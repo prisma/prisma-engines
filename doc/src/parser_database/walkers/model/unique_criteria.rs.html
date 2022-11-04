@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/model/unique_criteria.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>unique_criteria.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../parser_database/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/model/unique_criteria.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>unique_criteria.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../parser_database/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -60,67 +60,67 @@
 <span id="60">60</span>
 <span id="61">61</span>
 <span id="62">62</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
-    <span class="ident">types::FieldWithArgs</span>,
-    <span class="ident">walkers</span>::{<span class="ident">IndexFieldWalker</span>, <span class="ident">ScalarFieldWalker</span>},
-    <span class="ident">ParserDatabase</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    ast,
+    types::FieldWithArgs,
+    walkers::{IndexFieldWalker, ScalarFieldWalker},
+    ParserDatabase,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ModelWalker</span>;
+<span class="kw">use </span><span class="kw">super</span>::ModelWalker;
 
-<span class="doccomment">/// Describes any unique criteria in a model. Can either be a primary</span>
-<span class="doccomment">/// key, or a unique index.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UniqueCriteriaWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">FieldWithArgs</span>],
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
+<span class="doccomment">/// Describes any unique criteria in a model. Can either be a primary
+/// key, or a unique index.
+</span><span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>UniqueCriteriaWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_id: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>[FieldWithArgs],
+    <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">UniqueCriteriaWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">path</span>.<span class="ident">field_in_index</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; UniqueCriteriaWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub fn </span>fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = IndexFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + <span class="lifetime">&#39;db </span>{
+        <span class="self">self</span>.fields.iter().map(<span class="kw">move </span>|field| {
+            <span class="kw">let </span>field_id = field.path.field_in_index();
 
-            <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">path</span>.<span class="ident">type_holding_the_indexed_field</span>() {
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">scalar_field</span>(<span class="ident">field_id</span>);
-                    <span class="ident">IndexFieldWalker::new</span>(<span class="ident">walker</span>)
+            <span class="kw">match </span>field.path.type_holding_the_indexed_field() {
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">let </span>walker = <span class="self">self</span>.model().scalar_field(field_id);
+                    IndexFieldWalker::new(walker)
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">ctid</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_composite_type</span>(<span class="ident">ctid</span>).<span class="ident">field</span>(<span class="ident">field_id</span>);
-                    <span class="ident">IndexFieldWalker::new</span>(<span class="ident">walker</span>)
+                <span class="prelude-val">Some</span>(ctid) =&gt; {
+                    <span class="kw">let </span>walker = <span class="self">self</span>.db.walk_composite_type(ctid).field(field_id);
+                    IndexFieldWalker::new(walker)
                 }
             }
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_strict_criteria</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">has_optional_fields</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_unsupported_fields</span>()
+    <span class="kw">pub fn </span>is_strict_criteria(<span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.has_optional_fields() &amp;&amp; !<span class="self">self</span>.has_unsupported_fields()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_optional_fields</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">is_optional</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_optional_fields(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.fields().any(|field| field.is_optional())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_exactly_fields</span>(<span class="self">self</span>, <span class="ident">fields</span>: <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">fields</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="kw">pub fn </span>contains_exactly_fields(<span class="self">self</span>, fields: <span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.fields().len() != fields.len() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">fields</span>()
-            .<span class="ident">zip</span>(<span class="ident">fields</span>)
-            .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">left</span>, <span class="ident">right</span>)<span class="op">|</span> <span class="ident">left</span>.<span class="ident">field_id</span>() <span class="op">==</span> <span class="ident">right</span>.<span class="ident">field_id</span>())
+        <span class="self">self</span>.fields()
+            .zip(fields)
+            .all(|(left, right)| left.field_id() == right.field_id())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_unsupported_fields</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">is_unsupported</span>())
+    <span class="kw">pub fn </span>has_unsupported_fields(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.fields().any(|field| field.is_unsupported())
     }
 
-    <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">model_id</span>)
+    <span class="kw">fn </span>model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.model_id)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

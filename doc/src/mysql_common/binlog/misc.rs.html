@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/misc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>misc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/misc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>misc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -162,169 +162,169 @@
 <span id="162">162</span>
 <span id="163">163</span>
 <span id="164">164</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span> <span class="kw">as</span> <span class="ident">BE</span>, <span class="ident">ReadBytesExt</span>};
-<span class="kw">use</span> <span class="ident">saturating::Saturating</span> <span class="kw">as</span> <span class="ident">S</span>;
+</span><span class="kw">use </span>byteorder::{BigEndian <span class="kw">as </span>BE, ReadBytesExt};
+<span class="kw">use </span>saturating::Saturating <span class="kw">as </span>S;
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">cmp::min</span>,
-    <span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Write</span>},
+<span class="kw">use </span>std::{
+    cmp::min,
+    io::{<span class="self">self</span>, Write},
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::value::Value</span>;
+<span class="kw">use </span><span class="kw">crate</span>::value::Value;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TIMEF_INT_OFS</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">0x800000</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TIMEF_OFS</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">0x800000000000</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DATETIMEF_INT_OFS</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">0x8000000000</span>;
+<span class="kw">pub const </span>TIMEF_INT_OFS: i64 = <span class="number">0x800000</span>;
+<span class="kw">pub const </span>TIMEF_OFS: i64 = <span class="number">0x800000000000</span>;
+<span class="kw">pub const </span>DATETIMEF_INT_OFS: i64 = <span class="number">0x8000000000</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">my_packed_time_make_int</span>(<span class="ident">i</span>: <span class="ident">i64</span>) -&gt; <span class="ident">i64</span> {
-    ((<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">i64</span>
+<span class="kw">pub fn </span>my_packed_time_make_int(i: i64) -&gt; i64 {
+    ((i <span class="kw">as </span>u64) &lt;&lt; <span class="number">24</span>) <span class="kw">as </span>i64
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">my_packed_time_make</span>(<span class="ident">i</span>: <span class="ident">i64</span>, <span class="ident">f</span>: <span class="ident">i64</span>) -&gt; <span class="ident">i64</span> {
-    ((<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">i64</span> <span class="op">+</span> <span class="ident">f</span>
+<span class="kw">pub fn </span>my_packed_time_make(i: i64, f: i64) -&gt; i64 {
+    ((i <span class="kw">as </span>u64) &lt;&lt; <span class="number">24</span>) <span class="kw">as </span>i64 + f
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">my_time_packed_from_binary</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">io::Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">T</span>, <span class="ident">dec</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">dec</span> {
-        <span class="number">1</span> <span class="op">|</span> <span class="number">2</span> =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">intpart</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u24</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">-</span> <span class="ident">TIMEF_INT_OFS</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">frac</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">u32</span>;
-            <span class="kw">if</span> <span class="ident">intpart</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">frac</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="ident">intpart</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">frac</span> <span class="op">-</span><span class="op">=</span> <span class="number">0x100</span>;
+<span class="kw">pub fn </span>my_time_packed_from_binary&lt;T: io::Read&gt;(<span class="kw-2">mut </span>input: T, dec: u32) -&gt; io::Result&lt;i64&gt; {
+    <span class="kw">match </span>dec {
+        <span class="number">1 </span>| <span class="number">2 </span>=&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>intpart = input.read_u24::&lt;BE&gt;()<span class="question-mark">? </span><span class="kw">as </span>i64 - TIMEF_INT_OFS;
+            <span class="kw">let </span><span class="kw-2">mut </span>frac = input.read_u8()<span class="question-mark">? </span><span class="kw">as </span>u32;
+            <span class="kw">if </span>intpart &lt; <span class="number">0 </span>&amp;&amp; frac &gt; <span class="number">0 </span>{
+                intpart += <span class="number">1</span>;
+                frac -= <span class="number">0x100</span>;
             }
-            <span class="prelude-val">Ok</span>(<span class="ident">my_packed_time_make</span>(<span class="ident">intpart</span>, (<span class="ident">frac</span> <span class="kw">as</span> <span class="ident">i64</span>) <span class="op">*</span> <span class="number">10_000</span>))
+            <span class="prelude-val">Ok</span>(my_packed_time_make(intpart, (frac <span class="kw">as </span>i64) * <span class="number">10_000</span>))
         }
-        <span class="number">3</span> <span class="op">|</span> <span class="number">4</span> =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">intpart</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u24</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">-</span> <span class="ident">TIMEF_INT_OFS</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">frac</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i32</span>;
-            <span class="kw">if</span> <span class="ident">intpart</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">frac</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="ident">intpart</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">frac</span> <span class="op">-</span><span class="op">=</span> <span class="number">0x10000</span>;
+        <span class="number">3 </span>| <span class="number">4 </span>=&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>intpart = input.read_u24::&lt;BE&gt;()<span class="question-mark">? </span><span class="kw">as </span>i64 - TIMEF_INT_OFS;
+            <span class="kw">let </span><span class="kw-2">mut </span>frac = input.read_u16::&lt;BE&gt;()<span class="question-mark">? </span><span class="kw">as </span>i32;
+            <span class="kw">if </span>intpart &lt; <span class="number">0 </span>&amp;&amp; frac &gt; <span class="number">0 </span>{
+                intpart += <span class="number">1</span>;
+                frac -= <span class="number">0x10000</span>;
             }
-            <span class="prelude-val">Ok</span>(<span class="ident">my_packed_time_make</span>(<span class="ident">intpart</span>, (<span class="ident">frac</span> <span class="op">*</span> <span class="number">100</span>) <span class="kw">as</span> <span class="ident">i64</span>))
+            <span class="prelude-val">Ok</span>(my_packed_time_make(intpart, (frac * <span class="number">100</span>) <span class="kw">as </span>i64))
         }
-        <span class="number">5</span> <span class="op">|</span> <span class="number">6</span> =&gt; <span class="prelude-val">Ok</span>((<span class="ident">input</span>.<span class="ident">read_u48</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i64</span>) <span class="op">-</span> <span class="ident">TIMEF_OFS</span>),
-        <span class="kw">_</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u24</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">-</span> <span class="ident">TIMEF_INT_OFS</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">my_packed_time_make_int</span>(<span class="ident">i</span>))
+        <span class="number">5 </span>| <span class="number">6 </span>=&gt; <span class="prelude-val">Ok</span>((input.read_u48::&lt;BE&gt;()<span class="question-mark">? </span><span class="kw">as </span>i64) - TIMEF_OFS),
+        <span class="kw">_ </span>=&gt; {
+            <span class="kw">let </span>i = input.read_u24::&lt;BE&gt;()<span class="question-mark">? </span><span class="kw">as </span>i64 - TIMEF_INT_OFS;
+            <span class="prelude-val">Ok</span>(my_packed_time_make_int(i))
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">my_packed_time_get_int_part</span>(<span class="ident">i</span>: <span class="ident">i64</span>) -&gt; <span class="ident">i64</span> {
-    <span class="ident">i</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">24</span>
+<span class="kw">pub fn </span>my_packed_time_get_int_part(i: i64) -&gt; i64 {
+    i &gt;&gt; <span class="number">24
+</span>}
+
+<span class="kw">pub fn </span>my_packed_time_get_frac_part(i: i64) -&gt; i64 {
+    i % (<span class="number">1 </span>&lt;&lt; <span class="number">24</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">my_packed_time_get_frac_part</span>(<span class="ident">i</span>: <span class="ident">i64</span>) -&gt; <span class="ident">i64</span> {
-    <span class="ident">i</span> <span class="op">%</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>)
+<span class="kw">pub fn </span>time_from_packed(<span class="kw-2">mut </span>tmp: i64) -&gt; Value {
+    <span class="kw">let </span>neg = <span class="kw">if </span>tmp &lt; <span class="number">0 </span>{
+        tmp = -tmp;
+        <span class="bool-val">true
+    </span>} <span class="kw">else </span>{
+        <span class="bool-val">false
+    </span>};
+    <span class="kw">let </span>hms = my_packed_time_get_int_part(tmp);
+    <span class="kw">let </span>h = ((hms &gt;&gt; <span class="number">12</span>) <span class="kw">as </span>u32) % (<span class="number">1 </span>&lt;&lt; <span class="number">10</span>);
+    <span class="kw">let </span>m = ((hms &gt;&gt; <span class="number">6</span>) <span class="kw">as </span>u32) % (<span class="number">1 </span>&lt;&lt; <span class="number">6</span>);
+    <span class="kw">let </span>s = ((hms) <span class="kw">as </span>u32) % (<span class="number">1 </span>&lt;&lt; <span class="number">6</span>);
+    <span class="kw">let </span>u = my_packed_time_get_frac_part(tmp);
+    Value::Time(neg, <span class="number">0</span>, h <span class="kw">as </span>u8, m <span class="kw">as </span>u8, s <span class="kw">as </span>u8, u <span class="kw">as </span>u32)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time_from_packed</span>(<span class="kw-2">mut</span> <span class="ident">tmp</span>: <span class="ident">i64</span>) -&gt; <span class="ident">Value</span> {
-    <span class="kw">let</span> <span class="ident">neg</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">tmp</span> <span class="op">&lt;</span> <span class="number">0</span> {
-        <span class="ident">tmp</span> <span class="op">=</span> <span class="op">-</span><span class="ident">tmp</span>;
-        <span class="bool-val">true</span>
-    } <span class="kw">else</span> {
-        <span class="bool-val">false</span>
+<span class="kw">pub fn </span>my_datetime_packed_from_binary&lt;T: io::Read&gt;(<span class="kw-2">mut </span>input: T, dec: u32) -&gt; io::Result&lt;i64&gt; {
+    <span class="kw">let </span>intpart = (input.read_uint::&lt;BE&gt;(<span class="number">5</span>)<span class="question-mark">? </span><span class="kw">as </span>i64) - DATETIMEF_INT_OFS;
+    <span class="kw">let </span>frac = <span class="kw">match </span>dec {
+        <span class="number">1 </span>| <span class="number">2 </span>=&gt; (input.read_i8()<span class="question-mark">? </span><span class="kw">as </span>i32) * <span class="number">10_000</span>,
+        <span class="number">3 </span>| <span class="number">4 </span>=&gt; (input.read_i16::&lt;BE&gt;()<span class="question-mark">? </span><span class="kw">as </span>i32) * <span class="number">100</span>,
+        <span class="number">5 </span>| <span class="number">6 </span>=&gt; input.read_i24::&lt;BE&gt;()<span class="question-mark">?</span>,
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(my_packed_time_make_int(intpart)),
     };
-    <span class="kw">let</span> <span class="ident">hms</span> <span class="op">=</span> <span class="ident">my_packed_time_get_int_part</span>(<span class="ident">tmp</span>);
-    <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> ((<span class="ident">hms</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">12</span>) <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">%</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>);
-    <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> ((<span class="ident">hms</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">6</span>) <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">%</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>);
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> ((<span class="ident">hms</span>) <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">%</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>);
-    <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">my_packed_time_get_frac_part</span>(<span class="ident">tmp</span>);
-    <span class="ident">Value::Time</span>(<span class="ident">neg</span>, <span class="number">0</span>, <span class="ident">h</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">m</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">s</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">u</span> <span class="kw">as</span> <span class="ident">u32</span>)
+    <span class="prelude-val">Ok</span>(my_packed_time_make(intpart, frac <span class="kw">as </span>i64))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">my_datetime_packed_from_binary</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">io::Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">T</span>, <span class="ident">dec</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">intpart</span> <span class="op">=</span> (<span class="ident">input</span>.<span class="ident">read_uint</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>(<span class="number">5</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i64</span>) <span class="op">-</span> <span class="ident">DATETIMEF_INT_OFS</span>;
-    <span class="kw">let</span> <span class="ident">frac</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">dec</span> {
-        <span class="number">1</span> <span class="op">|</span> <span class="number">2</span> =&gt; (<span class="ident">input</span>.<span class="ident">read_i8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">*</span> <span class="number">10_000</span>,
-        <span class="number">3</span> <span class="op">|</span> <span class="number">4</span> =&gt; (<span class="ident">input</span>.<span class="ident">read_i16</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">*</span> <span class="number">100</span>,
-        <span class="number">5</span> <span class="op">|</span> <span class="number">6</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i24</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">my_packed_time_make_int</span>(<span class="ident">intpart</span>)),
-    };
-    <span class="prelude-val">Ok</span>(<span class="ident">my_packed_time_make</span>(<span class="ident">intpart</span>, <span class="ident">frac</span> <span class="kw">as</span> <span class="ident">i64</span>))
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datetime_from_packed</span>(<span class="kw-2">mut</span> <span class="ident">tmp</span>: <span class="ident">i64</span>) -&gt; <span class="ident">Value</span> {
-    <span class="kw">if</span> <span class="ident">tmp</span> <span class="op">&lt;</span> <span class="number">0</span> {
-        <span class="ident">tmp</span> <span class="op">=</span> <span class="op">-</span><span class="ident">tmp</span>;
+<span class="kw">pub fn </span>datetime_from_packed(<span class="kw-2">mut </span>tmp: i64) -&gt; Value {
+    <span class="kw">if </span>tmp &lt; <span class="number">0 </span>{
+        tmp = -tmp;
     }
-    <span class="kw">let</span> <span class="ident">usec</span> <span class="op">=</span> <span class="ident">my_packed_time_get_frac_part</span>(<span class="ident">tmp</span>);
-    <span class="kw">let</span> <span class="ident">ymdhms</span> <span class="op">=</span> <span class="ident">my_packed_time_get_int_part</span>(<span class="ident">tmp</span>);
+    <span class="kw">let </span>usec = my_packed_time_get_frac_part(tmp);
+    <span class="kw">let </span>ymdhms = my_packed_time_get_int_part(tmp);
 
-    <span class="kw">let</span> <span class="ident">ymd</span> <span class="op">=</span> <span class="ident">ymdhms</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">17</span>;
-    <span class="kw">let</span> <span class="ident">ym</span> <span class="op">=</span> <span class="ident">ymd</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">5</span>;
-    <span class="kw">let</span> <span class="ident">hms</span> <span class="op">=</span> <span class="ident">ymdhms</span> <span class="op">%</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>);
+    <span class="kw">let </span>ymd = ymdhms &gt;&gt; <span class="number">17</span>;
+    <span class="kw">let </span>ym = ymd &gt;&gt; <span class="number">5</span>;
+    <span class="kw">let </span>hms = ymdhms % (<span class="number">1 </span>&lt;&lt; <span class="number">17</span>);
 
-    <span class="kw">let</span> <span class="ident">day</span> <span class="op">=</span> <span class="ident">ymd</span> <span class="op">%</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>);
-    <span class="kw">let</span> <span class="ident">mon</span> <span class="op">=</span> <span class="ident">ym</span> <span class="op">%</span> <span class="number">13</span>;
-    <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> (<span class="ident">ym</span> <span class="op">/</span> <span class="number">13</span>) <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="kw">let </span>day = ymd % (<span class="number">1 </span>&lt;&lt; <span class="number">5</span>);
+    <span class="kw">let </span>mon = ym % <span class="number">13</span>;
+    <span class="kw">let </span>year = (ym / <span class="number">13</span>) <span class="kw">as </span>u32;
 
-    <span class="kw">let</span> <span class="ident">sec</span> <span class="op">=</span> <span class="ident">hms</span> <span class="op">%</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>);
-    <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> (<span class="ident">hms</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">6</span>) <span class="op">%</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>);
-    <span class="kw">let</span> <span class="ident">hour</span> <span class="op">=</span> (<span class="ident">hms</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">12</span>) <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="kw">let </span>sec = hms % (<span class="number">1 </span>&lt;&lt; <span class="number">6</span>);
+    <span class="kw">let </span>min = (hms &gt;&gt; <span class="number">6</span>) % (<span class="number">1 </span>&lt;&lt; <span class="number">6</span>);
+    <span class="kw">let </span>hour = (hms &gt;&gt; <span class="number">12</span>) <span class="kw">as </span>u32;
 
-    <span class="ident">Value::Date</span>(
-        <span class="ident">year</span> <span class="kw">as</span> <span class="ident">u16</span>,
-        <span class="ident">mon</span> <span class="kw">as</span> <span class="ident">u8</span>,
-        <span class="ident">day</span> <span class="kw">as</span> <span class="ident">u8</span>,
-        <span class="ident">hour</span> <span class="kw">as</span> <span class="ident">u8</span>,
-        <span class="ident">min</span> <span class="kw">as</span> <span class="ident">u8</span>,
-        <span class="ident">sec</span> <span class="kw">as</span> <span class="ident">u8</span>,
-        <span class="ident">usec</span> <span class="kw">as</span> <span class="ident">u32</span>,
+    Value::Date(
+        year <span class="kw">as </span>u16,
+        mon <span class="kw">as </span>u8,
+        day <span class="kw">as </span>u8,
+        hour <span class="kw">as </span>u8,
+        min <span class="kw">as </span>u8,
+        sec <span class="kw">as </span>u8,
+        usec <span class="kw">as </span>u32,
     )
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">my_timestamp_from_binary</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">io::Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">T</span>, <span class="ident">dec</span>: <span class="ident">u8</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">i32</span>, <span class="ident">i32</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">sec</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i32</span>;
-    <span class="kw">let</span> <span class="ident">usec</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">dec</span> {
-        <span class="number">1</span> <span class="op">|</span> <span class="number">2</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">*</span> <span class="number">10000</span>,
-        <span class="number">3</span> <span class="op">|</span> <span class="number">4</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i16</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">*</span> <span class="number">100</span>,
-        <span class="number">5</span> <span class="op">|</span> <span class="number">6</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i24</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
-        <span class="kw">_</span> =&gt; <span class="number">0</span>,
+<span class="kw">pub fn </span>my_timestamp_from_binary&lt;T: io::Read&gt;(<span class="kw-2">mut </span>input: T, dec: u8) -&gt; io::Result&lt;(i32, i32)&gt; {
+    <span class="kw">let </span>sec = input.read_u32::&lt;BE&gt;()<span class="question-mark">? </span><span class="kw">as </span>i32;
+    <span class="kw">let </span>usec = <span class="kw">match </span>dec {
+        <span class="number">1 </span>| <span class="number">2 </span>=&gt; input.read_i8()<span class="question-mark">? </span><span class="kw">as </span>i32 * <span class="number">10000</span>,
+        <span class="number">3 </span>| <span class="number">4 </span>=&gt; input.read_i16::&lt;BE&gt;()<span class="question-mark">? </span><span class="kw">as </span>i32 * <span class="number">100</span>,
+        <span class="number">5 </span>| <span class="number">6 </span>=&gt; input.read_i24::&lt;BE&gt;()<span class="question-mark">?</span>,
+        <span class="kw">_ </span>=&gt; <span class="number">0</span>,
     };
-    <span class="prelude-val">Ok</span>((<span class="ident">sec</span>, <span class="ident">usec</span>))
+    <span class="prelude-val">Ok</span>((sec, usec))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">LimitedWrite</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">limit</span>: <span class="ident">S</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">write</span>: <span class="ident">T</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>LimitedWrite&lt;T&gt; {
+    limit: S&lt;usize&gt;,
+    write: T,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">LimitedWrite</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">write</span>: <span class="ident">T</span>, <span class="ident">limit</span>: <span class="ident">S</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">limit</span>, <span class="ident">write</span> }
+<span class="kw">impl</span>&lt;T&gt; LimitedWrite&lt;T&gt; {
+    <span class="kw">pub fn </span>new(write: T, limit: S&lt;usize&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ limit, write }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Write</span><span class="op">&gt;</span> <span class="ident">Write</span> <span class="kw">for</span> <span class="ident">LimitedWrite</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">min</span>(<span class="ident">buf</span>.<span class="ident">len</span>(), <span class="self">self</span>.<span class="ident">limit</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..<span class="ident">limit</span>])<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">limit</span> <span class="op">-</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident">count</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">count</span>)
+<span class="kw">impl</span>&lt;T: Write&gt; Write <span class="kw">for </span>LimitedWrite&lt;T&gt; {
+    <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; io::Result&lt;usize&gt; {
+        <span class="kw">let </span>limit = min(buf.len(), <span class="self">self</span>.limit.<span class="number">0</span>);
+        <span class="kw">let </span>count = <span class="self">self</span>.write.write(<span class="kw-2">&amp;</span>buf[..limit])<span class="question-mark">?</span>;
+        <span class="self">self</span>.limit -= S(count);
+        <span class="prelude-val">Ok</span>(count)
     }
 
-    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">write</span>.<span class="ident">flush</span>()
-    }
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">LimitWrite</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="ident">Sized</span> {
-    <span class="kw">fn</span> <span class="ident">limit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">S</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">LimitedWrite</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">LimitedWrite::new</span>(<span class="self">self</span>, <span class="ident">limit</span>)
+    <span class="kw">fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
+        <span class="self">self</span>.write.flush()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Write</span><span class="op">&gt;</span> <span class="ident">LimitWrite</span> <span class="kw">for</span> <span class="ident">T</span> {}
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>LimitWrite: Write + Sized {
+    <span class="kw">fn </span>limit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, limit: S&lt;usize&gt;) -&gt; LimitedWrite&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt; {
+        LimitedWrite::new(<span class="self">self</span>, limit)
+    }
+}
+
+<span class="kw">impl</span>&lt;T: Write&gt; LimitWrite <span class="kw">for </span>T {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

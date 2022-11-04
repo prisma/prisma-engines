@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/convert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>convert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/convert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>convert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -48,55 +48,55 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">builders</span>, <span class="ident">InternalDataModel</span>, <span class="ident">InternalDataModelRef</span>};
-<span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{builders, InternalDataModel, InternalDataModelRef};
+<span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">convert</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">psl::ValidatedSchema</span>, <span class="ident">db_name</span>: <span class="ident">String</span>) -&gt; <span class="ident">InternalDataModelRef</span> {
-    <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">psl::lift</span>(<span class="ident">schema</span>);
-    <span class="kw">let</span> <span class="ident">relation_mode</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">relation_mode</span>();
+<span class="kw">pub fn </span>convert(schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema, db_name: String) -&gt; InternalDataModelRef {
+    <span class="kw">let </span>datamodel = psl::lift(schema);
+    <span class="kw">let </span>relation_mode = schema.relation_mode();
 
-    <span class="kw">let</span> <span class="ident">relation_placeholders</span> <span class="op">=</span> <span class="ident">builders::relation_placeholders</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>);
-    <span class="kw">let</span> <span class="ident">models</span> <span class="op">=</span> <span class="ident">builders::model_builders</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>, <span class="kw-2">&amp;</span><span class="ident">relation_placeholders</span>);
+    <span class="kw">let </span>relation_placeholders = builders::relation_placeholders(<span class="kw-2">&amp;</span>datamodel);
+    <span class="kw">let </span>models = builders::model_builders(<span class="kw-2">&amp;</span>datamodel, <span class="kw-2">&amp;</span>relation_placeholders);
 
-    <span class="comment">// relations can be influenced by the relation mode, e.g., to let an action conditionally become an alias</span>
-    <span class="comment">// for another action.</span>
-    <span class="kw">let</span> <span class="ident">relations</span> <span class="op">=</span> <span class="ident">builders::relation_builders</span>(<span class="kw-2">&amp;</span><span class="ident">relation_placeholders</span>, <span class="ident">relation_mode</span>);
+    <span class="comment">// relations can be influenced by the relation mode, e.g., to let an action conditionally become an alias
+    // for another action.
+    </span><span class="kw">let </span>relations = builders::relation_builders(<span class="kw-2">&amp;</span>relation_placeholders, relation_mode);
 
-    <span class="kw">let</span> <span class="ident">enums</span> <span class="op">=</span> <span class="ident">builders::convert_enums</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>);
-    <span class="kw">let</span> <span class="ident">composite_types</span> <span class="op">=</span> <span class="ident">builders::composite_type_builders</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>);
-    <span class="kw">let</span> <span class="ident">internal_data_model</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">InternalDataModel</span> {
-        <span class="ident">models</span>: <span class="ident">OnceCell::new</span>(),
-        <span class="ident">composite_types</span>: <span class="ident">OnceCell::new</span>(),
-        <span class="ident">relations</span>: <span class="ident">OnceCell::new</span>(),
-        <span class="ident">relation_fields</span>: <span class="ident">OnceCell::new</span>(),
-        <span class="ident">db_name</span>,
-        <span class="ident">enums</span>: <span class="ident">enums</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Arc::new</span>).<span class="ident">collect</span>(),
+    <span class="kw">let </span>enums = builders::convert_enums(<span class="kw-2">&amp;</span>datamodel);
+    <span class="kw">let </span>composite_types = builders::composite_type_builders(<span class="kw-2">&amp;</span>datamodel);
+    <span class="kw">let </span>internal_data_model = Arc::new(InternalDataModel {
+        models: OnceCell::new(),
+        composite_types: OnceCell::new(),
+        relations: OnceCell::new(),
+        relation_fields: OnceCell::new(),
+        db_name,
+        enums: enums.into_iter().map(Arc::new).collect(),
     });
 
-    <span class="kw">let</span> <span class="ident">composite_types</span> <span class="op">=</span> <span class="ident">builders::build_composites</span>(<span class="ident">composite_types</span>, <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">internal_data_model</span>));
-    <span class="ident">internal_data_model</span>.<span class="ident">composite_types</span>.<span class="ident">set</span>(<span class="ident">composite_types</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let </span>composite_types = builders::build_composites(composite_types, Arc::downgrade(<span class="kw-2">&amp;</span>internal_data_model));
+    internal_data_model.composite_types.set(composite_types).unwrap();
 
-    <span class="kw">let</span> <span class="ident">models</span> <span class="op">=</span> <span class="ident">models</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">mt</span><span class="op">|</span> {
-            <span class="ident">mt</span>.<span class="ident">build</span>(
-                <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">internal_data_model</span>),
-                <span class="ident">internal_data_model</span>.<span class="ident">composite_types</span>.<span class="ident">get</span>().<span class="ident">unwrap</span>(),
+    <span class="kw">let </span>models = models
+        .into_iter()
+        .map(|mt| {
+            mt.build(
+                Arc::downgrade(<span class="kw-2">&amp;</span>internal_data_model),
+                internal_data_model.composite_types.get().unwrap(),
             )
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="ident">internal_data_model</span>.<span class="ident">models</span>.<span class="ident">set</span>(<span class="ident">models</span>).<span class="ident">unwrap</span>();
+    internal_data_model.models.set(models).unwrap();
 
-    <span class="kw">let</span> <span class="ident">relations</span> <span class="op">=</span> <span class="ident">relations</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">rt</span><span class="op">|</span> <span class="ident">rt</span>.<span class="ident">build</span>(<span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">internal_data_model</span>)))
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>relations = relations
+        .into_iter()
+        .map(|rt| rt.build(Arc::downgrade(<span class="kw-2">&amp;</span>internal_data_model)))
+        .collect();
 
-    <span class="ident">internal_data_model</span>.<span class="ident">relations</span>.<span class="ident">set</span>(<span class="ident">relations</span>).<span class="ident">unwrap</span>();
-    <span class="ident">internal_data_model</span>.<span class="ident">finalize</span>();
-    <span class="ident">internal_data_model</span>
+    internal_data_model.relations.set(relations).unwrap();
+    internal_data_model.finalize();
+    internal_data_model
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

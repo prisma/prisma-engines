@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/document_symbols.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>document_symbols.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/document_symbols.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>document_symbols.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -130,137 +130,137 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">Location</span>, <span class="ident">PartialResultParams</span>, <span class="ident">Range</span>, <span class="ident">SymbolKind</span>, <span class="ident">SymbolKindCapability</span>, <span class="ident">TextDocumentIdentifier</span>,
-    <span class="ident">WorkDoneProgressParams</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    Location, PartialResultParams, Range, SymbolKind, SymbolKindCapability, TextDocumentIdentifier,
+    WorkDoneProgressParams,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">SymbolTag</span>, <span class="ident">TagSupport</span>};
+<span class="kw">use crate</span>::{SymbolTag, TagSupport};
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DocumentSymbolClientCapabilities</span> {
-    <span class="doccomment">/// This capability supports dynamic registration.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">dynamic_registration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DocumentSymbolClientCapabilities {
+    <span class="doccomment">/// This capability supports dynamic registration.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>dynamic_registration: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Specific capabilities for the `SymbolKind`.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">symbol_kind</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SymbolKindCapability</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specific capabilities for the `SymbolKind`.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>symbol_kind: <span class="prelude-ty">Option</span>&lt;SymbolKindCapability&gt;,
 
-    <span class="doccomment">/// The client support hierarchical document symbols.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">hierarchical_document_symbol_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The client support hierarchical document symbols.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>hierarchical_document_symbol_support: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The client supports tags on `SymbolInformation`. Tags are supported on</span>
-    <span class="doccomment">/// `DocumentSymbol` if `hierarchicalDocumentSymbolSupport` is set to true.</span>
-    <span class="doccomment">/// Clients supporting tags have to handle unknown tags gracefully.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// @since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">default</span>,
-        <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;TagSupport::deserialize_compat&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="ident">tag_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TagSupport</span><span class="op">&lt;</span><span class="ident">SymbolTag</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The client supports tags on `SymbolInformation`. Tags are supported on
+    /// `DocumentSymbol` if `hierarchicalDocumentSymbolSupport` is set to true.
+    /// Clients supporting tags have to handle unknown tags gracefully.
+    ///
+    /// @since 3.16.0
+    </span><span class="attribute">#[serde(
+        default,
+        skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>,
+        deserialize_with = <span class="string">&quot;TagSupport::deserialize_compat&quot;
+    </span>)]
+    </span><span class="kw">pub </span>tag_support: <span class="prelude-ty">Option</span>&lt;TagSupport&lt;SymbolTag&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DocumentSymbolResponse</span> {
-    <span class="ident">Flat</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SymbolInformation</span><span class="op">&gt;</span>),
-    <span class="ident">Nested</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DocumentSymbol</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>DocumentSymbolResponse {
+    Flat(Vec&lt;SymbolInformation&gt;),
+    Nested(Vec&lt;DocumentSymbol&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SymbolInformation</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DocumentSymbolResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">info</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SymbolInformation</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">DocumentSymbolResponse::Flat</span>(<span class="ident">info</span>)
+<span class="kw">impl </span>From&lt;Vec&lt;SymbolInformation&gt;&gt; <span class="kw">for </span>DocumentSymbolResponse {
+    <span class="kw">fn </span>from(info: Vec&lt;SymbolInformation&gt;) -&gt; <span class="self">Self </span>{
+        DocumentSymbolResponse::Flat(info)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DocumentSymbol</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DocumentSymbolResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">symbols</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DocumentSymbol</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">DocumentSymbolResponse::Nested</span>(<span class="ident">symbols</span>)
+<span class="kw">impl </span>From&lt;Vec&lt;DocumentSymbol&gt;&gt; <span class="kw">for </span>DocumentSymbolResponse {
+    <span class="kw">fn </span>from(symbols: Vec&lt;DocumentSymbol&gt;) -&gt; <span class="self">Self </span>{
+        DocumentSymbolResponse::Nested(symbols)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DocumentSymbolParams</span> {
-    <span class="doccomment">/// The text document.</span>
-    <span class="kw">pub</span> <span class="ident">text_document</span>: <span class="ident">TextDocumentIdentifier</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DocumentSymbolParams {
+    <span class="doccomment">/// The text document.
+    </span><span class="kw">pub </span>text_document: TextDocumentIdentifier,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_params</span>: <span class="ident">WorkDoneProgressParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_params: WorkDoneProgressParams,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">partial_result_params</span>: <span class="ident">PartialResultParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>partial_result_params: PartialResultParams,
 }
 
-<span class="doccomment">/// Represents programming constructs like variables, classes, interfaces etc.</span>
-<span class="doccomment">/// that appear in a document. Document symbols can be hierarchical and they have two ranges:</span>
-<span class="doccomment">/// one that encloses its definition and one that points to its most interesting range,</span>
-<span class="doccomment">/// e.g. the range of an identifier.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DocumentSymbol</span> {
-    <span class="doccomment">/// The name of this symbol.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// More detail for this symbol, e.g the signature of a function. If not provided the</span>
-    <span class="doccomment">/// name is used.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">detail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The kind of this symbol.</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">SymbolKind</span>,
-    <span class="doccomment">/// Tags for this completion item.</span>
-    <span class="doccomment">///  since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">tags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SymbolTag</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Indicates if this symbol is deprecated.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use tags instead&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">deprecated</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The range enclosing this symbol not including leading/trailing whitespace but everything else</span>
-    <span class="doccomment">/// like comments. This information is typically used to determine if the the clients cursor is</span>
-    <span class="doccomment">/// inside the symbol to reveal in the symbol in the UI.</span>
-    <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">Range</span>,
-    <span class="doccomment">/// The range that should be selected and revealed when this symbol is being picked, e.g the name of a function.</span>
-    <span class="doccomment">/// Must be contained by the the `range`.</span>
-    <span class="kw">pub</span> <span class="ident">selection_range</span>: <span class="ident">Range</span>,
-    <span class="doccomment">/// Children of this symbol, e.g. properties of a class.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">children</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DocumentSymbol</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represents programming constructs like variables, classes, interfaces etc.
+/// that appear in a document. Document symbols can be hierarchical and they have two ranges:
+/// one that encloses its definition and one that points to its most interesting range,
+/// e.g. the range of an identifier.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DocumentSymbol {
+    <span class="doccomment">/// The name of this symbol.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// More detail for this symbol, e.g the signature of a function. If not provided the
+    /// name is used.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>detail: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The kind of this symbol.
+    </span><span class="kw">pub </span>kind: SymbolKind,
+    <span class="doccomment">/// Tags for this completion item.
+    ///  since 3.16.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>tags: <span class="prelude-ty">Option</span>&lt;Vec&lt;SymbolTag&gt;&gt;,
+    <span class="doccomment">/// Indicates if this symbol is deprecated.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    #[deprecated(note = <span class="string">&quot;Use tags instead&quot;</span>)]
+    </span><span class="kw">pub </span>deprecated: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="doccomment">/// The range enclosing this symbol not including leading/trailing whitespace but everything else
+    /// like comments. This information is typically used to determine if the the clients cursor is
+    /// inside the symbol to reveal in the symbol in the UI.
+    </span><span class="kw">pub </span>range: Range,
+    <span class="doccomment">/// The range that should be selected and revealed when this symbol is being picked, e.g the name of a function.
+    /// Must be contained by the the `range`.
+    </span><span class="kw">pub </span>selection_range: Range,
+    <span class="doccomment">/// Children of this symbol, e.g. properties of a class.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>children: <span class="prelude-ty">Option</span>&lt;Vec&lt;DocumentSymbol&gt;&gt;,
 }
 
-<span class="doccomment">/// Represents information about programming constructs like variables, classes,</span>
-<span class="doccomment">/// interfaces etc.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SymbolInformation</span> {
-    <span class="doccomment">/// The name of this symbol.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Represents information about programming constructs like variables, classes,
+/// interfaces etc.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SymbolInformation {
+    <span class="doccomment">/// The name of this symbol.
+    </span><span class="kw">pub </span>name: String,
 
-    <span class="doccomment">/// The kind of this symbol.</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">SymbolKind</span>,
+    <span class="doccomment">/// The kind of this symbol.
+    </span><span class="kw">pub </span>kind: SymbolKind,
 
-    <span class="doccomment">/// Tags for this completion item.</span>
-    <span class="doccomment">///  since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">tags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SymbolTag</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Tags for this completion item.
+    ///  since 3.16.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>tags: <span class="prelude-ty">Option</span>&lt;Vec&lt;SymbolTag&gt;&gt;,
 
-    <span class="doccomment">/// Indicates if this symbol is deprecated.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use tags instead&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">deprecated</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Indicates if this symbol is deprecated.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    #[deprecated(note = <span class="string">&quot;Use tags instead&quot;</span>)]
+    </span><span class="kw">pub </span>deprecated: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The location of this symbol.</span>
-    <span class="kw">pub</span> <span class="ident">location</span>: <span class="ident">Location</span>,
+    <span class="doccomment">/// The location of this symbol.
+    </span><span class="kw">pub </span>location: Location,
 
-    <span class="doccomment">/// The name of the symbol containing this symbol.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">container_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The name of the symbol containing this symbol.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>container_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

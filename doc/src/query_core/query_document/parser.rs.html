@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_document/parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_document/parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -546,553 +546,553 @@
 <span id="546">546</span>
 <span id="547">547</span>
 <span id="548">548</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::schema</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">bigdecimal</span>::{<span class="ident">BigDecimal</span>, <span class="ident">ToPrimitive</span>};
-<span class="kw">use</span> <span class="ident">chrono::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">psl::dml::ValueGeneratorFn</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">collections::HashSet</span>, <span class="ident">convert::TryFrom</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">uuid::Uuid</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::schema::<span class="kw-2">*</span>;
+<span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
+<span class="kw">use </span>chrono::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>prisma_value::PrismaValue;
+<span class="kw">use </span>psl::dml::ValueGeneratorFn;
+<span class="kw">use </span>std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
+<span class="kw">use </span>uuid::Uuid;
 
-<span class="comment">// todo: validate is one of!</span>
+<span class="comment">// todo: validate is one of!
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryDocumentParser</span> {
-    <span class="doccomment">/// NOW() default value that&#39;s reused for all NOW() defaults on a single query</span>
-    <span class="ident">default_now</span>: <span class="ident">PrismaValue</span>,
+</span><span class="kw">pub struct </span>QueryDocumentParser {
+    <span class="doccomment">/// NOW() default value that&#39;s reused for all NOW() defaults on a single query
+    </span>default_now: PrismaValue,
 }
 
-<span class="kw">impl</span> <span class="ident">QueryDocumentParser</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">default_now</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">QueryDocumentParser</span> { <span class="ident">default_now</span> }
+<span class="kw">impl </span>QueryDocumentParser {
+    <span class="kw">pub fn </span>new(default_now: PrismaValue) -&gt; <span class="self">Self </span>{
+        QueryDocumentParser { default_now }
     }
 
-    <span class="doccomment">/// Parses and validates a set of selections against a schema (output) object.</span>
-    <span class="doccomment">/// On an output object, optional types designate whether or not an output field can be nulled.</span>
-    <span class="doccomment">/// In contrast, nullable and optional types on an input object are separate concepts.</span>
-    <span class="doccomment">/// The above is the reason we don&#39;t need to check nullability here, as it is done by the output</span>
-    <span class="doccomment">/// validation in the serialization step.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_object</span>(
+    <span class="doccomment">/// Parses and validates a set of selections against a schema (output) object.
+    /// On an output object, optional types designate whether or not an output field can be nulled.
+    /// In contrast, nullable and optional types on an input object are separate concepts.
+    /// The above is the reason we don&#39;t need to check nullability here, as it is done by the output
+    /// validation in the serialization step.
+    </span><span class="kw">pub fn </span>parse_object(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">parent_path</span>: <span class="ident">QueryPath</span>,
-        <span class="ident">selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">Selection</span>],
-        <span class="ident">schema_object</span>: <span class="kw-2">&amp;</span><span class="ident">ObjectTypeStrongRef</span>,
-    ) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">ParsedObject</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">parent_path</span>.<span class="ident">add</span>(<span class="ident">schema_object</span>.<span class="ident">identifier</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>());
+        parent_path: QueryPath,
+        selections: <span class="kw-2">&amp;</span>[Selection],
+        schema_object: <span class="kw-2">&amp;</span>ObjectTypeStrongRef,
+    ) -&gt; QueryParserResult&lt;ParsedObject&gt; {
+        <span class="kw">let </span>path = parent_path.add(schema_object.identifier.name().to_owned());
 
-        <span class="kw">if</span> <span class="ident">selections</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
-                <span class="ident">path</span>,
-                <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::FieldCountError</span>(<span class="ident">FieldCountError::new</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="number">0</span>)),
+        <span class="kw">if </span>selections.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(QueryParserError {
+                path,
+                error_kind: QueryParserErrorKind::FieldCountError(FieldCountError::new(<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="number">0</span>)),
             });
         }
 
-        <span class="ident">selections</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">selection</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">schema_object</span>.<span class="ident">find_field</span>(<span class="ident">selection</span>.<span class="ident">name</span>()) {
-                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">field</span>) =&gt; <span class="self">self</span>.<span class="ident">parse_field</span>(<span class="ident">path</span>.<span class="ident">clone</span>(), <span class="ident">selection</span>, <span class="ident">field</span>),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
-                    <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">add</span>(<span class="ident">selection</span>.<span class="ident">name</span>().<span class="ident">into</span>()),
-                    <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::FieldNotFoundError</span>,
+        selections
+            .iter()
+            .map(|selection| <span class="kw">match </span>schema_object.find_field(selection.name()) {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>field) =&gt; <span class="self">self</span>.parse_field(path.clone(), selection, field),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError {
+                    path: path.add(selection.name().into()),
+                    error_kind: QueryParserErrorKind::FieldNotFoundError,
                 }),
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">ParsedObject</span> { <span class="ident">fields</span> })
+            .collect::&lt;QueryParserResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()
+            .map(|fields| ParsedObject { fields })
     }
 
-    <span class="doccomment">/// Parses and validates a selection against a schema (output) field.</span>
-    <span class="kw">fn</span> <span class="ident">parse_field</span>(
+    <span class="doccomment">/// Parses and validates a selection against a schema (output) field.
+    </span><span class="kw">fn </span>parse_field(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">parent_path</span>: <span class="ident">QueryPath</span>,
-        <span class="ident">selection</span>: <span class="kw-2">&amp;</span><span class="ident">Selection</span>,
-        <span class="ident">schema_field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>,
-    ) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">FieldPair</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">parent_path</span>.<span class="ident">add</span>(<span class="ident">schema_field</span>.<span class="ident">name</span>.<span class="ident">clone</span>());
+        parent_path: QueryPath,
+        selection: <span class="kw-2">&amp;</span>Selection,
+        schema_field: <span class="kw-2">&amp;</span>OutputFieldRef,
+    ) -&gt; QueryParserResult&lt;FieldPair&gt; {
+        <span class="kw">let </span>path = parent_path.add(schema_field.name.clone());
 
-        <span class="comment">// Parse and validate all provided arguments for the field</span>
-        <span class="self">self</span>.<span class="ident">parse_arguments</span>(<span class="ident">path</span>.<span class="ident">clone</span>(), <span class="ident">schema_field</span>, <span class="ident">selection</span>.<span class="ident">arguments</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arguments</span><span class="op">|</span> {
-                <span class="comment">// If the output type of the field is an object type of any form, validate the sub selection as well.</span>
-                <span class="kw">let</span> <span class="ident">nested_fields</span> <span class="op">=</span> <span class="ident">schema_field</span>
-                    .<span class="ident">field_type</span>
-                    .<span class="ident">as_object_type</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">obj</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">parse_object</span>(<span class="ident">path</span>.<span class="ident">clone</span>(), <span class="ident">selection</span>.<span class="ident">nested_selections</span>(), <span class="kw-2">&amp;</span><span class="ident">obj</span>));
+        <span class="comment">// Parse and validate all provided arguments for the field
+        </span><span class="self">self</span>.parse_arguments(path.clone(), schema_field, selection.arguments())
+            .and_then(|arguments| {
+                <span class="comment">// If the output type of the field is an object type of any form, validate the sub selection as well.
+                </span><span class="kw">let </span>nested_fields = schema_field
+                    .field_type
+                    .as_object_type()
+                    .map(|obj| <span class="self">self</span>.parse_object(path.clone(), selection.nested_selections(), <span class="kw-2">&amp;</span>obj));
 
-                <span class="kw">let</span> <span class="ident">nested_fields</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">nested_fields</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sub</span><span class="question-mark">?</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="kw">let </span>nested_fields = <span class="kw">match </span>nested_fields {
+                    <span class="prelude-val">Some</span>(sub) =&gt; <span class="prelude-val">Some</span>(sub<span class="question-mark">?</span>),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
                 };
 
-                <span class="kw">let</span> <span class="ident">schema_field</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">schema_field</span>);
-                <span class="kw">let</span> <span class="ident">parsed_field</span> <span class="op">=</span> <span class="ident">ParsedField</span> {
-                    <span class="ident">name</span>: <span class="ident">selection</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(),
-                    <span class="ident">alias</span>: <span class="ident">selection</span>.<span class="ident">alias</span>().<span class="ident">clone</span>(),
-                    <span class="ident">arguments</span>,
-                    <span class="ident">nested_fields</span>,
+                <span class="kw">let </span>schema_field = Arc::clone(schema_field);
+                <span class="kw">let </span>parsed_field = ParsedField {
+                    name: selection.name().to_string(),
+                    alias: selection.alias().clone(),
+                    arguments,
+                    nested_fields,
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">FieldPair</span> {
-                    <span class="ident">parsed_field</span>,
-                    <span class="ident">schema_field</span>,
+                <span class="prelude-val">Ok</span>(FieldPair {
+                    parsed_field,
+                    schema_field,
                 })
             })
     }
 
-    <span class="doccomment">/// Parses and validates selection arguments against a schema defined field.</span>
-    <span class="kw">fn</span> <span class="ident">parse_arguments</span>(
+    <span class="doccomment">/// Parses and validates selection arguments against a schema defined field.
+    </span><span class="kw">fn </span>parse_arguments(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">parent_path</span>: <span class="ident">QueryPath</span>,
-        <span class="ident">schema_field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>,
-        <span class="ident">given_arguments</span>: <span class="kw-2">&amp;</span>[(<span class="ident">String</span>, <span class="ident">QueryValue</span>)],
-    ) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParsedArgument</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">left</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">schema_field</span>.<span class="ident">arguments</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">right</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">given_arguments</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="number">0</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">diff</span> <span class="op">=</span> <span class="ident">Diff::new</span>(<span class="kw-2">&amp;</span><span class="ident">left</span>, <span class="kw-2">&amp;</span><span class="ident">right</span>);
+        parent_path: QueryPath,
+        schema_field: <span class="kw-2">&amp;</span>OutputFieldRef,
+        given_arguments: <span class="kw-2">&amp;</span>[(String, QueryValue)],
+    ) -&gt; QueryParserResult&lt;Vec&lt;ParsedArgument&gt;&gt; {
+        <span class="kw">let </span>left: HashSet&lt;<span class="kw-2">&amp;</span>str&gt; = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
+        <span class="kw">let </span>right: HashSet&lt;<span class="kw-2">&amp;</span>str&gt; = given_arguments.iter().map(|arg| arg.<span class="number">0</span>.as_str()).collect();
+        <span class="kw">let </span>diff = Diff::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right);
 
-        <span class="comment">// All arguments that are not in the schema cause an error.</span>
-        <span class="ident">diff</span>.<span class="ident">right</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">extra_arg</span><span class="op">|</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
-                    <span class="ident">path</span>: <span class="ident">parent_path</span>.<span class="ident">add</span>(<span class="ident">extra_arg</span>.<span class="ident">to_string</span>()),
-                    <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::ArgumentNotFoundError</span>,
+        <span class="comment">// All arguments that are not in the schema cause an error.
+        </span>diff.right
+            .into_iter()
+            .map(|extra_arg| {
+                <span class="prelude-val">Err</span>(QueryParserError {
+                    path: parent_path.add(extra_arg.to_string()),
+                    error_kind: QueryParserErrorKind::ArgumentNotFoundError,
                 })
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            .collect::&lt;QueryParserResult&lt;Vec&lt;()&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="comment">// Check remaining arguments</span>
-        <span class="ident">schema_field</span>
-            .<span class="ident">arguments</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">schema_input_arg</span><span class="op">|</span> {
-                <span class="comment">// Match schema argument field to an argument field in the incoming document.</span>
-                <span class="kw">let</span> <span class="ident">selection_arg</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">QueryValue</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">given_arguments</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">given_argument</span><span class="op">|</span> <span class="ident">given_argument</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">schema_input_arg</span>.<span class="ident">name</span>)
-                    .<span class="ident">cloned</span>();
+        <span class="comment">// Check remaining arguments
+        </span>schema_field
+            .arguments
+            .iter()
+            .filter_map(|schema_input_arg| {
+                <span class="comment">// Match schema argument field to an argument field in the incoming document.
+                </span><span class="kw">let </span>selection_arg: <span class="prelude-ty">Option</span>&lt;(String, QueryValue)&gt; = given_arguments
+                    .iter()
+                    .find(|given_argument| given_argument.<span class="number">0 </span>== schema_input_arg.name)
+                    .cloned();
 
-                <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">parent_path</span>.<span class="ident">add</span>(<span class="ident">schema_input_arg</span>.<span class="ident">name</span>.<span class="ident">clone</span>());
+                <span class="kw">let </span>path = parent_path.add(schema_input_arg.name.clone());
 
-                <span class="comment">// If optional and not present ignore the field.</span>
-                <span class="comment">// If present, parse normally.</span>
-                <span class="comment">// If not present but required, throw a validation error.</span>
-                <span class="kw">match</span> <span class="ident">selection_arg</span> {
-                    <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">value</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">parse_input_value</span>(<span class="ident">path</span>, <span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">schema_input_arg</span>.<span class="ident">field_types</span>).<span class="ident">map</span>(
-                        <span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">ParsedArgument</span> {
-                            <span class="ident">name</span>: <span class="ident">schema_input_arg</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                            <span class="ident">value</span>,
+                <span class="comment">// If optional and not present ignore the field.
+                // If present, parse normally.
+                // If not present but required, throw a validation error.
+                </span><span class="kw">match </span>selection_arg {
+                    <span class="prelude-val">Some</span>((<span class="kw">_</span>, value)) =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.parse_input_value(path, value, <span class="kw-2">&amp;</span>schema_input_arg.field_types).map(
+                        |value| ParsedArgument {
+                            name: schema_input_arg.name.clone(),
+                            value,
                         },
                     )),
 
-                    <span class="prelude-val">None</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">schema_input_arg</span>.<span class="ident">is_required</span> =&gt; <span class="prelude-val">None</span>,
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
-                        <span class="ident">path</span>,
-                        <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::RequiredValueNotSetError</span>,
+                    <span class="prelude-val">None </span><span class="kw">if </span>!schema_input_arg.is_required =&gt; <span class="prelude-val">None</span>,
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(QueryParserError {
+                        path,
+                        error_kind: QueryParserErrorKind::RequiredValueNotSetError,
                     })),
                 }
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">ParsedArgument</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">collect</span>()
+            .collect::&lt;Vec&lt;QueryParserResult&lt;ParsedArgument&gt;&gt;&gt;()
+            .into_iter()
+            .collect()
     }
 
-    <span class="doccomment">/// Parses and validates a QueryValue against possible input types.</span>
-    <span class="doccomment">/// Matching is done in order of definition on the input type. First matching type wins.</span>
-    <span class="kw">fn</span> <span class="ident">parse_input_value</span>(
+    <span class="doccomment">/// Parses and validates a QueryValue against possible input types.
+    /// Matching is done in order of definition on the input type. First matching type wins.
+    </span><span class="kw">fn </span>parse_input_value(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">parent_path</span>: <span class="ident">QueryPath</span>,
-        <span class="ident">value</span>: <span class="ident">QueryValue</span>,
-        <span class="ident">possible_input_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">InputType</span>],
-    ) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+        parent_path: QueryPath,
+        value: QueryValue,
+        possible_input_types: <span class="kw-2">&amp;</span>[InputType],
+    ) -&gt; QueryParserResult&lt;ParsedInputValue&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>parse_results = <span class="macro">vec!</span>[];
 
-        <span class="kw">for</span> <span class="ident">input_type</span> <span class="kw">in</span> <span class="ident">possible_input_types</span> {
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="ident">input_type</span>) {
-                <span class="comment">// Null handling</span>
-                (<span class="ident">QueryValue::Null</span>, <span class="ident">InputType::Scalar</span>(<span class="ident">ScalarType::Null</span>)) =&gt; {
-                    <span class="prelude-val">Ok</span>(<span class="ident">ParsedInputValue::Single</span>(<span class="ident">PrismaValue::Null</span>))
+        <span class="kw">for </span>input_type <span class="kw">in </span>possible_input_types {
+            <span class="kw">let </span>value = value.clone();
+            <span class="kw">let </span>result = <span class="kw">match </span>(<span class="kw-2">&amp;</span>value, input_type) {
+                <span class="comment">// Null handling
+                </span>(QueryValue::Null, InputType::Scalar(ScalarType::Null)) =&gt; {
+                    <span class="prelude-val">Ok</span>(ParsedInputValue::Single(PrismaValue::Null))
                 }
-                (<span class="ident">QueryValue::Null</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
-                    <span class="ident">path</span>: <span class="ident">parent_path</span>.<span class="ident">clone</span>(),
-                    <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::RequiredValueNotSetError</span>,
+                (QueryValue::Null, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+                    path: parent_path.clone(),
+                    error_kind: QueryParserErrorKind::RequiredValueNotSetError,
                 }),
 
-                <span class="comment">// Scalar handling</span>
-                (<span class="kw">_</span>, <span class="ident">InputType::Scalar</span>(<span class="ident">scalar</span>)) =&gt; <span class="self">self</span>
-                    .<span class="ident">parse_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">parent_path</span>, <span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">scalar</span>)
-                    .<span class="ident">map</span>(<span class="ident">ParsedInputValue::Single</span>),
+                <span class="comment">// Scalar handling
+                </span>(<span class="kw">_</span>, InputType::Scalar(scalar)) =&gt; <span class="self">self
+                    </span>.parse_scalar(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>scalar)
+                    .map(ParsedInputValue::Single),
 
-                <span class="comment">// Enum handling</span>
-                (<span class="ident">QueryValue::Enum</span>(<span class="kw">_</span>), <span class="ident">InputType::Enum</span>(<span class="ident">et</span>)) =&gt; <span class="self">self</span>.<span class="ident">parse_enum</span>(<span class="kw-2">&amp;</span><span class="ident">parent_path</span>, <span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">et</span>.<span class="ident">into_arc</span>()),
-                (<span class="ident">QueryValue::String</span>(<span class="kw">_</span>), <span class="ident">InputType::Enum</span>(<span class="ident">et</span>)) =&gt; <span class="self">self</span>.<span class="ident">parse_enum</span>(<span class="kw-2">&amp;</span><span class="ident">parent_path</span>, <span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">et</span>.<span class="ident">into_arc</span>()),
-                (<span class="ident">QueryValue::Boolean</span>(<span class="kw">_</span>), <span class="ident">InputType::Enum</span>(<span class="ident">et</span>)) =&gt; <span class="self">self</span>.<span class="ident">parse_enum</span>(<span class="kw-2">&amp;</span><span class="ident">parent_path</span>, <span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">et</span>.<span class="ident">into_arc</span>()),
+                <span class="comment">// Enum handling
+                </span>(QueryValue::Enum(<span class="kw">_</span>), InputType::Enum(et)) =&gt; <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>et.into_arc()),
+                (QueryValue::String(<span class="kw">_</span>), InputType::Enum(et)) =&gt; <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>et.into_arc()),
+                (QueryValue::Boolean(<span class="kw">_</span>), InputType::Enum(et)) =&gt; <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>et.into_arc()),
 
-                <span class="comment">// List handling.</span>
-                (<span class="ident">QueryValue::List</span>(<span class="ident">values</span>), <span class="ident">InputType::List</span>(<span class="ident">l</span>)) =&gt; <span class="self">self</span>
-                    .<span class="ident">parse_list</span>(<span class="kw-2">&amp;</span><span class="ident">parent_path</span>, <span class="ident">values</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">l</span>)
-                    .<span class="ident">map</span>(<span class="ident">ParsedInputValue::List</span>),
+                <span class="comment">// List handling.
+                </span>(QueryValue::List(values), InputType::List(l)) =&gt; <span class="self">self
+                    </span>.parse_list(<span class="kw-2">&amp;</span>parent_path, values.clone(), <span class="kw-2">&amp;</span>l)
+                    .map(ParsedInputValue::List),
 
-                <span class="comment">// Object handling</span>
-                (<span class="ident">QueryValue::Object</span>(<span class="ident">o</span>), <span class="ident">InputType::Object</span>(<span class="ident">obj</span>)) =&gt; <span class="self">self</span>
-                    .<span class="ident">parse_input_object</span>(<span class="ident">parent_path</span>.<span class="ident">clone</span>(), <span class="ident">o</span>.<span class="ident">clone</span>(), <span class="ident">obj</span>.<span class="ident">into_arc</span>())
-                    .<span class="ident">map</span>(<span class="ident">ParsedInputValue::Map</span>),
+                <span class="comment">// Object handling
+                </span>(QueryValue::Object(o), InputType::Object(obj)) =&gt; <span class="self">self
+                    </span>.parse_input_object(parent_path.clone(), o.clone(), obj.into_arc())
+                    .map(ParsedInputValue::Map),
 
-                <span class="comment">// Invalid combinations</span>
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
-                    <span class="ident">path</span>: <span class="ident">parent_path</span>.<span class="ident">clone</span>(),
-                    <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::ValueTypeMismatchError</span> {
-                        <span class="ident">have</span>: <span class="ident">value</span>,
-                        <span class="ident">want</span>: <span class="ident">input_type</span>.<span class="ident">clone</span>(),
+                <span class="comment">// Invalid combinations
+                </span><span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError {
+                    path: parent_path.clone(),
+                    error_kind: QueryParserErrorKind::ValueTypeMismatchError {
+                        have: value,
+                        want: input_type.clone(),
                     },
                 }),
             };
 
-            <span class="ident">parse_results</span>.<span class="ident">push</span>(<span class="ident">result</span>);
+            parse_results.push(result);
         }
 
-        <span class="kw">let</span> (<span class="ident">successes</span>, <span class="kw-2">mut</span> <span class="ident">failures</span>): (<span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>) <span class="op">=</span> <span class="ident">parse_results</span>.<span class="ident">into_iter</span>().<span class="ident">partition</span>(<span class="op">|</span><span class="ident">result</span><span class="op">|</span> <span class="ident">result</span>.<span class="ident">is_ok</span>());
-        <span class="kw">if</span> <span class="ident">successes</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">if</span> <span class="ident">failures</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-                <span class="ident">failures</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>()
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
-                    <span class="ident">path</span>: <span class="ident">parent_path</span>,
-                    <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::InputUnionParseError</span> {
-                        <span class="ident">parsing_errors</span>: <span class="ident">failures</span>
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span> {
-                                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>,
+        <span class="kw">let </span>(successes, <span class="kw-2">mut </span>failures): (Vec&lt;<span class="kw">_</span>&gt;, Vec&lt;<span class="kw">_</span>&gt;) = parse_results.into_iter().partition(|result| result.is_ok());
+        <span class="kw">if </span>successes.is_empty() {
+            <span class="kw">if </span>failures.len() == <span class="number">1 </span>{
+                failures.pop().unwrap()
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Err</span>(QueryParserError {
+                    path: parent_path,
+                    error_kind: QueryParserErrorKind::InputUnionParseError {
+                        parsing_errors: failures
+                            .into_iter()
+                            .map(|err| <span class="kw">match </span>err {
+                                <span class="prelude-val">Err</span>(e) =&gt; e,
                                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Expecting to only have Result::Err in the `failures` vector.&quot;</span>),
                             })
-                            .<span class="ident">collect</span>(),
+                            .collect(),
                     },
                 })
             }
-        } <span class="kw">else</span> {
-            <span class="ident">successes</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()
+        } <span class="kw">else </span>{
+            successes.into_iter().next().unwrap()
         }
     }
 
-    <span class="doccomment">/// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.</span>
-    <span class="kw">fn</span> <span class="ident">parse_scalar</span>(
+    <span class="doccomment">/// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
+    </span><span class="kw">fn </span>parse_scalar(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">parent_path</span>: <span class="kw-2">&amp;</span><span class="ident">QueryPath</span>,
-        <span class="ident">value</span>: <span class="ident">QueryValue</span>,
-        <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-    ) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> (<span class="ident">value</span>, <span class="ident">scalar_type</span>.<span class="ident">clone</span>()) {
-            (<span class="ident">QueryValue::String</span>(<span class="ident">s</span>), <span class="ident">ScalarType::String</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)),
-            (<span class="ident">QueryValue::String</span>(<span class="ident">s</span>), <span class="ident">ScalarType::Xml</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Xml</span>(<span class="ident">s</span>)),
-            (<span class="ident">QueryValue::String</span>(<span class="ident">s</span>), <span class="ident">ScalarType::JsonList</span>) =&gt; <span class="self">self</span>.<span class="ident">parse_json_list</span>(<span class="ident">parent_path</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>),
-            (<span class="ident">QueryValue::String</span>(<span class="ident">s</span>), <span class="ident">ScalarType::Bytes</span>) =&gt; <span class="self">self</span>.<span class="ident">parse_bytes</span>(<span class="ident">parent_path</span>, <span class="ident">s</span>),
-            (<span class="ident">QueryValue::String</span>(<span class="ident">s</span>), <span class="ident">ScalarType::Decimal</span>) =&gt; <span class="self">self</span>.<span class="ident">parse_decimal</span>(<span class="ident">parent_path</span>, <span class="ident">s</span>),
-            (<span class="ident">QueryValue::String</span>(<span class="ident">s</span>), <span class="ident">ScalarType::BigInt</span>) =&gt; <span class="self">self</span>.<span class="ident">parse_bigint</span>(<span class="ident">parent_path</span>, <span class="ident">s</span>),
-            (<span class="ident">QueryValue::String</span>(<span class="ident">s</span>), <span class="ident">ScalarType::UUID</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">parse_uuid</span>(<span class="ident">parent_path</span>, <span class="ident">s</span>.<span class="ident">as_str</span>()).<span class="ident">map</span>(<span class="ident">PrismaValue::Uuid</span>)
+        parent_path: <span class="kw-2">&amp;</span>QueryPath,
+        value: QueryValue,
+        scalar_type: <span class="kw-2">&amp;</span>ScalarType,
+    ) -&gt; QueryParserResult&lt;PrismaValue&gt; {
+        <span class="kw">match </span>(value, scalar_type.clone()) {
+            (QueryValue::String(s), ScalarType::String) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::String(s)),
+            (QueryValue::String(s), ScalarType::Xml) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Xml(s)),
+            (QueryValue::String(s), ScalarType::JsonList) =&gt; <span class="self">self</span>.parse_json_list(parent_path, <span class="kw-2">&amp;</span>s),
+            (QueryValue::String(s), ScalarType::Bytes) =&gt; <span class="self">self</span>.parse_bytes(parent_path, s),
+            (QueryValue::String(s), ScalarType::Decimal) =&gt; <span class="self">self</span>.parse_decimal(parent_path, s),
+            (QueryValue::String(s), ScalarType::BigInt) =&gt; <span class="self">self</span>.parse_bigint(parent_path, s),
+            (QueryValue::String(s), ScalarType::UUID) =&gt; {
+                <span class="self">self</span>.parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
             }
-            (<span class="ident">QueryValue::String</span>(<span class="ident">s</span>), <span class="ident">ScalarType::Json</span>) =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Json</span>(<span class="self">self</span>.<span class="ident">parse_json</span>(<span class="ident">parent_path</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">s</span>)<span class="question-mark">?</span>))
+            (QueryValue::String(s), ScalarType::Json) =&gt; {
+                <span class="prelude-val">Ok</span>(PrismaValue::Json(<span class="self">self</span>.parse_json(parent_path, <span class="kw-2">&amp;</span>s).map(|<span class="kw">_</span>| s)<span class="question-mark">?</span>))
             }
-            (<span class="ident">QueryValue::String</span>(<span class="ident">s</span>), <span class="ident">ScalarType::DateTime</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">parse_datetime</span>(<span class="ident">parent_path</span>, <span class="ident">s</span>.<span class="ident">as_str</span>()).<span class="ident">map</span>(<span class="ident">PrismaValue::DateTime</span>)
+            (QueryValue::String(s), ScalarType::DateTime) =&gt; {
+                <span class="self">self</span>.parse_datetime(parent_path, s.as_str()).map(PrismaValue::DateTime)
             }
-            (<span class="ident">QueryValue::DateTime</span>(<span class="ident">s</span>), <span class="ident">ScalarType::DateTime</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="ident">s</span>)),
+            (QueryValue::DateTime(s), ScalarType::DateTime) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::DateTime(s)),
 
-            (<span class="ident">QueryValue::Int</span>(<span class="ident">i</span>), <span class="ident">ScalarType::Int</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)),
-            (<span class="ident">QueryValue::Int</span>(<span class="ident">i</span>), <span class="ident">ScalarType::Float</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from</span>(<span class="ident">i</span>))),
-            (<span class="ident">QueryValue::Int</span>(<span class="ident">i</span>), <span class="ident">ScalarType::Decimal</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from</span>(<span class="ident">i</span>))),
-            (<span class="ident">QueryValue::Int</span>(<span class="ident">i</span>), <span class="ident">ScalarType::BigInt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)),
+            (QueryValue::Int(i), ScalarType::Int) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Int(i)),
+            (QueryValue::Int(i), ScalarType::Float) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Float(BigDecimal::from(i))),
+            (QueryValue::Int(i), ScalarType::Decimal) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Float(BigDecimal::from(i))),
+            (QueryValue::Int(i), ScalarType::BigInt) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::BigInt(i)),
 
-            (<span class="ident">QueryValue::Float</span>(<span class="ident">f</span>), <span class="ident">ScalarType::Float</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)),
-            (<span class="ident">QueryValue::Float</span>(<span class="ident">f</span>), <span class="ident">ScalarType::Decimal</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)),
-            (<span class="ident">QueryValue::Float</span>(<span class="ident">f</span>), <span class="ident">ScalarType::Int</span>) =&gt; <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">to_i64</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">converted</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">converted</span>)),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError::new</span>(<span class="ident">parent_path</span>.<span class="ident">clone</span>(), <span class="ident">QueryParserErrorKind::ValueFitError</span>(
-                            <span class="macro">format!</span>(<span class="string">&quot;Unable to fit float value (or large JS integer serialized in exponent notation) &#39;{}&#39; into a 64 Bit signed integer for field &#39;{}&#39;. If you&#39;re trying to store large integers, consider using `BigInt`.&quot;</span>, <span class="ident">f</span>, <span class="ident">parent_path</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>())))),
+            (QueryValue::Float(f), ScalarType::Float) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Float(f)),
+            (QueryValue::Float(f), ScalarType::Decimal) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Float(f)),
+            (QueryValue::Float(f), ScalarType::Int) =&gt; <span class="kw">match </span>f.to_i64() {
+                <span class="prelude-val">Some</span>(converted) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Int(converted)),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError::new(parent_path.clone(), QueryParserErrorKind::ValueFitError(
+                            <span class="macro">format!</span>(<span class="string">&quot;Unable to fit float value (or large JS integer serialized in exponent notation) &#39;{}&#39; into a 64 Bit signed integer for field &#39;{}&#39;. If you&#39;re trying to store large integers, consider using `BigInt`.&quot;</span>, f, parent_path.last().unwrap())))),
             },
 
-            (<span class="ident">QueryValue::Boolean</span>(<span class="ident">b</span>), <span class="ident">ScalarType::Boolean</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)),
+            (QueryValue::Boolean(b), ScalarType::Boolean) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Boolean(b)),
 
-            <span class="comment">// All other combinations are value type mismatches.</span>
-            (<span class="ident">qv</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
-                <span class="ident">path</span>: <span class="ident">parent_path</span>.<span class="ident">clone</span>(),
-                <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::ValueTypeMismatchError</span> {
-                    <span class="ident">have</span>: <span class="ident">qv</span>,
-                    <span class="ident">want</span>: <span class="ident">InputType::Scalar</span>(<span class="ident">scalar_type</span>.<span class="ident">clone</span>()),
+            <span class="comment">// All other combinations are value type mismatches.
+            </span>(qv, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+                path: parent_path.clone(),
+                error_kind: QueryParserErrorKind::ValueTypeMismatchError {
+                    have: qv,
+                    want: InputType::Scalar(scalar_type.clone()),
                 },
             }),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_datetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">QueryPath</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">DateTime::parse_from_rfc3339</span>(<span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">QueryParserError</span> {
-            <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">clone</span>(),
-            <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::ValueParseError</span>(<span class="macro">format!</span>(
+    <span class="kw">fn </span>parse_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: <span class="kw-2">&amp;</span>str) -&gt; QueryParserResult&lt;DateTime&lt;FixedOffset&gt;&gt; {
+        DateTime::parse_from_rfc3339(s).map_err(|err| QueryParserError {
+            path: path.clone(),
+            error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(
                 <span class="string">&quot;Invalid DateTime: &#39;{}&#39; (must be ISO 8601 compatible). Underlying error: {}&quot;</span>,
-                <span class="ident">s</span>, <span class="ident">err</span>
+                s, err
             )),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">QueryPath</span>, <span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="ident">prisma_value::decode_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)
-            .<span class="ident">map</span>(<span class="ident">PrismaValue::Bytes</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">QueryParserError</span> {
-                <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">clone</span>(),
-                <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::ValueParseError</span>(<span class="macro">format!</span>(
+    <span class="kw">fn </span>parse_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: String) -&gt; QueryParserResult&lt;PrismaValue&gt; {
+        prisma_value::decode_bytes(<span class="kw-2">&amp;</span>s)
+            .map(PrismaValue::Bytes)
+            .map_err(|<span class="kw">_</span>| QueryParserError {
+                path: path.clone(),
+                error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(
                     <span class="string">&quot;&#39;{}&#39; is not a valid base64 encoded string.&quot;</span>,
-                    <span class="ident">s</span>
+                    s
                 )),
             })
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_decimal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">QueryPath</span>, <span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="ident">BigDecimal::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)
-            .<span class="ident">map</span>(<span class="ident">PrismaValue::Float</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">QueryParserError</span> {
-                <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">clone</span>(),
-                <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::ValueParseError</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39; is not a valid decimal string&quot;</span>, <span class="ident">s</span>)),
+    <span class="kw">fn </span>parse_decimal(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: String) -&gt; QueryParserResult&lt;PrismaValue&gt; {
+        BigDecimal::from_str(<span class="kw-2">&amp;</span>s)
+            .map(PrismaValue::Float)
+            .map_err(|<span class="kw">_</span>| QueryParserError {
+                path: path.clone(),
+                error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39; is not a valid decimal string&quot;</span>, s)),
             })
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_bigint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">QueryPath</span>, <span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">PrismaValue::BigInt</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">QueryParserError</span> {
-            <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">clone</span>(),
-            <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::ValueParseError</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39; is not a valid big integer string&quot;</span>, <span class="ident">s</span>)),
+    <span class="kw">fn </span>parse_bigint(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: String) -&gt; QueryParserResult&lt;PrismaValue&gt; {
+        s.parse::&lt;i64&gt;().map(PrismaValue::BigInt).map_err(|<span class="kw">_</span>| QueryParserError {
+            path: path.clone(),
+            error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39; is not a valid big integer string&quot;</span>, s)),
         })
     }
 
-    <span class="comment">// [DTODO] This is likely incorrect or at least using the wrong abstractions.</span>
-    <span class="kw">fn</span> <span class="ident">parse_json_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">QueryPath</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_json</span>(<span class="ident">path</span>, <span class="ident">s</span>)<span class="question-mark">?</span>;
+    <span class="comment">// [DTODO] This is likely incorrect or at least using the wrong abstractions.
+    </span><span class="kw">fn </span>parse_json_list(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: <span class="kw-2">&amp;</span>str) -&gt; QueryParserResult&lt;PrismaValue&gt; {
+        <span class="kw">let </span>json = <span class="self">self</span>.parse_json(path, s)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">json</span>.<span class="ident">as_array</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">QueryParserError</span> {
-            <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">clone</span>(),
-            <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::AssertionError</span>(<span class="string">&quot;JSON parameter needs to be an array&quot;</span>.<span class="ident">into</span>()),
+        <span class="kw">let </span>values = json.as_array().ok_or_else(|| QueryParserError {
+            path: path.clone(),
+            error_kind: QueryParserErrorKind::AssertionError(<span class="string">&quot;JSON parameter needs to be an array&quot;</span>.into()),
         })<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prisma_values</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">values</span>.<span class="ident">len</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>prisma_values = Vec::with_capacity(values.len());
 
-        <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">pv</span> <span class="op">=</span> <span class="ident">PrismaValue::try_from</span>(<span class="ident">v</span>.<span class="ident">clone</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">QueryParserError</span> {
-                <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">clone</span>(),
-                <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::AssertionError</span>(<span class="string">&quot;Nested JSON arguments are not supported&quot;</span>.<span class="ident">into</span>()),
+        <span class="kw">for </span>v <span class="kw">in </span>values.iter() {
+            <span class="kw">let </span>pv = PrismaValue::try_from(v.clone()).map_err(|<span class="kw">_</span>| QueryParserError {
+                path: path.clone(),
+                error_kind: QueryParserErrorKind::AssertionError(<span class="string">&quot;Nested JSON arguments are not supported&quot;</span>.into()),
             })<span class="question-mark">?</span>;
 
-            <span class="ident">prisma_values</span>.<span class="ident">push</span>(<span class="ident">pv</span>);
+            prisma_values.push(pv);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::List</span>(<span class="ident">prisma_values</span>))
+        <span class="prelude-val">Ok</span>(PrismaValue::List(prisma_values))
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">QueryPath</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
-        <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">QueryParserError</span> {
-            <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">clone</span>(),
-            <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::ValueParseError</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid json: {}&quot;</span>, <span class="ident">err</span>)),
+    <span class="kw">fn </span>parse_json(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: <span class="kw-2">&amp;</span>str) -&gt; QueryParserResult&lt;serde_json::Value&gt; {
+        serde_json::from_str(s).map_err(|err| QueryParserError {
+            path: path.clone(),
+            error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(<span class="string">&quot;Invalid json: {}&quot;</span>, err)),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_uuid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">QueryPath</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> {
-        <span class="ident">Uuid::parse_str</span>(<span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">QueryParserError</span> {
-            <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">clone</span>(),
-            <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::ValueParseError</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid UUID: {}&quot;</span>, <span class="ident">err</span>)),
+    <span class="kw">fn </span>parse_uuid(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: <span class="kw-2">&amp;</span>str) -&gt; QueryParserResult&lt;Uuid&gt; {
+        Uuid::parse_str(s).map_err(|err| QueryParserError {
+            path: path.clone(),
+            error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(<span class="string">&quot;Invalid UUID: {}&quot;</span>, err)),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_list</span>(
+    <span class="kw">fn </span>parse_list(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">QueryPath</span>,
-        <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryValue</span><span class="op">&gt;</span>,
-        <span class="ident">value_type</span>: <span class="kw-2">&amp;</span><span class="ident">InputType</span>,
-    ) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">values</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">parse_input_value</span>(<span class="ident">path</span>.<span class="ident">clone</span>(), <span class="ident">val</span>, <span class="kw-2">&amp;</span>[<span class="ident">value_type</span>.<span class="ident">clone</span>()]))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+        path: <span class="kw-2">&amp;</span>QueryPath,
+        values: Vec&lt;QueryValue&gt;,
+        value_type: <span class="kw-2">&amp;</span>InputType,
+    ) -&gt; QueryParserResult&lt;Vec&lt;ParsedInputValue&gt;&gt; {
+        values
+            .into_iter()
+            .map(|val| <span class="self">self</span>.parse_input_value(path.clone(), val, <span class="kw-2">&amp;</span>[value_type.clone()]))
+            .collect::&lt;QueryParserResult&lt;Vec&lt;ParsedInputValue&gt;&gt;&gt;()
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">QueryPath</span>, <span class="ident">val</span>: <span class="ident">QueryValue</span>, <span class="ident">typ</span>: <span class="kw-2">&amp;</span><span class="ident">EnumTypeRef</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">val</span> {
-            <span class="ident">QueryValue::Enum</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-            <span class="ident">QueryValue::String</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-            <span class="ident">QueryValue::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="kw">if</span> <span class="ident">b</span> { <span class="string">&quot;true&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;false&quot;</span> }.<span class="ident">to_owned</span>(), <span class="comment">// Case where a bool was misinterpreted as constant literal</span>
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
-                    <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">clone</span>(),
-                    <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::ValueParseError</span>(<span class="macro">format!</span>(
+    <span class="kw">fn </span>parse_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, val: QueryValue, typ: <span class="kw-2">&amp;</span>EnumTypeRef) -&gt; QueryParserResult&lt;ParsedInputValue&gt; {
+        <span class="kw">let </span>raw = <span class="kw">match </span>val {
+            QueryValue::Enum(s) =&gt; s,
+            QueryValue::String(s) =&gt; s,
+            QueryValue::Boolean(b) =&gt; <span class="kw">if </span>b { <span class="string">&quot;true&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;false&quot; </span>}.to_owned(), <span class="comment">// Case where a bool was misinterpreted as constant literal
+            </span><span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(QueryParserError {
+                    path: path.clone(),
+                    error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(
                         <span class="string">&quot;Unexpected Enum value type {:?} for enum {}&quot;</span>,
-                        <span class="ident">val</span>,
-                        <span class="ident">typ</span>.<span class="ident">name</span>()
+                        val,
+                        typ.name()
                     )),
                 });
             }
         };
 
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="op">|</span><span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
-                <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">clone</span>(),
-                <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::ValueParseError</span>(<span class="macro">format!</span>(
+        <span class="kw">let </span>err = |name: <span class="kw-2">&amp;</span>str| {
+            <span class="prelude-val">Err</span>(QueryParserError {
+                path: path.clone(),
+                error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(
                     <span class="string">&quot;Enum value &#39;{}&#39; is invalid for enum type {}&quot;</span>,
-                    <span class="ident">raw</span>, <span class="ident">name</span>
+                    raw, name
                 )),
             })
         };
 
-        <span class="kw">match</span> <span class="ident">typ</span>.<span class="ident">borrow</span>() {
-            <span class="ident">EnumType::Database</span>(<span class="ident">db</span>) =&gt; <span class="kw">match</span> <span class="ident">db</span>.<span class="ident">map_input_value</span>(<span class="kw-2">&amp;</span><span class="ident">raw</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParsedInputValue::Single</span>(<span class="ident">value</span>)),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">err</span>(<span class="ident">db</span>.<span class="ident">identifier</span>().<span class="ident">name</span>()),
+        <span class="kw">match </span>typ.borrow() {
+            EnumType::Database(db) =&gt; <span class="kw">match </span>db.map_input_value(<span class="kw-2">&amp;</span>raw) {
+                <span class="prelude-val">Some</span>(value) =&gt; <span class="prelude-val">Ok</span>(ParsedInputValue::Single(value)),
+                <span class="prelude-val">None </span>=&gt; err(db.identifier().name()),
             },
-            <span class="ident">EnumType::String</span>(<span class="ident">s</span>) =&gt; <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">value_for</span>(<span class="ident">raw</span>.<span class="ident">as_str</span>()) {
-                <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParsedInputValue::Single</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">val</span>.<span class="ident">to_owned</span>()))),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">err</span>(<span class="ident">s</span>.<span class="ident">identifier</span>().<span class="ident">name</span>()),
+            EnumType::String(s) =&gt; <span class="kw">match </span>s.value_for(raw.as_str()) {
+                <span class="prelude-val">Some</span>(val) =&gt; <span class="prelude-val">Ok</span>(ParsedInputValue::Single(PrismaValue::Enum(val.to_owned()))),
+                <span class="prelude-val">None </span>=&gt; err(s.identifier().name()),
             },
-            <span class="ident">EnumType::FieldRef</span>(<span class="ident">f</span>) =&gt; <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">value_for</span>(<span class="ident">raw</span>.<span class="ident">as_str</span>()) {
-                <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParsedInputValue::ScalarField</span>(<span class="ident">value</span>.<span class="ident">clone</span>())),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">err</span>(<span class="ident">f</span>.<span class="ident">identifier</span>().<span class="ident">name</span>()),
+            EnumType::FieldRef(f) =&gt; <span class="kw">match </span>f.value_for(raw.as_str()) {
+                <span class="prelude-val">Some</span>(value) =&gt; <span class="prelude-val">Ok</span>(ParsedInputValue::ScalarField(value.clone())),
+                <span class="prelude-val">None </span>=&gt; err(f.identifier().name()),
             },
         }
     }
 
-    <span class="doccomment">/// Parses and validates an input object recursively.</span>
-    <span class="kw">fn</span> <span class="ident">parse_input_object</span>(
+    <span class="doccomment">/// Parses and validates an input object recursively.
+    </span><span class="kw">fn </span>parse_input_object(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">parent_path</span>: <span class="ident">QueryPath</span>,
-        <span class="ident">object</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">QueryValue</span><span class="op">&gt;</span>,
-        <span class="ident">schema_object</span>: <span class="ident">InputObjectTypeStrongRef</span>,
-    ) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">ParsedInputMap</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">parent_path</span>.<span class="ident">add</span>(<span class="ident">schema_object</span>.<span class="ident">identifier</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>());
-        <span class="kw">let</span> <span class="ident">left</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">schema_object</span>
-            .<span class="ident">get_fields</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())
-            .<span class="ident">collect</span>();
+        parent_path: QueryPath,
+        object: IndexMap&lt;String, QueryValue&gt;,
+        schema_object: InputObjectTypeStrongRef,
+    ) -&gt; QueryParserResult&lt;ParsedInputMap&gt; {
+        <span class="kw">let </span>path = parent_path.add(schema_object.identifier.name().to_owned());
+        <span class="kw">let </span>left: HashSet&lt;<span class="kw-2">&amp;</span>str&gt; = schema_object
+            .get_fields()
+            .iter()
+            .map(|field| field.name.as_str())
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">right</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">object</span>.<span class="ident">keys</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">diff</span> <span class="op">=</span> <span class="ident">Diff::new</span>(<span class="kw-2">&amp;</span><span class="ident">left</span>, <span class="kw-2">&amp;</span><span class="ident">right</span>);
+        <span class="kw">let </span>right: HashSet&lt;<span class="kw-2">&amp;</span>str&gt; = object.keys().map(|k| k.as_str()).collect();
+        <span class="kw">let </span>diff = Diff::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right);
 
-        <span class="comment">// First, check that all fields **not** provided in the query (left diff) are optional,</span>
-        <span class="comment">// i.e. run the validation but disregard the result, or have defaults, in which case the</span>
-        <span class="comment">// value pair gets added to the result.</span>
-        <span class="kw">let</span> <span class="ident">defaults</span> <span class="op">=</span> <span class="ident">diff</span>
-            .<span class="ident">left</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">unset_field_name</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">schema_object</span>.<span class="ident">find_field</span>(<span class="kw-2">*</span><span class="ident">unset_field_name</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">add</span>(<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>());
+        <span class="comment">// First, check that all fields **not** provided in the query (left diff) are optional,
+        // i.e. run the validation but disregard the result, or have defaults, in which case the
+        // value pair gets added to the result.
+        </span><span class="kw">let </span>defaults = diff
+            .left
+            .into_iter()
+            .filter_map(|unset_field_name| {
+                <span class="kw">let </span>field = schema_object.find_field(<span class="kw-2">*</span>unset_field_name).unwrap();
+                <span class="kw">let </span>path = path.add(field.name.clone());
 
-                <span class="comment">// If the input field has a default, add the default to the result.</span>
-                <span class="comment">// If it&#39;s not optional and has no default, a required field has not been provided.</span>
-                <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">default_value</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">default_value</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">query_value</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">default_value</span>.<span class="ident">kind</span> {
-                            <span class="ident">psl::dml::DefaultKind::Expression</span>(<span class="kw-2">ref</span> <span class="ident">expr</span>)
-                                <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">expr</span>.<span class="ident">generator</span>(), <span class="ident">ValueGeneratorFn::Now</span>) =&gt;
+                <span class="comment">// If the input field has a default, add the default to the result.
+                // If it&#39;s not optional and has no default, a required field has not been provided.
+                </span><span class="kw">match </span><span class="kw-2">&amp;</span>field.default_value {
+                    <span class="prelude-val">Some</span>(default_value) =&gt; {
+                        <span class="kw">let </span>query_value = <span class="kw">match </span><span class="kw-2">&amp;</span>default_value.kind {
+                            psl::dml::DefaultKind::Expression(<span class="kw-2">ref </span>expr)
+                                <span class="kw">if </span><span class="macro">matches!</span>(expr.generator(), ValueGeneratorFn::Now) =&gt;
                             {
-                                <span class="self">self</span>.<span class="ident">default_now</span>.<span class="ident">clone</span>().<span class="ident">into</span>()
+                                <span class="self">self</span>.default_now.clone().into()
                             }
-                            <span class="kw">_</span> =&gt; <span class="ident">default_value</span>.<span class="ident">get</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
+                            <span class="kw">_ </span>=&gt; default_value.get()<span class="question-mark">?</span>.into(),
                         };
 
-                        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">parse_input_value</span>(<span class="ident">path</span>, <span class="ident">query_value</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">field_types</span>) {
-                            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">value</span>))),
-                            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)),
+                        <span class="kw">match </span><span class="self">self</span>.parse_input_value(path, query_value, <span class="kw-2">&amp;</span>field.field_types) {
+                            <span class="prelude-val">Ok</span>(value) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((field.name.clone(), value))),
+                            <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)),
                         }
                     }
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_required</span> {
-                            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">QueryParserErrorKind::RequiredValueNotSetError</span>;
-                            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">QueryParserError::new</span>(<span class="ident">path</span>, <span class="ident">kind</span>)))
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">None</span>
-                        }
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="kw">if </span>field.is_required {
+                            <span class="kw">let </span>kind = QueryParserErrorKind::RequiredValueNotSetError;
+                            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(QueryParserError::new(path, kind)))
+                        } <span class="kw">else </span>{
+                            <span class="prelude-val">None
+                        </span>}
                     }
                 }
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            .collect::&lt;QueryParserResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="comment">// Checks all fields on the provided input object. This will catch extra</span>
-        <span class="comment">// or unknown fields and parsing errors.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">object</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">schema_object</span>.<span class="ident">find_field</span>(<span class="ident">k</span>.<span class="ident">as_str</span>()).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">QueryParserErrorKind::FieldNotFoundError</span>;
-                    <span class="ident">QueryParserError::new</span>(<span class="ident">path</span>.<span class="ident">add</span>(<span class="ident">k</span>.<span class="ident">clone</span>()), <span class="ident">kind</span>)
+        <span class="comment">// Checks all fields on the provided input object. This will catch extra
+        // or unknown fields and parsing errors.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>map = object
+            .into_iter()
+            .map(|(k, v)| {
+                <span class="kw">let </span>field = schema_object.find_field(k.as_str()).ok_or_else(|| {
+                    <span class="kw">let </span>kind = QueryParserErrorKind::FieldNotFoundError;
+                    QueryParserError::new(path.add(k.clone()), kind)
                 })<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">add</span>(<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>());
-                <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_input_value</span>(<span class="ident">path</span>, <span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">field_types</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>path = path.add(field.name.clone());
+                <span class="kw">let </span>parsed = <span class="self">self</span>.parse_input_value(path, v, <span class="kw-2">&amp;</span>field.field_types)<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>((<span class="ident">k</span>, <span class="ident">parsed</span>))
+                <span class="prelude-val">Ok</span>((k, parsed))
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">ParsedInputMap</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            .collect::&lt;QueryParserResult&lt;ParsedInputMap&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="ident">map</span>.<span class="ident">extend</span>(<span class="ident">defaults</span>.<span class="ident">into_iter</span>());
+        map.extend(defaults.into_iter());
 
-        <span class="comment">// Ensure the constraints are upheld. If any `fields` are specified, then the constraints should be upheld against those only.</span>
-        <span class="comment">// If no `fields` are specified, then the constraints should be upheld against all fields of the object.</span>
-        <span class="kw">let</span> <span class="ident">num_fields</span> <span class="op">=</span> <span class="ident">schema_object</span>
-            .<span class="ident">constraints</span>
-            .<span class="ident">fields</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">cloned</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> {
-                <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">field</span><span class="op">|</span> {
-                    <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="ident">field</span>) {
-                        <span class="ident">acc</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="comment">// Ensure the constraints are upheld. If any `fields` are specified, then the constraints should be upheld against those only.
+        // If no `fields` are specified, then the constraints should be upheld against all fields of the object.
+        </span><span class="kw">let </span>num_fields = schema_object
+            .constraints
+            .fields
+            .as_ref()
+            .cloned()
+            .map(|fields| {
+                fields.iter().fold(<span class="number">0</span>, |<span class="kw-2">mut </span>acc, field| {
+                    <span class="kw">if </span>map.contains_key(field) {
+                        acc += <span class="number">1</span>;
                     }
 
-                    <span class="ident">acc</span>
+                    acc
                 })
             })
-            .<span class="ident">unwrap_or</span>(<span class="ident">map</span>.<span class="ident">len</span>());
+            .unwrap_or(map.len());
 
-        <span class="kw">let</span> <span class="ident">too_many</span> <span class="op">=</span> <span class="ident">schema_object</span>
-            .<span class="ident">constraints</span>
-            .<span class="ident">max_num_fields</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">max</span><span class="op">|</span> <span class="ident">num_fields</span> <span class="op">&gt;</span> <span class="ident">max</span>)
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
+        <span class="kw">let </span>too_many = schema_object
+            .constraints
+            .max_num_fields
+            .map(|max| num_fields &gt; max)
+            .unwrap_or(<span class="bool-val">false</span>);
 
-        <span class="kw">let</span> <span class="ident">too_few</span> <span class="op">=</span> <span class="ident">schema_object</span>
-            .<span class="ident">constraints</span>
-            .<span class="ident">min_num_fields</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">min</span><span class="op">|</span> <span class="ident">num_fields</span> <span class="op">&lt;</span> <span class="ident">min</span>)
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
+        <span class="kw">let </span>too_few = schema_object
+            .constraints
+            .min_num_fields
+            .map(|min| num_fields &lt; min)
+            .unwrap_or(<span class="bool-val">false</span>);
 
-        <span class="kw">if</span> <span class="ident">too_many</span> <span class="op">|</span><span class="op">|</span> <span class="ident">too_few</span> {
-            <span class="kw">let</span> <span class="ident">error_kind</span> <span class="op">=</span> <span class="ident">QueryParserErrorKind::FieldCountError</span>(<span class="ident">FieldCountError::new</span>(
-                <span class="ident">schema_object</span>.<span class="ident">constraints</span>.<span class="ident">min_num_fields</span>,
-                <span class="ident">schema_object</span>.<span class="ident">constraints</span>.<span class="ident">max_num_fields</span>,
-                <span class="ident">schema_object</span>.<span class="ident">constraints</span>.<span class="ident">fields</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>(),
-                <span class="ident">num_fields</span>,
+        <span class="kw">if </span>too_many || too_few {
+            <span class="kw">let </span>error_kind = QueryParserErrorKind::FieldCountError(FieldCountError::new(
+                schema_object.constraints.min_num_fields,
+                schema_object.constraints.max_num_fields,
+                schema_object.constraints.fields.as_ref().cloned(),
+                num_fields,
             ));
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryParserError::new</span>(<span class="ident">path</span>, <span class="ident">error_kind</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(QueryParserError::new(path, error_kind));
         }
 
-        <span class="ident">map</span>.<span class="ident">set_tag</span>(<span class="ident">schema_object</span>.<span class="ident">tag</span>.<span class="ident">clone</span>());
+        map.set_tag(schema_object.tag.clone());
 
-        <span class="prelude-val">Ok</span>(<span class="ident">map</span>)
+        <span class="prelude-val">Ok</span>(map)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">std::cmp::Eq</span> <span class="op">+</span> <span class="ident">std::hash::Hash</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">left</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">right</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">_equal</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Diff&lt;<span class="lifetime">&#39;a</span>, T: std::cmp::Eq + std::hash::Hash&gt; {
+    <span class="kw">pub </span>left: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;,
+    <span class="kw">pub </span>right: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;,
+    <span class="kw">pub </span>_equal: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">std::cmp::Eq</span> <span class="op">+</span> <span class="ident">std::hash::Hash</span><span class="op">&gt;</span> <span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">left_side</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">right_side</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">left</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">left_side</span>.<span class="ident">difference</span>(<span class="ident">right_side</span>).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">right</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">right_side</span>.<span class="ident">difference</span>(<span class="ident">left_side</span>).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">_equal</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">left_side</span>.<span class="ident">intersection</span>(<span class="ident">right_side</span>).<span class="ident">collect</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: std::cmp::Eq + std::hash::Hash&gt; Diff&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">fn </span>new(left_side: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HashSet&lt;T&gt;, right_side: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HashSet&lt;T&gt;) -&gt; Diff&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+        <span class="kw">let </span>left: Vec&lt;<span class="kw-2">&amp;</span>T&gt; = left_side.difference(right_side).collect();
+        <span class="kw">let </span>right: Vec&lt;<span class="kw-2">&amp;</span>T&gt; = right_side.difference(left_side).collect();
+        <span class="kw">let </span>_equal: Vec&lt;<span class="kw-2">&amp;</span>T&gt; = left_side.intersection(right_side).collect();
 
-        <span class="ident">Diff</span> { <span class="ident">left</span>, <span class="ident">right</span>, <span class="ident">_equal</span> }
+        Diff { left, right, _equal }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

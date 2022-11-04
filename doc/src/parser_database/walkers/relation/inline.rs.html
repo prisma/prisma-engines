@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/relation/inline.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>inline.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../parser_database/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/relation/inline.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>inline.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../parser_database/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -126,133 +126,133 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">complete</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>complete;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">complete::CompleteInlineRelationWalker</span>;
+<span class="kw">pub use </span>complete::CompleteInlineRelationWalker;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::RelationWalker</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">relations</span>::{<span class="ident">OneToManyRelationFields</span>, <span class="ident">OneToOneRelationFields</span>, <span class="ident">Relation</span>, <span class="ident">RelationAttributes</span>},
-    <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>, <span class="ident">ScalarFieldWalker</span>},
+<span class="kw">use </span><span class="kw">super</span>::RelationWalker;
+<span class="kw">use crate</span>::{
+    relations::{OneToManyRelationFields, OneToOneRelationFields, Relation, RelationAttributes},
+    walkers::{ModelWalker, RelationFieldWalker, RelationName, ScalarFieldWalker},
 };
 
-<span class="doccomment">/// An explicitly defined 1:1 or 1:n relation. The walker has the referencing side defined, but</span>
-<span class="doccomment">/// might miss the back relation in the AST.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>);
+<span class="doccomment">/// An explicitly defined 1:1 or 1:n relation. The walker has the referencing side defined, but
+/// might miss the back relation in the AST.
+</span><span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>InlineRelationWalker&lt;<span class="lifetime">&#39;db</span>&gt;(<span class="kw">pub</span>(<span class="kw">super</span>) RelationWalker&lt;<span class="lifetime">&#39;db</span>&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Get the relation attributes defined in the AST.</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">relations</span>[<span class="self">self</span>.<span class="number">0</span>.<span class="ident">id</span>]
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; InlineRelationWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// Get the relation attributes defined in the AST.
+    </span><span class="kw">fn </span>get(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>Relation {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.db.relations[<span class="self">self</span>.<span class="number">0</span>.id]
     }
 
-    <span class="doccomment">/// The relation is 1:1, having at most one record on both sides of the relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_one_to_one</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span>, <span class="ident">RelationAttributes::OneToOne</span>(<span class="kw">_</span>))
+    <span class="doccomment">/// The relation is 1:1, having at most one record on both sides of the relation.
+    </span><span class="kw">pub fn </span>is_one_to_one(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.get().attributes, RelationAttributes::OneToOne(<span class="kw">_</span>))
     }
 
-    <span class="doccomment">/// The model which holds the relation arguments.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_a</span>)
+    <span class="doccomment">/// The model which holds the relation arguments.
+    </span><span class="kw">pub fn </span>referencing_model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.db.walk(<span class="self">self</span>.get().model_a)
     }
 
-    <span class="doccomment">/// The model referenced and which hold the back-relation field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_b</span>)
+    <span class="doccomment">/// The model referenced and which hold the back-relation field.
+    </span><span class="kw">pub fn </span>referenced_model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.db.walk(<span class="self">self</span>.get().model_b)
     }
 
-    <span class="doccomment">/// If the relation is defined from both sides, convert to an explicit relation</span>
-    <span class="doccomment">/// walker.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_complete</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">forward_relation_field</span>(), <span class="self">self</span>.<span class="ident">back_relation_field</span>()) {
-            (<span class="prelude-val">Some</span>(<span class="ident">field_a</span>), <span class="prelude-val">Some</span>(<span class="ident">field_b</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="ident">CompleteInlineRelationWalker</span> {
-                    <span class="ident">side_a</span>: (<span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">id</span>, <span class="ident">field_a</span>.<span class="ident">field_id</span>),
-                    <span class="ident">side_b</span>: (<span class="self">self</span>.<span class="ident">referenced_model</span>().<span class="ident">id</span>, <span class="ident">field_b</span>.<span class="ident">field_id</span>),
-                    <span class="ident">db</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>,
+    <span class="doccomment">/// If the relation is defined from both sides, convert to an explicit relation
+    /// walker.
+    </span><span class="kw">pub fn </span>as_complete(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CompleteInlineRelationWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="kw">match </span>(<span class="self">self</span>.forward_relation_field(), <span class="self">self</span>.back_relation_field()) {
+            (<span class="prelude-val">Some</span>(field_a), <span class="prelude-val">Some</span>(field_b)) =&gt; {
+                <span class="kw">let </span>walker = CompleteInlineRelationWalker {
+                    side_a: (<span class="self">self</span>.referencing_model().id, field_a.field_id),
+                    side_b: (<span class="self">self</span>.referenced_model().id, field_b.field_id),
+                    db: <span class="self">self</span>.<span class="number">0</span>.db,
                 };
 
-                <span class="prelude-val">Some</span>(<span class="ident">walker</span>)
+                <span class="prelude-val">Some</span>(walker)
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// The referencing fields, from the forward relation field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_fields</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">forward_relation_field</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">fields</span>())
+    <span class="doccomment">/// The referencing fields, from the forward relation field.
+    </span><span class="kw">pub fn </span>referencing_fields(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;&gt; {
+        <span class="self">self</span>.forward_relation_field().and_then(|rf| rf.fields())
     }
 
-    <span class="doccomment">/// The referenced fields. Inferred or specified.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">forward_relation_field</span>()
-            .<span class="ident">and_then</span>(
-                <span class="op">|</span><span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">|</span> -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-                    <span class="ident">field</span>
-                        .<span class="ident">referenced_fields</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">Box::new</span>(<span class="ident">fields</span>) <span class="kw">as</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>)
+    <span class="doccomment">/// The referenced fields. Inferred or specified.
+    </span><span class="kw">pub fn </span>referenced_fields(<span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + <span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.forward_relation_field()
+            .and_then(
+                |field: RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;| -&gt; <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;&gt;&gt; {
+                    field
+                        .referenced_fields()
+                        .map(|fields| Box::new(fields) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;&gt;)
                 },
             )
-            .<span class="ident">unwrap_or_else</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="ident">Box::new</span>(
-                    <span class="self">self</span>.<span class="ident">referenced_model</span>()
-                        .<span class="ident">unique_criterias</span>()
-                        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_strict_criteria</span>())
-                        .<span class="ident">into_iter</span>()
-                        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">fields</span>())
-                        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_scalar_field</span>()),
+            .unwrap_or_else(<span class="kw">move </span>|| {
+                Box::new(
+                    <span class="self">self</span>.referenced_model()
+                        .unique_criterias()
+                        .find(|c| c.is_strict_criteria())
+                        .into_iter()
+                        .flat_map(|c| c.fields())
+                        .filter_map(|f| f.as_scalar_field()),
                 )
             })
     }
 
-    <span class="doccomment">/// The forward relation field (the relation field on model A, the referencing model).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forward_relation_field</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referencing_model</span>();
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span> {
-            <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Forward</span>(<span class="ident">a</span>))
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="ident">a</span>, <span class="kw">_</span>))
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Both</span>(<span class="ident">a</span>, <span class="kw">_</span>))
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Forward</span>(<span class="ident">a</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">model</span>.<span class="ident">relation_field</span>(<span class="ident">a</span>)),
-            <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Back</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } =&gt; <span class="macro">unreachable!</span>(),
-            <span class="ident">RelationAttributes::TwoWayEmbeddedManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } =&gt; <span class="macro">unreachable!</span>(),
+    <span class="doccomment">/// The forward relation field (the relation field on model A, the referencing model).
+    </span><span class="kw">pub fn </span>forward_relation_field(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="kw">let </span>model = <span class="self">self</span>.referencing_model();
+        <span class="kw">match </span><span class="self">self</span>.get().attributes {
+            RelationAttributes::OneToOne(OneToOneRelationFields::Forward(a))
+            | RelationAttributes::OneToOne(OneToOneRelationFields::Both(a, <span class="kw">_</span>))
+            | RelationAttributes::OneToMany(OneToManyRelationFields::Both(a, <span class="kw">_</span>))
+            | RelationAttributes::OneToMany(OneToManyRelationFields::Forward(a)) =&gt; <span class="prelude-val">Some</span>(model.relation_field(a)),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Back(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
+            RelationAttributes::ImplicitManyToMany { field_a: <span class="kw">_</span>, field_b: <span class="kw">_ </span>} =&gt; <span class="macro">unreachable!</span>(),
+            RelationAttributes::TwoWayEmbeddedManyToMany { field_a: <span class="kw">_</span>, field_b: <span class="kw">_ </span>} =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="doccomment">/// The contents of the `map: ...` argument of the `@relation` attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">forward_relation_field</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">mapped_name</span>())
+    <span class="doccomment">/// The contents of the `map: ...` argument of the `@relation` attribute.
+    </span><span class="kw">pub fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
+        <span class="self">self</span>.forward_relation_field().and_then(|field| field.mapped_name())
     }
 
-    <span class="doccomment">/// The back relation field, or virtual relation field (on model B, the referenced model).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">back_relation_field</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referenced_model</span>();
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span> {
-            <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="kw">_</span>, <span class="ident">b</span>))
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Both</span>(<span class="kw">_</span>, <span class="ident">b</span>))
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Back</span>(<span class="ident">b</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">model</span>.<span class="ident">relation_field</span>(<span class="ident">b</span>)),
-            <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Forward</span>(<span class="kw">_</span>))
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Forward</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } =&gt; <span class="macro">unreachable!</span>(),
-            <span class="ident">RelationAttributes::TwoWayEmbeddedManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } =&gt; <span class="macro">unreachable!</span>(),
+    <span class="doccomment">/// The back relation field, or virtual relation field (on model B, the referenced model).
+    </span><span class="kw">pub fn </span>back_relation_field(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="kw">let </span>model = <span class="self">self</span>.referenced_model();
+        <span class="kw">match </span><span class="self">self</span>.get().attributes {
+            RelationAttributes::OneToOne(OneToOneRelationFields::Both(<span class="kw">_</span>, b))
+            | RelationAttributes::OneToMany(OneToManyRelationFields::Both(<span class="kw">_</span>, b))
+            | RelationAttributes::OneToMany(OneToManyRelationFields::Back(b)) =&gt; <span class="prelude-val">Some</span>(model.relation_field(b)),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Forward(<span class="kw">_</span>))
+            | RelationAttributes::OneToOne(OneToOneRelationFields::Forward(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
+            RelationAttributes::ImplicitManyToMany { field_a: <span class="kw">_</span>, field_b: <span class="kw">_ </span>} =&gt; <span class="macro">unreachable!</span>(),
+            RelationAttributes::TwoWayEmbeddedManyToMany { field_a: <span class="kw">_</span>, field_b: <span class="kw">_ </span>} =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="doccomment">/// The unique identifier of the relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_id</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::RelationId</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">id</span>
+    <span class="doccomment">/// The unique identifier of the relation.
+    </span><span class="kw">pub fn </span>relation_id(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::RelationId {
+        <span class="self">self</span>.<span class="number">0</span>.id
     }
 
-    <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,</span>
-    <span class="doccomment">/// or generates an implicit name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>()
-            .<span class="ident">relation_name</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">string_id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>[<span class="ident">string_id</span>])
-            .<span class="ident">map</span>(<span class="ident">RelationName::Explicit</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">RelationName::generated</span>(<span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">name</span>(), <span class="self">self</span>.<span class="ident">referenced_model</span>().<span class="ident">name</span>()))
+    <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,
+    /// or generates an implicit name.
+    </span><span class="kw">pub fn </span>relation_name(<span class="self">self</span>) -&gt; RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.get()
+            .relation_name
+            .map(|string_id| <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.db[string_id])
+            .map(RelationName::Explicit)
+            .unwrap_or_else(|| RelationName::generated(<span class="self">self</span>.referencing_model().name(), <span class="self">self</span>.referenced_model().name()))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

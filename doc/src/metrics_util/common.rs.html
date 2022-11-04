@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -55,62 +55,62 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
-<span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt::Debug;
+<span class="kw">use </span>std::hash::{Hash, Hasher};
 
-<span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">Key</span>, <span class="ident">KeyHasher</span>};
+<span class="kw">use </span>metrics::{Key, KeyHasher};
 
-<span class="doccomment">/// A type that can hash itself.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In high-performance use cases, an object can pre-hash itself, or memoize its hash value, when it</span>
-<span class="doccomment">/// is anticipated that an object will be hashed multiple times. Rather than the standard library</span>
-<span class="doccomment">/// `Hash` trait, `Hashable` exposes an interface that forces objects to hash themselves entirely,</span>
-<span class="doccomment">/// providing only the resulting 8-byte hash.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As a key may sometimes need to be rehashed, we need to ensure that the same hashing algorithm</span>
-<span class="doccomment">/// used to pre-generate the hash for this value is used when rehashing it.  All implementors must</span>
-<span class="doccomment">/// define the hashing algorithm used by specifying the `Hasher` associated type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A default implementation, [`DefaultHashable`], is provided that utilizes the same hashing</span>
-<span class="doccomment">/// algorithm that [`Key`][metrics::Key] uses, which is high-performance.  This type can be used to</span>
-<span class="doccomment">/// satisfy `Hashable` so long as the type itself is already [`Hash`].</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Hashable</span>: <span class="ident">Hash</span> {
-    <span class="doccomment">/// The hasher implementation used internally.</span>
-    <span class="kw">type</span> <span class="ident">Hasher</span>: <span class="ident">Hasher</span> <span class="op">+</span> <span class="ident">Default</span>;
+<span class="doccomment">/// A type that can hash itself.
+///
+/// In high-performance use cases, an object can pre-hash itself, or memoize its hash value, when it
+/// is anticipated that an object will be hashed multiple times. Rather than the standard library
+/// `Hash` trait, `Hashable` exposes an interface that forces objects to hash themselves entirely,
+/// providing only the resulting 8-byte hash.
+///
+/// As a key may sometimes need to be rehashed, we need to ensure that the same hashing algorithm
+/// used to pre-generate the hash for this value is used when rehashing it.  All implementors must
+/// define the hashing algorithm used by specifying the `Hasher` associated type.
+///
+/// A default implementation, [`DefaultHashable`], is provided that utilizes the same hashing
+/// algorithm that [`Key`][metrics::Key] uses, which is high-performance.  This type can be used to
+/// satisfy `Hashable` so long as the type itself is already [`Hash`].
+</span><span class="kw">pub trait </span>Hashable: Hash {
+    <span class="doccomment">/// The hasher implementation used internally.
+    </span><span class="kw">type </span>Hasher: Hasher + Default;
 
-    <span class="doccomment">/// Generate the hash of this object.</span>
-    <span class="kw">fn</span> <span class="ident">hashable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Hasher::default</span>();
-        <span class="self">self</span>.<span class="ident">hash</span>(<span class="kw-2">&amp;mut</span> <span class="ident">hasher</span>);
-        <span class="ident">hasher</span>.<span class="ident">finish</span>()
+    <span class="doccomment">/// Generate the hash of this object.
+    </span><span class="kw">fn </span>hashable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = <span class="self">Self</span>::Hasher::default();
+        <span class="self">self</span>.hash(<span class="kw-2">&amp;mut </span>hasher);
+        hasher.finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Hashable</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">type</span> <span class="ident">Hasher</span> <span class="op">=</span> <span class="ident">KeyHasher</span>;
+<span class="kw">impl </span>Hashable <span class="kw">for </span>Key {
+    <span class="kw">type </span>Hasher = KeyHasher;
 
-    <span class="kw">fn</span> <span class="ident">hashable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">get_hash</span>()
+    <span class="kw">fn </span>hashable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.get_hash()
     }
 }
 
-<span class="doccomment">/// A wrapper type that provides `Hashable` for any type that is `Hash`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As part of using [`Registry`][crate::registry::Registry], the chosen key type must implement</span>
-<span class="doccomment">/// [`Hashable`].  For use cases where performance is not the utmost concern and there is no desire</span>
-<span class="doccomment">/// to deal with pre-hashing keys, `DefaultHashable` can be used to wrap the key type and provide</span>
-<span class="doccomment">/// the implementation of `Hashable` so long as `H` itself is `Hash`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DefaultHashable</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hash</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">H</span>);
+<span class="doccomment">/// A wrapper type that provides `Hashable` for any type that is `Hash`.
+///
+/// As part of using [`Registry`][crate::registry::Registry], the chosen key type must implement
+/// [`Hashable`].  For use cases where performance is not the utmost concern and there is no desire
+/// to deal with pre-hashing keys, `DefaultHashable` can be used to wrap the key type and provide
+/// the implementation of `Hashable` so long as `H` itself is `Hash`.
+</span><span class="attribute">#[derive(Debug, Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub struct </span>DefaultHashable&lt;H: Hash&gt;(<span class="kw">pub </span>H);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hash</span><span class="op">&gt;</span> <span class="ident">Hashable</span> <span class="kw">for</span> <span class="ident">DefaultHashable</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Hasher</span> <span class="op">=</span> <span class="ident">KeyHasher</span>;
+<span class="kw">impl</span>&lt;H: Hash&gt; Hashable <span class="kw">for </span>DefaultHashable&lt;H&gt; {
+    <span class="kw">type </span>Hasher = KeyHasher;
 
-    <span class="kw">fn</span> <span class="ident">hashable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">KeyHasher::default</span>();
-        <span class="self">self</span>.<span class="ident">hash</span>(<span class="kw-2">&amp;mut</span> <span class="ident">hasher</span>);
-        <span class="ident">hasher</span>.<span class="ident">finish</span>()
+    <span class="kw">fn </span>hashable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = KeyHasher::default();
+        <span class="self">self</span>.hash(<span class="kw-2">&amp;mut </span>hasher);
+        hasher.finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

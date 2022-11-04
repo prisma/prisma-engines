@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/sql_trace.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sql_trace.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/sql_trace.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sql_trace.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -57,64 +57,64 @@
 <span id="57">57</span>
 <span id="58">58</span>
 <span id="59">59</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">opentelemetry::trace</span>::{<span class="ident">SpanContext</span>, <span class="ident">TraceContextExt</span>, <span class="ident">TraceFlags</span>};
-<span class="kw">use</span> <span class="ident">quaint::ast</span>::{<span class="ident">Delete</span>, <span class="ident">Insert</span>, <span class="ident">Select</span>, <span class="ident">Update</span>};
-<span class="kw">use</span> <span class="ident">tracing::Span</span>;
-<span class="kw">use</span> <span class="ident">tracing_opentelemetry::OpenTelemetrySpanExt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>opentelemetry::trace::{SpanContext, TraceContextExt, TraceFlags};
+<span class="kw">use </span>quaint::ast::{Delete, Insert, Select, Update};
+<span class="kw">use </span>tracing::Span;
+<span class="kw">use </span>tracing_opentelemetry::OpenTelemetrySpanExt;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trace_parent_to_string</span>(<span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">SpanContext</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">trace_id</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">trace_id</span>();
-    <span class="kw">let</span> <span class="ident">span_id</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">span_id</span>();
+<span class="kw">pub fn </span>trace_parent_to_string(context: <span class="kw-2">&amp;</span>SpanContext) -&gt; String {
+    <span class="kw">let </span>trace_id = context.trace_id();
+    <span class="kw">let </span>span_id = context.span_id();
 
-    <span class="comment">// see https://www.w3.org/TR/trace-context/#traceparent-header-field-values</span>
-    <span class="macro">format!</span>(<span class="string">&quot;traceparent=00-{:032x}-{:032x}-01&quot;</span>, <span class="ident">trace_id</span>, <span class="ident">span_id</span>)
+    <span class="comment">// see https://www.w3.org/TR/trace-context/#traceparent-header-field-values
+    </span><span class="macro">format!</span>(<span class="string">&quot;traceparent=00-{:032x}-{:032x}-01&quot;</span>, trace_id, span_id)
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SqlTraceComment</span>: <span class="ident">Sized</span> {
-    <span class="kw">fn</span> <span class="ident">append_trace</span>(<span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">Span</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">add_trace_id</span>(<span class="self">self</span>, <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>;
+<span class="kw">pub trait </span>SqlTraceComment: Sized {
+    <span class="kw">fn </span>append_trace(<span class="self">self</span>, span: <span class="kw-2">&amp;</span>Span) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>add_trace_id(<span class="self">self</span>, trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self</span>;
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">sql_trace</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">what</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">SqlTraceComment</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">what</span> {
-            <span class="kw">fn</span> <span class="ident">append_trace</span>(<span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">Span</span>) -&gt; <span class="self">Self</span> {
-                <span class="kw">let</span> <span class="ident">otel_ctx</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">context</span>();
-                <span class="kw">let</span> <span class="ident">span_ref</span> <span class="op">=</span> <span class="ident">otel_ctx</span>.<span class="ident">span</span>();
-                <span class="kw">let</span> <span class="ident">otel_ctx</span> <span class="op">=</span> <span class="ident">span_ref</span>.<span class="ident">span_context</span>();
+<span class="macro">macro_rules! </span>sql_trace {
+    (<span class="macro-nonterminal">$what</span>:ty) =&gt; {
+        <span class="kw">impl </span>SqlTraceComment <span class="kw">for </span><span class="macro-nonterminal">$what </span>{
+            <span class="kw">fn </span>append_trace(<span class="self">self</span>, span: <span class="kw-2">&amp;</span>Span) -&gt; <span class="self">Self </span>{
+                <span class="kw">let </span>otel_ctx = span.context();
+                <span class="kw">let </span>span_ref = otel_ctx.span();
+                <span class="kw">let </span>otel_ctx = span_ref.span_context();
 
-                <span class="kw">if</span> <span class="ident">otel_ctx</span>.<span class="ident">trace_flags</span>() <span class="op">==</span> <span class="ident">TraceFlags::SAMPLED</span> {
-                    <span class="self">self</span>.<span class="ident">comment</span>(<span class="ident">trace_parent_to_string</span>(<span class="ident">otel_ctx</span>))
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>
-                }
+                <span class="kw">if </span>otel_ctx.trace_flags() == TraceFlags::SAMPLED {
+                    <span class="self">self</span>.comment(trace_parent_to_string(otel_ctx))
+                } <span class="kw">else </span>{
+                    <span class="self">self
+                </span>}
             }
-            <span class="comment">// Temporary method to pass the traceid in an operation</span>
-            <span class="kw">fn</span> <span class="ident">add_trace_id</span>(<span class="self">self</span>, <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">traceparent</span>) <span class="op">=</span> <span class="ident">trace_id</span> {
-                    <span class="kw">if</span> <span class="ident">should_sample</span>(<span class="kw-2">&amp;</span><span class="ident">traceparent</span>) {
-                        <span class="self">self</span>.<span class="ident">comment</span>(<span class="macro">format!</span>(<span class="string">&quot;traceparent={}&quot;</span>, <span class="ident">traceparent</span>))
-                    } <span class="kw">else</span> {
-                        <span class="self">self</span>
-                    }
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>
-                }
+            <span class="comment">// Temporary method to pass the traceid in an operation
+            </span><span class="kw">fn </span>add_trace_id(<span class="self">self</span>, trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(traceparent) = trace_id {
+                    <span class="kw">if </span>should_sample(<span class="kw-2">&amp;</span>traceparent) {
+                        <span class="self">self</span>.comment(<span class="macro">format!</span>(<span class="string">&quot;traceparent={}&quot;</span>, traceparent))
+                    } <span class="kw">else </span>{
+                        <span class="self">self
+                    </span>}
+                } <span class="kw">else </span>{
+                    <span class="self">self
+                </span>}
             }
         }
     };
 }
 
-<span class="kw">fn</span> <span class="ident">should_sample</span>(<span class="ident">traceparent</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">traceparent</span>.<span class="ident">split</span>(<span class="string">&#39;-&#39;</span>).<span class="ident">count</span>() <span class="op">==</span> <span class="number">4</span> <span class="op">&amp;&amp;</span> <span class="ident">traceparent</span>.<span class="ident">ends_with</span>(<span class="string">&quot;-01&quot;</span>)
+<span class="kw">fn </span>should_sample(traceparent: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    traceparent.split(<span class="string">&#39;-&#39;</span>).count() == <span class="number">4 </span>&amp;&amp; traceparent.ends_with(<span class="string">&quot;-01&quot;</span>)
 }
 
-<span class="macro">sql_trace!</span>(<span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>);
+<span class="macro">sql_trace!</span>(Insert&lt;<span class="lifetime">&#39;_</span>&gt;);
 
-<span class="macro">sql_trace!</span>(<span class="ident">Update</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>);
+<span class="macro">sql_trace!</span>(Update&lt;<span class="lifetime">&#39;_</span>&gt;);
 
-<span class="macro">sql_trace!</span>(<span class="ident">Delete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>);
+<span class="macro">sql_trace!</span>(Delete&lt;<span class="lifetime">&#39;_</span>&gt;);
 
-<span class="macro">sql_trace!</span>(<span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>);
+<span class="macro">sql_trace!</span>(Select&lt;<span class="lifetime">&#39;_</span>&gt;);
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

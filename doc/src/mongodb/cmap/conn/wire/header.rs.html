@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/conn/wire/header.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>header.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/conn/wire/header.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>header.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -67,74 +67,74 @@
 <span id="67">67</span>
 <span id="68">68</span>
 <span id="69">69</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncReadExt</span>, <span class="ident">AsyncWrite</span>, <span class="ident">AsyncWriteExt</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>tokio::io::{AsyncReadExt, AsyncWrite, AsyncWriteExt};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span><span class="kw">crate</span>::error::{ErrorKind, <span class="prelude-ty">Result</span>};
 
-<span class="doccomment">/// The wire protocol op codes.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">OpCode</span> {
-    <span class="ident">Reply</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">Query</span> <span class="op">=</span> <span class="number">2004</span>,
-    <span class="ident">Message</span> <span class="op">=</span> <span class="number">2013</span>,
-    <span class="ident">Compressed</span> <span class="op">=</span> <span class="number">2012</span>,
+<span class="doccomment">/// The wire protocol op codes.
+</span><span class="attribute">#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>OpCode {
+    Reply = <span class="number">1</span>,
+    Query = <span class="number">2004</span>,
+    Message = <span class="number">2013</span>,
+    Compressed = <span class="number">2012</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">OpCode</span> {
-    <span class="doccomment">/// Attempt to infer the op code based on the numeric value.</span>
-    <span class="kw">fn</span> <span class="ident">from_i32</span>(<span class="ident">i</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">i</span> {
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Reply</span>),
-            <span class="number">2004</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Query</span>),
-            <span class="number">2013</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Message</span>),
-            <span class="number">2012</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Compressed</span>),
-            <span class="ident">other</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Invalid wire protocol opcode: {}&quot;</span>, <span class="ident">other</span>),
+<span class="kw">impl </span>OpCode {
+    <span class="doccomment">/// Attempt to infer the op code based on the numeric value.
+    </span><span class="kw">fn </span>from_i32(i: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>i {
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(OpCode::Reply),
+            <span class="number">2004 </span>=&gt; <span class="prelude-val">Ok</span>(OpCode::Query),
+            <span class="number">2013 </span>=&gt; <span class="prelude-val">Ok</span>(OpCode::Message),
+            <span class="number">2012 </span>=&gt; <span class="prelude-val">Ok</span>(OpCode::Compressed),
+            other =&gt; <span class="prelude-val">Err</span>(ErrorKind::InvalidResponse {
+                message: <span class="macro">format!</span>(<span class="string">&quot;Invalid wire protocol opcode: {}&quot;</span>, other),
             }
-            .<span class="ident">into</span>()),
+            .into()),
         }
     }
 }
 
-<span class="doccomment">/// The header for any wire protocol message.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Header</span> {
-    <span class="kw">pub</span> <span class="ident">length</span>: <span class="ident">i32</span>,
-    <span class="kw">pub</span> <span class="ident">request_id</span>: <span class="ident">i32</span>,
-    <span class="kw">pub</span> <span class="ident">response_to</span>: <span class="ident">i32</span>,
-    <span class="kw">pub</span> <span class="ident">op_code</span>: <span class="ident">OpCode</span>,
+<span class="doccomment">/// The header for any wire protocol message.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Header {
+    <span class="kw">pub </span>length: i32,
+    <span class="kw">pub </span>request_id: i32,
+    <span class="kw">pub </span>response_to: i32,
+    <span class="kw">pub </span>op_code: OpCode,
 }
 
-<span class="kw">impl</span> <span class="ident">Header</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span> <span class="op">*</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>();
+<span class="kw">impl </span>Header {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>LENGTH: usize = <span class="number">4 </span>* std::mem::size_of::&lt;i32&gt;();
 
-    <span class="doccomment">/// Serializes the Header and writes the bytes to `w`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_to</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">stream</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">length</span>.<span class="ident">to_le_bytes</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">stream</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">request_id</span>.<span class="ident">to_le_bytes</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">stream</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">response_to</span>.<span class="ident">to_le_bytes</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">stream</span>
-            .<span class="ident">write_all</span>(<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">op_code</span> <span class="kw">as</span> <span class="ident">i32</span>).<span class="ident">to_le_bytes</span>())
+    <span class="doccomment">/// Serializes the Header and writes the bytes to `w`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>write_to&lt;W: AsyncWrite + Unpin&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>W) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        stream.write_all(<span class="kw-2">&amp;</span><span class="self">self</span>.length.to_le_bytes()).<span class="kw">await</span><span class="question-mark">?</span>;
+        stream.write_all(<span class="kw-2">&amp;</span><span class="self">self</span>.request_id.to_le_bytes()).<span class="kw">await</span><span class="question-mark">?</span>;
+        stream.write_all(<span class="kw-2">&amp;</span><span class="self">self</span>.response_to.to_le_bytes()).<span class="kw">await</span><span class="question-mark">?</span>;
+        stream
+            .write_all(<span class="kw-2">&amp;</span>(<span class="self">self</span>.op_code <span class="kw">as </span>i32).to_le_bytes())
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Reads bytes from `r` and deserializes them into a header.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_from</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">tokio::io::AsyncRead</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>(
-        <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32_le</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">request_id</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32_le</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">response_to</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32_le</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">op_code</span> <span class="op">=</span> <span class="ident">OpCode::from_i32</span>(<span class="ident">reader</span>.<span class="ident">read_i32_le</span>().<span class="kw">await</span><span class="question-mark">?</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">length</span>,
-            <span class="ident">request_id</span>,
-            <span class="ident">response_to</span>,
-            <span class="ident">op_code</span>,
+    <span class="doccomment">/// Reads bytes from `r` and deserializes them into a header.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>read_from&lt;R: tokio::io::AsyncRead + Unpin + Send&gt;(
+        reader: <span class="kw-2">&amp;mut </span>R,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>length = reader.read_i32_le().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>request_id = reader.read_i32_le().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>response_to = reader.read_i32_le().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>op_code = OpCode::from_i32(reader.read_i32_le().<span class="kw">await</span><span class="question-mark">?</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            length,
+            request_id,
+            response_to,
+            op_code,
         })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

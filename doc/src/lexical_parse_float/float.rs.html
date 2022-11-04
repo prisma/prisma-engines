@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/float.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>float.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/float.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>float.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -200,207 +200,207 @@
 <span id="200">200</span>
 <span id="201">201</span>
 <span id="202">202</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Extended helper trait for generic float types.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This adapted from the Rust implementation, based on the fast-float-rust</span>
-<span class="doccomment">//! implementation, and is similarly subject to an Apache2.0/MIT license.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Extended helper trait for generic float types.
+//!
+//! This adapted from the Rust implementation, based on the fast-float-rust
+//! implementation, and is similarly subject to an Apache2.0/MIT license.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+</span><span class="attribute">#![doc(hidden)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::libm</span>::{<span class="ident">powd</span>, <span class="ident">powf</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::limits</span>::{<span class="ident">ExactFloat</span>, <span class="ident">MaxDigits</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::table</span>::{<span class="ident">get_small_f32_power</span>, <span class="ident">get_small_f64_power</span>, <span class="ident">get_small_int_power</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util::bf16::bf16</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::extended_float::ExtendedFloat</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util::f16::f16</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::num</span>::{<span class="ident">AsCast</span>, <span class="ident">Float</span>};
+#[cfg(all(not(feature = <span class="string">&quot;std&quot;</span>), feature = <span class="string">&quot;compact&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::libm::{powd, powf};
+<span class="kw">use </span><span class="kw">crate</span>::limits::{ExactFloat, MaxDigits};
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::table::{get_small_f32_power, get_small_f64_power, get_small_int_power};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::bf16::bf16;
+<span class="kw">use </span>lexical_util::extended_float::ExtendedFloat;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::f16::f16;
+<span class="kw">use </span>lexical_util::num::{AsCast, Float};
 
-<span class="doccomment">/// Alias with ~80 bits of precision, 64 for the mantissa and 16 for exponent.</span>
-<span class="doccomment">/// This exponent is biased, and if the exponent is negative, it represents</span>
-<span class="doccomment">/// a value with a bias of `i32::MIN + F::EXPONENT_BIAS`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ExtendedFloat80</span> <span class="op">=</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Alias with ~80 bits of precision, 64 for the mantissa and 16 for exponent.
+/// This exponent is biased, and if the exponent is negative, it represents
+/// a value with a bias of `i32::MIN + F::EXPONENT_BIAS`.
+</span><span class="kw">pub type </span>ExtendedFloat80 = ExtendedFloat&lt;u64&gt;;
 
-<span class="doccomment">/// Helper trait to add more float characteristics for parsing floats.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RawFloat</span>: <span class="ident">Float</span> <span class="op">+</span> <span class="ident">ExactFloat</span> <span class="op">+</span> <span class="ident">MaxDigits</span> {
-    <span class="comment">// Maximum mantissa for the fast-path (`1 &lt;&lt; 53` for f64).</span>
-    <span class="kw">const</span> <span class="ident">MAX_MANTISSA_FAST_PATH</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">2_u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::MANTISSA_SIZE</span>;
+<span class="doccomment">/// Helper trait to add more float characteristics for parsing floats.
+</span><span class="kw">pub trait </span>RawFloat: Float + ExactFloat + MaxDigits {
+    <span class="comment">// Maximum mantissa for the fast-path (`1 &lt;&lt; 53` for f64).
+    </span><span class="kw">const </span>MAX_MANTISSA_FAST_PATH: u64 = <span class="number">2_u64 </span>&lt;&lt; <span class="self">Self</span>::MANTISSA_SIZE;
 
-    <span class="comment">// Largest exponent value `(1 &lt;&lt; EXP_BITS) - 1`.</span>
-    <span class="kw">const</span> <span class="ident">INFINITE_POWER</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::MAX_EXPONENT</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::EXPONENT_BIAS</span>;
+    <span class="comment">// Largest exponent value `(1 &lt;&lt; EXP_BITS) - 1`.
+    </span><span class="kw">const </span>INFINITE_POWER: i32 = <span class="self">Self</span>::MAX_EXPONENT + <span class="self">Self</span>::EXPONENT_BIAS;
 
-    <span class="doccomment">/// Minimum exponent that for a fast path case, or `-⌊(MANTISSA_SIZE+1)/log2(r)⌋`</span>
-    <span class="doccomment">/// where `r` is the radix with powers-of-two removed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">min_exponent_fast_path</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i64</span> {
-        <span class="ident"><span class="self">Self</span>::exponent_limit</span>(<span class="ident">radix</span>).<span class="number">0</span>
+    <span class="doccomment">/// Minimum exponent that for a fast path case, or `-⌊(MANTISSA_SIZE+1)/log2(r)⌋`
+    /// where `r` is the radix with powers-of-two removed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>min_exponent_fast_path(radix: u32) -&gt; i64 {
+        <span class="self">Self</span>::exponent_limit(radix).<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Maximum exponent that for a fast path case, or `⌊(MANTISSA_SIZE+1)/log2(r)⌋`
+    /// where `r` is the radix with powers-of-two removed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>max_exponent_fast_path(radix: u32) -&gt; i64 {
+        <span class="self">Self</span>::exponent_limit(radix).<span class="number">1
+    </span>}
+
+    <span class="comment">// Maximum exponent that can be represented for a disguised-fast path case.
+    // This is `max_exponent_fast_path(radix) + ⌊(MANTISSA_SIZE+1)/log2(radix)⌋`
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>max_exponent_disguised_fast_path(radix: u32) -&gt; i64 {
+        <span class="self">Self</span>::max_exponent_fast_path(radix) + <span class="self">Self</span>::mantissa_limit(radix)
     }
 
-    <span class="doccomment">/// Maximum exponent that for a fast path case, or `⌊(MANTISSA_SIZE+1)/log2(r)⌋`</span>
-    <span class="doccomment">/// where `r` is the radix with powers-of-two removed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">max_exponent_fast_path</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i64</span> {
-        <span class="ident"><span class="self">Self</span>::exponent_limit</span>(<span class="ident">radix</span>).<span class="number">1</span>
-    }
+    <span class="doccomment">/// Get a small power-of-radix for fast-path multiplication.
+    ///
+    /// # Safety
+    ///
+    /// Safe as long as the exponent is smaller than the table size.
+    </span><span class="kw">unsafe fn </span>pow_fast_path(exponent: usize, radix: u32) -&gt; <span class="self">Self</span>;
 
-    <span class="comment">// Maximum exponent that can be represented for a disguised-fast path case.</span>
-    <span class="comment">// This is `max_exponent_fast_path(radix) + ⌊(MANTISSA_SIZE+1)/log2(radix)⌋`</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">max_exponent_disguised_fast_path</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i64</span> {
-        <span class="ident"><span class="self">Self</span>::max_exponent_fast_path</span>(<span class="ident">radix</span>) <span class="op">+</span> <span class="ident"><span class="self">Self</span>::mantissa_limit</span>(<span class="ident">radix</span>)
-    }
+    <span class="doccomment">/// Get a small, integral power-of-radix for fast-path multiplication.
+    ///
+    /// # Safety
+    ///
+    /// Safe as long as the exponent is smaller than the table size.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">unsafe fn </span>int_pow_fast_path(exponent: usize, radix: u32) -&gt; u64 {
+        <span class="comment">// SAFETY: safe as long as the exponent is smaller than the radix table.
+        </span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+        </span><span class="kw">return unsafe </span>{ get_small_int_power(exponent, radix) };
 
-    <span class="doccomment">/// Get a small power-of-radix for fast-path multiplication.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Safe as long as the exponent is smaller than the table size.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">pow_fast_path</span>(<span class="ident">exponent</span>: <span class="ident">usize</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>;
-
-    <span class="doccomment">/// Get a small, integral power-of-radix for fast-path multiplication.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Safe as long as the exponent is smaller than the table size.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">int_pow_fast_path</span>(<span class="ident">exponent</span>: <span class="ident">usize</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u64</span> {
-        <span class="comment">// SAFETY: safe as long as the exponent is smaller than the radix table.</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-        <span class="kw">return</span> <span class="kw">unsafe</span> { <span class="ident">get_small_int_power</span>(<span class="ident">exponent</span>, <span class="ident">radix</span>) };
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>)]</span>
-        <span class="kw">return</span> (<span class="ident">radix</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">wrapping_pow</span>(<span class="ident">exponent</span> <span class="kw">as</span> <span class="ident">u32</span>);
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">RawFloat</span> <span class="kw">for</span> <span class="ident">f32</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">pow_fast_path</span>(<span class="ident">exponent</span>: <span class="ident">usize</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// SAFETY: safe as long as the exponent is smaller than the radix table.</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-        <span class="kw">return</span> <span class="kw">unsafe</span> { <span class="ident">get_small_f32_power</span>(<span class="ident">exponent</span>, <span class="ident">radix</span>) };
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>)]</span>
-        <span class="kw">return</span> <span class="ident">powf</span>(<span class="ident">radix</span> <span class="kw">as</span> <span class="ident">f32</span>, <span class="ident">exponent</span> <span class="kw">as</span> <span class="ident">f32</span>);
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;compact&quot;</span>)]
+        </span><span class="kw">return </span>(radix <span class="kw">as </span>u64).wrapping_pow(exponent <span class="kw">as </span>u32);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RawFloat</span> <span class="kw">for</span> <span class="ident">f64</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">pow_fast_path</span>(<span class="ident">exponent</span>: <span class="ident">usize</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// SAFETY: safe as long as the exponent is smaller than the radix table.</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-        <span class="kw">return</span> <span class="kw">unsafe</span> { <span class="ident">get_small_f64_power</span>(<span class="ident">exponent</span>, <span class="ident">radix</span>) };
+<span class="kw">impl </span>RawFloat <span class="kw">for </span>f32 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">unsafe fn </span>pow_fast_path(exponent: usize, radix: u32) -&gt; <span class="self">Self </span>{
+        <span class="comment">// SAFETY: safe as long as the exponent is smaller than the radix table.
+        </span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+        </span><span class="kw">return unsafe </span>{ get_small_f32_power(exponent, radix) };
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>)]</span>
-        <span class="kw">return</span> <span class="ident">powd</span>(<span class="ident">radix</span> <span class="kw">as</span> <span class="ident">f64</span>, <span class="ident">exponent</span> <span class="kw">as</span> <span class="ident">f64</span>);
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;compact&quot;</span>)]
+        </span><span class="kw">return </span>powf(radix <span class="kw">as </span>f32, exponent <span class="kw">as </span>f32);
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">RawFloat</span> <span class="kw">for</span> <span class="ident">f16</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">pow_fast_path</span>(<span class="kw">_</span>: <span class="ident">usize</span>, <span class="kw">_</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl </span>RawFloat <span class="kw">for </span>f64 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">unsafe fn </span>pow_fast_path(exponent: usize, radix: u32) -&gt; <span class="self">Self </span>{
+        <span class="comment">// SAFETY: safe as long as the exponent is smaller than the radix table.
+        </span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+        </span><span class="kw">return unsafe </span>{ get_small_f64_power(exponent, radix) };
+
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;compact&quot;</span>)]
+        </span><span class="kw">return </span>powd(radix <span class="kw">as </span>f64, exponent <span class="kw">as </span>f64);
+    }
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">impl </span>RawFloat <span class="kw">for </span>f16 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">unsafe fn </span>pow_fast_path(<span class="kw">_</span>: usize, <span class="kw">_</span>: u32) -&gt; <span class="self">Self </span>{
         <span class="macro">unimplemented!</span>()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">RawFloat</span> <span class="kw">for</span> <span class="ident">bf16</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">pow_fast_path</span>(<span class="kw">_</span>: <span class="ident">usize</span>, <span class="kw">_</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">impl </span>RawFloat <span class="kw">for </span>bf16 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">unsafe fn </span>pow_fast_path(<span class="kw">_</span>: usize, <span class="kw">_</span>: u32) -&gt; <span class="self">Self </span>{
         <span class="macro">unimplemented!</span>()
     }
 }
 
-<span class="doccomment">/// Helper trait to add more float characteristics for the Eisel-Lemire algorithm.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LemireFloat</span>: <span class="ident">RawFloat</span> {
-    <span class="comment">// Round-to-even only happens for negative values of q</span>
-    <span class="comment">// when q ≥ −4 in the 64-bit case and when q ≥ −17 in</span>
-    <span class="comment">// the 32-bitcase.</span>
-    <span class="comment">//</span>
-    <span class="comment">// When q ≥ 0,we have that 5^q ≤ 2m+1. In the 64-bit case,we</span>
-    <span class="comment">// have 5^q ≤ 2m+1 ≤ 2^54 or q ≤ 23. In the 32-bit case,we have</span>
-    <span class="comment">// 5^q ≤ 2m+1 ≤ 2^25 or q ≤ 10.</span>
-    <span class="comment">//</span>
-    <span class="comment">// When q &lt; 0, we have w ≥ (2m+1)×5^−q. We must have that w &lt; 2^64</span>
-    <span class="comment">// so (2m+1)×5^−q &lt; 2^64. We have that 2m+1 &gt; 2^53 (64-bit case)</span>
-    <span class="comment">// or 2m+1 &gt; 2^24 (32-bit case). Hence,we must have 2^53×5^−q &lt; 2^64</span>
-    <span class="comment">// (64-bit) and 2^24×5^−q &lt; 2^64 (32-bit). Hence we have 5^−q &lt; 2^11</span>
-    <span class="comment">// or q ≥ −4 (64-bit case) and 5^−q &lt; 2^40 or q ≥ −17 (32-bitcase).</span>
-    <span class="comment">//</span>
-    <span class="comment">// Thus we have that we only need to round ties to even when</span>
-    <span class="comment">// we have that q ∈ [−4,23](in the 64-bit case) or q∈[−17,10]</span>
-    <span class="comment">// (in the 32-bit case). In both cases,the power of five(5^|q|)</span>
-    <span class="comment">// fits in a 64-bit word.</span>
-    <span class="kw">const</span> <span class="ident">MIN_EXPONENT_ROUND_TO_EVEN</span>: <span class="ident">i32</span>;
-    <span class="kw">const</span> <span class="ident">MAX_EXPONENT_ROUND_TO_EVEN</span>: <span class="ident">i32</span>;
+<span class="doccomment">/// Helper trait to add more float characteristics for the Eisel-Lemire algorithm.
+</span><span class="kw">pub trait </span>LemireFloat: RawFloat {
+    <span class="comment">// Round-to-even only happens for negative values of q
+    // when q ≥ −4 in the 64-bit case and when q ≥ −17 in
+    // the 32-bitcase.
+    //
+    // When q ≥ 0,we have that 5^q ≤ 2m+1. In the 64-bit case,we
+    // have 5^q ≤ 2m+1 ≤ 2^54 or q ≤ 23. In the 32-bit case,we have
+    // 5^q ≤ 2m+1 ≤ 2^25 or q ≤ 10.
+    //
+    // When q &lt; 0, we have w ≥ (2m+1)×5^−q. We must have that w &lt; 2^64
+    // so (2m+1)×5^−q &lt; 2^64. We have that 2m+1 &gt; 2^53 (64-bit case)
+    // or 2m+1 &gt; 2^24 (32-bit case). Hence,we must have 2^53×5^−q &lt; 2^64
+    // (64-bit) and 2^24×5^−q &lt; 2^64 (32-bit). Hence we have 5^−q &lt; 2^11
+    // or q ≥ −4 (64-bit case) and 5^−q &lt; 2^40 or q ≥ −17 (32-bitcase).
+    //
+    // Thus we have that we only need to round ties to even when
+    // we have that q ∈ [−4,23](in the 64-bit case) or q∈[−17,10]
+    // (in the 32-bit case). In both cases,the power of five(5^|q|)
+    // fits in a 64-bit word.
+    </span><span class="kw">const </span>MIN_EXPONENT_ROUND_TO_EVEN: i32;
+    <span class="kw">const </span>MAX_EXPONENT_ROUND_TO_EVEN: i32;
 
-    <span class="doccomment">/// Minimum normal exponent value `-(1 &lt;&lt; (EXPONENT_SIZE - 1)) + 1`.</span>
-    <span class="kw">const</span> <span class="ident">MINIMUM_EXPONENT</span>: <span class="ident">i32</span>;
+    <span class="doccomment">/// Minimum normal exponent value `-(1 &lt;&lt; (EXPONENT_SIZE - 1)) + 1`.
+    </span><span class="kw">const </span>MINIMUM_EXPONENT: i32;
 
-    <span class="doccomment">/// Smallest decimal exponent for a non-zero value.</span>
-    <span class="kw">const</span> <span class="ident">SMALLEST_POWER_OF_TEN</span>: <span class="ident">i32</span>;
+    <span class="doccomment">/// Smallest decimal exponent for a non-zero value.
+    </span><span class="kw">const </span>SMALLEST_POWER_OF_TEN: i32;
 
-    <span class="doccomment">/// Largest decimal exponent for a non-infinite value.</span>
-    <span class="kw">const</span> <span class="ident">LARGEST_POWER_OF_TEN</span>: <span class="ident">i32</span>;
+    <span class="doccomment">/// Largest decimal exponent for a non-infinite value.
+    </span><span class="kw">const </span>LARGEST_POWER_OF_TEN: i32;
 }
 
-<span class="kw">impl</span> <span class="ident">LemireFloat</span> <span class="kw">for</span> <span class="ident">f32</span> {
-    <span class="kw">const</span> <span class="ident">MIN_EXPONENT_ROUND_TO_EVEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="op">-</span><span class="number">17</span>;
-    <span class="kw">const</span> <span class="ident">MAX_EXPONENT_ROUND_TO_EVEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">10</span>;
-    <span class="kw">const</span> <span class="ident">MINIMUM_EXPONENT</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="op">-</span><span class="number">127</span>;
-    <span class="kw">const</span> <span class="ident">SMALLEST_POWER_OF_TEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="op">-</span><span class="number">65</span>;
-    <span class="kw">const</span> <span class="ident">LARGEST_POWER_OF_TEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">38</span>;
+<span class="kw">impl </span>LemireFloat <span class="kw">for </span>f32 {
+    <span class="kw">const </span>MIN_EXPONENT_ROUND_TO_EVEN: i32 = -<span class="number">17</span>;
+    <span class="kw">const </span>MAX_EXPONENT_ROUND_TO_EVEN: i32 = <span class="number">10</span>;
+    <span class="kw">const </span>MINIMUM_EXPONENT: i32 = -<span class="number">127</span>;
+    <span class="kw">const </span>SMALLEST_POWER_OF_TEN: i32 = -<span class="number">65</span>;
+    <span class="kw">const </span>LARGEST_POWER_OF_TEN: i32 = <span class="number">38</span>;
 }
 
-<span class="kw">impl</span> <span class="ident">LemireFloat</span> <span class="kw">for</span> <span class="ident">f64</span> {
-    <span class="kw">const</span> <span class="ident">MIN_EXPONENT_ROUND_TO_EVEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="op">-</span><span class="number">4</span>;
-    <span class="kw">const</span> <span class="ident">MAX_EXPONENT_ROUND_TO_EVEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">23</span>;
-    <span class="kw">const</span> <span class="ident">MINIMUM_EXPONENT</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="op">-</span><span class="number">1023</span>;
-    <span class="kw">const</span> <span class="ident">SMALLEST_POWER_OF_TEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="op">-</span><span class="number">342</span>;
-    <span class="kw">const</span> <span class="ident">LARGEST_POWER_OF_TEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">308</span>;
+<span class="kw">impl </span>LemireFloat <span class="kw">for </span>f64 {
+    <span class="kw">const </span>MIN_EXPONENT_ROUND_TO_EVEN: i32 = -<span class="number">4</span>;
+    <span class="kw">const </span>MAX_EXPONENT_ROUND_TO_EVEN: i32 = <span class="number">23</span>;
+    <span class="kw">const </span>MINIMUM_EXPONENT: i32 = -<span class="number">1023</span>;
+    <span class="kw">const </span>SMALLEST_POWER_OF_TEN: i32 = -<span class="number">342</span>;
+    <span class="kw">const </span>LARGEST_POWER_OF_TEN: i32 = <span class="number">308</span>;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">LemireFloat</span> <span class="kw">for</span> <span class="ident">f16</span> {
-    <span class="kw">const</span> <span class="ident">MIN_EXPONENT_ROUND_TO_EVEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">MAX_EXPONENT_ROUND_TO_EVEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">MINIMUM_EXPONENT</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">SMALLEST_POWER_OF_TEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">LARGEST_POWER_OF_TEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">impl </span>LemireFloat <span class="kw">for </span>f16 {
+    <span class="kw">const </span>MIN_EXPONENT_ROUND_TO_EVEN: i32 = <span class="number">0</span>;
+    <span class="kw">const </span>MAX_EXPONENT_ROUND_TO_EVEN: i32 = <span class="number">0</span>;
+    <span class="kw">const </span>MINIMUM_EXPONENT: i32 = <span class="number">0</span>;
+    <span class="kw">const </span>SMALLEST_POWER_OF_TEN: i32 = <span class="number">0</span>;
+    <span class="kw">const </span>LARGEST_POWER_OF_TEN: i32 = <span class="number">0</span>;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">LemireFloat</span> <span class="kw">for</span> <span class="ident">bf16</span> {
-    <span class="kw">const</span> <span class="ident">MIN_EXPONENT_ROUND_TO_EVEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">MAX_EXPONENT_ROUND_TO_EVEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">MINIMUM_EXPONENT</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">SMALLEST_POWER_OF_TEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">LARGEST_POWER_OF_TEN</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">impl </span>LemireFloat <span class="kw">for </span>bf16 {
+    <span class="kw">const </span>MIN_EXPONENT_ROUND_TO_EVEN: i32 = <span class="number">0</span>;
+    <span class="kw">const </span>MAX_EXPONENT_ROUND_TO_EVEN: i32 = <span class="number">0</span>;
+    <span class="kw">const </span>MINIMUM_EXPONENT: i32 = <span class="number">0</span>;
+    <span class="kw">const </span>SMALLEST_POWER_OF_TEN: i32 = <span class="number">0</span>;
+    <span class="kw">const </span>LARGEST_POWER_OF_TEN: i32 = <span class="number">0</span>;
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">powf</span>(<span class="ident">x</span>: <span class="ident">f32</span>, <span class="ident">y</span>: <span class="ident">f32</span>) -&gt; <span class="ident">f32</span> {
-    <span class="ident">x</span>.<span class="ident">powf</span>(<span class="ident">y</span>)
+<span class="attribute">#[inline(always)]
+#[cfg(all(feature = <span class="string">&quot;std&quot;</span>, feature = <span class="string">&quot;compact&quot;</span>))]
+</span><span class="kw">pub fn </span>powf(x: f32, y: f32) -&gt; f32 {
+    x.powf(y)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">powd</span>(<span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
-    <span class="ident">x</span>.<span class="ident">powf</span>(<span class="ident">y</span>)
+<span class="attribute">#[inline(always)]
+#[cfg(all(feature = <span class="string">&quot;std&quot;</span>, feature = <span class="string">&quot;compact&quot;</span>))]
+</span><span class="kw">pub fn </span>powd(x: f64, y: f64) -&gt; f64 {
+    x.powf(y)
 }
 
-<span class="doccomment">/// Converts an `ExtendedFloat` to the closest machine float type.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extended_to_float</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Float</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="ident">ExtendedFloat80</span>) -&gt; <span class="ident">F</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">word</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">mant</span>;
-    <span class="ident">word</span> <span class="op">|</span><span class="op">=</span> (<span class="ident">x</span>.<span class="ident">exp</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">F::MANTISSA_SIZE</span>;
-    <span class="ident">F::from_bits</span>(<span class="ident">F::Unsigned::as_cast</span>(<span class="ident">word</span>))
+<span class="doccomment">/// Converts an `ExtendedFloat` to the closest machine float type.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>extended_to_float&lt;F: Float&gt;(x: ExtendedFloat80) -&gt; F {
+    <span class="kw">let </span><span class="kw-2">mut </span>word = x.mant;
+    word |= (x.exp <span class="kw">as </span>u64) &lt;&lt; F::MANTISSA_SIZE;
+    F::from_bits(F::Unsigned::as_cast(word))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/aes.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aes.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/aes.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aes.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -441,448 +441,448 @@
 <span id="441">441</span>
 <span id="442">442</span>
 <span id="443">443</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">counter</span>, <span class="ident">iv::Iv</span>, <span class="ident">quic::Sample</span>, <span class="ident">Block</span>, <span class="ident">Direction</span>, <span class="ident">BLOCK_LEN</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">bits::BitLength</span>, <span class="ident">c</span>, <span class="ident">cpu</span>, <span class="ident">endian</span>::<span class="kw-2">*</span>, <span class="ident">error</span>, <span class="ident">polyfill</span>};
+</span><span class="kw">use super</span>::{counter, iv::Iv, quic::Sample, Block, Direction, BLOCK_LEN};
+<span class="kw">use crate</span>::{bits::BitLength, c, cpu, endian::<span class="kw-2">*</span>, error, polyfill};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Key</span> {
-    <span class="ident">inner</span>: <span class="ident">AES_KEY</span>,
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Key {
+    inner: AES_KEY,
+    cpu_features: cpu::Features,
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">set_encrypt_key</span> {
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key_bits</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span> ) =&gt; {{
-        <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">user_key</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">bits</span>: <span class="ident">c::uint</span>, <span class="ident">key</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AES_KEY</span>) -&gt; <span class="ident">c::int</span>;
+<span class="macro">macro_rules! </span>set_encrypt_key {
+    ( <span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$bytes</span>:expr, <span class="macro-nonterminal">$key_bits</span>:expr, <span class="macro-nonterminal">$key</span>:expr ) =&gt; {{
+        <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+            <span class="kw">fn </span><span class="macro-nonterminal">$name</span>(user_key: <span class="kw-2">*const </span>u8, bits: c::uint, key: <span class="kw-2">&amp;mut </span>AES_KEY) -&gt; c::int;
         }
-        <span class="ident">set_encrypt_key</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key_bits</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>)
+        set_encrypt_key(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$bytes</span>, <span class="macro-nonterminal">$key_bits</span>, <span class="macro-nonterminal">$key</span>)
     }};
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">set_encrypt_key</span>(
-    <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">c::uint</span>, <span class="kw-2">&amp;mut</span> <span class="ident">AES_KEY</span>) -&gt; <span class="ident">c::int</span>,
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">key_bits</span>: <span class="ident">BitLength</span>,
-    <span class="ident">key</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AES_KEY</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="comment">// Unusually, in this case zero means success and non-zero means failure.</span>
-    <span class="kw">if</span> <span class="number">0</span> <span class="op">==</span> <span class="kw">unsafe</span> { <span class="ident">f</span>(<span class="ident">bytes</span>.<span class="ident">as_ptr</span>(), <span class="ident">key_bits</span>.<span class="ident">as_usize_bits</span>() <span class="kw">as</span> <span class="ident">c::uint</span>, <span class="ident">key</span>) } {
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>set_encrypt_key(
+    f: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(<span class="kw-2">*const </span>u8, c::uint, <span class="kw-2">&amp;mut </span>AES_KEY) -&gt; c::int,
+    bytes: <span class="kw-2">&amp;</span>[u8],
+    key_bits: BitLength,
+    key: <span class="kw-2">&amp;mut </span>AES_KEY,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+    <span class="comment">// Unusually, in this case zero means success and non-zero means failure.
+    </span><span class="kw">if </span><span class="number">0 </span>== <span class="kw">unsafe </span>{ f(bytes.as_ptr(), key_bits.as_usize_bits() <span class="kw">as </span>c::uint, key) } {
         <span class="prelude-val">Ok</span>(())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>)
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(error::Unspecified)
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">encrypt_block</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">block</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Block</span>, <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Block</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">AES_KEY</span>);
+<span class="macro">macro_rules! </span>encrypt_block {
+    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$block</span>:expr, <span class="macro-nonterminal">$key</span>:expr) =&gt; {{
+        <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+            <span class="kw">fn </span><span class="macro-nonterminal">$name</span>(a: <span class="kw-2">&amp;</span>Block, r: <span class="kw-2">*mut </span>Block, key: <span class="kw-2">&amp;</span>AES_KEY);
         }
-        <span class="ident">encrypt_block_</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">block</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>)
+        encrypt_block_(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$block</span>, <span class="macro-nonterminal">$key</span>)
     }};
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">encrypt_block_</span>(
-    <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">Block</span>, <span class="kw-2">*mut</span> <span class="ident">Block</span>, <span class="kw-2">&amp;</span><span class="ident">AES_KEY</span>),
-    <span class="ident">a</span>: <span class="ident">Block</span>,
-    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>,
-) -&gt; <span class="ident">Block</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">core::mem::MaybeUninit::uninit</span>();
-    <span class="kw">unsafe</span> {
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>, <span class="ident">result</span>.<span class="ident">as_mut_ptr</span>(), <span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">inner</span>);
-        <span class="ident">result</span>.<span class="ident">assume_init</span>()
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>encrypt_block_(
+    f: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(<span class="kw-2">&amp;</span>Block, <span class="kw-2">*mut </span>Block, <span class="kw-2">&amp;</span>AES_KEY),
+    a: Block,
+    key: <span class="kw-2">&amp;</span>Key,
+) -&gt; Block {
+    <span class="kw">let </span><span class="kw-2">mut </span>result = core::mem::MaybeUninit::uninit();
+    <span class="kw">unsafe </span>{
+        f(<span class="kw-2">&amp;</span>a, result.as_mut_ptr(), <span class="kw-2">&amp;</span>key.inner);
+        result.assume_init()
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">ctr32_encrypt_blocks</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">in_out</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">in_prefix_len</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ivec</span>:<span class="ident">expr</span> ) =&gt; {{
-        <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(
-                <span class="ident">input</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-                <span class="ident">output</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>,
-                <span class="ident">blocks</span>: <span class="ident">c::size_t</span>,
-                <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">AES_KEY</span>,
-                <span class="ident">ivec</span>: <span class="kw-2">&amp;</span><span class="ident">Counter</span>,
+<span class="macro">macro_rules! </span>ctr32_encrypt_blocks {
+    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$in_out</span>:expr, <span class="macro-nonterminal">$in_prefix_len</span>:expr, <span class="macro-nonterminal">$key</span>:expr, <span class="macro-nonterminal">$ivec</span>:expr ) =&gt; {{
+        <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+            <span class="kw">fn </span><span class="macro-nonterminal">$name</span>(
+                input: <span class="kw-2">*const </span>u8,
+                output: <span class="kw-2">*mut </span>u8,
+                blocks: c::size_t,
+                key: <span class="kw-2">&amp;</span>AES_KEY,
+                ivec: <span class="kw-2">&amp;</span>Counter,
             );
         }
-        <span class="ident">ctr32_encrypt_blocks_</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">in_out</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">in_prefix_len</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ivec</span>)
+        ctr32_encrypt_blocks_(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$in_out</span>, <span class="macro-nonterminal">$in_prefix_len</span>, <span class="macro-nonterminal">$key</span>, <span class="macro-nonterminal">$ivec</span>)
     }};
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">ctr32_encrypt_blocks_</span>(
-    <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">input</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-        <span class="ident">output</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>,
-        <span class="ident">blocks</span>: <span class="ident">c::size_t</span>,
-        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">AES_KEY</span>,
-        <span class="ident">ivec</span>: <span class="kw-2">&amp;</span><span class="ident">Counter</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>ctr32_encrypt_blocks_(
+    f: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(
+        input: <span class="kw-2">*const </span>u8,
+        output: <span class="kw-2">*mut </span>u8,
+        blocks: c::size_t,
+        key: <span class="kw-2">&amp;</span>AES_KEY,
+        ivec: <span class="kw-2">&amp;</span>Counter,
     ),
-    <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">in_prefix_len</span>: <span class="ident">usize</span>,
-    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">AES_KEY</span>,
-    <span class="ident">ctr</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counter</span>,
+    in_out: <span class="kw-2">&amp;mut </span>[u8],
+    in_prefix_len: usize,
+    key: <span class="kw-2">&amp;</span>AES_KEY,
+    ctr: <span class="kw-2">&amp;mut </span>Counter,
 ) {
-    <span class="kw">let</span> <span class="ident">in_out_len</span> <span class="op">=</span> <span class="ident">in_out</span>.<span class="ident">len</span>().<span class="ident">checked_sub</span>(<span class="ident">in_prefix_len</span>).<span class="ident">unwrap</span>();
-    <span class="macro">assert_eq!</span>(<span class="ident">in_out_len</span> <span class="op">%</span> <span class="ident">BLOCK_LEN</span>, <span class="number">0</span>);
+    <span class="kw">let </span>in_out_len = in_out.len().checked_sub(in_prefix_len).unwrap();
+    <span class="macro">assert_eq!</span>(in_out_len % BLOCK_LEN, <span class="number">0</span>);
 
-    <span class="kw">let</span> <span class="ident">blocks</span> <span class="op">=</span> <span class="ident">in_out_len</span> <span class="op">/</span> <span class="ident">BLOCK_LEN</span>;
-    <span class="kw">let</span> <span class="ident">blocks_u32</span> <span class="op">=</span> <span class="ident">blocks</span> <span class="kw">as</span> <span class="ident">u32</span>;
-    <span class="macro">assert_eq!</span>(<span class="ident">blocks</span>, <span class="ident">polyfill::usize_from_u32</span>(<span class="ident">blocks_u32</span>));
+    <span class="kw">let </span>blocks = in_out_len / BLOCK_LEN;
+    <span class="kw">let </span>blocks_u32 = blocks <span class="kw">as </span>u32;
+    <span class="macro">assert_eq!</span>(blocks, polyfill::usize_from_u32(blocks_u32));
 
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">in_out</span>[<span class="ident">in_prefix_len</span>..].<span class="ident">as_ptr</span>();
-    <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">in_out</span>.<span class="ident">as_mut_ptr</span>();
+    <span class="kw">let </span>input = in_out[in_prefix_len..].as_ptr();
+    <span class="kw">let </span>output = in_out.as_mut_ptr();
 
-    <span class="kw">unsafe</span> {
-        <span class="ident">f</span>(<span class="ident">input</span>, <span class="ident">output</span>, <span class="ident">blocks</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">ctr</span>);
+    <span class="kw">unsafe </span>{
+        f(input, output, blocks, <span class="kw-2">&amp;</span>key, ctr);
     }
-    <span class="ident">ctr</span>.<span class="ident">increment_by_less_safe</span>(<span class="ident">blocks_u32</span>);
+    ctr.increment_by_less_safe(blocks_u32);
 }
 
-<span class="kw">impl</span> <span class="ident">Key</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">variant</span>: <span class="ident">Variant</span>,
-        <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key_bits</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">variant</span> {
-            <span class="ident">Variant::AES_128</span> =&gt; <span class="ident">BitLength::from_usize_bits</span>(<span class="number">128</span>),
-            <span class="ident">Variant::AES_256</span> =&gt; <span class="ident">BitLength::from_usize_bits</span>(<span class="number">256</span>),
+<span class="kw">impl </span>Key {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>new(
+        bytes: <span class="kw-2">&amp;</span>[u8],
+        variant: Variant,
+        cpu_features: cpu::Features,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::Unspecified&gt; {
+        <span class="kw">let </span>key_bits = <span class="kw">match </span>variant {
+            Variant::AES_128 =&gt; BitLength::from_usize_bits(<span class="number">128</span>),
+            Variant::AES_256 =&gt; BitLength::from_usize_bits(<span class="number">256</span>),
         };
-        <span class="kw">if</span> <span class="ident">BitLength::from_usize_bytes</span>(<span class="ident">bytes</span>.<span class="ident">len</span>())<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="ident">key_bits</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+        <span class="kw">if </span>BitLength::from_usize_bytes(bytes.len())<span class="question-mark">? </span>!= key_bits {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">AES_KEY</span> {
-            <span class="ident">rd_key</span>: [<span class="number">0u32</span>; <span class="number">4</span> <span class="op">*</span> (<span class="ident">MAX_ROUNDS</span> <span class="op">+</span> <span class="number">1</span>)],
-            <span class="ident">rounds</span>: <span class="number">0</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>key = AES_KEY {
+            rd_key: [<span class="number">0u32</span>; <span class="number">4 </span>* (MAX_ROUNDS + <span class="number">1</span>)],
+            rounds: <span class="number">0</span>,
         };
 
-        <span class="kw">match</span> <span class="ident">detect_implementation</span>(<span class="ident">cpu_features</span>) {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-            ))]</span>
-            <span class="ident">Implementation::HWAES</span> =&gt; {
-                <span class="macro">set_encrypt_key!</span>(<span class="ident">GFp_aes_hw_set_encrypt_key</span>, <span class="ident">bytes</span>, <span class="ident">key_bits</span>, <span class="kw-2">&amp;mut</span> <span class="ident">key</span>)<span class="question-mark">?</span>
-            }
+        <span class="kw">match </span>detect_implementation(cpu_features) {
+            <span class="attribute">#[cfg(any(
+                target_arch = <span class="string">&quot;aarch64&quot;</span>,
+                target_arch = <span class="string">&quot;arm&quot;</span>,
+                target_arch = <span class="string">&quot;x86_64&quot;</span>,
+                target_arch = <span class="string">&quot;x86&quot;
+            </span>))]
+            </span>Implementation::HWAES =&gt; {
+                <span class="macro">set_encrypt_key!</span>(GFp_aes_hw_set_encrypt_key, bytes, key_bits, <span class="kw-2">&amp;mut </span>key)<span class="question-mark">?
+            </span>}
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-            ))]</span>
-            <span class="ident">Implementation::VPAES_BSAES</span> =&gt; {
-                <span class="macro">set_encrypt_key!</span>(<span class="ident">GFp_vpaes_set_encrypt_key</span>, <span class="ident">bytes</span>, <span class="ident">key_bits</span>, <span class="kw-2">&amp;mut</span> <span class="ident">key</span>)<span class="question-mark">?</span>
-            }
+            <span class="attribute">#[cfg(any(
+                target_arch = <span class="string">&quot;aarch64&quot;</span>,
+                target_arch = <span class="string">&quot;arm&quot;</span>,
+                target_arch = <span class="string">&quot;x86_64&quot;</span>,
+                target_arch = <span class="string">&quot;x86&quot;
+            </span>))]
+            </span>Implementation::VPAES_BSAES =&gt; {
+                <span class="macro">set_encrypt_key!</span>(GFp_vpaes_set_encrypt_key, bytes, key_bits, <span class="kw-2">&amp;mut </span>key)<span class="question-mark">?
+            </span>}
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-            <span class="ident">Implementation::NOHW</span> =&gt; {
-                <span class="macro">set_encrypt_key!</span>(<span class="ident">GFp_aes_nohw_set_encrypt_key</span>, <span class="ident">bytes</span>, <span class="ident">key_bits</span>, <span class="kw-2">&amp;mut</span> <span class="ident">key</span>)<span class="question-mark">?</span>
-            }
+            <span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;aarch64&quot;</span>))]
+            </span>Implementation::NOHW =&gt; {
+                <span class="macro">set_encrypt_key!</span>(GFp_aes_nohw_set_encrypt_key, bytes, key_bits, <span class="kw-2">&amp;mut </span>key)<span class="question-mark">?
+            </span>}
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">key</span>,
-            <span class="ident">cpu_features</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            inner: key,
+            cpu_features,
         })
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">Block</span>) -&gt; <span class="ident">Block</span> {
-        <span class="kw">match</span> <span class="ident">detect_implementation</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>) {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-            ))]</span>
-            <span class="ident">Implementation::HWAES</span> =&gt; <span class="macro">encrypt_block!</span>(<span class="ident">GFp_aes_hw_encrypt</span>, <span class="ident">a</span>, <span class="self">self</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>encrypt_block(<span class="kw-2">&amp;</span><span class="self">self</span>, a: Block) -&gt; Block {
+        <span class="kw">match </span>detect_implementation(<span class="self">self</span>.cpu_features) {
+            <span class="attribute">#[cfg(any(
+                target_arch = <span class="string">&quot;aarch64&quot;</span>,
+                target_arch = <span class="string">&quot;arm&quot;</span>,
+                target_arch = <span class="string">&quot;x86_64&quot;</span>,
+                target_arch = <span class="string">&quot;x86&quot;
+            </span>))]
+            </span>Implementation::HWAES =&gt; <span class="macro">encrypt_block!</span>(GFp_aes_hw_encrypt, a, <span class="self">self</span>),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-            ))]</span>
-            <span class="ident">Implementation::VPAES_BSAES</span> =&gt; <span class="macro">encrypt_block!</span>(<span class="ident">GFp_vpaes_encrypt</span>, <span class="ident">a</span>, <span class="self">self</span>),
+            <span class="attribute">#[cfg(any(
+                target_arch = <span class="string">&quot;aarch64&quot;</span>,
+                target_arch = <span class="string">&quot;arm&quot;</span>,
+                target_arch = <span class="string">&quot;x86_64&quot;</span>,
+                target_arch = <span class="string">&quot;x86&quot;
+            </span>))]
+            </span>Implementation::VPAES_BSAES =&gt; <span class="macro">encrypt_block!</span>(GFp_vpaes_encrypt, a, <span class="self">self</span>),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-            <span class="ident">Implementation::NOHW</span> =&gt; <span class="macro">encrypt_block!</span>(<span class="ident">GFp_aes_nohw_encrypt</span>, <span class="ident">a</span>, <span class="self">self</span>),
+            <span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;aarch64&quot;</span>))]
+            </span>Implementation::NOHW =&gt; <span class="macro">encrypt_block!</span>(GFp_aes_nohw_encrypt, a, <span class="self">self</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt_iv_xor_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">iv</span>: <span class="ident">Iv</span>, <span class="ident">input</span>: <span class="ident">Block</span>) -&gt; <span class="ident">Block</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">encrypt_block</span>(<span class="ident">Block::from</span>(<span class="kw-2">&amp;</span><span class="ident">iv</span>.<span class="ident">into_bytes_less_safe</span>()));
-        <span class="ident">output</span>.<span class="ident">bitxor_assign</span>(<span class="ident">input</span>);
-        <span class="ident">output</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>encrypt_iv_xor_block(<span class="kw-2">&amp;</span><span class="self">self</span>, iv: Iv, input: Block) -&gt; Block {
+        <span class="kw">let </span><span class="kw-2">mut </span>output = <span class="self">self</span>.encrypt_block(Block::from(<span class="kw-2">&amp;</span>iv.into_bytes_less_safe()));
+        output.bitxor_assign(input);
+        output
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ctr32_encrypt_blocks</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>ctr32_encrypt_blocks(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">direction</span>: <span class="ident">Direction</span>,
-        <span class="ident">ctr</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counter</span>,
+        in_out: <span class="kw-2">&amp;mut </span>[u8],
+        direction: Direction,
+        ctr: <span class="kw-2">&amp;mut </span>Counter,
     ) {
-        <span class="kw">let</span> <span class="ident">in_prefix_len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">direction</span> {
-            <span class="ident">Direction::Opening</span> { <span class="ident">in_prefix_len</span> } =&gt; <span class="ident">in_prefix_len</span>,
-            <span class="ident">Direction::Sealing</span> =&gt; <span class="number">0</span>,
+        <span class="kw">let </span>in_prefix_len = <span class="kw">match </span>direction {
+            Direction::Opening { in_prefix_len } =&gt; in_prefix_len,
+            Direction::Sealing =&gt; <span class="number">0</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">in_out_len</span> <span class="op">=</span> <span class="ident">in_out</span>.<span class="ident">len</span>().<span class="ident">checked_sub</span>(<span class="ident">in_prefix_len</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>in_out_len = in_out.len().checked_sub(in_prefix_len).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">in_out_len</span> <span class="op">%</span> <span class="ident">BLOCK_LEN</span>, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(in_out_len % BLOCK_LEN, <span class="number">0</span>);
 
-        <span class="kw">match</span> <span class="ident">detect_implementation</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>) {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-            ))]</span>
-            <span class="ident">Implementation::HWAES</span> =&gt; <span class="macro">ctr32_encrypt_blocks!</span>(
-                <span class="ident">GFp_aes_hw_ctr32_encrypt_blocks</span>,
-                <span class="ident">in_out</span>,
-                <span class="ident">in_prefix_len</span>,
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>,
-                <span class="ident">ctr</span>
+        <span class="kw">match </span>detect_implementation(<span class="self">self</span>.cpu_features) {
+            <span class="attribute">#[cfg(any(
+                target_arch = <span class="string">&quot;aarch64&quot;</span>,
+                target_arch = <span class="string">&quot;arm&quot;</span>,
+                target_arch = <span class="string">&quot;x86_64&quot;</span>,
+                target_arch = <span class="string">&quot;x86&quot;
+            </span>))]
+            </span>Implementation::HWAES =&gt; <span class="macro">ctr32_encrypt_blocks!</span>(
+                GFp_aes_hw_ctr32_encrypt_blocks,
+                in_out,
+                in_prefix_len,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.inner,
+                ctr
             ),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>))]</span>
-            <span class="ident">Implementation::VPAES_BSAES</span> =&gt; {
-                <span class="comment">// 8 blocks is the cut-off point where it&#39;s faster to use BSAES.</span>
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>)]</span>
-                <span class="kw">let</span> <span class="ident">in_out</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">in_out_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> <span class="op">*</span> <span class="ident">BLOCK_LEN</span> {
-                    <span class="kw">let</span> <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">in_out_len</span> <span class="op">%</span> (<span class="number">8</span> <span class="op">*</span> <span class="ident">BLOCK_LEN</span>);
-                    <span class="kw">let</span> <span class="ident">bsaes_in_out_len</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">remainder</span> <span class="op">&lt;</span> (<span class="number">4</span> <span class="op">*</span> <span class="ident">BLOCK_LEN</span>) {
-                        <span class="ident">in_out_len</span> <span class="op">-</span> <span class="ident">remainder</span>
-                    } <span class="kw">else</span> {
-                        <span class="ident">in_out_len</span>
+            <span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;arm&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+            </span>Implementation::VPAES_BSAES =&gt; {
+                <span class="comment">// 8 blocks is the cut-off point where it&#39;s faster to use BSAES.
+                </span><span class="attribute">#[cfg(target_arch = <span class="string">&quot;arm&quot;</span>)]
+                </span><span class="kw">let </span>in_out = <span class="kw">if </span>in_out_len &gt;= <span class="number">8 </span>* BLOCK_LEN {
+                    <span class="kw">let </span>remainder = in_out_len % (<span class="number">8 </span>* BLOCK_LEN);
+                    <span class="kw">let </span>bsaes_in_out_len = <span class="kw">if </span>remainder &lt; (<span class="number">4 </span>* BLOCK_LEN) {
+                        in_out_len - remainder
+                    } <span class="kw">else </span>{
+                        in_out_len
                     };
 
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bsaes_key</span> <span class="op">=</span> <span class="ident">AES_KEY</span> {
-                        <span class="ident">rd_key</span>: [<span class="number">0u32</span>; <span class="number">4</span> <span class="op">*</span> (<span class="ident">MAX_ROUNDS</span> <span class="op">+</span> <span class="number">1</span>)],
-                        <span class="ident">rounds</span>: <span class="number">0</span>,
+                    <span class="kw">let </span><span class="kw-2">mut </span>bsaes_key = AES_KEY {
+                        rd_key: [<span class="number">0u32</span>; <span class="number">4 </span>* (MAX_ROUNDS + <span class="number">1</span>)],
+                        rounds: <span class="number">0</span>,
                     };
-                    <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                        <span class="kw">fn</span> <span class="ident">GFp_vpaes_encrypt_key_to_bsaes</span>(
-                            <span class="ident">bsaes_key</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AES_KEY</span>,
-                            <span class="ident">vpaes_key</span>: <span class="kw-2">&amp;</span><span class="ident">AES_KEY</span>,
+                    <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                        <span class="kw">fn </span>GFp_vpaes_encrypt_key_to_bsaes(
+                            bsaes_key: <span class="kw-2">&amp;mut </span>AES_KEY,
+                            vpaes_key: <span class="kw-2">&amp;</span>AES_KEY,
                         );
                     }
-                    <span class="kw">unsafe</span> {
-                        <span class="ident">GFp_vpaes_encrypt_key_to_bsaes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bsaes_key</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>);
+                    <span class="kw">unsafe </span>{
+                        GFp_vpaes_encrypt_key_to_bsaes(<span class="kw-2">&amp;mut </span>bsaes_key, <span class="kw-2">&amp;</span><span class="self">self</span>.inner);
                     }
                     <span class="macro">ctr32_encrypt_blocks!</span>(
-                        <span class="ident">GFp_bsaes_ctr32_encrypt_blocks</span>,
-                        <span class="kw-2">&amp;mut</span> <span class="ident">in_out</span>[..(<span class="ident">bsaes_in_out_len</span> <span class="op">+</span> <span class="ident">in_prefix_len</span>)],
-                        <span class="ident">in_prefix_len</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">bsaes_key</span>,
-                        <span class="ident">ctr</span>
+                        GFp_bsaes_ctr32_encrypt_blocks,
+                        <span class="kw-2">&amp;mut </span>in_out[..(bsaes_in_out_len + in_prefix_len)],
+                        in_prefix_len,
+                        <span class="kw-2">&amp;</span>bsaes_key,
+                        ctr
                     );
 
-                    <span class="kw-2">&amp;mut</span> <span class="ident">in_out</span>[<span class="ident">bsaes_in_out_len</span>..]
-                } <span class="kw">else</span> {
-                    <span class="ident">in_out</span>
+                    <span class="kw-2">&amp;mut </span>in_out[bsaes_in_out_len..]
+                } <span class="kw">else </span>{
+                    in_out
                 };
 
                 <span class="macro">ctr32_encrypt_blocks!</span>(
-                    <span class="ident">GFp_vpaes_ctr32_encrypt_blocks</span>,
-                    <span class="ident">in_out</span>,
-                    <span class="ident">in_prefix_len</span>,
-                    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>,
-                    <span class="ident">ctr</span>
+                    GFp_vpaes_ctr32_encrypt_blocks,
+                    in_out,
+                    in_prefix_len,
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.inner,
+                    ctr
                 )
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>))]</span>
-            <span class="ident">Implementation::VPAES_BSAES</span> =&gt; {
-                <span class="ident"><span class="kw">super</span>::shift::shift_full_blocks</span>(<span class="ident">in_out</span>, <span class="ident">in_prefix_len</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-                    <span class="self">self</span>.<span class="ident">encrypt_iv_xor_block</span>(<span class="ident">ctr</span>.<span class="ident">increment</span>(), <span class="ident">Block::from</span>(<span class="ident">input</span>))
+            <span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;x86&quot;</span>))]
+            </span>Implementation::VPAES_BSAES =&gt; {
+                <span class="kw">super</span>::shift::shift_full_blocks(in_out, in_prefix_len, |input| {
+                    <span class="self">self</span>.encrypt_iv_xor_block(ctr.increment(), Block::from(input))
                 });
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-            <span class="ident">Implementation::NOHW</span> =&gt; <span class="macro">ctr32_encrypt_blocks!</span>(
-                <span class="ident">GFp_aes_nohw_ctr32_encrypt_blocks</span>,
-                <span class="ident">in_out</span>,
-                <span class="ident">in_prefix_len</span>,
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>,
-                <span class="ident">ctr</span>
+            <span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;aarch64&quot;</span>))]
+            </span>Implementation::NOHW =&gt; <span class="macro">ctr32_encrypt_blocks!</span>(
+                GFp_aes_nohw_ctr32_encrypt_blocks,
+                in_out,
+                in_prefix_len,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.inner,
+                ctr
             ),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_mask</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sample</span>: <span class="ident">Sample</span>) -&gt; [<span class="ident">u8</span>; <span class="number">5</span>] {
-        <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">encrypt_block</span>(<span class="ident">Block::from</span>(<span class="kw-2">&amp;</span><span class="ident">sample</span>));
+    <span class="kw">pub fn </span>new_mask(<span class="kw-2">&amp;</span><span class="self">self</span>, sample: Sample) -&gt; [u8; <span class="number">5</span>] {
+        <span class="kw">let </span>block = <span class="self">self</span>.encrypt_block(Block::from(<span class="kw-2">&amp;</span>sample));
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span>: [<span class="ident">u8</span>; <span class="number">5</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="number">5</span>];
-        <span class="ident">out</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">block</span>.<span class="ident">as_ref</span>()[..<span class="number">5</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>out: [u8; <span class="number">5</span>] = [<span class="number">0</span>; <span class="number">5</span>];
+        out.copy_from_slice(<span class="kw-2">&amp;</span>block.as_ref()[..<span class="number">5</span>]);
 
-        <span class="ident">out</span>
+        out
     }
 
-    <span class="comment">// TODO: use `matches!` when MSRV increases to 1.42.0 and remove this</span>
-    <span class="comment">// `#[allow(...)]`</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unknown_clippy_lints</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::match_like_matches_macro</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_aes_hw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="ident">detect_implementation</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>) {
-            <span class="ident">Implementation::HWAES</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="comment">// TODO: use `matches!` when MSRV increases to 1.42.0 and remove this
+    // `#[allow(...)]`
+    </span><span class="attribute">#[allow(clippy::unknown_clippy_lints)]
+    #[allow(clippy::match_like_matches_macro)]
+    #[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+    #[must_use]
+    </span><span class="kw">pub fn </span>is_aes_hw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span>detect_implementation(<span class="self">self</span>.cpu_features) {
+            Implementation::HWAES =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">inner_less_safe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AES_KEY</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
+    <span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+    #[must_use]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>inner_less_safe(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>AES_KEY {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner
     }
 }
 
-<span class="comment">// Keep this in sync with AES_KEY in aes.h.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">AES_KEY</span> {
-    <span class="kw">pub</span> <span class="ident">rd_key</span>: [<span class="ident">u32</span>; <span class="number">4</span> <span class="op">*</span> (<span class="ident">MAX_ROUNDS</span> <span class="op">+</span> <span class="number">1</span>)],
-    <span class="kw">pub</span> <span class="ident">rounds</span>: <span class="ident">c::uint</span>,
+<span class="comment">// Keep this in sync with AES_KEY in aes.h.
+</span><span class="attribute">#[repr(C)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>AES_KEY {
+    <span class="kw">pub </span>rd_key: [u32; <span class="number">4 </span>* (MAX_ROUNDS + <span class="number">1</span>)],
+    <span class="kw">pub </span>rounds: c::uint,
 }
 
-<span class="comment">// Keep this in sync with `AES_MAXNR` in aes.h.</span>
-<span class="kw">const</span> <span class="ident">MAX_ROUNDS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">14</span>;
+<span class="comment">// Keep this in sync with `AES_MAXNR` in aes.h.
+</span><span class="kw">const </span>MAX_ROUNDS: usize = <span class="number">14</span>;
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Variant</span> {
-    <span class="ident">AES_128</span>,
-    <span class="ident">AES_256</span>,
+<span class="kw">pub enum </span>Variant {
+    AES_128,
+    AES_256,
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Counter</span> <span class="op">=</span> <span class="ident">counter::Counter</span><span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>Counter = counter::Counter&lt;BigEndian&lt;u32&gt;&gt;;
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span> <span class="comment">// Only so `Key` can be `#[repr(C)]`</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Implementation</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-    ))]</span>
-    <span class="ident">HWAES</span> <span class="op">=</span> <span class="number">1</span>,
+<span class="attribute">#[repr(C)] </span><span class="comment">// Only so `Key` can be `#[repr(C)]`
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub enum </span>Implementation {
+    <span class="attribute">#[cfg(any(
+        target_arch = <span class="string">&quot;aarch64&quot;</span>,
+        target_arch = <span class="string">&quot;arm&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
+        target_arch = <span class="string">&quot;x86&quot;
+    </span>))]
+    </span>HWAES = <span class="number">1</span>,
 
-    <span class="comment">// On &quot;arm&quot; only, this indicates that the bsaes implementation may be used.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-    ))]</span>
-    <span class="ident">VPAES_BSAES</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="comment">// On &quot;arm&quot; only, this indicates that the bsaes implementation may be used.
+    </span><span class="attribute">#[cfg(any(
+        target_arch = <span class="string">&quot;aarch64&quot;</span>,
+        target_arch = <span class="string">&quot;arm&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
+        target_arch = <span class="string">&quot;x86&quot;
+    </span>))]
+    </span>VPAES_BSAES = <span class="number">2</span>,
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-    <span class="ident">NOHW</span> <span class="op">=</span> <span class="number">3</span>,
+    <span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;aarch64&quot;</span>))]
+    </span>NOHW = <span class="number">3</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">detect_implementation</span>(<span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="ident">Implementation</span> {
-    <span class="comment">// `cpu_features` is only used for specific platforms.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-    )))]</span>
-    <span class="kw">let</span> <span class="ident">_cpu_features</span> <span class="op">=</span> <span class="ident">cpu_features</span>;
+<span class="kw">fn </span>detect_implementation(cpu_features: cpu::Features) -&gt; Implementation {
+    <span class="comment">// `cpu_features` is only used for specific platforms.
+    </span><span class="attribute">#[cfg(not(any(
+        target_arch = <span class="string">&quot;aarch64&quot;</span>,
+        target_arch = <span class="string">&quot;arm&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
+        target_arch = <span class="string">&quot;x86&quot;
+    </span>)))]
+    </span><span class="kw">let </span>_cpu_features = cpu_features;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-    ))]</span>
-    {
-        <span class="kw">if</span> <span class="ident">cpu::intel::AES</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">cpu::arm::AES</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>) {
-            <span class="kw">return</span> <span class="ident">Implementation::HWAES</span>;
+    <span class="attribute">#[cfg(any(
+        target_arch = <span class="string">&quot;aarch64&quot;</span>,
+        target_arch = <span class="string">&quot;arm&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
+        target_arch = <span class="string">&quot;x86&quot;
+    </span>))]
+    </span>{
+        <span class="kw">if </span>cpu::intel::AES.available(cpu_features) || cpu::arm::AES.available(cpu_features) {
+            <span class="kw">return </span>Implementation::HWAES;
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>))]</span>
-    {
-        <span class="kw">if</span> <span class="ident">cpu::intel::SSSE3</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>) {
-            <span class="kw">return</span> <span class="ident">Implementation::VPAES_BSAES</span>;
+    <span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;x86_64&quot;</span>, target_arch = <span class="string">&quot;x86&quot;</span>))]
+    </span>{
+        <span class="kw">if </span>cpu::intel::SSSE3.available(cpu_features) {
+            <span class="kw">return </span>Implementation::VPAES_BSAES;
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>)]</span>
-    {
-        <span class="kw">if</span> <span class="ident">cpu::arm::NEON</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>) {
-            <span class="kw">return</span> <span class="ident">Implementation::VPAES_BSAES</span>;
+    <span class="attribute">#[cfg(target_arch = <span class="string">&quot;arm&quot;</span>)]
+    </span>{
+        <span class="kw">if </span>cpu::arm::NEON.available(cpu_features) {
+            <span class="kw">return </span>Implementation::VPAES_BSAES;
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>)]</span>
-    {
-        <span class="ident">Implementation::VPAES_BSAES</span>
+    <span class="attribute">#[cfg(target_arch = <span class="string">&quot;aarch64&quot;</span>)]
+    </span>{
+        Implementation::VPAES_BSAES
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-    {
-        <span class="ident">Implementation::NOHW</span>
+    <span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;aarch64&quot;</span>))]
+    </span>{
+        Implementation::NOHW
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident"><span class="kw">super</span>::BLOCK_LEN</span>, <span class="kw-2">*</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test</span>;
-    <span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::{<span class="kw">super</span>::BLOCK_LEN, <span class="kw-2">*</span>};
+    <span class="kw">use </span><span class="kw">crate</span>::test;
+    <span class="kw">use </span>core::convert::TryInto;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_aes</span>() {
-        <span class="ident">test::run</span>(<span class="macro">test_file!</span>(<span class="string">&quot;aes_tests.txt&quot;</span>), <span class="op">|</span><span class="ident">section</span>, <span class="ident">test_case</span><span class="op">|</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">section</span>, <span class="string">&quot;&quot;</span>);
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">consume_key</span>(<span class="ident">test_case</span>, <span class="string">&quot;Key&quot;</span>);
-            <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Input&quot;</span>);
-            <span class="kw">let</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="ident">BLOCK_LEN</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">as_slice</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">expected_output</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Output&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_aes() {
+        test::run(<span class="macro">test_file!</span>(<span class="string">&quot;aes_tests.txt&quot;</span>), |section, test_case| {
+            <span class="macro">assert_eq!</span>(section, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span>key = consume_key(test_case, <span class="string">&quot;Key&quot;</span>);
+            <span class="kw">let </span>input = test_case.consume_bytes(<span class="string">&quot;Input&quot;</span>);
+            <span class="kw">let </span>input: <span class="kw-2">&amp;</span>[u8; BLOCK_LEN] = input.as_slice().try_into()<span class="question-mark">?</span>;
+            <span class="kw">let </span>expected_output = test_case.consume_bytes(<span class="string">&quot;Output&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">Block::from</span>(<span class="ident">input</span>);
-            <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">encrypt_block</span>(<span class="ident">block</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">output</span>.<span class="ident">as_ref</span>(), <span class="kw-2">&amp;</span><span class="ident">expected_output</span>[..]);
+            <span class="kw">let </span>block = Block::from(input);
+            <span class="kw">let </span>output = key.encrypt_block(block);
+            <span class="macro">assert_eq!</span>(output.as_ref(), <span class="kw-2">&amp;</span>expected_output[..]);
 
             <span class="prelude-val">Ok</span>(())
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">consume_key</span>(<span class="ident">test_case</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::TestCase</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Key</span> {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="ident">variant</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">key</span>.<span class="ident">len</span>() {
-            <span class="number">16</span> =&gt; <span class="ident">Variant::AES_128</span>,
-            <span class="number">32</span> =&gt; <span class="ident">Variant::AES_256</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="kw">fn </span>consume_key(test_case: <span class="kw-2">&amp;mut </span>test::TestCase, name: <span class="kw-2">&amp;</span>str) -&gt; Key {
+        <span class="kw">let </span>key = test_case.consume_bytes(name);
+        <span class="kw">let </span>variant = <span class="kw">match </span>key.len() {
+            <span class="number">16 </span>=&gt; Variant::AES_128,
+            <span class="number">32 </span>=&gt; Variant::AES_256,
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         };
-        <span class="ident">Key::new</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>[..], <span class="ident">variant</span>, <span class="ident">cpu::features</span>()).<span class="ident">unwrap</span>()
+        Key::new(<span class="kw-2">&amp;</span>key[..], variant, cpu::features()).unwrap()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

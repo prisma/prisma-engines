@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mobc-711820eed980cd14/80462c4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mobc/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mobc-711820eed980cd14/80462c4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mobc/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -744,751 +744,751 @@
 <span id="744">744</span>
 <span id="745">745</span>
 <span id="746">746</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A generic connection pool with async/await support.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Opening a new database connection every time one is needed is both</span>
-<span class="doccomment">//! inefficient and can lead to resource exhaustion under high traffic</span>
-<span class="doccomment">//! conditions. A connection pool maintains a set of open connections to a</span>
-<span class="doccomment">//! database, handing them out for repeated use.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! mobc is agnostic to the connection type it is managing. Implementors of the</span>
-<span class="doccomment">//! `Manager` trait provide the database-specific logic to create and</span>
-<span class="doccomment">//! check the health of connections.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Example</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Using an imaginary &quot;foodb&quot; database.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//!use mobc::{Manager, Pool, async_trait};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!#[derive(Debug)]</span>
-<span class="doccomment">//!struct FooError;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!struct FooConnection;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!impl FooConnection {</span>
-<span class="doccomment">//!    async fn query(&amp;self) -&gt; String {</span>
-<span class="doccomment">//!        &quot;nori&quot;.to_string()</span>
-<span class="doccomment">//!    }</span>
-<span class="doccomment">//!}</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!struct FooManager;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!#[async_trait]</span>
-<span class="doccomment">//!impl Manager for FooManager {</span>
-<span class="doccomment">//!    type Connection = FooConnection;</span>
-<span class="doccomment">//!    type Error = FooError;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!    async fn connect(&amp;self) -&gt; Result&lt;Self::Connection, Self::Error&gt; {</span>
-<span class="doccomment">//!        Ok(FooConnection)</span>
-<span class="doccomment">//!    }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!    async fn check(&amp;self, conn: Self::Connection) -&gt; Result&lt;Self::Connection, Self::Error&gt; {</span>
-<span class="doccomment">//!        Ok(conn)</span>
-<span class="doccomment">//!    }</span>
-<span class="doccomment">//!}</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!#[tokio::main]</span>
-<span class="doccomment">//!async fn main() {</span>
-<span class="doccomment">//!    let pool = Pool::builder().max_open(15).build(FooManager);</span>
-<span class="doccomment">//!    let num: usize = 10000;</span>
-<span class="doccomment">//!    let (tx, mut rx) = tokio::sync::mpsc::channel::&lt;()&gt;(16);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!    for _ in 0..num {</span>
-<span class="doccomment">//!        let pool = pool.clone();</span>
-<span class="doccomment">//!        let mut tx = tx.clone();</span>
-<span class="doccomment">//!        tokio::spawn(async move {</span>
-<span class="doccomment">//!            let conn = pool.get().await.unwrap();</span>
-<span class="doccomment">//!            let name = conn.query().await;</span>
-<span class="doccomment">//!            assert_eq!(name, &quot;nori&quot;.to_string());</span>
-<span class="doccomment">//!            tx.send(()).await.unwrap();</span>
-<span class="doccomment">//!        });</span>
-<span class="doccomment">//!    }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!    for _ in 0..num {</span>
-<span class="doccomment">//!        rx.recv().await.unwrap();</span>
-<span class="doccomment">//!    }</span>
-<span class="doccomment">//!}</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Metrics</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Mobc uses the metrics crate to expose the following metrics</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! 1. Active Connections - The number of connections in use.</span>
-<span class="doccomment">//! 1. Idle Connections - The number of connections that are not being used</span>
-<span class="doccomment">//! 1. Wait Count - the number of processes waiting for a connection</span>
-<span class="doccomment">//! 1. Wait Duration - A cumulative histogram of the wait time for a connection</span>
-<span class="doccomment">//!</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A generic connection pool with async/await support.
+//!
+//! Opening a new database connection every time one is needed is both
+//! inefficient and can lead to resource exhaustion under high traffic
+//! conditions. A connection pool maintains a set of open connections to a
+//! database, handing them out for repeated use.
+//!
+//! mobc is agnostic to the connection type it is managing. Implementors of the
+//! `Manager` trait provide the database-specific logic to create and
+//! check the health of connections.
+//!
+//! # Example
+//!
+//! Using an imaginary &quot;foodb&quot; database.
+//!
+//! ```rust
+//!use mobc::{Manager, Pool, async_trait};
+//!
+//!#[derive(Debug)]
+//!struct FooError;
+//!
+//!struct FooConnection;
+//!
+//!impl FooConnection {
+//!    async fn query(&amp;self) -&gt; String {
+//!        &quot;nori&quot;.to_string()
+//!    }
+//!}
+//!
+//!struct FooManager;
+//!
+//!#[async_trait]
+//!impl Manager for FooManager {
+//!    type Connection = FooConnection;
+//!    type Error = FooError;
+//!
+//!    async fn connect(&amp;self) -&gt; Result&lt;Self::Connection, Self::Error&gt; {
+//!        Ok(FooConnection)
+//!    }
+//!
+//!    async fn check(&amp;self, conn: Self::Connection) -&gt; Result&lt;Self::Connection, Self::Error&gt; {
+//!        Ok(conn)
+//!    }
+//!}
+//!
+//!#[tokio::main]
+//!async fn main() {
+//!    let pool = Pool::builder().max_open(15).build(FooManager);
+//!    let num: usize = 10000;
+//!    let (tx, mut rx) = tokio::sync::mpsc::channel::&lt;()&gt;(16);
+//!
+//!    for _ in 0..num {
+//!        let pool = pool.clone();
+//!        let mut tx = tx.clone();
+//!        tokio::spawn(async move {
+//!            let conn = pool.get().await.unwrap();
+//!            let name = conn.query().await;
+//!            assert_eq!(name, &quot;nori&quot;.to_string());
+//!            tx.send(()).await.unwrap();
+//!        });
+//!    }
+//!
+//!    for _ in 0..num {
+//!        rx.recv().await.unwrap();
+//!    }
+//!}
+//! ```
+//!
+//! # Metrics
+//!
+//! Mobc uses the metrics crate to expose the following metrics
+//!
+//! 1. Active Connections - The number of connections in use.
+//! 1. Idle Connections - The number of connections that are not being used
+//! 1. Wait Count - the number of processes waiting for a connection
+//! 1. Wait Duration - A cumulative histogram of the wait time for a connection
+//!
 
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;256&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">config</span>;
+</span><span class="attribute">#![cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, feature(doc_cfg))]
+#![warn(missing_docs)]
+#![recursion_limit = <span class="string">&quot;256&quot;</span>]
+</span><span class="kw">mod </span>config;
 
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">metrics_utils</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unstable</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">runtime</span>;
-<span class="kw">mod</span> <span class="ident">spawn</span>;
-<span class="kw">mod</span> <span class="ident">time</span>;
+<span class="kw">mod </span>error;
+<span class="kw">mod </span>metrics_utils;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;unstable&quot;</span>)]
+#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(unstable)))]
+</span><span class="kw">pub mod </span>runtime;
+<span class="kw">mod </span>spawn;
+<span class="kw">mod </span>time;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::Error</span>;
+<span class="kw">pub use </span>error::Error;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">config::Builder</span>;
-<span class="kw">use</span> <span class="ident">config</span>::{<span class="ident">Config</span>, <span class="ident">InternalConfig</span>, <span class="ident">ShareConfig</span>};
-<span class="kw">use</span> <span class="ident">futures_channel::mpsc</span>::{<span class="self">self</span>, <span class="ident">Receiver</span>, <span class="ident">Sender</span>};
-<span class="kw">use</span> <span class="ident">futures_util::lock</span>::{<span class="ident">Mutex</span>, <span class="ident">MutexGuard</span>};
-<span class="kw">use</span> <span class="ident">futures_util::select</span>;
-<span class="kw">use</span> <span class="ident">futures_util::FutureExt</span>;
-<span class="kw">use</span> <span class="ident">futures_util::SinkExt</span>;
-<span class="kw">use</span> <span class="ident">futures_util::StreamExt</span>;
-<span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">decrement_gauge</span>, <span class="ident">gauge</span>, <span class="ident">histogram</span>, <span class="ident">increment_counter</span>, <span class="ident">increment_gauge</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">spawn::spawn</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
-<span class="kw">use</span> <span class="ident">std::sync</span>::{
-    <span class="ident">atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
-    <span class="ident">Arc</span>, <span class="ident">Weak</span>,
+<span class="kw">pub use </span>async_trait::async_trait;
+<span class="kw">pub use </span>config::Builder;
+<span class="kw">use </span>config::{Config, InternalConfig, ShareConfig};
+<span class="kw">use </span>futures_channel::mpsc::{<span class="self">self</span>, Receiver, Sender};
+<span class="kw">use </span>futures_util::lock::{Mutex, MutexGuard};
+<span class="kw">use </span>futures_util::select;
+<span class="kw">use </span>futures_util::FutureExt;
+<span class="kw">use </span>futures_util::SinkExt;
+<span class="kw">use </span>futures_util::StreamExt;
+<span class="kw">use </span>metrics::{decrement_gauge, gauge, histogram, increment_counter, increment_gauge};
+<span class="kw">pub use </span>spawn::spawn;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::ops::{Deref, DerefMut};
+<span class="kw">use </span>std::sync::{
+    atomic::{AtomicU64, Ordering},
+    Arc, Weak,
 };
-<span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time</span>::{<span class="ident">delay_for</span>, <span class="ident">interval</span>};
-<span class="kw">use</span> <span class="ident">tokio::sync::Semaphore</span>;
+<span class="kw">use </span>std::time::{Duration, Instant};
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub use </span>time::{delay_for, interval};
+<span class="kw">use </span>tokio::sync::Semaphore;
 
-<span class="kw">use</span> <span class="ident">metrics_utils</span>::{<span class="ident">ACTIVE_CONNECTIONS</span>, <span class="ident">WAIT_COUNT</span>, <span class="ident">WAIT_DURATION</span>};
+<span class="kw">use </span>metrics_utils::{ACTIVE_CONNECTIONS, WAIT_COUNT, WAIT_DURATION};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metrics_utils</span>::{<span class="ident">CLOSED_TOTAL</span>, <span class="ident">IDLE_CONNECTIONS</span>, <span class="ident">OPENED_TOTAL</span>, <span class="ident">OPEN_CONNECTIONS</span>};
+<span class="kw">use </span><span class="kw">crate</span>::metrics_utils::{CLOSED_TOTAL, IDLE_CONNECTIONS, OPENED_TOTAL, OPEN_CONNECTIONS};
 
-<span class="kw">const</span> <span class="ident">CONNECTION_REQUEST_QUEUE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10000</span>;
+<span class="kw">const </span>CONNECTION_REQUEST_QUEUE_SIZE: usize = <span class="number">10000</span>;
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="doccomment">/// A trait which provides connection-specific functionality.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Manager</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
-    <span class="doccomment">/// The connection type this manager deals with.</span>
-    <span class="kw">type</span> <span class="ident">Connection</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
-    <span class="doccomment">/// The error type returned by `Connection`s.</span>
-    <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+<span class="attribute">#[async_trait]
+</span><span class="doccomment">/// A trait which provides connection-specific functionality.
+</span><span class="kw">pub trait </span>Manager: Send + Sync + <span class="lifetime">&#39;static </span>{
+    <span class="doccomment">/// The connection type this manager deals with.
+    </span><span class="kw">type </span>Connection: Send + <span class="lifetime">&#39;static</span>;
+    <span class="doccomment">/// The error type returned by `Connection`s.
+    </span><span class="kw">type </span>Error: Send + Sync + <span class="lifetime">&#39;static</span>;
 
-    <span class="doccomment">/// Spawns a new asynchronous task.</span>
-    <span class="kw">fn</span> <span class="ident">spawn_task</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">task</span>: <span class="ident">T</span>)
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">T::Output</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Spawns a new asynchronous task.
+    </span><span class="kw">fn </span>spawn_task&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, task: T)
+    <span class="kw">where
+        </span>T: Future + Send + <span class="lifetime">&#39;static</span>,
+        T::Output: Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">spawn</span>(<span class="ident">task</span>);
+        spawn(task);
     }
 
-    <span class="doccomment">/// Attempts to create a new connection.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Connection</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Attempts to create a new connection.
+    </span><span class="kw">async fn </span>connect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Connection, <span class="self">Self</span>::Error&gt;;
 
-    <span class="doccomment">/// Determines if the connection is still connected to the database when check-out.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A standard implementation would check if a simple query like `SELECT 1`</span>
-    <span class="doccomment">/// succeeds.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">conn</span>: <span class="ident"><span class="self">Self</span>::Connection</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Connection</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Determines if the connection is still connected to the database when check-out.
+    ///
+    /// A standard implementation would check if a simple query like `SELECT 1`
+    /// succeeds.
+    </span><span class="kw">async fn </span>check(<span class="kw-2">&amp;</span><span class="self">self</span>, conn: <span class="self">Self</span>::Connection) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Connection, <span class="self">Self</span>::Error&gt;;
 
-    <span class="doccomment">/// *Quickly* determines a connection is still valid when check-in.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Connection</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
+    <span class="doccomment">/// *Quickly* determines a connection is still valid when check-in.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, _conn: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Connection) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+}
+
+<span class="kw">struct </span>SharedPool&lt;M: Manager&gt; {
+    config: ShareConfig,
+    manager: M,
+    internals: Mutex&lt;PoolInternals&lt;M::Connection, M::Error&gt;&gt;,
+    state: PoolState,
+    semaphore: Semaphore,
+}
+
+<span class="kw">struct </span>Conn&lt;C, E&gt; {
+    raw: <span class="prelude-ty">Option</span>&lt;C&gt;,
+    <span class="attribute">#[allow(dead_code)]
+    </span>last_err: Mutex&lt;<span class="prelude-ty">Option</span>&lt;E&gt;&gt;,
+    created_at: Instant,
+    last_used_at: Instant,
+    last_checked_at: Instant,
+    brand_new: bool,
+}
+
+<span class="kw">impl</span>&lt;C, E&gt; Conn&lt;C, E&gt; {
+    <span class="kw">fn </span>close(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>PoolState) {
+        state.num_open.fetch_sub(<span class="number">1</span>, Ordering::Relaxed);
+        state.max_idle_closed.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
+        <span class="macro">decrement_gauge!</span>(OPEN_CONNECTIONS, <span class="number">1.0</span>);
+        <span class="macro">increment_counter!</span>(CLOSED_TOTAL);
     }
-}
 
-<span class="kw">struct</span> <span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> {
-    <span class="ident">config</span>: <span class="ident">ShareConfig</span>,
-    <span class="ident">manager</span>: <span class="ident">M</span>,
-    <span class="ident">internals</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">state</span>: <span class="ident">PoolState</span>,
-    <span class="ident">semaphore</span>: <span class="ident">Semaphore</span>,
-}
-
-<span class="kw">struct</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="ident">raw</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="ident">last_err</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">created_at</span>: <span class="ident">Instant</span>,
-    <span class="ident">last_used_at</span>: <span class="ident">Instant</span>,
-    <span class="ident">last_checked_at</span>: <span class="ident">Instant</span>,
-    <span class="ident">brand_new</span>: <span class="ident">bool</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">PoolState</span>) {
-        <span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
-        <span class="ident">state</span>.<span class="ident">max_idle_closed</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
-        <span class="macro">decrement_gauge!</span>(<span class="ident">OPEN_CONNECTIONS</span>, <span class="number">1.0</span>);
-        <span class="macro">increment_counter!</span>(<span class="ident">CLOSED_TOTAL</span>);
-    }
-
-    <span class="kw">fn</span> <span class="ident">expired</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">timeout</span>
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">check_interval</span><span class="op">|</span> {
-                <span class="ident">Instant::now</span>()
-                    .<span class="ident">checked_duration_since</span>(<span class="self">self</span>.<span class="ident">created_at</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">dur_since</span><span class="op">|</span> <span class="ident">dur_since</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">check_interval</span>)
+    <span class="kw">fn </span>expired(<span class="kw-2">&amp;</span><span class="self">self</span>, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; bool {
+        timeout
+            .and_then(|check_interval| {
+                Instant::now()
+                    .checked_duration_since(<span class="self">self</span>.created_at)
+                    .map(|dur_since| dur_since &gt;= check_interval)
             })
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+            .unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">idle_expired</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">timeout</span>
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">check_interval</span><span class="op">|</span> {
-                <span class="ident">Instant::now</span>()
-                    .<span class="ident">checked_duration_since</span>(<span class="self">self</span>.<span class="ident">last_used_at</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">dur_since</span><span class="op">|</span> <span class="ident">dur_since</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">check_interval</span>)
+    <span class="kw">fn </span>idle_expired(<span class="kw-2">&amp;</span><span class="self">self</span>, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; bool {
+        timeout
+            .and_then(|check_interval| {
+                Instant::now()
+                    .checked_duration_since(<span class="self">self</span>.last_used_at)
+                    .map(|dur_since| dur_since &gt;= check_interval)
             })
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+            .unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">needs_health_check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">timeout</span>
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">check_interval</span><span class="op">|</span> {
-                <span class="ident">Instant::now</span>()
-                    .<span class="ident">checked_duration_since</span>(<span class="self">self</span>.<span class="ident">last_checked_at</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">dur_since</span><span class="op">|</span> <span class="ident">dur_since</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">check_interval</span>)
+    <span class="kw">fn </span>needs_health_check(<span class="kw-2">&amp;</span><span class="self">self</span>, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; bool {
+        timeout
+            .and_then(|check_interval| {
+                Instant::now()
+                    .checked_duration_since(<span class="self">self</span>.last_checked_at)
+                    .map(|dur_since| dur_since &gt;= check_interval)
             })
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
+            .unwrap_or(<span class="bool-val">true</span>)
     }
 }
 
-<span class="kw">struct</span> <span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="ident">config</span>: <span class="ident">InternalConfig</span>,
-    <span class="ident">free_conns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">wait_duration</span>: <span class="ident">Duration</span>,
-    <span class="ident">cleaner_ch</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>PoolInternals&lt;C, E&gt; {
+    config: InternalConfig,
+    free_conns: Vec&lt;Conn&lt;C, E&gt;&gt;,
+    wait_duration: Duration,
+    cleaner_ch: <span class="prelude-ty">Option</span>&lt;Sender&lt;()&gt;&gt;,
 }
 
-<span class="kw">struct</span> <span class="ident">PoolState</span> {
-    <span class="ident">num_open</span>: <span class="ident">AtomicU64</span>,
-    <span class="ident">max_lifetime_closed</span>: <span class="ident">AtomicU64</span>,
-    <span class="ident">max_idle_closed</span>: <span class="ident">AtomicU64</span>,
-    <span class="ident">wait_count</span>: <span class="ident">AtomicU64</span>,
+<span class="kw">struct </span>PoolState {
+    num_open: AtomicU64,
+    max_lifetime_closed: AtomicU64,
+    max_idle_closed: AtomicU64,
+    wait_count: AtomicU64,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+<span class="kw">impl</span>&lt;C, E&gt; Drop <span class="kw">for </span>PoolInternals&lt;C, E&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="macro">log::debug!</span>(<span class="string">&quot;Pool internal drop&quot;</span>);
     }
 }
 
-<span class="doccomment">/// A generic connection pool.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A generic connection pool.
+</span><span class="kw">pub struct </span>Pool&lt;M: Manager&gt;(Arc&lt;SharedPool&lt;M&gt;&gt;);
 
-<span class="doccomment">/// Returns a new `Pool` referencing the same state as `self`.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Pool</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>())
+<span class="doccomment">/// Returns a new `Pool` referencing the same state as `self`.
+</span><span class="kw">impl</span>&lt;M: Manager&gt; Clone <span class="kw">for </span>Pool&lt;M&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        Pool(<span class="self">self</span>.<span class="number">0</span>.clone())
     }
 }
 
-<span class="doccomment">/// Information about the state of a `Pool`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">State</span> {
-    <span class="doccomment">/// Maximum number of open connections to the database</span>
-    <span class="kw">pub</span> <span class="ident">max_open</span>: <span class="ident">u64</span>,
+<span class="doccomment">/// Information about the state of a `Pool`.
+</span><span class="kw">pub struct </span>State {
+    <span class="doccomment">/// Maximum number of open connections to the database
+    </span><span class="kw">pub </span>max_open: u64,
 
-    <span class="comment">// Pool Status</span>
-    <span class="doccomment">/// The number of established connections both in use and idle.</span>
-    <span class="kw">pub</span> <span class="ident">connections</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// The number of connections currently in use.</span>
-    <span class="kw">pub</span> <span class="ident">in_use</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// The number of idle connections.</span>
-    <span class="kw">pub</span> <span class="ident">idle</span>: <span class="ident">u64</span>,
+    <span class="comment">// Pool Status
+    </span><span class="doccomment">/// The number of established connections both in use and idle.
+    </span><span class="kw">pub </span>connections: u64,
+    <span class="doccomment">/// The number of connections currently in use.
+    </span><span class="kw">pub </span>in_use: u64,
+    <span class="doccomment">/// The number of idle connections.
+    </span><span class="kw">pub </span>idle: u64,
 
-    <span class="comment">// Counters</span>
-    <span class="doccomment">/// The total number of connections waited for.</span>
-    <span class="kw">pub</span> <span class="ident">wait_count</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// The total time blocked waiting for a new connection.</span>
-    <span class="kw">pub</span> <span class="ident">wait_duration</span>: <span class="ident">Duration</span>,
-    <span class="doccomment">/// The total number of connections closed due to `max_idle`.</span>
-    <span class="kw">pub</span> <span class="ident">max_idle_closed</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// The total number of connections closed due to `max_lifetime`.</span>
-    <span class="kw">pub</span> <span class="ident">max_lifetime_closed</span>: <span class="ident">u64</span>,
+    <span class="comment">// Counters
+    </span><span class="doccomment">/// The total number of connections waited for.
+    </span><span class="kw">pub </span>wait_count: u64,
+    <span class="doccomment">/// The total time blocked waiting for a new connection.
+    </span><span class="kw">pub </span>wait_duration: Duration,
+    <span class="doccomment">/// The total number of connections closed due to `max_idle`.
+    </span><span class="kw">pub </span>max_idle_closed: u64,
+    <span class="doccomment">/// The total number of connections closed due to `max_lifetime`.
+    </span><span class="kw">pub </span>max_lifetime_closed: u64,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Stats&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;max_open&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_open</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;connections&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connections</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;in_use&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">in_use</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;idle&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">idle</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;wait_count&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">wait_count</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;wait_duration&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">wait_duration</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;max_idle_closed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_idle_closed</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;max_lifetime_closed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_lifetime_closed</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>State {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;Stats&quot;</span>)
+            .field(<span class="string">&quot;max_open&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.max_open)
+            .field(<span class="string">&quot;connections&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.connections)
+            .field(<span class="string">&quot;in_use&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.in_use)
+            .field(<span class="string">&quot;idle&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.idle)
+            .field(<span class="string">&quot;wait_count&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.wait_count)
+            .field(<span class="string">&quot;wait_duration&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.wait_duration)
+            .field(<span class="string">&quot;max_idle_closed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.max_idle_closed)
+            .field(<span class="string">&quot;max_lifetime_closed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.max_lifetime_closed)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {}
+<span class="kw">impl</span>&lt;M: Manager&gt; Drop <span class="kw">for </span>Pool&lt;M&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new connection pool with a default configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">manager</span>: <span class="ident">M</span>) -&gt; <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-        <span class="ident">Pool::builder</span>().<span class="ident">build</span>(<span class="ident">manager</span>)
+<span class="kw">impl</span>&lt;M: Manager&gt; Pool&lt;M&gt; {
+    <span class="doccomment">/// Creates a new connection pool with a default configuration.
+    </span><span class="kw">pub fn </span>new(manager: M) -&gt; Pool&lt;M&gt; {
+        Pool::builder().build(manager)
     }
 
-    <span class="doccomment">/// Returns a builder type to configure a new pool.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() -&gt; <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-        <span class="ident">Builder::new</span>()
+    <span class="doccomment">/// Returns a builder type to configure a new pool.
+    </span><span class="kw">pub fn </span>builder() -&gt; Builder&lt;M&gt; {
+        Builder::new()
     }
 
-    <span class="doccomment">/// Sets the maximum number of connections managed by the pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 0 means unlimited, defaults to 10.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_max_open_conns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u64</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_open</span> <span class="op">=</span> <span class="ident">n</span>;
-        <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_idle</span> <span class="op">&gt;</span> <span class="ident">n</span> {
-            <span class="ident">drop</span>(<span class="ident">internals</span>);
-            <span class="self">self</span>.<span class="ident">set_max_idle_conns</span>(<span class="ident">n</span>).<span class="kw">await</span>;
+    <span class="doccomment">/// Sets the maximum number of connections managed by the pool.
+    ///
+    /// 0 means unlimited, defaults to 10.
+    </span><span class="kw">pub async fn </span>set_max_open_conns(<span class="kw-2">&amp;</span><span class="self">self</span>, n: u64) {
+        <span class="kw">let </span><span class="kw-2">mut </span>internals = <span class="self">self</span>.<span class="number">0</span>.internals.lock().<span class="kw">await</span>;
+        internals.config.max_open = n;
+        <span class="kw">if </span>n &gt; <span class="number">0 </span>&amp;&amp; internals.config.max_idle &gt; n {
+            drop(internals);
+            <span class="self">self</span>.set_max_idle_conns(n).<span class="kw">await</span>;
         }
     }
 
-    <span class="doccomment">/// Sets the maximum idle connection count maintained by the pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The pool will maintain at most this many idle connections</span>
-    <span class="doccomment">/// at all times, while respecting the value of `max_open`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to 2.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_max_idle_conns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u64</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_idle</span> <span class="op">=</span>
-            <span class="kw">if</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_open</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_open</span> {
-                <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_open</span>
-            } <span class="kw">else</span> {
-                <span class="ident">n</span>
+    <span class="doccomment">/// Sets the maximum idle connection count maintained by the pool.
+    ///
+    /// The pool will maintain at most this many idle connections
+    /// at all times, while respecting the value of `max_open`.
+    ///
+    /// Defaults to 2.
+    </span><span class="kw">pub async fn </span>set_max_idle_conns(<span class="kw-2">&amp;</span><span class="self">self</span>, n: u64) {
+        <span class="kw">let </span><span class="kw-2">mut </span>internals = <span class="self">self</span>.<span class="number">0</span>.internals.lock().<span class="kw">await</span>;
+        internals.config.max_idle =
+            <span class="kw">if </span>internals.config.max_open &gt; <span class="number">0 </span>&amp;&amp; n &gt; internals.config.max_open {
+                internals.config.max_open
+            } <span class="kw">else </span>{
+                n
             };
 
-        <span class="kw">let</span> <span class="ident">max_idle</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_idle</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">if</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">max_idle</span> {
-            <span class="kw">let</span> <span class="ident">closing</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">split_off</span>(<span class="ident">max_idle</span>);
-            <span class="kw">for</span> <span class="ident">conn</span> <span class="kw">in</span> <span class="ident">closing</span> {
-                <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>);
+        <span class="kw">let </span>max_idle = internals.config.max_idle <span class="kw">as </span>usize;
+        <span class="kw">if </span>internals.free_conns.len() &gt; max_idle {
+            <span class="kw">let </span>closing = internals.free_conns.split_off(max_idle);
+            <span class="kw">for </span>conn <span class="kw">in </span>closing {
+                conn.close(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.state);
             }
         }
     }
 
-    <span class="doccomment">/// Sets the maximum lifetime of connections in the pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Expired connections may be closed lazily before reuse.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// None meas reuse forever.</span>
-    <span class="doccomment">/// Defaults to None.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `max_lifetime` is the zero `Duration`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_conn_max_lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
+    <span class="doccomment">/// Sets the maximum lifetime of connections in the pool.
+    ///
+    /// Expired connections may be closed lazily before reuse.
+    ///
+    /// None meas reuse forever.
+    /// Defaults to None.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `max_lifetime` is the zero `Duration`.
+    </span><span class="kw">pub async fn </span>set_conn_max_lifetime(<span class="kw-2">&amp;</span><span class="self">self</span>, max_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;) {
         <span class="macro">assert_ne!</span>(
-            <span class="ident">max_lifetime</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">0</span>)),
-            <span class="string">&quot;max_lifetime must be positive&quot;</span>
-        );
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_lifetime</span> <span class="op">=</span> <span class="ident">max_lifetime</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">lifetime</span>) <span class="op">=</span> <span class="ident">max_lifetime</span> {
-            <span class="kw">match</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_lifetime</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">prev</span>) <span class="kw">if</span> <span class="ident">lifetime</span> <span class="op">&lt;</span> <span class="ident">prev</span> <span class="op">&amp;&amp;</span> <span class="ident">internals</span>.<span class="ident">cleaner_ch</span>.<span class="ident">is_some</span>() =&gt; {
-                    <span class="comment">// FIXME</span>
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">cleaner_ch</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">send</span>(()).<span class="kw">await</span>;
+            max_lifetime,
+            <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">0</span>)),
+            <span class="string">&quot;max_lifetime must be positive&quot;
+        </span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>internals = <span class="self">self</span>.<span class="number">0</span>.internals.lock().<span class="kw">await</span>;
+        internals.config.max_lifetime = max_lifetime;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(lifetime) = max_lifetime {
+            <span class="kw">match </span>internals.config.max_lifetime {
+                <span class="prelude-val">Some</span>(prev) <span class="kw">if </span>lifetime &lt; prev &amp;&amp; internals.cleaner_ch.is_some() =&gt; {
+                    <span class="comment">// FIXME
+                    </span><span class="kw">let _ </span>= internals.cleaner_ch.as_mut().unwrap().send(()).<span class="kw">await</span>;
                 }
-                <span class="kw">_</span> =&gt; (),
+                <span class="kw">_ </span>=&gt; (),
             }
         }
 
-        <span class="kw">if</span> <span class="ident">max_lifetime</span>.<span class="ident">is_some</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">&gt;</span> <span class="number">0</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">internals</span>.<span class="ident">cleaner_ch</span>.<span class="ident">is_none</span>()
+        <span class="kw">if </span>max_lifetime.is_some()
+            &amp;&amp; <span class="self">self</span>.<span class="number">0</span>.state.num_open.load(Ordering::Relaxed) &gt; <span class="number">0
+            </span>&amp;&amp; internals.cleaner_ch.is_none()
         {
             <span class="macro">log::debug!</span>(<span class="string">&quot;run connection cleaner&quot;</span>);
-            <span class="kw">let</span> <span class="ident">shared1</span> <span class="op">=</span> <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
-            <span class="kw">let</span> <span class="ident">clean_rate</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">config</span>.<span class="ident">clean_rate</span>;
-            <span class="kw">let</span> (<span class="ident">cleaner_ch_sender</span>, <span class="ident">cleaner_ch</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="number">1</span>);
-            <span class="ident">internals</span>.<span class="ident">cleaner_ch</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cleaner_ch_sender</span>);
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">manager</span>.<span class="ident">spawn_task</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="ident">connection_cleaner</span>(<span class="ident">shared1</span>, <span class="ident">cleaner_ch</span>, <span class="ident">clean_rate</span>).<span class="kw">await</span>;
+            <span class="kw">let </span>shared1 = Arc::downgrade(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
+            <span class="kw">let </span>clean_rate = <span class="self">self</span>.<span class="number">0</span>.config.clean_rate;
+            <span class="kw">let </span>(cleaner_ch_sender, cleaner_ch) = mpsc::channel(<span class="number">1</span>);
+            internals.cleaner_ch = <span class="prelude-val">Some</span>(cleaner_ch_sender);
+            <span class="self">self</span>.<span class="number">0</span>.manager.spawn_task(<span class="kw">async move </span>{
+                connection_cleaner(shared1, cleaner_ch, clean_rate).<span class="kw">await</span>;
             });
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_inner</span>(<span class="ident">manager</span>: <span class="ident">M</span>, <span class="ident">config</span>: <span class="ident">Config</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">max_open</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">max_open</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">CONNECTION_REQUEST_QUEUE_SIZE</span>
-        } <span class="kw">else</span> {
-            <span class="ident">config</span>.<span class="ident">max_open</span> <span class="kw">as</span> <span class="ident">usize</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_inner(manager: M, config: Config) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>max_open = <span class="kw">if </span>config.max_open == <span class="number">0 </span>{
+            CONNECTION_REQUEST_QUEUE_SIZE
+        } <span class="kw">else </span>{
+            config.max_open <span class="kw">as </span>usize
         };
 
-        <span class="macro">gauge!</span>(<span class="ident">IDLE_CONNECTIONS</span>, <span class="ident">max_open</span> <span class="kw">as</span> <span class="ident">f64</span>);
+        <span class="macro">gauge!</span>(IDLE_CONNECTIONS, max_open <span class="kw">as </span>f64);
 
-        <span class="kw">let</span> (<span class="ident">share_config</span>, <span class="ident">internal_config</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">split</span>();
-        <span class="kw">let</span> <span class="ident">internals</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">PoolInternals</span> {
-            <span class="ident">config</span>: <span class="ident">internal_config</span>,
-            <span class="ident">free_conns</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">wait_duration</span>: <span class="ident">Duration::from_secs</span>(<span class="number">0</span>),
-            <span class="ident">cleaner_ch</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>(share_config, internal_config) = config.split();
+        <span class="kw">let </span>internals = Mutex::new(PoolInternals {
+            config: internal_config,
+            free_conns: Vec::new(),
+            wait_duration: Duration::from_secs(<span class="number">0</span>),
+            cleaner_ch: <span class="prelude-val">None</span>,
         });
 
-        <span class="kw">let</span> <span class="ident">pool_state</span> <span class="op">=</span> <span class="ident">PoolState</span> {
-            <span class="ident">num_open</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
-            <span class="ident">max_lifetime_closed</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
-            <span class="ident">wait_count</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
-            <span class="ident">max_idle_closed</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
+        <span class="kw">let </span>pool_state = PoolState {
+            num_open: AtomicU64::new(<span class="number">0</span>),
+            max_lifetime_closed: AtomicU64::new(<span class="number">0</span>),
+            wait_count: AtomicU64::new(<span class="number">0</span>),
+            max_idle_closed: AtomicU64::new(<span class="number">0</span>),
         };
 
-        <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">SharedPool</span> {
-            <span class="ident">config</span>: <span class="ident">share_config</span>,
-            <span class="ident">manager</span>,
-            <span class="ident">internals</span>,
-            <span class="ident">semaphore</span>: <span class="ident">Semaphore::new</span>(<span class="ident">max_open</span>),
-            <span class="ident">state</span>: <span class="ident">pool_state</span>,
+        <span class="kw">let </span>shared = Arc::new(SharedPool {
+            config: share_config,
+            manager,
+            internals,
+            semaphore: Semaphore::new(max_open),
+            state: pool_state,
         });
 
-        <span class="ident">Pool</span>(<span class="ident">shared</span>)
+        Pool(shared)
     }
 
-    <span class="doccomment">/// Returns a single connection by either opening a new connection</span>
-    <span class="doccomment">/// or returning an existing connection from the connection pool. Conn will</span>
-    <span class="doccomment">/// block until either a connection is returned or timeout.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">config</span>.<span class="ident">get_timeout</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">duration</span>) =&gt; <span class="self">self</span>.<span class="ident">get_timeout</span>(<span class="ident">duration</span>).<span class="kw">await</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">inner_get_with_retries</span>().<span class="kw">await</span>,
+    <span class="doccomment">/// Returns a single connection by either opening a new connection
+    /// or returning an existing connection from the connection pool. Conn will
+    /// block until either a connection is returned or timeout.
+    </span><span class="kw">pub async fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Connection&lt;M&gt;, Error&lt;M::Error&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.config.get_timeout {
+            <span class="prelude-val">Some</span>(duration) =&gt; <span class="self">self</span>.get_timeout(duration).<span class="kw">await</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.inner_get_with_retries().<span class="kw">await</span>,
         }
     }
 
-    <span class="doccomment">/// Retrieves a connection from the pool, waiting for at most `timeout`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The given timeout will be used instead of the configured connection</span>
-    <span class="doccomment">/// timeout.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">time::timeout</span>(<span class="ident">duration</span>, <span class="self">self</span>.<span class="ident">inner_get_with_retries</span>()).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Retrieves a connection from the pool, waiting for at most `timeout`
+    ///
+    /// The given timeout will be used instead of the configured connection
+    /// timeout.
+    </span><span class="kw">pub async fn </span>get_timeout(<span class="kw-2">&amp;</span><span class="self">self</span>, duration: Duration) -&gt; <span class="prelude-ty">Result</span>&lt;Connection&lt;M&gt;, Error&lt;M::Error&gt;&gt; {
+        time::timeout(duration, <span class="self">self</span>.inner_get_with_retries()).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">inner_get_with_retries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">try_times</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">config</span>;
-        <span class="kw">loop</span> {
-            <span class="ident">try_times</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_connection</span>().<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">conn</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">conn</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">Error::BadConn</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">try_times</span> <span class="op">==</span> <span class="ident">config</span>.<span class="ident">max_bad_conn_retries</span> {
-                        <span class="kw">return</span> <span class="self">self</span>.<span class="ident">get_connection</span>().<span class="kw">await</span>;
+    <span class="kw">async fn </span>inner_get_with_retries(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Connection&lt;M&gt;, Error&lt;M::Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>try_times: u32 = <span class="number">0</span>;
+        <span class="kw">let </span>config = <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.config;
+        <span class="kw">loop </span>{
+            try_times += <span class="number">1</span>;
+            <span class="kw">match </span><span class="self">self</span>.get_connection().<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(conn) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(conn),
+                <span class="prelude-val">Err</span>(Error::BadConn) =&gt; {
+                    <span class="kw">if </span>try_times == config.max_bad_conn_retries {
+                        <span class="kw">return </span><span class="self">self</span>.get_connection().<span class="kw">await</span>;
                     }
                     <span class="kw">continue</span>;
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
             }
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_or_create_conn</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">c</span>.<span class="ident">last_used_at</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+    <span class="kw">async fn </span>get_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Connection&lt;M&gt;, Error&lt;M::Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>c = <span class="self">self</span>.get_or_create_conn().<span class="kw">await</span><span class="question-mark">?</span>;
+        c.last_used_at = Instant::now();
 
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Connection</span> {
-            <span class="ident">pool</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">clone</span>()),
-            <span class="ident">conn</span>: <span class="prelude-val">Some</span>(<span class="ident">c</span>),
+        <span class="kw">let </span>conn = Connection {
+            pool: <span class="prelude-val">Some</span>(<span class="self">self</span>.clone()),
+            conn: <span class="prelude-val">Some</span>(c),
         };
 
-        <span class="macro">increment_gauge!</span>(<span class="ident">ACTIVE_CONNECTIONS</span>, <span class="number">1.0</span>);
-        <span class="macro">decrement_gauge!</span>(<span class="ident">WAIT_COUNT</span>, <span class="number">1.0</span>);
+        <span class="macro">increment_gauge!</span>(ACTIVE_CONNECTIONS, <span class="number">1.0</span>);
+        <span class="macro">decrement_gauge!</span>(WAIT_COUNT, <span class="number">1.0</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">conn</span>)
+        <span class="prelude-val">Ok</span>(conn)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">validate_conn</span>(
+    <span class="kw">async fn </span>validate_conn(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">internal_config</span>: <span class="ident">InternalConfig</span>,
-        <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">brand_new</span> {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+        internal_config: InternalConfig,
+        conn: <span class="kw-2">&amp;mut </span>Conn&lt;M::Connection, M::Error&gt;,
+    ) -&gt; bool {
+        <span class="kw">if </span>conn.brand_new {
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">expired</span>(<span class="ident">internal_config</span>.<span class="ident">max_lifetime</span>) {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>conn.expired(internal_config.max_lifetime) {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">idle_expired</span>(<span class="ident">internal_config</span>.<span class="ident">max_idle_lifetime</span>) {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>conn.idle_expired(internal_config.max_idle_lifetime) {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">needs_health_check</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">config</span>.<span class="ident">health_check</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">conn</span>.<span class="ident">needs_health_check</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">config</span>.<span class="ident">health_check_interval</span>);
+        <span class="kw">let </span>needs_health_check = <span class="self">self</span>.<span class="number">0</span>.config.health_check
+            &amp;&amp; conn.needs_health_check(<span class="self">self</span>.<span class="number">0</span>.config.health_check_interval);
 
-        <span class="kw">if</span> <span class="ident">needs_health_check</span> {
-            <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">raw</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
-            <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">manager</span>.<span class="ident">check</span>(<span class="ident">raw</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">raw</span>) =&gt; {
-                    <span class="ident">conn</span>.<span class="ident">last_checked_at</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-                    <span class="ident">conn</span>.<span class="ident">raw</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">raw</span>)
+        <span class="kw">if </span>needs_health_check {
+            <span class="kw">let </span>raw = conn.raw.take().unwrap();
+            <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.manager.check(raw).<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(raw) =&gt; {
+                    conn.last_checked_at = Instant::now();
+                    conn.raw = <span class="prelude-val">Some</span>(raw)
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">_e</span>) =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
+                <span class="prelude-val">Err</span>(_e) =&gt; <span class="kw">return </span><span class="bool-val">false</span>,
             }
         }
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_or_create_conn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">wait_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
-        <span class="macro">increment_gauge!</span>(<span class="ident">WAIT_COUNT</span>, <span class="number">1.0</span>);
-        <span class="kw">let</span> <span class="ident">wait_start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+    <span class="kw">async fn </span>get_or_create_conn(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Conn&lt;M::Connection, M::Error&gt;, Error&lt;M::Error&gt;&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.state.wait_count.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
+        <span class="macro">increment_gauge!</span>(WAIT_COUNT, <span class="number">1.0</span>);
+        <span class="kw">let </span>wait_start = Instant::now();
 
-        <span class="kw">let</span> <span class="ident">permit</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="number">0</span>
-            .<span class="ident">semaphore</span>
-            .<span class="ident">acquire</span>()
-            .<span class="kw">await</span>
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::PoolClosed</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>permit = <span class="self">self
+            </span>.<span class="number">0
+            </span>.semaphore
+            .acquire()
+            .<span class="kw">await
+            </span>.map_err(|<span class="kw">_</span>| Error::PoolClosed)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">wait_count</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
+        <span class="self">self</span>.<span class="number">0</span>.state.wait_count.fetch_sub(<span class="number">1</span>, Ordering::SeqCst);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>internals = <span class="self">self</span>.<span class="number">0</span>.internals.lock().<span class="kw">await</span>;
 
-        <span class="ident">internals</span>.<span class="ident">wait_duration</span> <span class="op">+</span><span class="op">=</span> <span class="ident">wait_start</span>.<span class="ident">elapsed</span>();
-        <span class="macro">histogram!</span>(<span class="ident">WAIT_DURATION</span>, <span class="ident">wait_start</span>.<span class="ident">elapsed</span>());
+        internals.wait_duration += wait_start.elapsed();
+        <span class="macro">histogram!</span>(WAIT_DURATION, wait_start.elapsed());
 
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">pop</span>();
-        <span class="kw">let</span> <span class="ident">internal_config</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">clone</span>();
-        <span class="ident">drop</span>(<span class="ident">internals</span>);
+        <span class="kw">let </span>conn = internals.free_conns.pop();
+        <span class="kw">let </span>internal_config = internals.config.clone();
+        drop(internals);
 
-        <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">is_some</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">validate_conn</span>(<span class="ident">internal_config</span>, <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>).<span class="kw">await</span> {
-                <span class="macro">decrement_gauge!</span>(<span class="ident">IDLE_CONNECTIONS</span>, <span class="number">1.0</span>);
-                <span class="ident">permit</span>.<span class="ident">forget</span>();
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">conn</span>);
-            } <span class="kw">else</span> {
-                <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>);
+        <span class="kw">if </span>conn.is_some() {
+            <span class="kw">let </span><span class="kw-2">mut </span>conn = conn.unwrap();
+            <span class="kw">if </span><span class="self">self</span>.validate_conn(internal_config, <span class="kw-2">&amp;mut </span>conn).<span class="kw">await </span>{
+                <span class="macro">decrement_gauge!</span>(IDLE_CONNECTIONS, <span class="number">1.0</span>);
+                permit.forget();
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(conn);
+            } <span class="kw">else </span>{
+                conn.close(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.state);
             }
         }
 
-        <span class="kw">let</span> <span class="ident">create_r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">open_new_connection</span>().<span class="kw">await</span>;
+        <span class="kw">let </span>create_r = <span class="self">self</span>.open_new_connection().<span class="kw">await</span>;
 
-        <span class="kw">if</span> <span class="ident">create_r</span>.<span class="ident">is_ok</span>() {
-            <span class="macro">decrement_gauge!</span>(<span class="ident">IDLE_CONNECTIONS</span>, <span class="number">1.0</span>);
-            <span class="ident">permit</span>.<span class="ident">forget</span>();
+        <span class="kw">if </span>create_r.is_ok() {
+            <span class="macro">decrement_gauge!</span>(IDLE_CONNECTIONS, <span class="number">1.0</span>);
+            permit.forget();
         }
 
-        <span class="ident">create_r</span>
+        create_r
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_new_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async fn </span>open_new_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Conn&lt;M::Connection, M::Error&gt;, Error&lt;M::Error&gt;&gt; {
         <span class="macro">log::debug!</span>(<span class="string">&quot;creating new connection from manager&quot;</span>);
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">manager</span>.<span class="ident">connect</span>().<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
-                <span class="macro">increment_gauge!</span>(<span class="ident">OPENED_TOTAL</span>, <span class="number">1.0</span>);
-                <span class="macro">increment_counter!</span>(<span class="ident">OPEN_CONNECTIONS</span>);
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.manager.connect().<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(c) =&gt; {
+                <span class="self">self</span>.<span class="number">0</span>.state.num_open.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
+                <span class="macro">increment_gauge!</span>(OPENED_TOTAL, <span class="number">1.0</span>);
+                <span class="macro">increment_counter!</span>(OPEN_CONNECTIONS);
 
-                <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Conn</span> {
-                    <span class="ident">raw</span>: <span class="prelude-val">Some</span>(<span class="ident">c</span>),
-                    <span class="ident">last_err</span>: <span class="ident">Mutex::new</span>(<span class="prelude-val">None</span>),
-                    <span class="ident">created_at</span>: <span class="ident">Instant::now</span>(),
-                    <span class="ident">last_used_at</span>: <span class="ident">Instant::now</span>(),
-                    <span class="ident">last_checked_at</span>: <span class="ident">Instant::now</span>(),
-                    <span class="ident">brand_new</span>: <span class="bool-val">true</span>,
+                <span class="kw">let </span>conn = Conn {
+                    raw: <span class="prelude-val">Some</span>(c),
+                    last_err: Mutex::new(<span class="prelude-val">None</span>),
+                    created_at: Instant::now(),
+                    last_used_at: Instant::now(),
+                    last_checked_at: Instant::now(),
+                    brand_new: <span class="bool-val">true</span>,
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">conn</span>)
+                <span class="prelude-val">Ok</span>(conn)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::Inner</span>(<span class="ident">e</span>)),
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(Error::Inner(e)),
         }
     }
 
-    <span class="doccomment">/// Returns information about the current state of the pool.</span>
-    <span class="doccomment">/// It is better to use the metrics than this method, this method</span>
-    <span class="doccomment">/// requires a lock on the internals</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">State</span> {
-        <span class="kw">let</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">num_free_conns</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="kw">let</span> <span class="ident">wait_duration</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">wait_duration</span>;
-        <span class="kw">let</span> <span class="ident">max_open</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_open</span>;
-        <span class="ident">drop</span>(<span class="ident">internals</span>);
-        <span class="ident">State</span> {
-            <span class="ident">max_open</span>,
+    <span class="doccomment">/// Returns information about the current state of the pool.
+    /// It is better to use the metrics than this method, this method
+    /// requires a lock on the internals
+    </span><span class="kw">pub async fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; State {
+        <span class="kw">let </span>internals = <span class="self">self</span>.<span class="number">0</span>.internals.lock().<span class="kw">await</span>;
+        <span class="kw">let </span>num_free_conns = internals.free_conns.len() <span class="kw">as </span>u64;
+        <span class="kw">let </span>wait_duration = internals.wait_duration;
+        <span class="kw">let </span>max_open = internals.config.max_open;
+        drop(internals);
+        State {
+            max_open,
 
-            <span class="ident">connections</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>),
-            <span class="ident">in_use</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">-</span> <span class="ident">num_free_conns</span>,
-            <span class="ident">idle</span>: <span class="ident">num_free_conns</span>,
+            connections: <span class="self">self</span>.<span class="number">0</span>.state.num_open.load(Ordering::Relaxed),
+            in_use: <span class="self">self</span>.<span class="number">0</span>.state.num_open.load(Ordering::Relaxed) - num_free_conns,
+            idle: num_free_conns,
 
-            <span class="ident">wait_count</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">wait_count</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>),
-            <span class="ident">wait_duration</span>,
-            <span class="ident">max_idle_closed</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">max_idle_closed</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>),
-            <span class="ident">max_lifetime_closed</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">max_lifetime_closed</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>),
+            wait_count: <span class="self">self</span>.<span class="number">0</span>.state.wait_count.load(Ordering::Relaxed),
+            wait_duration,
+            max_idle_closed: <span class="self">self</span>.<span class="number">0</span>.state.max_idle_closed.load(Ordering::Relaxed),
+            max_lifetime_closed: <span class="self">self</span>.<span class="number">0</span>.state.max_lifetime_closed.load(Ordering::Relaxed),
         }
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recycle_conn</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(
-    <span class="ident">shared</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw-2">mut</span> <span class="ident">conn</span>: <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>,
+<span class="kw">async fn </span>recycle_conn&lt;M: Manager&gt;(
+    shared: <span class="kw-2">&amp;</span>Arc&lt;SharedPool&lt;M&gt;&gt;,
+    <span class="kw-2">mut </span>conn: Conn&lt;M::Connection, M::Error&gt;,
 ) {
-    <span class="kw">if</span> <span class="ident">conn_still_valid</span>(<span class="ident">shared</span>, <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>) {
-        <span class="ident">conn</span>.<span class="ident">brand_new</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="ident">internals</span> <span class="op">=</span> <span class="ident">shared</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="ident">put_idle_conn</span>(<span class="ident">shared</span>, <span class="ident">internals</span>, <span class="ident">conn</span>);
-    } <span class="kw">else</span> {
-        <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="ident">shared</span>.<span class="ident">state</span>);
+    <span class="kw">if </span>conn_still_valid(shared, <span class="kw-2">&amp;mut </span>conn) {
+        conn.brand_new = <span class="bool-val">false</span>;
+        <span class="kw">let </span>internals = shared.internals.lock().<span class="kw">await</span>;
+        put_idle_conn(shared, internals, conn);
+    } <span class="kw">else </span>{
+        conn.close(<span class="kw-2">&amp;</span>shared.state);
     }
 
-    <span class="ident">shared</span>.<span class="ident">semaphore</span>.<span class="ident">add_permits</span>(<span class="number">1</span>);
+    shared.semaphore.add_permits(<span class="number">1</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">conn_still_valid</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(
-    <span class="ident">shared</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">bool</span> {
-    <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">raw</span>.<span class="ident">is_none</span>() {
-        <span class="kw">return</span> <span class="bool-val">false</span>;
+<span class="kw">fn </span>conn_still_valid&lt;M: Manager&gt;(
+    shared: <span class="kw-2">&amp;</span>Arc&lt;SharedPool&lt;M&gt;&gt;,
+    conn: <span class="kw-2">&amp;mut </span>Conn&lt;M::Connection, M::Error&gt;,
+) -&gt; bool {
+    <span class="kw">if </span>conn.raw.is_none() {
+        <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">shared</span>.<span class="ident">manager</span>.<span class="ident">validate</span>(<span class="ident">conn</span>.<span class="ident">raw</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()) {
+    <span class="kw">if </span>!shared.manager.validate(conn.raw.as_mut().unwrap()) {
         <span class="macro">log::debug!</span>(<span class="string">&quot;bad conn when check in&quot;</span>);
-        <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
-    <span class="bool-val">true</span>
-}
+    <span class="bool-val">true
+</span>}
 
-<span class="kw">fn</span> <span class="ident">put_idle_conn</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(
-    <span class="ident">shared</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw-2">mut</span> <span class="ident">internals</span>: <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">conn</span>: <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>,
+<span class="kw">fn </span>put_idle_conn&lt;M: Manager&gt;(
+    shared: <span class="kw-2">&amp;</span>Arc&lt;SharedPool&lt;M&gt;&gt;,
+    <span class="kw-2">mut </span>internals: MutexGuard&lt;<span class="lifetime">&#39;_</span>, PoolInternals&lt;M::Connection, M::Error&gt;&gt;,
+    conn: Conn&lt;M::Connection, M::Error&gt;,
 ) {
-    <span class="kw">if</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_idle</span> <span class="op">&gt;</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> {
-        <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">push</span>(<span class="ident">conn</span>);
-        <span class="ident">drop</span>(<span class="ident">internals</span>);
-    } <span class="kw">else</span> {
-        <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="ident">shared</span>.<span class="ident">state</span>);
+    <span class="kw">if </span>internals.config.max_idle &gt; internals.free_conns.len() <span class="kw">as </span>u64 {
+        internals.free_conns.push(conn);
+        drop(internals);
+    } <span class="kw">else </span>{
+        conn.close(<span class="kw-2">&amp;</span>shared.state);
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connection_cleaner</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(
-    <span class="ident">shared</span>: <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw-2">mut</span> <span class="ident">cleaner_ch</span>: <span class="ident">Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-    <span class="ident">clean_rate</span>: <span class="ident">Duration</span>,
+<span class="kw">async fn </span>connection_cleaner&lt;M: Manager&gt;(
+    shared: Weak&lt;SharedPool&lt;M&gt;&gt;,
+    <span class="kw-2">mut </span>cleaner_ch: Receiver&lt;()&gt;,
+    clean_rate: Duration,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interval</span> <span class="op">=</span> <span class="ident">interval</span>(<span class="ident">clean_rate</span>);
-    <span class="ident">interval</span>.<span class="ident">tick</span>().<span class="kw">await</span>;
-    <span class="kw">loop</span> {
-        <span class="macro">select!</span> {
-            <span class="kw">_</span> <span class="op">=</span> <span class="ident">interval</span>.<span class="ident">tick</span>().<span class="ident">fuse</span>() =&gt; (),
-            <span class="ident">r</span> <span class="op">=</span> <span class="ident">cleaner_ch</span>.<span class="ident">next</span>().<span class="ident">fuse</span>() =&gt; <span class="kw">match</span> <span class="ident">r</span>{
+    <span class="kw">let </span><span class="kw-2">mut </span>interval = interval(clean_rate);
+    interval.tick().<span class="kw">await</span>;
+    <span class="kw">loop </span>{
+        <span class="macro">select! </span>{
+            <span class="kw">_ </span>= interval.tick().fuse() =&gt; (),
+            r = cleaner_ch.next().fuse() =&gt; <span class="kw">match </span>r{
                 <span class="prelude-val">Some</span>(()) =&gt; (),
-                <span class="prelude-val">None</span>=&gt; <span class="kw">return</span>
-            },
+                <span class="prelude-val">None</span>=&gt; <span class="kw">return
+            </span>},
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">clean_connection</span>(<span class="kw-2">&amp;</span><span class="ident">shared</span>).<span class="kw">await</span> {
+        <span class="kw">if </span>!clean_connection(<span class="kw-2">&amp;</span>shared).<span class="kw">await </span>{
             <span class="kw">return</span>;
         }
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clean_connection</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(<span class="ident">shared</span>: <span class="kw-2">&amp;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">shared</span>.<span class="ident">upgrade</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">shared</span>) =&gt; <span class="ident">shared</span>,
-        <span class="prelude-val">None</span> =&gt; {
+<span class="kw">async fn </span>clean_connection&lt;M: Manager&gt;(shared: <span class="kw-2">&amp;</span>Weak&lt;SharedPool&lt;M&gt;&gt;) -&gt; bool {
+    <span class="kw">let </span>shared = <span class="kw">match </span>shared.upgrade() {
+        <span class="prelude-val">Some</span>(shared) =&gt; shared,
+        <span class="prelude-val">None </span>=&gt; {
             <span class="macro">log::debug!</span>(<span class="string">&quot;Failed to clean connections&quot;</span>);
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
     };
 
     <span class="macro">log::debug!</span>(<span class="string">&quot;Clean connections&quot;</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="ident">shared</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-    <span class="kw">if</span> <span class="ident">shared</span>.<span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_lifetime</span>.<span class="ident">is_none</span>()
+    <span class="kw">let </span><span class="kw-2">mut </span>internals = shared.internals.lock().<span class="kw">await</span>;
+    <span class="kw">if </span>shared.state.num_open.load(Ordering::Relaxed) == <span class="number">0 </span>|| internals.config.max_lifetime.is_none()
     {
-        <span class="ident">internals</span>.<span class="ident">cleaner_ch</span>.<span class="ident">take</span>();
-        <span class="kw">return</span> <span class="bool-val">false</span>;
+        internals.cleaner_ch.take();
+        <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">expired</span> <span class="op">=</span> <span class="ident">Instant::now</span>() <span class="op">-</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_lifetime</span>.<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">closing</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let </span>expired = Instant::now() - internals.config.max_lifetime.unwrap();
+    <span class="kw">let </span><span class="kw-2">mut </span>closing = <span class="macro">vec!</span>[];
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
     <span class="macro">log::debug!</span>(
         <span class="string">&quot;clean connections, idle conns {}&quot;</span>,
-        <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">len</span>()
+        internals.free_conns.len()
     );
 
-    <span class="kw">loop</span> {
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">len</span>() {
+    <span class="kw">loop </span>{
+        <span class="kw">if </span>i &gt;= internals.free_conns.len() {
             <span class="kw">break</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>[<span class="ident">i</span>].<span class="ident">created_at</span> <span class="op">&lt;</span> <span class="ident">expired</span> {
-            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">swap_remove</span>(<span class="ident">i</span>);
-            <span class="ident">closing</span>.<span class="ident">push</span>(<span class="ident">c</span>);
+        <span class="kw">if </span>internals.free_conns[i].created_at &lt; expired {
+            <span class="kw">let </span>c = internals.free_conns.swap_remove(i);
+            closing.push(c);
             <span class="kw">continue</span>;
         }
-        <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        i += <span class="number">1</span>;
     }
-    <span class="ident">drop</span>(<span class="ident">internals</span>);
+    drop(internals);
 
-    <span class="ident">shared</span>
-        .<span class="ident">state</span>
-        .<span class="ident">max_lifetime_closed</span>
-        .<span class="ident">fetch_add</span>(<span class="ident">closing</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">Ordering::Relaxed</span>);
-    <span class="kw">for</span> <span class="ident">conn</span> <span class="kw">in</span> <span class="ident">closing</span> {
-        <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="ident">shared</span>.<span class="ident">state</span>);
+    shared
+        .state
+        .max_lifetime_closed
+        .fetch_add(closing.len() <span class="kw">as </span>u64, Ordering::Relaxed);
+    <span class="kw">for </span>conn <span class="kw">in </span>closing {
+        conn.close(<span class="kw-2">&amp;</span>shared.state);
     }
-    <span class="bool-val">true</span>
+    <span class="bool-val">true
+</span>}
+
+<span class="doccomment">/// A smart pointer wrapping a connection.
+</span><span class="kw">pub struct </span>Connection&lt;M: Manager&gt; {
+    pool: <span class="prelude-ty">Option</span>&lt;Pool&lt;M&gt;&gt;,
+    conn: <span class="prelude-ty">Option</span>&lt;Conn&lt;M::Connection, M::Error&gt;&gt;,
 }
 
-<span class="doccomment">/// A smart pointer wrapping a connection.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> {
-    <span class="ident">pool</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">conn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns true is the connection is newly established.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_brand_new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">brand_new</span>
+<span class="kw">impl</span>&lt;M: Manager&gt; Connection&lt;M&gt; {
+    <span class="doccomment">/// Returns true is the connection is newly established.
+    </span><span class="kw">pub fn </span>is_brand_new(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.conn.as_ref().unwrap().brand_new
     }
 
-    <span class="doccomment">/// Unwraps the raw database connection.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">M::Connection</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">raw</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Unwraps the raw database connection.
+    </span><span class="kw">pub fn </span>into_inner(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; M::Connection {
+        <span class="self">self</span>.conn.as_mut().unwrap().raw.take().unwrap()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
+<span class="kw">impl</span>&lt;M: Manager&gt; Drop <span class="kw">for </span>Connection&lt;M&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>pool = <span class="self">self</span>.pool.take().unwrap();
+        <span class="kw">let </span>conn = <span class="self">self</span>.conn.take().unwrap();
 
-        <span class="macro">decrement_gauge!</span>(<span class="ident">ACTIVE_CONNECTIONS</span>, <span class="number">1.0</span>);
-        <span class="macro">increment_gauge!</span>(<span class="ident">IDLE_CONNECTIONS</span>, <span class="number">1.0</span>);
-        <span class="comment">// FIXME: No clone!</span>
-        <span class="ident">pool</span>.<span class="ident">clone</span>().<span class="number">0</span>.<span class="ident">manager</span>.<span class="ident">spawn_task</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">recycle_conn</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">conn</span>).<span class="kw">await</span>;
+        <span class="macro">decrement_gauge!</span>(ACTIVE_CONNECTIONS, <span class="number">1.0</span>);
+        <span class="macro">increment_gauge!</span>(IDLE_CONNECTIONS, <span class="number">1.0</span>);
+        <span class="comment">// FIXME: No clone!
+        </span>pool.clone().<span class="number">0</span>.manager.spawn_task(<span class="kw">async move </span>{
+            recycle_conn(<span class="kw-2">&amp;</span>pool.<span class="number">0</span>, conn).<span class="kw">await</span>;
         });
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">M::Connection</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">raw</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
+<span class="kw">impl</span>&lt;M: Manager&gt; Deref <span class="kw">for </span>Connection&lt;M&gt; {
+    <span class="kw">type </span>Target = M::Connection;
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.conn.as_ref().unwrap().raw.as_ref().unwrap()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">M::Connection</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">raw</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()
+<span class="kw">impl</span>&lt;M: Manager&gt; DerefMut <span class="kw">for </span>Connection&lt;M&gt; {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>M::Connection {
+        <span class="self">self</span>.conn.as_mut().unwrap().raw.as_mut().unwrap()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mobc" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mobc" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

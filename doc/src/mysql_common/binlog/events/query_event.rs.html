@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/query_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/query_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -595,602 +595,602 @@
 <span id="595">595</span>
 <span id="596">596</span>
 <span id="597">597</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">cmp::min</span>,
-    <span class="ident">convert::TryFrom</span>,
-    <span class="ident">fmt</span>,
-    <span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Read</span>},
+</span><span class="kw">use </span>std::{
+    borrow::Cow,
+    cmp::min,
+    convert::TryFrom,
+    fmt,
+    io::{<span class="self">self</span>, Read},
 };
 
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">LittleEndian</span>, <span class="ident">ReadBytesExt</span>};
-<span class="kw">use</span> <span class="ident">saturating::Saturating</span> <span class="kw">as</span> <span class="ident">S</span>;
+<span class="kw">use </span>byteorder::{LittleEndian, ReadBytesExt};
+<span class="kw">use </span>saturating::Saturating <span class="kw">as </span>S;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">binlog</span>::{
-        <span class="ident">consts</span>::{<span class="ident">BinlogVersion</span>, <span class="ident">EventType</span>, <span class="ident">StatusVarKey</span>},
-        <span class="ident">BinlogCtx</span>, <span class="ident">BinlogEvent</span>, <span class="ident">BinlogStruct</span>,
+<span class="kw">use crate</span>::{
+    binlog::{
+        consts::{BinlogVersion, EventType, StatusVarKey},
+        BinlogCtx, BinlogEvent, BinlogStruct,
     },
-    <span class="ident">constants</span>::{<span class="ident">Flags2</span>, <span class="ident">SqlMode</span>},
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">misc</span>::{
-        <span class="ident">raw</span>::{
-            <span class="ident">bytes</span>::{<span class="ident">BareU16Bytes</span>, <span class="ident">BareU8Bytes</span>, <span class="ident">EofBytes</span>, <span class="ident">NullBytes</span>, <span class="ident">U8Bytes</span>},
-            <span class="ident">int</span>::<span class="kw-2">*</span>,
-            <span class="ident">RawBytes</span>, <span class="ident">RawFlags</span>, <span class="ident">Skip</span>,
+    constants::{Flags2, SqlMode},
+    io::ParseBuf,
+    misc::{
+        raw::{
+            bytes::{BareU16Bytes, BareU8Bytes, EofBytes, NullBytes, U8Bytes},
+            int::<span class="kw-2">*</span>,
+            RawBytes, RawFlags, Skip,
         },
-        <span class="ident">unexpected_buf_eof</span>,
+        unexpected_buf_eof,
     },
-    <span class="ident">proto</span>::{<span class="ident">MyDeserialize</span>, <span class="ident">MySerialize</span>},
+    proto::{MyDeserialize, MySerialize},
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BinlogEventHeader</span>;
+<span class="kw">use </span><span class="kw">super</span>::BinlogEventHeader;
 
-<span class="doccomment">/// A query event is created for each query that modifies the database, unless the query</span>
-<span class="doccomment">/// is logged row-based.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="comment">// post-header fields</span>
-    <span class="doccomment">/// The ID of the thread that issued this statement. It is needed for temporary tables.</span>
-    <span class="ident">thread_id</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The time from when the query started to when it was logged in the binlog, in seconds.</span>
-    <span class="ident">execution_time</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="ident">schema_len</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Error code generated by the master. If the master fails, the slave will fail with</span>
-    <span class="doccomment">/// the same error code.</span>
-    <span class="ident">error_code</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU16</span><span class="op">&gt;</span>,
-    <span class="ident">status_vars_len</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU16</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A query event is created for each query that modifies the database, unless the query
+/// is logged row-based.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>QueryEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="comment">// post-header fields
+    </span><span class="doccomment">/// The ID of the thread that issued this statement. It is needed for temporary tables.
+    </span>thread_id: RawInt&lt;LeU32&gt;,
+    <span class="doccomment">/// The time from when the query started to when it was logged in the binlog, in seconds.
+    </span>execution_time: RawInt&lt;LeU32&gt;,
+    schema_len: RawInt&lt;u8&gt;,
+    <span class="doccomment">/// Error code generated by the master. If the master fails, the slave will fail with
+    /// the same error code.
+    </span>error_code: RawInt&lt;LeU16&gt;,
+    status_vars_len: RawInt&lt;LeU16&gt;,
 
-    <span class="comment">// payload</span>
-    <span class="doccomment">/// Zero or more status variables (`status_vars_length` bytes).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each status variable consists of one byte identifying the variable stored, followed</span>
-    <span class="doccomment">/// by the value of the variable. Please consult the MySql documentation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only available if binlog version &gt;= 4 (empty otherwise).</span>
-    <span class="ident">status_vars</span>: <span class="ident">StatusVars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The currently selected database name (`schema-length` bytes).</span>
-    <span class="ident">schema</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">BareU8Bytes</span><span class="op">&gt;</span>,
-    <span class="ident">__skip</span>: <span class="ident">Skip</span><span class="op">&lt;</span><span class="number">1</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The SQL query.</span>
-    <span class="ident">query</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">EofBytes</span><span class="op">&gt;</span>,
+    <span class="comment">// payload
+    </span><span class="doccomment">/// Zero or more status variables (`status_vars_length` bytes).
+    ///
+    /// Each status variable consists of one byte identifying the variable stored, followed
+    /// by the value of the variable. Please consult the MySql documentation.
+    ///
+    /// Only available if binlog version &gt;= 4 (empty otherwise).
+    </span>status_vars: StatusVars&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="doccomment">/// The currently selected database name (`schema-length` bytes).
+    </span>schema: RawBytes&lt;<span class="lifetime">&#39;a</span>, BareU8Bytes&gt;,
+    __skip: Skip&lt;<span class="number">1</span>&gt;,
+    <span class="doccomment">/// The SQL query.
+    </span>query: RawBytes&lt;<span class="lifetime">&#39;a</span>, EofBytes&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">QueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">status_vars</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">schema</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">status_vars</span> <span class="op">=</span> <span class="ident">StatusVars</span>(<span class="ident">RawBytes::new</span>(<span class="ident">status_vars</span>));
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">RawBytes::new</span>(<span class="ident">schema</span>);
-        <span class="self">Self</span> {
-            <span class="ident">thread_id</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">execution_time</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">schema_len</span>: <span class="ident">RawInt::new</span>(<span class="ident">schema</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>),
-            <span class="ident">error_code</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">status_vars_len</span>: <span class="ident">RawInt::new</span>(<span class="ident">status_vars</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>),
-            <span class="ident">status_vars</span>,
-            <span class="ident">schema</span>,
-            <span class="ident">__skip</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">query</span>: <span class="ident">Default::default</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; QueryEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Creates a new instance.
+    </span><span class="kw">pub fn </span>new(status_vars: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;, schema: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>status_vars = StatusVars(RawBytes::new(status_vars));
+        <span class="kw">let </span>schema = RawBytes::new(schema);
+        <span class="self">Self </span>{
+            thread_id: Default::default(),
+            execution_time: Default::default(),
+            schema_len: RawInt::new(schema.len() <span class="kw">as </span>u8),
+            error_code: Default::default(),
+            status_vars_len: RawInt::new(status_vars.<span class="number">0</span>.len() <span class="kw">as </span>u16),
+            status_vars,
+            schema,
+            __skip: Default::default(),
+            query: Default::default(),
         }
     }
 
-    <span class="doccomment">/// Sets the `thread_id` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_thread_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">thread_id</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">thread_id</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">thread_id</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Sets the `thread_id` value.
+    </span><span class="kw">pub fn </span>with_thread_id(<span class="kw-2">mut </span><span class="self">self</span>, thread_id: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.thread_id = RawInt::new(thread_id);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `execution_time` value.
+    </span><span class="kw">pub fn </span>with_execution_time(<span class="kw-2">mut </span><span class="self">self</span>, execution_time: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.execution_time = RawInt::new(execution_time);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `error_code` value.
+    </span><span class="kw">pub fn </span>with_error_code(<span class="kw-2">mut </span><span class="self">self</span>, error_code: u16) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.error_code = RawInt::new(error_code);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `status_vars` value (max length is `u16::MAX).
+    </span><span class="kw">pub fn </span>with_status_vars(<span class="kw-2">mut </span><span class="self">self</span>, status_vars: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.status_vars = StatusVars(RawBytes::new(status_vars));
+        <span class="self">self</span>.status_vars_len.<span class="number">0 </span>= <span class="self">self</span>.status_vars.<span class="number">0</span>.len() <span class="kw">as </span>u16;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `schema` value (max length is `u8::MAX).
+    </span><span class="kw">pub fn </span>with_schema(<span class="kw-2">mut </span><span class="self">self</span>, schema: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.schema = RawBytes::new(schema);
+        <span class="self">self</span>.schema_len.<span class="number">0 </span>= <span class="self">self</span>.schema.len() <span class="kw">as </span>u8;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `query` value.
+    </span><span class="kw">pub fn </span>with_query(<span class="kw-2">mut </span><span class="self">self</span>, query: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.query = RawBytes::new(query);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Returns the `thread_id` value.
+    ///
+    /// `thread_id` is the ID of the thread that issued this statement.
+    /// It is needed for temporary tables.
+    </span><span class="kw">pub fn </span>thread_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.thread_id.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `execution_time` value.
+    ///
+    /// `execution_time` is the time from when the query started to when it was logged
+    /// in the binlog, in seconds.
+    </span><span class="kw">pub fn </span>execution_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.execution_time.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `error_code` value.
+    ///
+    /// `error_code` is the error code generated by the master. If the master fails, the slave will
+    /// fail with the same error code.
+    </span><span class="kw">pub fn </span>error_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.error_code.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `status_vars` value.
+    ///
+    /// `status_vars` contains zero or more status variables. Each status variable consists of one
+    /// byte identifying the variable stored, followed by the value of the variable.
+    </span><span class="kw">pub fn </span>status_vars_raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.status_vars.<span class="number">0</span>.as_bytes()
     }
 
-    <span class="doccomment">/// Sets the `execution_time` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_execution_time</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">execution_time</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">execution_time</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">execution_time</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns an iterator over status variables.
+    </span><span class="kw">pub fn </span>status_vars(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>StatusVars&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.status_vars
     }
 
-    <span class="doccomment">/// Sets the `error_code` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_error_code</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">error_code</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">error_code</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">error_code</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `schema` value.
+    ///
+    /// `schema` is schema name.
+    </span><span class="kw">pub fn </span>schema_raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.schema.as_bytes()
     }
 
-    <span class="doccomment">/// Sets the `status_vars` value (max length is `u16::MAX).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_status_vars</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">status_vars</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">status_vars</span> <span class="op">=</span> <span class="ident">StatusVars</span>(<span class="ident">RawBytes::new</span>(<span class="ident">status_vars</span>));
-        <span class="self">self</span>.<span class="ident">status_vars_len</span>.<span class="number">0</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">status_vars</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `schema` value as a string (lossy converted).
+    </span><span class="kw">pub fn </span>schema(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="self">self</span>.schema.as_str()
     }
 
-    <span class="doccomment">/// Sets the `schema` value (max length is `u8::MAX).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_schema</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">schema</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">schema</span> <span class="op">=</span> <span class="ident">RawBytes::new</span>(<span class="ident">schema</span>);
-        <span class="self">self</span>.<span class="ident">schema_len</span>.<span class="number">0</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `query` value.
+    ///
+    /// `query` is the corresponding LOAD DATA INFILE statement.
+    </span><span class="kw">pub fn </span>query_raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.query.as_bytes()
     }
 
-    <span class="doccomment">/// Sets the `query` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_query</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">query</span> <span class="op">=</span> <span class="ident">RawBytes::new</span>(<span class="ident">query</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `query` value as a string (lossy converted).
+    </span><span class="kw">pub fn </span>query(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="self">self</span>.query.as_str()
     }
 
-    <span class="doccomment">/// Returns the `thread_id` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `thread_id` is the ID of the thread that issued this statement.</span>
-    <span class="doccomment">/// It is needed for temporary tables.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">thread_id</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the `execution_time` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `execution_time` is the time from when the query started to when it was logged</span>
-    <span class="doccomment">/// in the binlog, in seconds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execution_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">execution_time</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the `error_code` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `error_code` is the error code generated by the master. If the master fails, the slave will</span>
-    <span class="doccomment">/// fail with the same error code.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">error_code</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the `status_vars` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `status_vars` contains zero or more status variables. Each status variable consists of one</span>
-    <span class="doccomment">/// byte identifying the variable stored, followed by the value of the variable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_vars_raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">status_vars</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>()
-    }
-
-    <span class="doccomment">/// Returns an iterator over status variables.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_vars</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StatusVars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">status_vars</span>
-    }
-
-    <span class="doccomment">/// Returns the `schema` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `schema` is schema name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">as_bytes</span>()
-    }
-
-    <span class="doccomment">/// Returns the `schema` value as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">as_str</span>()
-    }
-
-    <span class="doccomment">/// Returns the `query` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `query` is the corresponding LOAD DATA INFILE statement.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">as_bytes</span>()
-    }
-
-    <span class="doccomment">/// Returns the `query` value as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">as_str</span>()
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="ident">QueryEvent</span> {
-            <span class="ident">thread_id</span>: <span class="self">self</span>.<span class="ident">thread_id</span>,
-            <span class="ident">execution_time</span>: <span class="self">self</span>.<span class="ident">execution_time</span>,
-            <span class="ident">schema_len</span>: <span class="self">self</span>.<span class="ident">schema_len</span>,
-            <span class="ident">error_code</span>: <span class="self">self</span>.<span class="ident">error_code</span>,
-            <span class="ident">status_vars_len</span>: <span class="self">self</span>.<span class="ident">status_vars_len</span>,
-            <span class="ident">status_vars</span>: <span class="self">self</span>.<span class="ident">status_vars</span>.<span class="ident">into_owned</span>(),
-            <span class="ident">schema</span>: <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">into_owned</span>(),
-            <span class="ident">__skip</span>: <span class="self">self</span>.<span class="ident">__skip</span>,
-            <span class="ident">query</span>: <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">into_owned</span>(),
+    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; QueryEvent&lt;<span class="lifetime">&#39;static</span>&gt; {
+        QueryEvent {
+            thread_id: <span class="self">self</span>.thread_id,
+            execution_time: <span class="self">self</span>.execution_time,
+            schema_len: <span class="self">self</span>.schema_len,
+            error_code: <span class="self">self</span>.error_code,
+            status_vars_len: <span class="self">self</span>.status_vars_len,
+            status_vars: <span class="self">self</span>.status_vars.into_owned(),
+            schema: <span class="self">self</span>.schema.into_owned(),
+            __skip: <span class="self">self</span>.__skip,
+            query: <span class="self">self</span>.query.into_owned(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">BinlogCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>QueryEvent&lt;<span class="lifetime">&#39;de</span>&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = BinlogCtx&lt;<span class="lifetime">&#39;de</span>&gt;;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">ctx</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sbuf</span>: <span class="ident">ParseBuf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="number">13</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">thread_id</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">execution_time</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">schema_len</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">error_code</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">status_vars_len</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU16</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
+    <span class="kw">fn </span>deserialize(ctx: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>sbuf: ParseBuf = buf.parse(<span class="number">13</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>thread_id = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>execution_time = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>schema_len: RawInt&lt;u8&gt; = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>error_code = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>status_vars_len: RawInt&lt;LeU16&gt; = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">post_header_len</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">fde</span>.<span class="ident">get_event_type_header_length</span>(<span class="ident"><span class="self">Self</span>::EVENT_TYPE</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">buf</span>.<span class="ident">checked_skip</span>(<span class="ident">post_header_len</span>.<span class="ident">saturating_sub</span>(<span class="number">13</span>) <span class="kw">as</span> <span class="ident">usize</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">unexpected_buf_eof</span>());
+        <span class="kw">let </span>post_header_len = ctx.fde.get_event_type_header_length(<span class="self">Self</span>::EVENT_TYPE);
+        <span class="kw">if </span>!buf.checked_skip(post_header_len.saturating_sub(<span class="number">13</span>) <span class="kw">as </span>usize) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(unexpected_buf_eof());
         }
 
-        <span class="kw">let</span> <span class="ident">status_vars</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="kw-2">*</span><span class="ident">status_vars_len</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="kw-2">*</span><span class="ident">schema_len</span> <span class="kw">as</span> <span class="ident">usize</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">__skip</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>status_vars = buf.parse(<span class="kw-2">*</span>status_vars_len)<span class="question-mark">?</span>;
+        <span class="kw">let </span>schema = buf.parse(<span class="kw-2">*</span>schema_len <span class="kw">as </span>usize)<span class="question-mark">?</span>;
+        <span class="kw">let </span>__skip = buf.parse(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>query = buf.parse(())<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">thread_id</span>,
-            <span class="ident">execution_time</span>,
-            <span class="ident">schema_len</span>,
-            <span class="ident">error_code</span>,
-            <span class="ident">status_vars_len</span>,
-            <span class="ident">status_vars</span>,
-            <span class="ident">schema</span>,
-            <span class="ident">__skip</span>,
-            <span class="ident">query</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            thread_id,
+            execution_time,
+            schema_len,
+            error_code,
+            status_vars_len,
+            status_vars,
+            schema,
+            __skip,
+            query,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">QueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">thread_id</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">execution_time</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">schema_len</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">error_code</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">status_vars_len</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">status_vars</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">__skip</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+<span class="kw">impl </span>MySerialize <span class="kw">for </span>QueryEvent&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="self">self</span>.thread_id.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.execution_time.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.schema_len.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.error_code.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.status_vars_len.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.status_vars.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.schema.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.__skip.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.query.serialize(<span class="kw-2">&amp;mut *</span>buf);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BinlogEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">EVENT_TYPE</span>: <span class="ident">EventType</span> <span class="op">=</span> <span class="ident">EventType::QUERY_EVENT</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BinlogEvent&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>QueryEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">const </span>EVENT_TYPE: EventType = EventType::QUERY_EVENT;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BinlogStruct</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_version</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">S</span>(<span class="number">0</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BinlogStruct&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>QueryEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>, _version: BinlogVersion) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>len = S(<span class="number">0</span>);
 
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">4</span>);
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">4</span>);
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">1</span>);
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">2</span>);
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">2</span>);
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident">min</span>(<span class="self">self</span>.<span class="ident">status_vars</span>.<span class="number">0</span>.<span class="ident">len</span>(), <span class="ident">u16::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>));
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident">min</span>(<span class="self">self</span>.<span class="ident">schema</span>.<span class="number">0</span>.<span class="ident">len</span>(), <span class="ident">u8::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>));
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">1</span>);
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="self">self</span>.<span class="ident">query</span>.<span class="number">0</span>.<span class="ident">len</span>());
+        len += S(<span class="number">4</span>);
+        len += S(<span class="number">4</span>);
+        len += S(<span class="number">1</span>);
+        len += S(<span class="number">2</span>);
+        len += S(<span class="number">2</span>);
+        len += S(min(<span class="self">self</span>.status_vars.<span class="number">0</span>.len(), u16::MAX <span class="kw">as </span>usize));
+        len += S(min(<span class="self">self</span>.schema.<span class="number">0</span>.len(), u8::MAX <span class="kw">as </span>usize));
+        len += S(<span class="number">1</span>);
+        len += S(<span class="self">self</span>.query.<span class="number">0</span>.len());
 
-        <span class="ident">min</span>(<span class="ident">len</span>.<span class="number">0</span>, <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">BinlogEventHeader::LEN</span>)
+        min(len.<span class="number">0</span>, u32::MAX <span class="kw">as </span>usize - BinlogEventHeader::LEN)
     }
 }
 
-<span class="doccomment">/// Status variable value.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StatusVarVal</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Flags2</span>(<span class="ident">RawFlags</span><span class="op">&lt;</span><span class="ident">Flags2</span>, <span class="ident">LeU32</span><span class="op">&gt;</span>),
-    <span class="ident">SqlMode</span>(<span class="ident">RawFlags</span><span class="op">&lt;</span><span class="ident">SqlMode</span>, <span class="ident">LeU64</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Ignored by this implementation.</span>
-    <span class="ident">Catalog</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]),
-    <span class="ident">AutoIncrement</span> {
-        <span class="ident">increment</span>: <span class="ident">u16</span>,
-        <span class="ident">offset</span>: <span class="ident">u16</span>,
+<span class="doccomment">/// Status variable value.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>StatusVarVal&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Flags2(RawFlags&lt;Flags2, LeU32&gt;),
+    SqlMode(RawFlags&lt;SqlMode, LeU64&gt;),
+    <span class="doccomment">/// Ignored by this implementation.
+    </span>Catalog(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]),
+    AutoIncrement {
+        increment: u16,
+        offset: u16,
     },
-    <span class="ident">Charset</span> {
-        <span class="ident">charset_client</span>: <span class="ident">u16</span>,
-        <span class="ident">collation_connection</span>: <span class="ident">u16</span>,
-        <span class="ident">collation_server</span>: <span class="ident">u16</span>,
+    Charset {
+        charset_client: u16,
+        collation_connection: u16,
+        collation_server: u16,
     },
-    <span class="doccomment">/// Will be empty if timezone length is `0`.</span>
-    <span class="ident">TimeZone</span>(<span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U8Bytes</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Will be empty if timezone length is `0`.</span>
-    <span class="ident">CatalogNz</span>(<span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U8Bytes</span><span class="op">&gt;</span>),
-    <span class="ident">LcTimeNames</span>(<span class="ident">u16</span>),
-    <span class="ident">CharsetDatabase</span>(<span class="ident">u16</span>),
-    <span class="ident">TableMapForUpdate</span>(<span class="ident">u64</span>),
-    <span class="ident">MasterDataWritten</span>([<span class="ident">u8</span>; <span class="number">4</span>]),
-    <span class="ident">Invoker</span> {
-        <span class="ident">username</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U8Bytes</span><span class="op">&gt;</span>,
-        <span class="ident">hostname</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U8Bytes</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Will be empty if timezone length is `0`.
+    </span>TimeZone(RawBytes&lt;<span class="lifetime">&#39;a</span>, U8Bytes&gt;),
+    <span class="doccomment">/// Will be empty if timezone length is `0`.
+    </span>CatalogNz(RawBytes&lt;<span class="lifetime">&#39;a</span>, U8Bytes&gt;),
+    LcTimeNames(u16),
+    CharsetDatabase(u16),
+    TableMapForUpdate(u64),
+    MasterDataWritten([u8; <span class="number">4</span>]),
+    Invoker {
+        username: RawBytes&lt;<span class="lifetime">&#39;a</span>, U8Bytes&gt;,
+        hostname: RawBytes&lt;<span class="lifetime">&#39;a</span>, U8Bytes&gt;,
     },
-    <span class="ident">UpdatedDbNames</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">NullBytes</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">Microseconds</span>(<span class="ident">u32</span>),
-    <span class="doccomment">/// Ignored.</span>
-    <span class="ident">CommitTs</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]),
-    <span class="doccomment">/// Ignored.</span>
-    <span class="ident">CommitTs2</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]),
-    <span class="doccomment">/// `0` is interpreted as `false` and everything else as `true`.</span>
-    <span class="ident">ExplicitDefaultsForTimestamp</span>(<span class="ident">bool</span>),
-    <span class="ident">DdlLoggedWithXid</span>(<span class="ident">u64</span>),
-    <span class="ident">DefaultCollationForUtf8mb4</span>(<span class="ident">u16</span>),
-    <span class="ident">SqlRequirePrimaryKey</span>(<span class="ident">u8</span>),
-    <span class="ident">DefaultTableEncryption</span>(<span class="ident">u8</span>),
+    UpdatedDbNames(Vec&lt;RawBytes&lt;<span class="lifetime">&#39;a</span>, NullBytes&gt;&gt;),
+    Microseconds(u32),
+    <span class="doccomment">/// Ignored.
+    </span>CommitTs(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]),
+    <span class="doccomment">/// Ignored.
+    </span>CommitTs2(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]),
+    <span class="doccomment">/// `0` is interpreted as `false` and everything else as `true`.
+    </span>ExplicitDefaultsForTimestamp(bool),
+    DdlLoggedWithXid(u64),
+    DefaultCollationForUtf8mb4(u16),
+    SqlRequirePrimaryKey(u8),
+    DefaultTableEncryption(u8),
 }
 
-<span class="doccomment">/// Raw status variable.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StatusVar</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Status variable key.</span>
-    <span class="ident">key</span>: <span class="ident">StatusVarKey</span>,
-    <span class="doccomment">/// Raw value of a status variable. Use `Self::get_value`.</span>
-    <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
+<span class="doccomment">/// Raw status variable.
+</span><span class="attribute">#[derive(Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>StatusVar&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Status variable key.
+    </span>key: StatusVarKey,
+    <span class="doccomment">/// Raw value of a status variable. Use `Self::get_value`.
+    </span>value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
 }
 
-<span class="kw">impl</span> <span class="ident">StatusVar</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns parsed value of this status variable, or raw value in case of error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StatusVarVal</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">key</span> {
-            <span class="ident">StatusVarKey::Flags2</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="ident">read</span>.<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()
-                    .<span class="ident">map</span>(<span class="ident">RawFlags::new</span>)
-                    .<span class="ident">map</span>(<span class="ident">StatusVarVal::Flags2</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)
+<span class="kw">impl </span>StatusVar&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="doccomment">/// Returns parsed value of this status variable, or raw value in case of error.
+    </span><span class="kw">pub fn </span>get_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;StatusVarVal, <span class="kw-2">&amp;</span>[u8]&gt; {
+        <span class="kw">match </span><span class="self">self</span>.key {
+            StatusVarKey::Flags2 =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                read.read_u32::&lt;LittleEndian&gt;()
+                    .map(RawFlags::new)
+                    .map(StatusVarVal::Flags2)
+                    .map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)
             }
-            <span class="ident">StatusVarKey::SqlMode</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="ident">read</span>.<span class="ident">read_u64</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()
-                    .<span class="ident">map</span>(<span class="ident">RawFlags::new</span>)
-                    .<span class="ident">map</span>(<span class="ident">StatusVarVal::SqlMode</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)
+            StatusVarKey::SqlMode =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                read.read_u64::&lt;LittleEndian&gt;()
+                    .map(RawFlags::new)
+                    .map(StatusVarVal::SqlMode)
+                    .map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)
             }
-            <span class="ident">StatusVarKey::Catalog</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::Catalog</span>(<span class="self">self</span>.<span class="ident">value</span>)),
-            <span class="ident">StatusVarKey::AutoIncrement</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">increment</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::AutoIncrement</span> { <span class="ident">increment</span>, <span class="ident">offset</span> })
+            StatusVarKey::Catalog =&gt; <span class="prelude-val">Ok</span>(StatusVarVal::Catalog(<span class="self">self</span>.value)),
+            StatusVarKey::AutoIncrement =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>increment = read.read_u16::&lt;LittleEndian&gt;().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="kw">let </span>offset = read.read_u16::&lt;LittleEndian&gt;().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::AutoIncrement { increment, offset })
             }
-            <span class="ident">StatusVarKey::Charset</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">charset_client</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">collation_connection</span> <span class="op">=</span>
-                    <span class="ident">read</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">collation_server</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::Charset</span> {
-                    <span class="ident">charset_client</span>,
-                    <span class="ident">collation_connection</span>,
-                    <span class="ident">collation_server</span>,
+            StatusVarKey::Charset =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>charset_client = read.read_u16::&lt;LittleEndian&gt;().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="kw">let </span>collation_connection =
+                    read.read_u16::&lt;LittleEndian&gt;().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="kw">let </span>collation_server = read.read_u16::&lt;LittleEndian&gt;().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::Charset {
+                    charset_client,
+                    collation_connection,
+                    collation_server,
                 })
             }
-            <span class="ident">StatusVarKey::TimeZone</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u8</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">get</span>(..<span class="ident">len</span>).<span class="ident">ok_or</span>(<span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::TimeZone</span>(<span class="ident">RawBytes::new</span>(<span class="ident">text</span>)))
+            StatusVarKey::TimeZone =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>len = read.read_u8().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span>text = read.get(..len).ok_or(<span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::TimeZone(RawBytes::new(text)))
             }
-            <span class="ident">StatusVarKey::CatalogNz</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u8</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">get</span>(..<span class="ident">len</span>).<span class="ident">ok_or</span>(<span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::CatalogNz</span>(<span class="ident">RawBytes::new</span>(<span class="ident">text</span>)))
+            StatusVarKey::CatalogNz =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>len = read.read_u8().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span>text = read.get(..len).ok_or(<span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::CatalogNz(RawBytes::new(text)))
             }
-            <span class="ident">StatusVarKey::LcTimeNames</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::LcTimeNames</span>(<span class="ident">val</span>))
+            StatusVarKey::LcTimeNames =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>val = read.read_u16::&lt;LittleEndian&gt;().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::LcTimeNames(val))
             }
-            <span class="ident">StatusVarKey::CharsetDatabase</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::CharsetDatabase</span>(<span class="ident">val</span>))
+            StatusVarKey::CharsetDatabase =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>val = read.read_u16::&lt;LittleEndian&gt;().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::CharsetDatabase(val))
             }
-            <span class="ident">StatusVarKey::TableMapForUpdate</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u64</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::TableMapForUpdate</span>(<span class="ident">val</span>))
+            StatusVarKey::TableMapForUpdate =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>val = read.read_u64::&lt;LittleEndian&gt;().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::TableMapForUpdate(val))
             }
-            <span class="ident">StatusVarKey::MasterDataWritten</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">4</span>];
-                <span class="ident">read</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">val</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::MasterDataWritten</span>(<span class="ident">val</span>))
+            StatusVarKey::MasterDataWritten =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span><span class="kw-2">mut </span>val = [<span class="number">0u8</span>; <span class="number">4</span>];
+                read.read_exact(<span class="kw-2">&amp;mut </span>val).map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::MasterDataWritten(val))
             }
-            <span class="ident">StatusVarKey::Invoker</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
+            StatusVarKey::Invoker =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
 
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u8</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="ident">username</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">get</span>(..<span class="ident">len</span>).<span class="ident">ok_or</span>(<span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="ident">read</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">read</span>[<span class="ident">len</span>..];
+                <span class="kw">let </span>len = read.read_u8().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span>username = read.get(..len).ok_or(<span class="self">self</span>.value)<span class="question-mark">?</span>;
+                read = <span class="kw-2">&amp;</span>read[len..];
 
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u8</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="ident">hostname</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">get</span>(..<span class="ident">len</span>).<span class="ident">ok_or</span>(<span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>len = read.read_u8().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span>hostname = read.get(..len).ok_or(<span class="self">self</span>.value)<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::Invoker</span> {
-                    <span class="ident">username</span>: <span class="ident">RawBytes::new</span>(<span class="ident">username</span>),
-                    <span class="ident">hostname</span>: <span class="ident">RawBytes::new</span>(<span class="ident">hostname</span>),
+                <span class="prelude-val">Ok</span>(StatusVarVal::Invoker {
+                    username: RawBytes::new(username),
+                    hostname: RawBytes::new(hostname),
                 })
             }
-            <span class="ident">StatusVarKey::UpdatedDbNames</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u8</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">count</span>);
+            StatusVarKey::UpdatedDbNames =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>count = read.read_u8().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span><span class="kw-2">mut </span>names = Vec::with_capacity(count);
 
-                <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">count</span> {
-                    <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>).<span class="ident">ok_or</span>(<span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                    <span class="ident">names</span>.<span class="ident">push</span>(<span class="ident">RawBytes::new</span>(<span class="kw-2">&amp;</span><span class="ident">read</span>[..<span class="ident">index</span>]));
-                    <span class="ident">read</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">read</span>[<span class="ident">index</span>..];
+                <span class="kw">for _ in </span><span class="number">0</span>..count {
+                    <span class="kw">let </span>index = read.iter().position(|x| <span class="kw-2">*</span>x == <span class="number">0</span>).ok_or(<span class="self">self</span>.value)<span class="question-mark">?</span>;
+                    names.push(RawBytes::new(<span class="kw-2">&amp;</span>read[..index]));
+                    read = <span class="kw-2">&amp;</span>read[index..];
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::UpdatedDbNames</span>(<span class="ident">names</span>))
+                <span class="prelude-val">Ok</span>(StatusVarVal::UpdatedDbNames(names))
             }
-            <span class="ident">StatusVarKey::Microseconds</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::Microseconds</span>(<span class="ident">val</span>))
+            StatusVarKey::Microseconds =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>val = read.read_u32::&lt;LittleEndian&gt;().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::Microseconds(val))
             }
-            <span class="ident">StatusVarKey::CommitTs</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::CommitTs</span>(<span class="self">self</span>.<span class="ident">value</span>)),
-            <span class="ident">StatusVarKey::CommitTs2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::CommitTs2</span>(<span class="self">self</span>.<span class="ident">value</span>)),
-            <span class="ident">StatusVarKey::ExplicitDefaultsForTimestamp</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u8</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::ExplicitDefaultsForTimestamp</span>(<span class="ident">val</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>))
+            StatusVarKey::CommitTs =&gt; <span class="prelude-val">Ok</span>(StatusVarVal::CommitTs(<span class="self">self</span>.value)),
+            StatusVarKey::CommitTs2 =&gt; <span class="prelude-val">Ok</span>(StatusVarVal::CommitTs2(<span class="self">self</span>.value)),
+            StatusVarKey::ExplicitDefaultsForTimestamp =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>val = read.read_u8().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::ExplicitDefaultsForTimestamp(val != <span class="number">0</span>))
             }
-            <span class="ident">StatusVarKey::DdlLoggedWithXid</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u64</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::DdlLoggedWithXid</span>(<span class="ident">val</span>))
+            StatusVarKey::DdlLoggedWithXid =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>val = read.read_u64::&lt;LittleEndian&gt;().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::DdlLoggedWithXid(val))
             }
-            <span class="ident">StatusVarKey::DefaultCollationForUtf8mb4</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::DefaultCollationForUtf8mb4</span>(<span class="ident">val</span>))
+            StatusVarKey::DefaultCollationForUtf8mb4 =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>val = read.read_u16::&lt;LittleEndian&gt;().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::DefaultCollationForUtf8mb4(val))
             }
-            <span class="ident">StatusVarKey::SqlRequirePrimaryKey</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u8</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::SqlRequirePrimaryKey</span>(<span class="ident">val</span>))
+            StatusVarKey::SqlRequirePrimaryKey =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>val = read.read_u8().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::SqlRequirePrimaryKey(val))
             }
-            <span class="ident">StatusVarKey::DefaultTableEncryption</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">read_u8</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">StatusVarVal::DefaultTableEncryption</span>(<span class="ident">val</span>))
+            StatusVarKey::DefaultTableEncryption =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="self">self</span>.value;
+                <span class="kw">let </span>val = read.read_u8().map_err(|<span class="kw">_</span>| <span class="self">self</span>.value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(StatusVarVal::DefaultTableEncryption(val))
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">StatusVar</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;StatusVar&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;key&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;value&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_value</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>StatusVar&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;StatusVar&quot;</span>)
+            .field(<span class="string">&quot;key&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.key)
+            .field(<span class="string">&quot;value&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.get_value())
+            .finish()
     }
 }
 
-<span class="doccomment">/// Status variables of a QueryEvent.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StatusVars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">BareU16Bytes</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Status variables of a QueryEvent.
+</span><span class="attribute">#[derive(Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>StatusVars&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub </span>RawBytes&lt;<span class="lifetime">&#39;a</span>, BareU16Bytes&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">StatusVars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns an iterator over QueryEvent status variables.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">StatusVarsIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">StatusVarsIterator::new</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; StatusVars&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Returns an iterator over QueryEvent status variables.
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; StatusVarsIterator&lt;<span class="lifetime">&#39;a</span>&gt; {
+        StatusVarsIterator::new(<span class="self">self</span>.<span class="number">0</span>.as_bytes())
     }
 
-    <span class="doccomment">/// Returns raw value of a status variable by key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_status_var</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">needle</span>: <span class="ident">StatusVarKey</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StatusVar</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>()
-            .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">var</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">var</span>.<span class="ident">key</span> <span class="op">==</span> <span class="ident">needle</span> { <span class="prelude-val">Some</span>(<span class="ident">var</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> })
+    <span class="doccomment">/// Returns raw value of a status variable by key.
+    </span><span class="kw">pub fn </span>get_status_var(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, needle: StatusVarKey) -&gt; <span class="prelude-ty">Option</span>&lt;StatusVar&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.iter()
+            .find_map(|var| <span class="kw">if </span>var.key == needle { <span class="prelude-val">Some</span>(var) } <span class="kw">else </span>{ <span class="prelude-val">None </span>})
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">StatusVars</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="ident">StatusVars</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">into_owned</span>())
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StatusVars</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">u16</span>;
-
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">len</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">buf</span>.<span class="ident">parse</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)<span class="question-mark">?</span>))
+    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; StatusVars&lt;<span class="lifetime">&#39;static</span>&gt; {
+        StatusVars(<span class="self">self</span>.<span class="number">0</span>.into_owned())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">StatusVars</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>StatusVars&lt;<span class="lifetime">&#39;de</span>&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = u16;
+
+    <span class="kw">fn </span>deserialize(len: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(buf.parse(len <span class="kw">as </span>usize)<span class="question-mark">?</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">StatusVars</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>MySerialize <span class="kw">for </span>StatusVars&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="self">self</span>.<span class="number">0</span>.serialize(buf);
     }
 }
 
-<span class="doccomment">/// Iterator over status vars of a `QueryEvent`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It will stop iteration if vars can&#39;t be parsed.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StatusVarsIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">pos</span>: <span class="ident">usize</span>,
-    <span class="ident">status_vars</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>StatusVars&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.iter().fmt(f)
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">StatusVarsIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates new instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">status_vars</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">StatusVarsIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">Self</span> {
-            <span class="ident">pos</span>: <span class="number">0</span>,
-            <span class="ident">status_vars</span>,
+<span class="doccomment">/// Iterator over status vars of a `QueryEvent`.
+///
+/// It will stop iteration if vars can&#39;t be parsed.
+</span><span class="attribute">#[derive(Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>StatusVarsIterator&lt;<span class="lifetime">&#39;a</span>&gt; {
+    pos: usize,
+    status_vars: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; StatusVarsIterator&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Creates new instance.
+    </span><span class="kw">pub fn </span>new(status_vars: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; StatusVarsIterator&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">Self </span>{
+            pos: <span class="number">0</span>,
+            status_vars,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">StatusVarsIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_list</span>().<span class="ident">entries</span>(<span class="self">self</span>.<span class="ident">clone</span>()).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>StatusVarsIterator&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_list().entries(<span class="self">self</span>.clone()).finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">StatusVarsIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">StatusVar</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>StatusVarsIterator&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = StatusVar&lt;<span class="lifetime">&#39;a</span>&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">status_vars</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">pos</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">StatusVarKey::try_from</span>(<span class="ident">key</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>key = <span class="kw-2">*</span><span class="self">self</span>.status_vars.get(<span class="self">self</span>.pos)<span class="question-mark">?</span>;
+        <span class="kw">let </span>key = StatusVarKey::try_from(key).ok()<span class="question-mark">?</span>;
+        <span class="self">self</span>.pos += <span class="number">1</span>;
 
-        <span class="macro">macro_rules!</span> <span class="ident">get_fixed</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-                <span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>;
-                <span class="self">self</span>.<span class="ident">status_vars</span>.<span class="ident">get</span>((<span class="self">self</span>.<span class="ident">pos</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)..<span class="self">self</span>.<span class="ident">pos</span>)<span class="question-mark">?</span>
+        <span class="macro">macro_rules! </span>get_fixed {
+            (<span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+                <span class="self">self</span>.pos += <span class="macro-nonterminal">$len</span>;
+                <span class="self">self</span>.status_vars.get((<span class="self">self</span>.pos - <span class="macro-nonterminal">$len</span>)..<span class="self">self</span>.pos)<span class="question-mark">?
+            </span>}};
+        }
+
+        <span class="macro">macro_rules! </span>get_var {
+            (<span class="macro-nonterminal">$suffix_len</span>:expr) =&gt; {{
+                <span class="kw">let </span>len = <span class="kw-2">*</span><span class="self">self</span>.status_vars.get(<span class="self">self</span>.pos)<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="macro">get_fixed!</span>(<span class="number">1 </span>+ len + <span class="macro-nonterminal">$suffix_len</span>)
             }};
         }
 
-        <span class="macro">macro_rules!</span> <span class="ident">get_var</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">suffix_len</span>:<span class="ident">expr</span>) =&gt; {{
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">status_vars</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">pos</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="macro">get_fixed!</span>(<span class="number">1</span> <span class="op">+</span> <span class="ident">len</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">suffix_len</span>)
-            }};
-        }
-
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">key</span> {
-            <span class="ident">StatusVarKey::Flags2</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">4</span>),
-            <span class="ident">StatusVarKey::SqlMode</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">8</span>),
-            <span class="ident">StatusVarKey::Catalog</span> =&gt; <span class="macro">get_var!</span>(<span class="number">1</span>),
-            <span class="ident">StatusVarKey::AutoIncrement</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">4</span>),
-            <span class="ident">StatusVarKey::Charset</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">6</span>),
-            <span class="ident">StatusVarKey::TimeZone</span> =&gt; <span class="macro">get_var!</span>(<span class="number">0</span>),
-            <span class="ident">StatusVarKey::CatalogNz</span> =&gt; <span class="macro">get_var!</span>(<span class="number">0</span>),
-            <span class="ident">StatusVarKey::LcTimeNames</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">2</span>),
-            <span class="ident">StatusVarKey::CharsetDatabase</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">2</span>),
-            <span class="ident">StatusVarKey::TableMapForUpdate</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">8</span>),
-            <span class="ident">StatusVarKey::MasterDataWritten</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">4</span>),
-            <span class="ident">StatusVarKey::Invoker</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">user_len</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">status_vars</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">pos</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="ident">host_len</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">status_vars</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">user_len</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="macro">get_fixed!</span>(<span class="number">1</span> <span class="op">+</span> <span class="ident">user_len</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">host_len</span>)
+        <span class="kw">let </span>value = <span class="kw">match </span>key {
+            StatusVarKey::Flags2 =&gt; <span class="macro">get_fixed!</span>(<span class="number">4</span>),
+            StatusVarKey::SqlMode =&gt; <span class="macro">get_fixed!</span>(<span class="number">8</span>),
+            StatusVarKey::Catalog =&gt; <span class="macro">get_var!</span>(<span class="number">1</span>),
+            StatusVarKey::AutoIncrement =&gt; <span class="macro">get_fixed!</span>(<span class="number">4</span>),
+            StatusVarKey::Charset =&gt; <span class="macro">get_fixed!</span>(<span class="number">6</span>),
+            StatusVarKey::TimeZone =&gt; <span class="macro">get_var!</span>(<span class="number">0</span>),
+            StatusVarKey::CatalogNz =&gt; <span class="macro">get_var!</span>(<span class="number">0</span>),
+            StatusVarKey::LcTimeNames =&gt; <span class="macro">get_fixed!</span>(<span class="number">2</span>),
+            StatusVarKey::CharsetDatabase =&gt; <span class="macro">get_fixed!</span>(<span class="number">2</span>),
+            StatusVarKey::TableMapForUpdate =&gt; <span class="macro">get_fixed!</span>(<span class="number">8</span>),
+            StatusVarKey::MasterDataWritten =&gt; <span class="macro">get_fixed!</span>(<span class="number">4</span>),
+            StatusVarKey::Invoker =&gt; {
+                <span class="kw">let </span>user_len = <span class="kw-2">*</span><span class="self">self</span>.status_vars.get(<span class="self">self</span>.pos)<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span>host_len = <span class="kw-2">*</span><span class="self">self</span>.status_vars.get(<span class="self">self</span>.pos + <span class="number">1 </span>+ user_len)<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="macro">get_fixed!</span>(<span class="number">1 </span>+ user_len + <span class="number">1 </span>+ host_len)
             }
-            <span class="ident">StatusVarKey::UpdatedDbNames</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">status_vars</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">pos</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">count</span> {
-                    <span class="kw">while</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">status_vars</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span> <span class="ident">total</span>)<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0x00</span> {
-                        <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            StatusVarKey::UpdatedDbNames =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>total = <span class="number">1</span>;
+                <span class="kw">let </span>count = <span class="kw-2">*</span><span class="self">self</span>.status_vars.get(<span class="self">self</span>.pos)<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">for _ in </span><span class="number">0</span>..count {
+                    <span class="kw">while </span><span class="kw-2">*</span><span class="self">self</span>.status_vars.get(<span class="self">self</span>.pos + total)<span class="question-mark">? </span>!= <span class="number">0x00 </span>{
+                        total += <span class="number">1</span>;
                     }
-                    <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    total += <span class="number">1</span>;
                 }
-                <span class="macro">get_fixed!</span>(<span class="ident">total</span>)
+                <span class="macro">get_fixed!</span>(total)
             }
-            <span class="ident">StatusVarKey::Microseconds</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">3</span>),
-            <span class="ident">StatusVarKey::CommitTs</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">0</span>),
-            <span class="ident">StatusVarKey::CommitTs2</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">0</span>),
-            <span class="ident">StatusVarKey::ExplicitDefaultsForTimestamp</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">1</span>),
-            <span class="ident">StatusVarKey::DdlLoggedWithXid</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">8</span>),
-            <span class="ident">StatusVarKey::DefaultCollationForUtf8mb4</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">2</span>),
-            <span class="ident">StatusVarKey::SqlRequirePrimaryKey</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">1</span>),
-            <span class="ident">StatusVarKey::DefaultTableEncryption</span> =&gt; <span class="macro">get_fixed!</span>(<span class="number">1</span>),
+            StatusVarKey::Microseconds =&gt; <span class="macro">get_fixed!</span>(<span class="number">3</span>),
+            StatusVarKey::CommitTs =&gt; <span class="macro">get_fixed!</span>(<span class="number">0</span>),
+            StatusVarKey::CommitTs2 =&gt; <span class="macro">get_fixed!</span>(<span class="number">0</span>),
+            StatusVarKey::ExplicitDefaultsForTimestamp =&gt; <span class="macro">get_fixed!</span>(<span class="number">1</span>),
+            StatusVarKey::DdlLoggedWithXid =&gt; <span class="macro">get_fixed!</span>(<span class="number">8</span>),
+            StatusVarKey::DefaultCollationForUtf8mb4 =&gt; <span class="macro">get_fixed!</span>(<span class="number">2</span>),
+            StatusVarKey::SqlRequirePrimaryKey =&gt; <span class="macro">get_fixed!</span>(<span class="number">1</span>),
+            StatusVarKey::DefaultTableEncryption =&gt; <span class="macro">get_fixed!</span>(<span class="number">1</span>),
         };
 
-        <span class="prelude-val">Some</span>(<span class="ident">StatusVar</span> { <span class="ident">key</span>, <span class="ident">value</span> })
+        <span class="prelude-val">Some</span>(StatusVar { key, value })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

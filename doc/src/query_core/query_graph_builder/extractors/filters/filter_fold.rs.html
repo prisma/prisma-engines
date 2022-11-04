@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/extractors/filters/filter_fold.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>filter_fold.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/extractors/filters/filter_fold.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>filter_fold.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -347,354 +347,354 @@
 <span id="347">347</span>
 <span id="348">348</span>
 <span id="349">349</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector::Filter</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>connector::Filter;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fold_filter</span>(<span class="ident">filter</span>: <span class="ident">Filter</span>) -&gt; <span class="ident">Filter</span> {
-    <span class="kw">match</span> <span class="ident">filter</span> {
-        <span class="ident">Filter::And</span>(<span class="ident">and</span>) =&gt; <span class="ident">fold_and</span>(<span class="ident">and</span>),
-        <span class="ident">Filter::Or</span>(<span class="ident">or</span>) =&gt; <span class="ident">fold_or</span>(<span class="ident">or</span>),
-        <span class="ident">Filter::Not</span>(<span class="ident">not</span>) =&gt; <span class="ident">fold_not</span>(<span class="ident">not</span>),
-        <span class="ident">f</span> =&gt; <span class="ident">f</span>,
+<span class="kw">pub fn </span>fold_filter(filter: Filter) -&gt; Filter {
+    <span class="kw">match </span>filter {
+        Filter::And(and) =&gt; fold_and(and),
+        Filter::Or(or) =&gt; fold_or(or),
+        Filter::Not(not) =&gt; fold_not(not),
+        f =&gt; f,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">fold_and</span>(<span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span> {
-    <span class="kw">fn</span> <span class="ident">fold_and_impl</span>(<span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flattened</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="kw">fn </span>fold_and(filters: Vec&lt;Filter&gt;) -&gt; Filter {
+    <span class="kw">fn </span>fold_and_impl(filters: Vec&lt;Filter&gt;) -&gt; Vec&lt;Filter&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>flattened: Vec&lt;Filter&gt; = <span class="macro">vec!</span>[];
 
-        <span class="comment">// Parent is AND([...])</span>
-        <span class="kw">for</span> <span class="ident">f</span> <span class="kw">in</span> <span class="ident">filters</span> {
-            <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">clone</span>() {
-                <span class="ident">Filter::And</span>(<span class="ident">and</span>) =&gt; <span class="ident">flattened</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fold_and_impl</span>(<span class="ident">and</span>)),
-                <span class="ident">Filter::Or</span>(<span class="ident">or</span>) =&gt; <span class="ident">flattened</span>.<span class="ident">push</span>(<span class="ident">fold_or</span>(<span class="ident">or</span>)),
-                <span class="ident">Filter::Not</span>(<span class="ident">not</span>) =&gt; <span class="ident">flattened</span>.<span class="ident">push</span>(<span class="ident">fold_not</span>(<span class="ident">not</span>)),
-                <span class="ident">filter</span> =&gt; <span class="ident">flattened</span>.<span class="ident">push</span>(<span class="ident">filter</span>),
+        <span class="comment">// Parent is AND([...])
+        </span><span class="kw">for </span>f <span class="kw">in </span>filters {
+            <span class="kw">match </span>f.clone() {
+                Filter::And(and) =&gt; flattened.append(<span class="kw-2">&amp;mut </span>fold_and_impl(and)),
+                Filter::Or(or) =&gt; flattened.push(fold_or(or)),
+                Filter::Not(not) =&gt; flattened.push(fold_not(not)),
+                filter =&gt; flattened.push(filter),
             }
         }
-        <span class="ident">flattened</span>
+        flattened
     }
 
-    <span class="kw">let</span> <span class="ident">folded</span> <span class="op">=</span> <span class="ident">fold_and_impl</span>(<span class="ident">filters</span>);
+    <span class="kw">let </span>folded = fold_and_impl(filters);
 
-    <span class="kw">if</span> <span class="ident">folded</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-        <span class="ident">folded</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>()
-    } <span class="kw">else</span> {
-        <span class="ident">Filter::And</span>(<span class="ident">folded</span>)
+    <span class="kw">if </span>folded.len() == <span class="number">1 </span>{
+        folded.first().unwrap().clone()
+    } <span class="kw">else </span>{
+        Filter::And(folded)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">fold_or</span>(<span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span> {
-    <span class="kw">fn</span> <span class="ident">fold_or_impl</span>(<span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flattened</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="kw">fn </span>fold_or(filters: Vec&lt;Filter&gt;) -&gt; Filter {
+    <span class="kw">fn </span>fold_or_impl(filters: Vec&lt;Filter&gt;) -&gt; Vec&lt;Filter&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>flattened: Vec&lt;Filter&gt; = <span class="macro">vec!</span>[];
 
-        <span class="comment">// Parent is OR([...])</span>
-        <span class="kw">for</span> <span class="ident">f</span> <span class="kw">in</span> <span class="ident">filters</span> {
-            <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">clone</span>() {
-                <span class="ident">Filter::Or</span>(<span class="ident">or</span>) =&gt; <span class="ident">flattened</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fold_or_impl</span>(<span class="ident">or</span>)),
-                <span class="ident">Filter::And</span>(<span class="ident">and</span>) =&gt; <span class="ident">flattened</span>.<span class="ident">push</span>(<span class="ident">fold_and</span>(<span class="ident">and</span>)),
-                <span class="ident">Filter::Not</span>(<span class="ident">not</span>) =&gt; <span class="ident">flattened</span>.<span class="ident">push</span>(<span class="ident">fold_not</span>(<span class="ident">not</span>)),
-                <span class="ident">filter</span> =&gt; <span class="ident">flattened</span>.<span class="ident">push</span>(<span class="ident">filter</span>),
+        <span class="comment">// Parent is OR([...])
+        </span><span class="kw">for </span>f <span class="kw">in </span>filters {
+            <span class="kw">match </span>f.clone() {
+                Filter::Or(or) =&gt; flattened.append(<span class="kw-2">&amp;mut </span>fold_or_impl(or)),
+                Filter::And(and) =&gt; flattened.push(fold_and(and)),
+                Filter::Not(not) =&gt; flattened.push(fold_not(not)),
+                filter =&gt; flattened.push(filter),
             }
         }
-        <span class="ident">flattened</span>
+        flattened
     }
 
-    <span class="kw">let</span> <span class="ident">folded</span> <span class="op">=</span> <span class="ident">fold_or_impl</span>(<span class="ident">filters</span>);
+    <span class="kw">let </span>folded = fold_or_impl(filters);
 
-    <span class="kw">if</span> <span class="ident">folded</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-        <span class="ident">folded</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>()
-    } <span class="kw">else</span> {
-        <span class="ident">Filter::Or</span>(<span class="ident">folded</span>)
+    <span class="kw">if </span>folded.len() == <span class="number">1 </span>{
+        folded.first().unwrap().clone()
+    } <span class="kw">else </span>{
+        Filter::Or(folded)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">fold_not</span>(<span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span> {
-    <span class="kw">fn</span> <span class="ident">fold_not_impl</span>(<span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="kw">fn </span>fold_not(filters: Vec&lt;Filter&gt;) -&gt; Filter {
+    <span class="kw">fn </span>fold_not_impl(filters: Vec&lt;Filter&gt;) -&gt; Vec&lt;Filter&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>res: Vec&lt;Filter&gt; = <span class="macro">vec!</span>[];
 
-        <span class="kw">for</span> <span class="ident">f</span> <span class="kw">in</span> <span class="ident">filters</span> {
-            <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">clone</span>() {
-                <span class="ident">Filter::Not</span>(<span class="ident">not</span>) =&gt; <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">fold_not</span>(<span class="ident">not</span>)),
-                <span class="ident">Filter::And</span>(<span class="ident">and</span>) =&gt; <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">fold_and</span>(<span class="ident">and</span>)),
-                <span class="ident">Filter::Or</span>(<span class="ident">or</span>) =&gt; <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">fold_or</span>(<span class="ident">or</span>)),
-                <span class="ident">filter</span> =&gt; {
-                    <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">filter</span>);
+        <span class="kw">for </span>f <span class="kw">in </span>filters {
+            <span class="kw">match </span>f.clone() {
+                Filter::Not(not) =&gt; res.push(fold_not(not)),
+                Filter::And(and) =&gt; res.push(fold_and(and)),
+                Filter::Or(or) =&gt; res.push(fold_or(or)),
+                filter =&gt; {
+                    res.push(filter);
                 }
             }
         }
 
-        <span class="ident">res</span>
+        res
     }
 
-    <span class="kw">let</span> <span class="ident">folded</span> <span class="op">=</span> <span class="ident">fold_not_impl</span>(<span class="ident">filters</span>);
+    <span class="kw">let </span>folded = fold_not_impl(filters);
 
-    <span class="ident">Filter::Not</span>(<span class="ident">folded</span>)
+    Filter::Not(folded)
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">ensure_and_folded</span>() {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">fold_filter</span>(<span class="ident">Filter::And</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::And</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>])]));
-    <span class="kw">let</span> <span class="ident">expected_output</span> <span class="op">=</span> <span class="ident">Filter::And</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::Empty</span>]);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>ensure_and_folded() {
+    <span class="kw">let </span>input = fold_filter(Filter::And(<span class="macro">vec!</span>[Filter::Empty, Filter::And(<span class="macro">vec!</span>[Filter::Empty])]));
+    <span class="kw">let </span>expected_output = Filter::And(<span class="macro">vec!</span>[Filter::Empty, Filter::Empty]);
 
-    <span class="macro">assert_eq!</span>(<span class="ident">input</span>, <span class="ident">expected_output</span>)
+    <span class="macro">assert_eq!</span>(input, expected_output)
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">ensure_or_folded</span>() {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">fold_filter</span>(<span class="ident">Filter::Or</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::Or</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>])]));
-    <span class="kw">let</span> <span class="ident">expected_output</span> <span class="op">=</span> <span class="ident">Filter::Or</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::Empty</span>]);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>ensure_or_folded() {
+    <span class="kw">let </span>input = fold_filter(Filter::Or(<span class="macro">vec!</span>[Filter::Empty, Filter::Or(<span class="macro">vec!</span>[Filter::Empty])]));
+    <span class="kw">let </span>expected_output = Filter::Or(<span class="macro">vec!</span>[Filter::Empty, Filter::Empty]);
 
-    <span class="macro">assert_eq!</span>(<span class="ident">input</span>, <span class="ident">expected_output</span>)
+    <span class="macro">assert_eq!</span>(input, expected_output)
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">ensure_not_is_not_folded</span>() {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">fold_filter</span>(<span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>])]));
-    <span class="kw">let</span> <span class="ident">expected_output</span> <span class="op">=</span> <span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>])]);
-    <span class="macro">assert_eq!</span>(<span class="ident">input</span>, <span class="ident">expected_output</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>ensure_not_is_not_folded() {
+    <span class="kw">let </span>input = fold_filter(Filter::Not(<span class="macro">vec!</span>[Filter::Empty, Filter::Not(<span class="macro">vec!</span>[Filter::Empty])]));
+    <span class="kw">let </span>expected_output = Filter::Not(<span class="macro">vec!</span>[Filter::Empty, Filter::Not(<span class="macro">vec!</span>[Filter::Empty])]);
+    <span class="macro">assert_eq!</span>(input, expected_output);
 
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">fold_filter</span>(<span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[
-        <span class="ident">Filter::Empty</span>,
-        <span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>])]),
+    <span class="kw">let </span>input = fold_filter(Filter::Not(<span class="macro">vec!</span>[
+        Filter::Empty,
+        Filter::Not(<span class="macro">vec!</span>[Filter::Not(<span class="macro">vec!</span>[Filter::Empty])]),
     ]));
-    <span class="comment">// TODO: `Not(Not())` could be folded</span>
-    <span class="kw">let</span> <span class="ident">expected_output</span> <span class="op">=</span> <span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>])])]);
-    <span class="macro">assert_eq!</span>(<span class="ident">input</span>, <span class="ident">expected_output</span>);
+    <span class="comment">// TODO: `Not(Not())` could be folded
+    </span><span class="kw">let </span>expected_output = Filter::Not(<span class="macro">vec!</span>[Filter::Empty, Filter::Not(<span class="macro">vec!</span>[Filter::Not(<span class="macro">vec!</span>[Filter::Empty])])]);
+    <span class="macro">assert_eq!</span>(input, expected_output);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">ensure_nested_conditions_are_folded</span>() {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">fold_filter</span>(<span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[
-        <span class="ident">Filter::Empty</span>,
-        <span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>])]),
-        <span class="ident">Filter::Or</span>(<span class="macro">vec!</span>[
-            <span class="ident">Filter::And</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::And</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::Empty</span>])]),
-            <span class="ident">Filter::Or</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::Or</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::Empty</span>])]),
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>ensure_nested_conditions_are_folded() {
+    <span class="kw">let </span>input = fold_filter(Filter::Not(<span class="macro">vec!</span>[
+        Filter::Empty,
+        Filter::Not(<span class="macro">vec!</span>[Filter::Not(<span class="macro">vec!</span>[Filter::Empty])]),
+        Filter::Or(<span class="macro">vec!</span>[
+            Filter::And(<span class="macro">vec!</span>[Filter::Empty, Filter::And(<span class="macro">vec!</span>[Filter::Empty, Filter::Empty])]),
+            Filter::Or(<span class="macro">vec!</span>[Filter::Empty, Filter::Or(<span class="macro">vec!</span>[Filter::Empty, Filter::Empty])]),
         ]),
     ]));
-    <span class="kw">let</span> <span class="ident">expected_output</span> <span class="op">=</span> <span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[
-        <span class="ident">Filter::Empty</span>,
-        <span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>])]),
-        <span class="ident">Filter::Or</span>(<span class="macro">vec!</span>[
-            <span class="ident">Filter::And</span>(<span class="macro">vec!</span>[<span class="ident">Filter::Empty</span>, <span class="ident">Filter::Empty</span>, <span class="ident">Filter::Empty</span>]),
-            <span class="ident">Filter::Empty</span>,
-            <span class="ident">Filter::Empty</span>,
-            <span class="ident">Filter::Empty</span>,
+    <span class="kw">let </span>expected_output = Filter::Not(<span class="macro">vec!</span>[
+        Filter::Empty,
+        Filter::Not(<span class="macro">vec!</span>[Filter::Not(<span class="macro">vec!</span>[Filter::Empty])]),
+        Filter::Or(<span class="macro">vec!</span>[
+            Filter::And(<span class="macro">vec!</span>[Filter::Empty, Filter::Empty, Filter::Empty]),
+            Filter::Empty,
+            Filter::Empty,
+            Filter::Empty,
         ]),
     ]);
 
-    <span class="macro">assert_eq!</span>(<span class="ident">input</span>, <span class="ident">expected_output</span>)
+    <span class="macro">assert_eq!</span>(input, expected_output)
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">ensure_filter_fold_does_not_alter_boolean_logic</span>() {
-    <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">generate_filters</span>();
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>ensure_filter_fold_does_not_alter_boolean_logic() {
+    <span class="kw">let </span>filters = generate_filters();
 
-    <span class="kw">for</span> <span class="ident">filter</span> <span class="kw">in</span> <span class="ident">filters</span> {
-        <span class="kw">let</span> <span class="ident">folded_filter</span> <span class="op">=</span> <span class="ident">fold_filter</span>(<span class="ident">filter</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">visitor</span> <span class="op">=</span> <span class="ident">FilterVisitor::new</span>(<span class="ident">filter</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">folded_visitor</span> <span class="op">=</span> <span class="ident">FilterVisitor::new</span>(<span class="ident">folded_filter</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">visited_filter</span> <span class="op">=</span> <span class="ident">visitor</span>.<span class="ident">visit</span>();
-        <span class="kw">let</span> <span class="ident">visited_folded_filter</span> <span class="op">=</span> <span class="ident">folded_visitor</span>.<span class="ident">visit</span>();
+    <span class="kw">for </span>filter <span class="kw">in </span>filters {
+        <span class="kw">let </span>folded_filter = fold_filter(filter.clone());
+        <span class="kw">let </span>visitor = FilterVisitor::new(filter.clone());
+        <span class="kw">let </span>folded_visitor = FilterVisitor::new(folded_filter.clone());
+        <span class="kw">let </span>visited_filter = visitor.visit();
+        <span class="kw">let </span>visited_folded_filter = folded_visitor.visit();
 
-        <span class="kw">if</span> <span class="ident">visited_filter</span> <span class="op">!</span><span class="op">=</span> <span class="ident">visited_folded_filter</span> {
-            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span><span class="ident">filter</span>);
-            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span><span class="ident">folded_filter</span>);
+        <span class="kw">if </span>visited_filter != visited_folded_filter {
+            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span>filter);
+            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span>folded_filter);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">visitor</span>.<span class="ident">visit</span>(), <span class="ident">folded_visitor</span>.<span class="ident">visit</span>())
+        <span class="macro">assert_eq!</span>(visitor.visit(), folded_visitor.visit())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">struct</span> <span class="ident">FilterVisitor</span> {
-    <span class="ident">filter</span>: <span class="ident">Filter</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">struct </span>FilterVisitor {
+    filter: Filter,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">impl</span> <span class="ident">FilterVisitor</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">filter</span>: <span class="ident">Filter</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">filter</span> }
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">impl </span>FilterVisitor {
+    <span class="kw">pub fn </span>new(filter: Filter) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ filter }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">visit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span> {
-            <span class="ident">Filter::And</span>(<span class="ident">and</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_and</span>(<span class="ident">and</span>),
-            <span class="ident">Filter::Or</span>(<span class="ident">or</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_or</span>(<span class="ident">or</span>),
-            <span class="ident">Filter::Not</span>(<span class="ident">not</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_not</span>(<span class="ident">not</span>),
-            <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>) =&gt; <span class="kw-2">*</span><span class="ident">b</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="kw">pub fn </span>visit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.filter {
+            Filter::And(and) =&gt; <span class="self">self</span>.visit_and(and),
+            Filter::Or(or) =&gt; <span class="self">self</span>.visit_or(or),
+            Filter::Not(not) =&gt; <span class="self">self</span>.visit_not(not),
+            Filter::BoolFilter(b) =&gt; <span class="kw-2">*</span>b,
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filters</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">fn </span>visit_and(<span class="kw-2">&amp;</span><span class="self">self</span>, filters: <span class="kw-2">&amp;</span>Vec&lt;Filter&gt;) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="bool-val">true</span>;
 
-        <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">f</span>) <span class="kw">in</span> <span class="ident">filters</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">match</span> <span class="ident">f</span> {
-                <span class="ident">Filter::And</span>(<span class="ident">and</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">visit_and</span>(<span class="ident">and</span>);
+        <span class="kw">for </span>(index, f) <span class="kw">in </span>filters.iter().enumerate() {
+            <span class="kw">match </span>f {
+                Filter::And(and) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = <span class="self">self</span>.visit_and(and);
                 }
-                <span class="ident">Filter::And</span>(<span class="ident">and</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">visit_and</span>(<span class="ident">and</span>);
+                Filter::And(and) =&gt; {
+                    res = res &amp;&amp; <span class="self">self</span>.visit_and(and);
                 }
-                <span class="ident">Filter::Or</span>(<span class="ident">or</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">visit_or</span>(<span class="ident">or</span>);
+                Filter::Or(or) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = <span class="self">self</span>.visit_or(or);
                 }
-                <span class="ident">Filter::Or</span>(<span class="ident">or</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">visit_or</span>(<span class="ident">or</span>);
+                Filter::Or(or) =&gt; {
+                    res = res &amp;&amp; <span class="self">self</span>.visit_or(or);
                 }
-                <span class="ident">Filter::Not</span>(<span class="ident">not</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">visit_not</span>(<span class="ident">not</span>);
+                Filter::Not(not) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = <span class="self">self</span>.visit_not(not);
                 }
-                <span class="ident">Filter::Not</span>(<span class="ident">not</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">visit_not</span>(<span class="ident">not</span>);
+                Filter::Not(not) =&gt; {
+                    res = res &amp;&amp; <span class="self">self</span>.visit_not(not);
                 }
-                <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">b</span>;
+                Filter::BoolFilter(b) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = <span class="kw-2">*</span>b;
                 }
-                <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">b</span>;
+                Filter::BoolFilter(b) =&gt; {
+                    res = res &amp;&amp; <span class="kw-2">*</span>b;
                 }
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             }
         }
 
-        <span class="ident">res</span>
+        res
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filters</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">fn </span>visit_or(<span class="kw-2">&amp;</span><span class="self">self</span>, filters: <span class="kw-2">&amp;</span>Vec&lt;Filter&gt;) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="bool-val">true</span>;
 
-        <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">f</span>) <span class="kw">in</span> <span class="ident">filters</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">match</span> <span class="ident">f</span> {
-                <span class="ident">Filter::And</span>(<span class="ident">and</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">visit_and</span>(<span class="ident">and</span>);
+        <span class="kw">for </span>(index, f) <span class="kw">in </span>filters.iter().enumerate() {
+            <span class="kw">match </span>f {
+                Filter::And(and) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = <span class="self">self</span>.visit_and(and);
                 }
-                <span class="ident">Filter::And</span>(<span class="ident">and</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">visit_and</span>(<span class="ident">and</span>);
+                Filter::And(and) =&gt; {
+                    res = res || <span class="self">self</span>.visit_and(and);
                 }
-                <span class="ident">Filter::Or</span>(<span class="ident">or</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">visit_or</span>(<span class="ident">or</span>);
+                Filter::Or(or) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = <span class="self">self</span>.visit_or(or);
                 }
-                <span class="ident">Filter::Or</span>(<span class="ident">or</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">visit_or</span>(<span class="ident">or</span>);
+                Filter::Or(or) =&gt; {
+                    res = res || <span class="self">self</span>.visit_or(or);
                 }
-                <span class="ident">Filter::Not</span>(<span class="ident">not</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">visit_not</span>(<span class="ident">not</span>);
+                Filter::Not(not) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = <span class="self">self</span>.visit_not(not);
                 }
-                <span class="ident">Filter::Not</span>(<span class="ident">not</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">visit_not</span>(<span class="ident">not</span>);
+                Filter::Not(not) =&gt; {
+                    res = res || <span class="self">self</span>.visit_not(not);
                 }
-                <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">b</span>;
+                Filter::BoolFilter(b) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = <span class="kw-2">*</span>b;
                 }
-                <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">b</span>;
+                Filter::BoolFilter(b) =&gt; {
+                    res = res || <span class="kw-2">*</span>b;
                 }
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             }
         }
 
-        <span class="ident">res</span>
+        res
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_not</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filters</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">fn </span>visit_not(<span class="kw-2">&amp;</span><span class="self">self</span>, filters: <span class="kw-2">&amp;</span>Vec&lt;Filter&gt;) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="bool-val">true</span>;
 
-        <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">f</span>) <span class="kw">in</span> <span class="ident">filters</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">match</span> <span class="ident">f</span> {
-                <span class="ident">Filter::And</span>(<span class="ident">and</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">visit_and</span>(<span class="ident">and</span>);
+        <span class="kw">for </span>(index, f) <span class="kw">in </span>filters.iter().enumerate() {
+            <span class="kw">match </span>f {
+                Filter::And(and) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = !<span class="self">self</span>.visit_and(and);
                 }
-                <span class="ident">Filter::And</span>(<span class="ident">and</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">visit_and</span>(<span class="ident">and</span>);
+                Filter::And(and) =&gt; {
+                    res = res &amp;&amp; !<span class="self">self</span>.visit_and(and);
                 }
-                <span class="ident">Filter::Or</span>(<span class="ident">or</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">visit_or</span>(<span class="ident">or</span>);
+                Filter::Or(or) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = !<span class="self">self</span>.visit_or(or);
                 }
-                <span class="ident">Filter::Or</span>(<span class="ident">or</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">visit_or</span>(<span class="ident">or</span>);
+                Filter::Or(or) =&gt; {
+                    res = res &amp;&amp; !<span class="self">self</span>.visit_or(or);
                 }
-                <span class="ident">Filter::Not</span>(<span class="ident">not</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">visit_not</span>(<span class="ident">not</span>);
+                Filter::Not(not) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = !<span class="self">self</span>.visit_not(not);
                 }
-                <span class="ident">Filter::Not</span>(<span class="ident">not</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">visit_not</span>(<span class="ident">not</span>);
+                Filter::Not(not) =&gt; {
+                    res = res &amp;&amp; !<span class="self">self</span>.visit_not(not);
                 }
-                <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="op">!</span><span class="kw-2">*</span><span class="ident">b</span>;
+                Filter::BoolFilter(b) <span class="kw">if </span>index == <span class="number">0 </span>=&gt; {
+                    res = !<span class="kw-2">*</span>b;
                 }
-                <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>) =&gt; {
-                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="kw-2">*</span><span class="ident">b</span>;
+                Filter::BoolFilter(b) =&gt; {
+                    res = res &amp;&amp; !<span class="kw-2">*</span>b;
                 }
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             }
         }
 
-        <span class="ident">res</span>
+        res
     }
 }
 
-<span class="comment">// This helper deterministically generates a bunch of filters.</span>
-<span class="comment">// eg: And([true]), And([true, false]), ... Or([true]), Or([true, false]), ... And([true, Or([true, false])]) etc</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">fn</span> <span class="ident">generate_filters</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">all_vars</span> <span class="op">=</span> <span class="ident">combinations</span>(<span class="macro">vec!</span>[<span class="ident">Filter::BoolFilter</span>(<span class="bool-val">true</span>), <span class="ident">Filter::BoolFilter</span>(<span class="bool-val">false</span>)]);
-    <span class="kw">let</span> <span class="ident">all_conditions</span> <span class="op">=</span> <span class="ident">combinations</span>(<span class="macro">vec!</span>[<span class="ident">Filter::And</span>(<span class="macro">vec!</span>[]), <span class="ident">Filter::Or</span>(<span class="macro">vec!</span>[]), <span class="ident">Filter::Not</span>(<span class="macro">vec!</span>[])]);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="comment">// This helper deterministically generates a bunch of filters.
+// eg: And([true]), And([true, false]), ... Or([true]), Or([true, false]), ... And([true, Or([true, false])]) etc
+</span><span class="attribute">#[cfg(test)]
+</span><span class="kw">fn </span>generate_filters() -&gt; Vec&lt;Filter&gt; {
+    <span class="kw">let </span>all_vars = combinations(<span class="macro">vec!</span>[Filter::BoolFilter(<span class="bool-val">true</span>), Filter::BoolFilter(<span class="bool-val">false</span>)]);
+    <span class="kw">let </span>all_conditions = combinations(<span class="macro">vec!</span>[Filter::And(<span class="macro">vec!</span>[]), Filter::Or(<span class="macro">vec!</span>[]), Filter::Not(<span class="macro">vec!</span>[])]);
+    <span class="kw">let </span><span class="kw-2">mut </span>filters: Vec&lt;Filter&gt; = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">conditions</span> <span class="kw">in</span> <span class="ident">all_conditions</span> {
-        <span class="kw">for</span> <span class="ident">vars</span> <span class="kw">in</span> <span class="ident">all_vars</span>.<span class="ident">clone</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conditions_with_vars</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">for </span>conditions <span class="kw">in </span>all_conditions {
+        <span class="kw">for </span>vars <span class="kw">in </span>all_vars.clone() {
+            <span class="kw">let </span><span class="kw-2">mut </span>conditions_with_vars: Vec&lt;Filter&gt; = <span class="macro">vec!</span>[];
 
-            <span class="kw">for</span> <span class="ident">cond</span> <span class="kw">in</span> <span class="ident">conditions</span>.<span class="ident">clone</span>().<span class="ident">iter_mut</span>() {
-                <span class="kw">match</span> <span class="ident">cond</span> {
-                    <span class="ident">Filter::And</span>(<span class="ident">f</span>) =&gt; {
-                        <span class="ident">f</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">vars</span>.<span class="ident">clone</span>());
+            <span class="kw">for </span>cond <span class="kw">in </span>conditions.clone().iter_mut() {
+                <span class="kw">match </span>cond {
+                    Filter::And(f) =&gt; {
+                        f.append(<span class="kw-2">&amp;mut </span>vars.clone());
                     }
-                    <span class="ident">Filter::Or</span>(<span class="ident">f</span>) =&gt; {
-                        <span class="ident">f</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">vars</span>.<span class="ident">clone</span>());
+                    Filter::Or(f) =&gt; {
+                        f.append(<span class="kw-2">&amp;mut </span>vars.clone());
                     }
-                    <span class="ident">Filter::Not</span>(<span class="ident">f</span>) =&gt; {
-                        <span class="ident">f</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">vars</span>.<span class="ident">clone</span>());
+                    Filter::Not(f) =&gt; {
+                        f.append(<span class="kw-2">&amp;mut </span>vars.clone());
                     }
-                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                    <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                 }
 
-                <span class="ident">conditions_with_vars</span>.<span class="ident">push</span>(<span class="ident">cond</span>.<span class="ident">clone</span>());
+                conditions_with_vars.push(cond.clone());
             }
 
-            <span class="kw">let</span> (<span class="ident">nested_conditions</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="ident">conditions_with_vars</span>.<span class="ident">split_first_mut</span>().<span class="ident">unwrap</span>();
+            <span class="kw">let </span>(nested_conditions, rest) = conditions_with_vars.split_first_mut().unwrap();
 
-            <span class="kw">match</span> <span class="ident">nested_conditions</span> {
-                <span class="ident">Filter::And</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>.<span class="ident">to_vec</span>()),
-                <span class="ident">Filter::Or</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>.<span class="ident">to_vec</span>()),
-                <span class="ident">Filter::Not</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>.<span class="ident">to_vec</span>()),
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="kw">match </span>nested_conditions {
+                Filter::And(<span class="kw-2">ref mut </span>f) =&gt; f.append(<span class="kw-2">&amp;mut </span>rest.to_vec()),
+                Filter::Or(<span class="kw-2">ref mut </span>f) =&gt; f.append(<span class="kw-2">&amp;mut </span>rest.to_vec()),
+                Filter::Not(<span class="kw-2">ref mut </span>f) =&gt; f.append(<span class="kw-2">&amp;mut </span>rest.to_vec()),
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             }
 
-            <span class="ident">filters</span>.<span class="ident">push</span>(<span class="ident">nested_conditions</span>.<span class="ident">clone</span>());
+            filters.push(nested_conditions.clone());
         }
     }
-    <span class="ident">filters</span>
+    filters
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">fn</span> <span class="ident">combinations</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span>(<span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">fn </span>combinations&lt;T: Clone&gt;(vec: Vec&lt;T&gt;) -&gt; Vec&lt;Vec&lt;T&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>output: Vec&lt;Vec&lt;T&gt;&gt; = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">a</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">vec</span> {
-        <span class="ident">output</span>.<span class="ident">push</span>(<span class="macro">vec!</span>[<span class="ident">a</span>.<span class="ident">clone</span>()]);
-        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">vec</span> {
-            <span class="ident">output</span>.<span class="ident">push</span>(<span class="macro">vec!</span>[<span class="ident">a</span>.<span class="ident">clone</span>(), <span class="ident">b</span>.<span class="ident">clone</span>()]);
-            <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">vec</span> {
-                <span class="ident">output</span>.<span class="ident">push</span>(<span class="macro">vec!</span>[<span class="ident">a</span>.<span class="ident">clone</span>(), <span class="ident">b</span>.<span class="ident">clone</span>(), <span class="ident">c</span>.<span class="ident">clone</span>()]);
+    <span class="kw">for </span>a <span class="kw">in </span><span class="kw-2">&amp;</span>vec {
+        output.push(<span class="macro">vec!</span>[a.clone()]);
+        <span class="kw">for </span>b <span class="kw">in </span><span class="kw-2">&amp;</span>vec {
+            output.push(<span class="macro">vec!</span>[a.clone(), b.clone()]);
+            <span class="kw">for </span>c <span class="kw">in </span><span class="kw-2">&amp;</span>vec {
+                output.push(<span class="macro">vec!</span>[a.clone(), b.clone(), c.clone()]);
             }
         }
     }
 
-    <span class="ident">output</span>
+    output
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

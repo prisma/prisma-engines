@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/metrics/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_engine_metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/metrics/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_engine_metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -591,211 +591,211 @@
 <span id="591">591</span>
 <span id="592">592</span>
 <span id="593">593</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Query Engine Metrics</span>
-<span class="doccomment">//! This crate is responsible for capturing and recording metrics in the Query Engine.</span>
-<span class="doccomment">//! Metrics is broken into two parts, `MetricsRecorder` and `MetricsRegistry`, and uses our tracing framework to communicate.</span>
-<span class="doccomment">//! An example best explains this system.</span>
-<span class="doccomment">//! When the engine boots up, the `MetricRegistry` is added to our tracing as a layer and The MetricRecorder is</span>
-<span class="doccomment">//! set as the global metric recorder. When a metric value is recorded `gauge_increment!(&quot;my_gauge&quot;, 1.0)` is called.</span>
-<span class="doccomment">//! The Metric Recorder is called with `register_gauge` and returns a `MetricHandle`. The `MetricHandle` will convert</span>
-<span class="doccomment">//! ``gauge_increment!(&quot;my_gauge&quot;, 1.0)` into a `trace!` message.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The trace message is received by the `MetricRegistry` and converted into a `MetricVisitor` with all the information required</span>
-<span class="doccomment">//! to record the metric and the value. The MetricVisitor is then processed and the metric value added to the `Registry`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To view the recorded metrics we create a `Snapshot` of our metrics and then return it in `json` format.</span>
-<span class="doccomment">//! A few things to note:</span>
-<span class="doccomment">//! * We have an `ACCEPT_LIST` and those are the only metrics we capture. We don&#39;t want to accidentally record other metrics</span>
-<span class="doccomment">//!   recorded by external libraries that could leak more information than we want to expose.</span>
-<span class="doccomment">//! * The Histogram we use is a Cumulative Histogram. Meaning that a value is added to each bucket that the sample is smaller than.</span>
-<span class="doccomment">//!   This seems to be the way Prometheus expects it</span>
-<span class="doccomment">//! * At the moment, with the Histogram we only support one type of bucket which is a bucket for timings in milliseconds.</span>
-<span class="doccomment">//!</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Query Engine Metrics
+//! This crate is responsible for capturing and recording metrics in the Query Engine.
+//! Metrics is broken into two parts, `MetricsRecorder` and `MetricsRegistry`, and uses our tracing framework to communicate.
+//! An example best explains this system.
+//! When the engine boots up, the `MetricRegistry` is added to our tracing as a layer and The MetricRecorder is
+//! set as the global metric recorder. When a metric value is recorded `gauge_increment!(&quot;my_gauge&quot;, 1.0)` is called.
+//! The Metric Recorder is called with `register_gauge` and returns a `MetricHandle`. The `MetricHandle` will convert
+//! ``gauge_increment!(&quot;my_gauge&quot;, 1.0)` into a `trace!` message.
+//!
+//! The trace message is received by the `MetricRegistry` and converted into a `MetricVisitor` with all the information required
+//! to record the metric and the value. The MetricVisitor is then processed and the metric value added to the `Registry`.
+//!
+//! To view the recorded metrics we create a `Snapshot` of our metrics and then return it in `json` format.
+//! A few things to note:
+//! * We have an `ACCEPT_LIST` and those are the only metrics we capture. We don&#39;t want to accidentally record other metrics
+//!   recorded by external libraries that could leak more information than we want to expose.
+//! * The Histogram we use is a Cumulative Histogram. Meaning that a value is added to each bucket that the sample is smaller than.
+//!   This seems to be the way Prometheus expects it
+//! * At the moment, with the Histogram we only support one type of bucket which is a bucket for timings in milliseconds.
+//!
 
-<span class="kw">const</span> <span class="ident">METRIC_TARGET</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;qe_metrics&quot;</span>;
-<span class="kw">const</span> <span class="ident">METRIC_COUNTER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;counter&quot;</span>;
-<span class="kw">const</span> <span class="ident">METRIC_GAUGE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;gauge&quot;</span>;
-<span class="kw">const</span> <span class="ident">METRIC_HISTOGRAM</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;histogram&quot;</span>;
-<span class="kw">const</span> <span class="ident">METRIC_DESCRIPTION</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;description&quot;</span>;
+</span><span class="kw">const </span>METRIC_TARGET: <span class="kw-2">&amp;</span>str = <span class="string">&quot;qe_metrics&quot;</span>;
+<span class="kw">const </span>METRIC_COUNTER: <span class="kw-2">&amp;</span>str = <span class="string">&quot;counter&quot;</span>;
+<span class="kw">const </span>METRIC_GAUGE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;gauge&quot;</span>;
+<span class="kw">const </span>METRIC_HISTOGRAM: <span class="kw-2">&amp;</span>str = <span class="string">&quot;histogram&quot;</span>;
+<span class="kw">const </span>METRIC_DESCRIPTION: <span class="kw-2">&amp;</span>str = <span class="string">&quot;description&quot;</span>;
 
-<span class="kw">mod</span> <span class="ident">common</span>;
-<span class="kw">mod</span> <span class="ident">formatters</span>;
-<span class="kw">mod</span> <span class="ident">recorder</span>;
-<span class="kw">mod</span> <span class="ident">registry</span>;
+<span class="kw">mod </span>common;
+<span class="kw">mod </span>formatters;
+<span class="kw">mod </span>recorder;
+<span class="kw">mod </span>registry;
 
-<span class="kw">use</span> <span class="ident">recorder</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">registry::MetricRegistry</span>;
-<span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Once</span>;
+<span class="kw">use </span>recorder::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>registry::MetricRegistry;
+<span class="kw">use </span>serde::Deserialize;
+<span class="kw">use </span>std::sync::Once;
 
-<span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">metrics</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics</span>::{
-    <span class="ident">absolute_counter</span>, <span class="ident">decrement_gauge</span>, <span class="ident">describe_counter</span>, <span class="ident">describe_gauge</span>, <span class="ident">describe_histogram</span>, <span class="ident">gauge</span>, <span class="ident">histogram</span>,
-    <span class="ident">increment_counter</span>, <span class="ident">increment_gauge</span>,
+<span class="kw">pub extern crate </span>metrics;
+<span class="kw">pub use </span>metrics::{
+    absolute_counter, decrement_gauge, describe_counter, describe_gauge, describe_histogram, gauge, histogram,
+    increment_counter, increment_gauge,
 };
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_client_queries_total&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_client_queries_duration_histogram_ms&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_POOL_CONNECTIONS_OPENED_TOTAL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_pool_connections_opened_total&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_pool_connections_closed_total&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_POOL_CONNECTIONS_OPEN</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_pool_connections_open&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_POOL_CONNECTIONS_BUSY</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_pool_connections_busy&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_POOL_CONNECTIONS_IDLE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_pool_connections_idle&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_CLIENT_QUERIES_WAIT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_client_queries_wait&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_client_queries_wait_histogram_ms&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_datasource_queries_duration_histogram_ms&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_DATASOURCE_QUERIES_TOTAL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_datasource_queries_total&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_CLIENT_QUERIES_ACTIVE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_client_queries_active&quot;</span>;
+<span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_total&quot;</span>;
+<span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_HISTOGRAM_MS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_duration_histogram_ms&quot;</span>;
+<span class="kw">pub const </span>PRISMA_POOL_CONNECTIONS_OPENED_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_pool_connections_opened_total&quot;</span>;
+<span class="kw">pub const </span>PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_pool_connections_closed_total&quot;</span>;
+<span class="kw">pub const </span>PRISMA_POOL_CONNECTIONS_OPEN: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_pool_connections_open&quot;</span>;
+<span class="kw">pub const </span>PRISMA_POOL_CONNECTIONS_BUSY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_pool_connections_busy&quot;</span>;
+<span class="kw">pub const </span>PRISMA_POOL_CONNECTIONS_IDLE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_pool_connections_idle&quot;</span>;
+<span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_WAIT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_wait&quot;</span>;
+<span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_wait_histogram_ms&quot;</span>;
+<span class="kw">pub const </span>PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_datasource_queries_duration_histogram_ms&quot;</span>;
+<span class="kw">pub const </span>PRISMA_DATASOURCE_QUERIES_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_datasource_queries_total&quot;</span>;
+<span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_ACTIVE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_active&quot;</span>;
 
-<span class="comment">// At the moment the histogram is only used for timings. So the bounds are hard coded here</span>
-<span class="comment">// The buckets are for ms</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">HISTOGRAM_BOUNDS</span>: [<span class="ident">f64</span>; <span class="number">10</span>] <span class="op">=</span> [<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">5.0</span>, <span class="number">10.0</span>, <span class="number">50.0</span>, <span class="number">100.0</span>, <span class="number">500.0</span>, <span class="number">1000.0</span>, <span class="number">5000.0</span>, <span class="number">50000.0</span>];
-<span class="comment">// We need a list of acceptable metrics we want to expose, we don&#39;t want to accidentally expose metrics</span>
-<span class="comment">// that a different library have or unintended information</span>
-<span class="kw">const</span> <span class="ident">ACCEPT_LIST</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>,
-    <span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>,
-    <span class="ident">PRISMA_POOL_CONNECTIONS_OPENED_TOTAL</span>,
-    <span class="ident">PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL</span>,
-    <span class="ident">PRISMA_POOL_CONNECTIONS_OPEN</span>,
-    <span class="ident">PRISMA_POOL_CONNECTIONS_BUSY</span>,
-    <span class="ident">PRISMA_POOL_CONNECTIONS_IDLE</span>,
-    <span class="ident">PRISMA_CLIENT_QUERIES_WAIT</span>,
-    <span class="ident">PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS</span>,
-    <span class="ident">PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS</span>,
-    <span class="ident">PRISMA_DATASOURCE_QUERIES_TOTAL</span>,
-    <span class="ident">PRISMA_CLIENT_QUERIES_ACTIVE</span>,
+<span class="comment">// At the moment the histogram is only used for timings. So the bounds are hard coded here
+// The buckets are for ms
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>HISTOGRAM_BOUNDS: [f64; <span class="number">10</span>] = [<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">5.0</span>, <span class="number">10.0</span>, <span class="number">50.0</span>, <span class="number">100.0</span>, <span class="number">500.0</span>, <span class="number">1000.0</span>, <span class="number">5000.0</span>, <span class="number">50000.0</span>];
+<span class="comment">// We need a list of acceptable metrics we want to expose, we don&#39;t want to accidentally expose metrics
+// that a different library have or unintended information
+</span><span class="kw">const </span>ACCEPT_LIST: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[
+    PRISMA_CLIENT_QUERIES_HISTOGRAM_MS,
+    PRISMA_CLIENT_QUERIES_TOTAL,
+    PRISMA_POOL_CONNECTIONS_OPENED_TOTAL,
+    PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL,
+    PRISMA_POOL_CONNECTIONS_OPEN,
+    PRISMA_POOL_CONNECTIONS_BUSY,
+    PRISMA_POOL_CONNECTIONS_IDLE,
+    PRISMA_CLIENT_QUERIES_WAIT,
+    PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS,
+    PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
+    PRISMA_DATASOURCE_QUERIES_TOTAL,
+    PRISMA_CLIENT_QUERIES_ACTIVE,
 ];
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MetricFormat</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
-    <span class="ident">Json</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;prometheus&quot;</span>)]</span>
-    <span class="ident">Prometheus</span>,
+<span class="attribute">#[derive(PartialEq, Eq, Debug, Deserialize)]
+</span><span class="kw">pub enum </span>MetricFormat {
+    <span class="attribute">#[serde(alias = <span class="string">&quot;json&quot;</span>)]
+    </span>Json,
+    <span class="attribute">#[serde(alias = <span class="string">&quot;prometheus&quot;</span>)]
+    </span>Prometheus,
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup</span>() {
-    <span class="ident">set_recorder</span>();
-    <span class="ident">describe_metrics</span>();
+<span class="kw">pub fn </span>setup() {
+    set_recorder();
+    describe_metrics();
 }
 
-<span class="comment">// Describe all metric here so that every time for create</span>
-<span class="comment">// a new metric registry for a Query Instance the descriptions</span>
-<span class="comment">// will be in place</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">describe_metrics</span>() {
+<span class="comment">// Describe all metric here so that every time for create
+// a new metric registry for a Query Instance the descriptions
+// will be in place
+</span><span class="kw">pub fn </span>describe_metrics() {
     <span class="macro">describe_counter!</span>(
-        <span class="ident">PRISMA_POOL_CONNECTIONS_OPENED_TOTAL</span>,
-        <span class="string">&quot;Total number of Pool Connections opened&quot;</span>
-    );
+        PRISMA_POOL_CONNECTIONS_OPENED_TOTAL,
+        <span class="string">&quot;Total number of Pool Connections opened&quot;
+    </span>);
     <span class="macro">describe_counter!</span>(
-        <span class="ident">PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL</span>,
-        <span class="string">&quot;Total number of Pool Connections closed&quot;</span>
-    );
+        PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL,
+        <span class="string">&quot;Total number of Pool Connections closed&quot;
+    </span>);
     <span class="macro">describe_gauge!</span>(
-        <span class="ident">PRISMA_POOL_CONNECTIONS_BUSY</span>,
-        <span class="string">&quot;Number of currently busy Pool Connections (executing a datasource query)&quot;</span>
-    );
+        PRISMA_POOL_CONNECTIONS_BUSY,
+        <span class="string">&quot;Number of currently busy Pool Connections (executing a datasource query)&quot;
+    </span>);
 
     <span class="macro">describe_gauge!</span>(
-        <span class="ident">PRISMA_POOL_CONNECTIONS_IDLE</span>,
-        <span class="string">&quot;Number of currently unused Pool Connections (waiting for the next datasource query to run)&quot;</span>
-    );
+        PRISMA_POOL_CONNECTIONS_IDLE,
+        <span class="string">&quot;Number of currently unused Pool Connections (waiting for the next datasource query to run)&quot;
+    </span>);
 
     <span class="macro">describe_gauge!</span>(
-        <span class="ident">PRISMA_CLIENT_QUERIES_WAIT</span>,
-        <span class="string">&quot;Number of Prisma Client queries currently waiting for a connection&quot;</span>
-    );
+        PRISMA_CLIENT_QUERIES_WAIT,
+        <span class="string">&quot;Number of Prisma Client queries currently waiting for a connection&quot;
+    </span>);
     <span class="macro">describe_gauge!</span>(
-        <span class="ident">PRISMA_CLIENT_QUERIES_ACTIVE</span>,
-        <span class="string">&quot;Number of currently active Prisma Client queries&quot;</span>
-    );
+        PRISMA_CLIENT_QUERIES_ACTIVE,
+        <span class="string">&quot;Number of currently active Prisma Client queries&quot;
+    </span>);
 
-    <span class="macro">gauge!</span>(<span class="ident">PRISMA_POOL_CONNECTIONS_BUSY</span>, <span class="number">0.0</span>);
-    <span class="macro">gauge!</span>(<span class="ident">PRISMA_POOL_CONNECTIONS_IDLE</span>, <span class="number">0.0</span>);
-    <span class="macro">gauge!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_WAIT</span>, <span class="number">0.0</span>);
-    <span class="macro">gauge!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_ACTIVE</span>, <span class="number">0.0</span>);
-
-    <span class="macro">describe_gauge!</span>(
-        <span class="ident">PRISMA_CLIENT_QUERIES_ACTIVE</span>,
-        <span class="string">&quot;Number of currently active Prisma Client queries&quot;</span>
-    );
+    <span class="macro">gauge!</span>(PRISMA_POOL_CONNECTIONS_BUSY, <span class="number">0.0</span>);
+    <span class="macro">gauge!</span>(PRISMA_POOL_CONNECTIONS_IDLE, <span class="number">0.0</span>);
+    <span class="macro">gauge!</span>(PRISMA_CLIENT_QUERIES_WAIT, <span class="number">0.0</span>);
+    <span class="macro">gauge!</span>(PRISMA_CLIENT_QUERIES_ACTIVE, <span class="number">0.0</span>);
 
     <span class="macro">describe_gauge!</span>(
-        <span class="ident">PRISMA_POOL_CONNECTIONS_BUSY</span>,
-        <span class="string">&quot;Number of currently busy Pool Connections (executing a datasource query)&quot;</span>
-    );
+        PRISMA_CLIENT_QUERIES_ACTIVE,
+        <span class="string">&quot;Number of currently active Prisma Client queries&quot;
+    </span>);
 
     <span class="macro">describe_gauge!</span>(
-        <span class="ident">PRISMA_POOL_CONNECTIONS_IDLE</span>,
-        <span class="string">&quot;Number of currently unused Pool Connections (waiting for the next datasource query to run)&quot;</span>
-    );
+        PRISMA_POOL_CONNECTIONS_BUSY,
+        <span class="string">&quot;Number of currently busy Pool Connections (executing a datasource query)&quot;
+    </span>);
 
     <span class="macro">describe_gauge!</span>(
-        <span class="ident">PRISMA_CLIENT_QUERIES_WAIT</span>,
-        <span class="string">&quot;Number of Prisma Client queries currently waiting for a connection&quot;</span>
-    );
+        PRISMA_POOL_CONNECTIONS_IDLE,
+        <span class="string">&quot;Number of currently unused Pool Connections (waiting for the next datasource query to run)&quot;
+    </span>);
+
+    <span class="macro">describe_gauge!</span>(
+        PRISMA_CLIENT_QUERIES_WAIT,
+        <span class="string">&quot;Number of Prisma Client queries currently waiting for a connection&quot;
+    </span>);
 
     <span class="macro">describe_histogram!</span>(
-        <span class="ident">PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS</span>,
-        <span class="string">&quot;Histogram of the wait time of all Prisma Client Queries in ms&quot;</span>
-    );
+        PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS,
+        <span class="string">&quot;Histogram of the wait time of all Prisma Client Queries in ms&quot;
+    </span>);
     <span class="macro">describe_histogram!</span>(
-        <span class="ident">PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS</span>,
-        <span class="string">&quot;Histogram of the duration of all executed Datasource Queries in ms&quot;</span>
-    );
+        PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
+        <span class="string">&quot;Histogram of the duration of all executed Datasource Queries in ms&quot;
+    </span>);
 
     <span class="macro">describe_histogram!</span>(
-        <span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>,
-        <span class="string">&quot;Histogram of the duration of all executed Prisma Client queries in ms&quot;</span>
-    );
+        PRISMA_CLIENT_QUERIES_HISTOGRAM_MS,
+        <span class="string">&quot;Histogram of the duration of all executed Prisma Client queries in ms&quot;
+    </span>);
 
     <span class="macro">describe_counter!</span>(
-        <span class="ident">PRISMA_DATASOURCE_QUERIES_TOTAL</span>,
-        <span class="string">&quot;Total number of Datasource Queries executed&quot;</span>
-    );
+        PRISMA_DATASOURCE_QUERIES_TOTAL,
+        <span class="string">&quot;Total number of Datasource Queries executed&quot;
+    </span>);
 
     <span class="macro">describe_counter!</span>(
-        <span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>,
-        <span class="string">&quot;Total number of Prisma Client queries executed&quot;</span>
-    );
+        PRISMA_CLIENT_QUERIES_TOTAL,
+        <span class="string">&quot;Total number of Prisma Client queries executed&quot;
+    </span>);
 
-    <span class="macro">absolute_counter!</span>(<span class="ident">PRISMA_DATASOURCE_QUERIES_TOTAL</span>, <span class="number">0</span>);
-    <span class="macro">absolute_counter!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>, <span class="number">0</span>);
+    <span class="macro">absolute_counter!</span>(PRISMA_DATASOURCE_QUERIES_TOTAL, <span class="number">0</span>);
+    <span class="macro">absolute_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL, <span class="number">0</span>);
 }
 
-<span class="kw">static</span> <span class="ident">METRIC_RECORDER</span>: <span class="ident">Once</span> <span class="op">=</span> <span class="ident">Once::new</span>();
+<span class="kw">static </span>METRIC_RECORDER: Once = Once::new();
 
-<span class="kw">fn</span> <span class="ident">set_recorder</span>() {
-    <span class="ident">METRIC_RECORDER</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">MetricRecorder::default</span>();
-        <span class="ident">metrics::set_boxed_recorder</span>(<span class="ident">Box::new</span>(<span class="ident">recorder</span>)).<span class="ident">unwrap</span>();
+<span class="kw">fn </span>set_recorder() {
+    METRIC_RECORDER.call_once(|| {
+        <span class="kw">let </span>recorder = MetricRecorder::default();
+        metrics::set_boxed_recorder(Box::new(recorder)).unwrap();
     });
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">metrics</span>::{
-        <span class="ident">absolute_counter</span>, <span class="ident">decrement_gauge</span>, <span class="ident">describe_counter</span>, <span class="ident">describe_gauge</span>, <span class="ident">describe_histogram</span>, <span class="ident">gauge</span>, <span class="ident">histogram</span>,
-        <span class="ident">increment_counter</span>, <span class="ident">increment_gauge</span>, <span class="ident">register_counter</span>, <span class="ident">register_gauge</span>, <span class="ident">register_histogram</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>metrics::{
+        absolute_counter, decrement_gauge, describe_counter, describe_gauge, describe_histogram, gauge, histogram,
+        increment_counter, increment_gauge, register_counter, register_gauge, register_histogram,
     };
-    <span class="kw">use</span> <span class="ident">serde_json::json</span>;
-    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-    <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
-    <span class="kw">use</span> <span class="ident">tracing::instrument::WithSubscriber</span>;
-    <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">trace</span>, <span class="ident">Dispatch</span>};
-    <span class="kw">use</span> <span class="ident">tracing_subscriber::layer::SubscriberExt</span>;
+    <span class="kw">use </span>serde_json::json;
+    <span class="kw">use </span>std::collections::HashMap;
+    <span class="kw">use </span>std::time::Duration;
+    <span class="kw">use </span>tracing::instrument::WithSubscriber;
+    <span class="kw">use </span>tracing::{trace, Dispatch};
+    <span class="kw">use </span>tracing_subscriber::layer::SubscriberExt;
 
-    <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-    <span class="kw">use</span> <span class="ident">tokio::runtime::Runtime</span>;
+    <span class="kw">use </span>once_cell::sync::Lazy;
+    <span class="kw">use </span>tokio::runtime::Runtime;
 
-    <span class="kw">static</span> <span class="ident">RT</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">set_recorder</span>();
-        <span class="ident">Runtime::new</span>().<span class="ident">unwrap</span>()
+    <span class="kw">static </span>RT: Lazy&lt;Runtime&gt; = Lazy::new(|| {
+        set_recorder();
+        Runtime::new().unwrap()
     });
 
-    <span class="kw">const</span> <span class="ident">TESTING_ACCEPT_LIST</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="kw">const </span>TESTING_ACCEPT_LIST: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[
         <span class="string">&quot;test_counter&quot;</span>,
         <span class="string">&quot;another_counter&quot;</span>,
         <span class="string">&quot;test_gauge&quot;</span>,
@@ -810,73 +810,73 @@
         <span class="string">&quot;test.counter&quot;</span>,
     ];
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_counters</span>() {
-        <span class="ident">RT</span>.<span class="ident">block_on</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">MetricRegistry::new_with_accept_list</span>(<span class="ident">TESTING_ACCEPT_LIST</span>.<span class="ident">to_vec</span>());
-            <span class="kw">let</span> <span class="ident">dispatch</span> <span class="op">=</span> <span class="ident">Dispatch::new</span>(<span class="ident">tracing_subscriber::Registry::default</span>().<span class="ident">with</span>(<span class="ident">metrics</span>.<span class="ident">clone</span>()));
-            <span class="kw">async</span> {
-                <span class="kw">let</span> <span class="ident">counter1</span> <span class="op">=</span> <span class="macro">register_counter!</span>(<span class="string">&quot;test_counter&quot;</span>);
-                <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">1</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_counters() {
+        RT.block_on(<span class="kw">async </span>{
+            <span class="kw">let </span>metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
+            <span class="kw">let </span>dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            <span class="kw">async </span>{
+                <span class="kw">let </span>counter1 = <span class="macro">register_counter!</span>(<span class="string">&quot;test_counter&quot;</span>);
+                counter1.increment(<span class="number">1</span>);
                 <span class="macro">increment_counter!</span>(<span class="string">&quot;test_counter&quot;</span>);
                 <span class="macro">increment_counter!</span>(<span class="string">&quot;test_counter&quot;</span>);
 
                 <span class="macro">increment_counter!</span>(<span class="string">&quot;another_counter&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">counter_value</span>(<span class="string">&quot;test_counter&quot;</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">val</span>, <span class="number">3</span>);
+                <span class="kw">let </span>val = metrics.counter_value(<span class="string">&quot;test_counter&quot;</span>).unwrap();
+                <span class="macro">assert_eq!</span>(val, <span class="number">3</span>);
 
-                <span class="kw">let</span> <span class="ident">val2</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">counter_value</span>(<span class="string">&quot;another_counter&quot;</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">val2</span>, <span class="number">1</span>);
+                <span class="kw">let </span>val2 = metrics.counter_value(<span class="string">&quot;another_counter&quot;</span>).unwrap();
+                <span class="macro">assert_eq!</span>(val2, <span class="number">1</span>);
 
                 <span class="macro">absolute_counter!</span>(<span class="string">&quot;test_counter&quot;</span>, <span class="number">5</span>);
-                <span class="kw">let</span> <span class="ident">val3</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">counter_value</span>(<span class="string">&quot;test_counter&quot;</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">val3</span>, <span class="number">5</span>);
+                <span class="kw">let </span>val3 = metrics.counter_value(<span class="string">&quot;test_counter&quot;</span>).unwrap();
+                <span class="macro">assert_eq!</span>(val3, <span class="number">5</span>);
             }
-            .<span class="ident">with_subscriber</span>(<span class="ident">dispatch</span>)
+            .with_subscriber(dispatch)
             .<span class="kw">await</span>;
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_gauges</span>() {
-        <span class="ident">RT</span>.<span class="ident">block_on</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">MetricRegistry::new_with_accept_list</span>(<span class="ident">TESTING_ACCEPT_LIST</span>.<span class="ident">to_vec</span>());
-            <span class="kw">let</span> <span class="ident">dispatch</span> <span class="op">=</span> <span class="ident">Dispatch::new</span>(<span class="ident">tracing_subscriber::Registry::default</span>().<span class="ident">with</span>(<span class="ident">metrics</span>.<span class="ident">clone</span>()));
-            <span class="kw">async</span> {
-                <span class="kw">let</span> <span class="ident">gauge1</span> <span class="op">=</span> <span class="macro">register_gauge!</span>(<span class="string">&quot;test_gauge&quot;</span>);
-                <span class="ident">gauge1</span>.<span class="ident">increment</span>(<span class="number">1.0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_gauges() {
+        RT.block_on(<span class="kw">async </span>{
+            <span class="kw">let </span>metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
+            <span class="kw">let </span>dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            <span class="kw">async </span>{
+                <span class="kw">let </span>gauge1 = <span class="macro">register_gauge!</span>(<span class="string">&quot;test_gauge&quot;</span>);
+                gauge1.increment(<span class="number">1.0</span>);
                 <span class="macro">increment_gauge!</span>(<span class="string">&quot;test_gauge&quot;</span>, <span class="number">1.0</span>);
                 <span class="macro">increment_gauge!</span>(<span class="string">&quot;test_gauge&quot;</span>, <span class="number">1.0</span>);
                 <span class="macro">increment_gauge!</span>(<span class="string">&quot;another_gauge&quot;</span>, <span class="number">1.0</span>);
 
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">gauge_value</span>(<span class="string">&quot;test_gauge&quot;</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">val</span>, <span class="number">3.0</span>);
+                <span class="kw">let </span>val = metrics.gauge_value(<span class="string">&quot;test_gauge&quot;</span>).unwrap();
+                <span class="macro">assert_eq!</span>(val, <span class="number">3.0</span>);
 
-                <span class="kw">let</span> <span class="ident">val2</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">gauge_value</span>(<span class="string">&quot;another_gauge&quot;</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">val2</span>, <span class="number">1.0</span>);
+                <span class="kw">let </span>val2 = metrics.gauge_value(<span class="string">&quot;another_gauge&quot;</span>).unwrap();
+                <span class="macro">assert_eq!</span>(val2, <span class="number">1.0</span>);
 
-                <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">metrics</span>.<span class="ident">counter_value</span>(<span class="string">&quot;test_gauge&quot;</span>));
+                <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, metrics.counter_value(<span class="string">&quot;test_gauge&quot;</span>));
 
                 <span class="macro">gauge!</span>(<span class="string">&quot;test_gauge&quot;</span>, <span class="number">5.0</span>);
-                <span class="kw">let</span> <span class="ident">val3</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">gauge_value</span>(<span class="string">&quot;test_gauge&quot;</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">val3</span>, <span class="number">5.0</span>);
+                <span class="kw">let </span>val3 = metrics.gauge_value(<span class="string">&quot;test_gauge&quot;</span>).unwrap();
+                <span class="macro">assert_eq!</span>(val3, <span class="number">5.0</span>);
 
                 <span class="macro">decrement_gauge!</span>(<span class="string">&quot;test_gauge&quot;</span>, <span class="number">2.0</span>);
-                <span class="kw">let</span> <span class="ident">val4</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">gauge_value</span>(<span class="string">&quot;test_gauge&quot;</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">val4</span>, <span class="number">3.0</span>);
+                <span class="kw">let </span>val4 = metrics.gauge_value(<span class="string">&quot;test_gauge&quot;</span>).unwrap();
+                <span class="macro">assert_eq!</span>(val4, <span class="number">3.0</span>);
             }
-            .<span class="ident">with_subscriber</span>(<span class="ident">dispatch</span>)
+            .with_subscriber(dispatch)
             .<span class="kw">await</span>;
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_no_panic_and_ignore_other_traces</span>() {
-        <span class="ident">RT</span>.<span class="ident">block_on</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">MetricRegistry::new_with_accept_list</span>(<span class="ident">TESTING_ACCEPT_LIST</span>.<span class="ident">to_vec</span>());
-            <span class="kw">let</span> <span class="ident">dispatch</span> <span class="op">=</span> <span class="ident">Dispatch::new</span>(<span class="ident">tracing_subscriber::Registry::default</span>().<span class="ident">with</span>(<span class="ident">metrics</span>.<span class="ident">clone</span>()));
-            <span class="kw">async</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_no_panic_and_ignore_other_traces() {
+        RT.block_on(<span class="kw">async </span>{
+            <span class="kw">let </span>metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
+            <span class="kw">let </span>dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            <span class="kw">async </span>{
                 <span class="macro">trace!</span>(<span class="string">&quot;a fake trace&quot;</span>);
 
                 <span class="macro">increment_gauge!</span>(<span class="string">&quot;test_gauge&quot;</span>, <span class="number">1.0</span>);
@@ -884,49 +884,49 @@
 
                 <span class="macro">trace!</span>(<span class="string">&quot;another fake trace&quot;</span>);
 
-                <span class="macro">assert_eq!</span>(<span class="number">1.0</span>, <span class="ident">metrics</span>.<span class="ident">gauge_value</span>(<span class="string">&quot;test_gauge&quot;</span>).<span class="ident">unwrap</span>());
-                <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">metrics</span>.<span class="ident">counter_value</span>(<span class="string">&quot;test_counter&quot;</span>).<span class="ident">unwrap</span>());
+                <span class="macro">assert_eq!</span>(<span class="number">1.0</span>, metrics.gauge_value(<span class="string">&quot;test_gauge&quot;</span>).unwrap());
+                <span class="macro">assert_eq!</span>(<span class="number">1</span>, metrics.counter_value(<span class="string">&quot;test_counter&quot;</span>).unwrap());
             }
-            .<span class="ident">with_subscriber</span>(<span class="ident">dispatch</span>)
+            .with_subscriber(dispatch)
             .<span class="kw">await</span>;
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_ignore_non_accepted_metrics</span>() {
-        <span class="ident">RT</span>.<span class="ident">block_on</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">MetricRegistry::new_with_accept_list</span>(<span class="ident">TESTING_ACCEPT_LIST</span>.<span class="ident">to_vec</span>());
-            <span class="kw">let</span> <span class="ident">dispatch</span> <span class="op">=</span> <span class="ident">Dispatch::new</span>(<span class="ident">tracing_subscriber::Registry::default</span>().<span class="ident">with</span>(<span class="ident">metrics</span>.<span class="ident">clone</span>()));
-            <span class="kw">async</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_ignore_non_accepted_metrics() {
+        RT.block_on(<span class="kw">async </span>{
+            <span class="kw">let </span>metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
+            <span class="kw">let </span>dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            <span class="kw">async </span>{
                 <span class="macro">increment_gauge!</span>(<span class="string">&quot;not_accepted&quot;</span>, <span class="number">1.0</span>);
                 <span class="macro">increment_gauge!</span>(<span class="string">&quot;test_gauge&quot;</span>, <span class="number">1.0</span>);
 
-                <span class="macro">assert_eq!</span>(<span class="number">1.0</span>, <span class="ident">metrics</span>.<span class="ident">gauge_value</span>(<span class="string">&quot;test_gauge&quot;</span>).<span class="ident">unwrap</span>());
-                <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">metrics</span>.<span class="ident">gauge_value</span>(<span class="string">&quot;not_accepted&quot;</span>));
+                <span class="macro">assert_eq!</span>(<span class="number">1.0</span>, metrics.gauge_value(<span class="string">&quot;test_gauge&quot;</span>).unwrap());
+                <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, metrics.gauge_value(<span class="string">&quot;not_accepted&quot;</span>));
             }
-            .<span class="ident">with_subscriber</span>(<span class="ident">dispatch</span>)
+            .with_subscriber(dispatch)
             .<span class="kw">await</span>;
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_histograms</span>() {
-        <span class="ident">RT</span>.<span class="ident">block_on</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">MetricRegistry::new_with_accept_list</span>(<span class="ident">TESTING_ACCEPT_LIST</span>.<span class="ident">to_vec</span>());
-            <span class="kw">let</span> <span class="ident">dispatch</span> <span class="op">=</span> <span class="ident">Dispatch::new</span>(<span class="ident">tracing_subscriber::Registry::default</span>().<span class="ident">with</span>(<span class="ident">metrics</span>.<span class="ident">clone</span>()));
-            <span class="kw">async</span> {
-                <span class="kw">let</span> <span class="ident">hist</span> <span class="op">=</span> <span class="macro">register_histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>);
-                <span class="ident">hist</span>.<span class="ident">record</span>(<span class="ident">Duration::from_millis</span>(<span class="number">9</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_histograms() {
+        RT.block_on(<span class="kw">async </span>{
+            <span class="kw">let </span>metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
+            <span class="kw">let </span>dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            <span class="kw">async </span>{
+                <span class="kw">let </span>hist = <span class="macro">register_histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>);
+                hist.record(Duration::from_millis(<span class="number">9</span>));
 
-                <span class="macro">histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, <span class="ident">Duration::from_millis</span>(<span class="number">100</span>));
-                <span class="macro">histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, <span class="ident">Duration::from_millis</span>(<span class="number">1</span>));
+                <span class="macro">histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, Duration::from_millis(<span class="number">100</span>));
+                <span class="macro">histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, Duration::from_millis(<span class="number">1</span>));
 
-                <span class="macro">histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, <span class="ident">Duration::from_millis</span>(<span class="number">1999</span>));
-                <span class="macro">histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, <span class="ident">Duration::from_millis</span>(<span class="number">3999</span>));
-                <span class="macro">histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, <span class="ident">Duration::from_millis</span>(<span class="number">610</span>));
+                <span class="macro">histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, Duration::from_millis(<span class="number">1999</span>));
+                <span class="macro">histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, Duration::from_millis(<span class="number">3999</span>));
+                <span class="macro">histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, Duration::from_millis(<span class="number">610</span>));
 
-                <span class="kw">let</span> <span class="ident">hist</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">histogram_values</span>(<span class="string">&quot;test_histogram&quot;</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">expected</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="ident">u64</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::from</span>([
+                <span class="kw">let </span>hist = metrics.histogram_values(<span class="string">&quot;test_histogram&quot;</span>).unwrap();
+                <span class="kw">let </span>expected: Vec&lt;(f64, u64)&gt; = Vec::from([
                     (<span class="number">0.0</span>, <span class="number">0</span>),
                     (<span class="number">1.0</span>, <span class="number">1</span>),
                     (<span class="number">5.0</span>, <span class="number">1</span>),
@@ -939,149 +939,149 @@
                     (<span class="number">50000.0</span>, <span class="number">6</span>),
                 ]);
 
-                <span class="macro">assert_eq!</span>(<span class="ident">hist</span>.<span class="ident">buckets</span>(), <span class="ident">expected</span>);
+                <span class="macro">assert_eq!</span>(hist.buckets(), expected);
             }
-            .<span class="ident">with_subscriber</span>(<span class="ident">dispatch</span>)
+            .with_subscriber(dispatch)
             .<span class="kw">await</span>;
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_set_and_read_descriptions</span>() {
-        <span class="ident">RT</span>.<span class="ident">block_on</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">MetricRegistry::new_with_accept_list</span>(<span class="ident">TESTING_ACCEPT_LIST</span>.<span class="ident">to_vec</span>());
-            <span class="kw">let</span> <span class="ident">dispatch</span> <span class="op">=</span> <span class="ident">Dispatch::new</span>(<span class="ident">tracing_subscriber::Registry::default</span>().<span class="ident">with</span>(<span class="ident">metrics</span>.<span class="ident">clone</span>()));
-            <span class="kw">async</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_set_and_read_descriptions() {
+        RT.block_on(<span class="kw">async </span>{
+            <span class="kw">let </span>metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
+            <span class="kw">let </span>dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            <span class="kw">async </span>{
                 <span class="macro">describe_counter!</span>(<span class="string">&quot;test_counter&quot;</span>, <span class="string">&quot;This is a counter&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">descriptions</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">get_descriptions</span>();
-                <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">descriptions</span>.<span class="ident">get</span>(<span class="string">&quot;test_counter&quot;</span>).<span class="ident">unwrap</span>();
+                <span class="kw">let </span>descriptions = metrics.get_descriptions();
+                <span class="kw">let </span>description = descriptions.get(<span class="string">&quot;test_counter&quot;</span>).unwrap();
 
-                <span class="macro">assert_eq!</span>(<span class="string">&quot;This is a counter&quot;</span>, <span class="ident">description</span>);
+                <span class="macro">assert_eq!</span>(<span class="string">&quot;This is a counter&quot;</span>, description);
 
                 <span class="macro">describe_gauge!</span>(<span class="string">&quot;test_gauge&quot;</span>, <span class="string">&quot;This is a gauge&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">descriptions</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">get_descriptions</span>();
-                <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">descriptions</span>.<span class="ident">get</span>(<span class="string">&quot;test_gauge&quot;</span>).<span class="ident">unwrap</span>();
+                <span class="kw">let </span>descriptions = metrics.get_descriptions();
+                <span class="kw">let </span>description = descriptions.get(<span class="string">&quot;test_gauge&quot;</span>).unwrap();
 
-                <span class="macro">assert_eq!</span>(<span class="string">&quot;This is a gauge&quot;</span>, <span class="ident">description</span>);
+                <span class="macro">assert_eq!</span>(<span class="string">&quot;This is a gauge&quot;</span>, description);
 
                 <span class="macro">describe_histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, <span class="string">&quot;This is a hist&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">descriptions</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">get_descriptions</span>();
-                <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">descriptions</span>.<span class="ident">get</span>(<span class="string">&quot;test_histogram&quot;</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="string">&quot;This is a hist&quot;</span>, <span class="ident">description</span>);
+                <span class="kw">let </span>descriptions = metrics.get_descriptions();
+                <span class="kw">let </span>description = descriptions.get(<span class="string">&quot;test_histogram&quot;</span>).unwrap();
+                <span class="macro">assert_eq!</span>(<span class="string">&quot;This is a hist&quot;</span>, description);
             }
-            .<span class="ident">with_subscriber</span>(<span class="ident">dispatch</span>)
+            .with_subscriber(dispatch)
             .<span class="kw">await</span>;
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_to_json</span>() {
-        <span class="ident">RT</span>.<span class="ident">block_on</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">MetricRegistry::new_with_accept_list</span>(<span class="ident">TESTING_ACCEPT_LIST</span>.<span class="ident">to_vec</span>());
-            <span class="kw">let</span> <span class="ident">dispatch</span> <span class="op">=</span> <span class="ident">Dispatch::new</span>(<span class="ident">tracing_subscriber::Registry::default</span>().<span class="ident">with</span>(<span class="ident">metrics</span>.<span class="ident">clone</span>()));
-            <span class="kw">async</span> {
-                <span class="kw">let</span> <span class="ident">empty</span> <span class="op">=</span> <span class="macro">json!</span>({
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_to_json() {
+        RT.block_on(<span class="kw">async </span>{
+            <span class="kw">let </span>metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
+            <span class="kw">let </span>dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            <span class="kw">async </span>{
+                <span class="kw">let </span>empty = <span class="macro">json!</span>({
                     <span class="string">&quot;counters&quot;</span>: [],
                     <span class="string">&quot;gauges&quot;</span>: [],
                     <span class="string">&quot;histograms&quot;</span>: []
                 });
 
-                <span class="macro">assert_eq!</span>(<span class="ident">metrics</span>.<span class="ident">to_json</span>(<span class="ident">Default::default</span>()), <span class="ident">empty</span>);
+                <span class="macro">assert_eq!</span>(metrics.to_json(Default::default()), empty);
 
-                <span class="macro">absolute_counter!</span>(<span class="string">&quot;counter_1&quot;</span>, <span class="number">4</span>, <span class="string">&quot;label&quot;</span> =&gt; <span class="string">&quot;one&quot;</span>);
+                <span class="macro">absolute_counter!</span>(<span class="string">&quot;counter_1&quot;</span>, <span class="number">4</span>, <span class="string">&quot;label&quot; </span>=&gt; <span class="string">&quot;one&quot;</span>);
                 <span class="macro">describe_counter!</span>(<span class="string">&quot;counter_2&quot;</span>, <span class="string">&quot;this is a description for counter 2&quot;</span>);
-                <span class="macro">absolute_counter!</span>(<span class="string">&quot;counter_2&quot;</span>, <span class="number">2</span>, <span class="string">&quot;label&quot;</span> =&gt; <span class="string">&quot;one&quot;</span>, <span class="string">&quot;another_label&quot;</span> =&gt; <span class="string">&quot;two&quot;</span>);
+                <span class="macro">absolute_counter!</span>(<span class="string">&quot;counter_2&quot;</span>, <span class="number">2</span>, <span class="string">&quot;label&quot; </span>=&gt; <span class="string">&quot;one&quot;</span>, <span class="string">&quot;another_label&quot; </span>=&gt; <span class="string">&quot;two&quot;</span>);
 
                 <span class="macro">describe_gauge!</span>(<span class="string">&quot;gauge_1&quot;</span>, <span class="string">&quot;a description for gauge 1&quot;</span>);
                 <span class="macro">gauge!</span>(<span class="string">&quot;gauge_1&quot;</span>, <span class="number">7.0</span>);
-                <span class="macro">gauge!</span>(<span class="string">&quot;gauge_2&quot;</span>, <span class="number">3.0</span>, <span class="string">&quot;label&quot;</span> =&gt; <span class="string">&quot;three&quot;</span>);
+                <span class="macro">gauge!</span>(<span class="string">&quot;gauge_2&quot;</span>, <span class="number">3.0</span>, <span class="string">&quot;label&quot; </span>=&gt; <span class="string">&quot;three&quot;</span>);
 
                 <span class="macro">describe_histogram!</span>(<span class="string">&quot;histogram_1&quot;</span>, <span class="string">&quot;a description for histogram&quot;</span>);
-                <span class="kw">let</span> <span class="ident">hist</span> <span class="op">=</span> <span class="macro">register_histogram!</span>(<span class="string">&quot;histogram_1&quot;</span>, <span class="string">&quot;label&quot;</span> =&gt; <span class="string">&quot;one&quot;</span>, <span class="string">&quot;hist_two&quot;</span> =&gt; <span class="string">&quot;two&quot;</span>);
-                <span class="ident">hist</span>.<span class="ident">record</span>(<span class="ident">Duration::from_millis</span>(<span class="number">9</span>));
+                <span class="kw">let </span>hist = <span class="macro">register_histogram!</span>(<span class="string">&quot;histogram_1&quot;</span>, <span class="string">&quot;label&quot; </span>=&gt; <span class="string">&quot;one&quot;</span>, <span class="string">&quot;hist_two&quot; </span>=&gt; <span class="string">&quot;two&quot;</span>);
+                hist.record(Duration::from_millis(<span class="number">9</span>));
 
-                <span class="macro">histogram!</span>(<span class="string">&quot;histogram_2&quot;</span>, <span class="ident">Duration::from_millis</span>(<span class="number">9</span>));
-                <span class="macro">histogram!</span>(<span class="string">&quot;histogram_2&quot;</span>, <span class="ident">Duration::from_millis</span>(<span class="number">1000</span>));
-                <span class="macro">histogram!</span>(<span class="string">&quot;histogram_2&quot;</span>, <span class="ident">Duration::from_millis</span>(<span class="number">40</span>));
+                <span class="macro">histogram!</span>(<span class="string">&quot;histogram_2&quot;</span>, Duration::from_millis(<span class="number">9</span>));
+                <span class="macro">histogram!</span>(<span class="string">&quot;histogram_2&quot;</span>, Duration::from_millis(<span class="number">1000</span>));
+                <span class="macro">histogram!</span>(<span class="string">&quot;histogram_2&quot;</span>, Duration::from_millis(<span class="number">40</span>));
 
-                <span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">to_json</span>(<span class="ident">Default::default</span>());
-                <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">json!</span>({
+                <span class="kw">let </span>json = metrics.to_json(Default::default());
+                <span class="kw">let </span>expected = <span class="macro">json!</span>({
                     <span class="string">&quot;counters&quot;</span>:[{
                         <span class="string">&quot;key&quot;</span>:<span class="string">&quot;counter_1&quot;</span>,
                         <span class="string">&quot;labels&quot;</span>:{<span class="string">&quot;label&quot;</span>:<span class="string">&quot;one&quot;</span>},
                         <span class="string">&quot;value&quot;</span>:<span class="number">4</span>,
-                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;&quot;</span>
-                    },{
+                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;&quot;
+                    </span>},{
                         <span class="string">&quot;key&quot;</span>:<span class="string">&quot;counter_2&quot;</span>,
                         <span class="string">&quot;labels&quot;</span>:{<span class="string">&quot;label&quot;</span>:<span class="string">&quot;one&quot;</span>,<span class="string">&quot;another_label&quot;</span>:<span class="string">&quot;two&quot;</span>},
                         <span class="string">&quot;value&quot;</span>:<span class="number">2</span>,
-                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;this is a description for counter 2&quot;</span>
-                    }],
+                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;this is a description for counter 2&quot;
+                    </span>}],
                     <span class="string">&quot;gauges&quot;</span>:[{
                         <span class="string">&quot;key&quot;</span>:<span class="string">&quot;gauge_1&quot;</span>,
                         <span class="string">&quot;labels&quot;</span>:{},
                         <span class="string">&quot;value&quot;</span>:<span class="number">7.0</span>,
-                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;a description for gauge 1&quot;</span>
-                    },{
+                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;a description for gauge 1&quot;
+                    </span>},{
                         <span class="string">&quot;key&quot;</span>:<span class="string">&quot;gauge_2&quot;</span>,
                         <span class="string">&quot;labels&quot;</span>:{<span class="string">&quot;label&quot;</span>:<span class="string">&quot;three&quot;</span>},
                         <span class="string">&quot;value&quot;</span>:<span class="number">3.0</span>,
-                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;&quot;</span>
-                    }],
+                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;&quot;
+                    </span>}],
                     <span class="string">&quot;histograms&quot;</span>:[{
                         <span class="string">&quot;key&quot;</span>:<span class="string">&quot;histogram_1&quot;</span>,
                         <span class="string">&quot;labels&quot;</span>:{<span class="string">&quot;label&quot;</span>:<span class="string">&quot;one&quot;</span>,<span class="string">&quot;hist_two&quot;</span>:<span class="string">&quot;two&quot;</span>},
                         <span class="string">&quot;value&quot;</span>:{
                             <span class="string">&quot;buckets&quot;</span>: [[<span class="number">0.0</span>,<span class="number">0</span>],[<span class="number">1.0</span>,<span class="number">0</span>],[<span class="number">5.0</span>,<span class="number">0</span>],[<span class="number">10.0</span>,<span class="number">1</span>],[<span class="number">50.0</span>,<span class="number">0</span>],[<span class="number">100.0</span>,<span class="number">0</span>],[<span class="number">500.0</span>,<span class="number">0</span>],[<span class="number">1000.0</span>,<span class="number">0</span>],[<span class="number">5000.0</span>,<span class="number">0</span>],[<span class="number">50000.0</span>,<span class="number">0</span>]],
                             <span class="string">&quot;sum&quot;</span>:<span class="number">9.0</span>,
-                            <span class="string">&quot;count&quot;</span>:<span class="number">1</span>
-                        },
+                            <span class="string">&quot;count&quot;</span>:<span class="number">1
+                        </span>},
                         <span class="string">&quot;description&quot;</span>:<span class="string">&quot;a description for histogram&quot;</span>},{
                             <span class="string">&quot;key&quot;</span>:<span class="string">&quot;histogram_2&quot;</span>,
                             <span class="string">&quot;labels&quot;</span>:{},
                             <span class="string">&quot;value&quot;</span>:{
                                 <span class="string">&quot;buckets&quot;</span>:[[<span class="number">0.0</span>,<span class="number">0</span>],[<span class="number">1.0</span>,<span class="number">0</span>],[<span class="number">5.0</span>,<span class="number">0</span>],[<span class="number">10.0</span>,<span class="number">1</span>],[<span class="number">50.0</span>,<span class="number">1</span>],[<span class="number">100.0</span>,<span class="number">0</span>],[<span class="number">500.0</span>,<span class="number">0</span>],[<span class="number">1000.0</span>,<span class="number">1</span>],[<span class="number">5000.0</span>,<span class="number">0</span>],[<span class="number">50000.0</span>,<span class="number">0</span>]],
                                 <span class="string">&quot;sum&quot;</span>:<span class="number">1049.0</span>,
-                                <span class="string">&quot;count&quot;</span>:<span class="number">3</span>
-                            },
-                            <span class="string">&quot;description&quot;</span>:<span class="string">&quot;&quot;</span>
-                        }]
+                                <span class="string">&quot;count&quot;</span>:<span class="number">3
+                            </span>},
+                            <span class="string">&quot;description&quot;</span>:<span class="string">&quot;&quot;
+                        </span>}]
                     });
 
-                <span class="macro">assert_eq!</span>(<span class="ident">json</span>, <span class="ident">expected</span>);
+                <span class="macro">assert_eq!</span>(json, expected);
             }
-            .<span class="ident">with_subscriber</span>(<span class="ident">dispatch</span>)
+            .with_subscriber(dispatch)
             .<span class="kw">await</span>;
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_global_and_metric_labels</span>() {
-        <span class="ident">RT</span>.<span class="ident">block_on</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">MetricRegistry::new_with_accept_list</span>(<span class="ident">TESTING_ACCEPT_LIST</span>.<span class="ident">to_vec</span>());
-            <span class="kw">let</span> <span class="ident">dispatch</span> <span class="op">=</span> <span class="ident">Dispatch::new</span>(<span class="ident">tracing_subscriber::Registry::default</span>().<span class="ident">with</span>(<span class="ident">metrics</span>.<span class="ident">clone</span>()));
-            <span class="kw">async</span> {
-                <span class="kw">let</span> <span class="ident">hist</span> <span class="op">=</span> <span class="macro">register_histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, <span class="string">&quot;label&quot;</span> =&gt; <span class="string">&quot;one&quot;</span>, <span class="string">&quot;two&quot;</span> =&gt; <span class="string">&quot;another&quot;</span>);
-                <span class="ident">hist</span>.<span class="ident">record</span>(<span class="ident">Duration::from_millis</span>(<span class="number">9</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_global_and_metric_labels() {
+        RT.block_on(<span class="kw">async </span>{
+            <span class="kw">let </span>metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
+            <span class="kw">let </span>dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            <span class="kw">async </span>{
+                <span class="kw">let </span>hist = <span class="macro">register_histogram!</span>(<span class="string">&quot;test_histogram&quot;</span>, <span class="string">&quot;label&quot; </span>=&gt; <span class="string">&quot;one&quot;</span>, <span class="string">&quot;two&quot; </span>=&gt; <span class="string">&quot;another&quot;</span>);
+                hist.record(Duration::from_millis(<span class="number">9</span>));
 
                 <span class="macro">absolute_counter!</span>(<span class="string">&quot;counter_1&quot;</span>, <span class="number">1</span>);
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">global_labels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-                <span class="ident">global_labels</span>.<span class="ident">insert</span>(<span class="string">&quot;global_one&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;one&quot;</span>.<span class="ident">to_string</span>());
-                <span class="ident">global_labels</span>.<span class="ident">insert</span>(<span class="string">&quot;global_two&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;two&quot;</span>.<span class="ident">to_string</span>());
+                <span class="kw">let </span><span class="kw-2">mut </span>global_labels: HashMap&lt;String, String&gt; = HashMap::new();
+                global_labels.insert(<span class="string">&quot;global_one&quot;</span>.to_string(), <span class="string">&quot;one&quot;</span>.to_string());
+                global_labels.insert(<span class="string">&quot;global_two&quot;</span>.to_string(), <span class="string">&quot;two&quot;</span>.to_string());
 
-                <span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">to_json</span>(<span class="ident">global_labels</span>);
+                <span class="kw">let </span>json = metrics.to_json(global_labels);
 
-                <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">json!</span>({
+                <span class="kw">let </span>expected = <span class="macro">json!</span>({
                     <span class="string">&quot;counters&quot;</span>:[{
                         <span class="string">&quot;key&quot;</span>:<span class="string">&quot;counter_1&quot;</span>,
                         <span class="string">&quot;labels&quot;</span>:{<span class="string">&quot;global_one&quot;</span>:<span class="string">&quot;one&quot;</span>,<span class="string">&quot;global_two&quot;</span>:<span class="string">&quot;two&quot;</span>},
                         <span class="string">&quot;value&quot;</span>:<span class="number">1</span>,
-                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;&quot;</span>
-                    }],
+                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;&quot;
+                    </span>}],
                     <span class="string">&quot;gauges&quot;</span>:[],
                     <span class="string">&quot;histograms&quot;</span>:[{
                         <span class="string">&quot;key&quot;</span>:<span class="string">&quot;test_histogram&quot;</span>,
@@ -1089,44 +1089,44 @@
                         <span class="string">&quot;value&quot;</span>:{
                             <span class="string">&quot;buckets&quot;</span>: [[<span class="number">0.0</span>,<span class="number">0</span>],[<span class="number">1.0</span>,<span class="number">0</span>],[<span class="number">5.0</span>,<span class="number">0</span>],[<span class="number">10.0</span>,<span class="number">1</span>],[<span class="number">50.0</span>,<span class="number">0</span>],[<span class="number">100.0</span>,<span class="number">0</span>],[<span class="number">500.0</span>,<span class="number">0</span>],[<span class="number">1000.0</span>,<span class="number">0</span>],[<span class="number">5000.0</span>,<span class="number">0</span>],[<span class="number">50000.0</span>,<span class="number">0</span>]],
                             <span class="string">&quot;sum&quot;</span>: <span class="number">9.0</span>,
-                            <span class="string">&quot;count&quot;</span>: <span class="number">1</span>
-                        },
-                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;&quot;</span>
-                    }]
+                            <span class="string">&quot;count&quot;</span>: <span class="number">1
+                        </span>},
+                        <span class="string">&quot;description&quot;</span>:<span class="string">&quot;&quot;
+                    </span>}]
                 });
-                <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">json</span>);
+                <span class="macro">assert_eq!</span>(expected, json);
             }
-            .<span class="ident">with_subscriber</span>(<span class="ident">dispatch</span>)
+            .with_subscriber(dispatch)
             .<span class="kw">await</span>;
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_prometheus_format</span>() {
-        <span class="ident">RT</span>.<span class="ident">block_on</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">MetricRegistry::new_with_accept_list</span>(<span class="ident">TESTING_ACCEPT_LIST</span>.<span class="ident">to_vec</span>());
-            <span class="kw">let</span> <span class="ident">dispatch</span> <span class="op">=</span> <span class="ident">Dispatch::new</span>(<span class="ident">tracing_subscriber::Registry::default</span>().<span class="ident">with</span>(<span class="ident">metrics</span>.<span class="ident">clone</span>()));
-            <span class="kw">async</span> {
-                <span class="macro">absolute_counter!</span>(<span class="string">&quot;counter_1&quot;</span>, <span class="number">4</span>, <span class="string">&quot;label&quot;</span> =&gt; <span class="string">&quot;one&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_prometheus_format() {
+        RT.block_on(<span class="kw">async </span>{
+            <span class="kw">let </span>metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
+            <span class="kw">let </span>dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            <span class="kw">async </span>{
+                <span class="macro">absolute_counter!</span>(<span class="string">&quot;counter_1&quot;</span>, <span class="number">4</span>, <span class="string">&quot;label&quot; </span>=&gt; <span class="string">&quot;one&quot;</span>);
                 <span class="macro">describe_counter!</span>(<span class="string">&quot;counter_2&quot;</span>, <span class="string">&quot;this is a description for counter 2&quot;</span>);
-                <span class="macro">absolute_counter!</span>(<span class="string">&quot;counter_2&quot;</span>, <span class="number">2</span>, <span class="string">&quot;label&quot;</span> =&gt; <span class="string">&quot;one&quot;</span>, <span class="string">&quot;another_label&quot;</span> =&gt; <span class="string">&quot;two&quot;</span>);
+                <span class="macro">absolute_counter!</span>(<span class="string">&quot;counter_2&quot;</span>, <span class="number">2</span>, <span class="string">&quot;label&quot; </span>=&gt; <span class="string">&quot;one&quot;</span>, <span class="string">&quot;another_label&quot; </span>=&gt; <span class="string">&quot;two&quot;</span>);
 
                 <span class="macro">describe_gauge!</span>(<span class="string">&quot;gauge_1&quot;</span>, <span class="string">&quot;a description for gauge 1&quot;</span>);
                 <span class="macro">gauge!</span>(<span class="string">&quot;gauge_1&quot;</span>, <span class="number">7.0</span>);
-                <span class="macro">gauge!</span>(<span class="string">&quot;gauge_2&quot;</span>, <span class="number">3.0</span>, <span class="string">&quot;label&quot;</span> =&gt; <span class="string">&quot;three&quot;</span>);
+                <span class="macro">gauge!</span>(<span class="string">&quot;gauge_2&quot;</span>, <span class="number">3.0</span>, <span class="string">&quot;label&quot; </span>=&gt; <span class="string">&quot;three&quot;</span>);
 
                 <span class="macro">describe_histogram!</span>(<span class="string">&quot;histogram_1&quot;</span>, <span class="string">&quot;a description for histogram&quot;</span>);
-                <span class="kw">let</span> <span class="ident">hist</span> <span class="op">=</span> <span class="macro">register_histogram!</span>(<span class="string">&quot;histogram_1&quot;</span>, <span class="string">&quot;label&quot;</span> =&gt; <span class="string">&quot;one&quot;</span>, <span class="string">&quot;hist_two&quot;</span> =&gt; <span class="string">&quot;two&quot;</span>);
-                <span class="ident">hist</span>.<span class="ident">record</span>(<span class="ident">Duration::from_millis</span>(<span class="number">9</span>));
+                <span class="kw">let </span>hist = <span class="macro">register_histogram!</span>(<span class="string">&quot;histogram_1&quot;</span>, <span class="string">&quot;label&quot; </span>=&gt; <span class="string">&quot;one&quot;</span>, <span class="string">&quot;hist_two&quot; </span>=&gt; <span class="string">&quot;two&quot;</span>);
+                hist.record(Duration::from_millis(<span class="number">9</span>));
 
-                <span class="macro">histogram!</span>(<span class="string">&quot;histogram_2&quot;</span>, <span class="ident">Duration::from_millis</span>(<span class="number">1000</span>));
+                <span class="macro">histogram!</span>(<span class="string">&quot;histogram_2&quot;</span>, Duration::from_millis(<span class="number">1000</span>));
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">global_labels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-                <span class="ident">global_labels</span>.<span class="ident">insert</span>(<span class="string">&quot;global_two&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;two&quot;</span>.<span class="ident">to_string</span>());
-                <span class="ident">global_labels</span>.<span class="ident">insert</span>(<span class="string">&quot;global_one&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;one&quot;</span>.<span class="ident">to_string</span>());
+                <span class="kw">let </span><span class="kw-2">mut </span>global_labels: HashMap&lt;String, String&gt; = HashMap::new();
+                global_labels.insert(<span class="string">&quot;global_two&quot;</span>.to_string(), <span class="string">&quot;two&quot;</span>.to_string());
+                global_labels.insert(<span class="string">&quot;global_one&quot;</span>.to_string(), <span class="string">&quot;one&quot;</span>.to_string());
 
-                <span class="kw">let</span> <span class="ident">prometheus</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">to_prometheus</span>(<span class="ident">global_labels</span>);
-                <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="macro">expect_test::expect!</span>[[<span class="string">r##&quot;
+                <span class="kw">let </span>prometheus = metrics.to_prometheus(global_labels);
+                <span class="kw">let </span>snapshot = <span class="macro">expect_test::expect!</span>[[<span class="string">r##&quot;
                     # HELP counter_1 
                     # TYPE counter_1 counter
                     counter_1{global_one=&quot;one&quot;,global_two=&quot;two&quot;,label=&quot;one&quot;} 4
@@ -1177,12 +1177,12 @@
 
                 &quot;##</span>]];
 
-                <span class="ident">snapshot</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">prometheus</span>);
+                snapshot.assert_eq(<span class="kw-2">&amp;</span>prometheus);
             }
-            .<span class="ident">with_subscriber</span>(<span class="ident">dispatch</span>)
+            .with_subscriber(dispatch)
             .<span class="kw">await</span>;
         });
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_engine_metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_engine_metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

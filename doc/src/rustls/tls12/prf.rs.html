@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/tls12/prf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>prf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/tls12/prf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>prf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -65,72 +65,72 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">ring::hmac</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>ring::hmac;
 
-<span class="kw">fn</span> <span class="ident">concat_sign</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">hmac::Key</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">hmac::Tag</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">hmac::Context::with_key</span>(<span class="ident">key</span>);
-    <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">a</span>);
-    <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">b</span>);
-    <span class="ident">ctx</span>.<span class="ident">sign</span>()
+<span class="kw">fn </span>concat_sign(key: <span class="kw-2">&amp;</span>hmac::Key, a: <span class="kw-2">&amp;</span>[u8], b: <span class="kw-2">&amp;</span>[u8]) -&gt; hmac::Tag {
+    <span class="kw">let </span><span class="kw-2">mut </span>ctx = hmac::Context::with_key(key);
+    ctx.update(a);
+    ctx.update(b);
+    ctx.sign()
 }
 
-<span class="kw">fn</span> <span class="ident">p</span>(<span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>], <span class="ident">alg</span>: <span class="ident">hmac::Algorithm</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-    <span class="kw">let</span> <span class="ident">hmac_key</span> <span class="op">=</span> <span class="ident">hmac::Key::new</span>(<span class="ident">alg</span>, <span class="ident">secret</span>);
+<span class="kw">fn </span>p(out: <span class="kw-2">&amp;mut </span>[u8], alg: hmac::Algorithm, secret: <span class="kw-2">&amp;</span>[u8], seed: <span class="kw-2">&amp;</span>[u8]) {
+    <span class="kw">let </span>hmac_key = hmac::Key::new(alg, secret);
 
-    <span class="comment">// A(1)</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_a</span> <span class="op">=</span> <span class="ident">hmac::sign</span>(<span class="kw-2">&amp;</span><span class="ident">hmac_key</span>, <span class="ident">seed</span>);
-    <span class="kw">let</span> <span class="ident">chunk_size</span> <span class="op">=</span> <span class="ident">alg</span>.<span class="ident">digest_algorithm</span>().<span class="ident">output_len</span>;
-    <span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span> <span class="ident">out</span>.<span class="ident">chunks_mut</span>(<span class="ident">chunk_size</span>) {
-        <span class="comment">// P_hash[i] = HMAC_hash(secret, A(i) + seed)</span>
-        <span class="kw">let</span> <span class="ident">p_term</span> <span class="op">=</span> <span class="ident">concat_sign</span>(<span class="kw-2">&amp;</span><span class="ident">hmac_key</span>, <span class="ident">current_a</span>.<span class="ident">as_ref</span>(), <span class="ident">seed</span>);
-        <span class="ident">chunk</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">p_term</span>.<span class="ident">as_ref</span>()[..<span class="ident">chunk</span>.<span class="ident">len</span>()]);
+    <span class="comment">// A(1)
+    </span><span class="kw">let </span><span class="kw-2">mut </span>current_a = hmac::sign(<span class="kw-2">&amp;</span>hmac_key, seed);
+    <span class="kw">let </span>chunk_size = alg.digest_algorithm().output_len;
+    <span class="kw">for </span>chunk <span class="kw">in </span>out.chunks_mut(chunk_size) {
+        <span class="comment">// P_hash[i] = HMAC_hash(secret, A(i) + seed)
+        </span><span class="kw">let </span>p_term = concat_sign(<span class="kw-2">&amp;</span>hmac_key, current_a.as_ref(), seed);
+        chunk.copy_from_slice(<span class="kw-2">&amp;</span>p_term.as_ref()[..chunk.len()]);
 
-        <span class="comment">// A(i+1) = HMAC_hash(secret, A(i))</span>
-        <span class="ident">current_a</span> <span class="op">=</span> <span class="ident">hmac::sign</span>(<span class="kw-2">&amp;</span><span class="ident">hmac_key</span>, <span class="ident">current_a</span>.<span class="ident">as_ref</span>());
+        <span class="comment">// A(i+1) = HMAC_hash(secret, A(i))
+        </span>current_a = hmac::sign(<span class="kw-2">&amp;</span>hmac_key, current_a.as_ref());
     }
 }
 
-<span class="kw">fn</span> <span class="ident">concat</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">ret</span>.<span class="ident">extend_from_slice</span>(<span class="ident">a</span>);
-    <span class="ident">ret</span>.<span class="ident">extend_from_slice</span>(<span class="ident">b</span>);
-    <span class="ident">ret</span>
+<span class="kw">fn </span>concat(a: <span class="kw-2">&amp;</span>[u8], b: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>ret = Vec::new();
+    ret.extend_from_slice(a);
+    ret.extend_from_slice(b);
+    ret
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">prf</span>(<span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>], <span class="ident">alg</span>: <span class="ident">hmac::Algorithm</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-    <span class="kw">let</span> <span class="ident">joined_seed</span> <span class="op">=</span> <span class="ident">concat</span>(<span class="ident">label</span>, <span class="ident">seed</span>);
-    <span class="ident">p</span>(<span class="ident">out</span>, <span class="ident">alg</span>, <span class="ident">secret</span>, <span class="kw-2">&amp;</span><span class="ident">joined_seed</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>prf(out: <span class="kw-2">&amp;mut </span>[u8], alg: hmac::Algorithm, secret: <span class="kw-2">&amp;</span>[u8], label: <span class="kw-2">&amp;</span>[u8], seed: <span class="kw-2">&amp;</span>[u8]) {
+    <span class="kw">let </span>joined_seed = concat(label, seed);
+    p(out, alg, secret, <span class="kw-2">&amp;</span>joined_seed);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">ring::hmac</span>::{<span class="ident">HMAC_SHA256</span>, <span class="ident">HMAC_SHA512</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>ring::hmac::{HMAC_SHA256, HMAC_SHA512};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">check_sha256</span>() {
-        <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="string">b&quot;\x9b\xbe\x43\x6b\xa9\x40\xf0\x17\xb1\x76\x52\x84\x9a\x71\xdb\x35&quot;</span>;
-        <span class="kw">let</span> <span class="ident">seed</span> <span class="op">=</span> <span class="string">b&quot;\xa0\xba\x9f\x93\x6c\xda\x31\x18\x27\xa6\xf7\x96\xff\xd5\x19\x8c&quot;</span>;
-        <span class="kw">let</span> <span class="ident">label</span> <span class="op">=</span> <span class="string">b&quot;test label&quot;</span>;
-        <span class="kw">let</span> <span class="ident">expect</span> <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/prf-result.1.bin&quot;</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">100</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>check_sha256() {
+        <span class="kw">let </span>secret = <span class="string">b&quot;\x9b\xbe\x43\x6b\xa9\x40\xf0\x17\xb1\x76\x52\x84\x9a\x71\xdb\x35&quot;</span>;
+        <span class="kw">let </span>seed = <span class="string">b&quot;\xa0\xba\x9f\x93\x6c\xda\x31\x18\x27\xa6\xf7\x96\xff\xd5\x19\x8c&quot;</span>;
+        <span class="kw">let </span>label = <span class="string">b&quot;test label&quot;</span>;
+        <span class="kw">let </span>expect = <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/prf-result.1.bin&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>output = [<span class="number">0u8</span>; <span class="number">100</span>];
 
-        <span class="ident"><span class="kw">super</span>::prf</span>(<span class="kw-2">&amp;mut</span> <span class="ident">output</span>, <span class="ident">HMAC_SHA256</span>, <span class="ident">secret</span>, <span class="ident">label</span>, <span class="ident">seed</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">expect</span>.<span class="ident">len</span>(), <span class="ident">output</span>.<span class="ident">len</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">expect</span>.<span class="ident">to_vec</span>(), <span class="ident">output</span>.<span class="ident">to_vec</span>());
+        <span class="kw">super</span>::prf(<span class="kw-2">&amp;mut </span>output, HMAC_SHA256, secret, label, seed);
+        <span class="macro">assert_eq!</span>(expect.len(), output.len());
+        <span class="macro">assert_eq!</span>(expect.to_vec(), output.to_vec());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">check_sha512</span>() {
-        <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="string">b&quot;\xb0\x32\x35\x23\xc1\x85\x35\x99\x58\x4d\x88\x56\x8b\xbb\x05\xeb&quot;</span>;
-        <span class="kw">let</span> <span class="ident">seed</span> <span class="op">=</span> <span class="string">b&quot;\xd4\x64\x0e\x12\xe4\xbc\xdb\xfb\x43\x7f\x03\xe6\xae\x41\x8e\xe5&quot;</span>;
-        <span class="kw">let</span> <span class="ident">label</span> <span class="op">=</span> <span class="string">b&quot;test label&quot;</span>;
-        <span class="kw">let</span> <span class="ident">expect</span> <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/prf-result.2.bin&quot;</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">196</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>check_sha512() {
+        <span class="kw">let </span>secret = <span class="string">b&quot;\xb0\x32\x35\x23\xc1\x85\x35\x99\x58\x4d\x88\x56\x8b\xbb\x05\xeb&quot;</span>;
+        <span class="kw">let </span>seed = <span class="string">b&quot;\xd4\x64\x0e\x12\xe4\xbc\xdb\xfb\x43\x7f\x03\xe6\xae\x41\x8e\xe5&quot;</span>;
+        <span class="kw">let </span>label = <span class="string">b&quot;test label&quot;</span>;
+        <span class="kw">let </span>expect = <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/prf-result.2.bin&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>output = [<span class="number">0u8</span>; <span class="number">196</span>];
 
-        <span class="ident"><span class="kw">super</span>::prf</span>(<span class="kw-2">&amp;mut</span> <span class="ident">output</span>, <span class="ident">HMAC_SHA512</span>, <span class="ident">secret</span>, <span class="ident">label</span>, <span class="ident">seed</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">expect</span>.<span class="ident">len</span>(), <span class="ident">output</span>.<span class="ident">len</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">expect</span>.<span class="ident">to_vec</span>(), <span class="ident">output</span>.<span class="ident">to_vec</span>());
+        <span class="kw">super</span>::prf(<span class="kw-2">&amp;mut </span>output, HMAC_SHA512, secret, label, seed);
+        <span class="macro">assert_eq!</span>(expect.len(), output.len());
+        <span class="macro">assert_eq!</span>(expect.to_vec(), output.to_vec());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

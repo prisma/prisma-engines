@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/endian.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>endian.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/endian.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>endian.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -152,159 +152,159 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::num::Wrapping</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>core::num::Wrapping;
 
-<span class="doccomment">/// An `Encoding` of a type `T` can be converted to/from its byte</span>
-<span class="doccomment">/// representation without any byte swapping or other computation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Self: Copy` constraint addresses `clippy::declare_interior_mutable_const`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Encoding</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="self">Self</span>: <span class="ident">Copy</span>,
+<span class="doccomment">/// An `Encoding` of a type `T` can be converted to/from its byte
+/// representation without any byte swapping or other computation.
+///
+/// The `Self: Copy` constraint addresses `clippy::declare_interior_mutable_const`.
+</span><span class="kw">pub trait </span>Encoding&lt;T&gt;: From&lt;T&gt; + Into&lt;T&gt;
+<span class="kw">where
+    </span><span class="self">Self</span>: Copy,
 {
-    <span class="kw">const</span> <span class="ident">ZERO</span>: <span class="self">Self</span>;
+    <span class="kw">const </span>ZERO: <span class="self">Self</span>;
 }
 
-<span class="doccomment">/// Allow access to a slice of  of `Encoding&lt;T&gt;` as a slice of bytes.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_byte_slice</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Encoding</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span>[<span class="ident">E</span>]) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-    <span class="kw">unsafe</span> {
-        <span class="ident">core::slice::from_raw_parts</span>(<span class="ident">x</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">x</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>())
+<span class="doccomment">/// Allow access to a slice of  of `Encoding&lt;T&gt;` as a slice of bytes.
+</span><span class="kw">pub fn </span>as_byte_slice&lt;E: Encoding&lt;T&gt;, T&gt;(x: <span class="kw-2">&amp;</span>[E]) -&gt; <span class="kw-2">&amp;</span>[u8] {
+    <span class="kw">unsafe </span>{
+        core::slice::from_raw_parts(x.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>u8, x.len() * core::mem::size_of::&lt;E&gt;())
     }
 }
 
-<span class="doccomment">/// Work around the inability to implement `AsRef` for arrays of `Encoding`s</span>
-<span class="doccomment">/// due to the coherence rules.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArrayEncoding</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_byte_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span>;
+<span class="doccomment">/// Work around the inability to implement `AsRef` for arrays of `Encoding`s
+/// due to the coherence rules.
+</span><span class="kw">pub trait </span>ArrayEncoding&lt;T&gt; {
+    <span class="kw">fn </span>as_byte_array(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T;
 }
 
-<span class="doccomment">/// Work around the inability to implement `from` for arrays of `Encoding`s</span>
-<span class="doccomment">/// due to the coherence rules.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromByteArray</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from_byte_array</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// Work around the inability to implement `from` for arrays of `Encoding`s
+/// due to the coherence rules.
+</span><span class="kw">pub trait </span>FromByteArray&lt;T&gt; {
+    <span class="kw">fn </span>from_byte_array(a: <span class="kw-2">&amp;</span>T) -&gt; <span class="self">Self</span>;
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">define_endian</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>);
+<span class="macro">macro_rules! </span>define_endian {
+    (<span class="macro-nonterminal">$endian</span>:ident) =&gt; {
+        <span class="attribute">#[repr(transparent)]
+        </span><span class="kw">pub struct </span><span class="macro-nonterminal">$endian</span>&lt;T&gt;(T);
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="attribute">#[<span class="ident">deprecated</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_raw_value</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-                <span class="self">self</span>.<span class="number">0</span>
-            }
+        <span class="kw">impl</span>&lt;T&gt; <span class="macro-nonterminal">$endian</span>&lt;T&gt; {
+            <span class="attribute">#[deprecated]
+            </span><span class="kw">pub fn </span>into_raw_value(<span class="self">self</span>) -&gt; T {
+                <span class="self">self</span>.<span class="number">0
+            </span>}
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Copy</span> {}
+        <span class="kw">impl</span>&lt;T&gt; Copy <span class="kw">for </span><span class="macro-nonterminal">$endian</span>&lt;T&gt; <span class="kw">where </span>T: Copy {}
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">T</span>: <span class="ident">Clone</span>,
+        <span class="kw">impl</span>&lt;T&gt; Clone <span class="kw">for </span><span class="macro-nonterminal">$endian</span>&lt;T&gt;
+        <span class="kw">where
+            </span>T: Clone,
         {
-            <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-                <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>())
+            <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+                <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.clone())
             }
         }
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_from_byte_array</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elems</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">FromByteArray</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elems</span> <span class="op">*</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>()]<span class="op">&gt;</span>
-            <span class="kw">for</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elems</span>]
+<span class="macro">macro_rules! </span>impl_from_byte_array {
+    (<span class="macro-nonterminal">$endian</span>:ident, <span class="macro-nonterminal">$base</span>:ident, <span class="macro-nonterminal">$elems</span>:expr) =&gt; {
+        <span class="kw">impl </span>FromByteArray&lt;[u8; <span class="macro-nonterminal">$elems </span>* core::mem::size_of::&lt;<span class="macro-nonterminal">$base</span>&gt;()]&gt;
+            <span class="kw">for </span>[<span class="macro-nonterminal">$endian</span>&lt;<span class="macro-nonterminal">$base</span>&gt;; <span class="macro-nonterminal">$elems</span>]
         {
-            <span class="kw">fn</span> <span class="ident">from_byte_array</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elems</span> <span class="op">*</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>()]) -&gt; <span class="self">Self</span> {
-                <span class="kw">unsafe</span> { <span class="ident">core::mem::transmute_copy</span>(<span class="ident">a</span>) }
+            <span class="kw">fn </span>from_byte_array(a: <span class="kw-2">&amp;</span>[u8; <span class="macro-nonterminal">$elems </span>* core::mem::size_of::&lt;<span class="macro-nonterminal">$base</span>&gt;()]) -&gt; <span class="self">Self </span>{
+                <span class="kw">unsafe </span>{ core::mem::transmute_copy(a) }
             }
         }
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_array_encoding</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elems</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">ArrayEncoding</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elems</span> <span class="op">*</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>()]<span class="op">&gt;</span>
-            <span class="kw">for</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elems</span>]
+<span class="macro">macro_rules! </span>impl_array_encoding {
+    (<span class="macro-nonterminal">$endian</span>:ident, <span class="macro-nonterminal">$base</span>:ident, <span class="macro-nonterminal">$elems</span>:expr) =&gt; {
+        <span class="kw">impl </span>ArrayEncoding&lt;[u8; <span class="macro-nonterminal">$elems </span>* core::mem::size_of::&lt;<span class="macro-nonterminal">$base</span>&gt;()]&gt;
+            <span class="kw">for </span>[<span class="macro-nonterminal">$endian</span>&lt;<span class="macro-nonterminal">$base</span>&gt;; <span class="macro-nonterminal">$elems</span>]
         {
-            <span class="kw">fn</span> <span class="ident">as_byte_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elems</span> <span class="op">*</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>()] {
-                <span class="comment">// TODO: When we can require Rust 1.47.0 or later we could avoid</span>
-                <span class="comment">// `as` and `unsafe` here using</span>
-                <span class="comment">// `as_byte_slice(self).try_into().unwrap()`.</span>
-                <span class="kw">let</span> <span class="ident">as_bytes_ptr</span> <span class="op">=</span>
-                    <span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elems</span> <span class="op">*</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>()];
-                <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">as_bytes_ptr</span> }
+            <span class="kw">fn </span>as_byte_array(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8; <span class="macro-nonterminal">$elems </span>* core::mem::size_of::&lt;<span class="macro-nonterminal">$base</span>&gt;()] {
+                <span class="comment">// TODO: When we can require Rust 1.47.0 or later we could avoid
+                // `as` and `unsafe` here using
+                // `as_byte_slice(self).try_into().unwrap()`.
+                </span><span class="kw">let </span>as_bytes_ptr =
+                    <span class="self">self</span>.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>[u8; <span class="macro-nonterminal">$elems </span>* core::mem::size_of::&lt;<span class="macro-nonterminal">$base</span>&gt;()];
+                <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>as_bytes_ptr }
             }
         }
 
-        <span class="macro">impl_from_byte_array!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elems</span>);
+        <span class="macro">impl_from_byte_array!</span>(<span class="macro-nonterminal">$endian</span>, <span class="macro-nonterminal">$base</span>, <span class="macro-nonterminal">$elems</span>);
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_endian</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_endian</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_endian</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">Encoding</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
-            <span class="kw">const</span> <span class="ident">ZERO</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span>(<span class="number">0</span>);
+<span class="macro">macro_rules! </span>impl_endian {
+    (<span class="macro-nonterminal">$endian</span>:ident, <span class="macro-nonterminal">$base</span>:ident, <span class="macro-nonterminal">$to_endian</span>:ident, <span class="macro-nonterminal">$from_endian</span>:ident, <span class="macro-nonterminal">$size</span>:expr) =&gt; {
+        <span class="kw">impl </span>Encoding&lt;<span class="macro-nonterminal">$base</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$endian</span>&lt;<span class="macro-nonterminal">$base</span>&gt; {
+            <span class="kw">const </span>ZERO: <span class="self">Self </span>= <span class="self">Self</span>(<span class="number">0</span>);
         }
 
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>]) -&gt; <span class="self">Self</span> {
-                <span class="self">Self</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base::from_ne_bytes</span>(<span class="ident">bytes</span>))
+        <span class="kw">impl </span>From&lt;[u8; <span class="macro-nonterminal">$size</span>]&gt; <span class="kw">for </span><span class="macro-nonterminal">$endian</span>&lt;<span class="macro-nonterminal">$base</span>&gt; {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>from(bytes: [u8; <span class="macro-nonterminal">$size</span>]) -&gt; <span class="self">Self </span>{
+                <span class="self">Self</span>(<span class="macro-nonterminal">$base::from_ne_bytes</span>(bytes))
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>] {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">encoded</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base::to_ne_bytes</span>(<span class="ident">encoded</span>.<span class="number">0</span>)
+        <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$endian</span>&lt;<span class="macro-nonterminal">$base</span>&gt;&gt; <span class="kw">for </span>[u8; <span class="macro-nonterminal">$size</span>] {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>from(encoded: <span class="macro-nonterminal">$endian</span>&lt;<span class="macro-nonterminal">$base</span>&gt;) -&gt; <span class="self">Self </span>{
+                <span class="macro-nonterminal">$base::to_ne_bytes</span>(encoded.<span class="number">0</span>)
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>) -&gt; <span class="self">Self</span> {
-                <span class="self">Self</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_endian</span>(<span class="ident">value</span>))
+        <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$base</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$endian</span>&lt;<span class="macro-nonterminal">$base</span>&gt; {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>from(value: <span class="macro-nonterminal">$base</span>) -&gt; <span class="self">Self </span>{
+                <span class="self">Self</span>(<span class="macro-nonterminal">$base</span>::<span class="macro-nonterminal">$to_endian</span>(value))
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Wrapping</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">Wrapping</span>(<span class="ident">value</span>): <span class="ident">Wrapping</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                <span class="self">Self</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_endian</span>(<span class="ident">value</span>))
+        <span class="kw">impl </span>From&lt;Wrapping&lt;<span class="macro-nonterminal">$base</span>&gt;&gt; <span class="kw">for </span><span class="macro-nonterminal">$endian</span>&lt;<span class="macro-nonterminal">$base</span>&gt; {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>from(Wrapping(value): Wrapping&lt;<span class="macro-nonterminal">$base</span>&gt;) -&gt; <span class="self">Self </span>{
+                <span class="self">Self</span>(<span class="macro-nonterminal">$base</span>::<span class="macro-nonterminal">$to_endian</span>(value))
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span>(<span class="ident">value</span>): <span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_endian</span>(<span class="ident">value</span>)
+        <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$endian</span>&lt;<span class="macro-nonterminal">$base</span>&gt;&gt; <span class="kw">for </span><span class="macro-nonterminal">$base </span>{
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>from(<span class="macro-nonterminal">$endian</span>(value): <span class="macro-nonterminal">$endian</span>&lt;<span class="macro-nonterminal">$base</span>&gt;) -&gt; <span class="self">Self </span>{
+                <span class="macro-nonterminal">$base</span>::<span class="macro-nonterminal">$from_endian</span>(value)
             }
         }
 
-        <span class="macro">impl_array_encoding!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="number">1</span>);
-        <span class="macro">impl_array_encoding!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="number">2</span>);
-        <span class="macro">impl_array_encoding!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="number">3</span>);
-        <span class="macro">impl_array_encoding!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="number">4</span>);
-        <span class="macro">impl_array_encoding!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">endian</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="number">8</span>);
+        <span class="macro">impl_array_encoding!</span>(<span class="macro-nonterminal">$endian</span>, <span class="macro-nonterminal">$base</span>, <span class="number">1</span>);
+        <span class="macro">impl_array_encoding!</span>(<span class="macro-nonterminal">$endian</span>, <span class="macro-nonterminal">$base</span>, <span class="number">2</span>);
+        <span class="macro">impl_array_encoding!</span>(<span class="macro-nonterminal">$endian</span>, <span class="macro-nonterminal">$base</span>, <span class="number">3</span>);
+        <span class="macro">impl_array_encoding!</span>(<span class="macro-nonterminal">$endian</span>, <span class="macro-nonterminal">$base</span>, <span class="number">4</span>);
+        <span class="macro">impl_array_encoding!</span>(<span class="macro-nonterminal">$endian</span>, <span class="macro-nonterminal">$base</span>, <span class="number">8</span>);
     };
 }
 
-<span class="macro">define_endian!</span>(<span class="ident">BigEndian</span>);
-<span class="macro">define_endian!</span>(<span class="ident">LittleEndian</span>);
-<span class="macro">impl_endian!</span>(<span class="ident">BigEndian</span>, <span class="ident">u32</span>, <span class="ident">to_be</span>, <span class="ident">from_be</span>, <span class="number">4</span>);
-<span class="macro">impl_endian!</span>(<span class="ident">BigEndian</span>, <span class="ident">u64</span>, <span class="ident">to_be</span>, <span class="ident">from_be</span>, <span class="number">8</span>);
-<span class="macro">impl_endian!</span>(<span class="ident">LittleEndian</span>, <span class="ident">u32</span>, <span class="ident">to_le</span>, <span class="ident">from_le</span>, <span class="number">4</span>);
-<span class="macro">impl_endian!</span>(<span class="ident">LittleEndian</span>, <span class="ident">u64</span>, <span class="ident">to_le</span>, <span class="ident">from_le</span>, <span class="number">8</span>);
+<span class="macro">define_endian!</span>(BigEndian);
+<span class="macro">define_endian!</span>(LittleEndian);
+<span class="macro">impl_endian!</span>(BigEndian, u32, to_be, from_be, <span class="number">4</span>);
+<span class="macro">impl_endian!</span>(BigEndian, u64, to_be, from_be, <span class="number">8</span>);
+<span class="macro">impl_endian!</span>(LittleEndian, u32, to_le, from_le, <span class="number">4</span>);
+<span class="macro">impl_endian!</span>(LittleEndian, u64, to_le, from_le, <span class="number">8</span>);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_big_endian</span>() {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">BigEndian::from</span>(<span class="number">1u32</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u32::from</span>(<span class="ident">x</span>), <span class="number">1</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_big_endian() {
+        <span class="kw">let </span>x = BigEndian::from(<span class="number">1u32</span>);
+        <span class="macro">assert_eq!</span>(u32::from(x), <span class="number">1</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

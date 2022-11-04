@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/xfer/dns_exchange.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_exchange.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/xfer/dns_exchange.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_exchange.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -367,374 +367,374 @@
 <span id="367">367</span>
 <span id="368">368</span>
 <span id="369">369</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2018 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2018 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! This module contains all the types for demuxing DNS oriented streams.</span>
+</span><span class="doccomment">//! This module contains all the types for demuxing DNS oriented streams.
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+</span><span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
 
-<span class="kw">use</span> <span class="ident">futures_channel::mpsc</span>;
-<span class="kw">use</span> <span class="ident">futures_util::future</span>::{<span class="ident">Future</span>, <span class="ident">FutureExt</span>};
-<span class="kw">use</span> <span class="ident">futures_util::stream</span>::{<span class="ident">Peekable</span>, <span class="ident">Stream</span>, <span class="ident">StreamExt</span>};
-<span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">debug</span>, <span class="ident">warn</span>};
+<span class="kw">use </span>futures_channel::mpsc;
+<span class="kw">use </span>futures_util::future::{Future, FutureExt};
+<span class="kw">use </span>futures_util::stream::{Peekable, Stream, StreamExt};
+<span class="kw">use </span>log::{debug, warn};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer::dns_handle::DnsHandle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer::DnsResponseReceiver</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer</span>::{
-    <span class="ident">BufDnsRequestStreamHandle</span>, <span class="ident">DnsRequest</span>, <span class="ident">DnsRequestSender</span>, <span class="ident">DnsResponse</span>, <span class="ident">OneshotDnsRequest</span>,
-    <span class="ident">CHANNEL_BUFFER_SIZE</span>,
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::xfer::dns_handle::DnsHandle;
+<span class="kw">use </span><span class="kw">crate</span>::xfer::DnsResponseReceiver;
+<span class="kw">use </span><span class="kw">crate</span>::xfer::{
+    BufDnsRequestStreamHandle, DnsRequest, DnsRequestSender, DnsResponse, OneshotDnsRequest,
+    CHANNEL_BUFFER_SIZE,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Time</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Time;
 
-<span class="doccomment">/// This is a generic Exchange implemented over multiplexed DNS connection providers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The underlying `DnsRequestSender` is expected to multiplex any I/O connections. DnsExchange assumes that the underlying stream is responsible for this.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DnsExchange</span> {
-    <span class="ident">sender</span>: <span class="ident">BufDnsRequestStreamHandle</span>,
+<span class="doccomment">/// This is a generic Exchange implemented over multiplexed DNS connection providers.
+///
+/// The underlying `DnsRequestSender` is expected to multiplex any I/O connections. DnsExchange assumes that the underlying stream is responsible for this.
+</span><span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless polled&quot;</span>]
+</span><span class="kw">pub struct </span>DnsExchange {
+    sender: BufDnsRequestStreamHandle,
 }
 
-<span class="kw">impl</span> <span class="ident">DnsExchange</span> {
-    <span class="doccomment">/// Initializes a TcpStream with an existing tcp::TcpStream.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is intended for use with a TcpListener and Incoming.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `stream` - the established IO stream for communication</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_stream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>(<span class="ident">stream</span>: <span class="ident">S</span>) -&gt; (<span class="self">Self</span>, <span class="ident">DnsExchangeBackground</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>)
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">DnsRequestSender</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl </span>DnsExchange {
+    <span class="doccomment">/// Initializes a TcpStream with an existing tcp::TcpStream.
+    ///
+    /// This is intended for use with a TcpListener and Incoming.
+    ///
+    /// # Arguments
+    ///
+    /// * `stream` - the established IO stream for communication
+    </span><span class="kw">pub fn </span>from_stream&lt;S, TE&gt;(stream: S) -&gt; (<span class="self">Self</span>, DnsExchangeBackground&lt;S, TE&gt;)
+    <span class="kw">where
+        </span>S: DnsRequestSender + <span class="lifetime">&#39;static </span>+ Send + Unpin,
     {
-        <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="ident">CHANNEL_BUFFER_SIZE</span>);
-        <span class="kw">let</span> <span class="ident">message_sender</span> <span class="op">=</span> <span class="ident">BufDnsRequestStreamHandle</span> { <span class="ident">sender</span> };
+        <span class="kw">let </span>(sender, outbound_messages) = mpsc::channel(CHANNEL_BUFFER_SIZE);
+        <span class="kw">let </span>message_sender = BufDnsRequestStreamHandle { sender };
 
-        <span class="ident"><span class="self">Self</span>::from_stream_with_receiver</span>(<span class="ident">stream</span>, <span class="ident">outbound_messages</span>, <span class="ident">message_sender</span>)
+        <span class="self">Self</span>::from_stream_with_receiver(stream, outbound_messages, message_sender)
     }
 
-    <span class="doccomment">/// Wraps a stream where a sender and receiver have already been established</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_stream_with_receiver</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>(
-        <span class="ident">stream</span>: <span class="ident">S</span>,
-        <span class="ident">receiver</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">OneshotDnsRequest</span><span class="op">&gt;</span>,
-        <span class="ident">sender</span>: <span class="ident">BufDnsRequestStreamHandle</span>,
-    ) -&gt; (<span class="self">Self</span>, <span class="ident">DnsExchangeBackground</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>)
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">DnsRequestSender</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+    <span class="doccomment">/// Wraps a stream where a sender and receiver have already been established
+    </span><span class="kw">pub fn </span>from_stream_with_receiver&lt;S, TE&gt;(
+        stream: S,
+        receiver: mpsc::Receiver&lt;OneshotDnsRequest&gt;,
+        sender: BufDnsRequestStreamHandle,
+    ) -&gt; (<span class="self">Self</span>, DnsExchangeBackground&lt;S, TE&gt;)
+    <span class="kw">where
+        </span>S: DnsRequestSender + <span class="lifetime">&#39;static </span>+ Send + Unpin,
     {
-        <span class="kw">let</span> <span class="ident">background</span> <span class="op">=</span> <span class="ident">DnsExchangeBackground</span> {
-            <span class="ident">io_stream</span>: <span class="ident">stream</span>,
-            <span class="ident">outbound_messages</span>: <span class="ident">receiver</span>.<span class="ident">peekable</span>(),
-            <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
+        <span class="kw">let </span>background = DnsExchangeBackground {
+            io_stream: stream,
+            outbound_messages: receiver.peekable(),
+            marker: PhantomData,
         };
 
-        (<span class="self">Self</span> { <span class="ident">sender</span> }, <span class="ident">background</span>)
+        (<span class="self">Self </span>{ sender }, background)
     }
 
-    <span class="doccomment">/// Returns a future, which itself wraps a future which is awaiting connection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The connect_future should be lazy.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>(<span class="ident">connect_future</span>: <span class="ident">F</span>) -&gt; <span class="ident">DnsExchangeConnect</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">S</span>: <span class="ident">DnsRequestSender</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">TE</span>: <span class="ident">Time</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+    <span class="doccomment">/// Returns a future, which itself wraps a future which is awaiting connection.
+    ///
+    /// The connect_future should be lazy.
+    </span><span class="kw">pub fn </span>connect&lt;F, S, TE&gt;(connect_future: F) -&gt; DnsExchangeConnect&lt;F, S, TE&gt;
+    <span class="kw">where
+        </span>F: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;S, ProtoError&gt;&gt; + <span class="lifetime">&#39;static </span>+ Send + Unpin,
+        S: DnsRequestSender + <span class="lifetime">&#39;static </span>+ Send + Unpin,
+        TE: Time + Unpin,
     {
-        <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="ident">CHANNEL_BUFFER_SIZE</span>);
-        <span class="kw">let</span> <span class="ident">message_sender</span> <span class="op">=</span> <span class="ident">BufDnsRequestStreamHandle</span> { <span class="ident">sender</span> };
+        <span class="kw">let </span>(sender, outbound_messages) = mpsc::channel(CHANNEL_BUFFER_SIZE);
+        <span class="kw">let </span>message_sender = BufDnsRequestStreamHandle { sender };
 
-        <span class="ident">DnsExchangeConnect::connect</span>(<span class="ident">connect_future</span>, <span class="ident">outbound_messages</span>, <span class="ident">message_sender</span>)
+        DnsExchangeConnect::connect(connect_future, outbound_messages, message_sender)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">DnsExchange</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">sender</span>: <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">clone</span>(),
+<span class="kw">impl </span>Clone <span class="kw">for </span>DnsExchange {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            sender: <span class="self">self</span>.sender.clone(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DnsHandle</span> <span class="kw">for</span> <span class="ident">DnsExchange</span> {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">DnsExchangeSend</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ProtoError</span>;
+<span class="kw">impl </span>DnsHandle <span class="kw">for </span>DnsExchange {
+    <span class="kw">type </span>Response = DnsExchangeSend;
+    <span class="kw">type </span>Error = ProtoError;
 
-    <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
-        <span class="ident">DnsExchangeSend</span> {
-            <span class="ident">result</span>: <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">request</span>),
-            <span class="ident">_sender</span>: <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">clone</span>(), <span class="comment">// TODO: this shouldn&#39;t be necessary, currently the presence of Senders is what allows the background to track current users, it generally is dropped right after send, this makes sure that there is at least one active after send</span>
-        }
+    <span class="kw">fn </span>send&lt;R: Into&lt;DnsRequest&gt; + Unpin + Send + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request: R) -&gt; <span class="self">Self</span>::Response {
+        DnsExchangeSend {
+            result: <span class="self">self</span>.sender.send(request),
+            _sender: <span class="self">self</span>.sender.clone(), <span class="comment">// TODO: this shouldn&#39;t be necessary, currently the presence of Senders is what allows the background to track current users, it generally is dropped right after send, this makes sure that there is at least one active after send
+        </span>}
     }
 }
 
-<span class="doccomment">/// A Stream that will resolve to Responses after sending the request</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DnsExchangeSend</span> {
-    <span class="ident">result</span>: <span class="ident">DnsResponseReceiver</span>,
-    <span class="ident">_sender</span>: <span class="ident">BufDnsRequestStreamHandle</span>,
+<span class="doccomment">/// A Stream that will resolve to Responses after sending the request
+</span><span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless polled&quot;</span>]
+</span><span class="kw">pub struct </span>DnsExchangeSend {
+    result: DnsResponseReceiver,
+    _sender: BufDnsRequestStreamHandle,
 }
 
-<span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">DnsExchangeSend</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>Stream <span class="kw">for </span>DnsExchangeSend {
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;DnsResponse, ProtoError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// as long as there is no result, poll the exchange</span>
-        <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="comment">// as long as there is no result, poll the exchange
+        </span><span class="self">self</span>.result.poll_next_unpin(cx)
     }
 }
 
-<span class="doccomment">/// This background future is responsible for driving all network operations for the DNS protocol.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It must be spawned before any DNS messages are sent.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DnsExchangeBackground</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">DnsRequestSender</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="doccomment">/// This background future is responsible for driving all network operations for the DNS protocol.
+///
+/// It must be spawned before any DNS messages are sent.
+</span><span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless polled&quot;</span>]
+</span><span class="kw">pub struct </span>DnsExchangeBackground&lt;S, TE&gt;
+<span class="kw">where
+    </span>S: DnsRequestSender + <span class="lifetime">&#39;static </span>+ Send + Unpin,
 {
-    <span class="ident">io_stream</span>: <span class="ident">S</span>,
-    <span class="ident">outbound_messages</span>: <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">OneshotDnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">TE</span><span class="op">&gt;</span>,
+    io_stream: S,
+    outbound_messages: Peekable&lt;mpsc::Receiver&lt;OneshotDnsRequest&gt;&gt;,
+    marker: PhantomData&lt;TE&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span> <span class="ident">DnsExchangeBackground</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">DnsRequestSender</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;S, TE&gt; DnsExchangeBackground&lt;S, TE&gt;
+<span class="kw">where
+    </span>S: DnsRequestSender + <span class="lifetime">&#39;static </span>+ Send + Unpin,
 {
-    <span class="kw">fn</span> <span class="ident">pollable_split</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; (<span class="kw-2">&amp;mut</span> <span class="ident">S</span>, <span class="kw-2">&amp;mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">OneshotDnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        (<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">io_stream</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">outbound_messages</span>)
+    <span class="kw">fn </span>pollable_split(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;mut </span>S, <span class="kw-2">&amp;mut </span>Peekable&lt;mpsc::Receiver&lt;OneshotDnsRequest&gt;&gt;) {
+        (<span class="kw-2">&amp;mut </span><span class="self">self</span>.io_stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.outbound_messages)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">DnsExchangeBackground</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">DnsRequestSender</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">TE</span>: <span class="ident">Time</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;S, TE&gt; Future <span class="kw">for </span>DnsExchangeBackground&lt;S, TE&gt;
+<span class="kw">where
+    </span>S: DnsRequestSender + <span class="lifetime">&#39;static </span>+ Send + Unpin,
+    TE: Time + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ProtoError</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;(), ProtoError&gt;;
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unused_unit</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">io_stream</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pollable_split</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io_stream</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="ident">io_stream</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outbound_messages</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="ident">outbound_messages</span>);
+    <span class="attribute">#[allow(clippy::unused_unit)]
+    </span><span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>(io_stream, outbound_messages) = <span class="self">self</span>.pollable_split();
+        <span class="kw">let </span><span class="kw-2">mut </span>io_stream = Pin::new(io_stream);
+        <span class="kw">let </span><span class="kw-2">mut </span>outbound_messages = Pin::new(outbound_messages);
 
-        <span class="comment">// this will not accept incoming data while there is data to send</span>
-        <span class="comment">//  makes this self throttling.</span>
-        <span class="kw">loop</span> {
-            <span class="comment">// poll the underlying stream, to drive it...</span>
-            <span class="kw">match</span> <span class="ident">io_stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_next</span>(<span class="ident">cx</span>) {
-                <span class="comment">// The stream is ready</span>
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(()))) =&gt; (),
-                <span class="ident">Poll::Pending</span> =&gt; {
-                    <span class="kw">if</span> <span class="ident">io_stream</span>.<span class="ident">is_shutdown</span>() {
-                        <span class="comment">// the io_stream is in a shutdown state, we are only waiting for final results...</span>
-                        <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+        <span class="comment">// this will not accept incoming data while there is data to send
+        //  makes this self throttling.
+        </span><span class="kw">loop </span>{
+            <span class="comment">// poll the underlying stream, to drive it...
+            </span><span class="kw">match </span>io_stream.as_mut().poll_next(cx) {
+                <span class="comment">// The stream is ready
+                </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(()))) =&gt; (),
+                Poll::Pending =&gt; {
+                    <span class="kw">if </span>io_stream.is_shutdown() {
+                        <span class="comment">// the io_stream is in a shutdown state, we are only waiting for final results...
+                        </span><span class="kw">return </span>Poll::Pending;
                     }
 
-                    <span class="comment">// NotReady and not shutdown, see if there are more messages to send</span>
-                    ()
-                } <span class="comment">// underlying stream is complete.</span>
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; {
+                    <span class="comment">// NotReady and not shutdown, see if there are more messages to send
+                    </span>()
+                } <span class="comment">// underlying stream is complete.
+                </span>Poll::Ready(<span class="prelude-val">None</span>) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;io_stream is done, shutting down&quot;</span>);
-                    <span class="comment">// TODO: return shutdown error to anything in the stream?</span>
+                    <span class="comment">// TODO: return shutdown error to anything in the stream?
 
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+                    </span><span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
                 }
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>))) =&gt; {
-                    <span class="macro">warn!</span>(<span class="string">&quot;io_stream hit an error, shutting down: {}&quot;</span>, <span class="ident">err</span>);
+                Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err))) =&gt; {
+                    <span class="macro">warn!</span>(<span class="string">&quot;io_stream hit an error, shutting down: {}&quot;</span>, err);
 
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>));
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(err));
                 }
             }
 
-            <span class="comment">// then see if there is more to send</span>
-            <span class="kw">match</span> <span class="ident">outbound_messages</span>.<span class="ident">as_mut</span>().<span class="ident">poll_next</span>(<span class="ident">cx</span>) {
-                <span class="comment">// already handled above, here to make sure the poll() pops the next message</span>
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">dns_request</span>)) =&gt; {
-                    <span class="comment">// if there is no peer, this connection should die...</span>
-                    <span class="kw">let</span> (<span class="ident">dns_request</span>, <span class="ident">serial_response</span>): (<span class="ident">DnsRequest</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">dns_request</span>.<span class="ident">into_parts</span>();
+            <span class="comment">// then see if there is more to send
+            </span><span class="kw">match </span>outbound_messages.as_mut().poll_next(cx) {
+                <span class="comment">// already handled above, here to make sure the poll() pops the next message
+                </span>Poll::Ready(<span class="prelude-val">Some</span>(dns_request)) =&gt; {
+                    <span class="comment">// if there is no peer, this connection should die...
+                    </span><span class="kw">let </span>(dns_request, serial_response): (DnsRequest, <span class="kw">_</span>) = dns_request.into_parts();
 
-                    <span class="comment">// Try to forward the `DnsResponseStream` to the requesting task. If we fail,</span>
-                    <span class="comment">// it must be because the requesting task has gone away / is no longer</span>
-                    <span class="comment">// interested. In that case, we can just log a warning, but there&#39;s no need</span>
-                    <span class="comment">// to take any more serious measures (such as shutting down this task).</span>
-                    <span class="kw">match</span> <span class="ident">serial_response</span>.<span class="ident">send_response</span>(<span class="ident">io_stream</span>.<span class="ident">send_message</span>(<span class="ident">dns_request</span>)) {
+                    <span class="comment">// Try to forward the `DnsResponseStream` to the requesting task. If we fail,
+                    // it must be because the requesting task has gone away / is no longer
+                    // interested. In that case, we can just log a warning, but there&#39;s no need
+                    // to take any more serious measures (such as shutting down this task).
+                    </span><span class="kw">match </span>serial_response.send_response(io_stream.send_message(dns_request)) {
                         <span class="prelude-val">Ok</span>(()) =&gt; (),
                         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                             <span class="macro">warn!</span>(<span class="string">&quot;failed to associate send_message response to the sender&quot;</span>);
                         }
                     }
                 }
-                <span class="comment">// On not ready, this is our time to return...</span>
-                <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; {
-                    <span class="comment">// if there is nothing that can use this connection to send messages, then this is done...</span>
-                    <span class="ident">io_stream</span>.<span class="ident">shutdown</span>();
+                <span class="comment">// On not ready, this is our time to return...
+                </span>Poll::Pending =&gt; <span class="kw">return </span>Poll::Pending,
+                Poll::Ready(<span class="prelude-val">None</span>) =&gt; {
+                    <span class="comment">// if there is nothing that can use this connection to send messages, then this is done...
+                    </span>io_stream.shutdown();
 
-                    <span class="comment">// now we&#39;ll await the stream to shutdown... see io_stream poll above</span>
-                }
+                    <span class="comment">// now we&#39;ll await the stream to shutdown... see io_stream poll above
+                </span>}
             }
 
-            <span class="comment">// else we loop to poll on the outbound_messages</span>
-        }
+            <span class="comment">// else we loop to poll on the outbound_messages
+        </span>}
     }
 }
 
-<span class="doccomment">/// A wrapper for a future DnsExchange connection.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// DnsExchangeConnect is clonable, making it possible to share this if the connection</span>
-<span class="doccomment">///  will be shared across threads.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The future will return a tuple of the DnsExchange (for sending messages) and a background</span>
-<span class="doccomment">///  for running the background tasks. The background is optional as only one thread should run</span>
-<span class="doccomment">///  the background. If returned, it must be spawned before any dns requests will function.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DnsExchangeConnect</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>(<span class="ident">DnsExchangeConnectInner</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>)
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">S</span>: <span class="ident">DnsRequestSender</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">TE</span>: <span class="ident">Time</span> <span class="op">+</span> <span class="ident">Unpin</span>;
+<span class="doccomment">/// A wrapper for a future DnsExchange connection.
+///
+/// DnsExchangeConnect is clonable, making it possible to share this if the connection
+///  will be shared across threads.
+///
+/// The future will return a tuple of the DnsExchange (for sending messages) and a background
+///  for running the background tasks. The background is optional as only one thread should run
+///  the background. If returned, it must be spawned before any dns requests will function.
+</span><span class="kw">pub struct </span>DnsExchangeConnect&lt;F, S, TE&gt;(DnsExchangeConnectInner&lt;F, S, TE&gt;)
+<span class="kw">where
+    </span>F: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;S, ProtoError&gt;&gt; + <span class="lifetime">&#39;static </span>+ Send + Unpin,
+    S: DnsRequestSender + <span class="lifetime">&#39;static</span>,
+    TE: Time + Unpin;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span> <span class="ident">DnsExchangeConnect</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">S</span>: <span class="ident">DnsRequestSender</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">TE</span>: <span class="ident">Time</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;F, S, TE&gt; DnsExchangeConnect&lt;F, S, TE&gt;
+<span class="kw">where
+    </span>F: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;S, ProtoError&gt;&gt; + <span class="lifetime">&#39;static </span>+ Send + Unpin,
+    S: DnsRequestSender + <span class="lifetime">&#39;static</span>,
+    TE: Time + Unpin,
 {
-    <span class="kw">fn</span> <span class="ident">connect</span>(
-        <span class="ident">connect_future</span>: <span class="ident">F</span>,
-        <span class="ident">outbound_messages</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">OneshotDnsRequest</span><span class="op">&gt;</span>,
-        <span class="ident">sender</span>: <span class="ident">BufDnsRequestStreamHandle</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">DnsExchangeConnectInner::Connecting</span> {
-            <span class="ident">connect_future</span>,
-            <span class="ident">outbound_messages</span>: <span class="prelude-val">Some</span>(<span class="ident">outbound_messages</span>),
-            <span class="ident">sender</span>: <span class="prelude-val">Some</span>(<span class="ident">sender</span>),
+    <span class="kw">fn </span>connect(
+        connect_future: F,
+        outbound_messages: mpsc::Receiver&lt;OneshotDnsRequest&gt;,
+        sender: BufDnsRequestStreamHandle,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(DnsExchangeConnectInner::Connecting {
+            connect_future,
+            outbound_messages: <span class="prelude-val">Some</span>(outbound_messages),
+            sender: <span class="prelude-val">Some</span>(sender),
         })
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">DnsExchangeConnect</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">S</span>: <span class="ident">DnsRequestSender</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">TE</span>: <span class="ident">Time</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="attribute">#[allow(clippy::type_complexity)]
+</span><span class="kw">impl</span>&lt;F, S, TE&gt; Future <span class="kw">for </span>DnsExchangeConnect&lt;F, S, TE&gt;
+<span class="kw">where
+    </span>F: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;S, ProtoError&gt;&gt; + <span class="lifetime">&#39;static </span>+ Send + Unpin,
+    S: DnsRequestSender + <span class="lifetime">&#39;static </span>+ Send + Unpin,
+    TE: Time + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">DnsExchange</span>, <span class="ident">DnsExchangeBackground</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>), <span class="ident">ProtoError</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;(DnsExchange, DnsExchangeBackground&lt;S, TE&gt;), ProtoError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">poll_unpin</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.poll_unpin(cx)
     }
 }
 
-<span class="kw">enum</span> <span class="ident">DnsExchangeConnectInner</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
-    <span class="ident">S</span>: <span class="ident">DnsRequestSender</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
-    <span class="ident">TE</span>: <span class="ident">Time</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">enum </span>DnsExchangeConnectInner&lt;F, S, TE&gt;
+<span class="kw">where
+    </span>F: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;S, ProtoError&gt;&gt; + <span class="lifetime">&#39;static </span>+ Send,
+    S: DnsRequestSender + <span class="lifetime">&#39;static </span>+ Send,
+    TE: Time + Unpin,
 {
-    <span class="ident">Connecting</span> {
-        <span class="ident">connect_future</span>: <span class="ident">F</span>,
-        <span class="ident">outbound_messages</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">OneshotDnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">sender</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BufDnsRequestStreamHandle</span><span class="op">&gt;</span>,
+    Connecting {
+        connect_future: F,
+        outbound_messages: <span class="prelude-ty">Option</span>&lt;mpsc::Receiver&lt;OneshotDnsRequest&gt;&gt;,
+        sender: <span class="prelude-ty">Option</span>&lt;BufDnsRequestStreamHandle&gt;,
     },
-    <span class="ident">Connected</span> {
-        <span class="ident">exchange</span>: <span class="ident">DnsExchange</span>,
-        <span class="ident">background</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DnsExchangeBackground</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    Connected {
+        exchange: DnsExchange,
+        background: <span class="prelude-ty">Option</span>&lt;DnsExchangeBackground&lt;S, TE&gt;&gt;,
     },
-    <span class="ident">FailAll</span> {
-        <span class="ident">error</span>: <span class="ident">ProtoError</span>,
-        <span class="ident">outbound_messages</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">OneshotDnsRequest</span><span class="op">&gt;</span>,
+    FailAll {
+        error: ProtoError,
+        outbound_messages: mpsc::Receiver&lt;OneshotDnsRequest&gt;,
     },
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">DnsExchangeConnectInner</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">S</span>: <span class="ident">DnsRequestSender</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">TE</span>: <span class="ident">Time</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="attribute">#[allow(clippy::type_complexity)]
+</span><span class="kw">impl</span>&lt;F, S, TE&gt; Future <span class="kw">for </span>DnsExchangeConnectInner&lt;F, S, TE&gt;
+<span class="kw">where
+    </span>F: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;S, ProtoError&gt;&gt; + <span class="lifetime">&#39;static </span>+ Send + Unpin,
+    S: DnsRequestSender + <span class="lifetime">&#39;static </span>+ Send + Unpin,
+    TE: Time + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">DnsExchange</span>, <span class="ident">DnsExchangeBackground</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">TE</span><span class="op">&gt;</span>), <span class="ident">ProtoError</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;(DnsExchange, DnsExchangeBackground&lt;S, TE&gt;), ProtoError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">next</span>;
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                <span class="ident">DnsExchangeConnectInner::Connecting</span> {
-                    <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">connect_future</span>,
-                    <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">outbound_messages</span>,
-                    <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">sender</span>,
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>next;
+            <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+                DnsExchangeConnectInner::Connecting {
+                    <span class="kw-2">ref mut </span>connect_future,
+                    <span class="kw-2">ref mut </span>outbound_messages,
+                    <span class="kw-2">ref mut </span>sender,
                 } =&gt; {
-                    <span class="kw">let</span> <span class="ident">connect_future</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="ident">connect_future</span>);
-                    <span class="kw">match</span> <span class="ident">connect_future</span>.<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">stream</span>)) =&gt; {
-                            <span class="comment">//debug!(&quot;connection established: {}&quot;, stream);</span>
+                    <span class="kw">let </span>connect_future = Pin::new(connect_future);
+                    <span class="kw">match </span>connect_future.poll(cx) {
+                        Poll::Ready(<span class="prelude-val">Ok</span>(stream)) =&gt; {
+                            <span class="comment">//debug!(&quot;connection established: {}&quot;, stream);
 
-                            <span class="kw">let</span> (<span class="ident">exchange</span>, <span class="ident">background</span>) <span class="op">=</span> <span class="ident">DnsExchange::from_stream_with_receiver</span>(
-                                <span class="ident">stream</span>,
-                                <span class="ident">outbound_messages</span>
-                                    .<span class="ident">take</span>()
-                                    .<span class="ident">expect</span>(<span class="string">&quot;cannot poll after complete&quot;</span>),
-                                <span class="ident">sender</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;cannot poll after complete&quot;</span>),
+                            </span><span class="kw">let </span>(exchange, background) = DnsExchange::from_stream_with_receiver(
+                                stream,
+                                outbound_messages
+                                    .take()
+                                    .expect(<span class="string">&quot;cannot poll after complete&quot;</span>),
+                                sender.take().expect(<span class="string">&quot;cannot poll after complete&quot;</span>),
                             );
 
-                            <span class="ident">next</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Connected</span> {
-                                <span class="ident">exchange</span>,
-                                <span class="ident">background</span>: <span class="prelude-val">Some</span>(<span class="ident">background</span>),
+                            next = <span class="self">Self</span>::Connected {
+                                exchange,
+                                background: <span class="prelude-val">Some</span>(background),
                             };
                         }
-                        <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">error</span>)) =&gt; {
-                            <span class="macro">debug!</span>(<span class="string">&quot;stream errored while connecting: {:?}&quot;</span>, <span class="ident">error</span>);
-                            <span class="ident">next</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::FailAll</span> {
-                                <span class="ident">error</span>,
-                                <span class="ident">outbound_messages</span>: <span class="ident">outbound_messages</span>
-                                    .<span class="ident">take</span>()
-                                    .<span class="ident">expect</span>(<span class="string">&quot;cannot poll after complete&quot;</span>),
+                        Poll::Pending =&gt; <span class="kw">return </span>Poll::Pending,
+                        Poll::Ready(<span class="prelude-val">Err</span>(error)) =&gt; {
+                            <span class="macro">debug!</span>(<span class="string">&quot;stream errored while connecting: {:?}&quot;</span>, error);
+                            next = <span class="self">Self</span>::FailAll {
+                                error,
+                                outbound_messages: outbound_messages
+                                    .take()
+                                    .expect(<span class="string">&quot;cannot poll after complete&quot;</span>),
                             }
                         }
                     };
                 }
-                <span class="ident">DnsExchangeConnectInner::Connected</span> {
-                    <span class="kw-2">ref</span> <span class="ident">exchange</span>,
-                    <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">background</span>,
+                DnsExchangeConnectInner::Connected {
+                    <span class="kw-2">ref </span>exchange,
+                    <span class="kw-2">ref mut </span>background,
                 } =&gt; {
-                    <span class="kw">let</span> <span class="ident">exchange</span> <span class="op">=</span> <span class="ident">exchange</span>.<span class="ident">clone</span>();
-                    <span class="kw">let</span> <span class="ident">background</span> <span class="op">=</span> <span class="ident">background</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;cannot poll after complete&quot;</span>);
+                    <span class="kw">let </span>exchange = exchange.clone();
+                    <span class="kw">let </span>background = background.take().expect(<span class="string">&quot;cannot poll after complete&quot;</span>);
 
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>((<span class="ident">exchange</span>, <span class="ident">background</span>)));
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>((exchange, background)));
                 }
-                <span class="ident">DnsExchangeConnectInner::FailAll</span> {
-                    <span class="kw-2">ref</span> <span class="ident">error</span>,
-                    <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">outbound_messages</span>,
+                DnsExchangeConnectInner::FailAll {
+                    <span class="kw-2">ref </span>error,
+                    <span class="kw-2">ref mut </span>outbound_messages,
                 } =&gt; {
-                    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">outbound_message</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">outbound_messages</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll::Ready</span>(<span class="ident">opt</span>) =&gt; <span class="ident">opt</span>,
-                        <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
+                    <span class="kw">while let </span><span class="prelude-val">Some</span>(outbound_message) = <span class="kw">match </span>outbound_messages.poll_next_unpin(cx) {
+                        Poll::Ready(opt) =&gt; opt,
+                        Poll::Pending =&gt; <span class="kw">return </span>Poll::Pending,
                     } {
-                        <span class="comment">// ignoring errors... best effort send...</span>
-                        <span class="ident">outbound_message</span>
-                            .<span class="ident">into_parts</span>()
-                            .<span class="number">1</span>
-                            .<span class="ident">send_response</span>(<span class="ident">error</span>.<span class="ident">clone</span>().<span class="ident">into</span>())
-                            .<span class="ident">ok</span>();
+                        <span class="comment">// ignoring errors... best effort send...
+                        </span>outbound_message
+                            .into_parts()
+                            .<span class="number">1
+                            </span>.send_response(error.clone().into())
+                            .ok();
                     }
 
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">clone</span>()));
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(error.clone()));
                 }
             }
 
-            <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">next</span>;
+            <span class="kw-2">*</span><span class="self">self </span>= next;
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

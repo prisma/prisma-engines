@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/ser/impls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>impls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_with/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/ser/impls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>impls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_with/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -737,744 +737,744 @@
 <span id="737">737</span>
 <span id="738">738</span>
 <span id="739">739</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">formats::Strictness</span>, <span class="ident">rust::StringWithSeparator</span>, <span class="ident">utils::duration::DurationSigned</span>, <span class="ident">Separator</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{
+    formats::Strictness, rust::StringWithSeparator, utils::duration::DurationSigned, Separator,
 };
-<span class="kw">use</span> <span class="ident">alloc</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">boxed::Box</span>,
-    <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">BTreeSet</span>, <span class="ident">BinaryHeap</span>, <span class="ident">LinkedList</span>, <span class="ident">VecDeque</span>},
-    <span class="ident">rc</span>::{<span class="ident">Rc</span>, <span class="ident">Weak</span> <span class="kw">as</span> <span class="ident">RcWeak</span>},
-    <span class="ident">string</span>::{<span class="ident">String</span>, <span class="ident">ToString</span>},
-    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span> <span class="kw">as</span> <span class="ident">ArcWeak</span>},
-    <span class="ident">vec::Vec</span>,
+<span class="kw">use </span>alloc::{
+    borrow::Cow,
+    boxed::Box,
+    collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, VecDeque},
+    rc::{Rc, Weak <span class="kw">as </span>RcWeak},
+    string::{String, ToString},
+    sync::{Arc, Weak <span class="kw">as </span>ArcWeak},
+    vec::Vec,
 };
-<span class="kw">use</span> <span class="ident">core</span>::{
-    <span class="ident">cell</span>::{<span class="ident">Cell</span>, <span class="ident">RefCell</span>},
-    <span class="ident">convert::TryInto</span>,
-    <span class="ident">fmt::Display</span>,
-    <span class="ident">time::Duration</span>,
+<span class="kw">use </span>core::{
+    cell::{Cell, RefCell},
+    convert::TryInto,
+    fmt::Display,
+    time::Duration,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexmap&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">indexmap_crate</span>::{<span class="ident">IndexMap</span>, <span class="ident">IndexSet</span>};
-<span class="kw">use</span> <span class="ident">serde::ser::Error</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
-    <span class="ident">sync</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>},
-    <span class="ident">time::SystemTime</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;indexmap&quot;</span>)]
+</span><span class="kw">use </span>indexmap_crate::{IndexMap, IndexSet};
+<span class="kw">use </span>serde::ser::Error;
+<span class="kw">use </span>std::{
+    collections::{HashMap, HashSet},
+    sync::{Mutex, RwLock},
+    time::SystemTime,
 };
 
-<span class="comment">///////////////////////////////////////////////////////////////////////////////</span>
-<span class="comment">// region: Simple Wrapper types (e.g., Box, Option)</span>
+<span class="comment">///////////////////////////////////////////////////////////////////////////////
+// region: Simple Wrapper types (e.g., Box, Option)
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">U</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="ident">U</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, U&gt; SerializeAs&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>U
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
+    T: <span class="question-mark">?</span>Sized,
+    U: <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="op">&amp;&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: &amp;&amp;<span class="lifetime">&#39;a </span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;T, U&gt;::new(source).serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">U</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="ident">U</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, U&gt; SerializeAs&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>U
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
+    T: <span class="question-mark">?</span>Sized,
+    U: <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="op">&amp;&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: &amp;&amp;<span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;T, U&gt;::new(source).serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;Box&lt;T&gt;&gt; <span class="kw">for </span>Box&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>Box&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;T, U&gt;::new(source).serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">source</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">value</span>) =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_some</span>(<span class="kw-2">&amp;</span><span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">value</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+        <span class="kw">match </span><span class="kw-2">*</span>source {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>value) =&gt; serializer.serialize_some(<span class="kw-2">&amp;</span>SerializeAsWrap::&lt;T, U&gt;::new(value)),
+            <span class="prelude-val">None </span>=&gt; serializer.serialize_none(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;Rc&lt;T&gt;&gt; <span class="kw">for </span>Rc&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>Rc&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;T, U&gt;::new(source).serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">RcWeak</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RcWeak</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;RcWeak&lt;T&gt;&gt; <span class="kw">for </span>RcWeak&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">RcWeak</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>RcWeak&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">upgrade</span>())
-            .<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;<span class="prelude-ty">Option</span>&lt;Rc&lt;T&gt;&gt;, <span class="prelude-ty">Option</span>&lt;Rc&lt;U&gt;&gt;&gt;::new(<span class="kw-2">&amp;</span>source.upgrade())
+            .serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;Arc&lt;T&gt;&gt; <span class="kw">for </span>Arc&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>Arc&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;T, U&gt;::new(source).serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">ArcWeak</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ArcWeak</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;ArcWeak&lt;T&gt;&gt; <span class="kw">for </span>ArcWeak&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">ArcWeak</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>ArcWeak&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">upgrade</span>())
-            .<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;<span class="prelude-ty">Option</span>&lt;Arc&lt;T&gt;&gt;, <span class="prelude-ty">Option</span>&lt;Arc&lt;U&gt;&gt;&gt;::new(<span class="kw-2">&amp;</span>source.upgrade())
+            .serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">T</span>: <span class="ident">Copy</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;Cell&lt;T&gt;&gt; <span class="kw">for </span>Cell&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
+    T: Copy,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>Cell&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">get</span>()).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;T, U&gt;::new(<span class="kw-2">&amp;</span>source.get()).serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;RefCell&lt;T&gt;&gt; <span class="kw">for </span>RefCell&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>RefCell&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="kw">match</span> <span class="ident">source</span>.<span class="ident">try_borrow</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">source</span>) =&gt; <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">S::Error::custom</span>(<span class="string">&quot;already mutably borrowed&quot;</span>)),
+        <span class="kw">match </span>source.try_borrow() {
+            <span class="prelude-val">Ok</span>(source) =&gt; SerializeAsWrap::&lt;T, U&gt;::new(<span class="kw-2">&amp;*</span>source).serialize(serializer),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(S::Error::custom(<span class="string">&quot;already mutably borrowed&quot;</span>)),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;Mutex&lt;T&gt;&gt; <span class="kw">for </span>Mutex&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>Mutex&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="kw">match</span> <span class="ident">source</span>.<span class="ident">lock</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">source</span>) =&gt; <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">S::Error::custom</span>(<span class="string">&quot;lock poison error while serializing&quot;</span>)),
+        <span class="kw">match </span>source.lock() {
+            <span class="prelude-val">Ok</span>(source) =&gt; SerializeAsWrap::&lt;T, U&gt;::new(<span class="kw-2">&amp;*</span>source).serialize(serializer),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(S::Error::custom(<span class="string">&quot;lock poison error while serializing&quot;</span>)),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;RwLock&lt;T&gt;&gt; <span class="kw">for </span>RwLock&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>RwLock&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="kw">match</span> <span class="ident">source</span>.<span class="ident">read</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">source</span>) =&gt; <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">S::Error::custom</span>(<span class="string">&quot;lock poison error while serializing&quot;</span>)),
+        <span class="kw">match </span>source.read() {
+            <span class="prelude-val">Ok</span>(source) =&gt; SerializeAsWrap::&lt;T, U&gt;::new(<span class="kw-2">&amp;*</span>source).serialize(serializer),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(S::Error::custom(<span class="string">&quot;lock poison error while serializing&quot;</span>)),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TAs</span>, <span class="ident">E</span>, <span class="ident">EAs</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TAs</span>, <span class="ident">EAs</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">TAs</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">EAs</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, TAs, E, EAs&gt; SerializeAs&lt;<span class="prelude-ty">Result</span>&lt;T, E&gt;&gt; <span class="kw">for </span><span class="prelude-ty">Result</span>&lt;TAs, EAs&gt;
+<span class="kw">where
+    </span>TAs: SerializeAs&lt;T&gt;,
+    EAs: SerializeAs&lt;E&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span>&lt;T, E&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">source</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TAs</span><span class="op">&gt;</span><span class="ident">::new</span>)
-            .<span class="ident">map_err</span>(<span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">EAs</span><span class="op">&gt;</span><span class="ident">::new</span>)
-            .<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        source
+            .as_ref()
+            .map(SerializeAsWrap::&lt;T, TAs&gt;::new)
+            .map_err(SerializeAsWrap::&lt;E, EAs&gt;::new)
+            .serialize(serializer)
     }
 }
 
-<span class="comment">// endregion</span>
-<span class="comment">///////////////////////////////////////////////////////////////////////////////</span>
-<span class="comment">// region: Collection Types (e.g., Maps, Sets, Vec)</span>
+<span class="comment">// endregion
+///////////////////////////////////////////////////////////////////////////////
+// region: Collection Types (e.g., Maps, Sets, Vec)
 
-<span class="macro">macro_rules!</span> <span class="ident">seq_impl</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ident</span> <span class="op">&lt;</span> <span class="ident">T</span> $(: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tbound1</span>:<span class="ident">ident</span> $(<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tbound2</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>)<span class="op">*</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bound</span>:<span class="ident">ident</span> )<span class="op">*</span> <span class="op">&gt;</span>) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&lt;</span><span class="ident">T</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>)<span class="kw-2">*</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&lt;</span><span class="ident">U</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>)<span class="kw-2">*</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-            $(<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tbound1</span> $(<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tbound2</span>)<span class="kw-2">*</span>,)<span class="op">*</span>
-            $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bound</span>,)<span class="op">*</span>
+</span><span class="macro">macro_rules! </span>seq_impl {
+    (<span class="macro-nonterminal">$ty</span>:ident &lt; T $(: <span class="macro-nonterminal">$tbound1</span>:ident $(+ <span class="macro-nonterminal">$tbound2</span>:ident)<span class="kw-2">*</span>)* $(, <span class="macro-nonterminal">$typaram</span>:ident : <span class="macro-nonterminal">$bound</span>:ident )* &gt;) =&gt; {
+        <span class="kw">impl</span>&lt;T, U $(, <span class="macro-nonterminal">$typaram</span>)<span class="kw-2">*</span>&gt; SerializeAs&lt;<span class="macro-nonterminal">$ty</span>&lt;T $(, <span class="macro-nonterminal">$typaram</span>)<span class="kw-2">*</span>&gt;&gt; <span class="kw">for </span><span class="macro-nonterminal">$ty</span>&lt;U $(, <span class="macro-nonterminal">$typaram</span>)<span class="kw-2">*</span>&gt;
+        <span class="kw">where
+            </span>U: SerializeAs&lt;T&gt;,
+            $(T: <span class="question-mark">?</span>Sized + <span class="macro-nonterminal">$tbound1 </span>$(+ <span class="macro-nonterminal">$tbound2</span>)<span class="kw-2">*</span>,)*
+            $(<span class="macro-nonterminal">$typaram</span>: <span class="question-mark">?</span>Sized + <span class="macro-nonterminal">$bound</span>,)*
         {
-            <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&lt;</span><span class="ident">T</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>)<span class="kw-2">*</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">S</span>: <span class="ident">Serializer</span>,
+            <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$ty</span>&lt;T $(, <span class="macro-nonterminal">$typaram</span>)<span class="kw-2">*</span>&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+            <span class="kw">where
+                </span>S: Serializer,
             {
-                <span class="ident">serializer</span>.<span class="ident">collect_seq</span>(<span class="ident">source</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">item</span>)))
+                serializer.collect_seq(source.iter().map(|item| SerializeAsWrap::&lt;T, U&gt;::new(item)))
             }
         }
     }
 }
 
-<span class="kw">type</span> <span class="ident">BoxedSlice</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">Slice</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> [<span class="ident">T</span>];
-<span class="macro">seq_impl!</span>(<span class="ident">BinaryHeap</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-<span class="macro">seq_impl!</span>(<span class="ident">BoxedSlice</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-<span class="macro">seq_impl!</span>(<span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-<span class="macro">seq_impl!</span>(<span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>: <span class="ident">Sized</span><span class="op">&gt;</span>);
-<span class="macro">seq_impl!</span>(<span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-<span class="macro">seq_impl!</span>(<span class="ident">Slice</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-<span class="macro">seq_impl!</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-<span class="macro">seq_impl!</span>(<span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexmap&quot;</span>)]</span>
-<span class="macro">seq_impl!</span>(<span class="ident">IndexSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">H</span>: <span class="ident">Sized</span><span class="op">&gt;</span>);
+<span class="kw">type </span>BoxedSlice&lt;T&gt; = Box&lt;[T]&gt;;
+<span class="kw">type </span>Slice&lt;T&gt; = [T];
+<span class="macro">seq_impl!</span>(BinaryHeap&lt;T&gt;);
+<span class="macro">seq_impl!</span>(BoxedSlice&lt;T&gt;);
+<span class="macro">seq_impl!</span>(BTreeSet&lt;T&gt;);
+<span class="macro">seq_impl!</span>(HashSet&lt;T, H: Sized&gt;);
+<span class="macro">seq_impl!</span>(LinkedList&lt;T&gt;);
+<span class="macro">seq_impl!</span>(Slice&lt;T&gt;);
+<span class="macro">seq_impl!</span>(Vec&lt;T&gt;);
+<span class="macro">seq_impl!</span>(VecDeque&lt;T&gt;);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;indexmap&quot;</span>)]
+</span><span class="macro">seq_impl!</span>(IndexSet&lt;T, H: Sized&gt;);
 
-<span class="macro">macro_rules!</span> <span class="ident">map_impl</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ident</span> <span class="op">&lt;</span> <span class="ident">K</span> $(: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kbound1</span>:<span class="ident">ident</span> $(<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kbound2</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>)<span class="kw-2">*</span>, <span class="ident">V</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bound</span>:<span class="ident">ident</span>)<span class="op">*</span> <span class="op">&gt;</span>) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">KU</span>, <span class="ident">V</span>, <span class="ident">VU</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>)<span class="kw-2">*</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&lt;</span><span class="ident">KU</span>, <span class="ident">VU</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>)<span class="kw-2">*</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">KU</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
-            <span class="ident">VU</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>,
-            $(<span class="ident">K</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kbound1</span> $(<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kbound2</span>)<span class="kw-2">*</span>,)<span class="op">*</span>
-            $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bound</span>,)<span class="op">*</span>
+<span class="macro">macro_rules! </span>map_impl {
+    (<span class="macro-nonterminal">$ty</span>:ident &lt; K $(: <span class="macro-nonterminal">$kbound1</span>:ident $(+ <span class="macro-nonterminal">$kbound2</span>:ident)<span class="kw-2">*</span>)<span class="kw-2">*</span>, V $(, <span class="macro-nonterminal">$typaram</span>:ident : <span class="macro-nonterminal">$bound</span>:ident)* &gt;) =&gt; {
+        <span class="kw">impl</span>&lt;K, KU, V, VU $(, <span class="macro-nonterminal">$typaram</span>)<span class="kw-2">*</span>&gt; SerializeAs&lt;<span class="macro-nonterminal">$ty</span>&lt;K, V $(, <span class="macro-nonterminal">$typaram</span>)<span class="kw-2">*</span>&gt;&gt; <span class="kw">for </span><span class="macro-nonterminal">$ty</span>&lt;KU, VU $(, <span class="macro-nonterminal">$typaram</span>)<span class="kw-2">*</span>&gt;
+        <span class="kw">where
+            </span>KU: SerializeAs&lt;K&gt;,
+            VU: SerializeAs&lt;V&gt;,
+            $(K: <span class="question-mark">?</span>Sized + <span class="macro-nonterminal">$kbound1 </span>$(+ <span class="macro-nonterminal">$kbound2</span>)<span class="kw-2">*</span>,)*
+            $(<span class="macro-nonterminal">$typaram</span>: <span class="question-mark">?</span>Sized + <span class="macro-nonterminal">$bound</span>,)*
         {
-            <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>)<span class="kw-2">*</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">S</span>: <span class="ident">Serializer</span>,
+            <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$ty</span>&lt;K, V $(, <span class="macro-nonterminal">$typaram</span>)<span class="kw-2">*</span>&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+            <span class="kw">where
+                </span>S: Serializer,
             {
-                <span class="ident">serializer</span>.<span class="ident">collect_map</span>(<span class="ident">source</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">KU</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">k</span>), <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">V</span>, <span class="ident">VU</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">v</span>))))
+                serializer.collect_map(source.iter().map(|(k, v)| (SerializeAsWrap::&lt;K, KU&gt;::new(k), SerializeAsWrap::&lt;V, VU&gt;::new(v))))
             }
         }
     }
 }
 
-<span class="macro">map_impl!</span>(<span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>);
-<span class="macro">map_impl!</span>(<span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">H</span>: <span class="ident">Sized</span><span class="op">&gt;</span>);
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexmap&quot;</span>)]</span>
-<span class="macro">map_impl!</span>(<span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">H</span>: <span class="ident">Sized</span><span class="op">&gt;</span>);
+<span class="macro">map_impl!</span>(BTreeMap&lt;K, V&gt;);
+<span class="macro">map_impl!</span>(HashMap&lt;K, V, H: Sized&gt;);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;indexmap&quot;</span>)]
+</span><span class="macro">map_impl!</span>(IndexMap&lt;K, V, H: Sized&gt;);
 
-<span class="macro">macro_rules!</span> <span class="ident">tuple_impl</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">literal</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">tt</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tas</span>:<span class="ident">ident</span>)<span class="op">+</span>) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tas</span>,)<span class="op">+</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>,)<span class="op">+</span>)<span class="op">&gt;</span> <span class="kw">for</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tas</span>,)<span class="op">+</span>)
-        <span class="kw">where</span>
-            $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tas</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>,)<span class="op">+</span>
+<span class="macro">macro_rules! </span>tuple_impl {
+    (<span class="macro-nonterminal">$len</span>:literal $(<span class="macro-nonterminal">$n</span>:tt <span class="macro-nonterminal">$t</span>:ident <span class="macro-nonterminal">$tas</span>:ident)+) =&gt; {
+        <span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$t</span>, <span class="macro-nonterminal">$tas</span>,)+&gt; SerializeAs&lt;($(<span class="macro-nonterminal">$t</span>,)+)&gt; <span class="kw">for </span>($(<span class="macro-nonterminal">$tas</span>,)+)
+        <span class="kw">where
+            </span>$(<span class="macro-nonterminal">$tas</span>: SerializeAs&lt;<span class="macro-nonterminal">$t</span>&gt;,)+
         {
-            <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">tuple</span>: <span class="kw-2">&amp;</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>,)<span class="op">+</span>), <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">S</span>: <span class="ident">Serializer</span>,
+            <span class="kw">fn </span>serialize_as&lt;S&gt;(tuple: <span class="kw-2">&amp;</span>($(<span class="macro-nonterminal">$t</span>,)+), serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+            <span class="kw">where
+                </span>S: Serializer,
             {
-                <span class="kw">use</span> <span class="ident">serde::ser::SerializeTuple</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tup</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_tuple</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)<span class="question-mark">?</span>;
+                <span class="kw">use </span>serde::ser::SerializeTuple;
+                <span class="kw">let </span><span class="kw-2">mut </span>tup = serializer.serialize_tuple(<span class="macro-nonterminal">$len</span>)<span class="question-mark">?</span>;
                 $(
-                    <span class="ident">tup</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tas</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;</span><span class="ident">tuple</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>))<span class="question-mark">?</span>;
-                )<span class="op">+</span>
-                <span class="ident">tup</span>.<span class="ident">end</span>()
+                    tup.serialize_element(<span class="kw-2">&amp;</span>SerializeAsWrap::&lt;<span class="macro-nonterminal">$t</span>, <span class="macro-nonterminal">$tas</span>&gt;::new(<span class="kw-2">&amp;</span>tuple.<span class="macro-nonterminal">$n</span>))<span class="question-mark">?</span>;
+                )+
+                tup.end()
             }
         }
     };
 }
 
-<span class="macro">tuple_impl!</span>(<span class="number">1</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">2</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">3</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">4</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">5</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">6</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span> <span class="number">5</span> <span class="ident">T5</span> <span class="ident">As5</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">7</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span> <span class="number">5</span> <span class="ident">T5</span> <span class="ident">As5</span> <span class="number">6</span> <span class="ident">T6</span> <span class="ident">As6</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">8</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span> <span class="number">5</span> <span class="ident">T5</span> <span class="ident">As5</span> <span class="number">6</span> <span class="ident">T6</span> <span class="ident">As6</span> <span class="number">7</span> <span class="ident">T7</span> <span class="ident">As7</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">9</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span> <span class="number">5</span> <span class="ident">T5</span> <span class="ident">As5</span> <span class="number">6</span> <span class="ident">T6</span> <span class="ident">As6</span> <span class="number">7</span> <span class="ident">T7</span> <span class="ident">As7</span> <span class="number">8</span> <span class="ident">T8</span> <span class="ident">As8</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">10</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span> <span class="number">5</span> <span class="ident">T5</span> <span class="ident">As5</span> <span class="number">6</span> <span class="ident">T6</span> <span class="ident">As6</span> <span class="number">7</span> <span class="ident">T7</span> <span class="ident">As7</span> <span class="number">8</span> <span class="ident">T8</span> <span class="ident">As8</span> <span class="number">9</span> <span class="ident">T9</span> <span class="ident">As9</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">11</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span> <span class="number">5</span> <span class="ident">T5</span> <span class="ident">As5</span> <span class="number">6</span> <span class="ident">T6</span> <span class="ident">As6</span> <span class="number">7</span> <span class="ident">T7</span> <span class="ident">As7</span> <span class="number">8</span> <span class="ident">T8</span> <span class="ident">As8</span> <span class="number">9</span> <span class="ident">T9</span> <span class="ident">As9</span> <span class="number">10</span> <span class="ident">T10</span> <span class="ident">As10</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">12</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span> <span class="number">5</span> <span class="ident">T5</span> <span class="ident">As5</span> <span class="number">6</span> <span class="ident">T6</span> <span class="ident">As6</span> <span class="number">7</span> <span class="ident">T7</span> <span class="ident">As7</span> <span class="number">8</span> <span class="ident">T8</span> <span class="ident">As8</span> <span class="number">9</span> <span class="ident">T9</span> <span class="ident">As9</span> <span class="number">10</span> <span class="ident">T10</span> <span class="ident">As10</span> <span class="number">11</span> <span class="ident">T11</span> <span class="ident">As11</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">13</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span> <span class="number">5</span> <span class="ident">T5</span> <span class="ident">As5</span> <span class="number">6</span> <span class="ident">T6</span> <span class="ident">As6</span> <span class="number">7</span> <span class="ident">T7</span> <span class="ident">As7</span> <span class="number">8</span> <span class="ident">T8</span> <span class="ident">As8</span> <span class="number">9</span> <span class="ident">T9</span> <span class="ident">As9</span> <span class="number">10</span> <span class="ident">T10</span> <span class="ident">As10</span> <span class="number">11</span> <span class="ident">T11</span> <span class="ident">As11</span> <span class="number">12</span> <span class="ident">T12</span> <span class="ident">As12</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">14</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span> <span class="number">5</span> <span class="ident">T5</span> <span class="ident">As5</span> <span class="number">6</span> <span class="ident">T6</span> <span class="ident">As6</span> <span class="number">7</span> <span class="ident">T7</span> <span class="ident">As7</span> <span class="number">8</span> <span class="ident">T8</span> <span class="ident">As8</span> <span class="number">9</span> <span class="ident">T9</span> <span class="ident">As9</span> <span class="number">10</span> <span class="ident">T10</span> <span class="ident">As10</span> <span class="number">11</span> <span class="ident">T11</span> <span class="ident">As11</span> <span class="number">12</span> <span class="ident">T12</span> <span class="ident">As12</span> <span class="number">13</span> <span class="ident">T13</span> <span class="ident">As13</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">15</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span> <span class="number">5</span> <span class="ident">T5</span> <span class="ident">As5</span> <span class="number">6</span> <span class="ident">T6</span> <span class="ident">As6</span> <span class="number">7</span> <span class="ident">T7</span> <span class="ident">As7</span> <span class="number">8</span> <span class="ident">T8</span> <span class="ident">As8</span> <span class="number">9</span> <span class="ident">T9</span> <span class="ident">As9</span> <span class="number">10</span> <span class="ident">T10</span> <span class="ident">As10</span> <span class="number">11</span> <span class="ident">T11</span> <span class="ident">As11</span> <span class="number">12</span> <span class="ident">T12</span> <span class="ident">As12</span> <span class="number">13</span> <span class="ident">T13</span> <span class="ident">As13</span> <span class="number">14</span> <span class="ident">T14</span> <span class="ident">As14</span>);
-<span class="macro">tuple_impl!</span>(<span class="number">16</span> <span class="number">0</span> <span class="ident">T0</span> <span class="ident">As0</span> <span class="number">1</span> <span class="ident">T1</span> <span class="ident">As1</span> <span class="number">2</span> <span class="ident">T2</span> <span class="ident">As2</span> <span class="number">3</span> <span class="ident">T3</span> <span class="ident">As3</span> <span class="number">4</span> <span class="ident">T4</span> <span class="ident">As4</span> <span class="number">5</span> <span class="ident">T5</span> <span class="ident">As5</span> <span class="number">6</span> <span class="ident">T6</span> <span class="ident">As6</span> <span class="number">7</span> <span class="ident">T7</span> <span class="ident">As7</span> <span class="number">8</span> <span class="ident">T8</span> <span class="ident">As8</span> <span class="number">9</span> <span class="ident">T9</span> <span class="ident">As9</span> <span class="number">10</span> <span class="ident">T10</span> <span class="ident">As10</span> <span class="number">11</span> <span class="ident">T11</span> <span class="ident">As11</span> <span class="number">12</span> <span class="ident">T12</span> <span class="ident">As12</span> <span class="number">13</span> <span class="ident">T13</span> <span class="ident">As13</span> <span class="number">14</span> <span class="ident">T14</span> <span class="ident">As14</span> <span class="number">15</span> <span class="ident">T15</span> <span class="ident">As15</span>);
+<span class="macro">tuple_impl!</span>(<span class="number">1 0 </span>T0 As0);
+<span class="macro">tuple_impl!</span>(<span class="number">2 0 </span>T0 As0 <span class="number">1 </span>T1 As1);
+<span class="macro">tuple_impl!</span>(<span class="number">3 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2);
+<span class="macro">tuple_impl!</span>(<span class="number">4 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3);
+<span class="macro">tuple_impl!</span>(<span class="number">5 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4);
+<span class="macro">tuple_impl!</span>(<span class="number">6 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4 <span class="number">5 </span>T5 As5);
+<span class="macro">tuple_impl!</span>(<span class="number">7 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4 <span class="number">5 </span>T5 As5 <span class="number">6 </span>T6 As6);
+<span class="macro">tuple_impl!</span>(<span class="number">8 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4 <span class="number">5 </span>T5 As5 <span class="number">6 </span>T6 As6 <span class="number">7 </span>T7 As7);
+<span class="macro">tuple_impl!</span>(<span class="number">9 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4 <span class="number">5 </span>T5 As5 <span class="number">6 </span>T6 As6 <span class="number">7 </span>T7 As7 <span class="number">8 </span>T8 As8);
+<span class="macro">tuple_impl!</span>(<span class="number">10 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4 <span class="number">5 </span>T5 As5 <span class="number">6 </span>T6 As6 <span class="number">7 </span>T7 As7 <span class="number">8 </span>T8 As8 <span class="number">9 </span>T9 As9);
+<span class="macro">tuple_impl!</span>(<span class="number">11 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4 <span class="number">5 </span>T5 As5 <span class="number">6 </span>T6 As6 <span class="number">7 </span>T7 As7 <span class="number">8 </span>T8 As8 <span class="number">9 </span>T9 As9 <span class="number">10 </span>T10 As10);
+<span class="macro">tuple_impl!</span>(<span class="number">12 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4 <span class="number">5 </span>T5 As5 <span class="number">6 </span>T6 As6 <span class="number">7 </span>T7 As7 <span class="number">8 </span>T8 As8 <span class="number">9 </span>T9 As9 <span class="number">10 </span>T10 As10 <span class="number">11 </span>T11 As11);
+<span class="macro">tuple_impl!</span>(<span class="number">13 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4 <span class="number">5 </span>T5 As5 <span class="number">6 </span>T6 As6 <span class="number">7 </span>T7 As7 <span class="number">8 </span>T8 As8 <span class="number">9 </span>T9 As9 <span class="number">10 </span>T10 As10 <span class="number">11 </span>T11 As11 <span class="number">12 </span>T12 As12);
+<span class="macro">tuple_impl!</span>(<span class="number">14 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4 <span class="number">5 </span>T5 As5 <span class="number">6 </span>T6 As6 <span class="number">7 </span>T7 As7 <span class="number">8 </span>T8 As8 <span class="number">9 </span>T9 As9 <span class="number">10 </span>T10 As10 <span class="number">11 </span>T11 As11 <span class="number">12 </span>T12 As12 <span class="number">13 </span>T13 As13);
+<span class="macro">tuple_impl!</span>(<span class="number">15 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4 <span class="number">5 </span>T5 As5 <span class="number">6 </span>T6 As6 <span class="number">7 </span>T7 As7 <span class="number">8 </span>T8 As8 <span class="number">9 </span>T9 As9 <span class="number">10 </span>T10 As10 <span class="number">11 </span>T11 As11 <span class="number">12 </span>T12 As12 <span class="number">13 </span>T13 As13 <span class="number">14 </span>T14 As14);
+<span class="macro">tuple_impl!</span>(<span class="number">16 0 </span>T0 As0 <span class="number">1 </span>T1 As1 <span class="number">2 </span>T2 As2 <span class="number">3 </span>T3 As3 <span class="number">4 </span>T4 As4 <span class="number">5 </span>T5 As5 <span class="number">6 </span>T6 As6 <span class="number">7 </span>T7 As7 <span class="number">8 </span>T8 As8 <span class="number">9 </span>T9 As9 <span class="number">10 </span>T10 As10 <span class="number">11 </span>T11 As11 <span class="number">12 </span>T12 As12 <span class="number">13 </span>T13 As13 <span class="number">14 </span>T14 As14 <span class="number">15 </span>T15 As15);
 
-<span class="macro">macro_rules!</span> <span class="ident">map_as_tuple_seq</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ident</span> <span class="op">&lt;</span> <span class="ident">K</span> $(: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kbound1</span>:<span class="ident">ident</span> $(<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kbound2</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>)<span class="kw-2">*</span>, <span class="ident">V</span> <span class="op">&gt;</span>) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">KAs</span>, <span class="ident">V</span>, <span class="ident">VAs</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">KAs</span>, <span class="ident">VAs</span>)<span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">KAs</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
-            <span class="ident">VAs</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>,
+<span class="macro">macro_rules! </span>map_as_tuple_seq {
+    (<span class="macro-nonterminal">$ty</span>:ident &lt; K $(: <span class="macro-nonterminal">$kbound1</span>:ident $(+ <span class="macro-nonterminal">$kbound2</span>:ident)<span class="kw-2">*</span>)<span class="kw-2">*</span>, V &gt;) =&gt; {
+        <span class="kw">impl</span>&lt;K, KAs, V, VAs&gt; SerializeAs&lt;<span class="macro-nonterminal">$ty</span>&lt;K, V&gt;&gt; <span class="kw">for </span>Vec&lt;(KAs, VAs)&gt;
+        <span class="kw">where
+            </span>KAs: SerializeAs&lt;K&gt;,
+            VAs: SerializeAs&lt;V&gt;,
         {
-            <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">S</span>: <span class="ident">Serializer</span>,
+            <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$ty</span>&lt;K, V&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+            <span class="kw">where
+                </span>S: Serializer,
             {
-                <span class="ident">serializer</span>.<span class="ident">collect_seq</span>(<span class="ident">source</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> {
+                serializer.collect_seq(source.iter().map(|(k, v)| {
                     (
-                        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">KAs</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">k</span>),
-                        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">V</span>, <span class="ident">VAs</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">v</span>),
+                        SerializeAsWrap::&lt;K, KAs&gt;::new(k),
+                        SerializeAsWrap::&lt;V, VAs&gt;::new(v),
                     )
                 }))
             }
         }
     };
 }
-<span class="macro">map_as_tuple_seq!</span>(<span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>);
-<span class="comment">// TODO HashMap with a custom hasher support would be better, but results in &quot;unconstrained type parameter&quot;</span>
-<span class="macro">map_as_tuple_seq!</span>(<span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>);
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexmap&quot;</span>)]</span>
-<span class="macro">map_as_tuple_seq!</span>(<span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>);
+<span class="macro">map_as_tuple_seq!</span>(BTreeMap&lt;K, V&gt;);
+<span class="comment">// TODO HashMap with a custom hasher support would be better, but results in &quot;unconstrained type parameter&quot;
+</span><span class="macro">map_as_tuple_seq!</span>(HashMap&lt;K, V&gt;);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;indexmap&quot;</span>)]
+</span><span class="macro">map_as_tuple_seq!</span>(IndexMap&lt;K, V&gt;);
 
-<span class="comment">// endregion</span>
-<span class="comment">///////////////////////////////////////////////////////////////////////////////</span>
-<span class="comment">// region: Conversion types which cause different serialization behavior</span>
+<span class="comment">// endregion
+///////////////////////////////////////////////////////////////////////////////
+// region: Conversion types which cause different serialization behavior
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Same</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Serialize</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+</span><span class="kw">impl</span>&lt;T&gt; SerializeAs&lt;T&gt; <span class="kw">for </span>Same
+<span class="kw">where
+    </span>T: Serialize + <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">source</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        source.serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DisplayFromStr</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Display</span>,
+<span class="kw">impl</span>&lt;T&gt; SerializeAs&lt;T&gt; <span class="kw">for </span>DisplayFromStr
+<span class="kw">where
+    </span>T: Display,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident"><span class="kw">crate</span>::rust::display_fromstr::serialize</span>(<span class="ident">source</span>, <span class="ident">serializer</span>)
+        <span class="kw">crate</span>::rust::display_fromstr::serialize(source, serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">VecSkipError</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;Vec&lt;T&gt;&gt; <span class="kw">for </span>VecSkipError&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>Vec&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="ident">::serialize_as</span>(<span class="ident">source</span>, <span class="ident">serializer</span>)
+        Vec::&lt;U&gt;::serialize_as(source, serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">AsRefStr</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsRefStr</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NoneAsEmptyString</span>
-<span class="kw">where</span>
-    <span class="ident">AsRefStr</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;AsRefStr&gt; SerializeAs&lt;<span class="prelude-ty">Option</span>&lt;AsRefStr&gt;&gt; <span class="kw">for </span>NoneAsEmptyString
+<span class="kw">where
+    </span>AsRefStr: AsRef&lt;str&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsRefStr</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;AsRefStr&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident"><span class="kw">crate</span>::rust::string_empty_as_none::serialize</span>(<span class="ident">source</span>, <span class="ident">serializer</span>)
+        <span class="kw">crate</span>::rust::string_empty_as_none::serialize(source, serializer)
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">tuple_seq_as_map_impl_intern</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tyorig</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ident</span> <span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::implicit_hasher</span>)]</span>
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">KAs</span>, <span class="ident">V</span>, <span class="ident">VAs</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tyorig</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&lt;</span><span class="ident">KAs</span>, <span class="ident">VAs</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">KAs</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
-            <span class="ident">VAs</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>,
+<span class="macro">macro_rules! </span>tuple_seq_as_map_impl_intern {
+    (<span class="macro-nonterminal">$tyorig</span>:ty, <span class="macro-nonterminal">$ty</span>:ident &lt;K, V&gt;) =&gt; {
+        <span class="attribute">#[allow(clippy::implicit_hasher)]
+        </span><span class="kw">impl</span>&lt;K, KAs, V, VAs&gt; SerializeAs&lt;<span class="macro-nonterminal">$tyorig</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$ty</span>&lt;KAs, VAs&gt;
+        <span class="kw">where
+            </span>KAs: SerializeAs&lt;K&gt;,
+            VAs: SerializeAs&lt;V&gt;,
         {
-            <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tyorig</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">S</span>: <span class="ident">Serializer</span>,
+            <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$tyorig</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+            <span class="kw">where
+                </span>S: Serializer,
             {
-                <span class="ident">serializer</span>.<span class="ident">collect_map</span>(<span class="ident">source</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> {
+                serializer.collect_map(source.iter().map(|(k, v)| {
                     (
-                        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">KAs</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">k</span>),
-                        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">V</span>, <span class="ident">VAs</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">v</span>),
+                        SerializeAsWrap::&lt;K, KAs&gt;::new(k),
+                        SerializeAsWrap::&lt;V, VAs&gt;::new(v),
                     )
                 }))
             }
         }
     };
 }
-<span class="macro">macro_rules!</span> <span class="ident">tuple_seq_as_map_impl</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span> $(,)<span class="question-mark">?</span>)<span class="op">+</span>) =&gt; {$(
-        <span class="macro">tuple_seq_as_map_impl_intern!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>);
-        <span class="macro">tuple_seq_as_map_impl_intern!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>);
-    )<span class="op">+</span>}
+<span class="macro">macro_rules! </span>tuple_seq_as_map_impl {
+    ($(<span class="macro-nonterminal">$ty</span>:ty $(,)<span class="question-mark">?</span>)+) =&gt; {$(
+        <span class="macro">tuple_seq_as_map_impl_intern!</span>(<span class="macro-nonterminal">$ty</span>, BTreeMap&lt;K, V&gt;);
+        <span class="macro">tuple_seq_as_map_impl_intern!</span>(<span class="macro-nonterminal">$ty</span>, HashMap&lt;K, V&gt;);
+    )+}
 }
 
-<span class="macro">tuple_seq_as_map_impl!</span> {
-    <span class="ident">BinaryHeap</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>,
-    <span class="ident">BTreeSet</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>,
-    <span class="ident">LinkedList</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>,
-    <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>,
-    <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>,
-    <span class="ident">VecDeque</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>,
+<span class="macro">tuple_seq_as_map_impl! </span>{
+    BinaryHeap&lt;(K, V)&gt;,
+    BTreeSet&lt;(K, V)&gt;,
+    LinkedList&lt;(K, V)&gt;,
+    <span class="prelude-ty">Option</span>&lt;(K, V)&gt;,
+    Vec&lt;(K, V)&gt;,
+    VecDeque&lt;(K, V)&gt;,
 }
-<span class="macro">tuple_seq_as_map_impl!</span>(<span class="ident">HashSet</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>);
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexmap&quot;</span>)]</span>
-<span class="macro">tuple_seq_as_map_impl!</span>(<span class="ident">IndexSet</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>);
+<span class="macro">tuple_seq_as_map_impl!</span>(HashSet&lt;(K, V)&gt;);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;indexmap&quot;</span>)]
+</span><span class="macro">tuple_seq_as_map_impl!</span>(IndexSet&lt;(K, V)&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TAs</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DefaultOnError</span><span class="op">&lt;</span><span class="ident">TAs</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">TAs</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, TAs&gt; SerializeAs&lt;T&gt; <span class="kw">for </span>DefaultOnError&lt;TAs&gt;
+<span class="kw">where
+    </span>TAs: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">TAs::serialize_as</span>(<span class="ident">source</span>, <span class="ident">serializer</span>)
+        TAs::serialize_as(source, serializer)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BytesOrString</span> {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl </span>SerializeAs&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>BytesOrString {
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>Vec&lt;u8&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">source</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        source.serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">SEPARATOR</span>, <span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StringWithSeparator</span><span class="op">&lt;</span><span class="ident">SEPARATOR</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">SEPARATOR</span>: <span class="ident">Separator</span>,
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">T</span>: <span class="ident">ToString</span>,
+<span class="kw">impl</span>&lt;SEPARATOR, I, T&gt; SerializeAs&lt;I&gt; <span class="kw">for </span>StringWithSeparator&lt;SEPARATOR, T&gt;
+<span class="kw">where
+    </span>SEPARATOR: Separator,
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;,
+    T: ToString,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">I</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>I, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">source</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>.<span class="ident">to_string</span>());
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="ident">SEPARATOR::separator</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
+        <span class="kw">for </span>v <span class="kw">in </span>source {
+            s.push_str(<span class="kw-2">&amp;*</span>v.to_string());
+            s.push_str(SEPARATOR::separator());
         }
-        <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="kw">if</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// remove trailing separator if present</span>
-            <span class="kw-2">&amp;</span><span class="ident">s</span>[..<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">SEPARATOR::separator</span>().<span class="ident">len</span>()]
-        } <span class="kw">else</span> {
-            <span class="kw-2">&amp;</span><span class="ident">s</span>[..]
+        serializer.serialize_str(<span class="kw">if </span>!s.is_empty() {
+            <span class="comment">// remove trailing separator if present
+            </span><span class="kw-2">&amp;</span>s[..s.len() - SEPARATOR::separator().len()]
+        } <span class="kw">else </span>{
+            <span class="kw-2">&amp;</span>s[..]
         })
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">use_signed_duration</span> {
+<span class="macro">macro_rules! </span>use_signed_duration {
     (
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">main_trait</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">internal_trait</span>:<span class="ident">ident</span> =&gt;
+        <span class="macro-nonterminal">$main_trait</span>:ident <span class="macro-nonterminal">$internal_trait</span>:ident =&gt;
         {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span> =&gt;
+            <span class="macro-nonterminal">$ty</span>:ty =&gt;
             $({
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">strictness</span>:<span class="ident">ty</span> =&gt;
-                $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tbound</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bound</span>:<span class="ident">ident</span> $(,)<span class="question-mark">?</span>)<span class="op">*</span>
-            })<span class="op">*</span>
+                <span class="macro-nonterminal">$format</span>:ty, <span class="macro-nonterminal">$strictness</span>:ty =&gt;
+                $(<span class="macro-nonterminal">$tbound</span>:ident: <span class="macro-nonterminal">$bound</span>:ident $(,)<span class="question-mark">?</span>)*
+            })*
         }
     ) =&gt; {
         $(
-            <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tbound</span>,)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">main_trait</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">strictness</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tbound</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bound</span>,)<span class="op">*</span>
+            <span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$tbound</span>,)<span class="kw-2">*</span>&gt; SerializeAs&lt;<span class="macro-nonterminal">$ty</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$main_trait</span>&lt;<span class="macro-nonterminal">$format</span>, <span class="macro-nonterminal">$strictness</span>&gt;
+            <span class="kw">where
+                </span>$(<span class="macro-nonterminal">$tbound</span>: <span class="macro-nonterminal">$bound</span>,)*
             {
-                <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-                <span class="kw">where</span>
-                    <span class="ident">S</span>: <span class="ident">Serializer</span>,
+                <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$ty</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+                <span class="kw">where
+                    </span>S: Serializer,
                 {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">internal_trait</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">strictness</span><span class="op">&gt;</span><span class="ident">::serialize_as</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">DurationSigned::from</span>(<span class="ident">source</span>),
-                        <span class="ident">serializer</span>,
+                    <span class="macro-nonterminal">$internal_trait</span>::&lt;<span class="macro-nonterminal">$format</span>, <span class="macro-nonterminal">$strictness</span>&gt;::serialize_as(
+                        <span class="kw-2">&amp;</span>DurationSigned::from(source),
+                        serializer,
                     )
                 }
             }
-        )<span class="op">*</span>
+        )*
     };
     (
-        $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">main_trait</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">internal_trait</span>:<span class="ident">ident</span>, )<span class="op">+</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>
+        $( <span class="macro-nonterminal">$main_trait</span>:ident <span class="macro-nonterminal">$internal_trait</span>:ident, )+ =&gt; <span class="macro-nonterminal">$rest</span>:tt
     ) =&gt; {
-        $( <span class="macro">use_signed_duration!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">main_trait</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">internal_trait</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>); )<span class="op">+</span>
+        $( <span class="macro">use_signed_duration!</span>(<span class="macro-nonterminal">$main_trait $internal_trait </span>=&gt; <span class="macro-nonterminal">$rest</span>); )+
     };
 }
 
 <span class="macro">use_signed_duration!</span>(
-    <span class="ident">DurationSeconds</span> <span class="ident">DurationSeconds</span>,
-    <span class="ident">DurationMilliSeconds</span> <span class="ident">DurationMilliSeconds</span>,
-    <span class="ident">DurationMicroSeconds</span> <span class="ident">DurationMicroSeconds</span>,
-    <span class="ident">DurationNanoSeconds</span> <span class="ident">DurationNanoSeconds</span>,
+    DurationSeconds DurationSeconds,
+    DurationMilliSeconds DurationMilliSeconds,
+    DurationMicroSeconds DurationMicroSeconds,
+    DurationNanoSeconds DurationNanoSeconds,
     =&gt; {
-        <span class="ident">Duration</span> =&gt;
-        {<span class="ident">u64</span>, <span class="ident">STRICTNESS</span> =&gt; <span class="ident">STRICTNESS</span>: <span class="ident">Strictness</span>}
-        {<span class="ident">f64</span>, <span class="ident">STRICTNESS</span> =&gt; <span class="ident">STRICTNESS</span>: <span class="ident">Strictness</span>}
-        {<span class="ident">String</span>, <span class="ident">STRICTNESS</span> =&gt; <span class="ident">STRICTNESS</span>: <span class="ident">Strictness</span>}
+        Duration =&gt;
+        {u64, STRICTNESS =&gt; STRICTNESS: Strictness}
+        {f64, STRICTNESS =&gt; STRICTNESS: Strictness}
+        {String, STRICTNESS =&gt; STRICTNESS: Strictness}
     }
 );
 <span class="macro">use_signed_duration!</span>(
-    <span class="ident">DurationSecondsWithFrac</span> <span class="ident">DurationSecondsWithFrac</span>,
-    <span class="ident">DurationMilliSecondsWithFrac</span> <span class="ident">DurationMilliSecondsWithFrac</span>,
-    <span class="ident">DurationMicroSecondsWithFrac</span> <span class="ident">DurationMicroSecondsWithFrac</span>,
-    <span class="ident">DurationNanoSecondsWithFrac</span> <span class="ident">DurationNanoSecondsWithFrac</span>,
+    DurationSecondsWithFrac DurationSecondsWithFrac,
+    DurationMilliSecondsWithFrac DurationMilliSecondsWithFrac,
+    DurationMicroSecondsWithFrac DurationMicroSecondsWithFrac,
+    DurationNanoSecondsWithFrac DurationNanoSecondsWithFrac,
     =&gt; {
-        <span class="ident">Duration</span> =&gt;
-        {<span class="ident">f64</span>, <span class="ident">STRICTNESS</span> =&gt; <span class="ident">STRICTNESS</span>: <span class="ident">Strictness</span>}
-        {<span class="ident">String</span>, <span class="ident">STRICTNESS</span> =&gt; <span class="ident">STRICTNESS</span>: <span class="ident">Strictness</span>}
+        Duration =&gt;
+        {f64, STRICTNESS =&gt; STRICTNESS: Strictness}
+        {String, STRICTNESS =&gt; STRICTNESS: Strictness}
     }
 );
 
 <span class="macro">use_signed_duration!</span>(
-    <span class="ident">TimestampSeconds</span> <span class="ident">DurationSeconds</span>,
-    <span class="ident">TimestampMilliSeconds</span> <span class="ident">DurationMilliSeconds</span>,
-    <span class="ident">TimestampMicroSeconds</span> <span class="ident">DurationMicroSeconds</span>,
-    <span class="ident">TimestampNanoSeconds</span> <span class="ident">DurationNanoSeconds</span>,
+    TimestampSeconds DurationSeconds,
+    TimestampMilliSeconds DurationMilliSeconds,
+    TimestampMicroSeconds DurationMicroSeconds,
+    TimestampNanoSeconds DurationNanoSeconds,
     =&gt; {
-        <span class="ident">SystemTime</span> =&gt;
-        {<span class="ident">i64</span>, <span class="ident">STRICTNESS</span> =&gt; <span class="ident">STRICTNESS</span>: <span class="ident">Strictness</span>}
-        {<span class="ident">f64</span>, <span class="ident">STRICTNESS</span> =&gt; <span class="ident">STRICTNESS</span>: <span class="ident">Strictness</span>}
-        {<span class="ident">String</span>, <span class="ident">STRICTNESS</span> =&gt; <span class="ident">STRICTNESS</span>: <span class="ident">Strictness</span>}
+        SystemTime =&gt;
+        {i64, STRICTNESS =&gt; STRICTNESS: Strictness}
+        {f64, STRICTNESS =&gt; STRICTNESS: Strictness}
+        {String, STRICTNESS =&gt; STRICTNESS: Strictness}
     }
 );
 <span class="macro">use_signed_duration!</span>(
-    <span class="ident">TimestampSecondsWithFrac</span> <span class="ident">DurationSecondsWithFrac</span>,
-    <span class="ident">TimestampMilliSecondsWithFrac</span> <span class="ident">DurationMilliSecondsWithFrac</span>,
-    <span class="ident">TimestampMicroSecondsWithFrac</span> <span class="ident">DurationMicroSecondsWithFrac</span>,
-    <span class="ident">TimestampNanoSecondsWithFrac</span> <span class="ident">DurationNanoSecondsWithFrac</span>,
+    TimestampSecondsWithFrac DurationSecondsWithFrac,
+    TimestampMilliSecondsWithFrac DurationMilliSecondsWithFrac,
+    TimestampMicroSecondsWithFrac DurationMicroSecondsWithFrac,
+    TimestampNanoSecondsWithFrac DurationNanoSecondsWithFrac,
     =&gt; {
-        <span class="ident">SystemTime</span> =&gt;
-        {<span class="ident">f64</span>, <span class="ident">STRICTNESS</span> =&gt; <span class="ident">STRICTNESS</span>: <span class="ident">Strictness</span>}
-        {<span class="ident">String</span>, <span class="ident">STRICTNESS</span> =&gt; <span class="ident">STRICTNESS</span>: <span class="ident">Strictness</span>}
+        SystemTime =&gt;
+        {f64, STRICTNESS =&gt; STRICTNESS: Strictness}
+        {String, STRICTNESS =&gt; STRICTNESS: Strictness}
     }
 );
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DefaultOnNull</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;T&gt; <span class="kw">for </span>DefaultOnNull&lt;U&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">serializer</span>.<span class="ident">serialize_some</span>(<span class="kw-2">&amp;</span><span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>))
+        serializer.serialize_some(<span class="kw-2">&amp;</span>SerializeAsWrap::&lt;T, U&gt;::new(source))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="op">&amp;&amp;</span>[<span class="ident">u8</span>], <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl </span>SerializeAs&lt;<span class="kw-2">&amp;</span>[u8]&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(bytes: &amp;&amp;[u8], serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">serializer</span>.<span class="ident">serialize_bytes</span>(<span class="ident">bytes</span>)
+        serializer.serialize_bytes(bytes)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl </span>SerializeAs&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(bytes: <span class="kw-2">&amp;</span>Vec&lt;u8&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">serializer</span>.<span class="ident">serialize_bytes</span>(<span class="ident">bytes</span>)
+        serializer.serialize_bytes(bytes)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl </span>SerializeAs&lt;Box&lt;[u8]&gt;&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(bytes: <span class="kw-2">&amp;</span>Box&lt;[u8]&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">serializer</span>.<span class="ident">serialize_bytes</span>(<span class="ident">bytes</span>)
+        serializer.serialize_bytes(bytes)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SerializeAs&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(bytes: <span class="kw-2">&amp;</span>Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">serializer</span>.<span class="ident">serialize_bytes</span>(<span class="ident">bytes</span>)
+        serializer.serialize_bytes(bytes)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OneOrMany</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">formats::PreferOne</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;Vec&lt;T&gt;&gt; <span class="kw">for </span>OneOrMany&lt;U, formats::PreferOne&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>Vec&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="kw">match</span> <span class="ident">source</span>.<span class="ident">len</span>() {
-            <span class="number">1</span> =&gt; <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot be empty&quot;</span>))
-                .<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="kw">_</span> =&gt; <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>),
+        <span class="kw">match </span>source.len() {
+            <span class="number">1 </span>=&gt; SerializeAsWrap::&lt;T, U&gt;::new(source.iter().next().expect(<span class="string">&quot;Cannot be empty&quot;</span>))
+                .serialize(serializer),
+            <span class="kw">_ </span>=&gt; SerializeAsWrap::&lt;Vec&lt;T&gt;, Vec&lt;U&gt;&gt;::new(source).serialize(serializer),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OneOrMany</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">formats::PreferMany</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;Vec&lt;T&gt;&gt; <span class="kw">for </span>OneOrMany&lt;U, formats::PreferMany&gt;
+<span class="kw">where
+    </span>U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>Vec&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;Vec&lt;T&gt;, Vec&lt;U&gt;&gt;::new(source).serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TAs1</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PickFirst</span><span class="op">&lt;</span>(<span class="ident">TAs1</span>,)<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">TAs1</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, TAs1&gt; SerializeAs&lt;T&gt; <span class="kw">for </span>PickFirst&lt;(TAs1,)&gt;
+<span class="kw">where
+    </span>TAs1: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TAs1</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;T, TAs1&gt;::new(source).serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TAs1</span>, <span class="ident">TAs2</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PickFirst</span><span class="op">&lt;</span>(<span class="ident">TAs1</span>, <span class="ident">TAs2</span>)<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">TAs1</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, TAs1, TAs2&gt; SerializeAs&lt;T&gt; <span class="kw">for </span>PickFirst&lt;(TAs1, TAs2)&gt;
+<span class="kw">where
+    </span>TAs1: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TAs1</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;T, TAs1&gt;::new(source).serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TAs1</span>, <span class="ident">TAs2</span>, <span class="ident">TAs3</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PickFirst</span><span class="op">&lt;</span>(<span class="ident">TAs1</span>, <span class="ident">TAs2</span>, <span class="ident">TAs3</span>)<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">TAs1</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, TAs1, TAs2, TAs3&gt; SerializeAs&lt;T&gt; <span class="kw">for </span>PickFirst&lt;(TAs1, TAs2, TAs3)&gt;
+<span class="kw">where
+    </span>TAs1: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TAs1</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;T, TAs1&gt;::new(source).serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TAs1</span>, <span class="ident">TAs2</span>, <span class="ident">TAs3</span>, <span class="ident">TAs4</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PickFirst</span><span class="op">&lt;</span>(<span class="ident">TAs1</span>, <span class="ident">TAs2</span>, <span class="ident">TAs3</span>, <span class="ident">TAs4</span>)<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">TAs1</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, TAs1, TAs2, TAs3, TAs4&gt; SerializeAs&lt;T&gt; <span class="kw">for </span>PickFirst&lt;(TAs1, TAs2, TAs3, TAs4)&gt;
+<span class="kw">where
+    </span>TAs1: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">SerializeAsWrap</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TAs1</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">source</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        SerializeAsWrap::&lt;T, TAs1&gt;::new(source).serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FromInto</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">U</span>: <span class="ident">Serialize</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;T&gt; <span class="kw">for </span>FromInto&lt;U&gt;
+<span class="kw">where
+    </span>T: Into&lt;U&gt; + Clone,
+    U: Serialize,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">source</span>.<span class="ident">clone</span>().<span class="ident">into</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        source.clone().into().serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TryFromInto</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>: <span class="ident">Display</span>,
-    <span class="ident">U</span>: <span class="ident">Serialize</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SerializeAs&lt;T&gt; <span class="kw">for </span>TryFromInto&lt;U&gt;
+<span class="kw">where
+    </span>T: TryInto&lt;U&gt; + Clone,
+    &lt;T <span class="kw">as </span>TryInto&lt;U&gt;&gt;::Error: Display,
+    U: Serialize,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">source</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">try_into</span>()
-            .<span class="ident">map_err</span>(<span class="ident">S::Error::custom</span>)<span class="question-mark">?</span>
-            .<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        source
+            .clone()
+            .try_into()
+            .map_err(S::Error::custom)<span class="question-mark">?
+            </span>.serialize(serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BorrowCow</span> {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SerializeAs&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; <span class="kw">for </span>BorrowCow {
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="ident">source</span>)
+        serializer.serialize_str(source)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BorrowCow</span> {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SerializeAs&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt; <span class="kw">for </span>BorrowCow {
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(value: <span class="kw-2">&amp;</span>Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">serializer</span>.<span class="ident">collect_seq</span>(<span class="ident">value</span>.<span class="ident">iter</span>())
+        serializer.collect_seq(value.iter())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">STRICTNESS</span>: <span class="ident">Strictness</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BoolFromInt</span><span class="op">&lt;</span><span class="ident">STRICTNESS</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">bool</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl</span>&lt;STRICTNESS: Strictness&gt; SerializeAs&lt;bool&gt; <span class="kw">for </span>BoolFromInt&lt;STRICTNESS&gt; {
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>bool, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">serializer</span>.<span class="ident">serialize_u8</span>(<span class="kw-2">*</span><span class="ident">source</span> <span class="kw">as</span> <span class="ident">u8</span>)
+        serializer.serialize_u8(<span class="kw-2">*</span>source <span class="kw">as </span>u8)
     }
 }
 
-<span class="comment">// endregion</span>
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+<span class="comment">// endregion
+</span></code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

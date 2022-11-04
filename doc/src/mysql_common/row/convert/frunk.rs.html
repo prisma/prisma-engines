@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/row/convert/frunk.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>frunk.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/row/convert/frunk.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>frunk.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -198,191 +198,191 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="doccomment">//! `FromRow` implementation for `frunk::HList`.</span>
+</span><span class="doccomment">//! `FromRow` implementation for `frunk::HList`.
 
-<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;frunk&quot;</span>)]</span>
+</span><span class="attribute">#![cfg(feature = <span class="string">&quot;frunk&quot;</span>)]
 
-<span class="kw">use</span> <span class="ident">frunk</span>::{<span class="ident">hlist::h_cons</span>, <span class="ident">prelude::HList</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">frunk</span>::{<span class="ident">HCons</span>, <span class="ident">HNil</span>};
+</span><span class="kw">use </span>frunk::{hlist::h_cons, prelude::HList};
+<span class="kw">pub use </span>frunk::{HCons, HNil};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FromRow</span>, <span class="ident">FromRowError</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">row</span>::{<span class="ident">new_row_raw</span>, <span class="ident">Row</span>},
-    <span class="ident">value</span>::{
-        <span class="ident">convert</span>::{<span class="ident">ConvIr</span>, <span class="ident">FromValue</span>, <span class="ident">FromValueError</span>},
-        <span class="ident">Value</span>,
+<span class="kw">use super</span>::{FromRow, FromRowError};
+<span class="kw">use crate</span>::{
+    row::{new_row_raw, Row},
+    value::{
+        convert::{ConvIr, FromValue, FromValueError},
+        Value,
     },
 };
 
-<span class="kw">impl</span> <span class="ident">FromRow</span> <span class="kw">for</span> <span class="ident">HNil</span> {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromRowError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+<span class="kw">impl </span>FromRow <span class="kw">for </span>HNil {
+    <span class="kw">fn </span>from_row_opt(row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FromRowError&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">row</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+        <span class="kw">if </span>!row.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">HNil</span>)
+        <span class="prelude-val">Ok</span>(HNil)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> <span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">H</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">sealed::HlistFromRow</span>,
-    <span class="ident">T</span>: <span class="ident">HList</span>,
+<span class="kw">impl</span>&lt;H, T&gt; FromRow <span class="kw">for </span>HCons&lt;H, T&gt;
+<span class="kw">where
+    </span>H: FromValue,
+    T: FromRow + sealed::HlistFromRow,
+    T: HList,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromRowError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="kw">fn </span>from_row_opt(row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FromRowError&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="kw">use</span> <span class="ident">sealed::HlistFromRow</span>;
+        <span class="kw">use </span>sealed::HlistFromRow;
 
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::LEN</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+        <span class="kw">if </span>row.len() != <span class="self">Self</span>::LEN {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
 
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">columns</span>();
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">unwrap_raw</span>();
+        <span class="kw">let </span>columns = row.columns();
+        <span class="kw">let </span>values = row.unwrap_raw();
 
-        <span class="ident"><span class="self">Self</span>::hlist_from_row_opt</span>(<span class="ident">values</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">values</span><span class="op">|</span> <span class="ident">FromRowError</span>(<span class="ident">new_row_raw</span>(<span class="ident">values</span>, <span class="ident">columns</span>)))
+        <span class="self">Self</span>::hlist_from_row_opt(values)
+            .map_err(|values| FromRowError(new_row_raw(values, columns)))
     }
 }
 
-<span class="kw">mod</span> <span class="ident">sealed</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>sealed {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="doccomment">/// Helper trait for `FromRow for HList`.</span>
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">HlistFromRow</span>: <span class="ident">Sized</span> {
-        <span class="kw">fn</span> <span class="ident">hlist_from_row_opt</span>(<span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Helper trait for `FromRow for HList`.
+    </span><span class="kw">pub trait </span>HlistFromRow: Sized {
+        <span class="kw">fn </span>hlist_from_row_opt(values: Vec&lt;<span class="prelude-ty">Option</span>&lt;Value&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Vec&lt;<span class="prelude-ty">Option</span>&lt;Value&gt;&gt;&gt;;
     }
 
-    <span class="kw">impl</span> <span class="ident">HlistFromRow</span> <span class="kw">for</span> <span class="ident">HNil</span> {
-        <span class="kw">fn</span> <span class="ident">hlist_from_row_opt</span>(<span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">values</span>.<span class="ident">len</span>(), <span class="ident"><span class="self">Self</span>::LEN</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">HNil</span>)
+    <span class="kw">impl </span>HlistFromRow <span class="kw">for </span>HNil {
+        <span class="kw">fn </span>hlist_from_row_opt(values: Vec&lt;<span class="prelude-ty">Option</span>&lt;Value&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Vec&lt;<span class="prelude-ty">Option</span>&lt;Value&gt;&gt;&gt; {
+            <span class="macro">debug_assert_eq!</span>(values.len(), <span class="self">Self</span>::LEN);
+            <span class="prelude-val">Ok</span>(HNil)
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">HlistFromRow</span> <span class="kw">for</span> <span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">H</span>: <span class="ident">FromValue</span>,
-        <span class="ident">T</span>: <span class="ident">HlistFromRow</span>,
-        <span class="ident">T</span>: <span class="ident">HList</span>,
+    <span class="kw">impl</span>&lt;H, T&gt; HlistFromRow <span class="kw">for </span>HCons&lt;H, T&gt;
+    <span class="kw">where
+        </span>H: FromValue,
+        T: HlistFromRow,
+        T: HList,
     {
-        <span class="kw">fn</span> <span class="ident">hlist_from_row_opt</span>(<span class="kw-2">mut</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="self">Self</span>: <span class="ident">Sized</span>,
+        <span class="kw">fn </span>hlist_from_row_opt(<span class="kw-2">mut </span>values: Vec&lt;<span class="prelude-ty">Option</span>&lt;Value&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Vec&lt;<span class="prelude-ty">Option</span>&lt;Value&gt;&gt;&gt;
+        <span class="kw">where
+            </span><span class="self">Self</span>: Sized,
         {
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">values</span>.<span class="ident">len</span>(), <span class="ident"><span class="self">Self</span>::LEN</span>);
+            <span class="macro">debug_assert_eq!</span>(values.len(), <span class="self">Self</span>::LEN);
 
-            <span class="kw">if</span> <span class="ident">values</span>[<span class="number">0</span>].<span class="ident">is_none</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">values</span>);
+            <span class="kw">if </span>values[<span class="number">0</span>].is_none() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(values);
             }
 
-            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">remove</span>(<span class="number">0</span>).<span class="ident">expect</span>(<span class="string">&quot;must be here&quot;</span>);
+            <span class="kw">let </span>head = values.remove(<span class="number">0</span>).expect(<span class="string">&quot;must be here&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">ir</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">H::get_intermediate</span>(<span class="ident">head</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">ir</span>) =&gt; <span class="ident">ir</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">value</span>)) =&gt; {
-                    <span class="ident">values</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="ident">value</span>));
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">values</span>);
+            <span class="kw">let </span>ir = <span class="kw">match </span>H::get_intermediate(head) {
+                <span class="prelude-val">Ok</span>(ir) =&gt; ir,
+                <span class="prelude-val">Err</span>(FromValueError(value)) =&gt; {
+                    values.insert(<span class="number">0</span>, <span class="prelude-val">Some</span>(value));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(values);
                 }
             };
 
-            <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">T::hlist_from_row_opt</span>(<span class="ident">values</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
-                <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">values</span>) =&gt; {
-                    <span class="ident">values</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="ident">ir</span>.<span class="ident">rollback</span>()));
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">values</span>);
+            <span class="kw">let </span>tail = <span class="kw">match </span>T::hlist_from_row_opt(values) {
+                <span class="prelude-val">Ok</span>(t) =&gt; t,
+                <span class="prelude-val">Err</span>(<span class="kw-2">mut </span>values) =&gt; {
+                    values.insert(<span class="number">0</span>, <span class="prelude-val">Some</span>(ir.rollback()));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(values);
                 }
             };
 
-            <span class="prelude-val">Ok</span>(<span class="ident">h_cons</span>(<span class="ident">ir</span>.<span class="ident">commit</span>(), <span class="ident">tail</span>))
+            <span class="prelude-val">Ok</span>(h_cons(ir.commit(), tail))
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">hlist_from_row</span>() {
-    <span class="kw">use</span> <span class="kw">crate</span>::{
-        <span class="ident">constants::ColumnType</span>::{<span class="ident">MYSQL_TYPE_LONG</span>, <span class="ident">MYSQL_TYPE_VARCHAR</span>},
-        <span class="ident">packets::Column</span>,
-        <span class="ident">row</span>::{<span class="ident">convert::from_row</span>, <span class="ident">new_row</span>},
-        <span class="ident">value::Value</span>::<span class="kw-2">*</span>,
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>hlist_from_row() {
+    <span class="kw">use crate</span>::{
+        constants::ColumnType::{MYSQL_TYPE_LONG, MYSQL_TYPE_VARCHAR},
+        packets::Column,
+        row::{convert::from_row, new_row},
+        value::Value::<span class="kw-2">*</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">new_row</span>(
+    <span class="kw">let </span>row = new_row(
         <span class="macro">vec!</span>[
-            <span class="ident">Int</span>(<span class="number">0</span>),
-            <span class="ident">Bytes</span>(<span class="macro">vec!</span>[<span class="string">b&#39;0&#39;</span>]),
-            <span class="ident">Int</span>(<span class="number">1</span>),
-            <span class="ident">Bytes</span>(<span class="macro">vec!</span>[<span class="string">b&#39;1&#39;</span>]),
-            <span class="ident">Int</span>(<span class="number">2</span>),
-            <span class="ident">Bytes</span>(<span class="macro">vec!</span>[<span class="string">b&#39;2&#39;</span>]),
-            <span class="ident">Int</span>(<span class="number">3</span>),
-            <span class="ident">Bytes</span>(<span class="macro">vec!</span>[<span class="string">b&#39;3&#39;</span>]),
-            <span class="ident">Int</span>(<span class="number">4</span>),
-            <span class="ident">Bytes</span>(<span class="macro">vec!</span>[<span class="string">b&#39;4&#39;</span>]),
-            <span class="ident">Int</span>(<span class="number">5</span>),
-            <span class="ident">Bytes</span>(<span class="macro">vec!</span>[<span class="string">b&#39;5&#39;</span>]),
-            <span class="ident">Int</span>(<span class="number">6</span>),
-            <span class="ident">Bytes</span>(<span class="macro">vec!</span>[<span class="string">b&#39;6&#39;</span>]),
-            <span class="ident">Int</span>(<span class="number">7</span>),
-            <span class="ident">Bytes</span>(<span class="macro">vec!</span>[<span class="string">b&#39;7&#39;</span>]),
+            Int(<span class="number">0</span>),
+            Bytes(<span class="macro">vec!</span>[<span class="string">b&#39;0&#39;</span>]),
+            Int(<span class="number">1</span>),
+            Bytes(<span class="macro">vec!</span>[<span class="string">b&#39;1&#39;</span>]),
+            Int(<span class="number">2</span>),
+            Bytes(<span class="macro">vec!</span>[<span class="string">b&#39;2&#39;</span>]),
+            Int(<span class="number">3</span>),
+            Bytes(<span class="macro">vec!</span>[<span class="string">b&#39;3&#39;</span>]),
+            Int(<span class="number">4</span>),
+            Bytes(<span class="macro">vec!</span>[<span class="string">b&#39;4&#39;</span>]),
+            Int(<span class="number">5</span>),
+            Bytes(<span class="macro">vec!</span>[<span class="string">b&#39;5&#39;</span>]),
+            Int(<span class="number">6</span>),
+            Bytes(<span class="macro">vec!</span>[<span class="string">b&#39;6&#39;</span>]),
+            Int(<span class="number">7</span>),
+            Bytes(<span class="macro">vec!</span>[<span class="string">b&#39;7&#39;</span>]),
         ],
         <span class="macro">vec!</span>[
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_LONG</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_VARCHAR</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_LONG</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_VARCHAR</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_LONG</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_VARCHAR</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_LONG</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_VARCHAR</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_LONG</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_VARCHAR</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_LONG</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_VARCHAR</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_LONG</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_VARCHAR</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_LONG</span>),
-            <span class="ident">Column::new</span>(<span class="ident">MYSQL_TYPE_VARCHAR</span>),
+            Column::new(MYSQL_TYPE_LONG),
+            Column::new(MYSQL_TYPE_VARCHAR),
+            Column::new(MYSQL_TYPE_LONG),
+            Column::new(MYSQL_TYPE_VARCHAR),
+            Column::new(MYSQL_TYPE_LONG),
+            Column::new(MYSQL_TYPE_VARCHAR),
+            Column::new(MYSQL_TYPE_LONG),
+            Column::new(MYSQL_TYPE_VARCHAR),
+            Column::new(MYSQL_TYPE_LONG),
+            Column::new(MYSQL_TYPE_VARCHAR),
+            Column::new(MYSQL_TYPE_LONG),
+            Column::new(MYSQL_TYPE_VARCHAR),
+            Column::new(MYSQL_TYPE_LONG),
+            Column::new(MYSQL_TYPE_VARCHAR),
+            Column::new(MYSQL_TYPE_LONG),
+            Column::new(MYSQL_TYPE_VARCHAR),
         ]
-        .<span class="ident">into_boxed_slice</span>()
-        .<span class="ident">into</span>(),
+        .into_boxed_slice()
+        .into(),
     );
 
-    <span class="kw">let</span> <span class="ident">val</span>: <span class="macro">frunk::HList!</span>[
-        <span class="ident">u8</span>,
-        <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">u16</span>,
-        <span class="ident">String</span>,
-        <span class="ident">u8</span>,
-        <span class="ident">u8</span>,
-        <span class="ident">u8</span>,
-        <span class="ident">u8</span>,
-        <span class="ident">u8</span>,
-        <span class="ident">u8</span>,
-        <span class="ident">u8</span>,
-        <span class="ident">u8</span>,
-        <span class="ident">u8</span>,
-        <span class="ident">u8</span>,
-        <span class="ident">u8</span>,
-        <span class="ident">u8</span>
-    ] <span class="op">=</span> <span class="ident">from_row</span>(<span class="ident">row</span>);
+    <span class="kw">let </span>val: <span class="macro">frunk::HList!</span>[
+        u8,
+        Vec&lt;u8&gt;,
+        u16,
+        String,
+        u8,
+        u8,
+        u8,
+        u8,
+        u8,
+        u8,
+        u8,
+        u8,
+        u8,
+        u8,
+        u8,
+        u8
+    ] = from_row(row);
 
     <span class="macro">assert_eq!</span>(
-        <span class="ident">val</span>.<span class="ident">into_tuple2</span>(),
+        val.into_tuple2(),
         (
             <span class="number">0</span>,
             (
@@ -390,7 +390,7 @@
                 (
                     <span class="number">1</span>,
                     (
-                        <span class="ident">String::from</span>(<span class="string">&quot;1&quot;</span>),
+                        String::from(<span class="string">&quot;1&quot;</span>),
                         (<span class="number">2</span>, (<span class="number">2</span>, (<span class="number">3</span>, (<span class="number">3</span>, (<span class="number">4</span>, (<span class="number">4</span>, (<span class="number">5</span>, (<span class="number">5</span>, (<span class="number">6</span>, (<span class="number">6</span>, (<span class="number">7</span>, <span class="number">7</span>)))))))))))
                     )
                 )
@@ -399,4 +399,4 @@
     );
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

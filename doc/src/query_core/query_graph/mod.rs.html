@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -850,645 +850,645 @@
 <span id="850">850</span>
 <span id="851">851</span>
 <span id="852">852</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">formatters</span>;
-<span class="kw">mod</span> <span class="ident">guard</span>;
-<span class="kw">mod</span> <span class="ident">transformers</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>error;
+<span class="kw">mod </span>formatters;
+<span class="kw">mod </span>guard;
+<span class="kw">mod </span>transformers;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">formatters</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">transformers</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>error::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>formatters::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>transformers::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">interpreter::ExpressionResult</span>, <span class="ident">FilteredQuery</span>, <span class="ident">ManyRecordsQuery</span>, <span class="ident">Query</span>, <span class="ident">QueryGraphBuilderResult</span>, <span class="ident">ReadQuery</span>,
+<span class="kw">use crate</span>::{
+    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, ReadQuery,
 };
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">IntoFilter</span>, <span class="ident">QueryArguments</span>};
-<span class="kw">use</span> <span class="ident">guard</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">petgraph</span>::{<span class="ident">graph</span>::<span class="kw-2">*</span>, <span class="ident">visit::EdgeRef</span> <span class="kw">as</span> <span class="ident">PEdgeRef</span>, <span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelRef</span>, <span class="ident">SelectionResult</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">collections::HashSet</span>, <span class="ident">fmt</span>};
+<span class="kw">use </span>connector::{IntoFilter, QueryArguments};
+<span class="kw">use </span>guard::<span class="kw-2">*</span>;
+<span class="kw">use </span>petgraph::{graph::<span class="kw-2">*</span>, visit::EdgeRef <span class="kw">as </span>PEdgeRef, <span class="kw-2">*</span>};
+<span class="kw">use </span>prisma_models::{FieldSelection, ModelRef, SelectionResult};
+<span class="kw">use </span>std::{borrow::Borrow, collections::HashSet, fmt};
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">QueryGraphResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">QueryGraphError</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>QueryGraphResult&lt;T&gt; = std::result::Result&lt;T, QueryGraphError&gt;;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Node</span> {
-    <span class="doccomment">/// Nodes representing actual queries to the underlying connector.</span>
-    <span class="ident">Query</span>(<span class="ident">Query</span>),
+<span class="attribute">#[allow(clippy::large_enum_variant)]
+</span><span class="kw">pub enum </span>Node {
+    <span class="doccomment">/// Nodes representing actual queries to the underlying connector.
+    </span>Query(Query),
 
-    <span class="doccomment">/// Flow control nodes.</span>
-    <span class="ident">Flow</span>(<span class="ident">Flow</span>),
+    <span class="doccomment">/// Flow control nodes.
+    </span>Flow(Flow),
 
-    <span class="comment">// Todo this strongly indicates that the query graph has to change, probably towards a true AST for the interpretation,</span>
-    <span class="comment">// instead of this unsatisfying in-between of high-level abstraction over the incoming query and concrete interpreter actions.</span>
-    <span class="doccomment">/// A general computation to perform. As opposed to `Query`, this doesn&#39;t invoke the connector.</span>
-    <span class="ident">Computation</span>(<span class="ident">Computation</span>),
+    <span class="comment">// Todo this strongly indicates that the query graph has to change, probably towards a true AST for the interpretation,
+    // instead of this unsatisfying in-between of high-level abstraction over the incoming query and concrete interpreter actions.
+    </span><span class="doccomment">/// A general computation to perform. As opposed to `Query`, this doesn&#39;t invoke the connector.
+    </span>Computation(Computation),
 
-    <span class="doccomment">/// Empty node.</span>
-    <span class="ident">Empty</span>,
+    <span class="doccomment">/// Empty node.
+    </span>Empty,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Node</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">q</span>: <span class="ident">Query</span>) -&gt; <span class="ident">Node</span> {
-        <span class="ident">Node::Query</span>(<span class="ident">q</span>)
+<span class="kw">impl </span>From&lt;Query&gt; <span class="kw">for </span>Node {
+    <span class="kw">fn </span>from(q: Query) -&gt; Node {
+        Node::Query(q)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Flow</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Node</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">Flow</span>) -&gt; <span class="ident">Node</span> {
-        <span class="ident">Node::Flow</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>From&lt;Flow&gt; <span class="kw">for </span>Node {
+    <span class="kw">fn </span>from(f: Flow) -&gt; Node {
+        Node::Flow(f)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Flow</span> {
-    <span class="doccomment">/// Expresses a conditional control flow in the graph.</span>
-    <span class="doccomment">/// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.</span>
-    <span class="ident">If</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">bool</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
+<span class="kw">pub enum </span>Flow {
+    <span class="doccomment">/// Expresses a conditional control flow in the graph.
+    /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
+    </span>If(Box&lt;<span class="kw">dyn </span>FnOnce() -&gt; bool + Send + Sync + <span class="lifetime">&#39;static</span>&gt;),
 
-    <span class="doccomment">/// Returns a fixed set of results at runtime.</span>
-    <span class="ident">Return</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Returns a fixed set of results at runtime.
+    </span>Return(<span class="prelude-ty">Option</span>&lt;Vec&lt;SelectionResult&gt;&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">Flow</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_if</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::If</span>(<span class="ident">Box::new</span>(<span class="op">|</span><span class="op">|</span> <span class="bool-val">true</span>))
+<span class="kw">impl </span>Flow {
+    <span class="kw">pub fn </span>default_if() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::If(Box::new(|| <span class="bool-val">true</span>))
     }
 }
 
-<span class="comment">// Current limitation: We need to narrow it down to ID diffs for Hash and EQ.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Computation</span> {
-    <span class="ident">Diff</span>(<span class="ident">DiffNode</span>),
+<span class="comment">// Current limitation: We need to narrow it down to ID diffs for Hash and EQ.
+</span><span class="kw">pub enum </span>Computation {
+    Diff(DiffNode),
 }
 
-<span class="kw">impl</span> <span class="ident">Computation</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_diff</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Diff</span>(<span class="ident">DiffNode</span> {
-            <span class="ident">left</span>: <span class="ident">HashSet::new</span>(),
-            <span class="ident">right</span>: <span class="ident">HashSet::new</span>(),
+<span class="kw">impl </span>Computation {
+    <span class="kw">pub fn </span>empty_diff() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Diff(DiffNode {
+            left: HashSet::new(),
+            right: HashSet::new(),
         })
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiffNode</span> {
-    <span class="kw">pub</span> <span class="ident">left</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">right</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>DiffNode {
+    <span class="kw">pub </span>left: HashSet&lt;SelectionResult&gt;,
+    <span class="kw">pub </span>right: HashSet&lt;SelectionResult&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NodeRef</span> {
-    <span class="ident">node_ix</span>: <span class="ident">NodeIndex</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+</span><span class="kw">pub struct </span>NodeRef {
+    node_ix: NodeIndex,
 }
 
-<span class="kw">impl</span> <span class="ident">NodeRef</span> {
-    <span class="doccomment">/// Returns the unique identifier of the Node.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">node_ix</span>.<span class="ident">index</span>().<span class="ident">to_string</span>()
+<span class="kw">impl </span>NodeRef {
+    <span class="doccomment">/// Returns the unique identifier of the Node.
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.node_ix.index().to_string()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EdgeRef</span> {
-    <span class="ident">edge_ix</span>: <span class="ident">EdgeIndex</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub struct </span>EdgeRef {
+    edge_ix: EdgeIndex,
 }
 
-<span class="kw">impl</span> <span class="ident">EdgeRef</span> {
-    <span class="doccomment">/// Returns the unique identifier of the Edge.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">edge_ix</span>.<span class="ident">index</span>().<span class="ident">to_string</span>()
+<span class="kw">impl </span>EdgeRef {
+    <span class="doccomment">/// Returns the unique identifier of the Edge.
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.edge_ix.index().to_string()
     }
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ProjectedDataDependencyFn</span> <span class="op">=</span>
-    <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="ident">Node</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>ProjectedDataDependencyFn =
+    Box&lt;<span class="kw">dyn </span>FnOnce(Node, Vec&lt;SelectionResult&gt;) -&gt; QueryGraphBuilderResult&lt;Node&gt; + Send + Sync + <span class="lifetime">&#39;static</span>&gt;;
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DataDependencyFn</span> <span class="op">=</span>
-    <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="ident">Node</span>, <span class="kw-2">&amp;</span><span class="ident">ExpressionResult</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>DataDependencyFn =
+    Box&lt;<span class="kw">dyn </span>FnOnce(Node, <span class="kw-2">&amp;</span>ExpressionResult) -&gt; QueryGraphBuilderResult&lt;Node&gt; + Send + Sync + <span class="lifetime">&#39;static</span>&gt;;
 
-<span class="doccomment">/// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,</span>
-<span class="doccomment">/// expressing for example the need for additional information from the parent to be able to execute at runtime.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QueryGraphDependency</span> {
-    <span class="doccomment">/// Simple dependency indicating order of execution. Effectively an ordering and reachability tool for now.</span>
-    <span class="ident">ExecutionOrder</span>,
+<span class="doccomment">/// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
+/// expressing for example the need for additional information from the parent to be able to execute at runtime.
+</span><span class="kw">pub enum </span>QueryGraphDependency {
+    <span class="doccomment">/// Simple dependency indicating order of execution. Effectively an ordering and reachability tool for now.
+    </span>ExecutionOrder,
 
-    <span class="doccomment">/// Performs a transformation on the target node based on the source node result..</span>
-    <span class="ident">DataDependency</span>(<span class="ident">DataDependencyFn</span>),
+    <span class="doccomment">/// Performs a transformation on the target node based on the source node result..
+    </span>DataDependency(DataDependencyFn),
 
-    <span class="doccomment">/// More specialized version of `DataDependency` with more guarantees and side effects.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Performs a transformation on the target node based on the requested selection on the source result (represented as a single merged `FieldSelection`).</span>
-    <span class="doccomment">/// Assumes that the source result can be converted into the requested selection, else a runtime error will occur.</span>
-    <span class="doccomment">/// The `FieldSelection` is used to determine the set of values to extract from the source result.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Important note: As opposed to `DataDependency`, this dependency guarantees that if the closure is called, the source result contains at least the requested selection.</span>
-    <span class="doccomment">/// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a selection is not fulfilled.</span>
-    <span class="doccomment">/// See `insert_reloads` for more information.</span>
-    <span class="ident">ProjectedDataDependency</span>(<span class="ident">FieldSelection</span>, <span class="ident">ProjectedDataDependencyFn</span>), <span class="comment">// [Composites] todo rename</span>
+    <span class="doccomment">/// More specialized version of `DataDependency` with more guarantees and side effects.
+    ///
+    /// Performs a transformation on the target node based on the requested selection on the source result (represented as a single merged `FieldSelection`).
+    /// Assumes that the source result can be converted into the requested selection, else a runtime error will occur.
+    /// The `FieldSelection` is used to determine the set of values to extract from the source result.
+    ///
+    /// Important note: As opposed to `DataDependency`, this dependency guarantees that if the closure is called, the source result contains at least the requested selection.
+    /// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a selection is not fulfilled.
+    /// See `insert_reloads` for more information.
+    </span>ProjectedDataDependency(FieldSelection, ProjectedDataDependencyFn), <span class="comment">// [Composites] todo rename
 
-    <span class="doccomment">/// Only valid in the context of a `If` control flow node.</span>
-    <span class="ident">Then</span>,
+    </span><span class="doccomment">/// Only valid in the context of a `If` control flow node.
+    </span>Then,
 
-    <span class="doccomment">/// Only valid in the context of a `If` control flow node.</span>
-    <span class="ident">Else</span>,
+    <span class="doccomment">/// Only valid in the context of a `If` control flow node.
+    </span>Else,
 }
 
-<span class="doccomment">/// A graph representing an abstract view of queries and their execution dependencies.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Graph invariants (TODO put checks into the code?):</span>
-<span class="doccomment">/// - Directed, acyclic.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Node IDs are unique and stable.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - The graph may have multiple result nodes, and multiple paths in the graph may point to result nodes, but only one result is serialized.</span>
-<span class="doccomment">///   Note: The exact rules determining the final result are subject of the graph translation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Currently, Nodes are allowed to have multiple parents, but the following invariant applies: They may only refer to their parent and / or one of its ancestors.</span>
-<span class="doccomment">///   Note: This rule guarantees that the dependent ancestor node result is always in scope for fulfillment of dependencies.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Following the above, sibling dependencies are disallowed as well.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Edges are ordered.</span>
-<span class="doccomment">///   Node: Their evaluation is performed from low to high ordering, unless other rules require reshuffling the edges during translation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryGraph</span> {
-    <span class="ident">graph</span>: <span class="ident">InnerGraph</span>,
+<span class="doccomment">/// A graph representing an abstract view of queries and their execution dependencies.
+///
+/// Graph invariants (TODO put checks into the code?):
+/// - Directed, acyclic.
+///
+/// - Node IDs are unique and stable.
+///
+/// - The graph may have multiple result nodes, and multiple paths in the graph may point to result nodes, but only one result is serialized.
+///   Note: The exact rules determining the final result are subject of the graph translation.
+///
+/// - Currently, Nodes are allowed to have multiple parents, but the following invariant applies: They may only refer to their parent and / or one of its ancestors.
+///   Note: This rule guarantees that the dependent ancestor node result is always in scope for fulfillment of dependencies.
+///
+/// - Following the above, sibling dependencies are disallowed as well.
+///
+/// - Edges are ordered.
+///   Node: Their evaluation is performed from low to high ordering, unless other rules require reshuffling the edges during translation.
+</span><span class="attribute">#[derive(Default)]
+</span><span class="kw">pub struct </span>QueryGraph {
+    graph: InnerGraph,
 
-    <span class="doccomment">/// Designates the nodes that are returning the result of the entire QueryGraph.</span>
-    <span class="doccomment">/// If no nodes are set, the interpretation will take the result of the</span>
-    <span class="doccomment">/// last statement derived from the graph.</span>
-    <span class="ident">result_nodes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Designates the nodes that are returning the result of the entire QueryGraph.
+    /// If no nodes are set, the interpretation will take the result of the
+    /// last statement derived from the graph.
+    </span>result_nodes: Vec&lt;NodeIndex&gt;,
 
-    <span class="doccomment">/// Pairs of nodes marked for parent child swap.</span>
-    <span class="doccomment">/// The first `NodeRef` of the tuple is the parent, the second one the child.</span>
-    <span class="doccomment">/// The child will become the parents new parent when the graph is finalized.</span>
-    <span class="doccomment">/// More docs can be found on `swap_marked`.</span>
-    <span class="ident">marked_node_pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">NodeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// Pairs of nodes marked for parent child swap.
+    /// The first `NodeRef` of the tuple is the parent, the second one the child.
+    /// The child will become the parents new parent when the graph is finalized.
+    /// More docs can be found on `swap_marked`.
+    </span>marked_node_pairs: Vec&lt;(NodeRef, NodeRef)&gt;,
 
-    <span class="ident">finalized</span>: <span class="ident">bool</span>,
+    finalized: bool,
 
-    <span class="doccomment">/// For now a stupid marker if the query graph needs to be run inside a</span>
-    <span class="doccomment">/// transaction. Should happen if any of the queries is writing data.</span>
-    <span class="ident">needs_transaction</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// For now a stupid marker if the query graph needs to be run inside a
+    /// transaction. Should happen if any of the queries is writing data.
+    </span>needs_transaction: bool,
 
-    <span class="doccomment">/// Already visited nodes.</span>
-    <span class="doccomment">/// Nodes are visited during query graph processing.</span>
-    <span class="doccomment">/// Influences traversal rules and how child nodes are treated.</span>
-    <span class="ident">visited</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Already visited nodes.
+    /// Nodes are visited during query graph processing.
+    /// Influences traversal rules and how child nodes are treated.
+    </span>visited: Vec&lt;NodeIndex&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">QueryGraph</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;QueryGraph&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;graph&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;InnerGraph&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;result_nodes&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">result_nodes</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;marked_node_pairs&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">marked_node_pairs</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;finalized&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">finalized</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;needs_transaction&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">needs_transaction</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;visited&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">visited</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>QueryGraph {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;QueryGraph&quot;</span>)
+            .field(<span class="string">&quot;graph&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;InnerGraph&quot;</span>)
+            .field(<span class="string">&quot;result_nodes&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.result_nodes)
+            .field(<span class="string">&quot;marked_node_pairs&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.marked_node_pairs)
+            .field(<span class="string">&quot;finalized&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.finalized)
+            .field(<span class="string">&quot;needs_transaction&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.needs_transaction)
+            .field(<span class="string">&quot;visited&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.visited)
+            .finish()
     }
 }
 
-<span class="doccomment">/// Implementation detail of the QueryGraph.</span>
-<span class="kw">type</span> <span class="ident">InnerGraph</span> <span class="op">=</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">Guard</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span>, <span class="ident">Guard</span><span class="op">&lt;</span><span class="ident">QueryGraphDependency</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Implementation detail of the QueryGraph.
+</span><span class="kw">type </span>InnerGraph = Graph&lt;Guard&lt;Node&gt;, Guard&lt;QueryGraphDependency&gt;&gt;;
 
-<span class="kw">impl</span> <span class="ident">QueryGraph</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">graph</span>: <span class="ident">InnerGraph::new</span>(),
-            ..<span class="ident">Default::default</span>()
+<span class="kw">impl </span>QueryGraph {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            graph: InnerGraph::new(),
+            ..Default::default()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">QueryGraph</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>root&lt;F&gt;(f: F) -&gt; QueryGraphBuilderResult&lt;QueryGraph&gt;
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>QueryGraph) -&gt; QueryGraphBuilderResult&lt;()&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">graph</span> <span class="op">=</span> <span class="ident">QueryGraph::new</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">graph</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">graph</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>graph = QueryGraph::new();
+        f(<span class="kw-2">&amp;mut </span>graph)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(graph)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">finalized</span> {
-            <span class="self">self</span>.<span class="ident">swap_marked</span>()<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">ensure_return_nodes_have_parent_dependency</span>()<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">insert_reloads</span>()<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">normalize_if_nodes</span>()<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">finalized</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">pub fn </span>finalize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryGraphResult&lt;()&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.finalized {
+            <span class="self">self</span>.swap_marked()<span class="question-mark">?</span>;
+            <span class="self">self</span>.ensure_return_nodes_have_parent_dependency()<span class="question-mark">?</span>;
+            <span class="self">self</span>.insert_reloads()<span class="question-mark">?</span>;
+            <span class="self">self</span>.normalize_if_nodes()<span class="question-mark">?</span>;
+            <span class="self">self</span>.finalized = <span class="bool-val">true</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Returns a NodeRef to the result node that occurs in the subtree, if it exists.</span>
-    <span class="doccomment">/// Returns None if no such node is found.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_result_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">starting_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_result_node</span>(<span class="ident">starting_node</span>) {
-            <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">starting_node</span>)
-        } <span class="kw">else</span> {
+    <span class="doccomment">/// Returns a NodeRef to the result node that occurs in the subtree, if it exists.
+    /// Returns None if no such node is found.
+    </span><span class="kw">pub fn </span>find_result_node(<span class="kw-2">&amp;</span><span class="self">self</span>, starting_node: <span class="kw-2">&amp;</span>NodeRef) -&gt; <span class="prelude-ty">Option</span>&lt;NodeRef&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_result_node(starting_node) {
+            <span class="prelude-val">Some</span>(<span class="kw-2">*</span>starting_node)
+        } <span class="kw">else </span>{
             <span class="macro">todo!</span>()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">result_nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">result_nodes</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">node_ix</span><span class="op">|</span> <span class="ident">NodeRef</span> { <span class="ident">node_ix</span>: <span class="kw-2">*</span><span class="ident">node_ix</span> })
-            .<span class="ident">collect</span>()
+    <span class="kw">pub fn </span>result_nodes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;NodeRef&gt; {
+        <span class="self">self</span>.result_nodes
+            .iter()
+            .map(|node_ix| NodeRef { node_ix: <span class="kw-2">*</span>node_ix })
+            .collect()
     }
 
-    <span class="doccomment">/// Adds a result node to the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_result_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) {
-        <span class="self">self</span>.<span class="ident">result_nodes</span>.<span class="ident">push</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>);
+    <span class="doccomment">/// Adds a result node to the graph.
+    </span><span class="kw">pub fn </span>add_result_node(<span class="kw-2">&amp;mut </span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) {
+        <span class="self">self</span>.result_nodes.push(node.node_ix);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_visited</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">visited</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">node_ix</span>) {
-            <span class="macro">trace!</span>(<span class="string">&quot;Visited: {}&quot;</span>, <span class="ident">node</span>.<span class="ident">id</span>());
-            <span class="self">self</span>.<span class="ident">visited</span>.<span class="ident">push</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>);
+    <span class="kw">pub fn </span>mark_visited(<span class="kw-2">&amp;mut </span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) {
+        <span class="kw">if </span>!<span class="self">self</span>.visited.contains(<span class="kw-2">&amp;</span>node.node_ix) {
+            <span class="macro">trace!</span>(<span class="string">&quot;Visited: {}&quot;</span>, node.id());
+            <span class="self">self</span>.visited.push(node.node_ix);
         }
     }
 
-    <span class="doccomment">/// Checks if the given node is marked as one of the result nodes in the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_result_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">result_nodes</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">rn</span><span class="op">|</span> <span class="ident">rn</span>.<span class="ident">index</span>() <span class="op">==</span> <span class="ident">node</span>.<span class="ident">node_ix</span>.<span class="ident">index</span>())
+    <span class="doccomment">/// Checks if the given node is marked as one of the result nodes in the graph.
+    </span><span class="kw">pub fn </span>is_result_node(<span class="kw-2">&amp;</span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; bool {
+        <span class="self">self</span>.result_nodes.iter().any(|rn| rn.index() == node.node_ix.index())
     }
 
-    <span class="doccomment">/// Checks if the subgraph starting at the given node contains the node designated as the overall result.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subgraph_contains_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_result_node</span>(<span class="ident">node</span>) {
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">outgoing_edges</span>(<span class="ident">node</span>).<span class="ident">into_iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">child_node</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_target</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>);
-                <span class="self">self</span>.<span class="ident">subgraph_contains_result</span>(<span class="kw-2">&amp;</span><span class="ident">child_node</span>)
+    <span class="doccomment">/// Checks if the subgraph starting at the given node contains the node designated as the overall result.
+    </span><span class="kw">pub fn </span>subgraph_contains_result(<span class="kw-2">&amp;</span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.is_result_node(node) {
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.outgoing_edges(node).into_iter().any(|edge| {
+                <span class="kw">let </span>child_node = <span class="self">self</span>.edge_target(<span class="kw-2">&amp;</span>edge);
+                <span class="self">self</span>.subgraph_contains_result(<span class="kw-2">&amp;</span>child_node)
             })
         }
     }
 
-    <span class="doccomment">/// Returns all root nodes of the graph.</span>
-    <span class="doccomment">/// A root node is defined by having no incoming edges.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root_nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">graph</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">borrow</span>();
+    <span class="doccomment">/// Returns all root nodes of the graph.
+    /// A root node is defined by having no incoming edges.
+    </span><span class="kw">pub fn </span>root_nodes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;NodeRef&gt; {
+        <span class="kw">let </span>graph = <span class="self">self</span>.graph.borrow();
 
-        <span class="ident">graph</span>
-            .<span class="ident">node_indices</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">node_ix</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">graph</span>.<span class="ident">edges_directed</span>(<span class="ident">node_ix</span>, <span class="ident">Direction::Incoming</span>).<span class="ident">next</span>().<span class="ident">is_some</span>() {
-                    <span class="prelude-val">None</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">NodeRef</span> { <span class="ident">node_ix</span> })
+        graph
+            .node_indices()
+            .filter_map(|node_ix| {
+                <span class="kw">if </span>graph.edges_directed(node_ix, Direction::Incoming).next().is_some() {
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(NodeRef { node_ix })
                 }
             })
-            .<span class="ident">collect</span>()
+            .collect()
     }
 
-    <span class="doccomment">/// Creates a node with content `t` and adds it to the graph.</span>
-    <span class="doccomment">/// Returns a `NodeRef` to the newly added node.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) -&gt; <span class="ident">NodeRef</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Creates a node with content `t` and adds it to the graph.
+    /// Returns a `NodeRef` to the newly added node.
+    </span><span class="kw">pub fn </span>create_node&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, t: T) -&gt; NodeRef
+    <span class="kw">where
+        </span>T: Into&lt;Node&gt;,
     {
-        <span class="kw">let</span> <span class="ident">node_ix</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">add_node</span>(<span class="ident">Guard::new</span>(<span class="ident">t</span>.<span class="ident">into</span>()));
+        <span class="kw">let </span>node_ix = <span class="self">self</span>.graph.add_node(Guard::new(t.into()));
 
-        <span class="ident">NodeRef</span> { <span class="ident">node_ix</span> }
+        NodeRef { node_ix }
     }
 
-    <span class="doccomment">/// Creates an edge with given `content`, originating from node `from` and pointing to node `to`.</span>
-    <span class="doccomment">/// Checks are run after edge creation to ensure validity of the query graph.</span>
-    <span class="doccomment">/// Returns an `EdgeRef` to the newly added edge.</span>
-    <span class="doccomment">/// Todo currently panics, change interface to result type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-        <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-        <span class="ident">content</span>: <span class="ident">QueryGraphDependency</span>,
-    ) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">edge_ix</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">add_edge</span>(<span class="ident">from</span>.<span class="ident">node_ix</span>, <span class="ident">to</span>.<span class="ident">node_ix</span>, <span class="ident">Guard::new</span>(<span class="ident">content</span>));
-        <span class="kw">let</span> <span class="ident">edge</span> <span class="op">=</span> <span class="ident">EdgeRef</span> { <span class="ident">edge_ix</span> };
+    <span class="doccomment">/// Creates an edge with given `content`, originating from node `from` and pointing to node `to`.
+    /// Checks are run after edge creation to ensure validity of the query graph.
+    /// Returns an `EdgeRef` to the newly added edge.
+    /// Todo currently panics, change interface to result type.
+    </span><span class="kw">pub fn </span>create_edge(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        from: <span class="kw-2">&amp;</span>NodeRef,
+        to: <span class="kw-2">&amp;</span>NodeRef,
+        content: QueryGraphDependency,
+    ) -&gt; QueryGraphResult&lt;EdgeRef&gt; {
+        <span class="kw">let </span>edge_ix = <span class="self">self</span>.graph.add_edge(from.node_ix, to.node_ix, Guard::new(content));
+        <span class="kw">let </span>edge = EdgeRef { edge_ix };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">edge</span>)
+        <span class="prelude-val">Ok</span>(edge)
     }
 
-    <span class="doccomment">/// Mark the query graph to need a transaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flag_transactional</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">needs_transaction</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Mark the query graph to need a transaction.
+    </span><span class="kw">pub fn </span>flag_transactional(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.needs_transaction = <span class="bool-val">true</span>;
     }
 
-    <span class="doccomment">/// If true, the graph should be executed inside of a transaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">needs_transaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">needs_transaction</span>
+    <span class="doccomment">/// If true, the graph should be executed inside of a transaction.
+    </span><span class="kw">pub fn </span>needs_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.needs_transaction
     }
 
-    <span class="doccomment">/// Returns a reference to the content of `node`, if the content is still present.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Node</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">node_weight</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>).<span class="ident">unwrap</span>().<span class="ident">borrow</span>()
+    <span class="doccomment">/// Returns a reference to the content of `node`, if the content is still present.
+    </span><span class="kw">pub fn </span>node_content(<span class="kw-2">&amp;</span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Node&gt; {
+        <span class="self">self</span>.graph.node_weight(node.node_ix).unwrap().borrow()
     }
 
-    <span class="doccomment">/// Returns a reference to the content of `edge`, if the content is still present.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">QueryGraphDependency</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">edge_weight</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>().<span class="ident">borrow</span>()
+    <span class="doccomment">/// Returns a reference to the content of `edge`, if the content is still present.
+    </span><span class="kw">pub fn </span>edge_content(<span class="kw-2">&amp;</span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>QueryGraphDependency&gt; {
+        <span class="self">self</span>.graph.edge_weight(edge.edge_ix).unwrap().borrow()
     }
 
-    <span class="doccomment">/// Returns the node from where `edge` originates (e.g. source).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) -&gt; <span class="ident">NodeRef</span> {
-        <span class="kw">let</span> (<span class="ident">node_ix</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">edge_endpoints</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>();
-        <span class="ident">NodeRef</span> { <span class="ident">node_ix</span> }
+    <span class="doccomment">/// Returns the node from where `edge` originates (e.g. source).
+    </span><span class="kw">pub fn </span>edge_source(<span class="kw-2">&amp;</span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; NodeRef {
+        <span class="kw">let </span>(node_ix, <span class="kw">_</span>) = <span class="self">self</span>.graph.edge_endpoints(edge.edge_ix).unwrap();
+        NodeRef { node_ix }
     }
 
-    <span class="doccomment">/// Returns the node to which `edge` points (e.g. target).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) -&gt; <span class="ident">NodeRef</span> {
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">node_ix</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">edge_endpoints</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>();
-        <span class="ident">NodeRef</span> { <span class="ident">node_ix</span> }
+    <span class="doccomment">/// Returns the node to which `edge` points (e.g. target).
+    </span><span class="kw">pub fn </span>edge_target(<span class="kw-2">&amp;</span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; NodeRef {
+        <span class="kw">let </span>(<span class="kw">_</span>, node_ix) = <span class="self">self</span>.graph.edge_endpoints(edge.edge_ix).unwrap();
+        NodeRef { node_ix }
     }
 
-    <span class="doccomment">/// Returns all edges originating from= `node` (e.g. outgoing edges).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">outgoing_edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">collect_edges</span>(<span class="ident">node</span>, <span class="ident">Direction::Outgoing</span>)
+    <span class="doccomment">/// Returns all edges originating from= `node` (e.g. outgoing edges).
+    </span><span class="kw">pub fn </span>outgoing_edges(<span class="kw-2">&amp;</span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; Vec&lt;EdgeRef&gt; {
+        <span class="self">self</span>.collect_edges(node, Direction::Outgoing)
     }
 
-    <span class="doccomment">/// Returns all edges pointing to `node` (e.g. incoming edges).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">collect_edges</span>(<span class="ident">node</span>, <span class="ident">Direction::Incoming</span>)
+    <span class="doccomment">/// Returns all edges pointing to `node` (e.g. incoming edges).
+    </span><span class="kw">pub fn </span>incoming_edges(<span class="kw-2">&amp;</span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; Vec&lt;EdgeRef&gt; {
+        <span class="self">self</span>.collect_edges(node, Direction::Incoming)
     }
 
-    <span class="doccomment">/// Removes the edge from the graph but leaves the graph intact by keeping the empty</span>
-    <span class="doccomment">/// edge in the graph by plucking the content of the edge, but not the edge itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pluck_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) -&gt; <span class="ident">QueryGraphDependency</span> {
-        <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">edge_weight_mut</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>().<span class="ident">unset</span>()
+    <span class="doccomment">/// Removes the edge from the graph but leaves the graph intact by keeping the empty
+    /// edge in the graph by plucking the content of the edge, but not the edge itself.
+    </span><span class="kw">pub fn </span>pluck_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; QueryGraphDependency {
+        <span class="self">self</span>.graph.edge_weight_mut(edge.edge_ix).unwrap().unset()
     }
 
-    <span class="doccomment">/// Removes the node from the graph but leaves the graph intact by keeping the empty</span>
-    <span class="doccomment">/// node in the graph by plucking the content of the node, but not the node itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pluck_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Node</span> {
-        <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">node_weight_mut</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>).<span class="ident">unwrap</span>().<span class="ident">unset</span>()
+    <span class="doccomment">/// Removes the node from the graph but leaves the graph intact by keeping the empty
+    /// node in the graph by plucking the content of the node, but not the node itself.
+    </span><span class="kw">pub fn </span>pluck_node(<span class="kw-2">&amp;mut </span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; Node {
+        <span class="self">self</span>.graph.node_weight_mut(node.node_ix).unwrap().unset()
     }
 
-    <span class="doccomment">/// Completely removes the edge from the graph, returning it&#39;s content.</span>
-    <span class="doccomment">/// This operation is destructive on the underlying graph and invalidates references.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">EdgeRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QueryGraphDependency</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">remove_edge</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>().<span class="ident">into_inner</span>()
+    <span class="doccomment">/// Completely removes the edge from the graph, returning it&#39;s content.
+    /// This operation is destructive on the underlying graph and invalidates references.
+    </span><span class="kw">pub fn </span>remove_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, edge: EdgeRef) -&gt; <span class="prelude-ty">Option</span>&lt;QueryGraphDependency&gt; {
+        <span class="self">self</span>.graph.remove_edge(edge.edge_ix).unwrap().into_inner()
     }
 
-    <span class="doccomment">/// Checks if `child` is a direct child of `parent`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Criteria for a direct child (either):</span>
-    <span class="doccomment">/// - Every node that only has `parent` as their parent.</span>
-    <span class="doccomment">/// - In case of multiple parents, _all_ parents have already been visited before.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_direct_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">parent</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>, <span class="ident">child</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">incoming_edges</span>(<span class="ident">child</span>).<span class="ident">into_iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">other_parent</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>);
+    <span class="doccomment">/// Checks if `child` is a direct child of `parent`.
+    ///
+    /// Criteria for a direct child (either):
+    /// - Every node that only has `parent` as their parent.
+    /// - In case of multiple parents, _all_ parents have already been visited before.
+    </span><span class="kw">pub fn </span>is_direct_child(<span class="kw-2">&amp;</span><span class="self">self</span>, parent: <span class="kw-2">&amp;</span>NodeRef, child: <span class="kw-2">&amp;</span>NodeRef) -&gt; bool {
+        <span class="self">self</span>.incoming_edges(child).into_iter().all(|edge| {
+            <span class="kw">let </span>other_parent = <span class="self">self</span>.edge_source(<span class="kw-2">&amp;</span>edge);
 
-            <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">other_parent</span> <span class="op">!</span><span class="op">=</span> <span class="ident">parent</span> {
-                <span class="self">self</span>.<span class="ident">visited</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">other_parent</span>.<span class="ident">node_ix</span>)
-            } <span class="kw">else</span> {
-                <span class="bool-val">true</span>
-            }
+            <span class="kw">if </span><span class="kw-2">&amp;</span>other_parent != parent {
+                <span class="self">self</span>.visited.contains(<span class="kw-2">&amp;</span>other_parent.node_ix)
+            } <span class="kw">else </span>{
+                <span class="bool-val">true
+            </span>}
         })
     }
 
-    <span class="doccomment">/// Returns a list of child nodes, together with their child edge for the given `node`.</span>
-    <span class="doccomment">/// The list contains all children reachable by outgoing edges of `node`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">child_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">outgoing_edges</span>(<span class="ident">node</span>)
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_target</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>);
-                (<span class="ident">edge</span>, <span class="ident">target</span>)
+    <span class="doccomment">/// Returns a list of child nodes, together with their child edge for the given `node`.
+    /// The list contains all children reachable by outgoing edges of `node`.
+    </span><span class="kw">pub fn </span>child_pairs(<span class="kw-2">&amp;</span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; Vec&lt;(EdgeRef, NodeRef)&gt; {
+        <span class="self">self</span>.outgoing_edges(node)
+            .into_iter()
+            .map(|edge| {
+                <span class="kw">let </span>target = <span class="self">self</span>.edge_target(<span class="kw-2">&amp;</span>edge);
+                (edge, target)
             })
-            .<span class="ident">collect</span>()
+            .collect()
     }
 
-    <span class="doccomment">/// Returns all direct child pairs of `node`.</span>
-    <span class="doccomment">/// See `is_direct_child` for exact definition of what a direct child encompasses.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_child_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">outgoing_edges</span>(<span class="ident">node</span>)
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">child_node</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_target</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>);
+    <span class="doccomment">/// Returns all direct child pairs of `node`.
+    /// See `is_direct_child` for exact definition of what a direct child encompasses.
+    </span><span class="kw">pub fn </span>direct_child_pairs(<span class="kw-2">&amp;</span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; Vec&lt;(EdgeRef, NodeRef)&gt; {
+        <span class="self">self</span>.outgoing_edges(node)
+            .into_iter()
+            .filter_map(|edge| {
+                <span class="kw">let </span>child_node = <span class="self">self</span>.edge_target(<span class="kw-2">&amp;</span>edge);
 
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_direct_child</span>(<span class="ident">node</span>, <span class="kw-2">&amp;</span><span class="ident">child_node</span>) {
-                    <span class="prelude-val">Some</span>((<span class="ident">edge</span>, <span class="ident">child_node</span>))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+                <span class="kw">if </span><span class="self">self</span>.is_direct_child(node, <span class="kw-2">&amp;</span>child_node) {
+                    <span class="prelude-val">Some</span>((edge, child_node))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
             })
-            .<span class="ident">collect</span>()
+            .collect()
     }
 
-    <span class="doccomment">/// Resolves and adds all source `NodeRef`s to the respective `EdgeRef`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zip_source_nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span> {
-        <span class="ident">edges</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>);
-                (<span class="ident">edge</span>, <span class="ident">target</span>)
+    <span class="doccomment">/// Resolves and adds all source `NodeRef`s to the respective `EdgeRef`.
+    </span><span class="kw">pub fn </span>zip_source_nodes(<span class="kw-2">&amp;</span><span class="self">self</span>, edges: Vec&lt;EdgeRef&gt;) -&gt; Vec&lt;(EdgeRef, NodeRef)&gt; {
+        edges
+            .into_iter()
+            .map(|edge| {
+                <span class="kw">let </span>target = <span class="self">self</span>.edge_source(<span class="kw-2">&amp;</span>edge);
+                (edge, target)
             })
-            .<span class="ident">collect</span>()
+            .collect()
     }
 
-    <span class="doccomment">/// Internal utility function to collect all edges of defined direction directed to, or originating from, `node`.</span>
-    <span class="kw">fn</span> <span class="ident">collect_edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>, <span class="ident">direction</span>: <span class="ident">Direction</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edges</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">graph</span>
-            .<span class="ident">edges_directed</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>, <span class="ident">direction</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> <span class="ident">EdgeRef</span> { <span class="ident">edge_ix</span>: <span class="ident">edge</span>.<span class="ident">id</span>() })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+    <span class="doccomment">/// Internal utility function to collect all edges of defined direction directed to, or originating from, `node`.
+    </span><span class="kw">fn </span>collect_edges(<span class="kw-2">&amp;</span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef, direction: Direction) -&gt; Vec&lt;EdgeRef&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>edges = <span class="self">self
+            </span>.graph
+            .edges_directed(node.node_ix, direction)
+            .map(|edge| EdgeRef { edge_ix: edge.id() })
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="ident">edges</span>.<span class="ident">sort</span>();
-        <span class="ident">edges</span>
+        edges.sort();
+        edges
     }
 
-    <span class="doccomment">/// Marks a node pair for swapping.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_nodes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>, <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) {
-        <span class="self">self</span>.<span class="ident">marked_node_pairs</span>.<span class="ident">push</span>((<span class="kw-2">*</span><span class="ident">parent_node</span>, <span class="kw-2">*</span><span class="ident">child_node</span>));
+    <span class="doccomment">/// Marks a node pair for swapping.
+    </span><span class="kw">pub fn </span>mark_nodes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, parent_node: <span class="kw-2">&amp;</span>NodeRef, child_node: <span class="kw-2">&amp;</span>NodeRef) {
+        <span class="self">self</span>.marked_node_pairs.push((<span class="kw-2">*</span>parent_node, <span class="kw-2">*</span>child_node));
     }
 
-    <span class="doccomment">/// Swaps all marked parent-child pairs.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// With this function, given a tuple of `(parent, child)`, `child` will be a parent node of `parent` after the swap has been performed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operation preserves all edges from the parents of `parent` to the node, while inserting new edges from all parents of</span>
-    <span class="doccomment">/// `parent` to `child`, effectively &quot;pushing the child in the middle&quot; of `parent` and it&#39;s parents. The new edges are only expressing</span>
-    <span class="doccomment">/// exection order, and no node transformation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Any edge existing between `parent` and `child` will change direction and will point from `child` to `parent` instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Important exception**: If a parent node is a `Flow` node, we need to completely remove the edge to the flow node and rewire it to the child.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Example transformation</span>
-    <span class="doccomment">/// Given the marked pairs `[(A, B), (B, C), (B, D)]` and a graph (depicting the state before the transformation):</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///      ┌───┐</span>
-    <span class="doccomment">///      │ P │</span>
-    <span class="doccomment">///      └───┘</span>
-    <span class="doccomment">///        │</span>
-    <span class="doccomment">///        ▼</span>
-    <span class="doccomment">///      ┌───┐</span>
-    <span class="doccomment">///      │ A │</span>
-    <span class="doccomment">///      └───┘</span>
-    <span class="doccomment">///        │</span>
-    <span class="doccomment">///        ▼</span>
-    <span class="doccomment">///      ┌───┐</span>
-    <span class="doccomment">///   ┌──│ B │──┐</span>
-    <span class="doccomment">///   │  └───┘  │</span>
-    <span class="doccomment">///   │         │</span>
-    <span class="doccomment">///   ▼         ▼</span>
-    <span class="doccomment">/// ┌───┐     ┌───┐</span>
-    <span class="doccomment">/// │ C │     │ D │</span>
-    <span class="doccomment">/// └───┘     └───┘</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The marked pairs express that the operations performed by the contained parents depend on the child operation,</span>
-    <span class="doccomment">/// hence making it necessary to execute the child operation first.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Applying the transformations step by step will change the graph as following:</span>
-    <span class="doccomment">/// (new edges created in a transformation step are marked with *)</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///         ┌───┐                 ┌───┐                                 ┌───┐                         ┌───┐</span>
-    <span class="doccomment">///         │ P │                 │ P │────────────────┐             ┌──│ P │──────────┐           ┌──│ P │────────┐</span>
-    <span class="doccomment">///         └───┘                 └───┘               1│             │  └───┘         1│           │  └───┘       1│</span>
-    <span class="doccomment">///          1│                     │                  │            5│    │ 6*         │          5│   6│          │</span>
-    <span class="doccomment">///           ▼                     │                  │             │    ▼            │           │    ▼          │</span>
-    <span class="doccomment">///         ┌───┐                   │                  │             │  ┌───┐          │           │  ┌───┐  7*    │</span>
-    <span class="doccomment">///         │ A │                 5*│                  │             │  │ C │          │           │  │ C │───┐    │</span>
-    <span class="doccomment">///         └───┘     ═(A, B)═▶     │                  │ ═(B, C)═▶   │  └───┘          │ ═(B, D)═▶ │  └───┘   │    │</span>
-    <span class="doccomment">///          2│                     │                  │             │   3│            │           │   3│     │    │</span>
-    <span class="doccomment">///           ▼                     ▼                  │             │    ▼            │           │    │     ▼    │</span>
-    <span class="doccomment">///         ┌───┐                 ┌───┐                │             │  ┌───┐          │           │    │   ┌───┐  │</span>
-    <span class="doccomment">///      ┌──│ B │──┐           ┌──│ B │──┬────────┐    │             └─▶│ B │─────┐    │           │    │   │ D │  │</span>
-    <span class="doccomment">///     3│  └───┘ 4│          3│  └───┘ 4│       2│    │                └───┘     │    │           │    │   └───┘  │</span>
-    <span class="doccomment">///      │         │           │         │        │    │                 4│      2│    │           │    │    4│    │</span>
-    <span class="doccomment">///      ▼         ▼           ▼         ▼        ▼    │                  ▼       ▼    │           │    ▼     │    │</span>
-    <span class="doccomment">///    ┌───┐     ┌───┐       ┌───┐     ┌───┐    ┌───┐  │                ┌───┐   ┌───┐  │           │  ┌───┐   │    │</span>
-    <span class="doccomment">///    │ C │     │ D │       │ C │     │ D │    │ A │◀─┘                │ D │   │ A │◀─┘           └─▶│ B │◀──┘    │</span>
-    <span class="doccomment">///    └───┘     └───┘       └───┘     └───┘    └───┘                   └───┘   └───┘                 └───┘        │</span>
-    <span class="doccomment">///                                                                                                     │          │</span>
-    <span class="doccomment">///                                                                                                     │          │</span>
-    <span class="doccomment">///                                                                                                    2│   ┌───┐  │</span>
-    <span class="doccomment">///                                                                                                     └──▶│ A │◀─┘</span>
-    <span class="doccomment">///                                                                                                         └───┘</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [DTODO] put if flow exception illustration here.</span>
-    <span class="kw">fn</span> <span class="ident">swap_marked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">marked_node_pairs</span>.<span class="ident">is_empty</span>() {
+    <span class="doccomment">/// Swaps all marked parent-child pairs.
+    ///
+    /// With this function, given a tuple of `(parent, child)`, `child` will be a parent node of `parent` after the swap has been performed.
+    ///
+    /// This operation preserves all edges from the parents of `parent` to the node, while inserting new edges from all parents of
+    /// `parent` to `child`, effectively &quot;pushing the child in the middle&quot; of `parent` and it&#39;s parents. The new edges are only expressing
+    /// exection order, and no node transformation.
+    ///
+    /// Any edge existing between `parent` and `child` will change direction and will point from `child` to `parent` instead.
+    ///
+    /// **Important exception**: If a parent node is a `Flow` node, we need to completely remove the edge to the flow node and rewire it to the child.
+    ///
+    /// ## Example transformation
+    /// Given the marked pairs `[(A, B), (B, C), (B, D)]` and a graph (depicting the state before the transformation):
+    /// ```text
+    ///      ┌───┐
+    ///      │ P │
+    ///      └───┘
+    ///        │
+    ///        ▼
+    ///      ┌───┐
+    ///      │ A │
+    ///      └───┘
+    ///        │
+    ///        ▼
+    ///      ┌───┐
+    ///   ┌──│ B │──┐
+    ///   │  └───┘  │
+    ///   │         │
+    ///   ▼         ▼
+    /// ┌───┐     ┌───┐
+    /// │ C │     │ D │
+    /// └───┘     └───┘
+    /// ```
+    ///
+    /// The marked pairs express that the operations performed by the contained parents depend on the child operation,
+    /// hence making it necessary to execute the child operation first.
+    ///
+    /// Applying the transformations step by step will change the graph as following:
+    /// (new edges created in a transformation step are marked with *)
+    /// ```text
+    ///         ┌───┐                 ┌───┐                                 ┌───┐                         ┌───┐
+    ///         │ P │                 │ P │────────────────┐             ┌──│ P │──────────┐           ┌──│ P │────────┐
+    ///         └───┘                 └───┘               1│             │  └───┘         1│           │  └───┘       1│
+    ///          1│                     │                  │            5│    │ 6*         │          5│   6│          │
+    ///           ▼                     │                  │             │    ▼            │           │    ▼          │
+    ///         ┌───┐                   │                  │             │  ┌───┐          │           │  ┌───┐  7*    │
+    ///         │ A │                 5*│                  │             │  │ C │          │           │  │ C │───┐    │
+    ///         └───┘     ═(A, B)═▶     │                  │ ═(B, C)═▶   │  └───┘          │ ═(B, D)═▶ │  └───┘   │    │
+    ///          2│                     │                  │             │   3│            │           │   3│     │    │
+    ///           ▼                     ▼                  │             │    ▼            │           │    │     ▼    │
+    ///         ┌───┐                 ┌───┐                │             │  ┌───┐          │           │    │   ┌───┐  │
+    ///      ┌──│ B │──┐           ┌──│ B │──┬────────┐    │             └─▶│ B │─────┐    │           │    │   │ D │  │
+    ///     3│  └───┘ 4│          3│  └───┘ 4│       2│    │                └───┘     │    │           │    │   └───┘  │
+    ///      │         │           │         │        │    │                 4│      2│    │           │    │    4│    │
+    ///      ▼         ▼           ▼         ▼        ▼    │                  ▼       ▼    │           │    ▼     │    │
+    ///    ┌───┐     ┌───┐       ┌───┐     ┌───┐    ┌───┐  │                ┌───┐   ┌───┐  │           │  ┌───┐   │    │
+    ///    │ C │     │ D │       │ C │     │ D │    │ A │◀─┘                │ D │   │ A │◀─┘           └─▶│ B │◀──┘    │
+    ///    └───┘     └───┘       └───┘     └───┘    └───┘                   └───┘   └───┘                 └───┘        │
+    ///                                                                                                     │          │
+    ///                                                                                                     │          │
+    ///                                                                                                    2│   ┌───┐  │
+    ///                                                                                                     └──▶│ A │◀─┘
+    ///                                                                                                         └───┘
+    /// ```
+    /// [DTODO] put if flow exception illustration here.
+    </span><span class="kw">fn </span>swap_marked(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryGraphResult&lt;()&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.marked_node_pairs.is_empty() {
             <span class="macro">trace!</span>(<span class="string">&quot;[Graph][Swap] Before shape: {}&quot;</span>, <span class="self">self</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">marked</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">marked_node_pairs</span>);
-        <span class="ident">marked</span>.<span class="ident">reverse</span>(); <span class="comment">// Todo: Marked operation order is currently breaking if done bottom-up. Investigate how to fix it.</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>marked = std::mem::take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.marked_node_pairs);
+        marked.reverse(); <span class="comment">// Todo: Marked operation order is currently breaking if done bottom-up. Investigate how to fix it.
 
-        <span class="kw">for</span> (<span class="ident">parent_node</span>, <span class="ident">child_node</span>) <span class="kw">in</span> <span class="ident">marked</span> {
-            <span class="comment">// All parents of `parent_node` are becoming a parent of `child_node` as well, except flow nodes.</span>
-            <span class="kw">let</span> <span class="ident">parent_edges</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="ident">parent_node</span>);
-            <span class="kw">for</span> <span class="ident">parent_edge</span> <span class="kw">in</span> <span class="ident">parent_edges</span> {
-                <span class="kw">let</span> <span class="ident">parent_of_parent_node</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="ident">parent_edge</span>);
+        </span><span class="kw">for </span>(parent_node, child_node) <span class="kw">in </span>marked {
+            <span class="comment">// All parents of `parent_node` are becoming a parent of `child_node` as well, except flow nodes.
+            </span><span class="kw">let </span>parent_edges = <span class="self">self</span>.incoming_edges(<span class="kw-2">&amp;</span>parent_node);
+            <span class="kw">for </span>parent_edge <span class="kw">in </span>parent_edges {
+                <span class="kw">let </span>parent_of_parent_node = <span class="self">self</span>.edge_source(<span class="kw-2">&amp;</span>parent_edge);
 
-                <span class="kw">match</span> <span class="self">self</span>
-                    .<span class="ident">node_content</span>(<span class="kw-2">&amp;</span><span class="ident">parent_of_parent_node</span>)
-                    .<span class="ident">expect</span>(<span class="string">&quot;Expected marked nodes to be non-empty.&quot;</span>)
+                <span class="kw">match </span><span class="self">self
+                    </span>.node_content(<span class="kw-2">&amp;</span>parent_of_parent_node)
+                    .expect(<span class="string">&quot;Expected marked nodes to be non-empty.&quot;</span>)
                 {
-                    <span class="comment">// Exception rule: Only swap `Then` and `Else` edges.</span>
-                    <span class="ident">Node::Flow</span>(<span class="ident">Flow::If</span>(<span class="kw">_</span>)) =&gt; {
-                        <span class="kw">if</span> <span class="macro">matches!</span>(
-                            <span class="self">self</span>.<span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="ident">parent_edge</span>),
-                            <span class="prelude-val">Some</span>(<span class="ident">QueryGraphDependency::Then</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">QueryGraphDependency::Else</span>)
+                    <span class="comment">// Exception rule: Only swap `Then` and `Else` edges.
+                    </span>Node::Flow(Flow::If(<span class="kw">_</span>)) =&gt; {
+                        <span class="kw">if </span><span class="macro">matches!</span>(
+                            <span class="self">self</span>.edge_content(<span class="kw-2">&amp;</span>parent_edge),
+                            <span class="prelude-val">Some</span>(QueryGraphDependency::Then) | <span class="prelude-val">Some</span>(QueryGraphDependency::Else)
                         ) {
-                            <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="self">self</span>
-                                .<span class="ident">remove_edge</span>(<span class="ident">parent_edge</span>)
-                                .<span class="ident">expect</span>(<span class="string">&quot;Expected edges between marked nodes to be non-empty.&quot;</span>);
+                            <span class="kw">let </span>content = <span class="self">self
+                                </span>.remove_edge(parent_edge)
+                                .expect(<span class="string">&quot;Expected edges between marked nodes to be non-empty.&quot;</span>);
 
-                            <span class="self">self</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">parent_of_parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">child_node</span>, <span class="ident">content</span>)<span class="question-mark">?</span>;
+                            <span class="self">self</span>.create_edge(<span class="kw-2">&amp;</span>parent_of_parent_node, <span class="kw-2">&amp;</span>child_node, content)<span class="question-mark">?</span>;
                         }
                     }
 
-                    <span class="kw">_</span> =&gt; {
+                    <span class="kw">_ </span>=&gt; {
                         <span class="macro">trace!</span>(
                             <span class="string">&quot;[Graph][Swap] Connecting parent of parent {} with child {}&quot;</span>,
-                            <span class="ident">parent_of_parent_node</span>.<span class="ident">id</span>(),
-                            <span class="ident">child_node</span>.<span class="ident">id</span>()
+                            parent_of_parent_node.id(),
+                            child_node.id()
                         );
 
-                        <span class="self">self</span>.<span class="ident">create_edge</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">parent_of_parent_node</span>,
-                            <span class="kw-2">&amp;</span><span class="ident">child_node</span>,
-                            <span class="ident">QueryGraphDependency::ExecutionOrder</span>,
+                        <span class="self">self</span>.create_edge(
+                            <span class="kw-2">&amp;</span>parent_of_parent_node,
+                            <span class="kw-2">&amp;</span>child_node,
+                            QueryGraphDependency::ExecutionOrder,
                         )<span class="question-mark">?</span>;
                     }
                 }
             }
 
-            <span class="comment">// Find existing edge between parent and child. Can only be one at most.</span>
-            <span class="kw">let</span> <span class="ident">existing_edge</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">graph</span>
-                .<span class="ident">find_edge</span>(<span class="ident">parent_node</span>.<span class="ident">node_ix</span>, <span class="ident">child_node</span>.<span class="ident">node_ix</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">edge_ix</span><span class="op">|</span> <span class="ident">EdgeRef</span> { <span class="ident">edge_ix</span> });
+            <span class="comment">// Find existing edge between parent and child. Can only be one at most.
+            </span><span class="kw">let </span>existing_edge = <span class="self">self
+                </span>.graph
+                .find_edge(parent_node.node_ix, child_node.node_ix)
+                .map(|edge_ix| EdgeRef { edge_ix });
 
-            <span class="comment">// Remove edge and reinsert edge in reverse.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">edge</span>) <span class="op">=</span> <span class="ident">existing_edge</span> {
-                <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pluck_edge</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>);
-                <span class="self">self</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">child_node</span>, <span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="ident">content</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">remove_edge</span>(<span class="ident">edge</span>);
+            <span class="comment">// Remove edge and reinsert edge in reverse.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(edge) = existing_edge {
+                <span class="kw">let </span>content = <span class="self">self</span>.pluck_edge(<span class="kw-2">&amp;</span>edge);
+                <span class="self">self</span>.create_edge(<span class="kw-2">&amp;</span>child_node, <span class="kw-2">&amp;</span>parent_node, content)<span class="question-mark">?</span>;
+                <span class="self">self</span>.remove_edge(edge);
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Inserts ordering edges into the graph to prevent interdependency issues when rotating</span>
-    <span class="doccomment">/// nodes for `if`-flow nodes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// All sibling nodes of an if-node that are...</span>
-    <span class="doccomment">/// - ... not an `if`-flow node themself</span>
-    <span class="doccomment">/// - ... not already connected to the current `if`-flow node in any form (to prevent double edges)</span>
-    <span class="doccomment">/// - ... not connected to another `if`-flow node with control flow edges (indirect sibling)</span>
-    <span class="doccomment">/// will be ordered below the currently processed `if`-flow node in execution predence.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///      ┌ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">/// ┌ ─ ─    Parent   │─ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┬ ─ ─ ─ ─</span>
-    <span class="doccomment">///      └ ─ ─ ─ ─ ─ ─                        │                       │</span>
-    <span class="doccomment">/// │           │              │                             │</span>
-    <span class="doccomment">///             │                             │                       │</span>
-    <span class="doccomment">/// │           │              │                             │</span>
-    <span class="doccomment">///             ▼              ▼              ▼              ▼        │</span>
-    <span class="doccomment">/// │    ┌ ─ ─ ─ ─ ─ ─  ┌ ─ ─ ─ ─ ─ ─  ┌ ─ ─ ─ ─ ─ ─  ┌ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">///   ┌ ─      If     │    Sibling   │   Sibling If │   Sibling If │  │</span>
-    <span class="doccomment">/// │    └ ─ ─ ─ ─ ─ ─  └ ─ ─ ─ ─ ─ ─  └ ─ ─ ─ ─ ─ ─  └ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">///   │         │              ▲                             │        │</span>
-    <span class="doccomment">/// │           │              │</span>
-    <span class="doccomment">///   │         └────Inserted ─┘                       (Then / Else)  │</span>
-    <span class="doccomment">/// │                Ordering</span>
-    <span class="doccomment">///   │                                                      ▼        │</span>
-    <span class="doccomment">/// │    ┌ ─ ─ ─ ─ ─ ─                                ┌ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">///   │     Already   │                                  Indirect  │  │</span>
-    <span class="doccomment">/// └ ──▶│ connected                                  │  sibling    ◀─</span>
-    <span class="doccomment">///         sibling   │                                ─ ─ ─ ─ ─ ─ ┘</span>
-    <span class="doccomment">///      └ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">normalize_if_nodes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">node_ix</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">node_indices</span>() {
-            <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">NodeRef</span> { <span class="ident">node_ix</span> };
+    <span class="doccomment">/// Inserts ordering edges into the graph to prevent interdependency issues when rotating
+    /// nodes for `if`-flow nodes.
+    ///
+    /// All sibling nodes of an if-node that are...
+    /// - ... not an `if`-flow node themself
+    /// - ... not already connected to the current `if`-flow node in any form (to prevent double edges)
+    /// - ... not connected to another `if`-flow node with control flow edges (indirect sibling)
+    /// will be ordered below the currently processed `if`-flow node in execution predence.
+    ///
+    /// ```text
+    ///      ┌ ─ ─ ─ ─ ─ ─
+    /// ┌ ─ ─    Parent   │─ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┬ ─ ─ ─ ─
+    ///      └ ─ ─ ─ ─ ─ ─                        │                       │
+    /// │           │              │                             │
+    ///             │                             │                       │
+    /// │           │              │                             │
+    ///             ▼              ▼              ▼              ▼        │
+    /// │    ┌ ─ ─ ─ ─ ─ ─  ┌ ─ ─ ─ ─ ─ ─  ┌ ─ ─ ─ ─ ─ ─  ┌ ─ ─ ─ ─ ─ ─
+    ///   ┌ ─      If     │    Sibling   │   Sibling If │   Sibling If │  │
+    /// │    └ ─ ─ ─ ─ ─ ─  └ ─ ─ ─ ─ ─ ─  └ ─ ─ ─ ─ ─ ─  └ ─ ─ ─ ─ ─ ─
+    ///   │         │              ▲                             │        │
+    /// │           │              │
+    ///   │         └────Inserted ─┘                       (Then / Else)  │
+    /// │                Ordering
+    ///   │                                                      ▼        │
+    /// │    ┌ ─ ─ ─ ─ ─ ─                                ┌ ─ ─ ─ ─ ─ ─
+    ///   │     Already   │                                  Indirect  │  │
+    /// └ ──▶│ connected                                  │  sibling    ◀─
+    ///         sibling   │                                ─ ─ ─ ─ ─ ─ ┘
+    ///      └ ─ ─ ─ ─ ─ ─
+    /// ```
+    </span><span class="kw">fn </span>normalize_if_nodes(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryGraphResult&lt;()&gt; {
+        <span class="kw">for </span>node_ix <span class="kw">in </span><span class="self">self</span>.graph.node_indices() {
+            <span class="kw">let </span>node = NodeRef { node_ix };
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Flow</span>(<span class="ident">Flow::If</span>(<span class="kw">_</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">node_content</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>).<span class="ident">unwrap</span>() {
-                <span class="kw">let</span> <span class="ident">parents</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>);
+            <span class="kw">if let </span>Node::Flow(Flow::If(<span class="kw">_</span>)) = <span class="self">self</span>.node_content(<span class="kw-2">&amp;</span>node).unwrap() {
+                <span class="kw">let </span>parents = <span class="self">self</span>.incoming_edges(<span class="kw-2">&amp;</span>node);
 
-                <span class="kw">for</span> <span class="ident">parent_edge</span> <span class="kw">in</span> <span class="ident">parents</span> {
-                    <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="ident">parent_edge</span>);
-                    <span class="kw">let</span> <span class="ident">siblings</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">child_pairs</span>(<span class="kw-2">&amp;</span><span class="ident">parent</span>);
+                <span class="kw">for </span>parent_edge <span class="kw">in </span>parents {
+                    <span class="kw">let </span>parent = <span class="self">self</span>.edge_source(<span class="kw-2">&amp;</span>parent_edge);
+                    <span class="kw">let </span>siblings = <span class="self">self</span>.child_pairs(<span class="kw-2">&amp;</span>parent);
 
-                    <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">sibling</span>) <span class="kw">in</span> <span class="ident">siblings</span> {
-                        <span class="kw">let</span> <span class="ident">possible_edge</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">find_edge</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>, <span class="ident">sibling</span>.<span class="ident">node_ix</span>);
-                        <span class="kw">let</span> <span class="ident">is_if_node_child</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="ident">sibling</span>).<span class="ident">into_iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
-                            <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>).<span class="ident">unwrap</span>();
-                            <span class="macro">matches!</span>(<span class="ident">content</span>, <span class="ident">QueryGraphDependency::Then</span> <span class="op">|</span> <span class="ident">QueryGraphDependency::Else</span>)
+                    <span class="kw">for </span>(<span class="kw">_</span>, sibling) <span class="kw">in </span>siblings {
+                        <span class="kw">let </span>possible_edge = <span class="self">self</span>.graph.find_edge(node.node_ix, sibling.node_ix);
+                        <span class="kw">let </span>is_if_node_child = <span class="self">self</span>.incoming_edges(<span class="kw-2">&amp;</span>sibling).into_iter().any(|edge| {
+                            <span class="kw">let </span>content = <span class="self">self</span>.edge_content(<span class="kw-2">&amp;</span>edge).unwrap();
+                            <span class="macro">matches!</span>(content, QueryGraphDependency::Then | QueryGraphDependency::Else)
                         });
 
-                        <span class="kw">if</span> <span class="ident">sibling</span> <span class="op">!</span><span class="op">=</span> <span class="ident">node</span>
-                            <span class="op">&amp;&amp;</span> <span class="ident">possible_edge</span>.<span class="ident">is_none</span>()
-                            <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_if_node_child</span>
-                            <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">node_content</span>(<span class="kw-2">&amp;</span><span class="ident">sibling</span>).<span class="ident">unwrap</span>(), <span class="ident">Node::Flow</span>(<span class="kw">_</span>))
+                        <span class="kw">if </span>sibling != node
+                            &amp;&amp; possible_edge.is_none()
+                            &amp;&amp; !is_if_node_child
+                            &amp;&amp; !<span class="macro">matches!</span>(<span class="self">self</span>.node_content(<span class="kw-2">&amp;</span>sibling).unwrap(), Node::Flow(<span class="kw">_</span>))
                         {
-                            <span class="self">self</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>, <span class="kw-2">&amp;</span><span class="ident">sibling</span>, <span class="ident">QueryGraphDependency::ExecutionOrder</span>)<span class="question-mark">?</span>;
+                            <span class="self">self</span>.create_edge(<span class="kw-2">&amp;</span>node, <span class="kw-2">&amp;</span>sibling, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
                         }
                     }
                 }
@@ -1498,66 +1498,66 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Traverses the graph and ensures that return nodes have correct `ProjectedDataDependency`s on their incoming edges.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Steps:</span>
-    <span class="doccomment">/// - Collect &amp; merge the outgoing edge dependencies into a single `FieldSelection`</span>
-    <span class="doccomment">/// - Transform the incoming edge dependencies of the return nodes with the merged outgoing edge dependencies of the previous step</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This ensures that children nodes of return nodes have the proper data dependencies at their disposal.</span>
-    <span class="doccomment">/// In case the parent nodes of return nodes do not have a field selection that fullfils the new dependency,</span>
-    <span class="doccomment">/// a reload node will be inserted in between the parent and the return node by the `insert_reloads` method.</span>
-    <span class="kw">fn</span> <span class="ident">ensure_return_nodes_have_parent_dependency</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">return_nodes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">graph</span>
-            .<span class="ident">node_indices</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">ix</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">NodeRef</span> { <span class="ident">node_ix</span>: <span class="ident">ix</span> };
+    <span class="doccomment">/// Traverses the graph and ensures that return nodes have correct `ProjectedDataDependency`s on their incoming edges.
+    ///
+    /// Steps:
+    /// - Collect &amp; merge the outgoing edge dependencies into a single `FieldSelection`
+    /// - Transform the incoming edge dependencies of the return nodes with the merged outgoing edge dependencies of the previous step
+    ///
+    /// This ensures that children nodes of return nodes have the proper data dependencies at their disposal.
+    /// In case the parent nodes of return nodes do not have a field selection that fullfils the new dependency,
+    /// a reload node will be inserted in between the parent and the return node by the `insert_reloads` method.
+    </span><span class="kw">fn </span>ensure_return_nodes_have_parent_dependency(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryGraphResult&lt;()&gt; {
+        <span class="kw">let </span>return_nodes: Vec&lt;NodeRef&gt; = <span class="self">self
+            </span>.graph
+            .node_indices()
+            .filter_map(|ix| {
+                <span class="kw">let </span>node = NodeRef { node_ix: ix };
 
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">node_content</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>).<span class="ident">unwrap</span>() {
-                    <span class="ident">Node::Flow</span>(<span class="ident">Flow::Return</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">node</span>),
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="kw">match </span><span class="self">self</span>.node_content(<span class="kw-2">&amp;</span>node).unwrap() {
+                    Node::Flow(Flow::Return(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(node),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                 }
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">for</span> <span class="ident">return_node</span> <span class="kw">in</span> <span class="ident">return_nodes</span> {
-            <span class="kw">let</span> <span class="ident">out_edges</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">outgoing_edges</span>(<span class="kw-2">&amp;</span><span class="ident">return_node</span>);
-            <span class="kw">let</span> <span class="ident">dependencies</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">out_edges</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>).<span class="ident">unwrap</span>() {
-                    <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="kw-2">ref</span> <span class="ident">requested_selection</span>, <span class="kw">_</span>) =&gt; {
-                        <span class="prelude-val">Some</span>(<span class="ident">requested_selection</span>.<span class="ident">clone</span>())
+        <span class="kw">for </span>return_node <span class="kw">in </span>return_nodes {
+            <span class="kw">let </span>out_edges = <span class="self">self</span>.outgoing_edges(<span class="kw-2">&amp;</span>return_node);
+            <span class="kw">let </span>dependencies: Vec&lt;FieldSelection&gt; = out_edges
+                .into_iter()
+                .filter_map(|edge| <span class="kw">match </span><span class="self">self</span>.edge_content(<span class="kw-2">&amp;</span>edge).unwrap() {
+                    QueryGraphDependency::ProjectedDataDependency(<span class="kw-2">ref </span>requested_selection, <span class="kw">_</span>) =&gt; {
+                        <span class="prelude-val">Some</span>(requested_selection.clone())
                     }
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                 })
-                .<span class="ident">collect</span>();
-            <span class="kw">let</span> <span class="ident">dependencies</span> <span class="op">=</span> <span class="ident">FieldSelection::union</span>(<span class="ident">dependencies</span>);
+                .collect();
+            <span class="kw">let </span>dependencies = FieldSelection::union(dependencies);
 
-            <span class="comment">// Assumption: We currently always have at most one single incoming ProjectedDataDependency edge</span>
-            <span class="comment">// connected to return nodes. This will break if we ever have more.</span>
-            <span class="kw">let</span> <span class="ident">in_edges</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="ident">return_node</span>);
-            <span class="kw">let</span> <span class="ident">incoming_dep_edge</span> <span class="op">=</span> <span class="ident">in_edges</span>.<span class="ident">into_iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
+            <span class="comment">// Assumption: We currently always have at most one single incoming ProjectedDataDependency edge
+            // connected to return nodes. This will break if we ever have more.
+            </span><span class="kw">let </span>in_edges = <span class="self">self</span>.incoming_edges(<span class="kw-2">&amp;</span>return_node);
+            <span class="kw">let </span>incoming_dep_edge = in_edges.into_iter().find(|edge| {
                 <span class="macro">matches!</span>(
-                    <span class="self">self</span>.<span class="ident">edge_content</span>(<span class="ident">edge</span>),
-                    <span class="prelude-val">Some</span>(<span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="kw">_</span>, <span class="kw">_</span>))
+                    <span class="self">self</span>.edge_content(edge),
+                    <span class="prelude-val">Some</span>(QueryGraphDependency::ProjectedDataDependency(<span class="kw">_</span>, <span class="kw">_</span>))
                 )
             });
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">incoming_edge</span>) <span class="op">=</span> <span class="ident">incoming_dep_edge</span> {
-                <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="ident">incoming_edge</span>);
-                <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_target</span>(<span class="kw-2">&amp;</span><span class="ident">incoming_edge</span>);
-                <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">remove_edge</span>(<span class="ident">incoming_edge</span>)
-                    .<span class="ident">expect</span>(<span class="string">&quot;Expected edges between marked nodes to be non-empty.&quot;</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(incoming_edge) = incoming_dep_edge {
+                <span class="kw">let </span>source = <span class="self">self</span>.edge_source(<span class="kw-2">&amp;</span>incoming_edge);
+                <span class="kw">let </span>target = <span class="self">self</span>.edge_target(<span class="kw-2">&amp;</span>incoming_edge);
+                <span class="kw">let </span>content = <span class="self">self
+                    </span>.remove_edge(incoming_edge)
+                    .expect(<span class="string">&quot;Expected edges between marked nodes to be non-empty.&quot;</span>);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">existing</span>, <span class="ident">transformer</span>) <span class="op">=</span> <span class="ident">content</span> {
-                    <span class="kw">let</span> <span class="ident">merged_dependencies</span> <span class="op">=</span> <span class="ident">dependencies</span>.<span class="ident">merge</span>(<span class="ident">existing</span>);
+                <span class="kw">if let </span>QueryGraphDependency::ProjectedDataDependency(existing, transformer) = content {
+                    <span class="kw">let </span>merged_dependencies = dependencies.merge(existing);
 
-                    <span class="self">self</span>.<span class="ident">create_edge</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">source</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">target</span>,
-                        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">merged_dependencies</span>, <span class="ident">transformer</span>),
+                    <span class="self">self</span>.create_edge(
+                        <span class="kw-2">&amp;</span>source,
+                        <span class="kw-2">&amp;</span>target,
+                        QueryGraphDependency::ProjectedDataDependency(merged_dependencies, transformer),
                     )<span class="question-mark">?</span>;
                 }
             }
@@ -1566,136 +1566,136 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Traverses the query graph and checks if reloads of nodes are necessary.</span>
-    <span class="doccomment">/// Whether or not a node needs to be reloaded is determined based on the</span>
-    <span class="doccomment">/// incoming `ProjectedDataDependency` edge transformers, as those hold the `FieldSelection`s</span>
-    <span class="doccomment">/// all records of the source result need to contain in order to satisfy dependencies.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a node needs to be reloaded, ALL edges going out from the reloaded node need to be rewired, not</span>
-    <span class="doccomment">/// only unsatified ones.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Example</span>
-    <span class="doccomment">/// Given a query graph, where 3 children require different set of fields ((A, B), (B, C), (A, D))</span>
-    <span class="doccomment">/// to execute their dependent operations:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// ┌ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">///     Parent   │─────────┬───────────────┐</span>
-    <span class="doccomment">/// └ ─ ─ ─ ─ ─ ─          │               │</span>
-    <span class="doccomment">///        │               │               │</span>
-    <span class="doccomment">///     (A, B)          (B, C)           (A, D)</span>
-    <span class="doccomment">///        │               │               │</span>
-    <span class="doccomment">///        ▼               ▼               ▼</span>
-    <span class="doccomment">/// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">///    Child A   │     Child B   │     Child C   │</span>
-    <span class="doccomment">/// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// However, `Parent` only returns `(A, B)`, for example, because that&#39;s the primary ID of the parent model</span>
-    <span class="doccomment">/// and `Parent` is an operation that only returns IDs (e.g. update, updateMany).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In order to satisfy children B and C, the graph is altered by this post-processing call:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// ┌ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">///     Parent   │</span>
-    <span class="doccomment">/// └ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">///        │</span>
-    <span class="doccomment">///     (A, B) (== Primary ID)</span>
-    <span class="doccomment">///        │</span>
-    <span class="doccomment">///        ▼</span>
-    <span class="doccomment">/// ┌────────────┐</span>
-    <span class="doccomment">/// │   Reload   │─────────┬───────────────┐</span>
-    <span class="doccomment">/// └────────────┘         │               │</span>
-    <span class="doccomment">///        │               │               │</span>
-    <span class="doccomment">///     (A, B)          (B, C)           (A, D)</span>
-    <span class="doccomment">///        │               │               │</span>
-    <span class="doccomment">///        ▼               ▼               ▼</span>
-    <span class="doccomment">/// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">///    Child A   │     Child B   │     Child C   │</span>
-    <span class="doccomment">/// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The edges from `Parent` to all dependent children are removed from the graph and reinserted in order</span>
-    <span class="doccomment">/// on the reload node.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `Reload` node is always a &quot;find many&quot; query.</span>
-    <span class="doccomment">/// Unwraps are safe because we&#39;re operating on the unprocessed state of the graph (`Expressionista` changes that).</span>
-    <span class="kw">fn</span> <span class="ident">insert_reloads</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">reloads</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">NodeRef</span>, <span class="ident">ModelRef</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">graph</span>
-            .<span class="ident">node_indices</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">ix</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">NodeRef</span> { <span class="ident">node_ix</span>: <span class="ident">ix</span> };
+    <span class="doccomment">/// Traverses the query graph and checks if reloads of nodes are necessary.
+    /// Whether or not a node needs to be reloaded is determined based on the
+    /// incoming `ProjectedDataDependency` edge transformers, as those hold the `FieldSelection`s
+    /// all records of the source result need to contain in order to satisfy dependencies.
+    ///
+    /// If a node needs to be reloaded, ALL edges going out from the reloaded node need to be rewired, not
+    /// only unsatified ones.
+    ///
+    /// ## Example
+    /// Given a query graph, where 3 children require different set of fields ((A, B), (B, C), (A, D))
+    /// to execute their dependent operations:
+    /// ```text
+    /// ┌ ─ ─ ─ ─ ─ ─
+    ///     Parent   │─────────┬───────────────┐
+    /// └ ─ ─ ─ ─ ─ ─          │               │
+    ///        │               │               │
+    ///     (A, B)          (B, C)           (A, D)
+    ///        │               │               │
+    ///        ▼               ▼               ▼
+    /// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─
+    ///    Child A   │     Child B   │     Child C   │
+    /// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
+    /// ```
+    /// However, `Parent` only returns `(A, B)`, for example, because that&#39;s the primary ID of the parent model
+    /// and `Parent` is an operation that only returns IDs (e.g. update, updateMany).
+    ///
+    /// In order to satisfy children B and C, the graph is altered by this post-processing call:
+    /// ```text
+    /// ┌ ─ ─ ─ ─ ─ ─
+    ///     Parent   │
+    /// └ ─ ─ ─ ─ ─ ─
+    ///        │
+    ///     (A, B) (== Primary ID)
+    ///        │
+    ///        ▼
+    /// ┌────────────┐
+    /// │   Reload   │─────────┬───────────────┐
+    /// └────────────┘         │               │
+    ///        │               │               │
+    ///     (A, B)          (B, C)           (A, D)
+    ///        │               │               │
+    ///        ▼               ▼               ▼
+    /// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─
+    ///    Child A   │     Child B   │     Child C   │
+    /// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
+    /// ```
+    ///
+    /// The edges from `Parent` to all dependent children are removed from the graph and reinserted in order
+    /// on the reload node.
+    ///
+    /// The `Reload` node is always a &quot;find many&quot; query.
+    /// Unwraps are safe because we&#39;re operating on the unprocessed state of the graph (`Expressionista` changes that).
+    </span><span class="kw">fn </span>insert_reloads(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryGraphResult&lt;()&gt; {
+        <span class="kw">let </span>reloads: Vec&lt;(NodeRef, ModelRef, Vec&lt;FieldSelection&gt;)&gt; = <span class="self">self
+            </span>.graph
+            .node_indices()
+            .filter_map(|ix| {
+                <span class="kw">let </span>node = NodeRef { node_ix: ix };
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">q</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">node_content</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>).<span class="ident">unwrap</span>() {
-                    <span class="kw">let</span> <span class="ident">edges</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">outgoing_edges</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>);
+                <span class="kw">if let </span>Node::Query(q) = <span class="self">self</span>.node_content(<span class="kw-2">&amp;</span>node).unwrap() {
+                    <span class="kw">let </span>edges = <span class="self">self</span>.outgoing_edges(<span class="kw-2">&amp;</span>node);
 
-                    <span class="kw">let</span> <span class="ident">unsatisfied_dependencies</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">edges</span>
-                        .<span class="ident">into_iter</span>()
-                        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>).<span class="ident">unwrap</span>() {
-                            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="kw-2">ref</span> <span class="ident">requested_selection</span>, <span class="kw">_</span>)
-                                <span class="kw">if</span> <span class="op">!</span><span class="ident">q</span>.<span class="ident">returns</span>(<span class="ident">requested_selection</span>) =&gt;
+                    <span class="kw">let </span>unsatisfied_dependencies: Vec&lt;FieldSelection&gt; = edges
+                        .into_iter()
+                        .filter_map(|edge| <span class="kw">match </span><span class="self">self</span>.edge_content(<span class="kw-2">&amp;</span>edge).unwrap() {
+                            QueryGraphDependency::ProjectedDataDependency(<span class="kw-2">ref </span>requested_selection, <span class="kw">_</span>)
+                                <span class="kw">if </span>!q.returns(requested_selection) =&gt;
                             {
                                 <span class="macro">trace!</span>(
                                     <span class="string">&quot;Query {:?} does not return requested selection {:?} and will be reloaded.&quot;</span>,
-                                    <span class="ident">q</span>,
-                                    <span class="ident">requested_selection</span>.<span class="ident">prisma_names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                                    q,
+                                    requested_selection.prisma_names().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 );
-                                <span class="prelude-val">Some</span>(<span class="ident">requested_selection</span>.<span class="ident">clone</span>())
+                                <span class="prelude-val">Some</span>(requested_selection.clone())
                             }
-                            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                         })
-                        .<span class="ident">collect</span>();
+                        .collect();
 
-                    <span class="kw">if</span> <span class="ident">unsatisfied_dependencies</span>.<span class="ident">is_empty</span>() {
-                        <span class="prelude-val">None</span>
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">Some</span>((<span class="ident">node</span>, <span class="ident">q</span>.<span class="ident">model</span>(), <span class="ident">unsatisfied_dependencies</span>))
+                    <span class="kw">if </span>unsatisfied_dependencies.is_empty() {
+                        <span class="prelude-val">None
+                    </span>} <span class="kw">else </span>{
+                        <span class="prelude-val">Some</span>((node, q.model(), unsatisfied_dependencies))
                     }
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">for</span> (<span class="ident">node</span>, <span class="ident">model</span>, <span class="kw-2">mut</span> <span class="ident">identifiers</span>) <span class="kw">in</span> <span class="ident">reloads</span> {
-            <span class="comment">// Create reload node and connect it to the `node`.</span>
-            <span class="kw">let</span> <span class="ident">primary_model_id</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>();
-            <span class="ident">identifiers</span>.<span class="ident">push</span>(<span class="ident">primary_model_id</span>.<span class="ident">clone</span>());
+        <span class="kw">for </span>(node, model, <span class="kw-2">mut </span>identifiers) <span class="kw">in </span>reloads {
+            <span class="comment">// Create reload node and connect it to the `node`.
+            </span><span class="kw">let </span>primary_model_id = model.primary_identifier();
+            identifiers.push(primary_model_id.clone());
 
-            <span class="kw">let</span> <span class="ident">read_query</span> <span class="op">=</span> <span class="ident">ReadQuery::ManyRecordsQuery</span>(<span class="ident">ManyRecordsQuery</span> {
-                <span class="ident">name</span>: <span class="string">&quot;reload&quot;</span>.<span class="ident">into</span>(),
-                <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-                <span class="ident">model</span>: <span class="ident">model</span>.<span class="ident">clone</span>(),
-                <span class="ident">args</span>: <span class="ident">QueryArguments::new</span>(<span class="ident">model</span>),
-                <span class="ident">selected_fields</span>: <span class="ident">FieldSelection::union</span>(<span class="ident">identifiers</span>),
-                <span class="ident">nested</span>: <span class="macro">vec!</span>[],
-                <span class="ident">selection_order</span>: <span class="macro">vec!</span>[],
-                <span class="ident">aggregation_selections</span>: <span class="macro">vec!</span>[],
+            <span class="kw">let </span>read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
+                name: <span class="string">&quot;reload&quot;</span>.into(),
+                alias: <span class="prelude-val">None</span>,
+                model: model.clone(),
+                args: QueryArguments::new(model),
+                selected_fields: FieldSelection::union(identifiers),
+                nested: <span class="macro">vec!</span>[],
+                selection_order: <span class="macro">vec!</span>[],
+                aggregation_selections: <span class="macro">vec!</span>[],
             });
 
-            <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Query::Read</span>(<span class="ident">read_query</span>);
-            <span class="kw">let</span> <span class="ident">reload_node</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">create_node</span>(<span class="ident">query</span>);
+            <span class="kw">let </span>query = Query::Read(read_query);
+            <span class="kw">let </span>reload_node = <span class="self">self</span>.create_node(query);
 
-            <span class="self">self</span>.<span class="ident">create_edge</span>(
-                <span class="kw-2">&amp;</span><span class="ident">node</span>,
-                <span class="kw-2">&amp;</span><span class="ident">reload_node</span>,
-                <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-                    <span class="ident">primary_model_id</span>,
-                    <span class="ident">Box::new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">reload_node</span>, <span class="ident">parent_result</span><span class="op">|</span> {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Read</span>(<span class="ident">ReadQuery::ManyRecordsQuery</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">mr</span>))) <span class="op">=</span> <span class="ident">reload_node</span> {
-                            <span class="ident">mr</span>.<span class="ident">set_filter</span>(<span class="ident">parent_result</span>.<span class="ident">filter</span>());
+            <span class="self">self</span>.create_edge(
+                <span class="kw-2">&amp;</span>node,
+                <span class="kw-2">&amp;</span>reload_node,
+                QueryGraphDependency::ProjectedDataDependency(
+                    primary_model_id,
+                    Box::new(|<span class="kw-2">mut </span>reload_node, parent_result| {
+                        <span class="kw">if let </span>Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(<span class="kw-2">ref mut </span>mr))) = reload_node {
+                            mr.set_filter(parent_result.filter());
                         }
 
-                        <span class="prelude-val">Ok</span>(<span class="ident">reload_node</span>)
+                        <span class="prelude-val">Ok</span>(reload_node)
                     }),
                 ),
             )<span class="question-mark">?</span>;
 
-            <span class="comment">// Remove all edges from node to children, reattach them to the reload node</span>
-            <span class="kw">for</span> <span class="ident">edge</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">outgoing_edges</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>) {
-                <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_target</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>);
-                <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remove_edge</span>(<span class="ident">edge</span>).<span class="ident">unwrap</span>();
+            <span class="comment">// Remove all edges from node to children, reattach them to the reload node
+            </span><span class="kw">for </span>edge <span class="kw">in </span><span class="self">self</span>.outgoing_edges(<span class="kw-2">&amp;</span>node) {
+                <span class="kw">let </span>target = <span class="self">self</span>.edge_target(<span class="kw-2">&amp;</span>edge);
+                <span class="kw">let </span>content = <span class="self">self</span>.remove_edge(edge).unwrap();
 
-                <span class="self">self</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">reload_node</span>, <span class="kw-2">&amp;</span><span class="ident">target</span>, <span class="ident">content</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.create_edge(<span class="kw-2">&amp;</span>reload_node, <span class="kw-2">&amp;</span>target, content)<span class="question-mark">?</span>;
             }
         }
 
@@ -1703,4 +1703,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

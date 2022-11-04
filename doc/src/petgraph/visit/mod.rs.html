@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/visit/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../petgraph/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/visit/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../petgraph/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -712,719 +712,719 @@
 <span id="712">712</span>
 <span id="713">713</span>
 <span id="714">714</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Graph traits and graph traversals.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### The `Into-` Traits</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Graph traits like [`IntoNeighbors`][in] create iterators and use the same</span>
-<span class="doccomment">//! pattern that `IntoIterator` does: the trait takes a reference to a graph,</span>
-<span class="doccomment">//! and produces an iterator. These traits are quite composable, but with the</span>
-<span class="doccomment">//! limitation that they only use shared references to graphs.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Graph Traversal</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Dfs`](struct.Dfs.html), [`Bfs`][bfs], [`DfsPostOrder`][dfspo] and</span>
-<span class="doccomment">//! [`Topo`][topo]  are basic visitors and they use “walker” methods: the</span>
-<span class="doccomment">//! visitors don&#39;t hold the graph as borrowed during traversal, only for the</span>
-<span class="doccomment">//! `.next()` call on the walker. They can be converted to iterators</span>
-<span class="doccomment">//! through the [`Walker`][w] trait.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! There is also the callback based traversal [`depth_first_search`][dfs].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [bfs]: struct.Bfs.html</span>
-<span class="doccomment">//! [dfspo]: struct.DfsPostOrder.html</span>
-<span class="doccomment">//! [topo]: struct.Topo.html</span>
-<span class="doccomment">//! [dfs]: fn.depth_first_search.html</span>
-<span class="doccomment">//! [w]: trait.Walker.html</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Other Graph Traits</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The traits are rather loosely coupled at the moment (which is intentional,</span>
-<span class="doccomment">//! but will develop a bit), and there are traits missing that could be added.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Not much is needed to be able to use the visitors on a graph. A graph</span>
-<span class="doccomment">//! needs to define [`GraphBase`][gb], [`IntoNeighbors`][in] and</span>
-<span class="doccomment">//! [`Visitable`][vis] as a minimum.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [gb]: trait.GraphBase.html</span>
-<span class="doccomment">//! [in]: trait.IntoNeighbors.html</span>
-<span class="doccomment">//! [vis]: trait.Visitable.html</span>
-<span class="doccomment">//!</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Graph traits and graph traversals.
+//!
+//! ### The `Into-` Traits
+//!
+//! Graph traits like [`IntoNeighbors`][in] create iterators and use the same
+//! pattern that `IntoIterator` does: the trait takes a reference to a graph,
+//! and produces an iterator. These traits are quite composable, but with the
+//! limitation that they only use shared references to graphs.
+//!
+//! ### Graph Traversal
+//!
+//! [`Dfs`](struct.Dfs.html), [`Bfs`][bfs], [`DfsPostOrder`][dfspo] and
+//! [`Topo`][topo]  are basic visitors and they use “walker” methods: the
+//! visitors don&#39;t hold the graph as borrowed during traversal, only for the
+//! `.next()` call on the walker. They can be converted to iterators
+//! through the [`Walker`][w] trait.
+//!
+//! There is also the callback based traversal [`depth_first_search`][dfs].
+//!
+//! [bfs]: struct.Bfs.html
+//! [dfspo]: struct.DfsPostOrder.html
+//! [topo]: struct.Topo.html
+//! [dfs]: fn.depth_first_search.html
+//! [w]: trait.Walker.html
+//!
+//! ### Other Graph Traits
+//!
+//! The traits are rather loosely coupled at the moment (which is intentional,
+//! but will develop a bit), and there are traits missing that could be added.
+//!
+//! Not much is needed to be able to use the visitors on a graph. A graph
+//! needs to define [`GraphBase`][gb], [`IntoNeighbors`][in] and
+//! [`Visitable`][vis] as a minimum.
+//!
+//! [gb]: trait.GraphBase.html
+//! [in]: trait.IntoNeighbors.html
+//! [vis]: trait.Visitable.html
+//!
 
-<span class="comment">// filter, reversed have their `mod` lines at the end,</span>
-<span class="comment">// so that they can use the trait template macros</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::filter</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::reversed</span>::<span class="kw-2">*</span>;
+</span><span class="comment">// filter, reversed have their `mod` lines at the end,
+// so that they can use the trait template macros
+</span><span class="kw">pub use </span><span class="self">self</span>::filter::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::reversed::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span> <span class="kw">mod</span> <span class="ident">macros</span>;
+<span class="attribute">#[macro_use] </span><span class="kw">mod </span>macros;
 
-<span class="kw">mod</span> <span class="ident">dfsvisit</span>;
-<span class="kw">mod</span> <span class="ident">traversal</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::dfsvisit</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::traversal</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>dfsvisit;
+<span class="kw">mod </span>traversal;
+<span class="kw">pub use </span><span class="self">self</span>::dfsvisit::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::traversal::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">fixedbitset::FixedBitSet</span>;
-<span class="kw">use</span> <span class="ident">std::collections</span>::{
-    <span class="ident">HashSet</span>,
+<span class="kw">use </span>fixedbitset::FixedBitSet;
+<span class="kw">use </span>std::collections::{
+    HashSet,
 };
-<span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">Hash</span>, <span class="ident">BuildHasher</span>};
+<span class="kw">use </span>std::hash::{Hash, BuildHasher};
 
-<span class="kw">use</span> <span class="ident">prelude</span>::{<span class="ident">Graph</span>, <span class="ident">Direction</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">prelude::GraphMap</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">prelude::StableGraph</span>;
-<span class="kw">use</span> <span class="ident">graph</span>::{<span class="ident">NodeIndex</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">graph</span>,
-    <span class="ident">EdgeType</span>,
+<span class="kw">use </span>prelude::{Graph, Direction};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">use </span>prelude::GraphMap;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">use </span>prelude::StableGraph;
+<span class="kw">use </span>graph::{NodeIndex};
+<span class="kw">use super</span>::{
+    graph,
+    EdgeType,
 };
 
-<span class="kw">use</span> <span class="ident">graph</span>::{
-    <span class="ident">IndexType</span>,
+<span class="kw">use </span>graph::{
+    IndexType,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">stable_graph</span>;
-<span class="kw">use</span> <span class="ident">graph::Frozen</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">use </span>stable_graph;
+<span class="kw">use </span>graph::Frozen;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">graphmap</span>::{
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">use </span>graphmap::{
     <span class="self">self</span>,
-    <span class="ident">NodeTrait</span>,
+    NodeTrait,
 };
 
 <span class="macro">trait_template!</span>{
-<span class="doccomment">/// Base graph trait: defines the associated node identifier and</span>
-<span class="doccomment">/// edge identifier types.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GraphBase</span> {
-    <span class="comment">// FIXME: We can drop this escape/nodelegate stuff in Rust 1.18</span>
-    @<span class="ident">escape</span> [<span class="kw">type</span> <span class="ident">NodeId</span>]
-    @<span class="ident">escape</span> [<span class="kw">type</span> <span class="ident">EdgeId</span>]
-    @<span class="ident">section</span> <span class="ident">nodelegate</span>
-    <span class="doccomment">/// edge identifier</span>
-    <span class="kw">type</span> <span class="ident">EdgeId</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">PartialEq</span>;
-    <span class="doccomment">/// node identifier</span>
-    <span class="kw">type</span> <span class="ident">NodeId</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">PartialEq</span>;
+<span class="doccomment">/// Base graph trait: defines the associated node identifier and
+/// edge identifier types.
+</span><span class="kw">pub trait </span>GraphBase {
+    <span class="comment">// FIXME: We can drop this escape/nodelegate stuff in Rust 1.18
+    </span>@escape [<span class="kw">type </span>NodeId]
+    @escape [<span class="kw">type </span>EdgeId]
+    @section nodelegate
+    <span class="doccomment">/// edge identifier
+    </span><span class="kw">type </span>EdgeId: Copy + PartialEq;
+    <span class="doccomment">/// node identifier
+    </span><span class="kw">type </span>NodeId: Copy + PartialEq;
 }
 }
 
-<span class="macro">GraphBase!</span>{<span class="ident">delegate_impl</span> []}
-<span class="macro">GraphBase!</span>{<span class="ident">delegate_impl</span> [[<span class="lifetime">&#39;a</span>, <span class="ident">G</span>], <span class="ident">G</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">G</span>, <span class="ident">deref</span>]}
+<span class="macro">GraphBase!</span>{delegate_impl []}
+<span class="macro">GraphBase!</span>{delegate_impl [[<span class="lifetime">&#39;a</span>, G], G, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>G, deref]}
 
-<span class="doccomment">/// A copyable reference to a graph.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GraphRef</span> : <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">GraphBase</span> { }
+<span class="doccomment">/// A copyable reference to a graph.
+</span><span class="kw">pub trait </span>GraphRef : Copy + GraphBase { }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="ident">GraphRef</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">G</span> <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphBase</span> { }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, G&gt; GraphRef <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>G <span class="kw">where </span>G: GraphBase { }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="ident">GraphBase</span> <span class="kw">for</span> <span class="ident">Frozen</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphBase</span> {
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">G::NodeId</span>;
-    <span class="kw">type</span> <span class="ident">EdgeId</span> <span class="op">=</span> <span class="ident">G::EdgeId</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, G&gt; GraphBase <span class="kw">for </span>Frozen&lt;<span class="lifetime">&#39;a</span>, G&gt; <span class="kw">where </span>G: GraphBase {
+    <span class="kw">type </span>NodeId = G::NodeId;
+    <span class="kw">type </span>EdgeId = G::EdgeId;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IntoNeighbors</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty, Ix&gt; IntoNeighbors <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">Neighbors</span> <span class="op">=</span> <span class="ident">stable_graph::Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="ident"><span class="self">Self</span>::Neighbors</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">neighbors</span>(<span class="ident">n</span>)
+    <span class="kw">type </span>Neighbors = stable_graph::Neighbors&lt;<span class="lifetime">&#39;a</span>, E, Ix&gt;;
+    <span class="kw">fn </span>neighbors(<span class="self">self</span>, n: <span class="self">Self</span>::NodeId) -&gt; <span class="self">Self</span>::Neighbors {
+        (<span class="kw-2">*</span><span class="self">self</span>).neighbors(n)
     }
 }
 
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>: <span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">IntoNeighbors</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Hash</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N: <span class="lifetime">&#39;a</span>, E, Ty&gt; IntoNeighbors <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: Copy + Ord + Hash,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">Neighbors</span> <span class="op">=</span> <span class="ident">graphmap::Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ty</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="ident"><span class="self">Self</span>::Neighbors</span> {
-        <span class="self">self</span>.<span class="ident">neighbors</span>(<span class="ident">n</span>)
+    <span class="kw">type </span>Neighbors = graphmap::Neighbors&lt;<span class="lifetime">&#39;a</span>, N, Ty&gt;;
+    <span class="kw">fn </span>neighbors(<span class="self">self</span>, n: <span class="self">Self</span>::NodeId) -&gt; <span class="self">Self</span>::Neighbors {
+        <span class="self">self</span>.neighbors(n)
     }
 }
 
 
-<span class="macro">trait_template!</span> {
-<span class="doccomment">/// Access to the neighbors of each node</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The neighbors are, depending on the graph’s edge type:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - `Directed`: All targets of edges from `a`.</span>
-<span class="doccomment">/// - `Undirected`: All other endpoints of edges connected to `a`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoNeighbors</span> : <span class="ident">GraphRef</span> {
-    @<span class="ident">section</span> <span class="kw">type</span>
-    <span class="kw">type</span> <span class="ident">Neighbors</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::NodeId</span><span class="op">&gt;</span>;
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="doccomment">/// Return an iterator of the neighbors of node `a`.</span>
-    <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="self">self</span>: <span class="self">Self</span>, <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="ident"><span class="self">Self</span>::Neighbors</span>;
+<span class="macro">trait_template! </span>{
+<span class="doccomment">/// Access to the neighbors of each node
+///
+/// The neighbors are, depending on the graph’s edge type:
+///
+/// - `Directed`: All targets of edges from `a`.
+/// - `Undirected`: All other endpoints of edges connected to `a`.
+</span><span class="kw">pub trait </span>IntoNeighbors : GraphRef {
+    @section <span class="kw">type
+    type </span>Neighbors: Iterator&lt;Item=<span class="self">Self</span>::NodeId&gt;;
+    @section <span class="self">self
+    </span><span class="doccomment">/// Return an iterator of the neighbors of node `a`.
+    </span><span class="kw">fn </span>neighbors(<span class="self">self</span>: <span class="self">Self</span>, a: <span class="self">Self</span>::NodeId) -&gt; <span class="self">Self</span>::Neighbors;
 }
 }
 
-<span class="macro">IntoNeighbors!</span>{<span class="ident">delegate_impl</span> []}
+<span class="macro">IntoNeighbors!</span>{delegate_impl []}
 
-<span class="macro">trait_template!</span> {
-<span class="doccomment">/// Access to the neighbors of each node, through incoming or outgoing edges.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Depending on the graph’s edge type, the neighbors of a given directionality</span>
-<span class="doccomment">/// are:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - `Directed`, `Outgoing`: All targets of edges from `a`.</span>
-<span class="doccomment">/// - `Directed`, `Incoming`: All sources of edges to `a`.</span>
-<span class="doccomment">/// - `Undirected`: All other endpoints of edges connected to `a`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoNeighborsDirected</span> : <span class="ident">IntoNeighbors</span> {
-    @<span class="ident">section</span> <span class="kw">type</span>
-    <span class="kw">type</span> <span class="ident">NeighborsDirected</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::NodeId</span><span class="op">&gt;</span>;
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="kw">fn</span> <span class="ident">neighbors_directed</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>, <span class="ident">d</span>: <span class="ident">Direction</span>)
-        -&gt; <span class="ident"><span class="self">Self</span>::NeighborsDirected</span>;
+<span class="macro">trait_template! </span>{
+<span class="doccomment">/// Access to the neighbors of each node, through incoming or outgoing edges.
+///
+/// Depending on the graph’s edge type, the neighbors of a given directionality
+/// are:
+///
+/// - `Directed`, `Outgoing`: All targets of edges from `a`.
+/// - `Directed`, `Incoming`: All sources of edges to `a`.
+/// - `Undirected`: All other endpoints of edges connected to `a`.
+</span><span class="kw">pub trait </span>IntoNeighborsDirected : IntoNeighbors {
+    @section <span class="kw">type
+    type </span>NeighborsDirected: Iterator&lt;Item=<span class="self">Self</span>::NodeId&gt;;
+    @section <span class="self">self
+    </span><span class="kw">fn </span>neighbors_directed(<span class="self">self</span>, n: <span class="self">Self</span>::NodeId, d: Direction)
+        -&gt; <span class="self">Self</span>::NeighborsDirected;
 }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IntoNeighbors</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty, Ix&gt; IntoNeighbors <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">Neighbors</span> <span class="op">=</span> <span class="ident">graph::Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">graph::NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>)
-        -&gt; <span class="ident">graph::Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
+    <span class="kw">type </span>Neighbors = graph::Neighbors&lt;<span class="lifetime">&#39;a</span>, E, Ix&gt;;
+    <span class="kw">fn </span>neighbors(<span class="self">self</span>, n: graph::NodeIndex&lt;Ix&gt;)
+        -&gt; graph::Neighbors&lt;<span class="lifetime">&#39;a</span>, E, Ix&gt;
     {
-        <span class="ident">Graph::neighbors</span>(<span class="self">self</span>, <span class="ident">n</span>)
+        Graph::neighbors(<span class="self">self</span>, n)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IntoNeighborsDirected</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty, Ix&gt; IntoNeighborsDirected <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">NeighborsDirected</span> <span class="op">=</span> <span class="ident">graph::Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">neighbors_directed</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">graph::NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">d</span>: <span class="ident">Direction</span>)
-        -&gt; <span class="ident">graph::Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
+    <span class="kw">type </span>NeighborsDirected = graph::Neighbors&lt;<span class="lifetime">&#39;a</span>, E, Ix&gt;;
+    <span class="kw">fn </span>neighbors_directed(<span class="self">self</span>, n: graph::NodeIndex&lt;Ix&gt;, d: Direction)
+        -&gt; graph::Neighbors&lt;<span class="lifetime">&#39;a</span>, E, Ix&gt;
     {
-        <span class="ident">Graph::neighbors_directed</span>(<span class="self">self</span>, <span class="ident">n</span>, <span class="ident">d</span>)
+        Graph::neighbors_directed(<span class="self">self</span>, n, d)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IntoNeighborsDirected</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty, Ix&gt; IntoNeighborsDirected <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">NeighborsDirected</span> <span class="op">=</span> <span class="ident">stable_graph::Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">neighbors_directed</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">graph::NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">d</span>: <span class="ident">Direction</span>)
-        -&gt; <span class="ident"><span class="self">Self</span>::NeighborsDirected</span>
+    <span class="kw">type </span>NeighborsDirected = stable_graph::Neighbors&lt;<span class="lifetime">&#39;a</span>, E, Ix&gt;;
+    <span class="kw">fn </span>neighbors_directed(<span class="self">self</span>, n: graph::NodeIndex&lt;Ix&gt;, d: Direction)
+        -&gt; <span class="self">Self</span>::NeighborsDirected
     {
-        <span class="ident">StableGraph::neighbors_directed</span>(<span class="self">self</span>, <span class="ident">n</span>, <span class="ident">d</span>)
+        StableGraph::neighbors_directed(<span class="self">self</span>, n, d)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>: <span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">IntoNeighborsDirected</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Hash</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N: <span class="lifetime">&#39;a</span>, E, Ty&gt; IntoNeighborsDirected <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: Copy + Ord + Hash,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">NeighborsDirected</span> <span class="op">=</span> <span class="ident">graphmap::NeighborsDirected</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ty</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">neighbors_directed</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>, <span class="ident">dir</span>: <span class="ident">Direction</span>)
-        -&gt; <span class="ident"><span class="self">Self</span>::NeighborsDirected</span>
+    <span class="kw">type </span>NeighborsDirected = graphmap::NeighborsDirected&lt;<span class="lifetime">&#39;a</span>, N, Ty&gt;;
+    <span class="kw">fn </span>neighbors_directed(<span class="self">self</span>, n: N, dir: Direction)
+        -&gt; <span class="self">Self</span>::NeighborsDirected
     {
-        <span class="self">self</span>.<span class="ident">neighbors_directed</span>(<span class="ident">n</span>, <span class="ident">dir</span>)
+        <span class="self">self</span>.neighbors_directed(n, dir)
     }
 }
 
-<span class="macro">trait_template!</span> {
-<span class="doccomment">/// Access to the edges of each node.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The edges are, depending on the graph’s edge type:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - `Directed`: All edges from `a`.</span>
-<span class="doccomment">/// - `Undirected`: All edges connected to `a`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is an extended version of the trait `IntoNeighbors`; the former</span>
-<span class="doccomment">/// only iterates over the target node identifiers, while this trait</span>
-<span class="doccomment">/// yields edge references (trait [`EdgeRef`][er]).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [er]: trait.EdgeRef.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoEdges</span> : <span class="ident">IntoEdgeReferences</span> <span class="op">+</span> <span class="ident">IntoNeighbors</span> {
-    @<span class="ident">section</span> <span class="kw">type</span>
-    <span class="kw">type</span> <span class="ident">Edges</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::EdgeRef</span><span class="op">&gt;</span>;
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="kw">fn</span> <span class="ident">edges</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="ident"><span class="self">Self</span>::Edges</span>;
+<span class="macro">trait_template! </span>{
+<span class="doccomment">/// Access to the edges of each node.
+///
+/// The edges are, depending on the graph’s edge type:
+///
+/// - `Directed`: All edges from `a`.
+/// - `Undirected`: All edges connected to `a`.
+///
+/// This is an extended version of the trait `IntoNeighbors`; the former
+/// only iterates over the target node identifiers, while this trait
+/// yields edge references (trait [`EdgeRef`][er]).
+///
+/// [er]: trait.EdgeRef.html
+</span><span class="kw">pub trait </span>IntoEdges : IntoEdgeReferences + IntoNeighbors {
+    @section <span class="kw">type
+    type </span>Edges: Iterator&lt;Item=<span class="self">Self</span>::EdgeRef&gt;;
+    @section <span class="self">self
+    </span><span class="kw">fn </span>edges(<span class="self">self</span>, a: <span class="self">Self</span>::NodeId) -&gt; <span class="self">Self</span>::Edges;
 }
 }
 
-<span class="macro">IntoEdges!</span>{<span class="ident">delegate_impl</span> []}
+<span class="macro">IntoEdges!</span>{delegate_impl []}
 
-<span class="macro">trait_template!</span> {
-<span class="doccomment">/// Access to all edges of each node, in the specified direction.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The edges are, depending on the direction and the graph’s edge type:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - `Directed`, `Outgoing`: All edges from `a`.</span>
-<span class="doccomment">/// - `Directed`, `Incoming`: All edges to `a`.</span>
-<span class="doccomment">/// - `Undirected`: All edges connected to `a`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is an extended version of the trait `IntoNeighborsDirected`; the former</span>
-<span class="doccomment">/// only iterates over the target node identifiers, while this trait</span>
-<span class="doccomment">/// yields edge references (trait [`EdgeRef`][er]).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [er]: trait.EdgeRef.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoEdgesDirected</span> : <span class="ident">IntoEdges</span> <span class="op">+</span> <span class="ident">IntoNeighborsDirected</span> {
-    @<span class="ident">section</span> <span class="kw">type</span>
-    <span class="kw">type</span> <span class="ident">EdgesDirected</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::EdgeRef</span><span class="op">&gt;</span>;
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="kw">fn</span> <span class="ident">edges_directed</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>, <span class="ident">dir</span>: <span class="ident">Direction</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgesDirected</span>;
+<span class="macro">trait_template! </span>{
+<span class="doccomment">/// Access to all edges of each node, in the specified direction.
+///
+/// The edges are, depending on the direction and the graph’s edge type:
+///
+///
+/// - `Directed`, `Outgoing`: All edges from `a`.
+/// - `Directed`, `Incoming`: All edges to `a`.
+/// - `Undirected`: All edges connected to `a`.
+///
+/// This is an extended version of the trait `IntoNeighborsDirected`; the former
+/// only iterates over the target node identifiers, while this trait
+/// yields edge references (trait [`EdgeRef`][er]).
+///
+/// [er]: trait.EdgeRef.html
+</span><span class="kw">pub trait </span>IntoEdgesDirected : IntoEdges + IntoNeighborsDirected {
+    @section <span class="kw">type
+    type </span>EdgesDirected: Iterator&lt;Item=<span class="self">Self</span>::EdgeRef&gt;;
+    @section <span class="self">self
+    </span><span class="kw">fn </span>edges_directed(<span class="self">self</span>, a: <span class="self">Self</span>::NodeId, dir: Direction) -&gt; <span class="self">Self</span>::EdgesDirected;
 }
 }
 
-<span class="macro">IntoEdgesDirected!</span>{<span class="ident">delegate_impl</span> []}
+<span class="macro">IntoEdgesDirected!</span>{delegate_impl []}
 
-<span class="macro">trait_template!</span> {
-<span class="doccomment">/// Access to the sequence of the graph’s `NodeId`s.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoNodeIdentifiers</span> : <span class="ident">GraphRef</span> {
-    @<span class="ident">section</span> <span class="kw">type</span>
-    <span class="kw">type</span> <span class="ident">NodeIdentifiers</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::NodeId</span><span class="op">&gt;</span>;
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="kw">fn</span> <span class="ident">node_identifiers</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeIdentifiers</span>;
+<span class="macro">trait_template! </span>{
+<span class="doccomment">/// Access to the sequence of the graph’s `NodeId`s.
+</span><span class="kw">pub trait </span>IntoNodeIdentifiers : GraphRef {
+    @section <span class="kw">type
+    type </span>NodeIdentifiers: Iterator&lt;Item=<span class="self">Self</span>::NodeId&gt;;
+    @section <span class="self">self
+    </span><span class="kw">fn </span>node_identifiers(<span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeIdentifiers;
 }
 }
 
-<span class="macro">IntoNodeIdentifiers!</span>{<span class="ident">delegate_impl</span> []}
+<span class="macro">IntoNodeIdentifiers!</span>{delegate_impl []}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IntoNodeIdentifiers</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty, Ix&gt; IntoNodeIdentifiers <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">NodeIdentifiers</span> <span class="op">=</span> <span class="ident">graph::NodeIndices</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">node_identifiers</span>(<span class="self">self</span>) -&gt; <span class="ident">graph::NodeIndices</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span> {
-        <span class="ident">Graph::node_indices</span>(<span class="self">self</span>)
+    <span class="kw">type </span>NodeIdentifiers = graph::NodeIndices&lt;Ix&gt;;
+    <span class="kw">fn </span>node_identifiers(<span class="self">self</span>) -&gt; graph::NodeIndices&lt;Ix&gt; {
+        Graph::node_indices(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">NodeCount</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; NodeCount <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">node_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">node_count</span>()
+    <span class="kw">fn </span>node_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.node_count()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IntoNodeIdentifiers</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty, Ix&gt; IntoNodeIdentifiers <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">NodeIdentifiers</span> <span class="op">=</span> <span class="ident">stable_graph::NodeIndices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">node_identifiers</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeIdentifiers</span> {
-        <span class="ident">StableGraph::node_indices</span>(<span class="self">self</span>)
+    <span class="kw">type </span>NodeIdentifiers = stable_graph::NodeIndices&lt;<span class="lifetime">&#39;a</span>, N, Ix&gt;;
+    <span class="kw">fn </span>node_identifiers(<span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeIdentifiers {
+        StableGraph::node_indices(<span class="self">self</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">NodeCount</span> <span class="kw">for</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; NodeCount <span class="kw">for </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">node_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">node_count</span>()
+    <span class="kw">fn </span>node_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.node_count()
     }
 }
 
-<span class="macro">IntoNeighborsDirected!</span>{<span class="ident">delegate_impl</span> []}
+<span class="macro">IntoNeighborsDirected!</span>{delegate_impl []}
 
-<span class="macro">trait_template!</span> {
-<span class="doccomment">/// Define associated data for nodes and edges</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Data</span> : <span class="ident">GraphBase</span> {
-    @<span class="ident">section</span> <span class="kw">type</span>
-    <span class="kw">type</span> <span class="ident">NodeWeight</span>;
-    <span class="kw">type</span> <span class="ident">EdgeWeight</span>;
+<span class="macro">trait_template! </span>{
+<span class="doccomment">/// Define associated data for nodes and edges
+</span><span class="kw">pub trait </span>Data : GraphBase {
+    @section <span class="kw">type
+    type </span>NodeWeight;
+    <span class="kw">type </span>EdgeWeight;
 }
 }
 
-<span class="macro">Data!</span>{<span class="ident">delegate_impl</span> []}
-<span class="macro">Data!</span>{<span class="ident">delegate_impl</span> [[<span class="lifetime">&#39;a</span>, <span class="ident">G</span>], <span class="ident">G</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">G</span>, <span class="ident">deref</span>]}
+<span class="macro">Data!</span>{delegate_impl []}
+<span class="macro">Data!</span>{delegate_impl [[<span class="lifetime">&#39;a</span>, G], G, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>G, deref]}
 
-<span class="doccomment">/// An edge reference.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Edge references are used by traits `IntoEdges` and `IntoEdgeReferences`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">EdgeRef</span> : <span class="ident">Copy</span> {
-    <span class="kw">type</span> <span class="ident">NodeId</span>;
-    <span class="kw">type</span> <span class="ident">EdgeId</span>;
-    <span class="kw">type</span> <span class="ident">Weight</span>;
-    <span class="doccomment">/// The source node of the edge.</span>
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span>;
-    <span class="doccomment">/// The target node of the edge.</span>
-    <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span>;
-    <span class="doccomment">/// A reference to the weight of the edge.</span>
-    <span class="kw">fn</span> <span class="ident">weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Weight</span>;
-    <span class="doccomment">/// The edge’s identifier.</span>
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeId</span>;
+<span class="doccomment">/// An edge reference.
+///
+/// Edge references are used by traits `IntoEdges` and `IntoEdgeReferences`.
+</span><span class="kw">pub trait </span>EdgeRef : Copy {
+    <span class="kw">type </span>NodeId;
+    <span class="kw">type </span>EdgeId;
+    <span class="kw">type </span>Weight;
+    <span class="doccomment">/// The source node of the edge.
+    </span><span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeId;
+    <span class="doccomment">/// The target node of the edge.
+    </span><span class="kw">fn </span>target(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeId;
+    <span class="doccomment">/// A reference to the weight of the edge.
+    </span><span class="kw">fn </span>weight(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Weight;
+    <span class="doccomment">/// The edge’s identifier.
+    </span><span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::EdgeId;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">EdgeRef</span> <span class="kw">for</span> (<span class="ident">N</span>, <span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">E</span>)
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E&gt; EdgeRef <span class="kw">for </span>(N, N, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>E)
+    <span class="kw">where </span>N: Copy
 {
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">N</span>;
-    <span class="kw">type</span> <span class="ident">EdgeId</span> <span class="op">=</span> (<span class="ident">N</span>, <span class="ident">N</span>);
-    <span class="kw">type</span> <span class="ident">Weight</span> <span class="op">=</span> <span class="ident">E</span>;
+    <span class="kw">type </span>NodeId = N;
+    <span class="kw">type </span>EdgeId = (N, N);
+    <span class="kw">type </span>Weight = E;
 
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">N</span> { <span class="self">self</span>.<span class="number">0</span> }
-    <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">N</span> { <span class="self">self</span>.<span class="number">1</span> }
-    <span class="kw">fn</span> <span class="ident">weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">E</span> { <span class="self">self</span>.<span class="number">2</span> }
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">N</span>, <span class="ident">N</span>) { (<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>) }
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; N { <span class="self">self</span>.<span class="number">0 </span>}
+    <span class="kw">fn </span>target(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; N { <span class="self">self</span>.<span class="number">1 </span>}
+    <span class="kw">fn </span>weight(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>E { <span class="self">self</span>.<span class="number">2 </span>}
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (N, N) { (<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>) }
 }
 
-<span class="doccomment">/// A node reference.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NodeRef</span> : <span class="ident">Copy</span> {
-    <span class="kw">type</span> <span class="ident">NodeId</span>;
-    <span class="kw">type</span> <span class="ident">Weight</span>;
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span>;
-    <span class="kw">fn</span> <span class="ident">weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Weight</span>;
+<span class="doccomment">/// A node reference.
+</span><span class="kw">pub trait </span>NodeRef : Copy {
+    <span class="kw">type </span>NodeId;
+    <span class="kw">type </span>Weight;
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeId;
+    <span class="kw">fn </span>weight(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Weight;
 }
 
-<span class="macro">trait_template!</span> {
-<span class="doccomment">/// Access to the sequence of the graph’s nodes</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoNodeReferences</span> : <span class="ident">Data</span> <span class="op">+</span> <span class="ident">IntoNodeIdentifiers</span> {
-    @<span class="ident">section</span> <span class="kw">type</span>
-    <span class="kw">type</span> <span class="ident">NodeRef</span>: <span class="ident">NodeRef</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::NodeId</span>, <span class="ident">Weight</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">NodeReferences</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::NodeRef</span><span class="op">&gt;</span>;
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="kw">fn</span> <span class="ident">node_references</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeReferences</span>;
+<span class="macro">trait_template! </span>{
+<span class="doccomment">/// Access to the sequence of the graph’s nodes
+</span><span class="kw">pub trait </span>IntoNodeReferences : Data + IntoNodeIdentifiers {
+    @section <span class="kw">type
+    type </span>NodeRef: NodeRef&lt;NodeId=<span class="self">Self</span>::NodeId, Weight=<span class="self">Self</span>::NodeWeight&gt;;
+    <span class="kw">type </span>NodeReferences: Iterator&lt;Item=<span class="self">Self</span>::NodeRef&gt;;
+    @section <span class="self">self
+    </span><span class="kw">fn </span>node_references(<span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeReferences;
 }
 }
 
-<span class="macro">IntoNodeReferences!</span>{<span class="ident">delegate_impl</span> []}
+<span class="macro">IntoNodeReferences!</span>{delegate_impl []}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Id</span><span class="op">&gt;</span> <span class="ident">NodeRef</span> <span class="kw">for</span> (<span class="ident">Id</span>, ())
-    <span class="kw">where</span> <span class="ident">Id</span>: <span class="ident">Copy</span>,
+<span class="kw">impl</span>&lt;Id&gt; NodeRef <span class="kw">for </span>(Id, ())
+    <span class="kw">where </span>Id: Copy,
 {
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Id</span>;
-    <span class="kw">type</span> <span class="ident">Weight</span> <span class="op">=</span> ();
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> { <span class="self">self</span>.<span class="number">0</span> }
-    <span class="kw">fn</span> <span class="ident">weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Weight</span> {
-        <span class="kw">static</span> <span class="ident">DUMMY</span>: () <span class="op">=</span> ();
-        <span class="kw-2">&amp;</span><span class="ident">DUMMY</span>
+    <span class="kw">type </span>NodeId = Id;
+    <span class="kw">type </span>Weight = ();
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeId { <span class="self">self</span>.<span class="number">0 </span>}
+    <span class="kw">fn </span>weight(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Weight {
+        <span class="kw">static </span>DUMMY: () = ();
+        <span class="kw-2">&amp;</span>DUMMY
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Id</span>, <span class="ident">W</span><span class="op">&gt;</span> <span class="ident">NodeRef</span> <span class="kw">for</span> (<span class="ident">Id</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">W</span>)
-    <span class="kw">where</span> <span class="ident">Id</span>: <span class="ident">Copy</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Id, W&gt; NodeRef <span class="kw">for </span>(Id, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>W)
+    <span class="kw">where </span>Id: Copy,
 {
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Id</span>;
-    <span class="kw">type</span> <span class="ident">Weight</span> <span class="op">=</span> <span class="ident">W</span>;
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> { <span class="self">self</span>.<span class="number">0</span> }
-    <span class="kw">fn</span> <span class="ident">weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Weight</span> { <span class="self">self</span>.<span class="number">1</span> }
+    <span class="kw">type </span>NodeId = Id;
+    <span class="kw">type </span>Weight = W;
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeId { <span class="self">self</span>.<span class="number">0 </span>}
+    <span class="kw">fn </span>weight(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Weight { <span class="self">self</span>.<span class="number">1 </span>}
 }
 
 
-<span class="macro">trait_template!</span> {
-<span class="doccomment">/// Access to the sequence of the graph’s edges</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoEdgeReferences</span> : <span class="ident">Data</span> <span class="op">+</span> <span class="ident">GraphRef</span> {
-    @<span class="ident">section</span> <span class="kw">type</span>
-    <span class="kw">type</span> <span class="ident">EdgeRef</span>: <span class="ident">EdgeRef</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::NodeId</span>, <span class="ident">EdgeId</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::EdgeId</span>,
-                          <span class="ident">Weight</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">EdgeReferences</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident"><span class="self">Self</span>::EdgeRef</span><span class="op">&gt;</span>;
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="kw">fn</span> <span class="ident">edge_references</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeReferences</span>;
+<span class="macro">trait_template! </span>{
+<span class="doccomment">/// Access to the sequence of the graph’s edges
+</span><span class="kw">pub trait </span>IntoEdgeReferences : Data + GraphRef {
+    @section <span class="kw">type
+    type </span>EdgeRef: EdgeRef&lt;NodeId=<span class="self">Self</span>::NodeId, EdgeId=<span class="self">Self</span>::EdgeId,
+                          Weight=<span class="self">Self</span>::EdgeWeight&gt;;
+    <span class="kw">type </span>EdgeReferences: Iterator&lt;Item=<span class="self">Self</span>::EdgeRef&gt;;
+    @section <span class="self">self
+    </span><span class="kw">fn </span>edge_references(<span class="self">self</span>) -&gt; <span class="self">Self</span>::EdgeReferences;
 }
 }
 
-<span class="macro">IntoEdgeReferences!</span>{<span class="ident">delegate_impl</span> [] }
+<span class="macro">IntoEdgeReferences!</span>{delegate_impl [] }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Data</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty&gt; Data <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: Copy + PartialEq,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">NodeWeight</span> <span class="op">=</span> <span class="ident">N</span>;
-    <span class="kw">type</span> <span class="ident">EdgeWeight</span> <span class="op">=</span> <span class="ident">E</span>;
+    <span class="kw">type </span>NodeWeight = N;
+    <span class="kw">type </span>EdgeWeight = E;
 }
 
-<span class="macro">trait_template!</span> {
-    <span class="doccomment">/// Edge kind property (directed or undirected edges)</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GraphProp</span> : <span class="ident">GraphBase</span> {
-    @<span class="ident">section</span> <span class="kw">type</span>
-    <span class="doccomment">/// The kind edges in the graph.</span>
-    <span class="kw">type</span> <span class="ident">EdgeType</span>: <span class="ident">EdgeType</span>;
+<span class="macro">trait_template! </span>{
+    <span class="doccomment">/// Edge kind property (directed or undirected edges)
+</span><span class="kw">pub trait </span>GraphProp : GraphBase {
+    @section <span class="kw">type
+    </span><span class="doccomment">/// The kind edges in the graph.
+    </span><span class="kw">type </span>EdgeType: EdgeType;
 
-    @<span class="ident">section</span> <span class="ident">nodelegate</span>
-    <span class="kw">fn</span> <span class="ident">is_directed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeType</span><span class="op">&gt;</span><span class="ident">::is_directed</span>()
+    @section nodelegate
+    <span class="kw">fn </span>is_directed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        &lt;<span class="self">Self</span>::EdgeType&gt;::is_directed()
     }
 }
 }
 
-<span class="macro">GraphProp!</span>{<span class="ident">delegate_impl</span> []}
+<span class="macro">GraphProp!</span>{delegate_impl []}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">GraphProp</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; GraphProp <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">EdgeType</span> <span class="op">=</span> <span class="ident">Ty</span>;
+    <span class="kw">type </span>EdgeType = Ty;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">GraphProp</span> <span class="kw">for</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; GraphProp <span class="kw">for </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">EdgeType</span> <span class="op">=</span> <span class="ident">Ty</span>;
+    <span class="kw">type </span>EdgeType = Ty;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">GraphProp</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty&gt; GraphProp <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">EdgeType</span> <span class="op">=</span> <span class="ident">Ty</span>;
+    <span class="kw">type </span>EdgeType = Ty;
 }
 
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>: <span class="lifetime">&#39;a</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IntoEdgeReferences</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N: <span class="lifetime">&#39;a</span>, E: <span class="lifetime">&#39;a</span>, Ty, Ix&gt; IntoEdgeReferences <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">EdgeRef</span> <span class="op">=</span> <span class="ident">graph::EdgeReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">EdgeReferences</span> <span class="op">=</span> <span class="ident">graph::EdgeReferences</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edge_references</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeReferences</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">edge_references</span>()
+    <span class="kw">type </span>EdgeRef = graph::EdgeReference&lt;<span class="lifetime">&#39;a</span>, E, Ix&gt;;
+    <span class="kw">type </span>EdgeReferences = graph::EdgeReferences&lt;<span class="lifetime">&#39;a</span>, E, Ix&gt;;
+    <span class="kw">fn </span>edge_references(<span class="self">self</span>) -&gt; <span class="self">Self</span>::EdgeReferences {
+        (<span class="kw-2">*</span><span class="self">self</span>).edge_references()
     }
 }
 
 
 <span class="macro">trait_template!</span>{
-    <span class="doccomment">/// The graph’s `NodeId`s map to indices</span>
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NodeIndexable</span> : <span class="ident">GraphBase</span> {
-        @<span class="ident">section</span> <span class="self">self</span>
-        <span class="doccomment">/// Return an upper bound of the node indices in the graph</span>
-        <span class="doccomment">/// (suitable for the size of a bitmap).</span>
-        <span class="kw">fn</span> <span class="ident">node_bound</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">usize</span>;
-        <span class="doccomment">/// Convert `a` to an integer index.</span>
-        <span class="kw">fn</span> <span class="ident">to_index</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="ident">usize</span>;
-        <span class="doccomment">/// Convert `i` to a node index</span>
-        <span class="kw">fn</span> <span class="ident">from_index</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span>;
+    <span class="doccomment">/// The graph’s `NodeId`s map to indices
+    </span><span class="kw">pub trait </span>NodeIndexable : GraphBase {
+        @section <span class="self">self
+        </span><span class="doccomment">/// Return an upper bound of the node indices in the graph
+        /// (suitable for the size of a bitmap).
+        </span><span class="kw">fn </span>node_bound(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; usize;
+        <span class="doccomment">/// Convert `a` to an integer index.
+        </span><span class="kw">fn </span>to_index(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, a: <span class="self">Self</span>::NodeId) -&gt; usize;
+        <span class="doccomment">/// Convert `i` to a node index
+        </span><span class="kw">fn </span>from_index(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, i: usize) -&gt; <span class="self">Self</span>::NodeId;
     }
 }
 
-<span class="macro">NodeIndexable!</span>{<span class="ident">delegate_impl</span> []}
+<span class="macro">NodeIndexable!</span>{delegate_impl []}
 
-<span class="macro">trait_template!</span> {
-<span class="doccomment">/// A graph with a known node count.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NodeCount</span> : <span class="ident">GraphBase</span> {
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="kw">fn</span> <span class="ident">node_count</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">usize</span>;
+<span class="macro">trait_template! </span>{
+<span class="doccomment">/// A graph with a known node count.
+</span><span class="kw">pub trait </span>NodeCount : GraphBase {
+    @section <span class="self">self
+    </span><span class="kw">fn </span>node_count(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; usize;
 }
 }
 
-<span class="macro">NodeCount!</span>{<span class="ident">delegate_impl</span> []}
+<span class="macro">NodeCount!</span>{delegate_impl []}
 
-<span class="macro">trait_template!</span> {
-<span class="doccomment">/// The graph’s `NodeId`s map to indices, in a range without holes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The graph&#39;s node identifiers correspond to exactly the indices</span>
-<span class="doccomment">/// `0..self.node_bound()`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NodeCompactIndexable</span> : <span class="ident">NodeIndexable</span> <span class="op">+</span> <span class="ident">NodeCount</span> { }
+<span class="macro">trait_template! </span>{
+<span class="doccomment">/// The graph’s `NodeId`s map to indices, in a range without holes.
+///
+/// The graph&#39;s node identifiers correspond to exactly the indices
+/// `0..self.node_bound()`.
+</span><span class="kw">pub trait </span>NodeCompactIndexable : NodeIndexable + NodeCount { }
 }
 
-<span class="macro">NodeCompactIndexable!</span>{<span class="ident">delegate_impl</span> []}
+<span class="macro">NodeCompactIndexable!</span>{delegate_impl []}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">NodeIndexable</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; NodeIndexable <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">node_bound</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">node_count</span>() }
-    <span class="kw">fn</span> <span class="ident">to_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ix</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">usize</span> { <span class="ident">ix</span>.<span class="ident">index</span>() }
-    <span class="kw">fn</span> <span class="ident">from_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ix</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> { <span class="ident">NodeIndex::new</span>(<span class="ident">ix</span>) }
+    <span class="kw">fn </span>node_bound(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize { <span class="self">self</span>.node_count() }
+    <span class="kw">fn </span>to_index(<span class="kw-2">&amp;</span><span class="self">self</span>, ix: NodeIndex&lt;Ix&gt;) -&gt; usize { ix.index() }
+    <span class="kw">fn </span>from_index(<span class="kw-2">&amp;</span><span class="self">self</span>, ix: usize) -&gt; <span class="self">Self</span>::NodeId { NodeIndex::new(ix) }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">NodeCompactIndexable</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; NodeCompactIndexable <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 { }
 
-<span class="doccomment">/// A mapping for storing the visited status for NodeId `N`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Mark `a` as visited.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Return **true** if this is the first visit, false otherwise.</span>
-    <span class="kw">fn</span> <span class="ident">visit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">N</span>) -&gt; <span class="ident">bool</span>;
+<span class="doccomment">/// A mapping for storing the visited status for NodeId `N`.
+</span><span class="kw">pub trait </span>VisitMap&lt;N&gt; {
+    <span class="doccomment">/// Mark `a` as visited.
+    ///
+    /// Return **true** if this is the first visit, false otherwise.
+    </span><span class="kw">fn </span>visit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: N) -&gt; bool;
 
-    <span class="doccomment">/// Return whether `a` has been visited before.</span>
-    <span class="kw">fn</span> <span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">N</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Return whether `a` has been visited before.
+    </span><span class="kw">fn </span>is_visited(<span class="kw-2">&amp;</span><span class="self">self</span>, a: <span class="kw-2">&amp;</span>N) -&gt; bool;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident">graph::NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FixedBitSet</span>
-    <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;Ix&gt; VisitMap&lt;graph::NodeIndex&lt;Ix&gt;&gt; <span class="kw">for </span>FixedBitSet
+    <span class="kw">where </span>Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">visit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">graph::NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">put</span>(<span class="ident">x</span>.<span class="ident">index</span>())
+    <span class="kw">fn </span>visit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: graph::NodeIndex&lt;Ix&gt;) -&gt; bool {
+        !<span class="self">self</span>.put(x.index())
     }
-    <span class="kw">fn</span> <span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">graph::NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">x</span>.<span class="ident">index</span>())
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident">graph::EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FixedBitSet</span>
-    <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
-{
-    <span class="kw">fn</span> <span class="ident">visit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">graph::EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">put</span>(<span class="ident">x</span>.<span class="ident">index</span>())
-    }
-    <span class="kw">fn</span> <span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">graph::EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">x</span>.<span class="ident">index</span>())
+    <span class="kw">fn </span>is_visited(<span class="kw-2">&amp;</span><span class="self">self</span>, x: <span class="kw-2">&amp;</span>graph::NodeIndex&lt;Ix&gt;) -&gt; bool {
+        <span class="self">self</span>.contains(x.index())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FixedBitSet</span>
-    <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;Ix&gt; VisitMap&lt;graph::EdgeIndex&lt;Ix&gt;&gt; <span class="kw">for </span>FixedBitSet
+    <span class="kw">where </span>Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">visit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">Ix</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">put</span>(<span class="ident">x</span>.<span class="ident">index</span>())
+    <span class="kw">fn </span>visit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: graph::EdgeIndex&lt;Ix&gt;) -&gt; bool {
+        !<span class="self">self</span>.put(x.index())
     }
-    <span class="kw">fn</span> <span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Ix</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">x</span>.<span class="ident">index</span>())
+    <span class="kw">fn </span>is_visited(<span class="kw-2">&amp;</span><span class="self">self</span>, x: <span class="kw-2">&amp;</span>graph::EdgeIndex&lt;Ix&gt;) -&gt; bool {
+        <span class="self">self</span>.contains(x.index())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>,
-          <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;Ix&gt; VisitMap&lt;Ix&gt; <span class="kw">for </span>FixedBitSet
+    <span class="kw">where </span>Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">visit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">N</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">insert</span>(<span class="ident">x</span>)
+    <span class="kw">fn </span>visit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: Ix) -&gt; bool {
+        !<span class="self">self</span>.put(x.index())
     }
-    <span class="kw">fn</span> <span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">N</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">x</span>)
+    <span class="kw">fn </span>is_visited(<span class="kw-2">&amp;</span><span class="self">self</span>, x: <span class="kw-2">&amp;</span>Ix) -&gt; bool {
+        <span class="self">self</span>.contains(x.index())
+    }
+}
+
+<span class="kw">impl</span>&lt;N, S&gt; VisitMap&lt;N&gt; <span class="kw">for </span>HashSet&lt;N, S&gt;
+    <span class="kw">where </span>N: Hash + Eq,
+          S: BuildHasher,
+{
+    <span class="kw">fn </span>visit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: N) -&gt; bool {
+        <span class="self">self</span>.insert(x)
+    }
+    <span class="kw">fn </span>is_visited(<span class="kw-2">&amp;</span><span class="self">self</span>, x: <span class="kw-2">&amp;</span>N) -&gt; bool {
+        <span class="self">self</span>.contains(x)
     }
 }
 
 <span class="macro">trait_template!</span>{
-<span class="doccomment">/// A graph that can create a map that tracks the visited status of its nodes.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Visitable</span> : <span class="ident">GraphBase</span> {
-    @<span class="ident">section</span> <span class="kw">type</span>
-    <span class="doccomment">/// The associated map type</span>
-    <span class="kw">type</span> <span class="ident">Map</span>: <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::NodeId</span><span class="op">&gt;</span>;
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="doccomment">/// Create a new visitor map</span>
-    <span class="kw">fn</span> <span class="ident">visit_map</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Map</span>;
-    <span class="doccomment">/// Reset the visitor map (and resize to new size of graph if needed)</span>
-    <span class="kw">fn</span> <span class="ident">reset_map</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Map</span>) -&gt; ();
+<span class="doccomment">/// A graph that can create a map that tracks the visited status of its nodes.
+</span><span class="kw">pub trait </span>Visitable : GraphBase {
+    @section <span class="kw">type
+    </span><span class="doccomment">/// The associated map type
+    </span><span class="kw">type </span>Map: VisitMap&lt;<span class="self">Self</span>::NodeId&gt;;
+    @section <span class="self">self
+    </span><span class="doccomment">/// Create a new visitor map
+    </span><span class="kw">fn </span>visit_map(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span>::Map;
+    <span class="doccomment">/// Reset the visitor map (and resize to new size of graph if needed)
+    </span><span class="kw">fn </span>reset_map(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, map: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Map) -&gt; ();
 }
 }
-<span class="macro">Visitable!</span>{<span class="ident">delegate_impl</span> []}
+<span class="macro">Visitable!</span>{delegate_impl []}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">GraphBase</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; GraphBase <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">graph::NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">EdgeId</span> <span class="op">=</span> <span class="ident">graph::EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>NodeId = graph::NodeIndex&lt;Ix&gt;;
+    <span class="kw">type </span>EdgeId = graph::EdgeIndex&lt;Ix&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Visitable</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Visitable <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">Map</span> <span class="op">=</span> <span class="ident">FixedBitSet</span>;
-    <span class="kw">fn</span> <span class="ident">visit_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FixedBitSet</span> { <span class="ident">FixedBitSet::with_capacity</span>(<span class="self">self</span>.<span class="ident">node_count</span>()) }
+    <span class="kw">type </span>Map = FixedBitSet;
+    <span class="kw">fn </span>visit_map(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FixedBitSet { FixedBitSet::with_capacity(<span class="self">self</span>.node_count()) }
 
-    <span class="kw">fn</span> <span class="ident">reset_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Map</span>) {
-        <span class="ident">map</span>.<span class="ident">clear</span>();
-        <span class="ident">map</span>.<span class="ident">grow</span>(<span class="self">self</span>.<span class="ident">node_count</span>());
+    <span class="kw">fn </span>reset_map(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Map) {
+        map.clear();
+        map.grow(<span class="self">self</span>.node_count());
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">GraphBase</span> <span class="kw">for</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; GraphBase <span class="kw">for </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">graph::NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">EdgeId</span> <span class="op">=</span> <span class="ident">graph::EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>NodeId = graph::NodeIndex&lt;Ix&gt;;
+    <span class="kw">type </span>EdgeId = graph::EdgeIndex&lt;Ix&gt;;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Visitable</span> <span class="kw">for</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Visitable <span class="kw">for </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">Map</span> <span class="op">=</span> <span class="ident">FixedBitSet</span>;
-    <span class="kw">fn</span> <span class="ident">visit_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FixedBitSet</span> {
-        <span class="ident">FixedBitSet::with_capacity</span>(<span class="self">self</span>.<span class="ident">node_bound</span>())
+    <span class="kw">type </span>Map = FixedBitSet;
+    <span class="kw">fn </span>visit_map(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FixedBitSet {
+        FixedBitSet::with_capacity(<span class="self">self</span>.node_bound())
     }
-    <span class="kw">fn</span> <span class="ident">reset_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Map</span>) {
-        <span class="ident">map</span>.<span class="ident">clear</span>();
-        <span class="ident">map</span>.<span class="ident">grow</span>(<span class="self">self</span>.<span class="ident">node_bound</span>());
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Data</span> <span class="kw">for</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
-{
-    <span class="kw">type</span> <span class="ident">NodeWeight</span> <span class="op">=</span> <span class="ident">N</span>;
-    <span class="kw">type</span> <span class="ident">EdgeWeight</span> <span class="op">=</span> <span class="ident">E</span>;
-}
-
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">GraphBase</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
-{
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">N</span>;
-    <span class="kw">type</span> <span class="ident">EdgeId</span> <span class="op">=</span> (<span class="ident">N</span>, <span class="ident">N</span>);
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Visitable</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Hash</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-{
-    <span class="kw">type</span> <span class="ident">Map</span> <span class="op">=</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">visit_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> { <span class="ident">HashSet::with_capacity</span>(<span class="self">self</span>.<span class="ident">node_count</span>()) }
-    <span class="kw">fn</span> <span class="ident">reset_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Map</span>) {
-        <span class="ident">map</span>.<span class="ident">clear</span>();
+    <span class="kw">fn </span>reset_map(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Map) {
+        map.clear();
+        map.grow(<span class="self">self</span>.node_bound());
     }
 }
 
-<span class="macro">trait_template!</span> {
-<span class="doccomment">/// Create or access the adjacency matrix of a graph.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The implementor can either create an adjacency matrix, or it can return</span>
-<span class="doccomment">/// a placeholder if it has the needed representation internally.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GetAdjacencyMatrix</span> : <span class="ident">GraphBase</span> {
-    @<span class="ident">section</span> <span class="kw">type</span>
-    <span class="doccomment">/// The associated adjacency matrix type</span>
-    <span class="kw">type</span> <span class="ident">AdjMatrix</span>;
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="doccomment">/// Create the adjacency matrix</span>
-    <span class="kw">fn</span> <span class="ident">adjacency_matrix</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::AdjMatrix</span>;
-    <span class="doccomment">/// Return true if there is an edge from `a` to `b`, false otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Computes in O(1) time.</span>
-    <span class="kw">fn</span> <span class="ident">is_adjacent</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">matrix</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::AdjMatrix</span>, <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>, <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="ident">bool</span>;
-}
-}
-
-
-<span class="macro">GetAdjacencyMatrix!</span>{<span class="ident">delegate_impl</span> []}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="doccomment">/// The `GraphMap` keeps an adjacency matrix internally.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">GetAdjacencyMatrix</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Hash</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Data <span class="kw">for </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">AdjMatrix</span> <span class="op">=</span> ();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">adjacency_matrix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) { }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_adjacent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>(), <span class="ident">a</span>: <span class="ident">N</span>, <span class="ident">b</span>: <span class="ident">N</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>)
+    <span class="kw">type </span>NodeWeight = N;
+    <span class="kw">type </span>EdgeWeight = E;
+}
+
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty&gt; GraphBase <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: Copy + PartialEq,
+{
+    <span class="kw">type </span>NodeId = N;
+    <span class="kw">type </span>EdgeId = (N, N);
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty&gt; Visitable <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: Copy + Ord + Hash,
+          Ty: EdgeType,
+{
+    <span class="kw">type </span>Map = HashSet&lt;N&gt;;
+    <span class="kw">fn </span>visit_map(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashSet&lt;N&gt; { HashSet::with_capacity(<span class="self">self</span>.node_count()) }
+    <span class="kw">fn </span>reset_map(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Map) {
+        map.clear();
     }
 }
 
-<span class="kw">mod</span> <span class="ident">filter</span>;
-<span class="kw">mod</span> <span class="ident">reversed</span>;
+<span class="macro">trait_template! </span>{
+<span class="doccomment">/// Create or access the adjacency matrix of a graph.
+///
+/// The implementor can either create an adjacency matrix, or it can return
+/// a placeholder if it has the needed representation internally.
+</span><span class="kw">pub trait </span>GetAdjacencyMatrix : GraphBase {
+    @section <span class="kw">type
+    </span><span class="doccomment">/// The associated adjacency matrix type
+    </span><span class="kw">type </span>AdjMatrix;
+    @section <span class="self">self
+    </span><span class="doccomment">/// Create the adjacency matrix
+    </span><span class="kw">fn </span>adjacency_matrix(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span>::AdjMatrix;
+    <span class="doccomment">/// Return true if there is an edge from `a` to `b`, false otherwise.
+    ///
+    /// Computes in O(1) time.
+    </span><span class="kw">fn </span>is_adjacent(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, matrix: <span class="kw-2">&amp;</span><span class="self">Self</span>::AdjMatrix, a: <span class="self">Self</span>::NodeId, b: <span class="self">Self</span>::NodeId) -&gt; bool;
+}
+}
+
+
+<span class="macro">GetAdjacencyMatrix!</span>{delegate_impl []}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="doccomment">/// The `GraphMap` keeps an adjacency matrix internally.
+</span><span class="kw">impl</span>&lt;N, E, Ty&gt; GetAdjacencyMatrix <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: Copy + Ord + Hash,
+          Ty: EdgeType,
+{
+    <span class="kw">type </span>AdjMatrix = ();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>adjacency_matrix(<span class="kw-2">&amp;</span><span class="self">self</span>) { }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_adjacent(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>(), a: N, b: N) -&gt; bool {
+        <span class="self">self</span>.contains_edge(a, b)
+    }
+}
+
+<span class="kw">mod </span>filter;
+<span class="kw">mod </span>reversed;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

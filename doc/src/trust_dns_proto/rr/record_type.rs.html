@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/record_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>record_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/record_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>record_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -544,505 +544,505 @@
 <span id="544">544</span>
 <span id="545">545</span>
 <span id="546">546</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! record type definitions</span>
+</span><span class="doccomment">//! record type definitions
 
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">std::convert::From</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>};
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+</span><span class="kw">use </span>std::cmp::Ordering;
+<span class="kw">use </span>std::convert::From;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::fmt::{Display, Formatter};
+<span class="kw">use </span>std::str::FromStr;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-config&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
 
-<span class="comment">// TODO: adopt proper restrictions on usage: https://tools.ietf.org/html/rfc6895 section 3.1</span>
-<span class="comment">//  add the data TYPEs, QTYPEs, and Meta-TYPEs</span>
-<span class="comment">//</span>
+<span class="comment">// TODO: adopt proper restrictions on usage: https://tools.ietf.org/html/rfc6895 section 3.1
+//  add the data TYPEs, QTYPEs, and Meta-TYPEs
+//
 
-<span class="doccomment">/// The type of the resource record.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This specifies the type of data in the RData field of the Resource Record</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RecordType</span> {
-    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) IPv4 Address record</span>
-    <span class="ident">A</span>,
-    <span class="doccomment">/// [RFC 3596](https://tools.ietf.org/html/rfc3596) IPv6 address record</span>
-    <span class="ident">AAAA</span>,
-    <span class="doccomment">/// [ANAME draft-ietf-dnsop-aname](https://tools.ietf.org/html/draft-ietf-dnsop-aname-04)</span>
-    <span class="ident">ANAME</span>,
-    <span class="comment">//  AFSDB,      //	18	RFC 1183	AFS database record</span>
-    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) All cached records, aka ANY</span>
-    <span class="ident">ANY</span>,
-    <span class="comment">//  APL,        //	42	RFC 3123	Address Prefix List</span>
-    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Authoritative Zone Transfer</span>
-    <span class="ident">AXFR</span>,
-    <span class="doccomment">/// [RFC 6844](https://tools.ietf.org/html/rfc6844) Certification Authority Authorization</span>
-    <span class="ident">CAA</span>,
-    <span class="doccomment">/// [RFC 7344](https://tools.ietf.org/html/rfc7344) Child DS</span>
-    <span class="ident">CDS</span>,
-    <span class="doccomment">/// [RFC 7344](https://tools.ietf.org/html/rfc7344) Child DNSKEY</span>
-    <span class="ident">CDNSKEY</span>,
-    <span class="comment">//  CERT,       // 37 RFC 4398 Certificate record</span>
-    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Canonical name record</span>
-    <span class="ident">CNAME</span>,
-    <span class="comment">//  DHCID,      // 49 RFC 4701 DHCP identifier</span>
-    <span class="comment">//  DLV,        //	32769	RFC 4431	DNSSEC Lookaside Validation record</span>
-    <span class="comment">//  DNAME,      // 39 RFC 2672 Delegation Name</span>
-    <span class="doccomment">/// [RFC 7477](https://tools.ietf.org/html/rfc4034) Child-to-parent synchronization record</span>
-    <span class="ident">CSYNC</span>,
-    <span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034) DNS Key record: RSASHA256 and RSASHA512, RFC5702</span>
-    <span class="ident">DNSKEY</span>,
-    <span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034) Delegation signer: RSASHA256 and RSASHA512, RFC5702</span>
-    <span class="ident">DS</span>,
-    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) host information</span>
-    <span class="ident">HINFO</span>,
-    <span class="comment">//  HIP,        // 55 RFC 5205 Host Identity Protocol</span>
-    <span class="doccomment">/// [RFC draft-ietf-dnsop-svcb-https-03](https://tools.ietf.org/html/draft-ietf-dnsop-svcb-httpssvc-03) DNS SVCB and HTTPS RRs</span>
-    <span class="ident">HTTPS</span>,
-    <span class="comment">//  IPSECKEY,   // 45 RFC 4025 IPsec Key</span>
-    <span class="doccomment">/// [RFC 1996](https://tools.ietf.org/html/rfc1996) Incremental Zone Transfer</span>
-    <span class="ident">IXFR</span>,
-    <span class="comment">//  KX,         // 36 RFC 2230 Key eXchanger record</span>
-    <span class="doccomment">/// [RFC 2535](https://tools.ietf.org/html/rfc2535) and [RFC 2930](https://tools.ietf.org/html/rfc2930) Key record</span>
-    <span class="ident">KEY</span>,
-    <span class="comment">//  LOC,        // 29 RFC 1876 Location record</span>
-    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Mail exchange record</span>
-    <span class="ident">MX</span>,
-    <span class="doccomment">/// [RFC 3403](https://tools.ietf.org/html/rfc3403) Naming Authority Pointer</span>
-    <span class="ident">NAPTR</span>,
-    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Name server record</span>
-    <span class="ident">NS</span>,
-    <span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034) Next-Secure record</span>
-    <span class="ident">NSEC</span>,
-    <span class="doccomment">/// [RFC 5155](https://tools.ietf.org/html/rfc5155) NSEC record version 3</span>
-    <span class="ident">NSEC3</span>,
-    <span class="doccomment">/// [RFC 5155](https://tools.ietf.org/html/rfc5155) NSEC3 parameters</span>
-    <span class="ident">NSEC3PARAM</span>,
-    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Null server record, for testing</span>
-    <span class="ident">NULL</span>,
-    <span class="doccomment">/// [RFC 7929](https://tools.ietf.org/html/rfc7929) OpenPGP public key</span>
-    <span class="ident">OPENPGPKEY</span>,
-    <span class="doccomment">/// [RFC 6891](https://tools.ietf.org/html/rfc6891) Option</span>
-    <span class="ident">OPT</span>,
-    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Pointer record</span>
-    <span class="ident">PTR</span>,
-    <span class="comment">//  RP,         // 17 RFC 1183 Responsible person</span>
-    <span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034) DNSSEC signature: RSASHA256 and RSASHA512, RFC5702</span>
-    <span class="ident">RRSIG</span>,
-    <span class="doccomment">/// [RFC 2535](https://tools.ietf.org/html/rfc2535) (and [RFC 2931](https://tools.ietf.org/html/rfc2931)) Signature, to support [RFC 2137](https://tools.ietf.org/html/rfc2137) Update.</span>
-    <span class="ident">SIG</span>,
-    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) and [RFC 2308](https://tools.ietf.org/html/rfc2308) Start of [a zone of] authority record</span>
-    <span class="ident">SOA</span>,
-    <span class="doccomment">/// [RFC 2782](https://tools.ietf.org/html/rfc2782) Service locator</span>
-    <span class="ident">SRV</span>,
-    <span class="doccomment">/// [RFC 4255](https://tools.ietf.org/html/rfc4255) SSH Public Key Fingerprint</span>
-    <span class="ident">SSHFP</span>,
-    <span class="doccomment">/// [RFC draft-ietf-dnsop-svcb-https-03](https://tools.ietf.org/html/draft-ietf-dnsop-svcb-httpssvc-03) DNS SVCB and HTTPS RRs</span>
-    <span class="ident">SVCB</span>,
-    <span class="comment">//  TA,         // 32768 N/A DNSSEC Trust Authorities</span>
-    <span class="comment">//  TKEY,       // 249 RFC 2930 Secret key record</span>
-    <span class="doccomment">/// [RFC 6698](https://tools.ietf.org/html/rfc6698) TLSA certificate association</span>
-    <span class="ident">TLSA</span>,
-    <span class="doccomment">/// [RFC 8945](https://tools.ietf.org/html/rfc8945) Transaction Signature</span>
-    <span class="ident">TSIG</span>,
-    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Text record</span>
-    <span class="ident">TXT</span>,
-    <span class="doccomment">/// Unknown Record type, or unsupported</span>
-    <span class="ident">Unknown</span>(<span class="ident">u16</span>),
+</span><span class="doccomment">/// The type of the resource record.
+///
+/// This specifies the type of data in the RData field of the Resource Record
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone)]
+#[allow(dead_code)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>RecordType {
+    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) IPv4 Address record
+    </span>A,
+    <span class="doccomment">/// [RFC 3596](https://tools.ietf.org/html/rfc3596) IPv6 address record
+    </span>AAAA,
+    <span class="doccomment">/// [ANAME draft-ietf-dnsop-aname](https://tools.ietf.org/html/draft-ietf-dnsop-aname-04)
+    </span>ANAME,
+    <span class="comment">//  AFSDB,      //	18	RFC 1183	AFS database record
+    </span><span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) All cached records, aka ANY
+    </span>ANY,
+    <span class="comment">//  APL,        //	42	RFC 3123	Address Prefix List
+    </span><span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Authoritative Zone Transfer
+    </span>AXFR,
+    <span class="doccomment">/// [RFC 6844](https://tools.ietf.org/html/rfc6844) Certification Authority Authorization
+    </span>CAA,
+    <span class="doccomment">/// [RFC 7344](https://tools.ietf.org/html/rfc7344) Child DS
+    </span>CDS,
+    <span class="doccomment">/// [RFC 7344](https://tools.ietf.org/html/rfc7344) Child DNSKEY
+    </span>CDNSKEY,
+    <span class="comment">//  CERT,       // 37 RFC 4398 Certificate record
+    </span><span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Canonical name record
+    </span>CNAME,
+    <span class="comment">//  DHCID,      // 49 RFC 4701 DHCP identifier
+    //  DLV,        //	32769	RFC 4431	DNSSEC Lookaside Validation record
+    //  DNAME,      // 39 RFC 2672 Delegation Name
+    </span><span class="doccomment">/// [RFC 7477](https://tools.ietf.org/html/rfc4034) Child-to-parent synchronization record
+    </span>CSYNC,
+    <span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034) DNS Key record: RSASHA256 and RSASHA512, RFC5702
+    </span>DNSKEY,
+    <span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034) Delegation signer: RSASHA256 and RSASHA512, RFC5702
+    </span>DS,
+    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) host information
+    </span>HINFO,
+    <span class="comment">//  HIP,        // 55 RFC 5205 Host Identity Protocol
+    </span><span class="doccomment">/// [RFC draft-ietf-dnsop-svcb-https-03](https://tools.ietf.org/html/draft-ietf-dnsop-svcb-httpssvc-03) DNS SVCB and HTTPS RRs
+    </span>HTTPS,
+    <span class="comment">//  IPSECKEY,   // 45 RFC 4025 IPsec Key
+    </span><span class="doccomment">/// [RFC 1996](https://tools.ietf.org/html/rfc1996) Incremental Zone Transfer
+    </span>IXFR,
+    <span class="comment">//  KX,         // 36 RFC 2230 Key eXchanger record
+    </span><span class="doccomment">/// [RFC 2535](https://tools.ietf.org/html/rfc2535) and [RFC 2930](https://tools.ietf.org/html/rfc2930) Key record
+    </span>KEY,
+    <span class="comment">//  LOC,        // 29 RFC 1876 Location record
+    </span><span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Mail exchange record
+    </span>MX,
+    <span class="doccomment">/// [RFC 3403](https://tools.ietf.org/html/rfc3403) Naming Authority Pointer
+    </span>NAPTR,
+    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Name server record
+    </span>NS,
+    <span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034) Next-Secure record
+    </span>NSEC,
+    <span class="doccomment">/// [RFC 5155](https://tools.ietf.org/html/rfc5155) NSEC record version 3
+    </span>NSEC3,
+    <span class="doccomment">/// [RFC 5155](https://tools.ietf.org/html/rfc5155) NSEC3 parameters
+    </span>NSEC3PARAM,
+    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Null server record, for testing
+    </span>NULL,
+    <span class="doccomment">/// [RFC 7929](https://tools.ietf.org/html/rfc7929) OpenPGP public key
+    </span>OPENPGPKEY,
+    <span class="doccomment">/// [RFC 6891](https://tools.ietf.org/html/rfc6891) Option
+    </span>OPT,
+    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Pointer record
+    </span>PTR,
+    <span class="comment">//  RP,         // 17 RFC 1183 Responsible person
+    </span><span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034) DNSSEC signature: RSASHA256 and RSASHA512, RFC5702
+    </span>RRSIG,
+    <span class="doccomment">/// [RFC 2535](https://tools.ietf.org/html/rfc2535) (and [RFC 2931](https://tools.ietf.org/html/rfc2931)) Signature, to support [RFC 2137](https://tools.ietf.org/html/rfc2137) Update.
+    </span>SIG,
+    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) and [RFC 2308](https://tools.ietf.org/html/rfc2308) Start of [a zone of] authority record
+    </span>SOA,
+    <span class="doccomment">/// [RFC 2782](https://tools.ietf.org/html/rfc2782) Service locator
+    </span>SRV,
+    <span class="doccomment">/// [RFC 4255](https://tools.ietf.org/html/rfc4255) SSH Public Key Fingerprint
+    </span>SSHFP,
+    <span class="doccomment">/// [RFC draft-ietf-dnsop-svcb-https-03](https://tools.ietf.org/html/draft-ietf-dnsop-svcb-httpssvc-03) DNS SVCB and HTTPS RRs
+    </span>SVCB,
+    <span class="comment">//  TA,         // 32768 N/A DNSSEC Trust Authorities
+    //  TKEY,       // 249 RFC 2930 Secret key record
+    </span><span class="doccomment">/// [RFC 6698](https://tools.ietf.org/html/rfc6698) TLSA certificate association
+    </span>TLSA,
+    <span class="doccomment">/// [RFC 8945](https://tools.ietf.org/html/rfc8945) Transaction Signature
+    </span>TSIG,
+    <span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035) Text record
+    </span>TXT,
+    <span class="doccomment">/// Unknown Record type, or unsupported
+    </span>Unknown(u16),
 
-    <span class="doccomment">/// This corresponds to a record type of 0, unspecified</span>
-    <span class="ident">ZERO</span>,
+    <span class="doccomment">/// This corresponds to a record type of 0, unspecified
+    </span>ZERO,
 }
 
-<span class="kw">impl</span> <span class="ident">RecordType</span> {
-    <span class="doccomment">/// Returns true if this is an ANY</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_any</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::ANY</span>
+<span class="kw">impl </span>RecordType {
+    <span class="doccomment">/// Returns true if this is an ANY
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_any(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== <span class="self">Self</span>::ANY
     }
 
-    <span class="doccomment">/// Returns true if this is a CNAME</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cname</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::CNAME</span>
+    <span class="doccomment">/// Returns true if this is a CNAME
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_cname(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== <span class="self">Self</span>::CNAME
     }
 
-    <span class="doccomment">/// Returns true if this is an NS</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ns</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::NS</span>
+    <span class="doccomment">/// Returns true if this is an NS
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_ns(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== <span class="self">Self</span>::NS
     }
 
-    <span class="doccomment">/// Returns true if this is an SOA</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_soa</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::SOA</span>
+    <span class="doccomment">/// Returns true if this is an SOA
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_soa(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== <span class="self">Self</span>::SOA
     }
 
-    <span class="doccomment">/// Returns true if this is an SRV</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_srv</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::SRV</span>
+    <span class="doccomment">/// Returns true if this is an SRV
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_srv(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== <span class="self">Self</span>::SRV
     }
 
-    <span class="doccomment">/// Returns true if this is an A or an AAAA record</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ip_addr</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::A</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::AAAA</span>)
+    <span class="doccomment">/// Returns true if this is an A or an AAAA record
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_ip_addr(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::A | <span class="self">Self</span>::AAAA)
     }
 
-    <span class="doccomment">/// Returns true if this is a DNSSEC RecordType</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dnssec</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="doccomment">/// Returns true if this is a DNSSEC RecordType
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_dnssec(<span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
-            <span class="ident"><span class="self">Self</span>::DNSKEY</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::CDNSKEY</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::CDS</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::DS</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::KEY</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::NSEC</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::NSEC3</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::NSEC3PARAM</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::RRSIG</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::SIG</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::TSIG</span>
+            <span class="self">Self</span>::DNSKEY
+                | <span class="self">Self</span>::CDNSKEY
+                | <span class="self">Self</span>::CDS
+                | <span class="self">Self</span>::DS
+                | <span class="self">Self</span>::KEY
+                | <span class="self">Self</span>::NSEC
+                | <span class="self">Self</span>::NSEC3
+                | <span class="self">Self</span>::NSEC3PARAM
+                | <span class="self">Self</span>::RRSIG
+                | <span class="self">Self</span>::SIG
+                | <span class="self">Self</span>::TSIG
         )
     }
 
-    <span class="doccomment">/// Returns true if this is a Zero (unspecified) RecordType</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_zero</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::ZERO</span>
+    <span class="doccomment">/// Returns true if this is a Zero (unspecified) RecordType
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_zero(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== <span class="self">Self</span>::ZERO
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ProtoError</span>;
+<span class="kw">impl </span>FromStr <span class="kw">for </span>RecordType {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= ProtoError;
 
-    <span class="doccomment">/// Convert `&amp;str` to `RecordType`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use std::str::FromStr;</span>
-    <span class="doccomment">/// use trust_dns_proto::rr::record_type::RecordType;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let var: RecordType = RecordType::from_str(&quot;A&quot;).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(RecordType::A, var);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="comment">// TODO missing stuff?</span>
-        <span class="macro">debug_assert!</span>(<span class="ident">str</span>.<span class="ident">chars</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">char::is_digit</span>(<span class="ident">x</span>, <span class="number">36</span>)));
-        <span class="kw">match</span> <span class="ident">str</span> {
-            <span class="string">&quot;A&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::A</span>),
-            <span class="string">&quot;AAAA&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::AAAA</span>),
-            <span class="string">&quot;ANAME&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ANAME</span>),
-            <span class="string">&quot;AXFR&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::AXFR</span>),
-            <span class="string">&quot;CAA&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::CAA</span>),
-            <span class="string">&quot;CDNSKEY&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::CDNSKEY</span>),
-            <span class="string">&quot;CDS&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::CDS</span>),
-            <span class="string">&quot;CNAME&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::CNAME</span>),
-            <span class="string">&quot;CSYNC&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::CSYNC</span>),
-            <span class="string">&quot;DNSKEY&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::DNSKEY</span>),
-            <span class="string">&quot;DS&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::DS</span>),
-            <span class="string">&quot;HINFO&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::HINFO</span>),
-            <span class="string">&quot;HTTPS&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::HTTPS</span>),
-            <span class="string">&quot;KEY&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::KEY</span>),
-            <span class="string">&quot;MX&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::MX</span>),
-            <span class="string">&quot;NAPTR&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::NAPTR</span>),
-            <span class="string">&quot;NSEC&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::NSEC</span>),
-            <span class="string">&quot;NSEC3&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::NSEC3</span>),
-            <span class="string">&quot;NSEC3PARAM&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::NSEC3PARAM</span>),
-            <span class="string">&quot;NS&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::NS</span>),
-            <span class="string">&quot;NULL&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::NULL</span>),
-            <span class="string">&quot;OPENPGPKEY&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::OPENPGPKEY</span>),
-            <span class="string">&quot;PTR&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PTR</span>),
-            <span class="string">&quot;RRSIG&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::RRSIG</span>),
-            <span class="string">&quot;SIG&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SIG</span>),
-            <span class="string">&quot;SOA&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SOA</span>),
-            <span class="string">&quot;SRV&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SRV</span>),
-            <span class="string">&quot;SSHFP&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SSHFP</span>),
-            <span class="string">&quot;SVCB&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SVCB</span>),
-            <span class="string">&quot;TLSA&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::TLSA</span>),
-            <span class="string">&quot;TXT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::TXT</span>),
-            <span class="string">&quot;TSIG&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::TSIG</span>),
-            <span class="string">&quot;ANY&quot;</span> <span class="op">|</span> <span class="string">&quot;*&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ANY</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::UnknownRecordTypeStr</span>(<span class="ident">str</span>.<span class="ident">to_string</span>()).<span class="ident">into</span>()),
+    <span class="doccomment">/// Convert `&amp;str` to `RecordType`
+    ///
+    /// ```
+    /// use std::str::FromStr;
+    /// use trust_dns_proto::rr::record_type::RecordType;
+    ///
+    /// let var: RecordType = RecordType::from_str(&quot;A&quot;).unwrap();
+    /// assert_eq!(RecordType::A, var);
+    /// ```
+    </span><span class="kw">fn </span>from_str(str: <span class="kw-2">&amp;</span>str) -&gt; ProtoResult&lt;<span class="self">Self</span>&gt; {
+        <span class="comment">// TODO missing stuff?
+        </span><span class="macro">debug_assert!</span>(str.chars().all(|x| char::is_digit(x, <span class="number">36</span>)));
+        <span class="kw">match </span>str {
+            <span class="string">&quot;A&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::A),
+            <span class="string">&quot;AAAA&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::AAAA),
+            <span class="string">&quot;ANAME&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ANAME),
+            <span class="string">&quot;AXFR&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::AXFR),
+            <span class="string">&quot;CAA&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::CAA),
+            <span class="string">&quot;CDNSKEY&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::CDNSKEY),
+            <span class="string">&quot;CDS&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::CDS),
+            <span class="string">&quot;CNAME&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::CNAME),
+            <span class="string">&quot;CSYNC&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::CSYNC),
+            <span class="string">&quot;DNSKEY&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::DNSKEY),
+            <span class="string">&quot;DS&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::DS),
+            <span class="string">&quot;HINFO&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::HINFO),
+            <span class="string">&quot;HTTPS&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::HTTPS),
+            <span class="string">&quot;KEY&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::KEY),
+            <span class="string">&quot;MX&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::MX),
+            <span class="string">&quot;NAPTR&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::NAPTR),
+            <span class="string">&quot;NSEC&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::NSEC),
+            <span class="string">&quot;NSEC3&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::NSEC3),
+            <span class="string">&quot;NSEC3PARAM&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::NSEC3PARAM),
+            <span class="string">&quot;NS&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::NS),
+            <span class="string">&quot;NULL&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::NULL),
+            <span class="string">&quot;OPENPGPKEY&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::OPENPGPKEY),
+            <span class="string">&quot;PTR&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::PTR),
+            <span class="string">&quot;RRSIG&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::RRSIG),
+            <span class="string">&quot;SIG&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::SIG),
+            <span class="string">&quot;SOA&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::SOA),
+            <span class="string">&quot;SRV&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::SRV),
+            <span class="string">&quot;SSHFP&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::SSHFP),
+            <span class="string">&quot;SVCB&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::SVCB),
+            <span class="string">&quot;TLSA&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::TLSA),
+            <span class="string">&quot;TXT&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::TXT),
+            <span class="string">&quot;TSIG&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::TSIG),
+            <span class="string">&quot;ANY&quot; </span>| <span class="string">&quot;*&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ANY),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ProtoErrorKind::UnknownRecordTypeStr(str.to_string()).into()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="doccomment">/// Convert from `u16` to `RecordType`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use trust_dns_proto::rr::record_type::RecordType;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let var = RecordType::from(1);</span>
-    <span class="doccomment">/// assert_eq!(RecordType::A, var);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::A</span>,
-            <span class="number">28</span> =&gt; <span class="ident"><span class="self">Self</span>::AAAA</span>,
-            <span class="comment">// TODO: wrong value here, see https://github.com/bluejekyll/trust-dns/issues/723</span>
-            <span class="number">65305</span> =&gt; <span class="ident"><span class="self">Self</span>::ANAME</span>,
-            <span class="number">255</span> =&gt; <span class="ident"><span class="self">Self</span>::ANY</span>,
-            <span class="number">251</span> =&gt; <span class="ident"><span class="self">Self</span>::IXFR</span>,
-            <span class="number">252</span> =&gt; <span class="ident"><span class="self">Self</span>::AXFR</span>,
-            <span class="number">257</span> =&gt; <span class="ident"><span class="self">Self</span>::CAA</span>,
-            <span class="number">59</span> =&gt; <span class="ident"><span class="self">Self</span>::CDS</span>,
-            <span class="number">60</span> =&gt; <span class="ident"><span class="self">Self</span>::CDNSKEY</span>,
-            <span class="number">5</span> =&gt; <span class="ident"><span class="self">Self</span>::CNAME</span>,
-            <span class="number">62</span> =&gt; <span class="ident"><span class="self">Self</span>::CSYNC</span>,
-            <span class="number">48</span> =&gt; <span class="ident"><span class="self">Self</span>::DNSKEY</span>,
-            <span class="number">43</span> =&gt; <span class="ident"><span class="self">Self</span>::DS</span>,
-            <span class="number">13</span> =&gt; <span class="ident"><span class="self">Self</span>::HINFO</span>,
-            <span class="number">65</span> =&gt; <span class="ident"><span class="self">Self</span>::HTTPS</span>,
-            <span class="number">25</span> =&gt; <span class="ident"><span class="self">Self</span>::KEY</span>,
-            <span class="number">15</span> =&gt; <span class="ident"><span class="self">Self</span>::MX</span>,
-            <span class="number">35</span> =&gt; <span class="ident"><span class="self">Self</span>::NAPTR</span>,
-            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::NS</span>,
-            <span class="number">47</span> =&gt; <span class="ident"><span class="self">Self</span>::NSEC</span>,
-            <span class="number">50</span> =&gt; <span class="ident"><span class="self">Self</span>::NSEC3</span>,
-            <span class="number">51</span> =&gt; <span class="ident"><span class="self">Self</span>::NSEC3PARAM</span>,
-            <span class="number">10</span> =&gt; <span class="ident"><span class="self">Self</span>::NULL</span>,
-            <span class="number">61</span> =&gt; <span class="ident"><span class="self">Self</span>::OPENPGPKEY</span>,
-            <span class="number">41</span> =&gt; <span class="ident"><span class="self">Self</span>::OPT</span>,
-            <span class="number">12</span> =&gt; <span class="ident"><span class="self">Self</span>::PTR</span>,
-            <span class="number">46</span> =&gt; <span class="ident"><span class="self">Self</span>::RRSIG</span>,
-            <span class="number">24</span> =&gt; <span class="ident"><span class="self">Self</span>::SIG</span>,
-            <span class="number">6</span> =&gt; <span class="ident"><span class="self">Self</span>::SOA</span>,
-            <span class="number">33</span> =&gt; <span class="ident"><span class="self">Self</span>::SRV</span>,
-            <span class="number">44</span> =&gt; <span class="ident"><span class="self">Self</span>::SSHFP</span>,
-            <span class="number">64</span> =&gt; <span class="ident"><span class="self">Self</span>::SVCB</span>,
-            <span class="number">52</span> =&gt; <span class="ident"><span class="self">Self</span>::TLSA</span>,
-            <span class="number">250</span> =&gt; <span class="ident"><span class="self">Self</span>::TSIG</span>,
-            <span class="number">16</span> =&gt; <span class="ident"><span class="self">Self</span>::TXT</span>,
-            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::ZERO</span>,
-            <span class="comment">// all unknown record types</span>
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">value</span>),
+<span class="kw">impl </span>From&lt;u16&gt; <span class="kw">for </span>RecordType {
+    <span class="doccomment">/// Convert from `u16` to `RecordType`
+    ///
+    /// ```
+    /// use trust_dns_proto::rr::record_type::RecordType;
+    ///
+    /// let var = RecordType::from(1);
+    /// assert_eq!(RecordType::A, var);
+    /// ```
+    </span><span class="kw">fn </span>from(value: u16) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>value {
+            <span class="number">1 </span>=&gt; <span class="self">Self</span>::A,
+            <span class="number">28 </span>=&gt; <span class="self">Self</span>::AAAA,
+            <span class="comment">// TODO: wrong value here, see https://github.com/bluejekyll/trust-dns/issues/723
+            </span><span class="number">65305 </span>=&gt; <span class="self">Self</span>::ANAME,
+            <span class="number">255 </span>=&gt; <span class="self">Self</span>::ANY,
+            <span class="number">251 </span>=&gt; <span class="self">Self</span>::IXFR,
+            <span class="number">252 </span>=&gt; <span class="self">Self</span>::AXFR,
+            <span class="number">257 </span>=&gt; <span class="self">Self</span>::CAA,
+            <span class="number">59 </span>=&gt; <span class="self">Self</span>::CDS,
+            <span class="number">60 </span>=&gt; <span class="self">Self</span>::CDNSKEY,
+            <span class="number">5 </span>=&gt; <span class="self">Self</span>::CNAME,
+            <span class="number">62 </span>=&gt; <span class="self">Self</span>::CSYNC,
+            <span class="number">48 </span>=&gt; <span class="self">Self</span>::DNSKEY,
+            <span class="number">43 </span>=&gt; <span class="self">Self</span>::DS,
+            <span class="number">13 </span>=&gt; <span class="self">Self</span>::HINFO,
+            <span class="number">65 </span>=&gt; <span class="self">Self</span>::HTTPS,
+            <span class="number">25 </span>=&gt; <span class="self">Self</span>::KEY,
+            <span class="number">15 </span>=&gt; <span class="self">Self</span>::MX,
+            <span class="number">35 </span>=&gt; <span class="self">Self</span>::NAPTR,
+            <span class="number">2 </span>=&gt; <span class="self">Self</span>::NS,
+            <span class="number">47 </span>=&gt; <span class="self">Self</span>::NSEC,
+            <span class="number">50 </span>=&gt; <span class="self">Self</span>::NSEC3,
+            <span class="number">51 </span>=&gt; <span class="self">Self</span>::NSEC3PARAM,
+            <span class="number">10 </span>=&gt; <span class="self">Self</span>::NULL,
+            <span class="number">61 </span>=&gt; <span class="self">Self</span>::OPENPGPKEY,
+            <span class="number">41 </span>=&gt; <span class="self">Self</span>::OPT,
+            <span class="number">12 </span>=&gt; <span class="self">Self</span>::PTR,
+            <span class="number">46 </span>=&gt; <span class="self">Self</span>::RRSIG,
+            <span class="number">24 </span>=&gt; <span class="self">Self</span>::SIG,
+            <span class="number">6 </span>=&gt; <span class="self">Self</span>::SOA,
+            <span class="number">33 </span>=&gt; <span class="self">Self</span>::SRV,
+            <span class="number">44 </span>=&gt; <span class="self">Self</span>::SSHFP,
+            <span class="number">64 </span>=&gt; <span class="self">Self</span>::SVCB,
+            <span class="number">52 </span>=&gt; <span class="self">Self</span>::TLSA,
+            <span class="number">250 </span>=&gt; <span class="self">Self</span>::TSIG,
+            <span class="number">16 </span>=&gt; <span class="self">Self</span>::TXT,
+            <span class="number">0 </span>=&gt; <span class="self">Self</span>::ZERO,
+            <span class="comment">// all unknown record types
+            </span><span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown(value),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BinEncodable</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">encoder</span>.<span class="ident">emit_u16</span>((<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into</span>())
+<span class="kw">impl </span>BinEncodable <span class="kw">for </span>RecordType {
+    <span class="kw">fn </span>emit(<span class="kw-2">&amp;</span><span class="self">self</span>, encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ProtoResult&lt;()&gt; {
+        encoder.emit_u16((<span class="kw-2">*</span><span class="self">self</span>).into())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="ident">BinDecodable</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">decoder</span>
-            .<span class="ident">read_u16</span>()
-            .<span class="ident">map</span>(
-                <span class="ident">Restrict::unverified</span>, <span class="comment">/*RecordType is safe with any u16*/</span>
-            )
-            .<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::from</span>)<span class="question-mark">?</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>&gt; BinDecodable&lt;<span class="lifetime">&#39;r</span>&gt; <span class="kw">for </span>RecordType {
+    <span class="kw">fn </span>read(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ProtoResult&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Ok</span>(decoder
+            .read_u16()
+            .map(
+                Restrict::unverified, <span class="comment">/*RecordType is safe with any u16*/
+            </span>)
+            .map(<span class="self">Self</span>::from)<span class="question-mark">?</span>)
     }
 }
 
-<span class="comment">// TODO make these a macro...</span>
+<span class="comment">// TODO make these a macro...
 
-<span class="doccomment">/// Convert from `RecordType` to `&amp;str`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use std::convert::From;</span>
-<span class="doccomment">/// use trust_dns_proto::rr::record_type::RecordType;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let var: &amp;&#39;static str = From::from(RecordType::A);</span>
-<span class="doccomment">/// assert_eq!(&quot;A&quot;, var);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let var: &amp;&#39;static str = RecordType::A.into();</span>
-<span class="doccomment">/// assert_eq!(&quot;A&quot;, var);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RecordType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">RecordType</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="ident">rt</span> {
-            <span class="ident">RecordType::A</span> =&gt; <span class="string">&quot;A&quot;</span>,
-            <span class="ident">RecordType::AAAA</span> =&gt; <span class="string">&quot;AAAA&quot;</span>,
-            <span class="ident">RecordType::ANAME</span> =&gt; <span class="string">&quot;ANAME&quot;</span>,
-            <span class="ident">RecordType::ANY</span> =&gt; <span class="string">&quot;ANY&quot;</span>,
-            <span class="ident">RecordType::AXFR</span> =&gt; <span class="string">&quot;AXFR&quot;</span>,
-            <span class="ident">RecordType::CAA</span> =&gt; <span class="string">&quot;CAA&quot;</span>,
-            <span class="ident">RecordType::CDNSKEY</span> =&gt; <span class="string">&quot;CDNSKEY&quot;</span>,
-            <span class="ident">RecordType::CDS</span> =&gt; <span class="string">&quot;CDS&quot;</span>,
-            <span class="ident">RecordType::CNAME</span> =&gt; <span class="string">&quot;CNAME&quot;</span>,
-            <span class="ident">RecordType::CSYNC</span> =&gt; <span class="string">&quot;CSYNC&quot;</span>,
-            <span class="ident">RecordType::DNSKEY</span> =&gt; <span class="string">&quot;DNSKEY&quot;</span>,
-            <span class="ident">RecordType::DS</span> =&gt; <span class="string">&quot;DS&quot;</span>,
-            <span class="ident">RecordType::HINFO</span> =&gt; <span class="string">&quot;HINFO&quot;</span>,
-            <span class="ident">RecordType::HTTPS</span> =&gt; <span class="string">&quot;HTTPS&quot;</span>,
-            <span class="ident">RecordType::KEY</span> =&gt; <span class="string">&quot;KEY&quot;</span>,
-            <span class="ident">RecordType::IXFR</span> =&gt; <span class="string">&quot;IXFR&quot;</span>,
-            <span class="ident">RecordType::MX</span> =&gt; <span class="string">&quot;MX&quot;</span>,
-            <span class="ident">RecordType::NAPTR</span> =&gt; <span class="string">&quot;NAPTR&quot;</span>,
-            <span class="ident">RecordType::NS</span> =&gt; <span class="string">&quot;NS&quot;</span>,
-            <span class="ident">RecordType::NSEC</span> =&gt; <span class="string">&quot;NSEC&quot;</span>,
-            <span class="ident">RecordType::NSEC3</span> =&gt; <span class="string">&quot;NSEC3&quot;</span>,
-            <span class="ident">RecordType::NSEC3PARAM</span> =&gt; <span class="string">&quot;NSEC3PARAM&quot;</span>,
-            <span class="ident">RecordType::NULL</span> =&gt; <span class="string">&quot;NULL&quot;</span>,
-            <span class="ident">RecordType::OPENPGPKEY</span> =&gt; <span class="string">&quot;OPENPGPKEY&quot;</span>,
-            <span class="ident">RecordType::OPT</span> =&gt; <span class="string">&quot;OPT&quot;</span>,
-            <span class="ident">RecordType::PTR</span> =&gt; <span class="string">&quot;PTR&quot;</span>,
-            <span class="ident">RecordType::RRSIG</span> =&gt; <span class="string">&quot;RRSIG&quot;</span>,
-            <span class="ident">RecordType::SIG</span> =&gt; <span class="string">&quot;SIG&quot;</span>,
-            <span class="ident">RecordType::SOA</span> =&gt; <span class="string">&quot;SOA&quot;</span>,
-            <span class="ident">RecordType::SRV</span> =&gt; <span class="string">&quot;SRV&quot;</span>,
-            <span class="ident">RecordType::SSHFP</span> =&gt; <span class="string">&quot;SSHFP&quot;</span>,
-            <span class="ident">RecordType::SVCB</span> =&gt; <span class="string">&quot;SVCB&quot;</span>,
-            <span class="ident">RecordType::TLSA</span> =&gt; <span class="string">&quot;TLSA&quot;</span>,
-            <span class="ident">RecordType::TSIG</span> =&gt; <span class="string">&quot;TSIG&quot;</span>,
-            <span class="ident">RecordType::TXT</span> =&gt; <span class="string">&quot;TXT&quot;</span>,
-            <span class="ident">RecordType::ZERO</span> =&gt; <span class="string">&quot;ZERO&quot;</span>,
-            <span class="ident">RecordType::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Unknown&quot;</span>,
+</span><span class="doccomment">/// Convert from `RecordType` to `&amp;str`
+///
+/// ```
+/// use std::convert::From;
+/// use trust_dns_proto::rr::record_type::RecordType;
+///
+/// let var: &amp;&#39;static str = From::from(RecordType::A);
+/// assert_eq!(&quot;A&quot;, var);
+///
+/// let var: &amp;&#39;static str = RecordType::A.into();
+/// assert_eq!(&quot;A&quot;, var);
+/// ```
+</span><span class="kw">impl </span>From&lt;RecordType&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    <span class="kw">fn </span>from(rt: RecordType) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span>rt {
+            RecordType::A =&gt; <span class="string">&quot;A&quot;</span>,
+            RecordType::AAAA =&gt; <span class="string">&quot;AAAA&quot;</span>,
+            RecordType::ANAME =&gt; <span class="string">&quot;ANAME&quot;</span>,
+            RecordType::ANY =&gt; <span class="string">&quot;ANY&quot;</span>,
+            RecordType::AXFR =&gt; <span class="string">&quot;AXFR&quot;</span>,
+            RecordType::CAA =&gt; <span class="string">&quot;CAA&quot;</span>,
+            RecordType::CDNSKEY =&gt; <span class="string">&quot;CDNSKEY&quot;</span>,
+            RecordType::CDS =&gt; <span class="string">&quot;CDS&quot;</span>,
+            RecordType::CNAME =&gt; <span class="string">&quot;CNAME&quot;</span>,
+            RecordType::CSYNC =&gt; <span class="string">&quot;CSYNC&quot;</span>,
+            RecordType::DNSKEY =&gt; <span class="string">&quot;DNSKEY&quot;</span>,
+            RecordType::DS =&gt; <span class="string">&quot;DS&quot;</span>,
+            RecordType::HINFO =&gt; <span class="string">&quot;HINFO&quot;</span>,
+            RecordType::HTTPS =&gt; <span class="string">&quot;HTTPS&quot;</span>,
+            RecordType::KEY =&gt; <span class="string">&quot;KEY&quot;</span>,
+            RecordType::IXFR =&gt; <span class="string">&quot;IXFR&quot;</span>,
+            RecordType::MX =&gt; <span class="string">&quot;MX&quot;</span>,
+            RecordType::NAPTR =&gt; <span class="string">&quot;NAPTR&quot;</span>,
+            RecordType::NS =&gt; <span class="string">&quot;NS&quot;</span>,
+            RecordType::NSEC =&gt; <span class="string">&quot;NSEC&quot;</span>,
+            RecordType::NSEC3 =&gt; <span class="string">&quot;NSEC3&quot;</span>,
+            RecordType::NSEC3PARAM =&gt; <span class="string">&quot;NSEC3PARAM&quot;</span>,
+            RecordType::NULL =&gt; <span class="string">&quot;NULL&quot;</span>,
+            RecordType::OPENPGPKEY =&gt; <span class="string">&quot;OPENPGPKEY&quot;</span>,
+            RecordType::OPT =&gt; <span class="string">&quot;OPT&quot;</span>,
+            RecordType::PTR =&gt; <span class="string">&quot;PTR&quot;</span>,
+            RecordType::RRSIG =&gt; <span class="string">&quot;RRSIG&quot;</span>,
+            RecordType::SIG =&gt; <span class="string">&quot;SIG&quot;</span>,
+            RecordType::SOA =&gt; <span class="string">&quot;SOA&quot;</span>,
+            RecordType::SRV =&gt; <span class="string">&quot;SRV&quot;</span>,
+            RecordType::SSHFP =&gt; <span class="string">&quot;SSHFP&quot;</span>,
+            RecordType::SVCB =&gt; <span class="string">&quot;SVCB&quot;</span>,
+            RecordType::TLSA =&gt; <span class="string">&quot;TLSA&quot;</span>,
+            RecordType::TSIG =&gt; <span class="string">&quot;TSIG&quot;</span>,
+            RecordType::TXT =&gt; <span class="string">&quot;TXT&quot;</span>,
+            RecordType::ZERO =&gt; <span class="string">&quot;ZERO&quot;</span>,
+            RecordType::Unknown(<span class="kw">_</span>) =&gt; <span class="string">&quot;Unknown&quot;</span>,
         }
     }
 }
 
-<span class="doccomment">/// Convert from `RecordType` to `u16`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use std::convert::From;</span>
-<span class="doccomment">/// use trust_dns_proto::rr::record_type::RecordType;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let var: u16 = RecordType::A.into();</span>
-<span class="doccomment">/// assert_eq!(1, var);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RecordType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">RecordType</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">rt</span> {
-            <span class="ident">RecordType::A</span> =&gt; <span class="number">1</span>,
-            <span class="ident">RecordType::AAAA</span> =&gt; <span class="number">28</span>,
-            <span class="comment">// TODO: wrong value here, see https://github.com/bluejekyll/trust-dns/issues/723</span>
-            <span class="ident">RecordType::ANAME</span> =&gt; <span class="number">65305</span>,
-            <span class="ident">RecordType::ANY</span> =&gt; <span class="number">255</span>,
-            <span class="ident">RecordType::AXFR</span> =&gt; <span class="number">252</span>,
-            <span class="ident">RecordType::CAA</span> =&gt; <span class="number">257</span>,
-            <span class="ident">RecordType::CDNSKEY</span> =&gt; <span class="number">60</span>,
-            <span class="ident">RecordType::CDS</span> =&gt; <span class="number">59</span>,
-            <span class="ident">RecordType::CNAME</span> =&gt; <span class="number">5</span>,
-            <span class="ident">RecordType::CSYNC</span> =&gt; <span class="number">62</span>,
-            <span class="ident">RecordType::DNSKEY</span> =&gt; <span class="number">48</span>,
-            <span class="ident">RecordType::DS</span> =&gt; <span class="number">43</span>,
-            <span class="ident">RecordType::HINFO</span> =&gt; <span class="number">13</span>,
-            <span class="ident">RecordType::HTTPS</span> =&gt; <span class="number">65</span>,
-            <span class="ident">RecordType::KEY</span> =&gt; <span class="number">25</span>,
-            <span class="ident">RecordType::IXFR</span> =&gt; <span class="number">251</span>,
-            <span class="ident">RecordType::MX</span> =&gt; <span class="number">15</span>,
-            <span class="ident">RecordType::NAPTR</span> =&gt; <span class="number">35</span>,
-            <span class="ident">RecordType::NS</span> =&gt; <span class="number">2</span>,
-            <span class="ident">RecordType::NSEC</span> =&gt; <span class="number">47</span>,
-            <span class="ident">RecordType::NSEC3</span> =&gt; <span class="number">50</span>,
-            <span class="ident">RecordType::NSEC3PARAM</span> =&gt; <span class="number">51</span>,
-            <span class="ident">RecordType::NULL</span> =&gt; <span class="number">10</span>,
-            <span class="ident">RecordType::OPENPGPKEY</span> =&gt; <span class="number">61</span>,
-            <span class="ident">RecordType::OPT</span> =&gt; <span class="number">41</span>,
-            <span class="ident">RecordType::PTR</span> =&gt; <span class="number">12</span>,
-            <span class="ident">RecordType::RRSIG</span> =&gt; <span class="number">46</span>,
-            <span class="ident">RecordType::SIG</span> =&gt; <span class="number">24</span>,
-            <span class="ident">RecordType::SOA</span> =&gt; <span class="number">6</span>,
-            <span class="ident">RecordType::SRV</span> =&gt; <span class="number">33</span>,
-            <span class="ident">RecordType::SSHFP</span> =&gt; <span class="number">44</span>,
-            <span class="ident">RecordType::SVCB</span> =&gt; <span class="number">64</span>,
-            <span class="ident">RecordType::TLSA</span> =&gt; <span class="number">52</span>,
-            <span class="ident">RecordType::TSIG</span> =&gt; <span class="number">250</span>,
-            <span class="ident">RecordType::TXT</span> =&gt; <span class="number">16</span>,
-            <span class="ident">RecordType::ZERO</span> =&gt; <span class="number">0</span>,
-            <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>) =&gt; <span class="ident">code</span>,
+<span class="doccomment">/// Convert from `RecordType` to `u16`
+///
+/// ```
+/// use std::convert::From;
+/// use trust_dns_proto::rr::record_type::RecordType;
+///
+/// let var: u16 = RecordType::A.into();
+/// assert_eq!(1, var);
+/// ```
+</span><span class="kw">impl </span>From&lt;RecordType&gt; <span class="kw">for </span>u16 {
+    <span class="kw">fn </span>from(rt: RecordType) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>rt {
+            RecordType::A =&gt; <span class="number">1</span>,
+            RecordType::AAAA =&gt; <span class="number">28</span>,
+            <span class="comment">// TODO: wrong value here, see https://github.com/bluejekyll/trust-dns/issues/723
+            </span>RecordType::ANAME =&gt; <span class="number">65305</span>,
+            RecordType::ANY =&gt; <span class="number">255</span>,
+            RecordType::AXFR =&gt; <span class="number">252</span>,
+            RecordType::CAA =&gt; <span class="number">257</span>,
+            RecordType::CDNSKEY =&gt; <span class="number">60</span>,
+            RecordType::CDS =&gt; <span class="number">59</span>,
+            RecordType::CNAME =&gt; <span class="number">5</span>,
+            RecordType::CSYNC =&gt; <span class="number">62</span>,
+            RecordType::DNSKEY =&gt; <span class="number">48</span>,
+            RecordType::DS =&gt; <span class="number">43</span>,
+            RecordType::HINFO =&gt; <span class="number">13</span>,
+            RecordType::HTTPS =&gt; <span class="number">65</span>,
+            RecordType::KEY =&gt; <span class="number">25</span>,
+            RecordType::IXFR =&gt; <span class="number">251</span>,
+            RecordType::MX =&gt; <span class="number">15</span>,
+            RecordType::NAPTR =&gt; <span class="number">35</span>,
+            RecordType::NS =&gt; <span class="number">2</span>,
+            RecordType::NSEC =&gt; <span class="number">47</span>,
+            RecordType::NSEC3 =&gt; <span class="number">50</span>,
+            RecordType::NSEC3PARAM =&gt; <span class="number">51</span>,
+            RecordType::NULL =&gt; <span class="number">10</span>,
+            RecordType::OPENPGPKEY =&gt; <span class="number">61</span>,
+            RecordType::OPT =&gt; <span class="number">41</span>,
+            RecordType::PTR =&gt; <span class="number">12</span>,
+            RecordType::RRSIG =&gt; <span class="number">46</span>,
+            RecordType::SIG =&gt; <span class="number">24</span>,
+            RecordType::SOA =&gt; <span class="number">6</span>,
+            RecordType::SRV =&gt; <span class="number">33</span>,
+            RecordType::SSHFP =&gt; <span class="number">44</span>,
+            RecordType::SVCB =&gt; <span class="number">64</span>,
+            RecordType::TLSA =&gt; <span class="number">52</span>,
+            RecordType::TSIG =&gt; <span class="number">250</span>,
+            RecordType::TXT =&gt; <span class="number">16</span>,
+            RecordType::ZERO =&gt; <span class="number">0</span>,
+            RecordType::Unknown(code) =&gt; code,
         }
     }
 }
 
-<span class="doccomment">/// [Canonical DNS Name Order](https://tools.ietf.org/html/rfc4034#section-6)</span>
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+<span class="doccomment">/// [Canonical DNS Name Order](https://tools.ietf.org/html/rfc4034#section-6)
+</span><span class="kw">impl </span>PartialOrd&lt;<span class="self">Self</span>&gt; <span class="kw">for </span>RecordType {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="doccomment">/// [Canonical DNS Name Order](https://tools.ietf.org/html/rfc4034#section-6)</span>
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="ident">u16::from</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">u16::from</span>(<span class="kw-2">*</span><span class="ident">other</span>))
+<span class="doccomment">/// [Canonical DNS Name Order](https://tools.ietf.org/html/rfc4034#section-6)
+</span><span class="kw">impl </span>Ord <span class="kw">for </span>RecordType {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        u16::from(<span class="kw-2">*</span><span class="self">self</span>).cmp(<span class="kw-2">&amp;</span>u16::from(<span class="kw-2">*</span>other))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">Into</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="ident">::into</span>(<span class="kw-2">*</span><span class="self">self</span>))
+<span class="kw">impl </span>Display <span class="kw">for </span>RecordType {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        f.write_str(Into::&lt;<span class="kw-2">&amp;</span>str&gt;::into(<span class="kw-2">*</span><span class="self">self</span>))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_order</span>() {
-        <span class="kw">let</span> <span class="ident">ordered</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">RecordType::A</span>,
-            <span class="ident">RecordType::NS</span>,
-            <span class="ident">RecordType::CNAME</span>,
-            <span class="ident">RecordType::SOA</span>,
-            <span class="ident">RecordType::NULL</span>,
-            <span class="ident">RecordType::PTR</span>,
-            <span class="ident">RecordType::HINFO</span>,
-            <span class="ident">RecordType::MX</span>,
-            <span class="ident">RecordType::TXT</span>,
-            <span class="ident">RecordType::AAAA</span>,
-            <span class="ident">RecordType::SRV</span>,
-            <span class="ident">RecordType::CSYNC</span>,
-            <span class="ident">RecordType::AXFR</span>,
-            <span class="ident">RecordType::ANY</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_order() {
+        <span class="kw">let </span>ordered = <span class="macro">vec!</span>[
+            RecordType::A,
+            RecordType::NS,
+            RecordType::CNAME,
+            RecordType::SOA,
+            RecordType::NULL,
+            RecordType::PTR,
+            RecordType::HINFO,
+            RecordType::MX,
+            RecordType::TXT,
+            RecordType::AAAA,
+            RecordType::SRV,
+            RecordType::CSYNC,
+            RecordType::AXFR,
+            RecordType::ANY,
         ];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unordered</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">RecordType::ANY</span>,
-            <span class="ident">RecordType::NULL</span>,
-            <span class="ident">RecordType::AXFR</span>,
-            <span class="ident">RecordType::A</span>,
-            <span class="ident">RecordType::NS</span>,
-            <span class="ident">RecordType::SOA</span>,
-            <span class="ident">RecordType::SRV</span>,
-            <span class="ident">RecordType::PTR</span>,
-            <span class="ident">RecordType::MX</span>,
-            <span class="ident">RecordType::CNAME</span>,
-            <span class="ident">RecordType::TXT</span>,
-            <span class="ident">RecordType::AAAA</span>,
-            <span class="ident">RecordType::HINFO</span>,
-            <span class="ident">RecordType::CSYNC</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>unordered = <span class="macro">vec!</span>[
+            RecordType::ANY,
+            RecordType::NULL,
+            RecordType::AXFR,
+            RecordType::A,
+            RecordType::NS,
+            RecordType::SOA,
+            RecordType::SRV,
+            RecordType::PTR,
+            RecordType::MX,
+            RecordType::CNAME,
+            RecordType::TXT,
+            RecordType::AAAA,
+            RecordType::HINFO,
+            RecordType::CSYNC,
         ];
 
-        <span class="ident">unordered</span>.<span class="ident">sort</span>();
+        unordered.sort();
 
-        <span class="kw">for</span> <span class="ident">rtype</span> <span class="kw">in</span> <span class="ident">unordered</span>.<span class="ident">clone</span>() {
-            <span class="macro">println!</span>(<span class="string">&quot;u16 for {:?}: {}&quot;</span>, <span class="ident">rtype</span>, <span class="ident">u16::from</span>(<span class="ident">rtype</span>));
+        <span class="kw">for </span>rtype <span class="kw">in </span>unordered.clone() {
+            <span class="macro">println!</span>(<span class="string">&quot;u16 for {:?}: {}&quot;</span>, rtype, u16::from(rtype));
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">ordered</span>, <span class="ident">unordered</span>);
+        <span class="macro">assert_eq!</span>(ordered, unordered);
     }
 
-    <span class="doccomment">/// Check that all record type names parse into unique `RecordType` instances,</span>
-    <span class="doccomment">/// and can be converted back into the same name.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_record_type_parse</span>() {
-        <span class="kw">let</span> <span class="ident">record_names</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="doccomment">/// Check that all record type names parse into unique `RecordType` instances,
+    /// and can be converted back into the same name.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_record_type_parse() {
+        <span class="kw">let </span>record_names = <span class="kw-2">&amp;</span>[
             <span class="string">&quot;A&quot;</span>,
             <span class="string">&quot;AAAA&quot;</span>,
             <span class="string">&quot;ANAME&quot;</span>,
@@ -1065,8 +1065,8 @@
             <span class="string">&quot;AXFR&quot;</span>,
         ];
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">dnssec_record_names</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+        </span><span class="kw">let </span>dnssec_record_names = <span class="kw-2">&amp;</span>[
             <span class="string">&quot;CDNSKEY&quot;</span>,
             <span class="string">&quot;CDS&quot;</span>,
             <span class="string">&quot;DNSKEY&quot;</span>,
@@ -1079,16 +1079,16 @@
             <span class="string">&quot;SIG&quot;</span>,
             <span class="string">&quot;TSIG&quot;</span>,
         ];
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">dnssec_record_names</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[];
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;dnssec&quot;</span>))]
+        </span><span class="kw">let </span>dnssec_record_names = <span class="kw-2">&amp;</span>[];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rtypes</span> <span class="op">=</span> <span class="ident">std::collections::HashSet::new</span>();
-        <span class="kw">for</span> <span class="ident">name</span> <span class="kw">in</span> <span class="ident">record_names</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="ident">dnssec_record_names</span>) {
-            <span class="kw">let</span> <span class="ident">rtype</span>: <span class="ident">RecordType</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">rtype</span>.<span class="ident">to_string</span>().<span class="ident">to_ascii_uppercase</span>().<span class="ident">as_str</span>(), <span class="kw-2">*</span><span class="ident">name</span>);
-            <span class="macro">assert!</span>(<span class="ident">rtypes</span>.<span class="ident">insert</span>(<span class="ident">rtype</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>rtypes = std::collections::HashSet::new();
+        <span class="kw">for </span>name <span class="kw">in </span>record_names.iter().chain(dnssec_record_names) {
+            <span class="kw">let </span>rtype: RecordType = name.parse().unwrap();
+            <span class="macro">assert_eq!</span>(rtype.to_string().to_ascii_uppercase().as_str(), <span class="kw-2">*</span>name);
+            <span class="macro">assert!</span>(rtypes.insert(rtype));
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

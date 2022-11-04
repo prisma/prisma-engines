@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tiberius/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tiberius/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -157,164 +157,164 @@
 <span id="157">157</span>
 <span id="158">158</span>
 <span id="159">159</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Error module</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tds::codec::TokenError</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">std::io::ErrorKind</span> <span class="kw">as</span> <span class="ident">IoErrorKind</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">convert::Infallible</span>, <span class="ident">io</span>};
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Error module
+</span><span class="kw">pub use </span><span class="kw">crate</span>::tds::codec::TokenError;
+<span class="kw">pub use </span>std::io::ErrorKind <span class="kw">as </span>IoErrorKind;
+<span class="kw">use </span>std::{borrow::Cow, convert::Infallible, io};
+<span class="kw">use </span>thiserror::Error;
 
-<span class="doccomment">/// A unified error enum that contains several errors that might occurr during</span>
-<span class="doccomment">/// the lifecycle of this driver</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Error</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;An error occured during the attempt of performing I/O: {}&quot;</span>, <span class="ident">message</span>)]</span>
-    <span class="doccomment">/// An error occured when performing I/O to the server.</span>
-    <span class="ident">Io</span> {
-        <span class="doccomment">/// A list specifying general categories of I/O error.</span>
-        <span class="ident">kind</span>: <span class="ident">IoErrorKind</span>,
-        <span class="doccomment">/// The error description.</span>
-        <span class="ident">message</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A unified error enum that contains several errors that might occurr during
+/// the lifecycle of this driver
+</span><span class="attribute">#[derive(Debug, Clone, Error, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>Error {
+    <span class="attribute">#[error(<span class="string">&quot;An error occured during the attempt of performing I/O: {}&quot;</span>, message)]
+    </span><span class="doccomment">/// An error occured when performing I/O to the server.
+    </span>Io {
+        <span class="doccomment">/// A list specifying general categories of I/O error.
+        </span>kind: IoErrorKind,
+        <span class="doccomment">/// The error description.
+        </span>message: String,
     },
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Protocol error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="doccomment">/// An error happened during the request or response parsing.</span>
-    <span class="ident">Protocol</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Encoding error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="doccomment">/// Server responded with encoding not supported.</span>
-    <span class="ident">Encoding</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Conversion error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="doccomment">/// Conversion failure from one type to another.</span>
-    <span class="ident">Conversion</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;UTF-8 error&quot;</span>)]</span>
-    <span class="doccomment">/// Tried to convert data to UTF-8 that was not valid.</span>
-    <span class="ident">Utf8</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;UTF-16 error&quot;</span>)]</span>
-    <span class="doccomment">/// Tried to convert data to UTF-16 that was not valid.</span>
-    <span class="ident">Utf16</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error parsing an integer: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="doccomment">/// Tried to parse an integer that was not an integer.</span>
-    <span class="ident">ParseInt</span>(<span class="ident">std::num::ParseIntError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Token error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="doccomment">/// An error returned by the server.</span>
-    <span class="ident">Server</span>(<span class="ident">TokenError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error forming TLS connection: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="doccomment">/// An error in the TLS handshake.</span>
-    <span class="ident">Tls</span>(<span class="ident">String</span>),
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>), <span class="ident">doc</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>,
-        <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>)))
-    )]</span>
-    <span class="doccomment">/// An error from the GSSAPI library.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;GSSAPI Error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">Gssapi</span>(<span class="ident">String</span>),
-    <span class="attribute">#[<span class="ident">error</span>(
+    <span class="attribute">#[error(<span class="string">&quot;Protocol error: {}&quot;</span>, _0)]
+    </span><span class="doccomment">/// An error happened during the request or response parsing.
+    </span>Protocol(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;),
+    <span class="attribute">#[error(<span class="string">&quot;Encoding error: {}&quot;</span>, _0)]
+    </span><span class="doccomment">/// Server responded with encoding not supported.
+    </span>Encoding(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;),
+    <span class="attribute">#[error(<span class="string">&quot;Conversion error: {}&quot;</span>, _0)]
+    </span><span class="doccomment">/// Conversion failure from one type to another.
+    </span>Conversion(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;),
+    <span class="attribute">#[error(<span class="string">&quot;UTF-8 error&quot;</span>)]
+    </span><span class="doccomment">/// Tried to convert data to UTF-8 that was not valid.
+    </span>Utf8,
+    <span class="attribute">#[error(<span class="string">&quot;UTF-16 error&quot;</span>)]
+    </span><span class="doccomment">/// Tried to convert data to UTF-16 that was not valid.
+    </span>Utf16,
+    <span class="attribute">#[error(<span class="string">&quot;Error parsing an integer: {}&quot;</span>, _0)]
+    </span><span class="doccomment">/// Tried to parse an integer that was not an integer.
+    </span>ParseInt(std::num::ParseIntError),
+    <span class="attribute">#[error(<span class="string">&quot;Token error: {}&quot;</span>, _0)]
+    </span><span class="doccomment">/// An error returned by the server.
+    </span>Server(TokenError),
+    <span class="attribute">#[error(<span class="string">&quot;Error forming TLS connection: {}&quot;</span>, _0)]
+    </span><span class="doccomment">/// An error in the TLS handshake.
+    </span>Tls(String),
+    <span class="attribute">#[cfg(any(all(unix, feature = <span class="string">&quot;integrated-auth-gssapi&quot;</span>), doc))]
+    #[cfg_attr(
+        feature = <span class="string">&quot;docs&quot;</span>,
+        doc(cfg(all(unix, feature = <span class="string">&quot;integrated-auth-gssapi&quot;</span>)))
+    )]
+    </span><span class="doccomment">/// An error from the GSSAPI library.
+    </span><span class="attribute">#[error(<span class="string">&quot;GSSAPI Error: {}&quot;</span>, _0)]
+    </span>Gssapi(String),
+    <span class="attribute">#[error(
         <span class="string">&quot;Server requested a connection to an alternative address: `{}:{}`&quot;</span>,
-        <span class="ident">host</span>,
-        <span class="ident">port</span>
-    )]</span>
-    <span class="doccomment">/// Server requested a connection to an alternative address.</span>
-    <span class="ident">Routing</span> {
-        <span class="doccomment">/// The requested hostname</span>
-        <span class="ident">host</span>: <span class="ident">String</span>,
-        <span class="doccomment">/// The requested port.</span>
-        <span class="ident">port</span>: <span class="ident">u16</span>,
+        host,
+        port
+    )]
+    </span><span class="doccomment">/// Server requested a connection to an alternative address.
+    </span>Routing {
+        <span class="doccomment">/// The requested hostname
+        </span>host: String,
+        <span class="doccomment">/// The requested port.
+        </span>port: u16,
     },
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;BULK UPLOAD input failure: {0}&quot;</span>)]</span>
-    <span class="doccomment">/// Invalid input in Bulk Upload</span>
-    <span class="ident">BulkInput</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+    <span class="attribute">#[error(<span class="string">&quot;BULK UPLOAD input failure: {0}&quot;</span>)]
+    </span><span class="doccomment">/// Invalid input in Bulk Upload
+    </span>BulkInput(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// True, if the error was caused by a deadlock.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_deadlock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">code</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="number">1205</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+<span class="kw">impl </span>Error {
+    <span class="doccomment">/// True, if the error was caused by a deadlock.
+    </span><span class="kw">pub fn </span>is_deadlock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.code().map(|c| c == <span class="number">1205</span>).unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="doccomment">/// Returns the error code, if the error originates from the</span>
-    <span class="doccomment">/// server.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::Server</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">code</span>()),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Returns the error code, if the error originates from the
+    /// server.
+    </span><span class="kw">pub fn </span>code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Error::Server(e) =&gt; <span class="prelude-val">Some</span>(e.code()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">uuid::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">uuid::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Conversion</span>(<span class="macro">format!</span>(<span class="string">&quot;Error convertiong a Guid value {}&quot;</span>, <span class="ident">e</span>).<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;uuid::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(e: uuid::Error) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Conversion(<span class="macro">format!</span>(<span class="string">&quot;Error convertiong a Guid value {}&quot;</span>, e).into())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">async_native_tls::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">async_native_tls::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Tls</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>))
+<span class="attribute">#[cfg(feature = <span class="string">&quot;native-tls&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;async_native_tls::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(v: async_native_tls::Error) -&gt; <span class="self">Self </span>{
+        Error::Tls(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, v))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">opentls::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">opentls::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Tls</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>))
+<span class="attribute">#[cfg(feature = <span class="string">&quot;vendored-openssl&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;opentls::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(v: opentls::Error) -&gt; <span class="self">Self </span>{
+        Error::Tls(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, v))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Infallible</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">Infallible</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl </span>From&lt;Infallible&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(<span class="kw">_</span>: Infallible) -&gt; <span class="self">Self </span>{
         <span class="macro">unreachable!</span>()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident"><span class="self">Self</span>::Io</span> {
-            <span class="ident">kind</span>: <span class="ident">err</span>.<span class="ident">kind</span>(),
-            <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>),
+<span class="kw">impl </span>From&lt;io::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: io::Error) -&gt; Error {
+        <span class="self">Self</span>::Io {
+            kind: err.kind(),
+            message: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, err),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">std::num::ParseIntError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">std::num::ParseIntError</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::ParseInt</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;std::num::ParseIntError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: std::num::ParseIntError) -&gt; Error {
+        Error::ParseInt(err)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">std::str::Utf8Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">std::str::Utf8Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::Utf8</span>
+<span class="kw">impl </span>From&lt;std::str::Utf8Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(<span class="kw">_</span>: std::str::Utf8Error) -&gt; Error {
+        Error::Utf8
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">std::string::FromUtf8Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">_err</span>: <span class="ident">std::string::FromUtf8Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::Utf8</span>
+<span class="kw">impl </span>From&lt;std::string::FromUtf8Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(_err: std::string::FromUtf8Error) -&gt; Error {
+        Error::Utf8
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">std::string::FromUtf16Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">_err</span>: <span class="ident">std::string::FromUtf16Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::Utf16</span>
+<span class="kw">impl </span>From&lt;std::string::FromUtf16Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(_err: std::string::FromUtf16Error) -&gt; Error {
+        Error::Utf16
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">connection_string::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">connection_string::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>));
-        <span class="ident">Error::Conversion</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;connection_string::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: connection_string::Error) -&gt; Error {
+        <span class="kw">let </span>err = Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, err));
+        Error::Conversion(err)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>,
-    <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>)))
-)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">libgssapi::error::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">libgssapi::error::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::Gssapi</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>))
+<span class="attribute">#[cfg(all(unix, feature = <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]
+#[cfg_attr(
+    feature = <span class="string">&quot;docs&quot;</span>,
+    doc(cfg(all(unix, feature = <span class="string">&quot;integrated-auth-gssapi&quot;</span>)))
+)]
+</span><span class="kw">impl </span>From&lt;libgssapi::error::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: libgssapi::error::Error) -&gt; Error {
+        Error::Gssapi(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, err))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

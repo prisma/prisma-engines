@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/connection-string-0.1.13/src/ado.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ado.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../connection_string/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../connection_string/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../connection_string/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/connection-string-0.1.13/src/ado.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ado.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../connection_string/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../connection_string/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../connection_string/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -466,128 +466,128 @@
 <span id="466">466</span>
 <span id="467">467</span>
 <span id="468">468</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">fmt</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::ops::{Deref, DerefMut};
+<span class="kw">use </span>std::str::FromStr;
+<span class="kw">use </span>std::{collections::HashMap, fmt};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">bail</span>, <span class="ident">ensure</span>};
+<span class="kw">use crate</span>::{bail, ensure};
 
-<span class="doccomment">/// An ADO.net connection string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Keywords are not case-sensitive. Values, however, may be case-sensitive,</span>
-<span class="doccomment">/// depending on the data source. Both keywords and values may contain whitespace</span>
-<span class="doccomment">/// characters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Limitations</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This parser does not support [Excel connection strings with extended properties](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#connecting-to-excel).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Read more](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AdoNetString</span> {
-    <span class="ident">pairs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An ADO.net connection string.
+///
+/// Keywords are not case-sensitive. Values, however, may be case-sensitive,
+/// depending on the data source. Both keywords and values may contain whitespace
+/// characters.
+///
+/// # Limitations
+///
+/// This parser does not support [Excel connection strings with extended properties](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#connecting-to-excel).
+///
+/// [Read more](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax)
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>AdoNetString {
+    pairs: HashMap&lt;String, String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">AdoNetString</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>Deref <span class="kw">for </span>AdoNetString {
+    <span class="kw">type </span>Target = HashMap&lt;String, String&gt;;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pairs</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.pairs
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">AdoNetString</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">pairs</span>
+<span class="kw">impl </span>DerefMut <span class="kw">for </span>AdoNetString {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.pairs
     }
 }
 
-<span class="comment">// NOTE(yosh): Unfortunately we can&#39;t parse using `split(&#39;;&#39;)` because JDBC</span>
-<span class="comment">// strings support escaping. This means that `{;}` is valid and we need to write</span>
-<span class="comment">// an actual LR parser.</span>
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">AdoNetString</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
+<span class="comment">// NOTE(yosh): Unfortunately we can&#39;t parse using `split(&#39;;&#39;)` because JDBC
+// strings support escaping. This means that `{;}` is valid and we need to write
+// an actual LR parser.
+</span><span class="kw">impl </span>FromStr <span class="kw">for </span>AdoNetString {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= <span class="kw">crate</span>::Error;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lexer</span> <span class="op">=</span> <span class="ident">Lexer::tokenize</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+    <span class="kw">fn </span>from_str(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>lexer = Lexer::tokenize(input)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>pairs = HashMap::new();
 
-        <span class="comment">// Iterate over `key=value` pairs.</span>
-        <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">0</span>.. {
-            <span class="comment">// [property=[value][;property=value][;]]</span>
-            <span class="comment">//                                       ^</span>
-            <span class="kw">if</span> <span class="ident">lexer</span>.<span class="ident">peek</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Eof</span> {
+        <span class="comment">// Iterate over `key=value` pairs.
+        </span><span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>.. {
+            <span class="comment">// [property=[value][;property=value][;]]
+            //                                       ^
+            </span><span class="kw">if </span>lexer.peek().kind() == <span class="kw-2">&amp;</span>TokenKind::Eof {
                 <span class="kw">break</span>;
             }
 
-            <span class="comment">// [property=[value][;property=value][;]]</span>
-            <span class="comment">//                   ^</span>
-            <span class="kw">if</span> <span class="ident">n</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="string">&quot;Key-value pairs must be separated by a `;`&quot;</span>;
-                <span class="macro">ensure!</span>(<span class="ident">lexer</span>.<span class="ident">next</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Semi</span>, <span class="ident">err</span>);
+            <span class="comment">// [property=[value][;property=value][;]]
+            //                   ^
+            </span><span class="kw">if </span>n != <span class="number">0 </span>{
+                <span class="kw">let </span>err = <span class="string">&quot;Key-value pairs must be separated by a `;`&quot;</span>;
+                <span class="macro">ensure!</span>(lexer.next().kind() == <span class="kw-2">&amp;</span>TokenKind::Semi, err);
 
-                <span class="comment">// [property=value[;property=value][;]]</span>
-                <span class="comment">//                                  ^</span>
-                <span class="kw">if</span> <span class="ident">lexer</span>.<span class="ident">peek</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Eof</span> {
+                <span class="comment">// [property=value[;property=value][;]]
+                //                                  ^
+                </span><span class="kw">if </span>lexer.peek().kind() == <span class="kw-2">&amp;</span>TokenKind::Eof {
                     <span class="kw">break</span>;
                 }
             }
 
-            <span class="comment">// [property=[value][;property=value][;]]</span>
-            <span class="comment">//  ^^^^^^^^</span>
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">read_ident</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lexer</span>)<span class="question-mark">?</span>;
-            <span class="macro">ensure!</span>(<span class="op">!</span><span class="ident">key</span>.<span class="ident">is_empty</span>(), <span class="string">&quot;Key must not be empty&quot;</span>);
+            <span class="comment">// [property=[value][;property=value][;]]
+            //  ^^^^^^^^
+            </span><span class="kw">let </span>key = read_ident(<span class="kw-2">&amp;mut </span>lexer)<span class="question-mark">?</span>;
+            <span class="macro">ensure!</span>(!key.is_empty(), <span class="string">&quot;Key must not be empty&quot;</span>);
 
-            <span class="comment">// [property=[value][;property=value][;]]</span>
-            <span class="comment">//          ^</span>
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="string">&quot;key-value pairs must be joined by a `=`&quot;</span>;
-            <span class="macro">ensure!</span>(<span class="ident">lexer</span>.<span class="ident">next</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Eq</span>, <span class="ident">err</span>);
+            <span class="comment">// [property=[value][;property=value][;]]
+            //          ^
+            </span><span class="kw">let </span>err = <span class="string">&quot;key-value pairs must be joined by a `=`&quot;</span>;
+            <span class="macro">ensure!</span>(lexer.next().kind() == <span class="kw-2">&amp;</span>TokenKind::Eq, err);
 
-            <span class="comment">// [property=[value][;property=value][;]]</span>
-            <span class="comment">//           ^^^^^</span>
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">read_ident</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lexer</span>)<span class="question-mark">?</span>;
+            <span class="comment">// [property=[value][;property=value][;]]
+            //           ^^^^^
+            </span><span class="kw">let </span>value = read_ident(<span class="kw-2">&amp;mut </span>lexer)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">to_lowercase</span>();
-            <span class="ident">pairs</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span>);
+            <span class="kw">let </span>key = key.to_lowercase();
+            pairs.insert(key, value);
         }
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">pairs</span> })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ pairs })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">AdoNetString</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="doccomment">/// Escape all non-alphanumeric characters in a string..</span>
-        <span class="kw">fn</span> <span class="ident">escape</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">s</span>.<span class="ident">len</span>());
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">escaping</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">chars</span>() {
-                <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">b</span>, <span class="string">&#39;:&#39;</span> <span class="op">|</span> <span class="string">&#39;=&#39;</span> <span class="op">|</span> <span class="string">&#39;\\&#39;</span> <span class="op">|</span> <span class="string">&#39;/&#39;</span> <span class="op">|</span> <span class="string">&#39;;&#39;</span> <span class="op">|</span> <span class="string">&#39;{&#39;</span> <span class="op">|</span> <span class="string">&#39;}&#39;</span> <span class="op">|</span> <span class="string">&#39;[&#39;</span> <span class="op">|</span> <span class="string">&#39;]&#39;</span>) {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">escaping</span> {
-                        <span class="ident">escaping</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                        <span class="ident">output</span>.<span class="ident">push</span>(<span class="string">&#39;{&#39;</span>);
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>AdoNetString {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="doccomment">/// Escape all non-alphanumeric characters in a string..
+        </span><span class="kw">fn </span>escape(s: <span class="kw-2">&amp;</span>str) -&gt; String {
+            <span class="kw">let </span><span class="kw-2">mut </span>output = String::with_capacity(s.len());
+            <span class="kw">let </span><span class="kw-2">mut </span>escaping = <span class="bool-val">false</span>;
+            <span class="kw">for </span>b <span class="kw">in </span>s.chars() {
+                <span class="kw">if </span><span class="macro">matches!</span>(b, <span class="string">&#39;:&#39; </span>| <span class="string">&#39;=&#39; </span>| <span class="string">&#39;\\&#39; </span>| <span class="string">&#39;/&#39; </span>| <span class="string">&#39;;&#39; </span>| <span class="string">&#39;{&#39; </span>| <span class="string">&#39;}&#39; </span>| <span class="string">&#39;[&#39; </span>| <span class="string">&#39;]&#39;</span>) {
+                    <span class="kw">if </span>!escaping {
+                        escaping = <span class="bool-val">true</span>;
+                        output.push(<span class="string">&#39;{&#39;</span>);
                     }
-                    <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">b</span>);
-                } <span class="kw">else</span> {
-                    <span class="kw">if</span> <span class="ident">escaping</span> {
-                        <span class="ident">escaping</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                        <span class="ident">output</span>.<span class="ident">push</span>(<span class="string">&#39;}&#39;</span>);
+                    output.push(b);
+                } <span class="kw">else </span>{
+                    <span class="kw">if </span>escaping {
+                        escaping = <span class="bool-val">false</span>;
+                        output.push(<span class="string">&#39;}&#39;</span>);
                     }
-                    <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">b</span>);
+                    output.push(b);
                 }
             }
-            <span class="kw">if</span> <span class="ident">escaping</span> {
-                <span class="ident">output</span>.<span class="ident">push</span>(<span class="string">&#39;}&#39;</span>);
+            <span class="kw">if </span>escaping {
+                output.push(<span class="string">&#39;}&#39;</span>);
             }
-            <span class="ident">output</span>
+            output
         }
 
-        <span class="kw">let</span> <span class="ident">total_pairs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pairs</span>.<span class="ident">len</span>();
+        <span class="kw">let </span>total_pairs = <span class="self">self</span>.pairs.len();
 
-        <span class="kw">for</span> (<span class="ident">i</span>, (<span class="ident">k</span>, <span class="ident">v</span>)) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">pairs</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}={}&quot;</span>, <span class="ident">escape</span>(<span class="ident">k</span>.<span class="ident">trim</span>()), <span class="ident">escape</span>(<span class="ident">v</span>.<span class="ident">trim</span>()))<span class="question-mark">?</span>;
+        <span class="kw">for </span>(i, (k, v)) <span class="kw">in </span><span class="self">self</span>.pairs.iter().enumerate() {
+            <span class="macro">write!</span>(f, <span class="string">&quot;{}={}&quot;</span>, escape(k.trim()), escape(v.trim()))<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">total_pairs</span> <span class="op">-</span> <span class="number">1</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">if </span>i &lt; total_pairs - <span class="number">1 </span>{
+                <span class="macro">write!</span>(f, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>;
             }
         }
 
@@ -595,344 +595,344 @@
     }
 }
 
-<span class="doccomment">/// Read either a valid key or value from the lexer.</span>
-<span class="kw">fn</span> <span class="ident">read_ident</span>(<span class="ident">lexer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Lexer</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">Token</span> { <span class="ident">kind</span>, .. } <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">peek</span>();
-        <span class="kw">match</span> <span class="ident">kind</span> {
-            <span class="ident">TokenKind::Atom</span>(<span class="ident">c</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
-                <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">c</span>);
+<span class="doccomment">/// Read either a valid key or value from the lexer.
+</span><span class="kw">fn </span>read_ident(lexer: <span class="kw-2">&amp;mut </span>Lexer) -&gt; <span class="kw">crate</span>::Result&lt;String&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>output = String::new();
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>Token { kind, .. } = lexer.peek();
+        <span class="kw">match </span>kind {
+            TokenKind::Atom(c) =&gt; {
+                <span class="kw">let _ </span>= lexer.next();
+                output.push(c);
             }
-            <span class="ident">TokenKind::Escaped</span>(<span class="ident">seq</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
-                <span class="ident">output</span>.<span class="ident">extend</span>(<span class="ident">seq</span>);
+            TokenKind::Escaped(seq) =&gt; {
+                <span class="kw">let _ </span>= lexer.next();
+                output.extend(seq);
             }
-            <span class="ident">TokenKind::Semi</span> =&gt; <span class="kw">break</span>,
-            <span class="ident">TokenKind::Eq</span> =&gt; <span class="kw">break</span>,
-            <span class="ident">TokenKind::Newline</span> =&gt; {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
-                <span class="kw">continue</span>; <span class="comment">// NOTE(yosh): unsure if this is the correct behavior</span>
-            }
-            <span class="ident">TokenKind::Whitespace</span> =&gt; {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
-                <span class="kw">match</span> <span class="ident">output</span>.<span class="ident">len</span>() {
-                    <span class="number">0</span> =&gt; <span class="kw">continue</span>, <span class="comment">// ignore leading whitespace</span>
-                    <span class="kw">_</span> =&gt; <span class="ident">output</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>),
+            TokenKind::Semi =&gt; <span class="kw">break</span>,
+            TokenKind::Eq =&gt; <span class="kw">break</span>,
+            TokenKind::Newline =&gt; {
+                <span class="kw">let _ </span>= lexer.next();
+                <span class="kw">continue</span>; <span class="comment">// NOTE(yosh): unsure if this is the correct behavior
+            </span>}
+            TokenKind::Whitespace =&gt; {
+                <span class="kw">let _ </span>= lexer.next();
+                <span class="kw">match </span>output.len() {
+                    <span class="number">0 </span>=&gt; <span class="kw">continue</span>, <span class="comment">// ignore leading whitespace
+                    </span><span class="kw">_ </span>=&gt; output.push(<span class="string">&#39; &#39;</span>),
                 }
             }
-            <span class="ident">TokenKind::Eof</span> =&gt; <span class="kw">break</span>,
+            TokenKind::Eof =&gt; <span class="kw">break</span>,
         }
     }
-    <span class="ident">output</span> <span class="op">=</span> <span class="ident">output</span>.<span class="ident">trim_end</span>().<span class="ident">to_owned</span>(); <span class="comment">// remove trailing whitespace</span>
-    <span class="prelude-val">Ok</span>(<span class="ident">output</span>)
+    output = output.trim_end().to_owned(); <span class="comment">// remove trailing whitespace
+    </span><span class="prelude-val">Ok</span>(output)
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Token</span> {
-    <span class="ident">kind</span>: <span class="ident">TokenKind</span>,
-    <span class="ident">loc</span>: <span class="ident">Location</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">struct </span>Token {
+    kind: TokenKind,
+    loc: Location,
 }
 
-<span class="kw">impl</span> <span class="ident">Token</span> {
-    <span class="doccomment">/// Create a new instance.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">TokenKind</span>, <span class="ident">loc</span>: <span class="ident">Location</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">kind</span>, <span class="ident">loc</span> }
+<span class="kw">impl </span>Token {
+    <span class="doccomment">/// Create a new instance.
+    </span><span class="kw">fn </span>new(kind: TokenKind, loc: Location) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ kind, loc }
     }
 
-    <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">TokenKind</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>
+    <span class="kw">fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>TokenKind {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.kind
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">TokenKind</span> {
-    <span class="ident">Semi</span>,
-    <span class="ident">Eq</span>,
-    <span class="ident">Atom</span>(<span class="ident">char</span>),
-    <span class="ident">Escaped</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span>),
-    <span class="ident">Newline</span>,
-    <span class="ident">Whitespace</span>,
-    <span class="ident">Eof</span>,
+<span class="attribute">#[derive(Debug, Clone, Eq, PartialEq)]
+</span><span class="kw">enum </span>TokenKind {
+    Semi,
+    Eq,
+    Atom(char),
+    Escaped(Vec&lt;char&gt;),
+    Newline,
+    Whitespace,
+    Eof,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Lexer</span> {
-    <span class="ident">tokens</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Lexer {
+    tokens: Vec&lt;Token&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Lexer</span> {
-    <span class="doccomment">/// Parse a string into a sequence of tokens.</span>
-    <span class="kw">fn</span> <span class="ident">tokenize</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">Location::default</span>();
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">old_input</span> <span class="op">=</span> <span class="ident">input</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">chars</span>();
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>() {
-                <span class="string">&#39;&quot;&#39;</span> =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                    <span class="kw">loop</span> {
-                        <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;unclosed double quote&quot;</span>),
-                            <span class="comment">// When we read a double quote inside a double quote</span>
-                            <span class="comment">// we need to lookahead to determine whether it&#39;s an</span>
-                            <span class="comment">// escape sequence or a closing delimiter.</span>
-                            <span class="prelude-val">Some</span>(<span class="string">&#39;&quot;&#39;</span>) =&gt; <span class="kw">match</span> <span class="ident">lookahead</span>(<span class="kw-2">&amp;</span><span class="ident">chars</span>) {
+<span class="kw">impl </span>Lexer {
+    <span class="doccomment">/// Parse a string into a sequence of tokens.
+    </span><span class="kw">fn </span>tokenize(<span class="kw-2">mut </span>input: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>tokens = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>loc = Location::default();
+        <span class="kw">while </span>!input.is_empty() {
+            <span class="kw">let </span>old_input = input;
+            <span class="kw">let </span><span class="kw-2">mut </span>chars = input.chars();
+            <span class="kw">let </span>kind = <span class="kw">match </span>chars.next().unwrap() {
+                <span class="string">&#39;&quot;&#39; </span>=&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
+                    <span class="kw">loop </span>{
+                        <span class="kw">match </span>chars.next() {
+                            <span class="prelude-val">None </span>=&gt; <span class="macro">bail!</span>(<span class="string">&quot;unclosed double quote&quot;</span>),
+                            <span class="comment">// When we read a double quote inside a double quote
+                            // we need to lookahead to determine whether it&#39;s an
+                            // escape sequence or a closing delimiter.
+                            </span><span class="prelude-val">Some</span>(<span class="string">&#39;&quot;&#39;</span>) =&gt; <span class="kw">match </span>lookahead(<span class="kw-2">&amp;</span>chars) {
                                 <span class="prelude-val">Some</span>(<span class="string">&#39;&quot;&#39;</span>) =&gt; {
-                                    <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">is_empty</span>() {
+                                    <span class="kw">if </span>buf.is_empty() {
                                         <span class="kw">break</span>;
                                     }
-                                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">next</span>();
-                                    <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;&quot;&#39;</span>);
-                                    <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;&quot;&#39;</span>);
+                                    <span class="kw">let _ </span>= chars.next();
+                                    buf.push(<span class="string">&#39;&quot;&#39;</span>);
+                                    buf.push(<span class="string">&#39;&quot;&#39;</span>);
                                 }
-                                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
+                                <span class="prelude-val">Some</span>(<span class="kw">_</span>) | <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
                             },
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii</span>() =&gt; <span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">c</span>),
-                            <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token&quot;</span>),
+                            <span class="prelude-val">Some</span>(c) <span class="kw">if </span>c.is_ascii() =&gt; buf.push(c),
+                            <span class="kw">_ </span>=&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token&quot;</span>),
                         }
                     }
-                    <span class="ident">TokenKind::Escaped</span>(<span class="ident">buf</span>)
+                    TokenKind::Escaped(buf)
                 }
-                <span class="string">&#39;\&#39;&#39;</span> =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                    <span class="kw">loop</span> {
-                        <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;unclosed single quote&quot;</span>),
-                            <span class="comment">// When we read a single quote inside a single quote</span>
-                            <span class="comment">// we need to lookahead to determine whether it&#39;s an</span>
-                            <span class="comment">// escape sequence or a closing delimiter.</span>
-                            <span class="prelude-val">Some</span>(<span class="string">&#39;\&#39;&#39;</span>) =&gt; <span class="kw">match</span> <span class="ident">lookahead</span>(<span class="kw-2">&amp;</span><span class="ident">chars</span>) {
+                <span class="string">&#39;\&#39;&#39; </span>=&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
+                    <span class="kw">loop </span>{
+                        <span class="kw">match </span>chars.next() {
+                            <span class="prelude-val">None </span>=&gt; <span class="macro">bail!</span>(<span class="string">&quot;unclosed single quote&quot;</span>),
+                            <span class="comment">// When we read a single quote inside a single quote
+                            // we need to lookahead to determine whether it&#39;s an
+                            // escape sequence or a closing delimiter.
+                            </span><span class="prelude-val">Some</span>(<span class="string">&#39;\&#39;&#39;</span>) =&gt; <span class="kw">match </span>lookahead(<span class="kw-2">&amp;</span>chars) {
                                 <span class="prelude-val">Some</span>(<span class="string">&#39;\&#39;&#39;</span>) =&gt; {
-                                    <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">is_empty</span>() {
+                                    <span class="kw">if </span>buf.is_empty() {
                                         <span class="kw">break</span>;
                                     }
-                                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">next</span>();
-                                    <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;\&#39;&#39;</span>);
-                                    <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;\&#39;&#39;</span>);
+                                    <span class="kw">let _ </span>= chars.next();
+                                    buf.push(<span class="string">&#39;\&#39;&#39;</span>);
+                                    buf.push(<span class="string">&#39;\&#39;&#39;</span>);
                                 }
-                                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
+                                <span class="prelude-val">Some</span>(<span class="kw">_</span>) | <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
                             },
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii</span>() =&gt; <span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">c</span>),
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token `{}`&quot;</span>, <span class="ident">c</span>),
+                            <span class="prelude-val">Some</span>(c) <span class="kw">if </span>c.is_ascii() =&gt; buf.push(c),
+                            <span class="prelude-val">Some</span>(c) =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token `{}`&quot;</span>, c),
                         }
                     }
-                    <span class="ident">TokenKind::Escaped</span>(<span class="ident">buf</span>)
+                    TokenKind::Escaped(buf)
                 }
-                <span class="string">&#39;{&#39;</span> =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                    <span class="comment">// Read alphanumeric ASCII including whitespace until we find a closing curly.</span>
-                    <span class="kw">loop</span> {
-                        <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;unclosed escape literal&quot;</span>),
+                <span class="string">&#39;{&#39; </span>=&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
+                    <span class="comment">// Read alphanumeric ASCII including whitespace until we find a closing curly.
+                    </span><span class="kw">loop </span>{
+                        <span class="kw">match </span>chars.next() {
+                            <span class="prelude-val">None </span>=&gt; <span class="macro">bail!</span>(<span class="string">&quot;unclosed escape literal&quot;</span>),
                             <span class="prelude-val">Some</span>(<span class="string">&#39;}&#39;</span>) =&gt; <span class="kw">break</span>,
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii</span>() =&gt; <span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">c</span>),
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token `{}`&quot;</span>, <span class="ident">c</span>),
+                            <span class="prelude-val">Some</span>(c) <span class="kw">if </span>c.is_ascii() =&gt; buf.push(c),
+                            <span class="prelude-val">Some</span>(c) =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token `{}`&quot;</span>, c),
                         }
                     }
-                    <span class="ident">TokenKind::Escaped</span>(<span class="ident">buf</span>)
+                    TokenKind::Escaped(buf)
                 }
-                <span class="string">&#39;;&#39;</span> =&gt; <span class="ident">TokenKind::Semi</span>,
-                <span class="string">&#39;=&#39;</span> =&gt; <span class="ident">TokenKind::Eq</span>,
-                <span class="string">&#39;\n&#39;</span> =&gt; <span class="ident">TokenKind::Newline</span>,
-                <span class="string">&#39; &#39;</span> =&gt; <span class="ident">TokenKind::Whitespace</span>,
-                <span class="ident">char</span> <span class="kw">if</span> <span class="ident">char</span>.<span class="ident">is_ascii</span>() =&gt; <span class="ident">TokenKind::Atom</span>(<span class="ident">char</span>),
-                <span class="ident">char</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid character found: {}&quot;</span>, <span class="ident">char</span>),
+                <span class="string">&#39;;&#39; </span>=&gt; TokenKind::Semi,
+                <span class="string">&#39;=&#39; </span>=&gt; TokenKind::Eq,
+                <span class="string">&#39;\n&#39; </span>=&gt; TokenKind::Newline,
+                <span class="string">&#39; &#39; </span>=&gt; TokenKind::Whitespace,
+                char <span class="kw">if </span>char.is_ascii() =&gt; TokenKind::Atom(char),
+                char =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid character found: {}&quot;</span>, char),
             };
-            <span class="ident">tokens</span>.<span class="ident">push</span>(<span class="ident">Token::new</span>(<span class="ident">kind</span>, <span class="ident">loc</span>));
-            <span class="ident">input</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">as_str</span>();
+            tokens.push(Token::new(kind, loc));
+            input = chars.as_str();
 
-            <span class="kw">let</span> <span class="ident">consumed</span> <span class="op">=</span> <span class="ident">old_input</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">input</span>.<span class="ident">len</span>();
-            <span class="ident">loc</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="ident">old_input</span>[..<span class="ident">consumed</span>]);
+            <span class="kw">let </span>consumed = old_input.len() - input.len();
+            loc.advance(<span class="kw-2">&amp;</span>old_input[..consumed]);
         }
-        <span class="ident">tokens</span>.<span class="ident">reverse</span>();
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">tokens</span> })
+        tokens.reverse();
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ tokens })
     }
 
-    <span class="doccomment">/// Get the next token from the queue.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
-        <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">pop</span>().<span class="ident">unwrap_or</span>(<span class="ident">Token</span> {
-            <span class="ident">kind</span>: <span class="ident">TokenKind::Eof</span>,
-            <span class="ident">loc</span>: <span class="ident">Location::default</span>(),
+    <span class="doccomment">/// Get the next token from the queue.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Token {
+        <span class="self">self</span>.tokens.pop().unwrap_or(Token {
+            kind: TokenKind::Eof,
+            loc: Location::default(),
         })
     }
 
-    <span class="doccomment">/// Peek at the next token in the queue.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
-        <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">last</span>().<span class="ident">cloned</span>().<span class="ident">unwrap_or</span>(<span class="ident">Token</span> {
-            <span class="ident">kind</span>: <span class="ident">TokenKind::Eof</span>,
-            <span class="ident">loc</span>: <span class="ident">Location::default</span>(),
+    <span class="doccomment">/// Peek at the next token in the queue.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>peek(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Token {
+        <span class="self">self</span>.tokens.last().cloned().unwrap_or(Token {
+            kind: TokenKind::Eof,
+            loc: Location::default(),
         })
     }
 }
 
-<span class="doccomment">/// Look at the next char in the iterator.</span>
-<span class="kw">fn</span> <span class="ident">lookahead</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;</span><span class="ident">std::str::Chars</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">as_str</span>();
-    <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">next</span>()
+<span class="doccomment">/// Look at the next char in the iterator.
+</span><span class="kw">fn </span>lookahead(iter: <span class="kw-2">&amp;</span>std::str::Chars&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;char&gt; {
+    <span class="kw">let </span>s = iter.as_str();
+    s.chars().next()
 }
 
-<span class="doccomment">/// Track the location of the Token inside the string.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Location</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">column</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Track the location of the Token inside the string.
+</span><span class="attribute">#[derive(Copy, Clone, Default, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Location {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) column: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Location</span> {
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">column</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
+<span class="kw">impl </span>Location {
+    <span class="kw">fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.column += text.chars().count();
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::AdoNetString</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::AdoNetString;
 
-    <span class="kw">fn</span> <span class="ident">assert_kv</span>(<span class="ident">ado</span>: <span class="kw-2">&amp;</span><span class="ident">AdoNetString</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="macro">assert_eq!</span>(<span class="ident">ado</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">to_lowercase</span>()), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">to_owned</span>()));
+    <span class="kw">fn </span>assert_kv(ado: <span class="kw-2">&amp;</span>AdoNetString, key: <span class="kw-2">&amp;</span>str, value: <span class="kw-2">&amp;</span>str) {
+        <span class="macro">assert_eq!</span>(ado.get(<span class="kw-2">&amp;</span>key.to_lowercase()), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>value.to_owned()));
     }
 
-    <span class="comment">// Source: https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#windows-authentication-with-sqlclient</span>
-    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#windows-authentication-with-sqlclient</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">windows_auth_with_sql_client</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;Persist Security Info=False;Integrated Security=true;\nInitial Catalog=AdventureWorks;Server=MSSQL1&quot;</span>;
-        <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Persist Security Info&quot;</span>, <span class="string">&quot;False&quot;</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Integrated Security&quot;</span>, <span class="string">&quot;true&quot;</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Server&quot;</span>, <span class="string">&quot;MSSQL1&quot;</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Initial Catalog&quot;</span>, <span class="string">&quot;AdventureWorks&quot;</span>);
+    <span class="comment">// Source: https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#windows-authentication-with-sqlclient
+    // https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#windows-authentication-with-sqlclient
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>windows_auth_with_sql_client() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>input = <span class="string">&quot;Persist Security Info=False;Integrated Security=true;\nInitial Catalog=AdventureWorks;Server=MSSQL1&quot;</span>;
+        <span class="kw">let </span>ado: AdoNetString = input.parse()<span class="question-mark">?</span>;
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Persist Security Info&quot;</span>, <span class="string">&quot;False&quot;</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Integrated Security&quot;</span>, <span class="string">&quot;true&quot;</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Server&quot;</span>, <span class="string">&quot;MSSQL1&quot;</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Initial Catalog&quot;</span>, <span class="string">&quot;AdventureWorks&quot;</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#sql-server-authentication-with-sqlclient</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sql_server_auth_with_sql_client</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;Persist Security Info=False;User ID=*****;Password=*****;Initial Catalog=AdventureWorks;Server=MySqlServer&quot;</span>;
-        <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Persist Security Info&quot;</span>, <span class="string">&quot;False&quot;</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;User ID&quot;</span>, <span class="string">&quot;*****&quot;</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Password&quot;</span>, <span class="string">&quot;*****&quot;</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Initial Catalog&quot;</span>, <span class="string">&quot;AdventureWorks&quot;</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Server&quot;</span>, <span class="string">&quot;MySqlServer&quot;</span>);
+    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#sql-server-authentication-with-sqlclient
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>sql_server_auth_with_sql_client() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>input = <span class="string">&quot;Persist Security Info=False;User ID=*****;Password=*****;Initial Catalog=AdventureWorks;Server=MySqlServer&quot;</span>;
+        <span class="kw">let </span>ado: AdoNetString = input.parse()<span class="question-mark">?</span>;
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Persist Security Info&quot;</span>, <span class="string">&quot;False&quot;</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;User ID&quot;</span>, <span class="string">&quot;*****&quot;</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Password&quot;</span>, <span class="string">&quot;*****&quot;</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Initial Catalog&quot;</span>, <span class="string">&quot;AdventureWorks&quot;</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Server&quot;</span>, <span class="string">&quot;MySqlServer&quot;</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#connect-to-a-named-instance-of-sql-server</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">connect_to_named_sql_server_instance</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;Data Source=MySqlServer\MSSQL1;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Data Source&quot;</span>, <span class="string">r#&quot;MySqlServer\MSSQL1&quot;#</span>);
+    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#connect-to-a-named-instance-of-sql-server
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>connect_to_named_sql_server_instance() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>input = <span class="string">r#&quot;Data Source=MySqlServer\MSSQL1;&quot;#</span>;
+        <span class="kw">let </span>ado: AdoNetString = input.parse()<span class="question-mark">?</span>;
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Data Source&quot;</span>, <span class="string">r#&quot;MySqlServer\MSSQL1&quot;#</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#oledb-connection-string-syntax</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">oledb_connection_string_syntax</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;Provider=Microsoft.Jet.OLEDB.4.0; Data Source=d:\Northwind.mdb;User ID=Admin;Password=;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Provider&quot;</span>, <span class="string">r#&quot;Microsoft.Jet.OLEDB.4.0&quot;#</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Data Source&quot;</span>, <span class="string">r#&quot;d:\Northwind.mdb&quot;#</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;User ID&quot;</span>, <span class="string">r#&quot;Admin&quot;#</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Password&quot;</span>, <span class="string">r#&quot;&quot;#</span>);
+    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#oledb-connection-string-syntax
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>oledb_connection_string_syntax() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>input = <span class="string">r#&quot;Provider=Microsoft.Jet.OLEDB.4.0; Data Source=d:\Northwind.mdb;User ID=Admin;Password=;&quot;#</span>;
+        <span class="kw">let </span>ado: AdoNetString = input.parse()<span class="question-mark">?</span>;
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Provider&quot;</span>, <span class="string">r#&quot;Microsoft.Jet.OLEDB.4.0&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Data Source&quot;</span>, <span class="string">r#&quot;d:\Northwind.mdb&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;User ID&quot;</span>, <span class="string">r#&quot;Admin&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Password&quot;</span>, <span class="string">r#&quot;&quot;#</span>);
 
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=d:\Northwind.mdb;Jet OLEDB:System Database=d:\NorthwindSystem.mdw;User ID=*****;Password=*****;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Provider&quot;</span>, <span class="string">r#&quot;Microsoft.Jet.OLEDB.4.0&quot;#</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Data Source&quot;</span>, <span class="string">r#&quot;d:\Northwind.mdb&quot;#</span>);
-        <span class="ident">assert_kv</span>(
-            <span class="kw-2">&amp;</span><span class="ident">ado</span>,
+        <span class="kw">let </span>input = <span class="string">r#&quot;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=d:\Northwind.mdb;Jet OLEDB:System Database=d:\NorthwindSystem.mdw;User ID=*****;Password=*****;&quot;#</span>;
+        <span class="kw">let </span>ado: AdoNetString = input.parse()<span class="question-mark">?</span>;
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Provider&quot;</span>, <span class="string">r#&quot;Microsoft.Jet.OLEDB.4.0&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Data Source&quot;</span>, <span class="string">r#&quot;d:\Northwind.mdb&quot;#</span>);
+        assert_kv(
+            <span class="kw-2">&amp;</span>ado,
             <span class="string">&quot;Jet OLEDB:System Database&quot;</span>,
             <span class="string">r#&quot;d:\NorthwindSystem.mdw&quot;#</span>,
         );
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;User ID&quot;</span>, <span class="string">r#&quot;*****&quot;#</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Password&quot;</span>, <span class="string">r#&quot;*****&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;User ID&quot;</span>, <span class="string">r#&quot;*****&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Password&quot;</span>, <span class="string">r#&quot;*****&quot;#</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#using-datadirectory-to-connect-to-accessjet</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">connect_to_access_jet</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;Provider=Microsoft.Jet.OLEDB.4.0;  
+    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#using-datadirectory-to-connect-to-accessjet
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>connect_to_access_jet() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>input = <span class="string">r#&quot;Provider=Microsoft.Jet.OLEDB.4.0;  
                        Data Source=|DataDirectory|\Northwind.mdb;  
                        Jet OLEDB:System Database=|DataDirectory|\System.mdw;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Data Source&quot;</span>, <span class="string">r#&quot;|DataDirectory|\Northwind.mdb&quot;#</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Provider&quot;</span>, <span class="string">r#&quot;Microsoft.Jet.OLEDB.4.0&quot;#</span>);
-        <span class="ident">assert_kv</span>(
-            <span class="kw-2">&amp;</span><span class="ident">ado</span>,
+        <span class="kw">let </span>ado: AdoNetString = input.parse()<span class="question-mark">?</span>;
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Data Source&quot;</span>, <span class="string">r#&quot;|DataDirectory|\Northwind.mdb&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Provider&quot;</span>, <span class="string">r#&quot;Microsoft.Jet.OLEDB.4.0&quot;#</span>);
+        assert_kv(
+            <span class="kw-2">&amp;</span>ado,
             <span class="string">&quot;Jet OLEDB:System Database&quot;</span>,
             <span class="string">r#&quot;|DataDirectory|\System.mdw&quot;#</span>,
         );
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="comment">// NOTE(yosh): we do not support Excel connection strings yet because the</span>
-    <span class="comment">// double quote escaping is a small nightmare to parse.</span>
-    <span class="comment">// // https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#connecting-to-excel</span>
-    <span class="comment">// #[test]</span>
-    <span class="comment">// fn connect_to_excel() -&gt; crate::Result&lt;()&gt; {</span>
-    <span class="comment">//     let input = r#&quot;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=D:\MyExcel.xls;Extended Properties=&quot;&quot;Excel 8.0;HDR=Yes;IMEX=1&quot;&quot;&quot;#;</span>
-    <span class="comment">//     let ado: AdoNetString = input.parse()?;</span>
-    <span class="comment">//     assert_kv(&amp;ado, &quot;Provider&quot;, r#&quot;Microsoft.Jet.OLEDB.4.0&quot;#);</span>
-    <span class="comment">//     assert_kv(&amp;ado, &quot;Data Source&quot;, r#&quot;D:\MyExcel.xls&quot;#);</span>
-    <span class="comment">//     assert_kv(</span>
-    <span class="comment">//         &amp;ado,</span>
-    <span class="comment">//         &quot;Extended Properties&quot;,</span>
-    <span class="comment">//         r#&quot;&quot;&quot;Excel 8.0;HDR=Yes;IMEX=1&quot;&quot;&quot;#,</span>
-    <span class="comment">//     );</span>
-    <span class="comment">//     Ok(())</span>
-    <span class="comment">// }</span>
+    <span class="comment">// NOTE(yosh): we do not support Excel connection strings yet because the
+    // double quote escaping is a small nightmare to parse.
+    // // https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#connecting-to-excel
+    // #[test]
+    // fn connect_to_excel() -&gt; crate::Result&lt;()&gt; {
+    //     let input = r#&quot;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=D:\MyExcel.xls;Extended Properties=&quot;&quot;Excel 8.0;HDR=Yes;IMEX=1&quot;&quot;&quot;#;
+    //     let ado: AdoNetString = input.parse()?;
+    //     assert_kv(&amp;ado, &quot;Provider&quot;, r#&quot;Microsoft.Jet.OLEDB.4.0&quot;#);
+    //     assert_kv(&amp;ado, &quot;Data Source&quot;, r#&quot;D:\MyExcel.xls&quot;#);
+    //     assert_kv(
+    //         &amp;ado,
+    //         &quot;Extended Properties&quot;,
+    //         r#&quot;&quot;&quot;Excel 8.0;HDR=Yes;IMEX=1&quot;&quot;&quot;#,
+    //     );
+    //     Ok(())
+    // }
 
-    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#data-shape-provider-connection-string-syntax</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">data_shape_provider</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;Provider=MSDataShape;Data Provider=SQLOLEDB;Data Source=(local);Initial Catalog=pubs;Integrated Security=SSPI;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Provider&quot;</span>, <span class="string">r#&quot;MSDataShape&quot;#</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Data Provider&quot;</span>, <span class="string">r#&quot;SQLOLEDB&quot;#</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Data Source&quot;</span>, <span class="string">r#&quot;(local)&quot;#</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Initial Catalog&quot;</span>, <span class="string">r#&quot;pubs&quot;#</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Integrated Security&quot;</span>, <span class="string">r#&quot;SSPI&quot;#</span>);
+    // https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#data-shape-provider-connection-string-syntax
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>data_shape_provider() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>input = <span class="string">r#&quot;Provider=MSDataShape;Data Provider=SQLOLEDB;Data Source=(local);Initial Catalog=pubs;Integrated Security=SSPI;&quot;#</span>;
+        <span class="kw">let </span>ado: AdoNetString = input.parse()<span class="question-mark">?</span>;
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Provider&quot;</span>, <span class="string">r#&quot;MSDataShape&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Data Provider&quot;</span>, <span class="string">r#&quot;SQLOLEDB&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Data Source&quot;</span>, <span class="string">r#&quot;(local)&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Initial Catalog&quot;</span>, <span class="string">r#&quot;pubs&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Integrated Security&quot;</span>, <span class="string">r#&quot;SSPI&quot;#</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="comment">// NOTE(yosh): we do not support ODBC connection strings because the first part of the</span>
-    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#odbc-connection-strings</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">odbc_connection_strings</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;Driver={Microsoft Text Driver (*.txt; *.csv)};DBQ=d:\bin&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Driver&quot;</span>, <span class="string">r#&quot;Microsoft Text Driver (*.txt; *.csv)&quot;#</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;DBQ&quot;</span>, <span class="string">r#&quot;d:\bin&quot;#</span>);
+    <span class="comment">// NOTE(yosh): we do not support ODBC connection strings because the first part of the
+    // https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#odbc-connection-strings
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>odbc_connection_strings() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>input = <span class="string">r#&quot;Driver={Microsoft Text Driver (*.txt; *.csv)};DBQ=d:\bin&quot;#</span>;
+        <span class="kw">let </span>ado: AdoNetString = input.parse()<span class="question-mark">?</span>;
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Driver&quot;</span>, <span class="string">r#&quot;Microsoft Text Driver (*.txt; *.csv)&quot;#</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;DBQ&quot;</span>, <span class="string">r#&quot;d:\bin&quot;#</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#oracle-connection-strings</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">oracle_connection_strings</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;Data Source=Oracle9i;User ID=*****;Password=*****;&quot;</span>;
-        <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Data Source&quot;</span>, <span class="string">&quot;Oracle9i&quot;</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;User ID&quot;</span>, <span class="string">&quot;*****&quot;</span>);
-        <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Password&quot;</span>, <span class="string">&quot;*****&quot;</span>);
+    <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#oracle-connection-strings
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>oracle_connection_strings() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>input = <span class="string">&quot;Data Source=Oracle9i;User ID=*****;Password=*****;&quot;</span>;
+        <span class="kw">let </span>ado: AdoNetString = input.parse()<span class="question-mark">?</span>;
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Data Source&quot;</span>, <span class="string">&quot;Oracle9i&quot;</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;User ID&quot;</span>, <span class="string">&quot;*****&quot;</span>);
+        assert_kv(<span class="kw-2">&amp;</span>ado, <span class="string">&quot;Password&quot;</span>, <span class="string">&quot;*****&quot;</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">display_with_escaping</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;key=val{;}ue&quot;</span>;
-        <span class="kw">let</span> <span class="ident">conn</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>display_with_escaping() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>input = <span class="string">&quot;key=val{;}ue&quot;</span>;
+        <span class="kw">let </span>conn: AdoNetString = input.parse()<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">conn</span>), <span class="ident">input</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, conn), input);
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="connection_string" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="connection_string" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

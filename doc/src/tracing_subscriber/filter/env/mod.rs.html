@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/env/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/env/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -986,991 +986,991 @@
 <span id="984">984</span>
 <span id="985">985</span>
 <span id="986">986</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A `Layer` that enables or disables spans and events based on a set of</span>
-<span class="doccomment">//! filtering directives.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A `Layer` that enables or disables spans and events based on a set of
+//! filtering directives.
 
-<span class="comment">// these are publicly re-exported, but the compiler doesn&#39;t realize</span>
-<span class="comment">// that for some reason.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">builder::Builder</span>, <span class="ident">directive::Directive</span>, <span class="ident">field::BadName</span> <span class="kw">as</span> <span class="ident">BadFieldName</span>};
-<span class="kw">mod</span> <span class="ident">builder</span>;
-<span class="kw">mod</span> <span class="ident">directive</span>;
-<span class="kw">mod</span> <span class="ident">field</span>;
+</span><span class="comment">// these are publicly re-exported, but the compiler doesn&#39;t realize
+// that for some reason.
+</span><span class="attribute">#[allow(unreachable_pub)]
+</span><span class="kw">pub use </span><span class="self">self</span>::{builder::Builder, directive::Directive, field::BadName <span class="kw">as </span>BadFieldName};
+<span class="kw">mod </span>builder;
+<span class="kw">mod </span>directive;
+<span class="kw">mod </span>field;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">filter::LevelFilter</span>,
-    <span class="ident">layer</span>::{<span class="ident">Context</span>, <span class="ident">Layer</span>},
-    <span class="ident">sync::RwLock</span>,
+<span class="kw">use crate</span>::{
+    filter::LevelFilter,
+    layer::{Context, Layer},
+    sync::RwLock,
 };
-<span class="kw">use</span> <span class="ident">directive::ParseError</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cell::RefCell</span>, <span class="ident">collections::HashMap</span>, <span class="ident">env</span>, <span class="ident">error::Error</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
-<span class="kw">use</span> <span class="ident">thread_local::ThreadLocal</span>;
-<span class="kw">use</span> <span class="ident">tracing_core</span>::{
-    <span class="ident">callsite</span>,
-    <span class="ident">field::Field</span>,
-    <span class="ident">span</span>,
-    <span class="ident">subscriber</span>::{<span class="ident">Interest</span>, <span class="ident">Subscriber</span>},
-    <span class="ident">Metadata</span>,
+<span class="kw">use </span>directive::ParseError;
+<span class="kw">use </span>std::{cell::RefCell, collections::HashMap, env, error::Error, fmt, str::FromStr};
+<span class="kw">use </span>thread_local::ThreadLocal;
+<span class="kw">use </span>tracing_core::{
+    callsite,
+    field::Field,
+    span,
+    subscriber::{Interest, Subscriber},
+    Metadata,
 };
 
-<span class="doccomment">/// A [`Layer`] which filters spans and events based on a set of filter</span>
-<span class="doccomment">/// directives.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `EnvFilter` implements both the [`Layer`](#impl-Layer&lt;S&gt;) and [`Filter`] traits, so it may</span>
-<span class="doccomment">/// be used for both [global filtering][global] and [per-layer filtering][plf],</span>
-<span class="doccomment">/// respectively. See [the documentation on filtering with `Layer`s][filtering]</span>
-<span class="doccomment">/// for details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The [`Targets`] type implements a similar form of filtering, but without the</span>
-<span class="doccomment">/// ability to dynamically enable events based on the current span context, and</span>
-<span class="doccomment">/// without filtering on field values. When these features are not required,</span>
-<span class="doccomment">/// [`Targets`] provides a lighter-weight alternative to [`EnvFilter`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Directives</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A filter consists of one or more comma-separated directives which match on [`Span`]s and [`Event`]s.</span>
-<span class="doccomment">/// Each directive may have a corresponding maximum verbosity [`level`] which</span>
-<span class="doccomment">/// enables (e.g., _selects for_) spans and events that match. Like `log`,</span>
-<span class="doccomment">/// `tracing` considers less exclusive levels (like `trace` or `info`) to be more</span>
-<span class="doccomment">/// verbose than more exclusive levels (like `error` or `warn`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The directive syntax is similar to that of [`env_logger`]&#39;s. At a high level, the syntax for directives</span>
-<span class="doccomment">/// consists of several parts:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// target[span{field=value}]=level</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Each component (`target`, `span`, `field`, `value`, and `level`) will be covered in turn.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - `target` matches the event or span&#39;s target. In general, this is the module path and/or crate name.</span>
-<span class="doccomment">///    Examples of targets `h2`, `tokio::net`, or `tide::server`. For more information on targets,</span>
-<span class="doccomment">///    please refer to [`Metadata`]&#39;s documentation.</span>
-<span class="doccomment">/// - `span` matches on the span&#39;s name. If a `span` directive is provided alongside a `target`,</span>
-<span class="doccomment">///    the `span` directive will match on spans _within_ the `target`.</span>
-<span class="doccomment">/// - `field` matches on [fields] within spans. Field names can also be supplied without a `value`</span>
-<span class="doccomment">///    and will match on any [`Span`] or [`Event`] that has a field with that name.</span>
-<span class="doccomment">///    For example: `[span{field=\&quot;value\&quot;}]=debug`, `[{field}]=trace`.</span>
-<span class="doccomment">/// - `value` matches on the value of a span&#39;s field. If a value is a numeric literal or a bool,</span>
-<span class="doccomment">///    it will match _only_ on that value. Otherwise, this filter matches the</span>
-<span class="doccomment">///    [`std::fmt::Debug`] output from the value.</span>
-<span class="doccomment">/// - `level` sets a maximum verbosity level accepted by this directive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When a field value directive (`[{&lt;FIELD NAME&gt;=&lt;FIELD_VALUE&gt;}]=...`) matches a</span>
-<span class="doccomment">/// value&#39;s [`std::fmt::Debug`] output (i.e., the field value in the directive</span>
-<span class="doccomment">/// is not a `bool`, `i64`, `u64`, or `f64` literal), the matched pattern may be</span>
-<span class="doccomment">/// interpreted as either a regular expression or as the precise expected</span>
-<span class="doccomment">/// output of the field&#39;s [`std::fmt::Debug`] implementation. By default, these</span>
-<span class="doccomment">/// filters are interpreted as regular expressions, but this can be disabled</span>
-<span class="doccomment">/// using the [`Builder::with_regex`] builder method to use precise matching</span>
-<span class="doccomment">/// instead.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When field value filters are interpreted as regular expressions, the</span>
-<span class="doccomment">/// [`regex-automata` crate&#39;s regular expression syntax][re-syntax] is</span>
-<span class="doccomment">/// supported.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note**: When filters are constructed from potentially untrusted inputs,</span>
-<span class="doccomment">/// [disabling regular expression matching](Builder::with_regex) is strongly</span>
-<span class="doccomment">/// recommended.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Usage Notes</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - The portion of the directive which is included within the square brackets is `tracing`-specific.</span>
-<span class="doccomment">/// - Any portion of the directive can be omitted.</span>
-<span class="doccomment">///     - The sole exception are the `field` and `value` directives. If a `value` is provided,</span>
-<span class="doccomment">///       a `field` must _also_ be provided. However, the converse does not hold, as fields can</span>
-<span class="doccomment">///       be matched without a value.</span>
-<span class="doccomment">/// - If only a level is provided, it will set the maximum level for all `Span`s and `Event`s</span>
-<span class="doccomment">///   that are not enabled by other filters.</span>
-<span class="doccomment">/// - A directive without a level will enable anything that it matches. This is equivalent to `=trace`.</span>
-<span class="doccomment">/// - When a crate has a dash in its name, the default target for events will be the</span>
-<span class="doccomment">///   crate&#39;s module path as it appears in Rust. This means every dash will be replaced</span>
-<span class="doccomment">///   with an underscore.</span>
-<span class="doccomment">/// - A dash in a target will only appear when being specified explicitly:</span>
-<span class="doccomment">///   `tracing::info!(target: &quot;target-name&quot;, ...);`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Example Syntax</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - `tokio::net=info` will enable all spans or events that:</span>
-<span class="doccomment">///    - have the `tokio::net` target,</span>
-<span class="doccomment">///    - at the level `info` or above.</span>
-<span class="doccomment">/// - `warn,tokio::net=info` will enable all spans and events that:</span>
-<span class="doccomment">///    - are at the level `warn` or above, *or*</span>
-<span class="doccomment">///    - have the `tokio::net` target at the level `info` or above.</span>
-<span class="doccomment">/// - `my_crate[span_a]=trace` will enable all spans and events that:</span>
-<span class="doccomment">///    - are within the `span_a` span or named `span_a` _if_ `span_a` has the target `my_crate`,</span>
-<span class="doccomment">///    - at the level `trace` or above.</span>
-<span class="doccomment">/// - `[span_b{name=\&quot;bob\&quot;}]` will enable all spans or event that:</span>
-<span class="doccomment">///    - have _any_ target,</span>
-<span class="doccomment">///    - are inside a span named `span_b`,</span>
-<span class="doccomment">///    - which has a field named `name` with value `bob`,</span>
-<span class="doccomment">///    - at _any_ level.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Parsing an `EnvFilter` from the [default environment</span>
-<span class="doccomment">/// variable](EnvFilter::from_default_env) (`RUST_LOG`):</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tracing_subscriber::{EnvFilter, fmt, prelude::*};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// tracing_subscriber::registry()</span>
-<span class="doccomment">///     .with(fmt::layer())</span>
-<span class="doccomment">///     .with(EnvFilter::from_default_env())</span>
-<span class="doccomment">///     .init();</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Parsing an `EnvFilter` [from a user-provided environment</span>
-<span class="doccomment">/// variable](EnvFilter::from_env):</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tracing_subscriber::{EnvFilter, fmt, prelude::*};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// tracing_subscriber::registry()</span>
-<span class="doccomment">///     .with(fmt::layer())</span>
-<span class="doccomment">///     .with(EnvFilter::from_env(&quot;MYAPP_LOG&quot;))</span>
-<span class="doccomment">///     .init();</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using `EnvFilter` as a [per-layer filter][plf] to filter only a single</span>
-<span class="doccomment">/// [`Layer`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tracing_subscriber::{EnvFilter, fmt, prelude::*};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Parse an `EnvFilter` configuration from the `RUST_LOG`</span>
-<span class="doccomment">/// // environment variable.</span>
-<span class="doccomment">/// let filter = EnvFilter::from_default_env();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Apply the filter to this layer *only*.</span>
-<span class="doccomment">/// let filtered_layer = fmt::layer().with_filter(filter);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Some other layer, whose output we don&#39;t want to filter.</span>
-<span class="doccomment">/// let unfiltered_layer = // ...</span>
-<span class="doccomment">///     # fmt::layer();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// tracing_subscriber::registry()</span>
-<span class="doccomment">///     .with(filtered_layer)</span>
-<span class="doccomment">///     .with(unfiltered_layer)</span>
-<span class="doccomment">///     .init();</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # Constructing `EnvFilter`s</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An `EnvFilter` is be constructed by parsing a string containing one or more</span>
-<span class="doccomment">/// directives. The [`EnvFilter::new`] constructor parses an `EnvFilter` from a</span>
-<span class="doccomment">/// string, ignoring any invalid directives, while [`EnvFilter::try_new`]</span>
-<span class="doccomment">/// returns an error if invalid directives are encountered. Similarly, the</span>
-<span class="doccomment">/// [`EnvFilter::from_env`] and [`EnvFilter::try_from_env`] constructors parse</span>
-<span class="doccomment">/// an `EnvFilter` from the value of the provided environment variable, with</span>
-<span class="doccomment">/// lossy and strict validation, respectively.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A [builder](EnvFilter::builder) interface is available to set additional</span>
-<span class="doccomment">/// configuration options prior to parsing an `EnvFilter`. See the [`Builder`</span>
-<span class="doccomment">/// type&#39;s documentation](Builder) for details on the options that can be</span>
-<span class="doccomment">/// configured using the builder.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Span`]: tracing_core::span</span>
-<span class="doccomment">/// [fields]: tracing_core::Field</span>
-<span class="doccomment">/// [`Event`]: tracing_core::Event</span>
-<span class="doccomment">/// [`level`]: tracing_core::Level</span>
-<span class="doccomment">/// [`Metadata`]: tracing_core::Metadata</span>
-<span class="doccomment">/// [`Targets`]: crate::filter::Targets</span>
-<span class="doccomment">/// [`env_logger`]: https://crates.io/crates/env_logger</span>
-<span class="doccomment">/// [`Filter`]: #impl-Filter&lt;S&gt;</span>
-<span class="doccomment">/// [global]: crate::layer#global-filtering</span>
-<span class="doccomment">/// [plf]: crate::layer#per-layer-filtering</span>
-<span class="doccomment">/// [filtering]: crate::layer#filtering-with-layers</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;env-filter&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EnvFilter</span> {
-    <span class="ident">statics</span>: <span class="ident">directive::Statics</span>,
-    <span class="ident">dynamics</span>: <span class="ident">directive::Dynamics</span>,
-    <span class="ident">has_dynamics</span>: <span class="ident">bool</span>,
-    <span class="ident">by_id</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">span::Id</span>, <span class="ident">directive::SpanMatcher</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">by_cs</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">callsite::Identifier</span>, <span class="ident">directive::CallsiteMatcher</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">scope</span>: <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">regex</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A [`Layer`] which filters spans and events based on a set of filter
+/// directives.
+///
+/// `EnvFilter` implements both the [`Layer`](#impl-Layer&lt;S&gt;) and [`Filter`] traits, so it may
+/// be used for both [global filtering][global] and [per-layer filtering][plf],
+/// respectively. See [the documentation on filtering with `Layer`s][filtering]
+/// for details.
+///
+/// The [`Targets`] type implements a similar form of filtering, but without the
+/// ability to dynamically enable events based on the current span context, and
+/// without filtering on field values. When these features are not required,
+/// [`Targets`] provides a lighter-weight alternative to [`EnvFilter`].
+///
+/// # Directives
+///
+/// A filter consists of one or more comma-separated directives which match on [`Span`]s and [`Event`]s.
+/// Each directive may have a corresponding maximum verbosity [`level`] which
+/// enables (e.g., _selects for_) spans and events that match. Like `log`,
+/// `tracing` considers less exclusive levels (like `trace` or `info`) to be more
+/// verbose than more exclusive levels (like `error` or `warn`).
+///
+/// The directive syntax is similar to that of [`env_logger`]&#39;s. At a high level, the syntax for directives
+/// consists of several parts:
+///
+/// ```text
+/// target[span{field=value}]=level
+/// ```
+///
+/// Each component (`target`, `span`, `field`, `value`, and `level`) will be covered in turn.
+///
+/// - `target` matches the event or span&#39;s target. In general, this is the module path and/or crate name.
+///    Examples of targets `h2`, `tokio::net`, or `tide::server`. For more information on targets,
+///    please refer to [`Metadata`]&#39;s documentation.
+/// - `span` matches on the span&#39;s name. If a `span` directive is provided alongside a `target`,
+///    the `span` directive will match on spans _within_ the `target`.
+/// - `field` matches on [fields] within spans. Field names can also be supplied without a `value`
+///    and will match on any [`Span`] or [`Event`] that has a field with that name.
+///    For example: `[span{field=\&quot;value\&quot;}]=debug`, `[{field}]=trace`.
+/// - `value` matches on the value of a span&#39;s field. If a value is a numeric literal or a bool,
+///    it will match _only_ on that value. Otherwise, this filter matches the
+///    [`std::fmt::Debug`] output from the value.
+/// - `level` sets a maximum verbosity level accepted by this directive.
+///
+/// When a field value directive (`[{&lt;FIELD NAME&gt;=&lt;FIELD_VALUE&gt;}]=...`) matches a
+/// value&#39;s [`std::fmt::Debug`] output (i.e., the field value in the directive
+/// is not a `bool`, `i64`, `u64`, or `f64` literal), the matched pattern may be
+/// interpreted as either a regular expression or as the precise expected
+/// output of the field&#39;s [`std::fmt::Debug`] implementation. By default, these
+/// filters are interpreted as regular expressions, but this can be disabled
+/// using the [`Builder::with_regex`] builder method to use precise matching
+/// instead.
+///
+/// When field value filters are interpreted as regular expressions, the
+/// [`regex-automata` crate&#39;s regular expression syntax][re-syntax] is
+/// supported.
+///
+/// **Note**: When filters are constructed from potentially untrusted inputs,
+/// [disabling regular expression matching](Builder::with_regex) is strongly
+/// recommended.
+///
+/// ## Usage Notes
+///
+/// - The portion of the directive which is included within the square brackets is `tracing`-specific.
+/// - Any portion of the directive can be omitted.
+///     - The sole exception are the `field` and `value` directives. If a `value` is provided,
+///       a `field` must _also_ be provided. However, the converse does not hold, as fields can
+///       be matched without a value.
+/// - If only a level is provided, it will set the maximum level for all `Span`s and `Event`s
+///   that are not enabled by other filters.
+/// - A directive without a level will enable anything that it matches. This is equivalent to `=trace`.
+/// - When a crate has a dash in its name, the default target for events will be the
+///   crate&#39;s module path as it appears in Rust. This means every dash will be replaced
+///   with an underscore.
+/// - A dash in a target will only appear when being specified explicitly:
+///   `tracing::info!(target: &quot;target-name&quot;, ...);`
+///
+/// ## Example Syntax
+///
+/// - `tokio::net=info` will enable all spans or events that:
+///    - have the `tokio::net` target,
+///    - at the level `info` or above.
+/// - `warn,tokio::net=info` will enable all spans and events that:
+///    - are at the level `warn` or above, *or*
+///    - have the `tokio::net` target at the level `info` or above.
+/// - `my_crate[span_a]=trace` will enable all spans and events that:
+///    - are within the `span_a` span or named `span_a` _if_ `span_a` has the target `my_crate`,
+///    - at the level `trace` or above.
+/// - `[span_b{name=\&quot;bob\&quot;}]` will enable all spans or event that:
+///    - have _any_ target,
+///    - are inside a span named `span_b`,
+///    - which has a field named `name` with value `bob`,
+///    - at _any_ level.
+///
+/// # Examples
+///
+/// Parsing an `EnvFilter` from the [default environment
+/// variable](EnvFilter::from_default_env) (`RUST_LOG`):
+///
+/// ```
+/// use tracing_subscriber::{EnvFilter, fmt, prelude::*};
+///
+/// tracing_subscriber::registry()
+///     .with(fmt::layer())
+///     .with(EnvFilter::from_default_env())
+///     .init();
+/// ```
+///
+/// Parsing an `EnvFilter` [from a user-provided environment
+/// variable](EnvFilter::from_env):
+///
+/// ```
+/// use tracing_subscriber::{EnvFilter, fmt, prelude::*};
+///
+/// tracing_subscriber::registry()
+///     .with(fmt::layer())
+///     .with(EnvFilter::from_env(&quot;MYAPP_LOG&quot;))
+///     .init();
+/// ```
+///
+/// Using `EnvFilter` as a [per-layer filter][plf] to filter only a single
+/// [`Layer`]:
+///
+/// ```
+/// use tracing_subscriber::{EnvFilter, fmt, prelude::*};
+///
+/// // Parse an `EnvFilter` configuration from the `RUST_LOG`
+/// // environment variable.
+/// let filter = EnvFilter::from_default_env();
+///
+/// // Apply the filter to this layer *only*.
+/// let filtered_layer = fmt::layer().with_filter(filter);
+///
+/// // Some other layer, whose output we don&#39;t want to filter.
+/// let unfiltered_layer = // ...
+///     # fmt::layer();
+///
+/// tracing_subscriber::registry()
+///     .with(filtered_layer)
+///     .with(unfiltered_layer)
+///     .init();
+/// ```
+/// # Constructing `EnvFilter`s
+///
+/// An `EnvFilter` is be constructed by parsing a string containing one or more
+/// directives. The [`EnvFilter::new`] constructor parses an `EnvFilter` from a
+/// string, ignoring any invalid directives, while [`EnvFilter::try_new`]
+/// returns an error if invalid directives are encountered. Similarly, the
+/// [`EnvFilter::from_env`] and [`EnvFilter::try_from_env`] constructors parse
+/// an `EnvFilter` from the value of the provided environment variable, with
+/// lossy and strict validation, respectively.
+///
+/// A [builder](EnvFilter::builder) interface is available to set additional
+/// configuration options prior to parsing an `EnvFilter`. See the [`Builder`
+/// type&#39;s documentation](Builder) for details on the options that can be
+/// configured using the builder.
+///
+/// [`Span`]: tracing_core::span
+/// [fields]: tracing_core::Field
+/// [`Event`]: tracing_core::Event
+/// [`level`]: tracing_core::Level
+/// [`Metadata`]: tracing_core::Metadata
+/// [`Targets`]: crate::filter::Targets
+/// [`env_logger`]: https://crates.io/crates/env_logger
+/// [`Filter`]: #impl-Filter&lt;S&gt;
+/// [global]: crate::layer#global-filtering
+/// [plf]: crate::layer#per-layer-filtering
+/// [filtering]: crate::layer#filtering-with-layers
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;env-filter&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))))]
+#[derive(Debug)]
+</span><span class="kw">pub struct </span>EnvFilter {
+    statics: directive::Statics,
+    dynamics: directive::Dynamics,
+    has_dynamics: bool,
+    by_id: RwLock&lt;HashMap&lt;span::Id, directive::SpanMatcher&gt;&gt;,
+    by_cs: RwLock&lt;HashMap&lt;callsite::Identifier, directive::CallsiteMatcher&gt;&gt;,
+    scope: ThreadLocal&lt;RefCell&lt;Vec&lt;LevelFilter&gt;&gt;&gt;,
+    regex: bool,
 }
 
-<span class="kw">type</span> <span class="ident">FieldMap</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Field</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">type </span>FieldMap&lt;T&gt; = HashMap&lt;Field, T&gt;;
 
-<span class="doccomment">/// Indicates that an error occurred while parsing a `EnvFilter` from an</span>
-<span class="doccomment">/// environment variable.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;env-filter&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FromEnvError</span> {
-    <span class="ident">kind</span>: <span class="ident">ErrorKind</span>,
+<span class="doccomment">/// Indicates that an error occurred while parsing a `EnvFilter` from an
+/// environment variable.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;env-filter&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))))]
+#[derive(Debug)]
+</span><span class="kw">pub struct </span>FromEnvError {
+    kind: ErrorKind,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">ErrorKind</span> {
-    <span class="ident">Parse</span>(<span class="ident">ParseError</span>),
-    <span class="ident">Env</span>(<span class="ident">env::VarError</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>ErrorKind {
+    Parse(ParseError),
+    Env(env::VarError),
 }
 
-<span class="kw">impl</span> <span class="ident">EnvFilter</span> {
-    <span class="doccomment">/// `RUST_LOG` is the default environment variable used by</span>
-    <span class="doccomment">/// [`EnvFilter::from_default_env`] and [`EnvFilter::try_from_default_env`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EnvFilter::from_default_env`]: #method.from_default_env</span>
-    <span class="doccomment">/// [`EnvFilter::try_from_default_env`]: #method.try_from_default_env</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEFAULT_ENV</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;RUST_LOG&quot;</span>;
+<span class="kw">impl </span>EnvFilter {
+    <span class="doccomment">/// `RUST_LOG` is the default environment variable used by
+    /// [`EnvFilter::from_default_env`] and [`EnvFilter::try_from_default_env`].
+    ///
+    /// [`EnvFilter::from_default_env`]: #method.from_default_env
+    /// [`EnvFilter::try_from_default_env`]: #method.try_from_default_env
+    </span><span class="kw">pub const </span>DEFAULT_ENV: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;RUST_LOG&quot;</span>;
 
-    <span class="comment">// === constructors, etc ===</span>
+    <span class="comment">// === constructors, etc ===
 
-    <span class="doccomment">/// Returns a [builder] that can be used to configure a new [`EnvFilter`]</span>
-    <span class="doccomment">/// instance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`Builder`] type is used to set additional configurations, such as</span>
-    <span class="doccomment">/// [whether regular expressions are enabled](Builder::with_regex) or [the</span>
-    <span class="doccomment">/// default directive](Builder::with_default_directive) before parsing an</span>
-    <span class="doccomment">/// [`EnvFilter`] from a string or environment variable.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [builder]: https://rust-unofficial.github.io/patterns/patterns/creational/builder.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() -&gt; <span class="ident">Builder</span> {
-        <span class="ident">Builder::default</span>()
+    </span><span class="doccomment">/// Returns a [builder] that can be used to configure a new [`EnvFilter`]
+    /// instance.
+    ///
+    /// The [`Builder`] type is used to set additional configurations, such as
+    /// [whether regular expressions are enabled](Builder::with_regex) or [the
+    /// default directive](Builder::with_default_directive) before parsing an
+    /// [`EnvFilter`] from a string or environment variable.
+    ///
+    /// [builder]: https://rust-unofficial.github.io/patterns/patterns/creational/builder.html
+    </span><span class="kw">pub fn </span>builder() -&gt; Builder {
+        Builder::default()
     }
 
-    <span class="doccomment">/// Returns a new `EnvFilter` from the value of the `RUST_LOG` environment</span>
-    <span class="doccomment">/// variable, ignoring any invalid filter directives.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the environment variable is empty or not set, or if it contains only</span>
-    <span class="doccomment">/// invalid directives, a default directive enabling the [`ERROR`] level is</span>
-    <span class="doccomment">/// added.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To set additional configuration options prior to parsing the filter, use</span>
-    <span class="doccomment">/// the [`Builder`] type instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is equivalent to the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{EnvFilter, LevelFilter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn docs() -&gt; EnvFilter {</span>
-    <span class="doccomment">/// EnvFilter::builder()</span>
-    <span class="doccomment">///     .with_default_directive(LevelFilter::ERROR.into())</span>
-    <span class="doccomment">///     .from_env_lossy()</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ERROR`]: tracing::Level::ERROR</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_default_env</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::builder</span>()
-            .<span class="ident">with_default_directive</span>(<span class="ident">LevelFilter::ERROR</span>.<span class="ident">into</span>())
-            .<span class="ident">from_env_lossy</span>()
+    <span class="doccomment">/// Returns a new `EnvFilter` from the value of the `RUST_LOG` environment
+    /// variable, ignoring any invalid filter directives.
+    ///
+    /// If the environment variable is empty or not set, or if it contains only
+    /// invalid directives, a default directive enabling the [`ERROR`] level is
+    /// added.
+    ///
+    /// To set additional configuration options prior to parsing the filter, use
+    /// the [`Builder`] type instead.
+    ///
+    /// This function is equivalent to the following:
+    ///
+    /// ```rust
+    /// use tracing_subscriber::filter::{EnvFilter, LevelFilter};
+    ///
+    /// # fn docs() -&gt; EnvFilter {
+    /// EnvFilter::builder()
+    ///     .with_default_directive(LevelFilter::ERROR.into())
+    ///     .from_env_lossy()
+    /// # }
+    /// ```
+    ///
+    /// [`ERROR`]: tracing::Level::ERROR
+    </span><span class="kw">pub fn </span>from_default_env() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::builder()
+            .with_default_directive(LevelFilter::ERROR.into())
+            .from_env_lossy()
     }
 
-    <span class="doccomment">/// Returns a new `EnvFilter` from the value of the given environment</span>
-    <span class="doccomment">/// variable, ignoring any invalid filter directives.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the environment variable is empty or not set, or if it contains only</span>
-    <span class="doccomment">/// invalid directives, a default directive enabling the [`ERROR`] level is</span>
-    <span class="doccomment">/// added.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To set additional configuration options prior to parsing the filter, use</span>
-    <span class="doccomment">/// the [`Builder`] type instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is equivalent to the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{EnvFilter, LevelFilter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn docs() -&gt; EnvFilter {</span>
-    <span class="doccomment">/// # let env = &quot;&quot;;</span>
-    <span class="doccomment">/// EnvFilter::builder()</span>
-    <span class="doccomment">///     .with_default_directive(LevelFilter::ERROR.into())</span>
-    <span class="doccomment">///     .with_env_var(env)</span>
-    <span class="doccomment">///     .from_env_lossy()</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ERROR`]: tracing::Level::ERROR</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_env</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">env</span>: <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::builder</span>()
-            .<span class="ident">with_default_directive</span>(<span class="ident">LevelFilter::ERROR</span>.<span class="ident">into</span>())
-            .<span class="ident">with_env_var</span>(<span class="ident">env</span>.<span class="ident">as_ref</span>())
-            .<span class="ident">from_env_lossy</span>()
+    <span class="doccomment">/// Returns a new `EnvFilter` from the value of the given environment
+    /// variable, ignoring any invalid filter directives.
+    ///
+    /// If the environment variable is empty or not set, or if it contains only
+    /// invalid directives, a default directive enabling the [`ERROR`] level is
+    /// added.
+    ///
+    /// To set additional configuration options prior to parsing the filter, use
+    /// the [`Builder`] type instead.
+    ///
+    /// This function is equivalent to the following:
+    ///
+    /// ```rust
+    /// use tracing_subscriber::filter::{EnvFilter, LevelFilter};
+    ///
+    /// # fn docs() -&gt; EnvFilter {
+    /// # let env = &quot;&quot;;
+    /// EnvFilter::builder()
+    ///     .with_default_directive(LevelFilter::ERROR.into())
+    ///     .with_env_var(env)
+    ///     .from_env_lossy()
+    /// # }
+    /// ```
+    ///
+    /// [`ERROR`]: tracing::Level::ERROR
+    </span><span class="kw">pub fn </span>from_env&lt;A: AsRef&lt;str&gt;&gt;(env: A) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::builder()
+            .with_default_directive(LevelFilter::ERROR.into())
+            .with_env_var(env.as_ref())
+            .from_env_lossy()
     }
 
-    <span class="doccomment">/// Returns a new `EnvFilter` from the directives in the given string,</span>
-    <span class="doccomment">/// ignoring any that are invalid.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the string is empty or contains only invalid directives, a default</span>
-    <span class="doccomment">/// directive enabling the [`ERROR`] level is added.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To set additional configuration options prior to parsing the filter, use</span>
-    <span class="doccomment">/// the [`Builder`] type instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is equivalent to the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{EnvFilter, LevelFilter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn docs() -&gt; EnvFilter {</span>
-    <span class="doccomment">/// # let directives = &quot;&quot;;</span>
-    <span class="doccomment">/// EnvFilter::builder()</span>
-    <span class="doccomment">///     .with_default_directive(LevelFilter::ERROR.into())</span>
-    <span class="doccomment">///     .parse_lossy(directives)</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ERROR`]: tracing::Level::ERROR</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">directives</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::builder</span>()
-            .<span class="ident">with_default_directive</span>(<span class="ident">LevelFilter::ERROR</span>.<span class="ident">into</span>())
-            .<span class="ident">parse_lossy</span>(<span class="ident">directives</span>)
+    <span class="doccomment">/// Returns a new `EnvFilter` from the directives in the given string,
+    /// ignoring any that are invalid.
+    ///
+    /// If the string is empty or contains only invalid directives, a default
+    /// directive enabling the [`ERROR`] level is added.
+    ///
+    /// To set additional configuration options prior to parsing the filter, use
+    /// the [`Builder`] type instead.
+    ///
+    /// This function is equivalent to the following:
+    ///
+    /// ```rust
+    /// use tracing_subscriber::filter::{EnvFilter, LevelFilter};
+    ///
+    /// # fn docs() -&gt; EnvFilter {
+    /// # let directives = &quot;&quot;;
+    /// EnvFilter::builder()
+    ///     .with_default_directive(LevelFilter::ERROR.into())
+    ///     .parse_lossy(directives)
+    /// # }
+    /// ```
+    ///
+    /// [`ERROR`]: tracing::Level::ERROR
+    </span><span class="kw">pub fn </span>new&lt;S: AsRef&lt;str&gt;&gt;(directives: S) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::builder()
+            .with_default_directive(LevelFilter::ERROR.into())
+            .parse_lossy(directives)
     }
 
-    <span class="doccomment">/// Returns a new `EnvFilter` from the directives in the given string,</span>
-    <span class="doccomment">/// or an error if any are invalid.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the string is empty, a default directive enabling the [`ERROR`] level</span>
-    <span class="doccomment">/// is added.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To set additional configuration options prior to parsing the filter, use</span>
-    <span class="doccomment">/// the [`Builder`] type instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is equivalent to the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{EnvFilter, LevelFilter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn docs() -&gt; Result&lt;EnvFilter, tracing_subscriber::filter::ParseError&gt; {</span>
-    <span class="doccomment">/// # let directives = &quot;&quot;;</span>
-    <span class="doccomment">/// EnvFilter::builder()</span>
-    <span class="doccomment">///     .with_default_directive(LevelFilter::ERROR.into())</span>
-    <span class="doccomment">///     .parse(directives)</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ERROR`]: tracing::Level::ERROR</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">dirs</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">directive::ParseError</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::builder</span>().<span class="ident">parse</span>(<span class="ident">dirs</span>)
+    <span class="doccomment">/// Returns a new `EnvFilter` from the directives in the given string,
+    /// or an error if any are invalid.
+    ///
+    /// If the string is empty, a default directive enabling the [`ERROR`] level
+    /// is added.
+    ///
+    /// To set additional configuration options prior to parsing the filter, use
+    /// the [`Builder`] type instead.
+    ///
+    /// This function is equivalent to the following:
+    ///
+    /// ```rust
+    /// use tracing_subscriber::filter::{EnvFilter, LevelFilter};
+    ///
+    /// # fn docs() -&gt; Result&lt;EnvFilter, tracing_subscriber::filter::ParseError&gt; {
+    /// # let directives = &quot;&quot;;
+    /// EnvFilter::builder()
+    ///     .with_default_directive(LevelFilter::ERROR.into())
+    ///     .parse(directives)
+    /// # }
+    /// ```
+    ///
+    /// [`ERROR`]: tracing::Level::ERROR
+    </span><span class="kw">pub fn </span>try_new&lt;S: AsRef&lt;str&gt;&gt;(dirs: S) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, directive::ParseError&gt; {
+        <span class="self">Self</span>::builder().parse(dirs)
     }
 
-    <span class="doccomment">/// Returns a new `EnvFilter` from the value of the `RUST_LOG` environment</span>
-    <span class="doccomment">/// variable, or an error if the environment variable is unset or contains</span>
-    <span class="doccomment">/// any invalid filter directives.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To set additional configuration options prior to parsing the filter, use</span>
-    <span class="doccomment">/// the [`Builder`] type instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is equivalent to the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_subscriber::EnvFilter;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn docs() -&gt; Result&lt;EnvFilter, tracing_subscriber::filter::FromEnvError&gt; {</span>
-    <span class="doccomment">/// EnvFilter::builder().try_from_env()</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_default_env</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromEnvError</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::builder</span>().<span class="ident">try_from_env</span>()
+    <span class="doccomment">/// Returns a new `EnvFilter` from the value of the `RUST_LOG` environment
+    /// variable, or an error if the environment variable is unset or contains
+    /// any invalid filter directives.
+    ///
+    /// To set additional configuration options prior to parsing the filter, use
+    /// the [`Builder`] type instead.
+    ///
+    /// This function is equivalent to the following:
+    ///
+    /// ```rust
+    /// use tracing_subscriber::EnvFilter;
+    ///
+    /// # fn docs() -&gt; Result&lt;EnvFilter, tracing_subscriber::filter::FromEnvError&gt; {
+    /// EnvFilter::builder().try_from_env()
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>try_from_default_env() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FromEnvError&gt; {
+        <span class="self">Self</span>::builder().try_from_env()
     }
 
-    <span class="doccomment">/// Returns a new `EnvFilter` from the value of the given environment</span>
-    <span class="doccomment">/// variable, or an error if the environment variable is unset or contains</span>
-    <span class="doccomment">/// any invalid filter directives.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To set additional configuration options prior to parsing the filter, use</span>
-    <span class="doccomment">/// the [`Builder`] type instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is equivalent to the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_subscriber::EnvFilter;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn docs() -&gt; Result&lt;EnvFilter, tracing_subscriber::filter::FromEnvError&gt; {</span>
-    <span class="doccomment">/// # let env = &quot;&quot;;</span>
-    <span class="doccomment">/// EnvFilter::builder().with_env_var(env).try_from_env()</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_env</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">env</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromEnvError</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::builder</span>().<span class="ident">with_env_var</span>(<span class="ident">env</span>.<span class="ident">as_ref</span>()).<span class="ident">try_from_env</span>()
+    <span class="doccomment">/// Returns a new `EnvFilter` from the value of the given environment
+    /// variable, or an error if the environment variable is unset or contains
+    /// any invalid filter directives.
+    ///
+    /// To set additional configuration options prior to parsing the filter, use
+    /// the [`Builder`] type instead.
+    ///
+    /// This function is equivalent to the following:
+    ///
+    /// ```rust
+    /// use tracing_subscriber::EnvFilter;
+    ///
+    /// # fn docs() -&gt; Result&lt;EnvFilter, tracing_subscriber::filter::FromEnvError&gt; {
+    /// # let env = &quot;&quot;;
+    /// EnvFilter::builder().with_env_var(env).try_from_env()
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>try_from_env&lt;A: AsRef&lt;str&gt;&gt;(env: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FromEnvError&gt; {
+        <span class="self">Self</span>::builder().with_env_var(env.as_ref()).try_from_env()
     }
 
-    <span class="doccomment">/// Add a filtering directive to this `EnvFilter`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The added directive will be used in addition to any previously set</span>
-    <span class="doccomment">/// directives, either added using this method or provided when the filter</span>
-    <span class="doccomment">/// is constructed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Filters may be created from [`LevelFilter`] or [`Level`], which will</span>
-    <span class="doccomment">/// enable all traces at or below a certain verbosity level, or</span>
-    <span class="doccomment">/// parsed from a string specifying a directive.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a filter directive is inserted that matches exactly the same spans</span>
-    <span class="doccomment">/// and events as a previous filter, but sets a different level for those</span>
-    <span class="doccomment">/// spans and events, the previous directive is overwritten.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`LevelFilter`]: ../filter/struct.LevelFilter.html</span>
-    <span class="doccomment">/// [`Level`]: https://docs.rs/tracing-core/latest/tracing_core/struct.Level.html</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// From [`LevelFilter`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{EnvFilter, LevelFilter};</span>
-    <span class="doccomment">/// let mut filter = EnvFilter::from_default_env()</span>
-    <span class="doccomment">///     .add_directive(LevelFilter::INFO.into());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Or from [`Level`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use tracing_subscriber::filter::{EnvFilter, LevelFilter};</span>
-    <span class="doccomment">/// # use tracing::Level;</span>
-    <span class="doccomment">/// let mut filter = EnvFilter::from_default_env()</span>
-    <span class="doccomment">///     .add_directive(Level::INFO.into());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Parsed from a string:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{EnvFilter, Directive};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn try_mk_filter() -&gt; Result&lt;(), Box&lt;dyn ::std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut filter = EnvFilter::try_from_default_env()?</span>
-    <span class="doccomment">///     .add_directive(&quot;my_crate::module=trace&quot;.parse()?)</span>
-    <span class="doccomment">///     .add_directive(&quot;my_crate::my_other_module::something=info&quot;.parse()?);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_directive</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">directive</span>: <span class="ident">Directive</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">regex</span> {
-            <span class="ident">directive</span>.<span class="ident">deregexify</span>();
+    <span class="doccomment">/// Add a filtering directive to this `EnvFilter`.
+    ///
+    /// The added directive will be used in addition to any previously set
+    /// directives, either added using this method or provided when the filter
+    /// is constructed.
+    ///
+    /// Filters may be created from [`LevelFilter`] or [`Level`], which will
+    /// enable all traces at or below a certain verbosity level, or
+    /// parsed from a string specifying a directive.
+    ///
+    /// If a filter directive is inserted that matches exactly the same spans
+    /// and events as a previous filter, but sets a different level for those
+    /// spans and events, the previous directive is overwritten.
+    ///
+    /// [`LevelFilter`]: ../filter/struct.LevelFilter.html
+    /// [`Level`]: https://docs.rs/tracing-core/latest/tracing_core/struct.Level.html
+    ///
+    /// # Examples
+    ///
+    /// From [`LevelFilter`]:
+    ///
+    /// ```rust
+    /// use tracing_subscriber::filter::{EnvFilter, LevelFilter};
+    /// let mut filter = EnvFilter::from_default_env()
+    ///     .add_directive(LevelFilter::INFO.into());
+    /// ```
+    ///
+    /// Or from [`Level`]:
+    ///
+    /// ```rust
+    /// # use tracing_subscriber::filter::{EnvFilter, LevelFilter};
+    /// # use tracing::Level;
+    /// let mut filter = EnvFilter::from_default_env()
+    ///     .add_directive(Level::INFO.into());
+    /// ```
+    ///
+    /// Parsed from a string:
+    ///
+    /// ```rust
+    /// use tracing_subscriber::filter::{EnvFilter, Directive};
+    ///
+    /// # fn try_mk_filter() -&gt; Result&lt;(), Box&lt;dyn ::std::error::Error&gt;&gt; {
+    /// let mut filter = EnvFilter::try_from_default_env()?
+    ///     .add_directive(&quot;my_crate::module=trace&quot;.parse()?)
+    ///     .add_directive(&quot;my_crate::my_other_module::something=info&quot;.parse()?);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>add_directive(<span class="kw-2">mut </span><span class="self">self</span>, <span class="kw-2">mut </span>directive: Directive) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>!<span class="self">self</span>.regex {
+            directive.deregexify();
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stat</span>) <span class="op">=</span> <span class="ident">directive</span>.<span class="ident">to_static</span>() {
-            <span class="self">self</span>.<span class="ident">statics</span>.<span class="ident">add</span>(<span class="ident">stat</span>)
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">has_dynamics</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="self">self</span>.<span class="ident">dynamics</span>.<span class="ident">add</span>(<span class="ident">directive</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(stat) = directive.to_static() {
+            <span class="self">self</span>.statics.add(stat)
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.has_dynamics = <span class="bool-val">true</span>;
+            <span class="self">self</span>.dynamics.add(directive);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="comment">// === filtering methods ===</span>
+    <span class="comment">// === filtering methods ===
 
-    <span class="doccomment">/// Returns `true` if this `EnvFilter` would enable the provided `metadata`</span>
-    <span class="doccomment">/// in the current context.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to calling the [`Layer::enabled`] or</span>
-    <span class="doccomment">/// [`Filter::enabled`] methods on `EnvFilter`&#39;s implementations of those</span>
-    <span class="doccomment">/// traits, but it does not require the trait to be in scope.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enabled</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">metadata</span>.<span class="ident">level</span>();
+    </span><span class="doccomment">/// Returns `true` if this `EnvFilter` would enable the provided `metadata`
+    /// in the current context.
+    ///
+    /// This is equivalent to calling the [`Layer::enabled`] or
+    /// [`Filter::enabled`] methods on `EnvFilter`&#39;s implementations of those
+    /// traits, but it does not require the trait to be in scope.
+    </span><span class="kw">pub fn </span>enabled&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="kw">let </span>level = metadata.level();
 
-        <span class="comment">// is it possible for a dynamic filter directive to enable this event?</span>
-        <span class="comment">// if not, we can avoid the thread loca&#39;l access + iterating over the</span>
-        <span class="comment">// spans in the current scope.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_dynamics</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">dynamics</span>.<span class="ident">max_level</span> <span class="op">&gt;</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">level</span> {
-            <span class="kw">if</span> <span class="ident">metadata</span>.<span class="ident">is_span</span>() {
-                <span class="comment">// If the metadata is a span, see if we care about its callsite.</span>
-                <span class="kw">let</span> <span class="ident">enabled_by_cs</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">by_cs</span>
-                    .<span class="ident">read</span>()
-                    .<span class="ident">ok</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">by_cs</span><span class="op">|</span> <span class="ident">by_cs</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">metadata</span>.<span class="ident">callsite</span>()))
-                    .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
-                <span class="kw">if</span> <span class="ident">enabled_by_cs</span> {
-                    <span class="kw">return</span> <span class="bool-val">true</span>;
+        <span class="comment">// is it possible for a dynamic filter directive to enable this event?
+        // if not, we can avoid the thread loca&#39;l access + iterating over the
+        // spans in the current scope.
+        </span><span class="kw">if </span><span class="self">self</span>.has_dynamics &amp;&amp; <span class="self">self</span>.dynamics.max_level &gt;= <span class="kw-2">*</span>level {
+            <span class="kw">if </span>metadata.is_span() {
+                <span class="comment">// If the metadata is a span, see if we care about its callsite.
+                </span><span class="kw">let </span>enabled_by_cs = <span class="self">self
+                    </span>.by_cs
+                    .read()
+                    .ok()
+                    .map(|by_cs| by_cs.contains_key(<span class="kw-2">&amp;</span>metadata.callsite()))
+                    .unwrap_or(<span class="bool-val">false</span>);
+                <span class="kw">if </span>enabled_by_cs {
+                    <span class="kw">return </span><span class="bool-val">true</span>;
                 }
             }
 
-            <span class="kw">let</span> <span class="ident">enabled_by_scope</span> <span class="op">=</span> {
-                <span class="kw">let</span> <span class="ident">scope</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">scope</span>.<span class="ident">get_or_default</span>().<span class="ident">borrow</span>();
-                <span class="kw">for</span> <span class="ident">filter</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">scope</span> {
-                    <span class="kw">if</span> <span class="ident">filter</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">level</span> {
-                        <span class="kw">return</span> <span class="bool-val">true</span>;
+            <span class="kw">let </span>enabled_by_scope = {
+                <span class="kw">let </span>scope = <span class="self">self</span>.scope.get_or_default().borrow();
+                <span class="kw">for </span>filter <span class="kw">in </span><span class="kw-2">&amp;*</span>scope {
+                    <span class="kw">if </span>filter &gt;= level {
+                        <span class="kw">return </span><span class="bool-val">true</span>;
                     }
                 }
-                <span class="bool-val">false</span>
-            };
-            <span class="kw">if</span> <span class="ident">enabled_by_scope</span> {
-                <span class="kw">return</span> <span class="bool-val">true</span>;
+                <span class="bool-val">false
+            </span>};
+            <span class="kw">if </span>enabled_by_scope {
+                <span class="kw">return </span><span class="bool-val">true</span>;
             }
         }
 
-        <span class="comment">// is it possible for a static filter directive to enable this event?</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">statics</span>.<span class="ident">max_level</span> <span class="op">&gt;</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">level</span> {
-            <span class="comment">// Otherwise, fall back to checking if the callsite is</span>
-            <span class="comment">// statically enabled.</span>
-            <span class="kw">return</span> <span class="self">self</span>.<span class="ident">statics</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>);
+        <span class="comment">// is it possible for a static filter directive to enable this event?
+        </span><span class="kw">if </span><span class="self">self</span>.statics.max_level &gt;= <span class="kw-2">*</span>level {
+            <span class="comment">// Otherwise, fall back to checking if the callsite is
+            // statically enabled.
+            </span><span class="kw">return </span><span class="self">self</span>.statics.enabled(metadata);
         }
 
-        <span class="bool-val">false</span>
-    }
+        <span class="bool-val">false
+    </span>}
 
-    <span class="doccomment">/// Returns an optional hint of the highest [verbosity level][level] that</span>
-    <span class="doccomment">/// this `EnvFilter` will enable.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to calling the [`Layer::max_level_hint`] or</span>
-    <span class="doccomment">/// [`Filter::max_level_hint`] methods on `EnvFilter`&#39;s implementations of those</span>
-    <span class="doccomment">/// traits, but it does not require the trait to be in scope.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [level]: tracing_core::metadata::Level</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">dynamics</span>.<span class="ident">has_value_filters</span>() {
-            <span class="comment">// If we perform any filtering on span field *values*, we will</span>
-            <span class="comment">// enable *all* spans, because their field values are not known</span>
-            <span class="comment">// until recording.</span>
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">LevelFilter::TRACE</span>);
+    <span class="doccomment">/// Returns an optional hint of the highest [verbosity level][level] that
+    /// this `EnvFilter` will enable.
+    ///
+    /// This is equivalent to calling the [`Layer::max_level_hint`] or
+    /// [`Filter::max_level_hint`] methods on `EnvFilter`&#39;s implementations of those
+    /// traits, but it does not require the trait to be in scope.
+    ///
+    /// [level]: tracing_core::metadata::Level
+    </span><span class="kw">pub fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="kw">if </span><span class="self">self</span>.dynamics.has_value_filters() {
+            <span class="comment">// If we perform any filtering on span field *values*, we will
+            // enable *all* spans, because their field values are not known
+            // until recording.
+            </span><span class="kw">return </span><span class="prelude-val">Some</span>(LevelFilter::TRACE);
         }
-        <span class="ident">std::cmp::max</span>(
-            <span class="self">self</span>.<span class="ident">statics</span>.<span class="ident">max_level</span>.<span class="ident">into</span>(),
-            <span class="self">self</span>.<span class="ident">dynamics</span>.<span class="ident">max_level</span>.<span class="ident">into</span>(),
+        std::cmp::max(
+            <span class="self">self</span>.statics.max_level.into(),
+            <span class="self">self</span>.dynamics.max_level.into(),
         )
     }
 
-    <span class="doccomment">/// Informs the filter that a new span was created.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to calling the [`Layer::on_new_span`] or</span>
-    <span class="doccomment">/// [`Filter::on_new_span`] methods on `EnvFilter`&#39;s implementations of those</span>
-    <span class="doccomment">/// traits, but it does not require the trait to be in scope.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_new_span</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="kw">_</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">by_cs</span> <span class="op">=</span> <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">by_cs</span>.<span class="ident">read</span>());
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cs</span>) <span class="op">=</span> <span class="ident">by_cs</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">attrs</span>.<span class="ident">metadata</span>().<span class="ident">callsite</span>()) {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">cs</span>.<span class="ident">to_span_match</span>(<span class="ident">attrs</span>);
-            <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">by_id</span>.<span class="ident">write</span>()).<span class="ident">insert</span>(<span class="ident">id</span>.<span class="ident">clone</span>(), <span class="ident">span</span>);
+    <span class="doccomment">/// Informs the filter that a new span was created.
+    ///
+    /// This is equivalent to calling the [`Layer::on_new_span`] or
+    /// [`Filter::on_new_span`] methods on `EnvFilter`&#39;s implementations of those
+    /// traits, but it does not require the trait to be in scope.
+    </span><span class="kw">pub fn </span>on_new_span&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>span::Attributes&lt;<span class="lifetime">&#39;_</span>&gt;, id: <span class="kw-2">&amp;</span>span::Id, <span class="kw">_</span>: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="kw">let </span>by_cs = <span class="macro">try_lock!</span>(<span class="self">self</span>.by_cs.read());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(cs) = by_cs.get(<span class="kw-2">&amp;</span>attrs.metadata().callsite()) {
+            <span class="kw">let </span>span = cs.to_span_match(attrs);
+            <span class="macro">try_lock!</span>(<span class="self">self</span>.by_id.write()).insert(id.clone(), span);
         }
     }
 
-    <span class="doccomment">/// Informs the filter that the span with the provided `id` was entered.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to calling the [`Layer::on_enter`] or</span>
-    <span class="doccomment">/// [`Filter::on_enter`] methods on `EnvFilter`&#39;s implementations of those</span>
-    <span class="doccomment">/// traits, but it does not require the trait to be in scope.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_enter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="kw">_</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="comment">// XXX: This is where _we_ could push IDs to the stack instead, and use</span>
-        <span class="comment">// that to allow changing the filter while a span is already entered.</span>
-        <span class="comment">// But that might be much less efficient...</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">span</span>) <span class="op">=</span> <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">by_id</span>.<span class="ident">read</span>()).<span class="ident">get</span>(<span class="ident">id</span>) {
-            <span class="self">self</span>.<span class="ident">scope</span>.<span class="ident">get_or_default</span>().<span class="ident">borrow_mut</span>().<span class="ident">push</span>(<span class="ident">span</span>.<span class="ident">level</span>());
+    <span class="doccomment">/// Informs the filter that the span with the provided `id` was entered.
+    ///
+    /// This is equivalent to calling the [`Layer::on_enter`] or
+    /// [`Filter::on_enter`] methods on `EnvFilter`&#39;s implementations of those
+    /// traits, but it does not require the trait to be in scope.
+    </span><span class="kw">pub fn </span>on_enter&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, <span class="kw">_</span>: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="comment">// XXX: This is where _we_ could push IDs to the stack instead, and use
+        // that to allow changing the filter while a span is already entered.
+        // But that might be much less efficient...
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(span) = <span class="macro">try_lock!</span>(<span class="self">self</span>.by_id.read()).get(id) {
+            <span class="self">self</span>.scope.get_or_default().borrow_mut().push(span.level());
         }
     }
 
-    <span class="doccomment">/// Informs the filter that the span with the provided `id` was exited.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to calling the [`Layer::on_exit`] or</span>
-    <span class="doccomment">/// [`Filter::on_exit`] methods on `EnvFilter`&#39;s implementations of those</span>
-    <span class="doccomment">/// traits, but it does not require the trait to be in scope.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_exit</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="kw">_</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cares_about_span</span>(<span class="ident">id</span>) {
-            <span class="self">self</span>.<span class="ident">scope</span>.<span class="ident">get_or_default</span>().<span class="ident">borrow_mut</span>().<span class="ident">pop</span>();
+    <span class="doccomment">/// Informs the filter that the span with the provided `id` was exited.
+    ///
+    /// This is equivalent to calling the [`Layer::on_exit`] or
+    /// [`Filter::on_exit`] methods on `EnvFilter`&#39;s implementations of those
+    /// traits, but it does not require the trait to be in scope.
+    </span><span class="kw">pub fn </span>on_exit&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, <span class="kw">_</span>: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="kw">if </span><span class="self">self</span>.cares_about_span(id) {
+            <span class="self">self</span>.scope.get_or_default().borrow_mut().pop();
         }
     }
 
-    <span class="doccomment">/// Informs the filter that the span with the provided `id` was closed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to calling the [`Layer::on_close`] or</span>
-    <span class="doccomment">/// [`Filter::on_close`] methods on `EnvFilter`&#39;s implementations of those</span>
-    <span class="doccomment">/// traits, but it does not require the trait to be in scope.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_close</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>, <span class="kw">_</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="comment">// If we don&#39;t need to acquire a write lock, avoid doing so.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">cares_about_span</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
+    <span class="doccomment">/// Informs the filter that the span with the provided `id` was closed.
+    ///
+    /// This is equivalent to calling the [`Layer::on_close`] or
+    /// [`Filter::on_close`] methods on `EnvFilter`&#39;s implementations of those
+    /// traits, but it does not require the trait to be in scope.
+    </span><span class="kw">pub fn </span>on_close&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: span::Id, <span class="kw">_</span>: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="comment">// If we don&#39;t need to acquire a write lock, avoid doing so.
+        </span><span class="kw">if </span>!<span class="self">self</span>.cares_about_span(<span class="kw-2">&amp;</span>id) {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spans</span> <span class="op">=</span> <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">by_id</span>.<span class="ident">write</span>());
-        <span class="ident">spans</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>spans = <span class="macro">try_lock!</span>(<span class="self">self</span>.by_id.write());
+        spans.remove(<span class="kw-2">&amp;</span>id);
     }
 
-    <span class="doccomment">/// Informs the filter that the span with the provided `id` recorded the</span>
-    <span class="doccomment">/// provided field `values`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to calling the [`Layer::on_record`] or</span>
-    <span class="doccomment">/// [`Filter::on_record`] methods on `EnvFilter`&#39;s implementations of those</span>
-    <span class="doccomment">/// traits, but it does not require the trait to be in scope</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_record</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">span</span>) <span class="op">=</span> <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">by_id</span>.<span class="ident">read</span>()).<span class="ident">get</span>(<span class="ident">id</span>) {
-            <span class="ident">span</span>.<span class="ident">record_update</span>(<span class="ident">values</span>);
+    <span class="doccomment">/// Informs the filter that the span with the provided `id` recorded the
+    /// provided field `values`.
+    ///
+    /// This is equivalent to calling the [`Layer::on_record`] or
+    /// [`Filter::on_record`] methods on `EnvFilter`&#39;s implementations of those
+    /// traits, but it does not require the trait to be in scope
+    </span><span class="kw">pub fn </span>on_record&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, values: <span class="kw-2">&amp;</span>span::Record&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(span) = <span class="macro">try_lock!</span>(<span class="self">self</span>.by_id.read()).get(id) {
+            span.record_update(values);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">cares_about_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">spans</span> <span class="op">=</span> <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">by_id</span>.<span class="ident">read</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="bool-val">false</span>);
-        <span class="ident">spans</span>.<span class="ident">contains_key</span>(<span class="ident">span</span>)
+    <span class="kw">fn </span>cares_about_span(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id) -&gt; bool {
+        <span class="kw">let </span>spans = <span class="macro">try_lock!</span>(<span class="self">self</span>.by_id.read(), <span class="kw">else return </span><span class="bool-val">false</span>);
+        spans.contains_key(span)
     }
 
-    <span class="kw">fn</span> <span class="ident">base_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_dynamics</span> {
-            <span class="ident">Interest::sometimes</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">Interest::never</span>()
+    <span class="kw">fn </span>base_interest(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Interest {
+        <span class="kw">if </span><span class="self">self</span>.has_dynamics {
+            Interest::sometimes()
+        } <span class="kw">else </span>{
+            Interest::never()
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_dynamics</span> <span class="op">&amp;&amp;</span> <span class="ident">metadata</span>.<span class="ident">is_span</span>() {
-            <span class="comment">// If this metadata describes a span, first, check if there is a</span>
-            <span class="comment">// dynamic filter that should be constructed for it. If so, it</span>
-            <span class="comment">// should always be enabled, since it influences filtering.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">matcher</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">dynamics</span>.<span class="ident">matcher</span>(<span class="ident">metadata</span>) {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">by_cs</span> <span class="op">=</span> <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">by_cs</span>.<span class="ident">write</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="self">self</span>.<span class="ident">base_interest</span>());
-                <span class="ident">by_cs</span>.<span class="ident">insert</span>(<span class="ident">metadata</span>.<span class="ident">callsite</span>(), <span class="ident">matcher</span>);
-                <span class="kw">return</span> <span class="ident">Interest::always</span>();
+    <span class="kw">fn </span>register_callsite(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="kw">if </span><span class="self">self</span>.has_dynamics &amp;&amp; metadata.is_span() {
+            <span class="comment">// If this metadata describes a span, first, check if there is a
+            // dynamic filter that should be constructed for it. If so, it
+            // should always be enabled, since it influences filtering.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(matcher) = <span class="self">self</span>.dynamics.matcher(metadata) {
+                <span class="kw">let </span><span class="kw-2">mut </span>by_cs = <span class="macro">try_lock!</span>(<span class="self">self</span>.by_cs.write(), <span class="kw">else return </span><span class="self">self</span>.base_interest());
+                by_cs.insert(metadata.callsite(), matcher);
+                <span class="kw">return </span>Interest::always();
             }
         }
 
-        <span class="comment">// Otherwise, check if any of our static filters enable this metadata.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">statics</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>) {
-            <span class="ident">Interest::always</span>()
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">base_interest</span>()
+        <span class="comment">// Otherwise, check if any of our static filters enable this metadata.
+        </span><span class="kw">if </span><span class="self">self</span>.statics.enabled(metadata) {
+            Interest::always()
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.base_interest()
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Subscriber</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnvFilter</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="ident">EnvFilter::register_callsite</span>(<span class="self">self</span>, <span class="ident">metadata</span>)
+<span class="kw">impl</span>&lt;S: Subscriber&gt; Layer&lt;S&gt; <span class="kw">for </span>EnvFilter {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>register_callsite(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        EnvFilter::register_callsite(<span class="self">self</span>, metadata)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="ident">EnvFilter::max_level_hint</span>(<span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        EnvFilter::max_level_hint(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="self">self</span>.enabled(metadata, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>span::Attributes&lt;<span class="lifetime">&#39;_</span>&gt;, id: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.on_new_span(attrs, id, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">on_record</span>(<span class="ident">id</span>, <span class="ident">values</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_record(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, values: <span class="kw-2">&amp;</span>span::Record&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.on_record(id, values, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_enter(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.on_enter(id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_exit(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.on_exit(id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
-    }
-}
-
-<span class="macro">feature!</span> {
-    <span class="attribute">#![<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::layer::Filter</span>;
-
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnvFilter</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-            <span class="self">self</span>.<span class="ident">enabled</span>(<span class="ident">meta</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>())
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-            <span class="self">self</span>.<span class="ident">register_callsite</span>(<span class="ident">meta</span>)
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-            <span class="ident">EnvFilter::max_level_hint</span>(<span class="self">self</span>)
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>)
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">on_record</span>(<span class="ident">id</span>, <span class="ident">values</span>, <span class="ident">ctx</span>);
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
-        }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_close(<span class="kw-2">&amp;</span><span class="self">self</span>, id: span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.on_close(id, ctx);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">EnvFilter</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">directive::ParseError</span>;
+<span class="macro">feature! </span>{
+    <span class="attribute">#![all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">use </span><span class="kw">crate</span>::layer::Filter;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">spec</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::try_new</span>(<span class="ident">spec</span>)
+    <span class="kw">impl</span>&lt;S&gt; Filter&lt;S&gt; <span class="kw">for </span>EnvFilter {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+            <span class="self">self</span>.enabled(meta, ctx.clone())
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>callsite_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+            <span class="self">self</span>.register_callsite(meta)
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+            EnvFilter::max_level_hint(<span class="self">self</span>)
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>on_new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>span::Attributes&lt;<span class="lifetime">&#39;_</span>&gt;, id: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+            <span class="self">self</span>.on_new_span(attrs, id, ctx)
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>on_record(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, values: <span class="kw-2">&amp;</span>span::Record&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+            <span class="self">self</span>.on_record(id, values, ctx);
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>on_enter(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+            <span class="self">self</span>.on_enter(id, ctx);
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>on_exit(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+            <span class="self">self</span>.on_exit(id, ctx);
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>on_close(<span class="kw-2">&amp;</span><span class="self">self</span>, id: span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+            <span class="self">self</span>.on_close(id, ctx);
+        }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnvFilter</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>FromStr <span class="kw">for </span>EnvFilter {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= directive::ParseError;
+
+    <span class="kw">fn </span>from_str(spec: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="self">Self</span>::try_new(spec)
+    }
+}
+
+<span class="kw">impl</span>&lt;S&gt; From&lt;S&gt; <span class="kw">for </span>EnvFilter
+<span class="kw">where
+    </span>S: AsRef&lt;str&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">s</span>)
+    <span class="kw">fn </span>from(s: S) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">EnvFilter</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Builder::default</span>().<span class="ident">from_directives</span>(<span class="ident">std::iter::empty</span>())
+<span class="kw">impl </span>Default <span class="kw">for </span>EnvFilter {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        Builder::default().from_directives(std::iter::empty())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">EnvFilter</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">statics</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">statics</span>.<span class="ident">iter</span>();
-        <span class="kw">let</span> <span class="ident">wrote_statics</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span> <span class="ident">statics</span>.<span class="ident">next</span>() {
-            <span class="ident">fmt::Display::fmt</span>(<span class="ident">next</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
-            <span class="kw">for</span> <span class="ident">directive</span> <span class="kw">in</span> <span class="ident">statics</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="ident">directive</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>EnvFilter {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>statics = <span class="self">self</span>.statics.iter();
+        <span class="kw">let </span>wrote_statics = <span class="kw">if let </span><span class="prelude-val">Some</span>(next) = statics.next() {
+            fmt::Display::fmt(next, f)<span class="question-mark">?</span>;
+            <span class="kw">for </span>directive <span class="kw">in </span>statics {
+                <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, directive)<span class="question-mark">?</span>;
             }
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        };
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>};
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dynamics</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dynamics</span>.<span class="ident">iter</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span> <span class="ident">dynamics</span>.<span class="ident">next</span>() {
-            <span class="kw">if</span> <span class="ident">wrote_statics</span> {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;,&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dynamics = <span class="self">self</span>.dynamics.iter();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(next) = dynamics.next() {
+            <span class="kw">if </span>wrote_statics {
+                f.write_str(<span class="string">&quot;,&quot;</span>)<span class="question-mark">?</span>;
             }
-            <span class="ident">fmt::Display::fmt</span>(<span class="ident">next</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
-            <span class="kw">for</span> <span class="ident">directive</span> <span class="kw">in</span> <span class="ident">dynamics</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="ident">directive</span>)<span class="question-mark">?</span>;
+            fmt::Display::fmt(next, f)<span class="question-mark">?</span>;
+            <span class="kw">for </span>directive <span class="kw">in </span>dynamics {
+                <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, directive)<span class="question-mark">?</span>;
             }
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="comment">// ===== impl FromEnvError =====</span>
+<span class="comment">// ===== impl FromEnvError =====
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">directive::ParseError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FromEnvError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">p</span>: <span class="ident">directive::ParseError</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">kind</span>: <span class="ident">ErrorKind::Parse</span>(<span class="ident">p</span>),
+</span><span class="kw">impl </span>From&lt;directive::ParseError&gt; <span class="kw">for </span>FromEnvError {
+    <span class="kw">fn </span>from(p: directive::ParseError) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind: ErrorKind::Parse(p),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">env::VarError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FromEnvError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">env::VarError</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">kind</span>: <span class="ident">ErrorKind::Env</span>(<span class="ident">v</span>),
+<span class="kw">impl </span>From&lt;env::VarError&gt; <span class="kw">for </span>FromEnvError {
+    <span class="kw">fn </span>from(v: env::VarError) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind: ErrorKind::Env(v),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FromEnvError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">ErrorKind::Parse</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) =&gt; <span class="ident">p</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">ErrorKind::Env</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>FromEnvError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            ErrorKind::Parse(<span class="kw-2">ref </span>p) =&gt; p.fmt(f),
+            ErrorKind::Env(<span class="kw-2">ref </span>e) =&gt; e.fmt(f),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">FromEnvError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">ErrorKind::Parse</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">p</span>),
-            <span class="ident">ErrorKind::Env</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+<span class="kw">impl </span>Error <span class="kw">for </span>FromEnvError {
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Error + <span class="lifetime">&#39;static</span>)&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            ErrorKind::Parse(<span class="kw-2">ref </span>p) =&gt; <span class="prelude-val">Some</span>(p),
+            ErrorKind::Env(<span class="kw-2">ref </span>e) =&gt; <span class="prelude-val">Some</span>(e),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">tracing_core::field::FieldSet</span>;
-    <span class="kw">use</span> <span class="ident">tracing_core</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>tracing_core::field::FieldSet;
+    <span class="kw">use </span>tracing_core::<span class="kw-2">*</span>;
 
-    <span class="kw">struct</span> <span class="ident">NoSubscriber</span>;
-    <span class="kw">impl</span> <span class="ident">Subscriber</span> <span class="kw">for</span> <span class="ident">NoSubscriber</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">subscriber::Interest</span> {
-            <span class="ident">subscriber::Interest::always</span>()
+    <span class="kw">struct </span>NoSubscriber;
+    <span class="kw">impl </span>Subscriber <span class="kw">for </span>NoSubscriber {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>register_callsite(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; subscriber::Interest {
+            subscriber::Interest::always()
         }
-        <span class="kw">fn</span> <span class="ident">new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">span::Id</span> {
-            <span class="ident">span::Id::from_u64</span>(<span class="number">0xDEAD</span>)
+        <span class="kw">fn </span>new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>span::Attributes&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; span::Id {
+            span::Id::from_u64(<span class="number">0xDEAD</span>)
         }
-        <span class="kw">fn</span> <span class="ident">event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
-        <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">_values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
-        <span class="kw">fn</span> <span class="ident">record_follows_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">_follows</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) {}
+        <span class="kw">fn </span>event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: <span class="kw-2">&amp;</span>Event&lt;<span class="lifetime">&#39;_</span>&gt;) {}
+        <span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, _span: <span class="kw-2">&amp;</span>span::Id, _values: <span class="kw-2">&amp;</span>span::Record&lt;<span class="lifetime">&#39;_</span>&gt;) {}
+        <span class="kw">fn </span>record_follows_from(<span class="kw-2">&amp;</span><span class="self">self</span>, _span: <span class="kw-2">&amp;</span>span::Id, _follows: <span class="kw-2">&amp;</span>span::Id) {}
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-            <span class="bool-val">true</span>
-        }
-        <span class="kw">fn</span> <span class="ident">enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) {}
-        <span class="kw">fn</span> <span class="ident">exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) {}
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, _metadata: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+            <span class="bool-val">true
+        </span>}
+        <span class="kw">fn </span>enter(<span class="kw-2">&amp;</span><span class="self">self</span>, _span: <span class="kw-2">&amp;</span>span::Id) {}
+        <span class="kw">fn </span>exit(<span class="kw-2">&amp;</span><span class="self">self</span>, _span: <span class="kw-2">&amp;</span>span::Id) {}
     }
 
-    <span class="kw">struct</span> <span class="ident">Cs</span>;
-    <span class="kw">impl</span> <span class="ident">Callsite</span> <span class="kw">for</span> <span class="ident">Cs</span> {
-        <span class="kw">fn</span> <span class="ident">set_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_interest</span>: <span class="ident">Interest</span>) {}
-        <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">struct </span>Cs;
+    <span class="kw">impl </span>Callsite <span class="kw">for </span>Cs {
+        <span class="kw">fn </span>set_interest(<span class="kw-2">&amp;</span><span class="self">self</span>, _interest: Interest) {}
+        <span class="kw">fn </span>metadata(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt; {
             <span class="macro">unimplemented!</span>()
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">callsite_enabled_no_span_directive</span>() {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">EnvFilter::new</span>(<span class="string">&quot;app=debug&quot;</span>).<span class="ident">with_subscriber</span>(<span class="ident">NoSubscriber</span>);
-        <span class="kw">static</span> <span class="ident">META</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Metadata::new</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>callsite_enabled_no_span_directive() {
+        <span class="kw">let </span>filter = EnvFilter::new(<span class="string">&quot;app=debug&quot;</span>).with_subscriber(NoSubscriber);
+        <span class="kw">static </span>META: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt; = <span class="kw-2">&amp;</span>Metadata::new(
             <span class="string">&quot;mySpan&quot;</span>,
             <span class="string">&quot;app&quot;</span>,
-            <span class="ident">Level::TRACE</span>,
+            Level::TRACE,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
-            <span class="ident">FieldSet::new</span>(<span class="kw-2">&amp;</span>[], <span class="macro">identify_callsite!</span>(<span class="kw-2">&amp;</span><span class="ident">Cs</span>)),
-            <span class="ident">Kind::SPAN</span>,
+            FieldSet::new(<span class="kw-2">&amp;</span>[], <span class="macro">identify_callsite!</span>(<span class="kw-2">&amp;</span>Cs)),
+            Kind::SPAN,
         );
 
-        <span class="kw">let</span> <span class="ident">interest</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">register_callsite</span>(<span class="ident">META</span>);
-        <span class="macro">assert!</span>(<span class="ident">interest</span>.<span class="ident">is_never</span>());
+        <span class="kw">let </span>interest = filter.register_callsite(META);
+        <span class="macro">assert!</span>(interest.is_never());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">callsite_off</span>() {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">EnvFilter::new</span>(<span class="string">&quot;app=off&quot;</span>).<span class="ident">with_subscriber</span>(<span class="ident">NoSubscriber</span>);
-        <span class="kw">static</span> <span class="ident">META</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Metadata::new</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>callsite_off() {
+        <span class="kw">let </span>filter = EnvFilter::new(<span class="string">&quot;app=off&quot;</span>).with_subscriber(NoSubscriber);
+        <span class="kw">static </span>META: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt; = <span class="kw-2">&amp;</span>Metadata::new(
             <span class="string">&quot;mySpan&quot;</span>,
             <span class="string">&quot;app&quot;</span>,
-            <span class="ident">Level::ERROR</span>,
+            Level::ERROR,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
-            <span class="ident">FieldSet::new</span>(<span class="kw-2">&amp;</span>[], <span class="macro">identify_callsite!</span>(<span class="kw-2">&amp;</span><span class="ident">Cs</span>)),
-            <span class="ident">Kind::SPAN</span>,
+            FieldSet::new(<span class="kw-2">&amp;</span>[], <span class="macro">identify_callsite!</span>(<span class="kw-2">&amp;</span>Cs)),
+            Kind::SPAN,
         );
 
-        <span class="kw">let</span> <span class="ident">interest</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">register_callsite</span>(<span class="ident">META</span>);
-        <span class="macro">assert!</span>(<span class="ident">interest</span>.<span class="ident">is_never</span>());
+        <span class="kw">let </span>interest = filter.register_callsite(META);
+        <span class="macro">assert!</span>(interest.is_never());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">callsite_enabled_includes_span_directive</span>() {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">EnvFilter::new</span>(<span class="string">&quot;app[mySpan]=debug&quot;</span>).<span class="ident">with_subscriber</span>(<span class="ident">NoSubscriber</span>);
-        <span class="kw">static</span> <span class="ident">META</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Metadata::new</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>callsite_enabled_includes_span_directive() {
+        <span class="kw">let </span>filter = EnvFilter::new(<span class="string">&quot;app[mySpan]=debug&quot;</span>).with_subscriber(NoSubscriber);
+        <span class="kw">static </span>META: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt; = <span class="kw-2">&amp;</span>Metadata::new(
             <span class="string">&quot;mySpan&quot;</span>,
             <span class="string">&quot;app&quot;</span>,
-            <span class="ident">Level::TRACE</span>,
+            Level::TRACE,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
-            <span class="ident">FieldSet::new</span>(<span class="kw-2">&amp;</span>[], <span class="macro">identify_callsite!</span>(<span class="kw-2">&amp;</span><span class="ident">Cs</span>)),
-            <span class="ident">Kind::SPAN</span>,
+            FieldSet::new(<span class="kw-2">&amp;</span>[], <span class="macro">identify_callsite!</span>(<span class="kw-2">&amp;</span>Cs)),
+            Kind::SPAN,
         );
 
-        <span class="kw">let</span> <span class="ident">interest</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">register_callsite</span>(<span class="ident">META</span>);
-        <span class="macro">assert!</span>(<span class="ident">interest</span>.<span class="ident">is_always</span>());
+        <span class="kw">let </span>interest = filter.register_callsite(META);
+        <span class="macro">assert!</span>(interest.is_always());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">callsite_enabled_includes_span_directive_field</span>() {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span>
-            <span class="ident">EnvFilter::new</span>(<span class="string">&quot;app[mySpan{field=\&quot;value\&quot;}]=debug&quot;</span>).<span class="ident">with_subscriber</span>(<span class="ident">NoSubscriber</span>);
-        <span class="kw">static</span> <span class="ident">META</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Metadata::new</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>callsite_enabled_includes_span_directive_field() {
+        <span class="kw">let </span>filter =
+            EnvFilter::new(<span class="string">&quot;app[mySpan{field=\&quot;value\&quot;}]=debug&quot;</span>).with_subscriber(NoSubscriber);
+        <span class="kw">static </span>META: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt; = <span class="kw-2">&amp;</span>Metadata::new(
             <span class="string">&quot;mySpan&quot;</span>,
             <span class="string">&quot;app&quot;</span>,
-            <span class="ident">Level::TRACE</span>,
+            Level::TRACE,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
-            <span class="ident">FieldSet::new</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;field&quot;</span>], <span class="macro">identify_callsite!</span>(<span class="kw-2">&amp;</span><span class="ident">Cs</span>)),
-            <span class="ident">Kind::SPAN</span>,
+            FieldSet::new(<span class="kw-2">&amp;</span>[<span class="string">&quot;field&quot;</span>], <span class="macro">identify_callsite!</span>(<span class="kw-2">&amp;</span>Cs)),
+            Kind::SPAN,
         );
 
-        <span class="kw">let</span> <span class="ident">interest</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">register_callsite</span>(<span class="ident">META</span>);
-        <span class="macro">assert!</span>(<span class="ident">interest</span>.<span class="ident">is_always</span>());
+        <span class="kw">let </span>interest = filter.register_callsite(META);
+        <span class="macro">assert!</span>(interest.is_always());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">callsite_enabled_includes_span_directive_multiple_fields</span>() {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">EnvFilter::new</span>(<span class="string">&quot;app[mySpan{field=\&quot;value\&quot;,field2=2}]=debug&quot;</span>)
-            .<span class="ident">with_subscriber</span>(<span class="ident">NoSubscriber</span>);
-        <span class="kw">static</span> <span class="ident">META</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Metadata::new</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>callsite_enabled_includes_span_directive_multiple_fields() {
+        <span class="kw">let </span>filter = EnvFilter::new(<span class="string">&quot;app[mySpan{field=\&quot;value\&quot;,field2=2}]=debug&quot;</span>)
+            .with_subscriber(NoSubscriber);
+        <span class="kw">static </span>META: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt; = <span class="kw-2">&amp;</span>Metadata::new(
             <span class="string">&quot;mySpan&quot;</span>,
             <span class="string">&quot;app&quot;</span>,
-            <span class="ident">Level::TRACE</span>,
+            Level::TRACE,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
-            <span class="ident">FieldSet::new</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;field&quot;</span>], <span class="macro">identify_callsite!</span>(<span class="kw-2">&amp;</span><span class="ident">Cs</span>)),
-            <span class="ident">Kind::SPAN</span>,
+            FieldSet::new(<span class="kw-2">&amp;</span>[<span class="string">&quot;field&quot;</span>], <span class="macro">identify_callsite!</span>(<span class="kw-2">&amp;</span>Cs)),
+            Kind::SPAN,
         );
 
-        <span class="kw">let</span> <span class="ident">interest</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">register_callsite</span>(<span class="ident">META</span>);
-        <span class="macro">assert!</span>(<span class="ident">interest</span>.<span class="ident">is_never</span>());
+        <span class="kw">let </span>interest = filter.register_callsite(META);
+        <span class="macro">assert!</span>(interest.is_never());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">roundtrip</span>() {
-        <span class="kw">let</span> <span class="ident">f1</span>: <span class="ident">EnvFilter</span> <span class="op">=</span>
-            <span class="string">&quot;[span1{foo=1}]=error,[span2{bar=2 baz=false}],crate2[{quux=\&quot;quuux\&quot;}]=debug&quot;</span>
-                .<span class="ident">parse</span>()
-                .<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">f2</span>: <span class="ident">EnvFilter</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">f1</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">f1</span>.<span class="ident">statics</span>, <span class="ident">f2</span>.<span class="ident">statics</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">f1</span>.<span class="ident">dynamics</span>, <span class="ident">f2</span>.<span class="ident">dynamics</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>roundtrip() {
+        <span class="kw">let </span>f1: EnvFilter =
+            <span class="string">&quot;[span1{foo=1}]=error,[span2{bar=2 baz=false}],crate2[{quux=\&quot;quuux\&quot;}]=debug&quot;
+                </span>.parse()
+                .unwrap();
+        <span class="kw">let </span>f2: EnvFilter = <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, f1).parse().unwrap();
+        <span class="macro">assert_eq!</span>(f1.statics, f2.statics);
+        <span class="macro">assert_eq!</span>(f1.dynamics, f2.dynamics);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">size_of_filters</span>() {
-        <span class="kw">fn</span> <span class="ident">print_sz</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-            <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">EnvFilter</span><span class="op">&gt;</span>().<span class="ident">expect</span>(<span class="string">&quot;filter should parse&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>size_of_filters() {
+        <span class="kw">fn </span>print_sz(s: <span class="kw-2">&amp;</span>str) {
+            <span class="kw">let </span>filter = s.parse::&lt;EnvFilter&gt;().expect(<span class="string">&quot;filter should parse&quot;</span>);
             <span class="macro">println!</span>(
                 <span class="string">&quot;size_of_val({:?})\n -&gt; {}B&quot;</span>,
-                <span class="ident">s</span>,
-                <span class="ident">std::mem::size_of_val</span>(<span class="kw-2">&amp;</span><span class="ident">filter</span>)
+                s,
+                std::mem::size_of_val(<span class="kw-2">&amp;</span>filter)
             );
         }
 
-        <span class="ident">print_sz</span>(<span class="string">&quot;info&quot;</span>);
+        print_sz(<span class="string">&quot;info&quot;</span>);
 
-        <span class="ident">print_sz</span>(<span class="string">&quot;foo=debug&quot;</span>);
+        print_sz(<span class="string">&quot;foo=debug&quot;</span>);
 
-        <span class="ident">print_sz</span>(
+        print_sz(
             <span class="string">&quot;crate1::mod1=error,crate1::mod2=warn,crate1::mod2::mod3=info,\
             crate2=debug,crate3=trace,crate3::mod2::mod1=off&quot;</span>,
         );
 
-        <span class="ident">print_sz</span>(<span class="string">&quot;[span1{foo=1}]=error,[span2{bar=2 baz=false}],crate2[{quux=\&quot;quuux\&quot;}]=debug&quot;</span>);
+        print_sz(<span class="string">&quot;[span1{foo=1}]=error,[span2{bar=2 baz=false}],crate2[{quux=\&quot;quuux\&quot;}]=debug&quot;</span>);
 
-        <span class="ident">print_sz</span>(
+        print_sz(
             <span class="string">&quot;crate1::mod1=error,crate1::mod2=warn,crate1::mod2::mod3=info,\
             crate2=debug,crate3=trace,crate3::mod2::mod1=off,[span1{foo=1}]=error,\
             [span2{bar=2 baz=false}],crate2[{quux=\&quot;quuux\&quot;}]=debug&quot;</span>,
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_empty_string</span>() {
-        <span class="comment">// There is no corresponding test for [`Builder::parse_lossy`] as failed</span>
-        <span class="comment">// parsing does not produce any observable side effects. If this test fails</span>
-        <span class="comment">// check that [`Builder::parse_lossy`] is behaving correctly as well.</span>
-        <span class="macro">assert!</span>(<span class="ident">EnvFilter::builder</span>().<span class="ident">parse</span>(<span class="string">&quot;&quot;</span>).<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_empty_string() {
+        <span class="comment">// There is no corresponding test for [`Builder::parse_lossy`] as failed
+        // parsing does not produce any observable side effects. If this test fails
+        // check that [`Builder::parse_lossy`] is behaving correctly as well.
+        </span><span class="macro">assert!</span>(EnvFilter::builder().parse(<span class="string">&quot;&quot;</span>).is_ok());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

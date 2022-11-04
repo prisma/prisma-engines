@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/h1/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../hyper/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/h1/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../hyper/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -120,127 +120,127 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">pin::Pin</span>, <span class="ident">time::Duration</span>};
+</pre><pre class="rust"><code><span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+</span><span class="kw">use </span>std::{pin::Pin, time::Duration};
 
-<span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">HeaderMap</span>, <span class="ident">Method</span>};
-<span class="kw">use</span> <span class="ident">httparse::ParserConfig</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::Sleep</span>;
+<span class="kw">use </span>bytes::BytesMut;
+<span class="kw">use </span>http::{HeaderMap, Method};
+<span class="kw">use </span>httparse::ParserConfig;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+</span><span class="kw">use </span>tokio::time::Sleep;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::body::DecodedLength</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto</span>::{<span class="ident">BodyLength</span>, <span class="ident">MessageHead</span>};
+<span class="kw">use </span><span class="kw">crate</span>::body::DecodedLength;
+<span class="kw">use </span><span class="kw">crate</span>::proto::{BodyLength, MessageHead};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::conn::Conn</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::decode::Decoder</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::dispatch::Dispatcher</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::encode</span>::{<span class="ident">EncodedBuf</span>, <span class="ident">Encoder</span>};
-<span class="comment">//TODO: move out of h1::io</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::io::MINIMUM_MAX_BUFFER_SIZE</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::conn::Conn;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::decode::Decoder;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::dispatch::Dispatcher;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::encode::{EncodedBuf, Encoder};
+<span class="comment">//TODO: move out of h1::io
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::io::MINIMUM_MAX_BUFFER_SIZE;
 
-<span class="kw">mod</span> <span class="ident">conn</span>;
-<span class="kw">mod</span> <span class="ident">decode</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">dispatch</span>;
-<span class="kw">mod</span> <span class="ident">encode</span>;
-<span class="kw">mod</span> <span class="ident">io</span>;
-<span class="kw">mod</span> <span class="ident">role</span>;
+<span class="kw">mod </span>conn;
+<span class="kw">mod </span>decode;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>dispatch;
+<span class="kw">mod </span>encode;
+<span class="kw">mod </span>io;
+<span class="kw">mod </span>role;
 
-<span class="macro">cfg_client!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">ClientTransaction</span> <span class="op">=</span> <span class="ident">role::Client</span>;
+<span class="macro">cfg_client! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>ClientTransaction = role::Client;
 }
 
-<span class="macro">cfg_server!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">ServerTransaction</span> <span class="op">=</span> <span class="ident">role::Server</span>;
+<span class="macro">cfg_server! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>ServerTransaction = role::Server;
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">Http1Transaction</span> {
-    <span class="kw">type</span> <span class="ident">Incoming</span>;
-    <span class="kw">type</span> <span class="ident">Outgoing</span>: <span class="ident">Default</span>;
-    <span class="kw">const</span> <span class="ident">LOG</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>, <span class="ident">ctx</span>: <span class="ident">ParseContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Incoming</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="ident">enc</span>: <span class="ident">Encode</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident"><span class="self">Self</span>::Outgoing</span><span class="op">&gt;</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Encoder</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Http1Transaction {
+    <span class="kw">type </span>Incoming;
+    <span class="kw">type </span>Outgoing: Default;
+    <span class="kw">const </span>LOG: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
+    <span class="kw">fn </span>parse(bytes: <span class="kw-2">&amp;mut </span>BytesMut, ctx: ParseContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ParseResult&lt;<span class="self">Self</span>::Incoming&gt;;
+    <span class="kw">fn </span>encode(enc: Encode&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>::Outgoing&gt;, dst: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) -&gt; <span class="kw">crate</span>::Result&lt;Encoder&gt;;
 
-    <span class="kw">fn</span> <span class="ident">on_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::Error</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Outgoing</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>on_error(err: <span class="kw-2">&amp;</span><span class="kw">crate</span>::Error) -&gt; <span class="prelude-ty">Option</span>&lt;MessageHead&lt;<span class="self">Self</span>::Outgoing&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">is_client</span>() -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="ident"><span class="self">Self</span>::is_server</span>()
+    <span class="kw">fn </span>is_client() -&gt; bool {
+        !<span class="self">Self</span>::is_server()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_server</span>() -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="ident"><span class="self">Self</span>::is_client</span>()
+    <span class="kw">fn </span>is_server() -&gt; bool {
+        !<span class="self">Self</span>::is_client()
     }
 
-    <span class="kw">fn</span> <span class="ident">should_error_on_parse_eof</span>() -&gt; <span class="ident">bool</span> {
-        <span class="ident"><span class="self">Self</span>::is_client</span>()
+    <span class="kw">fn </span>should_error_on_parse_eof() -&gt; bool {
+        <span class="self">Self</span>::is_client()
     }
 
-    <span class="kw">fn</span> <span class="ident">should_read_first</span>() -&gt; <span class="ident">bool</span> {
-        <span class="ident"><span class="self">Self</span>::is_server</span>()
+    <span class="kw">fn </span>should_read_first() -&gt; bool {
+        <span class="self">Self</span>::is_server()
     }
 
-    <span class="kw">fn</span> <span class="ident">update_date</span>() {}
+    <span class="kw">fn </span>update_date() {}
 }
 
-<span class="doccomment">/// Result newtype for Http1Transaction::parse.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedMessage</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::error::Parse</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Result newtype for Http1Transaction::parse.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>ParseResult&lt;T&gt; = <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;ParsedMessage&lt;T&gt;&gt;, <span class="kw">crate</span>::error::Parse&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ParsedMessage</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">decode</span>: <span class="ident">DecodedLength</span>,
-    <span class="ident">expect_continue</span>: <span class="ident">bool</span>,
-    <span class="ident">keep_alive</span>: <span class="ident">bool</span>,
-    <span class="ident">wants_upgrade</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ParsedMessage&lt;T&gt; {
+    head: MessageHead&lt;T&gt;,
+    decode: DecodedLength,
+    expect_continue: bool,
+    keep_alive: bool,
+    wants_upgrade: bool,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ParseContext</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">cached_headers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>,
-    <span class="ident">req_method</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>,
-    <span class="ident">h1_parser_config</span>: <span class="ident">ParserConfig</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-    <span class="ident">h1_header_read_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-    <span class="ident">h1_header_read_timeout_fut</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-    <span class="ident">h1_header_read_timeout_running</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">bool</span>,
-    <span class="ident">preserve_header_case</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-    <span class="ident">preserve_header_order</span>: <span class="ident">bool</span>,
-    <span class="ident">h09_responses</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-    <span class="ident">on_informational</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::ffi::OnInformational</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-    <span class="ident">raw_headers</span>: <span class="ident">bool</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ParseContext&lt;<span class="lifetime">&#39;a</span>&gt; {
+    cached_headers: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="prelude-ty">Option</span>&lt;HeaderMap&gt;,
+    req_method: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="prelude-ty">Option</span>&lt;Method&gt;,
+    h1_parser_config: ParserConfig,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+    </span>h1_header_read_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+    </span>h1_header_read_timeout_fut: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="prelude-ty">Option</span>&lt;Pin&lt;Box&lt;Sleep&gt;&gt;&gt;,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+    </span>h1_header_read_timeout_running: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>bool,
+    preserve_header_case: bool,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;ffi&quot;</span>)]
+    </span>preserve_header_order: bool,
+    h09_responses: bool,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;ffi&quot;</span>)]
+    </span>on_informational: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::ffi::OnInformational&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;ffi&quot;</span>)]
+    </span>raw_headers: bool,
 }
 
-<span class="doccomment">/// Passed to Http1Transaction::encode</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BodyLength</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-    <span class="ident">keep_alive</span>: <span class="ident">bool</span>,
-    <span class="ident">req_method</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>,
-    <span class="ident">title_case_headers</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Passed to Http1Transaction::encode
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Encode&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    head: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>MessageHead&lt;T&gt;,
+    body: <span class="prelude-ty">Option</span>&lt;BodyLength&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;server&quot;</span>)]
+    </span>keep_alive: bool,
+    req_method: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="prelude-ty">Option</span>&lt;Method&gt;,
+    title_case_headers: bool,
 }
 
-<span class="doccomment">/// Extra flags that a request &quot;wants&quot;, like expect-continue or upgrades.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Wants</span>(<span class="ident">u8</span>);
+<span class="doccomment">/// Extra flags that a request &quot;wants&quot;, like expect-continue or upgrades.
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">struct </span>Wants(u8);
 
-<span class="kw">impl</span> <span class="ident">Wants</span> {
-    <span class="kw">const</span> <span class="ident">EMPTY</span>: <span class="ident">Wants</span> <span class="op">=</span> <span class="ident">Wants</span>(<span class="number">0b00</span>);
-    <span class="kw">const</span> <span class="ident">EXPECT</span>: <span class="ident">Wants</span> <span class="op">=</span> <span class="ident">Wants</span>(<span class="number">0b01</span>);
-    <span class="kw">const</span> <span class="ident">UPGRADE</span>: <span class="ident">Wants</span> <span class="op">=</span> <span class="ident">Wants</span>(<span class="number">0b10</span>);
+<span class="kw">impl </span>Wants {
+    <span class="kw">const </span>EMPTY: Wants = Wants(<span class="number">0b00</span>);
+    <span class="kw">const </span>EXPECT: Wants = Wants(<span class="number">0b01</span>);
+    <span class="kw">const </span>UPGRADE: Wants = Wants(<span class="number">0b10</span>);
 
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Wants</span>) -&gt; <span class="ident">Wants</span> {
-        <span class="ident">Wants</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">other</span>.<span class="number">0</span>)
+    <span class="attribute">#[must_use]
+    </span><span class="kw">fn </span>add(<span class="self">self</span>, other: Wants) -&gt; Wants {
+        Wants(<span class="self">self</span>.<span class="number">0 </span>| other.<span class="number">0</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Wants</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">other</span>.<span class="number">0</span>) <span class="op">==</span> <span class="ident">other</span>.<span class="number">0</span>
-    }
+    <span class="kw">fn </span>contains(<span class="kw-2">&amp;</span><span class="self">self</span>, other: Wants) -&gt; bool {
+        (<span class="self">self</span>.<span class="number">0 </span>&amp; other.<span class="number">0</span>) == other.<span class="number">0
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

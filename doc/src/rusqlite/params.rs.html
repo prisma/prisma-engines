@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/params.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>params.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/params.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>params.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -356,363 +356,363 @@
 <span id="356">356</span>
 <span id="357">357</span>
 <span id="358">358</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="prelude-ty">Result</span>, <span class="ident">Statement</span>, <span class="ident">ToSql</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{<span class="prelude-ty">Result</span>, Statement, ToSql};
 
-<span class="kw">mod</span> <span class="ident">sealed</span> {
-    <span class="doccomment">/// This trait exists just to ensure that the only impls of `trait Params`</span>
-    <span class="doccomment">/// that are allowed are ones in this crate.</span>
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {}
+<span class="kw">mod </span>sealed {
+    <span class="doccomment">/// This trait exists just to ensure that the only impls of `trait Params`
+    /// that are allowed are ones in this crate.
+    </span><span class="kw">pub trait </span>Sealed {}
 }
-<span class="kw">use</span> <span class="ident">sealed::Sealed</span>;
+<span class="kw">use </span>sealed::Sealed;
 
-<span class="doccomment">/// Trait used for [sets of parameter][params] passed into SQL</span>
-<span class="doccomment">/// statements/queries.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [params]: https://www.sqlite.org/c3ref/bind_blob.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: Currently, this trait can only be implemented inside this crate.</span>
-<span class="doccomment">/// Additionally, it&#39;s methods (which are `doc(hidden)`) should currently not be</span>
-<span class="doccomment">/// considered part of the stable API, although it&#39;s possible they will</span>
-<span class="doccomment">/// stabilize in the future.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Passing parameters to SQLite</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Many functions in this library let you pass parameters to SQLite. Doing this</span>
-<span class="doccomment">/// lets you avoid any risk of SQL injection, and is simpler than escaping</span>
-<span class="doccomment">/// things manually. Aside from deprecated functions and a few helpers, this is</span>
-<span class="doccomment">/// indicated by the function taking a generic argument that implements `Params`</span>
-<span class="doccomment">/// (this trait).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Positional parameters</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For cases where you want to pass a list of parameters where the number of</span>
-<span class="doccomment">/// parameters is known at compile time, this can be done in one of the</span>
-<span class="doccomment">/// following ways:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Using the [`rusqlite::params!`](crate::params!) macro, e.g.</span>
-<span class="doccomment">///   `thing.query(rusqlite::params![1, &quot;foo&quot;, bar])`. This is mostly useful for</span>
-<span class="doccomment">///   heterogeneous lists of parameters, or lists where the number of parameters</span>
-<span class="doccomment">///   exceeds 32.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - For small heterogeneous lists of parameters, they can either be passed as:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     - an array, as in `thing.query([1i32, 2, 3, 4])` or `thing.query([&quot;foo&quot;,</span>
-<span class="doccomment">///       &quot;bar&quot;, &quot;baz&quot;])`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     - a reference to an array of references, as in `thing.query(&amp;[&quot;foo&quot;,</span>
-<span class="doccomment">///       &quot;bar&quot;, &quot;baz&quot;])` or `thing.query(&amp;[&amp;1i32, &amp;2, &amp;3])`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///         (Note: in this case we don&#39;t implement this for slices for coherence</span>
-<span class="doccomment">///         reasons, so it really is only for the &quot;reference to array&quot; types —</span>
-<span class="doccomment">///         hence why the number of parameters must be &lt;= 32 or you need to</span>
-<span class="doccomment">///         reach for `rusqlite::params!`)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     Unfortunately, in the current design it&#39;s not possible to allow this for</span>
-<span class="doccomment">///     references to arrays of non-references (e.g. `&amp;[1i32, 2, 3]`). Code like</span>
-<span class="doccomment">///     this should instead either use `params!`, an array literal, a `&amp;[&amp;dyn</span>
-<span class="doccomment">///     ToSql]` or if none of those work, [`ParamsFromIter`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - As a slice of `ToSql` trait object references, e.g. `&amp;[&amp;dyn ToSql]`. This</span>
-<span class="doccomment">///   is mostly useful for passing parameter lists around as arguments without</span>
-<span class="doccomment">///   having every function take a generic `P: Params`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Example (positional)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use rusqlite::{Connection, Result, params};</span>
-<span class="doccomment">/// fn update_rows(conn: &amp;Connection) -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">///     let mut stmt = conn.prepare(&quot;INSERT INTO test (a, b) VALUES (?, ?)&quot;)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Using `rusqlite::params!`:</span>
-<span class="doccomment">///     stmt.execute(params![1i32, &quot;blah&quot;])?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // array literal — non-references</span>
-<span class="doccomment">///     stmt.execute([2i32, 3i32])?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // array literal — references</span>
-<span class="doccomment">///     stmt.execute([&quot;foo&quot;, &quot;bar&quot;])?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Slice literal, references:</span>
-<span class="doccomment">///     stmt.execute(&amp;[&amp;2i32, &amp;3i32])?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Note: The types behind the references don&#39;t have to be `Sized`</span>
-<span class="doccomment">///     stmt.execute(&amp;[&quot;foo&quot;, &quot;bar&quot;])?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // However, this doesn&#39;t work (see above):</span>
-<span class="doccomment">///     // stmt.execute(&amp;[1i32, 2i32])?;</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Named parameters</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// SQLite lets you name parameters using a number of conventions (&quot;:foo&quot;,</span>
-<span class="doccomment">/// &quot;@foo&quot;, &quot;$foo&quot;). You can pass named parameters in to SQLite using rusqlite</span>
-<span class="doccomment">/// in a few ways:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Using the [`rusqlite::named_params!`](crate::named_params!) macro, as in</span>
-<span class="doccomment">///   `stmt.execute(named_params!{ &quot;:name&quot;: &quot;foo&quot;, &quot;:age&quot;: 99 })`. Similar to</span>
-<span class="doccomment">///   the `params` macro, this is most useful for heterogeneous lists of</span>
-<span class="doccomment">///   parameters, or lists where the number of parameters exceeds 32.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - As a slice of `&amp;[(&amp;str, &amp;dyn ToSql)]`. This is what essentially all of</span>
-<span class="doccomment">///   these boil down to in the end, conceptually at least. In theory you can</span>
-<span class="doccomment">///   pass this as `stmt.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - As array references, similar to the positional params. This looks like</span>
-<span class="doccomment">///   `thing.query(&amp;[(&quot;:foo&quot;, &amp;1i32), (&quot;:bar&quot;, &amp;2i32)])` or</span>
-<span class="doccomment">///   `thing.query(&amp;[(&quot;:foo&quot;, &quot;abc&quot;), (&quot;:bar&quot;, &quot;def&quot;)])`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: Unbound named parameters will be left to the value they previously</span>
-<span class="doccomment">/// were bound with, falling back to `NULL` for parameters which have never been</span>
-<span class="doccomment">/// bound.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Example (named)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use rusqlite::{Connection, Result, named_params};</span>
-<span class="doccomment">/// fn insert(conn: &amp;Connection) -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">///     let mut stmt = conn.prepare(&quot;INSERT INTO test (key, value) VALUES (:key, :value)&quot;)?;</span>
-<span class="doccomment">///     // Using `rusqlite::params!`:</span>
-<span class="doccomment">///     stmt.execute(named_params!{ &quot;:key&quot;: &quot;one&quot;, &quot;:val&quot;: 2 })?;</span>
-<span class="doccomment">///     // Alternatively:</span>
-<span class="doccomment">///     stmt.execute(&amp;[(&quot;:key&quot;, &quot;three&quot;), (&quot;:val&quot;, &quot;four&quot;)])?;</span>
-<span class="doccomment">///     // Or:</span>
-<span class="doccomment">///     stmt.execute(&amp;[(&quot;:key&quot;, &amp;100), (&quot;:val&quot;, &amp;200)])?;</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## No parameters</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You can just use an empty array literal for no params. The</span>
-<span class="doccomment">/// `rusqlite::NO_PARAMS` constant which was so common in previous versions of</span>
-<span class="doccomment">/// this library is no longer needed (and is now deprecated).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Example (no parameters)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use rusqlite::{Connection, Result, params};</span>
-<span class="doccomment">/// fn delete_all_users(conn: &amp;Connection) -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">///     // Just use an empty array (e.g. `[]`) for no params.</span>
-<span class="doccomment">///     conn.execute(&quot;DELETE FROM users&quot;, [])?;</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Dynamic parameter list</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you have a number of parameters which is unknown at compile time (for</span>
-<span class="doccomment">/// example, building a dynamic query at runtime), you have two choices:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Use a `&amp;[&amp;dyn ToSql]`, which is nice if you have one otherwise might be</span>
-<span class="doccomment">///   annoying.</span>
-<span class="doccomment">/// - Use the [`ParamsFromIter`] type. This essentially lets you wrap an</span>
-<span class="doccomment">///   iterator some `T: ToSql` with something that implements `Params`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A lot of the considerations here are similar either way, so you should see</span>
-<span class="doccomment">/// the [`ParamsFromIter`] documentation for more info / examples.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Params</span>: <span class="ident">Sealed</span> {
-    <span class="comment">// XXX not public api, might not need to expose.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Binds the parameters to the statement. It is unlikely calling this</span>
-    <span class="comment">// explicitly will do what you want. Please use `Statement::query` or</span>
-    <span class="comment">// similar directly.</span>
-    <span class="comment">//</span>
-    <span class="comment">// For now, just hide the function in the docs...</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">__bind_in</span>(<span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="doccomment">/// Trait used for [sets of parameter][params] passed into SQL
+/// statements/queries.
+///
+/// [params]: https://www.sqlite.org/c3ref/bind_blob.html
+///
+/// Note: Currently, this trait can only be implemented inside this crate.
+/// Additionally, it&#39;s methods (which are `doc(hidden)`) should currently not be
+/// considered part of the stable API, although it&#39;s possible they will
+/// stabilize in the future.
+///
+/// # Passing parameters to SQLite
+///
+/// Many functions in this library let you pass parameters to SQLite. Doing this
+/// lets you avoid any risk of SQL injection, and is simpler than escaping
+/// things manually. Aside from deprecated functions and a few helpers, this is
+/// indicated by the function taking a generic argument that implements `Params`
+/// (this trait).
+///
+/// ## Positional parameters
+///
+/// For cases where you want to pass a list of parameters where the number of
+/// parameters is known at compile time, this can be done in one of the
+/// following ways:
+///
+/// - Using the [`rusqlite::params!`](crate::params!) macro, e.g.
+///   `thing.query(rusqlite::params![1, &quot;foo&quot;, bar])`. This is mostly useful for
+///   heterogeneous lists of parameters, or lists where the number of parameters
+///   exceeds 32.
+///
+/// - For small heterogeneous lists of parameters, they can either be passed as:
+///
+///     - an array, as in `thing.query([1i32, 2, 3, 4])` or `thing.query([&quot;foo&quot;,
+///       &quot;bar&quot;, &quot;baz&quot;])`.
+///
+///     - a reference to an array of references, as in `thing.query(&amp;[&quot;foo&quot;,
+///       &quot;bar&quot;, &quot;baz&quot;])` or `thing.query(&amp;[&amp;1i32, &amp;2, &amp;3])`.
+///
+///         (Note: in this case we don&#39;t implement this for slices for coherence
+///         reasons, so it really is only for the &quot;reference to array&quot; types —
+///         hence why the number of parameters must be &lt;= 32 or you need to
+///         reach for `rusqlite::params!`)
+///
+///     Unfortunately, in the current design it&#39;s not possible to allow this for
+///     references to arrays of non-references (e.g. `&amp;[1i32, 2, 3]`). Code like
+///     this should instead either use `params!`, an array literal, a `&amp;[&amp;dyn
+///     ToSql]` or if none of those work, [`ParamsFromIter`].
+///
+/// - As a slice of `ToSql` trait object references, e.g. `&amp;[&amp;dyn ToSql]`. This
+///   is mostly useful for passing parameter lists around as arguments without
+///   having every function take a generic `P: Params`.
+///
+/// ### Example (positional)
+///
+/// ```rust,no_run
+/// # use rusqlite::{Connection, Result, params};
+/// fn update_rows(conn: &amp;Connection) -&gt; Result&lt;()&gt; {
+///     let mut stmt = conn.prepare(&quot;INSERT INTO test (a, b) VALUES (?, ?)&quot;)?;
+///
+///     // Using `rusqlite::params!`:
+///     stmt.execute(params![1i32, &quot;blah&quot;])?;
+///
+///     // array literal — non-references
+///     stmt.execute([2i32, 3i32])?;
+///
+///     // array literal — references
+///     stmt.execute([&quot;foo&quot;, &quot;bar&quot;])?;
+///
+///     // Slice literal, references:
+///     stmt.execute(&amp;[&amp;2i32, &amp;3i32])?;
+///
+///     // Note: The types behind the references don&#39;t have to be `Sized`
+///     stmt.execute(&amp;[&quot;foo&quot;, &quot;bar&quot;])?;
+///
+///     // However, this doesn&#39;t work (see above):
+///     // stmt.execute(&amp;[1i32, 2i32])?;
+///     Ok(())
+/// }
+/// ```
+///
+/// ## Named parameters
+///
+/// SQLite lets you name parameters using a number of conventions (&quot;:foo&quot;,
+/// &quot;@foo&quot;, &quot;$foo&quot;). You can pass named parameters in to SQLite using rusqlite
+/// in a few ways:
+///
+/// - Using the [`rusqlite::named_params!`](crate::named_params!) macro, as in
+///   `stmt.execute(named_params!{ &quot;:name&quot;: &quot;foo&quot;, &quot;:age&quot;: 99 })`. Similar to
+///   the `params` macro, this is most useful for heterogeneous lists of
+///   parameters, or lists where the number of parameters exceeds 32.
+///
+/// - As a slice of `&amp;[(&amp;str, &amp;dyn ToSql)]`. This is what essentially all of
+///   these boil down to in the end, conceptually at least. In theory you can
+///   pass this as `stmt.
+///
+/// - As array references, similar to the positional params. This looks like
+///   `thing.query(&amp;[(&quot;:foo&quot;, &amp;1i32), (&quot;:bar&quot;, &amp;2i32)])` or
+///   `thing.query(&amp;[(&quot;:foo&quot;, &quot;abc&quot;), (&quot;:bar&quot;, &quot;def&quot;)])`.
+///
+/// Note: Unbound named parameters will be left to the value they previously
+/// were bound with, falling back to `NULL` for parameters which have never been
+/// bound.
+///
+/// ### Example (named)
+///
+/// ```rust,no_run
+/// # use rusqlite::{Connection, Result, named_params};
+/// fn insert(conn: &amp;Connection) -&gt; Result&lt;()&gt; {
+///     let mut stmt = conn.prepare(&quot;INSERT INTO test (key, value) VALUES (:key, :value)&quot;)?;
+///     // Using `rusqlite::params!`:
+///     stmt.execute(named_params!{ &quot;:key&quot;: &quot;one&quot;, &quot;:val&quot;: 2 })?;
+///     // Alternatively:
+///     stmt.execute(&amp;[(&quot;:key&quot;, &quot;three&quot;), (&quot;:val&quot;, &quot;four&quot;)])?;
+///     // Or:
+///     stmt.execute(&amp;[(&quot;:key&quot;, &amp;100), (&quot;:val&quot;, &amp;200)])?;
+///     Ok(())
+/// }
+/// ```
+///
+/// ## No parameters
+///
+/// You can just use an empty array literal for no params. The
+/// `rusqlite::NO_PARAMS` constant which was so common in previous versions of
+/// this library is no longer needed (and is now deprecated).
+///
+/// ### Example (no parameters)
+///
+/// ```rust,no_run
+/// # use rusqlite::{Connection, Result, params};
+/// fn delete_all_users(conn: &amp;Connection) -&gt; Result&lt;()&gt; {
+///     // Just use an empty array (e.g. `[]`) for no params.
+///     conn.execute(&quot;DELETE FROM users&quot;, [])?;
+///     Ok(())
+/// }
+/// ```
+///
+/// ## Dynamic parameter list
+///
+/// If you have a number of parameters which is unknown at compile time (for
+/// example, building a dynamic query at runtime), you have two choices:
+///
+/// - Use a `&amp;[&amp;dyn ToSql]`, which is nice if you have one otherwise might be
+///   annoying.
+/// - Use the [`ParamsFromIter`] type. This essentially lets you wrap an
+///   iterator some `T: ToSql` with something that implements `Params`.
+///
+/// A lot of the considerations here are similar either way, so you should see
+/// the [`ParamsFromIter`] documentation for more info / examples.
+</span><span class="kw">pub trait </span>Params: Sealed {
+    <span class="comment">// XXX not public api, might not need to expose.
+    //
+    // Binds the parameters to the statement. It is unlikely calling this
+    // explicitly will do what you want. Please use `Statement::query` or
+    // similar directly.
+    //
+    // For now, just hide the function in the docs...
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>__bind_in(<span class="self">self</span>, stmt: <span class="kw-2">&amp;mut </span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
 }
 
-<span class="comment">// Explicitly impl for empty array. Critically, for `conn.execute([])` to be</span>
-<span class="comment">// unambiguous, this must be the *only* implementation for an empty array. This</span>
-<span class="comment">// avoids `NO_PARAMS` being a necessary part of the API.</span>
-<span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> [<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>; <span class="number">0</span>] {}
-<span class="kw">impl</span> <span class="ident">Params</span> <span class="kw">for</span> [<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>; <span class="number">0</span>] {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">__bind_in</span>(<span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="comment">// Note: Can&#39;t just return `Ok(())` — `Statement::bind_parameters`</span>
-        <span class="comment">// checks that the right number of params were passed too.</span>
-        <span class="comment">// TODO: we should have tests for `Error::InvalidParameterCount`...</span>
-        <span class="ident">stmt</span>.<span class="ident">bind_parameters</span>(<span class="kw-2">&amp;</span>[] <span class="kw">as</span> <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>])
+<span class="comment">// Explicitly impl for empty array. Critically, for `conn.execute([])` to be
+// unambiguous, this must be the *only* implementation for an empty array. This
+// avoids `NO_PARAMS` being a necessary part of the API.
+</span><span class="kw">impl </span>Sealed <span class="kw">for </span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql; <span class="number">0</span>] {}
+<span class="kw">impl </span>Params <span class="kw">for </span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql; <span class="number">0</span>] {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>__bind_in(<span class="self">self</span>, stmt: <span class="kw-2">&amp;mut </span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="comment">// Note: Can&#39;t just return `Ok(())` — `Statement::bind_parameters`
+        // checks that the right number of params were passed too.
+        // TODO: we should have tests for `Error::InvalidParameterCount`...
+        </span>stmt.bind_parameters(<span class="kw-2">&amp;</span>[] <span class="kw">as </span><span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql])
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] {}
-<span class="kw">impl</span> <span class="ident">Params</span> <span class="kw">for</span> <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">__bind_in</span>(<span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">stmt</span>.<span class="ident">bind_parameters</span>(<span class="self">self</span>)
+<span class="kw">impl </span>Sealed <span class="kw">for </span><span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] {}
+<span class="kw">impl </span>Params <span class="kw">for </span><span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>__bind_in(<span class="self">self</span>, stmt: <span class="kw-2">&amp;mut </span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        stmt.bind_parameters(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)] {}
-<span class="kw">impl</span> <span class="ident">Params</span> <span class="kw">for</span> <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)] {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">__bind_in</span>(<span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">stmt</span>.<span class="ident">bind_parameters_named</span>(<span class="self">self</span>)
+<span class="kw">impl </span>Sealed <span class="kw">for </span><span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql)] {}
+<span class="kw">impl </span>Params <span class="kw">for </span><span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql)] {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>__bind_in(<span class="self">self</span>, stmt: <span class="kw-2">&amp;mut </span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        stmt.bind_parameters_named(<span class="self">self</span>)
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_for_array_ref</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">N</span>:<span class="ident">literal</span>)<span class="op">+</span>) =&gt; {$(
-        <span class="comment">// These are already generic, and there&#39;s a shedload of them, so lets</span>
-        <span class="comment">// avoid the compile time hit from making them all inline for now.</span>
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">T</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">N</span>] {}
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Params</span> <span class="kw">for</span> <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">T</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">N</span>] {
-            <span class="kw">fn</span> <span class="ident">__bind_in</span>(<span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-                <span class="ident">stmt</span>.<span class="ident">bind_parameters</span>(<span class="self">self</span>)
+<span class="macro">macro_rules! </span>impl_for_array_ref {
+    ($(<span class="macro-nonterminal">$N</span>:literal)+) =&gt; {$(
+        <span class="comment">// These are already generic, and there&#39;s a shedload of them, so lets
+        // avoid the compile time hit from making them all inline for now.
+        </span><span class="kw">impl</span>&lt;T: ToSql + <span class="question-mark">?</span>Sized&gt; Sealed <span class="kw">for </span><span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>T; <span class="macro-nonterminal">$N</span>] {}
+        <span class="kw">impl</span>&lt;T: ToSql + <span class="question-mark">?</span>Sized&gt; Params <span class="kw">for </span><span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>T; <span class="macro-nonterminal">$N</span>] {
+            <span class="kw">fn </span>__bind_in(<span class="self">self</span>, stmt: <span class="kw-2">&amp;mut </span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+                stmt.bind_parameters(<span class="self">self</span>)
             }
         }
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">N</span>] {}
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Params</span> <span class="kw">for</span> <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">N</span>] {
-            <span class="kw">fn</span> <span class="ident">__bind_in</span>(<span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-                <span class="ident">stmt</span>.<span class="ident">bind_parameters_named</span>(<span class="self">self</span>)
+        <span class="kw">impl</span>&lt;T: ToSql + <span class="question-mark">?</span>Sized&gt; Sealed <span class="kw">for </span><span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>T); <span class="macro-nonterminal">$N</span>] {}
+        <span class="kw">impl</span>&lt;T: ToSql + <span class="question-mark">?</span>Sized&gt; Params <span class="kw">for </span><span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>T); <span class="macro-nonterminal">$N</span>] {
+            <span class="kw">fn </span>__bind_in(<span class="self">self</span>, stmt: <span class="kw-2">&amp;mut </span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+                stmt.bind_parameters_named(<span class="self">self</span>)
             }
         }
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span><span class="op">&gt;</span> <span class="ident">Sealed</span> <span class="kw">for</span> [<span class="ident">T</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">N</span>] {}
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span><span class="op">&gt;</span> <span class="ident">Params</span> <span class="kw">for</span> [<span class="ident">T</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">N</span>] {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">__bind_in</span>(<span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-                <span class="ident">stmt</span>.<span class="ident">bind_parameters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)
+        <span class="kw">impl</span>&lt;T: ToSql&gt; Sealed <span class="kw">for </span>[T; <span class="macro-nonterminal">$N</span>] {}
+        <span class="kw">impl</span>&lt;T: ToSql&gt; Params <span class="kw">for </span>[T; <span class="macro-nonterminal">$N</span>] {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>__bind_in(<span class="self">self</span>, stmt: <span class="kw-2">&amp;mut </span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+                stmt.bind_parameters(<span class="kw-2">&amp;</span><span class="self">self</span>)
             }
         }
-    )<span class="op">+</span>};
+    )+};
 }
 
-<span class="comment">// Following libstd/libcore&#39;s (old) lead, implement this for arrays up to `[_;</span>
-<span class="comment">// 32]`. Note `[_; 0]` is intentionally omitted for coherence reasons, see the</span>
-<span class="comment">// note above the impl of `[&amp;dyn ToSql; 0]` for more information.</span>
-<span class="macro">impl_for_array_ref!</span>(
-    <span class="number">1</span> <span class="number">2</span> <span class="number">3</span> <span class="number">4</span> <span class="number">5</span> <span class="number">6</span> <span class="number">7</span> <span class="number">8</span> <span class="number">9</span> <span class="number">10</span> <span class="number">11</span> <span class="number">12</span> <span class="number">13</span> <span class="number">14</span> <span class="number">15</span> <span class="number">16</span> <span class="number">17</span>
-    <span class="number">18</span> <span class="number">19</span> <span class="number">20</span> <span class="number">21</span> <span class="number">22</span> <span class="number">23</span> <span class="number">24</span> <span class="number">25</span> <span class="number">26</span> <span class="number">27</span> <span class="number">29</span> <span class="number">30</span> <span class="number">31</span> <span class="number">32</span>
-);
+<span class="comment">// Following libstd/libcore&#39;s (old) lead, implement this for arrays up to `[_;
+// 32]`. Note `[_; 0]` is intentionally omitted for coherence reasons, see the
+// note above the impl of `[&amp;dyn ToSql; 0]` for more information.
+</span><span class="macro">impl_for_array_ref!</span>(
+    <span class="number">1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+    18 19 20 21 22 23 24 25 26 27 29 30 31 32
+</span>);
 
-<span class="doccomment">/// Adapter type which allows any iterator over [`ToSql`] values to implement</span>
-<span class="doccomment">/// [`Params`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct is created by the [`params_from_iter`] function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This can be useful if you have something like an `&amp;[String]` (of unknown</span>
-<span class="doccomment">/// length), and you want to use them with an API that wants something</span>
-<span class="doccomment">/// implementing `Params`. This way, you can avoid having to allocate storage</span>
-<span class="doccomment">/// for something like a `&amp;[&amp;dyn ToSql]`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This essentially is only ever actually needed when dynamically generating</span>
-<span class="doccomment">/// SQL — static SQL (by definition) has the number of parameters known</span>
-<span class="doccomment">/// statically. As dynamically generating SQL is itself pretty advanced, this</span>
-<span class="doccomment">/// API is itself for advanced use cases (See &quot;Realistic use case&quot; in the</span>
-<span class="doccomment">/// examples).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Basic usage</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use rusqlite::{Connection, Result, params_from_iter};</span>
-<span class="doccomment">/// use std::collections::BTreeSet;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn query(conn: &amp;Connection, ids: &amp;BTreeSet&lt;String&gt;) -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">///     assert_eq!(ids.len(), 3, &quot;Unrealistic sample code&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     let mut stmt = conn.prepare(&quot;SELECT * FROM users WHERE id IN (?, ?, ?)&quot;)?;</span>
-<span class="doccomment">///     let _rows = stmt.query(params_from_iter(ids.iter()))?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // use _rows...</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Realistic use case</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Here&#39;s how you&#39;d use `ParamsFromIter` to call [`Statement::exists`] with a</span>
-<span class="doccomment">/// dynamic number of parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use rusqlite::{Connection, Result};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// pub fn any_active_users(conn: &amp;Connection, usernames: &amp;[String]) -&gt; Result&lt;bool&gt; {</span>
-<span class="doccomment">///     if usernames.is_empty() {</span>
-<span class="doccomment">///         return Ok(false);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Note: `repeat_vars` never returns anything attacker-controlled, so</span>
-<span class="doccomment">///     // it&#39;s fine to use it in a dynamically-built SQL string.</span>
-<span class="doccomment">///     let vars = repeat_vars(usernames.len());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     let sql = format!(</span>
-<span class="doccomment">///         // In practice this would probably be better as an `EXISTS` query.</span>
-<span class="doccomment">///         &quot;SELECT 1 FROM user WHERE is_active AND name IN ({}) LIMIT 1&quot;,</span>
-<span class="doccomment">///         vars,</span>
-<span class="doccomment">///     );</span>
-<span class="doccomment">///     let mut stmt = conn.prepare(&amp;sql)?;</span>
-<span class="doccomment">///     stmt.exists(rusqlite::params_from_iter(usernames))</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Helper function to return a comma-separated sequence of `?`.</span>
-<span class="doccomment">/// // - `repeat_vars(0) =&gt; panic!(...)`</span>
-<span class="doccomment">/// // - `repeat_vars(1) =&gt; &quot;?&quot;`</span>
-<span class="doccomment">/// // - `repeat_vars(2) =&gt; &quot;?,?&quot;`</span>
-<span class="doccomment">/// // - `repeat_vars(3) =&gt; &quot;?,?,?&quot;`</span>
-<span class="doccomment">/// // - ...</span>
-<span class="doccomment">/// fn repeat_vars(count: usize) -&gt; String {</span>
-<span class="doccomment">///     assert_ne!(count, 0);</span>
-<span class="doccomment">///     let mut s = &quot;?,&quot;.repeat(count);</span>
-<span class="doccomment">///     // Remove trailing comma</span>
-<span class="doccomment">///     s.pop();</span>
-<span class="doccomment">///     s</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// That is fairly complex, and even so would need even more work to be fully</span>
-<span class="doccomment">/// production-ready:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - production code should ensure `usernames` isn&#39;t so large that it will</span>
-<span class="doccomment">///   surpass [`conn.limit(Limit::SQLITE_LIMIT_VARIABLE_NUMBER)`][limits]),</span>
-<span class="doccomment">///   chunking if too large. (Note that the limits api requires rusqlite to have</span>
-<span class="doccomment">///   the &quot;limits&quot; feature).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - `repeat_vars` can be implemented in a way that avoids needing to allocate</span>
-<span class="doccomment">///   a String.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Etc...</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [limits]: crate::Connection::limit</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This complexity reflects the fact that `ParamsFromIter` is mainly intended</span>
-<span class="doccomment">/// for advanced use cases — most of the time you should know how many</span>
-<span class="doccomment">/// parameters you have statically (and if you don&#39;t, you&#39;re either doing</span>
-<span class="doccomment">/// something tricky, or should take a moment to think about the design).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParamsFromIter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">I</span>);
+<span class="doccomment">/// Adapter type which allows any iterator over [`ToSql`] values to implement
+/// [`Params`].
+///
+/// This struct is created by the [`params_from_iter`] function.
+///
+/// This can be useful if you have something like an `&amp;[String]` (of unknown
+/// length), and you want to use them with an API that wants something
+/// implementing `Params`. This way, you can avoid having to allocate storage
+/// for something like a `&amp;[&amp;dyn ToSql]`.
+///
+/// This essentially is only ever actually needed when dynamically generating
+/// SQL — static SQL (by definition) has the number of parameters known
+/// statically. As dynamically generating SQL is itself pretty advanced, this
+/// API is itself for advanced use cases (See &quot;Realistic use case&quot; in the
+/// examples).
+///
+/// # Example
+///
+/// ## Basic usage
+///
+/// ```rust,no_run
+/// use rusqlite::{Connection, Result, params_from_iter};
+/// use std::collections::BTreeSet;
+///
+/// fn query(conn: &amp;Connection, ids: &amp;BTreeSet&lt;String&gt;) -&gt; Result&lt;()&gt; {
+///     assert_eq!(ids.len(), 3, &quot;Unrealistic sample code&quot;);
+///
+///     let mut stmt = conn.prepare(&quot;SELECT * FROM users WHERE id IN (?, ?, ?)&quot;)?;
+///     let _rows = stmt.query(params_from_iter(ids.iter()))?;
+///
+///     // use _rows...
+///     Ok(())
+/// }
+/// ```
+///
+/// ## Realistic use case
+///
+/// Here&#39;s how you&#39;d use `ParamsFromIter` to call [`Statement::exists`] with a
+/// dynamic number of parameters.
+///
+/// ```rust,no_run
+/// use rusqlite::{Connection, Result};
+///
+/// pub fn any_active_users(conn: &amp;Connection, usernames: &amp;[String]) -&gt; Result&lt;bool&gt; {
+///     if usernames.is_empty() {
+///         return Ok(false);
+///     }
+///
+///     // Note: `repeat_vars` never returns anything attacker-controlled, so
+///     // it&#39;s fine to use it in a dynamically-built SQL string.
+///     let vars = repeat_vars(usernames.len());
+///
+///     let sql = format!(
+///         // In practice this would probably be better as an `EXISTS` query.
+///         &quot;SELECT 1 FROM user WHERE is_active AND name IN ({}) LIMIT 1&quot;,
+///         vars,
+///     );
+///     let mut stmt = conn.prepare(&amp;sql)?;
+///     stmt.exists(rusqlite::params_from_iter(usernames))
+/// }
+///
+/// // Helper function to return a comma-separated sequence of `?`.
+/// // - `repeat_vars(0) =&gt; panic!(...)`
+/// // - `repeat_vars(1) =&gt; &quot;?&quot;`
+/// // - `repeat_vars(2) =&gt; &quot;?,?&quot;`
+/// // - `repeat_vars(3) =&gt; &quot;?,?,?&quot;`
+/// // - ...
+/// fn repeat_vars(count: usize) -&gt; String {
+///     assert_ne!(count, 0);
+///     let mut s = &quot;?,&quot;.repeat(count);
+///     // Remove trailing comma
+///     s.pop();
+///     s
+/// }
+/// ```
+///
+/// That is fairly complex, and even so would need even more work to be fully
+/// production-ready:
+///
+/// - production code should ensure `usernames` isn&#39;t so large that it will
+///   surpass [`conn.limit(Limit::SQLITE_LIMIT_VARIABLE_NUMBER)`][limits]),
+///   chunking if too large. (Note that the limits api requires rusqlite to have
+///   the &quot;limits&quot; feature).
+///
+/// - `repeat_vars` can be implemented in a way that avoids needing to allocate
+///   a String.
+///
+/// - Etc...
+///
+/// [limits]: crate::Connection::limit
+///
+/// This complexity reflects the fact that `ParamsFromIter` is mainly intended
+/// for advanced use cases — most of the time you should know how many
+/// parameters you have statically (and if you don&#39;t, you&#39;re either doing
+/// something tricky, or should take a moment to think about the design).
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>ParamsFromIter&lt;I&gt;(I);
 
-<span class="doccomment">/// Constructor function for a [`ParamsFromIter`]. See its documentation for</span>
-<span class="doccomment">/// more.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">params_from_iter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="ident">ParamsFromIter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
-    <span class="ident">I::Item</span>: <span class="ident">ToSql</span>,
+<span class="doccomment">/// Constructor function for a [`ParamsFromIter`]. See its documentation for
+/// more.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>params_from_iter&lt;I&gt;(iter: I) -&gt; ParamsFromIter&lt;I&gt;
+<span class="kw">where
+    </span>I: IntoIterator,
+    I::Item: ToSql,
 {
-    <span class="ident">ParamsFromIter</span>(<span class="ident">iter</span>)
+    ParamsFromIter(iter)
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="ident">ParamsFromIter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
-    <span class="ident">I::Item</span>: <span class="ident">ToSql</span>,
+<span class="kw">impl</span>&lt;I&gt; Sealed <span class="kw">for </span>ParamsFromIter&lt;I&gt;
+<span class="kw">where
+    </span>I: IntoIterator,
+    I::Item: ToSql,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Params</span> <span class="kw">for</span> <span class="ident">ParamsFromIter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
-    <span class="ident">I::Item</span>: <span class="ident">ToSql</span>,
+<span class="kw">impl</span>&lt;I&gt; Params <span class="kw">for </span>ParamsFromIter&lt;I&gt;
+<span class="kw">where
+    </span>I: IntoIterator,
+    I::Item: ToSql,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">__bind_in</span>(<span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">stmt</span>.<span class="ident">bind_parameters</span>(<span class="self">self</span>.<span class="number">0</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>__bind_in(<span class="self">self</span>, stmt: <span class="kw-2">&amp;mut </span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        stmt.bind_parameters(<span class="self">self</span>.<span class="number">0</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

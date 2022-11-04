@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/filter/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/filter/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -279,286 +279,286 @@
 <span id="279">279</span>
 <span id="280">280</span>
 <span id="281">281</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Filtering types to select records from the database</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The creation of the types should be done with</span>
-<span class="doccomment">//! [ScalarCompare](/query-connector/trait.ScalarCompare.html) and</span>
-<span class="doccomment">//! [RelationCompare](/query-connector/trait.RelationCompare.html).</span>
-<span class="doccomment">//! [CompositeCompare](/query-connector/trait.RelationCompare.html).</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Filtering types to select records from the database
+//!
+//! The creation of the types should be done with
+//! [ScalarCompare](/query-connector/trait.ScalarCompare.html) and
+//! [RelationCompare](/query-connector/trait.RelationCompare.html).
+//! [CompositeCompare](/query-connector/trait.RelationCompare.html).
 
-<span class="kw">mod</span> <span class="ident">composite</span>;
-<span class="kw">mod</span> <span class="ident">into_filter</span>;
-<span class="kw">mod</span> <span class="ident">json</span>;
-<span class="kw">mod</span> <span class="ident">list</span>;
-<span class="kw">mod</span> <span class="ident">relation</span>;
-<span class="kw">mod</span> <span class="ident">scalar</span>;
+</span><span class="kw">mod </span>composite;
+<span class="kw">mod </span>into_filter;
+<span class="kw">mod </span>json;
+<span class="kw">mod </span>list;
+<span class="kw">mod </span>relation;
+<span class="kw">mod </span>scalar;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">composite</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">into_filter</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">json</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">list</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::ScalarFieldRef</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">relation</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">scalar</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>composite::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>into_filter::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>json::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>list::<span class="kw-2">*</span>;
+<span class="kw">use </span>prisma_models::ScalarFieldRef;
+<span class="kw">pub use </span>relation::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>scalar::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Filter</span> {
-    <span class="ident">And</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>),
-    <span class="ident">Or</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>),
-    <span class="ident">Not</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>),
-    <span class="ident">Scalar</span>(<span class="ident">ScalarFilter</span>),
-    <span class="ident">ScalarList</span>(<span class="ident">ScalarListFilter</span>),
-    <span class="ident">OneRelationIsNull</span>(<span class="ident">OneRelationIsNullFilter</span>),
-    <span class="ident">Relation</span>(<span class="ident">RelationFilter</span>),
-    <span class="ident">Composite</span>(<span class="ident">CompositeFilter</span>),
-    <span class="ident">BoolFilter</span>(<span class="ident">bool</span>),
-    <span class="ident">Aggregation</span>(<span class="ident">AggregationFilter</span>),
-    <span class="ident">Empty</span>,
+<span class="attribute">#[derive(Debug, Clone, Eq, Hash, PartialEq)]
+</span><span class="kw">pub enum </span>Filter {
+    And(Vec&lt;Filter&gt;),
+    Or(Vec&lt;Filter&gt;),
+    Not(Vec&lt;Filter&gt;),
+    Scalar(ScalarFilter),
+    ScalarList(ScalarListFilter),
+    OneRelationIsNull(OneRelationIsNullFilter),
+    Relation(RelationFilter),
+    Composite(CompositeFilter),
+    BoolFilter(bool),
+    Aggregation(AggregationFilter),
+    Empty,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AggregationFilter</span> {
-    <span class="ident">Count</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>),
-    <span class="ident">Average</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>),
-    <span class="ident">Sum</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>),
-    <span class="ident">Min</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>),
-    <span class="ident">Max</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Clone, Eq, Hash, PartialEq)]
+</span><span class="kw">pub enum </span>AggregationFilter {
+    Count(Box&lt;Filter&gt;),
+    Average(Box&lt;Filter&gt;),
+    Sum(Box&lt;Filter&gt;),
+    Min(Box&lt;Filter&gt;),
+    Max(Box&lt;Filter&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">AggregationFilter</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Filter</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AggregationFilter::Count</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>,
-            <span class="ident">AggregationFilter::Average</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>,
-            <span class="ident">AggregationFilter::Sum</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>,
-            <span class="ident">AggregationFilter::Min</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>,
-            <span class="ident">AggregationFilter::Max</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>,
+<span class="kw">impl </span>AggregationFilter {
+    <span class="kw">pub fn </span>filter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Filter {
+        <span class="kw">match </span><span class="self">self </span>{
+            AggregationFilter::Count(f) =&gt; f,
+            AggregationFilter::Average(f) =&gt; f,
+            AggregationFilter::Sum(f) =&gt; f,
+            AggregationFilter::Min(f) =&gt; f,
+            AggregationFilter::Max(f) =&gt; f,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Filter</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and</span>(<span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Filter::And</span>(<span class="ident">filters</span>)
+<span class="kw">impl </span>Filter {
+    <span class="kw">pub fn </span>and(filters: Vec&lt;Filter&gt;) -&gt; <span class="self">Self </span>{
+        Filter::And(filters)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or</span>(<span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Filter::Or</span>(<span class="ident">filters</span>)
+    <span class="kw">pub fn </span>or(filters: Vec&lt;Filter&gt;) -&gt; <span class="self">Self </span>{
+        Filter::Or(filters)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">not</span>(<span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Filter::Not</span>(<span class="ident">filters</span>)
+    <span class="kw">pub fn </span>not(filters: Vec&lt;Filter&gt;) -&gt; <span class="self">Self </span>{
+        Filter::Not(filters)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Filter::Empty</span>
+    <span class="kw">pub fn </span>empty() -&gt; <span class="self">Self </span>{
+        Filter::Empty
     }
 
-    <span class="doccomment">/// Returns the size of the topmost filter elements (does not recursively compute the size).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::And</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">len</span>(),
-            <span class="ident"><span class="self">Self</span>::Or</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">len</span>(),
-            <span class="ident"><span class="self">Self</span>::Not</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">len</span>(),
-            <span class="ident"><span class="self">Self</span>::Empty</span> =&gt; <span class="number">0</span>,
-            <span class="kw">_</span> =&gt; <span class="number">1</span>,
+    <span class="doccomment">/// Returns the size of the topmost filter elements (does not recursively compute the size).
+    </span><span class="kw">pub fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::And(v) =&gt; v.len(),
+            <span class="self">Self</span>::Or(v) =&gt; v.len(),
+            <span class="self">Self</span>::Not(v) =&gt; v.len(),
+            <span class="self">Self</span>::Empty =&gt; <span class="number">0</span>,
+            <span class="kw">_ </span>=&gt; <span class="number">1</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">should_batch</span>(<span class="ident">chunk_size</span>),
-            <span class="ident"><span class="self">Self</span>::And</span>(<span class="ident">filters</span>) =&gt; <span class="ident">filters</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">should_batch</span>(<span class="ident">chunk_size</span>)),
-            <span class="ident"><span class="self">Self</span>::Or</span>(<span class="ident">filters</span>) =&gt; <span class="ident">filters</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">should_batch</span>(<span class="ident">chunk_size</span>)),
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">pub fn </span>should_batch(<span class="kw-2">&amp;</span><span class="self">self</span>, chunk_size: usize) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Scalar(sf) =&gt; sf.should_batch(chunk_size),
+            <span class="self">Self</span>::And(filters) =&gt; filters.iter().any(|f| f.should_batch(chunk_size)),
+            <span class="self">Self</span>::Or(filters) =&gt; filters.iter().any(|f| f.should_batch(chunk_size)),
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">can_batch</span>(),
-            <span class="ident"><span class="self">Self</span>::And</span>(<span class="ident">filters</span>) =&gt; <span class="ident">filters</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">can_batch</span>()),
-            <span class="ident"><span class="self">Self</span>::Or</span>(<span class="ident">filters</span>) =&gt; <span class="ident">filters</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">can_batch</span>()),
-            <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
+    <span class="kw">pub fn </span>can_batch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Scalar(sf) =&gt; sf.can_batch(),
+            <span class="self">Self</span>::And(filters) =&gt; filters.iter().all(|f| f.can_batch()),
+            <span class="self">Self</span>::Or(filters) =&gt; filters.iter().all(|f| f.can_batch()),
+            <span class="kw">_ </span>=&gt; <span class="bool-val">true</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">batched</span>(<span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">split_longest</span>(<span class="kw-2">mut</span> <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFilter</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">longest</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFilter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">other</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">filters</span>.<span class="ident">len</span>());
+    <span class="kw">pub fn </span>batched(<span class="self">self</span>, chunk_size: usize) -&gt; Vec&lt;Filter&gt; {
+        <span class="kw">fn </span>split_longest(<span class="kw-2">mut </span>filters: Vec&lt;Filter&gt;, chunk_size: usize) -&gt; (<span class="prelude-ty">Option</span>&lt;ScalarFilter&gt;, Vec&lt;Filter&gt;) {
+            <span class="kw">let </span><span class="kw-2">mut </span>longest: <span class="prelude-ty">Option</span>&lt;ScalarFilter&gt; = <span class="prelude-val">None</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>other = Vec::with_capacity(filters.len());
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span> <span class="ident">filters</span>.<span class="ident">pop</span>() {
-                <span class="kw">match</span> (<span class="ident">filter</span>, <span class="ident">longest</span>.<span class="ident">as_mut</span>()) {
-                    (<span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>), <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">prev</span>)) <span class="kw">if</span> <span class="ident">sf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">prev</span>.<span class="ident">len</span>() =&gt; {
-                        <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="ident">longest</span>.<span class="ident">replace</span>(<span class="ident">sf</span>);
-                        <span class="ident">other</span>.<span class="ident">push</span>(<span class="ident">Filter::Scalar</span>(<span class="ident">previous</span>.<span class="ident">unwrap</span>()));
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(filter) = filters.pop() {
+                <span class="kw">match </span>(filter, longest.as_mut()) {
+                    (Filter::Scalar(sf), <span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>prev)) <span class="kw">if </span>sf.len() &gt; prev.len() =&gt; {
+                        <span class="kw">let </span>previous = longest.replace(sf);
+                        other.push(Filter::Scalar(previous.unwrap()));
                     }
-                    (<span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">sf</span>.<span class="ident">should_batch</span>(<span class="ident">chunk_size</span>) =&gt; {
-                        <span class="ident">longest</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">sf</span>);
+                    (Filter::Scalar(sf), <span class="prelude-val">None</span>) <span class="kw">if </span>sf.should_batch(chunk_size) =&gt; {
+                        longest = <span class="prelude-val">Some</span>(sf);
                     }
-                    (<span class="ident">filter</span>, <span class="kw">_</span>) =&gt; <span class="ident">other</span>.<span class="ident">push</span>(<span class="ident">filter</span>),
+                    (filter, <span class="kw">_</span>) =&gt; other.push(filter),
                 }
             }
 
-            (<span class="ident">longest</span>, <span class="ident">other</span>)
+            (longest, other)
         }
 
-        <span class="kw">fn</span> <span class="ident">batch</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>,
+        <span class="kw">fn </span>batch&lt;F&gt;(filters: Vec&lt;Filter&gt;, chunk_size: usize, f: F) -&gt; Vec&lt;Filter&gt;
+        <span class="kw">where
+            </span>F: Fn(Vec&lt;Filter&gt;) -&gt; Filter,
         {
-            <span class="kw">let</span> (<span class="ident">longest</span>, <span class="ident">other</span>) <span class="op">=</span> <span class="ident">split_longest</span>(<span class="ident">filters</span>, <span class="ident">chunk_size</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batched</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+            <span class="kw">let </span>(longest, other) = split_longest(filters, chunk_size);
+            <span class="kw">let </span><span class="kw-2">mut </span>batched = Vec::new();
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span> <span class="ident">longest</span> {
-                <span class="kw">for</span> <span class="ident">filter</span> <span class="kw">in</span> <span class="ident">filter</span>.<span class="ident">batched</span>(<span class="ident">chunk_size</span>) {
-                    <span class="ident">batched</span>.<span class="ident">push</span>(<span class="ident">Filter::Scalar</span>(<span class="ident">filter</span>))
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(filter) = longest {
+                <span class="kw">for </span>filter <span class="kw">in </span>filter.batched(chunk_size) {
+                    batched.push(Filter::Scalar(filter))
                 }
 
-                <span class="ident">batched</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">batch</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">clone</span>();
-                        <span class="ident">filters</span>.<span class="ident">push</span>(<span class="ident">batch</span>);
+                batched
+                    .into_iter()
+                    .map(|batch| {
+                        <span class="kw">let </span><span class="kw-2">mut </span>filters = other.clone();
+                        filters.push(batch);
 
-                        <span class="ident">f</span>(<span class="ident">filters</span>)
+                        f(filters)
                     })
-                    .<span class="ident">collect</span>()
-            } <span class="kw">else</span> {
-                <span class="macro">vec!</span>[<span class="ident">f</span>(<span class="ident">other</span>)]
+                    .collect()
+            } <span class="kw">else </span>{
+                <span class="macro">vec!</span>[f(other)]
             }
         }
 
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">batched</span>(<span class="ident">chunk_size</span>).<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::Scalar</span>).<span class="ident">collect</span>(),
-            <span class="ident"><span class="self">Self</span>::And</span>(<span class="ident">filters</span>) =&gt; <span class="ident">batch</span>(<span class="ident">filters</span>, <span class="ident">chunk_size</span>, <span class="ident">Filter::And</span>),
-            <span class="ident"><span class="self">Self</span>::Or</span>(<span class="ident">filters</span>) =&gt; <span class="ident">batch</span>(<span class="ident">filters</span>, <span class="ident">chunk_size</span>, <span class="ident">Filter::Or</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">vec!</span>[<span class="self">self</span>],
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Scalar(sf) =&gt; sf.batched(chunk_size).into_iter().map(<span class="self">Self</span>::Scalar).collect(),
+            <span class="self">Self</span>::And(filters) =&gt; batch(filters, chunk_size, Filter::And),
+            <span class="self">Self</span>::Or(filters) =&gt; batch(filters, chunk_size, Filter::Or),
+            <span class="kw">_ </span>=&gt; <span class="macro">vec!</span>[<span class="self">self</span>],
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">QueryMode</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Filter::And</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">set_mode</span>(<span class="ident">mode</span>.<span class="ident">clone</span>())),
-            <span class="ident">Filter::Or</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">set_mode</span>(<span class="ident">mode</span>.<span class="ident">clone</span>())),
-            <span class="ident">Filter::Not</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">set_mode</span>(<span class="ident">mode</span>.<span class="ident">clone</span>())),
-            <span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">mode</span> <span class="op">=</span> <span class="ident">mode</span>,
-            <span class="kw">_</span> =&gt; {}
+    <span class="kw">pub fn </span>set_mode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mode: QueryMode) {
+        <span class="kw">match </span><span class="self">self </span>{
+            Filter::And(inner) =&gt; inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
+            Filter::Or(inner) =&gt; inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
+            Filter::Not(inner) =&gt; inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
+            Filter::Scalar(sf) =&gt; sf.mode = mode,
+            <span class="kw">_ </span>=&gt; {}
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count</span>(<span class="ident">condition</span>: <span class="ident">Filter</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Aggregation</span>(<span class="ident">AggregationFilter::Count</span>(<span class="ident">Box::new</span>(<span class="ident">condition</span>)))
+    <span class="kw">pub fn </span>count(condition: Filter) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Aggregation(AggregationFilter::Count(Box::new(condition)))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">average</span>(<span class="ident">condition</span>: <span class="ident">Filter</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Aggregation</span>(<span class="ident">AggregationFilter::Average</span>(<span class="ident">Box::new</span>(<span class="ident">condition</span>)))
+    <span class="kw">pub fn </span>average(condition: Filter) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Aggregation(AggregationFilter::Average(Box::new(condition)))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sum</span>(<span class="ident">condition</span>: <span class="ident">Filter</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Aggregation</span>(<span class="ident">AggregationFilter::Sum</span>(<span class="ident">Box::new</span>(<span class="ident">condition</span>)))
+    <span class="kw">pub fn </span>sum(condition: Filter) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Aggregation(AggregationFilter::Sum(Box::new(condition)))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min</span>(<span class="ident">condition</span>: <span class="ident">Filter</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Aggregation</span>(<span class="ident">AggregationFilter::Min</span>(<span class="ident">Box::new</span>(<span class="ident">condition</span>)))
+    <span class="kw">pub fn </span>min(condition: Filter) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Aggregation(AggregationFilter::Min(Box::new(condition)))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max</span>(<span class="ident">condition</span>: <span class="ident">Filter</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Aggregation</span>(<span class="ident">AggregationFilter::Max</span>(<span class="ident">Box::new</span>(<span class="ident">condition</span>)))
+    <span class="kw">pub fn </span>max(condition: Filter) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Aggregation(AggregationFilter::Max(Box::new(condition)))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFilter</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub fn </span>as_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarFilter&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Scalar(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_scalar</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFilter</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub fn </span>into_scalar(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarFilter&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Scalar(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">Filter::Empty</span>
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== <span class="kw-2">&amp;</span>Filter::Empty
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scalars</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="kw">pub fn </span>scalars(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>scalars: Vec&lt;ScalarFieldRef&gt; = Vec::new();
 
-        <span class="kw">let</span> <span class="ident">filter_check</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFilter</span><span class="op">|</span> <span class="bool-val">true</span>;
-        <span class="ident"><span class="self">Self</span>::filter_and_collect_scalars</span>(<span class="self">self</span>, <span class="ident">filter_check</span>, <span class="kw-2">&amp;mut</span> <span class="ident">scalars</span>);
-        <span class="ident">scalars</span>
+        <span class="kw">let </span>filter_check = |_sf: <span class="kw-2">&amp;</span>ScalarFilter| <span class="bool-val">true</span>;
+        <span class="self">Self</span>::filter_and_collect_scalars(<span class="self">self</span>, filter_check, <span class="kw-2">&amp;mut </span>scalars);
+        scalars
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_scalars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uniques</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="kw">pub fn </span>unique_scalars(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>uniques: Vec&lt;ScalarFieldRef&gt; = Vec::new();
 
-        <span class="kw">let</span> <span class="ident">filter_check</span> <span class="op">=</span> <span class="op">|</span><span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFilter</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">is_unique</span>();
-        <span class="ident"><span class="self">Self</span>::filter_and_collect_scalars</span>(<span class="self">self</span>, <span class="ident">filter_check</span>, <span class="kw-2">&amp;mut</span> <span class="ident">uniques</span>);
-        <span class="ident">uniques</span>
+        <span class="kw">let </span>filter_check = |sf: <span class="kw-2">&amp;</span>ScalarFilter| sf.is_unique();
+        <span class="self">Self</span>::filter_and_collect_scalars(<span class="self">self</span>, filter_check, <span class="kw-2">&amp;mut </span>uniques);
+        uniques
     }
 
-    <span class="kw">fn</span> <span class="ident">filter_and_collect_scalars</span>(
-        <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">Filter</span>,
-        <span class="ident">filter_check</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">ScalarFilter</span>) -&gt; <span class="ident">bool</span>,
-        <span class="ident">scalars</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>filter_and_collect_scalars(
+        filter: <span class="kw-2">&amp;</span>Filter,
+        filter_check: <span class="kw">fn</span>(<span class="kw-2">&amp;</span>ScalarFilter) -&gt; bool,
+        scalars: <span class="kw-2">&amp;mut </span>Vec&lt;ScalarFieldRef&gt;,
     ) {
-        <span class="kw">match</span> <span class="ident">filter</span> {
-            <span class="ident">Filter::And</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::filter_and_collect_scalars</span>(<span class="ident">f</span>, <span class="ident">filter_check</span>, <span class="ident">scalars</span>)),
-            <span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">filter_check</span>(<span class="ident">sf</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>) <span class="op">=</span> <span class="ident">sf</span>.<span class="ident">scalar_ref</span>() {
-                        <span class="ident">scalars</span>.<span class="ident">push</span>(<span class="ident">field</span>.<span class="ident">to_owned</span>())
+        <span class="kw">match </span>filter {
+            Filter::And(inner) =&gt; inner
+                .iter()
+                .for_each(|f| <span class="self">Self</span>::filter_and_collect_scalars(f, filter_check, scalars)),
+            Filter::Scalar(sf) =&gt; {
+                <span class="kw">if </span>filter_check(sf) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = sf.scalar_ref() {
+                        scalars.push(field.to_owned())
                     }
                 }
             }
-            <span class="kw">_</span> =&gt; (),
+            <span class="kw">_ </span>=&gt; (),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ScalarFilter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Filter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sf</span>: <span class="ident">ScalarFilter</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>)
+<span class="kw">impl </span>From&lt;ScalarFilter&gt; <span class="kw">for </span>Filter {
+    <span class="kw">fn </span>from(sf: ScalarFilter) -&gt; <span class="self">Self </span>{
+        Filter::Scalar(sf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ScalarListFilter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Filter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sf</span>: <span class="ident">ScalarListFilter</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Filter::ScalarList</span>(<span class="ident">sf</span>)
+<span class="kw">impl </span>From&lt;ScalarListFilter&gt; <span class="kw">for </span>Filter {
+    <span class="kw">fn </span>from(sf: ScalarListFilter) -&gt; <span class="self">Self </span>{
+        Filter::ScalarList(sf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">OneRelationIsNullFilter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Filter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sf</span>: <span class="ident">OneRelationIsNullFilter</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Filter::OneRelationIsNull</span>(<span class="ident">sf</span>)
+<span class="kw">impl </span>From&lt;OneRelationIsNullFilter&gt; <span class="kw">for </span>Filter {
+    <span class="kw">fn </span>from(sf: OneRelationIsNullFilter) -&gt; <span class="self">Self </span>{
+        Filter::OneRelationIsNull(sf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RelationFilter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Filter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sf</span>: <span class="ident">RelationFilter</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Filter::Relation</span>(<span class="ident">sf</span>)
+<span class="kw">impl </span>From&lt;RelationFilter&gt; <span class="kw">for </span>Filter {
+    <span class="kw">fn </span>from(sf: RelationFilter) -&gt; <span class="self">Self </span>{
+        Filter::Relation(sf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Filter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>)
+<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>Filter {
+    <span class="kw">fn </span>from(b: bool) -&gt; <span class="self">Self </span>{
+        Filter::BoolFilter(b)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CompositeFilter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Filter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cf</span>: <span class="ident">CompositeFilter</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Filter::Composite</span>(<span class="ident">cf</span>)
+<span class="kw">impl </span>From&lt;CompositeFilter&gt; <span class="kw">for </span>Filter {
+    <span class="kw">fn </span>from(cf: CompositeFilter) -&gt; <span class="self">Self </span>{
+        Filter::Composite(cf)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

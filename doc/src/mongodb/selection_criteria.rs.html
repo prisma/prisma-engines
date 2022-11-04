@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/selection_criteria.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>selection_criteria.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/selection_criteria.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>selection_criteria.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -409,416 +409,416 @@
 <span id="409">409</span>
 <span id="410">410</span>
 <span id="411">411</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::{collections::HashMap, sync::Arc, time::Duration};
 
-<span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::Error</span> <span class="kw">as</span> <span class="ident">SerdeError</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">typed_builder::TypedBuilder</span>;
+<span class="kw">use </span>derivative::Derivative;
+<span class="kw">use </span>serde::{de::Error <span class="kw">as </span>SerdeError, Deserialize, Deserializer, Serialize};
+<span class="kw">use </span>typed_builder::TypedBuilder;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson::doc</span>,
-    <span class="ident">bson_util</span>,
-    <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">options::ServerAddress</span>,
-    <span class="ident">sdam::public::ServerInfo</span>,
+<span class="kw">use crate</span>::{
+    bson::doc,
+    bson_util,
+    error::{ErrorKind, <span class="prelude-ty">Result</span>},
+    options::ServerAddress,
+    sdam::public::ServerInfo,
 };
 
-<span class="doccomment">/// Describes which servers are suitable for a given operation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Derivative</span>)]</span>
-<span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SelectionCriteria</span> {
-    <span class="doccomment">/// A read preference that describes the suitable servers based on the server type, max</span>
-    <span class="doccomment">/// staleness, and server tags.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation [here](https://www.mongodb.com/docs/manual/core/read-preference/) for more details.</span>
-    <span class="ident">ReadPreference</span>(<span class="ident">ReadPreference</span>),
+<span class="doccomment">/// Describes which servers are suitable for a given operation.
+</span><span class="attribute">#[derive(Clone, Derivative)]
+#[derivative(Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>SelectionCriteria {
+    <span class="doccomment">/// A read preference that describes the suitable servers based on the server type, max
+    /// staleness, and server tags.
+    ///
+    /// See the documentation [here](https://www.mongodb.com/docs/manual/core/read-preference/) for more details.
+    </span>ReadPreference(ReadPreference),
 
-    <span class="doccomment">/// A predicate used to filter servers that are considered suitable. A `server` will be</span>
-    <span class="doccomment">/// considered suitable by a `predicate` if `predicate(server)` returns true.</span>
-    <span class="ident">Predicate</span>(<span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span> <span class="op">=</span> <span class="string">&quot;ignore&quot;</span>)]</span> <span class="ident">Predicate</span>),
+    <span class="doccomment">/// A predicate used to filter servers that are considered suitable. A `server` will be
+    /// considered suitable by a `predicate` if `predicate(server)` returns true.
+    </span>Predicate(<span class="attribute">#[derivative(Debug = <span class="string">&quot;ignore&quot;</span>)] </span>Predicate),
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">SelectionCriteria</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident"><span class="self">Self</span>::ReadPreference</span>(<span class="ident">r1</span>), <span class="ident"><span class="self">Self</span>::ReadPreference</span>(<span class="ident">r2</span>)) =&gt; <span class="ident">r1</span> <span class="op">==</span> <span class="ident">r2</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>SelectionCriteria {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">match </span>(<span class="self">self</span>, other) {
+            (<span class="self">Self</span>::ReadPreference(r1), <span class="self">Self</span>::ReadPreference(r2)) =&gt; r1 == r2,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ReadPreference</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SelectionCriteria</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">read_pref</span>: <span class="ident">ReadPreference</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::ReadPreference</span>(<span class="ident">read_pref</span>)
+<span class="kw">impl </span>From&lt;ReadPreference&gt; <span class="kw">for </span>SelectionCriteria {
+    <span class="kw">fn </span>from(read_pref: ReadPreference) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::ReadPreference(read_pref)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SelectionCriteria</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_read_pref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReadPreference</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ReadPreference</span>(<span class="kw-2">ref</span> <span class="ident">read_pref</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>),
-            <span class="ident"><span class="self">Self</span>::Predicate</span>(..) =&gt; <span class="prelude-val">None</span>,
+<span class="kw">impl </span>SelectionCriteria {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_read_pref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ReadPreference&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::ReadPreference(<span class="kw-2">ref </span>read_pref) =&gt; <span class="prelude-val">Some</span>(read_pref),
+            <span class="self">Self</span>::Predicate(..) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_predicate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Predicate</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Predicate</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">p</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_predicate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Predicate&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Predicate(<span class="kw-2">ref </span>p) =&gt; <span class="prelude-val">Some</span>(p),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_read_pref_primary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::ReadPreference</span>(<span class="ident">ReadPreference::Primary</span>))
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_read_pref_primary(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::ReadPreference(ReadPreference::Primary))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">max_staleness</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_read_pref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pref</span><span class="op">|</span> <span class="ident">pref</span>.<span class="ident">max_staleness</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>max_staleness(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.as_read_pref().and_then(|pref| pref.max_staleness())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_address</span>(<span class="ident">address</span>: <span class="ident">ServerAddress</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SelectionCriteria::Predicate</span>(<span class="ident">Arc::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">server</span><span class="op">|</span> <span class="ident">server</span>.<span class="ident">address</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">address</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_address(address: ServerAddress) -&gt; <span class="self">Self </span>{
+        SelectionCriteria::Predicate(Arc::new(<span class="kw">move </span>|server| server.address() == <span class="kw-2">&amp;</span>address))
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_for_client_options</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
-        <span class="ident">selection_criteria</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
-        <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize_for_client_options&lt;S&gt;(
+        selection_criteria: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SelectionCriteria&gt;,
+        serializer: S,
+    ) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">match</span> <span class="ident">selection_criteria</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">SelectionCriteria::ReadPreference</span>(<span class="ident">pref</span>)) =&gt; {
-                <span class="ident">ReadPreference::serialize_for_client_options</span>(<span class="ident">pref</span>, <span class="ident">serializer</span>)
+        <span class="kw">match </span>selection_criteria {
+            <span class="prelude-val">Some</span>(SelectionCriteria::ReadPreference(pref)) =&gt; {
+                ReadPreference::serialize_for_client_options(pref, serializer)
             }
-            <span class="kw">_</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+            <span class="kw">_ </span>=&gt; serializer.serialize_none(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SelectionCriteria</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>SelectionCriteria {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">SelectionCriteria::ReadPreference</span>(
-            <span class="ident">ReadPreference::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
+        <span class="prelude-val">Ok</span>(SelectionCriteria::ReadPreference(
+            ReadPreference::deserialize(deserializer)<span class="question-mark">?</span>,
         ))
     }
 }
 
-<span class="doccomment">/// A predicate used to filter servers that are considered suitable.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Predicate</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">ServerInfo</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A predicate used to filter servers that are considered suitable.
+</span><span class="kw">pub type </span>Predicate = Arc&lt;<span class="kw">dyn </span>Send + Sync + Fn(<span class="kw-2">&amp;</span>ServerInfo) -&gt; bool&gt;;
 
-<span class="doccomment">/// Specifies how the driver should route a read operation to members of a replica set.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If applicable, `tag_sets` can be used to target specific nodes in a replica set, and</span>
-<span class="doccomment">/// `max_staleness` specifies the maximum lag behind the primary that a secondary can be to remain</span>
-<span class="doccomment">/// eligible for the operation. The max staleness value maps to the `maxStalenessSeconds` MongoDB</span>
-<span class="doccomment">/// option and will be sent to the server as an integer number of seconds.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the [MongoDB docs](https://www.mongodb.com/docs/manual/core/read-preference) for more details.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReadPreference</span> {
-    <span class="doccomment">/// Only route this operation to the primary.</span>
-    <span class="ident">Primary</span>,
+<span class="doccomment">/// Specifies how the driver should route a read operation to members of a replica set.
+///
+/// If applicable, `tag_sets` can be used to target specific nodes in a replica set, and
+/// `max_staleness` specifies the maximum lag behind the primary that a secondary can be to remain
+/// eligible for the operation. The max staleness value maps to the `maxStalenessSeconds` MongoDB
+/// option and will be sent to the server as an integer number of seconds.
+///
+/// See the [MongoDB docs](https://www.mongodb.com/docs/manual/core/read-preference) for more details.
+</span><span class="attribute">#[allow(missing_docs)]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub enum </span>ReadPreference {
+    <span class="doccomment">/// Only route this operation to the primary.
+    </span>Primary,
 
-    <span class="doccomment">/// Only route this operation to a secondary.</span>
-    <span class="ident">Secondary</span> { <span class="ident">options</span>: <span class="ident">ReadPreferenceOptions</span> },
+    <span class="doccomment">/// Only route this operation to a secondary.
+    </span>Secondary { options: ReadPreferenceOptions },
 
-    <span class="doccomment">/// Route this operation to the primary if it&#39;s available, but fall back to the secondaries if</span>
-    <span class="doccomment">/// not.</span>
-    <span class="ident">PrimaryPreferred</span> { <span class="ident">options</span>: <span class="ident">ReadPreferenceOptions</span> },
+    <span class="doccomment">/// Route this operation to the primary if it&#39;s available, but fall back to the secondaries if
+    /// not.
+    </span>PrimaryPreferred { options: ReadPreferenceOptions },
 
-    <span class="doccomment">/// Route this operation to a secondary if one is available, but fall back to the primary if</span>
-    <span class="doccomment">/// not.</span>
-    <span class="ident">SecondaryPreferred</span> { <span class="ident">options</span>: <span class="ident">ReadPreferenceOptions</span> },
+    <span class="doccomment">/// Route this operation to a secondary if one is available, but fall back to the primary if
+    /// not.
+    </span>SecondaryPreferred { options: ReadPreferenceOptions },
 
-    <span class="doccomment">/// Route this operation to the node with the least network latency regardless of whether it&#39;s</span>
-    <span class="doccomment">/// the primary or a secondary.</span>
-    <span class="ident">Nearest</span> { <span class="ident">options</span>: <span class="ident">ReadPreferenceOptions</span> },
+    <span class="doccomment">/// Route this operation to the node with the least network latency regardless of whether it&#39;s
+    /// the primary or a secondary.
+    </span>Nearest { options: ReadPreferenceOptions },
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReadPreference</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ReadPreference {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-        <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">deny_unknown_fields</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">ReadPreferenceHelper</span> {
-            <span class="ident">mode</span>: <span class="ident">String</span>,
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-            <span class="ident">options</span>: <span class="ident">ReadPreferenceOptions</span>,
+        <span class="attribute">#[derive(Serialize, Deserialize)]
+        #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>, deny_unknown_fields)]
+        </span><span class="kw">struct </span>ReadPreferenceHelper {
+            mode: String,
+            <span class="attribute">#[serde(flatten)]
+            </span>options: ReadPreferenceOptions,
         }
-        <span class="kw">let</span> <span class="ident">preference</span> <span class="op">=</span> <span class="ident">ReadPreferenceHelper::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>preference = ReadPreferenceHelper::deserialize(deserializer)<span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">preference</span>.<span class="ident">mode</span>.<span class="ident">as_str</span>() {
-            <span class="string">&quot;Primary&quot;</span> =&gt; {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">preference</span>.<span class="ident">options</span>.<span class="ident">is_default</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">D::Error::custom</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+        <span class="kw">match </span>preference.mode.as_str() {
+            <span class="string">&quot;Primary&quot; </span>=&gt; {
+                <span class="kw">if </span>!preference.options.is_default() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(D::Error::custom(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;no options can be specified with read preference mode = primary, but got \
                          {:?}&quot;</span>,
-                        <span class="ident">preference</span>.<span class="ident">options</span>
+                        preference.options
                     )));
                 }
-                <span class="prelude-val">Ok</span>(<span class="ident">ReadPreference::Primary</span>)
+                <span class="prelude-val">Ok</span>(ReadPreference::Primary)
             }
-            <span class="string">&quot;Secondary&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ReadPreference::Secondary</span> {
-                <span class="ident">options</span>: <span class="ident">preference</span>.<span class="ident">options</span>,
+            <span class="string">&quot;Secondary&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ReadPreference::Secondary {
+                options: preference.options,
             }),
-            <span class="string">&quot;PrimaryPreferred&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ReadPreference::PrimaryPreferred</span> {
-                <span class="ident">options</span>: <span class="ident">preference</span>.<span class="ident">options</span>,
+            <span class="string">&quot;PrimaryPreferred&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ReadPreference::PrimaryPreferred {
+                options: preference.options,
             }),
-            <span class="string">&quot;SecondaryPreferred&quot;</span> <span class="op">|</span> <span class="string">&quot;secondaryPreferred&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ReadPreference::SecondaryPreferred</span> {
-                <span class="ident">options</span>: <span class="ident">preference</span>.<span class="ident">options</span>,
+            <span class="string">&quot;SecondaryPreferred&quot; </span>| <span class="string">&quot;secondaryPreferred&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ReadPreference::SecondaryPreferred {
+                options: preference.options,
             }),
-            <span class="string">&quot;Nearest&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ReadPreference::Nearest</span> {
-                <span class="ident">options</span>: <span class="ident">preference</span>.<span class="ident">options</span>,
+            <span class="string">&quot;Nearest&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ReadPreference::Nearest {
+                options: preference.options,
             }),
-            <span class="ident">other</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">D::Error::custom</span>(<span class="macro">format!</span>(
+            other =&gt; <span class="prelude-val">Err</span>(D::Error::custom(<span class="macro">format!</span>(
                 <span class="string">&quot;Unknown read preference mode: {}&quot;</span>,
-                <span class="ident">other</span>
+                other
             ))),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">ReadPreference</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="kw">impl </span>Serialize <span class="kw">for </span>ReadPreference {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="attribute">#[<span class="ident">serde_with::skip_serializing_none</span>]</span>
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>)]</span>
-        <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">deny_unknown_fields</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">ReadPreferenceHelper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="ident">mode</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-            <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ReadPreferenceOptions</span><span class="op">&gt;</span>,
+        <span class="attribute">#[serde_with::skip_serializing_none]
+        #[derive(Serialize)]
+        #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>, deny_unknown_fields)]
+        </span><span class="kw">struct </span>ReadPreferenceHelper&lt;<span class="lifetime">&#39;a</span>&gt; {
+            mode: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+            <span class="attribute">#[serde(flatten)]
+            </span>options: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ReadPreferenceOptions&gt;,
         }
 
-        <span class="kw">let</span> <span class="ident">helper</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ReadPreference::Primary</span> =&gt; <span class="ident">ReadPreferenceHelper</span> {
-                <span class="ident">mode</span>: <span class="string">&quot;primary&quot;</span>,
-                <span class="ident">options</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>helper = <span class="kw">match </span><span class="self">self </span>{
+            ReadPreference::Primary =&gt; ReadPreferenceHelper {
+                mode: <span class="string">&quot;primary&quot;</span>,
+                options: <span class="prelude-val">None</span>,
             },
-            <span class="ident">ReadPreference::PrimaryPreferred</span> { <span class="ident">options</span> } =&gt; <span class="ident">ReadPreferenceHelper</span> {
-                <span class="ident">mode</span>: <span class="string">&quot;primaryPreferred&quot;</span>,
-                <span class="ident">options</span>: <span class="prelude-val">Some</span>(<span class="ident">options</span>),
+            ReadPreference::PrimaryPreferred { options } =&gt; ReadPreferenceHelper {
+                mode: <span class="string">&quot;primaryPreferred&quot;</span>,
+                options: <span class="prelude-val">Some</span>(options),
             },
-            <span class="ident">ReadPreference::Secondary</span> { <span class="ident">options</span> } =&gt; <span class="ident">ReadPreferenceHelper</span> {
-                <span class="ident">mode</span>: <span class="string">&quot;secondary&quot;</span>,
-                <span class="ident">options</span>: <span class="prelude-val">Some</span>(<span class="ident">options</span>),
+            ReadPreference::Secondary { options } =&gt; ReadPreferenceHelper {
+                mode: <span class="string">&quot;secondary&quot;</span>,
+                options: <span class="prelude-val">Some</span>(options),
             },
-            <span class="ident">ReadPreference::SecondaryPreferred</span> { <span class="ident">options</span> } =&gt; <span class="ident">ReadPreferenceHelper</span> {
-                <span class="ident">mode</span>: <span class="string">&quot;secondaryPreferred&quot;</span>,
-                <span class="ident">options</span>: <span class="prelude-val">Some</span>(<span class="ident">options</span>),
+            ReadPreference::SecondaryPreferred { options } =&gt; ReadPreferenceHelper {
+                mode: <span class="string">&quot;secondaryPreferred&quot;</span>,
+                options: <span class="prelude-val">Some</span>(options),
             },
-            <span class="ident">ReadPreference::Nearest</span> { <span class="ident">options</span> } =&gt; <span class="ident">ReadPreferenceHelper</span> {
-                <span class="ident">mode</span>: <span class="string">&quot;nearest&quot;</span>,
-                <span class="ident">options</span>: <span class="prelude-val">Some</span>(<span class="ident">options</span>),
+            ReadPreference::Nearest { options } =&gt; ReadPreferenceHelper {
+                mode: <span class="string">&quot;nearest&quot;</span>,
+                options: <span class="prelude-val">Some</span>(options),
             },
         };
 
-        <span class="ident">helper</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        helper.serialize(serializer)
     }
 }
 
-<span class="doccomment">/// Specifies read preference options for non-primary read preferences.</span>
-<span class="attribute">#[<span class="ident">serde_with::skip_serializing_none</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">TypedBuilder</span>)]</span>
-<span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReadPreferenceOptions</span> {
-    <span class="doccomment">/// Specifies which replica set members should be considered for operations. Each tag set will</span>
-    <span class="doccomment">/// be checked in order until one or more servers is found with each tag in the set.</span>
-    <span class="kw">pub</span> <span class="ident">tag_sets</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TagSet</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Specifies read preference options for non-primary read preferences.
+</span><span class="attribute">#[serde_with::skip_serializing_none]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, TypedBuilder)]
+#[builder(field_defaults(default, setter(into)))]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ReadPreferenceOptions {
+    <span class="doccomment">/// Specifies which replica set members should be considered for operations. Each tag set will
+    /// be checked in order until one or more servers is found with each tag in the set.
+    </span><span class="kw">pub </span>tag_sets: <span class="prelude-ty">Option</span>&lt;Vec&lt;TagSet&gt;&gt;,
 
-    <span class="doccomment">/// Specifies the maximum amount of lag behind the primary that a secondary can be to be</span>
-    <span class="doccomment">/// considered for the given operation. Any secondaries lagging behind more than</span>
-    <span class="doccomment">/// `max_staleness` will not be considered for the operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `max_staleness` must be at least 90 seconds. If a `max_staleness` less than 90 seconds is</span>
-    <span class="doccomment">/// specified for an operation, the operation will return an error.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;maxStalenessSeconds&quot;</span>,
-        <span class="ident">default</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::deserialize_duration_option_from_u64_seconds&quot;</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::serialize_duration_option_as_int_secs&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="ident">max_staleness</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specifies the maximum amount of lag behind the primary that a secondary can be to be
+    /// considered for the given operation. Any secondaries lagging behind more than
+    /// `max_staleness` will not be considered for the operation.
+    ///
+    /// `max_staleness` must be at least 90 seconds. If a `max_staleness` less than 90 seconds is
+    /// specified for an operation, the operation will return an error.
+    </span><span class="attribute">#[serde(
+        rename = <span class="string">&quot;maxStalenessSeconds&quot;</span>,
+        default,
+        deserialize_with = <span class="string">&quot;bson_util::deserialize_duration_option_from_u64_seconds&quot;</span>,
+        serialize_with = <span class="string">&quot;bson_util::serialize_duration_option_as_int_secs&quot;
+    </span>)]
+    </span><span class="kw">pub </span>max_staleness: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
-    <span class="doccomment">/// Specifies hedging behavior for reads. These options only apply to sharded clusters on</span>
-    <span class="doccomment">/// servers that are at least version 4.4. Note that hedged reads are automatically enabled for</span>
-    <span class="doccomment">/// read preference mode &quot;nearest&quot;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the [MongoDB docs](https://www.mongodb.com/docs/manual/core/read-preference-hedge-option/) for more details.</span>
-    <span class="kw">pub</span> <span class="ident">hedge</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HedgedReadOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specifies hedging behavior for reads. These options only apply to sharded clusters on
+    /// servers that are at least version 4.4. Note that hedged reads are automatically enabled for
+    /// read preference mode &quot;nearest&quot;.
+    ///
+    /// See the [MongoDB docs](https://www.mongodb.com/docs/manual/core/read-preference-hedge-option/) for more details.
+    </span><span class="kw">pub </span>hedge: <span class="prelude-ty">Option</span>&lt;HedgedReadOptions&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ReadPreferenceOptions</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_default</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">hedge</span>.<span class="ident">is_none</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">max_staleness</span>.<span class="ident">is_none</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>
-                .<span class="ident">tag_sets</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ts</span><span class="op">|</span> <span class="ident">ts</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">ts</span>[..] <span class="op">==</span> [<span class="ident">HashMap::default</span>()])
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
+<span class="kw">impl </span>ReadPreferenceOptions {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_default(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.hedge.is_none()
+            &amp;&amp; <span class="self">self</span>.max_staleness.is_none()
+            &amp;&amp; <span class="self">self
+                </span>.tag_sets
+                .as_ref()
+                .map(|ts| ts.is_empty() || ts[..] == [HashMap::default()])
+                .unwrap_or(<span class="bool-val">true</span>)
     }
 }
 
-<span class="doccomment">/// Specifies hedging behavior for reads.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the [MongoDB docs](https://www.mongodb.com/docs/manual/core/read-preference-hedge-option/) for more details.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">TypedBuilder</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HedgedReadOptions</span> {
-    <span class="doccomment">/// Whether or not to allow reads from a sharded cluster to be &quot;hedged&quot; across two replica</span>
-    <span class="doccomment">/// set members per shard, with the results from the first response received back from either</span>
-    <span class="doccomment">/// being returned.</span>
-    <span class="kw">pub</span> <span class="ident">enabled</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Specifies hedging behavior for reads.
+///
+/// See the [MongoDB docs](https://www.mongodb.com/docs/manual/core/read-preference-hedge-option/) for more details.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, TypedBuilder)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>HedgedReadOptions {
+    <span class="doccomment">/// Whether or not to allow reads from a sharded cluster to be &quot;hedged&quot; across two replica
+    /// set members per shard, with the results from the first response received back from either
+    /// being returned.
+    </span><span class="kw">pub </span>enabled: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">HedgedReadOptions</span> {
-    <span class="doccomment">/// Creates a new `HedgedReadOptions` with the given value for `enabled`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_enabled</span>(<span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">enabled</span> }
+<span class="kw">impl </span>HedgedReadOptions {
+    <span class="doccomment">/// Creates a new `HedgedReadOptions` with the given value for `enabled`.
+    </span><span class="kw">pub fn </span>with_enabled(enabled: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ enabled }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ReadPreference</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">max_staleness</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ReadPreference::Primary</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">ReadPreference::Secondary</span> { <span class="kw-2">ref</span> <span class="ident">options</span> }
-            <span class="op">|</span> <span class="ident">ReadPreference::PrimaryPreferred</span> { <span class="kw-2">ref</span> <span class="ident">options</span> }
-            <span class="op">|</span> <span class="ident">ReadPreference::SecondaryPreferred</span> { <span class="kw-2">ref</span> <span class="ident">options</span> }
-            <span class="op">|</span> <span class="ident">ReadPreference::Nearest</span> { <span class="kw-2">ref</span> <span class="ident">options</span> } =&gt; <span class="ident">options</span>.<span class="ident">max_staleness</span>,
+<span class="kw">impl </span>ReadPreference {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>max_staleness(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ReadPreference::Primary =&gt; <span class="prelude-val">None</span>,
+            ReadPreference::Secondary { <span class="kw-2">ref </span>options }
+            | ReadPreference::PrimaryPreferred { <span class="kw-2">ref </span>options }
+            | ReadPreference::SecondaryPreferred { <span class="kw-2">ref </span>options }
+            | ReadPreference::Nearest { <span class="kw-2">ref </span>options } =&gt; options.max_staleness,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_tags</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tag_sets</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TagSet</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ReadPreference::Primary</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;read preference tags can only be specified when a non-primary mode \
-                              is specified&quot;</span>
-                        .<span class="ident">to_string</span>(),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_tags(<span class="kw-2">mut </span><span class="self">self</span>, tag_sets: Vec&lt;TagSet&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>options = <span class="kw">match </span><span class="self">self </span>{
+            ReadPreference::Primary =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+                    message: <span class="string">&quot;read preference tags can only be specified when a non-primary mode \
+                              is specified&quot;
+                        </span>.to_string(),
                 }
-                .<span class="ident">into</span>());
+                .into());
             }
-            <span class="ident">ReadPreference::Secondary</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span> } =&gt; <span class="ident">options</span>,
-            <span class="ident">ReadPreference::PrimaryPreferred</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span> } =&gt; <span class="ident">options</span>,
-            <span class="ident">ReadPreference::SecondaryPreferred</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span> } =&gt; <span class="ident">options</span>,
-            <span class="ident">ReadPreference::Nearest</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span> } =&gt; <span class="ident">options</span>,
+            ReadPreference::Secondary { <span class="kw-2">ref mut </span>options } =&gt; options,
+            ReadPreference::PrimaryPreferred { <span class="kw-2">ref mut </span>options } =&gt; options,
+            ReadPreference::SecondaryPreferred { <span class="kw-2">ref mut </span>options } =&gt; options,
+            ReadPreference::Nearest { <span class="kw-2">ref mut </span>options } =&gt; options,
         };
 
-        <span class="ident">options</span>.<span class="ident">tag_sets</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tag_sets</span>);
+        options.tag_sets = <span class="prelude-val">Some</span>(tag_sets);
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_max_staleness</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_staleness</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ReadPreference::Primary</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;max staleness can only be specified when a non-primary mode is \
-                              specified&quot;</span>
-                        .<span class="ident">to_string</span>(),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_max_staleness(<span class="kw-2">mut </span><span class="self">self</span>, max_staleness: Duration) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>options = <span class="kw">match </span><span class="self">self </span>{
+            ReadPreference::Primary =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+                    message: <span class="string">&quot;max staleness can only be specified when a non-primary mode is \
+                              specified&quot;
+                        </span>.to_string(),
                 }
-                .<span class="ident">into</span>());
+                .into());
             }
-            <span class="ident">ReadPreference::Secondary</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span> } =&gt; <span class="ident">options</span>,
-            <span class="ident">ReadPreference::PrimaryPreferred</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span> } =&gt; <span class="ident">options</span>,
-            <span class="ident">ReadPreference::SecondaryPreferred</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span> } =&gt; <span class="ident">options</span>,
-            <span class="ident">ReadPreference::Nearest</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span> } =&gt; <span class="ident">options</span>,
+            ReadPreference::Secondary { <span class="kw-2">ref mut </span>options } =&gt; options,
+            ReadPreference::PrimaryPreferred { <span class="kw-2">ref mut </span>options } =&gt; options,
+            ReadPreference::SecondaryPreferred { <span class="kw-2">ref mut </span>options } =&gt; options,
+            ReadPreference::Nearest { <span class="kw-2">ref mut </span>options } =&gt; options,
         };
 
-        <span class="ident">options</span>.<span class="ident">max_staleness</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max_staleness</span>);
+        options.max_staleness = <span class="prelude-val">Some</span>(max_staleness);
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_for_client_options</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
-        <span class="ident">read_preference</span>: <span class="kw-2">&amp;</span><span class="ident">ReadPreference</span>,
-        <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize_for_client_options&lt;S&gt;(
+        read_preference: <span class="kw-2">&amp;</span>ReadPreference,
+        serializer: S,
+    ) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">serde::Serialize</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">ReadPreferenceHelper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="ident">readpreference</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+        <span class="attribute">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>ReadPreferenceHelper&lt;<span class="lifetime">&#39;a</span>&gt; {
+            readpreference: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 
-            <span class="ident">readpreferencetags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+            readpreferencetags: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vec&lt;HashMap&lt;String, String&gt;&gt;&gt;,
 
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;crate::bson_util::serialize_duration_option_as_int_secs&quot;</span>)]</span>
-            <span class="ident">maxstalenessseconds</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+            <span class="attribute">#[serde(serialize_with = <span class="string">&quot;crate::bson_util::serialize_duration_option_as_int_secs&quot;</span>)]
+            </span>maxstalenessseconds: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
         }
 
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">read_preference</span> {
-            <span class="ident">ReadPreference::Primary</span> =&gt; <span class="ident">ReadPreferenceHelper</span> {
-                <span class="ident">readpreference</span>: <span class="string">&quot;primary&quot;</span>,
-                <span class="ident">readpreferencetags</span>: <span class="prelude-val">None</span>,
-                <span class="ident">maxstalenessseconds</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>state = <span class="kw">match </span>read_preference {
+            ReadPreference::Primary =&gt; ReadPreferenceHelper {
+                readpreference: <span class="string">&quot;primary&quot;</span>,
+                readpreferencetags: <span class="prelude-val">None</span>,
+                maxstalenessseconds: <span class="prelude-val">None</span>,
             },
-            <span class="ident">ReadPreference::PrimaryPreferred</span> { <span class="ident">options</span> } =&gt; <span class="ident">ReadPreferenceHelper</span> {
-                <span class="ident">readpreference</span>: <span class="string">&quot;primaryPreferred&quot;</span>,
-                <span class="ident">readpreferencetags</span>: <span class="ident">options</span>.<span class="ident">tag_sets</span>.<span class="ident">as_ref</span>(),
-                <span class="ident">maxstalenessseconds</span>: <span class="ident">options</span>.<span class="ident">max_staleness</span>,
+            ReadPreference::PrimaryPreferred { options } =&gt; ReadPreferenceHelper {
+                readpreference: <span class="string">&quot;primaryPreferred&quot;</span>,
+                readpreferencetags: options.tag_sets.as_ref(),
+                maxstalenessseconds: options.max_staleness,
             },
-            <span class="ident">ReadPreference::Secondary</span> { <span class="ident">options</span> } =&gt; <span class="ident">ReadPreferenceHelper</span> {
-                <span class="ident">readpreference</span>: <span class="string">&quot;secondary&quot;</span>,
-                <span class="ident">readpreferencetags</span>: <span class="ident">options</span>.<span class="ident">tag_sets</span>.<span class="ident">as_ref</span>(),
-                <span class="ident">maxstalenessseconds</span>: <span class="ident">options</span>.<span class="ident">max_staleness</span>,
+            ReadPreference::Secondary { options } =&gt; ReadPreferenceHelper {
+                readpreference: <span class="string">&quot;secondary&quot;</span>,
+                readpreferencetags: options.tag_sets.as_ref(),
+                maxstalenessseconds: options.max_staleness,
             },
-            <span class="ident">ReadPreference::SecondaryPreferred</span> { <span class="ident">options</span> } =&gt; <span class="ident">ReadPreferenceHelper</span> {
-                <span class="ident">readpreference</span>: <span class="string">&quot;secondaryPreferred&quot;</span>,
-                <span class="ident">readpreferencetags</span>: <span class="ident">options</span>.<span class="ident">tag_sets</span>.<span class="ident">as_ref</span>(),
-                <span class="ident">maxstalenessseconds</span>: <span class="ident">options</span>.<span class="ident">max_staleness</span>,
+            ReadPreference::SecondaryPreferred { options } =&gt; ReadPreferenceHelper {
+                readpreference: <span class="string">&quot;secondaryPreferred&quot;</span>,
+                readpreferencetags: options.tag_sets.as_ref(),
+                maxstalenessseconds: options.max_staleness,
             },
-            <span class="ident">ReadPreference::Nearest</span> { <span class="ident">options</span> } =&gt; <span class="ident">ReadPreferenceHelper</span> {
-                <span class="ident">readpreference</span>: <span class="string">&quot;nearest&quot;</span>,
-                <span class="ident">readpreferencetags</span>: <span class="ident">options</span>.<span class="ident">tag_sets</span>.<span class="ident">as_ref</span>(),
-                <span class="ident">maxstalenessseconds</span>: <span class="ident">options</span>.<span class="ident">max_staleness</span>,
+            ReadPreference::Nearest { options } =&gt; ReadPreferenceHelper {
+                readpreference: <span class="string">&quot;nearest&quot;</span>,
+                readpreferencetags: options.tag_sets.as_ref(),
+                maxstalenessseconds: options.max_staleness,
             },
         };
 
-        <span class="ident">state</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        state.serialize(serializer)
     }
 }
 
-<span class="doccomment">/// A read preference tag set. See the documentation [here](https://www.mongodb.com/docs/manual/tutorial/configure-replica-set-tag-sets/) for more details.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TagSet</span> <span class="op">=</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A read preference tag set. See the documentation [here](https://www.mongodb.com/docs/manual/tutorial/configure-replica-set-tag-sets/) for more details.
+</span><span class="kw">pub type </span>TagSet = HashMap&lt;String, String&gt;;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">HedgedReadOptions</span>, <span class="ident">ReadPreference</span>, <span class="ident">ReadPreferenceOptions</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::bson::doc</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::{HedgedReadOptions, ReadPreference, ReadPreferenceOptions};
+    <span class="kw">use </span><span class="kw">crate</span>::bson::doc;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hedged_read_included_in_document</span>() {
-        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">ReadPreferenceOptions::builder</span>()
-            .<span class="ident">hedge</span>(<span class="ident">HedgedReadOptions</span> { <span class="ident">enabled</span>: <span class="bool-val">true</span> })
-            .<span class="ident">build</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hedged_read_included_in_document() {
+        <span class="kw">let </span>options = ReadPreferenceOptions::builder()
+            .hedge(HedgedReadOptions { enabled: <span class="bool-val">true </span>})
+            .build();
 
-        <span class="kw">let</span> <span class="ident">read_pref</span> <span class="op">=</span> <span class="ident">ReadPreference::Secondary</span> { <span class="ident">options</span> };
-        <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">bson::to_document</span>(<span class="kw-2">&amp;</span><span class="ident">read_pref</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>read_pref = ReadPreference::Secondary { options };
+        <span class="kw">let </span>doc = bson::to_document(<span class="kw-2">&amp;</span>read_pref).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">doc</span>,
-            <span class="macro">doc!</span> { <span class="string">&quot;mode&quot;</span>: <span class="string">&quot;secondary&quot;</span>, <span class="string">&quot;hedge&quot;</span>: { <span class="string">&quot;enabled&quot;</span>: <span class="bool-val">true</span> } }
+            doc,
+            <span class="macro">doc! </span>{ <span class="string">&quot;mode&quot;</span>: <span class="string">&quot;secondary&quot;</span>, <span class="string">&quot;hedge&quot;</span>: { <span class="string">&quot;enabled&quot;</span>: <span class="bool-val">true </span>} }
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

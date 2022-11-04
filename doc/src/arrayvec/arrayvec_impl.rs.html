@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.7.2/src/arrayvec_impl.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arrayvec_impl.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../arrayvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../arrayvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../arrayvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.7.2/src/arrayvec_impl.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arrayvec_impl.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../arrayvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../arrayvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../arrayvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -84,91 +84,91 @@
 <span id="84">84</span>
 <span id="85">85</span>
 <span id="86">86</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::ptr</span>;
-<span class="kw">use</span> <span class="ident">std::slice</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::ptr;
+<span class="kw">use </span>std::slice;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CapacityError</span>;
+<span class="kw">use </span><span class="kw">crate</span>::CapacityError;
 
-<span class="doccomment">/// Implements basic arrayvec methods - based on a few required methods</span>
-<span class="doccomment">/// for length and element access.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">ArrayVecImpl</span> {
-    <span class="kw">type</span> <span class="ident">Item</span>;
-    <span class="kw">const</span> <span class="ident">CAPACITY</span>: <span class="ident">usize</span>;
+<span class="doccomment">/// Implements basic arrayvec methods - based on a few required methods
+/// for length and element access.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>ArrayVecImpl {
+    <span class="kw">type </span>Item;
+    <span class="kw">const </span>CAPACITY: usize;
 
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">set_len</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>);
+    <span class="kw">unsafe fn </span>set_len(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_len: usize);
 
-    <span class="doccomment">/// Return a slice containing all elements of the vector.</span>
-    <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident"><span class="self">Self</span>::Item</span>] {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-        <span class="kw">unsafe</span> {
-            <span class="ident">slice::from_raw_parts</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">len</span>)
+    <span class="doccomment">/// Return a slice containing all elements of the vector.
+    </span><span class="kw">fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="self">Self</span>::Item] {
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
+        <span class="kw">unsafe </span>{
+            slice::from_raw_parts(<span class="self">self</span>.as_ptr(), len)
         }
     }
 
-    <span class="doccomment">/// Return a mutable slice containing all elements of the vector.</span>
-    <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident"><span class="self">Self</span>::Item</span>] {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-        <span class="kw">unsafe</span> {
-            <span class="ident">std::slice::from_raw_parts_mut</span>(<span class="self">self</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">len</span>)
+    <span class="doccomment">/// Return a mutable slice containing all elements of the vector.
+    </span><span class="kw">fn </span>as_mut_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[<span class="self">Self</span>::Item] {
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
+        <span class="kw">unsafe </span>{
+            std::slice::from_raw_parts_mut(<span class="self">self</span>.as_mut_ptr(), len)
         }
     }
 
-    <span class="doccomment">/// Return a raw pointer to the vector&#39;s buffer.</span>
-    <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="doccomment">/// Return a raw pointer to the vector&#39;s buffer.
+    </span><span class="kw">fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span><span class="self">Self</span>::Item;
 
-    <span class="doccomment">/// Return a raw mutable pointer to the vector&#39;s buffer.</span>
-    <span class="kw">fn</span> <span class="ident">as_mut_ptr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="doccomment">/// Return a raw mutable pointer to the vector&#39;s buffer.
+    </span><span class="kw">fn </span>as_mut_ptr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span><span class="self">Self</span>::Item;
 
-    <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">element</span>: <span class="ident"><span class="self">Self</span>::Item</span>) {
-        <span class="self">self</span>.<span class="ident">try_push</span>(<span class="ident">element</span>).<span class="ident">unwrap</span>()
+    <span class="kw">fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, element: <span class="self">Self</span>::Item) {
+        <span class="self">self</span>.try_push(element).unwrap()
     }
 
-    <span class="kw">fn</span> <span class="ident">try_push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">element</span>: <span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CapacityError</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::CAPACITY</span> {
-            <span class="kw">unsafe</span> {
-                <span class="self">self</span>.<span class="ident">push_unchecked</span>(<span class="ident">element</span>);
+    <span class="kw">fn </span>try_push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, element: <span class="self">Self</span>::Item) -&gt; <span class="prelude-ty">Result</span>&lt;(), CapacityError&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.len() &lt; <span class="self">Self</span>::CAPACITY {
+            <span class="kw">unsafe </span>{
+                <span class="self">self</span>.push_unchecked(element);
             }
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">CapacityError::new</span>(<span class="ident">element</span>))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(CapacityError::new(element))
         }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">push_unchecked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">element</span>: <span class="ident"><span class="self">Self</span>::Item</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-        <span class="macro">debug_assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::CAPACITY</span>);
-        <span class="ident">ptr::write</span>(<span class="self">self</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">add</span>(<span class="ident">len</span>), <span class="ident">element</span>);
-        <span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">len</span> <span class="op">+</span> <span class="number">1</span>);
+    <span class="kw">unsafe fn </span>push_unchecked(<span class="kw-2">&amp;mut </span><span class="self">self</span>, element: <span class="self">Self</span>::Item) {
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
+        <span class="macro">debug_assert!</span>(len &lt; <span class="self">Self</span>::CAPACITY);
+        ptr::write(<span class="self">self</span>.as_mut_ptr().add(len), element);
+        <span class="self">self</span>.set_len(len + <span class="number">1</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">fn </span>pop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">if </span><span class="self">self</span>.len() == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-            <span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">new_len</span>);
-            <span class="prelude-val">Some</span>(<span class="ident">ptr::read</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>().<span class="ident">add</span>(<span class="ident">new_len</span>)))
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>new_len = <span class="self">self</span>.len() - <span class="number">1</span>;
+            <span class="self">self</span>.set_len(new_len);
+            <span class="prelude-val">Some</span>(ptr::read(<span class="self">self</span>.as_ptr().add(new_len)))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">truncate</span>(<span class="number">0</span>)
+    <span class="kw">fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.truncate(<span class="number">0</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">truncate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-            <span class="kw">if</span> <span class="ident">new_len</span> <span class="op">&lt;</span> <span class="ident">len</span> {
-                <span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">new_len</span>);
-                <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts_mut</span>(<span class="self">self</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">add</span>(<span class="ident">new_len</span>), <span class="ident">len</span> <span class="op">-</span> <span class="ident">new_len</span>);
-                <span class="ident">ptr::drop_in_place</span>(<span class="ident">tail</span>);
+    <span class="kw">fn </span>truncate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_len: usize) {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>len = <span class="self">self</span>.len();
+            <span class="kw">if </span>new_len &lt; len {
+                <span class="self">self</span>.set_len(new_len);
+                <span class="kw">let </span>tail = slice::from_raw_parts_mut(<span class="self">self</span>.as_mut_ptr().add(new_len), len - new_len);
+                ptr::drop_in_place(tail);
             }
         }
     }
 }
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="arrayvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="arrayvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

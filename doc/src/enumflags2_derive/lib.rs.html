@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enumflags2_derive-0.7.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../enumflags2_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../enumflags2_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../enumflags2_derive/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enumflags2_derive-0.7.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../enumflags2_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../enumflags2_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../enumflags2_derive/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -358,365 +358,365 @@
 <span id="358">358</span>
 <span id="359">359</span>
 <span id="360">360</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;2048&quot;</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">quote</span>;
+</pre><pre class="rust"><code><span class="attribute">#![recursion_limit = <span class="string">&quot;2048&quot;</span>]
+</span><span class="kw">extern crate </span>proc_macro;
+<span class="attribute">#[macro_use]
+</span><span class="kw">extern crate </span>quote;
 
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Span</span>, <span class="ident">TokenStream</span>};
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-<span class="kw">use</span> <span class="ident">syn</span>::{
-    <span class="ident">parse</span>::{<span class="ident">Parse</span>, <span class="ident">ParseStream</span>},
-    <span class="ident">parse_macro_input</span>,
-    <span class="ident">spanned::Spanned</span>,
-    <span class="ident">Expr</span>, <span class="ident">Ident</span>, <span class="ident">Item</span>, <span class="ident">ItemEnum</span>, <span class="ident">Token</span>, <span class="ident">Variant</span>,
+<span class="kw">use </span>proc_macro2::{Span, TokenStream};
+<span class="kw">use </span>std::convert::TryFrom;
+<span class="kw">use </span>syn::{
+    parse::{Parse, ParseStream},
+    parse_macro_input,
+    spanned::Spanned,
+    Expr, Ident, Item, ItemEnum, Token, Variant,
 };
 
-<span class="kw">struct</span> <span class="ident">Flag</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">name</span>: <span class="ident">Ident</span>,
-    <span class="ident">span</span>: <span class="ident">Span</span>,
-    <span class="ident">value</span>: <span class="ident">FlagValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Flag&lt;<span class="lifetime">&#39;a</span>&gt; {
+    name: Ident,
+    span: Span,
+    value: FlagValue&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">enum</span> <span class="ident">FlagValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Literal</span>(<span class="ident">u128</span>),
-    <span class="ident">Deferred</span>,
-    <span class="ident">Inferred</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Variant</span>),
+<span class="kw">enum </span>FlagValue&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Literal(u128),
+    Deferred,
+    Inferred(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Variant),
 }
 
-<span class="kw">impl</span> <span class="ident">FlagValue</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="comment">// matches! is beyond our MSRV</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::match_like_matches_macro</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_inferred</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FlagValue::Inferred</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="kw">impl </span>FlagValue&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="comment">// matches! is beyond our MSRV
+    </span><span class="attribute">#[allow(clippy::match_like_matches_macro)]
+    </span><span class="kw">fn </span>is_inferred(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            FlagValue::Inferred(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">struct</span> <span class="ident">Parameters</span> {
-    <span class="ident">default</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Parameters {
+    default: Vec&lt;Ident&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Parameters</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span>) -&gt; <span class="ident">syn::parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Parameters</span> { <span class="ident">default</span>: <span class="macro">vec!</span>[] });
+<span class="kw">impl </span>Parse <span class="kw">for </span>Parameters {
+    <span class="kw">fn </span>parse(input: ParseStream) -&gt; syn::parse::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>input.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Parameters { default: <span class="macro">vec!</span>[] });
         }
 
-        <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="macro">Token!</span>[<span class="ident">default</span>]<span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="macro">Token!</span>[<span class="op">=</span>]<span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">default</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>];
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="macro">Token!</span>[<span class="op">|</span>]<span class="op">&gt;</span>()<span class="question-mark">?</span>;
-            <span class="ident">default</span>.<span class="ident">push</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>);
+        input.parse::&lt;<span class="macro">Token!</span>[default]&gt;()<span class="question-mark">?</span>;
+        input.parse::&lt;<span class="macro">Token!</span>[=]&gt;()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>default = <span class="macro">vec!</span>[input.parse()<span class="question-mark">?</span>];
+        <span class="kw">while </span>!input.is_empty() {
+            input.parse::&lt;<span class="macro">Token!</span>[|]&gt;()<span class="question-mark">?</span>;
+            default.push(input.parse()<span class="question-mark">?</span>);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Parameters</span> { <span class="ident">default</span> })
+        <span class="prelude-val">Ok</span>(Parameters { default })
     }
 }
 
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bitflags_internal</span>(
-    <span class="ident">attr</span>: <span class="ident">proc_macro::TokenStream</span>,
-    <span class="ident">input</span>: <span class="ident">proc_macro::TokenStream</span>,
-) -&gt; <span class="ident">proc_macro::TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">Parameters</span> { <span class="ident">default</span> } <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">attr</span> <span class="kw">as</span> <span class="ident">Parameters</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ast</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">Item</span>);
-    <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ast</span> {
-        <span class="ident">Item::Enum</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">item_enum</span>) =&gt; <span class="ident">gen_enumflags</span>(<span class="ident">item_enum</span>, <span class="ident">default</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-            <span class="kw-2">&amp;</span><span class="ident">ast</span>,
+<span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>bitflags_internal(
+    attr: proc_macro::TokenStream,
+    input: proc_macro::TokenStream,
+) -&gt; proc_macro::TokenStream {
+    <span class="kw">let </span>Parameters { default } = <span class="macro">parse_macro_input!</span>(attr <span class="kw">as </span>Parameters);
+    <span class="kw">let </span><span class="kw-2">mut </span>ast = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>Item);
+    <span class="kw">let </span>output = <span class="kw">match </span>ast {
+        Item::Enum(<span class="kw-2">ref mut </span>item_enum) =&gt; gen_enumflags(item_enum, default),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(syn::Error::new_spanned(
+            <span class="kw-2">&amp;</span>ast,
             <span class="string">&quot;#[bitflags] requires an enum&quot;</span>,
         )),
     };
 
-    <span class="ident">output</span>
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">to_compile_error</span>();
-            <span class="macro">quote!</span> {
-                #<span class="ident">ast</span>
-                #<span class="ident">error</span>
+    output
+        .unwrap_or_else(|err| {
+            <span class="kw">let </span>error = err.to_compile_error();
+            <span class="macro">quote! </span>{
+                #ast
+                #error
             }
         })
-        .<span class="ident">into</span>()
+        .into()
 }
 
-<span class="doccomment">/// Try to evaluate the expression given.</span>
-<span class="kw">fn</span> <span class="ident">fold_expr</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Expr</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">expr</span> {
-        <span class="ident">Expr::Lit</span>(<span class="kw-2">ref</span> <span class="ident">expr_lit</span>) =&gt; <span class="kw">match</span> <span class="ident">expr_lit</span>.<span class="ident">lit</span> {
-            <span class="ident">syn::Lit::Int</span>(<span class="kw-2">ref</span> <span class="ident">lit_int</span>) =&gt; <span class="ident">lit_int</span>.<span class="ident">base10_parse</span>().<span class="ident">ok</span>(),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Try to evaluate the expression given.
+</span><span class="kw">fn </span>fold_expr(expr: <span class="kw-2">&amp;</span>syn::Expr) -&gt; <span class="prelude-ty">Option</span>&lt;u128&gt; {
+    <span class="kw">match </span>expr {
+        Expr::Lit(<span class="kw-2">ref </span>expr_lit) =&gt; <span class="kw">match </span>expr_lit.lit {
+            syn::Lit::Int(<span class="kw-2">ref </span>lit_int) =&gt; lit_int.base10_parse().ok(),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         },
-        <span class="ident">Expr::Binary</span>(<span class="kw-2">ref</span> <span class="ident">expr_binary</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident">fold_expr</span>(<span class="kw-2">&amp;</span><span class="ident">expr_binary</span>.<span class="ident">left</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">fold_expr</span>(<span class="kw-2">&amp;</span><span class="ident">expr_binary</span>.<span class="ident">right</span>)<span class="question-mark">?</span>;
-            <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">expr_binary</span>.<span class="ident">op</span> {
-                <span class="ident">syn::BinOp::Shl</span>(<span class="kw">_</span>) =&gt; <span class="ident">u32::try_from</span>(<span class="ident">r</span>).<span class="ident">ok</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">checked_shl</span>(<span class="ident">r</span>)),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        Expr::Binary(<span class="kw-2">ref </span>expr_binary) =&gt; {
+            <span class="kw">let </span>l = fold_expr(<span class="kw-2">&amp;</span>expr_binary.left)<span class="question-mark">?</span>;
+            <span class="kw">let </span>r = fold_expr(<span class="kw-2">&amp;</span>expr_binary.right)<span class="question-mark">?</span>;
+            <span class="kw">match </span><span class="kw-2">&amp;</span>expr_binary.op {
+                syn::BinOp::Shl(<span class="kw">_</span>) =&gt; u32::try_from(r).ok().and_then(|r| l.checked_shl(r)),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             }
         }
-        <span class="ident">Expr::Paren</span>(<span class="ident">syn::ExprParen</span> { <span class="ident">expr</span>, .. }) <span class="op">|</span> <span class="ident">Expr::Group</span>(<span class="ident">syn::ExprGroup</span> { <span class="ident">expr</span>, .. }) =&gt; {
-            <span class="ident">fold_expr</span>(<span class="ident">expr</span>)
+        Expr::Paren(syn::ExprParen { expr, .. }) | Expr::Group(syn::ExprGroup { expr, .. }) =&gt; {
+            fold_expr(expr)
         }
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">collect_flags</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">variants</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Variant</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Flag</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="ident">variants</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> {
-            <span class="comment">// MSRV: Would this be cleaner with `matches!`?</span>
-            <span class="kw">match</span> <span class="ident">variant</span>.<span class="ident">fields</span> {
-                <span class="ident">syn::Fields::Unit</span> =&gt; (),
-                <span class="kw">_</span> =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">fields</span>,
+<span class="kw">fn </span>collect_flags&lt;<span class="lifetime">&#39;a</span>&gt;(
+    variants: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Variant&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Flag&lt;<span class="lifetime">&#39;a</span>&gt;&gt;, syn::Error&gt; {
+    variants
+        .map(|variant| {
+            <span class="comment">// MSRV: Would this be cleaner with `matches!`?
+            </span><span class="kw">match </span>variant.fields {
+                syn::Fields::Unit =&gt; (),
+                <span class="kw">_ </span>=&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(
+                        <span class="kw-2">&amp;</span>variant.fields,
                         <span class="string">&quot;Bitflag variants cannot contain additional data&quot;</span>,
                     ))
                 }
             }
 
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">variant</span>.<span class="ident">ident</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">variant</span>.<span class="ident">span</span>();
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">variant</span>.<span class="ident">discriminant</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span> <span class="ident">fold_expr</span>(<span class="kw-2">&amp;</span><span class="ident">expr</span>.<span class="number">1</span>) {
-                    <span class="ident">FlagValue::Literal</span>(<span class="ident">n</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">FlagValue::Deferred</span>
+            <span class="kw">let </span>name = variant.ident.clone();
+            <span class="kw">let </span>span = variant.span();
+            <span class="kw">let </span>value = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>expr) = variant.discriminant {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(n) = fold_expr(<span class="kw-2">&amp;</span>expr.<span class="number">1</span>) {
+                    FlagValue::Literal(n)
+                } <span class="kw">else </span>{
+                    FlagValue::Deferred
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">FlagValue::Inferred</span>(<span class="ident">variant</span>)
+            } <span class="kw">else </span>{
+                FlagValue::Inferred(variant)
             };
 
-            <span class="prelude-val">Ok</span>(<span class="ident">Flag</span> { <span class="ident">name</span>, <span class="ident">span</span>, <span class="ident">value</span> })
+            <span class="prelude-val">Ok</span>(Flag { name, span, value })
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">fn</span> <span class="ident">inferred_value</span>(<span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">previous_variants</span>: <span class="kw-2">&amp;</span>[<span class="ident">Ident</span>], <span class="ident">repr</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) -&gt; <span class="ident">Expr</span> {
-    <span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">previous_variants</span>.<span class="ident">is_empty</span>() {
+<span class="kw">fn </span>inferred_value(type_name: <span class="kw-2">&amp;</span>Ident, previous_variants: <span class="kw-2">&amp;</span>[Ident], repr: <span class="kw-2">&amp;</span>Ident) -&gt; Expr {
+    <span class="kw">let </span>tokens = <span class="kw">if </span>previous_variants.is_empty() {
         <span class="macro">quote!</span>(<span class="number">1</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">quote!</span>(<span class="ident">::enumflags2::_internal::next_bit</span>(
-                #(#<span class="ident">type_name</span>::#<span class="ident">previous_variants</span> <span class="kw">as</span> <span class="ident">u128</span>)<span class="op">|</span><span class="op">*</span>
-        ) <span class="kw">as</span> #<span class="ident">repr</span>)
+    } <span class="kw">else </span>{
+        <span class="macro">quote!</span>(::enumflags2::_internal::next_bit(
+                #(#type_name::#previous_variants <span class="kw">as </span>u128)|*
+        ) <span class="kw">as </span>#repr)
     };
 
-    <span class="ident">syn::parse2</span>(<span class="ident">tokens</span>).<span class="ident">expect</span>(<span class="string">&quot;couldn&#39;t parse inferred value&quot;</span>)
+    syn::parse2(tokens).expect(<span class="string">&quot;couldn&#39;t parse inferred value&quot;</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">infer_values</span>(<span class="ident">flags</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Flag</span>], <span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">repr</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">previous_variants</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">flags</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">flag</span><span class="op">|</span> <span class="op">!</span><span class="ident">flag</span>.<span class="ident">value</span>.<span class="ident">is_inferred</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">flag</span><span class="op">|</span> <span class="ident">flag</span>.<span class="ident">name</span>.<span class="ident">clone</span>())
-        .<span class="ident">collect</span>();
+<span class="kw">fn </span>infer_values(flags: <span class="kw-2">&amp;mut </span>[Flag], type_name: <span class="kw-2">&amp;</span>Ident, repr: <span class="kw-2">&amp;</span>Ident) {
+    <span class="kw">let </span><span class="kw-2">mut </span>previous_variants: Vec&lt;Ident&gt; = flags
+        .iter()
+        .filter(|flag| !flag.value.is_inferred())
+        .map(|flag| flag.name.clone())
+        .collect();
 
-    <span class="kw">for</span> <span class="ident">flag</span> <span class="kw">in</span> <span class="ident">flags</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FlagValue::Inferred</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">variant</span>) <span class="op">=</span> <span class="ident">flag</span>.<span class="ident">value</span> {
-            <span class="ident">variant</span>.<span class="ident">discriminant</span> <span class="op">=</span> <span class="prelude-val">Some</span>((
-                <span class="op">&lt;</span><span class="macro">Token!</span>[<span class="op">=</span>]<span class="op">&gt;</span><span class="ident">::default</span>(),
-                <span class="ident">inferred_value</span>(<span class="ident">type_name</span>, <span class="kw-2">&amp;</span><span class="ident">previous_variants</span>, <span class="ident">repr</span>),
+    <span class="kw">for </span>flag <span class="kw">in </span>flags {
+        <span class="kw">if let </span>FlagValue::Inferred(<span class="kw-2">ref mut </span>variant) = flag.value {
+            variant.discriminant = <span class="prelude-val">Some</span>((
+                &lt;<span class="macro">Token!</span>[=]&gt;::default(),
+                inferred_value(type_name, <span class="kw-2">&amp;</span>previous_variants, repr),
             ));
-            <span class="ident">previous_variants</span>.<span class="ident">push</span>(<span class="ident">flag</span>.<span class="ident">name</span>.<span class="ident">clone</span>());
+            previous_variants.push(flag.name.clone());
         }
     }
 }
 
-<span class="doccomment">/// Given a list of attributes, find the `repr`, if any, and return the integer</span>
-<span class="doccomment">/// type specified.</span>
-<span class="kw">fn</span> <span class="ident">extract_repr</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::Attribute</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">Meta</span>, <span class="ident">NestedMeta</span>};
-    <span class="ident">attrs</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">attr</span>.<span class="ident">parse_meta</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">why</span>) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-                <span class="ident">attr</span>,
-                <span class="macro">format!</span>(<span class="string">&quot;Couldn&#39;t parse attribute: {}&quot;</span>, <span class="ident">why</span>),
+<span class="doccomment">/// Given a list of attributes, find the `repr`, if any, and return the integer
+/// type specified.
+</span><span class="kw">fn </span>extract_repr(attrs: <span class="kw-2">&amp;</span>[syn::Attribute]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Ident&gt;, syn::Error&gt; {
+    <span class="kw">use </span>syn::{Meta, NestedMeta};
+    attrs
+        .iter()
+        .find_map(|attr| <span class="kw">match </span>attr.parse_meta() {
+            <span class="prelude-val">Err</span>(why) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(syn::Error::new_spanned(
+                attr,
+                <span class="macro">format!</span>(<span class="string">&quot;Couldn&#39;t parse attribute: {}&quot;</span>, why),
             ))),
-            <span class="prelude-val">Ok</span>(<span class="ident">Meta::List</span>(<span class="kw-2">ref</span> <span class="ident">meta</span>)) <span class="kw">if</span> <span class="ident">meta</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;repr&quot;</span>) =&gt; {
-                <span class="ident">meta</span>.<span class="ident">nested</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">mi</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">mi</span> {
-                    <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="ident">path</span>)) =&gt; <span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">cloned</span>().<span class="ident">map</span>(<span class="prelude-val">Ok</span>),
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">Ok</span>(Meta::List(<span class="kw-2">ref </span>meta)) <span class="kw">if </span>meta.path.is_ident(<span class="string">&quot;repr&quot;</span>) =&gt; {
+                meta.nested.iter().find_map(|mi| <span class="kw">match </span>mi {
+                    NestedMeta::Meta(Meta::Path(path)) =&gt; path.get_ident().cloned().map(<span class="prelude-val">Ok</span>),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                 })
             }
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         })
-        .<span class="ident">transpose</span>()
+        .transpose()
 }
 
-<span class="doccomment">/// Check the repr and return the number of bits available</span>
-<span class="kw">fn</span> <span class="ident">type_bits</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="comment">// This would be so much easier if we could just match on an Ident...</span>
-    <span class="kw">if</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;usize&quot;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-            <span class="ident">ty</span>,
+<span class="doccomment">/// Check the repr and return the number of bits available
+</span><span class="kw">fn </span>type_bits(ty: <span class="kw-2">&amp;</span>Ident) -&gt; <span class="prelude-ty">Result</span>&lt;u8, syn::Error&gt; {
+    <span class="comment">// This would be so much easier if we could just match on an Ident...
+    </span><span class="kw">if </span>ty == <span class="string">&quot;usize&quot; </span>{
+        <span class="prelude-val">Err</span>(syn::Error::new_spanned(
+            ty,
             <span class="string">&quot;#[repr(usize)] is not supported. Use u32 or u64 instead.&quot;</span>,
         ))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;i8&quot;</span>
-        <span class="op">|</span><span class="op">|</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;i16&quot;</span>
-        <span class="op">|</span><span class="op">|</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;i32&quot;</span>
-        <span class="op">|</span><span class="op">|</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;i64&quot;</span>
-        <span class="op">|</span><span class="op">|</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;i128&quot;</span>
-        <span class="op">|</span><span class="op">|</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;isize&quot;</span>
-    {
-        <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-            <span class="ident">ty</span>,
+    } <span class="kw">else if </span>ty == <span class="string">&quot;i8&quot;
+        </span>|| ty == <span class="string">&quot;i16&quot;
+        </span>|| ty == <span class="string">&quot;i32&quot;
+        </span>|| ty == <span class="string">&quot;i64&quot;
+        </span>|| ty == <span class="string">&quot;i128&quot;
+        </span>|| ty == <span class="string">&quot;isize&quot;
+    </span>{
+        <span class="prelude-val">Err</span>(syn::Error::new_spanned(
+            ty,
             <span class="string">&quot;Signed types in a repr are not supported.&quot;</span>,
         ))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;u8&quot;</span> {
+    } <span class="kw">else if </span>ty == <span class="string">&quot;u8&quot; </span>{
         <span class="prelude-val">Ok</span>(<span class="number">8</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;u16&quot;</span> {
+    } <span class="kw">else if </span>ty == <span class="string">&quot;u16&quot; </span>{
         <span class="prelude-val">Ok</span>(<span class="number">16</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;u32&quot;</span> {
+    } <span class="kw">else if </span>ty == <span class="string">&quot;u32&quot; </span>{
         <span class="prelude-val">Ok</span>(<span class="number">32</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;u64&quot;</span> {
+    } <span class="kw">else if </span>ty == <span class="string">&quot;u64&quot; </span>{
         <span class="prelude-val">Ok</span>(<span class="number">64</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ty</span> <span class="op">==</span> <span class="string">&quot;u128&quot;</span> {
+    } <span class="kw">else if </span>ty == <span class="string">&quot;u128&quot; </span>{
         <span class="prelude-val">Ok</span>(<span class="number">128</span>)
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-            <span class="ident">ty</span>,
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(syn::Error::new_spanned(
+            ty,
             <span class="string">&quot;repr must be an integer type for #[bitflags].&quot;</span>,
         ))
     }
 }
 
-<span class="doccomment">/// Returns deferred checks</span>
-<span class="kw">fn</span> <span class="ident">check_flag</span>(<span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">flag</span>: <span class="kw-2">&amp;</span><span class="ident">Flag</span>, <span class="ident">bits</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">FlagValue</span>::<span class="kw-2">*</span>;
-    <span class="kw">match</span> <span class="ident">flag</span>.<span class="ident">value</span> {
-        <span class="ident">Literal</span>(<span class="ident">n</span>) =&gt; {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">n</span>.<span class="ident">is_power_of_two</span>() {
-                <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
-                    <span class="ident">flag</span>.<span class="ident">span</span>,
+<span class="doccomment">/// Returns deferred checks
+</span><span class="kw">fn </span>check_flag(type_name: <span class="kw-2">&amp;</span>Ident, flag: <span class="kw-2">&amp;</span>Flag, bits: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;TokenStream&gt;, syn::Error&gt; {
+    <span class="kw">use </span>FlagValue::<span class="kw-2">*</span>;
+    <span class="kw">match </span>flag.value {
+        Literal(n) =&gt; {
+            <span class="kw">if </span>!n.is_power_of_two() {
+                <span class="prelude-val">Err</span>(syn::Error::new(
+                    flag.span,
                     <span class="string">&quot;Flags must have exactly one set bit&quot;</span>,
                 ))
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">bits</span> <span class="op">&lt;</span> <span class="number">128</span> <span class="op">&amp;&amp;</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">bits</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
-                    <span class="ident">flag</span>.<span class="ident">span</span>,
-                    <span class="macro">format!</span>(<span class="string">&quot;Flag value out of range for u{}&quot;</span>, <span class="ident">bits</span>),
+            } <span class="kw">else if </span>bits &lt; <span class="number">128 </span>&amp;&amp; n &gt;= <span class="number">1 </span>&lt;&lt; bits {
+                <span class="prelude-val">Err</span>(syn::Error::new(
+                    flag.span,
+                    <span class="macro">format!</span>(<span class="string">&quot;Flag value out of range for u{}&quot;</span>, bits),
                 ))
-            } <span class="kw">else</span> {
+            } <span class="kw">else </span>{
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
             }
         }
-        <span class="ident">Inferred</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-        <span class="ident">Deferred</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">variant_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">flag</span>.<span class="ident">name</span>;
-            <span class="comment">// MSRV: Use an unnamed constant (`const _: ...`).</span>
-            <span class="kw">let</span> <span class="ident">assertion_name</span> <span class="op">=</span> <span class="ident">syn::Ident::new</span>(
-                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;__enumflags_assertion_{}_{}&quot;</span>, <span class="ident">type_name</span>, <span class="ident">flag</span>.<span class="ident">name</span>),
-                <span class="ident">Span::call_site</span>(),
-            ); <span class="comment">// call_site because def_site is unstable</span>
+        Inferred(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        Deferred =&gt; {
+            <span class="kw">let </span>variant_name = <span class="kw-2">&amp;</span>flag.name;
+            <span class="comment">// MSRV: Use an unnamed constant (`const _: ...`).
+            </span><span class="kw">let </span>assertion_name = syn::Ident::new(
+                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;__enumflags_assertion_{}_{}&quot;</span>, type_name, flag.name),
+                Span::call_site(),
+            ); <span class="comment">// call_site because def_site is unstable
 
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="macro">quote_spanned!</span>(<span class="ident">flag</span>.<span class="ident">span</span> =&gt;
-                <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-                <span class="kw">const</span> #<span class="ident">assertion_name</span>:
-                    <span class="op">&lt;</span><span class="op">&lt;</span>[(); (
-                        (#<span class="ident">type_name</span>::#<span class="ident">variant_name</span> <span class="kw">as</span> <span class="ident">u128</span>).<span class="ident">is_power_of_two</span>()
-                    ) <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="ident">enumflags2::_internal::AssertionHelper</span><span class="op">&gt;</span>
-                        <span class="ident">::Status</span> <span class="kw">as</span> <span class="ident">enumflags2::_internal::ExactlyOneBitSet</span><span class="op">&gt;</span><span class="ident">::X</span>
-                    <span class="op">=</span> ();
+            </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="macro">quote_spanned!</span>(flag.span =&gt;
+                <span class="attribute">#[doc(hidden)]
+                </span><span class="kw">const </span>#assertion_name:
+                    &lt;&lt;[(); (
+                        (#type_name::#variant_name <span class="kw">as </span>u128).is_power_of_two()
+                    ) <span class="kw">as </span>usize] <span class="kw">as </span>enumflags2::_internal::AssertionHelper&gt;
+                        ::Status <span class="kw">as </span>enumflags2::_internal::ExactlyOneBitSet&gt;::X
+                    = ();
             )))
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">gen_enumflags</span>(<span class="ident">ast</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ItemEnum</span>, <span class="ident">default</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>.<span class="ident">ident</span>;
+<span class="kw">fn </span>gen_enumflags(ast: <span class="kw-2">&amp;mut </span>ItemEnum, default: Vec&lt;Ident&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, syn::Error&gt; {
+    <span class="kw">let </span>ident = <span class="kw-2">&amp;</span>ast.ident;
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::call_site</span>();
+    <span class="kw">let </span>span = Span::call_site();
 
-    <span class="kw">let</span> <span class="ident">repr</span> <span class="op">=</span> <span class="ident">extract_repr</span>(<span class="kw-2">&amp;</span><span class="ident">ast</span>.<span class="ident">attrs</span>)<span class="question-mark">?</span>
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">syn::Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>,
+    <span class="kw">let </span>repr = extract_repr(<span class="kw-2">&amp;</span>ast.attrs)<span class="question-mark">?
+        </span>.ok_or_else(|| syn::Error::new_spanned(<span class="kw-2">&amp;</span>ident,
                         <span class="string">&quot;repr attribute missing. Add #[repr(u64)] or a similar attribute to specify the size of the bitfield.&quot;</span>))<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">type_bits</span>(<span class="kw-2">&amp;</span><span class="ident">repr</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>bits = type_bits(<span class="kw-2">&amp;</span>repr)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">variants</span> <span class="op">=</span> <span class="ident">collect_flags</span>(<span class="ident">ast</span>.<span class="ident">variants</span>.<span class="ident">iter_mut</span>())<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">deferred</span> <span class="op">=</span> <span class="ident">variants</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> <span class="ident">check_flag</span>(<span class="ident">ident</span>, <span class="ident">variant</span>, <span class="ident">bits</span>).<span class="ident">transpose</span>())
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>variants = collect_flags(ast.variants.iter_mut())<span class="question-mark">?</span>;
+    <span class="kw">let </span>deferred = variants
+        .iter()
+        .flat_map(|variant| check_flag(ident, variant, bits).transpose())
+        .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="ident">infer_values</span>(<span class="kw-2">&amp;mut</span> <span class="ident">variants</span>, <span class="ident">ident</span>, <span class="kw-2">&amp;</span><span class="ident">repr</span>);
+    infer_values(<span class="kw-2">&amp;mut </span>variants, ident, <span class="kw-2">&amp;</span>repr);
 
-    <span class="kw">if</span> (<span class="ident">bits</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&lt;</span> <span class="ident">variants</span>.<span class="ident">len</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-            <span class="kw-2">&amp;</span><span class="ident">repr</span>,
-            <span class="macro">format!</span>(<span class="string">&quot;Not enough bits for {} flags&quot;</span>, <span class="ident">variants</span>.<span class="ident">len</span>()),
+    <span class="kw">if </span>(bits <span class="kw">as </span>usize) &lt; variants.len() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(
+            <span class="kw-2">&amp;</span>repr,
+            <span class="macro">format!</span>(<span class="string">&quot;Not enough bits for {} flags&quot;</span>, variants.len()),
         ));
     }
 
-    <span class="kw">let</span> <span class="ident">std</span> <span class="op">=</span> <span class="macro">quote_spanned!</span>(<span class="ident">span</span> =&gt; <span class="ident">::enumflags2::_internal::core</span>);
-    <span class="kw">let</span> <span class="ident">variant_names</span> <span class="op">=</span> <span class="ident">ast</span>.<span class="ident">variants</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">ident</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+    <span class="kw">let </span>std = <span class="macro">quote_spanned!</span>(span =&gt; ::enumflags2::_internal::core);
+    <span class="kw">let </span>variant_names = ast.variants.iter().map(|v| <span class="kw-2">&amp;</span>v.ident).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="prelude-val">Ok</span>(<span class="macro">quote_spanned!</span> {
-        <span class="ident">span</span> =&gt;
-            #<span class="ident">ast</span>
-            #(#<span class="ident">deferred</span>)<span class="op">*</span>
-            <span class="kw">impl</span> #<span class="ident">std::ops::Not</span> <span class="kw">for</span> #<span class="ident">ident</span> {
-                <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">::enumflags2::BitFlags</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
-                <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-                <span class="kw">fn</span> <span class="ident">not</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-                    <span class="kw">use</span> <span class="ident">::enumflags2::BitFlags</span>;
-                    <span class="ident">BitFlags::from_flag</span>(<span class="self">self</span>).<span class="ident">not</span>()
+    <span class="prelude-val">Ok</span>(<span class="macro">quote_spanned! </span>{
+        span =&gt;
+            #ast
+            #(#deferred)*
+            <span class="kw">impl </span>#std::ops::Not <span class="kw">for </span>#ident {
+                <span class="kw">type </span>Output = ::enumflags2::BitFlags&lt;<span class="self">Self</span>&gt;;
+                <span class="attribute">#[inline(always)]
+                </span><span class="kw">fn </span>not(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Output {
+                    <span class="kw">use </span>::enumflags2::BitFlags;
+                    BitFlags::from_flag(<span class="self">self</span>).not()
                 }
             }
 
-            <span class="kw">impl</span> #<span class="ident">std::ops::BitOr</span> <span class="kw">for</span> #<span class="ident">ident</span> {
-                <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">::enumflags2::BitFlags</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
-                <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-                <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-                    <span class="kw">use</span> <span class="ident">::enumflags2::BitFlags</span>;
-                    <span class="ident">BitFlags::from_flag</span>(<span class="self">self</span>) <span class="op">|</span> <span class="ident">other</span>
+            <span class="kw">impl </span>#std::ops::BitOr <span class="kw">for </span>#ident {
+                <span class="kw">type </span>Output = ::enumflags2::BitFlags&lt;<span class="self">Self</span>&gt;;
+                <span class="attribute">#[inline(always)]
+                </span><span class="kw">fn </span>bitor(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+                    <span class="kw">use </span>::enumflags2::BitFlags;
+                    BitFlags::from_flag(<span class="self">self</span>) | other
                 }
             }
 
-            <span class="kw">impl</span> #<span class="ident">std::ops::BitAnd</span> <span class="kw">for</span> #<span class="ident">ident</span> {
-                <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">::enumflags2::BitFlags</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
-                <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-                <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-                    <span class="kw">use</span> <span class="ident">::enumflags2::BitFlags</span>;
-                    <span class="ident">BitFlags::from_flag</span>(<span class="self">self</span>) <span class="op">&amp;</span> <span class="ident">other</span>
+            <span class="kw">impl </span>#std::ops::BitAnd <span class="kw">for </span>#ident {
+                <span class="kw">type </span>Output = ::enumflags2::BitFlags&lt;<span class="self">Self</span>&gt;;
+                <span class="attribute">#[inline(always)]
+                </span><span class="kw">fn </span>bitand(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+                    <span class="kw">use </span>::enumflags2::BitFlags;
+                    BitFlags::from_flag(<span class="self">self</span>) &amp; other
                 }
             }
 
-            <span class="kw">impl</span> #<span class="ident">std::ops::BitXor</span> <span class="kw">for</span> #<span class="ident">ident</span> {
-                <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">::enumflags2::BitFlags</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
-                <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-                <span class="kw">fn</span> <span class="ident">bitxor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-                    <span class="kw">use</span> <span class="ident">::enumflags2::BitFlags</span>;
-                    <span class="ident">BitFlags::from_flag</span>(<span class="self">self</span>) <span class="op">^</span> <span class="ident">other</span>
+            <span class="kw">impl </span>#std::ops::BitXor <span class="kw">for </span>#ident {
+                <span class="kw">type </span>Output = ::enumflags2::BitFlags&lt;<span class="self">Self</span>&gt;;
+                <span class="attribute">#[inline(always)]
+                </span><span class="kw">fn </span>bitxor(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+                    <span class="kw">use </span>::enumflags2::BitFlags;
+                    BitFlags::from_flag(<span class="self">self</span>) ^ other
                 }
             }
 
-            <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">::enumflags2::_internal::RawBitFlags</span> <span class="kw">for</span> #<span class="ident">ident</span> {
-                <span class="kw">type</span> <span class="ident">Numeric</span> <span class="op">=</span> #<span class="ident">repr</span>;
+            <span class="kw">unsafe impl </span>::enumflags2::_internal::RawBitFlags <span class="kw">for </span>#ident {
+                <span class="kw">type </span>Numeric = #repr;
 
-                <span class="kw">const</span> <span class="ident">EMPTY</span>: <span class="ident"><span class="self">Self</span>::Numeric</span> <span class="op">=</span> <span class="number">0</span>;
+                <span class="kw">const </span>EMPTY: <span class="self">Self</span>::Numeric = <span class="number">0</span>;
 
-                <span class="kw">const</span> <span class="ident">DEFAULT</span>: <span class="ident"><span class="self">Self</span>::Numeric</span> <span class="op">=</span>
-                    <span class="number">0</span> #(<span class="op">|</span> (<span class="self">Self</span>::#<span class="ident">default</span> <span class="kw">as</span> #<span class="ident">repr</span>))<span class="kw-2">*</span>;
+                <span class="kw">const </span>DEFAULT: <span class="self">Self</span>::Numeric =
+                    <span class="number">0 </span>#(| (<span class="self">Self</span>::#default <span class="kw">as </span>#repr))<span class="kw-2">*</span>;
 
-                <span class="kw">const</span> <span class="ident">ALL_BITS</span>: <span class="ident"><span class="self">Self</span>::Numeric</span> <span class="op">=</span>
-                    <span class="number">0</span> #(<span class="op">|</span> (<span class="self">Self</span>::#<span class="ident">variant_names</span> <span class="kw">as</span> #<span class="ident">repr</span>))<span class="kw-2">*</span>;
+                <span class="kw">const </span>ALL_BITS: <span class="self">Self</span>::Numeric =
+                    <span class="number">0 </span>#(| (<span class="self">Self</span>::#variant_names <span class="kw">as </span>#repr))<span class="kw-2">*</span>;
 
-                <span class="kw">const</span> <span class="ident">BITFLAGS_TYPE_NAME</span> : <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span>
-                    <span class="macro">concat!</span>(<span class="string">&quot;BitFlags&lt;&quot;</span>, <span class="macro">stringify!</span>(#<span class="ident">ident</span>), <span class="string">&quot;&gt;&quot;</span>);
+                <span class="kw">const </span>BITFLAGS_TYPE_NAME : <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str =
+                    <span class="macro">concat!</span>(<span class="string">&quot;BitFlags&lt;&quot;</span>, <span class="macro">stringify!</span>(#ident), <span class="string">&quot;&gt;&quot;</span>);
 
-                <span class="kw">fn</span> <span class="ident">bits</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Numeric</span> {
-                    <span class="self">self</span> <span class="kw">as</span> #<span class="ident">repr</span>
+                <span class="kw">fn </span>bits(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Numeric {
+                    <span class="self">self </span><span class="kw">as </span>#repr
                 }
             }
 
-            <span class="kw">impl</span> <span class="ident">::enumflags2::BitFlag</span> <span class="kw">for</span> #<span class="ident">ident</span> {}
+            <span class="kw">impl </span>::enumflags2::BitFlag <span class="kw">for </span>#ident {}
     })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="enumflags2_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="enumflags2_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

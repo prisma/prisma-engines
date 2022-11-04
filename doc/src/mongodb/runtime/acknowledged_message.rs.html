@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/runtime/acknowledged_message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>acknowledged_message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/runtime/acknowledged_message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>acknowledged_message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -63,70 +63,70 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
-</pre><pre class="rust"><code><span class="doccomment">/// A message type that includes an acknowledgement mechanism.</span>
-<span class="doccomment">/// When this is dropped or `acknowledge` is called, the sender will be notified.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AcknowledgedMessage</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">R</span> <span class="op">=</span> ()<span class="op">&gt;</span> {
-    <span class="ident">acknowledger</span>: <span class="ident">AcknowledgmentSender</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="ident">message</span>: <span class="ident">M</span>,
+</pre><pre class="rust"><code><span class="doccomment">/// A message type that includes an acknowledgement mechanism.
+/// When this is dropped or `acknowledge` is called, the sender will be notified.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AcknowledgedMessage&lt;M, R = ()&gt; {
+    acknowledger: AcknowledgmentSender&lt;R&gt;,
+    message: M,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">AcknowledgedMessage</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new message and return it along with the AcknowledgmentReceiver that will</span>
-    <span class="doccomment">/// be notified when the message is received or when it is dropped.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">package</span>(<span class="ident">message</span>: <span class="ident">M</span>) -&gt; (<span class="self">Self</span>, <span class="ident">AcknowledgmentReceiver</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">tokio::sync::oneshot::channel</span>();
+<span class="kw">impl</span>&lt;M, R&gt; AcknowledgedMessage&lt;M, R&gt; {
+    <span class="doccomment">/// Create a new message and return it along with the AcknowledgmentReceiver that will
+    /// be notified when the message is received or when it is dropped.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>package(message: M) -&gt; (<span class="self">Self</span>, AcknowledgmentReceiver&lt;R&gt;) {
+        <span class="kw">let </span>(sender, receiver) = tokio::sync::oneshot::channel();
         (
-            <span class="self">Self</span> {
-                <span class="ident">message</span>,
-                <span class="ident">acknowledger</span>: <span class="ident">AcknowledgmentSender</span> { <span class="ident">sender</span> },
+            <span class="self">Self </span>{
+                message,
+                acknowledger: AcknowledgmentSender { sender },
             },
-            <span class="ident">AcknowledgmentReceiver</span> { <span class="ident">receiver</span> },
+            AcknowledgmentReceiver { receiver },
         )
     }
 
-    <span class="doccomment">/// Send acknowledgement to the receiver.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">acknowledge</span>(<span class="self">self</span>, <span class="ident">result</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">acknowledger</span>.<span class="ident">acknowledge</span>(<span class="ident">result</span>)
+    <span class="doccomment">/// Send acknowledgement to the receiver.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>acknowledge(<span class="self">self</span>, result: <span class="kw">impl </span>Into&lt;R&gt;) {
+        <span class="self">self</span>.acknowledger.acknowledge(result)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; (<span class="ident">M</span>, <span class="ident">AcknowledgmentSender</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) {
-        (<span class="self">self</span>.<span class="ident">message</span>, <span class="self">self</span>.<span class="ident">acknowledger</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">AcknowledgedMessage</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">M</span>;
-
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_parts(<span class="self">self</span>) -&gt; (M, AcknowledgmentSender&lt;R&gt;) {
+        (<span class="self">self</span>.message, <span class="self">self</span>.acknowledger)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AcknowledgmentSender</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="ident">sender</span>: <span class="ident">tokio::sync::oneshot::Sender</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-}
+<span class="kw">impl</span>&lt;M, R&gt; std::ops::Deref <span class="kw">for </span>AcknowledgedMessage&lt;M, R&gt; {
+    <span class="kw">type </span>Target = M;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">AcknowledgmentSender</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Send acknowledgement to the receiver.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">acknowledge</span>(<span class="self">self</span>, <span class="ident">result</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) {
-        <span class="comment">// returns an error when the other end hangs up e.g. due to a timeout.</span>
-        <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">result</span>.<span class="ident">into</span>());
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.message
     }
 }
 
-<span class="doccomment">/// Receiver for the acknowledgement that the message was received or dropped.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AcknowledgmentReceiver</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="ident">receiver</span>: <span class="ident">tokio::sync::oneshot::Receiver</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AcknowledgmentSender&lt;R&gt; {
+    sender: tokio::sync::oneshot::Sender&lt;R&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">AcknowledgmentReceiver</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Wait for the message to be acknowledged. If this returns None, that means the message</span>
-    <span class="doccomment">/// was dropped without the receiving end explicitly sending anything back.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wait_for_acknowledgment</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">receiver</span>.<span class="kw">await</span>.<span class="ident">ok</span>()
+<span class="kw">impl</span>&lt;R&gt; AcknowledgmentSender&lt;R&gt; {
+    <span class="doccomment">/// Send acknowledgement to the receiver.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>acknowledge(<span class="self">self</span>, result: <span class="kw">impl </span>Into&lt;R&gt;) {
+        <span class="comment">// returns an error when the other end hangs up e.g. due to a timeout.
+        </span><span class="kw">let _</span>: std::result::Result&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = <span class="self">self</span>.sender.send(result.into());
+    }
+}
+
+<span class="doccomment">/// Receiver for the acknowledgement that the message was received or dropped.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AcknowledgmentReceiver&lt;R&gt; {
+    receiver: tokio::sync::oneshot::Receiver&lt;R&gt;,
+}
+
+<span class="kw">impl</span>&lt;R&gt; AcknowledgmentReceiver&lt;R&gt; {
+    <span class="doccomment">/// Wait for the message to be acknowledged. If this returns None, that means the message
+    /// was dropped without the receiving end explicitly sending anything back.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>wait_for_acknowledgment(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt; {
+        <span class="self">self</span>.receiver.<span class="kw">await</span>.ok()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

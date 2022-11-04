@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/field/relation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prisma_models/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/field/relation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prisma_models/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -301,308 +301,308 @@
 <span id="301">301</span>
 <span id="302">302</span>
 <span id="303">303</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">FieldArity</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationInfo</span>};
-<span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Display</span>},
-    <span class="ident">hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>},
-    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>},
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>dml::{FieldArity, ReferentialAction, RelationInfo};
+<span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>std::{
+    fmt::{Debug, Display},
+    hash::{Hash, Hasher},
+    sync::{Arc, Weak},
 };
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RelationFieldRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RelationFieldWeak</span> <span class="op">=</span> <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>RelationFieldRef = Arc&lt;RelationField&gt;;
+<span class="kw">pub type </span>RelationFieldWeak = Weak&lt;RelationField&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationField</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">arity</span>: <span class="ident">FieldArity</span>,
-    <span class="kw">pub</span> <span class="ident">relation_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">relation_side</span>: <span class="ident">RelationSide</span>,
-    <span class="kw">pub</span> <span class="ident">relation</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">RelationWeakRef</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">relation_info</span>: <span class="ident">RelationInfo</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>RelationField {
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>arity: FieldArity,
+    <span class="kw">pub </span>relation_name: String,
+    <span class="kw">pub </span>relation_side: RelationSide,
+    <span class="kw">pub </span>relation: OnceCell&lt;RelationWeakRef&gt;,
+    <span class="kw">pub </span>relation_info: RelationInfo,
 
-    <span class="kw">pub</span> <span class="ident">on_delete_default</span>: <span class="ident">ReferentialAction</span>,
-    <span class="kw">pub</span> <span class="ident">on_update_default</span>: <span class="ident">ReferentialAction</span>,
+    <span class="kw">pub </span>on_delete_default: ReferentialAction,
+    <span class="kw">pub </span>on_update_default: ReferentialAction,
 
-    <span class="kw">pub</span> <span class="ident">model</span>: <span class="ident">ModelWeakRef</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldWeak</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub </span>model: ModelWeakRef,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: OnceCell&lt;Vec&lt;ScalarFieldWeak&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">RelationField</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">arity</span>, <span class="ident">FieldArity::List</span>)
+<span class="kw">impl </span>RelationField {
+    <span class="kw">pub fn </span>is_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.arity, FieldArity::List)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">arity</span>, <span class="ident">FieldArity::Required</span>)
+    <span class="kw">pub fn </span>is_required(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.arity, FieldArity::Required)
     }
 
-    <span class="doccomment">/// Returns the `FieldSelection` used for this relation fields model.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## What is the field selection of a relation field?</span>
-    <span class="doccomment">/// The set of fields required by the relation (**on the model of the relation field**) to be able to link the related records.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In case of a many-to-many relation field, we can make the assumption that the primary identifier of the enclosing model</span>
-    <span class="doccomment">/// is the set of linking fields, as this is how Prisma many-to-many works and we only support implicit join tables (i.e. m:n)</span>
-    <span class="doccomment">/// in the Prisma style.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">linking_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FieldSelection</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">is_many_to_many</span>() {
-            <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>()
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">references</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">related_field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">related_field</span>();
-            <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>();
-            <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>();
+    <span class="doccomment">/// Returns the `FieldSelection` used for this relation fields model.
+    ///
+    /// ## What is the field selection of a relation field?
+    /// The set of fields required by the relation (**on the model of the relation field**) to be able to link the related records.
+    ///
+    /// In case of a many-to-many relation field, we can make the assumption that the primary identifier of the enclosing model
+    /// is the set of linking fields, as this is how Prisma many-to-many works and we only support implicit join tables (i.e. m:n)
+    /// in the Prisma style.
+    </span><span class="kw">pub fn </span>linking_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldSelection {
+        <span class="kw">if </span><span class="self">self</span>.relation().is_many_to_many() {
+            <span class="self">self</span>.model().primary_identifier()
+        } <span class="kw">else if </span><span class="self">self</span>.relation_info.references.is_empty() {
+            <span class="kw">let </span>related_field = <span class="self">self</span>.related_field();
+            <span class="kw">let </span>model = <span class="self">self</span>.model();
+            <span class="kw">let </span>fields = model.fields();
 
-            <span class="kw">let</span> <span class="ident">referenced_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">related_field</span>
-                .<span class="ident">relation_info</span>
-                .<span class="ident">references</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field_name</span><span class="op">|</span> {
-                    <span class="ident">fields</span>
-                        .<span class="ident">find_from_all</span>(<span class="ident">field_name</span>)
-                        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
+            <span class="kw">let </span>referenced_fields: Vec&lt;<span class="kw">_</span>&gt; = related_field
+                .relation_info
+                .references
+                .iter()
+                .map(|field_name| {
+                    fields
+                        .find_from_all(field_name)
+                        .unwrap_or_else(|<span class="kw">_</span>| {
                             <span class="macro">panic!</span>(
                                 <span class="string">&quot;Invalid data model: To field {} can&#39;t be resolved on model {}&quot;</span>,
-                                <span class="ident">field_name</span>, <span class="ident">model</span>.<span class="ident">name</span>
+                                field_name, model.name
                             )
                         })
-                        .<span class="ident">clone</span>()
+                        .clone()
                 })
-                .<span class="ident">collect</span>();
+                .collect();
 
-            <span class="ident">FieldSelection::from</span>(<span class="ident">referenced_fields</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">FieldSelection::from</span>(<span class="self">self</span>)
+            FieldSelection::from(referenced_fields)
+        } <span class="kw">else </span>{
+            FieldSelection::from(<span class="self">self</span>)
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_optional</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_required</span>()
+    <span class="kw">pub fn </span>is_optional(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.is_required()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelRef</span> {
-        <span class="self">self</span>.<span class="ident">model</span>
-            .<span class="ident">upgrade</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Model does not exist anymore. Parent model got deleted without deleting the child.&quot;</span>)
+    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
+        <span class="self">self</span>.model
+            .upgrade()
+            .expect(<span class="string">&quot;Model does not exist anymore. Parent model got deleted without deleting the child.&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>();
-            <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>();
+    <span class="kw">pub fn </span>scalar_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
+        <span class="kw">let </span>fields = <span class="self">self</span>.fields.get_or_init(|| {
+            <span class="kw">let </span>model = <span class="self">self</span>.model();
+            <span class="kw">let </span>fields = model.fields();
 
-            <span class="self">self</span>.<span class="ident">relation_info</span>
-                .<span class="ident">fields</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-                    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">find_from_scalar</span>(<span class="ident">f</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
+            <span class="self">self</span>.relation_info
+                .fields
+                .iter()
+                .map(|f| {
+                    Arc::downgrade(<span class="kw-2">&amp;</span>fields.find_from_scalar(f).unwrap_or_else(|<span class="kw">_</span>| {
                         <span class="macro">panic!</span>(
                             <span class="string">&quot;Expected &#39;{}&#39; to be a scalar field on model &#39;{}&#39;, found none.&quot;</span>,
-                            <span class="ident">f</span>, <span class="ident">model</span>.<span class="ident">name</span>
+                            f, model.name
                         )
                     }))
                 })
-                .<span class="ident">collect</span>()
+                .collect()
         });
 
-        <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">upgrade</span>().<span class="ident">unwrap</span>()).<span class="ident">collect</span>()
+        fields.iter().map(|f| f.upgrade().unwrap()).collect()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationRef</span> {
-        <span class="self">self</span>.<span class="ident">relation</span>
-            .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="self">self</span>.<span class="ident">model</span>()
-                    .<span class="ident">internal_data_model</span>()
-                    .<span class="ident">find_relation</span>(
-                        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span>),
-                        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_name</span>,
+    <span class="kw">pub fn </span>relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationRef {
+        <span class="self">self</span>.relation
+            .get_or_init(|| {
+                <span class="self">self</span>.model()
+                    .internal_data_model()
+                    .find_relation(
+                        (<span class="kw-2">&amp;</span><span class="self">self</span>.model().name, <span class="kw-2">&amp;</span><span class="self">self</span>.relation_info.referenced_model),
+                        <span class="kw-2">&amp;</span><span class="self">self</span>.relation_name,
                     )
-                    .<span class="ident">unwrap</span>()
+                    .unwrap()
             })
-            .<span class="ident">upgrade</span>()
-            .<span class="ident">unwrap</span>()
+            .upgrade()
+            .unwrap()
     }
 
-    <span class="doccomment">/// Alias for more clarity (in most cases, doesn&#39;t add more clarity for self-relations);</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_inlined_on_enclosing_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">relation_is_inlined_in_parent</span>()
+    <span class="doccomment">/// Alias for more clarity (in most cases, doesn&#39;t add more clarity for self-relations);
+    </span><span class="kw">pub fn </span>is_inlined_on_enclosing_model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.relation_is_inlined_in_parent()
     }
 
-    <span class="doccomment">/// Inlined in self / model of self</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_is_inlined_in_parent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation</span>();
+    <span class="doccomment">/// Inlined in self / model of self
+    </span><span class="kw">pub fn </span>relation_is_inlined_in_parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>relation = <span class="kw-2">&amp;</span><span class="self">self</span>.relation();
 
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">relation</span>.<span class="ident">manifestation</span> {
-            <span class="ident">RelationLinkManifestation::Inline</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">is_self_rel</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">is_self_relation</span>();
+        <span class="kw">match </span><span class="kw-2">&amp;</span>relation.manifestation {
+            RelationLinkManifestation::Inline(<span class="kw-2">ref </span>m) =&gt; {
+                <span class="kw">let </span>is_self_rel = relation.is_self_relation();
 
-                <span class="kw">if</span> <span class="ident">is_self_rel</span> {
-                    <span class="op">!</span><span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">references</span>.<span class="ident">is_empty</span>()
-                } <span class="kw">else</span> {
-                    <span class="ident">m</span>.<span class="ident">in_table_of_model_name</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>
+                <span class="kw">if </span>is_self_rel {
+                    !<span class="self">self</span>.relation_info.references.is_empty()
+                } <span class="kw">else </span>{
+                    m.in_table_of_model_name == <span class="self">self</span>.model().name
                 }
             }
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_is_inlined_in_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">is_inline_relation</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">relation_is_inlined_in_parent</span>()
+    <span class="kw">pub fn </span>relation_is_inlined_in_child(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.relation().is_inline_relation() &amp;&amp; !<span class="self">self</span>.relation_is_inlined_in_parent()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelRef</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">relation_side</span> {
-            <span class="ident">RelationSide::A</span> =&gt; <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">model_b</span>(),
-            <span class="ident">RelationSide::B</span> =&gt; <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">model_a</span>(),
+    <span class="kw">pub fn </span>related_model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
+        <span class="kw">match </span><span class="self">self</span>.relation_side {
+            RelationSide::A =&gt; <span class="self">self</span>.relation().model_b(),
+            RelationSide::B =&gt; <span class="self">self</span>.relation().model_a(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">relation_side</span> {
-            <span class="ident">RelationSide::A</span> =&gt; <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">field_b</span>(),
-            <span class="ident">RelationSide::B</span> =&gt; <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">field_a</span>(),
+    <span class="kw">pub fn </span>related_field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Arc&lt;RelationField&gt; {
+        <span class="kw">match </span><span class="self">self</span>.relation_side {
+            RelationSide::A =&gt; <span class="self">self</span>.relation().field_b(),
+            RelationSide::B =&gt; <span class="self">self</span>.relation().field_a(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_relation_with_name_and_side</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">relation_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">side</span>: <span class="ident">RelationSide</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">name</span> <span class="op">==</span> <span class="ident">relation_name</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_side</span> <span class="op">==</span> <span class="ident">side</span>
+    <span class="kw">pub fn </span>is_relation_with_name_and_side(<span class="kw-2">&amp;</span><span class="self">self</span>, relation_name: <span class="kw-2">&amp;</span>str, side: RelationSide) -&gt; bool {
+        <span class="self">self</span>.relation().name == relation_name &amp;&amp; <span class="self">self</span>.relation_side == side
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_identifiers_with_arities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TypeIdentifier</span>, <span class="ident">FieldArity</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">scalar_fields</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">type_identifier_with_arity</span>())
-            .<span class="ident">collect</span>()
+    <span class="kw">pub fn </span>type_identifiers_with_arities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(TypeIdentifier, FieldArity)&gt; {
+        <span class="self">self</span>.scalar_fields()
+            .iter()
+            .map(|f| f.type_identifier_with_arity())
+            .collect()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">relation_info</span>
-            .<span class="ident">references</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field_name</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">related_model</span>().<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="ident">field_name</span>).<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>()
+    <span class="kw">pub fn </span>referenced_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
+        <span class="self">self</span>.relation_info
+            .references
+            .iter()
+            .map(|field_name| <span class="self">self</span>.related_model().fields().find_from_scalar(field_name).unwrap())
+            .collect()
     }
 
-    <span class="comment">// Scalar fields on the left (source) side of the relation if starting traversal from `self`.</span>
-    <span class="comment">// Todo This is provisionary.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left_scalars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">is_many_to_many</span>() {
-            <span class="self">self</span>.<span class="ident">model</span>()
-                .<span class="ident">primary_identifier</span>()
-                .<span class="ident">as_scalar_fields</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;Left scalars contain non-scalar selections.&quot;</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-            <span class="self">self</span>.<span class="ident">scalar_fields</span>()
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">related_field</span>().<span class="ident">referenced_fields</span>()
+    <span class="comment">// Scalar fields on the left (source) side of the relation if starting traversal from `self`.
+    // Todo This is provisionary.
+    </span><span class="kw">pub fn </span>left_scalars(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
+        <span class="kw">if </span><span class="self">self</span>.relation().is_many_to_many() {
+            <span class="self">self</span>.model()
+                .primary_identifier()
+                .as_scalar_fields()
+                .expect(<span class="string">&quot;Left scalars contain non-scalar selections.&quot;</span>)
+        } <span class="kw">else if </span><span class="self">self</span>.is_inlined_on_enclosing_model() {
+            <span class="self">self</span>.scalar_fields()
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.related_field().referenced_fields()
         }
     }
 
-    <span class="comment">// Scalar fields on the right (target) side of the relation if starting traversal from `self`.</span>
-    <span class="comment">// Todo This is provisionary.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">right_scalars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">is_many_to_many</span>() {
-            <span class="kw">let</span> <span class="ident">related_field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">related_field</span>();
-            <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">related_model</span>();
+    <span class="comment">// Scalar fields on the right (target) side of the relation if starting traversal from `self`.
+    // Todo This is provisionary.
+    </span><span class="kw">pub fn </span>right_scalars(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
+        <span class="kw">if </span><span class="self">self</span>.relation().is_many_to_many() {
+            <span class="kw">let </span>related_field = <span class="self">self</span>.related_field();
+            <span class="kw">let </span>related_model = <span class="self">self</span>.related_model();
 
-            <span class="kw">if</span> <span class="ident">related_field</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">related_model</span>
-                    .<span class="ident">primary_identifier</span>()
-                    .<span class="ident">as_scalar_fields</span>()
-                    .<span class="ident">expect</span>(<span class="string">&quot;Right scalars contain non-scalar selections.&quot;</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">related_field</span>
-                    .<span class="ident">relation_info</span>
-                    .<span class="ident">fields</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">related_model</span>.<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="ident">f</span>.<span class="ident">as_str</span>()).<span class="ident">unwrap</span>())
-                    .<span class="ident">collect</span>()
+            <span class="kw">if </span>related_field.relation_info.fields.is_empty() {
+                related_model
+                    .primary_identifier()
+                    .as_scalar_fields()
+                    .expect(<span class="string">&quot;Right scalars contain non-scalar selections.&quot;</span>)
+            } <span class="kw">else </span>{
+                related_field
+                    .relation_info
+                    .fields
+                    .iter()
+                    .map(|f| related_model.fields().find_from_scalar(f.as_str()).unwrap())
+                    .collect()
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-            <span class="self">self</span>.<span class="ident">referenced_fields</span>()
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">related_field</span>().<span class="ident">scalar_fields</span>()
+        } <span class="kw">else if </span><span class="self">self</span>.is_inlined_on_enclosing_model() {
+            <span class="self">self</span>.referenced_fields()
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.related_field().scalar_fields()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">scalar_fields</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())
+    <span class="kw">pub fn </span>db_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = String&gt; {
+        <span class="self">self</span>.scalar_fields().into_iter().map(|f| f.db_name().to_owned())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span>.<span class="ident">as_ref</span>()
+    <span class="kw">pub fn </span>on_delete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ReferentialAction&gt; {
+        <span class="self">self</span>.relation_info.on_delete.as_ref()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">on_update</span>.<span class="ident">as_ref</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RelationField&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;arity&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">arity</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;relation_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_name</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;relation_side&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_side</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;relation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;relation_info&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_info</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;model&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#ModelWeakRef#&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fields</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">pub fn </span>on_update(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ReferentialAction&gt; {
+        <span class="self">self</span>.relation_info.on_update.as_ref()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>, <span class="self">self</span>.<span class="ident">name</span>)
+<span class="kw">impl </span>Debug <span class="kw">for </span>RelationField {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_struct(<span class="string">&quot;RelationField&quot;</span>)
+            .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
+            .field(<span class="string">&quot;arity&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.arity)
+            .field(<span class="string">&quot;relation_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.relation_name)
+            .field(<span class="string">&quot;relation_side&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.relation_side)
+            .field(<span class="string">&quot;relation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.relation)
+            .field(<span class="string">&quot;relation_info&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.relation_info)
+            .field(<span class="string">&quot;model&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#ModelWeakRef#&quot;</span>)
+            .field(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.fields)
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">RelationField</span> {}
-
-<span class="kw">impl</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">arity</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">relation_name</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">relation_side</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">hash</span>(<span class="ident">state</span>);
+<span class="kw">impl </span>Display <span class="kw">for </span>RelationField {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.model().name, <span class="self">self</span>.name)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">arity</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">arity</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">relation_name</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_side</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">relation_side</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">model</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">model</span>()
+<span class="kw">impl </span>Eq <span class="kw">for </span>RelationField {}
+
+<span class="kw">impl </span>Hash <span class="kw">for </span>RelationField {
+    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+        <span class="self">self</span>.name.hash(state);
+        <span class="self">self</span>.arity.hash(state);
+        <span class="self">self</span>.relation_name.hash(state);
+        <span class="self">self</span>.relation_side.hash(state);
+        <span class="self">self</span>.model().hash(state);
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RelationSide</span> {
-    <span class="ident">A</span>,
-    <span class="ident">B</span>,
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>RelationField {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.name == other.name
+            &amp;&amp; <span class="self">self</span>.arity == other.arity
+            &amp;&amp; <span class="self">self</span>.relation_name == other.relation_name
+            &amp;&amp; <span class="self">self</span>.relation_side == other.relation_side
+            &amp;&amp; <span class="self">self</span>.model() == other.model()
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">RelationSide</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opposite</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationSide</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelationSide::A</span> =&gt; <span class="ident">RelationSide::B</span>,
-            <span class="ident">RelationSide::B</span> =&gt; <span class="ident">RelationSide::A</span>,
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>RelationSide {
+    A,
+    B,
+}
+
+<span class="kw">impl </span>RelationSide {
+    <span class="kw">pub fn </span>opposite(<span class="self">self</span>) -&gt; RelationSide {
+        <span class="kw">match </span><span class="self">self </span>{
+            RelationSide::A =&gt; RelationSide::B,
+            RelationSide::B =&gt; RelationSide::A,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_a</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="ident">RelationSide::A</span>
+    <span class="kw">pub fn </span>is_a(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== RelationSide::A
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_b</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="ident">RelationSide::B</span>
+    <span class="kw">pub fn </span>is_b(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== RelationSide::B
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

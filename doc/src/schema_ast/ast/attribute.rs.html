@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/ast/attribute.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>attribute.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/ast/attribute.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>attribute.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -116,123 +116,123 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ArgumentsList</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithSpan</span>};
-<span class="kw">use</span> <span class="ident">std::ops::Index</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::{ArgumentsList, Identifier, Span, WithIdentifier, WithSpan};
+<span class="kw">use </span>std::ops::Index;
 
-<span class="doccomment">/// An attribute (following `@` or `@@``) on a model, model field, enum, enum value or composite</span>
-<span class="doccomment">/// type field.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Attribute</span> {
-    <span class="doccomment">/// The name of the attribute:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// @@index([a, b, c])</span>
-    <span class="doccomment">///   ^^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Identifier</span>,
-    <span class="doccomment">/// The arguments of the attribute.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// @@index([a, b, c], map: &quot;myidix&quot;)</span>
-    <span class="doccomment">///         ^^^^^^^^^^^^^^^^^^^^^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="ident">arguments</span>: <span class="ident">ArgumentsList</span>,
-    <span class="doccomment">/// The AST span of the node.</span>
-    <span class="kw">pub</span> <span class="ident">span</span>: <span class="ident">Span</span>,
+<span class="doccomment">/// An attribute (following `@` or `@@``) on a model, model field, enum, enum value or composite
+/// type field.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Attribute {
+    <span class="doccomment">/// The name of the attribute:
+    ///
+    /// ```ignore
+    /// @@index([a, b, c])
+    ///   ^^^^^
+    /// ```
+    </span><span class="kw">pub </span>name: Identifier,
+    <span class="doccomment">/// The arguments of the attribute.
+    ///
+    /// ```ignore
+    /// @@index([a, b, c], map: &quot;myidix&quot;)
+    ///         ^^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    </span><span class="kw">pub </span>arguments: ArgumentsList,
+    <span class="doccomment">/// The AST span of the node.
+    </span><span class="kw">pub </span>span: Span,
 }
 
-<span class="kw">impl</span> <span class="ident">Attribute</span> {
-    <span class="doccomment">/// Try to find the argument and return its span.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span_for_argument</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">argument</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">arguments</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">argument</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">span</span>)
+<span class="kw">impl </span>Attribute {
+    <span class="doccomment">/// Try to find the argument and return its span.
+    </span><span class="kw">pub fn </span>span_for_argument(<span class="kw-2">&amp;</span><span class="self">self</span>, argument: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Span&gt; {
+        <span class="self">self</span>.arguments
+            .iter()
+            .find(|a| a.name.as_ref().map(|n| n.name.as_str()) == <span class="prelude-val">Some</span>(argument))
+            .map(|a| a.span)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithIdentifier</span> <span class="kw">for</span> <span class="ident">Attribute</span> {
-    <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Identifier</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+<span class="kw">impl </span>WithIdentifier <span class="kw">for </span>Attribute {
+    <span class="kw">fn </span>identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Identifier {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithSpan</span> <span class="kw">for</span> <span class="ident">Attribute</span> {
-    <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Span</span> {
-        <span class="self">self</span>.<span class="ident">span</span>
+<span class="kw">impl </span>WithSpan <span class="kw">for </span>Attribute {
+    <span class="kw">fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Span {
+        <span class="self">self</span>.span
     }
 }
 
-<span class="doccomment">/// A node containing attributes.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AttributeContainer</span> {
-    <span class="ident">Model</span>(<span class="ident"><span class="kw">super</span>::ModelId</span>),
-    <span class="ident">ModelField</span>(<span class="ident"><span class="kw">super</span>::ModelId</span>, <span class="ident"><span class="kw">super</span>::FieldId</span>),
-    <span class="ident">Enum</span>(<span class="ident"><span class="kw">super</span>::EnumId</span>),
-    <span class="ident">EnumValue</span>(<span class="ident"><span class="kw">super</span>::EnumId</span>, <span class="ident">u32</span>),
-    <span class="ident">CompositeTypeField</span>(<span class="ident"><span class="kw">super</span>::CompositeTypeId</span>, <span class="ident"><span class="kw">super</span>::FieldId</span>),
+<span class="doccomment">/// A node containing attributes.
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+</span><span class="kw">pub enum </span>AttributeContainer {
+    Model(<span class="kw">super</span>::ModelId),
+    ModelField(<span class="kw">super</span>::ModelId, <span class="kw">super</span>::FieldId),
+    Enum(<span class="kw">super</span>::EnumId),
+    EnumValue(<span class="kw">super</span>::EnumId, u32),
+    CompositeTypeField(<span class="kw">super</span>::CompositeTypeId, <span class="kw">super</span>::FieldId),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::ModelId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttributeContainer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident"><span class="kw">super</span>::ModelId</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Model</span>(<span class="ident">v</span>)
+<span class="kw">impl </span>From&lt;<span class="kw">super</span>::ModelId&gt; <span class="kw">for </span>AttributeContainer {
+    <span class="kw">fn </span>from(v: <span class="kw">super</span>::ModelId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Model(v)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident"><span class="kw">super</span>::ModelId</span>, <span class="ident"><span class="kw">super</span>::FieldId</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttributeContainer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">model</span>, <span class="ident">field</span>): (<span class="ident"><span class="kw">super</span>::ModelId</span>, <span class="ident"><span class="kw">super</span>::FieldId</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::ModelField</span>(<span class="ident">model</span>, <span class="ident">field</span>)
+<span class="kw">impl </span>From&lt;(<span class="kw">super</span>::ModelId, <span class="kw">super</span>::FieldId)&gt; <span class="kw">for </span>AttributeContainer {
+    <span class="kw">fn </span>from((model, field): (<span class="kw">super</span>::ModelId, <span class="kw">super</span>::FieldId)) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::ModelField(model, field)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::EnumId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttributeContainer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident"><span class="kw">super</span>::EnumId</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Enum</span>(<span class="ident">v</span>)
+<span class="kw">impl </span>From&lt;<span class="kw">super</span>::EnumId&gt; <span class="kw">for </span>AttributeContainer {
+    <span class="kw">fn </span>from(v: <span class="kw">super</span>::EnumId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Enum(v)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident"><span class="kw">super</span>::CompositeTypeId</span>, <span class="ident"><span class="kw">super</span>::FieldId</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttributeContainer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">ct</span>, <span class="ident">field</span>): (<span class="ident"><span class="kw">super</span>::CompositeTypeId</span>, <span class="ident"><span class="kw">super</span>::FieldId</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::CompositeTypeField</span>(<span class="ident">ct</span>, <span class="ident">field</span>)
+<span class="kw">impl </span>From&lt;(<span class="kw">super</span>::CompositeTypeId, <span class="kw">super</span>::FieldId)&gt; <span class="kw">for </span>AttributeContainer {
+    <span class="kw">fn </span>from((ct, field): (<span class="kw">super</span>::CompositeTypeId, <span class="kw">super</span>::FieldId)) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::CompositeTypeField(ct, field)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident"><span class="kw">super</span>::EnumId</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttributeContainer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">enm</span>, <span class="ident">val</span>): (<span class="ident"><span class="kw">super</span>::EnumId</span>, <span class="ident">u32</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::EnumValue</span>(<span class="ident">enm</span>, <span class="ident">val</span>)
+<span class="kw">impl </span>From&lt;(<span class="kw">super</span>::EnumId, u32)&gt; <span class="kw">for </span>AttributeContainer {
+    <span class="kw">fn </span>from((enm, val): (<span class="kw">super</span>::EnumId, u32)) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::EnumValue(enm, val)
     }
 }
 
-<span class="doccomment">/// An attribute (@ or @@) node in the AST.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AttributeId</span>(<span class="ident">AttributeContainer</span>, <span class="ident">u32</span>);
+<span class="doccomment">/// An attribute (@ or @@) node in the AST.
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+</span><span class="kw">pub struct </span>AttributeId(AttributeContainer, u32);
 
-<span class="kw">impl</span> <span class="ident">AttributeId</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_in_container</span>(<span class="ident">container</span>: <span class="ident">AttributeContainer</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">AttributeId</span> {
-        <span class="ident">AttributeId</span>(<span class="ident">container</span>, <span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>)
+<span class="kw">impl </span>AttributeId {
+    <span class="kw">pub fn </span>new_in_container(container: AttributeContainer, idx: usize) -&gt; AttributeId {
+        AttributeId(container, idx <span class="kw">as </span>u32)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">AttributeContainer</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">super</span>::SchemaAst</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> [<span class="ident">Attribute</span>];
+<span class="kw">impl </span>Index&lt;AttributeContainer&gt; <span class="kw">for </span><span class="kw">super</span>::SchemaAst {
+    <span class="kw">type </span>Output = [Attribute];
 
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">AttributeContainer</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw">match</span> <span class="ident">index</span> {
-            <span class="ident">AttributeContainer::Model</span>(<span class="ident">model_id</span>) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">model_id</span>].<span class="ident">attributes</span>,
-            <span class="ident">AttributeContainer::ModelField</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">model_id</span>][<span class="ident">field_id</span>].<span class="ident">attributes</span>,
-            <span class="ident">AttributeContainer::Enum</span>(<span class="ident">enum_id</span>) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">enum_id</span>].<span class="ident">attributes</span>,
-            <span class="ident">AttributeContainer::EnumValue</span>(<span class="ident">enum_id</span>, <span class="ident">value_idx</span>) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">enum_id</span>].<span class="ident">values</span>[<span class="ident">value_idx</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">attributes</span>,
-            <span class="ident">AttributeContainer::CompositeTypeField</span>(<span class="ident">ctid</span>, <span class="ident">field_id</span>) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">ctid</span>][<span class="ident">field_id</span>].<span class="ident">attributes</span>,
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: AttributeContainer) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="kw">match </span>index {
+            AttributeContainer::Model(model_id) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[model_id].attributes,
+            AttributeContainer::ModelField(model_id, field_id) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[model_id][field_id].attributes,
+            AttributeContainer::Enum(enum_id) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[enum_id].attributes,
+            AttributeContainer::EnumValue(enum_id, value_idx) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[enum_id].values[value_idx <span class="kw">as </span>usize].attributes,
+            AttributeContainer::CompositeTypeField(ctid, field_id) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[ctid][field_id].attributes,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">AttributeId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">super</span>::SchemaAst</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Attribute</span>;
+<span class="kw">impl </span>Index&lt;AttributeId&gt; <span class="kw">for </span><span class="kw">super</span>::SchemaAst {
+    <span class="kw">type </span>Output = Attribute;
 
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">AttributeId</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">index</span>.<span class="number">0</span>][<span class="ident">index</span>.<span class="number">1</span> <span class="kw">as</span> <span class="ident">usize</span>]
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: AttributeId) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="kw-2">&amp;</span><span class="self">self</span>[index.<span class="number">0</span>][index.<span class="number">1 </span><span class="kw">as </span>usize]
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

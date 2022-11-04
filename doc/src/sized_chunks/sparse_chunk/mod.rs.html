@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sized-chunks-0.6.5/src/sparse_chunk/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sized_chunks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sized-chunks-0.6.5/src/sparse_chunk/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sized_chunks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -512,519 +512,519 @@
 <span id="512">512</span>
 <span id="513">513</span>
 <span id="514">514</span>
-</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public</span>
-<span class="comment">// License, v. 2.0. If a copy of the MPL was not distributed with this</span>
-<span class="comment">// file, You can obtain one at http://mozilla.org/MPL/2.0/.</span>
+</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-<span class="doccomment">//! A fixed capacity sparse array.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [`SparseChunk`](struct.SparseChunk.html)</span>
+</span><span class="doccomment">//! A fixed capacity sparse array.
+//!
+//! See [`SparseChunk`](struct.SparseChunk.html)
 
-<span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Error</span>, <span class="ident">Formatter</span>};
-<span class="kw">use</span> <span class="ident">core::iter::FromIterator</span>;
-<span class="kw">use</span> <span class="ident">core::mem</span>::{<span class="self">self</span>, <span class="ident">MaybeUninit</span>};
-<span class="kw">use</span> <span class="ident">core::ops::Index</span>;
-<span class="kw">use</span> <span class="ident">core::ops::IndexMut</span>;
-<span class="kw">use</span> <span class="ident">core::ptr</span>;
-<span class="kw">use</span> <span class="ident">core::slice</span>::{<span class="ident">from_raw_parts</span>, <span class="ident">from_raw_parts_mut</span>};
+</span><span class="kw">use </span>core::fmt::{Debug, Error, Formatter};
+<span class="kw">use </span>core::iter::FromIterator;
+<span class="kw">use </span>core::mem::{<span class="self">self</span>, MaybeUninit};
+<span class="kw">use </span>core::ops::Index;
+<span class="kw">use </span>core::ops::IndexMut;
+<span class="kw">use </span>core::ptr;
+<span class="kw">use </span>core::slice::{from_raw_parts, from_raw_parts_mut};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::collections::{BTreeMap, HashMap};
 
-<span class="kw">use</span> <span class="ident">typenum::U64</span>;
+<span class="kw">use </span>typenum::U64;
 
-<span class="kw">use</span> <span class="ident">bitmaps</span>::{<span class="ident">Bitmap</span>, <span class="ident">Bits</span>, <span class="ident">Iter</span> <span class="kw">as</span> <span class="ident">BitmapIter</span>};
+<span class="kw">use </span>bitmaps::{Bitmap, Bits, Iter <span class="kw">as </span>BitmapIter};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::ChunkLength</span>;
+<span class="kw">use </span><span class="kw">crate</span>::types::ChunkLength;
 
-<span class="kw">mod</span> <span class="ident">iter</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::iter</span>::{<span class="ident">Drain</span>, <span class="ident">Iter</span>, <span class="ident">IterMut</span>, <span class="ident">OptionDrain</span>, <span class="ident">OptionIter</span>, <span class="ident">OptionIterMut</span>};
+<span class="kw">mod </span>iter;
+<span class="kw">pub use </span><span class="self">self</span>::iter::{Drain, Iter, IterMut, OptionDrain, OptionIter, OptionIterMut};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;refpool&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">refpool</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;refpool&quot;</span>)]
+</span><span class="kw">mod </span>refpool;
 
-<span class="doccomment">/// A fixed capacity sparse array.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An inline sparse array of up to `N` items of type `A`, where `N` is an</span>
-<span class="doccomment">/// [`Unsigned`][Unsigned] type level numeral. You can think of it as an array</span>
-<span class="doccomment">/// of `Option&lt;A&gt;`, where the discriminant (whether the value is `Some&lt;A&gt;` or</span>
-<span class="doccomment">/// `None`) is kept in a bitmap instead of adjacent to the value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Because the bitmap is kept in a primitive type, the maximum value of `N` is</span>
-<span class="doccomment">/// currently 128, corresponding to a type of `u128`. The type of the bitmap</span>
-<span class="doccomment">/// will be the minimum unsigned integer type required to fit the number of bits</span>
-<span class="doccomment">/// required. Thus, disregarding memory alignment rules, the allocated size of a</span>
-<span class="doccomment">/// `SparseChunk` will be `uX` + `A` * `N` where `uX` is the type of the</span>
-<span class="doccomment">/// discriminant bitmap, either `u8`, `u16`, `u32`, `u64` or `u128`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate sized_chunks;</span>
-<span class="doccomment">/// # extern crate typenum;</span>
-<span class="doccomment">/// # use sized_chunks::SparseChunk;</span>
-<span class="doccomment">/// # use typenum::U20;</span>
-<span class="doccomment">/// // Construct a chunk with a 20 item capacity</span>
-<span class="doccomment">/// let mut chunk = SparseChunk::&lt;i32, U20&gt;::new();</span>
-<span class="doccomment">/// // Set the 18th index to the value 5.</span>
-<span class="doccomment">/// chunk.insert(18, 5);</span>
-<span class="doccomment">/// // Set the 5th index to the value 23.</span>
-<span class="doccomment">/// chunk.insert(5, 23);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(chunk.len(), 2);</span>
-<span class="doccomment">/// assert_eq!(chunk.get(5), Some(&amp;23));</span>
-<span class="doccomment">/// assert_eq!(chunk.get(6), None);</span>
-<span class="doccomment">/// assert_eq!(chunk.get(18), Some(&amp;5));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Unsigned]: https://docs.rs/typenum/1.10.0/typenum/marker_traits/trait.Unsigned.html</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">U64</span><span class="op">&gt;</span> {
-    <span class="ident">map</span>: <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
-    <span class="ident">data</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">N::SizedType</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A fixed capacity sparse array.
+///
+/// An inline sparse array of up to `N` items of type `A`, where `N` is an
+/// [`Unsigned`][Unsigned] type level numeral. You can think of it as an array
+/// of `Option&lt;A&gt;`, where the discriminant (whether the value is `Some&lt;A&gt;` or
+/// `None`) is kept in a bitmap instead of adjacent to the value.
+///
+/// Because the bitmap is kept in a primitive type, the maximum value of `N` is
+/// currently 128, corresponding to a type of `u128`. The type of the bitmap
+/// will be the minimum unsigned integer type required to fit the number of bits
+/// required. Thus, disregarding memory alignment rules, the allocated size of a
+/// `SparseChunk` will be `uX` + `A` * `N` where `uX` is the type of the
+/// discriminant bitmap, either `u8`, `u16`, `u32`, `u64` or `u128`.
+///
+/// # Examples
+///
+/// ```rust
+/// # #[macro_use] extern crate sized_chunks;
+/// # extern crate typenum;
+/// # use sized_chunks::SparseChunk;
+/// # use typenum::U20;
+/// // Construct a chunk with a 20 item capacity
+/// let mut chunk = SparseChunk::&lt;i32, U20&gt;::new();
+/// // Set the 18th index to the value 5.
+/// chunk.insert(18, 5);
+/// // Set the 5th index to the value 23.
+/// chunk.insert(5, 23);
+///
+/// assert_eq!(chunk.len(), 2);
+/// assert_eq!(chunk.get(5), Some(&amp;23));
+/// assert_eq!(chunk.get(6), None);
+/// assert_eq!(chunk.get(18), Some(&amp;5));
+/// ```
+///
+/// [Unsigned]: https://docs.rs/typenum/1.10.0/typenum/marker_traits/trait.Unsigned.html
+</span><span class="kw">pub struct </span>SparseChunk&lt;A, N: Bits + ChunkLength&lt;A&gt; = U64&gt; {
+    map: Bitmap&lt;N&gt;,
+    data: MaybeUninit&lt;N::SizedType&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="ident">mem::needs_drop</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() {
-            <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map</span>;
-            <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">bits</span> {
-                <span class="kw">unsafe</span> { <span class="ident">ptr::drop_in_place</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">values_mut</span>()[<span class="ident">index</span>]) }
+<span class="kw">impl</span>&lt;A, N: Bits + ChunkLength&lt;A&gt;&gt; Drop <span class="kw">for </span>SparseChunk&lt;A, N&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span>mem::needs_drop::&lt;A&gt;() {
+            <span class="kw">let </span>bits = <span class="self">self</span>.map;
+            <span class="kw">for </span>index <span class="kw">in </span><span class="kw-2">&amp;</span>bits {
+                <span class="kw">unsafe </span>{ ptr::drop_in_place(<span class="kw-2">&amp;mut </span><span class="self">self</span>.values_mut()[index]) }
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Clone</span>, <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span> {
-            <span class="ident">out</span>.<span class="ident">insert</span>(<span class="ident">index</span>, <span class="self">self</span>[<span class="ident">index</span>].<span class="ident">clone</span>());
+<span class="kw">impl</span>&lt;A: Clone, N: Bits + ChunkLength&lt;A&gt;&gt; Clone <span class="kw">for </span>SparseChunk&lt;A, N&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="self">Self</span>::new();
+        <span class="kw">for </span>index <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.map {
+            out.insert(index, <span class="self">self</span>[index].clone());
         }
-        <span class="ident">out</span>
+        out
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;A, N&gt; SparseChunk&lt;A, N&gt;
+<span class="kw">where
+    </span>N: Bits + ChunkLength&lt;A&gt;,
 {
-    <span class="doccomment">/// The maximum number of elements a `SparseChunk` can contain.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CAPACITY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">N::USIZE</span>;
+    <span class="doccomment">/// The maximum number of elements a `SparseChunk` can contain.
+    </span><span class="kw">pub const </span>CAPACITY: usize = N::USIZE;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">A</span>] {
-        <span class="kw">unsafe</span> { <span class="ident">from_raw_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">A</span>, <span class="ident">N::USIZE</span>) }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>values(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[A] {
+        <span class="kw">unsafe </span>{ from_raw_parts(<span class="kw-2">&amp;</span><span class="self">self</span>.data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>A, N::USIZE) }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">values_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">A</span>] {
-        <span class="kw">unsafe</span> { <span class="ident">from_raw_parts_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">A</span>, <span class="ident">N::USIZE</span>) }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>values_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[A] {
+        <span class="kw">unsafe </span>{ from_raw_parts_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as </span><span class="kw-2">*mut </span>A, N::USIZE) }
     }
 
-    <span class="doccomment">/// Copy the value at an index, discarding ownership of the copied value</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">force_read</span>(<span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">chunk</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">A</span> {
-        <span class="ident">ptr::read</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>.<span class="ident">values</span>()[<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span>])
+    <span class="doccomment">/// Copy the value at an index, discarding ownership of the copied value
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>force_read(index: usize, chunk: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; A {
+        ptr::read(<span class="kw-2">&amp;</span>chunk.values()[index <span class="kw">as </span>usize])
     }
 
-    <span class="doccomment">/// Write a value at an index without trying to drop what&#39;s already there</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">force_write</span>(<span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">A</span>, <span class="ident">chunk</span>: <span class="kw-2">&amp;mut</span> <span class="self">Self</span>) {
-        <span class="ident">ptr::write</span>(<span class="kw-2">&amp;mut</span> <span class="ident">chunk</span>.<span class="ident">values_mut</span>()[<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="ident">value</span>)
+    <span class="doccomment">/// Write a value at an index without trying to drop what&#39;s already there
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>force_write(index: usize, value: A, chunk: <span class="kw-2">&amp;mut </span><span class="self">Self</span>) {
+        ptr::write(<span class="kw-2">&amp;mut </span>chunk.values_mut()[index <span class="kw">as </span>usize], value)
     }
 
-    <span class="doccomment">/// Construct a new empty chunk.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">map</span>: <span class="ident">Bitmap::default</span>(),
-            <span class="ident">data</span>: <span class="ident">MaybeUninit::uninit</span>(),
+    <span class="doccomment">/// Construct a new empty chunk.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            map: Bitmap::default(),
+            data: MaybeUninit::uninit(),
         }
     }
 
-    <span class="doccomment">/// Construct a new chunk with one item.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unit</span>(<span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
-        <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="ident">index</span>, <span class="ident">value</span>);
-        <span class="ident">chunk</span>
+    <span class="doccomment">/// Construct a new chunk with one item.
+    </span><span class="kw">pub fn </span>unit(index: usize, value: A) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk = <span class="self">Self</span>::new();
+        chunk.insert(index, value);
+        chunk
     }
 
-    <span class="doccomment">/// Construct a new chunk with two items.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pair</span>(<span class="ident">index1</span>: <span class="ident">usize</span>, <span class="ident">value1</span>: <span class="ident">A</span>, <span class="ident">index2</span>: <span class="ident">usize</span>, <span class="ident">value2</span>: <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
-        <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="ident">index1</span>, <span class="ident">value1</span>);
-        <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="ident">index2</span>, <span class="ident">value2</span>);
-        <span class="ident">chunk</span>
+    <span class="doccomment">/// Construct a new chunk with two items.
+    </span><span class="kw">pub fn </span>pair(index1: usize, value1: A, index2: usize, value2: A) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk = <span class="self">Self</span>::new();
+        chunk.insert(index1, value1);
+        chunk.insert(index2, value2);
+        chunk
     }
 
-    <span class="doccomment">/// Get the length of the chunk.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Get the length of the chunk.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.map.len()
     }
 
-    <span class="doccomment">/// Test if the chunk is empty.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
+    <span class="doccomment">/// Test if the chunk is empty.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.map.len() == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Test if the chunk is at capacity.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_full(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == N::USIZE
     }
 
-    <span class="doccomment">/// Test if the chunk is at capacity.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">N::USIZE</span>
-    }
-
-    <span class="doccomment">/// Insert a new value at a given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previous value at that index, if any.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">N::USIZE</span> {
+    <span class="doccomment">/// Insert a new value at a given index.
+    ///
+    /// Returns the previous value at that index, if any.
+    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize, value: A) -&gt; <span class="prelude-ty">Option</span>&lt;A&gt; {
+        <span class="kw">if </span>index &gt;= N::USIZE {
             <span class="macro">panic!</span>(<span class="string">&quot;SparseChunk::insert: index out of bounds&quot;</span>);
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">set</span>(<span class="ident">index</span>, <span class="bool-val">true</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">values_mut</span>()[<span class="ident">index</span>], <span class="ident">value</span>))
-        } <span class="kw">else</span> {
-            <span class="kw">unsafe</span> { <span class="ident">SparseChunk::force_write</span>(<span class="ident">index</span>, <span class="ident">value</span>, <span class="self">self</span>) };
-            <span class="prelude-val">None</span>
-        }
+        <span class="kw">if </span><span class="self">self</span>.map.set(index, <span class="bool-val">true</span>) {
+            <span class="prelude-val">Some</span>(mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.values_mut()[index], value))
+        } <span class="kw">else </span>{
+            <span class="kw">unsafe </span>{ SparseChunk::force_write(index, value, <span class="self">self</span>) };
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="doccomment">/// Remove the value at a given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the value, or `None` if the index had no value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">N::USIZE</span> {
+    <span class="doccomment">/// Remove the value at a given index.
+    ///
+    /// Returns the value, or `None` if the index had no value.
+    </span><span class="kw">pub fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;A&gt; {
+        <span class="kw">if </span>index &gt;= N::USIZE {
             <span class="macro">panic!</span>(<span class="string">&quot;SparseChunk::remove: index out of bounds&quot;</span>);
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">set</span>(<span class="ident">index</span>, <span class="bool-val">false</span>) {
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="ident">SparseChunk::force_read</span>(<span class="ident">index</span>, <span class="self">self</span>) })
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+        <span class="kw">if </span><span class="self">self</span>.map.set(index, <span class="bool-val">false</span>) {
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ SparseChunk::force_read(index, <span class="self">self</span>) })
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="doccomment">/// Remove the first value present in the array.
+    ///
+    /// Returns the value that was removed, or `None` if the array was empty.
+    </span><span class="kw">pub fn </span>pop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;A&gt; {
+        <span class="self">self</span>.first_index().and_then(|index| <span class="self">self</span>.remove(index))
+    }
+
+    <span class="doccomment">/// Get the value at a given index.
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>A&gt; {
+        <span class="kw">if </span>index &gt;= N::USIZE {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+        <span class="kw">if </span><span class="self">self</span>.map.get(index) {
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="self">self</span>.get_unchecked(index) })
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="doccomment">/// Get a mutable reference to the value at a given index.
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>A&gt; {
+        <span class="kw">if </span>index &gt;= N::USIZE {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+        <span class="kw">if </span><span class="self">self</span>.map.get(index) {
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="self">self</span>.get_unchecked_mut(index) })
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="doccomment">/// Get an unchecked reference to the value at a given index.
+    ///
+    /// # Safety
+    ///
+    /// Uninhabited indices contain uninitialised data, so make sure you validate
+    /// the index before using this method.
+    </span><span class="kw">pub unsafe fn </span>get_unchecked(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">&amp;</span>A {
+        <span class="self">self</span>.values().get_unchecked(index)
+    }
+
+    <span class="doccomment">/// Get an unchecked mutable reference to the value at a given index.
+    ///
+    /// # Safety
+    ///
+    /// Uninhabited indices contain uninitialised data, so make sure you validate
+    /// the index before using this method.
+    </span><span class="kw">pub unsafe fn </span>get_unchecked_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">&amp;mut </span>A {
+        <span class="self">self</span>.values_mut().get_unchecked_mut(index)
+    }
+
+    <span class="doccomment">/// Make an iterator over the indices which contain values.
+    </span><span class="kw">pub fn </span>indices(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitmapIter&lt;<span class="lifetime">&#39;_</span>, N&gt; {
+        <span class="self">self</span>.map.into_iter()
+    }
+
+    <span class="doccomment">/// Find the first index which contains a value.
+    </span><span class="kw">pub fn </span>first_index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="self">self</span>.map.first_index()
+    }
+
+    <span class="doccomment">/// Make an iterator of references to the values contained in the array.
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;_</span>, A, N&gt; {
+        Iter {
+            indices: <span class="self">self</span>.indices(),
+            chunk: <span class="self">self</span>,
         }
     }
 
-    <span class="doccomment">/// Remove the first value present in the array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the value that was removed, or `None` if the array was empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">first_index</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">remove</span>(<span class="ident">index</span>))
-    }
-
-    <span class="doccomment">/// Get the value at a given index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">N::USIZE</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
-        }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">get</span>(<span class="ident">index</span>) {
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">index</span>) })
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+    <span class="doccomment">/// Make an iterator of mutable references to the values contained in the
+    /// array.
+    </span><span class="kw">pub fn </span>iter_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; IterMut&lt;<span class="lifetime">&#39;_</span>, A, N&gt; {
+        IterMut {
+            bitmap: <span class="self">self</span>.map,
+            chunk: <span class="self">self</span>,
         }
     }
 
-    <span class="doccomment">/// Get a mutable reference to the value at a given index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">N::USIZE</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
-        }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">get</span>(<span class="ident">index</span>) {
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">index</span>) })
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="doccomment">/// Turn the chunk into an iterator over the values contained within it.
+    </span><span class="kw">pub fn </span>drain(<span class="self">self</span>) -&gt; Drain&lt;A, N&gt; {
+        Drain { chunk: <span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Get an unchecked reference to the value at a given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Uninhabited indices contain uninitialised data, so make sure you validate</span>
-    <span class="doccomment">/// the index before using this method.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">A</span> {
-        <span class="self">self</span>.<span class="ident">values</span>().<span class="ident">get_unchecked</span>(<span class="ident">index</span>)
+    <span class="doccomment">/// Make an iterator of pairs of indices and references to the values
+    /// contained in the array.
+    </span><span class="kw">pub fn </span>entries(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (usize, <span class="kw-2">&amp;</span>A)&gt; {
+        <span class="self">self</span>.indices().zip(<span class="self">self</span>.iter())
     }
 
-    <span class="doccomment">/// Get an unchecked mutable reference to the value at a given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Uninhabited indices contain uninitialised data, so make sure you validate</span>
-    <span class="doccomment">/// the index before using this method.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_unchecked_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">A</span> {
-        <span class="self">self</span>.<span class="ident">values_mut</span>().<span class="ident">get_unchecked_mut</span>(<span class="ident">index</span>)
-    }
-
-    <span class="doccomment">/// Make an iterator over the indices which contain values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitmapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">into_iter</span>()
-    }
-
-    <span class="doccomment">/// Find the first index which contains a value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">first_index</span>()
-    }
-
-    <span class="doccomment">/// Make an iterator of references to the values contained in the array.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="ident">Iter</span> {
-            <span class="ident">indices</span>: <span class="self">self</span>.<span class="ident">indices</span>(),
-            <span class="ident">chunk</span>: <span class="self">self</span>,
+    <span class="doccomment">/// Make an iterator of `Option`s of references to the values contained in the array.
+    ///
+    /// Iterates over every index in the `SparseChunk`, from zero to its full capacity,
+    /// returning an `Option&lt;&amp;A&gt;` for each index.
+    </span><span class="kw">pub fn </span>option_iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OptionIter&lt;<span class="lifetime">&#39;_</span>, A, N&gt; {
+        OptionIter {
+            chunk: <span class="self">self</span>,
+            index: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Make an iterator of mutable references to the values contained in the</span>
-    <span class="doccomment">/// array.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="ident">IterMut</span> {
-            <span class="ident">bitmap</span>: <span class="self">self</span>.<span class="ident">map</span>,
-            <span class="ident">chunk</span>: <span class="self">self</span>,
+    <span class="doccomment">/// Make an iterator of `Option`s of mutable references to the values contained in the array.
+    ///
+    /// Iterates over every index in the `SparseChunk`, from zero to its full capacity,
+    /// returning an `Option&lt;&amp;mut A&gt;` for each index.
+    </span><span class="kw">pub fn </span>option_iter_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; OptionIterMut&lt;<span class="lifetime">&#39;_</span>, A, N&gt; {
+        OptionIterMut {
+            chunk: <span class="self">self</span>,
+            index: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Turn the chunk into an iterator over the values contained within it.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">drain</span>(<span class="self">self</span>) -&gt; <span class="ident">Drain</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="ident">Drain</span> { <span class="ident">chunk</span>: <span class="self">self</span> }
-    }
-
-    <span class="doccomment">/// Make an iterator of pairs of indices and references to the values</span>
-    <span class="doccomment">/// contained in the array.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">entries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">A</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">indices</span>().<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">iter</span>())
-    }
-
-    <span class="doccomment">/// Make an iterator of `Option`s of references to the values contained in the array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Iterates over every index in the `SparseChunk`, from zero to its full capacity,</span>
-    <span class="doccomment">/// returning an `Option&lt;&amp;A&gt;` for each index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">option_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OptionIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="ident">OptionIter</span> {
-            <span class="ident">chunk</span>: <span class="self">self</span>,
-            <span class="ident">index</span>: <span class="number">0</span>,
-        }
-    }
-
-    <span class="doccomment">/// Make an iterator of `Option`s of mutable references to the values contained in the array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Iterates over every index in the `SparseChunk`, from zero to its full capacity,</span>
-    <span class="doccomment">/// returning an `Option&lt;&amp;mut A&gt;` for each index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">option_iter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">OptionIterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="ident">OptionIterMut</span> {
-            <span class="ident">chunk</span>: <span class="self">self</span>,
-            <span class="ident">index</span>: <span class="number">0</span>,
-        }
-    }
-
-    <span class="doccomment">/// Make a draining iterator of `Option&#39;s of the values contained in the array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Iterates over every index in the `SparseChunk`, from zero to its full capacity,</span>
-    <span class="doccomment">/// returning an `Option&lt;A&gt;` for each index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">option_drain</span>(<span class="self">self</span>) -&gt; <span class="ident">OptionDrain</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="ident">OptionDrain</span> {
-            <span class="ident">chunk</span>: <span class="self">self</span>,
-            <span class="ident">index</span>: <span class="number">0</span>,
+    <span class="doccomment">/// Make a draining iterator of `Option&#39;s of the values contained in the array.
+    ///
+    /// Iterates over every index in the `SparseChunk`, from zero to its full capacity,
+    /// returning an `Option&lt;A&gt;` for each index.
+    </span><span class="kw">pub fn </span>option_drain(<span class="self">self</span>) -&gt; OptionDrain&lt;A, N&gt; {
+        OptionDrain {
+            chunk: <span class="self">self</span>,
+            index: <span class="number">0</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl</span>&lt;A, N: Bits + ChunkLength&lt;A&gt;&gt; Default <span class="kw">for </span>SparseChunk&lt;A, N&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">A</span>;
+<span class="kw">impl</span>&lt;A, N: Bits + ChunkLength&lt;A&gt;&gt; Index&lt;usize&gt; <span class="kw">for </span>SparseChunk&lt;A, N&gt; {
+    <span class="kw">type </span>Output = A;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">unwrap</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="self">self</span>.get(index).unwrap()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>).<span class="ident">unwrap</span>()
+<span class="kw">impl</span>&lt;A, N: Bits + ChunkLength&lt;A&gt;&gt; IndexMut&lt;usize&gt; <span class="kw">for </span>SparseChunk&lt;A, N&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Output {
+        <span class="self">self</span>.get_mut(index).unwrap()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">A</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Drain</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;A, N: Bits + ChunkLength&lt;A&gt;&gt; IntoIterator <span class="kw">for </span>SparseChunk&lt;A, N&gt; {
+    <span class="kw">type </span>Item = A;
+    <span class="kw">type </span>IntoIter = Drain&lt;A, N&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">drain</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.drain()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;A, N: Bits + ChunkLength&lt;A&gt;&gt; FromIterator&lt;<span class="prelude-ty">Option</span>&lt;A&gt;&gt; <span class="kw">for </span>SparseChunk&lt;A, N&gt; {
+    <span class="kw">fn </span>from_iter&lt;I&gt;(iter: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>I: IntoIterator&lt;Item = <span class="prelude-ty">Option</span>&lt;A&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
-        <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">iter</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">value</span> {
-                <span class="ident">out</span>.<span class="ident">insert</span>(<span class="ident">index</span>, <span class="ident">value</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="self">Self</span>::new();
+        <span class="kw">for </span>(index, value) <span class="kw">in </span>iter.into_iter().enumerate() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = value {
+                out.insert(index, value);
             }
         }
-        <span class="ident">out</span>
+        out
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">PartialEq</span>,
-    <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;A, N&gt; PartialEq <span class="kw">for </span>SparseChunk&lt;A, N&gt;
+<span class="kw">where
+    </span>A: PartialEq,
+    N: Bits + ChunkLength&lt;A&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">map</span> <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">map</span> {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.map != other.map {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">indices</span>() {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">index</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">get</span>(<span class="ident">index</span>) {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">for </span>index <span class="kw">in </span><span class="self">self</span>.indices() {
+            <span class="kw">if </span><span class="self">self</span>.get(index) != other.get(index) {
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
         }
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">PartialEq</span>,
-    <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl</span>&lt;A, N&gt; PartialEq&lt;BTreeMap&lt;usize, A&gt;&gt; <span class="kw">for </span>SparseChunk&lt;A, N&gt;
+<span class="kw">where
+    </span>A: PartialEq,
+    N: Bits + ChunkLength&lt;A&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BTreeMap&lt;usize, A&gt;) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.len() != other.len() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">indices</span>() {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">index</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>) {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">for </span>index <span class="kw">in </span><span class="self">self</span>.indices() {
+            <span class="kw">if </span><span class="self">self</span>.get(index) != other.get(<span class="kw-2">&amp;</span>index) {
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
         }
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">PartialEq</span>,
-    <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl</span>&lt;A, N&gt; PartialEq&lt;HashMap&lt;usize, A&gt;&gt; <span class="kw">for </span>SparseChunk&lt;A, N&gt;
+<span class="kw">where
+    </span>A: PartialEq,
+    N: Bits + ChunkLength&lt;A&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>HashMap&lt;usize, A&gt;) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.len() != other.len() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">indices</span>() {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">index</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>) {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">for </span>index <span class="kw">in </span><span class="self">self</span>.indices() {
+            <span class="kw">if </span><span class="self">self</span>.get(index) != other.get(<span class="kw-2">&amp;</span>index) {
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
         }
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Eq</span>,
-    <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;A, N&gt; Eq <span class="kw">for </span>SparseChunk&lt;A, N&gt;
+<span class="kw">where
+    </span>A: Eq,
+    N: Bits + ChunkLength&lt;A&gt;,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">N</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Debug</span>,
-    <span class="ident">N</span>: <span class="ident">Bits</span> <span class="op">+</span> <span class="ident">ChunkLength</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;A, N&gt; Debug <span class="kw">for </span>SparseChunk&lt;A, N&gt;
+<span class="kw">where
+    </span>A: Debug,
+    N: Bits + ChunkLength&lt;A&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;SparseChunk&quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">debug_map</span>().<span class="ident">entries</span>(<span class="self">self</span>.<span class="ident">entries</span>()).<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        f.write_str(<span class="string">&quot;SparseChunk&quot;</span>)<span class="question-mark">?</span>;
+        f.debug_map().entries(<span class="self">self</span>.entries()).finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">typenum::U32</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>typenum::U32;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">insert_remove_iterate</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span>: <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">U32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SparseChunk::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="number">5</span>, <span class="number">5</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="number">1</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="number">24</span>, <span class="number">42</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="number">22</span>, <span class="number">22</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">42</span>), <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="number">24</span>, <span class="number">24</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="number">31</span>, <span class="number">31</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">24</span>), <span class="ident">chunk</span>.<span class="ident">remove</span>(<span class="number">24</span>));
-        <span class="macro">assert_eq!</span>(<span class="number">4</span>, <span class="ident">chunk</span>.<span class="ident">len</span>());
-        <span class="kw">let</span> <span class="ident">indices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">indices</span>().<span class="ident">collect</span>();
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">5</span>, <span class="number">22</span>, <span class="number">31</span>], <span class="ident">indices</span>);
-        <span class="kw">let</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">5</span>, <span class="number">22</span>, <span class="number">31</span>], <span class="ident">values</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>insert_remove_iterate() {
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk: SparseChunk&lt;<span class="kw">_</span>, U32&gt; = SparseChunk::new();
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, chunk.insert(<span class="number">5</span>, <span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, chunk.insert(<span class="number">1</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, chunk.insert(<span class="number">24</span>, <span class="number">42</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, chunk.insert(<span class="number">22</span>, <span class="number">22</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">42</span>), chunk.insert(<span class="number">24</span>, <span class="number">24</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, chunk.insert(<span class="number">31</span>, <span class="number">31</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">24</span>), chunk.remove(<span class="number">24</span>));
+        <span class="macro">assert_eq!</span>(<span class="number">4</span>, chunk.len());
+        <span class="kw">let </span>indices: Vec&lt;<span class="kw">_</span>&gt; = chunk.indices().collect();
+        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">5</span>, <span class="number">22</span>, <span class="number">31</span>], indices);
+        <span class="kw">let </span>values: Vec&lt;<span class="kw">_</span>&gt; = chunk.into_iter().collect();
+        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">5</span>, <span class="number">22</span>, <span class="number">31</span>], values);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">clone_chunk</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span>: <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">U32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SparseChunk::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="number">5</span>, <span class="number">5</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="number">1</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="number">24</span>, <span class="number">42</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="number">22</span>, <span class="number">22</span>));
-        <span class="kw">let</span> <span class="ident">cloned</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">right_indices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">indices</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">left_indices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">cloned</span>.<span class="ident">indices</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">right</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">left</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">cloned</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">left</span>, <span class="ident">right</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">left_indices</span>, <span class="ident">right_indices</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">5</span>, <span class="number">22</span>, <span class="number">24</span>], <span class="ident">left_indices</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">5</span>, <span class="number">22</span>, <span class="number">24</span>], <span class="ident">right_indices</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>clone_chunk() {
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk: SparseChunk&lt;<span class="kw">_</span>, U32&gt; = SparseChunk::new();
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, chunk.insert(<span class="number">5</span>, <span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, chunk.insert(<span class="number">1</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, chunk.insert(<span class="number">24</span>, <span class="number">42</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, chunk.insert(<span class="number">22</span>, <span class="number">22</span>));
+        <span class="kw">let </span>cloned = chunk.clone();
+        <span class="kw">let </span>right_indices: Vec&lt;<span class="kw">_</span>&gt; = chunk.indices().collect();
+        <span class="kw">let </span>left_indices: Vec&lt;<span class="kw">_</span>&gt; = cloned.indices().collect();
+        <span class="kw">let </span>right: Vec&lt;<span class="kw">_</span>&gt; = chunk.into_iter().collect();
+        <span class="kw">let </span>left: Vec&lt;<span class="kw">_</span>&gt; = cloned.into_iter().collect();
+        <span class="macro">assert_eq!</span>(left, right);
+        <span class="macro">assert_eq!</span>(left_indices, right_indices);
+        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">5</span>, <span class="number">22</span>, <span class="number">24</span>], left_indices);
+        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">5</span>, <span class="number">22</span>, <span class="number">24</span>], right_indices);
     }
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tests::DropTest</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
+    <span class="kw">use </span><span class="kw">crate</span>::tests::DropTest;
+    <span class="kw">use </span>std::sync::atomic::{AtomicUsize, Ordering};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">dropping</span>() {
-        <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>dropping() {
+        <span class="kw">let </span>counter = AtomicUsize::new(<span class="number">0</span>);
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span>: <span class="ident">SparseChunk</span><span class="op">&lt;</span><span class="ident">DropTest</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SparseChunk::new</span>();
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">40</span> {
-                <span class="ident">chunk</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">DropTest::new</span>(<span class="kw-2">&amp;</span><span class="ident">counter</span>));
+            <span class="kw">let </span><span class="kw-2">mut </span>chunk: SparseChunk&lt;DropTest&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = SparseChunk::new();
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">40 </span>{
+                chunk.insert(i, DropTest::new(<span class="kw-2">&amp;</span>counter));
             }
-            <span class="macro">assert_eq!</span>(<span class="number">40</span>, <span class="ident">counter</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>));
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">20</span> {
-                <span class="ident">chunk</span>.<span class="ident">remove</span>(<span class="ident">i</span>);
+            <span class="macro">assert_eq!</span>(<span class="number">40</span>, counter.load(Ordering::Relaxed));
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">20 </span>{
+                chunk.remove(i);
             }
-            <span class="macro">assert_eq!</span>(<span class="number">20</span>, <span class="ident">counter</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>));
+            <span class="macro">assert_eq!</span>(<span class="number">20</span>, counter.load(Ordering::Relaxed));
         }
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">counter</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>));
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, counter.load(Ordering::Relaxed));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">equality</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c1</span> <span class="op">=</span> <span class="ident">SparseChunk</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="ident">::new</span>();
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">32</span> {
-            <span class="ident">c1</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">i</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>equality() {
+        <span class="kw">let </span><span class="kw-2">mut </span>c1 = SparseChunk::&lt;usize&gt;::new();
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">32 </span>{
+            c1.insert(i, i);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">c1</span>.<span class="ident">clone</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">c1</span>, <span class="ident">c2</span>);
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">4</span>..<span class="number">8</span> {
-            <span class="ident">c2</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="number">0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>c2 = c1.clone();
+        <span class="macro">assert_eq!</span>(c1, c2);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">4</span>..<span class="number">8 </span>{
+            c2.insert(i, <span class="number">0</span>);
         }
-        <span class="macro">assert_ne!</span>(<span class="ident">c1</span>, <span class="ident">c2</span>);
-        <span class="ident">c2</span> <span class="op">=</span> <span class="ident">c1</span>.<span class="ident">clone</span>();
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">16</span> {
-            <span class="ident">c2</span>.<span class="ident">remove</span>(<span class="ident">i</span>);
+        <span class="macro">assert_ne!</span>(c1, c2);
+        c2 = c1.clone();
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">16 </span>{
+            c2.remove(i);
         }
-        <span class="macro">assert_ne!</span>(<span class="ident">c1</span>, <span class="ident">c2</span>);
+        <span class="macro">assert_ne!</span>(c1, c2);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sized_chunks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sized_chunks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

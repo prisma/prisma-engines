@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/introspection-connector/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/introspection-connector/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -178,185 +178,185 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>error;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>};
+<span class="kw">pub use </span>error::{ConnectorError, ErrorKind};
 
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">dml::Datamodel</span>, <span class="ident">Datasource</span>, <span class="ident">PreviewFeature</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>psl::{dml::Datamodel, Datasource, PreviewFeature};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>serde_json::Value;
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>ConnectorResult&lt;T&gt; = <span class="prelude-ty">Result</span>&lt;T, ConnectorError&gt;;
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntrospectionConnector</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_databases</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="attribute">#[async_trait::async_trait]
+</span><span class="kw">pub trait </span>IntrospectionConnector: Send + Sync + <span class="lifetime">&#39;static </span>{
+    <span class="kw">async fn </span>list_databases(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorResult&lt;Vec&lt;String&gt;&gt;;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DatabaseMetadata</span><span class="op">&gt;</span>;
+    <span class="kw">async fn </span>get_metadata(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorResult&lt;DatabaseMetadata&gt;;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_database_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">async fn </span>get_database_description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorResult&lt;String&gt;;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_database_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">async fn </span>get_database_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorResult&lt;String&gt;;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span>;
+    <span class="kw">async fn </span>introspect(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>IntrospectionContext) -&gt; ConnectorResult&lt;IntrospectionResult&gt;;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseMetadata</span> {
-    <span class="kw">pub</span> <span class="ident">table_count</span>: <span class="ident">usize</span>,
-    <span class="kw">pub</span> <span class="ident">size_in_bytes</span>: <span class="ident">usize</span>,
+<span class="attribute">#[derive(Serialize, Deserialize, Debug)]
+</span><span class="kw">pub struct </span>DatabaseMetadata {
+    <span class="kw">pub </span>table_count: usize,
+    <span class="kw">pub </span>size_in_bytes: usize,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Version</span> {
-    <span class="ident">NonPrisma</span>,
-    <span class="ident">Prisma1</span>,
-    <span class="ident">Prisma11</span>,
-    <span class="ident">Prisma2</span>,
+<span class="attribute">#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
+</span><span class="kw">pub enum </span>Version {
+    NonPrisma,
+    Prisma1,
+    Prisma11,
+    Prisma2,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntrospectionResult</span> {
-    <span class="doccomment">/// Datamodel</span>
-    <span class="kw">pub</span> <span class="ident">data_model</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The introspected data model is empty</span>
-    <span class="kw">pub</span> <span class="ident">is_empty</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Introspection warnings</span>
-    <span class="kw">pub</span> <span class="ident">warnings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Inferred Prisma version</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">Version</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>IntrospectionResult {
+    <span class="doccomment">/// Datamodel
+    </span><span class="kw">pub </span>data_model: String,
+    <span class="doccomment">/// The introspected data model is empty
+    </span><span class="kw">pub </span>is_empty: bool,
+    <span class="doccomment">/// Introspection warnings
+    </span><span class="kw">pub </span>warnings: Vec&lt;Warning&gt;,
+    <span class="doccomment">/// Inferred Prisma version
+    </span><span class="kw">pub </span>version: Version,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Warning</span> {
-    <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">affected</span>: <span class="ident">Value</span>,
+<span class="attribute">#[derive(Serialize, Deserialize, Debug)]
+</span><span class="kw">pub struct </span>Warning {
+    <span class="kw">pub </span>code: u32,
+    <span class="kw">pub </span>message: String,
+    <span class="kw">pub </span>affected: Value,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntrospectionResultOutput</span> {
-    <span class="doccomment">/// Datamodel</span>
-    <span class="kw">pub</span> <span class="ident">datamodel</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// warnings</span>
-    <span class="kw">pub</span> <span class="ident">warnings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// version</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">Version</span>,
+<span class="attribute">#[derive(Debug, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>IntrospectionResultOutput {
+    <span class="doccomment">/// Datamodel
+    </span><span class="kw">pub </span>datamodel: String,
+    <span class="doccomment">/// warnings
+    </span><span class="kw">pub </span>warnings: Vec&lt;Warning&gt;,
+    <span class="doccomment">/// version
+    </span><span class="kw">pub </span>version: Version,
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntrospectionContext</span> {
-    <span class="kw">pub</span> <span class="ident">previous_data_model</span>: <span class="ident">Datamodel</span>,
-    <span class="doccomment">/// This should always be true. TODO: change everything where it&#39;s</span>
-    <span class="doccomment">/// set to false to take the config into account.</span>
-    <span class="kw">pub</span> <span class="ident">render_config</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">composite_type_depth</span>: <span class="ident">CompositeTypeDepth</span>,
-    <span class="ident">previous_schema</span>: <span class="ident">psl::ValidatedSchema</span>,
+<span class="kw">pub struct </span>IntrospectionContext {
+    <span class="kw">pub </span>previous_data_model: Datamodel,
+    <span class="doccomment">/// This should always be true. TODO: change everything where it&#39;s
+    /// set to false to take the config into account.
+    </span><span class="kw">pub </span>render_config: bool,
+    <span class="kw">pub </span>composite_type_depth: CompositeTypeDepth,
+    previous_schema: psl::ValidatedSchema,
 }
 
-<span class="kw">impl</span> <span class="ident">IntrospectionContext</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">previous_schema</span>: <span class="ident">psl::ValidatedSchema</span>, <span class="ident">composite_type_depth</span>: <span class="ident">CompositeTypeDepth</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new_naive</span>(<span class="ident">previous_schema</span>, <span class="ident">composite_type_depth</span>);
-        <span class="ident">ctx</span>.<span class="ident">previous_data_model</span> <span class="op">=</span> <span class="ident">psl::lift</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">previous_schema</span>);
-        <span class="ident">ctx</span>
+<span class="kw">impl </span>IntrospectionContext {
+    <span class="kw">pub fn </span>new(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>ctx = <span class="self">Self</span>::new_naive(previous_schema, composite_type_depth);
+        ctx.previous_data_model = psl::lift(<span class="kw-2">&amp;</span>ctx.previous_schema);
+        ctx
     }
 
-    <span class="doccomment">/// Take the previous schema _but ignore all the datamodel part_, keeping just the</span>
-    <span class="doccomment">/// configuration blocks.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_config_only</span>(<span class="ident">previous_schema</span>: <span class="ident">psl::ValidatedSchema</span>, <span class="ident">composite_type_depth</span>: <span class="ident">CompositeTypeDepth</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config_blocks</span> <span class="op">=</span> <span class="ident">String::new</span>();
+    <span class="doccomment">/// Take the previous schema _but ignore all the datamodel part_, keeping just the
+    /// configuration blocks.
+    </span><span class="kw">pub fn </span>new_config_only(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>config_blocks = String::new();
 
-        <span class="kw">for</span> <span class="ident">source</span> <span class="kw">in</span> <span class="ident">previous_schema</span>.<span class="ident">db</span>.<span class="ident">ast</span>().<span class="ident">sources</span>() {
-            <span class="ident">config_blocks</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">previous_schema</span>.<span class="ident">db</span>.<span class="ident">source</span>()[<span class="ident">source</span>.<span class="ident">span</span>.<span class="ident">start</span>..<span class="ident">source</span>.<span class="ident">span</span>.<span class="ident">end</span>]);
-            <span class="ident">config_blocks</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+        <span class="kw">for </span>source <span class="kw">in </span>previous_schema.db.ast().sources() {
+            config_blocks.push_str(<span class="kw-2">&amp;</span>previous_schema.db.source()[source.span.start..source.span.end]);
+            config_blocks.push(<span class="string">&#39;\n&#39;</span>);
         }
 
-        <span class="kw">for</span> <span class="ident">generator</span> <span class="kw">in</span> <span class="ident">previous_schema</span>.<span class="ident">db</span>.<span class="ident">ast</span>().<span class="ident">generators</span>() {
-            <span class="ident">config_blocks</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">previous_schema</span>.<span class="ident">db</span>.<span class="ident">source</span>()[<span class="ident">generator</span>.<span class="ident">span</span>.<span class="ident">start</span>..<span class="ident">generator</span>.<span class="ident">span</span>.<span class="ident">end</span>]);
-            <span class="ident">config_blocks</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+        <span class="kw">for </span>generator <span class="kw">in </span>previous_schema.db.ast().generators() {
+            config_blocks.push_str(<span class="kw-2">&amp;</span>previous_schema.db.source()[generator.span.start..generator.span.end]);
+            config_blocks.push(<span class="string">&#39;\n&#39;</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">previous_schema_config_only</span> <span class="op">=</span> <span class="ident">psl::parse_schema</span>(<span class="ident">config_blocks</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>previous_schema_config_only = psl::parse_schema(config_blocks).unwrap();
 
-        <span class="ident"><span class="self">Self</span>::new_naive</span>(<span class="ident">previous_schema_config_only</span>, <span class="ident">composite_type_depth</span>)
+        <span class="self">Self</span>::new_naive(previous_schema_config_only, composite_type_depth)
     }
 
-    <span class="kw">fn</span> <span class="ident">new_naive</span>(<span class="ident">previous_schema</span>: <span class="ident">psl::ValidatedSchema</span>, <span class="ident">composite_type_depth</span>: <span class="ident">CompositeTypeDepth</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">IntrospectionContext</span> {
-            <span class="ident">previous_data_model</span>: <span class="ident">psl::dml::Datamodel::new</span>(),
-            <span class="ident">previous_schema</span>,
-            <span class="ident">composite_type_depth</span>,
-            <span class="ident">render_config</span>: <span class="bool-val">true</span>,
+    <span class="kw">fn </span>new_naive(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -&gt; <span class="self">Self </span>{
+        IntrospectionContext {
+            previous_data_model: psl::dml::Datamodel::new(),
+            previous_schema,
+            composite_type_depth,
+            render_config: <span class="bool-val">true</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">previous_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">psl::ValidatedSchema</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">previous_schema</span>
+    <span class="kw">pub fn </span>previous_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>psl::ValidatedSchema {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.previous_schema
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datasource</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Datasource</span> {
-        <span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">configuration</span>.<span class="ident">datasources</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>datasource(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Datasource {
+        <span class="self">self</span>.previous_schema.configuration.datasources.first().unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_keys_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">datasource</span>().<span class="ident">relation_mode</span>().<span class="ident">uses_foreign_keys</span>()
+    <span class="kw">pub fn </span>foreign_keys_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.datasource().relation_mode().uses_foreign_keys()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">db</span>.<span class="ident">source</span>()
+    <span class="kw">pub fn </span>schema_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.previous_schema.db.source()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configuration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">psl::Configuration</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">configuration</span>
+    <span class="kw">pub fn </span>configuration(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>psl::Configuration {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.previous_schema.configuration
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">configuration</span>.<span class="ident">preview_features</span>()
+    <span class="kw">pub fn </span>preview_features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;PreviewFeature&gt; {
+        <span class="self">self</span>.previous_schema.configuration.preview_features()
     }
 }
 
-<span class="doccomment">/// Control type for composite type traversal.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CompositeTypeDepth</span> {
-    <span class="doccomment">/// Allow maximum of n layers of nested types.</span>
-    <span class="ident">Level</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Unrestricted traversal.</span>
-    <span class="ident">Infinite</span>,
-    <span class="doccomment">/// No traversal, typing into dynamic Json.</span>
-    <span class="prelude-val">None</span>,
+<span class="doccomment">/// Control type for composite type traversal.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub enum </span>CompositeTypeDepth {
+    <span class="doccomment">/// Allow maximum of n layers of nested types.
+    </span>Level(usize),
+    <span class="doccomment">/// Unrestricted traversal.
+    </span>Infinite,
+    <span class="doccomment">/// No traversal, typing into dynamic Json.
+    </span><span class="prelude-val">None</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CompositeTypeDepth</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">size</span>: <span class="ident">isize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">size</span> {
-            <span class="ident">size</span> <span class="kw">if</span> <span class="ident">size</span> <span class="op">&lt;</span> <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::Infinite</span>,
-            <span class="ident">size</span> <span class="kw">if</span> <span class="ident">size</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::None</span>,
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Level</span>(<span class="ident">size</span> <span class="kw">as</span> <span class="ident">usize</span>),
+<span class="kw">impl </span>From&lt;isize&gt; <span class="kw">for </span>CompositeTypeDepth {
+    <span class="kw">fn </span>from(size: isize) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>size {
+            size <span class="kw">if </span>size &lt; <span class="number">0 </span>=&gt; <span class="self">Self</span>::Infinite,
+            size <span class="kw">if </span>size == <span class="number">0 </span>=&gt; <span class="self">Self</span>::None,
+            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Level(size <span class="kw">as </span>usize),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CompositeTypeDepth</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::None</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>CompositeTypeDepth {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::None
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CompositeTypeDepth</span> {
-    <span class="doccomment">/// Traversal is not allowed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_none</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::None</span>)
+<span class="kw">impl </span>CompositeTypeDepth {
+    <span class="doccomment">/// Traversal is not allowed.
+    </span><span class="kw">pub fn </span>is_none(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::None)
     }
 
-    <span class="doccomment">/// Go one level down in nested composite types.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">level_down</span>(<span class="self">self</span>) -&gt; <span class="ident">CompositeTypeDepth</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CompositeTypeDepth::Level</span>(<span class="ident">level</span>) <span class="kw">if</span> <span class="ident">level</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::Level</span>(<span class="ident">level</span> <span class="op">-</span> <span class="number">1</span>),
-            <span class="ident">CompositeTypeDepth::Level</span>(<span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::None</span>,
-            <span class="ident">CompositeTypeDepth::Infinite</span> =&gt; <span class="ident"><span class="self">Self</span>::Infinite</span>,
-            <span class="ident">CompositeTypeDepth::None</span> =&gt; <span class="ident"><span class="self">Self</span>::None</span>,
+    <span class="doccomment">/// Go one level down in nested composite types.
+    </span><span class="kw">pub fn </span>level_down(<span class="self">self</span>) -&gt; CompositeTypeDepth {
+        <span class="kw">match </span><span class="self">self </span>{
+            CompositeTypeDepth::Level(level) <span class="kw">if </span>level &gt; <span class="number">1 </span>=&gt; <span class="self">Self</span>::Level(level - <span class="number">1</span>),
+            CompositeTypeDepth::Level(<span class="kw">_</span>) =&gt; <span class="self">Self</span>::None,
+            CompositeTypeDepth::Infinite =&gt; <span class="self">Self</span>::Infinite,
+            CompositeTypeDepth::None =&gt; <span class="self">Self</span>::None,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

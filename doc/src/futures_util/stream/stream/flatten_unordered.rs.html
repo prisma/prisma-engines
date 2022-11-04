@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/stream/stream/flatten_unordered.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>flatten_unordered.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../futures_util/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/stream/stream/flatten_unordered.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>flatten_unordered.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../futures_util/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -507,444 +507,444 @@
 <span id="507">507</span>
 <span id="508">508</span>
 <span id="509">509</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{
-    <span class="ident">cell::UnsafeCell</span>,
-    <span class="ident">convert::identity</span>,
-    <span class="ident">fmt</span>,
-    <span class="ident">num::NonZeroUsize</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU8</span>, <span class="ident">Ordering</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>alloc::sync::Arc;
+<span class="kw">use </span>core::{
+    cell::UnsafeCell,
+    convert::identity,
+    fmt,
+    num::NonZeroUsize,
+    pin::Pin,
+    sync::atomic::{AtomicU8, Ordering},
 };
 
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
+<span class="kw">use </span>pin_project_lite::pin_project;
 
-<span class="kw">use</span> <span class="ident">futures_core</span>::{
-    <span class="ident">future::Future</span>,
-    <span class="ident">ready</span>,
-    <span class="ident">stream</span>::{<span class="ident">FusedStream</span>, <span class="ident">Stream</span>},
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>, <span class="ident">Waker</span>},
+<span class="kw">use </span>futures_core::{
+    future::Future,
+    ready,
+    stream::{FusedStream, Stream},
+    task::{Context, Poll, Waker},
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">futures_sink::Sink</span>;
-<span class="kw">use</span> <span class="ident">futures_task</span>::{<span class="ident">waker</span>, <span class="ident">ArcWake</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;sink&quot;</span>)]
+</span><span class="kw">use </span>futures_sink::Sink;
+<span class="kw">use </span>futures_task::{waker, ArcWake};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::stream::FuturesUnordered</span>;
+<span class="kw">use </span><span class="kw">crate</span>::stream::FuturesUnordered;
 
-<span class="doccomment">/// There is nothing to poll and stream isn&#39;t being</span>
-<span class="doccomment">/// polled or waking at the moment.</span>
-<span class="kw">const</span> <span class="ident">NONE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// There is nothing to poll and stream isn&#39;t being
+/// polled or waking at the moment.
+</span><span class="kw">const </span>NONE: u8 = <span class="number">0</span>;
 
-<span class="doccomment">/// Inner streams need to be polled.</span>
-<span class="kw">const</span> <span class="ident">NEED_TO_POLL_INNER_STREAMS</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="doccomment">/// Inner streams need to be polled.
+</span><span class="kw">const </span>NEED_TO_POLL_INNER_STREAMS: u8 = <span class="number">1</span>;
 
-<span class="doccomment">/// The base stream needs to be polled.</span>
-<span class="kw">const</span> <span class="ident">NEED_TO_POLL_STREAM</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b10</span>;
+<span class="doccomment">/// The base stream needs to be polled.
+</span><span class="kw">const </span>NEED_TO_POLL_STREAM: u8 = <span class="number">0b10</span>;
 
-<span class="doccomment">/// It needs to poll base stream and inner streams.</span>
-<span class="kw">const</span> <span class="ident">NEED_TO_POLL_ALL</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">NEED_TO_POLL_INNER_STREAMS</span> <span class="op">|</span> <span class="ident">NEED_TO_POLL_STREAM</span>;
+<span class="doccomment">/// It needs to poll base stream and inner streams.
+</span><span class="kw">const </span>NEED_TO_POLL_ALL: u8 = NEED_TO_POLL_INNER_STREAMS | NEED_TO_POLL_STREAM;
 
-<span class="doccomment">/// The current stream is being polled at the moment.</span>
-<span class="kw">const</span> <span class="ident">POLLING</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b100</span>;
+<span class="doccomment">/// The current stream is being polled at the moment.
+</span><span class="kw">const </span>POLLING: u8 = <span class="number">0b100</span>;
 
-<span class="doccomment">/// Inner streams are being woken at the moment.</span>
-<span class="kw">const</span> <span class="ident">WAKING_INNER_STREAMS</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b1000</span>;
+<span class="doccomment">/// Inner streams are being woken at the moment.
+</span><span class="kw">const </span>WAKING_INNER_STREAMS: u8 = <span class="number">0b1000</span>;
 
-<span class="doccomment">/// The base stream is being woken at the moment.</span>
-<span class="kw">const</span> <span class="ident">WAKING_STREAM</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b10000</span>;
+<span class="doccomment">/// The base stream is being woken at the moment.
+</span><span class="kw">const </span>WAKING_STREAM: u8 = <span class="number">0b10000</span>;
 
-<span class="doccomment">/// The base stream and inner streams are being woken at the moment.</span>
-<span class="kw">const</span> <span class="ident">WAKING_ALL</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">WAKING_STREAM</span> <span class="op">|</span> <span class="ident">WAKING_INNER_STREAMS</span>;
+<span class="doccomment">/// The base stream and inner streams are being woken at the moment.
+</span><span class="kw">const </span>WAKING_ALL: u8 = WAKING_STREAM | WAKING_INNER_STREAMS;
 
-<span class="doccomment">/// The stream was waked and will be polled.</span>
-<span class="kw">const</span> <span class="ident">WOKEN</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b100000</span>;
+<span class="doccomment">/// The stream was waked and will be polled.
+</span><span class="kw">const </span>WOKEN: u8 = <span class="number">0b100000</span>;
 
-<span class="doccomment">/// Determines what needs to be polled, and is stream being polled at the</span>
-<span class="doccomment">/// moment or not.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">SharedPollState</span> {
-    <span class="ident">state</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicU8</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Determines what needs to be polled, and is stream being polled at the
+/// moment or not.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">struct </span>SharedPollState {
+    state: Arc&lt;AtomicU8&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">SharedPollState</span> {
-    <span class="doccomment">/// Constructs new `SharedPollState` with the given state.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="ident">SharedPollState</span> {
-        <span class="ident">SharedPollState</span> { <span class="ident">state</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicU8::new</span>(<span class="ident">value</span>)) }
+<span class="kw">impl </span>SharedPollState {
+    <span class="doccomment">/// Constructs new `SharedPollState` with the given state.
+    </span><span class="kw">fn </span>new(value: u8) -&gt; SharedPollState {
+        SharedPollState { state: Arc::new(AtomicU8::new(value)) }
     }
 
-    <span class="doccomment">/// Attempts to start polling, returning stored state in case of success.</span>
-    <span class="doccomment">/// Returns `None` if some waker is waking at the moment.</span>
-    <span class="kw">fn</span> <span class="ident">start_polling</span>(
+    <span class="doccomment">/// Attempts to start polling, returning stored state in case of success.
+    /// Returns `None` if some waker is waking at the moment.
+    </span><span class="kw">fn </span>start_polling(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">PollStateBomb</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">SharedPollState</span>) -&gt; <span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">state</span>
-            .<span class="ident">fetch_update</span>(<span class="ident">Ordering::SeqCst</span>, <span class="ident">Ordering::SeqCst</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">value</span> <span class="op">&amp;</span> <span class="ident">WAKING_ALL</span> <span class="op">==</span> <span class="ident">NONE</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">POLLING</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;(u8, PollStateBomb&lt;<span class="lifetime">&#39;_</span>, <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>SharedPollState) -&gt; u8&gt;)&gt; {
+        <span class="kw">let </span>value = <span class="self">self
+            </span>.state
+            .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |value| {
+                <span class="kw">if </span>value &amp; WAKING_ALL == NONE {
+                    <span class="prelude-val">Some</span>(POLLING)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
             })
-            .<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">bomb</span> <span class="op">=</span> <span class="ident">PollStateBomb::new</span>(<span class="self">self</span>, <span class="ident">SharedPollState::reset</span>);
+            .ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span>bomb = PollStateBomb::new(<span class="self">self</span>, SharedPollState::reset);
 
-        <span class="prelude-val">Some</span>((<span class="ident">value</span>, <span class="ident">bomb</span>))
+        <span class="prelude-val">Some</span>((value, bomb))
     }
 
-    <span class="doccomment">/// Starts the waking process and performs bitwise or with the given value.</span>
-    <span class="kw">fn</span> <span class="ident">start_waking</span>(
+    <span class="doccomment">/// Starts the waking process and performs bitwise or with the given value.
+    </span><span class="kw">fn </span>start_waking(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">to_poll</span>: <span class="ident">u8</span>,
-        <span class="ident">waking</span>: <span class="ident">u8</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">PollStateBomb</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">SharedPollState</span>) -&gt; <span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">state</span>
-            .<span class="ident">fetch_update</span>(<span class="ident">Ordering::SeqCst</span>, <span class="ident">Ordering::SeqCst</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-                <span class="comment">// Waking process for this waker already started</span>
-                <span class="kw">if</span> <span class="ident">value</span> <span class="op">&amp;</span> <span class="ident">waking</span> <span class="op">!</span><span class="op">=</span> <span class="ident">NONE</span> {
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+        to_poll: u8,
+        waking: u8,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;(u8, PollStateBomb&lt;<span class="lifetime">&#39;_</span>, <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>SharedPollState) -&gt; u8&gt;)&gt; {
+        <span class="kw">let </span>value = <span class="self">self
+            </span>.state
+            .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |value| {
+                <span class="comment">// Waking process for this waker already started
+                </span><span class="kw">if </span>value &amp; waking != NONE {
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_value</span> <span class="op">=</span> <span class="ident">value</span> <span class="op">|</span> <span class="ident">to_poll</span>;
-                <span class="comment">// Only start the waking process if we&#39;re not in the polling phase and the stream isn&#39;t woken already</span>
-                <span class="kw">if</span> <span class="ident">value</span> <span class="op">&amp;</span> (<span class="ident">WOKEN</span> <span class="op">|</span> <span class="ident">POLLING</span>) <span class="op">==</span> <span class="ident">NONE</span> {
-                    <span class="ident">next_value</span> <span class="op">|</span><span class="op">=</span> <span class="ident">waking</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>next_value = value | to_poll;
+                <span class="comment">// Only start the waking process if we&#39;re not in the polling phase and the stream isn&#39;t woken already
+                </span><span class="kw">if </span>value &amp; (WOKEN | POLLING) == NONE {
+                    next_value |= waking;
                 }
 
-                <span class="kw">if</span> <span class="ident">next_value</span> <span class="op">!</span><span class="op">=</span> <span class="ident">value</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">next_value</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+                <span class="kw">if </span>next_value != value {
+                    <span class="prelude-val">Some</span>(next_value)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
             })
-            .<span class="ident">ok</span>()<span class="question-mark">?</span>;
+            .ok()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">&amp;</span> (<span class="ident">WOKEN</span> <span class="op">|</span> <span class="ident">POLLING</span>) <span class="op">==</span> <span class="ident">NONE</span> {
-            <span class="kw">let</span> <span class="ident">bomb</span> <span class="op">=</span> <span class="ident">PollStateBomb::new</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">state</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">stop_waking</span>(<span class="ident">waking</span>));
+        <span class="kw">if </span>value &amp; (WOKEN | POLLING) == NONE {
+            <span class="kw">let </span>bomb = PollStateBomb::new(<span class="self">self</span>, <span class="kw">move </span>|state| state.stop_waking(waking));
 
-            <span class="prelude-val">Some</span>((<span class="ident">value</span>, <span class="ident">bomb</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+            <span class="prelude-val">Some</span>((value, bomb))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="doccomment">/// Sets current state to
+    /// - `!POLLING` allowing to use wakers
+    /// - `WOKEN` if the state was changed during `POLLING` phase as waker will be called,
+    ///   or `will_be_woken` flag supplied
+    /// - `!WAKING_ALL` as
+    ///   * Wakers called during the `POLLING` phase won&#39;t propagate their calls
+    ///   * `POLLING` phase can&#39;t start if some of the wakers are active
+    ///   So no wrapped waker can touch the inner waker&#39;s cell, it&#39;s safe to poll again.
+    </span><span class="kw">fn </span>stop_polling(<span class="kw-2">&amp;</span><span class="self">self</span>, to_poll: u8, will_be_woken: bool) -&gt; u8 {
+        <span class="self">self</span>.state
+            .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |<span class="kw-2">mut </span>value| {
+                <span class="kw">let </span><span class="kw-2">mut </span>next_value = to_poll;
+
+                value &amp;= NEED_TO_POLL_ALL;
+                <span class="kw">if </span>value != NONE || will_be_woken {
+                    next_value |= WOKEN;
+                }
+                next_value |= value;
+
+                <span class="prelude-val">Some</span>(next_value &amp; !POLLING &amp; !WAKING_ALL)
+            })
+            .unwrap()
+    }
+
+    <span class="doccomment">/// Toggles state to non-waking, allowing to start polling.
+    </span><span class="kw">fn </span>stop_waking(<span class="kw-2">&amp;</span><span class="self">self</span>, waking: u8) -&gt; u8 {
+        <span class="self">self</span>.state
+            .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |value| {
+                <span class="kw">let </span><span class="kw-2">mut </span>next_value = value &amp; !waking;
+                <span class="comment">// Waker will be called only if the current waking state is the same as the specified waker state
+                </span><span class="kw">if </span>value &amp; WAKING_ALL == waking {
+                    next_value |= WOKEN;
+                }
+
+                <span class="kw">if </span>next_value != value {
+                    <span class="prelude-val">Some</span>(next_value)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
+            })
+            .unwrap_or_else(identity)
+    }
+
+    <span class="doccomment">/// Resets current state allowing to poll the stream and wake up wakers.
+    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.state.swap(NEED_TO_POLL_ALL, Ordering::AcqRel)
+    }
+}
+
+<span class="doccomment">/// Used to execute some function on the given state when dropped.
+</span><span class="kw">struct </span>PollStateBomb&lt;<span class="lifetime">&#39;a</span>, F: FnOnce(<span class="kw-2">&amp;</span>SharedPollState) -&gt; u8&gt; {
+    state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SharedPollState,
+    drop: <span class="prelude-ty">Option</span>&lt;F&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, F: FnOnce(<span class="kw-2">&amp;</span>SharedPollState) -&gt; u8&gt; PollStateBomb&lt;<span class="lifetime">&#39;a</span>, F&gt; {
+    <span class="doccomment">/// Constructs new bomb with the given state.
+    </span><span class="kw">fn </span>new(state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SharedPollState, drop: F) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ state, drop: <span class="prelude-val">Some</span>(drop) }
+    }
+
+    <span class="doccomment">/// Deactivates bomb, forces it to not call provided function when dropped.
+    </span><span class="kw">fn </span>deactivate(<span class="kw-2">mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.drop.take();
+    }
+
+    <span class="doccomment">/// Manually fires the bomb, returning supplied state.
+    </span><span class="kw">fn </span>fire(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
+        <span class="self">self</span>.drop.take().map(|drop| (drop)(<span class="self">self</span>.state))
+    }
+}
+
+<span class="kw">impl</span>&lt;F: FnOnce(<span class="kw-2">&amp;</span>SharedPollState) -&gt; u8&gt; Drop <span class="kw">for </span>PollStateBomb&lt;<span class="lifetime">&#39;_</span>, F&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(drop) = <span class="self">self</span>.drop.take() {
+            (drop)(<span class="self">self</span>.state);
         }
     }
-
-    <span class="doccomment">/// Sets current state to</span>
-    <span class="doccomment">/// - `!POLLING` allowing to use wakers</span>
-    <span class="doccomment">/// - `WOKEN` if the state was changed during `POLLING` phase as waker will be called,</span>
-    <span class="doccomment">///   or `will_be_woken` flag supplied</span>
-    <span class="doccomment">/// - `!WAKING_ALL` as</span>
-    <span class="doccomment">///   * Wakers called during the `POLLING` phase won&#39;t propagate their calls</span>
-    <span class="doccomment">///   * `POLLING` phase can&#39;t start if some of the wakers are active</span>
-    <span class="doccomment">///   So no wrapped waker can touch the inner waker&#39;s cell, it&#39;s safe to poll again.</span>
-    <span class="kw">fn</span> <span class="ident">stop_polling</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">to_poll</span>: <span class="ident">u8</span>, <span class="ident">will_be_woken</span>: <span class="ident">bool</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">state</span>
-            .<span class="ident">fetch_update</span>(<span class="ident">Ordering::SeqCst</span>, <span class="ident">Ordering::SeqCst</span>, <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">value</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_value</span> <span class="op">=</span> <span class="ident">to_poll</span>;
-
-                <span class="ident">value</span> <span class="op">&amp;=</span> <span class="ident">NEED_TO_POLL_ALL</span>;
-                <span class="kw">if</span> <span class="ident">value</span> <span class="op">!</span><span class="op">=</span> <span class="ident">NONE</span> <span class="op">|</span><span class="op">|</span> <span class="ident">will_be_woken</span> {
-                    <span class="ident">next_value</span> <span class="op">|</span><span class="op">=</span> <span class="ident">WOKEN</span>;
-                }
-                <span class="ident">next_value</span> <span class="op">|</span><span class="op">=</span> <span class="ident">value</span>;
-
-                <span class="prelude-val">Some</span>(<span class="ident">next_value</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">POLLING</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">WAKING_ALL</span>)
-            })
-            .<span class="ident">unwrap</span>()
-    }
-
-    <span class="doccomment">/// Toggles state to non-waking, allowing to start polling.</span>
-    <span class="kw">fn</span> <span class="ident">stop_waking</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">waking</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">state</span>
-            .<span class="ident">fetch_update</span>(<span class="ident">Ordering::SeqCst</span>, <span class="ident">Ordering::SeqCst</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_value</span> <span class="op">=</span> <span class="ident">value</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">waking</span>;
-                <span class="comment">// Waker will be called only if the current waking state is the same as the specified waker state</span>
-                <span class="kw">if</span> <span class="ident">value</span> <span class="op">&amp;</span> <span class="ident">WAKING_ALL</span> <span class="op">==</span> <span class="ident">waking</span> {
-                    <span class="ident">next_value</span> <span class="op">|</span><span class="op">=</span> <span class="ident">WOKEN</span>;
-                }
-
-                <span class="kw">if</span> <span class="ident">next_value</span> <span class="op">!</span><span class="op">=</span> <span class="ident">value</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">next_value</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
-            })
-            .<span class="ident">unwrap_or_else</span>(<span class="ident">identity</span>)
-    }
-
-    <span class="doccomment">/// Resets current state allowing to poll the stream and wake up wakers.</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">swap</span>(<span class="ident">NEED_TO_POLL_ALL</span>, <span class="ident">Ordering::AcqRel</span>)
-    }
 }
 
-<span class="doccomment">/// Used to execute some function on the given state when dropped.</span>
-<span class="kw">struct</span> <span class="ident">PollStateBomb</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">SharedPollState</span>) -&gt; <span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SharedPollState</span>,
-    <span class="ident">drop</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Will update state with the provided value on `wake_by_ref` call
+/// and then, if there is a need, call `inner_waker`.
+</span><span class="kw">struct </span>InnerWaker {
+    inner_waker: UnsafeCell&lt;<span class="prelude-ty">Option</span>&lt;Waker&gt;&gt;,
+    poll_state: SharedPollState,
+    need_to_poll: u8,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">SharedPollState</span>) -&gt; <span class="ident">u8</span><span class="op">&gt;</span> <span class="ident">PollStateBomb</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructs new bomb with the given state.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SharedPollState</span>, <span class="ident">drop</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">state</span>, <span class="ident">drop</span>: <span class="prelude-val">Some</span>(<span class="ident">drop</span>) }
+<span class="kw">unsafe impl </span>Send <span class="kw">for </span>InnerWaker {}
+<span class="kw">unsafe impl </span>Sync <span class="kw">for </span>InnerWaker {}
+
+<span class="kw">impl </span>InnerWaker {
+    <span class="doccomment">/// Replaces given waker&#39;s inner_waker for polling stream/futures which will
+    /// update poll state on `wake_by_ref` call. Use only if you need several
+    /// contexts.
+    ///
+    /// ## Safety
+    ///
+    /// This function will modify waker&#39;s `inner_waker` via `UnsafeCell`, so
+    /// it should be used only during `POLLING` phase.
+    </span><span class="kw">unsafe fn </span>replace_waker(self_arc: <span class="kw-2">&amp;mut </span>Arc&lt;<span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Waker {
+        <span class="kw-2">*</span>self_arc.inner_waker.get() = cx.waker().clone().into();
+        waker(self_arc.clone())
     }
 
-    <span class="doccomment">/// Deactivates bomb, forces it to not call provided function when dropped.</span>
-    <span class="kw">fn</span> <span class="ident">deactivate</span>(<span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">drop</span>.<span class="ident">take</span>();
+    <span class="doccomment">/// Attempts to start the waking process for the waker with the given value.
+    /// If succeeded, then the stream isn&#39;t yet woken and not being polled at the moment.
+    </span><span class="kw">fn </span>start_waking(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(u8, PollStateBomb&lt;<span class="lifetime">&#39;_</span>, <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>SharedPollState) -&gt; u8&gt;)&gt; {
+        <span class="self">self</span>.poll_state.start_waking(<span class="self">self</span>.need_to_poll, <span class="self">self</span>.waking_state())
     }
 
-    <span class="doccomment">/// Manually fires the bomb, returning supplied state.</span>
-    <span class="kw">fn</span> <span class="ident">fire</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">drop</span>.<span class="ident">take</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">drop</span><span class="op">|</span> (<span class="ident">drop</span>)(<span class="self">self</span>.<span class="ident">state</span>))
-    }
+    <span class="doccomment">/// Returns the corresponding waking state toggled by this waker.
+    </span><span class="kw">fn </span>waking_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.need_to_poll &lt;&lt; <span class="number">3
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">SharedPollState</span>) -&gt; <span class="ident">u8</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">PollStateBomb</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">drop</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">drop</span>.<span class="ident">take</span>() {
-            (<span class="ident">drop</span>)(<span class="self">self</span>.<span class="ident">state</span>);
-        }
-    }
-}
+<span class="kw">impl </span>ArcWake <span class="kw">for </span>InnerWaker {
+    <span class="kw">fn </span>wake_by_ref(self_arc: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, state_bomb)) = self_arc.start_waking() {
+            <span class="comment">// Safety: now state is not `POLLING`
+            </span><span class="kw">let </span>waker_opt = <span class="kw">unsafe </span>{ self_arc.inner_waker.get().as_ref().unwrap() };
 
-<span class="doccomment">/// Will update state with the provided value on `wake_by_ref` call</span>
-<span class="doccomment">/// and then, if there is a need, call `inner_waker`.</span>
-<span class="kw">struct</span> <span class="ident">InnerWaker</span> {
-    <span class="ident">inner_waker</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">poll_state</span>: <span class="ident">SharedPollState</span>,
-    <span class="ident">need_to_poll</span>: <span class="ident">u8</span>,
-}
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(inner_waker) = waker_opt.clone() {
+                <span class="comment">// Stop waking to allow polling stream
+                </span><span class="kw">let </span>poll_state_value = state_bomb.fire().unwrap();
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">InnerWaker</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">InnerWaker</span> {}
-
-<span class="kw">impl</span> <span class="ident">InnerWaker</span> {
-    <span class="doccomment">/// Replaces given waker&#39;s inner_waker for polling stream/futures which will</span>
-    <span class="doccomment">/// update poll state on `wake_by_ref` call. Use only if you need several</span>
-    <span class="doccomment">/// contexts.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will modify waker&#39;s `inner_waker` via `UnsafeCell`, so</span>
-    <span class="doccomment">/// it should be used only during `POLLING` phase.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">replace_waker</span>(<span class="ident">self_arc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Waker</span> {
-        <span class="kw-2">*</span><span class="ident">self_arc</span>.<span class="ident">inner_waker</span>.<span class="ident">get</span>() <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">clone</span>().<span class="ident">into</span>();
-        <span class="ident">waker</span>(<span class="ident">self_arc</span>.<span class="ident">clone</span>())
-    }
-
-    <span class="doccomment">/// Attempts to start the waking process for the waker with the given value.</span>
-    <span class="doccomment">/// If succeeded, then the stream isn&#39;t yet woken and not being polled at the moment.</span>
-    <span class="kw">fn</span> <span class="ident">start_waking</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">PollStateBomb</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">SharedPollState</span>) -&gt; <span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll_state</span>.<span class="ident">start_waking</span>(<span class="self">self</span>.<span class="ident">need_to_poll</span>, <span class="self">self</span>.<span class="ident">waking_state</span>())
-    }
-
-    <span class="doccomment">/// Returns the corresponding waking state toggled by this waker.</span>
-    <span class="kw">fn</span> <span class="ident">waking_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">need_to_poll</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ArcWake</span> <span class="kw">for</span> <span class="ident">InnerWaker</span> {
-    <span class="kw">fn</span> <span class="ident">wake_by_ref</span>(<span class="ident">self_arc</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">state_bomb</span>)) <span class="op">=</span> <span class="ident">self_arc</span>.<span class="ident">start_waking</span>() {
-            <span class="comment">// Safety: now state is not `POLLING`</span>
-            <span class="kw">let</span> <span class="ident">waker_opt</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">self_arc</span>.<span class="ident">inner_waker</span>.<span class="ident">get</span>().<span class="ident">as_ref</span>().<span class="ident">unwrap</span>() };
-
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inner_waker</span>) <span class="op">=</span> <span class="ident">waker_opt</span>.<span class="ident">clone</span>() {
-                <span class="comment">// Stop waking to allow polling stream</span>
-                <span class="kw">let</span> <span class="ident">poll_state_value</span> <span class="op">=</span> <span class="ident">state_bomb</span>.<span class="ident">fire</span>().<span class="ident">unwrap</span>();
-
-                <span class="comment">// Here we want to call waker only if stream isn&#39;t woken yet and</span>
-                <span class="comment">// also to optimize the case when two wakers are called at the same time.</span>
-                <span class="comment">//</span>
-                <span class="comment">// In this case the best strategy will be to propagate only the latest waker&#39;s awake,</span>
-                <span class="comment">// and then poll both entities in a single `poll_next` call</span>
-                <span class="kw">if</span> <span class="ident">poll_state_value</span> <span class="op">&amp;</span> (<span class="ident">WOKEN</span> <span class="op">|</span> <span class="ident">WAKING_ALL</span>) <span class="op">==</span> <span class="ident">self_arc</span>.<span class="ident">waking_state</span>() {
-                    <span class="comment">// Wake up inner waker</span>
-                    <span class="ident">inner_waker</span>.<span class="ident">wake</span>();
+                <span class="comment">// Here we want to call waker only if stream isn&#39;t woken yet and
+                // also to optimize the case when two wakers are called at the same time.
+                //
+                // In this case the best strategy will be to propagate only the latest waker&#39;s awake,
+                // and then poll both entities in a single `poll_next` call
+                </span><span class="kw">if </span>poll_state_value &amp; (WOKEN | WAKING_ALL) == self_arc.waking_state() {
+                    <span class="comment">// Wake up inner waker
+                    </span>inner_waker.wake();
                 }
             }
         }
     }
 }
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// Future which contains optional stream.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If it&#39;s `Some`, it will attempt to call `poll_next` on it,</span>
-    <span class="doccomment">/// returning `Some((item, next_item_fut))` in case of `Poll::Ready(Some(...))`</span>
-    <span class="doccomment">/// or `None` in case of `Poll::Ready(None)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `poll_next` will return `Poll::Pending`, it will be forwarded to</span>
-    <span class="doccomment">/// the future and current task will be notified by waker.</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]</span>
-    <span class="kw">struct</span> <span class="ident">PollStreamFut</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">stream</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// Future which contains optional stream.
+    ///
+    /// If it&#39;s `Some`, it will attempt to call `poll_next` on it,
+    /// returning `Some((item, next_item_fut))` in case of `Poll::Ready(Some(...))`
+    /// or `None` in case of `Poll::Ready(None)`.
+    ///
+    /// If `poll_next` will return `Poll::Pending`, it will be forwarded to
+    /// the future and current task will be notified by waker.
+    </span><span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
+    </span><span class="kw">struct </span>PollStreamFut&lt;St&gt; {
+        <span class="attribute">#[pin]
+        </span>stream: <span class="prelude-ty">Option</span>&lt;St&gt;,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> <span class="ident">PollStreamFut</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructs new `PollStreamFut` using given `stream`.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">stream</span>: <span class="ident">stream</span>.<span class="ident">into</span>() }
+<span class="kw">impl</span>&lt;St&gt; PollStreamFut&lt;St&gt; {
+    <span class="doccomment">/// Constructs new `PollStreamFut` using given `stream`.
+    </span><span class="kw">fn </span>new(stream: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;St&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ stream: stream.into() }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">PollStreamFut</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">St::Item</span>, <span class="ident">PollStreamFut</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>)<span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;St: Stream + Unpin&gt; Future <span class="kw">for </span>PollStreamFut&lt;St&gt; {
+    <span class="kw">type </span>Output = <span class="prelude-ty">Option</span>&lt;(St::Item, PollStreamFut&lt;St&gt;)&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">stream</span>;
+    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>stream = <span class="self">self</span>.project().stream;
 
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">as_pin_mut</span>() {
-            <span class="macro">ready!</span>(<span class="ident">stream</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
-        <span class="kw">let</span> <span class="ident">next_item_fut</span> <span class="op">=</span> <span class="ident">PollStreamFut::new</span>(<span class="ident">stream</span>.<span class="ident">get_mut</span>().<span class="ident">take</span>());
-        <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> (<span class="ident">item</span>, <span class="ident">next_item_fut</span>));
+        <span class="kw">let </span>item = <span class="kw">if let </span><span class="prelude-val">Some</span>(stream) = stream.as_mut().as_pin_mut() {
+            <span class="macro">ready!</span>(stream.poll_next(cx))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
+        <span class="kw">let </span>next_item_fut = PollStreamFut::new(stream.get_mut().take());
+        <span class="kw">let </span>out = item.map(|item| (item, next_item_fut));
 
-        <span class="ident">Poll::Ready</span>(<span class="ident">out</span>)
+        Poll::Ready(out)
     }
 }
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// Stream for the [`flatten_unordered`](super::StreamExt::flatten_unordered)</span>
-    <span class="doccomment">/// method.</span>
-    <span class="attribute">#[<span class="ident">project</span> <span class="op">=</span> <span class="ident">FlattenUnorderedProj</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;streams do nothing unless polled&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FlattenUnordered</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">St</span>: <span class="ident">Stream</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">inner_streams</span>: <span class="ident">FuturesUnordered</span><span class="op">&lt;</span><span class="ident">PollStreamFut</span><span class="op">&lt;</span><span class="ident">St::Item</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">stream</span>: <span class="ident">St</span>,
-        <span class="ident">poll_state</span>: <span class="ident">SharedPollState</span>,
-        <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroUsize</span><span class="op">&gt;</span>,
-        <span class="ident">is_stream_done</span>: <span class="ident">bool</span>,
-        <span class="ident">inner_streams_waker</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerWaker</span><span class="op">&gt;</span>,
-        <span class="ident">stream_waker</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerWaker</span><span class="op">&gt;</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// Stream for the [`flatten_unordered`](super::StreamExt::flatten_unordered)
+    /// method.
+    </span><span class="attribute">#[project = FlattenUnorderedProj]
+    #[must_use = <span class="string">&quot;streams do nothing unless polled&quot;</span>]
+    </span><span class="kw">pub struct </span>FlattenUnordered&lt;St&gt; <span class="kw">where </span>St: Stream {
+        <span class="attribute">#[pin]
+        </span>inner_streams: FuturesUnordered&lt;PollStreamFut&lt;St::Item&gt;&gt;,
+        <span class="attribute">#[pin]
+        </span>stream: St,
+        poll_state: SharedPollState,
+        limit: <span class="prelude-ty">Option</span>&lt;NonZeroUsize&gt;,
+        is_stream_done: bool,
+        inner_streams_waker: Arc&lt;InnerWaker&gt;,
+        stream_waker: Arc&lt;InnerWaker&gt;,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FlattenUnordered</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
-    <span class="ident">St::Item</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;St&gt; fmt::Debug <span class="kw">for </span>FlattenUnordered&lt;St&gt;
+<span class="kw">where
+    </span>St: Stream + fmt::Debug,
+    St::Item: Stream + fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;FlattenUnordered&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;poll_state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">poll_state</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;inner_streams&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner_streams</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;limit&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">limit</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;stream&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stream</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;is_stream_done&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_stream_done</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;FlattenUnordered&quot;</span>)
+            .field(<span class="string">&quot;poll_state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.poll_state)
+            .field(<span class="string">&quot;inner_streams&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner_streams)
+            .field(<span class="string">&quot;limit&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.limit)
+            .field(<span class="string">&quot;stream&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.stream)
+            .field(<span class="string">&quot;is_stream_done&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.is_stream_done)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> <span class="ident">FlattenUnordered</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St</span>: <span class="ident">Stream</span>,
-    <span class="ident">St::Item</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;St&gt; FlattenUnordered&lt;St&gt;
+<span class="kw">where
+    </span>St: Stream,
+    St::Item: Stream + Unpin,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">St</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">FlattenUnordered</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">poll_state</span> <span class="op">=</span> <span class="ident">SharedPollState::new</span>(<span class="ident">NEED_TO_POLL_STREAM</span>);
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(stream: St, limit: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; FlattenUnordered&lt;St&gt; {
+        <span class="kw">let </span>poll_state = SharedPollState::new(NEED_TO_POLL_STREAM);
 
-        <span class="ident">FlattenUnordered</span> {
-            <span class="ident">inner_streams</span>: <span class="ident">FuturesUnordered::new</span>(),
-            <span class="ident">stream</span>,
-            <span class="ident">is_stream_done</span>: <span class="bool-val">false</span>,
-            <span class="ident">limit</span>: <span class="ident">limit</span>.<span class="ident">and_then</span>(<span class="ident">NonZeroUsize::new</span>),
-            <span class="ident">inner_streams_waker</span>: <span class="ident">Arc::new</span>(<span class="ident">InnerWaker</span> {
-                <span class="ident">inner_waker</span>: <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">None</span>),
-                <span class="ident">poll_state</span>: <span class="ident">poll_state</span>.<span class="ident">clone</span>(),
-                <span class="ident">need_to_poll</span>: <span class="ident">NEED_TO_POLL_INNER_STREAMS</span>,
+        FlattenUnordered {
+            inner_streams: FuturesUnordered::new(),
+            stream,
+            is_stream_done: <span class="bool-val">false</span>,
+            limit: limit.and_then(NonZeroUsize::new),
+            inner_streams_waker: Arc::new(InnerWaker {
+                inner_waker: UnsafeCell::new(<span class="prelude-val">None</span>),
+                poll_state: poll_state.clone(),
+                need_to_poll: NEED_TO_POLL_INNER_STREAMS,
             }),
-            <span class="ident">stream_waker</span>: <span class="ident">Arc::new</span>(<span class="ident">InnerWaker</span> {
-                <span class="ident">inner_waker</span>: <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">None</span>),
-                <span class="ident">poll_state</span>: <span class="ident">poll_state</span>.<span class="ident">clone</span>(),
-                <span class="ident">need_to_poll</span>: <span class="ident">NEED_TO_POLL_STREAM</span>,
+            stream_waker: Arc::new(InnerWaker {
+                inner_waker: UnsafeCell::new(<span class="prelude-val">None</span>),
+                poll_state: poll_state.clone(),
+                need_to_poll: NEED_TO_POLL_STREAM,
             }),
-            <span class="ident">poll_state</span>,
+            poll_state,
         }
     }
 
-    <span class="macro">delegate_access_inner!</span>(<span class="ident">stream</span>, <span class="ident">St</span>, ());
+    <span class="macro">delegate_access_inner!</span>(stream, St, ());
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> <span class="ident">FlattenUnorderedProj</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">St</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St</span>: <span class="ident">Stream</span>,
+<span class="kw">impl</span>&lt;St&gt; FlattenUnorderedProj&lt;<span class="lifetime">&#39;_</span>, St&gt;
+<span class="kw">where
+    </span>St: Stream,
 {
-    <span class="doccomment">/// Checks if current `inner_streams` size is less than optional limit.</span>
-    <span class="kw">fn</span> <span class="ident">is_exceeded_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">limit</span>.<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">limit</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">inner_streams</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">limit</span>.<span class="ident">get</span>())
+    <span class="doccomment">/// Checks if current `inner_streams` size is less than optional limit.
+    </span><span class="kw">fn </span>is_exceeded_limit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.limit.map_or(<span class="bool-val">false</span>, |limit| <span class="self">self</span>.inner_streams.len() &gt;= limit.get())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> <span class="ident">FusedStream</span> <span class="kw">for</span> <span class="ident">FlattenUnordered</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St</span>: <span class="ident">FusedStream</span>,
-    <span class="ident">St::Item</span>: <span class="ident">FusedStream</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;St&gt; FusedStream <span class="kw">for </span>FlattenUnordered&lt;St&gt;
+<span class="kw">where
+    </span>St: FusedStream,
+    St::Item: FusedStream + Unpin,
 {
-    <span class="kw">fn</span> <span class="ident">is_terminated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">is_terminated</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">inner_streams</span>.<span class="ident">is_empty</span>()
+    <span class="kw">fn </span>is_terminated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.stream.is_terminated() &amp;&amp; <span class="self">self</span>.inner_streams.is_empty()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">FlattenUnordered</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St</span>: <span class="ident">Stream</span>,
-    <span class="ident">St::Item</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;St&gt; Stream <span class="kw">for </span>FlattenUnordered&lt;St&gt;
+<span class="kw">where
+    </span>St: Stream,
+    St::Item: Stream + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">St::Item</span> <span class="kw">as</span> <span class="ident">Stream</span><span class="op">&gt;</span><span class="ident">::Item</span>;
+    <span class="kw">type </span>Item = &lt;St::Item <span class="kw">as </span>Stream&gt;::Item;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_item</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">need_to_poll_next</span> <span class="op">=</span> <span class="ident">NONE</span>;
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>next_item = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>need_to_poll_next = NONE;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.as_mut().project();
 
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">poll_state_value</span>, <span class="ident">state_bomb</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">poll_state</span>.<span class="ident">start_polling</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>,
-            <span class="kw">_</span> =&gt; {
-                <span class="comment">// Waker was called, just wait for the next poll</span>
-                <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+        <span class="kw">let </span>(<span class="kw-2">mut </span>poll_state_value, state_bomb) = <span class="kw">match </span>this.poll_state.start_polling() {
+            <span class="prelude-val">Some</span>(value) =&gt; value,
+            <span class="kw">_ </span>=&gt; {
+                <span class="comment">// Waker was called, just wait for the next poll
+                </span><span class="kw">return </span>Poll::Pending;
             }
         };
 
-        <span class="kw">if</span> <span class="ident">poll_state_value</span> <span class="op">&amp;</span> <span class="ident">NEED_TO_POLL_STREAM</span> <span class="op">!</span><span class="op">=</span> <span class="ident">NONE</span> {
-            <span class="comment">// Safety: now state is `POLLING`.</span>
-            <span class="kw">let</span> <span class="ident">stream_waker</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">InnerWaker::replace_waker</span>(<span class="ident">this</span>.<span class="ident">stream_waker</span>, <span class="ident">cx</span>) };
+        <span class="kw">if </span>poll_state_value &amp; NEED_TO_POLL_STREAM != NONE {
+            <span class="comment">// Safety: now state is `POLLING`.
+            </span><span class="kw">let </span>stream_waker = <span class="kw">unsafe </span>{ InnerWaker::replace_waker(this.stream_waker, cx) };
 
-            <span class="comment">// Here we need to poll the base stream.</span>
-            <span class="comment">//</span>
-            <span class="comment">// To improve performance, we will attempt to place as many items as we can</span>
-            <span class="comment">// to the `FuturesUnordered` bucket before polling inner streams</span>
-            <span class="kw">loop</span> {
-                <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">is_exceeded_limit</span>() <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">is_stream_done</span> {
-                    <span class="comment">// We either exceeded the limit or the stream is exhausted</span>
-                    <span class="kw">if</span> <span class="op">!</span><span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">is_stream_done</span> {
-                        <span class="comment">// The stream needs to be polled in the next iteration</span>
-                        <span class="ident">need_to_poll_next</span> <span class="op">|</span><span class="op">=</span> <span class="ident">NEED_TO_POLL_STREAM</span>;
+            <span class="comment">// Here we need to poll the base stream.
+            //
+            // To improve performance, we will attempt to place as many items as we can
+            // to the `FuturesUnordered` bucket before polling inner streams
+            </span><span class="kw">loop </span>{
+                <span class="kw">if </span>this.is_exceeded_limit() || <span class="kw-2">*</span>this.is_stream_done {
+                    <span class="comment">// We either exceeded the limit or the stream is exhausted
+                    </span><span class="kw">if </span>!<span class="kw-2">*</span>this.is_stream_done {
+                        <span class="comment">// The stream needs to be polled in the next iteration
+                        </span>need_to_poll_next |= NEED_TO_POLL_STREAM;
                     }
 
                     <span class="kw">break</span>;
-                } <span class="kw">else</span> {
-                    <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_next</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Context::from_waker</span>(<span class="kw-2">&amp;</span><span class="ident">stream_waker</span>)) {
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">inner_stream</span>)) =&gt; {
-                            <span class="comment">// Add new stream to the inner streams bucket</span>
-                            <span class="ident">this</span>.<span class="ident">inner_streams</span>.<span class="ident">as_mut</span>().<span class="ident">push</span>(<span class="ident">PollStreamFut::new</span>(<span class="ident">inner_stream</span>));
-                            <span class="comment">// Inner streams must be polled afterward</span>
-                            <span class="ident">poll_state_value</span> <span class="op">|</span><span class="op">=</span> <span class="ident">NEED_TO_POLL_INNER_STREAMS</span>;
+                } <span class="kw">else </span>{
+                    <span class="kw">match </span>this.stream.as_mut().poll_next(<span class="kw-2">&amp;mut </span>Context::from_waker(<span class="kw-2">&amp;</span>stream_waker)) {
+                        Poll::Ready(<span class="prelude-val">Some</span>(inner_stream)) =&gt; {
+                            <span class="comment">// Add new stream to the inner streams bucket
+                            </span>this.inner_streams.as_mut().push(PollStreamFut::new(inner_stream));
+                            <span class="comment">// Inner streams must be polled afterward
+                            </span>poll_state_value |= NEED_TO_POLL_INNER_STREAMS;
                         }
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; {
-                            <span class="comment">// Mark the stream as done</span>
-                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">is_stream_done</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                        Poll::Ready(<span class="prelude-val">None</span>) =&gt; {
+                            <span class="comment">// Mark the stream as done
+                            </span><span class="kw-2">*</span>this.is_stream_done = <span class="bool-val">true</span>;
                         }
-                        <span class="ident">Poll::Pending</span> =&gt; {
+                        Poll::Pending =&gt; {
                             <span class="kw">break</span>;
                         }
                     }
@@ -952,69 +952,69 @@
             }
         }
 
-        <span class="kw">if</span> <span class="ident">poll_state_value</span> <span class="op">&amp;</span> <span class="ident">NEED_TO_POLL_INNER_STREAMS</span> <span class="op">!</span><span class="op">=</span> <span class="ident">NONE</span> {
-            <span class="comment">// Safety: now state is `POLLING`.</span>
-            <span class="kw">let</span> <span class="ident">inner_streams_waker</span> <span class="op">=</span>
-                <span class="kw">unsafe</span> { <span class="ident">InnerWaker::replace_waker</span>(<span class="ident">this</span>.<span class="ident">inner_streams_waker</span>, <span class="ident">cx</span>) };
+        <span class="kw">if </span>poll_state_value &amp; NEED_TO_POLL_INNER_STREAMS != NONE {
+            <span class="comment">// Safety: now state is `POLLING`.
+            </span><span class="kw">let </span>inner_streams_waker =
+                <span class="kw">unsafe </span>{ InnerWaker::replace_waker(this.inner_streams_waker, cx) };
 
-            <span class="kw">match</span> <span class="ident">this</span>
-                .<span class="ident">inner_streams</span>
-                .<span class="ident">as_mut</span>()
-                .<span class="ident">poll_next</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Context::from_waker</span>(<span class="kw-2">&amp;</span><span class="ident">inner_streams_waker</span>))
+            <span class="kw">match </span>this
+                .inner_streams
+                .as_mut()
+                .poll_next(<span class="kw-2">&amp;mut </span>Context::from_waker(<span class="kw-2">&amp;</span>inner_streams_waker))
             {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>((<span class="ident">item</span>, <span class="ident">next_item_fut</span>)))) =&gt; {
-                    <span class="comment">// Push next inner stream item future to the list of inner streams futures</span>
-                    <span class="ident">this</span>.<span class="ident">inner_streams</span>.<span class="ident">as_mut</span>().<span class="ident">push</span>(<span class="ident">next_item_fut</span>);
-                    <span class="comment">// Take the received item</span>
-                    <span class="ident">next_item</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>);
-                    <span class="comment">// On the next iteration, inner streams must be polled again</span>
-                    <span class="ident">need_to_poll_next</span> <span class="op">|</span><span class="op">=</span> <span class="ident">NEED_TO_POLL_INNER_STREAMS</span>;
+                Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>((item, next_item_fut)))) =&gt; {
+                    <span class="comment">// Push next inner stream item future to the list of inner streams futures
+                    </span>this.inner_streams.as_mut().push(next_item_fut);
+                    <span class="comment">// Take the received item
+                    </span>next_item = <span class="prelude-val">Some</span>(item);
+                    <span class="comment">// On the next iteration, inner streams must be polled again
+                    </span>need_to_poll_next |= NEED_TO_POLL_INNER_STREAMS;
                 }
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">None</span>)) =&gt; {
-                    <span class="comment">// On the next iteration, inner streams must be polled again</span>
-                    <span class="ident">need_to_poll_next</span> <span class="op">|</span><span class="op">=</span> <span class="ident">NEED_TO_POLL_INNER_STREAMS</span>;
+                Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">None</span>)) =&gt; {
+                    <span class="comment">// On the next iteration, inner streams must be polled again
+                    </span>need_to_poll_next |= NEED_TO_POLL_INNER_STREAMS;
                 }
-                <span class="kw">_</span> =&gt; {}
+                <span class="kw">_ </span>=&gt; {}
             }
         }
 
-        <span class="comment">// We didn&#39;t have any `poll_next` panic, so it&#39;s time to deactivate the bomb</span>
-        <span class="ident">state_bomb</span>.<span class="ident">deactivate</span>();
+        <span class="comment">// We didn&#39;t have any `poll_next` panic, so it&#39;s time to deactivate the bomb
+        </span>state_bomb.deactivate();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">force_wake</span> <span class="op">=</span>
-            <span class="comment">// we need to poll the stream and didn&#39;t reach the limit yet</span>
-            <span class="ident">need_to_poll_next</span> <span class="op">&amp;</span> <span class="ident">NEED_TO_POLL_STREAM</span> <span class="op">!</span><span class="op">=</span> <span class="ident">NONE</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">this</span>.<span class="ident">is_exceeded_limit</span>()
-            <span class="comment">// or we need to poll inner streams again</span>
-            <span class="op">|</span><span class="op">|</span> <span class="ident">need_to_poll_next</span> <span class="op">&amp;</span> <span class="ident">NEED_TO_POLL_INNER_STREAMS</span> <span class="op">!</span><span class="op">=</span> <span class="ident">NONE</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>force_wake =
+            <span class="comment">// we need to poll the stream and didn&#39;t reach the limit yet
+            </span>need_to_poll_next &amp; NEED_TO_POLL_STREAM != NONE &amp;&amp; !this.is_exceeded_limit()
+            <span class="comment">// or we need to poll inner streams again
+            </span>|| need_to_poll_next &amp; NEED_TO_POLL_INNER_STREAMS != NONE;
 
-        <span class="comment">// Stop polling and swap the latest state</span>
-        <span class="ident">poll_state_value</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">poll_state</span>.<span class="ident">stop_polling</span>(<span class="ident">need_to_poll_next</span>, <span class="ident">force_wake</span>);
-        <span class="comment">// If state was changed during `POLLING` phase, need to manually call a waker</span>
-        <span class="ident">force_wake</span> <span class="op">|</span><span class="op">=</span> <span class="ident">poll_state_value</span> <span class="op">&amp;</span> <span class="ident">NEED_TO_POLL_ALL</span> <span class="op">!</span><span class="op">=</span> <span class="ident">NONE</span>;
+        <span class="comment">// Stop polling and swap the latest state
+        </span>poll_state_value = this.poll_state.stop_polling(need_to_poll_next, force_wake);
+        <span class="comment">// If state was changed during `POLLING` phase, need to manually call a waker
+        </span>force_wake |= poll_state_value &amp; NEED_TO_POLL_ALL != NONE;
 
-        <span class="kw">let</span> <span class="ident">is_done</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">is_stream_done</span> <span class="op">&amp;&amp;</span> <span class="ident">this</span>.<span class="ident">inner_streams</span>.<span class="ident">is_empty</span>();
+        <span class="kw">let </span>is_done = <span class="kw-2">*</span>this.is_stream_done &amp;&amp; this.inner_streams.is_empty();
 
-        <span class="kw">if</span> <span class="ident">next_item</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">is_done</span> {
-            <span class="ident">Poll::Ready</span>(<span class="ident">next_item</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">if</span> <span class="ident">force_wake</span> {
-                <span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">wake_by_ref</span>();
+        <span class="kw">if </span>next_item.is_some() || is_done {
+            Poll::Ready(next_item)
+        } <span class="kw">else </span>{
+            <span class="kw">if </span>force_wake {
+                cx.waker().wake_by_ref();
             }
 
-            <span class="ident">Poll::Pending</span>
+            Poll::Pending
         }
     }
 }
 
-<span class="comment">// Forwarding impl of Sink from the underlying stream</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St</span>, <span class="ident">Item</span><span class="op">&gt;</span> <span class="ident">Sink</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FlattenUnordered</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">Sink</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>,
+<span class="comment">// Forwarding impl of Sink from the underlying stream
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;sink&quot;</span>)]
+</span><span class="kw">impl</span>&lt;St, Item&gt; Sink&lt;Item&gt; <span class="kw">for </span>FlattenUnordered&lt;St&gt;
+<span class="kw">where
+    </span>St: Stream + Sink&lt;Item&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">St::Error</span>;
+    <span class="kw">type </span>Error = St::Error;
 
-    <span class="macro">delegate_sink!</span>(<span class="ident">stream</span>, <span class="ident">Item</span>);
+    <span class="macro">delegate_sink!</span>(stream, Item);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

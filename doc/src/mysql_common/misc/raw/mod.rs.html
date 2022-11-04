@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/misc/raw/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/misc/raw/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -171,178 +171,178 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="doccomment">//! Various parsing/serialization primitives.</span>
+</span><span class="doccomment">//! Various parsing/serialization primitives.
 
-<span class="kw">use</span> <span class="ident">std::io</span>;
+</span><span class="kw">use </span>std::io;
 
-<span class="kw">use</span> <span class="ident">::bytes::BufMut</span>;
-<span class="kw">use</span> <span class="ident">smallvec</span>::{<span class="ident">Array</span>, <span class="ident">SmallVec</span>};
+<span class="kw">use </span>::bytes::BufMut;
+<span class="kw">use </span>smallvec::{Array, SmallVec};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">proto</span>::{<span class="ident">MyDeserialize</span>, <span class="ident">MySerialize</span>},
+<span class="kw">use crate</span>::{
+    io::ParseBuf,
+    proto::{MyDeserialize, MySerialize},
 };
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::bytes::LenEnc</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">_const</span>::{<span class="ident">Const</span>, <span class="ident">RawConst</span>},
-    <span class="ident">bytes::RawBytes</span>,
-    <span class="ident">flags::RawFlags</span>,
-    <span class="ident">int::RawInt</span>,
-    <span class="ident">seq::RawSeq</span>,
+<span class="kw">use </span><span class="self">self</span>::bytes::LenEnc;
+<span class="kw">pub use </span><span class="self">self</span>::{
+    _const::{Const, RawConst},
+    bytes::RawBytes,
+    flags::RawFlags,
+    int::RawInt,
+    seq::RawSeq,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::unexpected_buf_eof</span>;
+<span class="kw">use </span><span class="kw">super</span>::unexpected_buf_eof;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">_const</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bytes</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">flags</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">int</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">seq</span>;
+<span class="kw">pub mod </span>_const;
+<span class="kw">pub mod </span>bytes;
+<span class="kw">pub mod </span>flags;
+<span class="kw">pub mod </span>int;
+<span class="kw">pub mod </span>seq;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>] {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">usize</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>[u8] {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = usize;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">len</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">buf</span>.<span class="ident">checked_eat</span>(<span class="ident">len</span>).<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)
+    <span class="kw">fn </span>deserialize(len: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        buf.checked_eat(len).ok_or_else(unexpected_buf_eof)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MySerialize</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="self">self</span>);
+<span class="kw">impl </span>MySerialize <span class="kw">for </span>[u8] {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        buf.put_slice(<span class="self">self</span>);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">u8</span>; <span class="ident">LEN</span>] {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">LEN</span>);
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>LEN: usize&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>[u8; LEN] {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">Some</span>(LEN);
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">eat</span>(<span class="ident">LEN</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> [<span class="number">0_u8</span>; <span class="ident">LEN</span>];
-        <span class="ident">this</span>.<span class="ident">copy_from_slice</span>(<span class="ident">value</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">this</span>)
+    <span class="kw">fn </span>deserialize((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>value = buf.eat(LEN);
+        <span class="kw">let </span><span class="kw-2">mut </span>this = [<span class="number">0_u8</span>; LEN];
+        this.copy_from_slice(value);
+        <span class="prelude-val">Ok</span>(this)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">MySerialize</span> <span class="kw">for</span> [<span class="ident">u8</span>; <span class="ident">LEN</span>] {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>[..]);
+<span class="kw">impl</span>&lt;<span class="kw">const </span>LEN: usize&gt; MySerialize <span class="kw">for </span>[u8; LEN] {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        buf.put_slice(<span class="kw-2">&amp;</span><span class="self">self</span>[..]);
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Skip</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span>;
+<span class="attribute">#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>Skip&lt;<span class="kw">const </span>LEN: usize&gt;;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Skip</span><span class="op">&lt;</span><span class="ident">LEN</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">LEN</span>);
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>LEN: usize&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Skip&lt;LEN&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">Some</span>(LEN);
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">buf</span>.<span class="ident">skip</span>(<span class="ident">LEN</span>);
+    <span class="kw">fn </span>deserialize((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        buf.skip(LEN);
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">Skip</span><span class="op">&lt;</span><span class="ident">LEN</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">0_u8</span>; <span class="ident">LEN</span>]);
+<span class="kw">impl</span>&lt;<span class="kw">const </span>LEN: usize&gt; MySerialize <span class="kw">for </span>Skip&lt;LEN&gt; {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        buf.put_slice(<span class="kw-2">&amp;</span>[<span class="number">0_u8</span>; LEN]);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">usize</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = usize;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">len</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">buf</span>.<span class="ident">checked_eat_buf</span>(<span class="ident">len</span>).<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)
+    <span class="kw">fn </span>deserialize(len: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        buf.checked_eat_buf(len).ok_or_else(unexpected_buf_eof)
     }
 }
 
-<span class="doccomment">/// This ad-hock impl parses length-encoded string into a `SmallVec`.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">LEN</span>]<span class="op">&gt;</span>
-<span class="kw">where</span>
-    [<span class="ident">u8</span>; <span class="ident">LEN</span>]: <span class="ident">Array</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
+<span class="doccomment">/// This ad-hock impl parses length-encoded string into a `SmallVec`.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>LEN: usize&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>SmallVec&lt;[u8; LEN]&gt;
+<span class="kw">where
+    </span>[u8; LEN]: Array&lt;Item = u8&gt;,
 {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">small_vec</span> <span class="op">=</span> <span class="ident">SmallVec::new</span>();
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">LenEnc</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
-        <span class="ident">small_vec</span>.<span class="ident">extend_from_slice</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>());
-        <span class="prelude-val">Ok</span>(<span class="ident">small_vec</span>)
+    <span class="kw">fn </span>deserialize((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>small_vec = SmallVec::new();
+        <span class="kw">let </span>s: RawBytes&lt;<span class="lifetime">&#39;de</span>, LenEnc&gt; = buf.parse(())<span class="question-mark">?</span>;
+        small_vec.extend_from_slice(s.as_bytes());
+        <span class="prelude-val">Ok</span>(small_vec)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">LEN</span>]<span class="op">&gt;</span>
-<span class="kw">where</span>
-    [<span class="ident">u8</span>; <span class="ident">LEN</span>]: <span class="ident">Array</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="kw">const </span>LEN: usize&gt; MySerialize <span class="kw">for </span>SmallVec&lt;[u8; LEN]&gt;
+<span class="kw">where
+    </span>[u8; LEN]: Array&lt;Item = u8&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>)
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        buf.put_slice(<span class="kw-2">&amp;*</span><span class="self">self</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="ident">Left</span>(<span class="ident">T</span>),
-    <span class="ident">Right</span>(<span class="ident">U</span>),
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>Either&lt;T, U&gt; {
+    Left(T),
+    Right(U),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
-    <span class="ident">U</span>: <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T, U&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Either&lt;T, U&gt;
+<span class="kw">where
+    </span>T: MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
+    U: MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>; <span class="comment">// TODO: maybe later</span>
-    <span class="doccomment">/// Which one to deserialize.</span>
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">T::Ctx</span>, <span class="ident">U::Ctx</span><span class="op">&gt;</span>;
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>; <span class="comment">// TODO: maybe later
+    </span><span class="doccomment">/// Which one to deserialize.
+    </span><span class="kw">type </span>Ctx = Either&lt;T::Ctx, U::Ctx&gt;;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">ctx</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">ctx</span> {
-            <span class="ident">Either::Left</span>(<span class="ident">ctx</span>) =&gt; <span class="ident">T::deserialize</span>(<span class="ident">ctx</span>, <span class="ident">buf</span>).<span class="ident">map</span>(<span class="ident">Either::Left</span>),
-            <span class="ident">Either::Right</span>(<span class="ident">ctx</span>) =&gt; <span class="ident">U::deserialize</span>(<span class="ident">ctx</span>, <span class="ident">buf</span>).<span class="ident">map</span>(<span class="ident">Either::Right</span>),
+    <span class="kw">fn </span>deserialize(ctx: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>ctx {
+            Either::Left(ctx) =&gt; T::deserialize(ctx, buf).map(Either::Left),
+            Either::Right(ctx) =&gt; U::deserialize(ctx, buf).map(Either::Right),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">MySerialize</span>,
-    <span class="ident">U</span>: <span class="ident">MySerialize</span>,
+<span class="kw">impl</span>&lt;T, U&gt; MySerialize <span class="kw">for </span>Either&lt;T, U&gt;
+<span class="kw">where
+    </span>T: MySerialize,
+    U: MySerialize,
 {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Either::Left</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">Either::Right</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="kw">match </span><span class="self">self </span>{
+            Either::Left(x) =&gt; x.serialize(buf),
+            Either::Right(x) =&gt; x.serialize(buf),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">f64</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">8</span>);
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>f64 {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">Some</span>(<span class="number">8</span>);
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">buf</span>.<span class="ident">eat_f64_le</span>())
+    <span class="kw">fn </span>deserialize((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Ok</span>(buf.eat_f64_le())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">f64</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">buf</span>.<span class="ident">put_f64_le</span>(<span class="kw-2">*</span><span class="self">self</span>);
+<span class="kw">impl </span>MySerialize <span class="kw">for </span>f64 {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        buf.put_f64_le(<span class="kw-2">*</span><span class="self">self</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/codec/prost.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>prost.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/codec/prost.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>prost.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -237,242 +237,242 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Codec</span>, <span class="ident">DecodeBuf</span>, <span class="ident">Decoder</span>, <span class="ident">Encoder</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::EncodeBuf</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Code</span>, <span class="ident">Status</span>};
-<span class="kw">use</span> <span class="ident">prost1::Message</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::{Codec, DecodeBuf, Decoder, Encoder};
+<span class="kw">use </span><span class="kw">crate</span>::codec::EncodeBuf;
+<span class="kw">use crate</span>::{Code, Status};
+<span class="kw">use </span>prost1::Message;
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="doccomment">/// A [`Codec`] that implements `application/grpc+proto` via the prost library..</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ProstCodec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="ident">_pd</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">U</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// A [`Codec`] that implements `application/grpc+proto` via the prost library..
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>ProstCodec&lt;T, U&gt; {
+    _pd: PhantomData&lt;(T, U)&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ProstCodec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">_pd</span>: <span class="ident">PhantomData</span> }
+<span class="kw">impl</span>&lt;T, U&gt; Default <span class="kw">for </span>ProstCodec&lt;T, U&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ _pd: PhantomData }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ProstCodec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Message</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">U</span>: <span class="ident">Message</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T, U&gt; Codec <span class="kw">for </span>ProstCodec&lt;T, U&gt;
+<span class="kw">where
+    </span>T: Message + Send + <span class="lifetime">&#39;static</span>,
+    U: Message + Default + Send + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">type</span> <span class="ident">Encode</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">Decode</span> <span class="op">=</span> <span class="ident">U</span>;
+    <span class="kw">type </span>Encode = T;
+    <span class="kw">type </span>Decode = U;
 
-    <span class="kw">type</span> <span class="ident">Encoder</span> <span class="op">=</span> <span class="ident">ProstEncoder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Decoder</span> <span class="op">=</span> <span class="ident">ProstDecoder</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Encoder = ProstEncoder&lt;T&gt;;
+    <span class="kw">type </span>Decoder = ProstDecoder&lt;U&gt;;
 
-    <span class="kw">fn</span> <span class="ident">encoder</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Encoder</span> {
-        <span class="ident">ProstEncoder</span>(<span class="ident">PhantomData</span>)
+    <span class="kw">fn </span>encoder(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Encoder {
+        ProstEncoder(PhantomData)
     }
 
-    <span class="kw">fn</span> <span class="ident">decoder</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Decoder</span> {
-        <span class="ident">ProstDecoder</span>(<span class="ident">PhantomData</span>)
+    <span class="kw">fn </span>decoder(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Decoder {
+        ProstDecoder(PhantomData)
     }
 }
 
-<span class="doccomment">/// A [`Encoder`] that knows how to encode `T`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ProstEncoder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A [`Encoder`] that knows how to encode `T`.
+</span><span class="attribute">#[derive(Debug, Clone, Default)]
+</span><span class="kw">pub struct </span>ProstEncoder&lt;T&gt;(PhantomData&lt;T&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Message</span><span class="op">&gt;</span> <span class="ident">Encoder</span> <span class="kw">for</span> <span class="ident">ProstEncoder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span>;
+<span class="kw">impl</span>&lt;T: Message&gt; Encoder <span class="kw">for </span>ProstEncoder&lt;T&gt; {
+    <span class="kw">type </span>Item = T;
+    <span class="kw">type </span>Error = Status;
 
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EncodeBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="ident">item</span>.<span class="ident">encode</span>(<span class="ident">buf</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;Message only errors if not enough space&quot;</span>);
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="self">Self</span>::Item, buf: <span class="kw-2">&amp;mut </span>EncodeBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        item.encode(buf)
+            .expect(<span class="string">&quot;Message only errors if not enough space&quot;</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="doccomment">/// A [`Decoder`] that knows how to decode `U`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ProstDecoder</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A [`Decoder`] that knows how to decode `U`.
+</span><span class="attribute">#[derive(Debug, Clone, Default)]
+</span><span class="kw">pub struct </span>ProstDecoder&lt;U&gt;(PhantomData&lt;U&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Message</span> <span class="op">+</span> <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">Decoder</span> <span class="kw">for</span> <span class="ident">ProstDecoder</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">U</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span>;
+<span class="kw">impl</span>&lt;U: Message + Default&gt; Decoder <span class="kw">for </span>ProstDecoder&lt;U&gt; {
+    <span class="kw">type </span>Item = U;
+    <span class="kw">type </span>Error = Status;
 
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DecodeBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">Message::decode</span>(<span class="ident">buf</span>)
-            .<span class="ident">map</span>(<span class="ident">Option::Some</span>)
-            .<span class="ident">map_err</span>(<span class="ident">from_decode_error</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>decode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>DecodeBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>item = Message::decode(buf)
+            .map(Option::Some)
+            .map_err(from_decode_error)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">item</span>)
+        <span class="prelude-val">Ok</span>(item)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">from_decode_error</span>(<span class="ident">error</span>: <span class="ident">prost1::DecodeError</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Status</span> {
-    <span class="comment">// Map Protobuf parse errors to an INTERNAL status code, as per</span>
-    <span class="comment">// https://github.com/grpc/grpc/blob/master/doc/statuscodes.md</span>
-    <span class="ident">Status::new</span>(<span class="ident">Code::Internal</span>, <span class="ident">error</span>.<span class="ident">to_string</span>())
+<span class="kw">fn </span>from_decode_error(error: prost1::DecodeError) -&gt; <span class="kw">crate</span>::Status {
+    <span class="comment">// Map Protobuf parse errors to an INTERNAL status code, as per
+    // https://github.com/grpc/grpc/blob/master/doc/statuscodes.md
+    </span>Status::new(Code::Internal, error.to_string())
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::compression::SingleMessageCompressionOverride</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec</span>::{
-        <span class="ident">encode_server</span>, <span class="ident">DecodeBuf</span>, <span class="ident">Decoder</span>, <span class="ident">EncodeBuf</span>, <span class="ident">Encoder</span>, <span class="ident">Streaming</span>, <span class="ident">HEADER_SIZE</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::codec::compression::SingleMessageCompressionOverride;
+    <span class="kw">use </span><span class="kw">crate</span>::codec::{
+        encode_server, DecodeBuf, Decoder, EncodeBuf, Encoder, Streaming, HEADER_SIZE,
     };
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Status</span>;
-    <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
-    <span class="kw">use</span> <span class="ident">http_body::Body</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::Status;
+    <span class="kw">use </span>bytes::{Buf, BufMut, BytesMut};
+    <span class="kw">use </span>http_body::Body;
 
-    <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10000</span>;
+    <span class="kw">const </span>LEN: usize = <span class="number">10000</span>;
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span>() {
-        <span class="kw">let</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">MockDecoder::default</span>();
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>decode() {
+        <span class="kw">let </span>decoder = MockDecoder::default();
 
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">LEN</span>];
+        <span class="kw">let </span>msg = <span class="macro">vec!</span>[<span class="number">0u8</span>; LEN];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = BytesMut::new();
 
-        <span class="ident">buf</span>.<span class="ident">reserve</span>(<span class="ident">msg</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">HEADER_SIZE</span>);
-        <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="number">0</span>);
-        <span class="ident">buf</span>.<span class="ident">put_u32</span>(<span class="ident">msg</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>);
+        buf.reserve(msg.len() + HEADER_SIZE);
+        buf.put_u8(<span class="number">0</span>);
+        buf.put_u32(msg.len() <span class="kw">as </span>u32);
 
-        <span class="ident">buf</span>.<span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>[..]);
+        buf.put(<span class="kw-2">&amp;</span>msg[..]);
 
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">body::MockBody::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..], <span class="number">10005</span>, <span class="number">0</span>);
+        <span class="kw">let </span>body = body::MockBody::new(<span class="kw-2">&amp;</span>buf[..], <span class="number">10005</span>, <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">Streaming::new_request</span>(<span class="ident">decoder</span>, <span class="ident">body</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>stream = Streaming::new_request(decoder, body, <span class="prelude-val">None</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0usize</span>;
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">output_msg</span>) <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">message</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>() {
-            <span class="macro">assert_eq!</span>(<span class="ident">output_msg</span>.<span class="ident">len</span>(), <span class="ident">msg</span>.<span class="ident">len</span>());
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0usize</span>;
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(output_msg) = stream.message().<span class="kw">await</span>.unwrap() {
+            <span class="macro">assert_eq!</span>(output_msg.len(), msg.len());
+            i += <span class="number">1</span>;
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">i</span>, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(i, <span class="number">1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">encode</span>() {
-        <span class="kw">let</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">MockEncoder::default</span>();
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>encode() {
+        <span class="kw">let </span>encoder = MockEncoder::default();
 
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">Vec::from</span>(<span class="kw-2">&amp;</span>[<span class="number">0u8</span>; <span class="number">1024</span>][..]);
+        <span class="kw">let </span>msg = Vec::from(<span class="kw-2">&amp;</span>[<span class="number">0u8</span>; <span class="number">1024</span>][..]);
 
-        <span class="kw">let</span> <span class="ident">messages</span> <span class="op">=</span> <span class="ident">std::iter::repeat_with</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Status</span><span class="op">&gt;</span>(<span class="ident">msg</span>.<span class="ident">clone</span>())).<span class="ident">take</span>(<span class="number">10000</span>);
-        <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">futures_util::stream::iter</span>(<span class="ident">messages</span>);
+        <span class="kw">let </span>messages = std::iter::repeat_with(<span class="kw">move </span>|| <span class="prelude-val">Ok</span>::&lt;<span class="kw">_</span>, Status&gt;(msg.clone())).take(<span class="number">10000</span>);
+        <span class="kw">let </span>source = futures_util::stream::iter(messages);
 
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">encode_server</span>(
-            <span class="ident">encoder</span>,
-            <span class="ident">source</span>,
+        <span class="kw">let </span>body = encode_server(
+            encoder,
+            source,
             <span class="prelude-val">None</span>,
-            <span class="ident">SingleMessageCompressionOverride::default</span>(),
+            SingleMessageCompressionOverride::default(),
         );
 
-        <span class="macro">futures_util::pin_mut!</span>(<span class="ident">body</span>);
+        <span class="macro">futures_util::pin_mut!</span>(body);
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">body</span>.<span class="ident">data</span>().<span class="kw">await</span> {
-            <span class="ident">r</span>.<span class="ident">unwrap</span>();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(r) = body.data().<span class="kw">await </span>{
+            r.unwrap();
         }
     }
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">MockEncoder</span>;
+    <span class="attribute">#[derive(Debug, Clone, Default)]
+    </span><span class="kw">struct </span>MockEncoder;
 
-    <span class="kw">impl</span> <span class="ident">Encoder</span> <span class="kw">for</span> <span class="ident">MockEncoder</span> {
-        <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
-        <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span>;
+    <span class="kw">impl </span>Encoder <span class="kw">for </span>MockEncoder {
+        <span class="kw">type </span>Item = Vec&lt;u8&gt;;
+        <span class="kw">type </span>Error = Status;
 
-        <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EncodeBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-            <span class="ident">buf</span>.<span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>[..]);
+        <span class="kw">fn </span>encode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="self">Self</span>::Item, buf: <span class="kw-2">&amp;mut </span>EncodeBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+            buf.put(<span class="kw-2">&amp;</span>item[..]);
             <span class="prelude-val">Ok</span>(())
         }
     }
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">MockDecoder</span>;
+    <span class="attribute">#[derive(Debug, Clone, Default)]
+    </span><span class="kw">struct </span>MockDecoder;
 
-    <span class="kw">impl</span> <span class="ident">Decoder</span> <span class="kw">for</span> <span class="ident">MockDecoder</span> {
-        <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
-        <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span>;
+    <span class="kw">impl </span>Decoder <span class="kw">for </span>MockDecoder {
+        <span class="kw">type </span>Item = Vec&lt;u8&gt;;
+        <span class="kw">type </span>Error = Status;
 
-        <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DecodeBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::from</span>(<span class="ident">buf</span>.<span class="ident">chunk</span>());
-            <span class="ident">buf</span>.<span class="ident">advance</span>(<span class="ident">LEN</span>);
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">out</span>))
+        <span class="kw">fn </span>decode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>DecodeBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;, <span class="self">Self</span>::Error&gt; {
+            <span class="kw">let </span>out = Vec::from(buf.chunk());
+            buf.advance(LEN);
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(out))
         }
     }
 
-    <span class="kw">mod</span> <span class="ident">body</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Status</span>;
-        <span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
-        <span class="kw">use</span> <span class="ident">http_body::Body</span>;
-        <span class="kw">use</span> <span class="ident">std</span>::{
-            <span class="ident">pin::Pin</span>,
-            <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+    <span class="kw">mod </span>body {
+        <span class="kw">use </span><span class="kw">crate</span>::Status;
+        <span class="kw">use </span>bytes::Bytes;
+        <span class="kw">use </span>http_body::Body;
+        <span class="kw">use </span>std::{
+            pin::Pin,
+            task::{Context, Poll},
         };
 
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">MockBody</span> {
-            <span class="ident">data</span>: <span class="ident">Bytes</span>,
+        <span class="attribute">#[derive(Debug)]
+        </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>MockBody {
+            data: Bytes,
 
-            <span class="comment">// the size of the partial message to send</span>
-            <span class="ident">partial_len</span>: <span class="ident">usize</span>,
+            <span class="comment">// the size of the partial message to send
+            </span>partial_len: usize,
 
-            <span class="comment">// the number of times we&#39;ve sent</span>
-            <span class="ident">count</span>: <span class="ident">usize</span>,
+            <span class="comment">// the number of times we&#39;ve sent
+            </span>count: usize,
         }
 
-        <span class="kw">impl</span> <span class="ident">MockBody</span> {
-            <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">partial_len</span>: <span class="ident">usize</span>, <span class="ident">count</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-                <span class="ident">MockBody</span> {
-                    <span class="ident">data</span>: <span class="ident">Bytes::copy_from_slice</span>(<span class="ident">b</span>),
-                    <span class="ident">partial_len</span>,
-                    <span class="ident">count</span>,
+        <span class="kw">impl </span>MockBody {
+            <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(b: <span class="kw-2">&amp;</span>[u8], partial_len: usize, count: usize) -&gt; <span class="self">Self </span>{
+                MockBody {
+                    data: Bytes::copy_from_slice(b),
+                    partial_len,
+                    count,
                 }
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">Body</span> <span class="kw">for</span> <span class="ident">MockBody</span> {
-            <span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="ident">Bytes</span>;
-            <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span>;
+        <span class="kw">impl </span>Body <span class="kw">for </span>MockBody {
+            <span class="kw">type </span>Data = Bytes;
+            <span class="kw">type </span>Error = Status;
 
-            <span class="kw">fn</span> <span class="ident">poll_data</span>(
-                <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-                <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-                <span class="comment">// every other call to poll_data returns data</span>
-                <span class="kw">let</span> <span class="ident">should_send</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">count</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span>;
-                <span class="kw">let</span> <span class="ident">data_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>();
-                <span class="kw">let</span> <span class="ident">partial_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">partial_len</span>;
-                <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">count</span>;
-                <span class="kw">if</span> <span class="ident">data_len</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">should_send</span> {
-                        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span>
-                            <span class="self">self</span>.<span class="ident">data</span>
-                                .<span class="ident">split_to</span>(<span class="kw">if</span> <span class="ident">count</span> <span class="op">==</span> <span class="number">0</span> { <span class="ident">partial_len</span> } <span class="kw">else</span> { <span class="ident">data_len</span> });
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">response</span>)))
-                    } <span class="kw">else</span> {
-                        <span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">wake_by_ref</span>();
-                        <span class="ident">Poll::Pending</span>
+            <span class="kw">fn </span>poll_data(
+                <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+                cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;&gt;&gt; {
+                <span class="comment">// every other call to poll_data returns data
+                </span><span class="kw">let </span>should_send = <span class="self">self</span>.count % <span class="number">2 </span>== <span class="number">0</span>;
+                <span class="kw">let </span>data_len = <span class="self">self</span>.data.len();
+                <span class="kw">let </span>partial_len = <span class="self">self</span>.partial_len;
+                <span class="kw">let </span>count = <span class="self">self</span>.count;
+                <span class="kw">if </span>data_len &gt; <span class="number">0 </span>{
+                    <span class="kw">let </span>result = <span class="kw">if </span>should_send {
+                        <span class="kw">let </span>response =
+                            <span class="self">self</span>.data
+                                .split_to(<span class="kw">if </span>count == <span class="number">0 </span>{ partial_len } <span class="kw">else </span>{ data_len });
+                        Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(response)))
+                    } <span class="kw">else </span>{
+                        cx.waker().wake_by_ref();
+                        Poll::Pending
                     };
-                    <span class="comment">// make some fake progress</span>
-                    <span class="self">self</span>.<span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="ident">result</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
+                    <span class="comment">// make some fake progress
+                    </span><span class="self">self</span>.count += <span class="number">1</span>;
+                    result
+                } <span class="kw">else </span>{
+                    Poll::Ready(<span class="prelude-val">None</span>)
                 }
             }
 
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::drop_ref</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-                <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-                <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">http::HeaderMap</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-                <span class="ident">drop</span>(<span class="ident">cx</span>);
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>))
+            <span class="attribute">#[allow(clippy::drop_ref)]
+            </span><span class="kw">fn </span>poll_trailers(
+                <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+                cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;http::HeaderMap&gt;, <span class="self">Self</span>::Error&gt;&gt; {
+                drop(cx);
+                Poll::Ready(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>))
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

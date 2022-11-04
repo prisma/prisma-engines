@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/convert_case-0.5.0/src/converter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>converter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../convert_case/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/convert_case-0.5.0/src/converter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>converter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../convert_case/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -390,397 +390,397 @@
 <span id="390">390</span>
 <span id="391">391</span>
 <span id="392">392</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::segmentation</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Boundary</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Case</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Pattern</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::segmentation;
+<span class="kw">use </span><span class="kw">crate</span>::Boundary;
+<span class="kw">use </span><span class="kw">crate</span>::Case;
+<span class="kw">use </span><span class="kw">crate</span>::Pattern;
 
-<span class="doccomment">/// The parameters for performing a case conversion.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `Converter` stores three fields needed for case conversion.</span>
-<span class="doccomment">/// 1) `boundaries`: how a string is segmented into _words_.</span>
-<span class="doccomment">/// 2) `pattern`: how words are mutated, or how each character&#39;s case will change.</span>
-<span class="doccomment">/// 3) `delim` or delimeter: how the mutated words are joined into the final string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Then calling [`convert`](Converter::convert) on a `Converter` will apply a case conversion</span>
-<span class="doccomment">/// defined by those fields.  The `Converter` struct is what is used underneath those functions</span>
-<span class="doccomment">/// available in the `Casing` struct.  </span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You can use `Converter` when you need more specificity on conversion</span>
-<span class="doccomment">/// than those provided in `Casing`, or if it is simply more convenient or explicit.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use convert_case::{Boundary, Case, Casing, Converter, Pattern};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let s = &quot;DialogueBox-border-shadow&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Convert using Casing trait</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &quot;dialoguebox_border_shadow&quot;,</span>
-<span class="doccomment">///     s.from_case(Case::Kebab).to_case(Case::Snake)</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Convert using similar functions on Converter</span>
-<span class="doccomment">/// let conv = Converter::new()</span>
-<span class="doccomment">///     .from_case(Case::Kebab)</span>
-<span class="doccomment">///     .to_case(Case::Snake);</span>
-<span class="doccomment">/// assert_eq!(&quot;dialoguebox_border_shadow&quot;, conv.convert(s));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Convert by setting each field explicitly.</span>
-<span class="doccomment">/// let conv = Converter::new()</span>
-<span class="doccomment">///     .set_boundaries(&amp;[Boundary::Hyphen])</span>
-<span class="doccomment">///     .set_pattern(Pattern::Lowercase)</span>
-<span class="doccomment">///     .set_delim(&quot;_&quot;);</span>
-<span class="doccomment">/// assert_eq!(&quot;dialoguebox_border_shadow&quot;, conv.convert(s));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Or you can use `Converter` when you are trying to make a unique case</span>
-<span class="doccomment">/// not provided as a variant of `Case`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use convert_case::{Boundary, Case, Casing, Converter, Pattern};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let dot_camel = Converter::new()</span>
-<span class="doccomment">///     .set_boundaries(&amp;[Boundary::LowerUpper, Boundary::LowerDigit])</span>
-<span class="doccomment">///     .set_pattern(Pattern::Camel)</span>
-<span class="doccomment">///     .set_delim(&quot;.&quot;);</span>
-<span class="doccomment">/// assert_eq!(&quot;collision.Shape.2d&quot;, dot_camel.convert(&quot;CollisionShape2D&quot;));</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Converter</span> {
-    <span class="doccomment">/// How a string is segmented into words.</span>
-    <span class="kw">pub</span> <span class="ident">boundaries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Boundary</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The parameters for performing a case conversion.
+///
+/// A `Converter` stores three fields needed for case conversion.
+/// 1) `boundaries`: how a string is segmented into _words_.
+/// 2) `pattern`: how words are mutated, or how each character&#39;s case will change.
+/// 3) `delim` or delimeter: how the mutated words are joined into the final string.
+///
+/// Then calling [`convert`](Converter::convert) on a `Converter` will apply a case conversion
+/// defined by those fields.  The `Converter` struct is what is used underneath those functions
+/// available in the `Casing` struct.  
+///
+/// You can use `Converter` when you need more specificity on conversion
+/// than those provided in `Casing`, or if it is simply more convenient or explicit.
+///
+/// ```
+/// use convert_case::{Boundary, Case, Casing, Converter, Pattern};
+///
+/// let s = &quot;DialogueBox-border-shadow&quot;;
+///
+/// // Convert using Casing trait
+/// assert_eq!(
+///     &quot;dialoguebox_border_shadow&quot;,
+///     s.from_case(Case::Kebab).to_case(Case::Snake)
+/// );
+///
+/// // Convert using similar functions on Converter
+/// let conv = Converter::new()
+///     .from_case(Case::Kebab)
+///     .to_case(Case::Snake);
+/// assert_eq!(&quot;dialoguebox_border_shadow&quot;, conv.convert(s));
+///
+/// // Convert by setting each field explicitly.
+/// let conv = Converter::new()
+///     .set_boundaries(&amp;[Boundary::Hyphen])
+///     .set_pattern(Pattern::Lowercase)
+///     .set_delim(&quot;_&quot;);
+/// assert_eq!(&quot;dialoguebox_border_shadow&quot;, conv.convert(s));
+/// ```
+///
+/// Or you can use `Converter` when you are trying to make a unique case
+/// not provided as a variant of `Case`.
+///
+/// ```
+/// use convert_case::{Boundary, Case, Casing, Converter, Pattern};
+///
+/// let dot_camel = Converter::new()
+///     .set_boundaries(&amp;[Boundary::LowerUpper, Boundary::LowerDigit])
+///     .set_pattern(Pattern::Camel)
+///     .set_delim(&quot;.&quot;);
+/// assert_eq!(&quot;collision.Shape.2d&quot;, dot_camel.convert(&quot;CollisionShape2D&quot;));
+/// ```
+</span><span class="kw">pub struct </span>Converter {
+    <span class="doccomment">/// How a string is segmented into words.
+    </span><span class="kw">pub </span>boundaries: Vec&lt;Boundary&gt;,
 
-    <span class="doccomment">/// How each word is mutated before joining.  In the case that there is no pattern, none of the</span>
-    <span class="doccomment">/// words will be mutated before joining and will maintain whatever case they were in the</span>
-    <span class="doccomment">/// original string.</span>
-    <span class="kw">pub</span> <span class="ident">pattern</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pattern</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// How each word is mutated before joining.  In the case that there is no pattern, none of the
+    /// words will be mutated before joining and will maintain whatever case they were in the
+    /// original string.
+    </span><span class="kw">pub </span>pattern: <span class="prelude-ty">Option</span>&lt;Pattern&gt;,
 
-    <span class="doccomment">/// The string used to join mutated words together.</span>
-    <span class="kw">pub</span> <span class="ident">delim</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The string used to join mutated words together.
+    </span><span class="kw">pub </span>delim: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Converter</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Converter</span> {
-            <span class="ident">boundaries</span>: <span class="ident">Boundary::defaults</span>(),
-            <span class="ident">pattern</span>: <span class="prelude-val">None</span>,
-            <span class="ident">delim</span>: <span class="ident">String::new</span>(),
+<span class="kw">impl </span>Default <span class="kw">for </span>Converter {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        Converter {
+            boundaries: Boundary::defaults(),
+            pattern: <span class="prelude-val">None</span>,
+            delim: String::new(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Converter</span> {
-    <span class="doccomment">/// Creates a new `Converter` with default fields.  This is the same as `Default::default()`.</span>
-    <span class="doccomment">/// The `Converter` will use `Boundary::defaults()` for boundaries, no pattern, and an empty</span>
-    <span class="doccomment">/// string as a delimeter.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Converter;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new();</span>
-    <span class="doccomment">/// assert_eq!(&quot;DeathPerennialQUEST&quot;, conv.convert(&quot;Death-Perennial QUEST&quot;))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>Converter {
+    <span class="doccomment">/// Creates a new `Converter` with default fields.  This is the same as `Default::default()`.
+    /// The `Converter` will use `Boundary::defaults()` for boundaries, no pattern, and an empty
+    /// string as a delimeter.
+    /// ```
+    /// use convert_case::Converter;
+    ///
+    /// let conv = Converter::new();
+    /// assert_eq!(&quot;DeathPerennialQUEST&quot;, conv.convert(&quot;Death-Perennial QUEST&quot;))
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Converts a string.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Case, Converter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .to_case(Case::Camel);</span>
-    <span class="doccomment">/// assert_eq!(&quot;xmlHttpRequest&quot;, conv.convert(&quot;XML_HTTP_Request&quot;))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">convert</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="ident">T</span>) -&gt; <span class="ident">String</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Converts a string.
+    /// ```
+    /// use convert_case::{Case, Converter};
+    ///
+    /// let conv = Converter::new()
+    ///     .to_case(Case::Camel);
+    /// assert_eq!(&quot;xmlHttpRequest&quot;, conv.convert(&quot;XML_HTTP_Request&quot;))
+    /// ```
+    </span><span class="kw">pub fn </span>convert&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, s: T) -&gt; String
+    <span class="kw">where
+        </span>T: AsRef&lt;str&gt;,
     {
-        <span class="kw">let</span> <span class="ident">words</span> <span class="op">=</span> <span class="ident">segmentation::split</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">boundaries</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pattern</span> {
-            <span class="ident">p</span>.<span class="ident">mutate</span>(<span class="kw-2">&amp;</span><span class="ident">words</span>).<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">delim</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">words</span>.<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">delim</span>)
+        <span class="kw">let </span>words = segmentation::split(<span class="kw-2">&amp;</span>s, <span class="kw-2">&amp;</span><span class="self">self</span>.boundaries);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(p) = <span class="self">self</span>.pattern {
+            p.mutate(<span class="kw-2">&amp;</span>words).join(<span class="kw-2">&amp;</span><span class="self">self</span>.delim)
+        } <span class="kw">else </span>{
+            words.join(<span class="kw-2">&amp;</span><span class="self">self</span>.delim)
         }
     }
 
-    <span class="doccomment">/// Set the pattern and delimiter to those associated with the given case.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Case, Converter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .to_case(Case::Pascal);</span>
-    <span class="doccomment">/// assert_eq!(&quot;VariableName&quot;, conv.convert(&quot;variable name&quot;))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_case</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">pattern</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">case</span>.<span class="ident">pattern</span>());
-        <span class="self">self</span>.<span class="ident">delim</span> <span class="op">=</span> <span class="ident">case</span>.<span class="ident">delim</span>().<span class="ident">to_string</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the pattern and delimiter to those associated with the given case.
+    /// ```
+    /// use convert_case::{Case, Converter};
+    ///
+    /// let conv = Converter::new()
+    ///     .to_case(Case::Pascal);
+    /// assert_eq!(&quot;VariableName&quot;, conv.convert(&quot;variable name&quot;))
+    /// ```
+    </span><span class="kw">pub fn </span>to_case(<span class="kw-2">mut </span><span class="self">self</span>, case: Case) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.pattern = <span class="prelude-val">Some</span>(case.pattern());
+        <span class="self">self</span>.delim = case.delim().to_string();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the boundaries to those associated with the provided case.  This is used</span>
-    <span class="doccomment">/// by the `from_case` function in the `Casing` trait.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Case, Converter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .from_case(Case::Snake)</span>
-    <span class="doccomment">///     .to_case(Case::Title);</span>
-    <span class="doccomment">/// assert_eq!(&quot;Dot Productvalue&quot;, conv.convert(&quot;dot_productValue&quot;))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_case</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">boundaries</span> <span class="op">=</span> <span class="ident">case</span>.<span class="ident">boundaries</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the boundaries to those associated with the provided case.  This is used
+    /// by the `from_case` function in the `Casing` trait.
+    /// ```
+    /// use convert_case::{Case, Converter};
+    ///
+    /// let conv = Converter::new()
+    ///     .from_case(Case::Snake)
+    ///     .to_case(Case::Title);
+    /// assert_eq!(&quot;Dot Productvalue&quot;, conv.convert(&quot;dot_productValue&quot;))
+    /// ```
+    </span><span class="kw">pub fn </span>from_case(<span class="kw-2">mut </span><span class="self">self</span>, case: Case) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.boundaries = case.boundaries();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the boundaries to those provided.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Boundary, Case, Converter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .set_boundaries(&amp;[Boundary::Underscore, Boundary::LowerUpper])</span>
-    <span class="doccomment">///     .to_case(Case::Lower);</span>
-    <span class="doccomment">/// assert_eq!(&quot;panic attack dream theater&quot;, conv.convert(&quot;panicAttack_dreamTheater&quot;))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_boundaries</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Boundary</span>]) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">boundaries</span> <span class="op">=</span> <span class="ident">bs</span>.<span class="ident">to_vec</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the boundaries to those provided.
+    /// ```
+    /// use convert_case::{Boundary, Case, Converter};
+    ///
+    /// let conv = Converter::new()
+    ///     .set_boundaries(&amp;[Boundary::Underscore, Boundary::LowerUpper])
+    ///     .to_case(Case::Lower);
+    /// assert_eq!(&quot;panic attack dream theater&quot;, conv.convert(&quot;panicAttack_dreamTheater&quot;))
+    /// ```
+    </span><span class="kw">pub fn </span>set_boundaries(<span class="kw-2">mut </span><span class="self">self</span>, bs: <span class="kw-2">&amp;</span>[Boundary]) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.boundaries = bs.to_vec();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds a boundary to the list of boundaries.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Boundary, Case, Converter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .from_case(Case::Title)</span>
-    <span class="doccomment">///     .add_boundary(Boundary::Hyphen)</span>
-    <span class="doccomment">///     .to_case(Case::Snake);</span>
-    <span class="doccomment">/// assert_eq!(&quot;my_biography_video_1&quot;, conv.convert(&quot;My Biography - Video 1&quot;))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_boundary</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">Boundary</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">boundaries</span>.<span class="ident">push</span>(<span class="ident">b</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Adds a boundary to the list of boundaries.
+    /// ```
+    /// use convert_case::{Boundary, Case, Converter};
+    ///
+    /// let conv = Converter::new()
+    ///     .from_case(Case::Title)
+    ///     .add_boundary(Boundary::Hyphen)
+    ///     .to_case(Case::Snake);
+    /// assert_eq!(&quot;my_biography_video_1&quot;, conv.convert(&quot;My Biography - Video 1&quot;))
+    /// ```
+    </span><span class="kw">pub fn </span>add_boundary(<span class="kw-2">mut </span><span class="self">self</span>, b: Boundary) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.boundaries.push(b);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds a vector of boundaries to the list of boundaries.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Boundary, Case, Converter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .from_case(Case::Kebab)</span>
-    <span class="doccomment">///     .to_case(Case::Title)</span>
-    <span class="doccomment">///     .add_boundaries(&amp;[Boundary::Underscore, Boundary::LowerUpper]);</span>
-    <span class="doccomment">/// assert_eq!(&quot;2020 10 First Day&quot;, conv.convert(&quot;2020-10_firstDay&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_boundaries</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Boundary</span>]) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">boundaries</span>.<span class="ident">extend</span>(<span class="ident">bs</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Adds a vector of boundaries to the list of boundaries.
+    /// ```
+    /// use convert_case::{Boundary, Case, Converter};
+    ///
+    /// let conv = Converter::new()
+    ///     .from_case(Case::Kebab)
+    ///     .to_case(Case::Title)
+    ///     .add_boundaries(&amp;[Boundary::Underscore, Boundary::LowerUpper]);
+    /// assert_eq!(&quot;2020 10 First Day&quot;, conv.convert(&quot;2020-10_firstDay&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>add_boundaries(<span class="kw-2">mut </span><span class="self">self</span>, bs: <span class="kw-2">&amp;</span>[Boundary]) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.boundaries.extend(bs);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Removes a boundary from the list of boundaries if it exists.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Boundary, Case, Converter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .remove_boundary(Boundary::Acronym)</span>
-    <span class="doccomment">///     .to_case(Case::Kebab);</span>
-    <span class="doccomment">/// assert_eq!(&quot;httprequest-parser&quot;, conv.convert(&quot;HTTPRequest_parser&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_boundary</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">Boundary</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">boundaries</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="ident">b</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Removes a boundary from the list of boundaries if it exists.
+    /// ```
+    /// use convert_case::{Boundary, Case, Converter};
+    ///
+    /// let conv = Converter::new()
+    ///     .remove_boundary(Boundary::Acronym)
+    ///     .to_case(Case::Kebab);
+    /// assert_eq!(&quot;httprequest-parser&quot;, conv.convert(&quot;HTTPRequest_parser&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>remove_boundary(<span class="kw-2">mut </span><span class="self">self</span>, b: Boundary) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.boundaries.retain(|<span class="kw-2">&amp;</span>x| x != b);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Removes all the provided boundaries from the list of boundaries if it exists.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Boundary, Case, Converter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .remove_boundaries(&amp;Boundary::digits())</span>
-    <span class="doccomment">///     .to_case(Case::Snake);</span>
-    <span class="doccomment">/// assert_eq!(&quot;c04_s03_path_finding.pdf&quot;, conv.convert(&quot;C04 S03 Path Finding.pdf&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_boundaries</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Boundary</span>]) -&gt; <span class="self">Self</span> {
-        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="ident">bs</span> {
-            <span class="self">self</span>.<span class="ident">boundaries</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">b</span>);
+    <span class="doccomment">/// Removes all the provided boundaries from the list of boundaries if it exists.
+    /// ```
+    /// use convert_case::{Boundary, Case, Converter};
+    ///
+    /// let conv = Converter::new()
+    ///     .remove_boundaries(&amp;Boundary::digits())
+    ///     .to_case(Case::Snake);
+    /// assert_eq!(&quot;c04_s03_path_finding.pdf&quot;, conv.convert(&quot;C04 S03 Path Finding.pdf&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>remove_boundaries(<span class="kw-2">mut </span><span class="self">self</span>, bs: <span class="kw-2">&amp;</span>[Boundary]) -&gt; <span class="self">Self </span>{
+        <span class="kw">for </span>b <span class="kw">in </span>bs {
+            <span class="self">self</span>.boundaries.retain(|<span class="kw-2">&amp;</span>x| x != <span class="kw-2">*</span>b);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the delimeter.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Case, Converter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .to_case(Case::Snake)</span>
-    <span class="doccomment">///     .set_delim(&quot;.&quot;);</span>
-    <span class="doccomment">/// assert_eq!(&quot;lower.with.dots&quot;, conv.convert(&quot;LowerWithDots&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_delim</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">d</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">ToString</span>,
+    <span class="doccomment">/// Sets the delimeter.
+    /// ```
+    /// use convert_case::{Case, Converter};
+    ///
+    /// let conv = Converter::new()
+    ///     .to_case(Case::Snake)
+    ///     .set_delim(&quot;.&quot;);
+    /// assert_eq!(&quot;lower.with.dots&quot;, conv.convert(&quot;LowerWithDots&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>set_delim&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, d: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: ToString,
     {
-        <span class="self">self</span>.<span class="ident">delim</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">to_string</span>();
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.delim = d.to_string();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the delimeter to an empty string.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Case, Converter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .to_case(Case::Snake)</span>
-    <span class="doccomment">///     .remove_delim();</span>
-    <span class="doccomment">/// assert_eq!(&quot;nodelimshere&quot;, conv.convert(&quot;No Delims Here&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_delim</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">delim</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the delimeter to an empty string.
+    /// ```
+    /// use convert_case::{Case, Converter};
+    ///
+    /// let conv = Converter::new()
+    ///     .to_case(Case::Snake)
+    ///     .remove_delim();
+    /// assert_eq!(&quot;nodelimshere&quot;, conv.convert(&quot;No Delims Here&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>remove_delim(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.delim = String::new();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the pattern.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Case, Converter, Pattern};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .set_delim(&quot;_&quot;)</span>
-    <span class="doccomment">///     .set_pattern(Pattern::Sentence);</span>
-    <span class="doccomment">/// assert_eq!(&quot;Bjarne_case&quot;, conv.convert(&quot;BJARNE CASE&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_pattern</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Pattern</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">pattern</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the pattern.
+    /// ```
+    /// use convert_case::{Case, Converter, Pattern};
+    ///
+    /// let conv = Converter::new()
+    ///     .set_delim(&quot;_&quot;)
+    ///     .set_pattern(Pattern::Sentence);
+    /// assert_eq!(&quot;Bjarne_case&quot;, conv.convert(&quot;BJARNE CASE&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>set_pattern(<span class="kw-2">mut </span><span class="self">self</span>, p: Pattern) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.pattern = <span class="prelude-val">Some</span>(p);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the pattern field to `None`.  Where there is no pattern, a character&#39;s case is never</span>
-    <span class="doccomment">/// mutated and will be maintained at the end of conversion.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::{Case, Converter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let conv = Converter::new()</span>
-    <span class="doccomment">///     .from_case(Case::Title)</span>
-    <span class="doccomment">///     .to_case(Case::Snake)</span>
-    <span class="doccomment">///     .remove_pattern();</span>
-    <span class="doccomment">/// assert_eq!(&quot;KoRn_Alone_I_Break&quot;, conv.convert(&quot;KoRn Alone I Break&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_pattern</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">pattern</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the pattern field to `None`.  Where there is no pattern, a character&#39;s case is never
+    /// mutated and will be maintained at the end of conversion.
+    /// ```
+    /// use convert_case::{Case, Converter};
+    ///
+    /// let conv = Converter::new()
+    ///     .from_case(Case::Title)
+    ///     .to_case(Case::Snake)
+    ///     .remove_pattern();
+    /// assert_eq!(&quot;KoRn_Alone_I_Break&quot;, conv.convert(&quot;KoRn Alone I Break&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>remove_pattern(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.pattern = <span class="prelude-val">None</span>;
+        <span class="self">self
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Casing</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Pattern</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::Casing;
+    <span class="kw">use </span><span class="kw">crate</span>::Pattern;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">snake_converter_from_case</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>().<span class="ident">to_case</span>(<span class="ident">Case::Snake</span>);
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;my var name&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_case</span>(<span class="ident">Case::Snake</span>), <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="ident">s</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>snake_converter_from_case() {
+        <span class="kw">let </span>conv = Converter::new().to_case(Case::Snake);
+        <span class="kw">let </span>s = String::from(<span class="string">&quot;my var name&quot;</span>);
+        <span class="macro">assert_eq!</span>(s.to_case(Case::Snake), conv.convert(s));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">snake_converter_from_scratch</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>()
-            .<span class="ident">set_delim</span>(<span class="string">&quot;_&quot;</span>)
-            .<span class="ident">set_pattern</span>(<span class="ident">Pattern::Lowercase</span>);
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;my var name&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_case</span>(<span class="ident">Case::Snake</span>), <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="ident">s</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>snake_converter_from_scratch() {
+        <span class="kw">let </span>conv = Converter::new()
+            .set_delim(<span class="string">&quot;_&quot;</span>)
+            .set_pattern(Pattern::Lowercase);
+        <span class="kw">let </span>s = String::from(<span class="string">&quot;my var name&quot;</span>);
+        <span class="macro">assert_eq!</span>(s.to_case(Case::Snake), conv.convert(s));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">custom_pattern</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>()
-            .<span class="ident">to_case</span>(<span class="ident">Case::Snake</span>)
-            .<span class="ident">set_pattern</span>(<span class="ident">Pattern::Sentence</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;Bjarne_case&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;bjarne case&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>custom_pattern() {
+        <span class="kw">let </span>conv = Converter::new()
+            .to_case(Case::Snake)
+            .set_pattern(Pattern::Sentence);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;Bjarne_case&quot;</span>, conv.convert(<span class="string">&quot;bjarne case&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">custom_delim</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>().<span class="ident">set_delim</span>(<span class="string">&quot;..&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;oh..My&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;ohMy&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>custom_delim() {
+        <span class="kw">let </span>conv = Converter::new().set_delim(<span class="string">&quot;..&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;oh..My&quot;</span>, conv.convert(<span class="string">&quot;ohMy&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">no_pattern</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>()
-            .<span class="ident">from_case</span>(<span class="ident">Case::Title</span>)
-            .<span class="ident">to_case</span>(<span class="ident">Case::Kebab</span>)
-            .<span class="ident">remove_pattern</span>();
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;wIErd-CASing&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;wIErd CASing&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>no_pattern() {
+        <span class="kw">let </span>conv = Converter::new()
+            .from_case(Case::Title)
+            .to_case(Case::Kebab)
+            .remove_pattern();
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;wIErd-CASing&quot;</span>, conv.convert(<span class="string">&quot;wIErd CASing&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">no_delim</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>()
-            .<span class="ident">from_case</span>(<span class="ident">Case::Title</span>)
-            .<span class="ident">to_case</span>(<span class="ident">Case::Kebab</span>)
-            .<span class="ident">remove_delim</span>();
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;justflat&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;Just Flat&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>no_delim() {
+        <span class="kw">let </span>conv = Converter::new()
+            .from_case(Case::Title)
+            .to_case(Case::Kebab)
+            .remove_delim();
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;justflat&quot;</span>, conv.convert(<span class="string">&quot;Just Flat&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">no_digit_boundaries</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>()
-            .<span class="ident">remove_boundaries</span>(<span class="kw-2">&amp;</span><span class="ident">Boundary::digits</span>())
-            .<span class="ident">to_case</span>(<span class="ident">Case::Snake</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;test_08bound&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;Test 08Bound&quot;</span>));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;a8a_a8a&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;a8aA8A&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>no_digit_boundaries() {
+        <span class="kw">let </span>conv = Converter::new()
+            .remove_boundaries(<span class="kw-2">&amp;</span>Boundary::digits())
+            .to_case(Case::Snake);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;test_08bound&quot;</span>, conv.convert(<span class="string">&quot;Test 08Bound&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;a8a_a8a&quot;</span>, conv.convert(<span class="string">&quot;a8aA8A&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remove_boundary</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>()
-            .<span class="ident">remove_boundary</span>(<span class="ident">Boundary::DigitUpper</span>)
-            .<span class="ident">to_case</span>(<span class="ident">Case::Snake</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;test_08bound&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;Test 08Bound&quot;</span>));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;a_8_a_a_8a&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;a8aA8A&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>remove_boundary() {
+        <span class="kw">let </span>conv = Converter::new()
+            .remove_boundary(Boundary::DigitUpper)
+            .to_case(Case::Snake);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;test_08bound&quot;</span>, conv.convert(<span class="string">&quot;Test 08Bound&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;a_8_a_a_8a&quot;</span>, conv.convert(<span class="string">&quot;a8aA8A&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add_boundary</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>()
-            .<span class="ident">from_case</span>(<span class="ident">Case::Snake</span>)
-            .<span class="ident">to_case</span>(<span class="ident">Case::Kebab</span>)
-            .<span class="ident">add_boundary</span>(<span class="ident">Boundary::LowerUpper</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;word-word-word&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;word_wordWord&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>add_boundary() {
+        <span class="kw">let </span>conv = Converter::new()
+            .from_case(Case::Snake)
+            .to_case(Case::Kebab)
+            .add_boundary(Boundary::LowerUpper);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;word-word-word&quot;</span>, conv.convert(<span class="string">&quot;word_wordWord&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add_boundaries</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>()
-            .<span class="ident">from_case</span>(<span class="ident">Case::Snake</span>)
-            .<span class="ident">to_case</span>(<span class="ident">Case::Kebab</span>)
-            .<span class="ident">add_boundaries</span>(<span class="kw-2">&amp;</span>[<span class="ident">Boundary::LowerUpper</span>, <span class="ident">Boundary::UpperLower</span>]);
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;word-word-w-ord&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;word_wordWord&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>add_boundaries() {
+        <span class="kw">let </span>conv = Converter::new()
+            .from_case(Case::Snake)
+            .to_case(Case::Kebab)
+            .add_boundaries(<span class="kw-2">&amp;</span>[Boundary::LowerUpper, Boundary::UpperLower]);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;word-word-w-ord&quot;</span>, conv.convert(<span class="string">&quot;word_wordWord&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">reuse_after_change</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>().<span class="ident">from_case</span>(<span class="ident">Case::Snake</span>).<span class="ident">to_case</span>(<span class="ident">Case::Kebab</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;word-wordword&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;word_wordWord&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>reuse_after_change() {
+        <span class="kw">let </span>conv = Converter::new().from_case(Case::Snake).to_case(Case::Kebab);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;word-wordword&quot;</span>, conv.convert(<span class="string">&quot;word_wordWord&quot;</span>));
 
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">conv</span>.<span class="ident">add_boundary</span>(<span class="ident">Boundary::LowerUpper</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;word-word-word&quot;</span>, <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;word_wordWord&quot;</span>));
+        <span class="kw">let </span>conv = conv.add_boundary(Boundary::LowerUpper);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;word-word-word&quot;</span>, conv.convert(<span class="string">&quot;word_wordWord&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">explicit_boundaries</span>() {
-        <span class="kw">let</span> <span class="ident">conv</span> <span class="op">=</span> <span class="ident">Converter::new</span>()
-            .<span class="ident">set_boundaries</span>(<span class="kw-2">&amp;</span>[
-                <span class="ident">Boundary::DigitLower</span>,
-                <span class="ident">Boundary::DigitUpper</span>,
-                <span class="ident">Boundary::Acronym</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>explicit_boundaries() {
+        <span class="kw">let </span>conv = Converter::new()
+            .set_boundaries(<span class="kw-2">&amp;</span>[
+                Boundary::DigitLower,
+                Boundary::DigitUpper,
+                Boundary::Acronym,
             ])
-            .<span class="ident">to_case</span>(<span class="ident">Case::Snake</span>);
+            .to_case(Case::Snake);
         <span class="macro">assert_eq!</span>(
             <span class="string">&quot;section8_lesson2_http_requests&quot;</span>,
-            <span class="ident">conv</span>.<span class="ident">convert</span>(<span class="string">&quot;section8lesson2HTTPRequests&quot;</span>)
+            conv.convert(<span class="string">&quot;section8lesson2HTTPRequests&quot;</span>)
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="convert_case" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="convert_case" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

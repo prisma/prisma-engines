@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.29.0/src/read/elf/note.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>note.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.29.0/src/read/elf/note.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>note.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -183,190 +183,190 @@
 <span id="183">183</span>
 <span id="184">184</span>
 <span id="185">185</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::fmt::Debug</span>;
-<span class="kw">use</span> <span class="ident">core::mem</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>core::fmt::Debug;
+<span class="kw">use </span>core::mem;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::elf</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endian</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pod::Pod</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read::util</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read</span>::{<span class="self">self</span>, <span class="ident">Bytes</span>, <span class="ident">Error</span>, <span class="ident">ReadError</span>};
+<span class="kw">use </span><span class="kw">crate</span>::elf;
+<span class="kw">use </span><span class="kw">crate</span>::endian;
+<span class="kw">use </span><span class="kw">crate</span>::pod::Pod;
+<span class="kw">use </span><span class="kw">crate</span>::read::util;
+<span class="kw">use </span><span class="kw">crate</span>::read::{<span class="self">self</span>, Bytes, Error, ReadError};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::FileHeader</span>;
+<span class="kw">use </span><span class="kw">super</span>::FileHeader;
 
-<span class="doccomment">/// An iterator over the notes in an ELF section or segment.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoteIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Elf</span>: <span class="ident">FileHeader</span>,
+<span class="doccomment">/// An iterator over the notes in an ELF section or segment.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>NoteIterator&lt;<span class="lifetime">&#39;data</span>, Elf&gt;
+<span class="kw">where
+    </span>Elf: FileHeader,
 {
-    <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
-    <span class="ident">align</span>: <span class="ident">usize</span>,
-    <span class="ident">data</span>: <span class="ident">Bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+    endian: Elf::Endian,
+    align: usize,
+    data: Bytes&lt;<span class="lifetime">&#39;data</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span> <span class="ident">NoteIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Elf</span>: <span class="ident">FileHeader</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, Elf&gt; NoteIterator&lt;<span class="lifetime">&#39;data</span>, Elf&gt;
+<span class="kw">where
+    </span>Elf: FileHeader,
 {
-    <span class="doccomment">/// Returns `Err` if `align` is invalid.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
-        <span class="ident">align</span>: <span class="ident">Elf::Word</span>,
-        <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">align</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">align</span>.<span class="ident">into</span>() {
-            <span class="number">0u64</span>..<span class="op">=</span><span class="number">4</span> =&gt; <span class="number">4</span>,
-            <span class="number">8</span> =&gt; <span class="number">8</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>(<span class="string">&quot;Invalid ELF note alignment&quot;</span>)),
+    <span class="doccomment">/// Returns `Err` if `align` is invalid.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(
+        endian: Elf::Endian,
+        align: Elf::Word,
+        data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8],
+    ) -&gt; read::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>align = <span class="kw">match </span>align.into() {
+            <span class="number">0u64</span>..=<span class="number">4 </span>=&gt; <span class="number">4</span>,
+            <span class="number">8 </span>=&gt; <span class="number">8</span>,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error(<span class="string">&quot;Invalid ELF note alignment&quot;</span>)),
         };
-        <span class="comment">// TODO: check data alignment?</span>
-        <span class="prelude-val">Ok</span>(<span class="ident">NoteIterator</span> {
-            <span class="ident">endian</span>,
-            <span class="ident">align</span>,
-            <span class="ident">data</span>: <span class="ident">Bytes</span>(<span class="ident">data</span>),
+        <span class="comment">// TODO: check data alignment?
+        </span><span class="prelude-val">Ok</span>(NoteIterator {
+            endian,
+            align,
+            data: Bytes(data),
         })
     }
 
-    <span class="doccomment">/// Returns the next note.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Note</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>;
-        <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+    <span class="doccomment">/// Returns the next note.
+    </span><span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; read::Result&lt;<span class="prelude-ty">Option</span>&lt;Note&lt;<span class="lifetime">&#39;data</span>, Elf&gt;&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="self">self</span>.data;
+        <span class="kw">if </span>data.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">data</span>
-            .<span class="ident">read_at</span>::<span class="op">&lt;</span><span class="ident">Elf::NoteHeader</span><span class="op">&gt;</span>(<span class="number">0</span>)
-            .<span class="ident">read_error</span>(<span class="string">&quot;ELF note is too short&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>header = data
+            .read_at::&lt;Elf::NoteHeader&gt;(<span class="number">0</span>)
+            .read_error(<span class="string">&quot;ELF note is too short&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="comment">// The name has no alignment requirement.</span>
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">Elf::NoteHeader</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">namesz</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">n_namesz</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">data</span>
-            .<span class="ident">read_bytes_at</span>(<span class="ident">offset</span>, <span class="ident">namesz</span>)
-            .<span class="ident">read_error</span>(<span class="string">&quot;Invalid ELF note namesz&quot;</span>)<span class="question-mark">?</span>
-            .<span class="number">0</span>;
+        <span class="comment">// The name has no alignment requirement.
+        </span><span class="kw">let </span>offset = mem::size_of::&lt;Elf::NoteHeader&gt;();
+        <span class="kw">let </span>namesz = header.n_namesz(<span class="self">self</span>.endian) <span class="kw">as </span>usize;
+        <span class="kw">let </span>name = data
+            .read_bytes_at(offset, namesz)
+            .read_error(<span class="string">&quot;Invalid ELF note namesz&quot;</span>)<span class="question-mark">?
+            </span>.<span class="number">0</span>;
 
-        <span class="comment">// The descriptor must be aligned.</span>
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">util::align</span>(<span class="ident">offset</span> <span class="op">+</span> <span class="ident">namesz</span>, <span class="self">self</span>.<span class="ident">align</span>);
-        <span class="kw">let</span> <span class="ident">descsz</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">n_descsz</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">let</span> <span class="ident">desc</span> <span class="op">=</span> <span class="ident">data</span>
-            .<span class="ident">read_bytes_at</span>(<span class="ident">offset</span>, <span class="ident">descsz</span>)
-            .<span class="ident">read_error</span>(<span class="string">&quot;Invalid ELF note descsz&quot;</span>)<span class="question-mark">?</span>
-            .<span class="number">0</span>;
+        <span class="comment">// The descriptor must be aligned.
+        </span><span class="kw">let </span>offset = util::align(offset + namesz, <span class="self">self</span>.align);
+        <span class="kw">let </span>descsz = header.n_descsz(<span class="self">self</span>.endian) <span class="kw">as </span>usize;
+        <span class="kw">let </span>desc = data
+            .read_bytes_at(offset, descsz)
+            .read_error(<span class="string">&quot;Invalid ELF note descsz&quot;</span>)<span class="question-mark">?
+            </span>.<span class="number">0</span>;
 
-        <span class="comment">// The next note (if any) must be aligned.</span>
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">util::align</span>(<span class="ident">offset</span> <span class="op">+</span> <span class="ident">descsz</span>, <span class="self">self</span>.<span class="ident">align</span>);
-        <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">skip</span>(<span class="ident">offset</span>).<span class="ident">is_err</span>() {
-            <span class="ident">data</span> <span class="op">=</span> <span class="ident">Bytes</span>(<span class="kw-2">&amp;</span>[]);
+        <span class="comment">// The next note (if any) must be aligned.
+        </span><span class="kw">let </span>offset = util::align(offset + descsz, <span class="self">self</span>.align);
+        <span class="kw">if </span>data.skip(offset).is_err() {
+            data = Bytes(<span class="kw-2">&amp;</span>[]);
         }
-        <span class="self">self</span>.<span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>;
+        <span class="self">self</span>.data = data;
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Note</span> { <span class="ident">header</span>, <span class="ident">name</span>, <span class="ident">desc</span> }))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Note { header, name, desc }))
     }
 }
 
-<span class="doccomment">/// A parsed `NoteHeader`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Note</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Elf</span>: <span class="ident">FileHeader</span>,
+<span class="doccomment">/// A parsed `NoteHeader`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Note&lt;<span class="lifetime">&#39;data</span>, Elf&gt;
+<span class="kw">where
+    </span>Elf: FileHeader,
 {
-    <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Elf::NoteHeader</span>,
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>],
-    <span class="ident">desc</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>],
+    header: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Elf::NoteHeader,
+    name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8],
+    desc: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8],
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span><span class="op">&gt;</span> <span class="ident">Note</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Return the `n_type` field of the `NoteHeader`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The meaning of this field is determined by `name`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">n_type</span>(<span class="ident">endian</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, Elf: FileHeader&gt; Note&lt;<span class="lifetime">&#39;data</span>, Elf&gt; {
+    <span class="doccomment">/// Return the `n_type` field of the `NoteHeader`.
+    ///
+    /// The meaning of this field is determined by `name`.
+    </span><span class="kw">pub fn </span>n_type(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: Elf::Endian) -&gt; u32 {
+        <span class="self">self</span>.header.n_type(endian)
     }
 
-    <span class="doccomment">/// Return the `n_namesz` field of the `NoteHeader`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">n_namesz</span>(<span class="ident">endian</span>)
+    <span class="doccomment">/// Return the `n_namesz` field of the `NoteHeader`.
+    </span><span class="kw">pub fn </span>n_namesz(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: Elf::Endian) -&gt; u32 {
+        <span class="self">self</span>.header.n_namesz(endian)
     }
 
-    <span class="doccomment">/// Return the `n_descsz` field of the `NoteHeader`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">n_descsz</span>(<span class="ident">endian</span>)
+    <span class="doccomment">/// Return the `n_descsz` field of the `NoteHeader`.
+    </span><span class="kw">pub fn </span>n_descsz(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: Elf::Endian) -&gt; u32 {
+        <span class="self">self</span>.header.n_descsz(endian)
     }
 
-    <span class="doccomment">/// Return the bytes for the name field following the `NoteHeader`,</span>
-    <span class="doccomment">/// excluding any null terminator.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This field is usually a string including a null terminator</span>
-    <span class="doccomment">/// (but it is not required to be).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The length of this field (including any null terminator) is given by</span>
-    <span class="doccomment">/// `n_namesz`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>] {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">last</span>, <span class="ident">name</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">split_last</span>() {
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">last</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="ident">name</span>;
+    <span class="doccomment">/// Return the bytes for the name field following the `NoteHeader`,
+    /// excluding any null terminator.
+    ///
+    /// This field is usually a string including a null terminator
+    /// (but it is not required to be).
+    ///
+    /// The length of this field (including any null terminator) is given by
+    /// `n_namesz`.
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8] {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((last, name)) = <span class="self">self</span>.name.split_last() {
+            <span class="kw">if </span><span class="kw-2">*</span>last == <span class="number">0 </span>{
+                <span class="kw">return </span>name;
             }
         }
-        <span class="self">self</span>.<span class="ident">name</span>
+        <span class="self">self</span>.name
     }
 
-    <span class="doccomment">/// Return the bytes for the desc field following the `NoteHeader`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The length of this field is given by `n_descsz`. The meaning</span>
-    <span class="doccomment">/// of this field is determined by `name` and `n_type`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">desc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">desc</span>
-    }
-}
-
-<span class="doccomment">/// A trait for generic access to `NoteHeader32` and `NoteHeader64`.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NoteHeader</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Pod</span> {
-    <span class="kw">type</span> <span class="ident">Endian</span>: <span class="ident">endian::Endian</span>;
-
-    <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span>;
-    <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span>;
-    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span>;
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Endian</span>: <span class="ident">endian::Endian</span><span class="op">&gt;</span> <span class="ident">NoteHeader</span> <span class="kw">for</span> <span class="ident">elf::NoteHeader32</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endian</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">n_namesz</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">n_descsz</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">n_type</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="doccomment">/// Return the bytes for the desc field following the `NoteHeader`.
+    ///
+    /// The length of this field is given by `n_descsz`. The meaning
+    /// of this field is determined by `name` and `n_type`.
+    </span><span class="kw">pub fn </span>desc(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8] {
+        <span class="self">self</span>.desc
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Endian</span>: <span class="ident">endian::Endian</span><span class="op">&gt;</span> <span class="ident">NoteHeader</span> <span class="kw">for</span> <span class="ident">elf::NoteHeader64</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endian</span>;
+<span class="doccomment">/// A trait for generic access to `NoteHeader32` and `NoteHeader64`.
+</span><span class="attribute">#[allow(missing_docs)]
+</span><span class="kw">pub trait </span>NoteHeader: Debug + Pod {
+    <span class="kw">type </span>Endian: endian::Endian;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">n_namesz</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="kw">fn </span>n_namesz(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32;
+    <span class="kw">fn </span>n_descsz(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32;
+    <span class="kw">fn </span>n_type(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32;
+}
+
+<span class="kw">impl</span>&lt;Endian: endian::Endian&gt; NoteHeader <span class="kw">for </span>elf::NoteHeader32&lt;Endian&gt; {
+    <span class="kw">type </span>Endian = Endian;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>n_namesz(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32 {
+        <span class="self">self</span>.n_namesz.get(endian)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">n_descsz</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>n_descsz(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32 {
+        <span class="self">self</span>.n_descsz.get(endian)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">n_type</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>n_type(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32 {
+        <span class="self">self</span>.n_type.get(endian)
+    }
+}
+
+<span class="kw">impl</span>&lt;Endian: endian::Endian&gt; NoteHeader <span class="kw">for </span>elf::NoteHeader64&lt;Endian&gt; {
+    <span class="kw">type </span>Endian = Endian;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>n_namesz(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32 {
+        <span class="self">self</span>.n_namesz.get(endian)
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>n_descsz(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32 {
+        <span class="self">self</span>.n_descsz.get(endian)
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>n_type(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32 {
+        <span class="self">self</span>.n_type.get(endian)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="object" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="object" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tinyvec-1.6.0/src/slicevec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slicevec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tinyvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tinyvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tinyvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tinyvec-1.6.0/src/slicevec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slicevec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tinyvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tinyvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tinyvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1078,1085 +1078,1085 @@
 <span id="1078">1078</span>
 <span id="1079">1079</span>
 <span id="1080">1080</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(unused_variables)]
+#![allow(missing_docs)]
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</span><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A slice-backed vector-like data structure.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is a very similar concept to `ArrayVec`, but instead</span>
-<span class="doccomment">/// of the backing memory being an owned array, the backing</span>
-<span class="doccomment">/// memory is a unique-borrowed slice. You can thus create</span>
-<span class="doccomment">/// one of these structures &quot;around&quot; some slice that you&#39;re</span>
-<span class="doccomment">/// working with to make it easier to manipulate.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * Has a fixed capacity (the initial slice size).</span>
-<span class="doccomment">/// * Has a variable length.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> [<span class="ident">T</span>],
-  <span class="ident">len</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// A slice-backed vector-like data structure.
+///
+/// This is a very similar concept to `ArrayVec`, but instead
+/// of the backing memory being an owned array, the backing
+/// memory is a unique-borrowed slice. You can thus create
+/// one of these structures &quot;around&quot; some slice that you&#39;re
+/// working with to make it easier to manipulate.
+///
+/// * Has a fixed capacity (the initial slice size).
+/// * Has a variable length.
+</span><span class="kw">pub struct </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span><span class="kw-2">mut </span>[T],
+  len: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-    <span class="self">Self</span> { <span class="ident">data</span>: <span class="kw-2">&amp;mut</span> [], <span class="ident">len</span>: <span class="number">0</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Default <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+    <span class="self">Self </span>{ data: <span class="kw-2">&amp;mut </span>[], len: <span class="number">0 </span>}
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> [<span class="ident">T</span>];
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[..<span class="self">self</span>.<span class="ident">len</span>]
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Deref <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="kw">type </span>Target = [T];
+  <span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+    <span class="kw-2">&amp;</span><span class="self">self</span>.data[..<span class="self">self</span>.len]
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-    <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[..<span class="self">self</span>.<span class="ident">len</span>]
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; DerefMut <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+    <span class="kw-2">&amp;mut </span><span class="self">self</span>.data[..<span class="self">self</span>.len]
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">I</span>: <span class="ident">SliceIndex</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T, I&gt; Index&lt;I&gt; <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>I: SliceIndex&lt;[T]&gt;,
 {
-  <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">SliceIndex</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>;
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">I</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
-    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">deref</span>()[<span class="ident">index</span>]
+  <span class="kw">type </span>Output = &lt;I <span class="kw">as </span>SliceIndex&lt;[T]&gt;&gt;::Output;
+  <span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: I) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+    <span class="kw-2">&amp;</span><span class="self">self</span>.deref()[index]
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">I</span>: <span class="ident">SliceIndex</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T, I&gt; IndexMut&lt;I&gt; <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>I: SliceIndex&lt;[T]&gt;,
 {
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">I</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Output</span> {
-    <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">deref_mut</span>()[<span class="ident">index</span>]
+  <span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: I) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Output {
+    <span class="kw-2">&amp;mut </span><span class="self">self</span>.deref_mut()[index]
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;mut</span> <span class="self">Self</span>)
-  <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>append(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;mut </span><span class="self">Self</span>)
+  <span class="kw">where
+    </span>T: Default,
   {
-    <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">other</span>.<span class="ident">drain</span>(..) {
-      <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">item</span>)
+    <span class="kw">for </span>item <span class="kw">in </span>other.drain(..) {
+      <span class="self">self</span>.push(item)
     }
   }
 
-  <span class="doccomment">/// A `*mut` pointer to the backing slice.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Safety</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// This pointer has provenance over the _entire_ backing slice.</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_ptr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
-    <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_mut_ptr</span>()
+  <span class="doccomment">/// A `*mut` pointer to the backing slice.
+  ///
+  /// ## Safety
+  ///
+  /// This pointer has provenance over the _entire_ backing slice.
+  </span><span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">pub fn </span>as_mut_ptr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>T {
+    <span class="self">self</span>.data.as_mut_ptr()
   }
 
-  <span class="doccomment">/// Performs a `deref_mut`, into unique slice form.</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">T</span>] {
-    <span class="self">self</span>.<span class="ident">deref_mut</span>()
+  <span class="doccomment">/// Performs a `deref_mut`, into unique slice form.
+  </span><span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">pub fn </span>as_mut_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[T] {
+    <span class="self">self</span>.deref_mut()
   }
 
-  <span class="doccomment">/// A `*const` pointer to the backing slice.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Safety</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// This pointer has provenance over the _entire_ backing slice.</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">T</span> {
-    <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_ptr</span>()
+  <span class="doccomment">/// A `*const` pointer to the backing slice.
+  ///
+  /// ## Safety
+  ///
+  /// This pointer has provenance over the _entire_ backing slice.
+  </span><span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>T {
+    <span class="self">self</span>.data.as_ptr()
   }
 
-  <span class="doccomment">/// Performs a `deref`, into shared slice form.</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">T</span>] {
-    <span class="self">self</span>.<span class="ident">deref</span>()
+  <span class="doccomment">/// Performs a `deref`, into shared slice form.
+  </span><span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[T] {
+    <span class="self">self</span>.deref()
   }
 
-  <span class="doccomment">/// The capacity of the `SliceVec`.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// This the length of the initial backing slice.</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-    <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>()
+  <span class="doccomment">/// The capacity of the `SliceVec`.
+  ///
+  /// This the length of the initial backing slice.
+  </span><span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">pub fn </span>capacity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+    <span class="self">self</span>.data.len()
   }
 
-  <span class="doccomment">/// Truncates the `SliceVec` down to length 0.</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>)
-  <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Default</span>,
+  <span class="doccomment">/// Truncates the `SliceVec` down to length 0.
+  </span><span class="attribute">#[inline(always)]
+  </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>)
+  <span class="kw">where
+    </span>T: Default,
   {
-    <span class="self">self</span>.<span class="ident">truncate</span>(<span class="number">0</span>)
+    <span class="self">self</span>.truncate(<span class="number">0</span>)
   }
 
-  <span class="doccomment">/// Creates a draining iterator that removes the specified range in the vector</span>
-  <span class="doccomment">/// and yields the removed items.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Panics</span>
-  <span class="doccomment">/// * If the start is greater than the end</span>
-  <span class="doccomment">/// * If the end is past the edge of the vec.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [6, 7, 8];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from(&amp;mut arr);</span>
-  <span class="doccomment">/// let drained_values: ArrayVec&lt;[i32; 4]&gt; = sv.drain(1..).collect();</span>
-  <span class="doccomment">/// assert_eq!(sv.as_slice(), &amp;[6][..]);</span>
-  <span class="doccomment">/// assert_eq!(drained_values.as_slice(), &amp;[7, 8][..]);</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// sv.drain(..);</span>
-  <span class="doccomment">/// assert_eq!(sv.as_slice(), &amp;[]);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">drain</span><span class="op">&lt;</span><span class="lifetime">&#39;p</span>, <span class="ident">R</span>: <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;p</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>,
-  ) -&gt; <span class="ident">SliceVecDrain</span><span class="op">&lt;</span><span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-  <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Default</span>,
+  <span class="doccomment">/// Creates a draining iterator that removes the specified range in the vector
+  /// and yields the removed items.
+  ///
+  /// ## Panics
+  /// * If the start is greater than the end
+  /// * If the end is past the edge of the vec.
+  ///
+  /// ## Example
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [6, 7, 8];
+  /// let mut sv = SliceVec::from(&amp;mut arr);
+  /// let drained_values: ArrayVec&lt;[i32; 4]&gt; = sv.drain(1..).collect();
+  /// assert_eq!(sv.as_slice(), &amp;[6][..]);
+  /// assert_eq!(drained_values.as_slice(), &amp;[7, 8][..]);
+  ///
+  /// sv.drain(..);
+  /// assert_eq!(sv.as_slice(), &amp;[]);
+  /// ```
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>drain&lt;<span class="lifetime">&#39;p</span>, R: RangeBounds&lt;usize&gt;&gt;(
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;p </span><span class="kw-2">mut </span><span class="self">self</span>, range: R,
+  ) -&gt; SliceVecDrain&lt;<span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, T&gt;
+  <span class="kw">where
+    </span>T: Default,
   {
-    <span class="kw">use</span> <span class="ident">core::ops::Bound</span>;
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">start_bound</span>() {
-      <span class="ident">Bound::Included</span>(<span class="ident">x</span>) =&gt; <span class="kw-2">*</span><span class="ident">x</span>,
-      <span class="ident">Bound::Excluded</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">saturating_add</span>(<span class="number">1</span>),
-      <span class="ident">Bound::Unbounded</span> =&gt; <span class="number">0</span>,
+    <span class="kw">use </span>core::ops::Bound;
+    <span class="kw">let </span>start = <span class="kw">match </span>range.start_bound() {
+      Bound::Included(x) =&gt; <span class="kw-2">*</span>x,
+      Bound::Excluded(x) =&gt; x.saturating_add(<span class="number">1</span>),
+      Bound::Unbounded =&gt; <span class="number">0</span>,
     };
-    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">end_bound</span>() {
-      <span class="ident">Bound::Included</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">saturating_add</span>(<span class="number">1</span>),
-      <span class="ident">Bound::Excluded</span>(<span class="ident">x</span>) =&gt; <span class="kw-2">*</span><span class="ident">x</span>,
-      <span class="ident">Bound::Unbounded</span> =&gt; <span class="self">self</span>.<span class="ident">len</span>,
+    <span class="kw">let </span>end = <span class="kw">match </span>range.end_bound() {
+      Bound::Included(x) =&gt; x.saturating_add(<span class="number">1</span>),
+      Bound::Excluded(x) =&gt; <span class="kw-2">*</span>x,
+      Bound::Unbounded =&gt; <span class="self">self</span>.len,
     };
     <span class="macro">assert!</span>(
-      <span class="ident">start</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">end</span>,
+      start &lt;= end,
       <span class="string">&quot;SliceVec::drain&gt; Illegal range, {} to {}&quot;</span>,
-      <span class="ident">start</span>,
-      <span class="ident">end</span>
+      start,
+      end
     );
     <span class="macro">assert!</span>(
-      <span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>,
+      end &lt;= <span class="self">self</span>.len,
       <span class="string">&quot;SliceVec::drain&gt; Range ends at {} but length is only {}!&quot;</span>,
-      <span class="ident">end</span>,
-      <span class="self">self</span>.<span class="ident">len</span>
+      end,
+      <span class="self">self</span>.len
     );
-    <span class="ident">SliceVecDrain</span> {
-      <span class="ident">parent</span>: <span class="self">self</span>,
-      <span class="ident">target_start</span>: <span class="ident">start</span>,
-      <span class="ident">target_index</span>: <span class="ident">start</span>,
-      <span class="ident">target_end</span>: <span class="ident">end</span>,
+    SliceVecDrain {
+      parent: <span class="self">self</span>,
+      target_start: start,
+      target_index: start,
+      target_end: end,
     }
   }
 
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sli</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>])
-  <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span>,
+  <span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>extend_from_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sli: <span class="kw-2">&amp;</span>[T])
+  <span class="kw">where
+    </span>T: Clone,
   {
-    <span class="kw">if</span> <span class="ident">sli</span>.<span class="ident">is_empty</span>() {
+    <span class="kw">if </span>sli.is_empty() {
       <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">+</span> <span class="ident">sli</span>.<span class="ident">len</span>();
-    <span class="kw">if</span> <span class="ident">new_len</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">capacity</span>() {
+    <span class="kw">let </span>new_len = <span class="self">self</span>.len + sli.len();
+    <span class="kw">if </span>new_len &gt; <span class="self">self</span>.capacity() {
       <span class="macro">panic!</span>(
         <span class="string">&quot;SliceVec::extend_from_slice&gt; total length {} exceeds capacity {}&quot;</span>,
-        <span class="ident">new_len</span>,
-        <span class="self">self</span>.<span class="ident">capacity</span>()
+        new_len,
+        <span class="self">self</span>.capacity()
       )
     }
 
-    <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="self">self</span>.<span class="ident">len</span>..<span class="ident">new_len</span>];
-    <span class="ident">target</span>.<span class="ident">clone_from_slice</span>(<span class="ident">sli</span>);
-    <span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">new_len</span>);
+    <span class="kw">let </span>target = <span class="kw-2">&amp;mut </span><span class="self">self</span>.data[<span class="self">self</span>.len..new_len];
+    target.clone_from_slice(sli);
+    <span class="self">self</span>.set_len(new_len);
   }
 
-  <span class="doccomment">/// Fill the vector until its capacity has been reached.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// Successively fills unused space in the spare slice of the vector with</span>
-  <span class="doccomment">/// elements from the iterator. It then returns the remaining iterator</span>
-  <span class="doccomment">/// without exhausting it. This also allows appending the head of an</span>
-  <span class="doccomment">/// infinite iterator.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// This is an alternative to `Extend::extend` method for cases where the</span>
-  <span class="doccomment">/// length of the iterator can not be checked. Since this vector can not</span>
-  <span class="doccomment">/// reallocate to increase its capacity, it is unclear what to do with</span>
-  <span class="doccomment">/// remaining elements in the iterator and the iterator itself. The</span>
-  <span class="doccomment">/// interface also provides no way to communicate this to the caller.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Panics</span>
-  <span class="doccomment">/// * If the `next` method of the provided iterator panics.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [7, 7, 7, 7];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 0);</span>
-  <span class="doccomment">/// let mut to_inf = sv.fill(0..);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [0, 1, 2, 3]);</span>
-  <span class="doccomment">/// assert_eq!(to_inf.next(), Some(4));</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="ident">I::IntoIter</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">into_iter</span>();
-    <span class="kw">for</span> <span class="ident">element</span> <span class="kw">in</span> <span class="ident">iter</span>.<span class="ident">by_ref</span>().<span class="ident">take</span>(<span class="self">self</span>.<span class="ident">capacity</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">len</span>()) {
-      <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">element</span>);
+  <span class="doccomment">/// Fill the vector until its capacity has been reached.
+  ///
+  /// Successively fills unused space in the spare slice of the vector with
+  /// elements from the iterator. It then returns the remaining iterator
+  /// without exhausting it. This also allows appending the head of an
+  /// infinite iterator.
+  ///
+  /// This is an alternative to `Extend::extend` method for cases where the
+  /// length of the iterator can not be checked. Since this vector can not
+  /// reallocate to increase its capacity, it is unclear what to do with
+  /// remaining elements in the iterator and the iterator itself. The
+  /// interface also provides no way to communicate this to the caller.
+  ///
+  /// ## Panics
+  /// * If the `next` method of the provided iterator panics.
+  ///
+  /// ## Example
+  ///
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [7, 7, 7, 7];
+  /// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 0);
+  /// let mut to_inf = sv.fill(0..);
+  /// assert_eq!(&amp;sv[..], [0, 1, 2, 3]);
+  /// assert_eq!(to_inf.next(), Some(4));
+  /// ```
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>fill&lt;I: IntoIterator&lt;Item = T&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) -&gt; I::IntoIter {
+    <span class="kw">let </span><span class="kw-2">mut </span>iter = iter.into_iter();
+    <span class="kw">for </span>element <span class="kw">in </span>iter.by_ref().take(<span class="self">self</span>.capacity() - <span class="self">self</span>.len()) {
+      <span class="self">self</span>.push(element);
     }
-    <span class="ident">iter</span>
+    iter
   }
 
-  <span class="doccomment">/// Wraps up a slice and uses the given length as the initial length.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// If you want to simply use the full slice, use `from` instead.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Panics</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// * The length specified must be less than or equal to the capacity of the</span>
-  <span class="doccomment">///   slice.</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::match_wild_err_arm</span>)]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice_len</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> [<span class="ident">T</span>], <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-    <span class="macro">assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>());
-    <span class="self">Self</span> { <span class="ident">data</span>, <span class="ident">len</span> }
+  <span class="doccomment">/// Wraps up a slice and uses the given length as the initial length.
+  ///
+  /// If you want to simply use the full slice, use `from` instead.
+  ///
+  /// ## Panics
+  ///
+  /// * The length specified must be less than or equal to the capacity of the
+  ///   slice.
+  </span><span class="attribute">#[inline]
+  #[must_use]
+  #[allow(clippy::match_wild_err_arm)]
+  </span><span class="kw">pub fn </span>from_slice_len(data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span><span class="kw-2">mut </span>[T], len: usize) -&gt; <span class="self">Self </span>{
+    <span class="macro">assert!</span>(len &lt;= data.len());
+    <span class="self">Self </span>{ data, len }
   }
 
-  <span class="doccomment">/// Inserts an item at the position given, moving all following elements +1</span>
-  <span class="doccomment">/// index.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Panics</span>
-  <span class="doccomment">/// * If `index` &gt; `len`</span>
-  <span class="doccomment">/// * If the capacity is exhausted</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [1, 2, 3, 0, 0];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 3);</span>
-  <span class="doccomment">/// sv.insert(1, 4);</span>
-  <span class="doccomment">/// assert_eq!(sv.as_slice(), &amp;[1, 4, 2, 3]);</span>
-  <span class="doccomment">/// sv.insert(4, 5);</span>
-  <span class="doccomment">/// assert_eq!(sv.as_slice(), &amp;[1, 4, 2, 3, 5]);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">item</span>: <span class="ident">T</span>) {
-    <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">len</span> {
-      <span class="macro">panic!</span>(<span class="string">&quot;SliceVec::insert&gt; index {} is out of bounds {}&quot;</span>, <span class="ident">index</span>, <span class="self">self</span>.<span class="ident">len</span>);
+  <span class="doccomment">/// Inserts an item at the position given, moving all following elements +1
+  /// index.
+  ///
+  /// ## Panics
+  /// * If `index` &gt; `len`
+  /// * If the capacity is exhausted
+  ///
+  /// ## Example
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [1, 2, 3, 0, 0];
+  /// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 3);
+  /// sv.insert(1, 4);
+  /// assert_eq!(sv.as_slice(), &amp;[1, 4, 2, 3]);
+  /// sv.insert(4, 5);
+  /// assert_eq!(sv.as_slice(), &amp;[1, 4, 2, 3, 5]);
+  /// ```
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize, item: T) {
+    <span class="kw">if </span>index &gt; <span class="self">self</span>.len {
+      <span class="macro">panic!</span>(<span class="string">&quot;SliceVec::insert&gt; index {} is out of bounds {}&quot;</span>, index, <span class="self">self</span>.len);
     }
 
-    <span class="comment">// Try to push the element.</span>
-    <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">item</span>);
-    <span class="comment">// And move it into its place.</span>
-    <span class="self">self</span>.<span class="ident">as_mut_slice</span>()[<span class="ident">index</span>..].<span class="ident">rotate_right</span>(<span class="number">1</span>);
+    <span class="comment">// Try to push the element.
+    </span><span class="self">self</span>.push(item);
+    <span class="comment">// And move it into its place.
+    </span><span class="self">self</span>.as_mut_slice()[index..].rotate_right(<span class="number">1</span>);
   }
 
-  <span class="doccomment">/// Checks if the length is 0.</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-    <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span>
+  <span class="doccomment">/// Checks if the length is 0.
+  </span><span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="self">self</span>.len == <span class="number">0
+  </span>}
+
+  <span class="doccomment">/// The length of the `SliceVec` (in elements).
+  </span><span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+    <span class="self">self</span>.len
   }
 
-  <span class="doccomment">/// The length of the `SliceVec` (in elements).</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-    <span class="self">self</span>.<span class="ident">len</span>
-  }
-
-  <span class="doccomment">/// Remove and return the last element of the vec, if there is one.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Failure</span>
-  <span class="doccomment">/// * If the vec is empty you get `None`.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [1, 2];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from(&amp;mut arr);</span>
-  <span class="doccomment">/// assert_eq!(sv.pop(), Some(2));</span>
-  <span class="doccomment">/// assert_eq!(sv.pop(), Some(1));</span>
-  <span class="doccomment">/// assert_eq!(sv.pop(), None);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-  <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Default</span>,
+  <span class="doccomment">/// Remove and return the last element of the vec, if there is one.
+  ///
+  /// ## Failure
+  /// * If the vec is empty you get `None`.
+  ///
+  /// ## Example
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [1, 2];
+  /// let mut sv = SliceVec::from(&amp;mut arr);
+  /// assert_eq!(sv.pop(), Some(2));
+  /// assert_eq!(sv.pop(), Some(1));
+  /// assert_eq!(sv.pop(), None);
+  /// ```
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>pop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
+  <span class="kw">where
+    </span>T: Default,
   {
-    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0</span> {
-      <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-      <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="self">self</span>.<span class="ident">len</span>]);
-      <span class="prelude-val">Some</span>(<span class="ident">out</span>)
-    } <span class="kw">else</span> {
-      <span class="prelude-val">None</span>
-    }
+    <span class="kw">if </span><span class="self">self</span>.len &gt; <span class="number">0 </span>{
+      <span class="self">self</span>.len -= <span class="number">1</span>;
+      <span class="kw">let </span>out = take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data[<span class="self">self</span>.len]);
+      <span class="prelude-val">Some</span>(out)
+    } <span class="kw">else </span>{
+      <span class="prelude-val">None
+    </span>}
   }
 
-  <span class="doccomment">/// Place an element onto the end of the vec.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Panics</span>
-  <span class="doccomment">/// * If the length of the vec would overflow the capacity.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [0, 0];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 0);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], []);</span>
-  <span class="doccomment">/// sv.push(1);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [1]);</span>
-  <span class="doccomment">/// sv.push(2);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [1, 2]);</span>
-  <span class="doccomment">/// // sv.push(3); this would overflow the ArrayVec and panic!</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) {
-    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">capacity</span>() {
-      <span class="self">self</span>.<span class="ident">data</span>[<span class="self">self</span>.<span class="ident">len</span>] <span class="op">=</span> <span class="ident">val</span>;
-      <span class="self">self</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-    } <span class="kw">else</span> {
+  <span class="doccomment">/// Place an element onto the end of the vec.
+  ///
+  /// ## Panics
+  /// * If the length of the vec would overflow the capacity.
+  ///
+  /// ## Example
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [0, 0];
+  /// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 0);
+  /// assert_eq!(&amp;sv[..], []);
+  /// sv.push(1);
+  /// assert_eq!(&amp;sv[..], [1]);
+  /// sv.push(2);
+  /// assert_eq!(&amp;sv[..], [1, 2]);
+  /// // sv.push(3); this would overflow the ArrayVec and panic!
+  /// ```
+  </span><span class="attribute">#[inline(always)]
+  </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: T) {
+    <span class="kw">if </span><span class="self">self</span>.len &lt; <span class="self">self</span>.capacity() {
+      <span class="self">self</span>.data[<span class="self">self</span>.len] = val;
+      <span class="self">self</span>.len += <span class="number">1</span>;
+    } <span class="kw">else </span>{
       <span class="macro">panic!</span>(<span class="string">&quot;SliceVec::push&gt; capacity overflow&quot;</span>)
     }
   }
 
-  <span class="doccomment">/// Removes the item at `index`, shifting all others down by one index.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// Returns the removed element.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Panics</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// * If the index is out of bounds.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [1, 2, 3];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from(&amp;mut arr);</span>
-  <span class="doccomment">/// assert_eq!(sv.remove(1), 2);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [1, 3]);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">T</span>
-  <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Default</span>,
+  <span class="doccomment">/// Removes the item at `index`, shifting all others down by one index.
+  ///
+  /// Returns the removed element.
+  ///
+  /// ## Panics
+  ///
+  /// * If the index is out of bounds.
+  ///
+  /// ## Example
+  ///
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [1, 2, 3];
+  /// let mut sv = SliceVec::from(&amp;mut arr);
+  /// assert_eq!(sv.remove(1), 2);
+  /// assert_eq!(&amp;sv[..], [1, 3]);
+  /// ```
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; T
+  <span class="kw">where
+    </span>T: Default,
   {
-    <span class="kw">let</span> <span class="ident">targets</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">T</span>] <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">deref_mut</span>()[<span class="ident">index</span>..];
-    <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">targets</span>[<span class="number">0</span>]);
-    <span class="ident">targets</span>.<span class="ident">rotate_left</span>(<span class="number">1</span>);
-    <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-    <span class="ident">item</span>
+    <span class="kw">let </span>targets: <span class="kw-2">&amp;mut </span>[T] = <span class="kw-2">&amp;mut </span><span class="self">self</span>.deref_mut()[index..];
+    <span class="kw">let </span>item = take(<span class="kw-2">&amp;mut </span>targets[<span class="number">0</span>]);
+    targets.rotate_left(<span class="number">1</span>);
+    <span class="self">self</span>.len -= <span class="number">1</span>;
+    item
   }
 
-  <span class="doccomment">/// As [`resize_with`](SliceVec::resize_with)</span>
-  <span class="doccomment">/// and it clones the value as the closure.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// // bigger</span>
-  <span class="doccomment">/// let mut arr = [&quot;hello&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 1);</span>
-  <span class="doccomment">/// sv.resize(3, &quot;world&quot;);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [&quot;hello&quot;, &quot;world&quot;, &quot;world&quot;]);</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// // smaller</span>
-  <span class="doccomment">/// let mut arr = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from(&amp;mut arr);</span>
-  <span class="doccomment">/// sv.resize(2, &#39;z&#39;);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [&#39;a&#39;, &#39;b&#39;]);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>, <span class="ident">new_val</span>: <span class="ident">T</span>)
-  <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span>,
+  <span class="doccomment">/// As [`resize_with`](SliceVec::resize_with)
+  /// and it clones the value as the closure.
+  ///
+  /// ## Example
+  ///
+  /// ```rust
+  /// # use tinyvec::*;
+  /// // bigger
+  /// let mut arr = [&quot;hello&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;];
+  /// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 1);
+  /// sv.resize(3, &quot;world&quot;);
+  /// assert_eq!(&amp;sv[..], [&quot;hello&quot;, &quot;world&quot;, &quot;world&quot;]);
+  ///
+  /// // smaller
+  /// let mut arr = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;];
+  /// let mut sv = SliceVec::from(&amp;mut arr);
+  /// sv.resize(2, &#39;z&#39;);
+  /// assert_eq!(&amp;sv[..], [&#39;a&#39;, &#39;b&#39;]);
+  /// ```
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>resize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_len: usize, new_val: T)
+  <span class="kw">where
+    </span>T: Clone,
   {
-    <span class="self">self</span>.<span class="ident">resize_with</span>(<span class="ident">new_len</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">new_val</span>.<span class="ident">clone</span>())
+    <span class="self">self</span>.resize_with(new_len, || new_val.clone())
   }
 
-  <span class="doccomment">/// Resize the vec to the new length.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// * If it needs to be longer, it&#39;s filled with repeated calls to the</span>
-  <span class="doccomment">///   provided function.</span>
-  <span class="doccomment">/// * If it needs to be shorter, it&#39;s truncated.</span>
-  <span class="doccomment">///   * If the type needs to drop the truncated slots are filled with calls to</span>
-  <span class="doccomment">///     the provided function.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [1, 2, 3, 7, 7, 7, 7];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 3);</span>
-  <span class="doccomment">/// sv.resize_with(5, Default::default);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [1, 2, 3, 0, 0]);</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// let mut arr = [0, 0, 0, 0];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 0);</span>
-  <span class="doccomment">/// let mut p = 1;</span>
-  <span class="doccomment">/// sv.resize_with(4, || {</span>
-  <span class="doccomment">///   p *= 2;</span>
-  <span class="doccomment">///   p</span>
-  <span class="doccomment">/// });</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [2, 4, 8, 16]);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resize_with</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnMut</span>() -&gt; <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) {
-    <span class="kw">match</span> <span class="ident">new_len</span>.<span class="ident">checked_sub</span>(<span class="self">self</span>.<span class="ident">len</span>) {
-      <span class="prelude-val">None</span> =&gt; {
-        <span class="kw">if</span> <span class="ident">needs_drop</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() {
-          <span class="kw">while</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">new_len</span> {
-            <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="self">self</span>.<span class="ident">data</span>[<span class="self">self</span>.<span class="ident">len</span>] <span class="op">=</span> <span class="ident">f</span>();
+  <span class="doccomment">/// Resize the vec to the new length.
+  ///
+  /// * If it needs to be longer, it&#39;s filled with repeated calls to the
+  ///   provided function.
+  /// * If it needs to be shorter, it&#39;s truncated.
+  ///   * If the type needs to drop the truncated slots are filled with calls to
+  ///     the provided function.
+  ///
+  /// ## Example
+  ///
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [1, 2, 3, 7, 7, 7, 7];
+  /// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 3);
+  /// sv.resize_with(5, Default::default);
+  /// assert_eq!(&amp;sv[..], [1, 2, 3, 0, 0]);
+  ///
+  /// let mut arr = [0, 0, 0, 0];
+  /// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 0);
+  /// let mut p = 1;
+  /// sv.resize_with(4, || {
+  ///   p *= 2;
+  ///   p
+  /// });
+  /// assert_eq!(&amp;sv[..], [2, 4, 8, 16]);
+  /// ```
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>resize_with&lt;F: FnMut() -&gt; T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_len: usize, <span class="kw-2">mut </span>f: F) {
+    <span class="kw">match </span>new_len.checked_sub(<span class="self">self</span>.len) {
+      <span class="prelude-val">None </span>=&gt; {
+        <span class="kw">if </span>needs_drop::&lt;T&gt;() {
+          <span class="kw">while </span><span class="self">self</span>.len() &gt; new_len {
+            <span class="self">self</span>.len -= <span class="number">1</span>;
+            <span class="self">self</span>.data[<span class="self">self</span>.len] = f();
           }
-        } <span class="kw">else</span> {
-          <span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">new_len</span>;
+        } <span class="kw">else </span>{
+          <span class="self">self</span>.len = new_len;
         }
       }
-      <span class="prelude-val">Some</span>(<span class="ident">new_elements</span>) =&gt; {
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">new_elements</span> {
-          <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">f</span>());
+      <span class="prelude-val">Some</span>(new_elements) =&gt; {
+        <span class="kw">for _ in </span><span class="number">0</span>..new_elements {
+          <span class="self">self</span>.push(f());
         }
       }
     }
   }
 
-  <span class="doccomment">/// Walk the vec and keep only the elements that pass the predicate given.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// let mut arr = [1, 1, 2, 3, 3, 4];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from(&amp;mut arr);</span>
-  <span class="doccomment">/// sv.retain(|&amp;x| x % 2 == 0);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [2, 4]);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retain</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">acceptable</span>: <span class="ident">F</span>)
-  <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Default</span>,
+  <span class="doccomment">/// Walk the vec and keep only the elements that pass the predicate given.
+  ///
+  /// ## Example
+  ///
+  /// ```rust
+  /// # use tinyvec::*;
+  ///
+  /// let mut arr = [1, 1, 2, 3, 3, 4];
+  /// let mut sv = SliceVec::from(&amp;mut arr);
+  /// sv.retain(|&amp;x| x % 2 == 0);
+  /// assert_eq!(&amp;sv[..], [2, 4]);
+  /// ```
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>retain&lt;F: FnMut(<span class="kw-2">&amp;</span>T) -&gt; bool&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>acceptable: F)
+  <span class="kw">where
+    </span>T: Default,
   {
-    <span class="comment">// Drop guard to contain exactly the remaining elements when the test</span>
-    <span class="comment">// panics.</span>
-    <span class="kw">struct</span> <span class="ident">JoinOnDrop</span><span class="op">&lt;</span><span class="lifetime">&#39;vec</span>, <span class="ident">Item</span><span class="op">&gt;</span> {
-      <span class="ident">items</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;vec</span> <span class="kw-2">mut</span> [<span class="ident">Item</span>],
-      <span class="ident">done_end</span>: <span class="ident">usize</span>,
-      <span class="comment">// Start of tail relative to `done_end`.</span>
-      <span class="ident">tail_start</span>: <span class="ident">usize</span>,
+    <span class="comment">// Drop guard to contain exactly the remaining elements when the test
+    // panics.
+    </span><span class="kw">struct </span>JoinOnDrop&lt;<span class="lifetime">&#39;vec</span>, Item&gt; {
+      items: <span class="kw-2">&amp;</span><span class="lifetime">&#39;vec </span><span class="kw-2">mut </span>[Item],
+      done_end: usize,
+      <span class="comment">// Start of tail relative to `done_end`.
+      </span>tail_start: usize,
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">JoinOnDrop</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Item</span><span class="op">&gt;</span> {
-      <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">items</span>[<span class="self">self</span>.<span class="ident">done_end</span>..].<span class="ident">rotate_left</span>(<span class="self">self</span>.<span class="ident">tail_start</span>);
+    <span class="kw">impl</span>&lt;Item&gt; Drop <span class="kw">for </span>JoinOnDrop&lt;<span class="lifetime">&#39;_</span>, Item&gt; {
+      <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.items[<span class="self">self</span>.done_end..].rotate_left(<span class="self">self</span>.tail_start);
       }
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rest</span> <span class="op">=</span> <span class="ident">JoinOnDrop</span> { <span class="ident">items</span>: <span class="self">self</span>.<span class="ident">data</span>, <span class="ident">done_end</span>: <span class="number">0</span>, <span class="ident">tail_start</span>: <span class="number">0</span> };
+    <span class="kw">let </span><span class="kw-2">mut </span>rest = JoinOnDrop { items: <span class="self">self</span>.data, done_end: <span class="number">0</span>, tail_start: <span class="number">0 </span>};
 
-    <span class="kw">for</span> <span class="ident">idx</span> <span class="kw">in</span> <span class="number">0</span>..<span class="self">self</span>.<span class="ident">len</span> {
-      <span class="comment">// Loop start invariant: idx = rest.done_end + rest.tail_start</span>
-      <span class="kw">if</span> <span class="op">!</span><span class="ident">acceptable</span>(<span class="kw-2">&amp;</span><span class="ident">rest</span>.<span class="ident">items</span>[<span class="ident">idx</span>]) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>.<span class="ident">items</span>[<span class="ident">idx</span>]);
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">rest</span>.<span class="ident">tail_start</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-      } <span class="kw">else</span> {
-        <span class="ident">rest</span>.<span class="ident">items</span>.<span class="ident">swap</span>(<span class="ident">rest</span>.<span class="ident">done_end</span>, <span class="ident">idx</span>);
-        <span class="ident">rest</span>.<span class="ident">done_end</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">for </span>idx <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.len {
+      <span class="comment">// Loop start invariant: idx = rest.done_end + rest.tail_start
+      </span><span class="kw">if </span>!acceptable(<span class="kw-2">&amp;</span>rest.items[idx]) {
+        <span class="kw">let _ </span>= take(<span class="kw-2">&amp;mut </span>rest.items[idx]);
+        <span class="self">self</span>.len -= <span class="number">1</span>;
+        rest.tail_start += <span class="number">1</span>;
+      } <span class="kw">else </span>{
+        rest.items.swap(rest.done_end, idx);
+        rest.done_end += <span class="number">1</span>;
       }
     }
   }
 
-  <span class="doccomment">/// Forces the length of the vector to `new_len`.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Panics</span>
-  <span class="doccomment">/// * If `new_len` is greater than the vec&#39;s capacity.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Safety</span>
-  <span class="doccomment">/// * This is a fully safe operation! The inactive memory already counts as</span>
-  <span class="doccomment">///   &quot;initialized&quot; by Rust&#39;s rules.</span>
-  <span class="doccomment">/// * Other than &quot;the memory is initialized&quot; there are no other guarantees</span>
-  <span class="doccomment">///   regarding what you find in the inactive portion of the vec.</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_len</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>) {
-    <span class="kw">if</span> <span class="ident">new_len</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">capacity</span>() {
-      <span class="comment">// Note(Lokathor): Technically we don&#39;t have to panic here, and we could</span>
-      <span class="comment">// just let some other call later on trigger a panic on accident when the</span>
-      <span class="comment">// length is wrong. However, it&#39;s a lot easier to catch bugs when things</span>
-      <span class="comment">// are more &quot;fail-fast&quot;.</span>
-      <span class="macro">panic!</span>(
+  <span class="doccomment">/// Forces the length of the vector to `new_len`.
+  ///
+  /// ## Panics
+  /// * If `new_len` is greater than the vec&#39;s capacity.
+  ///
+  /// ## Safety
+  /// * This is a fully safe operation! The inactive memory already counts as
+  ///   &quot;initialized&quot; by Rust&#39;s rules.
+  /// * Other than &quot;the memory is initialized&quot; there are no other guarantees
+  ///   regarding what you find in the inactive portion of the vec.
+  </span><span class="attribute">#[inline(always)]
+  </span><span class="kw">pub fn </span>set_len(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_len: usize) {
+    <span class="kw">if </span>new_len &gt; <span class="self">self</span>.capacity() {
+      <span class="comment">// Note(Lokathor): Technically we don&#39;t have to panic here, and we could
+      // just let some other call later on trigger a panic on accident when the
+      // length is wrong. However, it&#39;s a lot easier to catch bugs when things
+      // are more &quot;fail-fast&quot;.
+      </span><span class="macro">panic!</span>(
         <span class="string">&quot;SliceVec::set_len&gt; new length {} exceeds capacity {}&quot;</span>,
-        <span class="ident">new_len</span>,
-        <span class="self">self</span>.<span class="ident">capacity</span>()
+        new_len,
+        <span class="self">self</span>.capacity()
       )
-    } <span class="kw">else</span> {
-      <span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">new_len</span>;
+    } <span class="kw">else </span>{
+      <span class="self">self</span>.len = new_len;
     }
   }
 
-  <span class="doccomment">/// Splits the collection at the point given.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// * `[0, at)` stays in this vec (and this vec is now full).</span>
-  <span class="doccomment">/// * `[at, len)` ends up in the new vec (with any spare capacity).</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Panics</span>
-  <span class="doccomment">/// * if `at` &gt; `self.len()`</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [1, 2, 3];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from(&amp;mut arr);</span>
-  <span class="doccomment">/// let sv2 = sv.split_off(1);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [1]);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv2[..], [2, 3]);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_off</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">at</span>: <span class="ident">usize</span>) -&gt; <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-    <span class="kw">let</span> <span class="ident">backing</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> [<span class="ident">T</span>] <span class="op">=</span> <span class="ident">replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;mut</span> []);
-    <span class="kw">let</span> (<span class="ident">me</span>, <span class="ident">other</span>) <span class="op">=</span> <span class="ident">backing</span>.<span class="ident">split_at_mut</span>(<span class="ident">at</span>);
-    <span class="ident">new</span>.<span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">at</span>;
-    <span class="ident">new</span>.<span class="ident">data</span> <span class="op">=</span> <span class="ident">other</span>;
-    <span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">me</span>.<span class="ident">len</span>();
-    <span class="self">self</span>.<span class="ident">data</span> <span class="op">=</span> <span class="ident">me</span>;
-    <span class="ident">new</span>
+  <span class="doccomment">/// Splits the collection at the point given.
+  ///
+  /// * `[0, at)` stays in this vec (and this vec is now full).
+  /// * `[at, len)` ends up in the new vec (with any spare capacity).
+  ///
+  /// ## Panics
+  /// * if `at` &gt; `self.len()`
+  ///
+  /// ## Example
+  ///
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [1, 2, 3];
+  /// let mut sv = SliceVec::from(&amp;mut arr);
+  /// let sv2 = sv.split_off(1);
+  /// assert_eq!(&amp;sv[..], [1]);
+  /// assert_eq!(&amp;sv2[..], [2, 3]);
+  /// ```
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>split_off&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, at: usize) -&gt; SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>new = <span class="self">Self</span>::default();
+    <span class="kw">let </span>backing: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span><span class="kw-2">mut </span>[T] = replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data, <span class="kw-2">&amp;mut </span>[]);
+    <span class="kw">let </span>(me, other) = backing.split_at_mut(at);
+    new.len = <span class="self">self</span>.len - at;
+    new.data = other;
+    <span class="self">self</span>.len = me.len();
+    <span class="self">self</span>.data = me;
+    new
   }
 
-  <span class="doccomment">/// Remove an element, swapping the end of the vec into its place.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Panics</span>
-  <span class="doccomment">/// * If the index is out of bounds.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [&quot;foo&quot;, &quot;bar&quot;, &quot;quack&quot;, &quot;zap&quot;];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from(&amp;mut arr);</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// assert_eq!(sv.swap_remove(1), &quot;bar&quot;);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [&quot;foo&quot;, &quot;zap&quot;, &quot;quack&quot;]);</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// assert_eq!(sv.swap_remove(0), &quot;foo&quot;);</span>
-  <span class="doccomment">/// assert_eq!(&amp;sv[..], [&quot;quack&quot;, &quot;zap&quot;]);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">T</span>
-  <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Default</span>,
+  <span class="doccomment">/// Remove an element, swapping the end of the vec into its place.
+  ///
+  /// ## Panics
+  /// * If the index is out of bounds.
+  ///
+  /// ## Example
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [&quot;foo&quot;, &quot;bar&quot;, &quot;quack&quot;, &quot;zap&quot;];
+  /// let mut sv = SliceVec::from(&amp;mut arr);
+  ///
+  /// assert_eq!(sv.swap_remove(1), &quot;bar&quot;);
+  /// assert_eq!(&amp;sv[..], [&quot;foo&quot;, &quot;zap&quot;, &quot;quack&quot;]);
+  ///
+  /// assert_eq!(sv.swap_remove(0), &quot;foo&quot;);
+  /// assert_eq!(&amp;sv[..], [&quot;quack&quot;, &quot;zap&quot;]);
+  /// ```
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>swap_remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; T
+  <span class="kw">where
+    </span>T: Default,
   {
     <span class="macro">assert!</span>(
-      <span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">len</span>,
+      index &lt; <span class="self">self</span>.len,
       <span class="string">&quot;SliceVec::swap_remove&gt; index {} is out of bounds {}&quot;</span>,
-      <span class="ident">index</span>,
-      <span class="self">self</span>.<span class="ident">len</span>
+      index,
+      <span class="self">self</span>.len
     );
-    <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span> <span class="number">1</span> {
-      <span class="self">self</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>()
-    } <span class="kw">else</span> {
-      <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-      <span class="ident">replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>[<span class="ident">index</span>], <span class="ident">i</span>)
+    <span class="kw">if </span>index == <span class="self">self</span>.len - <span class="number">1 </span>{
+      <span class="self">self</span>.pop().unwrap()
+    } <span class="kw">else </span>{
+      <span class="kw">let </span>i = <span class="self">self</span>.pop().unwrap();
+      replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>[index], i)
     }
   }
 
-  <span class="doccomment">/// Reduces the vec&#39;s length to the given value.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// If the vec is already shorter than the input, nothing happens.</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">truncate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>)
-  <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Default</span>,
+  <span class="doccomment">/// Reduces the vec&#39;s length to the given value.
+  ///
+  /// If the vec is already shorter than the input, nothing happens.
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>truncate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_len: usize)
+  <span class="kw">where
+    </span>T: Default,
   {
-    <span class="kw">if</span> <span class="ident">needs_drop</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() {
-      <span class="kw">while</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">&gt;</span> <span class="ident">new_len</span> {
-        <span class="self">self</span>.<span class="ident">pop</span>();
+    <span class="kw">if </span>needs_drop::&lt;T&gt;() {
+      <span class="kw">while </span><span class="self">self</span>.len &gt; new_len {
+        <span class="self">self</span>.pop();
       }
-    } <span class="kw">else</span> {
-      <span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>.<span class="ident">min</span>(<span class="ident">new_len</span>);
+    } <span class="kw">else </span>{
+      <span class="self">self</span>.len = <span class="self">self</span>.len.min(new_len);
     }
   }
 
-  <span class="doccomment">/// Wraps a slice, using the given length as the starting length.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// If you want to use the whole length of the slice, you can just use the</span>
-  <span class="doccomment">/// `From` impl.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Failure</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// If the given length is greater than the length of the slice you get</span>
-  <span class="doccomment">/// `None`.</span>
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_slice_len</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> [<span class="ident">T</span>], <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>() {
-      <span class="prelude-val">Some</span>(<span class="self">Self</span> { <span class="ident">data</span>, <span class="ident">len</span> })
-    } <span class="kw">else</span> {
-      <span class="prelude-val">None</span>
+  <span class="doccomment">/// Wraps a slice, using the given length as the starting length.
+  ///
+  /// If you want to use the whole length of the slice, you can just use the
+  /// `From` impl.
+  ///
+  /// ## Failure
+  ///
+  /// If the given length is greater than the length of the slice you get
+  /// `None`.
+  </span><span class="attribute">#[inline]
+  </span><span class="kw">pub fn </span>try_from_slice_len(data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span><span class="kw-2">mut </span>[T], len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">if </span>len &lt;= data.len() {
+      <span class="prelude-val">Some</span>(<span class="self">Self </span>{ data, len })
+    } <span class="kw">else </span>{
+      <span class="prelude-val">None
+    </span>}
+  }
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grab_spare_slice&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="doccomment">/// Obtain the shared slice of the array _after_ the active memory.
+  ///
+  /// ## Example
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [0; 4];
+  /// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 0);
+  /// assert_eq!(sv.grab_spare_slice().len(), 4);
+  /// sv.push(10);
+  /// sv.push(11);
+  /// sv.push(12);
+  /// sv.push(13);
+  /// assert_eq!(sv.grab_spare_slice().len(), 0);
+  /// ```
+  </span><span class="attribute">#[inline(always)]
+  </span><span class="kw">pub fn </span>grab_spare_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[T] {
+    <span class="kw-2">&amp;</span><span class="self">self</span>.data[<span class="self">self</span>.len..]
+  }
+
+  <span class="doccomment">/// Obtain the mutable slice of the array _after_ the active memory.
+  ///
+  /// ## Example
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [0; 4];
+  /// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 0);
+  /// assert_eq!(sv.grab_spare_slice_mut().len(), 4);
+  /// sv.push(10);
+  /// sv.push(11);
+  /// assert_eq!(sv.grab_spare_slice_mut().len(), 2);
+  /// ```
+  </span><span class="attribute">#[inline(always)]
+  </span><span class="kw">pub fn </span>grab_spare_slice_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[T] {
+    <span class="kw-2">&amp;mut </span><span class="self">self</span>.data[<span class="self">self</span>.len..]
+  }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span><span class="kw-2">mut </span>[T]&gt; <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="doccomment">/// Uses the full slice as the initial length.
+  /// ## Example
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [0_i32; 2];
+  /// let mut sv = SliceVec::from(&amp;mut arr[..]);
+  /// ```
+  </span><span class="kw">fn </span>from(data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span><span class="kw-2">mut </span>[T]) -&gt; <span class="self">Self </span>{
+    <span class="kw">let </span>len = data.len();
+    <span class="self">Self </span>{ data, len }
+  }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T, A&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span><span class="kw-2">mut </span>A&gt; <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>A: AsMut&lt;[T]&gt;,
+{
+  <span class="doccomment">/// Calls `AsRef::as_mut` then uses the full slice as the initial length.
+  /// ## Example
+  /// ```rust
+  /// # use tinyvec::*;
+  /// let mut arr = [0, 0];
+  /// let mut sv = SliceVec::from(&amp;mut arr);
+  /// ```
+  </span><span class="kw">fn </span>from(a: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span><span class="kw-2">mut </span>A) -&gt; <span class="self">Self </span>{
+    <span class="kw">let </span>data = a.as_mut();
+    <span class="kw">let </span>len = data.len();
+    <span class="self">Self </span>{ data, len }
+  }
+}
+
+<span class="doccomment">/// Draining iterator for [`SliceVec`]
+///
+/// See [`SliceVec::drain`](SliceVec::drain)
+</span><span class="kw">pub struct </span>SliceVecDrain&lt;<span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, T: Default&gt; {
+  parent: <span class="kw-2">&amp;</span><span class="lifetime">&#39;p </span><span class="kw-2">mut </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;,
+  target_start: usize,
+  target_index: usize,
+  target_end: usize,
+}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, T: Default&gt; Iterator <span class="kw">for </span>SliceVecDrain&lt;<span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="kw">type </span>Item = T;
+  <span class="attribute">#[inline]
+  </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+    <span class="kw">if </span><span class="self">self</span>.target_index != <span class="self">self</span>.target_end {
+      <span class="kw">let </span>out = take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.parent[<span class="self">self</span>.target_index]);
+      <span class="self">self</span>.target_index += <span class="number">1</span>;
+      <span class="prelude-val">Some</span>(out)
+    } <span class="kw">else </span>{
+      <span class="prelude-val">None
+    </span>}
+  }
+}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, T: Default&gt; FusedIterator <span class="kw">for </span>SliceVecDrain&lt;<span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, T&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, T: Default&gt; Drop <span class="kw">for </span>SliceVecDrain&lt;<span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="attribute">#[inline]
+  </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+    <span class="comment">// Changed because it was moving `self`, it&#39;s also more clear and the std
+    // does the same
+    </span><span class="self">self</span>.for_each(drop);
+    <span class="comment">// Implementation very similar to [`SliceVec::remove`](SliceVec::remove)
+    </span><span class="kw">let </span>count = <span class="self">self</span>.target_end - <span class="self">self</span>.target_start;
+    <span class="kw">let </span>targets: <span class="kw-2">&amp;mut </span>[T] = <span class="kw-2">&amp;mut </span><span class="self">self</span>.parent.deref_mut()[<span class="self">self</span>.target_start..];
+    targets.rotate_left(count);
+    <span class="self">self</span>.parent.len -= count;
+  }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; AsMut&lt;[T]&gt; <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[T] {
+    <span class="kw-2">&amp;mut *</span><span class="self">self
+  </span>}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; AsRef&lt;[T]&gt; <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[T] {
+    <span class="kw-2">&amp;*</span><span class="self">self
+  </span>}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Borrow&lt;[T]&gt; <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[T] {
+    <span class="kw-2">&amp;*</span><span class="self">self
+  </span>}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; BorrowMut&lt;[T]&gt; <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">fn </span>borrow_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[T] {
+    <span class="kw-2">&amp;mut *</span><span class="self">self
+  </span>}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Extend&lt;T&gt; <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="attribute">#[inline]
+  </span><span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = T&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
+    <span class="kw">for </span>t <span class="kw">in </span>iter {
+      <span class="self">self</span>.push(t)
     }
   }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grab_spare_slice&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="doccomment">/// Obtain the shared slice of the array _after_ the active memory.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [0; 4];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 0);</span>
-  <span class="doccomment">/// assert_eq!(sv.grab_spare_slice().len(), 4);</span>
-  <span class="doccomment">/// sv.push(10);</span>
-  <span class="doccomment">/// sv.push(11);</span>
-  <span class="doccomment">/// sv.push(12);</span>
-  <span class="doccomment">/// sv.push(13);</span>
-  <span class="doccomment">/// assert_eq!(sv.grab_spare_slice().len(), 0);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">grab_spare_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">T</span>] {
-    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[<span class="self">self</span>.<span class="ident">len</span>..]
-  }
-
-  <span class="doccomment">/// Obtain the mutable slice of the array _after_ the active memory.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [0; 4];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from_slice_len(&amp;mut arr, 0);</span>
-  <span class="doccomment">/// assert_eq!(sv.grab_spare_slice_mut().len(), 4);</span>
-  <span class="doccomment">/// sv.push(10);</span>
-  <span class="doccomment">/// sv.push(11);</span>
-  <span class="doccomment">/// assert_eq!(sv.grab_spare_slice_mut().len(), 2);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">grab_spare_slice_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">T</span>] {
-    <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="self">self</span>.<span class="ident">len</span>..]
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; IntoIterator <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; {
+  <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span><span class="kw-2">mut </span>T;
+  <span class="kw">type </span>IntoIter = core::slice::IterMut&lt;<span class="lifetime">&#39;s</span>, T&gt;;
+  <span class="attribute">#[inline(always)]
+  #[must_use]
+  </span><span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+    <span class="self">self</span>.data.iter_mut()
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> [<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="doccomment">/// Uses the full slice as the initial length.</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [0_i32; 2];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from(&amp;mut arr[..]);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> [<span class="ident">T</span>]) -&gt; <span class="self">Self</span> {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
-    <span class="self">Self</span> { <span class="ident">data</span>, <span class="ident">len</span> }
-  }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> <span class="ident">A</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">A</span>: <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; PartialEq <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: PartialEq,
 {
-  <span class="doccomment">/// Calls `AsRef::as_mut` then uses the full slice as the initial length.</span>
-  <span class="doccomment">/// ## Example</span>
-  <span class="doccomment">/// ```rust</span>
-  <span class="doccomment">/// # use tinyvec::*;</span>
-  <span class="doccomment">/// let mut arr = [0, 0];</span>
-  <span class="doccomment">/// let mut sv = SliceVec::from(&amp;mut arr);</span>
-  <span class="doccomment">/// ```</span>
-  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
-    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">as_mut</span>();
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
-    <span class="self">Self</span> { <span class="ident">data</span>, <span class="ident">len</span> }
+  <span class="attribute">#[inline]
+  #[must_use]
+  </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+    <span class="self">self</span>.as_slice().eq(other.as_slice())
   }
 }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Eq <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt; <span class="kw">where </span>T: Eq {}
 
-<span class="doccomment">/// Draining iterator for [`SliceVec`]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [`SliceVec::drain`](SliceVec::drain)</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SliceVecDrain</span><span class="op">&lt;</span><span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, <span class="ident">T</span>: <span class="ident">Default</span><span class="op">&gt;</span> {
-  <span class="ident">parent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;p</span> <span class="kw-2">mut</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-  <span class="ident">target_start</span>: <span class="ident">usize</span>,
-  <span class="ident">target_index</span>: <span class="ident">usize</span>,
-  <span class="ident">target_end</span>: <span class="ident">usize</span>,
-}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, <span class="ident">T</span>: <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">SliceVecDrain</span><span class="op">&lt;</span><span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">target_index</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">target_end</span> {
-      <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">parent</span>[<span class="self">self</span>.<span class="ident">target_index</span>]);
-      <span class="self">self</span>.<span class="ident">target_index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-      <span class="prelude-val">Some</span>(<span class="ident">out</span>)
-    } <span class="kw">else</span> {
-      <span class="prelude-val">None</span>
-    }
-  }
-}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, <span class="ident">T</span>: <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">SliceVecDrain</span><span class="op">&lt;</span><span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, <span class="ident">T</span>: <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">SliceVecDrain</span><span class="op">&lt;</span><span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-    <span class="comment">// Changed because it was moving `self`, it&#39;s also more clear and the std</span>
-    <span class="comment">// does the same</span>
-    <span class="self">self</span>.<span class="ident">for_each</span>(<span class="ident">drop</span>);
-    <span class="comment">// Implementation very similar to [`SliceVec::remove`](SliceVec::remove)</span>
-    <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">target_end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">target_start</span>;
-    <span class="kw">let</span> <span class="ident">targets</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">T</span>] <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">parent</span>.<span class="ident">deref_mut</span>()[<span class="self">self</span>.<span class="ident">target_start</span>..];
-    <span class="ident">targets</span>.<span class="ident">rotate_left</span>(<span class="ident">count</span>);
-    <span class="self">self</span>.<span class="ident">parent</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">count</span>;
-  }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">T</span>] {
-    <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>
-  }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">T</span>] {
-    <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>
-  }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Borrow</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">T</span>] {
-    <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>
-  }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">BorrowMut</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">borrow_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">T</span>] {
-    <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>
-  }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">I</span>) {
-    <span class="kw">for</span> <span class="ident">t</span> <span class="kw">in</span> <span class="ident">iter</span> {
-      <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">t</span>)
-    }
-  }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> <span class="ident">T</span>;
-  <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">core::slice::IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>;
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-    <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">iter_mut</span>()
-  }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">PartialEq</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; PartialOrd <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: PartialOrd,
 {
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-    <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">eq</span>(<span class="ident">other</span>.<span class="ident">as_slice</span>())
+  <span class="attribute">#[inline]
+  #[must_use]
+  </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;core::cmp::Ordering&gt; {
+    <span class="self">self</span>.as_slice().partial_cmp(other.as_slice())
   }
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Eq</span> {}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">PartialOrd</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Ord <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: Ord,
 {
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">core::cmp::Ordering</span><span class="op">&gt;</span> {
-    <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">as_slice</span>())
-  }
-}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">Ord</span>,
-{
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">core::cmp::Ordering</span> {
-    <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">cmp</span>(<span class="ident">other</span>.<span class="ident">as_slice</span>())
+  <span class="attribute">#[inline]
+  #[must_use]
+  </span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; core::cmp::Ordering {
+    <span class="self">self</span>.as_slice().cmp(other.as_slice())
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">PartialEq</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; PartialEq&lt;<span class="kw-2">&amp;</span>[T]&gt; <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: PartialEq,
 {
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="attribute">#[<span class="ident">must_use</span>]</span>
-  <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span>[<span class="ident">T</span>]) -&gt; <span class="ident">bool</span> {
-    <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">eq</span>(<span class="kw-2">*</span><span class="ident">other</span>)
+  <span class="attribute">#[inline]
+  #[must_use]
+  </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: &amp;&amp;[T]) -&gt; bool {
+    <span class="self">self</span>.as_slice().eq(<span class="kw-2">*</span>other)
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">Hash</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Hash <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: Hash,
 {
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-    <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">hash</span>(<span class="ident">state</span>)
+  <span class="attribute">#[inline]
+  </span><span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+    <span class="self">self</span>.as_slice().hash(state)
   }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;experimental_write_impl&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span><span class="op">&gt;</span> <span class="ident">core::fmt::Write</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">u8</span><span class="op">&gt;</span> {
-  <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-    <span class="kw">let</span> <span class="ident">my_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-    <span class="kw">let</span> <span class="ident">str_len</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>();
-    <span class="kw">if</span> <span class="ident">my_len</span> <span class="op">+</span> <span class="ident">str_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">capacity</span>() {
-      <span class="kw">let</span> <span class="ident">remainder</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">my_len</span>..];
-      <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">remainder</span>[..<span class="ident">str_len</span>];
-      <span class="ident">target</span>.<span class="ident">copy_from_slice</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>());
+<span class="attribute">#[cfg(feature = <span class="string">&quot;experimental_write_impl&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>&gt; core::fmt::Write <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, u8&gt; {
+  <span class="kw">fn </span>write_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; core::fmt::Result {
+    <span class="kw">let </span>my_len = <span class="self">self</span>.len();
+    <span class="kw">let </span>str_len = s.as_bytes().len();
+    <span class="kw">if </span>my_len + str_len &lt;= <span class="self">self</span>.capacity() {
+      <span class="kw">let </span>remainder = <span class="kw-2">&amp;mut </span><span class="self">self</span>.data[my_len..];
+      <span class="kw">let </span>target = <span class="kw-2">&amp;mut </span>remainder[..str_len];
+      target.copy_from_slice(s.as_bytes());
       <span class="prelude-val">Ok</span>(())
-    } <span class="kw">else</span> {
-      <span class="prelude-val">Err</span>(<span class="ident">core::fmt::Error</span>)
+    } <span class="kw">else </span>{
+      <span class="prelude-val">Err</span>(core::fmt::Error)
     }
   }
 }
 
-<span class="comment">// // // // // // // //</span>
-<span class="comment">// Formatting impls</span>
-<span class="comment">// // // // // // // //</span>
+<span class="comment">// // // // // // // //
+// Formatting impls
+// // // // // // // //
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Binary</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">Binary</span>,
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Binary <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: Binary,
 {
-  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_inline_in_public_items</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
+  <span class="attribute">#[allow(clippy::missing_inline_in_public_items)]
+  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; core::fmt::Result {
+    <span class="macro">write!</span>(f, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">elem</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-      <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() { <span class="string">&quot;\n    &quot;</span> } <span class="kw">else</span> { <span class="string">&quot; &quot;</span> })<span class="question-mark">?</span>;
+    <span class="kw">for </span>(i, elem) <span class="kw">in </span><span class="self">self</span>.iter().enumerate() {
+      <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+        <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if </span>f.alternate() { <span class="string">&quot;\n    &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot; &quot; </span>})<span class="question-mark">?</span>;
       }
-      <span class="ident">Binary::fmt</span>(<span class="ident">elem</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+      Binary::fmt(elem, f)<span class="question-mark">?</span>;
     }
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;]&quot;</span>)
+    <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">Debug</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Debug <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: Debug,
 {
-  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_inline_in_public_items</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
+  <span class="attribute">#[allow(clippy::missing_inline_in_public_items)]
+  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; core::fmt::Result {
+    <span class="macro">write!</span>(f, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">elem</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-      <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() { <span class="string">&quot;\n    &quot;</span> } <span class="kw">else</span> { <span class="string">&quot; &quot;</span> })<span class="question-mark">?</span>;
+    <span class="kw">for </span>(i, elem) <span class="kw">in </span><span class="self">self</span>.iter().enumerate() {
+      <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+        <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if </span>f.alternate() { <span class="string">&quot;\n    &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot; &quot; </span>})<span class="question-mark">?</span>;
       }
-      <span class="ident">Debug::fmt</span>(<span class="ident">elem</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+      Debug::fmt(elem, f)<span class="question-mark">?</span>;
     }
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;]&quot;</span>)
+    <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">Display</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Display <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: Display,
 {
-  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_inline_in_public_items</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
+  <span class="attribute">#[allow(clippy::missing_inline_in_public_items)]
+  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; core::fmt::Result {
+    <span class="macro">write!</span>(f, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">elem</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-      <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() { <span class="string">&quot;\n    &quot;</span> } <span class="kw">else</span> { <span class="string">&quot; &quot;</span> })<span class="question-mark">?</span>;
+    <span class="kw">for </span>(i, elem) <span class="kw">in </span><span class="self">self</span>.iter().enumerate() {
+      <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+        <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if </span>f.alternate() { <span class="string">&quot;\n    &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot; &quot; </span>})<span class="question-mark">?</span>;
       }
-      <span class="ident">Display::fmt</span>(<span class="ident">elem</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+      Display::fmt(elem, f)<span class="question-mark">?</span>;
     }
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;]&quot;</span>)
+    <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">LowerExp</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">LowerExp</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; LowerExp <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: LowerExp,
 {
-  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_inline_in_public_items</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
+  <span class="attribute">#[allow(clippy::missing_inline_in_public_items)]
+  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; core::fmt::Result {
+    <span class="macro">write!</span>(f, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">elem</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-      <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() { <span class="string">&quot;\n    &quot;</span> } <span class="kw">else</span> { <span class="string">&quot; &quot;</span> })<span class="question-mark">?</span>;
+    <span class="kw">for </span>(i, elem) <span class="kw">in </span><span class="self">self</span>.iter().enumerate() {
+      <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+        <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if </span>f.alternate() { <span class="string">&quot;\n    &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot; &quot; </span>})<span class="question-mark">?</span>;
       }
-      <span class="ident">LowerExp::fmt</span>(<span class="ident">elem</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+      LowerExp::fmt(elem, f)<span class="question-mark">?</span>;
     }
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;]&quot;</span>)
+    <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">LowerHex</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">LowerHex</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; LowerHex <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: LowerHex,
 {
-  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_inline_in_public_items</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
+  <span class="attribute">#[allow(clippy::missing_inline_in_public_items)]
+  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; core::fmt::Result {
+    <span class="macro">write!</span>(f, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">elem</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-      <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() { <span class="string">&quot;\n    &quot;</span> } <span class="kw">else</span> { <span class="string">&quot; &quot;</span> })<span class="question-mark">?</span>;
+    <span class="kw">for </span>(i, elem) <span class="kw">in </span><span class="self">self</span>.iter().enumerate() {
+      <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+        <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if </span>f.alternate() { <span class="string">&quot;\n    &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot; &quot; </span>})<span class="question-mark">?</span>;
       }
-      <span class="ident">LowerHex::fmt</span>(<span class="ident">elem</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+      LowerHex::fmt(elem, f)<span class="question-mark">?</span>;
     }
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;]&quot;</span>)
+    <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Octal</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">Octal</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Octal <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: Octal,
 {
-  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_inline_in_public_items</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
+  <span class="attribute">#[allow(clippy::missing_inline_in_public_items)]
+  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; core::fmt::Result {
+    <span class="macro">write!</span>(f, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">elem</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-      <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() { <span class="string">&quot;\n    &quot;</span> } <span class="kw">else</span> { <span class="string">&quot; &quot;</span> })<span class="question-mark">?</span>;
+    <span class="kw">for </span>(i, elem) <span class="kw">in </span><span class="self">self</span>.iter().enumerate() {
+      <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+        <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if </span>f.alternate() { <span class="string">&quot;\n    &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot; &quot; </span>})<span class="question-mark">?</span>;
       }
-      <span class="ident">Octal::fmt</span>(<span class="ident">elem</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+      Octal::fmt(elem, f)<span class="question-mark">?</span>;
     }
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;]&quot;</span>)
+    <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Pointer</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">Pointer</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; Pointer <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: Pointer,
 {
-  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_inline_in_public_items</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
+  <span class="attribute">#[allow(clippy::missing_inline_in_public_items)]
+  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; core::fmt::Result {
+    <span class="macro">write!</span>(f, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">elem</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-      <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() { <span class="string">&quot;\n    &quot;</span> } <span class="kw">else</span> { <span class="string">&quot; &quot;</span> })<span class="question-mark">?</span>;
+    <span class="kw">for </span>(i, elem) <span class="kw">in </span><span class="self">self</span>.iter().enumerate() {
+      <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+        <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if </span>f.alternate() { <span class="string">&quot;\n    &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot; &quot; </span>})<span class="question-mark">?</span>;
       }
-      <span class="ident">Pointer::fmt</span>(<span class="ident">elem</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+      Pointer::fmt(elem, f)<span class="question-mark">?</span>;
     }
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;]&quot;</span>)
+    <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">UpperExp</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">UpperExp</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; UpperExp <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: UpperExp,
 {
-  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_inline_in_public_items</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
+  <span class="attribute">#[allow(clippy::missing_inline_in_public_items)]
+  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; core::fmt::Result {
+    <span class="macro">write!</span>(f, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">elem</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-      <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() { <span class="string">&quot;\n    &quot;</span> } <span class="kw">else</span> { <span class="string">&quot; &quot;</span> })<span class="question-mark">?</span>;
+    <span class="kw">for </span>(i, elem) <span class="kw">in </span><span class="self">self</span>.iter().enumerate() {
+      <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+        <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if </span>f.alternate() { <span class="string">&quot;\n    &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot; &quot; </span>})<span class="question-mark">?</span>;
       }
-      <span class="ident">UpperExp::fmt</span>(<span class="ident">elem</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+      UpperExp::fmt(elem, f)<span class="question-mark">?</span>;
     }
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;]&quot;</span>)
+    <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
   }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">UpperHex</span> <span class="kw">for</span> <span class="ident">SliceVec</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">T</span>: <span class="ident">UpperHex</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, T&gt; UpperHex <span class="kw">for </span>SliceVec&lt;<span class="lifetime">&#39;s</span>, T&gt;
+<span class="kw">where
+  </span>T: UpperHex,
 {
-  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_inline_in_public_items</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
+  <span class="attribute">#[allow(clippy::missing_inline_in_public_items)]
+  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; core::fmt::Result {
+    <span class="macro">write!</span>(f, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;\n    &quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">elem</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-      <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() { <span class="string">&quot;\n    &quot;</span> } <span class="kw">else</span> { <span class="string">&quot; &quot;</span> })<span class="question-mark">?</span>;
+    <span class="kw">for </span>(i, elem) <span class="kw">in </span><span class="self">self</span>.iter().enumerate() {
+      <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+        <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, <span class="kw">if </span>f.alternate() { <span class="string">&quot;\n    &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot; &quot; </span>})<span class="question-mark">?</span>;
       }
-      <span class="ident">UpperHex::fmt</span>(<span class="ident">elem</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+      UpperHex::fmt(elem, f)<span class="question-mark">?</span>;
     }
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-      <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>f.alternate() {
+      <span class="macro">write!</span>(f, <span class="string">&quot;,\n&quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;]&quot;</span>)
+    <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
   }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tinyvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tinyvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

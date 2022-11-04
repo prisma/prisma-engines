@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/value/convert/time03.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>time03.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/value/convert/time03.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>time03.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -596,597 +596,597 @@
 <span id="596">596</span>
 <span id="597">597</span>
 <span id="598">598</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="doccomment">//! This module implements conversion from/to `Value` for `time` v0.3.x crate types.</span>
+</span><span class="doccomment">//! This module implements conversion from/to `Value` for `time` v0.3.x crate types.
 
-<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time03&quot;</span>)]</span>
+</span><span class="attribute">#![cfg(feature = <span class="string">&quot;time03&quot;</span>)]
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp::Ordering</span>, <span class="ident">convert::TryFrom</span>, <span class="ident">str::from_utf8</span>};
+</span><span class="kw">use </span>std::{cmp::Ordering, convert::TryFrom, str::from_utf8};
 
-<span class="kw">use</span> <span class="ident">time03</span>::{
-    <span class="ident">error</span>::{<span class="ident">Parse</span>, <span class="ident">TryFromParsed</span>},
-    <span class="ident">format_description</span>::{
-        <span class="ident">modifier</span>::{<span class="self">self</span>, <span class="ident">Subsecond</span>},
-        <span class="ident">Component</span>, <span class="ident">FormatItem</span>,
+<span class="kw">use </span>time03::{
+    error::{Parse, TryFromParsed},
+    format_description::{
+        modifier::{<span class="self">self</span>, Subsecond},
+        Component, FormatItem,
     },
-    <span class="ident">Date</span>, <span class="ident">PrimitiveDateTime</span>, <span class="ident">Time</span>,
+    Date, PrimitiveDateTime, Time,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::value::Value</span>;
+<span class="kw">use </span><span class="kw">crate</span>::value::Value;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">parse_mysql_time_string</span>, <span class="ident">ConvIr</span>, <span class="ident">FromValueError</span>, <span class="ident">ParseIr</span>};
+<span class="kw">use super</span>::{parse_mysql_time_string, ConvIr, FromValueError, ParseIr};
 
-<span class="macro">lazy_static::lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">FULL_YEAR</span>: <span class="ident">modifier::Year</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">year_modifier</span> <span class="op">=</span> <span class="ident">modifier::Year::default</span>();
-        <span class="ident">year_modifier</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="ident">modifier::Padding::Zero</span>;
-        <span class="ident">year_modifier</span>.<span class="ident">repr</span> <span class="op">=</span> <span class="ident">modifier::YearRepr::Full</span>;
-        <span class="ident">year_modifier</span>.<span class="ident">iso_week_based</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="ident">year_modifier</span>.<span class="ident">sign_is_mandatory</span> <span class="op">=</span> <span class="bool-val">false</span>;
+<span class="macro">lazy_static::lazy_static! </span>{
+    <span class="kw">static </span><span class="kw-2">ref </span>FULL_YEAR: modifier::Year = {
+        <span class="kw">let </span><span class="kw-2">mut </span>year_modifier = modifier::Year::default();
+        year_modifier.padding = modifier::Padding::Zero;
+        year_modifier.repr = modifier::YearRepr::Full;
+        year_modifier.iso_week_based = <span class="bool-val">false</span>;
+        year_modifier.sign_is_mandatory = <span class="bool-val">false</span>;
 
-        <span class="ident">year_modifier</span>
+        year_modifier
     };
 
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">ZERO_PADDED_MONTH</span>: <span class="ident">modifier::Month</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">month_modifier</span> <span class="op">=</span> <span class="ident">modifier::Month::default</span>();
-        <span class="ident">month_modifier</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="ident">modifier::Padding::Zero</span>;
-        <span class="ident">month_modifier</span>.<span class="ident">repr</span> <span class="op">=</span> <span class="ident">modifier::MonthRepr::Numerical</span>;
-        <span class="ident">month_modifier</span>.<span class="ident">case_sensitive</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">static </span><span class="kw-2">ref </span>ZERO_PADDED_MONTH: modifier::Month = {
+        <span class="kw">let </span><span class="kw-2">mut </span>month_modifier = modifier::Month::default();
+        month_modifier.padding = modifier::Padding::Zero;
+        month_modifier.repr = modifier::MonthRepr::Numerical;
+        month_modifier.case_sensitive = <span class="bool-val">true</span>;
 
-        <span class="ident">month_modifier</span>
+        month_modifier
     };
 
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">ZERO_PADDED_DAY</span>: <span class="ident">modifier::Day</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">day_modifier</span> <span class="op">=</span> <span class="ident">modifier::Day::default</span>();
-        <span class="ident">day_modifier</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="ident">modifier::Padding::Zero</span>;
+    <span class="kw">static </span><span class="kw-2">ref </span>ZERO_PADDED_DAY: modifier::Day = {
+        <span class="kw">let </span><span class="kw-2">mut </span>day_modifier = modifier::Day::default();
+        day_modifier.padding = modifier::Padding::Zero;
 
-        <span class="ident">day_modifier</span>
+        day_modifier
     };
 
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">ZERO_PADDED_HOUR</span>: <span class="ident">modifier::Hour</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hour_modifier</span> <span class="op">=</span> <span class="ident">modifier::Hour::default</span>();
-        <span class="ident">hour_modifier</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="ident">modifier::Padding::Zero</span>;
-        <span class="ident">hour_modifier</span>.<span class="ident">is_12_hour_clock</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="kw">static </span><span class="kw-2">ref </span>ZERO_PADDED_HOUR: modifier::Hour = {
+        <span class="kw">let </span><span class="kw-2">mut </span>hour_modifier = modifier::Hour::default();
+        hour_modifier.padding = modifier::Padding::Zero;
+        hour_modifier.is_12_hour_clock = <span class="bool-val">false</span>;
 
-        <span class="ident">hour_modifier</span>
+        hour_modifier
     };
 
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">ZERO_PADDED_MINUTE</span>: <span class="ident">modifier::Minute</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">minute_modifier</span> <span class="op">=</span> <span class="ident">modifier::Minute::default</span>();
-        <span class="ident">minute_modifier</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="ident">modifier::Padding::Zero</span>;
+    <span class="kw">static </span><span class="kw-2">ref </span>ZERO_PADDED_MINUTE: modifier::Minute = {
+        <span class="kw">let </span><span class="kw-2">mut </span>minute_modifier = modifier::Minute::default();
+        minute_modifier.padding = modifier::Padding::Zero;
 
-        <span class="ident">minute_modifier</span>
+        minute_modifier
     };
 
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">ZERO_PADDED_SECOND</span>: <span class="ident">modifier::Second</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">second_modifier</span> <span class="op">=</span> <span class="ident">modifier::Second::default</span>();
-        <span class="ident">second_modifier</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="ident">modifier::Padding::Zero</span>;
+    <span class="kw">static </span><span class="kw-2">ref </span>ZERO_PADDED_SECOND: modifier::Second = {
+        <span class="kw">let </span><span class="kw-2">mut </span>second_modifier = modifier::Second::default();
+        second_modifier.padding = modifier::Padding::Zero;
 
-        <span class="ident">second_modifier</span>
+        second_modifier
     };
 
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DATE_FORMAT</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FormatItem</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> {
+    <span class="kw">static </span><span class="kw-2">ref </span>DATE_FORMAT: Vec&lt;FormatItem&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = {
         <span class="macro">vec!</span>[
-            <span class="ident">FormatItem::Component</span>(<span class="ident">Component::Year</span>(<span class="kw-2">*</span><span class="ident">FULL_YEAR</span>)),
-            <span class="ident">FormatItem::Literal</span>(<span class="string">b&quot;-&quot;</span>),
-            <span class="ident">FormatItem::Component</span>(<span class="ident">Component::Month</span>(<span class="kw-2">*</span><span class="ident">ZERO_PADDED_MONTH</span>)),
-            <span class="ident">FormatItem::Literal</span>(<span class="string">b&quot;-&quot;</span>),
-            <span class="ident">FormatItem::Component</span>(<span class="ident">Component::Day</span>(<span class="kw-2">*</span><span class="ident">ZERO_PADDED_DAY</span>)),
+            FormatItem::Component(Component::Year(<span class="kw-2">*</span>FULL_YEAR)),
+            FormatItem::Literal(<span class="string">b&quot;-&quot;</span>),
+            FormatItem::Component(Component::Month(<span class="kw-2">*</span>ZERO_PADDED_MONTH)),
+            FormatItem::Literal(<span class="string">b&quot;-&quot;</span>),
+            FormatItem::Component(Component::Day(<span class="kw-2">*</span>ZERO_PADDED_DAY)),
         ]
     };
 
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TIME_FORMAT</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FormatItem</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> {
+    <span class="kw">static </span><span class="kw-2">ref </span>TIME_FORMAT: Vec&lt;FormatItem&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = {
         <span class="macro">vec!</span>[
-            <span class="ident">FormatItem::Component</span>(<span class="ident">Component::Hour</span>(<span class="kw-2">*</span><span class="ident">ZERO_PADDED_HOUR</span>)),
-            <span class="ident">FormatItem::Literal</span>(<span class="string">b&quot;:&quot;</span>),
-            <span class="ident">FormatItem::Component</span>(<span class="ident">Component::Minute</span>(<span class="kw-2">*</span><span class="ident">ZERO_PADDED_MINUTE</span>)),
-            <span class="ident">FormatItem::Literal</span>(<span class="string">b&quot;:&quot;</span>),
-            <span class="ident">FormatItem::Component</span>(<span class="ident">Component::Second</span>(<span class="kw-2">*</span><span class="ident">ZERO_PADDED_SECOND</span>)),
+            FormatItem::Component(Component::Hour(<span class="kw-2">*</span>ZERO_PADDED_HOUR)),
+            FormatItem::Literal(<span class="string">b&quot;:&quot;</span>),
+            FormatItem::Component(Component::Minute(<span class="kw-2">*</span>ZERO_PADDED_MINUTE)),
+            FormatItem::Literal(<span class="string">b&quot;:&quot;</span>),
+            FormatItem::Component(Component::Second(<span class="kw-2">*</span>ZERO_PADDED_SECOND)),
         ]
     };
 
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TIME_FORMAT_MICRO</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FormatItem</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> {
+    <span class="kw">static </span><span class="kw-2">ref </span>TIME_FORMAT_MICRO: Vec&lt;FormatItem&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = {
         <span class="macro">vec!</span>[
-            <span class="ident">FormatItem::Component</span>(<span class="ident">Component::Hour</span>(<span class="kw-2">*</span><span class="ident">ZERO_PADDED_HOUR</span>)),
-            <span class="ident">FormatItem::Literal</span>(<span class="string">b&quot;:&quot;</span>),
-            <span class="ident">FormatItem::Component</span>(<span class="ident">Component::Minute</span>(<span class="kw-2">*</span><span class="ident">ZERO_PADDED_MINUTE</span>)),
-            <span class="ident">FormatItem::Literal</span>(<span class="string">b&quot;:&quot;</span>),
-            <span class="ident">FormatItem::Component</span>(<span class="ident">Component::Second</span>(<span class="kw-2">*</span><span class="ident">ZERO_PADDED_SECOND</span>)),
-            <span class="ident">FormatItem::Literal</span>(<span class="string">b&quot;.&quot;</span>),
-            <span class="ident">FormatItem::Component</span>(<span class="ident">Component::Subsecond</span>(<span class="ident">Subsecond::default</span>())),
+            FormatItem::Component(Component::Hour(<span class="kw-2">*</span>ZERO_PADDED_HOUR)),
+            FormatItem::Literal(<span class="string">b&quot;:&quot;</span>),
+            FormatItem::Component(Component::Minute(<span class="kw-2">*</span>ZERO_PADDED_MINUTE)),
+            FormatItem::Literal(<span class="string">b&quot;:&quot;</span>),
+            FormatItem::Component(Component::Second(<span class="kw-2">*</span>ZERO_PADDED_SECOND)),
+            FormatItem::Literal(<span class="string">b&quot;.&quot;</span>),
+            FormatItem::Component(Component::Subsecond(Subsecond::default())),
         ]
     };
 
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DATE_TIME_FORMAT</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FormatItem</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">DATE_FORMAT</span>.<span class="ident">clone</span>();
-        <span class="ident">format</span>.<span class="ident">push</span>(<span class="ident">FormatItem::Literal</span>(<span class="string">b&quot; &quot;</span>));
-        <span class="ident">format</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">TIME_FORMAT</span>);
-        <span class="ident">format</span>
+    <span class="kw">static </span><span class="kw-2">ref </span>DATE_TIME_FORMAT: Vec&lt;FormatItem&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = {
+        <span class="kw">let </span><span class="kw-2">mut </span>format = DATE_FORMAT.clone();
+        format.push(FormatItem::Literal(<span class="string">b&quot; &quot;</span>));
+        format.extend_from_slice(<span class="kw-2">&amp;*</span>TIME_FORMAT);
+        format
     };
 
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DATE_TIME_FORMAT_MICRO</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FormatItem</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">DATE_FORMAT</span>.<span class="ident">clone</span>();
-        <span class="ident">format</span>.<span class="ident">push</span>(<span class="ident">FormatItem::Literal</span>(<span class="string">b&quot; &quot;</span>));
-        <span class="ident">format</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">TIME_FORMAT_MICRO</span>);
-        <span class="ident">format</span>
+    <span class="kw">static </span><span class="kw-2">ref </span>DATE_TIME_FORMAT_MICRO: Vec&lt;FormatItem&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = {
+        <span class="kw">let </span><span class="kw-2">mut </span>format = DATE_FORMAT.clone();
+        format.push(FormatItem::Literal(<span class="string">b&quot; &quot;</span>));
+        format.extend_from_slice(<span class="kw-2">&amp;*</span>TIME_FORMAT_MICRO);
+        format
     };
 }
 
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">PrimitiveDateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">PrimitiveDateTime</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">PrimitiveDateTime</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">Value::Date</span>(<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>, <span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>, <span class="ident">micros</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                <span class="ident">value</span>: <span class="ident">Value::Date</span>(<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>, <span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>, <span class="ident">micros</span>),
-                <span class="ident">output</span>: <span class="kw">match</span> <span class="ident">create_primitive_date_time</span>(
-                    <span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>, <span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>, <span class="ident">micros</span>,
+<span class="kw">impl </span>ConvIr&lt;PrimitiveDateTime&gt; <span class="kw">for </span>ParseIr&lt;PrimitiveDateTime&gt; {
+    <span class="kw">fn </span>new(value: Value) -&gt; <span class="prelude-ty">Result</span>&lt;ParseIr&lt;PrimitiveDateTime&gt;, FromValueError&gt; {
+        <span class="kw">match </span>value {
+            Value::Date(year, month, day, hour, minute, second, micros) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                value: Value::Date(year, month, day, hour, minute, second, micros),
+                output: <span class="kw">match </span>create_primitive_date_time(
+                    year, month, day, hour, minute, second, micros,
                 ) {
-                    <span class="prelude-val">Some</span>(<span class="ident">datetime</span>) =&gt; <span class="ident">datetime</span>,
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">value</span>)),
+                    <span class="prelude-val">Some</span>(datetime) =&gt; datetime,
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(FromValueError(value)),
                 },
             }),
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; <span class="kw">match</span> <span class="ident">parse_mysql_datetime_string_with_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">output</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                    <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
-                    <span class="ident">output</span>,
+            Value::Bytes(bytes) =&gt; <span class="kw">match </span>parse_mysql_datetime_string_with_time(<span class="kw-2">&amp;*</span>bytes) {
+                <span class="prelude-val">Ok</span>(output) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                    value: Value::Bytes(bytes),
+                    output,
                 }),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(FromValueError(Value::Bytes(bytes))),
             },
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">PrimitiveDateTime</span> {
-        <span class="self">self</span>.<span class="ident">output</span>
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; PrimitiveDateTime {
+        <span class="self">self</span>.output
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="doccomment">/// Converts a MySQL `DATE` value to a `time03::Date`.</span>
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">Value::Date</span>(<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>, <span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>, <span class="ident">micros</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">mon</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">time03::Month::try_from</span>(<span class="ident">month</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">month</span>) =&gt; <span class="ident">month</span>,
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">value</span>)),
+<span class="doccomment">/// Converts a MySQL `DATE` value to a `time03::Date`.
+</span><span class="kw">impl </span>ConvIr&lt;Date&gt; <span class="kw">for </span>ParseIr&lt;Date&gt; {
+    <span class="kw">fn </span>new(value: Value) -&gt; <span class="prelude-ty">Result</span>&lt;ParseIr&lt;Date&gt;, FromValueError&gt; {
+        <span class="kw">match </span>value {
+            Value::Date(year, month, day, hour, minute, second, micros) =&gt; {
+                <span class="kw">let </span>mon = <span class="kw">match </span>time03::Month::try_from(month) {
+                    <span class="prelude-val">Ok</span>(month) =&gt; month,
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(FromValueError(value)),
                 };
-                <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                    <span class="ident">value</span>: <span class="ident">Value::Date</span>(<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>, <span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>, <span class="ident">micros</span>),
-                    <span class="ident">output</span>: <span class="kw">match</span> <span class="ident">Date::from_calendar_date</span>(<span class="ident">year</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">mon</span>, <span class="ident">day</span>) {
-                        <span class="prelude-val">Ok</span>(<span class="ident">date</span>) =&gt; <span class="ident">date</span>,
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">value</span>)),
+                <span class="prelude-val">Ok</span>(ParseIr {
+                    value: Value::Date(year, month, day, hour, minute, second, micros),
+                    output: <span class="kw">match </span>Date::from_calendar_date(year <span class="kw">as </span>i32, mon, day) {
+                        <span class="prelude-val">Ok</span>(date) =&gt; date,
+                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(FromValueError(value)),
                     },
                 })
             }
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; {
-                <span class="kw">match</span> <span class="ident">from_utf8</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>)
-                    .<span class="ident">ok</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">Date::parse</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">DATE_FORMAT</span>).<span class="ident">ok</span>())
+            Value::Bytes(bytes) =&gt; {
+                <span class="kw">match </span>from_utf8(<span class="kw-2">&amp;*</span>bytes)
+                    .ok()
+                    .and_then(|s| Date::parse(s, <span class="kw-2">&amp;*</span>DATE_FORMAT).ok())
                 {
-                    <span class="prelude-val">Some</span>(<span class="ident">output</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                        <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
-                        <span class="ident">output</span>,
+                    <span class="prelude-val">Some</span>(output) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                        value: Value::Bytes(bytes),
+                        output,
                     }),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(FromValueError(Value::Bytes(bytes))),
                 }
             }
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">Date</span> {
-        <span class="self">self</span>.<span class="ident">output</span>
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; Date {
+        <span class="self">self</span>.output
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="doccomment">/// Converts a MySQL `TIME` value to a `time03::Time`.</span>
-<span class="doccomment">/// Note: `time03::Time` only allows for time values in the 00:00:00 - 23:59:59 range.</span>
-<span class="doccomment">/// If you&#39;re expecting `TIME` values in MySQL&#39;s `TIME` value range of -838:59:59 - 838:59:59,</span>
-<span class="doccomment">/// use time03::Duration instead.</span>
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">Value::Time</span>(<span class="bool-val">false</span>, <span class="number">0</span>, <span class="ident">h</span>, <span class="ident">m</span>, <span class="ident">s</span>, <span class="ident">u</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                <span class="ident">value</span>: <span class="ident">Value::Time</span>(<span class="bool-val">false</span>, <span class="number">0</span>, <span class="ident">h</span>, <span class="ident">m</span>, <span class="ident">s</span>, <span class="ident">u</span>),
-                <span class="ident">output</span>: <span class="kw">match</span> <span class="ident">Time::from_hms_micro</span>(<span class="ident">h</span>, <span class="ident">m</span>, <span class="ident">s</span>, <span class="ident">u</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">time</span>) =&gt; <span class="ident">time</span>,
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">value</span>)),
+<span class="doccomment">/// Converts a MySQL `TIME` value to a `time03::Time`.
+/// Note: `time03::Time` only allows for time values in the 00:00:00 - 23:59:59 range.
+/// If you&#39;re expecting `TIME` values in MySQL&#39;s `TIME` value range of -838:59:59 - 838:59:59,
+/// use time03::Duration instead.
+</span><span class="kw">impl </span>ConvIr&lt;Time&gt; <span class="kw">for </span>ParseIr&lt;Time&gt; {
+    <span class="kw">fn </span>new(value: Value) -&gt; <span class="prelude-ty">Result</span>&lt;ParseIr&lt;Time&gt;, FromValueError&gt; {
+        <span class="kw">match </span>value {
+            Value::Time(<span class="bool-val">false</span>, <span class="number">0</span>, h, m, s, u) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                value: Value::Time(<span class="bool-val">false</span>, <span class="number">0</span>, h, m, s, u),
+                output: <span class="kw">match </span>Time::from_hms_micro(h, m, s, u) {
+                    <span class="prelude-val">Ok</span>(time) =&gt; time,
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(FromValueError(value)),
                 },
             }),
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; <span class="kw">match</span> <span class="ident">parse_mysql_time_string_with_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">output</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                    <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
-                    <span class="ident">output</span>,
+            Value::Bytes(bytes) =&gt; <span class="kw">match </span>parse_mysql_time_string_with_time(<span class="kw-2">&amp;*</span>bytes) {
+                <span class="prelude-val">Ok</span>(output) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                    value: Value::Bytes(bytes),
+                    output,
                 }),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(FromValueError(Value::Bytes(bytes))),
             },
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">Time</span> {
-        <span class="self">self</span>.<span class="ident">output</span>
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; Time {
+        <span class="self">self</span>.output
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">fn</span> <span class="ident">create_primitive_date_time</span>(
-    <span class="ident">year</span>: <span class="ident">u16</span>,
-    <span class="ident">month</span>: <span class="ident">u8</span>,
-    <span class="ident">day</span>: <span class="ident">u8</span>,
-    <span class="ident">hour</span>: <span class="ident">u8</span>,
-    <span class="ident">minute</span>: <span class="ident">u8</span>,
-    <span class="ident">second</span>: <span class="ident">u8</span>,
-    <span class="ident">micros</span>: <span class="ident">u32</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimitiveDateTime</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">mon</span> <span class="op">=</span> <span class="ident">time03::Month::try_from</span>(<span class="ident">month</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">date</span>) <span class="op">=</span> <span class="ident">Date::from_calendar_date</span>(<span class="ident">year</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">mon</span>, <span class="ident">day</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">time</span>) <span class="op">=</span> <span class="ident">Time::from_hms_micro</span>(<span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>, <span class="ident">micros</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">PrimitiveDateTime::new</span>(<span class="ident">date</span>, <span class="ident">time</span>));
+<span class="kw">fn </span>create_primitive_date_time(
+    year: u16,
+    month: u8,
+    day: u8,
+    hour: u8,
+    minute: u8,
+    second: u8,
+    micros: u32,
+) -&gt; <span class="prelude-ty">Option</span>&lt;PrimitiveDateTime&gt; {
+    <span class="kw">let </span>mon = time03::Month::try_from(month).ok()<span class="question-mark">?</span>;
+    <span class="kw">if let </span><span class="prelude-val">Ok</span>(date) = Date::from_calendar_date(year <span class="kw">as </span>i32, mon, day) {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(time) = Time::from_hms_micro(hour, minute, second, micros) {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(PrimitiveDateTime::new(date, time));
         }
     }
 
-    <span class="prelude-val">None</span>
-}
+    <span class="prelude-val">None
+</span>}
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_mysql_datetime_string_with_time</span>(
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrimitiveDateTime</span>, <span class="ident">Parse</span><span class="op">&gt;</span> {
-    <span class="ident">from_utf8</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Parse::TryFromParsed</span>(<span class="ident">TryFromParsed::InsufficientInformation</span>))
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">19</span> {
-                <span class="ident">PrimitiveDateTime::parse</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">DATE_TIME_FORMAT_MICRO</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">19</span> {
-                <span class="ident">PrimitiveDateTime::parse</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[..<span class="number">19</span>], <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">DATE_TIME_FORMAT</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">10</span> {
-                <span class="ident">PrimitiveDateTime::parse</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">DATE_FORMAT</span>)
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">Parse::TryFromParsed</span>(<span class="ident">TryFromParsed::InsufficientInformation</span>))
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_mysql_datetime_string_with_time(
+    bytes: <span class="kw-2">&amp;</span>[u8],
+) -&gt; <span class="prelude-ty">Result</span>&lt;PrimitiveDateTime, Parse&gt; {
+    from_utf8(<span class="kw-2">&amp;*</span>bytes)
+        .map_err(|<span class="kw">_</span>| Parse::TryFromParsed(TryFromParsed::InsufficientInformation))
+        .and_then(|s| {
+            <span class="kw">if </span>s.len() &gt; <span class="number">19 </span>{
+                PrimitiveDateTime::parse(s, <span class="kw-2">&amp;*</span>DATE_TIME_FORMAT_MICRO)
+            } <span class="kw">else if </span>s.len() == <span class="number">19 </span>{
+                PrimitiveDateTime::parse(<span class="kw-2">&amp;</span>s[..<span class="number">19</span>], <span class="kw-2">&amp;*</span>DATE_TIME_FORMAT)
+            } <span class="kw">else if </span>s.len() &gt;= <span class="number">10 </span>{
+                PrimitiveDateTime::parse(s, <span class="kw-2">&amp;*</span>DATE_FORMAT)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Err</span>(Parse::TryFromParsed(TryFromParsed::InsufficientInformation))
             }
         })
 }
 
-<span class="kw">fn</span> <span class="ident">parse_mysql_time_string_with_time</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Time</span>, <span class="ident">Parse</span><span class="op">&gt;</span> {
-    <span class="ident">from_utf8</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Parse::TryFromParsed</span>(<span class="ident">TryFromParsed::InsufficientInformation</span>))
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">len</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="number">8</span>) {
-            <span class="ident">Ordering::Less</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Parse::TryFromParsed</span>(<span class="ident">TryFromParsed::InsufficientInformation</span>)),
-            <span class="ident">Ordering::Equal</span> =&gt; <span class="ident">Time::parse</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">TIME_FORMAT</span>),
-            <span class="ident">Ordering::Greater</span> =&gt; <span class="ident">Time::parse</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">TIME_FORMAT_MICRO</span>),
+<span class="kw">fn </span>parse_mysql_time_string_with_time(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Time, Parse&gt; {
+    from_utf8(<span class="kw-2">&amp;*</span>bytes)
+        .map_err(|<span class="kw">_</span>| Parse::TryFromParsed(TryFromParsed::InsufficientInformation))
+        .and_then(|s| <span class="kw">match </span>s.len().cmp(<span class="kw-2">&amp;</span><span class="number">8</span>) {
+            Ordering::Less =&gt; <span class="prelude-val">Err</span>(Parse::TryFromParsed(TryFromParsed::InsufficientInformation)),
+            Ordering::Equal =&gt; Time::parse(s, <span class="kw-2">&amp;*</span>TIME_FORMAT),
+            Ordering::Greater =&gt; Time::parse(s, <span class="kw-2">&amp;*</span>TIME_FORMAT_MICRO),
         })
 }
 
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">time03::Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">time03::Duration</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">time03::Duration</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::Time</span>(<span class="ident">is_neg</span>, <span class="ident">days</span>, <span class="ident">hours</span>, <span class="ident">minutes</span>, <span class="ident">seconds</span>, <span class="ident">microseconds</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">time03::Duration::days</span>(<span class="ident">days</span>.<span class="ident">into</span>())
-                    <span class="op">+</span> <span class="ident">time03::Duration::hours</span>(<span class="ident">hours</span>.<span class="ident">into</span>())
-                    <span class="op">+</span> <span class="ident">time03::Duration::minutes</span>(<span class="ident">minutes</span>.<span class="ident">into</span>())
-                    <span class="op">+</span> <span class="ident">time03::Duration::seconds</span>(<span class="ident">seconds</span>.<span class="ident">into</span>())
-                    <span class="op">+</span> <span class="ident">time03::Duration::microseconds</span>(<span class="ident">microseconds</span>.<span class="ident">into</span>());
-                <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                    <span class="ident">value</span>: <span class="ident">Value::Time</span>(<span class="ident">is_neg</span>, <span class="ident">days</span>, <span class="ident">hours</span>, <span class="ident">minutes</span>, <span class="ident">seconds</span>, <span class="ident">microseconds</span>),
-                    <span class="ident">output</span>: <span class="kw">if</span> <span class="ident">is_neg</span> { <span class="op">-</span><span class="ident">duration</span> } <span class="kw">else</span> { <span class="ident">duration</span> },
+<span class="kw">impl </span>ConvIr&lt;time03::Duration&gt; <span class="kw">for </span>ParseIr&lt;time03::Duration&gt; {
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;ParseIr&lt;time03::Duration&gt;, FromValueError&gt; {
+        <span class="kw">match </span>v {
+            Value::Time(is_neg, days, hours, minutes, seconds, microseconds) =&gt; {
+                <span class="kw">let </span>duration = time03::Duration::days(days.into())
+                    + time03::Duration::hours(hours.into())
+                    + time03::Duration::minutes(minutes.into())
+                    + time03::Duration::seconds(seconds.into())
+                    + time03::Duration::microseconds(microseconds.into());
+                <span class="prelude-val">Ok</span>(ParseIr {
+                    value: Value::Time(is_neg, days, hours, minutes, seconds, microseconds),
+                    output: <span class="kw">if </span>is_neg { -duration } <span class="kw">else </span>{ duration },
                 })
             }
-            <span class="ident">Value::Bytes</span>(<span class="ident">val_bytes</span>) =&gt; {
-                <span class="comment">// Parse the string using `parse_mysql_time_string`</span>
-                <span class="comment">// instead of `parse_mysql_time_string_with_time` here,</span>
-                <span class="comment">// as it may contain an hour value that&#39;s outside of a day&#39;s normal 0-23 hour range.</span>
-                <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parse_mysql_time_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">val_bytes</span>) {
-                    <span class="prelude-val">Some</span>((<span class="ident">is_neg</span>, <span class="ident">hours</span>, <span class="ident">minutes</span>, <span class="ident">seconds</span>, <span class="ident">microseconds</span>)) =&gt; {
-                        <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">time03::Duration::hours</span>(<span class="ident">hours</span>.<span class="ident">into</span>())
-                            <span class="op">+</span> <span class="ident">time03::Duration::minutes</span>(<span class="ident">minutes</span>.<span class="ident">into</span>())
-                            <span class="op">+</span> <span class="ident">time03::Duration::seconds</span>(<span class="ident">seconds</span>.<span class="ident">into</span>())
-                            <span class="op">+</span> <span class="ident">time03::Duration::microseconds</span>(<span class="ident">microseconds</span>.<span class="ident">into</span>());
-                        <span class="kw">if</span> <span class="ident">is_neg</span> {
-                            <span class="op">-</span><span class="ident">duration</span>
-                        } <span class="kw">else</span> {
-                            <span class="ident">duration</span>
+            Value::Bytes(val_bytes) =&gt; {
+                <span class="comment">// Parse the string using `parse_mysql_time_string`
+                // instead of `parse_mysql_time_string_with_time` here,
+                // as it may contain an hour value that&#39;s outside of a day&#39;s normal 0-23 hour range.
+                </span><span class="kw">let </span>duration = <span class="kw">match </span>parse_mysql_time_string(<span class="kw-2">&amp;*</span>val_bytes) {
+                    <span class="prelude-val">Some</span>((is_neg, hours, minutes, seconds, microseconds)) =&gt; {
+                        <span class="kw">let </span>duration = time03::Duration::hours(hours.into())
+                            + time03::Duration::minutes(minutes.into())
+                            + time03::Duration::seconds(seconds.into())
+                            + time03::Duration::microseconds(microseconds.into());
+                        <span class="kw">if </span>is_neg {
+                            -duration
+                        } <span class="kw">else </span>{
+                            duration
                         }
                     }
-                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">val_bytes</span>))),
+                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(FromValueError(Value::Bytes(val_bytes))),
                 };
-                <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                    <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">val_bytes</span>),
-                    <span class="ident">output</span>: <span class="ident">duration</span>,
+                <span class="prelude-val">Ok</span>(ParseIr {
+                    value: Value::Bytes(val_bytes),
+                    output: duration,
                 })
             }
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">time03::Duration</span> {
-        <span class="self">self</span>.<span class="ident">output</span>
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; time03::Duration {
+        <span class="self">self</span>.output
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PrimitiveDateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">PrimitiveDateTime</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">Value::Date</span>(
-            <span class="ident">x</span>.<span class="ident">year</span>() <span class="kw">as</span> <span class="ident">u16</span>,
-            <span class="ident">x</span>.<span class="ident">month</span>() <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">x</span>.<span class="ident">day</span>(),
-            <span class="ident">x</span>.<span class="ident">hour</span>(),
-            <span class="ident">x</span>.<span class="ident">minute</span>(),
-            <span class="ident">x</span>.<span class="ident">second</span>(),
-            <span class="ident">x</span>.<span class="ident">microsecond</span>(),
+<span class="kw">impl </span>From&lt;PrimitiveDateTime&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: PrimitiveDateTime) -&gt; Value {
+        Value::Date(
+            x.year() <span class="kw">as </span>u16,
+            x.month() <span class="kw">as </span>u8,
+            x.day(),
+            x.hour(),
+            x.minute(),
+            x.second(),
+            x.microsecond(),
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">Date</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">Value::Date</span>(<span class="ident">x</span>.<span class="ident">year</span>() <span class="kw">as</span> <span class="ident">u16</span>, <span class="ident">x</span>.<span class="ident">month</span>() <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">x</span>.<span class="ident">day</span>(), <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
+<span class="kw">impl </span>From&lt;Date&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: Date) -&gt; Value {
+        Value::Date(x.year() <span class="kw">as </span>u16, x.month() <span class="kw">as </span>u8, x.day(), <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">Time</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">Value::Time</span>(
+<span class="kw">impl </span>From&lt;Time&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: Time) -&gt; Value {
+        Value::Time(
             <span class="bool-val">false</span>,
             <span class="number">0</span>,
-            <span class="ident">x</span>.<span class="ident">hour</span>() <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">x</span>.<span class="ident">minute</span>() <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">x</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">x</span>.<span class="ident">microsecond</span>(),
+            x.hour() <span class="kw">as </span>u8,
+            x.minute() <span class="kw">as </span>u8,
+            x.second() <span class="kw">as </span>u8,
+            x.microsecond(),
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">time03::Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw-2">mut</span> <span class="ident">x</span>: <span class="ident">time03::Duration</span>) -&gt; <span class="ident">Value</span> {
-        <span class="kw">let</span> <span class="ident">negative</span> <span class="op">=</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="ident">time03::Duration::ZERO</span>;
+<span class="kw">impl </span>From&lt;time03::Duration&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(<span class="kw-2">mut </span>x: time03::Duration) -&gt; Value {
+        <span class="kw">let </span>negative = x &lt; time03::Duration::ZERO;
 
-        <span class="kw">if</span> <span class="ident">negative</span> {
-            <span class="ident">x</span> <span class="op">=</span> <span class="op">-</span><span class="ident">x</span>;
+        <span class="kw">if </span>negative {
+            x = -x;
         }
 
-        <span class="kw">let</span> <span class="ident">days</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">whole_days</span>() <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="ident">x</span> <span class="op">=</span> <span class="ident">x</span> <span class="op">-</span> <span class="ident">time03::Duration::days</span>(<span class="ident">x</span>.<span class="ident">whole_days</span>());
-        <span class="kw">let</span> <span class="ident">hours</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">whole_hours</span>() <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">x</span> <span class="op">=</span> <span class="ident">x</span> <span class="op">-</span> <span class="ident">time03::Duration::hours</span>(<span class="ident">x</span>.<span class="ident">whole_hours</span>());
-        <span class="kw">let</span> <span class="ident">minutes</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">whole_minutes</span>() <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">x</span> <span class="op">=</span> <span class="ident">x</span> <span class="op">-</span> <span class="ident">time03::Duration::minutes</span>(<span class="ident">x</span>.<span class="ident">whole_minutes</span>());
-        <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">whole_seconds</span>() <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">x</span> <span class="op">=</span> <span class="ident">x</span> <span class="op">-</span> <span class="ident">time03::Duration::seconds</span>(<span class="ident">x</span>.<span class="ident">whole_seconds</span>());
-        <span class="kw">let</span> <span class="ident">microseconds</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">whole_microseconds</span>() <span class="kw">as</span> <span class="ident">u32</span>;
+        <span class="kw">let </span>days = x.whole_days() <span class="kw">as </span>u32;
+        x = x - time03::Duration::days(x.whole_days());
+        <span class="kw">let </span>hours = x.whole_hours() <span class="kw">as </span>u8;
+        x = x - time03::Duration::hours(x.whole_hours());
+        <span class="kw">let </span>minutes = x.whole_minutes() <span class="kw">as </span>u8;
+        x = x - time03::Duration::minutes(x.whole_minutes());
+        <span class="kw">let </span>seconds = x.whole_seconds() <span class="kw">as </span>u8;
+        x = x - time03::Duration::seconds(x.whole_seconds());
+        <span class="kw">let </span>microseconds = x.whole_microseconds() <span class="kw">as </span>u32;
 
-        <span class="ident">Value::Time</span>(<span class="ident">negative</span>, <span class="ident">days</span>, <span class="ident">hours</span>, <span class="ident">minutes</span>, <span class="ident">seconds</span>, <span class="ident">microseconds</span>)
+        Value::Time(negative, days, hours, minutes, seconds, microseconds)
     }
 }
 
-<span class="macro">impl_from_value!</span>(<span class="ident">PrimitiveDateTime</span>, <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">PrimitiveDateTime</span><span class="op">&gt;</span>);
-<span class="macro">impl_from_value!</span>(<span class="ident">Date</span>, <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span>);
-<span class="macro">impl_from_value!</span>(<span class="ident">Time</span>, <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span>);
-<span class="macro">impl_from_value!</span>(<span class="ident">time03::Duration</span>, <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">time03::Duration</span><span class="op">&gt;</span>);
+<span class="macro">impl_from_value!</span>(PrimitiveDateTime, ParseIr&lt;PrimitiveDateTime&gt;);
+<span class="macro">impl_from_value!</span>(Date, ParseIr&lt;Date&gt;);
+<span class="macro">impl_from_value!</span>(Time, ParseIr&lt;Time&gt;);
+<span class="macro">impl_from_value!</span>(time03::Duration, ParseIr&lt;time03::Duration&gt;);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">proptest::prelude</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">time03::error::ParseFromDescription</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>proptest::prelude::<span class="kw-2">*</span>;
+    <span class="kw">use </span>time03::error::ParseFromDescription;
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="macro">proptest!</span> {
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">parse_mysql_time_string_doesnt_crash</span>(<span class="ident">s</span> <span class="kw">in</span> <span class="string">r&quot;\PC*&quot;</span>) {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">parse_mysql_time_string_with_time</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>());
+    <span class="macro">proptest! </span>{
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>parse_mysql_time_string_doesnt_crash(s <span class="kw">in </span><span class="string">r&quot;\PC*&quot;</span>) {
+            <span class="kw">let _ </span>= parse_mysql_time_string_with_time(s.as_bytes());
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">parse_mysql_datetime_string_doesnt_crash</span>(<span class="ident">s</span> <span class="kw">in</span> <span class="string">r&quot;\PC*&quot;</span>) {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">parse_mysql_datetime_string_with_time</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>());
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>parse_mysql_datetime_string_doesnt_crash(s <span class="kw">in </span><span class="string">r&quot;\PC*&quot;</span>) {
+            <span class="kw">let _ </span>= parse_mysql_datetime_string_with_time(s.as_bytes());
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">parse_mysql_time_string_parses_correctly</span>(
-            <span class="ident">h</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">60</span>,
-            <span class="ident">i</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">60</span>,
-            <span class="ident">s</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">60</span>,
-            <span class="ident">have_us</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">2</span>,
-            <span class="ident">us</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">1000000</span>,
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>parse_mysql_time_string_parses_correctly(
+            h <span class="kw">in </span><span class="number">0u32</span>..<span class="number">60</span>,
+            i <span class="kw">in </span><span class="number">0u32</span>..<span class="number">60</span>,
+            s <span class="kw">in </span><span class="number">0u32</span>..<span class="number">60</span>,
+            have_us <span class="kw">in </span><span class="number">0</span>..<span class="number">2</span>,
+            us <span class="kw">in </span><span class="number">0u32</span>..<span class="number">1000000</span>,
         ) {
-            <span class="kw">let</span> <span class="ident">time_string</span> <span class="op">=</span> <span class="macro">format!</span>(
+            <span class="kw">let </span>time_string = <span class="macro">format!</span>(
                 <span class="string">&quot;{:02}:{:02}:{:02}{}&quot;</span>,
-                <span class="ident">h</span>, <span class="ident">i</span>, <span class="ident">s</span>,
-                <span class="kw">if</span> <span class="ident">have_us</span> <span class="op">==</span> <span class="number">1</span> {
-                    <span class="macro">format!</span>(<span class="string">&quot;.{:06}&quot;</span>, <span class="ident">us</span>).<span class="ident">trim_end_matches</span>(<span class="string">&#39;0&#39;</span>).<span class="ident">to_owned</span>()
-                } <span class="kw">else</span> {
-                    <span class="string">&quot;&quot;</span>.<span class="ident">into</span>()
+                h, i, s,
+                <span class="kw">if </span>have_us == <span class="number">1 </span>{
+                    <span class="macro">format!</span>(<span class="string">&quot;.{:06}&quot;</span>, us).trim_end_matches(<span class="string">&#39;0&#39;</span>).to_owned()
+                } <span class="kw">else </span>{
+                    <span class="string">&quot;&quot;</span>.into()
                 }
             );
 
-            <span class="kw">match</span> <span class="ident">parse_mysql_time_string_with_time</span>(<span class="ident">time_string</span>.<span class="ident">as_bytes</span>()) {
-                <span class="prelude-val">Ok</span>(<span class="ident">time</span>) =&gt; {
-                    <span class="comment">// If `time` successfully parsed the string,</span>
-                    <span class="comment">// then let&#39;s ensure it matches the values used to create that time string.</span>
+            <span class="kw">match </span>parse_mysql_time_string_with_time(time_string.as_bytes()) {
+                <span class="prelude-val">Ok</span>(time) =&gt; {
+                    <span class="comment">// If `time` successfully parsed the string,
+                    // then let&#39;s ensure it matches the values used to create that time string.
 
-                    <span class="comment">// `time` and other C-like `strptime` based parsers have no way of parsing</span>
-                    <span class="comment">// microseconds from the time string. As such, we ignore them entirely.</span>
-                    <span class="macro">assert_eq!</span>(
+                    // `time` and other C-like `strptime` based parsers have no way of parsing
+                    // microseconds from the time string. As such, we ignore them entirely.
+                    </span><span class="macro">assert_eq!</span>(
                         (
-                            <span class="ident">time</span>.<span class="ident">hour</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                            <span class="ident">time</span>.<span class="ident">minute</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                            <span class="ident">time</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                            <span class="ident">time</span>.<span class="ident">microsecond</span>() <span class="kw">as</span> <span class="ident">u32</span>,
+                            time.hour() <span class="kw">as </span>u32,
+                            time.minute() <span class="kw">as </span>u32,
+                            time.second() <span class="kw">as </span>u32,
+                            time.microsecond() <span class="kw">as </span>u32,
                         ),
-                        (<span class="ident">h</span>, <span class="ident">i</span>, <span class="ident">s</span>, <span class="kw">if</span> <span class="ident">have_us</span> <span class="op">==</span> <span class="number">1</span> { <span class="ident">us</span> } <span class="kw">else</span> { <span class="number">0</span> }));
+                        (h, i, s, <span class="kw">if </span>have_us == <span class="number">1 </span>{ us } <span class="kw">else </span>{ <span class="number">0 </span>}));
                 },
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                    <span class="comment">// If `time` failed to parse the string,</span>
-                    <span class="comment">// then let&#39;s check if we passed an invalid value based on the error received,</span>
-                    <span class="comment">// and fail the test if the string should have parsed successfully.</span>
-                    <span class="comment">// Any commented out checks are simply to avoid having the compiler show</span>
-                    <span class="comment">// &#39;comparison is useless due to type limits&#39; warnings.</span>
-                    <span class="kw">match</span> <span class="ident">err</span> {
-                        <span class="ident">Parse::ParseFromDescription</span>(<span class="ident">ParseFromDescription::InvalidComponent</span>(<span class="string">&quot;second&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*s &lt; 0 || */</span><span class="ident">s</span> <span class="op">&gt;</span> <span class="number">59</span>),
-                        <span class="ident">Parse::ParseFromDescription</span>(<span class="ident">ParseFromDescription::InvalidComponent</span>(<span class="string">&quot;minute&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span><span class="ident">i</span> <span class="op">&gt;</span> <span class="number">59</span>),
-                        <span class="comment">// For InvalidHour, only check if the randomized hour value is within</span>
-                        <span class="comment">// 0-23 instead of MySQL `TIME`&#39;s full range of -838-838,</span>
-                        <span class="comment">// since we don&#39;t generate values that low or high,</span>
-                        <span class="comment">// and should be parsed with time::Duration instead.</span>
-                        <span class="ident">Parse::ParseFromDescription</span>(<span class="ident">ParseFromDescription::InvalidComponent</span>(<span class="string">&quot;hour&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*h &lt; 0 || */</span><span class="ident">h</span> <span class="op">&gt;</span> <span class="number">23</span>),
-                        <span class="ident">Parse::TryFromParsed</span>(<span class="ident">TryFromParsed::ComponentRange</span>(<span class="kw">_</span>))  <span class="op">|</span>
-                        <span class="ident">Parse::TryFromParsed</span>(<span class="ident">TryFromParsed::InsufficientInformation</span>) =&gt; {
-                            <span class="comment">// We may receive an ComponentOutOfRange or InsufficientInformation</span>
-                            <span class="comment">// error for a few reasons, such as the format string being incorrect,</span>
-                            <span class="comment">// the format of the time string being incorrect,</span>
-                            <span class="comment">// or in some cases, when a value is out of range,</span>
-                            <span class="comment">// such as when trying to parse a hour value of</span>
-                            <span class="comment">// less than zero or greater than 23.</span>
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="comment">// If `time` failed to parse the string,
+                    // then let&#39;s check if we passed an invalid value based on the error received,
+                    // and fail the test if the string should have parsed successfully.
+                    // Any commented out checks are simply to avoid having the compiler show
+                    // &#39;comparison is useless due to type limits&#39; warnings.
+                    </span><span class="kw">match </span>err {
+                        Parse::ParseFromDescription(ParseFromDescription::InvalidComponent(<span class="string">&quot;second&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*s &lt; 0 || */</span>s &gt; <span class="number">59</span>),
+                        Parse::ParseFromDescription(ParseFromDescription::InvalidComponent(<span class="string">&quot;minute&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span>i &gt; <span class="number">59</span>),
+                        <span class="comment">// For InvalidHour, only check if the randomized hour value is within
+                        // 0-23 instead of MySQL `TIME`&#39;s full range of -838-838,
+                        // since we don&#39;t generate values that low or high,
+                        // and should be parsed with time::Duration instead.
+                        </span>Parse::ParseFromDescription(ParseFromDescription::InvalidComponent(<span class="string">&quot;hour&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*h &lt; 0 || */</span>h &gt; <span class="number">23</span>),
+                        Parse::TryFromParsed(TryFromParsed::ComponentRange(<span class="kw">_</span>))  |
+                        Parse::TryFromParsed(TryFromParsed::InsufficientInformation) =&gt; {
+                            <span class="comment">// We may receive an ComponentOutOfRange or InsufficientInformation
+                            // error for a few reasons, such as the format string being incorrect,
+                            // the format of the time string being incorrect,
+                            // or in some cases, when a value is out of range,
+                            // such as when trying to parse a hour value of
+                            // less than zero or greater than 23.
 
-                            <span class="comment">// Try creating `Date` and `Time` values from the values directly,</span>
-                            <span class="comment">// and catch any `ComponentRangeError` that they might return.</span>
+                            // Try creating `Date` and `Time` values from the values directly,
+                            // and catch any `ComponentRangeError` that they might return.
 
-                            <span class="comment">// Seeing as we have no way to tell which value</span>
-                            <span class="comment">// is rejected if we pass them in all at once,</span>
-                            <span class="comment">// we call `try_from_ymd` and `try_from_hms_micro`</span>
-                            <span class="comment">// for each value separately.</span>
+                            // Seeing as we have no way to tell which value
+                            // is rejected if we pass them in all at once,
+                            // we call `try_from_ymd` and `try_from_hms_micro`
+                            // for each value separately.
 
-                            <span class="kw">if</span> <span class="ident">Time::from_hms_micro</span>(<span class="ident">h</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="ident">is_err</span>() {
-                                <span class="macro">assert!</span>(<span class="comment">/*h &lt; 0 || */</span><span class="ident">h</span> <span class="op">&gt;</span> <span class="number">23</span>);
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">Time::from_hms_micro</span>(<span class="number">0</span>, <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="ident">is_err</span>() {
-                                <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span><span class="ident">i</span> <span class="op">&gt;</span> <span class="number">59</span>);
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">Time::from_hms_micro</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="ident">s</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">0</span>).<span class="ident">is_err</span>() {
-                                <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span><span class="ident">i</span> <span class="op">&gt;</span> <span class="number">59</span>);
+                            </span><span class="kw">if </span>Time::from_hms_micro(h <span class="kw">as </span>u8, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).is_err() {
+                                <span class="macro">assert!</span>(<span class="comment">/*h &lt; 0 || */</span>h &gt; <span class="number">23</span>);
+                            } <span class="kw">else if </span>Time::from_hms_micro(<span class="number">0</span>, i <span class="kw">as </span>u8, <span class="number">0</span>, <span class="number">0</span>).is_err() {
+                                <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span>i &gt; <span class="number">59</span>);
+                            } <span class="kw">else if </span>Time::from_hms_micro(<span class="number">0</span>, <span class="number">0</span>, s <span class="kw">as </span>u8, <span class="number">0</span>).is_err() {
+                                <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span>i &gt; <span class="number">59</span>);
                             }
 
-                            <span class="comment">// If each of the values passed separately, then the only reason we</span>
-                            <span class="comment">// were given an error is because the date or time itself is invalid,</span>
-                            <span class="comment">// i.e. February 30th, November 31st, etc.</span>
-                            <span class="comment">// We have no way of validating if the date or time is actually</span>
-                            <span class="comment">// invalid or not, so we just assume it&#39;s handled correctly</span>
-                            <span class="comment">// within `time` if all values could be handled separately.</span>
-                        },
-                        <span class="ident">err</span> =&gt; {
-                            <span class="comment">// Panic for any other error as well, seeing as the others either</span>
-                            <span class="comment">// would never happen, or the time string format must be incorrect,</span>
-                            <span class="comment">// neither of which should ever happen.</span>
-                            <span class="macro">panic!</span>(<span class="string">&quot;Failed to parse time `{}` due to an unknown reason. {}&quot;</span>, <span class="ident">time_string</span>, <span class="ident">err</span>);
+                            <span class="comment">// If each of the values passed separately, then the only reason we
+                            // were given an error is because the date or time itself is invalid,
+                            // i.e. February 30th, November 31st, etc.
+                            // We have no way of validating if the date or time is actually
+                            // invalid or not, so we just assume it&#39;s handled correctly
+                            // within `time` if all values could be handled separately.
+                        </span>},
+                        err =&gt; {
+                            <span class="comment">// Panic for any other error as well, seeing as the others either
+                            // would never happen, or the time string format must be incorrect,
+                            // neither of which should ever happen.
+                            </span><span class="macro">panic!</span>(<span class="string">&quot;Failed to parse time `{}` due to an unknown reason. {}&quot;</span>, time_string, err);
                         }
                     }
                 }
             }
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">parse_mysql_datetime_string_parses_correctly</span>(
-            <span class="ident">y</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">10000</span>,
-            <span class="ident">m</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">12</span>,
-            <span class="ident">d</span> <span class="kw">in</span> <span class="number">1u32</span>..<span class="number">32</span>,
-            <span class="ident">h</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">60</span>,
-            <span class="ident">i</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">60</span>,
-            <span class="ident">s</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">60</span>,
-            <span class="ident">have_us</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">2</span>,
-            <span class="ident">us</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">1000000</span>,
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>parse_mysql_datetime_string_parses_correctly(
+            y <span class="kw">in </span><span class="number">0u32</span>..<span class="number">10000</span>,
+            m <span class="kw">in </span><span class="number">0u32</span>..<span class="number">12</span>,
+            d <span class="kw">in </span><span class="number">1u32</span>..<span class="number">32</span>,
+            h <span class="kw">in </span><span class="number">0u32</span>..<span class="number">60</span>,
+            i <span class="kw">in </span><span class="number">0u32</span>..<span class="number">60</span>,
+            s <span class="kw">in </span><span class="number">0u32</span>..<span class="number">60</span>,
+            have_us <span class="kw">in </span><span class="number">0</span>..<span class="number">2</span>,
+            us <span class="kw">in </span><span class="number">0u32</span>..<span class="number">1000000</span>,
         ) {
-            <span class="kw">let</span> <span class="ident">time_string</span> <span class="op">=</span> <span class="macro">format!</span>(
+            <span class="kw">let </span>time_string = <span class="macro">format!</span>(
                 <span class="string">&quot;{:04}-{:02}-{:02} {:02}:{:02}:{:02}{}&quot;</span>,
-                <span class="ident">y</span>, <span class="ident">m</span>, <span class="ident">d</span>, <span class="ident">h</span>, <span class="ident">i</span>, <span class="ident">s</span>,
-                <span class="kw">if</span> <span class="ident">have_us</span> <span class="op">==</span> <span class="number">1</span> {
-                    <span class="macro">format!</span>(<span class="string">&quot;.{:06}&quot;</span>, <span class="ident">us</span>).<span class="ident">trim_end_matches</span>(<span class="string">&#39;0&#39;</span>).<span class="ident">to_owned</span>()
-                } <span class="kw">else</span> {
-                    <span class="string">&quot;&quot;</span>.<span class="ident">into</span>()
+                y, m, d, h, i, s,
+                <span class="kw">if </span>have_us == <span class="number">1 </span>{
+                    <span class="macro">format!</span>(<span class="string">&quot;.{:06}&quot;</span>, us).trim_end_matches(<span class="string">&#39;0&#39;</span>).to_owned()
+                } <span class="kw">else </span>{
+                    <span class="string">&quot;&quot;</span>.into()
                 }
             );
 
-            <span class="kw">match</span> <span class="ident">parse_mysql_datetime_string_with_time</span>(<span class="ident">time_string</span>.<span class="ident">as_bytes</span>()) {
-                <span class="prelude-val">Ok</span>(<span class="ident">datetime</span>) =&gt; {
-                    <span class="comment">// If `time` successfully parsed the string,</span>
-                    <span class="comment">// then let&#39;s ensure it matches the values used to create that time string.</span>
+            <span class="kw">match </span>parse_mysql_datetime_string_with_time(time_string.as_bytes()) {
+                <span class="prelude-val">Ok</span>(datetime) =&gt; {
+                    <span class="comment">// If `time` successfully parsed the string,
+                    // then let&#39;s ensure it matches the values used to create that time string.
 
-                    <span class="comment">// `time` and other C-like `strptime` based parsers have no way of parsing</span>
-                    <span class="comment">// microseconds from the time string. As such, we ignore them entirely.</span>
-                    <span class="macro">assert_eq!</span>(
+                    // `time` and other C-like `strptime` based parsers have no way of parsing
+                    // microseconds from the time string. As such, we ignore them entirely.
+                    </span><span class="macro">assert_eq!</span>(
                         (
-                            <span class="ident">datetime</span>.<span class="ident">year</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                            <span class="ident">datetime</span>.<span class="ident">month</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                            <span class="ident">datetime</span>.<span class="ident">day</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                            <span class="ident">datetime</span>.<span class="ident">hour</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                            <span class="ident">datetime</span>.<span class="ident">minute</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                            <span class="ident">datetime</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                            <span class="ident">datetime</span>.<span class="ident">microsecond</span>() <span class="kw">as</span> <span class="ident">u32</span>,
+                            datetime.year() <span class="kw">as </span>u32,
+                            datetime.month() <span class="kw">as </span>u32,
+                            datetime.day() <span class="kw">as </span>u32,
+                            datetime.hour() <span class="kw">as </span>u32,
+                            datetime.minute() <span class="kw">as </span>u32,
+                            datetime.second() <span class="kw">as </span>u32,
+                            datetime.microsecond() <span class="kw">as </span>u32,
                         ),
-                        (<span class="ident">y</span>, <span class="ident">m</span>, <span class="ident">d</span>, <span class="ident">h</span>, <span class="ident">i</span>, <span class="ident">s</span>, <span class="kw">if</span> <span class="ident">have_us</span> <span class="op">==</span> <span class="number">1</span> { <span class="ident">us</span> } <span class="kw">else</span> { <span class="number">0</span> }));
+                        (y, m, d, h, i, s, <span class="kw">if </span>have_us == <span class="number">1 </span>{ us } <span class="kw">else </span>{ <span class="number">0 </span>}));
                 },
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                    <span class="comment">// If `time` failed to parse the string,</span>
-                    <span class="comment">// then let&#39;s check if we passed an invalid value based on the error received,</span>
-                    <span class="comment">// and fail the test if the string should have parsed successfully.</span>
-                    <span class="comment">// Any commented out checks are simply to avoid having the compiler show</span>
-                    <span class="comment">// &#39;comparison is useless due to type limits&#39; warnings.</span>
-                    <span class="kw">match</span> <span class="ident">err</span> {
-                        <span class="ident">Parse::ParseFromDescription</span>(<span class="ident">ParseFromDescription::InvalidComponent</span>(<span class="string">&quot;second&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*s &lt; 0 || */</span><span class="ident">s</span> <span class="op">&gt;</span> <span class="number">59</span>),
-                        <span class="ident">Parse::ParseFromDescription</span>(<span class="ident">ParseFromDescription::InvalidComponent</span>(<span class="string">&quot;minute&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span><span class="ident">i</span> <span class="op">&gt;</span> <span class="number">59</span>),
-                        <span class="comment">// For InvalidHour, only check if the randomized hour value is within</span>
-                        <span class="comment">// 0-23 instead of MySQL `TIME`&#39;s full range of -838-838,</span>
-                        <span class="comment">// since we don&#39;t generate values that low or high,</span>
-                        <span class="comment">// and should be parsed with time::Duration instead.</span>
-                        <span class="ident">Parse::ParseFromDescription</span>(<span class="ident">ParseFromDescription::InvalidComponent</span>(<span class="string">&quot;hour&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*h &lt; 0 || */</span><span class="ident">h</span> <span class="op">&gt;</span> <span class="number">23</span>),
-                        <span class="ident">Parse::ParseFromDescription</span>(<span class="ident">ParseFromDescription::InvalidComponent</span>(<span class="string">&quot;dayofmonth&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="op">!</span>(<span class="number">1</span>..<span class="op">=</span><span class="number">31</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>)),
-                        <span class="ident">Parse::ParseFromDescription</span>(<span class="ident">ParseFromDescription::InvalidComponent</span>(<span class="string">&quot;month&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="ident">m</span> <span class="op">&lt;</span> <span class="number">1000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">m</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">12</span>),
-                        <span class="comment">// For InvalidYear, ensure that the year isn&#39;t also 0,</span>
-                        <span class="comment">// which is a valid value with non-strict-mode MySQL.</span>
-                        <span class="ident">Parse::ParseFromDescription</span>(<span class="ident">ParseFromDescription::InvalidComponent</span>(<span class="string">&quot;year&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="ident">y</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span>(<span class="number">1000</span>..<span class="op">=</span><span class="number">9999</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">y</span>)),
-                        <span class="ident">Parse::TryFromParsed</span>(<span class="ident">TryFromParsed::ComponentRange</span>(<span class="kw">_</span>))  <span class="op">|</span>
-                        <span class="ident">Parse::TryFromParsed</span>(<span class="ident">TryFromParsed::InsufficientInformation</span>) =&gt; {
-                            <span class="comment">// We may receive an ComponentOutOfRange or InsufficientInformation</span>
-                            <span class="comment">// error for a few reasons, such as the format string being incorrect,</span>
-                            <span class="comment">// the format of the time string being incorrect,</span>
-                            <span class="comment">// or in some cases, when a value is out of range,</span>
-                            <span class="comment">// such as when trying to parse a hour value of</span>
-                            <span class="comment">// less than zero or greater than 23.</span>
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="comment">// If `time` failed to parse the string,
+                    // then let&#39;s check if we passed an invalid value based on the error received,
+                    // and fail the test if the string should have parsed successfully.
+                    // Any commented out checks are simply to avoid having the compiler show
+                    // &#39;comparison is useless due to type limits&#39; warnings.
+                    </span><span class="kw">match </span>err {
+                        Parse::ParseFromDescription(ParseFromDescription::InvalidComponent(<span class="string">&quot;second&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*s &lt; 0 || */</span>s &gt; <span class="number">59</span>),
+                        Parse::ParseFromDescription(ParseFromDescription::InvalidComponent(<span class="string">&quot;minute&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span>i &gt; <span class="number">59</span>),
+                        <span class="comment">// For InvalidHour, only check if the randomized hour value is within
+                        // 0-23 instead of MySQL `TIME`&#39;s full range of -838-838,
+                        // since we don&#39;t generate values that low or high,
+                        // and should be parsed with time::Duration instead.
+                        </span>Parse::ParseFromDescription(ParseFromDescription::InvalidComponent(<span class="string">&quot;hour&quot;</span>)) =&gt; <span class="macro">assert!</span>(<span class="comment">/*h &lt; 0 || */</span>h &gt; <span class="number">23</span>),
+                        Parse::ParseFromDescription(ParseFromDescription::InvalidComponent(<span class="string">&quot;dayofmonth&quot;</span>)) =&gt; <span class="macro">assert!</span>(!(<span class="number">1</span>..=<span class="number">31</span>).contains(<span class="kw-2">&amp;</span>d)),
+                        Parse::ParseFromDescription(ParseFromDescription::InvalidComponent(<span class="string">&quot;month&quot;</span>)) =&gt; <span class="macro">assert!</span>(m &lt; <span class="number">1000 </span>|| m &lt;= <span class="number">12</span>),
+                        <span class="comment">// For InvalidYear, ensure that the year isn&#39;t also 0,
+                        // which is a valid value with non-strict-mode MySQL.
+                        </span>Parse::ParseFromDescription(ParseFromDescription::InvalidComponent(<span class="string">&quot;year&quot;</span>)) =&gt; <span class="macro">assert!</span>(y != <span class="number">0 </span>&amp;&amp; !(<span class="number">1000</span>..=<span class="number">9999</span>).contains(<span class="kw-2">&amp;</span>y)),
+                        Parse::TryFromParsed(TryFromParsed::ComponentRange(<span class="kw">_</span>))  |
+                        Parse::TryFromParsed(TryFromParsed::InsufficientInformation) =&gt; {
+                            <span class="comment">// We may receive an ComponentOutOfRange or InsufficientInformation
+                            // error for a few reasons, such as the format string being incorrect,
+                            // the format of the time string being incorrect,
+                            // or in some cases, when a value is out of range,
+                            // such as when trying to parse a hour value of
+                            // less than zero or greater than 23.
 
-                            <span class="comment">// Try creating `Date` and `Time` values from the values directly,</span>
-                            <span class="comment">// and catch any `ComponentRangeError` that they might return.</span>
+                            // Try creating `Date` and `Time` values from the values directly,
+                            // and catch any `ComponentRangeError` that they might return.
 
-                            <span class="comment">// Seeing as we have no way to tell which value</span>
-                            <span class="comment">// is rejected if we pass them in all at once,</span>
-                            <span class="comment">// we call `try_from_ymd` and `try_from_hms_micro`</span>
-                            <span class="comment">// for each value separately.</span>
+                            // Seeing as we have no way to tell which value
+                            // is rejected if we pass them in all at once,
+                            // we call `try_from_ymd` and `try_from_hms_micro`
+                            // for each value separately.
 
-                            <span class="kw">if</span> <span class="ident">Date::from_calendar_date</span>(<span class="ident">y</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">time03::Month::January</span>, <span class="number">1</span>).<span class="ident">is_err</span>() {
-                                <span class="macro">assert!</span>(<span class="ident">y</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span>(<span class="number">1000</span>..<span class="op">=</span><span class="number">9999</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">y</span>));
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">time03::Month::try_from</span>(<span class="ident">m</span> <span class="kw">as</span> <span class="ident">u8</span>).<span class="ident">is_err</span>() {
-                                <span class="macro">assert!</span>(<span class="ident">m</span> <span class="op">&lt;</span> <span class="number">1000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">m</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">12</span>);
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">Date::from_calendar_date</span>(<span class="number">0</span>, <span class="ident">time03::Month::January</span>, <span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>).<span class="ident">is_err</span>() {
-                                <span class="macro">assert!</span>(<span class="op">!</span>(<span class="number">1</span>..<span class="op">=</span><span class="number">31</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>));
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">Time::from_hms_micro</span>(<span class="ident">h</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="ident">is_err</span>() {
-                                <span class="macro">assert!</span>(<span class="comment">/*h &lt; 0 || */</span><span class="ident">h</span> <span class="op">&gt;</span> <span class="number">23</span>);
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">Time::from_hms_micro</span>(<span class="number">0</span>, <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="ident">is_err</span>() {
-                                <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span><span class="ident">i</span> <span class="op">&gt;</span> <span class="number">59</span>);
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">Time::from_hms_micro</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="ident">s</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">0</span>).<span class="ident">is_err</span>() {
-                                <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span><span class="ident">i</span> <span class="op">&gt;</span> <span class="number">59</span>);
+                            </span><span class="kw">if </span>Date::from_calendar_date(y <span class="kw">as </span>i32, time03::Month::January, <span class="number">1</span>).is_err() {
+                                <span class="macro">assert!</span>(y != <span class="number">0 </span>&amp;&amp; !(<span class="number">1000</span>..=<span class="number">9999</span>).contains(<span class="kw-2">&amp;</span>y));
+                            } <span class="kw">else if </span>time03::Month::try_from(m <span class="kw">as </span>u8).is_err() {
+                                <span class="macro">assert!</span>(m &lt; <span class="number">1000 </span>|| m &lt;= <span class="number">12</span>);
+                            } <span class="kw">else if </span>Date::from_calendar_date(<span class="number">0</span>, time03::Month::January, d <span class="kw">as </span>u8).is_err() {
+                                <span class="macro">assert!</span>(!(<span class="number">1</span>..=<span class="number">31</span>).contains(<span class="kw-2">&amp;</span>d));
+                            } <span class="kw">else if </span>Time::from_hms_micro(h <span class="kw">as </span>u8, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).is_err() {
+                                <span class="macro">assert!</span>(<span class="comment">/*h &lt; 0 || */</span>h &gt; <span class="number">23</span>);
+                            } <span class="kw">else if </span>Time::from_hms_micro(<span class="number">0</span>, i <span class="kw">as </span>u8, <span class="number">0</span>, <span class="number">0</span>).is_err() {
+                                <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span>i &gt; <span class="number">59</span>);
+                            } <span class="kw">else if </span>Time::from_hms_micro(<span class="number">0</span>, <span class="number">0</span>, s <span class="kw">as </span>u8, <span class="number">0</span>).is_err() {
+                                <span class="macro">assert!</span>(<span class="comment">/*i &lt; 0 || */</span>i &gt; <span class="number">59</span>);
                             }
 
-                            <span class="comment">// If each of the values passed separately, then the only reason we</span>
-                            <span class="comment">// were given an error is because the date or time itself is invalid,</span>
-                            <span class="comment">// i.e. February 30th, November 31st, etc.</span>
-                            <span class="comment">// We have no way of validating if the date or time is actually</span>
-                            <span class="comment">// invalid or not, so we just assume it&#39;s handled correctly</span>
-                            <span class="comment">// within `time` if all values could be handled separately.</span>
-                        },
-                        <span class="ident">err</span> =&gt; {
-                            <span class="comment">// Panic for any other error as well, seeing as the others either</span>
-                            <span class="comment">// would never happen, or the time string format must be incorrect,</span>
-                            <span class="comment">// neither of which should ever happen.</span>
-                            <span class="macro">panic!</span>(<span class="string">&quot;Failed to parse time `{}` due to an unknown reason. {}&quot;</span>, <span class="ident">time_string</span>, <span class="ident">err</span>);
+                            <span class="comment">// If each of the values passed separately, then the only reason we
+                            // were given an error is because the date or time itself is invalid,
+                            // i.e. February 30th, November 31st, etc.
+                            // We have no way of validating if the date or time is actually
+                            // invalid or not, so we just assume it&#39;s handled correctly
+                            // within `time` if all values could be handled separately.
+                        </span>},
+                        err =&gt; {
+                            <span class="comment">// Panic for any other error as well, seeing as the others either
+                            // would never happen, or the time string format must be incorrect,
+                            // neither of which should ever happen.
+                            </span><span class="macro">panic!</span>(<span class="string">&quot;Failed to parse time `{}` due to an unknown reason. {}&quot;</span>, time_string, err);
                         }
                     }
                 }
@@ -1195,4 +1195,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

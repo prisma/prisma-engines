@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/diagnostics/src/pretty_print.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pretty_print.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../diagnostics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../diagnostics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../diagnostics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/diagnostics/src/pretty_print.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pretty_print.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../diagnostics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../diagnostics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../diagnostics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -76,83 +76,83 @@
 <span id="76">76</span>
 <span id="77">77</span>
 <span id="78">78</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Span</span>;
-<span class="kw">use</span> <span class="ident">colored::Colorize</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::Span;
+<span class="kw">use </span>colored::Colorize;
 
-<span class="doccomment">/// Given the datamodel text representation, pretty prints an error or warning, including</span>
-<span class="doccomment">/// the offending portion of the source code, for human-friendly reading.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pretty_print</span>(
-    <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">std::io::Write</span>,
-    <span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">span</span>: <span class="ident">Span</span>,
-    <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">start_line_number</span> <span class="op">=</span> <span class="ident">text</span>[..<span class="ident">span</span>.<span class="ident">start</span>].<span class="ident">matches</span>(<span class="string">&#39;\n&#39;</span>).<span class="ident">count</span>();
-    <span class="kw">let</span> <span class="ident">end_line_number</span> <span class="op">=</span> <span class="ident">text</span>[..<span class="ident">span</span>.<span class="ident">end</span>].<span class="ident">matches</span>(<span class="string">&#39;\n&#39;</span>).<span class="ident">count</span>();
-    <span class="kw">let</span> <span class="ident">file_lines</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">split</span>(<span class="string">&#39;\n&#39;</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+<span class="doccomment">/// Given the datamodel text representation, pretty prints an error or warning, including
+/// the offending portion of the source code, for human-friendly reading.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pretty_print(
+    f: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>std::io::Write,
+    file_name: <span class="kw-2">&amp;</span>str,
+    text: <span class="kw-2">&amp;</span>str,
+    span: Span,
+    description: <span class="kw-2">&amp;</span>str,
+) -&gt; std::io::Result&lt;()&gt; {
+    <span class="kw">let </span>start_line_number = text[..span.start].matches(<span class="string">&#39;\n&#39;</span>).count();
+    <span class="kw">let </span>end_line_number = text[..span.end].matches(<span class="string">&#39;\n&#39;</span>).count();
+    <span class="kw">let </span>file_lines = text.split(<span class="string">&#39;\n&#39;</span>).collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;();
 
-    <span class="kw">let</span> <span class="ident">chars_in_line_before</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">file_lines</span>[..<span class="ident">start_line_number</span>].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">len</span>()).<span class="ident">sum</span>();
-    <span class="comment">// Don&#39;t forget to count the all the line breaks.</span>
-    <span class="kw">let</span> <span class="ident">chars_in_line_before</span> <span class="op">=</span> <span class="ident">chars_in_line_before</span> <span class="op">+</span> <span class="ident">start_line_number</span>;
+    <span class="kw">let </span>chars_in_line_before: usize = file_lines[..start_line_number].iter().map(|l| l.len()).sum();
+    <span class="comment">// Don&#39;t forget to count the all the line breaks.
+    </span><span class="kw">let </span>chars_in_line_before = chars_in_line_before + start_line_number;
 
-    <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">file_lines</span>[<span class="ident">start_line_number</span>];
+    <span class="kw">let </span>line = <span class="kw-2">&amp;</span>file_lines[start_line_number];
 
-    <span class="kw">let</span> <span class="ident">start_in_line</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">start</span> <span class="op">-</span> <span class="ident">chars_in_line_before</span>;
-    <span class="kw">let</span> <span class="ident">end_in_line</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">start_in_line</span> <span class="op">+</span> (<span class="ident">span</span>.<span class="ident">end</span> <span class="op">-</span> <span class="ident">span</span>.<span class="ident">start</span>), <span class="ident">line</span>.<span class="ident">len</span>());
+    <span class="kw">let </span>start_in_line = span.start - chars_in_line_before;
+    <span class="kw">let </span>end_in_line = std::cmp::min(start_in_line + (span.end - span.start), line.len());
 
-    <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">line</span>[..<span class="ident">start_in_line</span>];
-    <span class="kw">let</span> <span class="ident">offending</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">line</span>[<span class="ident">start_in_line</span>..<span class="ident">end_in_line</span>].<span class="ident">bright_red</span>().<span class="ident">bold</span>();
-    <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">line</span>[<span class="ident">end_in_line</span>..];
+    <span class="kw">let </span>prefix = <span class="kw-2">&amp;</span>line[..start_in_line];
+    <span class="kw">let </span>offending = <span class="kw-2">&amp;</span>line[start_in_line..end_in_line].bright_red().bold();
+    <span class="kw">let </span>suffix = <span class="kw-2">&amp;</span>line[end_in_line..];
 
-    <span class="kw">let</span> <span class="ident">arrow</span> <span class="op">=</span> <span class="string">&quot;--&gt;&quot;</span>.<span class="ident">bright_blue</span>().<span class="ident">bold</span>();
-    <span class="kw">let</span> <span class="ident">file_path</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">file_name</span>, <span class="ident">start_line_number</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">underline</span>();
+    <span class="kw">let </span>arrow = <span class="string">&quot;--&gt;&quot;</span>.bright_blue().bold();
+    <span class="kw">let </span>file_path = <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, file_name, start_line_number + <span class="number">1</span>).underline();
 
-    <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{}: {}&quot;</span>, <span class="string">&quot;error&quot;</span>.<span class="ident">bright_red</span>().<span class="ident">bold</span>(), <span class="ident">description</span>.<span class="ident">bold</span>())<span class="question-mark">?</span>;
-    <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;  {}  {}&quot;</span>, <span class="ident">arrow</span>, <span class="ident">file_path</span>)<span class="question-mark">?</span>;
-    <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">format_line_number</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
+    <span class="macro">writeln!</span>(f, <span class="string">&quot;{}: {}&quot;</span>, <span class="string">&quot;error&quot;</span>.bright_red().bold(), description.bold())<span class="question-mark">?</span>;
+    <span class="macro">writeln!</span>(f, <span class="string">&quot;  {}  {}&quot;</span>, arrow, file_path)<span class="question-mark">?</span>;
+    <span class="macro">writeln!</span>(f, <span class="string">&quot;{}&quot;</span>, format_line_number(<span class="number">0</span>))<span class="question-mark">?</span>;
 
-    <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">format_line_number_with_line</span>(<span class="ident">start_line_number</span>, <span class="kw-2">&amp;</span><span class="ident">file_lines</span>))<span class="question-mark">?</span>;
+    <span class="macro">writeln!</span>(f, <span class="string">&quot;{}&quot;</span>, format_line_number_with_line(start_line_number, <span class="kw-2">&amp;</span>file_lines))<span class="question-mark">?</span>;
     <span class="macro">writeln!</span>(
-        <span class="ident">f</span>,
+        f,
         <span class="string">&quot;{}{}{}{}&quot;</span>,
-        <span class="ident">format_line_number</span>(<span class="ident">start_line_number</span> <span class="op">+</span> <span class="number">1</span>),
-        <span class="ident">prefix</span>,
-        <span class="ident">offending</span>,
-        <span class="ident">suffix</span>
+        format_line_number(start_line_number + <span class="number">1</span>),
+        prefix,
+        offending,
+        suffix
     )<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">offending</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">let</span> <span class="ident">spacing</span> <span class="op">=</span> <span class="string">&quot; &quot;</span>.<span class="ident">repeat</span>(<span class="ident">start_in_line</span>);
+    <span class="kw">if </span>offending.len() == <span class="number">0 </span>{
+        <span class="kw">let </span>spacing = <span class="string">&quot; &quot;</span>.repeat(start_in_line);
         <span class="macro">writeln!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{}{}{}&quot;</span>,
-            <span class="ident">format_line_number</span>(<span class="number">0</span>),
-            <span class="ident">spacing</span>,
-            <span class="string">&quot;^ Unexpected token.&quot;</span>.<span class="ident">bold</span>().<span class="ident">bright_red</span>()
+            format_line_number(<span class="number">0</span>),
+            spacing,
+            <span class="string">&quot;^ Unexpected token.&quot;</span>.bold().bright_red()
         )<span class="question-mark">?</span>;
     }
 
-    <span class="kw">for</span> <span class="ident">line_number</span> <span class="kw">in</span> <span class="ident">start_line_number</span> <span class="op">+</span> <span class="number">2</span>..<span class="ident">end_line_number</span> <span class="op">+</span> <span class="number">2</span> {
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">format_line_number_with_line</span>(<span class="ident">line_number</span>, <span class="kw-2">&amp;</span><span class="ident">file_lines</span>))<span class="question-mark">?</span>;
+    <span class="kw">for </span>line_number <span class="kw">in </span>start_line_number + <span class="number">2</span>..end_line_number + <span class="number">2 </span>{
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;{}&quot;</span>, format_line_number_with_line(line_number, <span class="kw-2">&amp;</span>file_lines))<span class="question-mark">?</span>;
     }
 
-    <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">format_line_number</span>(<span class="number">0</span>))
+    <span class="macro">writeln!</span>(f, <span class="string">&quot;{}&quot;</span>, format_line_number(<span class="number">0</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">format_line_number_with_line</span>(<span class="ident">line_number</span>: <span class="ident">usize</span>, <span class="ident">lines</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">colored::ColoredString</span> {
-    <span class="kw">if</span> <span class="ident">line_number</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">line_number</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">lines</span>.<span class="ident">len</span>() {
-        <span class="ident">colored::ColoredString::from</span>(<span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">format_line_number</span>(<span class="ident">line_number</span>), <span class="ident">lines</span>[<span class="ident">line_number</span> <span class="op">-</span> <span class="number">1</span>]).<span class="ident">as_str</span>())
-    } <span class="kw">else</span> {
-        <span class="ident">format_line_number</span>(<span class="ident">line_number</span>)
+<span class="kw">fn </span>format_line_number_with_line(line_number: usize, lines: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; colored::ColoredString {
+    <span class="kw">if </span>line_number &gt; <span class="number">0 </span>&amp;&amp; line_number &lt;= lines.len() {
+        colored::ColoredString::from(<span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, format_line_number(line_number), lines[line_number - <span class="number">1</span>]).as_str())
+    } <span class="kw">else </span>{
+        format_line_number(line_number)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">format_line_number</span>(<span class="ident">line_number</span>: <span class="ident">usize</span>) -&gt; <span class="ident">colored::ColoredString</span> {
-    <span class="kw">if</span> <span class="ident">line_number</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;{:2} | &quot;</span>, <span class="ident">line_number</span>).<span class="ident">bold</span>().<span class="ident">bright_blue</span>()
-    } <span class="kw">else</span> {
-        <span class="string">&quot;   | &quot;</span>.<span class="ident">bold</span>().<span class="ident">bright_blue</span>()
+<span class="kw">fn </span>format_line_number(line_number: usize) -&gt; colored::ColoredString {
+    <span class="kw">if </span>line_number &gt; <span class="number">0 </span>{
+        <span class="macro">format!</span>(<span class="string">&quot;{:2} | &quot;</span>, line_number).bold().bright_blue()
+    } <span class="kw">else </span>{
+        <span class="string">&quot;   | &quot;</span>.bold().bright_blue()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="diagnostics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="diagnostics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

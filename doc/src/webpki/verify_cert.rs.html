@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/verify_cert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>verify_cert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/verify_cert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>verify_cert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -350,154 +350,154 @@
 <span id="350">350</span>
 <span id="351">351</span>
 <span id="352">352</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR</span>
-<span class="comment">// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN</span>
-<span class="comment">// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF</span>
-<span class="comment">// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">cert</span>::{<span class="self">self</span>, <span class="ident">Cert</span>, <span class="ident">EndEntityOrCa</span>},
-    <span class="ident">der</span>, <span class="ident">name</span>, <span class="ident">signed_data</span>, <span class="ident">time</span>, <span class="ident">Error</span>, <span class="ident">SignatureAlgorithm</span>, <span class="ident">TrustAnchor</span>,
+</span><span class="kw">use crate</span>::{
+    cert::{<span class="self">self</span>, Cert, EndEntityOrCa},
+    der, name, signed_data, time, Error, SignatureAlgorithm, TrustAnchor,
 };
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_chain</span>(
-    <span class="ident">required_eku_if_present</span>: <span class="ident">KeyPurposeId</span>,
-    <span class="ident">supported_sig_algs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">SignatureAlgorithm</span>],
-    <span class="ident">trust_anchors</span>: <span class="kw-2">&amp;</span>[<span class="ident">TrustAnchor</span>],
-    <span class="ident">intermediate_certs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]],
-    <span class="ident">cert</span>: <span class="kw-2">&amp;</span><span class="ident">Cert</span>,
-    <span class="ident">time</span>: <span class="ident">time::Time</span>,
-    <span class="ident">sub_ca_count</span>: <span class="ident">usize</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">used_as_ca</span> <span class="op">=</span> <span class="ident">used_as_ca</span>(<span class="kw-2">&amp;</span><span class="ident">cert</span>.<span class="ident">ee_or_ca</span>);
+<span class="kw">pub fn </span>build_chain(
+    required_eku_if_present: KeyPurposeId,
+    supported_sig_algs: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>SignatureAlgorithm],
+    trust_anchors: <span class="kw-2">&amp;</span>[TrustAnchor],
+    intermediate_certs: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]],
+    cert: <span class="kw-2">&amp;</span>Cert,
+    time: time::Time,
+    sub_ca_count: usize,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">let </span>used_as_ca = used_as_ca(<span class="kw-2">&amp;</span>cert.ee_or_ca);
 
-    <span class="ident">check_issuer_independent_properties</span>(
-        <span class="ident">cert</span>,
-        <span class="ident">time</span>,
-        <span class="ident">used_as_ca</span>,
-        <span class="ident">sub_ca_count</span>,
-        <span class="ident">required_eku_if_present</span>,
+    check_issuer_independent_properties(
+        cert,
+        time,
+        used_as_ca,
+        sub_ca_count,
+        required_eku_if_present,
     )<span class="question-mark">?</span>;
 
-    <span class="comment">// TODO: HPKP checks.</span>
+    <span class="comment">// TODO: HPKP checks.
 
-    <span class="kw">match</span> <span class="ident">used_as_ca</span> {
-        <span class="ident">UsedAsCa::Yes</span> =&gt; {
-            <span class="kw">const</span> <span class="ident">MAX_SUB_CA_COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">6</span>;
+    </span><span class="kw">match </span>used_as_ca {
+        UsedAsCa::Yes =&gt; {
+            <span class="kw">const </span>MAX_SUB_CA_COUNT: usize = <span class="number">6</span>;
 
-            <span class="kw">if</span> <span class="ident">sub_ca_count</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">MAX_SUB_CA_COUNT</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownIssuer</span>);
+            <span class="kw">if </span>sub_ca_count &gt;= MAX_SUB_CA_COUNT {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::UnknownIssuer);
             }
         }
-        <span class="ident">UsedAsCa::No</span> =&gt; {
-            <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">sub_ca_count</span>);
+        UsedAsCa::No =&gt; {
+            <span class="macro">assert_eq!</span>(<span class="number">0</span>, sub_ca_count);
         }
     }
 
-    <span class="comment">// TODO: revocation.</span>
+    <span class="comment">// TODO: revocation.
 
-    <span class="kw">match</span> <span class="ident">loop_while_non_fatal_error</span>(<span class="ident">trust_anchors</span>, <span class="op">|</span><span class="ident">trust_anchor</span>: <span class="kw-2">&amp;</span><span class="ident">TrustAnchor</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">trust_anchor_subject</span> <span class="op">=</span> <span class="ident">untrusted::Input::from</span>(<span class="ident">trust_anchor</span>.<span class="ident">subject</span>);
-        <span class="kw">if</span> <span class="ident">cert</span>.<span class="ident">issuer</span> <span class="op">!</span><span class="op">=</span> <span class="ident">trust_anchor_subject</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownIssuer</span>);
+    </span><span class="kw">match </span>loop_while_non_fatal_error(trust_anchors, |trust_anchor: <span class="kw-2">&amp;</span>TrustAnchor| {
+        <span class="kw">let </span>trust_anchor_subject = untrusted::Input::from(trust_anchor.subject);
+        <span class="kw">if </span>cert.issuer != trust_anchor_subject {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::UnknownIssuer);
         }
 
-        <span class="kw">let</span> <span class="ident">name_constraints</span> <span class="op">=</span> <span class="ident">trust_anchor</span>.<span class="ident">name_constraints</span>.<span class="ident">map</span>(<span class="ident">untrusted::Input::from</span>);
+        <span class="kw">let </span>name_constraints = trust_anchor.name_constraints.map(untrusted::Input::from);
 
-        <span class="ident">untrusted::read_all_optional</span>(<span class="ident">name_constraints</span>, <span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-            <span class="ident">name::check_name_constraints</span>(<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">cert</span>)
+        untrusted::read_all_optional(name_constraints, Error::BadDer, |value| {
+            name::check_name_constraints(value, <span class="kw-2">&amp;</span>cert)
         })<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">trust_anchor_spki</span> <span class="op">=</span> <span class="ident">untrusted::Input::from</span>(<span class="ident">trust_anchor</span>.<span class="ident">spki</span>);
+        <span class="kw">let </span>trust_anchor_spki = untrusted::Input::from(trust_anchor.spki);
 
-        <span class="comment">// TODO: check_distrust(trust_anchor_subject, trust_anchor_spki)?;</span>
+        <span class="comment">// TODO: check_distrust(trust_anchor_subject, trust_anchor_spki)?;
 
-        <span class="ident">check_signatures</span>(<span class="ident">supported_sig_algs</span>, <span class="ident">cert</span>, <span class="ident">trust_anchor_spki</span>)<span class="question-mark">?</span>;
+        </span>check_signatures(supported_sig_algs, cert, trust_anchor_spki)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }) {
         <span class="prelude-val">Ok</span>(()) =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
         <span class="prelude-val">Err</span>(..) =&gt; {
-            <span class="comment">// If the error is not fatal, then keep going.</span>
-        }
+            <span class="comment">// If the error is not fatal, then keep going.
+        </span>}
     }
 
-    <span class="ident">loop_while_non_fatal_error</span>(<span class="ident">intermediate_certs</span>, <span class="op">|</span><span class="ident">cert_der</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">potential_issuer</span> <span class="op">=</span>
-            <span class="ident">cert::parse_cert</span>(<span class="ident">untrusted::Input::from</span>(<span class="kw-2">*</span><span class="ident">cert_der</span>), <span class="ident">EndEntityOrCa::Ca</span>(<span class="kw-2">&amp;</span><span class="ident">cert</span>))<span class="question-mark">?</span>;
+    loop_while_non_fatal_error(intermediate_certs, |cert_der| {
+        <span class="kw">let </span>potential_issuer =
+            cert::parse_cert(untrusted::Input::from(<span class="kw-2">*</span>cert_der), EndEntityOrCa::Ca(<span class="kw-2">&amp;</span>cert))<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">potential_issuer</span>.<span class="ident">subject</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cert</span>.<span class="ident">issuer</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownIssuer</span>);
+        <span class="kw">if </span>potential_issuer.subject != cert.issuer {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::UnknownIssuer);
         }
 
-        <span class="comment">// Prevent loops; see RFC 4158 section 5.2.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">cert</span>;
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="ident">potential_issuer</span>.<span class="ident">spki</span>.<span class="ident">value</span>() <span class="op">==</span> <span class="ident">prev</span>.<span class="ident">spki</span>.<span class="ident">value</span>()
-                <span class="op">&amp;&amp;</span> <span class="ident">potential_issuer</span>.<span class="ident">subject</span> <span class="op">==</span> <span class="ident">prev</span>.<span class="ident">subject</span>
+        <span class="comment">// Prevent loops; see RFC 4158 section 5.2.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>prev = cert;
+        <span class="kw">loop </span>{
+            <span class="kw">if </span>potential_issuer.spki.value() == prev.spki.value()
+                &amp;&amp; potential_issuer.subject == prev.subject
             {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownIssuer</span>);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::UnknownIssuer);
             }
-            <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">prev</span>.<span class="ident">ee_or_ca</span> {
-                <span class="ident">EndEntityOrCa::EndEntity</span> =&gt; {
+            <span class="kw">match </span><span class="kw-2">&amp;</span>prev.ee_or_ca {
+                EndEntityOrCa::EndEntity =&gt; {
                     <span class="kw">break</span>;
                 }
-                <span class="ident">EndEntityOrCa::Ca</span>(<span class="ident">child_cert</span>) =&gt; {
-                    <span class="ident">prev</span> <span class="op">=</span> <span class="ident">child_cert</span>;
+                EndEntityOrCa::Ca(child_cert) =&gt; {
+                    prev = child_cert;
                 }
             }
         }
 
-        <span class="ident">untrusted::read_all_optional</span>(<span class="ident">potential_issuer</span>.<span class="ident">name_constraints</span>, <span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-            <span class="ident">name::check_name_constraints</span>(<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">cert</span>)
+        untrusted::read_all_optional(potential_issuer.name_constraints, Error::BadDer, |value| {
+            name::check_name_constraints(value, <span class="kw-2">&amp;</span>cert)
         })<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">next_sub_ca_count</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">used_as_ca</span> {
-            <span class="ident">UsedAsCa::No</span> =&gt; <span class="ident">sub_ca_count</span>,
-            <span class="ident">UsedAsCa::Yes</span> =&gt; <span class="ident">sub_ca_count</span> <span class="op">+</span> <span class="number">1</span>,
+        <span class="kw">let </span>next_sub_ca_count = <span class="kw">match </span>used_as_ca {
+            UsedAsCa::No =&gt; sub_ca_count,
+            UsedAsCa::Yes =&gt; sub_ca_count + <span class="number">1</span>,
         };
 
-        <span class="ident">build_chain</span>(
-            <span class="ident">required_eku_if_present</span>,
-            <span class="ident">supported_sig_algs</span>,
-            <span class="ident">trust_anchors</span>,
-            <span class="ident">intermediate_certs</span>,
-            <span class="kw-2">&amp;</span><span class="ident">potential_issuer</span>,
-            <span class="ident">time</span>,
-            <span class="ident">next_sub_ca_count</span>,
+        build_chain(
+            required_eku_if_present,
+            supported_sig_algs,
+            trust_anchors,
+            intermediate_certs,
+            <span class="kw-2">&amp;</span>potential_issuer,
+            time,
+            next_sub_ca_count,
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">check_signatures</span>(
-    <span class="ident">supported_sig_algs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">SignatureAlgorithm</span>],
-    <span class="ident">cert_chain</span>: <span class="kw-2">&amp;</span><span class="ident">Cert</span>,
-    <span class="ident">trust_anchor_key</span>: <span class="ident">untrusted::Input</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spki_value</span> <span class="op">=</span> <span class="ident">trust_anchor_key</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cert</span> <span class="op">=</span> <span class="ident">cert_chain</span>;
-    <span class="kw">loop</span> {
-        <span class="ident">signed_data::verify_signed_data</span>(<span class="ident">supported_sig_algs</span>, <span class="ident">spki_value</span>, <span class="kw-2">&amp;</span><span class="ident">cert</span>.<span class="ident">signed_data</span>)<span class="question-mark">?</span>;
+<span class="kw">fn </span>check_signatures(
+    supported_sig_algs: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>SignatureAlgorithm],
+    cert_chain: <span class="kw-2">&amp;</span>Cert,
+    trust_anchor_key: untrusted::Input,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>spki_value = trust_anchor_key;
+    <span class="kw">let </span><span class="kw-2">mut </span>cert = cert_chain;
+    <span class="kw">loop </span>{
+        signed_data::verify_signed_data(supported_sig_algs, spki_value, <span class="kw-2">&amp;</span>cert.signed_data)<span class="question-mark">?</span>;
 
-        <span class="comment">// TODO: check revocation</span>
+        <span class="comment">// TODO: check revocation
 
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">cert</span>.<span class="ident">ee_or_ca</span> {
-            <span class="ident">EndEntityOrCa::Ca</span>(<span class="ident">child_cert</span>) =&gt; {
-                <span class="ident">spki_value</span> <span class="op">=</span> <span class="ident">cert</span>.<span class="ident">spki</span>.<span class="ident">value</span>();
-                <span class="ident">cert</span> <span class="op">=</span> <span class="ident">child_cert</span>;
+        </span><span class="kw">match </span><span class="kw-2">&amp;</span>cert.ee_or_ca {
+            EndEntityOrCa::Ca(child_cert) =&gt; {
+                spki_value = cert.spki.value();
+                cert = child_cert;
             }
-            <span class="ident">EndEntityOrCa::EndEntity</span> =&gt; {
+            EndEntityOrCa::EndEntity =&gt; {
                 <span class="kw">break</span>;
             }
         }
@@ -506,176 +506,176 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">check_issuer_independent_properties</span>(
-    <span class="ident">cert</span>: <span class="kw-2">&amp;</span><span class="ident">Cert</span>,
-    <span class="ident">time</span>: <span class="ident">time::Time</span>,
-    <span class="ident">used_as_ca</span>: <span class="ident">UsedAsCa</span>,
-    <span class="ident">sub_ca_count</span>: <span class="ident">usize</span>,
-    <span class="ident">required_eku_if_present</span>: <span class="ident">KeyPurposeId</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="comment">// TODO: check_distrust(trust_anchor_subject, trust_anchor_spki)?;</span>
-    <span class="comment">// TODO: Check signature algorithm like mozilla::pkix.</span>
-    <span class="comment">// TODO: Check SPKI like mozilla::pkix.</span>
-    <span class="comment">// TODO: check for active distrust like mozilla::pkix.</span>
+<span class="kw">fn </span>check_issuer_independent_properties(
+    cert: <span class="kw-2">&amp;</span>Cert,
+    time: time::Time,
+    used_as_ca: UsedAsCa,
+    sub_ca_count: usize,
+    required_eku_if_present: KeyPurposeId,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="comment">// TODO: check_distrust(trust_anchor_subject, trust_anchor_spki)?;
+    // TODO: Check signature algorithm like mozilla::pkix.
+    // TODO: Check SPKI like mozilla::pkix.
+    // TODO: check for active distrust like mozilla::pkix.
 
-    <span class="comment">// See the comment in `remember_extension` for why we don&#39;t check the</span>
-    <span class="comment">// KeyUsage extension.</span>
+    // See the comment in `remember_extension` for why we don&#39;t check the
+    // KeyUsage extension.
 
-    <span class="ident">cert</span>.<span class="ident">validity</span>
-        .<span class="ident">read_all</span>(<span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">check_validity</span>(<span class="ident">value</span>, <span class="ident">time</span>))<span class="question-mark">?</span>;
-    <span class="ident">untrusted::read_all_optional</span>(<span class="ident">cert</span>.<span class="ident">basic_constraints</span>, <span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-        <span class="ident">check_basic_constraints</span>(<span class="ident">value</span>, <span class="ident">used_as_ca</span>, <span class="ident">sub_ca_count</span>)
+    </span>cert.validity
+        .read_all(Error::BadDer, |value| check_validity(value, time))<span class="question-mark">?</span>;
+    untrusted::read_all_optional(cert.basic_constraints, Error::BadDer, |value| {
+        check_basic_constraints(value, used_as_ca, sub_ca_count)
     })<span class="question-mark">?</span>;
-    <span class="ident">untrusted::read_all_optional</span>(<span class="ident">cert</span>.<span class="ident">eku</span>, <span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-        <span class="ident">check_eku</span>(<span class="ident">value</span>, <span class="ident">required_eku_if_present</span>)
+    untrusted::read_all_optional(cert.eku, Error::BadDer, |value| {
+        check_eku(value, required_eku_if_present)
     })<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.1.2.5</span>
-<span class="kw">fn</span> <span class="ident">check_validity</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>, <span class="ident">time</span>: <span class="ident">time::Time</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">not_before</span> <span class="op">=</span> <span class="ident">der::time_choice</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">not_after</span> <span class="op">=</span> <span class="ident">der::time_choice</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
+<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.1.2.5
+</span><span class="kw">fn </span>check_validity(input: <span class="kw-2">&amp;mut </span>untrusted::Reader, time: time::Time) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">let </span>not_before = der::time_choice(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>not_after = der::time_choice(input)<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">not_before</span> <span class="op">&gt;</span> <span class="ident">not_after</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidCertValidity</span>);
+    <span class="kw">if </span>not_before &gt; not_after {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidCertValidity);
     }
-    <span class="kw">if</span> <span class="ident">time</span> <span class="op">&lt;</span> <span class="ident">not_before</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::CertNotValidYet</span>);
+    <span class="kw">if </span>time &lt; not_before {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::CertNotValidYet);
     }
-    <span class="kw">if</span> <span class="ident">time</span> <span class="op">&gt;</span> <span class="ident">not_after</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::CertExpired</span>);
+    <span class="kw">if </span>time &gt; not_after {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::CertExpired);
     }
 
-    <span class="comment">// TODO: mozilla::pkix allows the TrustDomain to check not_before and</span>
-    <span class="comment">// not_after, to enforce things like a maximum validity period. We should</span>
-    <span class="comment">// do something similar.</span>
+    <span class="comment">// TODO: mozilla::pkix allows the TrustDomain to check not_before and
+    // not_after, to enforce things like a maximum validity period. We should
+    // do something similar.
 
-    <span class="prelude-val">Ok</span>(())
+    </span><span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">UsedAsCa</span> {
-    <span class="ident">Yes</span>,
-    <span class="ident">No</span>,
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">enum </span>UsedAsCa {
+    Yes,
+    No,
 }
 
-<span class="kw">fn</span> <span class="ident">used_as_ca</span>(<span class="ident">ee_or_ca</span>: <span class="kw-2">&amp;</span><span class="ident">EndEntityOrCa</span>) -&gt; <span class="ident">UsedAsCa</span> {
-    <span class="kw">match</span> <span class="ident">ee_or_ca</span> {
-        <span class="ident">EndEntityOrCa::EndEntity</span> =&gt; <span class="ident">UsedAsCa::No</span>,
-        <span class="ident">EndEntityOrCa::Ca</span>(..) =&gt; <span class="ident">UsedAsCa::Yes</span>,
+<span class="kw">fn </span>used_as_ca(ee_or_ca: <span class="kw-2">&amp;</span>EndEntityOrCa) -&gt; UsedAsCa {
+    <span class="kw">match </span>ee_or_ca {
+        EndEntityOrCa::EndEntity =&gt; UsedAsCa::No,
+        EndEntityOrCa::Ca(..) =&gt; UsedAsCa::Yes,
     }
 }
 
-<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.2.1.9</span>
-<span class="kw">fn</span> <span class="ident">check_basic_constraints</span>(
-    <span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&gt;</span>,
-    <span class="ident">used_as_ca</span>: <span class="ident">UsedAsCa</span>,
-    <span class="ident">sub_ca_count</span>: <span class="ident">usize</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">is_ca</span>, <span class="ident">path_len_constraint</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">input</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">is_ca</span> <span class="op">=</span> <span class="ident">der::optional_boolean</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
+<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.2.1.9
+</span><span class="kw">fn </span>check_basic_constraints(
+    input: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>untrusted::Reader&gt;,
+    used_as_ca: UsedAsCa,
+    sub_ca_count: usize,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">let </span>(is_ca, path_len_constraint) = <span class="kw">match </span>input {
+        <span class="prelude-val">Some</span>(input) =&gt; {
+            <span class="kw">let </span>is_ca = der::optional_boolean(input)<span class="question-mark">?</span>;
 
-            <span class="comment">// https://bugzilla.mozilla.org/show_bug.cgi?id=985025: RFC 5280</span>
-            <span class="comment">// says that a certificate must not have pathLenConstraint unless</span>
-            <span class="comment">// it is a CA certificate, but some real-world end-entity</span>
-            <span class="comment">// certificates have pathLenConstraint.</span>
-            <span class="kw">let</span> <span class="ident">path_len_constraint</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">at_end</span>() {
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">der::small_nonnegative_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Some</span>(<span class="ident">usize::from</span>(<span class="ident">value</span>))
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            };
+            <span class="comment">// https://bugzilla.mozilla.org/show_bug.cgi?id=985025: RFC 5280
+            // says that a certificate must not have pathLenConstraint unless
+            // it is a CA certificate, but some real-world end-entity
+            // certificates have pathLenConstraint.
+            </span><span class="kw">let </span>path_len_constraint = <span class="kw">if </span>!input.at_end() {
+                <span class="kw">let </span>value = der::small_nonnegative_integer(input)<span class="question-mark">?</span>;
+                <span class="prelude-val">Some</span>(usize::from(value))
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>};
 
-            (<span class="ident">is_ca</span>, <span class="ident">path_len_constraint</span>)
+            (is_ca, path_len_constraint)
         }
-        <span class="prelude-val">None</span> =&gt; (<span class="bool-val">false</span>, <span class="prelude-val">None</span>),
+        <span class="prelude-val">None </span>=&gt; (<span class="bool-val">false</span>, <span class="prelude-val">None</span>),
     };
 
-    <span class="kw">match</span> (<span class="ident">used_as_ca</span>, <span class="ident">is_ca</span>, <span class="ident">path_len_constraint</span>) {
-        (<span class="ident">UsedAsCa::No</span>, <span class="bool-val">true</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::CaUsedAsEndEntity</span>),
-        (<span class="ident">UsedAsCa::Yes</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::EndEntityUsedAsCa</span>),
-        (<span class="ident">UsedAsCa::Yes</span>, <span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">sub_ca_count</span> <span class="op">&gt;</span> <span class="ident">len</span> =&gt; {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::PathLenConstraintViolated</span>)
+    <span class="kw">match </span>(used_as_ca, is_ca, path_len_constraint) {
+        (UsedAsCa::No, <span class="bool-val">true</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(Error::CaUsedAsEndEntity),
+        (UsedAsCa::Yes, <span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(Error::EndEntityUsedAsCa),
+        (UsedAsCa::Yes, <span class="bool-val">true</span>, <span class="prelude-val">Some</span>(len)) <span class="kw">if </span>sub_ca_count &gt; len =&gt; {
+            <span class="prelude-val">Err</span>(Error::PathLenConstraintViolated)
         }
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">KeyPurposeId</span> {
-    <span class="ident">oid_value</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>KeyPurposeId {
+    oid_value: untrusted::Input&lt;<span class="lifetime">&#39;static</span>&gt;,
 }
 
-<span class="comment">// id-pkix            OBJECT IDENTIFIER ::= { 1 3 6 1 5 5 7 }</span>
-<span class="comment">// id-kp              OBJECT IDENTIFIER ::= { id-pkix 3 }</span>
+<span class="comment">// id-pkix            OBJECT IDENTIFIER ::= { 1 3 6 1 5 5 7 }
+// id-kp              OBJECT IDENTIFIER ::= { id-pkix 3 }
 
-<span class="comment">// id-kp-serverAuth   OBJECT IDENTIFIER ::= { id-kp 1 }</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::identity_op</span>)]</span> <span class="comment">// TODO: Make this clearer</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">EKU_SERVER_AUTH</span>: <span class="ident">KeyPurposeId</span> <span class="op">=</span> <span class="ident">KeyPurposeId</span> {
-    <span class="ident">oid_value</span>: <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span>[(<span class="number">40</span> <span class="op">*</span> <span class="number">1</span>) <span class="op">+</span> <span class="number">3</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">3</span>, <span class="number">1</span>]),
+// id-kp-serverAuth   OBJECT IDENTIFIER ::= { id-kp 1 }
+</span><span class="attribute">#[allow(clippy::identity_op)] </span><span class="comment">// TODO: Make this clearer
+</span><span class="kw">pub static </span>EKU_SERVER_AUTH: KeyPurposeId = KeyPurposeId {
+    oid_value: untrusted::Input::from(<span class="kw-2">&amp;</span>[(<span class="number">40 </span>* <span class="number">1</span>) + <span class="number">3</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">3</span>, <span class="number">1</span>]),
 };
 
-<span class="comment">// id-kp-clientAuth   OBJECT IDENTIFIER ::= { id-kp 2 }</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::identity_op</span>)]</span> <span class="comment">// TODO: Make this clearer</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">EKU_CLIENT_AUTH</span>: <span class="ident">KeyPurposeId</span> <span class="op">=</span> <span class="ident">KeyPurposeId</span> {
-    <span class="ident">oid_value</span>: <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span>[(<span class="number">40</span> <span class="op">*</span> <span class="number">1</span>) <span class="op">+</span> <span class="number">3</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">3</span>, <span class="number">2</span>]),
+<span class="comment">// id-kp-clientAuth   OBJECT IDENTIFIER ::= { id-kp 2 }
+</span><span class="attribute">#[allow(clippy::identity_op)] </span><span class="comment">// TODO: Make this clearer
+</span><span class="kw">pub static </span>EKU_CLIENT_AUTH: KeyPurposeId = KeyPurposeId {
+    oid_value: untrusted::Input::from(<span class="kw-2">&amp;</span>[(<span class="number">40 </span>* <span class="number">1</span>) + <span class="number">3</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">3</span>, <span class="number">2</span>]),
 };
 
-<span class="comment">// id-kp-OCSPSigning  OBJECT IDENTIFIER ::= { id-kp 9 }</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::identity_op</span>)]</span> <span class="comment">// TODO: Make this clearer</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">EKU_OCSP_SIGNING</span>: <span class="ident">KeyPurposeId</span> <span class="op">=</span> <span class="ident">KeyPurposeId</span> {
-    <span class="ident">oid_value</span>: <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span>[(<span class="number">40</span> <span class="op">*</span> <span class="number">1</span>) <span class="op">+</span> <span class="number">3</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">3</span>, <span class="number">9</span>]),
+<span class="comment">// id-kp-OCSPSigning  OBJECT IDENTIFIER ::= { id-kp 9 }
+</span><span class="attribute">#[allow(clippy::identity_op)] </span><span class="comment">// TODO: Make this clearer
+</span><span class="kw">pub static </span>EKU_OCSP_SIGNING: KeyPurposeId = KeyPurposeId {
+    oid_value: untrusted::Input::from(<span class="kw-2">&amp;</span>[(<span class="number">40 </span>* <span class="number">1</span>) + <span class="number">3</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">3</span>, <span class="number">9</span>]),
 };
 
-<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.2.1.12</span>
-<span class="comment">//</span>
-<span class="comment">// Notable Differences from RFC 5280:</span>
-<span class="comment">//</span>
-<span class="comment">// * We follow the convention established by Microsoft&#39;s implementation and</span>
-<span class="comment">//   mozilla::pkix of treating the EKU extension in a CA certificate as a</span>
-<span class="comment">//   restriction on the allowable EKUs for certificates issued by that CA. RFC</span>
-<span class="comment">//   5280 doesn&#39;t prescribe any meaning to the EKU extension when a certificate</span>
-<span class="comment">//   is being used as a CA certificate.</span>
-<span class="comment">//</span>
-<span class="comment">// * We do not recognize anyExtendedKeyUsage. NSS and mozilla::pkix do not</span>
-<span class="comment">//   recognize it either.</span>
-<span class="comment">//</span>
-<span class="comment">// * We treat id-Netscape-stepUp as being equivalent to id-kp-serverAuth in CA</span>
-<span class="comment">//   certificates (only). Comodo has issued certificates that require this</span>
-<span class="comment">//   behavior that don&#39;t expire until June 2020. See https://bugzilla.mozilla.org/show_bug.cgi?id=982292.</span>
-<span class="kw">fn</span> <span class="ident">check_eku</span>(
-    <span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&gt;</span>,
-    <span class="ident">required_eku_if_present</span>: <span class="ident">KeyPurposeId</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">input</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">input</span>) =&gt; {
-            <span class="kw">loop</span> {
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">der::Tag::OID</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">value</span> <span class="op">==</span> <span class="ident">required_eku_if_present</span>.<span class="ident">oid_value</span> {
-                    <span class="ident">input</span>.<span class="ident">skip_to_end</span>();
+<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.2.1.12
+//
+// Notable Differences from RFC 5280:
+//
+// * We follow the convention established by Microsoft&#39;s implementation and
+//   mozilla::pkix of treating the EKU extension in a CA certificate as a
+//   restriction on the allowable EKUs for certificates issued by that CA. RFC
+//   5280 doesn&#39;t prescribe any meaning to the EKU extension when a certificate
+//   is being used as a CA certificate.
+//
+// * We do not recognize anyExtendedKeyUsage. NSS and mozilla::pkix do not
+//   recognize it either.
+//
+// * We treat id-Netscape-stepUp as being equivalent to id-kp-serverAuth in CA
+//   certificates (only). Comodo has issued certificates that require this
+//   behavior that don&#39;t expire until June 2020. See https://bugzilla.mozilla.org/show_bug.cgi?id=982292.
+</span><span class="kw">fn </span>check_eku(
+    input: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>untrusted::Reader&gt;,
+    required_eku_if_present: KeyPurposeId,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">match </span>input {
+        <span class="prelude-val">Some</span>(input) =&gt; {
+            <span class="kw">loop </span>{
+                <span class="kw">let </span>value = der::expect_tag_and_get_value(input, der::Tag::OID)<span class="question-mark">?</span>;
+                <span class="kw">if </span>value == required_eku_if_present.oid_value {
+                    input.skip_to_end();
                     <span class="kw">break</span>;
                 }
-                <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">at_end</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::RequiredEkuNotFound</span>);
+                <span class="kw">if </span>input.at_end() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::RequiredEkuNotFound);
                 }
             }
             <span class="prelude-val">Ok</span>(())
         }
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="comment">// http://tools.ietf.org/html/rfc6960#section-4.2.2.2:</span>
-            <span class="comment">// &quot;OCSP signing delegation SHALL be designated by the inclusion of</span>
-            <span class="comment">// id-kp-OCSPSigning in an extended key usage certificate extension</span>
-            <span class="comment">// included in the OCSP response signer&#39;s certificate.&quot;</span>
-            <span class="comment">//</span>
-            <span class="comment">// A missing EKU extension generally means &quot;any EKU&quot;, but it is</span>
-            <span class="comment">// important that id-kp-OCSPSigning is explicit so that a normal</span>
-            <span class="comment">// end-entity certificate isn&#39;t able to sign trusted OCSP responses</span>
-            <span class="comment">// for itself or for other certificates issued by its issuing CA.</span>
-            <span class="kw">if</span> <span class="ident">required_eku_if_present</span>.<span class="ident">oid_value</span> <span class="op">==</span> <span class="ident">EKU_OCSP_SIGNING</span>.<span class="ident">oid_value</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::RequiredEkuNotFound</span>);
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="comment">// http://tools.ietf.org/html/rfc6960#section-4.2.2.2:
+            // &quot;OCSP signing delegation SHALL be designated by the inclusion of
+            // id-kp-OCSPSigning in an extended key usage certificate extension
+            // included in the OCSP response signer&#39;s certificate.&quot;
+            //
+            // A missing EKU extension generally means &quot;any EKU&quot;, but it is
+            // important that id-kp-OCSPSigning is explicit so that a normal
+            // end-entity certificate isn&#39;t able to sign trusted OCSP responses
+            // for itself or for other certificates issued by its issuing CA.
+            </span><span class="kw">if </span>required_eku_if_present.oid_value == EKU_OCSP_SIGNING.oid_value {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::RequiredEkuNotFound);
             }
 
             <span class="prelude-val">Ok</span>(())
@@ -683,24 +683,24 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">loop_while_non_fatal_error</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(
-    <span class="ident">values</span>: <span class="ident">V</span>,
-    <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">V::Item</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">V</span>: <span class="ident">IntoIterator</span>,
+<span class="kw">fn </span>loop_while_non_fatal_error&lt;V&gt;(
+    values: V,
+    f: <span class="kw">impl </span>Fn(V::Item) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;
+<span class="kw">where
+    </span>V: IntoIterator,
 {
-    <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">values</span> {
-        <span class="kw">match</span> <span class="ident">f</span>(<span class="ident">v</span>) {
+    <span class="kw">for </span>v <span class="kw">in </span>values {
+        <span class="kw">match </span>f(v) {
             <span class="prelude-val">Ok</span>(()) =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
             <span class="prelude-val">Err</span>(..) =&gt; {
-                <span class="comment">// If the error is not fatal, then keep going.</span>
-            }
+                <span class="comment">// If the error is not fatal, then keep going.
+            </span>}
         }
     }
-    <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownIssuer</span>)
+    <span class="prelude-val">Err</span>(Error::UnknownIssuer)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

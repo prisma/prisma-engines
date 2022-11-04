@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libz-sys-1.1.8/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../libz_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../libz_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../libz_sys/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libz-sys-1.1.8/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../libz_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../libz_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../libz_sys/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -350,357 +350,357 @@
 <span id="350">350</span>
 <span id="351">351</span>
 <span id="352">352</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types)]
 
-<span class="kw">use</span> <span class="ident">std::os::raw</span>::{<span class="ident">c_char</span>, <span class="ident">c_int</span>, <span class="ident">c_long</span>, <span class="ident">c_uchar</span>, <span class="ident">c_uint</span>, <span class="ident">c_ulong</span>, <span class="ident">c_void</span>};
+</span><span class="kw">use </span>std::os::raw::{c_char, c_int, c_long, c_uchar, c_uint, c_ulong, c_void};
 
-<span class="comment">// Macro for variances between zlib-ng in native mode and either zlib or zlib-ng in zlib compat</span>
-<span class="comment">// mode. Note in particular that zlib-ng in compat mode does *not* use the zng case.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">zng</span>))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">if_zng</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">_zng</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">not_zng</span>:<span class="ident">tt</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">not_zng</span>
-    };
+<span class="comment">// Macro for variances between zlib-ng in native mode and either zlib or zlib-ng in zlib compat
+// mode. Note in particular that zlib-ng in compat mode does *not* use the zng case.
+</span><span class="attribute">#[cfg(not(zng))]
+</span><span class="macro">macro_rules! </span>if_zng {
+    (<span class="macro-nonterminal">$_zng</span>:tt, <span class="macro-nonterminal">$not_zng</span>:tt) =&gt; {
+        <span class="macro-nonterminal">$not_zng
+    </span>};
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">zng</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">if_zng</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">zng</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">_not_zng</span>:<span class="ident">tt</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">zng</span>
-    };
+<span class="attribute">#[cfg(zng)]
+</span><span class="macro">macro_rules! </span>if_zng {
+    (<span class="macro-nonterminal">$zng</span>:tt, <span class="macro-nonterminal">$_not_zng</span>:tt) =&gt; {
+        <span class="macro-nonterminal">$zng
+    </span>};
 }
 
-<span class="comment">// zlib uses unsigned long for various sizes; zlib-ng uses size_t.</span>
-<span class="kw">type</span> <span class="ident">z_size</span> <span class="op">=</span> <span class="macro">if_zng!</span>(<span class="ident">usize</span>, <span class="ident">c_ulong</span>);
+<span class="comment">// zlib uses unsigned long for various sizes; zlib-ng uses size_t.
+</span><span class="kw">type </span>z_size = <span class="macro">if_zng!</span>(usize, c_ulong);
 
-<span class="comment">// zlib stores Adler-32 and CRC-32 checksums in unsigned long; zlib-ng uses uint32_t.</span>
-<span class="kw">type</span> <span class="ident">z_checksum</span> <span class="op">=</span> <span class="macro">if_zng!</span>(<span class="ident">u32</span>, <span class="ident">c_ulong</span>);
+<span class="comment">// zlib stores Adler-32 and CRC-32 checksums in unsigned long; zlib-ng uses uint32_t.
+</span><span class="kw">type </span>z_checksum = <span class="macro">if_zng!</span>(u32, c_ulong);
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">alloc_func</span> <span class="op">=</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">voidpf</span>, <span class="ident">uInt</span>, <span class="ident">uInt</span>) -&gt; <span class="ident">voidpf</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Bytef</span> <span class="op">=</span> <span class="ident">u8</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">free_func</span> <span class="op">=</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">voidpf</span>, <span class="ident">voidpf</span>);
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">zng</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libc&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">gzFile</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">gzFile_s</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">in_func</span> <span class="op">=</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">c_uchar</span>) -&gt; <span class="ident">c_uint</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">out_func</span> <span class="op">=</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>, <span class="ident">c_uint</span>) -&gt; <span class="ident">c_int</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">uInt</span> <span class="op">=</span> <span class="ident">c_uint</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">uLong</span> <span class="op">=</span> <span class="ident">c_ulong</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">uLongf</span> <span class="op">=</span> <span class="ident">c_ulong</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">voidp</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">voidpc</span> <span class="op">=</span> <span class="kw-2">*const</span> <span class="ident">c_void</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">voidpf</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>;
+<span class="kw">pub type </span>alloc_func = <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(voidpf, uInt, uInt) -&gt; voidpf;
+<span class="kw">pub type </span>Bytef = u8;
+<span class="kw">pub type </span>free_func = <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(voidpf, voidpf);
+<span class="attribute">#[cfg(any(zng, feature = <span class="string">&quot;libc&quot;</span>))]
+</span><span class="kw">pub type </span>gzFile = <span class="kw-2">*mut </span>gzFile_s;
+<span class="kw">pub type </span>in_func = <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(<span class="kw-2">*mut </span>c_void, <span class="kw-2">*mut *const </span>c_uchar) -&gt; c_uint;
+<span class="kw">pub type </span>out_func = <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(<span class="kw-2">*mut </span>c_void, <span class="kw-2">*mut </span>c_uchar, c_uint) -&gt; c_int;
+<span class="kw">pub type </span>uInt = c_uint;
+<span class="kw">pub type </span>uLong = c_ulong;
+<span class="kw">pub type </span>uLongf = c_ulong;
+<span class="kw">pub type </span>voidp = <span class="kw-2">*mut </span>c_void;
+<span class="kw">pub type </span>voidpc = <span class="kw-2">*const </span>c_void;
+<span class="kw">pub type </span>voidpf = <span class="kw-2">*mut </span>c_void;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">zng</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libc&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">gzFile_s</span> {}
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">internal_state</span> {}
+<span class="attribute">#[cfg(any(zng, feature = <span class="string">&quot;libc&quot;</span>))]
+</span><span class="kw">pub enum </span>gzFile_s {}
+<span class="kw">pub enum </span>internal_state {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">not</span>(<span class="ident">zng</span>),
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libc&quot;</span>,
-    <span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">target_family</span> <span class="op">=</span> <span class="string">&quot;wasm&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>))
-))]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">z_off_t</span> <span class="op">=</span> <span class="ident">libc::off_t</span>;
+<span class="attribute">#[cfg(all(
+    not(zng),
+    feature = <span class="string">&quot;libc&quot;</span>,
+    not(all(target_family = <span class="string">&quot;wasm&quot;</span>, target_os = <span class="string">&quot;unknown&quot;</span>))
+))]
+</span><span class="kw">pub type </span>z_off_t = libc::off_t;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">not</span>(<span class="ident">zng</span>),
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libc&quot;</span>,
-    <span class="ident">all</span>(<span class="ident">target_family</span> <span class="op">=</span> <span class="string">&quot;wasm&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>)
-))]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">z_off_t</span> <span class="op">=</span> <span class="ident">c_long</span>;
+<span class="attribute">#[cfg(all(
+    not(zng),
+    feature = <span class="string">&quot;libc&quot;</span>,
+    all(target_family = <span class="string">&quot;wasm&quot;</span>, target_os = <span class="string">&quot;unknown&quot;</span>)
+))]
+</span><span class="kw">pub type </span>z_off_t = c_long;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">zng</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">z_off_t</span> <span class="op">=</span> <span class="ident">i64</span>;
+<span class="attribute">#[cfg(zng)]
+</span><span class="kw">pub type </span>z_off_t = i64;
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">gz_header</span> {
-    <span class="kw">pub</span> <span class="ident">text</span>: <span class="ident">c_int</span>,
-    <span class="kw">pub</span> <span class="ident">time</span>: <span class="ident">uLong</span>,
-    <span class="kw">pub</span> <span class="ident">xflags</span>: <span class="ident">c_int</span>,
-    <span class="kw">pub</span> <span class="ident">os</span>: <span class="ident">c_int</span>,
-    <span class="kw">pub</span> <span class="ident">extra</span>: <span class="kw-2">*mut</span> <span class="ident">Bytef</span>,
-    <span class="kw">pub</span> <span class="ident">extra_len</span>: <span class="ident">uInt</span>,
-    <span class="kw">pub</span> <span class="ident">extra_max</span>: <span class="ident">uInt</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">*mut</span> <span class="ident">Bytef</span>,
-    <span class="kw">pub</span> <span class="ident">name_max</span>: <span class="ident">uInt</span>,
-    <span class="kw">pub</span> <span class="ident">comment</span>: <span class="kw-2">*mut</span> <span class="ident">Bytef</span>,
-    <span class="kw">pub</span> <span class="ident">comm_max</span>: <span class="ident">uInt</span>,
-    <span class="kw">pub</span> <span class="ident">hcrc</span>: <span class="ident">c_int</span>,
-    <span class="kw">pub</span> <span class="ident">done</span>: <span class="ident">c_int</span>,
+<span class="attribute">#[repr(C)]
+#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>gz_header {
+    <span class="kw">pub </span>text: c_int,
+    <span class="kw">pub </span>time: uLong,
+    <span class="kw">pub </span>xflags: c_int,
+    <span class="kw">pub </span>os: c_int,
+    <span class="kw">pub </span>extra: <span class="kw-2">*mut </span>Bytef,
+    <span class="kw">pub </span>extra_len: uInt,
+    <span class="kw">pub </span>extra_max: uInt,
+    <span class="kw">pub </span>name: <span class="kw-2">*mut </span>Bytef,
+    <span class="kw">pub </span>name_max: uInt,
+    <span class="kw">pub </span>comment: <span class="kw-2">*mut </span>Bytef,
+    <span class="kw">pub </span>comm_max: uInt,
+    <span class="kw">pub </span>hcrc: c_int,
+    <span class="kw">pub </span>done: c_int,
 }
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">gz_headerp</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">gz_header</span>;
+<span class="kw">pub type </span>gz_headerp = <span class="kw-2">*mut </span>gz_header;
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">z_stream</span> {
-    <span class="kw">pub</span> <span class="ident">next_in</span>: <span class="kw-2">*mut</span> <span class="ident">Bytef</span>,
-    <span class="kw">pub</span> <span class="ident">avail_in</span>: <span class="ident">uInt</span>,
-    <span class="kw">pub</span> <span class="ident">total_in</span>: <span class="ident">z_size</span>,
-    <span class="kw">pub</span> <span class="ident">next_out</span>: <span class="kw-2">*mut</span> <span class="ident">Bytef</span>,
-    <span class="kw">pub</span> <span class="ident">avail_out</span>: <span class="ident">uInt</span>,
-    <span class="kw">pub</span> <span class="ident">total_out</span>: <span class="ident">z_size</span>,
-    <span class="kw">pub</span> <span class="ident">msg</span>: <span class="kw-2">*mut</span> <span class="ident">c_char</span>,
-    <span class="kw">pub</span> <span class="ident">state</span>: <span class="kw-2">*mut</span> <span class="ident">internal_state</span>,
-    <span class="kw">pub</span> <span class="ident">zalloc</span>: <span class="ident">alloc_func</span>,
-    <span class="kw">pub</span> <span class="ident">zfree</span>: <span class="ident">free_func</span>,
-    <span class="kw">pub</span> <span class="ident">opaque</span>: <span class="ident">voidpf</span>,
-    <span class="kw">pub</span> <span class="ident">data_type</span>: <span class="ident">c_int</span>,
-    <span class="kw">pub</span> <span class="ident">adler</span>: <span class="ident">z_checksum</span>,
-    <span class="kw">pub</span> <span class="ident">reserved</span>: <span class="ident">uLong</span>,
+<span class="attribute">#[repr(C)]
+#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>z_stream {
+    <span class="kw">pub </span>next_in: <span class="kw-2">*mut </span>Bytef,
+    <span class="kw">pub </span>avail_in: uInt,
+    <span class="kw">pub </span>total_in: z_size,
+    <span class="kw">pub </span>next_out: <span class="kw-2">*mut </span>Bytef,
+    <span class="kw">pub </span>avail_out: uInt,
+    <span class="kw">pub </span>total_out: z_size,
+    <span class="kw">pub </span>msg: <span class="kw-2">*mut </span>c_char,
+    <span class="kw">pub </span>state: <span class="kw-2">*mut </span>internal_state,
+    <span class="kw">pub </span>zalloc: alloc_func,
+    <span class="kw">pub </span>zfree: free_func,
+    <span class="kw">pub </span>opaque: voidpf,
+    <span class="kw">pub </span>data_type: c_int,
+    <span class="kw">pub </span>adler: z_checksum,
+    <span class="kw">pub </span>reserved: uLong,
 }
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">z_streamp</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">z_stream</span>;
+<span class="kw">pub type </span>z_streamp = <span class="kw-2">*mut </span>z_stream;
 
-<span class="comment">// Ideally, this should instead use a macro that parses the whole block of externs, and generates</span>
-<span class="comment">// the appropriate link_name attributes, without duplicating the function names. However, ctest2</span>
-<span class="comment">// can&#39;t parse that.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">zng</span>))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">zng_prefix</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span>) =&gt; { <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">zng</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">zng_prefix</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span>) =&gt; { <span class="macro">concat!</span>(<span class="string">&quot;zng_&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>)) }
+<span class="comment">// Ideally, this should instead use a macro that parses the whole block of externs, and generates
+// the appropriate link_name attributes, without duplicating the function names. However, ctest2
+// can&#39;t parse that.
+</span><span class="attribute">#[cfg(not(zng))]
+</span><span class="macro">macro_rules! </span>zng_prefix {
+    (<span class="macro-nonterminal">$name</span>:expr) =&gt; { <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>) }
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">adler32</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adler32</span>(<span class="ident">adler</span>: <span class="ident">z_checksum</span>, <span class="ident">buf</span>: <span class="kw-2">*const</span> <span class="ident">Bytef</span>, <span class="ident">len</span>: <span class="ident">uInt</span>) -&gt; <span class="ident">z_checksum</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">crc32</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crc32</span>(<span class="ident">crc</span>: <span class="ident">z_checksum</span>, <span class="ident">buf</span>: <span class="kw-2">*const</span> <span class="ident">Bytef</span>, <span class="ident">len</span>: <span class="ident">uInt</span>) -&gt; <span class="ident">z_checksum</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflate</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflate</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>, <span class="ident">flush</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflateBound</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflateBound</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>, <span class="ident">sourceLen</span>: <span class="ident">uLong</span>) -&gt; <span class="ident">uLong</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflateCopy</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflateCopy</span>(<span class="ident">dest</span>: <span class="ident">z_streamp</span>, <span class="ident">source</span>: <span class="ident">z_streamp</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflateEnd</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflateEnd</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflateInit_</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflateInit_</span>(
-        <span class="ident">strm</span>: <span class="ident">z_streamp</span>,
-        <span class="ident">level</span>: <span class="ident">c_int</span>,
-        <span class="ident">version</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
-        <span class="ident">stream_size</span>: <span class="ident">c_int</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflateInit2_</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflateInit2_</span>(
-        <span class="ident">strm</span>: <span class="ident">z_streamp</span>,
-        <span class="ident">level</span>: <span class="ident">c_int</span>,
-        <span class="ident">method</span>: <span class="ident">c_int</span>,
-        <span class="ident">windowBits</span>: <span class="ident">c_int</span>,
-        <span class="ident">memLevel</span>: <span class="ident">c_int</span>,
-        <span class="ident">strategy</span>: <span class="ident">c_int</span>,
-        <span class="ident">version</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
-        <span class="ident">stream_size</span>: <span class="ident">c_int</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflateParams</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflateParams</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>, <span class="ident">level</span>: <span class="ident">c_int</span>, <span class="ident">strategy</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflatePrime</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflatePrime</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>, <span class="ident">bits</span>: <span class="ident">c_int</span>, <span class="ident">value</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflateReset</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflateReset</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflateSetDictionary</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflateSetDictionary</span>(
-        <span class="ident">strm</span>: <span class="ident">z_streamp</span>,
-        <span class="ident">dictionary</span>: <span class="kw-2">*const</span> <span class="ident">Bytef</span>,
-        <span class="ident">dictLength</span>: <span class="ident">uInt</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflateSetHeader</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflateSetHeader</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>, <span class="ident">head</span>: <span class="ident">gz_headerp</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">deflateTune</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deflateTune</span>(
-        <span class="ident">strm</span>: <span class="ident">z_streamp</span>,
-        <span class="ident">good_length</span>: <span class="ident">c_int</span>,
-        <span class="ident">max_lazy</span>: <span class="ident">c_int</span>,
-        <span class="ident">nice_length</span>: <span class="ident">c_int</span>,
-        <span class="ident">max_chain</span>: <span class="ident">c_int</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflate</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflate</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>, <span class="ident">flush</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateBack</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateBack</span>(
-        <span class="ident">strm</span>: <span class="ident">z_streamp</span>,
-        <span class="ident">_in</span>: <span class="ident">in_func</span>,
-        <span class="ident">in_desc</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
-        <span class="ident">out</span>: <span class="ident">out_func</span>,
-        <span class="ident">out_desc</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateBackEnd</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateBackEnd</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateBackInit_</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateBackInit_</span>(
-        <span class="ident">strm</span>: <span class="ident">z_streamp</span>,
-        <span class="ident">windowBits</span>: <span class="ident">c_int</span>,
-        <span class="ident">window</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
-        <span class="ident">version</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
-        <span class="ident">stream_size</span>: <span class="ident">c_int</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateCopy</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateCopy</span>(<span class="ident">dest</span>: <span class="ident">z_streamp</span>, <span class="ident">source</span>: <span class="ident">z_streamp</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateEnd</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateEnd</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateGetHeader</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateGetHeader</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>, <span class="ident">head</span>: <span class="ident">gz_headerp</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateInit_</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateInit_</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>, <span class="ident">version</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>, <span class="ident">stream_size</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateInit2_</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateInit2_</span>(
-        <span class="ident">strm</span>: <span class="ident">z_streamp</span>,
-        <span class="ident">windowBits</span>: <span class="ident">c_int</span>,
-        <span class="ident">version</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
-        <span class="ident">stream_size</span>: <span class="ident">c_int</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateMark</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateMark</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>) -&gt; <span class="ident">c_long</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflatePrime</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflatePrime</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>, <span class="ident">bits</span>: <span class="ident">c_int</span>, <span class="ident">value</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateReset</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateReset</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateReset2</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateReset2</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>, <span class="ident">windowBits</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateSetDictionary</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateSetDictionary</span>(
-        <span class="ident">strm</span>: <span class="ident">z_streamp</span>,
-        <span class="ident">dictionary</span>: <span class="kw-2">*const</span> <span class="ident">Bytef</span>,
-        <span class="ident">dictLength</span>: <span class="ident">uInt</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">inflateSync</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inflateSync</span>(<span class="ident">strm</span>: <span class="ident">z_streamp</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">zlibCompileFlags</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zlibCompileFlags</span>() -&gt; <span class="ident">uLong</span>;
-
-    <span class="comment">// The above set of functions currently target 1.2.3.4 (what&#39;s present on Ubuntu</span>
-    <span class="comment">// 12.04, but there&#39;s some other APIs that were added later. Should figure out</span>
-    <span class="comment">// how to expose them...</span>
-    <span class="comment">//</span>
-    <span class="comment">// Added in 1.2.5.1</span>
-    <span class="comment">//</span>
-    <span class="comment">//     pub fn deflatePending(strm: z_streamp,</span>
-    <span class="comment">//                           pending: *mut c_uint,</span>
-    <span class="comment">//                           bits: *mut c_int) -&gt; c_int;</span>
-    <span class="comment">//</span>
-    <span class="comment">// Addedin 1.2.7.1</span>
-    <span class="comment">//     pub fn inflateGetDictionary(strm: z_streamp,</span>
-    <span class="comment">//                                 dictionary: *mut Bytef,</span>
-    <span class="comment">//                                 dictLength: *mut uInt) -&gt; c_int;</span>
-    <span class="comment">//</span>
-    <span class="comment">// Added in 1.2.3.5</span>
-    <span class="comment">//     pub fn gzbuffer(file: gzFile, size: c_uint) -&gt; c_int;</span>
-    <span class="comment">//     pub fn gzclose_r(file: gzFile) -&gt; c_int;</span>
-    <span class="comment">//     pub fn gzclose_w(file: gzFile) -&gt; c_int;</span>
-    <span class="comment">//     pub fn gzoffset(file: gzFile) -&gt; z_off_t;</span>
+<span class="attribute">#[cfg(zng)]
+</span><span class="macro">macro_rules! </span>zng_prefix {
+    (<span class="macro-nonterminal">$name</span>:expr) =&gt; { <span class="macro">concat!</span>(<span class="string">&quot;zng_&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>)) }
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">if_zng!</span>(<span class="string">&quot;zlibng_version&quot;</span>, <span class="string">&quot;zlibVersion&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zlibVersion</span>() -&gt; <span class="kw-2">*const</span> <span class="ident">c_char</span>;
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(adler32)]
+    </span><span class="kw">pub fn </span>adler32(adler: z_checksum, buf: <span class="kw-2">*const </span>Bytef, len: uInt) -&gt; z_checksum;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(crc32)]
+    </span><span class="kw">pub fn </span>crc32(crc: z_checksum, buf: <span class="kw-2">*const </span>Bytef, len: uInt) -&gt; z_checksum;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflate)]
+    </span><span class="kw">pub fn </span>deflate(strm: z_streamp, flush: c_int) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflateBound)]
+    </span><span class="kw">pub fn </span>deflateBound(strm: z_streamp, sourceLen: uLong) -&gt; uLong;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflateCopy)]
+    </span><span class="kw">pub fn </span>deflateCopy(dest: z_streamp, source: z_streamp) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflateEnd)]
+    </span><span class="kw">pub fn </span>deflateEnd(strm: z_streamp) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflateInit_)]
+    </span><span class="kw">pub fn </span>deflateInit_(
+        strm: z_streamp,
+        level: c_int,
+        version: <span class="kw-2">*const </span>c_char,
+        stream_size: c_int,
+    ) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflateInit2_)]
+    </span><span class="kw">pub fn </span>deflateInit2_(
+        strm: z_streamp,
+        level: c_int,
+        method: c_int,
+        windowBits: c_int,
+        memLevel: c_int,
+        strategy: c_int,
+        version: <span class="kw-2">*const </span>c_char,
+        stream_size: c_int,
+    ) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflateParams)]
+    </span><span class="kw">pub fn </span>deflateParams(strm: z_streamp, level: c_int, strategy: c_int) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflatePrime)]
+    </span><span class="kw">pub fn </span>deflatePrime(strm: z_streamp, bits: c_int, value: c_int) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflateReset)]
+    </span><span class="kw">pub fn </span>deflateReset(strm: z_streamp) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflateSetDictionary)]
+    </span><span class="kw">pub fn </span>deflateSetDictionary(
+        strm: z_streamp,
+        dictionary: <span class="kw-2">*const </span>Bytef,
+        dictLength: uInt,
+    ) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflateSetHeader)]
+    </span><span class="kw">pub fn </span>deflateSetHeader(strm: z_streamp, head: gz_headerp) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(deflateTune)]
+    </span><span class="kw">pub fn </span>deflateTune(
+        strm: z_streamp,
+        good_length: c_int,
+        max_lazy: c_int,
+        nice_length: c_int,
+        max_chain: c_int,
+    ) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflate)]
+    </span><span class="kw">pub fn </span>inflate(strm: z_streamp, flush: c_int) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateBack)]
+    </span><span class="kw">pub fn </span>inflateBack(
+        strm: z_streamp,
+        _in: in_func,
+        in_desc: <span class="kw-2">*mut </span>c_void,
+        out: out_func,
+        out_desc: <span class="kw-2">*mut </span>c_void,
+    ) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateBackEnd)]
+    </span><span class="kw">pub fn </span>inflateBackEnd(strm: z_streamp) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateBackInit_)]
+    </span><span class="kw">pub fn </span>inflateBackInit_(
+        strm: z_streamp,
+        windowBits: c_int,
+        window: <span class="kw-2">*mut </span>c_uchar,
+        version: <span class="kw-2">*const </span>c_char,
+        stream_size: c_int,
+    ) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateCopy)]
+    </span><span class="kw">pub fn </span>inflateCopy(dest: z_streamp, source: z_streamp) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateEnd)]
+    </span><span class="kw">pub fn </span>inflateEnd(strm: z_streamp) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateGetHeader)]
+    </span><span class="kw">pub fn </span>inflateGetHeader(strm: z_streamp, head: gz_headerp) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateInit_)]
+    </span><span class="kw">pub fn </span>inflateInit_(strm: z_streamp, version: <span class="kw-2">*const </span>c_char, stream_size: c_int) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateInit2_)]
+    </span><span class="kw">pub fn </span>inflateInit2_(
+        strm: z_streamp,
+        windowBits: c_int,
+        version: <span class="kw-2">*const </span>c_char,
+        stream_size: c_int,
+    ) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateMark)]
+    </span><span class="kw">pub fn </span>inflateMark(strm: z_streamp) -&gt; c_long;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflatePrime)]
+    </span><span class="kw">pub fn </span>inflatePrime(strm: z_streamp, bits: c_int, value: c_int) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateReset)]
+    </span><span class="kw">pub fn </span>inflateReset(strm: z_streamp) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateReset2)]
+    </span><span class="kw">pub fn </span>inflateReset2(strm: z_streamp, windowBits: c_int) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateSetDictionary)]
+    </span><span class="kw">pub fn </span>inflateSetDictionary(
+        strm: z_streamp,
+        dictionary: <span class="kw-2">*const </span>Bytef,
+        dictLength: uInt,
+    ) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(inflateSync)]
+    </span><span class="kw">pub fn </span>inflateSync(strm: z_streamp) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(zlibCompileFlags)]
+    </span><span class="kw">pub fn </span>zlibCompileFlags() -&gt; uLong;
+
+    <span class="comment">// The above set of functions currently target 1.2.3.4 (what&#39;s present on Ubuntu
+    // 12.04, but there&#39;s some other APIs that were added later. Should figure out
+    // how to expose them...
+    //
+    // Added in 1.2.5.1
+    //
+    //     pub fn deflatePending(strm: z_streamp,
+    //                           pending: *mut c_uint,
+    //                           bits: *mut c_int) -&gt; c_int;
+    //
+    // Addedin 1.2.7.1
+    //     pub fn inflateGetDictionary(strm: z_streamp,
+    //                                 dictionary: *mut Bytef,
+    //                                 dictLength: *mut uInt) -&gt; c_int;
+    //
+    // Added in 1.2.3.5
+    //     pub fn gzbuffer(file: gzFile, size: c_uint) -&gt; c_int;
+    //     pub fn gzclose_r(file: gzFile) -&gt; c_int;
+    //     pub fn gzclose_w(file: gzFile) -&gt; c_int;
+    //     pub fn gzoffset(file: gzFile) -&gt; z_off_t;
+</span>}
+
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="attribute">#[link_name = <span class="macro">if_zng!</span>(<span class="string">&quot;zlibng_version&quot;</span>, <span class="string">&quot;zlibVersion&quot;</span>)]
+    </span><span class="kw">pub fn </span>zlibVersion() -&gt; <span class="kw-2">*const </span>c_char;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">zng</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libc&quot;</span>))]</span>
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">adler32_combine</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adler32_combine</span>(<span class="ident">adler1</span>: <span class="ident">z_checksum</span>, <span class="ident">adler2</span>: <span class="ident">z_checksum</span>, <span class="ident">len2</span>: <span class="ident">z_off_t</span>) -&gt; <span class="ident">z_checksum</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">compress</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compress</span>(
-        <span class="ident">dest</span>: <span class="kw-2">*mut</span> <span class="ident">Bytef</span>,
-        <span class="ident">destLen</span>: <span class="kw-2">*mut</span> <span class="ident">z_size</span>,
-        <span class="ident">source</span>: <span class="kw-2">*const</span> <span class="ident">Bytef</span>,
-        <span class="ident">sourceLen</span>: <span class="ident">z_size</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">compress2</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compress2</span>(
-        <span class="ident">dest</span>: <span class="kw-2">*mut</span> <span class="ident">Bytef</span>,
-        <span class="ident">destLen</span>: <span class="kw-2">*mut</span> <span class="ident">z_size</span>,
-        <span class="ident">source</span>: <span class="kw-2">*const</span> <span class="ident">Bytef</span>,
-        <span class="ident">sourceLen</span>: <span class="ident">z_size</span>,
-        <span class="ident">level</span>: <span class="ident">c_int</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">compressBound</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compressBound</span>(<span class="ident">sourceLen</span>: <span class="ident">z_size</span>) -&gt; <span class="ident">z_size</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">crc32_combine</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crc32_combine</span>(<span class="ident">crc1</span>: <span class="ident">z_checksum</span>, <span class="ident">crc2</span>: <span class="ident">z_checksum</span>, <span class="ident">len2</span>: <span class="ident">z_off_t</span>) -&gt; <span class="ident">z_checksum</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzdirect</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzdirect</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzdopen</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzdopen</span>(<span class="ident">fd</span>: <span class="ident">c_int</span>, <span class="ident">mode</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>) -&gt; <span class="ident">gzFile</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzclearerr</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzclearerr</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>);
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzclose</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzclose</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzeof</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzeof</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzerror</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzerror</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>, <span class="ident">errnum</span>: <span class="kw-2">*mut</span> <span class="ident">c_int</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">c_char</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzflush</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzflush</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>, <span class="ident">flush</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzgetc</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzgetc</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzgets</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzgets</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>, <span class="ident">buf</span>: <span class="kw-2">*mut</span> <span class="ident">c_char</span>, <span class="ident">len</span>: <span class="ident">c_int</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">c_char</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzopen</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzopen</span>(<span class="ident">path</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>, <span class="ident">mode</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>) -&gt; <span class="ident">gzFile</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzputc</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzputc</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>, <span class="ident">c</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzputs</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzputs</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>, <span class="ident">s</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzread</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzread</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>, <span class="ident">buf</span>: <span class="ident">voidp</span>, <span class="ident">len</span>: <span class="ident">c_uint</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzrewind</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzrewind</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzseek</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzseek</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>, <span class="ident">offset</span>: <span class="ident">z_off_t</span>, <span class="ident">whence</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">z_off_t</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzsetparams</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzsetparams</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>, <span class="ident">level</span>: <span class="ident">c_int</span>, <span class="ident">strategy</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gztell</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gztell</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>) -&gt; <span class="ident">z_off_t</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzungetc</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzungetc</span>(<span class="ident">c</span>: <span class="ident">c_int</span>, <span class="ident">file</span>: <span class="ident">gzFile</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">gzwrite</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gzwrite</span>(<span class="ident">file</span>: <span class="ident">gzFile</span>, <span class="ident">buf</span>: <span class="ident">voidpc</span>, <span class="ident">len</span>: <span class="ident">c_uint</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">link_name</span> <span class="op">=</span> <span class="macro">zng_prefix!</span>(<span class="ident">uncompress</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uncompress</span>(
-        <span class="ident">dest</span>: <span class="kw-2">*mut</span> <span class="ident">Bytef</span>,
-        <span class="ident">destLen</span>: <span class="kw-2">*mut</span> <span class="ident">z_size</span>,
-        <span class="ident">source</span>: <span class="kw-2">*const</span> <span class="ident">Bytef</span>,
-        <span class="ident">sourceLen</span>: <span class="ident">z_size</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+<span class="attribute">#[cfg(any(zng, feature = <span class="string">&quot;libc&quot;</span>))]
+</span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(adler32_combine)]
+    </span><span class="kw">pub fn </span>adler32_combine(adler1: z_checksum, adler2: z_checksum, len2: z_off_t) -&gt; z_checksum;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(compress)]
+    </span><span class="kw">pub fn </span>compress(
+        dest: <span class="kw-2">*mut </span>Bytef,
+        destLen: <span class="kw-2">*mut </span>z_size,
+        source: <span class="kw-2">*const </span>Bytef,
+        sourceLen: z_size,
+    ) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(compress2)]
+    </span><span class="kw">pub fn </span>compress2(
+        dest: <span class="kw-2">*mut </span>Bytef,
+        destLen: <span class="kw-2">*mut </span>z_size,
+        source: <span class="kw-2">*const </span>Bytef,
+        sourceLen: z_size,
+        level: c_int,
+    ) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(compressBound)]
+    </span><span class="kw">pub fn </span>compressBound(sourceLen: z_size) -&gt; z_size;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(crc32_combine)]
+    </span><span class="kw">pub fn </span>crc32_combine(crc1: z_checksum, crc2: z_checksum, len2: z_off_t) -&gt; z_checksum;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzdirect)]
+    </span><span class="kw">pub fn </span>gzdirect(file: gzFile) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzdopen)]
+    </span><span class="kw">pub fn </span>gzdopen(fd: c_int, mode: <span class="kw-2">*const </span>c_char) -&gt; gzFile;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzclearerr)]
+    </span><span class="kw">pub fn </span>gzclearerr(file: gzFile);
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzclose)]
+    </span><span class="kw">pub fn </span>gzclose(file: gzFile) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzeof)]
+    </span><span class="kw">pub fn </span>gzeof(file: gzFile) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzerror)]
+    </span><span class="kw">pub fn </span>gzerror(file: gzFile, errnum: <span class="kw-2">*mut </span>c_int) -&gt; <span class="kw-2">*const </span>c_char;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzflush)]
+    </span><span class="kw">pub fn </span>gzflush(file: gzFile, flush: c_int) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzgetc)]
+    </span><span class="kw">pub fn </span>gzgetc(file: gzFile) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzgets)]
+    </span><span class="kw">pub fn </span>gzgets(file: gzFile, buf: <span class="kw-2">*mut </span>c_char, len: c_int) -&gt; <span class="kw-2">*mut </span>c_char;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzopen)]
+    </span><span class="kw">pub fn </span>gzopen(path: <span class="kw-2">*const </span>c_char, mode: <span class="kw-2">*const </span>c_char) -&gt; gzFile;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzputc)]
+    </span><span class="kw">pub fn </span>gzputc(file: gzFile, c: c_int) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzputs)]
+    </span><span class="kw">pub fn </span>gzputs(file: gzFile, s: <span class="kw-2">*const </span>c_char) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzread)]
+    </span><span class="kw">pub fn </span>gzread(file: gzFile, buf: voidp, len: c_uint) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzrewind)]
+    </span><span class="kw">pub fn </span>gzrewind(file: gzFile) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzseek)]
+    </span><span class="kw">pub fn </span>gzseek(file: gzFile, offset: z_off_t, whence: c_int) -&gt; z_off_t;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzsetparams)]
+    </span><span class="kw">pub fn </span>gzsetparams(file: gzFile, level: c_int, strategy: c_int) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gztell)]
+    </span><span class="kw">pub fn </span>gztell(file: gzFile) -&gt; z_off_t;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzungetc)]
+    </span><span class="kw">pub fn </span>gzungetc(c: c_int, file: gzFile) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(gzwrite)]
+    </span><span class="kw">pub fn </span>gzwrite(file: gzFile, buf: voidpc, len: c_uint) -&gt; c_int;
+    <span class="attribute">#[link_name = <span class="macro">zng_prefix!</span>(uncompress)]
+    </span><span class="kw">pub fn </span>uncompress(
+        dest: <span class="kw-2">*mut </span>Bytef,
+        destLen: <span class="kw-2">*mut </span>z_size,
+        source: <span class="kw-2">*const </span>Bytef,
+        sourceLen: z_size,
+    ) -&gt; c_int;
 }
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_NO_FLUSH</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">0</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_PARTIAL_FLUSH</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_SYNC_FLUSH</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_FULL_FLUSH</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">3</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_FINISH</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">4</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_BLOCK</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">5</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_TREES</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">6</span>;
+<span class="kw">pub const </span>Z_NO_FLUSH: c_int = <span class="number">0</span>;
+<span class="kw">pub const </span>Z_PARTIAL_FLUSH: c_int = <span class="number">1</span>;
+<span class="kw">pub const </span>Z_SYNC_FLUSH: c_int = <span class="number">2</span>;
+<span class="kw">pub const </span>Z_FULL_FLUSH: c_int = <span class="number">3</span>;
+<span class="kw">pub const </span>Z_FINISH: c_int = <span class="number">4</span>;
+<span class="kw">pub const </span>Z_BLOCK: c_int = <span class="number">5</span>;
+<span class="kw">pub const </span>Z_TREES: c_int = <span class="number">6</span>;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_OK</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">0</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_STREAM_END</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_NEED_DICT</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_ERRNO</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="op">-</span><span class="number">1</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_STREAM_ERROR</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="op">-</span><span class="number">2</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_DATA_ERROR</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="op">-</span><span class="number">3</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_MEM_ERROR</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="op">-</span><span class="number">4</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_BUF_ERROR</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="op">-</span><span class="number">5</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_VERSION_ERROR</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="op">-</span><span class="number">6</span>;
+<span class="kw">pub const </span>Z_OK: c_int = <span class="number">0</span>;
+<span class="kw">pub const </span>Z_STREAM_END: c_int = <span class="number">1</span>;
+<span class="kw">pub const </span>Z_NEED_DICT: c_int = <span class="number">2</span>;
+<span class="kw">pub const </span>Z_ERRNO: c_int = -<span class="number">1</span>;
+<span class="kw">pub const </span>Z_STREAM_ERROR: c_int = -<span class="number">2</span>;
+<span class="kw">pub const </span>Z_DATA_ERROR: c_int = -<span class="number">3</span>;
+<span class="kw">pub const </span>Z_MEM_ERROR: c_int = -<span class="number">4</span>;
+<span class="kw">pub const </span>Z_BUF_ERROR: c_int = -<span class="number">5</span>;
+<span class="kw">pub const </span>Z_VERSION_ERROR: c_int = -<span class="number">6</span>;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_NO_COMPRESSION</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">0</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_BEST_SPEED</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_BEST_COMPRESSION</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">9</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_DEFAULT_COMPRESSION</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="op">-</span><span class="number">1</span>;
+<span class="kw">pub const </span>Z_NO_COMPRESSION: c_int = <span class="number">0</span>;
+<span class="kw">pub const </span>Z_BEST_SPEED: c_int = <span class="number">1</span>;
+<span class="kw">pub const </span>Z_BEST_COMPRESSION: c_int = <span class="number">9</span>;
+<span class="kw">pub const </span>Z_DEFAULT_COMPRESSION: c_int = -<span class="number">1</span>;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_FILTERED</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_HUFFMAN_ONLY</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_RLE</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">3</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_FIXED</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">4</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_DEFAULT_STRATEGY</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="kw">pub const </span>Z_FILTERED: c_int = <span class="number">1</span>;
+<span class="kw">pub const </span>Z_HUFFMAN_ONLY: c_int = <span class="number">2</span>;
+<span class="kw">pub const </span>Z_RLE: c_int = <span class="number">3</span>;
+<span class="kw">pub const </span>Z_FIXED: c_int = <span class="number">4</span>;
+<span class="kw">pub const </span>Z_DEFAULT_STRATEGY: c_int = <span class="number">0</span>;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_BINARY</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">0</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_TEXT</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_ASCII</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident">Z_TEXT</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_UNKNOWN</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">2</span>;
+<span class="kw">pub const </span>Z_BINARY: c_int = <span class="number">0</span>;
+<span class="kw">pub const </span>Z_TEXT: c_int = <span class="number">1</span>;
+<span class="kw">pub const </span>Z_ASCII: c_int = Z_TEXT;
+<span class="kw">pub const </span>Z_UNKNOWN: c_int = <span class="number">2</span>;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Z_DEFLATED</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">8</span>;
+<span class="kw">pub const </span>Z_DEFLATED: c_int = <span class="number">8</span>;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libz_sys" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libz_sys" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

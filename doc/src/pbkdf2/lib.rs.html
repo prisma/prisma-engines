@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pbkdf2-0.10.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pbkdf2/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pbkdf2/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pbkdf2-0.10.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pbkdf2/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pbkdf2/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pbkdf2/index.html">
                         <img src="https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -148,153 +148,153 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This crate implements the PBKDF2 key derivation function as specified</span>
-<span class="doccomment">//! in [RFC 2898](https://tools.ietf.org/html/rfc2898).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you are only using the low-level [`pbkdf2`] function instead of the</span>
-<span class="doccomment">//! higher-level [`Pbkdf2`] struct to produce/verify hash strings,</span>
-<span class="doccomment">//! it&#39;s recommended to disable default features in your `Cargo.toml`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! pbkdf2 = { version = &quot;0.7&quot;, default-features = false }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Usage (simple with default params)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note: this example requires the `rand_core` crate with the `std` feature</span>
-<span class="doccomment">//! enabled for `rand_core::OsRng` (embedded platforms can substitute their</span>
-<span class="doccomment">//! own RNG)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Add the following to your crate&#39;s `Cargo.toml` to import it:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! pbkdf2 = &quot;0.7&quot;</span>
-<span class="doccomment">//! rand_core = { version = &quot;0.6&quot;, features = [&quot;std&quot;] }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following example demonstrates the high-level password hashing API:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">//! # #[cfg(all(feature = &quot;password-hash&quot;, feature = &quot;std&quot;))]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use pbkdf2::{</span>
-<span class="doccomment">//!     password_hash::{</span>
-<span class="doccomment">//!         rand_core::OsRng,</span>
-<span class="doccomment">//!         PasswordHash, PasswordHasher, PasswordVerifier, SaltString</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//!     Pbkdf2</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let password = b&quot;hunter42&quot;; // Bad password; don&#39;t actually use!</span>
-<span class="doccomment">//! let salt = SaltString::generate(&amp;mut OsRng);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Hash password to PHC string ($pbkdf2-sha256$...)</span>
-<span class="doccomment">//! let password_hash = Pbkdf2.hash_password(password, &amp;salt)?.to_string();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Verify password against PHC string</span>
-<span class="doccomment">//! let parsed_hash = PasswordHash::new(&amp;password_hash)?;</span>
-<span class="doccomment">//! assert!(Pbkdf2.verify_password(password, &amp;parsed_hash).is_ok());</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! # Ok(())</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This crate implements the PBKDF2 key derivation function as specified
+//! in [RFC 2898](https://tools.ietf.org/html/rfc2898).
+//!
+//! If you are only using the low-level [`pbkdf2`] function instead of the
+//! higher-level [`Pbkdf2`] struct to produce/verify hash strings,
+//! it&#39;s recommended to disable default features in your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! pbkdf2 = { version = &quot;0.7&quot;, default-features = false }
+//! ```
+//!
+//! # Usage (simple with default params)
+//!
+//! Note: this example requires the `rand_core` crate with the `std` feature
+//! enabled for `rand_core::OsRng` (embedded platforms can substitute their
+//! own RNG)
+//!
+//! Add the following to your crate&#39;s `Cargo.toml` to import it:
+//!
+//! ```toml
+//! [dependencies]
+//! pbkdf2 = &quot;0.7&quot;
+//! rand_core = { version = &quot;0.6&quot;, features = [&quot;std&quot;] }
+//! ```
+//!
+//! The following example demonstrates the high-level password hashing API:
+//!
+//! ```
+//! # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+//! # #[cfg(all(feature = &quot;password-hash&quot;, feature = &quot;std&quot;))]
+//! # {
+//! use pbkdf2::{
+//!     password_hash::{
+//!         rand_core::OsRng,
+//!         PasswordHash, PasswordHasher, PasswordVerifier, SaltString
+//!     },
+//!     Pbkdf2
+//! };
+//!
+//! let password = b&quot;hunter42&quot;; // Bad password; don&#39;t actually use!
+//! let salt = SaltString::generate(&amp;mut OsRng);
+//!
+//! // Hash password to PHC string ($pbkdf2-sha256$...)
+//! let password_hash = Pbkdf2.hash_password(password, &amp;salt)?.to_string();
+//!
+//! // Verify password against PHC string
+//! let parsed_hash = PasswordHash::new(&amp;password_hash)?;
+//! assert!(Pbkdf2.verify_password(password, &amp;parsed_hash).is_ok());
+//! # }
+//! # Ok(())
+//! # }
+//! ```
 
-<span class="attribute">#![<span class="ident">no_std</span>]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
-<span class="attribute">#![<span class="ident">doc</span>(
-    <span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg&quot;</span>,
-    <span class="ident">html_favicon_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg&quot;</span>,
-    <span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/pbkdf2/0.10.1&quot;</span>
-)]</span>
+</span><span class="attribute">#![no_std]
+#![cfg_attr(docsrs, feature(doc_cfg))]
+#![doc(
+    html_logo_url = <span class="string">&quot;https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg&quot;</span>,
+    html_favicon_url = <span class="string">&quot;https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg&quot;</span>,
+    html_root_url = <span class="string">&quot;https://docs.rs/pbkdf2/0.10.1&quot;
+</span>)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span>;
+#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">extern crate </span>std;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simple&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;simple&quot;</span>)]
+</span><span class="kw">extern crate </span>alloc;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simple&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simple&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">password_hash</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;simple&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;simple&quot;</span>)))]
+</span><span class="kw">pub use </span>password_hash;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simple&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">simple</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;simple&quot;</span>)]
+</span><span class="kw">mod </span>simple;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simple&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::simple</span>::{<span class="ident">Algorithm</span>, <span class="ident">Params</span>, <span class="ident">Pbkdf2</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;simple&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::simple::{Algorithm, Params, Pbkdf2};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">rayon::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parallel&quot;</span>)]
+</span><span class="kw">use </span>rayon::prelude::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">digest</span>::{<span class="ident">generic_array::typenum::Unsigned</span>, <span class="ident">FixedOutput</span>, <span class="ident">KeyInit</span>, <span class="ident">Update</span>};
+<span class="kw">use </span>digest::{generic_array::typenum::Unsigned, FixedOutput, KeyInit, Update};
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">xor</span>(<span class="ident">res</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>], <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-    <span class="macro">debug_assert!</span>(<span class="ident">salt</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">res</span>.<span class="ident">len</span>(), <span class="string">&quot;length mismatch in xor&quot;</span>);
-    <span class="ident">res</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">salt</span>.<span class="ident">iter</span>()).<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">a</span> <span class="op">^</span><span class="op">=</span> <span class="ident">b</span>);
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>xor(res: <span class="kw-2">&amp;mut </span>[u8], salt: <span class="kw-2">&amp;</span>[u8]) {
+    <span class="macro">debug_assert!</span>(salt.len() &gt;= res.len(), <span class="string">&quot;length mismatch in xor&quot;</span>);
+    res.iter_mut().zip(salt.iter()).for_each(|(a, b)| <span class="kw-2">*</span>a ^= b);
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">pbkdf2_body</span><span class="op">&lt;</span><span class="ident">PRF</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">u32</span>, <span class="ident">chunk</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>], <span class="ident">prf</span>: <span class="kw-2">&amp;</span><span class="ident">PRF</span>, <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">rounds</span>: <span class="ident">u32</span>)
-<span class="kw">where</span>
-    <span class="ident">PRF</span>: <span class="ident">KeyInit</span> <span class="op">+</span> <span class="ident">Update</span> <span class="op">+</span> <span class="ident">FixedOutput</span> <span class="op">+</span> <span class="ident">Clone</span>,
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>pbkdf2_body&lt;PRF&gt;(i: u32, chunk: <span class="kw-2">&amp;mut </span>[u8], prf: <span class="kw-2">&amp;</span>PRF, salt: <span class="kw-2">&amp;</span>[u8], rounds: u32)
+<span class="kw">where
+    </span>PRF: KeyInit + Update + FixedOutput + Clone,
 {
-    <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">chunk</span>.<span class="ident">iter_mut</span>() {
-        <span class="kw-2">*</span><span class="ident">v</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">for </span>v <span class="kw">in </span>chunk.iter_mut() {
+        <span class="kw-2">*</span>v = <span class="number">0</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">salt</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prfc</span> <span class="op">=</span> <span class="ident">prf</span>.<span class="ident">clone</span>();
-        <span class="ident">prfc</span>.<span class="ident">update</span>(<span class="ident">salt</span>);
-        <span class="ident">prfc</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span>(<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">to_be_bytes</span>());
+    <span class="kw">let </span><span class="kw-2">mut </span>salt = {
+        <span class="kw">let </span><span class="kw-2">mut </span>prfc = prf.clone();
+        prfc.update(salt);
+        prfc.update(<span class="kw-2">&amp;</span>(i + <span class="number">1</span>).to_be_bytes());
 
-        <span class="kw">let</span> <span class="ident">salt</span> <span class="op">=</span> <span class="ident">prfc</span>.<span class="ident">finalize_fixed</span>();
-        <span class="ident">xor</span>(<span class="ident">chunk</span>, <span class="kw-2">&amp;</span><span class="ident">salt</span>);
-        <span class="ident">salt</span>
+        <span class="kw">let </span>salt = prfc.finalize_fixed();
+        xor(chunk, <span class="kw-2">&amp;</span>salt);
+        salt
     };
 
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">1</span>..<span class="ident">rounds</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prfc</span> <span class="op">=</span> <span class="ident">prf</span>.<span class="ident">clone</span>();
-        <span class="ident">prfc</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">salt</span>);
-        <span class="ident">salt</span> <span class="op">=</span> <span class="ident">prfc</span>.<span class="ident">finalize_fixed</span>();
+    <span class="kw">for _ in </span><span class="number">1</span>..rounds {
+        <span class="kw">let </span><span class="kw-2">mut </span>prfc = prf.clone();
+        prfc.update(<span class="kw-2">&amp;</span>salt);
+        salt = prfc.finalize_fixed();
 
-        <span class="ident">xor</span>(<span class="ident">chunk</span>, <span class="kw-2">&amp;</span><span class="ident">salt</span>);
+        xor(chunk, <span class="kw-2">&amp;</span>salt);
     }
 }
 
-<span class="doccomment">/// Generic implementation of PBKDF2 algorithm.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pbkdf2</span><span class="op">&lt;</span><span class="ident">PRF</span><span class="op">&gt;</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">rounds</span>: <span class="ident">u32</span>, <span class="ident">res</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>])
-<span class="kw">where</span>
-    <span class="ident">PRF</span>: <span class="ident">KeyInit</span> <span class="op">+</span> <span class="ident">Update</span> <span class="op">+</span> <span class="ident">FixedOutput</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Sync</span>,
+<span class="doccomment">/// Generic implementation of PBKDF2 algorithm.
+</span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;parallel&quot;</span>))]
+#[inline]
+</span><span class="kw">pub fn </span>pbkdf2&lt;PRF&gt;(password: <span class="kw-2">&amp;</span>[u8], salt: <span class="kw-2">&amp;</span>[u8], rounds: u32, res: <span class="kw-2">&amp;mut </span>[u8])
+<span class="kw">where
+    </span>PRF: KeyInit + Update + FixedOutput + Clone + Sync,
 {
-    <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">PRF::OutputSize::to_usize</span>();
-    <span class="comment">// note: HMAC can be initialized with keys of any size,</span>
-    <span class="comment">// so this panic never happens with it</span>
-    <span class="kw">let</span> <span class="ident">prf</span> <span class="op">=</span> <span class="ident">PRF::new_from_slice</span>(<span class="ident">password</span>).<span class="ident">expect</span>(<span class="string">&quot;PRF initialization failure&quot;</span>);
+    <span class="kw">let </span>n = PRF::OutputSize::to_usize();
+    <span class="comment">// note: HMAC can be initialized with keys of any size,
+    // so this panic never happens with it
+    </span><span class="kw">let </span>prf = PRF::new_from_slice(password).expect(<span class="string">&quot;PRF initialization failure&quot;</span>);
 
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">chunk</span>) <span class="kw">in</span> <span class="ident">res</span>.<span class="ident">chunks_mut</span>(<span class="ident">n</span>).<span class="ident">enumerate</span>() {
-        <span class="ident">pbkdf2_body</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">chunk</span>, <span class="kw-2">&amp;</span><span class="ident">prf</span>, <span class="ident">salt</span>, <span class="ident">rounds</span>);
+    <span class="kw">for </span>(i, chunk) <span class="kw">in </span>res.chunks_mut(n).enumerate() {
+        pbkdf2_body(i <span class="kw">as </span>u32, chunk, <span class="kw-2">&amp;</span>prf, salt, rounds);
     }
 }
 
-<span class="doccomment">/// Generic implementation of PBKDF2 algorithm.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pbkdf2</span><span class="op">&lt;</span><span class="ident">PRF</span><span class="op">&gt;</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">rounds</span>: <span class="ident">u32</span>, <span class="ident">res</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>])
-<span class="kw">where</span>
-    <span class="ident">PRF</span>: <span class="ident">KeyInit</span> <span class="op">+</span> <span class="ident">Update</span> <span class="op">+</span> <span class="ident">FixedOutput</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Sync</span>,
+<span class="doccomment">/// Generic implementation of PBKDF2 algorithm.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;parallel&quot;</span>)]
+#[inline]
+</span><span class="kw">pub fn </span>pbkdf2&lt;PRF&gt;(password: <span class="kw-2">&amp;</span>[u8], salt: <span class="kw-2">&amp;</span>[u8], rounds: u32, res: <span class="kw-2">&amp;mut </span>[u8])
+<span class="kw">where
+    </span>PRF: KeyInit + Update + FixedOutput + Clone + Sync,
 {
-    <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">PRF::OutputSize::to_usize</span>();
-    <span class="kw">let</span> <span class="ident">prf</span> <span class="op">=</span> <span class="ident">PRF::new_from_slice</span>(<span class="ident">password</span>).<span class="ident">expect</span>(<span class="string">&quot;PRF initialization failure&quot;</span>);
+    <span class="kw">let </span>n = PRF::OutputSize::to_usize();
+    <span class="kw">let </span>prf = PRF::new_from_slice(password).expect(<span class="string">&quot;PRF initialization failure&quot;</span>);
 
-    <span class="ident">res</span>.<span class="ident">par_chunks_mut</span>(<span class="ident">n</span>).<span class="ident">enumerate</span>().<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">chunk</span>)<span class="op">|</span> {
-        <span class="ident">pbkdf2_body</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">chunk</span>, <span class="kw-2">&amp;</span><span class="ident">prf</span>, <span class="ident">salt</span>, <span class="ident">rounds</span>);
+    res.par_chunks_mut(n).enumerate().for_each(|(i, chunk)| {
+        pbkdf2_body(i <span class="kw">as </span>u32, chunk, <span class="kw-2">&amp;</span>prf, salt, rounds);
     });
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pbkdf2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pbkdf2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

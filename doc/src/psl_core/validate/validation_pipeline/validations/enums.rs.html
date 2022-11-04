@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/enums.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enums.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/enums.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enums.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -124,131 +124,131 @@
 <span id="124">124</span>
 <span id="125">125</span>
 <span id="126">126</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">datamodel_connector::ConnectorCapability</span>,
-    <span class="ident">diagnostics::DatamodelError</span>,
-    <span class="ident">parser_database</span>::{<span class="self">self</span>, <span class="ident">ast::WithSpan</span>, <span class="ident">walkers::EnumWalker</span>},
-    <span class="ident">validate::validation_pipeline::context::Context</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    datamodel_connector::ConnectorCapability,
+    diagnostics::DatamodelError,
+    parser_database::{<span class="self">self</span>, ast::WithSpan, walkers::EnumWalker},
+    validate::validation_pipeline::context::Context,
 };
-<span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
+<span class="kw">use </span>std::collections::HashSet;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">database_name_clashes</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">database_names</span>: <span class="ident">HashSet</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashSet::with_capacity</span>(<span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">enums_count</span>());
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>database_name_clashes(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>database_names: HashSet&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, <span class="kw-2">&amp;</span>str)&gt; = HashSet::with_capacity(ctx.db.enums_count());
 
-    <span class="kw">for</span> <span class="ident">enm</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_enums</span>() {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">database_names</span>.<span class="ident">insert</span>((<span class="ident">enm</span>.<span class="ident">schema</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">n</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">n</span>), <span class="ident">enm</span>.<span class="ident">database_name</span>())) {
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_enum_database_name_error</span>(
-                <span class="ident">enm</span>.<span class="ident">ast_enum</span>().<span class="ident">span</span>(),
+    <span class="kw">for </span>enm <span class="kw">in </span>ctx.db.walk_enums() {
+        <span class="kw">if </span>!database_names.insert((enm.schema().map(|(n, <span class="kw">_</span>)| n), enm.database_name())) {
+            ctx.push_error(DatamodelError::new_duplicate_enum_database_name_error(
+                enm.ast_enum().span(),
             ));
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">schema_is_defined_in_the_datasource</span>(<span class="ident">r#enum</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident"><span class="kw">crate</span>::PreviewFeature::MultiSchema</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>schema_is_defined_in_the_datasource(r#enum: EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>!ctx.preview_features.contains(<span class="kw">crate</span>::PreviewFeature::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MultiSchema</span>) {
+    <span class="kw">if </span>!ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">datasource</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">datasource</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ds</span>) =&gt; <span class="ident">ds</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>datasource = <span class="kw">match </span>ctx.datasource {
+        <span class="prelude-val">Some</span>(ds) =&gt; ds,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">let</span> (<span class="ident">schema_name</span>, <span class="ident">span</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">r#enum</span>.<span class="ident">schema</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">tuple</span>) =&gt; <span class="ident">tuple</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>(schema_name, span) = <span class="kw">match </span>r#enum.schema() {
+        <span class="prelude-val">Some</span>(tuple) =&gt; tuple,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="ident">datasource</span>.<span class="ident">has_schema</span>(<span class="ident">schema_name</span>) {
+    <span class="kw">if </span>datasource.has_schema(schema_name) {
         <span class="kw">return</span>;
     }
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+    ctx.push_error(DatamodelError::new_static(
         <span class="string">&quot;This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema&quot;</span>,
-        <span class="ident">span</span>,
+        span,
     ))
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">schema_attribute_supported_in_connector</span>(<span class="ident">r#enum</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident"><span class="kw">crate</span>::PreviewFeature::MultiSchema</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>schema_attribute_supported_in_connector(r#enum: EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>!ctx.preview_features.contains(<span class="kw">crate</span>::PreviewFeature::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MultiSchema</span>) {
+    <span class="kw">if </span>ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">r#enum</span>.<span class="ident">schema</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">tuple</span>) =&gt; <span class="ident">tuple</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>(<span class="kw">_</span>, span) = <span class="kw">match </span>r#enum.schema() {
+        <span class="prelude-val">Some</span>(tuple) =&gt; tuple,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+    ctx.push_error(DatamodelError::new_static(
         <span class="string">&quot;@@schema is not supported on the current datasource provider&quot;</span>,
-        <span class="ident">span</span>,
+        span,
     ));
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">schema_attribute_missing</span>(<span class="ident">r#enum</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident"><span class="kw">crate</span>::PreviewFeature::MultiSchema</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>schema_attribute_missing(r#enum: EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>!ctx.preview_features.contains(<span class="kw">crate</span>::PreviewFeature::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MultiSchema</span>) {
+    <span class="kw">if </span>!ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
-        .<span class="ident">db</span>
-        .<span class="ident">schema_flags</span>()
-        .<span class="ident">contains</span>(<span class="ident">parser_database::SchemaFlags::UsesSchemaAttribute</span>)
+    <span class="kw">if </span>!ctx
+        .db
+        .schema_flags()
+        .contains(parser_database::SchemaFlags::UsesSchemaAttribute)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">is_provider</span>(<span class="string">&quot;mysql&quot;</span>) {
+    <span class="kw">if </span>ctx.connector.is_provider(<span class="string">&quot;mysql&quot;</span>) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">r#enum</span>.<span class="ident">schema</span>().<span class="ident">is_some</span>() {
+    <span class="kw">if </span>r#enum.schema().is_some() {
         <span class="kw">return</span>;
     }
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+    ctx.push_error(DatamodelError::new_static(
         <span class="string">&quot;This enum is missing an `@@schema` attribute.&quot;</span>,
-        <span class="ident">r#enum</span>.<span class="ident">ast_enum</span>().<span class="ident">span</span>,
+        r#enum.ast_enum().span,
     ))
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">multischema_feature_flag_needed</span>(<span class="ident">r#enum</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident"><span class="kw">crate</span>::PreviewFeature::MultiSchema</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>multischema_feature_flag_needed(r#enum: EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>ctx.preview_features.contains(<span class="kw">crate</span>::PreviewFeature::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">span</span>)) <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">schema</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, span)) = r#enum.schema() {
+        ctx.push_error(DatamodelError::new_static(
             <span class="string">&quot;@@schema is only available with the `multiSchema` preview feature.&quot;</span>,
-            <span class="ident">span</span>,
+            span,
         ));
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">connector_supports_enums</span>(<span class="ident">r#enum</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_enums</span>() {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>connector_supports_enums(r#enum: EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>ctx.connector.supports_enums() {
         <span class="kw">return</span>;
     }
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+    ctx.push_error(DatamodelError::new_validation_error(
         <span class="kw-2">&amp;</span><span class="macro">format!</span>(
             <span class="string">&quot;You defined the enum `{}`. But the current connector does not support enums.&quot;</span>,
-            <span class="ident">r#enum</span>.<span class="ident">name</span>()
+            r#enum.name()
         ),
-        <span class="ident">r#enum</span>.<span class="ident">ast_enum</span>().<span class="ident">span</span>,
+        r#enum.ast_enum().span,
     ));
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

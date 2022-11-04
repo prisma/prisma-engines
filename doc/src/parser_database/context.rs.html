@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parser_database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parser_database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -446,453 +446,453 @@
 <span id="446">446</span>
 <span id="447">447</span>
 <span id="448">448</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">attributes</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>attributes;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::attributes::AttributesValidationState</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>, <span class="ident">interner::StringInterner</span>, <span class="ident">names::Names</span>, <span class="ident">relations::Relations</span>, <span class="ident">types::Types</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>,
-    <span class="ident">StringId</span>,
+<span class="kw">use </span><span class="self">self</span>::attributes::AttributesValidationState;
+<span class="kw">use crate</span>::{
+    ast, interner::StringInterner, names::Names, relations::Relations, types::Types, DatamodelError, Diagnostics,
+    StringId,
 };
-<span class="kw">use</span> <span class="ident">schema_ast::ast</span>::{<span class="ident">Expression</span>, <span class="ident">WithName</span>};
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
+<span class="kw">use </span>schema_ast::ast::{Expression, WithName};
+<span class="kw">use </span>std::collections::{HashMap, HashSet};
 
-<span class="doccomment">/// Validation context. This is an implementation detail of ParserDatabase. It</span>
-<span class="doccomment">/// contains the database itself, as well as context that is discarded after</span>
-<span class="doccomment">/// validation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Attribute Validation</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The Context also acts as a state machine for attribute validation. The goal is to avoid manual</span>
-<span class="doccomment">/// work validating things that are valid for every attribute set, and every argument set inside an</span>
-<span class="doccomment">/// attribute: multiple unnamed arguments are not valid, attributes we do not use in parser-database</span>
-<span class="doccomment">/// are not valid, multiple arguments with the same name are not valid, etc.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See `visit_attributes()`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">ast</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::SchemaAst</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">interner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="kw-2">mut</span> <span class="ident">StringInterner</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="kw-2">mut</span> <span class="ident">Names</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="kw-2">mut</span> <span class="ident">Types</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">relations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="kw-2">mut</span> <span class="ident">Relations</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
-    <span class="ident">attributes</span>: <span class="ident">AttributesValidationState</span>, <span class="comment">// state machine for attribute validation</span>
+<span class="doccomment">/// Validation context. This is an implementation detail of ParserDatabase. It
+/// contains the database itself, as well as context that is discarded after
+/// validation.
+///
+/// ## Attribute Validation
+///
+/// The Context also acts as a state machine for attribute validation. The goal is to avoid manual
+/// work validating things that are valid for every attribute set, and every argument set inside an
+/// attribute: multiple unnamed arguments are not valid, attributes we do not use in parser-database
+/// are not valid, multiple arguments with the same name are not valid, etc.
+///
+/// See `visit_attributes()`.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Context&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) ast: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::SchemaAst,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) interner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="kw-2">mut </span>StringInterner,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) names: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="kw-2">mut </span>Names,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) types: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="kw-2">mut </span>Types,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) relations: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="kw-2">mut </span>Relations,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) diagnostics: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="kw-2">mut </span>Diagnostics,
+    attributes: AttributesValidationState, <span class="comment">// state machine for attribute validation
 
-    <span class="comment">// @map&#39;ed names indexes. These are not in the db because they are only used for validation.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_model_scalar_field_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">StringId</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_composite_type_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ast::CompositeTypeId</span>, <span class="ident">StringId</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_enum_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StringId</span>, <span class="ident">ast::EnumId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_enum_value_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ast::EnumId</span>, <span class="ident">StringId</span>), <span class="ident">u32</span><span class="op">&gt;</span>,
+    // @map&#39;ed names indexes. These are not in the db because they are only used for validation.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) mapped_model_scalar_field_names: HashMap&lt;(ast::ModelId, StringId), ast::FieldId&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) mapped_composite_type_names: HashMap&lt;(ast::CompositeTypeId, StringId), ast::FieldId&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) mapped_enum_names: HashMap&lt;StringId, ast::EnumId&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) mapped_enum_value_names: HashMap&lt;(ast::EnumId, StringId), u32&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">ast</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::SchemaAst</span>,
-        <span class="ident">interner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="kw-2">mut</span> <span class="ident">StringInterner</span>,
-        <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="kw-2">mut</span> <span class="ident">Names</span>,
-        <span class="ident">types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="kw-2">mut</span> <span class="ident">Types</span>,
-        <span class="ident">relations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="kw-2">mut</span> <span class="ident">Relations</span>,
-        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident">Context</span> {
-            <span class="ident">ast</span>,
-            <span class="ident">interner</span>,
-            <span class="ident">names</span>,
-            <span class="ident">types</span>,
-            <span class="ident">relations</span>,
-            <span class="ident">diagnostics</span>,
-            <span class="ident">attributes</span>: <span class="ident">AttributesValidationState::default</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Context&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(
+        ast: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::SchemaAst,
+        interner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="kw-2">mut </span>StringInterner,
+        names: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="kw-2">mut </span>Names,
+        types: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="kw-2">mut </span>Types,
+        relations: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="kw-2">mut </span>Relations,
+        diagnostics: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="kw-2">mut </span>Diagnostics,
+    ) -&gt; <span class="self">Self </span>{
+        Context {
+            ast,
+            interner,
+            names,
+            types,
+            relations,
+            diagnostics,
+            attributes: AttributesValidationState::default(),
 
-            <span class="ident">mapped_model_scalar_field_names</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">mapped_enum_names</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">mapped_enum_value_names</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">mapped_composite_type_names</span>: <span class="ident">Default::default</span>(),
+            mapped_model_scalar_field_names: Default::default(),
+            mapped_enum_names: Default::default(),
+            mapped_enum_value_names: Default::default(),
+            mapped_composite_type_names: Default::default(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">push_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="ident">DatamodelError</span>) {
-        <span class="self">self</span>.<span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">error</span>)
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>push_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, error: DatamodelError) {
+        <span class="self">self</span>.diagnostics.push_error(error)
     }
 
-    <span class="doccomment">/// Return the attribute currently being validated. Panics if the context is not in the right</span>
-    <span class="doccomment">/// state.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">current_attribute_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ast::AttributeId</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attribute</span>.<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Return the attribute currently being validated. Panics if the context is not in the right
+    /// state.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>current_attribute_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ast::AttributeId {
+        <span class="self">self</span>.attributes.attribute.unwrap()
     }
 
-    <span class="doccomment">/// Return the attribute currently being validated. Panics if the context is not in the right</span>
-    <span class="doccomment">/// state.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">current_attribute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Attribute</span> {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attribute</span>.<span class="ident">unwrap</span>();
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ast</span>[<span class="ident">id</span>]
+    <span class="doccomment">/// Return the attribute currently being validated. Panics if the context is not in the right
+    /// state.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>current_attribute(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Attribute {
+        <span class="kw">let </span>id = <span class="self">self</span>.attributes.attribute.unwrap();
+        <span class="kw-2">&amp;</span><span class="self">self</span>.ast[id]
     }
 
-    <span class="doccomment">/// Discard arguments without validation.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">discard_arguments</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attribute</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">args</span>.<span class="ident">clear</span>();
+    <span class="doccomment">/// Discard arguments without validation.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>discard_arguments(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.attributes.attribute = <span class="prelude-val">None</span>;
+        <span class="self">self</span>.attributes.args.clear();
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">current_attribute</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>push_attribute_validation_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, message: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">let </span>attribute = <span class="self">self</span>.current_attribute();
 
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span>
-            <span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">attribute</span>.<span class="ident">name</span>()), <span class="ident">attribute</span>.<span class="ident">span</span>);
-        <span class="self">self</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
+        <span class="kw">let </span>err =
+            DatamodelError::new_attribute_validation_error(message, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, attribute.name()), attribute.span);
+        <span class="self">self</span>.push_error(err);
     }
 
-    <span class="doccomment">/// We need special code for scalar field attribute validation, because the</span>
-    <span class="doccomment">/// attributes on a scalar field are the attributes on the scalar field</span>
-    <span class="doccomment">/// itself, plus the attributes on the type alias it may be using. That type</span>
-    <span class="doccomment">/// alias may be referencing another type alias that has attributes, and so</span>
-    <span class="doccomment">/// on transitively.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Other than for this peculiarity, this method is identical to</span>
-    <span class="doccomment">/// `visit_attributes()`.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">visit_scalar_field_attributes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>) {
-        <span class="self">self</span>.<span class="ident">visit_attributes</span>((<span class="ident">model_id</span>, <span class="ident">field_id</span>).<span class="ident">into</span>());
+    <span class="doccomment">/// We need special code for scalar field attribute validation, because the
+    /// attributes on a scalar field are the attributes on the scalar field
+    /// itself, plus the attributes on the type alias it may be using. That type
+    /// alias may be referencing another type alias that has attributes, and so
+    /// on transitively.
+    ///
+    /// Other than for this peculiarity, this method is identical to
+    /// `visit_attributes()`.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>visit_scalar_field_attributes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model_id: ast::ModelId, field_id: ast::FieldId) {
+        <span class="self">self</span>.visit_attributes((model_id, field_id).into());
     }
 
-    <span class="doccomment">/// All attribute validation should go through `visit_attributes()`. It lets</span>
-    <span class="doccomment">/// us enforce some rules, for example that certain attributes should not be</span>
-    <span class="doccomment">/// repeated, and make sure that _all_ attributes are visited during the</span>
-    <span class="doccomment">/// validation process, emitting unknown attribute errors when it is not</span>
-    <span class="doccomment">/// the case.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - When you are done validating an attribute, you must call `discard_arguments()` or</span>
-    <span class="doccomment">///   `validate_visited_arguments()`. Otherwise, Context will helpfully panic.</span>
-    <span class="doccomment">/// - When you are done validating an attribute set, you must call</span>
-    <span class="doccomment">///   `validate_visited_attributes()`. Otherwise, Context will helpfully panic.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">visit_attributes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ast_attributes</span>: <span class="ident">ast::AttributeContainer</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attributes</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">unused_attributes</span>.<span class="ident">is_empty</span>() {
+    <span class="doccomment">/// All attribute validation should go through `visit_attributes()`. It lets
+    /// us enforce some rules, for example that certain attributes should not be
+    /// repeated, and make sure that _all_ attributes are visited during the
+    /// validation process, emitting unknown attribute errors when it is not
+    /// the case.
+    ///
+    /// - When you are done validating an attribute, you must call `discard_arguments()` or
+    ///   `validate_visited_arguments()`. Otherwise, Context will helpfully panic.
+    /// - When you are done validating an attribute set, you must call
+    ///   `validate_visited_attributes()`. Otherwise, Context will helpfully panic.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>visit_attributes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ast_attributes: ast::AttributeContainer) {
+        <span class="kw">if </span>!<span class="self">self</span>.attributes.attributes.is_empty() || !<span class="self">self</span>.attributes.unused_attributes.is_empty() {
             <span class="macro">panic!</span>(
                 <span class="string">&quot;`ctx.visit_attributes() called with {:?} while the Context is still validating previous attribute set on {:?}`&quot;</span>,
-                <span class="ident">ast_attributes</span>,
-                <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attributes</span>
+                ast_attributes,
+                <span class="self">self</span>.attributes.attributes
             );
         }
 
-        <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attributes</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">unused_attributes</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">extend_attributes</span>(<span class="ident">ast_attributes</span>, <span class="self">self</span>.<span class="ident">ast</span>);
+        <span class="self">self</span>.attributes.attributes.clear();
+        <span class="self">self</span>.attributes.unused_attributes.clear();
+        <span class="self">self</span>.attributes.extend_attributes(ast_attributes, <span class="self">self</span>.ast);
     }
 
-    <span class="doccomment">/// Look for an optional attribute with a name of the form</span>
-    <span class="doccomment">/// &quot;&lt;datasource_name&gt;.&lt;attribute_name&gt;&quot;, return the scope name, attribute name and the</span>
-    <span class="doccomment">/// arguments.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Also note that native type arguments are treated differently from</span>
-    <span class="doccomment">/// arguments to other attributes: everywhere else, attributes are named,</span>
-    <span class="doccomment">/// with a default that can be first, but with native types, arguments are</span>
-    <span class="doccomment">/// purely positional.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">visit_datasource_scoped</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">StringId</span>, <span class="ident">StringId</span>, <span class="ident">ast::AttributeId</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span>
-            <span class="ident">iter_attributes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attributes</span>, <span class="self">self</span>.<span class="ident">ast</span>).<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">attr</span>)<span class="op">|</span> <span class="ident">attr</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">contains</span>(<span class="string">&#39;.&#39;</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">native_type_attr</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">diagnostics</span>;
+    <span class="doccomment">/// Look for an optional attribute with a name of the form
+    /// &quot;&lt;datasource_name&gt;.&lt;attribute_name&gt;&quot;, return the scope name, attribute name and the
+    /// arguments.
+    ///
+    /// Also note that native type arguments are treated differently from
+    /// arguments to other attributes: everywhere else, attributes are named,
+    /// with a default that can be first, but with native types, arguments are
+    /// purely positional.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visit_datasource_scoped(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(StringId, StringId, ast::AttributeId)&gt; {
+        <span class="kw">let </span>attrs =
+            iter_attributes(<span class="kw-2">&amp;</span><span class="self">self</span>.attributes.attributes, <span class="self">self</span>.ast).filter(|(<span class="kw">_</span>, attr)| attr.name.name.contains(<span class="string">&#39;.&#39;</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>native_type_attr = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>diagnostics = <span class="kw-2">&amp;mut </span><span class="self">self</span>.diagnostics;
 
-        <span class="comment">// Extract the attribute, validating that there are no duplicates.</span>
-        <span class="kw">for</span> (<span class="ident">attr_idx</span>, <span class="ident">attr</span>) <span class="kw">in</span> <span class="ident">attrs</span> {
-            <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">unused_attributes</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">attr_idx</span>));
+        <span class="comment">// Extract the attribute, validating that there are no duplicates.
+        </span><span class="kw">for </span>(attr_idx, attr) <span class="kw">in </span>attrs {
+            <span class="macro">assert!</span>(<span class="self">self</span>.attributes.unused_attributes.remove(<span class="kw-2">&amp;</span>attr_idx));
 
-            <span class="kw">match</span> <span class="ident">attr</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">split_once</span>(<span class="string">&#39;.&#39;</span>) {
-                <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
-                <span class="prelude-val">Some</span>((<span class="ident">datasource_name</span>, <span class="ident">attr_name</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">ds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">datasource_name</span>);
-                    <span class="kw">let</span> <span class="ident">attr_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">attr_name</span>);
-                    <span class="kw">if</span> <span class="ident">native_type_attr</span>.<span class="ident">replace</span>((<span class="ident">ds</span>, <span class="ident">attr_idx</span>, <span class="ident">attr_name</span>)).<span class="ident">is_some</span>() {
-                        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_attribute_error</span>(
-                            <span class="ident">datasource_name</span>,
-                            <span class="ident">attr</span>.<span class="ident">span</span>,
+            <span class="kw">match </span>attr.name.name.split_once(<span class="string">&#39;.&#39;</span>) {
+                <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(),
+                <span class="prelude-val">Some</span>((datasource_name, attr_name)) =&gt; {
+                    <span class="kw">let </span>ds = <span class="self">self</span>.interner.intern(datasource_name);
+                    <span class="kw">let </span>attr_name = <span class="self">self</span>.interner.intern(attr_name);
+                    <span class="kw">if </span>native_type_attr.replace((ds, attr_idx, attr_name)).is_some() {
+                        diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
+                            datasource_name,
+                            attr.span,
                         ));
                     }
                 }
             }
         }
 
-        <span class="comment">// early return if absent: it&#39;s optional</span>
-        <span class="kw">let</span> (<span class="ident">ds</span>, <span class="ident">attr</span>, <span class="ident">attr_name</span>) <span class="op">=</span> <span class="ident">native_type_attr</span><span class="question-mark">?</span>;
+        <span class="comment">// early return if absent: it&#39;s optional
+        </span><span class="kw">let </span>(ds, attr, attr_name) = native_type_attr<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>((<span class="ident">ds</span>, <span class="ident">attr_name</span>, <span class="ident">attr</span>))
+        <span class="prelude-val">Some</span>((ds, attr_name, attr))
     }
 
-    <span class="doccomment">/// Validate an _optional_ attribute that should occur only once. Returns whether the attribute</span>
-    <span class="doccomment">/// is defined.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">visit_optional_single_attr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">iter_attributes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attributes</span>, <span class="self">self</span>.<span class="ident">ast</span>).<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">a</span>)<span class="op">|</span> <span class="ident">a</span>.<span class="ident">name</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>);
-        <span class="kw">let</span> (<span class="ident">first_idx</span>, <span class="ident">first</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">attrs</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">first</span>) =&gt; <span class="ident">first</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
+    <span class="doccomment">/// Validate an _optional_ attribute that should occur only once. Returns whether the attribute
+    /// is defined.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visit_optional_single_attr(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>attrs = iter_attributes(<span class="kw-2">&amp;</span><span class="self">self</span>.attributes.attributes, <span class="self">self</span>.ast).filter(|(<span class="kw">_</span>, a)| a.name.name == name);
+        <span class="kw">let </span>(first_idx, first) = <span class="kw">match </span>attrs.next() {
+            <span class="prelude-val">Some</span>(first) =&gt; first,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
         };
-        <span class="kw">let</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">diagnostics</span>;
+        <span class="kw">let </span>diagnostics = <span class="kw-2">&amp;mut </span><span class="self">self</span>.diagnostics;
 
-        <span class="kw">if</span> <span class="ident">attrs</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-            <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">attr</span>) <span class="kw">in</span>
-                <span class="ident">iter_attributes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attributes</span>, <span class="self">self</span>.<span class="ident">ast</span>).<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">a</span>)<span class="op">|</span> <span class="ident">a</span>.<span class="ident">name</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
+        <span class="kw">if </span>attrs.next().is_some() {
+            <span class="kw">for </span>(idx, attr) <span class="kw">in
+                </span>iter_attributes(<span class="kw-2">&amp;</span><span class="self">self</span>.attributes.attributes, <span class="self">self</span>.ast).filter(|(<span class="kw">_</span>, a)| a.name.name == name)
             {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_attribute_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">attr</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-                    <span class="ident">attr</span>.<span class="ident">span</span>,
+                diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
+                    <span class="kw-2">&amp;</span>attr.name.name,
+                    attr.span,
                 ));
-                <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">unused_attributes</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">idx</span>));
+                <span class="macro">assert!</span>(<span class="self">self</span>.attributes.unused_attributes.remove(<span class="kw-2">&amp;</span>idx));
             }
 
-            <span class="kw">return</span> <span class="bool-val">false</span>; <span class="comment">// stop validation in this case</span>
-        }
+            <span class="kw">return </span><span class="bool-val">false</span>; <span class="comment">// stop validation in this case
+        </span>}
 
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">unused_attributes</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">first_idx</span>));
-        <span class="ident">drop</span>(<span class="ident">attrs</span>);
-        <span class="self">self</span>.<span class="ident">set_attribute</span>(<span class="ident">first_idx</span>, <span class="ident">first</span>)
+        <span class="macro">assert!</span>(<span class="self">self</span>.attributes.unused_attributes.remove(<span class="kw-2">&amp;</span>first_idx));
+        drop(attrs);
+        <span class="self">self</span>.set_attribute(first_idx, first)
     }
 
-    <span class="doccomment">/// Extract an attribute that can occur zero or more times. Example: @@index on models.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `true` as long as a next attribute is found.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">visit_repeated_attr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">has_valid_attribute</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="doccomment">/// Extract an attribute that can occur zero or more times. Example: @@index on models.
+    ///
+    /// Returns `true` as long as a next attribute is found.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visit_repeated_attr(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>has_valid_attribute = <span class="bool-val">false</span>;
 
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">has_valid_attribute</span> {
-            <span class="kw">let</span> <span class="ident">first_attr</span> <span class="op">=</span> <span class="ident">iter_attributes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attributes</span>, <span class="self">self</span>.<span class="ident">ast</span>)
-                .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">attr</span>)<span class="op">|</span> <span class="ident">attr</span>.<span class="ident">name</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
-                .<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">attr_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">unused_attributes</span>.<span class="ident">contains</span>(<span class="ident">attr_id</span>));
-            <span class="kw">let</span> (<span class="ident">attr_id</span>, <span class="ident">attr</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">first_attr</span>) <span class="op">=</span> <span class="ident">first_attr</span> {
-                <span class="ident">first_attr</span>
-            } <span class="kw">else</span> {
+        <span class="kw">while </span>!has_valid_attribute {
+            <span class="kw">let </span>first_attr = iter_attributes(<span class="kw-2">&amp;</span><span class="self">self</span>.attributes.attributes, <span class="self">self</span>.ast)
+                .filter(|(<span class="kw">_</span>, attr)| attr.name.name == name)
+                .find(|(attr_id, <span class="kw">_</span>)| <span class="self">self</span>.attributes.unused_attributes.contains(attr_id));
+            <span class="kw">let </span>(attr_id, attr) = <span class="kw">if let </span><span class="prelude-val">Some</span>(first_attr) = first_attr {
+                first_attr
+            } <span class="kw">else </span>{
                 <span class="kw">break</span>;
             };
-            <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">unused_attributes</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">attr_id</span>);
-            <span class="ident">has_valid_attribute</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">set_attribute</span>(<span class="ident">attr_id</span>, <span class="ident">attr</span>);
+            <span class="self">self</span>.attributes.unused_attributes.remove(<span class="kw-2">&amp;</span>attr_id);
+            has_valid_attribute = <span class="self">self</span>.set_attribute(attr_id, attr);
         }
 
-        <span class="ident">has_valid_attribute</span>
+        has_valid_attribute
     }
 
-    <span class="doccomment">/// Gets the argument with the given name in the current attribute, or if it is not found, the</span>
-    <span class="doccomment">/// first unnamed argument.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Use this to implement unnamed argument behavior.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">visit_default_arg_with_idx</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Expression</span>), <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name_s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>);
-        <span class="kw">match</span> (
-            <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">args</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="ident">name_s</span>)),
-            <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">args</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="prelude-val">None</span>),
+    <span class="doccomment">/// Gets the argument with the given name in the current attribute, or if it is not found, the
+    /// first unnamed argument.
+    ///
+    /// Use this to implement unnamed argument behavior.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visit_default_arg_with_idx(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(usize, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Expression), DatamodelError&gt; {
+        <span class="kw">let </span>name_s = <span class="self">self</span>.interner.intern(name);
+        <span class="kw">match </span>(
+            <span class="self">self</span>.attributes.args.remove(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(name_s)),
+            <span class="self">self</span>.attributes.args.remove(<span class="kw-2">&amp;</span><span class="prelude-val">None</span>),
         ) {
-            (<span class="prelude-val">Some</span>(<span class="ident">arg_idx</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">arg_idx</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">arg_at</span>(<span class="ident">arg_idx</span>);
-                <span class="prelude-val">Ok</span>((<span class="ident">arg_idx</span>, <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>))
+            (<span class="prelude-val">Some</span>(arg_idx), <span class="prelude-val">None</span>) | (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(arg_idx)) =&gt; {
+                <span class="kw">let </span>arg = <span class="self">self</span>.arg_at(arg_idx);
+                <span class="prelude-val">Ok</span>((arg_idx, <span class="kw-2">&amp;</span>arg.value))
             }
-            (<span class="prelude-val">Some</span>(<span class="ident">arg_idx</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">arg_at</span>(<span class="ident">arg_idx</span>);
-                <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_duplicate_default_argument_error</span>(<span class="ident">name</span>, <span class="ident">arg</span>.<span class="ident">span</span>))
+            (<span class="prelude-val">Some</span>(arg_idx), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; {
+                <span class="kw">let </span>arg = <span class="self">self</span>.arg_at(arg_idx);
+                <span class="prelude-val">Err</span>(DatamodelError::new_duplicate_default_argument_error(name, arg.span))
             }
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_argument_not_found_error</span>(
-                <span class="ident">name</span>,
-                <span class="self">self</span>.<span class="ident">current_attribute</span>().<span class="ident">span</span>,
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(DatamodelError::new_argument_not_found_error(
+                name,
+                <span class="self">self</span>.current_attribute().span,
             )),
         }
     }
 
-    <span class="doccomment">/// Gets the argument with the given name in the current attribute, or if it is not found, the</span>
-    <span class="doccomment">/// first unnamed argument.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Use this to implement unnamed argument behavior.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">visit_default_arg</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Expression</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">visit_default_arg_with_idx</span>(<span class="ident">name</span>)<span class="question-mark">?</span>.<span class="number">1</span>)
+    <span class="doccomment">/// Gets the argument with the given name in the current attribute, or if it is not found, the
+    /// first unnamed argument.
+    ///
+    /// Use this to implement unnamed argument behavior.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visit_default_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Expression, DatamodelError&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.visit_default_arg_with_idx(name)<span class="question-mark">?</span>.<span class="number">1</span>)
     }
 
-    <span class="doccomment">/// Visit an optional argument in the current attribute.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">visit_optional_arg</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Expression</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">arg_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">args</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="ident">arg_name</span>))<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">current_attribute</span>().<span class="ident">arguments</span>.<span class="ident">arguments</span>[<span class="ident">idx</span>].<span class="ident">value</span>)
+    <span class="doccomment">/// Visit an optional argument in the current attribute.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visit_optional_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Expression&gt; {
+        <span class="kw">let </span>arg_name = <span class="self">self</span>.interner.intern(name);
+        <span class="kw">let </span>idx = <span class="self">self</span>.attributes.args.remove(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(arg_name))<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.current_attribute().arguments.arguments[idx].value)
     }
 
-    <span class="doccomment">/// This must be called at the end of arguments validation. It will report errors for each argument that was not used by the validators. The Drop impl will helpfully panic</span>
-    <span class="doccomment">/// otherwise.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate_visited_arguments</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attrid</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attribute</span> {
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ast</span>[<span class="ident">attrid</span>]
-        } <span class="kw">else</span> {
+    <span class="doccomment">/// This must be called at the end of arguments validation. It will report errors for each argument that was not used by the validators. The Drop impl will helpfully panic
+    /// otherwise.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>validate_visited_arguments(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>attr = <span class="kw">if let </span><span class="prelude-val">Some</span>(attrid) = <span class="self">self</span>.attributes.attribute {
+            <span class="kw-2">&amp;</span><span class="self">self</span>.ast[attrid]
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;State error: missing attribute in validate_visited_arguments.&quot;</span>)
         };
 
-        <span class="kw">let</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">diagnostics</span>;
-        <span class="kw">for</span> <span class="ident">arg_idx</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">args</span>.<span class="ident">values</span>() {
-            <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attr</span>.<span class="ident">arguments</span>.<span class="ident">arguments</span>[<span class="kw-2">*</span><span class="ident">arg_idx</span>];
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_unused_argument_error</span>(<span class="ident">arg</span>.<span class="ident">span</span>));
+        <span class="kw">let </span>diagnostics = <span class="kw-2">&amp;mut </span><span class="self">self</span>.diagnostics;
+        <span class="kw">for </span>arg_idx <span class="kw">in </span><span class="self">self</span>.attributes.args.values() {
+            <span class="kw">let </span>arg = <span class="kw-2">&amp;</span>attr.arguments.arguments[<span class="kw-2">*</span>arg_idx];
+            diagnostics.push_error(DatamodelError::new_unused_argument_error(arg.span));
         }
 
-        <span class="self">self</span>.<span class="ident">discard_arguments</span>();
+        <span class="self">self</span>.discard_arguments();
     }
 
-    <span class="doccomment">/// Counterpart to visit_attributes(). This must be called at the end of the validation of the</span>
-    <span class="doccomment">/// attribute set. The Drop impl will helpfully panic otherwise.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate_visited_attributes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attribute</span>.<span class="ident">is_some</span>() {
+    <span class="doccomment">/// Counterpart to visit_attributes(). This must be called at the end of the validation of the
+    /// attribute set. The Drop impl will helpfully panic otherwise.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>validate_visited_attributes(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span>!<span class="self">self</span>.attributes.args.is_empty() || <span class="self">self</span>.attributes.attribute.is_some() {
             <span class="macro">panic!</span>(<span class="string">&quot;State error: validate_visited_attributes() when an attribute is still under validation.&quot;</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">diagnostics</span>;
-        <span class="kw">for</span> <span class="ident">attribute_id</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">unused_attributes</span> {
-            <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">attribute_id</span>];
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_not_known_error</span>(
-                <span class="kw-2">&amp;</span><span class="ident">attribute</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-                <span class="ident">attribute</span>.<span class="ident">span</span>,
+        <span class="kw">let </span>diagnostics = <span class="kw-2">&amp;mut </span><span class="self">self</span>.diagnostics;
+        <span class="kw">for </span>attribute_id <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.attributes.unused_attributes {
+            <span class="kw">let </span>attribute = <span class="kw-2">&amp;</span><span class="self">self</span>.ast[<span class="kw-2">*</span>attribute_id];
+            diagnostics.push_error(DatamodelError::new_attribute_not_known_error(
+                <span class="kw-2">&amp;</span>attribute.name.name,
+                attribute.span,
             ))
         }
-        <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attributes</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">unused_attributes</span>.<span class="ident">clear</span>();
+        <span class="self">self</span>.attributes.attributes.clear();
+        <span class="self">self</span>.attributes.unused_attributes.clear();
     }
 
-    <span class="comment">// Private methods start here.</span>
+    <span class="comment">// Private methods start here.
 
-    <span class="kw">fn</span> <span class="ident">arg_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Argument</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">current_attribute</span>().<span class="ident">arguments</span>.<span class="ident">arguments</span>[<span class="ident">idx</span>]
+    </span><span class="kw">fn </span>arg_at(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Argument {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.current_attribute().arguments.arguments[idx]
     }
 
-    <span class="doccomment">/// Find a specific field in a specific model.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">find_model_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">lookup</span>(<span class="ident">field_name</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">names</span>.<span class="ident">model_fields</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">name</span>)).<span class="ident">cloned</span>()
+    <span class="doccomment">/// Find a specific field in a specific model.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_model_field(<span class="kw-2">&amp;</span><span class="self">self</span>, model_id: ast::ModelId, field_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ast::FieldId&gt; {
+        <span class="kw">let </span>name = <span class="self">self</span>.interner.lookup(field_name)<span class="question-mark">?</span>;
+        <span class="self">self</span>.names.model_fields.get(<span class="kw-2">&amp;</span>(model_id, name)).cloned()
     }
 
-    <span class="doccomment">/// Find a specific field in a specific composite type.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">find_composite_type_field</span>(
+    <span class="doccomment">/// Find a specific field in a specific composite type.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_composite_type_field(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">composite_type_id</span>: <span class="ident">ast::CompositeTypeId</span>,
-        <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">lookup</span>(<span class="ident">field_name</span>)<span class="question-mark">?</span>;
+        composite_type_id: ast::CompositeTypeId,
+        field_name: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;ast::FieldId&gt; {
+        <span class="kw">let </span>name = <span class="self">self</span>.interner.lookup(field_name)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">names</span>
-            .<span class="ident">composite_type_fields</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">composite_type_id</span>, <span class="ident">name</span>))
-            .<span class="ident">cloned</span>()
+        <span class="self">self</span>.names
+            .composite_type_fields
+            .get(<span class="kw-2">&amp;</span>(composite_type_id, name))
+            .cloned()
     }
 
-    <span class="doccomment">/// Starts validating the arguments for an attribute, checking for duplicate arguments in the</span>
-    <span class="doccomment">/// process. Returns whether the attribute is valid enough to be usable.</span>
-    <span class="kw">fn</span> <span class="ident">set_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">attribute_id</span>: <span class="ident">ast::AttributeId</span>, <span class="ident">attribute</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Attribute</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attribute</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">panic!</span>(<span class="string">&quot;State error: we cannot start validating new arguments before `validate_visited_arguments()` or `discard_arguments()` has been called.\n{:#?}&quot;</span>, <span class="self">self</span>.<span class="ident">attributes</span>);
+    <span class="doccomment">/// Starts validating the arguments for an attribute, checking for duplicate arguments in the
+    /// process. Returns whether the attribute is valid enough to be usable.
+    </span><span class="kw">fn </span>set_attribute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attribute_id: ast::AttributeId, attribute: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Attribute) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.attributes.attribute.is_some() || !<span class="self">self</span>.attributes.args.is_empty() {
+            <span class="macro">panic!</span>(<span class="string">&quot;State error: we cannot start validating new arguments before `validate_visited_arguments()` or `discard_arguments()` has been called.\n{:#?}&quot;</span>, <span class="self">self</span>.attributes);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_reasonably_valid</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>is_reasonably_valid = <span class="bool-val">true</span>;
 
         {
-            <span class="comment">// The arguments lists of the attribute and all nested function expressions.</span>
-            <span class="kw">let</span> <span class="ident">all_arguments_lists</span> <span class="op">=</span> <span class="ident">std::iter::once</span>(<span class="kw-2">&amp;</span><span class="ident">attribute</span>.<span class="ident">arguments</span>).<span class="ident">chain</span>(
-                <span class="ident">attribute</span>
-                    .<span class="ident">arguments</span>
-                    .<span class="ident">arguments</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">as_function</span>())
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">args</span>),
+            <span class="comment">// The arguments lists of the attribute and all nested function expressions.
+            </span><span class="kw">let </span>all_arguments_lists = std::iter::once(<span class="kw-2">&amp;</span>attribute.arguments).chain(
+                attribute
+                    .arguments
+                    .arguments
+                    .iter()
+                    .filter_map(|arg| arg.value.as_function())
+                    .map(|(<span class="kw">_</span>, args, <span class="kw">_</span>)| args),
             );
 
-            <span class="kw">for</span> <span class="ident">args</span> <span class="kw">in</span> <span class="ident">all_arguments_lists</span> {
-                <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">args</span>.<span class="ident">empty_arguments</span> {
-                    <span class="self">self</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The `{}` argument is missing a value.&quot;</span>, <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>),
-                        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">attribute</span>.<span class="ident">name</span>()),
-                        <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>,
+            <span class="kw">for </span>args <span class="kw">in </span>all_arguments_lists {
+                <span class="kw">for </span>arg <span class="kw">in </span><span class="kw-2">&amp;</span>args.empty_arguments {
+                    <span class="self">self</span>.push_error(DatamodelError::new_attribute_validation_error(
+                        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The `{}` argument is missing a value.&quot;</span>, arg.name.name),
+                        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, attribute.name()),
+                        arg.name.span,
                     ));
-                    <span class="ident">is_reasonably_valid</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                    is_reasonably_valid = <span class="bool-val">false</span>;
                 }
 
-                <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">args</span>.<span class="ident">arguments</span>.<span class="ident">iter</span>() {
-                    <span class="kw">let</span> <span class="ident">exprs</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">arg</span>.<span class="ident">value</span> {
-                        <span class="ident">Expression::Array</span>(<span class="kw-2">ref</span> <span class="ident">exprs</span>, <span class="kw">_</span>) =&gt; <span class="ident">exprs</span>,
-                        <span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+                <span class="kw">for </span>arg <span class="kw">in </span>args.arguments.iter() {
+                    <span class="kw">let </span>exprs = <span class="kw">match </span>arg.value {
+                        Expression::Array(<span class="kw-2">ref </span>exprs, <span class="kw">_</span>) =&gt; exprs,
+                        <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
                     };
 
-                    <span class="kw">for</span> <span class="ident">expr</span> <span class="kw">in</span> <span class="ident">exprs</span> {
-                        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">expr</span> {
-                            <span class="ident">Expression::Function</span>(<span class="kw">_</span>, <span class="ident">args</span>, <span class="kw">_</span>) =&gt; <span class="ident">args</span>,
-                            <span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+                    <span class="kw">for </span>expr <span class="kw">in </span>exprs {
+                        <span class="kw">let </span>args = <span class="kw">match </span>expr {
+                            Expression::Function(<span class="kw">_</span>, args, <span class="kw">_</span>) =&gt; args,
+                            <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
                         };
 
-                        <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">args</span>.<span class="ident">empty_arguments</span>.<span class="ident">iter</span>() {
-                            <span class="self">self</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The `{}` argument is missing a value.&quot;</span>, <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>),
-                                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@@{}&quot;</span>, <span class="ident">attribute</span>.<span class="ident">name</span>()),
-                                <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>,
+                        <span class="kw">for </span>arg <span class="kw">in </span>args.empty_arguments.iter() {
+                            <span class="self">self</span>.push_error(DatamodelError::new_attribute_validation_error(
+                                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The `{}` argument is missing a value.&quot;</span>, arg.name.name),
+                                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@@{}&quot;</span>, attribute.name()),
+                                arg.name.span,
                             ));
                         }
                     }
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">span</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">trailing_comma</span> {
-                    <span class="self">self</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(span) = args.trailing_comma {
+                    <span class="self">self</span>.push_error(DatamodelError::new_attribute_validation_error(
                         <span class="string">&quot;Trailing commas are not valid in attribute arguments, please remove the comma.&quot;</span>,
-                        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">attribute</span>.<span class="ident">name</span>()),
-                        <span class="ident">span</span>,
+                        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, attribute.name()),
+                        span,
                     ))
                 }
             }
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">is_reasonably_valid</span> {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>!is_reasonably_valid {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attribute</span>.<span class="ident">arguments</span>;
-        <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attribute</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">attribute_id</span>);
-        <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">args</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">args</span>.<span class="ident">reserve</span>(<span class="ident">arguments</span>.<span class="ident">arguments</span>.<span class="ident">len</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unnamed_arguments</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">let </span>arguments = <span class="kw-2">&amp;</span>attribute.arguments;
+        <span class="self">self</span>.attributes.attribute = <span class="prelude-val">Some</span>(attribute_id);
+        <span class="self">self</span>.attributes.args.clear();
+        <span class="self">self</span>.attributes.args.reserve(arguments.arguments.len());
+        <span class="kw">let </span><span class="kw-2">mut </span>unnamed_arguments = Vec::new();
 
-        <span class="kw">for</span> (<span class="ident">arg_idx</span>, <span class="ident">arg</span>) <span class="kw">in</span> <span class="ident">arguments</span>.<span class="ident">arguments</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">arg_name</span> <span class="op">=</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>.<span class="ident">name</span>));
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing_argument</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">arg_name</span>, <span class="ident">arg_idx</span>) {
-                <span class="kw">if</span> <span class="ident">arg</span>.<span class="ident">is_unnamed</span>() {
-                    <span class="kw">if</span> <span class="ident">unnamed_arguments</span>.<span class="ident">is_empty</span>() {
-                        <span class="kw">let</span> <span class="ident">existing_arg_value</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attribute</span>.<span class="ident">arguments</span>.<span class="ident">arguments</span>[<span class="ident">existing_argument</span>].<span class="ident">value</span>;
-                        <span class="ident">unnamed_arguments</span>.<span class="ident">push</span>(<span class="ident">existing_arg_value</span>.<span class="ident">to_string</span>())
+        <span class="kw">for </span>(arg_idx, arg) <span class="kw">in </span>arguments.arguments.iter().enumerate() {
+            <span class="kw">let </span>arg_name = arg.name.as_ref().map(|name| <span class="self">self</span>.interner.intern(<span class="kw-2">&amp;</span>name.name));
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(existing_argument) = <span class="self">self</span>.attributes.args.insert(arg_name, arg_idx) {
+                <span class="kw">if </span>arg.is_unnamed() {
+                    <span class="kw">if </span>unnamed_arguments.is_empty() {
+                        <span class="kw">let </span>existing_arg_value = <span class="kw-2">&amp;</span>attribute.arguments.arguments[existing_argument].value;
+                        unnamed_arguments.push(existing_arg_value.to_string())
                     }
 
-                    <span class="ident">unnamed_arguments</span>.<span class="ident">push</span>(<span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">to_string</span>())
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_argument_error</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>,
-                        <span class="ident">arg</span>.<span class="ident">span</span>,
+                    unnamed_arguments.push(arg.value.to_string())
+                } <span class="kw">else </span>{
+                    <span class="self">self</span>.push_error(DatamodelError::new_duplicate_argument_error(
+                        <span class="kw-2">&amp;</span>arg.name.as_ref().unwrap().name,
+                        arg.span,
                     ));
                 }
             }
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">unnamed_arguments</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">push_attribute_validation_error</span>(
-                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;You provided multiple unnamed arguments. This is not possible. Did you forget the brackets? Did you mean `[{}]`?&quot;</span>, <span class="ident">unnamed_arguments</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)),
+        <span class="kw">if </span>!unnamed_arguments.is_empty() {
+            <span class="self">self</span>.push_attribute_validation_error(
+                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;You provided multiple unnamed arguments. This is not possible. Did you forget the brackets? Did you mean `[{}]`?&quot;</span>, unnamed_arguments.join(<span class="string">&quot;, &quot;</span>)),
                 )
         }
 
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="comment">// Implementation detail. Used for arguments validation.</span>
-<span class="kw">fn</span> <span class="ident">iter_attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;ast</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ast::AttributeContainer</span>],
-    <span class="ident">ast</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::SchemaAst</span>,
-) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">ast::AttributeId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span>)<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-    <span class="ident">attrs</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">flat_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">container</span><span class="op">|</span> <span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">container</span>].<span class="ident">iter</span>().<span class="ident">enumerate</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> (<span class="ident">a</span>, <span class="kw-2">*</span><span class="ident">container</span>)))
-        .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">idx</span>, <span class="ident">attr</span>), <span class="ident">container</span>)<span class="op">|</span> (<span class="ident">ast::AttributeId::new_in_container</span>(<span class="ident">container</span>, <span class="ident">idx</span>), <span class="ident">attr</span>))
+<span class="comment">// Implementation detail. Used for arguments validation.
+</span><span class="kw">fn </span>iter_attributes&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;ast</span>: <span class="lifetime">&#39;a</span>&gt;(
+    attrs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ast::AttributeContainer],
+    ast: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>ast::SchemaAst,
+) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (ast::AttributeId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>ast::Attribute)&gt; + <span class="lifetime">&#39;a </span>{
+    attrs
+        .iter()
+        .flat_map(<span class="kw">move </span>|container| ast[<span class="kw-2">*</span>container].iter().enumerate().map(|a| (a, <span class="kw-2">*</span>container)))
+        .map(|((idx, attr), container)| (ast::AttributeId::new_in_container(container, idx), attr))
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Index</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">str</span>;
+<span class="kw">impl </span>std::ops::Index&lt;StringId&gt; <span class="kw">for </span>Context&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">type </span>Output = str;
 
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">StringId</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">unwrap</span>()
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: StringId) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="self">self</span>.interner.get(index).unwrap()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

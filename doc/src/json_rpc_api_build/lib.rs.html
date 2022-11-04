@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/json-rpc-api-build/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../json_rpc_api_build/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../json_rpc_api_build/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../json_rpc_api_build/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/json-rpc-api-build/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../json_rpc_api_build/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../json_rpc_api_build/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../json_rpc_api_build/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -172,179 +172,179 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">rust_crate</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>error;
+<span class="kw">mod </span>rust_crate;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::CrateResult</span>;
-<span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>},
-    <span class="ident">path::Path</span>,
+<span class="kw">use </span><span class="self">self</span>::error::CrateResult;
+<span class="kw">use </span>serde::Deserialize;
+<span class="kw">use </span>std::{
+    collections::{BTreeMap, HashMap},
+    path::Path,
 };
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_rust_modules</span>(<span class="ident">out_dir</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">CrateResult</span> {
-    <span class="kw">let</span> <span class="ident">api_defs_root</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>), <span class="string">&quot;/methods&quot;</span>);
+<span class="kw">pub fn </span>generate_rust_modules(out_dir: <span class="kw-2">&amp;</span>Path) -&gt; CrateResult {
+    <span class="kw">let </span>api_defs_root = <span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>), <span class="string">&quot;/methods&quot;</span>);
 
-    <span class="comment">// https://doc.rust-lang.org/cargo/reference/build-scripts.html</span>
-    <span class="macro">println!</span>(<span class="string">&quot;cargo:rerun-if-changed={}&quot;</span>, <span class="ident">api_defs_root</span>);
+    <span class="comment">// https://doc.rust-lang.org/cargo/reference/build-scripts.html
+    </span><span class="macro">println!</span>(<span class="string">&quot;cargo:rerun-if-changed={}&quot;</span>, api_defs_root);
 
-    <span class="kw">let</span> <span class="ident">entries</span> <span class="op">=</span> <span class="ident">std::fs::read_dir</span>(<span class="ident">api_defs_root</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">Api::default</span>();
+    <span class="kw">let </span>entries = std::fs::read_dir(api_defs_root)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>api = Api::default();
 
-    <span class="kw">for</span> <span class="ident">entry</span> <span class="kw">in</span> <span class="ident">entries</span> {
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">entry</span><span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">entry</span>.<span class="ident">file_type</span>()<span class="question-mark">?</span>.<span class="ident">is_file</span>() {
+    <span class="kw">for </span>entry <span class="kw">in </span>entries {
+        <span class="kw">let </span>entry = entry<span class="question-mark">?</span>;
+        <span class="kw">if </span>!entry.file_type()<span class="question-mark">?</span>.is_file() {
             <span class="kw">continue</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">contents</span> <span class="op">=</span> <span class="ident">std::fs::read_to_string</span>(<span class="ident">entry</span>.<span class="ident">path</span>())<span class="question-mark">?</span>;
-        <span class="macro">eprintln!</span>(<span class="string">&quot;Merging {}&quot;</span>, <span class="ident">entry</span>.<span class="ident">path</span>().<span class="ident">file_name</span>().<span class="ident">unwrap</span>().<span class="ident">to_string_lossy</span>());
-        <span class="kw">let</span> <span class="ident">api_fragment</span>: <span class="ident">Api</span> <span class="op">=</span> <span class="ident">toml::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">contents</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>contents = std::fs::read_to_string(entry.path())<span class="question-mark">?</span>;
+        <span class="macro">eprintln!</span>(<span class="string">&quot;Merging {}&quot;</span>, entry.path().file_name().unwrap().to_string_lossy());
+        <span class="kw">let </span>api_fragment: Api = toml::from_str(<span class="kw-2">&amp;</span>contents)<span class="question-mark">?</span>;
 
-        <span class="ident">merge</span>(<span class="kw-2">&amp;mut</span> <span class="ident">api</span>, <span class="ident">api_fragment</span>);
+        merge(<span class="kw-2">&amp;mut </span>api, api_fragment);
     }
 
-    <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">api</span>);
+    validate(<span class="kw-2">&amp;</span>api);
 
-    <span class="ident">rust_crate::generate_rust_crate</span>(<span class="ident">out_dir</span>, <span class="kw-2">&amp;</span><span class="ident">api</span>)<span class="question-mark">?</span>;
+    rust_crate::generate_rust_crate(out_dir, <span class="kw-2">&amp;</span>api)<span class="question-mark">?</span>;
 
     <span class="macro">eprintln!</span>(<span class="string">&quot;ok: definitions generated&quot;</span>);
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">validate</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="ident">Api</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="kw">fn </span>validate(api: <span class="kw-2">&amp;</span>Api) {
+    <span class="kw">let </span><span class="kw-2">mut </span>errs: Vec&lt;String&gt; = Vec::new();
 
-    <span class="kw">for</span> (<span class="ident">method_name</span>, <span class="ident">method</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">api</span>.<span class="ident">methods</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">shape_exists</span>(<span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">request_shape</span>, <span class="ident">api</span>) {
-            <span class="ident">errs</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;Request shape for {} does not exist&quot;</span>, <span class="ident">method_name</span>))
+    <span class="kw">for </span>(method_name, method) <span class="kw">in </span><span class="kw-2">&amp;</span>api.methods {
+        <span class="kw">if </span>!shape_exists(<span class="kw-2">&amp;</span>method.request_shape, api) {
+            errs.push(<span class="macro">format!</span>(<span class="string">&quot;Request shape for {} does not exist&quot;</span>, method_name))
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">shape_exists</span>(<span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">response_shape</span>, <span class="ident">api</span>) {
-            <span class="ident">errs</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;Response shape for {} does not exist&quot;</span>, <span class="ident">method_name</span>))
+        <span class="kw">if </span>!shape_exists(<span class="kw-2">&amp;</span>method.response_shape, api) {
+            errs.push(<span class="macro">format!</span>(<span class="string">&quot;Response shape for {} does not exist&quot;</span>, method_name))
         }
     }
 
-    <span class="kw">for</span> (<span class="ident">record_name</span>, <span class="ident">record_shape</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">api</span>.<span class="ident">record_shapes</span> {
-        <span class="kw">for</span> (<span class="ident">field_name</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">record_shape</span>.<span class="ident">fields</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">shape_exists</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">shape</span>, <span class="ident">api</span>) {
-                <span class="ident">errs</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+    <span class="kw">for </span>(record_name, record_shape) <span class="kw">in </span><span class="kw-2">&amp;</span>api.record_shapes {
+        <span class="kw">for </span>(field_name, field) <span class="kw">in </span><span class="kw-2">&amp;</span>record_shape.fields {
+            <span class="kw">if </span>!shape_exists(<span class="kw-2">&amp;</span>field.shape, api) {
+                errs.push(<span class="macro">format!</span>(
                     <span class="string">&quot;Field shape for {}.{} does not exist.&quot;</span>,
-                    <span class="ident">record_name</span>, <span class="ident">field_name</span>
+                    record_name, field_name
                 ))
             }
         }
     }
 
-    <span class="kw">for</span> (<span class="ident">enum_name</span>, <span class="ident">enum_shape</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">api</span>.<span class="ident">enum_shapes</span> {
-        <span class="kw">for</span> (<span class="ident">variant_name</span>, <span class="ident">variant</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">enum_shape</span>.<span class="ident">variants</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shape</span>) <span class="op">=</span> <span class="ident">variant</span>.<span class="ident">shape</span>.<span class="ident">as_ref</span>() {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">shape_exists</span>(<span class="ident">shape</span>, <span class="ident">api</span>) {
-                    <span class="ident">errs</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+    <span class="kw">for </span>(enum_name, enum_shape) <span class="kw">in </span><span class="kw-2">&amp;</span>api.enum_shapes {
+        <span class="kw">for </span>(variant_name, variant) <span class="kw">in </span><span class="kw-2">&amp;</span>enum_shape.variants {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(shape) = variant.shape.as_ref() {
+                <span class="kw">if </span>!shape_exists(shape, api) {
+                    errs.push(<span class="macro">format!</span>(
                         <span class="string">&quot;Enum variant shape for {}.{} does not exist.&quot;</span>,
-                        <span class="ident">enum_name</span>, <span class="ident">variant_name</span>
+                        enum_name, variant_name
                     ))
                 }
             }
         }
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">errs</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">for</span> <span class="ident">err</span> <span class="kw">in</span> <span class="ident">errs</span> {
-            <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>);
+    <span class="kw">if </span>!errs.is_empty() {
+        <span class="kw">for </span>err <span class="kw">in </span>errs {
+            <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, err);
         }
-        <span class="ident">std::process::exit</span>(<span class="number">1</span>);
+        std::process::exit(<span class="number">1</span>);
     }
 }
 
-<span class="kw">fn</span> <span class="ident">shape_exists</span>(<span class="ident">shape</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="ident">Api</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">builtin_scalars</span> <span class="op">=</span> [<span class="string">&quot;string&quot;</span>, <span class="string">&quot;bool&quot;</span>, <span class="string">&quot;u32&quot;</span>];
+<span class="kw">fn </span>shape_exists(shape: <span class="kw-2">&amp;</span>str, api: <span class="kw-2">&amp;</span>Api) -&gt; bool {
+    <span class="kw">let </span>builtin_scalars = [<span class="string">&quot;string&quot;</span>, <span class="string">&quot;bool&quot;</span>, <span class="string">&quot;u32&quot;</span>];
 
-    <span class="kw">if</span> <span class="ident">builtin_scalars</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">shape</span>) {
-        <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="kw">if </span>builtin_scalars.contains(<span class="kw-2">&amp;</span>shape) {
+        <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">api</span>.<span class="ident">enum_shapes</span>.<span class="ident">contains_key</span>(<span class="ident">shape</span>) {
-        <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="kw">if </span>api.enum_shapes.contains_key(shape) {
+        <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">api</span>.<span class="ident">record_shapes</span>.<span class="ident">contains_key</span>(<span class="ident">shape</span>) {
-        <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="kw">if </span>api.record_shapes.contains_key(shape) {
+        <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    <span class="bool-val">false</span>
-}
+    <span class="bool-val">false
+</span>}
 
-<span class="kw">fn</span> <span class="ident">merge</span>(<span class="ident">api</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Api</span>, <span class="ident">new_fragment</span>: <span class="ident">Api</span>) {
-    <span class="kw">for</span> (<span class="ident">method_name</span>, <span class="ident">method</span>) <span class="kw">in</span> <span class="ident">new_fragment</span>.<span class="ident">methods</span> {
-        <span class="macro">assert!</span>(<span class="ident">api</span>.<span class="ident">methods</span>.<span class="ident">insert</span>(<span class="ident">method_name</span>, <span class="ident">method</span>).<span class="ident">is_none</span>());
+<span class="kw">fn </span>merge(api: <span class="kw-2">&amp;mut </span>Api, new_fragment: Api) {
+    <span class="kw">for </span>(method_name, method) <span class="kw">in </span>new_fragment.methods {
+        <span class="macro">assert!</span>(api.methods.insert(method_name, method).is_none());
     }
 
-    <span class="kw">for</span> (<span class="ident">record_name</span>, <span class="ident">record</span>) <span class="kw">in</span> <span class="ident">new_fragment</span>.<span class="ident">record_shapes</span> {
-        <span class="macro">assert!</span>(<span class="ident">api</span>.<span class="ident">record_shapes</span>.<span class="ident">insert</span>(<span class="ident">record_name</span>, <span class="ident">record</span>).<span class="ident">is_none</span>());
+    <span class="kw">for </span>(record_name, record) <span class="kw">in </span>new_fragment.record_shapes {
+        <span class="macro">assert!</span>(api.record_shapes.insert(record_name, record).is_none());
     }
 
-    <span class="kw">for</span> (<span class="ident">enum_name</span>, <span class="ident">enum_d</span>) <span class="kw">in</span> <span class="ident">new_fragment</span>.<span class="ident">enum_shapes</span> {
-        <span class="macro">assert!</span>(<span class="ident">api</span>.<span class="ident">enum_shapes</span>.<span class="ident">insert</span>(<span class="ident">enum_name</span>, <span class="ident">enum_d</span>).<span class="ident">is_none</span>());
+    <span class="kw">for </span>(enum_name, enum_d) <span class="kw">in </span>new_fragment.enum_shapes {
+        <span class="macro">assert!</span>(api.enum_shapes.insert(enum_name, enum_d).is_none());
     }
 }
 
-<span class="comment">// Make sure #[serde(deny_unknown_fields)] is on all struct types here.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Default</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Api</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;recordShapes&quot;</span>, <span class="ident">default</span>)]</span>
-    <span class="ident">record_shapes</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RecordShape</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;enumShapes&quot;</span>, <span class="ident">default</span>)]</span>
-    <span class="ident">enum_shapes</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">EnumShape</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="ident">methods</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Method</span><span class="op">&gt;</span>,
+<span class="comment">// Make sure #[serde(deny_unknown_fields)] is on all struct types here.
+</span><span class="attribute">#[derive(Debug, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">struct </span>Api {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;recordShapes&quot;</span>, default)]
+    </span>record_shapes: HashMap&lt;String, RecordShape&gt;,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;enumShapes&quot;</span>, default)]
+    </span>enum_shapes: HashMap&lt;String, EnumShape&gt;,
+    <span class="attribute">#[serde(default)]
+    </span>methods: HashMap&lt;String, Method&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">struct</span> <span class="ident">RecordShape</span> {
-    <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="ident">fields</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RecordField</span><span class="op">&gt;</span>,
-    <span class="ident">example</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">struct </span>RecordShape {
+    description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(default)]
+    </span>fields: BTreeMap&lt;String, RecordField&gt;,
+    example: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">struct</span> <span class="ident">RecordField</span> {
-    <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;isList&quot;</span>, <span class="ident">default</span>)]</span>
-    <span class="ident">is_list</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;isNullable&quot;</span>, <span class="ident">default</span>)]</span>
-    <span class="ident">is_nullable</span>: <span class="ident">bool</span>,
-    <span class="ident">shape</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">struct </span>RecordField {
+    description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;isList&quot;</span>, default)]
+    </span>is_list: bool,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;isNullable&quot;</span>, default)]
+    </span>is_nullable: bool,
+    shape: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">struct</span> <span class="ident">EnumVariant</span> {
-    <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// In case there is no shape, it just means the variant has no associated data.</span>
-    <span class="ident">shape</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">struct </span>EnumVariant {
+    description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// In case there is no shape, it just means the variant has no associated data.
+    </span>shape: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">struct</span> <span class="ident">EnumShape</span> {
-    <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">variants</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">EnumVariant</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">struct </span>EnumShape {
+    description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    variants: HashMap&lt;String, EnumVariant&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Method</span> {
-    <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;requestShape&quot;</span>)]</span>
-    <span class="ident">request_shape</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;responseShape&quot;</span>)]</span>
-    <span class="ident">response_shape</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">struct </span>Method {
+    description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;requestShape&quot;</span>)]
+    </span>request_shape: String,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;responseShape&quot;</span>)]
+    </span>response_shape: String,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="json_rpc_api_build" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="json_rpc_api_build" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

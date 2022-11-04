@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/ecdh.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ecdh.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../ring/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/ecdh.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ecdh.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../ring/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -234,241 +234,241 @@
 <span id="234">234</span>
 <span id="235">235</span>
 <span id="236">236</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! ECDH key agreement using the P-256 and P-384 curves.</span>
+</span><span class="doccomment">//! ECDH key agreement using the P-256 and P-384 curves.
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ops</span>::<span class="kw-2">*</span>, <span class="ident">private_key</span>::<span class="kw-2">*</span>, <span class="ident">public_key</span>::<span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">agreement</span>, <span class="ident">ec</span>, <span class="ident">error</span>};
+</span><span class="kw">use super</span>::{ops::<span class="kw-2">*</span>, private_key::<span class="kw-2">*</span>, public_key::<span class="kw-2">*</span>};
+<span class="kw">use crate</span>::{agreement, ec, error};
 
-<span class="doccomment">/// A key agreement algorithm.</span>
-<span class="macro">macro_rules!</span> <span class="ident">ecdh</span> {
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">NAME</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">curve</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name_str</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">private_key_ops</span>:<span class="ident">expr</span>,
-      <span class="macro-nonterminal">$</span><span class="macro-nonterminal">public_key_ops</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ecdh</span>:<span class="ident">ident</span> ) =&gt; {
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;ECDH using the NSA Suite B&quot;</span>]</span>
-        <span class="attribute">#[<span class="ident">doc</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name_str</span>]</span>
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;curve.&quot;</span>]</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// Public keys are encoding in uncompressed form using the</span>
-        <span class="doccomment">/// Octet-String-to-Elliptic-Curve-Point algorithm in</span>
-        <span class="doccomment">/// [SEC 1: Elliptic Curve Cryptography, Version 2.0]. Public keys are</span>
-        <span class="doccomment">/// validated during key agreement according to</span>
-        <span class="doccomment">/// [NIST Special Publication 800-56A, revision 2] and Appendix B.3 of</span>
-        <span class="doccomment">/// the NSA&#39;s [Suite B Implementer&#39;s Guide to NIST SP 800-56A].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [SEC 1: Elliptic Curve Cryptography, Version 2.0]:</span>
-        <span class="doccomment">///     http://www.secg.org/sec1-v2.pdf</span>
-        <span class="doccomment">/// [NIST Special Publication 800-56A, revision 2]:</span>
-        <span class="doccomment">///     http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar2.pdf</span>
-        <span class="doccomment">/// [Suite B Implementer&#39;s Guide to NIST SP 800-56A]:</span>
-        <span class="doccomment">///     https://github.com/briansmith/ring/blob/main/doc/ecdh.pdf</span>
-        <span class="kw">pub</span> <span class="kw">static</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">NAME</span>: <span class="ident">agreement::Algorithm</span> <span class="op">=</span> <span class="ident">agreement::Algorithm</span> {
-            <span class="ident">curve</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">curve</span>,
-            <span class="ident">ecdh</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ecdh</span>,
+<span class="doccomment">/// A key agreement algorithm.
+</span><span class="macro">macro_rules! </span>ecdh {
+    ( <span class="macro-nonterminal">$NAME</span>:ident, <span class="macro-nonterminal">$curve</span>:expr, <span class="macro-nonterminal">$name_str</span>:expr, <span class="macro-nonterminal">$private_key_ops</span>:expr,
+      <span class="macro-nonterminal">$public_key_ops</span>:expr, <span class="macro-nonterminal">$ecdh</span>:ident ) =&gt; {
+        <span class="attribute">#[doc = <span class="string">&quot;ECDH using the NSA Suite B&quot;</span>]
+        #[doc=<span class="macro-nonterminal">$name_str</span>]
+        #[doc = <span class="string">&quot;curve.&quot;</span>]
+        </span><span class="doccomment">///
+        /// Public keys are encoding in uncompressed form using the
+        /// Octet-String-to-Elliptic-Curve-Point algorithm in
+        /// [SEC 1: Elliptic Curve Cryptography, Version 2.0]. Public keys are
+        /// validated during key agreement according to
+        /// [NIST Special Publication 800-56A, revision 2] and Appendix B.3 of
+        /// the NSA&#39;s [Suite B Implementer&#39;s Guide to NIST SP 800-56A].
+        ///
+        /// [SEC 1: Elliptic Curve Cryptography, Version 2.0]:
+        ///     http://www.secg.org/sec1-v2.pdf
+        /// [NIST Special Publication 800-56A, revision 2]:
+        ///     http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar2.pdf
+        /// [Suite B Implementer&#39;s Guide to NIST SP 800-56A]:
+        ///     https://github.com/briansmith/ring/blob/main/doc/ecdh.pdf
+        </span><span class="kw">pub static </span><span class="macro-nonterminal">$NAME</span>: agreement::Algorithm = agreement::Algorithm {
+            curve: <span class="macro-nonterminal">$curve</span>,
+            ecdh: <span class="macro-nonterminal">$ecdh</span>,
         };
 
-        <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ecdh</span>(
-            <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-            <span class="ident">my_private_key</span>: <span class="kw-2">&amp;</span><span class="ident">ec::Seed</span>,
-            <span class="ident">peer_public_key</span>: <span class="ident">untrusted::Input</span>,
-        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-            <span class="ident">ecdh</span>(
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">private_key_ops</span>,
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">public_key_ops</span>,
-                <span class="ident">out</span>,
-                <span class="ident">my_private_key</span>,
-                <span class="ident">peer_public_key</span>,
+        <span class="kw">fn </span><span class="macro-nonterminal">$ecdh</span>(
+            out: <span class="kw-2">&amp;mut </span>[u8],
+            my_private_key: <span class="kw-2">&amp;</span>ec::Seed,
+            peer_public_key: untrusted::Input,
+        ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+            ecdh(
+                <span class="macro-nonterminal">$private_key_ops</span>,
+                <span class="macro-nonterminal">$public_key_ops</span>,
+                out,
+                my_private_key,
+                peer_public_key,
             )
         }
     };
 }
 
 <span class="macro">ecdh!</span>(
-    <span class="ident">ECDH_P256</span>,
-    <span class="kw-2">&amp;</span><span class="ident">ec::suite_b::curve::P256</span>,
+    ECDH_P256,
+    <span class="kw-2">&amp;</span>ec::suite_b::curve::P256,
     <span class="string">&quot;P-256 (secp256r1)&quot;</span>,
-    <span class="kw-2">&amp;</span><span class="ident">p256::PRIVATE_KEY_OPS</span>,
-    <span class="kw-2">&amp;</span><span class="ident">p256::PUBLIC_KEY_OPS</span>,
-    <span class="ident">p256_ecdh</span>
+    <span class="kw-2">&amp;</span>p256::PRIVATE_KEY_OPS,
+    <span class="kw-2">&amp;</span>p256::PUBLIC_KEY_OPS,
+    p256_ecdh
 );
 
 <span class="macro">ecdh!</span>(
-    <span class="ident">ECDH_P384</span>,
-    <span class="kw-2">&amp;</span><span class="ident">ec::suite_b::curve::P384</span>,
+    ECDH_P384,
+    <span class="kw-2">&amp;</span>ec::suite_b::curve::P384,
     <span class="string">&quot;P-384 (secp384r1)&quot;</span>,
-    <span class="kw-2">&amp;</span><span class="ident">p384::PRIVATE_KEY_OPS</span>,
-    <span class="kw-2">&amp;</span><span class="ident">p384::PUBLIC_KEY_OPS</span>,
-    <span class="ident">p384_ecdh</span>
+    <span class="kw-2">&amp;</span>p384::PRIVATE_KEY_OPS,
+    <span class="kw-2">&amp;</span>p384::PUBLIC_KEY_OPS,
+    p384_ecdh
 );
 
-<span class="kw">fn</span> <span class="ident">ecdh</span>(
-    <span class="ident">private_key_ops</span>: <span class="kw-2">&amp;</span><span class="ident">PrivateKeyOps</span>,
-    <span class="ident">public_key_ops</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKeyOps</span>,
-    <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">my_private_key</span>: <span class="kw-2">&amp;</span><span class="ident">ec::Seed</span>,
-    <span class="ident">peer_public_key</span>: <span class="ident">untrusted::Input</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="comment">// The NIST SP 800-56Ar2 steps are from section 5.7.1.2 Elliptic Curve</span>
-    <span class="comment">// Cryptography Cofactor Diffie-Hellman (ECC CDH) Primitive.</span>
-    <span class="comment">//</span>
-    <span class="comment">// The &quot;NSA Guide&quot; steps are from section 3.1 of the NSA guide, &quot;Ephemeral</span>
-    <span class="comment">// Unified Model.&quot;</span>
+<span class="kw">fn </span>ecdh(
+    private_key_ops: <span class="kw-2">&amp;</span>PrivateKeyOps,
+    public_key_ops: <span class="kw-2">&amp;</span>PublicKeyOps,
+    out: <span class="kw-2">&amp;mut </span>[u8],
+    my_private_key: <span class="kw-2">&amp;</span>ec::Seed,
+    peer_public_key: untrusted::Input,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+    <span class="comment">// The NIST SP 800-56Ar2 steps are from section 5.7.1.2 Elliptic Curve
+    // Cryptography Cofactor Diffie-Hellman (ECC CDH) Primitive.
+    //
+    // The &quot;NSA Guide&quot; steps are from section 3.1 of the NSA guide, &quot;Ephemeral
+    // Unified Model.&quot;
 
-    <span class="comment">// NSA Guide Step 1 is handled separately.</span>
+    // NSA Guide Step 1 is handled separately.
 
-    <span class="comment">// NIST SP 800-56Ar2 5.6.2.2.2.</span>
-    <span class="comment">// NSA Guide Step 2.</span>
-    <span class="comment">//</span>
-    <span class="comment">// `parse_uncompressed_point` verifies that the point is not at infinity</span>
-    <span class="comment">// and that it is on the curve, using the Partial Public-Key Validation</span>
-    <span class="comment">// Routine.</span>
-    <span class="kw">let</span> <span class="ident">peer_public_key</span> <span class="op">=</span> <span class="ident">parse_uncompressed_point</span>(<span class="ident">public_key_ops</span>, <span class="ident">peer_public_key</span>)<span class="question-mark">?</span>;
+    // NIST SP 800-56Ar2 5.6.2.2.2.
+    // NSA Guide Step 2.
+    //
+    // `parse_uncompressed_point` verifies that the point is not at infinity
+    // and that it is on the curve, using the Partial Public-Key Validation
+    // Routine.
+    </span><span class="kw">let </span>peer_public_key = parse_uncompressed_point(public_key_ops, peer_public_key)<span class="question-mark">?</span>;
 
-    <span class="comment">// NIST SP 800-56Ar2 Step 1.</span>
-    <span class="comment">// NSA Guide Step 3 (except point at infinity check).</span>
-    <span class="comment">//</span>
-    <span class="comment">// Note that the cofactor (h) is one since we only support prime-order</span>
-    <span class="comment">// curves, so we can safely ignore the cofactor.</span>
-    <span class="comment">//</span>
-    <span class="comment">// It is impossible for the result to be the point at infinity because our</span>
-    <span class="comment">// private key is in the range [1, n) and the curve has prime order and</span>
-    <span class="comment">// `parse_uncompressed_point` verified that the peer public key is on the</span>
-    <span class="comment">// curve and not at infinity. However, since the standards require the</span>
-    <span class="comment">// check, we do it using `assert!`.</span>
-    <span class="comment">//</span>
-    <span class="comment">// NIST SP 800-56Ar2 defines &quot;Destroy&quot; thusly: &quot;In this Recommendation, to</span>
-    <span class="comment">// destroy is an action applied to a key or a piece of secret data. After</span>
-    <span class="comment">// a key or a piece of secret data is destroyed, no information about its</span>
-    <span class="comment">// value can be recovered.&quot; We interpret &quot;destroy&quot; somewhat liberally: we</span>
-    <span class="comment">// assume that since we throw away the values to be destroyed, no</span>
-    <span class="comment">// information about their values can be recovered. This doesn&#39;t meet the</span>
-    <span class="comment">// NSA guide&#39;s explicit requirement to &quot;zeroize&quot; them though.</span>
-    <span class="comment">// TODO: this only needs common scalar ops</span>
-    <span class="kw">let</span> <span class="ident">my_private_key</span> <span class="op">=</span> <span class="ident">private_key_as_scalar</span>(<span class="ident">private_key_ops</span>, <span class="ident">my_private_key</span>);
-    <span class="kw">let</span> <span class="ident">product</span> <span class="op">=</span> <span class="ident">private_key_ops</span>.<span class="ident">point_mul</span>(<span class="kw-2">&amp;</span><span class="ident">my_private_key</span>, <span class="kw-2">&amp;</span><span class="ident">peer_public_key</span>);
+    <span class="comment">// NIST SP 800-56Ar2 Step 1.
+    // NSA Guide Step 3 (except point at infinity check).
+    //
+    // Note that the cofactor (h) is one since we only support prime-order
+    // curves, so we can safely ignore the cofactor.
+    //
+    // It is impossible for the result to be the point at infinity because our
+    // private key is in the range [1, n) and the curve has prime order and
+    // `parse_uncompressed_point` verified that the peer public key is on the
+    // curve and not at infinity. However, since the standards require the
+    // check, we do it using `assert!`.
+    //
+    // NIST SP 800-56Ar2 defines &quot;Destroy&quot; thusly: &quot;In this Recommendation, to
+    // destroy is an action applied to a key or a piece of secret data. After
+    // a key or a piece of secret data is destroyed, no information about its
+    // value can be recovered.&quot; We interpret &quot;destroy&quot; somewhat liberally: we
+    // assume that since we throw away the values to be destroyed, no
+    // information about their values can be recovered. This doesn&#39;t meet the
+    // NSA guide&#39;s explicit requirement to &quot;zeroize&quot; them though.
+    // TODO: this only needs common scalar ops
+    </span><span class="kw">let </span>my_private_key = private_key_as_scalar(private_key_ops, my_private_key);
+    <span class="kw">let </span>product = private_key_ops.point_mul(<span class="kw-2">&amp;</span>my_private_key, <span class="kw-2">&amp;</span>peer_public_key);
 
-    <span class="comment">// NIST SP 800-56Ar2 Steps 2, 3, 4, and 5.</span>
-    <span class="comment">// NSA Guide Steps 3 (point at infinity check) and 4.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Again, we have a pretty liberal interpretation of the NIST&#39;s spec&#39;s</span>
-    <span class="comment">// &quot;Destroy&quot; that doesn&#39;t meet the NSA requirement to &quot;zeroize.&quot;</span>
-    <span class="comment">// `big_endian_affine_from_jacobian` verifies that the result is not at</span>
-    <span class="comment">// infinity and also does an extra check to verify that the point is on</span>
-    <span class="comment">// the curve.</span>
-    <span class="ident">big_endian_affine_from_jacobian</span>(<span class="ident">private_key_ops</span>, <span class="prelude-val">Some</span>(<span class="ident">out</span>), <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="ident">product</span>)
+    <span class="comment">// NIST SP 800-56Ar2 Steps 2, 3, 4, and 5.
+    // NSA Guide Steps 3 (point at infinity check) and 4.
+    //
+    // Again, we have a pretty liberal interpretation of the NIST&#39;s spec&#39;s
+    // &quot;Destroy&quot; that doesn&#39;t meet the NSA requirement to &quot;zeroize.&quot;
+    // `big_endian_affine_from_jacobian` verifies that the result is not at
+    // infinity and also does an extra check to verify that the point is on
+    // the curve.
+    </span>big_endian_affine_from_jacobian(private_key_ops, <span class="prelude-val">Some</span>(out), <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>product)
 
-    <span class="comment">// NSA Guide Step 5 &amp; 6 are deferred to the caller. Again, we have a</span>
-    <span class="comment">// pretty liberal interpretation of the NIST&#39;s spec&#39;s &quot;Destroy&quot; that</span>
-    <span class="comment">// doesn&#39;t meet the NSA requirement to &quot;zeroize.&quot;</span>
-}
+    <span class="comment">// NSA Guide Step 5 &amp; 6 are deferred to the caller. Again, we have a
+    // pretty liberal interpretation of the NIST&#39;s spec&#39;s &quot;Destroy&quot; that
+    // doesn&#39;t meet the NSA requirement to &quot;zeroize.&quot;
+</span>}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::ops</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">agreement</span>, <span class="ident">ec</span>, <span class="ident">limb</span>, <span class="ident">test</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::ops;
+    <span class="kw">use crate</span>::{agreement, ec, limb, test};
 
-    <span class="kw">static</span> <span class="ident">SUPPORTED_SUITE_B_ALGS</span>: [(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">agreement::Algorithm</span>, <span class="kw-2">&amp;</span><span class="ident">ec::Curve</span>, <span class="kw-2">&amp;</span><span class="ident">ops::CommonOps</span>); <span class="number">2</span>] <span class="op">=</span> [
+    <span class="kw">static </span>SUPPORTED_SUITE_B_ALGS: [(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>agreement::Algorithm, <span class="kw-2">&amp;</span>ec::Curve, <span class="kw-2">&amp;</span>ops::CommonOps); <span class="number">2</span>] = [
         (
             <span class="string">&quot;P-256&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="ident">agreement::ECDH_P256</span>,
-            <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::curve::P256</span>,
-            <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::ops::p256::COMMON_OPS</span>,
+            <span class="kw-2">&amp;</span>agreement::ECDH_P256,
+            <span class="kw-2">&amp;</span><span class="kw">super</span>::<span class="kw">super</span>::curve::P256,
+            <span class="kw-2">&amp;</span><span class="kw">super</span>::<span class="kw">super</span>::ops::p256::COMMON_OPS,
         ),
         (
             <span class="string">&quot;P-384&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="ident">agreement::ECDH_P384</span>,
-            <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::curve::P384</span>,
-            <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::ops::p384::COMMON_OPS</span>,
+            <span class="kw-2">&amp;</span>agreement::ECDH_P384,
+            <span class="kw-2">&amp;</span><span class="kw">super</span>::<span class="kw">super</span>::curve::P384,
+            <span class="kw-2">&amp;</span><span class="kw">super</span>::<span class="kw">super</span>::ops::p384::COMMON_OPS,
         ),
     ];
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_agreement_suite_b_ecdh_generate</span>() {
-        <span class="comment">// Generates a string of bytes 0x00...00, which will always result in</span>
-        <span class="comment">// a scalar value of zero.</span>
-        <span class="kw">let</span> <span class="ident">random_00</span> <span class="op">=</span> <span class="ident">test::rand::FixedByteRandom</span> { <span class="ident">byte</span>: <span class="number">0x00</span> };
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_agreement_suite_b_ecdh_generate() {
+        <span class="comment">// Generates a string of bytes 0x00...00, which will always result in
+        // a scalar value of zero.
+        </span><span class="kw">let </span>random_00 = test::rand::FixedByteRandom { byte: <span class="number">0x00 </span>};
 
-        <span class="comment">// Generates a string of bytes 0xFF...FF, which will be larger than the</span>
-        <span class="comment">// group order of any curve that is supported.</span>
-        <span class="kw">let</span> <span class="ident">random_ff</span> <span class="op">=</span> <span class="ident">test::rand::FixedByteRandom</span> { <span class="ident">byte</span>: <span class="number">0xff</span> };
+        <span class="comment">// Generates a string of bytes 0xFF...FF, which will be larger than the
+        // group order of any curve that is supported.
+        </span><span class="kw">let </span>random_ff = test::rand::FixedByteRandom { byte: <span class="number">0xff </span>};
 
-        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">alg</span>, <span class="ident">curve</span>, <span class="ident">ops</span>) <span class="kw">in</span> <span class="ident">SUPPORTED_SUITE_B_ALGS</span>.<span class="ident">iter</span>() {
-            <span class="comment">// Test that the private key value zero is rejected and that</span>
-            <span class="comment">// `generate` gives up after a while of only getting zeros.</span>
-            <span class="macro">assert!</span>(<span class="ident">agreement::EphemeralPrivateKey::generate</span>(<span class="ident">alg</span>, <span class="kw-2">&amp;</span><span class="ident">random_00</span>).<span class="ident">is_err</span>());
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, alg, curve, ops) <span class="kw">in </span>SUPPORTED_SUITE_B_ALGS.iter() {
+            <span class="comment">// Test that the private key value zero is rejected and that
+            // `generate` gives up after a while of only getting zeros.
+            </span><span class="macro">assert!</span>(agreement::EphemeralPrivateKey::generate(alg, <span class="kw-2">&amp;</span>random_00).is_err());
 
-            <span class="comment">// Test that the private key value larger than the group order is</span>
-            <span class="comment">// rejected and that `generate` gives up after a while of only</span>
-            <span class="comment">// getting values larger than the group order.</span>
-            <span class="macro">assert!</span>(<span class="ident">agreement::EphemeralPrivateKey::generate</span>(<span class="ident">alg</span>, <span class="kw-2">&amp;</span><span class="ident">random_ff</span>).<span class="ident">is_err</span>());
+            <span class="comment">// Test that the private key value larger than the group order is
+            // rejected and that `generate` gives up after a while of only
+            // getting values larger than the group order.
+            </span><span class="macro">assert!</span>(agreement::EphemeralPrivateKey::generate(alg, <span class="kw-2">&amp;</span>random_ff).is_err());
 
-            <span class="comment">// Test that a private key value exactly equal to the group order</span>
-            <span class="comment">// is rejected and that `generate` gives up after a while of only</span>
-            <span class="comment">// getting that value from the PRNG.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n_bytes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">ec::SCALAR_MAX_BYTES</span>];
-            <span class="kw">let</span> <span class="ident">num_bytes</span> <span class="op">=</span> <span class="ident">curve</span>.<span class="ident">elem_scalar_seed_len</span>;
-            <span class="ident">limb::big_endian_from_limbs</span>(<span class="kw-2">&amp;</span><span class="ident">ops</span>.<span class="ident">n</span>.<span class="ident">limbs</span>[..<span class="ident">ops</span>.<span class="ident">num_limbs</span>], <span class="kw-2">&amp;mut</span> <span class="ident">n_bytes</span>[..<span class="ident">num_bytes</span>]);
+            <span class="comment">// Test that a private key value exactly equal to the group order
+            // is rejected and that `generate` gives up after a while of only
+            // getting that value from the PRNG.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>n_bytes = [<span class="number">0u8</span>; ec::SCALAR_MAX_BYTES];
+            <span class="kw">let </span>num_bytes = curve.elem_scalar_seed_len;
+            limb::big_endian_from_limbs(<span class="kw-2">&amp;</span>ops.n.limbs[..ops.num_limbs], <span class="kw-2">&amp;mut </span>n_bytes[..num_bytes]);
             {
-                <span class="kw">let</span> <span class="ident">n_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">n_bytes</span>[..<span class="ident">num_bytes</span>];
-                <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">test::rand::FixedSliceRandom</span> { <span class="ident">bytes</span>: <span class="ident">n_bytes</span> };
-                <span class="macro">assert!</span>(<span class="ident">agreement::EphemeralPrivateKey::generate</span>(<span class="ident">alg</span>, <span class="kw-2">&amp;</span><span class="ident">rng</span>).<span class="ident">is_err</span>());
+                <span class="kw">let </span>n_bytes = <span class="kw-2">&amp;mut </span>n_bytes[..num_bytes];
+                <span class="kw">let </span>rng = test::rand::FixedSliceRandom { bytes: n_bytes };
+                <span class="macro">assert!</span>(agreement::EphemeralPrivateKey::generate(alg, <span class="kw-2">&amp;</span>rng).is_err());
             }
 
-            <span class="comment">// Test that a private key value exactly equal to the group order</span>
-            <span class="comment">// minus 1 is accepted.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n_minus_1_bytes</span> <span class="op">=</span> <span class="ident">n_bytes</span>;
+            <span class="comment">// Test that a private key value exactly equal to the group order
+            // minus 1 is accepted.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>n_minus_1_bytes = n_bytes;
             {
-                <span class="kw">let</span> <span class="ident">n_minus_1_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">n_minus_1_bytes</span>[..<span class="ident">num_bytes</span>];
-                <span class="ident">n_minus_1_bytes</span>[<span class="ident">num_bytes</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">test::rand::FixedSliceRandom</span> {
-                    <span class="ident">bytes</span>: <span class="ident">n_minus_1_bytes</span>,
+                <span class="kw">let </span>n_minus_1_bytes = <span class="kw-2">&amp;mut </span>n_minus_1_bytes[..num_bytes];
+                n_minus_1_bytes[num_bytes - <span class="number">1</span>] -= <span class="number">1</span>;
+                <span class="kw">let </span>rng = test::rand::FixedSliceRandom {
+                    bytes: n_minus_1_bytes,
                 };
-                <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">agreement::EphemeralPrivateKey::generate</span>(<span class="ident">alg</span>, <span class="kw-2">&amp;</span><span class="ident">rng</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">n_minus_1_bytes</span>[..], <span class="ident">key</span>.<span class="ident">bytes</span>());
+                <span class="kw">let </span>key = agreement::EphemeralPrivateKey::generate(alg, <span class="kw-2">&amp;</span>rng).unwrap();
+                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>n_minus_1_bytes[..], key.bytes());
             }
 
-            <span class="comment">// Test that n + 1 also fails.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n_plus_1_bytes</span> <span class="op">=</span> <span class="ident">n_bytes</span>;
+            <span class="comment">// Test that n + 1 also fails.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>n_plus_1_bytes = n_bytes;
             {
-                <span class="kw">let</span> <span class="ident">n_plus_1_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">n_plus_1_bytes</span>[..<span class="ident">num_bytes</span>];
-                <span class="ident">n_plus_1_bytes</span>[<span class="ident">num_bytes</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">test::rand::FixedSliceRandom</span> {
-                    <span class="ident">bytes</span>: <span class="ident">n_plus_1_bytes</span>,
+                <span class="kw">let </span>n_plus_1_bytes = <span class="kw-2">&amp;mut </span>n_plus_1_bytes[..num_bytes];
+                n_plus_1_bytes[num_bytes - <span class="number">1</span>] += <span class="number">1</span>;
+                <span class="kw">let </span>rng = test::rand::FixedSliceRandom {
+                    bytes: n_plus_1_bytes,
                 };
-                <span class="macro">assert!</span>(<span class="ident">agreement::EphemeralPrivateKey::generate</span>(<span class="ident">alg</span>, <span class="kw-2">&amp;</span><span class="ident">rng</span>).<span class="ident">is_err</span>());
+                <span class="macro">assert!</span>(agreement::EphemeralPrivateKey::generate(alg, <span class="kw-2">&amp;</span>rng).is_err());
             }
 
-            <span class="comment">// Test recovery from initial RNG failure. The first value will be</span>
-            <span class="comment">// n, then n + 1, then zero, the next value will be n - 1, which</span>
-            <span class="comment">// will be accepted.</span>
-            {
-                <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> [
-                    <span class="kw-2">&amp;</span><span class="ident">n_bytes</span>[..<span class="ident">num_bytes</span>],
-                    <span class="kw-2">&amp;</span><span class="ident">n_plus_1_bytes</span>[..<span class="ident">num_bytes</span>],
-                    <span class="kw-2">&amp;</span>[<span class="number">0u8</span>; <span class="ident">ec::SCALAR_MAX_BYTES</span>][..<span class="ident">num_bytes</span>],
-                    <span class="kw-2">&amp;</span><span class="ident">n_minus_1_bytes</span>[..<span class="ident">num_bytes</span>],
+            <span class="comment">// Test recovery from initial RNG failure. The first value will be
+            // n, then n + 1, then zero, the next value will be n - 1, which
+            // will be accepted.
+            </span>{
+                <span class="kw">let </span>bytes = [
+                    <span class="kw-2">&amp;</span>n_bytes[..num_bytes],
+                    <span class="kw-2">&amp;</span>n_plus_1_bytes[..num_bytes],
+                    <span class="kw-2">&amp;</span>[<span class="number">0u8</span>; ec::SCALAR_MAX_BYTES][..num_bytes],
+                    <span class="kw-2">&amp;</span>n_minus_1_bytes[..num_bytes],
                 ];
-                <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">test::rand::FixedSliceSequenceRandom</span> {
-                    <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">bytes</span>,
-                    <span class="ident">current</span>: <span class="ident">core::cell::UnsafeCell::new</span>(<span class="number">0</span>),
+                <span class="kw">let </span>rng = test::rand::FixedSliceSequenceRandom {
+                    bytes: <span class="kw-2">&amp;</span>bytes,
+                    current: core::cell::UnsafeCell::new(<span class="number">0</span>),
                 };
-                <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">agreement::EphemeralPrivateKey::generate</span>(<span class="ident">alg</span>, <span class="kw-2">&amp;</span><span class="ident">rng</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">n_minus_1_bytes</span>[..<span class="ident">num_bytes</span>], <span class="ident">key</span>.<span class="ident">bytes</span>());
+                <span class="kw">let </span>key = agreement::EphemeralPrivateKey::generate(alg, <span class="kw-2">&amp;</span>rng).unwrap();
+                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>n_minus_1_bytes[..num_bytes], key.bytes());
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

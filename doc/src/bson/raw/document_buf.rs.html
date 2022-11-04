@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/document_buf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>document_buf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/document_buf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>document_buf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -399,406 +399,406 @@
 <span id="399">399</span>
 <span id="400">400</span>
 <span id="401">401</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow</span>::{<span class="ident">Borrow</span>, <span class="ident">Cow</span>},
-    <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
-    <span class="ident">iter::FromIterator</span>,
-    <span class="ident">ops::Deref</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    borrow::{Borrow, Cow},
+    convert::{TryFrom, TryInto},
+    iter::FromIterator,
+    ops::Deref,
 };
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">de::MIN_BSON_DOCUMENT_SIZE</span>,
-    <span class="ident">spec::BinarySubtype</span>,
-    <span class="ident">Document</span>,
-    <span class="ident">RawBinaryRef</span>,
-    <span class="ident">RawJavaScriptCodeWithScopeRef</span>,
+<span class="kw">use crate</span>::{
+    de::MIN_BSON_DOCUMENT_SIZE,
+    spec::BinarySubtype,
+    Document,
+    RawBinaryRef,
+    RawJavaScriptCodeWithScopeRef,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">bson::RawBson</span>,
-    <span class="ident">serde::OwnedOrBorrowedRawDocument</span>,
-    <span class="ident">Error</span>,
-    <span class="ident">ErrorKind</span>,
-    <span class="ident">Iter</span>,
-    <span class="ident">RawBsonRef</span>,
-    <span class="ident">RawDocument</span>,
+<span class="kw">use super</span>::{
+    bson::RawBson,
+    serde::OwnedOrBorrowedRawDocument,
+    Error,
+    ErrorKind,
+    Iter,
+    RawBsonRef,
+    RawDocument,
     <span class="prelude-ty">Result</span>,
 };
 
-<span class="doccomment">/// An owned BSON document (akin to [`std::path::PathBuf`]), backed by a buffer of raw BSON bytes.</span>
-<span class="doccomment">/// This can be created from a `Vec&lt;u8&gt;` or a [`crate::Document`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Accessing elements within a [`RawDocumentBuf`] is similar to element access in</span>
-<span class="doccomment">/// [`crate::Document`], but because the contents are parsed during iteration instead of at creation</span>
-<span class="doccomment">/// time, format errors can happen at any time during use.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Iterating over a [`RawDocumentBuf`] yields either an error or a key-value pair that borrows from</span>
-<span class="doccomment">/// the original document without making any additional allocations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use bson::raw::Error;</span>
-<span class="doccomment">/// use bson::raw::RawDocumentBuf;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let doc = RawDocumentBuf::from_bytes(b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;.to_vec())?;</span>
-<span class="doccomment">/// let mut iter = doc.iter();</span>
-<span class="doccomment">/// let (key, value) = iter.next().unwrap()?;</span>
-<span class="doccomment">/// assert_eq!(key, &quot;hi&quot;);</span>
-<span class="doccomment">/// assert_eq!(value.as_str(), Some(&quot;y&#39;all&quot;));</span>
-<span class="doccomment">/// assert!(iter.next().is_none());</span>
-<span class="doccomment">/// # Ok::&lt;(), Error&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type implements `Deref` to [`RawDocument`], meaning that all methods on [`RawDocument`] are</span>
-<span class="doccomment">/// available on [`RawDocumentBuf`] values as well. This includes [`RawDocument::get`] or any of the</span>
-<span class="doccomment">/// type-specific getters, such as [`RawDocument::get_object_id`] or [`RawDocument::get_str`]. Note</span>
-<span class="doccomment">/// that accessing elements is an O(N) operation, as it requires iterating through the document from</span>
-<span class="doccomment">/// the beginning to find the requested key.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use bson::raw::RawDocumentBuf;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let doc = RawDocumentBuf::from_bytes(b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;.to_vec())?;</span>
-<span class="doccomment">/// assert_eq!(doc.get_str(&quot;hi&quot;)?, &quot;y&#39;all&quot;);</span>
-<span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RawDocumentBuf</span> {
-    <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An owned BSON document (akin to [`std::path::PathBuf`]), backed by a buffer of raw BSON bytes.
+/// This can be created from a `Vec&lt;u8&gt;` or a [`crate::Document`].
+///
+/// Accessing elements within a [`RawDocumentBuf`] is similar to element access in
+/// [`crate::Document`], but because the contents are parsed during iteration instead of at creation
+/// time, format errors can happen at any time during use.
+///
+/// Iterating over a [`RawDocumentBuf`] yields either an error or a key-value pair that borrows from
+/// the original document without making any additional allocations.
+///
+/// ```
+/// # use bson::raw::Error;
+/// use bson::raw::RawDocumentBuf;
+///
+/// let doc = RawDocumentBuf::from_bytes(b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;.to_vec())?;
+/// let mut iter = doc.iter();
+/// let (key, value) = iter.next().unwrap()?;
+/// assert_eq!(key, &quot;hi&quot;);
+/// assert_eq!(value.as_str(), Some(&quot;y&#39;all&quot;));
+/// assert!(iter.next().is_none());
+/// # Ok::&lt;(), Error&gt;(())
+/// ```
+///
+/// This type implements `Deref` to [`RawDocument`], meaning that all methods on [`RawDocument`] are
+/// available on [`RawDocumentBuf`] values as well. This includes [`RawDocument::get`] or any of the
+/// type-specific getters, such as [`RawDocument::get_object_id`] or [`RawDocument::get_str`]. Note
+/// that accessing elements is an O(N) operation, as it requires iterating through the document from
+/// the beginning to find the requested key.
+///
+/// ```
+/// use bson::raw::RawDocumentBuf;
+///
+/// let doc = RawDocumentBuf::from_bytes(b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;.to_vec())?;
+/// assert_eq!(doc.get_str(&quot;hi&quot;)?, &quot;y&#39;all&quot;);
+/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+/// ```
+</span><span class="attribute">#[derive(Clone, PartialEq)]
+</span><span class="kw">pub struct </span>RawDocumentBuf {
+    data: Vec&lt;u8&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">RawDocumentBuf</span> {
-    <span class="doccomment">/// Creates a new, empty [`RawDocumentBuf`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">RawDocumentBuf</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">MIN_BSON_DOCUMENT_SIZE</span>.<span class="ident">to_le_bytes</span>());
-        <span class="ident">data</span>.<span class="ident">push</span>(<span class="number">0</span>);
-        <span class="self">Self</span> { <span class="ident">data</span> }
+<span class="kw">impl </span>RawDocumentBuf {
+    <span class="doccomment">/// Creates a new, empty [`RawDocumentBuf`].
+    </span><span class="kw">pub fn </span>new() -&gt; RawDocumentBuf {
+        <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::new();
+        data.extend(<span class="kw-2">&amp;</span>MIN_BSON_DOCUMENT_SIZE.to_le_bytes());
+        data.push(<span class="number">0</span>);
+        <span class="self">Self </span>{ data }
     }
 
-    <span class="doccomment">/// Constructs a new [`RawDocumentBuf`], validating _only_ the</span>
-    <span class="doccomment">/// following invariants:</span>
-    <span class="doccomment">///   * `data` is at least five bytes long (the minimum for a valid BSON document)</span>
-    <span class="doccomment">///   * the initial four bytes of `data` accurately represent the length of the bytes as</span>
-    <span class="doccomment">///     required by the BSON spec.</span>
-    <span class="doccomment">///   * the last byte of `data` is a 0</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the internal structure of the bytes representing the</span>
-    <span class="doccomment">/// BSON elements is _not_ validated at all by this method. If the</span>
-    <span class="doccomment">/// bytes do not conform to the BSON spec, then method calls on</span>
-    <span class="doccomment">/// the RawDocument will return Errors where appropriate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::{RawDocumentBuf, Error};</span>
-    <span class="doccomment">/// let doc = RawDocumentBuf::from_bytes(b&quot;\x05\0\0\0\0&quot;.to_vec())?;</span>
-    <span class="doccomment">/// # Ok::&lt;(), Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">RawDocument::from_bytes</span>(<span class="ident">data</span>.<span class="ident">as_slice</span>())<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">data</span> })
+    <span class="doccomment">/// Constructs a new [`RawDocumentBuf`], validating _only_ the
+    /// following invariants:
+    ///   * `data` is at least five bytes long (the minimum for a valid BSON document)
+    ///   * the initial four bytes of `data` accurately represent the length of the bytes as
+    ///     required by the BSON spec.
+    ///   * the last byte of `data` is a 0
+    ///
+    /// Note that the internal structure of the bytes representing the
+    /// BSON elements is _not_ validated at all by this method. If the
+    /// bytes do not conform to the BSON spec, then method calls on
+    /// the RawDocument will return Errors where appropriate.
+    ///
+    /// ```
+    /// # use bson::raw::{RawDocumentBuf, Error};
+    /// let doc = RawDocumentBuf::from_bytes(b&quot;\x05\0\0\0\0&quot;.to_vec())?;
+    /// # Ok::&lt;(), Error&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>from_bytes(data: Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;RawDocumentBuf&gt; {
+        <span class="kw">let _ </span>= RawDocument::from_bytes(data.as_slice())<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ data })
     }
 
-    <span class="doccomment">/// Create a [`RawDocumentBuf`] from a [`Document`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{doc, oid::ObjectId, raw::RawDocumentBuf};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let document = doc! {</span>
-    <span class="doccomment">///     &quot;_id&quot;: ObjectId::new(),</span>
-    <span class="doccomment">///     &quot;name&quot;: &quot;Herman Melville&quot;,</span>
-    <span class="doccomment">///     &quot;title&quot;: &quot;Moby-Dick&quot;,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">/// let doc = RawDocumentBuf::from_document(&amp;document)?;</span>
-    <span class="doccomment">/// # Ok::&lt;(), Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_document</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">doc</span>.<span class="ident">to_writer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error</span> {
-            <span class="ident">key</span>: <span class="prelude-val">None</span>,
-            <span class="ident">kind</span>: <span class="ident">ErrorKind::MalformedValue</span> {
-                <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
+    <span class="doccomment">/// Create a [`RawDocumentBuf`] from a [`Document`].
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{doc, oid::ObjectId, raw::RawDocumentBuf};
+    ///
+    /// let document = doc! {
+    ///     &quot;_id&quot;: ObjectId::new(),
+    ///     &quot;name&quot;: &quot;Herman Melville&quot;,
+    ///     &quot;title&quot;: &quot;Moby-Dick&quot;,
+    /// };
+    /// let doc = RawDocumentBuf::from_document(&amp;document)?;
+    /// # Ok::&lt;(), Error&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>from_document(doc: <span class="kw-2">&amp;</span>Document) -&gt; <span class="prelude-ty">Result</span>&lt;RawDocumentBuf&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::new();
+        doc.to_writer(<span class="kw-2">&amp;mut </span>data).map_err(|e| Error {
+            key: <span class="prelude-val">None</span>,
+            kind: ErrorKind::MalformedValue {
+                message: e.to_string(),
             },
         })<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">data</span> })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ data })
     }
 
-    <span class="doccomment">/// Gets an iterator over the elements in the [`RawDocumentBuf`], which yields</span>
-    <span class="doccomment">/// `Result&lt;(&amp;str, RawBson&lt;&#39;_&gt;)&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{doc, raw::RawDocumentBuf};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = RawDocumentBuf::from_document(&amp;doc! { &quot;ferris&quot;: true })?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// for element in doc.iter() {</span>
-    <span class="doccomment">///     let (key, value) = element?;</span>
-    <span class="doccomment">///     assert_eq!(key, &quot;ferris&quot;);</span>
-    <span class="doccomment">///     assert_eq!(value.as_bool(), Some(true));</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok::&lt;(), Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// There is no owning iterator for [`RawDocumentBuf`]. If you need ownership over</span>
-    <span class="doccomment">/// elements that might need to allocate, you must explicitly convert</span>
-    <span class="doccomment">/// them to owned types yourself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">into_iter</span>()
+    <span class="doccomment">/// Gets an iterator over the elements in the [`RawDocumentBuf`], which yields
+    /// `Result&lt;(&amp;str, RawBson&lt;&#39;_&gt;)&gt;`.
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{doc, raw::RawDocumentBuf};
+    ///
+    /// let doc = RawDocumentBuf::from_document(&amp;doc! { &quot;ferris&quot;: true })?;
+    ///
+    /// for element in doc.iter() {
+    ///     let (key, value) = element?;
+    ///     assert_eq!(key, &quot;ferris&quot;);
+    ///     assert_eq!(value.as_bool(), Some(true));
+    /// }
+    /// # Ok::&lt;(), Error&gt;(())
+    /// ```
+    ///
+    /// # Note:
+    ///
+    /// There is no owning iterator for [`RawDocumentBuf`]. If you need ownership over
+    /// elements that might need to allocate, you must explicitly convert
+    /// them to owned types yourself.
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.into_iter()
     }
 
-    <span class="doccomment">/// Return the contained data as a `Vec&lt;u8&gt;`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{doc, raw::RawDocumentBuf};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = RawDocumentBuf::from_document(&amp;doc!{})?;</span>
-    <span class="doccomment">/// assert_eq!(doc.into_bytes(), b&quot;\x05\x00\x00\x00\x00&quot;.to_vec());</span>
-    <span class="doccomment">/// # Ok::&lt;(), Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">data</span>
+    <span class="doccomment">/// Return the contained data as a `Vec&lt;u8&gt;`
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{doc, raw::RawDocumentBuf};
+    ///
+    /// let doc = RawDocumentBuf::from_document(&amp;doc!{})?;
+    /// assert_eq!(doc.into_bytes(), b&quot;\x05\x00\x00\x00\x00&quot;.to_vec());
+    /// # Ok::&lt;(), Error&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>into_bytes(<span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        <span class="self">self</span>.data
     }
 
-    <span class="doccomment">/// Append a key value pair to the end of the document without checking to see if</span>
-    <span class="doccomment">/// the key already exists.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is a user error to append the same key more than once to the same document, and it may</span>
-    <span class="doccomment">/// result in errors when communicating with MongoDB.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the provided key contains an interior null byte, this method will panic.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{doc, raw::RawDocumentBuf};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut doc = RawDocumentBuf::new();</span>
-    <span class="doccomment">/// doc.append(&quot;a string&quot;, &quot;some string&quot;);</span>
-    <span class="doccomment">/// doc.append(&quot;an integer&quot;, 12_i32);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut subdoc = RawDocumentBuf::new();</span>
-    <span class="doccomment">/// subdoc.append(&quot;a key&quot;, true);</span>
-    <span class="doccomment">/// doc.append(&quot;a document&quot;, subdoc);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let expected = doc! {</span>
-    <span class="doccomment">///     &quot;a string&quot;: &quot;some string&quot;,</span>
-    <span class="doccomment">///     &quot;an integer&quot;: 12_i32,</span>
-    <span class="doccomment">///     &quot;a document&quot;: { &quot;a key&quot;: true },</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(doc.to_document()?, expected);</span>
-    <span class="doccomment">/// # Ok::&lt;(), Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RawBson</span><span class="op">&gt;</span>) {
-        <span class="kw">fn</span> <span class="ident">append_string</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RawDocumentBuf</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-            <span class="ident">doc</span>.<span class="ident">data</span>
-                .<span class="ident">extend</span>(<span class="kw-2">&amp;</span>((<span class="ident">value</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">i32</span>).<span class="ident">to_le_bytes</span>());
-            <span class="ident">doc</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="ident">value</span>.<span class="ident">as_bytes</span>());
-            <span class="ident">doc</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="number">0</span>);
+    <span class="doccomment">/// Append a key value pair to the end of the document without checking to see if
+    /// the key already exists.
+    ///
+    /// It is a user error to append the same key more than once to the same document, and it may
+    /// result in errors when communicating with MongoDB.
+    ///
+    /// If the provided key contains an interior null byte, this method will panic.
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{doc, raw::RawDocumentBuf};
+    ///
+    /// let mut doc = RawDocumentBuf::new();
+    /// doc.append(&quot;a string&quot;, &quot;some string&quot;);
+    /// doc.append(&quot;an integer&quot;, 12_i32);
+    ///
+    /// let mut subdoc = RawDocumentBuf::new();
+    /// subdoc.append(&quot;a key&quot;, true);
+    /// doc.append(&quot;a document&quot;, subdoc);
+    ///
+    /// let expected = doc! {
+    ///     &quot;a string&quot;: &quot;some string&quot;,
+    ///     &quot;an integer&quot;: 12_i32,
+    ///     &quot;a document&quot;: { &quot;a key&quot;: true },
+    /// };
+    ///
+    /// assert_eq!(doc.to_document()?, expected);
+    /// # Ok::&lt;(), Error&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>append(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;, value: <span class="kw">impl </span>Into&lt;RawBson&gt;) {
+        <span class="kw">fn </span>append_string(doc: <span class="kw-2">&amp;mut </span>RawDocumentBuf, value: <span class="kw-2">&amp;</span>str) {
+            doc.data
+                .extend(<span class="kw-2">&amp;</span>((value.as_bytes().len() + <span class="number">1</span>) <span class="kw">as </span>i32).to_le_bytes());
+            doc.data.extend(value.as_bytes());
+            doc.data.push(<span class="number">0</span>);
         }
 
-        <span class="kw">fn</span> <span class="ident">append_cstring</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RawDocumentBuf</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-            <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">contains</span>(<span class="string">&#39;\0&#39;</span>) {
-                <span class="macro">panic!</span>(<span class="string">&quot;cstr includes interior null byte: {}&quot;</span>, <span class="ident">value</span>)
+        <span class="kw">fn </span>append_cstring(doc: <span class="kw-2">&amp;mut </span>RawDocumentBuf, value: <span class="kw-2">&amp;</span>str) {
+            <span class="kw">if </span>value.contains(<span class="string">&#39;\0&#39;</span>) {
+                <span class="macro">panic!</span>(<span class="string">&quot;cstr includes interior null byte: {}&quot;</span>, value)
             }
-            <span class="ident">doc</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="ident">value</span>.<span class="ident">as_bytes</span>());
-            <span class="ident">doc</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="number">0</span>);
+            doc.data.extend(value.as_bytes());
+            doc.data.push(<span class="number">0</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">original_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>();
+        <span class="kw">let </span>original_len = <span class="self">self</span>.data.len();
 
-        <span class="comment">// write the key for the next value to the end</span>
-        <span class="comment">// the element type will replace the previous null byte terminator of the document</span>
-        <span class="ident">append_cstring</span>(<span class="self">self</span>, <span class="ident">key</span>.<span class="ident">as_ref</span>());
+        <span class="comment">// write the key for the next value to the end
+        // the element type will replace the previous null byte terminator of the document
+        </span>append_cstring(<span class="self">self</span>, key.as_ref());
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">element_type</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">element_type</span>();
+        <span class="kw">let </span>value = value.into();
+        <span class="kw">let </span>element_type = value.element_type();
 
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">RawBson::Int32</span>(<span class="ident">i</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">to_le_bytes</span>());
+        <span class="kw">match </span>value {
+            RawBson::Int32(i) =&gt; {
+                <span class="self">self</span>.data.extend(<span class="kw-2">&amp;</span>i.to_le_bytes());
             }
-            <span class="ident">RawBson::String</span>(<span class="ident">s</span>) =&gt; {
-                <span class="ident">append_string</span>(<span class="self">self</span>, <span class="ident">s</span>.<span class="ident">as_str</span>());
+            RawBson::String(s) =&gt; {
+                append_string(<span class="self">self</span>, s.as_str());
             }
-            <span class="ident">RawBson::Document</span>(<span class="ident">d</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="ident">d</span>.<span class="ident">into_bytes</span>());
+            RawBson::Document(d) =&gt; {
+                <span class="self">self</span>.data.extend(d.into_bytes());
             }
-            <span class="ident">RawBson::Array</span>(<span class="ident">a</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="ident">a</span>.<span class="ident">into_vec</span>());
+            RawBson::Array(a) =&gt; {
+                <span class="self">self</span>.data.extend(a.into_vec());
             }
-            <span class="ident">RawBson::Binary</span>(<span class="ident">b</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">RawBinaryRef</span> {
-                    <span class="ident">bytes</span>: <span class="ident">b</span>.<span class="ident">bytes</span>.<span class="ident">as_slice</span>(),
-                    <span class="ident">subtype</span>: <span class="ident">b</span>.<span class="ident">subtype</span>,
+            RawBson::Binary(b) =&gt; {
+                <span class="kw">let </span>len = RawBinaryRef {
+                    bytes: b.bytes.as_slice(),
+                    subtype: b.subtype,
                 }
-                .<span class="ident">len</span>();
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>.<span class="ident">to_le_bytes</span>());
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">b</span>.<span class="ident">subtype</span>.<span class="ident">into</span>());
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">BinarySubtype::BinaryOld</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">subtype</span> {
-                    <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span>(<span class="ident">len</span> <span class="op">-</span> <span class="number">4</span>).<span class="ident">to_le_bytes</span>())
+                .len();
+                <span class="self">self</span>.data.extend(<span class="kw-2">&amp;</span>len.to_le_bytes());
+                <span class="self">self</span>.data.push(b.subtype.into());
+                <span class="kw">if let </span>BinarySubtype::BinaryOld = b.subtype {
+                    <span class="self">self</span>.data.extend(<span class="kw-2">&amp;</span>(len - <span class="number">4</span>).to_le_bytes())
                 }
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="ident">b</span>.<span class="ident">bytes</span>);
+                <span class="self">self</span>.data.extend(b.bytes);
             }
-            <span class="ident">RawBson::Boolean</span>(<span class="ident">b</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">b</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> };
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
+            RawBson::Boolean(b) =&gt; {
+                <span class="kw">let </span>byte = <span class="kw">if </span>b { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>};
+                <span class="self">self</span>.data.push(byte);
             }
-            <span class="ident">RawBson::DateTime</span>(<span class="ident">dt</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">dt</span>.<span class="ident">timestamp_millis</span>().<span class="ident">to_le_bytes</span>());
+            RawBson::DateTime(dt) =&gt; {
+                <span class="self">self</span>.data.extend(<span class="kw-2">&amp;</span>dt.timestamp_millis().to_le_bytes());
             }
-            <span class="ident">RawBson::DbPointer</span>(<span class="ident">dbp</span>) =&gt; {
-                <span class="ident">append_string</span>(<span class="self">self</span>, <span class="ident">dbp</span>.<span class="ident">namespace</span>.<span class="ident">as_str</span>());
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">dbp</span>.<span class="ident">id</span>.<span class="ident">bytes</span>());
+            RawBson::DbPointer(dbp) =&gt; {
+                append_string(<span class="self">self</span>, dbp.namespace.as_str());
+                <span class="self">self</span>.data.extend(<span class="kw-2">&amp;</span>dbp.id.bytes());
             }
-            <span class="ident">RawBson::Decimal128</span>(<span class="ident">d</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">bytes</span>());
+            RawBson::Decimal128(d) =&gt; {
+                <span class="self">self</span>.data.extend(<span class="kw-2">&amp;</span>d.bytes());
             }
-            <span class="ident">RawBson::Double</span>(<span class="ident">d</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">to_le_bytes</span>());
+            RawBson::Double(d) =&gt; {
+                <span class="self">self</span>.data.extend(<span class="kw-2">&amp;</span>d.to_le_bytes());
             }
-            <span class="ident">RawBson::Int64</span>(<span class="ident">i</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">to_le_bytes</span>());
+            RawBson::Int64(i) =&gt; {
+                <span class="self">self</span>.data.extend(<span class="kw-2">&amp;</span>i.to_le_bytes());
             }
-            <span class="ident">RawBson::RegularExpression</span>(<span class="ident">re</span>) =&gt; {
-                <span class="ident">append_cstring</span>(<span class="self">self</span>, <span class="ident">re</span>.<span class="ident">pattern</span>.<span class="ident">as_str</span>());
-                <span class="ident">append_cstring</span>(<span class="self">self</span>, <span class="ident">re</span>.<span class="ident">options</span>.<span class="ident">as_str</span>());
+            RawBson::RegularExpression(re) =&gt; {
+                append_cstring(<span class="self">self</span>, re.pattern.as_str());
+                append_cstring(<span class="self">self</span>, re.options.as_str());
             }
-            <span class="ident">RawBson::JavaScriptCode</span>(<span class="ident">js</span>) =&gt; {
-                <span class="ident">append_string</span>(<span class="self">self</span>, <span class="ident">js</span>.<span class="ident">as_str</span>());
+            RawBson::JavaScriptCode(js) =&gt; {
+                append_string(<span class="self">self</span>, js.as_str());
             }
-            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(<span class="ident">code_w_scope</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">RawJavaScriptCodeWithScopeRef</span> {
-                    <span class="ident">code</span>: <span class="ident">code_w_scope</span>.<span class="ident">code</span>.<span class="ident">as_str</span>(),
-                    <span class="ident">scope</span>: <span class="kw-2">&amp;</span><span class="ident">code_w_scope</span>.<span class="ident">scope</span>,
+            RawBson::JavaScriptCodeWithScope(code_w_scope) =&gt; {
+                <span class="kw">let </span>len = RawJavaScriptCodeWithScopeRef {
+                    code: code_w_scope.code.as_str(),
+                    scope: <span class="kw-2">&amp;</span>code_w_scope.scope,
                 }
-                .<span class="ident">len</span>();
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>.<span class="ident">to_le_bytes</span>());
-                <span class="ident">append_string</span>(<span class="self">self</span>, <span class="ident">code_w_scope</span>.<span class="ident">code</span>.<span class="ident">as_str</span>());
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="ident">code_w_scope</span>.<span class="ident">scope</span>.<span class="ident">into_bytes</span>());
+                .len();
+                <span class="self">self</span>.data.extend(<span class="kw-2">&amp;</span>len.to_le_bytes());
+                append_string(<span class="self">self</span>, code_w_scope.code.as_str());
+                <span class="self">self</span>.data.extend(code_w_scope.scope.into_bytes());
             }
-            <span class="ident">RawBson::Timestamp</span>(<span class="ident">ts</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">ts</span>.<span class="ident">to_le_i64</span>().<span class="ident">to_le_bytes</span>());
+            RawBson::Timestamp(ts) =&gt; {
+                <span class="self">self</span>.data.extend(<span class="kw-2">&amp;</span>ts.to_le_i64().to_le_bytes());
             }
-            <span class="ident">RawBson::ObjectId</span>(<span class="ident">oid</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">oid</span>.<span class="ident">bytes</span>());
+            RawBson::ObjectId(oid) =&gt; {
+                <span class="self">self</span>.data.extend(<span class="kw-2">&amp;</span>oid.bytes());
             }
-            <span class="ident">RawBson::Symbol</span>(<span class="ident">s</span>) =&gt; {
-                <span class="ident">append_string</span>(<span class="self">self</span>, <span class="ident">s</span>.<span class="ident">as_str</span>());
+            RawBson::Symbol(s) =&gt; {
+                append_string(<span class="self">self</span>, s.as_str());
             }
-            <span class="ident">RawBson::Null</span> <span class="op">|</span> <span class="ident">RawBson::Undefined</span> <span class="op">|</span> <span class="ident">RawBson::MinKey</span> <span class="op">|</span> <span class="ident">RawBson::MaxKey</span> =&gt; {}
+            RawBson::Null | RawBson::Undefined | RawBson::MinKey | RawBson::MaxKey =&gt; {}
         }
-        <span class="comment">// update element type</span>
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">original_len</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">element_type</span> <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="comment">// append trailing null byte</span>
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="number">0</span>);
-        <span class="comment">// update length</span>
-        <span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span>).<span class="ident">to_le_bytes</span>();
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>..<span class="number">4</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">new_len</span>);
+        <span class="comment">// update element type
+        </span><span class="self">self</span>.data[original_len - <span class="number">1</span>] = element_type <span class="kw">as </span>u8;
+        <span class="comment">// append trailing null byte
+        </span><span class="self">self</span>.data.push(<span class="number">0</span>);
+        <span class="comment">// update length
+        </span><span class="kw">let </span>new_len = (<span class="self">self</span>.data.len() <span class="kw">as </span>i32).to_le_bytes();
+        <span class="self">self</span>.data[<span class="number">0</span>..<span class="number">4</span>].copy_from_slice(<span class="kw-2">&amp;</span>new_len);
     }
 
-    <span class="doccomment">/// Convert this [`RawDocumentBuf`] to a [`Document`], returning an error</span>
-    <span class="doccomment">/// if invalid BSON is encountered.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">try_into</span>()
+    <span class="doccomment">/// Convert this [`RawDocumentBuf`] to a [`Document`], returning an error
+    /// if invalid BSON is encountered.
+    </span><span class="kw">pub fn </span>to_document(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Document&gt; {
+        <span class="self">self</span>.as_ref().try_into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">RawDocumentBuf</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>RawDocumentBuf {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawDocumentBuf</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>RawDocumentBuf {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">OwnedOrBorrowedRawDocument::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>.<span class="ident">into_owned</span>())
+        <span class="prelude-val">Ok</span>(OwnedOrBorrowedRawDocument::deserialize(deserializer)<span class="question-mark">?</span>.into_owned())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">RawDocumentBuf</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="kw">impl </span>Serialize <span class="kw">for </span>RawDocumentBuf {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">let</span> <span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">RawDocument</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">deref</span>();
-        <span class="ident">doc</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="kw">let </span>doc: <span class="kw-2">&amp;</span>RawDocument = <span class="self">self</span>.deref();
+        doc.serialize(serializer)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">RawDocumentBuf</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RawDocumentBuf&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;data&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">hex::encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>))
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>RawDocumentBuf {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_struct(<span class="string">&quot;RawDocumentBuf&quot;</span>)
+            .field(<span class="string">&quot;data&quot;</span>, <span class="kw-2">&amp;</span>hex::encode(<span class="kw-2">&amp;</span><span class="self">self</span>.data))
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">RawDocument</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rd</span>: <span class="ident">RawDocumentBuf</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Cow::Owned</span>(<span class="ident">rd</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;RawDocumentBuf&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;a</span>, RawDocument&gt; {
+    <span class="kw">fn </span>from(rd: RawDocumentBuf) -&gt; <span class="self">Self </span>{
+        Cow::Owned(rd)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">RawDocument</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rd</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocumentBuf</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Cow::Borrowed</span>(<span class="ident">rd</span>.<span class="ident">as_ref</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocumentBuf&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;a</span>, RawDocument&gt; {
+    <span class="kw">fn </span>from(rd: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocumentBuf) -&gt; <span class="self">Self </span>{
+        Cow::Borrowed(rd.as_ref())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Document</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl </span>TryFrom&lt;RawDocumentBuf&gt; <span class="kw">for </span>Document {
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">raw</span>: <span class="ident">RawDocumentBuf</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> {
-        <span class="ident">Document::try_from</span>(<span class="ident">raw</span>.<span class="ident">as_ref</span>())
+    <span class="kw">fn </span>try_from(raw: RawDocumentBuf) -&gt; <span class="prelude-ty">Result</span>&lt;Document&gt; {
+        Document::try_from(raw.as_ref())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocumentBuf</span> {
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)<span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocumentBuf {
+    <span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, RawBsonRef&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">Iter::new</span>(<span class="self">self</span>)
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+        Iter::new(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">RawDocument</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawDocumentBuf</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RawDocument</span> {
-        <span class="ident">RawDocument::new_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>)
+<span class="kw">impl </span>AsRef&lt;RawDocument&gt; <span class="kw">for </span>RawDocumentBuf {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RawDocument {
+        RawDocument::new_unchecked(<span class="kw-2">&amp;</span><span class="self">self</span>.data)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">RawDocumentBuf</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">RawDocument</span>;
+<span class="kw">impl </span>Deref <span class="kw">for </span>RawDocumentBuf {
+    <span class="kw">type </span>Target = RawDocument;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="ident">RawDocument::new_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>)
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        RawDocument::new_unchecked(<span class="kw-2">&amp;</span><span class="self">self</span>.data)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">RawDocument</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawDocumentBuf</span> {
-    <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RawDocument</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>
-    }
+<span class="kw">impl </span>Borrow&lt;RawDocument&gt; <span class="kw">for </span>RawDocumentBuf {
+    <span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RawDocument {
+        <span class="kw-2">&amp;*</span><span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RawBson</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">FromIterator</span><span class="op">&lt;</span>(<span class="ident">S</span>, <span class="ident">T</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawDocumentBuf</span> {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">S</span>, <span class="ident">T</span>)<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">RawDocumentBuf::new</span>();
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">iter</span> {
-            <span class="ident">buf</span>.<span class="ident">append</span>(<span class="ident">k</span>, <span class="ident">v</span>);
+<span class="kw">impl</span>&lt;S: AsRef&lt;str&gt;, T: Into&lt;RawBson&gt;&gt; FromIterator&lt;(S, T)&gt; <span class="kw">for </span>RawDocumentBuf {
+    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = (S, T)&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = RawDocumentBuf::new();
+        <span class="kw">for </span>(k, v) <span class="kw">in </span>iter {
+            buf.append(k, v);
         }
-        <span class="ident">buf</span>
+        buf
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

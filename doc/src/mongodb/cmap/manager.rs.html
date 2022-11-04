@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/manager.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>manager.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/manager.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>manager.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -150,157 +150,157 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">tokio::sync::mpsc</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio::sync::oneshot</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>tokio::sync::mpsc;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span>tokio::sync::oneshot;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Connection</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">bson::oid::ObjectId</span>, <span class="ident">error::Error</span>, <span class="ident">runtime::AcknowledgedMessage</span>};
+<span class="kw">use </span><span class="kw">super</span>::Connection;
+<span class="kw">use crate</span>::{bson::oid::ObjectId, error::Error, runtime::AcknowledgedMessage};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">channel</span>() -&gt; (<span class="ident">PoolManager</span>, <span class="ident">ManagementRequestReceiver</span>) {
-    <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded_channel</span>();
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>channel() -&gt; (PoolManager, ManagementRequestReceiver) {
+    <span class="kw">let </span>(sender, receiver) = mpsc::unbounded_channel();
     (
-        <span class="ident">PoolManager</span> { <span class="ident">sender</span> },
-        <span class="ident">ManagementRequestReceiver</span> { <span class="ident">receiver</span> },
+        PoolManager { sender },
+        ManagementRequestReceiver { receiver },
     )
 }
 
-<span class="doccomment">/// Struct used to make management requests to the pool (e.g. checking in a connection).</span>
-<span class="doccomment">/// A PoolManager will NOT keep a pool from going out of scope and closing.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">PoolManager</span> {
-    <span class="ident">sender</span>: <span class="ident">mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">PoolManagementRequest</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Struct used to make management requests to the pool (e.g. checking in a connection).
+/// A PoolManager will NOT keep a pool from going out of scope and closing.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>PoolManager {
+    sender: mpsc::UnboundedSender&lt;PoolManagementRequest&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PoolManager</span> {
-    <span class="doccomment">/// Lazily clear the pool.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cause</span>: <span class="ident">Error</span>, <span class="ident">service_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> (<span class="ident">message</span>, <span class="ident">acknowledgment_receiver</span>) <span class="op">=</span> <span class="ident">AcknowledgedMessage::package</span>(());
-        <span class="kw">if</span> <span class="self">self</span>
-            .<span class="ident">sender</span>
-            .<span class="ident">send</span>(<span class="ident">PoolManagementRequest::Clear</span> {
-                <span class="ident">_completion_handler</span>: <span class="ident">message</span>,
-                <span class="ident">cause</span>,
-                <span class="ident">service_id</span>,
+<span class="kw">impl </span>PoolManager {
+    <span class="doccomment">/// Lazily clear the pool.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>clear(<span class="kw-2">&amp;</span><span class="self">self</span>, cause: Error, service_id: <span class="prelude-ty">Option</span>&lt;ObjectId&gt;) {
+        <span class="kw">let </span>(message, acknowledgment_receiver) = AcknowledgedMessage::package(());
+        <span class="kw">if </span><span class="self">self
+            </span>.sender
+            .send(PoolManagementRequest::Clear {
+                _completion_handler: message,
+                cause,
+                service_id,
             })
-            .<span class="ident">is_ok</span>()
+            .is_ok()
         {
-            <span class="ident">acknowledgment_receiver</span>.<span class="ident">wait_for_acknowledgment</span>().<span class="kw">await</span>;
+            acknowledgment_receiver.wait_for_acknowledgment().<span class="kw">await</span>;
         }
     }
 
-    <span class="doccomment">/// Mark the pool as &quot;ready&quot; as per the CMAP specification.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_as_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> (<span class="ident">message</span>, <span class="ident">acknowledgment_receiver</span>) <span class="op">=</span> <span class="ident">AcknowledgedMessage::package</span>(());
-        <span class="kw">if</span> <span class="self">self</span>
-            .<span class="ident">sender</span>
-            .<span class="ident">send</span>(<span class="ident">PoolManagementRequest::MarkAsReady</span> {
-                <span class="ident">_completion_handler</span>: <span class="ident">message</span>,
+    <span class="doccomment">/// Mark the pool as &quot;ready&quot; as per the CMAP specification.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>mark_as_ready(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span>(message, acknowledgment_receiver) = AcknowledgedMessage::package(());
+        <span class="kw">if </span><span class="self">self
+            </span>.sender
+            .send(PoolManagementRequest::MarkAsReady {
+                _completion_handler: message,
             })
-            .<span class="ident">is_ok</span>()
+            .is_ok()
         {
-            <span class="ident">acknowledgment_receiver</span>.<span class="ident">wait_for_acknowledgment</span>().<span class="kw">await</span>;
+            acknowledgment_receiver.wait_for_acknowledgment().<span class="kw">await</span>;
         }
     }
 
-    <span class="doccomment">/// Check in the given connection to the pool.</span>
-    <span class="doccomment">/// This returns an error containing the connection if the pool has been dropped already.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="ident">Connection</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">Connection</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">sender</span>
-            .<span class="ident">send</span>(<span class="ident">PoolManagementRequest::CheckIn</span>(<span class="ident">Box::new</span>(<span class="ident">connection</span>)))
+    <span class="doccomment">/// Check in the given connection to the pool.
+    /// This returns an error containing the connection if the pool has been dropped already.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_in(<span class="kw-2">&amp;</span><span class="self">self</span>, connection: Connection) -&gt; std::result::Result&lt;(), Connection&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(request) = <span class="self">self
+            </span>.sender
+            .send(PoolManagementRequest::CheckIn(Box::new(connection)))
         {
-            <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">request</span>.<span class="number">0</span>.<span class="ident">unwrap_check_in</span>();
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">conn</span>);
+            <span class="kw">let </span>conn = request.<span class="number">0</span>.unwrap_check_in();
+            <span class="kw">return </span><span class="prelude-val">Err</span>(conn);
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Notify the pool that establishing a connection failed.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">handle_connection_failed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">sender</span>
-            .<span class="ident">send</span>(<span class="ident">PoolManagementRequest::HandleConnectionFailed</span>);
+    <span class="doccomment">/// Notify the pool that establishing a connection failed.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>handle_connection_failed(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let _ </span>= <span class="self">self
+            </span>.sender
+            .send(PoolManagementRequest::HandleConnectionFailed);
     }
 
-    <span class="doccomment">/// Notify the pool that establishing a connection succeeded.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">handle_connection_succeeded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">ConnectionSucceeded</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">sender</span>
-            .<span class="ident">send</span>(<span class="ident">PoolManagementRequest::HandleConnectionSucceeded</span>(<span class="ident">conn</span>));
+    <span class="doccomment">/// Notify the pool that establishing a connection succeeded.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>handle_connection_succeeded(<span class="kw-2">&amp;</span><span class="self">self</span>, conn: ConnectionSucceeded) {
+        <span class="kw">let _ </span>= <span class="self">self
+            </span>.sender
+            .send(PoolManagementRequest::HandleConnectionSucceeded(conn));
     }
 
-    <span class="doccomment">/// Create a synchronization point for the pool&#39;s worker.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">sync_worker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">oneshot::Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">PoolManagementRequest::Sync</span>(<span class="ident">tx</span>));
-        <span class="ident">rx</span>
-    }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">ManagementRequestReceiver</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">receiver</span>: <span class="ident">mpsc::UnboundedReceiver</span><span class="op">&lt;</span><span class="ident">PoolManagementRequest</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">ManagementRequestReceiver</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PoolManagementRequest</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">recv</span>().<span class="kw">await</span>
+    <span class="doccomment">/// Create a synchronization point for the pool&#39;s worker.
+    </span><span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>sync_worker(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; oneshot::Receiver&lt;()&gt; {
+        <span class="kw">let </span>(tx, rx) = oneshot::channel();
+        <span class="kw">let _ </span>= <span class="self">self</span>.sender.send(PoolManagementRequest::Sync(tx));
+        rx
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">PoolManagementRequest</span> {
-    <span class="doccomment">/// Clear the pool, transitioning it to Paused.</span>
-    <span class="ident">Clear</span> {
-        <span class="ident">_completion_handler</span>: <span class="ident">AcknowledgedMessage</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-        <span class="ident">cause</span>: <span class="ident">Error</span>,
-        <span class="ident">service_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>ManagementRequestReceiver {
+    <span class="kw">pub</span>(<span class="kw">super</span>) receiver: mpsc::UnboundedReceiver&lt;PoolManagementRequest&gt;,
+}
+
+<span class="kw">impl </span>ManagementRequestReceiver {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>recv(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PoolManagementRequest&gt; {
+        <span class="self">self</span>.receiver.recv().<span class="kw">await
+    </span>}
+}
+
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>PoolManagementRequest {
+    <span class="doccomment">/// Clear the pool, transitioning it to Paused.
+    </span>Clear {
+        _completion_handler: AcknowledgedMessage&lt;()&gt;,
+        cause: Error,
+        service_id: <span class="prelude-ty">Option</span>&lt;ObjectId&gt;,
     },
 
-    <span class="doccomment">/// Mark the pool as Ready, allowing connections to be created and checked out.</span>
-    <span class="ident">MarkAsReady</span> {
-        <span class="ident">_completion_handler</span>: <span class="ident">AcknowledgedMessage</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+    <span class="doccomment">/// Mark the pool as Ready, allowing connections to be created and checked out.
+    </span>MarkAsReady {
+        _completion_handler: AcknowledgedMessage&lt;()&gt;,
     },
 
-    <span class="doccomment">/// Check in the given connection.</span>
-    <span class="ident">CheckIn</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Check in the given connection.
+    </span>CheckIn(Box&lt;Connection&gt;),
 
-    <span class="doccomment">/// Update the pool based on the given establishment error.</span>
-    <span class="ident">HandleConnectionFailed</span>,
+    <span class="doccomment">/// Update the pool based on the given establishment error.
+    </span>HandleConnectionFailed,
 
-    <span class="doccomment">/// Update the pool after a successful connection, optionally populating the pool</span>
-    <span class="doccomment">/// with the successful connection.</span>
-    <span class="ident">HandleConnectionSucceeded</span>(<span class="ident">ConnectionSucceeded</span>),
+    <span class="doccomment">/// Update the pool after a successful connection, optionally populating the pool
+    /// with the successful connection.
+    </span>HandleConnectionSucceeded(ConnectionSucceeded),
 
-    <span class="doccomment">/// Synchronize the worker queue state with an external caller, i.e. a test.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="ident">Sync</span>(<span class="ident">oneshot::Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span>),
+    <span class="doccomment">/// Synchronize the worker queue state with an external caller, i.e. a test.
+    </span><span class="attribute">#[cfg(test)]
+    </span>Sync(oneshot::Sender&lt;()&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">PoolManagementRequest</span> {
-    <span class="kw">fn</span> <span class="ident">unwrap_check_in</span>(<span class="self">self</span>) -&gt; <span class="ident">Connection</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PoolManagementRequest::CheckIn</span>(<span class="ident">conn</span>) =&gt; <span class="kw-2">*</span><span class="ident">conn</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;tried to unwrap checkin but got {:?}&quot;</span>, <span class="self">self</span>),
+<span class="kw">impl </span>PoolManagementRequest {
+    <span class="kw">fn </span>unwrap_check_in(<span class="self">self</span>) -&gt; Connection {
+        <span class="kw">match </span><span class="self">self </span>{
+            PoolManagementRequest::CheckIn(conn) =&gt; <span class="kw-2">*</span>conn,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;tried to unwrap checkin but got {:?}&quot;</span>, <span class="self">self</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">ConnectionSucceeded</span> {
-    <span class="ident">ForPool</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span>),
-    <span class="ident">Used</span> { <span class="ident">service_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> },
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>ConnectionSucceeded {
+    ForPool(Box&lt;Connection&gt;),
+    Used { service_id: <span class="prelude-ty">Option</span>&lt;ObjectId&gt; },
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectionSucceeded</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConnectionSucceeded::ForPool</span>(<span class="ident">conn</span>) =&gt; <span class="ident">conn</span>.<span class="ident">generation</span>.<span class="ident">service_id</span>(),
-            <span class="ident">ConnectionSucceeded::Used</span> { <span class="ident">service_id</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">service_id</span>,
+<span class="kw">impl </span>ConnectionSucceeded {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>service_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ConnectionSucceeded::ForPool(conn) =&gt; conn.generation.service_id(),
+            ConnectionSucceeded::Used { service_id, .. } =&gt; <span class="kw-2">*</span>service_id,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/test.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/test.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -638,645 +638,645 @@
 <span id="638">638</span>
 <span id="639">639</span>
 <span id="640">640</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! Testing framework.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Unlike the rest of *ring*, this testing framework uses panics pretty</span>
-<span class="doccomment">//! liberally. It was originally designed for internal use--it drives most of</span>
-<span class="doccomment">//! *ring*&#39;s internal tests, and so it is optimized for getting *ring*&#39;s tests</span>
-<span class="doccomment">//! written quickly at the expense of some usability. The documentation is</span>
-<span class="doccomment">//! lacking. The best way to learn it is to look at some examples. The digest</span>
-<span class="doccomment">//! tests are the most complicated because they use named sections. Other tests</span>
-<span class="doccomment">//! avoid named sections and so are easier to understand.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Writing Tests</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Input files look like this:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//! # This is a comment.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! HMAC = SHA1</span>
-<span class="doccomment">//! Input = &quot;My test data&quot;</span>
-<span class="doccomment">//! Key = &quot;&quot;</span>
-<span class="doccomment">//! Output = 61afdecb95429ef494d61fdee15990cabf0826fc</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! HMAC = SHA256</span>
-<span class="doccomment">//! Input = &quot;Sample message for keylen&lt;blocklen&quot;</span>
-<span class="doccomment">//! Key = 000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F</span>
-<span class="doccomment">//! Output = A28CF43130EE696A98F14A37678B56BCFCBDD9E5CF69717FECF5480F0EBDF790</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Test cases are separated with blank lines. Note how the bytes of the `Key`</span>
-<span class="doccomment">//! attribute are specified as a quoted string in the first test case and as</span>
-<span class="doccomment">//! hex in the second test case; you can use whichever form is more convenient</span>
-<span class="doccomment">//! and you can mix and match within the same file. The empty sequence of bytes</span>
-<span class="doccomment">//! can only be represented with the quoted string form (`&quot;&quot;`).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Here&#39;s how you would consume the test data:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```ignore</span>
-<span class="doccomment">//! use ring::test;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! test::run(test::test_file!(&quot;hmac_tests.txt&quot;), |section, test_case| {</span>
-<span class="doccomment">//!     assert_eq!(section, &quot;&quot;); // This test doesn&#39;t use named sections.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     let digest_alg = test_case.consume_digest_alg(&quot;HMAC&quot;);</span>
-<span class="doccomment">//!     let input = test_case.consume_bytes(&quot;Input&quot;);</span>
-<span class="doccomment">//!     let key = test_case.consume_bytes(&quot;Key&quot;);</span>
-<span class="doccomment">//!     let output = test_case.consume_bytes(&quot;Output&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // Do the actual testing here</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that `consume_digest_alg` automatically maps the string &quot;SHA1&quot; to a</span>
-<span class="doccomment">//! reference to `digest::SHA1_FOR_LEGACY_USE_ONLY`, &quot;SHA256&quot; to</span>
-<span class="doccomment">//! `digest::SHA256`, etc.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Output When a Test Fails</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! When a test case fails, the framework automatically prints out the test</span>
-<span class="doccomment">//! case. If the test case failed with a panic, then the backtrace of the panic</span>
-<span class="doccomment">//! will be printed too. For example, let&#39;s say the failing test case looks</span>
-<span class="doccomment">//! like this:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//! Curve = P-256</span>
-<span class="doccomment">//! a = 2b11cb945c8cf152ffa4c9c2b1c965b019b35d0b7626919ef0ae6cb9d232f8af</span>
-<span class="doccomment">//! b = 18905f76a53755c679fb732b7762251075ba95fc5fedb60179e730d418a9143c</span>
-<span class="doccomment">//! r = 18905f76a53755c679fb732b7762251075ba95fc5fedb60179e730d418a9143c</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! If the test fails, this will be printed (if `$RUST_BACKTRACE` is `1`):</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//! src/example_tests.txt: Test panicked.</span>
-<span class="doccomment">//! Curve = P-256</span>
-<span class="doccomment">//! a = 2b11cb945c8cf152ffa4c9c2b1c965b019b35d0b7626919ef0ae6cb9d232f8af</span>
-<span class="doccomment">//! b = 18905f76a53755c679fb732b7762251075ba95fc5fedb60179e730d418a9143c</span>
-<span class="doccomment">//! r = 18905f76a53755c679fb732b7762251075ba95fc5fedb60179e730d418a9143c</span>
-<span class="doccomment">//! thread &#39;example_test&#39; panicked at &#39;Test failed.&#39;, src\test.rs:206</span>
-<span class="doccomment">//! stack backtrace:</span>
-<span class="doccomment">//!    0:     0x7ff654a05c7c - std::rt::lang_start::h61f4934e780b4dfc</span>
-<span class="doccomment">//!    1:     0x7ff654a04f32 - std::rt::lang_start::h61f4934e780b4dfc</span>
-<span class="doccomment">//!    2:     0x7ff6549f505d - std::panicking::rust_panic_with_hook::hfe203e3083c2b544</span>
-<span class="doccomment">//!    3:     0x7ff654a0825b - rust_begin_unwind</span>
-<span class="doccomment">//!    4:     0x7ff6549f63af - std::panicking::begin_panic_fmt::h484cd47786497f03</span>
-<span class="doccomment">//!    5:     0x7ff654a07e9b - rust_begin_unwind</span>
-<span class="doccomment">//!    6:     0x7ff654a0ae95 - core::panicking::panic_fmt::h257ceb0aa351d801</span>
-<span class="doccomment">//!    7:     0x7ff654a0b190 - core::panicking::panic::h4bb1497076d04ab9</span>
-<span class="doccomment">//!    8:     0x7ff65496dc41 - from_file&lt;closure&gt;</span>
-<span class="doccomment">//!                         at C:\Users\Example\example\&lt;core macros&gt;:4</span>
-<span class="doccomment">//!    9:     0x7ff65496d49c - example_test</span>
-<span class="doccomment">//!                         at C:\Users\Example\example\src\example.rs:652</span>
-<span class="doccomment">//!   10:     0x7ff6549d192a - test::stats::Summary::new::ha139494ed2e4e01f</span>
-<span class="doccomment">//!   11:     0x7ff6549d51a2 - test::stats::Summary::new::ha139494ed2e4e01f</span>
-<span class="doccomment">//!   12:     0x7ff654a0a911 - _rust_maybe_catch_panic</span>
-<span class="doccomment">//!   13:     0x7ff6549d56dd - test::stats::Summary::new::ha139494ed2e4e01f</span>
-<span class="doccomment">//!   14:     0x7ff654a03783 - std::sys::thread::Thread::new::h2b08da6cd2517f79</span>
-<span class="doccomment">//!   15:     0x7ff968518101 - BaseThreadInitThunk</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Notice that the output shows the name of the data file</span>
-<span class="doccomment">//! (`src/example_tests.txt`), the test inputs that led to the failure, and the</span>
-<span class="doccomment">//! stack trace to the line in the test code that panicked: entry 9 in the</span>
-<span class="doccomment">//! stack trace pointing to line 652 of the file `example.rs`.</span>
+</span><span class="doccomment">//! Testing framework.
+//!
+//! Unlike the rest of *ring*, this testing framework uses panics pretty
+//! liberally. It was originally designed for internal use--it drives most of
+//! *ring*&#39;s internal tests, and so it is optimized for getting *ring*&#39;s tests
+//! written quickly at the expense of some usability. The documentation is
+//! lacking. The best way to learn it is to look at some examples. The digest
+//! tests are the most complicated because they use named sections. Other tests
+//! avoid named sections and so are easier to understand.
+//!
+//! # Examples
+//!
+//! ## Writing Tests
+//!
+//! Input files look like this:
+//!
+//! ```text
+//! # This is a comment.
+//!
+//! HMAC = SHA1
+//! Input = &quot;My test data&quot;
+//! Key = &quot;&quot;
+//! Output = 61afdecb95429ef494d61fdee15990cabf0826fc
+//!
+//! HMAC = SHA256
+//! Input = &quot;Sample message for keylen&lt;blocklen&quot;
+//! Key = 000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F
+//! Output = A28CF43130EE696A98F14A37678B56BCFCBDD9E5CF69717FECF5480F0EBDF790
+//! ```
+//!
+//! Test cases are separated with blank lines. Note how the bytes of the `Key`
+//! attribute are specified as a quoted string in the first test case and as
+//! hex in the second test case; you can use whichever form is more convenient
+//! and you can mix and match within the same file. The empty sequence of bytes
+//! can only be represented with the quoted string form (`&quot;&quot;`).
+//!
+//! Here&#39;s how you would consume the test data:
+//!
+//! ```ignore
+//! use ring::test;
+//!
+//! test::run(test::test_file!(&quot;hmac_tests.txt&quot;), |section, test_case| {
+//!     assert_eq!(section, &quot;&quot;); // This test doesn&#39;t use named sections.
+//!
+//!     let digest_alg = test_case.consume_digest_alg(&quot;HMAC&quot;);
+//!     let input = test_case.consume_bytes(&quot;Input&quot;);
+//!     let key = test_case.consume_bytes(&quot;Key&quot;);
+//!     let output = test_case.consume_bytes(&quot;Output&quot;);
+//!
+//!     // Do the actual testing here
+//! });
+//! ```
+//!
+//! Note that `consume_digest_alg` automatically maps the string &quot;SHA1&quot; to a
+//! reference to `digest::SHA1_FOR_LEGACY_USE_ONLY`, &quot;SHA256&quot; to
+//! `digest::SHA256`, etc.
+//!
+//! ## Output When a Test Fails
+//!
+//! When a test case fails, the framework automatically prints out the test
+//! case. If the test case failed with a panic, then the backtrace of the panic
+//! will be printed too. For example, let&#39;s say the failing test case looks
+//! like this:
+//!
+//! ```text
+//! Curve = P-256
+//! a = 2b11cb945c8cf152ffa4c9c2b1c965b019b35d0b7626919ef0ae6cb9d232f8af
+//! b = 18905f76a53755c679fb732b7762251075ba95fc5fedb60179e730d418a9143c
+//! r = 18905f76a53755c679fb732b7762251075ba95fc5fedb60179e730d418a9143c
+//! ```
+//! If the test fails, this will be printed (if `$RUST_BACKTRACE` is `1`):
+//!
+//! ```text
+//! src/example_tests.txt: Test panicked.
+//! Curve = P-256
+//! a = 2b11cb945c8cf152ffa4c9c2b1c965b019b35d0b7626919ef0ae6cb9d232f8af
+//! b = 18905f76a53755c679fb732b7762251075ba95fc5fedb60179e730d418a9143c
+//! r = 18905f76a53755c679fb732b7762251075ba95fc5fedb60179e730d418a9143c
+//! thread &#39;example_test&#39; panicked at &#39;Test failed.&#39;, src\test.rs:206
+//! stack backtrace:
+//!    0:     0x7ff654a05c7c - std::rt::lang_start::h61f4934e780b4dfc
+//!    1:     0x7ff654a04f32 - std::rt::lang_start::h61f4934e780b4dfc
+//!    2:     0x7ff6549f505d - std::panicking::rust_panic_with_hook::hfe203e3083c2b544
+//!    3:     0x7ff654a0825b - rust_begin_unwind
+//!    4:     0x7ff6549f63af - std::panicking::begin_panic_fmt::h484cd47786497f03
+//!    5:     0x7ff654a07e9b - rust_begin_unwind
+//!    6:     0x7ff654a0ae95 - core::panicking::panic_fmt::h257ceb0aa351d801
+//!    7:     0x7ff654a0b190 - core::panicking::panic::h4bb1497076d04ab9
+//!    8:     0x7ff65496dc41 - from_file&lt;closure&gt;
+//!                         at C:\Users\Example\example\&lt;core macros&gt;:4
+//!    9:     0x7ff65496d49c - example_test
+//!                         at C:\Users\Example\example\src\example.rs:652
+//!   10:     0x7ff6549d192a - test::stats::Summary::new::ha139494ed2e4e01f
+//!   11:     0x7ff6549d51a2 - test::stats::Summary::new::ha139494ed2e4e01f
+//!   12:     0x7ff654a0a911 - _rust_maybe_catch_panic
+//!   13:     0x7ff6549d56dd - test::stats::Summary::new::ha139494ed2e4e01f
+//!   14:     0x7ff654a03783 - std::sys::thread::Thread::new::h2b08da6cd2517f79
+//!   15:     0x7ff968518101 - BaseThreadInitThunk
+//! ```
+//!
+//! Notice that the output shows the name of the data file
+//! (`src/example_tests.txt`), the test inputs that led to the failure, and the
+//! stack trace to the line in the test code that panicked: entry 9 in the
+//! stack trace pointing to line 652 of the file `example.rs`.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">format</span>, <span class="ident">string::String</span>, <span class="ident">vec::Vec</span>};
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use </span>alloc::{format, string::String, vec::Vec};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">bits</span>, <span class="ident">digest</span>, <span class="ident">error</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use crate</span>::{bits, digest, error};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;test_logging&quot;</span>))]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span>;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;std&quot;</span>, feature = <span class="string">&quot;test_logging&quot;</span>))]
+</span><span class="kw">extern crate </span>std;
 
-<span class="doccomment">/// `compile_time_assert_clone::&lt;T&gt;();` fails to compile if `T` doesn&#39;t</span>
-<span class="doccomment">/// implement `Clone`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile_time_assert_clone</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span>() {}
+<span class="doccomment">/// `compile_time_assert_clone::&lt;T&gt;();` fails to compile if `T` doesn&#39;t
+/// implement `Clone`.
+</span><span class="kw">pub fn </span>compile_time_assert_clone&lt;T: Clone&gt;() {}
 
-<span class="doccomment">/// `compile_time_assert_copy::&lt;T&gt;();` fails to compile if `T` doesn&#39;t</span>
-<span class="doccomment">/// implement `Copy`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile_time_assert_copy</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span><span class="op">&gt;</span>() {}
+<span class="doccomment">/// `compile_time_assert_copy::&lt;T&gt;();` fails to compile if `T` doesn&#39;t
+/// implement `Copy`.
+</span><span class="kw">pub fn </span>compile_time_assert_copy&lt;T: Copy&gt;() {}
 
-<span class="doccomment">/// `compile_time_assert_send::&lt;T&gt;();` fails to compile if `T` doesn&#39;t</span>
-<span class="doccomment">/// implement `Send`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile_time_assert_send</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span>() {}
+<span class="doccomment">/// `compile_time_assert_send::&lt;T&gt;();` fails to compile if `T` doesn&#39;t
+/// implement `Send`.
+</span><span class="kw">pub fn </span>compile_time_assert_send&lt;T: Send&gt;() {}
 
-<span class="doccomment">/// `compile_time_assert_sync::&lt;T&gt;();` fails to compile if `T` doesn&#39;t</span>
-<span class="doccomment">/// implement `Sync`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile_time_assert_sync</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sync</span><span class="op">&gt;</span>() {}
+<span class="doccomment">/// `compile_time_assert_sync::&lt;T&gt;();` fails to compile if `T` doesn&#39;t
+/// implement `Sync`.
+</span><span class="kw">pub fn </span>compile_time_assert_sync&lt;T: Sync&gt;() {}
 
-<span class="doccomment">/// `compile_time_assert_std_error_error::&lt;T&gt;();` fails to compile if `T`</span>
-<span class="doccomment">/// doesn&#39;t implement `std::error::Error`.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile_time_assert_std_error_error</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">std::error::Error</span><span class="op">&gt;</span>() {}
+<span class="doccomment">/// `compile_time_assert_std_error_error::&lt;T&gt;();` fails to compile if `T`
+/// doesn&#39;t implement `std::error::Error`.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">pub fn </span>compile_time_assert_std_error_error&lt;T: std::error::Error&gt;() {}
 
-<span class="doccomment">/// A test case. A test case consists of a set of named attributes. Every</span>
-<span class="doccomment">/// attribute in the test case must be consumed exactly once; this helps catch</span>
-<span class="doccomment">/// typos and omissions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires the `alloc` default feature to be enabled.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestCase</span> {
-    <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>, <span class="ident">bool</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// A test case. A test case consists of a set of named attributes. Every
+/// attribute in the test case must be consumed exactly once; this helps catch
+/// typos and omissions.
+///
+/// Requires the `alloc` default feature to be enabled.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+#[derive(Debug)]
+</span><span class="kw">pub struct </span>TestCase {
+    attributes: Vec&lt;(String, String, bool)&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">TestCase</span> {
-    <span class="doccomment">/// Maps the string &quot;true&quot; to true and the string &quot;false&quot; to false.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_bool</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>).<span class="ident">as_ref</span>() {
-            <span class="string">&quot;true&quot;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="string">&quot;false&quot;</span> =&gt; <span class="bool-val">false</span>,
-            <span class="ident">s</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid bool value: {}&quot;</span>, <span class="ident">s</span>),
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">impl </span>TestCase {
+    <span class="doccomment">/// Maps the string &quot;true&quot; to true and the string &quot;false&quot; to false.
+    </span><span class="kw">pub fn </span>consume_bool(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.consume_string(key).as_ref() {
+            <span class="string">&quot;true&quot; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="string">&quot;false&quot; </span>=&gt; <span class="bool-val">false</span>,
+            s =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid bool value: {}&quot;</span>, s),
         }
     }
 
-    <span class="doccomment">/// Maps the strings &quot;SHA1&quot;, &quot;SHA256&quot;, &quot;SHA384&quot;, and &quot;SHA512&quot; to digest</span>
-    <span class="doccomment">/// algorithms, maps &quot;SHA224&quot; to `None`, and panics on other (erroneous)</span>
-    <span class="doccomment">/// inputs. &quot;SHA224&quot; is mapped to None because *ring* intentionally does</span>
-    <span class="doccomment">/// not support SHA224, but we need to consume test vectors from NIST that</span>
-    <span class="doccomment">/// have SHA224 vectors in them.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_digest_alg</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
-        <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">as_ref</span>() {
-            <span class="string">&quot;SHA1&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA1_FOR_LEGACY_USE_ONLY</span>),
-            <span class="string">&quot;SHA224&quot;</span> =&gt; <span class="prelude-val">None</span>, <span class="comment">// We actively skip SHA-224 support.</span>
-            <span class="string">&quot;SHA256&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>),
-            <span class="string">&quot;SHA384&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span>),
-            <span class="string">&quot;SHA512&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA512</span>),
-            <span class="string">&quot;SHA512_256&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA512_256</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported digest algorithm: {}&quot;</span>, <span class="ident">name</span>),
+    <span class="doccomment">/// Maps the strings &quot;SHA1&quot;, &quot;SHA256&quot;, &quot;SHA384&quot;, and &quot;SHA512&quot; to digest
+    /// algorithms, maps &quot;SHA224&quot; to `None`, and panics on other (erroneous)
+    /// inputs. &quot;SHA224&quot; is mapped to None because *ring* intentionally does
+    /// not support SHA224, but we need to consume test vectors from NIST that
+    /// have SHA224 vectors in them.
+    </span><span class="kw">pub fn </span>consume_digest_alg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm&gt; {
+        <span class="kw">let </span>name = <span class="self">self</span>.consume_string(key);
+        <span class="kw">match </span>name.as_ref() {
+            <span class="string">&quot;SHA1&quot; </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>digest::SHA1_FOR_LEGACY_USE_ONLY),
+            <span class="string">&quot;SHA224&quot; </span>=&gt; <span class="prelude-val">None</span>, <span class="comment">// We actively skip SHA-224 support.
+            </span><span class="string">&quot;SHA256&quot; </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>digest::SHA256),
+            <span class="string">&quot;SHA384&quot; </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>digest::SHA384),
+            <span class="string">&quot;SHA512&quot; </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>digest::SHA512),
+            <span class="string">&quot;SHA512_256&quot; </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>digest::SHA512_256),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported digest algorithm: {}&quot;</span>, name),
         }
     }
 
-    <span class="doccomment">/// Returns the value of an attribute that is encoded as a sequence of an</span>
-    <span class="doccomment">/// even number of hex digits, or as a double-quoted UTF-8 string. The</span>
-    <span class="doccomment">/// empty (zero-length) value is represented as &quot;&quot;.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
-        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;\&quot;&#39;</span>) {
-            <span class="comment">// The value is a quoted UTF-8 string.</span>
+    <span class="doccomment">/// Returns the value of an attribute that is encoded as a sequence of an
+    /// even number of hex digits, or as a double-quoted UTF-8 string. The
+    /// empty (zero-length) value is represented as &quot;&quot;.
+    </span><span class="kw">pub fn </span>consume_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span>s = <span class="self">self</span>.consume_string(key);
+        <span class="kw">if </span>s.starts_with(<span class="string">&#39;\&quot;&#39;</span>) {
+            <span class="comment">// The value is a quoted UTF-8 string.
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>().<span class="ident">skip</span>(<span class="number">1</span>);
-            <span class="kw">loop</span> {
-                <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">next</span>() {
+            </span><span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::with_capacity(s.as_bytes().len() - <span class="number">2</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>s = s.as_bytes().iter().skip(<span class="number">1</span>);
+            <span class="kw">loop </span>{
+                <span class="kw">let </span>b = <span class="kw">match </span>s.next() {
                     <span class="prelude-val">Some</span>(<span class="string">b&#39;\\&#39;</span>) =&gt; {
-                        <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">next</span>() {
-                            <span class="comment">// We don&#39;t allow all octal escape sequences, only &quot;\0&quot; for null.</span>
-                            <span class="prelude-val">Some</span>(<span class="string">b&#39;0&#39;</span>) =&gt; <span class="number">0u8</span>,
+                        <span class="kw">match </span>s.next() {
+                            <span class="comment">// We don&#39;t allow all octal escape sequences, only &quot;\0&quot; for null.
+                            </span><span class="prelude-val">Some</span>(<span class="string">b&#39;0&#39;</span>) =&gt; <span class="number">0u8</span>,
                             <span class="prelude-val">Some</span>(<span class="string">b&#39;t&#39;</span>) =&gt; <span class="string">b&#39;\t&#39;</span>,
                             <span class="prelude-val">Some</span>(<span class="string">b&#39;n&#39;</span>) =&gt; <span class="string">b&#39;\n&#39;</span>,
-                            <span class="comment">// &quot;\xHH&quot;</span>
-                            <span class="prelude-val">Some</span>(<span class="string">b&#39;x&#39;</span>) =&gt; {
-                                <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;Invalid hex escape sequence in string.&quot;</span>);
-                                <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;Invalid hex escape sequence in string.&quot;</span>);
-                                <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Ok</span>(<span class="ident">hi</span>), <span class="prelude-val">Ok</span>(<span class="ident">lo</span>)) <span class="op">=</span> (<span class="ident">from_hex_digit</span>(<span class="kw-2">*</span><span class="ident">hi</span>), <span class="ident">from_hex_digit</span>(<span class="kw-2">*</span><span class="ident">lo</span>))
+                            <span class="comment">// &quot;\xHH&quot;
+                            </span><span class="prelude-val">Some</span>(<span class="string">b&#39;x&#39;</span>) =&gt; {
+                                <span class="kw">let </span>hi = s.next().expect(<span class="string">&quot;Invalid hex escape sequence in string.&quot;</span>);
+                                <span class="kw">let </span>lo = s.next().expect(<span class="string">&quot;Invalid hex escape sequence in string.&quot;</span>);
+                                <span class="kw">if let </span>(<span class="prelude-val">Ok</span>(hi), <span class="prelude-val">Ok</span>(lo)) = (from_hex_digit(<span class="kw-2">*</span>hi), from_hex_digit(<span class="kw-2">*</span>lo))
                                 {
-                                    (<span class="ident">hi</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">|</span> <span class="ident">lo</span>
-                                } <span class="kw">else</span> {
+                                    (hi &lt;&lt; <span class="number">4</span>) | lo
+                                } <span class="kw">else </span>{
                                     <span class="macro">panic!</span>(<span class="string">&quot;Invalid hex escape sequence in string.&quot;</span>);
                                 }
                             }
-                            <span class="kw">_</span> =&gt; {
+                            <span class="kw">_ </span>=&gt; {
                                 <span class="macro">panic!</span>(<span class="string">&quot;Invalid hex escape sequence in string.&quot;</span>);
                             }
                         }
                     }
                     <span class="prelude-val">Some</span>(<span class="string">b&#39;&quot;&#39;</span>) =&gt; {
-                        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
+                        <span class="kw">if </span>s.next().is_some() {
                             <span class="macro">panic!</span>(<span class="string">&quot;characters after the closing quote of a quoted string.&quot;</span>);
                         }
                         <span class="kw">break</span>;
                     }
-                    <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; <span class="kw-2">*</span><span class="ident">b</span>,
-                    <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Missing terminating &#39;\&quot;&#39; in string literal.&quot;</span>),
+                    <span class="prelude-val">Some</span>(b) =&gt; <span class="kw-2">*</span>b,
+                    <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Missing terminating &#39;\&quot;&#39; in string literal.&quot;</span>),
                 };
-                <span class="ident">bytes</span>.<span class="ident">push</span>(<span class="ident">b</span>);
+                bytes.push(b);
             }
-            <span class="ident">bytes</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// The value is hex encoded.</span>
-            <span class="kw">match</span> <span class="ident">from_hex</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">err_str</span>) =&gt; {
-                    <span class="macro">panic!</span>(<span class="string">&quot;{} in {}&quot;</span>, <span class="ident">err_str</span>, <span class="ident">s</span>);
+            bytes
+        } <span class="kw">else </span>{
+            <span class="comment">// The value is hex encoded.
+            </span><span class="kw">match </span>from_hex(<span class="kw-2">&amp;</span>s) {
+                <span class="prelude-val">Ok</span>(s) =&gt; s,
+                <span class="prelude-val">Err</span>(err_str) =&gt; {
+                    <span class="macro">panic!</span>(<span class="string">&quot;{} in {}&quot;</span>, err_str, s);
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Returns the value of an attribute that is an integer, in decimal</span>
-    <span class="doccomment">/// notation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_usize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
-        <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Returns the value of an attribute that is an integer, in decimal
+    /// notation.
+    </span><span class="kw">pub fn </span>consume_usize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; usize {
+        <span class="kw">let </span>s = <span class="self">self</span>.consume_string(key);
+        s.parse::&lt;usize&gt;().unwrap()
     }
 
-    <span class="doccomment">/// Returns the value of an attribute that is an integer, in decimal</span>
-    <span class="doccomment">/// notation, as a bit length.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_usize_bits</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bits::BitLength</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
-        <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>();
-        <span class="ident">bits::BitLength::from_usize_bits</span>(<span class="ident">bits</span>)
+    <span class="doccomment">/// Returns the value of an attribute that is an integer, in decimal
+    /// notation, as a bit length.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">pub fn </span>consume_usize_bits(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; bits::BitLength {
+        <span class="kw">let </span>s = <span class="self">self</span>.consume_string(key);
+        <span class="kw">let </span>bits = s.parse::&lt;usize&gt;().unwrap();
+        bits::BitLength::from_usize_bits(bits)
     }
 
-    <span class="doccomment">/// Returns the raw value of an attribute, without any unquoting or</span>
-    <span class="doccomment">/// other interpretation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_string</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">consume_optional_string</span>(<span class="ident">key</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;No attribute named \&quot;{}\&quot;&quot;</span>, <span class="ident">key</span>))
+    <span class="doccomment">/// Returns the raw value of an attribute, without any unquoting or
+    /// other interpretation.
+    </span><span class="kw">pub fn </span>consume_string(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="self">self</span>.consume_optional_string(key)
+            .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;No attribute named \&quot;{}\&quot;&quot;</span>, key))
     }
 
-    <span class="doccomment">/// Like `consume_string()` except it returns `None` if the test case</span>
-    <span class="doccomment">/// doesn&#39;t have the attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_optional_string</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">value</span>, <span class="ident">consumed</span>) <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">attributes</span> {
-            <span class="kw">if</span> <span class="ident">key</span> <span class="op">==</span> <span class="ident">name</span> {
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">consumed</span> {
-                    <span class="macro">panic!</span>(<span class="string">&quot;Attribute {} was already consumed&quot;</span>, <span class="ident">key</span>);
+    <span class="doccomment">/// Like `consume_string()` except it returns `None` if the test case
+    /// doesn&#39;t have the attribute.
+    </span><span class="kw">pub fn </span>consume_optional_string(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="kw">for </span>(name, value, consumed) <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.attributes {
+            <span class="kw">if </span>key == name {
+                <span class="kw">if </span><span class="kw-2">*</span>consumed {
+                    <span class="macro">panic!</span>(<span class="string">&quot;Attribute {} was already consumed&quot;</span>, key);
                 }
-                <span class="kw-2">*</span><span class="ident">consumed</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">clone</span>());
+                <span class="kw-2">*</span>consumed = <span class="bool-val">true</span>;
+                <span class="kw">return </span><span class="prelude-val">Some</span>(value.clone());
             }
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// References a test input file.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">test_file</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="ident"><span class="kw">crate</span>::test::File</span> {
-            <span class="ident">file_name</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>,
-            <span class="ident">contents</span>: <span class="macro">include_str!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>),
+<span class="doccomment">/// References a test input file.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+#[macro_export]
+</span><span class="macro">macro_rules! </span>test_file {
+    (<span class="macro-nonterminal">$file_name</span>:expr) =&gt; {
+        <span class="kw">crate</span>::test::File {
+            file_name: <span class="macro-nonterminal">$file_name</span>,
+            contents: <span class="macro">include_str!</span>(<span class="macro-nonterminal">$file_name</span>),
         }
     };
 }
 
-<span class="doccomment">/// A test input file.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">File</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The name (path) of the file.</span>
-    <span class="kw">pub</span> <span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+<span class="doccomment">/// A test input file.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub struct </span>File&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The name (path) of the file.
+    </span><span class="kw">pub </span>file_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 
-    <span class="doccomment">/// The contents of the file.</span>
-    <span class="kw">pub</span> <span class="ident">contents</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+    <span class="doccomment">/// The contents of the file.
+    </span><span class="kw">pub </span>contents: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 }
 
-<span class="doccomment">/// Parses test cases out of the given file, calling `f` on each vector until</span>
-<span class="doccomment">/// `f` fails or until all the test vectors have been read. `f` can indicate</span>
-<span class="doccomment">/// failure either by returning `Err()` or by panicking.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires the `alloc` default feature to be enabled</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">test_file</span>: <span class="ident">File</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>)
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;mut</span> <span class="ident">TestCase</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses test cases out of the given file, calling `f` on each vector until
+/// `f` fails or until all the test vectors have been read. `f` can indicate
+/// failure either by returning `Err()` or by panicking.
+///
+/// Requires the `alloc` default feature to be enabled
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub fn </span>run&lt;F&gt;(test_file: File, <span class="kw-2">mut </span>f: F)
+<span class="kw">where
+    </span>F: FnMut(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;mut </span>TestCase) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt;,
 {
-    <span class="kw">let</span> <span class="ident">lines</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">test_file</span>.<span class="ident">contents</span>.<span class="ident">lines</span>();
+    <span class="kw">let </span>lines = <span class="kw-2">&amp;mut </span>test_file.contents.lines();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_section</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;&quot;</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">failed</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>current_section = String::from(<span class="string">&quot;&quot;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>failed = <span class="bool-val">false</span>;
 
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">test_case</span>) <span class="op">=</span> <span class="ident">parse_test_case</span>(<span class="kw-2">&amp;mut</span> <span class="ident">current_section</span>, <span class="ident">lines</span>) {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">current_section</span>, <span class="kw-2">&amp;mut</span> <span class="ident">test_case</span>) {
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>test_case) = parse_test_case(<span class="kw-2">&amp;mut </span>current_section, lines) {
+        <span class="kw">let </span>result = <span class="kw">match </span>f(<span class="kw-2">&amp;</span>current_section, <span class="kw-2">&amp;mut </span>test_case) {
             <span class="prelude-val">Ok</span>(()) =&gt; {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">test_case</span>
-                    .<span class="ident">attributes</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">any</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">consumed</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">consumed</span>)
+                <span class="kw">if </span>!test_case
+                    .attributes
+                    .iter()
+                    .any(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw">_</span>, consumed)| !consumed)
                 {
                     <span class="prelude-val">Ok</span>(())
-                } <span class="kw">else</span> {
-                    <span class="ident">failed</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                } <span class="kw">else </span>{
+                    failed = <span class="bool-val">true</span>;
                     <span class="prelude-val">Err</span>(<span class="string">&quot;Test didn&#39;t consume all attributes.&quot;</span>)
                 }
             }
-            <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>) =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Test returned Err(error::Unspecified).&quot;</span>),
+            <span class="prelude-val">Err</span>(error::Unspecified) =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Test returned Err(error::Unspecified).&quot;</span>),
         };
 
-        <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_err</span>() {
-            <span class="ident">failed</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span>result.is_err() {
+            failed = <span class="bool-val">true</span>;
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;test_logging&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>) <span class="op">=</span> <span class="ident">result</span> {
-                <span class="macro">std::println!</span>(<span class="string">&quot;{}: {}&quot;</span>, <span class="ident">test_file</span>.<span class="ident">file_name</span>, <span class="ident">msg</span>);
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;test_logging&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(msg) = result {
+                <span class="macro">std::println!</span>(<span class="string">&quot;{}: {}&quot;</span>, test_file.file_name, msg);
 
-                <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">value</span>, <span class="ident">consumed</span>) <span class="kw">in</span> <span class="ident">test_case</span>.<span class="ident">attributes</span> {
-                    <span class="kw">let</span> <span class="ident">consumed_str</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">consumed</span> { <span class="string">&quot;&quot;</span> } <span class="kw">else</span> { <span class="string">&quot; (unconsumed)&quot;</span> };
-                    <span class="macro">std::println!</span>(<span class="string">&quot;{}{} = {}&quot;</span>, <span class="ident">name</span>, <span class="ident">consumed_str</span>, <span class="ident">value</span>);
+                <span class="kw">for </span>(name, value, consumed) <span class="kw">in </span>test_case.attributes {
+                    <span class="kw">let </span>consumed_str = <span class="kw">if </span>consumed { <span class="string">&quot;&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot; (unconsumed)&quot; </span>};
+                    <span class="macro">std::println!</span>(<span class="string">&quot;{}{} = {}&quot;</span>, name, consumed_str, value);
                 }
             };
         }
     }
 
-    <span class="kw">if</span> <span class="ident">failed</span> {
+    <span class="kw">if </span>failed {
         <span class="macro">panic!</span>(<span class="string">&quot;Test failed.&quot;</span>)
     }
 }
 
-<span class="doccomment">/// Decode an string of hex digits into a sequence of bytes. The input must</span>
-<span class="doccomment">/// have an even number of digits.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_hex</span>(<span class="ident">hex_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">hex_str</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">String::from</span>(
+<span class="doccomment">/// Decode an string of hex digits into a sequence of bytes. The input must
+/// have an even number of digits.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub fn </span>from_hex(hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, String&gt; {
+    <span class="kw">if </span>hex_str.len() % <span class="number">2 </span>!= <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(String::from(
             <span class="string">&quot;Hex string does not have an even number of digits&quot;</span>,
         ));
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">hex_str</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">2</span>);
-    <span class="kw">for</span> <span class="ident">digits</span> <span class="kw">in</span> <span class="ident">hex_str</span>.<span class="ident">as_bytes</span>().<span class="ident">chunks</span>(<span class="number">2</span>) {
-        <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">from_hex_digit</span>(<span class="ident">digits</span>[<span class="number">0</span>])<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">from_hex_digit</span>(<span class="ident">digits</span>[<span class="number">1</span>])<span class="question-mark">?</span>;
-        <span class="ident">result</span>.<span class="ident">push</span>((<span class="ident">hi</span> <span class="op">*</span> <span class="number">0x10</span>) <span class="op">|</span> <span class="ident">lo</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::with_capacity(hex_str.len() / <span class="number">2</span>);
+    <span class="kw">for </span>digits <span class="kw">in </span>hex_str.as_bytes().chunks(<span class="number">2</span>) {
+        <span class="kw">let </span>hi = from_hex_digit(digits[<span class="number">0</span>])<span class="question-mark">?</span>;
+        <span class="kw">let </span>lo = from_hex_digit(digits[<span class="number">1</span>])<span class="question-mark">?</span>;
+        result.push((hi * <span class="number">0x10</span>) | lo);
     }
-    <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+    <span class="prelude-val">Ok</span>(result)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">from_hex_digit</span>(<span class="ident">d</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">core::ops::RangeInclusive</span>;
-    <span class="kw">const</span> <span class="ident">DECIMAL</span>: (<span class="ident">u8</span>, <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">=</span> (<span class="number">0</span>, <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span>);
-    <span class="kw">const</span> <span class="ident">HEX_LOWER</span>: (<span class="ident">u8</span>, <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">=</span> (<span class="number">10</span>, <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;f&#39;</span>);
-    <span class="kw">const</span> <span class="ident">HEX_UPPER</span>: (<span class="ident">u8</span>, <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">=</span> (<span class="number">10</span>, <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;F&#39;</span>);
-    <span class="kw">for</span> (<span class="ident">offset</span>, <span class="ident">range</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span>[<span class="ident">DECIMAL</span>, <span class="ident">HEX_LOWER</span>, <span class="ident">HEX_UPPER</span>] {
-        <span class="kw">if</span> <span class="ident">range</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">d</span> <span class="op">-</span> <span class="ident">range</span>.<span class="ident">start</span>() <span class="op">+</span> <span class="ident">offset</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">fn </span>from_hex_digit(d: u8) -&gt; <span class="prelude-ty">Result</span>&lt;u8, String&gt; {
+    <span class="kw">use </span>core::ops::RangeInclusive;
+    <span class="kw">const </span>DECIMAL: (u8, RangeInclusive&lt;u8&gt;) = (<span class="number">0</span>, <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span>);
+    <span class="kw">const </span>HEX_LOWER: (u8, RangeInclusive&lt;u8&gt;) = (<span class="number">10</span>, <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;f&#39;</span>);
+    <span class="kw">const </span>HEX_UPPER: (u8, RangeInclusive&lt;u8&gt;) = (<span class="number">10</span>, <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;F&#39;</span>);
+    <span class="kw">for </span>(offset, range) <span class="kw">in </span><span class="kw-2">&amp;</span>[DECIMAL, HEX_LOWER, HEX_UPPER] {
+        <span class="kw">if </span>range.contains(<span class="kw-2">&amp;</span>d) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(d - range.start() + offset);
         }
     }
-    <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid hex digit &#39;{}&#39;&quot;</span>, <span class="ident">d</span> <span class="kw">as</span> <span class="ident">char</span>))
+    <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid hex digit &#39;{}&#39;&quot;</span>, d <span class="kw">as </span>char))
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">parse_test_case</span>(
-    <span class="ident">current_section</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>,
-    <span class="ident">lines</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TestCase</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">fn </span>parse_test_case(
+    current_section: <span class="kw-2">&amp;mut </span>String,
+    lines: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>str&gt;,
+) -&gt; <span class="prelude-ty">Option</span>&lt;TestCase&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>attributes = Vec::new();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_first_line</span> <span class="op">=</span> <span class="bool-val">true</span>;
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="ident">lines</span>.<span class="ident">next</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>is_first_line = <span class="bool-val">true</span>;
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>line = lines.next();
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;test_logging&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">text</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">line</span> {
-                <span class="macro">std::println!</span>(<span class="string">&quot;Line: {}&quot;</span>, <span class="ident">text</span>);
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;test_logging&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(text) = <span class="kw-2">&amp;</span>line {
+                <span class="macro">std::println!</span>(<span class="string">&quot;Line: {}&quot;</span>, text);
             }
         }
 
-        <span class="kw">match</span> <span class="ident">line</span> {
-            <span class="comment">// If we get to EOF when we&#39;re not in the middle of a test case,</span>
-            <span class="comment">// then we&#39;re done.</span>
-            <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">is_first_line</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">match </span>line {
+            <span class="comment">// If we get to EOF when we&#39;re not in the middle of a test case,
+            // then we&#39;re done.
+            </span><span class="prelude-val">None </span><span class="kw">if </span>is_first_line =&gt; {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
 
-            <span class="comment">// End of the file on a non-empty test cases ends the test case.</span>
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">TestCase</span> { <span class="ident">attributes</span> });
+            <span class="comment">// End of the file on a non-empty test cases ends the test case.
+            </span><span class="prelude-val">None </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(TestCase { attributes });
             }
 
-            <span class="comment">// A blank line ends a test case if the test case isn&#39;t empty.</span>
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">is_empty</span>() =&gt; {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">is_first_line</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">TestCase</span> { <span class="ident">attributes</span> });
+            <span class="comment">// A blank line ends a test case if the test case isn&#39;t empty.
+            </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>line) <span class="kw">if </span>line.is_empty() =&gt; {
+                <span class="kw">if </span>!is_first_line {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(TestCase { attributes });
                 }
-                <span class="comment">// Ignore leading blank lines.</span>
+                <span class="comment">// Ignore leading blank lines.
+            </span>}
+
+            <span class="comment">// Comments start with &#39;#&#39;; ignore them.
+            </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>line) <span class="kw">if </span>line.starts_with(<span class="string">&#39;#&#39;</span>) =&gt; (),
+
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>line) <span class="kw">if </span>line.starts_with(<span class="string">&#39;[&#39;</span>) =&gt; {
+                <span class="macro">assert!</span>(is_first_line);
+                <span class="macro">assert!</span>(line.ends_with(<span class="string">&#39;]&#39;</span>));
+                current_section.truncate(<span class="number">0</span>);
+                current_section.push_str(line);
+                <span class="kw">let _ </span>= current_section.pop();
+                <span class="kw">let _ </span>= current_section.remove(<span class="number">0</span>);
             }
 
-            <span class="comment">// Comments start with &#39;#&#39;; ignore them.</span>
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">starts_with</span>(<span class="string">&#39;#&#39;</span>) =&gt; (),
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>line) =&gt; {
+                is_first_line = <span class="bool-val">false</span>;
 
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">starts_with</span>(<span class="string">&#39;[&#39;</span>) =&gt; {
-                <span class="macro">assert!</span>(<span class="ident">is_first_line</span>);
-                <span class="macro">assert!</span>(<span class="ident">line</span>.<span class="ident">ends_with</span>(<span class="string">&#39;]&#39;</span>));
-                <span class="ident">current_section</span>.<span class="ident">truncate</span>(<span class="number">0</span>);
-                <span class="ident">current_section</span>.<span class="ident">push_str</span>(<span class="ident">line</span>);
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">current_section</span>.<span class="ident">pop</span>();
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">current_section</span>.<span class="ident">remove</span>(<span class="number">0</span>);
-            }
-
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) =&gt; {
-                <span class="ident">is_first_line</span> <span class="op">=</span> <span class="bool-val">false</span>;
-
-                <span class="kw">let</span> <span class="ident">parts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&quot; = &quot;</span>).<span class="ident">collect</span>();
-                <span class="kw">if</span> <span class="ident">parts</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">2</span> {
+                <span class="kw">let </span>parts: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = line.splitn(<span class="number">2</span>, <span class="string">&quot; = &quot;</span>).collect();
+                <span class="kw">if </span>parts.len() != <span class="number">2 </span>{
                     <span class="macro">panic!</span>(<span class="string">&quot;Syntax error: Expected Key = Value.&quot;</span>);
                 };
 
-                <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">parts</span>[<span class="number">0</span>].<span class="ident">trim</span>();
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">parts</span>[<span class="number">1</span>].<span class="ident">trim</span>();
+                <span class="kw">let </span>key = parts[<span class="number">0</span>].trim();
+                <span class="kw">let </span>value = parts[<span class="number">1</span>].trim();
 
-                <span class="comment">// Don&#39;t allow the value to be ommitted. An empty value can be</span>
-                <span class="comment">// represented as an empty quoted string.</span>
-                <span class="macro">assert_ne!</span>(<span class="ident">value</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+                <span class="comment">// Don&#39;t allow the value to be ommitted. An empty value can be
+                // represented as an empty quoted string.
+                </span><span class="macro">assert_ne!</span>(value.len(), <span class="number">0</span>);
 
-                <span class="comment">// Checking is_none() ensures we don&#39;t accept duplicate keys.</span>
-                <span class="ident">attributes</span>.<span class="ident">push</span>((<span class="ident">String::from</span>(<span class="ident">key</span>), <span class="ident">String::from</span>(<span class="ident">value</span>), <span class="bool-val">false</span>));
+                <span class="comment">// Checking is_none() ensures we don&#39;t accept duplicate keys.
+                </span>attributes.push((String::from(key), String::from(value), <span class="bool-val">false</span>));
             }
         }
     }
 }
 
-<span class="doccomment">/// Deterministic implementations of `ring::rand::SecureRandom`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These implementations are particularly useful for testing implementations</span>
-<span class="doccomment">/// of randomized algorithms &amp; protocols using known-answer-tests where the</span>
-<span class="doccomment">/// test vectors contain the random seed to use. They are also especially</span>
-<span class="doccomment">/// useful for some types of fuzzing.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rand</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">polyfill</span>, <span class="ident">rand</span>};
+<span class="doccomment">/// Deterministic implementations of `ring::rand::SecureRandom`.
+///
+/// These implementations are particularly useful for testing implementations
+/// of randomized algorithms &amp; protocols using known-answer-tests where the
+/// test vectors contain the random seed to use. They are also especially
+/// useful for some types of fuzzing.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub mod </span>rand {
+    <span class="kw">use crate</span>::{error, polyfill, rand};
 
-    <span class="doccomment">/// An implementation of `SecureRandom` that always fills the output slice</span>
-    <span class="doccomment">/// with the given byte.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixedByteRandom</span> {
-        <span class="kw">pub</span> <span class="ident">byte</span>: <span class="ident">u8</span>,
+    <span class="doccomment">/// An implementation of `SecureRandom` that always fills the output slice
+    /// with the given byte.
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>FixedByteRandom {
+        <span class="kw">pub </span>byte: u8,
     }
 
-    <span class="kw">impl</span> <span class="ident">rand::sealed::SecureRandom</span> <span class="kw">for</span> <span class="ident">FixedByteRandom</span> {
-        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-            <span class="ident">polyfill::slice::fill</span>(<span class="ident">dest</span>, <span class="self">self</span>.<span class="ident">byte</span>);
+    <span class="kw">impl </span>rand::sealed::SecureRandom <span class="kw">for </span>FixedByteRandom {
+        <span class="kw">fn </span>fill_impl(<span class="kw-2">&amp;</span><span class="self">self</span>, dest: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+            polyfill::slice::fill(dest, <span class="self">self</span>.byte);
             <span class="prelude-val">Ok</span>(())
         }
     }
 
-    <span class="doccomment">/// An implementation of `SecureRandom` that always fills the output slice</span>
-    <span class="doccomment">/// with the slice in `bytes`. The length of the slice given to `slice`</span>
-    <span class="doccomment">/// must match exactly.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixedSliceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">pub</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
+    <span class="doccomment">/// An implementation of `SecureRandom` that always fills the output slice
+    /// with the slice in `bytes`. The length of the slice given to `slice`
+    /// must match exactly.
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>FixedSliceRandom&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">pub </span>bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
     }
 
-    <span class="kw">impl</span> <span class="ident">rand::sealed::SecureRandom</span> <span class="kw">for</span> <span class="ident">FixedSliceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-            <span class="ident">dest</span>.<span class="ident">copy_from_slice</span>(<span class="self">self</span>.<span class="ident">bytes</span>);
+    <span class="kw">impl </span>rand::sealed::SecureRandom <span class="kw">for </span>FixedSliceRandom&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="kw">fn </span>fill_impl(<span class="kw-2">&amp;</span><span class="self">self</span>, dest: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+            dest.copy_from_slice(<span class="self">self</span>.bytes);
             <span class="prelude-val">Ok</span>(())
         }
     }
 
-    <span class="doccomment">/// An implementation of `SecureRandom` where each slice in `bytes` is a</span>
-    <span class="doccomment">/// test vector for one call to `fill()`. *Not thread-safe.*</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The first slice in `bytes` is the output for the first call to</span>
-    <span class="doccomment">/// `fill()`, the second slice is the output for the second call to</span>
-    <span class="doccomment">/// `fill()`, etc. The output slice passed to `fill()` must have exactly</span>
-    <span class="doccomment">/// the length of the corresponding entry in `bytes`. `current` must be</span>
-    <span class="doccomment">/// initialized to zero. `fill()` must be called exactly once for each</span>
-    <span class="doccomment">/// entry in `bytes`.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixedSliceSequenceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="doccomment">/// The value.</span>
-        <span class="kw">pub</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]],
-        <span class="kw">pub</span> <span class="ident">current</span>: <span class="ident">core::cell::UnsafeCell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An implementation of `SecureRandom` where each slice in `bytes` is a
+    /// test vector for one call to `fill()`. *Not thread-safe.*
+    ///
+    /// The first slice in `bytes` is the output for the first call to
+    /// `fill()`, the second slice is the output for the second call to
+    /// `fill()`, etc. The output slice passed to `fill()` must have exactly
+    /// the length of the corresponding entry in `bytes`. `current` must be
+    /// initialized to zero. `fill()` must be called exactly once for each
+    /// entry in `bytes`.
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>FixedSliceSequenceRandom&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="doccomment">/// The value.
+        </span><span class="kw">pub </span>bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]],
+        <span class="kw">pub </span>current: core::cell::UnsafeCell&lt;usize&gt;,
     }
 
-    <span class="kw">impl</span> <span class="ident">rand::sealed::SecureRandom</span> <span class="kw">for</span> <span class="ident">FixedSliceSequenceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">current</span>.<span class="ident">get</span>() };
-            <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>[<span class="ident">current</span>];
-            <span class="ident">dest</span>.<span class="ident">copy_from_slice</span>(<span class="ident">bytes</span>);
-            <span class="comment">// Remember that we returned this slice and prepare to return</span>
-            <span class="comment">// the next one, if any.</span>
-            <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">current</span>.<span class="ident">get</span>() <span class="op">+</span><span class="op">=</span> <span class="number">1</span> };
+    <span class="kw">impl </span>rand::sealed::SecureRandom <span class="kw">for </span>FixedSliceSequenceRandom&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="kw">fn </span>fill_impl(<span class="kw-2">&amp;</span><span class="self">self</span>, dest: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+            <span class="kw">let </span>current = <span class="kw">unsafe </span>{ <span class="kw-2">*</span><span class="self">self</span>.current.get() };
+            <span class="kw">let </span>bytes = <span class="self">self</span>.bytes[current];
+            dest.copy_from_slice(bytes);
+            <span class="comment">// Remember that we returned this slice and prepare to return
+            // the next one, if any.
+            </span><span class="kw">unsafe </span>{ <span class="kw-2">*</span><span class="self">self</span>.current.get() += <span class="number">1 </span>};
             <span class="prelude-val">Ok</span>(())
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">FixedSliceSequenceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-            <span class="comment">// Ensure that `fill()` was called exactly the right number of</span>
-            <span class="comment">// times.</span>
-            <span class="macro">assert_eq!</span>(<span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">current</span>.<span class="ident">get</span>() }, <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>());
+    <span class="kw">impl </span>Drop <span class="kw">for </span>FixedSliceSequenceRandom&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+            <span class="comment">// Ensure that `fill()` was called exactly the right number of
+            // times.
+            </span><span class="macro">assert_eq!</span>(<span class="kw">unsafe </span>{ <span class="kw-2">*</span><span class="self">self</span>.current.get() }, <span class="self">self</span>.bytes.len());
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">test</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use crate</span>::{error, test};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">one_ok</span>() {
-        <span class="ident">test::run</span>(<span class="macro">test_file!</span>(<span class="string">&quot;test_1_tests.txt&quot;</span>), <span class="op">|</span><span class="kw">_</span>, <span class="ident">test_case</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Key&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>one_ok() {
+        test::run(<span class="macro">test_file!</span>(<span class="string">&quot;test_1_tests.txt&quot;</span>), |<span class="kw">_</span>, test_case| {
+            <span class="kw">let _ </span>= test_case.consume_string(<span class="string">&quot;Key&quot;</span>);
             <span class="prelude-val">Ok</span>(())
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;Test failed.&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">one_err</span>() {
-        <span class="ident">test::run</span>(<span class="macro">test_file!</span>(<span class="string">&quot;test_1_tests.txt&quot;</span>), <span class="op">|</span><span class="kw">_</span>, <span class="ident">test_case</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Key&quot;</span>);
-            <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>)
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;Test failed.&quot;</span>)]
+    </span><span class="kw">fn </span>one_err() {
+        test::run(<span class="macro">test_file!</span>(<span class="string">&quot;test_1_tests.txt&quot;</span>), |<span class="kw">_</span>, test_case| {
+            <span class="kw">let _ </span>= test_case.consume_string(<span class="string">&quot;Key&quot;</span>);
+            <span class="prelude-val">Err</span>(error::Unspecified)
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;Oh noes!&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">one_panics</span>() {
-        <span class="ident">test::run</span>(<span class="macro">test_file!</span>(<span class="string">&quot;test_1_tests.txt&quot;</span>), <span class="op">|</span><span class="kw">_</span>, <span class="ident">test_case</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Key&quot;</span>);
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;Oh noes!&quot;</span>)]
+    </span><span class="kw">fn </span>one_panics() {
+        test::run(<span class="macro">test_file!</span>(<span class="string">&quot;test_1_tests.txt&quot;</span>), |<span class="kw">_</span>, test_case| {
+            <span class="kw">let _ </span>= test_case.consume_string(<span class="string">&quot;Key&quot;</span>);
             <span class="macro">panic!</span>(<span class="string">&quot;Oh noes!&quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;Test failed.&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">first_err</span>() {
-        <span class="ident">err_one</span>(<span class="number">0</span>)
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;Test failed.&quot;</span>)]
+    </span><span class="kw">fn </span>first_err() {
+        err_one(<span class="number">0</span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;Test failed.&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">middle_err</span>() {
-        <span class="ident">err_one</span>(<span class="number">1</span>)
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;Test failed.&quot;</span>)]
+    </span><span class="kw">fn </span>middle_err() {
+        err_one(<span class="number">1</span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;Test failed.&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">last_err</span>() {
-        <span class="ident">err_one</span>(<span class="number">2</span>)
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;Test failed.&quot;</span>)]
+    </span><span class="kw">fn </span>last_err() {
+        err_one(<span class="number">2</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">err_one</span>(<span class="ident">test_to_fail</span>: <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="ident">test::run</span>(<span class="macro">test_file!</span>(<span class="string">&quot;test_3_tests.txt&quot;</span>), <span class="op">|</span><span class="kw">_</span>, <span class="ident">test_case</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Key&quot;</span>);
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">!</span><span class="op">=</span> <span class="ident">test_to_fail</span> {
+    <span class="kw">fn </span>err_one(test_to_fail: usize) {
+        <span class="kw">let </span><span class="kw-2">mut </span>n = <span class="number">0</span>;
+        test::run(<span class="macro">test_file!</span>(<span class="string">&quot;test_3_tests.txt&quot;</span>), |<span class="kw">_</span>, test_case| {
+            <span class="kw">let _ </span>= test_case.consume_string(<span class="string">&quot;Key&quot;</span>);
+            <span class="kw">let </span>result = <span class="kw">if </span>n != test_to_fail {
                 <span class="prelude-val">Ok</span>(())
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Err</span>(error::Unspecified)
             };
-            <span class="ident">n</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">result</span>
+            n += <span class="number">1</span>;
+            result
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;Oh Noes!&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">first_panic</span>() {
-        <span class="ident">panic_one</span>(<span class="number">0</span>)
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;Oh Noes!&quot;</span>)]
+    </span><span class="kw">fn </span>first_panic() {
+        panic_one(<span class="number">0</span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;Oh Noes!&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">middle_panic</span>() {
-        <span class="ident">panic_one</span>(<span class="number">1</span>)
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;Oh Noes!&quot;</span>)]
+    </span><span class="kw">fn </span>middle_panic() {
+        panic_one(<span class="number">1</span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;Oh Noes!&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">last_panic</span>() {
-        <span class="ident">panic_one</span>(<span class="number">2</span>)
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;Oh Noes!&quot;</span>)]
+    </span><span class="kw">fn </span>last_panic() {
+        panic_one(<span class="number">2</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">panic_one</span>(<span class="ident">test_to_fail</span>: <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="ident">test::run</span>(<span class="macro">test_file!</span>(<span class="string">&quot;test_3_tests.txt&quot;</span>), <span class="op">|</span><span class="kw">_</span>, <span class="ident">test_case</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Key&quot;</span>);
-            <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">test_to_fail</span> {
+    <span class="kw">fn </span>panic_one(test_to_fail: usize) {
+        <span class="kw">let </span><span class="kw-2">mut </span>n = <span class="number">0</span>;
+        test::run(<span class="macro">test_file!</span>(<span class="string">&quot;test_3_tests.txt&quot;</span>), |<span class="kw">_</span>, test_case| {
+            <span class="kw">let _ </span>= test_case.consume_string(<span class="string">&quot;Key&quot;</span>);
+            <span class="kw">if </span>n == test_to_fail {
                 <span class="macro">panic!</span>(<span class="string">&quot;Oh Noes!&quot;</span>);
             };
-            <span class="ident">n</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            n += <span class="number">1</span>;
             <span class="prelude-val">Ok</span>(())
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;Syntax error: Expected Key = Value.&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">syntax_error</span>() {
-        <span class="ident">test::run</span>(<span class="macro">test_file!</span>(<span class="string">&quot;test_1_syntax_error_tests.txt&quot;</span>), <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(()));
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;Syntax error: Expected Key = Value.&quot;</span>)]
+    </span><span class="kw">fn </span>syntax_error() {
+        test::run(<span class="macro">test_file!</span>(<span class="string">&quot;test_1_syntax_error_tests.txt&quot;</span>), |<span class="kw">_</span>, <span class="kw">_</span>| <span class="prelude-val">Ok</span>(()));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

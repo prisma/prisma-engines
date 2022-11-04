@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/change_stream/session.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>session.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/change_stream/session.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>session.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -176,183 +176,183 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Types for change streams using sessions.</span>
-<span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Types for change streams using sessions.
+</span><span class="kw">use </span>serde::de::DeserializeOwned;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">cursor</span>::{<span class="ident">BatchValue</span>, <span class="ident">NextInBatchFuture</span>},
-    <span class="ident">error::Result</span>,
-    <span class="ident">ClientSession</span>,
-    <span class="ident">SessionCursor</span>,
+<span class="kw">use crate</span>::{
+    cursor::{BatchValue, NextInBatchFuture},
+    error::Result,
+    ClientSession,
+    SessionCursor,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">event</span>::{<span class="ident">ChangeStreamEvent</span>, <span class="ident">ResumeToken</span>},
-    <span class="ident">get_resume_token</span>,
-    <span class="ident">ChangeStreamData</span>,
-    <span class="ident">WatchArgs</span>,
+<span class="kw">use super</span>::{
+    event::{ChangeStreamEvent, ResumeToken},
+    get_resume_token,
+    ChangeStreamData,
+    WatchArgs,
 };
 
-<span class="doccomment">/// A [`SessionChangeStream`] is a change stream that was created with a ClientSession that must</span>
-<span class="doccomment">/// be iterated using one. To iterate, use [`SessionChangeStream::next`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use mongodb::{bson::Document, Client, error::Result};</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # async fn do_stuff() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-<span class="doccomment">/// # let mut session = client.start_session(None).await?;</span>
-<span class="doccomment">/// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// let mut cs = coll.watch_with_session(None, None, &amp;mut session).await?;</span>
-<span class="doccomment">/// while let Some(event) = cs.next(&amp;mut session).await? {</span>
-<span class="doccomment">///     println!(&quot;{:?}&quot;, event)</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionChangeStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="doccomment">/// A [`SessionChangeStream`] is a change stream that was created with a ClientSession that must
+/// be iterated using one. To iterate, use [`SessionChangeStream::next`]:
+///
+/// ```
+/// # use mongodb::{bson::Document, Client, error::Result};
+/// #
+/// # async fn do_stuff() -&gt; Result&lt;()&gt; {
+/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+/// # let mut session = client.start_session(None).await?;
+/// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);
+/// #
+/// let mut cs = coll.watch_with_session(None, None, &amp;mut session).await?;
+/// while let Some(event) = cs.next(&amp;mut session).await? {
+///     println!(&quot;{:?}&quot;, event)
+/// }
+/// #
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="kw">pub struct </span>SessionChangeStream&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned + Unpin,
 {
-    <span class="ident">cursor</span>: <span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">args</span>: <span class="ident">WatchArgs</span>,
-    <span class="ident">data</span>: <span class="ident">ChangeStreamData</span>,
+    cursor: SessionCursor&lt;T&gt;,
+    args: WatchArgs,
+    data: ChangeStreamData,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SessionChangeStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+<span class="kw">impl</span>&lt;T&gt; SessionChangeStream&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned + Unpin + Send + Sync,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cursor</span>: <span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">args</span>: <span class="ident">WatchArgs</span>, <span class="ident">data</span>: <span class="ident">ChangeStreamData</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">cursor</span>, <span class="ident">args</span>, <span class="ident">data</span> }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(cursor: SessionCursor&lt;T&gt;, args: WatchArgs, data: ChangeStreamData) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ cursor, args, data }
     }
 
-    <span class="doccomment">/// Returns the cached resume token that can be used to resume after the most recently returned</span>
-    <span class="doccomment">/// change.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation</span>
-    <span class="doccomment">/// [here](https://www.mongodb.com/docs/manual/changeStreams/#change-stream-resume-token) for more</span>
-    <span class="doccomment">/// information on change stream resume tokens.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resume_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resume_token</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Returns the cached resume token that can be used to resume after the most recently returned
+    /// change.
+    ///
+    /// See the documentation
+    /// [here](https://www.mongodb.com/docs/manual/changeStreams/#change-stream-resume-token) for more
+    /// information on change stream resume tokens.
+    </span><span class="kw">pub fn </span>resume_token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ResumeToken&gt; {
+        <span class="self">self</span>.data.resume_token.clone()
     }
 
-    <span class="doccomment">/// Update the type streamed values will be parsed as.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_type</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">SessionChangeStream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-        <span class="ident">SessionChangeStream::new</span>(<span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">with_type</span>(), <span class="self">self</span>.<span class="ident">args</span>, <span class="self">self</span>.<span class="ident">data</span>)
+    <span class="doccomment">/// Update the type streamed values will be parsed as.
+    </span><span class="kw">pub fn </span>with_type&lt;D: DeserializeOwned + Unpin + Send + Sync&gt;(<span class="self">self</span>) -&gt; SessionChangeStream&lt;D&gt; {
+        SessionChangeStream::new(<span class="self">self</span>.cursor.with_type(), <span class="self">self</span>.args, <span class="self">self</span>.data)
     }
 
-    <span class="doccomment">/// Retrieve the next result from the change stream.</span>
-    <span class="doccomment">/// The session provided must be the same session used to create the change stream.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::{doc, Document};</span>
-    <span class="doccomment">/// # use mongodb::Client;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// # async {</span>
-    <span class="doccomment">/// # let client = Client::with_uri_str(&quot;foo&quot;).await?;</span>
-    <span class="doccomment">/// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);</span>
-    <span class="doccomment">/// # let other_coll = coll.clone();</span>
-    <span class="doccomment">/// # let mut session = client.start_session(None).await?;</span>
-    <span class="doccomment">/// let mut cs = coll.watch_with_session(None, None, &amp;mut session).await?;</span>
-    <span class="doccomment">/// while let Some(event) = cs.next(&amp;mut session).await? {</span>
-    <span class="doccomment">///     let id = bson::to_bson(&amp;event.id)?;</span>
-    <span class="doccomment">///     other_coll.insert_one_with_session(doc! { &quot;id&quot;: id }, None, &amp;mut session).await?;</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok::&lt;(), mongodb::error::Error&gt;(())</span>
-    <span class="doccomment">/// # };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">maybe_next</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_if_any</span>(<span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">match</span> <span class="ident">maybe_next</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">t</span>)),
-                <span class="prelude-val">None</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_alive</span>() =&gt; <span class="kw">continue</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+    <span class="doccomment">/// Retrieve the next result from the change stream.
+    /// The session provided must be the same session used to create the change stream.
+    ///
+    /// ```
+    /// # use bson::{doc, Document};
+    /// # use mongodb::Client;
+    /// # fn main() {
+    /// # async {
+    /// # let client = Client::with_uri_str(&quot;foo&quot;).await?;
+    /// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);
+    /// # let other_coll = coll.clone();
+    /// # let mut session = client.start_session(None).await?;
+    /// let mut cs = coll.watch_with_session(None, None, &amp;mut session).await?;
+    /// while let Some(event) = cs.next(&amp;mut session).await? {
+    ///     let id = bson::to_bson(&amp;event.id)?;
+    ///     other_coll.insert_one_with_session(doc! { &quot;id&quot;: id }, None, &amp;mut session).await?;
+    /// }
+    /// # Ok::&lt;(), mongodb::error::Error&gt;(())
+    /// # };
+    /// # }
+    /// ```
+    </span><span class="kw">pub async fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, session: <span class="kw-2">&amp;mut </span>ClientSession) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>maybe_next = <span class="self">self</span>.next_if_any(session).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">match </span>maybe_next {
+                <span class="prelude-val">Some</span>(t) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(t)),
+                <span class="prelude-val">None </span><span class="kw">if </span><span class="self">self</span>.is_alive() =&gt; <span class="kw">continue</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             }
         }
     }
 
-    <span class="doccomment">/// Returns whether the change stream will continue to receive events.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_alive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_exhausted</span>()
+    <span class="doccomment">/// Returns whether the change stream will continue to receive events.
+    </span><span class="kw">pub fn </span>is_alive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.cursor.is_exhausted()
     }
 
-    <span class="doccomment">/// Retrieve the next result from the change stream, if any.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Where calling `next` will internally loop until a change document is received,</span>
-    <span class="doccomment">/// this will make at most one request and return `None` if the returned document batch is</span>
-    <span class="doccomment">/// empty.  This method should be used when storing the resume token in order to ensure the</span>
-    <span class="doccomment">/// most up to date token is received, e.g.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use mongodb::{Client, Collection, bson::Document, error::Result};</span>
-    <span class="doccomment">/// # async fn func() -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-    <span class="doccomment">/// # let coll: Collection&lt;Document&gt; = client.database(&quot;foo&quot;).collection(&quot;bar&quot;);</span>
-    <span class="doccomment">/// # let mut session = client.start_session(None).await?;</span>
-    <span class="doccomment">/// let mut change_stream = coll.watch_with_session(None, None, &amp;mut session).await?;</span>
-    <span class="doccomment">/// let mut resume_token = None;</span>
-    <span class="doccomment">/// while change_stream.is_alive() {</span>
-    <span class="doccomment">///     if let Some(event) = change_stream.next_if_any(&amp;mut session).await? {</span>
-    <span class="doccomment">///         // process event</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///     resume_token = change_stream.resume_token();</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">next_if_any</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> (<span class="ident">next</span>, <span class="ident">post_batch_token</span>, <span class="ident">client</span>) <span class="op">=</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">stream</span>(<span class="ident">session</span>);
-                <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">NextInBatchFuture::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stream</span>).<span class="kw">await</span>;
-                <span class="kw">let</span> <span class="ident">post_batch_token</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">post_batch_resume_token</span>().<span class="ident">cloned</span>();
-                <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">client</span>().<span class="ident">clone</span>();
-                (<span class="ident">next</span>, <span class="ident">post_batch_token</span>, <span class="ident">client</span>)
+    <span class="doccomment">/// Retrieve the next result from the change stream, if any.
+    ///
+    /// Where calling `next` will internally loop until a change document is received,
+    /// this will make at most one request and return `None` if the returned document batch is
+    /// empty.  This method should be used when storing the resume token in order to ensure the
+    /// most up to date token is received, e.g.
+    ///
+    /// ```
+    /// # use mongodb::{Client, Collection, bson::Document, error::Result};
+    /// # async fn func() -&gt; Result&lt;()&gt; {
+    /// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+    /// # let coll: Collection&lt;Document&gt; = client.database(&quot;foo&quot;).collection(&quot;bar&quot;);
+    /// # let mut session = client.start_session(None).await?;
+    /// let mut change_stream = coll.watch_with_session(None, None, &amp;mut session).await?;
+    /// let mut resume_token = None;
+    /// while change_stream.is_alive() {
+    ///     if let Some(event) = change_stream.next_if_any(&amp;mut session).await? {
+    ///         // process event
+    ///     }
+    ///     resume_token = change_stream.resume_token();
+    /// }
+    /// #
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub async fn </span>next_if_any(<span class="kw-2">&amp;mut </span><span class="self">self</span>, session: <span class="kw-2">&amp;mut </span>ClientSession) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>(next, post_batch_token, client) = {
+                <span class="kw">let </span><span class="kw-2">mut </span>stream = <span class="self">self</span>.cursor.stream(session);
+                <span class="kw">let </span>next = NextInBatchFuture::new(<span class="kw-2">&amp;mut </span>stream).<span class="kw">await</span>;
+                <span class="kw">let </span>post_batch_token = stream.post_batch_resume_token().cloned();
+                <span class="kw">let </span>client = stream.client().clone();
+                (next, post_batch_token, client)
             };
-            <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">bv</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>) <span class="op">=</span> <span class="ident">get_resume_token</span>(<span class="kw-2">&amp;</span><span class="ident">bv</span>, <span class="ident">post_batch_token</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span> {
-                        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resume_token</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>);
+            <span class="kw">match </span>next {
+                <span class="prelude-val">Ok</span>(bv) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(token) = get_resume_token(<span class="kw-2">&amp;</span>bv, post_batch_token.as_ref())<span class="question-mark">? </span>{
+                        <span class="self">self</span>.data.resume_token = <span class="prelude-val">Some</span>(token);
                     }
-                    <span class="kw">match</span> <span class="ident">bv</span> {
-                        <span class="ident">BatchValue::Some</span> { <span class="ident">doc</span>, .. } =&gt; {
-                            <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">document_returned</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">bson::from_slice</span>(<span class="ident">doc</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>));
+                    <span class="kw">match </span>bv {
+                        BatchValue::Some { doc, .. } =&gt; {
+                            <span class="self">self</span>.data.document_returned = <span class="bool-val">true</span>;
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(bson::from_slice(doc.as_bytes())<span class="question-mark">?</span>));
                         }
-                        <span class="ident">BatchValue::Empty</span> <span class="op">|</span> <span class="ident">BatchValue::Exhausted</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                        BatchValue::Empty | BatchValue::Exhausted =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
                     }
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is_resumable</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resume_attempted</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resume_attempted</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">clone</span>();
-                    <span class="kw">let</span> <span class="ident">new_stream</span>: <span class="ident">SessionChangeStream</span><span class="op">&lt;</span><span class="ident">ChangeStreamEvent</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">client</span>
-                        .<span class="ident">execute_watch_with_session</span>(
-                            <span class="ident">args</span>.<span class="ident">pipeline</span>,
-                            <span class="ident">args</span>.<span class="ident">options</span>,
-                            <span class="ident">args</span>.<span class="ident">target</span>,
-                            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">take</span>()),
-                            <span class="ident">session</span>,
+                <span class="prelude-val">Err</span>(e) <span class="kw">if </span>e.is_resumable() &amp;&amp; !<span class="self">self</span>.data.resume_attempted =&gt; {
+                    <span class="self">self</span>.data.resume_attempted = <span class="bool-val">true</span>;
+                    <span class="kw">let </span>args = <span class="self">self</span>.args.clone();
+                    <span class="kw">let </span>new_stream: SessionChangeStream&lt;ChangeStreamEvent&lt;()&gt;&gt; = client
+                        .execute_watch_with_session(
+                            args.pipeline,
+                            args.options,
+                            args.target,
+                            <span class="prelude-val">Some</span>(<span class="self">self</span>.data.take()),
+                            session,
                         )
                         .<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">new_stream</span> <span class="op">=</span> <span class="ident">new_stream</span>.<span class="ident">with_type</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
-                    <span class="self">self</span>.<span class="ident">cursor</span>
-                        .<span class="ident">set_drop_address</span>(<span class="ident">new_stream</span>.<span class="ident">cursor</span>.<span class="ident">address</span>().<span class="ident">clone</span>());
-                    <span class="self">self</span>.<span class="ident">cursor</span> <span class="op">=</span> <span class="ident">new_stream</span>.<span class="ident">cursor</span>;
-                    <span class="self">self</span>.<span class="ident">args</span> <span class="op">=</span> <span class="ident">new_stream</span>.<span class="ident">args</span>;
-                    <span class="comment">// After a successful resume, another resume must be allowed.</span>
-                    <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resume_attempted</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                    <span class="kw">let </span>new_stream = new_stream.with_type::&lt;T&gt;();
+                    <span class="self">self</span>.cursor
+                        .set_drop_address(new_stream.cursor.address().clone());
+                    <span class="self">self</span>.cursor = new_stream.cursor;
+                    <span class="self">self</span>.args = new_stream.args;
+                    <span class="comment">// After a successful resume, another resume must be allowed.
+                    </span><span class="self">self</span>.data.resume_attempted = <span class="bool-val">false</span>;
                     <span class="kw">continue</span>;
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(e),
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

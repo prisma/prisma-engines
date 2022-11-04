@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-exporter-prometheus-0.10.0/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_exporter_prometheus/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-exporter-prometheus-0.10.0/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_exporter_prometheus/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -81,88 +81,88 @@
 <span id="81">81</span>
 <span id="82">82</span>
 <span id="83">83</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::distribution::Distribution</span>;
+<span class="kw">use </span><span class="kw">crate</span>::distribution::Distribution;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::formatting::sanitize_metric_name</span>;
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="kw">use</span> <span class="ident">metrics::SetRecorderError</span>;
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+<span class="kw">use </span><span class="kw">crate</span>::formatting::sanitize_metric_name;
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>metrics::SetRecorderError;
+<span class="kw">use </span>thiserror::Error;
 
-<span class="doccomment">/// Matches a metric name in a specific way.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Used for specifying overrides for buckets, allowing a default set of histogram buckets to be</span>
-<span class="doccomment">/// specified while adjusting the buckets that get used for specific metrics.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Matcher</span> {
-    <span class="doccomment">/// Matches the entire metric name.</span>
-    <span class="ident">Full</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// Matches the beginning of the metric name.</span>
-    <span class="ident">Prefix</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// Matches the end of the metric name.</span>
-    <span class="ident">Suffix</span>(<span class="ident">String</span>),
+<span class="doccomment">/// Matches a metric name in a specific way.
+///
+/// Used for specifying overrides for buckets, allowing a default set of histogram buckets to be
+/// specified while adjusting the buckets that get used for specific metrics.
+</span><span class="attribute">#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="kw">pub enum </span>Matcher {
+    <span class="doccomment">/// Matches the entire metric name.
+    </span>Full(String),
+    <span class="doccomment">/// Matches the beginning of the metric name.
+    </span>Prefix(String),
+    <span class="doccomment">/// Matches the end of the metric name.
+    </span>Suffix(String),
 }
 
-<span class="kw">impl</span> <span class="ident">Matcher</span> {
-    <span class="doccomment">/// Checks if the given key matches this matcher.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">matches</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Matcher::Prefix</span>(<span class="ident">prefix</span>) =&gt; <span class="ident">key</span>.<span class="ident">starts_with</span>(<span class="ident">prefix</span>),
-            <span class="ident">Matcher::Suffix</span>(<span class="ident">suffix</span>) =&gt; <span class="ident">key</span>.<span class="ident">ends_with</span>(<span class="ident">suffix</span>),
-            <span class="ident">Matcher::Full</span>(<span class="ident">full</span>) =&gt; <span class="ident">key</span> <span class="op">==</span> <span class="ident">full</span>,
+<span class="kw">impl </span>Matcher {
+    <span class="doccomment">/// Checks if the given key matches this matcher.
+    </span><span class="kw">pub fn </span>matches(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            Matcher::Prefix(prefix) =&gt; key.starts_with(prefix),
+            Matcher::Suffix(suffix) =&gt; key.ends_with(suffix),
+            Matcher::Full(full) =&gt; key == full,
         }
     }
 
-    <span class="doccomment">/// Creates a sanitized version of this matcher.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sanitized</span>(<span class="self">self</span>) -&gt; <span class="ident">Matcher</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Matcher::Prefix</span>(<span class="ident">prefix</span>) =&gt; <span class="ident">Matcher::Prefix</span>(<span class="ident">sanitize_metric_name</span>(<span class="ident">prefix</span>.<span class="ident">as_str</span>())),
-            <span class="ident">Matcher::Suffix</span>(<span class="ident">suffix</span>) =&gt; <span class="ident">Matcher::Suffix</span>(<span class="ident">sanitize_metric_name</span>(<span class="ident">suffix</span>.<span class="ident">as_str</span>())),
-            <span class="ident">Matcher::Full</span>(<span class="ident">full</span>) =&gt; <span class="ident">Matcher::Full</span>(<span class="ident">sanitize_metric_name</span>(<span class="ident">full</span>.<span class="ident">as_str</span>())),
+    <span class="doccomment">/// Creates a sanitized version of this matcher.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sanitized(<span class="self">self</span>) -&gt; Matcher {
+        <span class="kw">match </span><span class="self">self </span>{
+            Matcher::Prefix(prefix) =&gt; Matcher::Prefix(sanitize_metric_name(prefix.as_str())),
+            Matcher::Suffix(suffix) =&gt; Matcher::Suffix(sanitize_metric_name(suffix.as_str())),
+            Matcher::Full(full) =&gt; Matcher::Full(sanitize_metric_name(full.as_str())),
         }
     }
 }
 
-<span class="doccomment">/// Errors that could occur while building or installing a Prometheus recorder/exporter.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BuildError</span> {
-    <span class="doccomment">/// There was an issue when creating the necessary Tokio runtime to launch the exporter.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;failed to create Tokio runtime for exporter: {0}&quot;</span>)]</span>
-    <span class="ident">FailedToCreateRuntime</span>(<span class="ident">String</span>),
+<span class="doccomment">/// Errors that could occur while building or installing a Prometheus recorder/exporter.
+</span><span class="attribute">#[derive(Debug, Error)]
+</span><span class="kw">pub enum </span>BuildError {
+    <span class="doccomment">/// There was an issue when creating the necessary Tokio runtime to launch the exporter.
+    </span><span class="attribute">#[error(<span class="string">&quot;failed to create Tokio runtime for exporter: {0}&quot;</span>)]
+    </span>FailedToCreateRuntime(String),
 
-    <span class="doccomment">/// There was an issue when creating the HTTP listener.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;failed to create HTTP listener: {0}&quot;</span>)]</span>
-    <span class="ident">FailedToCreateHTTPListener</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// There was an issue when creating the HTTP listener.
+    </span><span class="attribute">#[error(<span class="string">&quot;failed to create HTTP listener: {0}&quot;</span>)]
+    </span>FailedToCreateHTTPListener(String),
 
-    <span class="doccomment">/// Installing the recorder did not succeed.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;failed to install exporter as global recorder: {0}&quot;</span>)]</span>
-    <span class="ident">FailedToSetGlobalRecorder</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SetRecorderError</span>),
+    <span class="doccomment">/// Installing the recorder did not succeed.
+    </span><span class="attribute">#[error(<span class="string">&quot;failed to install exporter as global recorder: {0}&quot;</span>)]
+    </span>FailedToSetGlobalRecorder(<span class="attribute">#[from] </span>SetRecorderError),
 
-    <span class="doccomment">/// The given address could not be parsed successfully as an IP address/subnet.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;failed to parse address as a valid IP address/subnet: {0}&quot;</span>)]</span>
-    <span class="ident">InvalidAllowlistAddress</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// The given address could not be parsed successfully as an IP address/subnet.
+    </span><span class="attribute">#[error(<span class="string">&quot;failed to parse address as a valid IP address/subnet: {0}&quot;</span>)]
+    </span>InvalidAllowlistAddress(String),
 
-    <span class="doccomment">/// The given push gateway endpoint is not a valid URI.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;push gateway endpoint is not valid: {0}&quot;</span>)]</span>
-    <span class="ident">InvalidPushGatewayEndpoint</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// The given push gateway endpoint is not a valid URI.
+    </span><span class="attribute">#[error(<span class="string">&quot;push gateway endpoint is not valid: {0}&quot;</span>)]
+    </span>InvalidPushGatewayEndpoint(String),
 
-    <span class="doccomment">/// No exporter configuration was present.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This generally only occurs when HTTP listener support is disabled, but no push gateway</span>
-    <span class="doccomment">/// configuration was give to the builder.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;attempted to build exporter with no exporters enabled; did you disable default features and forget to enable either the `http-listener` or `push-gateway` features?&quot;</span>)]</span>
-    <span class="ident">MissingExporterConfiguration</span>,
+    <span class="doccomment">/// No exporter configuration was present.
+    ///
+    /// This generally only occurs when HTTP listener support is disabled, but no push gateway
+    /// configuration was give to the builder.
+    </span><span class="attribute">#[error(<span class="string">&quot;attempted to build exporter with no exporters enabled; did you disable default features and forget to enable either the `http-listener` or `push-gateway` features?&quot;</span>)]
+    </span>MissingExporterConfiguration,
 
-    <span class="doccomment">/// Bucket bounds or quantiles were empty.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;bucket bounds/quantiles cannot be empty&quot;</span>)]</span>
-    <span class="ident">EmptyBucketsOrQuantiles</span>,
+    <span class="doccomment">/// Bucket bounds or quantiles were empty.
+    </span><span class="attribute">#[error(<span class="string">&quot;bucket bounds/quantiles cannot be empty&quot;</span>)]
+    </span>EmptyBucketsOrQuantiles,
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Snapshot</span> {
-    <span class="kw">pub</span> <span class="ident">counters</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">gauges</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">distributions</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Distribution</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>Snapshot {
+    <span class="kw">pub </span>counters: HashMap&lt;String, HashMap&lt;Vec&lt;String&gt;, u64&gt;&gt;,
+    <span class="kw">pub </span>gauges: HashMap&lt;String, HashMap&lt;Vec&lt;String&gt;, f64&gt;&gt;,
+    <span class="kw">pub </span>distributions: HashMap&lt;String, IndexMap&lt;Vec&lt;String&gt;, Distribution&gt;&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_exporter_prometheus" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_exporter_prometheus" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

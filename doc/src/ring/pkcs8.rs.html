@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/pkcs8.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pkcs8.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/pkcs8.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pkcs8.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -199,206 +199,206 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2017 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2017 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! PKCS#8 is specified in [RFC 5958].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [RFC 5958]: https://tools.ietf.org/html/rfc5958.</span>
+</span><span class="doccomment">//! PKCS#8 is specified in [RFC 5958].
+//!
+//! [RFC 5958]: https://tools.ietf.org/html/rfc5958.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ec</span>, <span class="ident">error</span>, <span class="ident">io::der</span>};
+</span><span class="kw">use crate</span>::{ec, error, io::der};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Version</span> {
-    <span class="ident">V1Only</span>,
-    <span class="ident">V1OrV2</span>,
-    <span class="ident">V2Only</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Version {
+    V1Only,
+    V1OrV2,
+    V2Only,
 }
 
-<span class="doccomment">/// A template for constructing PKCS#8 documents.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that this only works for ECC.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Template</span> {
-    <span class="kw">pub</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>],
+<span class="doccomment">/// A template for constructing PKCS#8 documents.
+///
+/// Note that this only works for ECC.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Template {
+    <span class="kw">pub </span>bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8],
 
-    <span class="comment">// The range within `bytes` that holds the value (not including the tag and</span>
-    <span class="comment">// length) for use in the PKCS#8 document&#39;s privateKeyAlgorithm field.</span>
-    <span class="kw">pub</span> <span class="ident">alg_id_range</span>: <span class="ident">core::ops::Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="comment">// The range within `bytes` that holds the value (not including the tag and
+    // length) for use in the PKCS#8 document&#39;s privateKeyAlgorithm field.
+    </span><span class="kw">pub </span>alg_id_range: core::ops::Range&lt;usize&gt;,
 
-    <span class="comment">// `bytes[alg_id_range][curve_id_index..]` contains the OID identifying the,</span>
-    <span class="comment">// curve, including the tag and length.</span>
-    <span class="kw">pub</span> <span class="ident">curve_id_index</span>: <span class="ident">usize</span>,
+    <span class="comment">// `bytes[alg_id_range][curve_id_index..]` contains the OID identifying the,
+    // curve, including the tag and length.
+    </span><span class="kw">pub </span>curve_id_index: usize,
 
-    <span class="comment">// `bytes` will be split into two parts at `private_key_index`, where the</span>
-    <span class="comment">// first part is written before the private key and the second part is</span>
-    <span class="comment">// written after the private key. The public key is written after the second</span>
-    <span class="comment">// part.</span>
-    <span class="kw">pub</span> <span class="ident">private_key_index</span>: <span class="ident">usize</span>,
+    <span class="comment">// `bytes` will be split into two parts at `private_key_index`, where the
+    // first part is written before the private key and the second part is
+    // written after the private key. The public key is written after the second
+    // part.
+    </span><span class="kw">pub </span>private_key_index: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Template</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">alg_id_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">untrusted::Input</span> {
-        <span class="ident">untrusted::Input::from</span>(<span class="self">self</span>.<span class="ident">alg_id_value_</span>())
+<span class="kw">impl </span>Template {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>alg_id_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; untrusted::Input {
+        untrusted::Input::from(<span class="self">self</span>.alg_id_value_())
     }
 
-    <span class="kw">fn</span> <span class="ident">alg_id_value_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="self">self</span>.<span class="ident">alg_id_range</span>.<span class="ident">start</span>..<span class="self">self</span>.<span class="ident">alg_id_range</span>.<span class="ident">end</span>]
+    <span class="kw">fn </span>alg_id_value_(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.bytes[<span class="self">self</span>.alg_id_range.start..<span class="self">self</span>.alg_id_range.end]
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">curve_oid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">untrusted::Input</span> {
-        <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">alg_id_value_</span>()[<span class="self">self</span>.<span class="ident">curve_id_index</span>..])
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>curve_oid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; untrusted::Input {
+        untrusted::Input::from(<span class="kw-2">&amp;</span><span class="self">self</span>.alg_id_value_()[<span class="self">self</span>.curve_id_index..])
     }
 }
 
-<span class="doccomment">/// Parses an unencrypted PKCS#8 private key, verifies that it is the right type</span>
-<span class="doccomment">/// of key, and returns the key value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// PKCS#8 is specified in [RFC 5958].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 5958]: https://tools.ietf.org/html/rfc5958.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unwrap_key</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">template</span>: <span class="kw-2">&amp;</span><span class="ident">Template</span>,
-    <span class="ident">version</span>: <span class="ident">Version</span>,
-    <span class="ident">input</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-    <span class="ident">unwrap_key_</span>(<span class="ident">template</span>.<span class="ident">alg_id_value</span>(), <span class="ident">version</span>, <span class="ident">input</span>)
+<span class="doccomment">/// Parses an unencrypted PKCS#8 private key, verifies that it is the right type
+/// of key, and returns the key value.
+///
+/// PKCS#8 is specified in [RFC 5958].
+///
+/// [RFC 5958]: https://tools.ietf.org/html/rfc5958.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unwrap_key&lt;<span class="lifetime">&#39;a</span>&gt;(
+    template: <span class="kw-2">&amp;</span>Template,
+    version: Version,
+    input: untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="prelude-ty">Option</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;&gt;), error::KeyRejected&gt; {
+    unwrap_key_(template.alg_id_value(), version, input)
 }
 
-<span class="doccomment">/// Parses an unencrypted PKCS#8 private key, verifies that it is the right type</span>
-<span class="doccomment">/// of key, and returns the key value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `alg_id` must be the encoded value (not including the outermost `SEQUENCE`</span>
-<span class="doccomment">/// tag and length) of the `AlgorithmIdentifier` that identifies the key type.</span>
-<span class="doccomment">/// The result will be an encoded `RSAPrivateKey` or `ECPrivateKey` or similar.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// PKCS#8 is specified in [RFC 5958].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 5958]: https://tools.ietf.org/html/rfc5958.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unwrap_key_</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">alg_id</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">version</span>: <span class="ident">Version</span>,
-    <span class="ident">input</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-    <span class="ident">input</span>.<span class="ident">read_all</span>(<span class="ident">error::KeyRejected::invalid_encoding</span>(), <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-        <span class="ident">der::nested</span>(
-            <span class="ident">input</span>,
-            <span class="ident">der::Tag::Sequence</span>,
-            <span class="ident">error::KeyRejected::invalid_encoding</span>(),
-            <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">unwrap_key__</span>(<span class="ident">alg_id</span>, <span class="ident">version</span>, <span class="ident">input</span>),
+<span class="doccomment">/// Parses an unencrypted PKCS#8 private key, verifies that it is the right type
+/// of key, and returns the key value.
+///
+/// `alg_id` must be the encoded value (not including the outermost `SEQUENCE`
+/// tag and length) of the `AlgorithmIdentifier` that identifies the key type.
+/// The result will be an encoded `RSAPrivateKey` or `ECPrivateKey` or similar.
+///
+/// PKCS#8 is specified in [RFC 5958].
+///
+/// [RFC 5958]: https://tools.ietf.org/html/rfc5958.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unwrap_key_&lt;<span class="lifetime">&#39;a</span>&gt;(
+    alg_id: untrusted::Input,
+    version: Version,
+    input: untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="prelude-ty">Option</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;&gt;), error::KeyRejected&gt; {
+    input.read_all(error::KeyRejected::invalid_encoding(), |input| {
+        der::nested(
+            input,
+            der::Tag::Sequence,
+            error::KeyRejected::invalid_encoding(),
+            |input| unwrap_key__(alg_id, version, input),
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">unwrap_key__</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">alg_id</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">version</span>: <span class="ident">Version</span>,
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">actual_version</span> <span class="op">=</span> <span class="ident">der::small_nonnegative_integer</span>(<span class="ident">input</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
+<span class="kw">fn </span>unwrap_key__&lt;<span class="lifetime">&#39;a</span>&gt;(
+    alg_id: untrusted::Input,
+    version: Version,
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="prelude-ty">Option</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;&gt;), error::KeyRejected&gt; {
+    <span class="kw">let </span>actual_version = der::small_nonnegative_integer(input)
+        .map_err(|error::Unspecified| error::KeyRejected::invalid_encoding())<span class="question-mark">?</span>;
 
-    <span class="comment">// Do things in a specific order to return more useful errors:</span>
-    <span class="comment">// 1. Check for completely unsupported version.</span>
-    <span class="comment">// 2. Check for algorithm mismatch.</span>
-    <span class="comment">// 3. Check for algorithm-specific version mismatch.</span>
+    <span class="comment">// Do things in a specific order to return more useful errors:
+    // 1. Check for completely unsupported version.
+    // 2. Check for algorithm mismatch.
+    // 3. Check for algorithm-specific version mismatch.
 
-    <span class="kw">if</span> <span class="ident">actual_version</span> <span class="op">&gt;</span> <span class="number">1</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::KeyRejected::version_not_supported</span>());
+    </span><span class="kw">if </span>actual_version &gt; <span class="number">1 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::KeyRejected::version_not_supported());
     };
 
-    <span class="kw">let</span> <span class="ident">actual_alg_id</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">der::Tag::Sequence</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">actual_alg_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">alg_id</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::KeyRejected::wrong_algorithm</span>());
+    <span class="kw">let </span>actual_alg_id = der::expect_tag_and_get_value(input, der::Tag::Sequence)
+        .map_err(|error::Unspecified| error::KeyRejected::invalid_encoding())<span class="question-mark">?</span>;
+    <span class="kw">if </span>actual_alg_id != alg_id {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::KeyRejected::wrong_algorithm());
     }
 
-    <span class="kw">let</span> <span class="ident">require_public_key</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">actual_version</span>, <span class="ident">version</span>) {
-        (<span class="number">0</span>, <span class="ident">Version::V1Only</span>) =&gt; <span class="bool-val">false</span>,
-        (<span class="number">0</span>, <span class="ident">Version::V1OrV2</span>) =&gt; <span class="bool-val">false</span>,
-        (<span class="number">1</span>, <span class="ident">Version::V1OrV2</span>) <span class="op">|</span> (<span class="number">1</span>, <span class="ident">Version::V2Only</span>) =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::KeyRejected::version_not_supported</span>());
+    <span class="kw">let </span>require_public_key = <span class="kw">match </span>(actual_version, version) {
+        (<span class="number">0</span>, Version::V1Only) =&gt; <span class="bool-val">false</span>,
+        (<span class="number">0</span>, Version::V1OrV2) =&gt; <span class="bool-val">false</span>,
+        (<span class="number">1</span>, Version::V1OrV2) | (<span class="number">1</span>, Version::V2Only) =&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::KeyRejected::version_not_supported());
         }
     };
 
-    <span class="kw">let</span> <span class="ident">private_key</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">der::Tag::OctetString</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
+    <span class="kw">let </span>private_key = der::expect_tag_and_get_value(input, der::Tag::OctetString)
+        .map_err(|error::Unspecified| error::KeyRejected::invalid_encoding())<span class="question-mark">?</span>;
 
-    <span class="comment">// Ignore any attributes that are present.</span>
-    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">der::Tag::ContextSpecificConstructed0</span> <span class="kw">as</span> <span class="ident">u8</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">der::Tag::ContextSpecificConstructed0</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
+    <span class="comment">// Ignore any attributes that are present.
+    </span><span class="kw">if </span>input.peek(der::Tag::ContextSpecificConstructed0 <span class="kw">as </span>u8) {
+        <span class="kw">let _ </span>= der::expect_tag_and_get_value(input, der::Tag::ContextSpecificConstructed0)
+            .map_err(|error::Unspecified| error::KeyRejected::invalid_encoding())<span class="question-mark">?</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">require_public_key</span> {
-        <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">at_end</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::KeyRejected::public_key_is_missing</span>());
+    <span class="kw">let </span>public_key = <span class="kw">if </span>require_public_key {
+        <span class="kw">if </span>input.at_end() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::KeyRejected::public_key_is_missing());
         }
-        <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">der::nested</span>(
-            <span class="ident">input</span>,
-            <span class="ident">der::Tag::ContextSpecificConstructed1</span>,
-            <span class="ident">error::Unspecified</span>,
-            <span class="ident">der::bit_string_with_no_unused_bits</span>,
+        <span class="kw">let </span>public_key = der::nested(
+            input,
+            der::Tag::ContextSpecificConstructed1,
+            error::Unspecified,
+            der::bit_string_with_no_unused_bits,
         )
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">public_key</span>)
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    };
+        .map_err(|error::Unspecified| error::KeyRejected::invalid_encoding())<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(public_key)
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>};
 
-    <span class="prelude-val">Ok</span>((<span class="ident">private_key</span>, <span class="ident">public_key</span>))
+    <span class="prelude-val">Ok</span>((private_key, public_key))
 }
 
-<span class="doccomment">/// A generated PKCS#8 document.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Document</span> {
-    <span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="ident">ec::PKCS8_DOCUMENT_MAX_LEN</span>],
-    <span class="ident">len</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// A generated PKCS#8 document.
+</span><span class="kw">pub struct </span>Document {
+    bytes: [u8; ec::PKCS8_DOCUMENT_MAX_LEN],
+    len: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Document</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[..<span class="self">self</span>.<span class="ident">len</span>]
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>Document {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.bytes[..<span class="self">self</span>.len]
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wrap_key</span>(<span class="ident">template</span>: <span class="kw-2">&amp;</span><span class="ident">Template</span>, <span class="ident">private_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">public_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Document</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Document</span> {
-        <span class="ident">bytes</span>: [<span class="number">0</span>; <span class="ident">ec::PKCS8_DOCUMENT_MAX_LEN</span>],
-        <span class="ident">len</span>: <span class="ident">template</span>.<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">private_key</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">public_key</span>.<span class="ident">len</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>wrap_key(template: <span class="kw-2">&amp;</span>Template, private_key: <span class="kw-2">&amp;</span>[u8], public_key: <span class="kw-2">&amp;</span>[u8]) -&gt; Document {
+    <span class="kw">let </span><span class="kw-2">mut </span>result = Document {
+        bytes: [<span class="number">0</span>; ec::PKCS8_DOCUMENT_MAX_LEN],
+        len: template.bytes.len() + private_key.len() + public_key.len(),
     };
-    <span class="ident">wrap_key_</span>(
-        <span class="ident">template</span>,
-        <span class="ident">private_key</span>,
-        <span class="ident">public_key</span>,
-        <span class="kw-2">&amp;mut</span> <span class="ident">result</span>.<span class="ident">bytes</span>[..<span class="ident">result</span>.<span class="ident">len</span>],
+    wrap_key_(
+        template,
+        private_key,
+        public_key,
+        <span class="kw-2">&amp;mut </span>result.bytes[..result.len],
     );
-    <span class="ident">result</span>
+    result
 }
 
-<span class="doccomment">/// Formats a private key &quot;prefix||private_key||middle||public_key&quot; where</span>
-<span class="doccomment">/// `template` is &quot;prefix||middle&quot; split at position `private_key_index`.</span>
-<span class="kw">fn</span> <span class="ident">wrap_key_</span>(<span class="ident">template</span>: <span class="kw-2">&amp;</span><span class="ident">Template</span>, <span class="ident">private_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">public_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) {
-    <span class="kw">let</span> (<span class="ident">before_private_key</span>, <span class="ident">after_private_key</span>) <span class="op">=</span>
-        <span class="ident">template</span>.<span class="ident">bytes</span>.<span class="ident">split_at</span>(<span class="ident">template</span>.<span class="ident">private_key_index</span>);
-    <span class="kw">let</span> <span class="ident">private_key_end_index</span> <span class="op">=</span> <span class="ident">template</span>.<span class="ident">private_key_index</span> <span class="op">+</span> <span class="ident">private_key</span>.<span class="ident">len</span>();
-    <span class="ident">bytes</span>[..<span class="ident">template</span>.<span class="ident">private_key_index</span>].<span class="ident">copy_from_slice</span>(<span class="ident">before_private_key</span>);
-    <span class="ident">bytes</span>[<span class="ident">template</span>.<span class="ident">private_key_index</span>..<span class="ident">private_key_end_index</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">private_key</span>);
-    <span class="ident">bytes</span>[<span class="ident">private_key_end_index</span>..(<span class="ident">private_key_end_index</span> <span class="op">+</span> <span class="ident">after_private_key</span>.<span class="ident">len</span>())]
-        .<span class="ident">copy_from_slice</span>(<span class="ident">after_private_key</span>);
-    <span class="ident">bytes</span>[(<span class="ident">private_key_end_index</span> <span class="op">+</span> <span class="ident">after_private_key</span>.<span class="ident">len</span>())..].<span class="ident">copy_from_slice</span>(<span class="ident">public_key</span>);
+<span class="doccomment">/// Formats a private key &quot;prefix||private_key||middle||public_key&quot; where
+/// `template` is &quot;prefix||middle&quot; split at position `private_key_index`.
+</span><span class="kw">fn </span>wrap_key_(template: <span class="kw-2">&amp;</span>Template, private_key: <span class="kw-2">&amp;</span>[u8], public_key: <span class="kw-2">&amp;</span>[u8], bytes: <span class="kw-2">&amp;mut </span>[u8]) {
+    <span class="kw">let </span>(before_private_key, after_private_key) =
+        template.bytes.split_at(template.private_key_index);
+    <span class="kw">let </span>private_key_end_index = template.private_key_index + private_key.len();
+    bytes[..template.private_key_index].copy_from_slice(before_private_key);
+    bytes[template.private_key_index..private_key_end_index].copy_from_slice(<span class="kw-2">&amp;</span>private_key);
+    bytes[private_key_end_index..(private_key_end_index + after_private_key.len())]
+        .copy_from_slice(after_private_key);
+    bytes[(private_key_end_index + after_private_key.len())..].copy_from_slice(public_key);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

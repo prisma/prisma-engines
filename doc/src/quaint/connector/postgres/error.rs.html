@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/postgres/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../quaint/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/postgres/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../quaint/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -368,327 +368,327 @@
 <span id="368">368</span>
 <span id="369">369</span>
 <span id="370">370</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">DatabaseConstraint</span>, <span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="ident">Name</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::{DatabaseConstraint, Error, ErrorKind, Name};
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tokio_postgres::error::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">tokio_postgres::error::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="kw">use</span> <span class="ident">tokio_postgres::error::DbError</span>;
+<span class="kw">impl </span>From&lt;tokio_postgres::error::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(e: tokio_postgres::error::Error) -&gt; Error {
+        <span class="kw">use </span>tokio_postgres::error::DbError;
 
-        <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is_closed</span>() {
-            <span class="kw">return</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ConnectionClosed</span>).<span class="ident">build</span>();
+        <span class="kw">if </span>e.is_closed() {
+            <span class="kw">return </span>Error::builder(ErrorKind::ConnectionClosed).build();
         }
 
-        <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">code</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">code</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;22001&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
+        <span class="kw">match </span>e.code().map(|c| c.code()) {
+            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;22001&quot; </span>=&gt; {
+                <span class="kw">let </span>code = code.to_string();
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::LengthMismatch</span> {
-                    <span class="ident">column</span>: <span class="ident">Name::Unavailable</span>,
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::LengthMismatch {
+                    column: Name::Unavailable,
                 });
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                builder.set_original_code(code);
 
-                <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">db_error</span>) <span class="op">=</span> <span class="ident">db_error</span> {
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">db_error</span>.<span class="ident">to_string</span>());
+                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(db_error) = db_error {
+                    builder.set_original_message(db_error.to_string());
                 }
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;23505&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
+            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;23505&quot; </span>=&gt; {
+                <span class="kw">let </span>code = code.to_string();
 
-                <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
-                <span class="kw">let</span> <span class="ident">detail</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">detail</span>()).<span class="ident">map</span>(<span class="ident">ToString::to_string</span>);
+                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
+                <span class="kw">let </span>detail = db_error.as_ref().and_then(|e| e.detail()).map(ToString::to_string);
 
-                <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">detail</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">split</span>(<span class="string">&quot;)=(&quot;</span>).<span class="ident">next</span>())
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">split</span>(<span class="string">&quot; (&quot;</span>).<span class="ident">nth</span>(<span class="number">1</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">replace</span>(<span class="string">&#39;\&quot;&#39;</span>, <span class="string">&quot;&quot;</span>)))
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">DatabaseConstraint::fields</span>(<span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&quot;, &quot;</span>)))
-                    .<span class="ident">unwrap_or</span>(<span class="ident">DatabaseConstraint::CannotParse</span>);
+                <span class="kw">let </span>constraint = detail
+                    .as_ref()
+                    .and_then(|d| d.split(<span class="string">&quot;)=(&quot;</span>).next())
+                    .and_then(|d| d.split(<span class="string">&quot; (&quot;</span>).nth(<span class="number">1</span>).map(|s| s.replace(<span class="string">&#39;\&quot;&#39;</span>, <span class="string">&quot;&quot;</span>)))
+                    .map(|s| DatabaseConstraint::fields(s.split(<span class="string">&quot;, &quot;</span>)))
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::UniqueConstraintViolation</span> { <span class="ident">constraint</span> };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                <span class="kw">let </span>kind = ErrorKind::UniqueConstraintViolation { constraint };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                builder.set_original_code(code);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">detail</span>) <span class="op">=</span> <span class="ident">detail</span> {
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">detail</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(detail) = detail {
+                    builder.set_original_message(detail);
                 }
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
-            <span class="comment">// Even lipstick will not save this...</span>
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;23502&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
+            <span class="comment">// Even lipstick will not save this...
+            </span><span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;23502&quot; </span>=&gt; {
+                <span class="kw">let </span>code = code.to_string();
 
-                <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
-                <span class="kw">let</span> <span class="ident">detail</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">detail</span>()).<span class="ident">map</span>(<span class="ident">ToString::to_string</span>);
+                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
+                <span class="kw">let </span>detail = db_error.as_ref().and_then(|e| e.detail()).map(ToString::to_string);
 
-                <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">db_error</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">column</span>())
-                    .<span class="ident">map</span>(<span class="ident">DatabaseConstraint::fields</span>)
-                    .<span class="ident">unwrap_or</span>(<span class="ident">DatabaseConstraint::CannotParse</span>);
+                <span class="kw">let </span>constraint = db_error
+                    .as_ref()
+                    .map(|e| e.column())
+                    .map(DatabaseConstraint::fields)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::NullConstraintViolation</span> { <span class="ident">constraint</span> };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                <span class="kw">let </span>kind = ErrorKind::NullConstraintViolation { constraint };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                builder.set_original_code(code);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">detail</span>) <span class="op">=</span> <span class="ident">detail</span> {
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">detail</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(detail) = detail {
+                    builder.set_original_message(detail);
                 }
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;23503&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
-                <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
+            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;23503&quot; </span>=&gt; {
+                <span class="kw">let </span>code = code.to_string();
+                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
 
-                <span class="kw">match</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">column</span>()) {
-                    <span class="prelude-val">Some</span>(<span class="ident">column</span>) =&gt; {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ForeignKeyConstraintViolation</span> {
-                            <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint::fields</span>(<span class="prelude-val">Some</span>(<span class="ident">column</span>)),
+                <span class="kw">match </span>db_error.as_ref().and_then(|e| e.column()) {
+                    <span class="prelude-val">Some</span>(column) =&gt; {
+                        <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
+                            constraint: DatabaseConstraint::fields(<span class="prelude-val">Some</span>(column)),
                         });
 
-                        <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                        builder.set_original_code(code);
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>()) {
-                            <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">message</span>);
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = db_error.as_ref().map(|e| e.message()) {
+                            builder.set_original_message(message);
                         }
 
-                        <span class="ident">builder</span>.<span class="ident">build</span>()
+                        builder.build()
                     }
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">db_error</span>
-                            .<span class="ident">as_ref</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>())
-                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">split_whitespace</span>().<span class="ident">nth</span>(<span class="number">10</span>))
-                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;&quot;&#39;</span>).<span class="ident">nth</span>(<span class="number">1</span>))
-                            .<span class="ident">map</span>(<span class="ident">ToString::to_string</span>)
-                            .<span class="ident">map</span>(<span class="ident">DatabaseConstraint::Index</span>)
-                            .<span class="ident">unwrap_or</span>(<span class="ident">DatabaseConstraint::CannotParse</span>);
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="kw">let </span>constraint = db_error
+                            .as_ref()
+                            .map(|e| e.message())
+                            .and_then(|e| e.split_whitespace().nth(<span class="number">10</span>))
+                            .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
+                            .map(ToString::to_string)
+                            .map(DatabaseConstraint::Index)
+                            .unwrap_or(DatabaseConstraint::CannotParse);
 
-                        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::ForeignKeyConstraintViolation</span> { <span class="ident">constraint</span> };
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                        <span class="kw">let </span>kind = ErrorKind::ForeignKeyConstraintViolation { constraint };
+                        <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                        <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                        builder.set_original_code(code);
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>()) {
-                            <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">message</span>);
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = db_error.as_ref().map(|e| e.message()) {
+                            builder.set_original_message(message);
                         }
 
-                        <span class="ident">builder</span>.<span class="ident">build</span>()
+                        builder.build()
                     }
                 }
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;3D000&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
-                <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
+            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;3D000&quot; </span>=&gt; {
+                <span class="kw">let </span>code = code.to_string();
+                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
+                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
 
-                <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">message</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split_whitespace</span>().<span class="ident">nth</span>(<span class="number">1</span>))
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;&quot;&#39;</span>).<span class="ident">nth</span>(<span class="number">1</span>))
-                    .<span class="ident">into</span>();
+                <span class="kw">let </span>db_name = message
+                    .as_ref()
+                    .and_then(|s| s.split_whitespace().nth(<span class="number">1</span>))
+                    .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
+                    .into();
 
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::DatabaseDoesNotExist</span> { <span class="ident">db_name</span> };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                <span class="kw">let </span>kind = ErrorKind::DatabaseDoesNotExist { db_name };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                builder.set_original_code(code);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">message</span> {
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">message</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
+                    builder.set_original_message(message);
                 }
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;28000&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
-                <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
+            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;28000&quot; </span>=&gt; {
+                <span class="kw">let </span>code = code.to_string();
+                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
+                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
 
-                <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">message</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">split_whitespace</span>().<span class="ident">nth</span>(<span class="number">5</span>))
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;&quot;&#39;</span>).<span class="ident">nth</span>(<span class="number">1</span>))
-                    .<span class="ident">into</span>();
+                <span class="kw">let </span>db_name = message
+                    .as_ref()
+                    .and_then(|m| m.split_whitespace().nth(<span class="number">5</span>))
+                    .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
+                    .into();
 
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::DatabaseAccessDenied</span> { <span class="ident">db_name</span> };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                <span class="kw">let </span>kind = ErrorKind::DatabaseAccessDenied { db_name };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                builder.set_original_code(code);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">message</span> {
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">message</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
+                    builder.set_original_message(message);
                 }
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;28P01&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
-                <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
+            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;28P01&quot; </span>=&gt; {
+                <span class="kw">let </span>code = code.to_string();
+                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
+                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
 
-                <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">message</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">split_whitespace</span>().<span class="ident">last</span>())
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;&quot;&#39;</span>).<span class="ident">nth</span>(<span class="number">1</span>))
-                    .<span class="ident">into</span>();
+                <span class="kw">let </span>user = message
+                    .as_ref()
+                    .and_then(|m| m.split_whitespace().last())
+                    .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
+                    .into();
 
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::AuthenticationFailed</span> { <span class="ident">user</span> };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                <span class="kw">let </span>kind = ErrorKind::AuthenticationFailed { user };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                builder.set_original_code(code);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">message</span> {
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">message</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
+                    builder.set_original_message(message);
                 }
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;40001&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
-                <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::TransactionWriteConflict</span>);
+            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;40001&quot; </span>=&gt; {
+                <span class="kw">let </span>code = code.to_string();
+                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
+                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::TransactionWriteConflict);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                builder.set_original_code(code);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">message</span> {
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">message</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
+                    builder.set_original_message(message);
                 }
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;42P01&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
-                <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
+            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;42P01&quot; </span>=&gt; {
+                <span class="kw">let </span>code = code.to_string();
+                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
+                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
 
-                <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">message</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">split_whitespace</span>().<span class="ident">nth</span>(<span class="number">1</span>))
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;&quot;&#39;</span>).<span class="ident">nth</span>(<span class="number">1</span>))
-                    .<span class="ident">into</span>();
+                <span class="kw">let </span>table = message
+                    .as_ref()
+                    .and_then(|m| m.split_whitespace().nth(<span class="number">1</span>))
+                    .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
+                    .into();
 
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::TableDoesNotExist</span> { <span class="ident">table</span> };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                <span class="kw">let </span>kind = ErrorKind::TableDoesNotExist { table };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                builder.set_original_code(code);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">message</span> {
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">message</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
+                    builder.set_original_message(message);
                 }
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;42703&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
-                <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
+            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;42703&quot; </span>=&gt; {
+                <span class="kw">let </span>code = code.to_string();
+                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
+                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
 
-                <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">message</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">split_whitespace</span>().<span class="ident">nth</span>(<span class="number">1</span>))
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;\&quot;&#39;</span>))
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> (<span class="ident">s</span>.<span class="ident">next</span>(), <span class="ident">s</span>.<span class="ident">next</span>()) {
-                        (<span class="prelude-val">Some</span>(<span class="ident">column</span>), <span class="kw">_</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">column</span>.<span class="ident">is_empty</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">column</span>),
-                        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">column</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">column</span>.<span class="ident">is_empty</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">column</span>),
+                <span class="kw">let </span>column = message
+                    .as_ref()
+                    .and_then(|m| m.split_whitespace().nth(<span class="number">1</span>))
+                    .map(|s| s.split(<span class="string">&#39;\&quot;&#39;</span>))
+                    .and_then(|<span class="kw-2">mut </span>s| <span class="kw">match </span>(s.next(), s.next()) {
+                        (<span class="prelude-val">Some</span>(column), <span class="kw">_</span>) <span class="kw">if </span>!column.is_empty() =&gt; <span class="prelude-val">Some</span>(column),
+                        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(column)) <span class="kw">if </span>!column.is_empty() =&gt; <span class="prelude-val">Some</span>(column),
                         (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     })
-                    .<span class="ident">into</span>();
+                    .into();
 
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::ColumnNotFound</span> { <span class="ident">column</span> };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                <span class="kw">let </span>kind = ErrorKind::ColumnNotFound { column };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                builder.set_original_code(code);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">message</span> {
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">message</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
+                    builder.set_original_message(message);
                 }
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
 
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;42P04&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
-                <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
+            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;42P04&quot; </span>=&gt; {
+                <span class="kw">let </span>code = code.to_string();
+                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
+                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
 
-                <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">message</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">split_whitespace</span>().<span class="ident">nth</span>(<span class="number">1</span>))
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;&quot;&#39;</span>).<span class="ident">nth</span>(<span class="number">1</span>))
-                    .<span class="ident">into</span>();
+                <span class="kw">let </span>db_name = message
+                    .as_ref()
+                    .and_then(|m| m.split_whitespace().nth(<span class="number">1</span>))
+                    .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
+                    .into();
 
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::DatabaseAlreadyExists</span> { <span class="ident">db_name</span> };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                <span class="kw">let </span>kind = ErrorKind::DatabaseAlreadyExists { db_name };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                builder.set_original_code(code);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">message</span> {
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">message</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
+                    builder.set_original_message(message);
                 }
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
-            <span class="ident">code</span> =&gt; {
-                <span class="comment">// This is necessary, on top of the other conversions, for the cases where a</span>
-                <span class="comment">// native_tls error comes wrapped in a tokio_postgres error.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">tls_error</span>) <span class="op">=</span> <span class="ident">try_extracting_tls_error</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>) {
-                    <span class="kw">return</span> <span class="ident">tls_error</span>;
+            code =&gt; {
+                <span class="comment">// This is necessary, on top of the other conversions, for the cases where a
+                // native_tls error comes wrapped in a tokio_postgres error.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(tls_error) = try_extracting_tls_error(<span class="kw-2">&amp;</span>e) {
+                    <span class="kw">return </span>tls_error;
                 }
 
-                <span class="comment">// Same for IO errors.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">io_error</span>) <span class="op">=</span> <span class="ident">try_extracting_io_error</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>) {
-                    <span class="kw">return</span> <span class="ident">io_error</span>;
+                <span class="comment">// Same for IO errors.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(io_error) = try_extracting_io_error(<span class="kw-2">&amp;</span>e) {
+                    <span class="kw">return </span>io_error;
                 }
 
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">uuid_error</span>) <span class="op">=</span> <span class="ident">try_extracting_uuid_error</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>) {
-                    <span class="kw">return</span> <span class="ident">uuid_error</span>;
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(uuid_error) = try_extracting_uuid_error(<span class="kw-2">&amp;</span>e) {
+                    <span class="kw">return </span>uuid_error;
                 }
 
-                <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>);
+                <span class="kw">let </span>reason = <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, e);
 
-                <span class="kw">match</span> <span class="ident">reason</span>.<span class="ident">as_str</span>() {
-                    <span class="string">&quot;error connecting to server: timed out&quot;</span> =&gt; {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ConnectTimeout</span>);
+                <span class="kw">match </span>reason.as_str() {
+                    <span class="string">&quot;error connecting to server: timed out&quot; </span>=&gt; {
+                        <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ConnectTimeout);
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="op">=</span> <span class="ident">code</span> {
-                            <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(code) = code {
+                            builder.set_original_code(code);
                         };
 
-                        <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">reason</span>);
-                        <span class="ident">builder</span>.<span class="ident">build</span>()
-                    } <span class="comment">// sigh...</span>
-                    <span class="comment">// https://github.com/sfackler/rust-postgres/blob/0c84ed9f8201f4e5b4803199a24afa2c9f3723b2/tokio-postgres/src/connect_tls.rs#L37</span>
-                    <span class="string">&quot;error performing TLS handshake: server does not support TLS&quot;</span> =&gt; {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::TlsError</span> {
-                            <span class="ident">message</span>: <span class="ident">reason</span>.<span class="ident">clone</span>(),
+                        builder.set_original_message(reason);
+                        builder.build()
+                    } <span class="comment">// sigh...
+                    // https://github.com/sfackler/rust-postgres/blob/0c84ed9f8201f4e5b4803199a24afa2c9f3723b2/tokio-postgres/src/connect_tls.rs#L37
+                    </span><span class="string">&quot;error performing TLS handshake: server does not support TLS&quot; </span>=&gt; {
+                        <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::TlsError {
+                            message: reason.clone(),
                         });
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="op">=</span> <span class="ident">code</span> {
-                            <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(code) = code {
+                            builder.set_original_code(code);
                         };
 
-                        <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">reason</span>);
-                        <span class="ident">builder</span>.<span class="ident">build</span>()
-                    } <span class="comment">// double sigh</span>
-                    <span class="kw">_</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">to_string</span>());
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()));
+                        builder.set_original_message(reason);
+                        builder.build()
+                    } <span class="comment">// double sigh
+                    </span><span class="kw">_ </span>=&gt; {
+                        <span class="kw">let </span>code = code.map(|c| c.to_string());
+                        <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::QueryError(e.into()));
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="op">=</span> <span class="ident">code</span> {
-                            <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="ident">code</span>);
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(code) = code {
+                            builder.set_original_code(code);
                         };
 
-                        <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">reason</span>);
-                        <span class="ident">builder</span>.<span class="ident">build</span>()
+                        builder.set_original_message(reason);
+                        builder.build()
                     }
                 }
             }
@@ -696,47 +696,47 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">try_extracting_uuid_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">tokio_postgres::error::Error</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="kw">_</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+</span><span class="kw">fn </span>try_extracting_uuid_error(err: <span class="kw-2">&amp;</span>tokio_postgres::error::Error) -&gt; <span class="prelude-ty">Option</span>&lt;Error&gt; {
+    <span class="kw">use </span>std::error::Error <span class="kw">as _</span>;
 
-    <span class="ident">err</span>.<span class="ident">source</span>()
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">uuid::Error</span><span class="op">&gt;</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ErrorKind::UUIDError</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>)))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">kind</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>())
+    err.source()
+        .and_then(|err| err.downcast_ref::&lt;uuid::Error&gt;())
+        .map(|err| ErrorKind::UUIDError(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, err)))
+        .map(|kind| Error::builder(kind).build())
 }
 
-<span class="kw">fn</span> <span class="ident">try_extracting_tls_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">tokio_postgres::error::Error</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">std::error::Error</span>;
+<span class="kw">fn </span>try_extracting_tls_error(err: <span class="kw-2">&amp;</span>tokio_postgres::error::Error) -&gt; <span class="prelude-ty">Option</span>&lt;Error&gt; {
+    <span class="kw">use </span>std::error::Error;
 
-    <span class="ident">err</span>.<span class="ident">source</span>()
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">native_tls::Error</span><span class="op">&gt;</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">into</span>())
+    err.source()
+        .and_then(|err| err.downcast_ref::&lt;native_tls::Error&gt;())
+        .map(|err| err.into())
 }
 
-<span class="kw">fn</span> <span class="ident">try_extracting_io_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">tokio_postgres::error::Error</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="kw">_</span>;
+<span class="kw">fn </span>try_extracting_io_error(err: <span class="kw-2">&amp;</span>tokio_postgres::error::Error) -&gt; <span class="prelude-ty">Option</span>&lt;Error&gt; {
+    <span class="kw">use </span>std::error::Error <span class="kw">as _</span>;
 
-    <span class="ident">err</span>.<span class="ident">source</span>()
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">std::io::Error</span><span class="op">&gt;</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ErrorKind::ConnectionError</span>(<span class="ident">Box::new</span>(<span class="ident">std::io::Error::new</span>(<span class="ident">err</span>.<span class="ident">kind</span>(), <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>)))))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">kind</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>())
+    err.source()
+        .and_then(|err| err.downcast_ref::&lt;std::io::Error&gt;())
+        .map(|err| ErrorKind::ConnectionError(Box::new(std::io::Error::new(err.kind(), <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, err)))))
+        .map(|kind| Error::builder(kind).build())
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">native_tls::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">native_tls::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::from</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>)
+<span class="kw">impl </span>From&lt;native_tls::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(e: native_tls::Error) -&gt; Error {
+        Error::from(<span class="kw-2">&amp;</span>e)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">native_tls::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="ident">native_tls::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::TlsError</span> {
-            <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>),
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>native_tls::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(e: <span class="kw-2">&amp;</span>native_tls::Error) -&gt; Error {
+        <span class="kw">let </span>kind = ErrorKind::TlsError {
+            message: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, e),
         };
 
-        <span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>()
+        Error::builder(kind).build()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

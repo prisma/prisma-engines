@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pest-2.3.0/src/parser_state.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser_state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pest/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pest-2.3.0/src/parser_state.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser_state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pest/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1236,1243 +1236,1243 @@
 <span id="1236">1236</span>
 <span id="1237">1237</span>
 <span id="1238">1238</span>
-</pre><pre class="rust"><code><span class="comment">// pest. The Elegant Parser</span>
-<span class="comment">// Copyright (c) 2018 Dragoș Tiselice</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// pest. The Elegant Parser
+// Copyright (c) 2018 Dragoș Tiselice
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">alloc::borrow::ToOwned</span>;
-<span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
-<span class="kw">use</span> <span class="ident">alloc::rc::Rc</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">core::num::NonZeroUsize</span>;
-<span class="kw">use</span> <span class="ident">core::ops::Range</span>;
-<span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
+</span><span class="kw">use </span>alloc::borrow::ToOwned;
+<span class="kw">use </span>alloc::boxed::Box;
+<span class="kw">use </span>alloc::rc::Rc;
+<span class="kw">use </span>alloc::vec;
+<span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>core::num::NonZeroUsize;
+<span class="kw">use </span>core::ops::Range;
+<span class="kw">use </span>core::sync::atomic::{AtomicUsize, Ordering};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorVariant</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::iterators</span>::{<span class="ident">pairs</span>, <span class="ident">QueueableToken</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::position</span>::{<span class="self">self</span>, <span class="ident">Position</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::span::Span</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::stack::Stack</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RuleType</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::{Error, ErrorVariant};
+<span class="kw">use </span><span class="kw">crate</span>::iterators::{pairs, QueueableToken};
+<span class="kw">use </span><span class="kw">crate</span>::position::{<span class="self">self</span>, Position};
+<span class="kw">use </span><span class="kw">crate</span>::span::Span;
+<span class="kw">use </span><span class="kw">crate</span>::stack::Stack;
+<span class="kw">use </span><span class="kw">crate</span>::RuleType;
 
-<span class="doccomment">/// The current lookahead status of a [`ParserState`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ParserState`]: struct.ParserState.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Lookahead</span> {
-    <span class="ident">Positive</span>,
-    <span class="ident">Negative</span>,
+<span class="doccomment">/// The current lookahead status of a [`ParserState`].
+///
+/// [`ParserState`]: struct.ParserState.html
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>Lookahead {
+    Positive,
+    Negative,
     <span class="prelude-val">None</span>,
 }
 
-<span class="doccomment">/// The current atomicity of a [`ParserState`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ParserState`]: struct.ParserState.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Atomicity</span> {
-    <span class="ident">Atomic</span>,
-    <span class="ident">CompoundAtomic</span>,
-    <span class="ident">NonAtomic</span>,
+<span class="doccomment">/// The current atomicity of a [`ParserState`].
+///
+/// [`ParserState`]: struct.ParserState.html
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>Atomicity {
+    Atomic,
+    CompoundAtomic,
+    NonAtomic,
 }
 
-<span class="doccomment">/// Type alias to simplify specifying the return value of chained closures.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">S</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Type alias to simplify specifying the return value of chained closures.
+</span><span class="kw">pub type </span>ParseResult&lt;S&gt; = <span class="prelude-ty">Result</span>&lt;S, S&gt;;
 
-<span class="doccomment">/// Match direction for the stack. Used in `PEEK[a..b]`/`stack_match_peek_slice`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MatchDir</span> {
-    <span class="ident">BottomToTop</span>,
-    <span class="ident">TopToBottom</span>,
+<span class="doccomment">/// Match direction for the stack. Used in `PEEK[a..b]`/`stack_match_peek_slice`.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>MatchDir {
+    BottomToTop,
+    TopToBottom,
 }
 
-<span class="kw">static</span> <span class="ident">CALL_LIMIT</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+<span class="kw">static </span>CALL_LIMIT: AtomicUsize = AtomicUsize::new(<span class="number">0</span>);
 
-<span class="doccomment">/// Sets the maximum call limit for the parser state</span>
-<span class="doccomment">/// to prevent stack overflows or excessive execution times</span>
-<span class="doccomment">/// in some grammars.</span>
-<span class="doccomment">/// If set, the calls are tracked as a running total</span>
-<span class="doccomment">/// over all non-terminal rules that can nest closures</span>
-<span class="doccomment">/// (which are passed to transform the parser state).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Arguments</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `limit` - The maximum number of calls. If None,</span>
-<span class="doccomment">///             the number of calls is unlimited.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_call_limit</span>(<span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroUsize</span><span class="op">&gt;</span>) {
-    <span class="ident">CALL_LIMIT</span>.<span class="ident">store</span>(<span class="ident">limit</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">get</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>), <span class="ident">Ordering::Relaxed</span>);
+<span class="doccomment">/// Sets the maximum call limit for the parser state
+/// to prevent stack overflows or excessive execution times
+/// in some grammars.
+/// If set, the calls are tracked as a running total
+/// over all non-terminal rules that can nest closures
+/// (which are passed to transform the parser state).
+///
+/// # Arguments
+///
+/// * `limit` - The maximum number of calls. If None,
+///             the number of calls is unlimited.
+</span><span class="kw">pub fn </span>set_call_limit(limit: <span class="prelude-ty">Option</span>&lt;NonZeroUsize&gt;) {
+    CALL_LIMIT.store(limit.map(|f| f.get()).unwrap_or(<span class="number">0</span>), Ordering::Relaxed);
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CallLimitTracker</span> {
-    <span class="ident">current_call_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>CallLimitTracker {
+    current_call_limit: <span class="prelude-ty">Option</span>&lt;(usize, usize)&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CallLimitTracker</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">CALL_LIMIT</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-        <span class="kw">let</span> <span class="ident">current_call_limit</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">limit</span> <span class="op">&gt;</span> <span class="number">0</span> { <span class="prelude-val">Some</span>((<span class="number">0</span>, <span class="ident">limit</span>)) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
-        <span class="self">Self</span> { <span class="ident">current_call_limit</span> }
+<span class="kw">impl </span>Default <span class="kw">for </span>CallLimitTracker {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>limit = CALL_LIMIT.load(Ordering::Relaxed);
+        <span class="kw">let </span>current_call_limit = <span class="kw">if </span>limit &gt; <span class="number">0 </span>{ <span class="prelude-val">Some</span>((<span class="number">0</span>, limit)) } <span class="kw">else </span>{ <span class="prelude-val">None </span>};
+        <span class="self">Self </span>{ current_call_limit }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CallLimitTracker</span> {
-    <span class="kw">fn</span> <span class="ident">limit_reached</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">current_call_limit</span>
-            .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span>(<span class="ident">current</span>, <span class="ident">limit</span>)<span class="op">|</span> <span class="ident">current</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">limit</span>)
+<span class="kw">impl </span>CallLimitTracker {
+    <span class="kw">fn </span>limit_reached(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.current_call_limit
+            .map_or(<span class="bool-val">false</span>, |(current, limit)| current &gt;= limit)
     }
 
-    <span class="kw">fn</span> <span class="ident">increment_depth</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">current</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">current_call_limit</span> {
-            <span class="kw-2">*</span><span class="ident">current</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">fn </span>increment_depth(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((current, <span class="kw">_</span>)) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.current_call_limit {
+            <span class="kw-2">*</span>current += <span class="number">1</span>;
         }
     }
 }
 
-<span class="doccomment">/// The complete state of a [`Parser`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Parser`]: trait.Parser.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParserState</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span>: <span class="ident">RuleType</span><span class="op">&gt;</span> {
-    <span class="ident">position</span>: <span class="ident">Position</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>,
-    <span class="ident">queue</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueueableToken</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">lookahead</span>: <span class="ident">Lookahead</span>,
-    <span class="ident">pos_attempts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="ident">neg_attempts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="ident">attempt_pos</span>: <span class="ident">usize</span>,
-    <span class="ident">atomicity</span>: <span class="ident">Atomicity</span>,
-    <span class="ident">stack</span>: <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">call_tracker</span>: <span class="ident">CallLimitTracker</span>,
+<span class="doccomment">/// The complete state of a [`Parser`].
+///
+/// [`Parser`]: trait.Parser.html
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ParserState&lt;<span class="lifetime">&#39;i</span>, R: RuleType&gt; {
+    position: Position&lt;<span class="lifetime">&#39;i</span>&gt;,
+    queue: Vec&lt;QueueableToken&lt;R&gt;&gt;,
+    lookahead: Lookahead,
+    pos_attempts: Vec&lt;R&gt;,
+    neg_attempts: Vec&lt;R&gt;,
+    attempt_pos: usize,
+    atomicity: Atomicity,
+    stack: Stack&lt;Span&lt;<span class="lifetime">&#39;i</span>&gt;&gt;,
+    call_tracker: CallLimitTracker,
 }
 
-<span class="doccomment">/// Creates a `ParserState` from a `&amp;str`, supplying it to a closure `f`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use pest;</span>
-<span class="doccomment">/// let input = &quot;&quot;;</span>
-<span class="doccomment">/// pest::state::&lt;(), _&gt;(input, |s| Ok(s)).unwrap();</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">state</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span>: <span class="ident">RuleType</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">pairs::Pairs</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ParserState</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ParserState</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Creates a `ParserState` from a `&amp;str`, supplying it to a closure `f`.
+///
+/// # Examples
+///
+/// ```
+/// # use pest;
+/// let input = &quot;&quot;;
+/// pest::state::&lt;(), _&gt;(input, |s| Ok(s)).unwrap();
+/// ```
+</span><span class="kw">pub fn </span>state&lt;<span class="lifetime">&#39;i</span>, R: RuleType, F&gt;(input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;i </span>str, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;pairs::Pairs&lt;<span class="lifetime">&#39;i</span>, R&gt;, Error&lt;R&gt;&gt;
+<span class="kw">where
+    </span>F: FnOnce(Box&lt;ParserState&lt;<span class="lifetime">&#39;i</span>, R&gt;&gt;) -&gt; ParseResult&lt;Box&lt;ParserState&lt;<span class="lifetime">&#39;i</span>, R&gt;&gt;&gt;,
 {
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParserState::new</span>(<span class="ident">input</span>);
+    <span class="kw">let </span>state = ParserState::new(input);
 
-    <span class="kw">match</span> <span class="ident">f</span>(<span class="ident">state</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">state</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">queue</span>.<span class="ident">len</span>();
-            <span class="prelude-val">Ok</span>(<span class="ident">pairs::new</span>(<span class="ident">Rc::new</span>(<span class="ident">state</span>.<span class="ident">queue</span>), <span class="ident">input</span>, <span class="number">0</span>, <span class="ident">len</span>))
+    <span class="kw">match </span>f(state) {
+        <span class="prelude-val">Ok</span>(state) =&gt; {
+            <span class="kw">let </span>len = state.queue.len();
+            <span class="prelude-val">Ok</span>(pairs::new(Rc::new(state.queue), input, <span class="number">0</span>, len))
         }
-        <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">state</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">variant</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">reached_call_limit</span>() {
-                <span class="ident">ErrorVariant::CustomError</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;call limit reached&quot;</span>.<span class="ident">to_owned</span>(),
+        <span class="prelude-val">Err</span>(<span class="kw-2">mut </span>state) =&gt; {
+            <span class="kw">let </span>variant = <span class="kw">if </span>state.reached_call_limit() {
+                ErrorVariant::CustomError {
+                    message: <span class="string">&quot;call limit reached&quot;</span>.to_owned(),
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">state</span>.<span class="ident">pos_attempts</span>.<span class="ident">sort</span>();
-                <span class="ident">state</span>.<span class="ident">pos_attempts</span>.<span class="ident">dedup</span>();
-                <span class="ident">state</span>.<span class="ident">neg_attempts</span>.<span class="ident">sort</span>();
-                <span class="ident">state</span>.<span class="ident">neg_attempts</span>.<span class="ident">dedup</span>();
-                <span class="ident">ErrorVariant::ParsingError</span> {
-                    <span class="ident">positives</span>: <span class="ident">state</span>.<span class="ident">pos_attempts</span>.<span class="ident">clone</span>(),
-                    <span class="ident">negatives</span>: <span class="ident">state</span>.<span class="ident">neg_attempts</span>.<span class="ident">clone</span>(),
+            } <span class="kw">else </span>{
+                state.pos_attempts.sort();
+                state.pos_attempts.dedup();
+                state.neg_attempts.sort();
+                state.neg_attempts.dedup();
+                ErrorVariant::ParsingError {
+                    positives: state.pos_attempts.clone(),
+                    negatives: state.neg_attempts.clone(),
                 }
             };
 
-            <span class="prelude-val">Err</span>(<span class="ident">Error::new_from_pos</span>(
-                <span class="ident">variant</span>,
-                <span class="comment">// TODO(performance): Guarantee state.attempt_pos is a valid position</span>
-                <span class="ident">position::Position::new</span>(<span class="ident">input</span>, <span class="ident">state</span>.<span class="ident">attempt_pos</span>).<span class="ident">unwrap</span>(),
+            <span class="prelude-val">Err</span>(Error::new_from_pos(
+                variant,
+                <span class="comment">// TODO(performance): Guarantee state.attempt_pos is a valid position
+                </span>position::Position::new(input, state.attempt_pos).unwrap(),
             ))
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span>: <span class="ident">RuleType</span><span class="op">&gt;</span> <span class="ident">ParserState</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Allocates a fresh `ParserState` object to the heap and returns the owned `Box`. This `Box`</span>
-    <span class="doccomment">/// will be passed from closure to closure based on the needs of the specified `Parser`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// let input = &quot;&quot;;</span>
-    <span class="doccomment">/// let state: Box&lt;pest::ParserState&lt;&amp;str&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">Box::new</span>(<span class="ident">ParserState</span> {
-            <span class="ident">position</span>: <span class="ident">Position::from_start</span>(<span class="ident">input</span>),
-            <span class="ident">queue</span>: <span class="macro">vec!</span>[],
-            <span class="ident">lookahead</span>: <span class="ident">Lookahead::None</span>,
-            <span class="ident">pos_attempts</span>: <span class="macro">vec!</span>[],
-            <span class="ident">neg_attempts</span>: <span class="macro">vec!</span>[],
-            <span class="ident">attempt_pos</span>: <span class="number">0</span>,
-            <span class="ident">atomicity</span>: <span class="ident">Atomicity::NonAtomic</span>,
-            <span class="ident">stack</span>: <span class="ident">Stack::new</span>(),
-            <span class="ident">call_tracker</span>: <span class="ident">Default::default</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>, R: RuleType&gt; ParserState&lt;<span class="lifetime">&#39;i</span>, R&gt; {
+    <span class="doccomment">/// Allocates a fresh `ParserState` object to the heap and returns the owned `Box`. This `Box`
+    /// will be passed from closure to closure based on the needs of the specified `Parser`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// let input = &quot;&quot;;
+    /// let state: Box&lt;pest::ParserState&lt;&amp;str&gt;&gt; = pest::ParserState::new(input);
+    /// ```
+    </span><span class="kw">pub fn </span>new(input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;i </span>str) -&gt; Box&lt;<span class="self">Self</span>&gt; {
+        Box::new(ParserState {
+            position: Position::from_start(input),
+            queue: <span class="macro">vec!</span>[],
+            lookahead: Lookahead::None,
+            pos_attempts: <span class="macro">vec!</span>[],
+            neg_attempts: <span class="macro">vec!</span>[],
+            attempt_pos: <span class="number">0</span>,
+            atomicity: Atomicity::NonAtomic,
+            stack: Stack::new(),
+            call_tracker: Default::default(),
         })
     }
 
-    <span class="doccomment">/// Returns a reference to the current `Position` of the `ParserState`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {</span>
-    <span class="doccomment">///     ab</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let position = state.position();</span>
-    <span class="doccomment">/// assert_eq!(position.pos(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Position</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">position</span>
+    <span class="doccomment">/// Returns a reference to the current `Position` of the `ParserState`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {
+    ///     ab
+    /// }
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let position = state.position();
+    /// assert_eq!(position.pos(), 0);
+    /// ```
+    </span><span class="kw">pub fn </span>position(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Position&lt;<span class="lifetime">&#39;i</span>&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.position
     }
 
-    <span class="doccomment">/// Returns the current atomicity of the `ParserState`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # use pest::Atomicity;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {</span>
-    <span class="doccomment">///     ab</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let atomicity = state.atomicity();</span>
-    <span class="doccomment">/// assert_eq!(atomicity, Atomicity::NonAtomic);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">atomicity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Atomicity</span> {
-        <span class="self">self</span>.<span class="ident">atomicity</span>
+    <span class="doccomment">/// Returns the current atomicity of the `ParserState`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # use pest::Atomicity;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {
+    ///     ab
+    /// }
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let atomicity = state.atomicity();
+    /// assert_eq!(atomicity, Atomicity::NonAtomic);
+    /// ```
+    </span><span class="kw">pub fn </span>atomicity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Atomicity {
+        <span class="self">self</span>.atomicity
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inc_call_check_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">call_tracker</span>.<span class="ident">limit_reached</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>inc_call_check_limit(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.call_tracker.limit_reached() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="self">self</span>);
         }
-        <span class="self">self</span>.<span class="ident">call_tracker</span>.<span class="ident">increment_depth</span>();
+        <span class="self">self</span>.call_tracker.increment_depth();
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">reached_call_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">call_tracker</span>.<span class="ident">limit_reached</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>reached_call_limit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.call_tracker.limit_reached()
     }
 
-    <span class="doccomment">/// Wrapper needed to generate tokens. This will associate the `R` type rule to the closure</span>
-    <span class="doccomment">/// meant to match the rule.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {</span>
-    <span class="doccomment">///     a</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;a&quot;;</span>
-    <span class="doccomment">/// let pairs: Vec&lt;_&gt; = pest::state(input, |state| {</span>
-    <span class="doccomment">///     state.rule(Rule::a, |s| Ok(s))</span>
-    <span class="doccomment">/// }).unwrap().collect();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(pairs.len(), 1);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rule</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">rule</span>: <span class="ident">R</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Wrapper needed to generate tokens. This will associate the `R` type rule to the closure
+    /// meant to match the rule.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {
+    ///     a
+    /// }
+    ///
+    /// let input = &quot;a&quot;;
+    /// let pairs: Vec&lt;_&gt; = pest::state(input, |state| {
+    ///     state.rule(Rule::a, |s| Ok(s))
+    /// }).unwrap().collect();
+    ///
+    /// assert_eq!(pairs.len(), 1);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>rule&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, rule: R, f: F) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnOnce(Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;,
     {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inc_call_check_limit</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">actual_pos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">pos</span>();
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">len</span>();
+        <span class="self">self </span>= <span class="self">self</span>.inc_call_check_limit()<span class="question-mark">?</span>;
+        <span class="kw">let </span>actual_pos = <span class="self">self</span>.position.pos();
+        <span class="kw">let </span>index = <span class="self">self</span>.queue.len();
 
-        <span class="kw">let</span> (<span class="ident">pos_attempts_index</span>, <span class="ident">neg_attempts_index</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">actual_pos</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">attempt_pos</span> {
-            (<span class="self">self</span>.<span class="ident">pos_attempts</span>.<span class="ident">len</span>(), <span class="self">self</span>.<span class="ident">neg_attempts</span>.<span class="ident">len</span>())
-        } <span class="kw">else</span> {
-            <span class="comment">// Attempts have not been cleared yet since the attempt_pos is older.</span>
-            (<span class="number">0</span>, <span class="number">0</span>)
+        <span class="kw">let </span>(pos_attempts_index, neg_attempts_index) = <span class="kw">if </span>actual_pos == <span class="self">self</span>.attempt_pos {
+            (<span class="self">self</span>.pos_attempts.len(), <span class="self">self</span>.neg_attempts.len())
+        } <span class="kw">else </span>{
+            <span class="comment">// Attempts have not been cleared yet since the attempt_pos is older.
+            </span>(<span class="number">0</span>, <span class="number">0</span>)
         };
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">lookahead</span> <span class="op">==</span> <span class="ident">Lookahead::None</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">atomicity</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Atomicity::Atomic</span> {
-            <span class="comment">// Pair&#39;s position will only be known after running the closure.</span>
-            <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">push</span>(<span class="ident">QueueableToken::Start</span> {
-                <span class="ident">end_token_index</span>: <span class="number">0</span>,
-                <span class="ident">input_pos</span>: <span class="ident">actual_pos</span>,
+        <span class="kw">if </span><span class="self">self</span>.lookahead == Lookahead::None &amp;&amp; <span class="self">self</span>.atomicity != Atomicity::Atomic {
+            <span class="comment">// Pair&#39;s position will only be known after running the closure.
+            </span><span class="self">self</span>.queue.push(QueueableToken::Start {
+                end_token_index: <span class="number">0</span>,
+                input_pos: actual_pos,
             });
         }
 
-        <span class="kw">let</span> <span class="ident">attempts</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">attempts_at</span>(<span class="ident">actual_pos</span>);
+        <span class="kw">let </span>attempts = <span class="self">self</span>.attempts_at(actual_pos);
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>(<span class="self">self</span>);
+        <span class="kw">let </span>result = f(<span class="self">self</span>);
 
-        <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">new_state</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">new_state</span>.<span class="ident">lookahead</span> <span class="op">==</span> <span class="ident">Lookahead::Negative</span> {
-                    <span class="ident">new_state</span>.<span class="ident">track</span>(
-                        <span class="ident">rule</span>,
-                        <span class="ident">actual_pos</span>,
-                        <span class="ident">pos_attempts_index</span>,
-                        <span class="ident">neg_attempts_index</span>,
-                        <span class="ident">attempts</span>,
+        <span class="kw">match </span>result {
+            <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>new_state) =&gt; {
+                <span class="kw">if </span>new_state.lookahead == Lookahead::Negative {
+                    new_state.track(
+                        rule,
+                        actual_pos,
+                        pos_attempts_index,
+                        neg_attempts_index,
+                        attempts,
                     );
                 }
 
-                <span class="kw">if</span> <span class="ident">new_state</span>.<span class="ident">lookahead</span> <span class="op">==</span> <span class="ident">Lookahead::None</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">new_state</span>.<span class="ident">atomicity</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Atomicity::Atomic</span>
+                <span class="kw">if </span>new_state.lookahead == Lookahead::None
+                    &amp;&amp; new_state.atomicity != Atomicity::Atomic
                 {
-                    <span class="comment">// Storing the pair&#39;s index in the first token that was added before the closure was</span>
-                    <span class="comment">// run.</span>
-                    <span class="kw">let</span> <span class="ident">new_index</span> <span class="op">=</span> <span class="ident">new_state</span>.<span class="ident">queue</span>.<span class="ident">len</span>();
-                    <span class="kw">match</span> <span class="ident">new_state</span>.<span class="ident">queue</span>[<span class="ident">index</span>] {
-                        <span class="ident">QueueableToken::Start</span> {
-                            <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">end_token_index</span>,
+                    <span class="comment">// Storing the pair&#39;s index in the first token that was added before the closure was
+                    // run.
+                    </span><span class="kw">let </span>new_index = new_state.queue.len();
+                    <span class="kw">match </span>new_state.queue[index] {
+                        QueueableToken::Start {
+                            <span class="kw-2">ref mut </span>end_token_index,
                             ..
-                        } =&gt; <span class="kw-2">*</span><span class="ident">end_token_index</span> <span class="op">=</span> <span class="ident">new_index</span>,
-                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                        } =&gt; <span class="kw-2">*</span>end_token_index = new_index,
+                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                     };
 
-                    <span class="kw">let</span> <span class="ident">new_pos</span> <span class="op">=</span> <span class="ident">new_state</span>.<span class="ident">position</span>.<span class="ident">pos</span>();
+                    <span class="kw">let </span>new_pos = new_state.position.pos();
 
-                    <span class="ident">new_state</span>.<span class="ident">queue</span>.<span class="ident">push</span>(<span class="ident">QueueableToken::End</span> {
-                        <span class="ident">start_token_index</span>: <span class="ident">index</span>,
-                        <span class="ident">rule</span>,
-                        <span class="ident">input_pos</span>: <span class="ident">new_pos</span>,
+                    new_state.queue.push(QueueableToken::End {
+                        start_token_index: index,
+                        rule,
+                        input_pos: new_pos,
                     });
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">new_state</span>)
+                <span class="prelude-val">Ok</span>(new_state)
             }
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">new_state</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">new_state</span>.<span class="ident">lookahead</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Lookahead::Negative</span> {
-                    <span class="ident">new_state</span>.<span class="ident">track</span>(
-                        <span class="ident">rule</span>,
-                        <span class="ident">actual_pos</span>,
-                        <span class="ident">pos_attempts_index</span>,
-                        <span class="ident">neg_attempts_index</span>,
-                        <span class="ident">attempts</span>,
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut </span>new_state) =&gt; {
+                <span class="kw">if </span>new_state.lookahead != Lookahead::Negative {
+                    new_state.track(
+                        rule,
+                        actual_pos,
+                        pos_attempts_index,
+                        neg_attempts_index,
+                        attempts,
                     );
                 }
 
-                <span class="kw">if</span> <span class="ident">new_state</span>.<span class="ident">lookahead</span> <span class="op">==</span> <span class="ident">Lookahead::None</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">new_state</span>.<span class="ident">atomicity</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Atomicity::Atomic</span>
+                <span class="kw">if </span>new_state.lookahead == Lookahead::None
+                    &amp;&amp; new_state.atomicity != Atomicity::Atomic
                 {
-                    <span class="ident">new_state</span>.<span class="ident">queue</span>.<span class="ident">truncate</span>(<span class="ident">index</span>);
+                    new_state.queue.truncate(index);
                 }
 
-                <span class="prelude-val">Err</span>(<span class="ident">new_state</span>)
+                <span class="prelude-val">Err</span>(new_state)
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">attempts_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">attempt_pos</span> <span class="op">==</span> <span class="ident">pos</span> {
-            <span class="self">self</span>.<span class="ident">pos_attempts</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">neg_attempts</span>.<span class="ident">len</span>()
-        } <span class="kw">else</span> {
-            <span class="number">0</span>
-        }
+    <span class="kw">fn </span>attempts_at(<span class="kw-2">&amp;</span><span class="self">self</span>, pos: usize) -&gt; usize {
+        <span class="kw">if </span><span class="self">self</span>.attempt_pos == pos {
+            <span class="self">self</span>.pos_attempts.len() + <span class="self">self</span>.neg_attempts.len()
+        } <span class="kw">else </span>{
+            <span class="number">0
+        </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">track</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">rule</span>: <span class="ident">R</span>,
-        <span class="ident">pos</span>: <span class="ident">usize</span>,
-        <span class="ident">pos_attempts_index</span>: <span class="ident">usize</span>,
-        <span class="ident">neg_attempts_index</span>: <span class="ident">usize</span>,
-        <span class="ident">prev_attempts</span>: <span class="ident">usize</span>,
+    <span class="kw">fn </span>track(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        rule: R,
+        pos: usize,
+        pos_attempts_index: usize,
+        neg_attempts_index: usize,
+        prev_attempts: usize,
     ) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">atomicity</span> <span class="op">==</span> <span class="ident">Atomicity::Atomic</span> {
+        <span class="kw">if </span><span class="self">self</span>.atomicity == Atomicity::Atomic {
             <span class="kw">return</span>;
         }
 
-        <span class="comment">// If nested rules made no progress, there is no use to report them; it&#39;s only useful to</span>
-        <span class="comment">// track the current rule, the exception being when only one attempt has been made during</span>
-        <span class="comment">// the children rules.</span>
-        <span class="kw">let</span> <span class="ident">curr_attempts</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">attempts_at</span>(<span class="ident">pos</span>);
-        <span class="kw">if</span> <span class="ident">curr_attempts</span> <span class="op">&gt;</span> <span class="ident">prev_attempts</span> <span class="op">&amp;&amp;</span> <span class="ident">curr_attempts</span> <span class="op">-</span> <span class="ident">prev_attempts</span> <span class="op">==</span> <span class="number">1</span> {
+        <span class="comment">// If nested rules made no progress, there is no use to report them; it&#39;s only useful to
+        // track the current rule, the exception being when only one attempt has been made during
+        // the children rules.
+        </span><span class="kw">let </span>curr_attempts = <span class="self">self</span>.attempts_at(pos);
+        <span class="kw">if </span>curr_attempts &gt; prev_attempts &amp;&amp; curr_attempts - prev_attempts == <span class="number">1 </span>{
             <span class="kw">return</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">pos</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">attempt_pos</span> {
-            <span class="self">self</span>.<span class="ident">pos_attempts</span>.<span class="ident">truncate</span>(<span class="ident">pos_attempts_index</span>);
-            <span class="self">self</span>.<span class="ident">neg_attempts</span>.<span class="ident">truncate</span>(<span class="ident">neg_attempts_index</span>);
+        <span class="kw">if </span>pos == <span class="self">self</span>.attempt_pos {
+            <span class="self">self</span>.pos_attempts.truncate(pos_attempts_index);
+            <span class="self">self</span>.neg_attempts.truncate(neg_attempts_index);
         }
 
-        <span class="kw">if</span> <span class="ident">pos</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">attempt_pos</span> {
-            <span class="self">self</span>.<span class="ident">pos_attempts</span>.<span class="ident">clear</span>();
-            <span class="self">self</span>.<span class="ident">neg_attempts</span>.<span class="ident">clear</span>();
-            <span class="self">self</span>.<span class="ident">attempt_pos</span> <span class="op">=</span> <span class="ident">pos</span>;
+        <span class="kw">if </span>pos &gt; <span class="self">self</span>.attempt_pos {
+            <span class="self">self</span>.pos_attempts.clear();
+            <span class="self">self</span>.neg_attempts.clear();
+            <span class="self">self</span>.attempt_pos = pos;
         }
 
-        <span class="kw">let</span> <span class="ident">attempts</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">lookahead</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Lookahead::Negative</span> {
-            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">pos_attempts</span>
-        } <span class="kw">else</span> {
-            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">neg_attempts</span>
+        <span class="kw">let </span>attempts = <span class="kw">if </span><span class="self">self</span>.lookahead != Lookahead::Negative {
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos_attempts
+        } <span class="kw">else </span>{
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.neg_attempts
         };
 
-        <span class="kw">if</span> <span class="ident">pos</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">attempt_pos</span> {
-            <span class="ident">attempts</span>.<span class="ident">push</span>(<span class="ident">rule</span>);
+        <span class="kw">if </span>pos == <span class="self">self</span>.attempt_pos {
+            attempts.push(rule);
         }
     }
 
-    <span class="doccomment">/// Starts a sequence of transformations provided by `f` from the `Box&lt;ParserState&gt;`. Returns</span>
-    <span class="doccomment">/// the same `Result` returned by `f` in the case of an `Ok`, or `Err` with the current</span>
-    <span class="doccomment">/// `Box&lt;ParserState&gt;` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is useful to parse sequences that only match together which usually come in the</span>
-    <span class="doccomment">/// form of chained `Result`s with</span>
-    <span class="doccomment">/// [`Result::and_then`](https://doc.rust-lang.org/std/result/enum.Result.html#method.and_then).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {</span>
-    <span class="doccomment">///     a</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;a&quot;;</span>
-    <span class="doccomment">/// let pairs: Vec&lt;_&gt; = pest::state(input, |state| {</span>
-    <span class="doccomment">///     state.sequence(|s| {</span>
-    <span class="doccomment">///         s.rule(Rule::a, |s| Ok(s)).and_then(|s| {</span>
-    <span class="doccomment">///             s.match_string(&quot;b&quot;)</span>
-    <span class="doccomment">///         })</span>
-    <span class="doccomment">///     }).or_else(|s| {</span>
-    <span class="doccomment">///         Ok(s)</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">/// }).unwrap().collect();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(pairs.len(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sequence</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Starts a sequence of transformations provided by `f` from the `Box&lt;ParserState&gt;`. Returns
+    /// the same `Result` returned by `f` in the case of an `Ok`, or `Err` with the current
+    /// `Box&lt;ParserState&gt;` otherwise.
+    ///
+    /// This method is useful to parse sequences that only match together which usually come in the
+    /// form of chained `Result`s with
+    /// [`Result::and_then`](https://doc.rust-lang.org/std/result/enum.Result.html#method.and_then).
+    ///
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {
+    ///     a
+    /// }
+    ///
+    /// let input = &quot;a&quot;;
+    /// let pairs: Vec&lt;_&gt; = pest::state(input, |state| {
+    ///     state.sequence(|s| {
+    ///         s.rule(Rule::a, |s| Ok(s)).and_then(|s| {
+    ///             s.match_string(&quot;b&quot;)
+    ///         })
+    ///     }).or_else(|s| {
+    ///         Ok(s)
+    ///     })
+    /// }).unwrap().collect();
+    ///
+    /// assert_eq!(pairs.len(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>sequence&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, f: F) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnOnce(Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;,
     {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inc_call_check_limit</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">token_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">initial_pos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">position</span>;
+        <span class="self">self </span>= <span class="self">self</span>.inc_call_check_limit()<span class="question-mark">?</span>;
+        <span class="kw">let </span>token_index = <span class="self">self</span>.queue.len();
+        <span class="kw">let </span>initial_pos = <span class="self">self</span>.position;
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>(<span class="self">self</span>);
+        <span class="kw">let </span>result = f(<span class="self">self</span>);
 
-        <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">new_state</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">new_state</span>),
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">new_state</span>) =&gt; {
-                <span class="comment">// Restore the initial position and truncate the token queue.</span>
-                <span class="ident">new_state</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">initial_pos</span>;
-                <span class="ident">new_state</span>.<span class="ident">queue</span>.<span class="ident">truncate</span>(<span class="ident">token_index</span>);
-                <span class="prelude-val">Err</span>(<span class="ident">new_state</span>)
+        <span class="kw">match </span>result {
+            <span class="prelude-val">Ok</span>(new_state) =&gt; <span class="prelude-val">Ok</span>(new_state),
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut </span>new_state) =&gt; {
+                <span class="comment">// Restore the initial position and truncate the token queue.
+                </span>new_state.position = initial_pos;
+                new_state.queue.truncate(token_index);
+                <span class="prelude-val">Err</span>(new_state)
             }
         }
     }
 
-    <span class="doccomment">/// Repeatedly applies the transformation provided by `f` from the `Box&lt;ParserState&gt;`. Returns</span>
-    <span class="doccomment">/// `Ok` with the updated `Box&lt;ParserState&gt;` returned by `f` wrapped up in an `Err`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {</span>
-    <span class="doccomment">///     ab</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;aab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.repeat(|s| {</span>
-    <span class="doccomment">///     s.match_string(&quot;a&quot;)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// state = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// result = state.repeat(|s| {</span>
-    <span class="doccomment">///     s.match_string(&quot;b&quot;)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repeat</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Repeatedly applies the transformation provided by `f` from the `Box&lt;ParserState&gt;`. Returns
+    /// `Ok` with the updated `Box&lt;ParserState&gt;` returned by `f` wrapped up in an `Err`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {
+    ///     ab
+    /// }
+    ///
+    /// let input = &quot;aab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.repeat(|s| {
+    ///     s.match_string(&quot;a&quot;)
+    /// });
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 2);
+    ///
+    /// state = pest::ParserState::new(input);
+    /// result = state.repeat(|s| {
+    ///     s.match_string(&quot;b&quot;)
+    /// });
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>repeat&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, <span class="kw-2">mut </span>f: F) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnMut(Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;,
     {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inc_call_check_limit</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>(<span class="self">self</span>);
+        <span class="self">self </span>= <span class="self">self</span>.inc_call_check_limit()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>result = f(<span class="self">self</span>);
 
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident">result</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">state</span>) =&gt; <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">state</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">state</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">state</span>),
+        <span class="kw">loop </span>{
+            <span class="kw">match </span>result {
+                <span class="prelude-val">Ok</span>(state) =&gt; result = f(state),
+                <span class="prelude-val">Err</span>(state) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(state),
             };
         }
     }
 
-    <span class="doccomment">/// Optionally applies the transformation provided by `f` from the `Box&lt;ParserState&gt;`. Returns</span>
-    <span class="doccomment">/// `Ok` with the updated `Box&lt;ParserState&gt;` returned by `f` regardless of the `Result`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {</span>
-    <span class="doccomment">///     ab</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let result = state.optional(|s| {</span>
-    <span class="doccomment">///     s.match_string(&quot;ab&quot;)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// state = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let result = state.optional(|s| {</span>
-    <span class="doccomment">///     s.match_string(&quot;ac&quot;)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">optional</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Optionally applies the transformation provided by `f` from the `Box&lt;ParserState&gt;`. Returns
+    /// `Ok` with the updated `Box&lt;ParserState&gt;` returned by `f` regardless of the `Result`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {
+    ///     ab
+    /// }
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let result = state.optional(|s| {
+    ///     s.match_string(&quot;ab&quot;)
+    /// });
+    /// assert!(result.is_ok());
+    ///
+    /// state = pest::ParserState::new(input);
+    /// let result = state.optional(|s| {
+    ///     s.match_string(&quot;ac&quot;)
+    /// });
+    /// assert!(result.is_ok());
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>optional&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, f: F) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnOnce(Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;,
     {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inc_call_check_limit</span>()<span class="question-mark">?</span>;
-        <span class="kw">match</span> <span class="ident">f</span>(<span class="self">self</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">state</span>) <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="ident">state</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">state</span>),
+        <span class="self">self </span>= <span class="self">self</span>.inc_call_check_limit()<span class="question-mark">?</span>;
+        <span class="kw">match </span>f(<span class="self">self</span>) {
+            <span class="prelude-val">Ok</span>(state) | <span class="prelude-val">Err</span>(state) =&gt; <span class="prelude-val">Ok</span>(state),
         }
     }
 
-    <span class="doccomment">/// Attempts to match a single character based on a filter function. Returns `Ok` with the</span>
-    <span class="doccomment">/// updated `Box&lt;ParserState&gt;` if successful, or `Err` with the updated `Box&lt;ParserState&gt;`</span>
-    <span class="doccomment">/// otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let result = state.match_char_by(|c| c.is_ascii());</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;❤&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let result = state.match_char_by(|c| c.is_ascii());</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap_err().position().pos(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_char_by</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">char</span>) -&gt; <span class="ident">bool</span>,
+    <span class="doccomment">/// Attempts to match a single character based on a filter function. Returns `Ok` with the
+    /// updated `Box&lt;ParserState&gt;` if successful, or `Err` with the updated `Box&lt;ParserState&gt;`
+    /// otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let result = state.match_char_by(|c| c.is_ascii());
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 1);
+    ///
+    /// let input = &quot;❤&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let result = state.match_char_by(|c| c.is_ascii());
+    /// assert!(result.is_err());
+    /// assert_eq!(result.unwrap_err().position().pos(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>match_char_by&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, f: F) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnOnce(char) -&gt; bool,
     {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">match_char_by</span>(<span class="ident">f</span>) {
+        <span class="kw">if </span><span class="self">self</span>.position.match_char_by(f) {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(<span class="self">self</span>)
         }
     }
 
-    <span class="doccomment">/// Attempts to match the given string. Returns `Ok` with the updated `Box&lt;ParserState&gt;` if</span>
-    <span class="doccomment">/// successful, or `Err` with the updated `Box&lt;ParserState&gt;` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.match_string(&quot;ab&quot;);</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// state = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// result = state.match_string(&quot;ac&quot;);</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap_err().position().pos(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_string</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">match_string</span>(<span class="ident">string</span>) {
+    <span class="doccomment">/// Attempts to match the given string. Returns `Ok` with the updated `Box&lt;ParserState&gt;` if
+    /// successful, or `Err` with the updated `Box&lt;ParserState&gt;` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.match_string(&quot;ab&quot;);
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 2);
+    ///
+    /// state = pest::ParserState::new(input);
+    /// result = state.match_string(&quot;ac&quot;);
+    /// assert!(result.is_err());
+    /// assert_eq!(result.unwrap_err().position().pos(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>match_string(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, string: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.position.match_string(string) {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(<span class="self">self</span>)
         }
     }
 
-    <span class="doccomment">/// Attempts to case-insensitively match the given string. Returns `Ok` with the updated</span>
-    <span class="doccomment">/// `Box&lt;ParserState&gt;` if successful, or `Err` with the updated `Box&lt;ParserState&gt;` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.match_insensitive(&quot;AB&quot;);</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// state = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// result = state.match_insensitive(&quot;AC&quot;);</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap_err().position().pos(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_insensitive</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">match_insensitive</span>(<span class="ident">string</span>) {
+    <span class="doccomment">/// Attempts to case-insensitively match the given string. Returns `Ok` with the updated
+    /// `Box&lt;ParserState&gt;` if successful, or `Err` with the updated `Box&lt;ParserState&gt;` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.match_insensitive(&quot;AB&quot;);
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 2);
+    ///
+    /// state = pest::ParserState::new(input);
+    /// result = state.match_insensitive(&quot;AC&quot;);
+    /// assert!(result.is_err());
+    /// assert_eq!(result.unwrap_err().position().pos(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>match_insensitive(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, string: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.position.match_insensitive(string) {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(<span class="self">self</span>)
         }
     }
 
-    <span class="doccomment">/// Attempts to match a single character from the given range. Returns `Ok` with the updated</span>
-    <span class="doccomment">/// `Box&lt;ParserState&gt;` if successful, or `Err` with the updated `Box&lt;ParserState&gt;` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.match_range(&#39;a&#39;..&#39;z&#39;);</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// state = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// result = state.match_range(&#39;A&#39;..&#39;Z&#39;);</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap_err().position().pos(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_range</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">match_range</span>(<span class="ident">range</span>) {
+    <span class="doccomment">/// Attempts to match a single character from the given range. Returns `Ok` with the updated
+    /// `Box&lt;ParserState&gt;` if successful, or `Err` with the updated `Box&lt;ParserState&gt;` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.match_range(&#39;a&#39;..&#39;z&#39;);
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 1);
+    ///
+    /// state = pest::ParserState::new(input);
+    /// result = state.match_range(&#39;A&#39;..&#39;Z&#39;);
+    /// assert!(result.is_err());
+    /// assert_eq!(result.unwrap_err().position().pos(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>match_range(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, range: Range&lt;char&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.position.match_range(range) {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(<span class="self">self</span>)
         }
     }
 
-    <span class="doccomment">/// Attempts to skip `n` characters forward. Returns `Ok` with the updated `Box&lt;ParserState&gt;`</span>
-    <span class="doccomment">/// if successful, or `Err` with the updated `Box&lt;ParserState&gt;` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.skip(1);</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// state = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// result = state.skip(3);</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap_err().position().pos(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">skip</span>(<span class="ident">n</span>) {
+    <span class="doccomment">/// Attempts to skip `n` characters forward. Returns `Ok` with the updated `Box&lt;ParserState&gt;`
+    /// if successful, or `Err` with the updated `Box&lt;ParserState&gt;` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.skip(1);
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 1);
+    ///
+    /// state = pest::ParserState::new(input);
+    /// result = state.skip(3);
+    /// assert!(result.is_err());
+    /// assert_eq!(result.unwrap_err().position().pos(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>skip(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, n: usize) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.position.skip(n) {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(<span class="self">self</span>)
         }
     }
 
-    <span class="doccomment">/// Attempts to skip forward until one of the given strings is found. Returns `Ok` with the</span>
-    <span class="doccomment">/// updated `Box&lt;ParserState&gt;` whether or not one of the strings is found.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;abcd&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.skip_until(&amp;[&quot;c&quot;, &quot;d&quot;]);</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 2);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip_until</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">strings</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">skip_until</span>(<span class="ident">strings</span>);
+    <span class="doccomment">/// Attempts to skip forward until one of the given strings is found. Returns `Ok` with the
+    /// updated `Box&lt;ParserState&gt;` whether or not one of the strings is found.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;abcd&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.skip_until(&amp;[&quot;c&quot;, &quot;d&quot;]);
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 2);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>skip_until(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, strings: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="self">self</span>.position.skip_until(strings);
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Attempts to match the start of the input. Returns `Ok` with the current `Box&lt;ParserState&gt;`</span>
-    <span class="doccomment">/// if the parser has not yet advanced, or `Err` with the current `Box&lt;ParserState&gt;` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.start_of_input();</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// state = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// state = state.match_string(&quot;ab&quot;).unwrap();</span>
-    <span class="doccomment">/// result = state.start_of_input();</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_of_input</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">at_start</span>() {
+    <span class="doccomment">/// Attempts to match the start of the input. Returns `Ok` with the current `Box&lt;ParserState&gt;`
+    /// if the parser has not yet advanced, or `Err` with the current `Box&lt;ParserState&gt;` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.start_of_input();
+    /// assert!(result.is_ok());
+    ///
+    /// state = pest::ParserState::new(input);
+    /// state = state.match_string(&quot;ab&quot;).unwrap();
+    /// result = state.start_of_input();
+    /// assert!(result.is_err());
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>start_of_input(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.position.at_start() {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(<span class="self">self</span>)
         }
     }
 
-    <span class="doccomment">/// Attempts to match the end of the input. Returns `Ok` with the current `Box&lt;ParserState&gt;` if</span>
-    <span class="doccomment">/// there is no input remaining, or `Err` with the current `Box&lt;ParserState&gt;` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.end_of_input();</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// state = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// state = state.match_string(&quot;ab&quot;).unwrap();</span>
-    <span class="doccomment">/// result = state.end_of_input();</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_of_input</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">at_end</span>() {
+    <span class="doccomment">/// Attempts to match the end of the input. Returns `Ok` with the current `Box&lt;ParserState&gt;` if
+    /// there is no input remaining, or `Err` with the current `Box&lt;ParserState&gt;` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.end_of_input();
+    /// assert!(result.is_err());
+    ///
+    /// state = pest::ParserState::new(input);
+    /// state = state.match_string(&quot;ab&quot;).unwrap();
+    /// result = state.end_of_input();
+    /// assert!(result.is_ok());
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>end_of_input(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.position.at_end() {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(<span class="self">self</span>)
         }
     }
 
-    <span class="doccomment">/// Starts a lookahead transformation provided by `f` from the `Box&lt;ParserState&gt;`. It returns</span>
-    <span class="doccomment">/// `Ok` with the current `Box&lt;ParserState&gt;` if `f` also returns an `Ok`, or `Err` with the current</span>
-    <span class="doccomment">/// `Box&lt;ParserState&gt;` otherwise. If `is_positive` is `false`, it swaps the `Ok` and `Err`</span>
-    <span class="doccomment">/// together, negating the `Result`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {</span>
-    <span class="doccomment">///     a</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;a&quot;;</span>
-    <span class="doccomment">/// let pairs: Vec&lt;_&gt; = pest::state(input, |state| {</span>
-    <span class="doccomment">///     state.lookahead(true, |state| {</span>
-    <span class="doccomment">///         state.rule(Rule::a, |s| Ok(s))</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">/// }).unwrap().collect();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(pairs.len(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookahead</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">is_positive</span>: <span class="ident">bool</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Starts a lookahead transformation provided by `f` from the `Box&lt;ParserState&gt;`. It returns
+    /// `Ok` with the current `Box&lt;ParserState&gt;` if `f` also returns an `Ok`, or `Err` with the current
+    /// `Box&lt;ParserState&gt;` otherwise. If `is_positive` is `false`, it swaps the `Ok` and `Err`
+    /// together, negating the `Result`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {
+    ///     a
+    /// }
+    ///
+    /// let input = &quot;a&quot;;
+    /// let pairs: Vec&lt;_&gt; = pest::state(input, |state| {
+    ///     state.lookahead(true, |state| {
+    ///         state.rule(Rule::a, |s| Ok(s))
+    ///     })
+    /// }).unwrap().collect();
+    ///
+    /// assert_eq!(pairs.len(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>lookahead&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, is_positive: bool, f: F) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnOnce(Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;,
     {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inc_call_check_limit</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">initial_lookahead</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lookahead</span>;
+        <span class="self">self </span>= <span class="self">self</span>.inc_call_check_limit()<span class="question-mark">?</span>;
+        <span class="kw">let </span>initial_lookahead = <span class="self">self</span>.lookahead;
 
-        <span class="self">self</span>.<span class="ident">lookahead</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_positive</span> {
-            <span class="kw">match</span> <span class="ident">initial_lookahead</span> {
-                <span class="ident">Lookahead::None</span> <span class="op">|</span> <span class="ident">Lookahead::Positive</span> =&gt; <span class="ident">Lookahead::Positive</span>,
-                <span class="ident">Lookahead::Negative</span> =&gt; <span class="ident">Lookahead::Negative</span>,
+        <span class="self">self</span>.lookahead = <span class="kw">if </span>is_positive {
+            <span class="kw">match </span>initial_lookahead {
+                Lookahead::None | Lookahead::Positive =&gt; Lookahead::Positive,
+                Lookahead::Negative =&gt; Lookahead::Negative,
             }
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="ident">initial_lookahead</span> {
-                <span class="ident">Lookahead::None</span> <span class="op">|</span> <span class="ident">Lookahead::Positive</span> =&gt; <span class="ident">Lookahead::Negative</span>,
-                <span class="ident">Lookahead::Negative</span> =&gt; <span class="ident">Lookahead::Positive</span>,
-            }
-        };
-
-        <span class="kw">let</span> <span class="ident">initial_pos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">position</span>;
-
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">checkpoint</span>());
-
-        <span class="kw">let</span> <span class="ident">result_state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">new_state</span>) =&gt; {
-                <span class="ident">new_state</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">initial_pos</span>;
-                <span class="ident">new_state</span>.<span class="ident">lookahead</span> <span class="op">=</span> <span class="ident">initial_lookahead</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">new_state</span>.<span class="ident">restore</span>())
-            }
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">new_state</span>) =&gt; {
-                <span class="ident">new_state</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">initial_pos</span>;
-                <span class="ident">new_state</span>.<span class="ident">lookahead</span> <span class="op">=</span> <span class="ident">initial_lookahead</span>;
-                <span class="prelude-val">Err</span>(<span class="ident">new_state</span>.<span class="ident">restore</span>())
+        } <span class="kw">else </span>{
+            <span class="kw">match </span>initial_lookahead {
+                Lookahead::None | Lookahead::Positive =&gt; Lookahead::Negative,
+                Lookahead::Negative =&gt; Lookahead::Positive,
             }
         };
 
-        <span class="kw">if</span> <span class="ident">is_positive</span> {
-            <span class="ident">result_state</span>
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="ident">result_state</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">state</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">state</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">state</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">state</span>),
+        <span class="kw">let </span>initial_pos = <span class="self">self</span>.position;
+
+        <span class="kw">let </span>result = f(<span class="self">self</span>.checkpoint());
+
+        <span class="kw">let </span>result_state = <span class="kw">match </span>result {
+            <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>new_state) =&gt; {
+                new_state.position = initial_pos;
+                new_state.lookahead = initial_lookahead;
+                <span class="prelude-val">Ok</span>(new_state.restore())
+            }
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut </span>new_state) =&gt; {
+                new_state.position = initial_pos;
+                new_state.lookahead = initial_lookahead;
+                <span class="prelude-val">Err</span>(new_state.restore())
+            }
+        };
+
+        <span class="kw">if </span>is_positive {
+            result_state
+        } <span class="kw">else </span>{
+            <span class="kw">match </span>result_state {
+                <span class="prelude-val">Ok</span>(state) =&gt; <span class="prelude-val">Err</span>(state),
+                <span class="prelude-val">Err</span>(state) =&gt; <span class="prelude-val">Ok</span>(state),
             }
         }
     }
 
-    <span class="doccomment">/// Transformation which stops `Token`s from being generated according to `is_atomic`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest::{self, Atomicity};</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {</span>
-    <span class="doccomment">///     a</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;a&quot;;</span>
-    <span class="doccomment">/// let pairs: Vec&lt;_&gt; = pest::state(input, |state| {</span>
-    <span class="doccomment">///     state.atomic(Atomicity::Atomic, |s| {</span>
-    <span class="doccomment">///         s.rule(Rule::a, |s| Ok(s))</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">/// }).unwrap().collect();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(pairs.len(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">atomic</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">atomicity</span>: <span class="ident">Atomicity</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Transformation which stops `Token`s from being generated according to `is_atomic`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest::{self, Atomicity};
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {
+    ///     a
+    /// }
+    ///
+    /// let input = &quot;a&quot;;
+    /// let pairs: Vec&lt;_&gt; = pest::state(input, |state| {
+    ///     state.atomic(Atomicity::Atomic, |s| {
+    ///         s.rule(Rule::a, |s| Ok(s))
+    ///     })
+    /// }).unwrap().collect();
+    ///
+    /// assert_eq!(pairs.len(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>atomic&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, atomicity: Atomicity, f: F) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnOnce(Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;,
     {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inc_call_check_limit</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">initial_atomicity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">atomicity</span>;
-        <span class="kw">let</span> <span class="ident">should_toggle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">atomicity</span> <span class="op">!</span><span class="op">=</span> <span class="ident">atomicity</span>;
+        <span class="self">self </span>= <span class="self">self</span>.inc_call_check_limit()<span class="question-mark">?</span>;
+        <span class="kw">let </span>initial_atomicity = <span class="self">self</span>.atomicity;
+        <span class="kw">let </span>should_toggle = <span class="self">self</span>.atomicity != atomicity;
 
-        <span class="kw">if</span> <span class="ident">should_toggle</span> {
-            <span class="self">self</span>.<span class="ident">atomicity</span> <span class="op">=</span> <span class="ident">atomicity</span>;
+        <span class="kw">if </span>should_toggle {
+            <span class="self">self</span>.atomicity = atomicity;
         }
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>(<span class="self">self</span>);
+        <span class="kw">let </span>result = f(<span class="self">self</span>);
 
-        <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">new_state</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">should_toggle</span> {
-                    <span class="ident">new_state</span>.<span class="ident">atomicity</span> <span class="op">=</span> <span class="ident">initial_atomicity</span>;
+        <span class="kw">match </span>result {
+            <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>new_state) =&gt; {
+                <span class="kw">if </span>should_toggle {
+                    new_state.atomicity = initial_atomicity;
                 }
-                <span class="prelude-val">Ok</span>(<span class="ident">new_state</span>)
+                <span class="prelude-val">Ok</span>(new_state)
             }
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">new_state</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">should_toggle</span> {
-                    <span class="ident">new_state</span>.<span class="ident">atomicity</span> <span class="op">=</span> <span class="ident">initial_atomicity</span>;
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut </span>new_state) =&gt; {
+                <span class="kw">if </span>should_toggle {
+                    new_state.atomicity = initial_atomicity;
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">new_state</span>)
+                <span class="prelude-val">Err</span>(new_state)
             }
         }
     }
 
-    <span class="doccomment">/// Evaluates the result of closure `f` and pushes the span of the input consumed from before</span>
-    <span class="doccomment">/// `f` is called to after `f` is called to the stack. Returns `Ok(Box&lt;ParserState&gt;)` if `f` is</span>
-    <span class="doccomment">/// called successfully, or `Err(Box&lt;ParserState&gt;)` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.stack_push(|state| state.match_string(&quot;a&quot;));</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 1);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stack_push</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Evaluates the result of closure `f` and pushes the span of the input consumed from before
+    /// `f` is called to after `f` is called to the stack. Returns `Ok(Box&lt;ParserState&gt;)` if `f` is
+    /// called successfully, or `Err(Box&lt;ParserState&gt;)` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.stack_push(|state| state.match_string(&quot;a&quot;));
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 1);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>stack_push&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, f: F) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnOnce(Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;,
     {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inc_call_check_limit</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">position</span>;
+        <span class="self">self </span>= <span class="self">self</span>.inc_call_check_limit()<span class="question-mark">?</span>;
+        <span class="kw">let </span>start = <span class="self">self</span>.position;
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>(<span class="self">self</span>);
+        <span class="kw">let </span>result = f(<span class="self">self</span>);
 
-        <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">state</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">position</span>;
-                <span class="ident">state</span>.<span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">start</span>.<span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="ident">end</span>));
-                <span class="prelude-val">Ok</span>(<span class="ident">state</span>)
+        <span class="kw">match </span>result {
+            <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>state) =&gt; {
+                <span class="kw">let </span>end = state.position;
+                state.stack.push(start.span(<span class="kw-2">&amp;</span>end));
+                <span class="prelude-val">Ok</span>(state)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">state</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">state</span>),
+            <span class="prelude-val">Err</span>(state) =&gt; <span class="prelude-val">Err</span>(state),
         }
     }
 
-    <span class="doccomment">/// Peeks the top of the stack and attempts to match the string. Returns `Ok(Box&lt;ParserState&gt;)`</span>
-    <span class="doccomment">/// if the string is matched successfully, or `Err(Box&lt;ParserState&gt;)` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;aa&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.stack_push(|state| state.match_string(&quot;a&quot;)).and_then(</span>
-    <span class="doccomment">///     |state| state.stack_peek()</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 2);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stack_peek</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">stack</span>
-            .<span class="ident">peek</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;peek was called on empty stack&quot;</span>)
-            .<span class="ident">as_str</span>();
-        <span class="self">self</span>.<span class="ident">match_string</span>(<span class="ident">string</span>)
+    <span class="doccomment">/// Peeks the top of the stack and attempts to match the string. Returns `Ok(Box&lt;ParserState&gt;)`
+    /// if the string is matched successfully, or `Err(Box&lt;ParserState&gt;)` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;aa&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.stack_push(|state| state.match_string(&quot;a&quot;)).and_then(
+    ///     |state| state.stack_peek()
+    /// );
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 2);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>stack_peek(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">let </span>string = <span class="self">self
+            </span>.stack
+            .peek()
+            .expect(<span class="string">&quot;peek was called on empty stack&quot;</span>)
+            .as_str();
+        <span class="self">self</span>.match_string(string)
     }
 
-    <span class="doccomment">/// Pops the top of the stack and attempts to match the string. Returns `Ok(Box&lt;ParserState&gt;)`</span>
-    <span class="doccomment">/// if the string is matched successfully, or `Err(Box&lt;ParserState&gt;)` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;aa&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.stack_push(|state| state.match_string(&quot;a&quot;)).and_then(</span>
-    <span class="doccomment">///     |state| state.stack_pop()</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 2);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stack_pop</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">stack</span>
-            .<span class="ident">pop</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;pop was called on empty stack&quot;</span>)
-            .<span class="ident">as_str</span>();
-        <span class="self">self</span>.<span class="ident">match_string</span>(<span class="ident">string</span>)
+    <span class="doccomment">/// Pops the top of the stack and attempts to match the string. Returns `Ok(Box&lt;ParserState&gt;)`
+    /// if the string is matched successfully, or `Err(Box&lt;ParserState&gt;)` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;aa&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.stack_push(|state| state.match_string(&quot;a&quot;)).and_then(
+    ///     |state| state.stack_pop()
+    /// );
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 2);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>stack_pop(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">let </span>string = <span class="self">self
+            </span>.stack
+            .pop()
+            .expect(<span class="string">&quot;pop was called on empty stack&quot;</span>)
+            .as_str();
+        <span class="self">self</span>.match_string(string)
     }
 
-    <span class="doccomment">/// Matches part of the state of the stack.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest::{self, MatchDir};</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;abcd cd cb&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state</span>
-    <span class="doccomment">///     .stack_push(|state| state.match_string(&quot;a&quot;))</span>
-    <span class="doccomment">///     .and_then(|state| state.stack_push(|state| state.match_string(&quot;b&quot;)))</span>
-    <span class="doccomment">///     .and_then(|state| state.stack_push(|state| state.match_string(&quot;c&quot;)))</span>
-    <span class="doccomment">///     .and_then(|state| state.stack_push(|state| state.match_string(&quot;d&quot;)))</span>
-    <span class="doccomment">///     .and_then(|state| state.match_string(&quot; &quot;))</span>
-    <span class="doccomment">///     .and_then(|state| state.stack_match_peek_slice(2, None, MatchDir::BottomToTop))</span>
-    <span class="doccomment">///     .and_then(|state| state.match_string(&quot; &quot;))</span>
-    <span class="doccomment">///     .and_then(|state| state.stack_match_peek_slice(1, Some(-1), MatchDir::TopToBottom));</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 10);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stack_match_peek_slice</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">start</span>: <span class="ident">i32</span>,
-        <span class="ident">end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
-        <span class="ident">match_dir</span>: <span class="ident">MatchDir</span>,
-    ) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">constrain_idxs</span>(<span class="ident">start</span>, <span class="ident">end</span>, <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">len</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>),
+    <span class="doccomment">/// Matches part of the state of the stack.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest::{self, MatchDir};
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;abcd cd cb&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state
+    ///     .stack_push(|state| state.match_string(&quot;a&quot;))
+    ///     .and_then(|state| state.stack_push(|state| state.match_string(&quot;b&quot;)))
+    ///     .and_then(|state| state.stack_push(|state| state.match_string(&quot;c&quot;)))
+    ///     .and_then(|state| state.stack_push(|state| state.match_string(&quot;d&quot;)))
+    ///     .and_then(|state| state.match_string(&quot; &quot;))
+    ///     .and_then(|state| state.stack_match_peek_slice(2, None, MatchDir::BottomToTop))
+    ///     .and_then(|state| state.match_string(&quot; &quot;))
+    ///     .and_then(|state| state.stack_match_peek_slice(1, Some(-1), MatchDir::TopToBottom));
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 10);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>stack_match_peek_slice(
+        <span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;,
+        start: i32,
+        end: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+        match_dir: MatchDir,
+    ) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">let </span>range = <span class="kw">match </span>constrain_idxs(start, end, <span class="self">self</span>.stack.len()) {
+            <span class="prelude-val">Some</span>(r) =&gt; r,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="self">self</span>),
         };
-        <span class="comment">// return true if an empty sequence is requested</span>
-        <span class="kw">if</span> <span class="ident">range</span>.<span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">range</span>.<span class="ident">start</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>);
+        <span class="comment">// return true if an empty sequence is requested
+        </span><span class="kw">if </span>range.end &lt;= range.start {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">self</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">position</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">position</span>;
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter_b2t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>[<span class="ident">range</span>].<span class="ident">iter</span>();
-            <span class="kw">let</span> <span class="ident">matcher</span> <span class="op">=</span> <span class="op">|</span><span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">Span</span><span class="op">|</span> <span class="ident">position</span>.<span class="ident">match_string</span>(<span class="ident">span</span>.<span class="ident">as_str</span>());
-            <span class="kw">match</span> <span class="ident">match_dir</span> {
-                <span class="ident">MatchDir::BottomToTop</span> =&gt; <span class="ident">iter_b2t</span>.<span class="ident">all</span>(<span class="ident">matcher</span>),
-                <span class="ident">MatchDir::TopToBottom</span> =&gt; <span class="ident">iter_b2t</span>.<span class="ident">rev</span>().<span class="ident">all</span>(<span class="ident">matcher</span>),
+        <span class="kw">let </span><span class="kw-2">mut </span>position = <span class="self">self</span>.position;
+        <span class="kw">let </span>result = {
+            <span class="kw">let </span><span class="kw-2">mut </span>iter_b2t = <span class="self">self</span>.stack[range].iter();
+            <span class="kw">let </span>matcher = |span: <span class="kw-2">&amp;</span>Span| position.match_string(span.as_str());
+            <span class="kw">match </span>match_dir {
+                MatchDir::BottomToTop =&gt; iter_b2t.all(matcher),
+                MatchDir::TopToBottom =&gt; iter_b2t.rev().all(matcher),
             }
         };
-        <span class="kw">if</span> <span class="ident">result</span> {
-            <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">position</span>;
+        <span class="kw">if </span>result {
+            <span class="self">self</span>.position = position;
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(<span class="self">self</span>)
         }
     }
 
-    <span class="doccomment">/// Matches the full state of the stack.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;abba&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state</span>
-    <span class="doccomment">///     .stack_push(|state| state.match_string(&quot;a&quot;))</span>
-    <span class="doccomment">///     .and_then(|state| { state.stack_push(|state| state.match_string(&quot;b&quot;)) })</span>
-    <span class="doccomment">///     .and_then(|state| state.stack_match_peek());</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 4);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stack_match_peek</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stack_match_peek_slice</span>(<span class="number">0</span>, <span class="prelude-val">None</span>, <span class="ident">MatchDir::TopToBottom</span>)
+    <span class="doccomment">/// Matches the full state of the stack.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;abba&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state
+    ///     .stack_push(|state| state.match_string(&quot;a&quot;))
+    ///     .and_then(|state| { state.stack_push(|state| state.match_string(&quot;b&quot;)) })
+    ///     .and_then(|state| state.stack_match_peek());
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 4);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>stack_match_peek(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="self">self</span>.stack_match_peek_slice(<span class="number">0</span>, <span class="prelude-val">None</span>, MatchDir::TopToBottom)
     }
 
-    <span class="doccomment">/// Matches the full state of the stack. This method will clear the stack as it evaluates.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// /// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;aaaa&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.stack_push(|state| state.match_string(&quot;a&quot;)).and_then(|state| {</span>
-    <span class="doccomment">///     state.stack_push(|state| state.match_string(&quot;a&quot;))</span>
-    <span class="doccomment">/// }).and_then(|state| state.stack_match_peek());</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 4);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stack_match_pop</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">position</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">position</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">span</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">pop</span>() {
-            <span class="ident">result</span> <span class="op">=</span> <span class="ident">position</span>.<span class="ident">match_string</span>(<span class="ident">span</span>.<span class="ident">as_str</span>());
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">result</span> {
+    <span class="doccomment">/// Matches the full state of the stack. This method will clear the stack as it evaluates.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;aaaa&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.stack_push(|state| state.match_string(&quot;a&quot;)).and_then(|state| {
+    ///     state.stack_push(|state| state.match_string(&quot;a&quot;))
+    /// }).and_then(|state| state.stack_match_peek());
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 4);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>stack_match_pop(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>position = <span class="self">self</span>.position;
+        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="bool-val">true</span>;
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(span) = <span class="self">self</span>.stack.pop() {
+            result = position.match_string(span.as_str());
+            <span class="kw">if </span>!result {
                 <span class="kw">break</span>;
             }
         }
 
-        <span class="kw">if</span> <span class="ident">result</span> {
-            <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">position</span>;
+        <span class="kw">if </span>result {
+            <span class="self">self</span>.position = position;
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(<span class="self">self</span>)
         }
     }
 
-    <span class="doccomment">/// Drops the top of the stack. Returns `Ok(Box&lt;ParserState&gt;)` if there was a value to drop, or</span>
-    <span class="doccomment">/// `Err(Box&lt;ParserState&gt;)` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;aa&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.stack_push(|state| state.match_string(&quot;a&quot;)).and_then(</span>
-    <span class="doccomment">///     |state| state.stack_drop()</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert!(result.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(result.unwrap().position().pos(), 1);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stack_drop</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">pop</span>() {
+    <span class="doccomment">/// Drops the top of the stack. Returns `Ok(Box&lt;ParserState&gt;)` if there was a value to drop, or
+    /// `Err(Box&lt;ParserState&gt;)` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;aa&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.stack_push(|state| state.match_string(&quot;a&quot;)).and_then(
+    ///     |state| state.stack_drop()
+    /// );
+    /// assert!(result.is_ok());
+    /// assert_eq!(result.unwrap().position().pos(), 1);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>stack_drop(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.stack.pop() {
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>),
         }
     }
 
-    <span class="doccomment">/// Restores the original state of the `ParserState` when `f` returns an `Err`. Currently,</span>
-    <span class="doccomment">/// this method only restores the stack.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);</span>
-    <span class="doccomment">/// let mut result = state.restore_on_err(|state| state.stack_push(|state|</span>
-    <span class="doccomment">///     state.match_string(&quot;a&quot;)).and_then(|state| state.match_string(&quot;a&quot;))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Since the the rule doesn&#39;t match, the &quot;a&quot; pushed to the stack will be removed.</span>
-    <span class="doccomment">/// let catch_panic = std::panic::catch_unwind(|| result.unwrap_err().stack_pop());</span>
-    <span class="doccomment">/// assert!(catch_panic.is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restore_on_err</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Restores the original state of the `ParserState` when `f` returns an `Err`. Currently,
+    /// this method only restores the stack.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;ab&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input);
+    /// let mut result = state.restore_on_err(|state| state.stack_push(|state|
+    ///     state.match_string(&quot;a&quot;)).and_then(|state| state.match_string(&quot;a&quot;))
+    /// );
+    ///
+    /// assert!(result.is_err());
+    ///
+    /// // Since the the rule doesn&#39;t match, the &quot;a&quot; pushed to the stack will be removed.
+    /// let catch_panic = std::panic::catch_unwind(|| result.unwrap_err().stack_pop());
+    /// assert!(catch_panic.is_err());
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>restore_on_err&lt;F&gt;(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, f: F) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnOnce(Box&lt;<span class="self">Self</span>&gt;) -&gt; ParseResult&lt;Box&lt;<span class="self">Self</span>&gt;&gt;,
     {
-        <span class="kw">match</span> <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">checkpoint</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="ident">state</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">state</span>.<span class="ident">checkpoint_ok</span>()),
-            <span class="prelude-val">Err</span>(<span class="ident">state</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">state</span>.<span class="ident">restore</span>()),
+        <span class="kw">match </span>f(<span class="self">self</span>.checkpoint()) {
+            <span class="prelude-val">Ok</span>(state) =&gt; <span class="prelude-val">Ok</span>(state.checkpoint_ok()),
+            <span class="prelude-val">Err</span>(state) =&gt; <span class="prelude-val">Err</span>(state.restore()),
         }
     }
 
-    <span class="comment">// Mark the current state as a checkpoint and return the `Box`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">snapshot</span>();
-        <span class="self">self</span>
-    }
+    <span class="comment">// Mark the current state as a checkpoint and return the `Box`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>checkpoint(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; Box&lt;<span class="self">Self</span>&gt; {
+        <span class="self">self</span>.stack.snapshot();
+        <span class="self">self
+    </span>}
 
-    <span class="comment">// The checkpoint was cleared successfully</span>
-    <span class="comment">// so remove it without touching other stack state.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">checkpoint_ok</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">clear_snapshot</span>();
-        <span class="self">self</span>
-    }
+    <span class="comment">// The checkpoint was cleared successfully
+    // so remove it without touching other stack state.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>checkpoint_ok(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; Box&lt;<span class="self">Self</span>&gt; {
+        <span class="self">self</span>.stack.clear_snapshot();
+        <span class="self">self
+    </span>}
 
-    <span class="comment">// Restore the current state to the most recent checkpoint.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">restore</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">restore</span>();
-        <span class="self">self</span>
+    <span class="comment">// Restore the current state to the most recent checkpoint.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>restore(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; Box&lt;<span class="self">Self</span>&gt; {
+        <span class="self">self</span>.stack.restore();
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">fn </span>constrain_idxs(start: i32, end: <span class="prelude-ty">Option</span>&lt;i32&gt;, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;Range&lt;usize&gt;&gt; {
+    <span class="kw">let </span>start_norm = normalize_index(start, len)<span class="question-mark">?</span>;
+    <span class="kw">let </span>end_norm = end.map_or(<span class="prelude-val">Some</span>(len), |e| normalize_index(e, len))<span class="question-mark">?</span>;
+    <span class="prelude-val">Some</span>(start_norm..end_norm)
+}
+
+<span class="doccomment">/// Normalizes the index using its sequence’s length.
+/// Returns `None` if the normalized index is OOB.
+</span><span class="kw">fn </span>normalize_index(i: i32, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+    <span class="kw">if </span>i &gt; len <span class="kw">as </span>i32 {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else if </span>i &gt;= <span class="number">0 </span>{
+        <span class="prelude-val">Some</span>(i <span class="kw">as </span>usize)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>real_i = len <span class="kw">as </span>i32 + i;
+        <span class="kw">if </span>real_i &gt;= <span class="number">0 </span>{
+            <span class="prelude-val">Some</span>(real_i <span class="kw">as </span>usize)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="kw">fn</span> <span class="ident">constrain_idxs</span>(<span class="ident">start</span>: <span class="ident">i32</span>, <span class="ident">end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">start_norm</span> <span class="op">=</span> <span class="ident">normalize_index</span>(<span class="ident">start</span>, <span class="ident">len</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">end_norm</span> <span class="op">=</span> <span class="ident">end</span>.<span class="ident">map_or</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">normalize_index</span>(<span class="ident">e</span>, <span class="ident">len</span>))<span class="question-mark">?</span>;
-    <span class="prelude-val">Some</span>(<span class="ident">start_norm</span>..<span class="ident">end_norm</span>)
-}
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Normalizes the index using its sequence’s length.</span>
-<span class="doccomment">/// Returns `None` if the normalized index is OOB.</span>
-<span class="kw">fn</span> <span class="ident">normalize_index</span>(<span class="ident">i</span>: <span class="ident">i32</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">i32</span> {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>)
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">real_i</span> <span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="ident">i</span>;
-        <span class="kw">if</span> <span class="ident">real_i</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">real_i</span> <span class="kw">as</span> <span class="ident">usize</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">normalize_index_pos</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">normalize_index</span>(<span class="number">4</span>, <span class="number">6</span>), <span class="prelude-val">Some</span>(<span class="number">4</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">normalize_index</span>(<span class="number">5</span>, <span class="number">5</span>), <span class="prelude-val">Some</span>(<span class="number">5</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">normalize_index</span>(<span class="number">6</span>, <span class="number">3</span>), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>normalize_index_pos() {
+        <span class="macro">assert_eq!</span>(normalize_index(<span class="number">4</span>, <span class="number">6</span>), <span class="prelude-val">Some</span>(<span class="number">4</span>));
+        <span class="macro">assert_eq!</span>(normalize_index(<span class="number">5</span>, <span class="number">5</span>), <span class="prelude-val">Some</span>(<span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(normalize_index(<span class="number">6</span>, <span class="number">3</span>), <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">normalize_index_neg</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">normalize_index</span>(<span class="op">-</span><span class="number">4</span>, <span class="number">6</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">normalize_index</span>(<span class="op">-</span><span class="number">5</span>, <span class="number">5</span>), <span class="prelude-val">Some</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">normalize_index</span>(<span class="op">-</span><span class="number">6</span>, <span class="number">3</span>), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>normalize_index_neg() {
+        <span class="macro">assert_eq!</span>(normalize_index(-<span class="number">4</span>, <span class="number">6</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(normalize_index(-<span class="number">5</span>, <span class="number">5</span>), <span class="prelude-val">Some</span>(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(normalize_index(-<span class="number">6</span>, <span class="number">3</span>), <span class="prelude-val">None</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pest" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pest" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

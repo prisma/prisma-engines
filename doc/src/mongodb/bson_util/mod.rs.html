@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/bson_util/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/bson_util/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -239,246 +239,246 @@
 <span id="239">239</span>
 <span id="240">240</span>
 <span id="241">241</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">convert::TryFrom</span>,
-    <span class="ident">io</span>::{<span class="ident">Read</span>, <span class="ident">Write</span>},
-    <span class="ident">time::Duration</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    convert::TryFrom,
+    io::{Read, Write},
+    time::Duration,
 };
 
-<span class="kw">use</span> <span class="ident">bson::RawBsonRef</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::Error</span> <span class="kw">as</span> <span class="ident">SerdeDeError</span>, <span class="ident">ser</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
+<span class="kw">use </span>bson::RawBsonRef;
+<span class="kw">use </span>serde::{de::Error <span class="kw">as </span>SerdeDeError, ser, Deserialize, Deserializer, Serialize, Serializer};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>},
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">runtime::SyncLittleEndianRead</span>,
+<span class="kw">use crate</span>::{
+    bson::{doc, Bson, Document},
+    error::{Error, ErrorKind, <span class="prelude-ty">Result</span>},
+    runtime::SyncLittleEndianRead,
 };
 
-<span class="doccomment">/// Coerce numeric types into an `i64` if it would be lossless to do so. If this Bson is not numeric</span>
-<span class="doccomment">/// or the conversion would be lossy (e.g. 1.5 -&gt; 1), this returns `None`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_int</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">Bson</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">val</span> {
-        <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i64::from</span>(<span class="ident">i</span>)),
-        <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-        <span class="ident">Bson::Double</span>(<span class="ident">f</span>) <span class="kw">if</span> (<span class="ident">f</span> <span class="op">-</span> (<span class="ident">f</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="kw">as</span> <span class="ident">f64</span>)).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">f64::EPSILON</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">f</span> <span class="kw">as</span> <span class="ident">i64</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Coerce numeric types into an `i64` if it would be lossless to do so. If this Bson is not numeric
+/// or the conversion would be lossy (e.g. 1.5 -&gt; 1), this returns `None`.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_int(val: <span class="kw-2">&amp;</span>Bson) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+    <span class="kw">match </span><span class="kw-2">*</span>val {
+        Bson::Int32(i) =&gt; <span class="prelude-val">Some</span>(i64::from(i)),
+        Bson::Int64(i) =&gt; <span class="prelude-val">Some</span>(i),
+        Bson::Double(f) <span class="kw">if </span>(f - (f <span class="kw">as </span>i64 <span class="kw">as </span>f64)).abs() &lt;= f64::EPSILON =&gt; <span class="prelude-val">Some</span>(f <span class="kw">as </span>i64),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Coerce numeric types into an `i64` if it would be lossless to do so. If this Bson is not numeric</span>
-<span class="doccomment">/// or the conversion would be lossy (e.g. 1.5 -&gt; 1), this returns `None`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_int_raw</span>(<span class="ident">val</span>: <span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="ident">RawBsonRef::Int32</span>(<span class="ident">i</span>) =&gt; <span class="ident">get_int</span>(<span class="kw-2">&amp;</span><span class="ident">Bson::Int32</span>(<span class="ident">i</span>)),
-        <span class="ident">RawBsonRef::Int64</span>(<span class="ident">i</span>) =&gt; <span class="ident">get_int</span>(<span class="kw-2">&amp;</span><span class="ident">Bson::Int64</span>(<span class="ident">i</span>)),
-        <span class="ident">RawBsonRef::Double</span>(<span class="ident">i</span>) =&gt; <span class="ident">get_int</span>(<span class="kw-2">&amp;</span><span class="ident">Bson::Double</span>(<span class="ident">i</span>)),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Coerce numeric types into an `i64` if it would be lossless to do so. If this Bson is not numeric
+/// or the conversion would be lossy (e.g. 1.5 -&gt; 1), this returns `None`.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_int_raw(val: RawBsonRef&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+    <span class="kw">match </span>val {
+        RawBsonRef::Int32(i) =&gt; get_int(<span class="kw-2">&amp;</span>Bson::Int32(i)),
+        RawBsonRef::Int64(i) =&gt; get_int(<span class="kw-2">&amp;</span>Bson::Int64(i)),
+        RawBsonRef::Double(i) =&gt; get_int(<span class="kw-2">&amp;</span>Bson::Double(i)),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Coerce numeric types into an `u64` if it would be lossless to do so. If this Bson is not numeric</span>
-<span class="doccomment">/// or the conversion would be lossy (e.g. 1.5 -&gt; 1), this returns `None`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_u64</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">Bson</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">val</span> {
-        <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) =&gt; <span class="ident">u64::try_from</span>(<span class="ident">i</span>).<span class="ident">ok</span>(),
-        <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) =&gt; <span class="ident">u64::try_from</span>(<span class="ident">i</span>).<span class="ident">ok</span>(),
-        <span class="ident">Bson::Double</span>(<span class="ident">f</span>) <span class="kw">if</span> (<span class="ident">f</span> <span class="op">-</span> (<span class="ident">f</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">f64</span>)).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">f64::EPSILON</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">f</span> <span class="kw">as</span> <span class="ident">u64</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Coerce numeric types into an `u64` if it would be lossless to do so. If this Bson is not numeric
+/// or the conversion would be lossy (e.g. 1.5 -&gt; 1), this returns `None`.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_u64(val: <span class="kw-2">&amp;</span>Bson) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
+    <span class="kw">match </span><span class="kw-2">*</span>val {
+        Bson::Int32(i) =&gt; u64::try_from(i).ok(),
+        Bson::Int64(i) =&gt; u64::try_from(i).ok(),
+        Bson::Double(f) <span class="kw">if </span>(f - (f <span class="kw">as </span>u64 <span class="kw">as </span>f64)).abs() &lt;= f64::EPSILON =&gt; <span class="prelude-val">Some</span>(f <span class="kw">as </span>u64),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bson_array</span>(<span class="ident">docs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Document</span>]) -&gt; <span class="ident">Bson</span> {
-    <span class="ident">Bson::Array</span>(<span class="ident">docs</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">doc</span><span class="op">|</span> <span class="ident">Bson::Document</span>(<span class="ident">doc</span>.<span class="ident">clone</span>())).<span class="ident">collect</span>())
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_bson_array(docs: <span class="kw-2">&amp;</span>[Document]) -&gt; Bson {
+    Bson::Array(docs.iter().map(|doc| Bson::Document(doc.clone())).collect())
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sort_document</span>(<span class="ident">document</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Document</span>) {
-    <span class="kw">let</span> <span class="ident">temp</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="ident">document</span>);
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sort_document(document: <span class="kw-2">&amp;mut </span>Document) {
+    <span class="kw">let </span>temp = std::mem::take(document);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">elements</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">temp</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-    <span class="ident">elements</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">e1</span>, <span class="ident">e2</span><span class="op">|</span> <span class="ident">e1</span>.<span class="number">0</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">e2</span>.<span class="number">0</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>elements: Vec&lt;<span class="kw">_</span>&gt; = temp.into_iter().collect();
+    elements.sort_by(|e1, e2| e1.<span class="number">0</span>.cmp(<span class="kw-2">&amp;</span>e2.<span class="number">0</span>));
 
-    <span class="ident">document</span>.<span class="ident">extend</span>(<span class="ident">elements</span>);
+    document.extend(elements);
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">first_key</span>(<span class="ident">document</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="ident">document</span>.<span class="ident">keys</span>().<span class="ident">next</span>().<span class="ident">map</span>(<span class="ident">String::as_str</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>first_key(document: <span class="kw-2">&amp;</span>Document) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+    document.keys().next().map(String::as_str)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">replacement_document_check</span>(<span class="ident">replacement</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">first_key</span>(<span class="ident">replacement</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;$&#39;</span>) =&gt; <span class="prelude-val">Ok</span>(()),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-            <span class="ident">message</span>: <span class="string">&quot;replace document must have first key not starting with &#39;$&quot;</span>.<span class="ident">to_string</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>replacement_document_check(replacement: <span class="kw-2">&amp;</span>Document) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">match </span>first_key(replacement) {
+        <span class="prelude-val">Some</span>(s) <span class="kw">if </span>!s.starts_with(<span class="string">&#39;$&#39;</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+            message: <span class="string">&quot;replace document must have first key not starting with &#39;$&quot;</span>.to_string(),
         }
-        .<span class="ident">into</span>()),
+        .into()),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_document_check</span>(<span class="ident">update</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">first_key</span>(<span class="ident">update</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;$&#39;</span>) =&gt; <span class="prelude-val">Ok</span>(()),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-            <span class="ident">message</span>: <span class="string">&quot;update document must have first key starting with &#39;$&quot;</span>.<span class="ident">to_string</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_document_check(update: <span class="kw-2">&amp;</span>Document) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">match </span>first_key(update) {
+        <span class="prelude-val">Some</span>(s) <span class="kw">if </span>s.starts_with(<span class="string">&#39;$&#39;</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+            message: <span class="string">&quot;update document must have first key starting with &#39;$&quot;</span>.to_string(),
         }
-        .<span class="ident">into</span>()),
+        .into()),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_duration_option_as_int_millis</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">as_millis</span>() <span class="op">&gt;</span> <span class="ident">i32::MAX</span> <span class="kw">as</span> <span class="ident">u128</span> =&gt; {
-            <span class="ident">serializer</span>.<span class="ident">serialize_i64</span>(<span class="ident">duration</span>.<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">i64</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize_duration_option_as_int_millis&lt;S: Serializer&gt;(
+    val: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    serializer: S,
+) -&gt; std::result::Result&lt;S::Ok, S::Error&gt; {
+    <span class="kw">match </span>val {
+        <span class="prelude-val">Some</span>(duration) <span class="kw">if </span>duration.as_millis() &gt; i32::MAX <span class="kw">as </span>u128 =&gt; {
+            serializer.serialize_i64(duration.as_millis() <span class="kw">as </span>i64)
         }
-        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="ident">duration</span>.<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">i32</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+        <span class="prelude-val">Some</span>(duration) =&gt; serializer.serialize_i32(duration.as_millis() <span class="kw">as </span>i32),
+        <span class="prelude-val">None </span>=&gt; serializer.serialize_none(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_duration_option_as_int_secs</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="op">&gt;</span> <span class="ident">i32::MAX</span> <span class="kw">as</span> <span class="ident">u64</span> =&gt; {
-            <span class="ident">serializer</span>.<span class="ident">serialize_i64</span>(<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">i64</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize_duration_option_as_int_secs&lt;S: Serializer&gt;(
+    val: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    serializer: S,
+) -&gt; std::result::Result&lt;S::Ok, S::Error&gt; {
+    <span class="kw">match </span>val {
+        <span class="prelude-val">Some</span>(duration) <span class="kw">if </span>duration.as_secs() &gt; i32::MAX <span class="kw">as </span>u64 =&gt; {
+            serializer.serialize_i64(duration.as_secs() <span class="kw">as </span>i64)
         }
-        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">i32</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+        <span class="prelude-val">Some</span>(duration) =&gt; serializer.serialize_i32(duration.as_secs() <span class="kw">as </span>i32),
+        <span class="prelude-val">None </span>=&gt; serializer.serialize_none(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">deserialize_duration_option_from_u64_millis</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(
-    <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize_duration_option_from_u64_millis&lt;<span class="lifetime">&#39;de</span>, D&gt;(
+    deserializer: D,
+) -&gt; std::result::Result&lt;<span class="prelude-ty">Option</span>&lt;Duration&gt;, D::Error&gt;
+<span class="kw">where
+    </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">let</span> <span class="ident">millis</span> <span class="op">=</span> <span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="ident">::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">millis</span>.<span class="ident">map</span>(<span class="ident">Duration::from_millis</span>))
+    <span class="kw">let </span>millis = <span class="prelude-ty">Option</span>::&lt;u64&gt;::deserialize(deserializer)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(millis.map(Duration::from_millis))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">deserialize_duration_option_from_u64_seconds</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(
-    <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize_duration_option_from_u64_seconds&lt;<span class="lifetime">&#39;de</span>, D&gt;(
+    deserializer: D,
+) -&gt; std::result::Result&lt;<span class="prelude-ty">Option</span>&lt;Duration&gt;, D::Error&gt;
+<span class="kw">where
+    </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">let</span> <span class="ident">millis</span> <span class="op">=</span> <span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="ident">::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">millis</span>.<span class="ident">map</span>(<span class="ident">Duration::from_secs</span>))
+    <span class="kw">let </span>millis = <span class="prelude-ty">Option</span>::&lt;u64&gt;::deserialize(deserializer)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(millis.map(Duration::from_secs))
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::trivially_copy_pass_by_ref</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_u32_option_as_i32</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="ident">bson::serde_helpers::serialize_u32_as_i32</span>(<span class="ident">val</span>, <span class="ident">serializer</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+<span class="attribute">#[allow(clippy::trivially_copy_pass_by_ref)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize_u32_option_as_i32&lt;S: Serializer&gt;(
+    val: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;u32&gt;,
+    serializer: S,
+) -&gt; std::result::Result&lt;S::Ok, S::Error&gt; {
+    <span class="kw">match </span>val {
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>val) =&gt; bson::serde_helpers::serialize_u32_as_i32(val, serializer),
+        <span class="prelude-val">None </span>=&gt; serializer.serialize_none(),
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::trivially_copy_pass_by_ref</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_u32_option_as_batch_size</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">val</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">std::i32::MAX</span> <span class="kw">as</span> <span class="ident">u32</span> =&gt; (<span class="macro">doc!</span> {
-            <span class="string">&quot;batchSize&quot;</span>: (<span class="kw-2">*</span><span class="ident">val</span> <span class="kw">as</span> <span class="ident">i32</span>)
+<span class="attribute">#[allow(clippy::trivially_copy_pass_by_ref)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize_u32_option_as_batch_size&lt;S: Serializer&gt;(
+    val: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;u32&gt;,
+    serializer: S,
+) -&gt; std::result::Result&lt;S::Ok, S::Error&gt; {
+    <span class="kw">match </span>val {
+        <span class="prelude-val">Some</span>(val) <span class="kw">if </span><span class="kw-2">*</span>val &lt;= std::i32::MAX <span class="kw">as </span>u32 =&gt; (<span class="macro">doc! </span>{
+            <span class="string">&quot;batchSize&quot;</span>: (<span class="kw-2">*</span>val <span class="kw">as </span>i32)
         })
-        .<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="ident">Document::new</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(
+        .serialize(serializer),
+        <span class="prelude-val">None </span>=&gt; Document::new().serialize(serializer),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ser::Error::custom(
             <span class="string">&quot;batch size must be able to fit into a signed 32-bit integer&quot;</span>,
         )),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_u64_option_as_i64</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">bson::serde_helpers::serialize_u64_as_i64</span>(<span class="ident">v</span>, <span class="ident">serializer</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize_u64_option_as_i64&lt;S: Serializer&gt;(
+    val: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;u64&gt;,
+    serializer: S,
+) -&gt; std::result::Result&lt;S::Ok, S::Error&gt; {
+    <span class="kw">match </span>val {
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>v) =&gt; bson::serde_helpers::serialize_u64_as_i64(v, serializer),
+        <span class="prelude-val">None </span>=&gt; serializer.serialize_none(),
     }
 }
 
-<span class="doccomment">/// Deserialize an u64 from any BSON number type if it could be done losslessly.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">deserialize_u64_from_bson_number</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(
-    <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Deserialize an u64 from any BSON number type if it could be done losslessly.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize_u64_from_bson_number&lt;<span class="lifetime">&#39;de</span>, D&gt;(
+    deserializer: D,
+) -&gt; std::result::Result&lt;u64, D::Error&gt;
+<span class="kw">where
+    </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="ident">Bson::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="ident">get_u64</span>(<span class="kw-2">&amp;</span><span class="ident">bson</span>)
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">D::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;could not deserialize u64 from {:?}&quot;</span>, <span class="ident">bson</span>)))
+    <span class="kw">let </span>bson = Bson::deserialize(deserializer)<span class="question-mark">?</span>;
+    get_u64(<span class="kw-2">&amp;</span>bson)
+        .ok_or_else(|| D::Error::custom(<span class="macro">format!</span>(<span class="string">&quot;could not deserialize u64 from {:?}&quot;</span>, bson)))
 }
 
-<span class="doccomment">/// The size in bytes of the provided document&#39;s entry in a BSON array at the given index.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">array_entry_size_bytes</span>(<span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">doc_len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
-    <span class="comment">//   * type (1 byte)</span>
-    <span class="comment">//   * number of decimal digits in key</span>
-    <span class="comment">//   * null terminator for the key (1 byte)</span>
-    <span class="comment">//   * size of value</span>
+<span class="doccomment">/// The size in bytes of the provided document&#39;s entry in a BSON array at the given index.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>array_entry_size_bytes(index: usize, doc_len: usize) -&gt; u64 {
+    <span class="comment">//   * type (1 byte)
+    //   * number of decimal digits in key
+    //   * null terminator for the key (1 byte)
+    //   * size of value
 
-    <span class="number">1</span> <span class="op">+</span> <span class="ident">num_decimal_digits</span>(<span class="ident">index</span>) <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">doc_len</span> <span class="kw">as</span> <span class="ident">u64</span>
+    </span><span class="number">1 </span>+ num_decimal_digits(index) + <span class="number">1 </span>+ doc_len <span class="kw">as </span>u64
 }
 
-<span class="doccomment">/// The number of digits in `n` in base 10.</span>
-<span class="doccomment">/// Useful for calculating the size of an array entry in BSON.</span>
-<span class="kw">fn</span> <span class="ident">num_decimal_digits</span>(<span class="kw-2">mut</span> <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digits</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// The number of digits in `n` in base 10.
+/// Useful for calculating the size of an array entry in BSON.
+</span><span class="kw">fn </span>num_decimal_digits(<span class="kw-2">mut </span>n: usize) -&gt; u64 {
+    <span class="kw">let </span><span class="kw-2">mut </span>digits = <span class="number">0</span>;
 
-    <span class="kw">loop</span> {
-        <span class="ident">n</span> <span class="op">/</span><span class="op">=</span> <span class="number">10</span>;
-        <span class="ident">digits</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">loop </span>{
+        n /= <span class="number">10</span>;
+        digits += <span class="number">1</span>;
 
-        <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="ident">digits</span>;
+        <span class="kw">if </span>n == <span class="number">0 </span>{
+            <span class="kw">return </span>digits;
         }
     }
 }
 
-<span class="doccomment">/// Read a document&#39;s raw BSON bytes from the provided reader.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_document_bytes</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32_sync</span>()<span class="question-mark">?</span>;
+<span class="doccomment">/// Read a document&#39;s raw BSON bytes from the provided reader.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_document_bytes&lt;R: Read&gt;(<span class="kw-2">mut </span>reader: R) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
+    <span class="kw">let </span>length = reader.read_i32_sync()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">usize</span>);
-    <span class="ident">bytes</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">length</span>.<span class="ident">to_le_bytes</span>())<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::with_capacity(length <span class="kw">as </span>usize);
+    bytes.write_all(<span class="kw-2">&amp;</span>length.to_le_bytes())<span class="question-mark">?</span>;
 
-    <span class="ident">reader</span>.<span class="ident">take</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> <span class="number">4</span>).<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>)<span class="question-mark">?</span>;
+    reader.take(length <span class="kw">as </span>u64 - <span class="number">4</span>).read_to_end(<span class="kw-2">&amp;mut </span>bytes)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>)
+    <span class="prelude-val">Ok</span>(bytes)
 }
 
-<span class="doccomment">/// Serializes an Error as a string.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_error_as_string</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">Error</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>.<span class="ident">to_string</span>())
+<span class="doccomment">/// Serializes an Error as a string.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize_error_as_string&lt;S: Serializer&gt;(
+    val: <span class="kw-2">&amp;</span>Error,
+    serializer: S,
+) -&gt; std::result::Result&lt;S::Ok, S::Error&gt; {
+    serializer.serialize_str(<span class="kw-2">&amp;</span>val.to_string())
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::bson_util::num_decimal_digits</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">crate</span>::bson_util::num_decimal_digits;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">num_digits</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">num_decimal_digits</span>(<span class="number">0</span>), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">num_decimal_digits</span>(<span class="number">1</span>), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">num_decimal_digits</span>(<span class="number">10</span>), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">num_decimal_digits</span>(<span class="number">15</span>), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">num_decimal_digits</span>(<span class="number">100</span>), <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">num_decimal_digits</span>(<span class="number">125</span>), <span class="number">3</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>num_digits() {
+        <span class="macro">assert_eq!</span>(num_decimal_digits(<span class="number">0</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(num_decimal_digits(<span class="number">1</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(num_decimal_digits(<span class="number">10</span>), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(num_decimal_digits(<span class="number">15</span>), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(num_decimal_digits(<span class="number">100</span>), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(num_decimal_digits(<span class="number">125</span>), <span class="number">3</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

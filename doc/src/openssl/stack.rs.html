@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.41/src/stack.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stack.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.41/src/stack.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stack.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -378,385 +378,385 @@
 <span id="378">378</span>
 <span id="379">379</span>
 <span id="380">380</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">cfg_if::cfg_if</span>;
-<span class="kw">use</span> <span class="ident">foreign_types</span>::{<span class="ident">ForeignType</span>, <span class="ident">ForeignTypeRef</span>, <span class="ident">Opaque</span>};
-<span class="kw">use</span> <span class="ident">libc::c_int</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Borrow</span>;
-<span class="kw">use</span> <span class="ident">std::convert::AsRef</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::iter</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>, <span class="ident">Index</span>, <span class="ident">IndexMut</span>, <span class="ident">Range</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>cfg_if::cfg_if;
+<span class="kw">use </span>foreign_types::{ForeignType, ForeignTypeRef, Opaque};
+<span class="kw">use </span>libc::c_int;
+<span class="kw">use </span>std::borrow::Borrow;
+<span class="kw">use </span>std::convert::AsRef;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::iter;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::mem;
+<span class="kw">use </span>std::ops::{Deref, DerefMut, Index, IndexMut, Range};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::ErrorStack</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::ForeignTypeExt</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cvt</span>, <span class="ident">cvt_p</span>};
+<span class="kw">use </span><span class="kw">crate</span>::error::ErrorStack;
+<span class="kw">use </span><span class="kw">crate</span>::util::ForeignTypeExt;
+<span class="kw">use crate</span>::{cvt, cvt_p};
 
-<span class="macro">cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl110</span>)]</span> {
-        <span class="kw">use</span> <span class="ident">ffi</span>::{
-            <span class="ident">OPENSSL_sk_pop</span>, <span class="ident">OPENSSL_sk_free</span>, <span class="ident">OPENSSL_sk_num</span>, <span class="ident">OPENSSL_sk_value</span>, <span class="ident">OPENSSL_STACK</span>,
-            <span class="ident">OPENSSL_sk_new_null</span>, <span class="ident">OPENSSL_sk_push</span>,
+<span class="macro">cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(ossl110)] </span>{
+        <span class="kw">use </span>ffi::{
+            OPENSSL_sk_pop, OPENSSL_sk_free, OPENSSL_sk_num, OPENSSL_sk_value, OPENSSL_STACK,
+            OPENSSL_sk_new_null, OPENSSL_sk_push,
         };
-    } <span class="kw">else</span> {
-        <span class="kw">use</span> <span class="ident">ffi</span>::{
-            <span class="ident">sk_pop</span> <span class="kw">as</span> <span class="ident">OPENSSL_sk_pop</span>, <span class="ident">sk_free</span> <span class="kw">as</span> <span class="ident">OPENSSL_sk_free</span>, <span class="ident">sk_num</span> <span class="kw">as</span> <span class="ident">OPENSSL_sk_num</span>,
-            <span class="ident">sk_value</span> <span class="kw">as</span> <span class="ident">OPENSSL_sk_value</span>, <span class="ident">_STACK</span> <span class="kw">as</span> <span class="ident">OPENSSL_STACK</span>,
-            <span class="ident">sk_new_null</span> <span class="kw">as</span> <span class="ident">OPENSSL_sk_new_null</span>, <span class="ident">sk_push</span> <span class="kw">as</span> <span class="ident">OPENSSL_sk_push</span>,
+    } <span class="kw">else </span>{
+        <span class="kw">use </span>ffi::{
+            sk_pop <span class="kw">as </span>OPENSSL_sk_pop, sk_free <span class="kw">as </span>OPENSSL_sk_free, sk_num <span class="kw">as </span>OPENSSL_sk_num,
+            sk_value <span class="kw">as </span>OPENSSL_sk_value, _STACK <span class="kw">as </span>OPENSSL_STACK,
+            sk_new_null <span class="kw">as </span>OPENSSL_sk_new_null, sk_push <span class="kw">as </span>OPENSSL_sk_push,
         };
     }
 }
 
-<span class="doccomment">/// Trait implemented by types which can be placed in a stack.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It should not be implemented for any type outside of this crate.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Stackable</span>: <span class="ident">ForeignType</span> {
-    <span class="doccomment">/// The C stack type for this element.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Generally called `stack_st_{ELEMENT_TYPE}`, normally hidden by the</span>
-    <span class="doccomment">/// `STACK_OF(ELEMENT_TYPE)` macro in the OpenSSL API.</span>
-    <span class="kw">type</span> <span class="ident">StackType</span>;
+<span class="doccomment">/// Trait implemented by types which can be placed in a stack.
+///
+/// It should not be implemented for any type outside of this crate.
+</span><span class="kw">pub trait </span>Stackable: ForeignType {
+    <span class="doccomment">/// The C stack type for this element.
+    ///
+    /// Generally called `stack_st_{ELEMENT_TYPE}`, normally hidden by the
+    /// `STACK_OF(ELEMENT_TYPE)` macro in the OpenSSL API.
+    </span><span class="kw">type </span>StackType;
 }
 
-<span class="doccomment">/// An owned stack of `T`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span>(<span class="kw-2">*mut</span> <span class="ident">T::StackType</span>);
+<span class="doccomment">/// An owned stack of `T`.
+</span><span class="kw">pub struct </span>Stack&lt;T: Stackable&gt;(<span class="kw-2">*mut </span>T::StackType);
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe impl</span>&lt;T: Stackable + Send&gt; Send <span class="kw">for </span>Stack&lt;T&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: Stackable + Sync&gt; Sync <span class="kw">for </span>Stack&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Stackable</span>,
-    <span class="ident">T::Ref</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;T&gt; fmt::Debug <span class="kw">for </span>Stack&lt;T&gt;
+<span class="kw">where
+    </span>T: Stackable,
+    T::Ref: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_list</span>().<span class="ident">entries</span>(<span class="self">self</span>).<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_list().entries(<span class="self">self</span>).finish()
     }
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="kw">while</span> <span class="self">self</span>.<span class="ident">pop</span>().<span class="ident">is_some</span>() {}
-            <span class="ident">OPENSSL_sk_free</span>(<span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>);
+<span class="kw">impl</span>&lt;T: Stackable&gt; Drop <span class="kw">for </span>Stack&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="kw">while </span><span class="self">self</span>.pop().is_some() {}
+            OPENSSL_sk_free(<span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::init</span>();
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">cvt_p</span>(<span class="ident">OPENSSL_sk_new_null</span>())<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">Stack</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>))
+<span class="kw">impl</span>&lt;T: Stackable&gt; Stack&lt;T&gt; {
+    <span class="kw">pub fn </span>new() -&gt; <span class="prelude-ty">Result</span>&lt;Stack&lt;T&gt;, ErrorStack&gt; {
+        <span class="kw">unsafe </span>{
+            ffi::init();
+            <span class="kw">let </span>ptr = cvt_p(OPENSSL_sk_new_null())<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(Stack(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>))
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">iter::IntoIterator</span> <span class="kw">for</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T: Stackable&gt; iter::IntoIterator <span class="kw">for </span>Stack&lt;T&gt; {
+    <span class="kw">type </span>IntoIter = IntoIter&lt;T&gt;;
+    <span class="kw">type </span>Item = T;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">it</span> <span class="op">=</span> <span class="ident">IntoIter</span> {
-            <span class="ident">stack</span>: <span class="self">self</span>.<span class="number">0</span>,
-            <span class="ident">idxs</span>: <span class="number">0</span>..<span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">c_int</span>,
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; IntoIter&lt;T&gt; {
+        <span class="kw">let </span>it = IntoIter {
+            stack: <span class="self">self</span>.<span class="number">0</span>,
+            idxs: <span class="number">0</span>..<span class="self">self</span>.len() <span class="kw">as </span>c_int,
         };
-        <span class="ident">mem::forget</span>(<span class="self">self</span>);
-        <span class="ident">it</span>
+        mem::forget(<span class="self">self</span>);
+        it
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>
-    }
+<span class="kw">impl</span>&lt;T: Stackable&gt; AsRef&lt;StackRef&lt;T&gt;&gt; <span class="kw">for </span>Stack&lt;T&gt; {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>StackRef&lt;T&gt; {
+        <span class="kw-2">&amp;*</span><span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>
-    }
+<span class="kw">impl</span>&lt;T: Stackable&gt; Borrow&lt;StackRef&lt;T&gt;&gt; <span class="kw">for </span>Stack&lt;T&gt; {
+    <span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>StackRef&lt;T&gt; {
+        <span class="kw-2">&amp;*</span><span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">ForeignType</span> <span class="kw">for</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">CType</span> <span class="op">=</span> <span class="ident">T::StackType</span>;
-    <span class="kw">type</span> <span class="ident">Ref</span> <span class="op">=</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;T: Stackable&gt; ForeignType <span class="kw">for </span>Stack&lt;T&gt; {
+    <span class="kw">type </span>CType = T::StackType;
+    <span class="kw">type </span>Ref = StackRef&lt;T&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ptr</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">T::StackType</span>) -&gt; <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>from_ptr(ptr: <span class="kw-2">*mut </span>T::StackType) -&gt; Stack&lt;T&gt; {
         <span class="macro">assert!</span>(
-            <span class="op">!</span><span class="ident">ptr</span>.<span class="ident">is_null</span>(),
+            !ptr.is_null(),
             <span class="string">&quot;Must not instantiate a Stack from a null-ptr - use Stack::new() in \
-             that case&quot;</span>
-        );
-        <span class="ident">Stack</span>(<span class="ident">ptr</span>)
+             that case&quot;
+        </span>);
+        Stack(ptr)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T::StackType</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>T::StackType {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;T: Stackable&gt; Deref <span class="kw">for </span>Stack&lt;T&gt; {
+    <span class="kw">type </span>Target = StackRef&lt;T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> { <span class="ident">StackRef::from_ptr</span>(<span class="self">self</span>.<span class="number">0</span>) }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> { <span class="ident">StackRef::from_ptr_mut</span>(<span class="self">self</span>.<span class="number">0</span>) }
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>StackRef&lt;T&gt; {
+        <span class="kw">unsafe </span>{ StackRef::from_ptr(<span class="self">self</span>.<span class="number">0</span>) }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> {
-    <span class="ident">stack</span>: <span class="kw-2">*mut</span> <span class="ident">T::StackType</span>,
-    <span class="ident">idxs</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T: Stackable&gt; DerefMut <span class="kw">for </span>Stack&lt;T&gt; {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>StackRef&lt;T&gt; {
+        <span class="kw">unsafe </span>{ StackRef::from_ptr_mut(<span class="self">self</span>.<span class="number">0</span>) }
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// https://github.com/rust-lang/rust-clippy/issues/7510</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::while_let_on_iterator</span>)]</span>
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>() {}
-            <span class="ident">OPENSSL_sk_free</span>(<span class="self">self</span>.<span class="ident">stack</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>);
+<span class="kw">pub struct </span>IntoIter&lt;T: Stackable&gt; {
+    stack: <span class="kw-2">*mut </span>T::StackType,
+    idxs: Range&lt;c_int&gt;,
+}
+
+<span class="kw">impl</span>&lt;T: Stackable&gt; Drop <span class="kw">for </span>IntoIter&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// https://github.com/rust-lang/rust-clippy/issues/7510
+            </span><span class="attribute">#[allow(clippy::while_let_on_iterator)]
+            </span><span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw">_</span>) = <span class="self">self</span>.next() {}
+            OPENSSL_sk_free(<span class="self">self</span>.stack <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T: Stackable&gt; Iterator <span class="kw">for </span>IntoIter&lt;T&gt; {
+    <span class="kw">type </span>Item = T;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">idxs</span>
-                .<span class="ident">next</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">T::from_ptr</span>(<span class="ident">OPENSSL_sk_value</span>(<span class="self">self</span>.<span class="ident">stack</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>, <span class="ident">i</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>))
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.idxs
+                .next()
+                .map(|i| T::from_ptr(OPENSSL_sk_value(<span class="self">self</span>.stack <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>, i) <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">idxs</span>.<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.idxs.size_hint()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">idxs</span>
-                .<span class="ident">next_back</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">T::from_ptr</span>(<span class="ident">OPENSSL_sk_value</span>(<span class="self">self</span>.<span class="ident">stack</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>, <span class="ident">i</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>))
+<span class="kw">impl</span>&lt;T: Stackable&gt; DoubleEndedIterator <span class="kw">for </span>IntoIter&lt;T&gt; {
+    <span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.idxs
+                .next_back()
+                .map(|i| T::from_ptr(OPENSSL_sk_value(<span class="self">self</span>.stack <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>, i) <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>))
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;T: Stackable&gt; ExactSizeIterator <span class="kw">for </span>IntoIter&lt;T&gt; {}
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span>(<span class="ident">Opaque</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="kw">pub struct </span>StackRef&lt;T: Stackable&gt;(Opaque, PhantomData&lt;T&gt;);
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe impl</span>&lt;T: Stackable + Send&gt; Send <span class="kw">for </span>StackRef&lt;T&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: Stackable + Sync&gt; Sync <span class="kw">for </span>StackRef&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">ForeignTypeRef</span> <span class="kw">for</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">CType</span> <span class="op">=</span> <span class="ident">T::StackType</span>;
+<span class="kw">impl</span>&lt;T: Stackable&gt; ForeignTypeRef <span class="kw">for </span>StackRef&lt;T&gt; {
+    <span class="kw">type </span>CType = T::StackType;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_stack</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">OPENSSL_STACK</span> {
-        <span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>
+<span class="kw">impl</span>&lt;T: Stackable&gt; StackRef&lt;T&gt; {
+    <span class="kw">fn </span>as_stack(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>OPENSSL_STACK {
+        <span class="self">self</span>.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_
+    </span>}
+
+    <span class="doccomment">/// Returns the number of items in the stack.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">unsafe </span>{ OPENSSL_sk_num(<span class="self">self</span>.as_stack()) <span class="kw">as </span>usize }
     }
 
-    <span class="doccomment">/// Returns the number of items in the stack.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">unsafe</span> { <span class="ident">OPENSSL_sk_num</span>(<span class="self">self</span>.<span class="ident">as_stack</span>()) <span class="kw">as</span> <span class="ident">usize</span> }
-    }
+    <span class="doccomment">/// Determines if the stack is empty.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Determines if the stack is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Iter</span> {
-            <span class="ident">stack</span>: <span class="self">self</span>,
-            <span class="ident">idxs</span>: <span class="number">0</span>..<span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">c_int</span>,
+    <span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+        Iter {
+            stack: <span class="self">self</span>,
+            idxs: <span class="number">0</span>..<span class="self">self</span>.len() <span class="kw">as </span>c_int,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">IterMut</span> {
-            <span class="ident">idxs</span>: <span class="number">0</span>..<span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">c_int</span>,
-            <span class="ident">stack</span>: <span class="self">self</span>,
+    <span class="kw">pub fn </span>iter_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; IterMut&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+        IterMut {
+            idxs: <span class="number">0</span>..<span class="self">self</span>.len() <span class="kw">as </span>c_int,
+            stack: <span class="self">self</span>,
         }
     }
 
-    <span class="doccomment">/// Returns a reference to the element at the given index in the</span>
-    <span class="doccomment">/// stack or `None` if the index is out of bounds</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T::Ref</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Returns a reference to the element at the given index in the
+    /// stack or `None` if the index is out of bounds
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T::Ref&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">if </span>idx &gt;= <span class="self">self</span>.len() {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
 
-            <span class="prelude-val">Some</span>(<span class="ident">T::Ref::from_ptr</span>(<span class="self">self</span>.<span class="ident">_get</span>(<span class="ident">idx</span>)))
+            <span class="prelude-val">Some</span>(T::Ref::from_ptr(<span class="self">self</span>._get(idx)))
         }
     }
 
-    <span class="doccomment">/// Returns a mutable reference to the element at the given index in the</span>
-    <span class="doccomment">/// stack or `None` if the index is out of bounds</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">T::Ref</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Returns a mutable reference to the element at the given index in the
+    /// stack or `None` if the index is out of bounds
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, idx: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>T::Ref&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">if </span>idx &gt;= <span class="self">self</span>.len() {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
 
-            <span class="prelude-val">Some</span>(<span class="ident">T::Ref::from_ptr_mut</span>(<span class="self">self</span>.<span class="ident">_get</span>(<span class="ident">idx</span>)))
+            <span class="prelude-val">Some</span>(T::Ref::from_ptr_mut(<span class="self">self</span>._get(idx)))
         }
     }
 
-    <span class="doccomment">/// Pushes a value onto the top of the stack.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="ident">cvt</span>(<span class="ident">OPENSSL_sk_push</span>(<span class="self">self</span>.<span class="ident">as_stack</span>(), <span class="ident">data</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>))<span class="question-mark">?</span>;
-            <span class="ident">mem::forget</span>(<span class="ident">data</span>);
+    <span class="doccomment">/// Pushes a value onto the top of the stack.
+    </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrorStack&gt; {
+        <span class="kw">unsafe </span>{
+            cvt(OPENSSL_sk_push(<span class="self">self</span>.as_stack(), data.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>))<span class="question-mark">?</span>;
+            mem::forget(data);
             <span class="prelude-val">Ok</span>(())
         }
     }
 
-    <span class="doccomment">/// Removes the last element from the stack and returns it.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">OPENSSL_sk_pop</span>(<span class="self">self</span>.<span class="ident">as_stack</span>());
-            <span class="ident">T::from_ptr_opt</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>)
+    <span class="doccomment">/// Removes the last element from the stack and returns it.
+    </span><span class="kw">pub fn </span>pop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>ptr = OPENSSL_sk_pop(<span class="self">self</span>.as_stack());
+            T::from_ptr_opt(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>)
         }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">_get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T::CType</span> {
-        <span class="ident">OPENSSL_sk_value</span>(<span class="self">self</span>.<span class="ident">as_stack</span>(), <span class="ident">idx</span> <span class="kw">as</span> <span class="ident">c_int</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>
+    <span class="kw">unsafe fn </span>_get(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; <span class="kw-2">*mut </span>T::CType {
+        OPENSSL_sk_value(<span class="self">self</span>.as_stack(), idx <span class="kw">as </span>c_int) <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;T: Stackable&gt; Index&lt;usize&gt; <span class="kw">for </span>StackRef&lt;T&gt; {
+    <span class="kw">type </span>Output = T::Ref;
+
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">&amp;</span>T::Ref {
+        <span class="self">self</span>.get(index).unwrap()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T::Ref</span>;
-
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T::Ref</span> {
-        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">unwrap</span>()
+<span class="kw">impl</span>&lt;T: Stackable&gt; IndexMut&lt;usize&gt; <span class="kw">for </span>StackRef&lt;T&gt; {
+    <span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">&amp;mut </span>T::Ref {
+        <span class="self">self</span>.get_mut(index).unwrap()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T::Ref</span> {
-        <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>).<span class="ident">unwrap</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; iter::IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>StackRef&lt;T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T::Ref;
+    <span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>, T&gt;;
+
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+        <span class="self">self</span>.iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">iter::IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T::Ref</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; iter::IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>StackRef&lt;T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T::Ref;
+    <span class="kw">type </span>IntoIter = IterMut&lt;<span class="lifetime">&#39;a</span>, T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; IterMut&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+        <span class="self">self</span>.iter_mut()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">iter::IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T::Ref</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; iter::IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Stack&lt;T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T::Ref;
+    <span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>, T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter_mut</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+        <span class="self">self</span>.iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">iter::IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T::Ref</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; iter::IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Stack&lt;T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T::Ref;
+    <span class="kw">type </span>IntoIter = IterMut&lt;<span class="lifetime">&#39;a</span>, T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; IterMut&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+        <span class="self">self</span>.iter_mut()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">iter::IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T::Ref</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter_mut</span>()
-    }
+<span class="doccomment">/// An iterator over the stack&#39;s contents.
+</span><span class="kw">pub struct </span>Iter&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; {
+    stack: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>StackRef&lt;T&gt;,
+    idxs: Range&lt;c_int&gt;,
 }
 
-<span class="doccomment">/// An iterator over the stack&#39;s contents.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> {
-    <span class="ident">stack</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">idxs</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>,
-}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T::Ref;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T::Ref</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T::Ref</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">idxs</span>
-                .<span class="ident">next</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">T::Ref::from_ptr</span>(<span class="ident">OPENSSL_sk_value</span>(<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">as_stack</span>(), <span class="ident">i</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>))
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T::Ref&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.idxs
+                .next()
+                .map(|i| T::Ref::from_ptr(OPENSSL_sk_value(<span class="self">self</span>.stack.as_stack(), i) <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">idxs</span>.<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.idxs.size_hint()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T::Ref</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">idxs</span>
-                .<span class="ident">next_back</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">T::Ref::from_ptr</span>(<span class="ident">OPENSSL_sk_value</span>(<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">as_stack</span>(), <span class="ident">i</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>))
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
-
-<span class="doccomment">/// A mutable iterator over the stack&#39;s contents.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> {
-    <span class="ident">stack</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">idxs</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T::Ref</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T::Ref</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">idxs</span>
-                .<span class="ident">next</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">T::Ref::from_ptr_mut</span>(<span class="ident">OPENSSL_sk_value</span>(<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">as_stack</span>(), <span class="ident">i</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>))
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">idxs</span>.<span class="ident">size_hint</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T::Ref</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">idxs</span>
-                .<span class="ident">next_back</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">T::Ref::from_ptr_mut</span>(<span class="ident">OPENSSL_sk_value</span>(<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">as_stack</span>(), <span class="ident">i</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; DoubleEndedIterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T::Ref&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.idxs
+                .next_back()
+                .map(|i| T::Ref::from_ptr(OPENSSL_sk_value(<span class="self">self</span>.stack.as_stack(), i) <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>))
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Stackable</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; ExactSizeIterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>, T&gt; {}
+
+<span class="doccomment">/// A mutable iterator over the stack&#39;s contents.
+</span><span class="kw">pub struct </span>IterMut&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; {
+    stack: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>StackRef&lt;T&gt;,
+    idxs: Range&lt;c_int&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; Iterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T::Ref;
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T::Ref&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.idxs
+                .next()
+                .map(|i| T::Ref::from_ptr_mut(OPENSSL_sk_value(<span class="self">self</span>.stack.as_stack(), i) <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>))
+        }
+    }
+
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.idxs.size_hint()
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; DoubleEndedIterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T::Ref&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.idxs
+                .next_back()
+                .map(|i| T::Ref::from_ptr_mut(OPENSSL_sk_value(<span class="self">self</span>.stack.as_stack(), i) <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>))
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Stackable&gt; ExactSizeIterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">&#39;a</span>, T&gt; {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="openssl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="openssl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

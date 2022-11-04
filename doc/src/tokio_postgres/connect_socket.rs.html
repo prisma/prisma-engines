@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/connect_socket.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connect_socket.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/connect_socket.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connect_socket.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -79,86 +79,86 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::Host</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::keepalive::KeepaliveConfig</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Error</span>, <span class="ident">Socket</span>};
-<span class="kw">use</span> <span class="ident">socket2</span>::{<span class="ident">SockRef</span>, <span class="ident">TcpKeepalive</span>};
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio::net::UnixStream</span>;
-<span class="kw">use</span> <span class="ident">tokio::net</span>::{<span class="self">self</span>, <span class="ident">TcpStream</span>};
-<span class="kw">use</span> <span class="ident">tokio::time</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::config::Host;
+<span class="kw">use </span><span class="kw">crate</span>::keepalive::KeepaliveConfig;
+<span class="kw">use crate</span>::{Error, Socket};
+<span class="kw">use </span>socket2::{SockRef, TcpKeepalive};
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::time::Duration;
+<span class="attribute">#[cfg(unix)]
+</span><span class="kw">use </span>tokio::net::UnixStream;
+<span class="kw">use </span>tokio::net::{<span class="self">self</span>, TcpStream};
+<span class="kw">use </span>tokio::time;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_socket</span>(
-    <span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">Host</span>,
-    <span class="ident">port</span>: <span class="ident">u16</span>,
-    <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">keepalive_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">KeepaliveConfig</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Socket</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">host</span> {
-        <span class="ident">Host::Tcp</span>(<span class="ident">host</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">net::lookup_host</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">host</span>, <span class="ident">port</span>))
-                .<span class="kw">await</span>
-                .<span class="ident">map_err</span>(<span class="ident">Error::connect</span>)<span class="question-mark">?</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>connect_socket(
+    host: <span class="kw-2">&amp;</span>Host,
+    port: u16,
+    connect_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    keepalive_config: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>KeepaliveConfig&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Socket, Error&gt; {
+    <span class="kw">match </span>host {
+        Host::Tcp(host) =&gt; {
+            <span class="kw">let </span>addrs = net::lookup_host((<span class="kw-2">&amp;**</span>host, port))
+                .<span class="kw">await
+                </span>.map_err(Error::connect)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_err</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>last_err = <span class="prelude-val">None</span>;
 
-            <span class="kw">for</span> <span class="ident">addr</span> <span class="kw">in</span> <span class="ident">addrs</span> {
-                <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span>
-                    <span class="kw">match</span> <span class="ident">connect_with_timeout</span>(<span class="ident">TcpStream::connect</span>(<span class="ident">addr</span>), <span class="ident">connect_timeout</span>).<span class="kw">await</span> {
-                        <span class="prelude-val">Ok</span>(<span class="ident">stream</span>) =&gt; <span class="ident">stream</span>,
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                            <span class="ident">last_err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>);
+            <span class="kw">for </span>addr <span class="kw">in </span>addrs {
+                <span class="kw">let </span>stream =
+                    <span class="kw">match </span>connect_with_timeout(TcpStream::connect(addr), connect_timeout).<span class="kw">await </span>{
+                        <span class="prelude-val">Ok</span>(stream) =&gt; stream,
+                        <span class="prelude-val">Err</span>(e) =&gt; {
+                            last_err = <span class="prelude-val">Some</span>(e);
                             <span class="kw">continue</span>;
                         }
                     };
 
-                <span class="ident">stream</span>.<span class="ident">set_nodelay</span>(<span class="bool-val">true</span>).<span class="ident">map_err</span>(<span class="ident">Error::connect</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">keepalive_config</span>) <span class="op">=</span> <span class="ident">keepalive_config</span> {
-                    <span class="ident">SockRef::from</span>(<span class="kw-2">&amp;</span><span class="ident">stream</span>)
-                        .<span class="ident">set_tcp_keepalive</span>(<span class="kw-2">&amp;</span><span class="ident">TcpKeepalive::from</span>(<span class="ident">keepalive_config</span>))
-                        .<span class="ident">map_err</span>(<span class="ident">Error::connect</span>)<span class="question-mark">?</span>;
+                stream.set_nodelay(<span class="bool-val">true</span>).map_err(Error::connect)<span class="question-mark">?</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(keepalive_config) = keepalive_config {
+                    SockRef::from(<span class="kw-2">&amp;</span>stream)
+                        .set_tcp_keepalive(<span class="kw-2">&amp;</span>TcpKeepalive::from(keepalive_config))
+                        .map_err(Error::connect)<span class="question-mark">?</span>;
                 }
 
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Socket::new_tcp</span>(<span class="ident">stream</span>));
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(Socket::new_tcp(stream));
             }
 
-            <span class="prelude-val">Err</span>(<span class="ident">last_err</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="ident">Error::connect</span>(<span class="ident">io::Error::new</span>(
-                    <span class="ident">io::ErrorKind::InvalidInput</span>,
+            <span class="prelude-val">Err</span>(last_err.unwrap_or_else(|| {
+                Error::connect(io::Error::new(
+                    io::ErrorKind::InvalidInput,
                     <span class="string">&quot;could not resolve any addresses&quot;</span>,
                 ))
             }))
         }
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-        <span class="ident">Host::Unix</span>(<span class="ident">path</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">join</span>(<span class="macro">format!</span>(<span class="string">&quot;.s.PGSQL.{}&quot;</span>, <span class="ident">port</span>));
-            <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">connect_with_timeout</span>(<span class="ident">UnixStream::connect</span>(<span class="ident">path</span>), <span class="ident">connect_timeout</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">Socket::new_unix</span>(<span class="ident">socket</span>))
+        <span class="attribute">#[cfg(unix)]
+        </span>Host::Unix(path) =&gt; {
+            <span class="kw">let </span>path = path.join(<span class="macro">format!</span>(<span class="string">&quot;.s.PGSQL.{}&quot;</span>, port));
+            <span class="kw">let </span>socket = connect_with_timeout(UnixStream::connect(path), connect_timeout).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(Socket::new_unix(socket))
         }
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_with_timeout</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">connect</span>: <span class="ident">F</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">async fn </span>connect_with_timeout&lt;F, T&gt;(connect: F, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;
+<span class="kw">where
+    </span>F: Future&lt;Output = io::Result&lt;T&gt;&gt;,
 {
-    <span class="kw">match</span> <span class="ident">timeout</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">timeout</span>) =&gt; <span class="kw">match</span> <span class="ident">time::timeout</span>(<span class="ident">timeout</span>, <span class="ident">connect</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">socket</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">socket</span>),
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::connect</span>(<span class="ident">e</span>)),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::connect</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::TimedOut</span>,
+    <span class="kw">match </span>timeout {
+        <span class="prelude-val">Some</span>(timeout) =&gt; <span class="kw">match </span>time::timeout(timeout, connect).<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(socket)) =&gt; <span class="prelude-val">Ok</span>(socket),
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(e)) =&gt; <span class="prelude-val">Err</span>(Error::connect(e)),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(Error::connect(io::Error::new(
+                io::ErrorKind::TimedOut,
                 <span class="string">&quot;connection timed out&quot;</span>,
             ))),
         },
-        <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">connect</span>.<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">socket</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">socket</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::connect</span>(<span class="ident">e</span>)),
+        <span class="prelude-val">None </span>=&gt; <span class="kw">match </span>connect.<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(socket) =&gt; <span class="prelude-val">Ok</span>(socket),
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(Error::connect(e)),
         },
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

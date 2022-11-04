@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/types/impls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>impls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../barrel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/types/impls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>impls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../barrel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -239,246 +239,246 @@
 <span id="239">239</span>
 <span id="240">240</span>
 <span id="241">241</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Implementation specifics for the type system</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Implementation specifics for the type system
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>};
+</span><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Display};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::WrappedDefault</span>;
+<span class="kw">use </span><span class="kw">super</span>::WrappedDefault;
 
-<span class="doccomment">/// A smol wrapper around `Vec&lt;T&gt;` to get around the orphan rules</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WrapVec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A smol wrapper around `Vec&lt;T&gt;` to get around the orphan rules
+</span><span class="attribute">#[derive(PartialEq, Debug, Clone)]
+</span><span class="kw">pub struct </span>WrapVec&lt;T&gt;(<span class="kw">pub </span>Vec&lt;T&gt;);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Constraint</span> {
-    <span class="ident">Unique</span>,
-    <span class="ident">PrimaryKey</span>,
-    <span class="ident">ForeignKey</span> {
-        <span class="ident">table</span>: <span class="ident">String</span>,
-        <span class="ident">foreign_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">on_delete</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>,
-        <span class="ident">on_update</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(PartialEq, Debug, Clone)]
+</span><span class="kw">pub enum </span>Constraint {
+    Unique,
+    PrimaryKey,
+    ForeignKey {
+        table: String,
+        foreign_columns: Vec&lt;String&gt;,
+        on_delete: <span class="prelude-ty">Option</span>&lt;ReferentialAction&gt;,
+        on_update: <span class="prelude-ty">Option</span>&lt;ReferentialAction&gt;,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Constraint</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Unique</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;UNIQUE&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::PrimaryKey</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;PRIMARY KEY&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ForeignKey</span> { .. } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;FOREIGN KEY&quot;</span>),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Constraint {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Unique =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;UNIQUE&quot;</span>),
+            <span class="self">Self</span>::PrimaryKey =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;PRIMARY KEY&quot;</span>),
+            <span class="self">Self</span>::ForeignKey { .. } =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;FOREIGN KEY&quot;</span>),
         }
     }
 }
 
-<span class="comment">// The ON DELETE clause specifies the action to perform when a referenced row in</span>
-<span class="comment">// the referenced table is being deleted. Likewise, the ON UPDATE clause</span>
-<span class="comment">// specifies the action to perform when a referenced column in the referenced</span>
-<span class="comment">// table is being updated to a new value. If the row is updated, but the</span>
-<span class="comment">// referenced column is not actually changed, no action is done. Referential</span>
-<span class="comment">// actions other than the NO ACTION check cannot be deferred, even if the</span>
-<span class="comment">// constraint is declared deferrable.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReferentialAction</span> {
-    <span class="comment">// Delete any rows referencing the deleted row, or update the values of the</span>
-    <span class="comment">// referencing column(s) to the new values of the referenced columns,</span>
-    <span class="comment">// respectively.</span>
-    <span class="ident">Cascade</span>,
-    <span class="comment">// Produce an error indicating that the deletion or update would create a</span>
-    <span class="comment">// foreign key constraint violation. If the constraint is deferred, this</span>
-    <span class="comment">// error will be produced at constraint check time if there still exist any</span>
-    <span class="comment">// referencing rows. This is the default action.</span>
-    <span class="ident">NoAction</span>,
-    <span class="comment">// Produce an error indicating that the deletion or update would create a</span>
-    <span class="comment">// foreign key constraint violation. This is the same as NO ACTION except</span>
-    <span class="comment">// that the check is not deferrable.</span>
-    <span class="ident">Restrict</span>,
-    <span class="comment">// Set the referencing column(s) to null.</span>
-    <span class="ident">SetNull</span>,
-    <span class="comment">// Set the referencing column(s) to their default values. (There must be a</span>
-    <span class="comment">// row in the referenced table matching the default values, if they are not</span>
-    <span class="comment">// null, or the operation will fail.)</span>
-    <span class="ident">SetDefault</span>,
+<span class="comment">// The ON DELETE clause specifies the action to perform when a referenced row in
+// the referenced table is being deleted. Likewise, the ON UPDATE clause
+// specifies the action to perform when a referenced column in the referenced
+// table is being updated to a new value. If the row is updated, but the
+// referenced column is not actually changed, no action is done. Referential
+// actions other than the NO ACTION check cannot be deferred, even if the
+// constraint is declared deferrable.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone, Copy)]
+</span><span class="kw">pub enum </span>ReferentialAction {
+    <span class="comment">// Delete any rows referencing the deleted row, or update the values of the
+    // referencing column(s) to the new values of the referenced columns,
+    // respectively.
+    </span>Cascade,
+    <span class="comment">// Produce an error indicating that the deletion or update would create a
+    // foreign key constraint violation. If the constraint is deferred, this
+    // error will be produced at constraint check time if there still exist any
+    // referencing rows. This is the default action.
+    </span>NoAction,
+    <span class="comment">// Produce an error indicating that the deletion or update would create a
+    // foreign key constraint violation. This is the same as NO ACTION except
+    // that the check is not deferrable.
+    </span>Restrict,
+    <span class="comment">// Set the referencing column(s) to null.
+    </span>SetNull,
+    <span class="comment">// Set the referencing column(s) to their default values. (There must be a
+    // row in the referenced table matching the default values, if they are not
+    // null, or the operation will fail.)
+    </span>SetDefault,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ReferentialAction</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ReferentialAction::Cascade</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CASCADE&quot;</span>),
-            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;NO ACTION&quot;</span>),
-            <span class="ident">ReferentialAction::Restrict</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;RESTRICT&quot;</span>),
-            <span class="ident">ReferentialAction::SetNull</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SET NULL&quot;</span>),
-            <span class="ident">ReferentialAction::SetDefault</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SET DEFAULT&quot;</span>),
+<span class="kw">impl </span>Display <span class="kw">for </span>ReferentialAction {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            ReferentialAction::Cascade =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;CASCADE&quot;</span>),
+            ReferentialAction::NoAction =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;NO ACTION&quot;</span>),
+            ReferentialAction::Restrict =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;RESTRICT&quot;</span>),
+            ReferentialAction::SetNull =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SET NULL&quot;</span>),
+            ReferentialAction::SetDefault =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SET DEFAULT&quot;</span>),
         }
     }
 }
 
-<span class="doccomment">/// Core type enum, describing the basic type</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BaseType</span> {
-    <span class="doccomment">/// A string blob, stored in the heap with a pointer in the row</span>
-    <span class="ident">Text</span>,
-    <span class="doccomment">/// Variable-length string that (hopefully) is stored to the row</span>
-    <span class="ident">Varchar</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Fixed-length string that is stored to the row</span>
-    <span class="ident">Char</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Primary key (utility for incrementing integer – postgres supports this, we just mirror it)</span>
-    <span class="ident">Primary</span>,
-    <span class="doccomment">/// Simple integer</span>
-    <span class="ident">Integer</span>,
-    <span class="doccomment">/// An integer that as a default value of the next biggest number</span>
-    <span class="ident">Serial</span>,
-    <span class="doccomment">/// Floating point number</span>
-    <span class="ident">Float</span>,
-    <span class="doccomment">/// Like Float but `~ ~ d o u b l e    p r e c i s i o n ~ ~`</span>
-    <span class="ident">Double</span>,
-    <span class="doccomment">/// A unique identifier type</span>
-    <span class="ident">UUID</span>,
-    <span class="doccomment">/// True or False</span>
-    <span class="ident">Boolean</span>,
-    <span class="doccomment">/// Json encoded data</span>
-    <span class="ident">Json</span>,
-    <span class="doccomment">/// Date</span>
-    <span class="ident">Date</span>,
-    <span class="doccomment">/// Date</span>
-    <span class="ident">Time</span>,
-    <span class="doccomment">/// Date and time</span>
-    <span class="ident">DateTime</span>,
-    <span class="doccomment">/// &lt;inconceivable jibberish&gt;</span>
-    <span class="ident">Binary</span>,
-    <span class="doccomment">/// Foreign key to other table</span>
-    <span class="ident">Foreign</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">String</span>, <span class="ident">WrapVec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// I have no idea what you are – but I *like* it</span>
-    <span class="ident">Custom</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
-    <span class="doccomment">/// Any of the above, but **many** of them</span>
-    <span class="ident">Array</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">BaseType</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Indexing over multiple columns</span>
-    <span class="ident">Index</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Indexing over multiple columns</span>
-    <span class="ident">Constraint</span>(<span class="ident">Constraint</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Core type enum, describing the basic type
+</span><span class="attribute">#[derive(PartialEq, Debug, Clone)]
+</span><span class="kw">pub enum </span>BaseType {
+    <span class="doccomment">/// A string blob, stored in the heap with a pointer in the row
+    </span>Text,
+    <span class="doccomment">/// Variable-length string that (hopefully) is stored to the row
+    </span>Varchar(usize),
+    <span class="doccomment">/// Fixed-length string that is stored to the row
+    </span>Char(usize),
+    <span class="doccomment">/// Primary key (utility for incrementing integer – postgres supports this, we just mirror it)
+    </span>Primary,
+    <span class="doccomment">/// Simple integer
+    </span>Integer,
+    <span class="doccomment">/// An integer that as a default value of the next biggest number
+    </span>Serial,
+    <span class="doccomment">/// Floating point number
+    </span>Float,
+    <span class="doccomment">/// Like Float but `~ ~ d o u b l e    p r e c i s i o n ~ ~`
+    </span>Double,
+    <span class="doccomment">/// A unique identifier type
+    </span>UUID,
+    <span class="doccomment">/// True or False
+    </span>Boolean,
+    <span class="doccomment">/// Json encoded data
+    </span>Json,
+    <span class="doccomment">/// Date
+    </span>Date,
+    <span class="doccomment">/// Date
+    </span>Time,
+    <span class="doccomment">/// Date and time
+    </span>DateTime,
+    <span class="doccomment">/// &lt;inconceivable jibberish&gt;
+    </span>Binary,
+    <span class="doccomment">/// Foreign key to other table
+    </span>Foreign(<span class="prelude-ty">Option</span>&lt;String&gt;, String, WrapVec&lt;String&gt;),
+    <span class="doccomment">/// I have no idea what you are – but I *like* it
+    </span>Custom(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
+    <span class="doccomment">/// Any of the above, but **many** of them
+    </span>Array(Box&lt;BaseType&gt;),
+    <span class="doccomment">/// Indexing over multiple columns
+    </span>Index(Vec&lt;String&gt;),
+    <span class="doccomment">/// Indexing over multiple columns
+    </span>Constraint(Constraint, Vec&lt;String&gt;),
 }
 
-<span class="doccomment">/// A database column type and all the metadata attached to it</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using this struct directly is not recommended. Instead, you should be</span>
-<span class="doccomment">/// using the constructor APIs in the `types` module.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `Type` is an enum provided to other `barrel` APIs in order</span>
-<span class="doccomment">/// to generate SQL datatypes. Working with them directly is possible</span>
-<span class="doccomment">/// but not recommended.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Instead, you can use these helper functions to construct `Type` enums of</span>
-<span class="doccomment">/// different...types and constraints. Field metadata is added via chainable</span>
-<span class="doccomment">/// factory pattern functions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Default values</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If no additional arguments are provided, some assumptions will be made</span>
-<span class="doccomment">/// about the metadata of a column type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - `nullable`: `false`</span>
-<span class="doccomment">/// - `indexed`: `false`</span>
-<span class="doccomment">/// - `unique`: `false`</span>
-<span class="doccomment">/// - `default`:  `None`</span>
-<span class="doccomment">/// - `size`: `None` (which will error if size is important)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// extern crate barrel;</span>
-<span class="doccomment">/// use barrel::types::*;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Make your own Primary key :)</span>
-<span class="doccomment">/// let col = integer().increments(true).unique(true);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Type</span> {
-    <span class="kw">pub</span> <span class="ident">nullable</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">unique</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">increments</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">indexed</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">primary</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">inner</span>: <span class="ident">BaseType</span>,
+<span class="doccomment">/// A database column type and all the metadata attached to it
+///
+/// Using this struct directly is not recommended. Instead, you should be
+/// using the constructor APIs in the `types` module.
+///
+/// A `Type` is an enum provided to other `barrel` APIs in order
+/// to generate SQL datatypes. Working with them directly is possible
+/// but not recommended.
+///
+/// Instead, you can use these helper functions to construct `Type` enums of
+/// different...types and constraints. Field metadata is added via chainable
+/// factory pattern functions.
+///
+/// ## Default values
+///
+/// If no additional arguments are provided, some assumptions will be made
+/// about the metadata of a column type.
+///
+/// - `nullable`: `false`
+/// - `indexed`: `false`
+/// - `unique`: `false`
+/// - `default`:  `None`
+/// - `size`: `None` (which will error if size is important)
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// extern crate barrel;
+/// use barrel::types::*;
+///
+/// // Make your own Primary key :)
+/// let col = integer().increments(true).unique(true);
+/// ```
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>Type {
+    <span class="kw">pub </span>nullable: bool,
+    <span class="kw">pub </span>unique: bool,
+    <span class="kw">pub </span>increments: bool,
+    <span class="kw">pub </span>indexed: bool,
+    <span class="kw">pub </span>primary: bool,
+    <span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;WrappedDefault&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
+    <span class="kw">pub </span>size: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    <span class="kw">pub </span>inner: BaseType,
 }
 
-<span class="doccomment">/// This is a public API, be considered about breaking thigns</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">rustfmt</span>, <span class="ident">rustfmt_skip</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Type</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">BaseType</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">nullable</span>: <span class="bool-val">false</span>,
-            <span class="ident">unique</span>: <span class="bool-val">false</span>,
-            <span class="ident">increments</span>: <span class="bool-val">false</span>,
-            <span class="ident">indexed</span>: <span class="bool-val">false</span>,
-            <span class="ident">primary</span>: <span class="bool-val">false</span>,
-            <span class="ident">default</span>: <span class="prelude-val">None</span>,
-            <span class="ident">size</span>: <span class="prelude-val">None</span>,
-            <span class="ident">inner</span>,
+<span class="doccomment">/// This is a public API, be considered about breaking thigns
+</span><span class="attribute">#[cfg_attr(rustfmt, rustfmt_skip)]
+</span><span class="kw">impl </span>Type {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(inner: BaseType) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            nullable: <span class="bool-val">false</span>,
+            unique: <span class="bool-val">false</span>,
+            increments: <span class="bool-val">false</span>,
+            indexed: <span class="bool-val">false</span>,
+            primary: <span class="bool-val">false</span>,
+            default: <span class="prelude-val">None</span>,
+            size: <span class="prelude-val">None</span>,
+            inner,
         }
     }
 
-    <span class="doccomment">/// Function used to hide the inner type to outside users (sneaky, I know)</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BaseType</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Function used to hide the inner type to outside users (sneaky, I know)
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BaseType {
+        <span class="self">self</span>.inner.clone()
     }
 
-    <span class="doccomment">/// Set the nullability of this type</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nullable</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">nullable</span>: <span class="ident">arg</span>, ..<span class="self">self</span> }
+    <span class="doccomment">/// Set the nullability of this type
+    </span><span class="kw">pub fn </span>nullable(<span class="self">self</span>, arg: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ nullable: arg, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Set the uniqueness of this type</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">unique</span>: <span class="ident">arg</span>, ..<span class="self">self</span> }
+    <span class="doccomment">/// Set the uniqueness of this type
+    </span><span class="kw">pub fn </span>unique(<span class="self">self</span>, arg: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ unique: arg, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Specify if this type should auto-increment</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increments</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">increments</span>: <span class="ident">arg</span>, ..<span class="self">self</span> }
+    <span class="doccomment">/// Specify if this type should auto-increment
+    </span><span class="kw">pub fn </span>increments(<span class="self">self</span>, arg: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ increments: arg, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Specify if this type should be indexed by your SQL implementation</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexed</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">indexed</span>: <span class="ident">arg</span>, ..<span class="self">self</span> }
+    <span class="doccomment">/// Specify if this type should be indexed by your SQL implementation
+    </span><span class="kw">pub fn </span>indexed(<span class="self">self</span>, arg: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ indexed: arg, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Specify if this type should be a primary key</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">primary</span>: <span class="ident">arg</span>, ..<span class="self">self</span> }
+    <span class="doccomment">/// Specify if this type should be a primary key
+    </span><span class="kw">pub fn </span>primary(<span class="self">self</span>, arg: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ primary: arg, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Provide a default value for a type column</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">default</span>: <span class="prelude-val">Some</span>(<span class="ident">arg</span>.<span class="ident">into</span>()), ..<span class="self">self</span> }
+    <span class="doccomment">/// Provide a default value for a type column
+    </span><span class="kw">pub fn </span>default(<span class="self">self</span>, arg: <span class="kw">impl </span>Into&lt;WrappedDefault&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ default: <span class="prelude-val">Some</span>(arg.into()), ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Specify a size limit (important or varchar &amp; similar)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">size</span>: <span class="prelude-val">Some</span>(<span class="ident">arg</span>), ..<span class="self">self</span> }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrapVec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">WrapVec</span>(<span class="macro">vec!</span>[<span class="ident">s</span>.<span class="ident">into</span>()])
+    <span class="doccomment">/// Specify a size limit (important or varchar &amp; similar)
+    </span><span class="kw">pub fn </span>size(<span class="self">self</span>, arg: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ size: <span class="prelude-val">Some</span>(arg), ..<span class="self">self </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrapVec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">WrapVec</span>(<span class="macro">vec!</span>[<span class="ident">s</span>])
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>WrapVec&lt;String&gt; {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        WrapVec(<span class="macro">vec!</span>[s.into()])
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrapVec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>WrapVec&lt;String&gt; {
+    <span class="kw">fn </span>from(s: String) -&gt; <span class="self">Self </span>{
+        WrapVec(<span class="macro">vec!</span>[s])
+    }
+}
+
+<span class="kw">impl</span>&lt;I&gt; From&lt;Vec&lt;I&gt;&gt; <span class="kw">for </span>WrapVec&lt;String&gt;
+<span class="kw">where
+    </span>I: Into&lt;String&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">WrapVec</span>(<span class="ident">v</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">into</span>()).<span class="ident">collect</span>())
+    <span class="kw">fn </span>from(v: Vec&lt;I&gt;) -&gt; <span class="self">Self </span>{
+        WrapVec(v.into_iter().map(|s| s.into()).collect())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

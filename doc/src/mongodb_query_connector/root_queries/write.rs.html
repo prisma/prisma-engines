@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/root_queries/write.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>write.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/root_queries/write.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>write.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -500,507 +500,507 @@
 <span id="500">500</span>
 <span id="501">501</span>
 <span id="502">502</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">error</span>::{<span class="ident">DecorateErrorWithFieldInformationExtension</span>, <span class="ident">MongoError</span>},
-    <span class="ident">filter</span>::{<span class="ident">FilterPrefix</span>, <span class="ident">MongoFilter</span>, <span class="ident">MongoFilterVisitor</span>},
-    <span class="ident">output_meta</span>,
-    <span class="ident">query_builder::MongoReadQueryBuilder</span>,
-    <span class="ident">query_strings</span>::{<span class="ident">DeleteMany</span>, <span class="ident">InsertMany</span>, <span class="ident">InsertOne</span>, <span class="ident">UpdateMany</span>, <span class="ident">UpdateOne</span>},
-    <span class="ident">root_queries::raw</span>::{<span class="ident">MongoCommand</span>, <span class="ident">MongoOperation</span>},
-    <span class="ident">IntoBson</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{
+    error::{DecorateErrorWithFieldInformationExtension, MongoError},
+    filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
+    output_meta,
+    query_builder::MongoReadQueryBuilder,
+    query_strings::{DeleteMany, InsertMany, InsertOne, UpdateMany, UpdateOne},
+    root_queries::raw::{MongoCommand, MongoOperation},
+    IntoBson,
 };
-<span class="kw">use</span> <span class="ident">connector_interface</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">mongodb</span>::{
-    <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>},
-    <span class="ident">error::ErrorKind</span>,
-    <span class="ident">options::InsertManyOptions</span>,
-    <span class="ident">ClientSession</span>, <span class="ident">Collection</span>, <span class="ident">Database</span>,
+<span class="kw">use </span>connector_interface::<span class="kw-2">*</span>;
+<span class="kw">use </span>mongodb::{
+    bson::{doc, Document},
+    error::ErrorKind,
+    options::InsertManyOptions,
+    ClientSession, Collection, Database,
 };
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">SelectionResult</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">convert::TryInto</span>};
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">info_span</span>, <span class="ident">Instrument</span>};
-<span class="kw">use</span> <span class="ident">update::IntoUpdateDocumentExtension</span>;
+<span class="kw">use </span>prisma_models::{ModelRef, PrismaValue, SelectionResult};
+<span class="kw">use </span>std::{collections::HashMap, convert::TryInto};
+<span class="kw">use </span>tracing::{info_span, Instrument};
+<span class="kw">use </span>update::IntoUpdateDocumentExtension;
 
-<span class="doccomment">/// Create a single record to the database resulting in a</span>
-<span class="doccomment">/// `RecordProjection` as an identifier pointing to the just-created document.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
+<span class="doccomment">/// Create a single record to the database resulting in a
+/// `RecordProjection` as an identifier pointing to the just-created document.
+</span><span class="kw">pub async fn </span>create_record&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    database: <span class="kw-2">&amp;</span>Database,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    <span class="kw-2">mut </span>args: WriteArgs,
+) -&gt; <span class="kw">crate</span>::Result&lt;SelectionResult&gt; {
+    <span class="kw">let </span>coll = database.collection::&lt;Document&gt;(model.db_name());
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+    <span class="kw">let </span>span = <span class="macro">info_span!</span>(
         <span class="string">&quot;prisma:engine:db_query&quot;</span>,
-        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
-        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.insertOne(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+        user_facing = <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot; </span>= <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.insertOne(*)&quot;</span>, coll.name())
     );
 
-    <span class="kw">let</span> <span class="ident">id_field</span> <span class="op">=</span> <span class="ident">pick_singular_id</span>(<span class="ident">model</span>);
+    <span class="kw">let </span>id_field = pick_singular_id(model);
 
-    <span class="comment">// Fields to write to the document.</span>
-    <span class="comment">// Todo: Do we need to write null for everything? There&#39;s something with nulls and exists that might impact</span>
-    <span class="comment">//       query capability (e.g. query for field: null may need to check for exist as well?)</span>
-    <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model</span>
-        .<span class="ident">fields</span>()
-        .<span class="ident">non_relational</span>()
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">args</span>.<span class="ident">has_arg_for</span>(<span class="ident">field</span>.<span class="ident">db_name</span>()))
-        .<span class="ident">map</span>(<span class="ident">Clone::clone</span>)
-        .<span class="ident">collect</span>();
+    <span class="comment">// Fields to write to the document.
+    // Todo: Do we need to write null for everything? There&#39;s something with nulls and exists that might impact
+    //       query capability (e.g. query for field: null may need to check for exist as well?)
+    </span><span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = model
+        .fields()
+        .non_relational()
+        .iter()
+        .filter(|field| args.has_arg_for(field.db_name()))
+        .map(Clone::clone)
+        .collect();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Document::new</span>();
-    <span class="kw">let</span> <span class="ident">id_meta</span> <span class="op">=</span> <span class="ident">output_meta::from_scalar_field</span>(<span class="kw-2">&amp;</span><span class="ident">id_field</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>doc = Document::new();
+    <span class="kw">let </span>id_meta = output_meta::from_scalar_field(<span class="kw-2">&amp;</span>id_field);
 
-    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-        <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">db_name</span>();
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">take_field_value</span>(<span class="ident">db_name</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">value</span>
-            .<span class="ident">try_into</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Create calls can only use PrismaValue write expressions (right now).&quot;</span>);
+    <span class="kw">for </span>field <span class="kw">in </span>fields {
+        <span class="kw">let </span>db_name = field.db_name();
+        <span class="kw">let </span>value = args.take_field_value(db_name).unwrap();
+        <span class="kw">let </span>value: PrismaValue = value
+            .try_into()
+            .expect(<span class="string">&quot;Create calls can only use PrismaValue write expressions (right now).&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>().<span class="ident">decorate_with_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>bson = (<span class="kw-2">&amp;</span>field, value).into_bson().decorate_with_field_info(<span class="kw-2">&amp;</span>field)<span class="question-mark">?</span>;
 
-        <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(), <span class="ident">bson</span>);
+        doc.insert(field.db_name().to_owned(), bson);
     }
 
-    <span class="kw">let</span> <span class="ident">query_builder</span> <span class="op">=</span> <span class="ident">InsertOne::new</span>(<span class="kw-2">&amp;</span><span class="ident">doc</span>, <span class="ident">coll</span>.<span class="ident">name</span>());
-    <span class="kw">let</span> <span class="ident">insert_result</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_builder</span>), <span class="op">|</span><span class="op">|</span> {
-        <span class="ident">coll</span>.<span class="ident">insert_one_with_session</span>(<span class="kw-2">&amp;</span><span class="ident">doc</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    <span class="kw">let </span>query_builder = InsertOne::new(<span class="kw-2">&amp;</span>doc, coll.name());
+    <span class="kw">let </span>insert_result = observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_builder), || {
+        coll.insert_one_with_session(<span class="kw-2">&amp;</span>doc, <span class="prelude-val">None</span>, session)
     })
-    .<span class="ident">instrument</span>(<span class="ident">span</span>)
+    .instrument(span)
     .<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">id_value</span> <span class="op">=</span> <span class="ident">value_from_bson</span>(<span class="ident">insert_result</span>.<span class="ident">inserted_id</span>, <span class="kw-2">&amp;</span><span class="ident">id_meta</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>id_value = value_from_bson(insert_result.inserted_id, <span class="kw-2">&amp;</span>id_meta)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">SelectionResult::from</span>((<span class="ident">id_field</span>, <span class="ident">id_value</span>)))
+    <span class="prelude-val">Ok</span>(SelectionResult::from((id_field, id_value)))
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_records</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">WriteArgs</span><span class="op">&gt;</span>,
-    <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
+<span class="kw">pub async fn </span>create_records&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    database: <span class="kw-2">&amp;</span>Database,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    args: Vec&lt;WriteArgs&gt;,
+    skip_duplicates: bool,
+) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
+    <span class="kw">let </span>coll = database.collection::&lt;Document&gt;(model.db_name());
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+    <span class="kw">let </span>span = <span class="macro">info_span!</span>(
         <span class="string">&quot;prisma:engine:db_query&quot;</span>,
-        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
-        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.insertMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+        user_facing = <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot; </span>= <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.insertMany(*)&quot;</span>, coll.name())
     );
 
-    <span class="kw">let</span> <span class="ident">num_records</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">len</span>();
-    <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">non_relational</span>();
+    <span class="kw">let </span>num_records = args.len();
+    <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = model.fields().non_relational();
 
-    <span class="kw">let</span> <span class="ident">docs</span> <span class="op">=</span> <span class="ident">args</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Document::new</span>();
+    <span class="kw">let </span>docs = args
+        .into_iter()
+        .map(|arg| {
+            <span class="kw">let </span><span class="kw-2">mut </span>doc = Document::new();
 
-            <span class="kw">for</span> (<span class="ident">field_name</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">arg</span>.<span class="ident">args</span> {
-                <span class="comment">// Todo: This is inefficient.</span>
-                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">db_name</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">field_name</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">value</span>
-                    .<span class="ident">try_into</span>()
-                    .<span class="ident">expect</span>(<span class="string">&quot;Create calls can only use PrismaValue write expressions (right now).&quot;</span>);
+            <span class="kw">for </span>(field_name, value) <span class="kw">in </span>arg.args {
+                <span class="comment">// Todo: This is inefficient.
+                </span><span class="kw">let </span>field = fields.iter().find(|f| f.db_name() == <span class="kw-2">&amp;*</span>field_name).unwrap();
+                <span class="kw">let </span>value: PrismaValue = value
+                    .try_into()
+                    .expect(<span class="string">&quot;Create calls can only use PrismaValue write expressions (right now).&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> (<span class="ident">field</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>().<span class="ident">decorate_with_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>bson = (field, value).into_bson().decorate_with_field_info(<span class="kw-2">&amp;</span>field)<span class="question-mark">?</span>;
 
-                <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="ident">field_name</span>.<span class="ident">to_string</span>(), <span class="ident">bson</span>);
+                doc.insert(field_name.to_string(), bson);
             }
 
-            <span class="prelude-val">Ok</span>(<span class="ident">doc</span>)
+            <span class="prelude-val">Ok</span>(doc)
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="comment">// Ordered = false (inverse of `skip_duplicates`) will ignore errors while executing</span>
-    <span class="comment">// the operation and throw an error afterwards that we must handle.</span>
-    <span class="kw">let</span> <span class="ident">ordered</span> <span class="op">=</span> <span class="op">!</span><span class="ident">skip_duplicates</span>;
-    <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">InsertManyOptions::builder</span>().<span class="ident">ordered</span>(<span class="ident">ordered</span>).<span class="ident">build</span>());
+    <span class="comment">// Ordered = false (inverse of `skip_duplicates`) will ignore errors while executing
+    // the operation and throw an error afterwards that we must handle.
+    </span><span class="kw">let </span>ordered = !skip_duplicates;
+    <span class="kw">let </span>options = <span class="prelude-val">Some</span>(InsertManyOptions::builder().ordered(ordered).build());
 
-    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">InsertMany::new</span>(<span class="kw-2">&amp;</span><span class="ident">docs</span>, <span class="ident">ordered</span>, <span class="ident">coll</span>.<span class="ident">name</span>());
-    <span class="kw">let</span> <span class="ident">docs_iter</span> <span class="op">=</span> <span class="ident">docs</span>.<span class="ident">iter</span>();
-    <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
-        <span class="ident">coll</span>.<span class="ident">insert_many_with_session</span>(<span class="ident">docs_iter</span>, <span class="ident">options</span>, <span class="ident">session</span>)
+    <span class="kw">let </span>query_string_builder = InsertMany::new(<span class="kw-2">&amp;</span>docs, ordered, coll.name());
+    <span class="kw">let </span>docs_iter = docs.iter();
+    <span class="kw">let </span>insert = observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+        coll.insert_many_with_session(docs_iter, options, session)
     })
-    .<span class="ident">instrument</span>(<span class="ident">span</span>);
+    .instrument(span);
 
-    <span class="kw">match</span> <span class="ident">insert</span>.<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">insert_result</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">insert_result</span>.<span class="ident">inserted_ids</span>.<span class="ident">len</span>()),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">skip_duplicates</span> =&gt; <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">kind</span>.<span class="ident">as_ref</span>() {
-            <span class="ident">ErrorKind::BulkWrite</span>(<span class="kw-2">ref</span> <span class="ident">failure</span>) =&gt; <span class="kw">match</span> <span class="ident">failure</span>.<span class="ident">write_errors</span> {
-                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">errs</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">errs</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">code</span> <span class="op">!</span><span class="op">=</span> <span class="number">11000</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">num_records</span> <span class="op">-</span> <span class="ident">errs</span>.<span class="ident">len</span>()),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+    <span class="kw">match </span>insert.<span class="kw">await </span>{
+        <span class="prelude-val">Ok</span>(insert_result) =&gt; <span class="prelude-val">Ok</span>(insert_result.inserted_ids.len()),
+        <span class="prelude-val">Err</span>(err) <span class="kw">if </span>skip_duplicates =&gt; <span class="kw">match </span>err.kind.as_ref() {
+            ErrorKind::BulkWrite(<span class="kw-2">ref </span>failure) =&gt; <span class="kw">match </span>failure.write_errors {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>errs) <span class="kw">if </span>!errs.iter().any(|err| err.code != <span class="number">11000</span>) =&gt; <span class="prelude-val">Ok</span>(num_records - errs.len()),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(err.into()),
             },
 
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(err.into()),
         },
 
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(err.into()),
     }
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_records</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-    <span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    <span class="ident">update_type</span>: <span class="ident">UpdateType</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
+<span class="kw">pub async fn </span>update_records&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    database: <span class="kw-2">&amp;</span>Database,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    record_filter: RecordFilter,
+    <span class="kw-2">mut </span>args: WriteArgs,
+    update_type: UpdateType,
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;SelectionResult&gt;&gt; {
+    <span class="kw">let </span>coll = database.collection::&lt;Document&gt;(model.db_name());
 
-    <span class="comment">// We need to load ids of documents to be updated first because Mongo doesn&#39;t</span>
-    <span class="comment">// return ids on update, requiring us to follow the same approach as the SQL</span>
-    <span class="comment">// connectors.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Mongo can only have singular IDs (always `_id`), hence the unwraps. Since IDs are immutable, we also don&#39;t</span>
-    <span class="comment">// need to merge back id changes into the result set as with SQL.</span>
-    <span class="kw">let</span> <span class="ident">id_field</span> <span class="op">=</span> <span class="ident">pick_singular_id</span>(<span class="ident">model</span>);
-    <span class="kw">let</span> <span class="ident">id_meta</span> <span class="op">=</span> <span class="ident">output_meta::from_scalar_field</span>(<span class="kw-2">&amp;</span><span class="ident">id_field</span>);
-    <span class="kw">let</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">selectors</span>) <span class="op">=</span> <span class="ident">record_filter</span>.<span class="ident">selectors</span> {
-        <span class="ident">selectors</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                (<span class="kw-2">&amp;</span><span class="ident">id_field</span>, <span class="ident">p</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>())
-                    .<span class="ident">into_bson</span>()
-                    .<span class="ident">decorate_with_scalar_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">id_field</span>)
+    <span class="comment">// We need to load ids of documents to be updated first because Mongo doesn&#39;t
+    // return ids on update, requiring us to follow the same approach as the SQL
+    // connectors.
+    //
+    // Mongo can only have singular IDs (always `_id`), hence the unwraps. Since IDs are immutable, we also don&#39;t
+    // need to merge back id changes into the result set as with SQL.
+    </span><span class="kw">let </span>id_field = pick_singular_id(model);
+    <span class="kw">let </span>id_meta = output_meta::from_scalar_field(<span class="kw-2">&amp;</span>id_field);
+    <span class="kw">let </span>ids: Vec&lt;Bson&gt; = <span class="kw">if let </span><span class="prelude-val">Some</span>(selectors) = record_filter.selectors {
+        selectors
+            .into_iter()
+            .map(|p| {
+                (<span class="kw-2">&amp;</span>id_field, p.values().next().unwrap())
+                    .into_bson()
+                    .decorate_with_scalar_field_info(<span class="kw-2">&amp;</span>id_field)
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">MongoFilterVisitor::new</span>(<span class="ident">FilterPrefix::default</span>(), <span class="bool-val">false</span>).<span class="ident">visit</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>)<span class="question-mark">?</span>;
-        <span class="ident">find_ids</span>(<span class="ident">database</span>, <span class="ident">coll</span>.<span class="ident">clone</span>(), <span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">filter</span>).<span class="kw">await</span><span class="question-mark">?</span>
-    };
+            .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?
+    </span>} <span class="kw">else </span>{
+        <span class="kw">let </span>filter = MongoFilterVisitor::new(FilterPrefix::default(), <span class="bool-val">false</span>).visit(record_filter.filter)<span class="question-mark">?</span>;
+        find_ids(database, coll.clone(), session, model, filter).<span class="kw">await</span><span class="question-mark">?
+    </span>};
 
-    <span class="kw">if</span> <span class="ident">ids</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]);
+    <span class="kw">if </span>ids.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]);
     }
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+    <span class="kw">let </span>span = <span class="macro">info_span!</span>(
         <span class="string">&quot;prisma:engine:db_query&quot;</span>,
-        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
-        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.updateMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+        user_facing = <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot; </span>= <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.updateMany(*)&quot;</span>, coll.name())
     );
 
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="ident">id_field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$in&quot;</span>: <span class="ident">ids</span>.<span class="ident">clone</span>() } };
-    <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model</span>
-        .<span class="ident">fields</span>()
-        .<span class="ident">all</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-            <span class="ident">args</span>.<span class="ident">take_field_value</span>(<span class="ident">field</span>.<span class="ident">db_name</span>())
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">write_op</span><span class="op">|</span> (<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">write_op</span>))
+    <span class="kw">let </span>filter = <span class="macro">doc! </span>{ id_field.db_name(): { <span class="string">&quot;$in&quot;</span>: ids.clone() } };
+    <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = model
+        .fields()
+        .all
+        .iter()
+        .filter_map(|field| {
+            args.take_field_value(field.db_name())
+                .map(|write_op| (field.clone(), write_op))
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">update_docs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>update_docs: Vec&lt;Document&gt; = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> (<span class="ident">field</span>, <span class="ident">write_op</span>) <span class="kw">in</span> <span class="ident">fields</span> {
-        <span class="kw">let</span> <span class="ident">field_path</span> <span class="op">=</span> <span class="ident">FieldPath::new_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>);
+    <span class="kw">for </span>(field, write_op) <span class="kw">in </span>fields {
+        <span class="kw">let </span>field_path = FieldPath::new_from_segment(<span class="kw-2">&amp;</span>field);
 
-        <span class="ident">update_docs</span>.<span class="ident">extend</span>(<span class="ident">write_op</span>.<span class="ident">into_update_docs</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">field_path</span>)<span class="question-mark">?</span>);
+        update_docs.extend(write_op.into_update_docs(<span class="kw-2">&amp;</span>field, field_path)<span class="question-mark">?</span>);
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">update_docs</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">UpdateMany::new</span>(<span class="kw-2">&amp;</span><span class="ident">filter</span>, <span class="kw-2">&amp;</span><span class="ident">update_docs</span>, <span class="ident">coll</span>.<span class="ident">name</span>());
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
-            <span class="ident">coll</span>.<span class="ident">update_many_with_session</span>(<span class="ident">filter</span>.<span class="ident">clone</span>(), <span class="ident">update_docs</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    <span class="kw">if </span>!update_docs.is_empty() {
+        <span class="kw">let </span>query_string_builder = UpdateMany::new(<span class="kw-2">&amp;</span>filter, <span class="kw-2">&amp;</span>update_docs, coll.name());
+        <span class="kw">let </span>res = observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+            coll.update_many_with_session(filter.clone(), update_docs.clone(), <span class="prelude-val">None</span>, session)
         })
-        .<span class="ident">instrument</span>(<span class="ident">span</span>)
+        .instrument(span)
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">update_type</span> <span class="op">==</span> <span class="ident">UpdateType::Many</span> <span class="op">&amp;&amp;</span> <span class="ident">res</span>.<span class="ident">modified_count</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Vec::new</span>());
+        <span class="kw">if </span>update_type == UpdateType::Many &amp;&amp; res.modified_count == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Vec::new());
         }
     }
 
-    <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">ids</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">bson_id</span><span class="op">|</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">SelectionResult::from</span>((
-                <span class="ident">id_field</span>.<span class="ident">clone</span>(),
-                <span class="ident">value_from_bson</span>(<span class="ident">bson_id</span>, <span class="kw-2">&amp;</span><span class="ident">id_meta</span>)<span class="question-mark">?</span>,
+    <span class="kw">let </span>ids = ids
+        .into_iter()
+        .map(|bson_id| {
+            <span class="prelude-val">Ok</span>(SelectionResult::from((
+                id_field.clone(),
+                value_from_bson(bson_id, <span class="kw-2">&amp;</span>id_meta)<span class="question-mark">?</span>,
             )))
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">ids</span>)
+    <span class="prelude-val">Ok</span>(ids)
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_records</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
-    <span class="kw">let</span> <span class="ident">id_field</span> <span class="op">=</span> <span class="ident">pick_singular_id</span>(<span class="ident">model</span>);
+<span class="kw">pub async fn </span>delete_records&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    database: <span class="kw-2">&amp;</span>Database,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    record_filter: RecordFilter,
+) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
+    <span class="kw">let </span>coll = database.collection::&lt;Document&gt;(model.db_name());
+    <span class="kw">let </span>id_field = pick_singular_id(model);
 
-    <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">selectors</span>) <span class="op">=</span> <span class="ident">record_filter</span>.<span class="ident">selectors</span> {
-        <span class="ident">selectors</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                (<span class="kw-2">&amp;</span><span class="ident">id_field</span>, <span class="ident">p</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>())
-                    .<span class="ident">into_bson</span>()
-                    .<span class="ident">decorate_with_scalar_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">id_field</span>)
+    <span class="kw">let </span>ids = <span class="kw">if let </span><span class="prelude-val">Some</span>(selectors) = record_filter.selectors {
+        selectors
+            .into_iter()
+            .map(|p| {
+                (<span class="kw-2">&amp;</span>id_field, p.values().next().unwrap())
+                    .into_bson()
+                    .decorate_with_scalar_field_info(<span class="kw-2">&amp;</span>id_field)
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">MongoFilterVisitor::new</span>(<span class="ident">FilterPrefix::default</span>(), <span class="bool-val">false</span>).<span class="ident">visit</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>)<span class="question-mark">?</span>;
-        <span class="ident">find_ids</span>(<span class="ident">database</span>, <span class="ident">coll</span>.<span class="ident">clone</span>(), <span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">filter</span>).<span class="kw">await</span><span class="question-mark">?</span>
-    };
+            .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?
+    </span>} <span class="kw">else </span>{
+        <span class="kw">let </span>filter = MongoFilterVisitor::new(FilterPrefix::default(), <span class="bool-val">false</span>).visit(record_filter.filter)<span class="question-mark">?</span>;
+        find_ids(database, coll.clone(), session, model, filter).<span class="kw">await</span><span class="question-mark">?
+    </span>};
 
-    <span class="kw">if</span> <span class="ident">ids</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>);
+    <span class="kw">if </span>ids.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">0</span>);
     }
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+    <span class="kw">let </span>span = <span class="macro">info_span!</span>(
         <span class="string">&quot;prisma:engine:db_query&quot;</span>,
-        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
-        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.deleteMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+        user_facing = <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot; </span>= <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.deleteMany(*)&quot;</span>, coll.name())
     );
 
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="ident">id_field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$in&quot;</span>: <span class="ident">ids</span> } };
-    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">DeleteMany::new</span>(<span class="kw-2">&amp;</span><span class="ident">filter</span>, <span class="ident">coll</span>.<span class="ident">name</span>());
-    <span class="kw">let</span> <span class="ident">delete_result</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
-        <span class="ident">coll</span>.<span class="ident">delete_many_with_session</span>(<span class="ident">filter</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    <span class="kw">let </span>filter = <span class="macro">doc! </span>{ id_field.db_name(): { <span class="string">&quot;$in&quot;</span>: ids } };
+    <span class="kw">let </span>query_string_builder = DeleteMany::new(<span class="kw-2">&amp;</span>filter, coll.name());
+    <span class="kw">let </span>delete_result = observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+        coll.delete_many_with_session(filter.clone(), <span class="prelude-val">None</span>, session)
     })
-    .<span class="ident">instrument</span>(<span class="ident">span</span>)
+    .instrument(span)
     .<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">delete_result</span>.<span class="ident">deleted_count</span> <span class="kw">as</span> <span class="ident">usize</span>)
+    <span class="prelude-val">Ok</span>(delete_result.deleted_count <span class="kw">as </span>usize)
 }
 
-<span class="doccomment">/// Retrives document ids based on the given filter.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">find_ids</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">collection</span>: <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">filter</span>: <span class="ident">MongoFilter</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
+<span class="doccomment">/// Retrives document ids based on the given filter.
+</span><span class="kw">async fn </span>find_ids(
+    database: <span class="kw-2">&amp;</span>Database,
+    collection: Collection&lt;Document&gt;,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    filter: MongoFilter,
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Bson&gt;&gt; {
+    <span class="kw">let </span>coll = database.collection::&lt;Document&gt;(model.db_name());
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+    <span class="kw">let </span>span = <span class="macro">info_span!</span>(
         <span class="string">&quot;prisma:engine:db_query&quot;</span>,
-        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
-        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.findMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+        user_facing = <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot; </span>= <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.findMany(*)&quot;</span>, coll.name())
     );
 
-    <span class="kw">let</span> <span class="ident">id_field</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">MongoReadQueryBuilder::new</span>(<span class="ident">model</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>id_field = model.primary_identifier();
+    <span class="kw">let </span><span class="kw-2">mut </span>builder = MongoReadQueryBuilder::new(model.clone());
 
-    <span class="comment">// If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.</span>
-    <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">filter_joins</span>) <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">render</span>();
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">filter_joins</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">builder</span>.<span class="ident">joins</span> <span class="op">=</span> <span class="ident">filter_joins</span>;
-        <span class="ident">builder</span>.<span class="ident">join_filters</span>.<span class="ident">push</span>(<span class="ident">filter</span>);
-    } <span class="kw">else</span> {
-        <span class="ident">builder</span>.<span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>);
+    <span class="comment">// If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
+    </span><span class="kw">let </span>(filter, filter_joins) = filter.render();
+    <span class="kw">if </span>!filter_joins.is_empty() {
+        builder.joins = filter_joins;
+        builder.join_filters.push(filter);
+    } <span class="kw">else </span>{
+        builder.query = <span class="prelude-val">Some</span>(filter);
     };
 
-    <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">with_model_projection</span>(<span class="ident">id_field</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">docs</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">execute</span>(<span class="ident">collection</span>, <span class="ident">session</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">docs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">doc</span><span class="op">|</span> <span class="ident">doc</span>.<span class="ident">remove</span>(<span class="string">&quot;_id&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">collect</span>();
+    <span class="kw">let </span>builder = builder.with_model_projection(id_field)<span class="question-mark">?</span>;
+    <span class="kw">let </span>query = builder.build()<span class="question-mark">?</span>;
+    <span class="kw">let </span>docs = query.execute(collection, session).instrument(span).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>ids = docs.into_iter().map(|<span class="kw-2">mut </span>doc| doc.remove(<span class="string">&quot;_id&quot;</span>).unwrap()).collect();
 
-    <span class="prelude-val">Ok</span>(<span class="ident">ids</span>)
+    <span class="prelude-val">Ok</span>(ids)
 }
 
-<span class="doccomment">/// Connect relations defined in `child_ids` to a parent defined in `parent_id`.</span>
-<span class="doccomment">/// The relation information is in the `RelationFieldRef`.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_connect</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
-    <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">parent_model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
-    <span class="kw">let</span> <span class="ident">child_model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_model</span>();
+<span class="doccomment">/// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
+/// The relation information is in the `RelationFieldRef`.
+</span><span class="kw">pub async fn </span>m2m_connect&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    database: <span class="kw-2">&amp;</span>Database,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    parent_id: <span class="kw-2">&amp;</span>SelectionResult,
+    child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    <span class="kw">let </span>parent_model = field.model();
+    <span class="kw">let </span>child_model = field.related_model();
 
-    <span class="kw">let</span> <span class="ident">parent_coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">parent_model</span>.<span class="ident">db_name</span>());
-    <span class="kw">let</span> <span class="ident">child_coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">child_model</span>.<span class="ident">db_name</span>());
+    <span class="kw">let </span>parent_coll = database.collection::&lt;Document&gt;(parent_model.db_name());
+    <span class="kw">let </span>child_coll = database.collection::&lt;Document&gt;(child_model.db_name());
 
-    <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="ident">parent_id</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">parent_id_field</span> <span class="op">=</span> <span class="ident">pick_singular_id</span>(<span class="kw-2">&amp;</span><span class="ident">parent_model</span>);
+    <span class="kw">let </span>parent_id = parent_id.values().next().unwrap();
+    <span class="kw">let </span>parent_id_field = pick_singular_id(<span class="kw-2">&amp;</span>parent_model);
 
-    <span class="kw">let</span> <span class="ident">parent_ids_scalar_field_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">parent_id_field</span>, <span class="ident">parent_id</span>)
-        .<span class="ident">into_bson</span>()
-        .<span class="ident">decorate_with_scalar_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">parent_id_field</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>parent_ids_scalar_field_name = field.relation_info.fields.get(<span class="number">0</span>).unwrap();
+    <span class="kw">let </span>parent_id = (<span class="kw-2">&amp;</span>parent_id_field, parent_id)
+        .into_bson()
+        .decorate_with_scalar_field_info(<span class="kw-2">&amp;</span>parent_id_field)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">parent_filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$eq&quot;</span>: <span class="ident">parent_id</span>.<span class="ident">clone</span>() } };
-    <span class="kw">let</span> <span class="ident">child_ids</span> <span class="op">=</span> <span class="ident">child_ids</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">child_id</span><span class="op">|</span> {
-            <span class="kw">let</span> (<span class="ident">selection</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="ident">child_id</span>.<span class="ident">pairs</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let </span>parent_filter = <span class="macro">doc! </span>{ <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$eq&quot;</span>: parent_id.clone() } };
+    <span class="kw">let </span>child_ids = child_ids
+        .iter()
+        .map(|child_id| {
+            <span class="kw">let </span>(selection, value) = child_id.pairs.get(<span class="number">0</span>).unwrap();
 
-            (<span class="ident">selection</span>, <span class="ident">value</span>.<span class="ident">clone</span>())
-                .<span class="ident">into_bson</span>()
-                .<span class="ident">decorate_with_selected_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">selection</span>)
+            (selection, value.clone())
+                .into_bson()
+                .decorate_with_selected_field_info(<span class="kw-2">&amp;</span>selection)
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">parent_update</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;$addToSet&quot;</span>: { <span class="ident">parent_ids_scalar_field_name</span>: { <span class="string">&quot;$each&quot;</span>: <span class="ident">child_ids</span>.<span class="ident">clone</span>() } } };
+    <span class="kw">let </span>parent_update = <span class="macro">doc! </span>{ <span class="string">&quot;$addToSet&quot;</span>: { parent_ids_scalar_field_name: { <span class="string">&quot;$each&quot;</span>: child_ids.clone() } } };
 
-    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">UpdateOne::new</span>(<span class="kw-2">&amp;</span><span class="ident">parent_filter</span>, <span class="kw-2">&amp;</span><span class="ident">parent_update</span>, <span class="ident">parent_coll</span>.<span class="ident">name</span>());
+    <span class="kw">let </span>query_string_builder = UpdateOne::new(<span class="kw-2">&amp;</span>parent_filter, <span class="kw-2">&amp;</span>parent_update, parent_coll.name());
 
-    <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
-        <span class="ident">parent_coll</span>.<span class="ident">update_one_with_session</span>(<span class="ident">parent_filter</span>.<span class="ident">clone</span>(), <span class="ident">parent_update</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+        parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), <span class="prelude-val">None</span>, session)
     })
     .<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="comment">// Then update all children and add the parent</span>
-    <span class="kw">let</span> <span class="ident">child_filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$in&quot;</span>: <span class="ident">child_ids</span> } };
-    <span class="kw">let</span> <span class="ident">child_ids_scalar_field_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_field</span>().<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">child_update</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;$addToSet&quot;</span>: { <span class="ident">child_ids_scalar_field_name</span>: <span class="ident">parent_id</span> } };
+    <span class="comment">// Then update all children and add the parent
+    </span><span class="kw">let </span>child_filter = <span class="macro">doc! </span>{ <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$in&quot;</span>: child_ids } };
+    <span class="kw">let </span>child_ids_scalar_field_name = field.related_field().relation_info.fields.get(<span class="number">0</span>).unwrap().clone();
+    <span class="kw">let </span>child_update = <span class="macro">doc! </span>{ <span class="string">&quot;$addToSet&quot;</span>: { child_ids_scalar_field_name: parent_id } };
 
-    <span class="kw">let</span> <span class="ident">child_updates</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">child_update</span>.<span class="ident">clone</span>()];
-    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">UpdateMany::new</span>(<span class="kw-2">&amp;</span><span class="ident">child_filter</span>, <span class="kw-2">&amp;</span><span class="ident">child_updates</span>, <span class="ident">child_coll</span>.<span class="ident">name</span>());
-    <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
-        <span class="ident">child_coll</span>.<span class="ident">update_many_with_session</span>(<span class="ident">child_filter</span>.<span class="ident">clone</span>(), <span class="ident">child_update</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    <span class="kw">let </span>child_updates = <span class="macro">vec!</span>[child_update.clone()];
+    <span class="kw">let </span>query_string_builder = UpdateMany::new(<span class="kw-2">&amp;</span>child_filter, <span class="kw-2">&amp;</span>child_updates, child_coll.name());
+    observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+        child_coll.update_many_with_session(child_filter.clone(), child_update.clone(), <span class="prelude-val">None</span>, session)
     })
     .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_disconnect</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
-    <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">parent_model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
-    <span class="kw">let</span> <span class="ident">child_model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_model</span>();
+<span class="kw">pub async fn </span>m2m_disconnect&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    database: <span class="kw-2">&amp;</span>Database,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    parent_id: <span class="kw-2">&amp;</span>SelectionResult,
+    child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    <span class="kw">let </span>parent_model = field.model();
+    <span class="kw">let </span>child_model = field.related_model();
 
-    <span class="kw">let</span> <span class="ident">parent_coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">parent_model</span>.<span class="ident">db_name</span>());
-    <span class="kw">let</span> <span class="ident">child_coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">child_model</span>.<span class="ident">db_name</span>());
+    <span class="kw">let </span>parent_coll = database.collection::&lt;Document&gt;(parent_model.db_name());
+    <span class="kw">let </span>child_coll = database.collection::&lt;Document&gt;(child_model.db_name());
 
-    <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="ident">parent_id</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">parent_id_field</span> <span class="op">=</span> <span class="ident">pick_singular_id</span>(<span class="kw-2">&amp;</span><span class="ident">parent_model</span>);
+    <span class="kw">let </span>parent_id = parent_id.values().next().unwrap();
+    <span class="kw">let </span>parent_id_field = pick_singular_id(<span class="kw-2">&amp;</span>parent_model);
 
-    <span class="kw">let</span> <span class="ident">parent_ids_scalar_field_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">parent_id_field</span>, <span class="ident">parent_id</span>)
-        .<span class="ident">into_bson</span>()
-        .<span class="ident">decorate_with_scalar_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">parent_id_field</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>parent_ids_scalar_field_name = field.relation_info.fields.get(<span class="number">0</span>).unwrap();
+    <span class="kw">let </span>parent_id = (<span class="kw-2">&amp;</span>parent_id_field, parent_id)
+        .into_bson()
+        .decorate_with_scalar_field_info(<span class="kw-2">&amp;</span>parent_id_field)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">parent_filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$eq&quot;</span>: <span class="ident">parent_id</span>.<span class="ident">clone</span>() } };
-    <span class="kw">let</span> <span class="ident">child_ids</span> <span class="op">=</span> <span class="ident">child_ids</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">child_id</span><span class="op">|</span> {
-            <span class="kw">let</span> (<span class="ident">field</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="ident">child_id</span>.<span class="ident">pairs</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let </span>parent_filter = <span class="macro">doc! </span>{ <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$eq&quot;</span>: parent_id.clone() } };
+    <span class="kw">let </span>child_ids = child_ids
+        .iter()
+        .map(|child_id| {
+            <span class="kw">let </span>(field, value) = child_id.pairs.get(<span class="number">0</span>).unwrap();
 
-            (<span class="ident">field</span>, <span class="ident">value</span>.<span class="ident">clone</span>())
-                .<span class="ident">into_bson</span>()
-                .<span class="ident">decorate_with_selected_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>)
+            (field, value.clone())
+                .into_bson()
+                .decorate_with_selected_field_info(<span class="kw-2">&amp;</span>field)
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">parent_update</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;$pullAll&quot;</span>: { <span class="ident">parent_ids_scalar_field_name</span>: <span class="ident">child_ids</span>.<span class="ident">clone</span>() } };
+    <span class="kw">let </span>parent_update = <span class="macro">doc! </span>{ <span class="string">&quot;$pullAll&quot;</span>: { parent_ids_scalar_field_name: child_ids.clone() } };
 
-    <span class="comment">// First update the parent and remove all child IDs to the m:n scalar field.</span>
-    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">UpdateOne::new</span>(<span class="kw-2">&amp;</span><span class="ident">parent_filter</span>, <span class="kw-2">&amp;</span><span class="ident">parent_update</span>, <span class="ident">parent_coll</span>.<span class="ident">name</span>());
-    <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
-        <span class="ident">parent_coll</span>.<span class="ident">update_one_with_session</span>(<span class="ident">parent_filter</span>.<span class="ident">clone</span>(), <span class="ident">parent_update</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    <span class="comment">// First update the parent and remove all child IDs to the m:n scalar field.
+    </span><span class="kw">let </span>query_string_builder = UpdateOne::new(<span class="kw-2">&amp;</span>parent_filter, <span class="kw-2">&amp;</span>parent_update, parent_coll.name());
+    observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+        parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), <span class="prelude-val">None</span>, session)
     })
     .<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="comment">// Then update all children and add the parent</span>
-    <span class="kw">let</span> <span class="ident">child_filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$in&quot;</span>: <span class="ident">child_ids</span> } };
-    <span class="kw">let</span> <span class="ident">child_ids_scalar_field_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_field</span>().<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>();
+    <span class="comment">// Then update all children and add the parent
+    </span><span class="kw">let </span>child_filter = <span class="macro">doc! </span>{ <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$in&quot;</span>: child_ids } };
+    <span class="kw">let </span>child_ids_scalar_field_name = field.related_field().relation_info.fields.get(<span class="number">0</span>).unwrap().clone();
 
-    <span class="kw">let</span> <span class="ident">child_update</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;$pull&quot;</span>: { <span class="ident">child_ids_scalar_field_name</span>: <span class="ident">parent_id</span> } };
+    <span class="kw">let </span>child_update = <span class="macro">doc! </span>{ <span class="string">&quot;$pull&quot;</span>: { child_ids_scalar_field_name: parent_id } };
 
-    <span class="kw">let</span> <span class="ident">child_updates</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">child_update</span>.<span class="ident">clone</span>()];
-    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">UpdateMany::new</span>(<span class="kw-2">&amp;</span><span class="ident">child_filter</span>, <span class="kw-2">&amp;</span><span class="ident">child_updates</span>, <span class="ident">child_coll</span>.<span class="ident">name</span>());
-    <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
-        <span class="ident">child_coll</span>.<span class="ident">update_many_with_session</span>(<span class="ident">child_filter</span>.<span class="ident">clone</span>(), <span class="ident">child_update</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    <span class="kw">let </span>child_updates = <span class="macro">vec!</span>[child_update.clone()];
+    <span class="kw">let </span>query_string_builder = UpdateMany::new(<span class="kw-2">&amp;</span>child_filter, <span class="kw-2">&amp;</span>child_updates, child_coll.name());
+    observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+        child_coll.update_many_with_session(child_filter.clone(), child_update, <span class="prelude-val">None</span>, session)
     })
     .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Execute raw is not implemented on MongoDB</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">_database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">_session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">_inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(<span class="string">&quot;execute_raw&quot;</span>.<span class="ident">into</span>()))
+<span class="doccomment">/// Execute raw is not implemented on MongoDB
+</span><span class="kw">pub async fn </span>execute_raw&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    _database: <span class="kw-2">&amp;</span>Database,
+    _session: <span class="kw-2">&amp;mut </span>ClientSession,
+    _inputs: HashMap&lt;String, PrismaValue&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
+    <span class="prelude-val">Err</span>(MongoError::Unsupported(<span class="string">&quot;execute_raw&quot;</span>.into()))
 }
 
-<span class="doccomment">/// Execute a plain MongoDB query, returning the answer as a JSON `Value`.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>,
-    <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-    <span class="ident">query_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">db_statement</span> <span class="op">=</span> <span class="ident">get_raw_db_statement</span>(<span class="kw-2">&amp;</span><span class="ident">query_type</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">database</span>);
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+<span class="doccomment">/// Execute a plain MongoDB query, returning the answer as a JSON `Value`.
+</span><span class="kw">pub async fn </span>query_raw&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    database: <span class="kw-2">&amp;</span>Database,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelRef&gt;,
+    inputs: HashMap&lt;String, PrismaValue&gt;,
+    query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;serde_json::Value&gt; {
+    <span class="kw">let </span>db_statement = get_raw_db_statement(<span class="kw-2">&amp;</span>query_type, <span class="kw-2">&amp;</span>model, database);
+    <span class="kw">let </span>span = <span class="macro">info_span!</span>(
         <span class="string">&quot;prisma:engine:db_query&quot;</span>,
-        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
-        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="op">&amp;&amp;</span><span class="ident">db_statement</span>.<span class="ident">as_str</span>()
+        user_facing = <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot; </span>= &amp;&amp;db_statement.as_str()
     );
 
-    <span class="kw">let</span> <span class="ident">mongo_command</span> <span class="op">=</span> <span class="ident">MongoCommand::from_raw_query</span>(<span class="ident">model</span>, <span class="ident">inputs</span>, <span class="ident">query_type</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>mongo_command = MongoCommand::from_raw_query(model, inputs, query_type)<span class="question-mark">?</span>;
 
-    <span class="kw">async</span> {
-        <span class="kw">let</span> <span class="ident">json_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mongo_command</span> {
-            <span class="ident">MongoCommand::Raw</span> { <span class="ident">cmd</span> } =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">database</span>.<span class="ident">run_command_with_session</span>(<span class="ident">cmd</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async </span>{
+        <span class="kw">let </span>json_result = <span class="kw">match </span>mongo_command {
+            MongoCommand::Raw { cmd } =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>result = observing(<span class="prelude-val">None</span>, || database.run_command_with_session(cmd, <span class="prelude-val">None</span>, session)).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="comment">// Removes unnecessary properties from raw response</span>
-                <span class="comment">// See https://docs.mongodb.com/v5.0/reference/method/db.runCommand</span>
-                <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;operationTime&quot;</span>);
-                <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;$clusterTime&quot;</span>);
-                <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;opTime&quot;</span>);
-                <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;electionId&quot;</span>);
+                <span class="comment">// Removes unnecessary properties from raw response
+                // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand
+                </span>result.remove(<span class="string">&quot;operationTime&quot;</span>);
+                result.remove(<span class="string">&quot;$clusterTime&quot;</span>);
+                result.remove(<span class="string">&quot;opTime&quot;</span>);
+                result.remove(<span class="string">&quot;electionId&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">json_result</span>: <span class="ident">serde_json::Value</span> <span class="op">=</span> <span class="ident">Bson::Document</span>(<span class="ident">result</span>).<span class="ident">into</span>();
+                <span class="kw">let </span>json_result: serde_json::Value = Bson::Document(result).into();
 
-                <span class="ident">json_result</span>
+                json_result
             }
-            <span class="ident">MongoCommand::Handled</span> { <span class="ident">collection</span>, <span class="ident">operation</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">collection</span>.<span class="ident">as_str</span>());
+            MongoCommand::Handled { collection, operation } =&gt; {
+                <span class="kw">let </span>coll = database.collection::&lt;Document&gt;(collection.as_str());
 
-                <span class="kw">match</span> <span class="ident">operation</span> {
-                    <span class="ident">MongoOperation::Find</span>(<span class="ident">filter</span>, <span class="ident">options</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">coll</span>.<span class="ident">find_with_session</span>(<span class="ident">filter</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">match </span>operation {
+                    MongoOperation::Find(filter, options) =&gt; {
+                        <span class="kw">let </span>cursor = coll.find_with_session(filter, options, session).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                        <span class="ident">raw::cursor_to_json</span>(<span class="ident">cursor</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>
-                    }
-                    <span class="ident">MongoOperation::Aggregate</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">coll</span>.<span class="ident">aggregate_with_session</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                        raw::cursor_to_json(cursor, session).<span class="kw">await</span><span class="question-mark">?
+                    </span>}
+                    MongoOperation::Aggregate(pipeline, options) =&gt; {
+                        <span class="kw">let </span>cursor = coll.aggregate_with_session(pipeline, options, session).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                        <span class="ident">raw::cursor_to_json</span>(<span class="ident">cursor</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>
-                    }
+                        raw::cursor_to_json(cursor, session).<span class="kw">await</span><span class="question-mark">?
+                    </span>}
                 }
             }
         };
-        <span class="prelude-val">Ok</span>(<span class="ident">json_result</span>)
+        <span class="prelude-val">Ok</span>(json_result)
     }
-    .<span class="ident">instrument</span>(<span class="ident">span</span>)
-    .<span class="kw">await</span>
-}
+    .instrument(span)
+    .<span class="kw">await
+</span>}
 
-<span class="kw">fn</span> <span class="ident">get_raw_db_statement</span>(<span class="ident">query_type</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>, <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">match</span> (<span class="ident">query_type</span>.<span class="ident">as_deref</span>(), <span class="ident">model</span>) {
-        (<span class="prelude-val">Some</span>(<span class="string">&quot;findRaw&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;db.{}.findRaw(*)&quot;</span>, <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">m</span>.<span class="ident">db_name</span>()).<span class="ident">name</span>()),
-        (<span class="prelude-val">Some</span>(<span class="string">&quot;aggregateRaw&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="macro">format!</span>(
+<span class="kw">fn </span>get_raw_db_statement(query_type: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;String&gt;, model: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelRef&gt;, database: <span class="kw-2">&amp;</span>Database) -&gt; String {
+    <span class="kw">match </span>(query_type.as_deref(), model) {
+        (<span class="prelude-val">Some</span>(<span class="string">&quot;findRaw&quot;</span>), <span class="prelude-val">Some</span>(m)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;db.{}.findRaw(*)&quot;</span>, database.collection::&lt;Document&gt;(m.db_name()).name()),
+        (<span class="prelude-val">Some</span>(<span class="string">&quot;aggregateRaw&quot;</span>), <span class="prelude-val">Some</span>(m)) =&gt; <span class="macro">format!</span>(
             <span class="string">&quot;db.{}.aggregateRaw(*)&quot;</span>,
-            <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">m</span>.<span class="ident">db_name</span>()).<span class="ident">name</span>()
+            database.collection::&lt;Document&gt;(m.db_name()).name()
         ),
-        <span class="kw">_</span> =&gt; <span class="string">&quot;db.runCommandRaw(*)&quot;</span>.<span class="ident">to_string</span>(),
+        <span class="kw">_ </span>=&gt; <span class="string">&quot;db.runCommandRaw(*)&quot;</span>.to_string(),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

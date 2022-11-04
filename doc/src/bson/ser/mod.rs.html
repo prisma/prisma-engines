@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/ser/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/ser/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -309,316 +309,316 @@
 <span id="309">309</span>
 <span id="310">310</span>
 <span id="311">311</span>
-</pre><pre class="rust"><code><span class="comment">// The MIT License (MIT)</span>
+</pre><pre class="rust"><code><span class="comment">// The MIT License (MIT)
 
-<span class="comment">// Copyright (c) 2015 Y. T. Chung &lt;zonyitoo@gmail.com&gt;</span>
+// Copyright (c) 2015 Y. T. Chung &lt;zonyitoo@gmail.com&gt;
 
-<span class="comment">// Permission is hereby granted, free of charge, to any person obtaining a copy of</span>
-<span class="comment">// this software and associated documentation files (the &quot;Software&quot;), to deal in</span>
-<span class="comment">// the Software without restriction, including without limitation the rights to</span>
-<span class="comment">// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of</span>
-<span class="comment">// the Software, and to permit persons to whom the Software is furnished to do so,</span>
-<span class="comment">// subject to the following conditions:</span>
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the &quot;Software&quot;), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+// the Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
 
-<span class="comment">// The above copyright notice and this permission notice shall be included in all</span>
-<span class="comment">// copies or substantial portions of the Software.</span>
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
 
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
-<span class="comment">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS</span>
-<span class="comment">// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR</span>
-<span class="comment">// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER</span>
-<span class="comment">// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-<span class="doccomment">//! Serializer</span>
+</span><span class="doccomment">//! Serializer
 
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">raw</span>;
-<span class="kw">mod</span> <span class="ident">serde</span>;
+</span><span class="kw">mod </span>error;
+<span class="kw">mod </span>raw;
+<span class="kw">mod </span>serde;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">serde</span>::{<span class="ident">Serializer</span>, <span class="ident">SerializerOptions</span>},
+<span class="kw">pub use </span><span class="self">self</span>::{
+    error::{Error, <span class="prelude-ty">Result</span>},
+    serde::{Serializer, SerializerOptions},
 };
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io::Write</span>, <span class="ident">iter::FromIterator</span>, <span class="ident">mem</span>};
+<span class="kw">use </span>std::{io::Write, iter::FromIterator, mem};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">Bson</span>, <span class="ident">DbPointer</span>, <span class="ident">Document</span>, <span class="ident">JavaScriptCodeWithScope</span>, <span class="ident">Regex</span>},
-    <span class="ident">de::MAX_BSON_SIZE</span>,
-    <span class="ident">spec::BinarySubtype</span>,
-    <span class="ident">Binary</span>,
-    <span class="ident">RawDocumentBuf</span>,
+<span class="kw">use crate</span>::{
+    bson::{Bson, DbPointer, Document, JavaScriptCodeWithScope, Regex},
+    de::MAX_BSON_SIZE,
+    spec::BinarySubtype,
+    Binary,
+    RawDocumentBuf,
 };
-<span class="kw">use</span> <span class="ident">::serde</span>::{<span class="ident">ser::Error</span> <span class="kw">as</span> <span class="ident">SerdeError</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>::serde::{ser::Error <span class="kw">as </span>SerdeError, Serialize};
 
-<span class="kw">fn</span> <span class="ident">write_string</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span>(<span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">to_le_bytes</span>())<span class="question-mark">?</span>;
-    <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
-    <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="string">b&quot;\0&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">fn </span>write_string&lt;W: Write + <span class="question-mark">?</span>Sized&gt;(writer: <span class="kw-2">&amp;mut </span>W, s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    writer.write_all(<span class="kw-2">&amp;</span>(s.len() <span class="kw">as </span>i32 + <span class="number">1</span>).to_le_bytes())<span class="question-mark">?</span>;
+    writer.write_all(s.as_bytes())<span class="question-mark">?</span>;
+    writer.write_all(<span class="string">b&quot;\0&quot;</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">write_cstring</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&#39;\0&#39;</span>) {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidCString</span>(<span class="ident">s</span>.<span class="ident">into</span>()));
+<span class="kw">fn </span>write_cstring&lt;W: Write + <span class="question-mark">?</span>Sized&gt;(writer: <span class="kw-2">&amp;mut </span>W, s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">if </span>s.contains(<span class="string">&#39;\0&#39;</span>) {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidCString(s.into()));
     }
-    <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
-    <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="string">b&quot;\0&quot;</span>)<span class="question-mark">?</span>;
+    writer.write_all(s.as_bytes())<span class="question-mark">?</span>;
+    writer.write_all(<span class="string">b&quot;\0&quot;</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_i32</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">val</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">writer</span>
-        .<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>.<span class="ident">to_le_bytes</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-        .<span class="ident">map_err</span>(<span class="ident">From::from</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>write_i32&lt;W: Write + <span class="question-mark">?</span>Sized&gt;(writer: <span class="kw-2">&amp;mut </span>W, val: i32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    writer
+        .write_all(<span class="kw-2">&amp;</span>val.to_le_bytes())
+        .map(|<span class="kw">_</span>| ())
+        .map_err(From::from)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">write_i64</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">val</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">writer</span>
-        .<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>.<span class="ident">to_le_bytes</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-        .<span class="ident">map_err</span>(<span class="ident">From::from</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>write_i64&lt;W: Write + <span class="question-mark">?</span>Sized&gt;(writer: <span class="kw-2">&amp;mut </span>W, val: i64) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    writer
+        .write_all(<span class="kw-2">&amp;</span>val.to_le_bytes())
+        .map(|<span class="kw">_</span>| ())
+        .map_err(From::from)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">write_f64</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">val</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">writer</span>
-        .<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>.<span class="ident">to_le_bytes</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-        .<span class="ident">map_err</span>(<span class="ident">From::from</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>write_f64&lt;W: Write + <span class="question-mark">?</span>Sized&gt;(writer: <span class="kw-2">&amp;mut </span>W, val: f64) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    writer
+        .write_all(<span class="kw-2">&amp;</span>val.to_le_bytes())
+        .map(|<span class="kw">_</span>| ())
+        .map_err(From::from)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">write_binary</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="ident">W</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">subtype</span>: <span class="ident">BinarySubtype</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">BinarySubtype::BinaryOld</span> <span class="op">=</span> <span class="ident">subtype</span> {
-        <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">4</span>
-    } <span class="kw">else</span> {
-        <span class="ident">bytes</span>.<span class="ident">len</span>()
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>write_binary&lt;W: Write&gt;(<span class="kw-2">mut </span>writer: W, bytes: <span class="kw-2">&amp;</span>[u8], subtype: BinarySubtype) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">let </span>len = <span class="kw">if let </span>BinarySubtype::BinaryOld = subtype {
+        bytes.len() + <span class="number">4
+    </span>} <span class="kw">else </span>{
+        bytes.len()
     };
 
-    <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="ident">MAX_BSON_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::custom</span>(<span class="macro">format!</span>(
+    <span class="kw">if </span>len &gt; MAX_BSON_SIZE <span class="kw">as </span>usize {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::custom(<span class="macro">format!</span>(
             <span class="string">&quot;binary length {} exceeded maximum size&quot;</span>,
-            <span class="ident">bytes</span>.<span class="ident">len</span>()
+            bytes.len()
         )));
     }
 
-    <span class="ident">write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">i32</span>)<span class="question-mark">?</span>;
-    <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span>[<span class="ident">subtype</span>.<span class="ident">into</span>()])<span class="question-mark">?</span>;
+    write_i32(<span class="kw-2">&amp;mut </span>writer, len <span class="kw">as </span>i32)<span class="question-mark">?</span>;
+    writer.write_all(<span class="kw-2">&amp;</span>[subtype.into()])<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">BinarySubtype::BinaryOld</span> <span class="op">=</span> <span class="ident">subtype</span> {
-        <span class="ident">write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="number">4</span>)<span class="question-mark">?</span>;
+    <span class="kw">if let </span>BinarySubtype::BinaryOld = subtype {
+        write_i32(<span class="kw-2">&amp;mut </span>writer, len <span class="kw">as </span>i32 - <span class="number">4</span>)<span class="question-mark">?</span>;
     };
 
-    <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="ident">bytes</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
+    writer.write_all(bytes).map_err(From::from)
 }
 
-<span class="kw">fn</span> <span class="ident">serialize_array</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">arr</span>: <span class="kw-2">&amp;</span>[<span class="ident">Bson</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">val</span>) <span class="kw">in</span> <span class="ident">arr</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-        <span class="ident">serialize_bson</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">to_string</span>(), <span class="ident">val</span>)<span class="question-mark">?</span>;
+<span class="kw">fn </span>serialize_array&lt;W: Write + <span class="question-mark">?</span>Sized&gt;(writer: <span class="kw-2">&amp;mut </span>W, arr: <span class="kw-2">&amp;</span>[Bson]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
+    <span class="kw">for </span>(key, val) <span class="kw">in </span>arr.iter().enumerate() {
+        serialize_bson(<span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;</span>key.to_string(), val)<span class="question-mark">?</span>;
     }
 
-    <span class="ident">write_i32</span>(
-        <span class="ident">writer</span>,
-        (<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>() <span class="op">+</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>()) <span class="kw">as</span> <span class="ident">i32</span>,
+    write_i32(
+        writer,
+        (buf.len() + mem::size_of::&lt;i32&gt;() + mem::size_of::&lt;u8&gt;()) <span class="kw">as </span>i32,
     )<span class="question-mark">?</span>;
-    <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>)<span class="question-mark">?</span>;
-    <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="string">b&quot;\0&quot;</span>)<span class="question-mark">?</span>;
+    writer.write_all(<span class="kw-2">&amp;</span>buf)<span class="question-mark">?</span>;
+    writer.write_all(<span class="string">b&quot;\0&quot;</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_bson</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
-    <span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
-    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">Bson</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span>[<span class="ident">val</span>.<span class="ident">element_type</span>() <span class="kw">as</span> <span class="ident">u8</span>])<span class="question-mark">?</span>;
-    <span class="ident">write_cstring</span>(<span class="ident">writer</span>, <span class="ident">key</span>)<span class="question-mark">?</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize_bson&lt;W: Write + <span class="question-mark">?</span>Sized&gt;(
+    writer: <span class="kw-2">&amp;mut </span>W,
+    key: <span class="kw-2">&amp;</span>str,
+    val: <span class="kw-2">&amp;</span>Bson,
+) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    writer.write_all(<span class="kw-2">&amp;</span>[val.element_type() <span class="kw">as </span>u8])<span class="question-mark">?</span>;
+    write_cstring(writer, key)<span class="question-mark">?</span>;
 
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">val</span> {
-        <span class="ident">Bson::Double</span>(<span class="ident">v</span>) =&gt; <span class="ident">write_f64</span>(<span class="ident">writer</span>, <span class="ident">v</span>),
-        <span class="ident">Bson::String</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">write_string</span>(<span class="ident">writer</span>, <span class="ident">v</span>),
-        <span class="ident">Bson::Array</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">serialize_array</span>(<span class="ident">writer</span>, <span class="ident">v</span>),
-        <span class="ident">Bson::Document</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">to_writer</span>(<span class="ident">writer</span>),
-        <span class="ident">Bson::Boolean</span>(<span class="ident">v</span>) =&gt; <span class="ident">writer</span>
-            .<span class="ident">write_all</span>(<span class="kw-2">&amp;</span>[<span class="kw">if</span> <span class="ident">v</span> { <span class="number">0x01</span> } <span class="kw">else</span> { <span class="number">0x00</span> }])
-            .<span class="ident">map_err</span>(<span class="ident">From::from</span>),
-        <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex</span> {
-            <span class="kw-2">ref</span> <span class="ident">pattern</span>,
-            <span class="kw-2">ref</span> <span class="ident">options</span>,
+    <span class="kw">match </span><span class="kw-2">*</span>val {
+        Bson::Double(v) =&gt; write_f64(writer, v),
+        Bson::String(<span class="kw-2">ref </span>v) =&gt; write_string(writer, v),
+        Bson::Array(<span class="kw-2">ref </span>v) =&gt; serialize_array(writer, v),
+        Bson::Document(<span class="kw-2">ref </span>v) =&gt; v.to_writer(writer),
+        Bson::Boolean(v) =&gt; writer
+            .write_all(<span class="kw-2">&amp;</span>[<span class="kw">if </span>v { <span class="number">0x01 </span>} <span class="kw">else </span>{ <span class="number">0x00 </span>}])
+            .map_err(From::from),
+        Bson::RegularExpression(Regex {
+            <span class="kw-2">ref </span>pattern,
+            <span class="kw-2">ref </span>options,
         }) =&gt; {
-            <span class="ident">write_cstring</span>(<span class="ident">writer</span>, <span class="ident">pattern</span>)<span class="question-mark">?</span>;
+            write_cstring(writer, pattern)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">chars</span>().<span class="ident">collect</span>();
-            <span class="ident">chars</span>.<span class="ident">sort_unstable</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>chars: Vec&lt;char&gt; = options.chars().collect();
+            chars.sort_unstable();
 
-            <span class="ident">write_cstring</span>(<span class="ident">writer</span>, <span class="ident">String::from_iter</span>(<span class="ident">chars</span>).<span class="ident">as_str</span>())
+            write_cstring(writer, String::from_iter(chars).as_str())
         }
-        <span class="ident">Bson::JavaScriptCode</span>(<span class="kw-2">ref</span> <span class="ident">code</span>) =&gt; <span class="ident">write_string</span>(<span class="ident">writer</span>, <span class="ident">code</span>),
-        <span class="ident">Bson::ObjectId</span>(<span class="kw-2">ref</span> <span class="ident">id</span>) =&gt; <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>.<span class="ident">bytes</span>()).<span class="ident">map_err</span>(<span class="ident">From::from</span>),
-        <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident">JavaScriptCodeWithScope</span> {
-            <span class="kw-2">ref</span> <span class="ident">code</span>,
-            <span class="kw-2">ref</span> <span class="ident">scope</span>,
+        Bson::JavaScriptCode(<span class="kw-2">ref </span>code) =&gt; write_string(writer, code),
+        Bson::ObjectId(<span class="kw-2">ref </span>id) =&gt; writer.write_all(<span class="kw-2">&amp;</span>id.bytes()).map_err(From::from),
+        Bson::JavaScriptCodeWithScope(JavaScriptCodeWithScope {
+            <span class="kw-2">ref </span>code,
+            <span class="kw-2">ref </span>scope,
         }) =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-            <span class="ident">write_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>, <span class="ident">code</span>)<span class="question-mark">?</span>;
-            <span class="ident">scope</span>.<span class="ident">to_writer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
+            write_string(<span class="kw-2">&amp;mut </span>buf, code)<span class="question-mark">?</span>;
+            scope.to_writer(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
 
-            <span class="ident">write_i32</span>(<span class="ident">writer</span>, <span class="ident">buf</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">4</span>)<span class="question-mark">?</span>;
-            <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
+            write_i32(writer, buf.len() <span class="kw">as </span>i32 + <span class="number">4</span>)<span class="question-mark">?</span>;
+            writer.write_all(<span class="kw-2">&amp;</span>buf).map_err(From::from)
         }
-        <span class="ident">Bson::Int32</span>(<span class="ident">v</span>) =&gt; <span class="ident">write_i32</span>(<span class="ident">writer</span>, <span class="ident">v</span>),
-        <span class="ident">Bson::Int64</span>(<span class="ident">v</span>) =&gt; <span class="ident">write_i64</span>(<span class="ident">writer</span>, <span class="ident">v</span>),
-        <span class="ident">Bson::Timestamp</span>(<span class="ident">ts</span>) =&gt; <span class="ident">write_i64</span>(<span class="ident">writer</span>, <span class="ident">ts</span>.<span class="ident">to_le_i64</span>()),
-        <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> { <span class="ident">subtype</span>, <span class="kw-2">ref</span> <span class="ident">bytes</span> }) =&gt; <span class="ident">write_binary</span>(<span class="ident">writer</span>, <span class="ident">bytes</span>, <span class="ident">subtype</span>),
-        <span class="ident">Bson::DateTime</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">write_i64</span>(<span class="ident">writer</span>, <span class="ident">v</span>.<span class="ident">timestamp_millis</span>()),
-        <span class="ident">Bson::Null</span> =&gt; <span class="prelude-val">Ok</span>(()),
-        <span class="ident">Bson::Symbol</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">write_string</span>(<span class="ident">writer</span>, <span class="ident">v</span>),
-        <span class="ident">Bson::Decimal128</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; {
-            <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
+        Bson::Int32(v) =&gt; write_i32(writer, v),
+        Bson::Int64(v) =&gt; write_i64(writer, v),
+        Bson::Timestamp(ts) =&gt; write_i64(writer, ts.to_le_i64()),
+        Bson::Binary(Binary { subtype, <span class="kw-2">ref </span>bytes }) =&gt; write_binary(writer, bytes, subtype),
+        Bson::DateTime(<span class="kw-2">ref </span>v) =&gt; write_i64(writer, v.timestamp_millis()),
+        Bson::Null =&gt; <span class="prelude-val">Ok</span>(()),
+        Bson::Symbol(<span class="kw-2">ref </span>v) =&gt; write_string(writer, v),
+        Bson::Decimal128(<span class="kw-2">ref </span>v) =&gt; {
+            writer.write_all(<span class="kw-2">&amp;</span>v.bytes)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(())
         }
-        <span class="ident">Bson::Undefined</span> =&gt; <span class="prelude-val">Ok</span>(()),
-        <span class="ident">Bson::MinKey</span> =&gt; <span class="prelude-val">Ok</span>(()),
-        <span class="ident">Bson::MaxKey</span> =&gt; <span class="prelude-val">Ok</span>(()),
-        <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer</span> {
-            <span class="kw-2">ref</span> <span class="ident">namespace</span>,
-            <span class="kw-2">ref</span> <span class="ident">id</span>,
+        Bson::Undefined =&gt; <span class="prelude-val">Ok</span>(()),
+        Bson::MinKey =&gt; <span class="prelude-val">Ok</span>(()),
+        Bson::MaxKey =&gt; <span class="prelude-val">Ok</span>(()),
+        Bson::DbPointer(DbPointer {
+            <span class="kw-2">ref </span>namespace,
+            <span class="kw-2">ref </span>id,
         }) =&gt; {
-            <span class="ident">write_string</span>(<span class="ident">writer</span>, <span class="ident">namespace</span>)<span class="question-mark">?</span>;
-            <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>.<span class="ident">bytes</span>()).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
+            write_string(writer, namespace)<span class="question-mark">?</span>;
+            writer.write_all(<span class="kw-2">&amp;</span>id.bytes()).map_err(From::from)
         }
     }
 }
 
-<span class="doccomment">/// Encode a `T` Serializable into a BSON `Value`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Serializer` used by this function presents itself as human readable, whereas the</span>
-<span class="doccomment">/// one used in [`to_vec`] does not. This means that this function will produce different BSON than</span>
-<span class="doccomment">/// [`to_vec`] for types that change their serialization output depending on whether</span>
-<span class="doccomment">/// the format is human readable or not. To serialize to a [`Document`] with a serializer that</span>
-<span class="doccomment">/// presents itself as not human readable, use [`to_bson_with_options`] with</span>
-<span class="doccomment">/// [`SerializerOptions::human_readable`] set to false.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bson</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Serialize</span>,
+<span class="doccomment">/// Encode a `T` Serializable into a BSON `Value`.
+///
+/// The `Serializer` used by this function presents itself as human readable, whereas the
+/// one used in [`to_vec`] does not. This means that this function will produce different BSON than
+/// [`to_vec`] for types that change their serialization output depending on whether
+/// the format is human readable or not. To serialize to a [`Document`] with a serializer that
+/// presents itself as not human readable, use [`to_bson_with_options`] with
+/// [`SerializerOptions::human_readable`] set to false.
+</span><span class="kw">pub fn </span>to_bson&lt;T: <span class="question-mark">?</span>Sized&gt;(value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;Bson&gt;
+<span class="kw">where
+    </span>T: Serialize,
 {
-    <span class="kw">let</span> <span class="ident">ser</span> <span class="op">=</span> <span class="ident">Serializer::new</span>();
-    <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="ident">ser</span>)
+    <span class="kw">let </span>ser = Serializer::new();
+    value.serialize(ser)
 }
 
-<span class="doccomment">/// Encode a `T` into a `Bson` value, configuring the underlying serializer with the provided</span>
-<span class="doccomment">/// options.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde::Serialize;</span>
-<span class="doccomment">/// # use bson::{bson, SerializerOptions};</span>
-<span class="doccomment">/// #[derive(Debug, Serialize)]</span>
-<span class="doccomment">/// struct MyData {</span>
-<span class="doccomment">///     a: String,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let data = MyData { a: &quot;ok&quot;.to_string() };</span>
-<span class="doccomment">/// let options = SerializerOptions::builder().human_readable(false).build();</span>
-<span class="doccomment">/// let bson = bson::to_bson_with_options(&amp;data, options)?;</span>
-<span class="doccomment">/// assert_eq!(bson, bson!({ &quot;a&quot;: &quot;ok&quot; }));</span>
-<span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bson_with_options</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">options</span>: <span class="ident">SerializerOptions</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Serialize</span>,
+<span class="doccomment">/// Encode a `T` into a `Bson` value, configuring the underlying serializer with the provided
+/// options.
+/// ```
+/// # use serde::Serialize;
+/// # use bson::{bson, SerializerOptions};
+/// #[derive(Debug, Serialize)]
+/// struct MyData {
+///     a: String,
+/// }
+///
+/// let data = MyData { a: &quot;ok&quot;.to_string() };
+/// let options = SerializerOptions::builder().human_readable(false).build();
+/// let bson = bson::to_bson_with_options(&amp;data, options)?;
+/// assert_eq!(bson, bson!({ &quot;a&quot;: &quot;ok&quot; }));
+/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+/// ```
+</span><span class="kw">pub fn </span>to_bson_with_options&lt;T: <span class="question-mark">?</span>Sized&gt;(value: <span class="kw-2">&amp;</span>T, options: SerializerOptions) -&gt; <span class="prelude-ty">Result</span>&lt;Bson&gt;
+<span class="kw">where
+    </span>T: Serialize,
 {
-    <span class="kw">let</span> <span class="ident">ser</span> <span class="op">=</span> <span class="ident">Serializer::new_with_options</span>(<span class="ident">options</span>);
-    <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="ident">ser</span>)
+    <span class="kw">let </span>ser = Serializer::new_with_options(options);
+    value.serialize(ser)
 }
 
-<span class="doccomment">/// Encode a `T` Serializable into a BSON `Document`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Serializer` used by this function presents itself as human readable, whereas the</span>
-<span class="doccomment">/// one used in [`to_vec`] does not. This means that this function will produce different BSON than</span>
-<span class="doccomment">/// [`to_vec`] for types that change their serialization output depending on whether</span>
-<span class="doccomment">/// the format is human readable or not. To serialize to a [`Document`] with a serializer that</span>
-<span class="doccomment">/// presents itself as not human readable, use [`to_document_with_options`] with</span>
-<span class="doccomment">/// [`SerializerOptions::human_readable`] set to false.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_document</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Serialize</span>,
+<span class="doccomment">/// Encode a `T` Serializable into a BSON `Document`.
+///
+/// The `Serializer` used by this function presents itself as human readable, whereas the
+/// one used in [`to_vec`] does not. This means that this function will produce different BSON than
+/// [`to_vec`] for types that change their serialization output depending on whether
+/// the format is human readable or not. To serialize to a [`Document`] with a serializer that
+/// presents itself as not human readable, use [`to_document_with_options`] with
+/// [`SerializerOptions::human_readable`] set to false.
+</span><span class="kw">pub fn </span>to_document&lt;T: <span class="question-mark">?</span>Sized&gt;(value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;Document&gt;
+<span class="kw">where
+    </span>T: Serialize,
 {
-    <span class="ident">to_document_with_options</span>(<span class="ident">value</span>, <span class="ident">Default::default</span>())
+    to_document_with_options(value, Default::default())
 }
 
-<span class="doccomment">/// Encode a `T` into a [`Document`], configuring the underlying serializer with the provided</span>
-<span class="doccomment">/// options.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde::Serialize;</span>
-<span class="doccomment">/// # use bson::{doc, SerializerOptions};</span>
-<span class="doccomment">/// #[derive(Debug, Serialize)]</span>
-<span class="doccomment">/// struct MyData {</span>
-<span class="doccomment">///     a: String,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let data = MyData { a: &quot;ok&quot;.to_string() };</span>
-<span class="doccomment">/// let options = SerializerOptions::builder().human_readable(false).build();</span>
-<span class="doccomment">/// let doc = bson::to_document_with_options(&amp;data, options)?;</span>
-<span class="doccomment">/// assert_eq!(doc, doc! { &quot;a&quot;: &quot;ok&quot; });</span>
-<span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_document_with_options</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
-    <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-    <span class="ident">options</span>: <span class="ident">SerializerOptions</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Serialize</span>,
+<span class="doccomment">/// Encode a `T` into a [`Document`], configuring the underlying serializer with the provided
+/// options.
+/// ```
+/// # use serde::Serialize;
+/// # use bson::{doc, SerializerOptions};
+/// #[derive(Debug, Serialize)]
+/// struct MyData {
+///     a: String,
+/// }
+///
+/// let data = MyData { a: &quot;ok&quot;.to_string() };
+/// let options = SerializerOptions::builder().human_readable(false).build();
+/// let doc = bson::to_document_with_options(&amp;data, options)?;
+/// assert_eq!(doc, doc! { &quot;a&quot;: &quot;ok&quot; });
+/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+/// ```
+</span><span class="kw">pub fn </span>to_document_with_options&lt;T: <span class="question-mark">?</span>Sized&gt;(
+    value: <span class="kw-2">&amp;</span>T,
+    options: SerializerOptions,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Document&gt;
+<span class="kw">where
+    </span>T: Serialize,
 {
-    <span class="kw">match</span> <span class="ident">to_bson_with_options</span>(<span class="ident">value</span>, <span class="ident">options</span>)<span class="question-mark">?</span> {
-        <span class="ident">Bson::Document</span>(<span class="ident">doc</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">doc</span>),
-        <span class="ident">bson</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::SerializationError</span> {
-            <span class="ident">message</span>: <span class="macro">format!</span>(
+    <span class="kw">match </span>to_bson_with_options(value, options)<span class="question-mark">? </span>{
+        Bson::Document(doc) =&gt; <span class="prelude-val">Ok</span>(doc),
+        bson =&gt; <span class="prelude-val">Err</span>(Error::SerializationError {
+            message: <span class="macro">format!</span>(
                 <span class="string">&quot;Could not be serialized to Document, got {:?} instead&quot;</span>,
-                <span class="ident">bson</span>.<span class="ident">element_type</span>()
+                bson.element_type()
             ),
         }),
     }
 }
 
-<span class="doccomment">/// Serialize the given `T` as a BSON byte vector.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Serialize</span>,
+<span class="doccomment">/// Serialize the given `T` as a BSON byte vector.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>to_vec&lt;T&gt;(value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt;
+<span class="kw">where
+    </span>T: Serialize,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">raw::Serializer::new</span>();
-    <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">serializer</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">serializer</span>.<span class="ident">into_vec</span>())
+    <span class="kw">let </span><span class="kw-2">mut </span>serializer = raw::Serializer::new();
+    value.serialize(<span class="kw-2">&amp;mut </span>serializer)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(serializer.into_vec())
 }
 
-<span class="doccomment">/// Serialize the given `T` as a [`RawDocumentBuf`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serde::Serialize;</span>
-<span class="doccomment">/// use bson::rawdoc;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize)]</span>
-<span class="doccomment">/// struct Cat {</span>
-<span class="doccomment">///     name: String,</span>
-<span class="doccomment">///     age: i32</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let cat = Cat { name: &quot;Garfield&quot;.to_string(), age: 43 };</span>
-<span class="doccomment">/// let doc = bson::to_raw_document_buf(&amp;cat)?;</span>
-<span class="doccomment">/// assert_eq!(doc, rawdoc! { &quot;name&quot;: &quot;Garfield&quot;, &quot;age&quot;: 43 });</span>
-<span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_raw_document_buf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Serialize</span>,
+<span class="doccomment">/// Serialize the given `T` as a [`RawDocumentBuf`].
+///
+/// ```rust
+/// use serde::Serialize;
+/// use bson::rawdoc;
+///
+/// #[derive(Serialize)]
+/// struct Cat {
+///     name: String,
+///     age: i32
+/// }
+///
+/// let cat = Cat { name: &quot;Garfield&quot;.to_string(), age: 43 };
+/// let doc = bson::to_raw_document_buf(&amp;cat)?;
+/// assert_eq!(doc, rawdoc! { &quot;name&quot;: &quot;Garfield&quot;, &quot;age&quot;: 43 });
+/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+/// ```
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>to_raw_document_buf&lt;T&gt;(value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;RawDocumentBuf&gt;
+<span class="kw">where
+    </span>T: Serialize,
 {
-    <span class="ident">RawDocumentBuf::from_bytes</span>(<span class="ident">to_vec</span>(<span class="ident">value</span>)<span class="question-mark">?</span>).<span class="ident">map_err</span>(<span class="ident">Error::custom</span>)
+    RawDocumentBuf::from_bytes(to_vec(value)<span class="question-mark">?</span>).map_err(Error::custom)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

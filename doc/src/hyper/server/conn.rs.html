@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/server/conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../hyper/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/server/conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../hyper/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1043,1045 +1043,1045 @@
 <span id="1043">1043</span>
 <span id="1044">1044</span>
 <span id="1045">1045</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Lower-level Server connection API.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The types in this module are to provide a lower-level API based around a</span>
-<span class="doccomment">//! single connection. Accepting a connection and binding it with a service</span>
-<span class="doccomment">//! are not handled at this level. This module provides the building blocks to</span>
-<span class="doccomment">//! customize those things externally.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you don&#39;t have need to manage connections yourself, consider using the</span>
-<span class="doccomment">//! higher-level [Server](super) API.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Example</span>
-<span class="doccomment">//! A simple example that uses the `Http` struct to talk HTTP over a Tokio TCP stream</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # #[cfg(all(feature = &quot;http1&quot;, feature = &quot;runtime&quot;))]</span>
-<span class="doccomment">//! # mod rt {</span>
-<span class="doccomment">//! use http::{Request, Response, StatusCode};</span>
-<span class="doccomment">//! use hyper::{server::conn::Http, service::service_fn, Body};</span>
-<span class="doccomment">//! use std::{net::SocketAddr, convert::Infallible};</span>
-<span class="doccomment">//! use tokio::net::TcpListener;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[tokio::main]</span>
-<span class="doccomment">//! async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + Send + Sync&gt;&gt; {</span>
-<span class="doccomment">//!     let addr: SocketAddr = ([127, 0, 0, 1], 8080).into();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     let mut tcp_listener = TcpListener::bind(addr).await?;</span>
-<span class="doccomment">//!     loop {</span>
-<span class="doccomment">//!         let (tcp_stream, _) = tcp_listener.accept().await?;</span>
-<span class="doccomment">//!         tokio::task::spawn(async move {</span>
-<span class="doccomment">//!             if let Err(http_err) = Http::new()</span>
-<span class="doccomment">//!                     .http1_only(true)</span>
-<span class="doccomment">//!                     .http1_keep_alive(true)</span>
-<span class="doccomment">//!                     .serve_connection(tcp_stream, service_fn(hello))</span>
-<span class="doccomment">//!                     .await {</span>
-<span class="doccomment">//!                 eprintln!(&quot;Error while serving HTTP connection: {}&quot;, http_err);</span>
-<span class="doccomment">//!             }</span>
-<span class="doccomment">//!         });</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! async fn hello(_req: Request&lt;Body&gt;) -&gt; Result&lt;Response&lt;Body&gt;, Infallible&gt; {</span>
-<span class="doccomment">//!    Ok(Response::new(Body::from(&quot;Hello World!&quot;)))</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Lower-level Server connection API.
+//!
+//! The types in this module are to provide a lower-level API based around a
+//! single connection. Accepting a connection and binding it with a service
+//! are not handled at this level. This module provides the building blocks to
+//! customize those things externally.
+//!
+//! If you don&#39;t have need to manage connections yourself, consider using the
+//! higher-level [Server](super) API.
+//!
+//! ## Example
+//! A simple example that uses the `Http` struct to talk HTTP over a Tokio TCP stream
+//! ```no_run
+//! # #[cfg(all(feature = &quot;http1&quot;, feature = &quot;runtime&quot;))]
+//! # mod rt {
+//! use http::{Request, Response, StatusCode};
+//! use hyper::{server::conn::Http, service::service_fn, Body};
+//! use std::{net::SocketAddr, convert::Infallible};
+//! use tokio::net::TcpListener;
+//!
+//! #[tokio::main]
+//! async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + Send + Sync&gt;&gt; {
+//!     let addr: SocketAddr = ([127, 0, 0, 1], 8080).into();
+//!
+//!     let mut tcp_listener = TcpListener::bind(addr).await?;
+//!     loop {
+//!         let (tcp_stream, _) = tcp_listener.accept().await?;
+//!         tokio::task::spawn(async move {
+//!             if let Err(http_err) = Http::new()
+//!                     .http1_only(true)
+//!                     .http1_keep_alive(true)
+//!                     .serve_connection(tcp_stream, service_fn(hello))
+//!                     .await {
+//!                 eprintln!(&quot;Error while serving HTTP connection: {}&quot;, http_err);
+//!             }
+//!         });
+//!     }
+//! }
+//!
+//! async fn hello(_req: Request&lt;Body&gt;) -&gt; Result&lt;Response&lt;Body&gt;, Infallible&gt; {
+//!    Ok(Response::new(Body::from(&quot;Hello World!&quot;)))
+//! }
+//! # }
+//! ```
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>),
-    <span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))
-))]</span>
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</span><span class="attribute">#[cfg(all(
+    any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>),
+    not(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))
+))]
+</span><span class="kw">use </span>std::marker::PhantomData;
+<span class="attribute">#[cfg(all(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>), feature = <span class="string">&quot;runtime&quot;</span>))]
+</span><span class="kw">use </span>std::time::Duration;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::io::Rewind</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">Kind</span>, <span class="ident">Parse</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::upgrade::Upgraded</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::common::io::Rewind;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::error::{Kind, Parse};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::upgrade::Upgraded;
 
-<span class="macro">cfg_feature!</span> {
-    <span class="attribute">#![<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
+<span class="macro">cfg_feature! </span>{
+    <span class="attribute">#![any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>)]
 
-    <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
-    <span class="kw">use</span> <span class="ident">std::fmt</span>;
+    </span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+    <span class="kw">use </span>std::fmt;
 
-    <span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
-    <span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-    <span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-    <span class="kw">use</span> <span class="ident">tracing::trace</span>;
+    <span class="kw">use </span>bytes::Bytes;
+    <span class="kw">use </span>pin_project_lite::pin_project;
+    <span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
+    <span class="kw">use </span>tracing::trace;
 
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::server::Connecting</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::body</span>::{<span class="ident">Body</span>, <span class="ident">HttpBody</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">task</span>, <span class="ident">Future</span>, <span class="ident">Pin</span>, <span class="ident">Poll</span>, <span class="ident">Unpin</span>};
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::Never</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::exec</span>::{<span class="ident">ConnStreamExec</span>, <span class="ident">Exec</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::service::HttpService</span>;
+    <span class="kw">pub use </span><span class="kw">super</span>::server::Connecting;
+    <span class="kw">use </span><span class="kw">crate</span>::body::{Body, HttpBody};
+    <span class="kw">use </span><span class="kw">crate</span>::common::{task, Future, Pin, Poll, Unpin};
+    <span class="attribute">#[cfg(not(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">use </span><span class="kw">crate</span>::common::Never;
+    <span class="kw">use </span><span class="kw">crate</span>::common::exec::{ConnStreamExec, Exec};
+    <span class="kw">use </span><span class="kw">crate</span>::proto;
+    <span class="kw">use </span><span class="kw">crate</span>::service::HttpService;
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::upgrades::UpgradeableConnection</span>;
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use </span><span class="self">self</span>::upgrades::UpgradeableConnection;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tcp&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::tcp</span>::{<span class="ident">AddrIncoming</span>, <span class="ident">AddrStream</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tcp&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">super</span>::tcp::{AddrIncoming, AddrStream};
 
-<span class="doccomment">/// A lower-level configuration of the HTTP protocol.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This structure is used to configure options for an HTTP server connection.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you don&#39;t have need to manage connections yourself, consider using the</span>
-<span class="doccomment">/// higher-level [Server](super) API.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">E</span> <span class="op">=</span> <span class="ident">Exec</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">exec</span>: <span class="ident">E</span>,
-    <span class="ident">h1_half_close</span>: <span class="ident">bool</span>,
-    <span class="ident">h1_keep_alive</span>: <span class="ident">bool</span>,
-    <span class="ident">h1_title_case_headers</span>: <span class="ident">bool</span>,
-    <span class="ident">h1_preserve_header_case</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-    <span class="ident">h1_header_read_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">h1_writev</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="ident">h2_builder</span>: <span class="ident">proto::h2::server::Config</span>,
-    <span class="ident">mode</span>: <span class="ident">ConnectionMode</span>,
-    <span class="ident">max_buf_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">pipeline_flush</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A lower-level configuration of the HTTP protocol.
+///
+/// This structure is used to configure options for an HTTP server connection.
+///
+/// If you don&#39;t have need to manage connections yourself, consider using the
+/// higher-level [Server](super) API.
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))))]
+</span><span class="kw">pub struct </span>Http&lt;E = Exec&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) exec: E,
+    h1_half_close: bool,
+    h1_keep_alive: bool,
+    h1_title_case_headers: bool,
+    h1_preserve_header_case: bool,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+    </span>h1_header_read_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    h1_writev: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    </span>h2_builder: proto::h2::server::Config,
+    mode: ConnectionMode,
+    max_buf_size: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    pipeline_flush: bool,
 }
 
-<span class="doccomment">/// The internal mode of HTTP protocol which indicates the behavior when a parse error occurs.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">ConnectionMode</span> {
-    <span class="doccomment">/// Always use HTTP/1 and do not upgrade when a parse error occurs.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-    <span class="ident">H1Only</span>,
-    <span class="doccomment">/// Always use HTTP/2.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="ident">H2Only</span>,
-    <span class="doccomment">/// Use HTTP/1 and try to upgrade to h2 when a parse error occurs.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-    <span class="ident">Fallback</span>,
+<span class="doccomment">/// The internal mode of HTTP protocol which indicates the behavior when a parse error occurs.
+</span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">enum </span>ConnectionMode {
+    <span class="doccomment">/// Always use HTTP/1 and do not upgrade when a parse error occurs.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+    </span>H1Only,
+    <span class="doccomment">/// Always use HTTP/2.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    </span>H2Only,
+    <span class="doccomment">/// Use HTTP/1 and try to upgrade to h2 when a parse error occurs.
+    </span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+    </span>Fallback,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// A future binding a connection with a Service.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Polling this future will drive HTTP forward.</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">E</span> <span class="op">=</span> <span class="ident">Exec</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="macro">pin_project! </span>{
+    <span class="doccomment">/// A future binding a connection with a Service.
+    ///
+    /// Polling this future will drive HTTP forward.
+    </span><span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless polled&quot;</span>]
+    #[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))))]
+    </span><span class="kw">pub struct </span>Connection&lt;T, S, E = Exec&gt;
+    <span class="kw">where
+        </span>S: HttpService&lt;Body&gt;,
     {
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">conn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ProtoServer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S::ResBody</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">fallback</span>: <span class="ident">Fallback</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+        <span class="kw">pub</span>(<span class="kw">super</span>) conn: <span class="prelude-ty">Option</span>&lt;ProtoServer&lt;T, S::ResBody, S, E&gt;&gt;,
+        fallback: Fallback&lt;E&gt;,
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-<span class="kw">type</span> <span class="ident">Http1Dispatcher</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">proto::h1::Dispatcher</span><span class="op">&lt;</span><span class="ident">proto::h1::dispatch::Server</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">B</span>, <span class="ident">T</span>, <span class="ident">proto::ServerTransaction</span><span class="op">&gt;</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+</span><span class="kw">type </span>Http1Dispatcher&lt;T, B, S&gt; =
+    proto::h1::Dispatcher&lt;proto::h1::dispatch::Server&lt;S, Body&gt;, B, T, proto::ServerTransaction&gt;;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">type</span> <span class="ident">Http1Dispatcher</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="ident">Never</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span>);
+<span class="attribute">#[cfg(all(not(feature = <span class="string">&quot;http1&quot;</span>), feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">type </span>Http1Dispatcher&lt;T, B, S&gt; = (Never, PhantomData&lt;(T, Box&lt;Pin&lt;B&gt;&gt;, Box&lt;Pin&lt;S&gt;&gt;)&gt;);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-<span class="kw">type</span> <span class="ident">Http2Server</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">proto::h2::Server</span><span class="op">&lt;</span><span class="ident">Rewind</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">S</span>, <span class="ident">B</span>, <span class="ident">E</span><span class="op">&gt;</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+</span><span class="kw">type </span>Http2Server&lt;T, B, S, E&gt; = proto::h2::Server&lt;Rewind&lt;T&gt;, S, B, E&gt;;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>))]</span>
-<span class="kw">type</span> <span class="ident">Http2Server</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="op">=</span> (
-    <span class="ident">Never</span>,
-    <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[cfg(all(not(feature = <span class="string">&quot;http2&quot;</span>), feature = <span class="string">&quot;http1&quot;</span>))]
+</span><span class="kw">type </span>Http2Server&lt;T, B, S, E&gt; = (
+    Never,
+    PhantomData&lt;(T, Box&lt;Pin&lt;S&gt;&gt;, Box&lt;Pin&lt;B&gt;&gt;, Box&lt;Pin&lt;E&gt;&gt;)&gt;,
 );
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="macro">pin_project!</span> {
-    <span class="attribute">#[<span class="ident">project</span> <span class="op">=</span> <span class="ident">ProtoServerProj</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">ProtoServer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">S</span>, <span class="ident">E</span> <span class="op">=</span> <span class="ident">Exec</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>,
-        <span class="ident">B</span>: <span class="ident">HttpBody</span>,
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="macro">pin_project! </span>{
+    <span class="attribute">#[project = ProtoServerProj]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>ProtoServer&lt;T, B, S, E = Exec&gt;
+    <span class="kw">where
+        </span>S: HttpService&lt;Body&gt;,
+        B: HttpBody,
     {
-        <span class="ident">H1</span> {
-            <span class="attribute">#[<span class="ident">pin</span>]</span>
-            <span class="ident">h1</span>: <span class="ident">Http1Dispatcher</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>,
+        H1 {
+            <span class="attribute">#[pin]
+            </span>h1: Http1Dispatcher&lt;T, B, S&gt;,
         },
-        <span class="ident">H2</span> {
-            <span class="attribute">#[<span class="ident">pin</span>]</span>
-            <span class="ident">h2</span>: <span class="ident">Http2Server</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+        H2 {
+            <span class="attribute">#[pin]
+            </span>h2: Http2Server&lt;T, B, S, E&gt;,
         },
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Fallback</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="ident">ToHttp2</span>(<span class="ident">proto::h2::server::Config</span>, <span class="ident">E</span>),
-    <span class="ident">Http1Only</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+#[derive(Clone, Debug)]
+</span><span class="kw">enum </span>Fallback&lt;E&gt; {
+    ToHttp2(proto::h2::server::Config, E),
+    Http1Only,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>),
-    <span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))
-))]</span>
-<span class="kw">type</span> <span class="ident">Fallback</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>;
+<span class="attribute">#[cfg(all(
+    any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>),
+    not(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))
+))]
+</span><span class="kw">type </span>Fallback&lt;E&gt; = PhantomData&lt;E&gt;;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Fallback</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_h2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Fallback::ToHttp2</span>(..) =&gt; <span class="bool-val">true</span>,
-            <span class="ident">Fallback::Http1Only</span> =&gt; <span class="bool-val">false</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">impl</span>&lt;E&gt; Fallback&lt;E&gt; {
+    <span class="kw">fn </span>to_h2(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Fallback::ToHttp2(..) =&gt; <span class="bool-val">true</span>,
+            Fallback::Http1Only =&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">Fallback</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {}
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">impl</span>&lt;E&gt; Unpin <span class="kw">for </span>Fallback&lt;E&gt; {}
 
-<span class="doccomment">/// Deconstructed parts of a `Connection`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This allows taking apart a `Connection` at a later time, in order to</span>
-<span class="doccomment">/// reclaim the IO object, and additional related pieces.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Parts</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The original IO object used in the handshake.</span>
-    <span class="kw">pub</span> <span class="ident">io</span>: <span class="ident">T</span>,
-    <span class="doccomment">/// A buffer of bytes that have been read but not processed as HTTP.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the client sent additional bytes after its last request, and</span>
-    <span class="doccomment">/// this connection &quot;ended&quot; with an upgrade, the read buffer will contain</span>
-    <span class="doccomment">/// those bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You will want to check for any existing bytes if you plan to continue</span>
-    <span class="doccomment">/// communicating on the IO object.</span>
-    <span class="kw">pub</span> <span class="ident">read_buf</span>: <span class="ident">Bytes</span>,
-    <span class="doccomment">/// The `Service` used to serve this connection.</span>
-    <span class="kw">pub</span> <span class="ident">service</span>: <span class="ident">S</span>,
-    <span class="ident">_inner</span>: (),
+<span class="doccomment">/// Deconstructed parts of a `Connection`.
+///
+/// This allows taking apart a `Connection` at a later time, in order to
+/// reclaim the IO object, and additional related pieces.
+</span><span class="attribute">#[derive(Debug)]
+#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))))]
+</span><span class="kw">pub struct </span>Parts&lt;T, S&gt; {
+    <span class="doccomment">/// The original IO object used in the handshake.
+    </span><span class="kw">pub </span>io: T,
+    <span class="doccomment">/// A buffer of bytes that have been read but not processed as HTTP.
+    ///
+    /// If the client sent additional bytes after its last request, and
+    /// this connection &quot;ended&quot; with an upgrade, the read buffer will contain
+    /// those bytes.
+    ///
+    /// You will want to check for any existing bytes if you plan to continue
+    /// communicating on the IO object.
+    </span><span class="kw">pub </span>read_buf: Bytes,
+    <span class="doccomment">/// The `Service` used to serve this connection.
+    </span><span class="kw">pub </span>service: S,
+    _inner: (),
 }
 
-<span class="comment">// ===== impl Http =====</span>
+<span class="comment">// ===== impl Http =====
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">Http</span> {
-    <span class="doccomment">/// Creates a new instance of the HTTP protocol, ready to spawn a server or</span>
-    <span class="doccomment">/// start accepting connections.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Http</span> {
-        <span class="ident">Http</span> {
-            <span class="ident">exec</span>: <span class="ident">Exec::Default</span>,
-            <span class="ident">h1_half_close</span>: <span class="bool-val">false</span>,
-            <span class="ident">h1_keep_alive</span>: <span class="bool-val">true</span>,
-            <span class="ident">h1_title_case_headers</span>: <span class="bool-val">false</span>,
-            <span class="ident">h1_preserve_header_case</span>: <span class="bool-val">false</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-            <span class="ident">h1_header_read_timeout</span>: <span class="prelude-val">None</span>,
-            <span class="ident">h1_writev</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-            <span class="ident">h2_builder</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">mode</span>: <span class="ident">ConnectionMode::default</span>(),
-            <span class="ident">max_buf_size</span>: <span class="prelude-val">None</span>,
-            <span class="ident">pipeline_flush</span>: <span class="bool-val">false</span>,
+</span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">impl </span>Http {
+    <span class="doccomment">/// Creates a new instance of the HTTP protocol, ready to spawn a server or
+    /// start accepting connections.
+    </span><span class="kw">pub fn </span>new() -&gt; Http {
+        Http {
+            exec: Exec::Default,
+            h1_half_close: <span class="bool-val">false</span>,
+            h1_keep_alive: <span class="bool-val">true</span>,
+            h1_title_case_headers: <span class="bool-val">false</span>,
+            h1_preserve_header_case: <span class="bool-val">false</span>,
+            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+            </span>h1_header_read_timeout: <span class="prelude-val">None</span>,
+            h1_writev: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+            </span>h2_builder: Default::default(),
+            mode: ConnectionMode::default(),
+            max_buf_size: <span class="prelude-val">None</span>,
+            pipeline_flush: <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Sets whether HTTP1 is required.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is false</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_only</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">val</span> {
-            <span class="self">self</span>.<span class="ident">mode</span> <span class="op">=</span> <span class="ident">ConnectionMode::H1Only</span>;
-        } <span class="kw">else</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-            {
-                <span class="self">self</span>.<span class="ident">mode</span> <span class="op">=</span> <span class="ident">ConnectionMode::Fallback</span>;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">impl</span>&lt;E&gt; Http&lt;E&gt; {
+    <span class="doccomment">/// Sets whether HTTP1 is required.
+    ///
+    /// Default is false
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http1&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http1_only(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="kw">if </span>val {
+            <span class="self">self</span>.mode = ConnectionMode::H1Only;
+        } <span class="kw">else </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+            </span>{
+                <span class="self">self</span>.mode = ConnectionMode::Fallback;
             }
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set whether HTTP/1 connections should support half-closures.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Clients can chose to shutdown their write-side while waiting</span>
-    <span class="doccomment">/// for the server to respond. Setting this to `true` will</span>
-    <span class="doccomment">/// prevent closing the connection immediately if `read`</span>
-    <span class="doccomment">/// detects an EOF in the middle of a request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is `false`.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_half_close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">h1_half_close</span> <span class="op">=</span> <span class="ident">val</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set whether HTTP/1 connections should support half-closures.
+    ///
+    /// Clients can chose to shutdown their write-side while waiting
+    /// for the server to respond. Setting this to `true` will
+    /// prevent closing the connection immediately if `read`
+    /// detects an EOF in the middle of a request.
+    ///
+    /// Default is `false`.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http1&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http1_half_close(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.h1_half_close = val;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Enables or disables HTTP/1 keep-alive.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is true.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_keep_alive</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">h1_keep_alive</span> <span class="op">=</span> <span class="ident">val</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Enables or disables HTTP/1 keep-alive.
+    ///
+    /// Default is true.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http1&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http1_keep_alive(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.h1_keep_alive = val;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set whether HTTP/1 connections will write header names as title case at</span>
-    <span class="doccomment">/// the socket level.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this setting does not affect HTTP/2.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is false.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_title_case_headers</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">h1_title_case_headers</span> <span class="op">=</span> <span class="ident">enabled</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set whether HTTP/1 connections will write header names as title case at
+    /// the socket level.
+    ///
+    /// Note that this setting does not affect HTTP/2.
+    ///
+    /// Default is false.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http1&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http1_title_case_headers(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enabled: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.h1_title_case_headers = enabled;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set whether to support preserving original header cases.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Currently, this will record the original cases received, and store them</span>
-    <span class="doccomment">/// in a private extension on the `Request`. It will also look for and use</span>
-    <span class="doccomment">/// such an extension in any provided `Response`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Since the relevant extension is still private, there is no way to</span>
-    <span class="doccomment">/// interact with the original cases. The only effect this can have now is</span>
-    <span class="doccomment">/// to forward the cases in a proxy-like fashion.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this setting does not affect HTTP/2.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is false.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_preserve_header_case</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">h1_preserve_header_case</span> <span class="op">=</span> <span class="ident">enabled</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set whether to support preserving original header cases.
+    ///
+    /// Currently, this will record the original cases received, and store them
+    /// in a private extension on the `Request`. It will also look for and use
+    /// such an extension in any provided `Response`.
+    ///
+    /// Since the relevant extension is still private, there is no way to
+    /// interact with the original cases. The only effect this can have now is
+    /// to forward the cases in a proxy-like fashion.
+    ///
+    /// Note that this setting does not affect HTTP/2.
+    ///
+    /// Default is false.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http1&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http1_preserve_header_case(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enabled: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.h1_preserve_header_case = enabled;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set a timeout for reading client request headers. If a client does not </span>
-    <span class="doccomment">/// transmit the entire header within this time, the connection is closed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is None.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_header_read_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">read_timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">h1_header_read_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">read_timeout</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set a timeout for reading client request headers. If a client does not 
+    /// transmit the entire header within this time, the connection is closed.
+    ///
+    /// Default is None.
+    </span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+    #[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))))]
+    </span><span class="kw">pub fn </span>http1_header_read_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, read_timeout: Duration) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.h1_header_read_timeout = <span class="prelude-val">Some</span>(read_timeout);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set whether HTTP/1 connections should try to use vectored writes,</span>
-    <span class="doccomment">/// or always flatten into a single buffer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that setting this to false may mean more copies of body data,</span>
-    <span class="doccomment">/// but may also improve performance when an IO transport doesn&#39;t</span>
-    <span class="doccomment">/// support vectored writes well, such as most TLS implementations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting this to true will force hyper to use queued strategy</span>
-    <span class="doccomment">/// which may eliminate unnecessary cloning on some TLS backends</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is `auto`. In this mode hyper will try to guess which</span>
-    <span class="doccomment">/// mode to use</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_writev</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">h1_writev</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set whether HTTP/1 connections should try to use vectored writes,
+    /// or always flatten into a single buffer.
+    ///
+    /// Note that setting this to false may mean more copies of body data,
+    /// but may also improve performance when an IO transport doesn&#39;t
+    /// support vectored writes well, such as most TLS implementations.
+    ///
+    /// Setting this to true will force hyper to use queued strategy
+    /// which may eliminate unnecessary cloning on some TLS backends
+    ///
+    /// Default is `auto`. In this mode hyper will try to guess which
+    /// mode to use
+    </span><span class="attribute">#[inline]
+    #[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http1&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http1_writev(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.h1_writev = <span class="prelude-val">Some</span>(val);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets whether HTTP2 is required.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is false</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_only</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">val</span> {
-            <span class="self">self</span>.<span class="ident">mode</span> <span class="op">=</span> <span class="ident">ConnectionMode::H2Only</span>;
-        } <span class="kw">else</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-            {
-                <span class="self">self</span>.<span class="ident">mode</span> <span class="op">=</span> <span class="ident">ConnectionMode::Fallback</span>;
+    <span class="doccomment">/// Sets whether HTTP2 is required.
+    ///
+    /// Default is false
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http2_only(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="kw">if </span>val {
+            <span class="self">self</span>.mode = ConnectionMode::H2Only;
+        } <span class="kw">else </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+            </span>{
+                <span class="self">self</span>.mode = ConnectionMode::Fallback;
             }
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the [`SETTINGS_INITIAL_WINDOW_SIZE`][spec] option for HTTP2</span>
-    <span class="doccomment">/// stream-level flow control.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Passing `None` will do nothing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If not set, hyper will use a default.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [spec]: https://http2.github.io/http2-spec/#SETTINGS_INITIAL_WINDOW_SIZE</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_initial_stream_window_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sz</span>) <span class="op">=</span> <span class="ident">sz</span>.<span class="ident">into</span>() {
-            <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">adaptive_window</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">initial_stream_window_size</span> <span class="op">=</span> <span class="ident">sz</span>;
+    <span class="doccomment">/// Sets the [`SETTINGS_INITIAL_WINDOW_SIZE`][spec] option for HTTP2
+    /// stream-level flow control.
+    ///
+    /// Passing `None` will do nothing.
+    ///
+    /// If not set, hyper will use a default.
+    ///
+    /// [spec]: https://http2.github.io/http2-spec/#SETTINGS_INITIAL_WINDOW_SIZE
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http2_initial_stream_window_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sz: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(sz) = sz.into() {
+            <span class="self">self</span>.h2_builder.adaptive_window = <span class="bool-val">false</span>;
+            <span class="self">self</span>.h2_builder.initial_stream_window_size = sz;
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the max connection-level flow control for HTTP2.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Passing `None` will do nothing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If not set, hyper will use a default.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_initial_connection_window_size</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sz</span>) <span class="op">=</span> <span class="ident">sz</span>.<span class="ident">into</span>() {
-            <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">adaptive_window</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">initial_conn_window_size</span> <span class="op">=</span> <span class="ident">sz</span>;
+    <span class="doccomment">/// Sets the max connection-level flow control for HTTP2.
+    ///
+    /// Passing `None` will do nothing.
+    ///
+    /// If not set, hyper will use a default.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http2_initial_connection_window_size(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        sz: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;,
+    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(sz) = sz.into() {
+            <span class="self">self</span>.h2_builder.adaptive_window = <span class="bool-val">false</span>;
+            <span class="self">self</span>.h2_builder.initial_conn_window_size = sz;
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets whether to use an adaptive flow control.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Enabling this will override the limits set in</span>
-    <span class="doccomment">/// `http2_initial_stream_window_size` and</span>
-    <span class="doccomment">/// `http2_initial_connection_window_size`.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_adaptive_window</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">use</span> <span class="ident">proto::h2::SPEC_WINDOW_SIZE</span>;
+    <span class="doccomment">/// Sets whether to use an adaptive flow control.
+    ///
+    /// Enabling this will override the limits set in
+    /// `http2_initial_stream_window_size` and
+    /// `http2_initial_connection_window_size`.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http2_adaptive_window(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enabled: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="kw">use </span>proto::h2::SPEC_WINDOW_SIZE;
 
-        <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">adaptive_window</span> <span class="op">=</span> <span class="ident">enabled</span>;
-        <span class="kw">if</span> <span class="ident">enabled</span> {
-            <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">initial_conn_window_size</span> <span class="op">=</span> <span class="ident">SPEC_WINDOW_SIZE</span>;
-            <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">initial_stream_window_size</span> <span class="op">=</span> <span class="ident">SPEC_WINDOW_SIZE</span>;
+        <span class="self">self</span>.h2_builder.adaptive_window = enabled;
+        <span class="kw">if </span>enabled {
+            <span class="self">self</span>.h2_builder.initial_conn_window_size = SPEC_WINDOW_SIZE;
+            <span class="self">self</span>.h2_builder.initial_stream_window_size = SPEC_WINDOW_SIZE;
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the maximum frame size to use for HTTP2.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Passing `None` will do nothing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If not set, hyper will use a default.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_max_frame_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sz</span>) <span class="op">=</span> <span class="ident">sz</span>.<span class="ident">into</span>() {
-            <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">max_frame_size</span> <span class="op">=</span> <span class="ident">sz</span>;
+    <span class="doccomment">/// Sets the maximum frame size to use for HTTP2.
+    ///
+    /// Passing `None` will do nothing.
+    ///
+    /// If not set, hyper will use a default.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http2_max_frame_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sz: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(sz) = sz.into() {
+            <span class="self">self</span>.h2_builder.max_frame_size = sz;
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the [`SETTINGS_MAX_CONCURRENT_STREAMS`][spec] option for HTTP2</span>
-    <span class="doccomment">/// connections.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is no limit (`std::u32::MAX`). Passing `None` will do nothing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [spec]: https://http2.github.io/http2-spec/#SETTINGS_MAX_CONCURRENT_STREAMS</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_max_concurrent_streams</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">max_concurrent_streams</span> <span class="op">=</span> <span class="ident">max</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the [`SETTINGS_MAX_CONCURRENT_STREAMS`][spec] option for HTTP2
+    /// connections.
+    ///
+    /// Default is no limit (`std::u32::MAX`). Passing `None` will do nothing.
+    ///
+    /// [spec]: https://http2.github.io/http2-spec/#SETTINGS_MAX_CONCURRENT_STREAMS
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http2_max_concurrent_streams(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.h2_builder.max_concurrent_streams = max.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets an interval for HTTP2 Ping frames should be sent to keep a</span>
-    <span class="doccomment">/// connection alive.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Pass `None` to disable HTTP2 keep-alive.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is currently disabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Cargo Feature</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the `runtime` cargo feature to be enabled.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_keep_alive_interval</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">interval</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">keep_alive_interval</span> <span class="op">=</span> <span class="ident">interval</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets an interval for HTTP2 Ping frames should be sent to keep a
+    /// connection alive.
+    ///
+    /// Pass `None` to disable HTTP2 keep-alive.
+    ///
+    /// Default is currently disabled.
+    ///
+    /// # Cargo Feature
+    ///
+    /// Requires the `runtime` cargo feature to be enabled.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+    #[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http2_keep_alive_interval(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        interval: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;Duration&gt;&gt;,
+    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.h2_builder.keep_alive_interval = interval.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets a timeout for receiving an acknowledgement of the keep-alive ping.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the ping is not acknowledged within the timeout, the connection will</span>
-    <span class="doccomment">/// be closed. Does nothing if `http2_keep_alive_interval` is disabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is 20 seconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Cargo Feature</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the `runtime` cargo feature to be enabled.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_keep_alive_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">keep_alive_timeout</span> <span class="op">=</span> <span class="ident">timeout</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets a timeout for receiving an acknowledgement of the keep-alive ping.
+    ///
+    /// If the ping is not acknowledged within the timeout, the connection will
+    /// be closed. Does nothing if `http2_keep_alive_interval` is disabled.
+    ///
+    /// Default is 20 seconds.
+    ///
+    /// # Cargo Feature
+    ///
+    /// Requires the `runtime` cargo feature to be enabled.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+    #[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http2_keep_alive_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timeout: Duration) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.h2_builder.keep_alive_timeout = timeout;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the maximum write buffer size for each HTTP/2 stream.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is currently ~400KB, but may change.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The value must be no larger than `u32::MAX`.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_max_send_buf_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="ident">max</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">std::u32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">max_send_buffer_size</span> <span class="op">=</span> <span class="ident">max</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the maximum write buffer size for each HTTP/2 stream.
+    ///
+    /// Default is currently ~400KB, but may change.
+    ///
+    /// # Panics
+    ///
+    /// The value must be no larger than `u32::MAX`.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http2_max_send_buf_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max: usize) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="macro">assert!</span>(max &lt;= std::u32::MAX <span class="kw">as </span>usize);
+        <span class="self">self</span>.h2_builder.max_send_buffer_size = max;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Enables the [extended CONNECT protocol].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [extended CONNECT protocol]: https://datatracker.ietf.org/doc/html/rfc8441#section-4</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_enable_connect_protocol</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">enable_connect_protocol</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Enables the [extended CONNECT protocol].
+    ///
+    /// [extended CONNECT protocol]: https://datatracker.ietf.org/doc/html/rfc8441#section-4
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    </span><span class="kw">pub fn </span>http2_enable_connect_protocol(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.h2_builder.enable_connect_protocol = <span class="bool-val">true</span>;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the max size of received header frames.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is currently ~16MB, but may change.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_max_header_list_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">max_header_list_size</span> <span class="op">=</span> <span class="ident">max</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the max size of received header frames.
+    ///
+    /// Default is currently ~16MB, but may change.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">pub fn </span>http2_max_header_list_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max: u32) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.h2_builder.max_header_list_size = max;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the maximum buffer size for the connection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is ~400kb.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The minimum value allowed is 8192. This method panics if the passed `max` is less than the minimum.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_buf_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// Set the maximum buffer size for the connection.
+    ///
+    /// Default is ~400kb.
+    ///
+    /// # Panics
+    ///
+    /// The minimum value allowed is 8192. This method panics if the passed `max` is less than the minimum.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http1&quot;</span>)))]
+    </span><span class="kw">pub fn </span>max_buf_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max: usize) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="ident">max</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">proto::h1::MINIMUM_MAX_BUFFER_SIZE</span>,
-            <span class="string">&quot;the max_buf_size cannot be smaller than the minimum that h1 specifies.&quot;</span>
-        );
-        <span class="self">self</span>.<span class="ident">max_buf_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>);
-        <span class="self">self</span>
-    }
+            max &gt;= proto::h1::MINIMUM_MAX_BUFFER_SIZE,
+            <span class="string">&quot;the max_buf_size cannot be smaller than the minimum that h1 specifies.&quot;
+        </span>);
+        <span class="self">self</span>.max_buf_size = <span class="prelude-val">Some</span>(max);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Aggregates flushes to better support pipelined responses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Experimental, may have bugs.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is false.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pipeline_flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">pipeline_flush</span> <span class="op">=</span> <span class="ident">enabled</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Aggregates flushes to better support pipelined responses.
+    ///
+    /// Experimental, may have bugs.
+    ///
+    /// Default is false.
+    </span><span class="kw">pub fn </span>pipeline_flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enabled: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.pipeline_flush = enabled;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the executor used to spawn background tasks.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default uses implicit default (like `tokio::spawn`).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_executor</span><span class="op">&lt;</span><span class="ident">E2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">exec</span>: <span class="ident">E2</span>) -&gt; <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">E2</span><span class="op">&gt;</span> {
-        <span class="ident">Http</span> {
-            <span class="ident">exec</span>,
-            <span class="ident">h1_half_close</span>: <span class="self">self</span>.<span class="ident">h1_half_close</span>,
-            <span class="ident">h1_keep_alive</span>: <span class="self">self</span>.<span class="ident">h1_keep_alive</span>,
-            <span class="ident">h1_title_case_headers</span>: <span class="self">self</span>.<span class="ident">h1_title_case_headers</span>,
-            <span class="ident">h1_preserve_header_case</span>: <span class="self">self</span>.<span class="ident">h1_preserve_header_case</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-            <span class="ident">h1_header_read_timeout</span>: <span class="self">self</span>.<span class="ident">h1_header_read_timeout</span>,
-            <span class="ident">h1_writev</span>: <span class="self">self</span>.<span class="ident">h1_writev</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-            <span class="ident">h2_builder</span>: <span class="self">self</span>.<span class="ident">h2_builder</span>,
-            <span class="ident">mode</span>: <span class="self">self</span>.<span class="ident">mode</span>,
-            <span class="ident">max_buf_size</span>: <span class="self">self</span>.<span class="ident">max_buf_size</span>,
-            <span class="ident">pipeline_flush</span>: <span class="self">self</span>.<span class="ident">pipeline_flush</span>,
+    <span class="doccomment">/// Set the executor used to spawn background tasks.
+    ///
+    /// Default uses implicit default (like `tokio::spawn`).
+    </span><span class="kw">pub fn </span>with_executor&lt;E2&gt;(<span class="self">self</span>, exec: E2) -&gt; Http&lt;E2&gt; {
+        Http {
+            exec,
+            h1_half_close: <span class="self">self</span>.h1_half_close,
+            h1_keep_alive: <span class="self">self</span>.h1_keep_alive,
+            h1_title_case_headers: <span class="self">self</span>.h1_title_case_headers,
+            h1_preserve_header_case: <span class="self">self</span>.h1_preserve_header_case,
+            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+            </span>h1_header_read_timeout: <span class="self">self</span>.h1_header_read_timeout,
+            h1_writev: <span class="self">self</span>.h1_writev,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+            </span>h2_builder: <span class="self">self</span>.h2_builder,
+            mode: <span class="self">self</span>.mode,
+            max_buf_size: <span class="self">self</span>.max_buf_size,
+            pipeline_flush: <span class="self">self</span>.pipeline_flush,
         }
     }
 
-    <span class="doccomment">/// Bind a connection together with a [`Service`](crate::service::Service).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This returns a Future that must be polled in order for HTTP to be</span>
-    <span class="doccomment">/// driven on the connection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use hyper::{Body, Request, Response};</span>
-    <span class="doccomment">/// # use hyper::service::Service;</span>
-    <span class="doccomment">/// # use hyper::server::conn::Http;</span>
-    <span class="doccomment">/// # use tokio::io::{AsyncRead, AsyncWrite};</span>
-    <span class="doccomment">/// # async fn run&lt;I, S&gt;(some_io: I, some_service: S)</span>
-    <span class="doccomment">/// # where</span>
-    <span class="doccomment">/// #     I: AsyncRead + AsyncWrite + Unpin + Send + &#39;static,</span>
-    <span class="doccomment">/// #     S: Service&lt;hyper::Request&lt;Body&gt;, Response=hyper::Response&lt;Body&gt;&gt; + Send + &#39;static,</span>
-    <span class="doccomment">/// #     S::Error: Into&lt;Box&lt;dyn std::error::Error + Send + Sync&gt;&gt;,</span>
-    <span class="doccomment">/// #     S::Future: Send,</span>
-    <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// let http = Http::new();</span>
-    <span class="doccomment">/// let conn = http.serve_connection(some_io, some_service);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// if let Err(e) = conn.await {</span>
-    <span class="doccomment">///     eprintln!(&quot;server connection error: {}&quot;, e);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// # fn main() {}</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serve_connection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span>, <span class="ident">Bd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="ident">I</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span>, <span class="ident">ResBody</span> <span class="op">=</span> <span class="ident">Bd</span><span class="op">&gt;</span>,
-        <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">Bd</span>: <span class="ident">HttpBody</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">Bd::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">E</span>: <span class="ident">ConnStreamExec</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">Bd</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Bind a connection together with a [`Service`](crate::service::Service).
+    ///
+    /// This returns a Future that must be polled in order for HTTP to be
+    /// driven on the connection.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use hyper::{Body, Request, Response};
+    /// # use hyper::service::Service;
+    /// # use hyper::server::conn::Http;
+    /// # use tokio::io::{AsyncRead, AsyncWrite};
+    /// # async fn run&lt;I, S&gt;(some_io: I, some_service: S)
+    /// # where
+    /// #     I: AsyncRead + AsyncWrite + Unpin + Send + &#39;static,
+    /// #     S: Service&lt;hyper::Request&lt;Body&gt;, Response=hyper::Response&lt;Body&gt;&gt; + Send + &#39;static,
+    /// #     S::Error: Into&lt;Box&lt;dyn std::error::Error + Send + Sync&gt;&gt;,
+    /// #     S::Future: Send,
+    /// # {
+    /// let http = Http::new();
+    /// let conn = http.serve_connection(some_io, some_service);
+    ///
+    /// if let Err(e) = conn.await {
+    ///     eprintln!(&quot;server connection error: {}&quot;, e);
+    /// }
+    /// # }
+    /// # fn main() {}
+    /// ```
+    </span><span class="kw">pub fn </span>serve_connection&lt;S, I, Bd&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, io: I, service: S) -&gt; Connection&lt;I, S, E&gt;
+    <span class="kw">where
+        </span>S: HttpService&lt;Body, ResBody = Bd&gt;,
+        S::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+        Bd: HttpBody + <span class="lifetime">&#39;static</span>,
+        Bd::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+        I: AsyncRead + AsyncWrite + Unpin,
+        E: ConnStreamExec&lt;S::Future, Bd&gt;,
     {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-        <span class="macro">macro_rules!</span> <span class="ident">h1</span> {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+        </span><span class="macro">macro_rules! </span>h1 {
             () =&gt; {{
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">proto::Conn::new</span>(<span class="ident">io</span>);
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">h1_keep_alive</span> {
-                    <span class="ident">conn</span>.<span class="ident">disable_keep_alive</span>();
+                <span class="kw">let </span><span class="kw-2">mut </span>conn = proto::Conn::new(io);
+                <span class="kw">if </span>!<span class="self">self</span>.h1_keep_alive {
+                    conn.disable_keep_alive();
                 }
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">h1_half_close</span> {
-                    <span class="ident">conn</span>.<span class="ident">set_allow_half_close</span>();
+                <span class="kw">if </span><span class="self">self</span>.h1_half_close {
+                    conn.set_allow_half_close();
                 }
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">h1_title_case_headers</span> {
-                    <span class="ident">conn</span>.<span class="ident">set_title_case_headers</span>();
+                <span class="kw">if </span><span class="self">self</span>.h1_title_case_headers {
+                    conn.set_title_case_headers();
                 }
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">h1_preserve_header_case</span> {
-                    <span class="ident">conn</span>.<span class="ident">set_preserve_header_case</span>();
+                <span class="kw">if </span><span class="self">self</span>.h1_preserve_header_case {
+                    conn.set_preserve_header_case();
                 }
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">header_read_timeout</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">h1_header_read_timeout</span> {
-                    <span class="ident">conn</span>.<span class="ident">set_http1_header_read_timeout</span>(<span class="ident">header_read_timeout</span>);
+                <span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(header_read_timeout) = <span class="self">self</span>.h1_header_read_timeout {
+                    conn.set_http1_header_read_timeout(header_read_timeout);
                 }
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">writev</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">h1_writev</span> {
-                    <span class="kw">if</span> <span class="ident">writev</span> {
-                        <span class="ident">conn</span>.<span class="ident">set_write_strategy_queue</span>();
-                    } <span class="kw">else</span> {
-                        <span class="ident">conn</span>.<span class="ident">set_write_strategy_flatten</span>();
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(writev) = <span class="self">self</span>.h1_writev {
+                    <span class="kw">if </span>writev {
+                        conn.set_write_strategy_queue();
+                    } <span class="kw">else </span>{
+                        conn.set_write_strategy_flatten();
                     }
                 }
-                <span class="ident">conn</span>.<span class="ident">set_flush_pipeline</span>(<span class="self">self</span>.<span class="ident">pipeline_flush</span>);
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_buf_size</span> {
-                    <span class="ident">conn</span>.<span class="ident">set_max_buf_size</span>(<span class="ident">max</span>);
+                conn.set_flush_pipeline(<span class="self">self</span>.pipeline_flush);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(max) = <span class="self">self</span>.max_buf_size {
+                    conn.set_max_buf_size(max);
                 }
-                <span class="kw">let</span> <span class="ident">sd</span> <span class="op">=</span> <span class="ident">proto::h1::dispatch::Server::new</span>(<span class="ident">service</span>);
-                <span class="ident">ProtoServer::H1</span> {
-                    <span class="ident">h1</span>: <span class="ident">proto::h1::Dispatcher::new</span>(<span class="ident">sd</span>, <span class="ident">conn</span>),
+                <span class="kw">let </span>sd = proto::h1::dispatch::Server::new(service);
+                ProtoServer::H1 {
+                    h1: proto::h1::Dispatcher::new(sd, conn),
                 }
             }};
         }
 
-        <span class="kw">let</span> <span class="ident">proto</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">mode</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-            <span class="ident">ConnectionMode::H1Only</span> =&gt; <span class="macro">h1!</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-            <span class="ident">ConnectionMode::H1Only</span> <span class="op">|</span> <span class="ident">ConnectionMode::Fallback</span> =&gt; <span class="macro">h1!</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-            <span class="ident">ConnectionMode::H2Only</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">rewind_io</span> <span class="op">=</span> <span class="ident">Rewind::new</span>(<span class="ident">io</span>);
-                <span class="kw">let</span> <span class="ident">h2</span> <span class="op">=</span>
-                    <span class="ident">proto::h2::Server::new</span>(<span class="ident">rewind_io</span>, <span class="ident">service</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">h2_builder</span>, <span class="self">self</span>.<span class="ident">exec</span>.<span class="ident">clone</span>());
-                <span class="ident">ProtoServer::H2</span> { <span class="ident">h2</span> }
+        <span class="kw">let </span>proto = <span class="kw">match </span><span class="self">self</span>.mode {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+            #[cfg(not(feature = <span class="string">&quot;http2&quot;</span>))]
+            </span>ConnectionMode::H1Only =&gt; <span class="macro">h1!</span>(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+            #[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+            </span>ConnectionMode::H1Only | ConnectionMode::Fallback =&gt; <span class="macro">h1!</span>(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+            </span>ConnectionMode::H2Only =&gt; {
+                <span class="kw">let </span>rewind_io = Rewind::new(io);
+                <span class="kw">let </span>h2 =
+                    proto::h2::Server::new(rewind_io, service, <span class="kw-2">&amp;</span><span class="self">self</span>.h2_builder, <span class="self">self</span>.exec.clone());
+                ProtoServer::H2 { h2 }
             }
         };
 
-        <span class="ident">Connection</span> {
-            <span class="ident">conn</span>: <span class="prelude-val">Some</span>(<span class="ident">proto</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-            <span class="ident">fallback</span>: <span class="kw">if</span> <span class="self">self</span>.<span class="ident">mode</span> <span class="op">==</span> <span class="ident">ConnectionMode::Fallback</span> {
-                <span class="ident">Fallback::ToHttp2</span>(<span class="self">self</span>.<span class="ident">h2_builder</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">exec</span>.<span class="ident">clone</span>())
-            } <span class="kw">else</span> {
-                <span class="ident">Fallback::Http1Only</span>
+        Connection {
+            conn: <span class="prelude-val">Some</span>(proto),
+            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+            </span>fallback: <span class="kw">if </span><span class="self">self</span>.mode == ConnectionMode::Fallback {
+                Fallback::ToHttp2(<span class="self">self</span>.h2_builder.clone(), <span class="self">self</span>.exec.clone())
+            } <span class="kw">else </span>{
+                Fallback::Http1Only
             },
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-            <span class="ident">fallback</span>: <span class="ident">PhantomData</span>,
+            <span class="attribute">#[cfg(not(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>)))]
+            </span>fallback: PhantomData,
         }
     }
 }
 
-<span class="comment">// ===== impl Connection =====</span>
+<span class="comment">// ===== impl Connection =====
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span>, <span class="ident">ResBody</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,
-    <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">B</span>: <span class="ident">HttpBody</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">ConnStreamExec</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">B</span><span class="op">&gt;</span>,
+</span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">impl</span>&lt;I, B, S, E&gt; Connection&lt;I, S, E&gt;
+<span class="kw">where
+    </span>S: HttpService&lt;Body, ResBody = B&gt;,
+    S::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+    I: AsyncRead + AsyncWrite + Unpin,
+    B: HttpBody + <span class="lifetime">&#39;static</span>,
+    B::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+    E: ConnStreamExec&lt;S::Future, B&gt;,
 {
-    <span class="doccomment">/// Start a graceful shutdown process for this connection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This `Connection` should continue to be polled until shutdown</span>
-    <span class="doccomment">/// can finish.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should only be called while the `Connection` future is still</span>
-    <span class="doccomment">/// pending. If called after `Connection::poll` has resolved, this does</span>
-    <span class="doccomment">/// nothing.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">graceful_shutdown</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-            <span class="prelude-val">Some</span>(<span class="ident">ProtoServer::H1</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">h1</span>, .. }) =&gt; {
-                <span class="ident">h1</span>.<span class="ident">disable_keep_alive</span>();
+    <span class="doccomment">/// Start a graceful shutdown process for this connection.
+    ///
+    /// This `Connection` should continue to be polled until shutdown
+    /// can finish.
+    ///
+    /// # Note
+    ///
+    /// This should only be called while the `Connection` future is still
+    /// pending. If called after `Connection::poll` has resolved, this does
+    /// nothing.
+    </span><span class="kw">pub fn </span>graceful_shutdown(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) {
+        <span class="kw">match </span><span class="self">self</span>.conn {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+            </span><span class="prelude-val">Some</span>(ProtoServer::H1 { <span class="kw-2">ref mut </span>h1, .. }) =&gt; {
+                h1.disable_keep_alive();
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-            <span class="prelude-val">Some</span>(<span class="ident">ProtoServer::H2</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">h2</span> }) =&gt; {
-                <span class="ident">h2</span>.<span class="ident">graceful_shutdown</span>();
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+            </span><span class="prelude-val">Some</span>(ProtoServer::H2 { <span class="kw-2">ref mut </span>h2 }) =&gt; {
+                h2.graceful_shutdown();
             }
-            <span class="prelude-val">None</span> =&gt; (),
+            <span class="prelude-val">None </span>=&gt; (),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>))]</span>
-            <span class="prelude-val">Some</span>(<span class="ident">ProtoServer::H1</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">h1</span>, .. }) =&gt; <span class="kw">match</span> <span class="ident">h1</span>.<span class="number">0</span> {},
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-            <span class="prelude-val">Some</span>(<span class="ident">ProtoServer::H2</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">h2</span> }) =&gt; <span class="kw">match</span> <span class="ident">h2</span>.<span class="number">0</span> {},
+            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;http1&quot;</span>))]
+            </span><span class="prelude-val">Some</span>(ProtoServer::H1 { <span class="kw-2">ref mut </span>h1, .. }) =&gt; <span class="kw">match </span>h1.<span class="number">0 </span>{},
+            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;http2&quot;</span>))]
+            </span><span class="prelude-val">Some</span>(ProtoServer::H2 { <span class="kw-2">ref mut </span>h2 }) =&gt; <span class="kw">match </span>h2.<span class="number">0 </span>{},
         }
     }
 
-    <span class="doccomment">/// Return the inner IO object, and additional information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the IO object has been &quot;rewound&quot; the io will not contain those bytes rewound.</span>
-    <span class="doccomment">/// This should only be called after `poll_without_shutdown` signals</span>
-    <span class="doccomment">/// that the connection is &quot;done&quot;. Otherwise, it may not have finished</span>
-    <span class="doccomment">/// flushing all necessary HTTP bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">/// This method will panic if this connection is using an h2 protocol.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; <span class="ident">Parts</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">try_into_parts</span>()
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;h2 cannot into_inner&quot;</span>))
+    <span class="doccomment">/// Return the inner IO object, and additional information.
+    ///
+    /// If the IO object has been &quot;rewound&quot; the io will not contain those bytes rewound.
+    /// This should only be called after `poll_without_shutdown` signals
+    /// that the connection is &quot;done&quot;. Otherwise, it may not have finished
+    /// flushing all necessary HTTP bytes.
+    ///
+    /// # Panics
+    /// This method will panic if this connection is using an h2 protocol.
+    </span><span class="kw">pub fn </span>into_parts(<span class="self">self</span>) -&gt; Parts&lt;I, S&gt; {
+        <span class="self">self</span>.try_into_parts()
+            .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;h2 cannot into_inner&quot;</span>))
     }
 
-    <span class="doccomment">/// Return the inner IO object, and additional information, if available.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method will return a `None` if this connection is using an h2 protocol.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_into_parts</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Parts</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">unwrap</span>() {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-            <span class="ident">ProtoServer::H1</span> { <span class="ident">h1</span>, .. } =&gt; {
-                <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">read_buf</span>, <span class="ident">dispatch</span>) <span class="op">=</span> <span class="ident">h1</span>.<span class="ident">into_inner</span>();
-                <span class="prelude-val">Some</span>(<span class="ident">Parts</span> {
-                    <span class="ident">io</span>,
-                    <span class="ident">read_buf</span>,
-                    <span class="ident">service</span>: <span class="ident">dispatch</span>.<span class="ident">into_service</span>(),
-                    <span class="ident">_inner</span>: (),
+    <span class="doccomment">/// Return the inner IO object, and additional information, if available.
+    ///
+    /// This method will return a `None` if this connection is using an h2 protocol.
+    </span><span class="kw">pub fn </span>try_into_parts(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Parts&lt;I, S&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.conn.unwrap() {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+            </span>ProtoServer::H1 { h1, .. } =&gt; {
+                <span class="kw">let </span>(io, read_buf, dispatch) = h1.into_inner();
+                <span class="prelude-val">Some</span>(Parts {
+                    io,
+                    read_buf,
+                    service: dispatch.into_service(),
+                    _inner: (),
                 })
             }
-            <span class="ident">ProtoServer::H2</span> { .. } =&gt; <span class="prelude-val">None</span>,
+            ProtoServer::H2 { .. } =&gt; <span class="prelude-val">None</span>,
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>))]</span>
-            <span class="ident">ProtoServer::H1</span> { <span class="ident">h1</span>, .. } =&gt; <span class="kw">match</span> <span class="ident">h1</span>.<span class="number">0</span> {},
+            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;http1&quot;</span>))]
+            </span>ProtoServer::H1 { h1, .. } =&gt; <span class="kw">match </span>h1.<span class="number">0 </span>{},
         }
     }
 
-    <span class="doccomment">/// Poll the connection for completion, but without calling `shutdown`</span>
-    <span class="doccomment">/// on the underlying IO.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is useful to allow running a connection while doing an HTTP</span>
-    <span class="doccomment">/// upgrade. Once the upgrade is completed, the connection would be &quot;done&quot;,</span>
-    <span class="doccomment">/// but it is not desired to actually shutdown the IO object. Instead you</span>
-    <span class="doccomment">/// would take it back using `into_parts`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_without_shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Unpin</span>,
-        <span class="ident">S::Future</span>: <span class="ident">Unpin</span>,
-        <span class="ident">B</span>: <span class="ident">Unpin</span>,
+    <span class="doccomment">/// Poll the connection for completion, but without calling `shutdown`
+    /// on the underlying IO.
+    ///
+    /// This is useful to allow running a connection while doing an HTTP
+    /// upgrade. Once the upgrade is completed, the connection would be &quot;done&quot;,
+    /// but it is not desired to actually shutdown the IO object. Instead you
+    /// would take it back using `into_parts`.
+    </span><span class="kw">pub fn </span>poll_without_shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="kw">crate</span>::Result&lt;()&gt;&gt;
+    <span class="kw">where
+        </span>S: Unpin,
+        S::Future: Unpin,
+        B: Unpin,
     {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>() {
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-                <span class="ident">ProtoServer::H1</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">h1</span>, .. } =&gt; <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">h1</span>.<span class="ident">poll_without_shutdown</span>(<span class="ident">cx</span>)) {
-                    <span class="prelude-val">Ok</span>(()) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-                        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">kind</span>() {
-                            <span class="ident">Kind::Parse</span>(<span class="ident">Parse::VersionH2</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fallback</span>.<span class="ident">to_h2</span>() =&gt; {
-                                <span class="self">self</span>.<span class="ident">upgrade_h2</span>();
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="kw-2">*</span><span class="self">self</span>.conn.as_mut().unwrap() {
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+                </span>ProtoServer::H1 { <span class="kw-2">ref mut </span>h1, .. } =&gt; <span class="kw">match </span><span class="macro">ready!</span>(h1.poll_without_shutdown(cx)) {
+                    <span class="prelude-val">Ok</span>(()) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(())),
+                    <span class="prelude-val">Err</span>(e) =&gt; {
+                        <span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+                        </span><span class="kw">match </span><span class="kw-2">*</span>e.kind() {
+                            Kind::Parse(Parse::VersionH2) <span class="kw">if </span><span class="self">self</span>.fallback.to_h2() =&gt; {
+                                <span class="self">self</span>.upgrade_h2();
                                 <span class="kw">continue</span>;
                             }
-                            <span class="kw">_</span> =&gt; (),
+                            <span class="kw">_ </span>=&gt; (),
                         }
 
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>));
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(e));
                     }
                 },
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-                <span class="ident">ProtoServer::H2</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">h2</span> } =&gt; <span class="kw">return</span> <span class="ident">Pin::new</span>(<span class="ident">h2</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">map_ok</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()),
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+                </span>ProtoServer::H2 { <span class="kw-2">ref mut </span>h2 } =&gt; <span class="kw">return </span>Pin::new(h2).poll(cx).map_ok(|<span class="kw">_</span>| ()),
 
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>))]</span>
-                <span class="ident">ProtoServer::H1</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">h1</span>, .. } =&gt; <span class="kw">match</span> <span class="ident">h1</span>.<span class="number">0</span> {},
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-                <span class="ident">ProtoServer::H2</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">h2</span> } =&gt; <span class="kw">match</span> <span class="ident">h2</span>.<span class="number">0</span> {},
+                <span class="attribute">#[cfg(not(feature = <span class="string">&quot;http1&quot;</span>))]
+                </span>ProtoServer::H1 { <span class="kw-2">ref mut </span>h1, .. } =&gt; <span class="kw">match </span>h1.<span class="number">0 </span>{},
+                <span class="attribute">#[cfg(not(feature = <span class="string">&quot;http2&quot;</span>))]
+                </span>ProtoServer::H2 { <span class="kw-2">ref mut </span>h2 } =&gt; <span class="kw">match </span>h2.<span class="number">0 </span>{},
             };
         }
     }
 
-    <span class="doccomment">/// Prevent shutdown of the underlying IO object at the end of service the request,</span>
-    <span class="doccomment">/// instead run `into_parts`. This is a convenience wrapper over `poll_without_shutdown`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Error</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This errors if the underlying connection protocol is not HTTP/1.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">without_shutdown</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Parts</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Unpin</span>,
-        <span class="ident">S::Future</span>: <span class="ident">Unpin</span>,
-        <span class="ident">B</span>: <span class="ident">Unpin</span>,
+    <span class="doccomment">/// Prevent shutdown of the underlying IO object at the end of service the request,
+    /// instead run `into_parts`. This is a convenience wrapper over `poll_without_shutdown`.
+    ///
+    /// # Error
+    ///
+    /// This errors if the underlying connection protocol is not HTTP/1.
+    </span><span class="kw">pub fn </span>without_shutdown(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Future&lt;Output = <span class="kw">crate</span>::Result&lt;Parts&lt;I, S&gt;&gt;&gt;
+    <span class="kw">where
+        </span>S: Unpin,
+        S::Future: Unpin,
+        B: Unpin,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>);
-        <span class="ident">futures_util::future::poll_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
-            <span class="macro">ready!</span>(<span class="ident">conn</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">poll_without_shutdown</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
-            <span class="ident">Poll::Ready</span>(<span class="ident">conn</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>().<span class="ident">try_into_parts</span>().<span class="ident">ok_or_else</span>(<span class="ident"><span class="kw">crate</span>::Error::new_without_shutdown_not_h1</span>))
+        <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="prelude-val">Some</span>(<span class="self">self</span>);
+        futures_util::future::poll_fn(<span class="kw">move </span>|cx| {
+            <span class="macro">ready!</span>(conn.as_mut().unwrap().poll_without_shutdown(cx))<span class="question-mark">?</span>;
+            Poll::Ready(conn.take().unwrap().try_into_parts().ok_or_else(<span class="kw">crate</span>::Error::new_without_shutdown_not_h1))
         })
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">upgrade_h2</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+    </span><span class="kw">fn </span>upgrade_h2(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="macro">trace!</span>(<span class="string">&quot;Trying to upgrade connection to h2&quot;</span>);
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">take</span>();
+        <span class="kw">let </span>conn = <span class="self">self</span>.conn.take();
 
-        <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">read_buf</span>, <span class="ident">dispatch</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">unwrap</span>() {
-            <span class="ident">ProtoServer::H1</span> { <span class="ident">h1</span>, .. } =&gt; <span class="ident">h1</span>.<span class="ident">into_inner</span>(),
-            <span class="ident">ProtoServer::H2</span> { .. } =&gt; {
+        <span class="kw">let </span>(io, read_buf, dispatch) = <span class="kw">match </span>conn.unwrap() {
+            ProtoServer::H1 { h1, .. } =&gt; h1.into_inner(),
+            ProtoServer::H2 { .. } =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;h2 cannot into_inner&quot;</span>);
             }
         };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rewind_io</span> <span class="op">=</span> <span class="ident">Rewind::new</span>(<span class="ident">io</span>);
-        <span class="ident">rewind_io</span>.<span class="ident">rewind</span>(<span class="ident">read_buf</span>);
-        <span class="kw">let</span> (<span class="ident">builder</span>, <span class="ident">exec</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">fallback</span> {
-            <span class="ident">Fallback::ToHttp2</span>(<span class="kw-2">ref</span> <span class="ident">builder</span>, <span class="kw-2">ref</span> <span class="ident">exec</span>) =&gt; (<span class="ident">builder</span>, <span class="ident">exec</span>),
-            <span class="ident">Fallback::Http1Only</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;upgrade_h2 with Fallback::Http1Only&quot;</span>),
+        <span class="kw">let </span><span class="kw-2">mut </span>rewind_io = Rewind::new(io);
+        rewind_io.rewind(read_buf);
+        <span class="kw">let </span>(builder, exec) = <span class="kw">match </span><span class="self">self</span>.fallback {
+            Fallback::ToHttp2(<span class="kw-2">ref </span>builder, <span class="kw-2">ref </span>exec) =&gt; (builder, exec),
+            Fallback::Http1Only =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;upgrade_h2 with Fallback::Http1Only&quot;</span>),
         };
-        <span class="kw">let</span> <span class="ident">h2</span> <span class="op">=</span> <span class="ident">proto::h2::Server::new</span>(<span class="ident">rewind_io</span>, <span class="ident">dispatch</span>.<span class="ident">into_service</span>(), <span class="ident">builder</span>, <span class="ident">exec</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>h2 = proto::h2::Server::new(rewind_io, dispatch.into_service(), builder, exec.clone());
 
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">is_none</span>());
-        <span class="self">self</span>.<span class="ident">conn</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ProtoServer::H2</span> { <span class="ident">h2</span> });
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.conn.is_none());
+        <span class="self">self</span>.conn = <span class="prelude-val">Some</span>(ProtoServer::H2 { h2 });
     }
 
-    <span class="doccomment">/// Enable this connection to support higher-level HTTP upgrades.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [the `upgrade` module](crate::upgrade) for more.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_upgrades</span>(<span class="self">self</span>) -&gt; <span class="ident">UpgradeableConnection</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">Send</span>,
+    <span class="doccomment">/// Enable this connection to support higher-level HTTP upgrades.
+    ///
+    /// See [the `upgrade` module](crate::upgrade) for more.
+    </span><span class="kw">pub fn </span>with_upgrades(<span class="self">self</span>) -&gt; UpgradeableConnection&lt;I, S, E&gt;
+    <span class="kw">where
+        </span>I: Send,
     {
-        <span class="ident">UpgradeableConnection</span> { <span class="ident">inner</span>: <span class="self">self</span> }
+        UpgradeableConnection { inner: <span class="self">self </span>}
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span>, <span class="ident">ResBody</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,
-    <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">B</span>: <span class="ident">HttpBody</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">ConnStreamExec</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">B</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">impl</span>&lt;I, B, S, E&gt; Future <span class="kw">for </span>Connection&lt;I, S, E&gt;
+<span class="kw">where
+    </span>S: HttpService&lt;Body, ResBody = B&gt;,
+    S::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+    I: AsyncRead + AsyncWrite + Unpin + <span class="lifetime">&#39;static</span>,
+    B: HttpBody + <span class="lifetime">&#39;static</span>,
+    B::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+    E: ConnStreamExec&lt;S::Future, B&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="kw">crate</span>::Result&lt;()&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Ok</span>(<span class="ident">done</span>) =&gt; {
-                    <span class="kw">match</span> <span class="ident">done</span> {
-                        <span class="ident">proto::Dispatched::Shutdown</span> =&gt; {}
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-                        <span class="ident">proto::Dispatched::Upgrade</span>(<span class="ident">pending</span>) =&gt; {
-                            <span class="comment">// With no `Send` bound on `I`, we can&#39;t try to do</span>
-                            <span class="comment">// upgrades here. In case a user was trying to use</span>
-                            <span class="comment">// `Body::on_upgrade` with this API, send a special</span>
-                            <span class="comment">// error letting them know about that.</span>
-                            <span class="ident">pending</span>.<span class="ident">manual</span>();
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="macro">ready!</span>(Pin::new(<span class="self">self</span>.conn.as_mut().unwrap()).poll(cx)) {
+                <span class="prelude-val">Ok</span>(done) =&gt; {
+                    <span class="kw">match </span>done {
+                        proto::Dispatched::Shutdown =&gt; {}
+                        <span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+                        </span>proto::Dispatched::Upgrade(pending) =&gt; {
+                            <span class="comment">// With no `Send` bound on `I`, we can&#39;t try to do
+                            // upgrades here. In case a user was trying to use
+                            // `Body::on_upgrade` with this API, send a special
+                            // error letting them know about that.
+                            </span>pending.manual();
                         }
                     };
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-                    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">kind</span>() {
-                        <span class="ident">Kind::Parse</span>(<span class="ident">Parse::VersionH2</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fallback</span>.<span class="ident">to_h2</span>() =&gt; {
-                            <span class="self">self</span>.<span class="ident">upgrade_h2</span>();
+                <span class="prelude-val">Err</span>(e) =&gt; {
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+                    #[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+                    </span><span class="kw">match </span><span class="kw-2">*</span>e.kind() {
+                        Kind::Parse(Parse::VersionH2) <span class="kw">if </span><span class="self">self</span>.fallback.to_h2() =&gt; {
+                            <span class="self">self</span>.upgrade_h2();
                             <span class="kw">continue</span>;
                         }
-                        <span class="kw">_</span> =&gt; (),
+                        <span class="kw">_ </span>=&gt; (),
                     }
 
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>));
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(e));
                 }
             }
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">impl</span>&lt;I, S&gt; fmt::Debug <span class="kw">for </span>Connection&lt;I, S&gt;
+<span class="kw">where
+    </span>S: HttpService&lt;Body&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Connection&quot;</span>).<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Connection&quot;</span>).finish()
     }
 }
 
-<span class="comment">// ===== impl ConnectionMode =====</span>
+<span class="comment">// ===== impl ConnectionMode =====
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ConnectionMode</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">ConnectionMode</span> {
-        <span class="ident">ConnectionMode::Fallback</span>
+</span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">impl </span>Default <span class="kw">for </span>ConnectionMode {
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+    </span><span class="kw">fn </span>default() -&gt; ConnectionMode {
+        ConnectionMode::Fallback
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">ConnectionMode</span> {
-        <span class="ident">ConnectionMode::H1Only</span>
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, not(feature = <span class="string">&quot;http2&quot;</span>)))]
+    </span><span class="kw">fn </span>default() -&gt; ConnectionMode {
+        ConnectionMode::H1Only
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">ConnectionMode</span> {
-        <span class="ident">ConnectionMode::H2Only</span>
+    <span class="attribute">#[cfg(all(not(feature = <span class="string">&quot;http1&quot;</span>), feature = <span class="string">&quot;http2&quot;</span>))]
+    </span><span class="kw">fn </span>default() -&gt; ConnectionMode {
+        ConnectionMode::H2Only
     }
 }
 
-<span class="comment">// ===== impl ProtoServer =====</span>
+<span class="comment">// ===== impl ProtoServer =====
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">ProtoServer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span>, <span class="ident">ResBody</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,
-    <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">HttpBody</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">ConnStreamExec</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">B</span><span class="op">&gt;</span>,
+</span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">impl</span>&lt;T, B, S, E&gt; Future <span class="kw">for </span>ProtoServer&lt;T, B, S, E&gt;
+<span class="kw">where
+    </span>T: AsyncRead + AsyncWrite + Unpin,
+    S: HttpService&lt;Body, ResBody = B&gt;,
+    S::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+    B: HttpBody + <span class="lifetime">&#39;static</span>,
+    B::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+    E: ConnStreamExec&lt;S::Future, B&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">proto::Dispatched</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="kw">crate</span>::Result&lt;proto::Dispatched&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">project</span>() {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-            <span class="ident">ProtoServerProj::H1</span> { <span class="ident">h1</span>, .. } =&gt; <span class="ident">h1</span>.<span class="ident">poll</span>(<span class="ident">cx</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-            <span class="ident">ProtoServerProj::H2</span> { <span class="ident">h2</span> } =&gt; <span class="ident">h2</span>.<span class="ident">poll</span>(<span class="ident">cx</span>),
+    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">match </span><span class="self">self</span>.project() {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+            </span>ProtoServerProj::H1 { h1, .. } =&gt; h1.poll(cx),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+            </span>ProtoServerProj::H2 { h2 } =&gt; h2.poll(cx),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>))]</span>
-            <span class="ident">ProtoServerProj::H1</span> { <span class="ident">h1</span>, .. } =&gt; <span class="kw">match</span> <span class="ident">h1</span>.<span class="number">0</span> {},
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-            <span class="ident">ProtoServerProj::H2</span> { <span class="ident">h2</span> } =&gt; <span class="kw">match</span> <span class="ident">h2</span>.<span class="number">0</span> {},
+            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;http1&quot;</span>))]
+            </span>ProtoServerProj::H1 { h1, .. } =&gt; <span class="kw">match </span>h1.<span class="number">0 </span>{},
+            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;http2&quot;</span>))]
+            </span>ProtoServerProj::H2 { h2 } =&gt; <span class="kw">match </span>h2.<span class="number">0 </span>{},
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">upgrades</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))]
+</span><span class="kw">mod </span>upgrades {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="comment">// A future binding a connection with a Service with Upgrade support.</span>
-    <span class="comment">//</span>
-    <span class="comment">// This type is unnameable outside the crate, and so basically just an</span>
-    <span class="comment">// `impl Future`, without requiring Rust 1.26.</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UpgradeableConnection</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>,
+    <span class="comment">// A future binding a connection with a Service with Upgrade support.
+    //
+    // This type is unnameable outside the crate, and so basically just an
+    // `impl Future`, without requiring Rust 1.26.
+    </span><span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless polled&quot;</span>]
+    #[allow(missing_debug_implementations)]
+    </span><span class="kw">pub struct </span>UpgradeableConnection&lt;T, S, E&gt;
+    <span class="kw">where
+        </span>S: HttpService&lt;Body&gt;,
     {
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">inner</span>: <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+        <span class="kw">pub</span>(<span class="kw">super</span>) inner: Connection&lt;T, S, E&gt;,
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">UpgradeableConnection</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span>, <span class="ident">ResBody</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,
-        <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">B</span>: <span class="ident">HttpBody</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">E</span>: <span class="ident">ConnStreamExec</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">B</span><span class="op">&gt;</span>,
+    <span class="kw">impl</span>&lt;I, B, S, E&gt; UpgradeableConnection&lt;I, S, E&gt;
+    <span class="kw">where
+        </span>S: HttpService&lt;Body, ResBody = B&gt;,
+        S::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+        I: AsyncRead + AsyncWrite + Unpin,
+        B: HttpBody + <span class="lifetime">&#39;static</span>,
+        B::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+        E: ConnStreamExec&lt;S::Future, B&gt;,
     {
-        <span class="doccomment">/// Start a graceful shutdown process for this connection.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This `Connection` should continue to be polled until shutdown</span>
-        <span class="doccomment">/// can finish.</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">graceful_shutdown</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) {
-            <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">graceful_shutdown</span>()
+        <span class="doccomment">/// Start a graceful shutdown process for this connection.
+        ///
+        /// This `Connection` should continue to be polled until shutdown
+        /// can finish.
+        </span><span class="kw">pub fn </span>graceful_shutdown(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) {
+            Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).graceful_shutdown()
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">UpgradeableConnection</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span>, <span class="ident">ResBody</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,
-        <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">B</span>: <span class="ident">HttpBody</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">E</span>: <span class="ident">ConnStreamExec</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">B</span><span class="op">&gt;</span>,
+    <span class="kw">impl</span>&lt;I, B, S, E&gt; Future <span class="kw">for </span>UpgradeableConnection&lt;I, S, E&gt;
+    <span class="kw">where
+        </span>S: HttpService&lt;Body, ResBody = B&gt;,
+        S::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+        I: AsyncRead + AsyncWrite + Unpin + Send + <span class="lifetime">&#39;static</span>,
+        B: HttpBody + <span class="lifetime">&#39;static</span>,
+        B::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+        E: ConnStreamExec&lt;S::Future, B&gt;,
     {
-        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+        <span class="kw">type </span>Output = <span class="kw">crate</span>::Result&lt;()&gt;;
 
-        <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-            <span class="kw">loop</span> {
-                <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">conn</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll</span>(<span class="ident">cx</span>)) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">proto::Dispatched::Shutdown</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-                    <span class="prelude-val">Ok</span>(<span class="ident">proto::Dispatched::Upgrade</span>(<span class="ident">pending</span>)) =&gt; {
-                        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">conn</span>.<span class="ident">take</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">ProtoServer::H1</span> { <span class="ident">h1</span>, .. }) =&gt; {
-                                <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">buf</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">h1</span>.<span class="ident">into_inner</span>();
-                                <span class="ident">pending</span>.<span class="ident">fulfill</span>(<span class="ident">Upgraded::new</span>(<span class="ident">io</span>, <span class="ident">buf</span>));
-                                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+        <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+            <span class="kw">loop </span>{
+                <span class="kw">match </span><span class="macro">ready!</span>(Pin::new(<span class="self">self</span>.inner.conn.as_mut().unwrap()).poll(cx)) {
+                    <span class="prelude-val">Ok</span>(proto::Dispatched::Shutdown) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(())),
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+                    </span><span class="prelude-val">Ok</span>(proto::Dispatched::Upgrade(pending)) =&gt; {
+                        <span class="kw">match </span><span class="self">self</span>.inner.conn.take() {
+                            <span class="prelude-val">Some</span>(ProtoServer::H1 { h1, .. }) =&gt; {
+                                <span class="kw">let </span>(io, buf, <span class="kw">_</span>) = h1.into_inner();
+                                pending.fulfill(Upgraded::new(io, buf));
+                                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
                             }
-                            <span class="kw">_</span> =&gt; {
-                                <span class="ident">drop</span>(<span class="ident">pending</span>);
+                            <span class="kw">_ </span>=&gt; {
+                                drop(pending);
                                 <span class="macro">unreachable!</span>(<span class="string">&quot;Upgrade expects h1&quot;</span>)
                             }
                         };
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-                        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">kind</span>() {
-                            <span class="ident">Kind::Parse</span>(<span class="ident">Parse::VersionH2</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">fallback</span>.<span class="ident">to_h2</span>() =&gt; {
-                                <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">upgrade_h2</span>();
+                    <span class="prelude-val">Err</span>(e) =&gt; {
+                        <span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+                        #[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+                        </span><span class="kw">match </span><span class="kw-2">*</span>e.kind() {
+                            Kind::Parse(Parse::VersionH2) <span class="kw">if </span><span class="self">self</span>.inner.fallback.to_h2() =&gt; {
+                                <span class="self">self</span>.inner.upgrade_h2();
                                 <span class="kw">continue</span>;
                             }
-                            <span class="kw">_</span> =&gt; (),
+                            <span class="kw">_ </span>=&gt; (),
                         }
 
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>));
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(e));
                     }
                 }
             }
@@ -2089,4 +2089,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/stream/stream/buffered.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buffered.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../futures_util/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/stream/stream/buffered.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buffered.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../futures_util/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -106,113 +106,113 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::stream</span>::{<span class="ident">Fuse</span>, <span class="ident">FuturesOrdered</span>, <span class="ident">StreamExt</span>};
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">futures_core::future::Future</span>;
-<span class="kw">use</span> <span class="ident">futures_core::ready</span>;
-<span class="kw">use</span> <span class="ident">futures_core::stream::Stream</span>;
-<span class="kw">use</span> <span class="ident">futures_core::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">futures_sink::Sink</span>;
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::stream::{Fuse, FuturesOrdered, StreamExt};
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::pin::Pin;
+<span class="kw">use </span>futures_core::future::Future;
+<span class="kw">use </span>futures_core::ready;
+<span class="kw">use </span>futures_core::stream::Stream;
+<span class="kw">use </span>futures_core::task::{Context, Poll};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;sink&quot;</span>)]
+</span><span class="kw">use </span>futures_sink::Sink;
+<span class="kw">use </span>pin_project_lite::pin_project;
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// Stream for the [`buffered`](super::StreamExt::buffered) method.</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;streams do nothing unless polled&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">St</span>: <span class="ident">Stream</span>,
-        <span class="ident">St::Item</span>: <span class="ident">Future</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// Stream for the [`buffered`](super::StreamExt::buffered) method.
+    </span><span class="attribute">#[must_use = <span class="string">&quot;streams do nothing unless polled&quot;</span>]
+    </span><span class="kw">pub struct </span>Buffered&lt;St&gt;
+    <span class="kw">where
+        </span>St: Stream,
+        St::Item: Future,
     {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">stream</span>: <span class="ident">Fuse</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>,
-        <span class="ident">in_progress_queue</span>: <span class="ident">FuturesOrdered</span><span class="op">&lt;</span><span class="ident">St::Item</span><span class="op">&gt;</span>,
-        <span class="ident">max</span>: <span class="ident">usize</span>,
+        <span class="attribute">#[pin]
+        </span>stream: Fuse&lt;St&gt;,
+        in_progress_queue: FuturesOrdered&lt;St::Item&gt;,
+        max: usize,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
-    <span class="ident">St::Item</span>: <span class="ident">Future</span>,
+<span class="kw">impl</span>&lt;St&gt; fmt::Debug <span class="kw">for </span>Buffered&lt;St&gt;
+<span class="kw">where
+    </span>St: Stream + fmt::Debug,
+    St::Item: Future,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Buffered&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;stream&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stream</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;in_progress_queue&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">in_progress_queue</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;max&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Buffered&quot;</span>)
+            .field(<span class="string">&quot;stream&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.stream)
+            .field(<span class="string">&quot;in_progress_queue&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.in_progress_queue)
+            .field(<span class="string">&quot;max&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.max)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St</span>: <span class="ident">Stream</span>,
-    <span class="ident">St::Item</span>: <span class="ident">Future</span>,
+<span class="kw">impl</span>&lt;St&gt; Buffered&lt;St&gt;
+<span class="kw">where
+    </span>St: Stream,
+    St::Item: Future,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">St</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">stream</span>: <span class="ident"><span class="kw">super</span>::Fuse::new</span>(<span class="ident">stream</span>), <span class="ident">in_progress_queue</span>: <span class="ident">FuturesOrdered::new</span>(), <span class="ident">max</span>: <span class="ident">n</span> }
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(stream: St, n: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ stream: <span class="kw">super</span>::Fuse::new(stream), in_progress_queue: FuturesOrdered::new(), max: n }
     }
 
-    <span class="macro">delegate_access_inner!</span>(<span class="ident">stream</span>, <span class="ident">St</span>, (.));
+    <span class="macro">delegate_access_inner!</span>(stream, St, (.));
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St</span>: <span class="ident">Stream</span>,
-    <span class="ident">St::Item</span>: <span class="ident">Future</span>,
+<span class="kw">impl</span>&lt;St&gt; Stream <span class="kw">for </span>Buffered&lt;St&gt;
+<span class="kw">where
+    </span>St: Stream,
+    St::Item: Future,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">St::Item</span> <span class="kw">as</span> <span class="ident">Future</span><span class="op">&gt;</span><span class="ident">::Output</span>;
+    <span class="kw">type </span>Item = &lt;St::Item <span class="kw">as </span>Future&gt;::Output;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
 
-        <span class="comment">// First up, try to spawn off as many futures as possible by filling up</span>
-        <span class="comment">// our queue of futures.</span>
-        <span class="kw">while</span> <span class="ident">this</span>.<span class="ident">in_progress_queue</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">max</span> {
-            <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_next</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">fut</span>)) =&gt; <span class="ident">this</span>.<span class="ident">in_progress_queue</span>.<span class="ident">push_back</span>(<span class="ident">fut</span>),
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) <span class="op">|</span> <span class="ident">Poll::Pending</span> =&gt; <span class="kw">break</span>,
+        <span class="comment">// First up, try to spawn off as many futures as possible by filling up
+        // our queue of futures.
+        </span><span class="kw">while </span>this.in_progress_queue.len() &lt; <span class="kw-2">*</span>this.max {
+            <span class="kw">match </span>this.stream.as_mut().poll_next(cx) {
+                Poll::Ready(<span class="prelude-val">Some</span>(fut)) =&gt; this.in_progress_queue.push_back(fut),
+                Poll::Ready(<span class="prelude-val">None</span>) | Poll::Pending =&gt; <span class="kw">break</span>,
             }
         }
 
-        <span class="comment">// Attempt to pull the next value from the in_progress_queue</span>
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">in_progress_queue</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">res</span>) {
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>));
+        <span class="comment">// Attempt to pull the next value from the in_progress_queue
+        </span><span class="kw">let </span>res = this.in_progress_queue.poll_next_unpin(cx);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = <span class="macro">ready!</span>(res) {
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(val));
         }
 
-        <span class="comment">// If more values are still coming from the stream, we&#39;re not done yet</span>
-        <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">stream</span>.<span class="ident">is_done</span>() {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">Poll::Pending</span>
+        <span class="comment">// If more values are still coming from the stream, we&#39;re not done yet
+        </span><span class="kw">if </span>this.stream.is_done() {
+            Poll::Ready(<span class="prelude-val">None</span>)
+        } <span class="kw">else </span>{
+            Poll::Pending
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">queue_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">in_progress_queue</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> (<span class="ident">lower</span>, <span class="ident">upper</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">size_hint</span>();
-        <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="ident">lower</span>.<span class="ident">saturating_add</span>(<span class="ident">queue_len</span>);
-        <span class="kw">let</span> <span class="ident">upper</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">upper</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">checked_add</span>(<span class="ident">queue_len</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="kw">let </span>queue_len = <span class="self">self</span>.in_progress_queue.len();
+        <span class="kw">let </span>(lower, upper) = <span class="self">self</span>.stream.size_hint();
+        <span class="kw">let </span>lower = lower.saturating_add(queue_len);
+        <span class="kw">let </span>upper = <span class="kw">match </span>upper {
+            <span class="prelude-val">Some</span>(x) =&gt; x.checked_add(queue_len),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         };
-        (<span class="ident">lower</span>, <span class="ident">upper</span>)
+        (lower, upper)
     }
 }
 
-<span class="comment">// Forwarding impl of Sink from the underlying stream</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Item</span><span class="op">&gt;</span> <span class="ident">Sink</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">Sink</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>,
-    <span class="ident">S::Item</span>: <span class="ident">Future</span>,
+<span class="comment">// Forwarding impl of Sink from the underlying stream
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;sink&quot;</span>)]
+</span><span class="kw">impl</span>&lt;S, Item&gt; Sink&lt;Item&gt; <span class="kw">for </span>Buffered&lt;S&gt;
+<span class="kw">where
+    </span>S: Stream + Sink&lt;Item&gt;,
+    S::Item: Future,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
+    <span class="kw">type </span>Error = S::Error;
 
-    <span class="macro">delegate_sink!</span>(<span class="ident">stream</span>, <span class="ident">Item</span>);
+    <span class="macro">delegate_sink!</span>(stream, Item);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

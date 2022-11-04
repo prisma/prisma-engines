@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/make/make_service.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>make_service.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/make/make_service.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>make_service.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -249,256 +249,256 @@
 <span id="249">249</span>
 <span id="250">250</span>
 <span id="251">251</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Contains [`MakeService`] which is a trait alias for a [`Service`] of [`Service`]s.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Contains [`MakeService`] which is a trait alias for a [`Service`] of [`Service`]s.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::sealed::Sealed;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>tower_service::Service;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">shared</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>shared;
 
-<span class="doccomment">/// Creates new [`Service`] values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Acts as a service factory. This is useful for cases where new [`Service`]</span>
-<span class="doccomment">/// values must be produced. One case is a TCP server listener. The listener</span>
-<span class="doccomment">/// accepts new TCP streams, obtains a new [`Service`] value using the</span>
-<span class="doccomment">/// [`MakeService`] trait, and uses that new [`Service`] value to process inbound</span>
-<span class="doccomment">/// requests on that new TCP stream.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is essentially a trait alias for a [`Service`] of [`Service`]s.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>: <span class="ident">Sealed</span><span class="op">&lt;</span>(<span class="ident">Target</span>, <span class="ident">Request</span>)<span class="op">&gt;</span> {
-    <span class="doccomment">/// Responses given by the service</span>
-    <span class="kw">type</span> <span class="ident">Response</span>;
+<span class="doccomment">/// Creates new [`Service`] values.
+///
+/// Acts as a service factory. This is useful for cases where new [`Service`]
+/// values must be produced. One case is a TCP server listener. The listener
+/// accepts new TCP streams, obtains a new [`Service`] value using the
+/// [`MakeService`] trait, and uses that new [`Service`] value to process inbound
+/// requests on that new TCP stream.
+///
+/// This is essentially a trait alias for a [`Service`] of [`Service`]s.
+</span><span class="kw">pub trait </span>MakeService&lt;Target, Request&gt;: Sealed&lt;(Target, Request)&gt; {
+    <span class="doccomment">/// Responses given by the service
+    </span><span class="kw">type </span>Response;
 
-    <span class="doccomment">/// Errors produced by the service</span>
-    <span class="kw">type</span> <span class="ident">Error</span>;
+    <span class="doccomment">/// Errors produced by the service
+    </span><span class="kw">type </span>Error;
 
-    <span class="doccomment">/// The [`Service`] value created by this factory</span>
-    <span class="kw">type</span> <span class="ident">Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Response</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// The [`Service`] value created by this factory
+    </span><span class="kw">type </span>Service: Service&lt;Request, Response = <span class="self">Self</span>::Response, Error = <span class="self">Self</span>::Error&gt;;
 
-    <span class="doccomment">/// Errors produced while building a service.</span>
-    <span class="kw">type</span> <span class="ident">MakeError</span>;
+    <span class="doccomment">/// Errors produced while building a service.
+    </span><span class="kw">type </span>MakeError;
 
-    <span class="doccomment">/// The future of the [`Service`] instance.</span>
-    <span class="kw">type</span> <span class="ident">Future</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Service</span>, <span class="ident"><span class="self">Self</span>::MakeError</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// The future of the [`Service`] instance.
+    </span><span class="kw">type </span>Future: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Service, <span class="self">Self</span>::MakeError&gt;&gt;;
 
-    <span class="doccomment">/// Returns [`Poll::Ready`] when the factory is able to create more services.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the service is at capacity, then [`Poll::Pending`] is returned and the task</span>
-    <span class="doccomment">/// is notified when the service becomes ready again. This function is</span>
-    <span class="doccomment">/// expected to be called while on a task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Poll::Ready`]: std::task::Poll::Ready</span>
-    <span class="doccomment">/// [`Poll::Pending`]: std::task::Poll::Pending</span>
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::MakeError</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Returns [`Poll::Ready`] when the factory is able to create more services.
+    ///
+    /// If the service is at capacity, then [`Poll::Pending`] is returned and the task
+    /// is notified when the service becomes ready again. This function is
+    /// expected to be called while on a task.
+    ///
+    /// [`Poll::Ready`]: std::task::Poll::Ready
+    /// [`Poll::Pending`]: std::task::Poll::Pending
+    </span><span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::MakeError&gt;&gt;;
 
-    <span class="doccomment">/// Create and return a new service value asynchronously.</span>
-    <span class="kw">fn</span> <span class="ident">make_service</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">Target</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span>;
+    <span class="doccomment">/// Create and return a new service value asynchronously.
+    </span><span class="kw">fn </span>make_service(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: Target) -&gt; <span class="self">Self</span>::Future;
 
-    <span class="doccomment">/// Consume this [`MakeService`] and convert it into a [`Service`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use std::convert::Infallible;</span>
-    <span class="doccomment">/// use tower::Service;</span>
-    <span class="doccomment">/// use tower::make::MakeService;</span>
-    <span class="doccomment">/// use tower::service_fn;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// # async {</span>
-    <span class="doccomment">/// // A `MakeService`</span>
-    <span class="doccomment">/// let make_service = service_fn(|make_req: ()| async {</span>
-    <span class="doccomment">///     Ok::&lt;_, Infallible&gt;(service_fn(|req: String| async {</span>
-    <span class="doccomment">///         Ok::&lt;_, Infallible&gt;(req)</span>
-    <span class="doccomment">///     }))</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Convert the `MakeService` into a `Service`</span>
-    <span class="doccomment">/// let mut svc = make_service.into_service();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Make a new service</span>
-    <span class="doccomment">/// let mut new_svc = svc.call(()).await.unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the service</span>
-    <span class="doccomment">/// let res = new_svc.call(&quot;foo&quot;.to_string()).await.unwrap();</span>
-    <span class="doccomment">/// # };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">into_service</span>(<span class="self">self</span>) -&gt; <span class="ident">IntoService</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Consume this [`MakeService`] and convert it into a [`Service`].
+    ///
+    /// # Example
+    /// ```
+    /// use std::convert::Infallible;
+    /// use tower::Service;
+    /// use tower::make::MakeService;
+    /// use tower::service_fn;
+    ///
+    /// # fn main() {
+    /// # async {
+    /// // A `MakeService`
+    /// let make_service = service_fn(|make_req: ()| async {
+    ///     Ok::&lt;_, Infallible&gt;(service_fn(|req: String| async {
+    ///         Ok::&lt;_, Infallible&gt;(req)
+    ///     }))
+    /// });
+    ///
+    /// // Convert the `MakeService` into a `Service`
+    /// let mut svc = make_service.into_service();
+    ///
+    /// // Make a new service
+    /// let mut new_svc = svc.call(()).await.unwrap();
+    ///
+    /// // Call the service
+    /// let res = new_svc.call(&quot;foo&quot;.to_string()).await.unwrap();
+    /// # };
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>into_service(<span class="self">self</span>) -&gt; IntoService&lt;<span class="self">Self</span>, Request&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">IntoService</span> {
-            <span class="ident">make</span>: <span class="self">self</span>,
-            <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+        IntoService {
+            make: <span class="self">self</span>,
+            _marker: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Convert this [`MakeService`] into a [`Service`] without consuming the original [`MakeService`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use std::convert::Infallible;</span>
-    <span class="doccomment">/// use tower::Service;</span>
-    <span class="doccomment">/// use tower::make::MakeService;</span>
-    <span class="doccomment">/// use tower::service_fn;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// # async {</span>
-    <span class="doccomment">/// // A `MakeService`</span>
-    <span class="doccomment">/// let mut make_service = service_fn(|make_req: ()| async {</span>
-    <span class="doccomment">///     Ok::&lt;_, Infallible&gt;(service_fn(|req: String| async {</span>
-    <span class="doccomment">///         Ok::&lt;_, Infallible&gt;(req)</span>
-    <span class="doccomment">///     }))</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Convert the `MakeService` into a `Service`</span>
-    <span class="doccomment">/// let mut svc = make_service.as_service();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Make a new service</span>
-    <span class="doccomment">/// let mut new_svc = svc.call(()).await.unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the service</span>
-    <span class="doccomment">/// let res = new_svc.call(&quot;foo&quot;.to_string()).await.unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The original `MakeService` is still accessible</span>
-    <span class="doccomment">/// let new_svc = make_service.make_service(()).await.unwrap();</span>
-    <span class="doccomment">/// # };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">as_service</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">AsService</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Convert this [`MakeService`] into a [`Service`] without consuming the original [`MakeService`].
+    ///
+    /// # Example
+    /// ```
+    /// use std::convert::Infallible;
+    /// use tower::Service;
+    /// use tower::make::MakeService;
+    /// use tower::service_fn;
+    ///
+    /// # fn main() {
+    /// # async {
+    /// // A `MakeService`
+    /// let mut make_service = service_fn(|make_req: ()| async {
+    ///     Ok::&lt;_, Infallible&gt;(service_fn(|req: String| async {
+    ///         Ok::&lt;_, Infallible&gt;(req)
+    ///     }))
+    /// });
+    ///
+    /// // Convert the `MakeService` into a `Service`
+    /// let mut svc = make_service.as_service();
+    ///
+    /// // Make a new service
+    /// let mut new_svc = svc.call(()).await.unwrap();
+    ///
+    /// // Call the service
+    /// let res = new_svc.call(&quot;foo&quot;.to_string()).await.unwrap();
+    ///
+    /// // The original `MakeService` is still accessible
+    /// let new_svc = make_service.make_service(()).await.unwrap();
+    /// # };
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>as_service(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; AsService&lt;<span class="self">Self</span>, Request&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">AsService</span> {
-            <span class="ident">make</span>: <span class="self">self</span>,
-            <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+        AsService {
+            make: <span class="self">self</span>,
+            _marker: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Sealed</span><span class="op">&lt;</span>(<span class="ident">Target</span>, <span class="ident">Request</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">M</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;M, S, Target, Request&gt; Sealed&lt;(Target, Request)&gt; <span class="kw">for </span>M
+<span class="kw">where
+    </span>M: Service&lt;Target, Response = S&gt;,
+    S: Service&lt;Request&gt;,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">M</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;M, S, Target, Request&gt; MakeService&lt;Target, Request&gt; <span class="kw">for </span>M
+<span class="kw">where
+    </span>M: Service&lt;Target, Response = S&gt;,
+    S: Service&lt;Request&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">S::Response</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">S</span>;
-    <span class="kw">type</span> <span class="ident">MakeError</span> <span class="op">=</span> <span class="ident">M::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">M::Future</span>;
+    <span class="kw">type </span>Response = S::Response;
+    <span class="kw">type </span>Error = S::Error;
+    <span class="kw">type </span>Service = S;
+    <span class="kw">type </span>MakeError = M::Error;
+    <span class="kw">type </span>Future = M::Future;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::MakeError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Service::poll_ready</span>(<span class="self">self</span>, <span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::MakeError&gt;&gt; {
+        Service::poll_ready(<span class="self">self</span>, cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">make_service</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">Target</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="ident">Service::call</span>(<span class="self">self</span>, <span class="ident">target</span>)
+    <span class="kw">fn </span>make_service(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: Target) -&gt; <span class="self">Self</span>::Future {
+        Service::call(<span class="self">self</span>, target)
     }
 }
 
-<span class="doccomment">/// Service returned by [`MakeService::into_service`][into].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the documentation on [`into_service`][into] for details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [into]: MakeService::into_service</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntoService</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">Request</span><span class="op">&gt;</span> {
-    <span class="ident">make</span>: <span class="ident">M</span>,
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Service returned by [`MakeService::into_service`][into].
+///
+/// See the documentation on [`into_service`][into] for details.
+///
+/// [into]: MakeService::into_service
+</span><span class="kw">pub struct </span>IntoService&lt;M, Request&gt; {
+    make: M,
+    _marker: PhantomData&lt;Request&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">IntoService</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;M, Request&gt; Clone <span class="kw">for </span>IntoService&lt;M, Request&gt;
+<span class="kw">where
+    </span>M: Clone,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">make</span>: <span class="self">self</span>.<span class="ident">make</span>.<span class="ident">clone</span>(),
-            <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            make: <span class="self">self</span>.make.clone(),
+            _marker: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">IntoService</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;M, Request&gt; fmt::Debug <span class="kw">for </span>IntoService&lt;M, Request&gt;
+<span class="kw">where
+    </span>M: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;IntoService&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;make&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">make</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;IntoService&quot;</span>)
+            .field(<span class="string">&quot;make&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.make)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Target</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntoService</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;M, S, Target, Request&gt; Service&lt;Target&gt; <span class="kw">for </span>IntoService&lt;M, Request&gt;
+<span class="kw">where
+    </span>M: Service&lt;Target, Response = S&gt;,
+    S: Service&lt;Request&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">M::Response</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">M::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">M::Future</span>;
+    <span class="kw">type </span>Response = M::Response;
+    <span class="kw">type </span>Error = M::Error;
+    <span class="kw">type </span>Future = M::Future;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">make</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.make.poll_ready(cx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">Target</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="self">self</span>.<span class="ident">make</span>.<span class="ident">make_service</span>(<span class="ident">target</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: Target) -&gt; <span class="self">Self</span>::Future {
+        <span class="self">self</span>.make.make_service(target)
     }
 }
 
-<span class="doccomment">/// Service returned by [`MakeService::as_service`][as].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the documentation on [`as_service`][as] for details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [as]: MakeService::as_service</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AsService</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span>, <span class="ident">Request</span><span class="op">&gt;</span> {
-    <span class="ident">make</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">M</span>,
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Service returned by [`MakeService::as_service`][as].
+///
+/// See the documentation on [`as_service`][as] for details.
+///
+/// [as]: MakeService::as_service
+</span><span class="kw">pub struct </span>AsService&lt;<span class="lifetime">&#39;a</span>, M, Request&gt; {
+    make: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>M,
+    _marker: PhantomData&lt;Request&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">AsService</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;M, Request&gt; fmt::Debug <span class="kw">for </span>AsService&lt;<span class="lifetime">&#39;_</span>, M, Request&gt;
+<span class="kw">where
+    </span>M: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;AsService&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;make&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">make</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;AsService&quot;</span>)
+            .field(<span class="string">&quot;make&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.make)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Target</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsService</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;M, S, Target, Request&gt; Service&lt;Target&gt; <span class="kw">for </span>AsService&lt;<span class="lifetime">&#39;_</span>, M, Request&gt;
+<span class="kw">where
+    </span>M: Service&lt;Target, Response = S&gt;,
+    S: Service&lt;Request&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">M::Response</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">M::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">M::Future</span>;
+    <span class="kw">type </span>Response = M::Response;
+    <span class="kw">type </span>Error = M::Error;
+    <span class="kw">type </span>Future = M::Future;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">make</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.make.poll_ready(cx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">Target</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="self">self</span>.<span class="ident">make</span>.<span class="ident">make_service</span>(<span class="ident">target</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: Target) -&gt; <span class="self">Self</span>::Future {
+        <span class="self">self</span>.make.make_service(target)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

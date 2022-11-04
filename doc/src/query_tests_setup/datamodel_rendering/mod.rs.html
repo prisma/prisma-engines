@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/datamodel_rendering/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/datamodel_rendering/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -103,60 +103,60 @@
 <span id="103">103</span>
 <span id="104">104</span>
 <span id="105">105</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_renderer</span>;
-<span class="kw">mod</span> <span class="ident">sql_renderer</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>mongodb_renderer;
+<span class="kw">mod </span>sql_renderer;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mongodb_renderer</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sql_renderer</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>mongodb_renderer::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>sql_renderer::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">templating</span>, <span class="ident">ConnectorTagInterface</span>, <span class="ident">DatamodelFragment</span>, <span class="ident">IdFragment</span>, <span class="ident">M2mFragment</span>, <span class="ident">TestConfig</span>};
-<span class="kw">use</span> <span class="ident">indoc::indoc</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
-<span class="kw">use</span> <span class="ident">psl::ALL_PREVIEW_FEATURES</span>;
-<span class="kw">use</span> <span class="ident">regex::Regex</span>;
+<span class="kw">use crate</span>::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, TestConfig};
+<span class="kw">use </span>indoc::indoc;
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>lazy_static::lazy_static;
+<span class="kw">use </span>psl::ALL_PREVIEW_FEATURES;
+<span class="kw">use </span>regex::Regex;
 
-<span class="macro">lazy_static!</span> {
-    <span class="doccomment">/// Test configuration, loaded once at runtime.</span>
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">FRAGMENT_RE</span>: <span class="ident">Regex</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;#.*&quot;</span>).<span class="ident">unwrap</span>();
+<span class="macro">lazy_static! </span>{
+    <span class="doccomment">/// Test configuration, loaded once at runtime.
+    </span><span class="kw">static </span><span class="kw-2">ref </span>FRAGMENT_RE: Regex = Regex::new(<span class="string">r&quot;#.*&quot;</span>).unwrap();
 }
 
-<span class="doccomment">/// The main trait a datamodel renderer for a connector has to implement.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DatamodelRenderer</span> {
-    <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fragment</span>: <span class="ident">DatamodelFragment</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="ident">fragment</span> {
-            <span class="ident">DatamodelFragment::Id</span>(<span class="ident">id</span>) =&gt; <span class="self">self</span>.<span class="ident">render_id</span>(<span class="ident">id</span>),
-            <span class="ident">DatamodelFragment::M2m</span>(<span class="ident">m2m</span>) =&gt; <span class="self">self</span>.<span class="ident">render_m2m</span>(<span class="ident">m2m</span>),
+<span class="doccomment">/// The main trait a datamodel renderer for a connector has to implement.
+</span><span class="kw">pub trait </span>DatamodelRenderer {
+    <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, fragment: DatamodelFragment) -&gt; String {
+        <span class="kw">match </span>fragment {
+            DatamodelFragment::Id(id) =&gt; <span class="self">self</span>.render_id(id),
+            DatamodelFragment::M2m(m2m) =&gt; <span class="self">self</span>.render_m2m(m2m),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">IdFragment</span>) -&gt; <span class="ident">String</span>;
-    <span class="kw">fn</span> <span class="ident">render_m2m</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">m2m</span>: <span class="ident">M2mFragment</span>) -&gt; <span class="ident">String</span>;
+    <span class="kw">fn </span>render_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: IdFragment) -&gt; String;
+    <span class="kw">fn </span>render_m2m(<span class="kw-2">&amp;</span><span class="self">self</span>, m2m: M2mFragment) -&gt; String;
 }
 
-<span class="doccomment">/// Render the complete datamodel with all bells and whistles.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_test_datamodel</span>(
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">TestConfig</span>,
-    <span class="ident">test_database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">template</span>: <span class="ident">String</span>,
-    <span class="ident">excluded_features</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-    <span class="ident">relation_mode_override</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">db_schemas</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-    <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">test_connector_tag</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">render_preview_features</span>(<span class="ident">excluded_features</span>);
+<span class="doccomment">/// Render the complete datamodel with all bells and whistles.
+</span><span class="kw">pub fn </span>render_test_datamodel(
+    config: <span class="kw-2">&amp;</span>TestConfig,
+    test_database: <span class="kw-2">&amp;</span>str,
+    template: String,
+    excluded_features: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+    relation_mode_override: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+    isolation_level: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+) -&gt; String {
+    <span class="kw">let </span>tag = config.test_connector_tag().unwrap();
+    <span class="kw">let </span>preview_features = render_preview_features(excluded_features);
 
-    <span class="kw">let</span> <span class="ident">is_multi_schema</span> <span class="op">=</span> <span class="op">!</span><span class="ident">db_schemas</span>.<span class="ident">is_empty</span>();
+    <span class="kw">let </span>is_multi_schema = !db_schemas.is_empty();
 
-    <span class="kw">let</span> <span class="ident">schema_def</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_multi_schema</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;schemas = {:?}&quot;</span>, <span class="ident">db_schemas</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">String::default</span>()
+    <span class="kw">let </span>schema_def = <span class="kw">if </span>is_multi_schema {
+        <span class="macro">format!</span>(<span class="string">&quot;schemas = {:?}&quot;</span>, db_schemas)
+    } <span class="kw">else </span>{
+        String::default()
     };
 
-    <span class="kw">let</span> <span class="ident">datasource_with_generator</span> <span class="op">=</span> <span class="macro">format!</span>(
-        <span class="macro">indoc!</span> {<span class="string">r#&quot;
+    <span class="kw">let </span>datasource_with_generator = <span class="macro">format!</span>(
+        <span class="macro">indoc! </span>{<span class="string">r#&quot;
             datasource test {{
                 provider = &quot;{}&quot;
                 url = &quot;{}&quot;
@@ -169,44 +169,44 @@
                 previewFeatures = [{}]
             }}
         &quot;#</span>},
-        <span class="ident">tag</span>.<span class="ident">datamodel_provider</span>(),
-        <span class="ident">tag</span>.<span class="ident">connection_string</span>(<span class="ident">test_database</span>, <span class="ident">config</span>.<span class="ident">is_ci</span>(), <span class="ident">is_multi_schema</span>, <span class="ident">isolation_level</span>),
-        <span class="ident">relation_mode_override</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">tag</span>.<span class="ident">relation_mode</span>().<span class="ident">to_string</span>()),
-        <span class="ident">schema_def</span>,
-        <span class="ident">preview_features</span>
+        tag.datamodel_provider(),
+        tag.connection_string(test_database, config.is_ci(), is_multi_schema, isolation_level),
+        relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()),
+        schema_def,
+        preview_features
     );
 
-    <span class="kw">let</span> <span class="ident">renderer</span> <span class="op">=</span> <span class="ident">tag</span>.<span class="ident">datamodel_renderer</span>();
-    <span class="kw">let</span> <span class="ident">models</span> <span class="op">=</span> <span class="ident">process_template</span>(<span class="ident">template</span>, <span class="ident">renderer</span>);
+    <span class="kw">let </span>renderer = tag.datamodel_renderer();
+    <span class="kw">let </span>models = process_template(template, renderer);
 
-    <span class="macro">format!</span>(<span class="string">&quot;{}\n\n{}&quot;</span>, <span class="ident">datasource_with_generator</span>, <span class="ident">models</span>)
+    <span class="macro">format!</span>(<span class="string">&quot;{}\n\n{}&quot;</span>, datasource_with_generator, models)
 }
 
-<span class="kw">fn</span> <span class="ident">process_template</span>(<span class="ident">template</span>: <span class="ident">String</span>, <span class="ident">renderer</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">DatamodelRenderer</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fragment_defs</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="kw">fn </span>process_template(template: String, renderer: Box&lt;<span class="kw">dyn </span>DatamodelRenderer&gt;) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>fragment_defs = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">cap</span> <span class="kw">in</span> <span class="ident">FRAGMENT_RE</span>.<span class="ident">captures_iter</span>(<span class="kw-2">&amp;</span><span class="ident">template</span>) {
-        <span class="kw">let</span> <span class="ident">fragment</span> <span class="op">=</span> <span class="ident">templating::parse</span>(<span class="kw-2">&amp;</span><span class="ident">cap</span>[<span class="number">0</span>]).<span class="ident">unwrap</span>(); <span class="comment">// todo error handling</span>
-        <span class="ident">fragment_defs</span>.<span class="ident">push</span>(<span class="ident">fragment</span>);
+    <span class="kw">for </span>cap <span class="kw">in </span>FRAGMENT_RE.captures_iter(<span class="kw-2">&amp;</span>template) {
+        <span class="kw">let </span>fragment = templating::parse(<span class="kw-2">&amp;</span>cap[<span class="number">0</span>]).unwrap(); <span class="comment">// todo error handling
+        </span>fragment_defs.push(fragment);
     }
 
-    <span class="kw">let</span> <span class="ident">preprocessed</span> <span class="op">=</span> <span class="ident">FRAGMENT_RE</span>.<span class="ident">replace_all</span>(<span class="kw-2">&amp;</span><span class="ident">template</span>, <span class="string">&quot;#{}&quot;</span>).<span class="ident">to_owned</span>();
+    <span class="kw">let </span>preprocessed = FRAGMENT_RE.replace_all(<span class="kw-2">&amp;</span>template, <span class="string">&quot;#{}&quot;</span>);
 
-    <span class="ident">fragment_defs</span>.<span class="ident">into_iter</span>().<span class="ident">fold</span>(<span class="ident">preprocessed</span>.<span class="ident">to_string</span>(), <span class="op">|</span><span class="ident">aggr</span>, <span class="ident">next</span><span class="op">|</span> {
-        <span class="ident">aggr</span>.<span class="ident">replacen</span>(<span class="string">&quot;#{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">renderer</span>.<span class="ident">render</span>(<span class="ident">next</span>), <span class="number">1</span>)
+    fragment_defs.into_iter().fold(preprocessed.to_string(), |aggr, next| {
+        aggr.replacen(<span class="string">&quot;#{}&quot;</span>, <span class="kw-2">&amp;</span>renderer.render(next), <span class="number">1</span>)
     })
 }
 
-<span class="kw">fn</span> <span class="ident">render_preview_features</span>(<span class="ident">excluded_features</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">excluded_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">excluded_features</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, <span class="ident">f</span>)).<span class="ident">collect</span>();
+<span class="kw">fn </span>render_preview_features(excluded_features: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; String {
+    <span class="kw">let </span>excluded_features: Vec&lt;<span class="kw">_</span>&gt; = excluded_features.iter().map(|f| <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, f)).collect();
 
-    <span class="ident">ALL_PREVIEW_FEATURES</span>
-        .<span class="ident">active_features</span>()
-        .<span class="ident">iter</span>()
-        .<span class="ident">chain</span>(<span class="ident">ALL_PREVIEW_FEATURES</span>.<span class="ident">hidden_features</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, <span class="ident">f</span>))
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="op">!</span><span class="ident">excluded_features</span>.<span class="ident">contains</span>(<span class="ident">f</span>))
-        .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+    ALL_PREVIEW_FEATURES
+        .active_features()
+        .iter()
+        .chain(ALL_PREVIEW_FEATURES.hidden_features())
+        .map(|f| <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, f))
+        .filter(|f| !excluded_features.contains(f))
+        .join(<span class="string">&quot;, &quot;</span>)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

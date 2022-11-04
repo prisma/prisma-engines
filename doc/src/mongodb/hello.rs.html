@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/hello.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hello.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/hello.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hello.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -300,307 +300,307 @@
 <span id="300">300</span>
 <span id="301">301</span>
 <span id="302">302</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    sync::Arc,
+    time::{Duration, Instant},
 };
 
-<span class="kw">use</span> <span class="ident">bson::RawDocumentBuf</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>bson::RawDocumentBuf;
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">oid::ObjectId</span>, <span class="ident">DateTime</span>, <span class="ident">Document</span>, <span class="ident">Timestamp</span>},
-    <span class="ident">client</span>::{
-        <span class="ident">options</span>::{<span class="ident">ServerAddress</span>, <span class="ident">ServerApi</span>},
-        <span class="ident">ClusterTime</span>,
+<span class="kw">use crate</span>::{
+    bson::{doc, oid::ObjectId, DateTime, Document, Timestamp},
+    client::{
+        options::{ServerAddress, ServerApi},
+        ClusterTime,
     },
-    <span class="ident">cmap</span>::{<span class="ident">Command</span>, <span class="ident">Connection</span>},
-    <span class="ident">error::Result</span>,
-    <span class="ident">event::sdam</span>::{
-        <span class="ident">SdamEventHandler</span>,
-        <span class="ident">ServerHeartbeatFailedEvent</span>,
-        <span class="ident">ServerHeartbeatStartedEvent</span>,
-        <span class="ident">ServerHeartbeatSucceededEvent</span>,
+    cmap::{Command, Connection},
+    error::Result,
+    event::sdam::{
+        SdamEventHandler,
+        ServerHeartbeatFailedEvent,
+        ServerHeartbeatStartedEvent,
+        ServerHeartbeatSucceededEvent,
     },
-    <span class="ident">sdam</span>::{<span class="ident">ServerType</span>, <span class="ident">Topology</span>},
-    <span class="ident">selection_criteria::TagSet</span>,
+    sdam::{ServerType, Topology},
+    selection_criteria::TagSet,
 };
 
-<span class="doccomment">/// The legacy version of the `hello` command which was deprecated in 5.0.</span>
-<span class="doccomment">/// To limit usages of the legacy name in the codebase, this constant should be used</span>
-<span class="doccomment">/// wherever possible.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">LEGACY_HELLO_COMMAND_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;isMaster&quot;</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">LEGACY_HELLO_COMMAND_NAME_LOWERCASE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;ismaster&quot;</span>;
+<span class="doccomment">/// The legacy version of the `hello` command which was deprecated in 5.0.
+/// To limit usages of the legacy name in the codebase, this constant should be used
+/// wherever possible.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>LEGACY_HELLO_COMMAND_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;isMaster&quot;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>LEGACY_HELLO_COMMAND_NAME_LOWERCASE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;ismaster&quot;</span>;
 
-<span class="doccomment">/// Construct a hello or legacy hello command, depending on the circumstances.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If an API version is provided or `load_balanced` is true, `hello` will be used.</span>
-<span class="doccomment">/// If the server indicated `helloOk: true`, then `hello` will also be used.</span>
-<span class="doccomment">/// Otherwise, legacy hello will be used, and if it&#39;s unknown whether the server supports hello,</span>
-<span class="doccomment">/// the command also will contain `helloOk: true`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">hello_command</span>(
-    <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
-    <span class="ident">load_balanced</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="ident">hello_ok</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Command</span> {
-    <span class="kw">let</span> (<span class="ident">command</span>, <span class="ident">command_name</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">server_api</span>.<span class="ident">is_some</span>()
-        <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">load_balanced</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>))
-        <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">hello_ok</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>))
+<span class="doccomment">/// Construct a hello or legacy hello command, depending on the circumstances.
+///
+/// If an API version is provided or `load_balanced` is true, `hello` will be used.
+/// If the server indicated `helloOk: true`, then `hello` will also be used.
+/// Otherwise, legacy hello will be used, and if it&#39;s unknown whether the server supports hello,
+/// the command also will contain `helloOk: true`.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>hello_command(
+    server_api: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ServerApi&gt;,
+    load_balanced: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    hello_ok: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+) -&gt; Command {
+    <span class="kw">let </span>(command, command_name) = <span class="kw">if </span>server_api.is_some()
+        || <span class="macro">matches!</span>(load_balanced, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>))
+        || <span class="macro">matches!</span>(hello_ok, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>))
     {
-        (<span class="macro">doc!</span> { <span class="string">&quot;hello&quot;</span>: <span class="number">1</span> }, <span class="string">&quot;hello&quot;</span>)
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="ident">LEGACY_HELLO_COMMAND_NAME</span>: <span class="number">1</span> };
-        <span class="kw">if</span> <span class="ident">hello_ok</span>.<span class="ident">is_none</span>() {
-            <span class="ident">cmd</span>.<span class="ident">insert</span>(<span class="string">&quot;helloOk&quot;</span>, <span class="bool-val">true</span>);
+        (<span class="macro">doc! </span>{ <span class="string">&quot;hello&quot;</span>: <span class="number">1 </span>}, <span class="string">&quot;hello&quot;</span>)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>cmd = <span class="macro">doc! </span>{ LEGACY_HELLO_COMMAND_NAME: <span class="number">1 </span>};
+        <span class="kw">if </span>hello_ok.is_none() {
+            cmd.insert(<span class="string">&quot;helloOk&quot;</span>, <span class="bool-val">true</span>);
         }
-        (<span class="ident">cmd</span>, <span class="ident">LEGACY_HELLO_COMMAND_NAME</span>)
+        (cmd, LEGACY_HELLO_COMMAND_NAME)
     };
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">Command::new</span>(<span class="ident">command_name</span>.<span class="ident">into</span>(), <span class="string">&quot;admin&quot;</span>.<span class="ident">into</span>(), <span class="ident">command</span>);
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">server_api</span>) <span class="op">=</span> <span class="ident">server_api</span> {
-        <span class="ident">command</span>.<span class="ident">set_server_api</span>(<span class="ident">server_api</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>command = Command::new(command_name.into(), <span class="string">&quot;admin&quot;</span>.into(), command);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(server_api) = server_api {
+        command.set_server_api(server_api);
     }
-    <span class="ident">command</span>
+    command
 }
 
-<span class="doccomment">/// Execute a hello or legacy hello command, emiting events if a reference to the topology and a</span>
-<span class="doccomment">/// handler are provided.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A strong reference to the topology is used here to ensure it is still in scope and has not yet</span>
-<span class="doccomment">/// emitted a `TopologyClosedEvent`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_hello</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>,
-    <span class="ident">command</span>: <span class="ident">Command</span>,
-    <span class="ident">topology</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Topology</span><span class="op">&gt;</span>,
-    <span class="ident">handler</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SdamEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HelloReply</span><span class="op">&gt;</span> {
-    <span class="ident">emit_event</span>(<span class="ident">topology</span>, <span class="ident">handler</span>, <span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ServerHeartbeatStartedEvent</span> {
-            <span class="ident">server_address</span>: <span class="ident">conn</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
+<span class="doccomment">/// Execute a hello or legacy hello command, emiting events if a reference to the topology and a
+/// handler are provided.
+///
+/// A strong reference to the topology is used here to ensure it is still in scope and has not yet
+/// emitted a `TopologyClosedEvent`.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>run_hello(
+    conn: <span class="kw-2">&amp;mut </span>Connection,
+    command: Command,
+    topology: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Topology&gt;,
+    handler: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>SdamEventHandler&gt;&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;HelloReply&gt; {
+    emit_event(topology, handler, |handler| {
+        <span class="kw">let </span>event = ServerHeartbeatStartedEvent {
+            server_address: conn.address.clone(),
         };
-        <span class="ident">handler</span>.<span class="ident">handle_server_heartbeat_started_event</span>(<span class="ident">event</span>);
+        handler.handle_server_heartbeat_started_event(event);
     });
 
-    <span class="kw">let</span> <span class="ident">start_time</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-    <span class="kw">let</span> <span class="ident">response_result</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">send_command</span>(<span class="ident">command</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>;
-    <span class="kw">let</span> <span class="ident">end_time</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+    <span class="kw">let </span>start_time = Instant::now();
+    <span class="kw">let </span>response_result = conn.send_command(command, <span class="prelude-val">None</span>).<span class="kw">await</span>;
+    <span class="kw">let </span>end_time = Instant::now();
 
-    <span class="kw">let</span> <span class="ident">round_trip_time</span> <span class="op">=</span> <span class="ident">end_time</span>.<span class="ident">duration_since</span>(<span class="ident">start_time</span>);
+    <span class="kw">let </span>round_trip_time = end_time.duration_since(start_time);
 
-    <span class="kw">match</span> <span class="ident">response_result</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">raw_response</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">hello_reply</span> <span class="op">=</span> <span class="ident">raw_response</span>.<span class="ident">into_hello_reply</span>(<span class="ident">round_trip_time</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">hello_reply</span>)
+    <span class="kw">match </span>response_result.and_then(|raw_response| {
+        <span class="kw">let </span>hello_reply = raw_response.into_hello_reply(round_trip_time)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(hello_reply)
     }) {
-        <span class="prelude-val">Ok</span>(<span class="ident">hello_reply</span>) =&gt; {
-            <span class="ident">emit_event</span>(<span class="ident">topology</span>, <span class="ident">handler</span>, <span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reply</span> <span class="op">=</span> <span class="ident">hello_reply</span>
-                    .<span class="ident">raw_command_response</span>
-                    .<span class="ident">to_document</span>()
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">doc!</span> { <span class="string">&quot;deserialization error&quot;</span>: <span class="ident">e</span>.<span class="ident">to_string</span>() });
-                <span class="comment">// if this hello call is part of a handshake, remove speculative authentication</span>
-                <span class="comment">// information before publishing an event</span>
-                <span class="ident">reply</span>.<span class="ident">remove</span>(<span class="string">&quot;speculativeAuthenticate&quot;</span>);
-                <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ServerHeartbeatSucceededEvent</span> {
-                    <span class="ident">duration</span>: <span class="ident">round_trip_time</span>,
-                    <span class="ident">reply</span>,
-                    <span class="ident">server_address</span>: <span class="ident">conn</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
+        <span class="prelude-val">Ok</span>(hello_reply) =&gt; {
+            emit_event(topology, handler, |handler| {
+                <span class="kw">let </span><span class="kw-2">mut </span>reply = hello_reply
+                    .raw_command_response
+                    .to_document()
+                    .unwrap_or_else(|e| <span class="macro">doc! </span>{ <span class="string">&quot;deserialization error&quot;</span>: e.to_string() });
+                <span class="comment">// if this hello call is part of a handshake, remove speculative authentication
+                // information before publishing an event
+                </span>reply.remove(<span class="string">&quot;speculativeAuthenticate&quot;</span>);
+                <span class="kw">let </span>event = ServerHeartbeatSucceededEvent {
+                    duration: round_trip_time,
+                    reply,
+                    server_address: conn.address.clone(),
                 };
-                <span class="ident">handler</span>.<span class="ident">handle_server_heartbeat_succeeded_event</span>(<span class="ident">event</span>);
+                handler.handle_server_heartbeat_succeeded_event(event);
             });
-            <span class="prelude-val">Ok</span>(<span class="ident">hello_reply</span>)
+            <span class="prelude-val">Ok</span>(hello_reply)
         }
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-            <span class="ident">emit_event</span>(<span class="ident">topology</span>, <span class="ident">handler</span>, <span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ServerHeartbeatFailedEvent</span> {
-                    <span class="ident">duration</span>: <span class="ident">round_trip_time</span>,
-                    <span class="ident">failure</span>: <span class="ident">err</span>.<span class="ident">clone</span>(),
-                    <span class="ident">server_address</span>: <span class="ident">conn</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
+        <span class="prelude-val">Err</span>(err) =&gt; {
+            emit_event(topology, handler, |handler| {
+                <span class="kw">let </span>event = ServerHeartbeatFailedEvent {
+                    duration: round_trip_time,
+                    failure: err.clone(),
+                    server_address: conn.address.clone(),
                 };
-                <span class="ident">handler</span>.<span class="ident">handle_server_heartbeat_failed_event</span>(<span class="ident">event</span>);
+                handler.handle_server_heartbeat_failed_event(event);
             });
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>)
+            <span class="prelude-val">Err</span>(err)
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">emit_event</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">topology</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Topology</span><span class="op">&gt;</span>, <span class="ident">handler</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SdamEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">emit</span>: <span class="ident">F</span>)
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SdamEventHandler</span><span class="op">&gt;</span>),
+<span class="kw">fn </span>emit_event&lt;F&gt;(topology: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Topology&gt;, handler: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>SdamEventHandler&gt;&gt;, emit: F)
+<span class="kw">where
+    </span>F: FnOnce(<span class="kw-2">&amp;</span>Arc&lt;<span class="kw">dyn </span>SdamEventHandler&gt;),
 {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>) <span class="op">=</span> <span class="ident">handler</span> {
-        <span class="kw">if</span> <span class="ident">topology</span>.<span class="ident">is_some</span>() {
-            <span class="ident">emit</span>(<span class="ident">handler</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(handler) = handler {
+        <span class="kw">if </span>topology.is_some() {
+            emit(handler);
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">HelloReply</span> {
-    <span class="kw">pub</span> <span class="ident">server_address</span>: <span class="ident">ServerAddress</span>,
-    <span class="kw">pub</span> <span class="ident">command_response</span>: <span class="ident">HelloCommandResponse</span>,
-    <span class="kw">pub</span> <span class="ident">raw_command_response</span>: <span class="ident">RawDocumentBuf</span>,
-    <span class="kw">pub</span> <span class="ident">round_trip_time</span>: <span class="ident">Duration</span>,
-    <span class="kw">pub</span> <span class="ident">cluster_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, Serialize)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>HelloReply {
+    <span class="kw">pub </span>server_address: ServerAddress,
+    <span class="kw">pub </span>command_response: HelloCommandResponse,
+    <span class="kw">pub </span>raw_command_response: RawDocumentBuf,
+    <span class="kw">pub </span>round_trip_time: Duration,
+    <span class="kw">pub </span>cluster_time: <span class="prelude-ty">Option</span>&lt;ClusterTime&gt;,
 }
 
-<span class="doccomment">/// The response to a `hello` command.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the documentation [here](https://www.mongodb.com/docs/manual/reference/command/hello/) for more details.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">HelloCommandResponse</span> {
-    <span class="doccomment">/// Whether the server is writable. If true, this instance is a primary in a replica set, a</span>
-    <span class="doccomment">/// mongos instance, or a standalone mongod.</span>
-    <span class="kw">pub</span> <span class="ident">is_writable_primary</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The response to a `hello` command.
+///
+/// See the documentation [here](https://www.mongodb.com/docs/manual/reference/command/hello/) for more details.
+</span><span class="attribute">#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>HelloCommandResponse {
+    <span class="doccomment">/// Whether the server is writable. If true, this instance is a primary in a replica set, a
+    /// mongos instance, or a standalone mongod.
+    </span><span class="kw">pub </span>is_writable_primary: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;ismaster&quot;</span>)]</span>
-    <span class="doccomment">/// Legacy name for `is_writable_primary` field.</span>
-    <span class="kw">pub</span> <span class="ident">is_master</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;ismaster&quot;</span>)]
+    </span><span class="doccomment">/// Legacy name for `is_writable_primary` field.
+    </span><span class="kw">pub </span>is_master: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Whether or not the server supports using the `hello` command for monitoring instead</span>
-    <span class="doccomment">/// of the legacy hello command.</span>
-    <span class="kw">pub</span> <span class="ident">hello_ok</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether or not the server supports using the `hello` command for monitoring instead
+    /// of the legacy hello command.
+    </span><span class="kw">pub </span>hello_ok: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The list of all hosts.</span>
-    <span class="kw">pub</span> <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The list of all hosts.
+    </span><span class="kw">pub </span>hosts: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
-    <span class="doccomment">/// The list of all passives in a replica set.</span>
-    <span class="kw">pub</span> <span class="ident">passives</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The list of all passives in a replica set.
+    </span><span class="kw">pub </span>passives: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
-    <span class="doccomment">/// The list of all arbiters in a replica set.</span>
-    <span class="kw">pub</span> <span class="ident">arbiters</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The list of all arbiters in a replica set.
+    </span><span class="kw">pub </span>arbiters: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
-    <span class="doccomment">/// An optional message. This contains the value &quot;isdbgrid&quot; when returned from a mongos.</span>
-    <span class="kw">pub</span> <span class="ident">msg</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An optional message. This contains the value &quot;isdbgrid&quot; when returned from a mongos.
+    </span><span class="kw">pub </span>msg: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// The address of the server that returned this `HelloCommandResponse`.</span>
-    <span class="kw">pub</span> <span class="ident">me</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The address of the server that returned this `HelloCommandResponse`.
+    </span><span class="kw">pub </span>me: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-    <span class="doccomment">/// The list of compatible compressors that the server returned.</span>
-    <span class="kw">pub</span> <span class="ident">compressors</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;compression&quot;</span>)]
+    </span><span class="doccomment">/// The list of compatible compressors that the server returned.
+    </span><span class="kw">pub </span>compressors: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
-    <span class="doccomment">/// The current replica set config version.</span>
-    <span class="kw">pub</span> <span class="ident">set_version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The current replica set config version.
+    </span><span class="kw">pub </span>set_version: <span class="prelude-ty">Option</span>&lt;i32&gt;,
 
-    <span class="doccomment">/// The name of the current replica set.</span>
-    <span class="kw">pub</span> <span class="ident">set_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The name of the current replica set.
+    </span><span class="kw">pub </span>set_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Whether the server is hidden.</span>
-    <span class="kw">pub</span> <span class="ident">hidden</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether the server is hidden.
+    </span><span class="kw">pub </span>hidden: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Whether the server is a secondary.</span>
-    <span class="kw">pub</span> <span class="ident">secondary</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether the server is a secondary.
+    </span><span class="kw">pub </span>secondary: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Whether the server is an arbiter.</span>
-    <span class="kw">pub</span> <span class="ident">arbiter_only</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;isreplicaset&quot;</span>)]</span>
+    <span class="doccomment">/// Whether the server is an arbiter.
+    </span><span class="kw">pub </span>arbiter_only: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;isreplicaset&quot;</span>)]
 
-    <span class="doccomment">/// Whether the server is a replica set.</span>
-    <span class="kw">pub</span> <span class="ident">is_replica_set</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    </span><span class="doccomment">/// Whether the server is a replica set.
+    </span><span class="kw">pub </span>is_replica_set: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The time in minutes that a session remains active after its most recent use.</span>
-    <span class="kw">pub</span> <span class="ident">logical_session_timeout_minutes</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The time in minutes that a session remains active after its most recent use.
+    </span><span class="kw">pub </span>logical_session_timeout_minutes: <span class="prelude-ty">Option</span>&lt;i64&gt;,
 
-    <span class="doccomment">/// Optime and date information for the server&#39;s most recent write operation.</span>
-    <span class="kw">pub</span> <span class="ident">last_write</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LastWrite</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Optime and date information for the server&#39;s most recent write operation.
+    </span><span class="kw">pub </span>last_write: <span class="prelude-ty">Option</span>&lt;LastWrite&gt;,
 
-    <span class="doccomment">/// The minimum wire version that the server supports.</span>
-    <span class="kw">pub</span> <span class="ident">min_wire_version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The minimum wire version that the server supports.
+    </span><span class="kw">pub </span>min_wire_version: <span class="prelude-ty">Option</span>&lt;i32&gt;,
 
-    <span class="doccomment">/// The maximum wire version that the server supports.</span>
-    <span class="kw">pub</span> <span class="ident">max_wire_version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The maximum wire version that the server supports.
+    </span><span class="kw">pub </span>max_wire_version: <span class="prelude-ty">Option</span>&lt;i32&gt;,
 
-    <span class="doccomment">/// User-defined tags for a replica set member.</span>
-    <span class="kw">pub</span> <span class="ident">tags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TagSet</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// User-defined tags for a replica set member.
+    </span><span class="kw">pub </span>tags: <span class="prelude-ty">Option</span>&lt;TagSet&gt;,
 
-    <span class="doccomment">/// A unique identifier for each election.</span>
-    <span class="kw">pub</span> <span class="ident">election_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A unique identifier for each election.
+    </span><span class="kw">pub </span>election_id: <span class="prelude-ty">Option</span>&lt;ObjectId&gt;,
 
-    <span class="doccomment">/// The address of current primary member of the replica set.</span>
-    <span class="kw">pub</span> <span class="ident">primary</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The address of current primary member of the replica set.
+    </span><span class="kw">pub </span>primary: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// A list of SASL mechanisms used to create the user&#39;s credential(s).</span>
-    <span class="kw">pub</span> <span class="ident">sasl_supported_mechs</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A list of SASL mechanisms used to create the user&#39;s credential(s).
+    </span><span class="kw">pub </span>sasl_supported_mechs: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
-    <span class="doccomment">/// The reply to speculative authentication done in the authentication handshake.</span>
-    <span class="kw">pub</span> <span class="ident">speculative_authenticate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The reply to speculative authentication done in the authentication handshake.
+    </span><span class="kw">pub </span>speculative_authenticate: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 
-    <span class="doccomment">/// The maximum permitted size of a BSON object in bytes.</span>
-    <span class="kw">pub</span> <span class="ident">max_bson_object_size</span>: <span class="ident">i64</span>,
+    <span class="doccomment">/// The maximum permitted size of a BSON object in bytes.
+    </span><span class="kw">pub </span>max_bson_object_size: i64,
 
-    <span class="doccomment">/// The maximum number of write operations permitted in a write batch.</span>
-    <span class="kw">pub</span> <span class="ident">max_write_batch_size</span>: <span class="ident">i64</span>,
+    <span class="doccomment">/// The maximum number of write operations permitted in a write batch.
+    </span><span class="kw">pub </span>max_write_batch_size: i64,
 
-    <span class="doccomment">/// If the connection is to a load balancer, the id of the selected backend.</span>
-    <span class="kw">pub</span> <span class="ident">service_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If the connection is to a load balancer, the id of the selected backend.
+    </span><span class="kw">pub </span>service_id: <span class="prelude-ty">Option</span>&lt;ObjectId&gt;,
 
-    <span class="doccomment">/// For internal use.</span>
-    <span class="kw">pub</span> <span class="ident">topology_version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// For internal use.
+    </span><span class="kw">pub </span>topology_version: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 
-    <span class="doccomment">/// The maximum permitted size of a BSON wire protocol message.</span>
-    <span class="kw">pub</span> <span class="ident">max_message_size_bytes</span>: <span class="ident">i32</span>,
+    <span class="doccomment">/// The maximum permitted size of a BSON wire protocol message.
+    </span><span class="kw">pub </span>max_message_size_bytes: i32,
 
-    <span class="doccomment">/// The server-generated ID for the connection the &quot;hello&quot; command was run on.</span>
-    <span class="doccomment">/// Present on server versions 4.2+.</span>
-    <span class="kw">pub</span> <span class="ident">connection_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server-generated ID for the connection the &quot;hello&quot; command was run on.
+    /// Present on server versions 4.2+.
+    </span><span class="kw">pub </span>connection_id: <span class="prelude-ty">Option</span>&lt;i32&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">HelloCommandResponse</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">server_type</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">server_type</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">min_wire_version</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">min_wire_version</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">max_wire_version</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">max_wire_version</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">me</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">me</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">hosts</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">hosts</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">passives</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">passives</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">arbiters</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">arbiters</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">tags</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">tags</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">set_name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">set_name</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">set_version</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">set_version</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">election_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">election_id</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">primary</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">primary</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">logical_session_timeout_minutes</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">logical_session_timeout_minutes</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">max_bson_object_size</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">max_bson_object_size</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">max_write_batch_size</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">max_write_batch_size</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">service_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">service_id</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">max_message_size_bytes</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">max_message_size_bytes</span>
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>HelloCommandResponse {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.server_type() == other.server_type()
+            &amp;&amp; <span class="self">self</span>.min_wire_version == other.min_wire_version
+            &amp;&amp; <span class="self">self</span>.max_wire_version == other.max_wire_version
+            &amp;&amp; <span class="self">self</span>.me == other.me
+            &amp;&amp; <span class="self">self</span>.hosts == other.hosts
+            &amp;&amp; <span class="self">self</span>.passives == other.passives
+            &amp;&amp; <span class="self">self</span>.arbiters == other.arbiters
+            &amp;&amp; <span class="self">self</span>.tags == other.tags
+            &amp;&amp; <span class="self">self</span>.set_name == other.set_name
+            &amp;&amp; <span class="self">self</span>.set_version == other.set_version
+            &amp;&amp; <span class="self">self</span>.election_id == other.election_id
+            &amp;&amp; <span class="self">self</span>.primary == other.primary
+            &amp;&amp; <span class="self">self</span>.logical_session_timeout_minutes == other.logical_session_timeout_minutes
+            &amp;&amp; <span class="self">self</span>.max_bson_object_size == other.max_bson_object_size
+            &amp;&amp; <span class="self">self</span>.max_write_batch_size == other.max_write_batch_size
+            &amp;&amp; <span class="self">self</span>.service_id == other.service_id
+            &amp;&amp; <span class="self">self</span>.max_message_size_bytes == other.max_message_size_bytes
     }
 }
 
-<span class="kw">impl</span> <span class="ident">HelloCommandResponse</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">server_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ServerType</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">as_deref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;isdbgrid&quot;</span>) {
-            <span class="ident">ServerType::Mongos</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">set_name</span>.<span class="ident">is_some</span>() {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">hidden</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
-                <span class="ident">ServerType::RsOther</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_writable_primary</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_master</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
-                <span class="ident">ServerType::RsPrimary</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">secondary</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
-                <span class="ident">ServerType::RsSecondary</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">arbiter_only</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
-                <span class="ident">ServerType::RsArbiter</span>
-            } <span class="kw">else</span> {
-                <span class="ident">ServerType::RsOther</span>
+<span class="kw">impl </span>HelloCommandResponse {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>server_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ServerType {
+        <span class="kw">if </span><span class="self">self</span>.msg.as_deref() == <span class="prelude-val">Some</span>(<span class="string">&quot;isdbgrid&quot;</span>) {
+            ServerType::Mongos
+        } <span class="kw">else if </span><span class="self">self</span>.set_name.is_some() {
+            <span class="kw">if </span><span class="self">self</span>.hidden == <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
+                ServerType::RsOther
+            } <span class="kw">else if </span><span class="self">self</span>.is_writable_primary == <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) || <span class="self">self</span>.is_master == <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
+                ServerType::RsPrimary
+            } <span class="kw">else if </span><span class="self">self</span>.secondary == <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
+                ServerType::RsSecondary
+            } <span class="kw">else if </span><span class="self">self</span>.arbiter_only == <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
+                ServerType::RsArbiter
+            } <span class="kw">else </span>{
+                ServerType::RsOther
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_replica_set</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
-            <span class="ident">ServerType::RsGhost</span>
-        } <span class="kw">else</span> {
-            <span class="ident">ServerType::Standalone</span>
+        } <span class="kw">else if </span><span class="self">self</span>.is_replica_set == <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
+            ServerType::RsGhost
+        } <span class="kw">else </span>{
+            ServerType::Standalone
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">LastWrite</span> {
-    <span class="kw">pub</span> <span class="ident">last_write_date</span>: <span class="ident">DateTime</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>LastWrite {
+    <span class="kw">pub </span>last_write_date: DateTime,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OpTime</span> {
-    <span class="ident">ts</span>: <span class="ident">Timestamp</span>,
-    <span class="ident">t</span>: <span class="ident">i32</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Deserialize)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OpTime {
+    ts: Timestamp,
+    t: i32,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

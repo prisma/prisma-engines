@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/service/add_origin.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>add_origin.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/service/add_origin.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>add_origin.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -58,63 +58,63 @@
 <span id="56">56</span>
 <span id="57">57</span>
 <span id="58">58</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">futures_core::future::BoxFuture</span>;
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Request</span>, <span class="ident">Uri</span>};
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>futures_core::future::BoxFuture;
+<span class="kw">use </span>http::{Request, Uri};
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>tower_service::Service;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AddOrigin</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">T</span>,
-    <span class="ident">origin</span>: <span class="ident">Uri</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AddOrigin&lt;T&gt; {
+    inner: T,
+    origin: Uri,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AddOrigin</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">T</span>, <span class="ident">origin</span>: <span class="ident">Uri</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">inner</span>, <span class="ident">origin</span> }
+<span class="kw">impl</span>&lt;T&gt; AddOrigin&lt;T&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(inner: T, origin: Uri) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner, origin }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ReqBody</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AddOrigin</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">T::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">T::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, ReqBody&gt; Service&lt;Request&lt;ReqBody&gt;&gt; <span class="kw">for </span>AddOrigin&lt;T&gt;
+<span class="kw">where
+    </span>T: Service&lt;Request&lt;ReqBody&gt;&gt;,
+    T::Future: Send + <span class="lifetime">&#39;static</span>,
+    T::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">T::Response</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Response</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Response = T::Response;
+    <span class="kw">type </span>Error = <span class="kw">crate</span>::Error;
+    <span class="kw">type </span>Future = BoxFuture&lt;<span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Response, <span class="self">Self</span>::Error&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.inner.poll_ready(cx).map_err(Into::into)
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="comment">// Split the request into the head and the body.</span>
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">head</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">into_parts</span>();
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, req: Request&lt;ReqBody&gt;) -&gt; <span class="self">Self</span>::Future {
+        <span class="comment">// Split the request into the head and the body.
+        </span><span class="kw">let </span>(<span class="kw-2">mut </span>head, body) = req.into_parts();
 
-        <span class="comment">// Split the request URI into parts.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span>: <span class="ident">http::uri::Parts</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">uri</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">set_uri</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">origin</span>.<span class="ident">clone</span>().<span class="ident">into_parts</span>();
+        <span class="comment">// Split the request URI into parts.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>uri: http::uri::Parts = head.uri.into();
+        <span class="kw">let </span>set_uri = <span class="self">self</span>.origin.clone().into_parts();
 
-        <span class="kw">if</span> <span class="ident">set_uri</span>.<span class="ident">scheme</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">set_uri</span>.<span class="ident">authority</span>.<span class="ident">is_none</span>() {
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::transport::Error::new_invalid_uri</span>();
-            <span class="kw">return</span> <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Err</span>::<span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Response</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">err</span>.<span class="ident">into</span>()) });
+        <span class="kw">if </span>set_uri.scheme.is_none() || set_uri.authority.is_none() {
+            <span class="kw">let </span>err = <span class="kw">crate</span>::transport::Error::new_invalid_uri();
+            <span class="kw">return </span>Box::pin(<span class="kw">async move </span>{ <span class="prelude-val">Err</span>::&lt;<span class="self">Self</span>::Response, <span class="kw">_</span>&gt;(err.into()) });
         }
 
-        <span class="comment">// Update the URI parts, setting hte scheme and authority</span>
-        <span class="ident">uri</span>.<span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">set_uri</span>.<span class="ident">scheme</span>.<span class="ident">expect</span>(<span class="string">&quot;expected scheme&quot;</span>));
-        <span class="ident">uri</span>.<span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">set_uri</span>.<span class="ident">authority</span>.<span class="ident">expect</span>(<span class="string">&quot;expected authority&quot;</span>));
+        <span class="comment">// Update the URI parts, setting hte scheme and authority
+        </span>uri.scheme = <span class="prelude-val">Some</span>(set_uri.scheme.expect(<span class="string">&quot;expected scheme&quot;</span>));
+        uri.authority = <span class="prelude-val">Some</span>(set_uri.authority.expect(<span class="string">&quot;expected authority&quot;</span>));
 
-        <span class="comment">// Update the the request URI</span>
-        <span class="ident">head</span>.<span class="ident">uri</span> <span class="op">=</span> <span class="ident">http::Uri::from_parts</span>(<span class="ident">uri</span>).<span class="ident">expect</span>(<span class="string">&quot;valid uri&quot;</span>);
+        <span class="comment">// Update the the request URI
+        </span>head.uri = http::Uri::from_parts(uri).expect(<span class="string">&quot;valid uri&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">Request::from_parts</span>(<span class="ident">head</span>, <span class="ident">body</span>);
+        <span class="kw">let </span>request = Request::from_parts(head, body);
 
-        <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">call</span>(<span class="ident">request</span>);
+        <span class="kw">let </span>fut = <span class="self">self</span>.inner.call(request);
 
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">fut</span>.<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Into::into</span>) })
+        Box::pin(<span class="kw">async move </span>{ fut.<span class="kw">await</span>.map_err(Into::into) })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

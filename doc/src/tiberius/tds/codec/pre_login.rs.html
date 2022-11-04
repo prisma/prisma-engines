@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/pre_login.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pre_login.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/pre_login.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pre_login.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -283,290 +283,290 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::guid::reorder_bytes</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">tds</span>, <span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span>, <span class="ident">LittleEndian</span>, <span class="ident">ReadBytesExt</span>, <span class="ident">WriteBytesExt</span>};
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">Cursor</span>, <span class="ident">Read</span>};
-<span class="kw">use</span> <span class="ident">tds::EncryptionLevel</span>;
-<span class="kw">use</span> <span class="ident">uuid::Uuid</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::guid::reorder_bytes;
+<span class="kw">use super</span>::{Decode, Encode};
+<span class="kw">use crate</span>::{tds, Error, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span>byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
+<span class="kw">use </span>bytes::{BufMut, BytesMut};
+<span class="kw">use </span>std::convert::TryFrom;
+<span class="kw">use </span>std::io::{Cursor, Read};
+<span class="kw">use </span>tds::EncryptionLevel;
+<span class="kw">use </span>uuid::Uuid;
 
-<span class="doccomment">/// Client application activity id token used for debugging purposes introduced</span>
-<span class="doccomment">/// in TDS 7.4.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">derive</span>(<span class="ident">PartialEq</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityId</span> {
-    <span class="ident">id</span>: <span class="ident">Uuid</span>,
-    <span class="ident">sequence</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// Client application activity id token used for debugging purposes introduced
+/// in TDS 7.4.
+</span><span class="attribute">#[allow(unused)]
+#[derive(Debug, Clone)]
+#[cfg_attr(test, derive(PartialEq))]
+</span><span class="kw">pub struct </span>ActivityId {
+    id: Uuid,
+    sequence: u32,
 }
 
-<span class="doccomment">/// The prelogin packet used to initialize a connection</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">derive</span>(<span class="ident">PartialEq</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PreloginMessage</span> {
-    <span class="doccomment">/// [BE] token=0x00</span>
-    <span class="doccomment">/// Either the driver version or the version of the SQL server</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">sub_build</span>: <span class="ident">u16</span>,
-    <span class="doccomment">/// token=0x01</span>
-    <span class="kw">pub</span> <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>,
-    <span class="doccomment">/// token=0x02</span>
-    <span class="kw">pub</span> <span class="ident">instance_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// [client] threadid for debugging purposes, token=0x03</span>
-    <span class="kw">pub</span> <span class="ident">thread_id</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// token=0x04</span>
-    <span class="kw">pub</span> <span class="ident">mars</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// token=0x05</span>
-    <span class="kw">pub</span> <span class="ident">activity_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// token=0x06</span>
-    <span class="kw">pub</span> <span class="ident">fed_auth_required</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
+<span class="doccomment">/// The prelogin packet used to initialize a connection
+</span><span class="attribute">#[derive(Debug, Clone)]
+#[cfg_attr(test, derive(PartialEq))]
+</span><span class="kw">pub struct </span>PreloginMessage {
+    <span class="doccomment">/// [BE] token=0x00
+    /// Either the driver version or the version of the SQL server
+    </span><span class="kw">pub </span>version: u32,
+    <span class="kw">pub </span>sub_build: u16,
+    <span class="doccomment">/// token=0x01
+    </span><span class="kw">pub </span>encryption: EncryptionLevel,
+    <span class="doccomment">/// token=0x02
+    </span><span class="kw">pub </span>instance_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// [client] threadid for debugging purposes, token=0x03
+    </span><span class="kw">pub </span>thread_id: u32,
+    <span class="doccomment">/// token=0x04
+    </span><span class="kw">pub </span>mars: bool,
+    <span class="doccomment">/// token=0x05
+    </span><span class="kw">pub </span>activity_id: <span class="prelude-ty">Option</span>&lt;ActivityId&gt;,
+    <span class="doccomment">/// token=0x06
+    </span><span class="kw">pub </span>fed_auth_required: bool,
+    <span class="kw">pub </span>nonce: <span class="prelude-ty">Option</span>&lt;[u8; <span class="number">32</span>]&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PreloginMessage</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">PreloginMessage</span> {
-        <span class="kw">let</span> <span class="ident">driver_version</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::get_driver_version</span>();
-        <span class="ident">PreloginMessage</span> {
-            <span class="ident">version</span>: <span class="ident">driver_version</span> <span class="kw">as</span> <span class="ident">u32</span>,
-            <span class="ident">sub_build</span>: (<span class="ident">driver_version</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u16</span>,
-            <span class="ident">encryption</span>: <span class="ident">EncryptionLevel::NotSupported</span>,
-            <span class="ident">instance_name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">thread_id</span>: <span class="number">0</span>,
-            <span class="ident">mars</span>: <span class="bool-val">false</span>,
-            <span class="ident">activity_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">fed_auth_required</span>: <span class="bool-val">false</span>,
-            <span class="ident">nonce</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>PreloginMessage {
+    <span class="kw">pub fn </span>new() -&gt; PreloginMessage {
+        <span class="kw">let </span>driver_version = <span class="kw">crate</span>::get_driver_version();
+        PreloginMessage {
+            version: driver_version <span class="kw">as </span>u32,
+            sub_build: (driver_version &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u16,
+            encryption: EncryptionLevel::NotSupported,
+            instance_name: <span class="prelude-val">None</span>,
+            thread_id: <span class="number">0</span>,
+            mars: <span class="bool-val">false</span>,
+            activity_id: <span class="prelude-val">None</span>,
+            fed_auth_required: <span class="bool-val">false</span>,
+            nonce: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-    ))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negotiated_encryption</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">expected</span>: <span class="ident">EncryptionLevel</span>) -&gt; <span class="ident">EncryptionLevel</span> {
-        <span class="kw">match</span> (<span class="ident">expected</span>, <span class="self">self</span>.<span class="ident">encryption</span>) {
-            (<span class="ident">EncryptionLevel::NotSupported</span>, <span class="ident">EncryptionLevel::NotSupported</span>) =&gt; {
-                <span class="ident">EncryptionLevel::NotSupported</span>
+    <span class="attribute">#[cfg(any(
+        feature = <span class="string">&quot;rustls&quot;</span>,
+        feature = <span class="string">&quot;native-tls&quot;</span>,
+        feature = <span class="string">&quot;vendored-openssl&quot;
+    </span>))]
+    </span><span class="kw">pub fn </span>negotiated_encryption(<span class="kw-2">&amp;</span><span class="self">self</span>, expected: EncryptionLevel) -&gt; EncryptionLevel {
+        <span class="kw">match </span>(expected, <span class="self">self</span>.encryption) {
+            (EncryptionLevel::NotSupported, EncryptionLevel::NotSupported) =&gt; {
+                EncryptionLevel::NotSupported
             }
-            (<span class="ident">EncryptionLevel::Off</span>, <span class="ident">EncryptionLevel::Off</span>) =&gt; <span class="ident">EncryptionLevel::Off</span>,
-            (<span class="ident">EncryptionLevel::On</span>, <span class="ident">EncryptionLevel::Off</span>)
-            <span class="op">|</span> (<span class="ident">EncryptionLevel::On</span>, <span class="ident">EncryptionLevel::NotSupported</span>) =&gt; {
+            (EncryptionLevel::Off, EncryptionLevel::Off) =&gt; EncryptionLevel::Off,
+            (EncryptionLevel::On, EncryptionLevel::Off)
+            | (EncryptionLevel::On, EncryptionLevel::NotSupported) =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;Server does not allow the requested encryption level.&quot;</span>)
             }
-            (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">EncryptionLevel::On</span>,
+            (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; EncryptionLevel::On,
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-    )))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negotiated_encryption</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">EncryptionLevel</span>) -&gt; <span class="ident">EncryptionLevel</span> {
-        <span class="ident">EncryptionLevel::NotSupported</span>
+    <span class="attribute">#[cfg(not(any(
+        feature = <span class="string">&quot;rustls&quot;</span>,
+        feature = <span class="string">&quot;native-tls&quot;</span>,
+        feature = <span class="string">&quot;vendored-openssl&quot;
+    </span>)))]
+    </span><span class="kw">pub fn </span>negotiated_encryption(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: EncryptionLevel) -&gt; EncryptionLevel {
+        EncryptionLevel::NotSupported
     }
 }
 
-<span class="comment">// prelogin fields</span>
-<span class="comment">// http://msdn.microsoft.com/en-us/library/dd357559.aspx</span>
-<span class="kw">const</span> <span class="ident">PRELOGIN_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0</span>;
-<span class="kw">const</span> <span class="ident">PRELOGIN_ENCRYPTION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="kw">const</span> <span class="ident">PRELOGIN_INSTOPT</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">const</span> <span class="ident">PRELOGIN_THREADID</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">3</span>;
-<span class="kw">const</span> <span class="ident">PRELOGIN_MARS</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">4</span>;
-<span class="kw">const</span> <span class="ident">PRELOGIN_TRACEID</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">5</span>;
-<span class="kw">const</span> <span class="ident">PRELOGIN_FEDAUTHREQUIRED</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">6</span>;
-<span class="kw">const</span> <span class="ident">PRELOGIN_NONCEOPT</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">7</span>;
-<span class="kw">const</span> <span class="ident">PRELOGIN_TERMINATOR</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xff</span>;
+<span class="comment">// prelogin fields
+// http://msdn.microsoft.com/en-us/library/dd357559.aspx
+</span><span class="kw">const </span>PRELOGIN_VERSION: u8 = <span class="number">0</span>;
+<span class="kw">const </span>PRELOGIN_ENCRYPTION: u8 = <span class="number">1</span>;
+<span class="kw">const </span>PRELOGIN_INSTOPT: u8 = <span class="number">2</span>;
+<span class="kw">const </span>PRELOGIN_THREADID: u8 = <span class="number">3</span>;
+<span class="kw">const </span>PRELOGIN_MARS: u8 = <span class="number">4</span>;
+<span class="kw">const </span>PRELOGIN_TRACEID: u8 = <span class="number">5</span>;
+<span class="kw">const </span>PRELOGIN_FEDAUTHREQUIRED: u8 = <span class="number">6</span>;
+<span class="kw">const </span>PRELOGIN_NONCEOPT: u8 = <span class="number">7</span>;
+<span class="kw">const </span>PRELOGIN_TERMINATOR: u8 = <span class="number">0xff</span>;
 
-<span class="kw">impl</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PreloginMessage</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data_cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">Vec::with_capacity</span>(<span class="number">512</span>));
+<span class="kw">impl </span>Encode&lt;BytesMut&gt; <span class="kw">for </span>PreloginMessage {
+    <span class="kw">fn </span>encode(<span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>fields = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>data_cursor = Cursor::new(Vec::with_capacity(<span class="number">512</span>));
 
-        <span class="comment">// version</span>
-        <span class="ident">fields</span>.<span class="ident">push</span>((<span class="ident">PRELOGIN_VERSION</span>, <span class="number">0x04</span> <span class="op">+</span> <span class="number">0x02</span>)); <span class="comment">// version + subbuild</span>
-        <span class="ident">data_cursor</span>.<span class="ident">write_u32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">version</span> <span class="kw">as</span> <span class="ident">u32</span>)<span class="question-mark">?</span>;
-        <span class="ident">data_cursor</span>.<span class="ident">write_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">sub_build</span> <span class="kw">as</span> <span class="ident">u16</span>)<span class="question-mark">?</span>;
+        <span class="comment">// version
+        </span>fields.push((PRELOGIN_VERSION, <span class="number">0x04 </span>+ <span class="number">0x02</span>)); <span class="comment">// version + subbuild
+        </span>data_cursor.write_u32::&lt;BigEndian&gt;(<span class="self">self</span>.version <span class="kw">as </span>u32)<span class="question-mark">?</span>;
+        data_cursor.write_u16::&lt;BigEndian&gt;(<span class="self">self</span>.sub_build <span class="kw">as </span>u16)<span class="question-mark">?</span>;
 
-        <span class="comment">// encryption</span>
-        <span class="ident">fields</span>.<span class="ident">push</span>((<span class="ident">PRELOGIN_ENCRYPTION</span>, <span class="number">0x01</span>)); <span class="comment">// encryption</span>
-        <span class="ident">data_cursor</span>.<span class="ident">write_u8</span>(<span class="self">self</span>.<span class="ident">encryption</span> <span class="kw">as</span> <span class="ident">u8</span>)<span class="question-mark">?</span>;
+        <span class="comment">// encryption
+        </span>fields.push((PRELOGIN_ENCRYPTION, <span class="number">0x01</span>)); <span class="comment">// encryption
+        </span>data_cursor.write_u8(<span class="self">self</span>.encryption <span class="kw">as </span>u8)<span class="question-mark">?</span>;
 
-        <span class="comment">// threadid</span>
-        <span class="ident">fields</span>.<span class="ident">push</span>((<span class="ident">PRELOGIN_THREADID</span>, <span class="number">0x04</span>)); <span class="comment">// thread id</span>
-        <span class="ident">data_cursor</span>.<span class="ident">write_u32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">thread_id</span>)<span class="question-mark">?</span>;
+        <span class="comment">// threadid
+        </span>fields.push((PRELOGIN_THREADID, <span class="number">0x04</span>)); <span class="comment">// thread id
+        </span>data_cursor.write_u32::&lt;BigEndian&gt;(<span class="self">self</span>.thread_id)<span class="question-mark">?</span>;
 
-        <span class="comment">// MARS</span>
-        <span class="ident">fields</span>.<span class="ident">push</span>((<span class="ident">PRELOGIN_MARS</span>, <span class="number">0x01</span>)); <span class="comment">// MARS</span>
-        <span class="ident">data_cursor</span>.<span class="ident">write_u8</span>(<span class="self">self</span>.<span class="ident">mars</span> <span class="kw">as</span> <span class="ident">u8</span>)<span class="question-mark">?</span>;
+        <span class="comment">// MARS
+        </span>fields.push((PRELOGIN_MARS, <span class="number">0x01</span>)); <span class="comment">// MARS
+        </span>data_cursor.write_u8(<span class="self">self</span>.mars <span class="kw">as </span>u8)<span class="question-mark">?</span>;
 
-        <span class="comment">// fed auth</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fed_auth_required</span> {
-            <span class="ident">fields</span>.<span class="ident">push</span>((<span class="ident">PRELOGIN_FEDAUTHREQUIRED</span>, <span class="number">0x01</span>));
-            <span class="ident">data_cursor</span>.<span class="ident">write_u8</span>(<span class="number">0x01</span>)<span class="question-mark">?</span>;
+        <span class="comment">// fed auth
+        </span><span class="kw">if </span><span class="self">self</span>.fed_auth_required {
+            fields.push((PRELOGIN_FEDAUTHREQUIRED, <span class="number">0x01</span>));
+            data_cursor.write_u8(<span class="number">0x01</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="comment">// build the packet-body</span>
-        <span class="comment">// offset = PL_OPTION_TOKEN + PL_OFFSET + PL_OPTION_LENGTH = 5 bytes + the terminator (0xFF)</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data_offset</span> <span class="op">=</span> (<span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">5</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u16</span>;
+        <span class="comment">// build the packet-body
+        // offset = PL_OPTION_TOKEN + PL_OFFSET + PL_OPTION_LENGTH = 5 bytes + the terminator (0xFF)
+        </span><span class="kw">let </span><span class="kw-2">mut </span>data_offset = (fields.len() * <span class="number">5 </span>+ <span class="number">1</span>) <span class="kw">as </span>u16;
 
-        <span class="comment">// write the offset table</span>
-        <span class="kw">for</span> (<span class="ident">token</span>, <span class="ident">length</span>) <span class="kw">in</span> <span class="ident">fields</span> {
-            <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">token</span>);
-            <span class="ident">dst</span>.<span class="ident">put_u16</span>(<span class="ident">data_offset</span>);
-            <span class="ident">dst</span>.<span class="ident">put_u16</span>(<span class="ident">length</span>);
+        <span class="comment">// write the offset table
+        </span><span class="kw">for </span>(token, length) <span class="kw">in </span>fields {
+            dst.put_u8(token);
+            dst.put_u16(data_offset);
+            dst.put_u16(length);
 
-            <span class="ident">data_offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">length</span>;
+            data_offset += length;
         }
 
-        <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">PRELOGIN_TERMINATOR</span>);
-        <span class="ident">dst</span>.<span class="ident">extend</span>(<span class="ident">data_cursor</span>.<span class="ident">into_inner</span>());
+        dst.put_u8(PRELOGIN_TERMINATOR);
+        dst.extend(data_cursor.into_inner());
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Decode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PreloginMessage</span> {
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+<span class="kw">impl </span>Decode&lt;BytesMut&gt; <span class="kw">for </span>PreloginMessage {
+    <span class="kw">fn </span>decode(src: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">src</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">PreloginMessage::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>cursor = Cursor::new(src);
+        <span class="kw">let </span><span class="kw-2">mut </span>ret = PreloginMessage::new();
 
-        <span class="comment">// read all options</span>
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
+        <span class="comment">// read all options
+        </span><span class="kw">loop </span>{
+            <span class="kw">let </span>token = cursor.read_u8()<span class="question-mark">?</span>;
 
-            <span class="comment">// read until terminator</span>
-            <span class="kw">if</span> <span class="ident">token</span> <span class="op">==</span> <span class="number">0xff</span> {
+            <span class="comment">// read until terminator
+            </span><span class="kw">if </span>token == <span class="number">0xff </span>{
                 <span class="kw">break</span>;
             }
 
-            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">old_pos</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">position</span>();
+            <span class="kw">let </span>offset = cursor.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+            <span class="kw">let </span>length = cursor.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+            <span class="kw">let </span>old_pos = cursor.position();
 
-            <span class="ident">cursor</span>.<span class="ident">set_position</span>(<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">u64</span>);
+            cursor.set_position(offset <span class="kw">as </span>u64);
 
-            <span class="comment">// verify whether the server acts in accordance to what we requested</span>
-            <span class="comment">// and if we can handle on what we seemingly agreed to</span>
-            <span class="comment">// TODO: support parsing more</span>
-            <span class="kw">match</span> <span class="ident">token</span> {
-                <span class="comment">// version</span>
-                <span class="ident">PRELOGIN_VERSION</span> =&gt; {
-                    <span class="ident">ret</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                    <span class="ident">ret</span>.<span class="ident">sub_build</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            <span class="comment">// verify whether the server acts in accordance to what we requested
+            // and if we can handle on what we seemingly agreed to
+            // TODO: support parsing more
+            </span><span class="kw">match </span>token {
+                <span class="comment">// version
+                </span>PRELOGIN_VERSION =&gt; {
+                    ret.version = cursor.read_u32::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+                    ret.sub_build = cursor.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
                 }
-                <span class="comment">// encryption</span>
-                <span class="ident">PRELOGIN_ENCRYPTION</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">encrypt</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-                    <span class="ident">ret</span>.<span class="ident">encryption</span> <span class="op">=</span> <span class="ident">tds::EncryptionLevel::try_from</span>(<span class="ident">encrypt</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                        <span class="ident">Error::Protocol</span>(<span class="macro">format!</span>(<span class="string">&quot;invalid encryption value: {}&quot;</span>, <span class="ident">encrypt</span>).<span class="ident">into</span>())
+                <span class="comment">// encryption
+                </span>PRELOGIN_ENCRYPTION =&gt; {
+                    <span class="kw">let </span>encrypt = cursor.read_u8()<span class="question-mark">?</span>;
+                    ret.encryption = tds::EncryptionLevel::try_from(encrypt).map_err(|<span class="kw">_</span>| {
+                        Error::Protocol(<span class="macro">format!</span>(<span class="string">&quot;invalid encryption value: {}&quot;</span>, encrypt).into())
                     })<span class="question-mark">?</span>;
                 }
-                <span class="comment">// instance name</span>
-                <span class="ident">PRELOGIN_INSTOPT</span> =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_byte</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
+                <span class="comment">// instance name
+                </span>PRELOGIN_INSTOPT =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+                    <span class="kw">let </span><span class="kw-2">mut </span>next_byte = cursor.read_u8()<span class="question-mark">?</span>;
 
-                    <span class="kw">while</span> <span class="ident">next_byte</span> <span class="op">!</span><span class="op">=</span> <span class="number">0x00</span> {
-                        <span class="ident">bytes</span>.<span class="ident">push</span>(<span class="ident">next_byte</span>);
-                        <span class="ident">next_byte</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
+                    <span class="kw">while </span>next_byte != <span class="number">0x00 </span>{
+                        bytes.push(next_byte);
+                        next_byte = cursor.read_u8()<span class="question-mark">?</span>;
                     }
 
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">bytes</span>.<span class="ident">is_empty</span>() {
-                        <span class="ident">ret</span>.<span class="ident">instance_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>).<span class="ident">into_owned</span>());
+                    <span class="kw">if </span>!bytes.is_empty() {
+                        ret.instance_name = <span class="prelude-val">Some</span>(String::from_utf8_lossy(<span class="kw-2">&amp;</span>bytes).into_owned());
                     }
                 }
-                <span class="ident">PRELOGIN_THREADID</span> =&gt; {
-                    <span class="ident">ret</span>.<span class="ident">thread_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">length</span> <span class="op">==</span> <span class="number">0</span> {
-                        <span class="number">0</span>
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">length</span> <span class="op">==</span> <span class="number">4</span> {
-                        <span class="ident">cursor</span>.<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
-                    } <span class="kw">else</span> {
+                PRELOGIN_THREADID =&gt; {
+                    ret.thread_id = <span class="kw">if </span>length == <span class="number">0 </span>{
+                        <span class="number">0
+                    </span>} <span class="kw">else if </span>length == <span class="number">4 </span>{
+                        cursor.read_u32::&lt;BigEndian&gt;()<span class="question-mark">?
+                    </span>} <span class="kw">else </span>{
                         <span class="macro">panic!</span>(<span class="string">&quot;should never happen&quot;</span>)
                     }
                 }
-                <span class="comment">// mars</span>
-                <span class="ident">PRELOGIN_MARS</span> =&gt; {
-                    <span class="ident">ret</span>.<span class="ident">mars</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
+                <span class="comment">// mars
+                </span>PRELOGIN_MARS =&gt; {
+                    ret.mars = cursor.read_u8()<span class="question-mark">? </span>!= <span class="number">0</span>;
                 }
-                <span class="comment">// activity id</span>
-                <span class="ident">PRELOGIN_TRACEID</span> =&gt; {
-                    <span class="comment">// Data is a Guid, 16 bytes and ordered the wrong way around</span>
-                    <span class="comment">// than Uuid.</span>
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
+                <span class="comment">// activity id
+                </span>PRELOGIN_TRACEID =&gt; {
+                    <span class="comment">// Data is a Guid, 16 bytes and ordered the wrong way around
+                    // than Uuid.
+                    </span><span class="kw">let </span><span class="kw-2">mut </span>data = [<span class="number">0u8</span>; <span class="number">16</span>];
 
-                    <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>)<span class="question-mark">?</span>;
-                    <span class="ident">reorder_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>);
+                    cursor.read_exact(<span class="kw-2">&amp;mut </span>data)<span class="question-mark">?</span>;
+                    reorder_bytes(<span class="kw-2">&amp;mut </span>data);
 
-                    <span class="ident">ret</span>.<span class="ident">activity_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ActivityId</span> {
-                        <span class="ident">id</span>: <span class="ident">Uuid::from_bytes</span>(<span class="ident">data</span>),
-                        <span class="ident">sequence</span>: <span class="ident">cursor</span>.<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+                    ret.activity_id = <span class="prelude-val">Some</span>(ActivityId {
+                        id: Uuid::from_bytes(data),
+                        sequence: cursor.read_u32::&lt;LittleEndian&gt;()<span class="question-mark">?</span>,
                     });
                 }
-                <span class="comment">// fed auth</span>
-                <span class="ident">PRELOGIN_FEDAUTHREQUIRED</span> =&gt; {
-                    <span class="ident">ret</span>.<span class="ident">fed_auth_required</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
+                <span class="comment">// fed auth
+                </span>PRELOGIN_FEDAUTHREQUIRED =&gt; {
+                    ret.fed_auth_required = cursor.read_u8()<span class="question-mark">? </span>!= <span class="number">0</span>;
                 }
-                <span class="comment">// nonce</span>
-                <span class="ident">PRELOGIN_NONCEOPT</span> =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
+                <span class="comment">// nonce
+                </span>PRELOGIN_NONCEOPT =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>data = [<span class="number">0u8</span>; <span class="number">32</span>];
 
-                    <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">iter_mut</span>() {
-                        <span class="kw-2">*</span><span class="ident">item</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
+                    <span class="kw">for </span>item <span class="kw">in </span>data.iter_mut() {
+                        <span class="kw-2">*</span>item = cursor.read_u8()<span class="question-mark">?</span>;
                     }
 
-                    <span class="ident">ret</span>.<span class="ident">nonce</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>);
+                    ret.nonce = <span class="prelude-val">Some</span>(data);
                 }
-                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unsupported prelogin token: {}&quot;</span>, <span class="ident">token</span>),
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;unsupported prelogin token: {}&quot;</span>, token),
             }
 
-            <span class="ident">cursor</span>.<span class="ident">set_position</span>(<span class="ident">old_pos</span>);
+            cursor.set_position(old_pos);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
+        <span class="prelude-val">Ok</span>(ret)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">prelogin_roundtrip</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-        <span class="kw">let</span> <span class="ident">prelogin</span> <span class="op">=</span> <span class="ident">PreloginMessage::new</span>();
-        <span class="ident">prelogin</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">payload</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;encode should succeed&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>prelogin_roundtrip() {
+        <span class="kw">let </span><span class="kw-2">mut </span>payload = BytesMut::new();
+        <span class="kw">let </span>prelogin = PreloginMessage::new();
+        prelogin
+            .clone()
+            .encode(<span class="kw-2">&amp;mut </span>payload)
+            .expect(<span class="string">&quot;encode should succeed&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">PreloginMessage::decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">payload</span>).<span class="ident">expect</span>(<span class="string">&quot;decode should succeed&quot;</span>);
+        <span class="kw">let </span>decoded = PreloginMessage::decode(<span class="kw-2">&amp;mut </span>payload).expect(<span class="string">&quot;decode should succeed&quot;</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">prelogin</span>, <span class="ident">decoded</span>);
+        <span class="macro">assert_eq!</span>(prelogin, decoded);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">prelogin_with_fedauth_roundtrip</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prelogin</span> <span class="op">=</span> <span class="ident">PreloginMessage::new</span>();
-        <span class="ident">prelogin</span>.<span class="ident">fed_auth_required</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="ident">prelogin</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">payload</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;encode should succeed&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>prelogin_with_fedauth_roundtrip() {
+        <span class="kw">let </span><span class="kw-2">mut </span>payload = BytesMut::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>prelogin = PreloginMessage::new();
+        prelogin.fed_auth_required = <span class="bool-val">true</span>;
+        prelogin
+            .clone()
+            .encode(<span class="kw-2">&amp;mut </span>payload)
+            .expect(<span class="string">&quot;encode should succeed&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">PreloginMessage::decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">payload</span>).<span class="ident">expect</span>(<span class="string">&quot;decode should succeed&quot;</span>);
+        <span class="kw">let </span>decoded = PreloginMessage::decode(<span class="kw-2">&amp;mut </span>payload).expect(<span class="string">&quot;decode should succeed&quot;</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">prelogin</span>, <span class="ident">decoded</span>);
+        <span class="macro">assert_eq!</span>(prelogin, decoded);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

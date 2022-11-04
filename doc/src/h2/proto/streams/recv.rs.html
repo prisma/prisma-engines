@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/proto/streams/recv.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>recv.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../h2/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/proto/streams/recv.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>recv.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../h2/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1095,516 +1095,516 @@
 <span id="1095">1095</span>
 <span id="1096">1096</span>
 <span id="1097">1097</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::UserError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::frame</span>::{<span class="self">self</span>, <span class="ident">PushPromiseHeaderError</span>, <span class="ident">Reason</span>, <span class="ident">DEFAULT_INITIAL_WINDOW_SIZE</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto</span>::{<span class="self">self</span>, <span class="ident">Error</span>};
-<span class="kw">use</span> <span class="ident">std::task::Context</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::codec::UserError;
+<span class="kw">use </span><span class="kw">crate</span>::frame::{<span class="self">self</span>, PushPromiseHeaderError, Reason, DEFAULT_INITIAL_WINDOW_SIZE};
+<span class="kw">use </span><span class="kw">crate</span>::proto::{<span class="self">self</span>, Error};
+<span class="kw">use </span>std::task::Context;
 
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">HeaderMap</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
+<span class="kw">use </span>http::{HeaderMap, Request, Response};
 
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Poll</span>, <span class="ident">Waker</span>};
-<span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::task::{Poll, Waker};
+<span class="kw">use </span>std::time::{Duration, Instant};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Recv</span> {
-    <span class="doccomment">/// Initial window size of remote initiated streams</span>
-    <span class="ident">init_window_sz</span>: <span class="ident">WindowSize</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Recv {
+    <span class="doccomment">/// Initial window size of remote initiated streams
+    </span>init_window_sz: WindowSize,
 
-    <span class="doccomment">/// Connection level flow control governing received data</span>
-    <span class="ident">flow</span>: <span class="ident">FlowControl</span>,
+    <span class="doccomment">/// Connection level flow control governing received data
+    </span>flow: FlowControl,
 
-    <span class="doccomment">/// Amount of connection window capacity currently used by outstanding streams.</span>
-    <span class="ident">in_flight_data</span>: <span class="ident">WindowSize</span>,
+    <span class="doccomment">/// Amount of connection window capacity currently used by outstanding streams.
+    </span>in_flight_data: WindowSize,
 
-    <span class="doccomment">/// The lowest stream ID that is still idle</span>
-    <span class="ident">next_stream_id</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StreamId</span>, <span class="ident">StreamIdOverflow</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The lowest stream ID that is still idle
+    </span>next_stream_id: <span class="prelude-ty">Result</span>&lt;StreamId, StreamIdOverflow&gt;,
 
-    <span class="doccomment">/// The stream ID of the last processed stream</span>
-    <span class="ident">last_processed_id</span>: <span class="ident">StreamId</span>,
+    <span class="doccomment">/// The stream ID of the last processed stream
+    </span>last_processed_id: StreamId,
 
-    <span class="doccomment">/// Any streams with a higher ID are ignored.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This starts as MAX, but is lowered when a GOAWAY is received.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// &gt; After sending a GOAWAY frame, the sender can discard frames for</span>
-    <span class="doccomment">/// &gt; streams initiated by the receiver with identifiers higher than</span>
-    <span class="doccomment">/// &gt; the identified last stream.</span>
-    <span class="ident">max_stream_id</span>: <span class="ident">StreamId</span>,
+    <span class="doccomment">/// Any streams with a higher ID are ignored.
+    ///
+    /// This starts as MAX, but is lowered when a GOAWAY is received.
+    ///
+    /// &gt; After sending a GOAWAY frame, the sender can discard frames for
+    /// &gt; streams initiated by the receiver with identifiers higher than
+    /// &gt; the identified last stream.
+    </span>max_stream_id: StreamId,
 
-    <span class="doccomment">/// Streams that have pending window updates</span>
-    <span class="ident">pending_window_updates</span>: <span class="ident">store::Queue</span><span class="op">&lt;</span><span class="ident">stream::NextWindowUpdate</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Streams that have pending window updates
+    </span>pending_window_updates: store::Queue&lt;stream::NextWindowUpdate&gt;,
 
-    <span class="doccomment">/// New streams to be accepted</span>
-    <span class="ident">pending_accept</span>: <span class="ident">store::Queue</span><span class="op">&lt;</span><span class="ident">stream::NextAccept</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// New streams to be accepted
+    </span>pending_accept: store::Queue&lt;stream::NextAccept&gt;,
 
-    <span class="doccomment">/// Locally reset streams that should be reaped when they expire</span>
-    <span class="ident">pending_reset_expired</span>: <span class="ident">store::Queue</span><span class="op">&lt;</span><span class="ident">stream::NextResetExpire</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Locally reset streams that should be reaped when they expire
+    </span>pending_reset_expired: store::Queue&lt;stream::NextResetExpire&gt;,
 
-    <span class="doccomment">/// How long locally reset streams should ignore received frames</span>
-    <span class="ident">reset_duration</span>: <span class="ident">Duration</span>,
+    <span class="doccomment">/// How long locally reset streams should ignore received frames
+    </span>reset_duration: Duration,
 
-    <span class="doccomment">/// Holds frames that are waiting to be read</span>
-    <span class="ident">buffer</span>: <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Holds frames that are waiting to be read
+    </span>buffer: Buffer&lt;Event&gt;,
 
-    <span class="doccomment">/// Refused StreamId, this represents a frame that must be sent out.</span>
-    <span class="ident">refused</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StreamId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Refused StreamId, this represents a frame that must be sent out.
+    </span>refused: <span class="prelude-ty">Option</span>&lt;StreamId&gt;,
 
-    <span class="doccomment">/// If push promises are allowed to be received.</span>
-    <span class="ident">is_push_enabled</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// If push promises are allowed to be received.
+    </span>is_push_enabled: bool,
 
-    <span class="doccomment">/// If extended connect protocol is enabled.</span>
-    <span class="ident">is_extended_connect_protocol_enabled</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// If extended connect protocol is enabled.
+    </span>is_extended_connect_protocol_enabled: bool,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">Event</span> {
-    <span class="ident">Headers</span>(<span class="ident">peer::PollMessage</span>),
-    <span class="ident">Data</span>(<span class="ident">Bytes</span>),
-    <span class="ident">Trailers</span>(<span class="ident">HeaderMap</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>Event {
+    Headers(peer::PollMessage),
+    Data(Bytes),
+    Trailers(HeaderMap),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">RecvHeaderBlockError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">Oversize</span>(<span class="ident">T</span>),
-    <span class="ident">State</span>(<span class="ident">Error</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>RecvHeaderBlockError&lt;T&gt; {
+    Oversize(T),
+    State(Error),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Open</span> {
-    <span class="ident">PushPromise</span>,
-    <span class="ident">Headers</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Open {
+    PushPromise,
+    Headers,
 }
 
-<span class="kw">impl</span> <span class="ident">Recv</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">peer</span>: <span class="ident">peer::Dyn</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">next_stream_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">peer</span>.<span class="ident">is_server</span>() { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">2</span> };
+<span class="kw">impl </span>Recv {
+    <span class="kw">pub fn </span>new(peer: peer::Dyn, config: <span class="kw-2">&amp;</span>Config) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>next_stream_id = <span class="kw">if </span>peer.is_server() { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">2 </span>};
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flow</span> <span class="op">=</span> <span class="ident">FlowControl::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>flow = FlowControl::new();
 
-        <span class="comment">// connections always have the default window size, regardless of</span>
-        <span class="comment">// settings</span>
-        <span class="ident">flow</span>.<span class="ident">inc_window</span>(<span class="ident">DEFAULT_INITIAL_WINDOW_SIZE</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;invalid initial remote window size&quot;</span>);
-        <span class="ident">flow</span>.<span class="ident">assign_capacity</span>(<span class="ident">DEFAULT_INITIAL_WINDOW_SIZE</span>);
+        <span class="comment">// connections always have the default window size, regardless of
+        // settings
+        </span>flow.inc_window(DEFAULT_INITIAL_WINDOW_SIZE)
+            .expect(<span class="string">&quot;invalid initial remote window size&quot;</span>);
+        flow.assign_capacity(DEFAULT_INITIAL_WINDOW_SIZE);
 
-        <span class="ident">Recv</span> {
-            <span class="ident">init_window_sz</span>: <span class="ident">config</span>.<span class="ident">local_init_window_sz</span>,
-            <span class="ident">flow</span>,
-            <span class="ident">in_flight_data</span>: <span class="number">0</span> <span class="kw">as</span> <span class="ident">WindowSize</span>,
-            <span class="ident">next_stream_id</span>: <span class="prelude-val">Ok</span>(<span class="ident">next_stream_id</span>.<span class="ident">into</span>()),
-            <span class="ident">pending_window_updates</span>: <span class="ident">store::Queue::new</span>(),
-            <span class="ident">last_processed_id</span>: <span class="ident">StreamId::ZERO</span>,
-            <span class="ident">max_stream_id</span>: <span class="ident">StreamId::MAX</span>,
-            <span class="ident">pending_accept</span>: <span class="ident">store::Queue::new</span>(),
-            <span class="ident">pending_reset_expired</span>: <span class="ident">store::Queue::new</span>(),
-            <span class="ident">reset_duration</span>: <span class="ident">config</span>.<span class="ident">local_reset_duration</span>,
-            <span class="ident">buffer</span>: <span class="ident">Buffer::new</span>(),
-            <span class="ident">refused</span>: <span class="prelude-val">None</span>,
-            <span class="ident">is_push_enabled</span>: <span class="ident">config</span>.<span class="ident">local_push_enabled</span>,
-            <span class="ident">is_extended_connect_protocol_enabled</span>: <span class="ident">config</span>.<span class="ident">extended_connect_protocol_enabled</span>,
+        Recv {
+            init_window_sz: config.local_init_window_sz,
+            flow,
+            in_flight_data: <span class="number">0 </span><span class="kw">as </span>WindowSize,
+            next_stream_id: <span class="prelude-val">Ok</span>(next_stream_id.into()),
+            pending_window_updates: store::Queue::new(),
+            last_processed_id: StreamId::ZERO,
+            max_stream_id: StreamId::MAX,
+            pending_accept: store::Queue::new(),
+            pending_reset_expired: store::Queue::new(),
+            reset_duration: config.local_reset_duration,
+            buffer: Buffer::new(),
+            refused: <span class="prelude-val">None</span>,
+            is_push_enabled: config.local_push_enabled,
+            is_extended_connect_protocol_enabled: config.extended_connect_protocol_enabled,
         }
     }
 
-    <span class="doccomment">/// Returns the initial receive window size</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_window_sz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">WindowSize</span> {
-        <span class="self">self</span>.<span class="ident">init_window_sz</span>
+    <span class="doccomment">/// Returns the initial receive window size
+    </span><span class="kw">pub fn </span>init_window_sz(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; WindowSize {
+        <span class="self">self</span>.init_window_sz
     }
 
-    <span class="doccomment">/// Returns the ID of the last processed stream</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_processed_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StreamId</span> {
-        <span class="self">self</span>.<span class="ident">last_processed_id</span>
+    <span class="doccomment">/// Returns the ID of the last processed stream
+    </span><span class="kw">pub fn </span>last_processed_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StreamId {
+        <span class="self">self</span>.last_processed_id
     }
 
-    <span class="doccomment">/// Update state reflecting a new, remotely opened stream</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the stream state if successful. `None` if refused</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">id</span>: <span class="ident">StreamId</span>,
-        <span class="ident">mode</span>: <span class="ident">Open</span>,
-        <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StreamId</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">refused</span>.<span class="ident">is_none</span>());
+    <span class="doccomment">/// Update state reflecting a new, remotely opened stream
+    ///
+    /// Returns the stream state if successful. `None` if refused
+    </span><span class="kw">pub fn </span>open(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        id: StreamId,
+        mode: Open,
+        counts: <span class="kw-2">&amp;mut </span>Counts,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;StreamId&gt;, Error&gt; {
+        <span class="macro">assert!</span>(<span class="self">self</span>.refused.is_none());
 
-        <span class="ident">counts</span>.<span class="ident">peer</span>().<span class="ident">ensure_can_open</span>(<span class="ident">id</span>, <span class="ident">mode</span>)<span class="question-mark">?</span>;
+        counts.peer().ensure_can_open(id, mode)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">next_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_stream_id</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">id</span> <span class="op">&lt;</span> <span class="ident">next_id</span> {
-            <span class="macro">proto_err!</span>(<span class="ident">conn</span>: <span class="string">&quot;id ({:?}) &lt; next_id ({:?})&quot;</span>, <span class="ident">id</span>, <span class="ident">next_id</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>));
+        <span class="kw">let </span>next_id = <span class="self">self</span>.next_stream_id()<span class="question-mark">?</span>;
+        <span class="kw">if </span>id &lt; next_id {
+            <span class="macro">proto_err!</span>(conn: <span class="string">&quot;id ({:?}) &lt; next_id ({:?})&quot;</span>, id, next_id);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_go_away(Reason::PROTOCOL_ERROR));
         }
 
-        <span class="self">self</span>.<span class="ident">next_stream_id</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">next_id</span>();
+        <span class="self">self</span>.next_stream_id = id.next_id();
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">counts</span>.<span class="ident">can_inc_num_recv_streams</span>() {
-            <span class="self">self</span>.<span class="ident">refused</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>);
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+        <span class="kw">if </span>!counts.can_inc_num_recv_streams() {
+            <span class="self">self</span>.refused = <span class="prelude-val">Some</span>(id);
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">id</span>))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(id))
     }
 
-    <span class="doccomment">/// Transition the stream state based on receiving headers</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The caller ensures that the frame represents headers and not trailers.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_headers</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">frame</span>: <span class="ident">frame::Headers</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>,
-        <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">RecvHeaderBlockError</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">frame::Headers</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">tracing::trace!</span>(<span class="string">&quot;opening stream; init_window={}&quot;</span>, <span class="self">self</span>.<span class="ident">init_window_sz</span>);
-        <span class="kw">let</span> <span class="ident">is_initial</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">recv_open</span>(<span class="kw-2">&amp;</span><span class="ident">frame</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Transition the stream state based on receiving headers
+    ///
+    /// The caller ensures that the frame represents headers and not trailers.
+    </span><span class="kw">pub fn </span>recv_headers(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        frame: frame::Headers,
+        stream: <span class="kw-2">&amp;mut </span>store::Ptr,
+        counts: <span class="kw-2">&amp;mut </span>Counts,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), RecvHeaderBlockError&lt;<span class="prelude-ty">Option</span>&lt;frame::Headers&gt;&gt;&gt; {
+        <span class="macro">tracing::trace!</span>(<span class="string">&quot;opening stream; init_window={}&quot;</span>, <span class="self">self</span>.init_window_sz);
+        <span class="kw">let </span>is_initial = stream.state.recv_open(<span class="kw-2">&amp;</span>frame)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">is_initial</span> {
-            <span class="comment">// TODO: be smarter about this logic</span>
-            <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">stream_id</span>() <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">last_processed_id</span> {
-                <span class="self">self</span>.<span class="ident">last_processed_id</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">stream_id</span>();
+        <span class="kw">if </span>is_initial {
+            <span class="comment">// TODO: be smarter about this logic
+            </span><span class="kw">if </span>frame.stream_id() &gt; <span class="self">self</span>.last_processed_id {
+                <span class="self">self</span>.last_processed_id = frame.stream_id();
             }
 
-            <span class="comment">// Increment the number of concurrent streams</span>
-            <span class="ident">counts</span>.<span class="ident">inc_num_recv_streams</span>(<span class="ident">stream</span>);
+            <span class="comment">// Increment the number of concurrent streams
+            </span>counts.inc_num_recv_streams(stream);
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">stream</span>.<span class="ident">content_length</span>.<span class="ident">is_head</span>() {
-            <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::stream::ContentLength</span>;
-            <span class="kw">use</span> <span class="ident">http::header</span>;
+        <span class="kw">if </span>!stream.content_length.is_head() {
+            <span class="kw">use </span><span class="kw">super</span>::stream::ContentLength;
+            <span class="kw">use </span>http::header;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">content_length</span>) <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">fields</span>().<span class="ident">get</span>(<span class="ident">header::CONTENT_LENGTH</span>) {
-                <span class="kw">let</span> <span class="ident">content_length</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">frame::parse_u64</span>(<span class="ident">content_length</span>.<span class="ident">as_bytes</span>()) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(content_length) = frame.fields().get(header::CONTENT_LENGTH) {
+                <span class="kw">let </span>content_length = <span class="kw">match </span>frame::parse_u64(content_length.as_bytes()) {
+                    <span class="prelude-val">Ok</span>(v) =&gt; v,
                     <span class="prelude-val">Err</span>(()) =&gt; {
-                        <span class="macro">proto_err!</span>(<span class="ident">stream</span>: <span class="string">&quot;could not parse content-length; stream={:?}&quot;</span>, <span class="ident">stream</span>.<span class="ident">id</span>);
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_reset</span>(<span class="ident">stream</span>.<span class="ident">id</span>, <span class="ident">Reason::PROTOCOL_ERROR</span>).<span class="ident">into</span>());
+                        <span class="macro">proto_err!</span>(stream: <span class="string">&quot;could not parse content-length; stream={:?}&quot;</span>, stream.id);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_reset(stream.id, Reason::PROTOCOL_ERROR).into());
                     }
                 };
 
-                <span class="ident">stream</span>.<span class="ident">content_length</span> <span class="op">=</span> <span class="ident">ContentLength::Remaining</span>(<span class="ident">content_length</span>);
+                stream.content_length = ContentLength::Remaining(content_length);
             }
         }
 
-        <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">is_over_size</span>() {
-            <span class="comment">// A frame is over size if the decoded header block was bigger than</span>
-            <span class="comment">// SETTINGS_MAX_HEADER_LIST_SIZE.</span>
-            <span class="comment">//</span>
-            <span class="comment">// &gt; A server that receives a larger header block than it is willing</span>
-            <span class="comment">// &gt; to handle can send an HTTP 431 (Request Header Fields Too</span>
-            <span class="comment">// &gt; Large) status code [RFC6585]. A client can discard responses</span>
-            <span class="comment">// &gt; that it cannot process.</span>
-            <span class="comment">//</span>
-            <span class="comment">// So, if peer is a server, we&#39;ll send a 431. In either case,</span>
-            <span class="comment">// an error is recorded, which will send a REFUSED_STREAM,</span>
-            <span class="comment">// since we don&#39;t want any of the data frames either.</span>
-            <span class="macro">tracing::debug!</span>(
+        <span class="kw">if </span>frame.is_over_size() {
+            <span class="comment">// A frame is over size if the decoded header block was bigger than
+            // SETTINGS_MAX_HEADER_LIST_SIZE.
+            //
+            // &gt; A server that receives a larger header block than it is willing
+            // &gt; to handle can send an HTTP 431 (Request Header Fields Too
+            // &gt; Large) status code [RFC6585]. A client can discard responses
+            // &gt; that it cannot process.
+            //
+            // So, if peer is a server, we&#39;ll send a 431. In either case,
+            // an error is recorded, which will send a REFUSED_STREAM,
+            // since we don&#39;t want any of the data frames either.
+            </span><span class="macro">tracing::debug!</span>(
                 <span class="string">&quot;stream error REQUEST_HEADER_FIELDS_TOO_LARGE -- \
                  recv_headers: frame is over size; stream={:?}&quot;</span>,
-                <span class="ident">stream</span>.<span class="ident">id</span>
+                stream.id
             );
-            <span class="kw">return</span> <span class="kw">if</span> <span class="ident">counts</span>.<span class="ident">peer</span>().<span class="ident">is_server</span>() <span class="op">&amp;&amp;</span> <span class="ident">is_initial</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">frame::Headers::new</span>(
-                    <span class="ident">stream</span>.<span class="ident">id</span>,
-                    <span class="ident">frame::Pseudo::response</span>(<span class="ident">::http::StatusCode::REQUEST_HEADER_FIELDS_TOO_LARGE</span>),
-                    <span class="ident">HeaderMap::new</span>(),
+            <span class="kw">return if </span>counts.peer().is_server() &amp;&amp; is_initial {
+                <span class="kw">let </span><span class="kw-2">mut </span>res = frame::Headers::new(
+                    stream.id,
+                    frame::Pseudo::response(::http::StatusCode::REQUEST_HEADER_FIELDS_TOO_LARGE),
+                    HeaderMap::new(),
                 );
-                <span class="ident">res</span>.<span class="ident">set_end_stream</span>();
-                <span class="prelude-val">Err</span>(<span class="ident">RecvHeaderBlockError::Oversize</span>(<span class="prelude-val">Some</span>(<span class="ident">res</span>)))
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">RecvHeaderBlockError::Oversize</span>(<span class="prelude-val">None</span>))
+                res.set_end_stream();
+                <span class="prelude-val">Err</span>(RecvHeaderBlockError::Oversize(<span class="prelude-val">Some</span>(res)))
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Err</span>(RecvHeaderBlockError::Oversize(<span class="prelude-val">None</span>))
             };
         }
 
-        <span class="kw">let</span> <span class="ident">stream_id</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">stream_id</span>();
-        <span class="kw">let</span> (<span class="ident">pseudo</span>, <span class="ident">fields</span>) <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">into_parts</span>();
+        <span class="kw">let </span>stream_id = frame.stream_id();
+        <span class="kw">let </span>(pseudo, fields) = frame.into_parts();
 
-        <span class="kw">if</span> <span class="ident">pseudo</span>.<span class="ident">protocol</span>.<span class="ident">is_some</span>() {
-            <span class="kw">if</span> <span class="ident">counts</span>.<span class="ident">peer</span>().<span class="ident">is_server</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_extended_connect_protocol_enabled</span> {
-                <span class="macro">proto_err!</span>(<span class="ident">stream</span>: <span class="string">&quot;cannot use :protocol if extended connect protocol is disabled; stream={:?}&quot;</span>, <span class="ident">stream</span>.<span class="ident">id</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_reset</span>(<span class="ident">stream</span>.<span class="ident">id</span>, <span class="ident">Reason::PROTOCOL_ERROR</span>).<span class="ident">into</span>());
+        <span class="kw">if </span>pseudo.protocol.is_some() {
+            <span class="kw">if </span>counts.peer().is_server() &amp;&amp; !<span class="self">self</span>.is_extended_connect_protocol_enabled {
+                <span class="macro">proto_err!</span>(stream: <span class="string">&quot;cannot use :protocol if extended connect protocol is disabled; stream={:?}&quot;</span>, stream.id);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_reset(stream.id, Reason::PROTOCOL_ERROR).into());
             }
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">pseudo</span>.<span class="ident">is_informational</span>() {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">counts</span>
-                .<span class="ident">peer</span>()
-                .<span class="ident">convert_poll_message</span>(<span class="ident">pseudo</span>, <span class="ident">fields</span>, <span class="ident">stream_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>!pseudo.is_informational() {
+            <span class="kw">let </span>message = counts
+                .peer()
+                .convert_poll_message(pseudo, fields, stream_id)<span class="question-mark">?</span>;
 
-            <span class="comment">// Push the frame onto the stream&#39;s recv buffer</span>
-            <span class="ident">stream</span>
-                .<span class="ident">pending_recv</span>
-                .<span class="ident">push_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>, <span class="ident">Event::Headers</span>(<span class="ident">message</span>));
-            <span class="ident">stream</span>.<span class="ident">notify_recv</span>();
+            <span class="comment">// Push the frame onto the stream&#39;s recv buffer
+            </span>stream
+                .pending_recv
+                .push_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer, Event::Headers(message));
+            stream.notify_recv();
         }
 
-        <span class="comment">// Only servers can receive a headers frame that initiates the stream.</span>
-        <span class="comment">// This is verified in `Streams` before calling this function.</span>
-        <span class="kw">if</span> <span class="ident">counts</span>.<span class="ident">peer</span>().<span class="ident">is_server</span>() {
-            <span class="self">self</span>.<span class="ident">pending_accept</span>.<span class="ident">push</span>(<span class="ident">stream</span>);
+        <span class="comment">// Only servers can receive a headers frame that initiates the stream.
+        // This is verified in `Streams` before calling this function.
+        </span><span class="kw">if </span>counts.peer().is_server() {
+            <span class="self">self</span>.pending_accept.push(stream);
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Called by the server to get the request</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// TODO: Should this fn return `Result`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_request</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::peer::PollMessage</span>::<span class="kw-2">*</span>;
+    <span class="doccomment">/// Called by the server to get the request
+    ///
+    /// TODO: Should this fn return `Result`?
+    </span><span class="kw">pub fn </span>take_request(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr) -&gt; Request&lt;()&gt; {
+        <span class="kw">use </span><span class="kw">super</span>::peer::PollMessage::<span class="kw-2">*</span>;
 
-        <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">pop_front</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">Event::Headers</span>(<span class="ident">Server</span>(<span class="ident">request</span>))) =&gt; <span class="ident">request</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
+        <span class="kw">match </span>stream.pending_recv.pop_front(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer) {
+            <span class="prelude-val">Some</span>(Event::Headers(Server(request))) =&gt; request,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(),
         }
     }
 
-    <span class="doccomment">/// Called by the client to get pushed response</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_pushed</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Request</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">store::Key</span>), <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::peer::PollMessage</span>::<span class="kw-2">*</span>;
+    <span class="doccomment">/// Called by the client to get pushed response
+    </span><span class="kw">pub fn </span>poll_pushed(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;</span>Context,
+        stream: <span class="kw-2">&amp;mut </span>store::Ptr,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;(Request&lt;()&gt;, store::Key), proto::Error&gt;&gt;&gt; {
+        <span class="kw">use </span><span class="kw">super</span>::peer::PollMessage::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppp</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">pending_push_promises</span>.<span class="ident">take</span>();
-        <span class="kw">let</span> <span class="ident">pushed</span> <span class="op">=</span> <span class="ident">ppp</span>.<span class="ident">pop</span>(<span class="ident">stream</span>.<span class="ident">store_mut</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">pushed</span><span class="op">|</span> {
-            <span class="kw">match</span> <span class="ident">pushed</span>.<span class="ident">pending_recv</span>.<span class="ident">pop_front</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">Event::Headers</span>(<span class="ident">Server</span>(<span class="ident">headers</span>))) =&gt; (<span class="ident">headers</span>, <span class="ident">pushed</span>.<span class="ident">key</span>()),
-                <span class="comment">// When frames are pushed into the queue, it is verified that</span>
-                <span class="comment">// the first frame is a HEADERS frame.</span>
-                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Headers not set on pushed stream&quot;</span>),
+        <span class="kw">let </span><span class="kw-2">mut </span>ppp = stream.pending_push_promises.take();
+        <span class="kw">let </span>pushed = ppp.pop(stream.store_mut()).map(|<span class="kw-2">mut </span>pushed| {
+            <span class="kw">match </span>pushed.pending_recv.pop_front(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer) {
+                <span class="prelude-val">Some</span>(Event::Headers(Server(headers))) =&gt; (headers, pushed.key()),
+                <span class="comment">// When frames are pushed into the queue, it is verified that
+                // the first frame is a HEADERS frame.
+                </span><span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Headers not set on pushed stream&quot;</span>),
             }
         });
-        <span class="ident">stream</span>.<span class="ident">pending_push_promises</span> <span class="op">=</span> <span class="ident">ppp</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="ident">pushed</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">p</span>)))
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">is_open</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">ensure_recv_open</span>()<span class="question-mark">?</span>;
+        stream.pending_push_promises = ppp;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(p) = pushed {
+            Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(p)))
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>is_open = stream.state.ensure_recv_open()<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">is_open</span> {
-                <span class="ident">stream</span>.<span class="ident">recv_task</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">clone</span>());
-                <span class="ident">Poll::Pending</span>
-            } <span class="kw">else</span> {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
+            <span class="kw">if </span>is_open {
+                stream.recv_task = <span class="prelude-val">Some</span>(cx.waker().clone());
+                Poll::Pending
+            } <span class="kw">else </span>{
+                Poll::Ready(<span class="prelude-val">None</span>)
             }
         }
     }
 
-    <span class="doccomment">/// Called by the client to get the response</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_response</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::peer::PollMessage</span>::<span class="kw-2">*</span>;
+    <span class="doccomment">/// Called by the client to get the response
+    </span><span class="kw">pub fn </span>poll_response(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;</span>Context,
+        stream: <span class="kw-2">&amp;mut </span>store::Ptr,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;Response&lt;()&gt;, proto::Error&gt;&gt; {
+        <span class="kw">use </span><span class="kw">super</span>::peer::PollMessage::<span class="kw-2">*</span>;
 
-        <span class="comment">// If the buffer is not empty, then the first frame must be a HEADERS</span>
-        <span class="comment">// frame or the user violated the contract.</span>
-        <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">pop_front</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">Event::Headers</span>(<span class="ident">Client</span>(<span class="ident">response</span>))) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">response</span>)),
+        <span class="comment">// If the buffer is not empty, then the first frame must be a HEADERS
+        // frame or the user violated the contract.
+        </span><span class="kw">match </span>stream.pending_recv.pop_front(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer) {
+            <span class="prelude-val">Some</span>(Event::Headers(Client(response))) =&gt; Poll::Ready(<span class="prelude-val">Ok</span>(response)),
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;poll_response called after response returned&quot;</span>),
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">ensure_recv_open</span>()<span class="question-mark">?</span>;
+            <span class="prelude-val">None </span>=&gt; {
+                stream.state.ensure_recv_open()<span class="question-mark">?</span>;
 
-                <span class="ident">stream</span>.<span class="ident">recv_task</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">clone</span>());
-                <span class="ident">Poll::Pending</span>
+                stream.recv_task = <span class="prelude-val">Some</span>(cx.waker().clone());
+                Poll::Pending
             }
         }
     }
 
-    <span class="doccomment">/// Transition the stream based on receiving trailers</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_trailers</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">frame</span>: <span class="ident">frame::Headers</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// Transition the state</span>
-        <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">recv_close</span>()<span class="question-mark">?</span>;
+    <span class="doccomment">/// Transition the stream based on receiving trailers
+    </span><span class="kw">pub fn </span>recv_trailers(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        frame: frame::Headers,
+        stream: <span class="kw-2">&amp;mut </span>store::Ptr,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="comment">// Transition the state
+        </span>stream.state.recv_close()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">ensure_content_length_zero</span>().<span class="ident">is_err</span>() {
-            <span class="macro">proto_err!</span>(<span class="ident">stream</span>: <span class="string">&quot;recv_trailers: content-length is not zero; stream={:?};&quot;</span>,  <span class="ident">stream</span>.<span class="ident">id</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_reset</span>(<span class="ident">stream</span>.<span class="ident">id</span>, <span class="ident">Reason::PROTOCOL_ERROR</span>));
+        <span class="kw">if </span>stream.ensure_content_length_zero().is_err() {
+            <span class="macro">proto_err!</span>(stream: <span class="string">&quot;recv_trailers: content-length is not zero; stream={:?};&quot;</span>,  stream.id);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_reset(stream.id, Reason::PROTOCOL_ERROR));
         }
 
-        <span class="kw">let</span> <span class="ident">trailers</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">into_fields</span>();
+        <span class="kw">let </span>trailers = frame.into_fields();
 
-        <span class="comment">// Push the frame onto the stream&#39;s recv buffer</span>
-        <span class="ident">stream</span>
-            .<span class="ident">pending_recv</span>
-            .<span class="ident">push_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>, <span class="ident">Event::Trailers</span>(<span class="ident">trailers</span>));
-        <span class="ident">stream</span>.<span class="ident">notify_recv</span>();
+        <span class="comment">// Push the frame onto the stream&#39;s recv buffer
+        </span>stream
+            .pending_recv
+            .push_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer, Event::Trailers(trailers));
+        stream.notify_recv();
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Releases capacity of the connection</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">release_connection_capacity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">capacity</span>: <span class="ident">WindowSize</span>, <span class="ident">task</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>) {
+    <span class="doccomment">/// Releases capacity of the connection
+    </span><span class="kw">pub fn </span>release_connection_capacity(<span class="kw-2">&amp;mut </span><span class="self">self</span>, capacity: WindowSize, task: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Waker&gt;) {
         <span class="macro">tracing::trace!</span>(
             <span class="string">&quot;release_connection_capacity; size={}, connection in_flight_data={}&quot;</span>,
-            <span class="ident">capacity</span>,
-            <span class="self">self</span>.<span class="ident">in_flight_data</span>,
+            capacity,
+            <span class="self">self</span>.in_flight_data,
         );
 
-        <span class="comment">// Decrement in-flight data</span>
-        <span class="self">self</span>.<span class="ident">in_flight_data</span> <span class="op">-</span><span class="op">=</span> <span class="ident">capacity</span>;
+        <span class="comment">// Decrement in-flight data
+        </span><span class="self">self</span>.in_flight_data -= capacity;
 
-        <span class="comment">// Assign capacity to connection</span>
-        <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">assign_capacity</span>(<span class="ident">capacity</span>);
+        <span class="comment">// Assign capacity to connection
+        </span><span class="self">self</span>.flow.assign_capacity(capacity);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">unclaimed_capacity</span>().<span class="ident">is_some</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">task</span>) <span class="op">=</span> <span class="ident">task</span>.<span class="ident">take</span>() {
-                <span class="ident">task</span>.<span class="ident">wake</span>();
+        <span class="kw">if </span><span class="self">self</span>.flow.unclaimed_capacity().is_some() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(task) = task.take() {
+                task.wake();
             }
         }
     }
 
-    <span class="doccomment">/// Releases capacity back to the connection &amp; stream</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">release_capacity</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">capacity</span>: <span class="ident">WindowSize</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>,
-        <span class="ident">task</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
-        <span class="macro">tracing::trace!</span>(<span class="string">&quot;release_capacity; size={}&quot;</span>, <span class="ident">capacity</span>);
+    <span class="doccomment">/// Releases capacity back to the connection &amp; stream
+    </span><span class="kw">pub fn </span>release_capacity(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        capacity: WindowSize,
+        stream: <span class="kw-2">&amp;mut </span>store::Ptr,
+        task: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Waker&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), UserError&gt; {
+        <span class="macro">tracing::trace!</span>(<span class="string">&quot;release_capacity; size={}&quot;</span>, capacity);
 
-        <span class="kw">if</span> <span class="ident">capacity</span> <span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">in_flight_recv_data</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">UserError::ReleaseCapacityTooBig</span>);
+        <span class="kw">if </span>capacity &gt; stream.in_flight_recv_data {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(UserError::ReleaseCapacityTooBig);
         }
 
-        <span class="self">self</span>.<span class="ident">release_connection_capacity</span>(<span class="ident">capacity</span>, <span class="ident">task</span>);
+        <span class="self">self</span>.release_connection_capacity(capacity, task);
 
-        <span class="comment">// Decrement in-flight data</span>
-        <span class="ident">stream</span>.<span class="ident">in_flight_recv_data</span> <span class="op">-</span><span class="op">=</span> <span class="ident">capacity</span>;
+        <span class="comment">// Decrement in-flight data
+        </span>stream.in_flight_recv_data -= capacity;
 
-        <span class="comment">// Assign capacity to stream</span>
-        <span class="ident">stream</span>.<span class="ident">recv_flow</span>.<span class="ident">assign_capacity</span>(<span class="ident">capacity</span>);
+        <span class="comment">// Assign capacity to stream
+        </span>stream.recv_flow.assign_capacity(capacity);
 
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">recv_flow</span>.<span class="ident">unclaimed_capacity</span>().<span class="ident">is_some</span>() {
-            <span class="comment">// Queue the stream for sending the WINDOW_UPDATE frame.</span>
-            <span class="self">self</span>.<span class="ident">pending_window_updates</span>.<span class="ident">push</span>(<span class="ident">stream</span>);
+        <span class="kw">if </span>stream.recv_flow.unclaimed_capacity().is_some() {
+            <span class="comment">// Queue the stream for sending the WINDOW_UPDATE frame.
+            </span><span class="self">self</span>.pending_window_updates.push(stream);
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">task</span>) <span class="op">=</span> <span class="ident">task</span>.<span class="ident">take</span>() {
-                <span class="ident">task</span>.<span class="ident">wake</span>();
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(task) = task.take() {
+                task.wake();
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Release any unclaimed capacity for a closed stream.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">release_closed_capacity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>, <span class="ident">task</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>) {
-        <span class="macro">debug_assert_eq!</span>(<span class="ident">stream</span>.<span class="ident">ref_count</span>, <span class="number">0</span>);
+    <span class="doccomment">/// Release any unclaimed capacity for a closed stream.
+    </span><span class="kw">pub fn </span>release_closed_capacity(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr, task: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Waker&gt;) {
+        <span class="macro">debug_assert_eq!</span>(stream.ref_count, <span class="number">0</span>);
 
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">in_flight_recv_data</span> <span class="op">==</span> <span class="number">0</span> {
+        <span class="kw">if </span>stream.in_flight_recv_data == <span class="number">0 </span>{
             <span class="kw">return</span>;
         }
 
         <span class="macro">tracing::trace!</span>(
             <span class="string">&quot;auto-release closed stream ({:?}) capacity: {:?}&quot;</span>,
-            <span class="ident">stream</span>.<span class="ident">id</span>,
-            <span class="ident">stream</span>.<span class="ident">in_flight_recv_data</span>,
+            stream.id,
+            stream.in_flight_recv_data,
         );
 
-        <span class="self">self</span>.<span class="ident">release_connection_capacity</span>(<span class="ident">stream</span>.<span class="ident">in_flight_recv_data</span>, <span class="ident">task</span>);
-        <span class="ident">stream</span>.<span class="ident">in_flight_recv_data</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="self">self</span>.release_connection_capacity(stream.in_flight_recv_data, task);
+        stream.in_flight_recv_data = <span class="number">0</span>;
 
-        <span class="self">self</span>.<span class="ident">clear_recv_buffer</span>(<span class="ident">stream</span>);
+        <span class="self">self</span>.clear_recv_buffer(stream);
     }
 
-    <span class="doccomment">/// Set the &quot;target&quot; connection window size.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, all new connections start with 64kb of window size. As</span>
-    <span class="doccomment">/// streams used and release capacity, we will send WINDOW_UPDATEs for the</span>
-    <span class="doccomment">/// connection to bring it back up to the initial &quot;target&quot;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting a target means that we will try to tell the peer about</span>
-    <span class="doccomment">/// WINDOW_UPDATEs so the peer knows it has about `target` window to use</span>
-    <span class="doccomment">/// for the whole connection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `task` is an optional parked task for the `Connection` that might</span>
-    <span class="doccomment">/// be blocked on needing more window capacity.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_target_connection_window</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">WindowSize</span>, <span class="ident">task</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>) {
+    <span class="doccomment">/// Set the &quot;target&quot; connection window size.
+    ///
+    /// By default, all new connections start with 64kb of window size. As
+    /// streams used and release capacity, we will send WINDOW_UPDATEs for the
+    /// connection to bring it back up to the initial &quot;target&quot;.
+    ///
+    /// Setting a target means that we will try to tell the peer about
+    /// WINDOW_UPDATEs so the peer knows it has about `target` window to use
+    /// for the whole connection.
+    ///
+    /// The `task` is an optional parked task for the `Connection` that might
+    /// be blocked on needing more window capacity.
+    </span><span class="kw">pub fn </span>set_target_connection_window(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: WindowSize, task: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Waker&gt;) {
         <span class="macro">tracing::trace!</span>(
             <span class="string">&quot;set_target_connection_window; target={}; available={}, reserved={}&quot;</span>,
-            <span class="ident">target</span>,
-            <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">available</span>(),
-            <span class="self">self</span>.<span class="ident">in_flight_data</span>,
+            target,
+            <span class="self">self</span>.flow.available(),
+            <span class="self">self</span>.in_flight_data,
         );
 
-        <span class="comment">// The current target connection window is our `available` plus any</span>
-        <span class="comment">// in-flight data reserved by streams.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Update the flow controller with the difference between the new</span>
-        <span class="comment">// target and the current target.</span>
-        <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">available</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">in_flight_data</span>).<span class="ident">checked_size</span>();
-        <span class="kw">if</span> <span class="ident">target</span> <span class="op">&gt;</span> <span class="ident">current</span> {
-            <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">assign_capacity</span>(<span class="ident">target</span> <span class="op">-</span> <span class="ident">current</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">claim_capacity</span>(<span class="ident">current</span> <span class="op">-</span> <span class="ident">target</span>);
+        <span class="comment">// The current target connection window is our `available` plus any
+        // in-flight data reserved by streams.
+        //
+        // Update the flow controller with the difference between the new
+        // target and the current target.
+        </span><span class="kw">let </span>current = (<span class="self">self</span>.flow.available() + <span class="self">self</span>.in_flight_data).checked_size();
+        <span class="kw">if </span>target &gt; current {
+            <span class="self">self</span>.flow.assign_capacity(target - current);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.flow.claim_capacity(current - target);
         }
 
-        <span class="comment">// If changing the target capacity means we gained a bunch of capacity,</span>
-        <span class="comment">// enough that we went over the update threshold, then schedule sending</span>
-        <span class="comment">// a connection WINDOW_UPDATE.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">unclaimed_capacity</span>().<span class="ident">is_some</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">task</span>) <span class="op">=</span> <span class="ident">task</span>.<span class="ident">take</span>() {
-                <span class="ident">task</span>.<span class="ident">wake</span>();
+        <span class="comment">// If changing the target capacity means we gained a bunch of capacity,
+        // enough that we went over the update threshold, then schedule sending
+        // a connection WINDOW_UPDATE.
+        </span><span class="kw">if </span><span class="self">self</span>.flow.unclaimed_capacity().is_some() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(task) = task.take() {
+                task.wake();
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">apply_local_settings</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">settings</span>: <span class="kw-2">&amp;</span><span class="ident">frame::Settings</span>,
-        <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">proto::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">settings</span>.<span class="ident">is_extended_connect_protocol_enabled</span>() {
-            <span class="self">self</span>.<span class="ident">is_extended_connect_protocol_enabled</span> <span class="op">=</span> <span class="ident">val</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>apply_local_settings(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        settings: <span class="kw-2">&amp;</span>frame::Settings,
+        store: <span class="kw-2">&amp;mut </span>Store,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), proto::Error&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = settings.is_extended_connect_protocol_enabled() {
+            <span class="self">self</span>.is_extended_connect_protocol_enabled = val;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">target</span>) <span class="op">=</span> <span class="ident">settings</span>.<span class="ident">initial_window_size</span>() {
-            <span class="kw">let</span> <span class="ident">old_sz</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">init_window_sz</span>;
-            <span class="self">self</span>.<span class="ident">init_window_sz</span> <span class="op">=</span> <span class="ident">target</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(target) = settings.initial_window_size() {
+            <span class="kw">let </span>old_sz = <span class="self">self</span>.init_window_sz;
+            <span class="self">self</span>.init_window_sz = target;
 
-            <span class="macro">tracing::trace!</span>(<span class="string">&quot;update_initial_window_size; new={}; old={}&quot;</span>, <span class="ident">target</span>, <span class="ident">old_sz</span>,);
+            <span class="macro">tracing::trace!</span>(<span class="string">&quot;update_initial_window_size; new={}; old={}&quot;</span>, target, old_sz,);
 
-            <span class="comment">// Per RFC 7540 §6.9.2:</span>
-            <span class="comment">//</span>
-            <span class="comment">// In addition to changing the flow-control window for streams that are</span>
-            <span class="comment">// not yet active, a SETTINGS frame can alter the initial flow-control</span>
-            <span class="comment">// window size for streams with active flow-control windows (that is,</span>
-            <span class="comment">// streams in the &quot;open&quot; or &quot;half-closed (remote)&quot; state). When the</span>
-            <span class="comment">// value of SETTINGS_INITIAL_WINDOW_SIZE changes, a receiver MUST adjust</span>
-            <span class="comment">// the size of all stream flow-control windows that it maintains by the</span>
-            <span class="comment">// difference between the new value and the old value.</span>
-            <span class="comment">//</span>
-            <span class="comment">// A change to `SETTINGS_INITIAL_WINDOW_SIZE` can cause the available</span>
-            <span class="comment">// space in a flow-control window to become negative. A sender MUST</span>
-            <span class="comment">// track the negative flow-control window and MUST NOT send new</span>
-            <span class="comment">// flow-controlled frames until it receives WINDOW_UPDATE frames that</span>
-            <span class="comment">// cause the flow-control window to become positive.</span>
+            <span class="comment">// Per RFC 7540 §6.9.2:
+            //
+            // In addition to changing the flow-control window for streams that are
+            // not yet active, a SETTINGS frame can alter the initial flow-control
+            // window size for streams with active flow-control windows (that is,
+            // streams in the &quot;open&quot; or &quot;half-closed (remote)&quot; state). When the
+            // value of SETTINGS_INITIAL_WINDOW_SIZE changes, a receiver MUST adjust
+            // the size of all stream flow-control windows that it maintains by the
+            // difference between the new value and the old value.
+            //
+            // A change to `SETTINGS_INITIAL_WINDOW_SIZE` can cause the available
+            // space in a flow-control window to become negative. A sender MUST
+            // track the negative flow-control window and MUST NOT send new
+            // flow-controlled frames until it receives WINDOW_UPDATE frames that
+            // cause the flow-control window to become positive.
 
-            <span class="kw">if</span> <span class="ident">target</span> <span class="op">&lt;</span> <span class="ident">old_sz</span> {
-                <span class="comment">// We must decrease the (local) window on every open stream.</span>
-                <span class="kw">let</span> <span class="ident">dec</span> <span class="op">=</span> <span class="ident">old_sz</span> <span class="op">-</span> <span class="ident">target</span>;
-                <span class="macro">tracing::trace!</span>(<span class="string">&quot;decrementing all windows; dec={}&quot;</span>, <span class="ident">dec</span>);
+            </span><span class="kw">if </span>target &lt; old_sz {
+                <span class="comment">// We must decrease the (local) window on every open stream.
+                </span><span class="kw">let </span>dec = old_sz - target;
+                <span class="macro">tracing::trace!</span>(<span class="string">&quot;decrementing all windows; dec={}&quot;</span>, dec);
 
-                <span class="ident">store</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">stream</span><span class="op">|</span> {
-                    <span class="ident">stream</span>.<span class="ident">recv_flow</span>.<span class="ident">dec_recv_window</span>(<span class="ident">dec</span>);
+                store.for_each(|<span class="kw-2">mut </span>stream| {
+                    stream.recv_flow.dec_recv_window(dec);
                 })
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">target</span> <span class="op">&gt;</span> <span class="ident">old_sz</span> {
-                <span class="comment">// We must increase the (local) window on every open stream.</span>
-                <span class="kw">let</span> <span class="ident">inc</span> <span class="op">=</span> <span class="ident">target</span> <span class="op">-</span> <span class="ident">old_sz</span>;
-                <span class="macro">tracing::trace!</span>(<span class="string">&quot;incrementing all windows; inc={}&quot;</span>, <span class="ident">inc</span>);
-                <span class="ident">store</span>.<span class="ident">try_for_each</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">stream</span><span class="op">|</span> {
-                    <span class="comment">// XXX: Shouldn&#39;t the peer have already noticed our</span>
-                    <span class="comment">// overflow and sent us a GOAWAY?</span>
-                    <span class="ident">stream</span>
-                        .<span class="ident">recv_flow</span>
-                        .<span class="ident">inc_window</span>(<span class="ident">inc</span>)
-                        .<span class="ident">map_err</span>(<span class="ident">proto::Error::library_go_away</span>)<span class="question-mark">?</span>;
-                    <span class="ident">stream</span>.<span class="ident">recv_flow</span>.<span class="ident">assign_capacity</span>(<span class="ident">inc</span>);
-                    <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span>(())
+            } <span class="kw">else if </span>target &gt; old_sz {
+                <span class="comment">// We must increase the (local) window on every open stream.
+                </span><span class="kw">let </span>inc = target - old_sz;
+                <span class="macro">tracing::trace!</span>(<span class="string">&quot;incrementing all windows; inc={}&quot;</span>, inc);
+                store.try_for_each(|<span class="kw-2">mut </span>stream| {
+                    <span class="comment">// XXX: Shouldn&#39;t the peer have already noticed our
+                    // overflow and sent us a GOAWAY?
+                    </span>stream
+                        .recv_flow
+                        .inc_window(inc)
+                        .map_err(proto::Error::library_go_away)<span class="question-mark">?</span>;
+                    stream.recv_flow.assign_capacity(inc);
+                    <span class="prelude-val">Ok</span>::&lt;<span class="kw">_</span>, proto::Error&gt;(())
                 })<span class="question-mark">?</span>;
             }
         }
@@ -1612,585 +1612,585 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">store::Ptr</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_recv_closed</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="kw">pub fn </span>is_end_stream(<span class="kw-2">&amp;</span><span class="self">self</span>, stream: <span class="kw-2">&amp;</span>store::Ptr) -&gt; bool {
+        <span class="kw">if </span>!stream.state.is_recv_closed() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">is_empty</span>()
+        stream.pending_recv.is_empty()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">frame</span>: <span class="ident">frame::Data</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">len</span>();
+    <span class="kw">pub fn </span>recv_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, frame: frame::Data, stream: <span class="kw-2">&amp;mut </span>store::Ptr) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>sz = frame.payload().len();
 
-        <span class="comment">// This should have been enforced at the codec::FramedRead layer, so</span>
-        <span class="comment">// this is just a sanity check.</span>
-        <span class="macro">assert!</span>(<span class="ident">sz</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_WINDOW_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="comment">// This should have been enforced at the codec::FramedRead layer, so
+        // this is just a sanity check.
+        </span><span class="macro">assert!</span>(sz &lt;= MAX_WINDOW_SIZE <span class="kw">as </span>usize);
 
-        <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">sz</span> <span class="kw">as</span> <span class="ident">WindowSize</span>;
+        <span class="kw">let </span>sz = sz <span class="kw">as </span>WindowSize;
 
-        <span class="kw">let</span> <span class="ident">is_ignoring_frame</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_local_reset</span>();
+        <span class="kw">let </span>is_ignoring_frame = stream.state.is_local_reset();
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">is_ignoring_frame</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_recv_streaming</span>() {
-            <span class="comment">// TODO: There are cases where this can be a stream error of</span>
-            <span class="comment">// STREAM_CLOSED instead...</span>
+        <span class="kw">if </span>!is_ignoring_frame &amp;&amp; !stream.state.is_recv_streaming() {
+            <span class="comment">// TODO: There are cases where this can be a stream error of
+            // STREAM_CLOSED instead...
 
-            <span class="comment">// Receiving a DATA frame when not expecting one is a protocol</span>
-            <span class="comment">// error.</span>
-            <span class="macro">proto_err!</span>(<span class="ident">conn</span>: <span class="string">&quot;unexpected DATA frame; stream={:?}&quot;</span>, <span class="ident">stream</span>.<span class="ident">id</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>));
+            // Receiving a DATA frame when not expecting one is a protocol
+            // error.
+            </span><span class="macro">proto_err!</span>(conn: <span class="string">&quot;unexpected DATA frame; stream={:?}&quot;</span>, stream.id);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_go_away(Reason::PROTOCOL_ERROR));
         }
 
         <span class="macro">tracing::trace!</span>(
             <span class="string">&quot;recv_data; size={}; connection={}; stream={}&quot;</span>,
-            <span class="ident">sz</span>,
-            <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">window_size</span>(),
-            <span class="ident">stream</span>.<span class="ident">recv_flow</span>.<span class="ident">window_size</span>()
+            sz,
+            <span class="self">self</span>.flow.window_size(),
+            stream.recv_flow.window_size()
         );
 
-        <span class="kw">if</span> <span class="ident">is_ignoring_frame</span> {
+        <span class="kw">if </span>is_ignoring_frame {
             <span class="macro">tracing::trace!</span>(
                 <span class="string">&quot;recv_data; frame ignored on locally reset {:?} for some time&quot;</span>,
-                <span class="ident">stream</span>.<span class="ident">id</span>,
+                stream.id,
             );
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">ignore_data</span>(<span class="ident">sz</span>)<span class="question-mark">?</span>);
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">self</span>.ignore_data(sz)<span class="question-mark">?</span>);
         }
 
-        <span class="comment">// Ensure that there is enough capacity on the connection before acting</span>
-        <span class="comment">// on the stream.</span>
-        <span class="self">self</span>.<span class="ident">consume_connection_window</span>(<span class="ident">sz</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Ensure that there is enough capacity on the connection before acting
+        // on the stream.
+        </span><span class="self">self</span>.consume_connection_window(sz)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">recv_flow</span>.<span class="ident">window_size</span>() <span class="op">&lt;</span> <span class="ident">sz</span> {
-            <span class="comment">// http://httpwg.org/specs/rfc7540.html#WINDOW_UPDATE</span>
-            <span class="comment">// &gt; A receiver MAY respond with a stream error (Section 5.4.2) or</span>
-            <span class="comment">// &gt; connection error (Section 5.4.1) of type FLOW_CONTROL_ERROR if</span>
-            <span class="comment">// &gt; it is unable to accept a frame.</span>
-            <span class="comment">//</span>
-            <span class="comment">// So, for violating the **stream** window, we can send either a</span>
-            <span class="comment">// stream or connection error. We&#39;ve opted to send a stream</span>
-            <span class="comment">// error.</span>
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_reset</span>(<span class="ident">stream</span>.<span class="ident">id</span>, <span class="ident">Reason::FLOW_CONTROL_ERROR</span>));
+        <span class="kw">if </span>stream.recv_flow.window_size() &lt; sz {
+            <span class="comment">// http://httpwg.org/specs/rfc7540.html#WINDOW_UPDATE
+            // &gt; A receiver MAY respond with a stream error (Section 5.4.2) or
+            // &gt; connection error (Section 5.4.1) of type FLOW_CONTROL_ERROR if
+            // &gt; it is unable to accept a frame.
+            //
+            // So, for violating the **stream** window, we can send either a
+            // stream or connection error. We&#39;ve opted to send a stream
+            // error.
+            </span><span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_reset(stream.id, Reason::FLOW_CONTROL_ERROR));
         }
 
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">dec_content_length</span>(<span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">len</span>()).<span class="ident">is_err</span>() {
-            <span class="macro">proto_err!</span>(<span class="ident">stream</span>:
+        <span class="kw">if </span>stream.dec_content_length(frame.payload().len()).is_err() {
+            <span class="macro">proto_err!</span>(stream:
                 <span class="string">&quot;recv_data: content-length overflow; stream={:?}; len={:?}&quot;</span>,
-                <span class="ident">stream</span>.<span class="ident">id</span>,
-                <span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">len</span>(),
+                stream.id,
+                frame.payload().len(),
             );
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_reset</span>(<span class="ident">stream</span>.<span class="ident">id</span>, <span class="ident">Reason::PROTOCOL_ERROR</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_reset(stream.id, Reason::PROTOCOL_ERROR));
         }
 
-        <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">is_end_stream</span>() {
-            <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">ensure_content_length_zero</span>().<span class="ident">is_err</span>() {
-                <span class="macro">proto_err!</span>(<span class="ident">stream</span>:
+        <span class="kw">if </span>frame.is_end_stream() {
+            <span class="kw">if </span>stream.ensure_content_length_zero().is_err() {
+                <span class="macro">proto_err!</span>(stream:
                     <span class="string">&quot;recv_data: content-length underflow; stream={:?}; len={:?}&quot;</span>,
-                    <span class="ident">stream</span>.<span class="ident">id</span>,
-                    <span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">len</span>(),
+                    stream.id,
+                    frame.payload().len(),
                 );
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_reset</span>(<span class="ident">stream</span>.<span class="ident">id</span>, <span class="ident">Reason::PROTOCOL_ERROR</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_reset(stream.id, Reason::PROTOCOL_ERROR));
             }
 
-            <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">recv_close</span>().<span class="ident">is_err</span>() {
-                <span class="macro">proto_err!</span>(<span class="ident">conn</span>: <span class="string">&quot;recv_data: failed to transition to closed state; stream={:?}&quot;</span>, <span class="ident">stream</span>.<span class="ident">id</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>).<span class="ident">into</span>());
+            <span class="kw">if </span>stream.state.recv_close().is_err() {
+                <span class="macro">proto_err!</span>(conn: <span class="string">&quot;recv_data: failed to transition to closed state; stream={:?}&quot;</span>, stream.id);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_go_away(Reason::PROTOCOL_ERROR).into());
             }
         }
 
-        <span class="comment">// Update stream level flow control</span>
-        <span class="ident">stream</span>.<span class="ident">recv_flow</span>.<span class="ident">send_data</span>(<span class="ident">sz</span>);
+        <span class="comment">// Update stream level flow control
+        </span>stream.recv_flow.send_data(sz);
 
-        <span class="comment">// Track the data as in-flight</span>
-        <span class="ident">stream</span>.<span class="ident">in_flight_recv_data</span> <span class="op">+</span><span class="op">=</span> <span class="ident">sz</span>;
+        <span class="comment">// Track the data as in-flight
+        </span>stream.in_flight_recv_data += sz;
 
-        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">Event::Data</span>(<span class="ident">frame</span>.<span class="ident">into_payload</span>());
+        <span class="kw">let </span>event = Event::Data(frame.into_payload());
 
-        <span class="comment">// Push the frame onto the recv buffer</span>
-        <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">push_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>, <span class="ident">event</span>);
-        <span class="ident">stream</span>.<span class="ident">notify_recv</span>();
+        <span class="comment">// Push the frame onto the recv buffer
+        </span>stream.pending_recv.push_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer, event);
+        stream.notify_recv();
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="ident">WindowSize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// Ensure that there is enough capacity on the connection...</span>
-        <span class="self">self</span>.<span class="ident">consume_connection_window</span>(<span class="ident">sz</span>)<span class="question-mark">?</span>;
+    <span class="kw">pub fn </span>ignore_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sz: WindowSize) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="comment">// Ensure that there is enough capacity on the connection...
+        </span><span class="self">self</span>.consume_connection_window(sz)<span class="question-mark">?</span>;
 
-        <span class="comment">// Since we are ignoring this frame,</span>
-        <span class="comment">// we aren&#39;t returning the frame to the user. That means they</span>
-        <span class="comment">// have no way to release the capacity back to the connection. So</span>
-        <span class="comment">// we have to release it automatically.</span>
-        <span class="comment">//</span>
-        <span class="comment">// This call doesn&#39;t send a WINDOW_UPDATE immediately, just marks</span>
-        <span class="comment">// the capacity as available to be reclaimed. When the available</span>
-        <span class="comment">// capacity meets a threshold, a WINDOW_UPDATE is then sent.</span>
-        <span class="self">self</span>.<span class="ident">release_connection_capacity</span>(<span class="ident">sz</span>, <span class="kw-2">&amp;mut</span> <span class="prelude-val">None</span>);
+        <span class="comment">// Since we are ignoring this frame,
+        // we aren&#39;t returning the frame to the user. That means they
+        // have no way to release the capacity back to the connection. So
+        // we have to release it automatically.
+        //
+        // This call doesn&#39;t send a WINDOW_UPDATE immediately, just marks
+        // the capacity as available to be reclaimed. When the available
+        // capacity meets a threshold, a WINDOW_UPDATE is then sent.
+        </span><span class="self">self</span>.release_connection_capacity(sz, <span class="kw-2">&amp;mut </span><span class="prelude-val">None</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_connection_window</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="ident">WindowSize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">window_size</span>() <span class="op">&lt;</span> <span class="ident">sz</span> {
+    <span class="kw">pub fn </span>consume_connection_window(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sz: WindowSize) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.flow.window_size() &lt; sz {
             <span class="macro">tracing::debug!</span>(
                 <span class="string">&quot;connection error FLOW_CONTROL_ERROR -- window_size ({:?}) &lt; sz ({:?});&quot;</span>,
-                <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">window_size</span>(),
-                <span class="ident">sz</span>,
+                <span class="self">self</span>.flow.window_size(),
+                sz,
             );
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::FLOW_CONTROL_ERROR</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_go_away(Reason::FLOW_CONTROL_ERROR));
         }
 
-        <span class="comment">// Update connection level flow control</span>
-        <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">send_data</span>(<span class="ident">sz</span>);
+        <span class="comment">// Update connection level flow control
+        </span><span class="self">self</span>.flow.send_data(sz);
 
-        <span class="comment">// Track the data as in-flight</span>
-        <span class="self">self</span>.<span class="ident">in_flight_data</span> <span class="op">+</span><span class="op">=</span> <span class="ident">sz</span>;
+        <span class="comment">// Track the data as in-flight
+        </span><span class="self">self</span>.in_flight_data += sz;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_push_promise</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">frame</span>: <span class="ident">frame::PushPromise</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">reserve_remote</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">is_over_size</span>() {
-            <span class="comment">// A frame is over size if the decoded header block was bigger than</span>
-            <span class="comment">// SETTINGS_MAX_HEADER_LIST_SIZE.</span>
-            <span class="comment">//</span>
-            <span class="comment">// &gt; A server that receives a larger header block than it is willing</span>
-            <span class="comment">// &gt; to handle can send an HTTP 431 (Request Header Fields Too</span>
-            <span class="comment">// &gt; Large) status code [RFC6585]. A client can discard responses</span>
-            <span class="comment">// &gt; that it cannot process.</span>
-            <span class="comment">//</span>
-            <span class="comment">// So, if peer is a server, we&#39;ll send a 431. In either case,</span>
-            <span class="comment">// an error is recorded, which will send a REFUSED_STREAM,</span>
-            <span class="comment">// since we don&#39;t want any of the data frames either.</span>
-            <span class="macro">tracing::debug!</span>(
+    <span class="kw">pub fn </span>recv_push_promise(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        frame: frame::PushPromise,
+        stream: <span class="kw-2">&amp;mut </span>store::Ptr,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        stream.state.reserve_remote()<span class="question-mark">?</span>;
+        <span class="kw">if </span>frame.is_over_size() {
+            <span class="comment">// A frame is over size if the decoded header block was bigger than
+            // SETTINGS_MAX_HEADER_LIST_SIZE.
+            //
+            // &gt; A server that receives a larger header block than it is willing
+            // &gt; to handle can send an HTTP 431 (Request Header Fields Too
+            // &gt; Large) status code [RFC6585]. A client can discard responses
+            // &gt; that it cannot process.
+            //
+            // So, if peer is a server, we&#39;ll send a 431. In either case,
+            // an error is recorded, which will send a REFUSED_STREAM,
+            // since we don&#39;t want any of the data frames either.
+            </span><span class="macro">tracing::debug!</span>(
                 <span class="string">&quot;stream error REFUSED_STREAM -- recv_push_promise: \
                  headers frame is over size; promised_id={:?};&quot;</span>,
-                <span class="ident">frame</span>.<span class="ident">promised_id</span>(),
+                frame.promised_id(),
             );
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_reset</span>(
-                <span class="ident">frame</span>.<span class="ident">promised_id</span>(),
-                <span class="ident">Reason::REFUSED_STREAM</span>,
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_reset(
+                frame.promised_id(),
+                Reason::REFUSED_STREAM,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">promised_id</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">promised_id</span>();
-        <span class="kw">let</span> (<span class="ident">pseudo</span>, <span class="ident">fields</span>) <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">into_parts</span>();
-        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::server::Peer::convert_poll_message</span>(<span class="ident">pseudo</span>, <span class="ident">fields</span>, <span class="ident">promised_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>promised_id = frame.promised_id();
+        <span class="kw">let </span>(pseudo, fields) = frame.into_parts();
+        <span class="kw">let </span>req = <span class="kw">crate</span>::server::Peer::convert_poll_message(pseudo, fields, promised_id)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">frame::PushPromise::validate_request</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>) {
-            <span class="kw">use</span> <span class="ident">PushPromiseHeaderError</span>::<span class="kw-2">*</span>;
-            <span class="kw">match</span> <span class="ident">e</span> {
-                <span class="ident">NotSafeAndCacheable</span> =&gt; <span class="macro">proto_err!</span>(
-                    <span class="ident">stream</span>:
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = frame::PushPromise::validate_request(<span class="kw-2">&amp;</span>req) {
+            <span class="kw">use </span>PushPromiseHeaderError::<span class="kw-2">*</span>;
+            <span class="kw">match </span>e {
+                NotSafeAndCacheable =&gt; <span class="macro">proto_err!</span>(
+                    stream:
                     <span class="string">&quot;recv_push_promise: method {} is not safe and cacheable; promised_id={:?}&quot;</span>,
-                    <span class="ident">req</span>.<span class="ident">method</span>(),
-                    <span class="ident">promised_id</span>,
+                    req.method(),
+                    promised_id,
                 ),
-                <span class="ident">InvalidContentLength</span>(<span class="ident">e</span>) =&gt; <span class="macro">proto_err!</span>(
-                    <span class="ident">stream</span>:
+                InvalidContentLength(e) =&gt; <span class="macro">proto_err!</span>(
+                    stream:
                     <span class="string">&quot;recv_push_promise; promised request has invalid content-length {:?}; promised_id={:?}&quot;</span>,
-                    <span class="ident">e</span>,
-                    <span class="ident">promised_id</span>,
+                    e,
+                    promised_id,
                 ),
             }
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_reset</span>(<span class="ident">promised_id</span>, <span class="ident">Reason::PROTOCOL_ERROR</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_reset(promised_id, Reason::PROTOCOL_ERROR));
         }
 
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::peer::PollMessage</span>::<span class="kw-2">*</span>;
-        <span class="ident">stream</span>
-            .<span class="ident">pending_recv</span>
-            .<span class="ident">push_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>, <span class="ident">Event::Headers</span>(<span class="ident">Server</span>(<span class="ident">req</span>)));
-        <span class="ident">stream</span>.<span class="ident">notify_recv</span>();
+        <span class="kw">use </span><span class="kw">super</span>::peer::PollMessage::<span class="kw-2">*</span>;
+        stream
+            .pending_recv
+            .push_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer, Event::Headers(Server(req)));
+        stream.notify_recv();
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Ensures that `id` is not in the `Idle` state.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_not_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StreamId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Reason</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">next</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_stream_id</span> {
-            <span class="kw">if</span> <span class="ident">id</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">next</span> {
+    <span class="doccomment">/// Ensures that `id` is not in the `Idle` state.
+    </span><span class="kw">pub fn </span>ensure_not_idle(<span class="kw-2">&amp;</span><span class="self">self</span>, id: StreamId) -&gt; <span class="prelude-ty">Result</span>&lt;(), Reason&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(next) = <span class="self">self</span>.next_stream_id {
+            <span class="kw">if </span>id &gt;= next {
                 <span class="macro">tracing::debug!</span>(
                     <span class="string">&quot;stream ID implicitly closed, PROTOCOL_ERROR; stream={:?}&quot;</span>,
-                    <span class="ident">id</span>
+                    id
                 );
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Reason::PROTOCOL_ERROR);
             }
         }
-        <span class="comment">// if next_stream_id is overflowed, that&#39;s ok.</span>
+        <span class="comment">// if next_stream_id is overflowed, that&#39;s ok.
+
+        </span><span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Handle remote sending an explicit RST_STREAM.
+    </span><span class="kw">pub fn </span>recv_reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, frame: frame::Reset, stream: <span class="kw-2">&amp;mut </span>Stream) {
+        <span class="comment">// Notify the stream
+        </span>stream.state.recv_reset(frame, stream.is_pending_send);
+
+        stream.notify_send();
+        stream.notify_recv();
+    }
+
+    <span class="doccomment">/// Handle a connection-level error
+    </span><span class="kw">pub fn </span>handle_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, err: <span class="kw-2">&amp;</span>proto::Error, stream: <span class="kw-2">&amp;mut </span>Stream) {
+        <span class="comment">// Receive an error
+        </span>stream.state.handle_error(err);
+
+        <span class="comment">// If a receiver is waiting, notify it
+        </span>stream.notify_send();
+        stream.notify_recv();
+    }
+
+    <span class="kw">pub fn </span>go_away(<span class="kw-2">&amp;mut </span><span class="self">self</span>, last_processed_id: StreamId) {
+        <span class="macro">assert!</span>(<span class="self">self</span>.max_stream_id &gt;= last_processed_id);
+        <span class="self">self</span>.max_stream_id = last_processed_id;
+    }
+
+    <span class="kw">pub fn </span>recv_eof(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>Stream) {
+        stream.state.recv_eof();
+        stream.notify_send();
+        stream.notify_recv();
+    }
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>clear_recv_buffer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>Stream) {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw">_</span>) = stream.pending_recv.pop_front(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer) {
+            <span class="comment">// drop it
+        </span>}
+    }
+
+    <span class="doccomment">/// Get the max ID of streams we can receive.
+    ///
+    /// This gets lowered if we send a GOAWAY frame.
+    </span><span class="kw">pub fn </span>max_stream_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StreamId {
+        <span class="self">self</span>.max_stream_id
+    }
+
+    <span class="kw">pub fn </span>next_stream_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;StreamId, Error&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(id) = <span class="self">self</span>.next_stream_id {
+            <span class="prelude-val">Ok</span>(id)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(Error::library_go_away(Reason::PROTOCOL_ERROR))
+        }
+    }
+
+    <span class="kw">pub fn </span>may_have_created_stream(<span class="kw-2">&amp;</span><span class="self">self</span>, id: StreamId) -&gt; bool {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(next_id) = <span class="self">self</span>.next_stream_id {
+            <span class="comment">// Peer::is_local_init should have been called beforehand
+            </span><span class="macro">debug_assert_eq!</span>(id.is_server_initiated(), next_id.is_server_initiated(),);
+            id &lt; next_id
+        } <span class="kw">else </span>{
+            <span class="bool-val">true
+        </span>}
+    }
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>maybe_reset_next_stream_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: StreamId) {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(next_id) = <span class="self">self</span>.next_stream_id {
+            <span class="comment">// !Peer::is_local_init should have been called beforehand
+            </span><span class="macro">debug_assert_eq!</span>(id.is_server_initiated(), next_id.is_server_initiated());
+            <span class="kw">if </span>id &gt;= next_id {
+                <span class="self">self</span>.next_stream_id = id.next_id();
+            }
+        }
+    }
+
+    <span class="doccomment">/// Returns true if the remote peer can reserve a stream with the given ID.
+    </span><span class="kw">pub fn </span>ensure_can_reserve(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.is_push_enabled {
+            <span class="macro">proto_err!</span>(conn: <span class="string">&quot;recv_push_promise: push is disabled&quot;</span>);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_go_away(Reason::PROTOCOL_ERROR));
+        }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Handle remote sending an explicit RST_STREAM.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">frame</span>: <span class="ident">frame::Reset</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span>) {
-        <span class="comment">// Notify the stream</span>
-        <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">recv_reset</span>(<span class="ident">frame</span>, <span class="ident">stream</span>.<span class="ident">is_pending_send</span>);
-
-        <span class="ident">stream</span>.<span class="ident">notify_send</span>();
-        <span class="ident">stream</span>.<span class="ident">notify_recv</span>();
-    }
-
-    <span class="doccomment">/// Handle a connection-level error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">proto::Error</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span>) {
-        <span class="comment">// Receive an error</span>
-        <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">handle_error</span>(<span class="ident">err</span>);
-
-        <span class="comment">// If a receiver is waiting, notify it</span>
-        <span class="ident">stream</span>.<span class="ident">notify_send</span>();
-        <span class="ident">stream</span>.<span class="ident">notify_recv</span>();
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">go_away</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">last_processed_id</span>: <span class="ident">StreamId</span>) {
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">max_stream_id</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">last_processed_id</span>);
-        <span class="self">self</span>.<span class="ident">max_stream_id</span> <span class="op">=</span> <span class="ident">last_processed_id</span>;
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_eof</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span>) {
-        <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">recv_eof</span>();
-        <span class="ident">stream</span>.<span class="ident">notify_send</span>();
-        <span class="ident">stream</span>.<span class="ident">notify_recv</span>();
-    }
-
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">clear_recv_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span>) {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">pop_front</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>) {
-            <span class="comment">// drop it</span>
-        }
-    }
-
-    <span class="doccomment">/// Get the max ID of streams we can receive.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This gets lowered if we send a GOAWAY frame.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_stream_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StreamId</span> {
-        <span class="self">self</span>.<span class="ident">max_stream_id</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_stream_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StreamId</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_stream_id</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">id</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>))
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">may_have_created_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StreamId</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">next_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_stream_id</span> {
-            <span class="comment">// Peer::is_local_init should have been called beforehand</span>
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">id</span>.<span class="ident">is_server_initiated</span>(), <span class="ident">next_id</span>.<span class="ident">is_server_initiated</span>(),);
-            <span class="ident">id</span> <span class="op">&lt;</span> <span class="ident">next_id</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">true</span>
-        }
-    }
-
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">maybe_reset_next_stream_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StreamId</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">next_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_stream_id</span> {
-            <span class="comment">// !Peer::is_local_init should have been called beforehand</span>
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">id</span>.<span class="ident">is_server_initiated</span>(), <span class="ident">next_id</span>.<span class="ident">is_server_initiated</span>());
-            <span class="kw">if</span> <span class="ident">id</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">next_id</span> {
-                <span class="self">self</span>.<span class="ident">next_stream_id</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">next_id</span>();
-            }
-        }
-    }
-
-    <span class="doccomment">/// Returns true if the remote peer can reserve a stream with the given ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_can_reserve</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_push_enabled</span> {
-            <span class="macro">proto_err!</span>(<span class="ident">conn</span>: <span class="string">&quot;recv_push_promise: push is disabled&quot;</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>));
-        }
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Add a locally reset stream to queue to be eventually reaped.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enqueue_reset_expiration</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_local_reset</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">stream</span>.<span class="ident">is_pending_reset_expiration</span>() {
+    <span class="doccomment">/// Add a locally reset stream to queue to be eventually reaped.
+    </span><span class="kw">pub fn </span>enqueue_reset_expiration(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr, counts: <span class="kw-2">&amp;mut </span>Counts) {
+        <span class="kw">if </span>!stream.state.is_local_reset() || stream.is_pending_reset_expiration() {
             <span class="kw">return</span>;
         }
 
-        <span class="macro">tracing::trace!</span>(<span class="string">&quot;enqueue_reset_expiration; {:?}&quot;</span>, <span class="ident">stream</span>.<span class="ident">id</span>);
+        <span class="macro">tracing::trace!</span>(<span class="string">&quot;enqueue_reset_expiration; {:?}&quot;</span>, stream.id);
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">counts</span>.<span class="ident">can_inc_num_reset_streams</span>() {
-            <span class="comment">// try to evict 1 stream if possible</span>
-            <span class="comment">// if max allow is 0, this won&#39;t be able to evict,</span>
-            <span class="comment">// and then we&#39;ll just bail after</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">evicted</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_reset_expired</span>.<span class="ident">pop</span>(<span class="ident">stream</span>.<span class="ident">store_mut</span>()) {
-                <span class="ident">counts</span>.<span class="ident">transition_after</span>(<span class="ident">evicted</span>, <span class="bool-val">true</span>);
+        <span class="kw">if </span>!counts.can_inc_num_reset_streams() {
+            <span class="comment">// try to evict 1 stream if possible
+            // if max allow is 0, this won&#39;t be able to evict,
+            // and then we&#39;ll just bail after
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(evicted) = <span class="self">self</span>.pending_reset_expired.pop(stream.store_mut()) {
+                counts.transition_after(evicted, <span class="bool-val">true</span>);
             }
         }
 
-        <span class="kw">if</span> <span class="ident">counts</span>.<span class="ident">can_inc_num_reset_streams</span>() {
-            <span class="ident">counts</span>.<span class="ident">inc_num_reset_streams</span>();
-            <span class="self">self</span>.<span class="ident">pending_reset_expired</span>.<span class="ident">push</span>(<span class="ident">stream</span>);
+        <span class="kw">if </span>counts.can_inc_num_reset_streams() {
+            counts.inc_num_reset_streams();
+            <span class="self">self</span>.pending_reset_expired.push(stream);
         }
     }
 
-    <span class="doccomment">/// Send any pending refusals.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_pending_refusal</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="doccomment">/// Send any pending refusals.
+    </span><span class="kw">pub fn </span>send_pending_refusal&lt;T, B&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+        dst: <span class="kw-2">&amp;mut </span>Codec&lt;T, Prioritized&lt;B&gt;&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt;
+    <span class="kw">where
+        </span>T: AsyncWrite + Unpin,
+        B: Buf,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">refused</span> {
-            <span class="macro">ready!</span>(<span class="ident">dst</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(stream_id) = <span class="self">self</span>.refused {
+            <span class="macro">ready!</span>(dst.poll_ready(cx))<span class="question-mark">?</span>;
 
-            <span class="comment">// Create the RST_STREAM frame</span>
-            <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">frame::Reset::new</span>(<span class="ident">stream_id</span>, <span class="ident">Reason::REFUSED_STREAM</span>);
+            <span class="comment">// Create the RST_STREAM frame
+            </span><span class="kw">let </span>frame = frame::Reset::new(stream_id, Reason::REFUSED_STREAM);
 
-            <span class="comment">// Buffer the frame</span>
-            <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">frame</span>.<span class="ident">into</span>()).<span class="ident">expect</span>(<span class="string">&quot;invalid RST_STREAM frame&quot;</span>);
+            <span class="comment">// Buffer the frame
+            </span>dst.buffer(frame.into()).expect(<span class="string">&quot;invalid RST_STREAM frame&quot;</span>);
         }
 
-        <span class="self">self</span>.<span class="ident">refused</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="self">self</span>.refused = <span class="prelude-val">None</span>;
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_expired_reset_streams</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pending_reset_expired</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-            <span class="kw">let</span> <span class="ident">reset_duration</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">reset_duration</span>;
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_reset_expired</span>.<span class="ident">pop_if</span>(<span class="ident">store</span>, <span class="op">|</span><span class="ident">stream</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">reset_at</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">reset_at</span>.<span class="ident">expect</span>(<span class="string">&quot;reset_at must be set if in queue&quot;</span>);
-                <span class="comment">// rust-lang/rust#86470 tracks a bug in the standard library where `Instant`</span>
-                <span class="comment">// subtraction can panic (because, on some platforms, `Instant` isn&#39;t actually</span>
-                <span class="comment">// monotonic). We use a saturating operation to avoid this panic here.</span>
-                <span class="ident">now</span>.<span class="ident">saturating_duration_since</span>(<span class="ident">reset_at</span>) <span class="op">&gt;</span> <span class="ident">reset_duration</span>
+    <span class="kw">pub fn </span>clear_expired_reset_streams(<span class="kw-2">&amp;mut </span><span class="self">self</span>, store: <span class="kw-2">&amp;mut </span>Store, counts: <span class="kw-2">&amp;mut </span>Counts) {
+        <span class="kw">if </span>!<span class="self">self</span>.pending_reset_expired.is_empty() {
+            <span class="kw">let </span>now = Instant::now();
+            <span class="kw">let </span>reset_duration = <span class="self">self</span>.reset_duration;
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(stream) = <span class="self">self</span>.pending_reset_expired.pop_if(store, |stream| {
+                <span class="kw">let </span>reset_at = stream.reset_at.expect(<span class="string">&quot;reset_at must be set if in queue&quot;</span>);
+                <span class="comment">// rust-lang/rust#86470 tracks a bug in the standard library where `Instant`
+                // subtraction can panic (because, on some platforms, `Instant` isn&#39;t actually
+                // monotonic). We use a saturating operation to avoid this panic here.
+                </span>now.saturating_duration_since(reset_at) &gt; reset_duration
             }) {
-                <span class="ident">counts</span>.<span class="ident">transition_after</span>(<span class="ident">stream</span>, <span class="bool-val">true</span>);
+                counts.transition_after(stream, <span class="bool-val">true</span>);
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_queues</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">clear_pending_accept</span>: <span class="ident">bool</span>,
-        <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>,
-        <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>,
+    <span class="kw">pub fn </span>clear_queues(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        clear_pending_accept: bool,
+        store: <span class="kw-2">&amp;mut </span>Store,
+        counts: <span class="kw-2">&amp;mut </span>Counts,
     ) {
-        <span class="self">self</span>.<span class="ident">clear_stream_window_update_queue</span>(<span class="ident">store</span>, <span class="ident">counts</span>);
-        <span class="self">self</span>.<span class="ident">clear_all_reset_streams</span>(<span class="ident">store</span>, <span class="ident">counts</span>);
+        <span class="self">self</span>.clear_stream_window_update_queue(store, counts);
+        <span class="self">self</span>.clear_all_reset_streams(store, counts);
 
-        <span class="kw">if</span> <span class="ident">clear_pending_accept</span> {
-            <span class="self">self</span>.<span class="ident">clear_all_pending_accept</span>(<span class="ident">store</span>, <span class="ident">counts</span>);
+        <span class="kw">if </span>clear_pending_accept {
+            <span class="self">self</span>.clear_all_pending_accept(store, counts);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">clear_stream_window_update_queue</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_window_updates</span>.<span class="ident">pop</span>(<span class="ident">store</span>) {
-            <span class="ident">counts</span>.<span class="ident">transition</span>(<span class="ident">stream</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">stream</span><span class="op">|</span> {
-                <span class="macro">tracing::trace!</span>(<span class="string">&quot;clear_stream_window_update_queue; stream={:?}&quot;</span>, <span class="ident">stream</span>.<span class="ident">id</span>);
+    <span class="kw">fn </span>clear_stream_window_update_queue(<span class="kw-2">&amp;mut </span><span class="self">self</span>, store: <span class="kw-2">&amp;mut </span>Store, counts: <span class="kw-2">&amp;mut </span>Counts) {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(stream) = <span class="self">self</span>.pending_window_updates.pop(store) {
+            counts.transition(stream, |<span class="kw">_</span>, stream| {
+                <span class="macro">tracing::trace!</span>(<span class="string">&quot;clear_stream_window_update_queue; stream={:?}&quot;</span>, stream.id);
             })
         }
     }
 
-    <span class="doccomment">/// Called on EOF</span>
-    <span class="kw">fn</span> <span class="ident">clear_all_reset_streams</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_reset_expired</span>.<span class="ident">pop</span>(<span class="ident">store</span>) {
-            <span class="ident">counts</span>.<span class="ident">transition_after</span>(<span class="ident">stream</span>, <span class="bool-val">true</span>);
+    <span class="doccomment">/// Called on EOF
+    </span><span class="kw">fn </span>clear_all_reset_streams(<span class="kw-2">&amp;mut </span><span class="self">self</span>, store: <span class="kw-2">&amp;mut </span>Store, counts: <span class="kw-2">&amp;mut </span>Counts) {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(stream) = <span class="self">self</span>.pending_reset_expired.pop(store) {
+            counts.transition_after(stream, <span class="bool-val">true</span>);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">clear_all_pending_accept</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_accept</span>.<span class="ident">pop</span>(<span class="ident">store</span>) {
-            <span class="ident">counts</span>.<span class="ident">transition_after</span>(<span class="ident">stream</span>, <span class="bool-val">false</span>);
+    <span class="kw">fn </span>clear_all_pending_accept(<span class="kw-2">&amp;mut </span><span class="self">self</span>, store: <span class="kw-2">&amp;mut </span>Store, counts: <span class="kw-2">&amp;mut </span>Counts) {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(stream) = <span class="self">self</span>.pending_accept.pop(store) {
+            counts.transition_after(stream, <span class="bool-val">false</span>);
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_complete</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-        <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>,
-        <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="kw">pub fn </span>poll_complete&lt;T, B&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+        store: <span class="kw-2">&amp;mut </span>Store,
+        counts: <span class="kw-2">&amp;mut </span>Counts,
+        dst: <span class="kw-2">&amp;mut </span>Codec&lt;T, Prioritized&lt;B&gt;&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt;
+    <span class="kw">where
+        </span>T: AsyncWrite + Unpin,
+        B: Buf,
     {
-        <span class="comment">// Send any pending connection level window updates</span>
-        <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">send_connection_window_update</span>(<span class="ident">cx</span>, <span class="ident">dst</span>))<span class="question-mark">?</span>;
+        <span class="comment">// Send any pending connection level window updates
+        </span><span class="macro">ready!</span>(<span class="self">self</span>.send_connection_window_update(cx, dst))<span class="question-mark">?</span>;
 
-        <span class="comment">// Send any pending stream level window updates</span>
-        <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">send_stream_window_updates</span>(<span class="ident">cx</span>, <span class="ident">store</span>, <span class="ident">counts</span>, <span class="ident">dst</span>))<span class="question-mark">?</span>;
+        <span class="comment">// Send any pending stream level window updates
+        </span><span class="macro">ready!</span>(<span class="self">self</span>.send_stream_window_updates(cx, store, counts, dst))<span class="question-mark">?</span>;
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="doccomment">/// Send connection level window update</span>
-    <span class="kw">fn</span> <span class="ident">send_connection_window_update</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="doccomment">/// Send connection level window update
+    </span><span class="kw">fn </span>send_connection_window_update&lt;T, B&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+        dst: <span class="kw-2">&amp;mut </span>Codec&lt;T, Prioritized&lt;B&gt;&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt;
+    <span class="kw">where
+        </span>T: AsyncWrite + Unpin,
+        B: Buf,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">incr</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">unclaimed_capacity</span>() {
-            <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">frame::WindowUpdate::new</span>(<span class="ident">StreamId::zero</span>(), <span class="ident">incr</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(incr) = <span class="self">self</span>.flow.unclaimed_capacity() {
+            <span class="kw">let </span>frame = frame::WindowUpdate::new(StreamId::zero(), incr);
 
-            <span class="comment">// Ensure the codec has capacity</span>
-            <span class="macro">ready!</span>(<span class="ident">dst</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
+            <span class="comment">// Ensure the codec has capacity
+            </span><span class="macro">ready!</span>(dst.poll_ready(cx))<span class="question-mark">?</span>;
 
-            <span class="comment">// Buffer the WINDOW_UPDATE frame</span>
-            <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">frame</span>.<span class="ident">into</span>())
-                .<span class="ident">expect</span>(<span class="string">&quot;invalid WINDOW_UPDATE frame&quot;</span>);
+            <span class="comment">// Buffer the WINDOW_UPDATE frame
+            </span>dst.buffer(frame.into())
+                .expect(<span class="string">&quot;invalid WINDOW_UPDATE frame&quot;</span>);
 
-            <span class="comment">// Update flow control</span>
-            <span class="self">self</span>.<span class="ident">flow</span>
-                .<span class="ident">inc_window</span>(<span class="ident">incr</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;unexpected flow control state&quot;</span>);
+            <span class="comment">// Update flow control
+            </span><span class="self">self</span>.flow
+                .inc_window(incr)
+                .expect(<span class="string">&quot;unexpected flow control state&quot;</span>);
         }
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="doccomment">/// Send stream level window update</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_stream_window_updates</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-        <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>,
-        <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="doccomment">/// Send stream level window update
+    </span><span class="kw">pub fn </span>send_stream_window_updates&lt;T, B&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+        store: <span class="kw-2">&amp;mut </span>Store,
+        counts: <span class="kw-2">&amp;mut </span>Counts,
+        dst: <span class="kw-2">&amp;mut </span>Codec&lt;T, Prioritized&lt;B&gt;&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt;
+    <span class="kw">where
+        </span>T: AsyncWrite + Unpin,
+        B: Buf,
     {
-        <span class="kw">loop</span> {
-            <span class="comment">// Ensure the codec has capacity</span>
-            <span class="macro">ready!</span>(<span class="ident">dst</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
+        <span class="kw">loop </span>{
+            <span class="comment">// Ensure the codec has capacity
+            </span><span class="macro">ready!</span>(dst.poll_ready(cx))<span class="question-mark">?</span>;
 
-            <span class="comment">// Get the next stream</span>
-            <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">pending_window_updates</span>.<span class="ident">pop</span>(<span class="ident">store</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">stream</span>) =&gt; <span class="ident">stream</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
+            <span class="comment">// Get the next stream
+            </span><span class="kw">let </span>stream = <span class="kw">match </span><span class="self">self</span>.pending_window_updates.pop(store) {
+                <span class="prelude-val">Some</span>(stream) =&gt; stream,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(())),
             };
 
-            <span class="ident">counts</span>.<span class="ident">transition</span>(<span class="ident">stream</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">stream</span><span class="op">|</span> {
-                <span class="macro">tracing::trace!</span>(<span class="string">&quot;pending_window_updates -- pop; stream={:?}&quot;</span>, <span class="ident">stream</span>.<span class="ident">id</span>);
-                <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">stream</span>.<span class="ident">is_pending_window_update</span>);
+            counts.transition(stream, |<span class="kw">_</span>, stream| {
+                <span class="macro">tracing::trace!</span>(<span class="string">&quot;pending_window_updates -- pop; stream={:?}&quot;</span>, stream.id);
+                <span class="macro">debug_assert!</span>(!stream.is_pending_window_update);
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_recv_streaming</span>() {
-                    <span class="comment">// No need to send window updates on the stream if the stream is</span>
-                    <span class="comment">// no longer receiving data.</span>
-                    <span class="comment">//</span>
-                    <span class="comment">// TODO: is this correct? We could possibly send a window</span>
-                    <span class="comment">// update on a ReservedRemote stream if we already know</span>
-                    <span class="comment">// we want to stream the data faster...</span>
-                    <span class="kw">return</span>;
+                <span class="kw">if </span>!stream.state.is_recv_streaming() {
+                    <span class="comment">// No need to send window updates on the stream if the stream is
+                    // no longer receiving data.
+                    //
+                    // TODO: is this correct? We could possibly send a window
+                    // update on a ReservedRemote stream if we already know
+                    // we want to stream the data faster...
+                    </span><span class="kw">return</span>;
                 }
 
-                <span class="comment">// TODO: de-dup</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">incr</span>) <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">recv_flow</span>.<span class="ident">unclaimed_capacity</span>() {
-                    <span class="comment">// Create the WINDOW_UPDATE frame</span>
-                    <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">frame::WindowUpdate::new</span>(<span class="ident">stream</span>.<span class="ident">id</span>, <span class="ident">incr</span>);
+                <span class="comment">// TODO: de-dup
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(incr) = stream.recv_flow.unclaimed_capacity() {
+                    <span class="comment">// Create the WINDOW_UPDATE frame
+                    </span><span class="kw">let </span>frame = frame::WindowUpdate::new(stream.id, incr);
 
-                    <span class="comment">// Buffer it</span>
-                    <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">frame</span>.<span class="ident">into</span>())
-                        .<span class="ident">expect</span>(<span class="string">&quot;invalid WINDOW_UPDATE frame&quot;</span>);
+                    <span class="comment">// Buffer it
+                    </span>dst.buffer(frame.into())
+                        .expect(<span class="string">&quot;invalid WINDOW_UPDATE frame&quot;</span>);
 
-                    <span class="comment">// Update flow control</span>
-                    <span class="ident">stream</span>
-                        .<span class="ident">recv_flow</span>
-                        .<span class="ident">inc_window</span>(<span class="ident">incr</span>)
-                        .<span class="ident">expect</span>(<span class="string">&quot;unexpected flow control state&quot;</span>);
+                    <span class="comment">// Update flow control
+                    </span>stream
+                        .recv_flow
+                        .inc_window(incr)
+                        .expect(<span class="string">&quot;unexpected flow control state&quot;</span>);
                 }
             })
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_incoming</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">pending_accept</span>.<span class="ident">pop</span>(<span class="ident">store</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">ptr</span>.<span class="ident">key</span>())
+    <span class="kw">pub fn </span>next_incoming(<span class="kw-2">&amp;mut </span><span class="self">self</span>, store: <span class="kw-2">&amp;mut </span>Store) -&gt; <span class="prelude-ty">Option</span>&lt;store::Key&gt; {
+        <span class="self">self</span>.pending_accept.pop(store).map(|ptr| ptr.key())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_data</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// TODO: Return error when the stream is reset</span>
-        <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">pop_front</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">Event::Data</span>(<span class="ident">payload</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">payload</span>))),
-            <span class="prelude-val">Some</span>(<span class="ident">event</span>) =&gt; {
-                <span class="comment">// Frame is trailer</span>
-                <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">push_front</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>, <span class="ident">event</span>);
+    <span class="kw">pub fn </span>poll_data(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;</span>Context,
+        stream: <span class="kw-2">&amp;mut </span>Stream,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;Bytes, proto::Error&gt;&gt;&gt; {
+        <span class="comment">// TODO: Return error when the stream is reset
+        </span><span class="kw">match </span>stream.pending_recv.pop_front(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer) {
+            <span class="prelude-val">Some</span>(Event::Data(payload)) =&gt; Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(payload))),
+            <span class="prelude-val">Some</span>(event) =&gt; {
+                <span class="comment">// Frame is trailer
+                </span>stream.pending_recv.push_front(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer, event);
 
-                <span class="comment">// Notify the recv task. This is done just in case</span>
-                <span class="comment">// `poll_trailers` was called.</span>
-                <span class="comment">//</span>
-                <span class="comment">// It is very likely that `notify_recv` will just be a no-op (as</span>
-                <span class="comment">// the task will be None), so this isn&#39;t really much of a</span>
-                <span class="comment">// performance concern. It also means we don&#39;t have to track</span>
-                <span class="comment">// state to see if `poll_trailers` was called before `poll_data`</span>
-                <span class="comment">// returned `None`.</span>
-                <span class="ident">stream</span>.<span class="ident">notify_recv</span>();
+                <span class="comment">// Notify the recv task. This is done just in case
+                // `poll_trailers` was called.
+                //
+                // It is very likely that `notify_recv` will just be a no-op (as
+                // the task will be None), so this isn&#39;t really much of a
+                // performance concern. It also means we don&#39;t have to track
+                // state to see if `poll_trailers` was called before `poll_data`
+                // returned `None`.
+                </span>stream.notify_recv();
 
-                <span class="comment">// No more data frames</span>
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
+                <span class="comment">// No more data frames
+                </span>Poll::Ready(<span class="prelude-val">None</span>)
             }
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">schedule_recv</span>(<span class="ident">cx</span>, <span class="ident">stream</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.schedule_recv(cx, stream),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderMap</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">pop_front</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">Event::Trailers</span>(<span class="ident">trailers</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">trailers</span>))),
-            <span class="prelude-val">Some</span>(<span class="ident">event</span>) =&gt; {
-                <span class="comment">// Frame is not trailers.. not ready to poll trailers yet.</span>
-                <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">push_front</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>, <span class="ident">event</span>);
+    <span class="kw">pub fn </span>poll_trailers(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;</span>Context,
+        stream: <span class="kw-2">&amp;mut </span>Stream,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;HeaderMap, proto::Error&gt;&gt;&gt; {
+        <span class="kw">match </span>stream.pending_recv.pop_front(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer) {
+            <span class="prelude-val">Some</span>(Event::Trailers(trailers)) =&gt; Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(trailers))),
+            <span class="prelude-val">Some</span>(event) =&gt; {
+                <span class="comment">// Frame is not trailers.. not ready to poll trailers yet.
+                </span>stream.pending_recv.push_front(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer, event);
 
-                <span class="ident">Poll::Pending</span>
+                Poll::Pending
             }
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">schedule_recv</span>(<span class="ident">cx</span>, <span class="ident">stream</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.schedule_recv(cx, stream),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">schedule_recv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">ensure_recv_open</span>()<span class="question-mark">?</span> {
-            <span class="comment">// Request to get notified once more frames arrive</span>
-            <span class="ident">stream</span>.<span class="ident">recv_task</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">clone</span>());
-            <span class="ident">Poll::Pending</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// No more frames will be received</span>
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
+    <span class="kw">fn </span>schedule_recv&lt;T&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;</span>Context,
+        stream: <span class="kw-2">&amp;mut </span>Stream,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;T, proto::Error&gt;&gt;&gt; {
+        <span class="kw">if </span>stream.state.ensure_recv_open()<span class="question-mark">? </span>{
+            <span class="comment">// Request to get notified once more frames arrive
+            </span>stream.recv_task = <span class="prelude-val">Some</span>(cx.waker().clone());
+            Poll::Pending
+        } <span class="kw">else </span>{
+            <span class="comment">// No more frames will be received
+            </span>Poll::Ready(<span class="prelude-val">None</span>)
         }
     }
 }
 
-<span class="comment">// ===== impl Open =====</span>
+<span class="comment">// ===== impl Open =====
 
-<span class="kw">impl</span> <span class="ident">Open</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_push_promise</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Open</span>::<span class="kw-2">*</span>;
+</span><span class="kw">impl </span>Open {
+    <span class="kw">pub fn </span>is_push_promise(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">use </span><span class="self">self</span>::Open::<span class="kw-2">*</span>;
 
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">PushPromise</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            PushPromise =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="comment">// ===== impl RecvHeaderBlockError =====</span>
+<span class="comment">// ===== impl RecvHeaderBlockError =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecvHeaderBlockError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RecvHeaderBlockError::State</span>(<span class="ident">err</span>)
+</span><span class="kw">impl</span>&lt;T&gt; From&lt;Error&gt; <span class="kw">for </span>RecvHeaderBlockError&lt;T&gt; {
+    <span class="kw">fn </span>from(err: Error) -&gt; <span class="self">Self </span>{
+        RecvHeaderBlockError::State(err)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with_macros-1.5.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../serde_with_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serde_with_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with_macros-1.5.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../serde_with_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serde_with_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1014,349 +1014,349 @@
 <span id="1014">1014</span>
 <span id="1015">1015</span>
 <span id="1016">1016</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(
-    <span class="ident">clippy::semicolon_if_nothing_returned</span>,
-    <span class="ident">missing_copy_implementations</span>,
-    <span class="comment">// missing_crate_level_docs, not available in MSRV</span>
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">trivial_casts</span>,
-    <span class="ident">trivial_numeric_casts</span>,
-    <span class="ident">unused_extern_crates</span>,
-    <span class="ident">unused_import_braces</span>,
-    <span class="ident">unused_qualifications</span>,
-    <span class="ident">variant_size_differences</span>
-)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>))))]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">deny</span>(
-    <span class="ident">missing_copy_implementations</span>,
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">trivial_casts</span>,
-    <span class="ident">trivial_numeric_casts</span>,
-    <span class="ident">unused_extern_crates</span>,
-    <span class="ident">unused_import_braces</span>,
-    <span class="ident">unused_qualifications</span>,
-))))]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">warn</span>(<span class="ident">rust_2018_idioms</span>))))]</span>
-<span class="comment">// Not needed for 2018 edition and conflicts with `rust_2018_idioms`</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">no_crate_inject</span>))]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/serde_with_macros/1.5.2&quot;</span>)]</span>
-<span class="comment">// Necessary to silence the warning about clippy::unknown_clippy_lints on nightly</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">renamed_and_removed_lints</span>)]</span>
-<span class="comment">// Necessary for nightly clippy lints</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::unknown_clippy_lints</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![forbid(unsafe_code)]
+#![warn(
+    clippy::semicolon_if_nothing_returned,
+    missing_copy_implementations,
+    <span class="comment">// missing_crate_level_docs, not available in MSRV
+    </span>missing_debug_implementations,
+    missing_docs,
+    rust_2018_idioms,
+    trivial_casts,
+    trivial_numeric_casts,
+    unused_extern_crates,
+    unused_import_braces,
+    unused_qualifications,
+    variant_size_differences
+)]
+#![doc(test(attr(forbid(unsafe_code))))]
+#![doc(test(attr(deny(
+    missing_copy_implementations,
+    missing_debug_implementations,
+    trivial_casts,
+    trivial_numeric_casts,
+    unused_extern_crates,
+    unused_import_braces,
+    unused_qualifications,
+))))]
+#![doc(test(attr(warn(rust_2018_idioms))))]
+</span><span class="comment">// Not needed for 2018 edition and conflicts with `rust_2018_idioms`
+</span><span class="attribute">#![doc(test(no_crate_inject))]
+#![doc(html_root_url = <span class="string">&quot;https://docs.rs/serde_with_macros/1.5.2&quot;</span>)]
+</span><span class="comment">// Necessary to silence the warning about clippy::unknown_clippy_lints on nightly
+</span><span class="attribute">#![allow(renamed_and_removed_lints)]
+</span><span class="comment">// Necessary for nightly clippy lints
+</span><span class="attribute">#![allow(clippy::unknown_clippy_lints)]
 
-<span class="doccomment">//! proc-macro extensions for [`serde_with`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate should **NEVER** be used alone.</span>
-<span class="doccomment">//! All macros **MUST** be used via the re-exports in the [`serde_with`] crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`serde_with`]: https://crates.io/crates/serde_with/</span>
+</span><span class="doccomment">//! proc-macro extensions for [`serde_with`].
+//!
+//! This crate should **NEVER** be used alone.
+//! All macros **MUST** be used via the re-exports in the [`serde_with`] crate.
+//!
+//! [`serde_with`]: https://crates.io/crates/serde_with/
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_extern_crates</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+</span><span class="attribute">#[allow(unused_extern_crates)]
+</span><span class="kw">extern crate </span>proc_macro;
 
-<span class="kw">mod</span> <span class="ident">utils</span>;
+<span class="kw">mod </span>utils;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>::{<span class="ident">split_with_de_lifetime</span>, <span class="ident">DeriveOptions</span>, <span class="ident">IteratorExt</span> <span class="kw">as</span> <span class="kw">_</span>};
-<span class="kw">use</span> <span class="ident">darling::util::Override</span>;
-<span class="kw">use</span> <span class="ident">darling</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DarlingError</span>, <span class="ident">FromField</span>, <span class="ident">FromMeta</span>};
-<span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Span</span>, <span class="ident">TokenStream</span> <span class="kw">as</span> <span class="ident">TokenStream2</span>};
-<span class="kw">use</span> <span class="ident">quote::quote</span>;
-<span class="kw">use</span> <span class="ident">syn::punctuated::Pair</span>;
-<span class="kw">use</span> <span class="ident">syn::spanned::Spanned</span>;
-<span class="kw">use</span> <span class="ident">syn</span>::{
-    <span class="ident">parse_macro_input</span>, <span class="ident">parse_quote</span>, <span class="ident">AttributeArgs</span>, <span class="ident">DeriveInput</span>, <span class="ident">Error</span>, <span class="ident">Field</span>, <span class="ident">Fields</span>,
-    <span class="ident">GenericArgument</span>, <span class="ident">ItemEnum</span>, <span class="ident">ItemStruct</span>, <span class="ident">Meta</span>, <span class="ident">NestedMeta</span>, <span class="ident">Path</span>, <span class="ident">PathArguments</span>, <span class="ident">ReturnType</span>, <span class="ident">Type</span>,
+<span class="kw">use </span><span class="kw">crate</span>::utils::{split_with_de_lifetime, DeriveOptions, IteratorExt <span class="kw">as _</span>};
+<span class="kw">use </span>darling::util::Override;
+<span class="kw">use </span>darling::{Error <span class="kw">as </span>DarlingError, FromField, FromMeta};
+<span class="kw">use </span>proc_macro::TokenStream;
+<span class="kw">use </span>proc_macro2::{Span, TokenStream <span class="kw">as </span>TokenStream2};
+<span class="kw">use </span>quote::quote;
+<span class="kw">use </span>syn::punctuated::Pair;
+<span class="kw">use </span>syn::spanned::Spanned;
+<span class="kw">use </span>syn::{
+    parse_macro_input, parse_quote, AttributeArgs, DeriveInput, Error, Field, Fields,
+    GenericArgument, ItemEnum, ItemStruct, Meta, NestedMeta, Path, PathArguments, ReturnType, Type,
 };
 
-<span class="doccomment">/// Apply function on every field of structs or enums</span>
-<span class="kw">fn</span> <span class="ident">apply_function_to_struct_and_enum_fields</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="ident">TokenStream</span>,
-    <span class="ident">function</span>: <span class="ident">F</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream2</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Copy</span>,
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Field</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Apply function on every field of structs or enums
+</span><span class="kw">fn </span>apply_function_to_struct_and_enum_fields&lt;F&gt;(
+    input: TokenStream,
+    function: F,
+) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream2, Error&gt;
+<span class="kw">where
+    </span>F: Copy,
+    F: Fn(<span class="kw-2">&amp;mut </span>Field) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt;,
 {
-    <span class="doccomment">/// Handle a single struct or a single enum variant</span>
-    <span class="kw">fn</span> <span class="ident">apply_on_fields</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Fields</span>, <span class="ident">function</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Field</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Handle a single struct or a single enum variant
+    </span><span class="kw">fn </span>apply_on_fields&lt;F&gt;(fields: <span class="kw-2">&amp;mut </span>Fields, function: F) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;
+    <span class="kw">where
+        </span>F: Fn(<span class="kw-2">&amp;mut </span>Field) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt;,
     {
-        <span class="kw">match</span> <span class="ident">fields</span> {
-            <span class="comment">// simple, no fields, do nothing</span>
-            <span class="ident">Fields::Unit</span> =&gt; <span class="prelude-val">Ok</span>(()),
-            <span class="ident">Fields::Named</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) =&gt; <span class="ident">fields</span>
-                .<span class="ident">named</span>
-                .<span class="ident">iter_mut</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">function</span>(<span class="ident">field</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">Error::new</span>(<span class="ident">field</span>.<span class="ident">span</span>(), <span class="ident">err</span>)))
-                .<span class="ident">collect_error</span>(),
-            <span class="ident">Fields::Unnamed</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) =&gt; <span class="ident">fields</span>
-                .<span class="ident">unnamed</span>
-                .<span class="ident">iter_mut</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">function</span>(<span class="ident">field</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">Error::new</span>(<span class="ident">field</span>.<span class="ident">span</span>(), <span class="ident">err</span>)))
-                .<span class="ident">collect_error</span>(),
+        <span class="kw">match </span>fields {
+            <span class="comment">// simple, no fields, do nothing
+            </span>Fields::Unit =&gt; <span class="prelude-val">Ok</span>(()),
+            Fields::Named(<span class="kw-2">ref mut </span>fields) =&gt; fields
+                .named
+                .iter_mut()
+                .map(|field| function(field).map_err(|err| Error::new(field.span(), err)))
+                .collect_error(),
+            Fields::Unnamed(<span class="kw-2">ref mut </span>fields) =&gt; fields
+                .unnamed
+                .iter_mut()
+                .map(|field| function(field).map_err(|err| Error::new(field.span(), err)))
+                .collect_error(),
         }
     }
 
-    <span class="comment">// For each field in the struct given by `input`, add the `skip_serializing_if` attribute,</span>
-    <span class="comment">// if and only if, it is of type `Option`</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">input</span>) <span class="op">=</span> <span class="ident">syn::parse</span>::<span class="op">&lt;</span><span class="ident">ItemStruct</span><span class="op">&gt;</span>(<span class="ident">input</span>.<span class="ident">clone</span>()) {
-        <span class="ident">apply_on_fields</span>(<span class="kw-2">&amp;mut</span> <span class="ident">input</span>.<span class="ident">fields</span>, <span class="ident">function</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="macro">quote!</span>(#<span class="ident">input</span>))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">input</span>) <span class="op">=</span> <span class="ident">syn::parse</span>::<span class="op">&lt;</span><span class="ident">ItemEnum</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
-        <span class="ident">input</span>
-            .<span class="ident">variants</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> <span class="ident">apply_on_fields</span>(<span class="kw-2">&amp;mut</span> <span class="ident">variant</span>.<span class="ident">fields</span>, <span class="ident">function</span>))
-            .<span class="ident">collect_error</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="macro">quote!</span>(#<span class="ident">input</span>))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
-            <span class="ident">Span::call_site</span>(),
+    <span class="comment">// For each field in the struct given by `input`, add the `skip_serializing_if` attribute,
+    // if and only if, it is of type `Option`
+    </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>input) = syn::parse::&lt;ItemStruct&gt;(input.clone()) {
+        apply_on_fields(<span class="kw-2">&amp;mut </span>input.fields, function)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="macro">quote!</span>(#input))
+    } <span class="kw">else if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>input) = syn::parse::&lt;ItemEnum&gt;(input) {
+        input
+            .variants
+            .iter_mut()
+            .map(|variant| apply_on_fields(<span class="kw-2">&amp;mut </span>variant.fields, function))
+            .collect_error()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="macro">quote!</span>(#input))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(Error::new(
+            Span::call_site(),
             <span class="string">&quot;The attribute can only be applied to struct or enum definitions.&quot;</span>,
         ))
     }
 }
 
-<span class="doccomment">/// Like [apply_function_to_struct_and_enum_fields] but for darling errors</span>
-<span class="kw">fn</span> <span class="ident">apply_function_to_struct_and_enum_fields_darling</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="ident">TokenStream</span>,
-    <span class="ident">serde_with_crate_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
-    <span class="ident">function</span>: <span class="ident">F</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream2</span>, <span class="ident">DarlingError</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Copy</span>,
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Field</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Like [apply_function_to_struct_and_enum_fields] but for darling errors
+</span><span class="kw">fn </span>apply_function_to_struct_and_enum_fields_darling&lt;F&gt;(
+    input: TokenStream,
+    serde_with_crate_path: <span class="kw-2">&amp;</span>Path,
+    function: F,
+) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream2, DarlingError&gt;
+<span class="kw">where
+    </span>F: Copy,
+    F: Fn(<span class="kw-2">&amp;mut </span>Field) -&gt; <span class="prelude-ty">Result</span>&lt;(), DarlingError&gt;,
 {
-    <span class="doccomment">/// Handle a single struct or a single enum variant</span>
-    <span class="kw">fn</span> <span class="ident">apply_on_fields</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Fields</span>, <span class="ident">function</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Field</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Handle a single struct or a single enum variant
+    </span><span class="kw">fn </span>apply_on_fields&lt;F&gt;(fields: <span class="kw-2">&amp;mut </span>Fields, function: F) -&gt; <span class="prelude-ty">Result</span>&lt;(), DarlingError&gt;
+    <span class="kw">where
+        </span>F: Fn(<span class="kw-2">&amp;mut </span>Field) -&gt; <span class="prelude-ty">Result</span>&lt;(), DarlingError&gt;,
     {
-        <span class="kw">match</span> <span class="ident">fields</span> {
-            <span class="comment">// simple, no fields, do nothing</span>
-            <span class="ident">Fields::Unit</span> =&gt; <span class="prelude-val">Ok</span>(()),
-            <span class="ident">Fields::Named</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DarlingError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>
-                    .<span class="ident">named</span>
-                    .<span class="ident">iter_mut</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">function</span>(<span class="ident">field</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">with_span</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>)))
-                    <span class="comment">// turn the Err variant into the Some, such that we only collect errors</span>
-                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">res</span> {
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+        <span class="kw">match </span>fields {
+            <span class="comment">// simple, no fields, do nothing
+            </span>Fields::Unit =&gt; <span class="prelude-val">Ok</span>(()),
+            Fields::Named(<span class="kw-2">ref mut </span>fields) =&gt; {
+                <span class="kw">let </span>errors: Vec&lt;DarlingError&gt; = fields
+                    .named
+                    .iter_mut()
+                    .map(|field| function(field).map_err(|err| err.with_span(<span class="kw-2">&amp;</span>field)))
+                    <span class="comment">// turn the Err variant into the Some, such that we only collect errors
+                    </span>.filter_map(|res| <span class="kw">match </span>res {
+                        <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Some</span>(e),
                         <span class="prelude-val">Ok</span>(()) =&gt; <span class="prelude-val">None</span>,
                     })
-                    .<span class="ident">collect</span>();
-                <span class="kw">if</span> <span class="ident">errors</span>.<span class="ident">is_empty</span>() {
+                    .collect();
+                <span class="kw">if </span>errors.is_empty() {
                     <span class="prelude-val">Ok</span>(())
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">DarlingError::multiple</span>(<span class="ident">errors</span>))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(DarlingError::multiple(errors))
                 }
             }
-            <span class="ident">Fields::Unnamed</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DarlingError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>
-                    .<span class="ident">unnamed</span>
-                    .<span class="ident">iter_mut</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">function</span>(<span class="ident">field</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">with_span</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>)))
-                    <span class="comment">// turn the Err variant into the Some, such that we only collect errors</span>
-                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">res</span> {
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            Fields::Unnamed(<span class="kw-2">ref mut </span>fields) =&gt; {
+                <span class="kw">let </span>errors: Vec&lt;DarlingError&gt; = fields
+                    .unnamed
+                    .iter_mut()
+                    .map(|field| function(field).map_err(|err| err.with_span(<span class="kw-2">&amp;</span>field)))
+                    <span class="comment">// turn the Err variant into the Some, such that we only collect errors
+                    </span>.filter_map(|res| <span class="kw">match </span>res {
+                        <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Some</span>(e),
                         <span class="prelude-val">Ok</span>(()) =&gt; <span class="prelude-val">None</span>,
                     })
-                    .<span class="ident">collect</span>();
-                <span class="kw">if</span> <span class="ident">errors</span>.<span class="ident">is_empty</span>() {
+                    .collect();
+                <span class="kw">if </span>errors.is_empty() {
                     <span class="prelude-val">Ok</span>(())
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">DarlingError::multiple</span>(<span class="ident">errors</span>))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(DarlingError::multiple(errors))
                 }
             }
         }
     }
 
-    <span class="comment">// Add a dummy derive macro which consumes (makes inert) all field attributes</span>
-    <span class="kw">let</span> <span class="ident">consume_serde_as_attribute</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(
-        <span class="attribute">#[<span class="ident">derive</span>(#<span class="ident">serde_with_crate_path::__private_consume_serde_as_attributes</span>)]</span>
-    );
+    <span class="comment">// Add a dummy derive macro which consumes (makes inert) all field attributes
+    </span><span class="kw">let </span>consume_serde_as_attribute = <span class="macro">parse_quote!</span>(
+        <span class="attribute">#[derive(#serde_with_crate_path::__private_consume_serde_as_attributes)]
+    </span>);
 
-    <span class="comment">// For each field in the struct given by `input`, add the `skip_serializing_if` attribute,</span>
-    <span class="comment">// if and only if, it is of type `Option`</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">input</span>) <span class="op">=</span> <span class="ident">syn::parse</span>::<span class="op">&lt;</span><span class="ident">ItemStruct</span><span class="op">&gt;</span>(<span class="ident">input</span>.<span class="ident">clone</span>()) {
-        <span class="ident">apply_on_fields</span>(<span class="kw-2">&amp;mut</span> <span class="ident">input</span>.<span class="ident">fields</span>, <span class="ident">function</span>)<span class="question-mark">?</span>;
-        <span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">push</span>(<span class="ident">consume_serde_as_attribute</span>);
-        <span class="prelude-val">Ok</span>(<span class="macro">quote!</span>(#<span class="ident">input</span>))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">input</span>) <span class="op">=</span> <span class="ident">syn::parse</span>::<span class="op">&lt;</span><span class="ident">ItemEnum</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
-        <span class="kw">let</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DarlingError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">input</span>
-            .<span class="ident">variants</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> <span class="ident">apply_on_fields</span>(<span class="kw-2">&amp;mut</span> <span class="ident">variant</span>.<span class="ident">fields</span>, <span class="ident">function</span>))
-            <span class="comment">// turn the Err variant into the Some, such that we only collect errors</span>
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">res</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+    <span class="comment">// For each field in the struct given by `input`, add the `skip_serializing_if` attribute,
+    // if and only if, it is of type `Option`
+    </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>input) = syn::parse::&lt;ItemStruct&gt;(input.clone()) {
+        apply_on_fields(<span class="kw-2">&amp;mut </span>input.fields, function)<span class="question-mark">?</span>;
+        input.attrs.push(consume_serde_as_attribute);
+        <span class="prelude-val">Ok</span>(<span class="macro">quote!</span>(#input))
+    } <span class="kw">else if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>input) = syn::parse::&lt;ItemEnum&gt;(input) {
+        <span class="kw">let </span>errors: Vec&lt;DarlingError&gt; = input
+            .variants
+            .iter_mut()
+            .map(|variant| apply_on_fields(<span class="kw-2">&amp;mut </span>variant.fields, function))
+            <span class="comment">// turn the Err variant into the Some, such that we only collect errors
+            </span>.filter_map(|res| <span class="kw">match </span>res {
+                <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Some</span>(e),
                 <span class="prelude-val">Ok</span>(()) =&gt; <span class="prelude-val">None</span>,
             })
-            .<span class="ident">collect</span>();
-        <span class="kw">if</span> <span class="ident">errors</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">push</span>(<span class="ident">consume_serde_as_attribute</span>);
-            <span class="prelude-val">Ok</span>(<span class="macro">quote!</span>(#<span class="ident">input</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">DarlingError::multiple</span>(<span class="ident">errors</span>))
+            .collect();
+        <span class="kw">if </span>errors.is_empty() {
+            input.attrs.push(consume_serde_as_attribute);
+            <span class="prelude-val">Ok</span>(<span class="macro">quote!</span>(#input))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(DarlingError::multiple(errors))
         }
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">DarlingError::custom</span>(
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(DarlingError::custom(
             <span class="string">&quot;The attribute can only be applied to struct or enum definitions.&quot;</span>,
         )
-        .<span class="ident">with_span</span>(<span class="kw-2">&amp;</span><span class="ident">Span::call_site</span>()))
+        .with_span(<span class="kw-2">&amp;</span>Span::call_site()))
     }
 }
 
-<span class="doccomment">/// Add `skip_serializing_if` annotations to [`Option`] fields.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The attribute can be added to structs and enums.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Import this attribute with `use serde_with::skip_serializing_none;`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// JSON APIs sometimes have many optional values.</span>
-<span class="doccomment">/// Missing values should not be serialized, to keep the serialized format smaller.</span>
-<span class="doccomment">/// Such a data type might look like:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde::Serialize;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// #[derive(Serialize)]</span>
-<span class="doccomment">/// struct Data {</span>
-<span class="doccomment">///     #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]</span>
-<span class="doccomment">///     a: Option&lt;String&gt;,</span>
-<span class="doccomment">///     #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]</span>
-<span class="doccomment">///     b: Option&lt;u64&gt;,</span>
-<span class="doccomment">///     #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]</span>
-<span class="doccomment">///     c: Option&lt;String&gt;,</span>
-<span class="doccomment">///     #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]</span>
-<span class="doccomment">///     d: Option&lt;bool&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `skip_serializing_if` annotation is repetitive and harms readability.</span>
-<span class="doccomment">/// Instead, the same struct can be written as:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde::Serialize;</span>
-<span class="doccomment">/// # use serde_with_macros::skip_serializing_none;</span>
-<span class="doccomment">/// #[skip_serializing_none]</span>
-<span class="doccomment">/// #[derive(Serialize)]</span>
-<span class="doccomment">/// struct Data {</span>
-<span class="doccomment">///     a: Option&lt;String&gt;,</span>
-<span class="doccomment">///     b: Option&lt;u64&gt;,</span>
-<span class="doccomment">///     c: Option&lt;String&gt;,</span>
-<span class="doccomment">///     // Always serialize field d even if None</span>
-<span class="doccomment">///     #[serialize_always]</span>
-<span class="doccomment">///     d: Option&lt;bool&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Existing `skip_serializing_if` annotations will not be altered.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If some values should always be serialized, then the `serialize_always` can be used.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Limitations</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `serialize_always` cannot be used together with a manual `skip_serializing_if` annotations, as these conflict in their meaning.</span>
-<span class="doccomment">/// A compile error will be generated if this occurs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `skip_serializing_none` only works if the type is called [`Option`], [`std::option::Option`], or [`core::option::Option`].</span>
-<span class="doccomment">/// Type aliasing an [`Option`] and giving it another name, will cause this field to be ignored.</span>
-<span class="doccomment">/// This cannot be supported, as proc-macros run before type checking, thus it is not possible to determine if a type alias refers to an [`Option`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde::Serialize;</span>
-<span class="doccomment">/// # use serde_with_macros::skip_serializing_none;</span>
-<span class="doccomment">/// type MyOption&lt;T&gt; = Option&lt;T&gt;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[skip_serializing_none]</span>
-<span class="doccomment">/// #[derive(Serialize)]</span>
-<span class="doccomment">/// struct Data {</span>
-<span class="doccomment">///     a: MyOption&lt;String&gt;, // This field will not be skipped</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Likewise, if you import a type and name it `Option`, the `skip_serializing_if` attributes will be added and compile errors will occur, if `Option::is_none` is not a valid function.</span>
-<span class="doccomment">/// Here the function `Vec::is_none` does not exist and therefore the example fails to compile.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,compile_fail</span>
-<span class="doccomment">/// # use serde::Serialize;</span>
-<span class="doccomment">/// # use serde_with_macros::skip_serializing_none;</span>
-<span class="doccomment">/// use std::vec::Vec as Option;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[skip_serializing_none]</span>
-<span class="doccomment">/// #[derive(Serialize)]</span>
-<span class="doccomment">/// struct Data {</span>
-<span class="doccomment">///     a: Option&lt;String&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip_serializing_none</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">apply_function_to_struct_and_enum_fields</span>(
-        <span class="ident">input</span>,
-        <span class="ident">skip_serializing_none_add_attr_to_field</span>,
+<span class="doccomment">/// Add `skip_serializing_if` annotations to [`Option`] fields.
+///
+/// The attribute can be added to structs and enums.
+///
+/// Import this attribute with `use serde_with::skip_serializing_none;`.
+///
+/// # Example
+///
+/// JSON APIs sometimes have many optional values.
+/// Missing values should not be serialized, to keep the serialized format smaller.
+/// Such a data type might look like:
+///
+/// ```rust
+/// # use serde::Serialize;
+/// #
+/// #[derive(Serialize)]
+/// struct Data {
+///     #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]
+///     a: Option&lt;String&gt;,
+///     #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]
+///     b: Option&lt;u64&gt;,
+///     #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]
+///     c: Option&lt;String&gt;,
+///     #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]
+///     d: Option&lt;bool&gt;,
+/// }
+/// ```
+///
+/// The `skip_serializing_if` annotation is repetitive and harms readability.
+/// Instead, the same struct can be written as:
+///
+/// ```rust
+/// # use serde::Serialize;
+/// # use serde_with_macros::skip_serializing_none;
+/// #[skip_serializing_none]
+/// #[derive(Serialize)]
+/// struct Data {
+///     a: Option&lt;String&gt;,
+///     b: Option&lt;u64&gt;,
+///     c: Option&lt;String&gt;,
+///     // Always serialize field d even if None
+///     #[serialize_always]
+///     d: Option&lt;bool&gt;,
+/// }
+/// ```
+///
+/// Existing `skip_serializing_if` annotations will not be altered.
+///
+/// If some values should always be serialized, then the `serialize_always` can be used.
+///
+/// # Limitations
+///
+/// The `serialize_always` cannot be used together with a manual `skip_serializing_if` annotations, as these conflict in their meaning.
+/// A compile error will be generated if this occurs.
+///
+/// The `skip_serializing_none` only works if the type is called [`Option`], [`std::option::Option`], or [`core::option::Option`].
+/// Type aliasing an [`Option`] and giving it another name, will cause this field to be ignored.
+/// This cannot be supported, as proc-macros run before type checking, thus it is not possible to determine if a type alias refers to an [`Option`].
+///
+/// ```rust
+/// # use serde::Serialize;
+/// # use serde_with_macros::skip_serializing_none;
+/// type MyOption&lt;T&gt; = Option&lt;T&gt;;
+///
+/// #[skip_serializing_none]
+/// #[derive(Serialize)]
+/// struct Data {
+///     a: MyOption&lt;String&gt;, // This field will not be skipped
+/// }
+/// ```
+///
+/// Likewise, if you import a type and name it `Option`, the `skip_serializing_if` attributes will be added and compile errors will occur, if `Option::is_none` is not a valid function.
+/// Here the function `Vec::is_none` does not exist and therefore the example fails to compile.
+///
+/// ```rust,compile_fail
+/// # use serde::Serialize;
+/// # use serde_with_macros::skip_serializing_none;
+/// use std::vec::Vec as Option;
+///
+/// #[skip_serializing_none]
+/// #[derive(Serialize)]
+/// struct Data {
+///     a: Option&lt;String&gt;,
+/// }
+/// ```
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>skip_serializing_none(_args: TokenStream, input: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span>res = <span class="kw">match </span>apply_function_to_struct_and_enum_fields(
+        input,
+        skip_serializing_none_add_attr_to_field,
     ) {
-        <span class="prelude-val">Ok</span>(<span class="ident">res</span>) =&gt; <span class="ident">res</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">to_compile_error</span>(),
+        <span class="prelude-val">Ok</span>(res) =&gt; res,
+        <span class="prelude-val">Err</span>(err) =&gt; err.to_compile_error(),
     };
-    <span class="ident">TokenStream::from</span>(<span class="ident">res</span>)
+    TokenStream::from(res)
 }
 
-<span class="doccomment">/// Add the skip_serializing_if annotation to each field of the struct</span>
-<span class="kw">fn</span> <span class="ident">skip_serializing_none_add_attr_to_field</span>(<span class="ident">field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Field</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Type::Path</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span> {
-        <span class="kw">if</span> <span class="ident">is_std_option</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">path</span>) {
-            <span class="kw">let</span> <span class="ident">has_skip_serializing_if</span> <span class="op">=</span>
-                <span class="ident">field_has_attribute</span>(<span class="ident">field</span>, <span class="string">&quot;serde&quot;</span>, <span class="string">&quot;skip_serializing_if&quot;</span>);
+<span class="doccomment">/// Add the skip_serializing_if annotation to each field of the struct
+</span><span class="kw">fn </span>skip_serializing_none_add_attr_to_field(field: <span class="kw-2">&amp;mut </span>Field) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+    <span class="kw">if let </span>Type::Path(path) = <span class="kw-2">&amp;</span>field.ty {
+        <span class="kw">if </span>is_std_option(<span class="kw-2">&amp;</span>path.path) {
+            <span class="kw">let </span>has_skip_serializing_if =
+                field_has_attribute(field, <span class="string">&quot;serde&quot;</span>, <span class="string">&quot;skip_serializing_if&quot;</span>);
 
-            <span class="comment">// Remove the `serialize_always` attribute</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">has_always_attr</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">has_attr</span> <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;serialize_always&quot;</span>);
-                <span class="ident">has_always_attr</span> <span class="op">|</span><span class="op">=</span> <span class="ident">has_attr</span>;
-                <span class="op">!</span><span class="ident">has_attr</span>
+            <span class="comment">// Remove the `serialize_always` attribute
+            </span><span class="kw">let </span><span class="kw-2">mut </span>has_always_attr = <span class="bool-val">false</span>;
+            field.attrs.retain(|attr| {
+                <span class="kw">let </span>has_attr = attr.path.is_ident(<span class="string">&quot;serialize_always&quot;</span>);
+                has_always_attr |= has_attr;
+                !has_attr
             });
 
-            <span class="comment">// Error on conflicting attributes</span>
-            <span class="kw">if</span> <span class="ident">has_always_attr</span> <span class="op">&amp;&amp;</span> <span class="ident">has_skip_serializing_if</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">r#&quot;The attributes `serialize_always` and `serde(skip_serializing_if = &quot;...&quot;)` cannot be used on the same field&quot;#</span>.<span class="ident">to_string</span>();
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ident</span> {
-                    <span class="ident">msg</span> <span class="op">+</span><span class="op">=</span> <span class="string">&quot;: `&quot;</span>;
-                    <span class="ident">msg</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">to_string</span>();
-                    <span class="ident">msg</span> <span class="op">+</span><span class="op">=</span> <span class="string">&quot;`&quot;</span>;
+            <span class="comment">// Error on conflicting attributes
+            </span><span class="kw">if </span>has_always_attr &amp;&amp; has_skip_serializing_if {
+                <span class="kw">let </span><span class="kw-2">mut </span>msg = <span class="string">r#&quot;The attributes `serialize_always` and `serde(skip_serializing_if = &quot;...&quot;)` cannot be used on the same field&quot;#</span>.to_string();
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(ident) = <span class="kw-2">&amp;</span>field.ident {
+                    msg += <span class="string">&quot;: `&quot;</span>;
+                    msg += <span class="kw-2">&amp;</span>ident.to_string();
+                    msg += <span class="string">&quot;`&quot;</span>;
                 }
-                <span class="ident">msg</span> <span class="op">+</span><span class="op">=</span> <span class="string">&quot;.&quot;</span>;
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
+                msg += <span class="string">&quot;.&quot;</span>;
+                <span class="kw">return </span><span class="prelude-val">Err</span>(msg);
             }
 
-            <span class="comment">// Do nothing if `skip_serializing_if` or `serialize_always` is already present</span>
-            <span class="kw">if</span> <span class="ident">has_skip_serializing_if</span> <span class="op">|</span><span class="op">|</span> <span class="ident">has_always_attr</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+            <span class="comment">// Do nothing if `skip_serializing_if` or `serialize_always` is already present
+            </span><span class="kw">if </span>has_skip_serializing_if || has_always_attr {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
 
-            <span class="comment">// Add the `skip_serializing_if` attribute</span>
-            <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(
-                <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-            );
-            <span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">push</span>(<span class="ident">attr</span>);
-        } <span class="kw">else</span> {
-            <span class="comment">// Warn on use of `serialize_always` on non-Option fields</span>
-            <span class="kw">let</span> <span class="ident">has_attr</span> <span class="op">=</span> <span class="ident">field</span>
-                .<span class="ident">attrs</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;serialize_always&quot;</span>));
-            <span class="kw">if</span> <span class="ident">has_attr</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(
-                    <span class="string">&quot;`serialize_always` may only be used on fields of type `Option`.&quot;</span>.<span class="ident">into</span>(),
+            <span class="comment">// Add the `skip_serializing_if` attribute
+            </span><span class="kw">let </span>attr = <span class="macro">parse_quote!</span>(
+                <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+            </span>);
+            field.attrs.push(attr);
+        } <span class="kw">else </span>{
+            <span class="comment">// Warn on use of `serialize_always` on non-Option fields
+            </span><span class="kw">let </span>has_attr = field
+                .attrs
+                .iter()
+                .any(|attr| attr.path.is_ident(<span class="string">&quot;serialize_always&quot;</span>));
+            <span class="kw">if </span>has_attr {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(
+                    <span class="string">&quot;`serialize_always` may only be used on fields of type `Option`.&quot;</span>.into(),
                 );
             }
         }
@@ -1364,40 +1364,40 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Return `true`, if the type path refers to `std::option::Option`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Accepts</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `Option`</span>
-<span class="doccomment">/// * `std::option::Option`, with or without leading `::`</span>
-<span class="doccomment">/// * `core::option::Option`, with or without leading `::`</span>
-<span class="kw">fn</span> <span class="ident">is_std_option</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">bool</span> {
-    (<span class="ident">path</span>.<span class="ident">leading_colon</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;Option&quot;</span>)
-        <span class="op">|</span><span class="op">|</span> (<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">3</span>
-            <span class="op">&amp;&amp;</span> (<span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;std&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;core&quot;</span>)
-            <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">1</span>].<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;option&quot;</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">2</span>].<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;Option&quot;</span>)
+<span class="doccomment">/// Return `true`, if the type path refers to `std::option::Option`
+///
+/// Accepts
+///
+/// * `Option`
+/// * `std::option::Option`, with or without leading `::`
+/// * `core::option::Option`, with or without leading `::`
+</span><span class="kw">fn </span>is_std_option(path: <span class="kw-2">&amp;</span>Path) -&gt; bool {
+    (path.leading_colon.is_none() &amp;&amp; path.segments.len() == <span class="number">1 </span>&amp;&amp; path.segments[<span class="number">0</span>].ident == <span class="string">&quot;Option&quot;</span>)
+        || (path.segments.len() == <span class="number">3
+            </span>&amp;&amp; (path.segments[<span class="number">0</span>].ident == <span class="string">&quot;std&quot; </span>|| path.segments[<span class="number">0</span>].ident == <span class="string">&quot;core&quot;</span>)
+            &amp;&amp; path.segments[<span class="number">1</span>].ident == <span class="string">&quot;option&quot;
+            </span>&amp;&amp; path.segments[<span class="number">2</span>].ident == <span class="string">&quot;Option&quot;</span>)
 }
 
-<span class="doccomment">/// Determine if the `field` has an attribute with given `namespace` and `name`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// On the example of</span>
-<span class="doccomment">/// `#[serde(skip_serializing_if = &quot;Option::is_none&quot;)]`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `serde` is the outermost path, here namespace</span>
-<span class="doccomment">/// * it contains a Meta::List</span>
-<span class="doccomment">/// * which contains in another Meta a Meta::NameValue</span>
-<span class="doccomment">/// * with the name being `skip_serializing_if`</span>
-<span class="kw">fn</span> <span class="ident">field_has_attribute</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">namespace</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">attrs</span> {
-        <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="ident">namespace</span>) {
-            <span class="comment">// Ignore non parsable attributes, as these are not important for us</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">Meta::List</span>(<span class="ident">expr</span>)) <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">parse_meta</span>() {
-                <span class="kw">for</span> <span class="ident">expr</span> <span class="kw">in</span> <span class="ident">expr</span>.<span class="ident">nested</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::NameValue</span>(<span class="ident">expr</span>)) <span class="op">=</span> <span class="ident">expr</span> {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">path</span>.<span class="ident">get_ident</span>() {
-                            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">ident</span> <span class="op">==</span> <span class="ident">name</span> {
-                                <span class="kw">return</span> <span class="bool-val">true</span>;
+<span class="doccomment">/// Determine if the `field` has an attribute with given `namespace` and `name`
+///
+/// On the example of
+/// `#[serde(skip_serializing_if = &quot;Option::is_none&quot;)]`
+///
+/// * `serde` is the outermost path, here namespace
+/// * it contains a Meta::List
+/// * which contains in another Meta a Meta::NameValue
+/// * with the name being `skip_serializing_if`
+</span><span class="kw">fn </span>field_has_attribute(field: <span class="kw-2">&amp;</span>Field, namespace: <span class="kw-2">&amp;</span>str, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">for </span>attr <span class="kw">in </span><span class="kw-2">&amp;</span>field.attrs {
+        <span class="kw">if </span>attr.path.is_ident(namespace) {
+            <span class="comment">// Ignore non parsable attributes, as these are not important for us
+            </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(Meta::List(expr)) = attr.parse_meta() {
+                <span class="kw">for </span>expr <span class="kw">in </span>expr.nested {
+                    <span class="kw">if let </span>NestedMeta::Meta(Meta::NameValue(expr)) = expr {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(ident) = expr.path.get_ident() {
+                            <span class="kw">if </span><span class="kw-2">*</span>ident == name {
+                                <span class="kw">return </span><span class="bool-val">true</span>;
                             }
                         }
                     }
@@ -1405,630 +1405,630 @@
             }
         }
     }
-    <span class="bool-val">false</span>
-}
+    <span class="bool-val">false
+</span>}
 
-<span class="doccomment">/// Convenience macro to use the [`serde_as`] system.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The [`serde_as`] system is designed as a more flexible alternative to serde&#39;s with-annotation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// use serde_with::{serde_as, DisplayFromStr};</span>
-<span class="doccomment">/// use std::collections::HashMap;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[serde_as]</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Data {</span>
-<span class="doccomment">///     /// Serialize into number</span>
-<span class="doccomment">///     #[serde_as(as = &quot;_&quot;)]</span>
-<span class="doccomment">///     a: u32,</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     /// Serialize into String</span>
-<span class="doccomment">///     #[serde_as(as = &quot;DisplayFromStr&quot;)]</span>
-<span class="doccomment">///     b: u32,</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     /// Serialize into a map from String to String</span>
-<span class="doccomment">///     #[serde_as(as = &quot;HashMap&lt;DisplayFromStr, _&gt;&quot;)]</span>
-<span class="doccomment">///     c: Vec&lt;(u32, String)&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Alternative path to `serde_with` crate</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If `serde_with` is not available at the default path, its path should be specified with the</span>
-<span class="doccomment">/// `crate` argument. See [re-exporting `serde_as`] for more use case information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// #[serde_as(crate = &quot;::some_other_lib::serde_with&quot;)]</span>
-<span class="doccomment">/// #[derive(Deserialize)]</span>
-<span class="doccomment">/// struct Data {</span>
-<span class="doccomment">///     #[serde_as(as = &quot;_&quot;)]</span>
-<span class="doccomment">///     a: u32,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # What this macro does</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `serde_as` macro only serves a convenience function.</span>
-<span class="doccomment">/// All the steps it performs, can easily be done manually, in case the cost of an attribute macro is deemed to high.</span>
-<span class="doccomment">/// The functionality can best be described with an example.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// #[serde_as]</span>
-<span class="doccomment">/// #[derive(serde::Serialize)]</span>
-<span class="doccomment">/// struct Foo {</span>
-<span class="doccomment">///     #[serde_as(as = &quot;Vec&lt;_&gt;&quot;)]</span>
-<span class="doccomment">///     bar: Vec&lt;u32&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 1. All the placeholder type `_` will be replaced with `::serde_with::Same`.</span>
-<span class="doccomment">///     The placeholder type `_` marks all the places where the types `Serialize` implementation should be used.</span>
-<span class="doccomment">///     In the example, it means that the `u32` values will serialize with the `Serialize` implementation of `u32`.</span>
-<span class="doccomment">///     The `Same` type implements `SerializeAs` whenever the underlying type implements `Serialize` and is used to make the two traits compatible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     If you specify a custom path for `serde_with` via the `crate` attribute, the path to the `Same` type will be altered accordingly.</span>
-<span class="doccomment">/// 2. Wrap the type from the annotation inside a `::serde_with::As`.</span>
-<span class="doccomment">///     In the above example we know have something like `::serde_with::As::&lt;Vec&lt;::serde_with::Same&gt;&gt;`.</span>
-<span class="doccomment">///     The `As` type acts as the opposite of the `Same` type.</span>
-<span class="doccomment">///     It allows using a `SerializeAs` type whenever a `Serialize` is required.</span>
-<span class="doccomment">/// 3. Translate the `*as` attributes into the serde equivalent ones.</span>
-<span class="doccomment">///     `#[serde_as(as = ...)]` will become `#[serde(with = ...)]`.</span>
-<span class="doccomment">///     Similarly, `serialize_as` is translated to `serialize_with`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     The field attributes will be kept on the struct/enum such that other macros can use them too.</span>
-<span class="doccomment">/// 4. It searches `#[serde_as(as = ...)]` if there is a type named `BorrowCow` under any path.</span>
-<span class="doccomment">///     If `BorrowCow` is found, the attribute `#[serde(borrow)]` is added to the field.</span>
-<span class="doccomment">///     If `#[serde(borrow)]` or `#[serde(borrow = &quot;...&quot;)]` is already present, this step will be skipped.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// After all these steps, the code snippet will have transformed into roughly this.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// #[derive(serde::Serialize)]</span>
-<span class="doccomment">/// struct Foo {</span>
-<span class="doccomment">///     #[serde_as(as = &quot;Vec&lt;_&gt;&quot;)]</span>
-<span class="doccomment">///     #[serde(with = &quot;::serde_with::As::&lt;Vec&lt;::serde_with::Same&gt;&gt;&quot;)]</span>
-<span class="doccomment">///     bar: Vec&lt;u32&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`serde_as`]: https://docs.rs/serde_with/1.12.1/serde_with/guide/index.html</span>
-<span class="doccomment">/// [re-exporting `serde_as`]: https://docs.rs/serde_with/1.12.1/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serde_as</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">FromMeta</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">SerdeContainerOptions</span> {
-        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;crate&quot;</span>, <span class="ident">default</span>)]</span>
-        <span class="ident">alt_crate_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Convenience macro to use the [`serde_as`] system.
+///
+/// The [`serde_as`] system is designed as a more flexible alternative to serde&#39;s with-annotation.
+///
+/// # Example
+///
+/// ```rust,ignore
+/// use serde_with::{serde_as, DisplayFromStr};
+/// use std::collections::HashMap;
+///
+/// #[serde_as]
+/// #[derive(Serialize, Deserialize)]
+/// struct Data {
+///     /// Serialize into number
+///     #[serde_as(as = &quot;_&quot;)]
+///     a: u32,
+///
+///     /// Serialize into String
+///     #[serde_as(as = &quot;DisplayFromStr&quot;)]
+///     b: u32,
+///
+///     /// Serialize into a map from String to String
+///     #[serde_as(as = &quot;HashMap&lt;DisplayFromStr, _&gt;&quot;)]
+///     c: Vec&lt;(u32, String)&gt;,
+/// }
+/// ```
+///
+/// # Alternative path to `serde_with` crate
+///
+/// If `serde_with` is not available at the default path, its path should be specified with the
+/// `crate` argument. See [re-exporting `serde_as`] for more use case information.
+///
+/// ```rust,ignore
+/// #[serde_as(crate = &quot;::some_other_lib::serde_with&quot;)]
+/// #[derive(Deserialize)]
+/// struct Data {
+///     #[serde_as(as = &quot;_&quot;)]
+///     a: u32,
+/// }
+/// ```
+///
+/// # What this macro does
+///
+/// The `serde_as` macro only serves a convenience function.
+/// All the steps it performs, can easily be done manually, in case the cost of an attribute macro is deemed to high.
+/// The functionality can best be described with an example.
+///
+/// ```rust,ignore
+/// #[serde_as]
+/// #[derive(serde::Serialize)]
+/// struct Foo {
+///     #[serde_as(as = &quot;Vec&lt;_&gt;&quot;)]
+///     bar: Vec&lt;u32&gt;,
+/// }
+/// ```
+///
+/// 1. All the placeholder type `_` will be replaced with `::serde_with::Same`.
+///     The placeholder type `_` marks all the places where the types `Serialize` implementation should be used.
+///     In the example, it means that the `u32` values will serialize with the `Serialize` implementation of `u32`.
+///     The `Same` type implements `SerializeAs` whenever the underlying type implements `Serialize` and is used to make the two traits compatible.
+///
+///     If you specify a custom path for `serde_with` via the `crate` attribute, the path to the `Same` type will be altered accordingly.
+/// 2. Wrap the type from the annotation inside a `::serde_with::As`.
+///     In the above example we know have something like `::serde_with::As::&lt;Vec&lt;::serde_with::Same&gt;&gt;`.
+///     The `As` type acts as the opposite of the `Same` type.
+///     It allows using a `SerializeAs` type whenever a `Serialize` is required.
+/// 3. Translate the `*as` attributes into the serde equivalent ones.
+///     `#[serde_as(as = ...)]` will become `#[serde(with = ...)]`.
+///     Similarly, `serialize_as` is translated to `serialize_with`.
+///
+///     The field attributes will be kept on the struct/enum such that other macros can use them too.
+/// 4. It searches `#[serde_as(as = ...)]` if there is a type named `BorrowCow` under any path.
+///     If `BorrowCow` is found, the attribute `#[serde(borrow)]` is added to the field.
+///     If `#[serde(borrow)]` or `#[serde(borrow = &quot;...&quot;)]` is already present, this step will be skipped.
+///
+/// After all these steps, the code snippet will have transformed into roughly this.
+///
+/// ```rust,ignore
+/// #[derive(serde::Serialize)]
+/// struct Foo {
+///     #[serde_as(as = &quot;Vec&lt;_&gt;&quot;)]
+///     #[serde(with = &quot;::serde_with::As::&lt;Vec&lt;::serde_with::Same&gt;&gt;&quot;)]
+///     bar: Vec&lt;u32&gt;,
+/// }
+/// ```
+///
+/// [`serde_as`]: https://docs.rs/serde_with/1.12.1/serde_with/guide/index.html
+/// [re-exporting `serde_as`]: https://docs.rs/serde_with/1.12.1/serde_with/guide/serde_as/index.html#re-exporting-serde_as
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>serde_as(args: TokenStream, input: TokenStream) -&gt; TokenStream {
+    <span class="attribute">#[derive(FromMeta, Debug)]
+    </span><span class="kw">struct </span>SerdeContainerOptions {
+        <span class="attribute">#[darling(rename = <span class="string">&quot;crate&quot;</span>, default)]
+        </span>alt_crate_path: <span class="prelude-ty">Option</span>&lt;String&gt;,
     }
 
-    <span class="kw">let</span> <span class="ident">args</span>: <span class="ident">AttributeArgs</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">args</span>);
-    <span class="kw">let</span> <span class="ident">container_options</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">SerdeContainerOptions::from_list</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-            <span class="kw">return</span> <span class="ident">TokenStream::from</span>(<span class="ident">e</span>.<span class="ident">write_errors</span>());
+    <span class="kw">let </span>args: AttributeArgs = <span class="macro">parse_macro_input!</span>(args);
+    <span class="kw">let </span>container_options = <span class="kw">match </span>SerdeContainerOptions::from_list(<span class="kw-2">&amp;</span>args) {
+        <span class="prelude-val">Ok</span>(v) =&gt; v,
+        <span class="prelude-val">Err</span>(e) =&gt; {
+            <span class="kw">return </span>TokenStream::from(e.write_errors());
         }
     };
 
-    <span class="kw">let</span> <span class="ident">serde_with_crate_path</span> <span class="op">=</span> <span class="ident">container_options</span>
-        .<span class="ident">alt_crate_path</span>
-        .<span class="ident">as_deref</span>()
-        .<span class="ident">unwrap_or</span>(<span class="string">&quot;::serde_with&quot;</span>);
-    <span class="kw">let</span> <span class="ident">serde_with_crate_path</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">syn::parse_str</span>(<span class="ident">serde_with_crate_path</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">path</span>) =&gt; <span class="ident">path</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">TokenStream::from</span>(<span class="ident">DarlingError::from</span>(<span class="ident">err</span>).<span class="ident">write_errors</span>()),
+    <span class="kw">let </span>serde_with_crate_path = container_options
+        .alt_crate_path
+        .as_deref()
+        .unwrap_or(<span class="string">&quot;::serde_with&quot;</span>);
+    <span class="kw">let </span>serde_with_crate_path = <span class="kw">match </span>syn::parse_str(serde_with_crate_path) {
+        <span class="prelude-val">Ok</span>(path) =&gt; path,
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span>TokenStream::from(DarlingError::from(err).write_errors()),
     };
 
-    <span class="comment">// Convert any error message into a nice compiler error</span>
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">apply_function_to_struct_and_enum_fields_darling</span>(
-        <span class="ident">input</span>,
-        <span class="kw-2">&amp;</span><span class="ident">serde_with_crate_path</span>,
-        <span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">serde_as_add_attr_to_field</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">serde_with_crate_path</span>),
+    <span class="comment">// Convert any error message into a nice compiler error
+    </span><span class="kw">let </span>res = <span class="kw">match </span>apply_function_to_struct_and_enum_fields_darling(
+        input,
+        <span class="kw-2">&amp;</span>serde_with_crate_path,
+        |field| serde_as_add_attr_to_field(field, <span class="kw-2">&amp;</span>serde_with_crate_path),
     ) {
-        <span class="prelude-val">Ok</span>(<span class="ident">res</span>) =&gt; <span class="ident">res</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">write_errors</span>(),
+        <span class="prelude-val">Ok</span>(res) =&gt; res,
+        <span class="prelude-val">Err</span>(err) =&gt; err.write_errors(),
     };
-    <span class="ident">TokenStream::from</span>(<span class="ident">res</span>)
+    TokenStream::from(res)
 }
 
-<span class="doccomment">/// Inspect the field and convert the `serde_as` attribute into the classical `serde`</span>
-<span class="kw">fn</span> <span class="ident">serde_as_add_attr_to_field</span>(
-    <span class="ident">field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Field</span>,
-    <span class="ident">serde_with_crate_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">FromField</span>, <span class="ident">Debug</span>)]</span>
-    <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">attributes</span>(<span class="ident">serde_as</span>))]</span>
-    <span class="kw">struct</span> <span class="ident">SerdeAsOptions</span> {
-        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;as&quot;</span>, <span class="ident">default</span>)]</span>
-        <span class="ident">r#as</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">default</span>)]</span>
-        <span class="ident">deserialize_as</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">default</span>)]</span>
-        <span class="ident">serialize_as</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Inspect the field and convert the `serde_as` attribute into the classical `serde`
+</span><span class="kw">fn </span>serde_as_add_attr_to_field(
+    field: <span class="kw-2">&amp;mut </span>Field,
+    serde_with_crate_path: <span class="kw-2">&amp;</span>Path,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), DarlingError&gt; {
+    <span class="attribute">#[derive(FromField, Debug)]
+    #[darling(attributes(serde_as))]
+    </span><span class="kw">struct </span>SerdeAsOptions {
+        <span class="attribute">#[darling(rename = <span class="string">&quot;as&quot;</span>, default)]
+        </span>r#as: <span class="prelude-ty">Option</span>&lt;Type&gt;,
+        <span class="attribute">#[darling(default)]
+        </span>deserialize_as: <span class="prelude-ty">Option</span>&lt;Type&gt;,
+        <span class="attribute">#[darling(default)]
+        </span>serialize_as: <span class="prelude-ty">Option</span>&lt;Type&gt;,
     }
 
-    <span class="kw">impl</span> <span class="ident">SerdeAsOptions</span> {
-        <span class="kw">fn</span> <span class="ident">has_any_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-            <span class="self">self</span>.<span class="ident">r#as</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_as</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">serialize_as</span>.<span class="ident">is_some</span>()
+    <span class="kw">impl </span>SerdeAsOptions {
+        <span class="kw">fn </span>has_any_set(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+            <span class="self">self</span>.r#as.is_some() || <span class="self">self</span>.deserialize_as.is_some() || <span class="self">self</span>.serialize_as.is_some()
         }
     }
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">FromField</span>, <span class="ident">Debug</span>)]</span>
-    <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">attributes</span>(<span class="ident">serde</span>), <span class="ident">allow_unknown_fields</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">SerdeOptions</span> {
-        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">default</span>)]</span>
-        <span class="ident">with</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">default</span>)]</span>
-        <span class="ident">deserialize_with</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">default</span>)]</span>
-        <span class="ident">serialize_with</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[derive(FromField, Debug)]
+    #[darling(attributes(serde), allow_unknown_fields)]
+    </span><span class="kw">struct </span>SerdeOptions {
+        <span class="attribute">#[darling(default)]
+        </span>with: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        <span class="attribute">#[darling(default)]
+        </span>deserialize_with: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        <span class="attribute">#[darling(default)]
+        </span>serialize_with: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">default</span>)]</span>
-        <span class="ident">borrow</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Override</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="attribute">#[darling(default)]
+        </span>borrow: <span class="prelude-ty">Option</span>&lt;Override&lt;String&gt;&gt;,
     }
 
-    <span class="kw">impl</span> <span class="ident">SerdeOptions</span> {
-        <span class="kw">fn</span> <span class="ident">has_any_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-            <span class="self">self</span>.<span class="ident">with</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_with</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">serialize_with</span>.<span class="ident">is_some</span>()
+    <span class="kw">impl </span>SerdeOptions {
+        <span class="kw">fn </span>has_any_set(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+            <span class="self">self</span>.with.is_some() || <span class="self">self</span>.deserialize_with.is_some() || <span class="self">self</span>.serialize_with.is_some()
         }
     }
 
-    <span class="comment">// Check if there even is any `serde_as` attribute and exit early if not.</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">field</span>
-        .<span class="ident">attrs</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;serde_as&quot;</span>))
+    <span class="comment">// Check if there even is any `serde_as` attribute and exit early if not.
+    </span><span class="kw">if </span>!field
+        .attrs
+        .iter()
+        .any(|attr| attr.path.is_ident(<span class="string">&quot;serde_as&quot;</span>))
     {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
-    <span class="kw">let</span> <span class="ident">serde_as_options</span> <span class="op">=</span> <span class="ident">SerdeAsOptions::from_field</span>(<span class="ident">field</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">serde_options</span> <span class="op">=</span> <span class="ident">SerdeOptions::from_field</span>(<span class="ident">field</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>serde_as_options = SerdeAsOptions::from_field(field)<span class="question-mark">?</span>;
+    <span class="kw">let </span>serde_options = SerdeOptions::from_field(field)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">serde_as_options</span>.<span class="ident">has_any_set</span>() {
-        <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">DarlingError::custom</span>(<span class="string">&quot;An empty `serde_as` attribute on a field has no effect. You are missing an `as`, `serialize_as`, or `deserialize_as` parameter.&quot;</span>));
-    }
-
-    <span class="comment">// Check if there are any conflicting attributes</span>
-    <span class="kw">if</span> <span class="ident">serde_as_options</span>.<span class="ident">has_any_set</span>() <span class="op">&amp;&amp;</span> <span class="ident">serde_options</span>.<span class="ident">has_any_set</span>() {
-        <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">DarlingError::custom</span>(<span class="string">&quot;Cannot combine `serde_as` with serde&#39;s `with`, `deserialize_with`, or `serialize_with`.&quot;</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>errors = Vec::new();
+    <span class="kw">if </span>!serde_as_options.has_any_set() {
+        errors.push(DarlingError::custom(<span class="string">&quot;An empty `serde_as` attribute on a field has no effect. You are missing an `as`, `serialize_as`, or `deserialize_as` parameter.&quot;</span>));
     }
 
-    <span class="kw">if</span> <span class="ident">serde_as_options</span>.<span class="ident">r#as</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">serde_as_options</span>.<span class="ident">deserialize_as</span>.<span class="ident">is_some</span>() {
-        <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">DarlingError::custom</span>(<span class="string">&quot;Cannot combine `as` with `deserialize_as`. Use `serialize_as` to specify different serialization code.&quot;</span>));
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">serde_as_options</span>.<span class="ident">r#as</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">serde_as_options</span>.<span class="ident">serialize_as</span>.<span class="ident">is_some</span>() {
-        <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">DarlingError::custom</span>(<span class="string">&quot;Cannot combine `as` with `serialize_as`. Use `deserialize_as` to specify different deserialization code.&quot;</span>));
+    <span class="comment">// Check if there are any conflicting attributes
+    </span><span class="kw">if </span>serde_as_options.has_any_set() &amp;&amp; serde_options.has_any_set() {
+        errors.push(DarlingError::custom(<span class="string">&quot;Cannot combine `serde_as` with serde&#39;s `with`, `deserialize_with`, or `serialize_with`.&quot;</span>));
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">errors</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DarlingError::multiple</span>(<span class="ident">errors</span>));
+    <span class="kw">if </span>serde_as_options.r#as.is_some() &amp;&amp; serde_as_options.deserialize_as.is_some() {
+        errors.push(DarlingError::custom(<span class="string">&quot;Cannot combine `as` with `deserialize_as`. Use `serialize_as` to specify different serialization code.&quot;</span>));
+    } <span class="kw">else if </span>serde_as_options.r#as.is_some() &amp;&amp; serde_as_options.serialize_as.is_some() {
+        errors.push(DarlingError::custom(<span class="string">&quot;Cannot combine `as` with `serialize_as`. Use `deserialize_as` to specify different deserialization code.&quot;</span>));
     }
 
-    <span class="kw">let</span> <span class="ident">type_same</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">syn::parse_quote!</span>(#<span class="ident">serde_with_crate_path::Same</span>);
-    <span class="kw">let</span> <span class="ident">type_borrowcow</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">syn::parse_quote!</span>(<span class="ident">BorrowCow</span>);
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">type_</span>) <span class="op">=</span> <span class="ident">serde_as_options</span>.<span class="ident">r#as</span> {
-        <span class="comment">// If the field is not borrowed yet, check if we need to borrow it.</span>
-        <span class="kw">if</span> <span class="ident">serde_options</span>.<span class="ident">borrow</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">type_</span>, <span class="ident">type_borrowcow</span>) {
-            <span class="kw">let</span> <span class="ident">attr_borrow</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>)]</span>);
-            <span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">push</span>(<span class="ident">attr_borrow</span>);
+    <span class="kw">if </span>!errors.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(DarlingError::multiple(errors));
+    }
+
+    <span class="kw">let </span>type_same = <span class="kw-2">&amp;</span><span class="macro">syn::parse_quote!</span>(#serde_with_crate_path::Same);
+    <span class="kw">let </span>type_borrowcow = <span class="kw-2">&amp;</span><span class="macro">syn::parse_quote!</span>(BorrowCow);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(type_) = serde_as_options.r#as {
+        <span class="comment">// If the field is not borrowed yet, check if we need to borrow it.
+        </span><span class="kw">if </span>serde_options.borrow.is_none() &amp;&amp; has_type_embedded(<span class="kw-2">&amp;</span>type_, type_borrowcow) {
+            <span class="kw">let </span>attr_borrow = <span class="macro">parse_quote!</span>(<span class="attribute">#[serde(borrow)]</span>);
+            field.attrs.push(attr_borrow);
         }
 
-        <span class="kw">let</span> <span class="ident">replacement_type</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">type_same</span>);
-        <span class="kw">let</span> <span class="ident">attr_inner_tokens</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">serde_with_crate_path::As</span>::<span class="op">&lt;</span>#<span class="ident">replacement_type</span><span class="op">&gt;</span>).<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> #<span class="ident">attr_inner_tokens</span>)]</span>);
-        <span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">push</span>(<span class="ident">attr</span>);
+        <span class="kw">let </span>replacement_type = replace_infer_type_with_type(type_, type_same);
+        <span class="kw">let </span>attr_inner_tokens = <span class="macro">quote!</span>(#serde_with_crate_path::As::&lt;#replacement_type&gt;).to_string();
+        <span class="kw">let </span>attr = <span class="macro">parse_quote!</span>(<span class="attribute">#[serde(with = #attr_inner_tokens)]</span>);
+        field.attrs.push(attr);
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">type_</span>) <span class="op">=</span> <span class="ident">serde_as_options</span>.<span class="ident">deserialize_as</span> {
-        <span class="comment">// If the field is not borrowed yet, check if we need to borrow it.</span>
-        <span class="kw">if</span> <span class="ident">serde_options</span>.<span class="ident">borrow</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">type_</span>, <span class="ident">type_borrowcow</span>) {
-            <span class="kw">let</span> <span class="ident">attr_borrow</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>)]</span>);
-            <span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">push</span>(<span class="ident">attr_borrow</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(type_) = serde_as_options.deserialize_as {
+        <span class="comment">// If the field is not borrowed yet, check if we need to borrow it.
+        </span><span class="kw">if </span>serde_options.borrow.is_none() &amp;&amp; has_type_embedded(<span class="kw-2">&amp;</span>type_, type_borrowcow) {
+            <span class="kw">let </span>attr_borrow = <span class="macro">parse_quote!</span>(<span class="attribute">#[serde(borrow)]</span>);
+            field.attrs.push(attr_borrow);
         }
 
-        <span class="kw">let</span> <span class="ident">replacement_type</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">type_same</span>);
-        <span class="kw">let</span> <span class="ident">attr_inner_tokens</span> <span class="op">=</span>
-            <span class="macro">quote!</span>(#<span class="ident">serde_with_crate_path::As</span>::<span class="op">&lt;</span>#<span class="ident">replacement_type</span><span class="op">&gt;</span><span class="ident">::deserialize</span>).<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> #<span class="ident">attr_inner_tokens</span>)]</span>);
-        <span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">push</span>(<span class="ident">attr</span>);
+        <span class="kw">let </span>replacement_type = replace_infer_type_with_type(type_, type_same);
+        <span class="kw">let </span>attr_inner_tokens =
+            <span class="macro">quote!</span>(#serde_with_crate_path::As::&lt;#replacement_type&gt;::deserialize).to_string();
+        <span class="kw">let </span>attr = <span class="macro">parse_quote!</span>(<span class="attribute">#[serde(deserialize_with = #attr_inner_tokens)]</span>);
+        field.attrs.push(attr);
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">type_</span>) <span class="op">=</span> <span class="ident">serde_as_options</span>.<span class="ident">serialize_as</span> {
-        <span class="kw">let</span> <span class="ident">replacement_type</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">type_same</span>);
-        <span class="kw">let</span> <span class="ident">attr_inner_tokens</span> <span class="op">=</span>
-            <span class="macro">quote!</span>(#<span class="ident">serde_with_crate_path::As</span>::<span class="op">&lt;</span>#<span class="ident">replacement_type</span><span class="op">&gt;</span><span class="ident">::serialize</span>).<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> #<span class="ident">attr_inner_tokens</span>)]</span>);
-        <span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">push</span>(<span class="ident">attr</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(type_) = serde_as_options.serialize_as {
+        <span class="kw">let </span>replacement_type = replace_infer_type_with_type(type_, type_same);
+        <span class="kw">let </span>attr_inner_tokens =
+            <span class="macro">quote!</span>(#serde_with_crate_path::As::&lt;#replacement_type&gt;::serialize).to_string();
+        <span class="kw">let </span>attr = <span class="macro">parse_quote!</span>(<span class="attribute">#[serde(serialize_with = #attr_inner_tokens)]</span>);
+        field.attrs.push(attr);
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Recursively replace all occurrences of `_` with `replacement` in a [Type][]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The [serde_as][macro@serde_as] macro allows to use the infer type, i.e., `_`, as shortcut for `serde_with::As`.</span>
-<span class="doccomment">/// This function replaces all occurrences of the infer type with another type.</span>
-<span class="kw">fn</span> <span class="ident">replace_infer_type_with_type</span>(<span class="ident">to_replace</span>: <span class="ident">Type</span>, <span class="ident">replacement</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">Type</span> {
-    <span class="kw">match</span> <span class="ident">to_replace</span> {
-        <span class="comment">// Base case</span>
-        <span class="comment">// Replace the infer type with the actual replacement type</span>
-        <span class="ident">Type::Infer</span>(<span class="kw">_</span>) =&gt; <span class="ident">replacement</span>.<span class="ident">clone</span>(),
+<span class="doccomment">/// Recursively replace all occurrences of `_` with `replacement` in a [Type][]
+///
+/// The [serde_as][macro@serde_as] macro allows to use the infer type, i.e., `_`, as shortcut for `serde_with::As`.
+/// This function replaces all occurrences of the infer type with another type.
+</span><span class="kw">fn </span>replace_infer_type_with_type(to_replace: Type, replacement: <span class="kw-2">&amp;</span>Type) -&gt; Type {
+    <span class="kw">match </span>to_replace {
+        <span class="comment">// Base case
+        // Replace the infer type with the actual replacement type
+        </span>Type::Infer(<span class="kw">_</span>) =&gt; replacement.clone(),
 
-        <span class="comment">// Recursive cases</span>
-        <span class="comment">// Iterate through all positions where a type could occur and recursively call this function</span>
-        <span class="ident">Type::Array</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-            <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
-            <span class="ident">Type::Array</span>(<span class="ident">inner</span>)
+        <span class="comment">// Recursive cases
+        // Iterate through all positions where a type could occur and recursively call this function
+        </span>Type::Array(<span class="kw-2">mut </span>inner) =&gt; {
+            <span class="kw-2">*</span>inner.elem = replace_infer_type_with_type(<span class="kw-2">*</span>inner.elem, replacement);
+            Type::Array(inner)
         }
-        <span class="ident">Type::Group</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-            <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
-            <span class="ident">Type::Group</span>(<span class="ident">inner</span>)
+        Type::Group(<span class="kw-2">mut </span>inner) =&gt; {
+            <span class="kw-2">*</span>inner.elem = replace_infer_type_with_type(<span class="kw-2">*</span>inner.elem, replacement);
+            Type::Group(inner)
         }
-        <span class="ident">Type::Never</span>(<span class="ident">inner</span>) =&gt; <span class="ident">Type::Never</span>(<span class="ident">inner</span>),
-        <span class="ident">Type::Paren</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-            <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
-            <span class="ident">Type::Paren</span>(<span class="ident">inner</span>)
+        Type::Never(inner) =&gt; Type::Never(inner),
+        Type::Paren(<span class="kw-2">mut </span>inner) =&gt; {
+            <span class="kw-2">*</span>inner.elem = replace_infer_type_with_type(<span class="kw-2">*</span>inner.elem, replacement);
+            Type::Paren(inner)
         }
-        <span class="ident">Type::Path</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-            <span class="kw">match</span> <span class="ident">inner</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">pop</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">Pair::End</span>(<span class="kw-2">mut</span> <span class="ident">t</span>)) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Pair::Punctuated</span>(<span class="kw-2">mut</span> <span class="ident">t</span>, <span class="kw">_</span>)) =&gt; {
-                    <span class="ident">t</span>.<span class="ident">arguments</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">t</span>.<span class="ident">arguments</span> {
-                        <span class="ident">PathArguments::None</span> =&gt; <span class="ident">PathArguments::None</span>,
-                        <span class="ident">PathArguments::AngleBracketed</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-                            <span class="comment">// Iterate over the args between the angle brackets</span>
-                            <span class="ident">inner</span>.<span class="ident">args</span> <span class="op">=</span> <span class="ident">inner</span>
-                                .<span class="ident">args</span>
-                                .<span class="ident">into_iter</span>()
-                                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">generic_argument</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">generic_argument</span> {
-                                    <span class="comment">// replace types within the generics list, but leave other stuff like lifetimes untouched</span>
-                                    <span class="ident">GenericArgument::Type</span>(<span class="ident">type_</span>) =&gt; <span class="ident">GenericArgument::Type</span>(
-                                        <span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">replacement</span>),
+        Type::Path(<span class="kw-2">mut </span>inner) =&gt; {
+            <span class="kw">match </span>inner.path.segments.pop() {
+                <span class="prelude-val">Some</span>(Pair::End(<span class="kw-2">mut </span>t)) | <span class="prelude-val">Some</span>(Pair::Punctuated(<span class="kw-2">mut </span>t, <span class="kw">_</span>)) =&gt; {
+                    t.arguments = <span class="kw">match </span>t.arguments {
+                        PathArguments::None =&gt; PathArguments::None,
+                        PathArguments::AngleBracketed(<span class="kw-2">mut </span>inner) =&gt; {
+                            <span class="comment">// Iterate over the args between the angle brackets
+                            </span>inner.args = inner
+                                .args
+                                .into_iter()
+                                .map(|generic_argument| <span class="kw">match </span>generic_argument {
+                                    <span class="comment">// replace types within the generics list, but leave other stuff like lifetimes untouched
+                                    </span>GenericArgument::Type(type_) =&gt; GenericArgument::Type(
+                                        replace_infer_type_with_type(type_, replacement),
                                     ),
-                                    <span class="ident">ga</span> =&gt; <span class="ident">ga</span>,
+                                    ga =&gt; ga,
                                 })
-                                .<span class="ident">collect</span>();
-                            <span class="ident">PathArguments::AngleBracketed</span>(<span class="ident">inner</span>)
+                                .collect();
+                            PathArguments::AngleBracketed(inner)
                         }
-                        <span class="ident">PathArguments::Parenthesized</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-                            <span class="ident">inner</span>.<span class="ident">inputs</span> <span class="op">=</span> <span class="ident">inner</span>
-                                .<span class="ident">inputs</span>
-                                .<span class="ident">into_iter</span>()
-                                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">type_</span><span class="op">|</span> <span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">replacement</span>))
-                                .<span class="ident">collect</span>();
-                            <span class="ident">inner</span>.<span class="ident">output</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">inner</span>.<span class="ident">output</span> {
-                                <span class="ident">ReturnType::Type</span>(<span class="ident">arrow</span>, <span class="kw-2">mut</span> <span class="ident">type_</span>) =&gt; {
-                                    <span class="kw-2">*</span><span class="ident">type_</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">type_</span>, <span class="ident">replacement</span>);
-                                    <span class="ident">ReturnType::Type</span>(<span class="ident">arrow</span>, <span class="ident">type_</span>)
+                        PathArguments::Parenthesized(<span class="kw-2">mut </span>inner) =&gt; {
+                            inner.inputs = inner
+                                .inputs
+                                .into_iter()
+                                .map(|type_| replace_infer_type_with_type(type_, replacement))
+                                .collect();
+                            inner.output = <span class="kw">match </span>inner.output {
+                                ReturnType::Type(arrow, <span class="kw-2">mut </span>type_) =&gt; {
+                                    <span class="kw-2">*</span>type_ = replace_infer_type_with_type(<span class="kw-2">*</span>type_, replacement);
+                                    ReturnType::Type(arrow, type_)
                                 }
-                                <span class="ident">default</span> =&gt; <span class="ident">default</span>,
+                                default =&gt; default,
                             };
-                            <span class="ident">PathArguments::Parenthesized</span>(<span class="ident">inner</span>)
+                            PathArguments::Parenthesized(inner)
                         }
                     };
-                    <span class="ident">inner</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">push</span>(<span class="ident">t</span>);
+                    inner.path.segments.push(t);
                 }
-                <span class="prelude-val">None</span> =&gt; {}
+                <span class="prelude-val">None </span>=&gt; {}
             }
-            <span class="ident">Type::Path</span>(<span class="ident">inner</span>)
+            Type::Path(inner)
         }
-        <span class="ident">Type::Ptr</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-            <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
-            <span class="ident">Type::Ptr</span>(<span class="ident">inner</span>)
+        Type::Ptr(<span class="kw-2">mut </span>inner) =&gt; {
+            <span class="kw-2">*</span>inner.elem = replace_infer_type_with_type(<span class="kw-2">*</span>inner.elem, replacement);
+            Type::Ptr(inner)
         }
-        <span class="ident">Type::Reference</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-            <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
-            <span class="ident">Type::Reference</span>(<span class="ident">inner</span>)
+        Type::Reference(<span class="kw-2">mut </span>inner) =&gt; {
+            <span class="kw-2">*</span>inner.elem = replace_infer_type_with_type(<span class="kw-2">*</span>inner.elem, replacement);
+            Type::Reference(inner)
         }
-        <span class="ident">Type::Slice</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-            <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
-            <span class="ident">Type::Slice</span>(<span class="ident">inner</span>)
+        Type::Slice(<span class="kw-2">mut </span>inner) =&gt; {
+            <span class="kw-2">*</span>inner.elem = replace_infer_type_with_type(<span class="kw-2">*</span>inner.elem, replacement);
+            Type::Slice(inner)
         }
-        <span class="ident">Type::Tuple</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-            <span class="ident">inner</span>.<span class="ident">elems</span> <span class="op">=</span> <span class="ident">inner</span>
-                .<span class="ident">elems</span>
-                .<span class="ident">into_pairs</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">pair</span> {
-                    <span class="ident">Pair::Punctuated</span>(<span class="ident">type_</span>, <span class="ident">p</span>) =&gt; {
-                        <span class="ident">Pair::Punctuated</span>(<span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">replacement</span>), <span class="ident">p</span>)
+        Type::Tuple(<span class="kw-2">mut </span>inner) =&gt; {
+            inner.elems = inner
+                .elems
+                .into_pairs()
+                .map(|pair| <span class="kw">match </span>pair {
+                    Pair::Punctuated(type_, p) =&gt; {
+                        Pair::Punctuated(replace_infer_type_with_type(type_, replacement), p)
                     }
-                    <span class="ident">Pair::End</span>(<span class="ident">type_</span>) =&gt; <span class="ident">Pair::End</span>(<span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">replacement</span>)),
+                    Pair::End(type_) =&gt; Pair::End(replace_infer_type_with_type(type_, replacement)),
                 })
-                .<span class="ident">collect</span>();
-            <span class="ident">Type::Tuple</span>(<span class="ident">inner</span>)
+                .collect();
+            Type::Tuple(inner)
         }
 
-        <span class="comment">// Pass unknown types or non-handleable types (e.g., bare Fn) without performing any replacements</span>
-        <span class="ident">type_</span> =&gt; <span class="ident">type_</span>,
+        <span class="comment">// Pass unknown types or non-handleable types (e.g., bare Fn) without performing any replacements
+        </span>type_ =&gt; type_,
     }
 }
 
-<span class="doccomment">/// Check if a type ending in the `syn::Ident` `embedded_type` is contained in `type_`.</span>
-<span class="kw">fn</span> <span class="ident">has_type_embedded</span>(<span class="ident">type_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">embedded_type</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">type_</span> {
-        <span class="comment">// Base cases</span>
-        <span class="ident">Type::Infer</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-        <span class="ident">Type::Never</span>(<span class="ident">_inner</span>) =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// Check if a type ending in the `syn::Ident` `embedded_type` is contained in `type_`.
+</span><span class="kw">fn </span>has_type_embedded(type_: <span class="kw-2">&amp;</span>Type, embedded_type: <span class="kw-2">&amp;</span>syn::Ident) -&gt; bool {
+    <span class="kw">match </span>type_ {
+        <span class="comment">// Base cases
+        </span>Type::Infer(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+        Type::Never(_inner) =&gt; <span class="bool-val">false</span>,
 
-        <span class="comment">// Recursive cases</span>
-        <span class="comment">// Iterate through all positions where a type could occur and recursively call this function</span>
-        <span class="ident">Type::Array</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Group</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Paren</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Path</span>(<span class="ident">inner</span>) =&gt; {
-            <span class="kw">match</span> <span class="ident">inner</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">last</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">embedded_type</span> {
-                        <span class="kw">return</span> <span class="bool-val">true</span>;
+        <span class="comment">// Recursive cases
+        // Iterate through all positions where a type could occur and recursively call this function
+        </span>Type::Array(inner) =&gt; has_type_embedded(<span class="kw-2">&amp;</span>inner.elem, embedded_type),
+        Type::Group(inner) =&gt; has_type_embedded(<span class="kw-2">&amp;</span>inner.elem, embedded_type),
+        Type::Paren(inner) =&gt; has_type_embedded(<span class="kw-2">&amp;</span>inner.elem, embedded_type),
+        Type::Path(inner) =&gt; {
+            <span class="kw">match </span>inner.path.segments.last() {
+                <span class="prelude-val">Some</span>(t) =&gt; {
+                    <span class="kw">if </span>t.ident == <span class="kw-2">*</span>embedded_type {
+                        <span class="kw">return </span><span class="bool-val">true</span>;
                     }
 
-                    <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">arguments</span> {
-                        <span class="ident">PathArguments::None</span> =&gt; <span class="bool-val">false</span>,
-                        <span class="ident">PathArguments::AngleBracketed</span>(<span class="ident">inner</span>) =&gt; {
-                            <span class="comment">// Iterate over the args between the angle brackets</span>
-                            <span class="ident">inner</span>
-                                .<span class="ident">args</span>
-                                .<span class="ident">iter</span>()
-                                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">generic_argument</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">generic_argument</span> {
-                                    <span class="comment">// replace types within the generics list, but leave other stuff like lifetimes untouched</span>
-                                    <span class="ident">GenericArgument::Type</span>(<span class="ident">type_</span>) =&gt; {
-                                        <span class="ident">has_type_embedded</span>(<span class="ident">type_</span>, <span class="ident">embedded_type</span>)
+                    <span class="kw">match </span><span class="kw-2">&amp;</span>t.arguments {
+                        PathArguments::None =&gt; <span class="bool-val">false</span>,
+                        PathArguments::AngleBracketed(inner) =&gt; {
+                            <span class="comment">// Iterate over the args between the angle brackets
+                            </span>inner
+                                .args
+                                .iter()
+                                .any(|generic_argument| <span class="kw">match </span>generic_argument {
+                                    <span class="comment">// replace types within the generics list, but leave other stuff like lifetimes untouched
+                                    </span>GenericArgument::Type(type_) =&gt; {
+                                        has_type_embedded(type_, embedded_type)
                                     }
-                                    <span class="ident">_ga</span> =&gt; <span class="bool-val">false</span>,
+                                    _ga =&gt; <span class="bool-val">false</span>,
                                 })
                         }
-                        <span class="ident">PathArguments::Parenthesized</span>(<span class="ident">inner</span>) =&gt; {
-                            <span class="ident">inner</span>
-                                .<span class="ident">inputs</span>
-                                .<span class="ident">iter</span>()
-                                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">type_</span><span class="op">|</span> <span class="ident">has_type_embedded</span>(<span class="ident">type_</span>, <span class="ident">embedded_type</span>))
-                                <span class="op">|</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">output</span> {
-                                    <span class="ident">ReturnType::Type</span>(<span class="ident">_arrow</span>, <span class="ident">type_</span>) =&gt; {
-                                        <span class="ident">has_type_embedded</span>(<span class="ident">type_</span>, <span class="ident">embedded_type</span>)
+                        PathArguments::Parenthesized(inner) =&gt; {
+                            inner
+                                .inputs
+                                .iter()
+                                .any(|type_| has_type_embedded(type_, embedded_type))
+                                || <span class="kw">match </span><span class="kw-2">&amp;</span>inner.output {
+                                    ReturnType::Type(_arrow, type_) =&gt; {
+                                        has_type_embedded(type_, embedded_type)
                                     }
-                                    <span class="ident">_default</span> =&gt; <span class="bool-val">false</span>,
+                                    _default =&gt; <span class="bool-val">false</span>,
                                 }
                         }
                     }
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
             }
         }
-        <span class="ident">Type::Ptr</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Reference</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Slice</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Tuple</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">elems</span>.<span class="ident">pairs</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">pair</span> {
-            <span class="ident">Pair::Punctuated</span>(<span class="ident">type_</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Pair::End</span>(<span class="ident">type_</span>) =&gt; {
-                <span class="ident">has_type_embedded</span>(<span class="ident">type_</span>, <span class="ident">embedded_type</span>)
+        Type::Ptr(inner) =&gt; has_type_embedded(<span class="kw-2">&amp;</span>inner.elem, embedded_type),
+        Type::Reference(inner) =&gt; has_type_embedded(<span class="kw-2">&amp;</span>inner.elem, embedded_type),
+        Type::Slice(inner) =&gt; has_type_embedded(<span class="kw-2">&amp;</span>inner.elem, embedded_type),
+        Type::Tuple(inner) =&gt; inner.elems.pairs().any(|pair| <span class="kw">match </span>pair {
+            Pair::Punctuated(type_, <span class="kw">_</span>) | Pair::End(type_) =&gt; {
+                has_type_embedded(type_, embedded_type)
             }
         }),
 
-        <span class="comment">// Pass unknown types or non-handleable types (e.g., bare Fn) without performing any replacements</span>
-        <span class="ident">_type_</span> =&gt; <span class="bool-val">false</span>,
+        <span class="comment">// Pass unknown types or non-handleable types (e.g., bare Fn) without performing any replacements
+        </span>_type_ =&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// Deserialize value by using its [`FromStr`] implementation</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is an alternative way to implement `Deserialize` for types which also implement [`FromStr`] by deserializing the type from string.</span>
-<span class="doccomment">/// Ensure that the struct/enum also implements [`FromStr`].</span>
-<span class="doccomment">/// If the implementation is missing, you will get an error message like</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// error[E0277]: the trait bound `Struct: std::str::FromStr` is not satisfied</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Additionally, `FromStr::Err` **must** implement [`Display`] as otherwise you will see a rather unhelpful error message</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Serialization with [`Display`] is available with the matching [`SerializeDisplay`] derive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Attributes</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Attributes for the derive can be specified via the `#[serde_with(...)]` attribute on the struct or enum.</span>
-<span class="doccomment">/// Currently, these arguments to the attribute are possible:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * **`#[serde_with(crate = &quot;...&quot;)]`**: This allows using `DeserializeFromStr` when `serde_with` is not available from the crate root.</span>
-<span class="doccomment">///     This happens while [renaming dependencies in Cargo.toml][cargo-toml-rename] or when re-exporting the macro from a different crate.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     This argument is analogue to [serde&#39;s crate argument][serde-crate] and the [crate argument to `serde_as`][serde-as-crate].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// use std::str::FromStr;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(DeserializeFromStr)]</span>
-<span class="doccomment">/// struct A {</span>
-<span class="doccomment">///     a: u32,</span>
-<span class="doccomment">///     b: bool,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl FromStr for A {</span>
-<span class="doccomment">///     type Err = String;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     /// Parse a value like `123&lt;&gt;true`</span>
-<span class="doccomment">///     fn from_str(s: &amp;str) -&gt; Result&lt;Self, Self::Err&gt; {</span>
-<span class="doccomment">///         let mut parts = s.split(&quot;&lt;&gt;&quot;);</span>
-<span class="doccomment">///         let number = parts</span>
-<span class="doccomment">///             .next()</span>
-<span class="doccomment">///             .ok_or_else(|| &quot;Missing first value&quot;.to_string())?</span>
-<span class="doccomment">///             .parse()</span>
-<span class="doccomment">///             .map_err(|err: ParseIntError| err.to_string())?;</span>
-<span class="doccomment">///         let bool = parts</span>
-<span class="doccomment">///             .next()</span>
-<span class="doccomment">///             .ok_or_else(|| &quot;Missing second value&quot;.to_string())?</span>
-<span class="doccomment">///             .parse()</span>
-<span class="doccomment">///             .map_err(|err: ParseBoolError| err.to_string())?;</span>
-<span class="doccomment">///         Ok(Self { a: number, b: bool })</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let a: A = serde_json::from_str(&quot;\&quot;159&lt;&gt;true\&quot;&quot;).unwrap();</span>
-<span class="doccomment">/// assert_eq!(A { a: 159, b: true }, a);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Display`]: std::fmt::Display</span>
-<span class="doccomment">/// [`FromStr`]: std::str::FromStr</span>
-<span class="doccomment">/// [cargo-toml-rename]: https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#renaming-dependencies-in-cargotoml</span>
-<span class="doccomment">/// [serde-as-crate]: https://docs.rs/serde_with/1.12.1/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
-<span class="doccomment">/// [serde-crate]: https://serde.rs/container-attrs.html#crate</span>
-<span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">DeserializeFromStr</span>, <span class="ident">attributes</span>(<span class="ident">serde_with</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_deserialize_fromstr</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">DeriveInput</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">item</span>);
-    <span class="kw">let</span> <span class="ident">derive_options</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">DeriveOptions::from_derive_input</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">opt</span>) =&gt; <span class="ident">opt</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-            <span class="kw">return</span> <span class="ident">err</span>;
+<span class="doccomment">/// Deserialize value by using its [`FromStr`] implementation
+///
+/// This is an alternative way to implement `Deserialize` for types which also implement [`FromStr`] by deserializing the type from string.
+/// Ensure that the struct/enum also implements [`FromStr`].
+/// If the implementation is missing, you will get an error message like
+/// ```text
+/// error[E0277]: the trait bound `Struct: std::str::FromStr` is not satisfied
+/// ```
+/// Additionally, `FromStr::Err` **must** implement [`Display`] as otherwise you will see a rather unhelpful error message
+///
+/// Serialization with [`Display`] is available with the matching [`SerializeDisplay`] derive.
+///
+/// # Attributes
+///
+/// Attributes for the derive can be specified via the `#[serde_with(...)]` attribute on the struct or enum.
+/// Currently, these arguments to the attribute are possible:
+///
+/// * **`#[serde_with(crate = &quot;...&quot;)]`**: This allows using `DeserializeFromStr` when `serde_with` is not available from the crate root.
+///     This happens while [renaming dependencies in Cargo.toml][cargo-toml-rename] or when re-exporting the macro from a different crate.
+///
+///     This argument is analogue to [serde&#39;s crate argument][serde-crate] and the [crate argument to `serde_as`][serde-as-crate].
+///
+/// # Example
+///
+/// ```rust,ignore
+/// use std::str::FromStr;
+///
+/// #[derive(DeserializeFromStr)]
+/// struct A {
+///     a: u32,
+///     b: bool,
+/// }
+///
+/// impl FromStr for A {
+///     type Err = String;
+///
+///     /// Parse a value like `123&lt;&gt;true`
+///     fn from_str(s: &amp;str) -&gt; Result&lt;Self, Self::Err&gt; {
+///         let mut parts = s.split(&quot;&lt;&gt;&quot;);
+///         let number = parts
+///             .next()
+///             .ok_or_else(|| &quot;Missing first value&quot;.to_string())?
+///             .parse()
+///             .map_err(|err: ParseIntError| err.to_string())?;
+///         let bool = parts
+///             .next()
+///             .ok_or_else(|| &quot;Missing second value&quot;.to_string())?
+///             .parse()
+///             .map_err(|err: ParseBoolError| err.to_string())?;
+///         Ok(Self { a: number, b: bool })
+///     }
+/// }
+///
+/// let a: A = serde_json::from_str(&quot;\&quot;159&lt;&gt;true\&quot;&quot;).unwrap();
+/// assert_eq!(A { a: 159, b: true }, a);
+/// ```
+///
+/// [`Display`]: std::fmt::Display
+/// [`FromStr`]: std::str::FromStr
+/// [cargo-toml-rename]: https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#renaming-dependencies-in-cargotoml
+/// [serde-as-crate]: https://docs.rs/serde_with/1.12.1/serde_with/guide/serde_as/index.html#re-exporting-serde_as
+/// [serde-crate]: https://serde.rs/container-attrs.html#crate
+</span><span class="attribute">#[proc_macro_derive(DeserializeFromStr, attributes(serde_with))]
+</span><span class="kw">pub fn </span>derive_deserialize_fromstr(item: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span>input: DeriveInput = <span class="macro">parse_macro_input!</span>(item);
+    <span class="kw">let </span>derive_options = <span class="kw">match </span>DeriveOptions::from_derive_input(<span class="kw-2">&amp;</span>input) {
+        <span class="prelude-val">Ok</span>(opt) =&gt; opt,
+        <span class="prelude-val">Err</span>(err) =&gt; {
+            <span class="kw">return </span>err;
         }
     };
-    <span class="ident">TokenStream::from</span>(<span class="ident">deserialize_fromstr</span>(
-        <span class="ident">input</span>,
-        <span class="ident">derive_options</span>.<span class="ident">get_serde_with_path</span>(),
+    TokenStream::from(deserialize_fromstr(
+        input,
+        derive_options.get_serde_with_path(),
     ))
 }
 
-<span class="kw">fn</span> <span class="ident">deserialize_fromstr</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">DeriveInput</span>, <span class="ident">serde_with_crate_path</span>: <span class="ident">Path</span>) -&gt; <span class="ident">TokenStream2</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">ident</span>;
-    <span class="kw">let</span> <span class="ident">where_clause</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">input</span>.<span class="ident">generics</span>.<span class="ident">make_where_clause</span>().<span class="ident">predicates</span>;
-    <span class="ident">where_clause</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span>(<span class="self">Self</span>: <span class="ident">::std::str::FromStr</span>));
-    <span class="ident">where_clause</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span>(
-        <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">::std::str::FromStr</span><span class="op">&gt;</span><span class="ident">::Err</span>: <span class="ident">::std::fmt::Display</span>
+<span class="kw">fn </span>deserialize_fromstr(<span class="kw-2">mut </span>input: DeriveInput, serde_with_crate_path: Path) -&gt; TokenStream2 {
+    <span class="kw">let </span>ident = input.ident;
+    <span class="kw">let </span>where_clause = <span class="kw-2">&amp;mut </span>input.generics.make_where_clause().predicates;
+    where_clause.push(<span class="macro">parse_quote!</span>(<span class="self">Self</span>: ::std::str::FromStr));
+    where_clause.push(<span class="macro">parse_quote!</span>(
+        &lt;<span class="self">Self </span><span class="kw">as </span>::std::str::FromStr&gt;::Err: ::std::fmt::Display
     ));
-    <span class="kw">let</span> (<span class="ident">de_impl_generics</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">split_with_de_lifetime</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">generics</span>);
-    <span class="macro">quote!</span> {
-        <span class="attribute">#[<span class="ident">automatically_derived</span>]</span>
-        <span class="kw">impl</span> #<span class="ident">de_impl_generics</span> #<span class="ident">serde_with_crate_path::serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
-            <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">D</span>: #<span class="ident">serde_with_crate_path::serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">let </span>(de_impl_generics, ty_generics, where_clause) = split_with_de_lifetime(<span class="kw-2">&amp;</span>input.generics);
+    <span class="macro">quote! </span>{
+        <span class="attribute">#[automatically_derived]
+        </span><span class="kw">impl </span>#de_impl_generics #serde_with_crate_path::serde::Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>#ident #ty_generics #where_clause {
+            <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; ::std::result::Result&lt;<span class="self">Self</span>, D::Error&gt;
+            <span class="kw">where
+                </span>D: #serde_with_crate_path::serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
             {
-                <span class="kw">struct</span> <span class="ident">Helper</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">::std::marker::PhantomData</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>);
+                <span class="kw">struct </span>Helper&lt;S&gt;(::std::marker::PhantomData&lt;S&gt;);
 
-                <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">S</span><span class="op">&gt;</span> #<span class="ident">serde_with_crate_path::serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Helper</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-                <span class="kw">where</span>
-                    <span class="ident">S</span>: <span class="ident">::std::str::FromStr</span>,
-                    <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">::std::str::FromStr</span><span class="op">&gt;</span><span class="ident">::Err</span>: <span class="ident">::std::fmt::Display</span>,
+                <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, S&gt; #serde_with_crate_path::serde::de::Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Helper&lt;S&gt;
+                <span class="kw">where
+                    </span>S: ::std::str::FromStr,
+                    &lt;S <span class="kw">as </span>::std::str::FromStr&gt;::Err: ::std::fmt::Display,
                 {
-                    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">S</span>;
+                    <span class="kw">type </span>Value = S;
 
-                    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">::std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">::std::fmt::Result</span> {
-                        <span class="macro">::std::write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;string&quot;</span>)
+                    <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>::std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ::std::fmt::Result {
+                        <span class="macro">::std::write!</span>(formatter, <span class="string">&quot;string&quot;</span>)
                     }
 
-                    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-                    <span class="kw">where</span>
-                        <span class="ident">E</span>: #<span class="ident">serde_with_crate_path::serde::de::Error</span>,
+                    <span class="kw">fn </span>visit_str&lt;E&gt;(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; ::std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+                    <span class="kw">where
+                        </span>E: #serde_with_crate_path::serde::de::Error,
                     {
-                        <span class="ident">value</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(#<span class="ident">serde_with_crate_path::serde::de::Error::custom</span>)
+                        value.parse::&lt;<span class="self">Self</span>::Value&gt;().map_err(#serde_with_crate_path::serde::de::Error::custom)
                     }
 
-                    <span class="kw">fn</span> <span class="ident">visit_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-                    <span class="kw">where</span>
-                        <span class="ident">E</span>: #<span class="ident">serde_with_crate_path::serde::de::Error</span>,
+                    <span class="kw">fn </span>visit_bytes&lt;E&gt;(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>[u8]) -&gt; ::std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+                    <span class="kw">where
+                        </span>E: #serde_with_crate_path::serde::de::Error,
                     {
-                        <span class="kw">let</span> <span class="ident">utf8</span> <span class="op">=</span> <span class="ident">::std::str::from_utf8</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(#<span class="ident">serde_with_crate_path::serde::de::Error::custom</span>)<span class="question-mark">?</span>;
-                        <span class="self">self</span>.<span class="ident">visit_str</span>(<span class="ident">utf8</span>)
+                        <span class="kw">let </span>utf8 = ::std::str::from_utf8(value).map_err(#serde_with_crate_path::serde::de::Error::custom)<span class="question-mark">?</span>;
+                        <span class="self">self</span>.visit_str(utf8)
                     }
                 }
 
-                <span class="ident">deserializer</span>.<span class="ident">deserialize_str</span>(<span class="ident">Helper</span>(<span class="ident">::std::marker::PhantomData</span>))
+                deserializer.deserialize_str(Helper(::std::marker::PhantomData))
             }
         }
     }
 }
 
-<span class="doccomment">/// Serialize value by using it&#39;s [`Display`] implementation</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is an alternative way to implement `Serialize` for types which also implement [`Display`] by serializing the type as string.</span>
-<span class="doccomment">/// Ensure that the struct/enum also implements [`Display`].</span>
-<span class="doccomment">/// If the implementation is missing, you will get an error message like</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// error[E0277]: `Struct` doesn&#39;t implement `std::fmt::Display`</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Deserialization with [`FromStr`] is available with the matching [`DeserializeFromStr`] derive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Attributes</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Attributes for the derive can be specified via the `#[serde_with(...)]` attribute on the struct or enum.</span>
-<span class="doccomment">/// Currently, these arguments to the attribute are possible:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * **`#[serde_with(crate = &quot;...&quot;)]`**: This allows using `SerializeDisplay` when `serde_with` is not available from the crate root.</span>
-<span class="doccomment">///     This happens while [renaming dependencies in Cargo.toml][cargo-toml-rename] or when re-exporting the macro from a different crate.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     This argument is analogue to [serde&#39;s crate argument][serde-crate] and the [crate argument to `serde_as`][serde-as-crate].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// use std::fmt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(SerializeDisplay)]</span>
-<span class="doccomment">/// struct A {</span>
-<span class="doccomment">///     a: u32,</span>
-<span class="doccomment">///     b: bool,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl fmt::Display for A {</span>
-<span class="doccomment">///     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;&#39;_&gt;) -&gt; fmt::Result {</span>
-<span class="doccomment">///         write!(f, &quot;{}&lt;&gt;{}&quot;, self.a, self.b)</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let a = A { a: 123, b: false };</span>
-<span class="doccomment">/// assert_eq!(r#&quot;&quot;123&lt;&gt;false&quot;&quot;#, serde_json::to_string(&amp;a).unwrap());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Display`]: std::fmt::Display</span>
-<span class="doccomment">/// [`FromStr`]: std::str::FromStr</span>
-<span class="doccomment">/// [cargo-toml-rename]: https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#renaming-dependencies-in-cargotoml</span>
-<span class="doccomment">/// [serde-as-crate]: https://docs.rs/serde_with/1.12.1/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
-<span class="doccomment">/// [serde-crate]: https://serde.rs/container-attrs.html#crate</span>
-<span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">SerializeDisplay</span>, <span class="ident">attributes</span>(<span class="ident">serde_with</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_serialize_display</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">DeriveInput</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">item</span>);
-    <span class="kw">let</span> <span class="ident">derive_options</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">DeriveOptions::from_derive_input</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">opt</span>) =&gt; <span class="ident">opt</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-            <span class="kw">return</span> <span class="ident">err</span>;
+<span class="doccomment">/// Serialize value by using it&#39;s [`Display`] implementation
+///
+/// This is an alternative way to implement `Serialize` for types which also implement [`Display`] by serializing the type as string.
+/// Ensure that the struct/enum also implements [`Display`].
+/// If the implementation is missing, you will get an error message like
+/// ```text
+/// error[E0277]: `Struct` doesn&#39;t implement `std::fmt::Display`
+/// ```
+///
+/// Deserialization with [`FromStr`] is available with the matching [`DeserializeFromStr`] derive.
+///
+/// # Attributes
+///
+/// Attributes for the derive can be specified via the `#[serde_with(...)]` attribute on the struct or enum.
+/// Currently, these arguments to the attribute are possible:
+///
+/// * **`#[serde_with(crate = &quot;...&quot;)]`**: This allows using `SerializeDisplay` when `serde_with` is not available from the crate root.
+///     This happens while [renaming dependencies in Cargo.toml][cargo-toml-rename] or when re-exporting the macro from a different crate.
+///
+///     This argument is analogue to [serde&#39;s crate argument][serde-crate] and the [crate argument to `serde_as`][serde-as-crate].
+///
+/// # Example
+///
+/// ```rust,ignore
+/// use std::fmt;
+///
+/// #[derive(SerializeDisplay)]
+/// struct A {
+///     a: u32,
+///     b: bool,
+/// }
+///
+/// impl fmt::Display for A {
+///     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;&#39;_&gt;) -&gt; fmt::Result {
+///         write!(f, &quot;{}&lt;&gt;{}&quot;, self.a, self.b)
+///     }
+/// }
+///
+/// let a = A { a: 123, b: false };
+/// assert_eq!(r#&quot;&quot;123&lt;&gt;false&quot;&quot;#, serde_json::to_string(&amp;a).unwrap());
+/// ```
+///
+/// [`Display`]: std::fmt::Display
+/// [`FromStr`]: std::str::FromStr
+/// [cargo-toml-rename]: https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#renaming-dependencies-in-cargotoml
+/// [serde-as-crate]: https://docs.rs/serde_with/1.12.1/serde_with/guide/serde_as/index.html#re-exporting-serde_as
+/// [serde-crate]: https://serde.rs/container-attrs.html#crate
+</span><span class="attribute">#[proc_macro_derive(SerializeDisplay, attributes(serde_with))]
+</span><span class="kw">pub fn </span>derive_serialize_display(item: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span>input: DeriveInput = <span class="macro">parse_macro_input!</span>(item);
+    <span class="kw">let </span>derive_options = <span class="kw">match </span>DeriveOptions::from_derive_input(<span class="kw-2">&amp;</span>input) {
+        <span class="prelude-val">Ok</span>(opt) =&gt; opt,
+        <span class="prelude-val">Err</span>(err) =&gt; {
+            <span class="kw">return </span>err;
         }
     };
-    <span class="ident">TokenStream::from</span>(<span class="ident">serialize_display</span>(
-        <span class="ident">input</span>,
-        <span class="ident">derive_options</span>.<span class="ident">get_serde_with_path</span>(),
+    TokenStream::from(serialize_display(
+        input,
+        derive_options.get_serde_with_path(),
     ))
 }
 
-<span class="kw">fn</span> <span class="ident">serialize_display</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">DeriveInput</span>, <span class="ident">serde_with_crate_path</span>: <span class="ident">Path</span>) -&gt; <span class="ident">TokenStream2</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">ident</span>;
-    <span class="ident">input</span>
-        .<span class="ident">generics</span>
-        .<span class="ident">make_where_clause</span>()
-        .<span class="ident">predicates</span>
-        .<span class="ident">push</span>(<span class="macro">parse_quote!</span>(<span class="self">Self</span>: <span class="ident">::std::fmt::Display</span>));
-    <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
-    <span class="macro">quote!</span> {
-        <span class="attribute">#[<span class="ident">automatically_derived</span>]</span>
-        <span class="kw">impl</span> #<span class="ident">impl_generics</span> #<span class="ident">serde_with_crate_path::serde::Serialize</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
-            <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">S</span>: #<span class="ident">serde_with_crate_path::serde::Serializer</span>,
+<span class="kw">fn </span>serialize_display(<span class="kw-2">mut </span>input: DeriveInput, serde_with_crate_path: Path) -&gt; TokenStream2 {
+    <span class="kw">let </span>ident = input.ident;
+    input
+        .generics
+        .make_where_clause()
+        .predicates
+        .push(<span class="macro">parse_quote!</span>(<span class="self">Self</span>: ::std::fmt::Display));
+    <span class="kw">let </span>(impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
+    <span class="macro">quote! </span>{
+        <span class="attribute">#[automatically_derived]
+        </span><span class="kw">impl </span>#impl_generics #serde_with_crate_path::serde::Serialize <span class="kw">for </span>#ident #ty_generics #where_clause {
+            <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; ::std::result::Result&lt;S::Ok, S::Error&gt;
+            <span class="kw">where
+                </span>S: #serde_with_crate_path::serde::Serializer,
             {
-                <span class="ident">serializer</span>.<span class="ident">collect_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)
+                serializer.collect_str(<span class="kw-2">&amp;</span><span class="self">self</span>)
             }
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="doccomment">/// Private function. Not part of the public API</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The only task of this derive macro is to consume any `serde_as` attributes and turn them into inert attributes.</span>
-<span class="doccomment">/// This allows the serde_as macro to keep the field attributes without causing compiler errors.</span>
-<span class="doccomment">/// The intend is that keeping the field attributes allows downstream crates to consume and act on them without causing an ordering dependency to the serde_as macro.</span>
-<span class="doccomment">/// Otherwise, downstream proc-macros would need to be placed *in front of* the main `#[serde_as]` attribute, since otherwise the field attributes would already be stripped off.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// More details about the use-cases in the Github discussion: &lt;https://github.com/jonasbb/serde_with/discussions/260&gt;.</span>
-<span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">__private_consume_serde_as_attributes</span>, <span class="ident">attributes</span>(<span class="ident">serde_as</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__private_consume_serde_as_attributes</span>(<span class="kw">_</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">TokenStream::new</span>()
+<span class="attribute">#[doc(hidden)]
+</span><span class="doccomment">/// Private function. Not part of the public API
+///
+/// The only task of this derive macro is to consume any `serde_as` attributes and turn them into inert attributes.
+/// This allows the serde_as macro to keep the field attributes without causing compiler errors.
+/// The intend is that keeping the field attributes allows downstream crates to consume and act on them without causing an ordering dependency to the serde_as macro.
+/// Otherwise, downstream proc-macros would need to be placed *in front of* the main `#[serde_as]` attribute, since otherwise the field attributes would already be stripped off.
+///
+/// More details about the use-cases in the Github discussion: &lt;https://github.com/jonasbb/serde_with/discussions/260&gt;.
+</span><span class="attribute">#[proc_macro_derive(__private_consume_serde_as_attributes, attributes(serde_as))]
+</span><span class="kw">pub fn </span>__private_consume_serde_as_attributes(<span class="kw">_</span>: TokenStream) -&gt; TokenStream {
+    TokenStream::new()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_with_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_with_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

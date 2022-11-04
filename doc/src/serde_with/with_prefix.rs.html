@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/with_prefix.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>with_prefix.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serde_with/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/with_prefix.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>with_prefix.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serde_with/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -610,617 +610,617 @@
 <span id="610">610</span>
 <span id="611">611</span>
 <span id="612">612</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::string::String</span>;
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::{
-    <span class="ident">de</span>::{<span class="self">self</span>, <span class="ident">DeserializeSeed</span>, <span class="ident">Deserializer</span>, <span class="ident">IgnoredAny</span>, <span class="ident">IntoDeserializer</span>, <span class="ident">MapAccess</span>, <span class="ident">Visitor</span>},
-    <span class="ident">forward_to_deserialize_any</span>,
-    <span class="ident">ser</span>::{<span class="self">self</span>, <span class="ident">Impossible</span>, <span class="ident">Serialize</span>, <span class="ident">SerializeMap</span>, <span class="ident">SerializeStruct</span>, <span class="ident">Serializer</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>alloc::string::String;
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>serde::{
+    de::{<span class="self">self</span>, DeserializeSeed, Deserializer, IgnoredAny, IntoDeserializer, MapAccess, Visitor},
+    forward_to_deserialize_any,
+    ser::{<span class="self">self</span>, Impossible, Serialize, SerializeMap, SerializeStruct, Serializer},
 };
 
-<span class="doccomment">/// Serialize with an added prefix on every field name and deserialize by</span>
-<span class="doccomment">/// trimming away the prefix.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You can set the visibility of the generated module by prefixing the module name with a module visibility.</span>
-<span class="doccomment">/// `with_prefix!(pub(crate) prefix_foo &quot;foo_&quot;);` creates a module with `pub(crate)` visibility.</span>
-<span class="doccomment">/// The visibility is optional and by default `pub(self)`, i.e., private visibility is assumed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note:** Use of this macro is incompatible with applying the [`deny_unknown_fields`] attribute</span>
-<span class="doccomment">/// on the container.</span>
-<span class="doccomment">/// While deserializing, it will always warn about unknown fields, even though they are processed</span>
-<span class="doccomment">/// by the `with_prefix` wrapper.</span>
-<span class="doccomment">/// More details can be found in [this issue][issue-with_prefix-deny_unknown_fields].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The [Challonge REST API] likes to use prefixes to group related fields. In</span>
-<span class="doccomment">/// simplified form, their JSON may resemble the following:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Challonge REST API]: https://api.challonge.com/v1/documents/matches/show</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```json</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///   &quot;player1_name&quot;: &quot;name1&quot;,</span>
-<span class="doccomment">///   &quot;player1_votes&quot;: 1,</span>
-<span class="doccomment">///   &quot;player2_name&quot;: &quot;name2&quot;,</span>
-<span class="doccomment">///   &quot;player2_votes&quot;: 2</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In Rust, we would ideally like to model this data as a pair of `Player`</span>
-<span class="doccomment">/// structs, rather than repeating the fields of `Player` for each prefix.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[allow(dead_code)]</span>
-<span class="doccomment">/// struct Match {</span>
-<span class="doccomment">///     player1: Player,</span>
-<span class="doccomment">///     player2: Player,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # #[allow(dead_code)]</span>
-<span class="doccomment">/// struct Player {</span>
-<span class="doccomment">///     name: String,</span>
-<span class="doccomment">///     votes: u64,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This `with_prefix!` macro produces an adapter that adds a prefix onto field</span>
-<span class="doccomment">/// names during serialization and trims away the prefix during deserialization.</span>
-<span class="doccomment">/// An implementation of the Challonge API would use `with_prefix!` like this:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serde::{Deserialize, Serialize};</span>
-<span class="doccomment">/// use serde_with::with_prefix;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Match {</span>
-<span class="doccomment">///     #[serde(flatten, with = &quot;prefix_player1&quot;)]</span>
-<span class="doccomment">///     player1: Player,</span>
-<span class="doccomment">///     #[serde(flatten, with = &quot;prefix_player2&quot;)]</span>
-<span class="doccomment">///     player2: Player,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Player {</span>
-<span class="doccomment">///     name: String,</span>
-<span class="doccomment">///     votes: u64,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// with_prefix!(prefix_player1 &quot;player1_&quot;);</span>
-<span class="doccomment">/// // You can also set the visibility of the generated prefix module, the default is private.</span>
-<span class="doccomment">/// with_prefix!(pub prefix_player2 &quot;player2_&quot;);</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # const EXPECTED: &amp;str = r#&quot;{</span>
-<span class="doccomment">/// #   &quot;player1_name&quot;: &quot;name1&quot;,</span>
-<span class="doccomment">/// #   &quot;player1_votes&quot;: 1,</span>
-<span class="doccomment">/// #   &quot;player2_name&quot;: &quot;name2&quot;,</span>
-<span class="doccomment">/// #   &quot;player2_votes&quot;: 2</span>
-<span class="doccomment">/// # }&quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     let m = Match {</span>
-<span class="doccomment">///         player1: Player {</span>
-<span class="doccomment">///             name: &quot;name1&quot;.to_owned(),</span>
-<span class="doccomment">///             votes: 1,</span>
-<span class="doccomment">///         },</span>
-<span class="doccomment">///         player2: Player {</span>
-<span class="doccomment">///             name: &quot;name2&quot;.to_owned(),</span>
-<span class="doccomment">///             votes: 2,</span>
-<span class="doccomment">///         },</span>
-<span class="doccomment">///     };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     let j = serde_json::to_string_pretty(&amp;m).unwrap();</span>
-<span class="doccomment">///     println!(&quot;{}&quot;, j);</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// #     assert_eq!(j, EXPECTED);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`deny_unknown_fields`]: https://serde.rs/container-attrs.html#deny_unknown_fields</span>
-<span class="doccomment">/// [issue-with_prefix-deny_unknown_fields]: https://github.com/jonasbb/serde_with/issues/57</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">with_prefix</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prefix</span>:<span class="ident">expr</span>) =&gt; {<span class="macro-nonterminal">$</span><span class="macro">crate::with_prefix!</span>(<span class="kw">pub</span>(<span class="macro-nonterminal">self</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prefix</span>);};
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">vis</span>:<span class="ident">vis</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prefix</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">vis</span> <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span> {
-            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
-            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::with_prefix::WithPrefix</span>;
+<span class="doccomment">/// Serialize with an added prefix on every field name and deserialize by
+/// trimming away the prefix.
+///
+/// You can set the visibility of the generated module by prefixing the module name with a module visibility.
+/// `with_prefix!(pub(crate) prefix_foo &quot;foo_&quot;);` creates a module with `pub(crate)` visibility.
+/// The visibility is optional and by default `pub(self)`, i.e., private visibility is assumed.
+///
+/// **Note:** Use of this macro is incompatible with applying the [`deny_unknown_fields`] attribute
+/// on the container.
+/// While deserializing, it will always warn about unknown fields, even though they are processed
+/// by the `with_prefix` wrapper.
+/// More details can be found in [this issue][issue-with_prefix-deny_unknown_fields].
+///
+/// # Example
+///
+/// The [Challonge REST API] likes to use prefixes to group related fields. In
+/// simplified form, their JSON may resemble the following:
+///
+/// [Challonge REST API]: https://api.challonge.com/v1/documents/matches/show
+///
+/// ```json
+/// {
+///   &quot;player1_name&quot;: &quot;name1&quot;,
+///   &quot;player1_votes&quot;: 1,
+///   &quot;player2_name&quot;: &quot;name2&quot;,
+///   &quot;player2_votes&quot;: 2
+/// }
+/// ```
+///
+/// In Rust, we would ideally like to model this data as a pair of `Player`
+/// structs, rather than repeating the fields of `Player` for each prefix.
+///
+/// ```rust
+/// # #[allow(dead_code)]
+/// struct Match {
+///     player1: Player,
+///     player2: Player,
+/// }
+///
+/// # #[allow(dead_code)]
+/// struct Player {
+///     name: String,
+///     votes: u64,
+/// }
+/// ```
+///
+/// This `with_prefix!` macro produces an adapter that adds a prefix onto field
+/// names during serialization and trims away the prefix during deserialization.
+/// An implementation of the Challonge API would use `with_prefix!` like this:
+///
+/// ```rust
+/// use serde::{Deserialize, Serialize};
+/// use serde_with::with_prefix;
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Match {
+///     #[serde(flatten, with = &quot;prefix_player1&quot;)]
+///     player1: Player,
+///     #[serde(flatten, with = &quot;prefix_player2&quot;)]
+///     player2: Player,
+/// }
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Player {
+///     name: String,
+///     votes: u64,
+/// }
+///
+/// with_prefix!(prefix_player1 &quot;player1_&quot;);
+/// // You can also set the visibility of the generated prefix module, the default is private.
+/// with_prefix!(pub prefix_player2 &quot;player2_&quot;);
+/// #
+/// # const EXPECTED: &amp;str = r#&quot;{
+/// #   &quot;player1_name&quot;: &quot;name1&quot;,
+/// #   &quot;player1_votes&quot;: 1,
+/// #   &quot;player2_name&quot;: &quot;name2&quot;,
+/// #   &quot;player2_votes&quot;: 2
+/// # }&quot;#;
+///
+/// fn main() {
+///     let m = Match {
+///         player1: Player {
+///             name: &quot;name1&quot;.to_owned(),
+///             votes: 1,
+///         },
+///         player2: Player {
+///             name: &quot;name2&quot;.to_owned(),
+///             votes: 2,
+///         },
+///     };
+///
+///     let j = serde_json::to_string_pretty(&amp;m).unwrap();
+///     println!(&quot;{}&quot;, j);
+/// #
+/// #     assert_eq!(j, EXPECTED);
+/// }
+/// ```
+///
+/// [`deny_unknown_fields`]: https://serde.rs/container-attrs.html#deny_unknown_fields
+/// [issue-with_prefix-deny_unknown_fields]: https://github.com/jonasbb/serde_with/issues/57
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>with_prefix {
+    (<span class="macro-nonterminal">$module</span>:ident <span class="macro-nonterminal">$prefix</span>:expr) =&gt; {<span class="macro-nonterminal">$</span><span class="macro">crate::with_prefix!</span>(<span class="kw">pub</span>(<span class="macro-nonterminal">self</span>) <span class="macro-nonterminal">$module $prefix</span>);};
+    (<span class="macro-nonterminal">$vis</span>:vis <span class="macro-nonterminal">$module</span>:ident <span class="macro-nonterminal">$prefix</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$vis </span><span class="kw">mod </span><span class="macro-nonterminal">$module </span>{
+            <span class="kw">use </span><span class="macro-nonterminal">$crate::serde</span>::{Deserialize, Deserializer, Serialize, Serializer};
+            <span class="kw">use </span><span class="macro-nonterminal">$crate::with_prefix::WithPrefix</span>;
 
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">T</span>: <span class="ident">Serialize</span>,
-                <span class="ident">S</span>: <span class="ident">Serializer</span>,
+            <span class="attribute">#[allow(dead_code)]
+            </span><span class="kw">pub fn </span>serialize&lt;T, S&gt;(object: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; ::std::result::Result&lt;S::Ok, S::Error&gt;
+            <span class="kw">where
+                </span>T: Serialize,
+                S: Serializer,
             {
-                <span class="ident">object</span>.<span class="ident">serialize</span>(<span class="ident">WithPrefix</span> {
-                    <span class="ident">delegate</span>: <span class="ident">serializer</span>,
-                    <span class="ident">prefix</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prefix</span>,
+                object.serialize(WithPrefix {
+                    delegate: serializer,
+                    prefix: <span class="macro-nonterminal">$prefix</span>,
                 })
             }
 
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
-                <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+            <span class="attribute">#[allow(dead_code)]
+            </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, T, D&gt;(deserializer: D) -&gt; ::std::result::Result&lt;T, D::Error&gt;
+            <span class="kw">where
+                </span>T: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
+                D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
             {
-                <span class="ident">T::deserialize</span>(<span class="ident">WithPrefix</span> {
-                    <span class="ident">delegate</span>: <span class="ident">deserializer</span>,
-                    <span class="ident">prefix</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prefix</span>,
+                T::deserialize(WithPrefix {
+                    delegate: deserializer,
+                    prefix: <span class="macro-nonterminal">$prefix</span>,
                 })
             }
         }
     };
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WithPrefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">delegate</span>: <span class="ident">T</span>,
-    <span class="kw">pub</span> <span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+<span class="attribute">#[allow(missing_debug_implementations)]
+</span><span class="kw">pub struct </span>WithPrefix&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">pub </span>delegate: T,
+    <span class="kw">pub </span>prefix: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">WithPrefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Serialize</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; Serialize <span class="kw">for </span>WithPrefix&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where
+    </span>T: Serialize,
 {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize</span>(<span class="ident">WithPrefix</span> {
-            <span class="ident">delegate</span>: <span class="ident">serializer</span>,
-            <span class="ident">prefix</span>: <span class="self">self</span>.<span class="ident">prefix</span>,
+        <span class="self">self</span>.delegate.serialize(WithPrefix {
+            delegate: serializer,
+            prefix: <span class="self">self</span>.prefix,
         })
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Serializer</span> <span class="kw">for</span> <span class="ident">WithPrefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Serializer</span>,
-{
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> <span class="ident">S::Ok</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
-    <span class="kw">type</span> <span class="ident">SerializeSeq</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTuple</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTupleStruct</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTupleVariant</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeMap</span> <span class="op">=</span> <span class="ident">WithPrefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S::SerializeMap</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeStruct</span> <span class="op">=</span> <span class="ident">WithPrefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S::SerializeMap</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeStructVariant</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">serialize_bool</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_i8</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_i16</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_i32</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_i64</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_u8</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_u16</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_u32</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_u64</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_f32</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">f32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_f64</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_char</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_str</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">delegate</span>
-            .<span class="ident">collect_str</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">prefix</span>, <span class="ident">v</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_bytes</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_none</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize_none</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_some</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Serialize</span>,
-    {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize_some</span>(<span class="kw-2">&amp;</span><span class="ident">WithPrefix</span> {
-            <span class="ident">delegate</span>: <span class="ident">value</span>,
-            <span class="ident">prefix</span>: <span class="self">self</span>.<span class="ident">prefix</span>,
-        })
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_unit</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_unit_struct</span>(<span class="self">self</span>, <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_unit_variant</span>(
-        <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_str</span>(<span class="ident">variant</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_newtype_struct</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Serialize</span>,
-    {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_newtype_variant</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">_variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Serialize</span>,
-    {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_seq</span>(<span class="self">self</span>, <span class="ident">_len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeSeq</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_tuple</span>(<span class="self">self</span>, <span class="ident">_len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTuple</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_tuple_struct</span>(
-        <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTupleStruct</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_tuple_variant</span>(
-        <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">_variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTupleVariant</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_map</span>(<span class="self">self</span>, <span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeMap</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">WithPrefix</span> {
-            <span class="ident">delegate</span>: <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize_map</span>(<span class="ident">len</span>)<span class="question-mark">?</span>,
-            <span class="ident">prefix</span>: <span class="self">self</span>.<span class="ident">prefix</span>,
-        })
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_struct</span>(
-        <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeStruct</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_map</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_struct_variant</span>(
-        <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">_variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeStructVariant</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">SerializeMap</span> <span class="kw">for</span> <span class="ident">WithPrefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">SerializeMap</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S&gt; Serializer <span class="kw">for </span>WithPrefix&lt;<span class="lifetime">&#39;a</span>, S&gt;
+<span class="kw">where
+    </span>S: Serializer,
 {
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> <span class="ident">S::Ok</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= S::Ok;
+    <span class="kw">type </span>Error = S::Error;
+    <span class="kw">type </span>SerializeSeq = Impossible&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;;
+    <span class="kw">type </span>SerializeTuple = Impossible&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;;
+    <span class="kw">type </span>SerializeTupleStruct = Impossible&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;;
+    <span class="kw">type </span>SerializeTupleVariant = Impossible&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;;
+    <span class="kw">type </span>SerializeMap = WithPrefix&lt;<span class="lifetime">&#39;a</span>, S::SerializeMap&gt;;
+    <span class="kw">type </span>SerializeStruct = WithPrefix&lt;<span class="lifetime">&#39;a</span>, S::SerializeMap&gt;;
+    <span class="kw">type </span>SerializeStructVariant = Impossible&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">serialize_key</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Serialize</span>,
+    <span class="kw">fn </span>serialize_bool(<span class="self">self</span>, _v: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_i8(<span class="self">self</span>, _v: i8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_i16(<span class="self">self</span>, _v: i16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_i32(<span class="self">self</span>, _v: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_i64(<span class="self">self</span>, _v: i64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_u8(<span class="self">self</span>, _v: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_u16(<span class="self">self</span>, _v: u16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_u32(<span class="self">self</span>, _v: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_u64(<span class="self">self</span>, _v: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_f32(<span class="self">self</span>, _v: f32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_f64(<span class="self">self</span>, _v: f64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_char(<span class="self">self</span>, _v: char) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_str(<span class="self">self</span>, v: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.delegate
+            .collect_str(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.prefix, v))
+    }
+
+    <span class="kw">fn </span>serialize_bytes(<span class="self">self</span>, _v: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_none(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.delegate.serialize_none()
+    }
+
+    <span class="kw">fn </span>serialize_some&lt;T&gt;(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + Serialize,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize_key</span>(<span class="kw-2">&amp;</span><span class="ident">WithPrefix</span> {
-            <span class="ident">delegate</span>: <span class="ident">key</span>,
-            <span class="ident">prefix</span>: <span class="self">self</span>.<span class="ident">prefix</span>,
+        <span class="self">self</span>.delegate.serialize_some(<span class="kw-2">&amp;</span>WithPrefix {
+            delegate: value,
+            prefix: <span class="self">self</span>.prefix,
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_value</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Serialize</span>,
-    {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize_value</span>(<span class="ident">value</span>)
+    <span class="kw">fn </span>serialize_unit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_entry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Serialize</span>,
-        <span class="ident">V</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Serialize</span>,
+    <span class="kw">fn </span>serialize_unit_struct(<span class="self">self</span>, _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_unit_variant(
+        <span class="self">self</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.serialize_str(variant)
+    }
+
+    <span class="kw">fn </span>serialize_newtype_struct&lt;T&gt;(
+        <span class="self">self</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _value: <span class="kw-2">&amp;</span>T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + Serialize,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize_entry</span>(
-            <span class="kw-2">&amp;</span><span class="ident">WithPrefix</span> {
-                <span class="ident">delegate</span>: <span class="ident">key</span>,
-                <span class="ident">prefix</span>: <span class="self">self</span>.<span class="ident">prefix</span>,
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_newtype_variant&lt;T&gt;(
+        <span class="self">self</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        _variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _value: <span class="kw-2">&amp;</span>T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + Serialize,
+    {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_seq(<span class="self">self</span>, _len: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeSeq, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_tuple(<span class="self">self</span>, _len: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTuple, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_tuple_struct(
+        <span class="self">self</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTupleStruct, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_tuple_variant(
+        <span class="self">self</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        _variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTupleVariant, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+
+    <span class="kw">fn </span>serialize_map(<span class="self">self</span>, len: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeMap, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Ok</span>(WithPrefix {
+            delegate: <span class="self">self</span>.delegate.serialize_map(len)<span class="question-mark">?</span>,
+            prefix: <span class="self">self</span>.prefix,
+        })
+    }
+
+    <span class="kw">fn </span>serialize_struct(
+        <span class="self">self</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeStruct, <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.serialize_map(<span class="prelude-val">Some</span>(len))
+    }
+
+    <span class="kw">fn </span>serialize_struct_variant(
+        <span class="self">self</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        _variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeStructVariant, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for with_prefix&quot;</span>))
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S&gt; SerializeMap <span class="kw">for </span>WithPrefix&lt;<span class="lifetime">&#39;a</span>, S&gt;
+<span class="kw">where
+    </span>S: SerializeMap,
+{
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= S::Ok;
+    <span class="kw">type </span>Error = S::Error;
+
+    <span class="kw">fn </span>serialize_key&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + Serialize,
+    {
+        <span class="self">self</span>.delegate.serialize_key(<span class="kw-2">&amp;</span>WithPrefix {
+            delegate: key,
+            prefix: <span class="self">self</span>.prefix,
+        })
+    }
+
+    <span class="kw">fn </span>serialize_value&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + Serialize,
+    {
+        <span class="self">self</span>.delegate.serialize_value(value)
+    }
+
+    <span class="kw">fn </span>serialize_entry&lt;K, V&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K, value: <span class="kw-2">&amp;</span>V) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>K: <span class="question-mark">?</span>Sized + Serialize,
+        V: <span class="question-mark">?</span>Sized + Serialize,
+    {
+        <span class="self">self</span>.delegate.serialize_entry(
+            <span class="kw-2">&amp;</span>WithPrefix {
+                delegate: key,
+                prefix: <span class="self">self</span>.prefix,
             },
-            <span class="ident">value</span>,
+            value,
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">end</span>()
+    <span class="kw">fn </span>end(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.delegate.end()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">SerializeStruct</span> <span class="kw">for</span> <span class="ident">WithPrefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">SerializeMap</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S&gt; SerializeStruct <span class="kw">for </span>WithPrefix&lt;<span class="lifetime">&#39;a</span>, S&gt;
+<span class="kw">where
+    </span>S: SerializeMap,
 {
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> <span class="ident">S::Ok</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= S::Ok;
+    <span class="kw">type </span>Error = S::Error;
 
-    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Serialize</span>,
+    <span class="kw">fn </span>serialize_field&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + Serialize,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prefixed_key</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="self">self</span>.<span class="ident">prefix</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">key</span>.<span class="ident">len</span>());
-        <span class="ident">prefixed_key</span>.<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">prefix</span>);
-        <span class="ident">prefixed_key</span>.<span class="ident">push_str</span>(<span class="ident">key</span>);
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize_entry</span>(<span class="kw-2">&amp;</span><span class="ident">prefixed_key</span>, <span class="ident">value</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>prefixed_key = String::with_capacity(<span class="self">self</span>.prefix.len() + key.len());
+        prefixed_key.push_str(<span class="self">self</span>.prefix);
+        prefixed_key.push_str(key);
+        <span class="self">self</span>.delegate.serialize_entry(<span class="kw-2">&amp;</span>prefixed_key, value)
     }
 
-    <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">end</span>()
+    <span class="kw">fn </span>end(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.delegate.end()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WithPrefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, T&gt; DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>WithPrefix&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where
+    </span>T: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">T::Value</span>;
+    <span class="kw">type </span>Value = T::Value;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize&lt;D&gt;(<span class="self">self</span>, deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">deserialize</span>(<span class="ident">WithPrefix</span> {
-            <span class="ident">delegate</span>: <span class="ident">deserializer</span>,
-            <span class="ident">prefix</span>: <span class="self">self</span>.<span class="ident">prefix</span>,
+        <span class="self">self</span>.delegate.deserialize(WithPrefix {
+            delegate: deserializer,
+            prefix: <span class="self">self</span>.prefix,
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, <span class="ident">D</span><span class="op">&gt;</span> <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WithPrefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, D&gt; Deserializer&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>WithPrefix&lt;<span class="lifetime">&#39;a</span>, D&gt;
+<span class="kw">where
+    </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">D::Error</span>;
+    <span class="kw">type </span>Error = D::Error;
 
-    <span class="kw">fn</span> <span class="ident">deserialize_any</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize_any&lt;V&gt;(<span class="self">self</span>, visitor: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">deserialize_map</span>(<span class="ident">WithPrefix</span> {
-            <span class="ident">delegate</span>: <span class="ident">visitor</span>,
-            <span class="ident">prefix</span>: <span class="self">self</span>.<span class="ident">prefix</span>,
+        <span class="self">self</span>.delegate.deserialize_map(WithPrefix {
+            delegate: visitor,
+            prefix: <span class="self">self</span>.prefix,
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize_option&lt;V&gt;(<span class="self">self</span>, visitor: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">deserialize_any</span>(<span class="ident">WithPrefixOption</span> {
-            <span class="ident">first_key</span>: <span class="prelude-val">None</span>,
-            <span class="ident">delegate</span>: <span class="ident">visitor</span>,
-            <span class="ident">prefix</span>: <span class="self">self</span>.<span class="ident">prefix</span>,
+        <span class="self">self</span>.delegate.deserialize_any(WithPrefixOption {
+            first_key: <span class="prelude-val">None</span>,
+            delegate: visitor,
+            prefix: <span class="self">self</span>.prefix,
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_identifier</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize_identifier&lt;V&gt;(<span class="self">self</span>, visitor: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">deserialize_identifier</span>(<span class="ident">WithPrefix</span> {
-            <span class="ident">delegate</span>: <span class="ident">visitor</span>,
-            <span class="ident">prefix</span>: <span class="self">self</span>.<span class="ident">prefix</span>,
+        <span class="self">self</span>.delegate.deserialize_identifier(WithPrefix {
+            delegate: visitor,
+            prefix: <span class="self">self</span>.prefix,
         })
     }
 
-    <span class="macro">forward_to_deserialize_any!</span> {
-        <span class="ident">bool</span> <span class="ident">i8</span> <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">i64</span> <span class="ident">i128</span> <span class="ident">u8</span> <span class="ident">u16</span> <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">f32</span> <span class="ident">f64</span> <span class="ident">char</span> <span class="ident">str</span> <span class="ident">string</span>
-        <span class="ident">bytes</span> <span class="ident">byte_buf</span> <span class="ident">unit</span> <span class="ident">unit_struct</span> <span class="ident">newtype_struct</span> <span class="ident">seq</span> <span class="ident">tuple</span> <span class="ident">tuple_struct</span>
-        <span class="ident">map</span> <span class="kw">struct</span> <span class="kw">enum</span> <span class="ident">ignored_any</span>
+    <span class="macro">forward_to_deserialize_any! </span>{
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf unit unit_struct newtype_struct seq tuple tuple_struct
+        map <span class="kw">struct enum </span>ignored_any
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WithPrefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">V</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, V&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>WithPrefix&lt;<span class="lifetime">&#39;a</span>, V&gt;
+<span class="kw">where
+    </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">V::Value</span>;
+    <span class="kw">type </span>Value = V::Value;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">expecting</span>(<span class="ident">formatter</span>)
+    <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.delegate.expecting(formatter)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">map</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>visit_map&lt;A&gt;(<span class="self">self</span>, map: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, A::Error&gt;
+    <span class="kw">where
+        </span>A: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">visit_map</span>(<span class="ident">WithPrefix</span> {
-            <span class="ident">delegate</span>: <span class="ident">map</span>,
-            <span class="ident">prefix</span>: <span class="self">self</span>.<span class="ident">prefix</span>,
+        <span class="self">self</span>.delegate.visit_map(WithPrefix {
+            delegate: map,
+            prefix: <span class="self">self</span>.prefix,
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WithPrefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, A&gt; MapAccess&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>WithPrefix&lt;<span class="lifetime">&#39;a</span>, A&gt;
+<span class="kw">where
+    </span>A: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">A::Error</span>;
+    <span class="kw">type </span>Error = A::Error;
 
-    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>next_key_seed&lt;K&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, seed: K) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;K::Value&gt;, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>K: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">next_key</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">without_prefix</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">strip_prefix</span>(<span class="self">self</span>.<span class="ident">prefix</span>) {
-                <span class="kw">return</span> <span class="ident">seed</span>
-                    .<span class="ident">deserialize</span>(<span class="ident">without_prefix</span>.<span class="ident">into_deserializer</span>())
-                    .<span class="ident">map</span>(<span class="prelude-val">Some</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(s) = <span class="self">self</span>.delegate.next_key::&lt;String&gt;()<span class="question-mark">? </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(without_prefix) = s.strip_prefix(<span class="self">self</span>.prefix) {
+                <span class="kw">return </span>seed
+                    .deserialize(without_prefix.into_deserializer())
+                    .map(<span class="prelude-val">Some</span>);
             }
-            <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">IgnoredAny</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            <span class="self">self</span>.delegate.next_value::&lt;IgnoredAny&gt;()<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>next_value_seed&lt;V&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, seed: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">next_value_seed</span>(<span class="ident">seed</span>)
+        <span class="self">self</span>.delegate.next_value_seed(seed)
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WithPrefixOption</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">first_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">delegate</span>: <span class="ident">T</span>,
-    <span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+<span class="attribute">#[allow(missing_debug_implementations)]
+</span><span class="kw">pub struct </span>WithPrefixOption&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    first_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    delegate: T,
+    prefix: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WithPrefixOption</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">V</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, V&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>WithPrefixOption&lt;<span class="lifetime">&#39;a</span>, V&gt;
+<span class="kw">where
+    </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">V::Value</span>;
+    <span class="kw">type </span>Value = V::Value;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">expecting</span>(<span class="ident">formatter</span>)
+    <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.delegate.expecting(formatter)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_unit</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">de::Error</span>,
+    <span class="kw">fn </span>visit_unit&lt;E&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: de::Error,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">visit_none</span>()
+        <span class="self">self</span>.delegate.visit_none()
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>visit_map&lt;A&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>map: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, A::Error&gt;
+    <span class="kw">where
+        </span>A: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_key</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
-            <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="self">self</span>.<span class="ident">prefix</span>) {
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">visit_some</span>(<span class="ident">WithPrefixOption</span> {
-                    <span class="ident">first_key</span>: <span class="prelude-val">Some</span>(<span class="ident">s</span>),
-                    <span class="ident">delegate</span>: <span class="ident">map</span>,
-                    <span class="ident">prefix</span>: <span class="self">self</span>.<span class="ident">prefix</span>,
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(s) = map.next_key::&lt;String&gt;()<span class="question-mark">? </span>{
+            <span class="kw">if </span>s.starts_with(<span class="self">self</span>.prefix) {
+                <span class="kw">return </span><span class="self">self</span>.delegate.visit_some(WithPrefixOption {
+                    first_key: <span class="prelude-val">Some</span>(s),
+                    delegate: map,
+                    prefix: <span class="self">self</span>.prefix,
                 });
             }
-            <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">IgnoredAny</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            map.next_value::&lt;IgnoredAny&gt;()<span class="question-mark">?</span>;
         }
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">visit_none</span>()
+        <span class="self">self</span>.delegate.visit_none()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WithPrefixOption</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, A&gt; Deserializer&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>WithPrefixOption&lt;<span class="lifetime">&#39;a</span>, A&gt;
+<span class="kw">where
+    </span>A: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">A::Error</span>;
+    <span class="kw">type </span>Error = A::Error;
 
-    <span class="kw">fn</span> <span class="ident">deserialize_any</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize_any&lt;V&gt;(<span class="self">self</span>, visitor: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="self">self</span>)
+        visitor.visit_map(<span class="self">self</span>)
     }
 
-    <span class="macro">forward_to_deserialize_any!</span> {
-        <span class="ident">bool</span> <span class="ident">i8</span> <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">i64</span> <span class="ident">i128</span> <span class="ident">u8</span> <span class="ident">u16</span> <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">f32</span> <span class="ident">f64</span> <span class="ident">char</span> <span class="ident">str</span> <span class="ident">string</span>
-        <span class="ident">bytes</span> <span class="ident">byte_buf</span> <span class="ident">option</span> <span class="ident">unit</span> <span class="ident">unit_struct</span> <span class="ident">newtype_struct</span> <span class="ident">seq</span> <span class="ident">tuple</span>
-        <span class="ident">tuple_struct</span> <span class="ident">map</span> <span class="kw">struct</span> <span class="kw">enum</span> <span class="ident">identifier</span> <span class="ident">ignored_any</span>
+    <span class="macro">forward_to_deserialize_any! </span>{
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        tuple_struct map <span class="kw">struct enum </span>identifier ignored_any
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WithPrefixOption</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;a</span>, A&gt; MapAccess&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>WithPrefixOption&lt;<span class="lifetime">&#39;a</span>, A&gt;
+<span class="kw">where
+    </span>A: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">A::Error</span>;
+    <span class="kw">type </span>Error = A::Error;
 
-    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>next_key_seed&lt;K&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, seed: K) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;K::Value&gt;, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>K: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">first_key</span>.<span class="ident">take</span>() {
-            <span class="kw">let</span> <span class="ident">without_prefix</span> <span class="op">=</span> <span class="ident">s</span>[<span class="self">self</span>.<span class="ident">prefix</span>.<span class="ident">len</span>()..].<span class="ident">into_deserializer</span>();
-            <span class="kw">return</span> <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="ident">without_prefix</span>).<span class="ident">map</span>(<span class="prelude-val">Some</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = <span class="self">self</span>.first_key.take() {
+            <span class="kw">let </span>without_prefix = s[<span class="self">self</span>.prefix.len()..].into_deserializer();
+            <span class="kw">return </span>seed.deserialize(without_prefix).map(<span class="prelude-val">Some</span>);
         }
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">next_key</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">without_prefix</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">strip_prefix</span>(<span class="self">self</span>.<span class="ident">prefix</span>) {
-                <span class="kw">return</span> <span class="ident">seed</span>
-                    .<span class="ident">deserialize</span>(<span class="ident">without_prefix</span>.<span class="ident">into_deserializer</span>())
-                    .<span class="ident">map</span>(<span class="prelude-val">Some</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(s) = <span class="self">self</span>.delegate.next_key::&lt;String&gt;()<span class="question-mark">? </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(without_prefix) = s.strip_prefix(<span class="self">self</span>.prefix) {
+                <span class="kw">return </span>seed
+                    .deserialize(without_prefix.into_deserializer())
+                    .map(<span class="prelude-val">Some</span>);
             }
-            <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">IgnoredAny</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            <span class="self">self</span>.delegate.next_value::&lt;IgnoredAny&gt;()<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>next_value_seed&lt;V&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, seed: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">next_value_seed</span>(<span class="ident">seed</span>)
+        <span class="self">self</span>.delegate.next_value_seed(seed)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

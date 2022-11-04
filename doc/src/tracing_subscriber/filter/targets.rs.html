@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/targets.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>targets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/targets.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>targets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -710,715 +710,715 @@
 <span id="708">708</span>
 <span id="709">709</span>
 <span id="710">710</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A [filter] that enables or disables spans and events based on their [target] and [level].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [`Targets`] for details.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [target]: tracing_core::Metadata::target</span>
-<span class="doccomment">//! [level]: tracing_core::Level</span>
-<span class="doccomment">//! [filter]: crate::layer#filtering-with-layers</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A [filter] that enables or disables spans and events based on their [target] and [level].
+//!
+//! See [`Targets`] for details.
+//!
+//! [target]: tracing_core::Metadata::target
+//! [level]: tracing_core::Level
+//! [filter]: crate::layer#filtering-with-layers
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">filter</span>::{
-        <span class="ident">directive</span>::{<span class="ident">DirectiveSet</span>, <span class="ident">ParseError</span>, <span class="ident">StaticDirective</span>},
-        <span class="ident">LevelFilter</span>,
+</span><span class="kw">use crate</span>::{
+    filter::{
+        directive::{DirectiveSet, ParseError, StaticDirective},
+        LevelFilter,
     },
-    <span class="ident">layer</span>,
+    layer,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">alloc::string::String</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{
-    <span class="ident">iter</span>::{<span class="ident">Extend</span>, <span class="ident">FilterMap</span>, <span class="ident">FromIterator</span>},
-    <span class="ident">slice</span>,
-    <span class="ident">str::FromStr</span>,
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+</span><span class="kw">use </span>alloc::string::String;
+<span class="kw">use </span>core::{
+    iter::{Extend, FilterMap, FromIterator},
+    slice,
+    str::FromStr,
 };
-<span class="kw">use</span> <span class="ident">tracing_core</span>::{<span class="ident">Interest</span>, <span class="ident">Level</span>, <span class="ident">Metadata</span>, <span class="ident">Subscriber</span>};
+<span class="kw">use </span>tracing_core::{Interest, Level, Metadata, Subscriber};
 
-<span class="doccomment">/// A filter that enables or disables spans and events based on their [target]</span>
-<span class="doccomment">/// and [level].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Targets are typically equal to the Rust module path of the code where the</span>
-<span class="doccomment">/// span or event was recorded, although they may be overridden.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type can be used for both [per-layer filtering][plf] (using its</span>
-<span class="doccomment">/// [`Filter`] implementation) and [global filtering][global] (using its</span>
-<span class="doccomment">/// [`Layer`] implementation).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the [documentation on filtering with layers][filtering] for details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Filtering With `Targets`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `Targets` filter consists of one or more [target] prefixes, paired with</span>
-<span class="doccomment">/// [`LevelFilter`]s. If a span or event&#39;s [target] begins with one of those</span>
-<span class="doccomment">/// prefixes, and its [level] is at or below the [`LevelFilter`] enabled for</span>
-<span class="doccomment">/// that prefix, then the span or event will be enabled.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is similar to the behavior implemented by the [`env_logger` crate] in</span>
-<span class="doccomment">/// the `log` ecosystem.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The [`EnvFilter`] type also provided by this crate is very similar to `Targets`,</span>
-<span class="doccomment">/// but is capable of a more sophisticated form of filtering where events may</span>
-<span class="doccomment">/// also be enabled or disabled based on the span they are recorded in.</span>
-<span class="doccomment">/// `Targets` can be thought of as a lighter-weight form of [`EnvFilter`] that</span>
-<span class="doccomment">/// can be used instead when this dynamic filtering is not required.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `Targets` filter can be constructed by programmatically adding targets and</span>
-<span class="doccomment">/// levels to enable:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tracing_subscriber::{filter, prelude::*};</span>
-<span class="doccomment">/// use tracing_core::Level;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let filter = filter::Targets::new()</span>
-<span class="doccomment">///     // Enable the `INFO` level for anything in `my_crate`</span>
-<span class="doccomment">///     .with_target(&quot;my_crate&quot;, Level::INFO)</span>
-<span class="doccomment">///     // Enable the `DEBUG` level for a specific module.</span>
-<span class="doccomment">///     .with_target(&quot;my_crate::interesting_module&quot;, Level::DEBUG);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Build a new subscriber with the `fmt` layer using the `Targets`</span>
-<span class="doccomment">/// // filter we constructed above.</span>
-<span class="doccomment">/// tracing_subscriber::registry()</span>
-<span class="doccomment">///     .with(tracing_subscriber::fmt::layer())</span>
-<span class="doccomment">///     .with(filter)</span>
-<span class="doccomment">///     .init();</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`LevelFilter::OFF`] can be used to disable a particular target:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tracing_subscriber::filter::{Targets, LevelFilter};</span>
-<span class="doccomment">/// use tracing_core::Level;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let filter = Targets::new()</span>
-<span class="doccomment">///     .with_target(&quot;my_crate&quot;, Level::INFO)</span>
-<span class="doccomment">///     // Disable all traces from `annoying_module`.</span>
-<span class="doccomment">///     .with_target(&quot;my_crate::annoying_module&quot;, LevelFilter::OFF);</span>
-<span class="doccomment">/// # drop(filter);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Alternatively, `Targets` implements [`std::str::FromStr`], allowing it to be</span>
-<span class="doccomment">/// parsed from a comma-delimited list of `target=level` pairs. For example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// use tracing_subscriber::filter;</span>
-<span class="doccomment">/// use tracing_core::Level;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let filter = &quot;my_crate=info,my_crate::interesting_module=trace,other_crate=debug&quot;</span>
-<span class="doccomment">///     .parse::&lt;filter::Targets&gt;()?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // The parsed filter is identical to a filter constructed using `with_target`:</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     filter,</span>
-<span class="doccomment">///     filter::Targets::new()</span>
-<span class="doccomment">///         .with_target(&quot;my_crate&quot;, Level::INFO)</span>
-<span class="doccomment">///         .with_target(&quot;my_crate::interesting_module&quot;, Level::TRACE)</span>
-<span class="doccomment">///         .with_target(&quot;other_crate&quot;, Level::DEBUG)</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # Ok(()) }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is particularly useful when the list of enabled targets is configurable</span>
-<span class="doccomment">/// by the user at runtime.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Targets` filter can be used as a [per-layer filter][plf] *and* as a</span>
-<span class="doccomment">/// [global filter][global]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use tracing_subscriber::{</span>
-<span class="doccomment">///     fmt,</span>
-<span class="doccomment">///     filter::{Targets, LevelFilter},</span>
-<span class="doccomment">///     prelude::*,</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// use tracing_core::Level;</span>
-<span class="doccomment">/// use std::{sync::Arc, fs::File};</span>
-<span class="doccomment">/// # fn docs() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // A layer that logs events to stdout using the human-readable &quot;pretty&quot;</span>
-<span class="doccomment">/// // format.</span>
-<span class="doccomment">/// let stdout_log = fmt::layer().pretty();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // A layer that logs events to a file, using the JSON format.</span>
-<span class="doccomment">/// let file = File::create(&quot;debug_log.json&quot;)?;</span>
-<span class="doccomment">/// let debug_log = fmt::layer()</span>
-<span class="doccomment">///     .with_writer(Arc::new(file))</span>
-<span class="doccomment">///     .json();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// tracing_subscriber::registry()</span>
-<span class="doccomment">///     // Only log INFO and above to stdout, unless the span or event</span>
-<span class="doccomment">///     // has the `my_crate::cool_module` target prefix.</span>
-<span class="doccomment">///     .with(stdout_log</span>
-<span class="doccomment">///         .with_filter(</span>
-<span class="doccomment">///             Targets::default()</span>
-<span class="doccomment">///                 .with_target(&quot;my_crate::cool_module&quot;, Level::DEBUG)</span>
-<span class="doccomment">///                 .with_default(Level::INFO)</span>
-<span class="doccomment">///        )</span>
-<span class="doccomment">///     )</span>
-<span class="doccomment">///     // Log everything enabled by the global filter to `debug_log.json`.</span>
-<span class="doccomment">///     .with(debug_log)</span>
-<span class="doccomment">///     // Configure a global filter for the whole subscriber stack. This will</span>
-<span class="doccomment">///     // control what spans and events are recorded by both the `debug_log`</span>
-<span class="doccomment">///     // and the `stdout_log` layers, and `stdout_log` will *additionally* be</span>
-<span class="doccomment">///     // filtered by its per-layer filter.</span>
-<span class="doccomment">///     .with(</span>
-<span class="doccomment">///         Targets::default()</span>
-<span class="doccomment">///             .with_target(&quot;my_crate&quot;, Level::TRACE)</span>
-<span class="doccomment">///             .with_target(&quot;other_crate&quot;, Level::INFO)</span>
-<span class="doccomment">///             .with_target(&quot;other_crate::annoying_module&quot;, LevelFilter::OFF)</span>
-<span class="doccomment">///             .with_target(&quot;third_crate&quot;, Level::DEBUG)</span>
-<span class="doccomment">///     ).init();</span>
-<span class="doccomment">/// # Ok(()) }</span>
-<span class="doccomment">///```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [target]: tracing_core::Metadata::target</span>
-<span class="doccomment">/// [level]: tracing_core::Level</span>
-<span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-<span class="doccomment">/// [`Layer`]: crate::layer::Layer</span>
-<span class="doccomment">/// [plf]: crate::layer#per-layer-filtering</span>
-<span class="doccomment">/// [global]: crate::layer#global-filtering</span>
-<span class="doccomment">/// [filtering]: crate::layer#filtering-with-layers</span>
-<span class="doccomment">/// [`env_logger` crate]: https://docs.rs/env_logger/0.9.0/env_logger/index.html#enabling-logging</span>
-<span class="doccomment">/// [`EnvFilter`]: crate::filter::EnvFilter</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Targets</span>(<span class="ident">DirectiveSet</span><span class="op">&lt;</span><span class="ident">StaticDirective</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A filter that enables or disables spans and events based on their [target]
+/// and [level].
+///
+/// Targets are typically equal to the Rust module path of the code where the
+/// span or event was recorded, although they may be overridden.
+///
+/// This type can be used for both [per-layer filtering][plf] (using its
+/// [`Filter`] implementation) and [global filtering][global] (using its
+/// [`Layer`] implementation).
+///
+/// See the [documentation on filtering with layers][filtering] for details.
+///
+/// # Filtering With `Targets`
+///
+/// A `Targets` filter consists of one or more [target] prefixes, paired with
+/// [`LevelFilter`]s. If a span or event&#39;s [target] begins with one of those
+/// prefixes, and its [level] is at or below the [`LevelFilter`] enabled for
+/// that prefix, then the span or event will be enabled.
+///
+/// This is similar to the behavior implemented by the [`env_logger` crate] in
+/// the `log` ecosystem.
+///
+/// The [`EnvFilter`] type also provided by this crate is very similar to `Targets`,
+/// but is capable of a more sophisticated form of filtering where events may
+/// also be enabled or disabled based on the span they are recorded in.
+/// `Targets` can be thought of as a lighter-weight form of [`EnvFilter`] that
+/// can be used instead when this dynamic filtering is not required.
+///
+/// # Examples
+///
+/// A `Targets` filter can be constructed by programmatically adding targets and
+/// levels to enable:
+///
+/// ```
+/// use tracing_subscriber::{filter, prelude::*};
+/// use tracing_core::Level;
+///
+/// let filter = filter::Targets::new()
+///     // Enable the `INFO` level for anything in `my_crate`
+///     .with_target(&quot;my_crate&quot;, Level::INFO)
+///     // Enable the `DEBUG` level for a specific module.
+///     .with_target(&quot;my_crate::interesting_module&quot;, Level::DEBUG);
+///
+/// // Build a new subscriber with the `fmt` layer using the `Targets`
+/// // filter we constructed above.
+/// tracing_subscriber::registry()
+///     .with(tracing_subscriber::fmt::layer())
+///     .with(filter)
+///     .init();
+/// ```
+///
+/// [`LevelFilter::OFF`] can be used to disable a particular target:
+/// ```
+/// use tracing_subscriber::filter::{Targets, LevelFilter};
+/// use tracing_core::Level;
+///
+/// let filter = Targets::new()
+///     .with_target(&quot;my_crate&quot;, Level::INFO)
+///     // Disable all traces from `annoying_module`.
+///     .with_target(&quot;my_crate::annoying_module&quot;, LevelFilter::OFF);
+/// # drop(filter);
+/// ```
+///
+/// Alternatively, `Targets` implements [`std::str::FromStr`], allowing it to be
+/// parsed from a comma-delimited list of `target=level` pairs. For example:
+///
+/// ```rust
+/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// use tracing_subscriber::filter;
+/// use tracing_core::Level;
+///
+/// let filter = &quot;my_crate=info,my_crate::interesting_module=trace,other_crate=debug&quot;
+///     .parse::&lt;filter::Targets&gt;()?;
+///
+/// // The parsed filter is identical to a filter constructed using `with_target`:
+/// assert_eq!(
+///     filter,
+///     filter::Targets::new()
+///         .with_target(&quot;my_crate&quot;, Level::INFO)
+///         .with_target(&quot;my_crate::interesting_module&quot;, Level::TRACE)
+///         .with_target(&quot;other_crate&quot;, Level::DEBUG)
+/// );
+/// # Ok(()) }
+/// ```
+///
+/// This is particularly useful when the list of enabled targets is configurable
+/// by the user at runtime.
+///
+/// The `Targets` filter can be used as a [per-layer filter][plf] *and* as a
+/// [global filter][global]:
+///
+/// ```rust
+/// use tracing_subscriber::{
+///     fmt,
+///     filter::{Targets, LevelFilter},
+///     prelude::*,
+/// };
+/// use tracing_core::Level;
+/// use std::{sync::Arc, fs::File};
+/// # fn docs() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+///
+/// // A layer that logs events to stdout using the human-readable &quot;pretty&quot;
+/// // format.
+/// let stdout_log = fmt::layer().pretty();
+///
+/// // A layer that logs events to a file, using the JSON format.
+/// let file = File::create(&quot;debug_log.json&quot;)?;
+/// let debug_log = fmt::layer()
+///     .with_writer(Arc::new(file))
+///     .json();
+///
+/// tracing_subscriber::registry()
+///     // Only log INFO and above to stdout, unless the span or event
+///     // has the `my_crate::cool_module` target prefix.
+///     .with(stdout_log
+///         .with_filter(
+///             Targets::default()
+///                 .with_target(&quot;my_crate::cool_module&quot;, Level::DEBUG)
+///                 .with_default(Level::INFO)
+///        )
+///     )
+///     // Log everything enabled by the global filter to `debug_log.json`.
+///     .with(debug_log)
+///     // Configure a global filter for the whole subscriber stack. This will
+///     // control what spans and events are recorded by both the `debug_log`
+///     // and the `stdout_log` layers, and `stdout_log` will *additionally* be
+///     // filtered by its per-layer filter.
+///     .with(
+///         Targets::default()
+///             .with_target(&quot;my_crate&quot;, Level::TRACE)
+///             .with_target(&quot;other_crate&quot;, Level::INFO)
+///             .with_target(&quot;other_crate::annoying_module&quot;, LevelFilter::OFF)
+///             .with_target(&quot;third_crate&quot;, Level::DEBUG)
+///     ).init();
+/// # Ok(()) }
+///```
+///
+/// [target]: tracing_core::Metadata::target
+/// [level]: tracing_core::Level
+/// [`Filter`]: crate::layer::Filter
+/// [`Layer`]: crate::layer::Layer
+/// [plf]: crate::layer#per-layer-filtering
+/// [global]: crate::layer#global-filtering
+/// [filtering]: crate::layer#filtering-with-layers
+/// [`env_logger` crate]: https://docs.rs/env_logger/0.9.0/env_logger/index.html#enabling-logging
+/// [`EnvFilter`]: crate::filter::EnvFilter
+</span><span class="attribute">#[derive(Debug, Default, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>Targets(DirectiveSet&lt;StaticDirective&gt;);
 
-<span class="kw">impl</span> <span class="ident">Targets</span> {
-    <span class="doccomment">/// Returns a new `Targets` filter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This filter will enable no targets. Call [`with_target`] or [`with_targets`]</span>
-    <span class="doccomment">/// to add enabled targets, and [`with_default`] to change the default level</span>
-    <span class="doccomment">/// enabled for spans and events that didn&#39;t match any of the provided targets.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`with_target`]: Targets::with_target</span>
-    <span class="doccomment">/// [`with_targets`]: Targets::with_targets</span>
-    <span class="doccomment">/// [`with_default`]: Targets::with_default</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>Targets {
+    <span class="doccomment">/// Returns a new `Targets` filter.
+    ///
+    /// This filter will enable no targets. Call [`with_target`] or [`with_targets`]
+    /// to add enabled targets, and [`with_default`] to change the default level
+    /// enabled for spans and events that didn&#39;t match any of the provided targets.
+    ///
+    /// [`with_target`]: Targets::with_target
+    /// [`with_targets`]: Targets::with_targets
+    /// [`with_default`]: Targets::with_default
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Enables spans and events with [target]s starting with the provided target</span>
-    <span class="doccomment">/// prefix if they are at or below the provided [`LevelFilter`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::filter;</span>
-    <span class="doccomment">/// use tracing_core::Level;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = filter::Targets::new()</span>
-    <span class="doccomment">///     // Enable the `INFO` level for anything in `my_crate`</span>
-    <span class="doccomment">///     .with_target(&quot;my_crate&quot;, Level::INFO)</span>
-    <span class="doccomment">///     // Enable the `DEBUG` level for a specific module.</span>
-    <span class="doccomment">///     .with_target(&quot;my_crate::interesting_module&quot;, Level::DEBUG);</span>
-    <span class="doccomment">/// # drop(filter);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`LevelFilter::OFF`] can be used to disable a particular target:</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{Targets, LevelFilter};</span>
-    <span class="doccomment">/// use tracing_core::Level;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = Targets::new()</span>
-    <span class="doccomment">///     .with_target(&quot;my_crate&quot;, Level::INFO)</span>
-    <span class="doccomment">///     // Disable all traces from `annoying_module`.</span>
-    <span class="doccomment">///     .with_target(&quot;my_crate::interesting_module&quot;, LevelFilter::OFF);</span>
-    <span class="doccomment">/// # drop(filter);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [target]: tracing_core::Metadata::target</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_target</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">level</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">add</span>(<span class="ident">StaticDirective::new</span>(
-            <span class="prelude-val">Some</span>(<span class="ident">target</span>.<span class="ident">into</span>()),
-            <span class="ident">Default::default</span>(),
-            <span class="ident">level</span>.<span class="ident">into</span>(),
+    <span class="doccomment">/// Enables spans and events with [target]s starting with the provided target
+    /// prefix if they are at or below the provided [`LevelFilter`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tracing_subscriber::filter;
+    /// use tracing_core::Level;
+    ///
+    /// let filter = filter::Targets::new()
+    ///     // Enable the `INFO` level for anything in `my_crate`
+    ///     .with_target(&quot;my_crate&quot;, Level::INFO)
+    ///     // Enable the `DEBUG` level for a specific module.
+    ///     .with_target(&quot;my_crate::interesting_module&quot;, Level::DEBUG);
+    /// # drop(filter);
+    /// ```
+    ///
+    /// [`LevelFilter::OFF`] can be used to disable a particular target:
+    /// ```
+    /// use tracing_subscriber::filter::{Targets, LevelFilter};
+    /// use tracing_core::Level;
+    ///
+    /// let filter = Targets::new()
+    ///     .with_target(&quot;my_crate&quot;, Level::INFO)
+    ///     // Disable all traces from `annoying_module`.
+    ///     .with_target(&quot;my_crate::interesting_module&quot;, LevelFilter::OFF);
+    /// # drop(filter);
+    /// ```
+    ///
+    /// [target]: tracing_core::Metadata::target
+    </span><span class="kw">pub fn </span>with_target(<span class="kw-2">mut </span><span class="self">self</span>, target: <span class="kw">impl </span>Into&lt;String&gt;, level: <span class="kw">impl </span>Into&lt;LevelFilter&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0</span>.add(StaticDirective::new(
+            <span class="prelude-val">Some</span>(target.into()),
+            Default::default(),
+            level.into(),
         ));
-        <span class="self">self</span>
-    }
-    <span class="doccomment">/// Adds [target]s from an iterator of [target]-[`LevelFilter`] pairs to this filter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::filter;</span>
-    <span class="doccomment">/// use tracing_core::Level;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = filter::Targets::new()</span>
-    <span class="doccomment">///     .with_targets(vec![</span>
-    <span class="doccomment">///         (&quot;my_crate&quot;, Level::INFO),</span>
-    <span class="doccomment">///         (&quot;my_crate::some_module&quot;, Level::DEBUG),</span>
-    <span class="doccomment">///         (&quot;my_crate::other_module::cool_stuff&quot;, Level::TRACE),</span>
-    <span class="doccomment">///         (&quot;other_crate&quot;, Level::WARN)</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// # drop(filter);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`LevelFilter::OFF`] can be used to disable a particular target:</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{Targets, LevelFilter};</span>
-    <span class="doccomment">/// use tracing_core::Level;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = Targets::new()</span>
-    <span class="doccomment">///     .with_target(&quot;my_crate&quot;, Level::INFO)</span>
-    <span class="doccomment">///     // Disable all traces from `annoying_module`.</span>
-    <span class="doccomment">///     .with_target(&quot;my_crate::interesting_module&quot;, LevelFilter::OFF);</span>
-    <span class="doccomment">/// # drop(filter);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [target]: tracing_core::Metadata::target</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_targets</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">L</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">targets</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">T</span>, <span class="ident">L</span>)<span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">String</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">LevelFilter</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>,
+        <span class="self">self
+    </span>}
+    <span class="doccomment">/// Adds [target]s from an iterator of [target]-[`LevelFilter`] pairs to this filter.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tracing_subscriber::filter;
+    /// use tracing_core::Level;
+    ///
+    /// let filter = filter::Targets::new()
+    ///     .with_targets(vec![
+    ///         (&quot;my_crate&quot;, Level::INFO),
+    ///         (&quot;my_crate::some_module&quot;, Level::DEBUG),
+    ///         (&quot;my_crate::other_module::cool_stuff&quot;, Level::TRACE),
+    ///         (&quot;other_crate&quot;, Level::WARN)
+    ///     ]);
+    /// # drop(filter);
+    /// ```
+    ///
+    /// [`LevelFilter::OFF`] can be used to disable a particular target:
+    /// ```
+    /// use tracing_subscriber::filter::{Targets, LevelFilter};
+    /// use tracing_core::Level;
+    ///
+    /// let filter = Targets::new()
+    ///     .with_target(&quot;my_crate&quot;, Level::INFO)
+    ///     // Disable all traces from `annoying_module`.
+    ///     .with_target(&quot;my_crate::interesting_module&quot;, LevelFilter::OFF);
+    /// # drop(filter);
+    /// ```
+    ///
+    /// [target]: tracing_core::Metadata::target
+    </span><span class="kw">pub fn </span>with_targets&lt;T, L&gt;(<span class="kw-2">mut </span><span class="self">self</span>, targets: <span class="kw">impl </span>IntoIterator&lt;Item = (T, L)&gt;) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>String: From&lt;T&gt;,
+        LevelFilter: From&lt;L&gt;,
     {
-        <span class="self">self</span>.<span class="ident">extend</span>(<span class="ident">targets</span>);
-        <span class="self">self</span>
+        <span class="self">self</span>.extend(targets);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the default level to enable for spans and events whose targets did
+    /// not match any of the configured prefixes.
+    ///
+    /// By default, this is [`LevelFilter::OFF`]. This means that spans and
+    /// events will only be enabled if they match one of the configured target
+    /// prefixes. If this is changed to a different [`LevelFilter`], spans and
+    /// events with targets that did not match any of the configured prefixes
+    /// will be enabled if their level is at or below the provided level.
+    </span><span class="kw">pub fn </span>with_default(<span class="kw-2">mut </span><span class="self">self</span>, level: <span class="kw">impl </span>Into&lt;LevelFilter&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0
+            </span>.add(StaticDirective::new(<span class="prelude-val">None</span>, Default::default(), level.into()));
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Returns an iterator over the [target]-[`LevelFilter`] pairs in this filter.
+    ///
+    /// The order of iteration is undefined.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tracing_subscriber::filter::{Targets, LevelFilter};
+    /// use tracing_core::Level;
+    ///
+    /// let filter = Targets::new()
+    ///     .with_target(&quot;my_crate&quot;, Level::INFO)
+    ///     .with_target(&quot;my_crate::interesting_module&quot;, Level::DEBUG);
+    ///
+    /// let mut targets: Vec&lt;_&gt; = filter.iter().collect();
+    /// targets.sort();
+    ///
+    /// assert_eq!(targets, vec![
+    ///     (&quot;my_crate&quot;, LevelFilter::INFO),
+    ///     (&quot;my_crate::interesting_module&quot;, LevelFilter::DEBUG),
+    /// ]);
+    /// ```
+    ///
+    /// [target]: tracing_core::Metadata::target
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.into_iter()
     }
 
-    <span class="doccomment">/// Sets the default level to enable for spans and events whose targets did</span>
-    <span class="doccomment">/// not match any of the configured prefixes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, this is [`LevelFilter::OFF`]. This means that spans and</span>
-    <span class="doccomment">/// events will only be enabled if they match one of the configured target</span>
-    <span class="doccomment">/// prefixes. If this is changed to a different [`LevelFilter`], spans and</span>
-    <span class="doccomment">/// events with targets that did not match any of the configured prefixes</span>
-    <span class="doccomment">/// will be enabled if their level is at or below the provided level.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_default</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-            .<span class="ident">add</span>(<span class="ident">StaticDirective::new</span>(<span class="prelude-val">None</span>, <span class="ident">Default::default</span>(), <span class="ident">level</span>.<span class="ident">into</span>()));
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Returns an iterator over the [target]-[`LevelFilter`] pairs in this filter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order of iteration is undefined.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{Targets, LevelFilter};</span>
-    <span class="doccomment">/// use tracing_core::Level;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = Targets::new()</span>
-    <span class="doccomment">///     .with_target(&quot;my_crate&quot;, Level::INFO)</span>
-    <span class="doccomment">///     .with_target(&quot;my_crate::interesting_module&quot;, Level::DEBUG);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut targets: Vec&lt;_&gt; = filter.iter().collect();</span>
-    <span class="doccomment">/// targets.sort();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(targets, vec![</span>
-    <span class="doccomment">///     (&quot;my_crate&quot;, LevelFilter::INFO),</span>
-    <span class="doccomment">///     (&quot;my_crate::interesting_module&quot;, LevelFilter::DEBUG),</span>
-    <span class="doccomment">/// ]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [target]: tracing_core::Metadata::target</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">into_iter</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">interested</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>) {
-            <span class="ident">Interest::always</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">Interest::never</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>interested(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="kw">if </span><span class="self">self</span>.<span class="number">0</span>.enabled(metadata) {
+            Interest::always()
+        } <span class="kw">else </span>{
+            Interest::never()
         }
     }
 
-    <span class="doccomment">/// Returns whether a [target]-[`Level`] pair would be enabled</span>
-    <span class="doccomment">/// by this `Targets`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be used with [`module_path!`] from `std` as the target</span>
-    <span class="doccomment">/// in order to emulate the behavior of the [`tracing::event!`] and [`tracing::span!`]</span>
-    <span class="doccomment">/// macros.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{Targets, LevelFilter};</span>
-    <span class="doccomment">/// use tracing_core::Level;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = Targets::new()</span>
-    <span class="doccomment">///     .with_target(&quot;my_crate&quot;, Level::INFO)</span>
-    <span class="doccomment">///     .with_target(&quot;my_crate::interesting_module&quot;, Level::DEBUG);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(filter.would_enable(&quot;my_crate&quot;, &amp;Level::INFO));</span>
-    <span class="doccomment">/// assert!(!filter.would_enable(&quot;my_crate::interesting_module&quot;, &amp;Level::TRACE));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [target]: tracing_core::Metadata::target</span>
-    <span class="doccomment">/// [`module_path!`]: std::module_path!</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">would_enable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">level</span>: <span class="kw-2">&amp;</span><span class="ident">Level</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// &quot;Correct&quot; to call because `Targets` only produces `StaticDirective`&#39;s with NO</span>
-        <span class="comment">// fields</span>
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">target_enabled</span>(<span class="ident">target</span>, <span class="ident">level</span>)
+    <span class="doccomment">/// Returns whether a [target]-[`Level`] pair would be enabled
+    /// by this `Targets`.
+    ///
+    /// This method can be used with [`module_path!`] from `std` as the target
+    /// in order to emulate the behavior of the [`tracing::event!`] and [`tracing::span!`]
+    /// macros.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tracing_subscriber::filter::{Targets, LevelFilter};
+    /// use tracing_core::Level;
+    ///
+    /// let filter = Targets::new()
+    ///     .with_target(&quot;my_crate&quot;, Level::INFO)
+    ///     .with_target(&quot;my_crate::interesting_module&quot;, Level::DEBUG);
+    ///
+    /// assert!(filter.would_enable(&quot;my_crate&quot;, &amp;Level::INFO));
+    /// assert!(!filter.would_enable(&quot;my_crate::interesting_module&quot;, &amp;Level::TRACE));
+    /// ```
+    ///
+    /// [target]: tracing_core::Metadata::target
+    /// [`module_path!`]: std::module_path!
+    </span><span class="kw">pub fn </span>would_enable(<span class="kw-2">&amp;</span><span class="self">self</span>, target: <span class="kw-2">&amp;</span>str, level: <span class="kw-2">&amp;</span>Level) -&gt; bool {
+        <span class="comment">// &quot;Correct&quot; to call because `Targets` only produces `StaticDirective`&#39;s with NO
+        // fields
+        </span><span class="self">self</span>.<span class="number">0</span>.target_enabled(target, level)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">L</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Targets</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">L</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, L&gt; Extend&lt;(T, L)&gt; <span class="kw">for </span>Targets
+<span class="kw">where
+    </span>T: Into&lt;String&gt;,
+    L: Into&lt;LevelFilter&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">T</span>, <span class="ident">L</span>)<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">I</span>) {
-        <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">target</span>, <span class="ident">level</span>)<span class="op">|</span> {
-            <span class="ident">StaticDirective::new</span>(<span class="prelude-val">Some</span>(<span class="ident">target</span>.<span class="ident">into</span>()), <span class="ident">Default::default</span>(), <span class="ident">level</span>.<span class="ident">into</span>())
+    <span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = (T, L)&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
+        <span class="kw">let </span>iter = iter.into_iter().map(|(target, level)| {
+            StaticDirective::new(<span class="prelude-val">Some</span>(target.into()), Default::default(), level.into())
         });
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">extend</span>(<span class="ident">iter</span>);
+        <span class="self">self</span>.<span class="number">0</span>.extend(iter);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">FromIterator</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">L</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Targets</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">L</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, L&gt; FromIterator&lt;(T, L)&gt; <span class="kw">for </span>Targets
+<span class="kw">where
+    </span>T: Into&lt;String&gt;,
+    L: Into&lt;LevelFilter&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">T</span>, <span class="ident">L</span>)<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-        <span class="ident">this</span>.<span class="ident">extend</span>(<span class="ident">iter</span>);
-        <span class="ident">this</span>
+    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = (T, L)&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">Self</span>::default();
+        this.extend(iter);
+        this
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Targets</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ParseError</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>)
-            .<span class="ident">map</span>(<span class="ident">StaticDirective::from_str</span>)
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">map</span>(<span class="self">Self</span>)
+<span class="kw">impl </span>FromStr <span class="kw">for </span>Targets {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= ParseError;
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        s.split(<span class="string">&#39;,&#39;</span>)
+            .map(StaticDirective::from_str)
+            .collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;()
+            .map(<span class="self">Self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">layer::Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Targets</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+<span class="kw">impl</span>&lt;S&gt; layer::Layer&lt;S&gt; <span class="kw">for </span>Targets
+<span class="kw">where
+    </span>S: Subscriber,
 {
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>)
+    <span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.enabled(metadata)
     }
 
-    <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="self">self</span>.<span class="ident">interested</span>(<span class="ident">metadata</span>)
+    <span class="kw">fn </span>register_callsite(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="self">self</span>.interested(metadata)
     }
 
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">max_level</span>)
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Targets</span> {
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="self">self</span>.<span class="ident">interested</span>(<span class="ident">metadata</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">max_level</span>)
+    <span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.max_level)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">Targets</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">String</span>, <span class="ident">LevelFilter</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;registry&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;S&gt; layer::Filter&lt;S&gt; <span class="kw">for </span>Targets {
+    <span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;</span>layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.enabled(metadata)
+    }
 
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IntoIter</span>;
+    <span class="kw">fn </span>callsite_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="self">self</span>.interested(metadata)
+    }
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">IntoIter::new</span>(<span class="self">self</span>)
+    <span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.max_level)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Targets</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">LevelFilter</span>);
+<span class="kw">impl </span>IntoIterator <span class="kw">for </span>Targets {
+    <span class="kw">type </span>Item = (String, LevelFilter);
 
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>IntoIter = IntoIter;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">Iter::new</span>(<span class="self">self</span>)
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        IntoIter::new(<span class="self">self</span>)
     }
 }
 
-<span class="doccomment">/// An owning iterator over the [target]-[level] pairs of a `Targets` filter.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct is created by the `IntoIterator` trait implementation of [`Targets`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Merge the targets from one `Targets` with another:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tracing_subscriber::filter::Targets;</span>
-<span class="doccomment">/// use tracing_core::Level;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut filter = Targets::new().with_target(&quot;my_crate&quot;, Level::INFO);</span>
-<span class="doccomment">/// let overrides = Targets::new().with_target(&quot;my_crate::interesting_module&quot;, Level::DEBUG);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// filter.extend(overrides);</span>
-<span class="doccomment">/// # drop(filter);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [target]: tracing_core::Metadata::target</span>
-<span class="doccomment">/// [level]: tracing_core::Level</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntoIter</span>(
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span> <span class="comment">// alias indirection would probably make this more confusing</span>
-    <span class="ident">FilterMap</span><span class="op">&lt;</span>
-        <span class="op">&lt;</span><span class="ident">DirectiveSet</span><span class="op">&lt;</span><span class="ident">StaticDirective</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::IntoIter</span>,
-        <span class="kw">fn</span>(<span class="ident">StaticDirective</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">LevelFilter</span>)<span class="op">&gt;</span>,
-    <span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Targets {
+    <span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, LevelFilter);
+
+    <span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>&gt;;
+
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        Iter::new(<span class="self">self</span>)
+    }
+}
+
+<span class="doccomment">/// An owning iterator over the [target]-[level] pairs of a `Targets` filter.
+///
+/// This struct is created by the `IntoIterator` trait implementation of [`Targets`].
+///
+/// # Examples
+///
+/// Merge the targets from one `Targets` with another:
+///
+/// ```
+/// use tracing_subscriber::filter::Targets;
+/// use tracing_core::Level;
+///
+/// let mut filter = Targets::new().with_target(&quot;my_crate&quot;, Level::INFO);
+/// let overrides = Targets::new().with_target(&quot;my_crate::interesting_module&quot;, Level::DEBUG);
+///
+/// filter.extend(overrides);
+/// # drop(filter);
+/// ```
+///
+/// [target]: tracing_core::Metadata::target
+/// [level]: tracing_core::Level
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>IntoIter(
+    <span class="attribute">#[allow(clippy::type_complexity)] </span><span class="comment">// alias indirection would probably make this more confusing
+    </span>FilterMap&lt;
+        &lt;DirectiveSet&lt;StaticDirective&gt; <span class="kw">as </span>IntoIterator&gt;::IntoIter,
+        <span class="kw">fn</span>(StaticDirective) -&gt; <span class="prelude-ty">Option</span>&lt;(String, LevelFilter)&gt;,
+    &gt;,
 );
 
-<span class="kw">impl</span> <span class="ident">IntoIter</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">targets</span>: <span class="ident">Targets</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">targets</span>.<span class="number">0</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">directive</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">directive</span>.<span class="ident">level</span>;
-            <span class="ident">directive</span>.<span class="ident">target</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">target</span><span class="op">|</span> (<span class="ident">target</span>, <span class="ident">level</span>))
+<span class="kw">impl </span>IntoIter {
+    <span class="kw">fn </span>new(targets: Targets) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(targets.<span class="number">0</span>.into_iter().filter_map(|directive| {
+            <span class="kw">let </span>level = directive.level;
+            directive.target.map(|target| (target, level))
         }))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">String</span>, <span class="ident">LevelFilter</span>);
+<span class="kw">impl </span>Iterator <span class="kw">for </span>IntoIter {
+    <span class="kw">type </span>Item = (String, LevelFilter);
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>()
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.next()
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.<span class="number">0</span>.size_hint()
     }
 }
 
-<span class="doccomment">/// A borrowing iterator over the [target]-[level] pairs of a `Targets` filter.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct is created by [`iter`] method of [`Targets`], or from the `IntoIterator`</span>
-<span class="doccomment">/// implementation for `&amp;Targets`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [target]: tracing_core::Metadata::target</span>
-<span class="doccomment">/// [level]: tracing_core::Level</span>
-<span class="doccomment">/// [`iter`]: Targets::iter</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">FilterMap</span><span class="op">&lt;</span>
-        <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">StaticDirective</span><span class="op">&gt;</span>,
-        <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StaticDirective</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">LevelFilter</span>)<span class="op">&gt;</span>,
-    <span class="op">&gt;</span>,
+<span class="doccomment">/// A borrowing iterator over the [target]-[level] pairs of a `Targets` filter.
+///
+/// This struct is created by [`iter`] method of [`Targets`], or from the `IntoIterator`
+/// implementation for `&amp;Targets`.
+///
+/// [target]: tracing_core::Metadata::target
+/// [level]: tracing_core::Level
+/// [`iter`]: Targets::iter
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt;(
+    FilterMap&lt;
+        slice::Iter&lt;<span class="lifetime">&#39;a</span>, StaticDirective&gt;,
+        <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>StaticDirective) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, LevelFilter)&gt;,
+    &gt;,
 );
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">targets</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Targets</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">targets</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">directive</span><span class="op">|</span> {
-            <span class="ident">directive</span>
-                .<span class="ident">target</span>
-                .<span class="ident">as_deref</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">target</span><span class="op">|</span> (<span class="ident">target</span>, <span class="ident">directive</span>.<span class="ident">level</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new(targets: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Targets) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(targets.<span class="number">0</span>.iter().filter_map(|directive| {
+            directive
+                .target
+                .as_deref()
+                .map(|target| (target, directive.level))
         }))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">LevelFilter</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, LevelFilter);
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>()
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.next()
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.<span class="number">0</span>.size_hint()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="macro">feature!</span> {
-        <span class="attribute">#![<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-        <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">vec</span>, <span class="ident">vec::Vec</span>, <span class="ident">string::ToString</span>};
+    <span class="macro">feature! </span>{
+        <span class="attribute">#![not(feature = <span class="string">&quot;std&quot;</span>)]
+        </span><span class="kw">use </span>alloc::{vec, vec::Vec, string::ToString};
 
-        <span class="comment">// `dbg!` is only available with `libstd`; just nop it out when testing</span>
-        <span class="comment">// with alloc only.</span>
-        <span class="macro">macro_rules!</span> <span class="ident">dbg</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span> }
+        <span class="comment">// `dbg!` is only available with `libstd`; just nop it out when testing
+        // with alloc only.
+        </span><span class="macro">macro_rules! </span>dbg {
+            (<span class="macro-nonterminal">$x</span>:expr) =&gt; { <span class="macro-nonterminal">$x </span>}
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">expect_parse</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Targets</span> {
-        <span class="kw">match</span> <span class="macro">dbg!</span>(<span class="ident">s</span>).<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Targets</span><span class="op">&gt;</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;string {:?} did not parse successfully: {}&quot;</span>, <span class="ident">s</span>, <span class="ident">e</span>),
-            <span class="prelude-val">Ok</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>,
+    <span class="kw">fn </span>expect_parse(s: <span class="kw-2">&amp;</span>str) -&gt; Targets {
+        <span class="kw">match </span><span class="macro">dbg!</span>(s).parse::&lt;Targets&gt;() {
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;string {:?} did not parse successfully: {}&quot;</span>, s, e),
+            <span class="prelude-val">Ok</span>(e) =&gt; e,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">expect_parse_ralith</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">expect_parse</span>(<span class="ident">s</span>).<span class="number">0</span>.<span class="ident">into_vec</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">2</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;server&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+    <span class="kw">fn </span>expect_parse_ralith(s: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">let </span>dirs = expect_parse(s).<span class="number">0</span>.into_vec();
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">2</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;server&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].field_names, Vec::&lt;String&gt;::new());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;common&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::INFO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;common&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::INFO);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].field_names, Vec::&lt;String&gt;::new());
     }
 
-    <span class="kw">fn</span> <span class="ident">expect_parse_level_directives</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">expect_parse</span>(<span class="ident">s</span>).<span class="number">0</span>.<span class="ident">into_vec</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">6</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
+    <span class="kw">fn </span>expect_parse_level_directives(s: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">let </span>dirs = expect_parse(s).<span class="number">0</span>.into_vec();
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">6</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3::mod2::mod1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::OFF</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3::mod2::mod1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::OFF);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].field_names, Vec::&lt;String&gt;::new());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2::mod3&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::INFO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2::mod3&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::INFO);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].field_names, Vec::&lt;String&gt;::new());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::WARN</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].level, LevelFilter::WARN);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].field_names, Vec::&lt;String&gt;::new());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::ERROR</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].level, LevelFilter::ERROR);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].field_names, Vec::&lt;String&gt;::new());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::TRACE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].level, LevelFilter::TRACE);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].field_names, Vec::&lt;String&gt;::new());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].field_names, Vec::&lt;String&gt;::new());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_ralith</span>() {
-        <span class="ident">expect_parse_ralith</span>(<span class="string">&quot;common=info,server=debug&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_ralith() {
+        expect_parse_ralith(<span class="string">&quot;common=info,server=debug&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_ralith_uc</span>() {
-        <span class="ident">expect_parse_ralith</span>(<span class="string">&quot;common=INFO,server=DEBUG&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_ralith_uc() {
+        expect_parse_ralith(<span class="string">&quot;common=INFO,server=DEBUG&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_ralith_mixed</span>() {
-        <span class="ident">expect_parse</span>(<span class="string">&quot;common=iNfo,server=dEbUg&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_ralith_mixed() {
+        expect_parse(<span class="string">&quot;common=iNfo,server=dEbUg&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">expect_parse_valid</span>() {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">expect_parse</span>(<span class="string">&quot;crate1::mod1=error,crate1::mod2,crate2=debug,crate3=off&quot;</span>)
-            .<span class="number">0</span>
-            .<span class="ident">into_vec</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">4</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::TRACE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>expect_parse_valid() {
+        <span class="kw">let </span>dirs = expect_parse(<span class="string">&quot;crate1::mod1=error,crate1::mod2,crate2=debug,crate3=off&quot;</span>)
+            .<span class="number">0
+            </span>.into_vec();
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">4</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::TRACE);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].field_names, Vec::&lt;String&gt;::new());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::ERROR</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::ERROR);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].field_names, Vec::&lt;String&gt;::new());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::OFF</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].level, LevelFilter::OFF);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].field_names, Vec::&lt;String&gt;::new());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">field_names</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="ident">::new</span>());
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].field_names, Vec::&lt;String&gt;::new());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_level_directives</span>() {
-        <span class="ident">expect_parse_level_directives</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_level_directives() {
+        expect_parse_level_directives(
             <span class="string">&quot;crate1::mod1=error,crate1::mod2=warn,crate1::mod2::mod3=info,\
              crate2=debug,crate3=trace,crate3::mod2::mod1=off&quot;</span>,
         )
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_uppercase_level_directives</span>() {
-        <span class="ident">expect_parse_level_directives</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_uppercase_level_directives() {
+        expect_parse_level_directives(
             <span class="string">&quot;crate1::mod1=ERROR,crate1::mod2=WARN,crate1::mod2::mod3=INFO,\
              crate2=DEBUG,crate3=TRACE,crate3::mod2::mod1=OFF&quot;</span>,
         )
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_numeric_level_directives</span>() {
-        <span class="ident">expect_parse_level_directives</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_numeric_level_directives() {
+        expect_parse_level_directives(
             <span class="string">&quot;crate1::mod1=1,crate1::mod2=2,crate1::mod2::mod3=3,crate2=4,\
              crate3=5,crate3::mod2::mod1=0&quot;</span>,
         )
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">targets_iter</span>() {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">expect_parse</span>(<span class="string">&quot;crate1::mod1=error,crate1::mod2,crate2=debug,crate3=off&quot;</span>)
-            .<span class="ident">with_default</span>(<span class="ident">LevelFilter::WARN</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>targets_iter() {
+        <span class="kw">let </span>filter = expect_parse(<span class="string">&quot;crate1::mod1=error,crate1::mod2,crate2=debug,crate3=off&quot;</span>)
+            .with_default(LevelFilter::WARN);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">targets</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
-        <span class="ident">targets</span>.<span class="ident">sort</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>targets: Vec&lt;<span class="kw">_</span>&gt; = filter.iter().collect();
+        targets.sort();
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">targets</span>,
+            targets,
             <span class="macro">vec!</span>[
-                (<span class="string">&quot;crate1::mod1&quot;</span>, <span class="ident">LevelFilter::ERROR</span>),
-                (<span class="string">&quot;crate1::mod2&quot;</span>, <span class="ident">LevelFilter::TRACE</span>),
-                (<span class="string">&quot;crate2&quot;</span>, <span class="ident">LevelFilter::DEBUG</span>),
-                (<span class="string">&quot;crate3&quot;</span>, <span class="ident">LevelFilter::OFF</span>),
+                (<span class="string">&quot;crate1::mod1&quot;</span>, LevelFilter::ERROR),
+                (<span class="string">&quot;crate1::mod2&quot;</span>, LevelFilter::TRACE),
+                (<span class="string">&quot;crate2&quot;</span>, LevelFilter::DEBUG),
+                (<span class="string">&quot;crate3&quot;</span>, LevelFilter::OFF),
             ]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">targets_into_iter</span>() {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">expect_parse</span>(<span class="string">&quot;crate1::mod1=error,crate1::mod2,crate2=debug,crate3=off&quot;</span>)
-            .<span class="ident">with_default</span>(<span class="ident">LevelFilter::WARN</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>targets_into_iter() {
+        <span class="kw">let </span>filter = expect_parse(<span class="string">&quot;crate1::mod1=error,crate1::mod2,crate2=debug,crate3=off&quot;</span>)
+            .with_default(LevelFilter::WARN);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">targets</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-        <span class="ident">targets</span>.<span class="ident">sort</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>targets: Vec&lt;<span class="kw">_</span>&gt; = filter.into_iter().collect();
+        targets.sort();
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">targets</span>,
+            targets,
             <span class="macro">vec!</span>[
-                (<span class="string">&quot;crate1::mod1&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">LevelFilter::ERROR</span>),
-                (<span class="string">&quot;crate1::mod2&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">LevelFilter::TRACE</span>),
-                (<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">LevelFilter::DEBUG</span>),
-                (<span class="string">&quot;crate3&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">LevelFilter::OFF</span>),
+                (<span class="string">&quot;crate1::mod1&quot;</span>.to_string(), LevelFilter::ERROR),
+                (<span class="string">&quot;crate1::mod2&quot;</span>.to_string(), LevelFilter::TRACE),
+                (<span class="string">&quot;crate2&quot;</span>.to_string(), LevelFilter::DEBUG),
+                (<span class="string">&quot;crate3&quot;</span>.to_string(), LevelFilter::OFF),
             ]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="comment">// `println!` is only available with `libstd`.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">size_of_filters</span>() {
-        <span class="kw">fn</span> <span class="ident">print_sz</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-            <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Targets</span><span class="op">&gt;</span>().<span class="ident">expect</span>(<span class="string">&quot;filter should parse&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="comment">// `println!` is only available with `libstd`.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>size_of_filters() {
+        <span class="kw">fn </span>print_sz(s: <span class="kw-2">&amp;</span>str) {
+            <span class="kw">let </span>filter = s.parse::&lt;Targets&gt;().expect(<span class="string">&quot;filter should parse&quot;</span>);
             <span class="macro">println!</span>(
                 <span class="string">&quot;size_of_val({:?})\n -&gt; {}B&quot;</span>,
-                <span class="ident">s</span>,
-                <span class="ident">std::mem::size_of_val</span>(<span class="kw-2">&amp;</span><span class="ident">filter</span>)
+                s,
+                std::mem::size_of_val(<span class="kw-2">&amp;</span>filter)
             );
         }
 
-        <span class="ident">print_sz</span>(<span class="string">&quot;info&quot;</span>);
+        print_sz(<span class="string">&quot;info&quot;</span>);
 
-        <span class="ident">print_sz</span>(<span class="string">&quot;foo=debug&quot;</span>);
+        print_sz(<span class="string">&quot;foo=debug&quot;</span>);
 
-        <span class="ident">print_sz</span>(
+        print_sz(
             <span class="string">&quot;crate1::mod1=error,crate1::mod2=warn,crate1::mod2::mod3=info,\
             crate2=debug,crate3=trace,crate3::mod2::mod1=off&quot;</span>,
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

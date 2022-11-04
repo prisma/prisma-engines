@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/scheduler/current_thread.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>current_thread.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/scheduler/current_thread.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>current_thread.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -612,489 +612,489 @@
 <span id="612">612</span>
 <span id="613">613</span>
 <span id="614">614</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::future::poll_fn</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync::atomic::AtomicBool</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::park</span>::{<span class="ident">Park</span>, <span class="ident">Unpark</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::context::EnterGuard</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::driver::Driver</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::task</span>::{<span class="self">self</span>, <span class="ident">JoinHandle</span>, <span class="ident">OwnedTasks</span>, <span class="ident">Schedule</span>, <span class="ident">Task</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">Config</span>, <span class="ident">HandleInner</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">MetricsBatch</span>, <span class="ident">SchedulerMetrics</span>, <span class="ident">WorkerMetrics</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::notify::Notify</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::atomic_cell::AtomicCell</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">waker_ref</span>, <span class="ident">Wake</span>, <span class="ident">WakerRef</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::future::poll_fn;
+<span class="kw">use </span><span class="kw">crate</span>::loom::sync::atomic::AtomicBool;
+<span class="kw">use </span><span class="kw">crate</span>::loom::sync::{Arc, Mutex};
+<span class="kw">use </span><span class="kw">crate</span>::park::{Park, Unpark};
+<span class="kw">use </span><span class="kw">crate</span>::runtime::context::EnterGuard;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::driver::Driver;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::task::{<span class="self">self</span>, JoinHandle, OwnedTasks, Schedule, Task};
+<span class="kw">use </span><span class="kw">crate</span>::runtime::{Config, HandleInner};
+<span class="kw">use </span><span class="kw">crate</span>::runtime::{MetricsBatch, SchedulerMetrics, WorkerMetrics};
+<span class="kw">use </span><span class="kw">crate</span>::sync::notify::Notify;
+<span class="kw">use </span><span class="kw">crate</span>::util::atomic_cell::AtomicCell;
+<span class="kw">use </span><span class="kw">crate</span>::util::{waker_ref, Wake, WakerRef};
 
-<span class="kw">use</span> <span class="ident">std::cell::RefCell</span>;
-<span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering</span>::{<span class="ident">AcqRel</span>, <span class="ident">Release</span>};
-<span class="kw">use</span> <span class="ident">std::task::Poll</span>::{<span class="ident">Pending</span>, <span class="ident">Ready</span>};
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use </span>std::cell::RefCell;
+<span class="kw">use </span>std::collections::VecDeque;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::sync::atomic::Ordering::{AcqRel, Release};
+<span class="kw">use </span>std::task::Poll::{Pending, Ready};
+<span class="kw">use </span>std::time::Duration;
 
-<span class="doccomment">/// Executes tasks on the current thread</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CurrentThread</span> {
-    <span class="doccomment">/// Core scheduler data is acquired by a thread entering `block_on`.</span>
-    <span class="ident">core</span>: <span class="ident">AtomicCell</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Executes tasks on the current thread
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CurrentThread {
+    <span class="doccomment">/// Core scheduler data is acquired by a thread entering `block_on`.
+    </span>core: AtomicCell&lt;Core&gt;,
 
-    <span class="doccomment">/// Notifier for waking up other threads to steal the</span>
-    <span class="doccomment">/// driver.</span>
-    <span class="ident">notify</span>: <span class="ident">Notify</span>,
+    <span class="doccomment">/// Notifier for waking up other threads to steal the
+    /// driver.
+    </span>notify: Notify,
 
-    <span class="doccomment">/// Sendable task spawner</span>
-    <span class="ident">spawner</span>: <span class="ident">Spawner</span>,
+    <span class="doccomment">/// Sendable task spawner
+    </span>spawner: Spawner,
 
-    <span class="doccomment">/// This is usually None, but right before dropping the CurrentThread</span>
-    <span class="doccomment">/// scheduler, it is changed to `Some` with the context being the runtime&#39;s</span>
-    <span class="doccomment">/// own context. This ensures that any tasks dropped in the `CurrentThread`&#39;s</span>
-    <span class="doccomment">/// destructor run in that runtime&#39;s context.</span>
-    <span class="ident">context_guard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnterGuard</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// This is usually None, but right before dropping the CurrentThread
+    /// scheduler, it is changed to `Some` with the context being the runtime&#39;s
+    /// own context. This ensures that any tasks dropped in the `CurrentThread`&#39;s
+    /// destructor run in that runtime&#39;s context.
+    </span>context_guard: <span class="prelude-ty">Option</span>&lt;EnterGuard&gt;,
 }
 
-<span class="doccomment">/// Data required for executing the scheduler. The struct is passed around to</span>
-<span class="doccomment">/// a function that will perform the scheduling work and acts as a capability token.</span>
-<span class="kw">struct</span> <span class="ident">Core</span> {
-    <span class="doccomment">/// Scheduler run queue</span>
-    <span class="ident">tasks</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">task::Notified</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Data required for executing the scheduler. The struct is passed around to
+/// a function that will perform the scheduling work and acts as a capability token.
+</span><span class="kw">struct </span>Core {
+    <span class="doccomment">/// Scheduler run queue
+    </span>tasks: VecDeque&lt;task::Notified&lt;Arc&lt;Shared&gt;&gt;&gt;,
 
-    <span class="doccomment">/// Sendable task spawner</span>
-    <span class="ident">spawner</span>: <span class="ident">Spawner</span>,
+    <span class="doccomment">/// Sendable task spawner
+    </span>spawner: Spawner,
 
-    <span class="doccomment">/// Current tick</span>
-    <span class="ident">tick</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// Current tick
+    </span>tick: u32,
 
-    <span class="doccomment">/// Runtime driver</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The driver is removed before starting to park the thread</span>
-    <span class="ident">driver</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Driver</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Runtime driver
+    ///
+    /// The driver is removed before starting to park the thread
+    </span>driver: <span class="prelude-ty">Option</span>&lt;Driver&gt;,
 
-    <span class="doccomment">/// Metrics batch</span>
-    <span class="ident">metrics</span>: <span class="ident">MetricsBatch</span>,
+    <span class="doccomment">/// Metrics batch
+    </span>metrics: MetricsBatch,
 
-    <span class="doccomment">/// True if a task panicked without being handled and the runtime is</span>
-    <span class="doccomment">/// configured to shutdown on unhandled panic.</span>
-    <span class="ident">unhandled_panic</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// True if a task panicked without being handled and the runtime is
+    /// configured to shutdown on unhandled panic.
+    </span>unhandled_panic: bool,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Spawner</span> {
-    <span class="ident">shared</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Spawner {
+    shared: Arc&lt;Shared&gt;,
 }
 
-<span class="doccomment">/// Scheduler state shared between threads.</span>
-<span class="kw">struct</span> <span class="ident">Shared</span> {
-    <span class="doccomment">/// Remote run queue. None if the `Runtime` has been dropped.</span>
-    <span class="ident">queue</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">task::Notified</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Scheduler state shared between threads.
+</span><span class="kw">struct </span>Shared {
+    <span class="doccomment">/// Remote run queue. None if the `Runtime` has been dropped.
+    </span>queue: Mutex&lt;<span class="prelude-ty">Option</span>&lt;VecDeque&lt;task::Notified&lt;Arc&lt;Shared&gt;&gt;&gt;&gt;&gt;,
 
-    <span class="doccomment">/// Collection of all active tasks spawned onto this executor.</span>
-    <span class="ident">owned</span>: <span class="ident">OwnedTasks</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Collection of all active tasks spawned onto this executor.
+    </span>owned: OwnedTasks&lt;Arc&lt;Shared&gt;&gt;,
 
-    <span class="doccomment">/// Unpark the blocked thread.</span>
-    <span class="ident">unpark</span>: <span class="op">&lt;</span><span class="ident">Driver</span> <span class="kw">as</span> <span class="ident">Park</span><span class="op">&gt;</span><span class="ident">::Unpark</span>,
+    <span class="doccomment">/// Unpark the blocked thread.
+    </span>unpark: &lt;Driver <span class="kw">as </span>Park&gt;::Unpark,
 
-    <span class="doccomment">/// Indicates whether the blocked on thread was woken.</span>
-    <span class="ident">woken</span>: <span class="ident">AtomicBool</span>,
+    <span class="doccomment">/// Indicates whether the blocked on thread was woken.
+    </span>woken: AtomicBool,
 
-    <span class="doccomment">/// Handle to I/O driver, timer, blocking pool, ...</span>
-    <span class="ident">handle_inner</span>: <span class="ident">HandleInner</span>,
+    <span class="doccomment">/// Handle to I/O driver, timer, blocking pool, ...
+    </span>handle_inner: HandleInner,
 
-    <span class="doccomment">/// Scheduler configuration options</span>
-    <span class="ident">config</span>: <span class="ident">Config</span>,
+    <span class="doccomment">/// Scheduler configuration options
+    </span>config: Config,
 
-    <span class="doccomment">/// Keeps track of various runtime metrics.</span>
-    <span class="ident">scheduler_metrics</span>: <span class="ident">SchedulerMetrics</span>,
+    <span class="doccomment">/// Keeps track of various runtime metrics.
+    </span>scheduler_metrics: SchedulerMetrics,
 
-    <span class="doccomment">/// This scheduler only has one worker.</span>
-    <span class="ident">worker_metrics</span>: <span class="ident">WorkerMetrics</span>,
+    <span class="doccomment">/// This scheduler only has one worker.
+    </span>worker_metrics: WorkerMetrics,
 }
 
-<span class="doccomment">/// Thread-local context.</span>
-<span class="kw">struct</span> <span class="ident">Context</span> {
-    <span class="doccomment">/// Handle to the spawner</span>
-    <span class="ident">spawner</span>: <span class="ident">Spawner</span>,
+<span class="doccomment">/// Thread-local context.
+</span><span class="kw">struct </span>Context {
+    <span class="doccomment">/// Handle to the spawner
+    </span>spawner: Spawner,
 
-    <span class="doccomment">/// Scheduler core, enabling the holder of `Context` to execute the</span>
-    <span class="doccomment">/// scheduler.</span>
-    <span class="ident">core</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Scheduler core, enabling the holder of `Context` to execute the
+    /// scheduler.
+    </span>core: RefCell&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;Core&gt;&gt;&gt;,
 }
 
-<span class="doccomment">/// Initial queue capacity.</span>
-<span class="kw">const</span> <span class="ident">INITIAL_CAPACITY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">64</span>;
+<span class="doccomment">/// Initial queue capacity.
+</span><span class="kw">const </span>INITIAL_CAPACITY: usize = <span class="number">64</span>;
 
-<span class="comment">// Tracks the current CurrentThread.</span>
-<span class="macro">scoped_thread_local!</span>(<span class="kw">static</span> <span class="ident">CURRENT</span>: <span class="ident">Context</span>);
+<span class="comment">// Tracks the current CurrentThread.
+</span><span class="macro">scoped_thread_local!</span>(<span class="kw">static </span>CURRENT: Context);
 
-<span class="kw">impl</span> <span class="ident">CurrentThread</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">driver</span>: <span class="ident">Driver</span>, <span class="ident">handle_inner</span>: <span class="ident">HandleInner</span>, <span class="ident">config</span>: <span class="ident">Config</span>) -&gt; <span class="ident">CurrentThread</span> {
-        <span class="kw">let</span> <span class="ident">unpark</span> <span class="op">=</span> <span class="ident">driver</span>.<span class="ident">unpark</span>();
+<span class="kw">impl </span>CurrentThread {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(driver: Driver, handle_inner: HandleInner, config: Config) -&gt; CurrentThread {
+        <span class="kw">let </span>unpark = driver.unpark();
 
-        <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner</span> {
-            <span class="ident">shared</span>: <span class="ident">Arc::new</span>(<span class="ident">Shared</span> {
-                <span class="ident">queue</span>: <span class="ident">Mutex::new</span>(<span class="prelude-val">Some</span>(<span class="ident">VecDeque::with_capacity</span>(<span class="ident">INITIAL_CAPACITY</span>))),
-                <span class="ident">owned</span>: <span class="ident">OwnedTasks::new</span>(),
-                <span class="ident">unpark</span>,
-                <span class="ident">woken</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
-                <span class="ident">handle_inner</span>,
-                <span class="ident">config</span>,
-                <span class="ident">scheduler_metrics</span>: <span class="ident">SchedulerMetrics::new</span>(),
-                <span class="ident">worker_metrics</span>: <span class="ident">WorkerMetrics::new</span>(),
+        <span class="kw">let </span>spawner = Spawner {
+            shared: Arc::new(Shared {
+                queue: Mutex::new(<span class="prelude-val">Some</span>(VecDeque::with_capacity(INITIAL_CAPACITY))),
+                owned: OwnedTasks::new(),
+                unpark,
+                woken: AtomicBool::new(<span class="bool-val">false</span>),
+                handle_inner,
+                config,
+                scheduler_metrics: SchedulerMetrics::new(),
+                worker_metrics: WorkerMetrics::new(),
             }),
         };
 
-        <span class="kw">let</span> <span class="ident">core</span> <span class="op">=</span> <span class="ident">AtomicCell::new</span>(<span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">Core</span> {
-            <span class="ident">tasks</span>: <span class="ident">VecDeque::with_capacity</span>(<span class="ident">INITIAL_CAPACITY</span>),
-            <span class="ident">spawner</span>: <span class="ident">spawner</span>.<span class="ident">clone</span>(),
-            <span class="ident">tick</span>: <span class="number">0</span>,
-            <span class="ident">driver</span>: <span class="prelude-val">Some</span>(<span class="ident">driver</span>),
-            <span class="ident">metrics</span>: <span class="ident">MetricsBatch::new</span>(),
-            <span class="ident">unhandled_panic</span>: <span class="bool-val">false</span>,
+        <span class="kw">let </span>core = AtomicCell::new(<span class="prelude-val">Some</span>(Box::new(Core {
+            tasks: VecDeque::with_capacity(INITIAL_CAPACITY),
+            spawner: spawner.clone(),
+            tick: <span class="number">0</span>,
+            driver: <span class="prelude-val">Some</span>(driver),
+            metrics: MetricsBatch::new(),
+            unhandled_panic: <span class="bool-val">false</span>,
         })));
 
-        <span class="ident">CurrentThread</span> {
-            <span class="ident">core</span>,
-            <span class="ident">notify</span>: <span class="ident">Notify::new</span>(),
-            <span class="ident">spawner</span>,
-            <span class="ident">context_guard</span>: <span class="prelude-val">None</span>,
+        CurrentThread {
+            core,
+            notify: Notify::new(),
+            spawner,
+            context_guard: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spawner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Spawner</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">spawner</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>spawner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Spawner {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.spawner
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="ident">F::Output</span> {
-        <span class="macro">pin!</span>(<span class="ident">future</span>);
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>block_on&lt;F: Future&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, future: F) -&gt; F::Output {
+        <span class="macro">pin!</span>(future);
 
-        <span class="comment">// Attempt to steal the scheduler core and block_on the future if we can</span>
-        <span class="comment">// there, otherwise, lets select on a notification that the core is</span>
-        <span class="comment">// available or the future is complete.</span>
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">core</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">take_core</span>() {
-                <span class="kw">return</span> <span class="ident">core</span>.<span class="ident">block_on</span>(<span class="ident">future</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enter</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::runtime::enter</span>(<span class="bool-val">false</span>);
+        <span class="comment">// Attempt to steal the scheduler core and block_on the future if we can
+        // there, otherwise, lets select on a notification that the core is
+        // available or the future is complete.
+        </span><span class="kw">loop </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(core) = <span class="self">self</span>.take_core() {
+                <span class="kw">return </span>core.block_on(future);
+            } <span class="kw">else </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>enter = <span class="kw">crate</span>::runtime::enter(<span class="bool-val">false</span>);
 
-                <span class="kw">let</span> <span class="ident">notified</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">notify</span>.<span class="ident">notified</span>();
-                <span class="macro">pin!</span>(<span class="ident">notified</span>);
+                <span class="kw">let </span>notified = <span class="self">self</span>.notify.notified();
+                <span class="macro">pin!</span>(notified);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">out</span>) <span class="op">=</span> <span class="ident">enter</span>
-                    .<span class="ident">block_on</span>(<span class="ident">poll_fn</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
-                        <span class="kw">if</span> <span class="ident">notified</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">is_ready</span>() {
-                            <span class="kw">return</span> <span class="ident">Ready</span>(<span class="prelude-val">None</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(out) = enter
+                    .block_on(poll_fn(|cx| {
+                        <span class="kw">if </span>notified.as_mut().poll(cx).is_ready() {
+                            <span class="kw">return </span>Ready(<span class="prelude-val">None</span>);
                         }
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Ready</span>(<span class="ident">out</span>) <span class="op">=</span> <span class="ident">future</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                            <span class="kw">return</span> <span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">out</span>));
+                        <span class="kw">if let </span>Ready(out) = future.as_mut().poll(cx) {
+                            <span class="kw">return </span>Ready(<span class="prelude-val">Some</span>(out));
                         }
 
-                        <span class="ident">Pending</span>
+                        Pending
                     }))
-                    .<span class="ident">expect</span>(<span class="string">&quot;Failed to `Enter::block_on`&quot;</span>)
+                    .expect(<span class="string">&quot;Failed to `Enter::block_on`&quot;</span>)
                 {
-                    <span class="kw">return</span> <span class="ident">out</span>;
+                    <span class="kw">return </span>out;
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">take_core</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CoreGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">core</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">core</span>.<span class="ident">take</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn </span>take_core(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CoreGuard&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">let </span>core = <span class="self">self</span>.core.take()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="ident">CoreGuard</span> {
-            <span class="ident">context</span>: <span class="ident">Context</span> {
-                <span class="ident">spawner</span>: <span class="self">self</span>.<span class="ident">spawner</span>.<span class="ident">clone</span>(),
-                <span class="ident">core</span>: <span class="ident">RefCell::new</span>(<span class="prelude-val">Some</span>(<span class="ident">core</span>)),
+        <span class="prelude-val">Some</span>(CoreGuard {
+            context: Context {
+                spawner: <span class="self">self</span>.spawner.clone(),
+                core: RefCell::new(<span class="prelude-val">Some</span>(core)),
             },
-            <span class="ident">scheduler</span>: <span class="self">self</span>,
+            scheduler: <span class="self">self</span>,
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_context_guard</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">guard</span>: <span class="ident">EnterGuard</span>) {
-        <span class="self">self</span>.<span class="ident">context_guard</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">guard</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_context_guard(<span class="kw-2">&amp;mut </span><span class="self">self</span>, guard: EnterGuard) {
+        <span class="self">self</span>.context_guard = <span class="prelude-val">Some</span>(guard);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">CurrentThread</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// Avoid a double panic if we are currently panicking and</span>
-        <span class="comment">// the lock may be poisoned.</span>
+<span class="kw">impl </span>Drop <span class="kw">for </span>CurrentThread {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// Avoid a double panic if we are currently panicking and
+        // the lock may be poisoned.
 
-        <span class="kw">let</span> <span class="ident">core</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">take_core</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">core</span>) =&gt; <span class="ident">core</span>,
-            <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">std::thread::panicking</span>() =&gt; <span class="kw">return</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Oh no! We never placed the Core back, this is a bug!&quot;</span>),
+        </span><span class="kw">let </span>core = <span class="kw">match </span><span class="self">self</span>.take_core() {
+            <span class="prelude-val">Some</span>(core) =&gt; core,
+            <span class="prelude-val">None </span><span class="kw">if </span>std::thread::panicking() =&gt; <span class="kw">return</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Oh no! We never placed the Core back, this is a bug!&quot;</span>),
         };
 
-        <span class="ident">core</span>.<span class="ident">enter</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">core</span>, <span class="ident">context</span><span class="op">|</span> {
-            <span class="comment">// Drain the OwnedTasks collection. This call also closes the</span>
-            <span class="comment">// collection, ensuring that no tasks are ever pushed after this</span>
-            <span class="comment">// call returns.</span>
-            <span class="ident">context</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>.<span class="ident">owned</span>.<span class="ident">close_and_shutdown_all</span>();
+        core.enter(|<span class="kw-2">mut </span>core, context| {
+            <span class="comment">// Drain the OwnedTasks collection. This call also closes the
+            // collection, ensuring that no tasks are ever pushed after this
+            // call returns.
+            </span>context.spawner.shared.owned.close_and_shutdown_all();
 
-            <span class="comment">// Drain local queue</span>
-            <span class="comment">// We already shut down every task, so we just need to drop the task.</span>
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">task</span>) <span class="op">=</span> <span class="ident">core</span>.<span class="ident">pop_task</span>() {
-                <span class="ident">drop</span>(<span class="ident">task</span>);
+            <span class="comment">// Drain local queue
+            // We already shut down every task, so we just need to drop the task.
+            </span><span class="kw">while let </span><span class="prelude-val">Some</span>(task) = core.pop_task() {
+                drop(task);
             }
 
-            <span class="comment">// Drain remote queue and set it to None</span>
-            <span class="kw">let</span> <span class="ident">remote_queue</span> <span class="op">=</span> <span class="ident">core</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>.<span class="ident">queue</span>.<span class="ident">lock</span>().<span class="ident">take</span>();
+            <span class="comment">// Drain remote queue and set it to None
+            </span><span class="kw">let </span>remote_queue = core.spawner.shared.queue.lock().take();
 
-            <span class="comment">// Using `Option::take` to replace the shared queue with `None`.</span>
-            <span class="comment">// We already shut down every task, so we just need to drop the task.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">remote_queue</span>) <span class="op">=</span> <span class="ident">remote_queue</span> {
-                <span class="kw">for</span> <span class="ident">task</span> <span class="kw">in</span> <span class="ident">remote_queue</span> {
-                    <span class="ident">drop</span>(<span class="ident">task</span>);
+            <span class="comment">// Using `Option::take` to replace the shared queue with `None`.
+            // We already shut down every task, so we just need to drop the task.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(remote_queue) = remote_queue {
+                <span class="kw">for </span>task <span class="kw">in </span>remote_queue {
+                    drop(task);
                 }
             }
 
-            <span class="macro">assert!</span>(<span class="ident">context</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>.<span class="ident">owned</span>.<span class="ident">is_empty</span>());
+            <span class="macro">assert!</span>(context.spawner.shared.owned.is_empty());
 
-            <span class="comment">// Submit metrics</span>
-            <span class="ident">core</span>.<span class="ident">metrics</span>.<span class="ident">submit</span>(<span class="kw-2">&amp;</span><span class="ident">core</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>.<span class="ident">worker_metrics</span>);
+            <span class="comment">// Submit metrics
+            </span>core.metrics.submit(<span class="kw-2">&amp;</span>core.spawner.shared.worker_metrics);
 
-            (<span class="ident">core</span>, ())
+            (core, ())
         });
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">CurrentThread</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;CurrentThread&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>CurrentThread {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;CurrentThread&quot;</span>).finish()
     }
 }
 
-<span class="comment">// ===== impl Core =====</span>
+<span class="comment">// ===== impl Core =====
 
-<span class="kw">impl</span> <span class="ident">Core</span> {
-    <span class="kw">fn</span> <span class="ident">pop_task</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">task::Notified</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tasks</span>.<span class="ident">pop_front</span>();
-        <span class="self">self</span>.<span class="ident">spawner</span>
-            .<span class="ident">shared</span>
-            .<span class="ident">worker_metrics</span>
-            .<span class="ident">set_queue_depth</span>(<span class="self">self</span>.<span class="ident">tasks</span>.<span class="ident">len</span>());
-        <span class="ident">ret</span>
+</span><span class="kw">impl </span>Core {
+    <span class="kw">fn </span>pop_task(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;task::Notified&lt;Arc&lt;Shared&gt;&gt;&gt; {
+        <span class="kw">let </span>ret = <span class="self">self</span>.tasks.pop_front();
+        <span class="self">self</span>.spawner
+            .shared
+            .worker_metrics
+            .set_queue_depth(<span class="self">self</span>.tasks.len());
+        ret
     }
 
-    <span class="kw">fn</span> <span class="ident">push_task</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">task</span>: <span class="ident">task::Notified</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">tasks</span>.<span class="ident">push_back</span>(<span class="ident">task</span>);
-        <span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">inc_local_schedule_count</span>();
-        <span class="self">self</span>.<span class="ident">spawner</span>
-            .<span class="ident">shared</span>
-            .<span class="ident">worker_metrics</span>
-            .<span class="ident">set_queue_depth</span>(<span class="self">self</span>.<span class="ident">tasks</span>.<span class="ident">len</span>());
+    <span class="kw">fn </span>push_task(<span class="kw-2">&amp;mut </span><span class="self">self</span>, task: task::Notified&lt;Arc&lt;Shared&gt;&gt;) {
+        <span class="self">self</span>.tasks.push_back(task);
+        <span class="self">self</span>.metrics.inc_local_schedule_count();
+        <span class="self">self</span>.spawner
+            .shared
+            .worker_metrics
+            .set_queue_depth(<span class="self">self</span>.tasks.len());
     }
 }
 
-<span class="comment">// ===== impl Context =====</span>
+<span class="comment">// ===== impl Context =====
 
-<span class="kw">impl</span> <span class="ident">Context</span> {
-    <span class="doccomment">/// Execute the closure with the given scheduler core stored in the</span>
-    <span class="doccomment">/// thread-local context.</span>
-    <span class="kw">fn</span> <span class="ident">run_task</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">core</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">R</span>) -&gt; (<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span>, <span class="ident">R</span>) {
-        <span class="ident">core</span>.<span class="ident">metrics</span>.<span class="ident">incr_poll_count</span>();
-        <span class="self">self</span>.<span class="ident">enter</span>(<span class="ident">core</span>, <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::coop::budget</span>(<span class="ident">f</span>))
+</span><span class="kw">impl </span>Context {
+    <span class="doccomment">/// Execute the closure with the given scheduler core stored in the
+    /// thread-local context.
+    </span><span class="kw">fn </span>run_task&lt;R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>core: Box&lt;Core&gt;, f: <span class="kw">impl </span>FnOnce() -&gt; R) -&gt; (Box&lt;Core&gt;, R) {
+        core.metrics.incr_poll_count();
+        <span class="self">self</span>.enter(core, || <span class="kw">crate</span>::coop::budget(f))
     }
 
-    <span class="doccomment">/// Blocks the current thread until an event is received by the driver,</span>
-    <span class="doccomment">/// including I/O events, timer events, ...</span>
-    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">core</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">driver</span> <span class="op">=</span> <span class="ident">core</span>.<span class="ident">driver</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;driver missing&quot;</span>);
+    <span class="doccomment">/// Blocks the current thread until an event is received by the driver,
+    /// including I/O events, timer events, ...
+    </span><span class="kw">fn </span>park(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>core: Box&lt;Core&gt;) -&gt; Box&lt;Core&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>driver = core.driver.take().expect(<span class="string">&quot;driver missing&quot;</span>);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>.<span class="ident">config</span>.<span class="ident">before_park</span> {
-            <span class="comment">// Incorrect lint, the closures are actually different types so `f`</span>
-            <span class="comment">// cannot be passed as an argument to `enter`.</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure</span>)]</span>
-            <span class="kw">let</span> (<span class="ident">c</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">enter</span>(<span class="ident">core</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>());
-            <span class="ident">core</span> <span class="op">=</span> <span class="ident">c</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(f) = <span class="kw-2">&amp;</span><span class="self">self</span>.spawner.shared.config.before_park {
+            <span class="comment">// Incorrect lint, the closures are actually different types so `f`
+            // cannot be passed as an argument to `enter`.
+            </span><span class="attribute">#[allow(clippy::redundant_closure)]
+            </span><span class="kw">let </span>(c, <span class="kw">_</span>) = <span class="self">self</span>.enter(core, || f());
+            core = c;
         }
 
-        <span class="comment">// This check will fail if `before_park` spawns a task for us to run</span>
-        <span class="comment">// instead of parking the thread</span>
-        <span class="kw">if</span> <span class="ident">core</span>.<span class="ident">tasks</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// Park until the thread is signaled</span>
-            <span class="ident">core</span>.<span class="ident">metrics</span>.<span class="ident">about_to_park</span>();
-            <span class="ident">core</span>.<span class="ident">metrics</span>.<span class="ident">submit</span>(<span class="kw-2">&amp;</span><span class="ident">core</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>.<span class="ident">worker_metrics</span>);
+        <span class="comment">// This check will fail if `before_park` spawns a task for us to run
+        // instead of parking the thread
+        </span><span class="kw">if </span>core.tasks.is_empty() {
+            <span class="comment">// Park until the thread is signaled
+            </span>core.metrics.about_to_park();
+            core.metrics.submit(<span class="kw-2">&amp;</span>core.spawner.shared.worker_metrics);
 
-            <span class="kw">let</span> (<span class="ident">c</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">enter</span>(<span class="ident">core</span>, <span class="op">|</span><span class="op">|</span> {
-                <span class="ident">driver</span>.<span class="ident">park</span>().<span class="ident">expect</span>(<span class="string">&quot;failed to park&quot;</span>);
+            <span class="kw">let </span>(c, <span class="kw">_</span>) = <span class="self">self</span>.enter(core, || {
+                driver.park().expect(<span class="string">&quot;failed to park&quot;</span>);
             });
 
-            <span class="ident">core</span> <span class="op">=</span> <span class="ident">c</span>;
-            <span class="ident">core</span>.<span class="ident">metrics</span>.<span class="ident">returned_from_park</span>();
+            core = c;
+            core.metrics.returned_from_park();
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>.<span class="ident">config</span>.<span class="ident">after_unpark</span> {
-            <span class="comment">// Incorrect lint, the closures are actually different types so `f`</span>
-            <span class="comment">// cannot be passed as an argument to `enter`.</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure</span>)]</span>
-            <span class="kw">let</span> (<span class="ident">c</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">enter</span>(<span class="ident">core</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>());
-            <span class="ident">core</span> <span class="op">=</span> <span class="ident">c</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(f) = <span class="kw-2">&amp;</span><span class="self">self</span>.spawner.shared.config.after_unpark {
+            <span class="comment">// Incorrect lint, the closures are actually different types so `f`
+            // cannot be passed as an argument to `enter`.
+            </span><span class="attribute">#[allow(clippy::redundant_closure)]
+            </span><span class="kw">let </span>(c, <span class="kw">_</span>) = <span class="self">self</span>.enter(core, || f());
+            core = c;
         }
 
-        <span class="ident">core</span>.<span class="ident">driver</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">driver</span>);
-        <span class="ident">core</span>
+        core.driver = <span class="prelude-val">Some</span>(driver);
+        core
     }
 
-    <span class="doccomment">/// Checks the driver for new events without blocking the thread.</span>
-    <span class="kw">fn</span> <span class="ident">park_yield</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">core</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">driver</span> <span class="op">=</span> <span class="ident">core</span>.<span class="ident">driver</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;driver missing&quot;</span>);
+    <span class="doccomment">/// Checks the driver for new events without blocking the thread.
+    </span><span class="kw">fn </span>park_yield(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>core: Box&lt;Core&gt;) -&gt; Box&lt;Core&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>driver = core.driver.take().expect(<span class="string">&quot;driver missing&quot;</span>);
 
-        <span class="ident">core</span>.<span class="ident">metrics</span>.<span class="ident">submit</span>(<span class="kw-2">&amp;</span><span class="ident">core</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>.<span class="ident">worker_metrics</span>);
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">core</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">enter</span>(<span class="ident">core</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="ident">driver</span>
-                .<span class="ident">park_timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">0</span>))
-                .<span class="ident">expect</span>(<span class="string">&quot;failed to park&quot;</span>);
+        core.metrics.submit(<span class="kw-2">&amp;</span>core.spawner.shared.worker_metrics);
+        <span class="kw">let </span>(<span class="kw-2">mut </span>core, <span class="kw">_</span>) = <span class="self">self</span>.enter(core, || {
+            driver
+                .park_timeout(Duration::from_millis(<span class="number">0</span>))
+                .expect(<span class="string">&quot;failed to park&quot;</span>);
         });
 
-        <span class="ident">core</span>.<span class="ident">driver</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">driver</span>);
-        <span class="ident">core</span>
+        core.driver = <span class="prelude-val">Some</span>(driver);
+        core
     }
 
-    <span class="kw">fn</span> <span class="ident">enter</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">core</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">R</span>) -&gt; (<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span>, <span class="ident">R</span>) {
-        <span class="comment">// Store the scheduler core in the thread-local context</span>
-        <span class="comment">//</span>
-        <span class="comment">// A drop-guard is employed at a higher level.</span>
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">core</span>.<span class="ident">borrow_mut</span>() <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">core</span>);
+    <span class="kw">fn </span>enter&lt;R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, core: Box&lt;Core&gt;, f: <span class="kw">impl </span>FnOnce() -&gt; R) -&gt; (Box&lt;Core&gt;, R) {
+        <span class="comment">// Store the scheduler core in the thread-local context
+        //
+        // A drop-guard is employed at a higher level.
+        </span><span class="kw-2">*</span><span class="self">self</span>.core.borrow_mut() = <span class="prelude-val">Some</span>(core);
 
-        <span class="comment">// Execute the closure while tracking the execution budget</span>
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">f</span>();
+        <span class="comment">// Execute the closure while tracking the execution budget
+        </span><span class="kw">let </span>ret = f();
 
-        <span class="comment">// Take the scheduler core back</span>
-        <span class="kw">let</span> <span class="ident">core</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">core</span>.<span class="ident">borrow_mut</span>().<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;core missing&quot;</span>);
-        (<span class="ident">core</span>, <span class="ident">ret</span>)
+        <span class="comment">// Take the scheduler core back
+        </span><span class="kw">let </span>core = <span class="self">self</span>.core.borrow_mut().take().expect(<span class="string">&quot;core missing&quot;</span>);
+        (core, ret)
     }
 }
 
-<span class="comment">// ===== impl Spawner =====</span>
+<span class="comment">// ===== impl Spawner =====
 
-<span class="kw">impl</span> <span class="ident">Spawner</span> {
-    <span class="doccomment">/// Spawns a future onto the `CurrentThread` scheduler</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">id</span>: <span class="ident"><span class="kw">crate</span>::runtime::task::Id</span>) -&gt; <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident"><span class="kw">crate</span>::future::Future</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">F::Output</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+</span><span class="kw">impl </span>Spawner {
+    <span class="doccomment">/// Spawns a future onto the `CurrentThread` scheduler
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>spawn&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, future: F, id: <span class="kw">crate</span>::runtime::task::Id) -&gt; JoinHandle&lt;F::Output&gt;
+    <span class="kw">where
+        </span>F: <span class="kw">crate</span>::future::Future + Send + <span class="lifetime">&#39;static</span>,
+        F::Output: Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> (<span class="ident">handle</span>, <span class="ident">notified</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">owned</span>.<span class="ident">bind</span>(<span class="ident">future</span>, <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">clone</span>(), <span class="ident">id</span>);
+        <span class="kw">let </span>(handle, notified) = <span class="self">self</span>.shared.owned.bind(future, <span class="self">self</span>.shared.clone(), id);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">notified</span>) <span class="op">=</span> <span class="ident">notified</span> {
-            <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">schedule</span>(<span class="ident">notified</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(notified) = notified {
+            <span class="self">self</span>.shared.schedule(notified);
         }
 
-        <span class="ident">handle</span>
+        handle
     }
 
-    <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">task::Notified</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">queue</span>.<span class="ident">lock</span>().<span class="ident">as_mut</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">queue</span>) =&gt; <span class="ident">queue</span>.<span class="ident">pop_front</span>(),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>pop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;task::Notified&lt;Arc&lt;Shared&gt;&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.shared.queue.lock().as_mut() {
+            <span class="prelude-val">Some</span>(queue) =&gt; queue.pop_front(),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">waker_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">WakerRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="comment">// Set woken to true when enter block_on, ensure outer future</span>
-        <span class="comment">// be polled for the first time when enter loop</span>
-        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">woken</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>);
-        <span class="ident">waker_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>)
+    <span class="kw">fn </span>waker_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; WakerRef&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="comment">// Set woken to true when enter block_on, ensure outer future
+        // be polled for the first time when enter loop
+        </span><span class="self">self</span>.shared.woken.store(<span class="bool-val">true</span>, Release);
+        waker_ref(<span class="kw-2">&amp;</span><span class="self">self</span>.shared)
     }
 
-    <span class="comment">// reset woken to false and return original value</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">reset_woken</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">woken</span>.<span class="ident">swap</span>(<span class="bool-val">false</span>, <span class="ident">AcqRel</span>)
+    <span class="comment">// reset woken to false and return original value
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>reset_woken(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.shared.woken.swap(<span class="bool-val">false</span>, AcqRel)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_handle_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">HandleInner</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">handle_inner</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_handle_inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HandleInner {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.shared.handle_inner
     }
 }
 
-<span class="macro">cfg_metrics!</span> {
-    <span class="kw">impl</span> <span class="ident">Spawner</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">scheduler_metrics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SchedulerMetrics</span> {
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">scheduler_metrics</span>
+<span class="macro">cfg_metrics! </span>{
+    <span class="kw">impl </span>Spawner {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>scheduler_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>SchedulerMetrics {
+            <span class="kw-2">&amp;</span><span class="self">self</span>.shared.scheduler_metrics
         }
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">injection_queue_depth</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-            <span class="comment">// TODO: avoid having to lock. The multi-threaded injection queue</span>
-            <span class="comment">// could probably be used here.</span>
-            <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">queue</span>.<span class="ident">lock</span>()
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">queue</span><span class="op">|</span> <span class="ident">queue</span>.<span class="ident">len</span>())
-                .<span class="ident">unwrap_or</span>(<span class="number">0</span>)
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>injection_queue_depth(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+            <span class="comment">// TODO: avoid having to lock. The multi-threaded injection queue
+            // could probably be used here.
+            </span><span class="self">self</span>.shared.queue.lock()
+                .as_ref()
+                .map(|queue| queue.len())
+                .unwrap_or(<span class="number">0</span>)
         }
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">worker_metrics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">worker</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">WorkerMetrics</span> {
-            <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">worker</span>);
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">worker_metrics</span>
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>worker_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>, worker: usize) -&gt; <span class="kw-2">&amp;</span>WorkerMetrics {
+            <span class="macro">assert_eq!</span>(<span class="number">0</span>, worker);
+            <span class="kw-2">&amp;</span><span class="self">self</span>.shared.worker_metrics
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Spawner</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Spawner&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Spawner {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;Spawner&quot;</span>).finish()
     }
 }
 
-<span class="comment">// ===== impl Shared =====</span>
+<span class="comment">// ===== impl Shared =====
 
-<span class="kw">impl</span> <span class="ident">Schedule</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">release</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">task</span>: <span class="kw-2">&amp;</span><span class="ident">Task</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Task</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">owned</span>.<span class="ident">remove</span>(<span class="ident">task</span>)
+</span><span class="kw">impl </span>Schedule <span class="kw">for </span>Arc&lt;Shared&gt; {
+    <span class="kw">fn </span>release(<span class="kw-2">&amp;</span><span class="self">self</span>, task: <span class="kw-2">&amp;</span>Task&lt;<span class="self">Self</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Task&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="self">self</span>.owned.remove(task)
     }
 
-    <span class="kw">fn</span> <span class="ident">schedule</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">task</span>: <span class="ident">task::Notified</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="ident">CURRENT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">maybe_cx</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">maybe_cx</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">cx</span>) <span class="kw">if</span> <span class="ident">Arc::ptr_eq</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">core</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">core</span>.<span class="ident">borrow_mut</span>();
+    <span class="kw">fn </span>schedule(<span class="kw-2">&amp;</span><span class="self">self</span>, task: task::Notified&lt;<span class="self">Self</span>&gt;) {
+        CURRENT.with(|maybe_cx| <span class="kw">match </span>maybe_cx {
+            <span class="prelude-val">Some</span>(cx) <span class="kw">if </span>Arc::ptr_eq(<span class="self">self</span>, <span class="kw-2">&amp;</span>cx.spawner.shared) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>core = cx.core.borrow_mut();
 
-                <span class="comment">// If `None`, the runtime is shutting down, so there is no need</span>
-                <span class="comment">// to schedule the task.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">core</span>) <span class="op">=</span> <span class="ident">core</span>.<span class="ident">as_mut</span>() {
-                    <span class="ident">core</span>.<span class="ident">push_task</span>(<span class="ident">task</span>);
+                <span class="comment">// If `None`, the runtime is shutting down, so there is no need
+                // to schedule the task.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(core) = core.as_mut() {
+                    core.push_task(task);
                 }
             }
-            <span class="kw">_</span> =&gt; {
-                <span class="comment">// Track that a task was scheduled from **outside** of the runtime.</span>
-                <span class="self">self</span>.<span class="ident">scheduler_metrics</span>.<span class="ident">inc_remote_schedule_count</span>();
+            <span class="kw">_ </span>=&gt; {
+                <span class="comment">// Track that a task was scheduled from **outside** of the runtime.
+                </span><span class="self">self</span>.scheduler_metrics.inc_remote_schedule_count();
 
-                <span class="comment">// If the queue is None, then the runtime has shut down. We</span>
-                <span class="comment">// don&#39;t need to do anything with the notification in that case.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">lock</span>();
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">queue</span>) <span class="op">=</span> <span class="ident">guard</span>.<span class="ident">as_mut</span>() {
-                    <span class="ident">queue</span>.<span class="ident">push_back</span>(<span class="ident">task</span>);
-                    <span class="ident">drop</span>(<span class="ident">guard</span>);
-                    <span class="self">self</span>.<span class="ident">unpark</span>.<span class="ident">unpark</span>();
+                <span class="comment">// If the queue is None, then the runtime has shut down. We
+                // don&#39;t need to do anything with the notification in that case.
+                </span><span class="kw">let </span><span class="kw-2">mut </span>guard = <span class="self">self</span>.queue.lock();
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(queue) = guard.as_mut() {
+                    queue.push_back(task);
+                    drop(guard);
+                    <span class="self">self</span>.unpark.unpark();
                 }
             }
         });
     }
 
-    <span class="macro">cfg_unstable!</span> {
-        <span class="kw">fn</span> <span class="ident">unhandled_panic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-            <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::UnhandledPanic</span>;
+    <span class="macro">cfg_unstable! </span>{
+        <span class="kw">fn </span>unhandled_panic(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+            <span class="kw">use </span><span class="kw">crate</span>::runtime::UnhandledPanic;
 
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">unhandled_panic</span> {
-                <span class="ident">UnhandledPanic::Ignore</span> =&gt; {
-                    <span class="comment">// Do nothing</span>
-                }
-                <span class="ident">UnhandledPanic::ShutdownRuntime</span> =&gt; {
-                    <span class="comment">// This hook is only called from within the runtime, so</span>
-                    <span class="comment">// `CURRENT` should match with `&amp;self`, i.e. there is no</span>
-                    <span class="comment">// opportunity for a nested scheduler to be called.</span>
-                    <span class="ident">CURRENT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">maybe_cx</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">maybe_cx</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">cx</span>) <span class="kw">if</span> <span class="ident">Arc::ptr_eq</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>) =&gt; {
-                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">core</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">core</span>.<span class="ident">borrow_mut</span>();
+            <span class="kw">match </span><span class="self">self</span>.config.unhandled_panic {
+                UnhandledPanic::Ignore =&gt; {
+                    <span class="comment">// Do nothing
+                </span>}
+                UnhandledPanic::ShutdownRuntime =&gt; {
+                    <span class="comment">// This hook is only called from within the runtime, so
+                    // `CURRENT` should match with `&amp;self`, i.e. there is no
+                    // opportunity for a nested scheduler to be called.
+                    </span>CURRENT.with(|maybe_cx| <span class="kw">match </span>maybe_cx {
+                        <span class="prelude-val">Some</span>(cx) <span class="kw">if </span>Arc::ptr_eq(<span class="self">self</span>, <span class="kw-2">&amp;</span>cx.spawner.shared) =&gt; {
+                            <span class="kw">let </span><span class="kw-2">mut </span>core = cx.core.borrow_mut();
 
-                            <span class="comment">// If `None`, the runtime is shutting down, so there is no need to signal shutdown</span>
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">core</span>) <span class="op">=</span> <span class="ident">core</span>.<span class="ident">as_mut</span>() {
-                                <span class="ident">core</span>.<span class="ident">unhandled_panic</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                                <span class="self">self</span>.<span class="ident">owned</span>.<span class="ident">close_and_shutdown_all</span>();
+                            <span class="comment">// If `None`, the runtime is shutting down, so there is no need to signal shutdown
+                            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(core) = core.as_mut() {
+                                core.unhandled_panic = <span class="bool-val">true</span>;
+                                <span class="self">self</span>.owned.close_and_shutdown_all();
                             }
                         }
-                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;runtime core not set in CURRENT thread-local&quot;</span>),
+                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;runtime core not set in CURRENT thread-local&quot;</span>),
                     })
                 }
             }
@@ -1102,129 +1102,129 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Wake</span> <span class="kw">for</span> <span class="ident">Shared</span> {
-    <span class="kw">fn</span> <span class="ident">wake</span>(<span class="ident">arc_self</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="ident">Wake::wake_by_ref</span>(<span class="kw-2">&amp;</span><span class="ident">arc_self</span>)
+<span class="kw">impl </span>Wake <span class="kw">for </span>Shared {
+    <span class="kw">fn </span>wake(arc_self: Arc&lt;<span class="self">Self</span>&gt;) {
+        Wake::wake_by_ref(<span class="kw-2">&amp;</span>arc_self)
     }
 
-    <span class="doccomment">/// Wake by reference</span>
-    <span class="kw">fn</span> <span class="ident">wake_by_ref</span>(<span class="ident">arc_self</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="ident">arc_self</span>.<span class="ident">woken</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>);
-        <span class="ident">arc_self</span>.<span class="ident">unpark</span>.<span class="ident">unpark</span>();
+    <span class="doccomment">/// Wake by reference
+    </span><span class="kw">fn </span>wake_by_ref(arc_self: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;) {
+        arc_self.woken.store(<span class="bool-val">true</span>, Release);
+        arc_self.unpark.unpark();
     }
 }
 
-<span class="comment">// ===== CoreGuard =====</span>
+<span class="comment">// ===== CoreGuard =====
 
-<span class="doccomment">/// Used to ensure we always place the `Core` value back into its slot in</span>
-<span class="doccomment">/// `CurrentThread`, even if the future panics.</span>
-<span class="kw">struct</span> <span class="ident">CoreGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">context</span>: <span class="ident">Context</span>,
-    <span class="ident">scheduler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CurrentThread</span>,
+</span><span class="doccomment">/// Used to ensure we always place the `Core` value back into its slot in
+/// `CurrentThread`, even if the future panics.
+</span><span class="kw">struct </span>CoreGuard&lt;<span class="lifetime">&#39;a</span>&gt; {
+    context: Context,
+    scheduler: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CurrentThread,
 }
 
-<span class="kw">impl</span> <span class="ident">CoreGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="ident">F::Output</span> {
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">enter</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">core</span>, <span class="ident">context</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_enter</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::runtime::enter</span>(<span class="bool-val">false</span>);
-            <span class="kw">let</span> <span class="ident">waker</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">spawner</span>.<span class="ident">waker_ref</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">std::task::Context::from_waker</span>(<span class="kw-2">&amp;</span><span class="ident">waker</span>);
+<span class="kw">impl </span>CoreGuard&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">fn </span>block_on&lt;F: Future&gt;(<span class="self">self</span>, future: F) -&gt; F::Output {
+        <span class="kw">let </span>ret = <span class="self">self</span>.enter(|<span class="kw-2">mut </span>core, context| {
+            <span class="kw">let </span>_enter = <span class="kw">crate</span>::runtime::enter(<span class="bool-val">false</span>);
+            <span class="kw">let </span>waker = context.spawner.waker_ref();
+            <span class="kw">let </span><span class="kw-2">mut </span>cx = std::task::Context::from_waker(<span class="kw-2">&amp;</span>waker);
 
-            <span class="macro">pin!</span>(<span class="ident">future</span>);
+            <span class="macro">pin!</span>(future);
 
-            <span class="lifetime">&#39;outer</span>: <span class="kw">loop</span> {
-                <span class="kw">if</span> <span class="ident">core</span>.<span class="ident">spawner</span>.<span class="ident">reset_woken</span>() {
-                    <span class="kw">let</span> (<span class="ident">c</span>, <span class="ident">res</span>) <span class="op">=</span> <span class="ident">context</span>.<span class="ident">enter</span>(<span class="ident">core</span>, <span class="op">|</span><span class="op">|</span> {
-                        <span class="ident"><span class="kw">crate</span>::coop::budget</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">future</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cx</span>))
+            <span class="lifetime">&#39;outer</span>: <span class="kw">loop </span>{
+                <span class="kw">if </span>core.spawner.reset_woken() {
+                    <span class="kw">let </span>(c, res) = context.enter(core, || {
+                        <span class="kw">crate</span>::coop::budget(|| future.as_mut().poll(<span class="kw-2">&amp;mut </span>cx))
                     });
 
-                    <span class="ident">core</span> <span class="op">=</span> <span class="ident">c</span>;
+                    core = c;
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Ready</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">res</span> {
-                        <span class="kw">return</span> (<span class="ident">core</span>, <span class="prelude-val">Some</span>(<span class="ident">v</span>));
+                    <span class="kw">if let </span>Ready(v) = res {
+                        <span class="kw">return </span>(core, <span class="prelude-val">Some</span>(v));
                     }
                 }
 
-                <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">core</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>.<span class="ident">config</span>.<span class="ident">event_interval</span> {
-                    <span class="comment">// Make sure we didn&#39;t hit an unhandled_panic</span>
-                    <span class="kw">if</span> <span class="ident">core</span>.<span class="ident">unhandled_panic</span> {
-                        <span class="kw">return</span> (<span class="ident">core</span>, <span class="prelude-val">None</span>);
+                <span class="kw">for _ in </span><span class="number">0</span>..core.spawner.shared.config.event_interval {
+                    <span class="comment">// Make sure we didn&#39;t hit an unhandled_panic
+                    </span><span class="kw">if </span>core.unhandled_panic {
+                        <span class="kw">return </span>(core, <span class="prelude-val">None</span>);
                     }
 
-                    <span class="comment">// Get and increment the current tick</span>
-                    <span class="kw">let</span> <span class="ident">tick</span> <span class="op">=</span> <span class="ident">core</span>.<span class="ident">tick</span>;
-                    <span class="ident">core</span>.<span class="ident">tick</span> <span class="op">=</span> <span class="ident">core</span>.<span class="ident">tick</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
+                    <span class="comment">// Get and increment the current tick
+                    </span><span class="kw">let </span>tick = core.tick;
+                    core.tick = core.tick.wrapping_add(<span class="number">1</span>);
 
-                    <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">tick</span> <span class="op">%</span> <span class="ident">core</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>.<span class="ident">config</span>.<span class="ident">global_queue_interval</span> <span class="op">==</span> <span class="number">0</span> {
-                        <span class="ident">core</span>.<span class="ident">spawner</span>.<span class="ident">pop</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">core</span>.<span class="ident">tasks</span>.<span class="ident">pop_front</span>())
-                    } <span class="kw">else</span> {
-                        <span class="ident">core</span>.<span class="ident">tasks</span>.<span class="ident">pop_front</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">core</span>.<span class="ident">spawner</span>.<span class="ident">pop</span>())
+                    <span class="kw">let </span>entry = <span class="kw">if </span>tick % core.spawner.shared.config.global_queue_interval == <span class="number">0 </span>{
+                        core.spawner.pop().or_else(|| core.tasks.pop_front())
+                    } <span class="kw">else </span>{
+                        core.tasks.pop_front().or_else(|| core.spawner.pop())
                     };
 
-                    <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">entry</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">entry</span>) =&gt; <span class="ident">entry</span>,
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="ident">core</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">park</span>(<span class="ident">core</span>);
+                    <span class="kw">let </span>task = <span class="kw">match </span>entry {
+                        <span class="prelude-val">Some</span>(entry) =&gt; entry,
+                        <span class="prelude-val">None </span>=&gt; {
+                            core = context.park(core);
 
-                            <span class="comment">// Try polling the `block_on` future next</span>
-                            <span class="kw">continue</span> <span class="lifetime">&#39;outer</span>;
+                            <span class="comment">// Try polling the `block_on` future next
+                            </span><span class="kw">continue </span><span class="lifetime">&#39;outer</span>;
                         }
                     };
 
-                    <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">spawner</span>.<span class="ident">shared</span>.<span class="ident">owned</span>.<span class="ident">assert_owner</span>(<span class="ident">task</span>);
+                    <span class="kw">let </span>task = context.spawner.shared.owned.assert_owner(task);
 
-                    <span class="kw">let</span> (<span class="ident">c</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">context</span>.<span class="ident">run_task</span>(<span class="ident">core</span>, <span class="op">|</span><span class="op">|</span> {
-                        <span class="ident">task</span>.<span class="ident">run</span>();
+                    <span class="kw">let </span>(c, <span class="kw">_</span>) = context.run_task(core, || {
+                        task.run();
                     });
 
-                    <span class="ident">core</span> <span class="op">=</span> <span class="ident">c</span>;
+                    core = c;
                 }
 
-                <span class="comment">// Yield to the driver, this drives the timer and pulls any</span>
-                <span class="comment">// pending I/O events.</span>
-                <span class="ident">core</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">park_yield</span>(<span class="ident">core</span>);
+                <span class="comment">// Yield to the driver, this drives the timer and pulls any
+                // pending I/O events.
+                </span>core = context.park_yield(core);
             }
         });
 
-        <span class="kw">match</span> <span class="ident">ret</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ret</span>) =&gt; <span class="ident">ret</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="comment">// `block_on` panicked.</span>
-                <span class="macro">panic!</span>(<span class="string">&quot;a spawned task panicked and the runtime is configured to shut down on unhandled panic&quot;</span>);
+        <span class="kw">match </span>ret {
+            <span class="prelude-val">Some</span>(ret) =&gt; ret,
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="comment">// `block_on` panicked.
+                </span><span class="macro">panic!</span>(<span class="string">&quot;a spawned task panicked and the runtime is configured to shut down on unhandled panic&quot;</span>);
             }
         }
     }
 
-    <span class="doccomment">/// Enters the scheduler context. This sets the queue and other necessary</span>
-    <span class="doccomment">/// scheduler state in the thread-local.</span>
-    <span class="kw">fn</span> <span class="ident">enter</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">R</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; (<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Core</span><span class="op">&gt;</span>, <span class="ident">R</span>),
+    <span class="doccomment">/// Enters the scheduler context. This sets the queue and other necessary
+    /// scheduler state in the thread-local.
+    </span><span class="kw">fn </span>enter&lt;F, R&gt;(<span class="self">self</span>, f: F) -&gt; R
+    <span class="kw">where
+        </span>F: FnOnce(Box&lt;Core&gt;, <span class="kw-2">&amp;</span>Context) -&gt; (Box&lt;Core&gt;, R),
     {
-        <span class="comment">// Remove `core` from `context` to pass into the closure.</span>
-        <span class="kw">let</span> <span class="ident">core</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">core</span>.<span class="ident">borrow_mut</span>().<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;core missing&quot;</span>);
+        <span class="comment">// Remove `core` from `context` to pass into the closure.
+        </span><span class="kw">let </span>core = <span class="self">self</span>.context.core.borrow_mut().take().expect(<span class="string">&quot;core missing&quot;</span>);
 
-        <span class="comment">// Call the closure and place `core` back</span>
-        <span class="kw">let</span> (<span class="ident">core</span>, <span class="ident">ret</span>) <span class="op">=</span> <span class="ident">CURRENT</span>.<span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">context</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">core</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">context</span>));
+        <span class="comment">// Call the closure and place `core` back
+        </span><span class="kw">let </span>(core, ret) = CURRENT.set(<span class="kw-2">&amp;</span><span class="self">self</span>.context, || f(core, <span class="kw-2">&amp;</span><span class="self">self</span>.context));
 
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">context</span>.<span class="ident">core</span>.<span class="ident">borrow_mut</span>() <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">core</span>);
+        <span class="kw-2">*</span><span class="self">self</span>.context.core.borrow_mut() = <span class="prelude-val">Some</span>(core);
 
-        <span class="ident">ret</span>
+        ret
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">CoreGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">core</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">core</span>.<span class="ident">borrow_mut</span>().<span class="ident">take</span>() {
-            <span class="comment">// Replace old scheduler back into the state to allow</span>
-            <span class="comment">// other threads to pick it up and drive it.</span>
-            <span class="self">self</span>.<span class="ident">scheduler</span>.<span class="ident">core</span>.<span class="ident">set</span>(<span class="ident">core</span>);
+<span class="kw">impl </span>Drop <span class="kw">for </span>CoreGuard&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(core) = <span class="self">self</span>.context.core.borrow_mut().take() {
+            <span class="comment">// Replace old scheduler back into the state to allow
+            // other threads to pick it up and drive it.
+            </span><span class="self">self</span>.scheduler.core.set(core);
 
-            <span class="comment">// Wake up other possible threads that could steal the driver.</span>
-            <span class="self">self</span>.<span class="ident">scheduler</span>.<span class="ident">notify</span>.<span class="ident">notify_one</span>()
+            <span class="comment">// Wake up other possible threads that could steal the driver.
+            </span><span class="self">self</span>.scheduler.notify.notify_one()
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

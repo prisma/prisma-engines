@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/sql-ddl/src/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_ddl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_ddl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_ddl/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/sql-ddl/src/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_ddl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_ddl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_ddl/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -511,23 +511,23 @@
 <span id="511">511</span>
 <span id="512">512</span>
 <span id="513">513</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">IndexColumn</span>, <span class="ident">IteratorJoin</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Display</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::common::{IndexColumn, IteratorJoin};
+<span class="kw">use </span>std::{borrow::Cow, fmt::Display};
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AlterTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">Display</span>,
-    <span class="kw">pub</span> <span class="ident">clauses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AlterTableClause</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>AlterTable&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>table_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Display,
+    <span class="kw">pub </span>clauses: Vec&lt;AlterTableClause&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">AlterTable</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ALTER TABLE &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">table_name</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Display <span class="kw">for </span>AlterTable&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.write_str(<span class="string">&quot;ALTER TABLE &quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.table_name.fmt(f)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">clauses</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">clauses</span>[<span class="number">0</span>].<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
-        } <span class="kw">else</span> {
+        <span class="kw">if </span><span class="self">self</span>.clauses.len() &lt;= <span class="number">1 </span>{
+            f.write_str(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.clauses[<span class="number">0</span>].fmt(f)<span class="question-mark">?</span>;
+        } <span class="kw">else </span>{
             <span class="macro">todo!</span>(<span class="string">&quot;multiline ALTER TABLE&quot;</span>)
         }
 
@@ -535,494 +535,494 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AlterTableClause</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">AddColumn</span>(<span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">AddForeignKey</span>(<span class="ident">ForeignKey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">AddPrimaryKey</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">DropColumn</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="ident">DropConstraint</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="ident">RenameTo</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+<span class="kw">pub enum </span>AlterTableClause&lt;<span class="lifetime">&#39;a</span>&gt; {
+    AddColumn(Column&lt;<span class="lifetime">&#39;a</span>&gt;),
+    AddForeignKey(ForeignKey&lt;<span class="lifetime">&#39;a</span>&gt;),
+    AddPrimaryKey(Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
+    DropColumn(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    DropConstraint(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    RenameTo(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">AlterTableClause</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">AlterTableClause::AddColumn</span>(<span class="ident">col</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ADD COLUMN &quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">Display::fmt</span>(<span class="ident">col</span>, <span class="ident">f</span>)
+<span class="kw">impl </span>Display <span class="kw">for </span>AlterTableClause&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
+            AlterTableClause::AddColumn(col) =&gt; {
+                f.write_str(<span class="string">&quot;ADD COLUMN &quot;</span>)<span class="question-mark">?</span>;
+                Display::fmt(col, f)
             }
-            <span class="ident">AlterTableClause::AddForeignKey</span>(<span class="ident">fk</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ADD &quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">Display::fmt</span>(<span class="ident">fk</span>, <span class="ident">f</span>)
+            AlterTableClause::AddForeignKey(fk) =&gt; {
+                f.write_str(<span class="string">&quot;ADD &quot;</span>)<span class="question-mark">?</span>;
+                Display::fmt(fk, f)
             }
-            <span class="ident">AlterTableClause::AddPrimaryKey</span>(<span class="ident">cols</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ADD PRIMARY KEY (&quot;</span>)<span class="question-mark">?</span>;
+            AlterTableClause::AddPrimaryKey(cols) =&gt; {
+                f.write_str(<span class="string">&quot;ADD PRIMARY KEY (&quot;</span>)<span class="question-mark">?</span>;
 
-                <span class="ident">cols</span>.<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">PostgresIdentifier::from</span>(<span class="ident">s</span>.<span class="ident">as_ref</span>()))
-                    .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+                cols.iter()
+                    .map(|s| PostgresIdentifier::from(s.as_ref()))
+                    .join(<span class="string">&quot;, &quot;</span>, f)<span class="question-mark">?</span>;
 
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;)&quot;</span>)
+                f.write_str(<span class="string">&quot;)&quot;</span>)
             }
-            <span class="ident">AlterTableClause::DropColumn</span>(<span class="ident">colname</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DROP COLUMN &quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">PostgresIdentifier::from</span>(<span class="ident">colname</span>.<span class="ident">as_ref</span>()), <span class="ident">f</span>)
+            AlterTableClause::DropColumn(colname) =&gt; {
+                f.write_str(<span class="string">&quot;DROP COLUMN &quot;</span>)<span class="question-mark">?</span>;
+                Display::fmt(<span class="kw-2">&amp;</span>PostgresIdentifier::from(colname.as_ref()), f)
             }
-            <span class="ident">AlterTableClause::DropConstraint</span>(<span class="ident">constraint_name</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DROP CONSTRAINT &quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">PostgresIdentifier::from</span>(<span class="ident">constraint_name</span>.<span class="ident">as_ref</span>()), <span class="ident">f</span>)
+            AlterTableClause::DropConstraint(constraint_name) =&gt; {
+                f.write_str(<span class="string">&quot;DROP CONSTRAINT &quot;</span>)<span class="question-mark">?</span>;
+                Display::fmt(<span class="kw-2">&amp;</span>PostgresIdentifier::from(constraint_name.as_ref()), f)
             }
-            <span class="ident">AlterTableClause::RenameTo</span>(<span class="ident">to</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;RENAME TO &quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">PostgresIdentifier::from</span>(<span class="ident">to</span>.<span class="ident">as_ref</span>()), <span class="ident">f</span>)
+            AlterTableClause::RenameTo(to) =&gt; {
+                f.write_str(<span class="string">&quot;RENAME TO &quot;</span>)<span class="question-mark">?</span>;
+                Display::fmt(<span class="kw-2">&amp;</span>PostgresIdentifier::from(to.as_ref()), f)
             }
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">r#type</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>Column&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
+    <span class="kw">pub </span>r#type: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
+    <span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">PostgresIdentifier::from</span>(<span class="self">self</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>()), <span class="ident">f</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">r#type</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
+<span class="kw">impl </span>Display <span class="kw">for </span>Column&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        Display::fmt(<span class="kw-2">&amp;</span>PostgresIdentifier::from(<span class="self">self</span>.name.as_ref()), f)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
+        f.write_str(<span class="self">self</span>.r#type.as_ref())<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">default</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">default</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; DEFAULT &quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">default</span>)<span class="question-mark">?</span>;
-        }
-
-        <span class="prelude-val">Ok</span>(())
-    }
-}
-
-<span class="doccomment">/// Render a `DROP INDEX` statement.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sql_ddl::postgres::DropIndex;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let drop_index = DropIndex { index_name: &quot;Catidx&quot;.into() };</span>
-<span class="doccomment">/// assert_eq!(drop_index.to_string(), r#&quot;DROP INDEX &quot;Catidx&quot;&quot;#);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DropIndex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The name of the index to be dropped.</span>
-    <span class="kw">pub</span> <span class="ident">index_name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DropIndex</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DROP INDEX &quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">PostgresIdentifier::from</span>(<span class="self">self</span>.<span class="ident">index_name</span>.<span class="ident">as_ref</span>()), <span class="ident">f</span>)
-    }
-}
-
-<span class="doccomment">/// Render a `DROP TABLE` statement.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sql_ddl::postgres::DropTable;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let drop_table = DropTable { table_name: &quot;Cat&quot;.into(), cascade: false };</span>
-<span class="doccomment">/// assert_eq!(drop_table.to_string(), r#&quot;DROP TABLE &quot;Cat&quot;&quot;#);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let drop_table = DropTable { table_name: &quot;Cat&quot;.into(), cascade: true };</span>
-<span class="doccomment">/// assert_eq!(drop_table.to_string(), r#&quot;DROP TABLE &quot;Cat&quot; CASCADE&quot;#);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DropTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The name of the table to be dropped.</span>
-    <span class="kw">pub</span> <span class="ident">table_name</span>: <span class="ident">PostgresIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">cascade</span>: <span class="ident">bool</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DropTable</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DROP TABLE &quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">table_name</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cascade</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; CASCADE&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(default) = <span class="kw-2">&amp;</span><span class="self">self</span>.default {
+            f.write_str(<span class="string">&quot; DEFAULT &quot;</span>)<span class="question-mark">?</span>;
+            f.write_str(default)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="doccomment">/// Render a `DROP TYPE` statement.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sql_ddl::postgres::DropType;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let drop_type = DropType { type_name: &quot;CatMood&quot;.into() };</span>
-<span class="doccomment">/// assert_eq!(drop_type.to_string(), r#&quot;DROP TYPE &quot;CatMood&quot;&quot;#);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DropType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The name of the type to be dropped.</span>
-    <span class="kw">pub</span> <span class="ident">type_name</span>: <span class="ident">PostgresIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Render a `DROP INDEX` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropIndex;
+///
+/// let drop_index = DropIndex { index_name: &quot;Catidx&quot;.into() };
+/// assert_eq!(drop_index.to_string(), r#&quot;DROP INDEX &quot;Catidx&quot;&quot;#);
+/// ```
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>DropIndex&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The name of the index to be dropped.
+    </span><span class="kw">pub </span>index_name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DropType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DROP TYPE &quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">type_name</span>, <span class="ident">f</span>)
+<span class="kw">impl </span>Display <span class="kw">for </span>DropIndex&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.write_str(<span class="string">&quot;DROP INDEX &quot;</span>)<span class="question-mark">?</span>;
+        Display::fmt(<span class="kw-2">&amp;</span>PostgresIdentifier::from(<span class="self">self</span>.index_name.as_ref()), f)
     }
 }
 
-<span class="doccomment">/// Render a `DROP VIEW` statement.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sql_ddl::postgres::DropView;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let drop_view = DropView { view_name: &quot;Cat&quot;.into() };</span>
-<span class="doccomment">/// assert_eq!(drop_view.to_string(), r#&quot;DROP VIEW &quot;Cat&quot;&quot;#);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DropView</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The name of the view to be dropped.</span>
-    <span class="kw">pub</span> <span class="ident">view_name</span>: <span class="ident">PostgresIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Render a `DROP TABLE` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropTable;
+///
+/// let drop_table = DropTable { table_name: &quot;Cat&quot;.into(), cascade: false };
+/// assert_eq!(drop_table.to_string(), r#&quot;DROP TABLE &quot;Cat&quot;&quot;#);
+///
+/// let drop_table = DropTable { table_name: &quot;Cat&quot;.into(), cascade: true };
+/// assert_eq!(drop_table.to_string(), r#&quot;DROP TABLE &quot;Cat&quot; CASCADE&quot;#);
+/// ```
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>DropTable&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The name of the table to be dropped.
+    </span><span class="kw">pub </span>table_name: PostgresIdentifier&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub </span>cascade: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DropView</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DROP VIEW &quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">view_name</span>, <span class="ident">f</span>)
+<span class="kw">impl </span>Display <span class="kw">for </span>DropTable&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.write_str(<span class="string">&quot;DROP TABLE &quot;</span>)<span class="question-mark">?</span>;
+        Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.table_name, f)<span class="question-mark">?</span>;
+
+        <span class="kw">if </span><span class="self">self</span>.cascade {
+            f.write_str(<span class="string">&quot; CASCADE&quot;</span>)<span class="question-mark">?</span>;
+        }
+
+        <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ForeignKey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">constraint_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">constrained_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">referenced_table</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">Display</span>,
-    <span class="kw">pub</span> <span class="ident">referenced_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">on_delete</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ForeignKeyAction</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">on_update</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ForeignKeyAction</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Render a `DROP TYPE` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropType;
+///
+/// let drop_type = DropType { type_name: &quot;CatMood&quot;.into() };
+/// assert_eq!(drop_type.to_string(), r#&quot;DROP TYPE &quot;CatMood&quot;&quot;#);
+/// ```
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>DropType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The name of the type to be dropped.
+    </span><span class="kw">pub </span>type_name: PostgresIdentifier&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ForeignKey</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">constraint_name</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">constraint_name</span> {
+<span class="kw">impl </span>Display <span class="kw">for </span>DropType&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.write_str(<span class="string">&quot;DROP TYPE &quot;</span>)<span class="question-mark">?</span>;
+        Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.type_name, f)
+    }
+}
+
+<span class="doccomment">/// Render a `DROP VIEW` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropView;
+///
+/// let drop_view = DropView { view_name: &quot;Cat&quot;.into() };
+/// assert_eq!(drop_view.to_string(), r#&quot;DROP VIEW &quot;Cat&quot;&quot;#);
+/// ```
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>DropView&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The name of the view to be dropped.
+    </span><span class="kw">pub </span>view_name: PostgresIdentifier&lt;<span class="lifetime">&#39;a</span>&gt;,
+}
+
+<span class="kw">impl </span>Display <span class="kw">for </span>DropView&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.write_str(<span class="string">&quot;DROP VIEW &quot;</span>)<span class="question-mark">?</span>;
+        Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.view_name, f)
+    }
+}
+
+<span class="kw">pub struct </span>ForeignKey&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>constraint_name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    <span class="kw">pub </span>constrained_columns: Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    <span class="kw">pub </span>referenced_table: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Display,
+    <span class="kw">pub </span>referenced_columns: Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    <span class="kw">pub </span>on_delete: <span class="prelude-ty">Option</span>&lt;ForeignKeyAction&gt;,
+    <span class="kw">pub </span>on_update: <span class="prelude-ty">Option</span>&lt;ForeignKeyAction&gt;,
+}
+
+<span class="kw">impl </span>Display <span class="kw">for </span>ForeignKey&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(constraint_name) = <span class="kw-2">&amp;</span><span class="self">self</span>.constraint_name {
             <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+                f,
                 <span class="string">&quot;CONSTRAINT \&quot;{constraint_name}\&quot; &quot;</span>,
-                <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">constraint_name</span>,
+                constraint_name = constraint_name,
             )<span class="question-mark">?</span>;
         }
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;FOREIGN KEY (&quot;</span>)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;FOREIGN KEY (&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">constrained_columns</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">Ident</span>(<span class="ident">s</span>)).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.constrained_columns.iter().map(|s| Ident(s)).join(<span class="string">&quot;, &quot;</span>, f)<span class="question-mark">?</span>;
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;) REFERENCES {}(&quot;</span>, <span class="self">self</span>.<span class="ident">referenced_table</span>)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(f, <span class="string">&quot;) REFERENCES {}(&quot;</span>, <span class="self">self</span>.referenced_table)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">referenced_columns</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">Ident</span>(<span class="ident">s</span>)).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.referenced_columns.iter().map(|s| Ident(s)).join(<span class="string">&quot;, &quot;</span>, f)<span class="question-mark">?</span>;
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_delete</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">on_delete</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; ON DELETE &quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">on_delete</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(on_delete) = <span class="kw-2">&amp;</span><span class="self">self</span>.on_delete {
+            f.write_str(<span class="string">&quot; ON DELETE &quot;</span>)<span class="question-mark">?</span>;
+            on_delete.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_update</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">on_update</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; ON UPDATE &quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">on_update</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(on_update) = <span class="kw-2">&amp;</span><span class="self">self</span>.on_update {
+            f.write_str(<span class="string">&quot; ON UPDATE &quot;</span>)<span class="question-mark">?</span>;
+            on_update.fmt(f)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ForeignKeyAction</span> {
-    <span class="ident">Cascade</span>,
-    <span class="ident">NoAction</span>,
-    <span class="ident">Restrict</span>,
-    <span class="ident">SetDefault</span>,
-    <span class="ident">SetNull</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ForeignKeyAction {
+    Cascade,
+    NoAction,
+    Restrict,
+    SetDefault,
+    SetNull,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ForeignKeyAction</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ForeignKeyAction::Cascade</span> =&gt; <span class="string">&quot;CASCADE&quot;</span>,
-            <span class="ident">ForeignKeyAction::Restrict</span> =&gt; <span class="string">&quot;RESTRICT&quot;</span>,
-            <span class="ident">ForeignKeyAction::NoAction</span> =&gt; <span class="string">&quot;NO ACTION&quot;</span>,
-            <span class="ident">ForeignKeyAction::SetNull</span> =&gt; <span class="string">&quot;SET NULL&quot;</span>,
-            <span class="ident">ForeignKeyAction::SetDefault</span> =&gt; <span class="string">&quot;SET DEFAULT&quot;</span>,
+<span class="kw">impl </span>Display <span class="kw">for </span>ForeignKeyAction {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">let </span>s = <span class="kw">match </span><span class="self">self </span>{
+            ForeignKeyAction::Cascade =&gt; <span class="string">&quot;CASCADE&quot;</span>,
+            ForeignKeyAction::Restrict =&gt; <span class="string">&quot;RESTRICT&quot;</span>,
+            ForeignKeyAction::NoAction =&gt; <span class="string">&quot;NO ACTION&quot;</span>,
+            ForeignKeyAction::SetNull =&gt; <span class="string">&quot;SET NULL&quot;</span>,
+            ForeignKeyAction::SetDefault =&gt; <span class="string">&quot;SET DEFAULT&quot;</span>,
         };
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>)
+        f.write_str(s)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PostgresIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Simple</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="ident">WithSchema</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>PostgresIdentifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Simple(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    WithSchema(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PostgresIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">PostgresIdentifier::Simple</span>(<span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>))
+<span class="kw">impl </span>Default <span class="kw">for </span>PostgresIdentifier&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        PostgresIdentifier::Simple(Cow::Borrowed(<span class="string">&quot;&quot;</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PostgresIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">PostgresIdentifier::Simple</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>PostgresIdentifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        PostgresIdentifier::Simple(Cow::Borrowed(s))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">PostgresIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">delimiter</span> <span class="op">=</span> <span class="string">&quot;\&quot;&quot;</span>;
+<span class="kw">impl </span>Display <span class="kw">for </span>PostgresIdentifier&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">let </span>delimiter = <span class="string">&quot;\&quot;&quot;</span>;
 
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PostgresIdentifier::Simple</span>(<span class="ident">name</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">delimiter</span>)<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">delimiter</span>)
+        <span class="kw">match </span><span class="self">self </span>{
+            PostgresIdentifier::Simple(name) =&gt; {
+                f.write_str(delimiter)<span class="question-mark">?</span>;
+                f.write_str(name)<span class="question-mark">?</span>;
+                f.write_str(delimiter)
             }
-            <span class="ident">PostgresIdentifier::WithSchema</span>(<span class="ident">prefix</span>, <span class="ident">name</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">delimiter</span>)<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">prefix</span>)<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">r#&quot;&quot;.&quot;&quot;#</span>)<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">delimiter</span>)
+            PostgresIdentifier::WithSchema(prefix, name) =&gt; {
+                f.write_str(delimiter)<span class="question-mark">?</span>;
+                f.write_str(prefix)<span class="question-mark">?</span>;
+                f.write_str(<span class="string">r#&quot;&quot;.&quot;&quot;#</span>)<span class="question-mark">?</span>;
+                f.write_str(name)<span class="question-mark">?</span>;
+                f.write_str(delimiter)
             }
         }
     }
 }
 
-<span class="kw">struct</span> <span class="ident">StrLit</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>);
+<span class="kw">struct </span>StrLit&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str);
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">StrLit</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Display <span class="kw">for </span>StrLit&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">struct</span> <span class="ident">Ident</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>);
+<span class="kw">struct </span>Ident&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str);
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Ident</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Display <span class="kw">for </span>Ident&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PostgresIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">schema</span>, <span class="ident">item</span>): (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident">PostgresIdentifier::WithSchema</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">schema</span>), <span class="ident">Cow::Borrowed</span>(<span class="ident">item</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str)&gt; <span class="kw">for </span>PostgresIdentifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from((schema, item): (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str)) -&gt; <span class="self">Self </span>{
+        PostgresIdentifier::WithSchema(Cow::Borrowed(schema), Cow::Borrowed(item))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateEnum</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">enum_name</span>: <span class="ident">PostgresIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">variants</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>CreateEnum&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>enum_name: PostgresIdentifier&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub </span>variants: Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">CreateEnum</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CREATE TYPE {enum_name} AS ENUM (&quot;</span>, <span class="ident">enum_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">enum_name</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">variants</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">StrLit</span>(<span class="ident">s</span>)).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;)&quot;</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Display <span class="kw">for </span>CreateEnum&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;CREATE TYPE {enum_name} AS ENUM (&quot;</span>, enum_name = <span class="self">self</span>.enum_name)<span class="question-mark">?</span>;
+        <span class="self">self</span>.variants.iter().map(|s| StrLit(s)).join(<span class="string">&quot;, &quot;</span>, f)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;)&quot;</span>)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexAlgorithm</span> {
-    <span class="ident">BTree</span>,
-    <span class="ident">Hash</span>,
-    <span class="ident">Gist</span>,
-    <span class="ident">Gin</span>,
-    <span class="ident">SpGist</span>,
-    <span class="ident">Brin</span>,
+<span class="kw">pub enum </span>IndexAlgorithm {
+    BTree,
+    Hash,
+    Gist,
+    Gin,
+    SpGist,
+    Brin,
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateIndex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">index_name</span>: <span class="ident">PostgresIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">is_unique</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">table_reference</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">Display</span>,
-    <span class="kw">pub</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexColumn</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">using</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>CreateIndex&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>index_name: PostgresIdentifier&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub </span>is_unique: bool,
+    <span class="kw">pub </span>table_reference: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Display,
+    <span class="kw">pub </span>columns: Vec&lt;IndexColumn&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub </span>using: <span class="prelude-ty">Option</span>&lt;IndexAlgorithm&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">CreateIndex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">using</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">using</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>) =&gt; <span class="string">&quot; USING HASH &quot;</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gist</span>) =&gt; <span class="string">&quot; USING GIST &quot;</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gin</span>) =&gt; <span class="string">&quot; USING GIN &quot;</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::SpGist</span>) =&gt; <span class="string">&quot; USING SPGIST &quot;</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Brin</span>) =&gt; <span class="string">&quot; USING BRIN &quot;</span>,
-            <span class="kw">_</span> =&gt; <span class="string">&quot;&quot;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Display <span class="kw">for </span>CreateIndex&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">let </span>using = <span class="kw">match </span><span class="self">self</span>.using {
+            <span class="prelude-val">Some</span>(IndexAlgorithm::Hash) =&gt; <span class="string">&quot; USING HASH &quot;</span>,
+            <span class="prelude-val">Some</span>(IndexAlgorithm::Gist) =&gt; <span class="string">&quot; USING GIST &quot;</span>,
+            <span class="prelude-val">Some</span>(IndexAlgorithm::Gin) =&gt; <span class="string">&quot; USING GIN &quot;</span>,
+            <span class="prelude-val">Some</span>(IndexAlgorithm::SpGist) =&gt; <span class="string">&quot; USING SPGIST &quot;</span>,
+            <span class="prelude-val">Some</span>(IndexAlgorithm::Brin) =&gt; <span class="string">&quot; USING BRIN &quot;</span>,
+            <span class="kw">_ </span>=&gt; <span class="string">&quot;&quot;</span>,
         };
 
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;CREATE {uniqueness}INDEX {index_name} ON {table_reference}{using}(&quot;</span>,
-            <span class="ident">uniqueness</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_unique</span> { <span class="string">&quot;UNIQUE &quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
-            <span class="ident">index_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index_name</span>,
-            <span class="ident">table_reference</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table_reference</span>,
-            <span class="ident">using</span> <span class="op">=</span> <span class="ident">using</span>,
+            uniqueness = <span class="kw">if </span><span class="self">self</span>.is_unique { <span class="string">&quot;UNIQUE &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
+            index_name = <span class="self">self</span>.index_name,
+            table_reference = <span class="self">self</span>.table_reference,
+            using = using,
         )<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">columns</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">Ident</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">name</span>).<span class="ident">to_string</span>();
+        <span class="self">self</span>.columns
+            .iter()
+            .map(|c| {
+                <span class="kw">let </span><span class="kw-2">mut </span>rendered = Ident(<span class="kw-2">&amp;</span>c.name).to_string();
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">opclass</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">operator_class</span> {
-                    <span class="ident">rendered</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
-                    <span class="ident">rendered</span>.<span class="ident">push_str</span>(<span class="ident">opclass</span>.<span class="ident">as_ref</span>());
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(opclass) = <span class="kw-2">&amp;</span>c.operator_class {
+                    rendered.push(<span class="string">&#39; &#39;</span>);
+                    rendered.push_str(opclass.as_ref());
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sort_order</span>) <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span> {
-                    <span class="ident">rendered</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
-                    <span class="ident">rendered</span>.<span class="ident">push_str</span>(<span class="ident">sort_order</span>.<span class="ident">as_ref</span>());
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = c.sort_order {
+                    rendered.push(<span class="string">&#39; &#39;</span>);
+                    rendered.push_str(sort_order.as_ref());
                 }
 
-                <span class="ident">rendered</span>
+                rendered
             })
-            .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+            .join(<span class="string">&quot;, &quot;</span>, f)<span class="question-mark">?</span>;
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;)&quot;</span>)
+        f.write_str(<span class="string">&quot;)&quot;</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SortOrder</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::SortOrder;
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">create_enum_without_variants</span>() {
-        <span class="kw">let</span> <span class="ident">create_enum</span> <span class="op">=</span> <span class="ident">CreateEnum</span> {
-            <span class="ident">enum_name</span>: <span class="string">&quot;myEnum&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">variants</span>: <span class="ident">Vec::new</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>create_enum_without_variants() {
+        <span class="kw">let </span>create_enum = CreateEnum {
+            enum_name: <span class="string">&quot;myEnum&quot;</span>.into(),
+            variants: Vec::new(),
         };
 
-        <span class="macro">assert_eq!</span>(<span class="ident">create_enum</span>.<span class="ident">to_string</span>(), <span class="string">r#&quot;CREATE TYPE &quot;myEnum&quot; AS ENUM ()&quot;#</span>);
+        <span class="macro">assert_eq!</span>(create_enum.to_string(), <span class="string">r#&quot;CREATE TYPE &quot;myEnum&quot; AS ENUM ()&quot;#</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">create_enum_with_variants</span>() {
-        <span class="kw">let</span> <span class="ident">variants</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;One&quot;</span>.<span class="ident">into</span>(), <span class="string">&quot;Two&quot;</span>.<span class="ident">into</span>(), <span class="string">&quot;Three&quot;</span>.<span class="ident">into</span>()];
-        <span class="kw">let</span> <span class="ident">create_enum</span> <span class="op">=</span> <span class="ident">CreateEnum</span> {
-            <span class="ident">enum_name</span>: <span class="string">&quot;myEnum&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">variants</span>,
-        };
-
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">create_enum</span>.<span class="ident">to_string</span>(),
-            <span class="string">r#&quot;CREATE TYPE &quot;myEnum&quot; AS ENUM (&#39;One&#39;, &#39;Two&#39;, &#39;Three&#39;)&quot;#</span>
-        );
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">create_unique_index</span>() {
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">IndexColumn::new</span>(<span class="string">&quot;name&quot;</span>), <span class="ident">IndexColumn::new</span>(<span class="string">&quot;age&quot;</span>)];
-
-        <span class="kw">let</span> <span class="ident">create_index</span> <span class="op">=</span> <span class="ident">CreateIndex</span> {
-            <span class="ident">is_unique</span>: <span class="bool-val">true</span>,
-            <span class="ident">index_name</span>: <span class="string">&quot;meow_idx&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">table_reference</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresIdentifier::Simple</span>(<span class="ident">Cow::Borrowed</span>(<span class="string">&quot;Cat&quot;</span>)),
-            <span class="ident">columns</span>,
-            <span class="ident">using</span>: <span class="prelude-val">None</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>create_enum_with_variants() {
+        <span class="kw">let </span>variants = <span class="macro">vec!</span>[<span class="string">&quot;One&quot;</span>.into(), <span class="string">&quot;Two&quot;</span>.into(), <span class="string">&quot;Three&quot;</span>.into()];
+        <span class="kw">let </span>create_enum = CreateEnum {
+            enum_name: <span class="string">&quot;myEnum&quot;</span>.into(),
+            variants,
         };
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">create_index</span>.<span class="ident">to_string</span>(),
-            <span class="string">&quot;CREATE UNIQUE INDEX \&quot;meow_idx\&quot; ON \&quot;Cat\&quot;(\&quot;name\&quot;, \&quot;age\&quot;)&quot;</span>
-        )
+            create_enum.to_string(),
+            <span class="string">r#&quot;CREATE TYPE &quot;myEnum&quot; AS ENUM (&#39;One&#39;, &#39;Two&#39;, &#39;Three&#39;)&quot;#
+        </span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">create_hash_index</span>() {
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">IndexColumn::new</span>(<span class="string">&quot;name&quot;</span>)];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>create_unique_index() {
+        <span class="kw">let </span>columns = <span class="macro">vec!</span>[IndexColumn::new(<span class="string">&quot;name&quot;</span>), IndexColumn::new(<span class="string">&quot;age&quot;</span>)];
 
-        <span class="kw">let</span> <span class="ident">create_index</span> <span class="op">=</span> <span class="ident">CreateIndex</span> {
-            <span class="ident">is_unique</span>: <span class="bool-val">false</span>,
-            <span class="ident">index_name</span>: <span class="string">&quot;meow_idx&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">table_reference</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresIdentifier::Simple</span>(<span class="ident">Cow::Borrowed</span>(<span class="string">&quot;Cat&quot;</span>)),
-            <span class="ident">columns</span>,
-            <span class="ident">using</span>: <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>),
+        <span class="kw">let </span>create_index = CreateIndex {
+            is_unique: <span class="bool-val">true</span>,
+            index_name: <span class="string">&quot;meow_idx&quot;</span>.into(),
+            table_reference: <span class="kw-2">&amp;</span>PostgresIdentifier::Simple(Cow::Borrowed(<span class="string">&quot;Cat&quot;</span>)),
+            columns,
+            using: <span class="prelude-val">None</span>,
         };
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">create_index</span>.<span class="ident">to_string</span>(),
-            <span class="string">&quot;CREATE INDEX \&quot;meow_idx\&quot; ON \&quot;Cat\&quot; USING HASH (\&quot;name\&quot;)&quot;</span>
-        )
+            create_index.to_string(),
+            <span class="string">&quot;CREATE UNIQUE INDEX \&quot;meow_idx\&quot; ON \&quot;Cat\&quot;(\&quot;name\&quot;, \&quot;age\&quot;)&quot;
+        </span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">create_unique_index_sort_order</span>() {
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">IndexColumn</span> {
-                <span class="ident">name</span>: <span class="string">&quot;name&quot;</span>.<span class="ident">into</span>(),
-                <span class="ident">sort_order</span>: <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Asc</span>),
-                ..<span class="ident">Default::default</span>()
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>create_hash_index() {
+        <span class="kw">let </span>columns = <span class="macro">vec!</span>[IndexColumn::new(<span class="string">&quot;name&quot;</span>)];
+
+        <span class="kw">let </span>create_index = CreateIndex {
+            is_unique: <span class="bool-val">false</span>,
+            index_name: <span class="string">&quot;meow_idx&quot;</span>.into(),
+            table_reference: <span class="kw-2">&amp;</span>PostgresIdentifier::Simple(Cow::Borrowed(<span class="string">&quot;Cat&quot;</span>)),
+            columns,
+            using: <span class="prelude-val">Some</span>(IndexAlgorithm::Hash),
+        };
+
+        <span class="macro">assert_eq!</span>(
+            create_index.to_string(),
+            <span class="string">&quot;CREATE INDEX \&quot;meow_idx\&quot; ON \&quot;Cat\&quot; USING HASH (\&quot;name\&quot;)&quot;
+        </span>)
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>create_unique_index_sort_order() {
+        <span class="kw">let </span>columns = <span class="macro">vec!</span>[
+            IndexColumn {
+                name: <span class="string">&quot;name&quot;</span>.into(),
+                sort_order: <span class="prelude-val">Some</span>(SortOrder::Asc),
+                ..Default::default()
             },
-            <span class="ident">IndexColumn</span> {
-                <span class="ident">name</span>: <span class="string">&quot;age&quot;</span>.<span class="ident">into</span>(),
-                <span class="ident">sort_order</span>: <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>),
-                ..<span class="ident">Default::default</span>()
+            IndexColumn {
+                name: <span class="string">&quot;age&quot;</span>.into(),
+                sort_order: <span class="prelude-val">Some</span>(SortOrder::Desc),
+                ..Default::default()
             },
         ];
 
-        <span class="kw">let</span> <span class="ident">create_index</span> <span class="op">=</span> <span class="ident">CreateIndex</span> {
-            <span class="ident">is_unique</span>: <span class="bool-val">true</span>,
-            <span class="ident">index_name</span>: <span class="string">&quot;meow_idx&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">table_reference</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresIdentifier::Simple</span>(<span class="string">&quot;Cat&quot;</span>.<span class="ident">into</span>()),
-            <span class="ident">columns</span>,
-            <span class="ident">using</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>create_index = CreateIndex {
+            is_unique: <span class="bool-val">true</span>,
+            index_name: <span class="string">&quot;meow_idx&quot;</span>.into(),
+            table_reference: <span class="kw-2">&amp;</span>PostgresIdentifier::Simple(<span class="string">&quot;Cat&quot;</span>.into()),
+            columns,
+            using: <span class="prelude-val">None</span>,
         };
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">create_index</span>.<span class="ident">to_string</span>(),
-            <span class="string">&quot;CREATE UNIQUE INDEX \&quot;meow_idx\&quot; ON \&quot;Cat\&quot;(\&quot;name\&quot; ASC, \&quot;age\&quot; DESC)&quot;</span>
-        )
+            create_index.to_string(),
+            <span class="string">&quot;CREATE UNIQUE INDEX \&quot;meow_idx\&quot; ON \&quot;Cat\&quot;(\&quot;name\&quot; ASC, \&quot;age\&quot; DESC)&quot;
+        </span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">full_alter_table_add_foreign_key</span>() {
-        <span class="kw">let</span> <span class="ident">alter_table</span> <span class="op">=</span> <span class="ident">AlterTable</span> {
-            <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresIdentifier::WithSchema</span>(<span class="string">&quot;public&quot;</span>.<span class="ident">into</span>(), <span class="string">&quot;Cat&quot;</span>.<span class="ident">into</span>()),
-            <span class="ident">clauses</span>: <span class="macro">vec!</span>[<span class="ident">AlterTableClause::AddForeignKey</span>(<span class="ident">ForeignKey</span> {
-                <span class="ident">constrained_columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;friendName&quot;</span>.<span class="ident">into</span>(), <span class="string">&quot;friendTemperament&quot;</span>.<span class="ident">into</span>()],
-                <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;cat_friend&quot;</span>.<span class="ident">into</span>()),
-                <span class="ident">on_delete</span>: <span class="prelude-val">None</span>,
-                <span class="ident">on_update</span>: <span class="prelude-val">None</span>,
-                <span class="ident">referenced_columns</span>: <span class="macro">vec!</span>[<span class="string">&quot;name&quot;</span>.<span class="ident">into</span>(), <span class="string">&quot;temperament&quot;</span>.<span class="ident">into</span>()],
-                <span class="ident">referenced_table</span>: <span class="kw-2">&amp;</span><span class="string">&quot;Dog&quot;</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>full_alter_table_add_foreign_key() {
+        <span class="kw">let </span>alter_table = AlterTable {
+            table_name: <span class="kw-2">&amp;</span>PostgresIdentifier::WithSchema(<span class="string">&quot;public&quot;</span>.into(), <span class="string">&quot;Cat&quot;</span>.into()),
+            clauses: <span class="macro">vec!</span>[AlterTableClause::AddForeignKey(ForeignKey {
+                constrained_columns: <span class="macro">vec!</span>[<span class="string">&quot;friendName&quot;</span>.into(), <span class="string">&quot;friendTemperament&quot;</span>.into()],
+                constraint_name: <span class="prelude-val">Some</span>(<span class="string">&quot;cat_friend&quot;</span>.into()),
+                on_delete: <span class="prelude-val">None</span>,
+                on_update: <span class="prelude-val">None</span>,
+                referenced_columns: <span class="macro">vec!</span>[<span class="string">&quot;name&quot;</span>.into(), <span class="string">&quot;temperament&quot;</span>.into()],
+                referenced_table: <span class="kw-2">&amp;</span><span class="string">&quot;Dog&quot;</span>,
             })],
         };
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
+        <span class="kw">let </span>expected =
             <span class="string">&quot;ALTER TABLE \&quot;public\&quot;.\&quot;Cat\&quot; ADD CONSTRAINT \&quot;cat_friend\&quot; FOREIGN KEY (\&quot;friendName\&quot;, \&quot;friendTemperament\&quot;) REFERENCES Dog(\&quot;name\&quot;, \&quot;temperament\&quot;)&quot;</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">alter_table</span>.<span class="ident">to_string</span>(), <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(alter_table.to_string(), expected);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rename_table</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">r#&quot;ALTER TABLE Cat RENAME TO &quot;Dog&quot;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">alter_table</span> <span class="op">=</span> <span class="ident">AlterTable</span> {
-            <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="string">&quot;Cat&quot;</span>,
-            <span class="ident">clauses</span>: <span class="macro">vec!</span>[<span class="ident">AlterTableClause::RenameTo</span>(<span class="string">&quot;Dog&quot;</span>.<span class="ident">into</span>())],
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>rename_table() {
+        <span class="kw">let </span>expected = <span class="string">r#&quot;ALTER TABLE Cat RENAME TO &quot;Dog&quot;&quot;#</span>;
+        <span class="kw">let </span>alter_table = AlterTable {
+            table_name: <span class="kw-2">&amp;</span><span class="string">&quot;Cat&quot;</span>,
+            clauses: <span class="macro">vec!</span>[AlterTableClause::RenameTo(<span class="string">&quot;Dog&quot;</span>.into())],
         };
 
-        <span class="macro">assert_eq!</span>(<span class="ident">alter_table</span>.<span class="ident">to_string</span>(), <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(alter_table.to_string(), expected);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_ddl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_ddl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

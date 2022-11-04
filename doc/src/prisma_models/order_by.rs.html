@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/order_by.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>order_by.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/order_by.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>order_by.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -212,219 +212,219 @@
 <span id="212">212</span>
 <span id="213">213</span>
 <span id="214">214</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CompositeFieldRef</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>};
-<span class="kw">use</span> <span class="ident">std::string::ToString</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{CompositeFieldRef, RelationFieldRef, ScalarFieldRef};
+<span class="kw">use </span>std::string::ToString;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SortOrder</span> {
-    <span class="ident">Ascending</span>,
-    <span class="ident">Descending</span>,
+<span class="attribute">#[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
+</span><span class="kw">pub enum </span>SortOrder {
+    Ascending,
+    Descending,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NullsOrder</span> {
-    <span class="ident">First</span>,
-    <span class="ident">Last</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>NullsOrder {
+    First,
+    Last,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SortAggregation</span> {
-    <span class="ident">Count</span>,
-    <span class="ident">Avg</span>,
-    <span class="ident">Sum</span>,
-    <span class="ident">Min</span>,
-    <span class="ident">Max</span>,
+<span class="attribute">#[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
+</span><span class="kw">pub enum </span>SortAggregation {
+    Count,
+    Avg,
+    Sum,
+    Min,
+    Max,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OrderBy</span> {
-    <span class="ident">Scalar</span>(<span class="ident">OrderByScalar</span>),
-    <span class="ident">ScalarAggregation</span>(<span class="ident">OrderByScalarAggregation</span>),
-    <span class="ident">ToManyAggregation</span>(<span class="ident">OrderByToManyAggregation</span>),
-    <span class="ident">Relevance</span>(<span class="ident">OrderByRelevance</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>OrderBy {
+    Scalar(OrderByScalar),
+    ScalarAggregation(OrderByScalarAggregation),
+    ToManyAggregation(OrderByToManyAggregation),
+    Relevance(OrderByRelevance),
 }
 
-<span class="kw">impl</span> <span class="ident">OrderBy</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">OrderByHop</span>]<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">o</span>.<span class="ident">path</span>),
-            <span class="ident">OrderBy::ScalarAggregation</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">o</span>.<span class="ident">path</span>),
-            <span class="ident">OrderBy::ToManyAggregation</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">o</span>.<span class="ident">path</span>),
-            <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+<span class="kw">impl </span>OrderBy {
+    <span class="kw">pub fn </span>path(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[OrderByHop]&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            OrderBy::Scalar(o) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>o.path),
+            OrderBy::ScalarAggregation(o) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>o.path),
+            OrderBy::ToManyAggregation(o) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>o.path),
+            OrderBy::Relevance(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort_order</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SortOrder</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">sort_order</span>,
-            <span class="ident">OrderBy::ScalarAggregation</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">sort_order</span>,
-            <span class="ident">OrderBy::ToManyAggregation</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">sort_order</span>,
-            <span class="ident">OrderBy::Relevance</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">sort_order</span>,
+    <span class="kw">pub fn </span>sort_order(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SortOrder {
+        <span class="kw">match </span><span class="self">self </span>{
+            OrderBy::Scalar(o) =&gt; o.sort_order,
+            OrderBy::ScalarAggregation(o) =&gt; o.sort_order,
+            OrderBy::ToManyAggregation(o) =&gt; o.sort_order,
+            OrderBy::Relevance(o) =&gt; o.sort_order,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">clone</span>()),
-            <span class="ident">OrderBy::ScalarAggregation</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">clone</span>()),
-            <span class="ident">OrderBy::ToManyAggregation</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarFieldRef&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            OrderBy::Scalar(o) =&gt; <span class="prelude-val">Some</span>(o.field.clone()),
+            OrderBy::ScalarAggregation(o) =&gt; <span class="prelude-val">Some</span>(o.field.clone()),
+            OrderBy::ToManyAggregation(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            OrderBy::Relevance(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_relation_hops</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">path</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">path</span>) =&gt; <span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">hop</span>, <span class="kw-2">&amp;</span><span class="ident">OrderByHop::Relation</span>(<span class="kw">_</span>))),
-            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">pub fn </span>contains_relation_hops(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.path() {
+            <span class="prelude-val">Some</span>(path) =&gt; path.iter().any(|hop| <span class="macro">matches!</span>(hop, <span class="kw-2">&amp;</span>OrderByHop::Relation(<span class="kw">_</span>))),
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar</span>(
-        <span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>,
-        <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByHop</span><span class="op">&gt;</span>,
-        <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>,
-        <span class="ident">nulls_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NullsOrder</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">OrderByScalar</span> {
-            <span class="ident">field</span>,
-            <span class="ident">path</span>,
-            <span class="ident">sort_order</span>,
-            <span class="ident">nulls_order</span>,
+    <span class="kw">pub fn </span>scalar(
+        field: ScalarFieldRef,
+        path: Vec&lt;OrderByHop&gt;,
+        sort_order: SortOrder,
+        nulls_order: <span class="prelude-ty">Option</span>&lt;NullsOrder&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Scalar(OrderByScalar {
+            field,
+            path,
+            sort_order,
+            nulls_order,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_aggregation</span>(
-        <span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>,
-        <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByHop</span><span class="op">&gt;</span>,
-        <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>,
-        <span class="ident">sort_aggregation</span>: <span class="ident">SortAggregation</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::ScalarAggregation</span>(<span class="ident">OrderByScalarAggregation</span> {
-            <span class="ident">field</span>,
-            <span class="ident">path</span>,
-            <span class="ident">sort_order</span>,
-            <span class="ident">sort_aggregation</span>,
+    <span class="kw">pub fn </span>scalar_aggregation(
+        field: ScalarFieldRef,
+        path: Vec&lt;OrderByHop&gt;,
+        sort_order: SortOrder,
+        sort_aggregation: SortAggregation,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::ScalarAggregation(OrderByScalarAggregation {
+            field,
+            path,
+            sort_order,
+            sort_aggregation,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_many_aggregation</span>(
-        <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByHop</span><span class="op">&gt;</span>,
-        <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>,
-        <span class="ident">sort_aggregation</span>: <span class="ident">SortAggregation</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::ToManyAggregation</span>(<span class="ident">OrderByToManyAggregation</span> {
-            <span class="ident">path</span>,
-            <span class="ident">sort_order</span>,
-            <span class="ident">sort_aggregation</span>,
+    <span class="kw">pub fn </span>to_many_aggregation(
+        path: Vec&lt;OrderByHop&gt;,
+        sort_order: SortOrder,
+        sort_aggregation: SortAggregation,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::ToManyAggregation(OrderByToManyAggregation {
+            path,
+            sort_order,
+            sort_aggregation,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relevance</span>(<span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>, <span class="ident">search</span>: <span class="ident">String</span>, <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Relevance</span>(<span class="ident">OrderByRelevance</span> {
-            <span class="ident">fields</span>,
-            <span class="ident">sort_order</span>,
-            <span class="ident">search</span>,
+    <span class="kw">pub fn </span>relevance(fields: Vec&lt;ScalarFieldRef&gt;, search: String, sort_order: SortOrder) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Relevance(OrderByRelevance {
+            fields,
+            sort_order,
+            search,
         })
     }
 }
 
-<span class="doccomment">/// Describes a hop over to a relation or composite for an orderBy statement.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OrderByHop</span> {
-    <span class="ident">Relation</span>(<span class="ident">RelationFieldRef</span>),
-    <span class="ident">Composite</span>(<span class="ident">CompositeFieldRef</span>),
+<span class="doccomment">/// Describes a hop over to a relation or composite for an orderBy statement.
+</span><span class="attribute">#[derive(Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>OrderByHop {
+    Relation(RelationFieldRef),
+    Composite(CompositeFieldRef),
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">OrderByHop</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Relation&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{rf}&quot;</span>)).<span class="ident">finish</span>(),
-            <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Composite&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{cf}&quot;</span>)).<span class="ident">finish</span>(),
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>OrderByHop {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Relation(rf) =&gt; f.debug_tuple(<span class="string">&quot;Relation&quot;</span>).field(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{rf}&quot;</span>)).finish(),
+            <span class="self">Self</span>::Composite(cf) =&gt; f.debug_tuple(<span class="string">&quot;Composite&quot;</span>).field(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{cf}&quot;</span>)).finish(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">OrderByHop</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_relation_hop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">rf</span>),
-            <span class="ident">OrderByHop::Composite</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+<span class="kw">impl </span>OrderByHop {
+    <span class="kw">pub fn </span>into_relation_hop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            OrderByHop::Relation(rf) =&gt; <span class="prelude-val">Some</span>(rf),
+            OrderByHop::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OrderByHop</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">rf</span>.<span class="ident">clone</span>().<span class="ident">into</span>()
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt; <span class="kw">for </span>OrderByHop {
+    <span class="kw">fn </span>from(rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; <span class="self">Self </span>{
+        rf.clone().into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OrderByHop</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">cf</span>.<span class="ident">clone</span>().<span class="ident">into</span>()
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>CompositeFieldRef&gt; <span class="kw">for </span>OrderByHop {
+    <span class="kw">fn </span>from(cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="self">Self </span>{
+        cf.clone().into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OrderByHop</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rf</span>: <span class="ident">RelationFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Relation</span>(<span class="ident">rf</span>)
+<span class="kw">impl </span>From&lt;RelationFieldRef&gt; <span class="kw">for </span>OrderByHop {
+    <span class="kw">fn </span>from(rf: RelationFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Relation(rf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CompositeFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OrderByHop</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cf</span>: <span class="ident">CompositeFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">cf</span>)
+<span class="kw">impl </span>From&lt;CompositeFieldRef&gt; <span class="kw">for </span>OrderByHop {
+    <span class="kw">fn </span>from(cf: CompositeFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Composite(cf)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrderByScalar</span> {
-    <span class="kw">pub</span> <span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>,
-    <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByHop</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>,
-    <span class="kw">pub</span> <span class="ident">nulls_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NullsOrder</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>OrderByScalar {
+    <span class="kw">pub </span>field: ScalarFieldRef,
+    <span class="kw">pub </span>path: Vec&lt;OrderByHop&gt;,
+    <span class="kw">pub </span>sort_order: SortOrder,
+    <span class="kw">pub </span>nulls_order: <span class="prelude-ty">Option</span>&lt;NullsOrder&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrderByScalarAggregation</span> {
-    <span class="kw">pub</span> <span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>,
-    <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByHop</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>,
-    <span class="kw">pub</span> <span class="ident">sort_aggregation</span>: <span class="ident">SortAggregation</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>OrderByScalarAggregation {
+    <span class="kw">pub </span>field: ScalarFieldRef,
+    <span class="kw">pub </span>path: Vec&lt;OrderByHop&gt;,
+    <span class="kw">pub </span>sort_order: SortOrder,
+    <span class="kw">pub </span>sort_aggregation: SortAggregation,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrderByToManyAggregation</span> {
-    <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByHop</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>,
-    <span class="kw">pub</span> <span class="ident">sort_aggregation</span>: <span class="ident">SortAggregation</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>OrderByToManyAggregation {
+    <span class="kw">pub </span>path: Vec&lt;OrderByHop&gt;,
+    <span class="kw">pub </span>sort_order: SortOrder,
+    <span class="kw">pub </span>sort_aggregation: SortAggregation,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrderByRelevance</span> {
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>,
-    <span class="kw">pub</span> <span class="ident">search</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>OrderByRelevance {
+    <span class="kw">pub </span>fields: Vec&lt;ScalarFieldRef&gt;,
+    <span class="kw">pub </span>sort_order: SortOrder,
+    <span class="kw">pub </span>search: String,
 }
 
-<span class="kw">impl</span> <span class="ident">ToString</span> <span class="kw">for</span> <span class="ident">SortOrder</span> {
-    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SortOrder::Ascending</span> =&gt; <span class="ident">String::from</span>(<span class="string">&quot;ASC&quot;</span>),
-            <span class="ident">SortOrder::Descending</span> =&gt; <span class="ident">String::from</span>(<span class="string">&quot;DESC&quot;</span>),
+<span class="kw">impl </span>ToString <span class="kw">for </span>SortOrder {
+    <span class="kw">fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            SortOrder::Ascending =&gt; String::from(<span class="string">&quot;ASC&quot;</span>),
+            SortOrder::Descending =&gt; String::from(<span class="string">&quot;DESC&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OrderBy</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">OrderByScalar</span> {
-            <span class="ident">field</span>,
-            <span class="ident">path</span>: <span class="macro">vec!</span>[],
-            <span class="ident">sort_order</span>: <span class="ident">SortOrder::Ascending</span>,
-            <span class="ident">nulls_order</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>From&lt;ScalarFieldRef&gt; <span class="kw">for </span>OrderBy {
+    <span class="kw">fn </span>from(field: ScalarFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Scalar(OrderByScalar {
+            field,
+            path: <span class="macro">vec!</span>[],
+            sort_order: SortOrder::Ascending,
+            nulls_order: <span class="prelude-val">None</span>,
         })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

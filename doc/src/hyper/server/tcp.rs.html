@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/server/tcp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tcp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../hyper/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/server/tcp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tcp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../hyper/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -316,155 +316,155 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">SocketAddr</span>, <span class="ident">TcpListener</span> <span class="kw">as</span> <span class="ident">StdTcpListener</span>};
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::net::{SocketAddr, TcpListener <span class="kw">as </span>StdTcpListener};
+<span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use</span> <span class="ident">tokio::net::TcpListener</span>;
-<span class="kw">use</span> <span class="ident">tokio::time::Sleep</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">trace</span>};
+<span class="kw">use </span>tokio::net::TcpListener;
+<span class="kw">use </span>tokio::time::Sleep;
+<span class="kw">use </span>tracing::{debug, error, trace};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">task</span>, <span class="ident">Future</span>, <span class="ident">Pin</span>, <span class="ident">Poll</span>};
+<span class="kw">use </span><span class="kw">crate</span>::common::{task, Future, Pin, Poll};
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span> <span class="comment">// https://github.com/rust-lang/rust/issues/57411</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::addr_stream::AddrStream</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::accept::Accept</span>;
+<span class="attribute">#[allow(unreachable_pub)] </span><span class="comment">// https://github.com/rust-lang/rust/issues/57411
+</span><span class="kw">pub use </span><span class="self">self</span>::addr_stream::AddrStream;
+<span class="kw">use </span><span class="kw">super</span>::accept::Accept;
 
-<span class="doccomment">/// A stream of connections from binding to an address.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;streams do nothing unless polled&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AddrIncoming</span> {
-    <span class="ident">addr</span>: <span class="ident">SocketAddr</span>,
-    <span class="ident">listener</span>: <span class="ident">TcpListener</span>,
-    <span class="ident">sleep_on_errors</span>: <span class="ident">bool</span>,
-    <span class="ident">tcp_keepalive_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">tcp_nodelay</span>: <span class="ident">bool</span>,
-    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A stream of connections from binding to an address.
+</span><span class="attribute">#[must_use = <span class="string">&quot;streams do nothing unless polled&quot;</span>]
+</span><span class="kw">pub struct </span>AddrIncoming {
+    addr: SocketAddr,
+    listener: TcpListener,
+    sleep_on_errors: bool,
+    tcp_keepalive_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    tcp_nodelay: bool,
+    timeout: <span class="prelude-ty">Option</span>&lt;Pin&lt;Box&lt;Sleep&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">AddrIncoming</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">std_listener</span> <span class="op">=</span> <span class="ident">StdTcpListener::bind</span>(<span class="ident">addr</span>).<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_listen</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>AddrIncoming {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(addr: <span class="kw-2">&amp;</span>SocketAddr) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>std_listener = StdTcpListener::bind(addr).map_err(<span class="kw">crate</span>::Error::new_listen)<span class="question-mark">?</span>;
 
-        <span class="ident">AddrIncoming::from_std</span>(<span class="ident">std_listener</span>)
+        AddrIncoming::from_std(std_listener)
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_std</span>(<span class="ident">std_listener</span>: <span class="ident">StdTcpListener</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="comment">// TcpListener::from_std doesn&#39;t set O_NONBLOCK</span>
-        <span class="ident">std_listener</span>
-            .<span class="ident">set_nonblocking</span>(<span class="bool-val">true</span>)
-            .<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_listen</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">TcpListener::from_std</span>(<span class="ident">std_listener</span>).<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_listen</span>)<span class="question-mark">?</span>;
-        <span class="ident">AddrIncoming::from_listener</span>(<span class="ident">listener</span>)
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>from_std(std_listener: StdTcpListener) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="comment">// TcpListener::from_std doesn&#39;t set O_NONBLOCK
+        </span>std_listener
+            .set_nonblocking(<span class="bool-val">true</span>)
+            .map_err(<span class="kw">crate</span>::Error::new_listen)<span class="question-mark">?</span>;
+        <span class="kw">let </span>listener = TcpListener::from_std(std_listener).map_err(<span class="kw">crate</span>::Error::new_listen)<span class="question-mark">?</span>;
+        AddrIncoming::from_listener(listener)
     }
 
-    <span class="doccomment">/// Creates a new `AddrIncoming` binding to provided socket address.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bind</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">AddrIncoming::new</span>(<span class="ident">addr</span>)
+    <span class="doccomment">/// Creates a new `AddrIncoming` binding to provided socket address.
+    </span><span class="kw">pub fn </span>bind(addr: <span class="kw-2">&amp;</span>SocketAddr) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        AddrIncoming::new(addr)
     }
 
-    <span class="doccomment">/// Creates a new `AddrIncoming` from an existing `tokio::net::TcpListener`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_listener</span>(<span class="ident">listener</span>: <span class="ident">TcpListener</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">listener</span>.<span class="ident">local_addr</span>().<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_listen</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">AddrIncoming</span> {
-            <span class="ident">listener</span>,
-            <span class="ident">addr</span>,
-            <span class="ident">sleep_on_errors</span>: <span class="bool-val">true</span>,
-            <span class="ident">tcp_keepalive_timeout</span>: <span class="prelude-val">None</span>,
-            <span class="ident">tcp_nodelay</span>: <span class="bool-val">false</span>,
-            <span class="ident">timeout</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Creates a new `AddrIncoming` from an existing `tokio::net::TcpListener`.
+    </span><span class="kw">pub fn </span>from_listener(listener: TcpListener) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>addr = listener.local_addr().map_err(<span class="kw">crate</span>::Error::new_listen)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(AddrIncoming {
+            listener,
+            addr,
+            sleep_on_errors: <span class="bool-val">true</span>,
+            tcp_keepalive_timeout: <span class="prelude-val">None</span>,
+            tcp_nodelay: <span class="bool-val">false</span>,
+            timeout: <span class="prelude-val">None</span>,
         })
     }
 
-    <span class="doccomment">/// Get the local address bound to this listener.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SocketAddr</span> {
-        <span class="self">self</span>.<span class="ident">addr</span>
+    <span class="doccomment">/// Get the local address bound to this listener.
+    </span><span class="kw">pub fn </span>local_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SocketAddr {
+        <span class="self">self</span>.addr
     }
 
-    <span class="doccomment">/// Set whether TCP keepalive messages are enabled on accepted connections.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `None` is specified, keepalive is disabled, otherwise the duration</span>
-    <span class="doccomment">/// specified will be the time to remain idle before sending TCP keepalive</span>
-    <span class="doccomment">/// probes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_keepalive</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">keepalive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">tcp_keepalive_timeout</span> <span class="op">=</span> <span class="ident">keepalive</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// Set whether TCP keepalive messages are enabled on accepted connections.
+    ///
+    /// If `None` is specified, keepalive is disabled, otherwise the duration
+    /// specified will be the time to remain idle before sending TCP keepalive
+    /// probes.
+    </span><span class="kw">pub fn </span>set_keepalive(<span class="kw-2">&amp;mut </span><span class="self">self</span>, keepalive: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.tcp_keepalive_timeout = keepalive;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the value of `TCP_NODELAY` option for accepted connections.
+    </span><span class="kw">pub fn </span>set_nodelay(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enabled: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.tcp_nodelay = enabled;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set whether to sleep on accept errors.
+    ///
+    /// A possible scenario is that the process has hit the max open files
+    /// allowed, and so trying to accept a new connection will fail with
+    /// `EMFILE`. In some cases, it&#39;s preferable to just wait for some time, if
+    /// the application will likely close some files (or connections), and try
+    /// to accept the connection again. If this option is `true`, the error
+    /// will be logged at the `error` level, since it is still a big deal,
+    /// and then the listener will sleep for 1 second.
+    ///
+    /// In other cases, hitting the max open files should be treat similarly
+    /// to being out-of-memory, and simply error (and shutdown). Setting
+    /// this option to `false` will allow that.
+    ///
+    /// Default is `true`.
+    </span><span class="kw">pub fn </span>set_sleep_on_errors(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: bool) {
+        <span class="self">self</span>.sleep_on_errors = val;
     }
 
-    <span class="doccomment">/// Set the value of `TCP_NODELAY` option for accepted connections.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_nodelay</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">tcp_nodelay</span> <span class="op">=</span> <span class="ident">enabled</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set whether to sleep on accept errors.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A possible scenario is that the process has hit the max open files</span>
-    <span class="doccomment">/// allowed, and so trying to accept a new connection will fail with</span>
-    <span class="doccomment">/// `EMFILE`. In some cases, it&#39;s preferable to just wait for some time, if</span>
-    <span class="doccomment">/// the application will likely close some files (or connections), and try</span>
-    <span class="doccomment">/// to accept the connection again. If this option is `true`, the error</span>
-    <span class="doccomment">/// will be logged at the `error` level, since it is still a big deal,</span>
-    <span class="doccomment">/// and then the listener will sleep for 1 second.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In other cases, hitting the max open files should be treat similarly</span>
-    <span class="doccomment">/// to being out-of-memory, and simply error (and shutdown). Setting</span>
-    <span class="doccomment">/// this option to `false` will allow that.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is `true`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_sleep_on_errors</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">sleep_on_errors</span> <span class="op">=</span> <span class="ident">val</span>;
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_next_</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">AddrStream</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// Check if a previous timeout is active that was set by IO errors.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">to</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">timeout</span> {
-            <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">to</span>).<span class="ident">poll</span>(<span class="ident">cx</span>));
+    <span class="kw">fn </span>poll_next_(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;AddrStream&gt;&gt; {
+        <span class="comment">// Check if a previous timeout is active that was set by IO errors.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>to) = <span class="self">self</span>.timeout {
+            <span class="macro">ready!</span>(Pin::new(to).poll(cx));
         }
-        <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="self">self</span>.timeout = <span class="prelude-val">None</span>;
 
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">listener</span>.<span class="ident">poll_accept</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Ok</span>((<span class="ident">socket</span>, <span class="ident">remote_addr</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">tcp_keepalive_timeout</span> {
-                        <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">socket2::SockRef::from</span>(<span class="kw-2">&amp;</span><span class="ident">socket</span>);
-                        <span class="kw">let</span> <span class="ident">conf</span> <span class="op">=</span> <span class="ident">socket2::TcpKeepalive::new</span>().<span class="ident">with_time</span>(<span class="ident">dur</span>);
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">socket</span>.<span class="ident">set_tcp_keepalive</span>(<span class="kw-2">&amp;</span><span class="ident">conf</span>) {
-                            <span class="macro">trace!</span>(<span class="string">&quot;error trying to set TCP keepalive: {}&quot;</span>, <span class="ident">e</span>);
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="macro">ready!</span>(<span class="self">self</span>.listener.poll_accept(cx)) {
+                <span class="prelude-val">Ok</span>((socket, remote_addr)) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(dur) = <span class="self">self</span>.tcp_keepalive_timeout {
+                        <span class="kw">let </span>socket = socket2::SockRef::from(<span class="kw-2">&amp;</span>socket);
+                        <span class="kw">let </span>conf = socket2::TcpKeepalive::new().with_time(dur);
+                        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = socket.set_tcp_keepalive(<span class="kw-2">&amp;</span>conf) {
+                            <span class="macro">trace!</span>(<span class="string">&quot;error trying to set TCP keepalive: {}&quot;</span>, e);
                         }
                     }
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">socket</span>.<span class="ident">set_nodelay</span>(<span class="self">self</span>.<span class="ident">tcp_nodelay</span>) {
-                        <span class="macro">trace!</span>(<span class="string">&quot;error trying to set TCP nodelay: {}&quot;</span>, <span class="ident">e</span>);
+                    <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = socket.set_nodelay(<span class="self">self</span>.tcp_nodelay) {
+                        <span class="macro">trace!</span>(<span class="string">&quot;error trying to set TCP nodelay: {}&quot;</span>, e);
                     }
-                    <span class="kw">let</span> <span class="ident">local_addr</span> <span class="op">=</span> <span class="ident">socket</span>.<span class="ident">local_addr</span>()<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">AddrStream::new</span>(<span class="ident">socket</span>, <span class="ident">remote_addr</span>, <span class="ident">local_addr</span>)));
+                    <span class="kw">let </span>local_addr = socket.local_addr()<span class="question-mark">?</span>;
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(AddrStream::new(socket, remote_addr, local_addr)));
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                    <span class="comment">// Connection errors can be ignored directly, continue by</span>
-                    <span class="comment">// accepting the next request.</span>
-                    <span class="kw">if</span> <span class="ident">is_connection_error</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>) {
-                        <span class="macro">debug!</span>(<span class="string">&quot;accepted connection already errored: {}&quot;</span>, <span class="ident">e</span>);
+                <span class="prelude-val">Err</span>(e) =&gt; {
+                    <span class="comment">// Connection errors can be ignored directly, continue by
+                    // accepting the next request.
+                    </span><span class="kw">if </span>is_connection_error(<span class="kw-2">&amp;</span>e) {
+                        <span class="macro">debug!</span>(<span class="string">&quot;accepted connection already errored: {}&quot;</span>, e);
                         <span class="kw">continue</span>;
                     }
 
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sleep_on_errors</span> {
-                        <span class="macro">error!</span>(<span class="string">&quot;accept error: {}&quot;</span>, <span class="ident">e</span>);
+                    <span class="kw">if </span><span class="self">self</span>.sleep_on_errors {
+                        <span class="macro">error!</span>(<span class="string">&quot;accept error: {}&quot;</span>, e);
 
-                        <span class="comment">// Sleep 1s.</span>
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">Box::pin</span>(<span class="ident">tokio::time::sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>)));
+                        <span class="comment">// Sleep 1s.
+                        </span><span class="kw">let </span><span class="kw-2">mut </span>timeout = Box::pin(tokio::time::sleep(Duration::from_secs(<span class="number">1</span>)));
 
-                        <span class="kw">match</span> <span class="ident">timeout</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                            <span class="ident">Poll::Ready</span>(()) =&gt; {
-                                <span class="comment">// Wow, it&#39;s been a second already? Ok then...</span>
-                                <span class="kw">continue</span>;
+                        <span class="kw">match </span>timeout.as_mut().poll(cx) {
+                            Poll::Ready(()) =&gt; {
+                                <span class="comment">// Wow, it&#39;s been a second already? Ok then...
+                                </span><span class="kw">continue</span>;
                             }
-                            <span class="ident">Poll::Pending</span> =&gt; {
-                                <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timeout</span>);
-                                <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+                            Poll::Pending =&gt; {
+                                <span class="self">self</span>.timeout = <span class="prelude-val">Some</span>(timeout);
+                                <span class="kw">return </span>Poll::Pending;
                             }
                         }
-                    } <span class="kw">else</span> {
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>));
+                    } <span class="kw">else </span>{
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(e));
                     }
                 }
             }
@@ -472,167 +472,167 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Accept</span> <span class="kw">for</span> <span class="ident">AddrIncoming</span> {
-    <span class="kw">type</span> <span class="ident">Conn</span> <span class="op">=</span> <span class="ident">AddrStream</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
+<span class="kw">impl </span>Accept <span class="kw">for </span>AddrIncoming {
+    <span class="kw">type </span>Conn = AddrStream;
+    <span class="kw">type </span>Error = io::Error;
 
-    <span class="kw">fn</span> <span class="ident">poll_accept</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Conn</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">poll_next_</span>(<span class="ident">cx</span>));
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">result</span>))
+    <span class="kw">fn </span>poll_accept(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Conn, <span class="self">Self</span>::Error&gt;&gt;&gt; {
+        <span class="kw">let </span>result = <span class="macro">ready!</span>(<span class="self">self</span>.poll_next_(cx));
+        Poll::Ready(<span class="prelude-val">Some</span>(result))
     }
 }
 
-<span class="doccomment">/// This function defines errors that are per-connection. Which basically</span>
-<span class="doccomment">/// means that if we get this error from `accept()` system call it means</span>
-<span class="doccomment">/// next connection might be ready to be accepted.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All other errors will incur a timeout before next `accept()` is performed.</span>
-<span class="doccomment">/// The timeout is useful to handle resource exhaustion errors like ENFILE</span>
-<span class="doccomment">/// and EMFILE. Otherwise, could enter into tight loop.</span>
-<span class="kw">fn</span> <span class="ident">is_connection_error</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="ident">io::Error</span>) -&gt; <span class="ident">bool</span> {
+<span class="doccomment">/// This function defines errors that are per-connection. Which basically
+/// means that if we get this error from `accept()` system call it means
+/// next connection might be ready to be accepted.
+///
+/// All other errors will incur a timeout before next `accept()` is performed.
+/// The timeout is useful to handle resource exhaustion errors like ENFILE
+/// and EMFILE. Otherwise, could enter into tight loop.
+</span><span class="kw">fn </span>is_connection_error(e: <span class="kw-2">&amp;</span>io::Error) -&gt; bool {
     <span class="macro">matches!</span>(
-        <span class="ident">e</span>.<span class="ident">kind</span>(),
-        <span class="ident">io::ErrorKind::ConnectionRefused</span>
-            <span class="op">|</span> <span class="ident">io::ErrorKind::ConnectionAborted</span>
-            <span class="op">|</span> <span class="ident">io::ErrorKind::ConnectionReset</span>
+        e.kind(),
+        io::ErrorKind::ConnectionRefused
+            | io::ErrorKind::ConnectionAborted
+            | io::ErrorKind::ConnectionReset
     )
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">AddrIncoming</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;AddrIncoming&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;addr&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">addr</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;sleep_on_errors&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sleep_on_errors</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;tcp_keepalive_timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tcp_keepalive_timeout</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;tcp_nodelay&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tcp_nodelay</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>AddrIncoming {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;AddrIncoming&quot;</span>)
+            .field(<span class="string">&quot;addr&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.addr)
+            .field(<span class="string">&quot;sleep_on_errors&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.sleep_on_errors)
+            .field(<span class="string">&quot;tcp_keepalive_timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.tcp_keepalive_timeout)
+            .field(<span class="string">&quot;tcp_nodelay&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.tcp_nodelay)
+            .finish()
     }
 }
 
-<span class="kw">mod</span> <span class="ident">addr_stream</span> {
-    <span class="kw">use</span> <span class="ident">std::io</span>;
-    <span class="kw">use</span> <span class="ident">std::net::SocketAddr</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-    <span class="kw">use</span> <span class="ident">std::os::unix::io</span>::{<span class="ident">AsRawFd</span>, <span class="ident">RawFd</span>};
-    <span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
-    <span class="kw">use</span> <span class="ident">tokio::net::TcpStream</span>;
+<span class="kw">mod </span>addr_stream {
+    <span class="kw">use </span>std::io;
+    <span class="kw">use </span>std::net::SocketAddr;
+    <span class="attribute">#[cfg(unix)]
+    </span><span class="kw">use </span>std::os::unix::io::{AsRawFd, RawFd};
+    <span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
+    <span class="kw">use </span>tokio::net::TcpStream;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">task</span>, <span class="ident">Pin</span>, <span class="ident">Poll</span>};
+    <span class="kw">use </span><span class="kw">crate</span>::common::{task, Pin, Poll};
 
-    <span class="macro">pin_project_lite::pin_project!</span> {
-        <span class="doccomment">/// A transport returned yieled by `AddrIncoming`.</span>
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AddrStream</span> {
-            <span class="attribute">#[<span class="ident">pin</span>]</span>
-            <span class="ident">inner</span>: <span class="ident">TcpStream</span>,
-            <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">remote_addr</span>: <span class="ident">SocketAddr</span>,
-            <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">local_addr</span>: <span class="ident">SocketAddr</span>
+    <span class="macro">pin_project_lite::pin_project! </span>{
+        <span class="doccomment">/// A transport returned yieled by `AddrIncoming`.
+        </span><span class="attribute">#[derive(Debug)]
+        </span><span class="kw">pub struct </span>AddrStream {
+            <span class="attribute">#[pin]
+            </span>inner: TcpStream,
+            <span class="kw">pub</span>(<span class="kw">super</span>) remote_addr: SocketAddr,
+            <span class="kw">pub</span>(<span class="kw">super</span>) local_addr: SocketAddr
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">AddrStream</span> {
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-            <span class="ident">tcp</span>: <span class="ident">TcpStream</span>,
-            <span class="ident">remote_addr</span>: <span class="ident">SocketAddr</span>,
-            <span class="ident">local_addr</span>: <span class="ident">SocketAddr</span>,
-        ) -&gt; <span class="ident">AddrStream</span> {
-            <span class="ident">AddrStream</span> {
-                <span class="ident">inner</span>: <span class="ident">tcp</span>,
-                <span class="ident">remote_addr</span>,
-                <span class="ident">local_addr</span>,
+    <span class="kw">impl </span>AddrStream {
+        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(
+            tcp: TcpStream,
+            remote_addr: SocketAddr,
+            local_addr: SocketAddr,
+        ) -&gt; AddrStream {
+            AddrStream {
+                inner: tcp,
+                remote_addr,
+                local_addr,
             }
         }
 
-        <span class="doccomment">/// Returns the remote (peer) address of this connection.</span>
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remote_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SocketAddr</span> {
-            <span class="self">self</span>.<span class="ident">remote_addr</span>
+        <span class="doccomment">/// Returns the remote (peer) address of this connection.
+        </span><span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span>remote_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SocketAddr {
+            <span class="self">self</span>.remote_addr
         }
 
-        <span class="doccomment">/// Returns the local address of this connection.</span>
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SocketAddr</span> {
-            <span class="self">self</span>.<span class="ident">local_addr</span>
+        <span class="doccomment">/// Returns the local address of this connection.
+        </span><span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span>local_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SocketAddr {
+            <span class="self">self</span>.local_addr
         }
 
-        <span class="doccomment">/// Consumes the AddrStream and returns the underlying IO object</span>
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">TcpStream</span> {
-            <span class="self">self</span>.<span class="ident">inner</span>
+        <span class="doccomment">/// Consumes the AddrStream and returns the underlying IO object
+        </span><span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; TcpStream {
+            <span class="self">self</span>.inner
         }
 
-        <span class="doccomment">/// Attempt to receive data on the socket, without removing that data</span>
-        <span class="doccomment">/// from the queue, registering the current task for wakeup if data is</span>
-        <span class="doccomment">/// not yet available.</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_peek</span>(
-            <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">tokio::io::ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_peek</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
-        }
-    }
-
-    <span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">AddrStream</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">poll_read</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+        <span class="doccomment">/// Attempt to receive data on the socket, without removing that data
+        /// from the queue, registering the current task for wakeup if data is
+        /// not yet available.
+        </span><span class="kw">pub fn </span>poll_peek(
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+            cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            buf: <span class="kw-2">&amp;mut </span>tokio::io::ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+            <span class="self">self</span>.inner.poll_peek(cx, buf)
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">AddrStream</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">poll_write</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">poll_write_vectored</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">io::IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_write_vectored</span>(<span class="ident">cx</span>, <span class="ident">bufs</span>)
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="comment">// TCP flush is a noop</span>
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>)
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">is_write_vectored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-            <span class="comment">// Note that since `self.inner` is a `TcpStream`, this could</span>
-            <span class="comment">// *probably* be hard-coded to return `true`...but it seems more</span>
-            <span class="comment">// correct to ask it anyway (maybe we&#39;re on some platform without</span>
-            <span class="comment">// scatter-gather IO?)</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">is_write_vectored</span>()
+    <span class="kw">impl </span>AsyncRead <span class="kw">for </span>AddrStream {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>poll_read(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+            <span class="self">self</span>.project().inner.poll_read(cx, buf)
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-    <span class="kw">impl</span> <span class="ident">AsRawFd</span> <span class="kw">for</span> <span class="ident">AddrStream</span> {
-        <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_raw_fd</span>()
+    <span class="kw">impl </span>AsyncWrite <span class="kw">for </span>AddrStream {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>poll_write(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            buf: <span class="kw-2">&amp;</span>[u8],
+        ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+            <span class="self">self</span>.project().inner.poll_write(cx, buf)
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>poll_write_vectored(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            bufs: <span class="kw-2">&amp;</span>[io::IoSlice&lt;<span class="lifetime">&#39;_</span>&gt;],
+        ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+            <span class="self">self</span>.project().inner.poll_write_vectored(cx, bufs)
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, _cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+            <span class="comment">// TCP flush is a noop
+            </span>Poll::Ready(<span class="prelude-val">Ok</span>(()))
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>poll_shutdown(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+            <span class="self">self</span>.project().inner.poll_shutdown(cx)
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>is_write_vectored(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+            <span class="comment">// Note that since `self.inner` is a `TcpStream`, this could
+            // *probably* be hard-coded to return `true`...but it seems more
+            // correct to ask it anyway (maybe we&#39;re on some platform without
+            // scatter-gather IO?)
+            </span><span class="self">self</span>.inner.is_write_vectored()
+        }
+    }
+
+    <span class="attribute">#[cfg(unix)]
+    </span><span class="kw">impl </span>AsRawFd <span class="kw">for </span>AddrStream {
+        <span class="kw">fn </span>as_raw_fd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawFd {
+            <span class="self">self</span>.inner.as_raw_fd()
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/float.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>float.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/float.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>float.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -181,188 +181,188 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
-</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.</span>
+</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
-<span class="comment">// FLOAT TYPE</span>
+// FLOAT TYPE
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::num</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::rounding</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::shift</span>::<span class="kw-2">*</span>;
+</span><span class="kw">use </span><span class="kw">super</span>::num::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::rounding::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::shift::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Extended precision floating-point type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Private implementation, exposed only for testing purposes.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ExtendedFloat</span> {
-    <span class="doccomment">/// Mantissa for the extended-precision float.</span>
-    <span class="kw">pub</span> <span class="ident">mant</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Binary exponent for the extended-precision float.</span>
-    <span class="kw">pub</span> <span class="ident">exp</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// Extended precision floating-point type.
+///
+/// Private implementation, exposed only for testing purposes.
+</span><span class="attribute">#[doc(hidden)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ExtendedFloat {
+    <span class="doccomment">/// Mantissa for the extended-precision float.
+    </span><span class="kw">pub </span>mant: u64,
+    <span class="doccomment">/// Binary exponent for the extended-precision float.
+    </span><span class="kw">pub </span>exp: i32,
 }
 
-<span class="kw">impl</span> <span class="ident">ExtendedFloat</span> {
-    <span class="comment">// PROPERTIES</span>
+<span class="kw">impl </span>ExtendedFloat {
+    <span class="comment">// PROPERTIES
 
-    <span class="comment">// OPERATIONS</span>
+    // OPERATIONS
 
-    <span class="doccomment">/// Multiply two normalized extended-precision floats, as if by `a*b`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The precision is maximal when the numbers are normalized, however,</span>
-    <span class="doccomment">/// decent precision will occur as long as both values have high bits</span>
-    <span class="doccomment">/// set. The result is not normalized.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Algorithm:</span>
-    <span class="doccomment">///     1. Non-signed multiplication of mantissas (requires 2x as many bits as input).</span>
-    <span class="doccomment">///     2. Normalization of the result (not done here).</span>
-    <span class="doccomment">///     3. Addition of exponents.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">ExtendedFloat</span>) -&gt; <span class="ident">ExtendedFloat</span> {
-        <span class="comment">// Logic check, values must be decently normalized prior to multiplication.</span>
-        <span class="macro">debug_assert!</span>((<span class="self">self</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">u64::HIMASK</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) <span class="op">&amp;&amp;</span> (<span class="ident">b</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">u64::HIMASK</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>));
+    </span><span class="doccomment">/// Multiply two normalized extended-precision floats, as if by `a*b`.
+    ///
+    /// The precision is maximal when the numbers are normalized, however,
+    /// decent precision will occur as long as both values have high bits
+    /// set. The result is not normalized.
+    ///
+    /// Algorithm:
+    ///     1. Non-signed multiplication of mantissas (requires 2x as many bits as input).
+    ///     2. Normalization of the result (not done here).
+    ///     3. Addition of exponents.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mul(<span class="kw-2">&amp;</span><span class="self">self</span>, b: <span class="kw-2">&amp;</span>ExtendedFloat) -&gt; ExtendedFloat {
+        <span class="comment">// Logic check, values must be decently normalized prior to multiplication.
+        </span><span class="macro">debug_assert!</span>((<span class="self">self</span>.mant &amp; u64::HIMASK != <span class="number">0</span>) &amp;&amp; (b.mant &amp; u64::HIMASK != <span class="number">0</span>));
 
-        <span class="comment">// Extract high-and-low masks.</span>
-        <span class="kw">let</span> <span class="ident">ah</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mant</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">u64::HALF</span>;
-        <span class="kw">let</span> <span class="ident">al</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">u64::LOMASK</span>;
-        <span class="kw">let</span> <span class="ident">bh</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">mant</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">u64::HALF</span>;
-        <span class="kw">let</span> <span class="ident">bl</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">u64::LOMASK</span>;
+        <span class="comment">// Extract high-and-low masks.
+        </span><span class="kw">let </span>ah = <span class="self">self</span>.mant &gt;&gt; u64::HALF;
+        <span class="kw">let </span>al = <span class="self">self</span>.mant &amp; u64::LOMASK;
+        <span class="kw">let </span>bh = b.mant &gt;&gt; u64::HALF;
+        <span class="kw">let </span>bl = b.mant &amp; u64::LOMASK;
 
-        <span class="comment">// Get our products</span>
-        <span class="kw">let</span> <span class="ident">ah_bl</span> <span class="op">=</span> <span class="ident">ah</span> <span class="op">*</span> <span class="ident">bl</span>;
-        <span class="kw">let</span> <span class="ident">al_bh</span> <span class="op">=</span> <span class="ident">al</span> <span class="op">*</span> <span class="ident">bh</span>;
-        <span class="kw">let</span> <span class="ident">al_bl</span> <span class="op">=</span> <span class="ident">al</span> <span class="op">*</span> <span class="ident">bl</span>;
-        <span class="kw">let</span> <span class="ident">ah_bh</span> <span class="op">=</span> <span class="ident">ah</span> <span class="op">*</span> <span class="ident">bh</span>;
+        <span class="comment">// Get our products
+        </span><span class="kw">let </span>ah_bl = ah * bl;
+        <span class="kw">let </span>al_bh = al * bh;
+        <span class="kw">let </span>al_bl = al * bl;
+        <span class="kw">let </span>ah_bh = ah * bh;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> (<span class="ident">ah_bl</span> <span class="op">&amp;</span> <span class="ident">u64::LOMASK</span>) <span class="op">+</span> (<span class="ident">al_bh</span> <span class="op">&amp;</span> <span class="ident">u64::LOMASK</span>) <span class="op">+</span> (<span class="ident">al_bl</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">u64::HALF</span>);
-        <span class="comment">// round up</span>
-        <span class="ident">tmp</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">u64::HALF</span> <span class="op">-</span> <span class="number">1</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>tmp = (ah_bl &amp; u64::LOMASK) + (al_bh &amp; u64::LOMASK) + (al_bl &gt;&gt; u64::HALF);
+        <span class="comment">// round up
+        </span>tmp += <span class="number">1 </span>&lt;&lt; (u64::HALF - <span class="number">1</span>);
 
-        <span class="ident">ExtendedFloat</span> {
-            <span class="ident">mant</span>: <span class="ident">ah_bh</span> <span class="op">+</span> (<span class="ident">ah_bl</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">u64::HALF</span>) <span class="op">+</span> (<span class="ident">al_bh</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">u64::HALF</span>) <span class="op">+</span> (<span class="ident">tmp</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">u64::HALF</span>),
-            <span class="ident">exp</span>: <span class="self">self</span>.<span class="ident">exp</span> <span class="op">+</span> <span class="ident">b</span>.<span class="ident">exp</span> <span class="op">+</span> <span class="ident">u64::FULL</span>,
+        ExtendedFloat {
+            mant: ah_bh + (ah_bl &gt;&gt; u64::HALF) + (al_bh &gt;&gt; u64::HALF) + (tmp &gt;&gt; u64::HALF),
+            exp: <span class="self">self</span>.exp + b.exp + u64::FULL,
         }
     }
 
-    <span class="doccomment">/// Multiply in-place, as if by `a*b`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The result is not normalized.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">imul</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">ExtendedFloat</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mul</span>(<span class="ident">b</span>);
+    <span class="doccomment">/// Multiply in-place, as if by `a*b`.
+    ///
+    /// The result is not normalized.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>imul(<span class="kw-2">&amp;mut </span><span class="self">self</span>, b: <span class="kw-2">&amp;</span>ExtendedFloat) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.mul(b);
     }
 
-    <span class="comment">// NORMALIZE</span>
+    <span class="comment">// NORMALIZE
 
-    <span class="doccomment">/// Normalize float-point number.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Shift the mantissa so the number of leading zeros is 0, or the value</span>
-    <span class="doccomment">/// itself is 0.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Get the number of bytes shifted.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">normalize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="comment">// Note:</span>
-        <span class="comment">// Using the cltz intrinsic via leading_zeros is way faster (~10x)</span>
-        <span class="comment">// than shifting 1-bit at a time, via while loop, and also way</span>
-        <span class="comment">// faster (~2x) than an unrolled loop that checks at 32, 16, 4,</span>
-        <span class="comment">// 2, and 1 bit.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Using a modulus of pow2 (which will get optimized to a bitwise</span>
-        <span class="comment">// and with 0x3F or faster) is slightly slower than an if/then,</span>
-        <span class="comment">// however, removing the if/then will likely optimize more branched</span>
-        <span class="comment">// code as it removes conditional logic.</span>
+    </span><span class="doccomment">/// Normalize float-point number.
+    ///
+    /// Shift the mantissa so the number of leading zeros is 0, or the value
+    /// itself is 0.
+    ///
+    /// Get the number of bytes shifted.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>normalize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; u32 {
+        <span class="comment">// Note:
+        // Using the cltz intrinsic via leading_zeros is way faster (~10x)
+        // than shifting 1-bit at a time, via while loop, and also way
+        // faster (~2x) than an unrolled loop that checks at 32, 16, 4,
+        // 2, and 1 bit.
+        //
+        // Using a modulus of pow2 (which will get optimized to a bitwise
+        // and with 0x3F or faster) is slightly slower than an if/then,
+        // however, removing the if/then will likely optimize more branched
+        // code as it removes conditional logic.
 
-        <span class="comment">// Calculate the number of leading zeros, and then zero-out</span>
-        <span class="comment">// any overflowing bits, to avoid shl overflow when self.mant == 0.</span>
-        <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">mant</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="number">0</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">mant</span>.<span class="ident">leading_zeros</span>()
+        // Calculate the number of leading zeros, and then zero-out
+        // any overflowing bits, to avoid shl overflow when self.mant == 0.
+        </span><span class="kw">let </span>shift = <span class="kw">if </span><span class="self">self</span>.mant == <span class="number">0 </span>{
+            <span class="number">0
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.mant.leading_zeros()
         };
-        <span class="ident">shl</span>(<span class="self">self</span>, <span class="ident">shift</span> <span class="kw">as</span> <span class="ident">i32</span>);
-        <span class="ident">shift</span>
+        shl(<span class="self">self</span>, shift <span class="kw">as </span>i32);
+        shift
     }
 
-    <span class="comment">// ROUND</span>
+    <span class="comment">// ROUND
 
-    <span class="doccomment">/// Lossy round float-point number to native mantissa boundaries.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">round_to_native</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Algorithm</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">algorithm</span>: <span class="ident">Algorithm</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Float</span>,
-        <span class="ident">Algorithm</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">i32</span>),
+    </span><span class="doccomment">/// Lossy round float-point number to native mantissa boundaries.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>round_to_native&lt;F, Algorithm&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, algorithm: Algorithm)
+    <span class="kw">where
+        </span>F: Float,
+        Algorithm: FnOnce(<span class="kw-2">&amp;mut </span>ExtendedFloat, i32),
     {
-        <span class="ident">round_to_native</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">algorithm</span>);
+        round_to_native::&lt;F, <span class="kw">_</span>&gt;(<span class="self">self</span>, algorithm);
     }
 
-    <span class="comment">// FROM</span>
+    <span class="comment">// FROM
 
-    <span class="doccomment">/// Create extended float from native float.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_float</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Float</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ExtendedFloat</span> {
-        <span class="ident">from_float</span>(<span class="ident">f</span>)
+    </span><span class="doccomment">/// Create extended float from native float.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>from_float&lt;F: Float&gt;(f: F) -&gt; ExtendedFloat {
+        from_float(f)
     }
 
-    <span class="comment">// INTO</span>
+    <span class="comment">// INTO
 
-    <span class="doccomment">/// Convert into default-rounded, lower-precision native float.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_float</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Float</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">F</span> {
-        <span class="self">self</span>.<span class="ident">round_to_native</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">round_nearest_tie_even</span>);
-        <span class="ident">into_float</span>(<span class="self">self</span>)
+    </span><span class="doccomment">/// Convert into default-rounded, lower-precision native float.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_float&lt;F: Float&gt;(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; F {
+        <span class="self">self</span>.round_to_native::&lt;F, <span class="kw">_</span>&gt;(round_nearest_tie_even);
+        into_float(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Convert into downward-rounded, lower-precision native float.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_downward_float</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Float</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">F</span> {
-        <span class="self">self</span>.<span class="ident">round_to_native</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">round_downward</span>);
-        <span class="ident">into_float</span>(<span class="self">self</span>)
-    }
-}
-
-<span class="comment">// FROM FLOAT</span>
-
-<span class="comment">// Import ExtendedFloat from native float.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_float</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ExtendedFloat</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Float</span>,
-{
-    <span class="ident">ExtendedFloat</span> {
-        <span class="ident">mant</span>: <span class="ident">u64::as_cast</span>(<span class="ident">f</span>.<span class="ident">mantissa</span>()),
-        <span class="ident">exp</span>: <span class="ident">f</span>.<span class="ident">exponent</span>(),
+    <span class="doccomment">/// Convert into downward-rounded, lower-precision native float.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_downward_float&lt;F: Float&gt;(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; F {
+        <span class="self">self</span>.round_to_native::&lt;F, <span class="kw">_</span>&gt;(round_downward);
+        into_float(<span class="self">self</span>)
     }
 }
 
-<span class="comment">// INTO FLOAT</span>
+<span class="comment">// FROM FLOAT
 
-<span class="comment">// Export extended-precision float to native float.</span>
-<span class="comment">//</span>
-<span class="comment">// The extended-precision float must be in native float representation,</span>
-<span class="comment">// with overflow/underflow appropriately handled.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_float</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">fp</span>: <span class="ident">ExtendedFloat</span>) -&gt; <span class="ident">F</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Float</span>,
+// Import ExtendedFloat from native float.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_float&lt;F&gt;(f: F) -&gt; ExtendedFloat
+<span class="kw">where
+    </span>F: Float,
 {
-    <span class="comment">// Export floating-point number.</span>
-    <span class="kw">if</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">&lt;</span> <span class="ident">F::DENORMAL_EXPONENT</span> {
-        <span class="comment">// sub-denormal, underflow</span>
-        <span class="ident">F::ZERO</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::MAX_EXPONENT</span> {
-        <span class="comment">// overflow</span>
-        <span class="ident">F::from_bits</span>(<span class="ident">F::INFINITY_BITS</span>)
-    } <span class="kw">else</span> {
-        <span class="comment">// calculate the exp and fraction bits, and return a float from bits.</span>
-        <span class="kw">let</span> <span class="ident">exp</span>: <span class="ident">u64</span>;
-        <span class="kw">if</span> (<span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">==</span> <span class="ident">F::DENORMAL_EXPONENT</span>) <span class="op">&amp;&amp;</span> (<span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">F::HIDDEN_BIT_MASK</span>.<span class="ident">as_u64</span>()) <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">exp</span> <span class="op">=</span> <span class="number">0</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">exp</span> <span class="op">=</span> (<span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">+</span> <span class="ident">F::EXPONENT_BIAS</span>) <span class="kw">as</span> <span class="ident">u64</span>;
+    ExtendedFloat {
+        mant: u64::as_cast(f.mantissa()),
+        exp: f.exponent(),
+    }
+}
+
+<span class="comment">// INTO FLOAT
+
+// Export extended-precision float to native float.
+//
+// The extended-precision float must be in native float representation,
+// with overflow/underflow appropriately handled.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_float&lt;F&gt;(fp: ExtendedFloat) -&gt; F
+<span class="kw">where
+    </span>F: Float,
+{
+    <span class="comment">// Export floating-point number.
+    </span><span class="kw">if </span>fp.mant == <span class="number">0 </span>|| fp.exp &lt; F::DENORMAL_EXPONENT {
+        <span class="comment">// sub-denormal, underflow
+        </span>F::ZERO
+    } <span class="kw">else if </span>fp.exp &gt;= F::MAX_EXPONENT {
+        <span class="comment">// overflow
+        </span>F::from_bits(F::INFINITY_BITS)
+    } <span class="kw">else </span>{
+        <span class="comment">// calculate the exp and fraction bits, and return a float from bits.
+        </span><span class="kw">let </span>exp: u64;
+        <span class="kw">if </span>(fp.exp == F::DENORMAL_EXPONENT) &amp;&amp; (fp.mant &amp; F::HIDDEN_BIT_MASK.as_u64()) == <span class="number">0 </span>{
+            exp = <span class="number">0</span>;
+        } <span class="kw">else </span>{
+            exp = (fp.exp + F::EXPONENT_BIAS) <span class="kw">as </span>u64;
         }
-        <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="ident">exp</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">F::MANTISSA_SIZE</span>;
-        <span class="kw">let</span> <span class="ident">mant</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">F::MANTISSA_MASK</span>.<span class="ident">as_u64</span>();
-        <span class="ident">F::from_bits</span>(<span class="ident">F::Unsigned::as_cast</span>(<span class="ident">mant</span> <span class="op">|</span> <span class="ident">exp</span>))
+        <span class="kw">let </span>exp = exp &lt;&lt; F::MANTISSA_SIZE;
+        <span class="kw">let </span>mant = fp.mant &amp; F::MANTISSA_MASK.as_u64();
+        F::from_bits(F::Unsigned::as_cast(mant | exp))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

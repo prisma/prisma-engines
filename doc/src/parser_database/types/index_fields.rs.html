@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/types/index_fields.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>index_fields.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/types/index_fields.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>index_fields.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -195,202 +195,202 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">coerce</span>, <span class="ident">types::SortOrder</span>, <span class="ident">DatamodelError</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{ast, coerce, types::SortOrder, DatamodelError};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">OperatorClass</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Constant</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass</span>),
-    <span class="ident">Raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>OperatorClass&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Constant(<span class="kw">crate</span>::OperatorClass),
+    Raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::OperatorClass</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OperatorClass</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident"><span class="kw">crate</span>::OperatorClass</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Constant</span>(<span class="ident">inner</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw">crate</span>::OperatorClass&gt; <span class="kw">for </span>OperatorClass&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(inner: <span class="kw">crate</span>::OperatorClass) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Constant(inner)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">IndexFieldAttributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sort_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SortOrder</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">operator_class</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OperatorClass</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>IndexFieldAttributes&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) field_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) sort_order: <span class="prelude-ty">Option</span>&lt;SortOrder&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) length: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) operator_class: <span class="prelude-ty">Option</span>&lt;OperatorClass&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">struct</span> <span class="ident">FieldArguments</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">sort_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SortOrder</span><span class="op">&gt;</span>,
-    <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">operator_class</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OperatorClass</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>FieldArguments&lt;<span class="lifetime">&#39;a</span>&gt; {
+    sort_order: <span class="prelude-ty">Option</span>&lt;SortOrder&gt;,
+    length: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    operator_class: <span class="prelude-ty">Option</span>&lt;OperatorClass&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">coerce_field_array_with_args</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Expression</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics::Diagnostics</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexFieldAttributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Expression</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics::Diagnostics</span><span class="op">|</span> -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">expr</span> {
-            <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">field_name</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexFieldAttributes</span> {
-                <span class="ident">field_name</span>,
-                ..<span class="ident">Default::default</span>()
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>coerce_field_array_with_args&lt;<span class="lifetime">&#39;a</span>&gt;(
+    expr: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::Expression,
+    diagnostics: <span class="kw-2">&amp;mut </span>diagnostics::Diagnostics,
+) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;IndexFieldAttributes&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
+    <span class="kw">let </span>f = |expr: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::Expression, diagnostics: <span class="kw-2">&amp;mut </span>diagnostics::Diagnostics| -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt; {
+        <span class="kw">match </span>expr {
+            ast::Expression::ConstantValue(field_name, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(IndexFieldAttributes {
+                field_name,
+                ..Default::default()
             }),
-            <span class="ident">ast::Expression::Function</span>(<span class="ident">field_name</span>, <span class="ident">args</span>, <span class="kw">_</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">field_args</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>.<span class="ident">arguments</span>, <span class="ident">diagnostics</span>);
-                <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">IndexFieldAttributes</span> {
-                    <span class="ident">field_name</span>,
-                    <span class="ident">sort_order</span>: <span class="ident">args</span>.<span class="ident">sort_order</span>,
-                    <span class="ident">length</span>: <span class="ident">args</span>.<span class="ident">length</span>,
-                    <span class="ident">operator_class</span>: <span class="ident">args</span>.<span class="ident">operator_class</span>,
+            ast::Expression::Function(field_name, args, <span class="kw">_</span>) =&gt; {
+                <span class="kw">let </span>args = field_args(<span class="kw-2">&amp;</span>args.arguments, diagnostics);
+                <span class="kw">let </span>attrs = IndexFieldAttributes {
+                    field_name,
+                    sort_order: args.sort_order,
+                    length: args.length,
+                    operator_class: args.operator_class,
                 };
 
-                <span class="prelude-val">Some</span>(<span class="ident">attrs</span>)
+                <span class="prelude-val">Some</span>(attrs)
             }
-            <span class="kw">_</span> =&gt; {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_type_mismatch_error</span>(
+            <span class="kw">_ </span>=&gt; {
+                diagnostics.push_error(DatamodelError::new_type_mismatch_error(
                     <span class="string">&quot;constant literal&quot;</span>,
-                    <span class="ident">expr</span>.<span class="ident">describe_value_type</span>(),
-                    <span class="kw-2">&amp;</span><span class="ident">expr</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">expr</span>.<span class="ident">span</span>(),
+                    expr.describe_value_type(),
+                    <span class="kw-2">&amp;</span>expr.to_string(),
+                    expr.span(),
                 ));
-                <span class="prelude-val">None</span>
-            }
+                <span class="prelude-val">None
+            </span>}
         }
     };
 
-    <span class="ident"><span class="kw">crate</span>::coerce_array</span>(<span class="ident">expr</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="ident">diagnostics</span>)
+    <span class="kw">crate</span>::coerce_array(expr, <span class="kw-2">&amp;</span>f, diagnostics)
 }
 
-<span class="kw">fn</span> <span class="ident">field_args</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ast::Argument</span>], <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics::Diagnostics</span>) -&gt; <span class="ident">FieldArguments</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">args</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;sort&quot;</span>))
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">coerce::constant</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">diagnostics</span>) {
-            <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Asc</span>),
-            <span class="prelude-val">Some</span>(<span class="string">&quot;Desc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>),
+<span class="kw">fn </span>field_args&lt;<span class="lifetime">&#39;a</span>&gt;(args: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ast::Argument], diagnostics: <span class="kw-2">&amp;mut </span>diagnostics::Diagnostics) -&gt; FieldArguments&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">let </span>sort_order = args
+        .iter()
+        .find(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == <span class="prelude-val">Some</span>(<span class="string">&quot;sort&quot;</span>))
+        .and_then(|arg| <span class="kw">match </span>coerce::constant(<span class="kw-2">&amp;</span>arg.value, diagnostics) {
+            <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(SortOrder::Asc),
+            <span class="prelude-val">Some</span>(<span class="string">&quot;Desc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(SortOrder::Desc),
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(<span class="string">&quot;Asc, Desc&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">arg</span>.<span class="ident">span</span>));
-                <span class="prelude-val">None</span>
-            }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                diagnostics.push_error(DatamodelError::new_parser_error(<span class="string">&quot;Asc, Desc&quot;</span>.to_owned(), arg.span));
+                <span class="prelude-val">None
+            </span>}
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         });
 
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">args</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;length&quot;</span>))
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">coerce::integer</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">diagnostics</span>))
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">i</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>)
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>);
+    <span class="kw">let </span>length = args
+        .iter()
+        .find(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == <span class="prelude-val">Some</span>(<span class="string">&quot;length&quot;</span>))
+        .and_then(|arg| coerce::integer(<span class="kw-2">&amp;</span>arg.value, diagnostics))
+        .filter(|i| <span class="kw-2">*</span>i &gt;= <span class="number">0</span>)
+        .map(|i| i <span class="kw">as </span>u32);
 
-    <span class="kw">let</span> <span class="ident">operator_class</span> <span class="op">=</span> <span class="ident">args</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;ops&quot;</span>))
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span> {
-            <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">s</span>, <span class="ident">span</span>) =&gt; <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">as_str</span>() {
-                <span class="comment">// gist</span>
-                <span class="string">&quot;InetOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetOps</span>)),
+    <span class="kw">let </span>operator_class = args
+        .iter()
+        .find(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == <span class="prelude-val">Some</span>(<span class="string">&quot;ops&quot;</span>))
+        .and_then(|arg| <span class="kw">match </span><span class="kw-2">&amp;</span>arg.value {
+            ast::Expression::ConstantValue(s, span) =&gt; <span class="kw">match </span>s.as_str() {
+                <span class="comment">// gist
+                </span><span class="string">&quot;InetOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::InetOps)),
 
-                <span class="comment">// gin</span>
-                <span class="string">&quot;JsonbOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::JsonbOps</span>)),
-                <span class="string">&quot;JsonbPathOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::JsonbPathOps</span>)),
-                <span class="string">&quot;ArrayOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::ArrayOps</span>)),
+                <span class="comment">// gin
+                </span><span class="string">&quot;JsonbOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::JsonbOps)),
+                <span class="string">&quot;JsonbPathOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::JsonbPathOps)),
+                <span class="string">&quot;ArrayOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::ArrayOps)),
 
-                <span class="comment">// sp-gist</span>
-                <span class="string">&quot;TextOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TextOps</span>)),
+                <span class="comment">// sp-gist
+                </span><span class="string">&quot;TextOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TextOps)),
 
-                <span class="comment">// brin</span>
-                <span class="string">&quot;BitMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::BitMinMaxOps</span>)),
-                <span class="string">&quot;VarBitMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::VarBitMinMaxOps</span>)),
-                <span class="string">&quot;BpcharBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::BpcharBloomOps</span>)),
-                <span class="string">&quot;BpcharMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::BpcharMinMaxOps</span>)),
-                <span class="string">&quot;ByteaBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::ByteaBloomOps</span>)),
-                <span class="string">&quot;ByteaMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::ByteaMinMaxOps</span>)),
-                <span class="string">&quot;DateBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::DateBloomOps</span>)),
-                <span class="string">&quot;DateMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::DateMinMaxOps</span>)),
-                <span class="string">&quot;DateMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::DateMinMaxMultiOps</span>)),
-                <span class="string">&quot;Float4BloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float4BloomOps</span>)),
-                <span class="string">&quot;Float4MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float4MinMaxOps</span>)),
-                <span class="string">&quot;Float4MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float4MinMaxMultiOps</span>)),
-                <span class="string">&quot;Float8BloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float8BloomOps</span>)),
-                <span class="string">&quot;Float8MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float8MinMaxOps</span>)),
-                <span class="string">&quot;Float8MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float8MinMaxMultiOps</span>)),
-                <span class="string">&quot;InetInclusionOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetInclusionOps</span>)),
-                <span class="string">&quot;InetBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetBloomOps</span>)),
-                <span class="string">&quot;InetMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetMinMaxOps</span>)),
-                <span class="string">&quot;InetMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetMinMaxMultiOps</span>)),
-                <span class="string">&quot;Int2BloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int2BloomOps</span>)),
-                <span class="string">&quot;Int2MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int2MinMaxOps</span>)),
-                <span class="string">&quot;Int2MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int2MinMaxMultiOps</span>)),
-                <span class="string">&quot;Int4BloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int4BloomOps</span>)),
-                <span class="string">&quot;Int4MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int4MinMaxOps</span>)),
-                <span class="string">&quot;Int4MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int4MinMaxMultiOps</span>)),
-                <span class="string">&quot;Int8BloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int8BloomOps</span>)),
-                <span class="string">&quot;Int8MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int8MinMaxOps</span>)),
-                <span class="string">&quot;Int8MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int8MinMaxMultiOps</span>)),
-                <span class="string">&quot;NumericBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::NumericBloomOps</span>)),
-                <span class="string">&quot;NumericMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::NumericMinMaxOps</span>)),
-                <span class="string">&quot;NumericMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::NumericMinMaxMultiOps</span>)),
-                <span class="string">&quot;OidBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::OidBloomOps</span>)),
-                <span class="string">&quot;OidMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::OidMinMaxOps</span>)),
-                <span class="string">&quot;OidMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::OidMinMaxMultiOps</span>)),
-                <span class="string">&quot;TextBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TextBloomOps</span>)),
-                <span class="string">&quot;TextMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TextMinMaxOps</span>)),
-                <span class="string">&quot;TimestampBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampBloomOps</span>)),
-                <span class="string">&quot;TimestampMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampMinMaxOps</span>)),
-                <span class="string">&quot;TimestampMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampMinMaxMultiOps</span>)),
-                <span class="string">&quot;TimestampTzBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampTzBloomOps</span>)),
-                <span class="string">&quot;TimestampTzMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampTzMinMaxOps</span>)),
-                <span class="string">&quot;TimestampTzMinMaxMultiOps&quot;</span> =&gt; {
-                    <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampTzMinMaxMultiOps</span>))
+                <span class="comment">// brin
+                </span><span class="string">&quot;BitMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::BitMinMaxOps)),
+                <span class="string">&quot;VarBitMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::VarBitMinMaxOps)),
+                <span class="string">&quot;BpcharBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::BpcharBloomOps)),
+                <span class="string">&quot;BpcharMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::BpcharMinMaxOps)),
+                <span class="string">&quot;ByteaBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::ByteaBloomOps)),
+                <span class="string">&quot;ByteaMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::ByteaMinMaxOps)),
+                <span class="string">&quot;DateBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::DateBloomOps)),
+                <span class="string">&quot;DateMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::DateMinMaxOps)),
+                <span class="string">&quot;DateMinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::DateMinMaxMultiOps)),
+                <span class="string">&quot;Float4BloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Float4BloomOps)),
+                <span class="string">&quot;Float4MinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Float4MinMaxOps)),
+                <span class="string">&quot;Float4MinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Float4MinMaxMultiOps)),
+                <span class="string">&quot;Float8BloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Float8BloomOps)),
+                <span class="string">&quot;Float8MinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Float8MinMaxOps)),
+                <span class="string">&quot;Float8MinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Float8MinMaxMultiOps)),
+                <span class="string">&quot;InetInclusionOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::InetInclusionOps)),
+                <span class="string">&quot;InetBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::InetBloomOps)),
+                <span class="string">&quot;InetMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::InetMinMaxOps)),
+                <span class="string">&quot;InetMinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::InetMinMaxMultiOps)),
+                <span class="string">&quot;Int2BloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Int2BloomOps)),
+                <span class="string">&quot;Int2MinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Int2MinMaxOps)),
+                <span class="string">&quot;Int2MinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Int2MinMaxMultiOps)),
+                <span class="string">&quot;Int4BloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Int4BloomOps)),
+                <span class="string">&quot;Int4MinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Int4MinMaxOps)),
+                <span class="string">&quot;Int4MinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Int4MinMaxMultiOps)),
+                <span class="string">&quot;Int8BloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Int8BloomOps)),
+                <span class="string">&quot;Int8MinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Int8MinMaxOps)),
+                <span class="string">&quot;Int8MinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::Int8MinMaxMultiOps)),
+                <span class="string">&quot;NumericBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::NumericBloomOps)),
+                <span class="string">&quot;NumericMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::NumericMinMaxOps)),
+                <span class="string">&quot;NumericMinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::NumericMinMaxMultiOps)),
+                <span class="string">&quot;OidBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::OidBloomOps)),
+                <span class="string">&quot;OidMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::OidMinMaxOps)),
+                <span class="string">&quot;OidMinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::OidMinMaxMultiOps)),
+                <span class="string">&quot;TextBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TextBloomOps)),
+                <span class="string">&quot;TextMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TextMinMaxOps)),
+                <span class="string">&quot;TimestampBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimestampBloomOps)),
+                <span class="string">&quot;TimestampMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimestampMinMaxOps)),
+                <span class="string">&quot;TimestampMinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimestampMinMaxMultiOps)),
+                <span class="string">&quot;TimestampTzBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimestampTzBloomOps)),
+                <span class="string">&quot;TimestampTzMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimestampTzMinMaxOps)),
+                <span class="string">&quot;TimestampTzMinMaxMultiOps&quot; </span>=&gt; {
+                    <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimestampTzMinMaxMultiOps))
                 }
-                <span class="string">&quot;TimeBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeBloomOps</span>)),
-                <span class="string">&quot;TimeMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeMinMaxOps</span>)),
-                <span class="string">&quot;TimeMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeMinMaxMultiOps</span>)),
-                <span class="string">&quot;TimeTzBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeTzBloomOps</span>)),
-                <span class="string">&quot;TimeTzMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeTzMinMaxOps</span>)),
-                <span class="string">&quot;TimeTzMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeTzMinMaxMultiOps</span>)),
-                <span class="string">&quot;UuidBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::UuidBloomOps</span>)),
-                <span class="string">&quot;UuidMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::UuidMinMaxOps</span>)),
-                <span class="string">&quot;UuidMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::UuidMinMaxMultiOps</span>)),
+                <span class="string">&quot;TimeBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimeBloomOps)),
+                <span class="string">&quot;TimeMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimeMinMaxOps)),
+                <span class="string">&quot;TimeMinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimeMinMaxMultiOps)),
+                <span class="string">&quot;TimeTzBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimeTzBloomOps)),
+                <span class="string">&quot;TimeTzMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimeTzMinMaxOps)),
+                <span class="string">&quot;TimeTzMinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::TimeTzMinMaxMultiOps)),
+                <span class="string">&quot;UuidBloomOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::UuidBloomOps)),
+                <span class="string">&quot;UuidMinMaxOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::UuidMinMaxOps)),
+                <span class="string">&quot;UuidMinMaxMultiOps&quot; </span>=&gt; <span class="prelude-val">Some</span>(OperatorClass::from(<span class="kw">crate</span>::OperatorClass::UuidMinMaxMultiOps)),
 
-                <span class="ident">s</span> =&gt; {
-                    <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(
+                s =&gt; {
+                    diagnostics.push_error(DatamodelError::new_parser_error(
                         <span class="macro">format!</span>(<span class="string">&quot;Invalid operator class: {s}&quot;</span>),
-                        <span class="kw-2">*</span><span class="ident">span</span>,
+                        <span class="kw-2">*</span>span,
                     ));
-                    <span class="prelude-val">None</span>
-                }
+                    <span class="prelude-val">None
+                </span>}
             },
-            <span class="ident">ast::Expression::Function</span>(<span class="ident">fun</span>, <span class="ident">args</span>, <span class="ident">span</span>) =&gt; <span class="kw">match</span> <span class="ident">fun</span>.<span class="ident">as_str</span>() {
-                <span class="string">&quot;raw&quot;</span> =&gt; <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">arguments</span>.<span class="ident">as_slice</span>() {
-                    [<span class="ident">arg</span>] =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span> {
-                        <span class="ident">ast::Expression::StringValue</span>(<span class="ident">s</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Raw</span>(<span class="ident">s</span>.<span class="ident">as_str</span>())),
-                        <span class="kw">_</span> =&gt; {
-                            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(
-                                <span class="string">&quot;Invalid parameter type: expected string&quot;</span>.<span class="ident">into</span>(),
-                                <span class="kw-2">*</span><span class="ident">span</span>,
+            ast::Expression::Function(fun, args, span) =&gt; <span class="kw">match </span>fun.as_str() {
+                <span class="string">&quot;raw&quot; </span>=&gt; <span class="kw">match </span>args.arguments.as_slice() {
+                    [arg] =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>arg.value {
+                        ast::Expression::StringValue(s, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(OperatorClass::Raw(s.as_str())),
+                        <span class="kw">_ </span>=&gt; {
+                            diagnostics.push_error(DatamodelError::new_parser_error(
+                                <span class="string">&quot;Invalid parameter type: expected string&quot;</span>.into(),
+                                <span class="kw-2">*</span>span,
                             ));
-                            <span class="prelude-val">None</span>
-                        }
+                            <span class="prelude-val">None
+                        </span>}
                     },
-                    <span class="ident">args</span> =&gt; {
-                        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(
-                            <span class="macro">format!</span>(<span class="string">&quot;Wrong number of arguments. Expected: 1, got: {}&quot;</span>, <span class="ident">args</span>.<span class="ident">len</span>()),
-                            <span class="kw-2">*</span><span class="ident">span</span>,
+                    args =&gt; {
+                        diagnostics.push_error(DatamodelError::new_parser_error(
+                            <span class="macro">format!</span>(<span class="string">&quot;Wrong number of arguments. Expected: 1, got: {}&quot;</span>, args.len()),
+                            <span class="kw-2">*</span>span,
                         ));
-                        <span class="prelude-val">None</span>
-                    }
+                        <span class="prelude-val">None
+                    </span>}
                 },
-                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(),
             },
-            <span class="kw">_</span> =&gt; {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(<span class="string">&quot;operator class&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">arg</span>.<span class="ident">span</span>));
-                <span class="prelude-val">None</span>
-            }
+            <span class="kw">_ </span>=&gt; {
+                diagnostics.push_error(DatamodelError::new_parser_error(<span class="string">&quot;operator class&quot;</span>.to_owned(), arg.span));
+                <span class="prelude-val">None
+            </span>}
         });
 
-    <span class="ident">FieldArguments</span> {
-        <span class="ident">sort_order</span>,
-        <span class="ident">length</span>,
-        <span class="ident">operator_class</span>,
+    FieldArguments {
+        sort_order,
+        length,
+        operator_class,
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

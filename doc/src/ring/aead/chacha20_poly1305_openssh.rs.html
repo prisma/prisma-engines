@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/chacha20_poly1305_openssh.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>chacha20_poly1305_openssh.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/chacha20_poly1305_openssh.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>chacha20_poly1305_openssh.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -187,194 +187,194 @@
 <span id="187">187</span>
 <span id="188">188</span>
 <span id="189">189</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! The [chacha20-poly1305@openssh.com] AEAD-ish construct.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This should only be used by SSH implementations. It has a similar, but</span>
-<span class="doccomment">//! different API from `ring::aead` because the construct cannot use the same</span>
-<span class="doccomment">//! API as `ring::aead` due to the way the construct handles the encrypted</span>
-<span class="doccomment">//! packet length.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The concatenation of a and b is denoted `a||b`. `K_1` and `K_2` are defined</span>
-<span class="doccomment">//! in the [chacha20-poly1305@openssh.com] specification. `packet_length`,</span>
-<span class="doccomment">//! `padding_length`, `payload`, and `random padding` are defined in</span>
-<span class="doccomment">//! [RFC 4253]. The term `plaintext` is used as a shorthand for</span>
-<span class="doccomment">//! `padding_length||payload||random padding`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [chacha20-poly1305@openssh.com]:</span>
-<span class="doccomment">//!    http://cvsweb.openbsd.org/cgi-bin/cvsweb/src/usr.bin/ssh/PROTOCOL.chacha20poly1305?annotate=HEAD</span>
-<span class="doccomment">//! [RFC 4253]: https://tools.ietf.org/html/rfc4253</span>
+</span><span class="doccomment">//! The [chacha20-poly1305@openssh.com] AEAD-ish construct.
+//!
+//! This should only be used by SSH implementations. It has a similar, but
+//! different API from `ring::aead` because the construct cannot use the same
+//! API as `ring::aead` due to the way the construct handles the encrypted
+//! packet length.
+//!
+//! The concatenation of a and b is denoted `a||b`. `K_1` and `K_2` are defined
+//! in the [chacha20-poly1305@openssh.com] specification. `packet_length`,
+//! `padding_length`, `payload`, and `random padding` are defined in
+//! [RFC 4253]. The term `plaintext` is used as a shorthand for
+//! `padding_length||payload||random padding`.
+//!
+//! [chacha20-poly1305@openssh.com]:
+//!    http://cvsweb.openbsd.org/cgi-bin/cvsweb/src/usr.bin/ssh/PROTOCOL.chacha20poly1305?annotate=HEAD
+//! [RFC 4253]: https://tools.ietf.org/html/rfc4253
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">chacha</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
-    <span class="ident">chacha20_poly1305::derive_poly1305_key</span>,
-    <span class="ident">cpu</span>, <span class="ident">poly1305</span>, <span class="ident">Nonce</span>, <span class="ident">Tag</span>,
+</span><span class="kw">use super</span>::{
+    chacha::{<span class="self">self</span>, <span class="kw-2">*</span>},
+    chacha20_poly1305::derive_poly1305_key,
+    cpu, poly1305, Nonce, Tag,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constant_time</span>, <span class="ident">endian</span>::<span class="kw-2">*</span>, <span class="ident">error</span>};
-<span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
+<span class="kw">use crate</span>::{constant_time, endian::<span class="kw-2">*</span>, error};
+<span class="kw">use </span>core::convert::TryInto;
 
-<span class="doccomment">/// A key for sealing packets.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SealingKey</span> {
-    <span class="ident">key</span>: <span class="ident">Key</span>,
+<span class="doccomment">/// A key for sealing packets.
+</span><span class="kw">pub struct </span>SealingKey {
+    key: Key,
 }
 
-<span class="kw">impl</span> <span class="ident">SealingKey</span> {
-    <span class="doccomment">/// Constructs a new `SealingKey`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key_material</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="ident">KEY_LEN</span>]) -&gt; <span class="ident">SealingKey</span> {
-        <span class="ident">SealingKey</span> {
-            <span class="ident">key</span>: <span class="ident">Key::new</span>(<span class="ident">key_material</span>, <span class="ident">cpu::features</span>()),
+<span class="kw">impl </span>SealingKey {
+    <span class="doccomment">/// Constructs a new `SealingKey`.
+    </span><span class="kw">pub fn </span>new(key_material: <span class="kw-2">&amp;</span>[u8; KEY_LEN]) -&gt; SealingKey {
+        SealingKey {
+            key: Key::new(key_material, cpu::features()),
         }
     }
 
-    <span class="doccomment">/// Seals (encrypts and signs) a packet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On input, `plaintext_in_ciphertext_out` must contain the unencrypted</span>
-    <span class="doccomment">/// `packet_length||plaintext` where `plaintext` is the</span>
-    <span class="doccomment">/// `padding_length||payload||random padding`. It will be overwritten by</span>
-    <span class="doccomment">/// `encrypted_packet_length||ciphertext`, where `encrypted_packet_length`</span>
-    <span class="doccomment">/// is encrypted with `K_1` and `ciphertext` is encrypted by `K_2`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seal_in_place</span>(
+    <span class="doccomment">/// Seals (encrypts and signs) a packet.
+    ///
+    /// On input, `plaintext_in_ciphertext_out` must contain the unencrypted
+    /// `packet_length||plaintext` where `plaintext` is the
+    /// `padding_length||payload||random padding`. It will be overwritten by
+    /// `encrypted_packet_length||ciphertext`, where `encrypted_packet_length`
+    /// is encrypted with `K_1` and `ciphertext` is encrypted by `K_2`.
+    </span><span class="kw">pub fn </span>seal_in_place(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">sequence_number</span>: <span class="ident">u32</span>,
-        <span class="ident">plaintext_in_ciphertext_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">tag_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>; <span class="ident">TAG_LEN</span>],
+        sequence_number: u32,
+        plaintext_in_ciphertext_out: <span class="kw-2">&amp;mut </span>[u8],
+        tag_out: <span class="kw-2">&amp;mut </span>[u8; TAG_LEN],
     ) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">make_counter</span>(<span class="ident">sequence_number</span>);
-        <span class="kw">let</span> <span class="ident">poly_key</span> <span class="op">=</span>
-            <span class="ident">derive_poly1305_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>.<span class="ident">k_2</span>, <span class="ident">counter</span>.<span class="ident">increment</span>(), <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">cpu_features</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>counter = make_counter(sequence_number);
+        <span class="kw">let </span>poly_key =
+            derive_poly1305_key(<span class="kw-2">&amp;</span><span class="self">self</span>.key.k_2, counter.increment(), <span class="self">self</span>.key.cpu_features);
 
         {
-            <span class="kw">let</span> (<span class="ident">len_in_out</span>, <span class="ident">data_and_padding_in_out</span>) <span class="op">=</span>
-                <span class="ident">plaintext_in_ciphertext_out</span>.<span class="ident">split_at_mut</span>(<span class="ident">PACKET_LENGTH_LEN</span>);
+            <span class="kw">let </span>(len_in_out, data_and_padding_in_out) =
+                plaintext_in_ciphertext_out.split_at_mut(PACKET_LENGTH_LEN);
 
-            <span class="self">self</span>.<span class="ident">key</span>
-                .<span class="ident">k_1</span>
-                .<span class="ident">encrypt_in_place</span>(<span class="ident">make_counter</span>(<span class="ident">sequence_number</span>), <span class="ident">len_in_out</span>);
-            <span class="self">self</span>.<span class="ident">key</span>
-                .<span class="ident">k_2</span>
-                .<span class="ident">encrypt_in_place</span>(<span class="ident">counter</span>, <span class="ident">data_and_padding_in_out</span>);
+            <span class="self">self</span>.key
+                .k_1
+                .encrypt_in_place(make_counter(sequence_number), len_in_out);
+            <span class="self">self</span>.key
+                .k_2
+                .encrypt_in_place(counter, data_and_padding_in_out);
         }
 
-        <span class="kw">let</span> <span class="ident">Tag</span>(<span class="ident">tag</span>) <span class="op">=</span> <span class="ident">poly1305::sign</span>(<span class="ident">poly_key</span>, <span class="ident">plaintext_in_ciphertext_out</span>);
-        <span class="ident">tag_out</span>.<span class="ident">copy_from_slice</span>(<span class="ident">tag</span>.<span class="ident">as_ref</span>());
+        <span class="kw">let </span>Tag(tag) = poly1305::sign(poly_key, plaintext_in_ciphertext_out);
+        tag_out.copy_from_slice(tag.as_ref());
     }
 }
 
-<span class="doccomment">/// A key for opening packets.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OpeningKey</span> {
-    <span class="ident">key</span>: <span class="ident">Key</span>,
+<span class="doccomment">/// A key for opening packets.
+</span><span class="kw">pub struct </span>OpeningKey {
+    key: Key,
 }
 
-<span class="kw">impl</span> <span class="ident">OpeningKey</span> {
-    <span class="doccomment">/// Constructs a new `OpeningKey`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key_material</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="ident">KEY_LEN</span>]) -&gt; <span class="ident">OpeningKey</span> {
-        <span class="ident">OpeningKey</span> {
-            <span class="ident">key</span>: <span class="ident">Key::new</span>(<span class="ident">key_material</span>, <span class="ident">cpu::features</span>()),
+<span class="kw">impl </span>OpeningKey {
+    <span class="doccomment">/// Constructs a new `OpeningKey`.
+    </span><span class="kw">pub fn </span>new(key_material: <span class="kw-2">&amp;</span>[u8; KEY_LEN]) -&gt; OpeningKey {
+        OpeningKey {
+            key: Key::new(key_material, cpu::features()),
         }
     }
 
-    <span class="doccomment">/// Returns the decrypted, but unauthenticated, packet length.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Importantly, the result won&#39;t be authenticated until `open_in_place` is</span>
-    <span class="doccomment">/// called.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt_packet_length</span>(
+    <span class="doccomment">/// Returns the decrypted, but unauthenticated, packet length.
+    ///
+    /// Importantly, the result won&#39;t be authenticated until `open_in_place` is
+    /// called.
+    </span><span class="kw">pub fn </span>decrypt_packet_length(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">sequence_number</span>: <span class="ident">u32</span>,
-        <span class="ident">encrypted_packet_length</span>: [<span class="ident">u8</span>; <span class="ident">PACKET_LENGTH_LEN</span>],
-    ) -&gt; [<span class="ident">u8</span>; <span class="ident">PACKET_LENGTH_LEN</span>] {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">packet_length</span> <span class="op">=</span> <span class="ident">encrypted_packet_length</span>;
-        <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">make_counter</span>(<span class="ident">sequence_number</span>);
-        <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">k_1</span>.<span class="ident">encrypt_in_place</span>(<span class="ident">counter</span>, <span class="kw-2">&amp;mut</span> <span class="ident">packet_length</span>);
-        <span class="ident">packet_length</span>
+        sequence_number: u32,
+        encrypted_packet_length: [u8; PACKET_LENGTH_LEN],
+    ) -&gt; [u8; PACKET_LENGTH_LEN] {
+        <span class="kw">let </span><span class="kw-2">mut </span>packet_length = encrypted_packet_length;
+        <span class="kw">let </span>counter = make_counter(sequence_number);
+        <span class="self">self</span>.key.k_1.encrypt_in_place(counter, <span class="kw-2">&amp;mut </span>packet_length);
+        packet_length
     }
 
-    <span class="doccomment">/// Opens (authenticates and decrypts) a packet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `ciphertext_in_plaintext_out` must be of the form</span>
-    <span class="doccomment">/// `encrypted_packet_length||ciphertext` where `ciphertext` is the</span>
-    <span class="doccomment">/// encrypted `plaintext`. When the function succeeds the ciphertext is</span>
-    <span class="doccomment">/// replaced by the plaintext and the result is `Ok(plaintext)`, where</span>
-    <span class="doccomment">/// `plaintext` is `&amp;ciphertext_in_plaintext_out[PACKET_LENGTH_LEN..]`;</span>
-    <span class="doccomment">/// otherwise the contents of `ciphertext_in_plaintext_out` are unspecified</span>
-    <span class="doccomment">/// and must not be used.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_in_place</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Opens (authenticates and decrypts) a packet.
+    ///
+    /// `ciphertext_in_plaintext_out` must be of the form
+    /// `encrypted_packet_length||ciphertext` where `ciphertext` is the
+    /// encrypted `plaintext`. When the function succeeds the ciphertext is
+    /// replaced by the plaintext and the result is `Ok(plaintext)`, where
+    /// `plaintext` is `&amp;ciphertext_in_plaintext_out[PACKET_LENGTH_LEN..]`;
+    /// otherwise the contents of `ciphertext_in_plaintext_out` are unspecified
+    /// and must not be used.
+    </span><span class="kw">pub fn </span>open_in_place&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">sequence_number</span>: <span class="ident">u32</span>,
-        <span class="ident">ciphertext_in_plaintext_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-        <span class="ident">tag</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="ident">TAG_LEN</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">make_counter</span>(<span class="ident">sequence_number</span>);
+        sequence_number: u32,
+        ciphertext_in_plaintext_out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+        tag: <span class="kw-2">&amp;</span>[u8; TAG_LEN],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], error::Unspecified&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>counter = make_counter(sequence_number);
 
-        <span class="comment">// We must verify the tag before decrypting so that</span>
-        <span class="comment">// `ciphertext_in_plaintext_out` is unmodified if verification fails.</span>
-        <span class="comment">// This is beyond what we guarantee.</span>
-        <span class="kw">let</span> <span class="ident">poly_key</span> <span class="op">=</span>
-            <span class="ident">derive_poly1305_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>.<span class="ident">k_2</span>, <span class="ident">counter</span>.<span class="ident">increment</span>(), <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">cpu_features</span>);
-        <span class="ident">verify</span>(<span class="ident">poly_key</span>, <span class="ident">ciphertext_in_plaintext_out</span>, <span class="ident">tag</span>)<span class="question-mark">?</span>;
+        <span class="comment">// We must verify the tag before decrypting so that
+        // `ciphertext_in_plaintext_out` is unmodified if verification fails.
+        // This is beyond what we guarantee.
+        </span><span class="kw">let </span>poly_key =
+            derive_poly1305_key(<span class="kw-2">&amp;</span><span class="self">self</span>.key.k_2, counter.increment(), <span class="self">self</span>.key.cpu_features);
+        verify(poly_key, ciphertext_in_plaintext_out, tag)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">plaintext_in_ciphertext_out</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ciphertext_in_plaintext_out</span>[<span class="ident">PACKET_LENGTH_LEN</span>..];
-        <span class="self">self</span>.<span class="ident">key</span>
-            .<span class="ident">k_2</span>
-            .<span class="ident">encrypt_in_place</span>(<span class="ident">counter</span>, <span class="ident">plaintext_in_ciphertext_out</span>);
+        <span class="kw">let </span>plaintext_in_ciphertext_out = <span class="kw-2">&amp;mut </span>ciphertext_in_plaintext_out[PACKET_LENGTH_LEN..];
+        <span class="self">self</span>.key
+            .k_2
+            .encrypt_in_place(counter, plaintext_in_ciphertext_out);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">plaintext_in_ciphertext_out</span>)
+        <span class="prelude-val">Ok</span>(plaintext_in_ciphertext_out)
     }
 }
 
-<span class="kw">struct</span> <span class="ident">Key</span> {
-    <span class="ident">k_1</span>: <span class="ident">chacha::Key</span>,
-    <span class="ident">k_2</span>: <span class="ident">chacha::Key</span>,
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
+<span class="kw">struct </span>Key {
+    k_1: chacha::Key,
+    k_2: chacha::Key,
+    cpu_features: cpu::Features,
 }
 
-<span class="kw">impl</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key_material</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="ident">KEY_LEN</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="ident">Key</span> {
-        <span class="comment">// The first half becomes K_2 and the second half becomes K_1.</span>
-        <span class="kw">let</span> (<span class="ident">k_2</span>, <span class="ident">k_1</span>) <span class="op">=</span> <span class="ident">key_material</span>.<span class="ident">split_at</span>(<span class="ident">chacha::KEY_LEN</span>);
-        <span class="kw">let</span> <span class="ident">k_1</span>: [<span class="ident">u8</span>; <span class="ident">chacha::KEY_LEN</span>] <span class="op">=</span> <span class="ident">k_1</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">k_2</span>: [<span class="ident">u8</span>; <span class="ident">chacha::KEY_LEN</span>] <span class="op">=</span> <span class="ident">k_2</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
-        <span class="ident">Key</span> {
-            <span class="ident">k_1</span>: <span class="ident">chacha::Key::from</span>(<span class="ident">k_1</span>),
-            <span class="ident">k_2</span>: <span class="ident">chacha::Key::from</span>(<span class="ident">k_2</span>),
-            <span class="ident">cpu_features</span>,
+<span class="kw">impl </span>Key {
+    <span class="kw">fn </span>new(key_material: <span class="kw-2">&amp;</span>[u8; KEY_LEN], cpu_features: cpu::Features) -&gt; Key {
+        <span class="comment">// The first half becomes K_2 and the second half becomes K_1.
+        </span><span class="kw">let </span>(k_2, k_1) = key_material.split_at(chacha::KEY_LEN);
+        <span class="kw">let </span>k_1: [u8; chacha::KEY_LEN] = k_1.try_into().unwrap();
+        <span class="kw">let </span>k_2: [u8; chacha::KEY_LEN] = k_2.try_into().unwrap();
+        Key {
+            k_1: chacha::Key::from(k_1),
+            k_2: chacha::Key::from(k_2),
+            cpu_features,
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">make_counter</span>(<span class="ident">sequence_number</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Counter</span> {
-    <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> [
-        <span class="ident">BigEndian::ZERO</span>,
-        <span class="ident">BigEndian::ZERO</span>,
-        <span class="ident">BigEndian::from</span>(<span class="ident">sequence_number</span>),
+<span class="kw">fn </span>make_counter(sequence_number: u32) -&gt; Counter {
+    <span class="kw">let </span>nonce = [
+        BigEndian::ZERO,
+        BigEndian::ZERO,
+        BigEndian::from(sequence_number),
     ];
-    <span class="ident">Counter::zero</span>(<span class="ident">Nonce::assume_unique_for_key</span>(<span class="kw-2">*</span>(<span class="ident">nonce</span>.<span class="ident">as_byte_array</span>())))
+    Counter::zero(Nonce::assume_unique_for_key(<span class="kw-2">*</span>(nonce.as_byte_array())))
 }
 
-<span class="doccomment">/// The length of key.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KEY_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">chacha::KEY_LEN</span> <span class="op">*</span> <span class="number">2</span>;
+<span class="doccomment">/// The length of key.
+</span><span class="kw">pub const </span>KEY_LEN: usize = chacha::KEY_LEN * <span class="number">2</span>;
 
-<span class="doccomment">/// The length in bytes of the `packet_length` field in a SSH packet.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PACKET_LENGTH_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>; <span class="comment">// 32 bits</span>
+<span class="doccomment">/// The length in bytes of the `packet_length` field in a SSH packet.
+</span><span class="kw">pub const </span>PACKET_LENGTH_LEN: usize = <span class="number">4</span>; <span class="comment">// 32 bits
 
-<span class="doccomment">/// The length in bytes of an authentication tag.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TAG_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::BLOCK_LEN</span>;
+</span><span class="doccomment">/// The length in bytes of an authentication tag.
+</span><span class="kw">pub const </span>TAG_LEN: usize = <span class="kw">super</span>::BLOCK_LEN;
 
-<span class="kw">fn</span> <span class="ident">verify</span>(<span class="ident">key</span>: <span class="ident">poly1305::Key</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">tag</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="ident">TAG_LEN</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">Tag</span>(<span class="ident">calculated_tag</span>) <span class="op">=</span> <span class="ident">poly1305::sign</span>(<span class="ident">key</span>, <span class="ident">msg</span>);
-    <span class="ident">constant_time::verify_slices_are_equal</span>(<span class="ident">calculated_tag</span>.<span class="ident">as_ref</span>(), <span class="ident">tag</span>)
+<span class="kw">fn </span>verify(key: poly1305::Key, msg: <span class="kw-2">&amp;</span>[u8], tag: <span class="kw-2">&amp;</span>[u8; TAG_LEN]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+    <span class="kw">let </span>Tag(calculated_tag) = poly1305::sign(key, msg);
+    constant_time::verify_slices_are_equal(calculated_tag.as_ref(), tag)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/collation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>collation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/collation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>collation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -285,292 +285,292 @@
 <span id="285">285</span>
 <span id="286">286</span>
 <span id="287">287</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::convert::TryFrom;
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">typed_builder::TypedBuilder</span>;
+<span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>typed_builder::TypedBuilder;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>};
+<span class="kw">use </span><span class="kw">crate</span>::error::{Error, ErrorKind};
 
-<span class="doccomment">/// A collation configuration. See the official MongoDB</span>
-<span class="doccomment">/// [documentation](https://www.mongodb.com/docs/manual/reference/collation/) for more information on</span>
-<span class="doccomment">/// each of the fields.</span>
-<span class="attribute">#[<span class="ident">serde_with::skip_serializing_none</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">TypedBuilder</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Collation</span> {
-    <span class="doccomment">/// The ICU locale.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the list of supported languages and locales [here](https://www.mongodb.com/docs/manual/reference/collation-locales-defaults/#collation-languages-locales).</span>
-    <span class="kw">pub</span> <span class="ident">locale</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A collation configuration. See the official MongoDB
+/// [documentation](https://www.mongodb.com/docs/manual/reference/collation/) for more information on
+/// each of the fields.
+</span><span class="attribute">#[serde_with::skip_serializing_none]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, TypedBuilder)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[builder(field_defaults(setter(into)))]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Collation {
+    <span class="doccomment">/// The ICU locale.
+    ///
+    /// See the list of supported languages and locales [here](https://www.mongodb.com/docs/manual/reference/collation-locales-defaults/#collation-languages-locales).
+    </span><span class="kw">pub </span>locale: String,
 
-    <span class="doccomment">/// The level of comparison to perform. Corresponds to [ICU Comparison Levels](http://userguide.icu-project.org/collation/concepts#TOC-Comparison-Levels).</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">strength</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CollationStrength</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The level of comparison to perform. Corresponds to [ICU Comparison Levels](http://userguide.icu-project.org/collation/concepts#TOC-Comparison-Levels).
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>strength: <span class="prelude-ty">Option</span>&lt;CollationStrength&gt;,
 
-    <span class="doccomment">/// Whether to include a separate level for case differences. See [ICU Collation: CaseLevel](http://userguide.icu-project.org/collation/concepts#TOC-CaseLevel) for more information.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">case_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether to include a separate level for case differences. See [ICU Collation: CaseLevel](http://userguide.icu-project.org/collation/concepts#TOC-CaseLevel) for more information.
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>case_level: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The sort order of case differences during tertiary level comparisons.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">case_first</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CollationCaseFirst</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The sort order of case differences during tertiary level comparisons.
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>case_first: <span class="prelude-ty">Option</span>&lt;CollationCaseFirst&gt;,
 
-    <span class="doccomment">/// Whether to compare numeric strings as numbers or strings.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">numeric_ordering</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether to compare numeric strings as numbers or strings.
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>numeric_ordering: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Whether collation should consider whitespace and punctuation as base characters for</span>
-    <span class="doccomment">/// purposes of comparison.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">alternate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CollationAlternate</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether collation should consider whitespace and punctuation as base characters for
+    /// purposes of comparison.
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>alternate: <span class="prelude-ty">Option</span>&lt;CollationAlternate&gt;,
 
-    <span class="doccomment">/// Up to which characters are considered ignorable when `alternate` is &quot;shifted&quot;. Has no</span>
-    <span class="doccomment">/// effect if `alternate` is set to &quot;non-ignorable&quot;.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">max_variable</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CollationMaxVariable</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Up to which characters are considered ignorable when `alternate` is &quot;shifted&quot;. Has no
+    /// effect if `alternate` is set to &quot;non-ignorable&quot;.
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>max_variable: <span class="prelude-ty">Option</span>&lt;CollationMaxVariable&gt;,
 
-    <span class="doccomment">/// Whether to check if text require normalization and to perform it.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">normalization</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether to check if text require normalization and to perform it.
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>normalization: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Whether strings with diacritics sort from the back of the string.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">backwards</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether strings with diacritics sort from the back of the string.
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>backwards: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="doccomment">/// The level of comparison to perform. Corresponds to [ICU Comparison Levels](http://userguide.icu-project.org/collation/concepts#TOC-Comparison-Levels).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CollationStrength</span> {
-    <span class="doccomment">/// Typically, this is used to denote differences between base characters (for example, &quot;a&quot; &lt;</span>
-    <span class="doccomment">/// &quot;b&quot;).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is also called the level-1 strength.</span>
-    <span class="ident">Primary</span>,
+<span class="doccomment">/// The level of comparison to perform. Corresponds to [ICU Comparison Levels](http://userguide.icu-project.org/collation/concepts#TOC-Comparison-Levels).
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>CollationStrength {
+    <span class="doccomment">/// Typically, this is used to denote differences between base characters (for example, &quot;a&quot; &lt;
+    /// &quot;b&quot;).
+    ///
+    /// This is also called the level-1 strength.
+    </span>Primary,
 
-    <span class="doccomment">/// Accents in the characters are considered secondary differences (for example, &quot;as&quot; &lt; &quot;às&quot; &lt;</span>
-    <span class="doccomment">/// &quot;at&quot;).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is also called the level-2 strength.</span>
-    <span class="ident">Secondary</span>,
+    <span class="doccomment">/// Accents in the characters are considered secondary differences (for example, &quot;as&quot; &lt; &quot;às&quot; &lt;
+    /// &quot;at&quot;).
+    ///
+    /// This is also called the level-2 strength.
+    </span>Secondary,
 
-    <span class="doccomment">/// Upper and lower case differences in characters are distinguished at the tertiary level (for</span>
-    <span class="doccomment">/// example, &quot;ao&quot; &lt; &quot;Ao&quot; &lt; &quot;aò&quot;).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is also called the level-3 strength.</span>
-    <span class="ident">Tertiary</span>,
+    <span class="doccomment">/// Upper and lower case differences in characters are distinguished at the tertiary level (for
+    /// example, &quot;ao&quot; &lt; &quot;Ao&quot; &lt; &quot;aò&quot;).
+    ///
+    /// This is also called the level-3 strength.
+    </span>Tertiary,
 
-    <span class="doccomment">/// When punctuation is ignored at level 1-3, an additional level can be used to distinguish</span>
-    <span class="doccomment">/// words with and without punctuation (for example, &quot;ab&quot; &lt; &quot;a-b&quot; &lt; &quot;aB&quot;).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is also called the level-4 strength.</span>
-    <span class="ident">Quaternary</span>,
+    <span class="doccomment">/// When punctuation is ignored at level 1-3, an additional level can be used to distinguish
+    /// words with and without punctuation (for example, &quot;ab&quot; &lt; &quot;a-b&quot; &lt; &quot;aB&quot;).
+    ///
+    /// This is also called the level-4 strength.
+    </span>Quaternary,
 
-    <span class="doccomment">/// When all other levels are equal, the identical level is used as a tiebreaker. The Unicode</span>
-    <span class="doccomment">/// code point values of the NFD form of each string are compared at this level, just in</span>
-    <span class="doccomment">/// case there is no difference at levels 1-4.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is also called the level-5 strength.</span>
-    <span class="ident">Identical</span>,
+    <span class="doccomment">/// When all other levels are equal, the identical level is used as a tiebreaker. The Unicode
+    /// code point values of the NFD form of each string are compared at this level, just in
+    /// case there is no difference at levels 1-4.
+    ///
+    /// This is also called the level-5 strength.
+    </span>Identical,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CollationStrength</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">strength</span>: <span class="ident">CollationStrength</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">strength</span> {
-            <span class="ident">CollationStrength::Primary</span> =&gt; <span class="number">1</span>,
-            <span class="ident">CollationStrength::Secondary</span> =&gt; <span class="number">2</span>,
-            <span class="ident">CollationStrength::Tertiary</span> =&gt; <span class="number">3</span>,
-            <span class="ident">CollationStrength::Quaternary</span> =&gt; <span class="number">4</span>,
-            <span class="ident">CollationStrength::Identical</span> =&gt; <span class="number">5</span>,
+<span class="kw">impl </span>From&lt;CollationStrength&gt; <span class="kw">for </span>u32 {
+    <span class="kw">fn </span>from(strength: CollationStrength) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>strength {
+            CollationStrength::Primary =&gt; <span class="number">1</span>,
+            CollationStrength::Secondary =&gt; <span class="number">2</span>,
+            CollationStrength::Tertiary =&gt; <span class="number">3</span>,
+            CollationStrength::Quaternary =&gt; <span class="number">4</span>,
+            CollationStrength::Identical =&gt; <span class="number">5</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CollationStrength</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl </span>TryFrom&lt;u32&gt; <span class="kw">for </span>CollationStrength {
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">level</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">level</span> {
-            <span class="number">1</span> =&gt; <span class="ident">CollationStrength::Primary</span>,
-            <span class="number">2</span> =&gt; <span class="ident">CollationStrength::Secondary</span>,
-            <span class="number">3</span> =&gt; <span class="ident">CollationStrength::Tertiary</span>,
-            <span class="number">4</span> =&gt; <span class="ident">CollationStrength::Quaternary</span>,
-            <span class="number">5</span> =&gt; <span class="ident">CollationStrength::Identical</span>,
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                    <span class="ident">message</span>: (<span class="macro">format!</span>(<span class="string">&quot;invalid collation strength: {}&quot;</span>, <span class="ident">level</span>)),
+    <span class="kw">fn </span>try_from(level: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="kw">match </span>level {
+            <span class="number">1 </span>=&gt; CollationStrength::Primary,
+            <span class="number">2 </span>=&gt; CollationStrength::Secondary,
+            <span class="number">3 </span>=&gt; CollationStrength::Tertiary,
+            <span class="number">4 </span>=&gt; CollationStrength::Quaternary,
+            <span class="number">5 </span>=&gt; CollationStrength::Identical,
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+                    message: (<span class="macro">format!</span>(<span class="string">&quot;invalid collation strength: {}&quot;</span>, level)),
                 }
-                .<span class="ident">into</span>())
+                .into())
             }
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">CollationStrength</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="kw">impl </span>Serialize <span class="kw">for </span>CollationStrength {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">u32::from</span>(<span class="kw-2">*</span><span class="self">self</span>);
-        <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="ident">level</span> <span class="kw">as</span> <span class="ident">i32</span>)
+        <span class="kw">let </span>level = u32::from(<span class="kw-2">*</span><span class="self">self</span>);
+        serializer.serialize_i32(level <span class="kw">as </span>i32)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CollationStrength</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>CollationStrength {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">u32::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="ident">level</span>).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)
+        <span class="kw">let </span>level = u32::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="self">Self</span>::try_from(level).map_err(serde::de::Error::custom)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">CollationStrength</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">std::fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">u32::from</span>(<span class="kw-2">*</span><span class="self">self</span>), <span class="ident">f</span>)
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>CollationStrength {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        std::fmt::Display::fmt(<span class="kw-2">&amp;</span>u32::from(<span class="kw-2">*</span><span class="self">self</span>), f)
     }
 }
 
-<span class="doccomment">/// Setting that determines sort order of case differences during case tertiary level comparisons.</span>
-<span class="doccomment">/// For more info, see &lt;http://userguide.icu-project.org/collation/customization&gt;.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CollationCaseFirst</span> {
-    <span class="doccomment">/// Uppercase sorts before lowercase.</span>
-    <span class="ident">Upper</span>,
+<span class="doccomment">/// Setting that determines sort order of case differences during case tertiary level comparisons.
+/// For more info, see &lt;http://userguide.icu-project.org/collation/customization&gt;.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;kebab-case&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>CollationCaseFirst {
+    <span class="doccomment">/// Uppercase sorts before lowercase.
+    </span>Upper,
 
-    <span class="doccomment">/// Lowercase sorts before uppercase.</span>
-    <span class="ident">Lower</span>,
+    <span class="doccomment">/// Lowercase sorts before uppercase.
+    </span>Lower,
 
-    <span class="doccomment">/// Default value. Similar to `Lower` with slight differences.</span>
-    <span class="doccomment">/// See &lt;http://userguide.icu-project.org/collation/customization&gt; for details of differences.</span>
-    <span class="ident">Off</span>,
+    <span class="doccomment">/// Default value. Similar to `Lower` with slight differences.
+    /// See &lt;http://userguide.icu-project.org/collation/customization&gt; for details of differences.
+    </span>Off,
 }
 
-<span class="kw">impl</span> <span class="ident">std::str::FromStr</span> <span class="kw">for</span> <span class="ident">CollationCaseFirst</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl </span>std::str::FromStr <span class="kw">for </span>CollationCaseFirst {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= Error;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;upper&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationCaseFirst::Upper</span>),
-            <span class="string">&quot;lower&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationCaseFirst::Lower</span>),
-            <span class="string">&quot;off&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationCaseFirst::Off</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid CollationCaseFirst: {}&quot;</span>, <span class="ident">s</span>),
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">match </span>s {
+            <span class="string">&quot;upper&quot; </span>=&gt; <span class="prelude-val">Ok</span>(CollationCaseFirst::Upper),
+            <span class="string">&quot;lower&quot; </span>=&gt; <span class="prelude-val">Ok</span>(CollationCaseFirst::Lower),
+            <span class="string">&quot;off&quot; </span>=&gt; <span class="prelude-val">Ok</span>(CollationCaseFirst::Off),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+                message: <span class="macro">format!</span>(<span class="string">&quot;invalid CollationCaseFirst: {}&quot;</span>, s),
             }
-            .<span class="ident">into</span>()),
+            .into()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CollationCaseFirst</span> {
-    <span class="doccomment">/// Returns this [`CollationCaseFirst`] as a `&amp;&#39;static str`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CollationCaseFirst::Upper</span> =&gt; <span class="string">&quot;upper&quot;</span>,
-            <span class="ident">CollationCaseFirst::Lower</span> =&gt; <span class="string">&quot;lower&quot;</span>,
-            <span class="ident">CollationCaseFirst::Off</span> =&gt; <span class="string">&quot;off&quot;</span>,
+<span class="kw">impl </span>CollationCaseFirst {
+    <span class="doccomment">/// Returns this [`CollationCaseFirst`] as a `&amp;&#39;static str`.
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            CollationCaseFirst::Upper =&gt; <span class="string">&quot;upper&quot;</span>,
+            CollationCaseFirst::Lower =&gt; <span class="string">&quot;lower&quot;</span>,
+            CollationCaseFirst::Off =&gt; <span class="string">&quot;off&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">CollationCaseFirst</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>.<span class="ident">as_str</span>(), <span class="ident">f</span>)
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>CollationCaseFirst {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        std::fmt::Display::fmt(<span class="self">self</span>.as_str(), f)
     }
 }
 
-<span class="doccomment">/// Setting that determines whether collation should consider whitespace and punctuation as base</span>
-<span class="doccomment">/// characters for purposes of comparison.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CollationAlternate</span> {
-    <span class="doccomment">/// Whitespace and punctuation are considered base characters.</span>
-    <span class="ident">NonIgnorable</span>,
+<span class="doccomment">/// Setting that determines whether collation should consider whitespace and punctuation as base
+/// characters for purposes of comparison.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;kebab-case&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>CollationAlternate {
+    <span class="doccomment">/// Whitespace and punctuation are considered base characters.
+    </span>NonIgnorable,
 
-    <span class="doccomment">/// Whitespace and punctuation are not considered base characters and are only distinguished at</span>
-    <span class="doccomment">/// strength levels greater than 3.</span>
-    <span class="ident">Shifted</span>,
+    <span class="doccomment">/// Whitespace and punctuation are not considered base characters and are only distinguished at
+    /// strength levels greater than 3.
+    </span>Shifted,
 }
 
-<span class="kw">impl</span> <span class="ident">std::str::FromStr</span> <span class="kw">for</span> <span class="ident">CollationAlternate</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl </span>std::str::FromStr <span class="kw">for </span>CollationAlternate {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= Error;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;non-ignorable&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationAlternate::NonIgnorable</span>),
-            <span class="string">&quot;shifted&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationAlternate::Shifted</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid collation alternate: {}&quot;</span>, <span class="ident">s</span>),
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">match </span>s {
+            <span class="string">&quot;non-ignorable&quot; </span>=&gt; <span class="prelude-val">Ok</span>(CollationAlternate::NonIgnorable),
+            <span class="string">&quot;shifted&quot; </span>=&gt; <span class="prelude-val">Ok</span>(CollationAlternate::Shifted),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+                message: <span class="macro">format!</span>(<span class="string">&quot;invalid collation alternate: {}&quot;</span>, s),
             }
-            .<span class="ident">into</span>()),
+            .into()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CollationAlternate</span> {
-    <span class="doccomment">/// Returns this [`CollationAlternate`] as a `&amp;&#39;static str`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CollationAlternate::NonIgnorable</span> =&gt; <span class="string">&quot;non-ignorable&quot;</span>,
-            <span class="ident">CollationAlternate::Shifted</span> =&gt; <span class="string">&quot;shifted&quot;</span>,
+<span class="kw">impl </span>CollationAlternate {
+    <span class="doccomment">/// Returns this [`CollationAlternate`] as a `&amp;&#39;static str`.
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            CollationAlternate::NonIgnorable =&gt; <span class="string">&quot;non-ignorable&quot;</span>,
+            CollationAlternate::Shifted =&gt; <span class="string">&quot;shifted&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">CollationAlternate</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>.<span class="ident">as_str</span>(), <span class="ident">f</span>)
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>CollationAlternate {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        std::fmt::Display::fmt(<span class="self">self</span>.as_str(), f)
     }
 }
 
-<span class="doccomment">/// Field that determines up to which characters are considered ignorable when alternate: &quot;shifted&quot;.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CollationMaxVariable</span> {
-    <span class="doccomment">/// Both whitespace and punctuation are &quot;ignorable&quot;, i.e. not considered base characters.</span>
-    <span class="ident">Punct</span>,
+<span class="doccomment">/// Field that determines up to which characters are considered ignorable when alternate: &quot;shifted&quot;.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;kebab-case&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>CollationMaxVariable {
+    <span class="doccomment">/// Both whitespace and punctuation are &quot;ignorable&quot;, i.e. not considered base characters.
+    </span>Punct,
 
-    <span class="doccomment">/// Whitespace are &quot;ignorable&quot;, i.e. not considered base characters</span>
-    <span class="ident">Space</span>,
+    <span class="doccomment">/// Whitespace are &quot;ignorable&quot;, i.e. not considered base characters
+    </span>Space,
 }
 
-<span class="kw">impl</span> <span class="ident">std::str::FromStr</span> <span class="kw">for</span> <span class="ident">CollationMaxVariable</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl </span>std::str::FromStr <span class="kw">for </span>CollationMaxVariable {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= Error;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;punct&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationMaxVariable::Punct</span>),
-            <span class="string">&quot;space&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationMaxVariable::Space</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid collation max variable: {}&quot;</span>, <span class="ident">s</span>),
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">match </span>s {
+            <span class="string">&quot;punct&quot; </span>=&gt; <span class="prelude-val">Ok</span>(CollationMaxVariable::Punct),
+            <span class="string">&quot;space&quot; </span>=&gt; <span class="prelude-val">Ok</span>(CollationMaxVariable::Space),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+                message: <span class="macro">format!</span>(<span class="string">&quot;invalid collation max variable: {}&quot;</span>, s),
             }
-            .<span class="ident">into</span>()),
+            .into()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CollationMaxVariable</span> {
-    <span class="doccomment">/// Returns this [`CollationMaxVariable`] as a `&amp;&#39;static str`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CollationMaxVariable::Punct</span> =&gt; <span class="string">&quot;punct&quot;</span>,
-            <span class="ident">CollationMaxVariable::Space</span> =&gt; <span class="string">&quot;space&quot;</span>,
+<span class="kw">impl </span>CollationMaxVariable {
+    <span class="doccomment">/// Returns this [`CollationMaxVariable`] as a `&amp;&#39;static str`.
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            CollationMaxVariable::Punct =&gt; <span class="string">&quot;punct&quot;</span>,
+            CollationMaxVariable::Space =&gt; <span class="string">&quot;space&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">CollationMaxVariable</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>.<span class="ident">as_str</span>(), <span class="ident">f</span>)
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>CollationMaxVariable {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        std::fmt::Display::fmt(<span class="self">self</span>.as_str(), f)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

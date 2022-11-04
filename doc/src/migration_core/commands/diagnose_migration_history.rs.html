@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/core/src/commands/diagnose_migration_history.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>diagnose_migration_history.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../migration_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/core/src/commands/diagnose_migration_history.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>diagnose_migration_history.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../migration_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -313,320 +313,320 @@
 <span id="313">313</span>
 <span id="314">314</span>
 <span id="315">315</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CoreResult</span>;
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{
-    <span class="ident">migrations_directory</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorError</span>, <span class="ident">DiffTarget</span>, <span class="ident">MigrationConnector</span>, <span class="ident">MigrationRecord</span>,
-    <span class="ident">PersistenceNotInitializedError</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::CoreResult;
+<span class="kw">use </span>migration_connector::{
+    migrations_directory::<span class="kw-2">*</span>, ConnectorError, DiffTarget, MigrationConnector, MigrationRecord,
+    PersistenceNotInitializedError,
 };
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
+<span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::path::Path;
 
-<span class="doccomment">/// The input to the `DiagnoseMigrationHistory` command.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiagnoseMigrationHistoryInput</span> {
-    <span class="doccomment">/// The location of the migrations directory.</span>
-    <span class="kw">pub</span> <span class="ident">migrations_directory_path</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Whether creating shadow/temporary databases is allowed.</span>
-    <span class="kw">pub</span> <span class="ident">opt_in_to_shadow_database</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// The input to the `DiagnoseMigrationHistory` command.
+</span><span class="attribute">#[derive(Deserialize, Debug)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DiagnoseMigrationHistoryInput {
+    <span class="doccomment">/// The location of the migrations directory.
+    </span><span class="kw">pub </span>migrations_directory_path: String,
+    <span class="doccomment">/// Whether creating shadow/temporary databases is allowed.
+    </span><span class="kw">pub </span>opt_in_to_shadow_database: bool,
 }
 
-<span class="doccomment">/// The output of the `DiagnoseMigrationHistory` command.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiagnoseMigrationHistoryOutput</span> {
-    <span class="doccomment">/// Whether drift between the expected schema and the dev database could be</span>
-    <span class="doccomment">/// detected. `None` if the dev database has the expected schema.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">drift</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DriftDiagnostic</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The current status of the migration history of the database relative to</span>
-    <span class="doccomment">/// migrations directory. `None` if they are in sync and up to date.</span>
-    <span class="kw">pub</span> <span class="ident">history</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HistoryDiagnostic</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The names of the migrations that are currently in a failed state in the</span>
-    <span class="doccomment">/// database.</span>
-    <span class="kw">pub</span> <span class="ident">failed_migration_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The names of the migrations for which the checksum of the script in the</span>
-    <span class="doccomment">/// migration directory does not match the checksum of the applied migration</span>
-    <span class="doccomment">/// in the database.</span>
-    <span class="kw">pub</span> <span class="ident">edited_migration_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// An optional error encountered when applying a migration that is not</span>
-    <span class="doccomment">/// applied in the main database to the shadow database. We do this to</span>
-    <span class="doccomment">/// validate that unapplied migrations are at least minimally valid.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">error_in_unapplied_migration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectorError</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Is the migrations table initialized in the database.</span>
-    <span class="kw">pub</span> <span class="ident">has_migrations_table</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// The output of the `DiagnoseMigrationHistory` command.
+</span><span class="attribute">#[derive(Serialize, Debug)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DiagnoseMigrationHistoryOutput {
+    <span class="doccomment">/// Whether drift between the expected schema and the dev database could be
+    /// detected. `None` if the dev database has the expected schema.
+    </span><span class="attribute">#[serde(skip)]
+    </span><span class="kw">pub </span>drift: <span class="prelude-ty">Option</span>&lt;DriftDiagnostic&gt;,
+    <span class="doccomment">/// The current status of the migration history of the database relative to
+    /// migrations directory. `None` if they are in sync and up to date.
+    </span><span class="kw">pub </span>history: <span class="prelude-ty">Option</span>&lt;HistoryDiagnostic&gt;,
+    <span class="doccomment">/// The names of the migrations that are currently in a failed state in the
+    /// database.
+    </span><span class="kw">pub </span>failed_migration_names: Vec&lt;String&gt;,
+    <span class="doccomment">/// The names of the migrations for which the checksum of the script in the
+    /// migration directory does not match the checksum of the applied migration
+    /// in the database.
+    </span><span class="kw">pub </span>edited_migration_names: Vec&lt;String&gt;,
+    <span class="doccomment">/// An optional error encountered when applying a migration that is not
+    /// applied in the main database to the shadow database. We do this to
+    /// validate that unapplied migrations are at least minimally valid.
+    </span><span class="attribute">#[serde(skip)]
+    </span><span class="kw">pub </span>error_in_unapplied_migration: <span class="prelude-ty">Option</span>&lt;ConnectorError&gt;,
+    <span class="doccomment">/// Is the migrations table initialized in the database.
+    </span><span class="kw">pub </span>has_migrations_table: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">DiagnoseMigrationHistoryOutput</span> {
-    <span class="doccomment">/// True if no problem was found</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+<span class="kw">impl </span>DiagnoseMigrationHistoryOutput {
+    <span class="doccomment">/// True if no problem was found
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
-            <span class="ident">DiagnoseMigrationHistoryOutput</span> {
-                <span class="ident">drift</span>,
-                <span class="ident">history</span>,
-                <span class="ident">has_migrations_table</span>: <span class="kw">_</span>,
-                <span class="ident">failed_migration_names</span>,
-                <span class="ident">edited_migration_names</span>,
-                <span class="ident">error_in_unapplied_migration</span>,
-            } <span class="kw">if</span> <span class="ident">drift</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">history</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">failed_migration_names</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">edited_migration_names</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">error_in_unapplied_migration</span>.<span class="ident">is_none</span>()
+            DiagnoseMigrationHistoryOutput {
+                drift,
+                history,
+                has_migrations_table: <span class="kw">_</span>,
+                failed_migration_names,
+                edited_migration_names,
+                error_in_unapplied_migration,
+            } <span class="kw">if </span>drift.is_none() &amp;&amp; history.is_none() &amp;&amp; failed_migration_names.is_empty() &amp;&amp; edited_migration_names.is_empty() &amp;&amp; error_in_unapplied_migration.is_none()
         )
     }
 }
 
-<span class="doccomment">/// Read the contents of the migrations directory and the migrations table, and</span>
-<span class="doccomment">/// returns their relative statuses. At this stage, the migration engine only</span>
-<span class="doccomment">/// reads, it does not write to the dev database nor the migrations directory.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diagnose_migration_history</span>(
-    <span class="ident">input</span>: <span class="ident">DiagnoseMigrationHistoryInput</span>,
-    <span class="ident">connector</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
-) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiagnoseMigrationHistoryOutput</span><span class="op">&gt;</span> {
+<span class="doccomment">/// Read the contents of the migrations directory and the migrations table, and
+/// returns their relative statuses. At this stage, the migration engine only
+/// reads, it does not write to the dev database nor the migrations directory.
+</span><span class="kw">pub async fn </span>diagnose_migration_history(
+    input: DiagnoseMigrationHistoryInput,
+    connector: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>MigrationConnector,
+) -&gt; CoreResult&lt;DiagnoseMigrationHistoryOutput&gt; {
     <span class="macro">tracing::debug!</span>(<span class="string">&quot;Diagnosing migration history&quot;</span>);
 
-    <span class="ident">error_on_changed_provider</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">migrations_directory_path</span>, <span class="ident">connector</span>.<span class="ident">connector_type</span>())<span class="question-mark">?</span>;
+    error_on_changed_provider(<span class="kw-2">&amp;</span>input.migrations_directory_path, connector.connector_type())<span class="question-mark">?</span>;
 
-    <span class="comment">// Load the migrations.</span>
-    <span class="kw">let</span> <span class="ident">migrations_from_filesystem</span> <span class="op">=</span> <span class="ident">list_migrations</span>(<span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">migrations_directory_path</span>))<span class="question-mark">?</span>;
+    <span class="comment">// Load the migrations.
+    </span><span class="kw">let </span>migrations_from_filesystem = list_migrations(Path::new(<span class="kw-2">&amp;</span>input.migrations_directory_path))<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> (<span class="ident">migrations_from_database</span>, <span class="ident">has_migrations_table</span>) <span class="op">=</span>
-        <span class="kw">match</span> <span class="ident">connector</span>.<span class="ident">migration_persistence</span>().<span class="ident">list_migrations</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">migrations</span>) =&gt; (<span class="ident">migrations</span>, <span class="bool-val">true</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">PersistenceNotInitializedError</span> {}) =&gt; (<span class="macro">vec!</span>[], <span class="bool-val">false</span>),
+    <span class="kw">let </span>(migrations_from_database, has_migrations_table) =
+        <span class="kw">match </span>connector.migration_persistence().list_migrations().<span class="kw">await</span><span class="question-mark">? </span>{
+            <span class="prelude-val">Ok</span>(migrations) =&gt; (migrations, <span class="bool-val">true</span>),
+            <span class="prelude-val">Err</span>(PersistenceNotInitializedError {}) =&gt; (<span class="macro">vec!</span>[], <span class="bool-val">false</span>),
         };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">Diagnostics::new</span>(<span class="kw-2">&amp;</span><span class="ident">migrations_from_filesystem</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>diagnostics = Diagnostics::new(<span class="kw-2">&amp;</span>migrations_from_filesystem);
 
-    <span class="comment">// Check filesystem history against database history.</span>
-    <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">fs_migration</span>) <span class="kw">in</span> <span class="ident">migrations_from_filesystem</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">let</span> <span class="ident">corresponding_db_migration</span> <span class="op">=</span> <span class="ident">migrations_from_database</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">db_migration</span><span class="op">|</span> <span class="ident">db_migration</span>.<span class="ident">migration_name</span> <span class="op">==</span> <span class="ident">fs_migration</span>.<span class="ident">migration_name</span>());
+    <span class="comment">// Check filesystem history against database history.
+    </span><span class="kw">for </span>(index, fs_migration) <span class="kw">in </span>migrations_from_filesystem.iter().enumerate() {
+        <span class="kw">let </span>corresponding_db_migration = migrations_from_database
+            .iter()
+            .find(|db_migration| db_migration.migration_name == fs_migration.migration_name());
 
-        <span class="kw">match</span> <span class="ident">corresponding_db_migration</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">db_migration</span>)
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">fs_migration</span>
-                    .<span class="ident">matches_checksum</span>(<span class="kw-2">&amp;</span><span class="ident">db_migration</span>.<span class="ident">checksum</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">ConnectorError::from</span>)<span class="question-mark">?</span> =&gt;
+        <span class="kw">match </span>corresponding_db_migration {
+            <span class="prelude-val">Some</span>(db_migration)
+                <span class="kw">if </span>!fs_migration
+                    .matches_checksum(<span class="kw-2">&amp;</span>db_migration.checksum)
+                    .map_err(ConnectorError::from)<span class="question-mark">? </span>=&gt;
             {
-                <span class="ident">diagnostics</span>.<span class="ident">edited_migrations</span>.<span class="ident">push</span>(<span class="ident">db_migration</span>);
+                diagnostics.edited_migrations.push(db_migration);
             }
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; (),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">fs_migrations_not_in_db</span>.<span class="ident">push</span>((<span class="ident">index</span>, <span class="ident">fs_migration</span>)),
+            <span class="prelude-val">None </span>=&gt; diagnostics.fs_migrations_not_in_db.push((index, fs_migration)),
         }
     }
 
-    <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">db_migration</span>) <span class="kw">in</span> <span class="ident">migrations_from_database</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">let</span> <span class="ident">corresponding_fs_migration</span> <span class="op">=</span> <span class="ident">migrations_from_filesystem</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">fs_migration</span><span class="op">|</span> <span class="ident">db_migration</span>.<span class="ident">migration_name</span> <span class="op">==</span> <span class="ident">fs_migration</span>.<span class="ident">migration_name</span>());
+    <span class="kw">for </span>(index, db_migration) <span class="kw">in </span>migrations_from_database.iter().enumerate() {
+        <span class="kw">let </span>corresponding_fs_migration = migrations_from_filesystem
+            .iter()
+            .find(|fs_migration| db_migration.migration_name == fs_migration.migration_name());
 
-        <span class="kw">if</span> <span class="ident">db_migration</span>.<span class="ident">finished_at</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">db_migration</span>.<span class="ident">rolled_back_at</span>.<span class="ident">is_none</span>() {
-            <span class="ident">diagnostics</span>.<span class="ident">failed_migrations</span>.<span class="ident">push</span>(<span class="ident">db_migration</span>);
+        <span class="kw">if </span>db_migration.finished_at.is_none() &amp;&amp; db_migration.rolled_back_at.is_none() {
+            diagnostics.failed_migrations.push(db_migration);
         }
 
-        <span class="kw">if</span> <span class="ident">corresponding_fs_migration</span>.<span class="ident">is_none</span>() {
-            <span class="ident">diagnostics</span>.<span class="ident">db_migrations_not_in_fs</span>.<span class="ident">push</span>((<span class="ident">index</span>, <span class="ident">db_migration</span>))
+        <span class="kw">if </span>corresponding_fs_migration.is_none() {
+            diagnostics.db_migrations_not_in_fs.push((index, db_migration))
         }
     }
 
-    <span class="comment">// Detect drift</span>
-    <span class="kw">let</span> <span class="ident">applied_migrations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">migrations_from_filesystem</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">fs_migration</span><span class="op">|</span> {
-            <span class="ident">migrations_from_database</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">db_migration</span><span class="op">|</span> <span class="ident">db_migration</span>.<span class="ident">finished_at</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">db_migration</span>.<span class="ident">rolled_back_at</span>.<span class="ident">is_none</span>())
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">db_migration</span><span class="op">|</span> <span class="ident">db_migration</span>.<span class="ident">migration_name</span> <span class="op">==</span> <span class="ident">fs_migration</span>.<span class="ident">migration_name</span>())
+    <span class="comment">// Detect drift
+    </span><span class="kw">let </span>applied_migrations: Vec&lt;<span class="kw">_</span>&gt; = migrations_from_filesystem
+        .iter()
+        .filter(|fs_migration| {
+            migrations_from_database
+                .iter()
+                .filter(|db_migration| db_migration.finished_at.is_some() &amp;&amp; db_migration.rolled_back_at.is_none())
+                .any(|db_migration| db_migration.migration_name == fs_migration.migration_name())
         })
-        .<span class="ident">cloned</span>()
-        .<span class="ident">collect</span>();
+        .cloned()
+        .collect();
 
-    <span class="kw">let</span> (<span class="ident">drift</span>, <span class="ident">error_in_unapplied_migration</span>) <span class="op">=</span> {
-        <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">opt_in_to_shadow_database</span> {
-            <span class="comment">// TODO(MultiSchema): this should probably fill the following namespaces from the CLI since there is</span>
-            <span class="comment">// no schema to grab the namespaces off, in the case of MultiSchema.</span>
-            <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">connector</span>
-                .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">DiffTarget::Migrations</span>(<span class="kw-2">&amp;</span><span class="ident">applied_migrations</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+    <span class="kw">let </span>(drift, error_in_unapplied_migration) = {
+        <span class="kw">if </span>input.opt_in_to_shadow_database {
+            <span class="comment">// TODO(MultiSchema): this should probably fill the following namespaces from the CLI since there is
+            // no schema to grab the namespaces off, in the case of MultiSchema.
+            </span><span class="kw">let </span>from = connector
+                .database_schema_from_diff_target(DiffTarget::Migrations(<span class="kw-2">&amp;</span>applied_migrations), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
                 .<span class="kw">await</span>;
-            <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">connector</span>
-                .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">DiffTarget::Database</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+            <span class="kw">let </span>to = connector
+                .database_schema_from_diff_target(DiffTarget::Database, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
                 .<span class="kw">await</span>;
-            <span class="kw">let</span> <span class="ident">drift</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">from</span><span class="op">|</span> <span class="ident">to</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">to</span><span class="op">|</span> <span class="ident">connector</span>.<span class="ident">diff</span>(<span class="ident">from</span>, <span class="ident">to</span>))).<span class="ident">map</span>(<span class="op">|</span><span class="ident">mig</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">connector</span>.<span class="ident">migration_is_empty</span>(<span class="kw-2">&amp;</span><span class="ident">mig</span>) {
-                    <span class="prelude-val">None</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">mig</span>)
+            <span class="kw">let </span>drift = <span class="kw">match </span>from.and_then(|from| to.map(|to| connector.diff(from, to))).map(|mig| {
+                <span class="kw">if </span>connector.migration_is_empty(<span class="kw-2">&amp;</span>mig) {
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(mig)
                 }
             }) {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">drift</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">DriftDiagnostic::DriftDetected</span> {
-                    <span class="ident">summary</span>: <span class="ident">connector</span>.<span class="ident">migration_summary</span>(<span class="kw-2">&amp;</span><span class="ident">drift</span>),
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(drift)) =&gt; <span class="prelude-val">Some</span>(DriftDiagnostic::DriftDetected {
+                    summary: connector.migration_summary(<span class="kw-2">&amp;</span>drift),
                 }),
-                <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">DriftDiagnostic::MigrationFailedToApply</span> { <span class="ident">error</span> }),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="prelude-val">Err</span>(error) =&gt; <span class="prelude-val">Some</span>(DriftDiagnostic::MigrationFailedToApply { error }),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             };
 
-            <span class="kw">let</span> <span class="ident">error_in_unapplied_migration</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">drift</span>, <span class="prelude-val">Some</span>(<span class="ident">DriftDiagnostic::MigrationFailedToApply</span> { .. }))
+            <span class="kw">let </span>error_in_unapplied_migration = <span class="kw">if </span>!<span class="macro">matches!</span>(drift, <span class="prelude-val">Some</span>(DriftDiagnostic::MigrationFailedToApply { .. }))
             {
-                <span class="comment">// TODO(MultiSchema): Not entirely sure passing no namespaces here is correct. Probably should</span>
-                <span class="comment">// also grab this as a CLI argument.</span>
-                <span class="ident">connector</span>
-                    .<span class="ident">validate_migrations</span>(<span class="kw-2">&amp;</span><span class="ident">migrations_from_filesystem</span>, <span class="prelude-val">None</span>)
-                    .<span class="kw">await</span>
-                    .<span class="ident">err</span>()
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            };
+                <span class="comment">// TODO(MultiSchema): Not entirely sure passing no namespaces here is correct. Probably should
+                // also grab this as a CLI argument.
+                </span>connector
+                    .validate_migrations(<span class="kw-2">&amp;</span>migrations_from_filesystem, <span class="prelude-val">None</span>)
+                    .<span class="kw">await
+                    </span>.err()
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>};
 
-            (<span class="ident">drift</span>, <span class="ident">error_in_unapplied_migration</span>)
-        } <span class="kw">else</span> {
+            (drift, error_in_unapplied_migration)
+        } <span class="kw">else </span>{
             (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
         }
     };
 
-    <span class="prelude-val">Ok</span>(<span class="ident">DiagnoseMigrationHistoryOutput</span> {
-        <span class="ident">drift</span>,
-        <span class="ident">history</span>: <span class="ident">diagnostics</span>.<span class="ident">history</span>(),
-        <span class="ident">failed_migration_names</span>: <span class="ident">diagnostics</span>.<span class="ident">failed_migration_names</span>(),
-        <span class="ident">edited_migration_names</span>: <span class="ident">diagnostics</span>.<span class="ident">edited_migration_names</span>(),
-        <span class="ident">error_in_unapplied_migration</span>,
-        <span class="ident">has_migrations_table</span>,
+    <span class="prelude-val">Ok</span>(DiagnoseMigrationHistoryOutput {
+        drift,
+        history: diagnostics.history(),
+        failed_migration_names: diagnostics.failed_migration_names(),
+        edited_migration_names: diagnostics.edited_migration_names(),
+        error_in_unapplied_migration,
+        has_migrations_table,
     })
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Diagnostics</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">fs_migrations_not_in_db</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MigrationDirectory</span>)<span class="op">&gt;</span>,
-    <span class="ident">db_migrations_not_in_fs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MigrationRecord</span>)<span class="op">&gt;</span>,
-    <span class="ident">edited_migrations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MigrationRecord</span><span class="op">&gt;</span>,
-    <span class="ident">failed_migrations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MigrationRecord</span><span class="op">&gt;</span>,
-    <span class="ident">fs_migrations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">MigrationDirectory</span>],
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Diagnostics&lt;<span class="lifetime">&#39;a</span>&gt; {
+    fs_migrations_not_in_db: Vec&lt;(usize, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MigrationDirectory)&gt;,
+    db_migrations_not_in_fs: Vec&lt;(usize, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MigrationRecord)&gt;,
+    edited_migrations: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MigrationRecord&gt;,
+    failed_migrations: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MigrationRecord&gt;,
+    fs_migrations: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[MigrationDirectory],
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Diagnostics</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fs_migrations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">MigrationDirectory</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Diagnostics</span> {
-            <span class="ident">fs_migrations_not_in_db</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">db_migrations_not_in_fs</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">edited_migrations</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">failed_migrations</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">fs_migrations</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Diagnostics&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new(fs_migrations: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[MigrationDirectory]) -&gt; <span class="self">Self </span>{
+        Diagnostics {
+            fs_migrations_not_in_db: Vec::new(),
+            db_migrations_not_in_fs: Vec::new(),
+            edited_migrations: Vec::new(),
+            failed_migrations: Vec::new(),
+            fs_migrations,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">db_migration_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db_migrations_not_in_fs</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">migration</span>)<span class="op">|</span> <span class="ident">migration</span>.<span class="ident">migration_name</span>.<span class="ident">clone</span>())
-            .<span class="ident">collect</span>()
+    <span class="kw">fn </span>db_migration_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+        <span class="self">self</span>.db_migrations_not_in_fs
+            .iter()
+            .map(|(<span class="kw">_</span>, migration)| migration.migration_name.clone())
+            .collect()
     }
 
-    <span class="kw">fn</span> <span class="ident">edited_migration_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edited_migrations</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">migration</span><span class="op">|</span> <span class="ident">migration</span>.<span class="ident">migration_name</span>.<span class="ident">clone</span>())
-            .<span class="ident">collect</span>()
+    <span class="kw">fn </span>edited_migration_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+        <span class="self">self</span>.edited_migrations
+            .iter()
+            .map(|migration| migration.migration_name.clone())
+            .collect()
     }
 
-    <span class="kw">fn</span> <span class="ident">failed_migration_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">failed_migrations</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">migration</span><span class="op">|</span> <span class="ident">migration</span>.<span class="ident">migration_name</span>.<span class="ident">clone</span>())
-            .<span class="ident">collect</span>()
+    <span class="kw">fn </span>failed_migration_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+        <span class="self">self</span>.failed_migrations
+            .iter()
+            .map(|migration| migration.migration_name.clone())
+            .collect()
     }
 
-    <span class="kw">fn</span> <span class="ident">fs_migration_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fs_migrations_not_in_db</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">migration</span>)<span class="op">|</span> <span class="ident">migration</span>.<span class="ident">migration_name</span>().<span class="ident">to_owned</span>())
-            .<span class="ident">collect</span>()
+    <span class="kw">fn </span>fs_migration_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+        <span class="self">self</span>.fs_migrations_not_in_db
+            .iter()
+            .map(|(<span class="kw">_</span>, migration)| migration.migration_name().to_owned())
+            .collect()
     }
 
-    <span class="kw">fn</span> <span class="ident">history</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HistoryDiagnostic</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">fs_migrations_not_in_db</span>.<span class="ident">len</span>(), <span class="self">self</span>.<span class="ident">db_migrations_not_in_fs</span>.<span class="ident">len</span>()) {
+    <span class="kw">fn </span>history(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HistoryDiagnostic&gt; {
+        <span class="kw">match </span>(<span class="self">self</span>.fs_migrations_not_in_db.len(), <span class="self">self</span>.db_migrations_not_in_fs.len()) {
             (<span class="number">0</span>, <span class="number">0</span>) =&gt; <span class="prelude-val">None</span>,
-            (<span class="kw">_</span>, <span class="number">0</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">HistoryDiagnostic::DatabaseIsBehind</span> {
-                <span class="ident">unapplied_migration_names</span>: <span class="self">self</span>.<span class="ident">fs_migration_names</span>(),
+            (<span class="kw">_</span>, <span class="number">0</span>) =&gt; <span class="prelude-val">Some</span>(HistoryDiagnostic::DatabaseIsBehind {
+                unapplied_migration_names: <span class="self">self</span>.fs_migration_names(),
             }),
-            (<span class="number">0</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">HistoryDiagnostic::MigrationsDirectoryIsBehind</span> {
-                <span class="ident">unpersisted_migration_names</span>: <span class="self">self</span>.<span class="ident">db_migration_names</span>(),
+            (<span class="number">0</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(HistoryDiagnostic::MigrationsDirectoryIsBehind {
+                unpersisted_migration_names: <span class="self">self</span>.db_migration_names(),
             }),
-            (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">HistoryDiagnostic::HistoriesDiverge</span> {
-                <span class="ident">last_common_migration_name</span>: <span class="self">self</span>.<span class="ident">fs_migrations_not_in_db</span>.<span class="ident">first</span>().<span class="ident">and_then</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="kw">_</span>)<span class="op">|</span> {
-                    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">idx</span> <span class="op">==</span> <span class="number">0</span> {
-                        <span class="prelude-val">None</span>
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">fs_migrations</span>[<span class="ident">idx</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">migration_name</span>().<span class="ident">to_owned</span>())
+            (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(HistoryDiagnostic::HistoriesDiverge {
+                last_common_migration_name: <span class="self">self</span>.fs_migrations_not_in_db.first().and_then(|(idx, <span class="kw">_</span>)| {
+                    <span class="kw">if </span><span class="kw-2">*</span>idx == <span class="number">0 </span>{
+                        <span class="prelude-val">None
+                    </span>} <span class="kw">else </span>{
+                        <span class="prelude-val">Some</span>(<span class="self">self</span>.fs_migrations[idx - <span class="number">1</span>].migration_name().to_owned())
                     }
                 }),
-                <span class="ident">unpersisted_migration_names</span>: <span class="self">self</span>.<span class="ident">db_migration_names</span>(),
-                <span class="ident">unapplied_migration_names</span>: <span class="self">self</span>.<span class="ident">fs_migration_names</span>(),
+                unpersisted_migration_names: <span class="self">self</span>.db_migration_names(),
+                unapplied_migration_names: <span class="self">self</span>.fs_migration_names(),
             }),
         }
     }
 }
 
-<span class="doccomment">/// A diagnostic returned by `diagnoseMigrationHistory` when looking at the</span>
-<span class="doccomment">/// database migration history in relation to the migrations directory.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">tag</span> <span class="op">=</span> <span class="string">&quot;diagnostic&quot;</span>, <span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HistoryDiagnostic</span> {
-    <span class="doccomment">/// There are migrations in the migrations directory that have not been</span>
-    <span class="doccomment">/// applied to the database yet.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-    <span class="ident">DatabaseIsBehind</span> {
-        <span class="doccomment">/// The names of the migrations.</span>
-        <span class="ident">unapplied_migration_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A diagnostic returned by `diagnoseMigrationHistory` when looking at the
+/// database migration history in relation to the migrations directory.
+</span><span class="attribute">#[derive(Debug, PartialEq, Serialize)]
+#[serde(tag = <span class="string">&quot;diagnostic&quot;</span>, rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub enum </span>HistoryDiagnostic {
+    <span class="doccomment">/// There are migrations in the migrations directory that have not been
+    /// applied to the database yet.
+    </span><span class="attribute">#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    </span>DatabaseIsBehind {
+        <span class="doccomment">/// The names of the migrations.
+        </span>unapplied_migration_names: Vec&lt;String&gt;,
     },
-    <span class="doccomment">/// Migrations have been applied to the database that are not in the</span>
-    <span class="doccomment">/// migrations directory.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-    <span class="ident">MigrationsDirectoryIsBehind</span> {
-        <span class="doccomment">/// The names of the migrations.</span>
-        <span class="ident">unpersisted_migration_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Migrations have been applied to the database that are not in the
+    /// migrations directory.
+    </span><span class="attribute">#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    </span>MigrationsDirectoryIsBehind {
+        <span class="doccomment">/// The names of the migrations.
+        </span>unpersisted_migration_names: Vec&lt;String&gt;,
     },
-    <span class="doccomment">/// The migrations table history and the migrations directory history are</span>
-    <span class="doccomment">/// not the same. This currently ignores the ordering of migrations.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-    <span class="ident">HistoriesDiverge</span> {
-        <span class="doccomment">/// The last migration that is present both in the migrations directory</span>
-        <span class="doccomment">/// and the migrations table.</span>
-        <span class="ident">last_common_migration_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// The names of the migrations that are present in the migrations table</span>
-        <span class="doccomment">/// but not in the migrations directory.</span>
-        <span class="ident">unpersisted_migration_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// The names of the migrations that are present in the migrations</span>
-        <span class="doccomment">/// directory but have not been applied to the database.</span>
-        <span class="ident">unapplied_migration_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    },
-}
-
-<span class="doccomment">/// A diagnostic returned by `diagnoseMigrationHistory` when trying to determine</span>
-<span class="doccomment">/// whether the development database has the expected schema at its stage in</span>
-<span class="doccomment">/// history.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DriftDiagnostic</span> {
-    <span class="doccomment">/// The database schema of the current database does not match what would be</span>
-    <span class="doccomment">/// expected at its stage in the migration history.</span>
-    <span class="ident">DriftDetected</span> {
-        <span class="doccomment">/// The human-readable contents of the drift.</span>
-        <span class="ident">summary</span>: <span class="ident">String</span>,
-    },
-    <span class="doccomment">/// When a migration fails to apply cleanly to a shadow database.</span>
-    <span class="ident">MigrationFailedToApply</span> {
-        <span class="doccomment">/// The full error.</span>
-        <span class="ident">error</span>: <span class="ident">ConnectorError</span>,
+    <span class="doccomment">/// The migrations table history and the migrations directory history are
+    /// not the same. This currently ignores the ordering of migrations.
+    </span><span class="attribute">#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    </span>HistoriesDiverge {
+        <span class="doccomment">/// The last migration that is present both in the migrations directory
+        /// and the migrations table.
+        </span>last_common_migration_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        <span class="doccomment">/// The names of the migrations that are present in the migrations table
+        /// but not in the migrations directory.
+        </span>unpersisted_migration_names: Vec&lt;String&gt;,
+        <span class="doccomment">/// The names of the migrations that are present in the migrations
+        /// directory but have not been applied to the database.
+        </span>unapplied_migration_names: Vec&lt;String&gt;,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">DriftDiagnostic</span> {
-    <span class="doccomment">/// For tests.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_drift_detected</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DriftDiagnostic::DriftDetected</span> { <span class="ident">summary</span> } =&gt; <span class="ident">summary</span>,
-            <span class="ident">other</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unwrap_drift_detected on {:?}&quot;</span>, <span class="ident">other</span>),
+<span class="doccomment">/// A diagnostic returned by `diagnoseMigrationHistory` when trying to determine
+/// whether the development database has the expected schema at its stage in
+/// history.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DriftDiagnostic {
+    <span class="doccomment">/// The database schema of the current database does not match what would be
+    /// expected at its stage in the migration history.
+    </span>DriftDetected {
+        <span class="doccomment">/// The human-readable contents of the drift.
+        </span>summary: String,
+    },
+    <span class="doccomment">/// When a migration fails to apply cleanly to a shadow database.
+    </span>MigrationFailedToApply {
+        <span class="doccomment">/// The full error.
+        </span>error: ConnectorError,
+    },
+}
+
+<span class="kw">impl </span>DriftDiagnostic {
+    <span class="doccomment">/// For tests.
+    </span><span class="kw">pub fn </span>unwrap_drift_detected(<span class="self">self</span>) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            DriftDiagnostic::DriftDetected { summary } =&gt; summary,
+            other =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unwrap_drift_detected on {:?}&quot;</span>, other),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="migration_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="migration_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

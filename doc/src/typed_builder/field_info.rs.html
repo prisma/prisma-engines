@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/typed-builder-0.10.0/src/field_info.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field_info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../typed_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../typed_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../typed_builder/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/typed-builder-0.10.0/src/field_info.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field_info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../typed_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../typed_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../typed_builder/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -391,98 +391,98 @@
 <span id="391">391</span>
 <span id="392">392</span>
 <span id="393">393</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Span</span>, <span class="ident">TokenStream</span>};
-<span class="kw">use</span> <span class="ident">quote::quote</span>;
-<span class="kw">use</span> <span class="ident">syn::parse::Error</span>;
-<span class="kw">use</span> <span class="ident">syn::spanned::Spanned</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>proc_macro2::{Span, TokenStream};
+<span class="kw">use </span>quote::quote;
+<span class="kw">use </span>syn::parse::Error;
+<span class="kw">use </span>syn::spanned::Spanned;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">expr_to_single_string</span>, <span class="ident">ident_to_type</span>, <span class="ident">path_to_single_string</span>, <span class="ident">strip_raw_ident_prefix</span>};
+<span class="kw">use </span><span class="kw">crate</span>::util::{expr_to_single_string, ident_to_type, path_to_single_string, strip_raw_ident_prefix};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">ordinal</span>: <span class="ident">usize</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">syn::Ident</span>,
-    <span class="kw">pub</span> <span class="ident">generic_ident</span>: <span class="ident">syn::Ident</span>,
-    <span class="kw">pub</span> <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">syn::Type</span>,
-    <span class="kw">pub</span> <span class="ident">builder_attr</span>: <span class="ident">FieldBuilderAttr</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>FieldInfo&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>ordinal: usize,
+    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>syn::Ident,
+    <span class="kw">pub </span>generic_ident: syn::Ident,
+    <span class="kw">pub </span>ty: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>syn::Type,
+    <span class="kw">pub </span>builder_attr: FieldBuilderAttr,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FieldInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ordinal</span>: <span class="ident">usize</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Field</span>, <span class="ident">field_defaults</span>: <span class="ident">FieldBuilderAttr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FieldInfo</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ident</span> {
-            <span class="ident">FieldInfo</span> {
-                <span class="ident">ordinal</span>,
-                <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">name</span>,
-                <span class="ident">generic_ident</span>: <span class="ident">syn::Ident::new</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;__{}&quot;</span>, <span class="ident">strip_raw_ident_prefix</span>(<span class="ident">name</span>.<span class="ident">to_string</span>())), <span class="ident">Span::call_site</span>()),
-                <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span>,
-                <span class="ident">builder_attr</span>: <span class="ident">field_defaults</span>.<span class="ident">with</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">attrs</span>)<span class="question-mark">?</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FieldInfo&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(ordinal: usize, field: <span class="kw-2">&amp;</span>syn::Field, field_defaults: FieldBuilderAttr) -&gt; <span class="prelude-ty">Result</span>&lt;FieldInfo, Error&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>name) = field.ident {
+            FieldInfo {
+                ordinal,
+                name: <span class="kw-2">&amp;</span>name,
+                generic_ident: syn::Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;__{}&quot;</span>, strip_raw_ident_prefix(name.to_string())), Span::call_site()),
+                ty: <span class="kw-2">&amp;</span>field.ty,
+                builder_attr: field_defaults.with(<span class="kw-2">&amp;</span>field.attrs)<span class="question-mark">?</span>,
             }
-            .<span class="ident">post_process</span>()
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">field</span>.<span class="ident">span</span>(), <span class="string">&quot;Nameless field in struct&quot;</span>))
+            .post_process()
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(Error::new(field.span(), <span class="string">&quot;Nameless field in struct&quot;</span>))
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generic_ty_param</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">syn::GenericParam</span> {
-        <span class="ident">syn::GenericParam::Type</span>(<span class="self">self</span>.<span class="ident">generic_ident</span>.<span class="ident">clone</span>().<span class="ident">into</span>())
+    <span class="kw">pub fn </span>generic_ty_param(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; syn::GenericParam {
+        syn::GenericParam::Type(<span class="self">self</span>.generic_ident.clone().into())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_ident</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">syn::Type</span> {
-        <span class="ident">ident_to_type</span>(<span class="self">self</span>.<span class="ident">generic_ident</span>.<span class="ident">clone</span>())
+    <span class="kw">pub fn </span>type_ident(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; syn::Type {
+        ident_to_type(<span class="self">self</span>.generic_ident.clone())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tuplized_type_ty_param</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">syn::Type</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">types</span> <span class="op">=</span> <span class="ident">syn::punctuated::Punctuated::default</span>();
-        <span class="ident">types</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">ty</span>.<span class="ident">clone</span>());
-        <span class="ident">types</span>.<span class="ident">push_punct</span>(<span class="ident">Default::default</span>());
-        <span class="ident">syn::TypeTuple</span> {
-            <span class="ident">paren_token</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">elems</span>: <span class="ident">types</span>,
+    <span class="kw">pub fn </span>tuplized_type_ty_param(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; syn::Type {
+        <span class="kw">let </span><span class="kw-2">mut </span>types = syn::punctuated::Punctuated::default();
+        types.push(<span class="self">self</span>.ty.clone());
+        types.push_punct(Default::default());
+        syn::TypeTuple {
+            paren_token: Default::default(),
+            elems: types,
         }
-        .<span class="ident">into</span>()
+        .into()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_from_inside_option</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">syn::Type</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Type::Path</span>(<span class="ident">type_path</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">ty</span> {
-            <span class="kw">if</span> <span class="ident">type_path</span>.<span class="ident">qself</span>.<span class="ident">is_some</span>() {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
-            } <span class="kw">else</span> {
-                <span class="kw-2">&amp;</span><span class="ident">type_path</span>.<span class="ident">path</span>
+    <span class="kw">pub fn </span>type_from_inside_option(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>syn::Type&gt; {
+        <span class="kw">let </span>path = <span class="kw">if let </span>syn::Type::Path(type_path) = <span class="self">self</span>.ty {
+            <span class="kw">if </span>type_path.qself.is_some() {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
+            } <span class="kw">else </span>{
+                <span class="kw-2">&amp;</span>type_path.path
             }
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        } <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         };
-        <span class="kw">let</span> <span class="ident">segment</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">last</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">segment</span>.<span class="ident">ident</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;Option&quot;</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span>segment = path.segments.last()<span class="question-mark">?</span>;
+        <span class="kw">if </span>segment.ident != <span class="string">&quot;Option&quot; </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">generic_params</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::PathArguments::AngleBracketed</span>(<span class="ident">generic_params</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">segment</span>.<span class="ident">arguments</span> {
-            <span class="ident">generic_params</span>
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span>generic_params = <span class="kw">if let </span>syn::PathArguments::AngleBracketed(generic_params) = <span class="kw-2">&amp;</span>segment.arguments {
+            generic_params
+        } <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         };
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::GenericArgument::Type</span>(<span class="ident">ty</span>) <span class="op">=</span> <span class="ident">generic_params</span>.<span class="ident">args</span>.<span class="ident">first</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ty</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+        <span class="kw">if let </span>syn::GenericArgument::Type(ty) = generic_params.args.first()<span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(ty)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">post_process</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">strip_bool_span</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder_attr</span>.<span class="ident">setter</span>.<span class="ident">strip_bool</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">default_span</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder_attr</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">span</span>()) {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">Error::new</span>(
-                    <span class="kw-2">*</span><span class="ident">strip_bool_span</span>,
+    <span class="kw">fn </span>post_process(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>strip_bool_span) = <span class="self">self</span>.builder_attr.setter.strip_bool {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(default_span) = <span class="self">self</span>.builder_attr.default.as_ref().map(|d| d.span()) {
+                <span class="kw">let </span><span class="kw-2">mut </span>error = Error::new(
+                    <span class="kw-2">*</span>strip_bool_span,
                     <span class="string">&quot;cannot set both strip_bool and default - default is assumed to be false&quot;</span>,
                 );
-                <span class="ident">error</span>.<span class="ident">combine</span>(<span class="ident">Error::new</span>(<span class="ident">default_span</span>, <span class="string">&quot;default set here&quot;</span>));
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>);
+                error.combine(Error::new(default_span, <span class="string">&quot;default set here&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(error);
             }
-            <span class="self">self</span>.<span class="ident">builder_attr</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">syn::Expr::Lit</span>(<span class="ident">syn::ExprLit</span> {
-                <span class="ident">attrs</span>: <span class="ident">Default::default</span>(),
-                <span class="ident">lit</span>: <span class="ident">syn::Lit::Bool</span>(<span class="ident">syn::LitBool</span> {
-                    <span class="ident">value</span>: <span class="bool-val">false</span>,
-                    <span class="ident">span</span>: <span class="kw-2">*</span><span class="ident">strip_bool_span</span>,
+            <span class="self">self</span>.builder_attr.default = <span class="prelude-val">Some</span>(syn::Expr::Lit(syn::ExprLit {
+                attrs: Default::default(),
+                lit: syn::Lit::Bool(syn::LitBool {
+                    value: <span class="bool-val">false</span>,
+                    span: <span class="kw-2">*</span>strip_bool_span,
                 }),
             }));
         }
@@ -490,299 +490,299 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldBuilderAttr</span> {
-    <span class="kw">pub</span> <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Expr</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">setter</span>: <span class="ident">SetterSettings</span>,
+<span class="attribute">#[derive(Debug, Default, Clone)]
+</span><span class="kw">pub struct </span>FieldBuilderAttr {
+    <span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;syn::Expr&gt;,
+    <span class="kw">pub </span>setter: SetterSettings,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetterSettings</span> {
-    <span class="kw">pub</span> <span class="ident">doc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Expr</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">skip</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">auto_into</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">strip_option</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">strip_bool</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">transform</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Transform</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Default, Clone)]
+</span><span class="kw">pub struct </span>SetterSettings {
+    <span class="kw">pub </span>doc: <span class="prelude-ty">Option</span>&lt;syn::Expr&gt;,
+    <span class="kw">pub </span>skip: <span class="prelude-ty">Option</span>&lt;Span&gt;,
+    <span class="kw">pub </span>auto_into: <span class="prelude-ty">Option</span>&lt;Span&gt;,
+    <span class="kw">pub </span>strip_option: <span class="prelude-ty">Option</span>&lt;Span&gt;,
+    <span class="kw">pub </span>strip_bool: <span class="prelude-ty">Option</span>&lt;Span&gt;,
+    <span class="kw">pub </span>transform: <span class="prelude-ty">Option</span>&lt;Transform&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">FieldBuilderAttr</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::Attribute</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="ident">attrs</span> {
-            <span class="kw">if</span> <span class="ident">path_to_single_string</span>(<span class="kw-2">&amp;</span><span class="ident">attr</span>.<span class="ident">path</span>).<span class="ident">as_deref</span>() <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;builder&quot;</span>) {
+<span class="kw">impl </span>FieldBuilderAttr {
+    <span class="kw">pub fn </span>with(<span class="kw-2">mut </span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>[syn::Attribute]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">for </span>attr <span class="kw">in </span>attrs {
+            <span class="kw">if </span>path_to_single_string(<span class="kw-2">&amp;</span>attr.path).as_deref() != <span class="prelude-val">Some</span>(<span class="string">&quot;builder&quot;</span>) {
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">tokens</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">if </span>attr.tokens.is_empty() {
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">let</span> <span class="ident">as_expr</span>: <span class="ident">syn::Expr</span> <span class="op">=</span> <span class="ident">syn::parse2</span>(<span class="ident">attr</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
-            <span class="kw">match</span> <span class="ident">as_expr</span> {
-                <span class="ident">syn::Expr::Paren</span>(<span class="ident">body</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">apply_meta</span>(<span class="kw-2">*</span><span class="ident">body</span>.<span class="ident">expr</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>as_expr: syn::Expr = syn::parse2(attr.tokens.clone())<span class="question-mark">?</span>;
+            <span class="kw">match </span>as_expr {
+                syn::Expr::Paren(body) =&gt; {
+                    <span class="self">self</span>.apply_meta(<span class="kw-2">*</span>body.expr)<span class="question-mark">?</span>;
                 }
-                <span class="ident">syn::Expr::Tuple</span>(<span class="ident">body</span>) =&gt; {
-                    <span class="kw">for</span> <span class="ident">expr</span> <span class="kw">in</span> <span class="ident">body</span>.<span class="ident">elems</span>.<span class="ident">into_iter</span>() {
-                        <span class="self">self</span>.<span class="ident">apply_meta</span>(<span class="ident">expr</span>)<span class="question-mark">?</span>;
+                syn::Expr::Tuple(body) =&gt; {
+                    <span class="kw">for </span>expr <span class="kw">in </span>body.elems.into_iter() {
+                        <span class="self">self</span>.apply_meta(expr)<span class="question-mark">?</span>;
                     }
                 }
-                <span class="kw">_</span> =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">attr</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>(), <span class="string">&quot;Expected (&lt;...&gt;)&quot;</span>));
+                <span class="kw">_ </span>=&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_spanned(attr.tokens.clone(), <span class="string">&quot;Expected (&lt;...&gt;)&quot;</span>));
                 }
             }
         }
 
-        <span class="self">self</span>.<span class="ident">inter_fields_conflicts</span>()<span class="question-mark">?</span>;
+        <span class="self">self</span>.inter_fields_conflicts()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_meta</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">expr</span>: <span class="ident">syn::Expr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">expr</span> {
-            <span class="ident">syn::Expr::Assign</span>(<span class="ident">assign</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span>
-                    <span class="ident">expr_to_single_string</span>(<span class="kw-2">&amp;</span><span class="ident">assign</span>.<span class="ident">left</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">assign</span>.<span class="ident">left</span>, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">as_str</span>() {
-                    <span class="string">&quot;default&quot;</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">assign</span>.<span class="ident">right</span>);
+    <span class="kw">pub fn </span>apply_meta(<span class="kw-2">&amp;mut </span><span class="self">self</span>, expr: syn::Expr) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">match </span>expr {
+            syn::Expr::Assign(assign) =&gt; {
+                <span class="kw">let </span>name =
+                    expr_to_single_string(<span class="kw-2">&amp;</span>assign.left).ok_or_else(|| Error::new_spanned(<span class="kw-2">&amp;</span>assign.left, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">match </span>name.as_str() {
+                    <span class="string">&quot;default&quot; </span>=&gt; {
+                        <span class="self">self</span>.default = <span class="prelude-val">Some</span>(<span class="kw-2">*</span>assign.right);
                         <span class="prelude-val">Ok</span>(())
                     }
-                    <span class="string">&quot;default_code&quot;</span> =&gt; {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Expr::Lit</span>(<span class="ident">syn::ExprLit</span> {
-                            <span class="ident">lit</span>: <span class="ident">syn::Lit::Str</span>(<span class="ident">code</span>),
+                    <span class="string">&quot;default_code&quot; </span>=&gt; {
+                        <span class="kw">if let </span>syn::Expr::Lit(syn::ExprLit {
+                            lit: syn::Lit::Str(code),
                             ..
-                        }) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">assign</span>.<span class="ident">right</span>
+                        }) = <span class="kw-2">*</span>assign.right
                         {
-                            <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-                            <span class="kw">let</span> <span class="ident">tokenized_code</span> <span class="op">=</span> <span class="ident">TokenStream::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">code</span>.<span class="ident">value</span>())<span class="question-mark">?</span>;
-                            <span class="self">self</span>.<span class="ident">default</span> <span class="op">=</span>
-                                <span class="prelude-val">Some</span>(<span class="ident">syn::parse</span>(<span class="ident">tokenized_code</span>.<span class="ident">into</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::new_spanned</span>(<span class="ident">code</span>, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>)))<span class="question-mark">?</span>);
-                        } <span class="kw">else</span> {
-                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">assign</span>.<span class="ident">right</span>, <span class="string">&quot;Expected string&quot;</span>));
+                            <span class="kw">use </span>std::str::FromStr;
+                            <span class="kw">let </span>tokenized_code = TokenStream::from_str(<span class="kw-2">&amp;</span>code.value())<span class="question-mark">?</span>;
+                            <span class="self">self</span>.default =
+                                <span class="prelude-val">Some</span>(syn::parse(tokenized_code.into()).map_err(|e| Error::new_spanned(code, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, e)))<span class="question-mark">?</span>);
+                        } <span class="kw">else </span>{
+                            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_spanned(assign.right, <span class="string">&quot;Expected string&quot;</span>));
                         }
                         <span class="prelude-val">Ok</span>(())
                     }
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">assign</span>, <span class="macro">format!</span>(<span class="string">&quot;Unknown parameter {:?}&quot;</span>, <span class="ident">name</span>))),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new_spanned(<span class="kw-2">&amp;</span>assign, <span class="macro">format!</span>(<span class="string">&quot;Unknown parameter {:?}&quot;</span>, name))),
                 }
             }
-            <span class="ident">syn::Expr::Path</span>(<span class="ident">path</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">path_to_single_string</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">path</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">as_str</span>() {
-                    <span class="string">&quot;default&quot;</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">syn::parse</span>(<span class="macro">quote!</span>(<span class="ident">::core::default::Default::default</span>()).<span class="ident">into</span>()).<span class="ident">unwrap</span>());
+            syn::Expr::Path(path) =&gt; {
+                <span class="kw">let </span>name = path_to_single_string(<span class="kw-2">&amp;</span>path.path).ok_or_else(|| Error::new_spanned(<span class="kw-2">&amp;</span>path, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">match </span>name.as_str() {
+                    <span class="string">&quot;default&quot; </span>=&gt; {
+                        <span class="self">self</span>.default = <span class="prelude-val">Some</span>(syn::parse(<span class="macro">quote!</span>(::core::default::Default::default()).into()).unwrap());
                         <span class="prelude-val">Ok</span>(())
                     }
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>, <span class="macro">format!</span>(<span class="string">&quot;Unknown parameter {:?}&quot;</span>, <span class="ident">name</span>))),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new_spanned(<span class="kw-2">&amp;</span>path, <span class="macro">format!</span>(<span class="string">&quot;Unknown parameter {:?}&quot;</span>, name))),
                 }
             }
-            <span class="ident">syn::Expr::Call</span>(<span class="ident">call</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">subsetting_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Expr::Path</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">call</span>.<span class="ident">func</span> {
-                    <span class="ident">path_to_single_string</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">path</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">call_func</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">call</span>.<span class="ident">func</span>;
-                    <span class="kw">let</span> <span class="ident">call_func</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">call_func</span>);
-                    <span class="ident">Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">call</span>.<span class="ident">func</span>, <span class="macro">format!</span>(<span class="string">&quot;Illegal builder setting group {}&quot;</span>, <span class="ident">call_func</span>))
+            syn::Expr::Call(call) =&gt; {
+                <span class="kw">let </span>subsetting_name = <span class="kw">if let </span>syn::Expr::Path(path) = <span class="kw-2">&amp;*</span>call.func {
+                    path_to_single_string(<span class="kw-2">&amp;</span>path.path)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
+                .ok_or_else(|| {
+                    <span class="kw">let </span>call_func = <span class="kw-2">&amp;</span>call.func;
+                    <span class="kw">let </span>call_func = <span class="macro">quote!</span>(#call_func);
+                    Error::new_spanned(<span class="kw-2">&amp;</span>call.func, <span class="macro">format!</span>(<span class="string">&quot;Illegal builder setting group {}&quot;</span>, call_func))
                 })<span class="question-mark">?</span>;
-                <span class="kw">match</span> <span class="ident">subsetting_name</span>.<span class="ident">as_ref</span>() {
-                    <span class="string">&quot;setter&quot;</span> =&gt; {
-                        <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">call</span>.<span class="ident">args</span> {
-                            <span class="self">self</span>.<span class="ident">setter</span>.<span class="ident">apply_meta</span>(<span class="ident">arg</span>)<span class="question-mark">?</span>;
+                <span class="kw">match </span>subsetting_name.as_ref() {
+                    <span class="string">&quot;setter&quot; </span>=&gt; {
+                        <span class="kw">for </span>arg <span class="kw">in </span>call.args {
+                            <span class="self">self</span>.setter.apply_meta(arg)<span class="question-mark">?</span>;
                         }
                         <span class="prelude-val">Ok</span>(())
                     }
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">call</span>.<span class="ident">func</span>,
-                        <span class="macro">format!</span>(<span class="string">&quot;Illegal builder setting group name {}&quot;</span>, <span class="ident">subsetting_name</span>),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new_spanned(
+                        <span class="kw-2">&amp;</span>call.func,
+                        <span class="macro">format!</span>(<span class="string">&quot;Illegal builder setting group name {}&quot;</span>, subsetting_name),
                     )),
                 }
             }
-            <span class="ident">syn::Expr::Unary</span>(<span class="ident">syn::ExprUnary</span> {
-                <span class="ident">op</span>: <span class="ident">syn::UnOp::Not</span>(<span class="kw">_</span>),
-                <span class="ident">expr</span>,
+            syn::Expr::Unary(syn::ExprUnary {
+                op: syn::UnOp::Not(<span class="kw">_</span>),
+                expr,
                 ..
             }) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Expr::Path</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">expr</span> {
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span>
-                        <span class="ident">path_to_single_string</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">path</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
-                    <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">as_str</span>() {
-                        <span class="string">&quot;default&quot;</span> =&gt; {
-                            <span class="self">self</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                <span class="kw">if let </span>syn::Expr::Path(path) = <span class="kw-2">*</span>expr {
+                    <span class="kw">let </span>name =
+                        path_to_single_string(<span class="kw-2">&amp;</span>path.path).ok_or_else(|| Error::new_spanned(<span class="kw-2">&amp;</span>path, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
+                    <span class="kw">match </span>name.as_str() {
+                        <span class="string">&quot;default&quot; </span>=&gt; {
+                            <span class="self">self</span>.default = <span class="prelude-val">None</span>;
                             <span class="prelude-val">Ok</span>(())
                         }
-                        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">path</span>, <span class="string">&quot;Unknown setting&quot;</span>.<span class="ident">to_owned</span>())),
+                        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new_spanned(path, <span class="string">&quot;Unknown setting&quot;</span>.to_owned())),
                     }
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">expr</span>, <span class="string">&quot;Expected simple identifier&quot;</span>.<span class="ident">to_owned</span>()))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(Error::new_spanned(expr, <span class="string">&quot;Expected simple identifier&quot;</span>.to_owned()))
                 }
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">expr</span>, <span class="string">&quot;Expected (&lt;...&gt;=&lt;...&gt;)&quot;</span>)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new_spanned(expr, <span class="string">&quot;Expected (&lt;...&gt;=&lt;...&gt;)&quot;</span>)),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">inter_fields_conflicts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">skip</span>), <span class="prelude-val">None</span>) <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">setter</span>.<span class="ident">skip</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">default</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
-                <span class="kw-2">*</span><span class="ident">skip</span>,
+    <span class="kw">fn </span>inter_fields_conflicts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">if let </span>(<span class="prelude-val">Some</span>(skip), <span class="prelude-val">None</span>) = (<span class="kw-2">&amp;</span><span class="self">self</span>.setter.skip, <span class="kw-2">&amp;</span><span class="self">self</span>.default) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
+                <span class="kw-2">*</span>skip,
                 <span class="string">&quot;#[builder(skip)] must be accompanied by default or default_code&quot;</span>,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">conflicting_transformations</span> <span class="op">=</span> [
-            (<span class="string">&quot;transform&quot;</span>, <span class="self">self</span>.<span class="ident">setter</span>.<span class="ident">transform</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">span</span>)),
-            (<span class="string">&quot;strip_option&quot;</span>, <span class="self">self</span>.<span class="ident">setter</span>.<span class="ident">strip_option</span>.<span class="ident">as_ref</span>()),
-            (<span class="string">&quot;strip_bool&quot;</span>, <span class="self">self</span>.<span class="ident">setter</span>.<span class="ident">strip_bool</span>.<span class="ident">as_ref</span>()),
+        <span class="kw">let </span>conflicting_transformations = [
+            (<span class="string">&quot;transform&quot;</span>, <span class="self">self</span>.setter.transform.as_ref().map(|t| <span class="kw-2">&amp;</span>t.span)),
+            (<span class="string">&quot;strip_option&quot;</span>, <span class="self">self</span>.setter.strip_option.as_ref()),
+            (<span class="string">&quot;strip_bool&quot;</span>, <span class="self">self</span>.setter.strip_bool.as_ref()),
         ];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conflicting_transformations</span> <span class="op">=</span> <span class="ident">conflicting_transformations</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">caption</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">span</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">span</span><span class="op">|</span> (<span class="ident">caption</span>, <span class="ident">span</span>)))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>conflicting_transformations = conflicting_transformations
+            .iter()
+            .filter_map(|(caption, span)| span.map(|span| (caption, span)))
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="kw">if</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="ident">conflicting_transformations</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> (<span class="ident">first_caption</span>, <span class="ident">first_span</span>) <span class="op">=</span> <span class="ident">conflicting_transformations</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">conflicting_captions</span> <span class="op">=</span> <span class="ident">conflicting_transformations</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">caption</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">caption</span>)
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">Error::new</span>(
-                <span class="kw-2">*</span><span class="ident">first_span</span>,
-                <span class="macro">format_args!</span>(<span class="string">&quot;{} conflicts with {}&quot;</span>, <span class="ident">first_caption</span>, <span class="ident">conflicting_captions</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)),
+        <span class="kw">if </span><span class="number">1 </span>&lt; conflicting_transformations.len() {
+            <span class="kw">let </span>(first_caption, first_span) = conflicting_transformations.pop().unwrap();
+            <span class="kw">let </span>conflicting_captions = conflicting_transformations
+                .iter()
+                .map(|(caption, <span class="kw">_</span>)| <span class="kw-2">**</span>caption)
+                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+            <span class="kw">let </span><span class="kw-2">mut </span>error = Error::new(
+                <span class="kw-2">*</span>first_span,
+                <span class="macro">format_args!</span>(<span class="string">&quot;{} conflicts with {}&quot;</span>, first_caption, conflicting_captions.join(<span class="string">&quot;, &quot;</span>)),
             );
-            <span class="kw">for</span> (<span class="ident">caption</span>, <span class="ident">span</span>) <span class="kw">in</span> <span class="ident">conflicting_transformations</span> {
-                <span class="ident">error</span>.<span class="ident">combine</span>(<span class="ident">Error::new</span>(<span class="kw-2">*</span><span class="ident">span</span>, <span class="macro">format_args!</span>(<span class="string">&quot;{} set here&quot;</span>, <span class="ident">caption</span>)));
+            <span class="kw">for </span>(caption, span) <span class="kw">in </span>conflicting_transformations {
+                error.combine(Error::new(<span class="kw-2">*</span>span, <span class="macro">format_args!</span>(<span class="string">&quot;{} set here&quot;</span>, caption)));
             }
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error);
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SetterSettings</span> {
-    <span class="kw">fn</span> <span class="ident">apply_meta</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">expr</span>: <span class="ident">syn::Expr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">expr</span> {
-            <span class="ident">syn::Expr::Assign</span>(<span class="ident">assign</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span>
-                    <span class="ident">expr_to_single_string</span>(<span class="kw-2">&amp;</span><span class="ident">assign</span>.<span class="ident">left</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">assign</span>.<span class="ident">left</span>, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">as_str</span>() {
-                    <span class="string">&quot;doc&quot;</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">doc</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">assign</span>.<span class="ident">right</span>);
+<span class="kw">impl </span>SetterSettings {
+    <span class="kw">fn </span>apply_meta(<span class="kw-2">&amp;mut </span><span class="self">self</span>, expr: syn::Expr) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">match </span>expr {
+            syn::Expr::Assign(assign) =&gt; {
+                <span class="kw">let </span>name =
+                    expr_to_single_string(<span class="kw-2">&amp;</span>assign.left).ok_or_else(|| Error::new_spanned(<span class="kw-2">&amp;</span>assign.left, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">match </span>name.as_str() {
+                    <span class="string">&quot;doc&quot; </span>=&gt; {
+                        <span class="self">self</span>.doc = <span class="prelude-val">Some</span>(<span class="kw-2">*</span>assign.right);
                         <span class="prelude-val">Ok</span>(())
                     }
-                    <span class="string">&quot;transform&quot;</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">transform</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parse_transform_closure</span>(<span class="ident">assign</span>.<span class="ident">left</span>.<span class="ident">span</span>(), <span class="kw-2">&amp;</span><span class="ident">assign</span>.<span class="ident">right</span>)<span class="question-mark">?</span>);
+                    <span class="string">&quot;transform&quot; </span>=&gt; {
+                        <span class="self">self</span>.transform = <span class="prelude-val">Some</span>(parse_transform_closure(assign.left.span(), <span class="kw-2">&amp;</span>assign.right)<span class="question-mark">?</span>);
                         <span class="prelude-val">Ok</span>(())
                     }
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">assign</span>, <span class="macro">format!</span>(<span class="string">&quot;Unknown parameter {:?}&quot;</span>, <span class="ident">name</span>))),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new_spanned(<span class="kw-2">&amp;</span>assign, <span class="macro">format!</span>(<span class="string">&quot;Unknown parameter {:?}&quot;</span>, name))),
                 }
             }
-            <span class="ident">syn::Expr::Path</span>(<span class="ident">path</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">path_to_single_string</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">path</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
-                <span class="macro">macro_rules!</span> <span class="ident">handle_fields</span> {
-                    ( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">already</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">checks</span>:<span class="ident">expr</span>; )<span class="op">*</span> ) =&gt; {
-                        <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">as_str</span>() {
+            syn::Expr::Path(path) =&gt; {
+                <span class="kw">let </span>name = path_to_single_string(<span class="kw-2">&amp;</span>path.path).ok_or_else(|| Error::new_spanned(<span class="kw-2">&amp;</span>path, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
+                <span class="macro">macro_rules! </span>handle_fields {
+                    ( $( <span class="macro-nonterminal">$flag</span>:expr, <span class="macro-nonterminal">$field</span>:ident, <span class="macro-nonterminal">$already</span>:expr, <span class="macro-nonterminal">$checks</span>:expr; )* ) =&gt; {
+                        <span class="kw">match </span>name.as_str() {
                             $(
-                                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span> =&gt; {
-                                    <span class="kw">if</span> <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>.<span class="ident">is_some</span>() {
-                                        <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">path</span>.<span class="ident">span</span>(), <span class="macro">concat!</span>(<span class="string">&quot;Illegal setting - field is already &quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">already</span>)))
-                                    } <span class="kw">else</span> {
-                                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">checks</span>;
-                                        <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>.<span class="ident">span</span>());
+                                <span class="macro-nonterminal">$flag </span>=&gt; {
+                                    <span class="kw">if </span><span class="self">self</span>.<span class="macro-nonterminal">$field</span>.is_some() {
+                                        <span class="prelude-val">Err</span>(Error::new(path.span(), <span class="macro">concat!</span>(<span class="string">&quot;Illegal setting - field is already &quot;</span>, <span class="macro-nonterminal">$already</span>)))
+                                    } <span class="kw">else </span>{
+                                        <span class="macro-nonterminal">$checks</span>;
+                                        <span class="self">self</span>.<span class="macro-nonterminal">$field </span>= <span class="prelude-val">Some</span>(path.span());
                                         <span class="prelude-val">Ok</span>(())
                                     }
                                 }
-                            )<span class="op">*</span>
-                            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(
-                                    <span class="kw-2">&amp;</span><span class="ident">path</span>,
-                                    <span class="macro">format!</span>(<span class="string">&quot;Unknown setter parameter {:?}&quot;</span>, <span class="ident">name</span>),
+                            )*
+                            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new_spanned(
+                                    <span class="kw-2">&amp;</span>path,
+                                    <span class="macro">format!</span>(<span class="string">&quot;Unknown setter parameter {:?}&quot;</span>, name),
                             ))
                         }
                     }
                 }
                 <span class="macro">handle_fields!</span>(
-                    <span class="string">&quot;skip&quot;</span>, <span class="ident">skip</span>, <span class="string">&quot;skipped&quot;</span>, {};
-                    <span class="string">&quot;into&quot;</span>, <span class="ident">auto_into</span>, <span class="string">&quot;calling into() on the argument&quot;</span>, {};
-                    <span class="string">&quot;strip_option&quot;</span>, <span class="ident">strip_option</span>, <span class="string">&quot;putting the argument in Some(...)&quot;</span>, {};
-                    <span class="string">&quot;strip_bool&quot;</span>, <span class="ident">strip_bool</span>, <span class="string">&quot;zero arguments setter, sets the field to true&quot;</span>, {};
+                    <span class="string">&quot;skip&quot;</span>, skip, <span class="string">&quot;skipped&quot;</span>, {};
+                    <span class="string">&quot;into&quot;</span>, auto_into, <span class="string">&quot;calling into() on the argument&quot;</span>, {};
+                    <span class="string">&quot;strip_option&quot;</span>, strip_option, <span class="string">&quot;putting the argument in Some(...)&quot;</span>, {};
+                    <span class="string">&quot;strip_bool&quot;</span>, strip_bool, <span class="string">&quot;zero arguments setter, sets the field to true&quot;</span>, {};
                 )
             }
-            <span class="ident">syn::Expr::Unary</span>(<span class="ident">syn::ExprUnary</span> {
-                <span class="ident">op</span>: <span class="ident">syn::UnOp::Not</span>(<span class="kw">_</span>),
-                <span class="ident">expr</span>,
+            syn::Expr::Unary(syn::ExprUnary {
+                op: syn::UnOp::Not(<span class="kw">_</span>),
+                expr,
                 ..
             }) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Expr::Path</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">expr</span> {
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span>
-                        <span class="ident">path_to_single_string</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">path</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
-                    <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">as_str</span>() {
-                        <span class="string">&quot;doc&quot;</span> =&gt; {
-                            <span class="self">self</span>.<span class="ident">doc</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                <span class="kw">if let </span>syn::Expr::Path(path) = <span class="kw-2">*</span>expr {
+                    <span class="kw">let </span>name =
+                        path_to_single_string(<span class="kw-2">&amp;</span>path.path).ok_or_else(|| Error::new_spanned(<span class="kw-2">&amp;</span>path, <span class="string">&quot;Expected identifier&quot;</span>))<span class="question-mark">?</span>;
+                    <span class="kw">match </span>name.as_str() {
+                        <span class="string">&quot;doc&quot; </span>=&gt; {
+                            <span class="self">self</span>.doc = <span class="prelude-val">None</span>;
                             <span class="prelude-val">Ok</span>(())
                         }
-                        <span class="string">&quot;skip&quot;</span> =&gt; {
-                            <span class="self">self</span>.<span class="ident">skip</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                        <span class="string">&quot;skip&quot; </span>=&gt; {
+                            <span class="self">self</span>.skip = <span class="prelude-val">None</span>;
                             <span class="prelude-val">Ok</span>(())
                         }
-                        <span class="string">&quot;auto_into&quot;</span> =&gt; {
-                            <span class="self">self</span>.<span class="ident">auto_into</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                        <span class="string">&quot;auto_into&quot; </span>=&gt; {
+                            <span class="self">self</span>.auto_into = <span class="prelude-val">None</span>;
                             <span class="prelude-val">Ok</span>(())
                         }
-                        <span class="string">&quot;strip_option&quot;</span> =&gt; {
-                            <span class="self">self</span>.<span class="ident">strip_option</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                        <span class="string">&quot;strip_option&quot; </span>=&gt; {
+                            <span class="self">self</span>.strip_option = <span class="prelude-val">None</span>;
                             <span class="prelude-val">Ok</span>(())
                         }
-                        <span class="string">&quot;strip_bool&quot;</span> =&gt; {
-                            <span class="self">self</span>.<span class="ident">strip_bool</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                        <span class="string">&quot;strip_bool&quot; </span>=&gt; {
+                            <span class="self">self</span>.strip_bool = <span class="prelude-val">None</span>;
                             <span class="prelude-val">Ok</span>(())
                         }
-                        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">path</span>, <span class="string">&quot;Unknown setting&quot;</span>.<span class="ident">to_owned</span>())),
+                        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new_spanned(path, <span class="string">&quot;Unknown setting&quot;</span>.to_owned())),
                     }
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">expr</span>, <span class="string">&quot;Expected simple identifier&quot;</span>.<span class="ident">to_owned</span>()))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(Error::new_spanned(expr, <span class="string">&quot;Expected simple identifier&quot;</span>.to_owned()))
                 }
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">expr</span>, <span class="string">&quot;Expected (&lt;...&gt;=&lt;...&gt;)&quot;</span>)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new_spanned(expr, <span class="string">&quot;Expected (&lt;...&gt;=&lt;...&gt;)&quot;</span>)),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Transform</span> {
-    <span class="kw">pub</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">syn::Pat</span>, <span class="ident">syn::Type</span>)<span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">body</span>: <span class="ident">syn::Expr</span>,
-    <span class="ident">span</span>: <span class="ident">Span</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Transform {
+    <span class="kw">pub </span>params: Vec&lt;(syn::Pat, syn::Type)&gt;,
+    <span class="kw">pub </span>body: syn::Expr,
+    span: Span,
 }
 
-<span class="kw">fn</span> <span class="ident">parse_transform_closure</span>(<span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Expr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Transform</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">closure</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">expr</span> {
-        <span class="ident">syn::Expr::Closure</span>(<span class="ident">closure</span>) =&gt; <span class="ident">closure</span>,
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">expr</span>, <span class="string">&quot;Expected closure&quot;</span>)),
+<span class="kw">fn </span>parse_transform_closure(span: Span, expr: <span class="kw-2">&amp;</span>syn::Expr) -&gt; <span class="prelude-ty">Result</span>&lt;Transform, Error&gt; {
+    <span class="kw">let </span>closure = <span class="kw">match </span>expr {
+        syn::Expr::Closure(closure) =&gt; closure,
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_spanned(expr, <span class="string">&quot;Expected closure&quot;</span>)),
     };
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">kw</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">closure</span>.<span class="ident">asyncness</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">kw</span>.<span class="ident">span</span>, <span class="string">&quot;Transform closure cannot be async&quot;</span>));
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(kw) = <span class="kw-2">&amp;</span>closure.asyncness {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(kw.span, <span class="string">&quot;Transform closure cannot be async&quot;</span>));
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">kw</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">closure</span>.<span class="ident">capture</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">kw</span>.<span class="ident">span</span>, <span class="string">&quot;Transform closure cannot be move&quot;</span>));
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(kw) = <span class="kw-2">&amp;</span>closure.capture {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(kw.span, <span class="string">&quot;Transform closure cannot be move&quot;</span>));
     }
 
-    <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">closure</span>
-        .<span class="ident">inputs</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">input</span> {
-            <span class="ident">syn::Pat::Type</span>(<span class="ident">pat_type</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">syn::Pat::clone</span>(<span class="kw-2">&amp;</span><span class="ident">pat_type</span>.<span class="ident">pat</span>), <span class="ident">syn::Type::clone</span>(<span class="kw-2">&amp;</span><span class="ident">pat_type</span>.<span class="ident">ty</span>))),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">input</span>, <span class="string">&quot;Transform closure must explicitly declare types&quot;</span>)),
+    <span class="kw">let </span>params = closure
+        .inputs
+        .iter()
+        .map(|input| <span class="kw">match </span>input {
+            syn::Pat::Type(pat_type) =&gt; <span class="prelude-val">Ok</span>((syn::Pat::clone(<span class="kw-2">&amp;</span>pat_type.pat), syn::Type::clone(<span class="kw-2">&amp;</span>pat_type.ty))),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new_spanned(input, <span class="string">&quot;Transform closure must explicitly declare types&quot;</span>)),
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">closure</span>.<span class="ident">body</span>;
+    <span class="kw">let </span>body = <span class="kw-2">&amp;</span>closure.body;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">Transform</span> {
-        <span class="ident">params</span>,
-        <span class="ident">body</span>: <span class="ident">syn::Expr::clone</span>(<span class="ident">body</span>),
-        <span class="ident">span</span>,
+    <span class="prelude-val">Ok</span>(Transform {
+        params,
+        body: syn::Expr::clone(body),
+        span,
     })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="typed_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="typed_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

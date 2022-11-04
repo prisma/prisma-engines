@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sized-chunks-0.6.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sized_chunks/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sized-chunks-0.6.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sized_chunks/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -124,131 +124,131 @@
 <span id="124">124</span>
 <span id="125">125</span>
 <span id="126">126</span>
-</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public</span>
-<span class="comment">// License, v. 2.0. If a copy of the MPL was not distributed with this</span>
-<span class="comment">// file, You can obtain one at http://mozilla.org/MPL/2.0/.</span>
+</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-<span class="doccomment">//! # Sized Chunks</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate contains three fixed size low level array like data structures,</span>
-<span class="doccomment">//! primarily intended for use in [immutable.rs], but fully supported as a</span>
-<span class="doccomment">//! standalone crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Their sizing information is encoded in the type using the</span>
-<span class="doccomment">//! [`typenum`][typenum] crate, which you may want to take a look at before</span>
-<span class="doccomment">//! reading on, but usually all you need to know about it is that it provides</span>
-<span class="doccomment">//! types `U1` to `U128` to represent numbers, which the data types take as type</span>
-<span class="doccomment">//! parameters, eg. `SparseChunk&lt;A, U32&gt;` would give you a sparse array with</span>
-<span class="doccomment">//! room for 32 elements of type `A`. You can also omit the size, as they all</span>
-<span class="doccomment">//! default to a size of 64, so `SparseChunk&lt;A&gt;` would be a sparse array with a</span>
-<span class="doccomment">//! capacity of 64.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! All data structures always allocate the same amount of space, as determined</span>
-<span class="doccomment">//! by their capacity, regardless of how many elements they contain, and when</span>
-<span class="doccomment">//! they run out of space, they will panic.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Data Structures</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Type | Description | Push | Pop | Deref to `&amp;[A]` |</span>
-<span class="doccomment">//! | ---- | ----------- | ---- | --- | --------------- |</span>
-<span class="doccomment">//! | [`Chunk`][Chunk] | Contiguous array | O(1)/O(n) | O(1) | Yes |</span>
-<span class="doccomment">//! | [`RingBuffer`][RingBuffer] | Non-contiguous array | O(1) | O(1) | No |</span>
-<span class="doccomment">//! | [`SparseChunk`][SparseChunk] | Sparse array | N/A | N/A | No |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The [`Chunk`][Chunk] and [`RingBuffer`][RingBuffer] are very similar in</span>
-<span class="doccomment">//! practice, in that they both work like a plain array, except that you can</span>
-<span class="doccomment">//! push to either end with some expectation of performance. The difference is</span>
-<span class="doccomment">//! that [`RingBuffer`][RingBuffer] always allows you to do this in constant</span>
-<span class="doccomment">//! time, but in order to give that guarantee, it doesn&#39;t lay out its elements</span>
-<span class="doccomment">//! contiguously in memory, which means that you can&#39;t dereference it to a slice</span>
-<span class="doccomment">//! `&amp;[A]`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Chunk`][Chunk], on the other hand, will shift its contents around when</span>
-<span class="doccomment">//! necessary to accommodate a push to a full side, but is able to guarantee a</span>
-<span class="doccomment">//! contiguous memory layout in this way, so it can always be dereferenced into</span>
-<span class="doccomment">//! a slice. Performance wise, repeated pushes to the same side will always run</span>
-<span class="doccomment">//! in constant time, but a push to one side followed by a push to the other</span>
-<span class="doccomment">//! side will cause the latter to run in linear time if there&#39;s no room (which</span>
-<span class="doccomment">//! there would only be if you&#39;ve popped from that side).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To choose between them, you can use the following rules:</span>
-<span class="doccomment">//! - I only ever want to push to the back: you don&#39;t need this crate, try</span>
-<span class="doccomment">//!   [`ArrayVec`][ArrayVec].</span>
-<span class="doccomment">//! - I need to push to either side but probably not both on the same array: use</span>
-<span class="doccomment">//!   [`Chunk`][Chunk].</span>
-<span class="doccomment">//! - I need to push to both sides and I don&#39;t need slices: use</span>
-<span class="doccomment">//!   [`RingBuffer`][RingBuffer].</span>
-<span class="doccomment">//! - I need to push to both sides but I do need slices: use [`Chunk`][Chunk].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Finally, [`SparseChunk`][SparseChunk] is a more efficient version of</span>
-<span class="doccomment">//! `Vec&lt;Option&lt;A&gt;&gt;`: each index is either inhabited or not, but instead of</span>
-<span class="doccomment">//! using the `Option` discriminant to decide which is which, it uses a compact</span>
-<span class="doccomment">//! bitmap. You can also think of `SparseChunk&lt;A, N&gt;` as a `BTreeMap&lt;usize, A&gt;`</span>
-<span class="doccomment">//! where the `usize` must be less than `N`, but without the performance</span>
-<span class="doccomment">//! overhead. Its API is also more consistent with a map than an array - there&#39;s</span>
-<span class="doccomment">//! no push, pop, append, etc, just insert, remove and lookup.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # [`InlineArray`][InlineArray]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Finally, there&#39;s [`InlineArray`][InlineArray], which is a simple vector that&#39;s</span>
-<span class="doccomment">//! sized to fit inside any `Sized` type that&#39;s big enough to hold a size counter</span>
-<span class="doccomment">//! and at least one instance of the array element type. This can be a useful</span>
-<span class="doccomment">//! optimisation when implementing a list like data structure with a nontrivial</span>
-<span class="doccomment">//! set of pointers in its full form, where you could plausibly fit several</span>
-<span class="doccomment">//! elements inside the space allocated for the pointers. `im::Vector` is a</span>
-<span class="doccomment">//! good example of that, and the use case for which [`InlineArray`][InlineArray]</span>
-<span class="doccomment">//! was implemented.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Feature Flags</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following feature flags are available:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Feature | Description |</span>
-<span class="doccomment">//! | ------- | ----------- |</span>
-<span class="doccomment">//! | `arbitrary` | Provides [`Arbitrary`][Arbitrary] implementations from the [`arbitrary`][arbitrary_crate] crate. Requires the `std` flag. |</span>
-<span class="doccomment">//! | `refpool` | Provides [`PoolDefault`][PoolDefault] and [`PoolClone`][PoolClone] implemetations from the [`refpool`][refpool] crate. |</span>
-<span class="doccomment">//! | `ringbuffer` | Enables the [`RingBuffer`][RingBuffer] data structure. |</span>
-<span class="doccomment">//! | `std` | Without this flag (enabled by default), the crate will be `no_std`, and absent traits relating to `std::collections` and `std::io`. |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [immutable.rs]: https://immutable.rs/</span>
-<span class="doccomment">//! [typenum]: https://docs.rs/typenum/</span>
-<span class="doccomment">//! [Chunk]: struct.Chunk.html</span>
-<span class="doccomment">//! [RingBuffer]: struct.RingBuffer.html</span>
-<span class="doccomment">//! [SparseChunk]: struct.SparseChunk.html</span>
-<span class="doccomment">//! [InlineArray]: struct.InlineArray.html</span>
-<span class="doccomment">//! [ArrayVec]: https://docs.rs/arrayvec/</span>
-<span class="doccomment">//! [Arbitrary]: https://docs.rs/arbitrary/latest/arbitrary/trait.Arbitrary.html</span>
-<span class="doccomment">//! [arbitrary_crate]: https://docs.rs/arbitrary</span>
-<span class="doccomment">//! [refpool]: https://docs.rs/refpool</span>
-<span class="doccomment">//! [PoolDefault]: https://docs.rs/refpool/latest/refpool/trait.PoolDefault.html</span>
-<span class="doccomment">//! [PoolClone]: https://docs.rs/refpool/latest/refpool/trait.PoolClone.html</span>
+</span><span class="doccomment">//! # Sized Chunks
+//!
+//! This crate contains three fixed size low level array like data structures,
+//! primarily intended for use in [immutable.rs], but fully supported as a
+//! standalone crate.
+//!
+//! Their sizing information is encoded in the type using the
+//! [`typenum`][typenum] crate, which you may want to take a look at before
+//! reading on, but usually all you need to know about it is that it provides
+//! types `U1` to `U128` to represent numbers, which the data types take as type
+//! parameters, eg. `SparseChunk&lt;A, U32&gt;` would give you a sparse array with
+//! room for 32 elements of type `A`. You can also omit the size, as they all
+//! default to a size of 64, so `SparseChunk&lt;A&gt;` would be a sparse array with a
+//! capacity of 64.
+//!
+//! All data structures always allocate the same amount of space, as determined
+//! by their capacity, regardless of how many elements they contain, and when
+//! they run out of space, they will panic.
+//!
+//! ## Data Structures
+//!
+//! | Type | Description | Push | Pop | Deref to `&amp;[A]` |
+//! | ---- | ----------- | ---- | --- | --------------- |
+//! | [`Chunk`][Chunk] | Contiguous array | O(1)/O(n) | O(1) | Yes |
+//! | [`RingBuffer`][RingBuffer] | Non-contiguous array | O(1) | O(1) | No |
+//! | [`SparseChunk`][SparseChunk] | Sparse array | N/A | N/A | No |
+//!
+//! The [`Chunk`][Chunk] and [`RingBuffer`][RingBuffer] are very similar in
+//! practice, in that they both work like a plain array, except that you can
+//! push to either end with some expectation of performance. The difference is
+//! that [`RingBuffer`][RingBuffer] always allows you to do this in constant
+//! time, but in order to give that guarantee, it doesn&#39;t lay out its elements
+//! contiguously in memory, which means that you can&#39;t dereference it to a slice
+//! `&amp;[A]`.
+//!
+//! [`Chunk`][Chunk], on the other hand, will shift its contents around when
+//! necessary to accommodate a push to a full side, but is able to guarantee a
+//! contiguous memory layout in this way, so it can always be dereferenced into
+//! a slice. Performance wise, repeated pushes to the same side will always run
+//! in constant time, but a push to one side followed by a push to the other
+//! side will cause the latter to run in linear time if there&#39;s no room (which
+//! there would only be if you&#39;ve popped from that side).
+//!
+//! To choose between them, you can use the following rules:
+//! - I only ever want to push to the back: you don&#39;t need this crate, try
+//!   [`ArrayVec`][ArrayVec].
+//! - I need to push to either side but probably not both on the same array: use
+//!   [`Chunk`][Chunk].
+//! - I need to push to both sides and I don&#39;t need slices: use
+//!   [`RingBuffer`][RingBuffer].
+//! - I need to push to both sides but I do need slices: use [`Chunk`][Chunk].
+//!
+//! Finally, [`SparseChunk`][SparseChunk] is a more efficient version of
+//! `Vec&lt;Option&lt;A&gt;&gt;`: each index is either inhabited or not, but instead of
+//! using the `Option` discriminant to decide which is which, it uses a compact
+//! bitmap. You can also think of `SparseChunk&lt;A, N&gt;` as a `BTreeMap&lt;usize, A&gt;`
+//! where the `usize` must be less than `N`, but without the performance
+//! overhead. Its API is also more consistent with a map than an array - there&#39;s
+//! no push, pop, append, etc, just insert, remove and lookup.
+//!
+//! # [`InlineArray`][InlineArray]
+//!
+//! Finally, there&#39;s [`InlineArray`][InlineArray], which is a simple vector that&#39;s
+//! sized to fit inside any `Sized` type that&#39;s big enough to hold a size counter
+//! and at least one instance of the array element type. This can be a useful
+//! optimisation when implementing a list like data structure with a nontrivial
+//! set of pointers in its full form, where you could plausibly fit several
+//! elements inside the space allocated for the pointers. `im::Vector` is a
+//! good example of that, and the use case for which [`InlineArray`][InlineArray]
+//! was implemented.
+//!
+//! # Feature Flags
+//!
+//! The following feature flags are available:
+//!
+//! | Feature | Description |
+//! | ------- | ----------- |
+//! | `arbitrary` | Provides [`Arbitrary`][Arbitrary] implementations from the [`arbitrary`][arbitrary_crate] crate. Requires the `std` flag. |
+//! | `refpool` | Provides [`PoolDefault`][PoolDefault] and [`PoolClone`][PoolClone] implemetations from the [`refpool`][refpool] crate. |
+//! | `ringbuffer` | Enables the [`RingBuffer`][RingBuffer] data structure. |
+//! | `std` | Without this flag (enabled by default), the crate will be `no_std`, and absent traits relating to `std::collections` and `std::io`. |
+//!
+//! [immutable.rs]: https://immutable.rs/
+//! [typenum]: https://docs.rs/typenum/
+//! [Chunk]: struct.Chunk.html
+//! [RingBuffer]: struct.RingBuffer.html
+//! [SparseChunk]: struct.SparseChunk.html
+//! [InlineArray]: struct.InlineArray.html
+//! [ArrayVec]: https://docs.rs/arrayvec/
+//! [Arbitrary]: https://docs.rs/arbitrary/latest/arbitrary/trait.Arbitrary.html
+//! [arbitrary_crate]: https://docs.rs/arbitrary
+//! [refpool]: https://docs.rs/refpool
+//! [PoolDefault]: https://docs.rs/refpool/latest/refpool/trait.PoolDefault.html
+//! [PoolClone]: https://docs.rs/refpool/latest/refpool/trait.PoolClone.html
 
-<span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">rust_2018_idioms</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">nonstandard_style</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">unreachable_pub</span>, <span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>)), <span class="ident">no_std</span>)]</span>
-<span class="comment">// Jeremy Francis Corbyn, clippy devs need to calm down 🤦‍♀️</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::suspicious_op_assign_impl</span>, <span class="ident">clippy::suspicious_arithmetic_impl</span>)]</span>
+</span><span class="attribute">#![forbid(rust_2018_idioms)]
+#![deny(nonstandard_style)]
+#![warn(unreachable_pub, missing_docs)]
+#![cfg_attr(test, deny(warnings))]
+#![cfg_attr(not(any(feature = <span class="string">&quot;std&quot;</span>, test)), no_std)]
+</span><span class="comment">// Jeremy Francis Corbyn, clippy devs need to calm down 🤦‍♀️
+</span><span class="attribute">#![allow(clippy::suspicious_op_assign_impl, clippy::suspicious_arithmetic_impl)]
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">inline_array</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sized_chunk</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sparse_chunk</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">types</span>;
+</span><span class="kw">pub mod </span>inline_array;
+<span class="kw">pub mod </span>sized_chunk;
+<span class="kw">pub mod </span>sparse_chunk;
+<span class="kw">pub mod </span>types;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">arbitrary</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;arbitrary&quot;</span>)]
+</span><span class="kw">mod </span>arbitrary;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::inline_array::InlineArray</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sized_chunk::Chunk</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sparse_chunk::SparseChunk</span>;
+<span class="kw">pub use </span><span class="kw">crate</span>::inline_array::InlineArray;
+<span class="kw">pub use </span><span class="kw">crate</span>::sized_chunk::Chunk;
+<span class="kw">pub use </span><span class="kw">crate</span>::sparse_chunk::SparseChunk;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ringbuffer&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ring_buffer</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ringbuffer&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ring_buffer::RingBuffer</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;ringbuffer&quot;</span>)]
+</span><span class="kw">pub mod </span>ring_buffer;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;ringbuffer&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::ring_buffer::RingBuffer;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sized_chunks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sized_chunks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -257,264 +257,264 @@
 <span id="257">257</span>
 <span id="258">258</span>
 <span id="259">259</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Parsers which cause errors or modifies the returned error on parse failure.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Parsers which cause errors or modifies the returned error on parse failure.
 
-<span class="kw">use</span> <span class="ident">lib::marker::PhantomData</span>;
+</span><span class="kw">use </span>lib::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConsumedResult</span>, <span class="ident">Info</span>, <span class="ident">ParseError</span>, <span class="ident">StreamError</span>, <span class="ident">Tracked</span>};
-<span class="kw">use</span> <span class="ident">parser::ParseMode</span>;
-<span class="kw">use</span> {<span class="ident">Parser</span>, <span class="ident">Stream</span>, <span class="ident">StreamOnce</span>};
+<span class="kw">use </span>error::{ConsumedResult, Info, ParseError, StreamError, Tracked};
+<span class="kw">use </span>parser::ParseMode;
+<span class="kw">use </span>{Parser, Stream, StreamOnce};
 
-<span class="kw">use</span> <span class="ident">error::FastResult</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>error::FastResult::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Unexpected</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">Info</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; (<span class="ident">I</span>, <span class="ident">T</span>)<span class="op">&gt;</span>)
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>;
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Unexpected</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Unexpected&lt;I, T&gt;(Info&lt;I::Item, I::Range&gt;, PhantomData&lt;<span class="kw">fn</span>(I) -&gt; (I, T)&gt;)
+<span class="kw">where
+    </span>I: Stream;
+<span class="kw">impl</span>&lt;I, T&gt; Parser <span class="kw">for </span>Unexpected&lt;I, T&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">EmptyErr</span>(<span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error::empty</span>(<span class="ident">input</span>.<span class="ident">position</span>()).<span class="ident">into</span>())
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = T;
+    <span class="kw">type </span>PartialState = ();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;T, I&gt; {
+        EmptyErr(&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error::empty(input.position()).into())
     }
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="ident">errors</span>.<span class="ident">error</span>.<span class="ident">add</span>(<span class="ident">StreamError::unexpected</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()));
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        errors.error.add(StreamError::unexpected(<span class="self">self</span>.<span class="number">0</span>.clone()));
     }
 }
-<span class="doccomment">/// Always fails with `message` as an unexpected error.</span>
-<span class="doccomment">/// Never consumes any input.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Has `()` the output type</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # use combine::error::StreamError;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let result = unexpected(&quot;token&quot;)</span>
-<span class="doccomment">///     .easy_parse(&quot;a&quot;);</span>
-<span class="doccomment">/// assert!(result.is_err());</span>
-<span class="doccomment">/// assert!(</span>
-<span class="doccomment">///     result.err()</span>
-<span class="doccomment">///         .unwrap()</span>
-<span class="doccomment">///         .errors</span>
-<span class="doccomment">///         .iter()</span>
-<span class="doccomment">///         .any(|m| *m == StreamError::unexpected(&quot;token&quot;.into()))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unexpected</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">message</span>: <span class="ident">S</span>) -&gt; <span class="ident">Unexpected</span><span class="op">&lt;</span><span class="ident">I</span>, ()<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Always fails with `message` as an unexpected error.
+/// Never consumes any input.
+///
+/// Has `()` the output type
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # use combine::error::StreamError;
+/// # fn main() {
+/// let result = unexpected(&quot;token&quot;)
+///     .easy_parse(&quot;a&quot;);
+/// assert!(result.is_err());
+/// assert!(
+///     result.err()
+///         .unwrap()
+///         .errors
+///         .iter()
+///         .any(|m| *m == StreamError::unexpected(&quot;token&quot;.into()))
+/// );
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>unexpected&lt;I, S&gt;(message: S) -&gt; Unexpected&lt;I, ()&gt;
+<span class="kw">where
+    </span>I: Stream,
+    S: Into&lt;Info&lt;I::Item, I::Range&gt;&gt;,
 {
-    <span class="ident">unexpected_any</span>(<span class="ident">message</span>)
+    unexpected_any(message)
 }
 
-<span class="doccomment">/// Always fails with `message` as an unexpected error.</span>
-<span class="doccomment">/// Never consumes any input.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// May have anything as the output type but must be used such that the output type can inferred.</span>
-<span class="doccomment">/// The `unexpected` parser can be used if the output type does not matter</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # use combine::parser::error::unexpected_any;</span>
-<span class="doccomment">/// # use combine::error::StreamError;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let result = token(&#39;b&#39;).or(unexpected_any(&quot;token&quot;))</span>
-<span class="doccomment">///     .easy_parse(&quot;a&quot;);</span>
-<span class="doccomment">/// assert!(result.is_err());</span>
-<span class="doccomment">/// assert!(</span>
-<span class="doccomment">///     result.err()</span>
-<span class="doccomment">///         .unwrap()</span>
-<span class="doccomment">///         .errors</span>
-<span class="doccomment">///         .iter()</span>
-<span class="doccomment">///         .any(|m| *m == StreamError::unexpected(&quot;token&quot;.into()))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unexpected_any</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">message</span>: <span class="ident">S</span>) -&gt; <span class="ident">Unexpected</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Always fails with `message` as an unexpected error.
+/// Never consumes any input.
+///
+/// May have anything as the output type but must be used such that the output type can inferred.
+/// The `unexpected` parser can be used if the output type does not matter
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # use combine::parser::error::unexpected_any;
+/// # use combine::error::StreamError;
+/// # fn main() {
+/// let result = token(&#39;b&#39;).or(unexpected_any(&quot;token&quot;))
+///     .easy_parse(&quot;a&quot;);
+/// assert!(result.is_err());
+/// assert!(
+///     result.err()
+///         .unwrap()
+///         .errors
+///         .iter()
+///         .any(|m| *m == StreamError::unexpected(&quot;token&quot;.into()))
+/// );
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>unexpected_any&lt;I, S, T&gt;(message: S) -&gt; Unexpected&lt;I, T&gt;
+<span class="kw">where
+    </span>I: Stream,
+    S: Into&lt;Info&lt;I::Item, I::Range&gt;&gt;,
 {
-    <span class="ident">Unexpected</span>(<span class="ident">message</span>.<span class="ident">into</span>(), <span class="ident">PhantomData</span>)
+    Unexpected(message.into(), PhantomData)
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Message</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(
-    <span class="ident">P</span>,
-    <span class="ident">Info</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Item</span>, <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Message&lt;P&gt;(
+    P,
+    Info&lt;&lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Item, &lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Range&gt;,
 )
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Parser</span>;
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Message</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>,
+<span class="kw">where
+    </span>P: Parser;
+<span class="kw">impl</span>&lt;I, P&gt; Parser <span class="kw">for </span>Message&lt;P&gt;
+<span class="kw">where
+    </span>I: Stream,
+    P: Parser&lt;Input = I&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">P::Output</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="ident">P::PartialState</span>;
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = P::Output;
+    <span class="kw">type </span>PartialState = P::PartialState;
 
     <span class="macro">parse_mode!</span>();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_mode_impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">mode</span>: <span class="ident">M</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_mode_impl&lt;M&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        mode: M,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+    <span class="kw">where
+        </span>M: ParseMode,
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">state</span>) {
-            <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">x</span>),
-            <span class="ident">EmptyOk</span>(<span class="ident">x</span>) =&gt; <span class="ident">EmptyOk</span>(<span class="ident">x</span>),
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.parse_mode(mode, input, state) {
+            ConsumedOk(x) =&gt; ConsumedOk(x),
+            EmptyOk(x) =&gt; EmptyOk(x),
 
-            <span class="comment">// The message should always be added even if some input was consumed before failing</span>
-            <span class="ident">ConsumedErr</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
-                <span class="ident">err</span>.<span class="ident">add_message</span>(<span class="self">self</span>.<span class="number">1</span>.<span class="ident">clone</span>());
-                <span class="ident">ConsumedErr</span>(<span class="ident">err</span>)
+            <span class="comment">// The message should always be added even if some input was consumed before failing
+            </span>ConsumedErr(<span class="kw-2">mut </span>err) =&gt; {
+                err.add_message(<span class="self">self</span>.<span class="number">1</span>.clone());
+                ConsumedErr(err)
             }
 
-            <span class="comment">// The message will be added in `add_error`</span>
-            <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
+            <span class="comment">// The message will be added in `add_error`
+            </span>EmptyErr(err) =&gt; EmptyErr(err),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">add_error</span>(<span class="ident">errors</span>);
-        <span class="ident">errors</span>.<span class="ident">error</span>.<span class="ident">add_message</span>(<span class="self">self</span>.<span class="number">1</span>.<span class="ident">clone</span>());
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        <span class="self">self</span>.<span class="number">0</span>.add_error(errors);
+        errors.error.add_message(<span class="self">self</span>.<span class="number">1</span>.clone());
     }
 
-    <span class="macro">forward_parser!</span>(<span class="ident">parser_count</span> <span class="ident">add_consumed_expected_error</span>, <span class="number">0</span>);
+    <span class="macro">forward_parser!</span>(parser_count add_consumed_expected_error, <span class="number">0</span>);
 }
 
-<span class="doccomment">/// Equivalent to [`p1.message(msg)`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`p1.message(msg)`]: ../parser/trait.Parser.html#method.message</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(
-    <span class="ident">p</span>: <span class="ident">P</span>,
-    <span class="ident">msg</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Item</span>, <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Message</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Parser</span>,
+<span class="doccomment">/// Equivalent to [`p1.message(msg)`].
+///
+/// [`p1.message(msg)`]: ../parser/trait.Parser.html#method.message
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>message&lt;P&gt;(
+    p: P,
+    msg: Info&lt;&lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Item, &lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Range&gt;,
+) -&gt; Message&lt;P&gt;
+<span class="kw">where
+    </span>P: Parser,
 {
-    <span class="ident">Message</span>(<span class="ident">p</span>, <span class="ident">msg</span>)
+    Message(p, msg)
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(
-    <span class="ident">P</span>,
-    <span class="ident">Info</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Item</span>, <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Expected&lt;P&gt;(
+    P,
+    Info&lt;&lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Item, &lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Range&gt;,
 )
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Parser</span>;
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Parser</span>,
+<span class="kw">where
+    </span>P: Parser;
+<span class="kw">impl</span>&lt;P&gt; Parser <span class="kw">for </span>Expected&lt;P&gt;
+<span class="kw">where
+    </span>P: Parser,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">P::Input</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">P::Output</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="ident">P::PartialState</span>;
+    <span class="kw">type </span>Input = P::Input;
+    <span class="kw">type </span>Output = P::Output;
+    <span class="kw">type </span>PartialState = P::PartialState;
 
     <span class="macro">parse_mode!</span>();
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">parse_mode_impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">mode</span>: <span class="ident">M</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>parse_mode_impl&lt;M&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        mode: M,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+    <span class="kw">where
+        </span>M: ParseMode,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">state</span>)
+        <span class="self">self</span>.<span class="number">0</span>.parse_mode(mode, input, state)
     }
 
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="ident">ParseError::set_expected</span>(<span class="ident">errors</span>, <span class="ident">StreamError::expected</span>(<span class="self">self</span>.<span class="number">1</span>.<span class="ident">clone</span>()), <span class="op">|</span><span class="ident">errors</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">add_error</span>(<span class="ident">errors</span>);
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        ParseError::set_expected(errors, StreamError::expected(<span class="self">self</span>.<span class="number">1</span>.clone()), |errors| {
+            <span class="self">self</span>.<span class="number">0</span>.add_error(errors);
         })
     }
 
-    <span class="macro">forward_parser!</span>(<span class="ident">parser_count</span> <span class="ident">add_consumed_expected_error</span>, <span class="number">0</span>);
+    <span class="macro">forward_parser!</span>(parser_count add_consumed_expected_error, <span class="number">0</span>);
 }
 
-<span class="doccomment">/// Equivalent to [`p.expected(info)`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`p.expected(info)`]: ../parser/trait.Parser.html#method.expected</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expected</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(
-    <span class="ident">p</span>: <span class="ident">P</span>,
-    <span class="ident">info</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Item</span>, <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Parser</span>,
+<span class="doccomment">/// Equivalent to [`p.expected(info)`].
+///
+/// [`p.expected(info)`]: ../parser/trait.Parser.html#method.expected
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>expected&lt;P&gt;(
+    p: P,
+    info: Info&lt;&lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Item, &lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Range&gt;,
+) -&gt; Expected&lt;P&gt;
+<span class="kw">where
+    </span>P: Parser,
 {
-    <span class="ident">Expected</span>(<span class="ident">p</span>, <span class="ident">info</span>)
+    Expected(p, info)
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Silent</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">P</span>)
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Parser</span>;
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Silent</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Parser</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Silent&lt;P&gt;(P)
+<span class="kw">where
+    </span>P: Parser;
+<span class="kw">impl</span>&lt;P&gt; Parser <span class="kw">for </span>Silent&lt;P&gt;
+<span class="kw">where
+    </span>P: Parser,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">P::Input</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">P::Output</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="ident">P::PartialState</span>;
+    <span class="kw">type </span>Input = P::Input;
+    <span class="kw">type </span>Output = P::Output;
+    <span class="kw">type </span>PartialState = P::PartialState;
 
     <span class="macro">parse_mode!</span>();
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">parse_mode_impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">mode</span>: <span class="ident">M</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>parse_mode_impl&lt;M&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        mode: M,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+    <span class="kw">where
+        </span>M: ParseMode,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">state</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">err</span><span class="op">|</span> {
-            <span class="ident">err</span>.<span class="ident">clear_expected</span>();
-            <span class="ident">err</span>
+        <span class="self">self</span>.<span class="number">0</span>.parse_mode(mode, input, state).map_err(|<span class="kw-2">mut </span>err| {
+            err.clear_expected();
+            err
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {}
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {}
 
-    <span class="kw">fn</span> <span class="ident">add_consumed_expected_error</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>add_consumed_expected_error(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;,
     ) {
     }
 
-    <span class="macro">forward_parser!</span>(<span class="ident">parser_count</span>, <span class="number">0</span>);
+    <span class="macro">forward_parser!</span>(parser_count, <span class="number">0</span>);
 }
 
-<span class="doccomment">/// Equivalent to [`p.silent()`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`p.silent()`]: ../trait.Parser.html#method.silent</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">silent</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">p</span>: <span class="ident">P</span>) -&gt; <span class="ident">Silent</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Parser</span>,
+<span class="doccomment">/// Equivalent to [`p.silent()`].
+///
+/// [`p.silent()`]: ../trait.Parser.html#method.silent
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>silent&lt;P&gt;(p: P) -&gt; Silent&lt;P&gt;
+<span class="kw">where
+    </span>P: Parser,
 {
-    <span class="ident">Silent</span>(<span class="ident">p</span>)
+    Silent(p)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

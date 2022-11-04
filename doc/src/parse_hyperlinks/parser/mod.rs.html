@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/parser/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/parser/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -149,156 +149,156 @@
 <span id="149">149</span>
 <span id="150">150</span>
 <span id="151">151</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This module implements parsers to extract hyperlinks and link reference</span>
-<span class="doccomment">//! definitions from text input.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module implements parsers to extract hyperlinks and link reference
+//! definitions from text input.
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">asciidoc</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">html</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">markdown</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">parse</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">restructured_text</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">wikitext</span>;
+</span><span class="kw">pub mod </span>asciidoc;
+<span class="kw">pub mod </span>html;
+<span class="kw">pub mod </span>markdown;
+<span class="kw">pub mod </span>parse;
+<span class="kw">pub mod </span>restructured_text;
+<span class="kw">pub mod </span>wikitext;
 
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="doccomment">/// A link can be an _inline link_, a _reference link_, a _link reference</span>
-<span class="doccomment">/// definition_, a combined _inline link / link reference definition_, a</span>
-<span class="doccomment">/// _reference alias_ or an _inline image_. This is the main return type of this</span>
-<span class="doccomment">/// API.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The _link title_ in Markdown is optional, when not given the string is set</span>
-<span class="doccomment">/// to the empty string `&quot;&quot;`.  The back ticks \` in reStructuredText can be</span>
-<span class="doccomment">/// omitted when only one word is enclosed without spaces.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Link</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// In (stand alone) **inline links** the destination and title are given</span>
-    <span class="doccomment">/// immediately after the link text. When an _inline link_ is rendered, only</span>
-    <span class="doccomment">/// the `link_text` is visible in the continuous text.</span>
-    <span class="doccomment">/// * Markdown example:</span>
-    <span class="doccomment">///   ```md</span>
-    <span class="doccomment">///       [link_text](link_dest &quot;link title&quot;)</span>
-    <span class="doccomment">///   ```</span>
-    <span class="doccomment">/// * reStructuredText example:</span>
-    <span class="doccomment">///   ```rst</span>
-    <span class="doccomment">///       `link_text &lt;link_dest&gt;`__</span>
-    <span class="doccomment">///   ```</span>
-    <span class="doccomment">/// *  Asciidoc example:</span>
-    <span class="doccomment">///    ```adoc</span>
-    <span class="doccomment">///    http://link_dest[link_text]</span>
-    <span class="doccomment">///    ```</span>
-    <span class="doccomment">/// *  Wikitext example:</span>
-    <span class="doccomment">///    ```wm</span>
-    <span class="doccomment">///    [http://link_dest link_text]</span>
-    <span class="doccomment">///    ```</span>
-    <span class="doccomment">/// The tuple is defined as follows:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// Text2Dest(link_text, link_destination, link_title)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Text2Dest</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+<span class="doccomment">/// A link can be an _inline link_, a _reference link_, a _link reference
+/// definition_, a combined _inline link / link reference definition_, a
+/// _reference alias_ or an _inline image_. This is the main return type of this
+/// API.
+///
+/// The _link title_ in Markdown is optional, when not given the string is set
+/// to the empty string `&quot;&quot;`.  The back ticks \` in reStructuredText can be
+/// omitted when only one word is enclosed without spaces.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Link&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// In (stand alone) **inline links** the destination and title are given
+    /// immediately after the link text. When an _inline link_ is rendered, only
+    /// the `link_text` is visible in the continuous text.
+    /// * Markdown example:
+    ///   ```md
+    ///       [link_text](link_dest &quot;link title&quot;)
+    ///   ```
+    /// * reStructuredText example:
+    ///   ```rst
+    ///       `link_text &lt;link_dest&gt;`__
+    ///   ```
+    /// *  Asciidoc example:
+    ///    ```adoc
+    ///    http://link_dest[link_text]
+    ///    ```
+    /// *  Wikitext example:
+    ///    ```wm
+    ///    [http://link_dest link_text]
+    ///    ```
+    /// The tuple is defined as follows:
+    /// ```text
+    /// Text2Dest(link_text, link_destination, link_title)
+    /// ```
+    </span>Text2Dest(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
 
-    <span class="doccomment">/// In **reference links** the destination and title are defined elsewhere in</span>
-    <span class="doccomment">/// the document in some _link reference definition_. When a _reference link_</span>
-    <span class="doccomment">/// is rendered only `link_text` is visible.</span>
-    <span class="doccomment">/// * Markdown examples:</span>
-    <span class="doccomment">///   ```md</span>
-    <span class="doccomment">///   [link_text][link_label]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   [link_text]</span>
-    <span class="doccomment">///   ```</span>
-    <span class="doccomment">///   When only _link text_ is given, _link label_ is set to the same string.</span>
-    <span class="doccomment">/// * reStructuredText examples:</span>
-    <span class="doccomment">///   ```rst</span>
-    <span class="doccomment">///   `link_text &lt;link_label_&gt;`_</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   `link_text`_</span>
-    <span class="doccomment">///   ```</span>
-    <span class="doccomment">///   When only _link text_ is given, _link label_ is set to the same string.</span>
-    <span class="doccomment">/// * Asciidoc example:</span>
-    <span class="doccomment">///   ```adoc</span>
-    <span class="doccomment">///   {link_label}[link_text]</span>
-    <span class="doccomment">///   ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The tuple is defined as follows:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// Text2Label(link_text, link_label)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Text2Label</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// In **reference links** the destination and title are defined elsewhere in
+    /// the document in some _link reference definition_. When a _reference link_
+    /// is rendered only `link_text` is visible.
+    /// * Markdown examples:
+    ///   ```md
+    ///   [link_text][link_label]
+    ///
+    ///   [link_text]
+    ///   ```
+    ///   When only _link text_ is given, _link label_ is set to the same string.
+    /// * reStructuredText examples:
+    ///   ```rst
+    ///   `link_text &lt;link_label_&gt;`_
+    ///
+    ///   `link_text`_
+    ///   ```
+    ///   When only _link text_ is given, _link label_ is set to the same string.
+    /// * Asciidoc example:
+    ///   ```adoc
+    ///   {link_label}[link_text]
+    ///   ```
+    ///
+    /// The tuple is defined as follows:
+    /// ```text
+    /// Text2Label(link_text, link_label)
+    /// ```
+    </span>Text2Label(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
 
-    <span class="doccomment">/// A **link reference definition** refers to a _reference link_ with the</span>
-    <span class="doccomment">/// same _link label_. A _link reference definition_ is not visible</span>
-    <span class="doccomment">/// when the document is rendered.</span>
-    <span class="doccomment">/// _link title_ is optional.</span>
-    <span class="doccomment">/// * Markdown example:</span>
-    <span class="doccomment">///   ```md</span>
-    <span class="doccomment">///   [link_label]: link_dest &quot;link title&quot;</span>
-    <span class="doccomment">///   ```</span>
-    <span class="doccomment">/// * reStructuredText examples:</span>
-    <span class="doccomment">///   ```rst</span>
-    <span class="doccomment">///   .. _`link_label`: link_dest</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   .. __: link_dest</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   __ link_dest</span>
-    <span class="doccomment">///   ```</span>
-    <span class="doccomment">///   When `__` is given, the _link label_ is set to `&quot;_&quot;`, which is a marker</span>
-    <span class="doccomment">///   for an anonymous _link label_.</span>
-    <span class="doccomment">/// * Asciidoc example:</span>
-    <span class="doccomment">///   ```adoc</span>
-    <span class="doccomment">///   :link_label: http://link_dest</span>
-    <span class="doccomment">///   ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The tuple is defined as follows:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// Label2Dest(link_label, link_destination, link_title)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Label2Dest</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// A **link reference definition** refers to a _reference link_ with the
+    /// same _link label_. A _link reference definition_ is not visible
+    /// when the document is rendered.
+    /// _link title_ is optional.
+    /// * Markdown example:
+    ///   ```md
+    ///   [link_label]: link_dest &quot;link title&quot;
+    ///   ```
+    /// * reStructuredText examples:
+    ///   ```rst
+    ///   .. _`link_label`: link_dest
+    ///
+    ///   .. __: link_dest
+    ///
+    ///   __ link_dest
+    ///   ```
+    ///   When `__` is given, the _link label_ is set to `&quot;_&quot;`, which is a marker
+    ///   for an anonymous _link label_.
+    /// * Asciidoc example:
+    ///   ```adoc
+    ///   :link_label: http://link_dest
+    ///   ```
+    ///
+    /// The tuple is defined as follows:
+    /// ```text
+    /// Label2Dest(link_label, link_destination, link_title)
+    /// ```
+    </span>Label2Dest(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
 
-    <span class="doccomment">/// This type represents a combined **inline link** and **link reference</span>
-    <span class="doccomment">/// definition**.</span>
-    <span class="doccomment">/// Semantically `TextLabel2Dest` is a shorthand for two links `Text2Dest` and</span>
-    <span class="doccomment">/// `Label2Dest` in one object, where _link text_ and _link label_ are the</span>
-    <span class="doccomment">/// same string. When rendered, _link text_ is visible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * Consider the following reStructuredText link:</span>
-    <span class="doccomment">///   ```rst</span>
-    <span class="doccomment">///   `link_text_label &lt;link_dest&gt;`_</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   `a &lt;b&gt;`_</span>
-    <span class="doccomment">///   ```</span>
-    <span class="doccomment">///   In this link is `b` the _link destination_ and `a` has a double role: it</span>
-    <span class="doccomment">///   defines _link text_ of the first link `Text2Dest(&quot;a&quot;, &quot;b&quot;, &quot;&quot;)` and _link</span>
-    <span class="doccomment">///   label_ of the second link `Label2Dest(&quot;a&quot;, &quot;b&quot;, &quot;&quot;)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The tuple is defined as follows:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// Label2Dest(link_text_label, link_destination, link_title)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">TextLabel2Dest</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// This type represents a combined **inline link** and **link reference
+    /// definition**.
+    /// Semantically `TextLabel2Dest` is a shorthand for two links `Text2Dest` and
+    /// `Label2Dest` in one object, where _link text_ and _link label_ are the
+    /// same string. When rendered, _link text_ is visible.
+    ///
+    /// * Consider the following reStructuredText link:
+    ///   ```rst
+    ///   `link_text_label &lt;link_dest&gt;`_
+    ///
+    ///   `a &lt;b&gt;`_
+    ///   ```
+    ///   In this link is `b` the _link destination_ and `a` has a double role: it
+    ///   defines _link text_ of the first link `Text2Dest(&quot;a&quot;, &quot;b&quot;, &quot;&quot;)` and _link
+    ///   label_ of the second link `Label2Dest(&quot;a&quot;, &quot;b&quot;, &quot;&quot;)`.
+    ///
+    /// The tuple is defined as follows:
+    /// ```text
+    /// Label2Dest(link_text_label, link_destination, link_title)
+    /// ```
+    </span>TextLabel2Dest(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
 
-    <span class="doccomment">/// The **reference alias** defines an alternative link label</span>
-    <span class="doccomment">/// `alt_link_label` for an existing `link_label` defined elsewhere in the</span>
-    <span class="doccomment">/// document. At some point, the `link_label` must be resolved to a</span>
-    <span class="doccomment">/// `link_destination` by a _link_reference_definition_. A _reference</span>
-    <span class="doccomment">/// alias_ is not visible when the document is rendered.</span>
-    <span class="doccomment">/// This link type is only available in reStructuredText, e.g.</span>
-    <span class="doccomment">/// ```rst</span>
-    <span class="doccomment">/// .. _`alt_link_label`: `link_label`_</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The tuple is defined as follows:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// Label2Label(alt_link_label, link_label)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Label2Label</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// The **reference alias** defines an alternative link label
+    /// `alt_link_label` for an existing `link_label` defined elsewhere in the
+    /// document. At some point, the `link_label` must be resolved to a
+    /// `link_destination` by a _link_reference_definition_. A _reference
+    /// alias_ is not visible when the document is rendered.
+    /// This link type is only available in reStructuredText, e.g.
+    /// ```rst
+    /// .. _`alt_link_label`: `link_label`_
+    /// ```
+    ///
+    /// The tuple is defined as follows:
+    /// ```text
+    /// Label2Label(alt_link_label, link_label)
+    /// ```
+    </span>Label2Label(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
 
-    <span class="doccomment">/// Inline Image.</span>
-    <span class="doccomment">/// The tuple is defined as follows:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// Image(img_alt, img_src)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// Note: this crate does not contain parsers for this variant.</span>
-    <span class="ident">Image</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Inline Image.
+    /// The tuple is defined as follows:
+    /// ```text
+    /// Image(img_alt, img_src)
+    /// ```
+    /// Note: this crate does not contain parsers for this variant.
+    </span>Image(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

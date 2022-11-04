@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/sqlite/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../quaint/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/sqlite/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../quaint/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -209,216 +209,216 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">libsqlite3_sys</span> <span class="kw">as</span> <span class="ident">ffi</span>;
-<span class="kw">use</span> <span class="ident">rusqlite::types::FromSqlError</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span>libsqlite3_sys <span class="kw">as </span>ffi;
+<span class="kw">use </span>rusqlite::types::FromSqlError;
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">rusqlite::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">rusqlite::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">rusqlite::Error::ToSqlConversionFailure</span>(<span class="ident">error</span>) =&gt; <span class="kw">match</span> <span class="ident">error</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">error</span>) =&gt; <span class="kw-2">*</span><span class="ident">error</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">error</span>));
+<span class="kw">impl </span>From&lt;rusqlite::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(e: rusqlite::Error) -&gt; Error {
+        <span class="kw">match </span>e {
+            rusqlite::Error::ToSqlConversionFailure(error) =&gt; <span class="kw">match </span>error.downcast::&lt;Error&gt;() {
+                <span class="prelude-val">Ok</span>(error) =&gt; <span class="kw-2">*</span>error,
+                <span class="prelude-val">Err</span>(error) =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::QueryError(error));
 
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="string">&quot;Could not interpret parameters in an SQLite query.&quot;</span>);
+                    builder.set_original_message(<span class="string">&quot;Could not interpret parameters in an SQLite query.&quot;</span>);
 
-                    <span class="ident">builder</span>.<span class="ident">build</span>()
+                    builder.build()
                 }
             },
-            <span class="ident">rusqlite::Error::InvalidQuery</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()));
+            rusqlite::Error::InvalidQuery =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::QueryError(e.into()));
 
-                <span class="ident">builder</span>.<span class="ident">set_original_message</span>(
+                builder.set_original_message(
                     <span class="string">&quot;Could not interpret the query or its parameters. Check the syntax and parameter types.&quot;</span>,
                 );
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
-            <span class="ident">rusqlite::Error::ExecuteReturnedResults</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()));
-                <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="string">&quot;Execute returned results, which is not allowed in SQLite.&quot;</span>);
+            rusqlite::Error::ExecuteReturnedResults =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::QueryError(e.into()));
+                builder.set_original_message(<span class="string">&quot;Execute returned results, which is not allowed in SQLite.&quot;</span>);
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
 
-            <span class="ident">rusqlite::Error::QueryReturnedNoRows</span> =&gt; <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::NotFound</span>).<span class="ident">build</span>(),
+            rusqlite::Error::QueryReturnedNoRows =&gt; Error::builder(ErrorKind::NotFound).build(),
 
-            <span class="ident">rusqlite::Error::SqliteFailure</span>(
-                <span class="ident">ffi::Error</span> {
-                    <span class="ident">code</span>: <span class="ident">ffi::ErrorCode::ConstraintViolation</span>,
-                    <span class="ident">extended_code</span>: <span class="number">2067</span>,
+            rusqlite::Error::SqliteFailure(
+                ffi::Error {
+                    code: ffi::ErrorCode::ConstraintViolation,
+                    extended_code: <span class="number">2067</span>,
                 },
-                <span class="prelude-val">Some</span>(<span class="ident">description</span>),
+                <span class="prelude-val">Some</span>(description),
             ) =&gt; {
-                <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">description</span>
-                    .<span class="ident">split</span>(<span class="string">&quot;: &quot;</span>)
-                    .<span class="ident">nth</span>(<span class="number">1</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&quot;, &quot;</span>))
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;.&#39;</span>).<span class="ident">last</span>()))
-                    .<span class="ident">map</span>(<span class="ident">DatabaseConstraint::fields</span>)
-                    .<span class="ident">unwrap_or</span>(<span class="ident">DatabaseConstraint::CannotParse</span>);
+                <span class="kw">let </span>constraint = description
+                    .split(<span class="string">&quot;: &quot;</span>)
+                    .nth(<span class="number">1</span>)
+                    .map(|s| s.split(<span class="string">&quot;, &quot;</span>))
+                    .map(|i| i.flat_map(|s| s.split(<span class="string">&#39;.&#39;</span>).last()))
+                    .map(DatabaseConstraint::fields)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::UniqueConstraintViolation</span> { <span class="ident">constraint</span> };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                <span class="kw">let </span>kind = ErrorKind::UniqueConstraintViolation { constraint };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="string">&quot;2067&quot;</span>);
-                <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">description</span>);
+                builder.set_original_code(<span class="string">&quot;2067&quot;</span>);
+                builder.set_original_message(description);
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
 
-            <span class="ident">rusqlite::Error::SqliteFailure</span>(
-                <span class="ident">ffi::Error</span> {
-                    <span class="ident">code</span>: <span class="ident">ffi::ErrorCode::ConstraintViolation</span>,
-                    <span class="ident">extended_code</span>: <span class="number">1555</span>,
+            rusqlite::Error::SqliteFailure(
+                ffi::Error {
+                    code: ffi::ErrorCode::ConstraintViolation,
+                    extended_code: <span class="number">1555</span>,
                 },
-                <span class="prelude-val">Some</span>(<span class="ident">description</span>),
+                <span class="prelude-val">Some</span>(description),
             ) =&gt; {
-                <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">description</span>
-                    .<span class="ident">split</span>(<span class="string">&quot;: &quot;</span>)
-                    .<span class="ident">nth</span>(<span class="number">1</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&quot;, &quot;</span>))
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;.&#39;</span>).<span class="ident">last</span>()))
-                    .<span class="ident">map</span>(<span class="ident">DatabaseConstraint::fields</span>)
-                    .<span class="ident">unwrap_or</span>(<span class="ident">DatabaseConstraint::CannotParse</span>);
+                <span class="kw">let </span>constraint = description
+                    .split(<span class="string">&quot;: &quot;</span>)
+                    .nth(<span class="number">1</span>)
+                    .map(|s| s.split(<span class="string">&quot;, &quot;</span>))
+                    .map(|i| i.flat_map(|s| s.split(<span class="string">&#39;.&#39;</span>).last()))
+                    .map(DatabaseConstraint::fields)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::UniqueConstraintViolation</span> { <span class="ident">constraint</span> };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                <span class="kw">let </span>kind = ErrorKind::UniqueConstraintViolation { constraint };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="string">&quot;1555&quot;</span>);
-                <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">description</span>);
+                builder.set_original_code(<span class="string">&quot;1555&quot;</span>);
+                builder.set_original_message(description);
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
 
-            <span class="ident">rusqlite::Error::SqliteFailure</span>(
-                <span class="ident">ffi::Error</span> {
-                    <span class="ident">code</span>: <span class="ident">ffi::ErrorCode::ConstraintViolation</span>,
-                    <span class="ident">extended_code</span>: <span class="number">1299</span>,
+            rusqlite::Error::SqliteFailure(
+                ffi::Error {
+                    code: ffi::ErrorCode::ConstraintViolation,
+                    extended_code: <span class="number">1299</span>,
                 },
-                <span class="prelude-val">Some</span>(<span class="ident">description</span>),
+                <span class="prelude-val">Some</span>(description),
             ) =&gt; {
-                <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">description</span>
-                    .<span class="ident">split</span>(<span class="string">&quot;: &quot;</span>)
-                    .<span class="ident">nth</span>(<span class="number">1</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&quot;, &quot;</span>))
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;.&#39;</span>).<span class="ident">last</span>()))
-                    .<span class="ident">map</span>(<span class="ident">DatabaseConstraint::fields</span>)
-                    .<span class="ident">unwrap_or</span>(<span class="ident">DatabaseConstraint::CannotParse</span>);
+                <span class="kw">let </span>constraint = description
+                    .split(<span class="string">&quot;: &quot;</span>)
+                    .nth(<span class="number">1</span>)
+                    .map(|s| s.split(<span class="string">&quot;, &quot;</span>))
+                    .map(|i| i.flat_map(|s| s.split(<span class="string">&#39;.&#39;</span>).last()))
+                    .map(DatabaseConstraint::fields)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::NullConstraintViolation</span> { <span class="ident">constraint</span> };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
+                <span class="kw">let </span>kind = ErrorKind::NullConstraintViolation { constraint };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="string">&quot;1299&quot;</span>);
-                <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">description</span>);
+                builder.set_original_code(<span class="string">&quot;1299&quot;</span>);
+                builder.set_original_message(description);
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
 
-            <span class="ident">rusqlite::Error::SqliteFailure</span>(
-                <span class="ident">ffi::Error</span> {
-                    <span class="ident">code</span>: <span class="ident">ffi::ErrorCode::ConstraintViolation</span>,
-                    <span class="ident">extended_code</span>: <span class="number">787</span>,
+            rusqlite::Error::SqliteFailure(
+                ffi::Error {
+                    code: ffi::ErrorCode::ConstraintViolation,
+                    extended_code: <span class="number">787</span>,
                 },
-                <span class="prelude-val">Some</span>(<span class="ident">description</span>),
+                <span class="prelude-val">Some</span>(description),
             ) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ForeignKeyConstraintViolation</span> {
-                    <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint::ForeignKey</span>,
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
+                    constraint: DatabaseConstraint::ForeignKey,
                 });
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="string">&quot;787&quot;</span>);
-                <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">description</span>);
+                builder.set_original_code(<span class="string">&quot;787&quot;</span>);
+                builder.set_original_message(description);
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
 
-            <span class="ident">rusqlite::Error::SqliteFailure</span>(
-                <span class="ident">ffi::Error</span> {
-                    <span class="ident">code</span>: <span class="ident">ffi::ErrorCode::ConstraintViolation</span>,
-                    <span class="ident">extended_code</span>: <span class="number">1811</span>,
+            rusqlite::Error::SqliteFailure(
+                ffi::Error {
+                    code: ffi::ErrorCode::ConstraintViolation,
+                    extended_code: <span class="number">1811</span>,
                 },
-                <span class="prelude-val">Some</span>(<span class="ident">description</span>),
+                <span class="prelude-val">Some</span>(description),
             ) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ForeignKeyConstraintViolation</span> {
-                    <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint::ForeignKey</span>,
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
+                    constraint: DatabaseConstraint::ForeignKey,
                 });
 
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="string">&quot;1811&quot;</span>);
-                <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">description</span>);
+                builder.set_original_code(<span class="string">&quot;1811&quot;</span>);
+                builder.set_original_message(description);
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
 
-            <span class="ident">rusqlite::Error::SqliteFailure</span>(
-                <span class="ident">ffi::Error</span> {
-                    <span class="ident">code</span>: <span class="ident">ffi::ErrorCode::DatabaseBusy</span>,
-                    <span class="ident">extended_code</span>,
+            rusqlite::Error::SqliteFailure(
+                ffi::Error {
+                    code: ffi::ErrorCode::DatabaseBusy,
+                    extended_code,
                 },
-                <span class="ident">description</span>,
+                description,
             ) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::SocketTimeout</span>);
-                <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">extended_code</span>));
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::SocketTimeout);
+                builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, extended_code));
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>) <span class="op">=</span> <span class="ident">description</span> {
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">description</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(description) = description {
+                    builder.set_original_message(description);
                 }
 
-                <span class="ident">builder</span>.<span class="ident">build</span>()
+                builder.build()
             }
 
-            <span class="ident">rusqlite::Error::SqliteFailure</span>(<span class="ident">ffi::Error</span> { <span class="ident">extended_code</span>, .. }, <span class="kw-2">ref</span> <span class="ident">description</span>) =&gt; <span class="kw">match</span> <span class="ident">description</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">starts_with</span>(<span class="string">&quot;no such table&quot;</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">split</span>(<span class="string">&quot;: &quot;</span>).<span class="ident">last</span>().<span class="ident">into</span>();
-                    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::TableDoesNotExist</span> { <span class="ident">table</span> };
+            rusqlite::Error::SqliteFailure(ffi::Error { extended_code, .. }, <span class="kw-2">ref </span>description) =&gt; <span class="kw">match </span>description {
+                <span class="prelude-val">Some</span>(d) <span class="kw">if </span>d.starts_with(<span class="string">&quot;no such table&quot;</span>) =&gt; {
+                    <span class="kw">let </span>table = d.split(<span class="string">&quot;: &quot;</span>).last().into();
+                    <span class="kw">let </span>kind = ErrorKind::TableDoesNotExist { table };
 
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
-                    <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">extended_code</span>));
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">d</span>);
+                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
+                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, extended_code));
+                    builder.set_original_message(d);
 
-                    <span class="ident">builder</span>.<span class="ident">build</span>()
+                    builder.build()
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">contains</span>(<span class="string">&quot;has no column named&quot;</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">split</span>(<span class="string">&quot; has no column named &quot;</span>).<span class="ident">last</span>().<span class="ident">into</span>();
-                    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::ColumnNotFound</span> { <span class="ident">column</span> };
+                <span class="prelude-val">Some</span>(d) <span class="kw">if </span>d.contains(<span class="string">&quot;has no column named&quot;</span>) =&gt; {
+                    <span class="kw">let </span>column = d.split(<span class="string">&quot; has no column named &quot;</span>).last().into();
+                    <span class="kw">let </span>kind = ErrorKind::ColumnNotFound { column };
 
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
-                    <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">extended_code</span>));
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">d</span>);
+                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
+                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, extended_code));
+                    builder.set_original_message(d);
 
-                    <span class="ident">builder</span>.<span class="ident">build</span>()
+                    builder.build()
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">starts_with</span>(<span class="string">&quot;no such column: &quot;</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">split</span>(<span class="string">&quot;no such column: &quot;</span>).<span class="ident">last</span>().<span class="ident">into</span>();
-                    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::ColumnNotFound</span> { <span class="ident">column</span> };
+                <span class="prelude-val">Some</span>(d) <span class="kw">if </span>d.starts_with(<span class="string">&quot;no such column: &quot;</span>) =&gt; {
+                    <span class="kw">let </span>column = d.split(<span class="string">&quot;no such column: &quot;</span>).last().into();
+                    <span class="kw">let </span>kind = ErrorKind::ColumnNotFound { column };
 
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
-                    <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">extended_code</span>));
-                    <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">d</span>);
+                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
+                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, extended_code));
+                    builder.set_original_message(d);
 
-                    <span class="ident">builder</span>.<span class="ident">build</span>()
+                    builder.build()
                 }
-                <span class="kw">_</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">description</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">to_string</span>());
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()));
-                    <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">extended_code</span>));
+                <span class="kw">_ </span>=&gt; {
+                    <span class="kw">let </span>description = description.as_ref().map(|d| d.to_string());
+                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::QueryError(e.into()));
+                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, extended_code));
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>) <span class="op">=</span> <span class="ident">description</span> {
-                        <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">description</span>);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(description) = description {
+                        builder.set_original_message(description);
                     }
 
-                    <span class="ident">builder</span>.<span class="ident">build</span>()
+                    builder.build()
                 }
             },
-            <span class="ident">e</span> =&gt; <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
+            e =&gt; Error::builder(ErrorKind::QueryError(e.into())).build(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FromSqlError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">FromSqlError</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ColumnReadFailure</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>()
+<span class="kw">impl </span>From&lt;FromSqlError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(e: FromSqlError) -&gt; Error {
+        Error::builder(ErrorKind::ColumnReadFailure(e.into())).build()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/parsing/parsed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parsed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/parsing/parsed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parsed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -698,703 +698,703 @@
 <span id="696">696</span>
 <span id="697">697</span>
 <span id="698">698</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Information parsed from an input and format description.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Information parsed from an input and format description.
 
-<span class="kw">use</span> <span class="ident">core::mem::MaybeUninit</span>;
-<span class="kw">use</span> <span class="ident">core::num</span>::{<span class="ident">NonZeroU16</span>, <span class="ident">NonZeroU8</span>};
+</span><span class="kw">use </span>core::mem::MaybeUninit;
+<span class="kw">use </span>core::num::{NonZeroU16, NonZeroU8};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::TryFromParsed::InsufficientInformation</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::modifier</span>::{<span class="ident">WeekNumberRepr</span>, <span class="ident">YearRepr</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description</span>::{<span class="ident">Component</span>, <span class="ident">FormatItem</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::component</span>::{
-    <span class="ident">parse_day</span>, <span class="ident">parse_hour</span>, <span class="ident">parse_minute</span>, <span class="ident">parse_month</span>, <span class="ident">parse_offset_hour</span>, <span class="ident">parse_offset_minute</span>,
-    <span class="ident">parse_offset_second</span>, <span class="ident">parse_ordinal</span>, <span class="ident">parse_period</span>, <span class="ident">parse_second</span>, <span class="ident">parse_subsecond</span>,
-    <span class="ident">parse_week_number</span>, <span class="ident">parse_weekday</span>, <span class="ident">parse_year</span>, <span class="ident">Period</span>,
+<span class="kw">use </span><span class="kw">crate</span>::error::TryFromParsed::InsufficientInformation;
+<span class="kw">use </span><span class="kw">crate</span>::format_description::modifier::{WeekNumberRepr, YearRepr};
+<span class="kw">use </span><span class="kw">crate</span>::format_description::{Component, FormatItem};
+<span class="kw">use </span><span class="kw">crate</span>::parsing::component::{
+    parse_day, parse_hour, parse_minute, parse_month, parse_offset_hour, parse_offset_minute,
+    parse_offset_second, parse_ordinal, parse_period, parse_second, parse_subsecond,
+    parse_week_number, parse_weekday, parse_year, Period,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::ParsedItem</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">Date</span>, <span class="ident">Month</span>, <span class="ident">OffsetDateTime</span>, <span class="ident">PrimitiveDateTime</span>, <span class="ident">Time</span>, <span class="ident">UtcOffset</span>, <span class="ident">Weekday</span>};
+<span class="kw">use </span><span class="kw">crate</span>::parsing::ParsedItem;
+<span class="kw">use crate</span>::{error, Date, Month, OffsetDateTime, PrimitiveDateTime, Time, UtcOffset, Weekday};
 
-<span class="doccomment">/// All information parsed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This information is directly used to construct the final values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Most users will not need think about this struct in any way. It is public to allow for manual</span>
-<span class="doccomment">/// control over values, in the instance that the default parser is insufficient.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Parsed</span> {
-    <span class="doccomment">/// Bitflags indicating whether a particular field is present.</span>
-    <span class="ident">flags</span>: <span class="ident">u16</span>,
-    <span class="doccomment">/// Calendar year.</span>
-    <span class="ident">year</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The last two digits of the calendar year.</span>
-    <span class="ident">year_last_two</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Year of the [ISO week date](https://en.wikipedia.org/wiki/ISO_week_date).</span>
-    <span class="ident">iso_year</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The last two digits of the ISO week year.</span>
-    <span class="ident">iso_year_last_two</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Month of the year.</span>
-    <span class="ident">month</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Month</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Week of the year, where week one begins on the first Sunday of the calendar year.</span>
-    <span class="ident">sunday_week_number</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Week of the year, where week one begins on the first Monday of the calendar year.</span>
-    <span class="ident">monday_week_number</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Week of the year, where week one is the Monday-to-Sunday period containing January 4.</span>
-    <span class="ident">iso_week_number</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Day of the week.</span>
-    <span class="ident">weekday</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Weekday</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Day of the year.</span>
-    <span class="ident">ordinal</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU16</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Day of the month.</span>
-    <span class="ident">day</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Hour within the day.</span>
-    <span class="ident">hour_24</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Hour within the 12-hour period (midnight to noon or vice versa). This is typically used in</span>
-    <span class="doccomment">/// conjunction with AM/PM, which is indicated by the `hour_12_is_pm` field.</span>
-    <span class="ident">hour_12</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether the `hour_12` field indicates a time that &quot;PM&quot;.</span>
-    <span class="ident">hour_12_is_pm</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Minute within the hour.</span>
-    <span class="ident">minute</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Second within the minute.</span>
-    <span class="ident">second</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Nanosecond within the second.</span>
-    <span class="ident">subsecond</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whole hours of the UTC offset.</span>
-    <span class="ident">offset_hour</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Minutes within the hour of the UTC offset.</span>
-    <span class="ident">offset_minute</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Seconds within the minute of the UTC offset.</span>
-    <span class="ident">offset_second</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span>,
+<span class="doccomment">/// All information parsed.
+///
+/// This information is directly used to construct the final values.
+///
+/// Most users will not need think about this struct in any way. It is public to allow for manual
+/// control over values, in the instance that the default parser is insufficient.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub struct </span>Parsed {
+    <span class="doccomment">/// Bitflags indicating whether a particular field is present.
+    </span>flags: u16,
+    <span class="doccomment">/// Calendar year.
+    </span>year: MaybeUninit&lt;i32&gt;,
+    <span class="doccomment">/// The last two digits of the calendar year.
+    </span>year_last_two: MaybeUninit&lt;u8&gt;,
+    <span class="doccomment">/// Year of the [ISO week date](https://en.wikipedia.org/wiki/ISO_week_date).
+    </span>iso_year: MaybeUninit&lt;i32&gt;,
+    <span class="doccomment">/// The last two digits of the ISO week year.
+    </span>iso_year_last_two: MaybeUninit&lt;u8&gt;,
+    <span class="doccomment">/// Month of the year.
+    </span>month: <span class="prelude-ty">Option</span>&lt;Month&gt;,
+    <span class="doccomment">/// Week of the year, where week one begins on the first Sunday of the calendar year.
+    </span>sunday_week_number: MaybeUninit&lt;u8&gt;,
+    <span class="doccomment">/// Week of the year, where week one begins on the first Monday of the calendar year.
+    </span>monday_week_number: MaybeUninit&lt;u8&gt;,
+    <span class="doccomment">/// Week of the year, where week one is the Monday-to-Sunday period containing January 4.
+    </span>iso_week_number: <span class="prelude-ty">Option</span>&lt;NonZeroU8&gt;,
+    <span class="doccomment">/// Day of the week.
+    </span>weekday: <span class="prelude-ty">Option</span>&lt;Weekday&gt;,
+    <span class="doccomment">/// Day of the year.
+    </span>ordinal: <span class="prelude-ty">Option</span>&lt;NonZeroU16&gt;,
+    <span class="doccomment">/// Day of the month.
+    </span>day: <span class="prelude-ty">Option</span>&lt;NonZeroU8&gt;,
+    <span class="doccomment">/// Hour within the day.
+    </span>hour_24: MaybeUninit&lt;u8&gt;,
+    <span class="doccomment">/// Hour within the 12-hour period (midnight to noon or vice versa). This is typically used in
+    /// conjunction with AM/PM, which is indicated by the `hour_12_is_pm` field.
+    </span>hour_12: <span class="prelude-ty">Option</span>&lt;NonZeroU8&gt;,
+    <span class="doccomment">/// Whether the `hour_12` field indicates a time that &quot;PM&quot;.
+    </span>hour_12_is_pm: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="doccomment">/// Minute within the hour.
+    </span>minute: MaybeUninit&lt;u8&gt;,
+    <span class="doccomment">/// Second within the minute.
+    </span>second: MaybeUninit&lt;u8&gt;,
+    <span class="doccomment">/// Nanosecond within the second.
+    </span>subsecond: MaybeUninit&lt;u32&gt;,
+    <span class="doccomment">/// Whole hours of the UTC offset.
+    </span>offset_hour: MaybeUninit&lt;i8&gt;,
+    <span class="doccomment">/// Minutes within the hour of the UTC offset.
+    </span>offset_minute: MaybeUninit&lt;i8&gt;,
+    <span class="doccomment">/// Seconds within the minute of the UTC offset.
+    </span>offset_second: MaybeUninit&lt;i8&gt;,
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Parsed</span> {
-    <span class="kw">const</span> <span class="ident">YEAR_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">YEAR_LAST_TWO_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-    <span class="kw">const</span> <span class="ident">ISO_YEAR_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-    <span class="kw">const</span> <span class="ident">ISO_YEAR_LAST_TWO_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-    <span class="kw">const</span> <span class="ident">SUNDAY_WEEK_NUMBER_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
-    <span class="kw">const</span> <span class="ident">MONDAY_WEEK_NUMBER_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
-    <span class="kw">const</span> <span class="ident">HOUR_24_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
-    <span class="kw">const</span> <span class="ident">MINUTE_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
-    <span class="kw">const</span> <span class="ident">SECOND_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
-    <span class="kw">const</span> <span class="ident">SUBSECOND_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
-    <span class="kw">const</span> <span class="ident">OFFSET_HOUR_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
-    <span class="kw">const</span> <span class="ident">OFFSET_MINUTE_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
-    <span class="kw">const</span> <span class="ident">OFFSET_SECOND_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
-    <span class="doccomment">/// Indicates whether a leap second is permitted to be parsed. This is required by some</span>
-    <span class="doccomment">/// well-known formats.</span>
-    <span class="kw">const</span> <span class="ident">LEAP_SECOND_ALLOWED_FLAG</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
+<span class="attribute">#[allow(clippy::missing_docs_in_private_items)]
+</span><span class="kw">impl </span>Parsed {
+    <span class="kw">const </span>YEAR_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
+    <span class="kw">const </span>YEAR_LAST_TWO_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+    <span class="kw">const </span>ISO_YEAR_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
+    <span class="kw">const </span>ISO_YEAR_LAST_TWO_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
+    <span class="kw">const </span>SUNDAY_WEEK_NUMBER_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
+    <span class="kw">const </span>MONDAY_WEEK_NUMBER_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+    <span class="kw">const </span>HOUR_24_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
+    <span class="kw">const </span>MINUTE_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
+    <span class="kw">const </span>SECOND_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">8</span>;
+    <span class="kw">const </span>SUBSECOND_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">9</span>;
+    <span class="kw">const </span>OFFSET_HOUR_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">10</span>;
+    <span class="kw">const </span>OFFSET_MINUTE_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">11</span>;
+    <span class="kw">const </span>OFFSET_SECOND_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">12</span>;
+    <span class="doccomment">/// Indicates whether a leap second is permitted to be parsed. This is required by some
+    /// well-known formats.
+    </span><span class="kw">const </span>LEAP_SECOND_ALLOWED_FLAG: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">13</span>;
 }
 
-<span class="kw">impl</span> <span class="ident">Parsed</span> {
-    <span class="doccomment">/// Create a new instance of `Parsed` with no information known.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">flags</span>: <span class="number">0</span>,
-            <span class="ident">year</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">year_last_two</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">iso_year</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">iso_year_last_two</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">month</span>: <span class="prelude-val">None</span>,
-            <span class="ident">sunday_week_number</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">monday_week_number</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">iso_week_number</span>: <span class="prelude-val">None</span>,
-            <span class="ident">weekday</span>: <span class="prelude-val">None</span>,
-            <span class="ident">ordinal</span>: <span class="prelude-val">None</span>,
-            <span class="ident">day</span>: <span class="prelude-val">None</span>,
-            <span class="ident">hour_24</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">hour_12</span>: <span class="prelude-val">None</span>,
-            <span class="ident">hour_12_is_pm</span>: <span class="prelude-val">None</span>,
-            <span class="ident">minute</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">second</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">subsecond</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">offset_hour</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">offset_minute</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">offset_second</span>: <span class="ident">MaybeUninit::uninit</span>(),
+<span class="kw">impl </span>Parsed {
+    <span class="doccomment">/// Create a new instance of `Parsed` with no information known.
+    </span><span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            flags: <span class="number">0</span>,
+            year: MaybeUninit::uninit(),
+            year_last_two: MaybeUninit::uninit(),
+            iso_year: MaybeUninit::uninit(),
+            iso_year_last_two: MaybeUninit::uninit(),
+            month: <span class="prelude-val">None</span>,
+            sunday_week_number: MaybeUninit::uninit(),
+            monday_week_number: MaybeUninit::uninit(),
+            iso_week_number: <span class="prelude-val">None</span>,
+            weekday: <span class="prelude-val">None</span>,
+            ordinal: <span class="prelude-val">None</span>,
+            day: <span class="prelude-val">None</span>,
+            hour_24: MaybeUninit::uninit(),
+            hour_12: <span class="prelude-val">None</span>,
+            hour_12_is_pm: <span class="prelude-val">None</span>,
+            minute: MaybeUninit::uninit(),
+            second: MaybeUninit::uninit(),
+            subsecond: MaybeUninit::uninit(),
+            offset_hour: MaybeUninit::uninit(),
+            offset_minute: MaybeUninit::uninit(),
+            offset_second: MaybeUninit::uninit(),
         }
     }
 
-    <span class="doccomment">/// Parse a single [`FormatItem`], mutating the struct. The remaining input is returned as the</span>
-    <span class="doccomment">/// `Ok` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a [`FormatItem::Optional`] is passed, parsing will not fail; the input will be returned</span>
-    <span class="doccomment">/// as-is if the expected format is not present.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-        <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">FormatItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">error::ParseFromDescription</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">item</span> {
-            <span class="ident">FormatItem::Literal</span>(<span class="ident">literal</span>) =&gt; <span class="ident"><span class="self">Self</span>::parse_literal</span>(<span class="ident">input</span>, <span class="ident">literal</span>),
-            <span class="ident">FormatItem::Component</span>(<span class="ident">component</span>) =&gt; <span class="self">self</span>.<span class="ident">parse_component</span>(<span class="ident">input</span>, <span class="kw-2">*</span><span class="ident">component</span>),
-            <span class="ident">FormatItem::Compound</span>(<span class="ident">compound</span>) =&gt; <span class="self">self</span>.<span class="ident">parse_items</span>(<span class="ident">input</span>, <span class="ident">compound</span>),
-            <span class="ident">FormatItem::Optional</span>(<span class="ident">item</span>) =&gt; <span class="self">self</span>.<span class="ident">parse_item</span>(<span class="ident">input</span>, <span class="ident">item</span>).<span class="ident">or</span>(<span class="prelude-val">Ok</span>(<span class="ident">input</span>)),
-            <span class="ident">FormatItem::First</span>(<span class="ident">items</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first_err</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Parse a single [`FormatItem`], mutating the struct. The remaining input is returned as the
+    /// `Ok` value.
+    ///
+    /// If a [`FormatItem::Optional`] is passed, parsing will not fail; the input will be returned
+    /// as-is if the expected format is not present.
+    </span><span class="kw">pub fn </span>parse_item&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+        item: <span class="kw-2">&amp;</span>FormatItem&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], error::ParseFromDescription&gt; {
+        <span class="kw">match </span>item {
+            FormatItem::Literal(literal) =&gt; <span class="self">Self</span>::parse_literal(input, literal),
+            FormatItem::Component(component) =&gt; <span class="self">self</span>.parse_component(input, <span class="kw-2">*</span>component),
+            FormatItem::Compound(compound) =&gt; <span class="self">self</span>.parse_items(input, compound),
+            FormatItem::Optional(item) =&gt; <span class="self">self</span>.parse_item(input, item).or(<span class="prelude-val">Ok</span>(input)),
+            FormatItem::First(items) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>first_err = <span class="prelude-val">None</span>;
 
-                <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span>.<span class="ident">iter</span>() {
-                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">parse_item</span>(<span class="ident">input</span>, <span class="ident">item</span>) {
-                        <span class="prelude-val">Ok</span>(<span class="ident">remaining_input</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">remaining_input</span>),
-                        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">first_err</span>.<span class="ident">is_none</span>() =&gt; <span class="ident">first_err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+                <span class="kw">for </span>item <span class="kw">in </span>items.iter() {
+                    <span class="kw">match </span><span class="self">self</span>.parse_item(input, item) {
+                        <span class="prelude-val">Ok</span>(remaining_input) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(remaining_input),
+                        <span class="prelude-val">Err</span>(err) <span class="kw">if </span>first_err.is_none() =&gt; first_err = <span class="prelude-val">Some</span>(err),
                         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {}
                     }
                 }
 
-                <span class="kw">match</span> <span class="ident">first_err</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
-                    <span class="comment">// This location will be reached if the slice is empty, skipping the `for` loop.</span>
-                    <span class="comment">// As this case is expected to be uncommon, there&#39;s no need to check up front.</span>
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">input</span>),
+                <span class="kw">match </span>first_err {
+                    <span class="prelude-val">Some</span>(err) =&gt; <span class="prelude-val">Err</span>(err),
+                    <span class="comment">// This location will be reached if the slice is empty, skipping the `for` loop.
+                    // As this case is expected to be uncommon, there&#39;s no need to check up front.
+                    </span><span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(input),
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Parse a sequence of [`FormatItem`]s, mutating the struct. The remaining input is returned as</span>
-    <span class="doccomment">/// the `Ok` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method will fail if any of the contained [`FormatItem`]s fail to parse. `self` will not</span>
-    <span class="doccomment">/// be mutated in this instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_items</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-        <span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">FormatItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">error::ParseFromDescription</span><span class="op">&gt;</span> {
-        <span class="comment">// Make a copy that we can mutate. It will only be set to the user&#39;s copy if everything</span>
-        <span class="comment">// succeeds.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-        <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span> {
-            <span class="ident">input</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">parse_item</span>(<span class="ident">input</span>, <span class="ident">item</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Parse a sequence of [`FormatItem`]s, mutating the struct. The remaining input is returned as
+    /// the `Ok` value.
+    ///
+    /// This method will fail if any of the contained [`FormatItem`]s fail to parse. `self` will not
+    /// be mutated in this instance.
+    </span><span class="kw">pub fn </span>parse_items&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        <span class="kw-2">mut </span>input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+        items: <span class="kw-2">&amp;</span>[FormatItem&lt;<span class="lifetime">&#39;_</span>&gt;],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], error::ParseFromDescription&gt; {
+        <span class="comment">// Make a copy that we can mutate. It will only be set to the user&#39;s copy if everything
+        // succeeds.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>this = <span class="kw-2">*</span><span class="self">self</span>;
+        <span class="kw">for </span>item <span class="kw">in </span>items {
+            input = this.parse_item(input, item)<span class="question-mark">?</span>;
         }
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">this</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">input</span>)
+        <span class="kw-2">*</span><span class="self">self </span>= this;
+        <span class="prelude-val">Ok</span>(input)
     }
 
-    <span class="doccomment">/// Parse a literal byte sequence. The remaining input is returned as the `Ok` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_literal</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-        <span class="ident">literal</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">error::ParseFromDescription</span><span class="op">&gt;</span> {
-        <span class="ident">input</span>
-            .<span class="ident">strip_prefix</span>(<span class="ident">literal</span>)
-            .<span class="ident">ok_or</span>(<span class="ident">error::ParseFromDescription::InvalidLiteral</span>)
+    <span class="doccomment">/// Parse a literal byte sequence. The remaining input is returned as the `Ok` value.
+    </span><span class="kw">pub fn </span>parse_literal&lt;<span class="lifetime">&#39;a</span>&gt;(
+        input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+        literal: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], error::ParseFromDescription&gt; {
+        input
+            .strip_prefix(literal)
+            .ok_or(error::ParseFromDescription::InvalidLiteral)
     }
 
-    <span class="doccomment">/// Parse a single component, mutating the struct. The remaining input is returned as the `Ok`</span>
-    <span class="doccomment">/// value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_component</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-        <span class="ident">component</span>: <span class="ident">Component</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">error::ParseFromDescription</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">error::ParseFromDescription::InvalidComponent</span>;
+    <span class="doccomment">/// Parse a single component, mutating the struct. The remaining input is returned as the `Ok`
+    /// value.
+    </span><span class="kw">pub fn </span>parse_component&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+        component: Component,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], error::ParseFromDescription&gt; {
+        <span class="kw">use </span>error::ParseFromDescription::InvalidComponent;
 
-        <span class="kw">match</span> <span class="ident">component</span> {
-            <span class="ident">Component::Day</span>(<span class="ident">modifiers</span>) =&gt; <span class="ident">parse_day</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> <span class="ident">parsed</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_day</span>(<span class="ident">value</span>)))
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;day&quot;</span>)),
-            <span class="ident">Component::Month</span>(<span class="ident">modifiers</span>) =&gt; <span class="ident">parse_month</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> <span class="ident">parsed</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_month</span>(<span class="ident">value</span>)))
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;month&quot;</span>)),
-            <span class="ident">Component::Ordinal</span>(<span class="ident">modifiers</span>) =&gt; <span class="ident">parse_ordinal</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> <span class="ident">parsed</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_ordinal</span>(<span class="ident">value</span>)))
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;ordinal&quot;</span>)),
-            <span class="ident">Component::Weekday</span>(<span class="ident">modifiers</span>) =&gt; <span class="ident">parse_weekday</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> <span class="ident">parsed</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_weekday</span>(<span class="ident">value</span>)))
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;weekday&quot;</span>)),
-            <span class="ident">Component::WeekNumber</span>(<span class="ident">modifiers</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">remaining</span>, <span class="ident">value</span>) <span class="op">=</span>
-                    <span class="ident">parse_week_number</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;week number&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">match</span> <span class="ident">modifiers</span>.<span class="ident">repr</span> {
-                    <span class="ident">WeekNumberRepr::Iso</span> =&gt; {
-                        <span class="ident">NonZeroU8::new</span>(<span class="ident">value</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_iso_week_number</span>(<span class="ident">value</span>))
+        <span class="kw">match </span>component {
+            Component::Day(modifiers) =&gt; parse_day(input, modifiers)
+                .and_then(|parsed| parsed.consume_value(|value| <span class="self">self</span>.set_day(value)))
+                .ok_or(InvalidComponent(<span class="string">&quot;day&quot;</span>)),
+            Component::Month(modifiers) =&gt; parse_month(input, modifiers)
+                .and_then(|parsed| parsed.consume_value(|value| <span class="self">self</span>.set_month(value)))
+                .ok_or(InvalidComponent(<span class="string">&quot;month&quot;</span>)),
+            Component::Ordinal(modifiers) =&gt; parse_ordinal(input, modifiers)
+                .and_then(|parsed| parsed.consume_value(|value| <span class="self">self</span>.set_ordinal(value)))
+                .ok_or(InvalidComponent(<span class="string">&quot;ordinal&quot;</span>)),
+            Component::Weekday(modifiers) =&gt; parse_weekday(input, modifiers)
+                .and_then(|parsed| parsed.consume_value(|value| <span class="self">self</span>.set_weekday(value)))
+                .ok_or(InvalidComponent(<span class="string">&quot;weekday&quot;</span>)),
+            Component::WeekNumber(modifiers) =&gt; {
+                <span class="kw">let </span>ParsedItem(remaining, value) =
+                    parse_week_number(input, modifiers).ok_or(InvalidComponent(<span class="string">&quot;week number&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">match </span>modifiers.repr {
+                    WeekNumberRepr::Iso =&gt; {
+                        NonZeroU8::new(value).and_then(|value| <span class="self">self</span>.set_iso_week_number(value))
                     }
-                    <span class="ident">WeekNumberRepr::Sunday</span> =&gt; <span class="self">self</span>.<span class="ident">set_sunday_week_number</span>(<span class="ident">value</span>),
-                    <span class="ident">WeekNumberRepr::Monday</span> =&gt; <span class="self">self</span>.<span class="ident">set_monday_week_number</span>(<span class="ident">value</span>),
+                    WeekNumberRepr::Sunday =&gt; <span class="self">self</span>.set_sunday_week_number(value),
+                    WeekNumberRepr::Monday =&gt; <span class="self">self</span>.set_monday_week_number(value),
                 }
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;week number&quot;</span>))<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">remaining</span>)
+                .ok_or(InvalidComponent(<span class="string">&quot;week number&quot;</span>))<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(remaining)
             }
-            <span class="ident">Component::Year</span>(<span class="ident">modifiers</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">remaining</span>, <span class="ident">value</span>) <span class="op">=</span>
-                    <span class="ident">parse_year</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">match</span> (<span class="ident">modifiers</span>.<span class="ident">iso_week_based</span>, <span class="ident">modifiers</span>.<span class="ident">repr</span>) {
-                    (<span class="bool-val">false</span>, <span class="ident">YearRepr::Full</span>) =&gt; <span class="self">self</span>.<span class="ident">set_year</span>(<span class="ident">value</span>),
-                    (<span class="bool-val">false</span>, <span class="ident">YearRepr::LastTwo</span>) =&gt; <span class="self">self</span>.<span class="ident">set_year_last_two</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="kw">_</span>),
-                    (<span class="bool-val">true</span>, <span class="ident">YearRepr::Full</span>) =&gt; <span class="self">self</span>.<span class="ident">set_iso_year</span>(<span class="ident">value</span>),
-                    (<span class="bool-val">true</span>, <span class="ident">YearRepr::LastTwo</span>) =&gt; <span class="self">self</span>.<span class="ident">set_iso_year_last_two</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="kw">_</span>),
+            Component::Year(modifiers) =&gt; {
+                <span class="kw">let </span>ParsedItem(remaining, value) =
+                    parse_year(input, modifiers).ok_or(InvalidComponent(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">match </span>(modifiers.iso_week_based, modifiers.repr) {
+                    (<span class="bool-val">false</span>, YearRepr::Full) =&gt; <span class="self">self</span>.set_year(value),
+                    (<span class="bool-val">false</span>, YearRepr::LastTwo) =&gt; <span class="self">self</span>.set_year_last_two(value <span class="kw">as _</span>),
+                    (<span class="bool-val">true</span>, YearRepr::Full) =&gt; <span class="self">self</span>.set_iso_year(value),
+                    (<span class="bool-val">true</span>, YearRepr::LastTwo) =&gt; <span class="self">self</span>.set_iso_year_last_two(value <span class="kw">as _</span>),
                 }
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">remaining</span>)
+                .ok_or(InvalidComponent(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(remaining)
             }
-            <span class="ident">Component::Hour</span>(<span class="ident">modifiers</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">remaining</span>, <span class="ident">value</span>) <span class="op">=</span>
-                    <span class="ident">parse_hour</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;hour&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">modifiers</span>.<span class="ident">is_12_hour_clock</span> {
-                    <span class="ident">NonZeroU8::new</span>(<span class="ident">value</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_hour_12</span>(<span class="ident">value</span>))
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">set_hour_24</span>(<span class="ident">value</span>)
+            Component::Hour(modifiers) =&gt; {
+                <span class="kw">let </span>ParsedItem(remaining, value) =
+                    parse_hour(input, modifiers).ok_or(InvalidComponent(<span class="string">&quot;hour&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">if </span>modifiers.is_12_hour_clock {
+                    NonZeroU8::new(value).and_then(|value| <span class="self">self</span>.set_hour_12(value))
+                } <span class="kw">else </span>{
+                    <span class="self">self</span>.set_hour_24(value)
                 }
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;hour&quot;</span>))<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">remaining</span>)
+                .ok_or(InvalidComponent(<span class="string">&quot;hour&quot;</span>))<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(remaining)
             }
-            <span class="ident">Component::Minute</span>(<span class="ident">modifiers</span>) =&gt; <span class="ident">parse_minute</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> <span class="ident">parsed</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_minute</span>(<span class="ident">value</span>)))
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;minute&quot;</span>)),
-            <span class="ident">Component::Period</span>(<span class="ident">modifiers</span>) =&gt; <span class="ident">parse_period</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> {
-                    <span class="ident">parsed</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_hour_12_is_pm</span>(<span class="ident">value</span> <span class="op">==</span> <span class="ident">Period::Pm</span>))
+            Component::Minute(modifiers) =&gt; parse_minute(input, modifiers)
+                .and_then(|parsed| parsed.consume_value(|value| <span class="self">self</span>.set_minute(value)))
+                .ok_or(InvalidComponent(<span class="string">&quot;minute&quot;</span>)),
+            Component::Period(modifiers) =&gt; parse_period(input, modifiers)
+                .and_then(|parsed| {
+                    parsed.consume_value(|value| <span class="self">self</span>.set_hour_12_is_pm(value == Period::Pm))
                 })
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;period&quot;</span>)),
-            <span class="ident">Component::Second</span>(<span class="ident">modifiers</span>) =&gt; <span class="ident">parse_second</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> <span class="ident">parsed</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_second</span>(<span class="ident">value</span>)))
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;second&quot;</span>)),
-            <span class="ident">Component::Subsecond</span>(<span class="ident">modifiers</span>) =&gt; <span class="ident">parse_subsecond</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> <span class="ident">parsed</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_subsecond</span>(<span class="ident">value</span>)))
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;subsecond&quot;</span>)),
-            <span class="ident">Component::OffsetHour</span>(<span class="ident">modifiers</span>) =&gt; <span class="ident">parse_offset_hour</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> <span class="ident">parsed</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_offset_hour</span>(<span class="ident">value</span>)))
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset hour&quot;</span>)),
-            <span class="ident">Component::OffsetMinute</span>(<span class="ident">modifiers</span>) =&gt; <span class="ident">parse_offset_minute</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> {
-                    <span class="ident">parsed</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_offset_minute_signed</span>(<span class="ident">value</span>))
+                .ok_or(InvalidComponent(<span class="string">&quot;period&quot;</span>)),
+            Component::Second(modifiers) =&gt; parse_second(input, modifiers)
+                .and_then(|parsed| parsed.consume_value(|value| <span class="self">self</span>.set_second(value)))
+                .ok_or(InvalidComponent(<span class="string">&quot;second&quot;</span>)),
+            Component::Subsecond(modifiers) =&gt; parse_subsecond(input, modifiers)
+                .and_then(|parsed| parsed.consume_value(|value| <span class="self">self</span>.set_subsecond(value)))
+                .ok_or(InvalidComponent(<span class="string">&quot;subsecond&quot;</span>)),
+            Component::OffsetHour(modifiers) =&gt; parse_offset_hour(input, modifiers)
+                .and_then(|parsed| parsed.consume_value(|value| <span class="self">self</span>.set_offset_hour(value)))
+                .ok_or(InvalidComponent(<span class="string">&quot;offset hour&quot;</span>)),
+            Component::OffsetMinute(modifiers) =&gt; parse_offset_minute(input, modifiers)
+                .and_then(|parsed| {
+                    parsed.consume_value(|value| <span class="self">self</span>.set_offset_minute_signed(value))
                 })
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset minute&quot;</span>)),
-            <span class="ident">Component::OffsetSecond</span>(<span class="ident">modifiers</span>) =&gt; <span class="ident">parse_offset_second</span>(<span class="ident">input</span>, <span class="ident">modifiers</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> {
-                    <span class="ident">parsed</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_offset_second_signed</span>(<span class="ident">value</span>))
+                .ok_or(InvalidComponent(<span class="string">&quot;offset minute&quot;</span>)),
+            Component::OffsetSecond(modifiers) =&gt; parse_offset_second(input, modifiers)
+                .and_then(|parsed| {
+                    parsed.consume_value(|value| <span class="self">self</span>.set_offset_second_signed(value))
                 })
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset second&quot;</span>)),
+                .ok_or(InvalidComponent(<span class="string">&quot;offset second&quot;</span>)),
         }
     }
 }
 
-<span class="doccomment">/// Generate getters for each of the fields.</span>
-<span class="macro">macro_rules!</span> <span class="ident">getters</span> {
-    ($($(@<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">ident</span>)<span class="question-mark">?</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {$(
-        <span class="macro">getters!</span>(<span class="op">!</span> $(@<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>)<span class="question-mark">?</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>);
+<span class="doccomment">/// Generate getters for each of the fields.
+</span><span class="macro">macro_rules! </span>getters {
+    ($($(@<span class="macro-nonterminal">$flag</span>:ident)<span class="question-mark">? </span><span class="macro-nonterminal">$name</span>:ident: <span class="macro-nonterminal">$ty</span>:ty),+ $(,)<span class="question-mark">?</span>) =&gt; {$(
+        <span class="macro">getters!</span>(! $(@<span class="macro-nonterminal">$flag</span>)<span class="question-mark">? </span><span class="macro-nonterminal">$name</span>: <span class="macro-nonterminal">$ty</span>);
     )<span class="kw-2">*</span>};
-    (<span class="op">!</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="doccomment">/// Obtain the named component.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>
+    (! <span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$ty</span>:ty) =&gt; {
+        <span class="doccomment">/// Obtain the named component.
+        </span><span class="kw">pub const fn </span><span class="macro-nonterminal">$name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$ty</span>&gt; {
+            <span class="self">self</span>.<span class="macro-nonterminal">$name
+        </span>}
+    };
+    (! @<span class="macro-nonterminal">$flag</span>:ident <span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$ty</span>:ty) =&gt; {
+        <span class="doccomment">/// Obtain the named component.
+        </span><span class="kw">pub const fn </span><span class="macro-nonterminal">$name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$ty</span>&gt; {
+            <span class="kw">if </span><span class="self">self</span>.flags &amp; <span class="self">Self</span>::<span class="macro-nonterminal">$flag </span>!= <span class="self">Self</span>::<span class="macro-nonterminal">$flag </span>{
+                <span class="prelude-val">None
+            </span>} <span class="kw">else </span>{
+                <span class="comment">// SAFETY: We just checked if the field is present.
+                </span><span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="self">self</span>.<span class="macro-nonterminal">$name</span>.assume_init() })
+            }
         }
     };
-    (<span class="op">!</span> @<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="doccomment">/// Obtain the named component.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flags</span> <span class="op">&amp;</span> <span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span> <span class="op">!</span><span class="op">=</span> <span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span> {
-                <span class="prelude-val">None</span>
-            } <span class="kw">else</span> {
-                <span class="comment">// SAFETY: We just checked if the field is present.</span>
-                <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>.<span class="ident">assume_init</span>() })
-            }
-        }
-    };
 }
 
-<span class="doccomment">/// Getter methods</span>
-<span class="kw">impl</span> <span class="ident">Parsed</span> {
-    <span class="macro">getters!</span> {
-        @<span class="ident">YEAR_FLAG</span> <span class="ident">year</span>: <span class="ident">i32</span>,
-        @<span class="ident">YEAR_LAST_TWO_FLAG</span> <span class="ident">year_last_two</span>: <span class="ident">u8</span>,
-        @<span class="ident">ISO_YEAR_FLAG</span> <span class="ident">iso_year</span>: <span class="ident">i32</span>,
-        @<span class="ident">ISO_YEAR_LAST_TWO_FLAG</span> <span class="ident">iso_year_last_two</span>: <span class="ident">u8</span>,
-        <span class="ident">month</span>: <span class="ident">Month</span>,
-        @<span class="ident">SUNDAY_WEEK_NUMBER_FLAG</span> <span class="ident">sunday_week_number</span>: <span class="ident">u8</span>,
-        @<span class="ident">MONDAY_WEEK_NUMBER_FLAG</span> <span class="ident">monday_week_number</span>: <span class="ident">u8</span>,
-        <span class="ident">iso_week_number</span>: <span class="ident">NonZeroU8</span>,
-        <span class="ident">weekday</span>: <span class="ident">Weekday</span>,
-        <span class="ident">ordinal</span>: <span class="ident">NonZeroU16</span>,
-        <span class="ident">day</span>: <span class="ident">NonZeroU8</span>,
-        @<span class="ident">HOUR_24_FLAG</span> <span class="ident">hour_24</span>: <span class="ident">u8</span>,
-        <span class="ident">hour_12</span>: <span class="ident">NonZeroU8</span>,
-        <span class="ident">hour_12_is_pm</span>: <span class="ident">bool</span>,
-        @<span class="ident">MINUTE_FLAG</span> <span class="ident">minute</span>: <span class="ident">u8</span>,
-        @<span class="ident">SECOND_FLAG</span> <span class="ident">second</span>: <span class="ident">u8</span>,
-        @<span class="ident">SUBSECOND_FLAG</span> <span class="ident">subsecond</span>: <span class="ident">u32</span>,
-        @<span class="ident">OFFSET_HOUR_FLAG</span> <span class="ident">offset_hour</span>: <span class="ident">i8</span>,
+<span class="doccomment">/// Getter methods
+</span><span class="kw">impl </span>Parsed {
+    <span class="macro">getters! </span>{
+        @YEAR_FLAG year: i32,
+        @YEAR_LAST_TWO_FLAG year_last_two: u8,
+        @ISO_YEAR_FLAG iso_year: i32,
+        @ISO_YEAR_LAST_TWO_FLAG iso_year_last_two: u8,
+        month: Month,
+        @SUNDAY_WEEK_NUMBER_FLAG sunday_week_number: u8,
+        @MONDAY_WEEK_NUMBER_FLAG monday_week_number: u8,
+        iso_week_number: NonZeroU8,
+        weekday: Weekday,
+        ordinal: NonZeroU16,
+        day: NonZeroU8,
+        @HOUR_24_FLAG hour_24: u8,
+        hour_12: NonZeroU8,
+        hour_12_is_pm: bool,
+        @MINUTE_FLAG minute: u8,
+        @SECOND_FLAG second: u8,
+        @SUBSECOND_FLAG subsecond: u32,
+        @OFFSET_HOUR_FLAG offset_hour: i8,
     }
 
-    <span class="doccomment">/// Obtain the absolute value of the offset minute.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.3.8&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `parsed.offset_minute_signed()` instead&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">offset_minute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="ident">offset_minute_signed</span>()).<span class="ident">unsigned_abs</span>())
+    <span class="doccomment">/// Obtain the absolute value of the offset minute.
+    </span><span class="attribute">#[deprecated(since = <span class="string">&quot;0.3.8&quot;</span>, note = <span class="string">&quot;use `parsed.offset_minute_signed()` instead&quot;</span>)]
+    </span><span class="kw">pub const fn </span>offset_minute(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
+        <span class="prelude-val">Some</span>(<span class="macro">const_try_opt!</span>(<span class="self">self</span>.offset_minute_signed()).unsigned_abs())
     }
 
-    <span class="doccomment">/// Obtain the offset minute as an `i8`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">offset_minute_signed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::OFFSET_MINUTE_FLAG</span> <span class="op">!</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::OFFSET_MINUTE_FLAG</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// SAFETY: We just checked if the field is present.</span>
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">offset_minute</span>.<span class="ident">assume_init</span>() })
+    <span class="doccomment">/// Obtain the offset minute as an `i8`.
+    </span><span class="kw">pub const fn </span>offset_minute_signed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i8&gt; {
+        <span class="kw">if </span><span class="self">self</span>.flags &amp; <span class="self">Self</span>::OFFSET_MINUTE_FLAG != <span class="self">Self</span>::OFFSET_MINUTE_FLAG {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="comment">// SAFETY: We just checked if the field is present.
+            </span><span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="self">self</span>.offset_minute.assume_init() })
         }
     }
 
-    <span class="doccomment">/// Obtain the absolute value of the offset second.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.3.8&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `parsed.offset_second_signed()` instead&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">offset_second</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="ident">offset_second_signed</span>()).<span class="ident">unsigned_abs</span>())
+    <span class="doccomment">/// Obtain the absolute value of the offset second.
+    </span><span class="attribute">#[deprecated(since = <span class="string">&quot;0.3.8&quot;</span>, note = <span class="string">&quot;use `parsed.offset_second_signed()` instead&quot;</span>)]
+    </span><span class="kw">pub const fn </span>offset_second(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
+        <span class="prelude-val">Some</span>(<span class="macro">const_try_opt!</span>(<span class="self">self</span>.offset_second_signed()).unsigned_abs())
     }
 
-    <span class="doccomment">/// Obtain the offset second as an `i8`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">offset_second_signed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::OFFSET_SECOND_FLAG</span> <span class="op">!</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::OFFSET_SECOND_FLAG</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// SAFETY: We just checked if the field is present.</span>
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">offset_second</span>.<span class="ident">assume_init</span>() })
+    <span class="doccomment">/// Obtain the offset second as an `i8`.
+    </span><span class="kw">pub const fn </span>offset_second_signed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i8&gt; {
+        <span class="kw">if </span><span class="self">self</span>.flags &amp; <span class="self">Self</span>::OFFSET_SECOND_FLAG != <span class="self">Self</span>::OFFSET_SECOND_FLAG {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="comment">// SAFETY: We just checked if the field is present.
+            </span><span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="self">self</span>.offset_second.assume_init() })
         }
     }
 
-    <span class="doccomment">/// Obtain whether leap seconds are permitted in the current format.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">leap_second_allowed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::LEAP_SECOND_ALLOWED_FLAG</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::LEAP_SECOND_ALLOWED_FLAG</span>
+    <span class="doccomment">/// Obtain whether leap seconds are permitted in the current format.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>leap_second_allowed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.flags &amp; <span class="self">Self</span>::LEAP_SECOND_ALLOWED_FLAG == <span class="self">Self</span>::LEAP_SECOND_ALLOWED_FLAG
     }
 }
 
-<span class="doccomment">/// Generate setters for each of the fields.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This macro should only be used for fields where the value is not validated beyond its type.</span>
-<span class="macro">macro_rules!</span> <span class="ident">setters</span> {
-    ($($(@<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">ident</span>)<span class="question-mark">?</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">setter_name</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {$(
-        <span class="macro">setters!</span>(<span class="op">!</span> $(@<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>)<span class="question-mark">?</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">setter_name</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>);
+<span class="doccomment">/// Generate setters for each of the fields.
+///
+/// This macro should only be used for fields where the value is not validated beyond its type.
+</span><span class="macro">macro_rules! </span>setters {
+    ($($(@<span class="macro-nonterminal">$flag</span>:ident)<span class="question-mark">? </span><span class="macro-nonterminal">$setter_name</span>:ident <span class="macro-nonterminal">$name</span>:ident: <span class="macro-nonterminal">$ty</span>:ty),+ $(,)<span class="question-mark">?</span>) =&gt; {$(
+        <span class="macro">setters!</span>(! $(@<span class="macro-nonterminal">$flag</span>)<span class="question-mark">? </span><span class="macro-nonterminal">$setter_name $name</span>: <span class="macro-nonterminal">$ty</span>);
     )<span class="kw-2">*</span>};
-    (<span class="op">!</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">setter_name</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="doccomment">/// Set the named component.</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">setter_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
+    (! <span class="macro-nonterminal">$setter_name</span>:ident <span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$ty</span>:ty) =&gt; {
+        <span class="doccomment">/// Set the named component.
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$setter_name</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="macro-nonterminal">$ty</span>) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+            <span class="self">self</span>.<span class="macro-nonterminal">$name </span>= <span class="prelude-val">Some</span>(value);
             <span class="prelude-val">Some</span>(())
         }
     };
-    (<span class="op">!</span> @<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">setter_name</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="doccomment">/// Set the named component.</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">setter_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span> <span class="ident">MaybeUninit::new</span>(<span class="ident">value</span>);
-            <span class="self">self</span>.<span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>;
+    (! @<span class="macro-nonterminal">$flag</span>:ident <span class="macro-nonterminal">$setter_name</span>:ident <span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$ty</span>:ty) =&gt; {
+        <span class="doccomment">/// Set the named component.
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$setter_name</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="macro-nonterminal">$ty</span>) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+            <span class="self">self</span>.<span class="macro-nonterminal">$name </span>= MaybeUninit::new(value);
+            <span class="self">self</span>.flags |= <span class="self">Self</span>::<span class="macro-nonterminal">$flag</span>;
             <span class="prelude-val">Some</span>(())
         }
     };
 }
 
-<span class="doccomment">/// Setter methods</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All setters return `Option&lt;()&gt;`, which is `Some` if the value was set, and `None` if not. The</span>
-<span class="doccomment">/// setters _may_ fail if the value is invalid, though behavior is not guaranteed.</span>
-<span class="kw">impl</span> <span class="ident">Parsed</span> {
-    <span class="macro">setters!</span> {
-        @<span class="ident">YEAR_FLAG</span> <span class="ident">set_year</span> <span class="ident">year</span>: <span class="ident">i32</span>,
-        @<span class="ident">YEAR_LAST_TWO_FLAG</span> <span class="ident">set_year_last_two</span> <span class="ident">year_last_two</span>: <span class="ident">u8</span>,
-        @<span class="ident">ISO_YEAR_FLAG</span> <span class="ident">set_iso_year</span> <span class="ident">iso_year</span>: <span class="ident">i32</span>,
-        @<span class="ident">ISO_YEAR_LAST_TWO_FLAG</span> <span class="ident">set_iso_year_last_two</span> <span class="ident">iso_year_last_two</span>: <span class="ident">u8</span>,
-        <span class="ident">set_month</span> <span class="ident">month</span>: <span class="ident">Month</span>,
-        @<span class="ident">SUNDAY_WEEK_NUMBER_FLAG</span> <span class="ident">set_sunday_week_number</span> <span class="ident">sunday_week_number</span>: <span class="ident">u8</span>,
-        @<span class="ident">MONDAY_WEEK_NUMBER_FLAG</span> <span class="ident">set_monday_week_number</span> <span class="ident">monday_week_number</span>: <span class="ident">u8</span>,
-        <span class="ident">set_iso_week_number</span> <span class="ident">iso_week_number</span>: <span class="ident">NonZeroU8</span>,
-        <span class="ident">set_weekday</span> <span class="ident">weekday</span>: <span class="ident">Weekday</span>,
-        <span class="ident">set_ordinal</span> <span class="ident">ordinal</span>: <span class="ident">NonZeroU16</span>,
-        <span class="ident">set_day</span> <span class="ident">day</span>: <span class="ident">NonZeroU8</span>,
-        @<span class="ident">HOUR_24_FLAG</span> <span class="ident">set_hour_24</span> <span class="ident">hour_24</span>: <span class="ident">u8</span>,
-        <span class="ident">set_hour_12</span> <span class="ident">hour_12</span>: <span class="ident">NonZeroU8</span>,
-        <span class="ident">set_hour_12_is_pm</span> <span class="ident">hour_12_is_pm</span>: <span class="ident">bool</span>,
-        @<span class="ident">MINUTE_FLAG</span> <span class="ident">set_minute</span> <span class="ident">minute</span>: <span class="ident">u8</span>,
-        @<span class="ident">SECOND_FLAG</span> <span class="ident">set_second</span> <span class="ident">second</span>: <span class="ident">u8</span>,
-        @<span class="ident">SUBSECOND_FLAG</span> <span class="ident">set_subsecond</span> <span class="ident">subsecond</span>: <span class="ident">u32</span>,
-        @<span class="ident">OFFSET_HOUR_FLAG</span> <span class="ident">set_offset_hour</span> <span class="ident">offset_hour</span>: <span class="ident">i8</span>,
+<span class="doccomment">/// Setter methods
+///
+/// All setters return `Option&lt;()&gt;`, which is `Some` if the value was set, and `None` if not. The
+/// setters _may_ fail if the value is invalid, though behavior is not guaranteed.
+</span><span class="kw">impl </span>Parsed {
+    <span class="macro">setters! </span>{
+        @YEAR_FLAG set_year year: i32,
+        @YEAR_LAST_TWO_FLAG set_year_last_two year_last_two: u8,
+        @ISO_YEAR_FLAG set_iso_year iso_year: i32,
+        @ISO_YEAR_LAST_TWO_FLAG set_iso_year_last_two iso_year_last_two: u8,
+        set_month month: Month,
+        @SUNDAY_WEEK_NUMBER_FLAG set_sunday_week_number sunday_week_number: u8,
+        @MONDAY_WEEK_NUMBER_FLAG set_monday_week_number monday_week_number: u8,
+        set_iso_week_number iso_week_number: NonZeroU8,
+        set_weekday weekday: Weekday,
+        set_ordinal ordinal: NonZeroU16,
+        set_day day: NonZeroU8,
+        @HOUR_24_FLAG set_hour_24 hour_24: u8,
+        set_hour_12 hour_12: NonZeroU8,
+        set_hour_12_is_pm hour_12_is_pm: bool,
+        @MINUTE_FLAG set_minute minute: u8,
+        @SECOND_FLAG set_second second: u8,
+        @SUBSECOND_FLAG set_subsecond subsecond: u32,
+        @OFFSET_HOUR_FLAG set_offset_hour offset_hour: i8,
     }
 
-    <span class="doccomment">/// Set the named component.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.3.8&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `parsed.set_offset_minute_signed()` instead&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_offset_minute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">&gt;</span> <span class="ident">i8::MAX</span> <span class="kw">as</span> <span class="ident">u8</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">set_offset_minute_signed</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="kw">_</span>)
+    <span class="doccomment">/// Set the named component.
+    </span><span class="attribute">#[deprecated(
+        since = <span class="string">&quot;0.3.8&quot;</span>,
+        note = <span class="string">&quot;use `parsed.set_offset_minute_signed()` instead&quot;
+    </span>)]
+    </span><span class="kw">pub fn </span>set_offset_minute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u8) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">if </span>value &gt; i8::MAX <span class="kw">as </span>u8 {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.set_offset_minute_signed(value <span class="kw">as _</span>)
         }
     }
 
-    <span class="doccomment">/// Set the `offset_minute` component.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_offset_minute_signed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">i8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">offset_minute</span> <span class="op">=</span> <span class="ident">MaybeUninit::new</span>(<span class="ident">value</span>);
-        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::OFFSET_MINUTE_FLAG</span>;
+    <span class="doccomment">/// Set the `offset_minute` component.
+    </span><span class="kw">pub fn </span>set_offset_minute_signed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i8) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="self">self</span>.offset_minute = MaybeUninit::new(value);
+        <span class="self">self</span>.flags |= <span class="self">Self</span>::OFFSET_MINUTE_FLAG;
         <span class="prelude-val">Some</span>(())
     }
 
-    <span class="doccomment">/// Set the named component.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.3.8&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `parsed.set_offset_second_signed()` instead&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_offset_second</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">&gt;</span> <span class="ident">i8::MAX</span> <span class="kw">as</span> <span class="ident">u8</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">set_offset_second_signed</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="kw">_</span>)
+    <span class="doccomment">/// Set the named component.
+    </span><span class="attribute">#[deprecated(
+        since = <span class="string">&quot;0.3.8&quot;</span>,
+        note = <span class="string">&quot;use `parsed.set_offset_second_signed()` instead&quot;
+    </span>)]
+    </span><span class="kw">pub fn </span>set_offset_second(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u8) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">if </span>value &gt; i8::MAX <span class="kw">as </span>u8 {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.set_offset_second_signed(value <span class="kw">as _</span>)
         }
     }
 
-    <span class="doccomment">/// Set the `offset_second` component.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_offset_second_signed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">i8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">offset_second</span> <span class="op">=</span> <span class="ident">MaybeUninit::new</span>(<span class="ident">value</span>);
-        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::OFFSET_SECOND_FLAG</span>;
+    <span class="doccomment">/// Set the `offset_second` component.
+    </span><span class="kw">pub fn </span>set_offset_second_signed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i8) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="self">self</span>.offset_second = MaybeUninit::new(value);
+        <span class="self">self</span>.flags |= <span class="self">Self</span>::OFFSET_SECOND_FLAG;
         <span class="prelude-val">Some</span>(())
     }
 
-    <span class="doccomment">/// Set the leap second allowed flag.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_leap_second_allowed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-        <span class="kw">if</span> <span class="ident">value</span> {
-            <span class="self">self</span>.<span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::LEAP_SECOND_ALLOWED_FLAG</span>;
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">flags</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident"><span class="self">Self</span>::LEAP_SECOND_ALLOWED_FLAG</span>;
+    <span class="doccomment">/// Set the leap second allowed flag.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_leap_second_allowed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: bool) {
+        <span class="kw">if </span>value {
+            <span class="self">self</span>.flags |= <span class="self">Self</span>::LEAP_SECOND_ALLOWED_FLAG;
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.flags &amp;= !<span class="self">Self</span>::LEAP_SECOND_ALLOWED_FLAG;
         }
     }
 }
 
-<span class="doccomment">/// Generate build methods for each of the fields.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This macro should only be used for fields where the value is not validated beyond its type.</span>
-<span class="macro">macro_rules!</span> <span class="ident">builders</span> {
-    ($($(@<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">ident</span>)<span class="question-mark">?</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">builder_name</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {$(
-        <span class="macro">builders!</span>(<span class="op">!</span> $(@<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>)<span class="question-mark">?</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">builder_name</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>);
+<span class="doccomment">/// Generate build methods for each of the fields.
+///
+/// This macro should only be used for fields where the value is not validated beyond its type.
+</span><span class="macro">macro_rules! </span>builders {
+    ($($(@<span class="macro-nonterminal">$flag</span>:ident)<span class="question-mark">? </span><span class="macro-nonterminal">$builder_name</span>:ident <span class="macro-nonterminal">$name</span>:ident: <span class="macro-nonterminal">$ty</span>:ty),+ $(,)<span class="question-mark">?</span>) =&gt; {$(
+        <span class="macro">builders!</span>(! $(@<span class="macro-nonterminal">$flag</span>)<span class="question-mark">? </span><span class="macro-nonterminal">$builder_name $name</span>: <span class="macro-nonterminal">$ty</span>);
     )<span class="kw-2">*</span>};
-    (<span class="op">!</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">builder_name</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="doccomment">/// Set the named component and return `self`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">builder_name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
+    (! <span class="macro-nonterminal">$builder_name</span>:ident <span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$ty</span>:ty) =&gt; {
+        <span class="doccomment">/// Set the named component and return `self`.
+        </span><span class="kw">pub const fn </span><span class="macro-nonterminal">$builder_name</span>(<span class="kw-2">mut </span><span class="self">self</span>, value: <span class="macro-nonterminal">$ty</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+            <span class="self">self</span>.<span class="macro-nonterminal">$name </span>= <span class="prelude-val">Some</span>(value);
             <span class="prelude-val">Some</span>(<span class="self">self</span>)
         }
     };
-    (<span class="op">!</span> @<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">builder_name</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="doccomment">/// Set the named component and return `self`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">builder_name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span> <span class="ident">MaybeUninit::new</span>(<span class="ident">value</span>);
-            <span class="self">self</span>.<span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>;
+    (! @<span class="macro-nonterminal">$flag</span>:ident <span class="macro-nonterminal">$builder_name</span>:ident <span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$ty</span>:ty) =&gt; {
+        <span class="doccomment">/// Set the named component and return `self`.
+        </span><span class="kw">pub const fn </span><span class="macro-nonterminal">$builder_name</span>(<span class="kw-2">mut </span><span class="self">self</span>, value: <span class="macro-nonterminal">$ty</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+            <span class="self">self</span>.<span class="macro-nonterminal">$name </span>= MaybeUninit::new(value);
+            <span class="self">self</span>.flags |= <span class="self">Self</span>::<span class="macro-nonterminal">$flag</span>;
             <span class="prelude-val">Some</span>(<span class="self">self</span>)
         }
     };
 }
 
-<span class="doccomment">/// Builder methods</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All builder methods return `Option&lt;Self&gt;`, which is `Some` if the value was set, and `None` if</span>
-<span class="doccomment">/// not. The builder methods _may_ fail if the value is invalid, though behavior is not guaranteed.</span>
-<span class="kw">impl</span> <span class="ident">Parsed</span> {
-    <span class="macro">builders!</span> {
-        @<span class="ident">YEAR_FLAG</span> <span class="ident">with_year</span> <span class="ident">year</span>: <span class="ident">i32</span>,
-        @<span class="ident">YEAR_LAST_TWO_FLAG</span> <span class="ident">with_year_last_two</span> <span class="ident">year_last_two</span>: <span class="ident">u8</span>,
-        @<span class="ident">ISO_YEAR_FLAG</span> <span class="ident">with_iso_year</span> <span class="ident">iso_year</span>: <span class="ident">i32</span>,
-        @<span class="ident">ISO_YEAR_LAST_TWO_FLAG</span> <span class="ident">with_iso_year_last_two</span> <span class="ident">iso_year_last_two</span>: <span class="ident">u8</span>,
-        <span class="ident">with_month</span> <span class="ident">month</span>: <span class="ident">Month</span>,
-        @<span class="ident">SUNDAY_WEEK_NUMBER_FLAG</span> <span class="ident">with_sunday_week_number</span> <span class="ident">sunday_week_number</span>: <span class="ident">u8</span>,
-        @<span class="ident">MONDAY_WEEK_NUMBER_FLAG</span> <span class="ident">with_monday_week_number</span> <span class="ident">monday_week_number</span>: <span class="ident">u8</span>,
-        <span class="ident">with_iso_week_number</span> <span class="ident">iso_week_number</span>: <span class="ident">NonZeroU8</span>,
-        <span class="ident">with_weekday</span> <span class="ident">weekday</span>: <span class="ident">Weekday</span>,
-        <span class="ident">with_ordinal</span> <span class="ident">ordinal</span>: <span class="ident">NonZeroU16</span>,
-        <span class="ident">with_day</span> <span class="ident">day</span>: <span class="ident">NonZeroU8</span>,
-        @<span class="ident">HOUR_24_FLAG</span> <span class="ident">with_hour_24</span> <span class="ident">hour_24</span>: <span class="ident">u8</span>,
-        <span class="ident">with_hour_12</span> <span class="ident">hour_12</span>: <span class="ident">NonZeroU8</span>,
-        <span class="ident">with_hour_12_is_pm</span> <span class="ident">hour_12_is_pm</span>: <span class="ident">bool</span>,
-        @<span class="ident">MINUTE_FLAG</span> <span class="ident">with_minute</span> <span class="ident">minute</span>: <span class="ident">u8</span>,
-        @<span class="ident">SECOND_FLAG</span> <span class="ident">with_second</span> <span class="ident">second</span>: <span class="ident">u8</span>,
-        @<span class="ident">SUBSECOND_FLAG</span> <span class="ident">with_subsecond</span> <span class="ident">subsecond</span>: <span class="ident">u32</span>,
-        @<span class="ident">OFFSET_HOUR_FLAG</span> <span class="ident">with_offset_hour</span> <span class="ident">offset_hour</span>: <span class="ident">i8</span>,
+<span class="doccomment">/// Builder methods
+///
+/// All builder methods return `Option&lt;Self&gt;`, which is `Some` if the value was set, and `None` if
+/// not. The builder methods _may_ fail if the value is invalid, though behavior is not guaranteed.
+</span><span class="kw">impl </span>Parsed {
+    <span class="macro">builders! </span>{
+        @YEAR_FLAG with_year year: i32,
+        @YEAR_LAST_TWO_FLAG with_year_last_two year_last_two: u8,
+        @ISO_YEAR_FLAG with_iso_year iso_year: i32,
+        @ISO_YEAR_LAST_TWO_FLAG with_iso_year_last_two iso_year_last_two: u8,
+        with_month month: Month,
+        @SUNDAY_WEEK_NUMBER_FLAG with_sunday_week_number sunday_week_number: u8,
+        @MONDAY_WEEK_NUMBER_FLAG with_monday_week_number monday_week_number: u8,
+        with_iso_week_number iso_week_number: NonZeroU8,
+        with_weekday weekday: Weekday,
+        with_ordinal ordinal: NonZeroU16,
+        with_day day: NonZeroU8,
+        @HOUR_24_FLAG with_hour_24 hour_24: u8,
+        with_hour_12 hour_12: NonZeroU8,
+        with_hour_12_is_pm hour_12_is_pm: bool,
+        @MINUTE_FLAG with_minute minute: u8,
+        @SECOND_FLAG with_second second: u8,
+        @SUBSECOND_FLAG with_subsecond subsecond: u32,
+        @OFFSET_HOUR_FLAG with_offset_hour offset_hour: i8,
     }
 
-    <span class="doccomment">/// Set the named component and return `self`.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.3.8&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `parsed.with_offset_minute_signed()` instead&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">with_offset_minute</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">&gt;</span> <span class="ident">i8::MAX</span> <span class="kw">as</span> <span class="ident">u8</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">with_offset_minute_signed</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="kw">_</span>)
+    <span class="doccomment">/// Set the named component and return `self`.
+    </span><span class="attribute">#[deprecated(
+        since = <span class="string">&quot;0.3.8&quot;</span>,
+        note = <span class="string">&quot;use `parsed.with_offset_minute_signed()` instead&quot;
+    </span>)]
+    </span><span class="kw">pub const fn </span>with_offset_minute(<span class="self">self</span>, value: u8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>value &gt; i8::MAX <span class="kw">as </span>u8 {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.with_offset_minute_signed(value <span class="kw">as _</span>)
         }
     }
 
-    <span class="doccomment">/// Set the `offset_minute` component and return `self`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">with_offset_minute_signed</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">i8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">offset_minute</span> <span class="op">=</span> <span class="ident">MaybeUninit::new</span>(<span class="ident">value</span>);
-        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::OFFSET_MINUTE_FLAG</span>;
+    <span class="doccomment">/// Set the `offset_minute` component and return `self`.
+    </span><span class="kw">pub const fn </span>with_offset_minute_signed(<span class="kw-2">mut </span><span class="self">self</span>, value: i8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="self">self</span>.offset_minute = MaybeUninit::new(value);
+        <span class="self">self</span>.flags |= <span class="self">Self</span>::OFFSET_MINUTE_FLAG;
         <span class="prelude-val">Some</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Set the named component and return `self`.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.3.8&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `parsed.with_offset_second_signed()` instead&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">with_offset_second</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">&gt;</span> <span class="ident">i8::MAX</span> <span class="kw">as</span> <span class="ident">u8</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">with_offset_second_signed</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="kw">_</span>)
+    <span class="doccomment">/// Set the named component and return `self`.
+    </span><span class="attribute">#[deprecated(
+        since = <span class="string">&quot;0.3.8&quot;</span>,
+        note = <span class="string">&quot;use `parsed.with_offset_second_signed()` instead&quot;
+    </span>)]
+    </span><span class="kw">pub const fn </span>with_offset_second(<span class="self">self</span>, value: u8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>value &gt; i8::MAX <span class="kw">as </span>u8 {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.with_offset_second_signed(value <span class="kw">as _</span>)
         }
     }
 
-    <span class="doccomment">/// Set the `offset_second` component and return `self`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">with_offset_second_signed</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">i8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">offset_second</span> <span class="op">=</span> <span class="ident">MaybeUninit::new</span>(<span class="ident">value</span>);
-        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::OFFSET_SECOND_FLAG</span>;
+    <span class="doccomment">/// Set the `offset_second` component and return `self`.
+    </span><span class="kw">pub const fn </span>with_offset_second_signed(<span class="kw-2">mut </span><span class="self">self</span>, value: i8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="self">self</span>.offset_second = MaybeUninit::new(value);
+        <span class="self">self</span>.flags |= <span class="self">Self</span>::OFFSET_SECOND_FLAG;
         <span class="prelude-val">Some</span>(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Parsed</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Date</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">error::TryFromParsed</span>;
+<span class="kw">impl </span>TryFrom&lt;Parsed&gt; <span class="kw">for </span>Date {
+    <span class="kw">type </span>Error = error::TryFromParsed;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">parsed</span>: <span class="ident">Parsed</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="doccomment">/// Match on the components that need to be present.</span>
-        <span class="macro">macro_rules!</span> <span class="ident">match_</span> {
-            (<span class="kw">_</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">catch_all</span>:<span class="ident">expr</span> $(,)<span class="question-mark">?</span>) =&gt; {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">catch_all</span>
-            };
-            (($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arm</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> ($(<span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>)),<span class="kw-2">*</span>) <span class="op">=</span> ($(<span class="ident">parsed</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>()),<span class="kw-2">*</span>) {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arm</span>
-                } <span class="kw">else</span> {
-                    <span class="macro">match_!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>)
+    <span class="kw">fn </span>try_from(parsed: Parsed) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="doccomment">/// Match on the components that need to be present.
+        </span><span class="macro">macro_rules! </span>match_ {
+            (<span class="kw">_ </span>=&gt; <span class="macro-nonterminal">$catch_all</span>:expr $(,)<span class="question-mark">?</span>) =&gt; {
+                <span class="macro-nonterminal">$catch_all
+            </span>};
+            (($(<span class="macro-nonterminal">$name</span>:ident),* $(,)<span class="question-mark">?</span>) =&gt; <span class="macro-nonterminal">$arm</span>:expr, $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; {
+                <span class="kw">if let </span>($(<span class="prelude-val">Some</span>(<span class="macro-nonterminal">$name</span>)),<span class="kw-2">*</span>) = ($(parsed.<span class="macro-nonterminal">$name</span>()),<span class="kw-2">*</span>) {
+                    <span class="macro-nonterminal">$arm
+                </span>} <span class="kw">else </span>{
+                    <span class="macro">match_!</span>($(<span class="macro-nonterminal">$rest</span>)<span class="kw-2">*</span>)
                 }
             };
         }
 
-        <span class="doccomment">/// Get the value needed to adjust the ordinal day for Sunday and Monday-based week</span>
-        <span class="doccomment">/// numbering.</span>
-        <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">adjustment</span>(<span class="ident">year</span>: <span class="ident">i32</span>) -&gt; <span class="ident">i16</span> {
-            <span class="kw">match</span> <span class="ident">Date::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="number">1</span>).<span class="ident">weekday</span>() {
-                <span class="ident">Weekday::Monday</span> =&gt; <span class="number">7</span>,
-                <span class="ident">Weekday::Tuesday</span> =&gt; <span class="number">1</span>,
-                <span class="ident">Weekday::Wednesday</span> =&gt; <span class="number">2</span>,
-                <span class="ident">Weekday::Thursday</span> =&gt; <span class="number">3</span>,
-                <span class="ident">Weekday::Friday</span> =&gt; <span class="number">4</span>,
-                <span class="ident">Weekday::Saturday</span> =&gt; <span class="number">5</span>,
-                <span class="ident">Weekday::Sunday</span> =&gt; <span class="number">6</span>,
+        <span class="doccomment">/// Get the value needed to adjust the ordinal day for Sunday and Monday-based week
+        /// numbering.
+        </span><span class="kw">const fn </span>adjustment(year: i32) -&gt; i16 {
+            <span class="kw">match </span>Date::__from_ordinal_date_unchecked(year, <span class="number">1</span>).weekday() {
+                Weekday::Monday =&gt; <span class="number">7</span>,
+                Weekday::Tuesday =&gt; <span class="number">1</span>,
+                Weekday::Wednesday =&gt; <span class="number">2</span>,
+                Weekday::Thursday =&gt; <span class="number">3</span>,
+                Weekday::Friday =&gt; <span class="number">4</span>,
+                Weekday::Saturday =&gt; <span class="number">5</span>,
+                Weekday::Sunday =&gt; <span class="number">6</span>,
             }
         }
 
-        <span class="comment">// TODO Only the basics have been covered. There are many other valid values that are not</span>
-        <span class="comment">// currently constructed from the information known.</span>
+        <span class="comment">// TODO Only the basics have been covered. There are many other valid values that are not
+        // currently constructed from the information known.
 
-        <span class="macro">match_!</span> {
-            (<span class="ident">year</span>, <span class="ident">ordinal</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_ordinal_date</span>(<span class="ident">year</span>, <span class="ident">ordinal</span>.<span class="ident">get</span>())<span class="question-mark">?</span>),
-            (<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_calendar_date</span>(<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>.<span class="ident">get</span>())<span class="question-mark">?</span>),
-            (<span class="ident">iso_year</span>, <span class="ident">iso_week_number</span>, <span class="ident">weekday</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_iso_week_date</span>(
-                <span class="ident">iso_year</span>,
-                <span class="ident">iso_week_number</span>.<span class="ident">get</span>(),
-                <span class="ident">weekday</span>,
+        </span><span class="macro">match_! </span>{
+            (year, ordinal) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_ordinal_date(year, ordinal.get())<span class="question-mark">?</span>),
+            (year, month, day) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_calendar_date(year, month, day.get())<span class="question-mark">?</span>),
+            (iso_year, iso_week_number, weekday) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_iso_week_date(
+                iso_year,
+                iso_week_number.get(),
+                weekday,
             )<span class="question-mark">?</span>),
-            (<span class="ident">year</span>, <span class="ident">sunday_week_number</span>, <span class="ident">weekday</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_ordinal_date</span>(
-                <span class="ident">year</span>,
-                (<span class="ident">sunday_week_number</span> <span class="kw">as</span> <span class="ident">i16</span> <span class="op">*</span> <span class="number">7</span> <span class="op">+</span> <span class="ident">weekday</span>.<span class="ident">number_days_from_sunday</span>() <span class="kw">as</span> <span class="ident">i16</span>
-                    <span class="op">-</span> <span class="ident">adjustment</span>(<span class="ident">year</span>)
-                    <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u16</span>,
+            (year, sunday_week_number, weekday) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_ordinal_date(
+                year,
+                (sunday_week_number <span class="kw">as </span>i16 * <span class="number">7 </span>+ weekday.number_days_from_sunday() <span class="kw">as </span>i16
+                    - adjustment(year)
+                    + <span class="number">1</span>) <span class="kw">as </span>u16,
             )<span class="question-mark">?</span>),
-            (<span class="ident">year</span>, <span class="ident">monday_week_number</span>, <span class="ident">weekday</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_ordinal_date</span>(
-                <span class="ident">year</span>,
-                (<span class="ident">monday_week_number</span> <span class="kw">as</span> <span class="ident">i16</span> <span class="op">*</span> <span class="number">7</span> <span class="op">+</span> <span class="ident">weekday</span>.<span class="ident">number_days_from_monday</span>() <span class="kw">as</span> <span class="ident">i16</span>
-                    <span class="op">-</span> <span class="ident">adjustment</span>(<span class="ident">year</span>)
-                    <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u16</span>,
+            (year, monday_week_number, weekday) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_ordinal_date(
+                year,
+                (monday_week_number <span class="kw">as </span>i16 * <span class="number">7 </span>+ weekday.number_days_from_monday() <span class="kw">as </span>i16
+                    - adjustment(year)
+                    + <span class="number">1</span>) <span class="kw">as </span>u16,
             )<span class="question-mark">?</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">InsufficientInformation</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(InsufficientInformation),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Parsed</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Time</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">error::TryFromParsed</span>;
+<span class="kw">impl </span>TryFrom&lt;Parsed&gt; <span class="kw">for </span>Time {
+    <span class="kw">type </span>Error = error::TryFromParsed;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">parsed</span>: <span class="ident">Parsed</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">hour</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">parsed</span>.<span class="ident">hour_24</span>(), <span class="ident">parsed</span>.<span class="ident">hour_12</span>(), <span class="ident">parsed</span>.<span class="ident">hour_12_is_pm</span>()) {
-            (<span class="prelude-val">Some</span>(<span class="ident">hour</span>), <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">hour</span>,
-            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">hour</span>), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)) <span class="kw">if</span> <span class="ident">hour</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="number">12</span> =&gt; <span class="number">0</span>,
-            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">hour</span>), <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)) <span class="kw">if</span> <span class="ident">hour</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="number">12</span> =&gt; <span class="number">12</span>,
-            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">hour</span>), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)) =&gt; <span class="ident">hour</span>.<span class="ident">get</span>(),
-            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">hour</span>), <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)) =&gt; <span class="ident">hour</span>.<span class="ident">get</span>() <span class="op">+</span> <span class="number">12</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InsufficientInformation</span>),
+    <span class="kw">fn </span>try_from(parsed: Parsed) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>hour = <span class="kw">match </span>(parsed.hour_24(), parsed.hour_12(), parsed.hour_12_is_pm()) {
+            (<span class="prelude-val">Some</span>(hour), <span class="kw">_</span>, <span class="kw">_</span>) =&gt; hour,
+            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(hour), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)) <span class="kw">if </span>hour.get() == <span class="number">12 </span>=&gt; <span class="number">0</span>,
+            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(hour), <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)) <span class="kw">if </span>hour.get() == <span class="number">12 </span>=&gt; <span class="number">12</span>,
+            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(hour), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)) =&gt; hour.get(),
+            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(hour), <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)) =&gt; hour.get() + <span class="number">12</span>,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(InsufficientInformation),
         };
-        <span class="kw">if</span> <span class="ident">parsed</span>.<span class="ident">hour_24</span>().<span class="ident">is_none</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">parsed</span>.<span class="ident">hour_12</span>().<span class="ident">is_some</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">parsed</span>.<span class="ident">hour_12_is_pm</span>().<span class="ident">is_some</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">parsed</span>.<span class="ident">minute</span>().<span class="ident">is_none</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">parsed</span>.<span class="ident">second</span>().<span class="ident">is_none</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">parsed</span>.<span class="ident">subsecond</span>().<span class="ident">is_none</span>()
+        <span class="kw">if </span>parsed.hour_24().is_none()
+            &amp;&amp; parsed.hour_12().is_some()
+            &amp;&amp; parsed.hour_12_is_pm().is_some()
+            &amp;&amp; parsed.minute().is_none()
+            &amp;&amp; parsed.second().is_none()
+            &amp;&amp; parsed.subsecond().is_none()
         {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_hms_nano</span>(<span class="ident">hour</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)<span class="question-mark">?</span>);
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_hms_nano(hour, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)<span class="question-mark">?</span>);
         }
-        <span class="kw">let</span> <span class="ident">minute</span> <span class="op">=</span> <span class="ident">parsed</span>.<span class="ident">minute</span>().<span class="ident">ok_or</span>(<span class="ident">InsufficientInformation</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="ident">parsed</span>.<span class="ident">second</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">subsecond</span> <span class="op">=</span> <span class="ident">parsed</span>.<span class="ident">subsecond</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_hms_nano</span>(<span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>, <span class="ident">subsecond</span>)<span class="question-mark">?</span>)
+        <span class="kw">let </span>minute = parsed.minute().ok_or(InsufficientInformation)<span class="question-mark">?</span>;
+        <span class="kw">let </span>second = parsed.second().unwrap_or(<span class="number">0</span>);
+        <span class="kw">let </span>subsecond = parsed.subsecond().unwrap_or(<span class="number">0</span>);
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_hms_nano(hour, minute, second, subsecond)<span class="question-mark">?</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Parsed</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UtcOffset</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">error::TryFromParsed</span>;
+<span class="kw">impl </span>TryFrom&lt;Parsed&gt; <span class="kw">for </span>UtcOffset {
+    <span class="kw">type </span>Error = error::TryFromParsed;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">parsed</span>: <span class="ident">Parsed</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">hour</span> <span class="op">=</span> <span class="ident">parsed</span>.<span class="ident">offset_hour</span>().<span class="ident">ok_or</span>(<span class="ident">InsufficientInformation</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">minute</span> <span class="op">=</span> <span class="ident">parsed</span>.<span class="ident">offset_minute_signed</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="ident">parsed</span>.<span class="ident">offset_second_signed</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>);
+    <span class="kw">fn </span>try_from(parsed: Parsed) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>hour = parsed.offset_hour().ok_or(InsufficientInformation)<span class="question-mark">?</span>;
+        <span class="kw">let </span>minute = parsed.offset_minute_signed().unwrap_or(<span class="number">0</span>);
+        <span class="kw">let </span>second = parsed.offset_second_signed().unwrap_or(<span class="number">0</span>);
 
-        <span class="ident"><span class="self">Self</span>::from_hms</span>(<span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">err</span><span class="op">|</span> {
-            <span class="comment">// Provide the user a more accurate error.</span>
-            <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;hours&quot;</span> {
-                <span class="ident">err</span>.<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;offset hour&quot;</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;minutes&quot;</span> {
-                <span class="ident">err</span>.<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;offset minute&quot;</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;seconds&quot;</span> {
-                <span class="ident">err</span>.<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;offset second&quot;</span>;
+        <span class="self">Self</span>::from_hms(hour, minute, second).map_err(|<span class="kw-2">mut </span>err| {
+            <span class="comment">// Provide the user a more accurate error.
+            </span><span class="kw">if </span>err.name == <span class="string">&quot;hours&quot; </span>{
+                err.name = <span class="string">&quot;offset hour&quot;</span>;
+            } <span class="kw">else if </span>err.name == <span class="string">&quot;minutes&quot; </span>{
+                err.name = <span class="string">&quot;offset minute&quot;</span>;
+            } <span class="kw">else if </span>err.name == <span class="string">&quot;seconds&quot; </span>{
+                err.name = <span class="string">&quot;offset second&quot;</span>;
             }
-            <span class="ident">err</span>.<span class="ident">into</span>()
+            err.into()
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Parsed</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PrimitiveDateTime</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">error::TryFromParsed</span>;
+<span class="kw">impl </span>TryFrom&lt;Parsed&gt; <span class="kw">for </span>PrimitiveDateTime {
+    <span class="kw">type </span>Error = error::TryFromParsed;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">parsed</span>: <span class="ident">Parsed</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">parsed</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">parsed</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>))
+    <span class="kw">fn </span>try_from(parsed: Parsed) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::new(parsed.try_into()<span class="question-mark">?</span>, parsed.try_into()<span class="question-mark">?</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Parsed</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OffsetDateTime</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">error::TryFromParsed</span>;
+<span class="kw">impl </span>TryFrom&lt;Parsed&gt; <span class="kw">for </span>OffsetDateTime {
+    <span class="kw">type </span>Error = error::TryFromParsed;
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_in_result</span>)]</span> <span class="comment">// We know the values are valid.</span>
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="kw-2">mut</span> <span class="ident">parsed</span>: <span class="ident">Parsed</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="comment">// Some well-known formats explicitly allow leap seconds. We don&#39;t currently support them,</span>
-        <span class="comment">// so treat it as the nearest preceding moment that can be represented. Because leap seconds</span>
-        <span class="comment">// always fall at the end of a month UTC, reject any that are at other times.</span>
-        <span class="kw">let</span> <span class="ident">leap_second_input</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">parsed</span>.<span class="ident">leap_second_allowed</span>() <span class="op">&amp;&amp;</span> <span class="ident">parsed</span>.<span class="ident">second</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="number">60</span>) {
-            <span class="ident">parsed</span>.<span class="ident">set_second</span>(<span class="number">59</span>).<span class="ident">expect</span>(<span class="string">&quot;59 is a valid second&quot;</span>);
-            <span class="ident">parsed</span>
-                .<span class="ident">set_subsecond</span>(<span class="number">999_999_999</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;999_999_999 is a valid subsecond&quot;</span>);
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        };
-        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">PrimitiveDateTime::try_from</span>(<span class="ident">parsed</span>)<span class="question-mark">?</span>.<span class="ident">assume_offset</span>(<span class="ident">parsed</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>);
-        <span class="kw">if</span> <span class="ident">leap_second_input</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">dt</span>.<span class="ident">is_valid_leap_second_stand_in</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::TryFromParsed::ComponentRange</span>(
-                <span class="ident">error::ComponentRange</span> {
-                    <span class="ident">name</span>: <span class="string">&quot;second&quot;</span>,
-                    <span class="ident">minimum</span>: <span class="number">0</span>,
-                    <span class="ident">maximum</span>: <span class="number">59</span>,
-                    <span class="ident">value</span>: <span class="number">60</span>,
-                    <span class="ident">conditional_range</span>: <span class="bool-val">true</span>,
+    <span class="attribute">#[allow(clippy::unwrap_in_result)] </span><span class="comment">// We know the values are valid.
+    </span><span class="kw">fn </span>try_from(<span class="kw-2">mut </span>parsed: Parsed) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="comment">// Some well-known formats explicitly allow leap seconds. We don&#39;t currently support them,
+        // so treat it as the nearest preceding moment that can be represented. Because leap seconds
+        // always fall at the end of a month UTC, reject any that are at other times.
+        </span><span class="kw">let </span>leap_second_input = <span class="kw">if </span>parsed.leap_second_allowed() &amp;&amp; parsed.second() == <span class="prelude-val">Some</span>(<span class="number">60</span>) {
+            parsed.set_second(<span class="number">59</span>).expect(<span class="string">&quot;59 is a valid second&quot;</span>);
+            parsed
+                .set_subsecond(<span class="number">999_999_999</span>)
+                .expect(<span class="string">&quot;999_999_999 is a valid subsecond&quot;</span>);
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>};
+        <span class="kw">let </span>dt = PrimitiveDateTime::try_from(parsed)<span class="question-mark">?</span>.assume_offset(parsed.try_into()<span class="question-mark">?</span>);
+        <span class="kw">if </span>leap_second_input &amp;&amp; !dt.is_valid_leap_second_stand_in() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::TryFromParsed::ComponentRange(
+                error::ComponentRange {
+                    name: <span class="string">&quot;second&quot;</span>,
+                    minimum: <span class="number">0</span>,
+                    maximum: <span class="number">59</span>,
+                    value: <span class="number">60</span>,
+                    conditional_range: <span class="bool-val">true</span>,
                 },
             ));
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">dt</span>)
+        <span class="prelude-val">Ok</span>(dt)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

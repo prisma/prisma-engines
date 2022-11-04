@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-0.19.0/src/handles.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>handles.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-0.19.0/src/handles.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>handles.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -264,271 +264,271 @@
 <span id="264">264</span>
 <span id="265">265</span>
 <span id="266">266</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync</span>::{
-    <span class="ident">atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
-    <span class="ident">Arc</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>std::sync::{
+    atomic::{AtomicU64, Ordering},
+    Arc,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::IntoF64</span>;
+<span class="kw">use </span><span class="kw">crate</span>::IntoF64;
 
-<span class="doccomment">/// A counter handler.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CounterFn</span> {
-    <span class="doccomment">/// Increments the counter by the given amount.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previous value.</span>
-    <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>);
+<span class="doccomment">/// A counter handler.
+</span><span class="kw">pub trait </span>CounterFn {
+    <span class="doccomment">/// Increments the counter by the given amount.
+    ///
+    /// Returns the previous value.
+    </span><span class="kw">fn </span>increment(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64);
 
-    <span class="doccomment">/// Sets the counter to at least the given amount.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is intended to support use cases where multiple callers are attempting to synchronize</span>
-    <span class="doccomment">/// this counter with an external counter that they have no control over.  As multiple callers</span>
-    <span class="doccomment">/// may read that external counter, and attempt to set it here, there could be reordering issues</span>
-    <span class="doccomment">/// where a caller attempts to set an older (smaller) value after the counter has been updated to</span>
-    <span class="doccomment">/// the latest (larger) value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method must cope with those cases.  An example of doing so atomically can be found in</span>
-    <span class="doccomment">/// `AtomicCounter`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previous value.</span>
-    <span class="kw">fn</span> <span class="ident">absolute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>);
+    <span class="doccomment">/// Sets the counter to at least the given amount.
+    ///
+    /// This is intended to support use cases where multiple callers are attempting to synchronize
+    /// this counter with an external counter that they have no control over.  As multiple callers
+    /// may read that external counter, and attempt to set it here, there could be reordering issues
+    /// where a caller attempts to set an older (smaller) value after the counter has been updated to
+    /// the latest (larger) value.
+    ///
+    /// This method must cope with those cases.  An example of doing so atomically can be found in
+    /// `AtomicCounter`.
+    ///
+    /// Returns the previous value.
+    </span><span class="kw">fn </span>absolute(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64);
 }
 
-<span class="doccomment">/// A gauge handler.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GaugeFn</span> {
-    <span class="doccomment">/// Increments the gauge by the given amount.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previous value.</span>
-    <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>);
+<span class="doccomment">/// A gauge handler.
+</span><span class="kw">pub trait </span>GaugeFn {
+    <span class="doccomment">/// Increments the gauge by the given amount.
+    ///
+    /// Returns the previous value.
+    </span><span class="kw">fn </span>increment(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64);
 
-    <span class="doccomment">/// Decrements the gauge by the given amount.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previous value.</span>
-    <span class="kw">fn</span> <span class="ident">decrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>);
+    <span class="doccomment">/// Decrements the gauge by the given amount.
+    ///
+    /// Returns the previous value.
+    </span><span class="kw">fn </span>decrement(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64);
 
-    <span class="doccomment">/// Sets the gauge to the given amount.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previous value.</span>
-    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>);
+    <span class="doccomment">/// Sets the gauge to the given amount.
+    ///
+    /// Returns the previous value.
+    </span><span class="kw">fn </span>set(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64);
 }
 
-<span class="doccomment">/// A histogram handler.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">HistogramFn</span> {
-    <span class="doccomment">/// Records a value into the histogram.</span>
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>);
+<span class="doccomment">/// A histogram handler.
+</span><span class="kw">pub trait </span>HistogramFn {
+    <span class="doccomment">/// Records a value into the histogram.
+    </span><span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64);
 }
 
-<span class="doccomment">/// A counter.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Counter</span> {
-    <span class="ident">inner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CounterFn</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A counter.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Counter {
+    inner: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>CounterFn + Send + Sync&gt;&gt;,
 }
 
-<span class="doccomment">/// A gauge.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Gauge</span> {
-    <span class="ident">inner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">GaugeFn</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A gauge.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Gauge {
+    inner: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>GaugeFn + Send + Sync&gt;&gt;,
 }
 
-<span class="doccomment">/// A histogram.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Histogram</span> {
-    <span class="ident">inner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">HistogramFn</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A histogram.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Histogram {
+    inner: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>HistogramFn + Send + Sync&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Counter</span> {
-    <span class="doccomment">/// Creates a no-op `Counter` which does nothing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Suitable when a handle must be provided that does nothing i.e. a no-op recorder or a layer</span>
-    <span class="doccomment">/// that disables specific metrics, and so on.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">noop</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">inner</span>: <span class="prelude-val">None</span> }
+<span class="kw">impl </span>Counter {
+    <span class="doccomment">/// Creates a no-op `Counter` which does nothing.
+    ///
+    /// Suitable when a handle must be provided that does nothing i.e. a no-op recorder or a layer
+    /// that disables specific metrics, and so on.
+    </span><span class="kw">pub fn </span>noop() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner: <span class="prelude-val">None </span>}
     }
 
-    <span class="doccomment">/// Creates a `Counter` based on a shared handler.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_arc</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">CounterFn</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">inner</span>: <span class="prelude-val">Some</span>(<span class="ident">a</span>) }
+    <span class="doccomment">/// Creates a `Counter` based on a shared handler.
+    </span><span class="kw">pub fn </span>from_arc&lt;F: CounterFn + Send + Sync + <span class="lifetime">&#39;static</span>&gt;(a: Arc&lt;F&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner: <span class="prelude-val">Some</span>(a) }
     }
 
-    <span class="doccomment">/// Increments the counter.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">c</span>.<span class="ident">increment</span>(<span class="ident">value</span>)
+    <span class="doccomment">/// Increments the counter.
+    </span><span class="kw">pub fn </span>increment(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = <span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            c.increment(value)
         }
     }
 
-    <span class="doccomment">/// Sets the counter to an absolute value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">absolute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">c</span>.<span class="ident">absolute</span>(<span class="ident">value</span>)
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Gauge</span> {
-    <span class="doccomment">/// Creates a no-op `Gauge` which does nothing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Suitable when a handle must be provided that does nothing i.e. a no-op recorder or a layer</span>
-    <span class="doccomment">/// that disables specific metrics, and so on.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">noop</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">inner</span>: <span class="prelude-val">None</span> }
-    }
-
-    <span class="doccomment">/// Creates a `Gauge` based on a shared handler.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_arc</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">GaugeFn</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">inner</span>: <span class="prelude-val">Some</span>(<span class="ident">a</span>) }
-    }
-
-    <span class="doccomment">/// Increments the gauge.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoF64</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">g</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">g</span>.<span class="ident">increment</span>(<span class="ident">value</span>.<span class="ident">into_f64</span>())
-        }
-    }
-
-    <span class="doccomment">/// Decrements the gauge.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrement</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoF64</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">g</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">g</span>.<span class="ident">decrement</span>(<span class="ident">value</span>.<span class="ident">into_f64</span>())
-        }
-    }
-
-    <span class="doccomment">/// Sets the gauge.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoF64</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">g</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">g</span>.<span class="ident">set</span>(<span class="ident">value</span>.<span class="ident">into_f64</span>())
+    <span class="doccomment">/// Sets the counter to an absolute value.
+    </span><span class="kw">pub fn </span>absolute(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = <span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            c.absolute(value)
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Histogram</span> {
-    <span class="doccomment">/// Creates a no-op `Histogram` which does nothing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Suitable when a handle must be provided that does nothing i.e. a no-op recorder or a layer</span>
-    <span class="doccomment">/// that disables specific metrics, and so on.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">noop</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">inner</span>: <span class="prelude-val">None</span> }
+<span class="kw">impl </span>Gauge {
+    <span class="doccomment">/// Creates a no-op `Gauge` which does nothing.
+    ///
+    /// Suitable when a handle must be provided that does nothing i.e. a no-op recorder or a layer
+    /// that disables specific metrics, and so on.
+    </span><span class="kw">pub fn </span>noop() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner: <span class="prelude-val">None </span>}
     }
 
-    <span class="doccomment">/// Creates a `Histogram` based on a shared handler.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_arc</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">HistogramFn</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">inner</span>: <span class="prelude-val">Some</span>(<span class="ident">a</span>) }
+    <span class="doccomment">/// Creates a `Gauge` based on a shared handler.
+    </span><span class="kw">pub fn </span>from_arc&lt;F: GaugeFn + Send + Sync + <span class="lifetime">&#39;static</span>&gt;(a: Arc&lt;F&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner: <span class="prelude-val">Some</span>(a) }
     }
 
-    <span class="doccomment">/// Records a value in the histogram.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">record</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoF64</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">inner</span>.<span class="ident">record</span>(<span class="ident">value</span>.<span class="ident">into_f64</span>())
+    <span class="doccomment">/// Increments the gauge.
+    </span><span class="kw">pub fn </span>increment&lt;T: IntoF64&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(g) = <span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            g.increment(value.into_f64())
+        }
+    }
+
+    <span class="doccomment">/// Decrements the gauge.
+    </span><span class="kw">pub fn </span>decrement&lt;T: IntoF64&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(g) = <span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            g.decrement(value.into_f64())
+        }
+    }
+
+    <span class="doccomment">/// Sets the gauge.
+    </span><span class="kw">pub fn </span>set&lt;T: IntoF64&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(g) = <span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            g.set(value.into_f64())
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CounterFn</span> <span class="kw">for</span> <span class="ident">AtomicU64</span> {
-    <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fetch_add</span>(<span class="ident">value</span>, <span class="ident">Ordering::Release</span>);
+<span class="kw">impl </span>Histogram {
+    <span class="doccomment">/// Creates a no-op `Histogram` which does nothing.
+    ///
+    /// Suitable when a handle must be provided that does nothing i.e. a no-op recorder or a layer
+    /// that disables specific metrics, and so on.
+    </span><span class="kw">pub fn </span>noop() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner: <span class="prelude-val">None </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">absolute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fetch_max</span>(<span class="ident">value</span>, <span class="ident">Ordering::AcqRel</span>);
+    <span class="doccomment">/// Creates a `Histogram` based on a shared handler.
+    </span><span class="kw">pub fn </span>from_arc&lt;F: HistogramFn + Send + Sync + <span class="lifetime">&#39;static</span>&gt;(a: Arc&lt;F&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner: <span class="prelude-val">Some</span>(a) }
+    }
+
+    <span class="doccomment">/// Records a value in the histogram.
+    </span><span class="kw">pub fn </span>record&lt;T: IntoF64&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>inner) = <span class="self">self</span>.inner {
+            inner.record(value.into_f64())
+        }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">GaugeFn</span> <span class="kw">for</span> <span class="ident">AtomicU64</span> {
-    <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fetch_update</span>(<span class="ident">Ordering::AcqRel</span>, <span class="ident">Ordering::Relaxed</span>, <span class="op">|</span><span class="ident">curr</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">f64::from_bits</span>(<span class="ident">curr</span>);
-                <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">input</span> <span class="op">+</span> <span class="ident">value</span>;
-                <span class="prelude-val">Some</span>(<span class="ident">output</span>.<span class="ident">to_bits</span>())
+<span class="kw">impl </span>CounterFn <span class="kw">for </span>AtomicU64 {
+    <span class="kw">fn </span>increment(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64) {
+        <span class="kw">let _ </span>= <span class="self">self</span>.fetch_add(value, Ordering::Release);
+    }
+
+    <span class="kw">fn </span>absolute(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64) {
+        <span class="kw">let _ </span>= <span class="self">self</span>.fetch_max(value, Ordering::AcqRel);
+    }
+}
+
+<span class="kw">impl </span>GaugeFn <span class="kw">for </span>AtomicU64 {
+    <span class="kw">fn </span>increment(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>result = <span class="self">self</span>.fetch_update(Ordering::AcqRel, Ordering::Relaxed, |curr| {
+                <span class="kw">let </span>input = f64::from_bits(curr);
+                <span class="kw">let </span>output = input + value;
+                <span class="prelude-val">Some</span>(output.to_bits())
             });
 
-            <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() {
+            <span class="kw">if </span>result.is_ok() {
                 <span class="kw">break</span>;
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">decrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fetch_update</span>(<span class="ident">Ordering::AcqRel</span>, <span class="ident">Ordering::Relaxed</span>, <span class="op">|</span><span class="ident">curr</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">f64::from_bits</span>(<span class="ident">curr</span>);
-                <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">input</span> <span class="op">-</span> <span class="ident">value</span>;
-                <span class="prelude-val">Some</span>(<span class="ident">output</span>.<span class="ident">to_bits</span>())
+    <span class="kw">fn </span>decrement(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>result = <span class="self">self</span>.fetch_update(Ordering::AcqRel, Ordering::Relaxed, |curr| {
+                <span class="kw">let </span>input = f64::from_bits(curr);
+                <span class="kw">let </span>output = input - value;
+                <span class="prelude-val">Some</span>(output.to_bits())
             });
 
-            <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() {
+            <span class="kw">if </span>result.is_ok() {
                 <span class="kw">break</span>;
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">swap</span>(<span class="ident">value</span>.<span class="ident">to_bits</span>(), <span class="ident">Ordering::AcqRel</span>);
+    <span class="kw">fn </span>set(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        <span class="kw">let _ </span>= <span class="self">self</span>.swap(value.to_bits(), Ordering::AcqRel);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CounterFn</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">CounterFn</span>,
+<span class="kw">impl</span>&lt;T&gt; CounterFn <span class="kw">for </span>Arc&lt;T&gt;
+<span class="kw">where
+    </span>T: CounterFn,
 {
-    <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">increment</span>(<span class="ident">value</span>)
+    <span class="kw">fn </span>increment(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64) {
+        (<span class="kw-2">**</span><span class="self">self</span>).increment(value)
     }
 
-    <span class="kw">fn</span> <span class="ident">absolute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">absolute</span>(<span class="ident">value</span>)
+    <span class="kw">fn </span>absolute(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64) {
+        (<span class="kw-2">**</span><span class="self">self</span>).absolute(value)
     }
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">GaugeFn</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">GaugeFn</span>,
+<span class="kw">impl</span>&lt;T&gt; GaugeFn <span class="kw">for </span>Arc&lt;T&gt;
+<span class="kw">where
+    </span>T: GaugeFn,
 {
-    <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">increment</span>(<span class="ident">value</span>)
+    <span class="kw">fn </span>increment(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        (<span class="kw-2">**</span><span class="self">self</span>).increment(value)
     }
 
-    <span class="kw">fn</span> <span class="ident">decrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">decrement</span>(<span class="ident">value</span>)
+    <span class="kw">fn </span>decrement(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        (<span class="kw-2">**</span><span class="self">self</span>).decrement(value)
     }
 
-    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">set</span>(<span class="ident">value</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">HistogramFn</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">HistogramFn</span>,
-{
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">record</span>(<span class="ident">value</span>);
+    <span class="kw">fn </span>set(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        (<span class="kw-2">**</span><span class="self">self</span>).set(value)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Counter</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">CounterFn</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T&gt; HistogramFn <span class="kw">for </span>Arc&lt;T&gt;
+<span class="kw">where
+    </span>T: HistogramFn,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Counter::from_arc</span>(<span class="ident">inner</span>)
+    <span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        (<span class="kw-2">**</span><span class="self">self</span>).record(value);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Gauge</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">GaugeFn</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;Arc&lt;T&gt;&gt; <span class="kw">for </span>Counter
+<span class="kw">where
+    </span>T: CounterFn + Send + Sync + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Gauge::from_arc</span>(<span class="ident">inner</span>)
+    <span class="kw">fn </span>from(inner: Arc&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        Counter::from_arc(inner)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Histogram</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">HistogramFn</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;Arc&lt;T&gt;&gt; <span class="kw">for </span>Gauge
+<span class="kw">where
+    </span>T: GaugeFn + Send + Sync + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Histogram::from_arc</span>(<span class="ident">inner</span>)
+    <span class="kw">fn </span>from(inner: Arc&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        Gauge::from_arc(inner)
+    }
+}
+
+<span class="kw">impl</span>&lt;T&gt; From&lt;Arc&lt;T&gt;&gt; <span class="kw">for </span>Histogram
+<span class="kw">where
+    </span>T: HistogramFn + Send + Sync + <span class="lifetime">&#39;static</span>,
+{
+    <span class="kw">fn </span>from(inner: Arc&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        Histogram::from_arc(inner)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

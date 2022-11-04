@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/limits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>limits.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/limits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>limits.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -710,717 +710,717 @@
 <span id="710">710</span>
 <span id="711">711</span>
 <span id="712">712</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Determine the limits of exact exponent and mantissas for floats.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Determine the limits of exact exponent and mantissas for floats.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+</span><span class="attribute">#![doc(hidden)]
 
-<span class="kw">use</span> <span class="ident">lexical_util::assert::debug_assert_radix</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util::bf16::bf16</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util::f16::f16</span>;
+</span><span class="kw">use </span>lexical_util::assert::debug_assert_radix;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::bf16::bf16;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::f16::f16;
 
-<span class="comment">// EXACT EXPONENT</span>
-<span class="comment">// --------------</span>
+<span class="comment">// EXACT EXPONENT
+// --------------
 
-<span class="comment">// Calculating the exponent limit requires determining the largest exponent</span>
-<span class="comment">// we can calculate for a radix that can be **exactly** store in the</span>
-<span class="comment">// float type. If the value is a power-of-two, then we simply</span>
-<span class="comment">// need to scale the minimum, denormal exp and maximum exp to the type</span>
-<span class="comment">// size. Otherwise, we need to calculate the number of digits</span>
-<span class="comment">// that can fit into the type&#39;s precision, after removing a power-of-two</span>
-<span class="comment">// (since these values can be represented exactly).</span>
-<span class="comment">//</span>
-<span class="comment">// The mantissa limit is the number of digits we can remove from</span>
-<span class="comment">// the exponent into the mantissa, and is therefore is the</span>
-<span class="comment">// `⌊ precision / log2(radix) ⌋`, where precision does not include</span>
-<span class="comment">// the hidden bit.</span>
-<span class="comment">//</span>
-<span class="comment">// The algorithm for calculating both `exponent_limit` and `mantissa_limit`,</span>
-<span class="comment">// in Python, can be done as follows:</span>
-<span class="comment">//</span>
-<span class="comment">// DO NOT MODIFY: Generated by `src/etc/limits.py`</span>
+// Calculating the exponent limit requires determining the largest exponent
+// we can calculate for a radix that can be **exactly** store in the
+// float type. If the value is a power-of-two, then we simply
+// need to scale the minimum, denormal exp and maximum exp to the type
+// size. Otherwise, we need to calculate the number of digits
+// that can fit into the type&#39;s precision, after removing a power-of-two
+// (since these values can be represented exactly).
+//
+// The mantissa limit is the number of digits we can remove from
+// the exponent into the mantissa, and is therefore is the
+// `⌊ precision / log2(radix) ⌋`, where precision does not include
+// the hidden bit.
+//
+// The algorithm for calculating both `exponent_limit` and `mantissa_limit`,
+// in Python, can be done as follows:
+//
+// DO NOT MODIFY: Generated by `src/etc/limits.py`
 
-<span class="comment">// EXACT FLOAT</span>
-<span class="comment">// -----------</span>
+// EXACT FLOAT
+// -----------
 
-<span class="doccomment">/// Get exact exponent limit for radix.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ExactFloat</span> {
-    <span class="doccomment">/// Get min and max exponent limits (exact) from radix.</span>
-    <span class="kw">fn</span> <span class="ident">exponent_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">i64</span>, <span class="ident">i64</span>);
+</span><span class="doccomment">/// Get exact exponent limit for radix.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub trait </span>ExactFloat {
+    <span class="doccomment">/// Get min and max exponent limits (exact) from radix.
+    </span><span class="kw">fn </span>exponent_limit(radix: u32) -&gt; (i64, i64);
 
-    <span class="doccomment">/// Get the number of digits that can be shifted from exponent to mantissa.</span>
-    <span class="kw">fn</span> <span class="ident">mantissa_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i64</span>;
+    <span class="doccomment">/// Get the number of digits that can be shifted from exponent to mantissa.
+    </span><span class="kw">fn </span>mantissa_limit(radix: u32) -&gt; i64;
 }
 
-<span class="kw">impl</span> <span class="ident">ExactFloat</span> <span class="kw">for</span> <span class="ident">f32</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">exponent_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">i64</span>, <span class="ident">i64</span>) {
-        <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
-        <span class="ident">f32_exponent_limit</span>(<span class="ident">radix</span>)
+<span class="kw">impl </span>ExactFloat <span class="kw">for </span>f32 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>exponent_limit(radix: u32) -&gt; (i64, i64) {
+        debug_assert_radix(radix);
+        f32_exponent_limit(radix)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">mantissa_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i64</span> {
-        <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
-        <span class="ident">f32_mantissa_limit</span>(<span class="ident">radix</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ExactFloat</span> <span class="kw">for</span> <span class="ident">f64</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">exponent_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">i64</span>, <span class="ident">i64</span>) {
-        <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
-        <span class="ident">f64_exponent_limit</span>(<span class="ident">radix</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">mantissa_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i64</span> {
-        <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
-        <span class="ident">f64_mantissa_limit</span>(<span class="ident">radix</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>mantissa_limit(radix: u32) -&gt; i64 {
+        debug_assert_radix(radix);
+        f32_mantissa_limit(radix)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">ExactFloat</span> <span class="kw">for</span> <span class="ident">f16</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">exponent_limit</span>(<span class="kw">_</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">i64</span>, <span class="ident">i64</span>) {
+<span class="kw">impl </span>ExactFloat <span class="kw">for </span>f64 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>exponent_limit(radix: u32) -&gt; (i64, i64) {
+        debug_assert_radix(radix);
+        f64_exponent_limit(radix)
+    }
+
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>mantissa_limit(radix: u32) -&gt; i64 {
+        debug_assert_radix(radix);
+        f64_mantissa_limit(radix)
+    }
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">impl </span>ExactFloat <span class="kw">for </span>f16 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>exponent_limit(<span class="kw">_</span>: u32) -&gt; (i64, i64) {
         <span class="macro">unimplemented!</span>()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">mantissa_limit</span>(<span class="kw">_</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i64</span> {
-        <span class="macro">unimplemented!</span>()
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">ExactFloat</span> <span class="kw">for</span> <span class="ident">bf16</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">exponent_limit</span>(<span class="kw">_</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">i64</span>, <span class="ident">i64</span>) {
-        <span class="macro">unimplemented!</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">mantissa_limit</span>(<span class="kw">_</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i64</span> {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>mantissa_limit(<span class="kw">_</span>: u32) -&gt; i64 {
         <span class="macro">unimplemented!</span>()
     }
 }
 
-<span class="comment">//#[cfg(feature = &quot;f128&quot;)]</span>
-<span class="comment">//impl ExactFloat for f128 {</span>
-<span class="comment">//    #[inline(always)]</span>
-<span class="comment">//    fn exponent_limit(radix: u32) -&gt; (i64, i64) {</span>
-<span class="comment">//        debug_assert_radix(radix);</span>
-<span class="comment">//        match radix {</span>
-<span class="comment">//            2 if cfg!(feature = &quot;power-of-two&quot;) =&gt; (-16494, 16383),</span>
-<span class="comment">//            3 if cfg!(feature = &quot;radix&quot;) =&gt; (-71, 71),</span>
-<span class="comment">//            4 if cfg!(feature = &quot;power-of-two&quot;) =&gt; (-8247, 8191),</span>
-<span class="comment">//            5 if cfg!(feature = &quot;radix&quot;) =&gt; (-48, 48),</span>
-<span class="comment">//            6 if cfg!(feature = &quot;radix&quot;) =&gt; (-71, 71),</span>
-<span class="comment">//            7 if cfg!(feature = &quot;radix&quot;) =&gt; (-40, 40),</span>
-<span class="comment">//            8 if cfg!(feature = &quot;power-of-two&quot;) =&gt; (-5498, 5461),</span>
-<span class="comment">//            9 if cfg!(feature = &quot;radix&quot;) =&gt; (-35, 35),</span>
-<span class="comment">//            10 =&gt; (-48, 48),</span>
-<span class="comment">//            11 if cfg!(feature = &quot;radix&quot;) =&gt; (-32, 32),</span>
-<span class="comment">//            12 if cfg!(feature = &quot;radix&quot;) =&gt; (-71, 71),</span>
-<span class="comment">//            13 if cfg!(feature = &quot;radix&quot;) =&gt; (-30, 30),</span>
-<span class="comment">//            14 if cfg!(feature = &quot;radix&quot;) =&gt; (-40, 40),</span>
-<span class="comment">//            15 if cfg!(feature = &quot;radix&quot;) =&gt; (-28, 28),</span>
-<span class="comment">//            16 if cfg!(feature = &quot;power-of-two&quot;) =&gt; (-4123, 4095),</span>
-<span class="comment">//            17 if cfg!(feature = &quot;radix&quot;) =&gt; (-27, 27),</span>
-<span class="comment">//            18 if cfg!(feature = &quot;radix&quot;) =&gt; (-35, 35),</span>
-<span class="comment">//            19 if cfg!(feature = &quot;radix&quot;) =&gt; (-26, 26),</span>
-<span class="comment">//            20 if cfg!(feature = &quot;radix&quot;) =&gt; (-48, 48),</span>
-<span class="comment">//            21 if cfg!(feature = &quot;radix&quot;) =&gt; (-25, 25),</span>
-<span class="comment">//            22 if cfg!(feature = &quot;radix&quot;) =&gt; (-32, 32),</span>
-<span class="comment">//            23 if cfg!(feature = &quot;radix&quot;) =&gt; (-24, 24),</span>
-<span class="comment">//            24 if cfg!(feature = &quot;radix&quot;) =&gt; (-71, 71),</span>
-<span class="comment">//            25 if cfg!(feature = &quot;radix&quot;) =&gt; (-24, 24),</span>
-<span class="comment">//            26 if cfg!(feature = &quot;radix&quot;) =&gt; (-30, 30),</span>
-<span class="comment">//            27 if cfg!(feature = &quot;radix&quot;) =&gt; (-23, 23),</span>
-<span class="comment">//            28 if cfg!(feature = &quot;radix&quot;) =&gt; (-40, 40),</span>
-<span class="comment">//            29 if cfg!(feature = &quot;radix&quot;) =&gt; (-23, 23),</span>
-<span class="comment">//            30 if cfg!(feature = &quot;radix&quot;) =&gt; (-28, 28),</span>
-<span class="comment">//            31 if cfg!(feature = &quot;radix&quot;) =&gt; (-22, 22),</span>
-<span class="comment">//            32 if cfg!(feature = &quot;power-of-two&quot;) =&gt; (-3298, 3276),</span>
-<span class="comment">//            33 if cfg!(feature = &quot;radix&quot;) =&gt; (-22, 22),</span>
-<span class="comment">//            34 if cfg!(feature = &quot;radix&quot;) =&gt; (-27, 27),</span>
-<span class="comment">//            35 if cfg!(feature = &quot;radix&quot;) =&gt; (-22, 22),</span>
-<span class="comment">//            36 if cfg!(feature = &quot;radix&quot;) =&gt; (-35, 35),</span>
-<span class="comment">//            // Invalid radix</span>
-<span class="comment">//            _ =&gt; unreachable!(),</span>
-<span class="comment">//        }</span>
-<span class="comment">//    }</span>
-<span class="comment">//</span>
-<span class="comment">//    #[inline(always)]</span>
-<span class="comment">//    fn mantissa_limit(radix: u32) -&gt; i64 {</span>
-<span class="comment">//        debug_assert_radix(radix);</span>
-<span class="comment">//        match radix {</span>
-<span class="comment">//            2 if cfg!(feature = &quot;power-of-two&quot;) =&gt; 113,</span>
-<span class="comment">//            3 if cfg!(feature = &quot;radix&quot;) =&gt; 71,</span>
-<span class="comment">//            4 if cfg!(feature = &quot;power-of-two&quot;) =&gt; 56,</span>
-<span class="comment">//            5 if cfg!(feature = &quot;radix&quot;) =&gt; 48,</span>
-<span class="comment">//            6 if cfg!(feature = &quot;radix&quot;) =&gt; 43,</span>
-<span class="comment">//            7 if cfg!(feature = &quot;radix&quot;) =&gt; 40,</span>
-<span class="comment">//            8 if cfg!(feature = &quot;power-of-two&quot;) =&gt; 37,</span>
-<span class="comment">//            9 if cfg!(feature = &quot;radix&quot;) =&gt; 35,</span>
-<span class="comment">//            10 =&gt; 34,</span>
-<span class="comment">//            11 if cfg!(feature = &quot;radix&quot;) =&gt; 32,</span>
-<span class="comment">//            12 if cfg!(feature = &quot;radix&quot;) =&gt; 31,</span>
-<span class="comment">//            13 if cfg!(feature = &quot;radix&quot;) =&gt; 30,</span>
-<span class="comment">//            14 if cfg!(feature = &quot;radix&quot;) =&gt; 29,</span>
-<span class="comment">//            15 if cfg!(feature = &quot;radix&quot;) =&gt; 28,</span>
-<span class="comment">//            16 if cfg!(feature = &quot;power-of-two&quot;) =&gt; 28,</span>
-<span class="comment">//            17 if cfg!(feature = &quot;radix&quot;) =&gt; 27,</span>
-<span class="comment">//            18 if cfg!(feature = &quot;radix&quot;) =&gt; 27,</span>
-<span class="comment">//            19 if cfg!(feature = &quot;radix&quot;) =&gt; 26,</span>
-<span class="comment">//            20 if cfg!(feature = &quot;radix&quot;) =&gt; 26,</span>
-<span class="comment">//            21 if cfg!(feature = &quot;radix&quot;) =&gt; 25,</span>
-<span class="comment">//            22 if cfg!(feature = &quot;radix&quot;) =&gt; 25,</span>
-<span class="comment">//            23 if cfg!(feature = &quot;radix&quot;) =&gt; 24,</span>
-<span class="comment">//            24 if cfg!(feature = &quot;radix&quot;) =&gt; 24,</span>
-<span class="comment">//            25 if cfg!(feature = &quot;radix&quot;) =&gt; 24,</span>
-<span class="comment">//            26 if cfg!(feature = &quot;radix&quot;) =&gt; 24,</span>
-<span class="comment">//            27 if cfg!(feature = &quot;radix&quot;) =&gt; 23,</span>
-<span class="comment">//            28 if cfg!(feature = &quot;radix&quot;) =&gt; 23,</span>
-<span class="comment">//            29 if cfg!(feature = &quot;radix&quot;) =&gt; 23,</span>
-<span class="comment">//            30 if cfg!(feature = &quot;radix&quot;) =&gt; 23,</span>
-<span class="comment">//            31 if cfg!(feature = &quot;radix&quot;) =&gt; 22,</span>
-<span class="comment">//            32 if cfg!(feature = &quot;power-of-two&quot;) =&gt; 22,</span>
-<span class="comment">//            33 if cfg!(feature = &quot;radix&quot;) =&gt; 22,</span>
-<span class="comment">//            34 if cfg!(feature = &quot;radix&quot;) =&gt; 22,</span>
-<span class="comment">//            35 if cfg!(feature = &quot;radix&quot;) =&gt; 22,</span>
-<span class="comment">//            36 if cfg!(feature = &quot;radix&quot;) =&gt; 21,</span>
-<span class="comment">//            // Invalid radix</span>
-<span class="comment">//            _ =&gt; unreachable!(),</span>
-<span class="comment">//        }</span>
-<span class="comment">//    }</span>
-<span class="comment">//}</span>
-
-<span class="comment">// CONST FN</span>
-<span class="comment">// --------</span>
-
-<span class="doccomment">/// Get the exponent limit as a const fn.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">f32_exponent_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">i64</span>, <span class="ident">i64</span>) {
-    <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">2</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; (<span class="op">-</span><span class="number">127</span>, <span class="number">127</span>),
-        <span class="number">3</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">15</span>, <span class="number">15</span>),
-        <span class="number">4</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; (<span class="op">-</span><span class="number">63</span>, <span class="number">63</span>),
-        <span class="number">5</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">10</span>, <span class="number">10</span>),
-        <span class="number">6</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">15</span>, <span class="number">15</span>),
-        <span class="number">7</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">8</span>, <span class="number">8</span>),
-        <span class="number">8</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; (<span class="op">-</span><span class="number">42</span>, <span class="number">42</span>),
-        <span class="number">9</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">7</span>, <span class="number">7</span>),
-        <span class="number">10</span> =&gt; (<span class="op">-</span><span class="number">10</span>, <span class="number">10</span>),
-        <span class="number">11</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">6</span>, <span class="number">6</span>),
-        <span class="number">12</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">15</span>, <span class="number">15</span>),
-        <span class="number">13</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">6</span>, <span class="number">6</span>),
-        <span class="number">14</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">8</span>, <span class="number">8</span>),
-        <span class="number">15</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">6</span>, <span class="number">6</span>),
-        <span class="number">16</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; (<span class="op">-</span><span class="number">31</span>, <span class="number">31</span>),
-        <span class="number">17</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">5</span>, <span class="number">5</span>),
-        <span class="number">18</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">7</span>, <span class="number">7</span>),
-        <span class="number">19</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">5</span>, <span class="number">5</span>),
-        <span class="number">20</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">10</span>, <span class="number">10</span>),
-        <span class="number">21</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">5</span>, <span class="number">5</span>),
-        <span class="number">22</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">6</span>, <span class="number">6</span>),
-        <span class="number">23</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">5</span>, <span class="number">5</span>),
-        <span class="number">24</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">15</span>, <span class="number">15</span>),
-        <span class="number">25</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">5</span>, <span class="number">5</span>),
-        <span class="number">26</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">6</span>, <span class="number">6</span>),
-        <span class="number">27</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">5</span>, <span class="number">5</span>),
-        <span class="number">28</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">8</span>, <span class="number">8</span>),
-        <span class="number">29</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">4</span>, <span class="number">4</span>),
-        <span class="number">30</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">6</span>, <span class="number">6</span>),
-        <span class="number">31</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">4</span>, <span class="number">4</span>),
-        <span class="number">32</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; (<span class="op">-</span><span class="number">25</span>, <span class="number">25</span>),
-        <span class="number">33</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">4</span>, <span class="number">4</span>),
-        <span class="number">34</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">5</span>, <span class="number">5</span>),
-        <span class="number">35</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">4</span>, <span class="number">4</span>),
-        <span class="number">36</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">7</span>, <span class="number">7</span>),
-        <span class="kw">_</span> =&gt; (<span class="number">0</span>, <span class="number">0</span>),
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">impl </span>ExactFloat <span class="kw">for </span>bf16 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>exponent_limit(<span class="kw">_</span>: u32) -&gt; (i64, i64) {
+        <span class="macro">unimplemented!</span>()
     }
-}
 
-<span class="doccomment">/// Get the mantissa limit as a const fn.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">f32_mantissa_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i64</span> {
-    <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">2</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">24</span>,
-        <span class="number">3</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">15</span>,
-        <span class="number">4</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">5</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
-        <span class="number">6</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">9</span>,
-        <span class="number">7</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">8</span>,
-        <span class="number">8</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">8</span>,
-        <span class="number">9</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
-        <span class="number">10</span> =&gt; <span class="number">7</span>,
-        <span class="number">11</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">12</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">13</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">14</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">15</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">16</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">17</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">18</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">19</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">20</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">21</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">22</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">23</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">24</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">25</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">26</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">27</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">28</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">29</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">30</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">31</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">32</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">33</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">34</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">35</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">36</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="kw">_</span> =&gt; <span class="number">0</span>,
-    }
-}
-
-<span class="doccomment">/// Get the exponent limit as a const fn.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">f64_exponent_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">i64</span>, <span class="ident">i64</span>) {
-    <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">2</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; (<span class="op">-</span><span class="number">1023</span>, <span class="number">1023</span>),
-        <span class="number">3</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">33</span>, <span class="number">33</span>),
-        <span class="number">4</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; (<span class="op">-</span><span class="number">511</span>, <span class="number">511</span>),
-        <span class="number">5</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">22</span>, <span class="number">22</span>),
-        <span class="number">6</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">33</span>, <span class="number">33</span>),
-        <span class="number">7</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">18</span>, <span class="number">18</span>),
-        <span class="number">8</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; (<span class="op">-</span><span class="number">341</span>, <span class="number">341</span>),
-        <span class="number">9</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">16</span>, <span class="number">16</span>),
-        <span class="number">10</span> =&gt; (<span class="op">-</span><span class="number">22</span>, <span class="number">22</span>),
-        <span class="number">11</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">15</span>, <span class="number">15</span>),
-        <span class="number">12</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">33</span>, <span class="number">33</span>),
-        <span class="number">13</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">14</span>, <span class="number">14</span>),
-        <span class="number">14</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">18</span>, <span class="number">18</span>),
-        <span class="number">15</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">13</span>, <span class="number">13</span>),
-        <span class="number">16</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; (<span class="op">-</span><span class="number">255</span>, <span class="number">255</span>),
-        <span class="number">17</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">12</span>, <span class="number">12</span>),
-        <span class="number">18</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">16</span>, <span class="number">16</span>),
-        <span class="number">19</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">12</span>, <span class="number">12</span>),
-        <span class="number">20</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">22</span>, <span class="number">22</span>),
-        <span class="number">21</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">12</span>, <span class="number">12</span>),
-        <span class="number">22</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">15</span>, <span class="number">15</span>),
-        <span class="number">23</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">11</span>, <span class="number">11</span>),
-        <span class="number">24</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">33</span>, <span class="number">33</span>),
-        <span class="number">25</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">11</span>, <span class="number">11</span>),
-        <span class="number">26</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">14</span>, <span class="number">14</span>),
-        <span class="number">27</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">11</span>, <span class="number">11</span>),
-        <span class="number">28</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">18</span>, <span class="number">18</span>),
-        <span class="number">29</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">10</span>, <span class="number">10</span>),
-        <span class="number">30</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">13</span>, <span class="number">13</span>),
-        <span class="number">31</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">10</span>, <span class="number">10</span>),
-        <span class="number">32</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; (<span class="op">-</span><span class="number">204</span>, <span class="number">204</span>),
-        <span class="number">33</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">10</span>, <span class="number">10</span>),
-        <span class="number">34</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">12</span>, <span class="number">12</span>),
-        <span class="number">35</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">10</span>, <span class="number">10</span>),
-        <span class="number">36</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; (<span class="op">-</span><span class="number">16</span>, <span class="number">16</span>),
-        <span class="kw">_</span> =&gt; (<span class="number">0</span>, <span class="number">0</span>),
-    }
-}
-
-<span class="doccomment">/// Get the mantissa limit as a const fn.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">f64_mantissa_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i64</span> {
-    <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">2</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">53</span>,
-        <span class="number">3</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">33</span>,
-        <span class="number">4</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">26</span>,
-        <span class="number">5</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">22</span>,
-        <span class="number">6</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">20</span>,
-        <span class="number">7</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">18</span>,
-        <span class="number">8</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">17</span>,
-        <span class="number">9</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">16</span>,
-        <span class="number">10</span> =&gt; <span class="number">15</span>,
-        <span class="number">11</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">15</span>,
-        <span class="number">12</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
-        <span class="number">13</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
-        <span class="number">14</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
-        <span class="number">15</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
-        <span class="number">16</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">13</span>,
-        <span class="number">17</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">18</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">19</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">20</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">21</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">22</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
-        <span class="number">23</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
-        <span class="number">24</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
-        <span class="number">25</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
-        <span class="number">26</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
-        <span class="number">27</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
-        <span class="number">28</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
-        <span class="number">29</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
-        <span class="number">30</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
-        <span class="number">31</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
-        <span class="number">32</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">10</span>,
-        <span class="number">33</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
-        <span class="number">34</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
-        <span class="number">35</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
-        <span class="number">36</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
-        <span class="kw">_</span> =&gt; <span class="number">0</span>,
-    }
-}
-
-<span class="comment">// POWER LIMITS</span>
-<span class="comment">// ------------</span>
-
-<span class="comment">//  The code used to generate these limits is as follows:</span>
-<span class="comment">//</span>
-<span class="comment">//  ```text</span>
-<span class="comment">//  import math</span>
-<span class="comment">//</span>
-<span class="comment">//  def find_power(base, max_value):</span>
-<span class="comment">//      &#39;&#39;&#39;Using log is unreliable, since it uses float math.&#39;&#39;&#39;</span>
-<span class="comment">//</span>
-<span class="comment">//      power = 0</span>
-<span class="comment">//      while base**power &lt; max_value:</span>
-<span class="comment">//          power += 1</span>
-<span class="comment">//      return power - 1</span>
-<span class="comment">//</span>
-<span class="comment">//  def print_function(bits):</span>
-<span class="comment">//      print(&#39;#[inline(always)]&#39;)</span>
-<span class="comment">//      print(f&#39;pub const fn u{bits}_power_limit(radix: u32) -&gt; u32 {{&#39;)</span>
-<span class="comment">//      print(&#39;    match radix {&#39;)</span>
-<span class="comment">//      max_value = 2**bits - 1</span>
-<span class="comment">//      for radix in range(2, 37):</span>
-<span class="comment">//          power = find_power(radix, max_value)</span>
-<span class="comment">//          print(f&#39;        {radix} =&gt; {power},&#39;)</span>
-<span class="comment">//      print(&#39;        // Any other radix should be unreachable.&#39;)</span>
-<span class="comment">//      print(&#39;        _ =&gt; 1,&#39;)</span>
-<span class="comment">//      print(&#39;    }&#39;)</span>
-<span class="comment">//      print(&#39;}&#39;)</span>
-<span class="comment">//      print(&#39;&#39;)</span>
-<span class="comment">//</span>
-<span class="comment">//  print_function(32)</span>
-<span class="comment">//  print_function(64)</span>
-<span class="comment">//  ```</span>
-
-<span class="doccomment">/// Get the maximum value for `radix^N` that can be represented in a u32.</span>
-<span class="doccomment">/// This is calculated as `⌊log(2^32 - 1, b)⌋`.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">u32_power_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-    <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">2</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">31</span>,
-        <span class="number">3</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">20</span>,
-        <span class="number">4</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">15</span>,
-        <span class="number">5</span> =&gt; <span class="number">13</span>,
-        <span class="number">6</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">7</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
-        <span class="number">8</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">10</span>,
-        <span class="number">9</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
-        <span class="number">10</span> =&gt; <span class="number">9</span>,
-        <span class="number">11</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">9</span>,
-        <span class="number">12</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">8</span>,
-        <span class="number">13</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">8</span>,
-        <span class="number">14</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">8</span>,
-        <span class="number">15</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">8</span>,
-        <span class="number">16</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">7</span>,
-        <span class="number">17</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
-        <span class="number">18</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
-        <span class="number">19</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
-        <span class="number">20</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
-        <span class="number">21</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
-        <span class="number">22</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
-        <span class="number">23</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
-        <span class="number">24</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">25</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">26</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">27</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">28</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">29</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">30</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">31</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">32</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">33</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">34</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">35</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">36</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="comment">// Any other radix should be unreachable.</span>
-        <span class="kw">_</span> =&gt; <span class="number">1</span>,
-    }
-}
-
-<span class="doccomment">/// Get the maximum value for `radix^N` that can be represented in a u64.</span>
-<span class="doccomment">/// This is calculated as `⌊log(2^64 - 1, b)⌋`.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">u64_power_limit</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-    <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">2</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">63</span>,
-        <span class="number">3</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">40</span>,
-        <span class="number">4</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">31</span>,
-        <span class="number">5</span> =&gt; <span class="number">27</span>,
-        <span class="number">6</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">24</span>,
-        <span class="number">7</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">22</span>,
-        <span class="number">8</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">21</span>,
-        <span class="number">9</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">20</span>,
-        <span class="number">10</span> =&gt; <span class="number">19</span>,
-        <span class="number">11</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">18</span>,
-        <span class="number">12</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">17</span>,
-        <span class="number">13</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">17</span>,
-        <span class="number">14</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">16</span>,
-        <span class="number">15</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">16</span>,
-        <span class="number">16</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">15</span>,
-        <span class="number">17</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">15</span>,
-        <span class="number">18</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">15</span>,
-        <span class="number">19</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">15</span>,
-        <span class="number">20</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
-        <span class="number">21</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
-        <span class="number">22</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
-        <span class="number">23</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
-        <span class="number">24</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
-        <span class="number">25</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
-        <span class="number">26</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
-        <span class="number">27</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
-        <span class="number">28</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
-        <span class="number">29</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
-        <span class="number">30</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
-        <span class="number">31</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">32</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">33</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">34</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">35</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="number">36</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
-        <span class="comment">// Any other radix should be unreachable.</span>
-        <span class="kw">_</span> =&gt; <span class="number">1</span>,
-    }
-}
-
-<span class="comment">// MAX DIGITS</span>
-<span class="comment">// ----------</span>
-
-<span class="doccomment">/// Calculate the maximum number of digits possible in the mantissa.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns the maximum number of digits plus one.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// We can exactly represent a float in radix `b` from radix 2 if</span>
-<span class="doccomment">/// `b` is divisible by 2. This function calculates the exact number of</span>
-<span class="doccomment">/// digits required to exactly represent that float. This makes sense,</span>
-<span class="doccomment">/// and the exact reference and I quote is:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  &gt; A necessary and sufficient condition for all numbers representable in radix β</span>
-<span class="doccomment">///  &gt; with a finite number of digits to be representable in radix γ with a</span>
-<span class="doccomment">///  &gt; finite number of digits is that β should divide an integer power of γ.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// According to the &quot;Handbook of Floating Point Arithmetic&quot;,</span>
-<span class="doccomment">/// for IEEE754, with emin being the min exponent, p2 being the</span>
-<span class="doccomment">/// precision, and b being the radix, the number of digits follows as:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `−emin + p2 + ⌊(emin + 1) log(2, b) − log(1 − 2^(−p2), b)⌋`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For f16, this follows as:</span>
-<span class="doccomment">///     emin = -14</span>
-<span class="doccomment">///     p2 = 11</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For bfloat16 , this follows as:</span>
-<span class="doccomment">///     emin = -126</span>
-<span class="doccomment">///     p2 = 8</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For f32, this follows as:</span>
-<span class="doccomment">///     emin = -126</span>
-<span class="doccomment">///     p2 = 24</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For f64, this follows as:</span>
-<span class="doccomment">///     emin = -1022</span>
-<span class="doccomment">///     p2 = 53</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For f128, this follows as:</span>
-<span class="doccomment">///     emin = -16382</span>
-<span class="doccomment">///     p2 = 113</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In Python:</span>
-<span class="doccomment">///     `-emin + p2 + math.floor((emin+ 1)*math.log(2, b)-math.log(1-2**(-p2), b))`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This was used to calculate the maximum number of digits for [2, 36].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The minimum, denormal exponent can be calculated as follows: given</span>
-<span class="doccomment">/// the number of exponent bits `exp_bits`, and the number of bits</span>
-<span class="doccomment">/// in the mantissa `mantissa_bits`, we have an exponent bias</span>
-<span class="doccomment">/// `exp_bias` equal to `2^(exp_bits-1) - 1 + mantissa_bits`. We</span>
-<span class="doccomment">/// therefore have a denormal exponent `denormal_exp` equal to</span>
-<span class="doccomment">/// `1 - exp_bias` and the minimum, denormal float `min_float` is</span>
-<span class="doccomment">/// therefore `2^denormal_exp`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For f16, this follows as:</span>
-<span class="doccomment">///     exp_bits = 5</span>
-<span class="doccomment">///     mantissa_bits = 10</span>
-<span class="doccomment">///     exp_bias = 25</span>
-<span class="doccomment">///     denormal_exp = -24</span>
-<span class="doccomment">///     min_float = 5.96 * 10^−8</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For bfloat16, this follows as:</span>
-<span class="doccomment">///     exp_bits = 8</span>
-<span class="doccomment">///     mantissa_bits = 7</span>
-<span class="doccomment">///     exp_bias = 134</span>
-<span class="doccomment">///     denormal_exp = -133</span>
-<span class="doccomment">///     min_float = 9.18 * 10^−41</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For f32, this follows as:</span>
-<span class="doccomment">///     exp_bits = 8</span>
-<span class="doccomment">///     mantissa_bits = 23</span>
-<span class="doccomment">///     exp_bias = 150</span>
-<span class="doccomment">///     denormal_exp = -149</span>
-<span class="doccomment">///     min_float = 1.40 * 10^−45</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For f64, this follows as:</span>
-<span class="doccomment">///     exp_bits = 11</span>
-<span class="doccomment">///     mantissa_bits = 52</span>
-<span class="doccomment">///     exp_bias = 1075</span>
-<span class="doccomment">///     denormal_exp = -1074</span>
-<span class="doccomment">///     min_float = 5.00 * 10^−324</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For f128, this follows as:</span>
-<span class="doccomment">///     exp_bits = 15</span>
-<span class="doccomment">///     mantissa_bits = 112</span>
-<span class="doccomment">///     exp_bias = 16495</span>
-<span class="doccomment">///     denormal_exp = -16494</span>
-<span class="doccomment">///     min_float = 6.48 * 10^−4966</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These match statements can be generated with the following Python</span>
-<span class="doccomment">/// code:</span>
-<span class="doccomment">/// ```python</span>
-<span class="doccomment">/// import math</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// def digits(emin, p2, b):</span>
-<span class="doccomment">///     return -emin + p2 + math.floor((emin+ 1)*math.log(2, b)-math.log(1-2**(-p2), b))</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// def max_digits(emin, p2):</span>
-<span class="doccomment">///     radices = [6, 10, 12, 14, 18, 20, 22, 24 26 28, 30, 34, 36]</span>
-<span class="doccomment">///     print(&#39;match radix {&#39;)</span>
-<span class="doccomment">///     for radix in radices:</span>
-<span class="doccomment">///         value = digits(emin, p2, radix)</span>
-<span class="doccomment">///         print(f&#39;    {radix} =&gt; Some({value + 2}),&#39;)</span>
-<span class="doccomment">///     print(&#39;    // Powers of two should be unreachable.&#39;)</span>
-<span class="doccomment">///     print(&#39;    // Odd numbers will have infinite digits.&#39;)</span>
-<span class="doccomment">///     print(&#39;    _ =&gt; None,&#39;)</span>
-<span class="doccomment">///     print(&#39;}&#39;)</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">MaxDigits</span> {
-    <span class="kw">fn</span> <span class="ident">max_digits</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
-}
-
-<span class="doccomment">/// emin = -126</span>
-<span class="doccomment">/// p2 = 24</span>
-<span class="kw">impl</span> <span class="ident">MaxDigits</span> <span class="kw">for</span> <span class="ident">f32</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">max_digits</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
-        <span class="ident">f32_max_digits</span>(<span class="ident">radix</span>)
-    }
-}
-
-<span class="doccomment">/// emin = -1022</span>
-<span class="doccomment">/// p2 = 53</span>
-<span class="kw">impl</span> <span class="ident">MaxDigits</span> <span class="kw">for</span> <span class="ident">f64</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">max_digits</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
-        <span class="ident">f64_max_digits</span>(<span class="ident">radix</span>)
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">MaxDigits</span> <span class="kw">for</span> <span class="ident">f16</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">max_digits</span>(<span class="kw">_</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>mantissa_limit(<span class="kw">_</span>: u32) -&gt; i64 {
         <span class="macro">unimplemented!</span>()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">MaxDigits</span> <span class="kw">for</span> <span class="ident">bf16</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">max_digits</span>(<span class="kw">_</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="comment">//#[cfg(feature = &quot;f128&quot;)]
+//impl ExactFloat for f128 {
+//    #[inline(always)]
+//    fn exponent_limit(radix: u32) -&gt; (i64, i64) {
+//        debug_assert_radix(radix);
+//        match radix {
+//            2 if cfg!(feature = &quot;power-of-two&quot;) =&gt; (-16494, 16383),
+//            3 if cfg!(feature = &quot;radix&quot;) =&gt; (-71, 71),
+//            4 if cfg!(feature = &quot;power-of-two&quot;) =&gt; (-8247, 8191),
+//            5 if cfg!(feature = &quot;radix&quot;) =&gt; (-48, 48),
+//            6 if cfg!(feature = &quot;radix&quot;) =&gt; (-71, 71),
+//            7 if cfg!(feature = &quot;radix&quot;) =&gt; (-40, 40),
+//            8 if cfg!(feature = &quot;power-of-two&quot;) =&gt; (-5498, 5461),
+//            9 if cfg!(feature = &quot;radix&quot;) =&gt; (-35, 35),
+//            10 =&gt; (-48, 48),
+//            11 if cfg!(feature = &quot;radix&quot;) =&gt; (-32, 32),
+//            12 if cfg!(feature = &quot;radix&quot;) =&gt; (-71, 71),
+//            13 if cfg!(feature = &quot;radix&quot;) =&gt; (-30, 30),
+//            14 if cfg!(feature = &quot;radix&quot;) =&gt; (-40, 40),
+//            15 if cfg!(feature = &quot;radix&quot;) =&gt; (-28, 28),
+//            16 if cfg!(feature = &quot;power-of-two&quot;) =&gt; (-4123, 4095),
+//            17 if cfg!(feature = &quot;radix&quot;) =&gt; (-27, 27),
+//            18 if cfg!(feature = &quot;radix&quot;) =&gt; (-35, 35),
+//            19 if cfg!(feature = &quot;radix&quot;) =&gt; (-26, 26),
+//            20 if cfg!(feature = &quot;radix&quot;) =&gt; (-48, 48),
+//            21 if cfg!(feature = &quot;radix&quot;) =&gt; (-25, 25),
+//            22 if cfg!(feature = &quot;radix&quot;) =&gt; (-32, 32),
+//            23 if cfg!(feature = &quot;radix&quot;) =&gt; (-24, 24),
+//            24 if cfg!(feature = &quot;radix&quot;) =&gt; (-71, 71),
+//            25 if cfg!(feature = &quot;radix&quot;) =&gt; (-24, 24),
+//            26 if cfg!(feature = &quot;radix&quot;) =&gt; (-30, 30),
+//            27 if cfg!(feature = &quot;radix&quot;) =&gt; (-23, 23),
+//            28 if cfg!(feature = &quot;radix&quot;) =&gt; (-40, 40),
+//            29 if cfg!(feature = &quot;radix&quot;) =&gt; (-23, 23),
+//            30 if cfg!(feature = &quot;radix&quot;) =&gt; (-28, 28),
+//            31 if cfg!(feature = &quot;radix&quot;) =&gt; (-22, 22),
+//            32 if cfg!(feature = &quot;power-of-two&quot;) =&gt; (-3298, 3276),
+//            33 if cfg!(feature = &quot;radix&quot;) =&gt; (-22, 22),
+//            34 if cfg!(feature = &quot;radix&quot;) =&gt; (-27, 27),
+//            35 if cfg!(feature = &quot;radix&quot;) =&gt; (-22, 22),
+//            36 if cfg!(feature = &quot;radix&quot;) =&gt; (-35, 35),
+//            // Invalid radix
+//            _ =&gt; unreachable!(),
+//        }
+//    }
+//
+//    #[inline(always)]
+//    fn mantissa_limit(radix: u32) -&gt; i64 {
+//        debug_assert_radix(radix);
+//        match radix {
+//            2 if cfg!(feature = &quot;power-of-two&quot;) =&gt; 113,
+//            3 if cfg!(feature = &quot;radix&quot;) =&gt; 71,
+//            4 if cfg!(feature = &quot;power-of-two&quot;) =&gt; 56,
+//            5 if cfg!(feature = &quot;radix&quot;) =&gt; 48,
+//            6 if cfg!(feature = &quot;radix&quot;) =&gt; 43,
+//            7 if cfg!(feature = &quot;radix&quot;) =&gt; 40,
+//            8 if cfg!(feature = &quot;power-of-two&quot;) =&gt; 37,
+//            9 if cfg!(feature = &quot;radix&quot;) =&gt; 35,
+//            10 =&gt; 34,
+//            11 if cfg!(feature = &quot;radix&quot;) =&gt; 32,
+//            12 if cfg!(feature = &quot;radix&quot;) =&gt; 31,
+//            13 if cfg!(feature = &quot;radix&quot;) =&gt; 30,
+//            14 if cfg!(feature = &quot;radix&quot;) =&gt; 29,
+//            15 if cfg!(feature = &quot;radix&quot;) =&gt; 28,
+//            16 if cfg!(feature = &quot;power-of-two&quot;) =&gt; 28,
+//            17 if cfg!(feature = &quot;radix&quot;) =&gt; 27,
+//            18 if cfg!(feature = &quot;radix&quot;) =&gt; 27,
+//            19 if cfg!(feature = &quot;radix&quot;) =&gt; 26,
+//            20 if cfg!(feature = &quot;radix&quot;) =&gt; 26,
+//            21 if cfg!(feature = &quot;radix&quot;) =&gt; 25,
+//            22 if cfg!(feature = &quot;radix&quot;) =&gt; 25,
+//            23 if cfg!(feature = &quot;radix&quot;) =&gt; 24,
+//            24 if cfg!(feature = &quot;radix&quot;) =&gt; 24,
+//            25 if cfg!(feature = &quot;radix&quot;) =&gt; 24,
+//            26 if cfg!(feature = &quot;radix&quot;) =&gt; 24,
+//            27 if cfg!(feature = &quot;radix&quot;) =&gt; 23,
+//            28 if cfg!(feature = &quot;radix&quot;) =&gt; 23,
+//            29 if cfg!(feature = &quot;radix&quot;) =&gt; 23,
+//            30 if cfg!(feature = &quot;radix&quot;) =&gt; 23,
+//            31 if cfg!(feature = &quot;radix&quot;) =&gt; 22,
+//            32 if cfg!(feature = &quot;power-of-two&quot;) =&gt; 22,
+//            33 if cfg!(feature = &quot;radix&quot;) =&gt; 22,
+//            34 if cfg!(feature = &quot;radix&quot;) =&gt; 22,
+//            35 if cfg!(feature = &quot;radix&quot;) =&gt; 22,
+//            36 if cfg!(feature = &quot;radix&quot;) =&gt; 21,
+//            // Invalid radix
+//            _ =&gt; unreachable!(),
+//        }
+//    }
+//}
+
+// CONST FN
+// --------
+
+</span><span class="doccomment">/// Get the exponent limit as a const fn.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub const fn </span>f32_exponent_limit(radix: u32) -&gt; (i64, i64) {
+    <span class="kw">match </span>radix {
+        <span class="number">2 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; (-<span class="number">127</span>, <span class="number">127</span>),
+        <span class="number">3 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">15</span>, <span class="number">15</span>),
+        <span class="number">4 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; (-<span class="number">63</span>, <span class="number">63</span>),
+        <span class="number">5 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">10</span>, <span class="number">10</span>),
+        <span class="number">6 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">15</span>, <span class="number">15</span>),
+        <span class="number">7 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">8</span>, <span class="number">8</span>),
+        <span class="number">8 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; (-<span class="number">42</span>, <span class="number">42</span>),
+        <span class="number">9 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">7</span>, <span class="number">7</span>),
+        <span class="number">10 </span>=&gt; (-<span class="number">10</span>, <span class="number">10</span>),
+        <span class="number">11 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">6</span>, <span class="number">6</span>),
+        <span class="number">12 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">15</span>, <span class="number">15</span>),
+        <span class="number">13 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">6</span>, <span class="number">6</span>),
+        <span class="number">14 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">8</span>, <span class="number">8</span>),
+        <span class="number">15 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">6</span>, <span class="number">6</span>),
+        <span class="number">16 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; (-<span class="number">31</span>, <span class="number">31</span>),
+        <span class="number">17 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">5</span>, <span class="number">5</span>),
+        <span class="number">18 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">7</span>, <span class="number">7</span>),
+        <span class="number">19 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">5</span>, <span class="number">5</span>),
+        <span class="number">20 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">10</span>, <span class="number">10</span>),
+        <span class="number">21 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">5</span>, <span class="number">5</span>),
+        <span class="number">22 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">6</span>, <span class="number">6</span>),
+        <span class="number">23 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">5</span>, <span class="number">5</span>),
+        <span class="number">24 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">15</span>, <span class="number">15</span>),
+        <span class="number">25 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">5</span>, <span class="number">5</span>),
+        <span class="number">26 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">6</span>, <span class="number">6</span>),
+        <span class="number">27 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">5</span>, <span class="number">5</span>),
+        <span class="number">28 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">8</span>, <span class="number">8</span>),
+        <span class="number">29 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">4</span>, <span class="number">4</span>),
+        <span class="number">30 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">6</span>, <span class="number">6</span>),
+        <span class="number">31 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">4</span>, <span class="number">4</span>),
+        <span class="number">32 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; (-<span class="number">25</span>, <span class="number">25</span>),
+        <span class="number">33 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">4</span>, <span class="number">4</span>),
+        <span class="number">34 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">5</span>, <span class="number">5</span>),
+        <span class="number">35 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">4</span>, <span class="number">4</span>),
+        <span class="number">36 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">7</span>, <span class="number">7</span>),
+        <span class="kw">_ </span>=&gt; (<span class="number">0</span>, <span class="number">0</span>),
+    }
+}
+
+<span class="doccomment">/// Get the mantissa limit as a const fn.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub const fn </span>f32_mantissa_limit(radix: u32) -&gt; i64 {
+    <span class="kw">match </span>radix {
+        <span class="number">2 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">24</span>,
+        <span class="number">3 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">15</span>,
+        <span class="number">4 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">5 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
+        <span class="number">6 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">9</span>,
+        <span class="number">7 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">8</span>,
+        <span class="number">8 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">8</span>,
+        <span class="number">9 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
+        <span class="number">10 </span>=&gt; <span class="number">7</span>,
+        <span class="number">11 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">12 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">13 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">14 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">15 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">16 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">17 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">18 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">19 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">20 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">21 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">22 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">23 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">24 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">25 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">26 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">27 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">28 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">29 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">30 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">31 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">32 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">33 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">34 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">35 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">36 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="kw">_ </span>=&gt; <span class="number">0</span>,
+    }
+}
+
+<span class="doccomment">/// Get the exponent limit as a const fn.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub const fn </span>f64_exponent_limit(radix: u32) -&gt; (i64, i64) {
+    <span class="kw">match </span>radix {
+        <span class="number">2 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; (-<span class="number">1023</span>, <span class="number">1023</span>),
+        <span class="number">3 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">33</span>, <span class="number">33</span>),
+        <span class="number">4 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; (-<span class="number">511</span>, <span class="number">511</span>),
+        <span class="number">5 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">22</span>, <span class="number">22</span>),
+        <span class="number">6 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">33</span>, <span class="number">33</span>),
+        <span class="number">7 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">18</span>, <span class="number">18</span>),
+        <span class="number">8 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; (-<span class="number">341</span>, <span class="number">341</span>),
+        <span class="number">9 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">16</span>, <span class="number">16</span>),
+        <span class="number">10 </span>=&gt; (-<span class="number">22</span>, <span class="number">22</span>),
+        <span class="number">11 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">15</span>, <span class="number">15</span>),
+        <span class="number">12 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">33</span>, <span class="number">33</span>),
+        <span class="number">13 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">14</span>, <span class="number">14</span>),
+        <span class="number">14 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">18</span>, <span class="number">18</span>),
+        <span class="number">15 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">13</span>, <span class="number">13</span>),
+        <span class="number">16 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; (-<span class="number">255</span>, <span class="number">255</span>),
+        <span class="number">17 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">12</span>, <span class="number">12</span>),
+        <span class="number">18 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">16</span>, <span class="number">16</span>),
+        <span class="number">19 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">12</span>, <span class="number">12</span>),
+        <span class="number">20 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">22</span>, <span class="number">22</span>),
+        <span class="number">21 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">12</span>, <span class="number">12</span>),
+        <span class="number">22 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">15</span>, <span class="number">15</span>),
+        <span class="number">23 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">11</span>, <span class="number">11</span>),
+        <span class="number">24 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">33</span>, <span class="number">33</span>),
+        <span class="number">25 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">11</span>, <span class="number">11</span>),
+        <span class="number">26 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">14</span>, <span class="number">14</span>),
+        <span class="number">27 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">11</span>, <span class="number">11</span>),
+        <span class="number">28 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">18</span>, <span class="number">18</span>),
+        <span class="number">29 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">10</span>, <span class="number">10</span>),
+        <span class="number">30 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">13</span>, <span class="number">13</span>),
+        <span class="number">31 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">10</span>, <span class="number">10</span>),
+        <span class="number">32 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; (-<span class="number">204</span>, <span class="number">204</span>),
+        <span class="number">33 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">10</span>, <span class="number">10</span>),
+        <span class="number">34 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">12</span>, <span class="number">12</span>),
+        <span class="number">35 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">10</span>, <span class="number">10</span>),
+        <span class="number">36 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; (-<span class="number">16</span>, <span class="number">16</span>),
+        <span class="kw">_ </span>=&gt; (<span class="number">0</span>, <span class="number">0</span>),
+    }
+}
+
+<span class="doccomment">/// Get the mantissa limit as a const fn.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub const fn </span>f64_mantissa_limit(radix: u32) -&gt; i64 {
+    <span class="kw">match </span>radix {
+        <span class="number">2 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">53</span>,
+        <span class="number">3 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">33</span>,
+        <span class="number">4 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">26</span>,
+        <span class="number">5 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">22</span>,
+        <span class="number">6 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">20</span>,
+        <span class="number">7 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">18</span>,
+        <span class="number">8 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">17</span>,
+        <span class="number">9 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">16</span>,
+        <span class="number">10 </span>=&gt; <span class="number">15</span>,
+        <span class="number">11 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">15</span>,
+        <span class="number">12 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
+        <span class="number">13 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
+        <span class="number">14 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
+        <span class="number">15 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
+        <span class="number">16 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">13</span>,
+        <span class="number">17 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">18 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">19 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">20 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">21 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">22 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
+        <span class="number">23 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
+        <span class="number">24 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
+        <span class="number">25 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
+        <span class="number">26 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
+        <span class="number">27 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
+        <span class="number">28 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
+        <span class="number">29 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
+        <span class="number">30 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
+        <span class="number">31 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
+        <span class="number">32 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">10</span>,
+        <span class="number">33 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
+        <span class="number">34 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
+        <span class="number">35 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
+        <span class="number">36 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
+        <span class="kw">_ </span>=&gt; <span class="number">0</span>,
+    }
+}
+
+<span class="comment">// POWER LIMITS
+// ------------
+
+//  The code used to generate these limits is as follows:
+//
+//  ```text
+//  import math
+//
+//  def find_power(base, max_value):
+//      &#39;&#39;&#39;Using log is unreliable, since it uses float math.&#39;&#39;&#39;
+//
+//      power = 0
+//      while base**power &lt; max_value:
+//          power += 1
+//      return power - 1
+//
+//  def print_function(bits):
+//      print(&#39;#[inline(always)]&#39;)
+//      print(f&#39;pub const fn u{bits}_power_limit(radix: u32) -&gt; u32 {{&#39;)
+//      print(&#39;    match radix {&#39;)
+//      max_value = 2**bits - 1
+//      for radix in range(2, 37):
+//          power = find_power(radix, max_value)
+//          print(f&#39;        {radix} =&gt; {power},&#39;)
+//      print(&#39;        // Any other radix should be unreachable.&#39;)
+//      print(&#39;        _ =&gt; 1,&#39;)
+//      print(&#39;    }&#39;)
+//      print(&#39;}&#39;)
+//      print(&#39;&#39;)
+//
+//  print_function(32)
+//  print_function(64)
+//  ```
+
+</span><span class="doccomment">/// Get the maximum value for `radix^N` that can be represented in a u32.
+/// This is calculated as `⌊log(2^32 - 1, b)⌋`.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub const fn </span>u32_power_limit(radix: u32) -&gt; u32 {
+    <span class="kw">match </span>radix {
+        <span class="number">2 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">31</span>,
+        <span class="number">3 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">20</span>,
+        <span class="number">4 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">15</span>,
+        <span class="number">5 </span>=&gt; <span class="number">13</span>,
+        <span class="number">6 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">7 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">11</span>,
+        <span class="number">8 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">10</span>,
+        <span class="number">9 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">10</span>,
+        <span class="number">10 </span>=&gt; <span class="number">9</span>,
+        <span class="number">11 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">9</span>,
+        <span class="number">12 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">8</span>,
+        <span class="number">13 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">8</span>,
+        <span class="number">14 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">8</span>,
+        <span class="number">15 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">8</span>,
+        <span class="number">16 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">7</span>,
+        <span class="number">17 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
+        <span class="number">18 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
+        <span class="number">19 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
+        <span class="number">20 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
+        <span class="number">21 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
+        <span class="number">22 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
+        <span class="number">23 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">7</span>,
+        <span class="number">24 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">25 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">26 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">27 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">28 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">29 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">30 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">31 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">32 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">33 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">34 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">35 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">36 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="comment">// Any other radix should be unreachable.
+        </span><span class="kw">_ </span>=&gt; <span class="number">1</span>,
+    }
+}
+
+<span class="doccomment">/// Get the maximum value for `radix^N` that can be represented in a u64.
+/// This is calculated as `⌊log(2^64 - 1, b)⌋`.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub const fn </span>u64_power_limit(radix: u32) -&gt; u32 {
+    <span class="kw">match </span>radix {
+        <span class="number">2 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">63</span>,
+        <span class="number">3 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">40</span>,
+        <span class="number">4 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">31</span>,
+        <span class="number">5 </span>=&gt; <span class="number">27</span>,
+        <span class="number">6 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">24</span>,
+        <span class="number">7 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">22</span>,
+        <span class="number">8 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">21</span>,
+        <span class="number">9 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">20</span>,
+        <span class="number">10 </span>=&gt; <span class="number">19</span>,
+        <span class="number">11 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">18</span>,
+        <span class="number">12 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">17</span>,
+        <span class="number">13 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">17</span>,
+        <span class="number">14 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">16</span>,
+        <span class="number">15 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">16</span>,
+        <span class="number">16 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">15</span>,
+        <span class="number">17 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">15</span>,
+        <span class="number">18 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">15</span>,
+        <span class="number">19 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">15</span>,
+        <span class="number">20 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
+        <span class="number">21 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
+        <span class="number">22 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
+        <span class="number">23 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">14</span>,
+        <span class="number">24 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
+        <span class="number">25 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
+        <span class="number">26 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
+        <span class="number">27 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
+        <span class="number">28 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
+        <span class="number">29 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
+        <span class="number">30 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">13</span>,
+        <span class="number">31 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">32 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">33 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">34 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">35 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="number">36 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">12</span>,
+        <span class="comment">// Any other radix should be unreachable.
+        </span><span class="kw">_ </span>=&gt; <span class="number">1</span>,
+    }
+}
+
+<span class="comment">// MAX DIGITS
+// ----------
+
+</span><span class="doccomment">/// Calculate the maximum number of digits possible in the mantissa.
+///
+/// Returns the maximum number of digits plus one.
+///
+/// We can exactly represent a float in radix `b` from radix 2 if
+/// `b` is divisible by 2. This function calculates the exact number of
+/// digits required to exactly represent that float. This makes sense,
+/// and the exact reference and I quote is:
+///
+///  &gt; A necessary and sufficient condition for all numbers representable in radix β
+///  &gt; with a finite number of digits to be representable in radix γ with a
+///  &gt; finite number of digits is that β should divide an integer power of γ.
+///
+/// According to the &quot;Handbook of Floating Point Arithmetic&quot;,
+/// for IEEE754, with emin being the min exponent, p2 being the
+/// precision, and b being the radix, the number of digits follows as:
+///
+/// `−emin + p2 + ⌊(emin + 1) log(2, b) − log(1 − 2^(−p2), b)⌋`
+///
+/// For f16, this follows as:
+///     emin = -14
+///     p2 = 11
+///
+/// For bfloat16 , this follows as:
+///     emin = -126
+///     p2 = 8
+///
+/// For f32, this follows as:
+///     emin = -126
+///     p2 = 24
+///
+/// For f64, this follows as:
+///     emin = -1022
+///     p2 = 53
+///
+/// For f128, this follows as:
+///     emin = -16382
+///     p2 = 113
+///
+/// In Python:
+///     `-emin + p2 + math.floor((emin+ 1)*math.log(2, b)-math.log(1-2**(-p2), b))`
+///
+/// This was used to calculate the maximum number of digits for [2, 36].
+///
+/// The minimum, denormal exponent can be calculated as follows: given
+/// the number of exponent bits `exp_bits`, and the number of bits
+/// in the mantissa `mantissa_bits`, we have an exponent bias
+/// `exp_bias` equal to `2^(exp_bits-1) - 1 + mantissa_bits`. We
+/// therefore have a denormal exponent `denormal_exp` equal to
+/// `1 - exp_bias` and the minimum, denormal float `min_float` is
+/// therefore `2^denormal_exp`.
+///
+/// For f16, this follows as:
+///     exp_bits = 5
+///     mantissa_bits = 10
+///     exp_bias = 25
+///     denormal_exp = -24
+///     min_float = 5.96 * 10^−8
+///
+/// For bfloat16, this follows as:
+///     exp_bits = 8
+///     mantissa_bits = 7
+///     exp_bias = 134
+///     denormal_exp = -133
+///     min_float = 9.18 * 10^−41
+///
+/// For f32, this follows as:
+///     exp_bits = 8
+///     mantissa_bits = 23
+///     exp_bias = 150
+///     denormal_exp = -149
+///     min_float = 1.40 * 10^−45
+///
+/// For f64, this follows as:
+///     exp_bits = 11
+///     mantissa_bits = 52
+///     exp_bias = 1075
+///     denormal_exp = -1074
+///     min_float = 5.00 * 10^−324
+///
+/// For f128, this follows as:
+///     exp_bits = 15
+///     mantissa_bits = 112
+///     exp_bias = 16495
+///     denormal_exp = -16494
+///     min_float = 6.48 * 10^−4966
+///
+/// These match statements can be generated with the following Python
+/// code:
+/// ```python
+/// import math
+///
+/// def digits(emin, p2, b):
+///     return -emin + p2 + math.floor((emin+ 1)*math.log(2, b)-math.log(1-2**(-p2), b))
+///
+/// def max_digits(emin, p2):
+///     radices = [6, 10, 12, 14, 18, 20, 22, 24 26 28, 30, 34, 36]
+///     print(&#39;match radix {&#39;)
+///     for radix in radices:
+///         value = digits(emin, p2, radix)
+///         print(f&#39;    {radix} =&gt; Some({value + 2}),&#39;)
+///     print(&#39;    // Powers of two should be unreachable.&#39;)
+///     print(&#39;    // Odd numbers will have infinite digits.&#39;)
+///     print(&#39;    _ =&gt; None,&#39;)
+///     print(&#39;}&#39;)
+/// ```
+</span><span class="kw">pub trait </span>MaxDigits {
+    <span class="kw">fn </span>max_digits(radix: u32) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt;;
+}
+
+<span class="doccomment">/// emin = -126
+/// p2 = 24
+</span><span class="kw">impl </span>MaxDigits <span class="kw">for </span>f32 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>max_digits(radix: u32) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        debug_assert_radix(radix);
+        f32_max_digits(radix)
+    }
+}
+
+<span class="doccomment">/// emin = -1022
+/// p2 = 53
+</span><span class="kw">impl </span>MaxDigits <span class="kw">for </span>f64 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>max_digits(radix: u32) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        debug_assert_radix(radix);
+        f64_max_digits(radix)
+    }
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">impl </span>MaxDigits <span class="kw">for </span>f16 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>max_digits(<span class="kw">_</span>: u32) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
         <span class="macro">unimplemented!</span>()
     }
 }
 
-<span class="comment">///// emin = -16382</span>
-<span class="comment">///// p2 = 113</span>
-<span class="comment">//#[cfg(feature = &quot;f128&quot;)]</span>
-<span class="comment">//impl MaxDigits for f128 {</span>
-<span class="comment">//    #[inline(always)]</span>
-<span class="comment">//    fn max_digits(radix: u32) -&gt; Option&lt;usize&gt; {</span>
-<span class="comment">//        match radix {</span>
-<span class="comment">//            6 =&gt; Some(10159),</span>
-<span class="comment">//            10 =&gt; Some(11565),</span>
-<span class="comment">//            12 =&gt; Some(11927),</span>
-<span class="comment">//            14 =&gt; Some(12194),</span>
-<span class="comment">//            18 =&gt; Some(12568),</span>
-<span class="comment">//            20 =&gt; Some(12706),</span>
-<span class="comment">//            22 =&gt; Some(12823),</span>
-<span class="comment">//            24 =&gt; Some(12924),</span>
-<span class="comment">//            26 =&gt; Some(13012),</span>
-<span class="comment">//            28 =&gt; Some(13089),</span>
-<span class="comment">//            30 =&gt; Some(13158),</span>
-<span class="comment">//            34 =&gt; Some(13277),</span>
-<span class="comment">//            36 =&gt; Some(13328),</span>
-<span class="comment">//            // Powers of two should be unreachable.</span>
-<span class="comment">//            // Odd numbers will have infinite digits.</span>
-<span class="comment">//            _ =&gt; None,</span>
-<span class="comment">//        }</span>
-<span class="comment">//    }</span>
-<span class="comment">//}</span>
-
-<span class="comment">// CONST FN</span>
-<span class="comment">// --------</span>
-
-<span class="doccomment">/// Get the maximum number of significant digits as a const fn.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">f32_max_digits</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">6</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">103</span>),
-        <span class="number">10</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">114</span>),
-        <span class="number">12</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">117</span>),
-        <span class="number">14</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">119</span>),
-        <span class="number">18</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">122</span>),
-        <span class="number">20</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">123</span>),
-        <span class="number">22</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">123</span>),
-        <span class="number">24</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">124</span>),
-        <span class="number">26</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">125</span>),
-        <span class="number">28</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">125</span>),
-        <span class="number">30</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">126</span>),
-        <span class="number">34</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">127</span>),
-        <span class="number">36</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">127</span>),
-        <span class="comment">// Powers of two should be unreachable.</span>
-        <span class="comment">// Odd numbers will have infinite digits.</span>
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">impl </span>MaxDigits <span class="kw">for </span>bf16 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>max_digits(<span class="kw">_</span>: u32) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="macro">unimplemented!</span>()
     }
 }
 
-<span class="doccomment">/// Get the maximum number of significant digits as a const fn.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">f64_max_digits</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">6</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">682</span>),
-        <span class="number">10</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">769</span>),
-        <span class="number">12</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">792</span>),
-        <span class="number">14</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">808</span>),
-        <span class="number">18</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">832</span>),
-        <span class="number">20</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">840</span>),
-        <span class="number">22</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">848</span>),
-        <span class="number">24</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">854</span>),
-        <span class="number">26</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">859</span>),
-        <span class="number">28</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">864</span>),
-        <span class="number">30</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">868</span>),
-        <span class="number">34</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">876</span>),
-        <span class="number">36</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">879</span>),
-        <span class="comment">// Powers of two should be unreachable.</span>
-        <span class="comment">// Odd numbers will have infinite digits.</span>
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="comment">///// emin = -16382
+///// p2 = 113
+//#[cfg(feature = &quot;f128&quot;)]
+//impl MaxDigits for f128 {
+//    #[inline(always)]
+//    fn max_digits(radix: u32) -&gt; Option&lt;usize&gt; {
+//        match radix {
+//            6 =&gt; Some(10159),
+//            10 =&gt; Some(11565),
+//            12 =&gt; Some(11927),
+//            14 =&gt; Some(12194),
+//            18 =&gt; Some(12568),
+//            20 =&gt; Some(12706),
+//            22 =&gt; Some(12823),
+//            24 =&gt; Some(12924),
+//            26 =&gt; Some(13012),
+//            28 =&gt; Some(13089),
+//            30 =&gt; Some(13158),
+//            34 =&gt; Some(13277),
+//            36 =&gt; Some(13328),
+//            // Powers of two should be unreachable.
+//            // Odd numbers will have infinite digits.
+//            _ =&gt; None,
+//        }
+//    }
+//}
+
+// CONST FN
+// --------
+
+</span><span class="doccomment">/// Get the maximum number of significant digits as a const fn.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub const fn </span>f32_max_digits(radix: u32) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+    <span class="kw">match </span>radix {
+        <span class="number">6 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">103</span>),
+        <span class="number">10 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">114</span>),
+        <span class="number">12 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">117</span>),
+        <span class="number">14 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">119</span>),
+        <span class="number">18 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">122</span>),
+        <span class="number">20 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">123</span>),
+        <span class="number">22 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">123</span>),
+        <span class="number">24 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">124</span>),
+        <span class="number">26 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">125</span>),
+        <span class="number">28 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">125</span>),
+        <span class="number">30 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">126</span>),
+        <span class="number">34 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">127</span>),
+        <span class="number">36 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">127</span>),
+        <span class="comment">// Powers of two should be unreachable.
+        // Odd numbers will have infinite digits.
+        </span><span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+    }
+}
+
+<span class="doccomment">/// Get the maximum number of significant digits as a const fn.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub const fn </span>f64_max_digits(radix: u32) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+    <span class="kw">match </span>radix {
+        <span class="number">6 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">682</span>),
+        <span class="number">10 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">769</span>),
+        <span class="number">12 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">792</span>),
+        <span class="number">14 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">808</span>),
+        <span class="number">18 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">832</span>),
+        <span class="number">20 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">840</span>),
+        <span class="number">22 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">848</span>),
+        <span class="number">24 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">854</span>),
+        <span class="number">26 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">859</span>),
+        <span class="number">28 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">864</span>),
+        <span class="number">30 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">868</span>),
+        <span class="number">34 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">876</span>),
+        <span class="number">36 </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">879</span>),
+        <span class="comment">// Powers of two should be unreachable.
+        // Odd numbers will have infinite digits.
+        </span><span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

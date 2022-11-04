@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/layers/prefix.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>prefix.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../metrics_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/layers/prefix.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>prefix.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../metrics_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -154,161 +154,161 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::layers::Layer</span>;
-<span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">Counter</span>, <span class="ident">Gauge</span>, <span class="ident">Histogram</span>, <span class="ident">Key</span>, <span class="ident">KeyName</span>, <span class="ident">Recorder</span>, <span class="ident">SharedString</span>, <span class="ident">Unit</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::layers::Layer;
+<span class="kw">use </span>metrics::{Counter, Gauge, Histogram, Key, KeyName, Recorder, SharedString, Unit};
 
-<span class="doccomment">/// Applies a prefix to every metric key.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Keys will be prefixed in the format of `&lt;prefix&gt;.&lt;remaining&gt;`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Prefix</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="ident">prefix</span>: <span class="ident">SharedString</span>,
-    <span class="ident">inner</span>: <span class="ident">R</span>,
+<span class="doccomment">/// Applies a prefix to every metric key.
+///
+/// Keys will be prefixed in the format of `&lt;prefix&gt;.&lt;remaining&gt;`.
+</span><span class="kw">pub struct </span>Prefix&lt;R&gt; {
+    prefix: SharedString,
+    inner: R,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Prefix</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">prefix_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="ident">Key</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_name</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="self">self</span>.<span class="ident">prefix</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">key</span>.<span class="ident">name</span>().<span class="ident">len</span>());
-        <span class="ident">new_name</span>.<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">prefix</span>.<span class="ident">as_ref</span>());
-        <span class="ident">new_name</span>.<span class="ident">push</span>(<span class="string">&#39;.&#39;</span>);
-        <span class="ident">new_name</span>.<span class="ident">push_str</span>(<span class="ident">key</span>.<span class="ident">name</span>());
+<span class="kw">impl</span>&lt;R&gt; Prefix&lt;R&gt; {
+    <span class="kw">fn </span>prefix_key(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Key {
+        <span class="kw">let </span><span class="kw-2">mut </span>new_name = String::with_capacity(<span class="self">self</span>.prefix.len() + <span class="number">1 </span>+ key.name().len());
+        new_name.push_str(<span class="self">self</span>.prefix.as_ref());
+        new_name.push(<span class="string">&#39;.&#39;</span>);
+        new_name.push_str(key.name());
 
-        <span class="ident">Key::from_parts</span>(<span class="ident">new_name</span>, <span class="ident">key</span>.<span class="ident">labels</span>())
+        Key::from_parts(new_name, key.labels())
     }
 
-    <span class="kw">fn</span> <span class="ident">prefix_key_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_name</span>: <span class="ident">KeyName</span>) -&gt; <span class="ident">KeyName</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_name</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="self">self</span>.<span class="ident">prefix</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">key_name</span>.<span class="ident">as_str</span>().<span class="ident">len</span>());
-        <span class="ident">new_name</span>.<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">prefix</span>.<span class="ident">as_ref</span>());
-        <span class="ident">new_name</span>.<span class="ident">push</span>(<span class="string">&#39;.&#39;</span>);
-        <span class="ident">new_name</span>.<span class="ident">push_str</span>(<span class="ident">key_name</span>.<span class="ident">as_str</span>());
+    <span class="kw">fn </span>prefix_key_name(<span class="kw-2">&amp;</span><span class="self">self</span>, key_name: KeyName) -&gt; KeyName {
+        <span class="kw">let </span><span class="kw-2">mut </span>new_name = String::with_capacity(<span class="self">self</span>.prefix.len() + <span class="number">1 </span>+ key_name.as_str().len());
+        new_name.push_str(<span class="self">self</span>.prefix.as_ref());
+        new_name.push(<span class="string">&#39;.&#39;</span>);
+        new_name.push_str(key_name.as_str());
 
-        <span class="ident">KeyName::from</span>(<span class="ident">new_name</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Recorder</span><span class="op">&gt;</span> <span class="ident">Recorder</span> <span class="kw">for</span> <span class="ident">Prefix</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">describe_counter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_name</span>: <span class="ident">KeyName</span>, <span class="ident">unit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Unit</span><span class="op">&gt;</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">new_key_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">prefix_key_name</span>(<span class="ident">key_name</span>);
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">describe_counter</span>(<span class="ident">new_key_name</span>, <span class="ident">unit</span>, <span class="ident">description</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">describe_gauge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_name</span>: <span class="ident">KeyName</span>, <span class="ident">unit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Unit</span><span class="op">&gt;</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">new_key_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">prefix_key_name</span>(<span class="ident">key_name</span>);
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">describe_gauge</span>(<span class="ident">new_key_name</span>, <span class="ident">unit</span>, <span class="ident">description</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">describe_histogram</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_name</span>: <span class="ident">KeyName</span>, <span class="ident">unit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Unit</span><span class="op">&gt;</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">new_key_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">prefix_key_name</span>(<span class="ident">key_name</span>);
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">describe_histogram</span>(<span class="ident">new_key_name</span>, <span class="ident">unit</span>, <span class="ident">description</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="ident">Counter</span> {
-        <span class="kw">let</span> <span class="ident">new_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">prefix_key</span>(<span class="ident">key</span>);
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="ident">new_key</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">register_gauge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="ident">Gauge</span> {
-        <span class="kw">let</span> <span class="ident">new_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">prefix_key</span>(<span class="ident">key</span>);
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register_gauge</span>(<span class="kw-2">&amp;</span><span class="ident">new_key</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="ident">Histogram</span> {
-        <span class="kw">let</span> <span class="ident">new_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">prefix_key</span>(<span class="ident">key</span>);
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="ident">new_key</span>)
+        KeyName::from(new_name)
     }
 }
 
-<span class="doccomment">/// A layer for applying a prefix to every metric key.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// More information on the behavior of the layer can be found in [`Prefix`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrefixLayer</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>);
+<span class="kw">impl</span>&lt;R: Recorder&gt; Recorder <span class="kw">for </span>Prefix&lt;R&gt; {
+    <span class="kw">fn </span>describe_counter(<span class="kw-2">&amp;</span><span class="self">self</span>, key_name: KeyName, unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;, description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+        <span class="kw">let </span>new_key_name = <span class="self">self</span>.prefix_key_name(key_name);
+        <span class="self">self</span>.inner.describe_counter(new_key_name, unit, description)
+    }
 
-<span class="kw">impl</span> <span class="ident">PrefixLayer</span> {
-    <span class="doccomment">/// Creates a new `PrefixLayer` based on the given prefix.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">prefix</span>: <span class="ident">S</span>) -&gt; <span class="ident">PrefixLayer</span> {
-        <span class="ident">PrefixLayer</span>(<span class="ident">Box::leak</span>(<span class="ident">prefix</span>.<span class="ident">into</span>().<span class="ident">into_boxed_str</span>()))
+    <span class="kw">fn </span>describe_gauge(<span class="kw-2">&amp;</span><span class="self">self</span>, key_name: KeyName, unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;, description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+        <span class="kw">let </span>new_key_name = <span class="self">self</span>.prefix_key_name(key_name);
+        <span class="self">self</span>.inner.describe_gauge(new_key_name, unit, description)
+    }
+
+    <span class="kw">fn </span>describe_histogram(<span class="kw-2">&amp;</span><span class="self">self</span>, key_name: KeyName, unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;, description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+        <span class="kw">let </span>new_key_name = <span class="self">self</span>.prefix_key_name(key_name);
+        <span class="self">self</span>.inner.describe_histogram(new_key_name, unit, description)
+    }
+
+    <span class="kw">fn </span>register_counter(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Counter {
+        <span class="kw">let </span>new_key = <span class="self">self</span>.prefix_key(key);
+        <span class="self">self</span>.inner.register_counter(<span class="kw-2">&amp;</span>new_key)
+    }
+
+    <span class="kw">fn </span>register_gauge(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Gauge {
+        <span class="kw">let </span>new_key = <span class="self">self</span>.prefix_key(key);
+        <span class="self">self</span>.inner.register_gauge(<span class="kw-2">&amp;</span>new_key)
+    }
+
+    <span class="kw">fn </span>register_histogram(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Histogram {
+        <span class="kw">let </span>new_key = <span class="self">self</span>.prefix_key(key);
+        <span class="self">self</span>.inner.register_histogram(<span class="kw-2">&amp;</span>new_key)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PrefixLayer</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Prefix</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A layer for applying a prefix to every metric key.
+///
+/// More information on the behavior of the layer can be found in [`Prefix`].
+</span><span class="kw">pub struct </span>PrefixLayer(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str);
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inner</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident">Prefix</span> { <span class="ident">prefix</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>(), <span class="ident">inner</span> }
+<span class="kw">impl </span>PrefixLayer {
+    <span class="doccomment">/// Creates a new `PrefixLayer` based on the given prefix.
+    </span><span class="kw">pub fn </span>new&lt;S: Into&lt;String&gt;&gt;(prefix: S) -&gt; PrefixLayer {
+        PrefixLayer(Box::leak(prefix.into().into_boxed_str()))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Prefix</span>, <span class="ident">PrefixLayer</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::layers::Layer</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_util</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">Counter</span>, <span class="ident">Gauge</span>, <span class="ident">Histogram</span>, <span class="ident">Key</span>, <span class="ident">KeyName</span>, <span class="ident">Unit</span>};
+<span class="kw">impl</span>&lt;R&gt; Layer&lt;R&gt; <span class="kw">for </span>PrefixLayer {
+    <span class="kw">type </span>Output = Prefix&lt;R&gt;;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_basic_functionality</span>() {
-        <span class="kw">let</span> <span class="ident">inputs</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">RecorderOperation::DescribeCounter</span>(
-                <span class="string">&quot;counter_key&quot;</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">Some</span>(<span class="ident">Unit::Count</span>),
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, inner: R) -&gt; <span class="self">Self</span>::Output {
+        Prefix { prefix: <span class="self">self</span>.<span class="number">0</span>.into(), inner }
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::{Prefix, PrefixLayer};
+    <span class="kw">use </span><span class="kw">crate</span>::layers::Layer;
+    <span class="kw">use </span><span class="kw">crate</span>::test_util::<span class="kw-2">*</span>;
+    <span class="kw">use </span>metrics::{Counter, Gauge, Histogram, Key, KeyName, Unit};
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_basic_functionality() {
+        <span class="kw">let </span>inputs = <span class="macro">vec!</span>[
+            RecorderOperation::DescribeCounter(
+                <span class="string">&quot;counter_key&quot;</span>.into(),
+                <span class="prelude-val">Some</span>(Unit::Count),
                 <span class="string">&quot;counter desc&quot;</span>,
             ),
-            <span class="ident">RecorderOperation::DescribeGauge</span>(<span class="string">&quot;gauge_key&quot;</span>.<span class="ident">into</span>(), <span class="prelude-val">Some</span>(<span class="ident">Unit::Bytes</span>), <span class="string">&quot;gauge desc&quot;</span>),
-            <span class="ident">RecorderOperation::DescribeHistogram</span>(
-                <span class="string">&quot;histogram_key&quot;</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">Some</span>(<span class="ident">Unit::Nanoseconds</span>),
+            RecorderOperation::DescribeGauge(<span class="string">&quot;gauge_key&quot;</span>.into(), <span class="prelude-val">Some</span>(Unit::Bytes), <span class="string">&quot;gauge desc&quot;</span>),
+            RecorderOperation::DescribeHistogram(
+                <span class="string">&quot;histogram_key&quot;</span>.into(),
+                <span class="prelude-val">Some</span>(Unit::Nanoseconds),
                 <span class="string">&quot;histogram desc&quot;</span>,
             ),
-            <span class="ident">RecorderOperation::RegisterCounter</span>(<span class="string">&quot;counter_key&quot;</span>.<span class="ident">into</span>(), <span class="ident">Counter::noop</span>()),
-            <span class="ident">RecorderOperation::RegisterGauge</span>(<span class="string">&quot;gauge_key&quot;</span>.<span class="ident">into</span>(), <span class="ident">Gauge::noop</span>()),
-            <span class="ident">RecorderOperation::RegisterHistogram</span>(<span class="string">&quot;histogram_key&quot;</span>.<span class="ident">into</span>(), <span class="ident">Histogram::noop</span>()),
+            RecorderOperation::RegisterCounter(<span class="string">&quot;counter_key&quot;</span>.into(), Counter::noop()),
+            RecorderOperation::RegisterGauge(<span class="string">&quot;gauge_key&quot;</span>.into(), Gauge::noop()),
+            RecorderOperation::RegisterHistogram(<span class="string">&quot;histogram_key&quot;</span>.into(), Histogram::noop()),
         ];
 
-        <span class="kw">let</span> <span class="ident">expectations</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">RecorderOperation::DescribeCounter</span>(
-                <span class="string">&quot;testing.counter_key&quot;</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">Some</span>(<span class="ident">Unit::Count</span>),
+        <span class="kw">let </span>expectations = <span class="macro">vec!</span>[
+            RecorderOperation::DescribeCounter(
+                <span class="string">&quot;testing.counter_key&quot;</span>.into(),
+                <span class="prelude-val">Some</span>(Unit::Count),
                 <span class="string">&quot;counter desc&quot;</span>,
             ),
-            <span class="ident">RecorderOperation::DescribeGauge</span>(
-                <span class="string">&quot;testing.gauge_key&quot;</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">Some</span>(<span class="ident">Unit::Bytes</span>),
+            RecorderOperation::DescribeGauge(
+                <span class="string">&quot;testing.gauge_key&quot;</span>.into(),
+                <span class="prelude-val">Some</span>(Unit::Bytes),
                 <span class="string">&quot;gauge desc&quot;</span>,
             ),
-            <span class="ident">RecorderOperation::DescribeHistogram</span>(
-                <span class="string">&quot;testing.histogram_key&quot;</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">Some</span>(<span class="ident">Unit::Nanoseconds</span>),
+            RecorderOperation::DescribeHistogram(
+                <span class="string">&quot;testing.histogram_key&quot;</span>.into(),
+                <span class="prelude-val">Some</span>(Unit::Nanoseconds),
                 <span class="string">&quot;histogram desc&quot;</span>,
             ),
-            <span class="ident">RecorderOperation::RegisterCounter</span>(<span class="string">&quot;testing.counter_key&quot;</span>.<span class="ident">into</span>(), <span class="ident">Counter::noop</span>()),
-            <span class="ident">RecorderOperation::RegisterGauge</span>(<span class="string">&quot;testing.gauge_key&quot;</span>.<span class="ident">into</span>(), <span class="ident">Gauge::noop</span>()),
-            <span class="ident">RecorderOperation::RegisterHistogram</span>(<span class="string">&quot;testing.histogram_key&quot;</span>.<span class="ident">into</span>(), <span class="ident">Histogram::noop</span>()),
+            RecorderOperation::RegisterCounter(<span class="string">&quot;testing.counter_key&quot;</span>.into(), Counter::noop()),
+            RecorderOperation::RegisterGauge(<span class="string">&quot;testing.gauge_key&quot;</span>.into(), Gauge::noop()),
+            RecorderOperation::RegisterHistogram(<span class="string">&quot;testing.histogram_key&quot;</span>.into(), Histogram::noop()),
         ];
 
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">MockBasicRecorder::from_operations</span>(<span class="ident">expectations</span>);
-        <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">PrefixLayer::new</span>(<span class="string">&quot;testing&quot;</span>);
-        <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">layer</span>(<span class="ident">recorder</span>);
+        <span class="kw">let </span>recorder = MockBasicRecorder::from_operations(expectations);
+        <span class="kw">let </span>prefix = PrefixLayer::new(<span class="string">&quot;testing&quot;</span>);
+        <span class="kw">let </span>prefix = prefix.layer(recorder);
 
-        <span class="kw">for</span> <span class="ident">operation</span> <span class="kw">in</span> <span class="ident">inputs</span> {
-            <span class="ident">operation</span>.<span class="ident">apply_to_recorder</span>(<span class="kw-2">&amp;</span><span class="ident">prefix</span>);
+        <span class="kw">for </span>operation <span class="kw">in </span>inputs {
+            operation.apply_to_recorder(<span class="kw-2">&amp;</span>prefix);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_key_vs_key_name</span>() {
-        <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">Prefix</span> { <span class="ident">prefix</span>: <span class="string">&quot;foobar&quot;</span>.<span class="ident">into</span>(), <span class="ident">inner</span>: () };
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_key_vs_key_name() {
+        <span class="kw">let </span>prefix = Prefix { prefix: <span class="string">&quot;foobar&quot;</span>.into(), inner: () };
 
-        <span class="kw">let</span> <span class="ident">key_name</span> <span class="op">=</span> <span class="ident">KeyName::from</span>(<span class="string">&quot;my_key&quot;</span>);
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="ident">key_name</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>key_name = KeyName::from(<span class="string">&quot;my_key&quot;</span>);
+        <span class="kw">let </span>key = Key::from_name(key_name.clone());
 
-        <span class="kw">let</span> <span class="ident">prefixed_key</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">prefix_key</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="kw">let</span> <span class="ident">prefixed_key_name</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">prefix_key_name</span>(<span class="ident">key_name</span>);
+        <span class="kw">let </span>prefixed_key = prefix.prefix_key(<span class="kw-2">&amp;</span>key);
+        <span class="kw">let </span>prefixed_key_name = prefix.prefix_key_name(key_name);
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">prefixed_key</span>.<span class="ident">name</span>(),
-            <span class="ident">prefixed_key_name</span>.<span class="ident">as_str</span>(),
-            <span class="string">&quot;prefixed key and prefixed key name should match&quot;</span>
-        );
+            prefixed_key.name(),
+            prefixed_key_name.as_str(),
+            <span class="string">&quot;prefixed key and prefixed key name should match&quot;
+        </span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

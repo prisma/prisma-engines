@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/iterator.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iterator.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/iterator.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iterator.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -927,555 +927,555 @@
 <span id="927">927</span>
 <span id="928">928</span>
 <span id="929">929</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Module providing an iterator over the hyperlinks found in the input text.  Consult the</span>
-<span class="doccomment">//! documentation of `parser::parse::take_link()` to see a list of supported markup languages. The</span>
-<span class="doccomment">//! iterator resolves link references.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Module providing an iterator over the hyperlinks found in the input text.  Consult the
+//! documentation of `parser::parse::take_link()` to see a list of supported markup languages. The
+//! iterator resolves link references.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::parse::take_link</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::Link</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::mem::swap</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::parser::parse::take_link;
+<span class="kw">use </span><span class="kw">crate</span>::parser::Link;
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::mem::swap;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="doccomment">/// A collection of `Link` objects grouped by link type.</span>
-<span class="kw">struct</span> <span class="ident">HyperlinkCollection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Vector storing all `Link::Text2Dest`, `Link::Text2Label` and `Link::TextLabel2Dest` links.</span>
-    <span class="doccomment">/// The tuple is defined as follows: `(link_first_byte_offset, link_len, Link)`.</span>
-    <span class="ident">text2dest_label</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>, <span class="ident">Link</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="doccomment">/// Vector for `Link::Label2Label` links.</span>
-    <span class="ident">label2label</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="doccomment">/// Vector for `Link::Label2Dest` and `Link::TextLabel2Dest` links.</span>
-    <span class="doccomment">/// The `HashMap`&#39;s key is the `link_label` of the link, the value its</span>
-    <span class="doccomment">/// `(link_destination, link_title)`.</span>
-    <span class="ident">label2dest</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq)]
+</span><span class="doccomment">/// A collection of `Link` objects grouped by link type.
+</span><span class="kw">struct </span>HyperlinkCollection&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Vector storing all `Link::Text2Dest`, `Link::Text2Label` and `Link::TextLabel2Dest` links.
+    /// The tuple is defined as follows: `(link_first_byte_offset, link_len, Link)`.
+    </span>text2dest_label: Vec&lt;(usize, usize, Link&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;,
+    <span class="doccomment">/// Vector for `Link::Label2Label` links.
+    </span>label2label: Vec&lt;(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;)&gt;,
+    <span class="doccomment">/// Vector for `Link::Label2Dest` and `Link::TextLabel2Dest` links.
+    /// The `HashMap`&#39;s key is the `link_label` of the link, the value its
+    /// `(link_destination, link_title)`.
+    </span>label2dest: HashMap&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, (Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;)&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">HyperlinkCollection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">text2dest_label</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">label2label</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">label2dest</span>: <span class="ident">HashMap::new</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; HyperlinkCollection&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            text2dest_label: Vec::new(),
+            label2label: Vec::new(),
+            label2dest: HashMap::new(),
         }
     }
 
-    <span class="doccomment">/// Reads through the whole `Self::input` and extracts all hyperlinks and</span>
-    <span class="doccomment">/// stores them in `Self::HyperlinkCollection` according to their category.</span>
-    <span class="doccomment">/// One type is treated specially: `Link::TextLabel2Dest` are cloned and one</span>
-    <span class="doccomment">/// copy is stored in `HyperlinkCollection::Text2Dest` and the other copy is</span>
-    <span class="doccomment">/// stored in `HyperlinkCollection::Label2Dest`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">render_label2dest</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">input</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hc</span> <span class="op">=</span> <span class="ident">HyperlinkCollection::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">anonymous_text2label_counter</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">anonymous_label2x_counter</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="comment">// This index refers to `input`.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_idx</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="doccomment">/// Reads through the whole `Self::input` and extracts all hyperlinks and
+    /// stores them in `Self::HyperlinkCollection` according to their category.
+    /// One type is treated specially: `Link::TextLabel2Dest` are cloned and one
+    /// copy is stored in `HyperlinkCollection::Text2Dest` and the other copy is
+    /// stored in `HyperlinkCollection::Label2Dest`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, render_label2dest: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>i = input;
+        <span class="kw">let </span><span class="kw-2">mut </span>hc = HyperlinkCollection::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>anonymous_text2label_counter = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>anonymous_label2x_counter = <span class="number">0</span>;
+        <span class="comment">// This index refers to `input`.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>input_idx = <span class="number">0</span>;
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="ident">skipped</span>, <span class="ident">res</span>))) <span class="op">=</span> <span class="ident">take_link</span>(<span class="ident">i</span>) {
-            <span class="kw">match</span> <span class="ident">res</span> {
-                <span class="comment">// `Text2Dest` is stored without modification in `hc.text2dest_label`.</span>
-                <span class="ident">l</span> <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">l</span>, <span class="ident">Link::Text2Dest</span> { .. }) =&gt; {
-                    <span class="kw">let</span> <span class="ident">link_offset</span> <span class="op">=</span> <span class="ident">input_idx</span> <span class="op">+</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
-                    <span class="kw">let</span> <span class="ident">link_len</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">j</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
-                    <span class="ident">hc</span>.<span class="ident">text2dest_label</span>.<span class="ident">push</span>((<span class="ident">link_offset</span>, <span class="ident">link_len</span>, <span class="ident">l</span>));
+        <span class="kw">while let </span><span class="prelude-val">Ok</span>((j, (skipped, res))) = take_link(i) {
+            <span class="kw">match </span>res {
+                <span class="comment">// `Text2Dest` is stored without modification in `hc.text2dest_label`.
+                </span>l <span class="kw">if </span><span class="macro">matches!</span>(l, Link::Text2Dest { .. }) =&gt; {
+                    <span class="kw">let </span>link_offset = input_idx + skipped.len();
+                    <span class="kw">let </span>link_len = i.len() - j.len() - skipped.len();
+                    hc.text2dest_label.push((link_offset, link_len, l));
                 }
 
-                <span class="comment">// `Text2label` is stored without modification in `hc.text2dest_label`.</span>
-                <span class="ident">Link::Text2Label</span>(<span class="ident">text</span>, <span class="kw-2">mut</span> <span class="ident">label</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">label</span> <span class="op">==</span> <span class="string">&quot;_&quot;</span> {
-                        <span class="ident">anonymous_text2label_counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                        <span class="ident">label</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="ident">anonymous_text2label_counter</span>));
+                <span class="comment">// `Text2label` is stored without modification in `hc.text2dest_label`.
+                </span>Link::Text2Label(text, <span class="kw-2">mut </span>label) =&gt; {
+                    <span class="kw">if </span>label == <span class="string">&quot;_&quot; </span>{
+                        anonymous_text2label_counter += <span class="number">1</span>;
+                        label = Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, anonymous_text2label_counter));
                     }
-                    <span class="kw">let</span> <span class="ident">link_offset</span> <span class="op">=</span> <span class="ident">input_idx</span> <span class="op">+</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
-                    <span class="kw">let</span> <span class="ident">link_len</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">j</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
-                    <span class="ident">hc</span>.<span class="ident">text2dest_label</span>
-                        .<span class="ident">push</span>((<span class="ident">link_offset</span>, <span class="ident">link_len</span>, <span class="ident">Link::Text2Label</span>(<span class="ident">text</span>, <span class="ident">label</span>)))
+                    <span class="kw">let </span>link_offset = input_idx + skipped.len();
+                    <span class="kw">let </span>link_len = i.len() - j.len() - skipped.len();
+                    hc.text2dest_label
+                        .push((link_offset, link_len, Link::Text2Label(text, label)))
                 }
-                <span class="comment">//`TextLabel2Dest` are cloned and stored in `hc.text2dest_label` as `Text2Dest`</span>
-                <span class="comment">// and in `hc.label2dest` (repacked in a `HashMap`).</span>
-                <span class="ident">Link::TextLabel2Dest</span>(<span class="ident">tl</span>, <span class="ident">d</span>, <span class="ident">t</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">link_offset</span> <span class="op">=</span> <span class="ident">input_idx</span> <span class="op">+</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
-                    <span class="kw">let</span> <span class="ident">link_len</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">j</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
-                    <span class="ident">hc</span>.<span class="ident">text2dest_label</span>.<span class="ident">push</span>((
-                        <span class="ident">link_offset</span>,
-                        <span class="ident">link_len</span>,
-                        <span class="ident">Link::Text2Dest</span>(<span class="ident">tl</span>.<span class="ident">clone</span>(), <span class="ident">d</span>.<span class="ident">clone</span>(), <span class="ident">t</span>.<span class="ident">clone</span>()),
+                <span class="comment">//`TextLabel2Dest` are cloned and stored in `hc.text2dest_label` as `Text2Dest`
+                // and in `hc.label2dest` (repacked in a `HashMap`).
+                </span>Link::TextLabel2Dest(tl, d, t) =&gt; {
+                    <span class="kw">let </span>link_offset = input_idx + skipped.len();
+                    <span class="kw">let </span>link_len = i.len() - j.len() - skipped.len();
+                    hc.text2dest_label.push((
+                        link_offset,
+                        link_len,
+                        Link::Text2Dest(tl.clone(), d.clone(), t.clone()),
                     ));
 
-                    <span class="comment">// Silently ignore when overwriting a key that exists already.</span>
-                    <span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">insert</span>(<span class="ident">tl</span>, (<span class="ident">d</span>, <span class="ident">t</span>));
+                    <span class="comment">// Silently ignore when overwriting a key that exists already.
+                    </span>hc.label2dest.insert(tl, (d, t));
                 }
 
-                <span class="comment">// `Label2Label` are unpacked and stored in `hc.label2label`.</span>
-                <span class="ident">Link::Label2Label</span>(<span class="kw-2">mut</span> <span class="ident">from</span>, <span class="ident">to</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">from</span> <span class="op">==</span> <span class="string">&quot;_&quot;</span> {
-                        <span class="ident">anonymous_label2x_counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                        <span class="ident">from</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="ident">anonymous_label2x_counter</span>));
+                <span class="comment">// `Label2Label` are unpacked and stored in `hc.label2label`.
+                </span>Link::Label2Label(<span class="kw-2">mut </span>from, to) =&gt; {
+                    <span class="kw">if </span>from == <span class="string">&quot;_&quot; </span>{
+                        anonymous_label2x_counter += <span class="number">1</span>;
+                        from = Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, anonymous_label2x_counter));
                     }
-                    <span class="ident">hc</span>.<span class="ident">label2label</span>.<span class="ident">push</span>((<span class="ident">from</span>, <span class="ident">to</span>));
+                    hc.label2label.push((from, to));
                 }
 
-                <span class="comment">// `Label2Dest` are unpacked and stored as `HashMap` in `hc.label2dest`:</span>
-                <span class="ident">Link::Label2Dest</span>(<span class="kw-2">mut</span> <span class="ident">l</span>, <span class="ident">d</span>, <span class="ident">t</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">l</span> <span class="op">==</span> <span class="string">&quot;_&quot;</span> {
-                        <span class="ident">anonymous_label2x_counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                        <span class="ident">l</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="ident">anonymous_label2x_counter</span>));
+                <span class="comment">// `Label2Dest` are unpacked and stored as `HashMap` in `hc.label2dest`:
+                </span>Link::Label2Dest(<span class="kw-2">mut </span>l, d, t) =&gt; {
+                    <span class="kw">if </span>l == <span class="string">&quot;_&quot; </span>{
+                        anonymous_label2x_counter += <span class="number">1</span>;
+                        l = Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, anonymous_label2x_counter));
                     }
-                    <span class="comment">// Some want to have link reference definitions clickable</span>
-                    <span class="comment">// too. Strictly speaking they are not links, this is why</span>
-                    <span class="comment">// this is optional.</span>
-                    <span class="kw">if</span> <span class="ident">render_label2dest</span> {
-                        <span class="kw">let</span> <span class="ident">link_offset</span> <span class="op">=</span> <span class="ident">input_idx</span> <span class="op">+</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
-                        <span class="kw">let</span> <span class="ident">link_len</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">j</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
-                        <span class="ident">hc</span>.<span class="ident">text2dest_label</span>.<span class="ident">push</span>((
-                            <span class="ident">link_offset</span>,
-                            <span class="ident">link_len</span>,
-                            <span class="ident">Link::Text2Dest</span>(
-                                <span class="ident">Cow::from</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">link_offset</span>..<span class="ident">link_offset</span> <span class="op">+</span> <span class="ident">link_len</span>]),
-                                <span class="ident">d</span>.<span class="ident">clone</span>(),
-                                <span class="ident">t</span>.<span class="ident">clone</span>(),
+                    <span class="comment">// Some want to have link reference definitions clickable
+                    // too. Strictly speaking they are not links, this is why
+                    // this is optional.
+                    </span><span class="kw">if </span>render_label2dest {
+                        <span class="kw">let </span>link_offset = input_idx + skipped.len();
+                        <span class="kw">let </span>link_len = i.len() - j.len() - skipped.len();
+                        hc.text2dest_label.push((
+                            link_offset,
+                            link_len,
+                            Link::Text2Dest(
+                                Cow::from(<span class="kw-2">&amp;</span>input[link_offset..link_offset + link_len]),
+                                d.clone(),
+                                t.clone(),
                             ),
                         ));
                     };
 
-                    <span class="comment">// Silently ignore when overwriting a key that exists already.</span>
-                    <span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">insert</span>(<span class="ident">l</span>, (<span class="ident">d</span>, <span class="ident">t</span>));
+                    <span class="comment">// Silently ignore when overwriting a key that exists already.
+                    </span>hc.label2dest.insert(l, (d, t));
                 }
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             };
 
-            <span class="comment">// Prepare next iteration.</span>
-            <span class="ident">input_idx</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">j</span>.<span class="ident">len</span>();
-            <span class="ident">i</span> <span class="op">=</span> <span class="ident">j</span>;
+            <span class="comment">// Prepare next iteration.
+            </span>input_idx += i.len() - j.len();
+            i = j;
         }
 
-        <span class="ident">hc</span>
+        hc
     }
 
-    <span class="doccomment">/// Takes one by one, one item from `HyperlinkCollection::label2label` and</span>
-    <span class="doccomment">/// searches the corresponding label in `HyperlinkCollection::label2dest`.</span>
-    <span class="doccomment">/// When found, add a new item to `HyperlinkCollection::label2dest`. Continue</span>
-    <span class="doccomment">/// until `HyperlinkCollection::label2label` is empty or no more corresponding</span>
-    <span class="doccomment">/// items can be associated.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">resolve_label2label_references</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nb_no_match</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">label2label</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">nb_no_match</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">label2label</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> (<span class="ident">key_alias</span>, <span class="ident">key</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">label2label</span>[<span class="ident">idx</span>];
-            <span class="comment">// This makes sure, that we advance in the loop.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="ident">key</span>) {
-                <span class="kw">let</span> <span class="ident">found_new_key</span> <span class="op">=</span> <span class="ident">key_alias</span>.<span class="ident">clone</span>();
-                <span class="kw">let</span> <span class="ident">found_value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">clone</span>();
-                <span class="comment">// We advance in the loop, because we remove the element `idx` points to.</span>
-                <span class="self">self</span>.<span class="ident">label2label</span>.<span class="ident">remove</span>(<span class="ident">idx</span>);
-                <span class="self">self</span>.<span class="ident">label2dest</span>.<span class="ident">insert</span>(<span class="ident">found_new_key</span>, <span class="ident">found_value</span>);
-                <span class="comment">// We give up only, after a complete round without match.</span>
-                <span class="ident">nb_no_match</span> <span class="op">=</span> <span class="number">0</span>;
-            } <span class="kw">else</span> {
-                <span class="comment">// We advance in the loop because we increment `idx`.</span>
-                <span class="ident">idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">nb_no_match</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="doccomment">/// Takes one by one, one item from `HyperlinkCollection::label2label` and
+    /// searches the corresponding label in `HyperlinkCollection::label2dest`.
+    /// When found, add a new item to `HyperlinkCollection::label2dest`. Continue
+    /// until `HyperlinkCollection::label2label` is empty or no more corresponding
+    /// items can be associated.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>resolve_label2label_references(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>nb_no_match = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>idx = <span class="number">0</span>;
+        <span class="kw">while </span>!<span class="self">self</span>.label2label.is_empty() &amp;&amp; nb_no_match &lt; <span class="self">self</span>.label2label.len() {
+            <span class="kw">let </span>(key_alias, key) = <span class="kw-2">&amp;</span><span class="self">self</span>.label2label[idx];
+            <span class="comment">// This makes sure, that we advance in the loop.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(value) = <span class="self">self</span>.label2dest.get(key) {
+                <span class="kw">let </span>found_new_key = key_alias.clone();
+                <span class="kw">let </span>found_value = value.clone();
+                <span class="comment">// We advance in the loop, because we remove the element `idx` points to.
+                </span><span class="self">self</span>.label2label.remove(idx);
+                <span class="self">self</span>.label2dest.insert(found_new_key, found_value);
+                <span class="comment">// We give up only, after a complete round without match.
+                </span>nb_no_match = <span class="number">0</span>;
+            } <span class="kw">else </span>{
+                <span class="comment">// We advance in the loop because we increment `idx`.
+                </span>idx += <span class="number">1</span>;
+                nb_no_match += <span class="number">1</span>;
             };
-            <span class="comment">// Make sure, that `idx` always points to some valid index.</span>
-            <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">label2label</span>.<span class="ident">len</span>() {
-                <span class="ident">idx</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="comment">// Make sure, that `idx` always points to some valid index.
+            </span><span class="kw">if </span>idx &gt;= <span class="self">self</span>.label2label.len() {
+                idx = <span class="number">0</span>;
             }
         }
     }
 
-    <span class="doccomment">/// Takes one by one, one item of type `Link::Text2Label` from</span>
-    <span class="doccomment">/// `HyperlinkCollection::text2text_label` and searches the corresponding</span>
-    <span class="doccomment">/// label in `HyperlinkCollection::label2dest`. The associated</span>
-    <span class="doccomment">/// `Link::Text2Label` and `Link::Label2Dest` are resolved into a new</span>
-    <span class="doccomment">/// `Link::Text2Dest` object. Then the item form the fist list is replaced by</span>
-    <span class="doccomment">/// this new object. After this operation the</span>
-    <span class="doccomment">/// `HyperlinkCollection::text2text_label` list contains only</span>
-    <span class="doccomment">/// `Link::Text2Dest` objects (and some unresolvable `Link::Text2Label`</span>
-    <span class="doccomment">/// objects).</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">resolve_text2label_references</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">idx</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">text2dest_label</span>.<span class="ident">len</span>() {
-            <span class="comment">// If we can not resolve the label, we just skip it.</span>
-            <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">input_offset</span>, <span class="ident">len</span>, <span class="ident">Link::Text2Label</span>(<span class="ident">text</span>, <span class="ident">label</span>)) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">text2dest_label</span>[<span class="ident">idx</span>] {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">dest</span>, <span class="ident">title</span>)) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">label</span>) {
-                    <span class="kw">let</span> <span class="ident">new_link</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">text</span> <span class="op">==</span> <span class="string">&quot;&quot;</span> {
+    <span class="doccomment">/// Takes one by one, one item of type `Link::Text2Label` from
+    /// `HyperlinkCollection::text2text_label` and searches the corresponding
+    /// label in `HyperlinkCollection::label2dest`. The associated
+    /// `Link::Text2Label` and `Link::Label2Dest` are resolved into a new
+    /// `Link::Text2Dest` object. Then the item form the fist list is replaced by
+    /// this new object. After this operation the
+    /// `HyperlinkCollection::text2text_label` list contains only
+    /// `Link::Text2Dest` objects (and some unresolvable `Link::Text2Label`
+    /// objects).
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>resolve_text2label_references(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>idx = <span class="number">0</span>;
+        <span class="kw">while </span>idx &lt; <span class="self">self</span>.text2dest_label.len() {
+            <span class="comment">// If we can not resolve the label, we just skip it.
+            </span><span class="kw">if let </span>(input_offset, len, Link::Text2Label(text, label)) = <span class="kw-2">&amp;</span><span class="self">self</span>.text2dest_label[idx] {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>((dest, title)) = <span class="kw-2">&amp;</span><span class="self">self</span>.label2dest.get(<span class="kw-2">&amp;*</span>label) {
+                    <span class="kw">let </span>new_link = <span class="kw">if </span>text == <span class="string">&quot;&quot; </span>{
                         (
-                            <span class="kw-2">*</span><span class="ident">input_offset</span>,
-                            <span class="kw-2">*</span><span class="ident">len</span>,
-                            <span class="ident">Link::Text2Dest</span>(<span class="ident">dest</span>.<span class="ident">clone</span>(), <span class="ident">dest</span>.<span class="ident">clone</span>(), <span class="ident">title</span>.<span class="ident">clone</span>()),
+                            <span class="kw-2">*</span>input_offset,
+                            <span class="kw-2">*</span>len,
+                            Link::Text2Dest(dest.clone(), dest.clone(), title.clone()),
                         )
-                    } <span class="kw">else</span> {
+                    } <span class="kw">else </span>{
                         (
-                            <span class="kw-2">*</span><span class="ident">input_offset</span>,
-                            <span class="kw-2">*</span><span class="ident">len</span>,
-                            <span class="ident">Link::Text2Dest</span>(<span class="ident">text</span>.<span class="ident">clone</span>(), <span class="ident">dest</span>.<span class="ident">clone</span>(), <span class="ident">title</span>.<span class="ident">clone</span>()),
+                            <span class="kw-2">*</span>input_offset,
+                            <span class="kw-2">*</span>len,
+                            Link::Text2Dest(text.clone(), dest.clone(), title.clone()),
                         )
                     };
-                    <span class="self">self</span>.<span class="ident">text2dest_label</span>[<span class="ident">idx</span>] <span class="op">=</span> <span class="ident">new_link</span>;
+                    <span class="self">self</span>.text2dest_label[idx] = new_link;
                 };
             };
-            <span class="comment">// We advance in the loop because we increment `idx`.</span>
-            <span class="ident">idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="comment">// We advance in the loop because we increment `idx`.
+            </span>idx += <span class="number">1</span>;
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="doccomment">/// The interator&#39;s state.</span>
-<span class="kw">enum</span> <span class="ident">Status</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Initial state. Iterator is not started.</span>
-    <span class="ident">Init</span>,
-    <span class="doccomment">/// So far only `Text2Dest` links are coming, no links need to be resolved.</span>
-    <span class="ident">DirectSearch</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
-    <span class="doccomment">/// As soon as the first reference appears, the remaining text is read and</span>
-    <span class="doccomment">/// all links are resolved. The tuple describes a resolved link. The first</span>
-    <span class="doccomment">/// integer index points to the first byte of the link in `self.input`, the</span>
-    <span class="doccomment">/// second interger is the lenght of the link in `input` bytes. Then follows</span>
-    <span class="doccomment">/// the `Link`.</span>
-    <span class="ident">ResolvedLinks</span>(<span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>, <span class="ident">Link</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)<span class="op">&gt;</span>),
-    <span class="doccomment">/// All links have been returned. From now on only `None` are returned.</span>
-    <span class="ident">End</span>,
+<span class="attribute">#[derive(Debug, PartialEq)]
+</span><span class="doccomment">/// The interator&#39;s state.
+</span><span class="kw">enum </span>Status&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Initial state. Iterator is not started.
+    </span>Init,
+    <span class="doccomment">/// So far only `Text2Dest` links are coming, no links need to be resolved.
+    </span>DirectSearch(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
+    <span class="doccomment">/// As soon as the first reference appears, the remaining text is read and
+    /// all links are resolved. The tuple describes a resolved link. The first
+    /// integer index points to the first byte of the link in `self.input`, the
+    /// second interger is the lenght of the link in `input` bytes. Then follows
+    /// the `Link`.
+    </span>ResolvedLinks(Vec&lt;(usize, usize, Link&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;),
+    <span class="doccomment">/// All links have been returned. From now on only `None` are returned.
+    </span>End,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="doccomment">/// Iterator over all the hyperlinks in the `input` text.</span>
-<span class="doccomment">/// This struct holds the iterator&#39;s state and an advancing pointer into the `input` text.</span>
-<span class="doccomment">/// The iterator&#39;s `next()` method returns a tuple with 2 tuples inside:</span>
-<span class="doccomment">/// `Some(((input_split)(link_content)))`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Each tuple has the following parts:</span>
-<span class="doccomment">/// * `input_split = (skipped_characters, consumed_characters, remaining_characters)`</span>
-<span class="doccomment">/// * `link_content = (link_text, link_destination, link_title)`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Input split</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::iterator::Hyperlink;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = &quot;abc[text0](dest0)efg[text1](dest1)hij&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut iter = Hyperlink::new(i, false);</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().0, (&quot;abc&quot;, &quot;[text0](dest0)&quot;, &quot;efg[text1](dest1)hij&quot;));</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().0, (&quot;efg&quot;, &quot;[text1](dest1)&quot;, &quot;hij&quot;));</span>
-<span class="doccomment">/// assert_eq!(iter.next(), None);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # Link content</span>
-<span class="doccomment">/// ## Markdown</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::iterator::Hyperlink;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc[text0](dest0 &quot;title0&quot;)abc</span>
-<span class="doccomment">/// abc[text1][label1]abc</span>
-<span class="doccomment">/// abc[text2](dest2 &quot;title2&quot;)</span>
-<span class="doccomment">/// [text3]: dest3 &quot;title3&quot;</span>
-<span class="doccomment">/// [label1]: dest1 &quot;title1&quot;</span>
-<span class="doccomment">/// abc[text3]abc</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut iter = Hyperlink::new(i, false);</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text0&quot;), Cow::from(&quot;dest0&quot;), Cow::from(&quot;title0&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;title1&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text2&quot;), Cow::from(&quot;dest2&quot;), Cow::from(&quot;title2&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text3&quot;), Cow::from(&quot;dest3&quot;), Cow::from(&quot;title3&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next(), None);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## reStructuredText</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::iterator::Hyperlink;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;</span>
-<span class="doccomment">/// abc `text1 &lt;label1_&gt;`_abc</span>
-<span class="doccomment">/// abc text2_ abc</span>
-<span class="doccomment">/// abc text3__ abc</span>
-<span class="doccomment">/// abc text_label4_ abc</span>
-<span class="doccomment">/// abc text5__ abc</span>
-<span class="doccomment">/// .. _label1: dest1</span>
-<span class="doccomment">/// .. _text2: dest2</span>
-<span class="doccomment">/// .. __: dest3</span>
-<span class="doccomment">/// __ dest5</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut iter = Hyperlink::new(i, false);</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text2&quot;), Cow::from(&quot;dest2&quot;), Cow::from(&quot;&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text3&quot;), Cow::from(&quot;dest3&quot;), Cow::from(&quot;&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text5&quot;), Cow::from(&quot;dest5&quot;), Cow::from(&quot;&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next(), None);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// ## Asciidoc</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::iterator::Hyperlink;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc</span>
-<span class="doccomment">/// abc https://dest0[text0]abc</span>
-<span class="doccomment">/// abc link:https://dest1[text1]abc</span>
-<span class="doccomment">/// abc {label2}[text2]abc</span>
-<span class="doccomment">/// abc {label3}abc</span>
-<span class="doccomment">/// :label2: https://dest2</span>
-<span class="doccomment">/// :label3: https://dest3</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut iter = Hyperlink::new(i, false);</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text0&quot;), Cow::from(&quot;https://dest0&quot;), Cow::from(&quot;&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;https://dest1&quot;), Cow::from(&quot;&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text2&quot;), Cow::from(&quot;https://dest2&quot;), Cow::from(&quot;&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;https://dest3&quot;), Cow::from(&quot;https://dest3&quot;), Cow::from(&quot;&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next(), None);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # HTML</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::iterator::Hyperlink;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;abc</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut iter = Hyperlink::new(i, false);</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;title1&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text2&quot;), Cow::from(&quot;dest2&quot;), Cow::from(&quot;title2&quot;)));</span>
-<span class="doccomment">/// assert_eq!(iter.next(), None);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Hyperlink</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The remaining text input.</span>
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Status of the `Hyperlink` state machine.</span>
-    <span class="ident">status</span>: <span class="ident">Status</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Index where the last output started.</span>
-    <span class="ident">last_output_offset</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Length of the last output.</span>
-    <span class="ident">last_output_len</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// By default, `Label2Dest` link reference definitions are not rendered. If</span>
-    <span class="doccomment">/// `render_label` is true, then `Label2Dest` is rendered like an inline</span>
-    <span class="doccomment">/// link: with the full link reference definition&#39;s source as _link text_ and</span>
-    <span class="doccomment">/// the definition&#39;s destination as _link destination_.</span>
-    <span class="ident">render_label</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Debug, PartialEq)]
+</span><span class="doccomment">/// Iterator over all the hyperlinks in the `input` text.
+/// This struct holds the iterator&#39;s state and an advancing pointer into the `input` text.
+/// The iterator&#39;s `next()` method returns a tuple with 2 tuples inside:
+/// `Some(((input_split)(link_content)))`.
+///
+/// Each tuple has the following parts:
+/// * `input_split = (skipped_characters, consumed_characters, remaining_characters)`
+/// * `link_content = (link_text, link_destination, link_title)`
+///
+/// # Input split
+///
+/// ```
+/// use parse_hyperlinks::iterator::Hyperlink;
+/// use std::borrow::Cow;
+///
+/// let i = &quot;abc[text0](dest0)efg[text1](dest1)hij&quot;;
+///
+/// let mut iter = Hyperlink::new(i, false);
+/// assert_eq!(iter.next().unwrap().0, (&quot;abc&quot;, &quot;[text0](dest0)&quot;, &quot;efg[text1](dest1)hij&quot;));
+/// assert_eq!(iter.next().unwrap().0, (&quot;efg&quot;, &quot;[text1](dest1)&quot;, &quot;hij&quot;));
+/// assert_eq!(iter.next(), None);
+/// ```
+/// # Link content
+/// ## Markdown
+/// ```
+/// use parse_hyperlinks::iterator::Hyperlink;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc[text0](dest0 &quot;title0&quot;)abc
+/// abc[text1][label1]abc
+/// abc[text2](dest2 &quot;title2&quot;)
+/// [text3]: dest3 &quot;title3&quot;
+/// [label1]: dest1 &quot;title1&quot;
+/// abc[text3]abc
+/// &quot;#;
+///
+/// let mut iter = Hyperlink::new(i, false);
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text0&quot;), Cow::from(&quot;dest0&quot;), Cow::from(&quot;title0&quot;)));
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;title1&quot;)));
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text2&quot;), Cow::from(&quot;dest2&quot;), Cow::from(&quot;title2&quot;)));
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text3&quot;), Cow::from(&quot;dest3&quot;), Cow::from(&quot;title3&quot;)));
+/// assert_eq!(iter.next(), None);
+/// ```
+///
+/// ## reStructuredText
+///
+/// ```
+/// use parse_hyperlinks::iterator::Hyperlink;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;
+/// abc `text1 &lt;label1_&gt;`_abc
+/// abc text2_ abc
+/// abc text3__ abc
+/// abc text_label4_ abc
+/// abc text5__ abc
+/// .. _label1: dest1
+/// .. _text2: dest2
+/// .. __: dest3
+/// __ dest5
+/// &quot;#;
+///
+/// let mut iter = Hyperlink::new(i, false);
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;&quot;)));
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text2&quot;), Cow::from(&quot;dest2&quot;), Cow::from(&quot;&quot;)));
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text3&quot;), Cow::from(&quot;dest3&quot;), Cow::from(&quot;&quot;)));
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text5&quot;), Cow::from(&quot;dest5&quot;), Cow::from(&quot;&quot;)));
+/// assert_eq!(iter.next(), None);
+///
+/// ```
+/// ## Asciidoc
+///
+/// ```
+/// use parse_hyperlinks::iterator::Hyperlink;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc
+/// abc https://dest0[text0]abc
+/// abc link:https://dest1[text1]abc
+/// abc {label2}[text2]abc
+/// abc {label3}abc
+/// :label2: https://dest2
+/// :label3: https://dest3
+/// &quot;#;
+///
+/// let mut iter = Hyperlink::new(i, false);
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text0&quot;), Cow::from(&quot;https://dest0&quot;), Cow::from(&quot;&quot;)));
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;https://dest1&quot;), Cow::from(&quot;&quot;)));
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text2&quot;), Cow::from(&quot;https://dest2&quot;), Cow::from(&quot;&quot;)));
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;https://dest3&quot;), Cow::from(&quot;https://dest3&quot;), Cow::from(&quot;&quot;)));
+/// assert_eq!(iter.next(), None);
+/// ```
+///
+/// # HTML
+///
+/// ```
+/// use parse_hyperlinks::iterator::Hyperlink;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc
+/// abc&lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;abc
+/// &quot;#;
+///
+/// let mut iter = Hyperlink::new(i, false);
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;title1&quot;)));
+/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text2&quot;), Cow::from(&quot;dest2&quot;), Cow::from(&quot;title2&quot;)));
+/// assert_eq!(iter.next(), None);
+/// ```
+</span><span class="kw">pub struct </span>Hyperlink&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The remaining text input.
+    </span>input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="doccomment">/// Status of the `Hyperlink` state machine.
+    </span>status: Status&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="doccomment">/// Index where the last output started.
+    </span>last_output_offset: usize,
+    <span class="doccomment">/// Length of the last output.
+    </span>last_output_len: usize,
+    <span class="doccomment">/// By default, `Label2Dest` link reference definitions are not rendered. If
+    /// `render_label` is true, then `Label2Dest` is rendered like an inline
+    /// link: with the full link reference definition&#39;s source as _link text_ and
+    /// the definition&#39;s destination as _link destination_.
+    </span>render_label: bool,
 }
 
-<span class="doccomment">/// Constructor for the `Hyperlink` struct.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Hyperlink</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructor for the iterator. `input` is the text with hyperlinks to be</span>
-    <span class="doccomment">/// extracted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Optional rendering of Label2Dest link reference definitions</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default `Label2Dest` link reference definitions are not rendered:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use parse_hyperlinks::iterator::Hyperlink;</span>
-    <span class="doccomment">/// use std::borrow::Cow;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let i = r#&quot;abc[text1][label1]abc</span>
-    <span class="doccomment">/// [label1]: dest1 &quot;title1&quot;</span>
-    <span class="doccomment">/// &quot;#;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut iter = Hyperlink::new(i, false);</span>
-    <span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;title1&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(iter.next(), None);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the internal variable `render_label` is true, then `Label2Dest` link</span>
-    <span class="doccomment">/// reference definitions are rendered like inline links: the full</span>
-    <span class="doccomment">/// `Label2Dest` link reference definition&#39;s source will appear as _link</span>
-    <span class="doccomment">/// text_ and its destination as _link destination_. To enable this feature,</span>
-    <span class="doccomment">/// construct `Hyperlink` with the second positional parameter set to `true`,</span>
-    <span class="doccomment">/// e.g. `Hyperlink::new(i, true)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use parse_hyperlinks::iterator::Hyperlink;</span>
-    <span class="doccomment">/// use std::borrow::Cow;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let i = r#&quot;abc[text1][label1]abc</span>
-    <span class="doccomment">/// [label1]: dest1 &quot;title1&quot;</span>
-    <span class="doccomment">/// &quot;#;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut iter = Hyperlink::new(i, true);</span>
-    <span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;title1&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;[label1]: dest1 \&quot;title1\&quot;&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;title1&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(iter.next(), None);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">render_label</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">input</span>,
-            <span class="ident">status</span>: <span class="ident">Status::Init</span>,
-            <span class="ident">last_output_offset</span>: <span class="number">0</span>,
-            <span class="ident">last_output_len</span>: <span class="number">0</span>,
-            <span class="ident">render_label</span>,
+<span class="doccomment">/// Constructor for the `Hyperlink` struct.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Hyperlink&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Constructor for the iterator. `input` is the text with hyperlinks to be
+    /// extracted.
+    ///
+    /// # Optional rendering of Label2Dest link reference definitions
+    ///
+    /// By default `Label2Dest` link reference definitions are not rendered:
+    ///
+    /// ```
+    /// use parse_hyperlinks::iterator::Hyperlink;
+    /// use std::borrow::Cow;
+    ///
+    /// let i = r#&quot;abc[text1][label1]abc
+    /// [label1]: dest1 &quot;title1&quot;
+    /// &quot;#;
+    ///
+    /// let mut iter = Hyperlink::new(i, false);
+    /// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;title1&quot;)));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    ///
+    /// If the internal variable `render_label` is true, then `Label2Dest` link
+    /// reference definitions are rendered like inline links: the full
+    /// `Label2Dest` link reference definition&#39;s source will appear as _link
+    /// text_ and its destination as _link destination_. To enable this feature,
+    /// construct `Hyperlink` with the second positional parameter set to `true`,
+    /// e.g. `Hyperlink::new(i, true)`.
+    ///
+    /// ```
+    /// use parse_hyperlinks::iterator::Hyperlink;
+    /// use std::borrow::Cow;
+    ///
+    /// let i = r#&quot;abc[text1][label1]abc
+    /// [label1]: dest1 &quot;title1&quot;
+    /// &quot;#;
+    ///
+    /// let mut iter = Hyperlink::new(i, true);
+    /// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;text1&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;title1&quot;)));
+    /// assert_eq!(iter.next().unwrap().1, (Cow::from(&quot;[label1]: dest1 \&quot;title1\&quot;&quot;), Cow::from(&quot;dest1&quot;), Cow::from(&quot;title1&quot;)));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    ///
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>new(input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, render_label: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            input,
+            status: Status::Init,
+            last_output_offset: <span class="number">0</span>,
+            last_output_len: <span class="number">0</span>,
+            render_label,
         }
     }
 }
 
-<span class="doccomment">/// Iterator over the hyperlinks (with markup) in the `input`-text.</span>
-<span class="doccomment">/// The iterator&#39;s `next()` method returns a tuple with 2 tuples inside:</span>
-<span class="doccomment">/// * `Some(((input_split)(link_content)))`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Each tuple has the following parts:</span>
-<span class="doccomment">/// * `input_split = (skipped_characters, consumed_characters, remaining_characters)`</span>
-<span class="doccomment">/// * `link_content = (link_text, link_destination, link_title)`</span>
-<span class="doccomment">///</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Hyperlink</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (
-        (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
-        (<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Iterator over the hyperlinks (with markup) in the `input`-text.
+/// The iterator&#39;s `next()` method returns a tuple with 2 tuples inside:
+/// * `Some(((input_split)(link_content)))`
+///
+/// Each tuple has the following parts:
+/// * `input_split = (skipped_characters, consumed_characters, remaining_characters)`
+/// * `link_content = (link_text, link_destination, link_title)`
+///
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Hyperlink&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[allow(clippy::type_complexity)]
+    </span><span class="kw">type </span>Item = (
+        (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
+        (Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
     );
-    <span class="doccomment">/// The iterator operates in 2 modes:</span>
-    <span class="doccomment">/// 1. `Status::DirectSearch`: This is the starting state. So far</span>
-    <span class="doccomment">///    the iterator has only encountered inline links so far.</span>
-    <span class="doccomment">///    Nothing needs to be resolved and the next method can</span>
-    <span class="doccomment">///    output the link immediately.</span>
-    <span class="doccomment">///    The `next()` method outputs directly the result from the parser</span>
-    <span class="doccomment">///    `parser::take_link()`.</span>
-    <span class="doccomment">/// 2. `Status::ResolvedLinks`: as soon as the iterator encounters</span>
-    <span class="doccomment">///    some reference link, e.g. `Text2label`, `Label2Dest` or</span>
-    <span class="doccomment">///    `Label2Label` link, it switches into `Status::ResolvedLinks` mode.</span>
-    <span class="doccomment">///    The transition happens as follows:</span>
-    <span class="doccomment">///    1. The `next()` method consumes all the remaining `input` and</span>
-    <span class="doccomment">///       calls the `populate_collection()`,</span>
-    <span class="doccomment">///       `resolve_label2label_references()` and</span>
-    <span class="doccomment">///       `resolve_text2label_references()` methods.</span>
-    <span class="doccomment">///       From now on,</span>
-    <span class="doccomment">///    2. the `next()` method outputs and deletes</span>
-    <span class="doccomment">///       `HyperlinkCollection::Dest2Text_label[0]`.</span>
-    <span class="doccomment">///       Not resolved `Text2Label` are ignored.</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Status::Init</span>;
-        <span class="ident">swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">status</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">status</span>);
+    <span class="doccomment">/// The iterator operates in 2 modes:
+    /// 1. `Status::DirectSearch`: This is the starting state. So far
+    ///    the iterator has only encountered inline links so far.
+    ///    Nothing needs to be resolved and the next method can
+    ///    output the link immediately.
+    ///    The `next()` method outputs directly the result from the parser
+    ///    `parser::take_link()`.
+    /// 2. `Status::ResolvedLinks`: as soon as the iterator encounters
+    ///    some reference link, e.g. `Text2label`, `Label2Dest` or
+    ///    `Label2Label` link, it switches into `Status::ResolvedLinks` mode.
+    ///    The transition happens as follows:
+    ///    1. The `next()` method consumes all the remaining `input` and
+    ///       calls the `populate_collection()`,
+    ///       `resolve_label2label_references()` and
+    ///       `resolve_text2label_references()` methods.
+    ///       From now on,
+    ///    2. the `next()` method outputs and deletes
+    ///       `HyperlinkCollection::Dest2Text_label[0]`.
+    ///       Not resolved `Text2Label` are ignored.
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>output = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>status = Status::Init;
+        swap(<span class="kw-2">&amp;mut </span>status, <span class="kw-2">&amp;mut </span><span class="self">self</span>.status);
 
-        <span class="comment">// Advance state machine.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">again</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">while</span> <span class="ident">again</span> {
-            <span class="ident">status</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">status</span> {
-                <span class="comment">// Advance state machine and match one more time.</span>
-                <span class="ident">Status::Init</span> =&gt; <span class="ident">Status::DirectSearch</span>(<span class="self">self</span>.<span class="ident">input</span>),
+        <span class="comment">// Advance state machine.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>again = <span class="bool-val">true</span>;
+        <span class="kw">while </span>again {
+            status = <span class="kw">match </span>status {
+                <span class="comment">// Advance state machine and match one more time.
+                </span>Status::Init =&gt; Status::DirectSearch(<span class="self">self</span>.input),
 
-                <span class="ident">Status::DirectSearch</span>(<span class="ident">input</span>) =&gt; {
-                    <span class="comment">// We stay in direct mode.</span>
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>((<span class="ident">remaining_input</span>, (<span class="ident">skipped</span>, <span class="ident">Link::Text2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)))) <span class="op">=</span>
-                        <span class="ident">take_link</span>(<span class="ident">input</span>)
+                Status::DirectSearch(input) =&gt; {
+                    <span class="comment">// We stay in direct mode.
+                    </span><span class="kw">if let </span><span class="prelude-val">Ok</span>((remaining_input, (skipped, Link::Text2Dest(te, de, ti)))) =
+                        take_link(input)
                     {
-                        <span class="kw">let</span> <span class="ident">consumed</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">skipped</span>.<span class="ident">len</span>()..<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">remaining_input</span>.<span class="ident">len</span>()];
-                        <span class="comment">// Assing output.</span>
-                        <span class="ident">output</span> <span class="op">=</span> <span class="prelude-val">Some</span>(((<span class="ident">skipped</span>, <span class="ident">consumed</span>, <span class="ident">remaining_input</span>), (<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)));
-                        <span class="macro">debug_assert_eq!</span>(<span class="ident">input</span>, {
-                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>();
-                            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="ident">skipped</span>);
-                            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="ident">consumed</span>);
-                            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="ident">remaining_input</span>);
-                            <span class="ident">s</span>
+                        <span class="kw">let </span>consumed = <span class="kw-2">&amp;</span>input[skipped.len()..input.len() - remaining_input.len()];
+                        <span class="comment">// Assing output.
+                        </span>output = <span class="prelude-val">Some</span>(((skipped, consumed, remaining_input), (te, de, ti)));
+                        <span class="macro">debug_assert_eq!</span>(input, {
+                            <span class="kw">let </span><span class="kw-2">mut </span>s = <span class="string">&quot;&quot;</span>.to_string();
+                            s.push_str(skipped);
+                            s.push_str(consumed);
+                            s.push_str(remaining_input);
+                            s
                         });
-                        <span class="comment">// Same state, we leave the loop.</span>
-                        <span class="ident">again</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                        <span class="ident">Status::DirectSearch</span>(<span class="ident">remaining_input</span>)
-                    } <span class="kw">else</span> {
-                        <span class="comment">// We switch to resolving mode.</span>
-                        <span class="self">self</span>.<span class="ident">input</span> <span class="op">=</span> <span class="ident">input</span>;
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hc</span> <span class="op">=</span> <span class="ident">HyperlinkCollection::from</span>(<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">render_label</span>);
-                        <span class="ident">hc</span>.<span class="ident">resolve_label2label_references</span>();
-                        <span class="ident">hc</span>.<span class="ident">resolve_text2label_references</span>();
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resolved_links</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                        <span class="ident">swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">hc</span>.<span class="ident">text2dest_label</span>, <span class="kw-2">&amp;mut</span> <span class="ident">resolved_links</span>);
+                        <span class="comment">// Same state, we leave the loop.
+                        </span>again = <span class="bool-val">false</span>;
+                        Status::DirectSearch(remaining_input)
+                    } <span class="kw">else </span>{
+                        <span class="comment">// We switch to resolving mode.
+                        </span><span class="self">self</span>.input = input;
+                        <span class="kw">let </span><span class="kw-2">mut </span>hc = HyperlinkCollection::from(input, <span class="self">self</span>.render_label);
+                        hc.resolve_label2label_references();
+                        hc.resolve_text2label_references();
+                        <span class="kw">let </span><span class="kw-2">mut </span>resolved_links = Vec::new();
+                        swap(<span class="kw-2">&amp;mut </span>hc.text2dest_label, <span class="kw-2">&amp;mut </span>resolved_links);
 
-                        <span class="comment">// Advance state machine and match one more time.</span>
-                        <span class="ident">Status::ResolvedLinks</span>(<span class="ident">resolved_links</span>)
+                        <span class="comment">// Advance state machine and match one more time.
+                        </span>Status::ResolvedLinks(resolved_links)
                     }
                 }
 
-                <span class="ident">Status::ResolvedLinks</span>(<span class="kw-2">mut</span> <span class="ident">resolved_links</span>) =&gt; {
-                    <span class="kw">while</span> <span class="op">!</span><span class="ident">resolved_links</span>.<span class="ident">is_empty</span>() {
-                        <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">input_offset</span>, <span class="ident">len</span>, <span class="ident">Link::Text2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)) <span class="op">=</span>
-                            <span class="ident">resolved_links</span>.<span class="ident">remove</span>(<span class="number">0</span>)
+                Status::ResolvedLinks(<span class="kw-2">mut </span>resolved_links) =&gt; {
+                    <span class="kw">while </span>!resolved_links.is_empty() {
+                        <span class="kw">if let </span>(input_offset, len, Link::Text2Dest(te, de, ti)) =
+                            resolved_links.remove(<span class="number">0</span>)
                         {
-                            <span class="kw">let</span> <span class="ident">skipped</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>
-                                [(<span class="self">self</span>.<span class="ident">last_output_offset</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">last_output_len</span>)..<span class="ident">input_offset</span>];
-                            <span class="kw">let</span> <span class="ident">consumed</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">input_offset</span>..<span class="ident">input_offset</span> <span class="op">+</span> <span class="ident">len</span>];
-                            <span class="kw">let</span> <span class="ident">remaining_input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">input_offset</span> <span class="op">+</span> <span class="ident">len</span>..];
-                            <span class="comment">// Assign output.</span>
-                            <span class="ident">output</span> <span class="op">=</span> <span class="prelude-val">Some</span>(((<span class="ident">skipped</span>, <span class="ident">consumed</span>, <span class="ident">remaining_input</span>), (<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)));
-                            <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">input</span>, {
-                                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>
-                                    [..<span class="self">self</span>.<span class="ident">last_output_offset</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">last_output_len</span>])
-                                    .<span class="ident">to_string</span>();
-                                <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="ident">skipped</span>);
-                                <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="ident">consumed</span>);
-                                <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="ident">remaining_input</span>);
-                                <span class="ident">s</span>
+                            <span class="kw">let </span>skipped = <span class="kw-2">&amp;</span><span class="self">self</span>.input
+                                [(<span class="self">self</span>.last_output_offset + <span class="self">self</span>.last_output_len)..input_offset];
+                            <span class="kw">let </span>consumed = <span class="kw-2">&amp;</span><span class="self">self</span>.input[input_offset..input_offset + len];
+                            <span class="kw">let </span>remaining_input = <span class="kw-2">&amp;</span><span class="self">self</span>.input[input_offset + len..];
+                            <span class="comment">// Assign output.
+                            </span>output = <span class="prelude-val">Some</span>(((skipped, consumed, remaining_input), (te, de, ti)));
+                            <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.input, {
+                                <span class="kw">let </span><span class="kw-2">mut </span>s = (<span class="kw-2">&amp;</span><span class="self">self</span>.input
+                                    [..<span class="self">self</span>.last_output_offset + <span class="self">self</span>.last_output_len])
+                                    .to_string();
+                                s.push_str(skipped);
+                                s.push_str(consumed);
+                                s.push_str(remaining_input);
+                                s
                             });
-                            <span class="self">self</span>.<span class="ident">last_output_offset</span> <span class="op">=</span> <span class="ident">input_offset</span>;
-                            <span class="self">self</span>.<span class="ident">last_output_len</span> <span class="op">=</span> <span class="ident">len</span>;
+                            <span class="self">self</span>.last_output_offset = input_offset;
+                            <span class="self">self</span>.last_output_len = len;
                             <span class="kw">break</span>;
                         };
                     }
-                    <span class="ident">again</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                    <span class="kw">if</span> <span class="ident">output</span>.<span class="ident">is_some</span>() {
-                        <span class="ident">Status::ResolvedLinks</span>(<span class="ident">resolved_links</span>)
-                    } <span class="kw">else</span> {
-                        <span class="ident">Status::End</span>
+                    again = <span class="bool-val">false</span>;
+                    <span class="kw">if </span>output.is_some() {
+                        Status::ResolvedLinks(resolved_links)
+                    } <span class="kw">else </span>{
+                        Status::End
                     }
                 }
 
-                <span class="ident">Status::End</span> =&gt; {
-                    <span class="ident">again</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                    <span class="ident">output</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                    <span class="ident">Status::End</span>
+                Status::End =&gt; {
+                    again = <span class="bool-val">false</span>;
+                    output = <span class="prelude-val">None</span>;
+                    Status::End
                 }
             }
         }
-        <span class="ident">swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">status</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">status</span>);
-        <span class="ident">output</span>
+        swap(<span class="kw-2">&amp;mut </span>status, <span class="kw-2">&amp;mut </span><span class="self">self</span>.status);
+        output
     }
 }
 
-<span class="doccomment">/// Recognizes hyperlinks in all supported markup languages</span>
-<span class="doccomment">/// and returns the first hyperlink found as tuple:</span>
-<span class="doccomment">/// `Some((link_text, link_destination, link_title))`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns `None` if no hyperlink is found.</span>
-<span class="doccomment">/// This function resolves _link references_.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::iterator::first_hyperlink;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc[t][u]abc</span>
-<span class="doccomment">///            [u]: v &quot;w&quot;</span>
-<span class="doccomment">///            abc&quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let r = first_hyperlink(i);</span>
-<span class="doccomment">/// assert_eq!(r, Some((Cow::from(&quot;t&quot;), Cow::from(&quot;v&quot;), Cow::from(&quot;w&quot;))));</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_hyperlink</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, (<span class="ident">text</span>, <span class="ident">dest</span>, <span class="ident">title</span>))) <span class="op">=</span> <span class="ident">Hyperlink::new</span>(<span class="ident">i</span>, <span class="bool-val">false</span>).<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>((<span class="ident">text</span>, <span class="ident">dest</span>, <span class="ident">title</span>))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+<span class="doccomment">/// Recognizes hyperlinks in all supported markup languages
+/// and returns the first hyperlink found as tuple:
+/// `Some((link_text, link_destination, link_title))`.
+///
+/// Returns `None` if no hyperlink is found.
+/// This function resolves _link references_.
+/// ```
+/// use parse_hyperlinks::iterator::first_hyperlink;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc[t][u]abc
+///            [u]: v &quot;w&quot;
+///            abc&quot;#;
+///
+/// let r = first_hyperlink(i);
+/// assert_eq!(r, Some((Cow::from(&quot;t&quot;), Cow::from(&quot;v&quot;), Cow::from(&quot;w&quot;))));
+/// ```
+</span><span class="kw">pub fn </span>first_hyperlink(i: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(Cow&lt;str&gt;, Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, (text, dest, title))) = Hyperlink::new(i, <span class="bool-val">false</span>).next() {
+        <span class="prelude-val">Some</span>((text, dest, title))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_populate_collection</span>() {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;[md label1]: md_destination1 &quot;md title1&quot;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_populate_collection() {
+        <span class="kw">let </span>i = <span class="string">r#&quot;[md label1]: md_destination1 &quot;md title1&quot;
 abc [md text2](md_destination2 &quot;md title2&quot;)[md text3]: abc[md text4]: abc
    [md label5]: md_destination5 &quot;md title5&quot;
 abc `rst text1 &lt;rst_destination1&gt;`__abc
@@ -1490,9 +1490,9 @@ abc `rst text6`__abc
 abc `rst text_label7 &lt;rst_destination7&gt;`_abc
 &quot;#</span>;
 
-        <span class="kw">let</span> <span class="ident">hc</span> <span class="op">=</span> <span class="ident">HyperlinkCollection::from</span>(<span class="ident">i</span>, <span class="bool-val">false</span>);
+        <span class="kw">let </span>hc = HyperlinkCollection::from(i, <span class="bool-val">false</span>);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">r#&quot;[
+        <span class="kw">let </span>expected = <span class="string">r#&quot;[
     (
         45,
         39,
@@ -1561,12 +1561,12 @@ abc `rst text_label7 &lt;rst_destination7&gt;`_abc
         ),
     ),
 ]&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:#?}&quot;</span>, <span class="ident">hc</span>.<span class="ident">text2dest_label</span>);
-        <span class="comment">//eprintln!(&quot;{}&quot;, res);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">hc</span>.<span class="ident">text2dest_label</span>.<span class="ident">len</span>(), <span class="number">8</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>res = <span class="macro">format!</span>(<span class="string">&quot;{:#?}&quot;</span>, hc.text2dest_label);
+        <span class="comment">//eprintln!(&quot;{}&quot;, res);
+        </span><span class="macro">assert_eq!</span>(hc.text2dest_label.len(), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(res, expected);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">r#&quot;[
+        <span class="kw">let </span>expected = <span class="string">r#&quot;[
     (
         &quot;_1&quot;,
         &quot;rst_label5&quot;,
@@ -1577,37 +1577,37 @@ abc `rst text_label7 &lt;rst_destination7&gt;`_abc
     ),
 ]&quot;#</span>;
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:#?}&quot;</span>, <span class="ident">hc</span>.<span class="ident">label2label</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">hc</span>.<span class="ident">label2label</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>res = <span class="macro">format!</span>(<span class="string">&quot;{:#?}&quot;</span>, hc.label2label);
+        <span class="macro">assert_eq!</span>(hc.label2label.len(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(res, expected);
 
-        <span class="comment">//eprintln!(&quot;{:#?}&quot;, c.label2dest);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">len</span>(), <span class="number">5</span>);
+        <span class="comment">//eprintln!(&quot;{:#?}&quot;, c.label2dest);
+        </span><span class="macro">assert_eq!</span>(hc.label2dest.len(), <span class="number">5</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">*</span><span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="string">&quot;md label1&quot;</span>).<span class="ident">unwrap</span>(),
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;md_destination1&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;md title1&quot;</span>))
+            <span class="kw-2">*</span>hc.label2dest.get(<span class="string">&quot;md label1&quot;</span>).unwrap(),
+            (Cow::from(<span class="string">&quot;md_destination1&quot;</span>), Cow::from(<span class="string">&quot;md title1&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">*</span><span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="string">&quot;md label5&quot;</span>).<span class="ident">unwrap</span>(),
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;md_destination5&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;md title5&quot;</span>))
+            <span class="kw-2">*</span>hc.label2dest.get(<span class="string">&quot;md label5&quot;</span>).unwrap(),
+            (Cow::from(<span class="string">&quot;md_destination5&quot;</span>), Cow::from(<span class="string">&quot;md title5&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">*</span><span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="string">&quot;rst label3&quot;</span>).<span class="ident">unwrap</span>(),
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;rst_destination3&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+            <span class="kw-2">*</span>hc.label2dest.get(<span class="string">&quot;rst label3&quot;</span>).unwrap(),
+            (Cow::from(<span class="string">&quot;rst_destination3&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">*</span><span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="string">&quot;rst label4&quot;</span>).<span class="ident">unwrap</span>(),
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;rst_destination4&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+            <span class="kw-2">*</span>hc.label2dest.get(<span class="string">&quot;rst label4&quot;</span>).unwrap(),
+            (Cow::from(<span class="string">&quot;rst_destination4&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">*</span><span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="string">&quot;rst text_label7&quot;</span>).<span class="ident">unwrap</span>(),
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;rst_destination7&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+            <span class="kw-2">*</span>hc.label2dest.get(<span class="string">&quot;rst text_label7&quot;</span>).unwrap(),
+            (Cow::from(<span class="string">&quot;rst_destination7&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_resolve_label2label_references</span>() {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;label2_
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_resolve_label2label_references() {
+        <span class="kw">let </span>i = <span class="string">r#&quot;label2_
 .. _label2: rst_destination2
   .. _label5: label4_
   .. _label1: nolabel_
@@ -1615,37 +1615,37 @@ abc `rst text_label7 &lt;rst_destination7&gt;`_abc
   .. _label3: label2_
 &quot;#</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hc</span> <span class="op">=</span> <span class="ident">HyperlinkCollection::from</span>(<span class="ident">i</span>, <span class="bool-val">false</span>);
-        <span class="ident">hc</span>.<span class="ident">resolve_label2label_references</span>();
-        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">hc</span>.<span class="ident">label2label</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>hc = HyperlinkCollection::from(i, <span class="bool-val">false</span>);
+        hc.resolve_label2label_references();
+        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);
+        </span><span class="macro">assert_eq!</span>(hc.label2label.len(), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">hc</span>.<span class="ident">label2label</span>[<span class="number">0</span>],
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;label1&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;nolabel&quot;</span>))
+            hc.label2label[<span class="number">0</span>],
+            (Cow::from(<span class="string">&quot;label1&quot;</span>), Cow::from(<span class="string">&quot;nolabel&quot;</span>))
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">len</span>(), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(hc.label2dest.len(), <span class="number">4</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">*</span><span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="string">&quot;label2&quot;</span>).<span class="ident">unwrap</span>(),
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;rst_destination2&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+            <span class="kw-2">*</span>hc.label2dest.get(<span class="string">&quot;label2&quot;</span>).unwrap(),
+            (Cow::from(<span class="string">&quot;rst_destination2&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">*</span><span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="string">&quot;label3&quot;</span>).<span class="ident">unwrap</span>(),
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;rst_destination2&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+            <span class="kw-2">*</span>hc.label2dest.get(<span class="string">&quot;label3&quot;</span>).unwrap(),
+            (Cow::from(<span class="string">&quot;rst_destination2&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">*</span><span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="string">&quot;label4&quot;</span>).<span class="ident">unwrap</span>(),
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;rst_destination2&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+            <span class="kw-2">*</span>hc.label2dest.get(<span class="string">&quot;label4&quot;</span>).unwrap(),
+            (Cow::from(<span class="string">&quot;rst_destination2&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">*</span><span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="string">&quot;label5&quot;</span>).<span class="ident">unwrap</span>(),
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;rst_destination2&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+            <span class="kw-2">*</span>hc.label2dest.get(<span class="string">&quot;label5&quot;</span>).unwrap(),
+            (Cow::from(<span class="string">&quot;rst_destination2&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_resolve_text2label_references</span>() {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;abc[text1][label1]abc
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_resolve_text2label_references() {
+        <span class="kw">let </span>i = <span class="string">r#&quot;abc[text1][label1]abc
         abc [text2](destination2 &quot;title2&quot;)
           [label3]: destination3 &quot;title3&quot;
           [label1]: destination1 &quot;title1&quot;
@@ -1654,62 +1654,62 @@ abc `rst text_label7 &lt;rst_destination7&gt;`_abc
         label4_
         &quot;#</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hc</span> <span class="op">=</span> <span class="ident">HyperlinkCollection::from</span>(<span class="ident">i</span>, <span class="bool-val">false</span>);
-        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);</span>
-        <span class="ident">hc</span>.<span class="ident">resolve_label2label_references</span>();
-        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);</span>
-        <span class="ident">hc</span>.<span class="ident">resolve_text2label_references</span>();
-        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>hc = HyperlinkCollection::from(i, <span class="bool-val">false</span>);
+        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);
+        </span>hc.resolve_label2label_references();
+        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);
+        </span>hc.resolve_text2label_references();
+        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        </span><span class="kw">let </span>expected = <span class="macro">vec!</span>[
             (
                 <span class="number">3</span>,
                 <span class="number">15</span>,
-                <span class="ident">Link::Text2Dest</span>(
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;text1&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;destination1&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;title1&quot;</span>),
+                Link::Text2Dest(
+                    Cow::from(<span class="string">&quot;text1&quot;</span>),
+                    Cow::from(<span class="string">&quot;destination1&quot;</span>),
+                    Cow::from(<span class="string">&quot;title1&quot;</span>),
                 ),
             ),
             (
                 <span class="number">34</span>,
                 <span class="number">30</span>,
-                <span class="ident">Link::Text2Dest</span>(
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;text2&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;destination2&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;title2&quot;</span>),
+                Link::Text2Dest(
+                    Cow::from(<span class="string">&quot;text2&quot;</span>),
+                    Cow::from(<span class="string">&quot;destination2&quot;</span>),
+                    Cow::from(<span class="string">&quot;title2&quot;</span>),
                 ),
             ),
             (
                 <span class="number">191</span>,
                 <span class="number">8</span>,
-                <span class="ident">Link::Text2Dest</span>(
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;label3&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;destination3&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;title3&quot;</span>),
+                Link::Text2Dest(
+                    Cow::from(<span class="string">&quot;label3&quot;</span>),
+                    Cow::from(<span class="string">&quot;destination3&quot;</span>),
+                    Cow::from(<span class="string">&quot;title3&quot;</span>),
                 ),
             ),
             (
                 <span class="number">202</span>,
                 <span class="number">8</span>,
-                <span class="ident">Link::Text2Label</span>(<span class="ident">Cow::from</span>(<span class="string">&quot;label5&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;label5&quot;</span>)),
+                Link::Text2Label(Cow::from(<span class="string">&quot;label5&quot;</span>), Cow::from(<span class="string">&quot;label5&quot;</span>)),
             ),
             (
                 <span class="number">222</span>,
                 <span class="number">7</span>,
-                <span class="ident">Link::Text2Dest</span>(
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;label4&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;destination3&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;title3&quot;</span>),
+                Link::Text2Dest(
+                    Cow::from(<span class="string">&quot;label4&quot;</span>),
+                    Cow::from(<span class="string">&quot;destination3&quot;</span>),
+                    Cow::from(<span class="string">&quot;title3&quot;</span>),
                 ),
             ),
         ];
-        <span class="macro">assert_eq!</span>(<span class="ident">hc</span>.<span class="ident">text2dest_label</span>, <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(hc.text2dest_label, expected);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_resolve_text2label_references2</span>() {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_resolve_text2label_references2() {
+        <span class="kw">let </span>i = <span class="string">r#&quot;
 abc `text1 &lt;label1_&gt;`_abc
 abc text_label2_ abc
 abc text3__ abc
@@ -1721,78 +1721,78 @@ abc text5__ abc
   __ destination5
         &quot;#</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hc</span> <span class="op">=</span> <span class="ident">HyperlinkCollection::from</span>(<span class="ident">i</span>, <span class="bool-val">false</span>);
-        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);</span>
-        <span class="ident">hc</span>.<span class="ident">resolve_label2label_references</span>();
-        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);</span>
-        <span class="ident">hc</span>.<span class="ident">resolve_text2label_references</span>();
-        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>hc = HyperlinkCollection::from(i, <span class="bool-val">false</span>);
+        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);
+        </span>hc.resolve_label2label_references();
+        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);
+        </span>hc.resolve_text2label_references();
+        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        </span><span class="kw">let </span>expected = <span class="macro">vec!</span>[
             (
                 <span class="number">5</span>,
                 <span class="number">18</span>,
-                <span class="ident">Link::Text2Dest</span>(<span class="ident">Cow::from</span>(<span class="string">&quot;text1&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;destination1&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)),
+                Link::Text2Dest(Cow::from(<span class="string">&quot;text1&quot;</span>), Cow::from(<span class="string">&quot;destination1&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>)),
             ),
             (
                 <span class="number">31</span>,
                 <span class="number">12</span>,
-                <span class="ident">Link::Text2Dest</span>(
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;text_label2&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;destination2&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                Link::Text2Dest(
+                    Cow::from(<span class="string">&quot;text_label2&quot;</span>),
+                    Cow::from(<span class="string">&quot;destination2&quot;</span>),
+                    Cow::from(<span class="string">&quot;&quot;</span>),
                 ),
             ),
             (
                 <span class="number">52</span>,
                 <span class="number">7</span>,
-                <span class="ident">Link::Text2Dest</span>(<span class="ident">Cow::from</span>(<span class="string">&quot;text3&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;destination3&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)),
+                Link::Text2Dest(Cow::from(<span class="string">&quot;text3&quot;</span>), Cow::from(<span class="string">&quot;destination3&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>)),
             ),
             (
                 <span class="number">68</span>,
                 <span class="number">12</span>,
-                <span class="ident">Link::Text2Label</span>(<span class="ident">Cow::from</span>(<span class="string">&quot;text_label4&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;text_label4&quot;</span>)),
+                Link::Text2Label(Cow::from(<span class="string">&quot;text_label4&quot;</span>), Cow::from(<span class="string">&quot;text_label4&quot;</span>)),
             ),
             (
                 <span class="number">89</span>,
                 <span class="number">7</span>,
-                <span class="ident">Link::Text2Dest</span>(<span class="ident">Cow::from</span>(<span class="string">&quot;text5&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;destination5&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)),
+                Link::Text2Dest(Cow::from(<span class="string">&quot;text5&quot;</span>), Cow::from(<span class="string">&quot;destination5&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>)),
             ),
         ];
-        <span class="macro">assert_eq!</span>(<span class="ident">hc</span>.<span class="ident">text2dest_label</span>, <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(hc.text2dest_label, expected);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_resolve_text2label_references3</span>() {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_resolve_text2label_references3() {
+        <span class="kw">let </span>i = <span class="string">r#&quot;
 abc[my homepage]abc
 abc
 
 [my homepage]: https://getreu.net
 abc&quot;#</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hc</span> <span class="op">=</span> <span class="ident">HyperlinkCollection::from</span>(<span class="ident">i</span>, <span class="bool-val">false</span>);
-        <span class="macro">eprintln!</span>(<span class="string">&quot;{:#?}&quot;</span>, <span class="ident">hc</span>);
-        <span class="ident">hc</span>.<span class="ident">resolve_label2label_references</span>();
-        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);</span>
-        <span class="ident">hc</span>.<span class="ident">resolve_text2label_references</span>();
-        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>hc = HyperlinkCollection::from(i, <span class="bool-val">false</span>);
+        <span class="macro">eprintln!</span>(<span class="string">&quot;{:#?}&quot;</span>, hc);
+        hc.resolve_label2label_references();
+        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);
+        </span>hc.resolve_text2label_references();
+        <span class="comment">//eprintln!(&quot;{:#?}&quot;, hc);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">vec!</span>[(
+        </span><span class="kw">let </span>expected = <span class="macro">vec!</span>[(
             <span class="number">4</span>,
             <span class="number">13</span>,
-            <span class="ident">Link::Text2Dest</span>(
-                <span class="ident">Cow::from</span>(<span class="string">&quot;my homepage&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;https://getreu.net&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+            Link::Text2Dest(
+                Cow::from(<span class="string">&quot;my homepage&quot;</span>),
+                Cow::from(<span class="string">&quot;https://getreu.net&quot;</span>),
+                Cow::from(<span class="string">&quot;&quot;</span>),
             ),
         )];
-        <span class="macro">assert_eq!</span>(<span class="ident">hc</span>.<span class="ident">text2dest_label</span>, <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(hc.text2dest_label, expected);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_next</span>() {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;abc[text0](destination0)abc
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_next() {
+        <span class="kw">let </span>i = <span class="string">r#&quot;abc[text0](destination0)abc
 abc[text1][label1]abc
 abc [text2](destination2 &quot;title2&quot;)
   [label3]: destination3 &quot;title3&quot;
@@ -1802,59 +1802,59 @@ abc[label3]abc[label5]abc
 label4_
         &quot;#</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">Hyperlink::new</span>(<span class="ident">i</span>, <span class="bool-val">false</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>iter = Hyperlink::new(i, <span class="bool-val">false</span>);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="ident">Cow::from</span>(<span class="string">&quot;text0&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;destination0&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>));
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
-        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">item</span>.<span class="number">1</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>expected = (Cow::from(<span class="string">&quot;text0&quot;</span>), Cow::from(<span class="string">&quot;destination0&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>));
+        <span class="kw">let </span>item = iter.next().unwrap();
+        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);
+        </span><span class="macro">assert_eq!</span>(item.<span class="number">1</span>, expected);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
-            <span class="ident">Cow::from</span>(<span class="string">&quot;text1&quot;</span>),
-            <span class="ident">Cow::from</span>(<span class="string">&quot;destination1&quot;</span>),
-            <span class="ident">Cow::from</span>(<span class="string">&quot;title1&quot;</span>),
+        <span class="kw">let </span>expected = (
+            Cow::from(<span class="string">&quot;text1&quot;</span>),
+            Cow::from(<span class="string">&quot;destination1&quot;</span>),
+            Cow::from(<span class="string">&quot;title1&quot;</span>),
         );
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
-        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">item</span>.<span class="number">1</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>item = iter.next().unwrap();
+        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);
+        </span><span class="macro">assert_eq!</span>(item.<span class="number">1</span>, expected);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
-            <span class="ident">Cow::from</span>(<span class="string">&quot;text2&quot;</span>),
-            <span class="ident">Cow::from</span>(<span class="string">&quot;destination2&quot;</span>),
-            <span class="ident">Cow::from</span>(<span class="string">&quot;title2&quot;</span>),
+        <span class="kw">let </span>expected = (
+            Cow::from(<span class="string">&quot;text2&quot;</span>),
+            Cow::from(<span class="string">&quot;destination2&quot;</span>),
+            Cow::from(<span class="string">&quot;title2&quot;</span>),
         );
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
-        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">item</span>.<span class="number">1</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>item = iter.next().unwrap();
+        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);
+        </span><span class="macro">assert_eq!</span>(item.<span class="number">1</span>, expected);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
-            <span class="ident">Cow::from</span>(<span class="string">&quot;label3&quot;</span>),
-            <span class="ident">Cow::from</span>(<span class="string">&quot;destination3&quot;</span>),
-            <span class="ident">Cow::from</span>(<span class="string">&quot;title3&quot;</span>),
+        <span class="kw">let </span>expected = (
+            Cow::from(<span class="string">&quot;label3&quot;</span>),
+            Cow::from(<span class="string">&quot;destination3&quot;</span>),
+            Cow::from(<span class="string">&quot;title3&quot;</span>),
         );
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
-        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">item</span>.<span class="number">1</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>item = iter.next().unwrap();
+        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);
+        </span><span class="macro">assert_eq!</span>(item.<span class="number">1</span>, expected);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
-            <span class="ident">Cow::from</span>(<span class="string">&quot;label4&quot;</span>),
-            <span class="ident">Cow::from</span>(<span class="string">&quot;destination3&quot;</span>),
-            <span class="ident">Cow::from</span>(<span class="string">&quot;title3&quot;</span>),
+        <span class="kw">let </span>expected = (
+            Cow::from(<span class="string">&quot;label4&quot;</span>),
+            Cow::from(<span class="string">&quot;destination3&quot;</span>),
+            Cow::from(<span class="string">&quot;title3&quot;</span>),
         );
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
-        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">item</span>.<span class="number">1</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>item = iter.next().unwrap();
+        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);
+        </span><span class="macro">assert_eq!</span>(item.<span class="number">1</span>, expected);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
-        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">item</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>expected = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>item = iter.next();
+        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);
+        </span><span class="macro">assert_eq!</span>(item, expected);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
-        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">item</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>expected = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>item = iter.next();
+        <span class="comment">//eprintln!(&quot;item: {:#?}&quot;, item);
+        </span><span class="macro">assert_eq!</span>(item, expected);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

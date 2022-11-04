@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/month.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>month.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../chrono/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/month.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>month.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../chrono/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -350,357 +350,357 @@
 <span id="350">350</span>
 <span id="351">351</span>
 <span id="352">352</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>core::fmt;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rkyv&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">rkyv</span>::{<span class="ident">Archive</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;rkyv&quot;</span>)]
+</span><span class="kw">use </span>rkyv::{Archive, Deserialize, Serialize};
 
-<span class="doccomment">/// The month of the year.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This enum is just a convenience implementation.</span>
-<span class="doccomment">/// The month in dates created by DateLike objects does not return this enum.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is possible to convert from a date to a month independently</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use num_traits::FromPrimitive;</span>
-<span class="doccomment">/// use chrono::prelude::*;</span>
-<span class="doccomment">/// let date = Utc.ymd(2019, 10, 28).and_hms(9, 10, 11);</span>
-<span class="doccomment">/// // `2019-10-28T09:10:11Z`</span>
-<span class="doccomment">/// let month = Month::from_u32(date.month());</span>
-<span class="doccomment">/// assert_eq!(month, Some(Month::October))</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Or from a Month to an integer usable by dates</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use chrono::prelude::*;</span>
-<span class="doccomment">/// let month = Month::January;</span>
-<span class="doccomment">/// let dt = Utc.ymd(2019, month.number_from_month(), 28).and_hms(9, 10, 11);</span>
-<span class="doccomment">/// assert_eq!((dt.year(), dt.month(), dt.day()), (2019, 1, 28));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Allows mapping from and to month, from 1-January to 12-December.</span>
-<span class="doccomment">/// Can be Serialized/Deserialized with serde</span>
-<span class="comment">// Actual implementation is zero-indexed, API intended as 1-indexed for more intuitive behavior.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustc-serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">RustcEncodable</span>, <span class="ident">RustcDecodable</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rkyv&quot;</span>, <span class="ident">derive</span>(<span class="ident">Archive</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Month</span> {
-    <span class="doccomment">/// January</span>
-    <span class="ident">January</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// February</span>
-    <span class="ident">February</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// March</span>
-    <span class="ident">March</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// April</span>
-    <span class="ident">April</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="doccomment">/// May</span>
-    <span class="ident">May</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="doccomment">/// June</span>
-    <span class="ident">June</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="doccomment">/// July</span>
-    <span class="ident">July</span> <span class="op">=</span> <span class="number">6</span>,
-    <span class="doccomment">/// August</span>
-    <span class="ident">August</span> <span class="op">=</span> <span class="number">7</span>,
-    <span class="doccomment">/// September</span>
-    <span class="ident">September</span> <span class="op">=</span> <span class="number">8</span>,
-    <span class="doccomment">/// October</span>
-    <span class="ident">October</span> <span class="op">=</span> <span class="number">9</span>,
-    <span class="doccomment">/// November</span>
-    <span class="ident">November</span> <span class="op">=</span> <span class="number">10</span>,
-    <span class="doccomment">/// December</span>
-    <span class="ident">December</span> <span class="op">=</span> <span class="number">11</span>,
+<span class="doccomment">/// The month of the year.
+///
+/// This enum is just a convenience implementation.
+/// The month in dates created by DateLike objects does not return this enum.
+///
+/// It is possible to convert from a date to a month independently
+/// ```
+/// use num_traits::FromPrimitive;
+/// use chrono::prelude::*;
+/// let date = Utc.ymd(2019, 10, 28).and_hms(9, 10, 11);
+/// // `2019-10-28T09:10:11Z`
+/// let month = Month::from_u32(date.month());
+/// assert_eq!(month, Some(Month::October))
+/// ```
+/// Or from a Month to an integer usable by dates
+/// ```
+/// # use chrono::prelude::*;
+/// let month = Month::January;
+/// let dt = Utc.ymd(2019, month.number_from_month(), 28).and_hms(9, 10, 11);
+/// assert_eq!((dt.year(), dt.month(), dt.day()), (2019, 1, 28));
+/// ```
+/// Allows mapping from and to month, from 1-January to 12-December.
+/// Can be Serialized/Deserialized with serde
+</span><span class="comment">// Actual implementation is zero-indexed, API intended as 1-indexed for more intuitive behavior.
+</span><span class="attribute">#[derive(PartialEq, Eq, Copy, Clone, Debug, Hash)]
+#[cfg_attr(feature = <span class="string">&quot;rustc-serialize&quot;</span>, derive(RustcEncodable, RustcDecodable))]
+#[cfg_attr(feature = <span class="string">&quot;rkyv&quot;</span>, derive(Archive, Deserialize, Serialize))]
+</span><span class="kw">pub enum </span>Month {
+    <span class="doccomment">/// January
+    </span>January = <span class="number">0</span>,
+    <span class="doccomment">/// February
+    </span>February = <span class="number">1</span>,
+    <span class="doccomment">/// March
+    </span>March = <span class="number">2</span>,
+    <span class="doccomment">/// April
+    </span>April = <span class="number">3</span>,
+    <span class="doccomment">/// May
+    </span>May = <span class="number">4</span>,
+    <span class="doccomment">/// June
+    </span>June = <span class="number">5</span>,
+    <span class="doccomment">/// July
+    </span>July = <span class="number">6</span>,
+    <span class="doccomment">/// August
+    </span>August = <span class="number">7</span>,
+    <span class="doccomment">/// September
+    </span>September = <span class="number">8</span>,
+    <span class="doccomment">/// October
+    </span>October = <span class="number">9</span>,
+    <span class="doccomment">/// November
+    </span>November = <span class="number">10</span>,
+    <span class="doccomment">/// December
+    </span>December = <span class="number">11</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Month</span> {
-    <span class="doccomment">/// The next month.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `m`:        | `January`  | `February` | `...` | `December`</span>
-    <span class="doccomment">/// ----------- | ---------  | ---------- | --- | ---------</span>
-    <span class="doccomment">/// `m.succ()`: | `February` | `March`    | `...` | `January`</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">succ</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Month</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Month::January</span> =&gt; <span class="ident">Month::February</span>,
-            <span class="ident">Month::February</span> =&gt; <span class="ident">Month::March</span>,
-            <span class="ident">Month::March</span> =&gt; <span class="ident">Month::April</span>,
-            <span class="ident">Month::April</span> =&gt; <span class="ident">Month::May</span>,
-            <span class="ident">Month::May</span> =&gt; <span class="ident">Month::June</span>,
-            <span class="ident">Month::June</span> =&gt; <span class="ident">Month::July</span>,
-            <span class="ident">Month::July</span> =&gt; <span class="ident">Month::August</span>,
-            <span class="ident">Month::August</span> =&gt; <span class="ident">Month::September</span>,
-            <span class="ident">Month::September</span> =&gt; <span class="ident">Month::October</span>,
-            <span class="ident">Month::October</span> =&gt; <span class="ident">Month::November</span>,
-            <span class="ident">Month::November</span> =&gt; <span class="ident">Month::December</span>,
-            <span class="ident">Month::December</span> =&gt; <span class="ident">Month::January</span>,
+<span class="kw">impl </span>Month {
+    <span class="doccomment">/// The next month.
+    ///
+    /// `m`:        | `January`  | `February` | `...` | `December`
+    /// ----------- | ---------  | ---------- | --- | ---------
+    /// `m.succ()`: | `February` | `March`    | `...` | `January`
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>succ(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Month {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Month::January =&gt; Month::February,
+            Month::February =&gt; Month::March,
+            Month::March =&gt; Month::April,
+            Month::April =&gt; Month::May,
+            Month::May =&gt; Month::June,
+            Month::June =&gt; Month::July,
+            Month::July =&gt; Month::August,
+            Month::August =&gt; Month::September,
+            Month::September =&gt; Month::October,
+            Month::October =&gt; Month::November,
+            Month::November =&gt; Month::December,
+            Month::December =&gt; Month::January,
         }
     }
 
-    <span class="doccomment">/// The previous month.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `m`:        | `January`  | `February` | `...` | `December`</span>
-    <span class="doccomment">/// ----------- | ---------  | ---------- | --- | ---------</span>
-    <span class="doccomment">/// `m.pred()`: | `December` | `January`  | `...` | `November`</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pred</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Month</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Month::January</span> =&gt; <span class="ident">Month::December</span>,
-            <span class="ident">Month::February</span> =&gt; <span class="ident">Month::January</span>,
-            <span class="ident">Month::March</span> =&gt; <span class="ident">Month::February</span>,
-            <span class="ident">Month::April</span> =&gt; <span class="ident">Month::March</span>,
-            <span class="ident">Month::May</span> =&gt; <span class="ident">Month::April</span>,
-            <span class="ident">Month::June</span> =&gt; <span class="ident">Month::May</span>,
-            <span class="ident">Month::July</span> =&gt; <span class="ident">Month::June</span>,
-            <span class="ident">Month::August</span> =&gt; <span class="ident">Month::July</span>,
-            <span class="ident">Month::September</span> =&gt; <span class="ident">Month::August</span>,
-            <span class="ident">Month::October</span> =&gt; <span class="ident">Month::September</span>,
-            <span class="ident">Month::November</span> =&gt; <span class="ident">Month::October</span>,
-            <span class="ident">Month::December</span> =&gt; <span class="ident">Month::November</span>,
+    <span class="doccomment">/// The previous month.
+    ///
+    /// `m`:        | `January`  | `February` | `...` | `December`
+    /// ----------- | ---------  | ---------- | --- | ---------
+    /// `m.pred()`: | `December` | `January`  | `...` | `November`
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>pred(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Month {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Month::January =&gt; Month::December,
+            Month::February =&gt; Month::January,
+            Month::March =&gt; Month::February,
+            Month::April =&gt; Month::March,
+            Month::May =&gt; Month::April,
+            Month::June =&gt; Month::May,
+            Month::July =&gt; Month::June,
+            Month::August =&gt; Month::July,
+            Month::September =&gt; Month::August,
+            Month::October =&gt; Month::September,
+            Month::November =&gt; Month::October,
+            Month::December =&gt; Month::November,
         }
     }
 
-    <span class="doccomment">/// Returns a month-of-year number starting from January = 1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `m`:                     | `January` | `February` | `...` | `December`</span>
-    <span class="doccomment">/// -------------------------| --------- | ---------- | --- | -----</span>
-    <span class="doccomment">/// `m.number_from_month()`: | 1         | 2          | `...` | 12</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">number_from_month</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Month::January</span> =&gt; <span class="number">1</span>,
-            <span class="ident">Month::February</span> =&gt; <span class="number">2</span>,
-            <span class="ident">Month::March</span> =&gt; <span class="number">3</span>,
-            <span class="ident">Month::April</span> =&gt; <span class="number">4</span>,
-            <span class="ident">Month::May</span> =&gt; <span class="number">5</span>,
-            <span class="ident">Month::June</span> =&gt; <span class="number">6</span>,
-            <span class="ident">Month::July</span> =&gt; <span class="number">7</span>,
-            <span class="ident">Month::August</span> =&gt; <span class="number">8</span>,
-            <span class="ident">Month::September</span> =&gt; <span class="number">9</span>,
-            <span class="ident">Month::October</span> =&gt; <span class="number">10</span>,
-            <span class="ident">Month::November</span> =&gt; <span class="number">11</span>,
-            <span class="ident">Month::December</span> =&gt; <span class="number">12</span>,
+    <span class="doccomment">/// Returns a month-of-year number starting from January = 1.
+    ///
+    /// `m`:                     | `January` | `February` | `...` | `December`
+    /// -------------------------| --------- | ---------- | --- | -----
+    /// `m.number_from_month()`: | 1         | 2          | `...` | 12
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>number_from_month(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Month::January =&gt; <span class="number">1</span>,
+            Month::February =&gt; <span class="number">2</span>,
+            Month::March =&gt; <span class="number">3</span>,
+            Month::April =&gt; <span class="number">4</span>,
+            Month::May =&gt; <span class="number">5</span>,
+            Month::June =&gt; <span class="number">6</span>,
+            Month::July =&gt; <span class="number">7</span>,
+            Month::August =&gt; <span class="number">8</span>,
+            Month::September =&gt; <span class="number">9</span>,
+            Month::October =&gt; <span class="number">10</span>,
+            Month::November =&gt; <span class="number">11</span>,
+            Month::December =&gt; <span class="number">12</span>,
         }
     }
 
-    <span class="doccomment">/// Get the name of the month</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use chrono::Month;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(Month::January.name(), &quot;January&quot;)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Month::January</span> =&gt; <span class="string">&quot;January&quot;</span>,
-            <span class="ident">Month::February</span> =&gt; <span class="string">&quot;February&quot;</span>,
-            <span class="ident">Month::March</span> =&gt; <span class="string">&quot;March&quot;</span>,
-            <span class="ident">Month::April</span> =&gt; <span class="string">&quot;April&quot;</span>,
-            <span class="ident">Month::May</span> =&gt; <span class="string">&quot;May&quot;</span>,
-            <span class="ident">Month::June</span> =&gt; <span class="string">&quot;June&quot;</span>,
-            <span class="ident">Month::July</span> =&gt; <span class="string">&quot;July&quot;</span>,
-            <span class="ident">Month::August</span> =&gt; <span class="string">&quot;August&quot;</span>,
-            <span class="ident">Month::September</span> =&gt; <span class="string">&quot;September&quot;</span>,
-            <span class="ident">Month::October</span> =&gt; <span class="string">&quot;October&quot;</span>,
-            <span class="ident">Month::November</span> =&gt; <span class="string">&quot;November&quot;</span>,
-            <span class="ident">Month::December</span> =&gt; <span class="string">&quot;December&quot;</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">num_traits::FromPrimitive</span> <span class="kw">for</span> <span class="ident">Month</span> {
-    <span class="doccomment">/// Returns an Option&lt;Month&gt; from a i64, assuming a 1-index, January = 1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `Month::from_i64(n: i64)`: | `1`                  | `2`                   | ... | `12`</span>
-    <span class="doccomment">/// ---------------------------| -------------------- | --------------------- | ... | -----</span>
-    <span class="doccomment">/// ``:                        | Some(Month::January) | Some(Month::February) | ... | Some(Month::December)</span>
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u64</span>(<span class="ident">n</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Month</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::from_u32</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">u32</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_i64</span>(<span class="ident">n</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Month</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::from_u32</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">u32</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u32</span>(<span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Month</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">n</span> {
-            <span class="number">1</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::January</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::February</span>),
-            <span class="number">3</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::March</span>),
-            <span class="number">4</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::April</span>),
-            <span class="number">5</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::May</span>),
-            <span class="number">6</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::June</span>),
-            <span class="number">7</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::July</span>),
-            <span class="number">8</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::August</span>),
-            <span class="number">9</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::September</span>),
-            <span class="number">10</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::October</span>),
-            <span class="number">11</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::November</span>),
-            <span class="number">12</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Month::December</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Get the name of the month
+    ///
+    /// ```
+    /// use chrono::Month;
+    ///
+    /// assert_eq!(Month::January.name(), &quot;January&quot;)
+    /// ```
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Month::January =&gt; <span class="string">&quot;January&quot;</span>,
+            Month::February =&gt; <span class="string">&quot;February&quot;</span>,
+            Month::March =&gt; <span class="string">&quot;March&quot;</span>,
+            Month::April =&gt; <span class="string">&quot;April&quot;</span>,
+            Month::May =&gt; <span class="string">&quot;May&quot;</span>,
+            Month::June =&gt; <span class="string">&quot;June&quot;</span>,
+            Month::July =&gt; <span class="string">&quot;July&quot;</span>,
+            Month::August =&gt; <span class="string">&quot;August&quot;</span>,
+            Month::September =&gt; <span class="string">&quot;September&quot;</span>,
+            Month::October =&gt; <span class="string">&quot;October&quot;</span>,
+            Month::November =&gt; <span class="string">&quot;November&quot;</span>,
+            Month::December =&gt; <span class="string">&quot;December&quot;</span>,
         }
     }
 }
 
-<span class="doccomment">/// A duration in calendar months</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Months</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">u32</span>);
+<span class="kw">impl </span>num_traits::FromPrimitive <span class="kw">for </span>Month {
+    <span class="doccomment">/// Returns an Option&lt;Month&gt; from a i64, assuming a 1-index, January = 1.
+    ///
+    /// `Month::from_i64(n: i64)`: | `1`                  | `2`                   | ... | `12`
+    /// ---------------------------| -------------------- | --------------------- | ... | -----
+    /// ``:                        | Some(Month::January) | Some(Month::February) | ... | Some(Month::December)
 
-<span class="kw">impl</span> <span class="ident">Months</span> {
-    <span class="doccomment">/// Construct a new `Months` from a number of months</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">num</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">num</span>)
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u64(n: u64) -&gt; <span class="prelude-ty">Option</span>&lt;Month&gt; {
+        <span class="self">Self</span>::from_u32(n <span class="kw">as </span>u32)
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_i64(n: i64) -&gt; <span class="prelude-ty">Option</span>&lt;Month&gt; {
+        <span class="self">Self</span>::from_u32(n <span class="kw">as </span>u32)
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u32(n: u32) -&gt; <span class="prelude-ty">Option</span>&lt;Month&gt; {
+        <span class="kw">match </span>n {
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Some</span>(Month::January),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Some</span>(Month::February),
+            <span class="number">3 </span>=&gt; <span class="prelude-val">Some</span>(Month::March),
+            <span class="number">4 </span>=&gt; <span class="prelude-val">Some</span>(Month::April),
+            <span class="number">5 </span>=&gt; <span class="prelude-val">Some</span>(Month::May),
+            <span class="number">6 </span>=&gt; <span class="prelude-val">Some</span>(Month::June),
+            <span class="number">7 </span>=&gt; <span class="prelude-val">Some</span>(Month::July),
+            <span class="number">8 </span>=&gt; <span class="prelude-val">Some</span>(Month::August),
+            <span class="number">9 </span>=&gt; <span class="prelude-val">Some</span>(Month::September),
+            <span class="number">10 </span>=&gt; <span class="prelude-val">Some</span>(Month::October),
+            <span class="number">11 </span>=&gt; <span class="prelude-val">Some</span>(Month::November),
+            <span class="number">12 </span>=&gt; <span class="prelude-val">Some</span>(Month::December),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
     }
 }
 
-<span class="doccomment">/// An error resulting from reading `&lt;Month&gt;` value with `FromStr`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParseMonthError</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_dummy</span>: (),
-}
+<span class="doccomment">/// A duration in calendar months
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd)]
+</span><span class="kw">pub struct </span>Months(<span class="kw">pub</span>(<span class="kw">crate</span>) u32);
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ParseMonthError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ParseMonthError {{ .. }}&quot;</span>)
+<span class="kw">impl </span>Months {
+    <span class="doccomment">/// Construct a new `Months` from a number of months
+    </span><span class="kw">pub fn </span>new(num: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(num)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">month_serde</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Month</span>;
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de</span>, <span class="ident">ser</span>};
+<span class="doccomment">/// An error resulting from reading `&lt;Month&gt;` value with `FromStr`.
+</span><span class="attribute">#[derive(Clone, PartialEq)]
+</span><span class="kw">pub struct </span>ParseMonthError {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) _dummy: (),
+}
 
-    <span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>ParseMonthError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;ParseMonthError {{ .. }}&quot;</span>)
+    }
+}
 
-    <span class="kw">impl</span> <span class="ident">ser::Serialize</span> <span class="kw">for</span> <span class="ident">Month</span> {
-        <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">S</span>: <span class="ident">ser::Serializer</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde&quot;</span>)]
+</span><span class="kw">mod </span>month_serde {
+    <span class="kw">use </span><span class="kw">super</span>::Month;
+    <span class="kw">use </span>serde::{de, ser};
+
+    <span class="kw">use </span>core::fmt;
+
+    <span class="kw">impl </span>ser::Serialize <span class="kw">for </span>Month {
+        <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+        <span class="kw">where
+            </span>S: ser::Serializer,
         {
-            <span class="ident">serializer</span>.<span class="ident">collect_str</span>(<span class="self">self</span>.<span class="ident">name</span>())
+            serializer.collect_str(<span class="self">self</span>.name())
         }
     }
 
-    <span class="kw">struct</span> <span class="ident">MonthVisitor</span>;
+    <span class="kw">struct </span>MonthVisitor;
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MonthVisitor</span> {
-        <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">Month</span>;
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; de::Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>MonthVisitor {
+        <span class="kw">type </span>Value = Month;
 
-        <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Month&quot;</span>)
+        <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+            f.write_str(<span class="string">&quot;Month&quot;</span>)
         }
 
-        <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">E</span>: <span class="ident">de::Error</span>,
+        <span class="kw">fn </span>visit_str&lt;E&gt;(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+        <span class="kw">where
+            </span>E: de::Error,
         {
-            <span class="ident">value</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">E::custom</span>(<span class="string">&quot;short (3-letter) or full month names expected&quot;</span>))
+            value.parse().map_err(|<span class="kw">_</span>| E::custom(<span class="string">&quot;short (3-letter) or full month names expected&quot;</span>))
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">de::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Month</span> {
-        <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">D</span>: <span class="ident">de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; de::Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Month {
+        <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
+        <span class="kw">where
+            </span>D: de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
         {
-            <span class="ident">deserializer</span>.<span class="ident">deserialize_str</span>(<span class="ident">MonthVisitor</span>)
+            deserializer.deserialize_str(MonthVisitor)
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_serde_serialize</span>() {
-        <span class="kw">use</span> <span class="ident">serde_json::to_string</span>;
-        <span class="kw">use</span> <span class="ident">Month</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_serde_serialize() {
+        <span class="kw">use </span>serde_json::to_string;
+        <span class="kw">use </span>Month::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> <span class="ident">cases</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Month</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            (<span class="ident">January</span>, <span class="string">&quot;\&quot;January\&quot;&quot;</span>),
-            (<span class="ident">February</span>, <span class="string">&quot;\&quot;February\&quot;&quot;</span>),
-            (<span class="ident">March</span>, <span class="string">&quot;\&quot;March\&quot;&quot;</span>),
-            (<span class="ident">April</span>, <span class="string">&quot;\&quot;April\&quot;&quot;</span>),
-            (<span class="ident">May</span>, <span class="string">&quot;\&quot;May\&quot;&quot;</span>),
-            (<span class="ident">June</span>, <span class="string">&quot;\&quot;June\&quot;&quot;</span>),
-            (<span class="ident">July</span>, <span class="string">&quot;\&quot;July\&quot;&quot;</span>),
-            (<span class="ident">August</span>, <span class="string">&quot;\&quot;August\&quot;&quot;</span>),
-            (<span class="ident">September</span>, <span class="string">&quot;\&quot;September\&quot;&quot;</span>),
-            (<span class="ident">October</span>, <span class="string">&quot;\&quot;October\&quot;&quot;</span>),
-            (<span class="ident">November</span>, <span class="string">&quot;\&quot;November\&quot;&quot;</span>),
-            (<span class="ident">December</span>, <span class="string">&quot;\&quot;December\&quot;&quot;</span>),
+        <span class="kw">let </span>cases: Vec&lt;(Month, <span class="kw-2">&amp;</span>str)&gt; = <span class="macro">vec!</span>[
+            (January, <span class="string">&quot;\&quot;January\&quot;&quot;</span>),
+            (February, <span class="string">&quot;\&quot;February\&quot;&quot;</span>),
+            (March, <span class="string">&quot;\&quot;March\&quot;&quot;</span>),
+            (April, <span class="string">&quot;\&quot;April\&quot;&quot;</span>),
+            (May, <span class="string">&quot;\&quot;May\&quot;&quot;</span>),
+            (June, <span class="string">&quot;\&quot;June\&quot;&quot;</span>),
+            (July, <span class="string">&quot;\&quot;July\&quot;&quot;</span>),
+            (August, <span class="string">&quot;\&quot;August\&quot;&quot;</span>),
+            (September, <span class="string">&quot;\&quot;September\&quot;&quot;</span>),
+            (October, <span class="string">&quot;\&quot;October\&quot;&quot;</span>),
+            (November, <span class="string">&quot;\&quot;November\&quot;&quot;</span>),
+            (December, <span class="string">&quot;\&quot;December\&quot;&quot;</span>),
         ];
 
-        <span class="kw">for</span> (<span class="ident">month</span>, <span class="ident">expected_str</span>) <span class="kw">in</span> <span class="ident">cases</span> {
-            <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="ident">month</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">string</span>, <span class="ident">expected_str</span>);
+        <span class="kw">for </span>(month, expected_str) <span class="kw">in </span>cases {
+            <span class="kw">let </span>string = to_string(<span class="kw-2">&amp;</span>month).unwrap();
+            <span class="macro">assert_eq!</span>(string, expected_str);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_serde_deserialize</span>() {
-        <span class="kw">use</span> <span class="ident">serde_json::from_str</span>;
-        <span class="kw">use</span> <span class="ident">Month</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_serde_deserialize() {
+        <span class="kw">use </span>serde_json::from_str;
+        <span class="kw">use </span>Month::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> <span class="ident">cases</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Month</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            (<span class="string">&quot;\&quot;january\&quot;&quot;</span>, <span class="ident">January</span>),
-            (<span class="string">&quot;\&quot;jan\&quot;&quot;</span>, <span class="ident">January</span>),
-            (<span class="string">&quot;\&quot;FeB\&quot;&quot;</span>, <span class="ident">February</span>),
-            (<span class="string">&quot;\&quot;MAR\&quot;&quot;</span>, <span class="ident">March</span>),
-            (<span class="string">&quot;\&quot;mar\&quot;&quot;</span>, <span class="ident">March</span>),
-            (<span class="string">&quot;\&quot;april\&quot;&quot;</span>, <span class="ident">April</span>),
-            (<span class="string">&quot;\&quot;may\&quot;&quot;</span>, <span class="ident">May</span>),
-            (<span class="string">&quot;\&quot;june\&quot;&quot;</span>, <span class="ident">June</span>),
-            (<span class="string">&quot;\&quot;JULY\&quot;&quot;</span>, <span class="ident">July</span>),
-            (<span class="string">&quot;\&quot;august\&quot;&quot;</span>, <span class="ident">August</span>),
-            (<span class="string">&quot;\&quot;september\&quot;&quot;</span>, <span class="ident">September</span>),
-            (<span class="string">&quot;\&quot;October\&quot;&quot;</span>, <span class="ident">October</span>),
-            (<span class="string">&quot;\&quot;November\&quot;&quot;</span>, <span class="ident">November</span>),
-            (<span class="string">&quot;\&quot;DECEmbEr\&quot;&quot;</span>, <span class="ident">December</span>),
+        <span class="kw">let </span>cases: Vec&lt;(<span class="kw-2">&amp;</span>str, Month)&gt; = <span class="macro">vec!</span>[
+            (<span class="string">&quot;\&quot;january\&quot;&quot;</span>, January),
+            (<span class="string">&quot;\&quot;jan\&quot;&quot;</span>, January),
+            (<span class="string">&quot;\&quot;FeB\&quot;&quot;</span>, February),
+            (<span class="string">&quot;\&quot;MAR\&quot;&quot;</span>, March),
+            (<span class="string">&quot;\&quot;mar\&quot;&quot;</span>, March),
+            (<span class="string">&quot;\&quot;april\&quot;&quot;</span>, April),
+            (<span class="string">&quot;\&quot;may\&quot;&quot;</span>, May),
+            (<span class="string">&quot;\&quot;june\&quot;&quot;</span>, June),
+            (<span class="string">&quot;\&quot;JULY\&quot;&quot;</span>, July),
+            (<span class="string">&quot;\&quot;august\&quot;&quot;</span>, August),
+            (<span class="string">&quot;\&quot;september\&quot;&quot;</span>, September),
+            (<span class="string">&quot;\&quot;October\&quot;&quot;</span>, October),
+            (<span class="string">&quot;\&quot;November\&quot;&quot;</span>, November),
+            (<span class="string">&quot;\&quot;DECEmbEr\&quot;&quot;</span>, December),
         ];
 
-        <span class="kw">for</span> (<span class="ident">string</span>, <span class="ident">expected_month</span>) <span class="kw">in</span> <span class="ident">cases</span> {
-            <span class="kw">let</span> <span class="ident">month</span> <span class="op">=</span> <span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Month</span><span class="op">&gt;</span>(<span class="ident">string</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">month</span>, <span class="ident">expected_month</span>);
+        <span class="kw">for </span>(string, expected_month) <span class="kw">in </span>cases {
+            <span class="kw">let </span>month = from_str::&lt;Month&gt;(string).unwrap();
+            <span class="macro">assert_eq!</span>(month, expected_month);
         }
 
-        <span class="kw">let</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="kw">let </span>errors: Vec&lt;<span class="kw-2">&amp;</span>str&gt; =
             <span class="macro">vec!</span>[<span class="string">&quot;\&quot;not a month\&quot;&quot;</span>, <span class="string">&quot;\&quot;ja\&quot;&quot;</span>, <span class="string">&quot;\&quot;Dece\&quot;&quot;</span>, <span class="string">&quot;Dec&quot;</span>, <span class="string">&quot;\&quot;Augustin\&quot;&quot;</span>];
 
-        <span class="kw">for</span> <span class="ident">string</span> <span class="kw">in</span> <span class="ident">errors</span> {
-            <span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Month</span><span class="op">&gt;</span>(<span class="ident">string</span>).<span class="ident">unwrap_err</span>();
+        <span class="kw">for </span>string <span class="kw">in </span>errors {
+            from_str::&lt;Month&gt;(string).unwrap_err();
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Month</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Datelike</span>, <span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::Month;
+    <span class="kw">use crate</span>::{Datelike, TimeZone, Utc};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_month_enum_primitive_parse</span>() {
-        <span class="kw">use</span> <span class="ident">num_traits::FromPrimitive</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_month_enum_primitive_parse() {
+        <span class="kw">use </span>num_traits::FromPrimitive;
 
-        <span class="kw">let</span> <span class="ident">jan_opt</span> <span class="op">=</span> <span class="ident">Month::from_u32</span>(<span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">feb_opt</span> <span class="op">=</span> <span class="ident">Month::from_u64</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">dec_opt</span> <span class="op">=</span> <span class="ident">Month::from_i64</span>(<span class="number">12</span>);
-        <span class="kw">let</span> <span class="ident">no_month</span> <span class="op">=</span> <span class="ident">Month::from_u32</span>(<span class="number">13</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">jan_opt</span>, <span class="prelude-val">Some</span>(<span class="ident">Month::January</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">feb_opt</span>, <span class="prelude-val">Some</span>(<span class="ident">Month::February</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">dec_opt</span>, <span class="prelude-val">Some</span>(<span class="ident">Month::December</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">no_month</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>jan_opt = Month::from_u32(<span class="number">1</span>);
+        <span class="kw">let </span>feb_opt = Month::from_u64(<span class="number">2</span>);
+        <span class="kw">let </span>dec_opt = Month::from_i64(<span class="number">12</span>);
+        <span class="kw">let </span>no_month = Month::from_u32(<span class="number">13</span>);
+        <span class="macro">assert_eq!</span>(jan_opt, <span class="prelude-val">Some</span>(Month::January));
+        <span class="macro">assert_eq!</span>(feb_opt, <span class="prelude-val">Some</span>(Month::February));
+        <span class="macro">assert_eq!</span>(dec_opt, <span class="prelude-val">Some</span>(Month::December));
+        <span class="macro">assert_eq!</span>(no_month, <span class="prelude-val">None</span>);
 
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">Utc</span>.<span class="ident">ymd</span>(<span class="number">2019</span>, <span class="number">10</span>, <span class="number">28</span>).<span class="ident">and_hms</span>(<span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Month::from_u32</span>(<span class="ident">date</span>.<span class="ident">month</span>()), <span class="prelude-val">Some</span>(<span class="ident">Month::October</span>));
+        <span class="kw">let </span>date = Utc.ymd(<span class="number">2019</span>, <span class="number">10</span>, <span class="number">28</span>).and_hms(<span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>);
+        <span class="macro">assert_eq!</span>(Month::from_u32(date.month()), <span class="prelude-val">Some</span>(Month::October));
 
-        <span class="kw">let</span> <span class="ident">month</span> <span class="op">=</span> <span class="ident">Month::January</span>;
-        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">Utc</span>.<span class="ident">ymd</span>(<span class="number">2019</span>, <span class="ident">month</span>.<span class="ident">number_from_month</span>(), <span class="number">28</span>).<span class="ident">and_hms</span>(<span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>);
-        <span class="macro">assert_eq!</span>((<span class="ident">dt</span>.<span class="ident">year</span>(), <span class="ident">dt</span>.<span class="ident">month</span>(), <span class="ident">dt</span>.<span class="ident">day</span>()), (<span class="number">2019</span>, <span class="number">1</span>, <span class="number">28</span>));
+        <span class="kw">let </span>month = Month::January;
+        <span class="kw">let </span>dt = Utc.ymd(<span class="number">2019</span>, month.number_from_month(), <span class="number">28</span>).and_hms(<span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>);
+        <span class="macro">assert_eq!</span>((dt.year(), dt.month(), dt.day()), (<span class="number">2019</span>, <span class="number">1</span>, <span class="number">28</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_month_enum_succ_pred</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Month::January</span>.<span class="ident">succ</span>(), <span class="ident">Month::February</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Month::December</span>.<span class="ident">succ</span>(), <span class="ident">Month::January</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Month::January</span>.<span class="ident">pred</span>(), <span class="ident">Month::December</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Month::February</span>.<span class="ident">pred</span>(), <span class="ident">Month::January</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_month_enum_succ_pred() {
+        <span class="macro">assert_eq!</span>(Month::January.succ(), Month::February);
+        <span class="macro">assert_eq!</span>(Month::December.succ(), Month::January);
+        <span class="macro">assert_eq!</span>(Month::January.pred(), Month::December);
+        <span class="macro">assert_eq!</span>(Month::February.pred(), Month::January);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

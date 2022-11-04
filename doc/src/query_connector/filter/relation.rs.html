@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/filter/relation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/filter/relation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -145,152 +145,152 @@
 <span id="145">145</span>
 <span id="146">146</span>
 <span id="147">147</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::compare::RelationCompare</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::RelationField</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::compare::RelationCompare;
+<span class="kw">use </span><span class="kw">crate</span>::filter::Filter;
+<span class="kw">use </span>prisma_models::RelationField;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationFilter</span> {
-    <span class="doccomment">/// Starting field of the relation traversal.</span>
-    <span class="kw">pub</span> <span class="ident">field</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>RelationFilter {
+    <span class="doccomment">/// Starting field of the relation traversal.
+    </span><span class="kw">pub </span>field: Arc&lt;RelationField&gt;,
 
-    <span class="doccomment">/// Filter the related records need to fulfill.</span>
-    <span class="kw">pub</span> <span class="ident">nested_filter</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Filter the related records need to fulfill.
+    </span><span class="kw">pub </span>nested_filter: Box&lt;Filter&gt;,
 
-    <span class="doccomment">/// The type of relation condition to use.</span>
-    <span class="doccomment">/// E.g. if all related records or only some need</span>
-    <span class="doccomment">/// to fulfill `nested_filter`.</span>
-    <span class="kw">pub</span> <span class="ident">condition</span>: <span class="ident">RelationCondition</span>,
+    <span class="doccomment">/// The type of relation condition to use.
+    /// E.g. if all related records or only some need
+    /// to fulfill `nested_filter`.
+    </span><span class="kw">pub </span>condition: RelationCondition,
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">RelationFilter</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RelationFilter&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;field&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">field</span>))
-            .<span class="ident">field</span>(<span class="string">&quot;nested_filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">nested_filter</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;condition&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">condition</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>RelationFilter {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_struct(<span class="string">&quot;RelationFilter&quot;</span>)
+            .field(<span class="string">&quot;field&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.field))
+            .field(<span class="string">&quot;nested_filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.nested_filter)
+            .field(<span class="string">&quot;condition&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.condition)
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RelationFilter</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert</span>(<span class="self">self</span>, <span class="ident">invert</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">invert</span> {
-            <span class="kw">let</span> <span class="ident">is_to_one</span> <span class="op">=</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">field</span>.<span class="ident">is_list</span>();
+<span class="kw">impl </span>RelationFilter {
+    <span class="kw">pub fn </span>invert(<span class="self">self</span>, invert: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>invert {
+            <span class="kw">let </span>is_to_one = !<span class="self">self</span>.field.is_list();
 
-            <span class="self">Self</span> {
-                <span class="ident">field</span>: <span class="self">self</span>.<span class="ident">field</span>,
-                <span class="ident">nested_filter</span>: <span class="self">self</span>.<span class="ident">nested_filter</span>,
-                <span class="ident">condition</span>: <span class="self">self</span>.<span class="ident">condition</span>.<span class="ident">invert</span>(<span class="ident">invert</span>, <span class="ident">is_to_one</span>),
+            <span class="self">Self </span>{
+                field: <span class="self">self</span>.field,
+                nested_filter: <span class="self">self</span>.nested_filter,
+                condition: <span class="self">self</span>.condition.invert(invert, is_to_one),
             }
-        } <span class="kw">else</span> {
-            <span class="self">self</span>
-        }
+        } <span class="kw">else </span>{
+            <span class="self">self
+        </span>}
     }
 }
 
-<span class="doccomment">/// Filter that is solely responsible for checking if</span>
-<span class="doccomment">/// a to-one related record is null.</span>
-<span class="doccomment">/// Todo there&#39;s no good, obvious reason why this is a separate filter.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OneRelationIsNullFilter</span> {
-    <span class="kw">pub</span> <span class="ident">field</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Filter that is solely responsible for checking if
+/// a to-one related record is null.
+/// Todo there&#39;s no good, obvious reason why this is a separate filter.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>OneRelationIsNullFilter {
+    <span class="kw">pub </span>field: Arc&lt;RelationField&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RelationCondition</span> {
-    <span class="doccomment">/// Every single related record needs to fulfill a condition.</span>
-    <span class="doccomment">/// `every` query condition.</span>
-    <span class="ident">EveryRelatedRecord</span>,
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+</span><span class="kw">pub enum </span>RelationCondition {
+    <span class="doccomment">/// Every single related record needs to fulfill a condition.
+    /// `every` query condition.
+    </span>EveryRelatedRecord,
 
-    <span class="doccomment">/// At least one related record needs to fulfill a condition.</span>
-    <span class="doccomment">/// `some` query condition.</span>
-    <span class="ident">AtLeastOneRelatedRecord</span>,
+    <span class="doccomment">/// At least one related record needs to fulfill a condition.
+    /// `some` query condition.
+    </span>AtLeastOneRelatedRecord,
 
-    <span class="doccomment">/// No related record must to fulfill a condition.</span>
-    <span class="doccomment">/// `none` query condition.</span>
-    <span class="ident">NoRelatedRecord</span>,
+    <span class="doccomment">/// No related record must to fulfill a condition.
+    /// `none` query condition.
+    </span>NoRelatedRecord,
 
-    <span class="doccomment">/// To-one relation only - the related record must fulfill a condition.</span>
-    <span class="ident">ToOneRelatedRecord</span>,
+    <span class="doccomment">/// To-one relation only - the related record must fulfill a condition.
+    </span>ToOneRelatedRecord,
 }
 
-<span class="kw">impl</span> <span class="ident">RelationCondition</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert_of_subselect</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">RelationCondition::EveryRelatedRecord</span>)
+<span class="kw">impl </span>RelationCondition {
+    <span class="kw">pub fn </span>invert_of_subselect(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, RelationCondition::EveryRelatedRecord)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert</span>(<span class="self">self</span>, <span class="ident">invert</span>: <span class="ident">bool</span>, <span class="ident">to_one</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">invert</span> {
-            <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident">RelationCondition::EveryRelatedRecord</span> =&gt; <span class="ident">RelationCondition::NoRelatedRecord</span>,
-                <span class="ident">RelationCondition::AtLeastOneRelatedRecord</span> =&gt; <span class="ident">RelationCondition::NoRelatedRecord</span>,
-                <span class="ident">RelationCondition::NoRelatedRecord</span> <span class="kw">if</span> <span class="ident">to_one</span> =&gt; <span class="ident">RelationCondition::ToOneRelatedRecord</span>,
-                <span class="ident">RelationCondition::NoRelatedRecord</span> =&gt; <span class="ident">RelationCondition::AtLeastOneRelatedRecord</span>,
-                <span class="ident">RelationCondition::ToOneRelatedRecord</span> =&gt; <span class="ident">RelationCondition::NoRelatedRecord</span>,
+    <span class="kw">pub fn </span>invert(<span class="self">self</span>, invert: bool, to_one: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>invert {
+            <span class="kw">match </span><span class="self">self </span>{
+                RelationCondition::EveryRelatedRecord =&gt; RelationCondition::NoRelatedRecord,
+                RelationCondition::AtLeastOneRelatedRecord =&gt; RelationCondition::NoRelatedRecord,
+                RelationCondition::NoRelatedRecord <span class="kw">if </span>to_one =&gt; RelationCondition::ToOneRelatedRecord,
+                RelationCondition::NoRelatedRecord =&gt; RelationCondition::AtLeastOneRelatedRecord,
+                RelationCondition::ToOneRelatedRecord =&gt; RelationCondition::NoRelatedRecord,
             }
-        } <span class="kw">else</span> {
-            <span class="self">self</span>
-        }
+        } <span class="kw">else </span>{
+            <span class="self">self
+        </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RelationCompare</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Every related record matches the filter.</span>
-    <span class="kw">fn</span> <span class="ident">every_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>RelationCompare <span class="kw">for </span>Arc&lt;RelationField&gt; {
+    <span class="doccomment">/// Every related record matches the filter.
+    </span><span class="kw">fn </span>every_related&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;,
     {
-        <span class="ident">Filter::from</span>(<span class="ident">RelationFilter</span> {
-            <span class="ident">field</span>: <span class="ident">Arc::clone</span>(<span class="self">self</span>),
-            <span class="ident">nested_filter</span>: <span class="ident">Box::new</span>(<span class="ident">filter</span>.<span class="ident">into</span>()),
-            <span class="ident">condition</span>: <span class="ident">RelationCondition::EveryRelatedRecord</span>,
+        Filter::from(RelationFilter {
+            field: Arc::clone(<span class="self">self</span>),
+            nested_filter: Box::new(filter.into()),
+            condition: RelationCondition::EveryRelatedRecord,
         })
     }
 
-    <span class="doccomment">/// At least one related record matches the filter.</span>
-    <span class="kw">fn</span> <span class="ident">at_least_one_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// At least one related record matches the filter.
+    </span><span class="kw">fn </span>at_least_one_related&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;,
     {
-        <span class="ident">Filter::from</span>(<span class="ident">RelationFilter</span> {
-            <span class="ident">field</span>: <span class="ident">Arc::clone</span>(<span class="self">self</span>),
-            <span class="ident">nested_filter</span>: <span class="ident">Box::new</span>(<span class="ident">filter</span>.<span class="ident">into</span>()),
-            <span class="ident">condition</span>: <span class="ident">RelationCondition::AtLeastOneRelatedRecord</span>,
+        Filter::from(RelationFilter {
+            field: Arc::clone(<span class="self">self</span>),
+            nested_filter: Box::new(filter.into()),
+            condition: RelationCondition::AtLeastOneRelatedRecord,
         })
     }
 
-    <span class="doccomment">/// To one related record. FIXME</span>
-    <span class="kw">fn</span> <span class="ident">to_one_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// To one related record. FIXME
+    </span><span class="kw">fn </span>to_one_related&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;,
     {
-        <span class="ident">Filter::from</span>(<span class="ident">RelationFilter</span> {
-            <span class="ident">field</span>: <span class="ident">Arc::clone</span>(<span class="self">self</span>),
-            <span class="ident">nested_filter</span>: <span class="ident">Box::new</span>(<span class="ident">filter</span>.<span class="ident">into</span>()),
-            <span class="ident">condition</span>: <span class="ident">RelationCondition::ToOneRelatedRecord</span>,
+        Filter::from(RelationFilter {
+            field: Arc::clone(<span class="self">self</span>),
+            nested_filter: Box::new(filter.into()),
+            condition: RelationCondition::ToOneRelatedRecord,
         })
     }
 
-    <span class="doccomment">/// None of the related records matches the filter.</span>
-    <span class="kw">fn</span> <span class="ident">no_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// None of the related records matches the filter.
+    </span><span class="kw">fn </span>no_related&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;,
     {
-        <span class="ident">Filter::from</span>(<span class="ident">RelationFilter</span> {
-            <span class="ident">field</span>: <span class="ident">Arc::clone</span>(<span class="self">self</span>),
-            <span class="ident">nested_filter</span>: <span class="ident">Box::new</span>(<span class="ident">filter</span>.<span class="ident">into</span>()),
-            <span class="ident">condition</span>: <span class="ident">RelationCondition::NoRelatedRecord</span>,
+        Filter::from(RelationFilter {
+            field: Arc::clone(<span class="self">self</span>),
+            nested_filter: Box::new(filter.into()),
+            condition: RelationCondition::NoRelatedRecord,
         })
     }
 
-    <span class="doccomment">/// One of the relations is `Null`.</span>
-    <span class="kw">fn</span> <span class="ident">one_relation_is_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Filter</span> {
-        <span class="ident">Filter::from</span>(<span class="ident">OneRelationIsNullFilter</span> {
-            <span class="ident">field</span>: <span class="ident">Arc::clone</span>(<span class="self">self</span>),
+    <span class="doccomment">/// One of the relations is `Null`.
+    </span><span class="kw">fn </span>one_relation_is_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Filter {
+        Filter::from(OneRelationIsNullFilter {
+            field: Arc::clone(<span class="self">self</span>),
         })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

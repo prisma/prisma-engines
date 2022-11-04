@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/row.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>row.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/row.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>row.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -290,297 +290,297 @@
 <span id="290">290</span>
 <span id="291">291</span>
 <span id="292">292</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
-    <span class="ident">fmt</span>, <span class="ident">io</span>,
-    <span class="ident">sync::Arc</span>,
+</span><span class="kw">use </span>std::{
+    convert::{TryFrom, TryInto},
+    fmt, io,
+    sync::Arc,
 };
 
-<span class="kw">use</span> <span class="ident">bitvec</span>::{<span class="ident">prelude::BitVec</span>, <span class="ident">slice::BitSlice</span>};
+<span class="kw">use </span>bitvec::{prelude::BitVec, slice::BitSlice};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">constants</span>::{<span class="ident">ColumnFlags</span>, <span class="ident">ColumnType</span>},
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">misc::raw::int</span>::<span class="kw-2">*</span>,
-    <span class="ident">packets::Column</span>,
-    <span class="ident">proto::MyDeserialize</span>,
-    <span class="ident">row</span>::{<span class="ident">new_row_raw</span>, <span class="ident">Row</span>},
-    <span class="ident">value::Value</span>,
+<span class="kw">use crate</span>::{
+    constants::{ColumnFlags, ColumnType},
+    io::ParseBuf,
+    misc::raw::int::<span class="kw-2">*</span>,
+    packets::Column,
+    proto::MyDeserialize,
+    row::{new_row_raw, Row},
+    value::Value,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">events</span>::{<span class="ident">OptionalMetadataField</span>, <span class="ident">TableMapEvent</span>},
-    <span class="ident">value</span>::{<span class="ident">BinlogValue</span>, <span class="ident">BinlogValueToValueError</span>},
+<span class="kw">use super</span>::{
+    events::{OptionalMetadataField, TableMapEvent},
+    value::{BinlogValue, BinlogValueToValueError},
 };
 
-<span class="doccomment">/// Bonlog rows event row value options.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u64</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BinlogRowValueOptions</span> {
-    <span class="doccomment">/// Store JSON updates in partial form</span>
-    <span class="ident">PARTIAL_JSON_UPDATES</span> <span class="op">=</span> <span class="number">1</span>,
+<span class="doccomment">/// Bonlog rows event row value options.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[allow(non_camel_case_types)]
+#[repr(u64)]
+</span><span class="kw">pub enum </span>BinlogRowValueOptions {
+    <span class="doccomment">/// Store JSON updates in partial form
+    </span>PARTIAL_JSON_UPDATES = <span class="number">1</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown binlog version {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownBinlogRowValueOptions</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown binlog version {}&quot;</span>, _0)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>UnknownBinlogRowValueOptions(<span class="kw">pub </span>u64);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnknownBinlogRowValueOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">UnknownBinlogRowValueOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>From&lt;UnknownBinlogRowValueOptions&gt; <span class="kw">for </span>u64 {
+    <span class="kw">fn </span>from(x: UnknownBinlogRowValueOptions) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BinlogRowValueOptions</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownBinlogRowValueOptions</span>;
+<span class="kw">impl </span>TryFrom&lt;u64&gt; <span class="kw">for </span>BinlogRowValueOptions {
+    <span class="kw">type </span>Error = UnknownBinlogRowValueOptions;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PARTIAL_JSON_UPDATES</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownBinlogRowValueOptions</span>(<span class="ident">x</span>)),
+    <span class="kw">fn </span>try_from(value: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::PARTIAL_JSON_UPDATES),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownBinlogRowValueOptions(x)),
         }
     }
 }
 
-<span class="doccomment">/// Representation of a binlog row.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinlogRow</span> {
-    <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BinlogValue</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>,
+<span class="doccomment">/// Representation of a binlog row.
+</span><span class="attribute">#[derive(Clone, PartialEq)]
+</span><span class="kw">pub struct </span>BinlogRow {
+    values: Vec&lt;<span class="prelude-ty">Option</span>&lt;BinlogValue&lt;<span class="lifetime">&#39;static</span>&gt;&gt;&gt;,
+    columns: Arc&lt;[Column]&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">BinlogRow</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BinlogValue</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">values</span>, <span class="ident">columns</span> }
+<span class="kw">impl </span>BinlogRow {
+    <span class="kw">pub fn </span>new(values: Vec&lt;<span class="prelude-ty">Option</span>&lt;BinlogValue&lt;<span class="lifetime">&#39;static</span>&gt;&gt;&gt;, columns: Arc&lt;[Column]&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ values, columns }
     }
 
-    <span class="doccomment">/// Returns length of a row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Returns length of a row.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.values.len()
     }
 
-    <span class="doccomment">/// Returns true if the row has a length of 0.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// Returns true if the row has a length of 0.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.values.is_empty()
     }
 
-    <span class="doccomment">/// Returns columns of this row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
-        <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">columns</span>
+    <span class="doccomment">/// Returns columns of this row.
+    </span><span class="kw">pub fn </span>columns_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Column] {
+        <span class="kw-2">&amp;*</span><span class="self">self</span>.columns
     }
 
-    <span class="doccomment">/// Returns columns of this row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Returns columns of this row.
+    </span><span class="kw">pub fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Arc&lt;[Column]&gt; {
+        <span class="self">self</span>.columns.clone()
     }
 
-    <span class="doccomment">/// Returns reference to the value of a column with index `index` if it exists and wasn&#39;t taken</span>
-    <span class="doccomment">/// by `Row::take` method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Non panicking version of `row[usize]`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BinlogValue</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_ref</span>())
+    <span class="doccomment">/// Returns reference to the value of a column with index `index` if it exists and wasn&#39;t taken
+    /// by `Row::take` method.
+    ///
+    /// Non panicking version of `row[usize]`.
+    </span><span class="kw">pub fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>BinlogValue&gt; {
+        <span class="self">self</span>.values.get(index).and_then(|x| x.as_ref())
     }
 
-    <span class="doccomment">/// Will take value of a column with index `index` if it exists and wasn&#39;t taken earlier then</span>
-    <span class="doccomment">/// will converts it to `T`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BinlogValue</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">take</span>())
+    <span class="doccomment">/// Will take value of a column with index `index` if it exists and wasn&#39;t taken earlier then
+    /// will converts it to `T`.
+    </span><span class="kw">pub fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;BinlogValue&gt; {
+        <span class="self">self</span>.values.get_mut(index).and_then(|x| x.take())
     }
 
-    <span class="doccomment">/// Unwraps values of a row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if any of columns was taken by `take` method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BinlogValue</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">values</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t unwrap row if some of columns was taken&quot;</span>))
-            .<span class="ident">collect</span>()
+    <span class="doccomment">/// Unwraps values of a row.
+    ///
+    /// # Panics
+    ///
+    /// Panics if any of columns was taken by `take` method.
+    </span><span class="kw">pub fn </span>unwrap(<span class="self">self</span>) -&gt; Vec&lt;BinlogValue&lt;<span class="lifetime">&#39;static</span>&gt;&gt; {
+        <span class="self">self</span>.values
+            .into_iter()
+            .map(|x| x.expect(<span class="string">&quot;Can&#39;t unwrap row if some of columns was taken&quot;</span>))
+            .collect()
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">place</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">BinlogValue</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">values</span>[<span class="ident">index</span>] <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>place(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize, value: BinlogValue&lt;<span class="lifetime">&#39;static</span>&gt;) {
+        <span class="self">self</span>.values[index] = <span class="prelude-val">Some</span>(value);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BinlogRow</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="doccomment">/// Content:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * number of columns</span>
-    <span class="doccomment">/// * column bitmap - bit is set if column is in the row</span>
-    <span class="doccomment">/// * have shared image - `true` means, that this is a partial event</span>
-    <span class="doccomment">///   and this is an after image row. Therefore we need to parse a shared image</span>
-    <span class="doccomment">/// * corresponding table map event</span>
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> (<span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">bool</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> <span class="ident">TableMapEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BinlogRow {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Content:
+    ///
+    /// * number of columns
+    /// * column bitmap - bit is set if column is in the row
+    /// * have shared image - `true` means, that this is a partial event
+    ///   and this is an after image row. Therefore we need to parse a shared image
+    /// * corresponding table map event
+    </span><span class="kw">type </span>Ctx = (u64, <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>BitSlice&lt;u8&gt;, bool, <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>TableMapEvent&lt;<span class="lifetime">&#39;de</span>&gt;);
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(
-        (<span class="ident">num_columns</span>, <span class="ident">cols</span>, <span class="ident">have_shared_image</span>, <span class="ident">table_info</span>): <span class="ident"><span class="self">Self</span>::Ctx</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BinlogValue</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">fn </span>deserialize(
+        (num_columns, cols, have_shared_image, table_info): <span class="self">Self</span>::Ctx,
+        buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;,
+    ) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>values: Vec&lt;<span class="prelude-ty">Option</span>&lt;BinlogValue&lt;<span class="lifetime">&#39;static</span>&gt;&gt;&gt; = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>columns = <span class="macro">vec!</span>[];
 
-        <span class="comment">// read a shared image if needed (see WL#2955)</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">partial_cols</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">have_shared_image</span> {
-            <span class="kw">let</span> <span class="ident">value_options</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">buf</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LenEnc</span><span class="op">&gt;</span><span class="op">&gt;</span>(())<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">value_options</span> <span class="op">&amp;</span> <span class="ident">BinlogRowValueOptions::PARTIAL_JSON_UPDATES</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="kw">let</span> <span class="ident">json_columns_count</span> <span class="op">=</span> <span class="ident">table_info</span>.<span class="ident">json_column_count</span>();
-                <span class="kw">let</span> <span class="ident">partial_columns_len</span> <span class="op">=</span> (<span class="ident">json_columns_count</span> <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">8</span>;
-                <span class="kw">let</span> <span class="ident">partial_columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="ident">partial_columns_len</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">partial_columns</span> <span class="op">=</span> <span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::from_slice</span>(<span class="ident">partial_columns</span>);
-                <span class="prelude-val">Some</span>(<span class="ident">partial_columns</span>.<span class="ident">into_iter</span>().<span class="ident">take</span>(<span class="ident">json_columns_count</span>))
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
+        <span class="comment">// read a shared image if needed (see WL#2955)
+        </span><span class="kw">let </span><span class="kw-2">mut </span>partial_cols = <span class="kw">if </span>have_shared_image {
+            <span class="kw">let </span>value_options = <span class="kw-2">*</span>buf.parse::&lt;RawInt&lt;LenEnc&gt;&gt;(())<span class="question-mark">?</span>;
+            <span class="kw">if </span>value_options &amp; BinlogRowValueOptions::PARTIAL_JSON_UPDATES <span class="kw">as </span>u64 &gt; <span class="number">0 </span>{
+                <span class="kw">let </span>json_columns_count = table_info.json_column_count();
+                <span class="kw">let </span>partial_columns_len = (json_columns_count + <span class="number">7</span>) / <span class="number">8</span>;
+                <span class="kw">let </span>partial_columns: <span class="kw-2">&amp;</span>[u8] = buf.parse(partial_columns_len)<span class="question-mark">?</span>;
+                <span class="kw">let </span>partial_columns = BitSlice::&lt;u8&gt;::from_slice(partial_columns);
+                <span class="prelude-val">Some</span>(partial_columns.into_iter().take(json_columns_count))
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
 
-        <span class="kw">let</span> <span class="ident">num_bits</span> <span class="op">=</span> <span class="ident">cols</span>.<span class="ident">count_ones</span>();
-        <span class="kw">let</span> <span class="ident">bitmap_len</span> <span class="op">=</span> (<span class="ident">num_bits</span> <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">8</span>;
-        <span class="kw">let</span> <span class="ident">bitmap_buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="ident">bitmap_len</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">null_bitmap</span> <span class="op">=</span> <span class="ident">BitVec</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::from_slice</span>(<span class="ident">bitmap_buf</span>);
-        <span class="ident">null_bitmap</span>.<span class="ident">truncate</span>(<span class="ident">num_bits</span>);
+        <span class="kw">let </span>num_bits = cols.count_ones();
+        <span class="kw">let </span>bitmap_len = (num_bits + <span class="number">7</span>) / <span class="number">8</span>;
+        <span class="kw">let </span>bitmap_buf: <span class="kw-2">&amp;</span>[u8] = buf.parse(bitmap_len)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>null_bitmap = BitVec::&lt;u8&gt;::from_slice(bitmap_buf);
+        null_bitmap.truncate(num_bits);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">image_idx</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>image_idx = <span class="number">0</span>;
 
-        <span class="kw">let</span> <span class="ident">signedness</span> <span class="op">=</span> <span class="ident">table_info</span>.<span class="ident">iter_optional_meta</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
-            <span class="ident">m</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
-                <span class="ident">OptionalMetadataField::Signedness</span>(<span class="ident">bit_slice</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">bit_slice</span>),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">let </span>signedness = table_info.iter_optional_meta().find_map(|m| {
+            m.map(|f| <span class="kw">match </span>f {
+                OptionalMetadataField::Signedness(bit_slice) =&gt; <span class="prelude-val">Some</span>(bit_slice),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             })
-            .<span class="ident">unwrap_or</span>(<span class="prelude-val">None</span>)
+            .unwrap_or(<span class="prelude-val">None</span>)
         });
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">numeric_index</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">num_columns</span> <span class="kw">as</span> <span class="ident">usize</span>) {
-            <span class="comment">// check if column is in columns list</span>
-            <span class="kw">if</span> <span class="ident">cols</span>.<span class="ident">get</span>(<span class="ident">i</span>).<span class="ident">as_deref</span>().<span class="ident">copied</span>().<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
-                <span class="kw">let</span> <span class="ident">column_type</span> <span class="op">=</span> <span class="ident">table_info</span>.<span class="ident">get_column_type</span>(<span class="ident">i</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>numeric_index = <span class="number">0</span>;
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..(num_columns <span class="kw">as </span>usize) {
+            <span class="comment">// check if column is in columns list
+            </span><span class="kw">if </span>cols.get(i).as_deref().copied().unwrap_or(<span class="bool-val">false</span>) {
+                <span class="kw">let </span>column_type = table_info.get_column_type(i);
 
-                <span class="comment">// TableMapEvent must define column type for the current column.</span>
-                <span class="kw">let</span> <span class="ident">column_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">column_type</span> {
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ty</span>)) =&gt; <span class="ident">ty</span>,
+                <span class="comment">// TableMapEvent must define column type for the current column.
+                </span><span class="kw">let </span>column_type = <span class="kw">match </span>column_type {
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ty)) =&gt; ty,
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidData</span>, <span class="string">&quot;No column type&quot;</span>))
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(io::ErrorKind::InvalidData, <span class="string">&quot;No column type&quot;</span>))
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidData</span>, <span class="ident">e</span>)),
+                    <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(io::ErrorKind::InvalidData, e)),
                 };
 
-                <span class="kw">let</span> <span class="ident">column_meta</span> <span class="op">=</span> <span class="ident">table_info</span>.<span class="ident">get_column_metadata</span>(<span class="ident">i</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]);
-                <span class="kw">let</span> <span class="ident">is_partial</span> <span class="op">=</span> <span class="ident">column_type</span> <span class="op">==</span> <span class="ident">ColumnType::MYSQL_TYPE_JSON</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">partial_cols</span>
-                        .<span class="ident">as_mut</span>()
-                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">bits</span><span class="op">|</span> <span class="ident">bits</span>.<span class="ident">next</span>().<span class="ident">as_deref</span>().<span class="ident">copied</span>())
-                        .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
+                <span class="kw">let </span>column_meta = table_info.get_column_metadata(i).unwrap_or(<span class="kw-2">&amp;</span>[]);
+                <span class="kw">let </span>is_partial = column_type == ColumnType::MYSQL_TYPE_JSON
+                    &amp;&amp; partial_cols
+                        .as_mut()
+                        .and_then(|bits| bits.next().as_deref().copied())
+                        .unwrap_or(<span class="bool-val">false</span>);
 
-                <span class="kw">let</span> <span class="ident">is_unsigned</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">column_type</span>.<span class="ident">is_numeric_type</span>() {
-                    <span class="kw">let</span> <span class="ident">is_unsigned</span> <span class="op">=</span> <span class="ident">signedness</span>
-                        .<span class="ident">as_ref</span>()
-                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">bits</span><span class="op">|</span> <span class="ident">bits</span>.<span class="ident">get</span>(<span class="ident">numeric_index</span>).<span class="ident">as_deref</span>().<span class="ident">copied</span>())
-                        .<span class="ident">unwrap_or_default</span>();
-                    <span class="ident">numeric_index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="ident">is_unsigned</span>
-                } <span class="kw">else</span> {
-                    <span class="bool-val">false</span>
-                };
+                <span class="kw">let </span>is_unsigned = <span class="kw">if </span>column_type.is_numeric_type() {
+                    <span class="kw">let </span>is_unsigned = signedness
+                        .as_ref()
+                        .and_then(|bits| bits.get(numeric_index).as_deref().copied())
+                        .unwrap_or_default();
+                    numeric_index += <span class="number">1</span>;
+                    is_unsigned
+                } <span class="kw">else </span>{
+                    <span class="bool-val">false
+                </span>};
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">column_flags</span> <span class="op">=</span> <span class="ident">ColumnFlags::empty</span>();
-                <span class="kw">if</span> <span class="ident">is_unsigned</span> {
-                    <span class="ident">column_flags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">ColumnFlags::UNSIGNED_FLAG</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>column_flags = ColumnFlags::empty();
+                <span class="kw">if </span>is_unsigned {
+                    column_flags |= ColumnFlags::UNSIGNED_FLAG;
                 }
-                <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">Column::new</span>(<span class="ident">column_type</span>)
-                    <span class="comment">// column name – `@&lt;i&gt;` where i is a column offset in a table</span>
-                    .<span class="ident">with_name</span>(<span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">i</span>).<span class="ident">as_bytes</span>())
-                    .<span class="ident">with_flags</span>(<span class="ident">column_flags</span>)
-                    .<span class="ident">with_schema</span>(<span class="ident">table_info</span>.<span class="ident">database_name_raw</span>())
-                    .<span class="ident">with_org_table</span>(<span class="ident">table_info</span>.<span class="ident">table_name_raw</span>())
-                    .<span class="ident">with_table</span>(<span class="ident">table_info</span>.<span class="ident">table_name_raw</span>());
-                <span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">column</span>);
+                <span class="kw">let </span>column = Column::new(column_type)
+                    <span class="comment">// column name – `@&lt;i&gt;` where i is a column offset in a table
+                    </span>.with_name(<span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, i).as_bytes())
+                    .with_flags(column_flags)
+                    .with_schema(table_info.database_name_raw())
+                    .with_org_table(table_info.table_name_raw())
+                    .with_table(table_info.table_name_raw());
+                columns.push(column);
 
-                <span class="comment">// check if column is null</span>
-                <span class="kw">if</span> <span class="ident">null_bitmap</span>
-                    .<span class="ident">get</span>(<span class="ident">image_idx</span>)
-                    .<span class="ident">as_deref</span>()
-                    .<span class="ident">copied</span>()
-                    .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
+                <span class="comment">// check if column is null
+                </span><span class="kw">if </span>null_bitmap
+                    .get(image_idx)
+                    .as_deref()
+                    .copied()
+                    .unwrap_or(<span class="bool-val">true</span>)
                 {
-                    <span class="ident">values</span>.<span class="ident">push</span>(<span class="prelude-val">Some</span>(<span class="ident">BinlogValue::Value</span>(<span class="ident">Value::NULL</span>)));
-                } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> (<span class="ident">column_type</span>, <span class="ident">column_meta</span>, <span class="ident">is_unsigned</span>, <span class="ident">is_partial</span>);
-                    <span class="ident">values</span>.<span class="ident">push</span>(<span class="prelude-val">Some</span>(<span class="ident">buf</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">BinlogValue</span><span class="op">&gt;</span>(<span class="ident">ctx</span>)<span class="question-mark">?</span>.<span class="ident">into_owned</span>()));
+                    values.push(<span class="prelude-val">Some</span>(BinlogValue::Value(Value::NULL)));
+                } <span class="kw">else </span>{
+                    <span class="kw">let </span>ctx = (column_type, column_meta, is_unsigned, is_partial);
+                    values.push(<span class="prelude-val">Some</span>(buf.parse::&lt;BinlogValue&gt;(ctx)<span class="question-mark">?</span>.into_owned()));
                 }
 
-                <span class="ident">image_idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                image_idx += <span class="number">1</span>;
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">BinlogRow::new</span>(<span class="ident">values</span>, <span class="ident">columns</span>.<span class="ident">into_boxed_slice</span>().<span class="ident">into</span>()))
+        <span class="prelude-val">Ok</span>(BinlogRow::new(values, columns.into_boxed_slice().into()))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">BinlogRow</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">debug</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;BinlogRow&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">val</span>, <span class="ident">column</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">iter</span>()) {
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">val</span> {
-                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; {
-                    <span class="ident">debug</span>.<span class="ident">field</span>(<span class="ident">column</span>.<span class="ident">name_str</span>().<span class="ident">as_ref</span>(), <span class="ident">val</span>);
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>BinlogRow {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>debug = f.debug_struct(<span class="string">&quot;BinlogRow&quot;</span>);
+        <span class="kw">for </span>(val, column) <span class="kw">in </span><span class="self">self</span>.values.iter().zip(<span class="self">self</span>.columns.iter()) {
+            <span class="kw">match </span><span class="kw-2">*</span>val {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>val) =&gt; {
+                    debug.field(column.name_str().as_ref(), val);
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="ident">debug</span>.<span class="ident">field</span>(<span class="ident">column</span>.<span class="ident">name_str</span>().<span class="ident">as_ref</span>(), <span class="kw-2">&amp;</span><span class="string">&quot;&lt;taken&gt;&quot;</span>);
+                <span class="prelude-val">None </span>=&gt; {
+                    debug.field(column.name_str().as_ref(), <span class="kw-2">&amp;</span><span class="string">&quot;&lt;taken&gt;&quot;</span>);
                 }
             }
         }
-        <span class="ident">debug</span>.<span class="ident">finish</span>()
+        debug.finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(
+<span class="attribute">#[derive(Debug, thiserror::Error)]
+#[error(
     <span class="string">&quot;Can&#39;t convert BinlogRow to Row at column offset {}: {}&quot;</span>,
-    <span class="ident">column_offset</span>,
-    <span class="ident">error</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinlogRowToRowError</span> {
-    <span class="doccomment">/// Column offset.</span>
-    <span class="kw">pub</span> <span class="ident">column_offset</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Value convertion error.</span>
-    <span class="kw">pub</span> <span class="ident">error</span>: <span class="ident">BinlogValueToValueError</span>,
+    column_offset,
+    error
+)]
+</span><span class="kw">pub struct </span>BinlogRowToRowError {
+    <span class="doccomment">/// Column offset.
+    </span><span class="kw">pub </span>column_offset: usize,
+    <span class="doccomment">/// Value convertion error.
+    </span><span class="kw">pub </span>error: BinlogValueToValueError,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">BinlogRow</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Row</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">BinlogRowToRowError</span>;
+<span class="kw">impl </span>TryFrom&lt;BinlogRow&gt; <span class="kw">for </span>Row {
+    <span class="kw">type </span>Error = BinlogRowToRowError;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">binlog_row</span>: <span class="ident">BinlogRow</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">binlog_row</span>.<span class="ident">values</span>.<span class="ident">len</span>());
-        <span class="kw">for</span> (<span class="ident">column_offset</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">binlog_row</span>.<span class="ident">values</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">match</span> <span class="ident">value</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; {
-                    <span class="ident">values</span>.<span class="ident">push</span>(<span class="prelude-val">Some</span>(<span class="ident">x</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">BinlogRowToRowError</span> {
-                        <span class="ident">column_offset</span>,
-                        <span class="ident">error</span>,
+    <span class="kw">fn </span>try_from(binlog_row: BinlogRow) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>values = Vec::with_capacity(binlog_row.values.len());
+        <span class="kw">for </span>(column_offset, value) <span class="kw">in </span>binlog_row.values.into_iter().enumerate() {
+            <span class="kw">match </span>value {
+                <span class="prelude-val">Some</span>(x) =&gt; {
+                    values.push(<span class="prelude-val">Some</span>(x.try_into().map_err(|error| BinlogRowToRowError {
+                        column_offset,
+                        error,
                     })<span class="question-mark">?</span>))
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="ident">values</span>.<span class="ident">push</span>(<span class="prelude-val">None</span>),
+                <span class="prelude-val">None </span>=&gt; values.push(<span class="prelude-val">None</span>),
             }
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">new_row_raw</span>(<span class="ident">values</span>, <span class="ident">binlog_row</span>.<span class="ident">columns</span>))
+        <span class="prelude-val">Ok</span>(new_row_raw(values, binlog_row.columns))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

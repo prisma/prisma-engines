@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/graphql-parser-0ee44412461ea4ee/6a3f58b/src/query/grammar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>grammar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../graphql_parser/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/graphql-parser-0ee44412461ea4ee/6a3f58b/src/query/grammar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>grammar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../graphql_parser/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -291,243 +291,243 @@
 <span id="291">291</span>
 <span id="292">292</span>
 <span id="293">293</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">combine</span>::{<span class="ident">parser</span>, <span class="ident">ParseResult</span>, <span class="ident">Parser</span>};
-<span class="kw">use</span> <span class="ident">combine::combinator</span>::{<span class="ident">many1</span>, <span class="ident">eof</span>, <span class="ident">optional</span>, <span class="ident">position</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>combine::{parser, ParseResult, Parser};
+<span class="kw">use </span>combine::combinator::{many1, eof, optional, position};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">Directive</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">directives</span>, <span class="ident">arguments</span>, <span class="ident">default_value</span>, <span class="ident">parse_type</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tokenizer</span>::{<span class="ident">TokenStream</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::helpers</span>::{<span class="ident">punct</span>, <span class="ident">ident</span>, <span class="ident">name</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query::error</span>::{<span class="ident">ParseError</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query::ast</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::common::{Directive};
+<span class="kw">use </span><span class="kw">crate</span>::common::{directives, arguments, default_value, parse_type};
+<span class="kw">use </span><span class="kw">crate</span>::tokenizer::{TokenStream};
+<span class="kw">use </span><span class="kw">crate</span>::helpers::{punct, ident, name};
+<span class="kw">use </span><span class="kw">crate</span>::query::error::{ParseError};
+<span class="kw">use </span><span class="kw">crate</span>::query::ast::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)
-    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">pub fn </span>field&lt;<span class="lifetime">&#39;a</span>, S&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;)
+    -&gt; ParseResult&lt;Field&lt;<span class="lifetime">&#39;a</span>, S&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where </span>S: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
     (
-        <span class="ident">position</span>(),
-        <span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(),
-        <span class="ident">optional</span>(<span class="ident">punct</span>(<span class="string">&quot;:&quot;</span>).<span class="ident">with</span>(<span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>())),
-        <span class="ident">parser</span>(<span class="ident">arguments</span>),
-        <span class="ident">parser</span>(<span class="ident">directives</span>),
-        <span class="ident">optional</span>(<span class="ident">parser</span>(<span class="ident">selection_set</span>)),
-    ).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">position</span>, <span class="ident">name_or_alias</span>, <span class="ident">opt_name</span>, <span class="ident">arguments</span>, <span class="ident">directives</span>, <span class="ident">sel</span>)<span class="op">|</span> {
-        <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">alias</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">opt_name</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; (<span class="ident">name</span>, <span class="prelude-val">Some</span>(<span class="ident">name_or_alias</span>)),
-            <span class="prelude-val">None</span> =&gt; (<span class="ident">name_or_alias</span>, <span class="prelude-val">None</span>),
+        position(),
+        name::&lt;<span class="lifetime">&#39;a</span>, S&gt;(),
+        optional(punct(<span class="string">&quot;:&quot;</span>).with(name::&lt;<span class="lifetime">&#39;a</span>, S&gt;())),
+        parser(arguments),
+        parser(directives),
+        optional(parser(selection_set)),
+    ).map(|(position, name_or_alias, opt_name, arguments, directives, sel)| {
+        <span class="kw">let </span>(name, alias) = <span class="kw">match </span>opt_name {
+            <span class="prelude-val">Some</span>(name) =&gt; (name, <span class="prelude-val">Some</span>(name_or_alias)),
+            <span class="prelude-val">None </span>=&gt; (name_or_alias, <span class="prelude-val">None</span>),
         };
-        <span class="ident">Field</span> {
-            <span class="ident">position</span>, <span class="ident">name</span>, <span class="ident">alias</span>, <span class="ident">arguments</span>, <span class="ident">directives</span>,
-            <span class="ident">selection_set</span>: <span class="ident">sel</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="ident">SelectionSet</span> {
-                    <span class="ident">span</span>: (<span class="ident">position</span>, <span class="ident">position</span>),
-                    <span class="ident">items</span>: <span class="ident">Vec::new</span>(),
+        Field {
+            position, name, alias, arguments, directives,
+            selection_set: sel.unwrap_or_else(|| {
+                SelectionSet {
+                    span: (position, position),
+                    items: Vec::new(),
                 }
             }),
         }
     })
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)
-    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Selection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">pub fn </span>selection&lt;<span class="lifetime">&#39;a</span>, S&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;)
+    -&gt; ParseResult&lt;Selection&lt;<span class="lifetime">&#39;a</span>, S&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where </span>S: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="ident">parser</span>(<span class="ident">field</span>).<span class="ident">map</span>(<span class="ident">Selection::Field</span>)
-    .<span class="ident">or</span>(<span class="ident">punct</span>(<span class="string">&quot;...&quot;</span>).<span class="ident">with</span>((
-                <span class="ident">position</span>(),
-                <span class="ident">optional</span>(<span class="ident">ident</span>(<span class="string">&quot;on&quot;</span>).<span class="ident">with</span>(<span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>()).<span class="ident">map</span>(<span class="ident">TypeCondition::On</span>)),
-                <span class="ident">parser</span>(<span class="ident">directives</span>),
-                <span class="ident">parser</span>(<span class="ident">selection_set</span>),
-            ).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">position</span>, <span class="ident">type_condition</span>, <span class="ident">directives</span>, <span class="ident">selection_set</span>)<span class="op">|</span> {
-                <span class="ident">InlineFragment</span> { <span class="ident">position</span>, <span class="ident">type_condition</span>,
-                                 <span class="ident">selection_set</span>, <span class="ident">directives</span> }
+    parser(field).map(Selection::Field)
+    .or(punct(<span class="string">&quot;...&quot;</span>).with((
+                position(),
+                optional(ident(<span class="string">&quot;on&quot;</span>).with(name::&lt;<span class="lifetime">&#39;a</span>, S&gt;()).map(TypeCondition::On)),
+                parser(directives),
+                parser(selection_set),
+            ).map(|(position, type_condition, directives, selection_set)| {
+                InlineFragment { position, type_condition,
+                                 selection_set, directives }
             })
-            .<span class="ident">map</span>(<span class="ident">Selection::InlineFragment</span>)
-        .<span class="ident">or</span>((<span class="ident">position</span>(),
-             <span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(),
-             <span class="ident">parser</span>(<span class="ident">directives</span>),
-            ).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">position</span>, <span class="ident">fragment_name</span>, <span class="ident">directives</span>)<span class="op">|</span> {
-                <span class="ident">FragmentSpread</span> { <span class="ident">position</span>, <span class="ident">fragment_name</span>, <span class="ident">directives</span> }
+            .map(Selection::InlineFragment)
+        .or((position(),
+             name::&lt;<span class="lifetime">&#39;a</span>, S&gt;(),
+             parser(directives),
+            ).map(|(position, fragment_name, directives)| {
+                FragmentSpread { position, fragment_name, directives }
             })
-            .<span class="ident">map</span>(<span class="ident">Selection::FragmentSpread</span>))
+            .map(Selection::FragmentSpread))
     ))
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selection_set</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)
-    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">SelectionSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>selection_set&lt;<span class="lifetime">&#39;a</span>, S&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;)
+    -&gt; ParseResult&lt;SelectionSet&lt;<span class="lifetime">&#39;a</span>, S&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where </span>S: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
     (
-        <span class="ident">position</span>().<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;{&quot;</span>)),
-        <span class="ident">many1</span>(<span class="ident">parser</span>(<span class="ident">selection</span>)),
-        <span class="ident">position</span>().<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;}&quot;</span>)),
-    ).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">start</span>, <span class="ident">items</span>, <span class="ident">end</span>)<span class="op">|</span> <span class="ident">SelectionSet</span> { <span class="ident">span</span>: (<span class="ident">start</span>, <span class="ident">end</span>), <span class="ident">items</span> })
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+        position().skip(punct(<span class="string">&quot;{&quot;</span>)),
+        many1(parser(selection)),
+        position().skip(punct(<span class="string">&quot;}&quot;</span>)),
+    ).map(|(start, items, end)| SelectionSet { span: (start, end), items })
+    .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)
-    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>query&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;)
+    -&gt; ParseResult&lt;Query&lt;<span class="lifetime">&#39;a</span>, T&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">position</span>()
-    .<span class="ident">skip</span>(<span class="ident">ident</span>(<span class="string">&quot;query&quot;</span>))
-    .<span class="ident">and</span>(<span class="ident">parser</span>(<span class="ident">operation_common</span>))
-    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">position</span>, (<span class="ident">name</span>, <span class="ident">variable_definitions</span>, <span class="ident">directives</span>, <span class="ident">selection_set</span>))<span class="op">|</span>
-        <span class="ident">Query</span> {
-            <span class="ident">position</span>, <span class="ident">name</span>, <span class="ident">selection_set</span>, <span class="ident">variable_definitions</span>, <span class="ident">directives</span>,
+    position()
+    .skip(ident(<span class="string">&quot;query&quot;</span>))
+    .and(parser(operation_common))
+    .map(|(position, (name, variable_definitions, directives, selection_set))|
+        Query {
+            position, name, selection_set, variable_definitions, directives,
         })
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    .parse_stream(input)
 }
 
-<span class="doccomment">/// A set of attributes common to a Query and a Mutation</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">type_alias_bounds</span>)]</span>
-<span class="kw">type</span> <span class="ident">OperationCommon</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> (
-    <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span>,
-    <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VariableDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">SelectionSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A set of attributes common to a Query and a Mutation
+</span><span class="attribute">#[allow(type_alias_bounds)]
+</span><span class="kw">type </span>OperationCommon&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; = (
+    <span class="prelude-ty">Option</span>&lt;T::Value&gt;,
+    Vec&lt;VariableDefinition&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    SelectionSet&lt;<span class="lifetime">&#39;a</span>, T&gt;,
 );
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">operation_common</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)
-    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">OperationCommon</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>operation_common&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;)
+    -&gt; ParseResult&lt;OperationCommon&lt;<span class="lifetime">&#39;a</span>, T&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">optional</span>(<span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>())
-    .<span class="ident">and</span>(<span class="ident">optional</span>(
-        <span class="ident">punct</span>(<span class="string">&quot;(&quot;</span>)
-        .<span class="ident">with</span>(<span class="ident">many1</span>(
+    optional(name::&lt;<span class="lifetime">&#39;a</span>, T&gt;())
+    .and(optional(
+        punct(<span class="string">&quot;(&quot;</span>)
+        .with(many1(
             (
-                <span class="ident">position</span>(),
-                <span class="ident">punct</span>(<span class="string">&quot;$&quot;</span>).<span class="ident">with</span>(<span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>()).<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;:&quot;</span>)),
-                <span class="ident">parser</span>(<span class="ident">parse_type</span>),
-                <span class="ident">optional</span>(
-                    <span class="ident">punct</span>(<span class="string">&quot;=&quot;</span>)
-                    .<span class="ident">with</span>(<span class="ident">parser</span>(<span class="ident">default_value</span>))),
-            ).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">position</span>, <span class="ident">name</span>, <span class="ident">var_type</span>, <span class="ident">default_value</span>)<span class="op">|</span> {
-                <span class="ident">VariableDefinition</span> {
-                    <span class="ident">position</span>, <span class="ident">name</span>, <span class="ident">var_type</span>, <span class="ident">default_value</span>,
+                position(),
+                punct(<span class="string">&quot;$&quot;</span>).with(name::&lt;<span class="lifetime">&#39;a</span>, T&gt;()).skip(punct(<span class="string">&quot;:&quot;</span>)),
+                parser(parse_type),
+                optional(
+                    punct(<span class="string">&quot;=&quot;</span>)
+                    .with(parser(default_value))),
+            ).map(|(position, name, var_type, default_value)| {
+                VariableDefinition {
+                    position, name, var_type, default_value,
                 }
             })))
-        .<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;)&quot;</span>)))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">vars</span><span class="op">|</span> <span class="ident">vars</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">Vec::new</span>)))
-    .<span class="ident">and</span>(<span class="ident">parser</span>(<span class="ident">directives</span>))
-    .<span class="ident">and</span>(<span class="ident">parser</span>(<span class="ident">selection_set</span>))
-    .<span class="ident">map</span>(<span class="op">|</span>(((<span class="ident">a</span>, <span class="ident">b</span>), <span class="ident">c</span>), <span class="ident">d</span>)<span class="op">|</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>))
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+        .skip(punct(<span class="string">&quot;)&quot;</span>)))
+        .map(|vars| vars.unwrap_or_else(Vec::new)))
+    .and(parser(directives))
+    .and(parser(selection_set))
+    .map(|(((a, b), c), d)| (a, b, c, d))
+    .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mutation</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)
-    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Mutation</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>mutation&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;)
+    -&gt; ParseResult&lt;Mutation&lt;<span class="lifetime">&#39;a</span>, T&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">position</span>()
-    .<span class="ident">skip</span>(<span class="ident">ident</span>(<span class="string">&quot;mutation&quot;</span>))
-    .<span class="ident">and</span>(<span class="ident">parser</span>(<span class="ident">operation_common</span>))
-    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">position</span>, (<span class="ident">name</span>, <span class="ident">variable_definitions</span>, <span class="ident">directives</span>, <span class="ident">selection_set</span>))<span class="op">|</span>
-        <span class="ident">Mutation</span> {
-            <span class="ident">position</span>, <span class="ident">name</span>, <span class="ident">selection_set</span>, <span class="ident">variable_definitions</span>, <span class="ident">directives</span>,
+    position()
+    .skip(ident(<span class="string">&quot;mutation&quot;</span>))
+    .and(parser(operation_common))
+    .map(|(position, (name, variable_definitions, directives, selection_set))|
+        Mutation {
+            position, name, selection_set, variable_definitions, directives,
         })
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subscription</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)
-    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Subscription</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>subscription&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;)
+    -&gt; ParseResult&lt;Subscription&lt;<span class="lifetime">&#39;a</span>, T&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">position</span>()
-    .<span class="ident">skip</span>(<span class="ident">ident</span>(<span class="string">&quot;subscription&quot;</span>))
-    .<span class="ident">and</span>(<span class="ident">parser</span>(<span class="ident">operation_common</span>))
-    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">position</span>, (<span class="ident">name</span>, <span class="ident">variable_definitions</span>, <span class="ident">directives</span>, <span class="ident">selection_set</span>))<span class="op">|</span>
-        <span class="ident">Subscription</span> {
-            <span class="ident">position</span>, <span class="ident">name</span>, <span class="ident">selection_set</span>, <span class="ident">variable_definitions</span>, <span class="ident">directives</span>,
+    position()
+    .skip(ident(<span class="string">&quot;subscription&quot;</span>))
+    .and(parser(operation_common))
+    .map(|(position, (name, variable_definitions, directives, selection_set))|
+        Subscription {
+            position, name, selection_set, variable_definitions, directives,
         })
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">operation_definition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)
-    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">OperationDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>operation_definition&lt;<span class="lifetime">&#39;a</span>, S&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;)
+    -&gt; ParseResult&lt;OperationDefinition&lt;<span class="lifetime">&#39;a</span>, S&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where </span>S: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">parser</span>(<span class="ident">selection_set</span>).<span class="ident">map</span>(<span class="ident">OperationDefinition::SelectionSet</span>)
-    .<span class="ident">or</span>(<span class="ident">parser</span>(<span class="ident">query</span>).<span class="ident">map</span>(<span class="ident">OperationDefinition::Query</span>))
-    .<span class="ident">or</span>(<span class="ident">parser</span>(<span class="ident">mutation</span>).<span class="ident">map</span>(<span class="ident">OperationDefinition::Mutation</span>))
-    .<span class="ident">or</span>(<span class="ident">parser</span>(<span class="ident">subscription</span>).<span class="ident">map</span>(<span class="ident">OperationDefinition::Subscription</span>))
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    parser(selection_set).map(OperationDefinition::SelectionSet)
+    .or(parser(query).map(OperationDefinition::Query))
+    .or(parser(mutation).map(OperationDefinition::Mutation))
+    .or(parser(subscription).map(OperationDefinition::Subscription))
+    .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fragment_definition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)
-    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">FragmentDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>fragment_definition&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;)
+    -&gt; ParseResult&lt;FragmentDefinition&lt;<span class="lifetime">&#39;a</span>, T&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
     (
-        <span class="ident">position</span>().<span class="ident">skip</span>(<span class="ident">ident</span>(<span class="string">&quot;fragment&quot;</span>)),
-        <span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(),
-        <span class="ident">ident</span>(<span class="string">&quot;on&quot;</span>).<span class="ident">with</span>(<span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>()).<span class="ident">map</span>(<span class="ident">TypeCondition::On</span>),
-        <span class="ident">parser</span>(<span class="ident">directives</span>),
-        <span class="ident">parser</span>(<span class="ident">selection_set</span>)
-    ).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">position</span>, <span class="ident">name</span>, <span class="ident">type_condition</span>, <span class="ident">directives</span>, <span class="ident">selection_set</span>)<span class="op">|</span> {
-        <span class="ident">FragmentDefinition</span> {
-            <span class="ident">position</span>, <span class="ident">name</span>, <span class="ident">type_condition</span>, <span class="ident">directives</span>, <span class="ident">selection_set</span>,
+        position().skip(ident(<span class="string">&quot;fragment&quot;</span>)),
+        name::&lt;<span class="lifetime">&#39;a</span>, T&gt;(),
+        ident(<span class="string">&quot;on&quot;</span>).with(name::&lt;<span class="lifetime">&#39;a</span>, T&gt;()).map(TypeCondition::On),
+        parser(directives),
+        parser(selection_set)
+    ).map(|(position, name, type_condition, directives, selection_set)| {
+        FragmentDefinition {
+            position, name, type_condition, directives, selection_set,
         }
     })
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">definition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)
-    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Definition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>definition&lt;<span class="lifetime">&#39;a</span>, S&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;)
+    -&gt; ParseResult&lt;Definition&lt;<span class="lifetime">&#39;a</span>, S&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where </span>S: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">parser</span>(<span class="ident">operation_definition</span>).<span class="ident">map</span>(<span class="ident">Definition::Operation</span>)
-    .<span class="ident">or</span>(<span class="ident">parser</span>(<span class="ident">fragment_definition</span>).<span class="ident">map</span>(<span class="ident">Definition::Fragment</span>))
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    parser(operation_definition).map(Definition::Operation)
+    .or(parser(fragment_definition).map(Definition::Fragment))
+    .parse_stream(input)
 }
 
-<span class="doccomment">/// Parses a piece of query language and returns an AST</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> 
-    <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses a piece of query language and returns an AST
+</span><span class="kw">pub fn </span>parse_query&lt;<span class="lifetime">&#39;a</span>, S&gt;(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Document&lt;<span class="lifetime">&#39;a</span>, S&gt;, ParseError&gt; 
+    <span class="kw">where </span>S: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>(<span class="ident">s</span>);
-    <span class="kw">let</span> (<span class="ident">doc</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">many1</span>(<span class="ident">parser</span>(<span class="ident">definition</span>))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">Document</span> { <span class="ident">definitions</span>: <span class="ident">d</span> })
-        .<span class="ident">skip</span>(<span class="ident">eof</span>())
-        .<span class="ident">parse_stream</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tokens</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">into_inner</span>().<span class="ident">error</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>tokens = TokenStream::new(s);
+    <span class="kw">let </span>(doc, <span class="kw">_</span>) = many1(parser(definition))
+        .map(|d| Document { definitions: d })
+        .skip(eof())
+        .parse_stream(<span class="kw-2">&amp;mut </span>tokens)
+        .map_err(|e| e.into_inner().error)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">doc</span>)
+    <span class="prelude-val">Ok</span>(doc)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::position::Pos</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query::grammar</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::parse_query</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">crate</span>::position::Pos;
+    <span class="kw">use </span><span class="kw">crate</span>::query::grammar::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">super</span>::parse_query;
 
-    <span class="kw">fn</span> <span class="ident">ast</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Document</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="ident">parse_query</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">unwrap</span>().<span class="ident">to_owned</span>()
+    <span class="kw">fn </span>ast(s: <span class="kw-2">&amp;</span>str) -&gt; Document&lt;String&gt; {
+        parse_query::&lt;String&gt;(<span class="kw-2">&amp;</span>s).unwrap().to_owned()
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">one_field</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">ast</span>(<span class="string">&quot;{ a }&quot;</span>), <span class="ident">Document</span> {
-            <span class="ident">definitions</span>: <span class="macro">vec!</span>[
-                <span class="ident">Definition::Operation</span>(<span class="ident">OperationDefinition::SelectionSet</span>(
-                    <span class="ident">SelectionSet</span> {
-                        <span class="ident">span</span>: (<span class="ident">Pos</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">1</span> },
-                               <span class="ident">Pos</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">5</span> }),
-                        <span class="ident">items</span>: <span class="macro">vec!</span>[
-                            <span class="ident">Selection::Field</span>(<span class="ident">Field</span> {
-                                <span class="ident">position</span>: <span class="ident">Pos</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">3</span> },
-                                <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-                                <span class="ident">name</span>: <span class="string">&quot;a&quot;</span>.<span class="ident">into</span>(),
-                                <span class="ident">arguments</span>: <span class="ident">Vec::new</span>(),
-                                <span class="ident">directives</span>: <span class="ident">Vec::new</span>(),
-                                <span class="ident">selection_set</span>: <span class="ident">SelectionSet</span> {
-                                    <span class="ident">span</span>: (<span class="ident">Pos</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">3</span> },
-                                           <span class="ident">Pos</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">3</span> }),
-                                    <span class="ident">items</span>: <span class="ident">Vec::new</span>()
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>one_field() {
+        <span class="macro">assert_eq!</span>(ast(<span class="string">&quot;{ a }&quot;</span>), Document {
+            definitions: <span class="macro">vec!</span>[
+                Definition::Operation(OperationDefinition::SelectionSet(
+                    SelectionSet {
+                        span: (Pos { line: <span class="number">1</span>, column: <span class="number">1 </span>},
+                               Pos { line: <span class="number">1</span>, column: <span class="number">5 </span>}),
+                        items: <span class="macro">vec!</span>[
+                            Selection::Field(Field {
+                                position: Pos { line: <span class="number">1</span>, column: <span class="number">3 </span>},
+                                alias: <span class="prelude-val">None</span>,
+                                name: <span class="string">&quot;a&quot;</span>.into(),
+                                arguments: Vec::new(),
+                                directives: Vec::new(),
+                                selection_set: SelectionSet {
+                                    span: (Pos { line: <span class="number">1</span>, column: <span class="number">3 </span>},
+                                           Pos { line: <span class="number">1</span>, column: <span class="number">3 </span>}),
+                                    items: Vec::new()
                                 },
                             }),
                         ],
@@ -537,33 +537,33 @@
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">builtin_values</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">ast</span>(<span class="string">&quot;{ a(t: true, f: false, n: null) }&quot;</span>),
-            <span class="ident">Document</span> {
-                <span class="ident">definitions</span>: <span class="macro">vec!</span>[
-                    <span class="ident">Definition::Operation</span>(<span class="ident">OperationDefinition::SelectionSet</span>(
-                        <span class="ident">SelectionSet</span> {
-                            <span class="ident">span</span>: (<span class="ident">Pos</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">1</span> },
-                                   <span class="ident">Pos</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">33</span> }),
-                            <span class="ident">items</span>: <span class="macro">vec!</span>[
-                                <span class="ident">Selection::Field</span>(<span class="ident">Field</span> {
-                                    <span class="ident">position</span>: <span class="ident">Pos</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">3</span> },
-                                    <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-                                    <span class="ident">name</span>: <span class="string">&quot;a&quot;</span>.<span class="ident">into</span>(),
-                                    <span class="ident">arguments</span>: <span class="macro">vec!</span>[
-                                        (<span class="string">&quot;t&quot;</span>.<span class="ident">into</span>(),
-                                            <span class="ident">Value::Boolean</span>(<span class="bool-val">true</span>)),
-                                        (<span class="string">&quot;f&quot;</span>.<span class="ident">into</span>(),
-                                            <span class="ident">Value::Boolean</span>(<span class="bool-val">false</span>)),
-                                        (<span class="string">&quot;n&quot;</span>.<span class="ident">into</span>(),
-                                            <span class="ident">Value::Null</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>builtin_values() {
+        <span class="macro">assert_eq!</span>(ast(<span class="string">&quot;{ a(t: true, f: false, n: null) }&quot;</span>),
+            Document {
+                definitions: <span class="macro">vec!</span>[
+                    Definition::Operation(OperationDefinition::SelectionSet(
+                        SelectionSet {
+                            span: (Pos { line: <span class="number">1</span>, column: <span class="number">1 </span>},
+                                   Pos { line: <span class="number">1</span>, column: <span class="number">33 </span>}),
+                            items: <span class="macro">vec!</span>[
+                                Selection::Field(Field {
+                                    position: Pos { line: <span class="number">1</span>, column: <span class="number">3 </span>},
+                                    alias: <span class="prelude-val">None</span>,
+                                    name: <span class="string">&quot;a&quot;</span>.into(),
+                                    arguments: <span class="macro">vec!</span>[
+                                        (<span class="string">&quot;t&quot;</span>.into(),
+                                            Value::Boolean(<span class="bool-val">true</span>)),
+                                        (<span class="string">&quot;f&quot;</span>.into(),
+                                            Value::Boolean(<span class="bool-val">false</span>)),
+                                        (<span class="string">&quot;n&quot;</span>.into(),
+                                            Value::Null),
                                     ],
-                                    <span class="ident">directives</span>: <span class="ident">Vec::new</span>(),
-                                    <span class="ident">selection_set</span>: <span class="ident">SelectionSet</span> {
-                                        <span class="ident">span</span>: (<span class="ident">Pos</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">3</span> },
-                                               <span class="ident">Pos</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">3</span> }),
-                                        <span class="ident">items</span>: <span class="ident">Vec::new</span>()
+                                    directives: Vec::new(),
+                                    selection_set: SelectionSet {
+                                        span: (Pos { line: <span class="number">1</span>, column: <span class="number">3 </span>},
+                                               Pos { line: <span class="number">1</span>, column: <span class="number">3 </span>}),
+                                        items: Vec::new()
                                     },
                                 }),
                             ],
@@ -573,16 +573,16 @@
             });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">one_field_roundtrip</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">ast</span>(<span class="string">&quot;{ a }&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;{\n  a\n}\n&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>one_field_roundtrip() {
+        <span class="macro">assert_eq!</span>(ast(<span class="string">&quot;{ a }&quot;</span>).to_string(), <span class="string">&quot;{\n  a\n}\n&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span><span class="op">=</span><span class="string">&quot;number too large&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">large_integer</span>() {
-        <span class="ident">ast</span>(<span class="string">&quot;{ a(x: 10000000000000000000000000000 }&quot;</span>);
+    <span class="attribute">#[test]
+    #[should_panic(expected=<span class="string">&quot;number too large&quot;</span>)]
+    </span><span class="kw">fn </span>large_integer() {
+        ast(<span class="string">&quot;{ a(x: 10000000000000000000000000000 }&quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="graphql_parser" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="graphql_parser" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

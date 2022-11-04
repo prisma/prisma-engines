@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/check.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>check.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/check.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>check.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -75,82 +75,82 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;logging&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::log::warn</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">ContentType</span>, <span class="ident">HandshakeType</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::message::MessagePayload</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;logging&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::log::warn;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{ContentType, HandshakeType};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::message::MessagePayload;
 
-<span class="doccomment">/// For a Message $m, and a HandshakePayload enum member $payload_type,</span>
-<span class="doccomment">/// return Ok(payload) if $m is both a handshake message and one that</span>
-<span class="doccomment">/// has the given $payload_type.  If not, return Err(rustls::Error) quoting</span>
-<span class="doccomment">/// $handshake_type as the expected handshake type.</span>
-<span class="macro">macro_rules!</span> <span class="ident">require_handshake_msg</span>(
-  ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">handshake_type</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>:<span class="ident">path</span> ) =&gt; (
-    <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>.<span class="ident">payload</span> {
-        <span class="ident">MessagePayload::Handshake</span> { <span class="ident">parsed</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::msgs::handshake::HandshakeMessagePayload</span> {
-            <span class="ident">payload</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>(<span class="ident">hm</span>),
+<span class="doccomment">/// For a Message $m, and a HandshakePayload enum member $payload_type,
+/// return Ok(payload) if $m is both a handshake message and one that
+/// has the given $payload_type.  If not, return Err(rustls::Error) quoting
+/// $handshake_type as the expected handshake type.
+</span><span class="macro">macro_rules! </span>require_handshake_msg(
+  ( <span class="macro-nonterminal">$m</span>:expr, <span class="macro-nonterminal">$handshake_type</span>:path, <span class="macro-nonterminal">$payload_type</span>:path ) =&gt; (
+    <span class="kw">match </span><span class="kw-2">&amp;</span><span class="macro-nonterminal">$m</span>.payload {
+        MessagePayload::Handshake { parsed: <span class="macro-nonterminal">$crate::msgs::handshake::HandshakeMessagePayload </span>{
+            payload: <span class="macro-nonterminal">$payload_type</span>(hm),
             ..
-        }, .. } =&gt; <span class="prelude-val">Ok</span>(<span class="ident">hm</span>),
-        <span class="ident">payload</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::check::inappropriate_handshake_message</span>(
-            <span class="ident">payload</span>,
-            <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::msgs::enums::ContentType::Handshake</span>],
-            <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">handshake_type</span>]))
+        }, .. } =&gt; <span class="prelude-val">Ok</span>(hm),
+        payload =&gt; <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$crate::check::inappropriate_handshake_message</span>(
+            payload,
+            <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$crate::msgs::enums::ContentType::Handshake</span>],
+            <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$handshake_type</span>]))
     }
   )
 );
 
-<span class="doccomment">/// Like require_handshake_msg, but moves the payload out of $m.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">require_handshake_msg_move</span>(
-  ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">handshake_type</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>:<span class="ident">path</span> ) =&gt; (
-    <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>.<span class="ident">payload</span> {
-        <span class="ident">MessagePayload::Handshake</span> { <span class="ident">parsed</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::msgs::handshake::HandshakeMessagePayload</span> {
-            <span class="ident">payload</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>(<span class="ident">hm</span>),
+<span class="doccomment">/// Like require_handshake_msg, but moves the payload out of $m.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="macro">macro_rules! </span>require_handshake_msg_move(
+  ( <span class="macro-nonterminal">$m</span>:expr, <span class="macro-nonterminal">$handshake_type</span>:path, <span class="macro-nonterminal">$payload_type</span>:path ) =&gt; (
+    <span class="kw">match </span><span class="macro-nonterminal">$m</span>.payload {
+        MessagePayload::Handshake { parsed: <span class="macro-nonterminal">$crate::msgs::handshake::HandshakeMessagePayload </span>{
+            payload: <span class="macro-nonterminal">$payload_type</span>(hm),
             ..
-        }, .. } =&gt; <span class="prelude-val">Ok</span>(<span class="ident">hm</span>),
-        <span class="ident">payload</span> =&gt;
-            <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::check::inappropriate_handshake_message</span>(
-                <span class="kw-2">&amp;</span><span class="ident">payload</span>,
-                <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::msgs::enums::ContentType::Handshake</span>],
-                <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">handshake_type</span>]))
+        }, .. } =&gt; <span class="prelude-val">Ok</span>(hm),
+        payload =&gt;
+            <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$crate::check::inappropriate_handshake_message</span>(
+                <span class="kw-2">&amp;</span>payload,
+                <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$crate::msgs::enums::ContentType::Handshake</span>],
+                <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$handshake_type</span>]))
     }
   )
 );
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">inappropriate_message</span>(
-    <span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="ident">MessagePayload</span>,
-    <span class="ident">content_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">ContentType</span>],
-) -&gt; <span class="ident">Error</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>inappropriate_message(
+    payload: <span class="kw-2">&amp;</span>MessagePayload,
+    content_types: <span class="kw-2">&amp;</span>[ContentType],
+) -&gt; Error {
     <span class="macro">warn!</span>(
         <span class="string">&quot;Received a {:?} message while expecting {:?}&quot;</span>,
-        <span class="ident">payload</span>.<span class="ident">content_type</span>(),
-        <span class="ident">content_types</span>
+        payload.content_type(),
+        content_types
     );
-    <span class="ident">Error::InappropriateMessage</span> {
-        <span class="ident">expect_types</span>: <span class="ident">content_types</span>.<span class="ident">to_vec</span>(),
-        <span class="ident">got_type</span>: <span class="ident">payload</span>.<span class="ident">content_type</span>(),
+    Error::InappropriateMessage {
+        expect_types: content_types.to_vec(),
+        got_type: payload.content_type(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">inappropriate_handshake_message</span>(
-    <span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="ident">MessagePayload</span>,
-    <span class="ident">content_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">ContentType</span>],
-    <span class="ident">handshake_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">HandshakeType</span>],
-) -&gt; <span class="ident">Error</span> {
-    <span class="kw">match</span> <span class="ident">payload</span> {
-        <span class="ident">MessagePayload::Handshake</span> { <span class="ident">parsed</span>, .. } =&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>inappropriate_handshake_message(
+    payload: <span class="kw-2">&amp;</span>MessagePayload,
+    content_types: <span class="kw-2">&amp;</span>[ContentType],
+    handshake_types: <span class="kw-2">&amp;</span>[HandshakeType],
+) -&gt; Error {
+    <span class="kw">match </span>payload {
+        MessagePayload::Handshake { parsed, .. } =&gt; {
             <span class="macro">warn!</span>(
                 <span class="string">&quot;Received a {:?} handshake message while expecting {:?}&quot;</span>,
-                <span class="ident">parsed</span>.<span class="ident">typ</span>, <span class="ident">handshake_types</span>
+                parsed.typ, handshake_types
             );
-            <span class="ident">Error::InappropriateHandshakeMessage</span> {
-                <span class="ident">expect_types</span>: <span class="ident">handshake_types</span>.<span class="ident">to_vec</span>(),
-                <span class="ident">got_type</span>: <span class="ident">parsed</span>.<span class="ident">typ</span>,
+            Error::InappropriateHandshakeMessage {
+                expect_types: handshake_types.to_vec(),
+                got_type: parsed.typ,
             }
         }
-        <span class="ident">payload</span> =&gt; <span class="ident">inappropriate_message</span>(<span class="ident">payload</span>, <span class="ident">content_types</span>),
+        payload =&gt; inappropriate_message(payload, content_types),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

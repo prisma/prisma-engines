@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/root_queries/raw.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>raw.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/root_queries/raw.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>raw.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -178,185 +178,185 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::MongoError</span>, <span class="ident">vacuum_cursor</span>, <span class="ident">BsonTransform</span>};
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">mongodb</span>::{
-    <span class="ident">bson</span>::{<span class="ident">from_bson</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>},
-    <span class="ident">options</span>::<span class="kw-2">*</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{error::MongoError, vacuum_cursor, BsonTransform};
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>mongodb::{
+    bson::{from_bson, Bson, Document},
+    options::<span class="kw-2">*</span>,
 };
-<span class="kw">use</span> <span class="ident">prisma_models::ModelRef</span>;
-<span class="kw">use</span> <span class="ident">psl::dml::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use </span>prisma_models::ModelRef;
+<span class="kw">use </span>psl::dml::PrismaValue;
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MongoCommand</span> {
-    <span class="ident">Raw</span> {
-        <span class="ident">cmd</span>: <span class="ident">Document</span>,
+<span class="attribute">#[allow(clippy::large_enum_variant)]
+</span><span class="kw">pub enum </span>MongoCommand {
+    Raw {
+        cmd: Document,
     },
-    <span class="ident">Handled</span> {
-        <span class="ident">collection</span>: <span class="ident">String</span>,
-        <span class="ident">operation</span>: <span class="ident">MongoOperation</span>,
+    Handled {
+        collection: String,
+        operation: MongoOperation,
     },
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MongoOperation</span> {
-    <span class="ident">Find</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOptions</span><span class="op">&gt;</span>),
-    <span class="ident">Aggregate</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AggregateOptions</span><span class="op">&gt;</span>),
+<span class="attribute">#[allow(clippy::large_enum_variant)]
+</span><span class="kw">pub enum </span>MongoOperation {
+    Find(<span class="prelude-ty">Option</span>&lt;Document&gt;, <span class="prelude-ty">Option</span>&lt;FindOptions&gt;),
+    Aggregate(Vec&lt;Document&gt;, <span class="prelude-ty">Option</span>&lt;AggregateOptions&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">MongoCommand</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_raw_query</span>(
-        <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>,
-        <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-        <span class="ident">query_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoCommand</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> (<span class="ident">query_type</span>.<span class="ident">as_deref</span>(), <span class="ident">model</span>) {
-            (<span class="prelude-val">Some</span>(<span class="string">&quot;findRaw&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident"><span class="self">Self</span>::find</span>(<span class="ident">m</span>, <span class="ident">inputs</span>),
-            (<span class="prelude-val">Some</span>(<span class="string">&quot;aggregateRaw&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident"><span class="self">Self</span>::aggregate</span>(<span class="ident">m</span>, <span class="ident">inputs</span>),
-            (<span class="prelude-val">Some</span>(<span class="string">&quot;runCommandRaw&quot;</span>), <span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::raw</span>(<span class="ident">inputs</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unexpected MongoDB raw query&quot;</span>),
+<span class="kw">impl </span>MongoCommand {
+    <span class="kw">pub fn </span>from_raw_query(
+        model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelRef&gt;,
+        inputs: HashMap&lt;String, PrismaValue&gt;,
+        query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;MongoCommand&gt; {
+        <span class="kw">match </span>(query_type.as_deref(), model) {
+            (<span class="prelude-val">Some</span>(<span class="string">&quot;findRaw&quot;</span>), <span class="prelude-val">Some</span>(m)) =&gt; <span class="self">Self</span>::find(m, inputs),
+            (<span class="prelude-val">Some</span>(<span class="string">&quot;aggregateRaw&quot;</span>), <span class="prelude-val">Some</span>(m)) =&gt; <span class="self">Self</span>::aggregate(m, inputs),
+            (<span class="prelude-val">Some</span>(<span class="string">&quot;runCommandRaw&quot;</span>), <span class="kw">_</span>) =&gt; <span class="self">Self</span>::raw(inputs),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unexpected MongoDB raw query&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">find</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoCommand</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">inputs</span>.<span class="ident">get_document</span>(<span class="string">&quot;filter&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">inputs</span>
-            .<span class="ident">get_document</span>(<span class="string">&quot;options&quot;</span>)<span class="question-mark">?</span>
-            .<span class="ident">map</span>(<span class="ident">Bson::Document</span>)
-            .<span class="ident">map</span>(<span class="ident">from_bson</span>::<span class="op">&lt;</span><span class="ident">FindOptions</span><span class="op">&gt;</span>)
-            .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn </span>find(model: <span class="kw-2">&amp;</span>ModelRef, inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; <span class="kw">crate</span>::Result&lt;MongoCommand&gt; {
+        <span class="kw">let </span>filter = inputs.get_document(<span class="string">&quot;filter&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>options = inputs
+            .get_document(<span class="string">&quot;options&quot;</span>)<span class="question-mark">?
+            </span>.map(Bson::Document)
+            .map(from_bson::&lt;FindOptions&gt;)
+            .transpose()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Handled</span> {
-            <span class="ident">collection</span>: <span class="ident">model</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">operation</span>: <span class="ident">MongoOperation::Find</span>(<span class="ident">filter</span>, <span class="ident">options</span>),
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Handled {
+            collection: model.db_name().to_owned(),
+            operation: MongoOperation::Find(filter, options),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">aggregate</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoCommand</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pipeline</span> <span class="op">=</span> <span class="ident">inputs</span>.<span class="ident">get_array_document</span>(<span class="string">&quot;pipeline&quot;</span>)<span class="question-mark">?</span>.<span class="ident">unwrap_or_default</span>();
-        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">inputs</span>
-            .<span class="ident">get_document</span>(<span class="string">&quot;options&quot;</span>)<span class="question-mark">?</span>
-            .<span class="ident">map</span>(<span class="ident">Bson::Document</span>)
-            .<span class="ident">map</span>(<span class="ident">from_bson</span>::<span class="op">&lt;</span><span class="ident">AggregateOptions</span><span class="op">&gt;</span>)
-            .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn </span>aggregate(model: <span class="kw-2">&amp;</span>ModelRef, inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; <span class="kw">crate</span>::Result&lt;MongoCommand&gt; {
+        <span class="kw">let </span>pipeline = inputs.get_array_document(<span class="string">&quot;pipeline&quot;</span>)<span class="question-mark">?</span>.unwrap_or_default();
+        <span class="kw">let </span>options = inputs
+            .get_document(<span class="string">&quot;options&quot;</span>)<span class="question-mark">?
+            </span>.map(Bson::Document)
+            .map(from_bson::&lt;AggregateOptions&gt;)
+            .transpose()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">MongoCommand::Handled</span> {
-            <span class="ident">collection</span>: <span class="ident">model</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">operation</span>: <span class="ident">MongoOperation::Aggregate</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>),
+        <span class="prelude-val">Ok</span>(MongoCommand::Handled {
+            collection: model.db_name().to_owned(),
+            operation: MongoOperation::Aggregate(pipeline, options),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">raw</span>(<span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoCommand</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">inputs</span>.<span class="ident">get_required_document</span>(<span class="string">&quot;command&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>raw(inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; <span class="kw">crate</span>::Result&lt;MongoCommand&gt; {
+        <span class="kw">let </span>cmd = inputs.get_required_document(<span class="string">&quot;command&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">MongoCommand::Raw</span> { <span class="ident">cmd</span> })
+        <span class="prelude-val">Ok</span>(MongoCommand::Raw { cmd })
     }
 }
 
-<span class="kw">trait</span> <span class="ident">QueryRawParsingExtension</span> {
-    <span class="kw">fn</span> <span class="ident">get_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">get_required_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">get_array_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">trait </span>QueryRawParsingExtension {
+    <span class="kw">fn </span>get_document(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;Document&gt;&gt;;
+    <span class="kw">fn </span>get_required_document(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Document&gt;;
+    <span class="kw">fn </span>get_array_document(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;Document&gt;&gt;&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">QueryRawParsingExtension</span> <span class="kw">for</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">get_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">key</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">pv</span><span class="op">|</span> <span class="ident">pv</span>.<span class="ident">try_as_bson_document</span>(<span class="ident">key</span>)).<span class="ident">transpose</span>()
+<span class="kw">impl </span>QueryRawParsingExtension <span class="kw">for </span>HashMap&lt;String, PrismaValue&gt; {
+    <span class="kw">fn </span>get_document(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;Document&gt;&gt; {
+        <span class="self">self</span>.get(key).map(|pv| pv.try_as_bson_document(key)).transpose()
     }
 
-    <span class="kw">fn</span> <span class="ident">get_required_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_document</span>(<span class="ident">key</span>)<span class="question-mark">?</span>
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">MongoError::MissingRequiredArgumentError</span> {
-                <span class="ident">argument</span>: <span class="ident">key</span>.<span class="ident">to_string</span>(),
+    <span class="kw">fn </span>get_required_document(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Document&gt; {
+        <span class="self">self</span>.get_document(key)<span class="question-mark">?
+            </span>.ok_or_else(|| MongoError::MissingRequiredArgumentError {
+                argument: key.to_string(),
             })
     }
 
-    <span class="kw">fn</span> <span class="ident">get_array_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">key</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pv</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">stages</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pv</span>
-                    .<span class="ident">try_as_bson_array</span>(<span class="ident">key</span>)<span class="question-mark">?</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">stage</span><span class="op">|</span> {
-                        <span class="ident">stage</span>.<span class="ident">into_document</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                            <span class="ident">MongoError::argument_type_mismatch</span>(<span class="ident">key</span>, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">pv</span>), <span class="string">&quot;Json::Array&lt;Json::Object&gt;&quot;</span>)
+    <span class="kw">fn </span>get_array_document(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;Document&gt;&gt;&gt; {
+        <span class="self">self</span>.get(key)
+            .map(|pv| {
+                <span class="kw">let </span>stages: Vec&lt;<span class="kw">_</span>&gt; = pv
+                    .try_as_bson_array(key)<span class="question-mark">?
+                    </span>.into_iter()
+                    .map(|stage| {
+                        stage.into_document().map_err(|<span class="kw">_</span>| {
+                            MongoError::argument_type_mismatch(key, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, pv), <span class="string">&quot;Json::Array&lt;Json::Object&gt;&quot;</span>)
                         })
                     })
-                    .<span class="ident">try_collect</span>()<span class="question-mark">?</span>;
+                    .try_collect()<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">stages</span>)
+                <span class="prelude-val">Ok</span>(stages)
             })
-            .<span class="ident">transpose</span>()
+            .transpose()
     }
 }
 
-<span class="kw">trait</span> <span class="ident">QueryRawConversionExtension</span> {
-    <span class="kw">fn</span> <span class="ident">try_as_bson</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">arg_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">try_as_bson_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">arg_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">try_as_bson_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">arg_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">trait </span>QueryRawConversionExtension {
+    <span class="kw">fn </span>try_as_bson(<span class="kw-2">&amp;</span><span class="self">self</span>, arg_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt;;
+    <span class="kw">fn </span>try_as_bson_document(<span class="kw-2">&amp;</span><span class="self">self</span>, arg_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Document&gt;;
+    <span class="kw">fn </span>try_as_bson_array(<span class="kw-2">&amp;</span><span class="self">self</span>, arg_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Bson&gt;&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">QueryRawConversionExtension</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">PrismaValue</span> {
-    <span class="kw">fn</span> <span class="ident">try_as_bson</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">arg_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PrismaValue::Json</span>(<span class="ident">json</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">json</span>: <span class="ident">serde_json::Value</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">json</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="ident">Bson::try_from</span>(<span class="ident">json</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>QueryRawConversionExtension <span class="kw">for </span><span class="kw-2">&amp;</span>PrismaValue {
+    <span class="kw">fn </span>try_as_bson(<span class="kw-2">&amp;</span><span class="self">self</span>, arg_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            PrismaValue::Json(json) =&gt; {
+                <span class="kw">let </span>json: serde_json::Value = serde_json::from_str(json.as_str())<span class="question-mark">?</span>;
+                <span class="kw">let </span>bson = Bson::try_from(json)<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">bson</span>)
+                <span class="prelude-val">Ok</span>(bson)
             }
-            <span class="ident">PrismaValue::List</span>(<span class="ident">list</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="ident">list</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pv</span><span class="op">|</span> <span class="ident">pv</span>.<span class="ident">try_as_bson</span>(<span class="ident">arg_name</span>))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            PrismaValue::List(list) =&gt; {
+                <span class="kw">let </span>bson = list
+                    .iter()
+                    .map(|pv| pv.try_as_bson(arg_name))
+                    .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">Bson::Array</span>(<span class="ident">bson</span>))
+                <span class="prelude-val">Ok</span>(Bson::Array(bson))
             }
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">MongoError::argument_type_mismatch</span>(<span class="ident">arg_name</span>, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">x</span>), <span class="string">&quot;Json&quot;</span>)),
+            x =&gt; <span class="prelude-val">Err</span>(MongoError::argument_type_mismatch(arg_name, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, x), <span class="string">&quot;Json&quot;</span>)),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">try_as_bson_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">arg_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_as_bson</span>(<span class="ident">arg_name</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>try_as_bson_document(<span class="kw-2">&amp;</span><span class="self">self</span>, arg_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Document&gt; {
+        <span class="kw">let </span>bson = <span class="self">self</span>.try_as_bson(arg_name)<span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">bson</span> {
-            <span class="ident">Bson::Document</span>(<span class="ident">doc</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">doc</span>),
-            <span class="ident">bson</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">MongoError::argument_type_mismatch</span>(
-                <span class="ident">arg_name</span>,
-                <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">bson</span>),
+        <span class="kw">match </span>bson {
+            Bson::Document(doc) =&gt; <span class="prelude-val">Ok</span>(doc),
+            bson =&gt; <span class="prelude-val">Err</span>(MongoError::argument_type_mismatch(
+                arg_name,
+                <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, bson),
                 <span class="string">&quot;Json::Object&quot;</span>,
             )),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">try_as_bson_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">arg_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_as_bson</span>(<span class="ident">arg_name</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>try_as_bson_array(<span class="kw-2">&amp;</span><span class="self">self</span>, arg_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Bson&gt;&gt; {
+        <span class="kw">let </span>bson = <span class="self">self</span>.try_as_bson(arg_name)<span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">bson</span> {
-            <span class="ident">Bson::Array</span>(<span class="ident">doc</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">doc</span>),
-            <span class="ident">bson</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">MongoError::argument_type_mismatch</span>(
-                <span class="ident">arg_name</span>,
-                <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">bson</span>),
+        <span class="kw">match </span>bson {
+            Bson::Array(doc) =&gt; <span class="prelude-val">Ok</span>(doc),
+            bson =&gt; <span class="prelude-val">Err</span>(MongoError::argument_type_mismatch(
+                arg_name,
+                <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, bson),
                 <span class="string">&quot;Json::Array&quot;</span>,
             )),
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">cursor_to_json</span>(
-    <span class="ident">cursor</span>: <span class="ident">mongodb::SessionCursor</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">mongodb::ClientSession</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">bson_result</span> <span class="op">=</span> <span class="ident">vacuum_cursor</span>(<span class="ident">cursor</span>, <span class="ident">session</span>)
-        .<span class="kw">await</span><span class="question-mark">?</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="ident">Bson::Document</span>)
-        .<span class="ident">collect_vec</span>();
-    <span class="kw">let</span> <span class="ident">json_result</span>: <span class="ident">serde_json::Value</span> <span class="op">=</span> <span class="ident">Bson::Array</span>(<span class="ident">bson_result</span>).<span class="ident">into</span>();
+<span class="kw">pub async fn </span>cursor_to_json(
+    cursor: mongodb::SessionCursor&lt;Document&gt;,
+    session: <span class="kw-2">&amp;mut </span>mongodb::ClientSession,
+) -&gt; <span class="kw">crate</span>::Result&lt;serde_json::Value&gt; {
+    <span class="kw">let </span>bson_result = vacuum_cursor(cursor, session)
+        .<span class="kw">await</span><span class="question-mark">?
+        </span>.into_iter()
+        .map(Bson::Document)
+        .collect_vec();
+    <span class="kw">let </span>json_result: serde_json::Value = Bson::Array(bson_result).into();
 
-    <span class="prelude-val">Ok</span>(<span class="ident">json_result</span>)
+    <span class="prelude-val">Ok</span>(json_result)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

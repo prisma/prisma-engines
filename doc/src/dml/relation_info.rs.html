@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/relation_info.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation_info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/relation_info.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation_info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -100,107 +100,107 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::bitflags</span>;
-<span class="kw">use</span> <span class="ident">psl_core::parser_database</span> <span class="kw">as</span> <span class="ident">db</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>enumflags2::bitflags;
+<span class="kw">use </span>psl_core::parser_database <span class="kw">as </span>db;
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// Holds information about a relation field.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationInfo</span> {
-    <span class="doccomment">/// The target model of the relation.</span>
-    <span class="kw">pub</span> <span class="ident">referenced_model</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The fields forming the relation.</span>
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The target field of the relation a.k.a. `references`</span>
-    <span class="kw">pub</span> <span class="ident">references</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The name of the relation. Internally, an empty string signals no name.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Foreign Key Constraint Name if there is one</span>
-    <span class="kw">pub</span> <span class="ident">fk_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A strategy indicating what happens when</span>
-    <span class="doccomment">/// a related node is deleted.</span>
-    <span class="kw">pub</span> <span class="ident">on_delete</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A strategy indicating what happens when</span>
-    <span class="doccomment">/// a related node is updated.</span>
-    <span class="kw">pub</span> <span class="ident">on_update</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Holds information about a relation field.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>RelationInfo {
+    <span class="doccomment">/// The target model of the relation.
+    </span><span class="kw">pub </span>referenced_model: String,
+    <span class="doccomment">/// The fields forming the relation.
+    </span><span class="kw">pub </span>fields: Vec&lt;String&gt;,
+    <span class="doccomment">/// The target field of the relation a.k.a. `references`
+    </span><span class="kw">pub </span>references: Vec&lt;String&gt;,
+    <span class="doccomment">/// The name of the relation. Internally, an empty string signals no name.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// Foreign Key Constraint Name if there is one
+    </span><span class="kw">pub </span>fk_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// A strategy indicating what happens when
+    /// a related node is deleted.
+    </span><span class="kw">pub </span>on_delete: <span class="prelude-ty">Option</span>&lt;ReferentialAction&gt;,
+    <span class="doccomment">/// A strategy indicating what happens when
+    /// a related node is updated.
+    </span><span class="kw">pub </span>on_update: <span class="prelude-ty">Option</span>&lt;ReferentialAction&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">RelationInfo</span> {
-    <span class="doccomment">/// Creates a new relation info for the</span>
-    <span class="doccomment">/// given target model.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">RelationInfo</span> {
-        <span class="ident">RelationInfo</span> {
-            <span class="ident">referenced_model</span>: <span class="ident">String::from</span>(<span class="ident">model</span>),
-            <span class="ident">fields</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">references</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">name</span>: <span class="ident">String::new</span>(),
-            <span class="ident">fk_name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">on_delete</span>: <span class="prelude-val">None</span>,
-            <span class="ident">on_update</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>RelationInfo {
+    <span class="doccomment">/// Creates a new relation info for the
+    /// given target model.
+    </span><span class="kw">pub fn </span>new(model: <span class="kw-2">&amp;</span>str) -&gt; RelationInfo {
+        RelationInfo {
+            referenced_model: String::from(model),
+            fields: Vec::new(),
+            references: Vec::new(),
+            name: String::new(),
+            fk_name: <span class="prelude-val">None</span>,
+            on_delete: <span class="prelude-val">None</span>,
+            on_update: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// Describes what happens when related nodes are deleted.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="attribute">#[<span class="ident">bitflags</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReferentialAction</span> {
-    <span class="doccomment">/// Deletes record if dependent record is deleted. Updates relation scalar</span>
-    <span class="doccomment">/// fields if referenced scalar fields of the dependent record are updated.</span>
-    <span class="doccomment">/// Prevents operation (both updates and deletes) from succeeding if any</span>
-    <span class="doccomment">/// records are connected.</span>
-    <span class="ident">Cascade</span>,
-    <span class="doccomment">/// Prevents operation (both updates and deletes) from succeeding if any</span>
-    <span class="doccomment">/// records are connected. This behavior will always result in a runtime</span>
-    <span class="doccomment">/// error for required relations.</span>
-    <span class="ident">Restrict</span>,
-    <span class="doccomment">/// Behavior is database specific. Either defers throwing an integrity check</span>
-    <span class="doccomment">/// error until the end of the transaction or errors immediately. If</span>
-    <span class="doccomment">/// deferred, this makes it possible to temporarily violate integrity in a</span>
-    <span class="doccomment">/// transaction while making sure that subsequent operations in the</span>
-    <span class="doccomment">/// transaction restore integrity.</span>
-    <span class="doccomment">/// When using relationMode = &quot;prisma&quot;, NoAction becomes an alias of</span>
-    <span class="doccomment">/// the emulated Restrict (when supported).</span>
-    <span class="ident">NoAction</span>,
-    <span class="doccomment">/// Sets relation scalar fields to null if the relation is deleted or</span>
-    <span class="doccomment">/// updated. This will always result in a runtime error if one or more of the</span>
-    <span class="doccomment">/// relation scalar fields are required.</span>
-    <span class="ident">SetNull</span>,
-    <span class="doccomment">/// Sets relation scalar fields to their default values on update or delete</span>
-    <span class="doccomment">/// of relation. Will always result in a runtime error if no defaults are</span>
-    <span class="doccomment">/// provided for any relation scalar fields.</span>
-    <span class="ident">SetDefault</span>,
+<span class="doccomment">/// Describes what happens when related nodes are deleted.
+</span><span class="attribute">#[repr(u8)]
+#[bitflags]
+#[derive(Debug, Copy, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>ReferentialAction {
+    <span class="doccomment">/// Deletes record if dependent record is deleted. Updates relation scalar
+    /// fields if referenced scalar fields of the dependent record are updated.
+    /// Prevents operation (both updates and deletes) from succeeding if any
+    /// records are connected.
+    </span>Cascade,
+    <span class="doccomment">/// Prevents operation (both updates and deletes) from succeeding if any
+    /// records are connected. This behavior will always result in a runtime
+    /// error for required relations.
+    </span>Restrict,
+    <span class="doccomment">/// Behavior is database specific. Either defers throwing an integrity check
+    /// error until the end of the transaction or errors immediately. If
+    /// deferred, this makes it possible to temporarily violate integrity in a
+    /// transaction while making sure that subsequent operations in the
+    /// transaction restore integrity.
+    /// When using relationMode = &quot;prisma&quot;, NoAction becomes an alias of
+    /// the emulated Restrict (when supported).
+    </span>NoAction,
+    <span class="doccomment">/// Sets relation scalar fields to null if the relation is deleted or
+    /// updated. This will always result in a runtime error if one or more of the
+    /// relation scalar fields are required.
+    </span>SetNull,
+    <span class="doccomment">/// Sets relation scalar fields to their default values on update or delete
+    /// of relation. Will always result in a runtime error if no defaults are
+    /// provided for any relation scalar fields.
+    </span>SetDefault,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">db::ReferentialAction</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReferentialAction</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ra</span>: <span class="ident">db::ReferentialAction</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">ra</span> {
-            <span class="ident">db::ReferentialAction::Cascade</span> =&gt; <span class="ident">ReferentialAction::Cascade</span>,
-            <span class="ident">db::ReferentialAction::SetNull</span> =&gt; <span class="ident">ReferentialAction::SetNull</span>,
-            <span class="ident">db::ReferentialAction::SetDefault</span> =&gt; <span class="ident">ReferentialAction::SetDefault</span>,
-            <span class="ident">db::ReferentialAction::Restrict</span> =&gt; <span class="ident">ReferentialAction::Restrict</span>,
-            <span class="ident">db::ReferentialAction::NoAction</span> =&gt; <span class="ident">ReferentialAction::NoAction</span>,
+<span class="kw">impl </span>From&lt;db::ReferentialAction&gt; <span class="kw">for </span>ReferentialAction {
+    <span class="kw">fn </span>from(ra: db::ReferentialAction) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>ra {
+            db::ReferentialAction::Cascade =&gt; ReferentialAction::Cascade,
+            db::ReferentialAction::SetNull =&gt; ReferentialAction::SetNull,
+            db::ReferentialAction::SetDefault =&gt; ReferentialAction::SetDefault,
+            db::ReferentialAction::Restrict =&gt; ReferentialAction::Restrict,
+            db::ReferentialAction::NoAction =&gt; ReferentialAction::NoAction,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReferentialAction</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ReferentialAction::Cascade</span> =&gt; <span class="string">&quot;Cascade&quot;</span>,
-            <span class="ident">ReferentialAction::Restrict</span> =&gt; <span class="string">&quot;Restrict&quot;</span>,
-            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="string">&quot;NoAction&quot;</span>,
-            <span class="ident">ReferentialAction::SetNull</span> =&gt; <span class="string">&quot;SetNull&quot;</span>,
-            <span class="ident">ReferentialAction::SetDefault</span> =&gt; <span class="string">&quot;SetDefault&quot;</span>,
+<span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>ReferentialAction {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            ReferentialAction::Cascade =&gt; <span class="string">&quot;Cascade&quot;</span>,
+            ReferentialAction::Restrict =&gt; <span class="string">&quot;Restrict&quot;</span>,
+            ReferentialAction::NoAction =&gt; <span class="string">&quot;NoAction&quot;</span>,
+            ReferentialAction::SetNull =&gt; <span class="string">&quot;SetNull&quot;</span>,
+            ReferentialAction::SetDefault =&gt; <span class="string">&quot;SetDefault&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ReferentialAction</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">as_ref</span>())
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ReferentialAction {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="self">self</span>.as_ref())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

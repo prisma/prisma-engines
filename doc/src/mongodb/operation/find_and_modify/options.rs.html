@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/operation/find_and_modify/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/operation/find_and_modify/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -152,159 +152,159 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
-<span class="kw">use</span> <span class="ident">typed_builder::TypedBuilder</span>;
+<span class="kw">use </span>serde::{Serialize, Serializer};
+<span class="kw">use </span>typed_builder::TypedBuilder;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>},
-    <span class="ident">bson_util</span>,
-    <span class="ident">coll::options</span>::{
-        <span class="ident">FindOneAndDeleteOptions</span>,
-        <span class="ident">FindOneAndReplaceOptions</span>,
-        <span class="ident">FindOneAndUpdateOptions</span>,
-        <span class="ident">Hint</span>,
-        <span class="ident">ReturnDocument</span>,
-        <span class="ident">UpdateModifications</span>,
+<span class="kw">use crate</span>::{
+    bson::{doc, Document},
+    bson_util,
+    coll::options::{
+        FindOneAndDeleteOptions,
+        FindOneAndReplaceOptions,
+        FindOneAndUpdateOptions,
+        Hint,
+        ReturnDocument,
+        UpdateModifications,
     },
-    <span class="ident">collation::Collation</span>,
-    <span class="ident">concern::WriteConcern</span>,
+    collation::Collation,
+    concern::WriteConcern,
 };
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">Modification</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;remove&quot;</span>, <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;self::serialize_true&quot;</span>)]</span>
-    <span class="ident">Delete</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;update&quot;</span>)]</span>
-    <span class="ident">Update</span>(<span class="ident">UpdateModifications</span>),
+<span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>Modification {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;remove&quot;</span>, serialize_with = <span class="string">&quot;self::serialize_true&quot;</span>)]
+    </span>Delete,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;update&quot;</span>)]
+    </span>Update(UpdateModifications),
 }
 
-<span class="kw">fn</span> <span class="ident">serialize_true</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="ident">s</span>.<span class="ident">serialize_bool</span>(<span class="bool-val">true</span>)
+<span class="kw">fn </span>serialize_true&lt;S: Serializer&gt;(s: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt; {
+    s.serialize_bool(<span class="bool-val">true</span>)
 }
 
-<span class="attribute">#[<span class="ident">serde_with::skip_serializing_none</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">TypedBuilder</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">FindAndModifyOptions</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">modification</span>: <span class="ident">Modification</span>,
+<span class="attribute">#[serde_with::skip_serializing_none]
+#[derive(Clone, Debug, TypedBuilder, Serialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>FindAndModifyOptions {
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) modification: Modification,
 
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sort</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="attribute">#[builder(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) sort: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[builder(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) new: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">upsert</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[builder(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) upsert: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">bypass_document_validation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[builder(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) bypass_document_validation: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">write_concern</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span>,
+    <span class="attribute">#[builder(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) write_concern: <span class="prelude-ty">Option</span>&lt;WriteConcern&gt;,
 
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">array_filters</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[builder(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) array_filters: <span class="prelude-ty">Option</span>&lt;Vec&lt;Document&gt;&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::serialize_duration_option_as_int_millis&quot;</span>,
-        <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;maxTimeMS&quot;</span>
-    )]</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(
+        serialize_with = <span class="string">&quot;bson_util::serialize_duration_option_as_int_millis&quot;</span>,
+        rename = <span class="string">&quot;maxTimeMS&quot;
+    </span>)]
+    #[builder(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) max_time: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;fields&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">projection</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;fields&quot;</span>)]
+    #[builder(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) projection: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">collation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span>,
+    <span class="attribute">#[builder(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) collation: <span class="prelude-ty">Option</span>&lt;Collation&gt;,
 
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Hint</span><span class="op">&gt;</span>,
+    <span class="attribute">#[builder(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) hint: <span class="prelude-ty">Option</span>&lt;Hint&gt;,
 
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;let&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">let_vars</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="attribute">#[builder(default)]
+    #[serde(rename = <span class="string">&quot;let&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) let_vars: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">FindAndModifyOptions</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_find_one_and_delete_options</span>(
-        <span class="ident">opts</span>: <span class="ident">FindOneAndDeleteOptions</span>,
-    ) -&gt; <span class="ident">FindAndModifyOptions</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">modify_opts</span> <span class="op">=</span> <span class="ident">FindAndModifyOptions::builder</span>()
-            .<span class="ident">modification</span>(<span class="ident">Modification::Delete</span>)
-            .<span class="ident">build</span>();
+<span class="kw">impl </span>FindAndModifyOptions {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>from_find_one_and_delete_options(
+        opts: FindOneAndDeleteOptions,
+    ) -&gt; FindAndModifyOptions {
+        <span class="kw">let </span><span class="kw-2">mut </span>modify_opts = FindAndModifyOptions::builder()
+            .modification(Modification::Delete)
+            .build();
 
-        <span class="ident">modify_opts</span>.<span class="ident">collation</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">collation</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">max_time</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">max_time</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">projection</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">projection</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">sort</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">sort</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">write_concern</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">write_concern</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">hint</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">hint</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">let_vars</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">let_vars</span>;
-        <span class="ident">modify_opts</span>
+        modify_opts.collation = opts.collation;
+        modify_opts.max_time = opts.max_time;
+        modify_opts.projection = opts.projection;
+        modify_opts.sort = opts.sort;
+        modify_opts.write_concern = opts.write_concern;
+        modify_opts.hint = opts.hint;
+        modify_opts.let_vars = opts.let_vars;
+        modify_opts
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_find_one_and_replace_options</span>(
-        <span class="ident">replacement</span>: <span class="ident">Document</span>,
-        <span class="ident">opts</span>: <span class="ident">FindOneAndReplaceOptions</span>,
-    ) -&gt; <span class="ident">FindAndModifyOptions</span> {
-        <span class="kw">let</span> <span class="ident">replacement</span> <span class="op">=</span> <span class="ident">UpdateModifications::Document</span>(<span class="ident">replacement</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">modify_opts</span> <span class="op">=</span> <span class="ident">FindAndModifyOptions::builder</span>()
-            .<span class="ident">modification</span>(<span class="ident">Modification::Update</span>(<span class="ident">replacement</span>))
-            .<span class="ident">build</span>();
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>from_find_one_and_replace_options(
+        replacement: Document,
+        opts: FindOneAndReplaceOptions,
+    ) -&gt; FindAndModifyOptions {
+        <span class="kw">let </span>replacement = UpdateModifications::Document(replacement);
+        <span class="kw">let </span><span class="kw-2">mut </span>modify_opts = FindAndModifyOptions::builder()
+            .modification(Modification::Update(replacement))
+            .build();
 
-        <span class="ident">modify_opts</span>.<span class="ident">collation</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">collation</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">bypass_document_validation</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">bypass_document_validation</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">max_time</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">max_time</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">projection</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">projection</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">new</span> <span class="op">=</span> <span class="ident">return_document_to_bool</span>(<span class="ident">opts</span>.<span class="ident">return_document</span>);
-        <span class="ident">modify_opts</span>.<span class="ident">sort</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">sort</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">upsert</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">upsert</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">write_concern</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">write_concern</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">hint</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">hint</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">let_vars</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">let_vars</span>;
+        modify_opts.collation = opts.collation;
+        modify_opts.bypass_document_validation = opts.bypass_document_validation;
+        modify_opts.max_time = opts.max_time;
+        modify_opts.projection = opts.projection;
+        modify_opts.new = return_document_to_bool(opts.return_document);
+        modify_opts.sort = opts.sort;
+        modify_opts.upsert = opts.upsert;
+        modify_opts.write_concern = opts.write_concern;
+        modify_opts.hint = opts.hint;
+        modify_opts.let_vars = opts.let_vars;
 
-        <span class="ident">modify_opts</span>
+        modify_opts
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_find_one_and_update_options</span>(
-        <span class="ident">update</span>: <span class="ident">UpdateModifications</span>,
-        <span class="ident">opts</span>: <span class="ident">FindOneAndUpdateOptions</span>,
-    ) -&gt; <span class="ident">FindAndModifyOptions</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">modify_opts</span> <span class="op">=</span> <span class="ident">FindAndModifyOptions::builder</span>()
-            .<span class="ident">modification</span>(<span class="ident">Modification::Update</span>(<span class="ident">update</span>))
-            .<span class="ident">build</span>();
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>from_find_one_and_update_options(
+        update: UpdateModifications,
+        opts: FindOneAndUpdateOptions,
+    ) -&gt; FindAndModifyOptions {
+        <span class="kw">let </span><span class="kw-2">mut </span>modify_opts = FindAndModifyOptions::builder()
+            .modification(Modification::Update(update))
+            .build();
 
-        <span class="ident">modify_opts</span>.<span class="ident">collation</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">collation</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">array_filters</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">array_filters</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">bypass_document_validation</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">bypass_document_validation</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">max_time</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">max_time</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">projection</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">projection</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">new</span> <span class="op">=</span> <span class="ident">return_document_to_bool</span>(<span class="ident">opts</span>.<span class="ident">return_document</span>);
-        <span class="ident">modify_opts</span>.<span class="ident">sort</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">sort</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">upsert</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">upsert</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">write_concern</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">write_concern</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">hint</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">hint</span>;
-        <span class="ident">modify_opts</span>.<span class="ident">let_vars</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">let_vars</span>;
+        modify_opts.collation = opts.collation;
+        modify_opts.array_filters = opts.array_filters;
+        modify_opts.bypass_document_validation = opts.bypass_document_validation;
+        modify_opts.max_time = opts.max_time;
+        modify_opts.projection = opts.projection;
+        modify_opts.new = return_document_to_bool(opts.return_document);
+        modify_opts.sort = opts.sort;
+        modify_opts.upsert = opts.upsert;
+        modify_opts.write_concern = opts.write_concern;
+        modify_opts.hint = opts.hint;
+        modify_opts.let_vars = opts.let_vars;
 
-        <span class="ident">modify_opts</span>
+        modify_opts
     }
 }
 
-<span class="kw">fn</span> <span class="ident">return_document_to_bool</span>(<span class="ident">return_document</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReturnDocument</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">return_document</span>) <span class="op">=</span> <span class="ident">return_document</span> {
-        <span class="kw">return</span> <span class="kw">match</span> <span class="ident">return_document</span> {
-            <span class="ident">ReturnDocument::After</span> =&gt; <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
-            <span class="ident">ReturnDocument::Before</span> =&gt; <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+<span class="kw">fn </span>return_document_to_bool(return_document: <span class="prelude-ty">Option</span>&lt;ReturnDocument&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(return_document) = return_document {
+        <span class="kw">return match </span>return_document {
+            ReturnDocument::After =&gt; <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+            ReturnDocument::Before =&gt; <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
         };
     }
-    <span class="prelude-val">None</span>
-}
+    <span class="prelude-val">None
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

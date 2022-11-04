@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/der.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>der.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/der.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>der.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -171,76 +171,76 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR</span>
-<span class="comment">// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN</span>
-<span class="comment">// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF</span>
-<span class="comment">// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">calendar</span>, <span class="ident">time</span>, <span class="ident">Error</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ring::io</span>::{
-    <span class="ident">der</span>::{<span class="ident">nested</span>, <span class="ident">Tag</span>, <span class="ident">CONSTRUCTED</span>},
-    <span class="ident">Positive</span>,
+</span><span class="kw">use crate</span>::{calendar, time, Error};
+<span class="kw">pub use </span>ring::io::{
+    der::{nested, Tag, CONSTRUCTED},
+    Positive,
 };
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expect_tag_and_get_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">tag</span>: <span class="ident">Tag</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="ident">ring::io::der::expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">tag</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::BadDer</span>)
+<span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>expect_tag_and_get_value&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+    tag: Tag,
+) -&gt; <span class="prelude-ty">Result</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, Error&gt; {
+    ring::io::der::expect_tag_and_get_value(input, tag).map_err(|<span class="kw">_</span>| Error::BadDer)
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>Value&lt;<span class="lifetime">&#39;a</span>&gt; {
+    value: untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Value&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expect_tag</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">tag</span>: <span class="ident">Tag</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">actual_tag</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="ident">read_tag_and_get_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">usize::from</span>(<span class="ident">tag</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">usize::from</span>(<span class="ident">actual_tag</span>) {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::BadDer</span>);
+<span class="kw">pub fn </span>expect_tag&lt;<span class="lifetime">&#39;a</span>&gt;(input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;, tag: Tag) -&gt; <span class="prelude-ty">Result</span>&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;, Error&gt; {
+    <span class="kw">let </span>(actual_tag, value) = read_tag_and_get_value(input)<span class="question-mark">?</span>;
+    <span class="kw">if </span>usize::from(tag) != usize::from(actual_tag) {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::BadDer);
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">Value</span> { <span class="ident">value</span> })
+    <span class="prelude-val">Ok</span>(Value { value })
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_tag_and_get_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="ident">ring::io::der::read_tag_and_get_value</span>(<span class="ident">input</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::BadDer</span>)
+<span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>read_tag_and_get_value&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(u8, untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;), Error&gt; {
+    ring::io::der::read_tag_and_get_value(input).map_err(|<span class="kw">_</span>| Error::BadDer)
 }
 
-<span class="comment">// TODO: investigate taking decoder as a reference to reduce generated code</span>
-<span class="comment">// size.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_of_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">outer_tag</span>: <span class="ident">Tag</span>,
-    <span class="ident">inner_tag</span>: <span class="ident">Tag</span>,
-    <span class="ident">error</span>: <span class="ident">E</span>,
-    <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">Copy</span>,
+<span class="comment">// TODO: investigate taking decoder as a reference to reduce generated code
+// size.
+</span><span class="kw">pub fn </span>nested_of_mut&lt;<span class="lifetime">&#39;a</span>, E&gt;(
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+    outer_tag: Tag,
+    inner_tag: Tag,
+    error: E,
+    <span class="kw-2">mut </span>decoder: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), E&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), E&gt;
+<span class="kw">where
+    </span>E: Copy,
 {
-    <span class="ident">nested</span>(<span class="ident">input</span>, <span class="ident">outer_tag</span>, <span class="ident">error</span>, <span class="op">|</span><span class="ident">outer</span><span class="op">|</span> {
-        <span class="kw">loop</span> {
-            <span class="ident">nested</span>(<span class="ident">outer</span>, <span class="ident">inner_tag</span>, <span class="ident">error</span>, <span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">decoder</span>(<span class="ident">inner</span>))<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">outer</span>.<span class="ident">at_end</span>() {
+    nested(input, outer_tag, error, |outer| {
+        <span class="kw">loop </span>{
+            nested(outer, inner_tag, error, |inner| decoder(inner))<span class="question-mark">?</span>;
+            <span class="kw">if </span>outer.at_end() {
                 <span class="kw">break</span>;
             }
         }
@@ -248,101 +248,101 @@
     })
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_string_with_no_unused_bits</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="ident">nested</span>(<span class="ident">input</span>, <span class="ident">Tag::BitString</span>, <span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">unused_bits_at_end</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">read_byte</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::BadDer</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">unused_bits_at_end</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::BadDer</span>);
+<span class="kw">pub fn </span>bit_string_with_no_unused_bits&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, Error&gt; {
+    nested(input, Tag::BitString, Error::BadDer, |value| {
+        <span class="kw">let </span>unused_bits_at_end = value.read_byte().map_err(|<span class="kw">_</span>| Error::BadDer)<span class="question-mark">?</span>;
+        <span class="kw">if </span>unused_bits_at_end != <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::BadDer);
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">value</span>.<span class="ident">read_bytes_to_end</span>())
+        <span class="prelude-val">Ok</span>(value.read_bytes_to_end())
     })
 }
 
-<span class="comment">// Like mozilla::pkix, we accept the nonconformant explicit encoding of</span>
-<span class="comment">// the default value (false) for compatibility with real-world certificates.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">optional_boolean</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">Tag::Boolean</span>.<span class="ident">into</span>()) {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+<span class="comment">// Like mozilla::pkix, we accept the nonconformant explicit encoding of
+// the default value (false) for compatibility with real-world certificates.
+</span><span class="kw">pub fn </span>optional_boolean(input: <span class="kw-2">&amp;mut </span>untrusted::Reader) -&gt; <span class="prelude-ty">Result</span>&lt;bool, Error&gt; {
+    <span class="kw">if </span>!input.peek(Tag::Boolean.into()) {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
     }
-    <span class="ident">nested</span>(<span class="ident">input</span>, <span class="ident">Tag::Boolean</span>, <span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-        <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_byte</span>() {
+    nested(input, Tag::Boolean, Error::BadDer, |input| {
+        <span class="kw">match </span>input.read_byte() {
             <span class="prelude-val">Ok</span>(<span class="number">0xff</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
             <span class="prelude-val">Ok</span>(<span class="number">0x00</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::BadDer</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::BadDer),
         }
     })
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">positive_integer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Positive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="ident">ring::io::der::positive_integer</span>(<span class="ident">input</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::BadDer</span>)
+<span class="kw">pub fn </span>positive_integer&lt;<span class="lifetime">&#39;a</span>&gt;(input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>untrusted::Reader) -&gt; <span class="prelude-ty">Result</span>&lt;Positive&lt;<span class="lifetime">&#39;a</span>&gt;, Error&gt; {
+    ring::io::der::positive_integer(input).map_err(|<span class="kw">_</span>| Error::BadDer)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">small_nonnegative_integer</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="ident">ring::io::der::small_nonnegative_integer</span>(<span class="ident">input</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::BadDer</span>)
+<span class="kw">pub fn </span>small_nonnegative_integer(input: <span class="kw-2">&amp;mut </span>untrusted::Reader) -&gt; <span class="prelude-ty">Result</span>&lt;u8, Error&gt; {
+    ring::io::der::small_nonnegative_integer(input).map_err(|<span class="kw">_</span>| Error::BadDer)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time_choice</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">time::Time</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">is_utc_time</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">Tag::UTCTime</span>.<span class="ident">into</span>());
-    <span class="kw">let</span> <span class="ident">expected_tag</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_utc_time</span> {
-        <span class="ident">Tag::UTCTime</span>
-    } <span class="kw">else</span> {
-        <span class="ident">Tag::GeneralizedTime</span>
+<span class="kw">pub fn </span>time_choice(input: <span class="kw-2">&amp;mut </span>untrusted::Reader) -&gt; <span class="prelude-ty">Result</span>&lt;time::Time, Error&gt; {
+    <span class="kw">let </span>is_utc_time = input.peek(Tag::UTCTime.into());
+    <span class="kw">let </span>expected_tag = <span class="kw">if </span>is_utc_time {
+        Tag::UTCTime
+    } <span class="kw">else </span>{
+        Tag::GeneralizedTime
     };
 
-    <span class="kw">fn</span> <span class="ident">read_digit</span>(<span class="ident">inner</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">const</span> <span class="ident">DIGIT</span>: <span class="ident">core::ops::RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span>;
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">read_byte</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::BadDerTime</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">DIGIT</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">u64::from</span>(<span class="ident">b</span> <span class="op">-</span> <span class="ident">DIGIT</span>.<span class="ident">start</span>()));
+    <span class="kw">fn </span>read_digit(inner: <span class="kw-2">&amp;mut </span>untrusted::Reader) -&gt; <span class="prelude-ty">Result</span>&lt;u64, Error&gt; {
+        <span class="kw">const </span>DIGIT: core::ops::RangeInclusive&lt;u8&gt; = <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span>;
+        <span class="kw">let </span>b = inner.read_byte().map_err(|<span class="kw">_</span>| Error::BadDerTime)<span class="question-mark">?</span>;
+        <span class="kw">if </span>DIGIT.contains(<span class="kw-2">&amp;</span>b) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(u64::from(b - DIGIT.start()));
         }
-        <span class="prelude-val">Err</span>(<span class="ident">Error::BadDerTime</span>)
+        <span class="prelude-val">Err</span>(Error::BadDerTime)
     }
 
-    <span class="kw">fn</span> <span class="ident">read_two_digits</span>(<span class="ident">inner</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>, <span class="ident">min</span>: <span class="ident">u64</span>, <span class="ident">max</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">read_digit</span>(<span class="ident">inner</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">read_digit</span>(<span class="ident">inner</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> (<span class="ident">hi</span> <span class="op">*</span> <span class="number">10</span>) <span class="op">+</span> <span class="ident">lo</span>;
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">&lt;</span> <span class="ident">min</span> <span class="op">|</span><span class="op">|</span> <span class="ident">value</span> <span class="op">&gt;</span> <span class="ident">max</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::BadDerTime</span>);
+    <span class="kw">fn </span>read_two_digits(inner: <span class="kw-2">&amp;mut </span>untrusted::Reader, min: u64, max: u64) -&gt; <span class="prelude-ty">Result</span>&lt;u64, Error&gt; {
+        <span class="kw">let </span>hi = read_digit(inner)<span class="question-mark">?</span>;
+        <span class="kw">let </span>lo = read_digit(inner)<span class="question-mark">?</span>;
+        <span class="kw">let </span>value = (hi * <span class="number">10</span>) + lo;
+        <span class="kw">if </span>value &lt; min || value &gt; max {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::BadDerTime);
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
+        <span class="prelude-val">Ok</span>(value)
     }
 
-    <span class="ident">nested</span>(<span class="ident">input</span>, <span class="ident">expected_tag</span>, <span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-        <span class="kw">let</span> (<span class="ident">year_hi</span>, <span class="ident">year_lo</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_utc_time</span> {
-            <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">read_two_digits</span>(<span class="ident">value</span>, <span class="number">0</span>, <span class="number">99</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">lo</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">50</span> { <span class="number">19</span> } <span class="kw">else</span> { <span class="number">20</span> };
-            (<span class="ident">hi</span>, <span class="ident">lo</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">read_two_digits</span>(<span class="ident">value</span>, <span class="number">0</span>, <span class="number">99</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">read_two_digits</span>(<span class="ident">value</span>, <span class="number">0</span>, <span class="number">99</span>)<span class="question-mark">?</span>;
-            (<span class="ident">hi</span>, <span class="ident">lo</span>)
+    nested(input, expected_tag, Error::BadDer, |value| {
+        <span class="kw">let </span>(year_hi, year_lo) = <span class="kw">if </span>is_utc_time {
+            <span class="kw">let </span>lo = read_two_digits(value, <span class="number">0</span>, <span class="number">99</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>hi = <span class="kw">if </span>lo &gt;= <span class="number">50 </span>{ <span class="number">19 </span>} <span class="kw">else </span>{ <span class="number">20 </span>};
+            (hi, lo)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>hi = read_two_digits(value, <span class="number">0</span>, <span class="number">99</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>lo = read_two_digits(value, <span class="number">0</span>, <span class="number">99</span>)<span class="question-mark">?</span>;
+            (hi, lo)
         };
 
-        <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> (<span class="ident">year_hi</span> <span class="op">*</span> <span class="number">100</span>) <span class="op">+</span> <span class="ident">year_lo</span>;
-        <span class="kw">let</span> <span class="ident">month</span> <span class="op">=</span> <span class="ident">read_two_digits</span>(<span class="ident">value</span>, <span class="number">1</span>, <span class="number">12</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">days_in_month</span> <span class="op">=</span> <span class="ident">calendar::days_in_month</span>(<span class="ident">year</span>, <span class="ident">month</span>);
-        <span class="kw">let</span> <span class="ident">day_of_month</span> <span class="op">=</span> <span class="ident">read_two_digits</span>(<span class="ident">value</span>, <span class="number">1</span>, <span class="ident">days_in_month</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">hours</span> <span class="op">=</span> <span class="ident">read_two_digits</span>(<span class="ident">value</span>, <span class="number">0</span>, <span class="number">23</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">minutes</span> <span class="op">=</span> <span class="ident">read_two_digits</span>(<span class="ident">value</span>, <span class="number">0</span>, <span class="number">59</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="ident">read_two_digits</span>(<span class="ident">value</span>, <span class="number">0</span>, <span class="number">59</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>year = (year_hi * <span class="number">100</span>) + year_lo;
+        <span class="kw">let </span>month = read_two_digits(value, <span class="number">1</span>, <span class="number">12</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>days_in_month = calendar::days_in_month(year, month);
+        <span class="kw">let </span>day_of_month = read_two_digits(value, <span class="number">1</span>, days_in_month)<span class="question-mark">?</span>;
+        <span class="kw">let </span>hours = read_two_digits(value, <span class="number">0</span>, <span class="number">23</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>minutes = read_two_digits(value, <span class="number">0</span>, <span class="number">59</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>seconds = read_two_digits(value, <span class="number">0</span>, <span class="number">59</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">time_zone</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">read_byte</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::BadDerTime</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">time_zone</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;Z&#39;</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::BadDerTime</span>);
+        <span class="kw">let </span>time_zone = value.read_byte().map_err(|<span class="kw">_</span>| Error::BadDerTime)<span class="question-mark">?</span>;
+        <span class="kw">if </span>time_zone != <span class="string">b&#39;Z&#39; </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::BadDerTime);
         }
 
-        <span class="ident">calendar::time_from_ymdhms_utc</span>(<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day_of_month</span>, <span class="ident">hours</span>, <span class="ident">minutes</span>, <span class="ident">seconds</span>)
+        calendar::time_from_ymdhms_utc(year, month, day_of_month, hours, minutes, seconds)
     })
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">oid</span> {
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">second</span>:<span class="ident">expr</span>, $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">expr</span> ),<span class="op">*</span> ) =&gt;
+<span class="macro">macro_rules! </span>oid {
+    ( <span class="macro-nonterminal">$first</span>:expr, <span class="macro-nonterminal">$second</span>:expr, $( <span class="macro-nonterminal">$tail</span>:expr ),* ) =&gt;
     (
-        [(<span class="number">40</span> <span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>) <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">second</span>, $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span> ),<span class="kw-2">*</span>]
+        [(<span class="number">40 </span>* <span class="macro-nonterminal">$first</span>) + <span class="macro-nonterminal">$second</span>, $( <span class="macro-nonterminal">$tail </span>),<span class="kw-2">*</span>]
     )
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

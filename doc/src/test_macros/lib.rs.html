@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/test-macros/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../test_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../test_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../test_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/test-macros/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../test_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../test_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../test_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -212,174 +212,174 @@
 <span id="212">212</span>
 <span id="213">213</span>
 <span id="214">214</span>
-</pre><pre class="rust"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+</pre><pre class="rust"><code><span class="kw">extern crate </span>proc_macro;
 
-<span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Delimiter</span>, <span class="ident">TokenTree</span>};
-<span class="kw">use</span> <span class="ident">quote::quote</span>;
-<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_macro_input</span>, <span class="ident">AttributeArgs</span>, <span class="ident">Lit</span>, <span class="ident">LitStr</span>, <span class="ident">Meta</span>, <span class="ident">MetaList</span>, <span class="ident">MetaNameValue</span>, <span class="ident">NestedMeta</span>, <span class="ident">Signature</span>};
+<span class="kw">use </span>proc_macro::TokenStream;
+<span class="kw">use </span>proc_macro2::{Delimiter, TokenTree};
+<span class="kw">use </span>quote::quote;
+<span class="kw">use </span>syn::{parse_macro_input, AttributeArgs, Lit, LitStr, Meta, MetaList, MetaNameValue, NestedMeta, Signature};
 
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_connector</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">attributes_meta</span>: <span class="ident">syn::AttributeArgs</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">attr</span> <span class="kw">as</span> <span class="ident">AttributeArgs</span>);
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">proc_macro2::TokenStream::from</span>(<span class="ident">input</span>);
+<span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>test_connector(attr: TokenStream, input: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span>attributes_meta: syn::AttributeArgs = <span class="macro">parse_macro_input!</span>(attr <span class="kw">as </span>AttributeArgs);
+    <span class="kw">let </span>input = proc_macro2::TokenStream::from(input);
 
-    <span class="comment">// First the attributes</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">TestConnectorAttrs::default</span>();
+    <span class="comment">// First the attributes
+    </span><span class="kw">let </span><span class="kw-2">mut </span>attrs = TestConnectorAttrs::default();
 
-    <span class="kw">for</span> <span class="ident">meta</span> <span class="kw">in</span> <span class="ident">attributes_meta</span> {
-        <span class="kw">match</span> <span class="ident">meta</span> {
-            <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::List</span>(<span class="ident">list</span>)) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">attrs</span>.<span class="ident">ingest_meta_list</span>(<span class="ident">list</span>) {
-                    <span class="kw">return</span> <span class="ident">err</span>.<span class="ident">to_compile_error</span>().<span class="ident">into</span>();
+    <span class="kw">for </span>meta <span class="kw">in </span>attributes_meta {
+        <span class="kw">match </span>meta {
+            NestedMeta::Meta(Meta::List(list)) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = attrs.ingest_meta_list(list) {
+                    <span class="kw">return </span>err.to_compile_error().into();
                 }
             }
-            <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::NameValue</span>(<span class="ident">MetaNameValue</span> {
-                <span class="ident">lit</span>: <span class="ident">Lit::Str</span>(<span class="ident">litstr</span>),
-                <span class="ident">eq_token</span>: <span class="kw">_</span>,
-                <span class="ident">path</span>,
-            })) <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;ignore&quot;</span>) =&gt; <span class="ident">attrs</span>.<span class="ident">ignore_reason</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">litstr</span>),
-            <span class="ident">other</span> =&gt; {
-                <span class="kw">return</span> <span class="ident">syn::Error::new_spanned</span>(<span class="ident">other</span>, <span class="string">&quot;Unexpected argument&quot;</span>)
-                    .<span class="ident">into_compile_error</span>()
-                    .<span class="ident">into</span>()
+            NestedMeta::Meta(Meta::NameValue(MetaNameValue {
+                lit: Lit::Str(litstr),
+                eq_token: <span class="kw">_</span>,
+                path,
+            })) <span class="kw">if </span>path.is_ident(<span class="string">&quot;ignore&quot;</span>) =&gt; attrs.ignore_reason = <span class="prelude-val">Some</span>(litstr),
+            other =&gt; {
+                <span class="kw">return </span>syn::Error::new_spanned(other, <span class="string">&quot;Unexpected argument&quot;</span>)
+                    .into_compile_error()
+                    .into()
             }
         }
     }
 
-    <span class="comment">// Then the function item</span>
-    <span class="comment">// We take advantage of the function body being the last token tree (surrounded by braces).</span>
-    <span class="kw">let</span> (<span class="ident">sig</span>, <span class="ident">body</span>): (<span class="ident">Signature</span>, <span class="ident">proc_macro2::TokenStream</span>) <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">sig_tokens</span> <span class="op">=</span> <span class="ident">input</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">t</span>, <span class="ident">TokenTree::Group</span>(<span class="ident">g</span>) <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">g</span>.<span class="ident">delimiter</span>(), <span class="ident">Delimiter::Brace</span>)))
-            .<span class="ident">collect</span>();
+    <span class="comment">// Then the function item
+    // We take advantage of the function body being the last token tree (surrounded by braces).
+    </span><span class="kw">let </span>(sig, body): (Signature, proc_macro2::TokenStream) = {
+        <span class="kw">let </span>sig_tokens = input
+            .clone()
+            .into_iter()
+            .take_while(|t| !<span class="macro">matches!</span>(t, TokenTree::Group(g) <span class="kw">if </span><span class="macro">matches!</span>(g.delimiter(), Delimiter::Brace)))
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">into_iter</span>().<span class="ident">last</span>().<span class="ident">expect</span>(<span class="string">&quot;Failed to find function body&quot;</span>);
+        <span class="kw">let </span>body = input.into_iter().last().expect(<span class="string">&quot;Failed to find function body&quot;</span>);
 
-        <span class="kw">match</span> <span class="ident">syn::parse2</span>(<span class="ident">sig_tokens</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">sig</span>) =&gt; (<span class="ident">sig</span>, <span class="ident">body</span>.<span class="ident">into</span>()),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">err</span>.<span class="ident">into_compile_error</span>().<span class="ident">into</span>(),
+        <span class="kw">match </span>syn::parse2(sig_tokens) {
+            <span class="prelude-val">Ok</span>(sig) =&gt; (sig, body.into()),
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span>err.into_compile_error().into(),
         }
     };
 
-    <span class="comment">// Generate the final function</span>
-    <span class="kw">let</span> <span class="ident">include_tagged</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attrs</span>.<span class="ident">include_tagged</span>;
-    <span class="kw">let</span> <span class="ident">exclude_tagged</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attrs</span>.<span class="ident">exclude_tagged</span>;
-    <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attrs</span>.<span class="ident">capabilities</span>;
-    <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attrs</span>.<span class="ident">preview_features</span>;
-    <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attrs</span>.<span class="ident">namespaces</span>;
+    <span class="comment">// Generate the final function
+    </span><span class="kw">let </span>include_tagged = <span class="kw-2">&amp;</span>attrs.include_tagged;
+    <span class="kw">let </span>exclude_tagged = <span class="kw-2">&amp;</span>attrs.exclude_tagged;
+    <span class="kw">let </span>capabilities = <span class="kw-2">&amp;</span>attrs.capabilities;
+    <span class="kw">let </span>preview_features = <span class="kw-2">&amp;</span>attrs.preview_features;
+    <span class="kw">let </span>namespaces = <span class="kw-2">&amp;</span>attrs.namespaces;
 
-    <span class="kw">let</span> <span class="ident">test_function_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sig</span>.<span class="ident">ident</span>;
-    <span class="kw">let</span> <span class="ident">test_function_name_lit</span> <span class="op">=</span> <span class="ident">sig</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>();
-    <span class="kw">let</span> (<span class="ident">arg_name</span>, <span class="ident">arg_type</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">extract_api_arg</span>(<span class="kw-2">&amp;</span><span class="ident">sig</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">args</span>) =&gt; <span class="ident">args</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">err</span>.<span class="ident">to_compile_error</span>().<span class="ident">into</span>(),
+    <span class="kw">let </span>test_function_name = <span class="kw-2">&amp;</span>sig.ident;
+    <span class="kw">let </span>test_function_name_lit = sig.ident.to_string();
+    <span class="kw">let </span>(arg_name, arg_type) = <span class="kw">match </span>extract_api_arg(<span class="kw-2">&amp;</span>sig) {
+        <span class="prelude-val">Ok</span>(args) =&gt; args,
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span>err.to_compile_error().into(),
     };
-    <span class="kw">let</span> <span class="ident">ignore_attr</span> <span class="op">=</span> <span class="ident">attrs</span>.<span class="ident">ignore_reason</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">reason</span><span class="op">|</span> <span class="macro">quote!</span>(<span class="attribute">#[<span class="ident">ignore</span> <span class="op">=</span> #<span class="ident">reason</span>]</span>));
+    <span class="kw">let </span>ignore_attr = attrs.ignore_reason.map(|reason| <span class="macro">quote!</span>(<span class="attribute">#[ignore = #reason]</span>));
 
-    <span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">sig</span>.<span class="ident">asyncness</span>.<span class="ident">is_some</span>() {
-        <span class="kw">let</span> (<span class="ident">return_ty</span>, <span class="ident">unwrap</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">sig</span>.<span class="ident">output</span> {
-            <span class="ident">syn::ReturnType::Default</span> =&gt; (<span class="macro">quote!</span>(()), <span class="macro">quote!</span>()),
-            <span class="ident">syn::ReturnType::Type</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">ty</span>) =&gt; (<span class="macro">quote!</span>(#<span class="ident">ty</span>), <span class="macro">quote!</span>(.<span class="ident">unwrap</span>())),
+    <span class="kw">let </span>tokens = <span class="kw">if </span>sig.asyncness.is_some() {
+        <span class="kw">let </span>(return_ty, unwrap) = <span class="kw">match </span>sig.output {
+            syn::ReturnType::Default =&gt; (<span class="macro">quote!</span>(()), <span class="macro">quote!</span>()),
+            syn::ReturnType::Type(<span class="kw">_</span>, <span class="kw-2">ref </span>ty) =&gt; (<span class="macro">quote!</span>(#ty), <span class="macro">quote!</span>(.unwrap())),
         };
 
-        <span class="macro">quote!</span> {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            #<span class="ident">ignore_attr</span>
-            <span class="kw">fn</span> #<span class="ident">test_function_name</span>() {
-                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">test_setup::TestApiArgs::new</span>(#<span class="ident">test_function_name_lit</span>, <span class="kw-2">&amp;</span>[#(#<span class="ident">preview_features</span>,)<span class="kw-2">*</span>], <span class="kw-2">&amp;</span>[#(#<span class="ident">namespaces</span>,)<span class="kw-2">*</span>]);
+        <span class="macro">quote! </span>{
+            <span class="attribute">#[test]
+            </span>#ignore_attr
+            <span class="kw">fn </span>#test_function_name() {
+                <span class="kw">let </span>args = test_setup::TestApiArgs::new(#test_function_name_lit, <span class="kw-2">&amp;</span>[#(#preview_features,)<span class="kw-2">*</span>], <span class="kw-2">&amp;</span>[#(#namespaces,)<span class="kw-2">*</span>]);
 
-                <span class="kw">if</span> <span class="ident">test_setup::should_skip_test</span>(
-                    <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Tags</span>::#<span class="ident">include_tagged</span>)<span class="kw-2">*</span>,
-                    <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Tags</span>::#<span class="ident">exclude_tagged</span>)<span class="kw-2">*</span>,
-                    <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Capabilities</span>::#<span class="ident">capabilities</span>)<span class="kw-2">*</span>,
-                ) { <span class="kw">return</span> }
+                <span class="kw">if </span>test_setup::should_skip_test(
+                    BitFlags::empty() #(| Tags::#include_tagged)<span class="kw-2">*</span>,
+                    BitFlags::empty() #(| Tags::#exclude_tagged)<span class="kw-2">*</span>,
+                    BitFlags::empty() #(| Capabilities::#capabilities)<span class="kw-2">*</span>,
+                ) { <span class="kw">return </span>}
 
-                <span class="ident">test_setup::runtime::run_with_thread_local_runtime</span>::<span class="op">&lt;</span>#<span class="ident">return_ty</span><span class="op">&gt;</span>(<span class="kw">async</span> {
-                    <span class="kw">let</span> #<span class="ident">arg_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span>#<span class="ident">arg_type::new</span>(<span class="ident">args</span>).<span class="kw">await</span>;
+                test_setup::runtime::run_with_thread_local_runtime::&lt;#return_ty&gt;(<span class="kw">async </span>{
+                    <span class="kw">let </span>#arg_name = <span class="kw-2">&amp;</span>#arg_type::new(args).<span class="kw">await</span>;
 
-                    #<span class="ident">body</span>
+                    #body
 
-                })#<span class="ident">unwrap</span>;
+                })#unwrap;
             }
         }
-    } <span class="kw">else</span> {
-        <span class="macro">quote!</span> {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            #<span class="ident">ignore_attr</span>
-            <span class="kw">fn</span> #<span class="ident">test_function_name</span>() {
-                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">test_setup::TestApiArgs::new</span>(#<span class="ident">test_function_name_lit</span>, <span class="kw-2">&amp;</span>[#(#<span class="ident">preview_features</span>,)<span class="kw-2">*</span>], <span class="kw-2">&amp;</span>[#(#<span class="ident">namespaces</span>,)<span class="kw-2">*</span>]);
+    } <span class="kw">else </span>{
+        <span class="macro">quote! </span>{
+            <span class="attribute">#[test]
+            </span>#ignore_attr
+            <span class="kw">fn </span>#test_function_name() {
+                <span class="kw">let </span>args = test_setup::TestApiArgs::new(#test_function_name_lit, <span class="kw-2">&amp;</span>[#(#preview_features,)<span class="kw-2">*</span>], <span class="kw-2">&amp;</span>[#(#namespaces,)<span class="kw-2">*</span>]);
 
-                <span class="kw">if</span> <span class="ident">test_setup::should_skip_test</span>(
-                    <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Tags</span>::#<span class="ident">include_tagged</span>)<span class="kw-2">*</span>,
-                    <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Tags</span>::#<span class="ident">exclude_tagged</span>)<span class="kw-2">*</span>,
-                    <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Capabilities</span>::#<span class="ident">capabilities</span>)<span class="kw-2">*</span>,
-                ) { <span class="kw">return</span> }
+                <span class="kw">if </span>test_setup::should_skip_test(
+                    BitFlags::empty() #(| Tags::#include_tagged)<span class="kw-2">*</span>,
+                    BitFlags::empty() #(| Tags::#exclude_tagged)<span class="kw-2">*</span>,
+                    BitFlags::empty() #(| Capabilities::#capabilities)<span class="kw-2">*</span>,
+                ) { <span class="kw">return </span>}
 
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">all</span>)]</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> #<span class="ident">arg_name</span> <span class="op">=</span> #<span class="ident">arg_type::new</span>(<span class="ident">args</span>);
+                <span class="attribute">#[allow(all)]
+                </span><span class="kw">let </span><span class="kw-2">mut </span>#arg_name = #arg_type::new(args);
 
-                #<span class="ident">body</span>
+                #body
             }
         }
     };
 
-    <span class="ident">tokens</span>.<span class="ident">into</span>()
+    tokens.into()
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">struct</span> <span class="ident">TestConnectorAttrs</span> {
-    <span class="ident">include_tagged</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::Path</span><span class="op">&gt;</span>,
-    <span class="ident">exclude_tagged</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::Path</span><span class="op">&gt;</span>,
-    <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::Path</span><span class="op">&gt;</span>,
-    <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::LitStr</span><span class="op">&gt;</span>,
-    <span class="ident">namespaces</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::LitStr</span><span class="op">&gt;</span>,
-    <span class="ident">ignore_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LitStr</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Default)]
+</span><span class="kw">struct </span>TestConnectorAttrs {
+    include_tagged: Vec&lt;syn::Path&gt;,
+    exclude_tagged: Vec&lt;syn::Path&gt;,
+    capabilities: Vec&lt;syn::Path&gt;,
+    preview_features: Vec&lt;syn::LitStr&gt;,
+    namespaces: Vec&lt;syn::LitStr&gt;,
+    ignore_reason: <span class="prelude-ty">Option</span>&lt;LitStr&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TestConnectorAttrs</span> {
-    <span class="kw">fn</span> <span class="ident">ingest_meta_list</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">list</span>: <span class="ident">MetaList</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">list</span>.<span class="ident">path</span> {
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">is_ident</span>(<span class="string">&quot;tags&quot;</span>) =&gt; <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">include_tagged</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">is_ident</span>(<span class="string">&quot;exclude&quot;</span>) =&gt; <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">exclude_tagged</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">is_ident</span>(<span class="string">&quot;capabilities&quot;</span>) =&gt; <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">capabilities</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">is_ident</span>(<span class="string">&quot;preview_features&quot;</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">preview_features</span>.<span class="ident">reserve</span>(<span class="ident">list</span>.<span class="ident">nested</span>.<span class="ident">len</span>());
+<span class="kw">impl </span>TestConnectorAttrs {
+    <span class="kw">fn </span>ingest_meta_list(<span class="kw-2">&amp;mut </span><span class="self">self</span>, list: MetaList) -&gt; <span class="prelude-ty">Result</span>&lt;(), syn::Error&gt; {
+        <span class="kw">let </span>target: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw">_</span>&gt; = <span class="kw">match </span>list.path {
+            p <span class="kw">if </span>p.is_ident(<span class="string">&quot;tags&quot;</span>) =&gt; <span class="kw-2">&amp;mut </span><span class="self">self</span>.include_tagged,
+            p <span class="kw">if </span>p.is_ident(<span class="string">&quot;exclude&quot;</span>) =&gt; <span class="kw-2">&amp;mut </span><span class="self">self</span>.exclude_tagged,
+            p <span class="kw">if </span>p.is_ident(<span class="string">&quot;capabilities&quot;</span>) =&gt; <span class="kw-2">&amp;mut </span><span class="self">self</span>.capabilities,
+            p <span class="kw">if </span>p.is_ident(<span class="string">&quot;preview_features&quot;</span>) =&gt; {
+                <span class="self">self</span>.preview_features.reserve(list.nested.len());
 
-                <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">list</span>.<span class="ident">nested</span> {
-                    <span class="kw">match</span> <span class="ident">item</span> {
-                        <span class="ident">NestedMeta::Lit</span>(<span class="ident">Lit::Str</span>(<span class="ident">s</span>)) =&gt; <span class="self">self</span>.<span class="ident">preview_features</span>.<span class="ident">push</span>(<span class="ident">s</span>),
-                        <span class="ident">other</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">other</span>, <span class="string">&quot;Unexpected argument&quot;</span>)),
+                <span class="kw">for </span>item <span class="kw">in </span>list.nested {
+                    <span class="kw">match </span>item {
+                        NestedMeta::Lit(Lit::Str(s)) =&gt; <span class="self">self</span>.preview_features.push(s),
+                        other =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(other, <span class="string">&quot;Unexpected argument&quot;</span>)),
                     }
                 }
 
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">is_ident</span>(<span class="string">&quot;namespaces&quot;</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">namespaces</span>.<span class="ident">reserve</span>(<span class="ident">list</span>.<span class="ident">nested</span>.<span class="ident">len</span>());
+            p <span class="kw">if </span>p.is_ident(<span class="string">&quot;namespaces&quot;</span>) =&gt; {
+                <span class="self">self</span>.namespaces.reserve(list.nested.len());
 
-                <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">list</span>.<span class="ident">nested</span> {
-                    <span class="kw">match</span> <span class="ident">item</span> {
-                        <span class="ident">NestedMeta::Lit</span>(<span class="ident">Lit::Str</span>(<span class="ident">s</span>)) =&gt; <span class="self">self</span>.<span class="ident">namespaces</span>.<span class="ident">push</span>(<span class="ident">s</span>),
-                        <span class="ident">other</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">other</span>, <span class="string">&quot;Unexpected argument&quot;</span>)),
+                <span class="kw">for </span>item <span class="kw">in </span>list.nested {
+                    <span class="kw">match </span>item {
+                        NestedMeta::Lit(Lit::Str(s)) =&gt; <span class="self">self</span>.namespaces.push(s),
+                        other =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(other, <span class="string">&quot;Unexpected argument&quot;</span>)),
                     }
                 }
 
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
-            <span class="ident">other</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">other</span>, <span class="string">&quot;Unexpected argument&quot;</span>)),
+            other =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(other, <span class="string">&quot;Unexpected argument&quot;</span>)),
         };
 
-        <span class="ident">target</span>.<span class="ident">reserve</span>(<span class="ident">list</span>.<span class="ident">nested</span>.<span class="ident">len</span>());
+        target.reserve(list.nested.len());
 
-        <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">list</span>.<span class="ident">nested</span> {
-            <span class="kw">match</span> <span class="ident">item</span> {
-                <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="ident">p</span>)) <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">get_ident</span>().<span class="ident">is_some</span>() =&gt; {
-                    <span class="ident">target</span>.<span class="ident">push</span>(<span class="ident">p</span>);
+        <span class="kw">for </span>item <span class="kw">in </span>list.nested {
+            <span class="kw">match </span>item {
+                NestedMeta::Meta(Meta::Path(p)) <span class="kw">if </span>p.get_ident().is_some() =&gt; {
+                    target.push(p);
                 }
-                <span class="ident">other</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">other</span>, <span class="string">&quot;Unexpected argument&quot;</span>)),
+                other =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(other, <span class="string">&quot;Unexpected argument&quot;</span>)),
             }
         }
 
@@ -387,44 +387,44 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">extract_api_arg</span>(<span class="ident">sig</span>: <span class="kw-2">&amp;</span><span class="ident">Signature</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>, <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>), <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">syn::spanned::Spanned</span>;
+<span class="kw">fn </span>extract_api_arg(sig: <span class="kw-2">&amp;</span>Signature) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span>syn::Ident, <span class="kw-2">&amp;</span>syn::Ident), syn::Error&gt; {
+    <span class="kw">use </span>syn::spanned::Spanned;
 
-    <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="op">|</span><span class="ident">span</span><span class="op">|</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
-            <span class="ident">span</span>,
+    <span class="kw">let </span>err = |span| {
+        <span class="prelude-val">Err</span>(syn::Error::new(
+            span,
             <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">&quot;Unsupported syntax. Arguments to test functions should be of the form `fn test_fn(api: {}TestApi)`&quot;</span>,
-                <span class="kw">if</span> <span class="ident">sig</span>.<span class="ident">asyncness</span>.<span class="ident">is_some</span>() { <span class="string">&quot;&amp;&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> }
+                <span class="kw">if </span>sig.asyncness.is_some() { <span class="string">&quot;&amp;&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>}
             ),
         ))
     };
 
-    <span class="kw">match</span> (<span class="ident">sig</span>.<span class="ident">inputs</span>.<span class="ident">first</span>(), <span class="ident">sig</span>.<span class="ident">inputs</span>.<span class="ident">len</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">syn::FnArg::Typed</span>(<span class="ident">pattype</span>)), <span class="number">1</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">arg_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pattype</span>.<span class="ident">pat</span>.<span class="ident">as_ref</span>() {
-                <span class="ident">syn::Pat::Ident</span>(<span class="ident">ident</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">ident</span>,
-                <span class="ident">other</span> =&gt; <span class="kw">return</span> <span class="ident">err</span>(<span class="ident">other</span>.<span class="ident">span</span>()),
+    <span class="kw">match </span>(sig.inputs.first(), sig.inputs.len()) {
+        (<span class="prelude-val">Some</span>(syn::FnArg::Typed(pattype)), <span class="number">1</span>) =&gt; {
+            <span class="kw">let </span>arg_name = <span class="kw">match </span>pattype.pat.as_ref() {
+                syn::Pat::Ident(ident) =&gt; <span class="kw-2">&amp;</span>ident.ident,
+                other =&gt; <span class="kw">return </span>err(other.span()),
             };
 
-            <span class="kw">let</span> <span class="ident">arg_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pattype</span>.<span class="ident">ty</span>.<span class="ident">as_ref</span>() {
-                <span class="ident">syn::Type::Reference</span>(<span class="ident">syn::TypeReference</span> {
-                    <span class="ident">mutability</span>: <span class="prelude-val">None</span>, <span class="ident">elem</span>, ..
-                }) <span class="kw">if</span> <span class="ident">sig</span>.<span class="ident">asyncness</span>.<span class="ident">is_some</span>() =&gt; <span class="kw">match</span> <span class="ident">elem</span>.<span class="ident">as_ref</span>() {
-                    <span class="ident">syn::Type::Path</span>(<span class="ident">ident</span>) =&gt; <span class="ident">ident</span>.<span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">unwrap</span>(),
-                    <span class="ident">other</span> =&gt; <span class="kw">return</span> <span class="ident">err</span>(<span class="ident">other</span>.<span class="ident">span</span>()),
+            <span class="kw">let </span>arg_type = <span class="kw">match </span>pattype.ty.as_ref() {
+                syn::Type::Reference(syn::TypeReference {
+                    mutability: <span class="prelude-val">None</span>, elem, ..
+                }) <span class="kw">if </span>sig.asyncness.is_some() =&gt; <span class="kw">match </span>elem.as_ref() {
+                    syn::Type::Path(ident) =&gt; ident.path.get_ident().unwrap(),
+                    other =&gt; <span class="kw">return </span>err(other.span()),
                 },
-                <span class="ident">syn::Type::Path</span>(<span class="ident">ident</span>) =&gt; <span class="ident">ident</span>.<span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">unwrap</span>(),
-                <span class="ident">other</span> =&gt; <span class="kw">return</span> <span class="ident">err</span>(<span class="ident">other</span>.<span class="ident">span</span>()),
+                syn::Type::Path(ident) =&gt; ident.path.get_ident().unwrap(),
+                other =&gt; <span class="kw">return </span>err(other.span()),
             };
 
-            <span class="prelude-val">Ok</span>((<span class="ident">arg_name</span>, <span class="ident">arg_type</span>))
+            <span class="prelude-val">Ok</span>((arg_name, arg_type))
         }
-        (<span class="kw">_</span>, <span class="ident">n</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-            <span class="kw-2">&amp;</span><span class="ident">sig</span>.<span class="ident">inputs</span>,
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Test functions should take one argument, not {}&quot;</span>, <span class="ident">n</span>),
+        (<span class="kw">_</span>, n) =&gt; <span class="prelude-val">Err</span>(syn::Error::new_spanned(
+            <span class="kw-2">&amp;</span>sig.inputs,
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Test functions should take one argument, not {}&quot;</span>, n),
         )),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="test_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="test_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

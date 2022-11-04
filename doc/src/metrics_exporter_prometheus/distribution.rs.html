@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-exporter-prometheus-0.10.0/src/distribution.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>distribution.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_exporter_prometheus/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-exporter-prometheus-0.10.0/src/distribution.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>distribution.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_exporter_prometheus/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -108,115 +108,115 @@
 <span id="108">108</span>
 <span id="109">109</span>
 <span id="110">110</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Arc</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::{collections::HashMap, sync::Arc};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::Matcher</span>;
+<span class="kw">use </span><span class="kw">crate</span>::common::Matcher;
 
-<span class="kw">use</span> <span class="ident">metrics_util</span>::{<span class="ident">Histogram</span>, <span class="ident">Quantile</span>, <span class="ident">Summary</span>};
+<span class="kw">use </span>metrics_util::{Histogram, Quantile, Summary};
 
-<span class="doccomment">/// Distribution type.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Distribution</span> {
-    <span class="doccomment">/// A Prometheus histogram.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Exposes &quot;bucketed&quot; values to Prometheus, counting the number of samples</span>
-    <span class="doccomment">/// below a given threshold i.e. 100 requests faster than 20ms, 1000 requests</span>
-    <span class="doccomment">/// faster than 50ms, etc.</span>
-    <span class="ident">Histogram</span>(<span class="ident">Histogram</span>),
-    <span class="doccomment">/// A Prometheus summary.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Computes and exposes value quantiles directly to Prometheus i.e. 50% of</span>
-    <span class="doccomment">/// requests were faster than 200ms, and 99% of requests were faster than</span>
-    <span class="doccomment">/// 1000ms, etc.</span>
-    <span class="ident">Summary</span>(<span class="ident">Summary</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Quantile</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">f64</span>),
+<span class="doccomment">/// Distribution type.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub enum </span>Distribution {
+    <span class="doccomment">/// A Prometheus histogram.
+    ///
+    /// Exposes &quot;bucketed&quot; values to Prometheus, counting the number of samples
+    /// below a given threshold i.e. 100 requests faster than 20ms, 1000 requests
+    /// faster than 50ms, etc.
+    </span>Histogram(Histogram),
+    <span class="doccomment">/// A Prometheus summary.
+    ///
+    /// Computes and exposes value quantiles directly to Prometheus i.e. 50% of
+    /// requests were faster than 200ms, and 99% of requests were faster than
+    /// 1000ms, etc.
+    </span>Summary(Summary, Arc&lt;Vec&lt;Quantile&gt;&gt;, f64),
 }
 
-<span class="kw">impl</span> <span class="ident">Distribution</span> {
-    <span class="doccomment">/// Creates a histogram distribution.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_histogram</span>(<span class="ident">buckets</span>: <span class="kw-2">&amp;</span>[<span class="ident">f64</span>]) -&gt; <span class="ident">Distribution</span> {
-        <span class="kw">let</span> <span class="ident">hist</span> <span class="op">=</span> <span class="ident">Histogram::new</span>(<span class="ident">buckets</span>).<span class="ident">expect</span>(<span class="string">&quot;buckets should never be empty&quot;</span>);
-        <span class="ident">Distribution::Histogram</span>(<span class="ident">hist</span>)
+<span class="kw">impl </span>Distribution {
+    <span class="doccomment">/// Creates a histogram distribution.
+    </span><span class="kw">pub fn </span>new_histogram(buckets: <span class="kw-2">&amp;</span>[f64]) -&gt; Distribution {
+        <span class="kw">let </span>hist = Histogram::new(buckets).expect(<span class="string">&quot;buckets should never be empty&quot;</span>);
+        Distribution::Histogram(hist)
     }
 
-    <span class="doccomment">/// Creates a summary distribution.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_summary</span>(<span class="ident">quantiles</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Quantile</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Distribution</span> {
-        <span class="kw">let</span> <span class="ident">summary</span> <span class="op">=</span> <span class="ident">Summary::with_defaults</span>();
-        <span class="ident">Distribution::Summary</span>(<span class="ident">summary</span>, <span class="ident">quantiles</span>, <span class="number">0.0</span>)
+    <span class="doccomment">/// Creates a summary distribution.
+    </span><span class="kw">pub fn </span>new_summary(quantiles: Arc&lt;Vec&lt;Quantile&gt;&gt;) -&gt; Distribution {
+        <span class="kw">let </span>summary = Summary::with_defaults();
+        Distribution::Summary(summary, quantiles, <span class="number">0.0</span>)
     }
 
-    <span class="doccomment">/// Records the given `samples` in the current distribution.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">record_samples</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">samples</span>: <span class="kw-2">&amp;</span>[<span class="ident">f64</span>]) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Distribution::Histogram</span>(<span class="ident">hist</span>) =&gt; <span class="ident">hist</span>.<span class="ident">record_many</span>(<span class="ident">samples</span>),
-            <span class="ident">Distribution::Summary</span>(<span class="ident">hist</span>, <span class="kw">_</span>, <span class="ident">sum</span>) =&gt; {
-                <span class="kw">for</span> <span class="ident">sample</span> <span class="kw">in</span> <span class="ident">samples</span> {
-                    <span class="ident">hist</span>.<span class="ident">add</span>(<span class="kw-2">*</span><span class="ident">sample</span>);
-                    <span class="kw-2">*</span><span class="ident">sum</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">sample</span>;
+    <span class="doccomment">/// Records the given `samples` in the current distribution.
+    </span><span class="kw">pub fn </span>record_samples(<span class="kw-2">&amp;mut </span><span class="self">self</span>, samples: <span class="kw-2">&amp;</span>[f64]) {
+        <span class="kw">match </span><span class="self">self </span>{
+            Distribution::Histogram(hist) =&gt; hist.record_many(samples),
+            Distribution::Summary(hist, <span class="kw">_</span>, sum) =&gt; {
+                <span class="kw">for </span>sample <span class="kw">in </span>samples {
+                    hist.add(<span class="kw-2">*</span>sample);
+                    <span class="kw-2">*</span>sum += <span class="kw-2">*</span>sample;
                 }
             }
         }
     }
 }
 
-<span class="doccomment">/// Builds distributions for metric names based on a set of configured overrides.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DistributionBuilder</span> {
-    <span class="ident">quantiles</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Quantile</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">buckets</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">bucket_overrides</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Matcher</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Builds distributions for metric names based on a set of configured overrides.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>DistributionBuilder {
+    quantiles: Arc&lt;Vec&lt;Quantile&gt;&gt;,
+    buckets: <span class="prelude-ty">Option</span>&lt;Vec&lt;f64&gt;&gt;,
+    bucket_overrides: <span class="prelude-ty">Option</span>&lt;Vec&lt;(Matcher, Vec&lt;f64&gt;)&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">DistributionBuilder</span> {
-    <span class="doccomment">/// Creates a new instance of `DistributionBuilder`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">quantiles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Quantile</span><span class="op">&gt;</span>,
-        <span class="ident">buckets</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">bucket_overrides</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Matcher</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">DistributionBuilder</span> {
-        <span class="ident">DistributionBuilder</span> {
-            <span class="ident">quantiles</span>: <span class="ident">Arc::new</span>(<span class="ident">quantiles</span>),
-            <span class="ident">buckets</span>,
-            <span class="ident">bucket_overrides</span>: <span class="ident">bucket_overrides</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">entries</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">matchers</span> <span class="op">=</span> <span class="ident">entries</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-                <span class="ident">matchers</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="number">0</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">0</span>));
-                <span class="ident">matchers</span>
+<span class="kw">impl </span>DistributionBuilder {
+    <span class="doccomment">/// Creates a new instance of `DistributionBuilder`.
+    </span><span class="kw">pub fn </span>new(
+        quantiles: Vec&lt;Quantile&gt;,
+        buckets: <span class="prelude-ty">Option</span>&lt;Vec&lt;f64&gt;&gt;,
+        bucket_overrides: <span class="prelude-ty">Option</span>&lt;HashMap&lt;Matcher, Vec&lt;f64&gt;&gt;&gt;,
+    ) -&gt; DistributionBuilder {
+        DistributionBuilder {
+            quantiles: Arc::new(quantiles),
+            buckets,
+            bucket_overrides: bucket_overrides.map(|entries| {
+                <span class="kw">let </span><span class="kw-2">mut </span>matchers = entries.into_iter().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+                matchers.sort_by(|a, b| a.<span class="number">0</span>.cmp(<span class="kw-2">&amp;</span>b.<span class="number">0</span>));
+                matchers
             }),
         }
     }
 
-    <span class="doccomment">/// Returns a distribution for the given metric key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_distribution</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Distribution</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">overrides</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">bucket_overrides</span> {
-            <span class="kw">for</span> (<span class="ident">matcher</span>, <span class="ident">buckets</span>) <span class="kw">in</span> <span class="ident">overrides</span>.<span class="ident">iter</span>() {
-                <span class="kw">if</span> <span class="ident">matcher</span>.<span class="ident">matches</span>(<span class="ident">name</span>) {
-                    <span class="kw">return</span> <span class="ident">Distribution::new_histogram</span>(<span class="ident">buckets</span>);
+    <span class="doccomment">/// Returns a distribution for the given metric key.
+    </span><span class="kw">pub fn </span>get_distribution(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; Distribution {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>overrides) = <span class="self">self</span>.bucket_overrides {
+            <span class="kw">for </span>(matcher, buckets) <span class="kw">in </span>overrides.iter() {
+                <span class="kw">if </span>matcher.matches(name) {
+                    <span class="kw">return </span>Distribution::new_histogram(buckets);
                 }
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">buckets</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">buckets</span> {
-            <span class="kw">return</span> <span class="ident">Distribution::new_histogram</span>(<span class="ident">buckets</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>buckets) = <span class="self">self</span>.buckets {
+            <span class="kw">return </span>Distribution::new_histogram(buckets);
         }
 
-        <span class="ident">Distribution::new_summary</span>(<span class="self">self</span>.<span class="ident">quantiles</span>.<span class="ident">clone</span>())
+        Distribution::new_summary(<span class="self">self</span>.quantiles.clone())
     }
 
-    <span class="doccomment">/// Returns the distribution type for the given metric key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_distribution_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="string">&quot;histogram&quot;</span>;
+    <span class="doccomment">/// Returns the distribution type for the given metric key.
+    </span><span class="kw">pub fn </span>get_distribution_type(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">if </span><span class="self">self</span>.buckets.is_some() {
+            <span class="kw">return </span><span class="string">&quot;histogram&quot;</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">overrides</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">bucket_overrides</span> {
-            <span class="kw">for</span> (<span class="ident">matcher</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">overrides</span>.<span class="ident">iter</span>() {
-                <span class="kw">if</span> <span class="ident">matcher</span>.<span class="ident">matches</span>(<span class="ident">name</span>) {
-                    <span class="kw">return</span> <span class="string">&quot;histogram&quot;</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>overrides) = <span class="self">self</span>.bucket_overrides {
+            <span class="kw">for </span>(matcher, <span class="kw">_</span>) <span class="kw">in </span>overrides.iter() {
+                <span class="kw">if </span>matcher.matches(name) {
+                    <span class="kw">return </span><span class="string">&quot;histogram&quot;</span>;
                 }
             }
         }
 
-        <span class="string">&quot;summary&quot;</span>
-    }
+        <span class="string">&quot;summary&quot;
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_exporter_prometheus" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_exporter_prometheus" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

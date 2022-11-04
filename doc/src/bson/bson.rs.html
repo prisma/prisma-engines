@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/bson.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bson.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/bson.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bson.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1144,765 +1144,765 @@
 <span id="1144">1144</span>
 <span id="1145">1145</span>
 <span id="1146">1146</span>
-</pre><pre class="rust"><code><span class="comment">// The MIT License (MIT)</span>
+</pre><pre class="rust"><code><span class="comment">// The MIT License (MIT)
 
-<span class="comment">// Copyright (c) 2015 Y. T. Chung &lt;zonyitoo@gmail.com&gt;</span>
+// Copyright (c) 2015 Y. T. Chung &lt;zonyitoo@gmail.com&gt;
 
-<span class="comment">// Permission is hereby granted, free of charge, to any person obtaining a copy of</span>
-<span class="comment">// this software and associated documentation files (the &quot;Software&quot;), to deal in</span>
-<span class="comment">// the Software without restriction, including without limitation the rights to</span>
-<span class="comment">// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of</span>
-<span class="comment">// the Software, and to permit persons to whom the Software is furnished to do so,</span>
-<span class="comment">// subject to the following conditions:</span>
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the &quot;Software&quot;), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+// the Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
 
-<span class="comment">// The above copyright notice and this permission notice shall be included in all</span>
-<span class="comment">// copies or substantial portions of the Software.</span>
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
 
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
-<span class="comment">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS</span>
-<span class="comment">// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR</span>
-<span class="comment">// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER</span>
-<span class="comment">// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-<span class="doccomment">//! BSON definition</span>
+</span><span class="doccomment">//! BSON definition
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
-    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>},
+</span><span class="kw">use </span>std::{
+    convert::{TryFrom, TryInto},
+    fmt::{<span class="self">self</span>, Debug, Display, Formatter},
 };
 
-<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
+<span class="kw">use </span>serde_json::{json, Value};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::document::Document</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">oid</span>::{<span class="self">self</span>, <span class="ident">ObjectId</span>},
-    <span class="ident">spec</span>::{<span class="ident">BinarySubtype</span>, <span class="ident">ElementType</span>},
-    <span class="ident">Decimal128</span>,
-    <span class="ident">RawBinaryRef</span>,
+<span class="kw">pub use </span><span class="kw">crate</span>::document::Document;
+<span class="kw">use crate</span>::{
+    oid::{<span class="self">self</span>, ObjectId},
+    spec::{BinarySubtype, ElementType},
+    Decimal128,
+    RawBinaryRef,
 };
 
-<span class="doccomment">/// Possible BSON value types.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Bson</span> {
-    <span class="doccomment">/// 64-bit binary floating point</span>
-    <span class="ident">Double</span>(<span class="ident">f64</span>),
-    <span class="doccomment">/// UTF-8 string</span>
-    <span class="ident">String</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// Array</span>
-    <span class="ident">Array</span>(<span class="ident">Array</span>),
-    <span class="doccomment">/// Embedded document</span>
-    <span class="ident">Document</span>(<span class="ident">Document</span>),
-    <span class="doccomment">/// Boolean value</span>
-    <span class="ident">Boolean</span>(<span class="ident">bool</span>),
-    <span class="doccomment">/// Null value</span>
-    <span class="ident">Null</span>,
-    <span class="doccomment">/// Regular expression</span>
-    <span class="ident">RegularExpression</span>(<span class="ident">Regex</span>),
-    <span class="doccomment">/// JavaScript code</span>
-    <span class="ident">JavaScriptCode</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// JavaScript code w/ scope</span>
-    <span class="ident">JavaScriptCodeWithScope</span>(<span class="ident">JavaScriptCodeWithScope</span>),
-    <span class="doccomment">/// 32-bit signed integer</span>
-    <span class="ident">Int32</span>(<span class="ident">i32</span>),
-    <span class="doccomment">/// 64-bit signed integer</span>
-    <span class="ident">Int64</span>(<span class="ident">i64</span>),
-    <span class="doccomment">/// Timestamp</span>
-    <span class="ident">Timestamp</span>(<span class="ident">Timestamp</span>),
-    <span class="doccomment">/// Binary data</span>
-    <span class="ident">Binary</span>(<span class="ident">Binary</span>),
-    <span class="doccomment">/// [ObjectId](http://dochub.mongodb.org/core/objectids)</span>
-    <span class="ident">ObjectId</span>(<span class="ident">oid::ObjectId</span>),
-    <span class="doccomment">/// UTC datetime</span>
-    <span class="ident">DateTime</span>(<span class="ident"><span class="kw">crate</span>::DateTime</span>),
-    <span class="doccomment">/// Symbol (Deprecated)</span>
-    <span class="ident">Symbol</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// [128-bit decimal floating point](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst)</span>
-    <span class="ident">Decimal128</span>(<span class="ident">Decimal128</span>),
-    <span class="doccomment">/// Undefined value (Deprecated)</span>
-    <span class="ident">Undefined</span>,
-    <span class="doccomment">/// Max key</span>
-    <span class="ident">MaxKey</span>,
-    <span class="doccomment">/// Min key</span>
-    <span class="ident">MinKey</span>,
-    <span class="doccomment">/// DBPointer (Deprecated)</span>
-    <span class="ident">DbPointer</span>(<span class="ident">DbPointer</span>),
+<span class="doccomment">/// Possible BSON value types.
+</span><span class="attribute">#[derive(Clone, PartialEq)]
+</span><span class="kw">pub enum </span>Bson {
+    <span class="doccomment">/// 64-bit binary floating point
+    </span>Double(f64),
+    <span class="doccomment">/// UTF-8 string
+    </span>String(String),
+    <span class="doccomment">/// Array
+    </span>Array(Array),
+    <span class="doccomment">/// Embedded document
+    </span>Document(Document),
+    <span class="doccomment">/// Boolean value
+    </span>Boolean(bool),
+    <span class="doccomment">/// Null value
+    </span>Null,
+    <span class="doccomment">/// Regular expression
+    </span>RegularExpression(Regex),
+    <span class="doccomment">/// JavaScript code
+    </span>JavaScriptCode(String),
+    <span class="doccomment">/// JavaScript code w/ scope
+    </span>JavaScriptCodeWithScope(JavaScriptCodeWithScope),
+    <span class="doccomment">/// 32-bit signed integer
+    </span>Int32(i32),
+    <span class="doccomment">/// 64-bit signed integer
+    </span>Int64(i64),
+    <span class="doccomment">/// Timestamp
+    </span>Timestamp(Timestamp),
+    <span class="doccomment">/// Binary data
+    </span>Binary(Binary),
+    <span class="doccomment">/// [ObjectId](http://dochub.mongodb.org/core/objectids)
+    </span>ObjectId(oid::ObjectId),
+    <span class="doccomment">/// UTC datetime
+    </span>DateTime(<span class="kw">crate</span>::DateTime),
+    <span class="doccomment">/// Symbol (Deprecated)
+    </span>Symbol(String),
+    <span class="doccomment">/// [128-bit decimal floating point](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst)
+    </span>Decimal128(Decimal128),
+    <span class="doccomment">/// Undefined value (Deprecated)
+    </span>Undefined,
+    <span class="doccomment">/// Max key
+    </span>MaxKey,
+    <span class="doccomment">/// Min key
+    </span>MinKey,
+    <span class="doccomment">/// DBPointer (Deprecated)
+    </span>DbPointer(DbPointer),
 }
 
-<span class="doccomment">/// Alias for `Vec&lt;Bson&gt;`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Array</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Alias for `Vec&lt;Bson&gt;`.
+</span><span class="kw">pub type </span>Array = Vec&lt;Bson&gt;;
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Bson::Null</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        Bson::Null
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Double</span>(<span class="ident">f</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">f</span>),
-            <span class="ident">Bson::String</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="ident">s</span>),
-            <span class="ident">Bson::Array</span>(<span class="kw-2">ref</span> <span class="ident">vec</span>) =&gt; {
-                <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Display <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Double(f) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, f),
+            Bson::String(<span class="kw-2">ref </span>s) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;\&quot;{}\&quot;&quot;</span>, s),
+            Bson::Array(<span class="kw-2">ref </span>vec) =&gt; {
+                fmt.write_str(<span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="kw">for</span> <span class="ident">bson</span> <span class="kw">in</span> <span class="ident">vec</span> {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">first</span> {
-                        <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
+                <span class="kw">for </span>bson <span class="kw">in </span>vec {
+                    <span class="kw">if </span>!first {
+                        fmt.write_str(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
                     }
 
-                    <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">bson</span>)<span class="question-mark">?</span>;
-                    <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                    <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, bson)<span class="question-mark">?</span>;
+                    first = <span class="bool-val">false</span>;
                 }
 
-                <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;]&quot;</span>)
+                fmt.write_str(<span class="string">&quot;]&quot;</span>)
             }
-            <span class="ident">Bson::Document</span>(<span class="kw-2">ref</span> <span class="ident">doc</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">doc</span>),
-            <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">b</span>),
-            <span class="ident">Bson::Null</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;null&quot;</span>),
-            <span class="ident">Bson::RegularExpression</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Bson::JavaScriptCode</span>(<span class="kw-2">ref</span> <span class="ident">code</span>)
-            <span class="op">|</span> <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident">JavaScriptCodeWithScope</span> { <span class="kw-2">ref</span> <span class="ident">code</span>, .. }) =&gt; {
-                <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="ident">code</span>)
+            Bson::Document(<span class="kw-2">ref </span>doc) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, doc),
+            Bson::Boolean(b) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, b),
+            Bson::Null =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;null&quot;</span>),
+            Bson::RegularExpression(<span class="kw-2">ref </span>x) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, x),
+            Bson::JavaScriptCode(<span class="kw-2">ref </span>code)
+            | Bson::JavaScriptCodeWithScope(JavaScriptCodeWithScope { <span class="kw-2">ref </span>code, .. }) =&gt; {
+                fmt.write_str(code)
             }
-            <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">i</span>),
-            <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">i</span>),
-            <span class="ident">Bson::Timestamp</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Bson::Binary</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Bson::ObjectId</span>(<span class="kw-2">ref</span> <span class="ident">id</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;ObjectId(\&quot;{}\&quot;)&quot;</span>, <span class="ident">id</span>),
-            <span class="ident">Bson::DateTime</span>(<span class="ident">date_time</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;DateTime(\&quot;{}\&quot;)&quot;</span>, <span class="ident">date_time</span>),
-            <span class="ident">Bson::Symbol</span>(<span class="kw-2">ref</span> <span class="ident">sym</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;Symbol(\&quot;{}\&quot;)&quot;</span>, <span class="ident">sym</span>),
-            <span class="ident">Bson::Decimal128</span>(<span class="kw-2">ref</span> <span class="ident">d</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">d</span>),
-            <span class="ident">Bson::Undefined</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;undefined&quot;</span>),
-            <span class="ident">Bson::MinKey</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;MinKey&quot;</span>),
-            <span class="ident">Bson::MaxKey</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;MaxKey&quot;</span>),
-            <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer</span> {
-                <span class="kw-2">ref</span> <span class="ident">namespace</span>,
-                <span class="kw-2">ref</span> <span class="ident">id</span>,
-            }) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;DbPointer({}, {})&quot;</span>, <span class="ident">namespace</span>, <span class="ident">id</span>),
+            Bson::Int32(i) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, i),
+            Bson::Int64(i) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, i),
+            Bson::Timestamp(<span class="kw-2">ref </span>x) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, x),
+            Bson::Binary(<span class="kw-2">ref </span>x) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, x),
+            Bson::ObjectId(<span class="kw-2">ref </span>id) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;ObjectId(\&quot;{}\&quot;)&quot;</span>, id),
+            Bson::DateTime(date_time) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;DateTime(\&quot;{}\&quot;)&quot;</span>, date_time),
+            Bson::Symbol(<span class="kw-2">ref </span>sym) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;Symbol(\&quot;{}\&quot;)&quot;</span>, sym),
+            Bson::Decimal128(<span class="kw-2">ref </span>d) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, d),
+            Bson::Undefined =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;undefined&quot;</span>),
+            Bson::MinKey =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;MinKey&quot;</span>),
+            Bson::MaxKey =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;MaxKey&quot;</span>),
+            Bson::DbPointer(DbPointer {
+                <span class="kw-2">ref </span>namespace,
+                <span class="kw-2">ref </span>id,
+            }) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;DbPointer({}, {})&quot;</span>, namespace, id),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Double</span>(<span class="ident">f</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Double&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">f</span>).<span class="ident">finish</span>(),
-            <span class="ident">Bson::String</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;String&quot;</span>).<span class="ident">field</span>(<span class="ident">s</span>).<span class="ident">finish</span>(),
-            <span class="ident">Bson::Array</span>(<span class="kw-2">ref</span> <span class="ident">vec</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;Array(&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">Debug::fmt</span>(<span class="ident">vec</span>, <span class="ident">fmt</span>)<span class="question-mark">?</span>;
-                <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;)&quot;</span>)
+<span class="kw">impl </span>Debug <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Double(f) =&gt; fmt.debug_tuple(<span class="string">&quot;Double&quot;</span>).field(<span class="kw-2">&amp;</span>f).finish(),
+            Bson::String(<span class="kw-2">ref </span>s) =&gt; fmt.debug_tuple(<span class="string">&quot;String&quot;</span>).field(s).finish(),
+            Bson::Array(<span class="kw-2">ref </span>vec) =&gt; {
+                <span class="macro">write!</span>(fmt, <span class="string">&quot;Array(&quot;</span>)<span class="question-mark">?</span>;
+                Debug::fmt(vec, fmt)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(fmt, <span class="string">&quot;)&quot;</span>)
             }
-            <span class="ident">Bson::Document</span>(<span class="kw-2">ref</span> <span class="ident">doc</span>) =&gt; <span class="ident">Debug::fmt</span>(<span class="ident">doc</span>, <span class="ident">fmt</span>),
-            <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Boolean&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>).<span class="ident">finish</span>(),
-            <span class="ident">Bson::Null</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;Null&quot;</span>),
-            <span class="ident">Bson::RegularExpression</span>(<span class="kw-2">ref</span> <span class="ident">regex</span>) =&gt; <span class="ident">Debug::fmt</span>(<span class="ident">regex</span>, <span class="ident">fmt</span>),
-            <span class="ident">Bson::JavaScriptCode</span>(<span class="kw-2">ref</span> <span class="ident">code</span>) =&gt; {
-                <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;JavaScriptCode&quot;</span>).<span class="ident">field</span>(<span class="ident">code</span>).<span class="ident">finish</span>()
+            Bson::Document(<span class="kw-2">ref </span>doc) =&gt; Debug::fmt(doc, fmt),
+            Bson::Boolean(b) =&gt; fmt.debug_tuple(<span class="string">&quot;Boolean&quot;</span>).field(<span class="kw-2">&amp;</span>b).finish(),
+            Bson::Null =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;Null&quot;</span>),
+            Bson::RegularExpression(<span class="kw-2">ref </span>regex) =&gt; Debug::fmt(regex, fmt),
+            Bson::JavaScriptCode(<span class="kw-2">ref </span>code) =&gt; {
+                fmt.debug_tuple(<span class="string">&quot;JavaScriptCode&quot;</span>).field(code).finish()
             }
-            <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="kw-2">ref</span> <span class="ident">code</span>) =&gt; <span class="ident">Debug::fmt</span>(<span class="ident">code</span>, <span class="ident">fmt</span>),
-            <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Int32&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>).<span class="ident">finish</span>(),
-            <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Int64&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>).<span class="ident">finish</span>(),
-            <span class="ident">Bson::Timestamp</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; <span class="ident">Debug::fmt</span>(<span class="ident">t</span>, <span class="ident">fmt</span>),
-            <span class="ident">Bson::Binary</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">Debug::fmt</span>(<span class="ident">b</span>, <span class="ident">fmt</span>),
-            <span class="ident">Bson::ObjectId</span>(<span class="kw-2">ref</span> <span class="ident">id</span>) =&gt; <span class="ident">Debug::fmt</span>(<span class="ident">id</span>, <span class="ident">fmt</span>),
-            <span class="ident">Bson::DateTime</span>(<span class="kw-2">ref</span> <span class="ident">date_time</span>) =&gt; <span class="ident">Debug::fmt</span>(<span class="ident">date_time</span>, <span class="ident">fmt</span>),
-            <span class="ident">Bson::Symbol</span>(<span class="kw-2">ref</span> <span class="ident">sym</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Symbol&quot;</span>).<span class="ident">field</span>(<span class="ident">sym</span>).<span class="ident">finish</span>(),
-            <span class="ident">Bson::Decimal128</span>(<span class="kw-2">ref</span> <span class="ident">d</span>) =&gt; <span class="ident">Debug::fmt</span>(<span class="ident">d</span>, <span class="ident">fmt</span>),
-            <span class="ident">Bson::Undefined</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;Undefined&quot;</span>),
-            <span class="ident">Bson::MinKey</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;MinKey&quot;</span>),
-            <span class="ident">Bson::MaxKey</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;MaxKey&quot;</span>),
-            <span class="ident">Bson::DbPointer</span>(<span class="kw-2">ref</span> <span class="ident">pointer</span>) =&gt; <span class="ident">Debug::fmt</span>(<span class="ident">pointer</span>, <span class="ident">fmt</span>),
+            Bson::JavaScriptCodeWithScope(<span class="kw-2">ref </span>code) =&gt; Debug::fmt(code, fmt),
+            Bson::Int32(i) =&gt; fmt.debug_tuple(<span class="string">&quot;Int32&quot;</span>).field(<span class="kw-2">&amp;</span>i).finish(),
+            Bson::Int64(i) =&gt; fmt.debug_tuple(<span class="string">&quot;Int64&quot;</span>).field(<span class="kw-2">&amp;</span>i).finish(),
+            Bson::Timestamp(<span class="kw-2">ref </span>t) =&gt; Debug::fmt(t, fmt),
+            Bson::Binary(<span class="kw-2">ref </span>b) =&gt; Debug::fmt(b, fmt),
+            Bson::ObjectId(<span class="kw-2">ref </span>id) =&gt; Debug::fmt(id, fmt),
+            Bson::DateTime(<span class="kw-2">ref </span>date_time) =&gt; Debug::fmt(date_time, fmt),
+            Bson::Symbol(<span class="kw-2">ref </span>sym) =&gt; fmt.debug_tuple(<span class="string">&quot;Symbol&quot;</span>).field(sym).finish(),
+            Bson::Decimal128(<span class="kw-2">ref </span>d) =&gt; Debug::fmt(d, fmt),
+            Bson::Undefined =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;Undefined&quot;</span>),
+            Bson::MinKey =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;MinKey&quot;</span>),
+            Bson::MaxKey =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;MaxKey&quot;</span>),
+            Bson::DbPointer(<span class="kw-2">ref </span>pointer) =&gt; Debug::fmt(pointer, fmt),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">f32</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::Double</span>(<span class="ident">a</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;f32&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: f32) -&gt; Bson {
+        Bson::Double(a.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">f64</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::Double</span>(<span class="ident">a</span>)
+<span class="kw">impl </span>From&lt;f64&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: f64) -&gt; Bson {
+        Bson::Double(a)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::String</span>(<span class="ident">s</span>.<span class="ident">to_owned</span>())
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>str&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span>str) -&gt; Bson {
+        Bson::String(s.to_owned())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">String</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::String</span>(<span class="ident">a</span>)
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: String) -&gt; Bson {
+        Bson::String(a)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">Document</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::Document</span>(<span class="ident">a</span>)
+<span class="kw">impl </span>From&lt;Document&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: Document) -&gt; Bson {
+        Bson::Document(a)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::Boolean</span>(<span class="ident">a</span>)
+<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: bool) -&gt; Bson {
+        Bson::Boolean(a)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">regex</span>: <span class="ident">Regex</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::RegularExpression</span>(<span class="ident">regex</span>)
+<span class="kw">impl </span>From&lt;Regex&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(regex: Regex) -&gt; Bson {
+        Bson::RegularExpression(regex)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">JavaScriptCodeWithScope</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">code_with_scope</span>: <span class="ident">JavaScriptCodeWithScope</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident">code_with_scope</span>)
+<span class="kw">impl </span>From&lt;JavaScriptCodeWithScope&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(code_with_scope: JavaScriptCodeWithScope) -&gt; Bson {
+        Bson::JavaScriptCodeWithScope(code_with_scope)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Binary</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">binary</span>: <span class="ident">Binary</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::Binary</span>(<span class="ident">binary</span>)
+<span class="kw">impl </span>From&lt;Binary&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(binary: Binary) -&gt; Bson {
+        Bson::Binary(binary)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ts</span>: <span class="ident">Timestamp</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::Timestamp</span>(<span class="ident">ts</span>)
+<span class="kw">impl </span>From&lt;Timestamp&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(ts: Timestamp) -&gt; Bson {
+        Bson::Timestamp(ts)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;<span class="kw-2">&amp;</span>T&gt; <span class="kw">for </span>Bson
+<span class="kw">where
+    </span>T: Clone + Into&lt;Bson&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">t</span>.<span class="ident">clone</span>().<span class="ident">into</span>()
+    <span class="kw">fn </span>from(t: <span class="kw-2">&amp;</span>T) -&gt; Bson {
+        t.clone().into()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;Vec&lt;T&gt;&gt; <span class="kw">for </span>Bson
+<span class="kw">where
+    </span>T: Into&lt;Bson&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::Array</span>(<span class="ident">v</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">into</span>()).<span class="ident">collect</span>())
+    <span class="kw">fn </span>from(v: Vec&lt;T&gt;) -&gt; Bson {
+        Bson::Array(v.into_iter().map(|val| val.into()).collect())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;<span class="kw-2">&amp;</span>[T]&gt; <span class="kw">for </span>Bson
+<span class="kw">where
+    </span>T: Clone + Into&lt;Bson&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::Array</span>(<span class="ident">s</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">into</span>()).<span class="ident">collect</span>())
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span>[T]) -&gt; Bson {
+        Bson::Array(s.iter().cloned().map(|val| val.into()).collect())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">::std::iter::FromIterator</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use std::iter::FromIterator;</span>
-    <span class="doccomment">/// use bson::Bson;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let x: Bson = Bson::from_iter(vec![&quot;lorem&quot;, &quot;ipsum&quot;, &quot;dolor&quot;]);</span>
-    <span class="doccomment">/// // or</span>
-    <span class="doccomment">/// let x: Bson = vec![&quot;lorem&quot;, &quot;ipsum&quot;, &quot;dolor&quot;].into_iter().collect();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bson::Array</span>(<span class="ident">iter</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>())
+<span class="kw">impl</span>&lt;T: Into&lt;Bson&gt;&gt; ::std::iter::FromIterator&lt;T&gt; <span class="kw">for </span>Bson {
+    <span class="doccomment">/// # Examples
+    ///
+    /// ```
+    /// use std::iter::FromIterator;
+    /// use bson::Bson;
+    ///
+    /// let x: Bson = Bson::from_iter(vec![&quot;lorem&quot;, &quot;ipsum&quot;, &quot;dolor&quot;]);
+    /// // or
+    /// let x: Bson = vec![&quot;lorem&quot;, &quot;ipsum&quot;, &quot;dolor&quot;].into_iter().collect();
+    /// ```
+    </span><span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = T&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
+        Bson::Array(iter.into_iter().map(Into::into).collect())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">i32</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::Int32</span>(<span class="ident">a</span>)
+<span class="kw">impl </span>From&lt;i32&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: i32) -&gt; Bson {
+        Bson::Int32(a)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">i64</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::Int64</span>(<span class="ident">a</span>)
+<span class="kw">impl </span>From&lt;i64&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: i64) -&gt; Bson {
+        Bson::Int64(a)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">i32::try_from</span>(<span class="ident">a</span>) {
-            <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">Bson::Int64</span>(<span class="ident">a</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;u32&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: u32) -&gt; Bson {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(i) = i32::try_from(a) {
+            Bson::Int32(i)
+        } <span class="kw">else </span>{
+            Bson::Int64(a.into())
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">12</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: [<span class="ident">u8</span>; <span class="number">12</span>]) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::ObjectId</span>(<span class="ident">oid::ObjectId::from_bytes</span>(<span class="ident">a</span>))
+<span class="kw">impl </span>From&lt;[u8; <span class="number">12</span>]&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: [u8; <span class="number">12</span>]) -&gt; Bson {
+        Bson::ObjectId(oid::ObjectId::from_bytes(a))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">oid::ObjectId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">oid::ObjectId</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::ObjectId</span>(<span class="ident">a</span>)
+<span class="kw">impl </span>From&lt;oid::ObjectId&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: oid::ObjectId) -&gt; Bson {
+        Bson::ObjectId(a)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">time::OffsetDateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">time::OffsetDateTime</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::DateTime</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from</span>(<span class="ident">a</span>))
+<span class="attribute">#[cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)))]
+</span><span class="kw">impl </span>From&lt;time::OffsetDateTime&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: time::OffsetDateTime) -&gt; Bson {
+        Bson::DateTime(<span class="kw">crate</span>::DateTime::from(a))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">chrono::TimeZone</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::DateTime</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from</span>(<span class="ident">a</span>))
+<span class="attribute">#[cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;T: chrono::TimeZone&gt; From&lt;chrono::DateTime&lt;T&gt;&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: chrono::DateTime&lt;T&gt;) -&gt; Bson {
+        Bson::DateTime(<span class="kw">crate</span>::DateTime::from(a))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">uuid_0_8::Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uuid</span>: <span class="ident">uuid_0_8::Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bson::Binary</span>(<span class="ident">uuid</span>.<span class="ident">into</span>())
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)))]
+</span><span class="kw">impl </span>From&lt;uuid_0_8::Uuid&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(uuid: uuid_0_8::Uuid) -&gt; <span class="self">Self </span>{
+        Bson::Binary(uuid.into())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">uuid::Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uuid</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bson::Binary</span>(<span class="ident">uuid</span>.<span class="ident">into</span>())
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)))]
+</span><span class="kw">impl </span>From&lt;uuid::Uuid&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(uuid: uuid::Uuid) -&gt; <span class="self">Self </span>{
+        Bson::Binary(uuid.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">dt</span>: <span class="ident"><span class="kw">crate</span>::DateTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>)
+<span class="kw">impl </span>From&lt;<span class="kw">crate</span>::DateTime&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(dt: <span class="kw">crate</span>::DateTime) -&gt; <span class="self">Self </span>{
+        Bson::DateTime(dt)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DbPointer</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">DbPointer</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="ident">Bson::DbPointer</span>(<span class="ident">a</span>)
+<span class="kw">impl </span>From&lt;DbPointer&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(a: DbPointer) -&gt; Bson {
+        Bson::DbPointer(a)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Decimal128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">d</span>: <span class="ident">Decimal128</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bson::Decimal128</span>(<span class="ident">d</span>)
+<span class="kw">impl </span>From&lt;Decimal128&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(d: Decimal128) -&gt; <span class="self">Self </span>{
+        Bson::Decimal128(d)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt; <span class="kw">for </span>Bson
+<span class="kw">where
+    </span>T: Into&lt;Bson&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="kw">match</span> <span class="ident">a</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="ident">Bson::Null</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">into</span>(),
+    <span class="kw">fn </span>from(a: <span class="prelude-ty">Option</span>&lt;T&gt;) -&gt; Bson {
+        <span class="kw">match </span>a {
+            <span class="prelude-val">None </span>=&gt; Bson::Null,
+            <span class="prelude-val">Some</span>(t) =&gt; t.into(),
         }
     }
 }
 
-<span class="doccomment">/// This will create the [relaxed Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/) representation of the provided [`Bson`](../enum.Bson.html).</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bson</span>: <span class="ident">Bson</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">bson</span>.<span class="ident">into_relaxed_extjson</span>()
+<span class="doccomment">/// This will create the [relaxed Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/) representation of the provided [`Bson`](../enum.Bson.html).
+</span><span class="kw">impl </span>From&lt;Bson&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(bson: Bson) -&gt; <span class="self">Self </span>{
+        bson.into_relaxed_extjson()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Bson</span> {
-    <span class="doccomment">/// Converts the Bson value into its [relaxed extended JSON representation](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: If this method is called on a case which contains a `Decimal128` value, it will panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_relaxed_extjson</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Bson::Double</span>(<span class="ident">v</span>) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_nan</span>() =&gt; {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_sign_negative</span>() { <span class="string">&quot;-NaN&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;NaN&quot;</span> };
+<span class="kw">impl </span>Bson {
+    <span class="doccomment">/// Converts the Bson value into its [relaxed extended JSON representation](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).
+    ///
+    /// Note: If this method is called on a case which contains a `Decimal128` value, it will panic.
+    </span><span class="kw">pub fn </span>into_relaxed_extjson(<span class="self">self</span>) -&gt; Value {
+        <span class="kw">match </span><span class="self">self </span>{
+            Bson::Double(v) <span class="kw">if </span>v.is_nan() =&gt; {
+                <span class="kw">let </span>s = <span class="kw">if </span>v.is_sign_negative() { <span class="string">&quot;-NaN&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;NaN&quot; </span>};
 
-                <span class="macro">json!</span>({ <span class="string">&quot;$numberDouble&quot;</span>: <span class="ident">s</span> })
+                <span class="macro">json!</span>({ <span class="string">&quot;$numberDouble&quot;</span>: s })
             }
-            <span class="ident">Bson::Double</span>(<span class="ident">v</span>) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_infinite</span>() =&gt; {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_sign_negative</span>() {
-                    <span class="string">&quot;-Infinity&quot;</span>
-                } <span class="kw">else</span> {
-                    <span class="string">&quot;Infinity&quot;</span>
-                };
+            Bson::Double(v) <span class="kw">if </span>v.is_infinite() =&gt; {
+                <span class="kw">let </span>s = <span class="kw">if </span>v.is_sign_negative() {
+                    <span class="string">&quot;-Infinity&quot;
+                </span>} <span class="kw">else </span>{
+                    <span class="string">&quot;Infinity&quot;
+                </span>};
 
-                <span class="macro">json!</span>({ <span class="string">&quot;$numberDouble&quot;</span>: <span class="ident">s</span> })
+                <span class="macro">json!</span>({ <span class="string">&quot;$numberDouble&quot;</span>: s })
             }
-            <span class="ident">Bson::Double</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>(<span class="ident">v</span>),
-            <span class="ident">Bson::String</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>(<span class="ident">v</span>),
-            <span class="ident">Bson::Array</span>(<span class="ident">v</span>) =&gt; <span class="ident">Value::Array</span>(<span class="ident">v</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Bson::into_relaxed_extjson</span>).<span class="ident">collect</span>()),
-            <span class="ident">Bson::Document</span>(<span class="ident">v</span>) =&gt; <span class="ident">Value::Object</span>(
-                <span class="ident">v</span>.<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>, <span class="ident">v</span>.<span class="ident">into_relaxed_extjson</span>()))
-                    .<span class="ident">collect</span>(),
+            Bson::Double(v) =&gt; <span class="macro">json!</span>(v),
+            Bson::String(v) =&gt; <span class="macro">json!</span>(v),
+            Bson::Array(v) =&gt; Value::Array(v.into_iter().map(Bson::into_relaxed_extjson).collect()),
+            Bson::Document(v) =&gt; Value::Object(
+                v.into_iter()
+                    .map(|(k, v)| (k, v.into_relaxed_extjson()))
+                    .collect(),
             ),
-            <span class="ident">Bson::Boolean</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>(<span class="ident">v</span>),
-            <span class="ident">Bson::Null</span> =&gt; <span class="ident">Value::Null</span>,
-            <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex</span> { <span class="ident">pattern</span>, <span class="ident">options</span> }) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">chars</span>().<span class="ident">collect</span>();
-                <span class="ident">chars</span>.<span class="ident">sort_unstable</span>();
+            Bson::Boolean(v) =&gt; <span class="macro">json!</span>(v),
+            Bson::Null =&gt; Value::Null,
+            Bson::RegularExpression(Regex { pattern, options }) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>chars: Vec&lt;<span class="kw">_</span>&gt; = options.chars().collect();
+                chars.sort_unstable();
 
-                <span class="kw">let</span> <span class="ident">options</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
+                <span class="kw">let </span>options: String = chars.into_iter().collect();
 
                 <span class="macro">json!</span>({
                     <span class="string">&quot;$regularExpression&quot;</span>: {
-                        <span class="string">&quot;pattern&quot;</span>: <span class="ident">pattern</span>,
-                        <span class="string">&quot;options&quot;</span>: <span class="ident">options</span>,
+                        <span class="string">&quot;pattern&quot;</span>: pattern,
+                        <span class="string">&quot;options&quot;</span>: options,
                     }
                 })
             }
-            <span class="ident">Bson::JavaScriptCode</span>(<span class="ident">code</span>) =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$code&quot;</span>: <span class="ident">code</span> }),
-            <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident">JavaScriptCodeWithScope</span> { <span class="ident">code</span>, <span class="ident">scope</span> }) =&gt; <span class="macro">json!</span>({
-                <span class="string">&quot;$code&quot;</span>: <span class="ident">code</span>,
-                <span class="string">&quot;$scope&quot;</span>: <span class="ident">scope</span>,
+            Bson::JavaScriptCode(code) =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$code&quot;</span>: code }),
+            Bson::JavaScriptCodeWithScope(JavaScriptCodeWithScope { code, scope }) =&gt; <span class="macro">json!</span>({
+                <span class="string">&quot;$code&quot;</span>: code,
+                <span class="string">&quot;$scope&quot;</span>: scope,
             }),
-            <span class="ident">Bson::Int32</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">into</span>(),
-            <span class="ident">Bson::Int64</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">into</span>(),
-            <span class="ident">Bson::Timestamp</span>(<span class="ident">Timestamp</span> { <span class="ident">time</span>, <span class="ident">increment</span> }) =&gt; <span class="macro">json!</span>({
+            Bson::Int32(v) =&gt; v.into(),
+            Bson::Int64(v) =&gt; v.into(),
+            Bson::Timestamp(Timestamp { time, increment }) =&gt; <span class="macro">json!</span>({
                 <span class="string">&quot;$timestamp&quot;</span>: {
-                    <span class="string">&quot;t&quot;</span>: <span class="ident">time</span>,
-                    <span class="string">&quot;i&quot;</span>: <span class="ident">increment</span>,
+                    <span class="string">&quot;t&quot;</span>: time,
+                    <span class="string">&quot;i&quot;</span>: increment,
                 }
             }),
-            <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> { <span class="ident">subtype</span>, <span class="kw-2">ref</span> <span class="ident">bytes</span> }) =&gt; {
-                <span class="kw">let</span> <span class="ident">tval</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">From::from</span>(<span class="ident">subtype</span>);
+            Bson::Binary(Binary { subtype, <span class="kw-2">ref </span>bytes }) =&gt; {
+                <span class="kw">let </span>tval: u8 = From::from(subtype);
                 <span class="macro">json!</span>({
                     <span class="string">&quot;$binary&quot;</span>: {
-                        <span class="string">&quot;base64&quot;</span>: <span class="ident">base64::encode</span>(<span class="ident">bytes</span>),
-                        <span class="string">&quot;subType&quot;</span>: <span class="ident">hex::encode</span>([<span class="ident">tval</span>]),
+                        <span class="string">&quot;base64&quot;</span>: base64::encode(bytes),
+                        <span class="string">&quot;subType&quot;</span>: hex::encode([tval]),
                     }
                 })
             }
-            <span class="ident">Bson::ObjectId</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>({<span class="string">&quot;$oid&quot;</span>: <span class="ident">v</span>.<span class="ident">to_hex</span>()}),
-            <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">timestamp_millis</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">v</span>.<span class="ident">to_time_0_3</span>().<span class="ident">year</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">9999</span> =&gt; {
+            Bson::ObjectId(v) =&gt; <span class="macro">json!</span>({<span class="string">&quot;$oid&quot;</span>: v.to_hex()}),
+            Bson::DateTime(v) <span class="kw">if </span>v.timestamp_millis() &gt;= <span class="number">0 </span>&amp;&amp; v.to_time_0_3().year() &lt;= <span class="number">9999 </span>=&gt; {
                 <span class="macro">json!</span>({
-                    <span class="comment">// Unwrap safety: timestamps in the guarded range can always be formatted.</span>
-                    <span class="string">&quot;$date&quot;</span>: <span class="ident">v</span>.<span class="ident">try_to_rfc3339_string</span>().<span class="ident">unwrap</span>(),
+                    <span class="comment">// Unwrap safety: timestamps in the guarded range can always be formatted.
+                    </span><span class="string">&quot;$date&quot;</span>: v.try_to_rfc3339_string().unwrap(),
                 })
             }
-            <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>({
-                <span class="string">&quot;$date&quot;</span>: { <span class="string">&quot;$numberLong&quot;</span>: <span class="ident">v</span>.<span class="ident">timestamp_millis</span>().<span class="ident">to_string</span>() },
+            Bson::DateTime(v) =&gt; <span class="macro">json!</span>({
+                <span class="string">&quot;$date&quot;</span>: { <span class="string">&quot;$numberLong&quot;</span>: v.timestamp_millis().to_string() },
             }),
-            <span class="ident">Bson::Symbol</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$symbol&quot;</span>: <span class="ident">v</span> }),
-            <span class="ident">Bson::Decimal128</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Decimal128 extended JSON not implemented yet.&quot;</span>),
-            <span class="ident">Bson::Undefined</span> =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$undefined&quot;</span>: <span class="bool-val">true</span> }),
-            <span class="ident">Bson::MinKey</span> =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$minKey&quot;</span>: <span class="number">1</span> }),
-            <span class="ident">Bson::MaxKey</span> =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$maxKey&quot;</span>: <span class="number">1</span> }),
-            <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer</span> {
-                <span class="kw-2">ref</span> <span class="ident">namespace</span>,
-                <span class="kw-2">ref</span> <span class="ident">id</span>,
+            Bson::Symbol(v) =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$symbol&quot;</span>: v }),
+            Bson::Decimal128(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Decimal128 extended JSON not implemented yet.&quot;</span>),
+            Bson::Undefined =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$undefined&quot;</span>: <span class="bool-val">true </span>}),
+            Bson::MinKey =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$minKey&quot;</span>: <span class="number">1 </span>}),
+            Bson::MaxKey =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$maxKey&quot;</span>: <span class="number">1 </span>}),
+            Bson::DbPointer(DbPointer {
+                <span class="kw-2">ref </span>namespace,
+                <span class="kw-2">ref </span>id,
             }) =&gt; <span class="macro">json!</span>({
                 <span class="string">&quot;$dbPointer&quot;</span>: {
-                    <span class="string">&quot;$ref&quot;</span>: <span class="ident">namespace</span>,
+                    <span class="string">&quot;$ref&quot;</span>: namespace,
                     <span class="string">&quot;$id&quot;</span>: {
-                        <span class="string">&quot;$oid&quot;</span>: <span class="ident">id</span>.<span class="ident">to_hex</span>()
+                        <span class="string">&quot;$oid&quot;</span>: id.to_hex()
                     }
                 }
             }),
         }
     }
 
-    <span class="doccomment">/// Converts the Bson value into its [canonical extended JSON representation](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: extended json encoding for `Decimal128` values is not supported. If this method is</span>
-    <span class="doccomment">/// called on a case which contains a `Decimal128` value, it will panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_canonical_extjson</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$numberInt&quot;</span>: <span class="ident">i</span>.<span class="ident">to_string</span>() }),
-            <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$numberLong&quot;</span>: <span class="ident">i</span>.<span class="ident">to_string</span>() }),
-            <span class="ident">Bson::Double</span>(<span class="ident">f</span>) <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_normal</span>() =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">to_string</span>();
-                <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">fract</span>() <span class="op">==</span> <span class="number">0.0</span> {
-                    <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">&quot;.0&quot;</span>);
+    <span class="doccomment">/// Converts the Bson value into its [canonical extended JSON representation](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).
+    ///
+    /// Note: extended json encoding for `Decimal128` values is not supported. If this method is
+    /// called on a case which contains a `Decimal128` value, it will panic.
+    </span><span class="kw">pub fn </span>into_canonical_extjson(<span class="self">self</span>) -&gt; Value {
+        <span class="kw">match </span><span class="self">self </span>{
+            Bson::Int32(i) =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$numberInt&quot;</span>: i.to_string() }),
+            Bson::Int64(i) =&gt; <span class="macro">json!</span>({ <span class="string">&quot;$numberLong&quot;</span>: i.to_string() }),
+            Bson::Double(f) <span class="kw">if </span>f.is_normal() =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>s = f.to_string();
+                <span class="kw">if </span>f.fract() == <span class="number">0.0 </span>{
+                    s.push_str(<span class="string">&quot;.0&quot;</span>);
                 }
 
-                <span class="macro">json!</span>({ <span class="string">&quot;$numberDouble&quot;</span>: <span class="ident">s</span> })
+                <span class="macro">json!</span>({ <span class="string">&quot;$numberDouble&quot;</span>: s })
             }
-            <span class="ident">Bson::Double</span>(<span class="ident">f</span>) <span class="kw">if</span> <span class="ident">f</span> <span class="op">==</span> <span class="number">0.0</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_sign_negative</span>() { <span class="string">&quot;-0.0&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;0.0&quot;</span> };
+            Bson::Double(f) <span class="kw">if </span>f == <span class="number">0.0 </span>=&gt; {
+                <span class="kw">let </span>s = <span class="kw">if </span>f.is_sign_negative() { <span class="string">&quot;-0.0&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;0.0&quot; </span>};
 
-                <span class="macro">json!</span>({ <span class="string">&quot;$numberDouble&quot;</span>: <span class="ident">s</span> })
+                <span class="macro">json!</span>({ <span class="string">&quot;$numberDouble&quot;</span>: s })
             }
-            <span class="ident">Bson::DateTime</span>(<span class="ident">date</span>) =&gt; {
-                <span class="macro">json!</span>({ <span class="string">&quot;$date&quot;</span>: { <span class="string">&quot;$numberLong&quot;</span>: <span class="ident">date</span>.<span class="ident">timestamp_millis</span>().<span class="ident">to_string</span>() } })
+            Bson::DateTime(date) =&gt; {
+                <span class="macro">json!</span>({ <span class="string">&quot;$date&quot;</span>: { <span class="string">&quot;$numberLong&quot;</span>: date.timestamp_millis().to_string() } })
             }
-            <span class="ident">Bson::Array</span>(<span class="ident">arr</span>) =&gt; {
-                <span class="ident">Value::Array</span>(<span class="ident">arr</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Bson::into_canonical_extjson</span>).<span class="ident">collect</span>())
+            Bson::Array(arr) =&gt; {
+                Value::Array(arr.into_iter().map(Bson::into_canonical_extjson).collect())
             }
-            <span class="ident">Bson::Document</span>(<span class="ident">arr</span>) =&gt; <span class="ident">Value::Object</span>(
-                <span class="ident">arr</span>.<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>, <span class="ident">v</span>.<span class="ident">into_canonical_extjson</span>()))
-                    .<span class="ident">collect</span>(),
+            Bson::Document(arr) =&gt; Value::Object(
+                arr.into_iter()
+                    .map(|(k, v)| (k, v.into_canonical_extjson()))
+                    .collect(),
             ),
-            <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident">JavaScriptCodeWithScope</span> { <span class="ident">code</span>, <span class="ident">scope</span> }) =&gt; <span class="macro">json!</span>({
-                <span class="string">&quot;$code&quot;</span>: <span class="ident">code</span>,
-                <span class="string">&quot;$scope&quot;</span>: <span class="ident">Bson::Document</span>(<span class="ident">scope</span>).<span class="ident">into_canonical_extjson</span>(),
+            Bson::JavaScriptCodeWithScope(JavaScriptCodeWithScope { code, scope }) =&gt; <span class="macro">json!</span>({
+                <span class="string">&quot;$code&quot;</span>: code,
+                <span class="string">&quot;$scope&quot;</span>: Bson::Document(scope).into_canonical_extjson(),
             }),
 
-            <span class="ident">other</span> =&gt; <span class="ident">other</span>.<span class="ident">into_relaxed_extjson</span>(),
+            other =&gt; other.into_relaxed_extjson(),
         }
     }
 
-    <span class="doccomment">/// Get the `ElementType` of this value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">element_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ElementType</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Double</span>(..) =&gt; <span class="ident">ElementType::Double</span>,
-            <span class="ident">Bson::String</span>(..) =&gt; <span class="ident">ElementType::String</span>,
-            <span class="ident">Bson::Array</span>(..) =&gt; <span class="ident">ElementType::Array</span>,
-            <span class="ident">Bson::Document</span>(..) =&gt; <span class="ident">ElementType::EmbeddedDocument</span>,
-            <span class="ident">Bson::Boolean</span>(..) =&gt; <span class="ident">ElementType::Boolean</span>,
-            <span class="ident">Bson::Null</span> =&gt; <span class="ident">ElementType::Null</span>,
-            <span class="ident">Bson::RegularExpression</span>(..) =&gt; <span class="ident">ElementType::RegularExpression</span>,
-            <span class="ident">Bson::JavaScriptCode</span>(..) =&gt; <span class="ident">ElementType::JavaScriptCode</span>,
-            <span class="ident">Bson::JavaScriptCodeWithScope</span>(..) =&gt; <span class="ident">ElementType::JavaScriptCodeWithScope</span>,
-            <span class="ident">Bson::Int32</span>(..) =&gt; <span class="ident">ElementType::Int32</span>,
-            <span class="ident">Bson::Int64</span>(..) =&gt; <span class="ident">ElementType::Int64</span>,
-            <span class="ident">Bson::Timestamp</span>(..) =&gt; <span class="ident">ElementType::Timestamp</span>,
-            <span class="ident">Bson::Binary</span>(..) =&gt; <span class="ident">ElementType::Binary</span>,
-            <span class="ident">Bson::ObjectId</span>(..) =&gt; <span class="ident">ElementType::ObjectId</span>,
-            <span class="ident">Bson::DateTime</span>(..) =&gt; <span class="ident">ElementType::DateTime</span>,
-            <span class="ident">Bson::Symbol</span>(..) =&gt; <span class="ident">ElementType::Symbol</span>,
-            <span class="ident">Bson::Decimal128</span>(..) =&gt; <span class="ident">ElementType::Decimal128</span>,
-            <span class="ident">Bson::Undefined</span> =&gt; <span class="ident">ElementType::Undefined</span>,
-            <span class="ident">Bson::MaxKey</span> =&gt; <span class="ident">ElementType::MaxKey</span>,
-            <span class="ident">Bson::MinKey</span> =&gt; <span class="ident">ElementType::MinKey</span>,
-            <span class="ident">Bson::DbPointer</span>(..) =&gt; <span class="ident">ElementType::DbPointer</span>,
+    <span class="doccomment">/// Get the `ElementType` of this value.
+    </span><span class="kw">pub fn </span>element_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ElementType {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Double(..) =&gt; ElementType::Double,
+            Bson::String(..) =&gt; ElementType::String,
+            Bson::Array(..) =&gt; ElementType::Array,
+            Bson::Document(..) =&gt; ElementType::EmbeddedDocument,
+            Bson::Boolean(..) =&gt; ElementType::Boolean,
+            Bson::Null =&gt; ElementType::Null,
+            Bson::RegularExpression(..) =&gt; ElementType::RegularExpression,
+            Bson::JavaScriptCode(..) =&gt; ElementType::JavaScriptCode,
+            Bson::JavaScriptCodeWithScope(..) =&gt; ElementType::JavaScriptCodeWithScope,
+            Bson::Int32(..) =&gt; ElementType::Int32,
+            Bson::Int64(..) =&gt; ElementType::Int64,
+            Bson::Timestamp(..) =&gt; ElementType::Timestamp,
+            Bson::Binary(..) =&gt; ElementType::Binary,
+            Bson::ObjectId(..) =&gt; ElementType::ObjectId,
+            Bson::DateTime(..) =&gt; ElementType::DateTime,
+            Bson::Symbol(..) =&gt; ElementType::Symbol,
+            Bson::Decimal128(..) =&gt; ElementType::Decimal128,
+            Bson::Undefined =&gt; ElementType::Undefined,
+            Bson::MaxKey =&gt; ElementType::MaxKey,
+            Bson::MinKey =&gt; ElementType::MinKey,
+            Bson::DbPointer(..) =&gt; ElementType::DbPointer,
         }
     }
 
-    <span class="doccomment">/// Converts to extended format.</span>
-    <span class="doccomment">/// This function mainly used for [extended JSON format](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).</span>
-    <span class="comment">// TODO RUST-426: Investigate either removing this from the serde implementation or unifying</span>
-    <span class="comment">// with the extended JSON implementation.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_extended_document</span>(<span class="self">self</span>, <span class="ident">rawbson</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Document</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex</span> {
-                <span class="kw-2">ref</span> <span class="ident">pattern</span>,
-                <span class="kw-2">ref</span> <span class="ident">options</span>,
+    <span class="doccomment">/// Converts to extended format.
+    /// This function mainly used for [extended JSON format](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).
+    </span><span class="comment">// TODO RUST-426: Investigate either removing this from the serde implementation or unifying
+    // with the extended JSON implementation.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_extended_document(<span class="self">self</span>, rawbson: bool) -&gt; Document {
+        <span class="kw">match </span><span class="self">self </span>{
+            Bson::RegularExpression(Regex {
+                <span class="kw-2">ref </span>pattern,
+                <span class="kw-2">ref </span>options,
             }) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">chars</span>().<span class="ident">collect</span>();
-                <span class="ident">chars</span>.<span class="ident">sort_unstable</span>();
+                <span class="kw">let </span><span class="kw-2">mut </span>chars: Vec&lt;<span class="kw">_</span>&gt; = options.chars().collect();
+                chars.sort_unstable();
 
-                <span class="kw">let</span> <span class="ident">options</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
+                <span class="kw">let </span>options: String = chars.into_iter().collect();
 
-                <span class="macro">doc!</span> {
+                <span class="macro">doc! </span>{
                     <span class="string">&quot;$regularExpression&quot;</span>: {
-                        <span class="string">&quot;pattern&quot;</span>: <span class="ident">pattern</span>,
-                        <span class="string">&quot;options&quot;</span>: <span class="ident">options</span>,
+                        <span class="string">&quot;pattern&quot;</span>: pattern,
+                        <span class="string">&quot;options&quot;</span>: options,
                     }
                 }
             }
-            <span class="ident">Bson::JavaScriptCode</span>(<span class="kw-2">ref</span> <span class="ident">code</span>) =&gt; {
-                <span class="macro">doc!</span> {
-                    <span class="string">&quot;$code&quot;</span>: <span class="ident">code</span>,
+            Bson::JavaScriptCode(<span class="kw-2">ref </span>code) =&gt; {
+                <span class="macro">doc! </span>{
+                    <span class="string">&quot;$code&quot;</span>: code,
                 }
             }
-            <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident">JavaScriptCodeWithScope</span> { <span class="ident">code</span>, <span class="ident">scope</span> }) =&gt; {
-                <span class="macro">doc!</span> {
-                    <span class="string">&quot;$code&quot;</span>: <span class="ident">code</span>,
-                    <span class="string">&quot;$scope&quot;</span>: <span class="ident">scope</span>,
+            Bson::JavaScriptCodeWithScope(JavaScriptCodeWithScope { code, scope }) =&gt; {
+                <span class="macro">doc! </span>{
+                    <span class="string">&quot;$code&quot;</span>: code,
+                    <span class="string">&quot;$scope&quot;</span>: scope,
                 }
             }
-            <span class="ident">Bson::Timestamp</span>(<span class="ident">Timestamp</span> { <span class="ident">time</span>, <span class="ident">increment</span> }) =&gt; {
-                <span class="macro">doc!</span> {
+            Bson::Timestamp(Timestamp { time, increment }) =&gt; {
+                <span class="macro">doc! </span>{
                     <span class="string">&quot;$timestamp&quot;</span>: {
-                        <span class="string">&quot;t&quot;</span>: <span class="ident">time</span>,
-                        <span class="string">&quot;i&quot;</span>: <span class="ident">increment</span>,
+                        <span class="string">&quot;t&quot;</span>: time,
+                        <span class="string">&quot;i&quot;</span>: increment,
                     }
                 }
             }
-            <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> { <span class="ident">subtype</span>, <span class="ident">bytes</span> }) =&gt; {
-                <span class="kw">let</span> <span class="ident">tval</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">From::from</span>(<span class="ident">subtype</span>);
-                <span class="kw">if</span> <span class="ident">rawbson</span> {
-                    <span class="macro">doc!</span> {
+            Bson::Binary(Binary { subtype, bytes }) =&gt; {
+                <span class="kw">let </span>tval: u8 = From::from(subtype);
+                <span class="kw">if </span>rawbson {
+                    <span class="macro">doc! </span>{
                         <span class="string">&quot;$binary&quot;</span>: {
-                            <span class="string">&quot;bytes&quot;</span>: <span class="ident">Binary</span> { <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Generic</span>, <span class="ident">bytes</span> },
-                            <span class="string">&quot;subType&quot;</span>: <span class="ident">Bson::Int32</span>(<span class="ident">tval</span>.<span class="ident">into</span>())
+                            <span class="string">&quot;bytes&quot;</span>: Binary { subtype: BinarySubtype::Generic, bytes },
+                            <span class="string">&quot;subType&quot;</span>: Bson::Int32(tval.into())
                         }
                     }
-                } <span class="kw">else</span> {
-                    <span class="macro">doc!</span> {
+                } <span class="kw">else </span>{
+                    <span class="macro">doc! </span>{
                         <span class="string">&quot;$binary&quot;</span>: {
-                            <span class="string">&quot;base64&quot;</span>: <span class="ident">base64::encode</span>(<span class="ident">bytes</span>),
-                            <span class="string">&quot;subType&quot;</span>: <span class="ident">hex::encode</span>([<span class="ident">tval</span>]),
+                            <span class="string">&quot;base64&quot;</span>: base64::encode(bytes),
+                            <span class="string">&quot;subType&quot;</span>: hex::encode([tval]),
                         }
                     }
                 }
             }
-            <span class="ident">Bson::ObjectId</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; {
-                <span class="macro">doc!</span> {
-                    <span class="string">&quot;$oid&quot;</span>: <span class="ident">v</span>.<span class="ident">to_string</span>(),
+            Bson::ObjectId(<span class="kw-2">ref </span>v) =&gt; {
+                <span class="macro">doc! </span>{
+                    <span class="string">&quot;$oid&quot;</span>: v.to_string(),
                 }
             }
-            <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) <span class="kw">if</span> <span class="ident">rawbson</span> =&gt; <span class="macro">doc!</span> {
-                <span class="string">&quot;$date&quot;</span>: <span class="ident">v</span>.<span class="ident">timestamp_millis</span>(),
+            Bson::DateTime(v) <span class="kw">if </span>rawbson =&gt; <span class="macro">doc! </span>{
+                <span class="string">&quot;$date&quot;</span>: v.timestamp_millis(),
             },
-            <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">timestamp_millis</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">v</span>.<span class="ident">to_time_0_3</span>().<span class="ident">year</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">9999</span> =&gt; {
-                <span class="macro">doc!</span> {
-                    <span class="comment">// Unwrap safety: timestamps in the guarded range can always be formatted.</span>
-                    <span class="string">&quot;$date&quot;</span>: <span class="ident">v</span>.<span class="ident">try_to_rfc3339_string</span>().<span class="ident">unwrap</span>(),
+            Bson::DateTime(v) <span class="kw">if </span>v.timestamp_millis() &gt;= <span class="number">0 </span>&amp;&amp; v.to_time_0_3().year() &lt;= <span class="number">9999 </span>=&gt; {
+                <span class="macro">doc! </span>{
+                    <span class="comment">// Unwrap safety: timestamps in the guarded range can always be formatted.
+                    </span><span class="string">&quot;$date&quot;</span>: v.try_to_rfc3339_string().unwrap(),
                 }
             }
-            <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) =&gt; <span class="macro">doc!</span> {
-                <span class="string">&quot;$date&quot;</span>: { <span class="string">&quot;$numberLong&quot;</span>: <span class="ident">v</span>.<span class="ident">timestamp_millis</span>().<span class="ident">to_string</span>() },
+            Bson::DateTime(v) =&gt; <span class="macro">doc! </span>{
+                <span class="string">&quot;$date&quot;</span>: { <span class="string">&quot;$numberLong&quot;</span>: v.timestamp_millis().to_string() },
             },
-            <span class="ident">Bson::Symbol</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; {
-                <span class="macro">doc!</span> {
-                    <span class="string">&quot;$symbol&quot;</span>: <span class="ident">v</span>.<span class="ident">to_owned</span>(),
+            Bson::Symbol(<span class="kw-2">ref </span>v) =&gt; {
+                <span class="macro">doc! </span>{
+                    <span class="string">&quot;$symbol&quot;</span>: v.to_owned(),
                 }
             }
-            <span class="ident">Bson::Undefined</span> =&gt; {
-                <span class="macro">doc!</span> {
+            Bson::Undefined =&gt; {
+                <span class="macro">doc! </span>{
                     <span class="string">&quot;$undefined&quot;</span>: <span class="bool-val">true</span>,
                 }
             }
-            <span class="ident">Bson::MinKey</span> =&gt; {
-                <span class="macro">doc!</span> {
+            Bson::MinKey =&gt; {
+                <span class="macro">doc! </span>{
                     <span class="string">&quot;$minKey&quot;</span>: <span class="number">1</span>,
                 }
             }
-            <span class="ident">Bson::MaxKey</span> =&gt; {
-                <span class="macro">doc!</span> {
+            Bson::MaxKey =&gt; {
+                <span class="macro">doc! </span>{
                     <span class="string">&quot;$maxKey&quot;</span>: <span class="number">1</span>,
                 }
             }
-            <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer</span> {
-                <span class="kw-2">ref</span> <span class="ident">namespace</span>,
-                <span class="kw-2">ref</span> <span class="ident">id</span>,
+            Bson::DbPointer(DbPointer {
+                <span class="kw-2">ref </span>namespace,
+                <span class="kw-2">ref </span>id,
             }) =&gt; {
-                <span class="macro">doc!</span> {
+                <span class="macro">doc! </span>{
                     <span class="string">&quot;$dbPointer&quot;</span>: {
-                        <span class="string">&quot;$ref&quot;</span>: <span class="ident">namespace</span>,
+                        <span class="string">&quot;$ref&quot;</span>: namespace,
                         <span class="string">&quot;$id&quot;</span>: {
-                            <span class="string">&quot;$oid&quot;</span>: <span class="ident">id</span>.<span class="ident">to_string</span>()
+                            <span class="string">&quot;$oid&quot;</span>: id.to_string()
                         }
                     }
                 }
             }
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Attempted conversion of invalid data type: {}&quot;</span>, <span class="self">self</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Attempted conversion of invalid data type: {}&quot;</span>, <span class="self">self</span>),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_extended_document</span>(<span class="ident">doc</span>: <span class="ident">Document</span>) -&gt; <span class="ident">Bson</span> {
-        <span class="kw">if</span> <span class="ident">doc</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">2</span> {
-            <span class="kw">return</span> <span class="ident">Bson::Document</span>(<span class="ident">doc</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_extended_document(doc: Document) -&gt; Bson {
+        <span class="kw">if </span>doc.len() &gt; <span class="number">2 </span>{
+            <span class="kw">return </span>Bson::Document(doc);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">keys</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>();
-        <span class="ident">keys</span>.<span class="ident">sort_unstable</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>keys: Vec&lt;<span class="kw">_</span>&gt; = doc.keys().map(|s| s.as_str()).collect();
+        keys.sort_unstable();
 
-        <span class="kw">match</span> <span class="ident">keys</span>.<span class="ident">as_slice</span>() {
+        <span class="kw">match </span>keys.as_slice() {
             [<span class="string">&quot;$oid&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">oid</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;$oid&quot;</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">oid</span>) <span class="op">=</span> <span class="ident">ObjectId::parse_str</span>(<span class="ident">oid</span>) {
-                        <span class="kw">return</span> <span class="ident">Bson::ObjectId</span>(<span class="ident">oid</span>);
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(oid) = doc.get_str(<span class="string">&quot;$oid&quot;</span>) {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(oid) = ObjectId::parse_str(oid) {
+                        <span class="kw">return </span>Bson::ObjectId(oid);
                     }
                 }
             }
 
             [<span class="string">&quot;$symbol&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">symbol</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;$symbol&quot;</span>) {
-                    <span class="kw">return</span> <span class="ident">Bson::Symbol</span>(<span class="ident">symbol</span>.<span class="ident">into</span>());
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(symbol) = doc.get_str(<span class="string">&quot;$symbol&quot;</span>) {
+                    <span class="kw">return </span>Bson::Symbol(symbol.into());
                 }
             }
 
             [<span class="string">&quot;$numberInt&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;$numberInt&quot;</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">i</span>.<span class="ident">parse</span>() {
-                        <span class="kw">return</span> <span class="ident">Bson::Int32</span>(<span class="ident">i</span>);
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(i) = doc.get_str(<span class="string">&quot;$numberInt&quot;</span>) {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(i) = i.parse() {
+                        <span class="kw">return </span>Bson::Int32(i);
                     }
                 }
             }
 
             [<span class="string">&quot;$numberLong&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;$numberLong&quot;</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">i</span>.<span class="ident">parse</span>() {
-                        <span class="kw">return</span> <span class="ident">Bson::Int64</span>(<span class="ident">i</span>);
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(i) = doc.get_str(<span class="string">&quot;$numberLong&quot;</span>) {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(i) = i.parse() {
+                        <span class="kw">return </span>Bson::Int64(i);
                     }
                 }
             }
 
-            [<span class="string">&quot;$numberDouble&quot;</span>] =&gt; <span class="kw">match</span> <span class="ident">doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;$numberDouble&quot;</span>) {
-                <span class="prelude-val">Ok</span>(<span class="string">&quot;Infinity&quot;</span>) =&gt; <span class="kw">return</span> <span class="ident">Bson::Double</span>(<span class="ident">std::f64::INFINITY</span>),
-                <span class="prelude-val">Ok</span>(<span class="string">&quot;-Infinity&quot;</span>) =&gt; <span class="kw">return</span> <span class="ident">Bson::Double</span>(<span class="ident">std::f64::NEG_INFINITY</span>),
-                <span class="prelude-val">Ok</span>(<span class="string">&quot;NaN&quot;</span>) =&gt; <span class="kw">return</span> <span class="ident">Bson::Double</span>(<span class="ident">std::f64::NAN</span>),
-                <span class="prelude-val">Ok</span>(<span class="ident">other</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">d</span>) <span class="op">=</span> <span class="ident">other</span>.<span class="ident">parse</span>() {
-                        <span class="kw">return</span> <span class="ident">Bson::Double</span>(<span class="ident">d</span>);
+            [<span class="string">&quot;$numberDouble&quot;</span>] =&gt; <span class="kw">match </span>doc.get_str(<span class="string">&quot;$numberDouble&quot;</span>) {
+                <span class="prelude-val">Ok</span>(<span class="string">&quot;Infinity&quot;</span>) =&gt; <span class="kw">return </span>Bson::Double(std::f64::INFINITY),
+                <span class="prelude-val">Ok</span>(<span class="string">&quot;-Infinity&quot;</span>) =&gt; <span class="kw">return </span>Bson::Double(std::f64::NEG_INFINITY),
+                <span class="prelude-val">Ok</span>(<span class="string">&quot;NaN&quot;</span>) =&gt; <span class="kw">return </span>Bson::Double(std::f64::NAN),
+                <span class="prelude-val">Ok</span>(other) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(d) = other.parse() {
+                        <span class="kw">return </span>Bson::Double(d);
                     }
                 }
-                <span class="kw">_</span> =&gt; {}
+                <span class="kw">_ </span>=&gt; {}
             },
 
             [<span class="string">&quot;$numberDecimalBytes&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_binary_generic</span>(<span class="string">&quot;$numberDecimalBytes&quot;</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">b</span>) <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">clone</span>().<span class="ident">try_into</span>() {
-                        <span class="kw">return</span> <span class="ident">Bson::Decimal128</span>(<span class="ident">Decimal128</span> { <span class="ident">bytes</span>: <span class="ident">b</span> });
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(bytes) = doc.get_binary_generic(<span class="string">&quot;$numberDecimalBytes&quot;</span>) {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(b) = bytes.clone().try_into() {
+                        <span class="kw">return </span>Bson::Decimal128(Decimal128 { bytes: b });
                     }
                 }
             }
 
             [<span class="string">&quot;$binary&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">binary</span>) <span class="op">=</span> <span class="ident">Binary::from_extended_doc</span>(<span class="kw-2">&amp;</span><span class="ident">doc</span>) {
-                    <span class="kw">return</span> <span class="ident">Bson::Binary</span>(<span class="ident">binary</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(binary) = Binary::from_extended_doc(<span class="kw-2">&amp;</span>doc) {
+                    <span class="kw">return </span>Bson::Binary(binary);
                 }
             }
 
             [<span class="string">&quot;$code&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">code</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;$code&quot;</span>) {
-                    <span class="kw">return</span> <span class="ident">Bson::JavaScriptCode</span>(<span class="ident">code</span>.<span class="ident">into</span>());
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(code) = doc.get_str(<span class="string">&quot;$code&quot;</span>) {
+                    <span class="kw">return </span>Bson::JavaScriptCode(code.into());
                 }
             }
 
             [<span class="string">&quot;$code&quot;</span>, <span class="string">&quot;$scope&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">code</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;$code&quot;</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">scope</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_document</span>(<span class="string">&quot;$scope&quot;</span>) {
-                        <span class="kw">return</span> <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident">JavaScriptCodeWithScope</span> {
-                            <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">into</span>(),
-                            <span class="ident">scope</span>: <span class="ident">scope</span>.<span class="ident">clone</span>(),
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(code) = doc.get_str(<span class="string">&quot;$code&quot;</span>) {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(scope) = doc.get_document(<span class="string">&quot;$scope&quot;</span>) {
+                        <span class="kw">return </span>Bson::JavaScriptCodeWithScope(JavaScriptCodeWithScope {
+                            code: code.into(),
+                            scope: scope.clone(),
                         });
                     }
                 }
             }
 
             [<span class="string">&quot;$timestamp&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">timestamp</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_document</span>(<span class="string">&quot;$timestamp&quot;</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="ident">timestamp</span>.<span class="ident">get_i32</span>(<span class="string">&quot;t&quot;</span>) {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">timestamp</span>.<span class="ident">get_i32</span>(<span class="string">&quot;i&quot;</span>) {
-                            <span class="kw">return</span> <span class="ident">Bson::Timestamp</span>(<span class="ident">Timestamp</span> {
-                                <span class="ident">time</span>: <span class="ident">t</span> <span class="kw">as</span> <span class="ident">u32</span>,
-                                <span class="ident">increment</span>: <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>,
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(timestamp) = doc.get_document(<span class="string">&quot;$timestamp&quot;</span>) {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(t) = timestamp.get_i32(<span class="string">&quot;t&quot;</span>) {
+                        <span class="kw">if let </span><span class="prelude-val">Ok</span>(i) = timestamp.get_i32(<span class="string">&quot;i&quot;</span>) {
+                            <span class="kw">return </span>Bson::Timestamp(Timestamp {
+                                time: t <span class="kw">as </span>u32,
+                                increment: i <span class="kw">as </span>u32,
                             });
                         }
                     }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="ident">timestamp</span>.<span class="ident">get_i64</span>(<span class="string">&quot;t&quot;</span>) {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">timestamp</span>.<span class="ident">get_i64</span>(<span class="string">&quot;i&quot;</span>) {
-                            <span class="kw">if</span> <span class="ident">t</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>
-                                <span class="op">&amp;&amp;</span> <span class="ident">i</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>
-                                <span class="op">&amp;&amp;</span> <span class="ident">t</span> <span class="op">&lt;</span><span class="op">=</span> (<span class="ident">std::u32::MAX</span> <span class="kw">as</span> <span class="ident">i64</span>)
-                                <span class="op">&amp;&amp;</span> <span class="ident">i</span> <span class="op">&lt;</span><span class="op">=</span> (<span class="ident">std::u32::MAX</span> <span class="kw">as</span> <span class="ident">i64</span>)
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(t) = timestamp.get_i64(<span class="string">&quot;t&quot;</span>) {
+                        <span class="kw">if let </span><span class="prelude-val">Ok</span>(i) = timestamp.get_i64(<span class="string">&quot;i&quot;</span>) {
+                            <span class="kw">if </span>t &gt;= <span class="number">0
+                                </span>&amp;&amp; i &gt;= <span class="number">0
+                                </span>&amp;&amp; t &lt;= (std::u32::MAX <span class="kw">as </span>i64)
+                                &amp;&amp; i &lt;= (std::u32::MAX <span class="kw">as </span>i64)
                             {
-                                <span class="kw">return</span> <span class="ident">Bson::Timestamp</span>(<span class="ident">Timestamp</span> {
-                                    <span class="ident">time</span>: <span class="ident">t</span> <span class="kw">as</span> <span class="ident">u32</span>,
-                                    <span class="ident">increment</span>: <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>,
+                                <span class="kw">return </span>Bson::Timestamp(Timestamp {
+                                    time: t <span class="kw">as </span>u32,
+                                    increment: i <span class="kw">as </span>u32,
                                 });
                             }
                         }
@@ -1911,22 +1911,22 @@
             }
 
             [<span class="string">&quot;$regularExpression&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">regex</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_document</span>(<span class="string">&quot;$regularExpression&quot;</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">pattern</span>) <span class="op">=</span> <span class="ident">regex</span>.<span class="ident">get_str</span>(<span class="string">&quot;pattern&quot;</span>) {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">options</span>) <span class="op">=</span> <span class="ident">regex</span>.<span class="ident">get_str</span>(<span class="string">&quot;options&quot;</span>) {
-                            <span class="kw">return</span> <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex::new</span>(<span class="ident">pattern</span>, <span class="ident">options</span>));
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(regex) = doc.get_document(<span class="string">&quot;$regularExpression&quot;</span>) {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(pattern) = regex.get_str(<span class="string">&quot;pattern&quot;</span>) {
+                        <span class="kw">if let </span><span class="prelude-val">Ok</span>(options) = regex.get_str(<span class="string">&quot;options&quot;</span>) {
+                            <span class="kw">return </span>Bson::RegularExpression(Regex::new(pattern, options));
                         }
                     }
                 }
             }
 
             [<span class="string">&quot;$dbPointer&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">db_pointer</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_document</span>(<span class="string">&quot;$dbPointer&quot;</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ns</span>) <span class="op">=</span> <span class="ident">db_pointer</span>.<span class="ident">get_str</span>(<span class="string">&quot;$ref&quot;</span>) {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">db_pointer</span>.<span class="ident">get_object_id</span>(<span class="string">&quot;$id&quot;</span>) {
-                            <span class="kw">return</span> <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer</span> {
-                                <span class="ident">namespace</span>: <span class="ident">ns</span>.<span class="ident">into</span>(),
-                                <span class="ident">id</span>,
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(db_pointer) = doc.get_document(<span class="string">&quot;$dbPointer&quot;</span>) {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(ns) = db_pointer.get_str(<span class="string">&quot;$ref&quot;</span>) {
+                        <span class="kw">if let </span><span class="prelude-val">Ok</span>(id) = db_pointer.get_object_id(<span class="string">&quot;$id&quot;</span>) {
+                            <span class="kw">return </span>Bson::DbPointer(DbPointer {
+                                namespace: ns.into(),
+                                id,
                             });
                         }
                     }
@@ -1934,361 +1934,361 @@
             }
 
             [<span class="string">&quot;$date&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">date</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_i64</span>(<span class="string">&quot;$date&quot;</span>) {
-                    <span class="kw">return</span> <span class="ident">Bson::DateTime</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from_millis</span>(<span class="ident">date</span>));
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(date) = doc.get_i64(<span class="string">&quot;$date&quot;</span>) {
+                    <span class="kw">return </span>Bson::DateTime(<span class="kw">crate</span>::DateTime::from_millis(date));
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">date</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;$date&quot;</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::DateTime::parse_rfc3339_str</span>(<span class="ident">date</span>) {
-                        <span class="kw">return</span> <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>);
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(date) = doc.get_str(<span class="string">&quot;$date&quot;</span>) {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(dt) = <span class="kw">crate</span>::DateTime::parse_rfc3339_str(date) {
+                        <span class="kw">return </span>Bson::DateTime(dt);
                     }
                 }
             }
 
             [<span class="string">&quot;$minKey&quot;</span>] =&gt; {
-                <span class="kw">let</span> <span class="ident">min_key</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get</span>(<span class="string">&quot;$minKey&quot;</span>);
+                <span class="kw">let </span>min_key = doc.get(<span class="string">&quot;$minKey&quot;</span>);
 
-                <span class="kw">if</span> <span class="ident">min_key</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Bson::Int32</span>(<span class="number">1</span>)) <span class="op">|</span><span class="op">|</span> <span class="ident">min_key</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Bson::Int64</span>(<span class="number">1</span>)) {
-                    <span class="kw">return</span> <span class="ident">Bson::MinKey</span>;
+                <span class="kw">if </span>min_key == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>Bson::Int32(<span class="number">1</span>)) || min_key == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>Bson::Int64(<span class="number">1</span>)) {
+                    <span class="kw">return </span>Bson::MinKey;
                 }
             }
 
             [<span class="string">&quot;$maxKey&quot;</span>] =&gt; {
-                <span class="kw">let</span> <span class="ident">max_key</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get</span>(<span class="string">&quot;$maxKey&quot;</span>);
+                <span class="kw">let </span>max_key = doc.get(<span class="string">&quot;$maxKey&quot;</span>);
 
-                <span class="kw">if</span> <span class="ident">max_key</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Bson::Int32</span>(<span class="number">1</span>)) <span class="op">|</span><span class="op">|</span> <span class="ident">max_key</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Bson::Int64</span>(<span class="number">1</span>)) {
-                    <span class="kw">return</span> <span class="ident">Bson::MaxKey</span>;
+                <span class="kw">if </span>max_key == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>Bson::Int32(<span class="number">1</span>)) || max_key == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>Bson::Int64(<span class="number">1</span>)) {
+                    <span class="kw">return </span>Bson::MaxKey;
                 }
             }
 
             [<span class="string">&quot;$undefined&quot;</span>] =&gt; {
-                <span class="kw">if</span> <span class="ident">doc</span>.<span class="ident">get</span>(<span class="string">&quot;$undefined&quot;</span>) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Bson::Boolean</span>(<span class="bool-val">true</span>)) {
-                    <span class="kw">return</span> <span class="ident">Bson::Undefined</span>;
+                <span class="kw">if </span>doc.get(<span class="string">&quot;$undefined&quot;</span>) == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>Bson::Boolean(<span class="bool-val">true</span>)) {
+                    <span class="kw">return </span>Bson::Undefined;
                 }
             }
 
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         };
 
-        <span class="ident">Bson::Document</span>(
-            <span class="ident">doc</span>.<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">v</span> {
-                        <span class="ident">Bson::Document</span>(<span class="ident">v</span>) =&gt; <span class="ident">Bson::from_extended_document</span>(<span class="ident">v</span>),
-                        <span class="ident">other</span> =&gt; <span class="ident">other</span>,
+        Bson::Document(
+            doc.into_iter()
+                .map(|(k, v)| {
+                    <span class="kw">let </span>v = <span class="kw">match </span>v {
+                        Bson::Document(v) =&gt; Bson::from_extended_document(v),
+                        other =&gt; other,
                     };
 
-                    (<span class="ident">k</span>, <span class="ident">v</span>)
+                    (k, v)
                 })
-                .<span class="ident">collect</span>(),
+                .collect(),
         )
     }
 }
 
-<span class="doccomment">/// Value helpers</span>
-<span class="kw">impl</span> <span class="ident">Bson</span> {
-    <span class="doccomment">/// If `Bson` is `Double`, return its value as an `f64`. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Double</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Value helpers
+</span><span class="kw">impl </span>Bson {
+    <span class="doccomment">/// If `Bson` is `Double`, return its value as an `f64`. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Double(v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `String`, return its value as a `&amp;str`. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::String</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `String`, return its value as a `&amp;str`. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::String(<span class="kw-2">ref </span>s) =&gt; <span class="prelude-val">Some</span>(s),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `String`, return a mutable reference to its value as a `str`. Returns `None`</span>
-    <span class="doccomment">/// otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::String</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">s</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `String`, return a mutable reference to its value as a `str`. Returns `None`
+    /// otherwise
+    </span><span class="kw">pub fn </span>as_str_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>str&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::String(<span class="kw-2">ref mut </span>s) =&gt; <span class="prelude-val">Some</span>(s),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `Array`, return its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Array</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Array</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `Array`, return its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_array(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Array&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Array(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `Array`, return a mutable reference to its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_array_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">Array</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Array</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `Array`, return a mutable reference to its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_array_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Array&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Array(<span class="kw-2">ref mut </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `Document`, return its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Document</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Document</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `Document`, return its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_document(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Document&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Document(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `Document`, return a mutable reference to its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_document_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">Document</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Document</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `Document`, return a mutable reference to its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_document_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Document&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Document(<span class="kw-2">ref mut </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `Bool`, return its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Boolean</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `Bool`, return its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_bool(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Boolean(v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `I32`, return its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_i32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Int32</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `I32`, return its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_i32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i32&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Int32(v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `I64`, return its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Int64</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `I64`, return its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_i64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Int64(v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `Objectid`, return its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_object_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">oid::ObjectId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::ObjectId</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `Objectid`, return its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_object_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;oid::ObjectId&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::ObjectId(v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `Objectid`, return a mutable reference to its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_object_id_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">oid::ObjectId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::ObjectId</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `Objectid`, return a mutable reference to its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_object_id_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>oid::ObjectId&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::ObjectId(<span class="kw-2">ref mut </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `DateTime`, return its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_datetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::DateTime</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `DateTime`, return its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">crate</span>::DateTime&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::DateTime(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `DateTime`, return a mutable reference to its value. Returns `None`</span>
-    <span class="doccomment">/// otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_datetime_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::DateTime</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `DateTime`, return a mutable reference to its value. Returns `None`
+    /// otherwise
+    </span><span class="kw">pub fn </span>as_datetime_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span><span class="kw">crate</span>::DateTime&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::DateTime(<span class="kw-2">ref mut </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `Symbol`, return its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_symbol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Symbol</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `Symbol`, return its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_symbol(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Symbol(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `Symbol`, return a mutable reference to its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_symbol_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Symbol</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `Symbol`, return a mutable reference to its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_symbol_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>str&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Symbol(<span class="kw-2">ref mut </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `Timestamp`, return its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Timestamp</span>(<span class="ident">timestamp</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `Timestamp`, return its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Timestamp&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Timestamp(timestamp) =&gt; <span class="prelude-val">Some</span>(timestamp),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If `Bson` is `Null`, return its value. Returns `None` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Bson::Null</span> =&gt; <span class="prelude-val">Some</span>(()),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If `Bson` is `Null`, return its value. Returns `None` otherwise
+    </span><span class="kw">pub fn </span>as_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Bson::Null =&gt; <span class="prelude-val">Some</span>(()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_db_pointer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DbPointer</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Bson::DbPointer</span>(<span class="kw-2">ref</span> <span class="ident">db_pointer</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">db_pointer</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-}
-
-<span class="doccomment">/// Represents a BSON timestamp value.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Timestamp</span> {
-    <span class="doccomment">/// The number of seconds since the Unix epoch.</span>
-    <span class="kw">pub</span> <span class="ident">time</span>: <span class="ident">u32</span>,
-
-    <span class="doccomment">/// An incrementing value to order timestamps with the same number of seconds in the `time`</span>
-    <span class="doccomment">/// field.</span>
-    <span class="kw">pub</span> <span class="ident">increment</span>: <span class="ident">u32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Timestamp</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;Timestamp({}, {})&quot;</span>, <span class="self">self</span>.<span class="ident">time</span>, <span class="self">self</span>.<span class="ident">increment</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Timestamp</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_le_i64</span>(<span class="self">self</span>) -&gt; <span class="ident">i64</span> {
-        <span class="kw">let</span> <span class="ident">upper</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">time</span>.<span class="ident">to_le</span>() <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>;
-        <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">increment</span>.<span class="ident">to_le</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-
-        (<span class="ident">upper</span> <span class="op">|</span> <span class="ident">lower</span>) <span class="kw">as</span> <span class="ident">i64</span>
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_le_i64</span>(<span class="ident">val</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">ts</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">to_le</span>();
-
-        <span class="ident">Timestamp</span> {
-            <span class="ident">time</span>: ((<span class="ident">ts</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>,
-            <span class="ident">increment</span>: (<span class="ident">ts</span> <span class="op">&amp;</span> <span class="number">0xFFFF_FFFF</span>) <span class="kw">as</span> <span class="ident">u32</span>,
+    <span class="kw">pub fn </span>as_db_pointer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DbPointer&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Bson::DbPointer(<span class="kw-2">ref </span>db_pointer) =&gt; <span class="prelude-val">Some</span>(db_pointer),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// Represents a BSON regular expression value.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Regex</span> {
-    <span class="doccomment">/// The regex pattern to match.</span>
-    <span class="kw">pub</span> <span class="ident">pattern</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Represents a BSON timestamp value.
+</span><span class="attribute">#[derive(Debug, Eq, Ord, PartialEq, PartialOrd, Clone, Copy, Hash)]
+</span><span class="kw">pub struct </span>Timestamp {
+    <span class="doccomment">/// The number of seconds since the Unix epoch.
+    </span><span class="kw">pub </span>time: u32,
 
-    <span class="doccomment">/// The options for the regex.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Options are identified by characters, which must be stored in</span>
-    <span class="doccomment">/// alphabetical order. Valid options are &#39;i&#39; for case insensitive matching, &#39;m&#39; for</span>
-    <span class="doccomment">/// multiline matching, &#39;x&#39; for verbose mode, &#39;l&#39; to make \w, \W, etc. locale dependent,</span>
-    <span class="doccomment">/// &#39;s&#39; for dotall mode (&#39;.&#39; matches everything), and &#39;u&#39; to make \w, \W, etc. match</span>
-    <span class="doccomment">/// unicode.</span>
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// An incrementing value to order timestamps with the same number of seconds in the `time`
+    /// field.
+    </span><span class="kw">pub </span>increment: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">Regex</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">pattern</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">chars</span>().<span class="ident">collect</span>();
-        <span class="ident">chars</span>.<span class="ident">sort_unstable</span>();
-        <span class="kw">let</span> <span class="ident">options</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-        <span class="self">Self</span> {
-            <span class="ident">pattern</span>: <span class="ident">pattern</span>.<span class="ident">as_ref</span>().<span class="ident">to_string</span>(),
-            <span class="ident">options</span>,
+<span class="kw">impl </span>Display <span class="kw">for </span>Timestamp {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(fmt, <span class="string">&quot;Timestamp({}, {})&quot;</span>, <span class="self">self</span>.time, <span class="self">self</span>.increment)
+    }
+}
+
+<span class="kw">impl </span>Timestamp {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_le_i64(<span class="self">self</span>) -&gt; i64 {
+        <span class="kw">let </span>upper = (<span class="self">self</span>.time.to_le() <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>;
+        <span class="kw">let </span>lower = <span class="self">self</span>.increment.to_le() <span class="kw">as </span>u64;
+
+        (upper | lower) <span class="kw">as </span>i64
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_le_i64(val: i64) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>ts = val.to_le();
+
+        Timestamp {
+            time: ((ts <span class="kw">as </span>u64) &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32,
+            increment: (ts &amp; <span class="number">0xFFFF_FFFF</span>) <span class="kw">as </span>u32,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Regex</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;/{}/{}&quot;</span>, <span class="self">self</span>.<span class="ident">pattern</span>, <span class="self">self</span>.<span class="ident">options</span>)
+<span class="doccomment">/// Represents a BSON regular expression value.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>Regex {
+    <span class="doccomment">/// The regex pattern to match.
+    </span><span class="kw">pub </span>pattern: String,
+
+    <span class="doccomment">/// The options for the regex.
+    ///
+    /// Options are identified by characters, which must be stored in
+    /// alphabetical order. Valid options are &#39;i&#39; for case insensitive matching, &#39;m&#39; for
+    /// multiline matching, &#39;x&#39; for verbose mode, &#39;l&#39; to make \w, \W, etc. locale dependent,
+    /// &#39;s&#39; for dotall mode (&#39;.&#39; matches everything), and &#39;u&#39; to make \w, \W, etc. match
+    /// unicode.
+    </span><span class="kw">pub </span>options: String,
+}
+
+<span class="kw">impl </span>Regex {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(pattern: <span class="kw">impl </span>AsRef&lt;str&gt;, options: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>chars: Vec&lt;<span class="kw">_</span>&gt; = options.as_ref().chars().collect();
+        chars.sort_unstable();
+        <span class="kw">let </span>options: String = chars.into_iter().collect();
+        <span class="self">Self </span>{
+            pattern: pattern.as_ref().to_string(),
+            options,
+        }
     }
 }
 
-<span class="doccomment">/// Represents a BSON code with scope value.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JavaScriptCodeWithScope</span> {
-    <span class="doccomment">/// The JavaScript code.</span>
-    <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">String</span>,
-
-    <span class="doccomment">/// The scope document containing variable bindings.</span>
-    <span class="kw">pub</span> <span class="ident">scope</span>: <span class="ident">Document</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">JavaScriptCodeWithScope</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">code</span>)
+<span class="kw">impl </span>Display <span class="kw">for </span>Regex {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(fmt, <span class="string">&quot;/{}/{}&quot;</span>, <span class="self">self</span>.pattern, <span class="self">self</span>.options)
     }
 }
 
-<span class="doccomment">/// Represents a BSON binary value.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Binary</span> {
-    <span class="doccomment">/// The subtype of the bytes.</span>
-    <span class="kw">pub</span> <span class="ident">subtype</span>: <span class="ident">BinarySubtype</span>,
+<span class="doccomment">/// Represents a BSON code with scope value.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>JavaScriptCodeWithScope {
+    <span class="doccomment">/// The JavaScript code.
+    </span><span class="kw">pub </span>code: String,
 
-    <span class="doccomment">/// The binary bytes.</span>
-    <span class="kw">pub</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The scope document containing variable bindings.
+    </span><span class="kw">pub </span>scope: Document,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Binary</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+<span class="kw">impl </span>Display <span class="kw">for </span>JavaScriptCodeWithScope {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        fmt.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.code)
+    }
+}
+
+<span class="doccomment">/// Represents a BSON binary value.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>Binary {
+    <span class="doccomment">/// The subtype of the bytes.
+    </span><span class="kw">pub </span>subtype: BinarySubtype,
+
+    <span class="doccomment">/// The binary bytes.
+    </span><span class="kw">pub </span>bytes: Vec&lt;u8&gt;,
+}
+
+<span class="kw">impl </span>Display <span class="kw">for </span>Binary {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="macro">write!</span>(
-            <span class="ident">fmt</span>,
+            fmt,
             <span class="string">&quot;Binary({:#x}, {})&quot;</span>,
-            <span class="ident">u8::from</span>(<span class="self">self</span>.<span class="ident">subtype</span>),
-            <span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>)
+            u8::from(<span class="self">self</span>.subtype),
+            base64::encode(<span class="kw-2">&amp;</span><span class="self">self</span>.bytes)
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Binary</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_extended_doc</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">binary_doc</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_document</span>(<span class="string">&quot;$binary&quot;</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+<span class="kw">impl </span>Binary {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_extended_doc(doc: <span class="kw-2">&amp;</span>Document) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>binary_doc = doc.get_document(<span class="string">&quot;$binary&quot;</span>).ok()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) <span class="op">=</span> <span class="ident">binary_doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;base64&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">base64::decode</span>(<span class="ident">bytes</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">binary_doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;subType&quot;</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">hex::decode</span>(<span class="ident">subtype</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">subtype</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-                <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-                    <span class="ident">bytes</span>,
-                    <span class="ident">subtype</span>: <span class="ident">subtype</span>[<span class="number">0</span>].<span class="ident">into</span>(),
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(bytes) = binary_doc.get_str(<span class="string">&quot;base64&quot;</span>) {
+            <span class="kw">let </span>bytes = base64::decode(bytes).ok()<span class="question-mark">?</span>;
+            <span class="kw">let </span>subtype = binary_doc.get_str(<span class="string">&quot;subType&quot;</span>).ok()<span class="question-mark">?</span>;
+            <span class="kw">let </span>subtype = hex::decode(subtype).ok()<span class="question-mark">?</span>;
+            <span class="kw">if </span>subtype.len() == <span class="number">1 </span>{
+                <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+                    bytes,
+                    subtype: subtype[<span class="number">0</span>].into(),
                 })
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
-        } <span class="kw">else</span> {
-            <span class="comment">// in non-human-readable mode, RawBinary will serialize as</span>
-            <span class="comment">// { &quot;$binary&quot;: { &quot;bytes&quot;: &lt;bytes&gt;, &quot;subType&quot;: &lt;i32&gt; } };</span>
-            <span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">binary_doc</span>.<span class="ident">get_binary_generic</span>(<span class="string">&quot;bytes&quot;</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">binary_doc</span>.<span class="ident">get_i32</span>(<span class="string">&quot;subType&quot;</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
+        } <span class="kw">else </span>{
+            <span class="comment">// in non-human-readable mode, RawBinary will serialize as
+            // { &quot;$binary&quot;: { &quot;bytes&quot;: &lt;bytes&gt;, &quot;subType&quot;: &lt;i32&gt; } };
+            </span><span class="kw">let </span>binary = binary_doc.get_binary_generic(<span class="string">&quot;bytes&quot;</span>).ok()<span class="question-mark">?</span>;
+            <span class="kw">let </span>subtype = binary_doc.get_i32(<span class="string">&quot;subType&quot;</span>).ok()<span class="question-mark">?</span>;
 
-            <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-                <span class="ident">bytes</span>: <span class="ident">binary</span>.<span class="ident">clone</span>(),
-                <span class="ident">subtype</span>: <span class="ident">u8::try_from</span>(<span class="ident">subtype</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
+            <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+                bytes: binary.clone(),
+                subtype: u8::try_from(subtype).ok()<span class="question-mark">?</span>.into(),
             })
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_raw_binary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawBinaryRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">RawBinaryRef</span> {
-            <span class="ident">bytes</span>: <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">as_slice</span>(),
-            <span class="ident">subtype</span>: <span class="self">self</span>.<span class="ident">subtype</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_raw_binary(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawBinaryRef&lt;<span class="lifetime">&#39;_</span>&gt; {
+        RawBinaryRef {
+            bytes: <span class="self">self</span>.bytes.as_slice(),
+            subtype: <span class="self">self</span>.subtype,
         }
     }
 }
 
-<span class="doccomment">/// Represents a DBPointer. (Deprecated)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DbPointer</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">namespace</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">id</span>: <span class="ident">oid::ObjectId</span>,
+<span class="doccomment">/// Represents a DBPointer. (Deprecated)
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>DbPointer {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) namespace: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) id: oid::ObjectId,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

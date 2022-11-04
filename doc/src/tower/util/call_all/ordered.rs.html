@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/util/call_all/ordered.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ordered.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tower/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/util/call_all/ordered.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ordered.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tower/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -177,184 +177,184 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
-</pre><pre class="rust"><code><span class="doccomment">//! [`Stream&lt;Item = Request&gt;`][stream] + [`Service&lt;Request&gt;`] =&gt; [`Stream&lt;Item = Response&gt;`][stream].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Service&lt;Request&gt;`]: crate::Service</span>
-<span class="doccomment">//! [stream]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html</span>
+</pre><pre class="rust"><code><span class="doccomment">//! [`Stream&lt;Item = Request&gt;`][stream] + [`Service&lt;Request&gt;`] =&gt; [`Stream&lt;Item = Response&gt;`][stream].
+//!
+//! [`Service&lt;Request&gt;`]: crate::Service
+//! [stream]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::common</span>;
-<span class="kw">use</span> <span class="ident">futures_core::Stream</span>;
-<span class="kw">use</span> <span class="ident">futures_util::stream::FuturesOrdered</span>;
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+</span><span class="kw">use </span><span class="kw">super</span>::common;
+<span class="kw">use </span>futures_core::Stream;
+<span class="kw">use </span>futures_util::stream::FuturesOrdered;
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>std::{
+    future::Future,
+    pin::Pin,
+    task::{Context, Poll},
 };
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+<span class="kw">use </span>tower_service::Service;
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// This is a [`Stream`] of responses resulting from calling the wrapped [`Service`] for each</span>
-    <span class="doccomment">/// request received on the wrapped [`Stream`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use std::cell::Cell;</span>
-    <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use std::rc::Rc;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use futures::future::{ready, Ready};</span>
-    <span class="doccomment">/// use futures::StreamExt;</span>
-    <span class="doccomment">/// use futures::channel::mpsc;</span>
-    <span class="doccomment">/// use tower_service::Service;</span>
-    <span class="doccomment">/// use tower::util::ServiceExt;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // First, we need to have a Service to process our requests.</span>
-    <span class="doccomment">/// #[derive(Debug, Eq, PartialEq)]</span>
-    <span class="doccomment">/// struct FirstLetter;</span>
-    <span class="doccomment">/// impl Service&lt;&amp;&#39;static str&gt; for FirstLetter {</span>
-    <span class="doccomment">///      type Response = &amp;&#39;static str;</span>
-    <span class="doccomment">///      type Error = Box&lt;dyn Error + Send + Sync&gt;;</span>
-    <span class="doccomment">///      type Future = Ready&lt;Result&lt;Self::Response, Self::Error&gt;&gt;;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">///          Poll::Ready(Ok(()))</span>
-    <span class="doccomment">///      }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      fn call(&amp;mut self, req: &amp;&#39;static str) -&gt; Self::Future {</span>
-    <span class="doccomment">///          ready(Ok(&amp;req[..1]))</span>
-    <span class="doccomment">///      }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[tokio::main]</span>
-    <span class="doccomment">/// async fn main() {</span>
-    <span class="doccomment">///     // Next, we need a Stream of requests.</span>
-    <span class="comment">// TODO(eliza): when `tokio-util` has a nice way to convert MPSCs to streams,</span>
-    <span class="comment">//              tokio::sync::mpsc again?</span>
-    <span class="doccomment">///     let (mut reqs, rx) = mpsc::unbounded();</span>
-    <span class="doccomment">///     // Note that we have to help Rust out here by telling it what error type to use.</span>
-    <span class="doccomment">///     // Specifically, it has to be From&lt;Service::Error&gt; + From&lt;Stream::Error&gt;.</span>
-    <span class="doccomment">///     let mut rsps = FirstLetter.call_all(rx);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // Now, let&#39;s send a few requests and then check that we get the corresponding responses.</span>
-    <span class="doccomment">///     reqs.unbounded_send(&quot;one&quot;).unwrap();</span>
-    <span class="doccomment">///     reqs.unbounded_send(&quot;two&quot;).unwrap();</span>
-    <span class="doccomment">///     reqs.unbounded_send(&quot;three&quot;).unwrap();</span>
-    <span class="doccomment">///     drop(reqs);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // We then loop over the response Strem that we get back from call_all.</span>
-    <span class="doccomment">///     let mut i = 0usize;</span>
-    <span class="doccomment">///     while let Some(rsp) = rsps.next().await {</span>
-    <span class="doccomment">///         // Each response is a Result (we could also have used TryStream::try_next)</span>
-    <span class="doccomment">///         match (i + 1, rsp.unwrap()) {</span>
-    <span class="doccomment">///             (1, &quot;o&quot;) |</span>
-    <span class="doccomment">///             (2, &quot;t&quot;) |</span>
-    <span class="doccomment">///             (3, &quot;t&quot;) =&gt; {}</span>
-    <span class="doccomment">///             (n, i) =&gt; {</span>
-    <span class="doccomment">///                 unreachable!(&quot;{}. response was &#39;{}&#39;&quot;, n, i);</span>
-    <span class="doccomment">///             }</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///         i += 1;</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // And at the end, we can get the Service back when there are no more requests.</span>
-    <span class="doccomment">///     assert_eq!(rsps.into_inner(), FirstLetter);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Stream`]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CallAll</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Svc</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">S::Item</span><span class="op">&gt;</span>,
-        <span class="ident">S</span>: <span class="ident">Stream</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// This is a [`Stream`] of responses resulting from calling the wrapped [`Service`] for each
+    /// request received on the wrapped [`Stream`].
+    ///
+    /// ```rust
+    /// # use std::task::{Poll, Context};
+    /// # use std::cell::Cell;
+    /// # use std::error::Error;
+    /// # use std::rc::Rc;
+    /// #
+    /// use futures::future::{ready, Ready};
+    /// use futures::StreamExt;
+    /// use futures::channel::mpsc;
+    /// use tower_service::Service;
+    /// use tower::util::ServiceExt;
+    ///
+    /// // First, we need to have a Service to process our requests.
+    /// #[derive(Debug, Eq, PartialEq)]
+    /// struct FirstLetter;
+    /// impl Service&lt;&amp;&#39;static str&gt; for FirstLetter {
+    ///      type Response = &amp;&#39;static str;
+    ///      type Error = Box&lt;dyn Error + Send + Sync&gt;;
+    ///      type Future = Ready&lt;Result&lt;Self::Response, Self::Error&gt;&gt;;
+    ///
+    ///      fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    ///          Poll::Ready(Ok(()))
+    ///      }
+    ///
+    ///      fn call(&amp;mut self, req: &amp;&#39;static str) -&gt; Self::Future {
+    ///          ready(Ok(&amp;req[..1]))
+    ///      }
+    /// }
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     // Next, we need a Stream of requests.
+    </span><span class="comment">// TODO(eliza): when `tokio-util` has a nice way to convert MPSCs to streams,
+    //              tokio::sync::mpsc again?
+    </span><span class="doccomment">///     let (mut reqs, rx) = mpsc::unbounded();
+    ///     // Note that we have to help Rust out here by telling it what error type to use.
+    ///     // Specifically, it has to be From&lt;Service::Error&gt; + From&lt;Stream::Error&gt;.
+    ///     let mut rsps = FirstLetter.call_all(rx);
+    ///
+    ///     // Now, let&#39;s send a few requests and then check that we get the corresponding responses.
+    ///     reqs.unbounded_send(&quot;one&quot;).unwrap();
+    ///     reqs.unbounded_send(&quot;two&quot;).unwrap();
+    ///     reqs.unbounded_send(&quot;three&quot;).unwrap();
+    ///     drop(reqs);
+    ///
+    ///     // We then loop over the response Strem that we get back from call_all.
+    ///     let mut i = 0usize;
+    ///     while let Some(rsp) = rsps.next().await {
+    ///         // Each response is a Result (we could also have used TryStream::try_next)
+    ///         match (i + 1, rsp.unwrap()) {
+    ///             (1, &quot;o&quot;) |
+    ///             (2, &quot;t&quot;) |
+    ///             (3, &quot;t&quot;) =&gt; {}
+    ///             (n, i) =&gt; {
+    ///                 unreachable!(&quot;{}. response was &#39;{}&#39;&quot;, n, i);
+    ///             }
+    ///         }
+    ///         i += 1;
+    ///     }
+    ///
+    ///     // And at the end, we can get the Service back when there are no more requests.
+    ///     assert_eq!(rsps.into_inner(), FirstLetter);
+    /// }
+    /// ```
+    ///
+    /// [`Stream`]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>CallAll&lt;Svc, S&gt;
+    <span class="kw">where
+        </span>Svc: Service&lt;S::Item&gt;,
+        S: Stream,
     {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">inner</span>: <span class="ident">common::CallAll</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span>, <span class="ident">FuturesOrdered</span><span class="op">&lt;</span><span class="ident">Svc::Future</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="attribute">#[pin]
+        </span>inner: common::CallAll&lt;Svc, S, FuturesOrdered&lt;Svc::Future&gt;&gt;,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">CallAll</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Svc</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">S::Item</span><span class="op">&gt;</span>,
-    <span class="ident">Svc::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Stream</span>,
+<span class="kw">impl</span>&lt;Svc, S&gt; CallAll&lt;Svc, S&gt;
+<span class="kw">where
+    </span>Svc: Service&lt;S::Item&gt;,
+    Svc::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    S: Stream,
 {
-    <span class="doccomment">/// Create new [`CallAll`] combinator.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each request yielded by `stream` is passed to `svc`, and the resulting responses are</span>
-    <span class="doccomment">/// yielded in the same order by the implementation of [`Stream`] for [`CallAll`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Stream`]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">service</span>: <span class="ident">Svc</span>, <span class="ident">stream</span>: <span class="ident">S</span>) -&gt; <span class="ident">CallAll</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">CallAll</span> {
-            <span class="ident">inner</span>: <span class="ident">common::CallAll::new</span>(<span class="ident">service</span>, <span class="ident">stream</span>, <span class="ident">FuturesOrdered::new</span>()),
+    <span class="doccomment">/// Create new [`CallAll`] combinator.
+    ///
+    /// Each request yielded by `stream` is passed to `svc`, and the resulting responses are
+    /// yielded in the same order by the implementation of [`Stream`] for [`CallAll`].
+    ///
+    /// [`Stream`]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html
+    </span><span class="kw">pub fn </span>new(service: Svc, stream: S) -&gt; CallAll&lt;Svc, S&gt; {
+        CallAll {
+            inner: common::CallAll::new(service, stream, FuturesOrdered::new()),
         }
     }
 
-    <span class="doccomment">/// Extract the wrapped [`Service`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if [`take_service`] was already called.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`take_service`]: crate::util::CallAll::take_service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">Svc</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_inner</span>()
+    <span class="doccomment">/// Extract the wrapped [`Service`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if [`take_service`] was already called.
+    ///
+    /// [`take_service`]: crate::util::CallAll::take_service
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; Svc {
+        <span class="self">self</span>.inner.into_inner()
     }
 
-    <span class="doccomment">/// Extract the wrapped [`Service`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This [`CallAll`] can no longer be used after this function has been called.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if [`take_service`] was already called.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`take_service`]: crate::util::CallAll::take_service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_service</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Svc</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">take_service</span>()
+    <span class="doccomment">/// Extract the wrapped [`Service`].
+    ///
+    /// This [`CallAll`] can no longer be used after this function has been called.
+    ///
+    /// # Panics
+    ///
+    /// Panics if [`take_service`] was already called.
+    ///
+    /// [`take_service`]: crate::util::CallAll::take_service
+    </span><span class="kw">pub fn </span>take_service(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) -&gt; Svc {
+        <span class="self">self</span>.project().inner.take_service()
     }
 
-    <span class="doccomment">/// Return responses as they are ready, regardless of the initial order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function must be called before the stream is polled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if [`poll`] was called.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`poll`]: std::future::Future::poll</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unordered</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">super</span>::CallAllUnordered</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">unordered</span>()
+    <span class="doccomment">/// Return responses as they are ready, regardless of the initial order.
+    ///
+    /// This function must be called before the stream is polled.
+    ///
+    /// # Panics
+    ///
+    /// Panics if [`poll`] was called.
+    ///
+    /// [`poll`]: std::future::Future::poll
+    </span><span class="kw">pub fn </span>unordered(<span class="self">self</span>) -&gt; <span class="kw">super</span>::CallAllUnordered&lt;Svc, S&gt; {
+        <span class="self">self</span>.inner.unordered()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">CallAll</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Svc</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">S::Item</span><span class="op">&gt;</span>,
-    <span class="ident">Svc::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Stream</span>,
+<span class="kw">impl</span>&lt;Svc, S&gt; Stream <span class="kw">for </span>CallAll&lt;Svc, S&gt;
+<span class="kw">where
+    </span>Svc: Service&lt;S::Item&gt;,
+    Svc::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    S: Stream,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Svc::Response</span>, <span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;Svc::Response, <span class="kw">crate</span>::BoxError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="self">self</span>.project().inner.poll_next(cx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span> <span class="ident">common::Drive</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FuturesOrdered</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">FuturesOrdered::is_empty</span>(<span class="self">self</span>)
+<span class="kw">impl</span>&lt;F: Future&gt; common::Drive&lt;F&gt; <span class="kw">for </span>FuturesOrdered&lt;F&gt; {
+    <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        FuturesOrdered::is_empty(<span class="self">self</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) {
-        <span class="ident">FuturesOrdered::push</span>(<span class="self">self</span>, <span class="ident">future</span>)
+    <span class="kw">fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, future: F) {
+        FuturesOrdered::push(<span class="self">self</span>, future)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Stream::poll_next</span>(<span class="ident">Pin::new</span>(<span class="self">self</span>), <span class="ident">cx</span>)
+    <span class="kw">fn </span>poll(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;F::Output&gt;&gt; {
+        Stream::poll_next(Pin::new(<span class="self">self</span>), cx)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

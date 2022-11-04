@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/global/propagation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>propagation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/global/propagation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>propagation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -57,62 +57,62 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::propagation::TextMapPropagator</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::propagation::TextMapCompositePropagator</span>;
-<span class="kw">use</span> <span class="ident">std::sync::RwLock</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::propagation::TextMapPropagator;
+<span class="kw">use </span><span class="kw">crate</span>::sdk::propagation::TextMapCompositePropagator;
+<span class="kw">use </span>std::sync::RwLock;
 
-<span class="macro">lazy_static::lazy_static!</span> {
-    <span class="doccomment">/// The current global `TextMapPropagator` propagator.</span>
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">GLOBAL_TEXT_MAP_PROPAGATOR</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">TextMapPropagator</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">RwLock::new</span>(<span class="ident">Box::new</span>(<span class="ident">TextMapCompositePropagator::new</span>(<span class="macro">vec!</span>[])));
-    <span class="doccomment">/// The global default `TextMapPropagator` propagator.</span>
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DEFAULT_TEXT_MAP_PROPAGATOR</span>: <span class="ident">TextMapCompositePropagator</span> <span class="op">=</span> <span class="ident">TextMapCompositePropagator::new</span>(<span class="macro">vec!</span>[]);
+<span class="macro">lazy_static::lazy_static! </span>{
+    <span class="doccomment">/// The current global `TextMapPropagator` propagator.
+    </span><span class="kw">static </span><span class="kw-2">ref </span>GLOBAL_TEXT_MAP_PROPAGATOR: RwLock&lt;Box&lt;<span class="kw">dyn </span>TextMapPropagator + Send + Sync&gt;&gt; = RwLock::new(Box::new(TextMapCompositePropagator::new(<span class="macro">vec!</span>[])));
+    <span class="doccomment">/// The global default `TextMapPropagator` propagator.
+    </span><span class="kw">static </span><span class="kw-2">ref </span>DEFAULT_TEXT_MAP_PROPAGATOR: TextMapCompositePropagator = TextMapCompositePropagator::new(<span class="macro">vec!</span>[]);
 }
 
-<span class="doccomment">/// Sets the given [`TextMapPropagator`] propagator as the current global propagator.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use opentelemetry::{global, sdk::propagation::TraceContextPropagator};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // create your text map propagator</span>
-<span class="doccomment">/// let propagator = TraceContextPropagator::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // assign it as the global propagator</span>
-<span class="doccomment">/// global::set_text_map_propagator(propagator);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_text_map_propagator</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">TextMapPropagator</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">propagator</span>: <span class="ident">P</span>) {
-    <span class="kw">let</span> <span class="ident">_lock</span> <span class="op">=</span> <span class="ident">GLOBAL_TEXT_MAP_PROPAGATOR</span>
-        .<span class="ident">write</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">global_propagator</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">global_propagator</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">propagator</span>));
+<span class="doccomment">/// Sets the given [`TextMapPropagator`] propagator as the current global propagator.
+///
+/// # Examples
+///
+/// ```
+/// use opentelemetry::{global, sdk::propagation::TraceContextPropagator};
+///
+/// // create your text map propagator
+/// let propagator = TraceContextPropagator::new();
+///
+/// // assign it as the global propagator
+/// global::set_text_map_propagator(propagator);
+/// ```
+</span><span class="kw">pub fn </span>set_text_map_propagator&lt;P: TextMapPropagator + Send + Sync + <span class="lifetime">&#39;static</span>&gt;(propagator: P) {
+    <span class="kw">let </span>_lock = GLOBAL_TEXT_MAP_PROPAGATOR
+        .write()
+        .map(|<span class="kw-2">mut </span>global_propagator| <span class="kw-2">*</span>global_propagator = Box::new(propagator));
 }
 
-<span class="doccomment">/// Executes a closure with a reference to the current global [`TextMapPropagator`] propagator.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use opentelemetry::{propagation::TextMapPropagator, global};</span>
-<span class="doccomment">/// use opentelemetry::sdk::propagation::TraceContextPropagator;</span>
-<span class="doccomment">/// use std::collections::HashMap;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let example_carrier = HashMap::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // create your text map propagator</span>
-<span class="doccomment">/// let tc_propagator = TraceContextPropagator::new();</span>
-<span class="doccomment">/// global::set_text_map_propagator(tc_propagator);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // use the global text map propagator to extract contexts</span>
-<span class="doccomment">/// let _cx = global::get_text_map_propagator(|propagator| propagator.extract(&amp;example_carrier));</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_text_map_propagator</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TextMapPropagator</span>) -&gt; <span class="ident">T</span>,
+<span class="doccomment">/// Executes a closure with a reference to the current global [`TextMapPropagator`] propagator.
+///
+/// # Examples
+///
+/// ```
+/// use opentelemetry::{propagation::TextMapPropagator, global};
+/// use opentelemetry::sdk::propagation::TraceContextPropagator;
+/// use std::collections::HashMap;
+///
+/// let example_carrier = HashMap::new();
+///
+/// // create your text map propagator
+/// let tc_propagator = TraceContextPropagator::new();
+/// global::set_text_map_propagator(tc_propagator);
+///
+/// // use the global text map propagator to extract contexts
+/// let _cx = global::get_text_map_propagator(|propagator| propagator.extract(&amp;example_carrier));
+/// ```
+</span><span class="kw">pub fn </span>get_text_map_propagator&lt;T, F&gt;(<span class="kw-2">mut </span>f: F) -&gt; T
+<span class="kw">where
+    </span>F: FnMut(<span class="kw-2">&amp;</span><span class="kw">dyn </span>TextMapPropagator) -&gt; T,
 {
-    <span class="ident">GLOBAL_TEXT_MAP_PROPAGATOR</span>
-        .<span class="ident">read</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">propagator</span><span class="op">|</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">propagator</span>))
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">DEFAULT_TEXT_MAP_PROPAGATOR</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TextMapPropagator</span>))
+    GLOBAL_TEXT_MAP_PROPAGATOR
+        .read()
+        .map(|propagator| f(<span class="kw-2">&amp;**</span>propagator))
+        .unwrap_or_else(|<span class="kw">_</span>| f(<span class="kw-2">&amp;*</span>DEFAULT_TEXT_MAP_PROPAGATOR <span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>TextMapPropagator))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-macros-0.2.4/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../time_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-macros-0.2.4/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../time_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -127,134 +127,134 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::iter::once</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::iter::once;
 
-<span class="kw">use</span> <span class="ident">proc_macro</span>::{<span class="ident">Delimiter</span>, <span class="ident">Group</span>, <span class="ident">Ident</span>, <span class="ident">Literal</span>, <span class="ident">Punct</span>, <span class="ident">Spacing</span>, <span class="ident">Span</span>, <span class="ident">TokenStream</span>, <span class="ident">TokenTree</span>};
+<span class="kw">use </span>proc_macro::{Delimiter, Group, Ident, Literal, Punct, Spacing, Span, TokenStream, TokenTree};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::error::InvalidFormatDescription</span>;
+<span class="kw">use </span><span class="kw">crate</span>::format_description::error::InvalidFormatDescription;
 
-<span class="kw">trait</span> <span class="ident">WithSpan</span> {
-    <span class="kw">fn</span> <span class="ident">with_span</span>(<span class="self">self</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="self">Self</span>;
+<span class="kw">trait </span>WithSpan {
+    <span class="kw">fn </span>with_span(<span class="self">self</span>, span: Span) -&gt; <span class="self">Self</span>;
 }
 
-<span class="kw">impl</span> <span class="ident">WithSpan</span> <span class="kw">for</span> <span class="ident">TokenTree</span> {
-    <span class="kw">fn</span> <span class="ident">with_span</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">set_span</span>(<span class="ident">span</span>);
-        <span class="self">self</span>
-    }
+<span class="kw">impl </span>WithSpan <span class="kw">for </span>TokenTree {
+    <span class="kw">fn </span>with_span(<span class="kw-2">mut </span><span class="self">self</span>, span: Span) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.set_span(span);
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="ident">MissingComponent</span> {
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">span_start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
-        <span class="ident">span_end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Error {
+    MissingComponent {
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        span_start: <span class="prelude-ty">Option</span>&lt;Span&gt;,
+        span_end: <span class="prelude-ty">Option</span>&lt;Span&gt;,
     },
-    <span class="ident">InvalidComponent</span> {
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">value</span>: <span class="ident">String</span>,
-        <span class="ident">span_start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
-        <span class="ident">span_end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
+    InvalidComponent {
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        value: String,
+        span_start: <span class="prelude-ty">Option</span>&lt;Span&gt;,
+        span_end: <span class="prelude-ty">Option</span>&lt;Span&gt;,
     },
-    <span class="ident">ExpectedString</span> {
-        <span class="ident">span_start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
-        <span class="ident">span_end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
+    ExpectedString {
+        span_start: <span class="prelude-ty">Option</span>&lt;Span&gt;,
+        span_end: <span class="prelude-ty">Option</span>&lt;Span&gt;,
     },
-    <span class="ident">UnexpectedToken</span> {
-        <span class="ident">tree</span>: <span class="ident">TokenTree</span>,
+    UnexpectedToken {
+        tree: TokenTree,
     },
-    <span class="ident">UnexpectedEndOfInput</span>,
-    <span class="ident">InvalidFormatDescription</span> {
-        <span class="ident">error</span>: <span class="ident">InvalidFormatDescription</span>,
-        <span class="ident">span_start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
-        <span class="ident">span_end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
+    UnexpectedEndOfInput,
+    InvalidFormatDescription {
+        error: InvalidFormatDescription,
+        span_start: <span class="prelude-ty">Option</span>&lt;Span&gt;,
+        span_end: <span class="prelude-ty">Option</span>&lt;Span&gt;,
     },
-    <span class="ident">Custom</span> {
-        <span class="ident">message</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">span_start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
-        <span class="ident">span_end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
+    Custom {
+        message: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+        span_start: <span class="prelude-ty">Option</span>&lt;Span&gt;,
+        span_end: <span class="prelude-ty">Option</span>&lt;Span&gt;,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::MissingComponent</span> { <span class="ident">name</span>, .. } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;missing component: {}&quot;</span>, <span class="ident">name</span>),
-            <span class="ident"><span class="self">Self</span>::InvalidComponent</span> { <span class="ident">name</span>, <span class="ident">value</span>, .. } =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid component: {} was {}&quot;</span>, <span class="ident">name</span>, <span class="ident">value</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::MissingComponent { name, .. } =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;missing component: {}&quot;</span>, name),
+            <span class="self">Self</span>::InvalidComponent { name, value, .. } =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;invalid component: {} was {}&quot;</span>, name, value)
             }
-            <span class="ident"><span class="self">Self</span>::ExpectedString</span> { .. } =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;expected string&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::UnexpectedToken</span> { <span class="ident">tree</span> } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unexpected token: {}&quot;</span>, <span class="ident">tree</span>),
-            <span class="ident"><span class="self">Self</span>::UnexpectedEndOfInput</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;unexpected end of input&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::InvalidFormatDescription</span> { <span class="ident">error</span>, .. } =&gt; <span class="ident">error</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident"><span class="self">Self</span>::Custom</span> { <span class="ident">message</span>, .. } =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">message</span>),
+            <span class="self">Self</span>::ExpectedString { .. } =&gt; f.write_str(<span class="string">&quot;expected string&quot;</span>),
+            <span class="self">Self</span>::UnexpectedToken { tree } =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;unexpected token: {}&quot;</span>, tree),
+            <span class="self">Self</span>::UnexpectedEndOfInput =&gt; f.write_str(<span class="string">&quot;unexpected end of input&quot;</span>),
+            <span class="self">Self</span>::InvalidFormatDescription { error, .. } =&gt; error.fmt(f),
+            <span class="self">Self</span>::Custom { message, .. } =&gt; f.write_str(message),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">span_start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Span</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::MissingComponent</span> { <span class="ident">span_start</span>, .. }
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::InvalidComponent</span> { <span class="ident">span_start</span>, .. }
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::ExpectedString</span> { <span class="ident">span_start</span>, .. }
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::InvalidFormatDescription</span> { <span class="ident">span_start</span>, .. }
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Custom</span> { <span class="ident">span_start</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">span_start</span>,
-            <span class="ident"><span class="self">Self</span>::UnexpectedToken</span> { <span class="ident">tree</span> } =&gt; <span class="prelude-val">Some</span>(<span class="ident">tree</span>.<span class="ident">span</span>()),
-            <span class="ident"><span class="self">Self</span>::UnexpectedEndOfInput</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Span::mixed_site</span>()),
+<span class="kw">impl </span>Error {
+    <span class="kw">fn </span>span_start(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Span {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::MissingComponent { span_start, .. }
+            | <span class="self">Self</span>::InvalidComponent { span_start, .. }
+            | <span class="self">Self</span>::ExpectedString { span_start, .. }
+            | <span class="self">Self</span>::InvalidFormatDescription { span_start, .. }
+            | <span class="self">Self</span>::Custom { span_start, .. } =&gt; <span class="kw-2">*</span>span_start,
+            <span class="self">Self</span>::UnexpectedToken { tree } =&gt; <span class="prelude-val">Some</span>(tree.span()),
+            <span class="self">Self</span>::UnexpectedEndOfInput =&gt; <span class="prelude-val">Some</span>(Span::mixed_site()),
         }
-        .<span class="ident">unwrap_or_else</span>(<span class="ident">Span::mixed_site</span>)
+        .unwrap_or_else(Span::mixed_site)
     }
 
-    <span class="kw">fn</span> <span class="ident">span_end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Span</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::MissingComponent</span> { <span class="ident">span_end</span>, .. }
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::InvalidComponent</span> { <span class="ident">span_end</span>, .. }
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::ExpectedString</span> { <span class="ident">span_end</span>, .. }
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::InvalidFormatDescription</span> { <span class="ident">span_end</span>, .. }
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Custom</span> { <span class="ident">span_end</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">span_end</span>,
-            <span class="ident"><span class="self">Self</span>::UnexpectedToken</span> { <span class="ident">tree</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="ident">tree</span>.<span class="ident">span</span>()),
-            <span class="ident"><span class="self">Self</span>::UnexpectedEndOfInput</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Span::mixed_site</span>()),
+    <span class="kw">fn </span>span_end(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Span {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::MissingComponent { span_end, .. }
+            | <span class="self">Self</span>::InvalidComponent { span_end, .. }
+            | <span class="self">Self</span>::ExpectedString { span_end, .. }
+            | <span class="self">Self</span>::InvalidFormatDescription { span_end, .. }
+            | <span class="self">Self</span>::Custom { span_end, .. } =&gt; <span class="kw-2">*</span>span_end,
+            <span class="self">Self</span>::UnexpectedToken { tree, .. } =&gt; <span class="prelude-val">Some</span>(tree.span()),
+            <span class="self">Self</span>::UnexpectedEndOfInput =&gt; <span class="prelude-val">Some</span>(Span::mixed_site()),
         }
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">span_start</span>())
+        .unwrap_or_else(|| <span class="self">self</span>.span_start())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_compile_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">let</span> (<span class="ident">start</span>, <span class="ident">end</span>) <span class="op">=</span> (<span class="self">self</span>.<span class="ident">span_start</span>(), <span class="self">self</span>.<span class="ident">span_end</span>());
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_compile_error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream {
+        <span class="kw">let </span>(start, end) = (<span class="self">self</span>.span_start(), <span class="self">self</span>.span_end());
 
         [
-            <span class="ident">TokenTree::from</span>(<span class="ident">Punct::new</span>(<span class="string">&#39;:&#39;</span>, <span class="ident">Spacing::Joint</span>)).<span class="ident">with_span</span>(<span class="ident">start</span>),
-            <span class="ident">TokenTree::from</span>(<span class="ident">Punct::new</span>(<span class="string">&#39;:&#39;</span>, <span class="ident">Spacing::Alone</span>)).<span class="ident">with_span</span>(<span class="ident">start</span>),
-            <span class="ident">TokenTree::from</span>(<span class="ident">Ident::new</span>(<span class="string">&quot;core&quot;</span>, <span class="ident">start</span>)),
-            <span class="ident">TokenTree::from</span>(<span class="ident">Punct::new</span>(<span class="string">&#39;:&#39;</span>, <span class="ident">Spacing::Joint</span>)).<span class="ident">with_span</span>(<span class="ident">start</span>),
-            <span class="ident">TokenTree::from</span>(<span class="ident">Punct::new</span>(<span class="string">&#39;:&#39;</span>, <span class="ident">Spacing::Alone</span>)).<span class="ident">with_span</span>(<span class="ident">start</span>),
-            <span class="ident">TokenTree::from</span>(<span class="ident">Ident::new</span>(<span class="string">&quot;compile_error&quot;</span>, <span class="ident">start</span>)),
-            <span class="ident">TokenTree::from</span>(<span class="ident">Punct::new</span>(<span class="string">&#39;!&#39;</span>, <span class="ident">Spacing::Alone</span>)).<span class="ident">with_span</span>(<span class="ident">start</span>),
-            <span class="ident">TokenTree::from</span>(<span class="ident">Group::new</span>(
-                <span class="ident">Delimiter::Parenthesis</span>,
-                <span class="ident">TokenStream::from</span>(
-                    <span class="ident">TokenTree::from</span>(<span class="ident">Literal::string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_string</span>())).<span class="ident">with_span</span>(<span class="ident">end</span>),
+            TokenTree::from(Punct::new(<span class="string">&#39;:&#39;</span>, Spacing::Joint)).with_span(start),
+            TokenTree::from(Punct::new(<span class="string">&#39;:&#39;</span>, Spacing::Alone)).with_span(start),
+            TokenTree::from(Ident::new(<span class="string">&quot;core&quot;</span>, start)),
+            TokenTree::from(Punct::new(<span class="string">&#39;:&#39;</span>, Spacing::Joint)).with_span(start),
+            TokenTree::from(Punct::new(<span class="string">&#39;:&#39;</span>, Spacing::Alone)).with_span(start),
+            TokenTree::from(Ident::new(<span class="string">&quot;compile_error&quot;</span>, start)),
+            TokenTree::from(Punct::new(<span class="string">&#39;!&#39;</span>, Spacing::Alone)).with_span(start),
+            TokenTree::from(Group::new(
+                Delimiter::Parenthesis,
+                TokenStream::from(
+                    TokenTree::from(Literal::string(<span class="kw-2">&amp;</span><span class="self">self</span>.to_string())).with_span(end),
                 ),
             ))
-            .<span class="ident">with_span</span>(<span class="ident">end</span>),
+            .with_span(end),
         ]
-        .<span class="ident">iter</span>()
-        .<span class="ident">cloned</span>()
-        .<span class="ident">collect</span>()
+        .iter()
+        .cloned()
+        .collect()
     }
 
-    <span class="doccomment">/// Like `to_compile_error`, but for use in macros that produce items.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_compile_error_standalone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">span_end</span>();
-        <span class="self">self</span>.<span class="ident">to_compile_error</span>()
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">chain</span>(<span class="ident">once</span>(
-                <span class="ident">TokenTree::from</span>(<span class="ident">Punct::new</span>(<span class="string">&#39;;&#39;</span>, <span class="ident">Spacing::Alone</span>)).<span class="ident">with_span</span>(<span class="ident">end</span>),
+    <span class="doccomment">/// Like `to_compile_error`, but for use in macros that produce items.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_compile_error_standalone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream {
+        <span class="kw">let </span>end = <span class="self">self</span>.span_end();
+        <span class="self">self</span>.to_compile_error()
+            .into_iter()
+            .chain(once(
+                TokenTree::from(Punct::new(<span class="string">&#39;;&#39;</span>, Spacing::Alone)).with_span(end),
             ))
-            .<span class="ident">collect</span>()
+            .collect()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

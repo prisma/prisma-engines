@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/shared.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shared.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/shared.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shared.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -282,289 +282,289 @@
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Shared utilities and algorithms.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Shared utilities and algorithms.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+</span><span class="attribute">#![doc(hidden)]
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::float</span>::{<span class="ident">ExtendedFloat80</span>, <span class="ident">RawFloat</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mask</span>::{<span class="ident">lower_n_halfway</span>, <span class="ident">lower_n_mask</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util::format::NumberFormat</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::num::AsPrimitive</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::float::{ExtendedFloat80, RawFloat};
+<span class="kw">use </span><span class="kw">crate</span>::mask::{lower_n_halfway, lower_n_mask};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::format::NumberFormat;
+<span class="kw">use </span>lexical_util::num::AsPrimitive;
 
-<span class="comment">// 8 DIGIT</span>
-<span class="comment">// -------</span>
+<span class="comment">// 8 DIGIT
+// -------
 
-<span class="doccomment">/// Check if we can try to parse 8 digits.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">can_try_parse_8digits</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">is_contiguous</span>() <span class="op">&amp;&amp;</span> (<span class="macro">cfg!</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)) <span class="op">|</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">10</span>)
+</span><span class="doccomment">/// Check if we can try to parse 8 digits.
+</span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+</span><span class="macro">macro_rules! </span>can_try_parse_8digits {
+    (<span class="macro-nonterminal">$iter</span>:expr, <span class="macro-nonterminal">$radix</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$iter</span>.is_contiguous() &amp;&amp; (<span class="macro">cfg!</span>(not(feature = <span class="string">&quot;power-of-two&quot;</span>)) || <span class="macro-nonterminal">$radix </span>&lt;= <span class="number">10</span>)
     };
 }
 
-<span class="comment">// POWER2</span>
-<span class="comment">// ------</span>
+<span class="comment">// POWER2
+// ------
 
-<span class="doccomment">/// Calculate the shift to move the significant digits into place.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calculate_shift</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">RawFloat</span><span class="op">&gt;</span>(<span class="ident">power2</span>: <span class="ident">i32</span>) -&gt; <span class="ident">i32</span> {
-    <span class="kw">let</span> <span class="ident">mantissa_shift</span> <span class="op">=</span> <span class="number">64</span> <span class="op">-</span> <span class="ident">F::MANTISSA_SIZE</span> <span class="op">-</span> <span class="number">1</span>;
-    <span class="kw">if</span> <span class="op">-</span><span class="ident">power2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">mantissa_shift</span> {
-        <span class="op">-</span><span class="ident">power2</span> <span class="op">+</span> <span class="number">1</span>
-    } <span class="kw">else</span> {
-        <span class="ident">mantissa_shift</span>
+</span><span class="doccomment">/// Calculate the shift to move the significant digits into place.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>calculate_shift&lt;F: RawFloat&gt;(power2: i32) -&gt; i32 {
+    <span class="kw">let </span>mantissa_shift = <span class="number">64 </span>- F::MANTISSA_SIZE - <span class="number">1</span>;
+    <span class="kw">if </span>-power2 &gt;= mantissa_shift {
+        -power2 + <span class="number">1
+    </span>} <span class="kw">else </span>{
+        mantissa_shift
     }
 }
 
-<span class="doccomment">/// Calculate the biased, binary exponent from the mantissa shift and exponent.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calculate_power2</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">RawFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">exponent</span>: <span class="ident">i64</span>, <span class="ident">ctlz</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i32</span> {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="ident">exponent</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">*</span> <span class="ident">log2</span>(<span class="ident">format</span>.<span class="ident">exponent_base</span>()) <span class="op">+</span> <span class="ident">F::EXPONENT_BIAS</span> <span class="op">-</span> <span class="ident">ctlz</span> <span class="kw">as</span> <span class="ident">i32</span>
+<span class="doccomment">/// Calculate the biased, binary exponent from the mantissa shift and exponent.
+</span><span class="attribute">#[inline(always)]
+#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+</span><span class="kw">pub fn </span>calculate_power2&lt;F: RawFloat, <span class="kw">const </span>FORMAT: u128&gt;(exponent: i64, ctlz: u32) -&gt; i32 {
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    exponent <span class="kw">as </span>i32 * log2(format.exponent_base()) + F::EXPONENT_BIAS - ctlz <span class="kw">as </span>i32
 }
 
-<span class="doccomment">/// Bias for marking an invalid extended float.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INVALID_FP</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">i16::MIN</span> <span class="kw">as</span> <span class="ident">i32</span>;
+<span class="doccomment">/// Bias for marking an invalid extended float.
+</span><span class="kw">pub const </span>INVALID_FP: i32 = i16::MIN <span class="kw">as </span>i32;
 
-<span class="comment">// LOG2</span>
-<span class="comment">// ----</span>
+<span class="comment">// LOG2
+// ----
 
-<span class="doccomment">/// Quick log2 that evaluates at compile time for the radix.</span>
-<span class="doccomment">/// Note that this may produce inaccurate results for other radixes:</span>
-<span class="doccomment">/// we don&#39;t care since it&#39;s only called for powers-of-two.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">log2</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i32</span> {
-    <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">2</span> =&gt; <span class="number">1</span>,
-        <span class="number">4</span> =&gt; <span class="number">2</span>,
-        <span class="number">8</span> =&gt; <span class="number">3</span>,
-        <span class="number">16</span> =&gt; <span class="number">4</span>,
-        <span class="number">32</span> =&gt; <span class="number">5</span>,
-        <span class="comment">// Fallthrough to 1 for non-power-of-two radixes.</span>
-        <span class="kw">_</span> =&gt; <span class="number">1</span>,
+</span><span class="doccomment">/// Quick log2 that evaluates at compile time for the radix.
+/// Note that this may produce inaccurate results for other radixes:
+/// we don&#39;t care since it&#39;s only called for powers-of-two.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub const fn </span>log2(radix: u32) -&gt; i32 {
+    <span class="kw">match </span>radix {
+        <span class="number">2 </span>=&gt; <span class="number">1</span>,
+        <span class="number">4 </span>=&gt; <span class="number">2</span>,
+        <span class="number">8 </span>=&gt; <span class="number">3</span>,
+        <span class="number">16 </span>=&gt; <span class="number">4</span>,
+        <span class="number">32 </span>=&gt; <span class="number">5</span>,
+        <span class="comment">// Fallthrough to 1 for non-power-of-two radixes.
+        </span><span class="kw">_ </span>=&gt; <span class="number">1</span>,
     }
 }
 
-<span class="comment">// STARTS WITH</span>
-<span class="comment">// -----------</span>
+<span class="comment">// STARTS WITH
+// -----------
 
-<span class="doccomment">/// Check if left iter starts with right iter.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This optimizes decently well, to the following ASM for pure slices:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// starts_with_slc:</span>
-<span class="doccomment">///         xor     eax, eax</span>
-<span class="doccomment">/// .LBB0_1:</span>
-<span class="doccomment">///         cmp     rcx, rax</span>
-<span class="doccomment">///         je      .LBB0_2</span>
-<span class="doccomment">///         cmp     rsi, rax</span>
-<span class="doccomment">///         je      .LBB0_5</span>
-<span class="doccomment">///         movzx   r8d, byte ptr [rdi + rax]</span>
-<span class="doccomment">///         lea     r9, [rax + 1]</span>
-<span class="doccomment">///         cmp     r8b, byte ptr [rdx + rax]</span>
-<span class="doccomment">///         mov     rax, r9</span>
-<span class="doccomment">///         je      .LBB0_1</span>
-<span class="doccomment">/// .LBB0_5:</span>
-<span class="doccomment">///         xor     eax, eax</span>
-<span class="doccomment">///         ret</span>
-<span class="doccomment">/// .LBB0_2:</span>
-<span class="doccomment">///         mov     al, 1</span>
-<span class="doccomment">///         ret</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">starts_with</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">Iter1</span>, <span class="ident">Iter2</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">x</span>: <span class="ident">Iter1</span>, <span class="kw-2">mut</span> <span class="ident">y</span>: <span class="ident">Iter2</span>) -&gt; <span class="ident">bool</span>
-<span class="kw">where</span>
-    <span class="ident">Iter1</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">Iter2</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">u8</span><span class="op">&gt;</span>,
+</span><span class="doccomment">/// Check if left iter starts with right iter.
+///
+/// This optimizes decently well, to the following ASM for pure slices:
+///
+/// ```text
+/// starts_with_slc:
+///         xor     eax, eax
+/// .LBB0_1:
+///         cmp     rcx, rax
+///         je      .LBB0_2
+///         cmp     rsi, rax
+///         je      .LBB0_5
+///         movzx   r8d, byte ptr [rdi + rax]
+///         lea     r9, [rax + 1]
+///         cmp     r8b, byte ptr [rdx + rax]
+///         mov     rax, r9
+///         je      .LBB0_1
+/// .LBB0_5:
+///         xor     eax, eax
+///         ret
+/// .LBB0_2:
+///         mov     al, 1
+///         ret
+/// ```
+</span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+</span><span class="kw">pub fn </span>starts_with&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, Iter1, Iter2&gt;(<span class="kw-2">mut </span>x: Iter1, <span class="kw-2">mut </span>y: Iter2) -&gt; bool
+<span class="kw">where
+    </span>Iter1: Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8&gt;,
+    Iter2: Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>u8&gt;,
 {
-    <span class="kw">loop</span> {
-        <span class="comment">// Only call `next()` on x if y is not None, otherwise,</span>
-        <span class="comment">// we may incorrectly consume an x character.</span>
-        <span class="kw">let</span> <span class="ident">yi</span> <span class="op">=</span> <span class="ident">y</span>.<span class="ident">next</span>();
-        <span class="kw">if</span> <span class="ident">yi</span>.<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">next</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">yi</span> {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="kw">loop </span>{
+        <span class="comment">// Only call `next()` on x if y is not None, otherwise,
+        // we may incorrectly consume an x character.
+        </span><span class="kw">let </span>yi = y.next();
+        <span class="kw">if </span>yi.is_none() {
+            <span class="kw">return </span><span class="bool-val">true</span>;
+        } <span class="kw">else if </span>x.next() != yi {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
     }
 }
 
-<span class="doccomment">/// Check if left iter starts with right iter without case-sensitivity.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This optimizes decently well, to the following ASM for pure slices:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// case_insensitive_starts_with_slc:</span>
-<span class="doccomment">///         xor     eax, eax</span>
-<span class="doccomment">/// .LBB1_1:</span>
-<span class="doccomment">///         cmp     rcx, rax</span>
-<span class="doccomment">///         je      .LBB1_2</span>
-<span class="doccomment">///         cmp     rsi, rax</span>
-<span class="doccomment">///         je      .LBB1_5</span>
-<span class="doccomment">///         movzx   r8d, byte ptr [rdi + rax]</span>
-<span class="doccomment">///         xor     r8b, byte ptr [rdx + rax]</span>
-<span class="doccomment">///         add     rax, 1</span>
-<span class="doccomment">///         test    r8b, -33</span>
-<span class="doccomment">///         je      .LBB1_1</span>
-<span class="doccomment">/// .LBB1_5:</span>
-<span class="doccomment">///         xor     eax, eax</span>
-<span class="doccomment">///         ret</span>
-<span class="doccomment">/// .LBB1_2:</span>
-<span class="doccomment">///         mov     al, 1</span>
-<span class="doccomment">///         ret</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">case_insensitive_starts_with</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">Iter1</span>, <span class="ident">Iter2</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">x</span>: <span class="ident">Iter1</span>, <span class="kw-2">mut</span> <span class="ident">y</span>: <span class="ident">Iter2</span>) -&gt; <span class="ident">bool</span>
-<span class="kw">where</span>
-    <span class="ident">Iter1</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">Iter2</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">u8</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Check if left iter starts with right iter without case-sensitivity.
+///
+/// This optimizes decently well, to the following ASM for pure slices:
+///
+/// ```text
+/// case_insensitive_starts_with_slc:
+///         xor     eax, eax
+/// .LBB1_1:
+///         cmp     rcx, rax
+///         je      .LBB1_2
+///         cmp     rsi, rax
+///         je      .LBB1_5
+///         movzx   r8d, byte ptr [rdi + rax]
+///         xor     r8b, byte ptr [rdx + rax]
+///         add     rax, 1
+///         test    r8b, -33
+///         je      .LBB1_1
+/// .LBB1_5:
+///         xor     eax, eax
+///         ret
+/// .LBB1_2:
+///         mov     al, 1
+///         ret
+/// ```
+</span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+</span><span class="kw">pub fn </span>case_insensitive_starts_with&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, Iter1, Iter2&gt;(<span class="kw-2">mut </span>x: Iter1, <span class="kw-2">mut </span>y: Iter2) -&gt; bool
+<span class="kw">where
+    </span>Iter1: Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8&gt;,
+    Iter2: Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>u8&gt;,
 {
-    <span class="comment">// We use a faster optimization here for ASCII letters, which NaN</span>
-    <span class="comment">// and infinite strings **must** be. [A-Z] is 0x41-0x5A, while</span>
-    <span class="comment">// [a-z] is 0x61-0x7A. Therefore, the xor must be 0 or 32 if they</span>
-    <span class="comment">// are case-insensitive equal, but only if at least 1 of the inputs</span>
-    <span class="comment">// is an ASCII letter.</span>
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">yi</span> <span class="op">=</span> <span class="ident">y</span>.<span class="ident">next</span>();
-        <span class="kw">if</span> <span class="ident">yi</span>.<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="comment">// We use a faster optimization here for ASCII letters, which NaN
+    // and infinite strings **must** be. [A-Z] is 0x41-0x5A, while
+    // [a-z] is 0x61-0x7A. Therefore, the xor must be 0 or 32 if they
+    // are case-insensitive equal, but only if at least 1 of the inputs
+    // is an ASCII letter.
+    </span><span class="kw">loop </span>{
+        <span class="kw">let </span>yi = y.next();
+        <span class="kw">if </span>yi.is_none() {
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
-        <span class="kw">let</span> <span class="ident">yi</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">yi</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">is_not_equal</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">next</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">xi</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">xor</span> <span class="op">=</span> <span class="ident">xi</span> <span class="op">^</span> <span class="ident">yi</span>;
-            <span class="ident">xor</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">xor</span> <span class="op">!</span><span class="op">=</span> <span class="number">0x20</span>
-        });
-        <span class="kw">if</span> <span class="ident">is_not_equal</span> {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">let </span>yi = <span class="kw-2">*</span>yi.unwrap();
+        <span class="kw">let </span>is_not_equal = x.next().map_or(<span class="bool-val">true</span>, |<span class="kw-2">&amp;</span>xi| {
+            <span class="kw">let </span>xor = xi ^ yi;
+            xor != <span class="number">0 </span>&amp;&amp; xor != <span class="number">0x20
+        </span>});
+        <span class="kw">if </span>is_not_equal {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
     }
 }
 
-<span class="comment">// ROUNDING</span>
-<span class="comment">// --------</span>
+<span class="comment">// ROUNDING
+// --------
 
-<span class="doccomment">/// Round an extended-precision float to the nearest machine float.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Shifts the significant digits into place, adjusts the exponent,</span>
-<span class="doccomment">/// so it can be easily converted to a native float.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">round</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Cb</span><span class="op">&gt;</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat80</span>, <span class="ident">cb</span>: <span class="ident">Cb</span>)
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">RawFloat</span>,
-    <span class="ident">Cb</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat80</span>, <span class="ident">i32</span>),
+</span><span class="doccomment">/// Round an extended-precision float to the nearest machine float.
+///
+/// Shifts the significant digits into place, adjusts the exponent,
+/// so it can be easily converted to a native float.
+</span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+</span><span class="kw">pub fn </span>round&lt;F, Cb&gt;(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat80, cb: Cb)
+<span class="kw">where
+    </span>F: RawFloat,
+    Cb: Fn(<span class="kw-2">&amp;mut </span>ExtendedFloat80, i32),
 {
-    <span class="kw">let</span> <span class="ident">fp_inf</span> <span class="op">=</span> <span class="ident">ExtendedFloat80</span> {
-        <span class="ident">mant</span>: <span class="number">0</span>,
-        <span class="ident">exp</span>: <span class="ident">F::INFINITE_POWER</span>,
+    <span class="kw">let </span>fp_inf = ExtendedFloat80 {
+        mant: <span class="number">0</span>,
+        exp: F::INFINITE_POWER,
     };
 
-    <span class="comment">// Calculate our shift in significant digits.</span>
-    <span class="kw">let</span> <span class="ident">mantissa_shift</span> <span class="op">=</span> <span class="number">64</span> <span class="op">-</span> <span class="ident">F::MANTISSA_SIZE</span> <span class="op">-</span> <span class="number">1</span>;
+    <span class="comment">// Calculate our shift in significant digits.
+    </span><span class="kw">let </span>mantissa_shift = <span class="number">64 </span>- F::MANTISSA_SIZE - <span class="number">1</span>;
 
-    <span class="comment">// Check for a denormal float, if after the shift the exponent is negative.</span>
-    <span class="kw">if</span> <span class="op">-</span><span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">mantissa_shift</span> {
-        <span class="comment">// Have a denormal float that isn&#39;t a literal 0.</span>
-        <span class="comment">// The extra 1 is to adjust for the denormal float, which is</span>
-        <span class="comment">// `1 - F::EXPONENT_BIAS`. This works as before, because our</span>
-        <span class="comment">// old logic rounded to `F::DENORMAL_EXPONENT` (now 1), and then</span>
-        <span class="comment">// checked if `exp == F::DENORMAL_EXPONENT` and no hidden mask</span>
-        <span class="comment">// bit was set. Here, we handle that here, rather than later.</span>
-        <span class="comment">//</span>
-        <span class="comment">// This might round-down to 0, but shift will be at **max** 65,</span>
-        <span class="comment">// for halfway cases rounding towards 0.</span>
-        <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="op">-</span><span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">+</span> <span class="number">1</span>;
-        <span class="macro">debug_assert!</span>(<span class="ident">shift</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">65</span>);
-        <span class="ident">cb</span>(<span class="ident">fp</span>, <span class="ident">shift</span>.<span class="ident">min</span>(<span class="number">64</span>));
-        <span class="comment">// Check for round-up: if rounding-nearest carried us to the hidden bit.</span>
-        <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">=</span> (<span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::HIDDEN_BIT_MASK</span>.<span class="ident">as_u64</span>()) <span class="kw">as</span> <span class="ident">i32</span>;
+    <span class="comment">// Check for a denormal float, if after the shift the exponent is negative.
+    </span><span class="kw">if </span>-fp.exp &gt;= mantissa_shift {
+        <span class="comment">// Have a denormal float that isn&#39;t a literal 0.
+        // The extra 1 is to adjust for the denormal float, which is
+        // `1 - F::EXPONENT_BIAS`. This works as before, because our
+        // old logic rounded to `F::DENORMAL_EXPONENT` (now 1), and then
+        // checked if `exp == F::DENORMAL_EXPONENT` and no hidden mask
+        // bit was set. Here, we handle that here, rather than later.
+        //
+        // This might round-down to 0, but shift will be at **max** 65,
+        // for halfway cases rounding towards 0.
+        </span><span class="kw">let </span>shift = -fp.exp + <span class="number">1</span>;
+        <span class="macro">debug_assert!</span>(shift &lt;= <span class="number">65</span>);
+        cb(fp, shift.min(<span class="number">64</span>));
+        <span class="comment">// Check for round-up: if rounding-nearest carried us to the hidden bit.
+        </span>fp.exp = (fp.mant &gt;= F::HIDDEN_BIT_MASK.as_u64()) <span class="kw">as </span>i32;
         <span class="kw">return</span>;
     }
 
-    <span class="comment">// The float is normal, round to the hidden bit.</span>
-    <span class="ident">cb</span>(<span class="ident">fp</span>, <span class="ident">mantissa_shift</span>);
+    <span class="comment">// The float is normal, round to the hidden bit.
+    </span>cb(fp, mantissa_shift);
 
-    <span class="comment">// Check if we carried, and if so, shift the bit to the hidden bit.</span>
-    <span class="kw">let</span> <span class="ident">carry_mask</span> <span class="op">=</span> <span class="ident">F::CARRY_MASK</span>.<span class="ident">as_u64</span>();
-    <span class="kw">if</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">carry_mask</span> <span class="op">==</span> <span class="ident">carry_mask</span> {
-        <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="comment">// Check if we carried, and if so, shift the bit to the hidden bit.
+    </span><span class="kw">let </span>carry_mask = F::CARRY_MASK.as_u64();
+    <span class="kw">if </span>fp.mant &amp; carry_mask == carry_mask {
+        fp.mant &gt;&gt;= <span class="number">1</span>;
+        fp.exp += <span class="number">1</span>;
     }
 
-    <span class="comment">// Handle if we carried and check for overflow again.</span>
-    <span class="kw">if</span> <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::INFINITE_POWER</span> {
-        <span class="comment">// Exponent is above largest normal value, must be infinite.</span>
-        <span class="kw-2">*</span><span class="ident">fp</span> <span class="op">=</span> <span class="ident">fp_inf</span>;
+    <span class="comment">// Handle if we carried and check for overflow again.
+    </span><span class="kw">if </span>fp.exp &gt;= F::INFINITE_POWER {
+        <span class="comment">// Exponent is above largest normal value, must be infinite.
+        </span><span class="kw-2">*</span>fp = fp_inf;
         <span class="kw">return</span>;
     }
 
-    <span class="comment">// Remove the hidden bit.</span>
-    <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;=</span> <span class="ident">F::MANTISSA_MASK</span>.<span class="ident">as_u64</span>();
+    <span class="comment">// Remove the hidden bit.
+    </span>fp.mant &amp;= F::MANTISSA_MASK.as_u64();
 }
 
-<span class="doccomment">/// Shift right N-bytes and round towards a direction.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Callback should take the following parameters:</span>
-<span class="doccomment">///     1. is_odd</span>
-<span class="doccomment">///     1. is_halfway</span>
-<span class="doccomment">///     1. is_above</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">round_nearest_tie_even</span><span class="op">&lt;</span><span class="ident">Cb</span><span class="op">&gt;</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat80</span>, <span class="ident">shift</span>: <span class="ident">i32</span>, <span class="ident">cb</span>: <span class="ident">Cb</span>)
-<span class="kw">where</span>
-    <span class="comment">// is_odd, is_halfway, is_above</span>
-    <span class="ident">Cb</span>: <span class="ident">Fn</span>(<span class="ident">bool</span>, <span class="ident">bool</span>, <span class="ident">bool</span>) -&gt; <span class="ident">bool</span>,
+<span class="doccomment">/// Shift right N-bytes and round towards a direction.
+///
+/// Callback should take the following parameters:
+///     1. is_odd
+///     1. is_halfway
+///     1. is_above
+</span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+</span><span class="kw">pub fn </span>round_nearest_tie_even&lt;Cb&gt;(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat80, shift: i32, cb: Cb)
+<span class="kw">where
+    </span><span class="comment">// is_odd, is_halfway, is_above
+    </span>Cb: Fn(bool, bool, bool) -&gt; bool,
 {
-    <span class="comment">// Ensure we&#39;ve already handled denormal values that underflow.</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">shift</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">64</span>);
+    <span class="comment">// Ensure we&#39;ve already handled denormal values that underflow.
+    </span><span class="macro">debug_assert!</span>(shift &lt;= <span class="number">64</span>);
 
-    <span class="comment">// Extract the truncated bits using mask.</span>
-    <span class="comment">// Calculate if the value of the truncated bits are either above</span>
-    <span class="comment">// the mid-way point, or equal to it.</span>
-    <span class="comment">//</span>
-    <span class="comment">// For example, for 4 truncated bytes, the mask would be 0b1111</span>
-    <span class="comment">// and the midway point would be 0b1000.</span>
-    <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">lower_n_mask</span>(<span class="ident">shift</span> <span class="kw">as</span> <span class="ident">u64</span>);
-    <span class="kw">let</span> <span class="ident">halfway</span> <span class="op">=</span> <span class="ident">lower_n_halfway</span>(<span class="ident">shift</span> <span class="kw">as</span> <span class="ident">u64</span>);
-    <span class="kw">let</span> <span class="ident">truncated_bits</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">mask</span>;
-    <span class="kw">let</span> <span class="ident">is_above</span> <span class="op">=</span> <span class="ident">truncated_bits</span> <span class="op">&gt;</span> <span class="ident">halfway</span>;
-    <span class="kw">let</span> <span class="ident">is_halfway</span> <span class="op">=</span> <span class="ident">truncated_bits</span> <span class="op">==</span> <span class="ident">halfway</span>;
+    <span class="comment">// Extract the truncated bits using mask.
+    // Calculate if the value of the truncated bits are either above
+    // the mid-way point, or equal to it.
+    //
+    // For example, for 4 truncated bytes, the mask would be 0b1111
+    // and the midway point would be 0b1000.
+    </span><span class="kw">let </span>mask = lower_n_mask(shift <span class="kw">as </span>u64);
+    <span class="kw">let </span>halfway = lower_n_halfway(shift <span class="kw">as </span>u64);
+    <span class="kw">let </span>truncated_bits = fp.mant &amp; mask;
+    <span class="kw">let </span>is_above = truncated_bits &gt; halfway;
+    <span class="kw">let </span>is_halfway = truncated_bits == halfway;
 
-    <span class="comment">// Bit shift so the leading bit is in the hidden bit.</span>
-    <span class="comment">// This optimixes pretty well:</span>
-    <span class="comment">//  ```text</span>
-    <span class="comment">//   mov     ecx, esi</span>
-    <span class="comment">//   shr     rdi, cl</span>
-    <span class="comment">//   xor     eax, eax</span>
-    <span class="comment">//   cmp     esi, 64</span>
-    <span class="comment">//   cmovne  rax, rdi</span>
-    <span class="comment">//   ret</span>
-    <span class="comment">//  ```</span>
-    <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">shift</span> <span class="op">==</span> <span class="number">64</span> {
-        <span class="bool-val">true</span> =&gt; <span class="number">0</span>,
-        <span class="bool-val">false</span> =&gt; <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">shift</span>,
+    <span class="comment">// Bit shift so the leading bit is in the hidden bit.
+    // This optimixes pretty well:
+    //  ```text
+    //   mov     ecx, esi
+    //   shr     rdi, cl
+    //   xor     eax, eax
+    //   cmp     esi, 64
+    //   cmovne  rax, rdi
+    //   ret
+    //  ```
+    </span>fp.mant = <span class="kw">match </span>shift == <span class="number">64 </span>{
+        <span class="bool-val">true </span>=&gt; <span class="number">0</span>,
+        <span class="bool-val">false </span>=&gt; fp.mant &gt;&gt; shift,
     };
-    <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">+</span><span class="op">=</span> <span class="ident">shift</span>;
+    fp.exp += shift;
 
-    <span class="comment">// Extract the last bit after shifting (and determine if it is odd).</span>
-    <span class="kw">let</span> <span class="ident">is_odd</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">==</span> <span class="number">1</span>;
+    <span class="comment">// Extract the last bit after shifting (and determine if it is odd).
+    </span><span class="kw">let </span>is_odd = fp.mant &amp; <span class="number">1 </span>== <span class="number">1</span>;
 
-    <span class="comment">// Calculate if we need to roundup.</span>
-    <span class="comment">// We need to roundup if we are above halfway, or if we are odd</span>
-    <span class="comment">// and at half-way (need to tie-to-even). Avoid the branch here.</span>
-    <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">+</span><span class="op">=</span> <span class="ident">cb</span>(<span class="ident">is_odd</span>, <span class="ident">is_halfway</span>, <span class="ident">is_above</span>) <span class="kw">as</span> <span class="ident">u64</span>;
+    <span class="comment">// Calculate if we need to roundup.
+    // We need to roundup if we are above halfway, or if we are odd
+    // and at half-way (need to tie-to-even). Avoid the branch here.
+    </span>fp.mant += cb(is_odd, is_halfway, is_above) <span class="kw">as </span>u64;
 }
 
-<span class="doccomment">/// Round our significant digits into place, truncating them.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">round_down</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat80</span>, <span class="ident">shift</span>: <span class="ident">i32</span>) {
-    <span class="comment">// Might have a shift greater than 64 if we have an error.</span>
-    <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">shift</span> <span class="op">==</span> <span class="number">64</span> {
-        <span class="bool-val">true</span> =&gt; <span class="number">0</span>,
-        <span class="bool-val">false</span> =&gt; <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">shift</span>,
+<span class="doccomment">/// Round our significant digits into place, truncating them.
+</span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+</span><span class="kw">pub fn </span>round_down(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat80, shift: i32) {
+    <span class="comment">// Might have a shift greater than 64 if we have an error.
+    </span>fp.mant = <span class="kw">match </span>shift == <span class="number">64 </span>{
+        <span class="bool-val">true </span>=&gt; <span class="number">0</span>,
+        <span class="bool-val">false </span>=&gt; fp.mant &gt;&gt; shift,
     };
-    <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">+</span><span class="op">=</span> <span class="ident">shift</span>;
+    fp.exp += shift;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

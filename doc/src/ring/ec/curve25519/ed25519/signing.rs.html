@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/curve25519/ed25519/signing.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>signing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/curve25519/ed25519/signing.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>signing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -268,275 +268,275 @@
 <span id="268">268</span>
 <span id="269">269</span>
 <span id="270">270</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! EdDSA Signatures.</span>
+</span><span class="doccomment">//! EdDSA Signatures.
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident"><span class="kw">super</span>::ops</span>::<span class="kw-2">*</span>, <span class="ident">eddsa_digest</span>, <span class="ident">ED25519_PUBLIC_KEY_LEN</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">digest</span>, <span class="ident">error</span>,
-    <span class="ident">io::der</span>,
-    <span class="ident">pkcs8</span>, <span class="ident">rand</span>,
-    <span class="ident">signature</span>::{<span class="self">self</span>, <span class="ident">KeyPair</span> <span class="kw">as</span> <span class="ident">SigningKeyPair</span>},
+</span><span class="kw">use super</span>::{<span class="kw">super</span>::ops::<span class="kw-2">*</span>, eddsa_digest, ED25519_PUBLIC_KEY_LEN};
+<span class="kw">use crate</span>::{
+    digest, error,
+    io::der,
+    pkcs8, rand,
+    signature::{<span class="self">self</span>, KeyPair <span class="kw">as </span>SigningKeyPair},
 };
-<span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
+<span class="kw">use </span>core::convert::TryInto;
 
-<span class="doccomment">/// An Ed25519 key pair, for signing.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ed25519KeyPair</span> {
-    <span class="comment">// RFC 8032 Section 5.1.6 calls this *s*.</span>
-    <span class="ident">private_scalar</span>: <span class="ident">Scalar</span>,
+<span class="doccomment">/// An Ed25519 key pair, for signing.
+</span><span class="kw">pub struct </span>Ed25519KeyPair {
+    <span class="comment">// RFC 8032 Section 5.1.6 calls this *s*.
+    </span>private_scalar: Scalar,
 
-    <span class="comment">// RFC 8032 Section 5.1.6 calls this *prefix*.</span>
-    <span class="ident">private_prefix</span>: <span class="ident">Prefix</span>,
+    <span class="comment">// RFC 8032 Section 5.1.6 calls this *prefix*.
+    </span>private_prefix: Prefix,
 
-    <span class="comment">// RFC 8032 Section 5.1.5 calls this *A*.</span>
-    <span class="ident">public_key</span>: <span class="ident">PublicKey</span>,
+    <span class="comment">// RFC 8032 Section 5.1.5 calls this *A*.
+    </span>public_key: PublicKey,
 }
 
-<span class="macro">derive_debug_via_field!</span>(<span class="ident">Ed25519KeyPair</span>, <span class="macro">stringify!</span>(<span class="ident">Ed25519KeyPair</span>), <span class="ident">public_key</span>);
+<span class="macro">derive_debug_via_field!</span>(Ed25519KeyPair, <span class="macro">stringify!</span>(Ed25519KeyPair), public_key);
 
-<span class="kw">impl</span> <span class="ident">Ed25519KeyPair</span> {
-    <span class="doccomment">/// Generates a new key pair and returns the key pair serialized as a</span>
-    <span class="doccomment">/// PKCS#8 document.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The PKCS#8 document will be a v2 `OneAsymmetricKey` with the public key,</span>
-    <span class="doccomment">/// as described in [RFC 5958 Section 2]; see [RFC 8410 Section 10.3] for an</span>
-    <span class="doccomment">/// example.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [RFC 5958 Section 2]: https://tools.ietf.org/html/rfc5958#section-2</span>
-    <span class="doccomment">/// [RFC 8410 Section 10.3]: https://tools.ietf.org/html/rfc8410#section-10.3</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_pkcs8</span>(
-        <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">pkcs8::Document</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">seed</span>: [<span class="ident">u8</span>; <span class="ident">SEED_LEN</span>] <span class="op">=</span> <span class="ident">rand::generate</span>(<span class="ident">rng</span>)<span class="question-mark">?</span>.<span class="ident">expose</span>();
-        <span class="kw">let</span> <span class="ident">key_pair</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_seed_</span>(<span class="kw-2">&amp;</span><span class="ident">seed</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">pkcs8::wrap_key</span>(
-            <span class="kw-2">&amp;</span><span class="ident">PKCS8_TEMPLATE</span>,
-            <span class="kw-2">&amp;</span><span class="ident">seed</span>[..],
-            <span class="ident">key_pair</span>.<span class="ident">public_key</span>().<span class="ident">as_ref</span>(),
+<span class="kw">impl </span>Ed25519KeyPair {
+    <span class="doccomment">/// Generates a new key pair and returns the key pair serialized as a
+    /// PKCS#8 document.
+    ///
+    /// The PKCS#8 document will be a v2 `OneAsymmetricKey` with the public key,
+    /// as described in [RFC 5958 Section 2]; see [RFC 8410 Section 10.3] for an
+    /// example.
+    ///
+    /// [RFC 5958 Section 2]: https://tools.ietf.org/html/rfc5958#section-2
+    /// [RFC 8410 Section 10.3]: https://tools.ietf.org/html/rfc8410#section-10.3
+    </span><span class="kw">pub fn </span>generate_pkcs8(
+        rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;pkcs8::Document, error::Unspecified&gt; {
+        <span class="kw">let </span>seed: [u8; SEED_LEN] = rand::generate(rng)<span class="question-mark">?</span>.expose();
+        <span class="kw">let </span>key_pair = <span class="self">Self</span>::from_seed_(<span class="kw-2">&amp;</span>seed);
+        <span class="prelude-val">Ok</span>(pkcs8::wrap_key(
+            <span class="kw-2">&amp;</span>PKCS8_TEMPLATE,
+            <span class="kw-2">&amp;</span>seed[..],
+            key_pair.public_key().as_ref(),
         ))
     }
 
-    <span class="doccomment">/// Constructs an Ed25519 key pair by parsing an unencrypted PKCS#8 v2</span>
-    <span class="doccomment">/// Ed25519 private key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `openssl genpkey -algorithm ED25519` generates PKCS# v1 keys, which</span>
-    <span class="doccomment">/// require the use of `Ed25519KeyPair::from_pkcs8_maybe_unchecked()`</span>
-    <span class="doccomment">/// instead of `Ed25519KeyPair::from_pkcs8()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The input must be in PKCS#8 v2 format, and in particular it must contain</span>
-    <span class="doccomment">/// the public key in addition to the private key. `from_pkcs8()` will</span>
-    <span class="doccomment">/// verify that the public key and the private key are consistent with each</span>
-    <span class="doccomment">/// other.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you need to parse PKCS#8 v1 files (without the public key) then use</span>
-    <span class="doccomment">/// `Ed25519KeyPair::from_pkcs8_maybe_unchecked()` instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pkcs8</span>(<span class="ident">pkcs8</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">seed</span>, <span class="ident">public_key</span>) <span class="op">=</span>
-            <span class="ident">unwrap_pkcs8</span>(<span class="ident">pkcs8::Version::V2Only</span>, <span class="ident">untrusted::Input::from</span>(<span class="ident">pkcs8</span>))<span class="question-mark">?</span>;
-        <span class="ident"><span class="self">Self</span>::from_seed_and_public_key</span>(
-            <span class="ident">seed</span>.<span class="ident">as_slice_less_safe</span>(),
-            <span class="ident">public_key</span>.<span class="ident">unwrap</span>().<span class="ident">as_slice_less_safe</span>(),
+    <span class="doccomment">/// Constructs an Ed25519 key pair by parsing an unencrypted PKCS#8 v2
+    /// Ed25519 private key.
+    ///
+    /// `openssl genpkey -algorithm ED25519` generates PKCS# v1 keys, which
+    /// require the use of `Ed25519KeyPair::from_pkcs8_maybe_unchecked()`
+    /// instead of `Ed25519KeyPair::from_pkcs8()`.
+    ///
+    /// The input must be in PKCS#8 v2 format, and in particular it must contain
+    /// the public key in addition to the private key. `from_pkcs8()` will
+    /// verify that the public key and the private key are consistent with each
+    /// other.
+    ///
+    /// If you need to parse PKCS#8 v1 files (without the public key) then use
+    /// `Ed25519KeyPair::from_pkcs8_maybe_unchecked()` instead.
+    </span><span class="kw">pub fn </span>from_pkcs8(pkcs8: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::KeyRejected&gt; {
+        <span class="kw">let </span>(seed, public_key) =
+            unwrap_pkcs8(pkcs8::Version::V2Only, untrusted::Input::from(pkcs8))<span class="question-mark">?</span>;
+        <span class="self">Self</span>::from_seed_and_public_key(
+            seed.as_slice_less_safe(),
+            public_key.unwrap().as_slice_less_safe(),
         )
     }
 
-    <span class="doccomment">/// Constructs an Ed25519 key pair by parsing an unencrypted PKCS#8 v1 or v2</span>
-    <span class="doccomment">/// Ed25519 private key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `openssl genpkey -algorithm ED25519` generates PKCS# v1 keys.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is recommended to use `Ed25519KeyPair::from_pkcs8()`, which accepts</span>
-    <span class="doccomment">/// only PKCS#8 v2 files that contain the public key.</span>
-    <span class="doccomment">/// `from_pkcs8_maybe_unchecked()` parses PKCS#2 files exactly like</span>
-    <span class="doccomment">/// `from_pkcs8()`. It also accepts v1 files. PKCS#8 v1 files do not contain</span>
-    <span class="doccomment">/// the public key, so when a v1 file is parsed the public key will be</span>
-    <span class="doccomment">/// computed from the private key, and there will be no consistency check</span>
-    <span class="doccomment">/// between the public key and the private key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// PKCS#8 v2 files are parsed exactly like `Ed25519KeyPair::from_pkcs8()`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pkcs8_maybe_unchecked</span>(<span class="ident">pkcs8</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">seed</span>, <span class="ident">public_key</span>) <span class="op">=</span>
-            <span class="ident">unwrap_pkcs8</span>(<span class="ident">pkcs8::Version::V1OrV2</span>, <span class="ident">untrusted::Input::from</span>(<span class="ident">pkcs8</span>))<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">public_key</span>) <span class="op">=</span> <span class="ident">public_key</span> {
-            <span class="ident"><span class="self">Self</span>::from_seed_and_public_key</span>(
-                <span class="ident">seed</span>.<span class="ident">as_slice_less_safe</span>(),
-                <span class="ident">public_key</span>.<span class="ident">as_slice_less_safe</span>(),
+    <span class="doccomment">/// Constructs an Ed25519 key pair by parsing an unencrypted PKCS#8 v1 or v2
+    /// Ed25519 private key.
+    ///
+    /// `openssl genpkey -algorithm ED25519` generates PKCS# v1 keys.
+    ///
+    /// It is recommended to use `Ed25519KeyPair::from_pkcs8()`, which accepts
+    /// only PKCS#8 v2 files that contain the public key.
+    /// `from_pkcs8_maybe_unchecked()` parses PKCS#2 files exactly like
+    /// `from_pkcs8()`. It also accepts v1 files. PKCS#8 v1 files do not contain
+    /// the public key, so when a v1 file is parsed the public key will be
+    /// computed from the private key, and there will be no consistency check
+    /// between the public key and the private key.
+    ///
+    /// PKCS#8 v2 files are parsed exactly like `Ed25519KeyPair::from_pkcs8()`.
+    </span><span class="kw">pub fn </span>from_pkcs8_maybe_unchecked(pkcs8: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::KeyRejected&gt; {
+        <span class="kw">let </span>(seed, public_key) =
+            unwrap_pkcs8(pkcs8::Version::V1OrV2, untrusted::Input::from(pkcs8))<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(public_key) = public_key {
+            <span class="self">Self</span>::from_seed_and_public_key(
+                seed.as_slice_less_safe(),
+                public_key.as_slice_less_safe(),
             )
-        } <span class="kw">else</span> {
-            <span class="ident"><span class="self">Self</span>::from_seed_unchecked</span>(<span class="ident">seed</span>.<span class="ident">as_slice_less_safe</span>())
+        } <span class="kw">else </span>{
+            <span class="self">Self</span>::from_seed_unchecked(seed.as_slice_less_safe())
         }
     }
 
-    <span class="doccomment">/// Constructs an Ed25519 key pair from the private key seed `seed` and its</span>
-    <span class="doccomment">/// public key `public_key`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is recommended to use `Ed25519KeyPair::from_pkcs8()` instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The private and public keys will be verified to be consistent with each</span>
-    <span class="doccomment">/// other. This helps avoid misuse of the key (e.g. accidentally swapping</span>
-    <span class="doccomment">/// the private key and public key, or using the wrong private key for the</span>
-    <span class="doccomment">/// public key). This also detects any corruption of the public or private</span>
-    <span class="doccomment">/// key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_seed_and_public_key</span>(
-        <span class="ident">seed</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">public_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_seed_unchecked</span>(<span class="ident">seed</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Constructs an Ed25519 key pair from the private key seed `seed` and its
+    /// public key `public_key`.
+    ///
+    /// It is recommended to use `Ed25519KeyPair::from_pkcs8()` instead.
+    ///
+    /// The private and public keys will be verified to be consistent with each
+    /// other. This helps avoid misuse of the key (e.g. accidentally swapping
+    /// the private key and public key, or using the wrong private key for the
+    /// public key). This also detects any corruption of the public or private
+    /// key.
+    </span><span class="kw">pub fn </span>from_seed_and_public_key(
+        seed: <span class="kw-2">&amp;</span>[u8],
+        public_key: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::KeyRejected&gt; {
+        <span class="kw">let </span>pair = <span class="self">Self</span>::from_seed_unchecked(seed)<span class="question-mark">?</span>;
 
-        <span class="comment">// This implicitly verifies that `public_key` is the right length.</span>
-        <span class="comment">// XXX: This rejects ~18 keys when they are partially reduced, though</span>
-        <span class="comment">// those keys are virtually impossible to find.</span>
-        <span class="kw">if</span> <span class="ident">public_key</span> <span class="op">!</span><span class="op">=</span> <span class="ident">pair</span>.<span class="ident">public_key</span>.<span class="ident">as_ref</span>() {
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">public_key</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">pair</span>.<span class="ident">public_key</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>() {
-                <span class="ident">error::KeyRejected::invalid_encoding</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">error::KeyRejected::inconsistent_components</span>()
+        <span class="comment">// This implicitly verifies that `public_key` is the right length.
+        // XXX: This rejects ~18 keys when they are partially reduced, though
+        // those keys are virtually impossible to find.
+        </span><span class="kw">if </span>public_key != pair.public_key.as_ref() {
+            <span class="kw">let </span>err = <span class="kw">if </span>public_key.len() != pair.public_key.as_ref().len() {
+                error::KeyRejected::invalid_encoding()
+            } <span class="kw">else </span>{
+                error::KeyRejected::inconsistent_components()
             };
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(err);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">pair</span>)
+        <span class="prelude-val">Ok</span>(pair)
     }
 
-    <span class="doccomment">/// Constructs a Ed25519 key pair from the private key seed `seed`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is recommended to use `Ed25519KeyPair::from_pkcs8()` instead. When</span>
-    <span class="doccomment">/// that is not practical, it is recommended to use</span>
-    <span class="doccomment">/// `Ed25519KeyPair::from_seed_and_public_key()` instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Since the public key is not given, the public key will be computed from</span>
-    <span class="doccomment">/// the private key. It is not possible to detect misuse or corruption of</span>
-    <span class="doccomment">/// the private key since the public key isn&#39;t given as input.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_seed_unchecked</span>(<span class="ident">seed</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">seed</span> <span class="op">=</span> <span class="ident">seed</span>
-            .<span class="ident">try_into</span>()
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_seed_</span>(<span class="ident">seed</span>))
+    <span class="doccomment">/// Constructs a Ed25519 key pair from the private key seed `seed`.
+    ///
+    /// It is recommended to use `Ed25519KeyPair::from_pkcs8()` instead. When
+    /// that is not practical, it is recommended to use
+    /// `Ed25519KeyPair::from_seed_and_public_key()` instead.
+    ///
+    /// Since the public key is not given, the public key will be computed from
+    /// the private key. It is not possible to detect misuse or corruption of
+    /// the private key since the public key isn&#39;t given as input.
+    </span><span class="kw">pub fn </span>from_seed_unchecked(seed: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::KeyRejected&gt; {
+        <span class="kw">let </span>seed = seed
+            .try_into()
+            .map_err(|<span class="kw">_</span>| error::KeyRejected::invalid_encoding())<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_seed_(seed))
     }
 
-    <span class="kw">fn</span> <span class="ident">from_seed_</span>(<span class="ident">seed</span>: <span class="kw-2">&amp;</span><span class="ident">Seed</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">digest::digest</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA512</span>, <span class="ident">seed</span>);
-        <span class="kw">let</span> (<span class="ident">private_scalar</span>, <span class="ident">private_prefix</span>) <span class="op">=</span> <span class="ident">h</span>.<span class="ident">as_ref</span>().<span class="ident">split_at</span>(<span class="ident">SCALAR_LEN</span>);
+    <span class="kw">fn </span>from_seed_(seed: <span class="kw-2">&amp;</span>Seed) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>h = digest::digest(<span class="kw-2">&amp;</span>digest::SHA512, seed);
+        <span class="kw">let </span>(private_scalar, private_prefix) = h.as_ref().split_at(SCALAR_LEN);
 
-        <span class="kw">let</span> <span class="ident">private_scalar</span> <span class="op">=</span>
-            <span class="ident">MaskedScalar::from_bytes_masked</span>(<span class="ident">private_scalar</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>()).<span class="ident">into</span>();
+        <span class="kw">let </span>private_scalar =
+            MaskedScalar::from_bytes_masked(private_scalar.try_into().unwrap()).into();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">ExtPoint::new_at_infinity</span>();
-        <span class="kw">unsafe</span> {
-            <span class="ident">GFp_x25519_ge_scalarmult_base</span>(<span class="kw-2">&amp;mut</span> <span class="ident">a</span>, <span class="kw-2">&amp;</span><span class="ident">private_scalar</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>a = ExtPoint::new_at_infinity();
+        <span class="kw">unsafe </span>{
+            GFp_x25519_ge_scalarmult_base(<span class="kw-2">&amp;mut </span>a, <span class="kw-2">&amp;</span>private_scalar);
         }
 
-        <span class="self">Self</span> {
-            <span class="ident">private_scalar</span>,
-            <span class="ident">private_prefix</span>: <span class="ident">private_prefix</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">public_key</span>: <span class="ident">PublicKey</span>(<span class="ident">a</span>.<span class="ident">into_encoded_point</span>()),
+        <span class="self">Self </span>{
+            private_scalar,
+            private_prefix: private_prefix.try_into().unwrap(),
+            public_key: PublicKey(a.into_encoded_point()),
         }
     }
 
-    <span class="doccomment">/// Returns the signature of the message `msg`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">signature::Signature</span> {
-        <span class="ident">signature::Signature::new</span>(<span class="op">|</span><span class="ident">signature_bytes</span><span class="op">|</span> {
-            <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                <span class="kw">fn</span> <span class="ident">GFp_x25519_sc_muladd</span>(
-                    <span class="ident">s</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>; <span class="ident">SCALAR_LEN</span>],
-                    <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>,
-                    <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>,
-                    <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>,
+    <span class="doccomment">/// Returns the signature of the message `msg`.
+    </span><span class="kw">pub fn </span>sign(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw-2">&amp;</span>[u8]) -&gt; signature::Signature {
+        signature::Signature::new(|signature_bytes| {
+            <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                <span class="kw">fn </span>GFp_x25519_sc_muladd(
+                    s: <span class="kw-2">&amp;mut </span>[u8; SCALAR_LEN],
+                    a: <span class="kw-2">&amp;</span>Scalar,
+                    b: <span class="kw-2">&amp;</span>Scalar,
+                    c: <span class="kw-2">&amp;</span>Scalar,
                 );
             }
 
-            <span class="kw">let</span> (<span class="ident">signature_bytes</span>, <span class="ident">_unused</span>) <span class="op">=</span> <span class="ident">signature_bytes</span>.<span class="ident">split_at_mut</span>(<span class="ident">ELEM_LEN</span> <span class="op">+</span> <span class="ident">SCALAR_LEN</span>);
-            <span class="kw">let</span> (<span class="ident">signature_r</span>, <span class="ident">signature_s</span>) <span class="op">=</span> <span class="ident">signature_bytes</span>.<span class="ident">split_at_mut</span>(<span class="ident">ELEM_LEN</span>);
-            <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">digest::Context::new</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA512</span>);
-                <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">private_prefix</span>);
-                <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">msg</span>);
-                <span class="ident">ctx</span>.<span class="ident">finish</span>()
+            <span class="kw">let </span>(signature_bytes, _unused) = signature_bytes.split_at_mut(ELEM_LEN + SCALAR_LEN);
+            <span class="kw">let </span>(signature_r, signature_s) = signature_bytes.split_at_mut(ELEM_LEN);
+            <span class="kw">let </span>nonce = {
+                <span class="kw">let </span><span class="kw-2">mut </span>ctx = digest::Context::new(<span class="kw-2">&amp;</span>digest::SHA512);
+                ctx.update(<span class="kw-2">&amp;</span><span class="self">self</span>.private_prefix);
+                ctx.update(msg);
+                ctx.finish()
             };
-            <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">Scalar::from_sha512_digest_reduced</span>(<span class="ident">nonce</span>);
+            <span class="kw">let </span>nonce = Scalar::from_sha512_digest_reduced(nonce);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ExtPoint::new_at_infinity</span>();
-            <span class="kw">unsafe</span> {
-                <span class="ident">GFp_x25519_ge_scalarmult_base</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="ident">nonce</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>r = ExtPoint::new_at_infinity();
+            <span class="kw">unsafe </span>{
+                GFp_x25519_ge_scalarmult_base(<span class="kw-2">&amp;mut </span>r, <span class="kw-2">&amp;</span>nonce);
             }
-            <span class="ident">signature_r</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">into_encoded_point</span>());
-            <span class="kw">let</span> <span class="ident">hram_digest</span> <span class="op">=</span> <span class="ident">eddsa_digest</span>(<span class="ident">signature_r</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">public_key</span>.<span class="ident">as_ref</span>(), <span class="ident">msg</span>);
-            <span class="kw">let</span> <span class="ident">hram</span> <span class="op">=</span> <span class="ident">Scalar::from_sha512_digest_reduced</span>(<span class="ident">hram_digest</span>);
-            <span class="kw">unsafe</span> {
-                <span class="ident">GFp_x25519_sc_muladd</span>(
-                    <span class="ident">signature_s</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>(),
-                    <span class="kw-2">&amp;</span><span class="ident">hram</span>,
-                    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">private_scalar</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">nonce</span>,
+            signature_r.copy_from_slice(<span class="kw-2">&amp;</span>r.into_encoded_point());
+            <span class="kw">let </span>hram_digest = eddsa_digest(signature_r, <span class="kw-2">&amp;</span><span class="self">self</span>.public_key.as_ref(), msg);
+            <span class="kw">let </span>hram = Scalar::from_sha512_digest_reduced(hram_digest);
+            <span class="kw">unsafe </span>{
+                GFp_x25519_sc_muladd(
+                    signature_s.try_into().unwrap(),
+                    <span class="kw-2">&amp;</span>hram,
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.private_scalar,
+                    <span class="kw-2">&amp;</span>nonce,
                 );
             }
 
-            <span class="ident">SIGNATURE_LEN</span>
+            SIGNATURE_LEN
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">signature::KeyPair</span> <span class="kw">for</span> <span class="ident">Ed25519KeyPair</span> {
-    <span class="kw">type</span> <span class="ident">PublicKey</span> <span class="op">=</span> <span class="ident">PublicKey</span>;
+<span class="kw">impl </span>signature::KeyPair <span class="kw">for </span>Ed25519KeyPair {
+    <span class="kw">type </span>PublicKey = PublicKey;
 
-    <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::PublicKey</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">public_key</span>
+    <span class="kw">fn </span>public_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::PublicKey {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.public_key
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PublicKey</span>([<span class="ident">u8</span>; <span class="ident">ED25519_PUBLIC_KEY_LEN</span>]);
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>PublicKey([u8; ED25519_PUBLIC_KEY_LEN]);
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>PublicKey {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.<span class="number">0</span>.as_ref()
     }
 }
 
-<span class="macro">derive_debug_self_as_ref_hex_bytes!</span>(<span class="ident">PublicKey</span>);
+<span class="macro">derive_debug_self_as_ref_hex_bytes!</span>(PublicKey);
 
-<span class="kw">fn</span> <span class="ident">unwrap_pkcs8</span>(
-    <span class="ident">version</span>: <span class="ident">pkcs8::Version</span>,
-    <span class="ident">input</span>: <span class="ident">untrusted::Input</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">private_key</span>, <span class="ident">public_key</span>) <span class="op">=</span> <span class="ident">pkcs8::unwrap_key</span>(<span class="kw-2">&amp;</span><span class="ident">PKCS8_TEMPLATE</span>, <span class="ident">version</span>, <span class="ident">input</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">private_key</span> <span class="op">=</span> <span class="ident">private_key</span>
-        .<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-            <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">der::Tag::OctetString</span>)
+<span class="kw">fn </span>unwrap_pkcs8(
+    version: pkcs8::Version,
+    input: untrusted::Input,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(untrusted::Input, <span class="prelude-ty">Option</span>&lt;untrusted::Input&gt;), error::KeyRejected&gt; {
+    <span class="kw">let </span>(private_key, public_key) = pkcs8::unwrap_key(<span class="kw-2">&amp;</span>PKCS8_TEMPLATE, version, input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>private_key = private_key
+        .read_all(error::Unspecified, |input| {
+            der::expect_tag_and_get_value(input, der::Tag::OctetString)
         })
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">private_key</span>, <span class="ident">public_key</span>))
+        .map_err(|error::Unspecified| error::KeyRejected::invalid_encoding())<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((private_key, public_key))
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">fn</span> <span class="ident">GFp_x25519_ge_scalarmult_base</span>(<span class="ident">h</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtPoint</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>);
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">fn </span>GFp_x25519_ge_scalarmult_base(h: <span class="kw-2">&amp;mut </span>ExtPoint, a: <span class="kw-2">&amp;</span>Scalar);
 }
 
-<span class="kw">type</span> <span class="ident">Prefix</span> <span class="op">=</span> [<span class="ident">u8</span>; <span class="ident">PREFIX_LEN</span>];
-<span class="kw">const</span> <span class="ident">PREFIX_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">digest::SHA512_OUTPUT_LEN</span> <span class="op">-</span> <span class="ident">SCALAR_LEN</span>;
+<span class="kw">type </span>Prefix = [u8; PREFIX_LEN];
+<span class="kw">const </span>PREFIX_LEN: usize = digest::SHA512_OUTPUT_LEN - SCALAR_LEN;
 
-<span class="kw">const</span> <span class="ident">SIGNATURE_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">ELEM_LEN</span> <span class="op">+</span> <span class="ident">SCALAR_LEN</span>;
+<span class="kw">const </span>SIGNATURE_LEN: usize = ELEM_LEN + SCALAR_LEN;
 
-<span class="kw">type</span> <span class="ident">Seed</span> <span class="op">=</span> [<span class="ident">u8</span>; <span class="ident">SEED_LEN</span>];
-<span class="kw">const</span> <span class="ident">SEED_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="kw">type </span>Seed = [u8; SEED_LEN];
+<span class="kw">const </span>SEED_LEN: usize = <span class="number">32</span>;
 
-<span class="kw">static</span> <span class="ident">PKCS8_TEMPLATE</span>: <span class="ident">pkcs8::Template</span> <span class="op">=</span> <span class="ident">pkcs8::Template</span> {
-    <span class="ident">bytes</span>: <span class="macro">include_bytes!</span>(<span class="string">&quot;ed25519_pkcs8_v2_template.der&quot;</span>),
-    <span class="ident">alg_id_range</span>: <span class="ident">core::ops::Range</span> { <span class="ident">start</span>: <span class="number">7</span>, <span class="ident">end</span>: <span class="number">12</span> },
-    <span class="ident">curve_id_index</span>: <span class="number">0</span>,
-    <span class="ident">private_key_index</span>: <span class="number">0x10</span>,
+<span class="kw">static </span>PKCS8_TEMPLATE: pkcs8::Template = pkcs8::Template {
+    bytes: <span class="macro">include_bytes!</span>(<span class="string">&quot;ed25519_pkcs8_v2_template.der&quot;</span>),
+    alg_id_range: core::ops::Range { start: <span class="number">7</span>, end: <span class="number">12 </span>},
+    curve_id_index: <span class="number">0</span>,
+    private_key_index: <span class="number">0x10</span>,
 };
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/completions/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/completions/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -180,187 +180,187 @@
 <span id="180">180</span>
 <span id="181">181</span>
 <span id="182">182</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">macros</span>;
-<span class="kw">mod</span> <span class="ident">bash</span>;
-<span class="kw">mod</span> <span class="ident">elvish</span>;
-<span class="kw">mod</span> <span class="ident">fish</span>;
-<span class="kw">mod</span> <span class="ident">powershell</span>;
-<span class="kw">mod</span> <span class="ident">shell</span>;
-<span class="kw">mod</span> <span class="ident">zsh</span>;
+</pre><pre class="rust"><code><span class="attribute">#[macro_use]
+</span><span class="kw">mod </span>macros;
+<span class="kw">mod </span>bash;
+<span class="kw">mod </span>elvish;
+<span class="kw">mod </span>fish;
+<span class="kw">mod </span>powershell;
+<span class="kw">mod </span>shell;
+<span class="kw">mod </span>zsh;
 
-<span class="comment">// Std</span>
-<span class="kw">use</span> <span class="ident">std::io::Write</span>;
+<span class="comment">// Std
+</span><span class="kw">use </span>std::io::Write;
 
-<span class="comment">// Internal</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::completions::shell::Shell</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">app::parser::Parser</span>,
-    <span class="ident">completions</span>::{
-        <span class="ident">bash::BashGen</span>, <span class="ident">elvish::ElvishGen</span>, <span class="ident">fish::FishGen</span>, <span class="ident">powershell::PowerShellGen</span>, <span class="ident">zsh::ZshGen</span>,
+<span class="comment">// Internal
+</span><span class="kw">pub use </span><span class="kw">crate</span>::completions::shell::Shell;
+<span class="kw">use crate</span>::{
+    app::parser::Parser,
+    completions::{
+        bash::BashGen, elvish::ElvishGen, fish::FishGen, powershell::PowerShellGen, zsh::ZshGen,
     },
 };
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ComplGen</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
+<span class="kw">pub struct </span>ComplGen&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;
+<span class="kw">where
+    </span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
 {
-    <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
+    p: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Parser&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">ComplGen</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ComplGen</span> { <span class="ident">p</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; ComplGen&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub fn </span>new(p: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Parser&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;) -&gt; <span class="self">Self </span>{
+        ComplGen { p }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">for_shell</span>: <span class="ident">Shell</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) {
-        <span class="kw">match</span> <span class="ident">for_shell</span> {
-            <span class="ident">Shell::Bash</span> =&gt; <span class="ident">BashGen::new</span>(<span class="self">self</span>.<span class="ident">p</span>).<span class="ident">generate_to</span>(<span class="ident">buf</span>),
-            <span class="ident">Shell::Fish</span> =&gt; <span class="ident">FishGen::new</span>(<span class="self">self</span>.<span class="ident">p</span>).<span class="ident">generate_to</span>(<span class="ident">buf</span>),
-            <span class="ident">Shell::Zsh</span> =&gt; <span class="ident">ZshGen::new</span>(<span class="self">self</span>.<span class="ident">p</span>).<span class="ident">generate_to</span>(<span class="ident">buf</span>),
-            <span class="ident">Shell::PowerShell</span> =&gt; <span class="ident">PowerShellGen::new</span>(<span class="self">self</span>.<span class="ident">p</span>).<span class="ident">generate_to</span>(<span class="ident">buf</span>),
-            <span class="ident">Shell::Elvish</span> =&gt; <span class="ident">ElvishGen::new</span>(<span class="self">self</span>.<span class="ident">p</span>).<span class="ident">generate_to</span>(<span class="ident">buf</span>),
+    <span class="kw">pub fn </span>generate&lt;W: Write&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, for_shell: Shell, buf: <span class="kw-2">&amp;mut </span>W) {
+        <span class="kw">match </span>for_shell {
+            Shell::Bash =&gt; BashGen::new(<span class="self">self</span>.p).generate_to(buf),
+            Shell::Fish =&gt; FishGen::new(<span class="self">self</span>.p).generate_to(buf),
+            Shell::Zsh =&gt; ZshGen::new(<span class="self">self</span>.p).generate_to(buf),
+            Shell::PowerShell =&gt; PowerShellGen::new(<span class="self">self</span>.p).generate_to(buf),
+            Shell::Elvish =&gt; ElvishGen::new(<span class="self">self</span>.p).generate_to(buf),
         }
     }
 }
 
-<span class="comment">// Gets all subcommands including child subcommands in the form of &#39;name&#39; where the name</span>
-<span class="comment">// is a single word (i.e. &quot;install&quot;)  of the path to said subcommand (i.e.</span>
-<span class="comment">// &quot;rustup toolchain install&quot;)</span>
-<span class="comment">//</span>
-<span class="comment">// Also note, aliases are treated as their own subcommands but duplicates of whatever they&#39;re</span>
-<span class="comment">// aliasing.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all_subcommand_names</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Parser</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="comment">// Gets all subcommands including child subcommands in the form of &#39;name&#39; where the name
+// is a single word (i.e. &quot;install&quot;)  of the path to said subcommand (i.e.
+// &quot;rustup toolchain install&quot;)
+//
+// Also note, aliases are treated as their own subcommands but duplicates of whatever they&#39;re
+// aliasing.
+</span><span class="kw">pub fn </span>all_subcommand_names(p: <span class="kw-2">&amp;</span>Parser) -&gt; Vec&lt;String&gt; {
     <span class="macro">debugln!</span>(<span class="string">&quot;all_subcommand_names;&quot;</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subcmds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">subcommands_of</span>(<span class="ident">p</span>)
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">n</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">n</span>.<span class="ident">clone</span>())
-        .<span class="ident">collect</span>();
-    <span class="kw">for</span> <span class="ident">sc_v</span> <span class="kw">in</span> <span class="ident">p</span>.<span class="ident">subcommands</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">all_subcommand_names</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">p</span>)) {
-        <span class="ident">subcmds</span>.<span class="ident">extend</span>(<span class="ident">sc_v</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>subcmds: Vec&lt;<span class="kw">_</span>&gt; = subcommands_of(p)
+        .iter()
+        .map(|<span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>n, <span class="kw">_</span>)| n.clone())
+        .collect();
+    <span class="kw">for </span>sc_v <span class="kw">in </span>p.subcommands.iter().map(|s| all_subcommand_names(<span class="kw-2">&amp;</span>s.p)) {
+        subcmds.extend(sc_v);
     }
-    <span class="ident">subcmds</span>.<span class="ident">sort</span>();
-    <span class="ident">subcmds</span>.<span class="ident">dedup</span>();
-    <span class="ident">subcmds</span>
+    subcmds.sort();
+    subcmds.dedup();
+    subcmds
 }
 
-<span class="comment">// Gets all subcommands including child subcommands in the form of (&#39;name&#39;, &#39;bin_name&#39;) where the name</span>
-<span class="comment">// is a single word (i.e. &quot;install&quot;) of the path and full bin_name of said subcommand (i.e.</span>
-<span class="comment">// &quot;rustup toolchain install&quot;)</span>
-<span class="comment">//</span>
-<span class="comment">// Also note, aliases are treated as their own subcommands but duplicates of whatever they&#39;re</span>
-<span class="comment">// aliasing.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all_subcommands</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Parser</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
+<span class="comment">// Gets all subcommands including child subcommands in the form of (&#39;name&#39;, &#39;bin_name&#39;) where the name
+// is a single word (i.e. &quot;install&quot;) of the path and full bin_name of said subcommand (i.e.
+// &quot;rustup toolchain install&quot;)
+//
+// Also note, aliases are treated as their own subcommands but duplicates of whatever they&#39;re
+// aliasing.
+</span><span class="kw">pub fn </span>all_subcommands(p: <span class="kw-2">&amp;</span>Parser) -&gt; Vec&lt;(String, String)&gt; {
     <span class="macro">debugln!</span>(<span class="string">&quot;all_subcommands;&quot;</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subcmds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">subcommands_of</span>(<span class="ident">p</span>);
-    <span class="kw">for</span> <span class="ident">sc_v</span> <span class="kw">in</span> <span class="ident">p</span>.<span class="ident">subcommands</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">all_subcommands</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">p</span>)) {
-        <span class="ident">subcmds</span>.<span class="ident">extend</span>(<span class="ident">sc_v</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>subcmds: Vec&lt;<span class="kw">_</span>&gt; = subcommands_of(p);
+    <span class="kw">for </span>sc_v <span class="kw">in </span>p.subcommands.iter().map(|s| all_subcommands(<span class="kw-2">&amp;</span>s.p)) {
+        subcmds.extend(sc_v);
     }
-    <span class="ident">subcmds</span>
+    subcmds
 }
 
-<span class="comment">// Gets all subcommands excluding child subcommands in the form of (name, bin_name) where the name</span>
-<span class="comment">// is a single word (i.e. &quot;install&quot;) and the bin_name is a space delineated list of the path to said</span>
-<span class="comment">// subcommand (i.e. &quot;rustup toolchain install&quot;)</span>
-<span class="comment">//</span>
-<span class="comment">// Also note, aliases are treated as their own subcommands but duplicates of whatever they&#39;re</span>
-<span class="comment">// aliasing.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subcommands_of</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Parser</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
+<span class="comment">// Gets all subcommands excluding child subcommands in the form of (name, bin_name) where the name
+// is a single word (i.e. &quot;install&quot;) and the bin_name is a space delineated list of the path to said
+// subcommand (i.e. &quot;rustup toolchain install&quot;)
+//
+// Also note, aliases are treated as their own subcommands but duplicates of whatever they&#39;re
+// aliasing.
+</span><span class="kw">pub fn </span>subcommands_of(p: <span class="kw-2">&amp;</span>Parser) -&gt; Vec&lt;(String, String)&gt; {
     <span class="macro">debugln!</span>(
         <span class="string">&quot;subcommands_of: name={}, bin_name={}&quot;</span>,
-        <span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">name</span>,
-        <span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">bin_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
+        p.meta.name,
+        p.meta.bin_name.as_ref().unwrap()
     );
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subcmds</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>subcmds = <span class="macro">vec!</span>[];
 
     <span class="macro">debugln!</span>(
         <span class="string">&quot;subcommands_of: Has subcommands...{:?}&quot;</span>,
-        <span class="ident">p</span>.<span class="ident">has_subcommands</span>()
+        p.has_subcommands()
     );
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">p</span>.<span class="ident">has_subcommands</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">if </span>!p.has_subcommands() {
+        <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="macro">vec!</span>[];
         <span class="macro">debugln!</span>(<span class="string">&quot;subcommands_of: Looking for aliases...&quot;</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">aliases</span>) <span class="op">=</span> <span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">aliases</span> {
-            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">n</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">aliases</span> {
-                <span class="macro">debugln!</span>(<span class="string">&quot;subcommands_of:iter:iter: Found alias...{}&quot;</span>, <span class="ident">n</span>);
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">als_bin_name</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
-                    <span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">bin_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">split</span>(<span class="string">&#39; &#39;</span>).<span class="ident">collect</span>();
-                <span class="ident">als_bin_name</span>.<span class="ident">push</span>(<span class="ident">n</span>);
-                <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="ident">als_bin_name</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>;
-                <span class="ident">als_bin_name</span>.<span class="ident">swap_remove</span>(<span class="ident">old</span>);
-                <span class="ident">ret</span>.<span class="ident">push</span>((<span class="ident">n</span>.<span class="ident">to_owned</span>(), <span class="ident">als_bin_name</span>.<span class="ident">join</span>(<span class="string">&quot; &quot;</span>)));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>aliases) = p.meta.aliases {
+            <span class="kw">for </span><span class="kw-2">&amp;</span>(n, <span class="kw">_</span>) <span class="kw">in </span>aliases {
+                <span class="macro">debugln!</span>(<span class="string">&quot;subcommands_of:iter:iter: Found alias...{}&quot;</span>, n);
+                <span class="kw">let </span><span class="kw-2">mut </span>als_bin_name: Vec&lt;<span class="kw">_</span>&gt; =
+                    p.meta.bin_name.as_ref().unwrap().split(<span class="string">&#39; &#39;</span>).collect();
+                als_bin_name.push(n);
+                <span class="kw">let </span>old = als_bin_name.len() - <span class="number">2</span>;
+                als_bin_name.swap_remove(old);
+                ret.push((n.to_owned(), als_bin_name.join(<span class="string">&quot; &quot;</span>)));
             }
         }
-        <span class="kw">return</span> <span class="ident">ret</span>;
+        <span class="kw">return </span>ret;
     }
-    <span class="kw">for</span> <span class="ident">sc</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">subcommands</span> {
+    <span class="kw">for </span>sc <span class="kw">in </span><span class="kw-2">&amp;</span>p.subcommands {
         <span class="macro">debugln!</span>(
             <span class="string">&quot;subcommands_of:iter: name={}, bin_name={}&quot;</span>,
-            <span class="ident">sc</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">name</span>,
-            <span class="ident">sc</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">bin_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
+            sc.p.meta.name,
+            sc.p.meta.bin_name.as_ref().unwrap()
         );
 
         <span class="macro">debugln!</span>(<span class="string">&quot;subcommands_of:iter: Looking for aliases...&quot;</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">aliases</span>) <span class="op">=</span> <span class="ident">sc</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">aliases</span> {
-            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">n</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">aliases</span> {
-                <span class="macro">debugln!</span>(<span class="string">&quot;subcommands_of:iter:iter: Found alias...{}&quot;</span>, <span class="ident">n</span>);
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">als_bin_name</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
-                    <span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">bin_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">split</span>(<span class="string">&#39; &#39;</span>).<span class="ident">collect</span>();
-                <span class="ident">als_bin_name</span>.<span class="ident">push</span>(<span class="ident">n</span>);
-                <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="ident">als_bin_name</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>;
-                <span class="ident">als_bin_name</span>.<span class="ident">swap_remove</span>(<span class="ident">old</span>);
-                <span class="ident">subcmds</span>.<span class="ident">push</span>((<span class="ident">n</span>.<span class="ident">to_owned</span>(), <span class="ident">als_bin_name</span>.<span class="ident">join</span>(<span class="string">&quot; &quot;</span>)));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>aliases) = sc.p.meta.aliases {
+            <span class="kw">for </span><span class="kw-2">&amp;</span>(n, <span class="kw">_</span>) <span class="kw">in </span>aliases {
+                <span class="macro">debugln!</span>(<span class="string">&quot;subcommands_of:iter:iter: Found alias...{}&quot;</span>, n);
+                <span class="kw">let </span><span class="kw-2">mut </span>als_bin_name: Vec&lt;<span class="kw">_</span>&gt; =
+                    p.meta.bin_name.as_ref().unwrap().split(<span class="string">&#39; &#39;</span>).collect();
+                als_bin_name.push(n);
+                <span class="kw">let </span>old = als_bin_name.len() - <span class="number">2</span>;
+                als_bin_name.swap_remove(old);
+                subcmds.push((n.to_owned(), als_bin_name.join(<span class="string">&quot; &quot;</span>)));
             }
         }
-        <span class="ident">subcmds</span>.<span class="ident">push</span>((
-            <span class="ident">sc</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">sc</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">bin_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>(),
+        subcmds.push((
+            sc.p.meta.name.clone(),
+            sc.p.meta.bin_name.as_ref().unwrap().clone(),
         ));
     }
-    <span class="ident">subcmds</span>
+    subcmds
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_all_subcommand_paths</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Parser</span>, <span class="ident">first</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">pub fn </span>get_all_subcommand_paths(p: <span class="kw-2">&amp;</span>Parser, first: bool) -&gt; Vec&lt;String&gt; {
     <span class="macro">debugln!</span>(<span class="string">&quot;get_all_subcommand_paths;&quot;</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subcmds</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">p</span>.<span class="ident">has_subcommands</span>() {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">first</span> {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">name</span>;
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">bin_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;__&quot;</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">path</span>.<span class="ident">clone</span>()];
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">aliases</span>) <span class="op">=</span> <span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">aliases</span> {
-                <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">n</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">aliases</span> {
-                    <span class="ident">ret</span>.<span class="ident">push</span>(<span class="ident">path</span>.<span class="ident">replace</span>(<span class="ident">name</span>, <span class="ident">n</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>subcmds = <span class="macro">vec!</span>[];
+    <span class="kw">if </span>!p.has_subcommands() {
+        <span class="kw">if </span>!first {
+            <span class="kw">let </span>name = <span class="kw-2">&amp;*</span>p.meta.name;
+            <span class="kw">let </span>path = p.meta.bin_name.as_ref().unwrap().clone().replace(<span class="string">&quot; &quot;</span>, <span class="string">&quot;__&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="macro">vec!</span>[path.clone()];
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>aliases) = p.meta.aliases {
+                <span class="kw">for </span><span class="kw-2">&amp;</span>(n, <span class="kw">_</span>) <span class="kw">in </span>aliases {
+                    ret.push(path.replace(name, n));
                 }
             }
-            <span class="kw">return</span> <span class="ident">ret</span>;
+            <span class="kw">return </span>ret;
         }
-        <span class="kw">return</span> <span class="macro">vec!</span>[];
+        <span class="kw">return </span><span class="macro">vec!</span>[];
     }
-    <span class="kw">for</span> <span class="ident">sc</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">subcommands</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sc</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">name</span>;
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span>
-            <span class="ident">sc</span>.<span class="ident">p</span>.<span class="ident">meta</span>
-                .<span class="ident">bin_name</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">clone</span>()
-                .<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;__&quot;</span>);
-        <span class="ident">subcmds</span>.<span class="ident">push</span>(<span class="ident">path</span>.<span class="ident">clone</span>());
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">aliases</span>) <span class="op">=</span> <span class="ident">sc</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">aliases</span> {
-            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">n</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">aliases</span> {
-                <span class="ident">subcmds</span>.<span class="ident">push</span>(<span class="ident">path</span>.<span class="ident">replace</span>(<span class="ident">name</span>, <span class="ident">n</span>));
+    <span class="kw">for </span>sc <span class="kw">in </span><span class="kw-2">&amp;</span>p.subcommands {
+        <span class="kw">let </span>name = <span class="kw-2">&amp;*</span>sc.p.meta.name;
+        <span class="kw">let </span>path =
+            sc.p.meta
+                .bin_name
+                .as_ref()
+                .unwrap()
+                .clone()
+                .replace(<span class="string">&quot; &quot;</span>, <span class="string">&quot;__&quot;</span>);
+        subcmds.push(path.clone());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>aliases) = sc.p.meta.aliases {
+            <span class="kw">for </span><span class="kw-2">&amp;</span>(n, <span class="kw">_</span>) <span class="kw">in </span>aliases {
+                subcmds.push(path.replace(name, n));
             }
         }
     }
-    <span class="kw">for</span> <span class="ident">sc_v</span> <span class="kw">in</span> <span class="ident">p</span>
-        .<span class="ident">subcommands</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">get_all_subcommand_paths</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">p</span>, <span class="bool-val">false</span>))
+    <span class="kw">for </span>sc_v <span class="kw">in </span>p
+        .subcommands
+        .iter()
+        .map(|s| get_all_subcommand_paths(<span class="kw-2">&amp;</span>s.p, <span class="bool-val">false</span>))
     {
-        <span class="ident">subcmds</span>.<span class="ident">extend</span>(<span class="ident">sc_v</span>);
+        subcmds.extend(sc_v);
     }
-    <span class="ident">subcmds</span>
+    subcmds
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

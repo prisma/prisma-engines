@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_renderer/sqlite_renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite_renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_renderer/sqlite_renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite_renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -342,349 +342,349 @@
 <span id="342">342</span>
 <span id="343">343</span>
 <span id="344">344</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">SqlRenderer</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">flavour::SqliteFlavour</span>,
-    <span class="ident">pair::Pair</span>,
-    <span class="ident">sql_migration</span>::{<span class="ident">AlterEnum</span>, <span class="ident">AlterTable</span>, <span class="ident">RedefineTable</span>, <span class="ident">TableChange</span>},
+</pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, SqlRenderer};
+<span class="kw">use crate</span>::{
+    flavour::SqliteFlavour,
+    pair::Pair,
+    sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
-<span class="kw">use</span> <span class="ident">indoc::formatdoc</span>;
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">psl::dml::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">regex::Regex</span>;
-<span class="kw">use</span> <span class="ident">sql_ddl::sqlite</span> <span class="kw">as</span> <span class="ident">ddl</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use </span>indoc::formatdoc;
+<span class="kw">use </span>once_cell::sync::Lazy;
+<span class="kw">use </span>psl::dml::PrismaValue;
+<span class="kw">use </span>regex::Regex;
+<span class="kw">use </span>sql_ddl::sqlite <span class="kw">as </span>ddl;
+<span class="kw">use </span>sql_schema_describer::{walkers::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">impl</span> <span class="ident">SqlRenderer</span> <span class="kw">for</span> <span class="ident">SqliteFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">quote</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Quoted</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="ident">Quoted::Double</span>(<span class="ident">name</span>)
+<span class="kw">impl </span>SqlRenderer <span class="kw">for </span>SqliteFlavour {
+    <span class="kw">fn </span>quote&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Quoted&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        Quoted::Double(name)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_alter_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_alter_enum</span>: <span class="kw-2">&amp;</span><span class="ident">AlterEnum</span>, <span class="ident">_schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>render_alter_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, _alter_enum: <span class="kw-2">&amp;</span>AlterEnum, _schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_alter_enum on sqlite&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">index_type</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() { <span class="string">&quot;UNIQUE &quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> };
-        <span class="kw">let</span> <span class="ident">index_name</span> <span class="op">=</span> <span class="ident">Quoted::sqlite_ident</span>(<span class="ident">index</span>.<span class="ident">name</span>());
-        <span class="kw">let</span> <span class="ident">table_reference</span> <span class="op">=</span> <span class="ident">Quoted::sqlite_ident</span>(<span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>());
+    <span class="kw">fn </span>render_create_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+        <span class="kw">let </span>index_type = <span class="kw">if </span>index.is_unique() { <span class="string">&quot;UNIQUE &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+        <span class="kw">let </span>index_name = Quoted::sqlite_ident(index.name());
+        <span class="kw">let </span>table_reference = Quoted::sqlite_ident(index.table().name());
 
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>()));
+        <span class="kw">let </span>columns = index.columns().map(|c| {
+            <span class="kw">let </span><span class="kw-2">mut </span>rendered = <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.quote(c.as_column().name()));
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sort_order</span>) <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>() {
-                <span class="ident">rendered</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
-                <span class="ident">rendered</span>.<span class="ident">push_str</span>(<span class="ident">sort_order</span>.<span class="ident">as_ref</span>());
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = c.sort_order() {
+                rendered.push(<span class="string">&#39; &#39;</span>);
+                rendered.push_str(sort_order.as_ref());
             }
 
-            <span class="ident">rendered</span>
+            rendered
         });
 
-        <span class="kw">let</span> <span class="ident">index_create</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>index_create = <span class="macro">format!</span>(
             <span class="string">&quot;CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})&quot;</span>,
-            <span class="ident">index_type</span> <span class="op">=</span> <span class="ident">index_type</span>,
-            <span class="ident">index_name</span> <span class="op">=</span> <span class="ident">index_name</span>,
-            <span class="ident">table_reference</span> <span class="op">=</span> <span class="ident">table_reference</span>,
-            <span class="ident">columns</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+            index_type = index_type,
+            index_name = index_name,
+            table_reference = table_reference,
+            columns = columns.join(<span class="string">&quot;, &quot;</span>)
         );
 
-        <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">starts_with</span>(<span class="string">&quot;sqlite_&quot;</span>) {
+        <span class="kw">if </span>index.name().starts_with(<span class="string">&quot;sqlite_&quot;</span>) {
             <span class="macro">formatdoc!</span>(
                 <span class="string">&quot;Pragma writable_schema=1;
                  {};
                  Pragma writable_schema=0&quot;</span>,
-                <span class="ident">index_create</span>
+                index_create
             )
-        } <span class="kw">else</span> {
-            <span class="ident">index_create</span>
+        } <span class="kw">else </span>{
+            index_create
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_add_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_foreign_key</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn </span>render_add_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, _foreign_key: ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         <span class="macro">unreachable!</span>(<span class="string">&quot;AddForeignKey on SQLite&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_alter_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">alter_table</span>: <span class="kw-2">&amp;</span><span class="ident">AlterTable</span>, <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">AlterTable</span> { <span class="ident">changes</span>, <span class="ident">table_ids</span> } <span class="op">=</span> <span class="ident">alter_table</span>;
-        <span class="kw">let</span> <span class="ident">tables</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">table_ids</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">statements</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="kw">fn </span>render_alter_table(<span class="kw-2">&amp;</span><span class="self">self</span>, alter_table: <span class="kw-2">&amp;</span>AlterTable, schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
+        <span class="kw">let </span>AlterTable { changes, table_ids } = alter_table;
+        <span class="kw">let </span>tables = schemas.walk(<span class="kw-2">*</span>table_ids);
+        <span class="kw">let </span><span class="kw-2">mut </span>statements = Vec::new();
 
-        <span class="comment">// See https://www.sqlite.org/lang_altertable.html for the reference on</span>
-        <span class="comment">// what is possible on SQLite.</span>
+        <span class="comment">// See https://www.sqlite.org/lang_altertable.html for the reference on
+        // what is possible on SQLite.
 
-        <span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="ident">changes</span> {
-            <span class="kw">match</span> <span class="ident">change</span> {
-                <span class="ident">TableChange::AddColumn</span> {
-                    <span class="ident">column_id</span>,
-                    <span class="ident">has_virtual_default</span>: <span class="kw">_</span>,
+        </span><span class="kw">for </span>change <span class="kw">in </span>changes {
+            <span class="kw">match </span>change {
+                TableChange::AddColumn {
+                    column_id,
+                    has_virtual_default: <span class="kw">_</span>,
                 } =&gt; {
-                    <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
-                    <span class="kw">let</span> <span class="ident">col_sql</span> <span class="op">=</span> <span class="ident">render_column</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>);
+                    <span class="kw">let </span>column = schemas.next.walk(<span class="kw-2">*</span>column_id);
+                    <span class="kw">let </span>col_sql = render_column(<span class="kw-2">&amp;</span>column);
 
-                    <span class="ident">statements</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+                    statements.push(<span class="macro">format!</span>(
                         <span class="string">&quot;ALTER TABLE {table_name} ADD COLUMN {column_definition}&quot;</span>,
-                        <span class="ident">table_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>()),
-                        <span class="ident">column_definition</span> <span class="op">=</span> <span class="ident">col_sql</span>,
+                        table_name = <span class="self">self</span>.quote(tables.previous.name()),
+                        column_definition = col_sql,
                     ));
                 }
-                <span class="ident">TableChange::AddPrimaryKey</span> { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;AddPrimaryKey on SQLite&quot;</span>),
-                <span class="ident">TableChange::AlterColumn</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;AlterColumn on SQLite&quot;</span>),
-                <span class="ident">TableChange::DropAndRecreateColumn</span> { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;DropAndRecreateColumn on SQLite&quot;</span>),
-                <span class="ident">TableChange::DropColumn</span> { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;DropColumn on SQLite&quot;</span>),
-                <span class="ident">TableChange::DropPrimaryKey</span> { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;DropPrimaryKey on SQLite&quot;</span>),
-                <span class="ident">TableChange::RenamePrimaryKey</span> { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;AddPrimaryKey on SQLite&quot;</span>),
+                TableChange::AddPrimaryKey { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;AddPrimaryKey on SQLite&quot;</span>),
+                TableChange::AlterColumn(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;AlterColumn on SQLite&quot;</span>),
+                TableChange::DropAndRecreateColumn { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;DropAndRecreateColumn on SQLite&quot;</span>),
+                TableChange::DropColumn { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;DropColumn on SQLite&quot;</span>),
+                TableChange::DropPrimaryKey { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;DropPrimaryKey on SQLite&quot;</span>),
+                TableChange::RenamePrimaryKey { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;AddPrimaryKey on SQLite&quot;</span>),
             };
         }
 
-        <span class="ident">statements</span>
+        statements
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>render_create_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;String&gt; {
         <span class="macro">unreachable!</span>(<span class="string">&quot;Unreachable render_create_enum() on SQLite. SQLite does not have enums.&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">render_create_table_as</span>(<span class="ident">table</span>, <span class="ident">TableName</span>(<span class="prelude-val">None</span>, <span class="ident">Quoted::sqlite_ident</span>(<span class="ident">table</span>.<span class="ident">name</span>())))
+    <span class="kw">fn </span>render_create_table(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+        <span class="self">self</span>.render_create_table_as(table, TableName(<span class="prelude-val">None</span>, Quoted::sqlite_ident(table.name())))
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_table_as</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table_name</span>: <span class="ident">TableName</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_table</span> <span class="op">=</span> <span class="ident">sql_ddl::sqlite::CreateTable</span> {
-            <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">table_name</span>,
-            <span class="ident">columns</span>: <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">render_column</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>)).<span class="ident">collect</span>(),
-            <span class="ident">primary_key</span>: <span class="prelude-val">None</span>,
-            <span class="ident">foreign_keys</span>: <span class="ident">table</span>
-                .<span class="ident">foreign_keys</span>()
-                .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="ident">sql_ddl::sqlite::ForeignKey</span> {
-                    <span class="ident">constrains</span>: <span class="ident">fk</span>.<span class="ident">constrained_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">name</span>().<span class="ident">into</span>()).<span class="ident">collect</span>(),
-                    <span class="ident">references</span>: (
-                        <span class="ident">fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-                        <span class="ident">fk</span>.<span class="ident">referenced_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">name</span>().<span class="ident">into</span>()).<span class="ident">collect</span>(),
+    <span class="kw">fn </span>render_create_table_as(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, table_name: TableName&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>create_table = sql_ddl::sqlite::CreateTable {
+            table_name: <span class="kw-2">&amp;</span>table_name,
+            columns: table.columns().map(|col| render_column(<span class="kw-2">&amp;</span>col)).collect(),
+            primary_key: <span class="prelude-val">None</span>,
+            foreign_keys: table
+                .foreign_keys()
+                .map(<span class="kw">move </span>|fk| sql_ddl::sqlite::ForeignKey {
+                    constrains: fk.constrained_columns().map(|col| col.name().into()).collect(),
+                    references: (
+                        fk.referenced_table().name().into(),
+                        fk.referenced_columns().map(|col| col.name().into()).collect(),
                     ),
-                    <span class="ident">constraint_name</span>: <span class="ident">fk</span>.<span class="ident">constraint_name</span>().<span class="ident">map</span>(<span class="ident">From::from</span>),
-                    <span class="ident">on_delete</span>: <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">fk</span>.<span class="ident">on_delete_action</span>() {
-                        <span class="ident">ForeignKeyAction::NoAction</span> =&gt; <span class="ident">sql_ddl::sqlite::ForeignKeyAction::NoAction</span>,
-                        <span class="ident">ForeignKeyAction::Restrict</span> =&gt; <span class="ident">sql_ddl::sqlite::ForeignKeyAction::Restrict</span>,
-                        <span class="ident">ForeignKeyAction::Cascade</span> =&gt; <span class="ident">sql_ddl::sqlite::ForeignKeyAction::Cascade</span>,
-                        <span class="ident">ForeignKeyAction::SetNull</span> =&gt; <span class="ident">sql_ddl::sqlite::ForeignKeyAction::SetNull</span>,
-                        <span class="ident">ForeignKeyAction::SetDefault</span> =&gt; <span class="ident">sql_ddl::sqlite::ForeignKeyAction::SetDefault</span>,
+                    constraint_name: fk.constraint_name().map(From::from),
+                    on_delete: <span class="prelude-val">Some</span>(<span class="kw">match </span>fk.on_delete_action() {
+                        ForeignKeyAction::NoAction =&gt; sql_ddl::sqlite::ForeignKeyAction::NoAction,
+                        ForeignKeyAction::Restrict =&gt; sql_ddl::sqlite::ForeignKeyAction::Restrict,
+                        ForeignKeyAction::Cascade =&gt; sql_ddl::sqlite::ForeignKeyAction::Cascade,
+                        ForeignKeyAction::SetNull =&gt; sql_ddl::sqlite::ForeignKeyAction::SetNull,
+                        ForeignKeyAction::SetDefault =&gt; sql_ddl::sqlite::ForeignKeyAction::SetDefault,
                     }),
-                    <span class="ident">on_update</span>: <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">fk</span>.<span class="ident">on_update_action</span>() {
-                        <span class="ident">ForeignKeyAction::NoAction</span> =&gt; <span class="ident">sql_ddl::sqlite::ForeignKeyAction::NoAction</span>,
-                        <span class="ident">ForeignKeyAction::Restrict</span> =&gt; <span class="ident">sql_ddl::sqlite::ForeignKeyAction::Restrict</span>,
-                        <span class="ident">ForeignKeyAction::Cascade</span> =&gt; <span class="ident">sql_ddl::sqlite::ForeignKeyAction::Cascade</span>,
-                        <span class="ident">ForeignKeyAction::SetNull</span> =&gt; <span class="ident">sql_ddl::sqlite::ForeignKeyAction::SetNull</span>,
-                        <span class="ident">ForeignKeyAction::SetDefault</span> =&gt; <span class="ident">sql_ddl::sqlite::ForeignKeyAction::SetDefault</span>,
+                    on_update: <span class="prelude-val">Some</span>(<span class="kw">match </span>fk.on_update_action() {
+                        ForeignKeyAction::NoAction =&gt; sql_ddl::sqlite::ForeignKeyAction::NoAction,
+                        ForeignKeyAction::Restrict =&gt; sql_ddl::sqlite::ForeignKeyAction::Restrict,
+                        ForeignKeyAction::Cascade =&gt; sql_ddl::sqlite::ForeignKeyAction::Cascade,
+                        ForeignKeyAction::SetNull =&gt; sql_ddl::sqlite::ForeignKeyAction::SetNull,
+                        ForeignKeyAction::SetDefault =&gt; sql_ddl::sqlite::ForeignKeyAction::SetDefault,
                     }),
                 })
-                .<span class="ident">collect</span>(),
+                .collect(),
         };
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">is_single_primary_key</span>()) {
-            <span class="ident">create_table</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">table</span>
-                .<span class="ident">primary_key_columns</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">into</span>()).<span class="ident">collect</span>());
+        <span class="kw">if </span>!table.columns().any(|col| col.is_single_primary_key()) {
+            create_table.primary_key = table
+                .primary_key_columns()
+                .map(|c| c.map(|c| c.name().into()).collect());
         }
 
-        <span class="ident">create_table</span>.<span class="ident">to_string</span>()
+        create_table.to_string()
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>render_drop_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;String&gt; {
         <span class="macro">unreachable!</span>(<span class="string">&quot;Unreachable render_drop_enum() on SQLite. SQLite does not have enums.&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_foreign_key</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn </span>render_drop_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, _foreign_key: ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_drop_foreign_key on SQLite&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;DROP INDEX {}&quot;</span>, <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">index</span>.<span class="ident">name</span>()))
+    <span class="kw">fn </span>render_drop_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;DROP INDEX {}&quot;</span>, <span class="self">self</span>.quote(index.name()))
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_and_recreate_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">indexes</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>render_drop_and_recreate_index(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
         <span class="macro">vec!</span>[
-            <span class="self">self</span>.<span class="ident">render_drop_index</span>(<span class="ident">indexes</span>.<span class="ident">previous</span>),
-            <span class="self">self</span>.<span class="ident">render_create_index</span>(<span class="ident">indexes</span>.<span class="ident">next</span>),
+            <span class="self">self</span>.render_drop_index(indexes.previous),
+            <span class="self">self</span>.render_create_index(indexes.next),
         ]
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="comment">// Turning off the pragma is safe, because schema validation would forbid foreign keys</span>
-        <span class="comment">// to a non-existent model. There appears to be no other way to deal with cyclic</span>
-        <span class="comment">// dependencies in the dropping order of tables in the presence of foreign key</span>
-        <span class="comment">// constraints on SQLite.</span>
-        <span class="ident">render_step</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">step</span><span class="op">|</span> {
-            <span class="ident">step</span>.<span class="ident">render_statement</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> {
-                <span class="ident">stmt</span>.<span class="ident">push_str</span>(<span class="string">&quot;PRAGMA foreign_keys=off&quot;</span>);
+    <span class="kw">fn </span>render_drop_table(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;String&gt; {
+        <span class="comment">// Turning off the pragma is safe, because schema validation would forbid foreign keys
+        // to a non-existent model. There appears to be no other way to deal with cyclic
+        // dependencies in the dropping order of tables in the presence of foreign key
+        // constraints on SQLite.
+        </span>render_step(<span class="kw-2">&amp;mut </span>|step| {
+            step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
+                stmt.push_str(<span class="string">&quot;PRAGMA foreign_keys=off&quot;</span>);
             });
-            <span class="ident">step</span>.<span class="ident">render_statement</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> {
-                <span class="ident">stmt</span>.<span class="ident">push_str</span>(<span class="string">&quot;DROP TABLE &quot;</span>);
-                <span class="ident">stmt</span>.<span class="ident">push_display</span>(<span class="kw-2">&amp;</span><span class="ident">Quoted::sqlite_ident</span>(<span class="ident">table_name</span>));
+            step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
+                stmt.push_str(<span class="string">&quot;DROP TABLE &quot;</span>);
+                stmt.push_display(<span class="kw-2">&amp;</span>Quoted::sqlite_ident(table_name));
             });
-            <span class="ident">step</span>.<span class="ident">render_statement</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> {
-                <span class="ident">stmt</span>.<span class="ident">push_str</span>(<span class="string">&quot;PRAGMA foreign_keys=on&quot;</span>);
+            step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
+                stmt.push_str(<span class="string">&quot;PRAGMA foreign_keys=on&quot;</span>);
             });
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">render_redefine_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tables</span>: <span class="kw-2">&amp;</span>[<span class="ident">RedefineTable</span>], <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="comment">// Based on &#39;Making Other Kinds Of Table Schema Changes&#39; from https://www.sqlite.org/lang_altertable.html</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;PRAGMA foreign_keys=OFF&quot;</span>.<span class="ident">to_string</span>()];
+    <span class="kw">fn </span>render_redefine_tables(<span class="kw-2">&amp;</span><span class="self">self</span>, tables: <span class="kw-2">&amp;</span>[RedefineTable], schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
+        <span class="comment">// Based on &#39;Making Other Kinds Of Table Schema Changes&#39; from https://www.sqlite.org/lang_altertable.html
+        </span><span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[<span class="string">&quot;PRAGMA foreign_keys=OFF&quot;</span>.to_string()];
 
-        <span class="kw">for</span> <span class="ident">redefine_table</span> <span class="kw">in</span> <span class="ident">tables</span> {
-            <span class="kw">let</span> <span class="ident">tables</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="ident">redefine_table</span>.<span class="ident">table_ids</span>);
-            <span class="kw">let</span> <span class="ident">temporary_table_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;new_{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">name</span>());
+        <span class="kw">for </span>redefine_table <span class="kw">in </span>tables {
+            <span class="kw">let </span>tables = schemas.walk(redefine_table.table_ids);
+            <span class="kw">let </span>temporary_table_name = <span class="macro">format!</span>(<span class="string">&quot;new_{}&quot;</span>, <span class="kw-2">&amp;</span>tables.next.name());
 
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_create_table_as</span>(
-                <span class="ident">tables</span>.<span class="ident">next</span>,
-                <span class="ident">TableName</span>(<span class="prelude-val">None</span>, <span class="ident">Quoted::sqlite_ident</span>(<span class="kw-2">&amp;</span><span class="ident">temporary_table_name</span>)),
+            result.push(<span class="self">self</span>.render_create_table_as(
+                tables.next,
+                TableName(<span class="prelude-val">None</span>, Quoted::sqlite_ident(<span class="kw-2">&amp;</span>temporary_table_name)),
             ));
 
-            <span class="ident">copy_current_table_into_new_table</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>, <span class="ident">redefine_table</span>, <span class="ident">tables</span>, <span class="kw-2">&amp;</span><span class="ident">temporary_table_name</span>);
+            copy_current_table_into_new_table(<span class="kw-2">&amp;mut </span>result, redefine_table, tables, <span class="kw-2">&amp;</span>temporary_table_name);
 
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">r#&quot;DROP TABLE &quot;{}&quot;&quot;#</span>, <span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>()));
+            result.push(<span class="macro">format!</span>(<span class="string">r#&quot;DROP TABLE &quot;{}&quot;&quot;#</span>, tables.previous.name()));
 
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+            result.push(<span class="macro">format!</span>(
                 <span class="string">r#&quot;ALTER TABLE &quot;{old_name}&quot; RENAME TO &quot;{new_name}&quot;&quot;#</span>,
-                <span class="ident">old_name</span> <span class="op">=</span> <span class="ident">temporary_table_name</span>,
-                <span class="ident">new_name</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">name</span>(),
+                old_name = temporary_table_name,
+                new_name = tables.next.name(),
             ));
 
-            <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">indexes</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="op">!</span><span class="ident">idx</span>.<span class="ident">is_primary_key</span>()) {
-                <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_create_index</span>(<span class="ident">index</span>));
+            <span class="kw">for </span>index <span class="kw">in </span>tables.next.indexes().filter(|idx| !idx.is_primary_key()) {
+                result.push(<span class="self">self</span>.render_create_index(index));
             }
         }
 
-        <span class="ident">result</span>.<span class="ident">push</span>(<span class="string">&quot;PRAGMA foreign_key_check&quot;</span>.<span class="ident">to_string</span>());
-        <span class="ident">result</span>.<span class="ident">push</span>(<span class="string">&quot;PRAGMA foreign_keys=ON&quot;</span>.<span class="ident">to_string</span>());
+        result.push(<span class="string">&quot;PRAGMA foreign_key_check&quot;</span>.to_string());
+        result.push(<span class="string">&quot;PRAGMA foreign_keys=ON&quot;</span>.to_string());
 
-        <span class="ident">result</span>
+        result
     }
 
-    <span class="kw">fn</span> <span class="ident">render_rename_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">r#&quot;ALTER TABLE &quot;{}&quot; RENAME TO &quot;{}&quot;&quot;#</span>, <span class="ident">name</span>, <span class="ident">new_name</span>)
+    <span class="kw">fn </span>render_rename_table(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, new_name: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">r#&quot;ALTER TABLE &quot;{}&quot; RENAME TO &quot;{}&quot;&quot;#</span>, name, new_name)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_view</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">view</span>: <span class="ident">ViewWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">r#&quot;DROP VIEW &quot;{}&quot;&quot;#</span>, <span class="ident">view</span>.<span class="ident">name</span>())
+    <span class="kw">fn </span>render_drop_view(<span class="kw-2">&amp;</span><span class="self">self</span>, view: ViewWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">r#&quot;DROP VIEW &quot;{}&quot;&quot;#</span>, view.name())
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_user_defined_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">UserDefinedTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn </span>render_drop_user_defined_type(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>UserDefinedTypeWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_drop_user_defined_type on SQLite&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_fks</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn </span>render_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, _fks: Pair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; String {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render RenameForeignKey on SQLite&quot;</span>)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render_column_type</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnType</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-    <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">family</span> {
-        <span class="ident">ColumnTypeFamily::Boolean</span> =&gt; <span class="string">&quot;BOOLEAN&quot;</span>,
-        <span class="ident">ColumnTypeFamily::DateTime</span> =&gt; <span class="string">&quot;DATETIME&quot;</span>,
-        <span class="ident">ColumnTypeFamily::Float</span> =&gt; <span class="string">&quot;REAL&quot;</span>,
-        <span class="ident">ColumnTypeFamily::Decimal</span> =&gt; <span class="string">&quot;DECIMAL&quot;</span>,
-        <span class="ident">ColumnTypeFamily::Int</span> =&gt; <span class="string">&quot;INTEGER&quot;</span>,
-        <span class="ident">ColumnTypeFamily::BigInt</span> =&gt; <span class="string">&quot;BIGINT&quot;</span>,
-        <span class="ident">ColumnTypeFamily::String</span> =&gt; <span class="string">&quot;TEXT&quot;</span>,
-        <span class="ident">ColumnTypeFamily::Binary</span> =&gt; <span class="string">&quot;BLOB&quot;</span>,
-        <span class="ident">ColumnTypeFamily::Json</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;ColumnTypeFamily::Json on SQLite&quot;</span>),
-        <span class="ident">ColumnTypeFamily::Enum</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;ColumnTypeFamily::Enum on SQLite&quot;</span>),
-        <span class="ident">ColumnTypeFamily::Uuid</span> =&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;ColumnTypeFamily::Uuid on SQLite&quot;</span>),
-        <span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">as_ref</span>(),
+<span class="kw">fn </span>render_column_type(t: <span class="kw-2">&amp;</span>ColumnType) -&gt; <span class="kw-2">&amp;</span>str {
+    <span class="kw">match </span><span class="kw-2">&amp;</span>t.family {
+        ColumnTypeFamily::Boolean =&gt; <span class="string">&quot;BOOLEAN&quot;</span>,
+        ColumnTypeFamily::DateTime =&gt; <span class="string">&quot;DATETIME&quot;</span>,
+        ColumnTypeFamily::Float =&gt; <span class="string">&quot;REAL&quot;</span>,
+        ColumnTypeFamily::Decimal =&gt; <span class="string">&quot;DECIMAL&quot;</span>,
+        ColumnTypeFamily::Int =&gt; <span class="string">&quot;INTEGER&quot;</span>,
+        ColumnTypeFamily::BigInt =&gt; <span class="string">&quot;BIGINT&quot;</span>,
+        ColumnTypeFamily::String =&gt; <span class="string">&quot;TEXT&quot;</span>,
+        ColumnTypeFamily::Binary =&gt; <span class="string">&quot;BLOB&quot;</span>,
+        ColumnTypeFamily::Json =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;ColumnTypeFamily::Json on SQLite&quot;</span>),
+        ColumnTypeFamily::Enum(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;ColumnTypeFamily::Enum on SQLite&quot;</span>),
+        ColumnTypeFamily::Uuid =&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;ColumnTypeFamily::Uuid on SQLite&quot;</span>),
+        ColumnTypeFamily::Unsupported(x) =&gt; x.as_ref(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">escape_quotes</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">static</span> <span class="ident">STRING_LITERAL_CHARACTER_TO_ESCAPE_RE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">r#&quot;&#39;&quot;#</span>).<span class="ident">unwrap</span>());
+<span class="kw">fn </span>escape_quotes(s: <span class="kw-2">&amp;</span>str) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+    <span class="kw">static </span>STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r#&quot;&#39;&quot;#</span>).unwrap());
 
-    <span class="ident">STRING_LITERAL_CHARACTER_TO_ESCAPE_RE</span>.<span class="ident">replace_all</span>(<span class="ident">s</span>, <span class="string">&quot;&#39;$0&quot;</span>)
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, <span class="string">&quot;&#39;$0&quot;</span>)
 }
 
-<span class="doccomment">/// Copy the existing data into the new table.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The process is complicated by the migrations that add make an optional column required with a</span>
-<span class="doccomment">/// default value. In this case, we need to treat them differently and `coalesce`ing them with the</span>
-<span class="doccomment">/// default value, since SQLite does not have the `DEFAULT` keyword.</span>
-<span class="kw">fn</span> <span class="ident">copy_current_table_into_new_table</span>(
-    <span class="ident">steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">redefine_table</span>: <span class="kw-2">&amp;</span><span class="ident">RedefineTable</span>,
-    <span class="ident">tables</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">temporary_table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+<span class="doccomment">/// Copy the existing data into the new table.
+///
+/// The process is complicated by the migrations that add make an optional column required with a
+/// default value. In this case, we need to treat them differently and `coalesce`ing them with the
+/// default value, since SQLite does not have the `DEFAULT` keyword.
+</span><span class="kw">fn </span>copy_current_table_into_new_table(
+    steps: <span class="kw-2">&amp;mut </span>Vec&lt;String&gt;,
+    redefine_table: <span class="kw-2">&amp;</span>RedefineTable,
+    tables: Pair&lt;TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    temporary_table_name: <span class="kw-2">&amp;</span>str,
 ) {
-    <span class="kw">if</span> <span class="ident">redefine_table</span>.<span class="ident">column_pairs</span>.<span class="ident">is_empty</span>() {
+    <span class="kw">if </span>redefine_table.column_pairs.is_empty() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">destination_columns</span> <span class="op">=</span> <span class="ident">redefine_table</span>
-        .<span class="ident">column_pairs</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">column_ids</span>, <span class="kw">_</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">walk</span>(<span class="ident">column_ids</span>.<span class="ident">next</span>).<span class="ident">name</span>());
+    <span class="kw">let </span>destination_columns = redefine_table
+        .column_pairs
+        .iter()
+        .map(|(column_ids, <span class="kw">_</span>, <span class="kw">_</span>)| tables.next.walk(column_ids.next).name());
 
-    <span class="kw">let</span> <span class="ident">source_columns</span> <span class="op">=</span> <span class="ident">redefine_table</span>.<span class="ident">column_pairs</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">column_ides</span>, <span class="ident">changes</span>, <span class="kw">_</span>)<span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">schema</span>).<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">column_ides</span>);
+    <span class="kw">let </span>source_columns = redefine_table.column_pairs.iter().map(|(column_ides, changes, <span class="kw">_</span>)| {
+        <span class="kw">let </span>columns = tables.map(|t| t.schema).walk(<span class="kw-2">*</span>column_ides);
 
-        <span class="kw">let</span> <span class="ident">col_became_required_with_a_default</span> <span class="op">=</span>
-            <span class="ident">changes</span>.<span class="ident">arity_changed</span>() <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>() <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">default</span>().<span class="ident">is_some</span>();
+        <span class="kw">let </span>col_became_required_with_a_default =
+            changes.arity_changed() &amp;&amp; columns.next.arity().is_required() &amp;&amp; columns.next.default().is_some();
 
-        <span class="kw">if</span> <span class="ident">col_became_required_with_a_default</span> {
+        <span class="kw">if </span>col_became_required_with_a_default {
             <span class="macro">format!</span>(
                 <span class="string">&quot;coalesce({column_name}, {default_value}) AS {column_name}&quot;</span>,
-                <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">Quoted::sqlite_ident</span>(<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>()),
-                <span class="ident">default_value</span> <span class="op">=</span>
-                    <span class="ident">render_default</span>(<span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">default</span>().<span class="ident">expect</span>(<span class="string">&quot;default on required column with default&quot;</span>),)
+                column_name = Quoted::sqlite_ident(columns.previous.name()),
+                default_value =
+                    render_default(columns.next.default().expect(<span class="string">&quot;default on required column with default&quot;</span>),)
             )
-        } <span class="kw">else</span> {
-            <span class="ident">Quoted::sqlite_ident</span>(<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>()).<span class="ident">to_string</span>()
+        } <span class="kw">else </span>{
+            Quoted::sqlite_ident(columns.previous.name()).to_string()
         }
     });
 
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>query = <span class="macro">format!</span>(
         <span class="string">r#&quot;INSERT INTO &quot;{temporary_table_name}&quot; ({destination_columns}) SELECT {source_columns} FROM &quot;{previous_table_name}&quot;&quot;#</span>,
-        <span class="ident">temporary_table_name</span> <span class="op">=</span> <span class="ident">temporary_table_name</span>,
-        <span class="ident">destination_columns</span> <span class="op">=</span> <span class="ident">destination_columns</span>.<span class="ident">map</span>(<span class="ident">Quoted::sqlite_ident</span>).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
-        <span class="ident">source_columns</span> <span class="op">=</span> <span class="ident">source_columns</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
-        <span class="ident">previous_table_name</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>(),
+        temporary_table_name = temporary_table_name,
+        destination_columns = destination_columns.map(Quoted::sqlite_ident).join(<span class="string">&quot;, &quot;</span>),
+        source_columns = source_columns.join(<span class="string">&quot;, &quot;</span>),
+        previous_table_name = tables.previous.name(),
     );
 
-    <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">query</span>)
+    steps.push(query)
 }
 
-<span class="kw">fn</span> <span class="ident">render_column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ddl::Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">sql_ddl::sqlite::Column</span> {
-        <span class="ident">autoincrement</span>: <span class="ident">column</span>.<span class="ident">is_single_primary_key</span>() <span class="op">&amp;&amp;</span> <span class="ident">column</span>.<span class="ident">column_type_family</span>().<span class="ident">is_int</span>(),
-        <span class="ident">default</span>: <span class="ident">column</span>
-            .<span class="ident">default</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> {
-                <span class="op">!</span><span class="macro">matches!</span>(
-                    <span class="ident">default</span>.<span class="ident">kind</span>(),
-                    <span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">None</span>)
+<span class="kw">fn </span>render_column&lt;<span class="lifetime">&#39;a</span>&gt;(column: <span class="kw-2">&amp;</span>ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ddl::Column&lt;<span class="lifetime">&#39;a</span>&gt; {
+    sql_ddl::sqlite::Column {
+        autoincrement: column.is_single_primary_key() &amp;&amp; column.column_type_family().is_int(),
+        default: column
+            .default()
+            .filter(|default| {
+                !<span class="macro">matches!</span>(
+                    default.kind(),
+                    DefaultKind::Sequence(<span class="kw">_</span>) | DefaultKind::DbGenerated(<span class="prelude-val">None</span>)
                 )
             })
-            .<span class="ident">map</span>(<span class="ident">render_default</span>),
-        <span class="ident">name</span>: <span class="ident">column</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
-        <span class="ident">not_null</span>: <span class="op">!</span><span class="ident">column</span>.<span class="ident">arity</span>().<span class="ident">is_nullable</span>(),
-        <span class="ident">primary_key</span>: <span class="ident">column</span>.<span class="ident">is_single_primary_key</span>(),
-        <span class="ident">r#type</span>: <span class="ident">render_column_type</span>(<span class="ident">column</span>.<span class="ident">column_type</span>()).<span class="ident">into</span>(),
+            .map(render_default),
+        name: column.name().into(),
+        not_null: !column.arity().is_nullable(),
+        primary_key: column.is_single_primary_key(),
+        r#type: render_column_type(column.column_type()).into(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render_default</span>(<span class="ident">default</span>: <span class="kw-2">&amp;</span><span class="ident">DefaultValue</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">default</span>.<span class="ident">kind</span>() {
-        <span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) =&gt; <span class="ident">val</span>.<span class="ident">as_str</span>().<span class="ident">into</span>(),
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">val</span>)) <span class="op">|</span> <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">val</span>)) =&gt; {
-            <span class="ident">Quoted::sqlite_string</span>(<span class="ident">escape_quotes</span>(<span class="ident">val</span>)).<span class="ident">to_string</span>().<span class="ident">into</span>()
+<span class="kw">fn </span>render_default(default: <span class="kw-2">&amp;</span>DefaultValue) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+    <span class="kw">match </span>default.kind() {
+        DefaultKind::DbGenerated(<span class="prelude-val">Some</span>(val)) =&gt; val.as_str().into(),
+        DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) =&gt; {
+            Quoted::sqlite_string(escape_quotes(val)).to_string().into()
         }
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>)) =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::new</span>();
-            <span class="ident">format_hex</span>(<span class="ident">b</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
-            <span class="ident">Quoted::sqlite_string</span>(<span class="ident">out</span>).<span class="ident">to_string</span>().<span class="ident">into</span>()
+        DefaultKind::Value(PrismaValue::Bytes(b)) =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>out = String::new();
+            format_hex(b, <span class="kw-2">&amp;mut </span>out);
+            Quoted::sqlite_string(out).to_string().into()
         }
-        <span class="ident">DefaultKind::Now</span> =&gt; <span class="string">&quot;CURRENT_TIMESTAMP&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="ident">val</span>)) =&gt; <span class="ident">Quoted::sqlite_string</span>(<span class="ident">val</span>).<span class="ident">to_string</span>().<span class="ident">into</span>(),
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
-        <span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">None</span>) <span class="op">|</span> <span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">DefaultKind::UniqueRowid</span> =&gt; <span class="macro">unreachable!</span>(),
+        DefaultKind::Now =&gt; <span class="string">&quot;CURRENT_TIMESTAMP&quot;</span>.into(),
+        DefaultKind::Value(PrismaValue::DateTime(val)) =&gt; Quoted::sqlite_string(val).to_string().into(),
+        DefaultKind::Value(val) =&gt; val.to_string().into(),
+        DefaultKind::DbGenerated(<span class="prelude-val">None</span>) | DefaultKind::Sequence(<span class="kw">_</span>) | DefaultKind::UniqueRowid =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

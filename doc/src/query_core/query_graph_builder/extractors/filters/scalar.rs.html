@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/extractors/filters/scalar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scalar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/extractors/filters/scalar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scalar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -593,600 +593,600 @@
 <span id="593">593</span>
 <span id="594">594</span>
 <span id="595">595</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>, <span class="ident">QueryGraphBuilderError</span>, <span class="ident">QueryGraphBuilderResult</span>};
-<span class="kw">use</span> <span class="ident">connector</span>::{
-    <span class="ident">ConditionListValue</span>, <span class="ident">ConditionValue</span>, <span class="ident">Filter</span>, <span class="ident">JsonCompare</span>, <span class="ident">JsonFilterPath</span>, <span class="ident">JsonTargetType</span>, <span class="ident">ScalarCompare</span>,
-    <span class="ident">ScalarListCompare</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
+<span class="kw">use </span>connector::{
+    ConditionListValue, ConditionValue, Filter, JsonCompare, JsonFilterPath, JsonTargetType, ScalarCompare,
+    ScalarListCompare,
 };
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">Field</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">TypeIdentifier</span>};
-<span class="kw">use</span> <span class="ident">schema_builder::constants</span>::{<span class="ident">aggregations</span>, <span class="ident">filters</span>, <span class="ident">json_null</span>};
-<span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
+<span class="kw">use </span>prisma_models::{Field, PrismaValue, ScalarFieldRef, TypeIdentifier};
+<span class="kw">use </span>schema_builder::constants::{aggregations, filters, json_null};
+<span class="kw">use </span>std::convert::TryInto;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScalarFilterParser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The field on which the filters are applied.</span>
-    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ScalarFieldRef</span>,
-    <span class="doccomment">/// Whether it should extract inverted filters.</span>
-    <span class="ident">reverse</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Whether the parser is going to parse a filter map that relates to a _count filter.</span>
-    <span class="ident">is_count_filter</span>: <span class="ident">bool</span>,
+<span class="kw">pub struct </span>ScalarFilterParser&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The field on which the filters are applied.
+    </span>field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ScalarFieldRef,
+    <span class="doccomment">/// Whether it should extract inverted filters.
+    </span>reverse: bool,
+    <span class="doccomment">/// Whether the parser is going to parse a filter map that relates to a _count filter.
+    </span>is_count_filter: bool,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ScalarFilterParser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ScalarFieldRef</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">field</span>,
-            <span class="ident">reverse</span>,
-            <span class="ident">is_count_filter</span>: <span class="bool-val">false</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ScalarFilterParser&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ScalarFieldRef, reverse: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            field,
+            reverse,
+            is_count_filter: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field</span>
+    <span class="kw">fn </span>field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ScalarFieldRef {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.field
     }
 
-    <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">reverse</span>
+    <span class="kw">fn </span>reverse(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.reverse
     }
 
-    <span class="kw">fn</span> <span class="ident">is_count_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_count_filter</span>
+    <span class="kw">fn </span>is_count_filter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_count_filter
     }
 
-    <span class="doccomment">/// Whether the parser is going to parse a filter map that relates to a _count filter</span>
-    <span class="doccomment">/// Used to enable referencing fields of TypeIdentifier::Int although the field on which the</span>
-    <span class="doccomment">/// filter is applied is of a different TypeIdentifier</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_is_count_filter</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">is_count_filter</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">is_count_filter</span> <span class="op">=</span> <span class="ident">is_count_filter</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Whether the parser is going to parse a filter map that relates to a _count filter
+    /// Used to enable referencing fields of TypeIdentifier::Int although the field on which the
+    /// filter is applied is of a different TypeIdentifier
+    </span><span class="kw">pub fn </span>set_is_count_filter(<span class="kw-2">mut </span><span class="self">self</span>, is_count_filter: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.is_count_filter = is_count_filter;
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">filter_map</span>: <span class="ident">ParsedInputMap</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">json_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">filter_map</span>.<span class="ident">remove</span>(<span class="ident">filters::PATH</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">parse_json_path</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>parse(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>filter_map: ParsedInputMap) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
+        <span class="kw">let </span>json_path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt; = <span class="kw">match </span>filter_map.remove(filters::PATH) {
+            <span class="prelude-val">Some</span>(v) =&gt; <span class="prelude-val">Some</span>(parse_json_path(v)<span class="question-mark">?</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">filter_map</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">name</span>, <span class="ident">value</span>)<span class="op">|</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">type_identifier</span> {
-                <span class="ident">TypeIdentifier::Json</span> =&gt; <span class="self">self</span>.<span class="ident">parse_json</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">value</span>, <span class="ident">json_path</span>.<span class="ident">clone</span>()),
-                <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">parse_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">value</span>),
+        <span class="kw">let </span>filters: Vec&lt;Filter&gt; = filter_map
+            .into_iter()
+            .map(|(name, value)| <span class="kw">match </span><span class="self">self</span>.field().type_identifier {
+                TypeIdentifier::Json =&gt; <span class="self">self</span>.parse_json(<span class="kw-2">&amp;</span>name, value, json_path.clone()),
+                <span class="kw">_ </span>=&gt; <span class="self">self</span>.parse_scalar(<span class="kw-2">&amp;</span>name, value),
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">flatten</span>()
-            .<span class="ident">collect</span>();
+            .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;&gt;()<span class="question-mark">?
+            </span>.into_iter()
+            .flatten()
+            .collect();
 
-        <span class="kw">if</span> <span class="ident">json_path</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">filters</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(
-                <span class="string">&quot;A JSON path cannot be set without a scalar filter.&quot;</span>.<span class="ident">to_owned</span>(),
+        <span class="kw">if </span>json_path.is_some() &amp;&amp; filters.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(
+                <span class="string">&quot;A JSON path cannot be set without a scalar filter.&quot;</span>.to_owned(),
             ));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">filters</span>)
+        <span class="prelude-val">Ok</span>(filters)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">input</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>();
+    <span class="kw">fn </span>parse_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, filter_name: <span class="kw-2">&amp;</span>str, input: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
+        <span class="kw">let </span>field = <span class="self">self</span>.field();
 
-        <span class="kw">match</span> <span class="ident">filter_name</span> {
-            <span class="ident">filters::NOT_LOWERCASE</span> =&gt; {
-                <span class="kw">match</span> <span class="ident">input</span> {
-                    <span class="comment">// Support for syntax `{ scalarField: { not: null } }` and `{ scalarField: { not: &lt;value&gt; } }`</span>
-                    <span class="ident">ParsedInputValue::Single</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="ident">value</span>)]),
-                    <span class="kw">_</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">inner_object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+        <span class="kw">match </span>filter_name {
+            filters::NOT_LOWERCASE =&gt; {
+                <span class="kw">match </span>input {
+                    <span class="comment">// Support for syntax `{ scalarField: { not: null } }` and `{ scalarField: { not: &lt;value&gt; } }`
+                    </span>ParsedInputValue::Single(value) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.not_equals(value)]),
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="kw">let </span>inner_object: ParsedInputMap = input.try_into()<span class="question-mark">?</span>;
 
-                        <span class="ident">ScalarFilterParser::new</span>(<span class="self">self</span>.<span class="ident">field</span>, <span class="op">!</span><span class="self">self</span>.<span class="ident">reverse</span>()).<span class="ident">parse</span>(<span class="ident">inner_object</span>)
+                        ScalarFilterParser::new(<span class="self">self</span>.field, !<span class="self">self</span>.reverse()).parse(inner_object)
                     }
                 }
             }
 
-            <span class="ident">filters::IN</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+            filters::IN =&gt; {
+                <span class="kw">let </span>value = <span class="self">self</span>.as_condition_value(input, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-                    <span class="ident">ConditionValue::Value</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span> {
-                        <span class="ident">PrismaValue::Null</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="ident">value</span>),
-                        <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="ident">field</span>.<span class="ident">not_in</span>(<span class="ident">values</span>),
+                <span class="kw">let </span>filter = <span class="kw">match </span>value {
+                    ConditionValue::Value(value) =&gt; <span class="kw">match </span>value {
+                        PrismaValue::Null <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; field.not_equals(value),
+                        PrismaValue::List(values) <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; field.not_in(values),
 
-                        <span class="ident">PrismaValue::Null</span> =&gt; <span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">value</span>),
-                        <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) =&gt; <span class="ident">field</span>.<span class="ident">is_in</span>(<span class="ident">values</span>),
+                        PrismaValue::Null =&gt; field.equals(value),
+                        PrismaValue::List(values) =&gt; field.is_in(values),
 
-                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees this.</span>
-                    },
-                    <span class="ident">ConditionValue::FieldRef</span>(<span class="ident">field_ref</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="ident">field</span>.<span class="ident">not_in</span>(<span class="ident">field_ref</span>),
-                    <span class="ident">ConditionValue::FieldRef</span>(<span class="ident">field_ref</span>) =&gt; <span class="ident">field</span>.<span class="ident">is_in</span>(<span class="ident">field_ref</span>),
+                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees this.
+                    </span>},
+                    ConditionValue::FieldRef(field_ref) <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; field.not_in(field_ref),
+                    ConditionValue::FieldRef(field_ref) =&gt; field.is_in(field_ref),
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
             }
 
-            <span class="comment">// Legacy operation</span>
-            <span class="ident">filters::NOT_IN</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+            <span class="comment">// Legacy operation
+            </span>filters::NOT_IN =&gt; {
+                <span class="kw">let </span>value = <span class="self">self</span>.as_condition_value(input, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-                    <span class="ident">ConditionValue::Value</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span> {
-                        <span class="ident">PrismaValue::Null</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">value</span>), <span class="comment">// not not in null =&gt; in null</span>
-                        <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="ident">field</span>.<span class="ident">is_in</span>(<span class="ident">values</span>), <span class="comment">// not not in values =&gt; in values</span>
+                <span class="kw">let </span>filter = <span class="kw">match </span>value {
+                    ConditionValue::Value(value) =&gt; <span class="kw">match </span>value {
+                        PrismaValue::Null <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; field.equals(value), <span class="comment">// not not in null =&gt; in null
+                        </span>PrismaValue::List(values) <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; field.is_in(values), <span class="comment">// not not in values =&gt; in values
 
-                        <span class="ident">PrismaValue::Null</span> =&gt; <span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="ident">value</span>),
-                        <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) =&gt; <span class="ident">field</span>.<span class="ident">not_in</span>(<span class="ident">values</span>),
+                        </span>PrismaValue::Null =&gt; field.not_equals(value),
+                        PrismaValue::List(values) =&gt; field.not_in(values),
 
-                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees this.</span>
-                    },
-                    <span class="ident">ConditionValue::FieldRef</span>(<span class="ident">field_ref</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="ident">field</span>.<span class="ident">is_in</span>(<span class="ident">field_ref</span>),
-                    <span class="ident">ConditionValue::FieldRef</span>(<span class="ident">field_ref</span>) =&gt; <span class="ident">field</span>.<span class="ident">not_in</span>(<span class="ident">field_ref</span>),
+                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees this.
+                    </span>},
+                    ConditionValue::FieldRef(field_ref) <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; field.is_in(field_ref),
+                    ConditionValue::FieldRef(field_ref) =&gt; field.not_in(field_ref),
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
             }
 
-            <span class="ident">filters::EQUALS</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::CONTAINS</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_contains</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::STARTS_WITH</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_starts_with</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)])
+            filters::EQUALS <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.not_equals(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::CONTAINS <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.not_contains(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::STARTS_WITH <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.not_starts_with(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)])
             }
-            <span class="ident">filters::ENDS_WITH</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_ends_with</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)])
+            filters::ENDS_WITH <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.not_ends_with(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)])
             }
 
-            <span class="ident">filters::EQUALS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">equals</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::CONTAINS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::STARTS_WITH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">starts_with</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::ENDS_WITH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">ends_with</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::EQUALS =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.equals(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::CONTAINS =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.contains(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::STARTS_WITH =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.starts_with(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::ENDS_WITH =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.ends_with(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
 
-            <span class="ident">filters::LOWER_THAN</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
-                <span class="ident">field</span>.<span class="ident">greater_than_or_equals</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)
+            filters::LOWER_THAN <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
+                field.greater_than_or_equals(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)
             ]),
-            <span class="ident">filters::GREATER_THAN</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than_or_equals</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)])
+            filters::GREATER_THAN <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.less_than_or_equals(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)])
             }
-            <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">greater_than</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)])
+            filters::LOWER_THAN_OR_EQUAL <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.greater_than(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)])
             }
-            <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)])
+            filters::GREATER_THAN_OR_EQUAL <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.less_than(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)])
             }
 
-            <span class="ident">filters::LOWER_THAN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::GREATER_THAN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">greater_than</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than_or_equals</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
-                <span class="ident">field</span>.<span class="ident">greater_than_or_equals</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)
+            filters::LOWER_THAN =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.less_than(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::GREATER_THAN =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.greater_than(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::LOWER_THAN_OR_EQUAL =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.less_than_or_equals(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::GREATER_THAN_OR_EQUAL =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
+                field.greater_than_or_equals(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)
             ]),
 
-            <span class="ident">filters::SEARCH</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_search</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::SEARCH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">search</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::SEARCH <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.not_search(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::SEARCH =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.search(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
 
-            <span class="ident">filters::IS_SET</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="kw">let</span> <span class="ident">is_set</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+            filters::IS_SET <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="kw">let </span>is_set: bool = input.try_into()<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">is_set</span>(<span class="op">!</span><span class="ident">is_set</span>)])
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.is_set(!is_set)])
             }
-            <span class="ident">filters::IS_SET</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">is_set</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)]),
+            filters::IS_SET =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.is_set(input.try_into()<span class="question-mark">?</span>)]),
 
-            <span class="comment">// List-specific filters</span>
-            <span class="ident">filters::HAS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_element</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::HAS_EVERY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_every_element</span>(<span class="self">self</span>.<span class="ident">as_condition_list_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::HAS_SOME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_some_element</span>(<span class="self">self</span>.<span class="ident">as_condition_list_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::IS_EMPTY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">is_empty_list</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)]),
+            <span class="comment">// List-specific filters
+            </span>filters::HAS =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.contains_element(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::HAS_EVERY =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.contains_every_element(<span class="self">self</span>.as_condition_list_value(input)<span class="question-mark">?</span>)]),
+            filters::HAS_SOME =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.contains_some_element(<span class="self">self</span>.as_condition_list_value(input)<span class="question-mark">?</span>)]),
+            filters::IS_EMPTY =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.is_empty_list(input.try_into()<span class="question-mark">?</span>)]),
 
-            <span class="comment">// Aggregation filters</span>
-            <span class="ident">aggregations::UNDERSCORE_COUNT</span> =&gt; <span class="self">self</span>.<span class="ident">aggregation_filter</span>(<span class="ident">input</span>, <span class="ident">Filter::count</span>, <span class="bool-val">true</span>),
-            <span class="ident">aggregations::UNDERSCORE_AVG</span> =&gt; <span class="self">self</span>.<span class="ident">aggregation_filter</span>(<span class="ident">input</span>, <span class="ident">Filter::average</span>, <span class="bool-val">false</span>),
-            <span class="ident">aggregations::UNDERSCORE_SUM</span> =&gt; <span class="self">self</span>.<span class="ident">aggregation_filter</span>(<span class="ident">input</span>, <span class="ident">Filter::sum</span>, <span class="bool-val">false</span>),
-            <span class="ident">aggregations::UNDERSCORE_MIN</span> =&gt; <span class="self">self</span>.<span class="ident">aggregation_filter</span>(<span class="ident">input</span>, <span class="ident">Filter::min</span>, <span class="bool-val">false</span>),
-            <span class="ident">aggregations::UNDERSCORE_MAX</span> =&gt; <span class="self">self</span>.<span class="ident">aggregation_filter</span>(<span class="ident">input</span>, <span class="ident">Filter::max</span>, <span class="bool-val">false</span>),
+            <span class="comment">// Aggregation filters
+            </span>aggregations::UNDERSCORE_COUNT =&gt; <span class="self">self</span>.aggregation_filter(input, Filter::count, <span class="bool-val">true</span>),
+            aggregations::UNDERSCORE_AVG =&gt; <span class="self">self</span>.aggregation_filter(input, Filter::average, <span class="bool-val">false</span>),
+            aggregations::UNDERSCORE_SUM =&gt; <span class="self">self</span>.aggregation_filter(input, Filter::sum, <span class="bool-val">false</span>),
+            aggregations::UNDERSCORE_MIN =&gt; <span class="self">self</span>.aggregation_filter(input, Filter::min, <span class="bool-val">false</span>),
+            aggregations::UNDERSCORE_MAX =&gt; <span class="self">self</span>.aggregation_filter(input, Filter::max, <span class="bool-val">false</span>),
 
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
                     <span class="string">&quot;{} is not a valid scalar filter operation&quot;</span>,
-                    <span class="ident">filter_name</span>
+                    filter_name
                 )))
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_json</span>(
+    <span class="kw">fn </span>parse_json(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">filter_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">input</span>: <span class="ident">ParsedInputValue</span>,
-        <span class="ident">json_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>();
+        filter_name: <span class="kw-2">&amp;</span>str,
+        input: ParsedInputValue,
+        json_path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;,
+    ) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
+        <span class="kw">let </span>field = <span class="self">self</span>.field();
 
-        <span class="kw">match</span> <span class="ident">filter_name</span> {
-            <span class="ident">filters::NOT_LOWERCASE</span> =&gt; {
-                <span class="kw">match</span> <span class="ident">input</span> {
-                    <span class="comment">// Support for syntax `{ scalarField: { not: &lt;value&gt; } }` and `{ scalarField: { not: &lt;value&gt; } }`</span>
-                    <span class="ident">ParsedInputValue::Single</span>(<span class="ident">value</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span>
-                            <span class="ident">json_null_enum_filter</span>(<span class="ident">value</span>, <span class="ident">json_path</span>, <span class="op">|</span><span class="ident">val</span>, <span class="ident">path</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">json_not_equals</span>(<span class="ident">val</span>, <span class="ident">path</span>), <span class="bool-val">true</span>);
+        <span class="kw">match </span>filter_name {
+            filters::NOT_LOWERCASE =&gt; {
+                <span class="kw">match </span>input {
+                    <span class="comment">// Support for syntax `{ scalarField: { not: &lt;value&gt; } }` and `{ scalarField: { not: &lt;value&gt; } }`
+                    </span>ParsedInputValue::Single(value) =&gt; {
+                        <span class="kw">let </span>filter =
+                            json_null_enum_filter(value, json_path, |val, path| field.json_not_equals(val, path), <span class="bool-val">true</span>);
 
-                        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
                     }
-                    <span class="ident">ParsedInputValue::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">map</span>.<span class="ident">tag</span>, <span class="prelude-val">Some</span>(<span class="ident">schema::ObjectTag::FieldRefType</span>(<span class="kw">_</span>))) =&gt; {
-                        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">json_not_equals</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>);
+                    ParsedInputValue::Map(<span class="kw-2">ref </span>map) <span class="kw">if </span><span class="macro">matches!</span>(map.tag, <span class="prelude-val">Some</span>(schema::ObjectTag::FieldRefType(<span class="kw">_</span>))) =&gt; {
+                        <span class="kw">let </span>filter = field.json_not_equals(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>, json_path);
 
-                        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
                     }
-                    <span class="kw">_</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">inner_object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="kw">let </span>inner_object: ParsedInputMap = input.try_into()<span class="question-mark">?</span>;
 
-                        <span class="ident">ScalarFilterParser::new</span>(<span class="self">self</span>.<span class="ident">field</span>(), <span class="op">!</span><span class="self">self</span>.<span class="ident">reverse</span>()).<span class="ident">parse</span>(<span class="ident">inner_object</span>)
+                        ScalarFilterParser::new(<span class="self">self</span>.field(), !<span class="self">self</span>.reverse()).parse(inner_object)
                     }
                 }
             }
 
-            <span class="ident">filters::EQUALS</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
-                    <span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
-                    <span class="ident">json_path</span>,
-                    <span class="op">|</span><span class="ident">val</span>, <span class="ident">path</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">json_not_equals</span>(<span class="ident">val</span>, <span class="ident">path</span>),
+            filters::EQUALS <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="kw">let </span>filter = json_null_enum_filter(
+                    <span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
+                    json_path,
+                    |val, path| field.json_not_equals(val, path),
                     <span class="bool-val">true</span>,
                 );
 
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
             }
 
-            <span class="ident">filters::EQUALS</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
-                    <span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
-                    <span class="ident">json_path</span>,
-                    <span class="op">|</span><span class="ident">val</span>, <span class="ident">path</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">json_equals</span>(<span class="ident">val</span>, <span class="ident">path</span>),
+            filters::EQUALS =&gt; {
+                <span class="kw">let </span>filter = json_null_enum_filter(
+                    <span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
+                    json_path,
+                    |val, path| field.json_equals(val, path),
                     <span class="bool-val">false</span>,
                 );
 
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
             }
 
-            <span class="ident">filters::LOWER_THAN</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_greater_than_or_equals</span>(
-                    <span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
-                    <span class="ident">json_path</span>,
+            filters::LOWER_THAN <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.json_greater_than_or_equals(
+                    <span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
+                    json_path,
                 )])
             }
 
-            <span class="ident">filters::GREATER_THAN</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_less_than_or_equals</span>(
-                    <span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
-                    <span class="ident">json_path</span>,
+            filters::GREATER_THAN <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.json_less_than_or_equals(
+                    <span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
+                    json_path,
                 )])
             }
 
-            <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
-                <span class="ident">field</span>.<span class="ident">json_greater_than</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)
+            filters::LOWER_THAN_OR_EQUAL <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
+                field.json_greater_than(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>, json_path)
             ]),
 
-            <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
-                <span class="ident">field</span>.<span class="ident">json_less_than</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)
+            filters::GREATER_THAN_OR_EQUAL <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
+                field.json_less_than(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>, json_path)
             ]),
-            <span class="ident">filters::LOWER_THAN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
-                <span class="ident">field</span>.<span class="ident">json_less_than</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)
+            filters::LOWER_THAN =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
+                field.json_less_than(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>, json_path)
             ]),
-            <span class="ident">filters::GREATER_THAN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
-                <span class="ident">field</span>.<span class="ident">json_greater_than</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)
+            filters::GREATER_THAN =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
+                field.json_greater_than(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>, json_path)
             ]),
-            <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_less_than_or_equals</span>(
-                    <span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
-                    <span class="ident">json_path</span>,
+            filters::LOWER_THAN_OR_EQUAL =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.json_less_than_or_equals(
+                    <span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
+                    json_path,
                 )])
             }
 
-            <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_greater_than_or_equals</span>(
-                    <span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
-                    <span class="ident">json_path</span>,
+            filters::GREATER_THAN_OR_EQUAL =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.json_greater_than_or_equals(
+                    <span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
+                    json_path,
                 )])
             }
 
-            <span class="comment">// List-specific filters</span>
-            <span class="ident">filters::HAS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_element</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::HAS_EVERY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_every_element</span>(<span class="self">self</span>.<span class="ident">as_condition_list_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::HAS_SOME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_some_element</span>(<span class="self">self</span>.<span class="ident">as_condition_list_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-            <span class="ident">filters::IS_EMPTY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">is_empty_list</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)]),
+            <span class="comment">// List-specific filters
+            </span>filters::HAS =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.contains_element(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>)]),
+            filters::HAS_EVERY =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.contains_every_element(<span class="self">self</span>.as_condition_list_value(input)<span class="question-mark">?</span>)]),
+            filters::HAS_SOME =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.contains_some_element(<span class="self">self</span>.as_condition_list_value(input)<span class="question-mark">?</span>)]),
+            filters::IS_EMPTY =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.is_empty_list(input.try_into()<span class="question-mark">?</span>)]),
 
-            <span class="comment">// Json-specific filters</span>
-            <span class="ident">filters::ARRAY_CONTAINS</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
-                    <span class="ident">coerce_json_null</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>),
-                    <span class="ident">json_path</span>,
-                    <span class="op">|</span><span class="ident">val</span>, <span class="ident">path</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">json_not_contains</span>(<span class="ident">val</span>, <span class="ident">path</span>, <span class="ident">JsonTargetType::Array</span>),
+            <span class="comment">// Json-specific filters
+            </span>filters::ARRAY_CONTAINS <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="kw">let </span>filter = json_null_enum_filter(
+                    coerce_json_null(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>),
+                    json_path,
+                    |val, path| field.json_not_contains(val, path, JsonTargetType::Array),
                     <span class="bool-val">true</span>,
                 );
 
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
             }
 
-            <span class="ident">filters::ARRAY_STARTS_WITH</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
-                    <span class="ident">coerce_json_null</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>),
-                    <span class="ident">json_path</span>,
-                    <span class="op">|</span><span class="ident">val</span>, <span class="ident">path</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">json_not_starts_with</span>(<span class="ident">val</span>, <span class="ident">path</span>, <span class="ident">JsonTargetType::Array</span>),
+            filters::ARRAY_STARTS_WITH <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="kw">let </span>filter = json_null_enum_filter(
+                    coerce_json_null(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>),
+                    json_path,
+                    |val, path| field.json_not_starts_with(val, path, JsonTargetType::Array),
                     <span class="bool-val">true</span>,
                 );
 
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
             }
 
-            <span class="ident">filters::ARRAY_ENDS_WITH</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; {
-                <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
-                    <span class="ident">coerce_json_null</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>),
-                    <span class="ident">json_path</span>,
-                    <span class="op">|</span><span class="ident">val</span>, <span class="ident">path</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">json_not_ends_with</span>(<span class="ident">val</span>, <span class="ident">path</span>, <span class="ident">JsonTargetType::Array</span>),
+            filters::ARRAY_ENDS_WITH <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; {
+                <span class="kw">let </span>filter = json_null_enum_filter(
+                    coerce_json_null(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>),
+                    json_path,
+                    |val, path| field.json_not_ends_with(val, path, JsonTargetType::Array),
                     <span class="bool-val">true</span>,
                 );
 
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
             }
 
-            <span class="ident">filters::STRING_CONTAINS</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_not_contains</span>(
-                <span class="self">self</span>.<span class="ident">internal_as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier::String</span>)<span class="question-mark">?</span>,
-                <span class="ident">json_path</span>,
-                <span class="ident">JsonTargetType::String</span>,
+            filters::STRING_CONTAINS <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.json_not_contains(
+                <span class="self">self</span>.internal_as_condition_value(input, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span>TypeIdentifier::String)<span class="question-mark">?</span>,
+                json_path,
+                JsonTargetType::String,
             )]),
 
-            <span class="ident">filters::STRING_STARTS_WITH</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_not_starts_with</span>(
-                <span class="self">self</span>.<span class="ident">internal_as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier::String</span>)<span class="question-mark">?</span>,
-                <span class="ident">json_path</span>,
-                <span class="ident">JsonTargetType::String</span>,
+            filters::STRING_STARTS_WITH <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.json_not_starts_with(
+                <span class="self">self</span>.internal_as_condition_value(input, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span>TypeIdentifier::String)<span class="question-mark">?</span>,
+                json_path,
+                JsonTargetType::String,
             )]),
 
-            <span class="ident">filters::STRING_ENDS_WITH</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reverse</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_not_ends_with</span>(
-                <span class="self">self</span>.<span class="ident">internal_as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier::String</span>)<span class="question-mark">?</span>,
-                <span class="ident">json_path</span>,
-                <span class="ident">JsonTargetType::String</span>,
+            filters::STRING_ENDS_WITH <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.json_not_ends_with(
+                <span class="self">self</span>.internal_as_condition_value(input, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span>TypeIdentifier::String)<span class="question-mark">?</span>,
+                json_path,
+                JsonTargetType::String,
             )]),
 
-            <span class="ident">filters::ARRAY_CONTAINS</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
-                    <span class="ident">coerce_json_null</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>),
-                    <span class="ident">json_path</span>,
-                    <span class="op">|</span><span class="ident">val</span>, <span class="ident">path</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">json_contains</span>(<span class="ident">val</span>, <span class="ident">path</span>, <span class="ident">JsonTargetType::Array</span>),
+            filters::ARRAY_CONTAINS =&gt; {
+                <span class="kw">let </span>filter = json_null_enum_filter(
+                    coerce_json_null(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>),
+                    json_path,
+                    |val, path| field.json_contains(val, path, JsonTargetType::Array),
                     <span class="bool-val">true</span>,
                 );
 
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
             }
 
-            <span class="ident">filters::ARRAY_STARTS_WITH</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
-                    <span class="ident">coerce_json_null</span>(<span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>),
-                    <span class="ident">json_path</span>,
-                    <span class="op">|</span><span class="ident">val</span>, <span class="ident">path</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">json_starts_with</span>(<span class="ident">val</span>, <span class="ident">path</span>, <span class="ident">JsonTargetType::Array</span>),
+            filters::ARRAY_STARTS_WITH =&gt; {
+                <span class="kw">let </span>filter = json_null_enum_filter(
+                    coerce_json_null(<span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>),
+                    json_path,
+                    |val, path| field.json_starts_with(val, path, JsonTargetType::Array),
                     <span class="bool-val">true</span>,
                 );
 
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
             }
 
-            <span class="ident">filters::ARRAY_ENDS_WITH</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
-                    <span class="self">self</span>.<span class="ident">as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
-                    <span class="ident">json_path</span>,
-                    <span class="op">|</span><span class="ident">val</span>, <span class="ident">path</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">json_ends_with</span>(<span class="ident">val</span>, <span class="ident">path</span>, <span class="ident">JsonTargetType::Array</span>),
+            filters::ARRAY_ENDS_WITH =&gt; {
+                <span class="kw">let </span>filter = json_null_enum_filter(
+                    <span class="self">self</span>.as_condition_value(input, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
+                    json_path,
+                    |val, path| field.json_ends_with(val, path, JsonTargetType::Array),
                     <span class="bool-val">true</span>,
                 );
 
-                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
+                <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
             }
 
-            <span class="ident">filters::STRING_CONTAINS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_contains</span>(
-                <span class="self">self</span>.<span class="ident">internal_as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier::String</span>)<span class="question-mark">?</span>,
-                <span class="ident">json_path</span>,
-                <span class="ident">JsonTargetType::String</span>,
+            filters::STRING_CONTAINS =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.json_contains(
+                <span class="self">self</span>.internal_as_condition_value(input, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span>TypeIdentifier::String)<span class="question-mark">?</span>,
+                json_path,
+                JsonTargetType::String,
             )]),
 
-            <span class="ident">filters::STRING_STARTS_WITH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_starts_with</span>(
-                <span class="self">self</span>.<span class="ident">internal_as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier::String</span>)<span class="question-mark">?</span>,
-                <span class="ident">json_path</span>,
-                <span class="ident">JsonTargetType::String</span>,
+            filters::STRING_STARTS_WITH =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.json_starts_with(
+                <span class="self">self</span>.internal_as_condition_value(input, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span>TypeIdentifier::String)<span class="question-mark">?</span>,
+                json_path,
+                JsonTargetType::String,
             )]),
 
-            <span class="ident">filters::STRING_ENDS_WITH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_ends_with</span>(
-                <span class="self">self</span>.<span class="ident">internal_as_condition_value</span>(<span class="ident">input</span>, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier::String</span>)<span class="question-mark">?</span>,
-                <span class="ident">json_path</span>,
-                <span class="ident">JsonTargetType::String</span>,
+            filters::STRING_ENDS_WITH =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.json_ends_with(
+                <span class="self">self</span>.internal_as_condition_value(input, <span class="bool-val">false</span>, <span class="kw-2">&amp;</span>TypeIdentifier::String)<span class="question-mark">?</span>,
+                json_path,
+                JsonTargetType::String,
             )]),
 
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
                     <span class="string">&quot;{} is not a valid scalar filter operation&quot;</span>,
-                    <span class="ident">filter_name</span>
+                    filter_name
                 )))
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">as_condition_value</span>(
+    <span class="kw">fn </span>as_condition_value(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="ident">ParsedInputValue</span>,
-        <span class="ident">expect_list_ref</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span> {
-        <span class="comment">// If we&#39;re parsing a count filter, force the referenced field to be of TypeIdentifier::Int</span>
-        <span class="kw">let</span> <span class="ident">expected_type</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_count_filter</span>() {
-            <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier::Int</span>
-        } <span class="kw">else</span> {
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field</span>().<span class="ident">type_identifier</span>
+        input: ParsedInputValue,
+        expect_list_ref: bool,
+    ) -&gt; QueryGraphBuilderResult&lt;ConditionValue&gt; {
+        <span class="comment">// If we&#39;re parsing a count filter, force the referenced field to be of TypeIdentifier::Int
+        </span><span class="kw">let </span>expected_type = <span class="kw">if </span><span class="self">self</span>.is_count_filter() {
+            <span class="kw-2">&amp;</span>TypeIdentifier::Int
+        } <span class="kw">else </span>{
+            <span class="kw-2">&amp;</span><span class="self">self</span>.field().type_identifier
         };
 
-        <span class="self">self</span>.<span class="ident">internal_as_condition_value</span>(<span class="ident">input</span>, <span class="ident">expect_list_ref</span>, <span class="ident">expected_type</span>)
+        <span class="self">self</span>.internal_as_condition_value(input, expect_list_ref, expected_type)
     }
 
-    <span class="kw">fn</span> <span class="ident">internal_as_condition_value</span>(
+    <span class="kw">fn </span>internal_as_condition_value(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="ident">ParsedInputValue</span>,
-        <span class="ident">expect_list_ref</span>: <span class="ident">bool</span>,
-        <span class="ident">expected_type</span>: <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier</span>,
-    ) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>();
+        input: ParsedInputValue,
+        expect_list_ref: bool,
+        expected_type: <span class="kw-2">&amp;</span>TypeIdentifier,
+    ) -&gt; QueryGraphBuilderResult&lt;ConditionValue&gt; {
+        <span class="kw">let </span>field = <span class="self">self</span>.field();
 
-        <span class="kw">match</span> <span class="ident">input</span> {
-            <span class="ident">ParsedInputValue::Map</span>(<span class="kw-2">mut</span> <span class="ident">map</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">field_ref_name</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="ident">filters::UNDERSCORE_REF</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">field_ref_name</span> <span class="op">=</span> <span class="ident">PrismaValue::try_from</span>(<span class="ident">field_ref_name</span>)<span class="question-mark">?</span>.<span class="ident">into_string</span>().<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">field_ref</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">container</span>().<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">field_ref_name</span>);
+        <span class="kw">match </span>input {
+            ParsedInputValue::Map(<span class="kw-2">mut </span>map) =&gt; {
+                <span class="kw">let </span>field_ref_name = map.remove(filters::UNDERSCORE_REF).unwrap();
+                <span class="kw">let </span>field_ref_name = PrismaValue::try_from(field_ref_name)<span class="question-mark">?</span>.into_string().unwrap();
+                <span class="kw">let </span>field_ref = field.container().find_field(<span class="kw-2">&amp;</span>field_ref_name);
 
-                <span class="kw">match</span> <span class="ident">field_ref</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">Field::Scalar</span>(<span class="ident">field_ref</span>))
-                        <span class="kw">if</span> <span class="ident">field_ref</span>.<span class="ident">is_list</span>() <span class="op">==</span> <span class="ident">expect_list_ref</span> <span class="op">&amp;&amp;</span> <span class="ident">field_ref</span>.<span class="ident">type_identifier</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">expected_type</span> =&gt;
+                <span class="kw">match </span>field_ref {
+                    <span class="prelude-val">Some</span>(Field::Scalar(field_ref))
+                        <span class="kw">if </span>field_ref.is_list() == expect_list_ref &amp;&amp; field_ref.type_identifier == <span class="kw-2">*</span>expected_type =&gt;
                     {
-                        <span class="prelude-val">Ok</span>(<span class="ident">ConditionValue::reference</span>(<span class="ident">field_ref</span>))
+                        <span class="prelude-val">Ok</span>(ConditionValue::reference(field_ref))
                     }
-                    <span class="prelude-val">Some</span>(<span class="ident">Field::Scalar</span>(<span class="ident">field_ref</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+                    <span class="prelude-val">Some</span>(Field::Scalar(field_ref)) =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
                         <span class="string">&quot;Expected a referenced scalar field of type {}{} but found {} of type {}{}.&quot;</span>,
-                        <span class="ident">expected_type</span>,
-                        <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_list</span>() { <span class="string">&quot;[]&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
-                        <span class="ident">field_ref</span>,
-                        <span class="ident">field_ref</span>.<span class="ident">type_identifier</span>,
-                        <span class="kw">if</span> <span class="ident">field_ref</span>.<span class="ident">is_list</span>() { <span class="string">&quot;[]&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
+                        expected_type,
+                        <span class="kw">if </span>field.is_list() { <span class="string">&quot;[]&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
+                        field_ref,
+                        field_ref.type_identifier,
+                        <span class="kw">if </span>field_ref.is_list() { <span class="string">&quot;[]&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
                     ))),
-                    <span class="prelude-val">Some</span>(<span class="ident">Field::Relation</span>(<span class="ident">field_ref</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+                    <span class="prelude-val">Some</span>(Field::Relation(field_ref)) =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
                         <span class="string">&quot;Expected a referenced scalar field {} but found a relation field.&quot;</span>,
-                        <span class="ident">field_ref</span>
+                        field_ref
                     ))),
-                    <span class="prelude-val">Some</span>(<span class="ident">Field::Composite</span>(<span class="ident">field_ref</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+                    <span class="prelude-val">Some</span>(Field::Composite(field_ref)) =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
                         <span class="string">&quot;Expected a referenced scalar field {} but found a composite field.&quot;</span>,
-                        <span class="ident">field_ref</span>
+                        field_ref
                     ))),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
                         <span class="string">&quot;The referenced scalar field {}.{} does not exist.&quot;</span>,
-                        <span class="ident">field</span>.<span class="ident">container</span>.<span class="ident">name</span>(),
-                        <span class="kw-2">&amp;</span><span class="ident">field_ref_name</span>
+                        field.container.name(),
+                        <span class="kw-2">&amp;</span>field_ref_name
                     ))),
                 }
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ConditionValue::value</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(ConditionValue::value(input.try_into()<span class="question-mark">?</span>)),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">as_condition_list_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">ConditionListValue</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>();
+    <span class="kw">fn </span>as_condition_list_value(<span class="kw-2">&amp;</span><span class="self">self</span>, input: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;ConditionListValue&gt; {
+        <span class="kw">let </span>field = <span class="self">self</span>.field();
 
-        <span class="kw">match</span> <span class="ident">input</span> {
-            <span class="ident">ParsedInputValue::Map</span>(<span class="kw-2">mut</span> <span class="ident">map</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">field_ref_name</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="ident">filters::UNDERSCORE_REF</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">field_ref_name</span> <span class="op">=</span> <span class="ident">PrismaValue::try_from</span>(<span class="ident">field_ref_name</span>)<span class="question-mark">?</span>.<span class="ident">into_string</span>().<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">field_ref</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">container</span>.<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">field_ref_name</span>);
+        <span class="kw">match </span>input {
+            ParsedInputValue::Map(<span class="kw-2">mut </span>map) =&gt; {
+                <span class="kw">let </span>field_ref_name = map.remove(filters::UNDERSCORE_REF).unwrap();
+                <span class="kw">let </span>field_ref_name = PrismaValue::try_from(field_ref_name)<span class="question-mark">?</span>.into_string().unwrap();
+                <span class="kw">let </span>field_ref = field.container.find_field(<span class="kw-2">&amp;</span>field_ref_name);
 
-                <span class="kw">match</span> <span class="ident">field_ref</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">Field::Scalar</span>(<span class="ident">field_ref</span>))
-                        <span class="kw">if</span> <span class="ident">field_ref</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">field_ref</span>.<span class="ident">type_identifier</span> <span class="op">==</span> <span class="ident">field</span>.<span class="ident">type_identifier</span> =&gt;
+                <span class="kw">match </span>field_ref {
+                    <span class="prelude-val">Some</span>(Field::Scalar(field_ref))
+                        <span class="kw">if </span>field_ref.is_list() &amp;&amp; field_ref.type_identifier == field.type_identifier =&gt;
                     {
-                        <span class="prelude-val">Ok</span>(<span class="ident">ConditionListValue::reference</span>(<span class="ident">field_ref</span>))
+                        <span class="prelude-val">Ok</span>(ConditionListValue::reference(field_ref))
                     }
-                    <span class="prelude-val">Some</span>(<span class="ident">Field::Scalar</span>(<span class="ident">field_ref</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+                    <span class="prelude-val">Some</span>(Field::Scalar(field_ref)) =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
                         <span class="string">&quot;Expected a referenced scalar field of type {}{} but found {} of type {}{}.&quot;</span>,
-                        <span class="ident">field</span>.<span class="ident">type_identifier</span>,
-                        <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_list</span>() { <span class="string">&quot;[]&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
-                        <span class="ident">field_ref</span>,
-                        <span class="ident">field_ref</span>.<span class="ident">type_identifier</span>,
-                        <span class="kw">if</span> <span class="ident">field_ref</span>.<span class="ident">is_list</span>() { <span class="string">&quot;[]&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
+                        field.type_identifier,
+                        <span class="kw">if </span>field.is_list() { <span class="string">&quot;[]&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
+                        field_ref,
+                        field_ref.type_identifier,
+                        <span class="kw">if </span>field_ref.is_list() { <span class="string">&quot;[]&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
                     ))),
-                    <span class="prelude-val">Some</span>(<span class="ident">Field::Relation</span>(<span class="ident">rf</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+                    <span class="prelude-val">Some</span>(Field::Relation(rf)) =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
                         <span class="string">&quot;Expected a referenced scalar list field {} but found a relation field.&quot;</span>,
-                        <span class="ident">rf</span>
+                        rf
                     ))),
-                    <span class="prelude-val">Some</span>(<span class="ident">Field::Composite</span>(<span class="ident">cf</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+                    <span class="prelude-val">Some</span>(Field::Composite(cf)) =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
                         <span class="string">&quot;Expected a referenced scalar list field {} but found a composite field.&quot;</span>,
-                        <span class="ident">cf</span>
+                        cf
                     ))),
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
                         <span class="string">&quot;The referenced scalar list field {}.{} does not exist.&quot;</span>,
-                        <span class="ident">field</span>.<span class="ident">container</span>.<span class="ident">name</span>(),
-                        <span class="kw-2">&amp;</span><span class="ident">field_ref_name</span>
+                        field.container.name(),
+                        <span class="kw-2">&amp;</span>field_ref_name
                     ))),
                 }
             }
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">vals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>vals: Vec&lt;PrismaValue&gt; = input.try_into()<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">ConditionListValue::list</span>(<span class="ident">vals</span>))
+                <span class="prelude-val">Ok</span>(ConditionListValue::list(vals))
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">aggregation_filter</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>aggregation_filter&lt;F&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="ident">ParsedInputValue</span>,
-        <span class="ident">func</span>: <span class="ident">F</span>,
-        <span class="ident">is_count_filter</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Filter</span>) -&gt; <span class="ident">Filter</span>,
+        input: ParsedInputValue,
+        func: F,
+        is_count_filter: bool,
+    ) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt;
+    <span class="kw">where
+        </span>F: Fn(Filter) -&gt; Filter,
     {
-        <span class="kw">let</span> <span class="ident">inner_object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ScalarFilterParser::new</span>(<span class="self">self</span>.<span class="ident">field</span>, <span class="self">self</span>.<span class="ident">reverse</span>())
-            .<span class="ident">set_is_count_filter</span>(<span class="ident">is_count_filter</span>)
-            .<span class="ident">parse</span>(<span class="ident">inner_object</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>inner_object: ParsedInputMap = input.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>filters: Vec&lt;Filter&gt; = ScalarFilterParser::new(<span class="self">self</span>.field, <span class="self">self</span>.reverse())
+            .set_is_count_filter(is_count_filter)
+            .parse(inner_object)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">filters</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">func</span>).<span class="ident">collect</span>())
+        <span class="prelude-val">Ok</span>(filters.into_iter().map(func).collect())
     }
 }
 
-<span class="kw">fn</span> <span class="ident">json_null_enum_filter</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-    <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
-    <span class="ident">json_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>,
-    <span class="ident">filter_fn</span>: <span class="ident">F</span>,
-    <span class="ident">reverse</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">Filter</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">ConditionValue</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>,
+<span class="kw">fn </span>json_null_enum_filter&lt;F&gt;(
+    value: <span class="kw">impl </span>Into&lt;ConditionValue&gt;,
+    json_path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;,
+    filter_fn: F,
+    reverse: bool,
+) -&gt; Filter
+<span class="kw">where
+    </span>F: Fn(ConditionValue, <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;) -&gt; Filter,
 {
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">into</span>() {
-        <span class="ident">ConditionValue::Value</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">PrismaValue::Enum</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">as_str</span>() {
-                <span class="ident">json_null::DB_NULL</span> =&gt; <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Null</span>.<span class="ident">into</span>(), <span class="ident">json_path</span>),
-                <span class="ident">json_null::JSON_NULL</span> =&gt; <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Json</span>(<span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>()).<span class="ident">into</span>(), <span class="ident">json_path</span>),
+    <span class="kw">let </span>filter = <span class="kw">match </span>value.into() {
+        ConditionValue::Value(value) =&gt; <span class="kw">match </span>value {
+            PrismaValue::Enum(e) =&gt; <span class="kw">match </span>e.as_str() {
+                json_null::DB_NULL =&gt; filter_fn(PrismaValue::Null.into(), json_path),
+                json_null::JSON_NULL =&gt; filter_fn(PrismaValue::Json(<span class="string">&quot;null&quot;</span>.to_owned()).into(), json_path),
 
-                <span class="ident">json_null::ANY_NULL</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="ident">Filter::And</span>(<span class="macro">vec!</span>[
-                    <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Json</span>(<span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>()).<span class="ident">into</span>(), <span class="ident">json_path</span>.<span class="ident">clone</span>()),
-                    <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Null</span>.<span class="ident">into</span>(), <span class="ident">json_path</span>),
+                json_null::ANY_NULL <span class="kw">if </span>reverse =&gt; Filter::And(<span class="macro">vec!</span>[
+                    filter_fn(PrismaValue::Json(<span class="string">&quot;null&quot;</span>.to_owned()).into(), json_path.clone()),
+                    filter_fn(PrismaValue::Null.into(), json_path),
                 ]),
 
-                <span class="ident">json_null::ANY_NULL</span> =&gt; <span class="ident">Filter::Or</span>(<span class="macro">vec!</span>[
-                    <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Json</span>(<span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>()).<span class="ident">into</span>(), <span class="ident">json_path</span>.<span class="ident">clone</span>()),
-                    <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Null</span>.<span class="ident">into</span>(), <span class="ident">json_path</span>),
+                json_null::ANY_NULL =&gt; Filter::Or(<span class="macro">vec!</span>[
+                    filter_fn(PrismaValue::Json(<span class="string">&quot;null&quot;</span>.to_owned()).into(), json_path.clone()),
+                    filter_fn(PrismaValue::Null.into(), json_path),
                 ]),
 
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees correct enum values.</span>
-            },
-            <span class="ident">val</span> =&gt; <span class="ident">filter_fn</span>(<span class="ident">val</span>.<span class="ident">into</span>(), <span class="ident">json_path</span>),
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees correct enum values.
+            </span>},
+            val =&gt; filter_fn(val.into(), json_path),
         },
-        <span class="ident">ConditionValue::FieldRef</span>(<span class="ident">field_ref</span>) =&gt; <span class="ident">filter_fn</span>(<span class="ident">field_ref</span>.<span class="ident">into</span>(), <span class="ident">json_path</span>),
+        ConditionValue::FieldRef(field_ref) =&gt; filter_fn(field_ref.into(), json_path),
     };
 
-    <span class="ident">filter</span>
+    filter
 }
 
-<span class="kw">fn</span> <span class="ident">parse_json_path</span>(<span class="ident">input</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">path</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+<span class="kw">fn </span>parse_json_path(input: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;JsonFilterPath&gt; {
+    <span class="kw">let </span>path: PrismaValue = input.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">match</span> <span class="ident">path</span> {
-        <span class="ident">PrismaValue::String</span>(<span class="ident">str</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">JsonFilterPath::String</span>(<span class="ident">str</span>)),
-        <span class="ident">PrismaValue::List</span>(<span class="ident">list</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">list</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> {
-                    <span class="ident">key</span>.<span class="ident">into_string</span>()
-                        .<span class="ident">expect</span>(<span class="string">&quot;Json filtering array path elements must all be of type string&quot;</span>)
+    <span class="kw">match </span>path {
+        PrismaValue::String(str) =&gt; <span class="prelude-val">Ok</span>(JsonFilterPath::String(str)),
+        PrismaValue::List(list) =&gt; {
+            <span class="kw">let </span>keys = list
+                .into_iter()
+                .map(|key| {
+                    key.into_string()
+                        .expect(<span class="string">&quot;Json filtering array path elements must all be of type string&quot;</span>)
                 })
-                .<span class="ident">collect</span>();
+                .collect();
 
-            <span class="prelude-val">Ok</span>(<span class="ident">JsonFilterPath::Array</span>(<span class="ident">keys</span>))
+            <span class="prelude-val">Ok</span>(JsonFilterPath::Array(keys))
         }
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">coerce_json_null</span>(<span class="ident">value</span>: <span class="ident">ConditionValue</span>) -&gt; <span class="ident">ConditionValue</span> {
-    <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">ConditionValue::Value</span>(<span class="ident">PrismaValue::Null</span>) =&gt; <span class="ident">ConditionValue::value</span>(<span class="ident">PrismaValue::Json</span>(<span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>())),
-        <span class="kw">_</span> =&gt; <span class="ident">value</span>,
+<span class="kw">fn </span>coerce_json_null(value: ConditionValue) -&gt; ConditionValue {
+    <span class="kw">match </span>value {
+        ConditionValue::Value(PrismaValue::Null) =&gt; ConditionValue::value(PrismaValue::Json(<span class="string">&quot;null&quot;</span>.to_owned())),
+        <span class="kw">_ </span>=&gt; value,
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

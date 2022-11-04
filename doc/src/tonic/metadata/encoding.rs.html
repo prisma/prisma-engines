@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/metadata/encoding.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>encoding.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/metadata/encoding.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>encoding.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -206,211 +206,211 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
-<span class="kw">use</span> <span class="ident">http::header::HeaderValue</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>bytes::Bytes;
+<span class="kw">use </span>http::header::HeaderValue;
+<span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::hash::Hash;
 
-<span class="doccomment">/// A possible error when converting a `MetadataValue` from a string or byte</span>
-<span class="doccomment">/// slice.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidMetadataValue</span> {
-    <span class="ident">_priv</span>: (),
+<span class="doccomment">/// A possible error when converting a `MetadataValue` from a string or byte
+/// slice.
+</span><span class="attribute">#[derive(Debug, Hash)]
+</span><span class="kw">pub struct </span>InvalidMetadataValue {
+    _priv: (),
 }
 
-<span class="kw">mod</span> <span class="ident">value_encoding</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::InvalidMetadataValueBytes</span>;
-    <span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
-    <span class="kw">use</span> <span class="ident">http::header::HeaderValue</span>;
-    <span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">mod </span>value_encoding {
+    <span class="kw">use </span><span class="kw">super</span>::InvalidMetadataValueBytes;
+    <span class="kw">use </span>bytes::Bytes;
+    <span class="kw">use </span>http::header::HeaderValue;
+    <span class="kw">use </span>std::fmt;
 
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span>;
+    <span class="kw">pub trait </span>Sealed {
+        <span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>is_empty(value: <span class="kw-2">&amp;</span>[u8]) -&gt; bool;
 
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span>;
+        <span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>from_bytes(value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;HeaderValue, InvalidMetadataValueBytes&gt;;
 
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">value</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span>;
+        <span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>from_shared(value: Bytes) -&gt; <span class="prelude-ty">Result</span>&lt;HeaderValue, InvalidMetadataValueBytes&gt;;
 
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">HeaderValue</span>;
+        <span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>from_static(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; HeaderValue;
 
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span>;
+        <span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>decode(value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Bytes, InvalidMetadataValueBytes&gt;;
 
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">equals</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span>;
+        <span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>equals(a: <span class="kw-2">&amp;</span>HeaderValue, b: <span class="kw-2">&amp;</span>[u8]) -&gt; bool;
 
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">values_equal</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>) -&gt; <span class="ident">bool</span>;
+        <span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>values_equal(a: <span class="kw-2">&amp;</span>HeaderValue, b: <span class="kw-2">&amp;</span>HeaderValue) -&gt; bool;
 
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span>;
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ValueEncoding</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident"><span class="self">self</span>::value_encoding::Sealed</span> {
-    <span class="doccomment">/// Returns true if the provided key is valid for this ValueEncoding type.</span>
-    <span class="doccomment">/// For example, `Ascii::is_valid_key(&quot;a&quot;) == true`,</span>
-    <span class="doccomment">/// `Ascii::is_valid_key(&quot;a-bin&quot;) == false`.</span>
-    <span class="kw">fn</span> <span class="ident">is_valid_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span>;
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Ascii</span> {}
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Binary</span> {}
-
-<span class="comment">// ===== impl ValueEncoding =====</span>
-
-<span class="kw">impl</span> <span class="ident"><span class="self">self</span>::value_encoding::Sealed</span> <span class="kw">for</span> <span class="ident">Ascii</span> {
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="ident">value</span>.<span class="ident">is_empty</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
-        <span class="ident">HeaderValue::from_bytes</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidMetadataValueBytes::new</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">value</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
-        <span class="ident">HeaderValue::from_maybe_shared</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidMetadataValueBytes::new</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">HeaderValue</span> {
-        <span class="ident">HeaderValue::from_static</span>(<span class="ident">value</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Bytes::copy_from_slice</span>(<span class="ident">value</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">equals</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="ident">a</span>.<span class="ident">as_bytes</span>() <span class="op">==</span> <span class="ident">b</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">values_equal</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Debug::fmt</span>(<span class="ident">value</span>, <span class="ident">f</span>)
+        <span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>fmt(value: <span class="kw-2">&amp;</span>HeaderValue, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ValueEncoding</span> <span class="kw">for</span> <span class="ident">Ascii</span> {
-    <span class="kw">fn</span> <span class="ident">is_valid_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="ident">Binary::is_valid_key</span>(<span class="ident">key</span>)
+<span class="kw">pub trait </span>ValueEncoding: Clone + Eq + PartialEq + Hash + <span class="self">self</span>::value_encoding::Sealed {
+    <span class="doccomment">/// Returns true if the provided key is valid for this ValueEncoding type.
+    /// For example, `Ascii::is_valid_key(&quot;a&quot;) == true`,
+    /// `Ascii::is_valid_key(&quot;a-bin&quot;) == false`.
+    </span><span class="kw">fn </span>is_valid_key(key: <span class="kw-2">&amp;</span>str) -&gt; bool;
+}
+
+<span class="attribute">#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[doc(hidden)]
+</span><span class="kw">pub enum </span>Ascii {}
+<span class="attribute">#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[doc(hidden)]
+</span><span class="kw">pub enum </span>Binary {}
+
+<span class="comment">// ===== impl ValueEncoding =====
+
+</span><span class="kw">impl </span><span class="self">self</span>::value_encoding::Sealed <span class="kw">for </span>Ascii {
+    <span class="kw">fn </span>is_empty(value: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+        value.is_empty()
+    }
+
+    <span class="kw">fn </span>from_bytes(value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;HeaderValue, InvalidMetadataValueBytes&gt; {
+        HeaderValue::from_bytes(value).map_err(|<span class="kw">_</span>| InvalidMetadataValueBytes::new())
+    }
+
+    <span class="kw">fn </span>from_shared(value: Bytes) -&gt; <span class="prelude-ty">Result</span>&lt;HeaderValue, InvalidMetadataValueBytes&gt; {
+        HeaderValue::from_maybe_shared(value).map_err(|<span class="kw">_</span>| InvalidMetadataValueBytes::new())
+    }
+
+    <span class="kw">fn </span>from_static(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; HeaderValue {
+        HeaderValue::from_static(value)
+    }
+
+    <span class="kw">fn </span>decode(value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Bytes, InvalidMetadataValueBytes&gt; {
+        <span class="prelude-val">Ok</span>(Bytes::copy_from_slice(value))
+    }
+
+    <span class="kw">fn </span>equals(a: <span class="kw-2">&amp;</span>HeaderValue, b: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+        a.as_bytes() == b
+    }
+
+    <span class="kw">fn </span>values_equal(a: <span class="kw-2">&amp;</span>HeaderValue, b: <span class="kw-2">&amp;</span>HeaderValue) -&gt; bool {
+        a == b
+    }
+
+    <span class="kw">fn </span>fmt(value: <span class="kw-2">&amp;</span>HeaderValue, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Debug::fmt(value, f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident"><span class="self">self</span>::value_encoding::Sealed</span> <span class="kw">for</span> <span class="ident">Binary</span> {
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">value</span> {
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;=&#39;</span> {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+<span class="kw">impl </span>ValueEncoding <span class="kw">for </span>Ascii {
+    <span class="kw">fn </span>is_valid_key(key: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        !Binary::is_valid_key(key)
+    }
+}
+
+<span class="kw">impl </span><span class="self">self</span>::value_encoding::Sealed <span class="kw">for </span>Binary {
+    <span class="kw">fn </span>is_empty(value: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+        <span class="kw">for </span>c <span class="kw">in </span>value {
+            <span class="kw">if </span><span class="kw-2">*</span>c != <span class="string">b&#39;=&#39; </span>{
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
         }
-        <span class="bool-val">true</span>
+        <span class="bool-val">true
+    </span>}
+
+    <span class="kw">fn </span>from_bytes(value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;HeaderValue, InvalidMetadataValueBytes&gt; {
+        <span class="kw">let </span>encoded_value: String = base64::encode_config(value, base64::STANDARD_NO_PAD);
+        HeaderValue::from_maybe_shared(Bytes::from(encoded_value))
+            .map_err(|<span class="kw">_</span>| InvalidMetadataValueBytes::new())
     }
 
-    <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">encoded_value</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">base64::encode_config</span>(<span class="ident">value</span>, <span class="ident">base64::STANDARD_NO_PAD</span>);
-        <span class="ident">HeaderValue::from_maybe_shared</span>(<span class="ident">Bytes::from</span>(<span class="ident">encoded_value</span>))
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidMetadataValueBytes::new</span>())
+    <span class="kw">fn </span>from_shared(value: Bytes) -&gt; <span class="prelude-ty">Result</span>&lt;HeaderValue, InvalidMetadataValueBytes&gt; {
+        <span class="self">Self</span>::from_bytes(value.as_ref())
     }
 
-    <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">value</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::from_bytes</span>(<span class="ident">value</span>.<span class="ident">as_ref</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">HeaderValue</span> {
-        <span class="kw">if</span> <span class="ident">base64::decode</span>(<span class="ident">value</span>).<span class="ident">is_err</span>() {
-            <span class="macro">panic!</span>(<span class="string">&quot;Invalid base64 passed to from_static: {}&quot;</span>, <span class="ident">value</span>);
+    <span class="kw">fn </span>from_static(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; HeaderValue {
+        <span class="kw">if </span>base64::decode(value).is_err() {
+            <span class="macro">panic!</span>(<span class="string">&quot;Invalid base64 passed to from_static: {}&quot;</span>, value);
         }
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Because this is valid base64 this must be a valid HTTP header value,</span>
-            <span class="comment">// no need to check again by calling from_shared.</span>
-            <span class="ident">HeaderValue::from_maybe_shared_unchecked</span>(<span class="ident">Bytes::from_static</span>(<span class="ident">value</span>.<span class="ident">as_ref</span>()))
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
-        <span class="ident">base64::decode</span>(<span class="ident">value</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">bytes_vec</span><span class="op">|</span> <span class="ident">bytes_vec</span>.<span class="ident">into</span>())
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidMetadataValueBytes::new</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">equals</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">decoded</span>) <span class="op">=</span> <span class="ident">base64::decode</span>(<span class="ident">a</span>.<span class="ident">as_bytes</span>()) {
-            <span class="ident">decoded</span> <span class="op">==</span> <span class="ident">b</span>
-        } <span class="kw">else</span> {
-            <span class="ident">a</span>.<span class="ident">as_bytes</span>() <span class="op">==</span> <span class="ident">b</span>
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Because this is valid base64 this must be a valid HTTP header value,
+            // no need to check again by calling from_shared.
+            </span>HeaderValue::from_maybe_shared_unchecked(Bytes::from_static(value.as_ref()))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">values_equal</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> (<span class="ident"><span class="self">Self</span>::decode</span>(<span class="ident">a</span>.<span class="ident">as_bytes</span>()), <span class="ident"><span class="self">Self</span>::decode</span>(<span class="ident">b</span>.<span class="ident">as_bytes</span>())) {
-            (<span class="prelude-val">Ok</span>(<span class="ident">a</span>), <span class="prelude-val">Ok</span>(<span class="ident">b</span>)) =&gt; <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>,
+    <span class="kw">fn </span>decode(value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Bytes, InvalidMetadataValueBytes&gt; {
+        base64::decode(value)
+            .map(|bytes_vec| bytes_vec.into())
+            .map_err(|<span class="kw">_</span>| InvalidMetadataValueBytes::new())
+    }
+
+    <span class="kw">fn </span>equals(a: <span class="kw-2">&amp;</span>HeaderValue, b: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(decoded) = base64::decode(a.as_bytes()) {
+            decoded == b
+        } <span class="kw">else </span>{
+            a.as_bytes() == b
+        }
+    }
+
+    <span class="kw">fn </span>values_equal(a: <span class="kw-2">&amp;</span>HeaderValue, b: <span class="kw-2">&amp;</span>HeaderValue) -&gt; bool {
+        <span class="kw">match </span>(<span class="self">Self</span>::decode(a.as_bytes()), <span class="self">Self</span>::decode(b.as_bytes())) {
+            (<span class="prelude-val">Ok</span>(a), <span class="prelude-val">Ok</span>(b)) =&gt; a == b,
             (<span class="prelude-val">Err</span>(<span class="kw">_</span>), <span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">decoded</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::decode</span>(<span class="ident">value</span>.<span class="ident">as_bytes</span>()) {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">decoded</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;b[invalid]{:?}&quot;</span>, <span class="ident">value</span>)
+    <span class="kw">fn </span>fmt(value: <span class="kw-2">&amp;</span>HeaderValue, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(decoded) = <span class="self">Self</span>::decode(value.as_bytes()) {
+            <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, decoded)
+        } <span class="kw">else </span>{
+            <span class="macro">write!</span>(f, <span class="string">&quot;b[invalid]{:?}&quot;</span>, value)
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ValueEncoding</span> <span class="kw">for</span> <span class="ident">Binary</span> {
-    <span class="kw">fn</span> <span class="ident">is_valid_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">key</span>.<span class="ident">ends_with</span>(<span class="string">&quot;-bin&quot;</span>)
+<span class="kw">impl </span>ValueEncoding <span class="kw">for </span>Binary {
+    <span class="kw">fn </span>is_valid_key(key: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        key.ends_with(<span class="string">&quot;-bin&quot;</span>)
     }
 }
 
-<span class="comment">// ===== impl InvalidMetadataValue =====</span>
+<span class="comment">// ===== impl InvalidMetadataValue =====
 
-<span class="kw">impl</span> <span class="ident">InvalidMetadataValue</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">InvalidMetadataValue</span> { <span class="ident">_priv</span>: () }
+</span><span class="kw">impl </span>InvalidMetadataValue {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        InvalidMetadataValue { _priv: () }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidMetadataValue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;failed to parse metadata value&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>InvalidMetadataValue {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;failed to parse metadata value&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">InvalidMetadataValue</span> {}
+<span class="kw">impl </span>Error <span class="kw">for </span>InvalidMetadataValue {}
 
-<span class="doccomment">/// A possible error when converting a `MetadataValue` from a string or byte</span>
-<span class="doccomment">/// slice.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidMetadataValueBytes</span>(<span class="ident">InvalidMetadataValue</span>);
+<span class="doccomment">/// A possible error when converting a `MetadataValue` from a string or byte
+/// slice.
+</span><span class="attribute">#[derive(Debug, Hash)]
+</span><span class="kw">pub struct </span>InvalidMetadataValueBytes(InvalidMetadataValue);
 
-<span class="comment">// ===== impl InvalidMetadataValueBytes =====</span>
+<span class="comment">// ===== impl InvalidMetadataValueBytes =====
 
-<span class="kw">impl</span> <span class="ident">InvalidMetadataValueBytes</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">InvalidMetadataValueBytes</span>(<span class="ident">InvalidMetadataValue::new</span>())
+</span><span class="kw">impl </span>InvalidMetadataValueBytes {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        InvalidMetadataValueBytes(InvalidMetadataValue::new())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidMetadataValueBytes</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>InvalidMetadataValueBytes {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">InvalidMetadataValueBytes</span> {}
+<span class="kw">impl </span>Error <span class="kw">for </span>InvalidMetadataValueBytes {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

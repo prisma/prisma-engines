@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/graphql/schema_renderer/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../request_handlers/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/graphql/schema_renderer/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../request_handlers/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -187,194 +187,194 @@
 <span id="187">187</span>
 <span id="188">188</span>
 <span id="189">189</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">enum_renderer</span>;
-<span class="kw">mod</span> <span class="ident">field_renderer</span>;
-<span class="kw">mod</span> <span class="ident">object_renderer</span>;
-<span class="kw">mod</span> <span class="ident">type_renderer</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>enum_renderer;
+<span class="kw">mod </span>field_renderer;
+<span class="kw">mod </span>object_renderer;
+<span class="kw">mod </span>type_renderer;
 
-<span class="kw">use</span> <span class="ident">enum_renderer</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">field_renderer</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">object_renderer</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">query_core::schema</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::HashMap</span>,
-    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>},
+<span class="kw">use </span>enum_renderer::<span class="kw-2">*</span>;
+<span class="kw">use </span>field_renderer::<span class="kw-2">*</span>;
+<span class="kw">use </span>object_renderer::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_core::schema::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::{
+    collections::HashMap,
+    sync::{Arc, Weak},
 };
-<span class="kw">use</span> <span class="ident">type_renderer</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>type_renderer::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GraphQLSchemaRenderer</span>;
+<span class="attribute">#[allow(dead_code)]
+</span><span class="kw">pub struct </span>GraphQLSchemaRenderer;
 
-<span class="doccomment">/// Top level GraphQL schema renderer.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GqlSchemaRenderer</span> {
-    <span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>,
+<span class="doccomment">/// Top level GraphQL schema renderer.
+</span><span class="kw">pub struct </span>GqlSchemaRenderer {
+    query_schema: QuerySchemaRef,
 }
 
-<span class="kw">impl</span> <span class="ident">Renderer</span> <span class="kw">for</span> <span class="ident">GqlSchemaRenderer</span> {
-    <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RenderContext</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">query</span>.<span class="ident">into_renderer</span>().<span class="ident">render</span>(<span class="ident">ctx</span>);
-        <span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">mutation</span>.<span class="ident">into_renderer</span>().<span class="ident">render</span>(<span class="ident">ctx</span>)
+<span class="kw">impl </span>Renderer <span class="kw">for </span>GqlSchemaRenderer {
+    <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+        <span class="kw">let _ </span>= <span class="self">self</span>.query_schema.query.into_renderer().render(ctx);
+        <span class="self">self</span>.query_schema.mutation.into_renderer().render(ctx)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">GqlSchemaRenderer</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>) -&gt; <span class="ident">GqlSchemaRenderer</span> {
-        <span class="ident">GqlSchemaRenderer</span> { <span class="ident">query_schema</span> }
+<span class="kw">impl </span>GqlSchemaRenderer {
+    <span class="kw">pub fn </span>new(query_schema: QuerySchemaRef) -&gt; GqlSchemaRenderer {
+        GqlSchemaRenderer { query_schema }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">QuerySchemaRenderer</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GraphQLSchemaRenderer</span> {
-    <span class="kw">fn</span> <span class="ident">render</span>(<span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">RenderContext::new</span>();
-        <span class="ident">query_schema</span>.<span class="ident">into_renderer</span>().<span class="ident">render</span>(<span class="kw-2">&amp;mut</span> <span class="ident">context</span>);
+<span class="kw">impl </span>QuerySchemaRenderer&lt;String&gt; <span class="kw">for </span>GraphQLSchemaRenderer {
+    <span class="kw">fn </span>render(query_schema: QuerySchemaRef) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>context = RenderContext::new();
+        query_schema.into_renderer().render(<span class="kw-2">&amp;mut </span>context);
 
-        <span class="comment">// Add custom scalar types (required for graphql.js implementations)</span>
-        <span class="macro">format!</span>(
+        <span class="comment">// Add custom scalar types (required for graphql.js implementations)
+        </span><span class="macro">format!</span>(
             <span class="string">&quot;{}\n\nscalar DateTime\nscalar Json\nscalar UUID\nscalar BigInt\nscalar Decimal\nscalar Bytes&quot;</span>,
-            <span class="ident">context</span>.<span class="ident">format</span>()
+            context.format()
         )
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Renderer</span> {
-    <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RenderContext</span>) -&gt; <span class="ident">String</span>;
+<span class="kw">pub trait </span>Renderer {
+    <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String;
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RenderContext</span> {
-    <span class="doccomment">/// Output queue for all (top level) elements that need to be rendered,</span>
-    <span class="ident">output_queue</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>RenderContext {
+    <span class="doccomment">/// Output queue for all (top level) elements that need to be rendered,
+    </span>output_queue: Vec&lt;String&gt;,
 
-    <span class="doccomment">/// Prevents double rendering of elements that are referenced multiple times.</span>
-    <span class="ident">rendered</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, ()<span class="op">&gt;</span>,
+    <span class="doccomment">/// Prevents double rendering of elements that are referenced multiple times.
+    </span>rendered: HashMap&lt;String, ()&gt;,
 
-    <span class="doccomment">/// General indent level in spaces.</span>
-    <span class="ident">indent</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// General indent level in spaces.
+    </span>indent: usize,
 
-    <span class="doccomment">/// Indent string.</span>
-    <span class="ident">indent_str</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+    <span class="doccomment">/// Indent string.
+    </span>indent_str: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">RenderContext</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">output_queue</span>: <span class="macro">vec!</span>[],
-            <span class="ident">rendered</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">indent</span>: <span class="number">2</span>,
-            <span class="ident">indent_str</span>: <span class="string">&quot; &quot;</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>RenderContext {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            output_queue: <span class="macro">vec!</span>[],
+            rendered: HashMap::new(),
+            indent: <span class="number">2</span>,
+            indent_str: <span class="string">&quot; &quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RenderContext</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">RenderContext</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>RenderContext {
+    <span class="kw">pub fn </span>new() -&gt; RenderContext {
+        <span class="self">Self</span>::default()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">output_queue</span>.<span class="ident">join</span>(<span class="string">&quot;\n\n&quot;</span>)
+    <span class="kw">pub fn </span>format(<span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.output_queue.join(<span class="string">&quot;\n\n&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">already_rendered</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">rendered</span>.<span class="ident">contains_key</span>(<span class="ident">cache_key</span>)
+    <span class="kw">pub fn </span>already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_key: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.rendered.contains_key(cache_key)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_as_rendered</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache_key</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">rendered</span>.<span class="ident">insert</span>(<span class="ident">cache_key</span>, ());
+    <span class="kw">pub fn </span>mark_as_rendered(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_key: String) {
+        <span class="self">self</span>.rendered.insert(cache_key, ());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_output</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">output_queue</span>.<span class="ident">push</span>(<span class="ident">output</span>);
+    <span class="kw">pub fn </span>add_output(<span class="kw-2">&amp;mut </span><span class="self">self</span>, output: String) {
+        <span class="self">self</span>.output_queue.push(output);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache_key</span>: <span class="ident">String</span>, <span class="ident">output</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">add_output</span>(<span class="ident">output</span>);
-        <span class="self">self</span>.<span class="ident">mark_as_rendered</span>(<span class="ident">cache_key</span>);
+    <span class="kw">pub fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_key: String, output: String) {
+        <span class="self">self</span>.add_output(output);
+        <span class="self">self</span>.mark_as_rendered(cache_key);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">indent_str</span>.<span class="ident">repeat</span>(<span class="self">self</span>.<span class="ident">indent</span>)
+    <span class="kw">pub fn </span>indent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.indent_str.repeat(<span class="self">self</span>.indent)
     }
 }
 
-<span class="kw">enum</span> <span class="ident">GqlRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Schema</span>(<span class="ident">GqlSchemaRenderer</span>),
-    <span class="ident">Object</span>(<span class="ident">GqlObjectRenderer</span>),
-    <span class="ident">Type</span>(<span class="ident">GqlTypeRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">Field</span>(<span class="ident">GqlFieldRenderer</span>),
-    <span class="ident">Enum</span>(<span class="ident">GqlEnumRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="kw">enum </span>GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Schema(GqlSchemaRenderer),
+    Object(GqlObjectRenderer),
+    Type(GqlTypeRenderer&lt;<span class="lifetime">&#39;a</span>&gt;),
+    Field(GqlFieldRenderer),
+    Enum(GqlEnumRenderer&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Renderer</span> <span class="kw">for</span> <span class="ident">GqlRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RenderContext</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">GqlRenderer::Schema</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">render</span>(<span class="ident">ctx</span>),
-            <span class="ident">GqlRenderer::Object</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">render</span>(<span class="ident">ctx</span>),
-            <span class="ident">GqlRenderer::Type</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">render</span>(<span class="ident">ctx</span>),
-            <span class="ident">GqlRenderer::Field</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">render</span>(<span class="ident">ctx</span>),
-            <span class="ident">GqlRenderer::Enum</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">render</span>(<span class="ident">ctx</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Renderer <span class="kw">for </span>GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            GqlRenderer::Schema(s) =&gt; s.render(ctx),
+            GqlRenderer::Object(o) =&gt; o.render(ctx),
+            GqlRenderer::Type(t) =&gt; t.render(ctx),
+            GqlRenderer::Field(f) =&gt; f.render(ctx),
+            GqlRenderer::Enum(e) =&gt; e.render(ctx),
         }
     }
 }
 
-<span class="kw">trait</span> <span class="ident">IntoRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into_renderer</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">GqlRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="kw">trait </span>IntoRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>into_renderer(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QuerySchemaRef</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into_renderer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GqlRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">GqlRenderer::Schema</span>(<span class="ident">GqlSchemaRenderer::new</span>(<span class="ident">Arc::clone</span>(<span class="self">self</span>)))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>QuerySchemaRef {
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>into_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Schema(GqlSchemaRenderer::new(Arc::clone(<span class="self">self</span>)))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">InputType</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into_renderer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GqlRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">GqlRenderer::Type</span>(<span class="ident">GqlTypeRenderer::Input</span>(<span class="self">self</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InputType {
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>into_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Type(GqlTypeRenderer::Input(<span class="self">self</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OutputType</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into_renderer</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">GqlRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">GqlRenderer::Type</span>(<span class="ident">GqlTypeRenderer::Output</span>(<span class="self">self</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>OutputType {
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>into_renderer(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Type(GqlTypeRenderer::Output(<span class="self">self</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InputFieldRef</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into_renderer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GqlRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">GqlRenderer::Field</span>(<span class="ident">GqlFieldRenderer::Input</span>(<span class="ident">Arc::clone</span>(<span class="self">self</span>)))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>InputFieldRef {
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>into_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Field(GqlFieldRenderer::Input(Arc::clone(<span class="self">self</span>)))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OutputFieldRef</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into_renderer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GqlRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">GqlRenderer::Field</span>(<span class="ident">GqlFieldRenderer::Output</span>(<span class="ident">Arc::clone</span>(<span class="self">self</span>)))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>OutputFieldRef {
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>into_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Field(GqlFieldRenderer::Output(Arc::clone(<span class="self">self</span>)))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnumType</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into_renderer</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">GqlRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">GqlRenderer::Enum</span>(<span class="ident">GqlEnumRenderer::new</span>(<span class="self">self</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>EnumType {
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>into_renderer(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Enum(GqlEnumRenderer::new(<span class="self">self</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into_renderer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GqlRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">GqlRenderer::Object</span>(<span class="ident">GqlObjectRenderer::Input</span>(<span class="ident">Weak::clone</span>(<span class="self">self</span>)))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InputObjectTypeWeakRef {
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>into_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Object(GqlObjectRenderer::Input(Weak::clone(<span class="self">self</span>)))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ObjectTypeWeakRef</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into_renderer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GqlRenderer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">GqlRenderer::Object</span>(<span class="ident">GqlObjectRenderer::Output</span>(<span class="ident">Weak::clone</span>(<span class="self">self</span>)))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ObjectTypeWeakRef {
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>into_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Object(GqlObjectRenderer::Output(Weak::clone(<span class="self">self</span>)))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="request_handlers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="request_handlers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

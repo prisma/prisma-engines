@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/calendar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>calendar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/calendar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>calendar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -160,167 +160,167 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR</span>
-<span class="comment">// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN</span>
-<span class="comment">// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF</span>
-<span class="comment">// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">time::Time</span>, <span class="ident">Error</span>};
+</span><span class="kw">use super</span>::{time::Time, Error};
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time_from_ymdhms_utc</span>(
-    <span class="ident">year</span>: <span class="ident">u64</span>,
-    <span class="ident">month</span>: <span class="ident">u64</span>,
-    <span class="ident">day_of_month</span>: <span class="ident">u64</span>,
-    <span class="ident">hours</span>: <span class="ident">u64</span>,
-    <span class="ident">minutes</span>: <span class="ident">u64</span>,
-    <span class="ident">seconds</span>: <span class="ident">u64</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Time</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">days_before_year_since_unix_epoch</span> <span class="op">=</span> <span class="ident">days_before_year_since_unix_epoch</span>(<span class="ident">year</span>)<span class="question-mark">?</span>;
+<span class="kw">pub fn </span>time_from_ymdhms_utc(
+    year: u64,
+    month: u64,
+    day_of_month: u64,
+    hours: u64,
+    minutes: u64,
+    seconds: u64,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Time, Error&gt; {
+    <span class="kw">let </span>days_before_year_since_unix_epoch = days_before_year_since_unix_epoch(year)<span class="question-mark">?</span>;
 
-    <span class="kw">const</span> <span class="ident">JAN</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">31</span>;
-    <span class="kw">let</span> <span class="ident">feb</span> <span class="op">=</span> <span class="ident">days_in_feb</span>(<span class="ident">year</span>);
-    <span class="kw">const</span> <span class="ident">MAR</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">31</span>;
-    <span class="kw">const</span> <span class="ident">APR</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">30</span>;
-    <span class="kw">const</span> <span class="ident">MAY</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">31</span>;
-    <span class="kw">const</span> <span class="ident">JUN</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">30</span>;
-    <span class="kw">const</span> <span class="ident">JUL</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">31</span>;
-    <span class="kw">const</span> <span class="ident">AUG</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">31</span>;
-    <span class="kw">const</span> <span class="ident">SEP</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">30</span>;
-    <span class="kw">const</span> <span class="ident">OCT</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">31</span>;
-    <span class="kw">const</span> <span class="ident">NOV</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">30</span>;
-    <span class="kw">let</span> <span class="ident">days_before_month_in_year</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">month</span> {
-        <span class="number">1</span> =&gt; <span class="number">0</span>,
-        <span class="number">2</span> =&gt; <span class="ident">JAN</span>,
-        <span class="number">3</span> =&gt; <span class="ident">JAN</span> <span class="op">+</span> <span class="ident">feb</span>,
-        <span class="number">4</span> =&gt; <span class="ident">JAN</span> <span class="op">+</span> <span class="ident">feb</span> <span class="op">+</span> <span class="ident">MAR</span>,
-        <span class="number">5</span> =&gt; <span class="ident">JAN</span> <span class="op">+</span> <span class="ident">feb</span> <span class="op">+</span> <span class="ident">MAR</span> <span class="op">+</span> <span class="ident">APR</span>,
-        <span class="number">6</span> =&gt; <span class="ident">JAN</span> <span class="op">+</span> <span class="ident">feb</span> <span class="op">+</span> <span class="ident">MAR</span> <span class="op">+</span> <span class="ident">APR</span> <span class="op">+</span> <span class="ident">MAY</span>,
-        <span class="number">7</span> =&gt; <span class="ident">JAN</span> <span class="op">+</span> <span class="ident">feb</span> <span class="op">+</span> <span class="ident">MAR</span> <span class="op">+</span> <span class="ident">APR</span> <span class="op">+</span> <span class="ident">MAY</span> <span class="op">+</span> <span class="ident">JUN</span>,
-        <span class="number">8</span> =&gt; <span class="ident">JAN</span> <span class="op">+</span> <span class="ident">feb</span> <span class="op">+</span> <span class="ident">MAR</span> <span class="op">+</span> <span class="ident">APR</span> <span class="op">+</span> <span class="ident">MAY</span> <span class="op">+</span> <span class="ident">JUN</span> <span class="op">+</span> <span class="ident">JUL</span>,
-        <span class="number">9</span> =&gt; <span class="ident">JAN</span> <span class="op">+</span> <span class="ident">feb</span> <span class="op">+</span> <span class="ident">MAR</span> <span class="op">+</span> <span class="ident">APR</span> <span class="op">+</span> <span class="ident">MAY</span> <span class="op">+</span> <span class="ident">JUN</span> <span class="op">+</span> <span class="ident">JUL</span> <span class="op">+</span> <span class="ident">AUG</span>,
-        <span class="number">10</span> =&gt; <span class="ident">JAN</span> <span class="op">+</span> <span class="ident">feb</span> <span class="op">+</span> <span class="ident">MAR</span> <span class="op">+</span> <span class="ident">APR</span> <span class="op">+</span> <span class="ident">MAY</span> <span class="op">+</span> <span class="ident">JUN</span> <span class="op">+</span> <span class="ident">JUL</span> <span class="op">+</span> <span class="ident">AUG</span> <span class="op">+</span> <span class="ident">SEP</span>,
-        <span class="number">11</span> =&gt; <span class="ident">JAN</span> <span class="op">+</span> <span class="ident">feb</span> <span class="op">+</span> <span class="ident">MAR</span> <span class="op">+</span> <span class="ident">APR</span> <span class="op">+</span> <span class="ident">MAY</span> <span class="op">+</span> <span class="ident">JUN</span> <span class="op">+</span> <span class="ident">JUL</span> <span class="op">+</span> <span class="ident">AUG</span> <span class="op">+</span> <span class="ident">SEP</span> <span class="op">+</span> <span class="ident">OCT</span>,
-        <span class="number">12</span> =&gt; <span class="ident">JAN</span> <span class="op">+</span> <span class="ident">feb</span> <span class="op">+</span> <span class="ident">MAR</span> <span class="op">+</span> <span class="ident">APR</span> <span class="op">+</span> <span class="ident">MAY</span> <span class="op">+</span> <span class="ident">JUN</span> <span class="op">+</span> <span class="ident">JUL</span> <span class="op">+</span> <span class="ident">AUG</span> <span class="op">+</span> <span class="ident">SEP</span> <span class="op">+</span> <span class="ident">OCT</span> <span class="op">+</span> <span class="ident">NOV</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// `read_two_digits` already bounds-checked it.</span>
-    };
+    <span class="kw">const </span>JAN: u64 = <span class="number">31</span>;
+    <span class="kw">let </span>feb = days_in_feb(year);
+    <span class="kw">const </span>MAR: u64 = <span class="number">31</span>;
+    <span class="kw">const </span>APR: u64 = <span class="number">30</span>;
+    <span class="kw">const </span>MAY: u64 = <span class="number">31</span>;
+    <span class="kw">const </span>JUN: u64 = <span class="number">30</span>;
+    <span class="kw">const </span>JUL: u64 = <span class="number">31</span>;
+    <span class="kw">const </span>AUG: u64 = <span class="number">31</span>;
+    <span class="kw">const </span>SEP: u64 = <span class="number">30</span>;
+    <span class="kw">const </span>OCT: u64 = <span class="number">31</span>;
+    <span class="kw">const </span>NOV: u64 = <span class="number">30</span>;
+    <span class="kw">let </span>days_before_month_in_year = <span class="kw">match </span>month {
+        <span class="number">1 </span>=&gt; <span class="number">0</span>,
+        <span class="number">2 </span>=&gt; JAN,
+        <span class="number">3 </span>=&gt; JAN + feb,
+        <span class="number">4 </span>=&gt; JAN + feb + MAR,
+        <span class="number">5 </span>=&gt; JAN + feb + MAR + APR,
+        <span class="number">6 </span>=&gt; JAN + feb + MAR + APR + MAY,
+        <span class="number">7 </span>=&gt; JAN + feb + MAR + APR + MAY + JUN,
+        <span class="number">8 </span>=&gt; JAN + feb + MAR + APR + MAY + JUN + JUL,
+        <span class="number">9 </span>=&gt; JAN + feb + MAR + APR + MAY + JUN + JUL + AUG,
+        <span class="number">10 </span>=&gt; JAN + feb + MAR + APR + MAY + JUN + JUL + AUG + SEP,
+        <span class="number">11 </span>=&gt; JAN + feb + MAR + APR + MAY + JUN + JUL + AUG + SEP + OCT,
+        <span class="number">12 </span>=&gt; JAN + feb + MAR + APR + MAY + JUN + JUL + AUG + SEP + OCT + NOV,
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(), <span class="comment">// `read_two_digits` already bounds-checked it.
+    </span>};
 
-    <span class="kw">let</span> <span class="ident">days_before</span> <span class="op">=</span>
-        <span class="ident">days_before_year_since_unix_epoch</span> <span class="op">+</span> <span class="ident">days_before_month_in_year</span> <span class="op">+</span> <span class="ident">day_of_month</span> <span class="op">-</span> <span class="number">1</span>;
+    <span class="kw">let </span>days_before =
+        days_before_year_since_unix_epoch + days_before_month_in_year + day_of_month - <span class="number">1</span>;
 
-    <span class="kw">let</span> <span class="ident">seconds_since_unix_epoch</span> <span class="op">=</span>
-        (<span class="ident">days_before</span> <span class="op">*</span> <span class="number">24</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>) <span class="op">+</span> (<span class="ident">hours</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>) <span class="op">+</span> (<span class="ident">minutes</span> <span class="op">*</span> <span class="number">60</span>) <span class="op">+</span> <span class="ident">seconds</span>;
+    <span class="kw">let </span>seconds_since_unix_epoch =
+        (days_before * <span class="number">24 </span>* <span class="number">60 </span>* <span class="number">60</span>) + (hours * <span class="number">60 </span>* <span class="number">60</span>) + (minutes * <span class="number">60</span>) + seconds;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">Time::from_seconds_since_unix_epoch</span>(
-        <span class="ident">seconds_since_unix_epoch</span>,
+    <span class="prelude-val">Ok</span>(Time::from_seconds_since_unix_epoch(
+        seconds_since_unix_epoch,
     ))
 }
 
-<span class="kw">fn</span> <span class="ident">days_before_year_since_unix_epoch</span>(<span class="ident">year</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="comment">// We don&#39;t support dates before January 1, 1970 because that is the</span>
-    <span class="comment">// Unix epoch. It is likely that other software won&#39;t deal well with</span>
-    <span class="comment">// certificates that have dates before the epoch.</span>
-    <span class="kw">if</span> <span class="ident">year</span> <span class="op">&lt;</span> <span class="number">1970</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::BadDerTime</span>);
+<span class="kw">fn </span>days_before_year_since_unix_epoch(year: u64) -&gt; <span class="prelude-ty">Result</span>&lt;u64, Error&gt; {
+    <span class="comment">// We don&#39;t support dates before January 1, 1970 because that is the
+    // Unix epoch. It is likely that other software won&#39;t deal well with
+    // certificates that have dates before the epoch.
+    </span><span class="kw">if </span>year &lt; <span class="number">1970 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::BadDerTime);
     }
-    <span class="kw">let</span> <span class="ident">days_before_year_ad</span> <span class="op">=</span> <span class="ident">days_before_year_ad</span>(<span class="ident">year</span>);
-    <span class="macro">debug_assert!</span>(<span class="ident">days_before_year_ad</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">DAYS_BEFORE_UNIX_EPOCH_AD</span>);
-    <span class="prelude-val">Ok</span>(<span class="ident">days_before_year_ad</span> <span class="op">-</span> <span class="ident">DAYS_BEFORE_UNIX_EPOCH_AD</span>)
+    <span class="kw">let </span>days_before_year_ad = days_before_year_ad(year);
+    <span class="macro">debug_assert!</span>(days_before_year_ad &gt;= DAYS_BEFORE_UNIX_EPOCH_AD);
+    <span class="prelude-val">Ok</span>(days_before_year_ad - DAYS_BEFORE_UNIX_EPOCH_AD)
 }
 
-<span class="kw">fn</span> <span class="ident">days_before_year_ad</span>(<span class="ident">year</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    ((<span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">*</span> <span class="number">365</span>)
-        <span class="op">+</span> ((<span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">4</span>)    <span class="comment">// leap years are every 4 years,</span>
-        <span class="op">-</span> ((<span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">100</span>)  <span class="comment">// except years divisible by 100,</span>
-        <span class="op">+</span> ((<span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">400</span>) <span class="comment">// except years divisible by 400.</span>
+<span class="kw">fn </span>days_before_year_ad(year: u64) -&gt; u64 {
+    ((year - <span class="number">1</span>) * <span class="number">365</span>)
+        + ((year - <span class="number">1</span>) / <span class="number">4</span>)    <span class="comment">// leap years are every 4 years,
+        </span>- ((year - <span class="number">1</span>) / <span class="number">100</span>)  <span class="comment">// except years divisible by 100,
+        </span>+ ((year - <span class="number">1</span>) / <span class="number">400</span>) <span class="comment">// except years divisible by 400.
+</span>}
+
+<span class="kw">pub fn </span>days_in_month(year: u64, month: u64) -&gt; u64 {
+    <span class="kw">match </span>month {
+        <span class="number">1 </span>| <span class="number">3 </span>| <span class="number">5 </span>| <span class="number">7 </span>| <span class="number">8 </span>| <span class="number">10 </span>| <span class="number">12 </span>=&gt; <span class="number">31</span>,
+        <span class="number">4 </span>| <span class="number">6 </span>| <span class="number">9 </span>| <span class="number">11 </span>=&gt; <span class="number">30</span>,
+        <span class="number">2 </span>=&gt; days_in_feb(year),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(), <span class="comment">// `read_two_digits` already bounds-checked it.
+    </span>}
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">days_in_month</span>(<span class="ident">year</span>: <span class="ident">u64</span>, <span class="ident">month</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">match</span> <span class="ident">month</span> {
-        <span class="number">1</span> <span class="op">|</span> <span class="number">3</span> <span class="op">|</span> <span class="number">5</span> <span class="op">|</span> <span class="number">7</span> <span class="op">|</span> <span class="number">8</span> <span class="op">|</span> <span class="number">10</span> <span class="op">|</span> <span class="number">12</span> =&gt; <span class="number">31</span>,
-        <span class="number">4</span> <span class="op">|</span> <span class="number">6</span> <span class="op">|</span> <span class="number">9</span> <span class="op">|</span> <span class="number">11</span> =&gt; <span class="number">30</span>,
-        <span class="number">2</span> =&gt; <span class="ident">days_in_feb</span>(<span class="ident">year</span>),
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// `read_two_digits` already bounds-checked it.</span>
-    }
+<span class="kw">fn </span>days_in_feb(year: u64) -&gt; u64 {
+    <span class="kw">if </span>(year % <span class="number">4 </span>== <span class="number">0</span>) &amp;&amp; ((year % <span class="number">100 </span>!= <span class="number">0</span>) || (year % <span class="number">400 </span>== <span class="number">0</span>)) {
+        <span class="number">29
+    </span>} <span class="kw">else </span>{
+        <span class="number">28
+    </span>}
 }
 
-<span class="kw">fn</span> <span class="ident">days_in_feb</span>(<span class="ident">year</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">if</span> (<span class="ident">year</span> <span class="op">%</span> <span class="number">4</span> <span class="op">==</span> <span class="number">0</span>) <span class="op">&amp;&amp;</span> ((<span class="ident">year</span> <span class="op">%</span> <span class="number">100</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">year</span> <span class="op">%</span> <span class="number">400</span> <span class="op">==</span> <span class="number">0</span>)) {
-        <span class="number">29</span>
-    } <span class="kw">else</span> {
-        <span class="number">28</span>
-    }
-}
+<span class="attribute">#[allow(clippy::unreadable_literal)] </span><span class="comment">// TODO: Make this clear.
+</span><span class="kw">const </span>DAYS_BEFORE_UNIX_EPOCH_AD: u64 = <span class="number">719162</span>;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unreadable_literal</span>)]</span> <span class="comment">// TODO: Make this clear.</span>
-<span class="kw">const</span> <span class="ident">DAYS_BEFORE_UNIX_EPOCH_AD</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">719162</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_days_before_unix_epoch</span>() {
-        <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">days_before_year_ad</span>, <span class="ident">DAYS_BEFORE_UNIX_EPOCH_AD</span>};
-        <span class="macro">assert_eq!</span>(<span class="ident">DAYS_BEFORE_UNIX_EPOCH_AD</span>, <span class="ident">days_before_year_ad</span>(<span class="number">1970</span>));
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_days_before_unix_epoch() {
+        <span class="kw">use super</span>::{days_before_year_ad, DAYS_BEFORE_UNIX_EPOCH_AD};
+        <span class="macro">assert_eq!</span>(DAYS_BEFORE_UNIX_EPOCH_AD, days_before_year_ad(<span class="number">1970</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_days_in_month</span>() {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::days_in_month</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">1</span>), <span class="number">31</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">2</span>), <span class="number">28</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">3</span>), <span class="number">31</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">4</span>), <span class="number">30</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">5</span>), <span class="number">31</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">6</span>), <span class="number">30</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">7</span>), <span class="number">31</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">8</span>), <span class="number">31</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">9</span>), <span class="number">30</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">10</span>), <span class="number">31</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">11</span>), <span class="number">30</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2017</span>, <span class="number">12</span>), <span class="number">31</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_days_in_month() {
+        <span class="kw">use </span><span class="kw">super</span>::days_in_month;
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">1</span>), <span class="number">31</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">2</span>), <span class="number">28</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">3</span>), <span class="number">31</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">4</span>), <span class="number">30</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">5</span>), <span class="number">31</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">6</span>), <span class="number">30</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">7</span>), <span class="number">31</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">8</span>), <span class="number">31</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">9</span>), <span class="number">30</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">10</span>), <span class="number">31</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">11</span>), <span class="number">30</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2017</span>, <span class="number">12</span>), <span class="number">31</span>);
 
-        <span class="comment">// leap cases</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2000</span>, <span class="number">2</span>), <span class="number">29</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2004</span>, <span class="number">2</span>), <span class="number">29</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2016</span>, <span class="number">2</span>), <span class="number">29</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">days_in_month</span>(<span class="number">2100</span>, <span class="number">2</span>), <span class="number">28</span>);
+        <span class="comment">// leap cases
+        </span><span class="macro">assert_eq!</span>(days_in_month(<span class="number">2000</span>, <span class="number">2</span>), <span class="number">29</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2004</span>, <span class="number">2</span>), <span class="number">29</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2016</span>, <span class="number">2</span>), <span class="number">29</span>);
+        <span class="macro">assert_eq!</span>(days_in_month(<span class="number">2100</span>, <span class="number">2</span>), <span class="number">28</span>);
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unreadable_literal</span>)]</span> <span class="comment">// TODO: Make this clear.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_time_from_ymdhms_utc</span>() {
-        <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">time_from_ymdhms_utc</span>, <span class="ident">Time</span>};
+    <span class="attribute">#[allow(clippy::unreadable_literal)] </span><span class="comment">// TODO: Make this clear.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_time_from_ymdhms_utc() {
+        <span class="kw">use super</span>::{time_from_ymdhms_utc, Time};
 
-        <span class="comment">// year boundary</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">Time::from_seconds_since_unix_epoch</span>(<span class="number">1483228799</span>),
-            <span class="ident">time_from_ymdhms_utc</span>(<span class="number">2016</span>, <span class="number">12</span>, <span class="number">31</span>, <span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>).<span class="ident">unwrap</span>()
+        <span class="comment">// year boundary
+        </span><span class="macro">assert_eq!</span>(
+            Time::from_seconds_since_unix_epoch(<span class="number">1483228799</span>),
+            time_from_ymdhms_utc(<span class="number">2016</span>, <span class="number">12</span>, <span class="number">31</span>, <span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>).unwrap()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Time::from_seconds_since_unix_epoch</span>(<span class="number">1483228800</span>),
-            <span class="ident">time_from_ymdhms_utc</span>(<span class="number">2017</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="ident">unwrap</span>()
+            Time::from_seconds_since_unix_epoch(<span class="number">1483228800</span>),
+            time_from_ymdhms_utc(<span class="number">2017</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).unwrap()
         );
 
-        <span class="comment">// not a leap year</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">Time::from_seconds_since_unix_epoch</span>(<span class="number">1492449162</span>),
-            <span class="ident">time_from_ymdhms_utc</span>(<span class="number">2017</span>, <span class="number">4</span>, <span class="number">17</span>, <span class="number">17</span>, <span class="number">12</span>, <span class="number">42</span>).<span class="ident">unwrap</span>()
+        <span class="comment">// not a leap year
+        </span><span class="macro">assert_eq!</span>(
+            Time::from_seconds_since_unix_epoch(<span class="number">1492449162</span>),
+            time_from_ymdhms_utc(<span class="number">2017</span>, <span class="number">4</span>, <span class="number">17</span>, <span class="number">17</span>, <span class="number">12</span>, <span class="number">42</span>).unwrap()
         );
 
-        <span class="comment">// leap year, post-feb</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">Time::from_seconds_since_unix_epoch</span>(<span class="number">1460913162</span>),
-            <span class="ident">time_from_ymdhms_utc</span>(<span class="number">2016</span>, <span class="number">4</span>, <span class="number">17</span>, <span class="number">17</span>, <span class="number">12</span>, <span class="number">42</span>).<span class="ident">unwrap</span>()
+        <span class="comment">// leap year, post-feb
+        </span><span class="macro">assert_eq!</span>(
+            Time::from_seconds_since_unix_epoch(<span class="number">1460913162</span>),
+            time_from_ymdhms_utc(<span class="number">2016</span>, <span class="number">4</span>, <span class="number">17</span>, <span class="number">17</span>, <span class="number">12</span>, <span class="number">42</span>).unwrap()
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

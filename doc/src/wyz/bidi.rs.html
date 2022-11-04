@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wyz-0.5.0/src/bidi.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bidi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wyz/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wyz-0.5.0/src/bidi.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bidi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wyz/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -214,9 +214,9 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A bidirectional iterator that only checks its direction once.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A bidirectional iterator that only checks its direction once.
 
-<span class="kw">use</span> <span class="ident">core::iter::FusedIterator</span>;
+</span><span class="kw">use </span>core::iter::FusedIterator;
 
 <span class="doccomment">/** An iterator that conditionally reverses itself upon creation.
 
@@ -254,181 +254,181 @@ unsafe fn memmove&lt;T&gt;(from: *const T, to: *mut T, count: usize) {
 This example detects if `to` is between `from` and `from.add(count)` and uses
 that to determine whether to iterate forward from `0` to `count - 1` or backward
 from `count - 1` to `0`.
-**/</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Bidi</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">DoubleEndedIterator</span>
+**/
+</span><span class="kw">pub struct </span>Bidi&lt;I&gt;
+<span class="kw">where </span>I: DoubleEndedIterator
 {
-	<span class="doccomment">/// The iterator being governed.</span>
-	<span class="ident">inner</span>: <span class="ident">I</span>,
-	<span class="doccomment">/// A pointer to either `I::next` or `I::next_back`.</span>
-	<span class="ident">next</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">I</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>,
-	<span class="doccomment">/// A pointer to either `I::next_back` or `I::next`.</span>
-	<span class="ident">next_back</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">I</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>,
-	<span class="doccomment">/// A pointer to either `I::nth` or `I::nth_back`.</span>
-	<span class="ident">nth</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">I</span>, <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>,
-	<span class="doccomment">/// A pointer to either `I::nth_back` or `I::nth`.</span>
-	<span class="ident">nth_back</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">I</span>, <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// The iterator being governed.
+	</span>inner: I,
+	<span class="doccomment">/// A pointer to either `I::next` or `I::next_back`.
+	</span>next: <span class="kw">fn</span>(<span class="kw-2">&amp;mut </span>I) -&gt; <span class="prelude-ty">Option</span>&lt;&lt;I <span class="kw">as </span>Iterator&gt;::Item&gt;,
+	<span class="doccomment">/// A pointer to either `I::next_back` or `I::next`.
+	</span>next_back: <span class="kw">fn</span>(<span class="kw-2">&amp;mut </span>I) -&gt; <span class="prelude-ty">Option</span>&lt;&lt;I <span class="kw">as </span>Iterator&gt;::Item&gt;,
+	<span class="doccomment">/// A pointer to either `I::nth` or `I::nth_back`.
+	</span>nth: <span class="kw">fn</span>(<span class="kw-2">&amp;mut </span>I, usize) -&gt; <span class="prelude-ty">Option</span>&lt;&lt;I <span class="kw">as </span>Iterator&gt;::Item&gt;,
+	<span class="doccomment">/// A pointer to either `I::nth_back` or `I::nth`.
+	</span>nth_back: <span class="kw">fn</span>(<span class="kw-2">&amp;mut </span>I, usize) -&gt; <span class="prelude-ty">Option</span>&lt;&lt;I <span class="kw">as </span>Iterator&gt;::Item&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Bidi</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">DoubleEndedIterator</span>
+<span class="kw">impl</span>&lt;I&gt; Bidi&lt;I&gt;
+<span class="kw">where </span>I: DoubleEndedIterator
 {
-	<span class="doccomment">/// Applies the `Bidi` adapter to a double-ended iterator and selects the</span>
-	<span class="doccomment">/// direction of traversal.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `iter`: anything that can be made into a double-ended iterator</span>
-	<span class="doccomment">/// - `cond`: determines whether iteration proceeds ordinarily or reversed</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">II</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">II</span>, <span class="ident">cond</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span> <span class="ident">II</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">into_iter</span>();
-		<span class="kw">if</span> <span class="ident">cond</span> {
-			<span class="self">Self</span> {
-				<span class="ident">inner</span>,
-				<span class="ident">next</span>: <span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">DoubleEndedIterator</span><span class="op">&gt;</span><span class="ident">::next_back</span>,
-				<span class="ident">next_back</span>: <span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::next</span>,
-				<span class="ident">nth</span>: <span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">DoubleEndedIterator</span><span class="op">&gt;</span><span class="ident">::nth_back</span>,
-				<span class="ident">nth_back</span>: <span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::nth</span>,
+	<span class="doccomment">/// Applies the `Bidi` adapter to a double-ended iterator and selects the
+	/// direction of traversal.
+	///
+	/// ## Parameters
+	///
+	/// - `iter`: anything that can be made into a double-ended iterator
+	/// - `cond`: determines whether iteration proceeds ordinarily or reversed
+	</span><span class="kw">pub fn </span>new&lt;II&gt;(iter: II, cond: bool) -&gt; <span class="self">Self
+	</span><span class="kw">where </span>II: IntoIterator&lt;IntoIter = I&gt; {
+		<span class="kw">let </span>inner = iter.into_iter();
+		<span class="kw">if </span>cond {
+			<span class="self">Self </span>{
+				inner,
+				next: &lt;I <span class="kw">as </span>DoubleEndedIterator&gt;::next_back,
+				next_back: &lt;I <span class="kw">as </span>Iterator&gt;::next,
+				nth: &lt;I <span class="kw">as </span>DoubleEndedIterator&gt;::nth_back,
+				nth_back: &lt;I <span class="kw">as </span>Iterator&gt;::nth,
 			}
 		}
-		<span class="kw">else</span> {
-			<span class="self">Self</span> {
-				<span class="ident">inner</span>,
-				<span class="ident">next</span>: <span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::next</span>,
-				<span class="ident">next_back</span>: <span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">DoubleEndedIterator</span><span class="op">&gt;</span><span class="ident">::next_back</span>,
-				<span class="ident">nth</span>: <span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::nth</span>,
-				<span class="ident">nth_back</span>: <span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">DoubleEndedIterator</span><span class="op">&gt;</span><span class="ident">::nth_back</span>,
+		<span class="kw">else </span>{
+			<span class="self">Self </span>{
+				inner,
+				next: &lt;I <span class="kw">as </span>Iterator&gt;::next,
+				next_back: &lt;I <span class="kw">as </span>DoubleEndedIterator&gt;::next_back,
+				nth: &lt;I <span class="kw">as </span>Iterator&gt;::nth,
+				nth_back: &lt;I <span class="kw">as </span>DoubleEndedIterator&gt;::nth_back,
 			}
 		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Bidi</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">DoubleEndedIterator</span>
+<span class="kw">impl</span>&lt;I&gt; Iterator <span class="kw">for </span>Bidi&lt;I&gt;
+<span class="kw">where </span>I: DoubleEndedIterator
 {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::Item</span>;
+	<span class="kw">type </span>Item = &lt;I <span class="kw">as </span>Iterator&gt;::Item;
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">next</span>)(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		(<span class="kw-2">&amp;mut </span><span class="self">self</span>.next)(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner)
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">nth</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">nth</span>)(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">n</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>nth(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		(<span class="kw-2">&amp;mut </span><span class="self">self</span>.nth)(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner, n)
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">size_hint</span>()
+	<span class="attribute">#[inline]
+	#[cfg(not(tarpaulin_include))]
+	</span><span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+		<span class="self">self</span>.inner.size_hint()
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">fn</span> <span class="ident">count</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">count</span>()
+	<span class="attribute">#[inline]
+	#[cfg(not(tarpaulin_include))]
+	</span><span class="kw">fn </span>count(<span class="self">self</span>) -&gt; usize {
+		<span class="self">self</span>.inner.count()
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">fn</span> <span class="ident">last</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">next_back</span>()
+	<span class="attribute">#[inline]
+	#[cfg(not(tarpaulin_include))]
+	</span><span class="kw">fn </span>last(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="self">self</span>.next_back()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Bidi</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">DoubleEndedIterator</span>
+<span class="kw">impl</span>&lt;I&gt; DoubleEndedIterator <span class="kw">for </span>Bidi&lt;I&gt;
+<span class="kw">where </span>I: DoubleEndedIterator
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">next_back</span>)(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		(<span class="kw-2">&amp;mut </span><span class="self">self</span>.next_back)(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner)
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">nth_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">nth_back</span>)(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">n</span>)
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">Bidi</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">DoubleEndedIterator</span> <span class="op">+</span> <span class="ident">ExactSizeIterator</span>
-{
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>()
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>nth_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		(<span class="kw-2">&amp;mut </span><span class="self">self</span>.nth_back)(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner, n)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">Bidi</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">DoubleEndedIterator</span> <span class="op">+</span> <span class="ident">FusedIterator</span>
+<span class="kw">impl</span>&lt;I&gt; ExactSizeIterator <span class="kw">for </span>Bidi&lt;I&gt;
+<span class="kw">where </span>I: DoubleEndedIterator + ExactSizeIterator
 {
-}
-
-<span class="doccomment">/// Extension trait that provides `.bidi()` for all double-ended iterators.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BidiIterator</span>
-<span class="kw">where</span>
-	<span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
-	<span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::IntoIter</span>: <span class="ident">DoubleEndedIterator</span>,
-{
-	<span class="doccomment">/// Conditionally reverses the direction of iteration.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// When `cond` is true, this adapter swaps the `next` and `nth` methods</span>
-	<span class="doccomment">/// with `next_back` and `nth_back`. The resulting iterator is equivalent to</span>
-	<span class="doccomment">/// `if cond { self.rev() } else { self }`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use wyz::BidiIterator;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let data = [1, 2, 3];</span>
-	<span class="doccomment">/// let mut iter = data.iter().copied().bidi(false);</span>
-	<span class="doccomment">/// assert_eq!(iter.next(), Some(1));</span>
-	<span class="doccomment">/// assert_eq!(iter.next_back(), Some(3));</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut iter = data.iter().copied().bidi(true);</span>
-	<span class="doccomment">/// assert_eq!(iter.next(), Some(3));</span>
-	<span class="doccomment">/// assert_eq!(iter.next_back(), Some(1));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">bidi</span>(<span class="self">self</span>, <span class="ident">cond</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Bidi</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::IntoIter</span><span class="op">&gt;</span> {
-		<span class="ident">Bidi::new</span>(<span class="self">self</span>, <span class="ident">cond</span>)
+	<span class="attribute">#[inline]
+	#[cfg(not(tarpaulin_include))]
+	</span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+		<span class="self">self</span>.inner.len()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">BidiIterator</span> <span class="kw">for</span> <span class="ident">I</span>
-<span class="kw">where</span>
-	<span class="ident">I</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
-	<span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::IntoIter</span>: <span class="ident">DoubleEndedIterator</span>,
+<span class="kw">impl</span>&lt;I&gt; FusedIterator <span class="kw">for </span>Bidi&lt;I&gt; <span class="kw">where </span>I: DoubleEndedIterator + FusedIterator
 {
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="doccomment">/// Extension trait that provides `.bidi()` for all double-ended iterators.
+</span><span class="kw">pub trait </span>BidiIterator
+<span class="kw">where
+	</span><span class="self">Self</span>: Sized + IntoIterator,
+	&lt;<span class="self">Self </span><span class="kw">as </span>IntoIterator&gt;::IntoIter: DoubleEndedIterator,
+{
+	<span class="doccomment">/// Conditionally reverses the direction of iteration.
+	///
+	/// When `cond` is true, this adapter swaps the `next` and `nth` methods
+	/// with `next_back` and `nth_back`. The resulting iterator is equivalent to
+	/// `if cond { self.rev() } else { self }`.
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// use wyz::BidiIterator;
+	///
+	/// let data = [1, 2, 3];
+	/// let mut iter = data.iter().copied().bidi(false);
+	/// assert_eq!(iter.next(), Some(1));
+	/// assert_eq!(iter.next_back(), Some(3));
+	///
+	/// let mut iter = data.iter().copied().bidi(true);
+	/// assert_eq!(iter.next(), Some(3));
+	/// assert_eq!(iter.next_back(), Some(1));
+	/// ```
+	</span><span class="kw">fn </span>bidi(<span class="self">self</span>, cond: bool) -&gt; Bidi&lt;<span class="self">Self</span>::IntoIter&gt; {
+		Bidi::new(<span class="self">self</span>, cond)
+	}
+}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">forward</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> (<span class="number">0</span> .. <span class="number">6</span>).<span class="ident">bidi</span>(<span class="bool-val">false</span>);
+<span class="kw">impl</span>&lt;I&gt; BidiIterator <span class="kw">for </span>I
+<span class="kw">where
+	</span>I: Sized + IntoIterator,
+	&lt;I <span class="kw">as </span>IntoIterator&gt;::IntoIter: DoubleEndedIterator,
+{
+}
 
-		<span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>(<span class="number">0</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), <span class="prelude-val">Some</span>(<span class="number">5</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">nth</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">nth_back</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
-		<span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+	<span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>forward() {
+		<span class="kw">let </span><span class="kw-2">mut </span>iter = (<span class="number">0 </span>.. <span class="number">6</span>).bidi(<span class="bool-val">false</span>);
+
+		<span class="macro">assert_eq!</span>(iter.next(), <span class="prelude-val">Some</span>(<span class="number">0</span>));
+		<span class="macro">assert_eq!</span>(iter.next_back(), <span class="prelude-val">Some</span>(<span class="number">5</span>));
+		<span class="macro">assert_eq!</span>(iter.nth(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>));
+		<span class="macro">assert_eq!</span>(iter.nth_back(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
+		<span class="macro">assert!</span>(iter.next().is_none());
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">reverse</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> (<span class="number">0</span> .. <span class="number">6</span>).<span class="ident">bidi</span>(<span class="bool-val">true</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>reverse() {
+		<span class="kw">let </span><span class="kw-2">mut </span>iter = (<span class="number">0 </span>.. <span class="number">6</span>).bidi(<span class="bool-val">true</span>);
 
-		<span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>(<span class="number">5</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), <span class="prelude-val">Some</span>(<span class="number">0</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">nth</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">nth_back</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>));
-		<span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
+		<span class="macro">assert_eq!</span>(iter.next(), <span class="prelude-val">Some</span>(<span class="number">5</span>));
+		<span class="macro">assert_eq!</span>(iter.next_back(), <span class="prelude-val">Some</span>(<span class="number">0</span>));
+		<span class="macro">assert_eq!</span>(iter.nth(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
+		<span class="macro">assert_eq!</span>(iter.nth_back(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>));
+		<span class="macro">assert!</span>(iter.next().is_none());
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wyz" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wyz" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/ast/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/ast/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -152,159 +152,159 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">Attribute</span>, <span class="ident">Comment</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>, <span class="ident">WithAttributes</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan,
 };
 
-<span class="doccomment">/// A field definition in a model or a composite type.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Field</span> {
-    <span class="doccomment">/// The field&#39;s type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// name String</span>
-    <span class="doccomment">///      ^^^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="ident">field_type</span>: <span class="ident">FieldType</span>,
-    <span class="doccomment">/// The name of the field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// name String</span>
-    <span class="doccomment">/// ^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">name</span>: <span class="ident">Identifier</span>,
-    <span class="doccomment">/// The arity of the field.</span>
-    <span class="kw">pub</span> <span class="ident">arity</span>: <span class="ident">FieldArity</span>,
-    <span class="doccomment">/// The attributes of this field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// name String @id @default(&quot;lol&quot;)</span>
-    <span class="doccomment">///             ^^^^^^^^^^^^^^^^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The comments for this field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// /// Lorem ipsum</span>
-    <span class="doccomment">///     ^^^^^^^^^^^</span>
-    <span class="doccomment">/// name String @id @default(&quot;lol&quot;)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The location of this field in the text representation.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">span</span>: <span class="ident">Span</span>,
+<span class="doccomment">/// A field definition in a model or a composite type.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Field {
+    <span class="doccomment">/// The field&#39;s type.
+    ///
+    /// ```ignore
+    /// name String
+    ///      ^^^^^^
+    /// ```
+    </span><span class="kw">pub </span>field_type: FieldType,
+    <span class="doccomment">/// The name of the field.
+    ///
+    /// ```ignore
+    /// name String
+    /// ^^^^
+    /// ```
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) name: Identifier,
+    <span class="doccomment">/// The arity of the field.
+    </span><span class="kw">pub </span>arity: FieldArity,
+    <span class="doccomment">/// The attributes of this field.
+    ///
+    /// ```ignore
+    /// name String @id @default(&quot;lol&quot;)
+    ///             ^^^^^^^^^^^^^^^^^^^
+    /// ```
+    </span><span class="kw">pub </span>attributes: Vec&lt;Attribute&gt;,
+    <span class="doccomment">/// The comments for this field.
+    ///
+    /// ```ignore
+    /// /// Lorem ipsum
+    ///     ^^^^^^^^^^^
+    /// name String @id @default(&quot;lol&quot;)
+    /// ```
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) documentation: <span class="prelude-ty">Option</span>&lt;Comment&gt;,
+    <span class="doccomment">/// The location of this field in the text representation.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) span: Span,
 }
 
-<span class="kw">impl</span> <span class="ident">Field</span> {
-    <span class="doccomment">/// Finds the position span of the argument in the given field attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span_for_argument</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attribute</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">argument</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">attribute</span>)
-            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">arguments</span>.<span class="ident">iter</span>())
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">argument</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">span</span>)
-            .<span class="ident">next</span>()
+<span class="kw">impl </span>Field {
+    <span class="doccomment">/// Finds the position span of the argument in the given field attribute.
+    </span><span class="kw">pub fn </span>span_for_argument(<span class="kw-2">&amp;</span><span class="self">self</span>, attribute: <span class="kw-2">&amp;</span>str, argument: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Span&gt; {
+        <span class="self">self</span>.attributes
+            .iter()
+            .filter(|a| a.name() == attribute)
+            .flat_map(|a| a.arguments.iter())
+            .filter(|a| a.name.as_ref().map(|n| n.name.as_str()) == <span class="prelude-val">Some</span>(argument))
+            .map(|a| a.span)
+            .next()
     }
 
-    <span class="doccomment">/// Finds the position span of the given attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span_for_attribute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attribute</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">attribute</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">span</span>)
-            .<span class="ident">next</span>()
+    <span class="doccomment">/// Finds the position span of the given attribute.
+    </span><span class="kw">pub fn </span>span_for_attribute(<span class="kw-2">&amp;</span><span class="self">self</span>, attribute: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Span&gt; {
+        <span class="self">self</span>.attributes
+            .iter()
+            .filter(|a| a.name() == attribute)
+            .map(|a| a.span)
+            .next()
     }
 
-    <span class="doccomment">/// The name of the field</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>.<span class="ident">name</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">WithIdentifier</span> <span class="kw">for</span> <span class="ident">Field</span> {
-    <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Identifier</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+    <span class="doccomment">/// The name of the field
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name.name
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithSpan</span> <span class="kw">for</span> <span class="ident">Field</span> {
-    <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Span</span> {
-        <span class="self">self</span>.<span class="ident">span</span>
+<span class="kw">impl </span>WithIdentifier <span class="kw">for </span>Field {
+    <span class="kw">fn </span>identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Identifier {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithAttributes</span> <span class="kw">for</span> <span class="ident">Field</span> {
-    <span class="kw">fn</span> <span class="ident">attributes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Attribute</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attributes</span>
+<span class="kw">impl </span>WithSpan <span class="kw">for </span>Field {
+    <span class="kw">fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Span {
+        <span class="self">self</span>.span
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithDocumentation</span> <span class="kw">for</span> <span class="ident">Field</span> {
-    <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">documentation</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">doc</span><span class="op">|</span> <span class="ident">doc</span>.<span class="ident">text</span>.<span class="ident">as_str</span>())
+<span class="kw">impl </span>WithAttributes <span class="kw">for </span>Field {
+    <span class="kw">fn </span>attributes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Attribute] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.attributes
     }
 }
 
-<span class="doccomment">/// An arity of a data model field.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FieldArity</span> {
-    <span class="doccomment">/// The field either must be in an insert statement, or the field must have</span>
-    <span class="doccomment">/// a default value for the insert to succeed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// name String</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Required</span>,
-    <span class="doccomment">/// The field does not need to be in an insert statement for the write to</span>
-    <span class="doccomment">/// succeed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// name String?</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Optional</span>,
-    <span class="doccomment">/// The field can have multiple values stored in the same column.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// name String[]</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">List</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">FieldArity</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">FieldArity::List</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_optional</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">FieldArity::Optional</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">FieldArity::Required</span>)
+<span class="kw">impl </span>WithDocumentation <span class="kw">for </span>Field {
+    <span class="kw">fn </span>documentation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.documentation.as_ref().map(|doc| doc.text.as_str())
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FieldType</span> {
-    <span class="ident">Supported</span>(<span class="ident">Identifier</span>),
-    <span class="doccomment">/// Unsupported(&quot;...&quot;)</span>
-    <span class="ident">Unsupported</span>(<span class="ident">String</span>, <span class="ident">Span</span>),
+<span class="doccomment">/// An arity of a data model field.
+</span><span class="attribute">#[derive(Copy, Debug, Clone)]
+</span><span class="kw">pub enum </span>FieldArity {
+    <span class="doccomment">/// The field either must be in an insert statement, or the field must have
+    /// a default value for the insert to succeed.
+    ///
+    /// ```ignore
+    /// name String
+    /// ```
+    </span>Required,
+    <span class="doccomment">/// The field does not need to be in an insert statement for the write to
+    /// succeed.
+    ///
+    /// ```ignore
+    /// name String?
+    /// ```
+    </span>Optional,
+    <span class="doccomment">/// The field can have multiple values stored in the same column.
+    ///
+    /// ```ignore
+    /// name String[]
+    /// ```
+    </span>List,
 }
 
-<span class="kw">impl</span> <span class="ident">FieldType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Span</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::Supported</span>(<span class="ident">ident</span>) =&gt; <span class="ident">ident</span>.<span class="ident">span</span>,
-            <span class="ident">FieldType::Unsupported</span>(<span class="kw">_</span>, <span class="ident">span</span>) =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
+<span class="kw">impl </span>FieldArity {
+    <span class="kw">pub fn </span>is_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span>FieldArity::List)
+    }
+
+    <span class="kw">pub fn </span>is_optional(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span>FieldArity::Optional)
+    }
+
+    <span class="kw">pub fn </span>is_required(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span>FieldArity::Required)
+    }
+}
+
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>FieldType {
+    Supported(Identifier),
+    <span class="doccomment">/// Unsupported(&quot;...&quot;)
+    </span>Unsupported(String, Span),
+}
+
+<span class="kw">impl </span>FieldType {
+    <span class="kw">pub fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Span {
+        <span class="kw">match </span><span class="self">self </span>{
+            FieldType::Supported(ident) =&gt; ident.span,
+            FieldType::Unsupported(<span class="kw">_</span>, span) =&gt; <span class="kw-2">*</span>span,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_unsupported</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">Span</span>)<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::Unsupported</span>(<span class="ident">name</span>, <span class="ident">span</span>) =&gt; <span class="prelude-val">Some</span>((<span class="ident">name</span>, <span class="ident">span</span>)),
-            <span class="ident">FieldType::Supported</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>as_unsupported(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>Span)&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            FieldType::Unsupported(name, span) =&gt; <span class="prelude-val">Some</span>((name, span)),
+            FieldType::Supported(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.29.0/src/read/elf/symbol.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>symbol.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.29.0/src/read/elf/symbol.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>symbol.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -577,584 +577,584 @@
 <span id="577">577</span>
 <span id="578">578</span>
 <span id="579">579</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::fmt</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">core::fmt::Debug</span>;
-<span class="kw">use</span> <span class="ident">core::slice</span>;
-<span class="kw">use</span> <span class="ident">core::str</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>alloc::fmt;
+<span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>core::fmt::Debug;
+<span class="kw">use </span>core::slice;
+<span class="kw">use </span>core::str;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::elf</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endian</span>::{<span class="self">self</span>, <span class="ident">Endianness</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pod::Pod</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read::util::StringTable</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read</span>::{
-    <span class="self">self</span>, <span class="ident">ObjectSymbol</span>, <span class="ident">ObjectSymbolTable</span>, <span class="ident">ReadError</span>, <span class="ident">ReadRef</span>, <span class="ident">SectionIndex</span>, <span class="ident">SymbolFlags</span>,
-    <span class="ident">SymbolIndex</span>, <span class="ident">SymbolKind</span>, <span class="ident">SymbolMap</span>, <span class="ident">SymbolMapEntry</span>, <span class="ident">SymbolScope</span>, <span class="ident">SymbolSection</span>,
+<span class="kw">use </span><span class="kw">crate</span>::elf;
+<span class="kw">use </span><span class="kw">crate</span>::endian::{<span class="self">self</span>, Endianness};
+<span class="kw">use </span><span class="kw">crate</span>::pod::Pod;
+<span class="kw">use </span><span class="kw">crate</span>::read::util::StringTable;
+<span class="kw">use </span><span class="kw">crate</span>::read::{
+    <span class="self">self</span>, ObjectSymbol, ObjectSymbolTable, ReadError, ReadRef, SectionIndex, SymbolFlags,
+    SymbolIndex, SymbolKind, SymbolMap, SymbolMapEntry, SymbolScope, SymbolSection,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FileHeader</span>, <span class="ident">SectionHeader</span>, <span class="ident">SectionTable</span>};
+<span class="kw">use super</span>::{FileHeader, SectionHeader, SectionTable};
 
-<span class="doccomment">/// A table of symbol entries in an ELF file.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Also includes the string table used for the symbol names.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A table of symbol entries in an ELF file.
+///
+/// Also includes the string table used for the symbol names.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub struct </span>SymbolTable&lt;<span class="lifetime">&#39;data</span>, Elf: FileHeader, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt;
+<span class="kw">where
+    </span>R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="ident">section</span>: <span class="ident">SectionIndex</span>,
-    <span class="ident">string_section</span>: <span class="ident">SectionIndex</span>,
-    <span class="ident">shndx_section</span>: <span class="ident">SectionIndex</span>,
-    <span class="ident">symbols</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">Elf::Sym</span>],
-    <span class="ident">strings</span>: <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="ident">shndx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u32</span>],
+    section: SectionIndex,
+    string_section: SectionIndex,
+    shndx_section: SectionIndex,
+    symbols: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[Elf::Sym],
+    strings: StringTable&lt;<span class="lifetime">&#39;data</span>, R&gt;,
+    shndx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u32],
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">SymbolTable</span> {
-            <span class="ident">section</span>: <span class="ident">SectionIndex</span>(<span class="number">0</span>),
-            <span class="ident">string_section</span>: <span class="ident">SectionIndex</span>(<span class="number">0</span>),
-            <span class="ident">shndx_section</span>: <span class="ident">SectionIndex</span>(<span class="number">0</span>),
-            <span class="ident">symbols</span>: <span class="kw-2">&amp;</span>[],
-            <span class="ident">strings</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">shndx</span>: <span class="kw-2">&amp;</span>[],
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, Elf: FileHeader, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; Default <span class="kw">for </span>SymbolTable&lt;<span class="lifetime">&#39;data</span>, Elf, R&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        SymbolTable {
+            section: SectionIndex(<span class="number">0</span>),
+            string_section: SectionIndex(<span class="number">0</span>),
+            shndx_section: SectionIndex(<span class="number">0</span>),
+            symbols: <span class="kw-2">&amp;</span>[],
+            strings: Default::default(),
+            shndx: <span class="kw-2">&amp;</span>[],
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Parse the given symbol table section.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(
-        <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
-        <span class="ident">data</span>: <span class="ident">R</span>,
-        <span class="ident">sections</span>: <span class="kw-2">&amp;</span><span class="ident">SectionTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>,
-        <span class="ident">section_index</span>: <span class="ident">SectionIndex</span>,
-        <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="ident">Elf::SectionHeader</span>,
-    ) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, Elf: FileHeader, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; SymbolTable&lt;<span class="lifetime">&#39;data</span>, Elf, R&gt; {
+    <span class="doccomment">/// Parse the given symbol table section.
+    </span><span class="kw">pub fn </span>parse(
+        endian: Elf::Endian,
+        data: R,
+        sections: <span class="kw-2">&amp;</span>SectionTable&lt;<span class="lifetime">&#39;data</span>, Elf, R&gt;,
+        section_index: SectionIndex,
+        section: <span class="kw-2">&amp;</span>Elf::SectionHeader,
+    ) -&gt; read::Result&lt;SymbolTable&lt;<span class="lifetime">&#39;data</span>, Elf, R&gt;&gt; {
         <span class="macro">debug_assert!</span>(
-            <span class="ident">section</span>.<span class="ident">sh_type</span>(<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHT_DYNSYM</span>
-                <span class="op">|</span><span class="op">|</span> <span class="ident">section</span>.<span class="ident">sh_type</span>(<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHT_SYMTAB</span>
+            section.sh_type(endian) == elf::SHT_DYNSYM
+                || section.sh_type(endian) == elf::SHT_SYMTAB
         );
 
-        <span class="kw">let</span> <span class="ident">symbols</span> <span class="op">=</span> <span class="ident">section</span>
-            .<span class="ident">data_as_array</span>(<span class="ident">endian</span>, <span class="ident">data</span>)
-            .<span class="ident">read_error</span>(<span class="string">&quot;Invalid ELF symbol table data&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>symbols = section
+            .data_as_array(endian, data)
+            .read_error(<span class="string">&quot;Invalid ELF symbol table data&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">link</span> <span class="op">=</span> <span class="ident">SectionIndex</span>(<span class="ident">section</span>.<span class="ident">sh_link</span>(<span class="ident">endian</span>) <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="kw">let</span> <span class="ident">strings</span> <span class="op">=</span> <span class="ident">sections</span>.<span class="ident">strings</span>(<span class="ident">endian</span>, <span class="ident">data</span>, <span class="ident">link</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>link = SectionIndex(section.sh_link(endian) <span class="kw">as </span>usize);
+        <span class="kw">let </span>strings = sections.strings(endian, data, link)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shndx_section</span> <span class="op">=</span> <span class="ident">SectionIndex</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shndx</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[][..];
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">s</span>) <span class="kw">in</span> <span class="ident">sections</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">sh_type</span>(<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHT_SYMTAB_SHNDX</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">sh_link</span>(<span class="ident">endian</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">==</span> <span class="ident">section_index</span>.<span class="number">0</span>
-            {
-                <span class="ident">shndx_section</span> <span class="op">=</span> <span class="ident">SectionIndex</span>(<span class="ident">i</span>);
-                <span class="ident">shndx</span> <span class="op">=</span> <span class="ident">s</span>
-                    .<span class="ident">data_as_array</span>(<span class="ident">endian</span>, <span class="ident">data</span>)
-                    .<span class="ident">read_error</span>(<span class="string">&quot;Invalid ELF symtab_shndx data&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>shndx_section = SectionIndex(<span class="number">0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>shndx = <span class="kw-2">&amp;</span>[][..];
+        <span class="kw">for </span>(i, s) <span class="kw">in </span>sections.iter().enumerate() {
+            <span class="kw">if </span>s.sh_type(endian) == elf::SHT_SYMTAB_SHNDX
+                &amp;&amp; s.sh_link(endian) <span class="kw">as </span>usize == section_index.<span class="number">0
+            </span>{
+                shndx_section = SectionIndex(i);
+                shndx = s
+                    .data_as_array(endian, data)
+                    .read_error(<span class="string">&quot;Invalid ELF symtab_shndx data&quot;</span>)<span class="question-mark">?</span>;
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">SymbolTable</span> {
-            <span class="ident">section</span>: <span class="ident">section_index</span>,
-            <span class="ident">string_section</span>: <span class="ident">link</span>,
-            <span class="ident">symbols</span>,
-            <span class="ident">strings</span>,
-            <span class="ident">shndx</span>,
-            <span class="ident">shndx_section</span>,
+        <span class="prelude-val">Ok</span>(SymbolTable {
+            section: section_index,
+            string_section: link,
+            symbols,
+            strings,
+            shndx,
+            shndx_section,
         })
     }
 
-    <span class="doccomment">/// Return the section index of this symbol table.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">section</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SectionIndex</span> {
-        <span class="self">self</span>.<span class="ident">section</span>
+    <span class="doccomment">/// Return the section index of this symbol table.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>section(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SectionIndex {
+        <span class="self">self</span>.section
     }
 
-    <span class="doccomment">/// Return the section index of the shndx table.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shndx_section</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SectionIndex</span> {
-        <span class="self">self</span>.<span class="ident">shndx_section</span>
+    <span class="doccomment">/// Return the section index of the shndx table.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>shndx_section(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SectionIndex {
+        <span class="self">self</span>.shndx_section
     }
 
-    <span class="doccomment">/// Return the section index of the linked string table.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string_section</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SectionIndex</span> {
-        <span class="self">self</span>.<span class="ident">string_section</span>
+    <span class="doccomment">/// Return the section index of the linked string table.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>string_section(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SectionIndex {
+        <span class="self">self</span>.string_section
     }
 
-    <span class="doccomment">/// Return the string table used for the symbol names.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">strings</span>
+    <span class="doccomment">/// Return the string table used for the symbol names.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>strings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StringTable&lt;<span class="lifetime">&#39;data</span>, R&gt; {
+        <span class="self">self</span>.strings
     }
 
-    <span class="doccomment">/// Return the symbol table.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symbols</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">Elf::Sym</span>] {
-        <span class="self">self</span>.<span class="ident">symbols</span>
+    <span class="doccomment">/// Return the symbol table.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>symbols(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[Elf::Sym] {
+        <span class="self">self</span>.symbols
     }
 
-    <span class="doccomment">/// Iterate over the symbols.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf::Sym</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">iter</span>()
+    <span class="doccomment">/// Iterate over the symbols.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; slice::Iter&lt;<span class="lifetime">&#39;data</span>, Elf::Sym&gt; {
+        <span class="self">self</span>.symbols.iter()
     }
 
-    <span class="doccomment">/// Return true if the symbol table is empty.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// Return true if the symbol table is empty.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.symbols.is_empty()
     }
 
-    <span class="doccomment">/// The number of symbols.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// The number of symbols.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.symbols.len()
     }
 
-    <span class="doccomment">/// Return the symbol at the given index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symbol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Elf::Sym</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">symbols</span>
-            .<span class="ident">get</span>(<span class="ident">index</span>)
-            .<span class="ident">read_error</span>(<span class="string">&quot;Invalid ELF symbol index&quot;</span>)
+    <span class="doccomment">/// Return the symbol at the given index.
+    </span><span class="kw">pub fn </span>symbol(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; read::Result&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Elf::Sym&gt; {
+        <span class="self">self</span>.symbols
+            .get(index)
+            .read_error(<span class="string">&quot;Invalid ELF symbol index&quot;</span>)
     }
 
-    <span class="doccomment">/// Return the extended section index for the given symbol if present.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">shndx</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">copied</span>()
+    <span class="doccomment">/// Return the extended section index for the given symbol if present.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>shndx(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.shndx.get(index).copied()
     }
 
-    <span class="doccomment">/// Return the section index for the given symbol.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This uses the extended section index if present.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symbol_section</span>(
+    <span class="doccomment">/// Return the section index for the given symbol.
+    ///
+    /// This uses the extended section index if present.
+    </span><span class="kw">pub fn </span>symbol_section(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
-        <span class="ident">symbol</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Elf::Sym</span>,
-        <span class="ident">index</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SectionIndex</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="ident">endian</span>) {
-            <span class="ident">elf::SHN_UNDEF</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            <span class="ident">elf::SHN_XINDEX</span> =&gt; <span class="self">self</span>
-                .<span class="ident">shndx</span>(<span class="ident">index</span>)
-                .<span class="ident">read_error</span>(<span class="string">&quot;Missing ELF symbol extended index&quot;</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">SectionIndex</span>(<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span>))),
-            <span class="ident">shndx</span> <span class="kw">if</span> <span class="ident">shndx</span> <span class="op">&lt;</span> <span class="ident">elf::SHN_LORESERVE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">SectionIndex</span>(<span class="ident">shndx</span>.<span class="ident">into</span>()))),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        endian: Elf::Endian,
+        symbol: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Elf::Sym,
+        index: usize,
+    ) -&gt; read::Result&lt;<span class="prelude-ty">Option</span>&lt;SectionIndex&gt;&gt; {
+        <span class="kw">match </span>symbol.st_shndx(endian) {
+            elf::SHN_UNDEF =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            elf::SHN_XINDEX =&gt; <span class="self">self
+                </span>.shndx(index)
+                .read_error(<span class="string">&quot;Missing ELF symbol extended index&quot;</span>)
+                .map(|index| <span class="prelude-val">Some</span>(SectionIndex(index <span class="kw">as </span>usize))),
+            shndx <span class="kw">if </span>shndx &lt; elf::SHN_LORESERVE =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(SectionIndex(shndx.into()))),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 
-    <span class="doccomment">/// Return the symbol name for the given symbol.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symbol_name</span>(
+    <span class="doccomment">/// Return the symbol name for the given symbol.
+    </span><span class="kw">pub fn </span>symbol_name(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
-        <span class="ident">symbol</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Elf::Sym</span>,
-    ) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="ident">symbol</span>.<span class="ident">name</span>(<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">strings</span>)
+        endian: Elf::Endian,
+        symbol: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Elf::Sym,
+    ) -&gt; read::Result&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
+        symbol.name(endian, <span class="self">self</span>.strings)
     }
 
-    <span class="doccomment">/// Construct a map from addresses to a user-defined map entry.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">Entry</span>: <span class="ident">SymbolMapEntry</span>, <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Elf::Sym</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Construct a map from addresses to a user-defined map entry.
+    </span><span class="kw">pub fn </span>map&lt;Entry: SymbolMapEntry, F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Elf::Sym) -&gt; <span class="prelude-ty">Option</span>&lt;Entry&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="ident">SymbolMap</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">symbols</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">len</span>());
-        <span class="kw">for</span> <span class="ident">symbol</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">symbols</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">symbol</span>.<span class="ident">is_definition</span>(<span class="ident">endian</span>) {
+        endian: Elf::Endian,
+        f: F,
+    ) -&gt; SymbolMap&lt;Entry&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>symbols = Vec::with_capacity(<span class="self">self</span>.symbols.len());
+        <span class="kw">for </span>symbol <span class="kw">in </span><span class="self">self</span>.symbols {
+            <span class="kw">if </span>!symbol.is_definition(endian) {
                 <span class="kw">continue</span>;
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">entry</span>) <span class="op">=</span> <span class="ident">f</span>(<span class="ident">symbol</span>) {
-                <span class="ident">symbols</span>.<span class="ident">push</span>(<span class="ident">entry</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(entry) = f(symbol) {
+                symbols.push(entry);
             }
         }
-        <span class="ident">SymbolMap::new</span>(<span class="ident">symbols</span>)
+        SymbolMap::new(symbols)
     }
 }
 
-<span class="doccomment">/// A symbol table of an `ElfFile32`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ElfSymbolTable32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">ElfSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">elf::FileHeader32</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
-<span class="doccomment">/// A symbol table of an `ElfFile32`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ElfSymbolTable64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">ElfSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">elf::FileHeader64</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A symbol table of an `ElfFile32`.
+</span><span class="kw">pub type </span>ElfSymbolTable32&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    ElfSymbolTable&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, elf::FileHeader32&lt;Endian&gt;, R&gt;;
+<span class="doccomment">/// A symbol table of an `ElfFile32`.
+</span><span class="kw">pub type </span>ElfSymbolTable64&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    ElfSymbolTable&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, elf::FileHeader64&lt;Endian&gt;, R&gt;;
 
-<span class="doccomment">/// A symbol table of an `ElfFile`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ElfSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;data</span>: <span class="lifetime">&#39;file</span>,
-    <span class="ident">Elf</span>: <span class="ident">FileHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A symbol table of an `ElfFile`.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub struct </span>ElfSymbolTable&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt;
+<span class="kw">where
+    </span><span class="lifetime">&#39;data</span>: <span class="lifetime">&#39;file</span>,
+    Elf: FileHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">symbols</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) endian: Elf::Endian,
+    <span class="kw">pub</span>(<span class="kw">super</span>) symbols: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>SymbolTable&lt;<span class="lifetime">&#39;data</span>, Elf, R&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">read::private::Sealed</span>
-    <span class="kw">for</span> <span class="ident">ElfSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf: FileHeader, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; read::private::Sealed
+    <span class="kw">for </span>ElfSymbolTable&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R&gt;
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">ObjectSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>
-    <span class="kw">for</span> <span class="ident">ElfSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf: FileHeader, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; ObjectSymbolTable&lt;<span class="lifetime">&#39;data</span>&gt;
+    <span class="kw">for </span>ElfSymbolTable&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R&gt;
 {
-    <span class="kw">type</span> <span class="ident">Symbol</span> <span class="op">=</span> <span class="ident">ElfSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SymbolIterator</span> <span class="op">=</span> <span class="ident">ElfSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Symbol = ElfSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R&gt;;
+    <span class="kw">type </span>SymbolIterator = ElfSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R&gt;;
 
-    <span class="kw">fn</span> <span class="ident">symbols</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::SymbolIterator</span> {
-        <span class="ident">ElfSymbolIterator</span> {
-            <span class="ident">endian</span>: <span class="self">self</span>.<span class="ident">endian</span>,
-            <span class="ident">symbols</span>: <span class="self">self</span>.<span class="ident">symbols</span>,
-            <span class="ident">index</span>: <span class="number">0</span>,
+    <span class="kw">fn </span>symbols(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::SymbolIterator {
+        ElfSymbolIterator {
+            endian: <span class="self">self</span>.endian,
+            symbols: <span class="self">self</span>.symbols,
+            index: <span class="number">0</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">symbol_by_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">SymbolIndex</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Symbol</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">symbol</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">symbol</span>(<span class="ident">index</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">ElfSymbol</span> {
-            <span class="ident">endian</span>: <span class="self">self</span>.<span class="ident">endian</span>,
-            <span class="ident">symbols</span>: <span class="self">self</span>.<span class="ident">symbols</span>,
-            <span class="ident">index</span>,
-            <span class="ident">symbol</span>,
+    <span class="kw">fn </span>symbol_by_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: SymbolIndex) -&gt; read::Result&lt;<span class="self">Self</span>::Symbol&gt; {
+        <span class="kw">let </span>symbol = <span class="self">self</span>.symbols.symbol(index.<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(ElfSymbol {
+            endian: <span class="self">self</span>.endian,
+            symbols: <span class="self">self</span>.symbols,
+            index,
+            symbol,
         })
     }
 }
 
-<span class="doccomment">/// An iterator over the symbols of an `ElfFile32`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ElfSymbolIterator32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">ElfSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">elf::FileHeader32</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
-<span class="doccomment">/// An iterator over the symbols of an `ElfFile64`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ElfSymbolIterator64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">ElfSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">elf::FileHeader64</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An iterator over the symbols of an `ElfFile32`.
+</span><span class="kw">pub type </span>ElfSymbolIterator32&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    ElfSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, elf::FileHeader32&lt;Endian&gt;, R&gt;;
+<span class="doccomment">/// An iterator over the symbols of an `ElfFile64`.
+</span><span class="kw">pub type </span>ElfSymbolIterator64&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    ElfSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, elf::FileHeader64&lt;Endian&gt;, R&gt;;
 
-<span class="doccomment">/// An iterator over the symbols of an `ElfFile`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ElfSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;data</span>: <span class="lifetime">&#39;file</span>,
-    <span class="ident">Elf</span>: <span class="ident">FileHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An iterator over the symbols of an `ElfFile`.
+</span><span class="kw">pub struct </span>ElfSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt;
+<span class="kw">where
+    </span><span class="lifetime">&#39;data</span>: <span class="lifetime">&#39;file</span>,
+    Elf: FileHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">symbols</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">index</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) endian: Elf::Endian,
+    <span class="kw">pub</span>(<span class="kw">super</span>) symbols: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>SymbolTable&lt;<span class="lifetime">&#39;data</span>, Elf, R&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) index: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span>
-    <span class="kw">for</span> <span class="ident">ElfSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf: FileHeader, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; fmt::Debug
+    <span class="kw">for </span>ElfSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R&gt;
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ElfSymbolIterator&quot;</span>).<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;ElfSymbolIterator&quot;</span>).finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Iterator</span>
-    <span class="kw">for</span> <span class="ident">ElfSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf: FileHeader, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; Iterator
+    <span class="kw">for </span>ElfSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R&gt;
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">ElfSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = ElfSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>;
-        <span class="kw">let</span> <span class="ident">symbol</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">symbols</span>.<span class="ident">get</span>(<span class="ident">index</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">ElfSymbol</span> {
-            <span class="ident">endian</span>: <span class="self">self</span>.<span class="ident">endian</span>,
-            <span class="ident">symbols</span>: <span class="self">self</span>.<span class="ident">symbols</span>,
-            <span class="ident">index</span>: <span class="ident">SymbolIndex</span>(<span class="ident">index</span>),
-            <span class="ident">symbol</span>,
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>index = <span class="self">self</span>.index;
+        <span class="kw">let </span>symbol = <span class="self">self</span>.symbols.symbols.get(index)<span class="question-mark">?</span>;
+        <span class="self">self</span>.index += <span class="number">1</span>;
+        <span class="prelude-val">Some</span>(ElfSymbol {
+            endian: <span class="self">self</span>.endian,
+            symbols: <span class="self">self</span>.symbols,
+            index: SymbolIndex(index),
+            symbol,
         })
     }
 }
 
-<span class="doccomment">/// A symbol of an `ElfFile32`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ElfSymbol32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">ElfSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">elf::FileHeader32</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
-<span class="doccomment">/// A symbol of an `ElfFile64`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ElfSymbol64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">ElfSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">elf::FileHeader64</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A symbol of an `ElfFile32`.
+</span><span class="kw">pub type </span>ElfSymbol32&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    ElfSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, elf::FileHeader32&lt;Endian&gt;, R&gt;;
+<span class="doccomment">/// A symbol of an `ElfFile64`.
+</span><span class="kw">pub type </span>ElfSymbol64&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    ElfSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, elf::FileHeader64&lt;Endian&gt;, R&gt;;
 
-<span class="doccomment">/// A symbol of an `ElfFile`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ElfSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;data</span>: <span class="lifetime">&#39;file</span>,
-    <span class="ident">Elf</span>: <span class="ident">FileHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A symbol of an `ElfFile`.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub struct </span>ElfSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt;
+<span class="kw">where
+    </span><span class="lifetime">&#39;data</span>: <span class="lifetime">&#39;file</span>,
+    Elf: FileHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">symbols</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">index</span>: <span class="ident">SymbolIndex</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">symbol</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Elf::Sym</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) endian: Elf::Endian,
+    <span class="kw">pub</span>(<span class="kw">super</span>) symbols: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>SymbolTable&lt;<span class="lifetime">&#39;data</span>, Elf, R&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) index: SymbolIndex,
+    <span class="kw">pub</span>(<span class="kw">super</span>) symbol: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Elf::Sym,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">read::private::Sealed</span>
-    <span class="kw">for</span> <span class="ident">ElfSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf: FileHeader, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; read::private::Sealed
+    <span class="kw">for </span>ElfSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R&gt;
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">ObjectSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>
-    <span class="kw">for</span> <span class="ident">ElfSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf: FileHeader, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; ObjectSymbol&lt;<span class="lifetime">&#39;data</span>&gt;
+    <span class="kw">for </span>ElfSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Elf, R&gt;
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolIndex</span> {
-        <span class="self">self</span>.<span class="ident">index</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SymbolIndex {
+        <span class="self">self</span>.index
     }
 
-    <span class="kw">fn</span> <span class="ident">name_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">name</span>(<span class="self">self</span>.<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">strings</span>())
+    <span class="kw">fn </span>name_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; read::Result&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
+        <span class="self">self</span>.symbol.name(<span class="self">self</span>.endian, <span class="self">self</span>.symbols.strings())
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name_bytes</span>()<span class="question-mark">?</span>;
-        <span class="ident">str::from_utf8</span>(<span class="ident">name</span>)
-            .<span class="ident">ok</span>()
-            .<span class="ident">read_error</span>(<span class="string">&quot;Non UTF-8 ELF symbol name&quot;</span>)
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; read::Result&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>str&gt; {
+        <span class="kw">let </span>name = <span class="self">self</span>.name_bytes()<span class="question-mark">?</span>;
+        str::from_utf8(name)
+            .ok()
+            .read_error(<span class="string">&quot;Non UTF-8 ELF symbol name&quot;</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_value</span>(<span class="self">self</span>.<span class="ident">endian</span>).<span class="ident">into</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.symbol.st_value(<span class="self">self</span>.endian).into()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_size</span>(<span class="self">self</span>.<span class="ident">endian</span>).<span class="ident">into</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.symbol.st_size(<span class="self">self</span>.endian).into()
     }
 
-    <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolKind</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_type</span>() {
-            <span class="ident">elf::STT_NOTYPE</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">SymbolKind::Null</span>,
-            <span class="ident">elf::STT_OBJECT</span> <span class="op">|</span> <span class="ident">elf::STT_COMMON</span> =&gt; <span class="ident">SymbolKind::Data</span>,
-            <span class="ident">elf::STT_FUNC</span> =&gt; <span class="ident">SymbolKind::Text</span>,
-            <span class="ident">elf::STT_SECTION</span> =&gt; <span class="ident">SymbolKind::Section</span>,
-            <span class="ident">elf::STT_FILE</span> =&gt; <span class="ident">SymbolKind::File</span>,
-            <span class="ident">elf::STT_TLS</span> =&gt; <span class="ident">SymbolKind::Tls</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">SymbolKind::Unknown</span>,
+    <span class="kw">fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SymbolKind {
+        <span class="kw">match </span><span class="self">self</span>.symbol.st_type() {
+            elf::STT_NOTYPE <span class="kw">if </span><span class="self">self</span>.index.<span class="number">0 </span>== <span class="number">0 </span>=&gt; SymbolKind::Null,
+            elf::STT_OBJECT | elf::STT_COMMON =&gt; SymbolKind::Data,
+            elf::STT_FUNC =&gt; SymbolKind::Text,
+            elf::STT_SECTION =&gt; SymbolKind::Section,
+            elf::STT_FILE =&gt; SymbolKind::File,
+            elf::STT_TLS =&gt; SymbolKind::Tls,
+            <span class="kw">_ </span>=&gt; SymbolKind::Unknown,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">section</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolSection</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="self">self</span>.<span class="ident">endian</span>) {
-            <span class="ident">elf::SHN_UNDEF</span> =&gt; <span class="ident">SymbolSection::Undefined</span>,
-            <span class="ident">elf::SHN_ABS</span> =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_type</span>() <span class="op">==</span> <span class="ident">elf::STT_FILE</span> {
-                    <span class="ident">SymbolSection::None</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">SymbolSection::Absolute</span>
+    <span class="kw">fn </span>section(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SymbolSection {
+        <span class="kw">match </span><span class="self">self</span>.symbol.st_shndx(<span class="self">self</span>.endian) {
+            elf::SHN_UNDEF =&gt; SymbolSection::Undefined,
+            elf::SHN_ABS =&gt; {
+                <span class="kw">if </span><span class="self">self</span>.symbol.st_type() == elf::STT_FILE {
+                    SymbolSection::None
+                } <span class="kw">else </span>{
+                    SymbolSection::Absolute
                 }
             }
-            <span class="ident">elf::SHN_COMMON</span> =&gt; <span class="ident">SymbolSection::Common</span>,
-            <span class="ident">elf::SHN_XINDEX</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">shndx</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="number">0</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="ident">SymbolSection::Section</span>(<span class="ident">SectionIndex</span>(<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span>)),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">SymbolSection::Unknown</span>,
+            elf::SHN_COMMON =&gt; SymbolSection::Common,
+            elf::SHN_XINDEX =&gt; <span class="kw">match </span><span class="self">self</span>.symbols.shndx(<span class="self">self</span>.index.<span class="number">0</span>) {
+                <span class="prelude-val">Some</span>(index) =&gt; SymbolSection::Section(SectionIndex(index <span class="kw">as </span>usize)),
+                <span class="prelude-val">None </span>=&gt; SymbolSection::Unknown,
             },
-            <span class="ident">index</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">elf::SHN_LORESERVE</span> =&gt; {
-                <span class="ident">SymbolSection::Section</span>(<span class="ident">SectionIndex</span>(<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span>))
+            index <span class="kw">if </span>index &lt; elf::SHN_LORESERVE =&gt; {
+                SymbolSection::Section(SectionIndex(index <span class="kw">as </span>usize))
             }
-            <span class="kw">_</span> =&gt; <span class="ident">SymbolSection::Unknown</span>,
+            <span class="kw">_ </span>=&gt; SymbolSection::Unknown,
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_undefined</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHN_UNDEF</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_undefined(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.symbol.st_shndx(<span class="self">self</span>.endian) == elf::SHN_UNDEF
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_definition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">is_definition</span>(<span class="self">self</span>.<span class="ident">endian</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_definition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.symbol.is_definition(<span class="self">self</span>.endian)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_common</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHN_COMMON</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_common(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.symbol.st_shndx(<span class="self">self</span>.endian) == elf::SHN_COMMON
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_weak</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_bind</span>() <span class="op">==</span> <span class="ident">elf::STB_WEAK</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_weak(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.symbol.st_bind() == elf::STB_WEAK
     }
 
-    <span class="kw">fn</span> <span class="ident">scope</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolScope</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHN_UNDEF</span> {
-            <span class="ident">SymbolScope::Unknown</span>
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_bind</span>() {
-                <span class="ident">elf::STB_LOCAL</span> =&gt; <span class="ident">SymbolScope::Compilation</span>,
-                <span class="ident">elf::STB_GLOBAL</span> <span class="op">|</span> <span class="ident">elf::STB_WEAK</span> =&gt; {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_visibility</span>() <span class="op">==</span> <span class="ident">elf::STV_HIDDEN</span> {
-                        <span class="ident">SymbolScope::Linkage</span>
-                    } <span class="kw">else</span> {
-                        <span class="ident">SymbolScope::Dynamic</span>
+    <span class="kw">fn </span>scope(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SymbolScope {
+        <span class="kw">if </span><span class="self">self</span>.symbol.st_shndx(<span class="self">self</span>.endian) == elf::SHN_UNDEF {
+            SymbolScope::Unknown
+        } <span class="kw">else </span>{
+            <span class="kw">match </span><span class="self">self</span>.symbol.st_bind() {
+                elf::STB_LOCAL =&gt; SymbolScope::Compilation,
+                elf::STB_GLOBAL | elf::STB_WEAK =&gt; {
+                    <span class="kw">if </span><span class="self">self</span>.symbol.st_visibility() == elf::STV_HIDDEN {
+                        SymbolScope::Linkage
+                    } <span class="kw">else </span>{
+                        SymbolScope::Dynamic
                     }
                 }
-                <span class="kw">_</span> =&gt; <span class="ident">SymbolScope::Unknown</span>,
+                <span class="kw">_ </span>=&gt; SymbolScope::Unknown,
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_global</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_bind</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">elf::STB_LOCAL</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_global(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.symbol.st_bind() != elf::STB_LOCAL
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_bind</span>() <span class="op">==</span> <span class="ident">elf::STB_LOCAL</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_local(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.symbol.st_bind() == elf::STB_LOCAL
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolFlags</span><span class="op">&lt;</span><span class="ident">SectionIndex</span><span class="op">&gt;</span> {
-        <span class="ident">SymbolFlags::Elf</span> {
-            <span class="ident">st_info</span>: <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_info</span>(),
-            <span class="ident">st_other</span>: <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_other</span>(),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SymbolFlags&lt;SectionIndex&gt; {
+        SymbolFlags::Elf {
+            st_info: <span class="self">self</span>.symbol.st_info(),
+            st_other: <span class="self">self</span>.symbol.st_other(),
         }
     }
 }
 
-<span class="doccomment">/// A trait for generic access to `Sym32` and `Sym64`.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sym</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Pod</span> {
-    <span class="kw">type</span> <span class="ident">Word</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Endian</span>: <span class="ident">endian::Endian</span>;
+<span class="doccomment">/// A trait for generic access to `Sym32` and `Sym64`.
+</span><span class="attribute">#[allow(missing_docs)]
+</span><span class="kw">pub trait </span>Sym: Debug + Pod {
+    <span class="kw">type </span>Word: Into&lt;u64&gt;;
+    <span class="kw">type </span>Endian: endian::Endian;
 
-    <span class="kw">fn</span> <span class="ident">st_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span>;
-    <span class="kw">fn</span> <span class="ident">st_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">st_bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">st_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">st_other</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">st_visibility</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">st_shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u16</span>;
-    <span class="kw">fn</span> <span class="ident">st_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span>;
-    <span class="kw">fn</span> <span class="ident">st_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span>;
+    <span class="kw">fn </span>st_name(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32;
+    <span class="kw">fn </span>st_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
+    <span class="kw">fn </span>st_bind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
+    <span class="kw">fn </span>st_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
+    <span class="kw">fn </span>st_other(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
+    <span class="kw">fn </span>st_visibility(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
+    <span class="kw">fn </span>st_shndx(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u16;
+    <span class="kw">fn </span>st_value(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; <span class="self">Self</span>::Word;
+    <span class="kw">fn </span>st_size(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; <span class="self">Self</span>::Word;
 
-    <span class="doccomment">/// Parse the symbol name from the string table.</span>
-    <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Parse the symbol name from the string table.
+    </span><span class="kw">fn </span>name&lt;<span class="lifetime">&#39;data</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>,
-        <span class="ident">strings</span>: <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="ident">strings</span>
-            .<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">st_name</span>(<span class="ident">endian</span>))
-            .<span class="ident">read_error</span>(<span class="string">&quot;Invalid ELF symbol name offset&quot;</span>)
+        endian: <span class="self">Self</span>::Endian,
+        strings: StringTable&lt;<span class="lifetime">&#39;data</span>, R&gt;,
+    ) -&gt; read::Result&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
+        strings
+            .get(<span class="self">self</span>.st_name(endian))
+            .read_error(<span class="string">&quot;Invalid ELF symbol name offset&quot;</span>)
     }
 
-    <span class="doccomment">/// Return true if the symbol is undefined.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_undefined</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">st_shndx</span>(<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHN_UNDEF</span>
+    <span class="doccomment">/// Return true if the symbol is undefined.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_undefined(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; bool {
+        <span class="self">self</span>.st_shndx(endian) == elf::SHN_UNDEF
     }
 
-    <span class="doccomment">/// Return true if the symbol is a definition of a function or data object.</span>
-    <span class="kw">fn</span> <span class="ident">is_definition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">st_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">st_type</span>();
-        (<span class="ident">st_type</span> <span class="op">==</span> <span class="ident">elf::STT_NOTYPE</span> <span class="op">|</span><span class="op">|</span> <span class="ident">st_type</span> <span class="op">==</span> <span class="ident">elf::STT_FUNC</span> <span class="op">|</span><span class="op">|</span> <span class="ident">st_type</span> <span class="op">==</span> <span class="ident">elf::STT_OBJECT</span>)
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">st_shndx</span>(<span class="ident">endian</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">elf::SHN_UNDEF</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Endian</span>: <span class="ident">endian::Endian</span><span class="op">&gt;</span> <span class="ident">Sym</span> <span class="kw">for</span> <span class="ident">elf::Sym32</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Word</span> <span class="op">=</span> <span class="ident">u32</span>;
-    <span class="kw">type</span> <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endian</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">st_name</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">st_info</span>
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">st_bind</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">st_type</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_other</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">st_other</span>
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_visibility</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">st_visibility</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">st_shndx</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
-        <span class="self">self</span>.<span class="ident">st_value</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
-        <span class="self">self</span>.<span class="ident">st_size</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="doccomment">/// Return true if the symbol is a definition of a function or data object.
+    </span><span class="kw">fn </span>is_definition(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; bool {
+        <span class="kw">let </span>st_type = <span class="self">self</span>.st_type();
+        (st_type == elf::STT_NOTYPE || st_type == elf::STT_FUNC || st_type == elf::STT_OBJECT)
+            &amp;&amp; <span class="self">self</span>.st_shndx(endian) != elf::SHN_UNDEF
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Endian</span>: <span class="ident">endian::Endian</span><span class="op">&gt;</span> <span class="ident">Sym</span> <span class="kw">for</span> <span class="ident">elf::Sym64</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Word</span> <span class="op">=</span> <span class="ident">u64</span>;
-    <span class="kw">type</span> <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endian</span>;
+<span class="kw">impl</span>&lt;Endian: endian::Endian&gt; Sym <span class="kw">for </span>elf::Sym32&lt;Endian&gt; {
+    <span class="kw">type </span>Word = u32;
+    <span class="kw">type </span>Endian = Endian;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">st_name</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_name(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32 {
+        <span class="self">self</span>.st_name.get(endian)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">st_info</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.st_info
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">st_bind</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_bind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.st_bind()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">st_type</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.st_type()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_other</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">st_other</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_other(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.st_other
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_visibility</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">st_visibility</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_visibility(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.st_visibility()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">st_shndx</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_shndx(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u16 {
+        <span class="self">self</span>.st_shndx.get(endian)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
-        <span class="self">self</span>.<span class="ident">st_value</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_value(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; <span class="self">Self</span>::Word {
+        <span class="self">self</span>.st_value.get(endian)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
-        <span class="self">self</span>.<span class="ident">st_size</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_size(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; <span class="self">Self</span>::Word {
+        <span class="self">self</span>.st_size.get(endian)
+    }
+}
+
+<span class="kw">impl</span>&lt;Endian: endian::Endian&gt; Sym <span class="kw">for </span>elf::Sym64&lt;Endian&gt; {
+    <span class="kw">type </span>Word = u64;
+    <span class="kw">type </span>Endian = Endian;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_name(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32 {
+        <span class="self">self</span>.st_name.get(endian)
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.st_info
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_bind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.st_bind()
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.st_type()
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_other(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.st_other
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_visibility(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.st_visibility()
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_shndx(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u16 {
+        <span class="self">self</span>.st_shndx.get(endian)
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_value(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; <span class="self">Self</span>::Word {
+        <span class="self">self</span>.st_value.get(endian)
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>st_size(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; <span class="self">Self</span>::Word {
+        <span class="self">self</span>.st_size.get(endian)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="object" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="object" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

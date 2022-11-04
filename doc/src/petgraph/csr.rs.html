@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/csr.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>csr.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/csr.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>csr.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -938,198 +938,198 @@
 <span id="938">938</span>
 <span id="939">939</span>
 <span id="940">940</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Compressed Sparse Row (CSR) is a sparse adjacency matrix graph.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Compressed Sparse Row (CSR) is a sparse adjacency matrix graph.
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::cmp::max</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Range</span>, <span class="ident">Index</span>, <span class="ident">IndexMut</span>};
-<span class="kw">use</span> <span class="ident">std::iter</span>::{<span class="ident">Enumerate</span>, <span class="ident">Zip</span>};
-<span class="kw">use</span> <span class="ident">std::slice::Windows</span>;
+</span><span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::cmp::max;
+<span class="kw">use </span>std::ops::{Range, Index, IndexMut};
+<span class="kw">use </span>std::iter::{Enumerate, Zip};
+<span class="kw">use </span>std::slice::Windows;
 
-<span class="kw">use</span> <span class="ident">visit</span>::{<span class="ident">EdgeRef</span>, <span class="ident">GraphBase</span>, <span class="ident">IntoNeighbors</span>, <span class="ident">NodeIndexable</span>, <span class="ident">IntoEdges</span>};
-<span class="kw">use</span> <span class="ident">visit</span>::{<span class="ident">NodeCompactIndexable</span>, <span class="ident">IntoNodeIdentifiers</span>, <span class="ident">Visitable</span>};
-<span class="kw">use</span> <span class="ident">visit</span>::{<span class="ident">Data</span>, <span class="ident">IntoEdgeReferences</span>, <span class="ident">NodeCount</span>, <span class="ident">GraphProp</span>};
+<span class="kw">use </span>visit::{EdgeRef, GraphBase, IntoNeighbors, NodeIndexable, IntoEdges};
+<span class="kw">use </span>visit::{NodeCompactIndexable, IntoNodeIdentifiers, Visitable};
+<span class="kw">use </span>visit::{Data, IntoEdgeReferences, NodeCount, GraphProp};
 
-<span class="kw">use</span> <span class="ident">util::zip</span>;
+<span class="kw">use </span>util::zip;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">graph</span>::{<span class="ident">IndexType</span>, <span class="ident">DefaultIx</span>};
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>graph::{IndexType, DefaultIx};
 
-<span class="kw">use</span> {
-    <span class="ident">EdgeType</span>,
-    <span class="ident">Directed</span>,
-    <span class="ident">IntoWeightedEdge</span>,
+<span class="kw">use </span>{
+    EdgeType,
+    Directed,
+    IntoWeightedEdge,
 };
 
-<span class="doccomment">/// Csr node index type, a plain integer.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span> <span class="op">=</span> <span class="ident">DefaultIx</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Ix</span>;
-<span class="doccomment">/// Csr edge index type, a plain integer.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">EdgeIndex</span> <span class="op">=</span> <span class="ident">usize</span>;
+<span class="doccomment">/// Csr node index type, a plain integer.
+</span><span class="kw">pub type </span>NodeIndex&lt;Ix = DefaultIx&gt; = Ix;
+<span class="doccomment">/// Csr edge index type, a plain integer.
+</span><span class="kw">pub type </span>EdgeIndex = usize;
 
-<span class="kw">const</span> <span class="ident">BINARY_SEARCH_CUTOFF</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="kw">const </span>BINARY_SEARCH_CUTOFF: usize = <span class="number">32</span>;
 
-<span class="doccomment">/// Compressed Sparse Row ([`CSR`]) is a sparse adjacency matrix graph.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `CSR` is parameterized over:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Associated data `N` for nodes and `E` for edges, called *weights*.</span>
-<span class="doccomment">///   The associated data can be of arbitrary type.</span>
-<span class="doccomment">/// - Edge type `Ty` that determines whether the graph edges are directed or undirected.</span>
-<span class="doccomment">/// - Index type `Ix`, which determines the maximum size of the graph.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using **O(|E| + |V|)** space.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Self loops are allowed, no parallel edges.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Fast iteration of the outgoing edges of a vertex.</span>
-<span class="doccomment">/// [`CSR`]: https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span> <span class="op">=</span> (), <span class="ident">E</span> <span class="op">=</span> (), <span class="ident">Ty</span> <span class="op">=</span> <span class="ident">Directed</span>, <span class="ident">Ix</span> <span class="op">=</span> <span class="ident">DefaultIx</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Column of next edge</span>
-    <span class="ident">column</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// weight of each edge; lock step with column</span>
-    <span class="ident">edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Index of start of row Always node_count + 1 long.</span>
-    <span class="doccomment">/// Last element is always equal to column.len()</span>
-    <span class="ident">row</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">node_weights</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
-    <span class="ident">edge_count</span>: <span class="ident">usize</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Compressed Sparse Row ([`CSR`]) is a sparse adjacency matrix graph.
+///
+/// `CSR` is parameterized over:
+///
+/// - Associated data `N` for nodes and `E` for edges, called *weights*.
+///   The associated data can be of arbitrary type.
+/// - Edge type `Ty` that determines whether the graph edges are directed or undirected.
+/// - Index type `Ix`, which determines the maximum size of the graph.
+///
+///
+/// Using **O(|E| + |V|)** space.
+///
+/// Self loops are allowed, no parallel edges.
+///
+/// Fast iteration of the outgoing edges of a vertex.
+/// [`CSR`]: https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Csr&lt;N = (), E = (), Ty = Directed, Ix = DefaultIx&gt; {
+    <span class="doccomment">/// Column of next edge
+    </span>column: Vec&lt;NodeIndex&lt;Ix&gt;&gt;,
+    <span class="doccomment">/// weight of each edge; lock step with column
+    </span>edges: Vec&lt;E&gt;,
+    <span class="doccomment">/// Index of start of row Always node_count + 1 long.
+    /// Last element is always equal to column.len()
+    </span>row: Vec&lt;usize&gt;,
+    node_weights: Vec&lt;N&gt;,
+    edge_count: usize,
+    ty: PhantomData&lt;Ty&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Default <span class="kw">for </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">Clone</span>, <span class="ident">E</span>: <span class="ident">Clone</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Csr</span> {
-            <span class="ident">column</span>: <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">clone</span>(),
-            <span class="ident">edges</span>: <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">clone</span>(),
-            <span class="ident">row</span>: <span class="self">self</span>.<span class="ident">row</span>.<span class="ident">clone</span>(),
-            <span class="ident">node_weights</span>: <span class="self">self</span>.<span class="ident">node_weights</span>.<span class="ident">clone</span>(),
-            <span class="ident">edge_count</span>: <span class="self">self</span>.<span class="ident">edge_count</span>,
-            <span class="ident">ty</span>: <span class="self">self</span>.<span class="ident">ty</span>,
+<span class="kw">impl</span>&lt;N: Clone, E: Clone, Ty, Ix: Clone&gt; Clone <span class="kw">for </span>Csr&lt;N, E, Ty, Ix&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        Csr {
+            column: <span class="self">self</span>.column.clone(),
+            edges: <span class="self">self</span>.edges.clone(),
+            row: <span class="self">self</span>.row.clone(),
+            node_weights: <span class="self">self</span>.node_weights.clone(),
+            edge_count: <span class="self">self</span>.edge_count,
+            ty: <span class="self">self</span>.ty,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="doccomment">/// Create an empty `Csr`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Csr</span> {
-            <span class="ident">column</span>: <span class="macro">vec!</span>[],
-            <span class="ident">edges</span>: <span class="macro">vec!</span>[],
-            <span class="ident">row</span>: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">1</span>],
-            <span class="ident">node_weights</span>: <span class="macro">vec!</span>[],
-            <span class="ident">edge_count</span>: <span class="number">0</span>,
-            <span class="ident">ty</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Create an empty `Csr`.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        Csr {
+            column: <span class="macro">vec!</span>[],
+            edges: <span class="macro">vec!</span>[],
+            row: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">1</span>],
+            node_weights: <span class="macro">vec!</span>[],
+            edge_count: <span class="number">0</span>,
+            ty: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Create a new [`Csr`] with `n` nodes. `N` must implement [`Default`] for the weight of each node.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Default`]: https://doc.rust-lang.org/nightly/core/default/trait.Default.html</span>
-    <span class="doccomment">/// [`Csr`]: #struct.Csr.html</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use petgraph::csr::Csr;</span>
-    <span class="doccomment">/// use petgraph::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let graph = Csr::&lt;u8,()&gt;::with_nodes(5);</span>
-    <span class="doccomment">/// assert_eq!(graph.node_count(),5);</span>
-    <span class="doccomment">/// assert_eq!(graph.edge_count(),0);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(graph[0],0);</span>
-    <span class="doccomment">/// assert_eq!(graph[4],0);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_nodes</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Default</span>,
+    <span class="doccomment">/// Create a new [`Csr`] with `n` nodes. `N` must implement [`Default`] for the weight of each node.
+    ///
+    /// [`Default`]: https://doc.rust-lang.org/nightly/core/default/trait.Default.html
+    /// [`Csr`]: #struct.Csr.html
+    ///
+    /// # Example
+    /// ```rust
+    /// use petgraph::csr::Csr;
+    /// use petgraph::prelude::*;
+    ///
+    /// # fn main() {
+    ///
+    /// let graph = Csr::&lt;u8,()&gt;::with_nodes(5);
+    /// assert_eq!(graph.node_count(),5);
+    /// assert_eq!(graph.edge_count(),0);
+    ///
+    /// assert_eq!(graph[0],0);
+    /// assert_eq!(graph[4],0);
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>with_nodes(n: usize) -&gt; <span class="self">Self
+        </span><span class="kw">where </span>N: Default,
     {
-        <span class="ident">Csr</span> {
-            <span class="ident">column</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">edges</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">row</span>: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>],
-            <span class="ident">node_weights</span>: (<span class="number">0</span>..<span class="ident">n</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">N::default</span>()).<span class="ident">collect</span>(),
-            <span class="ident">edge_count</span>: <span class="number">0</span>,
-            <span class="ident">ty</span>: <span class="ident">PhantomData</span>,
+        Csr {
+            column: Vec::new(),
+            edges: Vec::new(),
+            row: <span class="macro">vec!</span>[<span class="number">0</span>; n + <span class="number">1</span>],
+            node_weights: (<span class="number">0</span>..n).map(|<span class="kw">_</span>| N::default()).collect(),
+            edge_count: <span class="number">0</span>,
+            ty: PhantomData,
         }
     }
 }
 
-<span class="doccomment">/// Csr creation error: edges were not in sorted order.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EdgesNotSorted</span> {
-    <span class="ident">first_error</span>: (<span class="ident">usize</span>, <span class="ident">usize</span>),
+<span class="doccomment">/// Csr creation error: edges were not in sorted order.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>EdgesNotSorted {
+    first_error: (usize, usize),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Directed</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ix&gt; Csr&lt;N, E, Directed, Ix&gt;
+    <span class="kw">where </span>Ix: IndexType,
 {
 
-    <span class="doccomment">/// Create a new `Csr` from a sorted sequence of edges</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Edges **must** be sorted and unique, where the sort order is the default</span>
-    <span class="doccomment">/// order for the pair *(u, v)* in Rust (*u* has priority).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Computes in **O(|E| + |V|)** time.</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use petgraph::csr::Csr;</span>
-    <span class="doccomment">/// use petgraph::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let graph = Csr::&lt;(),()&gt;::from_sorted_edges(&amp;[</span>
-    <span class="doccomment">///                     (0, 1), (0, 2),</span>
-    <span class="doccomment">///                     (1, 0), (1, 2), (1, 3),</span>
-    <span class="doccomment">///                     (2, 0),</span>
-    <span class="doccomment">///                     (3, 1),</span>
-    <span class="doccomment">/// ]);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_sorted_edges</span><span class="op">&lt;</span><span class="ident">Edge</span><span class="op">&gt;</span>(<span class="ident">edges</span>: <span class="kw-2">&amp;</span>[<span class="ident">Edge</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">EdgesNotSorted</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">Edge</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">NodeId</span><span class="op">=</span><span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-              <span class="ident">N</span>: <span class="ident">Default</span>,
+    <span class="doccomment">/// Create a new `Csr` from a sorted sequence of edges
+    ///
+    /// Edges **must** be sorted and unique, where the sort order is the default
+    /// order for the pair *(u, v)* in Rust (*u* has priority).
+    ///
+    /// Computes in **O(|E| + |V|)** time.
+    /// # Example
+    /// ```rust
+    /// use petgraph::csr::Csr;
+    /// use petgraph::prelude::*;
+    ///
+    /// # fn main() {
+    ///
+    /// let graph = Csr::&lt;(),()&gt;::from_sorted_edges(&amp;[
+    ///                     (0, 1), (0, 2),
+    ///                     (1, 0), (1, 2), (1, 3),
+    ///                     (2, 0),
+    ///                     (3, 1),
+    /// ]);
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>from_sorted_edges&lt;Edge&gt;(edges: <span class="kw-2">&amp;</span>[Edge]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, EdgesNotSorted&gt;
+        <span class="kw">where </span>Edge: Clone + IntoWeightedEdge&lt;E, NodeId=NodeIndex&lt;Ix&gt;&gt;,
+              N: Default,
     {
-        <span class="kw">let</span> <span class="ident">max_node_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">edges</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span>
-            <span class="kw">match</span> <span class="ident">edge</span>.<span class="ident">clone</span>().<span class="ident">into_weighted_edge</span>() {
-                (<span class="ident">x</span>, <span class="ident">y</span>, <span class="kw">_</span>) =&gt; <span class="ident">max</span>(<span class="ident">x</span>.<span class="ident">index</span>(), <span class="ident">y</span>.<span class="ident">index</span>())
-            }).<span class="ident">max</span>() {
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::with_nodes</span>(<span class="number">0</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+        <span class="kw">let </span>max_node_id = <span class="kw">match </span>edges.iter().map(|edge|
+            <span class="kw">match </span>edge.clone().into_weighted_edge() {
+                (x, y, <span class="kw">_</span>) =&gt; max(x.index(), y.index())
+            }).max() {
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::with_nodes(<span class="number">0</span>)),
+            <span class="prelude-val">Some</span>(x) =&gt; x,
         };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">self_</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::with_nodes</span>(<span class="ident">max_node_id</span> <span class="op">+</span> <span class="number">1</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">edges</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">peekable</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>self_ = <span class="self">Self</span>::with_nodes(max_node_id + <span class="number">1</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>iter = edges.iter().cloned().peekable();
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">self_</span>.<span class="ident">row</span>.<span class="ident">iter_mut</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>rows = self_.row.iter_mut();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">node</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rstart</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_target</span>;
-            <span class="lifetime">&#39;outer</span>: <span class="kw">for</span> <span class="ident">r</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">rows</span> {
-                <span class="kw-2">*</span><span class="ident">r</span> <span class="op">=</span> <span class="ident">rstart</span>;
-                <span class="ident">last_target</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="lifetime">&#39;inner</span>: <span class="kw">loop</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">edge</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">peek</span>() {
-                        <span class="kw">let</span> (<span class="ident">n</span>, <span class="ident">m</span>, <span class="ident">weight</span>) <span class="op">=</span> <span class="ident">edge</span>.<span class="ident">clone</span>().<span class="ident">into_weighted_edge</span>();
-                        <span class="comment">// check that the edges are in increasing sequence</span>
-                        <span class="kw">if</span> <span class="ident">node</span> <span class="op">&gt;</span> <span class="ident">n</span>.<span class="ident">index</span>() {
-                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">EdgesNotSorted</span> {
-                                <span class="ident">first_error</span>: (<span class="ident">n</span>.<span class="ident">index</span>(), <span class="ident">m</span>.<span class="ident">index</span>()),
+            <span class="kw">let </span><span class="kw-2">mut </span>node = <span class="number">0</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>rstart = <span class="number">0</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>last_target;
+            <span class="lifetime">&#39;outer</span>: <span class="kw">for </span>r <span class="kw">in </span><span class="kw-2">&amp;mut </span>rows {
+                <span class="kw-2">*</span>r = rstart;
+                last_target = <span class="prelude-val">None</span>;
+                <span class="lifetime">&#39;inner</span>: <span class="kw">loop </span>{
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(edge) = iter.peek() {
+                        <span class="kw">let </span>(n, m, weight) = edge.clone().into_weighted_edge();
+                        <span class="comment">// check that the edges are in increasing sequence
+                        </span><span class="kw">if </span>node &gt; n.index() {
+                            <span class="kw">return </span><span class="prelude-val">Err</span>(EdgesNotSorted {
+                                first_error: (n.index(), m.index()),
                             });
                         }
                         <span class="comment">/*
@@ -1138,490 +1138,490 @@
                                               &quot;failed assertion source {:?} &lt;= {:?} &quot;,
                                               &quot;for edge {:?}&quot;),
                                       node, n, (n, m));
-                                      */</span>
-                        <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">index</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">node</span> {
-                            <span class="kw">break</span> <span class="lifetime">&#39;inner</span>;
+                                      */
+                        </span><span class="kw">if </span>n.index() != node {
+                            <span class="kw">break </span><span class="lifetime">&#39;inner</span>;
                         }
-                        <span class="comment">// check that the edges are in increasing sequence</span>
-                        <span class="comment">/*
+                        <span class="comment">// check that the edges are in increasing sequence
+                        /*
                         debug_assert!(last_target.map_or(true, |x| m &gt; x),
                                       &quot;edges are not sorted, failed assertion {:?} &lt; {:?}&quot;,
                                       last_target, m);
-                                      */</span>
-                        <span class="kw">if</span> <span class="op">!</span><span class="ident">last_target</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">m</span> <span class="op">&gt;</span> <span class="ident">x</span>) {
-                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">EdgesNotSorted</span> {
-                                <span class="ident">first_error</span>: (<span class="ident">n</span>.<span class="ident">index</span>(), <span class="ident">m</span>.<span class="ident">index</span>()),
+                                      */
+                        </span><span class="kw">if </span>!last_target.map_or(<span class="bool-val">true</span>, |x| m &gt; x) {
+                            <span class="kw">return </span><span class="prelude-val">Err</span>(EdgesNotSorted {
+                                first_error: (n.index(), m.index()),
                             });
                         }
-                        <span class="ident">last_target</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>);
-                        <span class="ident">self_</span>.<span class="ident">column</span>.<span class="ident">push</span>(<span class="ident">m</span>);
-                        <span class="ident">self_</span>.<span class="ident">edges</span>.<span class="ident">push</span>(<span class="ident">weight</span>);
-                        <span class="ident">rstart</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    } <span class="kw">else</span> {
-                        <span class="kw">break</span> <span class="lifetime">&#39;outer</span>;
+                        last_target = <span class="prelude-val">Some</span>(m);
+                        self_.column.push(m);
+                        self_.edges.push(weight);
+                        rstart += <span class="number">1</span>;
+                    } <span class="kw">else </span>{
+                        <span class="kw">break </span><span class="lifetime">&#39;outer</span>;
                     }
-                    <span class="ident">iter</span>.<span class="ident">next</span>();
+                    iter.next();
                 }
-                <span class="ident">node</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                node += <span class="number">1</span>;
             }
-            <span class="kw">for</span> <span class="ident">r</span> <span class="kw">in</span> <span class="ident">rows</span> {
-                <span class="kw-2">*</span><span class="ident">r</span> <span class="op">=</span> <span class="ident">rstart</span>;
+            <span class="kw">for </span>r <span class="kw">in </span>rows {
+                <span class="kw-2">*</span>r = rstart;
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">self_</span>)
+        <span class="prelude-val">Ok</span>(self_)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">row</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>
-    }
+    <span class="kw">pub fn </span>node_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.row.len() - <span class="number">1
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_directed</span>() {
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">len</span>()
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">edge_count</span>
+    <span class="kw">pub fn </span>edge_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">if </span><span class="self">self</span>.is_directed() {
+            <span class="self">self</span>.column.len()
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.edge_count
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_directed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">Ty::is_directed</span>()
+    <span class="kw">pub fn </span>is_directed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        Ty::is_directed()
     }
 
-    <span class="doccomment">/// Remove all edges</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_edges</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">clear</span>();
-        <span class="kw">for</span> <span class="ident">r</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">row</span> {
-            <span class="kw-2">*</span><span class="ident">r</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="doccomment">/// Remove all edges
+    </span><span class="kw">pub fn </span>clear_edges(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.column.clear();
+        <span class="self">self</span>.edges.clear();
+        <span class="kw">for </span>r <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.row {
+            <span class="kw-2">*</span>r = <span class="number">0</span>;
         }
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_directed</span>() {
-            <span class="self">self</span>.<span class="ident">edge_count</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">if </span>!<span class="self">self</span>.is_directed() {
+            <span class="self">self</span>.edge_count = <span class="number">0</span>;
         }
     }
 
-    <span class="doccomment">/// Adds a new node with the given weight, returning the corresponding node index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">N</span>) -&gt; <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">row</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">row</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="number">0</span>);
-        <span class="self">self</span>.<span class="ident">node_weights</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">weight</span>);
-        <span class="ident">Ix::new</span>(<span class="ident">i</span>)
+    <span class="doccomment">/// Adds a new node with the given weight, returning the corresponding node index.
+    </span><span class="kw">pub fn </span>add_node(<span class="kw-2">&amp;mut </span><span class="self">self</span>, weight: N) -&gt; NodeIndex&lt;Ix&gt; {
+        <span class="kw">let </span>i = <span class="self">self</span>.row.len() - <span class="number">1</span>;
+        <span class="self">self</span>.row.insert(i, <span class="number">0</span>);
+        <span class="self">self</span>.node_weights.insert(i, weight);
+        Ix::new(i)
     }
 
-    <span class="doccomment">/// Return `true` if the edge was added</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you add all edges in row-major order, the time complexity</span>
-    <span class="doccomment">/// is **O(|V|·|E|)** for the whole operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if `a` or `b` are out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">weight</span>: <span class="ident">E</span>) -&gt; <span class="ident">bool</span>
-        <span class="kw">where</span> <span class="ident">E</span>: <span class="ident">Clone</span>,
+    <span class="doccomment">/// Return `true` if the edge was added
+    ///
+    /// If you add all edges in row-major order, the time complexity
+    /// is **O(|V|·|E|)** for the whole operation.
+    ///
+    /// **Panics** if `a` or `b` are out of bounds.
+    </span><span class="kw">pub fn </span>add_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: NodeIndex&lt;Ix&gt;, b: NodeIndex&lt;Ix&gt;, weight: E) -&gt; bool
+        <span class="kw">where </span>E: Clone,
     {
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">add_edge_</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>.<span class="ident">clone</span>());
-        <span class="kw">if</span> <span class="ident">ret</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_directed</span>() {
-            <span class="self">self</span>.<span class="ident">edge_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">let </span>ret = <span class="self">self</span>.add_edge_(a, b, weight.clone());
+        <span class="kw">if </span>ret &amp;&amp; !<span class="self">self</span>.is_directed() {
+            <span class="self">self</span>.edge_count += <span class="number">1</span>;
         }
-        <span class="kw">if</span> <span class="ident">ret</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_directed</span>() <span class="op">&amp;&amp;</span> <span class="ident">a</span> <span class="op">!</span><span class="op">=</span> <span class="ident">b</span> {
-            <span class="kw">let</span> <span class="ident">_ret2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">add_edge_</span>(<span class="ident">b</span>, <span class="ident">a</span>, <span class="ident">weight</span>);
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">ret</span>, <span class="ident">_ret2</span>);
+        <span class="kw">if </span>ret &amp;&amp; !<span class="self">self</span>.is_directed() &amp;&amp; a != b {
+            <span class="kw">let </span>_ret2 = <span class="self">self</span>.add_edge_(b, a, weight);
+            <span class="macro">debug_assert_eq!</span>(ret, _ret2);
         }
-        <span class="ident">ret</span>
+        ret
     }
 
-    <span class="comment">// Return false if the edge already exists</span>
-    <span class="kw">fn</span> <span class="ident">add_edge_</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">weight</span>: <span class="ident">E</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">assert!</span>(<span class="ident">a</span>.<span class="ident">index</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">node_count</span>() <span class="op">&amp;&amp;</span> <span class="ident">b</span>.<span class="ident">index</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">node_count</span>());
-        <span class="comment">// a x b is at (a, b) in the matrix</span>
+    <span class="comment">// Return false if the edge already exists
+    </span><span class="kw">fn </span>add_edge_(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: NodeIndex&lt;Ix&gt;, b: NodeIndex&lt;Ix&gt;, weight: E) -&gt; bool {
+        <span class="macro">assert!</span>(a.index() &lt; <span class="self">self</span>.node_count() &amp;&amp; b.index() &lt; <span class="self">self</span>.node_count());
+        <span class="comment">// a x b is at (a, b) in the matrix
 
-        <span class="comment">// find current range of edges from a</span>
-        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">find_edge_pos</span>(<span class="ident">a</span>, <span class="ident">b</span>) {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="bool-val">false</span>, <span class="comment">/* already exists */</span>
-            <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
+        // find current range of edges from a
+        </span><span class="kw">let </span>pos = <span class="kw">match </span><span class="self">self</span>.find_edge_pos(a, b) {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="bool-val">false</span>, <span class="comment">/* already exists */
+            </span><span class="prelude-val">Err</span>(i) =&gt; i,
         };
-        <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">insert</span>(<span class="ident">pos</span>, <span class="ident">b</span>);
-        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">insert</span>(<span class="ident">pos</span>, <span class="ident">weight</span>);
-        <span class="comment">// update row vector</span>
-        <span class="kw">for</span> <span class="ident">r</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">row</span>[<span class="ident">a</span>.<span class="ident">index</span>() <span class="op">+</span> <span class="number">1</span>..] {
-            <span class="kw-2">*</span><span class="ident">r</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="self">self</span>.column.insert(pos, b);
+        <span class="self">self</span>.edges.insert(pos, weight);
+        <span class="comment">// update row vector
+        </span><span class="kw">for </span>r <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.row[a.index() + <span class="number">1</span>..] {
+            <span class="kw-2">*</span>r += <span class="number">1</span>;
         }
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">find_edge_pos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">index</span>, <span class="ident">neighbors</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">neighbors_of</span>(<span class="ident">a</span>);
-        <span class="kw">if</span> <span class="ident">neighbors</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">BINARY_SEARCH_CUTOFF</span> {
-            <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">elt</span>) <span class="kw">in</span> <span class="ident">neighbors</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-                <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">elt</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span> <span class="op">+</span> <span class="ident">index</span>);
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">&gt;</span> <span class="ident">b</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">i</span> <span class="op">+</span> <span class="ident">index</span>);
+    <span class="kw">fn </span>find_edge_pos(<span class="kw-2">&amp;</span><span class="self">self</span>, a: NodeIndex&lt;Ix&gt;, b: NodeIndex&lt;Ix&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;usize, usize&gt; {
+        <span class="kw">let </span>(index, neighbors) = <span class="self">self</span>.neighbors_of(a);
+        <span class="kw">if </span>neighbors.len() &lt; BINARY_SEARCH_CUTOFF {
+            <span class="kw">for </span>(i, elt) <span class="kw">in </span>neighbors.iter().enumerate() {
+                <span class="kw">if </span>b == <span class="kw-2">*</span>elt {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(i + index);
+                } <span class="kw">else if </span><span class="kw-2">*</span>elt &gt; b {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(i + index);
                 }
             }
-            <span class="prelude-val">Err</span>(<span class="ident">neighbors</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">index</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="ident">neighbors</span>.<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">i</span> <span class="op">+</span> <span class="ident">index</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">i</span> <span class="op">+</span> <span class="ident">index</span>),
+            <span class="prelude-val">Err</span>(neighbors.len() + index)
+        } <span class="kw">else </span>{
+            <span class="kw">match </span>neighbors.binary_search(<span class="kw-2">&amp;</span>b) {
+                <span class="prelude-val">Ok</span>(i) =&gt; <span class="prelude-val">Ok</span>(i + index),
+                <span class="prelude-val">Err</span>(i) =&gt; <span class="prelude-val">Err</span>(i + index),
             }
         }
     }
 
-    <span class="doccomment">/// Computes in **O(log |V|)** time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if the node `a` does not exist.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_edge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">find_edge_pos</span>(<span class="ident">a</span>, <span class="ident">b</span>).<span class="ident">is_ok</span>()
+    <span class="doccomment">/// Computes in **O(log |V|)** time.
+    ///
+    /// **Panics** if the node `a` does not exist.
+    </span><span class="kw">pub fn </span>contains_edge(<span class="kw-2">&amp;</span><span class="self">self</span>, a: NodeIndex&lt;Ix&gt;, b: NodeIndex&lt;Ix&gt;) -&gt; bool {
+        <span class="self">self</span>.find_edge_pos(a, b).is_ok()
     }
 
-    <span class="kw">fn</span> <span class="ident">neighbors_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">row</span>[<span class="ident">a</span>.<span class="ident">index</span>()];
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">row</span>.<span class="ident">get</span>(<span class="ident">a</span>.<span class="ident">index</span>() <span class="op">+</span> <span class="number">1</span>).<span class="ident">cloned</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">len</span>());
-        <span class="ident">index</span>..<span class="ident">end</span>
+    <span class="kw">fn </span>neighbors_range(<span class="kw-2">&amp;</span><span class="self">self</span>, a: NodeIndex&lt;Ix&gt;) -&gt; Range&lt;usize&gt; {
+        <span class="kw">let </span>index = <span class="self">self</span>.row[a.index()];
+        <span class="kw">let </span>end = <span class="self">self</span>.row.get(a.index() + <span class="number">1</span>).cloned().unwrap_or_else(|| <span class="self">self</span>.column.len());
+        index..end
     }
 
-    <span class="kw">fn</span> <span class="ident">neighbors_of</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; (<span class="ident">usize</span>, <span class="kw-2">&amp;</span>[<span class="ident">Ix</span>]) {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">neighbors_range</span>(<span class="ident">a</span>);
-        (<span class="ident">r</span>.<span class="ident">start</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">column</span>[<span class="ident">r</span>])
+    <span class="kw">fn </span>neighbors_of(<span class="kw-2">&amp;</span><span class="self">self</span>, a: NodeIndex&lt;Ix&gt;) -&gt; (usize, <span class="kw-2">&amp;</span>[Ix]) {
+        <span class="kw">let </span>r = <span class="self">self</span>.neighbors_range(a);
+        (r.start, <span class="kw-2">&amp;</span><span class="self">self</span>.column[r])
     }
 
-    <span class="doccomment">/// Computes in **O(1)** time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if the node `a` does not exist.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">out_degree</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">neighbors_range</span>(<span class="ident">a</span>);
-        <span class="ident">r</span>.<span class="ident">end</span> <span class="op">-</span> <span class="ident">r</span>.<span class="ident">start</span>
+    <span class="doccomment">/// Computes in **O(1)** time.
+    ///
+    /// **Panics** if the node `a` does not exist.
+    </span><span class="kw">pub fn </span>out_degree(<span class="kw-2">&amp;</span><span class="self">self</span>, a: NodeIndex&lt;Ix&gt;) -&gt; usize {
+        <span class="kw">let </span>r = <span class="self">self</span>.neighbors_range(a);
+        r.end - r.start
     }
 
-    <span class="doccomment">/// Computes in **O(1)** time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if the node `a` does not exist.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">neighbors_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>] {
-        <span class="self">self</span>.<span class="ident">neighbors_of</span>(<span class="ident">a</span>).<span class="number">1</span>
+    <span class="doccomment">/// Computes in **O(1)** time.
+    ///
+    /// **Panics** if the node `a` does not exist.
+    </span><span class="kw">pub fn </span>neighbors_slice(<span class="kw-2">&amp;</span><span class="self">self</span>, a: NodeIndex&lt;Ix&gt;) -&gt; <span class="kw-2">&amp;</span>[NodeIndex&lt;Ix&gt;] {
+        <span class="self">self</span>.neighbors_of(a).<span class="number">1
+    </span>}
+
+    <span class="doccomment">/// Computes in **O(1)** time.
+    ///
+    /// **Panics** if the node `a` does not exist.
+    </span><span class="kw">pub fn </span>edges_slice(<span class="kw-2">&amp;</span><span class="self">self</span>, a: NodeIndex&lt;Ix&gt;) -&gt; <span class="kw-2">&amp;</span>[E] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.edges[<span class="self">self</span>.neighbors_range(a)]
     }
 
-    <span class="doccomment">/// Computes in **O(1)** time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if the node `a` does not exist.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edges_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">E</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">edges</span>[<span class="self">self</span>.<span class="ident">neighbors_range</span>(<span class="ident">a</span>)]
-    }
-
-    <span class="doccomment">/// Return an iterator of all edges of `a`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `Directed`: Outgoing edges from `a`.</span>
-    <span class="doccomment">/// - `Undirected`: All edges connected to `a`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if the node `a` does not exist.&lt;br&gt;</span>
-    <span class="doccomment">/// Iterator element type is `EdgeReference&lt;E, Ty, Ix&gt;`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">Edges</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">neighbors_range</span>(<span class="ident">a</span>);
-        <span class="ident">Edges</span> {
-            <span class="ident">index</span>: <span class="ident">r</span>.<span class="ident">start</span>,
-            <span class="ident">source</span>: <span class="ident">a</span>,
-            <span class="ident">iter</span>: <span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">column</span>[<span class="ident">r</span>.<span class="ident">clone</span>()], <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">edges</span>[<span class="ident">r</span>]),
-            <span class="ident">ty</span>: <span class="self">self</span>.<span class="ident">ty</span>,
+    <span class="doccomment">/// Return an iterator of all edges of `a`.
+    ///
+    /// - `Directed`: Outgoing edges from `a`.
+    /// - `Undirected`: All edges connected to `a`.
+    ///
+    /// **Panics** if the node `a` does not exist.&lt;br&gt;
+    /// Iterator element type is `EdgeReference&lt;E, Ty, Ix&gt;`.
+    </span><span class="kw">pub fn </span>edges(<span class="kw-2">&amp;</span><span class="self">self</span>, a: NodeIndex&lt;Ix&gt;) -&gt; Edges&lt;E, Ty, Ix&gt; {
+        <span class="kw">let </span>r = <span class="self">self</span>.neighbors_range(a);
+        Edges {
+            index: r.start,
+            source: a,
+            iter: zip(<span class="kw-2">&amp;</span><span class="self">self</span>.column[r.clone()], <span class="kw-2">&amp;</span><span class="self">self</span>.edges[r]),
+            ty: <span class="self">self</span>.ty,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Edges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span> <span class="op">=</span> <span class="ident">Directed</span>, <span class="ident">Ix</span>: <span class="lifetime">&#39;a</span> <span class="op">=</span> <span class="ident">DefaultIx</span><span class="op">&gt;</span> {
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-    <span class="ident">source</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>,
-    <span class="ident">iter</span>: <span class="ident">Zip</span><span class="op">&lt;</span><span class="ident">SliceIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">SliceIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Edges&lt;<span class="lifetime">&#39;a</span>, E: <span class="lifetime">&#39;a</span>, Ty = Directed, Ix: <span class="lifetime">&#39;a </span>= DefaultIx&gt; {
+    index: usize,
+    source: NodeIndex&lt;Ix&gt;,
+    iter: Zip&lt;SliceIter&lt;<span class="lifetime">&#39;a</span>, NodeIndex&lt;Ix&gt;&gt;, SliceIter&lt;<span class="lifetime">&#39;a</span>, E&gt;&gt;,
+    ty: PhantomData&lt;Ty&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EdgeReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span>: <span class="lifetime">&#39;a</span> <span class="op">=</span> <span class="ident">DefaultIx</span><span class="op">&gt;</span> {
-    <span class="ident">index</span>: <span class="ident">EdgeIndex</span>,
-    <span class="ident">source</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>,
-    <span class="ident">target</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>,
-    <span class="ident">weight</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">E</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>EdgeReference&lt;<span class="lifetime">&#39;a</span>, E: <span class="lifetime">&#39;a</span>, Ty, Ix: <span class="lifetime">&#39;a </span>= DefaultIx&gt; {
+    index: EdgeIndex,
+    source: NodeIndex&lt;Ix&gt;,
+    target: NodeIndex&lt;Ix&gt;,
+    weight: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>E,
+    ty: PhantomData&lt;Ty&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">EdgeReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw-2">*</span><span class="self">self</span>
-    }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix: Copy&gt; Clone <span class="kw">for </span>EdgeReference&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw-2">*</span><span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">EdgeReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> { }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix: Copy&gt; Copy <span class="kw">for </span>EdgeReference&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt; { }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Ty</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">EdgeReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Ty, E, Ix&gt; EdgeReference&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
 {
-    <span class="doccomment">/// Access the edge’s weight.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE** that this method offers a longer lifetime</span>
-    <span class="doccomment">/// than the trait (unfortunately they don&#39;t match yet).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">E</span> { <span class="self">self</span>.<span class="ident">weight</span> }
+    <span class="doccomment">/// Access the edge’s weight.
+    ///
+    /// **NOTE** that this method offers a longer lifetime
+    /// than the trait (unfortunately they don&#39;t match yet).
+    </span><span class="kw">pub fn </span>weight(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>E { <span class="self">self</span>.weight }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">EdgeRef</span> <span class="kw">for</span> <span class="ident">EdgeReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt; EdgeRef <span class="kw">for </span>EdgeReference&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">EdgeId</span> <span class="op">=</span> <span class="ident">EdgeIndex</span>;
-    <span class="kw">type</span> <span class="ident">Weight</span> <span class="op">=</span> <span class="ident">E</span>;
+    <span class="kw">type </span>NodeId = NodeIndex&lt;Ix&gt;;
+    <span class="kw">type </span>EdgeId = EdgeIndex;
+    <span class="kw">type </span>Weight = E;
 
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> { <span class="self">self</span>.<span class="ident">source</span> }
-    <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> { <span class="self">self</span>.<span class="ident">target</span> }
-    <span class="kw">fn</span> <span class="ident">weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">E</span> { <span class="self">self</span>.<span class="ident">weight</span> }
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeId</span> { <span class="self">self</span>.<span class="ident">index</span> }
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeId { <span class="self">self</span>.source }
+    <span class="kw">fn </span>target(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeId { <span class="self">self</span>.target }
+    <span class="kw">fn </span>weight(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>E { <span class="self">self</span>.weight }
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::EdgeId { <span class="self">self</span>.index }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Edges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt; Iterator <span class="kw">for </span>Edges&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">EdgeReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="kw-2">&amp;</span><span class="ident">j</span>, <span class="ident">w</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>;
-            <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">EdgeReference</span> {
-                <span class="ident">index</span>: <span class="ident">index</span>,
-                <span class="ident">source</span>: <span class="self">self</span>.<span class="ident">source</span>,
-                <span class="ident">target</span>: <span class="ident">j</span>,
-                <span class="ident">weight</span>: <span class="ident">w</span>,
-                <span class="ident">ty</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">type </span>Item = EdgeReference&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt;;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.iter.next().map(<span class="kw">move </span>|(<span class="kw-2">&amp;</span>j, w)| {
+            <span class="kw">let </span>index = <span class="self">self</span>.index;
+            <span class="self">self</span>.index += <span class="number">1</span>;
+            EdgeReference {
+                index: index,
+                source: <span class="self">self</span>.source,
+                target: j,
+                weight: w,
+                ty: PhantomData,
             }
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Data</span> <span class="kw">for</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Data <span class="kw">for </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">NodeWeight</span> <span class="op">=</span> <span class="ident">N</span>;
-    <span class="kw">type</span> <span class="ident">EdgeWeight</span> <span class="op">=</span> <span class="ident">E</span>;
+    <span class="kw">type </span>NodeWeight = N;
+    <span class="kw">type </span>EdgeWeight = E;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IntoEdgeReferences</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty, Ix&gt; IntoEdgeReferences <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">EdgeRef</span> <span class="op">=</span> <span class="ident">EdgeReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">EdgeReferences</span> <span class="op">=</span> <span class="ident">EdgeReferences</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edge_references</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeReferences</span> {
-        <span class="ident">EdgeReferences</span> {
-            <span class="ident">index</span>: <span class="number">0</span>,
-            <span class="ident">source_index</span>: <span class="ident">Ix::new</span>(<span class="number">0</span>),
-            <span class="ident">edge_ranges</span>: <span class="self">self</span>.<span class="ident">row</span>.<span class="ident">windows</span>(<span class="number">2</span>).<span class="ident">enumerate</span>(),
-            <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">column</span>,
-            <span class="ident">edges</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">edges</span>,
-            <span class="ident">iter</span>: <span class="ident">zip</span>(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]),
-            <span class="ident">ty</span>: <span class="self">self</span>.<span class="ident">ty</span>,
+    <span class="kw">type </span>EdgeRef = EdgeReference&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt;;
+    <span class="kw">type </span>EdgeReferences = EdgeReferences&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt;;
+    <span class="kw">fn </span>edge_references(<span class="self">self</span>) -&gt; <span class="self">Self</span>::EdgeReferences {
+        EdgeReferences {
+            index: <span class="number">0</span>,
+            source_index: Ix::new(<span class="number">0</span>),
+            edge_ranges: <span class="self">self</span>.row.windows(<span class="number">2</span>).enumerate(),
+            column: <span class="kw-2">&amp;</span><span class="self">self</span>.column,
+            edges: <span class="kw-2">&amp;</span><span class="self">self</span>.edges,
+            iter: zip(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]),
+            ty: <span class="self">self</span>.ty,
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EdgeReferences</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">source_index</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>,
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-    <span class="ident">edge_ranges</span>: <span class="ident">Enumerate</span><span class="op">&lt;</span><span class="ident">Windows</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>],
-    <span class="ident">edges</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">E</span>],
-    <span class="ident">iter</span>: <span class="ident">Zip</span><span class="op">&lt;</span><span class="ident">SliceIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">SliceIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>EdgeReferences&lt;<span class="lifetime">&#39;a</span>, E: <span class="lifetime">&#39;a</span>, Ty, Ix: <span class="lifetime">&#39;a</span>&gt; {
+    source_index: NodeIndex&lt;Ix&gt;,
+    index: usize,
+    edge_ranges: Enumerate&lt;Windows&lt;<span class="lifetime">&#39;a</span>, usize&gt;&gt;,
+    column: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[NodeIndex&lt;Ix&gt;],
+    edges: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[E],
+    iter: Zip&lt;SliceIter&lt;<span class="lifetime">&#39;a</span>, NodeIndex&lt;Ix&gt;&gt;, SliceIter&lt;<span class="lifetime">&#39;a</span>, E&gt;&gt;,
+    ty: PhantomData&lt;Ty&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">EdgeReferences</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt; Iterator <span class="kw">for </span>EdgeReferences&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">EdgeReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="ident">j</span>, <span class="ident">w</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>() {
-                <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>;
-                <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">EdgeReference</span> {
-                    <span class="ident">index</span>: <span class="ident">index</span>,
-                    <span class="ident">source</span>: <span class="self">self</span>.<span class="ident">source_index</span>,
-                    <span class="ident">target</span>: <span class="ident">j</span>,
-                    <span class="ident">weight</span>: <span class="ident">w</span>,
-                    <span class="ident">ty</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">type </span>Item = EdgeReference&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt;;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>j, w)) = <span class="self">self</span>.iter.next() {
+                <span class="kw">let </span>index = <span class="self">self</span>.index;
+                <span class="self">self</span>.index += <span class="number">1</span>;
+                <span class="kw">return </span><span class="prelude-val">Some</span>(EdgeReference {
+                    index: index,
+                    source: <span class="self">self</span>.source_index,
+                    target: j,
+                    weight: w,
+                    ty: PhantomData,
                 })
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">w</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_ranges</span>.<span class="ident">next</span>() {
-                <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">w</span>[<span class="number">0</span>];
-                <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">w</span>[<span class="number">1</span>];
-                <span class="self">self</span>.<span class="ident">iter</span> <span class="op">=</span> <span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">column</span>[<span class="ident">a</span>..<span class="ident">b</span>], <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">edges</span>[<span class="ident">a</span>..<span class="ident">b</span>]);
-                <span class="self">self</span>.<span class="ident">source_index</span> <span class="op">=</span> <span class="ident">Ix::new</span>(<span class="ident">i</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+            <span class="kw">if let </span><span class="prelude-val">Some</span>((i, w)) = <span class="self">self</span>.edge_ranges.next() {
+                <span class="kw">let </span>a = w[<span class="number">0</span>];
+                <span class="kw">let </span>b = w[<span class="number">1</span>];
+                <span class="self">self</span>.iter = zip(<span class="kw-2">&amp;</span><span class="self">self</span>.column[a..b], <span class="kw-2">&amp;</span><span class="self">self</span>.edges[a..b]);
+                <span class="self">self</span>.source_index = Ix::new(i);
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IntoEdges</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty, Ix&gt; IntoEdges <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">Edges</span> <span class="op">=</span> <span class="ident">Edges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edges</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="ident"><span class="self">Self</span>::Edges</span> {
-        <span class="self">self</span>.<span class="ident">edges</span>(<span class="ident">a</span>)
+    <span class="kw">type </span>Edges = Edges&lt;<span class="lifetime">&#39;a</span>, E, Ty, Ix&gt;;
+    <span class="kw">fn </span>edges(<span class="self">self</span>, a: <span class="self">Self</span>::NodeId) -&gt; <span class="self">Self</span>::Edges {
+        <span class="self">self</span>.edges(a)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">GraphBase</span> <span class="kw">for</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; GraphBase <span class="kw">for </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">EdgeId</span> <span class="op">=</span> <span class="ident">EdgeIndex</span>; <span class="comment">// index into edges vector</span>
-}
+    <span class="kw">type </span>NodeId = NodeIndex&lt;Ix&gt;;
+    <span class="kw">type </span>EdgeId = EdgeIndex; <span class="comment">// index into edges vector
+</span>}
 
-<span class="kw">use</span> <span class="ident">fixedbitset::FixedBitSet</span>;
+<span class="kw">use </span>fixedbitset::FixedBitSet;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Visitable</span> <span class="kw">for</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Visitable <span class="kw">for </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">Map</span> <span class="op">=</span> <span class="ident">FixedBitSet</span>;
-    <span class="kw">fn</span> <span class="ident">visit_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FixedBitSet</span> {
-        <span class="ident">FixedBitSet::with_capacity</span>(<span class="self">self</span>.<span class="ident">node_count</span>())
+    <span class="kw">type </span>Map = FixedBitSet;
+    <span class="kw">fn </span>visit_map(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FixedBitSet {
+        FixedBitSet::with_capacity(<span class="self">self</span>.node_count())
     }
-    <span class="kw">fn</span> <span class="ident">reset_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Map</span>) {
-        <span class="ident">map</span>.<span class="ident">clear</span>();
-        <span class="ident">map</span>.<span class="ident">grow</span>(<span class="self">self</span>.<span class="ident">node_count</span>());
-    }
-}
-
-<span class="kw">use</span> <span class="ident">std::slice::Iter</span> <span class="kw">as</span> <span class="ident">SliceIter</span>;
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Ix</span>: <span class="lifetime">&#39;a</span> <span class="op">=</span> <span class="ident">DefaultIx</span><span class="op">&gt;</span> {
-    <span class="ident">iter</span>: <span class="ident">SliceIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
-{
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">cloned</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>reset_map(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Map) {
+        map.clear();
+        map.grow(<span class="self">self</span>.node_count());
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IntoNeighbors</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
-{
-    <span class="kw">type</span> <span class="ident">Neighbors</span> <span class="op">=</span> <span class="ident">Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
+<span class="kw">use </span>std::slice::Iter <span class="kw">as </span>SliceIter;
 
-    <span class="doccomment">/// Return an iterator of all neighbors of `a`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `Directed`: Targets of outgoing edges from `a`.</span>
-    <span class="doccomment">/// - `Undirected`: Opposing endpoints of all edges connected to `a`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if the node `a` does not exist.&lt;br&gt;</span>
-    <span class="doccomment">/// Iterator element type is `NodeIndex&lt;Ix&gt;`.</span>
-    <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="ident"><span class="self">Self</span>::Neighbors</span> {
-        <span class="ident">Neighbors</span> {
-            <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">neighbors_slice</span>(<span class="ident">a</span>).<span class="ident">iter</span>(),
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Neighbors&lt;<span class="lifetime">&#39;a</span>, Ix: <span class="lifetime">&#39;a </span>= DefaultIx&gt; {
+    iter: SliceIter&lt;<span class="lifetime">&#39;a</span>, NodeIndex&lt;Ix&gt;&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Ix&gt; Iterator <span class="kw">for </span>Neighbors&lt;<span class="lifetime">&#39;a</span>, Ix&gt;
+    <span class="kw">where </span>Ix: IndexType,
+{
+    <span class="kw">type </span>Item = NodeIndex&lt;Ix&gt;;
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.iter.next().cloned()
+    }
+
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.iter.size_hint()
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty, Ix&gt; IntoNeighbors <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
+{
+    <span class="kw">type </span>Neighbors = Neighbors&lt;<span class="lifetime">&#39;a</span>, Ix&gt;;
+
+    <span class="doccomment">/// Return an iterator of all neighbors of `a`.
+    ///
+    /// - `Directed`: Targets of outgoing edges from `a`.
+    /// - `Undirected`: Opposing endpoints of all edges connected to `a`.
+    ///
+    /// **Panics** if the node `a` does not exist.&lt;br&gt;
+    /// Iterator element type is `NodeIndex&lt;Ix&gt;`.
+    </span><span class="kw">fn </span>neighbors(<span class="self">self</span>, a: <span class="self">Self</span>::NodeId) -&gt; <span class="self">Self</span>::Neighbors {
+        Neighbors {
+            iter: <span class="self">self</span>.neighbors_slice(a).iter(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">NodeIndexable</span> <span class="kw">for</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; NodeIndexable <span class="kw">for </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">node_bound</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">node_count</span>() }
-    <span class="kw">fn</span> <span class="ident">to_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="ident">usize</span> { <span class="ident">a</span>.<span class="ident">index</span>() }
-    <span class="kw">fn</span> <span class="ident">from_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ix</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> { <span class="ident">Ix::new</span>(<span class="ident">ix</span>) }
+    <span class="kw">fn </span>node_bound(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize { <span class="self">self</span>.node_count() }
+    <span class="kw">fn </span>to_index(<span class="kw-2">&amp;</span><span class="self">self</span>, a: <span class="self">Self</span>::NodeId) -&gt; usize { a.index() }
+    <span class="kw">fn </span>from_index(<span class="kw-2">&amp;</span><span class="self">self</span>, ix: usize) -&gt; <span class="self">Self</span>::NodeId { Ix::new(ix) }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">NodeCompactIndexable</span> <span class="kw">for</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; NodeCompactIndexable <span class="kw">for </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Index&lt;NodeIndex&lt;Ix&gt;&gt; <span class="kw">for </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">N</span>;
+    <span class="kw">type </span>Output = N;
 
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ix</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">N</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">node_weights</span>[<span class="ident">ix</span>.<span class="ident">index</span>()]
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, ix: NodeIndex&lt;Ix&gt;) -&gt; <span class="kw-2">&amp;</span>N {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.node_weights[ix.index()]
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; IndexMut&lt;NodeIndex&lt;Ix&gt;&gt; <span class="kw">for </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ix</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">N</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">node_weights</span>[<span class="ident">ix</span>.<span class="ident">index</span>()]
+    <span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ix: NodeIndex&lt;Ix&gt;) -&gt; <span class="kw-2">&amp;mut </span>N {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.node_weights[ix.index()]
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NodeIdentifiers</span><span class="op">&lt;</span><span class="ident">Ix</span> <span class="op">=</span> <span class="ident">DefaultIx</span><span class="op">&gt;</span> {
-    <span class="ident">r</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>NodeIdentifiers&lt;Ix = DefaultIx&gt; {
+    r: Range&lt;usize&gt;,
+    ty: PhantomData&lt;Ix&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">NodeIdentifiers</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;Ix&gt; Iterator <span class="kw">for </span>NodeIdentifiers&lt;Ix&gt;
+    <span class="kw">where </span>Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = NodeIndex&lt;Ix&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="ident">Ix::new</span>)
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.r.next().map(Ix::new)
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.r.size_hint()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">IntoNodeIdentifiers</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty, Ix&gt; IntoNodeIdentifiers <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">NodeIdentifiers</span> <span class="op">=</span> <span class="ident">NodeIdentifiers</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">node_identifiers</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeIdentifiers</span> {
-        <span class="ident">NodeIdentifiers</span> {
-            <span class="ident">r</span>: <span class="number">0</span>..<span class="self">self</span>.<span class="ident">node_count</span>(),
-            <span class="ident">ty</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">type </span>NodeIdentifiers = NodeIdentifiers&lt;Ix&gt;;
+    <span class="kw">fn </span>node_identifiers(<span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeIdentifiers {
+        NodeIdentifiers {
+            r: <span class="number">0</span>..<span class="self">self</span>.node_count(),
+            ty: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">NodeCount</span> <span class="kw">for</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; NodeCount <span class="kw">for </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">node_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">node_count</span>()
+    <span class="kw">fn </span>node_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        (<span class="kw-2">*</span><span class="self">self</span>).node_count()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">GraphProp</span> <span class="kw">for</span> <span class="ident">Csr</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; GraphProp <span class="kw">for </span>Csr&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">type</span> <span class="ident">EdgeType</span> <span class="op">=</span> <span class="ident">Ty</span>;
+    <span class="kw">type </span>EdgeType = Ty;
 }
 
 <span class="comment">/*
@@ -1636,106 +1636,106 @@ Values: [a, b, c, d, e, f]
 Column: [0, 2, 0, 1, 2, 2]
 Row   : [0, 2, 5]   &lt;- value index of row start
 
- * */</span>
+ * */
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Csr</span>;
-    <span class="kw">use</span> <span class="ident">Undirected</span>;
-    <span class="kw">use</span> <span class="ident">visit::Dfs</span>;
-    <span class="kw">use</span> <span class="ident">visit::VisitMap</span>;
-    <span class="kw">use</span> <span class="ident">algo::tarjan_scc</span>;
-    <span class="kw">use</span> <span class="ident">algo::bellman_ford</span>;
+</span><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::Csr;
+    <span class="kw">use </span>Undirected;
+    <span class="kw">use </span>visit::Dfs;
+    <span class="kw">use </span>visit::VisitMap;
+    <span class="kw">use </span>algo::tarjan_scc;
+    <span class="kw">use </span>algo::bellman_ford;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">csr1</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span>: <span class="ident">Csr</span> <span class="op">=</span> <span class="ident">Csr::with_nodes</span>(<span class="number">3</span>);
-        <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">0</span>, <span class="number">0</span>, ());
-        <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">1</span>, <span class="number">2</span>, ());
-        <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">2</span>, <span class="number">2</span>, ());
-        <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">0</span>, <span class="number">2</span>, ());
-        <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">1</span>, <span class="number">0</span>, ());
-        <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">1</span>, <span class="number">1</span>, ());
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">m</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">column</span>, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>]);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">row</span>, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">6</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>csr1() {
+        <span class="kw">let </span><span class="kw-2">mut </span>m: Csr = Csr::with_nodes(<span class="number">3</span>);
+        m.add_edge(<span class="number">0</span>, <span class="number">0</span>, ());
+        m.add_edge(<span class="number">1</span>, <span class="number">2</span>, ());
+        m.add_edge(<span class="number">2</span>, <span class="number">2</span>, ());
+        m.add_edge(<span class="number">0</span>, <span class="number">2</span>, ());
+        m.add_edge(<span class="number">1</span>, <span class="number">0</span>, ());
+        m.add_edge(<span class="number">1</span>, <span class="number">1</span>, ());
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, m);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>m.column, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>m.row, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">6</span>]);
 
-        <span class="kw">let</span> <span class="ident">added</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">1</span>, <span class="number">2</span>, ());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">added</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">column</span>, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>]);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">row</span>, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">6</span>]);
+        <span class="kw">let </span>added = m.add_edge(<span class="number">1</span>, <span class="number">2</span>, ());
+        <span class="macro">assert!</span>(!added);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>m.column, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>m.row, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">6</span>]);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">neighbors_slice</span>(<span class="number">1</span>), <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">node_count</span>(), <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">edge_count</span>(), <span class="number">6</span>);
+        <span class="macro">assert_eq!</span>(m.neighbors_slice(<span class="number">1</span>), <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]);
+        <span class="macro">assert_eq!</span>(m.node_count(), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(m.edge_count(), <span class="number">6</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">csr_undirected</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>csr_undirected() {
     <span class="comment">/*
         [ 1 . 1
           . . 1
           1 1 1 ]
-     */</span>
+     */
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span>: <span class="ident">Csr</span><span class="op">&lt;</span>(), (), <span class="ident">Undirected</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Csr::with_nodes</span>(<span class="number">3</span>);
-        <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">0</span>, <span class="number">0</span>, ());
-        <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">0</span>, <span class="number">2</span>, ());
-        <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">1</span>, <span class="number">2</span>, ());
-        <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">2</span>, <span class="number">2</span>, ());
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">m</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">column</span>, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">row</span>, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">6</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">node_count</span>(), <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">edge_count</span>(), <span class="number">4</span>);
+        </span><span class="kw">let </span><span class="kw-2">mut </span>m: Csr&lt;(), (), Undirected&gt; = Csr::with_nodes(<span class="number">3</span>);
+        m.add_edge(<span class="number">0</span>, <span class="number">0</span>, ());
+        m.add_edge(<span class="number">0</span>, <span class="number">2</span>, ());
+        m.add_edge(<span class="number">1</span>, <span class="number">2</span>, ());
+        m.add_edge(<span class="number">2</span>, <span class="number">2</span>, ());
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, m);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>m.column, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>m.row, <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">6</span>]);
+        <span class="macro">assert_eq!</span>(m.node_count(), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(m.edge_count(), <span class="number">4</span>);
     }
 
-    <span class="attribute">#[<span class="ident">should_panic</span>]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">csr_from_error_1</span>() {
-        <span class="comment">// not sorted in source</span>
-        <span class="kw">let</span> <span class="ident">m</span>: <span class="ident">Csr</span> <span class="op">=</span> <span class="ident">Csr::from_sorted_edges</span>(<span class="kw-2">&amp;</span>[
+    <span class="attribute">#[should_panic]
+    #[test]
+    </span><span class="kw">fn </span>csr_from_error_1() {
+        <span class="comment">// not sorted in source
+        </span><span class="kw">let </span>m: Csr = Csr::from_sorted_edges(<span class="kw-2">&amp;</span>[
             (<span class="number">0</span>, <span class="number">1</span>),
             (<span class="number">1</span>, <span class="number">0</span>),
             (<span class="number">0</span>, <span class="number">2</span>),
-        ]).<span class="ident">unwrap</span>();
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">m</span>);
+        ]).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, m);
     }
 
-    <span class="attribute">#[<span class="ident">should_panic</span>]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">csr_from_error_2</span>() {
-        <span class="comment">// not sorted in target</span>
-        <span class="kw">let</span> <span class="ident">m</span>: <span class="ident">Csr</span> <span class="op">=</span> <span class="ident">Csr::from_sorted_edges</span>(<span class="kw-2">&amp;</span>[
+    <span class="attribute">#[should_panic]
+    #[test]
+    </span><span class="kw">fn </span>csr_from_error_2() {
+        <span class="comment">// not sorted in target
+        </span><span class="kw">let </span>m: Csr = Csr::from_sorted_edges(<span class="kw-2">&amp;</span>[
             (<span class="number">0</span>, <span class="number">1</span>),
             (<span class="number">1</span>, <span class="number">0</span>),
             (<span class="number">1</span>, <span class="number">2</span>),
             (<span class="number">1</span>, <span class="number">1</span>),
-        ]).<span class="ident">unwrap</span>();
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">m</span>);
+        ]).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, m);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">csr_from</span>() {
-        <span class="kw">let</span> <span class="ident">m</span>: <span class="ident">Csr</span> <span class="op">=</span> <span class="ident">Csr::from_sorted_edges</span>(<span class="kw-2">&amp;</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>csr_from() {
+        <span class="kw">let </span>m: Csr = Csr::from_sorted_edges(<span class="kw-2">&amp;</span>[
             (<span class="number">0</span>, <span class="number">1</span>),
             (<span class="number">0</span>, <span class="number">2</span>),
             (<span class="number">1</span>, <span class="number">0</span>),
             (<span class="number">1</span>, <span class="number">1</span>),
             (<span class="number">2</span>, <span class="number">2</span>),
             (<span class="number">2</span>, <span class="number">4</span>),
-        ]).<span class="ident">unwrap</span>();
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">m</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">neighbors_slice</span>(<span class="number">0</span>), <span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">neighbors_slice</span>(<span class="number">1</span>), <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">neighbors_slice</span>(<span class="number">2</span>), <span class="kw-2">&amp;</span>[<span class="number">2</span>, <span class="number">4</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">node_count</span>(), <span class="number">5</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">edge_count</span>(), <span class="number">6</span>);
+        ]).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, m);
+        <span class="macro">assert_eq!</span>(m.neighbors_slice(<span class="number">0</span>), <span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>]);
+        <span class="macro">assert_eq!</span>(m.neighbors_slice(<span class="number">1</span>), <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>]);
+        <span class="macro">assert_eq!</span>(m.neighbors_slice(<span class="number">2</span>), <span class="kw-2">&amp;</span>[<span class="number">2</span>, <span class="number">4</span>]);
+        <span class="macro">assert_eq!</span>(m.node_count(), <span class="number">5</span>);
+        <span class="macro">assert_eq!</span>(m.edge_count(), <span class="number">6</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">csr_dfs</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span>: <span class="ident">Csr</span> <span class="op">=</span> <span class="ident">Csr::from_sorted_edges</span>(<span class="kw-2">&amp;</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>csr_dfs() {
+        <span class="kw">let </span><span class="kw-2">mut </span>m: Csr = Csr::from_sorted_edges(<span class="kw-2">&amp;</span>[
             (<span class="number">0</span>, <span class="number">1</span>),
             (<span class="number">0</span>, <span class="number">2</span>),
             (<span class="number">1</span>, <span class="number">0</span>),
@@ -1743,36 +1743,36 @@ Row   : [0, 2, 5]   &lt;- value index of row start
             (<span class="number">1</span>, <span class="number">3</span>),
             (<span class="number">2</span>, <span class="number">2</span>),
 
-            <span class="comment">// disconnected subgraph</span>
-            (<span class="number">4</span>, <span class="number">4</span>),
+            <span class="comment">// disconnected subgraph
+            </span>(<span class="number">4</span>, <span class="number">4</span>),
             (<span class="number">4</span>, <span class="number">5</span>),
-        ]).<span class="ident">unwrap</span>();
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">m</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dfs</span> <span class="op">=</span> <span class="ident">Dfs::new</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>, <span class="number">0</span>);
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">dfs</span>.<span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>) {
+        ]).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, m);
+        <span class="kw">let </span><span class="kw-2">mut </span>dfs = Dfs::new(<span class="kw-2">&amp;</span>m, <span class="number">0</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw">_</span>) = dfs.next(<span class="kw-2">&amp;</span>m) {
         }
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">m</span>.<span class="ident">node_count</span>() <span class="op">-</span> <span class="number">2</span> {
-            <span class="macro">assert!</span>(<span class="ident">dfs</span>.<span class="ident">discovered</span>.<span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>), <span class="string">&quot;visited {}&quot;</span>, <span class="ident">i</span>)
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..m.node_count() - <span class="number">2 </span>{
+            <span class="macro">assert!</span>(dfs.discovered.is_visited(<span class="kw-2">&amp;</span>i), <span class="string">&quot;visited {}&quot;</span>, i)
         }
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">dfs</span>.<span class="ident">discovered</span>[<span class="number">4</span>]);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">dfs</span>.<span class="ident">discovered</span>[<span class="number">5</span>]);
+        <span class="macro">assert!</span>(!dfs.discovered[<span class="number">4</span>]);
+        <span class="macro">assert!</span>(!dfs.discovered[<span class="number">5</span>]);
 
-        <span class="ident">m</span>.<span class="ident">add_edge</span>(<span class="number">1</span>, <span class="number">4</span>, ());
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">m</span>);
+        m.add_edge(<span class="number">1</span>, <span class="number">4</span>, ());
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, m);
 
-        <span class="ident">dfs</span>.<span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>);
-        <span class="ident">dfs</span>.<span class="ident">move_to</span>(<span class="number">0</span>);
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">dfs</span>.<span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>) {
+        dfs.reset(<span class="kw-2">&amp;</span>m);
+        dfs.move_to(<span class="number">0</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw">_</span>) = dfs.next(<span class="kw-2">&amp;</span>m) {
         }
 
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">m</span>.<span class="ident">node_count</span>() {
-            <span class="macro">assert!</span>(<span class="ident">dfs</span>.<span class="ident">discovered</span>[<span class="ident">i</span>], <span class="string">&quot;visited {}&quot;</span>, <span class="ident">i</span>)
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..m.node_count() {
+            <span class="macro">assert!</span>(dfs.discovered[i], <span class="string">&quot;visited {}&quot;</span>, i)
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">csr_tarjan</span>() {
-        <span class="kw">let</span> <span class="ident">m</span>: <span class="ident">Csr</span> <span class="op">=</span> <span class="ident">Csr::from_sorted_edges</span>(<span class="kw-2">&amp;</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>csr_tarjan() {
+        <span class="kw">let </span>m: Csr = Csr::from_sorted_edges(<span class="kw-2">&amp;</span>[
             (<span class="number">0</span>, <span class="number">1</span>),
             (<span class="number">0</span>, <span class="number">2</span>),
             (<span class="number">1</span>, <span class="number">0</span>),
@@ -1783,14 +1783,14 @@ Row   : [0, 2, 5]   &lt;- value index of row start
             (<span class="number">4</span>, <span class="number">4</span>),
             (<span class="number">4</span>, <span class="number">5</span>),
             (<span class="number">5</span>, <span class="number">2</span>),
-        ]).<span class="ident">unwrap</span>();
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">m</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">tarjan_scc</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>));
+        ]).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, m);
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, tarjan_scc(<span class="kw-2">&amp;</span>m));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_bellman_ford</span>() {
-        <span class="kw">let</span> <span class="ident">m</span>: <span class="ident">Csr</span><span class="op">&lt;</span>(), <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Csr::from_sorted_edges</span>(<span class="kw-2">&amp;</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_bellman_ford() {
+        <span class="kw">let </span>m: Csr&lt;(), <span class="kw">_</span>&gt; = Csr::from_sorted_edges(<span class="kw-2">&amp;</span>[
             (<span class="number">0</span>, <span class="number">1</span>, <span class="number">0.5</span>),
             (<span class="number">0</span>, <span class="number">2</span>, <span class="number">2.</span>),
             (<span class="number">1</span>, <span class="number">0</span>, <span class="number">1.</span>),
@@ -1803,35 +1803,35 @@ Row   : [0, 2, 5]   &lt;- value index of row start
             (<span class="number">5</span>, <span class="number">7</span>, <span class="number">2.</span>),
             (<span class="number">6</span>, <span class="number">7</span>, <span class="number">1.</span>),
             (<span class="number">7</span>, <span class="number">8</span>, <span class="number">3.</span>),
-        ]).<span class="ident">unwrap</span>();
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">m</span>);
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">bellman_ford</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>, <span class="number">0</span>).<span class="ident">unwrap</span>();
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">result</span>);
-        <span class="kw">let</span> <span class="ident">answer</span> <span class="op">=</span> [<span class="number">0.</span>, <span class="number">0.5</span>, <span class="number">1.5</span>, <span class="number">1.5</span>];
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">answer</span>, <span class="kw-2">&amp;</span><span class="ident">result</span>.<span class="number">0</span>[..<span class="number">4</span>]);
-        <span class="macro">assert!</span>(<span class="ident">answer</span>[<span class="number">4</span>..].<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">f64::is_infinite</span>(<span class="ident">x</span>)));
+        ]).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, m);
+        <span class="kw">let </span>result = bellman_ford(<span class="kw-2">&amp;</span>m, <span class="number">0</span>).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, result);
+        <span class="kw">let </span>answer = [<span class="number">0.</span>, <span class="number">0.5</span>, <span class="number">1.5</span>, <span class="number">1.5</span>];
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>answer, <span class="kw-2">&amp;</span>result.<span class="number">0</span>[..<span class="number">4</span>]);
+        <span class="macro">assert!</span>(answer[<span class="number">4</span>..].iter().all(|<span class="kw-2">&amp;</span>x| f64::is_infinite(x)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_bellman_ford_neg_cycle</span>() {
-        <span class="kw">let</span> <span class="ident">m</span>: <span class="ident">Csr</span><span class="op">&lt;</span>(), <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Csr::from_sorted_edges</span>(<span class="kw-2">&amp;</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_bellman_ford_neg_cycle() {
+        <span class="kw">let </span>m: Csr&lt;(), <span class="kw">_</span>&gt; = Csr::from_sorted_edges(<span class="kw-2">&amp;</span>[
             (<span class="number">0</span>, <span class="number">1</span>, <span class="number">0.5</span>),
             (<span class="number">0</span>, <span class="number">2</span>, <span class="number">2.</span>),
             (<span class="number">1</span>, <span class="number">0</span>, <span class="number">1.</span>),
-            (<span class="number">1</span>, <span class="number">1</span>, <span class="op">-</span><span class="number">1.</span>),
+            (<span class="number">1</span>, <span class="number">1</span>, -<span class="number">1.</span>),
             (<span class="number">1</span>, <span class="number">2</span>, <span class="number">1.</span>),
             (<span class="number">1</span>, <span class="number">3</span>, <span class="number">1.</span>),
             (<span class="number">2</span>, <span class="number">3</span>, <span class="number">3.</span>),
-        ]).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">bellman_ford</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>, <span class="number">0</span>);
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_err</span>());
+        ]).unwrap();
+        <span class="kw">let </span>result = bellman_ford(<span class="kw-2">&amp;</span>m, <span class="number">0</span>);
+        <span class="macro">assert!</span>(result.is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_edge_references</span>() {
-        <span class="kw">use</span> <span class="ident">visit::EdgeRef</span>;
-        <span class="kw">use</span> <span class="ident">visit::IntoEdgeReferences</span>;
-        <span class="kw">let</span> <span class="ident">m</span>: <span class="ident">Csr</span><span class="op">&lt;</span>(), <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Csr::from_sorted_edges</span>(<span class="kw-2">&amp;</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_edge_references() {
+        <span class="kw">use </span>visit::EdgeRef;
+        <span class="kw">use </span>visit::IntoEdgeReferences;
+        <span class="kw">let </span>m: Csr&lt;(), <span class="kw">_</span>&gt; = Csr::from_sorted_edges(<span class="kw-2">&amp;</span>[
             (<span class="number">0</span>, <span class="number">1</span>, <span class="number">0.5</span>),
             (<span class="number">0</span>, <span class="number">2</span>, <span class="number">2.</span>),
             (<span class="number">1</span>, <span class="number">0</span>, <span class="number">1.</span>),
@@ -1844,39 +1844,39 @@ Row   : [0, 2, 5]   &lt;- value index of row start
             (<span class="number">5</span>, <span class="number">7</span>, <span class="number">2.</span>),
             (<span class="number">6</span>, <span class="number">7</span>, <span class="number">1.</span>),
             (<span class="number">7</span>, <span class="number">8</span>, <span class="number">3.</span>),
-        ]).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">copy</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">m</span>.<span class="ident">edge_references</span>() {
-            <span class="ident">copy</span>.<span class="ident">push</span>((<span class="ident">e</span>.<span class="ident">source</span>(), <span class="ident">e</span>.<span class="ident">target</span>(), <span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">weight</span>()));
-            <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">e</span>);
+        ]).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>copy = Vec::new();
+        <span class="kw">for </span>e <span class="kw">in </span>m.edge_references() {
+            copy.push((e.source(), e.target(), <span class="kw-2">*</span>e.weight()));
+            <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, e);
         }
-        <span class="kw">let</span> <span class="ident">m2</span>: <span class="ident">Csr</span><span class="op">&lt;</span>(), <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Csr::from_sorted_edges</span>(<span class="kw-2">&amp;</span><span class="ident">copy</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">row</span>, <span class="kw-2">&amp;</span><span class="ident">m2</span>.<span class="ident">row</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">column</span>, <span class="kw-2">&amp;</span><span class="ident">m2</span>.<span class="ident">column</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">edges</span>, <span class="kw-2">&amp;</span><span class="ident">m2</span>.<span class="ident">edges</span>);
+        <span class="kw">let </span>m2: Csr&lt;(), <span class="kw">_</span>&gt; = Csr::from_sorted_edges(<span class="kw-2">&amp;</span>copy).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>m.row, <span class="kw-2">&amp;</span>m2.row);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>m.column, <span class="kw-2">&amp;</span>m2.column);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>m.edges, <span class="kw-2">&amp;</span>m2.edges);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_add_node</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span>: <span class="ident">Csr</span> <span class="op">=</span> <span class="ident">Csr::new</span>();
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">add_node</span>(());
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">add_node</span>(());
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">add_node</span>(());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_add_node() {
+        <span class="kw">let </span><span class="kw-2">mut </span>g: Csr = Csr::new();
+        <span class="kw">let </span>a = g.add_node(());
+        <span class="kw">let </span>b = g.add_node(());
+        <span class="kw">let </span>c = g.add_node(());
 
-        <span class="macro">assert!</span>(<span class="ident">g</span>.<span class="ident">add_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, ()));
-        <span class="macro">assert!</span>(<span class="ident">g</span>.<span class="ident">add_edge</span>(<span class="ident">b</span>, <span class="ident">c</span>, ()));
-        <span class="macro">assert!</span>(<span class="ident">g</span>.<span class="ident">add_edge</span>(<span class="ident">c</span>, <span class="ident">a</span>, ()));
+        <span class="macro">assert!</span>(g.add_edge(a, b, ()));
+        <span class="macro">assert!</span>(g.add_edge(b, c, ()));
+        <span class="macro">assert!</span>(g.add_edge(c, a, ()));
 
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">g</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, g);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">node_count</span>(), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(g.node_count(), <span class="number">3</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">neighbors_slice</span>(<span class="ident">a</span>), <span class="kw-2">&amp;</span>[<span class="ident">b</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">neighbors_slice</span>(<span class="ident">b</span>), <span class="kw-2">&amp;</span>[<span class="ident">c</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">neighbors_slice</span>(<span class="ident">c</span>), <span class="kw-2">&amp;</span>[<span class="ident">a</span>]);
+        <span class="macro">assert_eq!</span>(g.neighbors_slice(a), <span class="kw-2">&amp;</span>[b]);
+        <span class="macro">assert_eq!</span>(g.neighbors_slice(b), <span class="kw-2">&amp;</span>[c]);
+        <span class="macro">assert_eq!</span>(g.neighbors_slice(c), <span class="kw-2">&amp;</span>[a]);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">edge_count</span>(), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(g.edge_count(), <span class="number">3</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

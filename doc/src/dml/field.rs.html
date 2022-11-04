@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -593,600 +593,600 @@
 <span id="593">593</span>
 <span id="594">594</span>
 <span id="595">595</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A field in a model.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A field in a model.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::native_type_instance::NativeTypeInstance</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::relation_info::RelationInfo</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::scalars::ScalarType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::traits</span>::{<span class="ident">Ignorable</span>, <span class="ident">WithDatabaseName</span>, <span class="ident">WithName</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">default_value</span>::{<span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">ValueGenerator</span>},
-    <span class="ident">relation_info::ReferentialAction</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::native_type_instance::NativeTypeInstance;
+<span class="kw">use </span><span class="kw">crate</span>::relation_info::RelationInfo;
+<span class="kw">use </span><span class="kw">crate</span>::scalars::ScalarType;
+<span class="kw">use </span><span class="kw">crate</span>::traits::{Ignorable, WithDatabaseName, WithName};
+<span class="kw">use crate</span>::{
+    default_value::{DefaultKind, DefaultValue, ValueGenerator},
+    relation_info::ReferentialAction,
 };
-<span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
+<span class="kw">use </span>std::hash::Hash;
 
-<span class="doccomment">/// Arity of a Field in a Model.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FieldArity</span> {
-    <span class="ident">Required</span>,
-    <span class="ident">Optional</span>,
-    <span class="ident">List</span>,
+<span class="doccomment">/// Arity of a Field in a Model.
+</span><span class="attribute">#[derive(Debug, PartialEq, Copy, Clone, Eq, Hash)]
+</span><span class="kw">pub enum </span>FieldArity {
+    Required,
+    Optional,
+    List,
 }
 
-<span class="kw">impl</span> <span class="ident">FieldArity</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::List</span>
+<span class="kw">impl </span>FieldArity {
+    <span class="kw">pub fn </span>is_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== <span class="kw-2">&amp;</span><span class="self">Self</span>::List
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Required</span>
+    <span class="kw">pub fn </span>is_required(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== <span class="kw-2">&amp;</span><span class="self">Self</span>::Required
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_optional</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Optional</span>
-    }
-}
-
-<span class="doccomment">/// Datamodel field type.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FieldType</span> {
-    <span class="doccomment">/// This is an enum field, with an enum of the given name.</span>
-    <span class="ident">Enum</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// This is a relation field.</span>
-    <span class="ident">Relation</span>(<span class="ident">RelationInfo</span>),
-    <span class="doccomment">/// This is a field with an unsupported datatype. The content is the db&#39;s description of the type, it should enable migrate to create the type.</span>
-    <span class="ident">Unsupported</span>(<span class="ident">String</span>),
-    <span class="ident">Scalar</span>(<span class="ident">ScalarType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// This is a composite type fields, with a composite type of the given type.</span>
-    <span class="ident">CompositeType</span>(<span class="ident">String</span>),
-}
-
-<span class="kw">impl</span> <span class="ident">FieldType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarType</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::Scalar</span>(<span class="ident">scalar_type</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">scalar_type</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">ScalarType</span>, <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>)<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::Scalar</span>(<span class="ident">a</span>, <span class="prelude-val">Some</span>(<span class="ident">b</span>)) =&gt; <span class="prelude-val">Some</span>((<span class="ident">a</span>, <span class="ident">b</span>)),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_composite_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::CompositeType</span>(<span class="ident">ct</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ct</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_datetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">scalar_type</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">st</span><span class="op">|</span> <span class="ident">st</span>.<span class="ident">is_datetime</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">scalar_type</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">st</span><span class="op">|</span> <span class="ident">st</span>.<span class="ident">is_string</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_composite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::CompositeType</span>(<span class="kw">_</span>))
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Enum</span>(<span class="ident">this</span>) <span class="kw">if</span> <span class="ident">this</span> <span class="op">==</span> <span class="ident">name</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unsupported</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="kw">_</span>))
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarType</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::Scalar</span>(<span class="ident">st</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">st</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::Scalar</span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">nt</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">nt</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
+    <span class="kw">pub fn </span>is_optional(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== <span class="kw-2">&amp;</span><span class="self">Self</span>::Optional
     }
 }
 
-<span class="doccomment">/// Represents a Field in a Model.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Field</span> {
-    <span class="ident">ScalarField</span>(<span class="ident">ScalarField</span>),
-    <span class="ident">RelationField</span>(<span class="ident">RelationField</span>),
-    <span class="ident">CompositeField</span>(<span class="ident">CompositeField</span>),
+<span class="doccomment">/// Datamodel field type.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>FieldType {
+    <span class="doccomment">/// This is an enum field, with an enum of the given name.
+    </span>Enum(String),
+    <span class="doccomment">/// This is a relation field.
+    </span>Relation(RelationInfo),
+    <span class="doccomment">/// This is a field with an unsupported datatype. The content is the db&#39;s description of the type, it should enable migrate to create the type.
+    </span>Unsupported(String),
+    Scalar(ScalarType, <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt;),
+    <span class="doccomment">/// This is a composite type fields, with a composite type of the given type.
+    </span>CompositeType(String),
 }
 
-<span class="kw">impl</span> <span class="ident">Field</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_relation_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationField</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::RelationField</span>(<span class="ident">sf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sf</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">impl </span>FieldType {
+    <span class="kw">pub fn </span>as_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarType&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            FieldType::Scalar(scalar_type, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(scalar_type),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_relation_field_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">RelationField</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::RelationField</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">rf</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>as_native_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>ScalarType, <span class="kw-2">&amp;</span>NativeTypeInstance)&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            FieldType::Scalar(a, <span class="prelude-val">Some</span>(b)) =&gt; <span class="prelude-val">Some</span>((a, b)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarField</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sf</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>as_composite_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            FieldType::CompositeType(ct) =&gt; <span class="prelude-val">Some</span>(ct),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar_field_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ScalarField</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sf</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>is_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.scalar_type().map(|st| st.is_datetime()).unwrap_or(<span class="bool-val">false</span>)
+    }
+
+    <span class="kw">pub fn </span>is_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.scalar_type().map(|st| st.is_string()).unwrap_or(<span class="bool-val">false</span>)
+    }
+
+    <span class="kw">pub fn </span>is_composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::CompositeType(<span class="kw">_</span>))
+    }
+
+    <span class="kw">pub fn </span>is_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Enum(this) <span class="kw">if </span>this == name)
+    }
+
+    <span class="kw">pub fn </span>is_unsupported(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Unsupported(<span class="kw">_</span>))
+    }
+
+    <span class="kw">pub fn </span>scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarType&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            FieldType::Scalar(st, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>st),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_composite_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CompositeField</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">cf</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Field::RelationField</span>(<span class="kw">_</span>))
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_scalar_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Field::ScalarField</span>(<span class="kw">_</span>))
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>,
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">name</span>,
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">name</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">documentation</span>.<span class="ident">as_deref</span>(),
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">documentation</span>.<span class="ident">as_deref</span>(),
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">documentation</span>.<span class="ident">as_deref</span>(),
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_documentation</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">documentation</span>,
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">documentation</span>,
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">documentation</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_commented_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">is_commented_out</span>,
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">is_commented_out</span>,
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">is_commented_out</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">FieldArity</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">arity</span>,
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">arity</span>,
-            <span class="ident">Field::CompositeField</span>(<span class="ident">rf</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">arity</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FieldType</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">field_type</span>.<span class="ident">clone</span>(),
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="ident">FieldType::Relation</span>(<span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">clone</span>()),
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="ident">FieldType::CompositeType</span>(<span class="ident">cf</span>.<span class="ident">composite_type</span>.<span class="ident">clone</span>()),
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">default_value</span>.<span class="ident">as_ref</span>(),
-            <span class="ident">Field::RelationField</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">Field::CompositeField</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_updated_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">is_updated_at</span>,
-            <span class="ident">Field::RelationField</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="ident">Field::CompositeField</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_generated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">is_generated</span>,
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">is_generated</span>,
-            <span class="ident">Field::CompositeField</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+    <span class="kw">pub fn </span>native_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NativeTypeInstance&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            FieldType::Scalar(<span class="kw">_</span>, <span class="prelude-val">Some</span>(nt)) =&gt; <span class="prelude-val">Some</span>(nt),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithName</span> <span class="kw">for</span> <span class="ident">Field</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">name</span>(),
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">name</span>(),
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">name</span>(),
+<span class="doccomment">/// Represents a Field in a Model.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>Field {
+    ScalarField(ScalarField),
+    RelationField(RelationField),
+    CompositeField(CompositeField),
+}
+
+<span class="kw">impl </span>Field {
+    <span class="kw">pub fn </span>as_relation_field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationField&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::RelationField(sf) =&gt; <span class="prelude-val">Some</span>(sf),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
-    <span class="kw">fn</span> <span class="ident">set_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">set_name</span>(<span class="ident">name</span>),
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">set_name</span>(<span class="ident">name</span>),
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">set_name</span>(<span class="ident">name</span>),
+
+    <span class="kw">pub fn </span>as_relation_field_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>RelationField&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::RelationField(<span class="kw-2">ref mut </span>rf) =&gt; <span class="prelude-val">Some</span>(rf),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>as_scalar_field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarField&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; <span class="prelude-val">Some</span>(sf),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>as_scalar_field_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ScalarField&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; <span class="prelude-val">Some</span>(sf),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>as_composite_field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CompositeField&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::CompositeField(cf) =&gt; <span class="prelude-val">Some</span>(cf),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>is_relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, Field::RelationField(<span class="kw">_</span>))
+    }
+
+    <span class="kw">pub fn </span>is_scalar_field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, Field::ScalarField(<span class="kw">_</span>))
+    }
+
+    <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; <span class="kw-2">&amp;</span>sf.name,
+            Field::RelationField(rf) =&gt; <span class="kw-2">&amp;</span>rf.name,
+            Field::CompositeField(cf) =&gt; <span class="kw-2">&amp;</span>cf.name,
+        }
+    }
+
+    <span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; sf.documentation.as_deref(),
+            Field::RelationField(rf) =&gt; rf.documentation.as_deref(),
+            Field::CompositeField(cf) =&gt; cf.documentation.as_deref(),
+        }
+    }
+
+    <span class="kw">pub fn </span>set_documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="prelude-ty">Option</span>&lt;String&gt;) {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; sf.documentation = documentation,
+            Field::RelationField(rf) =&gt; rf.documentation = documentation,
+            Field::CompositeField(cf) =&gt; cf.documentation = documentation,
+        }
+    }
+
+    <span class="kw">pub fn </span>is_commented_out(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; sf.is_commented_out,
+            Field::RelationField(rf) =&gt; rf.is_commented_out,
+            Field::CompositeField(cf) =&gt; cf.is_commented_out,
+        }
+    }
+
+    <span class="kw">pub fn </span>arity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>FieldArity {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; <span class="kw-2">&amp;</span>sf.arity,
+            Field::RelationField(rf) =&gt; <span class="kw-2">&amp;</span>rf.arity,
+            Field::CompositeField(rf) =&gt; <span class="kw-2">&amp;</span>rf.arity,
+        }
+    }
+
+    <span class="kw">pub fn </span>field_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldType {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; sf.field_type.clone(),
+            Field::RelationField(rf) =&gt; FieldType::Relation(rf.relation_info.clone()),
+            Field::CompositeField(cf) =&gt; FieldType::CompositeType(cf.composite_type.clone()),
+        }
+    }
+
+    <span class="kw">pub fn </span>default_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DefaultValue&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; sf.default_value.as_ref(),
+            Field::RelationField(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            Field::CompositeField(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>is_updated_at(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; sf.is_updated_at,
+            Field::RelationField(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            Field::CompositeField(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>is_generated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; sf.is_generated,
+            Field::RelationField(rf) =&gt; rf.is_generated,
+            Field::CompositeField(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithDatabaseName</span> <span class="kw">for</span> <span class="ident">Field</span> {
-    <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">database_name</span>.<span class="ident">as_deref</span>(),
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">database_name</span>.<span class="ident">as_deref</span>(),
-            <span class="ident">Field::RelationField</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+<span class="kw">impl </span>WithName <span class="kw">for </span>Field {
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>String {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; sf.name(),
+            Field::RelationField(rf) =&gt; rf.name(),
+            Field::CompositeField(cf) =&gt; cf.name(),
         }
     }
-
-    <span class="kw">fn</span> <span class="ident">set_database_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">set_database_name</span>(<span class="ident">database_name</span>),
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">set_database_name</span>(<span class="ident">database_name</span>),
-            <span class="ident">Field::RelationField</span>(<span class="kw">_</span>) =&gt; (),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Ignorable</span> <span class="kw">for</span> <span class="ident">Field</span> {
-    <span class="kw">fn</span> <span class="ident">is_ignored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">is_ignored</span>,
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">is_ignored</span>,
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">is_ignored</span>,
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">ignore</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="bool-val">true</span>,
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="bool-val">true</span>,
-            <span class="ident">Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="bool-val">true</span>,
+    <span class="kw">fn </span>set_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; sf.set_name(name),
+            Field::RelationField(rf) =&gt; rf.set_name(name),
+            Field::CompositeField(cf) =&gt; cf.set_name(name),
         }
     }
 }
 
-<span class="doccomment">/// Represents a relation field in a model.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationField</span> {
-    <span class="doccomment">/// Name of the field.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-
-    <span class="doccomment">/// The field&#39;s type.</span>
-    <span class="kw">pub</span> <span class="ident">relation_info</span>: <span class="ident">RelationInfo</span>,
-
-    <span class="doccomment">/// The field&#39;s arity.</span>
-    <span class="kw">pub</span> <span class="ident">arity</span>: <span class="ident">FieldArity</span>,
-
-    <span class="doccomment">/// The arity of underlying fields for referential actions.</span>
-    <span class="kw">pub</span> <span class="ident">referential_arity</span>: <span class="ident">FieldArity</span>,
-
-    <span class="doccomment">/// Comments associated with this field.</span>
-    <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// signals that this field was internally generated (only back relation fields as of now)</span>
-    <span class="kw">pub</span> <span class="ident">is_generated</span>: <span class="ident">bool</span>,
-
-    <span class="doccomment">/// Indicates if this field has to be commented out.</span>
-    <span class="kw">pub</span> <span class="ident">is_commented_out</span>: <span class="ident">bool</span>,
-
-    <span class="doccomment">/// Indicates if this field has to be ignored by the Client.</span>
-    <span class="kw">pub</span> <span class="ident">is_ignored</span>: <span class="ident">bool</span>,
-
-    <span class="doccomment">/// Is `ON DELETE/UPDATE RESTRICT` allowed.</span>
-    <span class="kw">pub</span> <span class="ident">supports_restrict_action</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// Do we run the referential actions in the core instead of the database.</span>
-    <span class="kw">pub</span> <span class="ident">emulates_referential_actions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">RelationField</span> {
-    <span class="doccomment">/// Creates a new field with the given name and type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">arity</span>: <span class="ident">FieldArity</span>, <span class="ident">referential_arity</span>: <span class="ident">FieldArity</span>, <span class="ident">relation_info</span>: <span class="ident">RelationInfo</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RelationField</span> {
-            <span class="ident">name</span>: <span class="ident">String::from</span>(<span class="ident">name</span>),
-            <span class="ident">arity</span>,
-            <span class="ident">referential_arity</span>,
-            <span class="ident">relation_info</span>,
-            <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
-            <span class="ident">is_generated</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_commented_out</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_ignored</span>: <span class="bool-val">false</span>,
-            <span class="ident">supports_restrict_action</span>: <span class="prelude-val">None</span>,
-            <span class="ident">emulates_referential_actions</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>WithDatabaseName <span class="kw">for </span>Field {
+    <span class="kw">fn </span>database_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; sf.database_name.as_deref(),
+            Field::CompositeField(cf) =&gt; cf.database_name.as_deref(),
+            Field::RelationField(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// The default `onDelete` can be `Restrict`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_restrict_action</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">supports_restrict_action</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
+    <span class="kw">fn </span>set_database_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, database_name: <span class="prelude-ty">Option</span>&lt;String&gt;) {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::ScalarField(sf) =&gt; sf.set_database_name(database_name),
+            Field::CompositeField(cf) =&gt; cf.set_database_name(database_name),
+            Field::RelationField(<span class="kw">_</span>) =&gt; (),
+        }
+    }
+}
+
+<span class="kw">impl </span>Ignorable <span class="kw">for </span>Field {
+    <span class="kw">fn </span>is_ignored(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::RelationField(rf) =&gt; rf.is_ignored,
+            Field::ScalarField(sf) =&gt; sf.is_ignored,
+            Field::CompositeField(cf) =&gt; cf.is_ignored,
+        }
     }
 
-    <span class="doccomment">/// The referential actions should be handled by the core.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emulates_referential_actions</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">emulates_referential_actions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
+    <span class="kw">fn </span>ignore(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::RelationField(rf) =&gt; rf.is_ignored = <span class="bool-val">true</span>,
+            Field::ScalarField(sf) =&gt; sf.is_ignored = <span class="bool-val">true</span>,
+            Field::CompositeField(cf) =&gt; cf.is_ignored = <span class="bool-val">true</span>,
+        }
+    }
+}
+
+<span class="doccomment">/// Represents a relation field in a model.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>RelationField {
+    <span class="doccomment">/// Name of the field.
+    </span><span class="kw">pub </span>name: String,
+
+    <span class="doccomment">/// The field&#39;s type.
+    </span><span class="kw">pub </span>relation_info: RelationInfo,
+
+    <span class="doccomment">/// The field&#39;s arity.
+    </span><span class="kw">pub </span>arity: FieldArity,
+
+    <span class="doccomment">/// The arity of underlying fields for referential actions.
+    </span><span class="kw">pub </span>referential_arity: FieldArity,
+
+    <span class="doccomment">/// Comments associated with this field.
+    </span><span class="kw">pub </span>documentation: <span class="prelude-ty">Option</span>&lt;String&gt;,
+
+    <span class="doccomment">/// signals that this field was internally generated (only back relation fields as of now)
+    </span><span class="kw">pub </span>is_generated: bool,
+
+    <span class="doccomment">/// Indicates if this field has to be commented out.
+    </span><span class="kw">pub </span>is_commented_out: bool,
+
+    <span class="doccomment">/// Indicates if this field has to be ignored by the Client.
+    </span><span class="kw">pub </span>is_ignored: bool,
+
+    <span class="doccomment">/// Is `ON DELETE/UPDATE RESTRICT` allowed.
+    </span><span class="kw">pub </span>supports_restrict_action: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+
+    <span class="doccomment">/// Do we run the referential actions in the core instead of the database.
+    </span><span class="kw">pub </span>emulates_referential_actions: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+}
+
+<span class="kw">impl </span>RelationField {
+    <span class="doccomment">/// Creates a new field with the given name and type.
+    </span><span class="kw">pub fn </span>new(name: <span class="kw-2">&amp;</span>str, arity: FieldArity, referential_arity: FieldArity, relation_info: RelationInfo) -&gt; <span class="self">Self </span>{
+        RelationField {
+            name: String::from(name),
+            arity,
+            referential_arity,
+            relation_info,
+            documentation: <span class="prelude-val">None</span>,
+            is_generated: <span class="bool-val">false</span>,
+            is_commented_out: <span class="bool-val">false</span>,
+            is_ignored: <span class="bool-val">false</span>,
+            supports_restrict_action: <span class="prelude-val">None</span>,
+            emulates_referential_actions: <span class="prelude-val">None</span>,
+        }
     }
 
-    <span class="doccomment">/// Creates a new field with the given name and type, marked as generated and optional.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_generated</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">info</span>: <span class="ident">RelationInfo</span>, <span class="ident">required</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">required</span> {
-            <span class="ident">FieldArity::Required</span>
-        } <span class="kw">else</span> {
-            <span class="ident">FieldArity::Optional</span>
+    <span class="doccomment">/// The default `onDelete` can be `Restrict`.
+    </span><span class="kw">pub fn </span>supports_restrict_action(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: bool) {
+        <span class="self">self</span>.supports_restrict_action = <span class="prelude-val">Some</span>(value);
+    }
+
+    <span class="doccomment">/// The referential actions should be handled by the core.
+    </span><span class="kw">pub fn </span>emulates_referential_actions(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: bool) {
+        <span class="self">self</span>.emulates_referential_actions = <span class="prelude-val">Some</span>(value);
+    }
+
+    <span class="doccomment">/// Creates a new field with the given name and type, marked as generated and optional.
+    </span><span class="kw">pub fn </span>new_generated(name: <span class="kw-2">&amp;</span>str, info: RelationInfo, required: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>arity = <span class="kw">if </span>required {
+            FieldArity::Required
+        } <span class="kw">else </span>{
+            FieldArity::Optional
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">name</span>, <span class="ident">arity</span>, <span class="ident">arity</span>, <span class="ident">info</span>);
-        <span class="ident">field</span>.<span class="ident">is_generated</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="self">Self</span>::new(name, arity, arity, info);
+        field.is_generated = <span class="bool-val">true</span>;
 
-        <span class="ident">field</span>
+        field
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">points_to_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span> <span class="op">==</span> <span class="ident">name</span>
+    <span class="kw">pub fn </span>points_to_model(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.relation_info.referenced_model == name
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">arity</span>.<span class="ident">is_required</span>()
+    <span class="kw">pub fn </span>is_required(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.arity.is_required()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>()
+    <span class="kw">pub fn </span>is_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.arity.is_list()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_singular</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_list</span>()
+    <span class="kw">pub fn </span>is_singular(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.is_list()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_optional</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">arity</span>.<span class="ident">is_optional</span>()
+    <span class="kw">pub fn </span>is_optional(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.arity.is_optional()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_on_delete_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
-        <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
+    <span class="kw">pub fn </span>default_on_delete_action(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReferentialAction {
+        <span class="kw">use </span>ReferentialAction::<span class="kw-2">*</span>;
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">referential_arity</span> {
-            <span class="ident">FieldArity::Required</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">supports_restrict_action</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>) =&gt; <span class="ident">Restrict</span>,
-            <span class="ident">FieldArity::Required</span> =&gt; <span class="ident">NoAction</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">SetNull</span>,
+        <span class="kw">match </span><span class="self">self</span>.referential_arity {
+            FieldArity::Required <span class="kw">if </span><span class="self">self</span>.supports_restrict_action.unwrap_or(<span class="bool-val">true</span>) =&gt; Restrict,
+            FieldArity::Required =&gt; NoAction,
+            <span class="kw">_ </span>=&gt; SetNull,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_on_update_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
-        <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
+    <span class="kw">pub fn </span>default_on_update_action(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReferentialAction {
+        <span class="kw">use </span>ReferentialAction::<span class="kw-2">*</span>;
 
-        <span class="ident">Cascade</span>
+        Cascade
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithName</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">String</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+<span class="kw">impl </span>WithName <span class="kw">for </span>RelationField {
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>String {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 
-    <span class="kw">fn</span> <span class="ident">set_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="ident">name</span>)
+    <span class="kw">fn </span>set_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.name = String::from(name)
     }
 }
 
-<span class="doccomment">/// Represents a scalar field in a model.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScalarField</span> {
-    <span class="doccomment">/// Name of the field.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Represents a scalar field in a model.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>ScalarField {
+    <span class="doccomment">/// Name of the field.
+    </span><span class="kw">pub </span>name: String,
 
-    <span class="doccomment">/// The field&#39;s type.</span>
-    <span class="kw">pub</span> <span class="ident">field_type</span>: <span class="ident">FieldType</span>,
+    <span class="doccomment">/// The field&#39;s type.
+    </span><span class="kw">pub </span>field_type: FieldType,
 
-    <span class="doccomment">/// The field&#39;s arity.</span>
-    <span class="kw">pub</span> <span class="ident">arity</span>: <span class="ident">FieldArity</span>,
+    <span class="doccomment">/// The field&#39;s arity.
+    </span><span class="kw">pub </span>arity: FieldArity,
 
-    <span class="doccomment">/// The database internal name.</span>
-    <span class="kw">pub</span> <span class="ident">database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The database internal name.
+    </span><span class="kw">pub </span>database_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// The default value.</span>
-    <span class="kw">pub</span> <span class="ident">default_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The default value.
+    </span><span class="kw">pub </span>default_value: <span class="prelude-ty">Option</span>&lt;DefaultValue&gt;,
 
-    <span class="doccomment">/// Comments associated with this field.</span>
-    <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Comments associated with this field.
+    </span><span class="kw">pub </span>documentation: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// signals that this field was internally generated (only back relation fields as of now)</span>
-    <span class="kw">pub</span> <span class="ident">is_generated</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// signals that this field was internally generated (only back relation fields as of now)
+    </span><span class="kw">pub </span>is_generated: bool,
 
-    <span class="doccomment">/// If set, signals that this field is updated_at and will be updated to now()</span>
-    <span class="doccomment">/// automatically.</span>
-    <span class="kw">pub</span> <span class="ident">is_updated_at</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// If set, signals that this field is updated_at and will be updated to now()
+    /// automatically.
+    </span><span class="kw">pub </span>is_updated_at: bool,
 
-    <span class="doccomment">/// Indicates if this field has to be commented out.</span>
-    <span class="kw">pub</span> <span class="ident">is_commented_out</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Indicates if this field has to be commented out.
+    </span><span class="kw">pub </span>is_commented_out: bool,
 
-    <span class="doccomment">/// Indicates if this field is ignored by the Client.</span>
-    <span class="kw">pub</span> <span class="ident">is_ignored</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Indicates if this field is ignored by the Client.
+    </span><span class="kw">pub </span>is_ignored: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">ScalarField</span> {
-    <span class="doccomment">/// Creates a new field with the given name and type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">arity</span>: <span class="ident">FieldArity</span>, <span class="ident">field_type</span>: <span class="ident">FieldType</span>) -&gt; <span class="ident">ScalarField</span> {
-        <span class="ident">ScalarField</span> {
-            <span class="ident">name</span>: <span class="ident">String::from</span>(<span class="ident">name</span>),
-            <span class="ident">arity</span>,
-            <span class="ident">field_type</span>,
-            <span class="ident">database_name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">default_value</span>: <span class="prelude-val">None</span>,
-            <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
-            <span class="ident">is_generated</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_updated_at</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_commented_out</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_ignored</span>: <span class="bool-val">false</span>,
+<span class="kw">impl </span>ScalarField {
+    <span class="doccomment">/// Creates a new field with the given name and type.
+    </span><span class="kw">pub fn </span>new(name: <span class="kw-2">&amp;</span>str, arity: FieldArity, field_type: FieldType) -&gt; ScalarField {
+        ScalarField {
+            name: String::from(name),
+            arity,
+            field_type,
+            database_name: <span class="prelude-val">None</span>,
+            default_value: <span class="prelude-val">None</span>,
+            documentation: <span class="prelude-val">None</span>,
+            is_generated: <span class="bool-val">false</span>,
+            is_updated_at: <span class="bool-val">false</span>,
+            is_commented_out: <span class="bool-val">false</span>,
+            is_ignored: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Creates a new field with the given name and type, marked as generated and optional.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_generated</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">field_type</span>: <span class="ident">FieldType</span>) -&gt; <span class="ident">ScalarField</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">name</span>, <span class="ident">FieldArity::Optional</span>, <span class="ident">field_type</span>);
-        <span class="ident">field</span>.<span class="ident">is_generated</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Creates a new field with the given name and type, marked as generated and optional.
+    </span><span class="kw">pub fn </span>new_generated(name: <span class="kw-2">&amp;</span>str, field_type: FieldType) -&gt; ScalarField {
+        <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="self">Self</span>::new(name, FieldArity::Optional, field_type);
+        field.is_generated = <span class="bool-val">true</span>;
 
-        <span class="ident">field</span>
+        field
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_default_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">DefaultValue</span>) {
-        <span class="self">self</span>.<span class="ident">default_value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>)
+    <span class="kw">pub fn </span>set_default_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: DefaultValue) {
+        <span class="self">self</span>.default_value = <span class="prelude-val">Some</span>(val)
     }
 
-    <span class="comment">//todo use withdatabasename::final_database_name instead</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">database_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
+    <span class="comment">//todo use withdatabasename::final_database_name instead
+    </span><span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.database_name.as_ref().unwrap_or(<span class="kw-2">&amp;</span><span class="self">self</span>.name)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">arity</span>.<span class="ident">is_required</span>()
+    <span class="kw">pub fn </span>is_required(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.arity.is_required()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>()
+    <span class="kw">pub fn </span>is_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.arity.is_list()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_singular</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_list</span>()
+    <span class="kw">pub fn </span>is_singular(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.is_list()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_optional</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">arity</span>.<span class="ident">is_optional</span>()
+    <span class="kw">pub fn </span>is_optional(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.arity.is_optional()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_auto_increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">kind</span>());
-        <span class="macro">matches!</span>(<span class="ident">kind</span>, <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Expression</span>(<span class="kw-2">ref</span> <span class="ident">expr</span>)) <span class="kw">if</span> <span class="ident">expr</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">ValueGenerator::new_autoincrement</span>())
+    <span class="kw">pub fn </span>is_auto_increment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>kind = <span class="self">self</span>.default_value().map(|val| val.kind());
+        <span class="macro">matches!</span>(kind, <span class="prelude-val">Some</span>(DefaultKind::Expression(<span class="kw-2">ref </span>expr)) <span class="kw">if </span>expr == <span class="kw-2">&amp;</span>ValueGenerator::new_autoincrement())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">default_value</span>.<span class="ident">as_ref</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">WithName</span> <span class="kw">for</span> <span class="ident">ScalarField</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">String</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
-    }
-    <span class="kw">fn</span> <span class="ident">set_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="ident">name</span>)
+    <span class="kw">pub fn </span>default_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DefaultValue&gt; {
+        <span class="self">self</span>.default_value.as_ref()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithDatabaseName</span> <span class="kw">for</span> <span class="ident">ScalarField</span> {
-    <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">database_name</span>.<span class="ident">as_deref</span>()
+<span class="kw">impl </span>WithName <span class="kw">for </span>ScalarField {
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>String {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
-    <span class="kw">fn</span> <span class="ident">set_database_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">database_name</span>;
+    <span class="kw">fn </span>set_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.name = String::from(name)
     }
 }
 
-<span class="doccomment">/// Represents a composite field.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompositeField</span> {
-    <span class="doccomment">/// Name of the field.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-
-    <span class="doccomment">/// The database internal name.</span>
-    <span class="kw">pub</span> <span class="ident">database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// The name of the composite type that backs this field.</span>
-    <span class="kw">pub</span> <span class="ident">composite_type</span>: <span class="ident">String</span>,
-
-    <span class="doccomment">/// The field&#39;s arity.</span>
-    <span class="kw">pub</span> <span class="ident">arity</span>: <span class="ident">FieldArity</span>,
-
-    <span class="doccomment">/// Comments associated with this field.</span>
-    <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// Indicates if this field has to be commented out.</span>
-    <span class="kw">pub</span> <span class="ident">is_commented_out</span>: <span class="ident">bool</span>,
-
-    <span class="doccomment">/// Indicates if this field has to be ignored by the Client.</span>
-    <span class="kw">pub</span> <span class="ident">is_ignored</span>: <span class="ident">bool</span>,
-
-    <span class="doccomment">/// The default value of this field</span>
-    <span class="kw">pub</span> <span class="ident">default_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>WithDatabaseName <span class="kw">for </span>ScalarField {
+    <span class="kw">fn </span>database_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.database_name.as_deref()
+    }
+    <span class="kw">fn </span>set_database_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, database_name: <span class="prelude-ty">Option</span>&lt;String&gt;) {
+        <span class="self">self</span>.database_name = database_name;
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">CompositeField</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">CompositeField</span> {
-            <span class="ident">name</span>: <span class="ident">String::new</span>(),
-            <span class="ident">database_name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">composite_type</span>: <span class="ident">String::new</span>(),
-            <span class="ident">arity</span>: <span class="ident">FieldArity::Optional</span>,
-            <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
-            <span class="ident">is_commented_out</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_ignored</span>: <span class="bool-val">false</span>,
-            <span class="ident">default_value</span>: <span class="prelude-val">None</span>,
+<span class="doccomment">/// Represents a composite field.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>CompositeField {
+    <span class="doccomment">/// Name of the field.
+    </span><span class="kw">pub </span>name: String,
+
+    <span class="doccomment">/// The database internal name.
+    </span><span class="kw">pub </span>database_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+
+    <span class="doccomment">/// The name of the composite type that backs this field.
+    </span><span class="kw">pub </span>composite_type: String,
+
+    <span class="doccomment">/// The field&#39;s arity.
+    </span><span class="kw">pub </span>arity: FieldArity,
+
+    <span class="doccomment">/// Comments associated with this field.
+    </span><span class="kw">pub </span>documentation: <span class="prelude-ty">Option</span>&lt;String&gt;,
+
+    <span class="doccomment">/// Indicates if this field has to be commented out.
+    </span><span class="kw">pub </span>is_commented_out: bool,
+
+    <span class="doccomment">/// Indicates if this field has to be ignored by the Client.
+    </span><span class="kw">pub </span>is_ignored: bool,
+
+    <span class="doccomment">/// The default value of this field
+    </span><span class="kw">pub </span>default_value: <span class="prelude-ty">Option</span>&lt;DefaultValue&gt;,
+}
+
+<span class="kw">impl </span>CompositeField {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        CompositeField {
+            name: String::new(),
+            database_name: <span class="prelude-val">None</span>,
+            composite_type: String::new(),
+            arity: FieldArity::Optional,
+            documentation: <span class="prelude-val">None</span>,
+            is_commented_out: <span class="bool-val">false</span>,
+            is_ignored: <span class="bool-val">false</span>,
+            default_value: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CompositeField</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>CompositeField {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithName</span> <span class="kw">for</span> <span class="ident">CompositeField</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">String</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+<span class="kw">impl </span>WithName <span class="kw">for </span>CompositeField {
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>String {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 
-    <span class="kw">fn</span> <span class="ident">set_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="ident">name</span>)
+    <span class="kw">fn </span>set_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.name = String::from(name)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithDatabaseName</span> <span class="kw">for</span> <span class="ident">CompositeField</span> {
-    <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">database_name</span>.<span class="ident">as_deref</span>()
+<span class="kw">impl </span>WithDatabaseName <span class="kw">for </span>CompositeField {
+    <span class="kw">fn </span>database_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.database_name.as_deref()
     }
-    <span class="kw">fn</span> <span class="ident">set_database_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">database_name</span>;
+    <span class="kw">fn </span>set_database_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, database_name: <span class="prelude-ty">Option</span>&lt;String&gt;) {
+        <span class="self">self</span>.database_name = database_name;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">psl_core::parser_database::ast::FieldArity</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FieldArity</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">arity</span>: <span class="ident">psl_core::parser_database::ast::FieldArity</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">arity</span> {
-            <span class="ident">schema_ast::ast::FieldArity::Required</span> =&gt; <span class="ident">FieldArity::Required</span>,
-            <span class="ident">schema_ast::ast::FieldArity::Optional</span> =&gt; <span class="ident">FieldArity::Optional</span>,
-            <span class="ident">schema_ast::ast::FieldArity::List</span> =&gt; <span class="ident">FieldArity::List</span>,
+<span class="kw">impl </span>From&lt;psl_core::parser_database::ast::FieldArity&gt; <span class="kw">for </span>FieldArity {
+    <span class="kw">fn </span>from(arity: psl_core::parser_database::ast::FieldArity) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>arity {
+            schema_ast::ast::FieldArity::Required =&gt; FieldArity::Required,
+            schema_ast::ast::FieldArity::Optional =&gt; FieldArity::Optional,
+            schema_ast::ast::FieldArity::List =&gt; FieldArity::List,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

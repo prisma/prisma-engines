@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/runtime/stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/runtime/stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -267,274 +267,274 @@
 <span id="267">267</span>
 <span id="268">268</span>
 <span id="269">269</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">net::SocketAddr</span>,
-    <span class="ident">ops::DerefMut</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
-    <span class="ident">time::Duration</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    net::SocketAddr,
+    ops::DerefMut,
+    pin::Pin,
+    task::{Context, Poll},
+    time::Duration,
 };
 
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">cmap::options::StreamOptions</span>,
-    <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">options::ServerAddress</span>,
-    <span class="ident">runtime</span>,
+<span class="kw">use crate</span>::{
+    cmap::options::StreamOptions,
+    error::{ErrorKind, <span class="prelude-ty">Result</span>},
+    options::ServerAddress,
+    runtime,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::tls::AsyncTlsStream</span>;
+<span class="kw">use </span><span class="kw">super</span>::tls::AsyncTlsStream;
 
-<span class="kw">const</span> <span class="ident">DEFAULT_CONNECT_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">10</span>);
-<span class="kw">const</span> <span class="ident">KEEPALIVE_TIME</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">120</span>);
+<span class="kw">const </span>DEFAULT_CONNECT_TIMEOUT: Duration = Duration::from_secs(<span class="number">10</span>);
+<span class="kw">const </span>KEEPALIVE_TIME: Duration = Duration::from_secs(<span class="number">120</span>);
 
-<span class="doccomment">/// A runtime-agnostic async stream possibly using TLS.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">AsyncStream</span> {
-    <span class="ident">Null</span>,
+<span class="doccomment">/// A runtime-agnostic async stream possibly using TLS.
+</span><span class="attribute">#[allow(clippy::large_enum_variant)]
+#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>AsyncStream {
+    Null,
 
-    <span class="doccomment">/// A basic TCP connection to the server.</span>
-    <span class="ident">Tcp</span>(<span class="ident">AsyncTcpStream</span>),
+    <span class="doccomment">/// A basic TCP connection to the server.
+    </span>Tcp(AsyncTcpStream),
 
-    <span class="doccomment">/// A TLS connection over TCP.</span>
-    <span class="ident">Tls</span>(<span class="ident">AsyncTlsStream</span>),
+    <span class="doccomment">/// A TLS connection over TCP.
+    </span>Tls(AsyncTlsStream),
 }
 
-<span class="doccomment">/// A runtime-agnostic async stream.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">AsyncTcpStream</span> {
-    <span class="doccomment">/// Wrapper around `tokio::net:TcpStream`.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-    <span class="ident">Tokio</span>(<span class="ident">tokio::net::TcpStream</span>),
+<span class="doccomment">/// A runtime-agnostic async stream.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>AsyncTcpStream {
+    <span class="doccomment">/// Wrapper around `tokio::net:TcpStream`.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)]
+    </span>Tokio(tokio::net::TcpStream),
 
-    <span class="doccomment">/// Wrapper around `async_std::net::TcpStream`.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-    <span class="ident">AsyncStd</span>(<span class="ident">async_std::net::TcpStream</span>),
+    <span class="doccomment">/// Wrapper around `async_std::net::TcpStream`.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;async-std-runtime&quot;</span>)]
+    </span>AsyncStd(async_std::net::TcpStream),
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tokio::net::TcpStream</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsyncTcpStream</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">stream</span>: <span class="ident">tokio::net::TcpStream</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Tokio</span>(<span class="ident">stream</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;tokio::net::TcpStream&gt; <span class="kw">for </span>AsyncTcpStream {
+    <span class="kw">fn </span>from(stream: tokio::net::TcpStream) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Tokio(stream)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">async_std::net::TcpStream</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsyncTcpStream</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">stream</span>: <span class="ident">async_std::net::TcpStream</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::AsyncStd</span>(<span class="ident">stream</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;async-std-runtime&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;async_std::net::TcpStream&gt; <span class="kw">for </span>AsyncTcpStream {
+    <span class="kw">fn </span>from(stream: async_std::net::TcpStream) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::AsyncStd(stream)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncTcpStream</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">try_connect</span>(<span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>, <span class="ident">connect_timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">tokio::net::TcpStream</span>;
+<span class="kw">impl </span>AsyncTcpStream {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)]
+    </span><span class="kw">async fn </span>try_connect(address: <span class="kw-2">&amp;</span>SocketAddr, connect_timeout: Duration) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>tokio::net::TcpStream;
 
-        <span class="kw">let</span> <span class="ident">stream_future</span> <span class="op">=</span> <span class="ident">TcpStream::connect</span>(<span class="ident">address</span>);
+        <span class="kw">let </span>stream_future = TcpStream::connect(address);
 
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">connect_timeout</span> <span class="op">==</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>) {
-            <span class="ident">stream_future</span>.<span class="kw">await</span><span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">runtime::timeout</span>(<span class="ident">connect_timeout</span>, <span class="ident">stream_future</span>).<span class="kw">await</span><span class="question-mark">?</span><span class="question-mark">?</span>
-        };
+        <span class="kw">let </span>stream = <span class="kw">if </span>connect_timeout == Duration::from_secs(<span class="number">0</span>) {
+            stream_future.<span class="kw">await</span><span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            runtime::timeout(connect_timeout, stream_future).<span class="kw">await</span><span class="question-mark">??
+        </span>};
 
-        <span class="ident">stream</span>.<span class="ident">set_nodelay</span>(<span class="bool-val">true</span>)<span class="question-mark">?</span>;
+        stream.set_nodelay(<span class="bool-val">true</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">socket2::Socket::from</span>(<span class="ident">stream</span>.<span class="ident">into_std</span>()<span class="question-mark">?</span>);
-        <span class="kw">let</span> <span class="ident">conf</span> <span class="op">=</span> <span class="ident">socket2::TcpKeepalive::new</span>().<span class="ident">with_time</span>(<span class="ident">KEEPALIVE_TIME</span>);
-        <span class="ident">socket</span>.<span class="ident">set_tcp_keepalive</span>(<span class="kw-2">&amp;</span><span class="ident">conf</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">std_stream</span> <span class="op">=</span> <span class="ident">std::net::TcpStream::from</span>(<span class="ident">socket</span>);
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">TcpStream::from_std</span>(<span class="ident">std_stream</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>socket = socket2::Socket::from(stream.into_std()<span class="question-mark">?</span>);
+        <span class="kw">let </span>conf = socket2::TcpKeepalive::new().with_time(KEEPALIVE_TIME);
+        socket.set_tcp_keepalive(<span class="kw-2">&amp;</span>conf)<span class="question-mark">?</span>;
+        <span class="kw">let </span>std_stream = std::net::TcpStream::from(socket);
+        <span class="kw">let </span>stream = TcpStream::from_std(std_stream)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">stream</span>.<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(stream.into())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">try_connect</span>(<span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>, <span class="ident">connect_timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">async_std::net::TcpStream</span>;
-        <span class="kw">use</span> <span class="ident">socket2</span>::{<span class="ident">Domain</span>, <span class="ident">Protocol</span>, <span class="ident">SockAddr</span>, <span class="ident">Socket</span>, <span class="ident">Type</span>};
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;async-std-runtime&quot;</span>)]
+    </span><span class="kw">async fn </span>try_connect(address: <span class="kw-2">&amp;</span>SocketAddr, connect_timeout: Duration) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>async_std::net::TcpStream;
+        <span class="kw">use </span>socket2::{Domain, Protocol, SockAddr, Socket, Type};
 
-        <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="ident">Domain::for_address</span>(<span class="kw-2">*</span><span class="ident">address</span>);
-        <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">Socket::new</span>(<span class="ident">domain</span>, <span class="ident">Type::STREAM</span>, <span class="prelude-val">Some</span>(<span class="ident">Protocol::TCP</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">conf</span> <span class="op">=</span> <span class="ident">socket2::TcpKeepalive::new</span>().<span class="ident">with_time</span>(<span class="ident">KEEPALIVE_TIME</span>);
-        <span class="ident">socket</span>.<span class="ident">set_tcp_keepalive</span>(<span class="kw-2">&amp;</span><span class="ident">conf</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>domain = Domain::for_address(<span class="kw-2">*</span>address);
+        <span class="kw">let </span>socket = Socket::new(domain, Type::STREAM, <span class="prelude-val">Some</span>(Protocol::TCP))<span class="question-mark">?</span>;
+        <span class="kw">let </span>conf = socket2::TcpKeepalive::new().with_time(KEEPALIVE_TIME);
+        socket.set_tcp_keepalive(<span class="kw-2">&amp;</span>conf)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">address</span>: <span class="ident">SockAddr</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">address</span>).<span class="ident">into</span>();
-        <span class="kw">if</span> <span class="ident">connect_timeout</span> <span class="op">==</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>) {
-            <span class="ident">socket</span>.<span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">address</span>)<span class="question-mark">?</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">socket</span>.<span class="ident">connect_timeout</span>(<span class="kw-2">&amp;</span><span class="ident">address</span>, <span class="ident">connect_timeout</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>address: SockAddr = (<span class="kw-2">*</span>address).into();
+        <span class="kw">if </span>connect_timeout == Duration::from_secs(<span class="number">0</span>) {
+            socket.connect(<span class="kw-2">&amp;</span>address)<span class="question-mark">?</span>;
+        } <span class="kw">else </span>{
+            socket.connect_timeout(<span class="kw-2">&amp;</span>address, connect_timeout)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">stream</span>: <span class="ident">TcpStream</span> <span class="op">=</span> <span class="ident">std::net::TcpStream::from</span>(<span class="ident">socket</span>).<span class="ident">into</span>();
-        <span class="ident">stream</span>.<span class="ident">set_nodelay</span>(<span class="bool-val">true</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>stream: TcpStream = std::net::TcpStream::from(socket).into();
+        stream.set_nodelay(<span class="bool-val">true</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">stream</span>.<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(stream.into())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span>, <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">connect_timeout</span>.<span class="ident">unwrap_or</span>(<span class="ident">DEFAULT_CONNECT_TIMEOUT</span>);
+    <span class="kw">async fn </span>connect(address: <span class="kw-2">&amp;</span>ServerAddress, connect_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>timeout = connect_timeout.unwrap_or(DEFAULT_CONNECT_TIMEOUT);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">socket_addrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">runtime::resolve_address</span>(<span class="ident">address</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">collect</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>socket_addrs: Vec&lt;<span class="kw">_</span>&gt; = runtime::resolve_address(address).<span class="kw">await</span><span class="question-mark">?</span>.collect();
 
-        <span class="kw">if</span> <span class="ident">socket_addrs</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::DnsResolve</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;No DNS results for domain {}&quot;</span>, <span class="ident">address</span>),
+        <span class="kw">if </span>socket_addrs.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::DnsResolve {
+                message: <span class="macro">format!</span>(<span class="string">&quot;No DNS results for domain {}&quot;</span>, address),
             }
-            .<span class="ident">into</span>());
+            .into());
         }
 
-        <span class="comment">// After considering various approaches, we decided to do what other drivers do, namely try</span>
-        <span class="comment">// each of the addresses in sequence with a preference for IPv4.</span>
-        <span class="ident">socket_addrs</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span><span class="ident">addr</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">addr</span>.<span class="ident">is_ipv4</span>() { <span class="number">0</span> } <span class="kw">else</span> { <span class="number">1</span> });
+        <span class="comment">// After considering various approaches, we decided to do what other drivers do, namely try
+        // each of the addresses in sequence with a preference for IPv4.
+        </span>socket_addrs.sort_by_key(|addr| <span class="kw">if </span>addr.is_ipv4() { <span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">1 </span>});
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connect_error</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>connect_error = <span class="prelude-val">None</span>;
 
-        <span class="kw">for</span> <span class="ident">address</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">socket_addrs</span> {
-            <span class="ident">connect_error</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::try_connect</span>(<span class="ident">address</span>, <span class="ident">timeout</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">stream</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">stream</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+        <span class="kw">for </span>address <span class="kw">in </span><span class="kw-2">&amp;</span>socket_addrs {
+            connect_error = <span class="kw">match </span><span class="self">Self</span>::try_connect(address, timeout).<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(stream) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(stream),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Some</span>(err),
             };
         }
 
-        <span class="prelude-val">Err</span>(<span class="ident">connect_error</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">ErrorKind::Internal</span> {
-                <span class="ident">message</span>: <span class="string">&quot;connecting to all DNS results failed but no error reported&quot;</span>.<span class="ident">to_string</span>(),
+        <span class="prelude-val">Err</span>(connect_error.unwrap_or_else(|| {
+            ErrorKind::Internal {
+                message: <span class="string">&quot;connecting to all DNS results failed but no error reported&quot;</span>.to_string(),
             }
-            .<span class="ident">into</span>()
+            .into()
         }))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncStream</span> {
-    <span class="doccomment">/// Creates a new Tokio TCP stream connected to the server as specified by `options`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">options</span>: <span class="ident">StreamOptions</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">AsyncTcpStream::connect</span>(<span class="kw-2">&amp;</span><span class="ident">options</span>.<span class="ident">address</span>, <span class="ident">options</span>.<span class="ident">connect_timeout</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">impl </span>AsyncStream {
+    <span class="doccomment">/// Creates a new Tokio TCP stream connected to the server as specified by `options`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>connect(options: StreamOptions) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>inner = AsyncTcpStream::connect(<span class="kw-2">&amp;</span>options.address, options.connect_timeout).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="comment">// If there are TLS options, wrap the inner stream with rustls.</span>
-        <span class="kw">match</span> <span class="ident">options</span>.<span class="ident">tls_options</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">cfg</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">address</span>.<span class="ident">host</span>();
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Tls</span>(<span class="ident">AsyncTlsStream::connect</span>(<span class="ident">host</span>, <span class="ident">inner</span>, <span class="ident">cfg</span>).<span class="kw">await</span><span class="question-mark">?</span>))
+        <span class="comment">// If there are TLS options, wrap the inner stream with rustls.
+        </span><span class="kw">match </span>options.tls_options {
+            <span class="prelude-val">Some</span>(cfg) =&gt; {
+                <span class="kw">let </span>host = options.address.host();
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Tls(AsyncTlsStream::connect(host, inner, cfg).<span class="kw">await</span><span class="question-mark">?</span>))
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Tcp</span>(<span class="ident">inner</span>)),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Tcp(inner)),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">tokio::io::AsyncRead</span> <span class="kw">for</span> <span class="ident">AsyncStream</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">tokio::io::ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">deref_mut</span>() {
-            <span class="ident"><span class="self">Self</span>::Null</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
-            <span class="ident"><span class="self">Self</span>::Tcp</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">tokio::io::AsyncRead::poll_read</span>(<span class="ident">Pin::new</span>(<span class="ident">inner</span>), <span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="ident"><span class="self">Self</span>::Tls</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">tokio::io::AsyncRead::poll_read</span>(<span class="ident">Pin::new</span>(<span class="ident">inner</span>), <span class="ident">cx</span>, <span class="ident">buf</span>),
+<span class="kw">impl </span>tokio::io::AsyncRead <span class="kw">for </span>AsyncStream {
+    <span class="kw">fn </span>poll_read(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>tokio::io::ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.deref_mut() {
+            <span class="self">Self</span>::Null =&gt; Poll::Ready(<span class="prelude-val">Ok</span>(())),
+            <span class="self">Self</span>::Tcp(<span class="kw-2">ref mut </span>inner) =&gt; tokio::io::AsyncRead::poll_read(Pin::new(inner), cx, buf),
+            <span class="self">Self</span>::Tls(<span class="kw-2">ref mut </span>inner) =&gt; tokio::io::AsyncRead::poll_read(Pin::new(inner), cx, buf),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">AsyncStream</span> {
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">deref_mut</span>() {
-            <span class="ident"><span class="self">Self</span>::Null</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>)),
-            <span class="ident"><span class="self">Self</span>::Tcp</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">AsyncWrite::poll_write</span>(<span class="ident">Pin::new</span>(<span class="ident">inner</span>), <span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="ident"><span class="self">Self</span>::Tls</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">inner</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+<span class="kw">impl </span>AsyncWrite <span class="kw">for </span>AsyncStream {
+    <span class="kw">fn </span>poll_write(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;std::io::Result&lt;usize&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.deref_mut() {
+            <span class="self">Self</span>::Null =&gt; Poll::Ready(<span class="prelude-val">Ok</span>(<span class="number">0</span>)),
+            <span class="self">Self</span>::Tcp(<span class="kw-2">ref mut </span>inner) =&gt; AsyncWrite::poll_write(Pin::new(inner), cx, buf),
+            <span class="self">Self</span>::Tls(<span class="kw-2">ref mut </span>inner) =&gt; Pin::new(inner).poll_write(cx, buf),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">deref_mut</span>() {
-            <span class="ident"><span class="self">Self</span>::Null</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
-            <span class="ident"><span class="self">Self</span>::Tcp</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">AsyncWrite::poll_flush</span>(<span class="ident">Pin::new</span>(<span class="ident">inner</span>), <span class="ident">cx</span>),
-            <span class="ident"><span class="self">Self</span>::Tls</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">inner</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
+    <span class="kw">fn </span>poll_flush(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.deref_mut() {
+            <span class="self">Self</span>::Null =&gt; Poll::Ready(<span class="prelude-val">Ok</span>(())),
+            <span class="self">Self</span>::Tcp(<span class="kw-2">ref mut </span>inner) =&gt; AsyncWrite::poll_flush(Pin::new(inner), cx),
+            <span class="self">Self</span>::Tls(<span class="kw-2">ref mut </span>inner) =&gt; Pin::new(inner).poll_flush(cx),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">deref_mut</span>() {
-            <span class="ident"><span class="self">Self</span>::Null</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
-            <span class="ident"><span class="self">Self</span>::Tcp</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">inner</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>),
-            <span class="ident"><span class="self">Self</span>::Tls</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">inner</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>),
+    <span class="kw">fn </span>poll_shutdown(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.deref_mut() {
+            <span class="self">Self</span>::Null =&gt; Poll::Ready(<span class="prelude-val">Ok</span>(())),
+            <span class="self">Self</span>::Tcp(<span class="kw-2">ref mut </span>inner) =&gt; Pin::new(inner).poll_shutdown(cx),
+            <span class="self">Self</span>::Tls(<span class="kw-2">ref mut </span>inner) =&gt; Pin::new(inner).poll_shutdown(cx),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">AsyncTcpStream</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">tokio::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">deref_mut</span>() {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Tokio</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">inner</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+<span class="kw">impl </span>AsyncRead <span class="kw">for </span>AsyncTcpStream {
+    <span class="kw">fn </span>poll_read(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>ReadBuf,
+    ) -&gt; Poll&lt;tokio::io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.deref_mut() {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)]
+            </span><span class="self">Self</span>::Tokio(<span class="kw-2">ref mut </span>inner) =&gt; Pin::new(inner).poll_read(cx, buf),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::AsyncStd</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-                <span class="kw">use</span> <span class="ident">tokio_util::compat::FuturesAsyncReadCompatExt</span>;
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;async-std-runtime&quot;</span>)]
+            </span><span class="self">Self</span>::AsyncStd(<span class="kw-2">ref mut </span>inner) =&gt; {
+                <span class="kw">use </span>tokio_util::compat::FuturesAsyncReadCompatExt;
 
-                <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">compat</span>()).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+                Pin::new(<span class="kw-2">&amp;mut </span>inner.compat()).poll_read(cx, buf)
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">AsyncTcpStream</span> {
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">tokio::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">deref_mut</span>() {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Tokio</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">inner</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+<span class="kw">impl </span>AsyncWrite <span class="kw">for </span>AsyncTcpStream {
+    <span class="kw">fn </span>poll_write(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;tokio::io::Result&lt;usize&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.deref_mut() {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)]
+            </span><span class="self">Self</span>::Tokio(<span class="kw-2">ref mut </span>inner) =&gt; Pin::new(inner).poll_write(cx, buf),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::AsyncStd</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-                <span class="kw">use</span> <span class="ident">tokio_util::compat::FuturesAsyncReadCompatExt</span>;
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;async-std-runtime&quot;</span>)]
+            </span><span class="self">Self</span>::AsyncStd(<span class="kw-2">ref mut </span>inner) =&gt; {
+                <span class="kw">use </span>tokio_util::compat::FuturesAsyncReadCompatExt;
 
-                <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">compat</span>()).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+                Pin::new(<span class="kw-2">&amp;mut </span>inner.compat()).poll_write(cx, buf)
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">tokio::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">deref_mut</span>() {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Tokio</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">inner</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
+    <span class="kw">fn </span>poll_flush(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;tokio::io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.deref_mut() {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)]
+            </span><span class="self">Self</span>::Tokio(<span class="kw-2">ref mut </span>inner) =&gt; Pin::new(inner).poll_flush(cx),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::AsyncStd</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-                <span class="kw">use</span> <span class="ident">tokio_util::compat::FuturesAsyncReadCompatExt</span>;
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;async-std-runtime&quot;</span>)]
+            </span><span class="self">Self</span>::AsyncStd(<span class="kw-2">ref mut </span>inner) =&gt; {
+                <span class="kw">use </span>tokio_util::compat::FuturesAsyncReadCompatExt;
 
-                <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">compat</span>()).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
+                Pin::new(<span class="kw-2">&amp;mut </span>inner.compat()).poll_flush(cx)
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">tokio::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">deref_mut</span>() {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Tokio</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">inner</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>),
+    <span class="kw">fn </span>poll_shutdown(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;tokio::io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.deref_mut() {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)]
+            </span><span class="self">Self</span>::Tokio(<span class="kw-2">ref mut </span>inner) =&gt; Pin::new(inner).poll_shutdown(cx),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::AsyncStd</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
-                <span class="kw">use</span> <span class="ident">tokio_util::compat::FuturesAsyncReadCompatExt</span>;
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;async-std-runtime&quot;</span>)]
+            </span><span class="self">Self</span>::AsyncStd(<span class="kw-2">ref mut </span>inner) =&gt; {
+                <span class="kw">use </span>tokio_util::compat::FuturesAsyncReadCompatExt;
 
-                <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">compat</span>()).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>)
+                Pin::new(<span class="kw-2">&amp;mut </span>inner.compat()).poll_shutdown(cx)
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/rows_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rows_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/rows_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rows_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -344,351 +344,351 @@
 <span id="344">344</span>
 <span id="345">345</span>
 <span id="346">346</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp::min</span>, <span class="ident">fmt</span>, <span class="ident">io</span>};
+</span><span class="kw">use </span>std::{cmp::min, fmt, io};
 
-<span class="kw">use</span> <span class="ident">bitvec::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">bytes::BufMut</span>;
-<span class="kw">use</span> <span class="ident">saturating::Saturating</span> <span class="kw">as</span> <span class="ident">S</span>;
+<span class="kw">use </span>bitvec::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>bytes::BufMut;
+<span class="kw">use </span>saturating::Saturating <span class="kw">as </span>S;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">binlog</span>::{
-        <span class="ident">consts</span>::{<span class="ident">BinlogVersion</span>, <span class="ident">EventType</span>, <span class="ident">RowsEventFlags</span>},
-        <span class="ident">row::BinlogRow</span>,
-        <span class="ident">BinlogCtx</span>,
+<span class="kw">use crate</span>::{
+    binlog::{
+        consts::{BinlogVersion, EventType, RowsEventFlags},
+        row::BinlogRow,
+        BinlogCtx,
     },
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">misc</span>::{
-        <span class="ident">raw</span>::{
-            <span class="ident">bytes</span>::{<span class="ident">BareBytes</span>, <span class="ident">EofBytes</span>},
-            <span class="ident">int</span>::<span class="kw-2">*</span>,
-            <span class="ident">RawBytes</span>, <span class="ident">RawFlags</span>,
+    io::ParseBuf,
+    misc::{
+        raw::{
+            bytes::{BareBytes, EofBytes},
+            int::<span class="kw-2">*</span>,
+            RawBytes, RawFlags,
         },
-        <span class="ident">unexpected_buf_eof</span>,
+        unexpected_buf_eof,
     },
-    <span class="ident">proto</span>::{<span class="ident">MyDeserialize</span>, <span class="ident">MySerialize</span>},
+    proto::{MyDeserialize, MySerialize},
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">BinlogEventHeader</span>, <span class="ident">TableMapEvent</span>};
+<span class="kw">use super</span>::{BinlogEventHeader, TableMapEvent};
 
-<span class="doccomment">/// Common base structure for all row-containing binary log events.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RowsEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// An actual `EventType` of this wrapped object.</span>
-    <span class="ident">event_type</span>: <span class="ident">EventType</span>,
-    <span class="doccomment">/// Table identifier.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the table id is `0x00ffffff` it is a dummy event that should have</span>
-    <span class="doccomment">/// the end of statement flag set that declares that all table maps can be freed.</span>
-    <span class="doccomment">/// Otherwise it refers to a table defined by `TABLE_MAP_EVENT`.</span>
-    <span class="ident">table_id</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU48</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Raw rows event flags (see `RowsEventFalgs`).</span>
-    <span class="ident">flags</span>: <span class="ident">RawFlags</span><span class="op">&lt;</span><span class="ident">RowsEventFlags</span>, <span class="ident">LeU16</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Raw extra data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Length is up to `u16::MAX - 2` bytes.</span>
-    <span class="ident">extra_data</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">BareBytes</span><span class="op">&lt;</span>{ <span class="ident">u16::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">2</span> }<span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Number of columns.</span>
-    <span class="ident">num_columns</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LenEnc</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// For DELETE and UPDATE only. Bit-field indicating whether each column is used one bit</span>
-    <span class="doccomment">/// per column.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Will be empty for WRITE events.</span>
-    <span class="ident">columns_before_image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">BareBytes</span><span class="op">&lt;</span><span class="number">0x2000000000000000</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// For WRITE and UPDATE only. Bit-field indicating whether each column is used</span>
-    <span class="doccomment">/// in the `UPDATE_ROWS_EVENT` and `WRITE_ROWS_EVENT` after-image; one bit per column.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Will be empty for DELETE events.</span>
-    <span class="ident">columns_after_image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">BareBytes</span><span class="op">&lt;</span><span class="number">0x2000000000000000</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A sequence of zero or more rows. The end is determined by the size of the event.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each row has the following format:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   A Bit-field indicating whether each field in the row is NULL. Only columns that</span>
-    <span class="doccomment">///     are &quot;used&quot; according to the second field in the variable data part are listed here.</span>
-    <span class="doccomment">///     If the second field in the variable data part has N one-bits, the amount of storage</span>
-    <span class="doccomment">///     required for this field is INT((N + 7) / 8) bytes.</span>
-    <span class="doccomment">/// *   The row-image, containing values of all table fields. This only lists table fields</span>
-    <span class="doccomment">///     that are used (according to the second field of the variable data part) and non-NULL</span>
-    <span class="doccomment">///     (according to the previous field). In other words, the number of values listed here</span>
-    <span class="doccomment">///     is equal to the number of zero bits in the previous field. (not counting padding</span>
-    <span class="doccomment">///     bits in the last byte).</span>
-    <span class="ident">rows_data</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">EofBytes</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Common base structure for all row-containing binary log events.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>RowsEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// An actual `EventType` of this wrapped object.
+    </span>event_type: EventType,
+    <span class="doccomment">/// Table identifier.
+    ///
+    /// If the table id is `0x00ffffff` it is a dummy event that should have
+    /// the end of statement flag set that declares that all table maps can be freed.
+    /// Otherwise it refers to a table defined by `TABLE_MAP_EVENT`.
+    </span>table_id: RawInt&lt;LeU48&gt;,
+    <span class="doccomment">/// Raw rows event flags (see `RowsEventFalgs`).
+    </span>flags: RawFlags&lt;RowsEventFlags, LeU16&gt;,
+    <span class="doccomment">/// Raw extra data.
+    ///
+    /// Length is up to `u16::MAX - 2` bytes.
+    </span>extra_data: RawBytes&lt;<span class="lifetime">&#39;a</span>, BareBytes&lt;{ u16::MAX <span class="kw">as </span>usize - <span class="number">2 </span>}&gt;&gt;,
+    <span class="doccomment">/// Number of columns.
+    </span>num_columns: RawInt&lt;LenEnc&gt;,
+    <span class="doccomment">/// For DELETE and UPDATE only. Bit-field indicating whether each column is used one bit
+    /// per column.
+    ///
+    /// Will be empty for WRITE events.
+    </span>columns_before_image: <span class="prelude-ty">Option</span>&lt;RawBytes&lt;<span class="lifetime">&#39;a</span>, BareBytes&lt;<span class="number">0x2000000000000000</span>&gt;&gt;&gt;,
+    <span class="doccomment">/// For WRITE and UPDATE only. Bit-field indicating whether each column is used
+    /// in the `UPDATE_ROWS_EVENT` and `WRITE_ROWS_EVENT` after-image; one bit per column.
+    ///
+    /// Will be empty for DELETE events.
+    </span>columns_after_image: <span class="prelude-ty">Option</span>&lt;RawBytes&lt;<span class="lifetime">&#39;a</span>, BareBytes&lt;<span class="number">0x2000000000000000</span>&gt;&gt;&gt;,
+    <span class="doccomment">/// A sequence of zero or more rows. The end is determined by the size of the event.
+    ///
+    /// Each row has the following format:
+    ///
+    /// *   A Bit-field indicating whether each field in the row is NULL. Only columns that
+    ///     are &quot;used&quot; according to the second field in the variable data part are listed here.
+    ///     If the second field in the variable data part has N one-bits, the amount of storage
+    ///     required for this field is INT((N + 7) / 8) bytes.
+    /// *   The row-image, containing values of all table fields. This only lists table fields
+    ///     that are used (according to the second field of the variable data part) and non-NULL
+    ///     (according to the previous field). In other words, the number of values listed here
+    ///     is equal to the number of zero bits in the previous field. (not counting padding
+    ///     bits in the last byte).
+    </span>rows_data: RawBytes&lt;<span class="lifetime">&#39;a</span>, EofBytes&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RowsEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns an actual event type of this rows event.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">EventType</span> {
-        <span class="self">self</span>.<span class="ident">event_type</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RowsEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Returns an actual event type of this rows event.
+    </span><span class="kw">pub fn </span>event_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EventType {
+        <span class="self">self</span>.event_type
     }
 
-    <span class="doccomment">/// Returns the number that identifies the table (see `TableMapEvent`).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">table_id</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Returns the number that identifies the table (see `TableMapEvent`).
+    </span><span class="kw">pub fn </span>table_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.table_id.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns the number of columns in the table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">num_columns</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Returns the number of columns in the table.
+    </span><span class="kw">pub fn </span>num_columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.num_columns.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns columns in the before-image (only for DELETE and UPDATE).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each bit indicates whether corresponding column is used in the image.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns_before_image</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">columns_before_image</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">bytes</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">BitSlice::from_slice</span>(<span class="ident">bytes</span>.<span class="ident">as_bytes</span>());
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">slice</span>[..<span class="self">self</span>.<span class="ident">num_columns</span>() <span class="kw">as</span> <span class="ident">usize</span>])
+    <span class="doccomment">/// Returns columns in the before-image (only for DELETE and UPDATE).
+    ///
+    /// Each bit indicates whether corresponding column is used in the image.
+    </span><span class="kw">pub fn </span>columns_before_image(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BitSlice&lt;u8&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.columns_before_image {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>bytes) =&gt; {
+                <span class="kw">let </span>slice = BitSlice::from_slice(bytes.as_bytes());
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>slice[..<span class="self">self</span>.num_columns() <span class="kw">as </span>usize])
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Returns columns in the after-image (only for WRITE and UPDATE).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each bit indicates whether corresponding column is used in the image.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns_after_image</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">columns_after_image</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">bytes</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">BitSlice::from_slice</span>(<span class="ident">bytes</span>.<span class="ident">as_bytes</span>());
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">slice</span>[..<span class="self">self</span>.<span class="ident">num_columns</span>() <span class="kw">as</span> <span class="ident">usize</span>])
+    <span class="doccomment">/// Returns columns in the after-image (only for WRITE and UPDATE).
+    ///
+    /// Each bit indicates whether corresponding column is used in the image.
+    </span><span class="kw">pub fn </span>columns_after_image(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BitSlice&lt;u8&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.columns_after_image {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>bytes) =&gt; {
+                <span class="kw">let </span>slice = BitSlice::from_slice(bytes.as_bytes());
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>slice[..<span class="self">self</span>.num_columns() <span class="kw">as </span>usize])
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Returns raw rows data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rows_data</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">rows_data</span>.<span class="ident">as_bytes</span>()
+    <span class="doccomment">/// Returns raw rows data.
+    </span><span class="kw">pub fn </span>rows_data(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.rows_data.as_bytes()
     }
 
-    <span class="doccomment">/// Returns length of this event in bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will be used in `BinlogStruct` implementations for derived events.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_version</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">S</span>(<span class="number">0</span>);
+    <span class="doccomment">/// Returns length of this event in bytes.
+    ///
+    /// This function will be used in `BinlogStruct` implementations for derived events.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>, _version: BinlogVersion) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>len = S(<span class="number">0</span>);
 
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">6</span>); <span class="comment">// table_id</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">2</span>); <span class="comment">// flags</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">2</span>); <span class="comment">// extra-data len</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident">min</span>(<span class="self">self</span>.<span class="ident">extra_data</span>.<span class="ident">len</span>(), <span class="ident">u16::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">2</span>)); <span class="comment">// extra data</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident"><span class="kw">crate</span>::misc::lenenc_int_len</span>(<span class="self">self</span>.<span class="ident">num_columns</span>()) <span class="kw">as</span> <span class="ident">usize</span>); <span class="comment">// number of columns</span>
-        <span class="kw">let</span> <span class="ident">bitmap_len</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">num_columns</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">8</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">columns_before_image</span>.<span class="ident">is_some</span>() {
-            <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident">bitmap_len</span>); <span class="comment">// columns present bitmap 1</span>
-        }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">columns_after_image</span>.<span class="ident">is_some</span>() {
-            <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident">bitmap_len</span>); <span class="comment">// columns present bitmap 2</span>
-        }
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="self">self</span>.<span class="ident">rows_data</span>.<span class="ident">len</span>());
+        len += S(<span class="number">6</span>); <span class="comment">// table_id
+        </span>len += S(<span class="number">2</span>); <span class="comment">// flags
+        </span>len += S(<span class="number">2</span>); <span class="comment">// extra-data len
+        </span>len += S(min(<span class="self">self</span>.extra_data.len(), u16::MAX <span class="kw">as </span>usize - <span class="number">2</span>)); <span class="comment">// extra data
+        </span>len += S(<span class="kw">crate</span>::misc::lenenc_int_len(<span class="self">self</span>.num_columns()) <span class="kw">as </span>usize); <span class="comment">// number of columns
+        </span><span class="kw">let </span>bitmap_len = (<span class="self">self</span>.num_columns() <span class="kw">as </span>usize + <span class="number">7</span>) / <span class="number">8</span>;
+        <span class="kw">if </span><span class="self">self</span>.columns_before_image.is_some() {
+            len += S(bitmap_len); <span class="comment">// columns present bitmap 1
+        </span>}
+        <span class="kw">if </span><span class="self">self</span>.columns_after_image.is_some() {
+            len += S(bitmap_len); <span class="comment">// columns present bitmap 2
+        </span>}
+        len += S(<span class="self">self</span>.rows_data.len());
 
-        <span class="ident">min</span>(<span class="ident">len</span>.<span class="number">0</span>, <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">BinlogEventHeader::LEN</span>)
+        min(len.<span class="number">0</span>, u32::MAX <span class="kw">as </span>usize - BinlogEventHeader::LEN)
     }
 
-    <span class="doccomment">/// Returns an iterator over event&#39;s rows given the corresponding `TableMapEvent`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rows</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>, <span class="ident">table_map_event</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">TableMapEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="ident">RowsEventRows</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-        <span class="ident">RowsEventRows</span> {
-            <span class="ident">rows_event</span>: <span class="self">self</span>,
-            <span class="ident">table_map_event</span>,
-            <span class="ident">rows_data</span>: <span class="ident">ParseBuf</span>(<span class="self">self</span>.<span class="ident">rows_data</span>.<span class="ident">as_bytes</span>()),
+    <span class="doccomment">/// Returns an iterator over event&#39;s rows given the corresponding `TableMapEvent`.
+    </span><span class="kw">pub fn </span>rows&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="self">self</span>, table_map_event: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>TableMapEvent&lt;<span class="lifetime">&#39;b</span>&gt;) -&gt; RowsEventRows&lt;<span class="lifetime">&#39;b</span>&gt; {
+        RowsEventRows {
+            rows_event: <span class="self">self</span>,
+            table_map_event,
+            rows_data: ParseBuf(<span class="self">self</span>.rows_data.as_bytes()),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">RowsEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="ident">RowsEvent</span> {
-            <span class="ident">event_type</span>: <span class="self">self</span>.<span class="ident">event_type</span>,
-            <span class="ident">table_id</span>: <span class="self">self</span>.<span class="ident">table_id</span>,
-            <span class="ident">flags</span>: <span class="self">self</span>.<span class="ident">flags</span>,
-            <span class="ident">extra_data</span>: <span class="self">self</span>.<span class="ident">extra_data</span>.<span class="ident">into_owned</span>(),
-            <span class="ident">num_columns</span>: <span class="self">self</span>.<span class="ident">num_columns</span>,
-            <span class="ident">columns_before_image</span>: <span class="self">self</span>.<span class="ident">columns_before_image</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">into_owned</span>()),
-            <span class="ident">columns_after_image</span>: <span class="self">self</span>.<span class="ident">columns_after_image</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">into_owned</span>()),
-            <span class="ident">rows_data</span>: <span class="self">self</span>.<span class="ident">rows_data</span>.<span class="ident">into_owned</span>(),
+    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; RowsEvent&lt;<span class="lifetime">&#39;static</span>&gt; {
+        RowsEvent {
+            event_type: <span class="self">self</span>.event_type,
+            table_id: <span class="self">self</span>.table_id,
+            flags: <span class="self">self</span>.flags,
+            extra_data: <span class="self">self</span>.extra_data.into_owned(),
+            num_columns: <span class="self">self</span>.num_columns,
+            columns_before_image: <span class="self">self</span>.columns_before_image.map(|x| x.into_owned()),
+            columns_after_image: <span class="self">self</span>.columns_after_image.map(|x| x.into_owned()),
+            rows_data: <span class="self">self</span>.rows_data.into_owned(),
         }
     }
 }
 
-<span class="doccomment">/// Deserialization context for [`RowsEvent`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RowsEventCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// An actual event type.</span>
-    <span class="kw">pub</span> <span class="ident">event_type</span>: <span class="ident">EventType</span>,
-    <span class="doccomment">/// Additional context data.</span>
-    <span class="kw">pub</span> <span class="ident">binlog_ctx</span>: <span class="ident">BinlogCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Deserialization context for [`RowsEvent`].
+</span><span class="kw">pub struct </span>RowsEventCtx&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// An actual event type.
+    </span><span class="kw">pub </span>event_type: EventType,
+    <span class="doccomment">/// Additional context data.
+    </span><span class="kw">pub </span>binlog_ctx: BinlogCtx&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RowsEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">RowsEventCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>RowsEvent&lt;<span class="lifetime">&#39;de</span>&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = RowsEventCtx&lt;<span class="lifetime">&#39;de</span>&gt;;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">ctx</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">post_header_len</span> <span class="op">=</span> <span class="ident">ctx</span>
-            .<span class="ident">binlog_ctx</span>
-            .<span class="ident">fde</span>
-            .<span class="ident">get_event_type_header_length</span>(<span class="ident">ctx</span>.<span class="ident">event_type</span>);
+    <span class="kw">fn </span>deserialize(ctx: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>post_header_len = ctx
+            .binlog_ctx
+            .fde
+            .get_event_type_header_length(ctx.event_type);
 
-        <span class="kw">let</span> <span class="ident">is_delete_event</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::DELETE_ROWS_EVENT</span>
-            <span class="op">|</span><span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::DELETE_ROWS_EVENT_V1</span>;
+        <span class="kw">let </span>is_delete_event = ctx.event_type == EventType::DELETE_ROWS_EVENT
+            || ctx.event_type == EventType::DELETE_ROWS_EVENT_V1;
 
-        <span class="kw">let</span> <span class="ident">is_update_event</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::UPDATE_ROWS_EVENT</span>
-            <span class="op">|</span><span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::UPDATE_ROWS_EVENT_V1</span>
-            <span class="op">|</span><span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::PARTIAL_UPDATE_ROWS_EVENT</span>;
+        <span class="kw">let </span>is_update_event = ctx.event_type == EventType::UPDATE_ROWS_EVENT
+            || ctx.event_type == EventType::UPDATE_ROWS_EVENT_V1
+            || ctx.event_type == EventType::PARTIAL_UPDATE_ROWS_EVENT;
 
-        <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">post_header_len</span> <span class="op">==</span> <span class="number">6</span> {
-            <span class="comment">// old server</span>
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span><span class="op">&gt;</span>(())<span class="question-mark">?</span>;
-            <span class="ident">RawInt::new</span>(<span class="ident">value</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u64</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>
-        };
+        <span class="kw">let </span>table_id = <span class="kw">if </span>post_header_len == <span class="number">6 </span>{
+            <span class="comment">// old server
+            </span><span class="kw">let </span>value = buf.parse::&lt;RawInt&lt;LeU32&gt;&gt;(())<span class="question-mark">?</span>;
+            RawInt::new(value.<span class="number">0 </span><span class="kw">as </span>u64)
+        } <span class="kw">else </span>{
+            buf.parse(())<span class="question-mark">?
+        </span>};
 
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>flags = buf.parse(())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">extra_data</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">post_header_len</span>
-            <span class="op">==</span> <span class="ident">ctx</span>
-                .<span class="ident">binlog_ctx</span>
-                .<span class="ident">fde</span>
-                .<span class="ident">get_event_type_header_length</span>(<span class="ident">EventType::WRITE_ROWS_EVENT</span>)
+        <span class="kw">let </span>extra_data = <span class="kw">if </span>post_header_len
+            == ctx
+                .binlog_ctx
+                .fde
+                .get_event_type_header_length(EventType::WRITE_ROWS_EVENT)
         {
-            <span class="comment">// variable-length post header containing extra data</span>
-            <span class="kw">let</span> <span class="ident">extra_data_len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">checked_eat_u16_le</span>().<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="ident">extra_data_len</span>.<span class="ident">saturating_sub</span>(<span class="number">2</span>))<span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">RawBytes::new</span>(<span class="kw-2">&amp;</span>[][..])
+            <span class="comment">// variable-length post header containing extra data
+            </span><span class="kw">let </span>extra_data_len = buf.checked_eat_u16_le().ok_or_else(unexpected_buf_eof)<span class="question-mark">? </span><span class="kw">as </span>usize;
+            buf.parse(extra_data_len.saturating_sub(<span class="number">2</span>))<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            RawBytes::new(<span class="kw-2">&amp;</span>[][..])
         };
 
-        <span class="kw">let</span> <span class="ident">num_columns</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LenEnc</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">bitmap_len</span> <span class="op">=</span> (<span class="ident">num_columns</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">8</span>;
+        <span class="kw">let </span>num_columns: RawInt&lt;LenEnc&gt; = buf.parse(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>bitmap_len = (num_columns.<span class="number">0 </span><span class="kw">as </span>usize + <span class="number">7</span>) / <span class="number">8</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns_before_image</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns_after_image</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>columns_before_image = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>columns_after_image = <span class="prelude-val">None</span>;
 
-        <span class="kw">if</span> <span class="ident">is_update_event</span> {
-            <span class="ident">columns_before_image</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">buf</span>.<span class="ident">parse</span>(<span class="ident">bitmap_len</span>)<span class="question-mark">?</span>);
-            <span class="ident">columns_after_image</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">buf</span>.<span class="ident">parse</span>(<span class="ident">bitmap_len</span>)<span class="question-mark">?</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_delete_event</span> {
-            <span class="ident">columns_before_image</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">buf</span>.<span class="ident">parse</span>(<span class="ident">bitmap_len</span>)<span class="question-mark">?</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">columns_after_image</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">buf</span>.<span class="ident">parse</span>(<span class="ident">bitmap_len</span>)<span class="question-mark">?</span>);
+        <span class="kw">if </span>is_update_event {
+            columns_before_image = <span class="prelude-val">Some</span>(buf.parse(bitmap_len)<span class="question-mark">?</span>);
+            columns_after_image = <span class="prelude-val">Some</span>(buf.parse(bitmap_len)<span class="question-mark">?</span>);
+        } <span class="kw">else if </span>is_delete_event {
+            columns_before_image = <span class="prelude-val">Some</span>(buf.parse(bitmap_len)<span class="question-mark">?</span>);
+        } <span class="kw">else </span>{
+            columns_after_image = <span class="prelude-val">Some</span>(buf.parse(bitmap_len)<span class="question-mark">?</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">rows_data</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>rows_data = buf.parse(())<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">event_type</span>: <span class="ident">ctx</span>.<span class="ident">event_type</span>,
-            <span class="ident">table_id</span>,
-            <span class="ident">flags</span>,
-            <span class="ident">extra_data</span>,
-            <span class="ident">num_columns</span>,
-            <span class="ident">columns_before_image</span>,
-            <span class="ident">columns_after_image</span>,
-            <span class="ident">rows_data</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            event_type: ctx.event_type,
+            table_id,
+            flags,
+            extra_data,
+            num_columns,
+            columns_before_image,
+            columns_after_image,
+            rows_data,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">RowsEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">table_id</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+<span class="kw">impl </span>MySerialize <span class="kw">for </span>RowsEvent&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="self">self</span>.table_id.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.flags.serialize(<span class="kw-2">&amp;mut *</span>buf);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::WRITE_ROWS_EVENT</span>
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::UPDATE_ROWS_EVENT</span>
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::DELETE_ROWS_EVENT</span>
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::PARTIAL_UPDATE_ROWS_EVENT</span>
+        <span class="kw">if </span><span class="self">self</span>.event_type == EventType::WRITE_ROWS_EVENT
+            || <span class="self">self</span>.event_type == EventType::UPDATE_ROWS_EVENT
+            || <span class="self">self</span>.event_type == EventType::DELETE_ROWS_EVENT
+            || <span class="self">self</span>.event_type == EventType::PARTIAL_UPDATE_ROWS_EVENT
         {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">min</span>(<span class="self">self</span>.<span class="ident">extra_data</span>.<span class="ident">len</span>().<span class="ident">saturating_add</span>(<span class="number">2</span>), <span class="ident">u16::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">u16</span>;
-            <span class="ident">buf</span>.<span class="ident">put_u16_le</span>(<span class="ident">len</span>);
-            <span class="self">self</span>.<span class="ident">extra_data</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+            <span class="kw">let </span>len = min(<span class="self">self</span>.extra_data.len().saturating_add(<span class="number">2</span>), u16::MAX <span class="kw">as </span>usize) <span class="kw">as </span>u16;
+            buf.put_u16_le(len);
+            <span class="self">self</span>.extra_data.serialize(<span class="kw-2">&amp;mut *</span>buf);
         }
 
-        <span class="self">self</span>.<span class="ident">num_columns</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+        <span class="self">self</span>.num_columns.serialize(<span class="kw-2">&amp;mut *</span>buf);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bitmap</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">columns_before_image</span> {
-            <span class="ident">bitmap</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(bitmap) = <span class="kw-2">&amp;</span><span class="self">self</span>.columns_before_image {
+            bitmap.serialize(<span class="kw-2">&amp;mut *</span>buf);
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bitmap</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">columns_after_image</span> {
-            <span class="ident">bitmap</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(bitmap) = <span class="kw-2">&amp;</span><span class="self">self</span>.columns_after_image {
+            bitmap.serialize(<span class="kw-2">&amp;mut *</span>buf);
         }
 
-        <span class="self">self</span>.<span class="ident">rows_data</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>);
+        <span class="self">self</span>.rows_data.serialize(buf);
     }
 }
 
-<span class="doccomment">/// Iterator over rows of a `RowsEvent`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RowsEventRows</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">rows_event</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RowsEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">table_map_event</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TableMapEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">rows_data</span>: <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Iterator over rows of a `RowsEvent`.
+</span><span class="attribute">#[derive(Clone, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>RowsEventRows&lt;<span class="lifetime">&#39;a</span>&gt; {
+    rows_event: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RowsEvent&lt;<span class="lifetime">&#39;a</span>&gt;,
+    table_map_event: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TableMapEvent&lt;<span class="lifetime">&#39;a</span>&gt;,
+    rows_data: ParseBuf&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RowsEventRows</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">rows_event</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RowsEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-        <span class="ident">table_map_event</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TableMapEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-        <span class="ident">rows_data</span>: <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">rows_event</span>,
-            <span class="ident">table_map_event</span>,
-            <span class="ident">rows_data</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RowsEventRows&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        rows_event: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RowsEvent&lt;<span class="lifetime">&#39;a</span>&gt;,
+        table_map_event: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TableMapEvent&lt;<span class="lifetime">&#39;a</span>&gt;,
+        rows_data: ParseBuf&lt;<span class="lifetime">&#39;a</span>&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            rows_event,
+            table_map_event,
+            rows_data,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">RowsEventRows</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BinlogRow</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BinlogRow</span><span class="op">&gt;</span>)<span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>RowsEventRows&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = io::Result&lt;(<span class="prelude-ty">Option</span>&lt;BinlogRow&gt;, <span class="prelude-ty">Option</span>&lt;BinlogRow&gt;)&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row_before</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row_after</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>row_before = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>row_after = <span class="prelude-val">None</span>;
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">rows_data</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">if </span><span class="self">self</span>.rows_data.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cols</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">rows_event</span>.<span class="ident">columns_before_image</span>() {
-            <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> (
-                <span class="self">self</span>.<span class="ident">rows_event</span>.<span class="ident">num_columns</span>(),
-                <span class="ident">cols</span>,
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(cols) = <span class="self">self</span>.rows_event.columns_before_image() {
+            <span class="kw">let </span>ctx = (
+                <span class="self">self</span>.rows_event.num_columns(),
+                cols,
                 <span class="bool-val">false</span>,
-                <span class="self">self</span>.<span class="ident">table_map_event</span>,
+                <span class="self">self</span>.table_map_event,
             );
-            <span class="ident">row_before</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rows_data</span>.<span class="ident">parse</span>(<span class="ident">ctx</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">row_before</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">row_before</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)),
+            row_before = <span class="kw">match </span><span class="self">self</span>.rows_data.parse(ctx) {
+                <span class="prelude-val">Ok</span>(row_before) =&gt; <span class="prelude-val">Some</span>(row_before),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)),
             };
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cols</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">rows_event</span>.<span class="ident">columns_after_image</span>() {
-            <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> (
-                <span class="self">self</span>.<span class="ident">rows_event</span>.<span class="ident">num_columns</span>(),
-                <span class="ident">cols</span>,
-                <span class="self">self</span>.<span class="ident">rows_event</span>.<span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::PARTIAL_UPDATE_ROWS_EVENT</span>,
-                <span class="self">self</span>.<span class="ident">table_map_event</span>,
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(cols) = <span class="self">self</span>.rows_event.columns_after_image() {
+            <span class="kw">let </span>ctx = (
+                <span class="self">self</span>.rows_event.num_columns(),
+                cols,
+                <span class="self">self</span>.rows_event.event_type == EventType::PARTIAL_UPDATE_ROWS_EVENT,
+                <span class="self">self</span>.table_map_event,
             );
-            <span class="ident">row_after</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rows_data</span>.<span class="ident">parse</span>(<span class="ident">ctx</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">row_after</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">row_after</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)),
+            row_after = <span class="kw">match </span><span class="self">self</span>.rows_data.parse(ctx) {
+                <span class="prelude-val">Ok</span>(row_after) =&gt; <span class="prelude-val">Some</span>(row_after),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)),
             };
         }
 
-        <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((<span class="ident">row_before</span>, <span class="ident">row_after</span>)))
+        <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((row_before, row_after)))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">RowsEventRows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_list</span>().<span class="ident">entries</span>(<span class="self">self</span>.<span class="ident">clone</span>()).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>RowsEventRows&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_list().entries(<span class="self">self</span>.clone()).finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

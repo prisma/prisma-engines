@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/gcm.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gcm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/gcm.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gcm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -338,345 +338,345 @@
 <span id="338">338</span>
 <span id="339">339</span>
 <span id="340">340</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Aad</span>, <span class="ident">Block</span>, <span class="ident">BLOCK_LEN</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cpu</span>;
+</span><span class="kw">use super</span>::{Aad, Block, BLOCK_LEN};
+<span class="kw">use </span><span class="kw">crate</span>::cpu;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">gcm_nohw</span>;
+<span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;aarch64&quot;</span>))]
+</span><span class="kw">mod </span>gcm_nohw;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Key</span>(<span class="ident">HTable</span>);
+<span class="kw">pub struct </span>Key(HTable);
 
-<span class="kw">impl</span> <span class="ident">Key</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">h_be</span>: <span class="ident">Block</span>, <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">h_be</span>.<span class="ident">u64s_be_to_native</span>();
+<span class="kw">impl </span>Key {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(h_be: Block, cpu_features: cpu::Features) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>h = h_be.u64s_be_to_native();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="self">Self</span>(<span class="ident">HTable</span> {
-            <span class="ident">Htable</span>: [<span class="ident">u128</span> { <span class="ident">hi</span>: <span class="number">0</span>, <span class="ident">lo</span>: <span class="number">0</span> }; <span class="ident">HTABLE_LEN</span>],
+        <span class="kw">let </span><span class="kw-2">mut </span>key = <span class="self">Self</span>(HTable {
+            Htable: [u128 { hi: <span class="number">0</span>, lo: <span class="number">0 </span>}; HTABLE_LEN],
         });
-        <span class="kw">let</span> <span class="ident">h_table</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">key</span>.<span class="number">0</span>;
+        <span class="kw">let </span>h_table = <span class="kw-2">&amp;mut </span>key.<span class="number">0</span>;
 
-        <span class="kw">match</span> <span class="ident">detect_implementation</span>(<span class="ident">cpu_features</span>) {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-            <span class="ident">Implementation::CLMUL</span> <span class="kw">if</span> <span class="ident">has_avx_movbe</span>(<span class="ident">cpu_features</span>) =&gt; {
-                <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                    <span class="kw">fn</span> <span class="ident">GFp_gcm_init_avx</span>(<span class="ident">HTable</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HTable</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>]);
+        <span class="kw">match </span>detect_implementation(cpu_features) {
+            <span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+            </span>Implementation::CLMUL <span class="kw">if </span>has_avx_movbe(cpu_features) =&gt; {
+                <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                    <span class="kw">fn </span>GFp_gcm_init_avx(HTable: <span class="kw-2">&amp;mut </span>HTable, h: <span class="kw-2">&amp;</span>[u64; <span class="number">2</span>]);
                 }
-                <span class="kw">unsafe</span> {
-                    <span class="ident">GFp_gcm_init_avx</span>(<span class="ident">h_table</span>, <span class="kw-2">&amp;</span><span class="ident">h</span>);
+                <span class="kw">unsafe </span>{
+                    GFp_gcm_init_avx(h_table, <span class="kw-2">&amp;</span>h);
                 }
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-            ))]</span>
-            <span class="ident">Implementation::CLMUL</span> =&gt; {
-                <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                    <span class="kw">fn</span> <span class="ident">GFp_gcm_init_clmul</span>(<span class="ident">Htable</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HTable</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>]);
+            <span class="attribute">#[cfg(any(
+                target_arch = <span class="string">&quot;aarch64&quot;</span>,
+                target_arch = <span class="string">&quot;arm&quot;</span>,
+                target_arch = <span class="string">&quot;x86_64&quot;</span>,
+                target_arch = <span class="string">&quot;x86&quot;
+            </span>))]
+            </span>Implementation::CLMUL =&gt; {
+                <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                    <span class="kw">fn </span>GFp_gcm_init_clmul(Htable: <span class="kw-2">&amp;mut </span>HTable, h: <span class="kw-2">&amp;</span>[u64; <span class="number">2</span>]);
                 }
-                <span class="kw">unsafe</span> {
-                    <span class="ident">GFp_gcm_init_clmul</span>(<span class="ident">h_table</span>, <span class="kw-2">&amp;</span><span class="ident">h</span>);
-                }
-            }
-
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>))]</span>
-            <span class="ident">Implementation::NEON</span> =&gt; {
-                <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                    <span class="kw">fn</span> <span class="ident">GFp_gcm_init_neon</span>(<span class="ident">Htable</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HTable</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>]);
-                }
-                <span class="kw">unsafe</span> {
-                    <span class="ident">GFp_gcm_init_neon</span>(<span class="ident">h_table</span>, <span class="kw-2">&amp;</span><span class="ident">h</span>);
+                <span class="kw">unsafe </span>{
+                    GFp_gcm_init_clmul(h_table, <span class="kw-2">&amp;</span>h);
                 }
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-            <span class="ident">Implementation::Fallback</span> =&gt; {
-                <span class="ident">h_table</span>.<span class="ident">Htable</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">gcm_nohw::init</span>(<span class="ident">h</span>);
+            <span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;arm&quot;</span>))]
+            </span>Implementation::NEON =&gt; {
+                <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                    <span class="kw">fn </span>GFp_gcm_init_neon(Htable: <span class="kw-2">&amp;mut </span>HTable, h: <span class="kw-2">&amp;</span>[u64; <span class="number">2</span>]);
+                }
+                <span class="kw">unsafe </span>{
+                    GFp_gcm_init_neon(h_table, <span class="kw-2">&amp;</span>h);
+                }
+            }
+
+            <span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;aarch64&quot;</span>))]
+            </span>Implementation::Fallback =&gt; {
+                h_table.Htable[<span class="number">0</span>] = gcm_nohw::init(h);
             }
         }
 
-        <span class="ident">key</span>
+        key
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span> {
-    <span class="ident">inner</span>: <span class="ident">ContextInner</span>,
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
+<span class="kw">pub struct </span>Context {
+    inner: ContextInner,
+    cpu_features: cpu::Features,
 }
 
-<span class="kw">impl</span> <span class="ident">Context</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>, <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context</span> {
-            <span class="ident">inner</span>: <span class="ident">ContextInner</span> {
-                <span class="ident">Xi</span>: <span class="ident">Xi</span>(<span class="ident">Block::zero</span>()),
-                <span class="ident">_unused</span>: <span class="ident">Block::zero</span>(),
-                <span class="ident">Htable</span>: <span class="ident">key</span>.<span class="number">0</span>.<span class="ident">clone</span>(),
+<span class="kw">impl </span>Context {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(key: <span class="kw-2">&amp;</span>Key, aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;, cpu_features: cpu::Features) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>ctx = Context {
+            inner: ContextInner {
+                Xi: Xi(Block::zero()),
+                _unused: Block::zero(),
+                Htable: key.<span class="number">0</span>.clone(),
             },
-            <span class="ident">cpu_features</span>,
+            cpu_features,
         };
 
-        <span class="kw">for</span> <span class="ident">ad</span> <span class="kw">in</span> <span class="ident">aad</span>.<span class="number">0</span>.<span class="ident">chunks</span>(<span class="ident">BLOCK_LEN</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">Block::zero</span>();
-            <span class="ident">block</span>.<span class="ident">overwrite_part_at</span>(<span class="number">0</span>, <span class="ident">ad</span>);
-            <span class="ident">ctx</span>.<span class="ident">update_block</span>(<span class="ident">block</span>);
+        <span class="kw">for </span>ad <span class="kw">in </span>aad.<span class="number">0</span>.chunks(BLOCK_LEN) {
+            <span class="kw">let </span><span class="kw-2">mut </span>block = Block::zero();
+            block.overwrite_part_at(<span class="number">0</span>, ad);
+            ctx.update_block(block);
         }
 
-        <span class="ident">ctx</span>
+        ctx
     }
 
-    <span class="doccomment">/// Access to `inner` for the integrated AES-GCM implementations only.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">ContextInner</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>
+    <span class="doccomment">/// Access to `inner` for the integrated AES-GCM implementations only.
+    </span><span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>inner(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>ContextInner {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_blocks</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="macro">debug_assert!</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>);
-        <span class="macro">debug_assert_eq!</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">BLOCK_LEN</span>, <span class="number">0</span>);
+    <span class="kw">pub fn </span>update_blocks(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="macro">debug_assert!</span>(input.len() &gt; <span class="number">0</span>);
+        <span class="macro">debug_assert_eq!</span>(input.len() % BLOCK_LEN, <span class="number">0</span>);
 
-        <span class="comment">// Although these functions take `Xi` and `h_table` as separate</span>
-        <span class="comment">// parameters, one or more of them might assume that they are part of</span>
-        <span class="comment">// the same `ContextInner` structure.</span>
-        <span class="kw">let</span> <span class="ident">xi</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">Xi</span>;
-        <span class="kw">let</span> <span class="ident">h_table</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">Htable</span>;
+        <span class="comment">// Although these functions take `Xi` and `h_table` as separate
+        // parameters, one or more of them might assume that they are part of
+        // the same `ContextInner` structure.
+        </span><span class="kw">let </span>xi = <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner.Xi;
+        <span class="kw">let </span>h_table = <span class="kw-2">&amp;</span><span class="self">self</span>.inner.Htable;
 
-        <span class="kw">match</span> <span class="ident">detect_implementation</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>) {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-            <span class="ident">Implementation::CLMUL</span> <span class="kw">if</span> <span class="ident">has_avx_movbe</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>) =&gt; {
-                <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                    <span class="kw">fn</span> <span class="ident">GFp_gcm_ghash_avx</span>(
-                        <span class="ident">xi</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Xi</span>,
-                        <span class="ident">Htable</span>: <span class="kw-2">&amp;</span><span class="ident">HTable</span>,
-                        <span class="ident">inp</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-                        <span class="ident">len</span>: <span class="ident"><span class="kw">crate</span>::c::size_t</span>,
+        <span class="kw">match </span>detect_implementation(<span class="self">self</span>.cpu_features) {
+            <span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+            </span>Implementation::CLMUL <span class="kw">if </span>has_avx_movbe(<span class="self">self</span>.cpu_features) =&gt; {
+                <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                    <span class="kw">fn </span>GFp_gcm_ghash_avx(
+                        xi: <span class="kw-2">&amp;mut </span>Xi,
+                        Htable: <span class="kw-2">&amp;</span>HTable,
+                        inp: <span class="kw-2">*const </span>u8,
+                        len: <span class="kw">crate</span>::c::size_t,
                     );
                 }
-                <span class="kw">unsafe</span> {
-                    <span class="ident">GFp_gcm_ghash_avx</span>(<span class="ident">xi</span>, <span class="ident">h_table</span>, <span class="ident">input</span>.<span class="ident">as_ptr</span>(), <span class="ident">input</span>.<span class="ident">len</span>());
+                <span class="kw">unsafe </span>{
+                    GFp_gcm_ghash_avx(xi, h_table, input.as_ptr(), input.len());
                 }
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-            ))]</span>
-            <span class="ident">Implementation::CLMUL</span> =&gt; {
-                <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                    <span class="kw">fn</span> <span class="ident">GFp_gcm_ghash_clmul</span>(
-                        <span class="ident">xi</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Xi</span>,
-                        <span class="ident">Htable</span>: <span class="kw-2">&amp;</span><span class="ident">HTable</span>,
-                        <span class="ident">inp</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-                        <span class="ident">len</span>: <span class="ident"><span class="kw">crate</span>::c::size_t</span>,
+            <span class="attribute">#[cfg(any(
+                target_arch = <span class="string">&quot;aarch64&quot;</span>,
+                target_arch = <span class="string">&quot;arm&quot;</span>,
+                target_arch = <span class="string">&quot;x86_64&quot;</span>,
+                target_arch = <span class="string">&quot;x86&quot;
+            </span>))]
+            </span>Implementation::CLMUL =&gt; {
+                <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                    <span class="kw">fn </span>GFp_gcm_ghash_clmul(
+                        xi: <span class="kw-2">&amp;mut </span>Xi,
+                        Htable: <span class="kw-2">&amp;</span>HTable,
+                        inp: <span class="kw-2">*const </span>u8,
+                        len: <span class="kw">crate</span>::c::size_t,
                     );
                 }
-                <span class="kw">unsafe</span> {
-                    <span class="ident">GFp_gcm_ghash_clmul</span>(<span class="ident">xi</span>, <span class="ident">h_table</span>, <span class="ident">input</span>.<span class="ident">as_ptr</span>(), <span class="ident">input</span>.<span class="ident">len</span>());
+                <span class="kw">unsafe </span>{
+                    GFp_gcm_ghash_clmul(xi, h_table, input.as_ptr(), input.len());
                 }
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>))]</span>
-            <span class="ident">Implementation::NEON</span> =&gt; {
-                <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                    <span class="kw">fn</span> <span class="ident">GFp_gcm_ghash_neon</span>(
-                        <span class="ident">xi</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Xi</span>,
-                        <span class="ident">Htable</span>: <span class="kw-2">&amp;</span><span class="ident">HTable</span>,
-                        <span class="ident">inp</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-                        <span class="ident">len</span>: <span class="ident"><span class="kw">crate</span>::c::size_t</span>,
+            <span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;arm&quot;</span>))]
+            </span>Implementation::NEON =&gt; {
+                <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                    <span class="kw">fn </span>GFp_gcm_ghash_neon(
+                        xi: <span class="kw-2">&amp;mut </span>Xi,
+                        Htable: <span class="kw-2">&amp;</span>HTable,
+                        inp: <span class="kw-2">*const </span>u8,
+                        len: <span class="kw">crate</span>::c::size_t,
                     );
                 }
-                <span class="kw">unsafe</span> {
-                    <span class="ident">GFp_gcm_ghash_neon</span>(<span class="ident">xi</span>, <span class="ident">h_table</span>, <span class="ident">input</span>.<span class="ident">as_ptr</span>(), <span class="ident">input</span>.<span class="ident">len</span>());
+                <span class="kw">unsafe </span>{
+                    GFp_gcm_ghash_neon(xi, h_table, input.as_ptr(), input.len());
                 }
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-            <span class="ident">Implementation::Fallback</span> =&gt; {
-                <span class="ident">gcm_nohw::ghash</span>(<span class="ident">xi</span>, <span class="ident">h_table</span>.<span class="ident">Htable</span>[<span class="number">0</span>], <span class="ident">input</span>);
-            }
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_block</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">Block</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">Xi</span>.<span class="ident">bitxor_assign</span>(<span class="ident">a</span>);
-
-        <span class="comment">// Although these functions take `Xi` and `h_table` as separate</span>
-        <span class="comment">// parameters, one or more of them might assume that they are part of</span>
-        <span class="comment">// the same `ContextInner` structure.</span>
-        <span class="kw">let</span> <span class="ident">xi</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">Xi</span>;
-        <span class="kw">let</span> <span class="ident">h_table</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">Htable</span>;
-
-        <span class="kw">match</span> <span class="ident">detect_implementation</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>) {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-                <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-            ))]</span>
-            <span class="ident">Implementation::CLMUL</span> =&gt; {
-                <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                    <span class="kw">fn</span> <span class="ident">GFp_gcm_gmult_clmul</span>(<span class="ident">xi</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Xi</span>, <span class="ident">Htable</span>: <span class="kw-2">&amp;</span><span class="ident">HTable</span>);
-                }
-                <span class="kw">unsafe</span> {
-                    <span class="ident">GFp_gcm_gmult_clmul</span>(<span class="ident">xi</span>, <span class="ident">h_table</span>);
-                }
-            }
-
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>))]</span>
-            <span class="ident">Implementation::NEON</span> =&gt; {
-                <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                    <span class="kw">fn</span> <span class="ident">GFp_gcm_gmult_neon</span>(<span class="ident">xi</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Xi</span>, <span class="ident">Htable</span>: <span class="kw-2">&amp;</span><span class="ident">HTable</span>);
-                }
-                <span class="kw">unsafe</span> {
-                    <span class="ident">GFp_gcm_gmult_neon</span>(<span class="ident">xi</span>, <span class="ident">h_table</span>);
-                }
-            }
-
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-            <span class="ident">Implementation::Fallback</span> =&gt; {
-                <span class="ident">gcm_nohw::gmult</span>(<span class="ident">xi</span>, <span class="ident">h_table</span>.<span class="ident">Htable</span>[<span class="number">0</span>]);
+            <span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;aarch64&quot;</span>))]
+            </span>Implementation::Fallback =&gt; {
+                gcm_nohw::ghash(xi, h_table.Htable[<span class="number">0</span>], input);
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">pre_finish</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident"><span class="kw">super</span>::Tag</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Xi</span>) -&gt; <span class="ident"><span class="kw">super</span>::Tag</span>,
+    <span class="kw">pub fn </span>update_block(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: Block) {
+        <span class="self">self</span>.inner.Xi.bitxor_assign(a);
+
+        <span class="comment">// Although these functions take `Xi` and `h_table` as separate
+        // parameters, one or more of them might assume that they are part of
+        // the same `ContextInner` structure.
+        </span><span class="kw">let </span>xi = <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner.Xi;
+        <span class="kw">let </span>h_table = <span class="kw-2">&amp;</span><span class="self">self</span>.inner.Htable;
+
+        <span class="kw">match </span>detect_implementation(<span class="self">self</span>.cpu_features) {
+            <span class="attribute">#[cfg(any(
+                target_arch = <span class="string">&quot;aarch64&quot;</span>,
+                target_arch = <span class="string">&quot;arm&quot;</span>,
+                target_arch = <span class="string">&quot;x86_64&quot;</span>,
+                target_arch = <span class="string">&quot;x86&quot;
+            </span>))]
+            </span>Implementation::CLMUL =&gt; {
+                <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                    <span class="kw">fn </span>GFp_gcm_gmult_clmul(xi: <span class="kw-2">&amp;mut </span>Xi, Htable: <span class="kw-2">&amp;</span>HTable);
+                }
+                <span class="kw">unsafe </span>{
+                    GFp_gcm_gmult_clmul(xi, h_table);
+                }
+            }
+
+            <span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;arm&quot;</span>))]
+            </span>Implementation::NEON =&gt; {
+                <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                    <span class="kw">fn </span>GFp_gcm_gmult_neon(xi: <span class="kw-2">&amp;mut </span>Xi, Htable: <span class="kw-2">&amp;</span>HTable);
+                }
+                <span class="kw">unsafe </span>{
+                    GFp_gcm_gmult_neon(xi, h_table);
+                }
+            }
+
+            <span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;aarch64&quot;</span>))]
+            </span>Implementation::Fallback =&gt; {
+                gcm_nohw::gmult(xi, h_table.Htable[<span class="number">0</span>]);
+            }
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>pre_finish&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; <span class="kw">super</span>::Tag
+    <span class="kw">where
+        </span>F: FnOnce(Xi) -&gt; <span class="kw">super</span>::Tag,
     {
-        <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">Xi</span>)
+        f(<span class="self">self</span>.inner.Xi)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_avx2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="ident">detect_implementation</span>(<span class="ident">cpu_features</span>) {
-            <span class="ident">Implementation::CLMUL</span> =&gt; <span class="ident">has_avx_movbe</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>),
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>is_avx2(<span class="kw-2">&amp;</span><span class="self">self</span>, cpu_features: cpu::Features) -&gt; bool {
+        <span class="kw">match </span>detect_implementation(cpu_features) {
+            Implementation::CLMUL =&gt; has_avx_movbe(<span class="self">self</span>.cpu_features),
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="comment">// The alignment is required by non-Rust code that uses `GCM128_CONTEXT`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>, <span class="ident">align</span>(<span class="number">16</span>))]</span>
-<span class="kw">struct</span> <span class="ident">HTable</span> {
-    <span class="ident">Htable</span>: [<span class="ident">u128</span>; <span class="ident">HTABLE_LEN</span>],
+<span class="comment">// The alignment is required by non-Rust code that uses `GCM128_CONTEXT`.
+</span><span class="attribute">#[derive(Clone)]
+#[repr(C, align(<span class="number">16</span>))]
+</span><span class="kw">struct </span>HTable {
+    Htable: [u128; HTABLE_LEN],
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">struct</span> <span class="ident">u128</span> {
-    <span class="ident">hi</span>: <span class="ident">u64</span>,
-    <span class="ident">lo</span>: <span class="ident">u64</span>,
+<span class="attribute">#[derive(Clone, Copy)]
+#[repr(C)]
+</span><span class="kw">struct </span>u128 {
+    hi: u64,
+    lo: u64,
 }
 
-<span class="kw">const</span> <span class="ident">HTABLE_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span>;
+<span class="kw">const </span>HTABLE_LEN: usize = <span class="number">16</span>;
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Xi</span>(<span class="ident">Block</span>);
+<span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub struct </span>Xi(Block);
 
-<span class="kw">impl</span> <span class="ident">Xi</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitxor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">Block</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">bitxor_assign</span>(<span class="ident">a</span>)
+<span class="kw">impl </span>Xi {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitxor_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: Block) {
+        <span class="self">self</span>.<span class="number">0</span>.bitxor_assign(a)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Xi</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Block</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">Xi</span>(<span class="ident">block</span>): <span class="ident">Xi</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">block</span>
+<span class="kw">impl </span>From&lt;Xi&gt; <span class="kw">for </span>Block {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(Xi(block): Xi) -&gt; <span class="self">Self </span>{
+        block
     }
 }
 
-<span class="comment">// This corresponds roughly to the `GCM128_CONTEXT` structure in BoringSSL.</span>
-<span class="comment">// Some assembly language code, in particular the MOVEBE+AVX2 X86-64</span>
-<span class="comment">// implementation, requires this exact layout.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>, <span class="ident">align</span>(<span class="number">16</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">ContextInner</span> {
-    <span class="ident">Xi</span>: <span class="ident">Xi</span>,
-    <span class="ident">_unused</span>: <span class="ident">Block</span>,
-    <span class="ident">Htable</span>: <span class="ident">HTable</span>,
+<span class="comment">// This corresponds roughly to the `GCM128_CONTEXT` structure in BoringSSL.
+// Some assembly language code, in particular the MOVEBE+AVX2 X86-64
+// implementation, requires this exact layout.
+</span><span class="attribute">#[repr(C, align(<span class="number">16</span>))]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>ContextInner {
+    Xi: Xi,
+    _unused: Block,
+    Htable: HTable,
 }
 
-<span class="kw">enum</span> <span class="ident">Implementation</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-    ))]</span>
-    <span class="ident">CLMUL</span>,
+<span class="kw">enum </span>Implementation {
+    <span class="attribute">#[cfg(any(
+        target_arch = <span class="string">&quot;aarch64&quot;</span>,
+        target_arch = <span class="string">&quot;arm&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
+        target_arch = <span class="string">&quot;x86&quot;
+    </span>))]
+    </span>CLMUL,
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>))]</span>
-    <span class="ident">NEON</span>,
+    <span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;arm&quot;</span>))]
+    </span>NEON,
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-    <span class="ident">Fallback</span>,
+    <span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;aarch64&quot;</span>))]
+    </span>Fallback,
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">detect_implementation</span>(<span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="ident">Implementation</span> {
-    <span class="comment">// `cpu_features` is only used for specific platforms.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-    )))]</span>
-    <span class="kw">let</span> <span class="ident">_cpu_features</span> <span class="op">=</span> <span class="ident">cpu_features</span>;
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>detect_implementation(cpu_features: cpu::Features) -&gt; Implementation {
+    <span class="comment">// `cpu_features` is only used for specific platforms.
+    </span><span class="attribute">#[cfg(not(any(
+        target_arch = <span class="string">&quot;aarch64&quot;</span>,
+        target_arch = <span class="string">&quot;arm&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
+        target_arch = <span class="string">&quot;x86&quot;
+    </span>)))]
+    </span><span class="kw">let </span>_cpu_features = cpu_features;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
-    ))]</span>
-    {
-        <span class="kw">if</span> (<span class="ident">cpu::intel::FXSR</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>)
-            <span class="op">&amp;&amp;</span> <span class="ident">cpu::intel::PCLMULQDQ</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>))
-            <span class="op">|</span><span class="op">|</span> <span class="ident">cpu::arm::PMULL</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>)
+    <span class="attribute">#[cfg(any(
+        target_arch = <span class="string">&quot;aarch64&quot;</span>,
+        target_arch = <span class="string">&quot;arm&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
+        target_arch = <span class="string">&quot;x86&quot;
+    </span>))]
+    </span>{
+        <span class="kw">if </span>(cpu::intel::FXSR.available(cpu_features)
+            &amp;&amp; cpu::intel::PCLMULQDQ.available(cpu_features))
+            || cpu::arm::PMULL.available(cpu_features)
         {
-            <span class="kw">return</span> <span class="ident">Implementation::CLMUL</span>;
+            <span class="kw">return </span>Implementation::CLMUL;
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>)]</span>
-    {
-        <span class="kw">if</span> <span class="ident">cpu::arm::NEON</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>) {
-            <span class="kw">return</span> <span class="ident">Implementation::NEON</span>;
+    <span class="attribute">#[cfg(target_arch = <span class="string">&quot;arm&quot;</span>)]
+    </span>{
+        <span class="kw">if </span>cpu::arm::NEON.available(cpu_features) {
+            <span class="kw">return </span>Implementation::NEON;
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>)]</span>
-    {
-        <span class="kw">return</span> <span class="ident">Implementation::NEON</span>;
+    <span class="attribute">#[cfg(target_arch = <span class="string">&quot;aarch64&quot;</span>)]
+    </span>{
+        <span class="kw">return </span>Implementation::NEON;
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-    <span class="ident">Implementation::Fallback</span>
+    <span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;aarch64&quot;</span>))]
+    </span>Implementation::Fallback
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">has_avx_movbe</span>(<span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">cpu::intel::AVX</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>) <span class="op">&amp;&amp;</span> <span class="ident">cpu::intel::MOVBE</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>)
+<span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+</span><span class="kw">fn </span>has_avx_movbe(cpu_features: cpu::Features) -&gt; bool {
+    cpu::intel::AVX.available(cpu_features) &amp;&amp; cpu::intel::MOVBE.available(cpu_features)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

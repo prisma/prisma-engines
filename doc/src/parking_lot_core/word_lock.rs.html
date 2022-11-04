@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parking_lot_core-0.9.3/src/word_lock.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>word_lock.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parking_lot_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parking_lot_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parking_lot_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parking_lot_core-0.9.3/src/word_lock.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>word_lock.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parking_lot_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parking_lot_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parking_lot_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -325,332 +325,332 @@
 <span id="325">325</span>
 <span id="326">326</span>
 <span id="327">327</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Amanieu d&#39;Antras</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Amanieu d&#39;Antras
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::spinwait::SpinWait</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::thread_parker</span>::{<span class="ident">ThreadParker</span>, <span class="ident">ThreadParkerT</span>, <span class="ident">UnparkHandleT</span>};
-<span class="kw">use</span> <span class="ident">core</span>::{
-    <span class="ident">cell::Cell</span>,
-    <span class="ident">mem</span>, <span class="ident">ptr</span>,
-    <span class="ident">sync::atomic</span>::{<span class="ident">fence</span>, <span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>},
+</span><span class="kw">use </span><span class="kw">crate</span>::spinwait::SpinWait;
+<span class="kw">use </span><span class="kw">crate</span>::thread_parker::{ThreadParker, ThreadParkerT, UnparkHandleT};
+<span class="kw">use </span>core::{
+    cell::Cell,
+    mem, ptr,
+    sync::atomic::{fence, AtomicUsize, Ordering},
 };
 
-<span class="kw">struct</span> <span class="ident">ThreadData</span> {
-    <span class="ident">parker</span>: <span class="ident">ThreadParker</span>,
+<span class="kw">struct </span>ThreadData {
+    parker: ThreadParker,
 
-    <span class="comment">// Linked list of threads in the queue. The queue is split into two parts:</span>
-    <span class="comment">// the processed part and the unprocessed part. When new nodes are added to</span>
-    <span class="comment">// the list, they only have the next pointer set, and queue_tail is null.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Nodes are processed with the queue lock held, which consists of setting</span>
-    <span class="comment">// the prev pointer for each node and setting the queue_tail pointer on the</span>
-    <span class="comment">// first processed node of the list.</span>
-    <span class="comment">//</span>
-    <span class="comment">// This setup allows nodes to be added to the queue without a lock, while</span>
-    <span class="comment">// still allowing O(1) removal of nodes from the processed part of the list.</span>
-    <span class="comment">// The only cost is the O(n) processing, but this only needs to be done</span>
-    <span class="comment">// once for each node, and therefore isn&#39;t too expensive.</span>
-    <span class="ident">queue_tail</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="kw-2">*const</span> <span class="ident">ThreadData</span><span class="op">&gt;</span>,
-    <span class="ident">prev</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="kw-2">*const</span> <span class="ident">ThreadData</span><span class="op">&gt;</span>,
-    <span class="ident">next</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="kw-2">*const</span> <span class="ident">ThreadData</span><span class="op">&gt;</span>,
+    <span class="comment">// Linked list of threads in the queue. The queue is split into two parts:
+    // the processed part and the unprocessed part. When new nodes are added to
+    // the list, they only have the next pointer set, and queue_tail is null.
+    //
+    // Nodes are processed with the queue lock held, which consists of setting
+    // the prev pointer for each node and setting the queue_tail pointer on the
+    // first processed node of the list.
+    //
+    // This setup allows nodes to be added to the queue without a lock, while
+    // still allowing O(1) removal of nodes from the processed part of the list.
+    // The only cost is the O(n) processing, but this only needs to be done
+    // once for each node, and therefore isn&#39;t too expensive.
+    </span>queue_tail: Cell&lt;<span class="kw-2">*const </span>ThreadData&gt;,
+    prev: Cell&lt;<span class="kw-2">*const </span>ThreadData&gt;,
+    next: Cell&lt;<span class="kw-2">*const </span>ThreadData&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ThreadData</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">ThreadData</span> {
-        <span class="macro">assert!</span>(<span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">ThreadData</span><span class="op">&gt;</span>() <span class="op">&gt;</span> <span class="op">!</span><span class="ident">QUEUE_MASK</span>);
-        <span class="ident">ThreadData</span> {
-            <span class="ident">parker</span>: <span class="ident">ThreadParker::new</span>(),
-            <span class="ident">queue_tail</span>: <span class="ident">Cell::new</span>(<span class="ident">ptr::null</span>()),
-            <span class="ident">prev</span>: <span class="ident">Cell::new</span>(<span class="ident">ptr::null</span>()),
-            <span class="ident">next</span>: <span class="ident">Cell::new</span>(<span class="ident">ptr::null</span>()),
+<span class="kw">impl </span>ThreadData {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>new() -&gt; ThreadData {
+        <span class="macro">assert!</span>(mem::align_of::&lt;ThreadData&gt;() &gt; !QUEUE_MASK);
+        ThreadData {
+            parker: ThreadParker::new(),
+            queue_tail: Cell::new(ptr::null()),
+            prev: Cell::new(ptr::null()),
+            next: Cell::new(ptr::null()),
         }
     }
 }
 
-<span class="comment">// Invokes the given closure with a reference to the current thread `ThreadData`.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">with_thread_data</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">ThreadData</span>) -&gt; <span class="ident">T</span>) -&gt; <span class="ident">T</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread_data_ptr</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
-    <span class="comment">// If ThreadData is expensive to construct, then we want to use a cached</span>
-    <span class="comment">// version in thread-local storage if possible.</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ThreadParker::IS_CHEAP_TO_CONSTRUCT</span> {
-        <span class="macro">thread_local!</span>(<span class="kw">static</span> <span class="ident">THREAD_DATA</span>: <span class="ident">ThreadData</span> <span class="op">=</span> <span class="ident">ThreadData::new</span>());
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">tls_thread_data</span>) <span class="op">=</span> <span class="ident">THREAD_DATA</span>.<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">ThreadData</span>) {
-            <span class="ident">thread_data_ptr</span> <span class="op">=</span> <span class="ident">tls_thread_data</span>;
+<span class="comment">// Invokes the given closure with a reference to the current thread `ThreadData`.
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>with_thread_data&lt;T&gt;(f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>ThreadData) -&gt; T) -&gt; T {
+    <span class="kw">let </span><span class="kw-2">mut </span>thread_data_ptr = ptr::null();
+    <span class="comment">// If ThreadData is expensive to construct, then we want to use a cached
+    // version in thread-local storage if possible.
+    </span><span class="kw">if </span>!ThreadParker::IS_CHEAP_TO_CONSTRUCT {
+        <span class="macro">thread_local!</span>(<span class="kw">static </span>THREAD_DATA: ThreadData = ThreadData::new());
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(tls_thread_data) = THREAD_DATA.try_with(|x| x <span class="kw">as </span><span class="kw-2">*const </span>ThreadData) {
+            thread_data_ptr = tls_thread_data;
         }
     }
-    <span class="comment">// Otherwise just create a ThreadData on the stack</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread_data_storage</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">if</span> <span class="ident">thread_data_ptr</span>.<span class="ident">is_null</span>() {
-        <span class="ident">thread_data_ptr</span> <span class="op">=</span> <span class="ident">thread_data_storage</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">ThreadData::new</span>);
+    <span class="comment">// Otherwise just create a ThreadData on the stack
+    </span><span class="kw">let </span><span class="kw-2">mut </span>thread_data_storage = <span class="prelude-val">None</span>;
+    <span class="kw">if </span>thread_data_ptr.is_null() {
+        thread_data_ptr = thread_data_storage.get_or_insert_with(ThreadData::new);
     }
 
-    <span class="ident">f</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">thread_data_ptr</span> })
+    f(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>thread_data_ptr })
 }
 
-<span class="kw">const</span> <span class="ident">LOCKED_BIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="kw">const</span> <span class="ident">QUEUE_LOCKED_BIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">const</span> <span class="ident">QUEUE_MASK</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="op">!</span><span class="number">3</span>;
+<span class="kw">const </span>LOCKED_BIT: usize = <span class="number">1</span>;
+<span class="kw">const </span>QUEUE_LOCKED_BIT: usize = <span class="number">2</span>;
+<span class="kw">const </span>QUEUE_MASK: usize = !<span class="number">3</span>;
 
-<span class="comment">// Word-sized lock that is used to implement the parking_lot API. Since this</span>
-<span class="comment">// can&#39;t use parking_lot, it instead manages its own queue of waiting threads.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WordLock</span> {
-    <span class="ident">state</span>: <span class="ident">AtomicUsize</span>,
+<span class="comment">// Word-sized lock that is used to implement the parking_lot API. Since this
+// can&#39;t use parking_lot, it instead manages its own queue of waiting threads.
+</span><span class="kw">pub struct </span>WordLock {
+    state: AtomicUsize,
 }
 
-<span class="kw">impl</span> <span class="ident">WordLock</span> {
-    <span class="doccomment">/// Returns a new, unlocked, WordLock.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">WordLock</span> {
-            <span class="ident">state</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>),
+<span class="kw">impl </span>WordLock {
+    <span class="doccomment">/// Returns a new, unlocked, WordLock.
+    </span><span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
+        WordLock {
+            state: AtomicUsize::new(<span class="number">0</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>
-            .<span class="ident">state</span>
-            .<span class="ident">compare_exchange_weak</span>(<span class="number">0</span>, <span class="ident">LOCKED_BIT</span>, <span class="ident">Ordering::Acquire</span>, <span class="ident">Ordering::Relaxed</span>)
-            .<span class="ident">is_ok</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>lock(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self
+            </span>.state
+            .compare_exchange_weak(<span class="number">0</span>, LOCKED_BIT, Ordering::Acquire, Ordering::Relaxed)
+            .is_ok()
         {
             <span class="kw">return</span>;
         }
-        <span class="self">self</span>.<span class="ident">lock_slow</span>();
+        <span class="self">self</span>.lock_slow();
     }
 
-    <span class="doccomment">/// Must not be called on an already unlocked `WordLock`!</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unlock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">fetch_sub</span>(<span class="ident">LOCKED_BIT</span>, <span class="ident">Ordering::Release</span>);
-        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_queue_locked</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">queue_head</span>().<span class="ident">is_null</span>() {
+    <span class="doccomment">/// Must not be called on an already unlocked `WordLock`!
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub unsafe fn </span>unlock(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span>state = <span class="self">self</span>.state.fetch_sub(LOCKED_BIT, Ordering::Release);
+        <span class="kw">if </span>state.is_queue_locked() || state.queue_head().is_null() {
             <span class="kw">return</span>;
         }
-        <span class="self">self</span>.<span class="ident">unlock_slow</span>();
+        <span class="self">self</span>.unlock_slow();
     }
 
-    <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">lock_slow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spinwait</span> <span class="op">=</span> <span class="ident">SpinWait::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-        <span class="kw">loop</span> {
-            <span class="comment">// Grab the lock if it isn&#39;t locked, even if there is a queue on it</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">state</span>.<span class="ident">is_locked</span>() {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compare_exchange_weak</span>(
-                    <span class="ident">state</span>,
-                    <span class="ident">state</span> <span class="op">|</span> <span class="ident">LOCKED_BIT</span>,
-                    <span class="ident">Ordering::Acquire</span>,
-                    <span class="ident">Ordering::Relaxed</span>,
+    <span class="attribute">#[cold]
+    </span><span class="kw">fn </span>lock_slow(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>spinwait = SpinWait::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state.load(Ordering::Relaxed);
+        <span class="kw">loop </span>{
+            <span class="comment">// Grab the lock if it isn&#39;t locked, even if there is a queue on it
+            </span><span class="kw">if </span>!state.is_locked() {
+                <span class="kw">match </span><span class="self">self</span>.state.compare_exchange_weak(
+                    state,
+                    state | LOCKED_BIT,
+                    Ordering::Acquire,
+                    Ordering::Relaxed,
                 ) {
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
+                    <span class="prelude-val">Err</span>(x) =&gt; state = x,
                 }
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// If there is no queue, try spinning a few times</span>
-            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">queue_head</span>().<span class="ident">is_null</span>() <span class="op">&amp;&amp;</span> <span class="ident">spinwait</span>.<span class="ident">spin</span>() {
-                <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+            <span class="comment">// If there is no queue, try spinning a few times
+            </span><span class="kw">if </span>state.queue_head().is_null() &amp;&amp; spinwait.spin() {
+                state = <span class="self">self</span>.state.load(Ordering::Relaxed);
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// Get our thread data and prepare it for parking</span>
-            <span class="ident">state</span> <span class="op">=</span> <span class="ident">with_thread_data</span>(<span class="op">|</span><span class="ident">thread_data</span><span class="op">|</span> {
-                <span class="comment">// The pthread implementation is still unsafe, so we need to surround `prepare_park`</span>
-                <span class="comment">// with `unsafe {}`.</span>
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_unsafe</span>)]</span>
-                <span class="kw">unsafe</span> {
-                    <span class="ident">thread_data</span>.<span class="ident">parker</span>.<span class="ident">prepare_park</span>();
+            <span class="comment">// Get our thread data and prepare it for parking
+            </span>state = with_thread_data(|thread_data| {
+                <span class="comment">// The pthread implementation is still unsafe, so we need to surround `prepare_park`
+                // with `unsafe {}`.
+                </span><span class="attribute">#[allow(unused_unsafe)]
+                </span><span class="kw">unsafe </span>{
+                    thread_data.parker.prepare_park();
                 }
 
-                <span class="comment">// Add our thread to the front of the queue</span>
-                <span class="kw">let</span> <span class="ident">queue_head</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">queue_head</span>();
-                <span class="kw">if</span> <span class="ident">queue_head</span>.<span class="ident">is_null</span>() {
-                    <span class="ident">thread_data</span>.<span class="ident">queue_tail</span>.<span class="ident">set</span>(<span class="ident">thread_data</span>);
-                    <span class="ident">thread_data</span>.<span class="ident">prev</span>.<span class="ident">set</span>(<span class="ident">ptr::null</span>());
-                } <span class="kw">else</span> {
-                    <span class="ident">thread_data</span>.<span class="ident">queue_tail</span>.<span class="ident">set</span>(<span class="ident">ptr::null</span>());
-                    <span class="ident">thread_data</span>.<span class="ident">prev</span>.<span class="ident">set</span>(<span class="ident">ptr::null</span>());
-                    <span class="ident">thread_data</span>.<span class="ident">next</span>.<span class="ident">set</span>(<span class="ident">queue_head</span>);
+                <span class="comment">// Add our thread to the front of the queue
+                </span><span class="kw">let </span>queue_head = state.queue_head();
+                <span class="kw">if </span>queue_head.is_null() {
+                    thread_data.queue_tail.set(thread_data);
+                    thread_data.prev.set(ptr::null());
+                } <span class="kw">else </span>{
+                    thread_data.queue_tail.set(ptr::null());
+                    thread_data.prev.set(ptr::null());
+                    thread_data.next.set(queue_head);
                 }
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compare_exchange_weak</span>(
-                    <span class="ident">state</span>,
-                    <span class="ident">state</span>.<span class="ident">with_queue_head</span>(<span class="ident">thread_data</span>),
-                    <span class="ident">Ordering::AcqRel</span>,
-                    <span class="ident">Ordering::Relaxed</span>,
+                <span class="kw">if let </span><span class="prelude-val">Err</span>(x) = <span class="self">self</span>.state.compare_exchange_weak(
+                    state,
+                    state.with_queue_head(thread_data),
+                    Ordering::AcqRel,
+                    Ordering::Relaxed,
                 ) {
-                    <span class="kw">return</span> <span class="ident">x</span>;
+                    <span class="kw">return </span>x;
                 }
 
-                <span class="comment">// Sleep until we are woken up by an unlock</span>
-                <span class="comment">// Ignoring unused unsafe, since it&#39;s only a few platforms where this is unsafe.</span>
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_unsafe</span>)]</span>
-                <span class="kw">unsafe</span> {
-                    <span class="ident">thread_data</span>.<span class="ident">parker</span>.<span class="ident">park</span>();
+                <span class="comment">// Sleep until we are woken up by an unlock
+                // Ignoring unused unsafe, since it&#39;s only a few platforms where this is unsafe.
+                </span><span class="attribute">#[allow(unused_unsafe)]
+                </span><span class="kw">unsafe </span>{
+                    thread_data.parker.park();
                 }
 
-                <span class="comment">// Loop back and try locking again</span>
-                <span class="ident">spinwait</span>.<span class="ident">reset</span>();
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>)
+                <span class="comment">// Loop back and try locking again
+                </span>spinwait.reset();
+                <span class="self">self</span>.state.load(Ordering::Relaxed)
             });
         }
     }
 
-    <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unlock_slow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-        <span class="kw">loop</span> {
-            <span class="comment">// We just unlocked the WordLock. Just check if there is a thread</span>
-            <span class="comment">// to wake up. If the queue is locked then another thread is already</span>
-            <span class="comment">// taking care of waking up a thread.</span>
-            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_queue_locked</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">queue_head</span>().<span class="ident">is_null</span>() {
+    <span class="attribute">#[cold]
+    </span><span class="kw">fn </span>unlock_slow(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state.load(Ordering::Relaxed);
+        <span class="kw">loop </span>{
+            <span class="comment">// We just unlocked the WordLock. Just check if there is a thread
+            // to wake up. If the queue is locked then another thread is already
+            // taking care of waking up a thread.
+            </span><span class="kw">if </span>state.is_queue_locked() || state.queue_head().is_null() {
                 <span class="kw">return</span>;
             }
 
-            <span class="comment">// Try to grab the queue lock</span>
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compare_exchange_weak</span>(
-                <span class="ident">state</span>,
-                <span class="ident">state</span> <span class="op">|</span> <span class="ident">QUEUE_LOCKED_BIT</span>,
-                <span class="ident">Ordering::Acquire</span>,
-                <span class="ident">Ordering::Relaxed</span>,
+            <span class="comment">// Try to grab the queue lock
+            </span><span class="kw">match </span><span class="self">self</span>.state.compare_exchange_weak(
+                state,
+                state | QUEUE_LOCKED_BIT,
+                Ordering::Acquire,
+                Ordering::Relaxed,
             ) {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
+                <span class="prelude-val">Err</span>(x) =&gt; state = x,
             }
         }
 
-        <span class="comment">// Now we have the queue lock and the queue is non-empty</span>
-        <span class="lifetime">&#39;outer</span>: <span class="kw">loop</span> {
-            <span class="comment">// First, we need to fill in the prev pointers for any newly added</span>
-            <span class="comment">// threads. We do this until we reach a node that we previously</span>
-            <span class="comment">// processed, which has a non-null queue_tail pointer.</span>
-            <span class="kw">let</span> <span class="ident">queue_head</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">queue_head</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">queue_tail</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current</span> <span class="op">=</span> <span class="ident">queue_head</span>;
-            <span class="kw">loop</span> {
-                <span class="ident">queue_tail</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="ident">current</span>).<span class="ident">queue_tail</span>.<span class="ident">get</span>() };
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">queue_tail</span>.<span class="ident">is_null</span>() {
+        <span class="comment">// Now we have the queue lock and the queue is non-empty
+        </span><span class="lifetime">&#39;outer</span>: <span class="kw">loop </span>{
+            <span class="comment">// First, we need to fill in the prev pointers for any newly added
+            // threads. We do this until we reach a node that we previously
+            // processed, which has a non-null queue_tail pointer.
+            </span><span class="kw">let </span>queue_head = state.queue_head();
+            <span class="kw">let </span><span class="kw-2">mut </span>queue_tail;
+            <span class="kw">let </span><span class="kw-2">mut </span>current = queue_head;
+            <span class="kw">loop </span>{
+                queue_tail = <span class="kw">unsafe </span>{ (<span class="kw-2">*</span>current).queue_tail.get() };
+                <span class="kw">if </span>!queue_tail.is_null() {
                     <span class="kw">break</span>;
                 }
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">current</span>).<span class="ident">next</span>.<span class="ident">get</span>();
-                    (<span class="kw-2">*</span><span class="ident">next</span>).<span class="ident">prev</span>.<span class="ident">set</span>(<span class="ident">current</span>);
-                    <span class="ident">current</span> <span class="op">=</span> <span class="ident">next</span>;
+                <span class="kw">unsafe </span>{
+                    <span class="kw">let </span>next = (<span class="kw-2">*</span>current).next.get();
+                    (<span class="kw-2">*</span>next).prev.set(current);
+                    current = next;
                 }
             }
 
-            <span class="comment">// Set queue_tail on the queue head to indicate that the whole list</span>
-            <span class="comment">// has prev pointers set correctly.</span>
-            <span class="kw">unsafe</span> {
-                (<span class="kw-2">*</span><span class="ident">queue_head</span>).<span class="ident">queue_tail</span>.<span class="ident">set</span>(<span class="ident">queue_tail</span>);
+            <span class="comment">// Set queue_tail on the queue head to indicate that the whole list
+            // has prev pointers set correctly.
+            </span><span class="kw">unsafe </span>{
+                (<span class="kw-2">*</span>queue_head).queue_tail.set(queue_tail);
             }
 
-            <span class="comment">// If the WordLock is locked, then there is no point waking up a</span>
-            <span class="comment">// thread now. Instead we let the next unlocker take care of waking</span>
-            <span class="comment">// up a thread.</span>
-            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_locked</span>() {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compare_exchange_weak</span>(
-                    <span class="ident">state</span>,
-                    <span class="ident">state</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">QUEUE_LOCKED_BIT</span>,
-                    <span class="ident">Ordering::Release</span>,
-                    <span class="ident">Ordering::Relaxed</span>,
+            <span class="comment">// If the WordLock is locked, then there is no point waking up a
+            // thread now. Instead we let the next unlocker take care of waking
+            // up a thread.
+            </span><span class="kw">if </span>state.is_locked() {
+                <span class="kw">match </span><span class="self">self</span>.state.compare_exchange_weak(
+                    state,
+                    state &amp; !QUEUE_LOCKED_BIT,
+                    Ordering::Release,
+                    Ordering::Relaxed,
                 ) {
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
+                    <span class="prelude-val">Err</span>(x) =&gt; state = x,
                 }
 
-                <span class="comment">// Need an acquire fence before reading the new queue</span>
-                <span class="ident">fence_acquire</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>);
+                <span class="comment">// Need an acquire fence before reading the new queue
+                </span>fence_acquire(<span class="kw-2">&amp;</span><span class="self">self</span>.state);
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// Remove the last thread from the queue and unlock the queue</span>
-            <span class="kw">let</span> <span class="ident">new_tail</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="ident">queue_tail</span>).<span class="ident">prev</span>.<span class="ident">get</span>() };
-            <span class="kw">if</span> <span class="ident">new_tail</span>.<span class="ident">is_null</span>() {
-                <span class="kw">loop</span> {
-                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compare_exchange_weak</span>(
-                        <span class="ident">state</span>,
-                        <span class="ident">state</span> <span class="op">&amp;</span> <span class="ident">LOCKED_BIT</span>,
-                        <span class="ident">Ordering::Release</span>,
-                        <span class="ident">Ordering::Relaxed</span>,
+            <span class="comment">// Remove the last thread from the queue and unlock the queue
+            </span><span class="kw">let </span>new_tail = <span class="kw">unsafe </span>{ (<span class="kw-2">*</span>queue_tail).prev.get() };
+            <span class="kw">if </span>new_tail.is_null() {
+                <span class="kw">loop </span>{
+                    <span class="kw">match </span><span class="self">self</span>.state.compare_exchange_weak(
+                        state,
+                        state &amp; LOCKED_BIT,
+                        Ordering::Release,
+                        Ordering::Relaxed,
                     ) {
                         <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
-                        <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
+                        <span class="prelude-val">Err</span>(x) =&gt; state = x,
                     }
 
-                    <span class="comment">// If the compare_exchange failed because a new thread was</span>
-                    <span class="comment">// added to the queue then we need to re-scan the queue to</span>
-                    <span class="comment">// find the previous element.</span>
-                    <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">queue_head</span>().<span class="ident">is_null</span>() {
+                    <span class="comment">// If the compare_exchange failed because a new thread was
+                    // added to the queue then we need to re-scan the queue to
+                    // find the previous element.
+                    </span><span class="kw">if </span>state.queue_head().is_null() {
                         <span class="kw">continue</span>;
-                    } <span class="kw">else</span> {
-                        <span class="comment">// Need an acquire fence before reading the new queue</span>
-                        <span class="ident">fence_acquire</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>);
-                        <span class="kw">continue</span> <span class="lifetime">&#39;outer</span>;
+                    } <span class="kw">else </span>{
+                        <span class="comment">// Need an acquire fence before reading the new queue
+                        </span>fence_acquire(<span class="kw-2">&amp;</span><span class="self">self</span>.state);
+                        <span class="kw">continue </span><span class="lifetime">&#39;outer</span>;
                     }
                 }
-            } <span class="kw">else</span> {
-                <span class="kw">unsafe</span> {
-                    (<span class="kw-2">*</span><span class="ident">queue_head</span>).<span class="ident">queue_tail</span>.<span class="ident">set</span>(<span class="ident">new_tail</span>);
+            } <span class="kw">else </span>{
+                <span class="kw">unsafe </span>{
+                    (<span class="kw-2">*</span>queue_head).queue_tail.set(new_tail);
                 }
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">fetch_and</span>(<span class="op">!</span><span class="ident">QUEUE_LOCKED_BIT</span>, <span class="ident">Ordering::Release</span>);
+                <span class="self">self</span>.state.fetch_and(!QUEUE_LOCKED_BIT, Ordering::Release);
             }
 
-            <span class="comment">// Finally, wake up the thread we removed from the queue. Note that</span>
-            <span class="comment">// we don&#39;t need to worry about any races here since the thread is</span>
-            <span class="comment">// guaranteed to be sleeping right now and we are the only one who</span>
-            <span class="comment">// can wake it up.</span>
-            <span class="kw">unsafe</span> {
-                (<span class="kw-2">*</span><span class="ident">queue_tail</span>).<span class="ident">parker</span>.<span class="ident">unpark_lock</span>().<span class="ident">unpark</span>();
+            <span class="comment">// Finally, wake up the thread we removed from the queue. Note that
+            // we don&#39;t need to worry about any races here since the thread is
+            // guaranteed to be sleeping right now and we are the only one who
+            // can wake it up.
+            </span><span class="kw">unsafe </span>{
+                (<span class="kw-2">*</span>queue_tail).parker.unpark_lock().unpark();
             }
             <span class="kw">break</span>;
         }
     }
 }
 
-<span class="comment">// Thread-Sanitizer only has partial fence support, so when running under it, we</span>
-<span class="comment">// try and avoid false positives by using a discarded acquire load instead.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">fence_acquire</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">tsan_enabled</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-    } <span class="kw">else</span> {
-        <span class="ident">fence</span>(<span class="ident">Ordering::Acquire</span>);
+<span class="comment">// Thread-Sanitizer only has partial fence support, so when running under it, we
+// try and avoid false positives by using a discarded acquire load instead.
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>fence_acquire(a: <span class="kw-2">&amp;</span>AtomicUsize) {
+    <span class="kw">if </span><span class="macro">cfg!</span>(tsan_enabled) {
+        <span class="kw">let _ </span>= a.load(Ordering::Acquire);
+    } <span class="kw">else </span>{
+        fence(Ordering::Acquire);
     }
 }
 
-<span class="kw">trait</span> <span class="ident">LockState</span> {
-    <span class="kw">fn</span> <span class="ident">is_locked</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">is_queue_locked</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">queue_head</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">ThreadData</span>;
-    <span class="kw">fn</span> <span class="ident">with_queue_head</span>(<span class="self">self</span>, <span class="ident">thread_data</span>: <span class="kw-2">*const</span> <span class="ident">ThreadData</span>) -&gt; <span class="self">Self</span>;
+<span class="kw">trait </span>LockState {
+    <span class="kw">fn </span>is_locked(<span class="self">self</span>) -&gt; bool;
+    <span class="kw">fn </span>is_queue_locked(<span class="self">self</span>) -&gt; bool;
+    <span class="kw">fn </span>queue_head(<span class="self">self</span>) -&gt; <span class="kw-2">*const </span>ThreadData;
+    <span class="kw">fn </span>with_queue_head(<span class="self">self</span>, thread_data: <span class="kw-2">*const </span>ThreadData) -&gt; <span class="self">Self</span>;
 }
 
-<span class="kw">impl</span> <span class="ident">LockState</span> <span class="kw">for</span> <span class="ident">usize</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_locked</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">&amp;</span> <span class="ident">LOCKED_BIT</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+<span class="kw">impl </span>LockState <span class="kw">for </span>usize {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_locked(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>&amp; LOCKED_BIT != <span class="number">0
+    </span>}
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_queue_locked(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>&amp; QUEUE_LOCKED_BIT != <span class="number">0
+    </span>}
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>queue_head(<span class="self">self</span>) -&gt; <span class="kw-2">*const </span>ThreadData {
+        (<span class="self">self </span>&amp; QUEUE_MASK) <span class="kw">as </span><span class="kw-2">*const </span>ThreadData
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_queue_locked</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">&amp;</span> <span class="ident">QUEUE_LOCKED_BIT</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">queue_head</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">ThreadData</span> {
-        (<span class="self">self</span> <span class="op">&amp;</span> <span class="ident">QUEUE_MASK</span>) <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">ThreadData</span>
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_queue_head</span>(<span class="self">self</span>, <span class="ident">thread_data</span>: <span class="kw-2">*const</span> <span class="ident">ThreadData</span>) -&gt; <span class="self">Self</span> {
-        (<span class="self">self</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">QUEUE_MASK</span>) <span class="op">|</span> <span class="ident">thread_data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>with_queue_head(<span class="self">self</span>, thread_data: <span class="kw-2">*const </span>ThreadData) -&gt; <span class="self">Self </span>{
+        (<span class="self">self </span>&amp; !QUEUE_MASK) | thread_data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parking_lot_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parking_lot_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/enum_map.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enum_map.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serde_with/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/enum_map.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enum_map.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serde_with/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -886,893 +886,893 @@
 <span id="886">886</span>
 <span id="887">887</span>
 <span id="888">888</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">content::ser</span>::{<span class="ident">Content</span>, <span class="ident">ContentSerializer</span>},
-    <span class="ident">DeserializeAs</span>, <span class="ident">SerializeAs</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    content::ser::{Content, ContentSerializer},
+    DeserializeAs, SerializeAs,
 };
-<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">string::ToString</span>, <span class="ident">vec::Vec</span>};
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::{
-    <span class="ident">de</span>::{<span class="ident">DeserializeSeed</span>, <span class="ident">EnumAccess</span>, <span class="ident">Error</span>, <span class="ident">MapAccess</span>, <span class="ident">SeqAccess</span>, <span class="ident">VariantAccess</span>, <span class="ident">Visitor</span>},
-    <span class="ident">ser</span>,
-    <span class="ident">ser</span>::{<span class="ident">Impossible</span>, <span class="ident">SerializeMap</span>, <span class="ident">SerializeSeq</span>, <span class="ident">SerializeStructVariant</span>, <span class="ident">SerializeTupleVariant</span>},
-    <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>,
+<span class="kw">use </span>alloc::{string::ToString, vec::Vec};
+<span class="kw">use </span>core::{fmt, marker::PhantomData};
+<span class="kw">use </span>serde::{
+    de::{DeserializeSeed, EnumAccess, Error, MapAccess, SeqAccess, VariantAccess, Visitor},
+    ser,
+    ser::{Impossible, SerializeMap, SerializeSeq, SerializeStructVariant, SerializeTupleVariant},
+    Deserialize, Deserializer, Serialize, Serializer,
 };
 
-<span class="doccomment">/// Represent a list of enum values as a map.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This **only works** if the enum uses the default *externally tagged* representation.</span>
-<span class="doccomment">/// Other enum representations are not supported.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// serde data formats often represent *externally tagged* enums as maps with a single key.</span>
-<span class="doccomment">/// The key is the enum variant name, and the value is the variant value.</span>
-<span class="doccomment">/// Sometimes a map with multiple keys should be treated like a list of enum values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## JSON Map with multiple keys</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
-<span class="doccomment">/// use serde_with::EnumMap;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # #[derive(Debug, Clone, PartialEq, Eq)]</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// enum EnumValue {</span>
-<span class="doccomment">///     Int(i32),</span>
-<span class="doccomment">///     String(String),</span>
-<span class="doccomment">///     Unit,</span>
-<span class="doccomment">///     Tuple(i32, String, bool),</span>
-<span class="doccomment">///     Struct {</span>
-<span class="doccomment">///         a: i32,</span>
-<span class="doccomment">///         b: String,</span>
-<span class="doccomment">///         c: bool,</span>
-<span class="doccomment">///     },</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[serde_with::serde_as]</span>
-<span class="doccomment">/// # #[derive(Debug, Clone, PartialEq, Eq)]</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct VecEnumValues (</span>
-<span class="doccomment">///     #[serde_as(as = &quot;EnumMap&quot;)]</span>
-<span class="doccomment">///     Vec&lt;EnumValue&gt;,</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // ---</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // This will serialize this list of values</span>
-<span class="doccomment">/// let values = VecEnumValues(vec![</span>
-<span class="doccomment">///     EnumValue::Int(123),</span>
-<span class="doccomment">///     EnumValue::String(&quot;FooBar&quot;.to_string()),</span>
-<span class="doccomment">///     EnumValue::Int(456),</span>
-<span class="doccomment">///     EnumValue::String(&quot;XXX&quot;.to_string()),</span>
-<span class="doccomment">///     EnumValue::Unit,</span>
-<span class="doccomment">///     EnumValue::Tuple(1, &quot;Middle&quot;.to_string(), false),</span>
-<span class="doccomment">///     EnumValue::Struct {</span>
-<span class="doccomment">///         a: 666,</span>
-<span class="doccomment">///         b: &quot;BBB&quot;.to_string(),</span>
-<span class="doccomment">///         c: true,</span>
-<span class="doccomment">///     },</span>
-<span class="doccomment">/// ]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // into this JSON map</span>
-<span class="doccomment">/// // Duplicate keys are emitted for identical enum variants.</span>
-<span class="doccomment">/// let expected =</span>
-<span class="doccomment">/// r#&quot;{</span>
-<span class="doccomment">///   &quot;Int&quot;: 123,</span>
-<span class="doccomment">///   &quot;String&quot;: &quot;FooBar&quot;,</span>
-<span class="doccomment">///   &quot;Int&quot;: 456,</span>
-<span class="doccomment">///   &quot;String&quot;: &quot;XXX&quot;,</span>
-<span class="doccomment">///   &quot;Unit&quot;: null,</span>
-<span class="doccomment">///   &quot;Tuple&quot;: [</span>
-<span class="doccomment">///     1,</span>
-<span class="doccomment">///     &quot;Middle&quot;,</span>
-<span class="doccomment">///     false</span>
-<span class="doccomment">///   ],</span>
-<span class="doccomment">///   &quot;Struct&quot;: {</span>
-<span class="doccomment">///     &quot;a&quot;: 666,</span>
-<span class="doccomment">///     &quot;b&quot;: &quot;BBB&quot;,</span>
-<span class="doccomment">///     &quot;c&quot;: true</span>
-<span class="doccomment">///   }</span>
-<span class="doccomment">/// }&quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Both serialization and deserialization work flawlessly.</span>
-<span class="doccomment">/// let serialized = serde_json::to_string_pretty(&amp;values).unwrap();</span>
-<span class="doccomment">/// assert_eq!(expected, serialized);</span>
-<span class="doccomment">/// let deserialized: VecEnumValues = serde_json::from_str(&amp;serialized).unwrap();</span>
-<span class="doccomment">/// assert_eq!(values, deserialized);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## XML structure with varying keys</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// With `serde_xml_rs` tuple and struct variants are not supported since they fail to roundtrip.</span>
-<span class="doccomment">/// The enum may have such variants as long as they are not serialized or deserialized.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
-<span class="doccomment">/// use serde_with::EnumMap;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # #[derive(Debug, Clone, PartialEq, Eq)]</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// enum EnumValue {</span>
-<span class="doccomment">///     Int(i32),</span>
-<span class="doccomment">///     String(String),</span>
-<span class="doccomment">///     Unit,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[serde_with::serde_as]</span>
-<span class="doccomment">/// # #[derive(Debug, Clone, PartialEq, Eq)]</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct VecEnumValues {</span>
-<span class="doccomment">///     #[serde_as(as = &quot;EnumMap&quot;)]</span>
-<span class="doccomment">///     vec: Vec&lt;EnumValue&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // ---</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // This will serialize this list of values</span>
-<span class="doccomment">/// let values = VecEnumValues {</span>
-<span class="doccomment">///     vec: vec![</span>
-<span class="doccomment">///         EnumValue::Int(123),</span>
-<span class="doccomment">///         EnumValue::String(&quot;FooBar&quot;.to_string()),</span>
-<span class="doccomment">///         EnumValue::Int(456),</span>
-<span class="doccomment">///         EnumValue::String(&quot;XXX&quot;.to_string()),</span>
-<span class="doccomment">///         EnumValue::Unit,</span>
-<span class="doccomment">///     ],</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // into this XML document</span>
-<span class="doccomment">/// // Duplicate keys are emitted for identical enum variants.</span>
-<span class="doccomment">/// let expected = r#&quot;</span>
-<span class="doccomment">/// &lt;VecEnumValues&gt;</span>
-<span class="doccomment">///     &lt;vec&gt;</span>
-<span class="doccomment">///         &lt;Int&gt;123&lt;/Int&gt;</span>
-<span class="doccomment">///         &lt;String&gt;FooBar&lt;/String&gt;</span>
-<span class="doccomment">///         &lt;Int&gt;456&lt;/Int&gt;</span>
-<span class="doccomment">///         &lt;String&gt;XXX&lt;/String&gt;</span>
-<span class="doccomment">///         &lt;Unit&gt;&lt;/Unit&gt;</span>
-<span class="doccomment">///     &lt;/vec&gt;</span>
-<span class="doccomment">/// &lt;/VecEnumValues&gt;&quot;#</span>
-<span class="doccomment">/// // Remove whitespace</span>
-<span class="doccomment">/// .replace(&#39; &#39;, &quot;&quot;)</span>
-<span class="doccomment">/// .replace(&#39;\n&#39;, &quot;&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Both serialization and deserialization work flawlessly.</span>
-<span class="doccomment">/// let serialized = serde_xml_rs::to_string(&amp;values).unwrap();</span>
-<span class="doccomment">/// assert_eq!(expected, serialized);</span>
-<span class="doccomment">/// let deserialized: VecEnumValues = serde_xml_rs::from_str(&amp;serialized).unwrap();</span>
-<span class="doccomment">/// assert_eq!(values, deserialized);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EnumMap</span>;
+<span class="doccomment">/// Represent a list of enum values as a map.
+///
+/// This **only works** if the enum uses the default *externally tagged* representation.
+/// Other enum representations are not supported.
+///
+/// serde data formats often represent *externally tagged* enums as maps with a single key.
+/// The key is the enum variant name, and the value is the variant value.
+/// Sometimes a map with multiple keys should be treated like a list of enum values.
+///
+/// # Examples
+///
+/// ## JSON Map with multiple keys
+///
+/// ```rust
+/// # #[cfg(feature = &quot;macros&quot;)] {
+/// # use serde::{Deserialize, Serialize};
+/// use serde_with::EnumMap;
+///
+/// # #[derive(Debug, Clone, PartialEq, Eq)]
+/// #[derive(Serialize, Deserialize)]
+/// enum EnumValue {
+///     Int(i32),
+///     String(String),
+///     Unit,
+///     Tuple(i32, String, bool),
+///     Struct {
+///         a: i32,
+///         b: String,
+///         c: bool,
+///     },
+/// }
+///
+/// #[serde_with::serde_as]
+/// # #[derive(Debug, Clone, PartialEq, Eq)]
+/// #[derive(Serialize, Deserialize)]
+/// struct VecEnumValues (
+///     #[serde_as(as = &quot;EnumMap&quot;)]
+///     Vec&lt;EnumValue&gt;,
+/// );
+///
+/// // ---
+///
+/// // This will serialize this list of values
+/// let values = VecEnumValues(vec![
+///     EnumValue::Int(123),
+///     EnumValue::String(&quot;FooBar&quot;.to_string()),
+///     EnumValue::Int(456),
+///     EnumValue::String(&quot;XXX&quot;.to_string()),
+///     EnumValue::Unit,
+///     EnumValue::Tuple(1, &quot;Middle&quot;.to_string(), false),
+///     EnumValue::Struct {
+///         a: 666,
+///         b: &quot;BBB&quot;.to_string(),
+///         c: true,
+///     },
+/// ]);
+///
+/// // into this JSON map
+/// // Duplicate keys are emitted for identical enum variants.
+/// let expected =
+/// r#&quot;{
+///   &quot;Int&quot;: 123,
+///   &quot;String&quot;: &quot;FooBar&quot;,
+///   &quot;Int&quot;: 456,
+///   &quot;String&quot;: &quot;XXX&quot;,
+///   &quot;Unit&quot;: null,
+///   &quot;Tuple&quot;: [
+///     1,
+///     &quot;Middle&quot;,
+///     false
+///   ],
+///   &quot;Struct&quot;: {
+///     &quot;a&quot;: 666,
+///     &quot;b&quot;: &quot;BBB&quot;,
+///     &quot;c&quot;: true
+///   }
+/// }&quot;#;
+///
+/// // Both serialization and deserialization work flawlessly.
+/// let serialized = serde_json::to_string_pretty(&amp;values).unwrap();
+/// assert_eq!(expected, serialized);
+/// let deserialized: VecEnumValues = serde_json::from_str(&amp;serialized).unwrap();
+/// assert_eq!(values, deserialized);
+/// # }
+/// ```
+///
+/// ## XML structure with varying keys
+///
+/// With `serde_xml_rs` tuple and struct variants are not supported since they fail to roundtrip.
+/// The enum may have such variants as long as they are not serialized or deserialized.
+///
+/// ```
+/// # #[cfg(feature = &quot;macros&quot;)] {
+/// # use serde::{Deserialize, Serialize};
+/// use serde_with::EnumMap;
+///
+/// # #[derive(Debug, Clone, PartialEq, Eq)]
+/// #[derive(Serialize, Deserialize)]
+/// enum EnumValue {
+///     Int(i32),
+///     String(String),
+///     Unit,
+/// }
+///
+/// #[serde_with::serde_as]
+/// # #[derive(Debug, Clone, PartialEq, Eq)]
+/// #[derive(Serialize, Deserialize)]
+/// struct VecEnumValues {
+///     #[serde_as(as = &quot;EnumMap&quot;)]
+///     vec: Vec&lt;EnumValue&gt;,
+/// }
+///
+/// // ---
+///
+/// // This will serialize this list of values
+/// let values = VecEnumValues {
+///     vec: vec![
+///         EnumValue::Int(123),
+///         EnumValue::String(&quot;FooBar&quot;.to_string()),
+///         EnumValue::Int(456),
+///         EnumValue::String(&quot;XXX&quot;.to_string()),
+///         EnumValue::Unit,
+///     ],
+/// };
+///
+/// // into this XML document
+/// // Duplicate keys are emitted for identical enum variants.
+/// let expected = r#&quot;
+/// &lt;VecEnumValues&gt;
+///     &lt;vec&gt;
+///         &lt;Int&gt;123&lt;/Int&gt;
+///         &lt;String&gt;FooBar&lt;/String&gt;
+///         &lt;Int&gt;456&lt;/Int&gt;
+///         &lt;String&gt;XXX&lt;/String&gt;
+///         &lt;Unit&gt;&lt;/Unit&gt;
+///     &lt;/vec&gt;
+/// &lt;/VecEnumValues&gt;&quot;#
+/// // Remove whitespace
+/// .replace(&#39; &#39;, &quot;&quot;)
+/// .replace(&#39;\n&#39;, &quot;&quot;);
+///
+/// // Both serialization and deserialization work flawlessly.
+/// let serialized = serde_xml_rs::to_string(&amp;values).unwrap();
+/// assert_eq!(expected, serialized);
+/// let deserialized: VecEnumValues = serde_xml_rs::from_str(&amp;serialized).unwrap();
+/// assert_eq!(values, deserialized);
+/// # }
+/// ```
+</span><span class="attribute">#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub struct </span>EnumMap;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnumMap</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Serialize</span>,
+<span class="kw">impl</span>&lt;T&gt; SerializeAs&lt;Vec&lt;T&gt;&gt; <span class="kw">for </span>EnumMap
+<span class="kw">where
+    </span>T: Serialize,
 {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>Vec&lt;T&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">source</span>.<span class="ident">serialize</span>(<span class="ident">SeqAsMapSerializer</span>(<span class="ident">serializer</span>))
+        source.serialize(SeqAsMapSerializer(serializer))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnumMap</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T&gt; DeserializeAs&lt;<span class="lifetime">&#39;de</span>, Vec&lt;T&gt;&gt; <span class="kw">for </span>EnumMap
+<span class="kw">where
+    </span>T: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;T&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">struct</span> <span class="ident">EnumMapVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+        <span class="kw">struct </span>EnumMapVisitor&lt;T&gt;(PhantomData&lt;T&gt;);
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnumMapVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>EnumMapVisitor&lt;T&gt;
+        <span class="kw">where
+            </span>T: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
         {
-            <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+            <span class="kw">type </span>Value = Vec&lt;T&gt;;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a map or enum values&quot;</span>)
+            <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+                <span class="macro">write!</span>(formatter, <span class="string">&quot;a map or enum values&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">map</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span> {
-                <span class="ident">Vec::deserialize</span>(<span class="ident">SeqDeserializer</span>(<span class="ident">map</span>))
+            <span class="kw">fn </span>visit_map&lt;A: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(<span class="self">self</span>, map: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, A::Error&gt; {
+                Vec::deserialize(SeqDeserializer(map))
             }
         }
 
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_map</span>(<span class="ident">EnumMapVisitor</span>(<span class="ident">PhantomData</span>))
+        deserializer.deserialize_map(EnumMapVisitor(PhantomData))
     }
 }
 
-<span class="kw">static</span> <span class="ident">END_OF_MAP_IDENTIFIER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;__PRIVATE_END_OF_MAP_MARKER__&quot;</span>;
+<span class="kw">static </span>END_OF_MAP_IDENTIFIER: <span class="kw-2">&amp;</span>str = <span class="string">&quot;__PRIVATE_END_OF_MAP_MARKER__&quot;</span>;
 
-<span class="comment">// Serialization code below here</span>
+<span class="comment">// Serialization code below here
 
-<span class="doccomment">/// Convert a sequence to a map during serialization.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Only `serialize_seq` is implemented and forwarded to `serialize_map` on the inner `Serializer`.</span>
-<span class="doccomment">/// The elements are serialized with [`SerializeSeqElement`].</span>
-<span class="kw">struct</span> <span class="ident">SeqAsMapSerializer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">S</span>);
+</span><span class="doccomment">/// Convert a sequence to a map during serialization.
+///
+/// Only `serialize_seq` is implemented and forwarded to `serialize_map` on the inner `Serializer`.
+/// The elements are serialized with [`SerializeSeqElement`].
+</span><span class="kw">struct </span>SeqAsMapSerializer&lt;S&gt;(S);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Serializer</span> <span class="kw">for</span> <span class="ident">SeqAsMapSerializer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl</span>&lt;S&gt; Serializer <span class="kw">for </span>SeqAsMapSerializer&lt;S&gt;
+<span class="kw">where
+    </span>S: Serializer,
 {
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> <span class="ident">S::Ok</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= S::Ok;
+    <span class="kw">type </span>Error = S::Error;
 
-    <span class="kw">type</span> <span class="ident">SerializeSeq</span> <span class="op">=</span> <span class="ident">SerializeSeqElement</span><span class="op">&lt;</span><span class="ident">S::SerializeMap</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTuple</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTupleStruct</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTupleVariant</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeMap</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeStruct</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeStructVariant</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>SerializeSeq = SerializeSeqElement&lt;S::SerializeMap&gt;;
+    <span class="kw">type </span>SerializeTuple = Impossible&lt;S::Ok, S::Error&gt;;
+    <span class="kw">type </span>SerializeTupleStruct = Impossible&lt;S::Ok, S::Error&gt;;
+    <span class="kw">type </span>SerializeTupleVariant = Impossible&lt;S::Ok, S::Error&gt;;
+    <span class="kw">type </span>SerializeMap = Impossible&lt;S::Ok, S::Error&gt;;
+    <span class="kw">type </span>SerializeStruct = Impossible&lt;S::Ok, S::Error&gt;;
+    <span class="kw">type </span>SerializeStructVariant = Impossible&lt;S::Ok, S::Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">serialize_bool</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_bool(<span class="self">self</span>, _v: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_i8</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_i8(<span class="self">self</span>, _v: i8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_i16</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_i16(<span class="self">self</span>, _v: i16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_i32</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_i32(<span class="self">self</span>, _v: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_i64</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_i64(<span class="self">self</span>, _v: i64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_i128</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i128</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_i128(<span class="self">self</span>, _v: i128) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_u8</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_u8(<span class="self">self</span>, _v: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_u16</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_u16(<span class="self">self</span>, _v: u16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_u32</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_u32(<span class="self">self</span>, _v: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_u64</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_u64(<span class="self">self</span>, _v: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_u128</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u128</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_u128(<span class="self">self</span>, _v: u128) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_f32</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">f32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_f32(<span class="self">self</span>, _v: f32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_f64</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_f64(<span class="self">self</span>, _v: f64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_char</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_char(<span class="self">self</span>, _v: char) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_str</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_str(<span class="self">self</span>, _v: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_bytes</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_bytes(<span class="self">self</span>, _v: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_none</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_none(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_some</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+    <span class="kw">fn </span>serialize_some&lt;T: <span class="question-mark">?</span>Sized&gt;(<span class="self">self</span>, _value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_unit</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_unit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_unit_struct</span>(<span class="self">self</span>, <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_unit_struct(<span class="self">self</span>, _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_unit_variant</span>(
+    <span class="kw">fn </span>serialize_unit_variant(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">_variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        _variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_newtype_struct</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>serialize_newtype_struct&lt;T: <span class="question-mark">?</span>Sized&gt;(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _value: <span class="kw-2">&amp;</span>T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_newtype_variant</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>serialize_newtype_variant&lt;T: <span class="question-mark">?</span>Sized&gt;(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">_variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        _variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _value: <span class="kw-2">&amp;</span>T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_seq</span>(<span class="self">self</span>, <span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeSeq</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">is_human_readable</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_human_readable</span>();
-        <span class="self">self</span>.<span class="number">0</span>
-            .<span class="ident">serialize_map</span>(<span class="ident">len</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">delegate</span><span class="op">|</span> <span class="ident">SerializeSeqElement</span> {
-                <span class="ident">delegate</span>,
-                <span class="ident">is_human_readable</span>,
+    <span class="kw">fn </span>serialize_seq(<span class="self">self</span>, len: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeSeq, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>is_human_readable = <span class="self">self</span>.<span class="number">0</span>.is_human_readable();
+        <span class="self">self</span>.<span class="number">0
+            </span>.serialize_map(len)
+            .map(|delegate| SerializeSeqElement {
+                delegate,
+                is_human_readable,
             })
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_tuple</span>(<span class="self">self</span>, <span class="ident">_len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTuple</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_tuple(<span class="self">self</span>, _len: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTuple, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_tuple_struct</span>(
+    <span class="kw">fn </span>serialize_tuple_struct(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTupleStruct</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTupleStruct, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_tuple_variant</span>(
+    <span class="kw">fn </span>serialize_tuple_variant(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">_variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTupleVariant</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        _variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTupleVariant, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_map</span>(<span class="self">self</span>, <span class="ident">_len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeMap</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_map(<span class="self">self</span>, _len: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeMap, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_struct</span>(
+    <span class="kw">fn </span>serialize_struct(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeStruct</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeStruct, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_struct_variant</span>(
+    <span class="kw">fn </span>serialize_struct_variant(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">_variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeStructVariant</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        _variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeStructVariant, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 }
 
-<span class="doccomment">/// Serialize a single element but turn the sequence into a map logic.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It uses [`SerializeEnumAsMapElement`] for the map element serialization.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The [`Serializer`] implementation handles all the `serialize_*_variant` functions and defers to [`SerializeVariant`] for the more complicated tuple and struct variants.</span>
-<span class="kw">struct</span> <span class="ident">SerializeSeqElement</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="ident">delegate</span>: <span class="ident">M</span>,
-    <span class="ident">is_human_readable</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Serialize a single element but turn the sequence into a map logic.
+///
+/// It uses [`SerializeEnumAsMapElement`] for the map element serialization.
+///
+/// The [`Serializer`] implementation handles all the `serialize_*_variant` functions and defers to [`SerializeVariant`] for the more complicated tuple and struct variants.
+</span><span class="kw">struct </span>SerializeSeqElement&lt;M&gt; {
+    delegate: M,
+    is_human_readable: bool,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">SerializeSeq</span> <span class="kw">for</span> <span class="ident">SerializeSeqElement</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">SerializeMap</span>,
+<span class="kw">impl</span>&lt;M&gt; SerializeSeq <span class="kw">for </span>SerializeSeqElement&lt;M&gt;
+<span class="kw">where
+    </span>M: SerializeMap,
 {
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> <span class="ident">M::Ok</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">M::Error</span>;
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= M::Ok;
+    <span class="kw">type </span>Error = M::Error;
 
-    <span class="kw">fn</span> <span class="ident">serialize_element</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+    <span class="kw">fn </span>serialize_element&lt;T: <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="ident">EnumAsMapElementSerializer</span> {
-            <span class="ident">delegate</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">delegate</span>,
-            <span class="ident">is_human_readable</span>: <span class="self">self</span>.<span class="ident">is_human_readable</span>,
+        value.serialize(EnumAsMapElementSerializer {
+            delegate: <span class="kw-2">&amp;mut </span><span class="self">self</span>.delegate,
+            is_human_readable: <span class="self">self</span>.is_human_readable,
         })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">end</span>()
+    <span class="kw">fn </span>end(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.delegate.end()
     }
 }
 
-<span class="kw">struct</span> <span class="ident">EnumAsMapElementSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="ident">delegate</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">M</span>,
-    <span class="ident">is_human_readable</span>: <span class="ident">bool</span>,
+<span class="kw">struct </span>EnumAsMapElementSerializer&lt;<span class="lifetime">&#39;a</span>, M&gt; {
+    delegate: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>M,
+    is_human_readable: bool,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Serializer</span> <span class="kw">for</span> <span class="ident">EnumAsMapElementSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">SerializeMap</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, M&gt; Serializer <span class="kw">for </span>EnumAsMapElementSerializer&lt;<span class="lifetime">&#39;a</span>, M&gt;
+<span class="kw">where
+    </span>M: SerializeMap,
 {
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">M::Error</span>;
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= ();
+    <span class="kw">type </span>Error = M::Error;
 
-    <span class="kw">type</span> <span class="ident">SerializeSeq</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTuple</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTupleStruct</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTupleVariant</span> <span class="op">=</span> <span class="ident">SerializeVariant</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeMap</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeStruct</span> <span class="op">=</span> <span class="ident">Impossible</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeStructVariant</span> <span class="op">=</span> <span class="ident">SerializeVariant</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>SerializeSeq = Impossible&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;;
+    <span class="kw">type </span>SerializeTuple = Impossible&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;;
+    <span class="kw">type </span>SerializeTupleStruct = Impossible&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;;
+    <span class="kw">type </span>SerializeTupleVariant = SerializeVariant&lt;<span class="lifetime">&#39;a</span>, M&gt;;
+    <span class="kw">type </span>SerializeMap = Impossible&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;;
+    <span class="kw">type </span>SerializeStruct = Impossible&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;;
+    <span class="kw">type </span>SerializeStructVariant = SerializeVariant&lt;<span class="lifetime">&#39;a</span>, M&gt;;
 
-    <span class="kw">fn</span> <span class="ident">serialize_bool</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_bool(<span class="self">self</span>, _v: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_i8</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_i8(<span class="self">self</span>, _v: i8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_i16</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_i16(<span class="self">self</span>, _v: i16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_i32</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_i32(<span class="self">self</span>, _v: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_i64</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_i64(<span class="self">self</span>, _v: i64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_i128</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">i128</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_i128(<span class="self">self</span>, _v: i128) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_u8</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_u8(<span class="self">self</span>, _v: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_u16</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_u16(<span class="self">self</span>, _v: u16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_u32</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_u32(<span class="self">self</span>, _v: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_u64</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_u64(<span class="self">self</span>, _v: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_u128</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">u128</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_u128(<span class="self">self</span>, _v: u128) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_f32</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">f32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_f32(<span class="self">self</span>, _v: f32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_f64</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_f64(<span class="self">self</span>, _v: f64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_char</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_char(<span class="self">self</span>, _v: char) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_str</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_str(<span class="self">self</span>, _v: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_bytes</span>(<span class="self">self</span>, <span class="ident">_v</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_bytes(<span class="self">self</span>, _v: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_none</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_none(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_some</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+    <span class="kw">fn </span>serialize_some&lt;T: <span class="question-mark">?</span>Sized&gt;(<span class="self">self</span>, _value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_unit</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_unit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_unit_struct</span>(<span class="self">self</span>, <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_unit_struct(<span class="self">self</span>, _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_unit_variant</span>(
+    <span class="kw">fn </span>serialize_unit_variant(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize_entry</span>(<span class="ident">variant</span>, <span class="kw-2">&amp;</span>())<span class="question-mark">?</span>;
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.delegate.serialize_entry(variant, <span class="kw-2">&amp;</span>())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_newtype_struct</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>serialize_newtype_struct&lt;T: <span class="question-mark">?</span>Sized&gt;(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _value: <span class="kw-2">&amp;</span>T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_newtype_variant</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>serialize_newtype_variant&lt;T: <span class="question-mark">?</span>Sized&gt;(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        value: <span class="kw-2">&amp;</span>T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize_entry</span>(<span class="ident">variant</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.delegate.serialize_entry(variant, value)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_seq</span>(<span class="self">self</span>, <span class="ident">_len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeSeq</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_seq(<span class="self">self</span>, _len: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeSeq, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_tuple</span>(<span class="self">self</span>, <span class="ident">_len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTuple</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_tuple(<span class="self">self</span>, _len: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTuple, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_tuple_struct</span>(
+    <span class="kw">fn </span>serialize_tuple_struct(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTupleStruct</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTupleStruct, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_tuple_variant</span>(
+    <span class="kw">fn </span>serialize_tuple_variant(
         <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTupleVariant</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">SerializeVariant</span> {
-            <span class="ident">delegate</span>: <span class="self">self</span>.<span class="ident">delegate</span>,
-            <span class="ident">is_human_readable</span>: <span class="self">self</span>.<span class="ident">is_human_readable</span>,
-            <span class="ident">variant</span>,
-            <span class="ident">content</span>: <span class="ident">Content::TupleStruct</span>(<span class="ident">name</span>, <span class="ident">Vec::with_capacity</span>(<span class="ident">len</span>)),
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTupleVariant, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Ok</span>(SerializeVariant {
+            delegate: <span class="self">self</span>.delegate,
+            is_human_readable: <span class="self">self</span>.is_human_readable,
+            variant,
+            content: Content::TupleStruct(name, Vec::with_capacity(len)),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_map</span>(<span class="self">self</span>, <span class="ident">_len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeMap</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+    <span class="kw">fn </span>serialize_map(<span class="self">self</span>, _len: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeMap, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_struct</span>(
+    <span class="kw">fn </span>serialize_struct(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeStruct</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeStruct, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Err</span>(ser::Error::custom(<span class="string">&quot;wrong type for EnumMap&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_struct_variant</span>(
+    <span class="kw">fn </span>serialize_struct_variant(
         <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeStructVariant</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">SerializeVariant</span> {
-            <span class="ident">delegate</span>: <span class="self">self</span>.<span class="ident">delegate</span>,
-            <span class="ident">is_human_readable</span>: <span class="self">self</span>.<span class="ident">is_human_readable</span>,
-            <span class="ident">variant</span>,
-            <span class="ident">content</span>: <span class="ident">Content::Struct</span>(<span class="ident">name</span>, <span class="ident">Vec::with_capacity</span>(<span class="ident">len</span>)),
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeStructVariant, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Ok</span>(SerializeVariant {
+            delegate: <span class="self">self</span>.delegate,
+            is_human_readable: <span class="self">self</span>.is_human_readable,
+            variant,
+            content: Content::Struct(name, Vec::with_capacity(len)),
         })
     }
 }
 
-<span class="doccomment">/// Serialize a struct or tuple variant enum as a map element</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`SerializeStructVariant`] serializes a struct variant, and [`SerializeTupleVariant`] a tuple variant.</span>
-<span class="kw">struct</span> <span class="ident">SerializeVariant</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="ident">delegate</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">M</span>,
-    <span class="ident">is_human_readable</span>: <span class="ident">bool</span>,
-    <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="ident">content</span>: <span class="ident">Content</span>,
+<span class="doccomment">/// Serialize a struct or tuple variant enum as a map element
+///
+/// [`SerializeStructVariant`] serializes a struct variant, and [`SerializeTupleVariant`] a tuple variant.
+</span><span class="kw">struct </span>SerializeVariant&lt;<span class="lifetime">&#39;a</span>, M&gt; {
+    delegate: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>M,
+    is_human_readable: bool,
+    variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    content: Content,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">SerializeStructVariant</span> <span class="kw">for</span> <span class="ident">SerializeVariant</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">SerializeMap</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, M&gt; SerializeStructVariant <span class="kw">for </span>SerializeVariant&lt;<span class="lifetime">&#39;a</span>, M&gt;
+<span class="kw">where
+    </span>M: SerializeMap,
 {
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= ();
 
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">M::Error</span>;
+    <span class="kw">type </span>Error = M::Error;
 
-    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+    <span class="kw">fn </span>serialize_field&lt;T: <span class="question-mark">?</span>Sized&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        value: <span class="kw-2">&amp;</span>T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="comment">// Serialize to a Content type first</span>
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Content</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="ident">ContentSerializer::new</span>(<span class="self">self</span>.<span class="ident">is_human_readable</span>))<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Content::Struct</span>(<span class="ident">_name</span>, <span class="ident">fields</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">content</span> {
-            <span class="ident">fields</span>.<span class="ident">push</span>((<span class="ident">key</span>, <span class="ident">value</span>));
+        <span class="comment">// Serialize to a Content type first
+        </span><span class="kw">let </span>value: Content = value.serialize(ContentSerializer::new(<span class="self">self</span>.is_human_readable))<span class="question-mark">?</span>;
+        <span class="kw">if let </span>Content::Struct(_name, fields) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.content {
+            fields.push((key, value));
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">variant</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span>)
+    <span class="kw">fn </span>end(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.delegate.serialize_entry(<span class="kw-2">&amp;</span><span class="self">self</span>.variant, <span class="kw-2">&amp;</span><span class="self">self</span>.content)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">SerializeTupleVariant</span> <span class="kw">for</span> <span class="ident">SerializeVariant</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">SerializeMap</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, M&gt; SerializeTupleVariant <span class="kw">for </span>SerializeVariant&lt;<span class="lifetime">&#39;a</span>, M&gt;
+<span class="kw">where
+    </span>M: SerializeMap,
 {
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= ();
 
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">M::Error</span>;
+    <span class="kw">type </span>Error = M::Error;
 
-    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+    <span class="kw">fn </span>serialize_field&lt;T: <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="comment">// Serialize to a Content type first</span>
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Content</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="ident">ContentSerializer::new</span>(<span class="self">self</span>.<span class="ident">is_human_readable</span>))<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Content::TupleStruct</span>(<span class="ident">_name</span>, <span class="ident">fields</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">content</span> {
-            <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">value</span>);
+        <span class="comment">// Serialize to a Content type first
+        </span><span class="kw">let </span>value: Content = value.serialize(ContentSerializer::new(<span class="self">self</span>.is_human_readable))<span class="question-mark">?</span>;
+        <span class="kw">if let </span>Content::TupleStruct(_name, fields) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.content {
+            fields.push(value);
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">serialize_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">variant</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span>)
+    <span class="kw">fn </span>end(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.delegate.serialize_entry(<span class="kw-2">&amp;</span><span class="self">self</span>.variant, <span class="kw-2">&amp;</span><span class="self">self</span>.content)
     }
 }
 
-<span class="comment">// Below is deserialization code</span>
+<span class="comment">// Below is deserialization code
 
-<span class="doccomment">/// Deserialize the sequence of enum instances.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The main [`Deserializer`] implementation handles the outer sequence (e.g., `Vec`), while the [`SeqAccess`] implementation is responsible for the inner elements.</span>
-<span class="kw">struct</span> <span class="ident">SeqDeserializer</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">M</span>);
+</span><span class="doccomment">/// Deserialize the sequence of enum instances.
+///
+/// The main [`Deserializer`] implementation handles the outer sequence (e.g., `Vec`), while the [`SeqAccess`] implementation is responsible for the inner elements.
+</span><span class="kw">struct </span>SeqDeserializer&lt;M&gt;(M);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SeqDeserializer</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, M&gt; Deserializer&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>SeqDeserializer&lt;M&gt;
+<span class="kw">where
+    </span>M: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">M::Error</span>;
+    <span class="kw">type </span>Error = M::Error;
 
-    <span class="kw">fn</span> <span class="ident">deserialize_seq</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize_seq&lt;V&gt;(<span class="self">self</span>, visitor: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">visitor</span>.<span class="ident">visit_seq</span>(<span class="self">self</span>)
+        visitor.visit_seq(<span class="self">self</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_any</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize_any&lt;V&gt;(<span class="self">self</span>, visitor: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="ident">deserialize_seq</span>(<span class="ident">visitor</span>)
+        <span class="self">self</span>.deserialize_seq(visitor)
     }
 
-    <span class="macro">serde::forward_to_deserialize_any!</span> {
-        <span class="ident">bool</span> <span class="ident">i8</span> <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">i64</span> <span class="ident">i128</span> <span class="ident">u8</span> <span class="ident">u16</span> <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">f32</span> <span class="ident">f64</span> <span class="ident">char</span> <span class="ident">str</span> <span class="ident">string</span>
-        <span class="ident">bytes</span> <span class="ident">byte_buf</span> <span class="ident">option</span> <span class="ident">unit</span> <span class="ident">unit_struct</span> <span class="ident">newtype_struct</span> <span class="ident">tuple</span>
-        <span class="ident">tuple_struct</span> <span class="ident">map</span> <span class="kw">struct</span> <span class="kw">enum</span> <span class="ident">identifier</span> <span class="ident">ignored_any</span>
+    <span class="macro">serde::forward_to_deserialize_any! </span>{
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct newtype_struct tuple
+        tuple_struct map <span class="kw">struct enum </span>identifier ignored_any
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SeqDeserializer</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, M&gt; SeqAccess&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>SeqDeserializer&lt;M&gt;
+<span class="kw">where
+    </span>M: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">M::Error</span>;
+    <span class="kw">type </span>Error = M::Error;
 
-    <span class="kw">fn</span> <span class="ident">next_element_seed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>next_element_seed&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, seed: T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T::Value&gt;, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">match</span> <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="ident">EnumDeserializer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>)) {
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                <span class="comment">// Unfortunately we loose the optional aspect of MapAccess, so we need to special case an error value to mark the end of the map.</span>
-                <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">to_string</span>().<span class="ident">contains</span>(<span class="ident">END_OF_MAP_IDENTIFIER</span>) {
+        <span class="kw">match </span>seed.deserialize(EnumDeserializer(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>)) {
+            <span class="prelude-val">Ok</span>(value) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(value)),
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="comment">// Unfortunately we loose the optional aspect of MapAccess, so we need to special case an error value to mark the end of the map.
+                </span><span class="kw">if </span>err.to_string().contains(END_OF_MAP_IDENTIFIER) {
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(err)
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.size_hint()
     }
 }
 
-<span class="doccomment">/// Deserialize an enum from a map element</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The [`Deserializer`] implementation is the starting point, which first calls the [`EnumAccess`] methods.</span>
-<span class="doccomment">/// The [`EnumAccess`] is used to deserialize the enum variant type of the enum.</span>
-<span class="doccomment">/// The [`VariantAccess`] is used to deserialize the value part of the enum.</span>
-<span class="kw">struct</span> <span class="ident">EnumDeserializer</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">M</span>);
+<span class="doccomment">/// Deserialize an enum from a map element
+///
+/// The [`Deserializer`] implementation is the starting point, which first calls the [`EnumAccess`] methods.
+/// The [`EnumAccess`] is used to deserialize the enum variant type of the enum.
+/// The [`VariantAccess`] is used to deserialize the value part of the enum.
+</span><span class="kw">struct </span>EnumDeserializer&lt;M&gt;(M);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnumDeserializer</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, M&gt; Deserializer&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>EnumDeserializer&lt;M&gt;
+<span class="kw">where
+    </span>M: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">M::Error</span>;
+    <span class="kw">type </span>Error = M::Error;
 
-    <span class="kw">fn</span> <span class="ident">deserialize_any</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize_any&lt;V&gt;(<span class="self">self</span>, visitor: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="ident">deserialize_enum</span>(<span class="string">&quot;&quot;</span>, <span class="kw-2">&amp;</span>[], <span class="ident">visitor</span>)
+        <span class="self">self</span>.deserialize_enum(<span class="string">&quot;&quot;</span>, <span class="kw-2">&amp;</span>[], visitor)
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_enum</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>deserialize_enum&lt;V&gt;(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variants</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-        <span class="ident">visitor</span>: <span class="ident">V</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variants: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+        visitor: V,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">visitor</span>.<span class="ident">visit_enum</span>(<span class="self">self</span>)
+        visitor.visit_enum(<span class="self">self</span>)
     }
 
-    <span class="macro">serde::forward_to_deserialize_any!</span> {
-        <span class="ident">bool</span> <span class="ident">i8</span> <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">i64</span> <span class="ident">i128</span> <span class="ident">u8</span> <span class="ident">u16</span> <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">f32</span> <span class="ident">f64</span> <span class="ident">char</span> <span class="ident">str</span> <span class="ident">string</span>
-        <span class="ident">bytes</span> <span class="ident">byte_buf</span> <span class="ident">option</span> <span class="ident">unit</span> <span class="ident">unit_struct</span> <span class="ident">newtype_struct</span> <span class="ident">seq</span> <span class="ident">tuple</span>
-        <span class="ident">tuple_struct</span> <span class="ident">map</span> <span class="kw">struct</span> <span class="ident">identifier</span> <span class="ident">ignored_any</span>
+    <span class="macro">serde::forward_to_deserialize_any! </span>{
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        tuple_struct map <span class="kw">struct </span>identifier ignored_any
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">EnumAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnumDeserializer</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, M&gt; EnumAccess&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>EnumDeserializer&lt;M&gt;
+<span class="kw">where
+    </span>M: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">M::Error</span>;
-    <span class="kw">type</span> <span class="ident">Variant</span> <span class="op">=</span> <span class="self">Self</span>;
+    <span class="kw">type </span>Error = M::Error;
+    <span class="kw">type </span>Variant = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">variant_seed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T::Value</span>, <span class="ident"><span class="self">Self</span>::Variant</span>), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>variant_seed&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, seed: T) -&gt; <span class="prelude-ty">Result</span>&lt;(T::Value, <span class="self">Self</span>::Variant), <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next_key_seed</span>(<span class="ident">seed</span>)<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">key</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">key</span>, <span class="self">self</span>)),
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.next_key_seed(seed)<span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(key) =&gt; <span class="prelude-val">Ok</span>((key, <span class="self">self</span>)),
 
-            <span class="comment">// Unfortunately we loose the optional aspect of MapAccess, so we need to special case an error value to mark the end of the map.</span>
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::custom</span>(<span class="ident">END_OF_MAP_IDENTIFIER</span>)),
+            <span class="comment">// Unfortunately we loose the optional aspect of MapAccess, so we need to special case an error value to mark the end of the map.
+            </span><span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(Error::custom(END_OF_MAP_IDENTIFIER)),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">VariantAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnumDeserializer</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, M&gt; VariantAccess&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>EnumDeserializer&lt;M&gt;
+<span class="kw">where
+    </span>M: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">M::Error</span>;
+    <span class="kw">type </span>Error = M::Error;
 
-    <span class="kw">fn</span> <span class="ident">unit_variant</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next_value</span>()
+    <span class="kw">fn </span>unit_variant(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.next_value()
     }
 
-    <span class="kw">fn</span> <span class="ident">newtype_variant_seed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>newtype_variant_seed&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, seed: T) -&gt; <span class="prelude-ty">Result</span>&lt;T::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>T: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next_value_seed</span>(<span class="ident">seed</span>)
+        <span class="self">self</span>.<span class="number">0</span>.next_value_seed(seed)
     }
 
-    <span class="kw">fn</span> <span class="ident">tuple_variant</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>tuple_variant&lt;V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, len: usize, visitor: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next_value_seed</span>(<span class="ident">SeedTupleVariant</span> { <span class="ident">len</span>, <span class="ident">visitor</span> })
+        <span class="self">self</span>.<span class="number">0</span>.next_value_seed(SeedTupleVariant { len, visitor })
     }
 
-    <span class="kw">fn</span> <span class="ident">struct_variant</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">_fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-        <span class="ident">visitor</span>: <span class="ident">V</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>struct_variant&lt;V&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        _fields: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+        visitor: V,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next_value_seed</span>(<span class="ident">SeedStructVariant</span> { <span class="ident">visitor</span> })
+        <span class="self">self</span>.<span class="number">0</span>.next_value_seed(SeedStructVariant { visitor })
     }
 }
 
-<span class="kw">struct</span> <span class="ident">SeedTupleVariant</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="ident">len</span>: <span class="ident">usize</span>,
-    <span class="ident">visitor</span>: <span class="ident">V</span>,
+<span class="kw">struct </span>SeedTupleVariant&lt;V&gt; {
+    len: usize,
+    visitor: V,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SeedTupleVariant</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, V&gt; DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>SeedTupleVariant&lt;V&gt;
+<span class="kw">where
+    </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">V::Value</span>;
+    <span class="kw">type </span>Value = V::Value;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize&lt;D&gt;(<span class="self">self</span>, deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_tuple</span>(<span class="self">self</span>.<span class="ident">len</span>, <span class="self">self</span>.<span class="ident">visitor</span>)
+        deserializer.deserialize_tuple(<span class="self">self</span>.len, <span class="self">self</span>.visitor)
     }
 }
 
-<span class="kw">struct</span> <span class="ident">SeedStructVariant</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="ident">visitor</span>: <span class="ident">V</span>,
+<span class="kw">struct </span>SeedStructVariant&lt;V&gt; {
+    visitor: V,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SeedStructVariant</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, V&gt; DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>SeedStructVariant&lt;V&gt;
+<span class="kw">where
+    </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">V::Value</span>;
+    <span class="kw">type </span>Value = V::Value;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize&lt;D&gt;(<span class="self">self</span>, deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_map</span>(<span class="self">self</span>.<span class="ident">visitor</span>)
+        deserializer.deserialize_map(<span class="self">self</span>.visitor)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/channel/tls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/channel/tls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -93,98 +93,98 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transport</span>::{
-    <span class="ident">service::TlsConnector</span>,
-    <span class="ident">tls</span>::{<span class="ident">Certificate</span>, <span class="ident">Identity</span>},
-    <span class="ident">Error</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::transport::{
+    service::TlsConnector,
+    tls::{Certificate, Identity},
+    Error,
 };
-<span class="kw">use</span> <span class="ident">http::Uri</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span>http::Uri;
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// Configures TLS settings for endpoints.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientTlsConfig</span> {
-    <span class="ident">domain</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">cert</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Certificate</span><span class="op">&gt;</span>,
-    <span class="ident">identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Identity</span><span class="op">&gt;</span>,
-    <span class="ident">rustls_raw</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">tokio_rustls::rustls::ClientConfig</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Configures TLS settings for endpoints.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tls&quot;</span>)))]
+#[derive(Clone, Default)]
+</span><span class="kw">pub struct </span>ClientTlsConfig {
+    domain: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    cert: <span class="prelude-ty">Option</span>&lt;Certificate&gt;,
+    identity: <span class="prelude-ty">Option</span>&lt;Identity&gt;,
+    rustls_raw: <span class="prelude-ty">Option</span>&lt;tokio_rustls::rustls::ClientConfig&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ClientTlsConfig</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ClientTlsConfig&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;domain&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">domain</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;cert&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cert</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;identity&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">identity</span>)
-            .<span class="ident">finish</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">impl </span>fmt::Debug <span class="kw">for </span>ClientTlsConfig {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;ClientTlsConfig&quot;</span>)
+            .field(<span class="string">&quot;domain&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.domain)
+            .field(<span class="string">&quot;cert&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.cert)
+            .field(<span class="string">&quot;identity&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.identity)
+            .finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">ClientTlsConfig</span> {
-    <span class="doccomment">/// Creates a new `ClientTlsConfig` using Rustls.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ClientTlsConfig</span> {
-            <span class="ident">domain</span>: <span class="prelude-val">None</span>,
-            <span class="ident">cert</span>: <span class="prelude-val">None</span>,
-            <span class="ident">identity</span>: <span class="prelude-val">None</span>,
-            <span class="ident">rustls_raw</span>: <span class="prelude-val">None</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">impl </span>ClientTlsConfig {
+    <span class="doccomment">/// Creates a new `ClientTlsConfig` using Rustls.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        ClientTlsConfig {
+            domain: <span class="prelude-val">None</span>,
+            cert: <span class="prelude-val">None</span>,
+            identity: <span class="prelude-val">None</span>,
+            rustls_raw: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Sets the domain name against which to verify the server&#39;s TLS certificate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain_name</span>(<span class="self">self</span>, <span class="ident">domain_name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ClientTlsConfig</span> {
-            <span class="ident">domain</span>: <span class="prelude-val">Some</span>(<span class="ident">domain_name</span>.<span class="ident">into</span>()),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Sets the domain name against which to verify the server&#39;s TLS certificate.
+    </span><span class="kw">pub fn </span>domain_name(<span class="self">self</span>, domain_name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        ClientTlsConfig {
+            domain: <span class="prelude-val">Some</span>(domain_name.into()),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Sets the CA Certificate against which to verify the server&#39;s TLS certificate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This has no effect if `rustls_client_config` is used to configure Rustls.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ca_certificate</span>(<span class="self">self</span>, <span class="ident">ca_certificate</span>: <span class="ident">Certificate</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ClientTlsConfig</span> {
-            <span class="ident">cert</span>: <span class="prelude-val">Some</span>(<span class="ident">ca_certificate</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Sets the CA Certificate against which to verify the server&#39;s TLS certificate.
+    ///
+    /// This has no effect if `rustls_client_config` is used to configure Rustls.
+    </span><span class="kw">pub fn </span>ca_certificate(<span class="self">self</span>, ca_certificate: Certificate) -&gt; <span class="self">Self </span>{
+        ClientTlsConfig {
+            cert: <span class="prelude-val">Some</span>(ca_certificate),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Sets the client identity to present to the server.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This has no effect if `rustls_client_config` is used to configure Rustls.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity</span>(<span class="self">self</span>, <span class="ident">identity</span>: <span class="ident">Identity</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ClientTlsConfig</span> {
-            <span class="ident">identity</span>: <span class="prelude-val">Some</span>(<span class="ident">identity</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Sets the client identity to present to the server.
+    ///
+    /// This has no effect if `rustls_client_config` is used to configure Rustls.
+    </span><span class="kw">pub fn </span>identity(<span class="self">self</span>, identity: Identity) -&gt; <span class="self">Self </span>{
+        ClientTlsConfig {
+            identity: <span class="prelude-val">Some</span>(identity),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Use options specified by the given `ClientConfig` to configure TLS.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This overrides all other TLS options set via other means.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rustls_client_config</span>(<span class="self">self</span>, <span class="ident">config</span>: <span class="ident">tokio_rustls::rustls::ClientConfig</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ClientTlsConfig</span> {
-            <span class="ident">rustls_raw</span>: <span class="prelude-val">Some</span>(<span class="ident">config</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Use options specified by the given `ClientConfig` to configure TLS.
+    ///
+    /// This overrides all other TLS options set via other means.
+    </span><span class="kw">pub fn </span>rustls_client_config(<span class="self">self</span>, config: tokio_rustls::rustls::ClientConfig) -&gt; <span class="self">Self </span>{
+        ClientTlsConfig {
+            rustls_raw: <span class="prelude-val">Some</span>(config),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="ident">Uri</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TlsConnector</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">domain</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="ident">uri</span>.<span class="ident">host</span>().<span class="ident">ok_or_else</span>(<span class="ident">Error::new_invalid_uri</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">domain</span>) =&gt; <span class="ident">domain</span>.<span class="ident">clone</span>(),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tls_connector(<span class="kw-2">&amp;</span><span class="self">self</span>, uri: Uri) -&gt; <span class="prelude-ty">Result</span>&lt;TlsConnector, <span class="kw">crate</span>::Error&gt; {
+        <span class="kw">let </span>domain = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.domain {
+            <span class="prelude-val">None </span>=&gt; uri.host().ok_or_else(Error::new_invalid_uri)<span class="question-mark">?</span>.to_string(),
+            <span class="prelude-val">Some</span>(domain) =&gt; domain.clone(),
         };
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rustls_raw</span> {
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="ident">TlsConnector::new_with_rustls_cert</span>(<span class="self">self</span>.<span class="ident">cert</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">identity</span>.<span class="ident">clone</span>(), <span class="ident">domain</span>)
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.rustls_raw {
+            <span class="prelude-val">None </span>=&gt; {
+                TlsConnector::new_with_rustls_cert(<span class="self">self</span>.cert.clone(), <span class="self">self</span>.identity.clone(), domain)
             }
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">TlsConnector::new_with_rustls_raw</span>(<span class="ident">c</span>.<span class="ident">clone</span>(), <span class="ident">domain</span>),
+            <span class="prelude-val">Some</span>(c) =&gt; TlsConnector::new_with_rustls_raw(c.clone(), domain),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

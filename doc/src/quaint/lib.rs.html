@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../quaint/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../quaint/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -136,143 +136,143 @@
 <span id="136">136</span>
 <span id="137">137</span>
 <span id="138">138</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # quaint</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A database client abstraction for reading and writing to an SQL database in a</span>
-<span class="doccomment">//! safe manner.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Goals</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - Query generation when the database and conditions are not known at compile</span>
-<span class="doccomment">//!   time.</span>
-<span class="doccomment">//! - Parameterized queries.</span>
-<span class="doccomment">//! - A modular design, separate AST for query building and visitors for</span>
-<span class="doccomment">//!   different databases.</span>
-<span class="doccomment">//! - Database support behind a feature flag.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Non-goals</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - Database-level type-safety in query building or being an ORM.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Databases</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - SQLite</span>
-<span class="doccomment">//! - PostgreSQL</span>
-<span class="doccomment">//! - MySQL</span>
-<span class="doccomment">//! - Microsoft SQL Server</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Methods of connecting</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Quaint provides two options to connect to the underlying database.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The [single connection method](single/struct.Quaint.html):</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ``` rust</span>
-<span class="doccomment">//! use quaint::{prelude::*, single::Quaint};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[tokio::main]</span>
-<span class="doccomment">//! async fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-<span class="doccomment">//!     let conn = Quaint::new(&quot;file:///tmp/example.db&quot;).await?;</span>
-<span class="doccomment">//!     let result = conn.select(Select::default().value(1)).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     assert_eq!(</span>
-<span class="doccomment">//!         Some(1),</span>
-<span class="doccomment">//!         result.into_iter().nth(0).and_then(|row| row[0].as_i64()),</span>
-<span class="doccomment">//!     );</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Ok(())</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The [pooled method](pooled/struct.Quaint.html):</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ``` rust</span>
-<span class="doccomment">//! use quaint::{prelude::*, pooled::Quaint};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[tokio::main]</span>
-<span class="doccomment">//! async fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-<span class="doccomment">//!     let pool = Quaint::builder(&quot;file:///tmp/example.db&quot;)?.build();</span>
-<span class="doccomment">//!     let conn = pool.check_out().await?;</span>
-<span class="doccomment">//!     let result = conn.select(Select::default().value(1)).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     assert_eq!(</span>
-<span class="doccomment">//!         Some(1),</span>
-<span class="doccomment">//!         result.into_iter().nth(0).and_then(|row| row[0].as_i64()),</span>
-<span class="doccomment">//!     );</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Ok(())</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Using the AST module</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The crate can be used as an SQL string builder using the [ast](ast/index.html) and</span>
-<span class="doccomment">//! [visitor](visitor/index.html) modules.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! AST is generic for all databases and the visitors generate correct SQL</span>
-<span class="doccomment">//! syntax for the database.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The visitor returns the query as a string and its parameters as a vector.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use quaint::{prelude::*, visitor::{Sqlite, Visitor}};</span>
-<span class="doccomment">//! # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-<span class="doccomment">//! let conditions = &quot;word&quot;</span>
-<span class="doccomment">//!     .equals(&quot;meow&quot;)</span>
-<span class="doccomment">//!     .and(&quot;age&quot;.less_than(10))</span>
-<span class="doccomment">//!     .and(&quot;paw&quot;.equals(&quot;warm&quot;));</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let query = Select::from_table(&quot;naukio&quot;).so_that(conditions);</span>
-<span class="doccomment">//! let (sql_str, params) = Sqlite::build(query)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(</span>
-<span class="doccomment">//!     &quot;SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND `age` &lt; ? AND `paw` = ?)&quot;,</span>
-<span class="doccomment">//!     sql_str,</span>
-<span class="doccomment">//! );</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(</span>
-<span class="doccomment">//!     vec![</span>
-<span class="doccomment">//!         Value::from(&quot;meow&quot;),</span>
-<span class="doccomment">//!         Value::from(10),</span>
-<span class="doccomment">//!         Value::from(&quot;warm&quot;),</span>
-<span class="doccomment">//!     ],</span>
-<span class="doccomment">//!     params</span>
-<span class="doccomment">//! );</span>
-<span class="doccomment">//! # Ok(())</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! # quaint
+//!
+//! A database client abstraction for reading and writing to an SQL database in a
+//! safe manner.
+//!
+//! ### Goals
+//!
+//! - Query generation when the database and conditions are not known at compile
+//!   time.
+//! - Parameterized queries.
+//! - A modular design, separate AST for query building and visitors for
+//!   different databases.
+//! - Database support behind a feature flag.
+//!
+//! ### Non-goals
+//!
+//! - Database-level type-safety in query building or being an ORM.
+//!
+//! ## Databases
+//!
+//! - SQLite
+//! - PostgreSQL
+//! - MySQL
+//! - Microsoft SQL Server
+//!
+//! ### Methods of connecting
+//!
+//! Quaint provides two options to connect to the underlying database.
+//!
+//! The [single connection method](single/struct.Quaint.html):
+//!
+//! ``` rust
+//! use quaint::{prelude::*, single::Quaint};
+//!
+//! #[tokio::main]
+//! async fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+//!     let conn = Quaint::new(&quot;file:///tmp/example.db&quot;).await?;
+//!     let result = conn.select(Select::default().value(1)).await?;
+//!
+//!     assert_eq!(
+//!         Some(1),
+//!         result.into_iter().nth(0).and_then(|row| row[0].as_i64()),
+//!     );
+//!
+//!     Ok(())
+//! }
+//! ```
+//!
+//! The [pooled method](pooled/struct.Quaint.html):
+//!
+//! ``` rust
+//! use quaint::{prelude::*, pooled::Quaint};
+//!
+//! #[tokio::main]
+//! async fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+//!     let pool = Quaint::builder(&quot;file:///tmp/example.db&quot;)?.build();
+//!     let conn = pool.check_out().await?;
+//!     let result = conn.select(Select::default().value(1)).await?;
+//!
+//!     assert_eq!(
+//!         Some(1),
+//!         result.into_iter().nth(0).and_then(|row| row[0].as_i64()),
+//!     );
+//!
+//!     Ok(())
+//! }
+//! ```
+//!
+//! ### Using the AST module
+//!
+//! The crate can be used as an SQL string builder using the [ast](ast/index.html) and
+//! [visitor](visitor/index.html) modules.
+//!
+//! AST is generic for all databases and the visitors generate correct SQL
+//! syntax for the database.
+//!
+//! The visitor returns the query as a string and its parameters as a vector.
+//!
+//! ```
+//! # use quaint::{prelude::*, visitor::{Sqlite, Visitor}};
+//! # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+//! let conditions = &quot;word&quot;
+//!     .equals(&quot;meow&quot;)
+//!     .and(&quot;age&quot;.less_than(10))
+//!     .and(&quot;paw&quot;.equals(&quot;warm&quot;));
+//!
+//! let query = Select::from_table(&quot;naukio&quot;).so_that(conditions);
+//! let (sql_str, params) = Sqlite::build(query)?;
+//!
+//! assert_eq!(
+//!     &quot;SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND `age` &lt; ? AND `paw` = ?)&quot;,
+//!     sql_str,
+//! );
+//!
+//! assert_eq!(
+//!     vec![
+//!         Value::from(&quot;meow&quot;),
+//!         Value::from(10),
+//!         Value::from(&quot;warm&quot;),
+//!     ],
+//!     params
+//! );
+//! # Ok(())
+//! # }
+//! ```
 
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
+</span><span class="attribute">#![cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, feature(doc_cfg))]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)))]</span>
-<span class="macro">compile_error!</span>(<span class="string">&quot;one of &#39;sqlite&#39;, &#39;postgresql&#39;, &#39;mysql&#39; or &#39;mssql&#39; features must be enabled&quot;</span>);
+#[cfg(not(any(feature = <span class="string">&quot;sqlite&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>, feature = <span class="string">&quot;mssql&quot;</span>)))]
+</span><span class="macro">compile_error!</span>(<span class="string">&quot;one of &#39;sqlite&#39;, &#39;postgresql&#39;, &#39;mysql&#39; or &#39;mssql&#39; features must be enabled&quot;</span>);
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">macros</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">mod </span>macros;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">metrics</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">extern crate </span>metrics;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">bigdecimal_</span> <span class="kw">as</span> <span class="ident">bigdecimal</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
+</span><span class="kw">extern crate </span>bigdecimal_ <span class="kw">as </span>bigdecimal;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ast</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">connector</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pooled&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">pooled</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pooled</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-support&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-support&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">serde</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">single</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">visitor</span>;
+<span class="kw">pub mod </span>ast;
+<span class="kw">pub mod </span>connector;
+<span class="kw">pub mod </span>error;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;pooled&quot;</span>)]
+#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(pooled)))]
+</span><span class="kw">pub mod </span>pooled;
+<span class="kw">pub mod </span>prelude;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-support&quot;</span>)]
+#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;serde-support&quot;</span>)))]
+</span><span class="kw">pub mod </span>serde;
+<span class="kw">pub mod </span>single;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests;
+<span class="kw">pub mod </span>visitor;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ast::Value</span>;
+<span class="kw">pub use </span>ast::Value;
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">error::Error</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, error::Error&gt;;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

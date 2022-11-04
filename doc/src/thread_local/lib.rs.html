@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/thread_local-1.1.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../thread_local/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../thread_local/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../thread_local/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/thread_local-1.1.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../thread_local/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../thread_local/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../thread_local/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -636,643 +636,643 @@
 <span id="636">636</span>
 <span id="637">637</span>
 <span id="638">638</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2017 Amanieu d&#39;Antras</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2017 Amanieu d&#39;Antras
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! Per-object thread-local storage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This library provides the `ThreadLocal` type which allows a separate copy of</span>
-<span class="doccomment">//! an object to be used for each thread. This allows for per-object</span>
-<span class="doccomment">//! thread-local storage, unlike the standard library&#39;s `thread_local!` macro</span>
-<span class="doccomment">//! which only allows static thread-local storage.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Per-thread objects are not destroyed when a thread exits. Instead, objects</span>
-<span class="doccomment">//! are only destroyed when the `ThreadLocal` containing them is destroyed.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! You can also iterate over the thread-local values of all thread in a</span>
-<span class="doccomment">//! `ThreadLocal` object using the `iter_mut` and `into_iter` methods. This can</span>
-<span class="doccomment">//! only be done if you have mutable access to the `ThreadLocal` object, which</span>
-<span class="doccomment">//! guarantees that you are the only thread currently accessing it.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that since thread IDs are recycled when a thread exits, it is possible</span>
-<span class="doccomment">//! for one thread to retrieve the object of another thread. Since this can only</span>
-<span class="doccomment">//! occur after a thread has exited this does not lead to any race conditions.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Basic usage of `ThreadLocal`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use thread_local::ThreadLocal;</span>
-<span class="doccomment">//! let tls: ThreadLocal&lt;u32&gt; = ThreadLocal::new();</span>
-<span class="doccomment">//! assert_eq!(tls.get(), None);</span>
-<span class="doccomment">//! assert_eq!(tls.get_or(|| 5), &amp;5);</span>
-<span class="doccomment">//! assert_eq!(tls.get(), Some(&amp;5));</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Combining thread-local values into a single result:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use thread_local::ThreadLocal;</span>
-<span class="doccomment">//! use std::sync::Arc;</span>
-<span class="doccomment">//! use std::cell::Cell;</span>
-<span class="doccomment">//! use std::thread;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let tls = Arc::new(ThreadLocal::new());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Create a bunch of threads to do stuff</span>
-<span class="doccomment">//! for _ in 0..5 {</span>
-<span class="doccomment">//!     let tls2 = tls.clone();</span>
-<span class="doccomment">//!     thread::spawn(move || {</span>
-<span class="doccomment">//!         // Increment a counter to count some event...</span>
-<span class="doccomment">//!         let cell = tls2.get_or(|| Cell::new(0));</span>
-<span class="doccomment">//!         cell.set(cell.get() + 1);</span>
-<span class="doccomment">//!     }).join().unwrap();</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Once all threads are done, collect the counter values and return the</span>
-<span class="doccomment">//! // sum of all thread-local counter values.</span>
-<span class="doccomment">//! let tls = Arc::try_unwrap(tls).unwrap();</span>
-<span class="doccomment">//! let total = tls.into_iter().fold(0, |x, y| x + y.get());</span>
-<span class="doccomment">//! assert_eq!(total, 5);</span>
-<span class="doccomment">//! ```</span>
+</span><span class="doccomment">//! Per-object thread-local storage
+//!
+//! This library provides the `ThreadLocal` type which allows a separate copy of
+//! an object to be used for each thread. This allows for per-object
+//! thread-local storage, unlike the standard library&#39;s `thread_local!` macro
+//! which only allows static thread-local storage.
+//!
+//! Per-thread objects are not destroyed when a thread exits. Instead, objects
+//! are only destroyed when the `ThreadLocal` containing them is destroyed.
+//!
+//! You can also iterate over the thread-local values of all thread in a
+//! `ThreadLocal` object using the `iter_mut` and `into_iter` methods. This can
+//! only be done if you have mutable access to the `ThreadLocal` object, which
+//! guarantees that you are the only thread currently accessing it.
+//!
+//! Note that since thread IDs are recycled when a thread exits, it is possible
+//! for one thread to retrieve the object of another thread. Since this can only
+//! occur after a thread has exited this does not lead to any race conditions.
+//!
+//! # Examples
+//!
+//! Basic usage of `ThreadLocal`:
+//!
+//! ```rust
+//! use thread_local::ThreadLocal;
+//! let tls: ThreadLocal&lt;u32&gt; = ThreadLocal::new();
+//! assert_eq!(tls.get(), None);
+//! assert_eq!(tls.get_or(|| 5), &amp;5);
+//! assert_eq!(tls.get(), Some(&amp;5));
+//! ```
+//!
+//! Combining thread-local values into a single result:
+//!
+//! ```rust
+//! use thread_local::ThreadLocal;
+//! use std::sync::Arc;
+//! use std::cell::Cell;
+//! use std::thread;
+//!
+//! let tls = Arc::new(ThreadLocal::new());
+//!
+//! // Create a bunch of threads to do stuff
+//! for _ in 0..5 {
+//!     let tls2 = tls.clone();
+//!     thread::spawn(move || {
+//!         // Increment a counter to count some event...
+//!         let cell = tls2.get_or(|| Cell::new(0));
+//!         cell.set(cell.get() + 1);
+//!     }).join().unwrap();
+//! }
+//!
+//! // Once all threads are done, collect the counter values and return the
+//! // sum of all thread-local counter values.
+//! let tls = Arc::try_unwrap(tls).unwrap();
+//! let total = tls.into_iter().fold(0, |x, y| x + y.get());
+//! assert_eq!(total, 5);
+//! ```
 
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::mutex_atomic</span>)]</span>
+</span><span class="attribute">#![warn(missing_docs)]
+#![allow(clippy::mutex_atomic)]
 
-<span class="kw">mod</span> <span class="ident">cached</span>;
-<span class="kw">mod</span> <span class="ident">thread_id</span>;
-<span class="kw">mod</span> <span class="ident">unreachable</span>;
+</span><span class="kw">mod </span>cached;
+<span class="kw">mod </span>thread_id;
+<span class="kw">mod </span>unreachable;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cached</span>::{<span class="ident">CachedIntoIter</span>, <span class="ident">CachedIterMut</span>, <span class="ident">CachedThreadLocal</span>};
+<span class="attribute">#[allow(deprecated)]
+</span><span class="kw">pub use </span>cached::{CachedIntoIter, CachedIterMut, CachedThreadLocal};
 
-<span class="kw">use</span> <span class="ident">std::cell::UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::iter::FusedIterator</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">std::mem::MaybeUninit</span>;
-<span class="kw">use</span> <span class="ident">std::panic::UnwindSafe</span>;
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">AtomicPtr</span>, <span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
-<span class="kw">use</span> <span class="ident">std::sync::Mutex</span>;
-<span class="kw">use</span> <span class="ident">thread_id::Thread</span>;
-<span class="kw">use</span> <span class="ident">unreachable::UncheckedResultExt</span>;
+<span class="kw">use </span>std::cell::UnsafeCell;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::iter::FusedIterator;
+<span class="kw">use </span>std::mem;
+<span class="kw">use </span>std::mem::MaybeUninit;
+<span class="kw">use </span>std::panic::UnwindSafe;
+<span class="kw">use </span>std::ptr;
+<span class="kw">use </span>std::sync::atomic::{AtomicBool, AtomicPtr, AtomicUsize, Ordering};
+<span class="kw">use </span>std::sync::Mutex;
+<span class="kw">use </span>thread_id::Thread;
+<span class="kw">use </span>unreachable::UncheckedResultExt;
 
-<span class="comment">// Use usize::BITS once it has stabilized and the MSRV has been bumped.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;16&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">POINTER_WIDTH</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">16</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">POINTER_WIDTH</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">32</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">POINTER_WIDTH</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">64</span>;
+<span class="comment">// Use usize::BITS once it has stabilized and the MSRV has been bumped.
+</span><span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;16&quot;</span>)]
+</span><span class="kw">const </span>POINTER_WIDTH: u8 = <span class="number">16</span>;
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;32&quot;</span>)]
+</span><span class="kw">const </span>POINTER_WIDTH: u8 = <span class="number">32</span>;
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+</span><span class="kw">const </span>POINTER_WIDTH: u8 = <span class="number">64</span>;
 
-<span class="doccomment">/// The total number of buckets stored in each thread local.</span>
-<span class="kw">const</span> <span class="ident">BUCKETS</span>: <span class="ident">usize</span> <span class="op">=</span> (<span class="ident">POINTER_WIDTH</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>;
+<span class="doccomment">/// The total number of buckets stored in each thread local.
+</span><span class="kw">const </span>BUCKETS: usize = (POINTER_WIDTH + <span class="number">1</span>) <span class="kw">as </span>usize;
 
-<span class="doccomment">/// Thread-local variable wrapper</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the [module-level documentation](index.html) for more.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The buckets in the thread local. The nth bucket contains `2^(n-1)`</span>
-    <span class="doccomment">/// elements. Each bucket is lazily allocated.</span>
-    <span class="ident">buckets</span>: [<span class="ident">AtomicPtr</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>; <span class="ident">BUCKETS</span>],
+<span class="doccomment">/// Thread-local variable wrapper
+///
+/// See the [module-level documentation](index.html) for more.
+</span><span class="kw">pub struct </span>ThreadLocal&lt;T: Send&gt; {
+    <span class="doccomment">/// The buckets in the thread local. The nth bucket contains `2^(n-1)`
+    /// elements. Each bucket is lazily allocated.
+    </span>buckets: [AtomicPtr&lt;Entry&lt;T&gt;&gt;; BUCKETS],
 
-    <span class="doccomment">/// The number of values in the thread local. This can be less than the real number of values,</span>
-    <span class="doccomment">/// but is never more.</span>
-    <span class="ident">values</span>: <span class="ident">AtomicUsize</span>,
+    <span class="doccomment">/// The number of values in the thread local. This can be less than the real number of values,
+    /// but is never more.
+    </span>values: AtomicUsize,
 
-    <span class="doccomment">/// Lock used to guard against concurrent modifications. This is taken when</span>
-    <span class="doccomment">/// there is a possibility of allocating a new bucket, which only occurs</span>
-    <span class="doccomment">/// when inserting values.</span>
-    <span class="ident">lock</span>: <span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+    <span class="doccomment">/// Lock used to guard against concurrent modifications. This is taken when
+    /// there is a possibility of allocating a new bucket, which only occurs
+    /// when inserting values.
+    </span>lock: Mutex&lt;()&gt;,
 }
 
-<span class="kw">struct</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">present</span>: <span class="ident">AtomicBool</span>,
-    <span class="ident">value</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Entry&lt;T&gt; {
+    present: AtomicBool,
+    value: UnsafeCell&lt;MaybeUninit&lt;T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">present</span>.<span class="ident">get_mut</span>() {
-                <span class="ident">ptr::drop_in_place</span>((<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">value</span>.<span class="ident">get</span>()).<span class="ident">as_mut_ptr</span>());
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>Entry&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.present.get_mut() {
+                ptr::drop_in_place((<span class="kw-2">*</span><span class="self">self</span>.value.get()).as_mut_ptr());
             }
         }
     }
 }
 
-<span class="comment">// ThreadLocal is always Sync, even if T isn&#39;t</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="comment">// ThreadLocal is always Sync, even if T isn&#39;t
+</span><span class="kw">unsafe impl</span>&lt;T: Send&gt; Sync <span class="kw">for </span>ThreadLocal&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">ThreadLocal::new</span>()
+<span class="kw">impl</span>&lt;T: Send&gt; Default <span class="kw">for </span>ThreadLocal&lt;T&gt; {
+    <span class="kw">fn </span>default() -&gt; ThreadLocal&lt;T&gt; {
+        ThreadLocal::new()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bucket_size</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="kw">impl</span>&lt;T: Send&gt; Drop <span class="kw">for </span>ThreadLocal&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>bucket_size = <span class="number">1</span>;
 
-        <span class="comment">// Free each non-null bucket</span>
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">bucket</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">bucket_ptr</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">bucket</span>.<span class="ident">get_mut</span>();
+        <span class="comment">// Free each non-null bucket
+        </span><span class="kw">for </span>(i, bucket) <span class="kw">in </span><span class="self">self</span>.buckets.iter_mut().enumerate() {
+            <span class="kw">let </span>bucket_ptr = <span class="kw-2">*</span>bucket.get_mut();
 
-            <span class="kw">let</span> <span class="ident">this_bucket_size</span> <span class="op">=</span> <span class="ident">bucket_size</span>;
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">bucket_size</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">let </span>this_bucket_size = bucket_size;
+            <span class="kw">if </span>i != <span class="number">0 </span>{
+                bucket_size &lt;&lt;= <span class="number">1</span>;
             }
 
-            <span class="kw">if</span> <span class="ident">bucket_ptr</span>.<span class="ident">is_null</span>() {
+            <span class="kw">if </span>bucket_ptr.is_null() {
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">unsafe</span> { <span class="ident">Box::from_raw</span>(<span class="ident">std::slice::from_raw_parts_mut</span>(<span class="ident">bucket_ptr</span>, <span class="ident">this_bucket_size</span>)) };
+            <span class="kw">unsafe </span>{ Box::from_raw(std::slice::from_raw_parts_mut(bucket_ptr, this_bucket_size)) };
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new empty `ThreadLocal`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="number">2</span>)
+<span class="kw">impl</span>&lt;T: Send&gt; ThreadLocal&lt;T&gt; {
+    <span class="doccomment">/// Creates a new empty `ThreadLocal`.
+    </span><span class="kw">pub fn </span>new() -&gt; ThreadLocal&lt;T&gt; {
+        <span class="self">Self</span>::with_capacity(<span class="number">2</span>)
     }
 
-    <span class="doccomment">/// Creates a new `ThreadLocal` with an initial capacity. If less than the capacity threads</span>
-    <span class="doccomment">/// access the thread local it will never reallocate. The capacity may be rounded up to the</span>
-    <span class="doccomment">/// nearest power of two.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">allocated_buckets</span> <span class="op">=</span> <span class="ident">capacity</span>
-            .<span class="ident">checked_sub</span>(<span class="number">1</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">usize::from</span>(<span class="ident">POINTER_WIDTH</span>) <span class="op">-</span> (<span class="ident">c</span>.<span class="ident">leading_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">+</span> <span class="number">1</span>)
-            .<span class="ident">unwrap_or</span>(<span class="number">0</span>);
+    <span class="doccomment">/// Creates a new `ThreadLocal` with an initial capacity. If less than the capacity threads
+    /// access the thread local it will never reallocate. The capacity may be rounded up to the
+    /// nearest power of two.
+    </span><span class="kw">pub fn </span>with_capacity(capacity: usize) -&gt; ThreadLocal&lt;T&gt; {
+        <span class="kw">let </span>allocated_buckets = capacity
+            .checked_sub(<span class="number">1</span>)
+            .map(|c| usize::from(POINTER_WIDTH) - (c.leading_zeros() <span class="kw">as </span>usize) + <span class="number">1</span>)
+            .unwrap_or(<span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buckets</span> <span class="op">=</span> [<span class="ident">ptr::null_mut</span>(); <span class="ident">BUCKETS</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bucket_size</span> <span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">bucket</span>) <span class="kw">in</span> <span class="ident">buckets</span>[..<span class="ident">allocated_buckets</span>].<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>() {
-            <span class="kw-2">*</span><span class="ident">bucket</span> <span class="op">=</span> <span class="ident">allocate_bucket</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">bucket_size</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>buckets = [ptr::null_mut(); BUCKETS];
+        <span class="kw">let </span><span class="kw-2">mut </span>bucket_size = <span class="number">1</span>;
+        <span class="kw">for </span>(i, bucket) <span class="kw">in </span>buckets[..allocated_buckets].iter_mut().enumerate() {
+            <span class="kw-2">*</span>bucket = allocate_bucket::&lt;T&gt;(bucket_size);
 
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">bucket_size</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">if </span>i != <span class="number">0 </span>{
+                bucket_size &lt;&lt;= <span class="number">1</span>;
             }
         }
 
-        <span class="ident">ThreadLocal</span> {
-            <span class="comment">// Safety: AtomicPtr has the same representation as a pointer and arrays have the same</span>
-            <span class="comment">// representation as a sequence of their inner type.</span>
-            <span class="ident">buckets</span>: <span class="kw">unsafe</span> { <span class="ident">mem::transmute</span>(<span class="ident">buckets</span>) },
-            <span class="ident">values</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>),
-            <span class="ident">lock</span>: <span class="ident">Mutex::new</span>(()),
+        ThreadLocal {
+            <span class="comment">// Safety: AtomicPtr has the same representation as a pointer and arrays have the same
+            // representation as a sequence of their inner type.
+            </span>buckets: <span class="kw">unsafe </span>{ mem::transmute(buckets) },
+            values: AtomicUsize::new(<span class="number">0</span>),
+            lock: Mutex::new(()),
         }
     }
 
-    <span class="doccomment">/// Returns the element for the current thread, if it exists.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident">thread_id::get</span>();
-        <span class="self">self</span>.<span class="ident">get_inner</span>(<span class="ident">thread</span>)
+    <span class="doccomment">/// Returns the element for the current thread, if it exists.
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt; {
+        <span class="kw">let </span>thread = thread_id::get();
+        <span class="self">self</span>.get_inner(thread)
     }
 
-    <span class="doccomment">/// Returns the element for the current thread, or creates it if it doesn&#39;t</span>
-    <span class="doccomment">/// exist.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_or</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">create</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span>,
+    <span class="doccomment">/// Returns the element for the current thread, or creates it if it doesn&#39;t
+    /// exist.
+    </span><span class="kw">pub fn </span>get_or&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, create: F) -&gt; <span class="kw-2">&amp;</span>T
+    <span class="kw">where
+        </span>F: FnOnce() -&gt; T,
     {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">get_or_try</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="ident">T</span>, ()<span class="op">&gt;</span>(<span class="ident">create</span>()))
-                .<span class="ident">unchecked_unwrap_ok</span>()
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.get_or_try(|| <span class="prelude-val">Ok</span>::&lt;T, ()&gt;(create()))
+                .unchecked_unwrap_ok()
         }
     }
 
-    <span class="doccomment">/// Returns the element for the current thread, or creates it if it doesn&#39;t</span>
-    <span class="doccomment">/// exist. If `create` fails, that error is returned and no element is</span>
-    <span class="doccomment">/// added.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_or_try</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">create</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Returns the element for the current thread, or creates it if it doesn&#39;t
+    /// exist. If `create` fails, that error is returned and no element is
+    /// added.
+    </span><span class="kw">pub fn </span>get_or_try&lt;F, E&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, create: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>T, E&gt;
+    <span class="kw">where
+        </span>F: FnOnce() -&gt; <span class="prelude-ty">Result</span>&lt;T, E&gt;,
     {
-        <span class="kw">let</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident">thread_id::get</span>();
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_inner</span>(<span class="ident">thread</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">insert</span>(<span class="ident">thread</span>, <span class="ident">create</span>()<span class="question-mark">?</span>)),
+        <span class="kw">let </span>thread = thread_id::get();
+        <span class="kw">match </span><span class="self">self</span>.get_inner(thread) {
+            <span class="prelude-val">Some</span>(x) =&gt; <span class="prelude-val">Ok</span>(x),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.insert(thread, create()<span class="question-mark">?</span>)),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">thread</span>: <span class="ident">Thread</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bucket_ptr</span> <span class="op">=</span>
-            <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">get_unchecked</span>(<span class="ident">thread</span>.<span class="ident">bucket</span>) }.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">if</span> <span class="ident">bucket_ptr</span>.<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">fn </span>get_inner(<span class="kw-2">&amp;</span><span class="self">self</span>, thread: Thread) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt; {
+        <span class="kw">let </span>bucket_ptr =
+            <span class="kw">unsafe </span>{ <span class="self">self</span>.buckets.get_unchecked(thread.bucket) }.load(Ordering::Acquire);
+        <span class="kw">if </span>bucket_ptr.is_null() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bucket_ptr</span>.<span class="ident">add</span>(<span class="ident">thread</span>.<span class="ident">index</span>);
-            <span class="comment">// Read without atomic operations as only this thread can set the value.</span>
-            <span class="kw">if</span> (<span class="kw-2">&amp;</span><span class="ident">entry</span>.<span class="ident">present</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">bool</span>).<span class="ident">read</span>() {
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">entry</span>.<span class="ident">value</span>.<span class="ident">get</span>()).<span class="ident">as_ptr</span>())
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>entry = <span class="kw-2">&amp;*</span>bucket_ptr.add(thread.index);
+            <span class="comment">// Read without atomic operations as only this thread can set the value.
+            </span><span class="kw">if </span>(<span class="kw-2">&amp;</span>entry.present <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>bool).read() {
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;*</span>(<span class="kw-2">&amp;*</span>entry.value.get()).as_ptr())
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
         }
     }
 
-    <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">thread</span>: <span class="ident">Thread</span>, <span class="ident">data</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="comment">// Lock the Mutex to ensure only a single thread is allocating buckets at once</span>
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[cold]
+    </span><span class="kw">fn </span>insert(<span class="kw-2">&amp;</span><span class="self">self</span>, thread: Thread, data: T) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="comment">// Lock the Mutex to ensure only a single thread is allocating buckets at once
+        </span><span class="kw">let </span>_guard = <span class="self">self</span>.lock.lock().unwrap();
 
-        <span class="kw">let</span> <span class="ident">bucket_atomic_ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">get_unchecked</span>(<span class="ident">thread</span>.<span class="ident">bucket</span>) };
+        <span class="kw">let </span>bucket_atomic_ptr = <span class="kw">unsafe </span>{ <span class="self">self</span>.buckets.get_unchecked(thread.bucket) };
 
-        <span class="kw">let</span> <span class="ident">bucket_ptr</span>: <span class="kw-2">*const</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">bucket_atomic_ptr</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="ident">bucket_ptr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">bucket_ptr</span>.<span class="ident">is_null</span>() {
-            <span class="comment">// Allocate a new bucket</span>
-            <span class="kw">let</span> <span class="ident">bucket_ptr</span> <span class="op">=</span> <span class="ident">allocate_bucket</span>(<span class="ident">thread</span>.<span class="ident">bucket_size</span>);
-            <span class="ident">bucket_atomic_ptr</span>.<span class="ident">store</span>(<span class="ident">bucket_ptr</span>, <span class="ident">Ordering::Release</span>);
-            <span class="ident">bucket_ptr</span>
-        } <span class="kw">else</span> {
-            <span class="ident">bucket_ptr</span>
+        <span class="kw">let </span>bucket_ptr: <span class="kw-2">*const </span><span class="kw">_ </span>= bucket_atomic_ptr.load(Ordering::Acquire);
+        <span class="kw">let </span>bucket_ptr = <span class="kw">if </span>bucket_ptr.is_null() {
+            <span class="comment">// Allocate a new bucket
+            </span><span class="kw">let </span>bucket_ptr = allocate_bucket(thread.bucket_size);
+            bucket_atomic_ptr.store(bucket_ptr, Ordering::Release);
+            bucket_ptr
+        } <span class="kw">else </span>{
+            bucket_ptr
         };
 
-        <span class="ident">drop</span>(<span class="ident">_guard</span>);
+        drop(_guard);
 
-        <span class="comment">// Insert the new element into the bucket</span>
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bucket_ptr</span>.<span class="ident">add</span>(<span class="ident">thread</span>.<span class="ident">index</span>) };
-        <span class="kw">let</span> <span class="ident">value_ptr</span> <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">value</span>.<span class="ident">get</span>();
-        <span class="kw">unsafe</span> { <span class="ident">value_ptr</span>.<span class="ident">write</span>(<span class="ident">MaybeUninit::new</span>(<span class="ident">data</span>)) };
-        <span class="ident">entry</span>.<span class="ident">present</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::Release</span>);
+        <span class="comment">// Insert the new element into the bucket
+        </span><span class="kw">let </span>entry = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>bucket_ptr.add(thread.index) };
+        <span class="kw">let </span>value_ptr = entry.value.get();
+        <span class="kw">unsafe </span>{ value_ptr.write(MaybeUninit::new(data)) };
+        entry.present.store(<span class="bool-val">true</span>, Ordering::Release);
 
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Release</span>);
+        <span class="self">self</span>.values.fetch_add(<span class="number">1</span>, Ordering::Release);
 
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">value_ptr</span>).<span class="ident">as_ptr</span>() }
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(<span class="kw-2">&amp;*</span>value_ptr).as_ptr() }
     }
 
-    <span class="doccomment">/// Returns an iterator over the local values of all threads in unspecified</span>
-    <span class="doccomment">/// order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This call can be done safely, as `T` is required to implement [`Sync`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Sync</span>,
+    <span class="doccomment">/// Returns an iterator over the local values of all threads in unspecified
+    /// order.
+    ///
+    /// This call can be done safely, as `T` is required to implement [`Sync`].
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;_</span>, T&gt;
+    <span class="kw">where
+        </span>T: Sync,
     {
-        <span class="ident">Iter</span> {
-            <span class="ident">thread_local</span>: <span class="self">self</span>,
-            <span class="ident">raw</span>: <span class="ident">RawIter::new</span>(),
+        Iter {
+            thread_local: <span class="self">self</span>,
+            raw: RawIter::new(),
         }
     }
 
-    <span class="doccomment">/// Returns a mutable iterator over the local values of all threads in</span>
-    <span class="doccomment">/// unspecified order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Since this call borrows the `ThreadLocal` mutably, this operation can</span>
-    <span class="doccomment">/// be done safely---the mutable borrow statically guarantees no other</span>
-    <span class="doccomment">/// threads are currently accessing their associated values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">IterMut</span> {
-            <span class="ident">thread_local</span>: <span class="self">self</span>,
-            <span class="ident">raw</span>: <span class="ident">RawIter::new</span>(),
+    <span class="doccomment">/// Returns a mutable iterator over the local values of all threads in
+    /// unspecified order.
+    ///
+    /// Since this call borrows the `ThreadLocal` mutably, this operation can
+    /// be done safely---the mutable borrow statically guarantees no other
+    /// threads are currently accessing their associated values.
+    </span><span class="kw">pub fn </span>iter_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; IterMut&lt;T&gt; {
+        IterMut {
+            thread_local: <span class="self">self</span>,
+            raw: RawIter::new(),
         }
     }
 
-    <span class="doccomment">/// Removes all thread-specific values from the `ThreadLocal`, effectively</span>
-    <span class="doccomment">/// reseting it to its original state.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Since this call borrows the `ThreadLocal` mutably, this operation can</span>
-    <span class="doccomment">/// be done safely---the mutable borrow statically guarantees no other</span>
-    <span class="doccomment">/// threads are currently accessing their associated values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">ThreadLocal::new</span>();
+    <span class="doccomment">/// Removes all thread-specific values from the `ThreadLocal`, effectively
+    /// reseting it to its original state.
+    ///
+    /// Since this call borrows the `ThreadLocal` mutably, this operation can
+    /// be done safely---the mutable borrow statically guarantees no other
+    /// threads are currently accessing their associated values.
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw-2">*</span><span class="self">self </span>= ThreadLocal::new();
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;T: Send&gt; IntoIterator <span class="kw">for </span>ThreadLocal&lt;T&gt; {
+    <span class="kw">type </span>Item = T;
+    <span class="kw">type </span>IntoIter = IntoIter&lt;T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">IntoIter</span> {
-            <span class="ident">thread_local</span>: <span class="self">self</span>,
-            <span class="ident">raw</span>: <span class="ident">RawIter::new</span>(),
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; IntoIter&lt;T&gt; {
+        IntoIter {
+            thread_local: <span class="self">self</span>,
+            raw: RawIter::new(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Send + Sync&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ThreadLocal&lt;T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T;
+    <span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>, T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Send&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ThreadLocal&lt;T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T;
+    <span class="kw">type </span>IntoIter = IterMut&lt;<span class="lifetime">&#39;a</span>, T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter_mut</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; IterMut&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+        <span class="self">self</span>.iter_mut()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns the element for the current thread, or creates a default one if</span>
-    <span class="doccomment">/// it doesn&#39;t exist.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_or_default</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">get_or</span>(<span class="ident">Default::default</span>)
+<span class="kw">impl</span>&lt;T: Send + Default&gt; ThreadLocal&lt;T&gt; {
+    <span class="doccomment">/// Returns the element for the current thread, or creates a default one if
+    /// it doesn&#39;t exist.
+    </span><span class="kw">pub fn </span>get_or_default(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="self">self</span>.get_or(Default::default)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ThreadLocal {{ local_data: {:?} }}&quot;</span>, <span class="self">self</span>.<span class="ident">get</span>())
+<span class="kw">impl</span>&lt;T: Send + fmt::Debug&gt; fmt::Debug <span class="kw">for </span>ThreadLocal&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;ThreadLocal {{ local_data: {:?} }}&quot;</span>, <span class="self">self</span>.get())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">UnwindSafe</span><span class="op">&gt;</span> <span class="ident">UnwindSafe</span> <span class="kw">for</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;T: Send + UnwindSafe&gt; UnwindSafe <span class="kw">for </span>ThreadLocal&lt;T&gt; {}
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">RawIter</span> {
-    <span class="ident">yielded</span>: <span class="ident">usize</span>,
-    <span class="ident">bucket</span>: <span class="ident">usize</span>,
-    <span class="ident">bucket_size</span>: <span class="ident">usize</span>,
-    <span class="ident">index</span>: <span class="ident">usize</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>RawIter {
+    yielded: usize,
+    bucket: usize,
+    bucket_size: usize,
+    index: usize,
 }
-<span class="kw">impl</span> <span class="ident">RawIter</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">yielded</span>: <span class="number">0</span>,
-            <span class="ident">bucket</span>: <span class="number">0</span>,
-            <span class="ident">bucket_size</span>: <span class="number">1</span>,
-            <span class="ident">index</span>: <span class="number">0</span>,
+<span class="kw">impl </span>RawIter {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            yielded: <span class="number">0</span>,
+            bucket: <span class="number">0</span>,
+            bucket_size: <span class="number">1</span>,
+            index: <span class="number">0</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">next</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">thread_local</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">bucket</span> <span class="op">&lt;</span> <span class="ident">BUCKETS</span> {
-            <span class="kw">let</span> <span class="ident">bucket</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">thread_local</span>.<span class="ident">buckets</span>.<span class="ident">get_unchecked</span>(<span class="self">self</span>.<span class="ident">bucket</span>) };
-            <span class="kw">let</span> <span class="ident">bucket</span> <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+    <span class="kw">fn </span>next&lt;<span class="lifetime">&#39;a</span>, T: Send + Sync&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, thread_local: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ThreadLocal&lt;T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; {
+        <span class="kw">while </span><span class="self">self</span>.bucket &lt; BUCKETS {
+            <span class="kw">let </span>bucket = <span class="kw">unsafe </span>{ thread_local.buckets.get_unchecked(<span class="self">self</span>.bucket) };
+            <span class="kw">let </span>bucket = bucket.load(Ordering::Acquire);
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">bucket</span>.<span class="ident">is_null</span>() {
-                <span class="kw">while</span> <span class="self">self</span>.<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">bucket_size</span> {
-                    <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bucket</span>.<span class="ident">add</span>(<span class="self">self</span>.<span class="ident">index</span>) };
-                    <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="kw">if</span> <span class="ident">entry</span>.<span class="ident">present</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>) {
-                        <span class="self">self</span>.<span class="ident">yielded</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">entry</span>.<span class="ident">value</span>.<span class="ident">get</span>()).<span class="ident">as_ptr</span>() });
+            <span class="kw">if </span>!bucket.is_null() {
+                <span class="kw">while </span><span class="self">self</span>.index &lt; <span class="self">self</span>.bucket_size {
+                    <span class="kw">let </span>entry = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>bucket.add(<span class="self">self</span>.index) };
+                    <span class="self">self</span>.index += <span class="number">1</span>;
+                    <span class="kw">if </span>entry.present.load(Ordering::Acquire) {
+                        <span class="self">self</span>.yielded += <span class="number">1</span>;
+                        <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(<span class="kw-2">&amp;*</span>entry.value.get()).as_ptr() });
                     }
                 }
             }
 
-            <span class="self">self</span>.<span class="ident">next_bucket</span>();
+            <span class="self">self</span>.next_bucket();
         }
-        <span class="prelude-val">None</span>
-    }
-    <span class="kw">fn</span> <span class="ident">next_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">thread_local</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">thread_local</span>.<span class="ident">values</span>.<span class="ident">get_mut</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">yielded</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="prelude-val">None
+    </span>}
+    <span class="kw">fn </span>next_mut&lt;<span class="lifetime">&#39;a</span>, T: Send&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        thread_local: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ThreadLocal&lt;T&gt;,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Entry&lt;T&gt;&gt; {
+        <span class="kw">if </span><span class="kw-2">*</span>thread_local.values.get_mut() == <span class="self">self</span>.yielded {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">bucket</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">thread_local</span>.<span class="ident">buckets</span>.<span class="ident">get_unchecked_mut</span>(<span class="self">self</span>.<span class="ident">bucket</span>) };
-            <span class="kw">let</span> <span class="ident">bucket</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">bucket</span>.<span class="ident">get_mut</span>();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>bucket = <span class="kw">unsafe </span>{ thread_local.buckets.get_unchecked_mut(<span class="self">self</span>.bucket) };
+            <span class="kw">let </span>bucket = <span class="kw-2">*</span>bucket.get_mut();
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">bucket</span>.<span class="ident">is_null</span>() {
-                <span class="kw">while</span> <span class="self">self</span>.<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">bucket_size</span> {
-                    <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">bucket</span>.<span class="ident">add</span>(<span class="self">self</span>.<span class="ident">index</span>) };
-                    <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">entry</span>.<span class="ident">present</span>.<span class="ident">get_mut</span>() {
-                        <span class="self">self</span>.<span class="ident">yielded</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">entry</span>);
+            <span class="kw">if </span>!bucket.is_null() {
+                <span class="kw">while </span><span class="self">self</span>.index &lt; <span class="self">self</span>.bucket_size {
+                    <span class="kw">let </span>entry = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>bucket.add(<span class="self">self</span>.index) };
+                    <span class="self">self</span>.index += <span class="number">1</span>;
+                    <span class="kw">if </span><span class="kw-2">*</span>entry.present.get_mut() {
+                        <span class="self">self</span>.yielded += <span class="number">1</span>;
+                        <span class="kw">return </span><span class="prelude-val">Some</span>(entry);
                     }
                 }
             }
 
-            <span class="self">self</span>.<span class="ident">next_bucket</span>();
+            <span class="self">self</span>.next_bucket();
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next_bucket</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">bucket</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">bucket_size</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next_bucket(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.bucket != <span class="number">0 </span>{
+            <span class="self">self</span>.bucket_size &lt;&lt;= <span class="number">1</span>;
         }
-        <span class="self">self</span>.<span class="ident">bucket</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">index</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="self">self</span>.bucket += <span class="number">1</span>;
+        <span class="self">self</span>.index = <span class="number">0</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">thread_local</span>: <span class="kw-2">&amp;</span><span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">total</span> <span class="op">=</span> <span class="ident">thread_local</span>.<span class="ident">values</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        (<span class="ident">total</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">yielded</span>, <span class="prelude-val">None</span>)
+    <span class="kw">fn </span>size_hint&lt;T: Send&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, thread_local: <span class="kw-2">&amp;</span>ThreadLocal&lt;T&gt;) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="kw">let </span>total = thread_local.values.load(Ordering::Acquire);
+        (total - <span class="self">self</span>.yielded, <span class="prelude-val">None</span>)
     }
-    <span class="kw">fn</span> <span class="ident">size_hint_frozen</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">thread_local</span>: <span class="kw-2">&amp;</span><span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">total</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="ident">thread_local</span>.<span class="ident">values</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">AtomicUsize</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">usize</span>) };
-        <span class="kw">let</span> <span class="ident">remaining</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">yielded</span>;
-        (<span class="ident">remaining</span>, <span class="prelude-val">Some</span>(<span class="ident">remaining</span>))
-    }
-}
-
-<span class="doccomment">/// Iterator over the contents of a `ThreadLocal`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> {
-    <span class="ident">thread_local</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">raw</span>: <span class="ident">RawIter</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">next</span>(<span class="self">self</span>.<span class="ident">thread_local</span>)
-    }
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">size_hint</span>(<span class="self">self</span>.<span class="ident">thread_local</span>)
-    }
-}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
-
-<span class="doccomment">/// Mutable iterator over the contents of a `ThreadLocal`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> {
-    <span class="ident">thread_local</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">raw</span>: <span class="ident">RawIter</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">raw</span>
-            .<span class="ident">next_mut</span>(<span class="self">self</span>.<span class="ident">thread_local</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">entry</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">entry</span>.<span class="ident">value</span>.<span class="ident">get</span>()).<span class="ident">as_mut_ptr</span>() })
-    }
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">size_hint_frozen</span>(<span class="self">self</span>.<span class="ident">thread_local</span>)
+    <span class="kw">fn </span>size_hint_frozen&lt;T: Send&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, thread_local: <span class="kw-2">&amp;</span>ThreadLocal&lt;T&gt;) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="kw">let </span>total = <span class="kw">unsafe </span>{ <span class="kw-2">*</span>(<span class="kw-2">&amp;</span>thread_local.values <span class="kw">as </span><span class="kw-2">*const </span>AtomicUsize <span class="kw">as </span><span class="kw-2">*const </span>usize) };
+        <span class="kw">let </span>remaining = total - <span class="self">self</span>.yielded;
+        (remaining, <span class="prelude-val">Some</span>(remaining))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="doccomment">/// Iterator over the contents of a `ThreadLocal`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Iter&lt;<span class="lifetime">&#39;a</span>, T: Send + Sync&gt; {
+    thread_local: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ThreadLocal&lt;T&gt;,
+    raw: RawIter,
+}
 
-<span class="comment">// Manual impl so we don&#39;t call Debug on the ThreadLocal, as doing so would create a reference to</span>
-<span class="comment">// this thread&#39;s value that potentially aliases with a mutable reference we have given out.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;IterMut&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;raw&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw</span>).<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Send + Sync&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.raw.next(<span class="self">self</span>.thread_local)
+    }
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.raw.size_hint(<span class="self">self</span>.thread_local)
+    }
+}
+<span class="kw">impl</span>&lt;T: Send + Sync&gt; FusedIterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;_</span>, T&gt; {}
+
+<span class="doccomment">/// Mutable iterator over the contents of a `ThreadLocal`.
+</span><span class="kw">pub struct </span>IterMut&lt;<span class="lifetime">&#39;a</span>, T: Send&gt; {
+    thread_local: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ThreadLocal&lt;T&gt;,
+    raw: RawIter,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Send&gt; Iterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T&gt; {
+        <span class="self">self</span>.raw
+            .next_mut(<span class="self">self</span>.thread_local)
+            .map(|entry| <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>(<span class="kw-2">&amp;mut *</span>entry.value.get()).as_mut_ptr() })
+    }
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.raw.size_hint_frozen(<span class="self">self</span>.thread_local)
     }
 }
 
-<span class="doccomment">/// An iterator that moves out of a `ThreadLocal`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> {
-    <span class="ident">thread_local</span>: <span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">raw</span>: <span class="ident">RawIter</span>,
+<span class="kw">impl</span>&lt;T: Send&gt; ExactSizeIterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">&#39;_</span>, T&gt; {}
+<span class="kw">impl</span>&lt;T: Send&gt; FusedIterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">&#39;_</span>, T&gt; {}
+
+<span class="comment">// Manual impl so we don&#39;t call Debug on the ThreadLocal, as doing so would create a reference to
+// this thread&#39;s value that potentially aliases with a mutable reference we have given out.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Send + fmt::Debug&gt; fmt::Debug <span class="kw">for </span>IterMut&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;IterMut&quot;</span>).field(<span class="string">&quot;raw&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.raw).finish()
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">next_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">thread_local</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">entry</span><span class="op">|</span> {
-            <span class="kw-2">*</span><span class="ident">entry</span>.<span class="ident">present</span>.<span class="ident">get_mut</span>() <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="kw">unsafe</span> {
-                <span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">entry</span>.<span class="ident">value</span>.<span class="ident">get</span>(), <span class="ident">MaybeUninit::uninit</span>()).<span class="ident">assume_init</span>()
+<span class="doccomment">/// An iterator that moves out of a `ThreadLocal`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>IntoIter&lt;T: Send&gt; {
+    thread_local: ThreadLocal&lt;T&gt;,
+    raw: RawIter,
+}
+
+<span class="kw">impl</span>&lt;T: Send&gt; Iterator <span class="kw">for </span>IntoIter&lt;T&gt; {
+    <span class="kw">type </span>Item = T;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="self">self</span>.raw.next_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>.thread_local).map(|entry| {
+            <span class="kw-2">*</span>entry.present.get_mut() = <span class="bool-val">false</span>;
+            <span class="kw">unsafe </span>{
+                std::mem::replace(<span class="kw-2">&amp;mut *</span>entry.value.get(), MaybeUninit::uninit()).assume_init()
             }
         })
     }
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">size_hint_frozen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">thread_local</span>)
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.raw.size_hint_frozen(<span class="kw-2">&amp;</span><span class="self">self</span>.thread_local)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;T: Send&gt; ExactSizeIterator <span class="kw">for </span>IntoIter&lt;T&gt; {}
+<span class="kw">impl</span>&lt;T: Send&gt; FusedIterator <span class="kw">for </span>IntoIter&lt;T&gt; {}
 
-<span class="kw">fn</span> <span class="ident">allocate_bucket</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">size</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">Box::into_raw</span>(
-        (<span class="number">0</span>..<span class="ident">size</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Entry</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-                <span class="ident">present</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
-                <span class="ident">value</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">MaybeUninit::uninit</span>()),
+<span class="kw">fn </span>allocate_bucket&lt;T&gt;(size: usize) -&gt; <span class="kw-2">*mut </span>Entry&lt;T&gt; {
+    Box::into_raw(
+        (<span class="number">0</span>..size)
+            .map(|<span class="kw">_</span>| Entry::&lt;T&gt; {
+                present: AtomicBool::new(<span class="bool-val">false</span>),
+                value: UnsafeCell::new(MaybeUninit::uninit()),
             })
-            .<span class="ident">collect</span>(),
-    ) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>
-}
+            .collect(),
+    ) <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_
+</span>}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ThreadLocal</span>;
-    <span class="kw">use</span> <span class="ident">std::cell::RefCell</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::atomic::AtomicUsize</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering::Relaxed</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-    <span class="kw">use</span> <span class="ident">std::thread</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::ThreadLocal;
+    <span class="kw">use </span>std::cell::RefCell;
+    <span class="kw">use </span>std::sync::atomic::AtomicUsize;
+    <span class="kw">use </span>std::sync::atomic::Ordering::Relaxed;
+    <span class="kw">use </span>std::sync::Arc;
+    <span class="kw">use </span>std::thread;
 
-    <span class="kw">fn</span> <span class="ident">make_create</span>() -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() -&gt; <span class="ident">usize</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
-        <span class="ident">Arc::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Relaxed</span>))
+    <span class="kw">fn </span>make_create() -&gt; Arc&lt;<span class="kw">dyn </span>Fn() -&gt; usize + Send + Sync&gt; {
+        <span class="kw">let </span>count = AtomicUsize::new(<span class="number">0</span>);
+        Arc::new(<span class="kw">move </span>|| count.fetch_add(<span class="number">1</span>, Relaxed))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">same_thread</span>() {
-        <span class="kw">let</span> <span class="ident">create</span> <span class="op">=</span> <span class="ident">make_create</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tls</span> <span class="op">=</span> <span class="ident">ThreadLocal::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">tls</span>.<span class="ident">get</span>());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;ThreadLocal { local_data: None }&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">tls</span>));
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw-2">*</span><span class="ident">tls</span>.<span class="ident">get_or</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">create</span>()));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), <span class="ident">tls</span>.<span class="ident">get</span>());
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw-2">*</span><span class="ident">tls</span>.<span class="ident">get_or</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">create</span>()));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), <span class="ident">tls</span>.<span class="ident">get</span>());
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw-2">*</span><span class="ident">tls</span>.<span class="ident">get_or</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">create</span>()));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), <span class="ident">tls</span>.<span class="ident">get</span>());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;ThreadLocal { local_data: Some(0) }&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">tls</span>));
-        <span class="ident">tls</span>.<span class="ident">clear</span>();
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">tls</span>.<span class="ident">get</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>same_thread() {
+        <span class="kw">let </span>create = make_create();
+        <span class="kw">let </span><span class="kw-2">mut </span>tls = ThreadLocal::new();
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, tls.get());
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;ThreadLocal { local_data: None }&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span>tls));
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw-2">*</span>tls.get_or(|| create()));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), tls.get());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw-2">*</span>tls.get_or(|| create()));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), tls.get());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw-2">*</span>tls.get_or(|| create()));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), tls.get());
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;ThreadLocal { local_data: Some(0) }&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span>tls));
+        tls.clear();
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, tls.get());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">different_thread</span>() {
-        <span class="kw">let</span> <span class="ident">create</span> <span class="op">=</span> <span class="ident">make_create</span>();
-        <span class="kw">let</span> <span class="ident">tls</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">ThreadLocal::new</span>());
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">tls</span>.<span class="ident">get</span>());
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw-2">*</span><span class="ident">tls</span>.<span class="ident">get_or</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">create</span>()));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), <span class="ident">tls</span>.<span class="ident">get</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>different_thread() {
+        <span class="kw">let </span>create = make_create();
+        <span class="kw">let </span>tls = Arc::new(ThreadLocal::new());
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, tls.get());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw-2">*</span>tls.get_or(|| create()));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), tls.get());
 
-        <span class="kw">let</span> <span class="ident">tls2</span> <span class="op">=</span> <span class="ident">tls</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">create2</span> <span class="op">=</span> <span class="ident">create</span>.<span class="ident">clone</span>();
-        <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">tls2</span>.<span class="ident">get</span>());
-            <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="kw-2">*</span><span class="ident">tls2</span>.<span class="ident">get_or</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">create2</span>()));
-            <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="ident">tls2</span>.<span class="ident">get</span>());
+        <span class="kw">let </span>tls2 = tls.clone();
+        <span class="kw">let </span>create2 = create.clone();
+        thread::spawn(<span class="kw">move </span>|| {
+            <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, tls2.get());
+            <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="kw-2">*</span>tls2.get_or(|| create2()));
+            <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>), tls2.get());
         })
-        .<span class="ident">join</span>()
-        .<span class="ident">unwrap</span>();
+        .join()
+        .unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), <span class="ident">tls</span>.<span class="ident">get</span>());
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw-2">*</span><span class="ident">tls</span>.<span class="ident">get_or</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">create</span>()));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), tls.get());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw-2">*</span>tls.get_or(|| create()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">iter</span>() {
-        <span class="kw">let</span> <span class="ident">tls</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">ThreadLocal::new</span>());
-        <span class="ident">tls</span>.<span class="ident">get_or</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Box::new</span>(<span class="number">1</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>iter() {
+        <span class="kw">let </span>tls = Arc::new(ThreadLocal::new());
+        tls.get_or(|| Box::new(<span class="number">1</span>));
 
-        <span class="kw">let</span> <span class="ident">tls2</span> <span class="op">=</span> <span class="ident">tls</span>.<span class="ident">clone</span>();
-        <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="ident">tls2</span>.<span class="ident">get_or</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Box::new</span>(<span class="number">2</span>));
-            <span class="kw">let</span> <span class="ident">tls3</span> <span class="op">=</span> <span class="ident">tls2</span>.<span class="ident">clone</span>();
-            <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="ident">tls3</span>.<span class="ident">get_or</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Box::new</span>(<span class="number">3</span>));
+        <span class="kw">let </span>tls2 = tls.clone();
+        thread::spawn(<span class="kw">move </span>|| {
+            tls2.get_or(|| Box::new(<span class="number">2</span>));
+            <span class="kw">let </span>tls3 = tls2.clone();
+            thread::spawn(<span class="kw">move </span>|| {
+                tls3.get_or(|| Box::new(<span class="number">3</span>));
             })
-            .<span class="ident">join</span>()
-            .<span class="ident">unwrap</span>();
-            <span class="ident">drop</span>(<span class="ident">tls2</span>);
+            .join()
+            .unwrap();
+            drop(tls2);
         })
-        .<span class="ident">join</span>()
-        .<span class="ident">unwrap</span>();
+        .join()
+        .unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tls</span> <span class="op">=</span> <span class="ident">Arc::try_unwrap</span>(<span class="ident">tls</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>tls = Arc::try_unwrap(tls).unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">tls</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">x</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="ident">v</span>.<span class="ident">sort_unstable</span>();
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], <span class="ident">v</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>v = tls.iter().map(|x| <span class="kw-2">**</span>x).collect::&lt;Vec&lt;i32&gt;&gt;();
+        v.sort_unstable();
+        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], v);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">tls</span>.<span class="ident">iter_mut</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">x</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="ident">v</span>.<span class="ident">sort_unstable</span>();
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], <span class="ident">v</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>v = tls.iter_mut().map(|x| <span class="kw-2">**</span>x).collect::&lt;Vec&lt;i32&gt;&gt;();
+        v.sort_unstable();
+        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], v);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">tls</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="ident">v</span>.<span class="ident">sort_unstable</span>();
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], <span class="ident">v</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>v = tls.into_iter().map(|x| <span class="kw-2">*</span>x).collect::&lt;Vec&lt;i32&gt;&gt;();
+        v.sort_unstable();
+        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], v);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_drop</span>() {
-        <span class="kw">let</span> <span class="ident">local</span> <span class="op">=</span> <span class="ident">ThreadLocal::new</span>();
-        <span class="kw">struct</span> <span class="ident">Dropped</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicUsize</span><span class="op">&gt;</span>);
-        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Dropped</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Relaxed</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_drop() {
+        <span class="kw">let </span>local = ThreadLocal::new();
+        <span class="kw">struct </span>Dropped(Arc&lt;AtomicUsize&gt;);
+        <span class="kw">impl </span>Drop <span class="kw">for </span>Dropped {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                <span class="self">self</span>.<span class="number">0</span>.fetch_add(<span class="number">1</span>, Relaxed);
             }
         }
 
-        <span class="kw">let</span> <span class="ident">dropped</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicUsize::new</span>(<span class="number">0</span>));
-        <span class="ident">local</span>.<span class="ident">get_or</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Dropped</span>(<span class="ident">dropped</span>.<span class="ident">clone</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dropped</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>), <span class="number">0</span>);
-        <span class="ident">drop</span>(<span class="ident">local</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dropped</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>), <span class="number">1</span>);
+        <span class="kw">let </span>dropped = Arc::new(AtomicUsize::new(<span class="number">0</span>));
+        local.get_or(|| Dropped(dropped.clone()));
+        <span class="macro">assert_eq!</span>(dropped.load(Relaxed), <span class="number">0</span>);
+        drop(local);
+        <span class="macro">assert_eq!</span>(dropped.load(Relaxed), <span class="number">1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_sync</span>() {
-        <span class="kw">fn</span> <span class="ident">foo</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sync</span><span class="op">&gt;</span>() {}
-        <span class="ident">foo</span>::<span class="op">&lt;</span><span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="ident">foo</span>::<span class="op">&lt;</span><span class="ident">ThreadLocal</span><span class="op">&lt;</span><span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_sync() {
+        <span class="kw">fn </span>foo&lt;T: Sync&gt;() {}
+        foo::&lt;ThreadLocal&lt;String&gt;&gt;();
+        foo::&lt;ThreadLocal&lt;RefCell&lt;String&gt;&gt;&gt;();
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="thread_local" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="thread_local" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

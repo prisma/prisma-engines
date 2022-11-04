@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/conn/routines/helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/conn/routines/helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -133,41 +133,41 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Private routine helpers.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Private routine helpers.
 
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</span><span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">futures_util::StreamExt</span>;
-<span class="kw">use</span> <span class="ident">mysql_common</span>::{
-    <span class="ident">constants::MAX_PAYLOAD_LEN</span>,
-    <span class="ident">io</span>::{<span class="ident">ParseBuf</span>, <span class="ident">ReadMysqlExt</span>},
-    <span class="ident">packets</span>::{<span class="ident">ComStmtSendLongData</span>, <span class="ident">LocalInfilePacket</span>},
-    <span class="ident">value::Value</span>,
+<span class="kw">use </span>futures_util::StreamExt;
+<span class="kw">use </span>mysql_common::{
+    constants::MAX_PAYLOAD_LEN,
+    io::{ParseBuf, ReadMysqlExt},
+    packets::{ComStmtSendLongData, LocalInfilePacket},
+    value::Value,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::LocalInfileError</span>, <span class="ident">queryable::Protocol</span>, <span class="ident">Conn</span>, <span class="ident">Error</span>};
+<span class="kw">use crate</span>::{error::LocalInfileError, queryable::Protocol, Conn, Error};
 
-<span class="kw">impl</span> <span class="ident">Conn</span> {
-    <span class="doccomment">/// Helper, that sends all `Value::Bytes` in the given list of paramenters as long data.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_long_data</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">statement_id</span>: <span class="ident">u32</span>,
-        <span class="ident">params</span>: <span class="ident">I</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Value</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>Conn {
+    <span class="doccomment">/// Helper, that sends all `Value::Bytes` in the given list of paramenters as long data.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>send_long_data&lt;<span class="lifetime">&#39;a</span>, I&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        statement_id: u32,
+        params: I,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;
+    <span class="kw">where
+        </span>I: Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value&gt;,
     {
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">params</span>.<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) <span class="op">=</span> <span class="ident">value</span> {
-                <span class="kw">let</span> <span class="ident">chunks</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">chunks</span>(<span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">-</span> <span class="number">6</span>);
-                <span class="kw">let</span> <span class="ident">chunks</span> <span class="op">=</span> <span class="ident">chunks</span>.<span class="ident">chain</span>(<span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">is_empty</span>() {
+        <span class="kw">for </span>(i, value) <span class="kw">in </span>params.enumerate() {
+            <span class="kw">if let </span>Value::Bytes(bytes) = value {
+                <span class="kw">let </span>chunks = bytes.chunks(MAX_PAYLOAD_LEN - <span class="number">6</span>);
+                <span class="kw">let </span>chunks = chunks.chain(<span class="kw">if </span>bytes.is_empty() {
                     <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[][..])
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                });
-                <span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span> <span class="ident">chunks</span> {
-                    <span class="kw">let</span> <span class="ident">com</span> <span class="op">=</span> <span class="ident">ComStmtSendLongData::new</span>(<span class="ident">statement_id</span>, <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u16</span>, <span class="ident">chunk</span>);
-                    <span class="self">self</span>.<span class="ident">write_command</span>(<span class="kw-2">&amp;</span><span class="ident">com</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>});
+                <span class="kw">for </span>chunk <span class="kw">in </span>chunks {
+                    <span class="kw">let </span>com = ComStmtSendLongData::new(statement_id, i <span class="kw">as </span>u16, chunk);
+                    <span class="self">self</span>.write_command(<span class="kw-2">&amp;</span>com).<span class="kw">await</span><span class="question-mark">?</span>;
                 }
             }
         }
@@ -175,98 +175,98 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Will read result set and write pending result into `self` (if any).</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_result_set</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">is_first_result_set</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">Protocol</span>,
+    <span class="doccomment">/// Will read result set and write pending result into `self` (if any).
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>read_result_set&lt;P&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        is_first_result_set: bool,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;
+    <span class="kw">where
+        </span>P: Protocol,
     {
-        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">read_packet</span>().<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">packet</span>) =&gt; <span class="ident">packet</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span> @ <span class="ident">Error::Server</span>(<span class="kw">_</span>)) <span class="kw">if</span> <span class="ident">is_first_result_set</span> =&gt; {
-                <span class="comment">// shortcut to emit an error right to the caller of a query/execute</span>
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+        <span class="kw">let </span>packet = <span class="kw">match </span><span class="self">self</span>.read_packet().<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(packet) =&gt; packet,
+            <span class="prelude-val">Err</span>(err @ Error::Server(<span class="kw">_</span>)) <span class="kw">if </span>is_first_result_set =&gt; {
+                <span class="comment">// shortcut to emit an error right to the caller of a query/execute
+                </span><span class="kw">return </span><span class="prelude-val">Err</span>(err);
             }
-            <span class="prelude-val">Err</span>(<span class="ident">Error::Server</span>(<span class="ident">error</span>)) =&gt; {
-                <span class="comment">// error will be consumed as a part of a multi-result set</span>
-                <span class="self">self</span>.<span class="ident">set_pending_result_error</span>(<span class="ident">error</span>)<span class="question-mark">?</span>;
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+            <span class="prelude-val">Err</span>(Error::Server(error)) =&gt; {
+                <span class="comment">// error will be consumed as a part of a multi-result set
+                </span><span class="self">self</span>.set_pending_result_error(error)<span class="question-mark">?</span>;
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                <span class="comment">// non-server errors are fatal</span>
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="comment">// non-server errors are fatal
+                </span><span class="kw">return </span><span class="prelude-val">Err</span>(err);
             }
         };
 
-        <span class="kw">match</span> <span class="ident">packet</span>.<span class="ident">get</span>(<span class="number">0</span>) {
+        <span class="kw">match </span>packet.get(<span class="number">0</span>) {
             <span class="prelude-val">Some</span>(<span class="number">0x00</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">set_pending_result</span>(<span class="prelude-val">Some</span>(<span class="ident">P::result_set_meta</span>(<span class="ident">Arc::from</span>(
-                    <span class="ident">Vec::new</span>().<span class="ident">into_boxed_slice</span>(),
+                <span class="self">self</span>.set_pending_result(<span class="prelude-val">Some</span>(P::result_set_meta(Arc::from(
+                    Vec::new().into_boxed_slice(),
                 ))))<span class="question-mark">?</span>;
             }
-            <span class="prelude-val">Some</span>(<span class="number">0xFB</span>) =&gt; <span class="self">self</span>.<span class="ident">handle_local_infile</span>::<span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">packet</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">handle_result_set</span>::<span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">packet</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="prelude-val">Some</span>(<span class="number">0xFB</span>) =&gt; <span class="self">self</span>.handle_local_infile::&lt;P&gt;(<span class="kw-2">&amp;*</span>packet).<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="kw">_ </span>=&gt; <span class="self">self</span>.handle_result_set::&lt;P&gt;(<span class="kw-2">&amp;*</span>packet).<span class="kw">await</span><span class="question-mark">?</span>,
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Will handle local infile packet.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_local_infile</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">packet</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">Protocol</span>,
+    <span class="doccomment">/// Will handle local infile packet.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>handle_local_infile&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, packet: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;
+    <span class="kw">where
+        </span>P: Protocol,
     {
-        <span class="kw">let</span> <span class="ident">local_infile</span> <span class="op">=</span> <span class="ident">ParseBuf</span>(<span class="ident">packet</span>).<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">LocalInfilePacket</span><span class="op">&gt;</span>(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>local_infile = ParseBuf(packet).parse::&lt;LocalInfilePacket&gt;(())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">infile_data</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">infile_handler</span>.<span class="ident">take</span>() {
-            <span class="ident">handler</span>.<span class="kw">await</span><span class="question-mark">?</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">opts</span>().<span class="ident">local_infile_handler</span>() {
-            <span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">local_infile</span>.<span class="ident">file_name_ref</span>()).<span class="kw">await</span><span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">LocalInfileError::NoHandler</span>.<span class="ident">into</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>infile_data = <span class="kw">if let </span><span class="prelude-val">Some</span>(handler) = <span class="self">self</span>.inner.infile_handler.take() {
+            handler.<span class="kw">await</span><span class="question-mark">?
+        </span>} <span class="kw">else if let </span><span class="prelude-val">Some</span>(handler) = <span class="self">self</span>.opts().local_infile_handler() {
+            handler.handle(local_infile.file_name_ref()).<span class="kw">await</span><span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(LocalInfileError::NoHandler.into());
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(());
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bytes</span>) <span class="op">=</span> <span class="ident">infile_data</span>.<span class="ident">next</span>().<span class="kw">await</span> {
-            <span class="kw">match</span> <span class="ident">bytes</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) =&gt; {
-                    <span class="comment">// We&#39;ll skip empty chunks to stay compliant with the protocol.</span>
-                    <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-                        <span class="self">self</span>.<span class="ident">write_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="prelude-val">Ok</span>(());
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(bytes) = infile_data.next().<span class="kw">await </span>{
+            <span class="kw">match </span>bytes {
+                <span class="prelude-val">Ok</span>(bytes) =&gt; {
+                    <span class="comment">// We&#39;ll skip empty chunks to stay compliant with the protocol.
+                    </span><span class="kw">if </span>bytes.len() &gt; <span class="number">0 </span>{
+                        <span class="self">self</span>.write_bytes(<span class="kw-2">&amp;</span>bytes).<span class="kw">await</span><span class="question-mark">?</span>;
                     }
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                    <span class="comment">// Abort the stream in case of an error.</span>
-                    <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident">LocalInfileError::from</span>(<span class="ident">err</span>));
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="comment">// Abort the stream in case of an error.
+                    </span>result = <span class="prelude-val">Err</span>(LocalInfileError::from(err));
                     <span class="kw">break</span>;
                 }
             }
         }
-        <span class="self">self</span>.<span class="ident">write_bytes</span>(<span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.write_bytes(<span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">read_packet</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">set_pending_result</span>(<span class="prelude-val">Some</span>(<span class="ident">P::result_set_meta</span>(<span class="ident">Arc::from</span>(
-            <span class="ident">Vec::new</span>().<span class="ident">into_boxed_slice</span>(),
+        <span class="self">self</span>.read_packet().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.set_pending_result(<span class="prelude-val">Some</span>(P::result_set_meta(Arc::from(
+            Vec::new().into_boxed_slice(),
         ))))<span class="question-mark">?</span>;
 
-        <span class="ident">result</span>.<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+        result.map_err(Into::into)
     }
 
-    <span class="doccomment">/// Helper that handles result set packet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires that `packet` contains non-zero length-encoded integer.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_result_set</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">packet</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">Protocol</span>,
+    <span class="doccomment">/// Helper that handles result set packet.
+    ///
+    /// Requires that `packet` contains non-zero length-encoded integer.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>handle_result_set&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>packet: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;
+    <span class="kw">where
+        </span>P: Protocol,
     {
-        <span class="kw">let</span> <span class="ident">column_count</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">read_lenenc_int</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_column_defs</span>(<span class="ident">column_count</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">P::result_set_meta</span>(<span class="ident">Arc::from</span>(<span class="ident">columns</span>.<span class="ident">into_boxed_slice</span>()));
-        <span class="self">self</span>.<span class="ident">set_pending_result</span>(<span class="prelude-val">Some</span>(<span class="ident">meta</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>column_count = packet.read_lenenc_int()<span class="question-mark">?</span>;
+        <span class="kw">let </span>columns = <span class="self">self</span>.read_column_defs(column_count <span class="kw">as </span>usize).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>meta = P::result_set_meta(Arc::from(columns.into_boxed_slice()));
+        <span class="self">self</span>.set_pending_result(<span class="prelude-val">Some</span>(meta))<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

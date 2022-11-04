@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/internal_data_model.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>internal_data_model.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/internal_data_model.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>internal_data_model.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -141,148 +141,148 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">parent_container::ParentContainer</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">CompositeTypeRef</span>, <span class="ident">InternalEnumRef</span>};
-<span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{parent_container::ParentContainer, prelude::<span class="kw-2">*</span>, CompositeTypeRef, InternalEnumRef};
+<span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>std::sync::{Arc, Weak};
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">InternalDataModelRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InternalDataModel</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">InternalDataModelWeakRef</span> <span class="op">=</span> <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">InternalDataModel</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>InternalDataModelRef = Arc&lt;InternalDataModel&gt;;
+<span class="kw">pub type </span>InternalDataModelWeakRef = Weak&lt;InternalDataModel&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InternalDataModel</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">models</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">composite_types</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CompositeTypeRef</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">relations</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationRef</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">relation_fields</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>InternalDataModel {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) models: OnceCell&lt;Vec&lt;ModelRef&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) composite_types: OnceCell&lt;Vec&lt;CompositeTypeRef&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) relations: OnceCell&lt;Vec&lt;RelationRef&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) relation_fields: OnceCell&lt;Vec&lt;RelationFieldRef&gt;&gt;,
 
-    <span class="doccomment">/// Todo clarify / rename.</span>
-    <span class="doccomment">/// The db name influences how data is queried from the database.</span>
-    <span class="doccomment">/// E.g. this influences the schema part of a postgres query: `database`.`schema`.`table`.</span>
-    <span class="doccomment">/// Other connectors do not use `schema`, like postgres does, and this variable would</span>
-    <span class="doccomment">/// influence the `database` part instead.</span>
-    <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">enums</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InternalEnumRef</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Todo clarify / rename.
+    /// The db name influences how data is queried from the database.
+    /// E.g. this influences the schema part of a postgres query: `database`.`schema`.`table`.
+    /// Other connectors do not use `schema`, like postgres does, and this variable would
+    /// influence the `database` part instead.
+    </span><span class="kw">pub </span>db_name: String,
+    <span class="kw">pub </span>enums: Vec&lt;InternalEnumRef&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">InternalDataModel</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">models</span>().<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">finalize</span>());
+<span class="kw">impl </span>InternalDataModel {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>finalize(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.models().iter().for_each(|model| model.finalize());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">ModelRef</span>] {
-        <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">get</span>().<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>models(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ModelRef] {
+        <span class="self">self</span>.models.get().unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">CompositeTypeRef</span>] {
-        <span class="self">self</span>.<span class="ident">composite_types</span>.<span class="ident">get</span>().<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>composite_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[CompositeTypeRef] {
+        <span class="self">self</span>.composite_types.get().unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models_cloned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">get</span>().<span class="ident">unwrap</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>).<span class="ident">collect</span>()
+    <span class="kw">pub fn </span>models_cloned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ModelRef&gt; {
+        <span class="self">self</span>.models.get().unwrap().iter().map(Arc::clone).collect()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">RelationRef</span>] {
-        <span class="self">self</span>.<span class="ident">relations</span>.<span class="ident">get</span>().<span class="ident">unwrap</span>().<span class="ident">as_slice</span>()
+    <span class="kw">pub fn </span>relations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[RelationRef] {
+        <span class="self">self</span>.relations.get().unwrap().as_slice()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">InternalEnumRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">enums</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
-            .<span class="ident">cloned</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DomainError::EnumNotFound</span> { <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>() })
+    <span class="kw">pub fn </span>find_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;InternalEnumRef&gt; {
+        <span class="self">self</span>.enums
+            .iter()
+            .find(|e| e.name == name)
+            .cloned()
+            .ok_or_else(|| DomainError::EnumNotFound { name: name.to_string() })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">models</span>
-            .<span class="ident">get</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">models</span><span class="op">|</span> <span class="ident">models</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>))
-            .<span class="ident">cloned</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DomainError::ModelNotFound</span> { <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>() })
+    <span class="kw">pub fn </span>find_model(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;ModelRef&gt; {
+        <span class="self">self</span>.models
+            .get()
+            .and_then(|models| models.iter().find(|model| model.name == name))
+            .cloned()
+            .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
-    <span class="doccomment">/// This method takes the two models at the ends of the relation as a first argument, because</span>
-    <span class="doccomment">/// relation names are scoped by the pair of models in the relation. Relation names are _not_</span>
-    <span class="doccomment">/// globally unique.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_names</span>: (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>), <span class="ident">relation_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">RelationWeakRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">relations</span>
-            .<span class="ident">get</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">relations</span><span class="op">|</span> {
-                <span class="ident">relations</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">relation</span><span class="op">|</span> <span class="ident">relation_matches</span>(<span class="ident">relation</span>, <span class="ident">model_names</span>, <span class="ident">relation_name</span>))
+    <span class="doccomment">/// This method takes the two models at the ends of the relation as a first argument, because
+    /// relation names are scoped by the pair of models in the relation. Relation names are _not_
+    /// globally unique.
+    </span><span class="kw">pub fn </span>find_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, model_names: (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str), relation_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;RelationWeakRef&gt; {
+        <span class="self">self</span>.relations
+            .get()
+            .and_then(|relations| {
+                relations
+                    .iter()
+                    .find(|relation| relation_matches(relation, model_names, relation_name))
             })
-            .<span class="ident">map</span>(<span class="ident">Arc::downgrade</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DomainError::RelationNotFound</span> {
-                <span class="ident">name</span>: <span class="ident">relation_name</span>.<span class="ident">to_owned</span>(),
+            .map(Arc::downgrade)
+            .ok_or_else(|| DomainError::RelationNotFound {
+                name: relation_name.to_owned(),
             })
     }
 
-    <span class="doccomment">/// Finds all non-list relation fields pointing to the given model.</span>
-    <span class="doccomment">/// `required` may narrow down the returned fields to required fields only. Returns all on `false`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields_pointing_to_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">required</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">relation_fields</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">related_model</span>() <span class="op">==</span> <span class="ident">model</span>) <span class="comment">// All relation fields pointing to `model`.</span>
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">is_inlined_on_enclosing_model</span>()) <span class="comment">// Not a list, not a virtual field.</span>
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="op">!</span><span class="ident">required</span> <span class="op">|</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">is_required</span>()) <span class="comment">// If only required fields should be returned</span>
-            .<span class="ident">map</span>(<span class="ident">Arc::clone</span>)
-            .<span class="ident">collect</span>()
+    <span class="doccomment">/// Finds all non-list relation fields pointing to the given model.
+    /// `required` may narrow down the returned fields to required fields only. Returns all on `false`.
+    </span><span class="kw">pub fn </span>fields_pointing_to_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>ModelRef, required: bool) -&gt; Vec&lt;RelationFieldRef&gt; {
+        <span class="self">self</span>.relation_fields()
+            .iter()
+            .filter(|rf| <span class="kw-2">&amp;</span>rf.related_model() == model) <span class="comment">// All relation fields pointing to `model`.
+            </span>.filter(|rf| rf.is_inlined_on_enclosing_model()) <span class="comment">// Not a list, not a virtual field.
+            </span>.filter(|rf| !required || rf.is_required()) <span class="comment">// If only required fields should be returned
+            </span>.map(Arc::clone)
+            .collect()
     }
 
-    <span class="doccomment">/// Finds all relation fields where the foreign key refers to the given field (as either singular or compound).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields_refering_to_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">container</span> {
-            <span class="ident">ParentContainer::Model</span>(<span class="ident">model</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">upgrade</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>;
+    <span class="doccomment">/// Finds all relation fields where the foreign key refers to the given field (as either singular or compound).
+    </span><span class="kw">pub fn </span>fields_refering_to_field(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; Vec&lt;RelationFieldRef&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span>field.container {
+            ParentContainer::Model(model) =&gt; {
+                <span class="kw">let </span>model_name = <span class="kw-2">&amp;</span>model.upgrade().unwrap().name;
 
-                <span class="self">self</span>.<span class="ident">relation_fields</span>()
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span> <span class="op">==</span> <span class="ident">model_name</span>)
-                    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">references</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>))
-                    .<span class="ident">map</span>(<span class="ident">Arc::clone</span>)
-                    .<span class="ident">collect</span>()
+                <span class="self">self</span>.relation_fields()
+                    .iter()
+                    .filter(|rf| <span class="kw-2">&amp;</span>rf.relation_info.referenced_model == model_name)
+                    .filter(|rf| rf.relation_info.references.contains(<span class="kw-2">&amp;</span>field.name))
+                    .map(Arc::clone)
+                    .collect()
             }
-            <span class="comment">// Relation fields can not refer to composite fields.</span>
-            <span class="ident">ParentContainer::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[],
+            <span class="comment">// Relation fields can not refer to composite fields.
+            </span>ParentContainer::CompositeType(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[],
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">RelationFieldRef</span>] {
-        <span class="self">self</span>.<span class="ident">relation_fields</span>
-            .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="self">self</span>.<span class="ident">models</span>()
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">relation</span>())
-                    .<span class="ident">collect</span>()
+    <span class="kw">pub fn </span>relation_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[RelationFieldRef] {
+        <span class="self">self</span>.relation_fields
+            .get_or_init(|| {
+                <span class="self">self</span>.models()
+                    .iter()
+                    .flat_map(|model| model.fields().relation())
+                    .collect()
             })
-            .<span class="ident">as_slice</span>()
+            .as_slice()
     }
 }
 
-<span class="doccomment">/// A relation&#39;s &quot;primary key&quot; in a Prisma schema is the relation name (defaulting to an empty</span>
-<span class="doccomment">/// string) qualified by the one or two models involved in the relation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In other words, the scope for a relation name is only between two models. Every pair of models</span>
-<span class="doccomment">/// has its own scope for relation names.</span>
-<span class="kw">fn</span> <span class="ident">relation_matches</span>(<span class="ident">relation</span>: <span class="kw-2">&amp;</span><span class="ident">Relation</span>, <span class="ident">model_names</span>: (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>), <span class="ident">relation_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">relation_name</span> {
-        <span class="kw">return</span> <span class="bool-val">false</span>;
+<span class="doccomment">/// A relation&#39;s &quot;primary key&quot; in a Prisma schema is the relation name (defaulting to an empty
+/// string) qualified by the one or two models involved in the relation.
+///
+/// In other words, the scope for a relation name is only between two models. Every pair of models
+/// has its own scope for relation names.
+</span><span class="kw">fn </span>relation_matches(relation: <span class="kw-2">&amp;</span>Relation, model_names: (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str), relation_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">if </span>relation.name != relation_name {
+        <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">is_self_relation</span>() <span class="op">&amp;&amp;</span> <span class="ident">model_names</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">model_names</span>.<span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">relation</span>.<span class="ident">model_a_name</span> <span class="op">==</span> <span class="ident">model_names</span>.<span class="number">0</span> {
-        <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="kw">if </span>relation.is_self_relation() &amp;&amp; model_names.<span class="number">0 </span>== model_names.<span class="number">1 </span>&amp;&amp; relation.model_a_name == model_names.<span class="number">0 </span>{
+        <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">model_names</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">relation</span>.<span class="ident">model_a_name</span> <span class="op">&amp;&amp;</span> <span class="ident">model_names</span>.<span class="number">1</span> <span class="op">==</span> <span class="ident">relation</span>.<span class="ident">model_b_name</span> {
-        <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="kw">if </span>model_names.<span class="number">0 </span>== relation.model_a_name &amp;&amp; model_names.<span class="number">1 </span>== relation.model_b_name {
+        <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">model_names</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">relation</span>.<span class="ident">model_b_name</span> <span class="op">&amp;&amp;</span> <span class="ident">model_names</span>.<span class="number">1</span> <span class="op">==</span> <span class="ident">relation</span>.<span class="ident">model_a_name</span> {
-        <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="kw">if </span>model_names.<span class="number">0 </span>== relation.model_b_name &amp;&amp; model_names.<span class="number">1 </span>== relation.model_a_name {
+        <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    <span class="bool-val">false</span>
-}
+    <span class="bool-val">false
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/warnings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>warnings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/warnings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>warnings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -220,227 +220,227 @@
 <span id="220">220</span>
 <span id="221">221</span>
 <span id="222">222</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
-<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>introspection_connector::Warning;
+<span class="kw">use </span>serde::Serialize;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Model</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Serialize, Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Model {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Enum</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">enm</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Serialize, Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Enum {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) enm: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Enum</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Enum</span> { <span class="ident">enm</span>: <span class="ident">name</span>.<span class="ident">to_owned</span>() }
+<span class="kw">impl </span>Enum {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        Enum { enm: name.to_owned() }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ModelAndField</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Serialize, Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ModelAndField {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) field: String,
 }
 
-<span class="kw">impl</span> <span class="ident">ModelAndField</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ModelAndField</span> {
-            <span class="ident">model</span>: <span class="ident">model</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">to_owned</span>(),
+<span class="kw">impl </span>ModelAndField {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(model: <span class="kw-2">&amp;</span>str, field: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        ModelAndField {
+            model: model.to_owned(),
+            field: field.to_owned(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ModelAndIndex</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index_db_name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Serialize, Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ModelAndIndex {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) index_db_name: String,
 }
 
-<span class="kw">impl</span> <span class="ident">ModelAndIndex</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">index_db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ModelAndIndex</span> {
-            <span class="ident">model</span>: <span class="ident">model</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">index_db_name</span>: <span class="ident">index_db_name</span>.<span class="ident">to_owned</span>(),
+<span class="kw">impl </span>ModelAndIndex {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(model: <span class="kw-2">&amp;</span>str, index_db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        ModelAndIndex {
+            model: model.to_owned(),
+            index_db_name: index_db_name.to_owned(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ModelAndFieldAndType</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">tpe</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Serialize, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ModelAndFieldAndType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) field: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tpe: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">EnumAndValue</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">enm</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">value</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Serialize, Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EnumAndValue {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) enm: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) value: String,
 }
 
-<span class="kw">impl</span> <span class="ident">EnumAndValue</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">enm</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">EnumAndValue</span> {
-            <span class="ident">enm</span>: <span class="ident">enm</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">value</span>: <span class="ident">value</span>.<span class="ident">to_owned</span>(),
+<span class="kw">impl </span>EnumAndValue {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(enm: <span class="kw-2">&amp;</span>str, value: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        EnumAndValue {
+            enm: enm.to_owned(),
+            value: value.to_owned(),
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_models_without_identifier</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">1</span>,
-        <span class="ident">message</span>: <span class="string">&quot;The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_models_without_identifier(affected: <span class="kw-2">&amp;</span>[Model]) -&gt; Warning {
+    Warning {
+        code: <span class="number">1</span>,
+        message: <span class="string">&quot;The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.&quot;</span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_fields_with_empty_names</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">2</span>,
-        <span class="ident">message</span>: <span class="string">&quot;These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.&quot;</span>
-            .<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_fields_with_empty_names(affected: <span class="kw-2">&amp;</span>[ModelAndField]) -&gt; Warning {
+    Warning {
+        code: <span class="number">2</span>,
+        message: <span class="string">&quot;These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.&quot;
+            </span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_unsupported_types</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndFieldAndType</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">3</span>,
-        <span class="ident">message</span>: <span class="string">&quot;These fields are not supported by the Prisma Client, because Prisma currently does not support their types.&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_unsupported_types(affected: <span class="kw-2">&amp;</span>[ModelAndFieldAndType]) -&gt; Warning {
+    Warning {
+        code: <span class="number">3</span>,
+        message: <span class="string">&quot;These fields are not supported by the Prisma Client, because Prisma currently does not support their types.&quot;</span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enum_values_with_empty_names</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">EnumAndValue</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">4</span>,
-        <span class="ident">message</span>: <span class="string">&quot;These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.&quot;</span>
-            .<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enum_values_with_empty_names(affected: <span class="kw-2">&amp;</span>[EnumAndValue]) -&gt; Warning {
+    Warning {
+        code: <span class="number">4</span>,
+        message: <span class="string">&quot;These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.&quot;
+            </span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_default_cuid_warning</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">5</span>,
-        <span class="ident">message</span>:
-            <span class="string">&quot;These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1.&quot;</span>
-                .<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_default_cuid_warning(affected: <span class="kw-2">&amp;</span>[ModelAndField]) -&gt; Warning {
+    Warning {
+        code: <span class="number">5</span>,
+        message:
+            <span class="string">&quot;These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1.&quot;
+                </span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_default_uuid_warning</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">6</span>,
-        <span class="ident">message</span>:
-            <span class="string">&quot;These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1.&quot;</span>
-                .<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_default_uuid_warning(affected: <span class="kw-2">&amp;</span>[ModelAndField]) -&gt; Warning {
+    Warning {
+        code: <span class="number">6</span>,
+        message:
+            <span class="string">&quot;These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1.&quot;
+                </span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_map_on_model</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">7</span>,
-        <span class="ident">message</span>: <span class="string">&quot;These models were enriched with `@@map` information taken from the previous Prisma schema.&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_map_on_model(affected: <span class="kw-2">&amp;</span>[Model]) -&gt; Warning {
+    Warning {
+        code: <span class="number">7</span>,
+        message: <span class="string">&quot;These models were enriched with `@@map` information taken from the previous Prisma schema.&quot;</span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_map_on_field</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">8</span>,
-        <span class="ident">message</span>: <span class="string">&quot;These fields were enriched with `@map` information taken from the previous Prisma schema.&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_map_on_field(affected: <span class="kw-2">&amp;</span>[ModelAndField]) -&gt; Warning {
+    Warning {
+        code: <span class="number">8</span>,
+        message: <span class="string">&quot;These fields were enriched with `@map` information taken from the previous Prisma schema.&quot;</span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_map_on_enum</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Enum</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">9</span>,
-        <span class="ident">message</span>: <span class="string">&quot;These enums were enriched with `@@map` information taken from the previous Prisma schema.&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_map_on_enum(affected: <span class="kw-2">&amp;</span>[Enum]) -&gt; Warning {
+    Warning {
+        code: <span class="number">9</span>,
+        message: <span class="string">&quot;These enums were enriched with `@@map` information taken from the previous Prisma schema.&quot;</span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_map_on_enum_value</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">EnumAndValue</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">10</span>,
-        <span class="ident">message</span>: <span class="string">&quot;These enum values were enriched with `@map` information taken from the previous Prisma schema.&quot;</span>
-            .<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_map_on_enum_value(affected: <span class="kw-2">&amp;</span>[EnumAndValue]) -&gt; Warning {
+    Warning {
+        code: <span class="number">10</span>,
+        message: <span class="string">&quot;These enum values were enriched with `@map` information taken from the previous Prisma schema.&quot;
+            </span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_cuid</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">11</span>,
-        <span class="ident">message</span>:
-            <span class="string">&quot;These id fields were enriched with `@default(cuid())` information taken from the previous Prisma schema.&quot;</span>
-                .<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_cuid(affected: <span class="kw-2">&amp;</span>[ModelAndField]) -&gt; Warning {
+    Warning {
+        code: <span class="number">11</span>,
+        message:
+            <span class="string">&quot;These id fields were enriched with `@default(cuid())` information taken from the previous Prisma schema.&quot;
+                </span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_uuid</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">12</span>,
-        <span class="ident">message</span>:
-            <span class="string">&quot;These id fields were enriched with `@default(uuid())` information taken from the previous Prisma schema.&quot;</span>
-                .<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_uuid(affected: <span class="kw-2">&amp;</span>[ModelAndField]) -&gt; Warning {
+    Warning {
+        code: <span class="number">12</span>,
+        message:
+            <span class="string">&quot;These id fields were enriched with `@default(uuid())` information taken from the previous Prisma schema.&quot;
+                </span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_updated_at</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">13</span>,
-        <span class="ident">message</span>:
-            <span class="string">&quot;These DateTime fields were enriched with `@updatedAt` information taken from the previous Prisma schema.&quot;</span>
-                .<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_updated_at(affected: <span class="kw-2">&amp;</span>[ModelAndField]) -&gt; Warning {
+    Warning {
+        code: <span class="number">13</span>,
+        message:
+            <span class="string">&quot;These DateTime fields were enriched with `@updatedAt` information taken from the previous Prisma schema.&quot;
+                </span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="comment">//todo maybe we can get rid of this alltogether due to @@ignore</span>
-<span class="comment">//but maybe we should have warnings for ignored fields and models</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_models_without_columns</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">14</span>,
-        <span class="ident">message</span>: <span class="string">&quot;The following models were commented out as we could not retrieve columns for them. Please check your privileges.&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="comment">//todo maybe we can get rid of this alltogether due to @@ignore
+//but maybe we should have warnings for ignored fields and models
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_models_without_columns(affected: <span class="kw-2">&amp;</span>[Model]) -&gt; Warning {
+    Warning {
+        code: <span class="number">14</span>,
+        message: <span class="string">&quot;The following models were commented out as we could not retrieve columns for them. Please check your privileges.&quot;</span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_custom_index_names</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndIndex</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">17</span>,
-        <span class="ident">message</span>: <span class="string">&quot;These Indices were enriched with custom index names taken from the previous Prisma schema.&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_custom_index_names(affected: <span class="kw-2">&amp;</span>[ModelAndIndex]) -&gt; Warning {
+    Warning {
+        code: <span class="number">17</span>,
+        message: <span class="string">&quot;These Indices were enriched with custom index names taken from the previous Prisma schema.&quot;</span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_custom_primary_key_names</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">18</span>,
-        <span class="ident">message</span>: <span class="string">&quot;These models were enriched with custom compound id names taken from the previous Prisma schema.&quot;</span>
-            .<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_custom_primary_key_names(affected: <span class="kw-2">&amp;</span>[Model]) -&gt; Warning {
+    Warning {
+        code: <span class="number">18</span>,
+        message: <span class="string">&quot;These models were enriched with custom compound id names taken from the previous Prisma schema.&quot;
+            </span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_relations_added_from_the_previous_data_model</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">19</span>,
-        <span class="ident">message</span>: <span class="string">&quot;Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore.&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="ident">affected</span>).<span class="ident">unwrap</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_relations_added_from_the_previous_data_model(affected: <span class="kw-2">&amp;</span>[Model]) -&gt; Warning {
+    Warning {
+        code: <span class="number">19</span>,
+        message: <span class="string">&quot;Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore.&quot;</span>.into(),
+        affected: serde_json::to_value(affected).unwrap(),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

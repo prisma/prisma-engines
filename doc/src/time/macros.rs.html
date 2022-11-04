@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -132,137 +132,137 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Macros to construct statically known values.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Macros to construct statically known values.
 
-<span class="doccomment">/// Construct a [`Date`](crate::Date) with a statically known value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The resulting expression can be used in `const` or `static` declarations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Three formats are supported: year-week-weekday, year-ordinal, and year-month-day.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use time::{Date, Weekday::*, Month, macros::date};</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     date!(2020 - W 01 - 3),</span>
-<span class="doccomment">///     Date::from_iso_week_date(2020, 1, Wednesday)?</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(date!(2020 - 001), Date::from_ordinal_date(2020, 1)?);</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     date!(2020 - 01 - 01),</span>
-<span class="doccomment">///     Date::from_calendar_date(2020, Month::January, 1)?</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_macros::date</span>;
-<span class="doccomment">/// Construct a [`PrimitiveDateTime`] or [`OffsetDateTime`] with a statically known value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The resulting expression can be used in `const` or `static` declarations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The syntax accepted by this macro is the same as [`date!`] and [`time!`], with an optional</span>
-<span class="doccomment">/// [`offset!`], all space-separated. If an [`offset!`] is provided, the resulting value will</span>
-<span class="doccomment">/// be an [`OffsetDateTime`]; otherwise it will be a [`PrimitiveDateTime`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`OffsetDateTime`]: crate::OffsetDateTime</span>
-<span class="doccomment">/// [`PrimitiveDateTime`]: crate::PrimitiveDateTime</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use time::{Date, Month, macros::datetime, UtcOffset};</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     datetime!(2020-01-01 0:00),</span>
-<span class="doccomment">///     Date::from_calendar_date(2020, Month::January, 1)?.midnight()</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     datetime!(2020-01-01 0:00 UTC),</span>
-<span class="doccomment">///     Date::from_calendar_date(2020, Month::January, 1)?.midnight().assume_utc()</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     datetime!(2020-01-01 0:00 -1),</span>
-<span class="doccomment">///     Date::from_calendar_date(2020, Month::January, 1)?.midnight()</span>
-<span class="doccomment">///         .assume_offset(UtcOffset::from_hms(-1, 0, 0)?)</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_macros::datetime</span>;
-<span class="doccomment">/// Equivalent of performing [`format_description::parse()`] at compile time.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using the macro instead of the function results in a static slice rather than a [`Vec`],</span>
-<span class="doccomment">/// such that it can be used in `#![no_alloc]` situations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The resulting expression can be used in `const` or `static` declarations, and implements</span>
-<span class="doccomment">/// the sealed traits required for both formatting and parsing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use time::{format_description, macros::format_description};</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     format_description!(&quot;[hour]:[minute]:[second]&quot;),</span>
-<span class="doccomment">///     format_description::parse(&quot;[hour]:[minute]:[second]&quot;)?</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The syntax accepted by this macro is the same as [`format_description::parse()`], which can</span>
-<span class="doccomment">/// be found in [the book](https://time-rs.github.io/book/api/format-description.html).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`format_description::parse()`]: crate::format_description::parse()</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_macros::format_description</span>;
-<span class="doccomment">/// Construct a [`UtcOffset`](crate::UtcOffset) with a statically known value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The resulting expression can be used in `const` or `static` declarations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A sign and the hour must be provided; minutes and seconds default to zero. `UTC` (both</span>
-<span class="doccomment">/// uppercase and lowercase) is also allowed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use time::{UtcOffset, macros::offset};</span>
-<span class="doccomment">/// assert_eq!(offset!(UTC), UtcOffset::from_hms(0, 0, 0)?);</span>
-<span class="doccomment">/// assert_eq!(offset!(utc), UtcOffset::from_hms(0, 0, 0)?);</span>
-<span class="doccomment">/// assert_eq!(offset!(+0), UtcOffset::from_hms(0, 0, 0)?);</span>
-<span class="doccomment">/// assert_eq!(offset!(+1), UtcOffset::from_hms(1, 0, 0)?);</span>
-<span class="doccomment">/// assert_eq!(offset!(-1), UtcOffset::from_hms(-1, 0, 0)?);</span>
-<span class="doccomment">/// assert_eq!(offset!(+1:30), UtcOffset::from_hms(1, 30, 0)?);</span>
-<span class="doccomment">/// assert_eq!(offset!(-1:30), UtcOffset::from_hms(-1, -30, 0)?);</span>
-<span class="doccomment">/// assert_eq!(offset!(+1:30:59), UtcOffset::from_hms(1, 30, 59)?);</span>
-<span class="doccomment">/// assert_eq!(offset!(-1:30:59), UtcOffset::from_hms(-1, -30, -59)?);</span>
-<span class="doccomment">/// assert_eq!(offset!(+23:59:59), UtcOffset::from_hms(23, 59, 59)?);</span>
-<span class="doccomment">/// assert_eq!(offset!(-23:59:59), UtcOffset::from_hms(-23, -59, -59)?);</span>
-<span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_macros::offset</span>;
-<span class="doccomment">/// Construct a [`Time`](crate::Time) with a statically known value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The resulting expression can be used in `const` or `static` declarations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Hours and minutes must be provided, while seconds defaults to zero. AM/PM is allowed</span>
-<span class="doccomment">/// (either uppercase or lowercase). Any number of subsecond digits may be provided (though any</span>
-<span class="doccomment">/// past nine will be discarded).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All components are validated at compile-time. An error will be raised if any value is</span>
-<span class="doccomment">/// invalid.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use time::{Time, macros::time};</span>
-<span class="doccomment">/// assert_eq!(time!(0:00), Time::from_hms(0, 0, 0)?);</span>
-<span class="doccomment">/// assert_eq!(time!(1:02:03), Time::from_hms(1, 2, 3)?);</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     time!(1:02:03.004_005_006),</span>
-<span class="doccomment">///     Time::from_hms_nano(1, 2, 3, 4_005_006)?</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(time!(12:00 am), Time::from_hms(0, 0, 0)?);</span>
-<span class="doccomment">/// assert_eq!(time!(1:02:03 am), Time::from_hms(1, 2, 3)?);</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     time!(1:02:03.004_005_006 am),</span>
-<span class="doccomment">///     Time::from_hms_nano(1, 2, 3, 4_005_006)?</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(time!(12 pm), Time::from_hms(12, 0, 0)?);</span>
-<span class="doccomment">/// assert_eq!(time!(12:00 pm), Time::from_hms(12, 0, 0)?);</span>
-<span class="doccomment">/// assert_eq!(time!(1:02:03 pm), Time::from_hms(13, 2, 3)?);</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     time!(1:02:03.004_005_006 pm),</span>
-<span class="doccomment">///     Time::from_hms_nano(13, 2, 3, 4_005_006)?</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_macros::time</span>;
+/// Construct a [`Date`](crate::Date) with a statically known value.
+///
+/// The resulting expression can be used in `const` or `static` declarations.
+///
+/// Three formats are supported: year-week-weekday, year-ordinal, and year-month-day.
+///
+/// ```rust
+/// # use time::{Date, Weekday::*, Month, macros::date};
+/// assert_eq!(
+///     date!(2020 - W 01 - 3),
+///     Date::from_iso_week_date(2020, 1, Wednesday)?
+/// );
+/// assert_eq!(date!(2020 - 001), Date::from_ordinal_date(2020, 1)?);
+/// assert_eq!(
+///     date!(2020 - 01 - 01),
+///     Date::from_calendar_date(2020, Month::January, 1)?
+/// );
+/// # Ok::&lt;_, time::Error&gt;(())
+/// ```
+</span><span class="kw">pub use </span>time_macros::date;
+<span class="doccomment">/// Construct a [`PrimitiveDateTime`] or [`OffsetDateTime`] with a statically known value.
+///
+/// The resulting expression can be used in `const` or `static` declarations.
+///
+/// The syntax accepted by this macro is the same as [`date!`] and [`time!`], with an optional
+/// [`offset!`], all space-separated. If an [`offset!`] is provided, the resulting value will
+/// be an [`OffsetDateTime`]; otherwise it will be a [`PrimitiveDateTime`].
+///
+/// [`OffsetDateTime`]: crate::OffsetDateTime
+/// [`PrimitiveDateTime`]: crate::PrimitiveDateTime
+///
+/// ```rust
+/// # use time::{Date, Month, macros::datetime, UtcOffset};
+/// assert_eq!(
+///     datetime!(2020-01-01 0:00),
+///     Date::from_calendar_date(2020, Month::January, 1)?.midnight()
+/// );
+/// assert_eq!(
+///     datetime!(2020-01-01 0:00 UTC),
+///     Date::from_calendar_date(2020, Month::January, 1)?.midnight().assume_utc()
+/// );
+/// assert_eq!(
+///     datetime!(2020-01-01 0:00 -1),
+///     Date::from_calendar_date(2020, Month::January, 1)?.midnight()
+///         .assume_offset(UtcOffset::from_hms(-1, 0, 0)?)
+/// );
+/// # Ok::&lt;_, time::Error&gt;(())
+/// ```
+</span><span class="kw">pub use </span>time_macros::datetime;
+<span class="doccomment">/// Equivalent of performing [`format_description::parse()`] at compile time.
+///
+/// Using the macro instead of the function results in a static slice rather than a [`Vec`],
+/// such that it can be used in `#![no_alloc]` situations.
+///
+/// The resulting expression can be used in `const` or `static` declarations, and implements
+/// the sealed traits required for both formatting and parsing.
+///
+/// ```rust
+/// # use time::{format_description, macros::format_description};
+/// assert_eq!(
+///     format_description!(&quot;[hour]:[minute]:[second]&quot;),
+///     format_description::parse(&quot;[hour]:[minute]:[second]&quot;)?
+/// );
+/// # Ok::&lt;_, time::Error&gt;(())
+/// ```
+///
+/// The syntax accepted by this macro is the same as [`format_description::parse()`], which can
+/// be found in [the book](https://time-rs.github.io/book/api/format-description.html).
+///
+/// [`format_description::parse()`]: crate::format_description::parse()
+</span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;formatting&quot;</span>, feature = <span class="string">&quot;parsing&quot;</span>))]
+</span><span class="kw">pub use </span>time_macros::format_description;
+<span class="doccomment">/// Construct a [`UtcOffset`](crate::UtcOffset) with a statically known value.
+///
+/// The resulting expression can be used in `const` or `static` declarations.
+///
+/// A sign and the hour must be provided; minutes and seconds default to zero. `UTC` (both
+/// uppercase and lowercase) is also allowed.
+///
+/// ```rust
+/// # use time::{UtcOffset, macros::offset};
+/// assert_eq!(offset!(UTC), UtcOffset::from_hms(0, 0, 0)?);
+/// assert_eq!(offset!(utc), UtcOffset::from_hms(0, 0, 0)?);
+/// assert_eq!(offset!(+0), UtcOffset::from_hms(0, 0, 0)?);
+/// assert_eq!(offset!(+1), UtcOffset::from_hms(1, 0, 0)?);
+/// assert_eq!(offset!(-1), UtcOffset::from_hms(-1, 0, 0)?);
+/// assert_eq!(offset!(+1:30), UtcOffset::from_hms(1, 30, 0)?);
+/// assert_eq!(offset!(-1:30), UtcOffset::from_hms(-1, -30, 0)?);
+/// assert_eq!(offset!(+1:30:59), UtcOffset::from_hms(1, 30, 59)?);
+/// assert_eq!(offset!(-1:30:59), UtcOffset::from_hms(-1, -30, -59)?);
+/// assert_eq!(offset!(+23:59:59), UtcOffset::from_hms(23, 59, 59)?);
+/// assert_eq!(offset!(-23:59:59), UtcOffset::from_hms(-23, -59, -59)?);
+/// # Ok::&lt;_, time::Error&gt;(())
+/// ```
+</span><span class="kw">pub use </span>time_macros::offset;
+<span class="doccomment">/// Construct a [`Time`](crate::Time) with a statically known value.
+///
+/// The resulting expression can be used in `const` or `static` declarations.
+///
+/// Hours and minutes must be provided, while seconds defaults to zero. AM/PM is allowed
+/// (either uppercase or lowercase). Any number of subsecond digits may be provided (though any
+/// past nine will be discarded).
+///
+/// All components are validated at compile-time. An error will be raised if any value is
+/// invalid.
+///
+/// ```rust
+/// # use time::{Time, macros::time};
+/// assert_eq!(time!(0:00), Time::from_hms(0, 0, 0)?);
+/// assert_eq!(time!(1:02:03), Time::from_hms(1, 2, 3)?);
+/// assert_eq!(
+///     time!(1:02:03.004_005_006),
+///     Time::from_hms_nano(1, 2, 3, 4_005_006)?
+/// );
+/// assert_eq!(time!(12:00 am), Time::from_hms(0, 0, 0)?);
+/// assert_eq!(time!(1:02:03 am), Time::from_hms(1, 2, 3)?);
+/// assert_eq!(
+///     time!(1:02:03.004_005_006 am),
+///     Time::from_hms_nano(1, 2, 3, 4_005_006)?
+/// );
+/// assert_eq!(time!(12 pm), Time::from_hms(12, 0, 0)?);
+/// assert_eq!(time!(12:00 pm), Time::from_hms(12, 0, 0)?);
+/// assert_eq!(time!(1:02:03 pm), Time::from_hms(13, 2, 3)?);
+/// assert_eq!(
+///     time!(1:02:03.004_005_006 pm),
+///     Time::from_hms_nano(13, 2, 3, 4_005_006)?
+/// );
+/// # Ok::&lt;_, time::Error&gt;(())
+/// ```
+</span><span class="kw">pub use </span>time_macros::time;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

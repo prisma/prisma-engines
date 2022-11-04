@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/offset/local/tz_info/timezone.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>timezone.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../chrono/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/offset/local/tz_info/timezone.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>timezone.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../chrono/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -912,375 +912,375 @@
 <span id="912">912</span>
 <span id="913">913</span>
 <span id="914">914</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Types related to a time zone.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Types related to a time zone.
 
-<span class="kw">use</span> <span class="ident">std::fs</span>::{<span class="self">self</span>, <span class="ident">File</span>};
-<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">Read</span>};
-<span class="kw">use</span> <span class="ident">std::path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp::Ordering</span>, <span class="ident">fmt</span>, <span class="ident">str</span>};
+</span><span class="kw">use </span>std::fs::{<span class="self">self</span>, File};
+<span class="kw">use </span>std::io::{<span class="self">self</span>, Read};
+<span class="kw">use </span>std::path::{Path, PathBuf};
+<span class="kw">use </span>std::{cmp::Ordering, fmt, str};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::rule</span>::{<span class="ident">AlternateTime</span>, <span class="ident">TransitionRule</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">parser</span>, <span class="ident">Error</span>, <span class="ident">DAYS_PER_WEEK</span>, <span class="ident">SECONDS_PER_DAY</span>};
+<span class="kw">use </span><span class="kw">super</span>::rule::{AlternateTime, TransitionRule};
+<span class="kw">use super</span>::{parser, Error, DAYS_PER_WEEK, SECONDS_PER_DAY};
 
-<span class="doccomment">/// Time zone</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TimeZone</span> {
-    <span class="doccomment">/// List of transitions</span>
-    <span class="ident">transitions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transition</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// List of local time types (cannot be empty)</span>
-    <span class="ident">local_time_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LocalTimeType</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// List of leap seconds</span>
-    <span class="ident">leap_seconds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LeapSecond</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Extra transition rule applicable after the last transition</span>
-    <span class="ident">extra_rule</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TransitionRule</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Time zone
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TimeZone {
+    <span class="doccomment">/// List of transitions
+    </span>transitions: Vec&lt;Transition&gt;,
+    <span class="doccomment">/// List of local time types (cannot be empty)
+    </span>local_time_types: Vec&lt;LocalTimeType&gt;,
+    <span class="doccomment">/// List of leap seconds
+    </span>leap_seconds: Vec&lt;LeapSecond&gt;,
+    <span class="doccomment">/// Extra transition rule applicable after the last transition
+    </span>extra_rule: <span class="prelude-ty">Option</span>&lt;TransitionRule&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TimeZone</span> {
-    <span class="doccomment">/// Returns local time zone.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method in not supported on non-UNIX platforms, and returns the UTC time zone instead.</span>
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">local</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">tz</span>) <span class="op">=</span> <span class="ident">std::env::var</span>(<span class="string">&quot;TZ&quot;</span>) {
-            <span class="ident"><span class="self">Self</span>::from_posix_tz</span>(<span class="kw-2">&amp;</span><span class="ident">tz</span>)
-        } <span class="kw">else</span> {
-            <span class="ident"><span class="self">Self</span>::from_posix_tz</span>(<span class="string">&quot;localtime&quot;</span>)
+<span class="kw">impl </span>TimeZone {
+    <span class="doccomment">/// Returns local time zone.
+    ///
+    /// This method in not supported on non-UNIX platforms, and returns the UTC time zone instead.
+    ///
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>local() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(tz) = std::env::var(<span class="string">&quot;TZ&quot;</span>) {
+            <span class="self">Self</span>::from_posix_tz(<span class="kw-2">&amp;</span>tz)
+        } <span class="kw">else </span>{
+            <span class="self">Self</span>::from_posix_tz(<span class="string">&quot;localtime&quot;</span>)
         }
     }
 
-    <span class="doccomment">/// Construct a time zone from a POSIX TZ string, as described in [the POSIX documentation of the `TZ` environment variable](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html).</span>
-    <span class="kw">fn</span> <span class="ident">from_posix_tz</span>(<span class="ident">tz_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">tz_string</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTzString</span>(<span class="string">&quot;empty TZ string&quot;</span>));
+    <span class="doccomment">/// Construct a time zone from a POSIX TZ string, as described in [the POSIX documentation of the `TZ` environment variable](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html).
+    </span><span class="kw">fn </span>from_posix_tz(tz_string: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>tz_string.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzString(<span class="string">&quot;empty TZ string&quot;</span>));
         }
 
-        <span class="kw">if</span> <span class="ident">tz_string</span> <span class="op">==</span> <span class="string">&quot;localtime&quot;</span> {
-            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::from_tz_data</span>(<span class="kw-2">&amp;</span><span class="ident">fs::read</span>(<span class="string">&quot;/etc/localtime&quot;</span>)<span class="question-mark">?</span>);
+        <span class="kw">if </span>tz_string == <span class="string">&quot;localtime&quot; </span>{
+            <span class="kw">return </span><span class="self">Self</span>::from_tz_data(<span class="kw-2">&amp;</span>fs::read(<span class="string">&quot;/etc/localtime&quot;</span>)<span class="question-mark">?</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">tz_string</span>.<span class="ident">chars</span>();
-        <span class="kw">if</span> <span class="ident">chars</span>.<span class="ident">next</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&#39;:&#39;</span>) {
-            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::from_file</span>(<span class="kw-2">&amp;mut</span> <span class="ident">find_tz_file</span>(<span class="ident">chars</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>chars = tz_string.chars();
+        <span class="kw">if </span>chars.next() == <span class="prelude-val">Some</span>(<span class="string">&#39;:&#39;</span>) {
+            <span class="kw">return </span><span class="self">Self</span>::from_file(<span class="kw-2">&amp;mut </span>find_tz_file(chars.as_str())<span class="question-mark">?</span>);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">file</span>) <span class="op">=</span> <span class="ident">find_tz_file</span>(<span class="ident">tz_string</span>) {
-            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::from_file</span>(<span class="kw-2">&amp;mut</span> <span class="ident">file</span>);
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>file) = find_tz_file(tz_string) {
+            <span class="kw">return </span><span class="self">Self</span>::from_file(<span class="kw-2">&amp;mut </span>file);
         }
 
-        <span class="comment">// TZ string extensions are not allowed</span>
-        <span class="kw">let</span> <span class="ident">tz_string</span> <span class="op">=</span> <span class="ident">tz_string</span>.<span class="ident">trim_matches</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_ascii_whitespace</span>());
-        <span class="kw">let</span> <span class="ident">rule</span> <span class="op">=</span> <span class="ident">TransitionRule::from_tz_string</span>(<span class="ident">tz_string</span>.<span class="ident">as_bytes</span>(), <span class="bool-val">false</span>)<span class="question-mark">?</span>;
-        <span class="ident"><span class="self">Self</span>::new</span>(
+        <span class="comment">// TZ string extensions are not allowed
+        </span><span class="kw">let </span>tz_string = tz_string.trim_matches(|c: char| c.is_ascii_whitespace());
+        <span class="kw">let </span>rule = TransitionRule::from_tz_string(tz_string.as_bytes(), <span class="bool-val">false</span>)<span class="question-mark">?</span>;
+        <span class="self">Self</span>::new(
             <span class="macro">vec!</span>[],
-            <span class="kw">match</span> <span class="ident">rule</span> {
-                <span class="ident">TransitionRule::Fixed</span>(<span class="ident">local_time_type</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">local_time_type</span>],
-                <span class="ident">TransitionRule::Alternate</span>(<span class="ident">AlternateTime</span> { <span class="ident">std</span>, <span class="ident">dst</span>, .. }) =&gt; <span class="macro">vec!</span>[<span class="ident">std</span>, <span class="ident">dst</span>],
+            <span class="kw">match </span>rule {
+                TransitionRule::Fixed(local_time_type) =&gt; <span class="macro">vec!</span>[local_time_type],
+                TransitionRule::Alternate(AlternateTime { std, dst, .. }) =&gt; <span class="macro">vec!</span>[std, dst],
             },
             <span class="macro">vec!</span>[],
-            <span class="prelude-val">Some</span>(<span class="ident">rule</span>),
+            <span class="prelude-val">Some</span>(rule),
         )
     }
 
-    <span class="doccomment">/// Construct a time zone</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">transitions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transition</span><span class="op">&gt;</span>,
-        <span class="ident">local_time_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LocalTimeType</span><span class="op">&gt;</span>,
-        <span class="ident">leap_seconds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LeapSecond</span><span class="op">&gt;</span>,
-        <span class="ident">extra_rule</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TransitionRule</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="self">Self</span> { <span class="ident">transitions</span>, <span class="ident">local_time_types</span>, <span class="ident">leap_seconds</span>, <span class="ident">extra_rule</span> };
-        <span class="ident">new</span>.<span class="ident">as_ref</span>().<span class="ident">validate</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">new</span>)
+    <span class="doccomment">/// Construct a time zone
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(
+        transitions: Vec&lt;Transition&gt;,
+        local_time_types: Vec&lt;LocalTimeType&gt;,
+        leap_seconds: Vec&lt;LeapSecond&gt;,
+        extra_rule: <span class="prelude-ty">Option</span>&lt;TransitionRule&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span>new = <span class="self">Self </span>{ transitions, local_time_types, leap_seconds, extra_rule };
+        new.as_ref().validate()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(new)
     }
 
-    <span class="doccomment">/// Construct a time zone from the contents of a time zone file</span>
-    <span class="kw">fn</span> <span class="ident">from_file</span>(<span class="ident">file</span>: <span class="kw-2">&amp;mut</span> <span class="ident">File</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">file</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>)<span class="question-mark">?</span>;
-        <span class="ident"><span class="self">Self</span>::from_tz_data</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>)
+    <span class="doccomment">/// Construct a time zone from the contents of a time zone file
+    </span><span class="kw">fn </span>from_file(file: <span class="kw-2">&amp;mut </span>File) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        file.read_to_end(<span class="kw-2">&amp;mut </span>bytes)<span class="question-mark">?</span>;
+        <span class="self">Self</span>::from_tz_data(<span class="kw-2">&amp;</span>bytes)
     }
 
-    <span class="doccomment">/// Construct a time zone from the contents of a time zone file</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Parse TZif data as described in [RFC 8536](https://datatracker.ietf.org/doc/html/rfc8536).</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_tz_data</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">parser::parse</span>(<span class="ident">bytes</span>)
+    <span class="doccomment">/// Construct a time zone from the contents of a time zone file
+    ///
+    /// Parse TZif data as described in [RFC 8536](https://datatracker.ietf.org/doc/html/rfc8536).
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>from_tz_data(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        parser::parse(bytes)
     }
 
-    <span class="doccomment">/// Construct a time zone with the specified UTC offset in seconds</span>
-    <span class="kw">fn</span> <span class="ident">fixed</span>(<span class="ident">ut_offset</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">transitions</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">local_time_types</span>: <span class="macro">vec!</span>[<span class="ident">LocalTimeType::with_offset</span>(<span class="ident">ut_offset</span>)<span class="question-mark">?</span>],
-            <span class="ident">leap_seconds</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">extra_rule</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Construct a time zone with the specified UTC offset in seconds
+    </span><span class="kw">fn </span>fixed(ut_offset: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            transitions: Vec::new(),
+            local_time_types: <span class="macro">vec!</span>[LocalTimeType::with_offset(ut_offset)<span class="question-mark">?</span>],
+            leap_seconds: Vec::new(),
+            extra_rule: <span class="prelude-val">None</span>,
         })
     }
 
-    <span class="doccomment">/// Construct the time zone associated to UTC</span>
-    <span class="kw">fn</span> <span class="ident">utc</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">transitions</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">local_time_types</span>: <span class="macro">vec!</span>[<span class="ident">LocalTimeType::UTC</span>],
-            <span class="ident">leap_seconds</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">extra_rule</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Construct the time zone associated to UTC
+    </span><span class="kw">fn </span>utc() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            transitions: Vec::new(),
+            local_time_types: <span class="macro">vec!</span>[LocalTimeType::UTC],
+            leap_seconds: Vec::new(),
+            extra_rule: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Find the local time type associated to the time zone at the specified Unix time in seconds</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">find_local_time_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">unix_time</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">LocalTimeType</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">find_local_time_type</span>(<span class="ident">unix_time</span>)
+    <span class="doccomment">/// Find the local time type associated to the time zone at the specified Unix time in seconds
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_local_time_type(<span class="kw-2">&amp;</span><span class="self">self</span>, unix_time: i64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>LocalTimeType, Error&gt; {
+        <span class="self">self</span>.as_ref().find_local_time_type(unix_time)
     }
 
-    <span class="comment">// should we pass NaiveDateTime all the way through to this fn?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">find_local_time_type_from_local</span>(
+    <span class="comment">// should we pass NaiveDateTime all the way through to this fn?
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_local_time_type_from_local(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">local_time</span>: <span class="ident">i64</span>,
-        <span class="ident">year</span>: <span class="ident">i32</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::LocalResult</span><span class="op">&lt;</span><span class="ident">LocalTimeType</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">find_local_time_type_from_local</span>(<span class="ident">local_time</span>, <span class="ident">year</span>)
+        local_time: i64,
+        year: i32,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">crate</span>::LocalResult&lt;LocalTimeType&gt;, Error&gt; {
+        <span class="self">self</span>.as_ref().find_local_time_type_from_local(local_time, year)
     }
 
-    <span class="doccomment">/// Returns a reference to the time zone</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TimeZoneRef</span> {
-        <span class="ident">TimeZoneRef</span> {
-            <span class="ident">transitions</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">transitions</span>,
-            <span class="ident">local_time_types</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">local_time_types</span>,
-            <span class="ident">leap_seconds</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">leap_seconds</span>,
-            <span class="ident">extra_rule</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">extra_rule</span>,
+    <span class="doccomment">/// Returns a reference to the time zone
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TimeZoneRef {
+        TimeZoneRef {
+            transitions: <span class="kw-2">&amp;</span><span class="self">self</span>.transitions,
+            local_time_types: <span class="kw-2">&amp;</span><span class="self">self</span>.local_time_types,
+            leap_seconds: <span class="kw-2">&amp;</span><span class="self">self</span>.leap_seconds,
+            extra_rule: <span class="kw-2">&amp;</span><span class="self">self</span>.extra_rule,
         }
     }
 }
 
-<span class="doccomment">/// Reference to a time zone</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TimeZoneRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// List of transitions</span>
-    <span class="ident">transitions</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Transition</span>],
-    <span class="doccomment">/// List of local time types (cannot be empty)</span>
-    <span class="ident">local_time_types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">LocalTimeType</span>],
-    <span class="doccomment">/// List of leap seconds</span>
-    <span class="ident">leap_seconds</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">LeapSecond</span>],
-    <span class="doccomment">/// Extra transition rule applicable after the last transition</span>
-    <span class="ident">extra_rule</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TransitionRule</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Reference to a time zone
+</span><span class="attribute">#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TimeZoneRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// List of transitions
+    </span>transitions: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Transition],
+    <span class="doccomment">/// List of local time types (cannot be empty)
+    </span>local_time_types: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[LocalTimeType],
+    <span class="doccomment">/// List of leap seconds
+    </span>leap_seconds: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[LeapSecond],
+    <span class="doccomment">/// Extra transition rule applicable after the last transition
+    </span>extra_rule: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="prelude-ty">Option</span>&lt;TransitionRule&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TimeZoneRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Find the local time type associated to the time zone at the specified Unix time in seconds</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">find_local_time_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">unix_time</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">LocalTimeType</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">extra_rule</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">transitions</span>.<span class="ident">last</span>() {
-            <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">extra_rule</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">extra_rule</span>) =&gt; <span class="ident">extra_rule</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">local_time_types</span>[<span class="number">0</span>]),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TimeZoneRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Find the local time type associated to the time zone at the specified Unix time in seconds
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_local_time_type(<span class="kw-2">&amp;</span><span class="self">self</span>, unix_time: i64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LocalTimeType, Error&gt; {
+        <span class="kw">let </span>extra_rule = <span class="kw">match </span><span class="self">self</span>.transitions.last() {
+            <span class="prelude-val">None </span>=&gt; <span class="kw">match </span><span class="self">self</span>.extra_rule {
+                <span class="prelude-val">Some</span>(extra_rule) =&gt; extra_rule,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.local_time_types[<span class="number">0</span>]),
             },
-            <span class="prelude-val">Some</span>(<span class="ident">last_transition</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">unix_leap_time</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">unix_time_to_unix_leap_time</span>(<span class="ident">unix_time</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">unix_leap_time</span>) =&gt; <span class="ident">unix_leap_time</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">Error::OutOfRange</span>(<span class="ident">error</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::FindLocalTimeType</span>(<span class="ident">error</span>)),
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+            <span class="prelude-val">Some</span>(last_transition) =&gt; {
+                <span class="kw">let </span>unix_leap_time = <span class="kw">match </span><span class="self">self</span>.unix_time_to_unix_leap_time(unix_time) {
+                    <span class="prelude-val">Ok</span>(unix_leap_time) =&gt; unix_leap_time,
+                    <span class="prelude-val">Err</span>(Error::OutOfRange(error)) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::FindLocalTimeType(error)),
+                    <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
                 };
 
-                <span class="kw">if</span> <span class="ident">unix_leap_time</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">last_transition</span>.<span class="ident">unix_leap_time</span> {
-                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">extra_rule</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">extra_rule</span>) =&gt; <span class="ident">extra_rule</span>,
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::FindLocalTimeType</span>(
+                <span class="kw">if </span>unix_leap_time &gt;= last_transition.unix_leap_time {
+                    <span class="kw">match </span><span class="self">self</span>.extra_rule {
+                        <span class="prelude-val">Some</span>(extra_rule) =&gt; extra_rule,
+                        <span class="prelude-val">None </span>=&gt; {
+                            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::FindLocalTimeType(
                                 <span class="string">&quot;no local time type is available for the specified timestamp&quot;</span>,
                             ))
                         }
                     }
-                } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>
-                        .<span class="ident">transitions</span>
-                        .<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">unix_leap_time</span>, <span class="ident">Transition::unix_leap_time</span>)
+                } <span class="kw">else </span>{
+                    <span class="kw">let </span>index = <span class="kw">match </span><span class="self">self
+                        </span>.transitions
+                        .binary_search_by_key(<span class="kw-2">&amp;</span>unix_leap_time, Transition::unix_leap_time)
                     {
-                        <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="op">+</span> <span class="number">1</span>,
-                        <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+                        <span class="prelude-val">Ok</span>(x) =&gt; x + <span class="number">1</span>,
+                        <span class="prelude-val">Err</span>(x) =&gt; x,
                     };
 
-                    <span class="kw">let</span> <span class="ident">local_time_type_index</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                        <span class="self">self</span>.<span class="ident">transitions</span>[<span class="ident">index</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">local_time_type_index</span>
-                    } <span class="kw">else</span> {
-                        <span class="number">0</span>
-                    };
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">local_time_types</span>[<span class="ident">local_time_type_index</span>]);
+                    <span class="kw">let </span>local_time_type_index = <span class="kw">if </span>index &gt; <span class="number">0 </span>{
+                        <span class="self">self</span>.transitions[index - <span class="number">1</span>].local_time_type_index
+                    } <span class="kw">else </span>{
+                        <span class="number">0
+                    </span>};
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.local_time_types[local_time_type_index]);
                 }
             }
         };
 
-        <span class="kw">match</span> <span class="ident">extra_rule</span>.<span class="ident">find_local_time_type</span>(<span class="ident">unix_time</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">local_time_type</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">local_time_type</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">Error::OutOfRange</span>(<span class="ident">error</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::FindLocalTimeType</span>(<span class="ident">error</span>)),
-            <span class="ident">err</span> =&gt; <span class="ident">err</span>,
+        <span class="kw">match </span>extra_rule.find_local_time_type(unix_time) {
+            <span class="prelude-val">Ok</span>(local_time_type) =&gt; <span class="prelude-val">Ok</span>(local_time_type),
+            <span class="prelude-val">Err</span>(Error::OutOfRange(error)) =&gt; <span class="prelude-val">Err</span>(Error::FindLocalTimeType(error)),
+            err =&gt; err,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">find_local_time_type_from_local</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_local_time_type_from_local(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">local_time</span>: <span class="ident">i64</span>,
-        <span class="ident">year</span>: <span class="ident">i32</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::LocalResult</span><span class="op">&lt;</span><span class="ident">LocalTimeType</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// #TODO: this is wrong as we need &#39;local_time_to_local_leap_time ?</span>
-        <span class="comment">// but ... does the local time even include leap seconds ??</span>
-        <span class="comment">// let unix_leap_time = match self.unix_time_to_unix_leap_time(local_time) {</span>
-        <span class="comment">//     Ok(unix_leap_time) =&gt; unix_leap_time,</span>
-        <span class="comment">//     Err(Error::OutOfRange(error)) =&gt; return Err(Error::FindLocalTimeType(error)),</span>
-        <span class="comment">//     Err(err) =&gt; return Err(err),</span>
-        <span class="comment">// };</span>
-        <span class="kw">let</span> <span class="ident">local_leap_time</span> <span class="op">=</span> <span class="ident">local_time</span>;
+        local_time: i64,
+        year: i32,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">crate</span>::LocalResult&lt;LocalTimeType&gt;, Error&gt; {
+        <span class="comment">// #TODO: this is wrong as we need &#39;local_time_to_local_leap_time ?
+        // but ... does the local time even include leap seconds ??
+        // let unix_leap_time = match self.unix_time_to_unix_leap_time(local_time) {
+        //     Ok(unix_leap_time) =&gt; unix_leap_time,
+        //     Err(Error::OutOfRange(error)) =&gt; return Err(Error::FindLocalTimeType(error)),
+        //     Err(err) =&gt; return Err(err),
+        // };
+        </span><span class="kw">let </span>local_leap_time = local_time;
 
-        <span class="comment">// if we have at least one transition,</span>
-        <span class="comment">// we must check _all_ of them, incase of any Overlapping (LocalResult::Ambiguous) or Skipping (LocalResult::None) transitions</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">transitions</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prev</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">local_time_types</span>[<span class="number">0</span>]);
+        <span class="comment">// if we have at least one transition,
+        // we must check _all_ of them, incase of any Overlapping (LocalResult::Ambiguous) or Skipping (LocalResult::None) transitions
+        </span><span class="kw">if </span>!<span class="self">self</span>.transitions.is_empty() {
+            <span class="kw">let </span><span class="kw-2">mut </span>prev = <span class="prelude-val">Some</span>(<span class="self">self</span>.local_time_types[<span class="number">0</span>]);
 
-            <span class="kw">for</span> <span class="ident">transition</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">transitions</span> {
-                <span class="kw">let</span> <span class="ident">after_ltt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">local_time_types</span>[<span class="ident">transition</span>.<span class="ident">local_time_type_index</span>];
+            <span class="kw">for </span>transition <span class="kw">in </span><span class="self">self</span>.transitions {
+                <span class="kw">let </span>after_ltt = <span class="self">self</span>.local_time_types[transition.local_time_type_index];
 
-                <span class="comment">// the end and start here refers to where the time starts prior to the transition</span>
-                <span class="comment">// and where it ends up after. not the temporal relationship.</span>
-                <span class="kw">let</span> <span class="ident">transition_end</span> <span class="op">=</span> <span class="ident">transition</span>.<span class="ident">unix_leap_time</span> <span class="op">+</span> <span class="ident">i64::from</span>(<span class="ident">after_ltt</span>.<span class="ident">ut_offset</span>);
-                <span class="kw">let</span> <span class="ident">transition_start</span> <span class="op">=</span>
-                    <span class="ident">transition</span>.<span class="ident">unix_leap_time</span> <span class="op">+</span> <span class="ident">i64::from</span>(<span class="ident">prev</span>.<span class="ident">unwrap</span>().<span class="ident">ut_offset</span>);
+                <span class="comment">// the end and start here refers to where the time starts prior to the transition
+                // and where it ends up after. not the temporal relationship.
+                </span><span class="kw">let </span>transition_end = transition.unix_leap_time + i64::from(after_ltt.ut_offset);
+                <span class="kw">let </span>transition_start =
+                    transition.unix_leap_time + i64::from(prev.unwrap().ut_offset);
 
-                <span class="kw">match</span> <span class="ident">transition_start</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">transition_end</span>) {
-                    <span class="ident">Ordering::Greater</span> =&gt; {
-                        <span class="comment">// bakwards transition, eg from DST to regular</span>
-                        <span class="comment">// this means a given local time could have one of two possible offsets</span>
-                        <span class="kw">if</span> <span class="ident">local_leap_time</span> <span class="op">&lt;</span> <span class="ident">transition_end</span> {
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::LocalResult::Single</span>(<span class="ident">prev</span>.<span class="ident">unwrap</span>()));
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">local_leap_time</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">transition_end</span>
-                            <span class="op">&amp;&amp;</span> <span class="ident">local_leap_time</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">transition_start</span>
+                <span class="kw">match </span>transition_start.cmp(<span class="kw-2">&amp;</span>transition_end) {
+                    Ordering::Greater =&gt; {
+                        <span class="comment">// bakwards transition, eg from DST to regular
+                        // this means a given local time could have one of two possible offsets
+                        </span><span class="kw">if </span>local_leap_time &lt; transition_end {
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">crate</span>::LocalResult::Single(prev.unwrap()));
+                        } <span class="kw">else if </span>local_leap_time &gt;= transition_end
+                            &amp;&amp; local_leap_time &lt;= transition_start
                         {
-                            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">unwrap</span>().<span class="ident">ut_offset</span> <span class="op">&lt;</span> <span class="ident">after_ltt</span>.<span class="ident">ut_offset</span> {
-                                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::LocalResult::Ambiguous</span>(<span class="ident">prev</span>.<span class="ident">unwrap</span>(), <span class="ident">after_ltt</span>));
-                            } <span class="kw">else</span> {
-                                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::LocalResult::Ambiguous</span>(<span class="ident">after_ltt</span>, <span class="ident">prev</span>.<span class="ident">unwrap</span>()));
+                            <span class="kw">if </span>prev.unwrap().ut_offset &lt; after_ltt.ut_offset {
+                                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">crate</span>::LocalResult::Ambiguous(prev.unwrap(), after_ltt));
+                            } <span class="kw">else </span>{
+                                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">crate</span>::LocalResult::Ambiguous(after_ltt, prev.unwrap()));
                             }
                         }
                     }
-                    <span class="ident">Ordering::Equal</span> =&gt; {
-                        <span class="comment">// should this ever happen? presumably we have to handle it anyway.</span>
-                        <span class="kw">if</span> <span class="ident">local_leap_time</span> <span class="op">&lt;</span> <span class="ident">transition_start</span> {
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::LocalResult::Single</span>(<span class="ident">prev</span>.<span class="ident">unwrap</span>()));
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">local_leap_time</span> <span class="op">==</span> <span class="ident">transition_end</span> {
-                            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">unwrap</span>().<span class="ident">ut_offset</span> <span class="op">&lt;</span> <span class="ident">after_ltt</span>.<span class="ident">ut_offset</span> {
-                                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::LocalResult::Ambiguous</span>(<span class="ident">prev</span>.<span class="ident">unwrap</span>(), <span class="ident">after_ltt</span>));
-                            } <span class="kw">else</span> {
-                                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::LocalResult::Ambiguous</span>(<span class="ident">after_ltt</span>, <span class="ident">prev</span>.<span class="ident">unwrap</span>()));
+                    Ordering::Equal =&gt; {
+                        <span class="comment">// should this ever happen? presumably we have to handle it anyway.
+                        </span><span class="kw">if </span>local_leap_time &lt; transition_start {
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">crate</span>::LocalResult::Single(prev.unwrap()));
+                        } <span class="kw">else if </span>local_leap_time == transition_end {
+                            <span class="kw">if </span>prev.unwrap().ut_offset &lt; after_ltt.ut_offset {
+                                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">crate</span>::LocalResult::Ambiguous(prev.unwrap(), after_ltt));
+                            } <span class="kw">else </span>{
+                                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">crate</span>::LocalResult::Ambiguous(after_ltt, prev.unwrap()));
                             }
                         }
                     }
-                    <span class="ident">Ordering::Less</span> =&gt; {
-                        <span class="comment">// forwards transition, eg from regular to DST</span>
-                        <span class="comment">// this means that times that are skipped are invalid local times</span>
-                        <span class="kw">if</span> <span class="ident">local_leap_time</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">transition_start</span> {
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::LocalResult::Single</span>(<span class="ident">prev</span>.<span class="ident">unwrap</span>()));
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">local_leap_time</span> <span class="op">&lt;</span> <span class="ident">transition_end</span> {
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::LocalResult::None</span>);
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">local_leap_time</span> <span class="op">==</span> <span class="ident">transition_end</span> {
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::LocalResult::Single</span>(<span class="ident">after_ltt</span>));
+                    Ordering::Less =&gt; {
+                        <span class="comment">// forwards transition, eg from regular to DST
+                        // this means that times that are skipped are invalid local times
+                        </span><span class="kw">if </span>local_leap_time &lt;= transition_start {
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">crate</span>::LocalResult::Single(prev.unwrap()));
+                        } <span class="kw">else if </span>local_leap_time &lt; transition_end {
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">crate</span>::LocalResult::None);
+                        } <span class="kw">else if </span>local_leap_time == transition_end {
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">crate</span>::LocalResult::Single(after_ltt));
                         }
                     }
                 }
 
-                <span class="comment">// try the next transition, we are fully after this one</span>
-                <span class="ident">prev</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">after_ltt</span>);
+                <span class="comment">// try the next transition, we are fully after this one
+                </span>prev = <span class="prelude-val">Some</span>(after_ltt);
             }
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">extra_rule</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">extra_rule</span> {
-            <span class="kw">match</span> <span class="ident">extra_rule</span>.<span class="ident">find_local_time_type_from_local</span>(<span class="ident">local_time</span>, <span class="ident">year</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">local_time_type</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">local_time_type</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">Error::OutOfRange</span>(<span class="ident">error</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::FindLocalTimeType</span>(<span class="ident">error</span>)),
-                <span class="ident">err</span> =&gt; <span class="ident">err</span>,
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(extra_rule) = <span class="self">self</span>.extra_rule {
+            <span class="kw">match </span>extra_rule.find_local_time_type_from_local(local_time, year) {
+                <span class="prelude-val">Ok</span>(local_time_type) =&gt; <span class="prelude-val">Ok</span>(local_time_type),
+                <span class="prelude-val">Err</span>(Error::OutOfRange(error)) =&gt; <span class="prelude-val">Err</span>(Error::FindLocalTimeType(error)),
+                err =&gt; err,
             }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::LocalResult::Single</span>(<span class="self">self</span>.<span class="ident">local_time_types</span>[<span class="number">0</span>]))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(<span class="kw">crate</span>::LocalResult::Single(<span class="self">self</span>.local_time_types[<span class="number">0</span>]))
         }
     }
 
-    <span class="doccomment">/// Check time zone inputs</span>
-    <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// Check local time types</span>
-        <span class="kw">let</span> <span class="ident">local_time_types_size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">local_time_types</span>.<span class="ident">len</span>();
-        <span class="kw">if</span> <span class="ident">local_time_types_size</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::TimeZone</span>(<span class="string">&quot;list of local time types must not be empty&quot;</span>));
+    <span class="doccomment">/// Check time zone inputs
+    </span><span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="comment">// Check local time types
+        </span><span class="kw">let </span>local_time_types_size = <span class="self">self</span>.local_time_types.len();
+        <span class="kw">if </span>local_time_types_size == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TimeZone(<span class="string">&quot;list of local time types must not be empty&quot;</span>));
         }
 
-        <span class="comment">// Check transitions</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i_transition</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">i_transition</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">transitions</span>.<span class="ident">len</span>() {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">transitions</span>[<span class="ident">i_transition</span>].<span class="ident">local_time_type_index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">local_time_types_size</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::TimeZone</span>(<span class="string">&quot;invalid local time type index&quot;</span>));
+        <span class="comment">// Check transitions
+        </span><span class="kw">let </span><span class="kw-2">mut </span>i_transition = <span class="number">0</span>;
+        <span class="kw">while </span>i_transition &lt; <span class="self">self</span>.transitions.len() {
+            <span class="kw">if </span><span class="self">self</span>.transitions[i_transition].local_time_type_index &gt;= local_time_types_size {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TimeZone(<span class="string">&quot;invalid local time type index&quot;</span>));
             }
 
-            <span class="kw">if</span> <span class="ident">i_transition</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">transitions</span>.<span class="ident">len</span>()
-                <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">transitions</span>[<span class="ident">i_transition</span>].<span class="ident">unix_leap_time</span>
-                    <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">transitions</span>[<span class="ident">i_transition</span> <span class="op">+</span> <span class="number">1</span>].<span class="ident">unix_leap_time</span>
+            <span class="kw">if </span>i_transition + <span class="number">1 </span>&lt; <span class="self">self</span>.transitions.len()
+                &amp;&amp; <span class="self">self</span>.transitions[i_transition].unix_leap_time
+                    &gt;= <span class="self">self</span>.transitions[i_transition + <span class="number">1</span>].unix_leap_time
             {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::TimeZone</span>(<span class="string">&quot;invalid transition&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TimeZone(<span class="string">&quot;invalid transition&quot;</span>));
             }
 
-            <span class="ident">i_transition</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            i_transition += <span class="number">1</span>;
         }
 
-        <span class="comment">// Check leap seconds</span>
-        <span class="kw">if</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">leap_seconds</span>.<span class="ident">is_empty</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">leap_seconds</span>[<span class="number">0</span>].<span class="ident">unix_leap_time</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">saturating_abs</span>(<span class="self">self</span>.<span class="ident">leap_seconds</span>[<span class="number">0</span>].<span class="ident">correction</span>) <span class="op">==</span> <span class="number">1</span>)
+        <span class="comment">// Check leap seconds
+        </span><span class="kw">if </span>!(<span class="self">self</span>.leap_seconds.is_empty()
+            || <span class="self">self</span>.leap_seconds[<span class="number">0</span>].unix_leap_time &gt;= <span class="number">0
+                </span>&amp;&amp; saturating_abs(<span class="self">self</span>.leap_seconds[<span class="number">0</span>].correction) == <span class="number">1</span>)
         {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::TimeZone</span>(<span class="string">&quot;invalid leap second&quot;</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TimeZone(<span class="string">&quot;invalid leap second&quot;</span>));
         }
 
-        <span class="kw">let</span> <span class="ident">min_interval</span> <span class="op">=</span> <span class="ident">SECONDS_PER_28_DAYS</span> <span class="op">-</span> <span class="number">1</span>;
+        <span class="kw">let </span>min_interval = SECONDS_PER_28_DAYS - <span class="number">1</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i_leap_second</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">i_leap_second</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">leap_seconds</span>.<span class="ident">len</span>() {
-            <span class="kw">if</span> <span class="ident">i_leap_second</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">leap_seconds</span>.<span class="ident">len</span>() {
-                <span class="kw">let</span> <span class="ident">x0</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">leap_seconds</span>[<span class="ident">i_leap_second</span>];
-                <span class="kw">let</span> <span class="ident">x1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">leap_seconds</span>[<span class="ident">i_leap_second</span> <span class="op">+</span> <span class="number">1</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>i_leap_second = <span class="number">0</span>;
+        <span class="kw">while </span>i_leap_second &lt; <span class="self">self</span>.leap_seconds.len() {
+            <span class="kw">if </span>i_leap_second + <span class="number">1 </span>&lt; <span class="self">self</span>.leap_seconds.len() {
+                <span class="kw">let </span>x0 = <span class="kw-2">&amp;</span><span class="self">self</span>.leap_seconds[i_leap_second];
+                <span class="kw">let </span>x1 = <span class="kw-2">&amp;</span><span class="self">self</span>.leap_seconds[i_leap_second + <span class="number">1</span>];
 
-                <span class="kw">let</span> <span class="ident">diff_unix_leap_time</span> <span class="op">=</span> <span class="ident">x1</span>.<span class="ident">unix_leap_time</span>.<span class="ident">saturating_sub</span>(<span class="ident">x0</span>.<span class="ident">unix_leap_time</span>);
-                <span class="kw">let</span> <span class="ident">abs_diff_correction</span> <span class="op">=</span>
-                    <span class="ident">saturating_abs</span>(<span class="ident">x1</span>.<span class="ident">correction</span>.<span class="ident">saturating_sub</span>(<span class="ident">x0</span>.<span class="ident">correction</span>));
+                <span class="kw">let </span>diff_unix_leap_time = x1.unix_leap_time.saturating_sub(x0.unix_leap_time);
+                <span class="kw">let </span>abs_diff_correction =
+                    saturating_abs(x1.correction.saturating_sub(x0.correction));
 
-                <span class="kw">if</span> <span class="op">!</span>(<span class="ident">diff_unix_leap_time</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">min_interval</span> <span class="op">&amp;&amp;</span> <span class="ident">abs_diff_correction</span> <span class="op">==</span> <span class="number">1</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::TimeZone</span>(<span class="string">&quot;invalid leap second&quot;</span>));
+                <span class="kw">if </span>!(diff_unix_leap_time &gt;= min_interval &amp;&amp; abs_diff_correction == <span class="number">1</span>) {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TimeZone(<span class="string">&quot;invalid leap second&quot;</span>));
                 }
             }
-            <span class="ident">i_leap_second</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            i_leap_second += <span class="number">1</span>;
         }
 
-        <span class="comment">// Check extra rule</span>
-        <span class="kw">let</span> (<span class="ident">extra_rule</span>, <span class="ident">last_transition</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">extra_rule</span>, <span class="self">self</span>.<span class="ident">transitions</span>.<span class="ident">last</span>()) {
-            (<span class="prelude-val">Some</span>(<span class="ident">rule</span>), <span class="prelude-val">Some</span>(<span class="ident">trans</span>)) =&gt; (<span class="ident">rule</span>, <span class="ident">trans</span>),
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+        <span class="comment">// Check extra rule
+        </span><span class="kw">let </span>(extra_rule, last_transition) = <span class="kw">match </span>(<span class="kw-2">&amp;</span><span class="self">self</span>.extra_rule, <span class="self">self</span>.transitions.last()) {
+            (<span class="prelude-val">Some</span>(rule), <span class="prelude-val">Some</span>(trans)) =&gt; (rule, trans),
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
         };
 
-        <span class="kw">let</span> <span class="ident">last_local_time_type</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">local_time_types</span>[<span class="ident">last_transition</span>.<span class="ident">local_time_type_index</span>];
-        <span class="kw">let</span> <span class="ident">unix_time</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">unix_leap_time_to_unix_time</span>(<span class="ident">last_transition</span>.<span class="ident">unix_leap_time</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">unix_time</span>) =&gt; <span class="ident">unix_time</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">Error::OutOfRange</span>(<span class="ident">error</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::TimeZone</span>(<span class="ident">error</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+        <span class="kw">let </span>last_local_time_type = <span class="kw-2">&amp;</span><span class="self">self</span>.local_time_types[last_transition.local_time_type_index];
+        <span class="kw">let </span>unix_time = <span class="kw">match </span><span class="self">self</span>.unix_leap_time_to_unix_time(last_transition.unix_leap_time) {
+            <span class="prelude-val">Ok</span>(unix_time) =&gt; unix_time,
+            <span class="prelude-val">Err</span>(Error::OutOfRange(error)) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TimeZone(error)),
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
         };
 
-        <span class="kw">let</span> <span class="ident">rule_local_time_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">extra_rule</span>.<span class="ident">find_local_time_type</span>(<span class="ident">unix_time</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">rule_local_time_type</span>) =&gt; <span class="ident">rule_local_time_type</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">Error::OutOfRange</span>(<span class="ident">error</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::TimeZone</span>(<span class="ident">error</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+        <span class="kw">let </span>rule_local_time_type = <span class="kw">match </span>extra_rule.find_local_time_type(unix_time) {
+            <span class="prelude-val">Ok</span>(rule_local_time_type) =&gt; rule_local_time_type,
+            <span class="prelude-val">Err</span>(Error::OutOfRange(error)) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TimeZone(error)),
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
         };
 
-        <span class="kw">let</span> <span class="ident">check</span> <span class="op">=</span> <span class="ident">last_local_time_type</span>.<span class="ident">ut_offset</span> <span class="op">==</span> <span class="ident">rule_local_time_type</span>.<span class="ident">ut_offset</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">last_local_time_type</span>.<span class="ident">is_dst</span> <span class="op">==</span> <span class="ident">rule_local_time_type</span>.<span class="ident">is_dst</span>
-            <span class="op">&amp;&amp;</span> <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">last_local_time_type</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">rule_local_time_type</span>.<span class="ident">name</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">x</span>), <span class="prelude-val">Some</span>(<span class="ident">y</span>)) =&gt; <span class="ident">x</span>.<span class="ident">equal</span>(<span class="ident">y</span>),
+        <span class="kw">let </span>check = last_local_time_type.ut_offset == rule_local_time_type.ut_offset
+            &amp;&amp; last_local_time_type.is_dst == rule_local_time_type.is_dst
+            &amp;&amp; <span class="kw">match </span>(<span class="kw-2">&amp;</span>last_local_time_type.name, <span class="kw-2">&amp;</span>rule_local_time_type.name) {
+                (<span class="prelude-val">Some</span>(x), <span class="prelude-val">Some</span>(y)) =&gt; x.equal(y),
                 (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="bool-val">true</span>,
-                <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+                <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
             };
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">check</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::TimeZone</span>(
+        <span class="kw">if </span>!check {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TimeZone(
                 <span class="string">&quot;extra transition rule is inconsistent with the last transition&quot;</span>,
             ));
         }
@@ -1288,543 +1288,543 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Convert Unix time to Unix leap time, from the list of leap seconds in a time zone</span>
-    <span class="kw">fn</span> <span class="ident">unix_time_to_unix_leap_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">unix_time</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unix_leap_time</span> <span class="op">=</span> <span class="ident">unix_time</span>;
+    <span class="doccomment">/// Convert Unix time to Unix leap time, from the list of leap seconds in a time zone
+    </span><span class="kw">fn </span>unix_time_to_unix_leap_time(<span class="kw-2">&amp;</span><span class="self">self</span>, unix_time: i64) -&gt; <span class="prelude-ty">Result</span>&lt;i64, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>unix_leap_time = unix_time;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">leap_seconds</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">leap_second</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">leap_seconds</span>[<span class="ident">i</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+        <span class="kw">while </span>i &lt; <span class="self">self</span>.leap_seconds.len() {
+            <span class="kw">let </span>leap_second = <span class="kw-2">&amp;</span><span class="self">self</span>.leap_seconds[i];
 
-            <span class="kw">if</span> <span class="ident">unix_leap_time</span> <span class="op">&lt;</span> <span class="ident">leap_second</span>.<span class="ident">unix_leap_time</span> {
+            <span class="kw">if </span>unix_leap_time &lt; leap_second.unix_leap_time {
                 <span class="kw">break</span>;
             }
 
-            <span class="ident">unix_leap_time</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">unix_time</span>.<span class="ident">checked_add</span>(<span class="ident">leap_second</span>.<span class="ident">correction</span> <span class="kw">as</span> <span class="ident">i64</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">unix_leap_time</span>) =&gt; <span class="ident">unix_leap_time</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::OutOfRange</span>(<span class="string">&quot;out of range operation&quot;</span>)),
+            unix_leap_time = <span class="kw">match </span>unix_time.checked_add(leap_second.correction <span class="kw">as </span>i64) {
+                <span class="prelude-val">Some</span>(unix_leap_time) =&gt; unix_leap_time,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::OutOfRange(<span class="string">&quot;out of range operation&quot;</span>)),
             };
 
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            i += <span class="number">1</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">unix_leap_time</span>)
+        <span class="prelude-val">Ok</span>(unix_leap_time)
     }
 
-    <span class="doccomment">/// Convert Unix leap time to Unix time, from the list of leap seconds in a time zone</span>
-    <span class="kw">fn</span> <span class="ident">unix_leap_time_to_unix_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">unix_leap_time</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">unix_leap_time</span> <span class="op">==</span> <span class="ident">i64::min_value</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::OutOfRange</span>(<span class="string">&quot;out of range operation&quot;</span>));
+    <span class="doccomment">/// Convert Unix leap time to Unix time, from the list of leap seconds in a time zone
+    </span><span class="kw">fn </span>unix_leap_time_to_unix_time(<span class="kw-2">&amp;</span><span class="self">self</span>, unix_leap_time: i64) -&gt; <span class="prelude-ty">Result</span>&lt;i64, Error&gt; {
+        <span class="kw">if </span>unix_leap_time == i64::min_value() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::OutOfRange(<span class="string">&quot;out of range operation&quot;</span>));
         }
 
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>
-            .<span class="ident">leap_seconds</span>
-            .<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span>(<span class="ident">unix_leap_time</span> <span class="op">-</span> <span class="number">1</span>), <span class="ident">LeapSecond::unix_leap_time</span>)
+        <span class="kw">let </span>index = <span class="kw">match </span><span class="self">self
+            </span>.leap_seconds
+            .binary_search_by_key(<span class="kw-2">&amp;</span>(unix_leap_time - <span class="number">1</span>), LeapSecond::unix_leap_time)
         {
-            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="op">+</span> <span class="number">1</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+            <span class="prelude-val">Ok</span>(x) =&gt; x + <span class="number">1</span>,
+            <span class="prelude-val">Err</span>(x) =&gt; x,
         };
 
-        <span class="kw">let</span> <span class="ident">correction</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="number">0</span> { <span class="self">self</span>.<span class="ident">leap_seconds</span>[<span class="ident">index</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">correction</span> } <span class="kw">else</span> { <span class="number">0</span> };
+        <span class="kw">let </span>correction = <span class="kw">if </span>index &gt; <span class="number">0 </span>{ <span class="self">self</span>.leap_seconds[index - <span class="number">1</span>].correction } <span class="kw">else </span>{ <span class="number">0 </span>};
 
-        <span class="kw">match</span> <span class="ident">unix_leap_time</span>.<span class="ident">checked_sub</span>(<span class="ident">correction</span> <span class="kw">as</span> <span class="ident">i64</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">unix_time</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">unix_time</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::OutOfRange</span>(<span class="string">&quot;out of range operation&quot;</span>)),
+        <span class="kw">match </span>unix_leap_time.checked_sub(correction <span class="kw">as </span>i64) {
+            <span class="prelude-val">Some</span>(unix_time) =&gt; <span class="prelude-val">Ok</span>(unix_time),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(Error::OutOfRange(<span class="string">&quot;out of range operation&quot;</span>)),
         }
     }
 
-    <span class="doccomment">/// The UTC time zone</span>
-    <span class="kw">const</span> <span class="ident">UTC</span>: <span class="ident">TimeZoneRef</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">TimeZoneRef</span> {
-        <span class="ident">transitions</span>: <span class="kw-2">&amp;</span>[],
-        <span class="ident">local_time_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">LocalTimeType::UTC</span>],
-        <span class="ident">leap_seconds</span>: <span class="kw-2">&amp;</span>[],
-        <span class="ident">extra_rule</span>: <span class="kw-2">&amp;</span><span class="prelude-val">None</span>,
+    <span class="doccomment">/// The UTC time zone
+    </span><span class="kw">const </span>UTC: TimeZoneRef&lt;<span class="lifetime">&#39;static</span>&gt; = TimeZoneRef {
+        transitions: <span class="kw-2">&amp;</span>[],
+        local_time_types: <span class="kw-2">&amp;</span>[LocalTimeType::UTC],
+        leap_seconds: <span class="kw-2">&amp;</span>[],
+        extra_rule: <span class="kw-2">&amp;</span><span class="prelude-val">None</span>,
     };
 }
 
-<span class="doccomment">/// Transition of a TZif file</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Transition</span> {
-    <span class="doccomment">/// Unix leap time</span>
-    <span class="ident">unix_leap_time</span>: <span class="ident">i64</span>,
-    <span class="doccomment">/// Index specifying the local time type of the transition</span>
-    <span class="ident">local_time_type_index</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Transition of a TZif file
+</span><span class="attribute">#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Transition {
+    <span class="doccomment">/// Unix leap time
+    </span>unix_leap_time: i64,
+    <span class="doccomment">/// Index specifying the local time type of the transition
+    </span>local_time_type_index: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Transition</span> {
-    <span class="doccomment">/// Construct a TZif file transition</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">unix_leap_time</span>: <span class="ident">i64</span>, <span class="ident">local_time_type_index</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">unix_leap_time</span>, <span class="ident">local_time_type_index</span> }
+<span class="kw">impl </span>Transition {
+    <span class="doccomment">/// Construct a TZif file transition
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(unix_leap_time: i64, local_time_type_index: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ unix_leap_time, local_time_type_index }
     }
 
-    <span class="doccomment">/// Returns Unix leap time</span>
-    <span class="kw">fn</span> <span class="ident">unix_leap_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">unix_leap_time</span>
-    }
-}
-
-<span class="doccomment">/// Leap second of a TZif file</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">LeapSecond</span> {
-    <span class="doccomment">/// Unix leap time</span>
-    <span class="ident">unix_leap_time</span>: <span class="ident">i64</span>,
-    <span class="doccomment">/// Leap second correction</span>
-    <span class="ident">correction</span>: <span class="ident">i32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">LeapSecond</span> {
-    <span class="doccomment">/// Construct a TZif file leap second</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">unix_leap_time</span>: <span class="ident">i64</span>, <span class="ident">correction</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">unix_leap_time</span>, <span class="ident">correction</span> }
-    }
-
-    <span class="doccomment">/// Returns Unix leap time</span>
-    <span class="kw">fn</span> <span class="ident">unix_leap_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">unix_leap_time</span>
+    <span class="doccomment">/// Returns Unix leap time
+    </span><span class="kw">fn </span>unix_leap_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
+        <span class="self">self</span>.unix_leap_time
     }
 }
 
-<span class="doccomment">/// ASCII-encoded fixed-capacity string, used for storing time zone names</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">struct</span> <span class="ident">TimeZoneName</span> {
-    <span class="doccomment">/// Length-prefixed string buffer</span>
-    <span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">8</span>],
+<span class="doccomment">/// Leap second of a TZif file
+</span><span class="attribute">#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>LeapSecond {
+    <span class="doccomment">/// Unix leap time
+    </span>unix_leap_time: i64,
+    <span class="doccomment">/// Leap second correction
+    </span>correction: i32,
 }
 
-<span class="kw">impl</span> <span class="ident">TimeZoneName</span> {
-    <span class="doccomment">/// Construct a time zone name</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>();
+<span class="kw">impl </span>LeapSecond {
+    <span class="doccomment">/// Construct a TZif file leap second
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(unix_leap_time: i64, correction: i32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ unix_leap_time, correction }
+    }
 
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">3</span> <span class="op">|</span><span class="op">|</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">7</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::LocalTimeType</span>(
+    <span class="doccomment">/// Returns Unix leap time
+    </span><span class="kw">fn </span>unix_leap_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
+        <span class="self">self</span>.unix_leap_time
+    }
+}
+
+<span class="doccomment">/// ASCII-encoded fixed-capacity string, used for storing time zone names
+</span><span class="attribute">#[derive(Copy, Clone, Eq, PartialEq)]
+</span><span class="kw">struct </span>TimeZoneName {
+    <span class="doccomment">/// Length-prefixed string buffer
+    </span>bytes: [u8; <span class="number">8</span>],
+}
+
+<span class="kw">impl </span>TimeZoneName {
+    <span class="doccomment">/// Construct a time zone name
+    </span><span class="kw">fn </span>new(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span>len = input.len();
+
+        <span class="kw">if </span>len &lt; <span class="number">3 </span>|| len &gt; <span class="number">7 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::LocalTimeType(
                 <span class="string">&quot;time zone name must have between 3 and 7 characters&quot;</span>,
             ));
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-        <span class="ident">bytes</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = [<span class="number">0</span>; <span class="number">8</span>];
+        bytes[<span class="number">0</span>] = input.len() <span class="kw">as </span>u8;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">len</span> {
-            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">input</span>[<span class="ident">i</span>];
-            <span class="kw">match</span> <span class="ident">b</span> {
-                <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> <span class="op">|</span> <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;Z&#39;</span> <span class="op">|</span> <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;z&#39;</span> <span class="op">|</span> <span class="string">b&#39;+&#39;</span> <span class="op">|</span> <span class="string">b&#39;-&#39;</span> =&gt; {}
-                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::LocalTimeType</span>(<span class="string">&quot;invalid characters in time zone name&quot;</span>)),
+        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+        <span class="kw">while </span>i &lt; len {
+            <span class="kw">let </span>b = input[i];
+            <span class="kw">match </span>b {
+                <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39; </span>| <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;Z&#39; </span>| <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;z&#39; </span>| <span class="string">b&#39;+&#39; </span>| <span class="string">b&#39;-&#39; </span>=&gt; {}
+                <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::LocalTimeType(<span class="string">&quot;invalid characters in time zone name&quot;</span>)),
             }
 
-            <span class="ident">bytes</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">b</span>;
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            bytes[i + <span class="number">1</span>] = b;
+            i += <span class="number">1</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">bytes</span> })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ bytes })
     }
 
-    <span class="doccomment">/// Returns time zone name as a byte slice</span>
-    <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">bytes</span>[<span class="number">0</span>] {
-            <span class="number">3</span> =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="number">1</span>..<span class="number">4</span>],
-            <span class="number">4</span> =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="number">1</span>..<span class="number">5</span>],
-            <span class="number">5</span> =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="number">1</span>..<span class="number">6</span>],
-            <span class="number">6</span> =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="number">1</span>..<span class="number">7</span>],
-            <span class="number">7</span> =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="number">1</span>..<span class="number">8</span>],
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="doccomment">/// Returns time zone name as a byte slice
+    </span><span class="kw">fn </span>as_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw">match </span><span class="self">self</span>.bytes[<span class="number">0</span>] {
+            <span class="number">3 </span>=&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.bytes[<span class="number">1</span>..<span class="number">4</span>],
+            <span class="number">4 </span>=&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.bytes[<span class="number">1</span>..<span class="number">5</span>],
+            <span class="number">5 </span>=&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.bytes[<span class="number">1</span>..<span class="number">6</span>],
+            <span class="number">6 </span>=&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.bytes[<span class="number">1</span>..<span class="number">7</span>],
+            <span class="number">7 </span>=&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.bytes[<span class="number">1</span>..<span class="number">8</span>],
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="doccomment">/// Check if two time zone names are equal</span>
-    <span class="kw">fn</span> <span class="ident">equal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">bytes</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">bytes</span>
+    <span class="doccomment">/// Check if two time zone names are equal
+    </span><span class="kw">fn </span>equal(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.bytes == other.bytes
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TimeZoneName</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="comment">// SAFETY: ASCII is valid UTF-8</span>
-        <span class="kw">unsafe</span> { <span class="ident">str::from_utf8_unchecked</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>()) }
+<span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>TimeZoneName {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="comment">// SAFETY: ASCII is valid UTF-8
+        </span><span class="kw">unsafe </span>{ str::from_utf8_unchecked(<span class="self">self</span>.as_bytes()) }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TimeZoneName</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>TimeZoneName {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="self">self</span>.as_ref().fmt(f)
     }
 }
 
-<span class="doccomment">/// Local time type associated to a time zone</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">LocalTimeType</span> {
-    <span class="doccomment">/// Offset from UTC in seconds</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">ut_offset</span>: <span class="ident">i32</span>,
-    <span class="doccomment">/// Daylight Saving Time indicator</span>
-    <span class="ident">is_dst</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Time zone name</span>
-    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TimeZoneName</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Local time type associated to a time zone
+</span><span class="attribute">#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>LocalTimeType {
+    <span class="doccomment">/// Offset from UTC in seconds
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) ut_offset: i32,
+    <span class="doccomment">/// Daylight Saving Time indicator
+    </span>is_dst: bool,
+    <span class="doccomment">/// Time zone name
+    </span>name: <span class="prelude-ty">Option</span>&lt;TimeZoneName&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">LocalTimeType</span> {
-    <span class="doccomment">/// Construct a local time type</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ut_offset</span>: <span class="ident">i32</span>, <span class="ident">is_dst</span>: <span class="ident">bool</span>, <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">ut_offset</span> <span class="op">==</span> <span class="ident">i32::min_value</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::LocalTimeType</span>(<span class="string">&quot;invalid UTC offset&quot;</span>));
+<span class="kw">impl </span>LocalTimeType {
+    <span class="doccomment">/// Construct a local time type
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(ut_offset: i32, is_dst: bool, name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>ut_offset == i32::min_value() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::LocalTimeType(<span class="string">&quot;invalid UTC offset&quot;</span>));
         }
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">TimeZoneName::new</span>(<span class="ident">name</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">ut_offset</span>, <span class="ident">is_dst</span>, <span class="ident">name</span>: <span class="prelude-val">None</span> }),
+        <span class="kw">let </span>name = <span class="kw">match </span>name {
+            <span class="prelude-val">Some</span>(name) =&gt; TimeZoneName::new(name)<span class="question-mark">?</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self </span>{ ut_offset, is_dst, name: <span class="prelude-val">None </span>}),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">ut_offset</span>, <span class="ident">is_dst</span>, <span class="ident">name</span>: <span class="prelude-val">Some</span>(<span class="ident">name</span>) })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ ut_offset, is_dst, name: <span class="prelude-val">Some</span>(name) })
     }
 
-    <span class="doccomment">/// Construct a local time type with the specified UTC offset in seconds</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">with_offset</span>(<span class="ident">ut_offset</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">ut_offset</span> <span class="op">==</span> <span class="ident">i32::min_value</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::LocalTimeType</span>(<span class="string">&quot;invalid UTC offset&quot;</span>));
+    <span class="doccomment">/// Construct a local time type with the specified UTC offset in seconds
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>with_offset(ut_offset: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">if </span>ut_offset == i32::min_value() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::LocalTimeType(<span class="string">&quot;invalid UTC offset&quot;</span>));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">ut_offset</span>, <span class="ident">is_dst</span>: <span class="bool-val">false</span>, <span class="ident">name</span>: <span class="prelude-val">None</span> })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ ut_offset, is_dst: <span class="bool-val">false</span>, name: <span class="prelude-val">None </span>})
     }
 
-    <span class="doccomment">/// Returns offset from UTC in seconds</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">ut_offset</span>
+    <span class="doccomment">/// Returns offset from UTC in seconds
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.ut_offset
     }
 
-    <span class="doccomment">/// Returns daylight saving time indicator</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_dst</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_dst</span>
+    <span class="doccomment">/// Returns daylight saving time indicator
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>is_dst(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_dst
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const</span> <span class="ident">UTC</span>: <span class="ident">LocalTimeType</span> <span class="op">=</span> <span class="self">Self</span> { <span class="ident">ut_offset</span>: <span class="number">0</span>, <span class="ident">is_dst</span>: <span class="bool-val">false</span>, <span class="ident">name</span>: <span class="prelude-val">None</span> };
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const </span>UTC: LocalTimeType = <span class="self">Self </span>{ ut_offset: <span class="number">0</span>, is_dst: <span class="bool-val">false</span>, name: <span class="prelude-val">None </span>};
 }
 
-<span class="doccomment">/// Open the TZif file corresponding to a TZ string</span>
-<span class="kw">fn</span> <span class="ident">find_tz_file</span>(<span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">File</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="comment">// Don&#39;t check system timezone directories on non-UNIX platforms</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">unix</span>))]</span>
-    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">File::open</span>(<span class="ident">path</span>)<span class="question-mark">?</span>);
+<span class="doccomment">/// Open the TZif file corresponding to a TZ string
+</span><span class="kw">fn </span>find_tz_file(path: <span class="kw">impl </span>AsRef&lt;Path&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;File, Error&gt; {
+    <span class="comment">// Don&#39;t check system timezone directories on non-UNIX platforms
+    </span><span class="attribute">#[cfg(not(unix))]
+    </span><span class="kw">return </span><span class="prelude-val">Ok</span>(File::open(path)<span class="question-mark">?</span>);
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-    {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>();
-        <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_absolute</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">File::open</span>(<span class="ident">path</span>)<span class="question-mark">?</span>);
+    <span class="attribute">#[cfg(unix)]
+    </span>{
+        <span class="kw">let </span>path = path.as_ref();
+        <span class="kw">if </span>path.is_absolute() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(File::open(path)<span class="question-mark">?</span>);
         }
 
-        <span class="kw">for</span> <span class="ident">folder</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ZONE_INFO_DIRECTORIES</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">file</span>) <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">PathBuf::from</span>(<span class="ident">folder</span>).<span class="ident">join</span>(<span class="ident">path</span>)) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">file</span>);
+        <span class="kw">for </span>folder <span class="kw">in </span><span class="kw-2">&amp;</span>ZONE_INFO_DIRECTORIES {
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(file) = File::open(PathBuf::from(folder).join(path)) {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(file);
             }
         }
 
-        <span class="prelude-val">Err</span>(<span class="ident">Error::Io</span>(<span class="ident">io::ErrorKind::NotFound</span>.<span class="ident">into</span>()))
+        <span class="prelude-val">Err</span>(Error::Io(io::ErrorKind::NotFound.into()))
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">saturating_abs</span>(<span class="ident">v</span>: <span class="ident">i32</span>) -&gt; <span class="ident">i32</span> {
-    <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_positive</span>() {
-        <span class="ident">v</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span> <span class="op">==</span> <span class="ident">i32::min_value</span>() {
-        <span class="ident">i32::max_value</span>()
-    } <span class="kw">else</span> {
-        <span class="op">-</span><span class="ident">v</span>
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>saturating_abs(v: i32) -&gt; i32 {
+    <span class="kw">if </span>v.is_positive() {
+        v
+    } <span class="kw">else if </span>v == i32::min_value() {
+        i32::max_value()
+    } <span class="kw">else </span>{
+        -v
     }
 }
 
-<span class="comment">// Possible system timezone directories</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">const</span> <span class="ident">ZONE_INFO_DIRECTORIES</span>: [<span class="kw-2">&amp;</span><span class="ident">str</span>; <span class="number">3</span>] <span class="op">=</span>
+<span class="comment">// Possible system timezone directories
+</span><span class="attribute">#[cfg(unix)]
+</span><span class="kw">const </span>ZONE_INFO_DIRECTORIES: [<span class="kw-2">&amp;</span>str; <span class="number">3</span>] =
     [<span class="string">&quot;/usr/share/zoneinfo&quot;</span>, <span class="string">&quot;/share/zoneinfo&quot;</span>, <span class="string">&quot;/etc/zoneinfo&quot;</span>];
 
-<span class="doccomment">/// Number of seconds in one week</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">SECONDS_PER_WEEK</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="ident">SECONDS_PER_DAY</span> <span class="op">*</span> <span class="ident">DAYS_PER_WEEK</span>;
-<span class="doccomment">/// Number of seconds in 28 days</span>
-<span class="kw">const</span> <span class="ident">SECONDS_PER_28_DAYS</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="ident">SECONDS_PER_DAY</span> <span class="op">*</span> <span class="number">28</span>;
+<span class="doccomment">/// Number of seconds in one week
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>SECONDS_PER_WEEK: i64 = SECONDS_PER_DAY * DAYS_PER_WEEK;
+<span class="doccomment">/// Number of seconds in 28 days
+</span><span class="kw">const </span>SECONDS_PER_28_DAYS: i64 = SECONDS_PER_DAY * <span class="number">28</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::Error</span>;
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">LeapSecond</span>, <span class="ident">LocalTimeType</span>, <span class="ident">TimeZone</span>, <span class="ident">TimeZoneName</span>, <span class="ident">Transition</span>, <span class="ident">TransitionRule</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::matches</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::Error;
+    <span class="kw">use super</span>::{LeapSecond, LocalTimeType, TimeZone, TimeZoneName, Transition, TransitionRule};
+    <span class="kw">use </span><span class="kw">crate</span>::matches;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_no_dst</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tz_string</span> <span class="op">=</span> <span class="string">b&quot;HST10&quot;</span>;
-        <span class="kw">let</span> <span class="ident">transition_rule</span> <span class="op">=</span> <span class="ident">TransitionRule::from_tz_string</span>(<span class="ident">tz_string</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">transition_rule</span>, <span class="ident">LocalTimeType::new</span>(<span class="op">-</span><span class="number">36000</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HST&quot;</span>))<span class="question-mark">?</span>.<span class="ident">into</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_no_dst() -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>tz_string = <span class="string">b&quot;HST10&quot;</span>;
+        <span class="kw">let </span>transition_rule = TransitionRule::from_tz_string(tz_string, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(transition_rule, LocalTimeType::new(-<span class="number">36000</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HST&quot;</span>))<span class="question-mark">?</span>.into());
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_error</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_error() -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
-            <span class="ident">TransitionRule::from_tz_string</span>(<span class="string">b&quot;IST-1GMT0&quot;</span>, <span class="bool-val">false</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedTzString</span>(<span class="kw">_</span>))
+            TransitionRule::from_tz_string(<span class="string">b&quot;IST-1GMT0&quot;</span>, <span class="bool-val">false</span>),
+            <span class="prelude-val">Err</span>(Error::UnsupportedTzString(<span class="kw">_</span>))
         ));
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
-            <span class="ident">TransitionRule::from_tz_string</span>(<span class="string">b&quot;EET-2EEST&quot;</span>, <span class="bool-val">false</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedTzString</span>(<span class="kw">_</span>))
+            TransitionRule::from_tz_string(<span class="string">b&quot;EET-2EEST&quot;</span>, <span class="bool-val">false</span>),
+            <span class="prelude-val">Err</span>(Error::UnsupportedTzString(<span class="kw">_</span>))
         ));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_v1_file_with_leap_seconds</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="string">b&quot;TZif\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x01\0\0\0\x01\0\0\0\x1b\0\0\0\0\0\0\0\x01\0\0\0\x04\0\0\0\0\0\0UTC\0\x04\xb2\x58\0\0\0\0\x01\x05\xa4\xec\x01\0\0\0\x02\x07\x86\x1f\x82\0\0\0\x03\x09\x67\x53\x03\0\0\0\x04\x0b\x48\x86\x84\0\0\0\x05\x0d\x2b\x0b\x85\0\0\0\x06\x0f\x0c\x3f\x06\0\0\0\x07\x10\xed\x72\x87\0\0\0\x08\x12\xce\xa6\x08\0\0\0\x09\x15\x9f\xca\x89\0\0\0\x0a\x17\x80\xfe\x0a\0\0\0\x0b\x19\x62\x31\x8b\0\0\0\x0c\x1d\x25\xea\x0c\0\0\0\x0d\x21\xda\xe5\x0d\0\0\0\x0e\x25\x9e\x9d\x8e\0\0\0\x0f\x27\x7f\xd1\x0f\0\0\0\x10\x2a\x50\xf5\x90\0\0\0\x11\x2c\x32\x29\x11\0\0\0\x12\x2e\x13\x5c\x92\0\0\0\x13\x30\xe7\x24\x13\0\0\0\x14\x33\xb8\x48\x94\0\0\0\x15\x36\x8c\x10\x15\0\0\0\x16\x43\xb7\x1b\x96\0\0\0\x17\x49\x5c\x07\x97\0\0\0\x18\x4f\xef\x93\x18\0\0\0\x19\x55\x93\x2d\x99\0\0\0\x1a\x58\x68\x46\x9a\0\0\0\x1b\0\0&quot;</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_v1_file_with_leap_seconds() -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>bytes = <span class="string">b&quot;TZif\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x01\0\0\0\x01\0\0\0\x1b\0\0\0\0\0\0\0\x01\0\0\0\x04\0\0\0\0\0\0UTC\0\x04\xb2\x58\0\0\0\0\x01\x05\xa4\xec\x01\0\0\0\x02\x07\x86\x1f\x82\0\0\0\x03\x09\x67\x53\x03\0\0\0\x04\x0b\x48\x86\x84\0\0\0\x05\x0d\x2b\x0b\x85\0\0\0\x06\x0f\x0c\x3f\x06\0\0\0\x07\x10\xed\x72\x87\0\0\0\x08\x12\xce\xa6\x08\0\0\0\x09\x15\x9f\xca\x89\0\0\0\x0a\x17\x80\xfe\x0a\0\0\0\x0b\x19\x62\x31\x8b\0\0\0\x0c\x1d\x25\xea\x0c\0\0\0\x0d\x21\xda\xe5\x0d\0\0\0\x0e\x25\x9e\x9d\x8e\0\0\0\x0f\x27\x7f\xd1\x0f\0\0\0\x10\x2a\x50\xf5\x90\0\0\0\x11\x2c\x32\x29\x11\0\0\0\x12\x2e\x13\x5c\x92\0\0\0\x13\x30\xe7\x24\x13\0\0\0\x14\x33\xb8\x48\x94\0\0\0\x15\x36\x8c\x10\x15\0\0\0\x16\x43\xb7\x1b\x96\0\0\0\x17\x49\x5c\x07\x97\0\0\0\x18\x4f\xef\x93\x18\0\0\0\x19\x55\x93\x2d\x99\0\0\0\x1a\x58\x68\x46\x9a\0\0\0\x1b\0\0&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">time_zone</span> <span class="op">=</span> <span class="ident">TimeZone::from_tz_data</span>(<span class="ident">bytes</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>time_zone = TimeZone::from_tz_data(bytes)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">time_zone_result</span> <span class="op">=</span> <span class="ident">TimeZone::new</span>(
-            <span class="ident">Vec::new</span>(),
-            <span class="macro">vec!</span>[<span class="ident">LocalTimeType::new</span>(<span class="number">0</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;UTC&quot;</span>))<span class="question-mark">?</span>],
+        <span class="kw">let </span>time_zone_result = TimeZone::new(
+            Vec::new(),
+            <span class="macro">vec!</span>[LocalTimeType::new(<span class="number">0</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;UTC&quot;</span>))<span class="question-mark">?</span>],
             <span class="macro">vec!</span>[
-                <span class="ident">LeapSecond::new</span>(<span class="number">78796800</span>, <span class="number">1</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">94694401</span>, <span class="number">2</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">126230402</span>, <span class="number">3</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">157766403</span>, <span class="number">4</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">189302404</span>, <span class="number">5</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">220924805</span>, <span class="number">6</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">252460806</span>, <span class="number">7</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">283996807</span>, <span class="number">8</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">315532808</span>, <span class="number">9</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">362793609</span>, <span class="number">10</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">394329610</span>, <span class="number">11</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">425865611</span>, <span class="number">12</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">489024012</span>, <span class="number">13</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">567993613</span>, <span class="number">14</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">631152014</span>, <span class="number">15</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">662688015</span>, <span class="number">16</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">709948816</span>, <span class="number">17</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">741484817</span>, <span class="number">18</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">773020818</span>, <span class="number">19</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">820454419</span>, <span class="number">20</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">867715220</span>, <span class="number">21</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">915148821</span>, <span class="number">22</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">1136073622</span>, <span class="number">23</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">1230768023</span>, <span class="number">24</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">1341100824</span>, <span class="number">25</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">1435708825</span>, <span class="number">26</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">1483228826</span>, <span class="number">27</span>),
+                LeapSecond::new(<span class="number">78796800</span>, <span class="number">1</span>),
+                LeapSecond::new(<span class="number">94694401</span>, <span class="number">2</span>),
+                LeapSecond::new(<span class="number">126230402</span>, <span class="number">3</span>),
+                LeapSecond::new(<span class="number">157766403</span>, <span class="number">4</span>),
+                LeapSecond::new(<span class="number">189302404</span>, <span class="number">5</span>),
+                LeapSecond::new(<span class="number">220924805</span>, <span class="number">6</span>),
+                LeapSecond::new(<span class="number">252460806</span>, <span class="number">7</span>),
+                LeapSecond::new(<span class="number">283996807</span>, <span class="number">8</span>),
+                LeapSecond::new(<span class="number">315532808</span>, <span class="number">9</span>),
+                LeapSecond::new(<span class="number">362793609</span>, <span class="number">10</span>),
+                LeapSecond::new(<span class="number">394329610</span>, <span class="number">11</span>),
+                LeapSecond::new(<span class="number">425865611</span>, <span class="number">12</span>),
+                LeapSecond::new(<span class="number">489024012</span>, <span class="number">13</span>),
+                LeapSecond::new(<span class="number">567993613</span>, <span class="number">14</span>),
+                LeapSecond::new(<span class="number">631152014</span>, <span class="number">15</span>),
+                LeapSecond::new(<span class="number">662688015</span>, <span class="number">16</span>),
+                LeapSecond::new(<span class="number">709948816</span>, <span class="number">17</span>),
+                LeapSecond::new(<span class="number">741484817</span>, <span class="number">18</span>),
+                LeapSecond::new(<span class="number">773020818</span>, <span class="number">19</span>),
+                LeapSecond::new(<span class="number">820454419</span>, <span class="number">20</span>),
+                LeapSecond::new(<span class="number">867715220</span>, <span class="number">21</span>),
+                LeapSecond::new(<span class="number">915148821</span>, <span class="number">22</span>),
+                LeapSecond::new(<span class="number">1136073622</span>, <span class="number">23</span>),
+                LeapSecond::new(<span class="number">1230768023</span>, <span class="number">24</span>),
+                LeapSecond::new(<span class="number">1341100824</span>, <span class="number">25</span>),
+                LeapSecond::new(<span class="number">1435708825</span>, <span class="number">26</span>),
+                LeapSecond::new(<span class="number">1483228826</span>, <span class="number">27</span>),
             ],
             <span class="prelude-val">None</span>,
         )<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">time_zone</span>, <span class="ident">time_zone_result</span>);
+        <span class="macro">assert_eq!</span>(time_zone, time_zone_result);
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_v2_file</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="string">b&quot;TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x06\0\0\0\x06\0\0\0\0\0\0\0\x07\0\0\0\x06\0\0\0\x14\x80\0\0\0\xbb\x05\x43\x48\xbb\x21\x71\x58\xcb\x89\x3d\xc8\xd2\x23\xf4\x70\xd2\x61\x49\x38\xd5\x8d\x73\x48\x01\x02\x01\x03\x04\x01\x05\xff\xff\x6c\x02\0\0\xff\xff\x6c\x58\0\x04\xff\xff\x7a\x68\x01\x08\xff\xff\x7a\x68\x01\x0c\xff\xff\x7a\x68\x01\x10\xff\xff\x73\x60\0\x04LMT\0HST\0HDT\0HWT\0HPT\0\0\0\0\0\x01\0\0\0\0\0\x01\0TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x06\0\0\0\x06\0\0\0\0\0\0\0\x07\0\0\0\x06\0\0\0\x14\xff\xff\xff\xff\x74\xe0\x70\xbe\xff\xff\xff\xff\xbb\x05\x43\x48\xff\xff\xff\xff\xbb\x21\x71\x58\xff\xff\xff\xff\xcb\x89\x3d\xc8\xff\xff\xff\xff\xd2\x23\xf4\x70\xff\xff\xff\xff\xd2\x61\x49\x38\xff\xff\xff\xff\xd5\x8d\x73\x48\x01\x02\x01\x03\x04\x01\x05\xff\xff\x6c\x02\0\0\xff\xff\x6c\x58\0\x04\xff\xff\x7a\x68\x01\x08\xff\xff\x7a\x68\x01\x0c\xff\xff\x7a\x68\x01\x10\xff\xff\x73\x60\0\x04LMT\0HST\0HDT\0HWT\0HPT\0\0\0\0\0\x01\0\0\0\0\0\x01\0\x0aHST10\x0a&quot;</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_v2_file() -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>bytes = <span class="string">b&quot;TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x06\0\0\0\x06\0\0\0\0\0\0\0\x07\0\0\0\x06\0\0\0\x14\x80\0\0\0\xbb\x05\x43\x48\xbb\x21\x71\x58\xcb\x89\x3d\xc8\xd2\x23\xf4\x70\xd2\x61\x49\x38\xd5\x8d\x73\x48\x01\x02\x01\x03\x04\x01\x05\xff\xff\x6c\x02\0\0\xff\xff\x6c\x58\0\x04\xff\xff\x7a\x68\x01\x08\xff\xff\x7a\x68\x01\x0c\xff\xff\x7a\x68\x01\x10\xff\xff\x73\x60\0\x04LMT\0HST\0HDT\0HWT\0HPT\0\0\0\0\0\x01\0\0\0\0\0\x01\0TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x06\0\0\0\x06\0\0\0\0\0\0\0\x07\0\0\0\x06\0\0\0\x14\xff\xff\xff\xff\x74\xe0\x70\xbe\xff\xff\xff\xff\xbb\x05\x43\x48\xff\xff\xff\xff\xbb\x21\x71\x58\xff\xff\xff\xff\xcb\x89\x3d\xc8\xff\xff\xff\xff\xd2\x23\xf4\x70\xff\xff\xff\xff\xd2\x61\x49\x38\xff\xff\xff\xff\xd5\x8d\x73\x48\x01\x02\x01\x03\x04\x01\x05\xff\xff\x6c\x02\0\0\xff\xff\x6c\x58\0\x04\xff\xff\x7a\x68\x01\x08\xff\xff\x7a\x68\x01\x0c\xff\xff\x7a\x68\x01\x10\xff\xff\x73\x60\0\x04LMT\0HST\0HDT\0HWT\0HPT\0\0\0\0\0\x01\0\0\0\0\0\x01\0\x0aHST10\x0a&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">time_zone</span> <span class="op">=</span> <span class="ident">TimeZone::from_tz_data</span>(<span class="ident">bytes</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>time_zone = TimeZone::from_tz_data(bytes)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">time_zone_result</span> <span class="op">=</span> <span class="ident">TimeZone::new</span>(
+        <span class="kw">let </span>time_zone_result = TimeZone::new(
             <span class="macro">vec!</span>[
-                <span class="ident">Transition::new</span>(<span class="op">-</span><span class="number">2334101314</span>, <span class="number">1</span>),
-                <span class="ident">Transition::new</span>(<span class="op">-</span><span class="number">1157283000</span>, <span class="number">2</span>),
-                <span class="ident">Transition::new</span>(<span class="op">-</span><span class="number">1155436200</span>, <span class="number">1</span>),
-                <span class="ident">Transition::new</span>(<span class="op">-</span><span class="number">880198200</span>, <span class="number">3</span>),
-                <span class="ident">Transition::new</span>(<span class="op">-</span><span class="number">769395600</span>, <span class="number">4</span>),
-                <span class="ident">Transition::new</span>(<span class="op">-</span><span class="number">765376200</span>, <span class="number">1</span>),
-                <span class="ident">Transition::new</span>(<span class="op">-</span><span class="number">712150200</span>, <span class="number">5</span>),
+                Transition::new(-<span class="number">2334101314</span>, <span class="number">1</span>),
+                Transition::new(-<span class="number">1157283000</span>, <span class="number">2</span>),
+                Transition::new(-<span class="number">1155436200</span>, <span class="number">1</span>),
+                Transition::new(-<span class="number">880198200</span>, <span class="number">3</span>),
+                Transition::new(-<span class="number">769395600</span>, <span class="number">4</span>),
+                Transition::new(-<span class="number">765376200</span>, <span class="number">1</span>),
+                Transition::new(-<span class="number">712150200</span>, <span class="number">5</span>),
             ],
             <span class="macro">vec!</span>[
-                <span class="ident">LocalTimeType::new</span>(<span class="op">-</span><span class="number">37886</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;LMT&quot;</span>))<span class="question-mark">?</span>,
-                <span class="ident">LocalTimeType::new</span>(<span class="op">-</span><span class="number">37800</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HST&quot;</span>))<span class="question-mark">?</span>,
-                <span class="ident">LocalTimeType::new</span>(<span class="op">-</span><span class="number">34200</span>, <span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HDT&quot;</span>))<span class="question-mark">?</span>,
-                <span class="ident">LocalTimeType::new</span>(<span class="op">-</span><span class="number">34200</span>, <span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HWT&quot;</span>))<span class="question-mark">?</span>,
-                <span class="ident">LocalTimeType::new</span>(<span class="op">-</span><span class="number">34200</span>, <span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HPT&quot;</span>))<span class="question-mark">?</span>,
-                <span class="ident">LocalTimeType::new</span>(<span class="op">-</span><span class="number">36000</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HST&quot;</span>))<span class="question-mark">?</span>,
+                LocalTimeType::new(-<span class="number">37886</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;LMT&quot;</span>))<span class="question-mark">?</span>,
+                LocalTimeType::new(-<span class="number">37800</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HST&quot;</span>))<span class="question-mark">?</span>,
+                LocalTimeType::new(-<span class="number">34200</span>, <span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HDT&quot;</span>))<span class="question-mark">?</span>,
+                LocalTimeType::new(-<span class="number">34200</span>, <span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HWT&quot;</span>))<span class="question-mark">?</span>,
+                LocalTimeType::new(-<span class="number">34200</span>, <span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HPT&quot;</span>))<span class="question-mark">?</span>,
+                LocalTimeType::new(-<span class="number">36000</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HST&quot;</span>))<span class="question-mark">?</span>,
             ],
-            <span class="ident">Vec::new</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">TransitionRule::from</span>(<span class="ident">LocalTimeType::new</span>(<span class="op">-</span><span class="number">36000</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HST&quot;</span>))<span class="question-mark">?</span>)),
+            Vec::new(),
+            <span class="prelude-val">Some</span>(TransitionRule::from(LocalTimeType::new(-<span class="number">36000</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HST&quot;</span>))<span class="question-mark">?</span>)),
         )<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">time_zone</span>, <span class="ident">time_zone_result</span>);
+        <span class="macro">assert_eq!</span>(time_zone, time_zone_result);
 
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">*</span><span class="ident">time_zone</span>.<span class="ident">find_local_time_type</span>(<span class="op">-</span><span class="number">1156939200</span>)<span class="question-mark">?</span>,
-            <span class="ident">LocalTimeType::new</span>(<span class="op">-</span><span class="number">34200</span>, <span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HDT&quot;</span>))<span class="question-mark">?</span>
-        );
+            <span class="kw-2">*</span>time_zone.find_local_time_type(-<span class="number">1156939200</span>)<span class="question-mark">?</span>,
+            LocalTimeType::new(-<span class="number">34200</span>, <span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HDT&quot;</span>))<span class="question-mark">?
+        </span>);
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">*</span><span class="ident">time_zone</span>.<span class="ident">find_local_time_type</span>(<span class="number">1546300800</span>)<span class="question-mark">?</span>,
-            <span class="ident">LocalTimeType::new</span>(<span class="op">-</span><span class="number">36000</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HST&quot;</span>))<span class="question-mark">?</span>
-        );
+            <span class="kw-2">*</span>time_zone.find_local_time_type(<span class="number">1546300800</span>)<span class="question-mark">?</span>,
+            LocalTimeType::new(-<span class="number">36000</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;HST&quot;</span>))<span class="question-mark">?
+        </span>);
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_tz_ascii_str</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;&quot;</span>), <span class="prelude-val">Err</span>(<span class="ident">Error::LocalTimeType</span>(<span class="kw">_</span>))));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;1&quot;</span>), <span class="prelude-val">Err</span>(<span class="ident">Error::LocalTimeType</span>(<span class="kw">_</span>))));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;12&quot;</span>), <span class="prelude-val">Err</span>(<span class="ident">Error::LocalTimeType</span>(<span class="kw">_</span>))));
-        <span class="macro">assert_eq!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;123&quot;</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>(), <span class="string">b&quot;123&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;1234&quot;</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>(), <span class="string">b&quot;1234&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;12345&quot;</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>(), <span class="string">b&quot;12345&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;123456&quot;</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>(), <span class="string">b&quot;123456&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;1234567&quot;</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>(), <span class="string">b&quot;1234567&quot;</span>);
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;12345678&quot;</span>), <span class="prelude-val">Err</span>(<span class="ident">Error::LocalTimeType</span>(<span class="kw">_</span>))));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;123456789&quot;</span>), <span class="prelude-val">Err</span>(<span class="ident">Error::LocalTimeType</span>(<span class="kw">_</span>))));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;1234567890&quot;</span>), <span class="prelude-val">Err</span>(<span class="ident">Error::LocalTimeType</span>(<span class="kw">_</span>))));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_tz_ascii_str() -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(TimeZoneName::new(<span class="string">b&quot;&quot;</span>), <span class="prelude-val">Err</span>(Error::LocalTimeType(<span class="kw">_</span>))));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(TimeZoneName::new(<span class="string">b&quot;1&quot;</span>), <span class="prelude-val">Err</span>(Error::LocalTimeType(<span class="kw">_</span>))));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(TimeZoneName::new(<span class="string">b&quot;12&quot;</span>), <span class="prelude-val">Err</span>(Error::LocalTimeType(<span class="kw">_</span>))));
+        <span class="macro">assert_eq!</span>(TimeZoneName::new(<span class="string">b&quot;123&quot;</span>)<span class="question-mark">?</span>.as_bytes(), <span class="string">b&quot;123&quot;</span>);
+        <span class="macro">assert_eq!</span>(TimeZoneName::new(<span class="string">b&quot;1234&quot;</span>)<span class="question-mark">?</span>.as_bytes(), <span class="string">b&quot;1234&quot;</span>);
+        <span class="macro">assert_eq!</span>(TimeZoneName::new(<span class="string">b&quot;12345&quot;</span>)<span class="question-mark">?</span>.as_bytes(), <span class="string">b&quot;12345&quot;</span>);
+        <span class="macro">assert_eq!</span>(TimeZoneName::new(<span class="string">b&quot;123456&quot;</span>)<span class="question-mark">?</span>.as_bytes(), <span class="string">b&quot;123456&quot;</span>);
+        <span class="macro">assert_eq!</span>(TimeZoneName::new(<span class="string">b&quot;1234567&quot;</span>)<span class="question-mark">?</span>.as_bytes(), <span class="string">b&quot;1234567&quot;</span>);
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(TimeZoneName::new(<span class="string">b&quot;12345678&quot;</span>), <span class="prelude-val">Err</span>(Error::LocalTimeType(<span class="kw">_</span>))));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(TimeZoneName::new(<span class="string">b&quot;123456789&quot;</span>), <span class="prelude-val">Err</span>(Error::LocalTimeType(<span class="kw">_</span>))));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(TimeZoneName::new(<span class="string">b&quot;1234567890&quot;</span>), <span class="prelude-val">Err</span>(Error::LocalTimeType(<span class="kw">_</span>))));
 
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">TimeZoneName::new</span>(<span class="string">b&quot;123\0\0\0&quot;</span>), <span class="prelude-val">Err</span>(<span class="ident">Error::LocalTimeType</span>(<span class="kw">_</span>))));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(TimeZoneName::new(<span class="string">b&quot;123\0\0\0&quot;</span>), <span class="prelude-val">Err</span>(Error::LocalTimeType(<span class="kw">_</span>))));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_time_zone</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">utc</span> <span class="op">=</span> <span class="ident">LocalTimeType::UTC</span>;
-        <span class="kw">let</span> <span class="ident">cet</span> <span class="op">=</span> <span class="ident">LocalTimeType::with_offset</span>(<span class="number">3600</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_time_zone() -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>utc = LocalTimeType::UTC;
+        <span class="kw">let </span>cet = LocalTimeType::with_offset(<span class="number">3600</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">utc_local_time_types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">utc</span>];
-        <span class="kw">let</span> <span class="ident">fixed_extra_rule</span> <span class="op">=</span> <span class="ident">TransitionRule::from</span>(<span class="ident">cet</span>);
+        <span class="kw">let </span>utc_local_time_types = <span class="macro">vec!</span>[utc];
+        <span class="kw">let </span>fixed_extra_rule = TransitionRule::from(cet);
 
-        <span class="kw">let</span> <span class="ident">time_zone_1</span> <span class="op">=</span> <span class="ident">TimeZone::new</span>(<span class="macro">vec!</span>[], <span class="ident">utc_local_time_types</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[], <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">time_zone_2</span> <span class="op">=</span>
-            <span class="ident">TimeZone::new</span>(<span class="macro">vec!</span>[], <span class="ident">utc_local_time_types</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[], <span class="prelude-val">Some</span>(<span class="ident">fixed_extra_rule</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">time_zone_3</span> <span class="op">=</span>
-            <span class="ident">TimeZone::new</span>(<span class="macro">vec!</span>[<span class="ident">Transition::new</span>(<span class="number">0</span>, <span class="number">0</span>)], <span class="ident">utc_local_time_types</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[], <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">time_zone_4</span> <span class="op">=</span> <span class="ident">TimeZone::new</span>(
-            <span class="macro">vec!</span>[<span class="ident">Transition::new</span>(<span class="ident">i32::min_value</span>().<span class="ident">into</span>(), <span class="number">0</span>), <span class="ident">Transition::new</span>(<span class="number">0</span>, <span class="number">1</span>)],
-            <span class="macro">vec!</span>[<span class="ident">utc</span>, <span class="ident">cet</span>],
-            <span class="ident">Vec::new</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">fixed_extra_rule</span>),
+        <span class="kw">let </span>time_zone_1 = TimeZone::new(<span class="macro">vec!</span>[], utc_local_time_types.clone(), <span class="macro">vec!</span>[], <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>time_zone_2 =
+            TimeZone::new(<span class="macro">vec!</span>[], utc_local_time_types.clone(), <span class="macro">vec!</span>[], <span class="prelude-val">Some</span>(fixed_extra_rule))<span class="question-mark">?</span>;
+        <span class="kw">let </span>time_zone_3 =
+            TimeZone::new(<span class="macro">vec!</span>[Transition::new(<span class="number">0</span>, <span class="number">0</span>)], utc_local_time_types.clone(), <span class="macro">vec!</span>[], <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>time_zone_4 = TimeZone::new(
+            <span class="macro">vec!</span>[Transition::new(i32::min_value().into(), <span class="number">0</span>), Transition::new(<span class="number">0</span>, <span class="number">1</span>)],
+            <span class="macro">vec!</span>[utc, cet],
+            Vec::new(),
+            <span class="prelude-val">Some</span>(fixed_extra_rule),
         )<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">time_zone_1</span>.<span class="ident">find_local_time_type</span>(<span class="number">0</span>)<span class="question-mark">?</span>, <span class="ident">utc</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">time_zone_2</span>.<span class="ident">find_local_time_type</span>(<span class="number">0</span>)<span class="question-mark">?</span>, <span class="ident">cet</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>time_zone_1.find_local_time_type(<span class="number">0</span>)<span class="question-mark">?</span>, utc);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>time_zone_2.find_local_time_type(<span class="number">0</span>)<span class="question-mark">?</span>, cet);
 
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">time_zone_3</span>.<span class="ident">find_local_time_type</span>(<span class="op">-</span><span class="number">1</span>)<span class="question-mark">?</span>, <span class="ident">utc</span>);
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">time_zone_3</span>.<span class="ident">find_local_time_type</span>(<span class="number">0</span>), <span class="prelude-val">Err</span>(<span class="ident">Error::FindLocalTimeType</span>(<span class="kw">_</span>))));
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>time_zone_3.find_local_time_type(-<span class="number">1</span>)<span class="question-mark">?</span>, utc);
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(time_zone_3.find_local_time_type(<span class="number">0</span>), <span class="prelude-val">Err</span>(Error::FindLocalTimeType(<span class="kw">_</span>))));
 
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">time_zone_4</span>.<span class="ident">find_local_time_type</span>(<span class="op">-</span><span class="number">1</span>)<span class="question-mark">?</span>, <span class="ident">utc</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">time_zone_4</span>.<span class="ident">find_local_time_type</span>(<span class="number">0</span>)<span class="question-mark">?</span>, <span class="ident">cet</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>time_zone_4.find_local_time_type(-<span class="number">1</span>)<span class="question-mark">?</span>, utc);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>time_zone_4.find_local_time_type(<span class="number">0</span>)<span class="question-mark">?</span>, cet);
 
-        <span class="kw">let</span> <span class="ident">time_zone_err</span> <span class="op">=</span> <span class="ident">TimeZone::new</span>(
-            <span class="macro">vec!</span>[<span class="ident">Transition::new</span>(<span class="number">0</span>, <span class="number">0</span>)],
-            <span class="ident">utc_local_time_types</span>,
+        <span class="kw">let </span>time_zone_err = TimeZone::new(
+            <span class="macro">vec!</span>[Transition::new(<span class="number">0</span>, <span class="number">0</span>)],
+            utc_local_time_types,
             <span class="macro">vec!</span>[],
-            <span class="prelude-val">Some</span>(<span class="ident">fixed_extra_rule</span>),
+            <span class="prelude-val">Some</span>(fixed_extra_rule),
         );
-        <span class="macro">assert!</span>(<span class="ident">time_zone_err</span>.<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(time_zone_err.is_err());
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_time_zone_from_posix_tz</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-        {
-            <span class="comment">// if the TZ var is set, this essentially _overrides_ the</span>
-            <span class="comment">// time set by the localtime symlink</span>
-            <span class="comment">// so just ensure that ::local() acts as expected</span>
-            <span class="comment">// in this case</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">tz</span>) <span class="op">=</span> <span class="ident">std::env::var</span>(<span class="string">&quot;TZ&quot;</span>) {
-                <span class="kw">let</span> <span class="ident">time_zone_local</span> <span class="op">=</span> <span class="ident">TimeZone::local</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">time_zone_local_1</span> <span class="op">=</span> <span class="ident">TimeZone::from_posix_tz</span>(<span class="kw-2">&amp;</span><span class="ident">tz</span>)<span class="question-mark">?</span>;
-                <span class="macro">assert_eq!</span>(<span class="ident">time_zone_local</span>, <span class="ident">time_zone_local_1</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">time_zone_local</span> <span class="op">=</span> <span class="ident">TimeZone::local</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">time_zone_local_1</span> <span class="op">=</span> <span class="ident">TimeZone::from_posix_tz</span>(<span class="string">&quot;localtime&quot;</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">time_zone_local_2</span> <span class="op">=</span> <span class="ident">TimeZone::from_posix_tz</span>(<span class="string">&quot;/etc/localtime&quot;</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">time_zone_local_3</span> <span class="op">=</span> <span class="ident">TimeZone::from_posix_tz</span>(<span class="string">&quot;:/etc/localtime&quot;</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_time_zone_from_posix_tz() -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="attribute">#[cfg(unix)]
+        </span>{
+            <span class="comment">// if the TZ var is set, this essentially _overrides_ the
+            // time set by the localtime symlink
+            // so just ensure that ::local() acts as expected
+            // in this case
+            </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(tz) = std::env::var(<span class="string">&quot;TZ&quot;</span>) {
+                <span class="kw">let </span>time_zone_local = TimeZone::local()<span class="question-mark">?</span>;
+                <span class="kw">let </span>time_zone_local_1 = TimeZone::from_posix_tz(<span class="kw-2">&amp;</span>tz)<span class="question-mark">?</span>;
+                <span class="macro">assert_eq!</span>(time_zone_local, time_zone_local_1);
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>time_zone_local = TimeZone::local()<span class="question-mark">?</span>;
+                <span class="kw">let </span>time_zone_local_1 = TimeZone::from_posix_tz(<span class="string">&quot;localtime&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>time_zone_local_2 = TimeZone::from_posix_tz(<span class="string">&quot;/etc/localtime&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>time_zone_local_3 = TimeZone::from_posix_tz(<span class="string">&quot;:/etc/localtime&quot;</span>)<span class="question-mark">?</span>;
 
-                <span class="macro">assert_eq!</span>(<span class="ident">time_zone_local</span>, <span class="ident">time_zone_local_1</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">time_zone_local</span>, <span class="ident">time_zone_local_2</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">time_zone_local</span>, <span class="ident">time_zone_local_3</span>);
+                <span class="macro">assert_eq!</span>(time_zone_local, time_zone_local_1);
+                <span class="macro">assert_eq!</span>(time_zone_local, time_zone_local_2);
+                <span class="macro">assert_eq!</span>(time_zone_local, time_zone_local_3);
             }
 
-            <span class="kw">let</span> <span class="ident">time_zone_utc</span> <span class="op">=</span> <span class="ident">TimeZone::from_posix_tz</span>(<span class="string">&quot;UTC&quot;</span>)<span class="question-mark">?</span>;
-            <span class="macro">assert_eq!</span>(<span class="ident">time_zone_utc</span>.<span class="ident">find_local_time_type</span>(<span class="number">0</span>)<span class="question-mark">?</span>.<span class="ident">offset</span>(), <span class="number">0</span>);
+            <span class="kw">let </span>time_zone_utc = TimeZone::from_posix_tz(<span class="string">&quot;UTC&quot;</span>)<span class="question-mark">?</span>;
+            <span class="macro">assert_eq!</span>(time_zone_utc.find_local_time_type(<span class="number">0</span>)<span class="question-mark">?</span>.offset(), <span class="number">0</span>);
         }
 
-        <span class="macro">assert!</span>(<span class="ident">TimeZone::from_posix_tz</span>(<span class="string">&quot;EST5EDT,0/0,J365/25&quot;</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">TimeZone::from_posix_tz</span>(<span class="string">&quot;&quot;</span>).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(TimeZone::from_posix_tz(<span class="string">&quot;EST5EDT,0/0,J365/25&quot;</span>).is_err());
+        <span class="macro">assert!</span>(TimeZone::from_posix_tz(<span class="string">&quot;&quot;</span>).is_err());
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_leap_seconds</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">time_zone</span> <span class="op">=</span> <span class="ident">TimeZone::new</span>(
-            <span class="ident">Vec::new</span>(),
-            <span class="macro">vec!</span>[<span class="ident">LocalTimeType::new</span>(<span class="number">0</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;UTC&quot;</span>))<span class="question-mark">?</span>],
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_leap_seconds() -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>time_zone = TimeZone::new(
+            Vec::new(),
+            <span class="macro">vec!</span>[LocalTimeType::new(<span class="number">0</span>, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="string">b&quot;UTC&quot;</span>))<span class="question-mark">?</span>],
             <span class="macro">vec!</span>[
-                <span class="ident">LeapSecond::new</span>(<span class="number">78796800</span>, <span class="number">1</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">94694401</span>, <span class="number">2</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">126230402</span>, <span class="number">3</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">157766403</span>, <span class="number">4</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">189302404</span>, <span class="number">5</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">220924805</span>, <span class="number">6</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">252460806</span>, <span class="number">7</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">283996807</span>, <span class="number">8</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">315532808</span>, <span class="number">9</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">362793609</span>, <span class="number">10</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">394329610</span>, <span class="number">11</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">425865611</span>, <span class="number">12</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">489024012</span>, <span class="number">13</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">567993613</span>, <span class="number">14</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">631152014</span>, <span class="number">15</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">662688015</span>, <span class="number">16</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">709948816</span>, <span class="number">17</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">741484817</span>, <span class="number">18</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">773020818</span>, <span class="number">19</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">820454419</span>, <span class="number">20</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">867715220</span>, <span class="number">21</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">915148821</span>, <span class="number">22</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">1136073622</span>, <span class="number">23</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">1230768023</span>, <span class="number">24</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">1341100824</span>, <span class="number">25</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">1435708825</span>, <span class="number">26</span>),
-                <span class="ident">LeapSecond::new</span>(<span class="number">1483228826</span>, <span class="number">27</span>),
+                LeapSecond::new(<span class="number">78796800</span>, <span class="number">1</span>),
+                LeapSecond::new(<span class="number">94694401</span>, <span class="number">2</span>),
+                LeapSecond::new(<span class="number">126230402</span>, <span class="number">3</span>),
+                LeapSecond::new(<span class="number">157766403</span>, <span class="number">4</span>),
+                LeapSecond::new(<span class="number">189302404</span>, <span class="number">5</span>),
+                LeapSecond::new(<span class="number">220924805</span>, <span class="number">6</span>),
+                LeapSecond::new(<span class="number">252460806</span>, <span class="number">7</span>),
+                LeapSecond::new(<span class="number">283996807</span>, <span class="number">8</span>),
+                LeapSecond::new(<span class="number">315532808</span>, <span class="number">9</span>),
+                LeapSecond::new(<span class="number">362793609</span>, <span class="number">10</span>),
+                LeapSecond::new(<span class="number">394329610</span>, <span class="number">11</span>),
+                LeapSecond::new(<span class="number">425865611</span>, <span class="number">12</span>),
+                LeapSecond::new(<span class="number">489024012</span>, <span class="number">13</span>),
+                LeapSecond::new(<span class="number">567993613</span>, <span class="number">14</span>),
+                LeapSecond::new(<span class="number">631152014</span>, <span class="number">15</span>),
+                LeapSecond::new(<span class="number">662688015</span>, <span class="number">16</span>),
+                LeapSecond::new(<span class="number">709948816</span>, <span class="number">17</span>),
+                LeapSecond::new(<span class="number">741484817</span>, <span class="number">18</span>),
+                LeapSecond::new(<span class="number">773020818</span>, <span class="number">19</span>),
+                LeapSecond::new(<span class="number">820454419</span>, <span class="number">20</span>),
+                LeapSecond::new(<span class="number">867715220</span>, <span class="number">21</span>),
+                LeapSecond::new(<span class="number">915148821</span>, <span class="number">22</span>),
+                LeapSecond::new(<span class="number">1136073622</span>, <span class="number">23</span>),
+                LeapSecond::new(<span class="number">1230768023</span>, <span class="number">24</span>),
+                LeapSecond::new(<span class="number">1341100824</span>, <span class="number">25</span>),
+                LeapSecond::new(<span class="number">1435708825</span>, <span class="number">26</span>),
+                LeapSecond::new(<span class="number">1483228826</span>, <span class="number">27</span>),
             ],
             <span class="prelude-val">None</span>,
         )<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">time_zone_ref</span> <span class="op">=</span> <span class="ident">time_zone</span>.<span class="ident">as_ref</span>();
+        <span class="kw">let </span>time_zone_ref = time_zone.as_ref();
 
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">time_zone_ref</span>.<span class="ident">unix_leap_time_to_unix_time</span>(<span class="number">1136073621</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073599</span>)));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">time_zone_ref</span>.<span class="ident">unix_leap_time_to_unix_time</span>(<span class="number">1136073622</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073600</span>)));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">time_zone_ref</span>.<span class="ident">unix_leap_time_to_unix_time</span>(<span class="number">1136073623</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073600</span>)));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">time_zone_ref</span>.<span class="ident">unix_leap_time_to_unix_time</span>(<span class="number">1136073624</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073601</span>)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(time_zone_ref.unix_leap_time_to_unix_time(<span class="number">1136073621</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073599</span>)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(time_zone_ref.unix_leap_time_to_unix_time(<span class="number">1136073622</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073600</span>)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(time_zone_ref.unix_leap_time_to_unix_time(<span class="number">1136073623</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073600</span>)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(time_zone_ref.unix_leap_time_to_unix_time(<span class="number">1136073624</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073601</span>)));
 
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">time_zone_ref</span>.<span class="ident">unix_time_to_unix_leap_time</span>(<span class="number">1136073599</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073621</span>)));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">time_zone_ref</span>.<span class="ident">unix_time_to_unix_leap_time</span>(<span class="number">1136073600</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073623</span>)));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">time_zone_ref</span>.<span class="ident">unix_time_to_unix_leap_time</span>(<span class="number">1136073601</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073624</span>)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(time_zone_ref.unix_time_to_unix_leap_time(<span class="number">1136073599</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073621</span>)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(time_zone_ref.unix_time_to_unix_leap_time(<span class="number">1136073600</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073623</span>)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(time_zone_ref.unix_time_to_unix_leap_time(<span class="number">1136073601</span>), <span class="prelude-val">Ok</span>(<span class="number">1136073624</span>)));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_leap_seconds_overflow</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">time_zone_err</span> <span class="op">=</span> <span class="ident">TimeZone::new</span>(
-            <span class="macro">vec!</span>[<span class="ident">Transition::new</span>(<span class="ident">i64::min_value</span>(), <span class="number">0</span>)],
-            <span class="macro">vec!</span>[<span class="ident">LocalTimeType::UTC</span>],
-            <span class="macro">vec!</span>[<span class="ident">LeapSecond::new</span>(<span class="number">0</span>, <span class="number">1</span>)],
-            <span class="prelude-val">Some</span>(<span class="ident">TransitionRule::from</span>(<span class="ident">LocalTimeType::UTC</span>)),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_leap_seconds_overflow() -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>time_zone_err = TimeZone::new(
+            <span class="macro">vec!</span>[Transition::new(i64::min_value(), <span class="number">0</span>)],
+            <span class="macro">vec!</span>[LocalTimeType::UTC],
+            <span class="macro">vec!</span>[LeapSecond::new(<span class="number">0</span>, <span class="number">1</span>)],
+            <span class="prelude-val">Some</span>(TransitionRule::from(LocalTimeType::UTC)),
         );
-        <span class="macro">assert!</span>(<span class="ident">time_zone_err</span>.<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(time_zone_err.is_err());
 
-        <span class="kw">let</span> <span class="ident">time_zone</span> <span class="op">=</span> <span class="ident">TimeZone::new</span>(
-            <span class="macro">vec!</span>[<span class="ident">Transition::new</span>(<span class="ident">i64::max_value</span>(), <span class="number">0</span>)],
-            <span class="macro">vec!</span>[<span class="ident">LocalTimeType::UTC</span>],
-            <span class="macro">vec!</span>[<span class="ident">LeapSecond::new</span>(<span class="number">0</span>, <span class="number">1</span>)],
+        <span class="kw">let </span>time_zone = TimeZone::new(
+            <span class="macro">vec!</span>[Transition::new(i64::max_value(), <span class="number">0</span>)],
+            <span class="macro">vec!</span>[LocalTimeType::UTC],
+            <span class="macro">vec!</span>[LeapSecond::new(<span class="number">0</span>, <span class="number">1</span>)],
             <span class="prelude-val">None</span>,
         )<span class="question-mark">?</span>;
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
-            <span class="ident">time_zone</span>.<span class="ident">find_local_time_type</span>(<span class="ident">i64::max_value</span>()),
-            <span class="prelude-val">Err</span>(<span class="ident">Error::FindLocalTimeType</span>(<span class="kw">_</span>))
+            time_zone.find_local_time_type(i64::max_value()),
+            <span class="prelude-val">Err</span>(Error::FindLocalTimeType(<span class="kw">_</span>))
         ));
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

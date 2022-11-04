@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/parser/parse_source_and_generator.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse_source_and_generator.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/parser/parse_source_and_generator.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse_source_and_generator.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -80,87 +80,87 @@
 <span id="80">80</span>
 <span id="81">81</span>
 <span id="82">82</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Pair</span>},
-    <span class="ident">parse_comments</span>::<span class="kw-2">*</span>,
-    <span class="ident">parse_expression::parse_expression</span>,
-    <span class="ident">Rule</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    helpers::{parsing_catch_all, Pair},
+    parse_comments::<span class="kw-2">*</span>,
+    parse_expression::parse_expression,
+    Rule,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
+<span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
+<span class="kw">use </span>diagnostics::{DatamodelError, Diagnostics};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_config_block</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">Top</span> {
-    <span class="kw">let</span> <span class="ident">pair_span</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">as_span</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Identifier</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">properties</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">kw</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_config_block(pair: Pair&lt;<span class="lifetime">&#39;_</span>&gt;, diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics) -&gt; Top {
+    <span class="kw">let </span>pair_span = pair.as_span();
+    <span class="kw">let </span><span class="kw-2">mut </span>name: <span class="prelude-ty">Option</span>&lt;Identifier&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>properties = Vec::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>comment: <span class="prelude-ty">Option</span>&lt;Comment&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>kw = <span class="prelude-val">None</span>;
 
-    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
-        <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">into</span>()),
-            <span class="ident">Rule::key_value</span> =&gt; <span class="ident">properties</span>.<span class="ident">push</span>(<span class="ident">parse_key_value</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>)),
-            <span class="ident">Rule::comment_block</span> =&gt; <span class="ident">comment</span> <span class="op">=</span> <span class="ident">parse_comment_block</span>(<span class="ident">current</span>),
-            <span class="ident">Rule::DATASOURCE_KEYWORD</span> <span class="op">|</span> <span class="ident">Rule::GENERATOR_KEYWORD</span> =&gt; <span class="ident">kw</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">as_str</span>()),
-            <span class="ident">Rule::BLOCK_OPEN</span> <span class="op">|</span> <span class="ident">Rule::BLOCK_CLOSE</span> =&gt; {}
-            <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">for </span>current <span class="kw">in </span>pair.into_inner() {
+        <span class="kw">match </span>current.as_rule() {
+            Rule::identifier =&gt; name = <span class="prelude-val">Some</span>(current.into()),
+            Rule::key_value =&gt; properties.push(parse_key_value(current, diagnostics)),
+            Rule::comment_block =&gt; comment = parse_comment_block(current),
+            Rule::DATASOURCE_KEYWORD | Rule::GENERATOR_KEYWORD =&gt; kw = <span class="prelude-val">Some</span>(current.as_str()),
+            Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE =&gt; {}
+            Rule::BLOCK_LEVEL_CATCH_ALL =&gt; {
+                <span class="kw">let </span>msg = <span class="macro">format!</span>(
                     <span class="string">&quot;This line is not a valid definition within a {}.&quot;</span>,
-                    <span class="ident">kw</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;configuration block&quot;</span>)
+                    kw.unwrap_or(<span class="string">&quot;configuration block&quot;</span>)
                 );
 
-                <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>());
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
+                <span class="kw">let </span>err = DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, current.as_span().into());
+                diagnostics.push_error(err);
             }
-            <span class="kw">_</span> =&gt; <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;source&quot;</span>),
+            <span class="kw">_ </span>=&gt; parsing_catch_all(<span class="kw-2">&amp;</span>current, <span class="string">&quot;source&quot;</span>),
         }
     }
 
-    <span class="kw">match</span> <span class="ident">kw</span> {
-        <span class="prelude-val">Some</span>(<span class="string">&quot;datasource&quot;</span>) =&gt; <span class="ident">Top::Source</span>(<span class="ident">SourceConfig</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">unwrap</span>(),
-            <span class="ident">properties</span>,
-            <span class="ident">documentation</span>: <span class="ident">comment</span>,
-            <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="ident">pair_span</span>),
+    <span class="kw">match </span>kw {
+        <span class="prelude-val">Some</span>(<span class="string">&quot;datasource&quot;</span>) =&gt; Top::Source(SourceConfig {
+            name: name.unwrap(),
+            properties,
+            documentation: comment,
+            span: Span::from(pair_span),
         }),
-        <span class="prelude-val">Some</span>(<span class="string">&quot;generator&quot;</span>) =&gt; <span class="ident">Top::Generator</span>(<span class="ident">GeneratorConfig</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">unwrap</span>(),
-            <span class="ident">properties</span>,
-            <span class="ident">documentation</span>: <span class="ident">comment</span>,
-            <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="ident">pair_span</span>),
+        <span class="prelude-val">Some</span>(<span class="string">&quot;generator&quot;</span>) =&gt; Top::Generator(GeneratorConfig {
+            name: name.unwrap(),
+            properties,
+            documentation: comment,
+            span: Span::from(pair_span),
         }),
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_key_value</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">ConfigBlockProperty</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Identifier</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">let</span> (<span class="ident">pair_span</span>, <span class="ident">pair_str</span>) <span class="op">=</span> (<span class="ident">pair</span>.<span class="ident">as_span</span>(), <span class="ident">pair</span>.<span class="ident">as_str</span>());
+<span class="kw">fn </span>parse_key_value(pair: Pair&lt;<span class="lifetime">&#39;_</span>&gt;, diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics) -&gt; ConfigBlockProperty {
+    <span class="kw">let </span><span class="kw-2">mut </span>name: <span class="prelude-ty">Option</span>&lt;Identifier&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>value: <span class="prelude-ty">Option</span>&lt;Expression&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">let </span>(pair_span, pair_str) = (pair.as_span(), pair.as_str());
 
-    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
-        <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">into</span>()),
-            <span class="ident">Rule::expression</span> =&gt; <span class="ident">value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parse_expression</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>)),
-            <span class="ident">Rule::trailing_comment</span> =&gt; (),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(
+    <span class="kw">for </span>current <span class="kw">in </span>pair.into_inner() {
+        <span class="kw">match </span>current.as_rule() {
+            Rule::identifier =&gt; name = <span class="prelude-val">Some</span>(current.into()),
+            Rule::expression =&gt; value = <span class="prelude-val">Some</span>(parse_expression(current, diagnostics)),
+            Rule::trailing_comment =&gt; (),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(
                 <span class="string">&quot;Encountered impossible source property declaration during parsing: {:?}&quot;</span>,
-                <span class="ident">current</span>.<span class="ident">tokens</span>()
+                current.tokens()
             ),
         }
     }
 
-    <span class="kw">match</span> (<span class="ident">name</span>, <span class="ident">value</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">name</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>)) =&gt; <span class="ident">ConfigBlockProperty</span> {
-            <span class="ident">name</span>,
-            <span class="ident">value</span>,
-            <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="ident">pair_span</span>),
+    <span class="kw">match </span>(name, value) {
+        (<span class="prelude-val">Some</span>(name), <span class="prelude-val">Some</span>(value)) =&gt; ConfigBlockProperty {
+            name,
+            value,
+            span: Span::from(pair_span),
         },
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(
             <span class="string">&quot;Encountered impossible source property declaration during parsing: {:?}&quot;</span>,
-            <span class="ident">pair_str</span>,
+            pair_str,
         ),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

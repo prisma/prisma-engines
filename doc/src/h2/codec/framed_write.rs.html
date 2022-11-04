@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/codec/framed_write.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>framed_write.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../h2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/codec/framed_write.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>framed_write.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../h2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -372,379 +372,379 @@
 <span id="372">372</span>
 <span id="373">373</span>
 <span id="374">374</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::UserError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::UserError</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::frame</span>::{<span class="self">self</span>, <span class="ident">Frame</span>, <span class="ident">FrameSize</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::hpack</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::codec::UserError;
+<span class="kw">use </span><span class="kw">crate</span>::codec::UserError::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::frame::{<span class="self">self</span>, Frame, FrameSize};
+<span class="kw">use </span><span class="kw">crate</span>::hpack;
 
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
+<span class="kw">use </span>bytes::{Buf, BufMut, BytesMut};
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
-<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">Cursor</span>, <span class="ident">IoSlice</span>};
+<span class="kw">use </span>std::io::{<span class="self">self</span>, Cursor, IoSlice};
 
-<span class="comment">// A macro to get around a method needing to borrow &amp;mut self</span>
-<span class="macro">macro_rules!</span> <span class="ident">limited_write_buf</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">max_frame_size</span>() <span class="op">+</span> <span class="ident">frame::HEADER_LEN</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">buf</span>.<span class="ident">get_mut</span>().<span class="ident">limit</span>(<span class="ident">limit</span>)
+<span class="comment">// A macro to get around a method needing to borrow &amp;mut self
+</span><span class="macro">macro_rules! </span>limited_write_buf {
+    (<span class="macro-nonterminal">$self</span>:expr) =&gt; {{
+        <span class="kw">let </span>limit = <span class="macro-nonterminal">$self</span>.max_frame_size() + frame::HEADER_LEN;
+        <span class="macro-nonterminal">$self</span>.buf.get_mut().limit(limit)
     }};
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FramedWrite</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Upstream `AsyncWrite`</span>
-    <span class="ident">inner</span>: <span class="ident">T</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>FramedWrite&lt;T, B&gt; {
+    <span class="doccomment">/// Upstream `AsyncWrite`
+    </span>inner: T,
 
-    <span class="ident">encoder</span>: <span class="ident">Encoder</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+    encoder: Encoder&lt;B&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Encoder</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// HPACK encoder</span>
-    <span class="ident">hpack</span>: <span class="ident">hpack::Encoder</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Encoder&lt;B&gt; {
+    <span class="doccomment">/// HPACK encoder
+    </span>hpack: hpack::Encoder,
 
-    <span class="doccomment">/// Write buffer</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// TODO: Should this be a ring buffer?</span>
-    <span class="ident">buf</span>: <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Write buffer
+    ///
+    /// TODO: Should this be a ring buffer?
+    </span>buf: Cursor&lt;BytesMut&gt;,
 
-    <span class="doccomment">/// Next frame to encode</span>
-    <span class="ident">next</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Next</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Next frame to encode
+    </span>next: <span class="prelude-ty">Option</span>&lt;Next&lt;B&gt;&gt;,
 
-    <span class="doccomment">/// Last data frame</span>
-    <span class="ident">last_data_frame</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">frame::Data</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Last data frame
+    </span>last_data_frame: <span class="prelude-ty">Option</span>&lt;frame::Data&lt;B&gt;&gt;,
 
-    <span class="doccomment">/// Max frame size, this is specified by the peer</span>
-    <span class="ident">max_frame_size</span>: <span class="ident">FrameSize</span>,
+    <span class="doccomment">/// Max frame size, this is specified by the peer
+    </span>max_frame_size: FrameSize,
 
-    <span class="doccomment">/// Whether or not the wrapped `AsyncWrite` supports vectored IO.</span>
-    <span class="ident">is_write_vectored</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether or not the wrapped `AsyncWrite` supports vectored IO.
+    </span>is_write_vectored: bool,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Next</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="ident">Data</span>(<span class="ident">frame::Data</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>),
-    <span class="ident">Continuation</span>(<span class="ident">frame::Continuation</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>Next&lt;B&gt; {
+    Data(frame::Data&lt;B&gt;),
+    Continuation(frame::Continuation),
 }
 
-<span class="doccomment">/// Initialize the connection with this amount of write buffer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The minimum MAX_FRAME_SIZE is 16kb, so always be able to send a HEADERS</span>
-<span class="doccomment">/// frame that big.</span>
-<span class="kw">const</span> <span class="ident">DEFAULT_BUFFER_CAPACITY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span> <span class="op">*</span> <span class="number">1_024</span>;
+<span class="doccomment">/// Initialize the connection with this amount of write buffer.
+///
+/// The minimum MAX_FRAME_SIZE is 16kb, so always be able to send a HEADERS
+/// frame that big.
+</span><span class="kw">const </span>DEFAULT_BUFFER_CAPACITY: usize = <span class="number">16 </span>* <span class="number">1_024</span>;
 
-<span class="doccomment">/// Min buffer required to attempt to write a frame</span>
-<span class="kw">const</span> <span class="ident">MIN_BUFFER_CAPACITY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">frame::HEADER_LEN</span> <span class="op">+</span> <span class="ident">CHAIN_THRESHOLD</span>;
+<span class="doccomment">/// Min buffer required to attempt to write a frame
+</span><span class="kw">const </span>MIN_BUFFER_CAPACITY: usize = frame::HEADER_LEN + CHAIN_THRESHOLD;
 
-<span class="doccomment">/// Chain payloads bigger than this. The remote will never advertise a max frame</span>
-<span class="doccomment">/// size less than this (well, the spec says the max frame size can&#39;t be less</span>
-<span class="doccomment">/// than 16kb, so not even close).</span>
-<span class="kw">const</span> <span class="ident">CHAIN_THRESHOLD</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">256</span>;
+<span class="doccomment">/// Chain payloads bigger than this. The remote will never advertise a max frame
+/// size less than this (well, the spec says the max frame size can&#39;t be less
+/// than 16kb, so not even close).
+</span><span class="kw">const </span>CHAIN_THRESHOLD: usize = <span class="number">256</span>;
 
-<span class="comment">// TODO: Make generic</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">FramedWrite</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+<span class="comment">// TODO: Make generic
+</span><span class="kw">impl</span>&lt;T, B&gt; FramedWrite&lt;T, B&gt;
+<span class="kw">where
+    </span>T: AsyncWrite + Unpin,
+    B: Buf,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">T</span>) -&gt; <span class="ident">FramedWrite</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">is_write_vectored</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">is_write_vectored</span>();
-        <span class="ident">FramedWrite</span> {
-            <span class="ident">inner</span>,
-            <span class="ident">encoder</span>: <span class="ident">Encoder</span> {
-                <span class="ident">hpack</span>: <span class="ident">hpack::Encoder::default</span>(),
-                <span class="ident">buf</span>: <span class="ident">Cursor::new</span>(<span class="ident">BytesMut::with_capacity</span>(<span class="ident">DEFAULT_BUFFER_CAPACITY</span>)),
-                <span class="ident">next</span>: <span class="prelude-val">None</span>,
-                <span class="ident">last_data_frame</span>: <span class="prelude-val">None</span>,
-                <span class="ident">max_frame_size</span>: <span class="ident">frame::DEFAULT_MAX_FRAME_SIZE</span>,
-                <span class="ident">is_write_vectored</span>,
+    <span class="kw">pub fn </span>new(inner: T) -&gt; FramedWrite&lt;T, B&gt; {
+        <span class="kw">let </span>is_write_vectored = inner.is_write_vectored();
+        FramedWrite {
+            inner,
+            encoder: Encoder {
+                hpack: hpack::Encoder::default(),
+                buf: Cursor::new(BytesMut::with_capacity(DEFAULT_BUFFER_CAPACITY)),
+                next: <span class="prelude-val">None</span>,
+                last_data_frame: <span class="prelude-val">None</span>,
+                max_frame_size: frame::DEFAULT_MAX_FRAME_SIZE,
+                is_write_vectored,
             },
         }
     }
 
-    <span class="doccomment">/// Returns `Ready` when `send` is able to accept a frame</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calling this function may result in the current contents of the buffer</span>
-    <span class="doccomment">/// to be flushed to `T`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">has_capacity</span>() {
-            <span class="comment">// Try flushing</span>
-            <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">flush</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
+    <span class="doccomment">/// Returns `Ready` when `send` is able to accept a frame
+    ///
+    /// Calling this function may result in the current contents of the buffer
+    /// to be flushed to `T`.
+    </span><span class="kw">pub fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.encoder.has_capacity() {
+            <span class="comment">// Try flushing
+            </span><span class="macro">ready!</span>(<span class="self">self</span>.flush(cx))<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">has_capacity</span>() {
-                <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+            <span class="kw">if </span>!<span class="self">self</span>.encoder.has_capacity() {
+                <span class="kw">return </span>Poll::Pending;
             }
         }
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="doccomment">/// Buffer a frame.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `poll_ready` must be called first to ensure that a frame may be</span>
-    <span class="doccomment">/// accepted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buffer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">buffer</span>(<span class="ident">item</span>)
+    <span class="doccomment">/// Buffer a frame.
+    ///
+    /// `poll_ready` must be called first to ensure that a frame may be
+    /// accepted.
+    </span><span class="kw">pub fn </span>buffer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: Frame&lt;B&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), UserError&gt; {
+        <span class="self">self</span>.encoder.buffer(item)
     }
 
-    <span class="doccomment">/// Flush buffered data to the wire</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;FramedWrite::flush&quot;</span>);
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+    <span class="doccomment">/// Flush buffered data to the wire
+    </span><span class="kw">pub fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;FramedWrite::flush&quot;</span>);
+        <span class="kw">let </span>_e = span.enter();
 
-        <span class="kw">loop</span> {
-            <span class="kw">while</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">next</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">Next::Data</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">frame</span>)) =&gt; {
-                        <span class="macro">tracing::trace!</span>(<span class="ident">queued_data_frame</span> <span class="op">=</span> <span class="bool-val">true</span>);
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> (<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">buf</span>).<span class="ident">chain</span>(<span class="ident">frame</span>.<span class="ident">payload_mut</span>());
-                        <span class="macro">ready!</span>(<span class="ident">write</span>(
-                            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>,
-                            <span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">is_write_vectored</span>,
-                            <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>,
-                            <span class="ident">cx</span>,
-                        ))<span class="question-mark">?</span>
-                    }
-                    <span class="kw">_</span> =&gt; {
-                        <span class="macro">tracing::trace!</span>(<span class="ident">queued_data_frame</span> <span class="op">=</span> <span class="bool-val">false</span>);
-                        <span class="macro">ready!</span>(<span class="ident">write</span>(
-                            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>,
-                            <span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">is_write_vectored</span>,
-                            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">buf</span>,
-                            <span class="ident">cx</span>,
-                        ))<span class="question-mark">?</span>
-                    }
+        <span class="kw">loop </span>{
+            <span class="kw">while </span>!<span class="self">self</span>.encoder.is_empty() {
+                <span class="kw">match </span><span class="self">self</span>.encoder.next {
+                    <span class="prelude-val">Some</span>(Next::Data(<span class="kw-2">ref mut </span>frame)) =&gt; {
+                        <span class="macro">tracing::trace!</span>(queued_data_frame = <span class="bool-val">true</span>);
+                        <span class="kw">let </span><span class="kw-2">mut </span>buf = (<span class="kw-2">&amp;mut </span><span class="self">self</span>.encoder.buf).chain(frame.payload_mut());
+                        <span class="macro">ready!</span>(write(
+                            <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner,
+                            <span class="self">self</span>.encoder.is_write_vectored,
+                            <span class="kw-2">&amp;mut </span>buf,
+                            cx,
+                        ))<span class="question-mark">?
+                    </span>}
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="macro">tracing::trace!</span>(queued_data_frame = <span class="bool-val">false</span>);
+                        <span class="macro">ready!</span>(write(
+                            <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner,
+                            <span class="self">self</span>.encoder.is_write_vectored,
+                            <span class="kw-2">&amp;mut </span><span class="self">self</span>.encoder.buf,
+                            cx,
+                        ))<span class="question-mark">?
+                    </span>}
                 }
             }
 
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">unset_frame</span>() {
-                <span class="ident">ControlFlow::Continue</span> =&gt; (),
-                <span class="ident">ControlFlow::Break</span> =&gt; <span class="kw">break</span>,
+            <span class="kw">match </span><span class="self">self</span>.encoder.unset_frame() {
+                ControlFlow::Continue =&gt; (),
+                ControlFlow::Break =&gt; <span class="kw">break</span>,
             }
         }
 
         <span class="macro">tracing::trace!</span>(<span class="string">&quot;flushing buffer&quot;</span>);
-        <span class="comment">// Flush the upstream</span>
-        <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
+        <span class="comment">// Flush the upstream
+        </span><span class="macro">ready!</span>(Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_flush(cx))<span class="question-mark">?</span>;
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="doccomment">/// Close the codec</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">flush</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>)
+    <span class="doccomment">/// Close the codec
+    </span><span class="kw">pub fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="macro">ready!</span>(<span class="self">self</span>.flush(cx))<span class="question-mark">?</span>;
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_shutdown(cx)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">write</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>(
-    <span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-    <span class="ident">is_write_vectored</span>: <span class="ident">bool</span>,
-    <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
-    <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+<span class="kw">fn </span>write&lt;T, B&gt;(
+    writer: <span class="kw-2">&amp;mut </span>T,
+    is_write_vectored: bool,
+    buf: <span class="kw-2">&amp;mut </span>B,
+    cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; Poll&lt;io::Result&lt;()&gt;&gt;
+<span class="kw">where
+    </span>T: AsyncWrite + Unpin,
+    B: Buf,
 {
-    <span class="comment">// TODO(eliza): when tokio-util 0.5.1 is released, this</span>
-    <span class="comment">// could just use `poll_write_buf`...</span>
-    <span class="kw">const</span> <span class="ident">MAX_IOVS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">64</span>;
-    <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_write_vectored</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bufs</span> <span class="op">=</span> [<span class="ident">IoSlice::new</span>(<span class="kw-2">&amp;</span>[]); <span class="ident">MAX_IOVS</span>];
-        <span class="kw">let</span> <span class="ident">cnt</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">chunks_vectored</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bufs</span>);
-        <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">writer</span>).<span class="ident">poll_write_vectored</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="ident">bufs</span>[..<span class="ident">cnt</span>]))<span class="question-mark">?</span>
-    } <span class="kw">else</span> {
-        <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">writer</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>.<span class="ident">chunk</span>()))<span class="question-mark">?</span>
-    };
-    <span class="ident">buf</span>.<span class="ident">advance</span>(<span class="ident">n</span>);
-    <span class="prelude-val">Ok</span>(()).<span class="ident">into</span>()
+    <span class="comment">// TODO(eliza): when tokio-util 0.5.1 is released, this
+    // could just use `poll_write_buf`...
+    </span><span class="kw">const </span>MAX_IOVS: usize = <span class="number">64</span>;
+    <span class="kw">let </span>n = <span class="kw">if </span>is_write_vectored {
+        <span class="kw">let </span><span class="kw-2">mut </span>bufs = [IoSlice::new(<span class="kw-2">&amp;</span>[]); MAX_IOVS];
+        <span class="kw">let </span>cnt = buf.chunks_vectored(<span class="kw-2">&amp;mut </span>bufs);
+        <span class="macro">ready!</span>(Pin::new(writer).poll_write_vectored(cx, <span class="kw-2">&amp;</span>bufs[..cnt]))<span class="question-mark">?
+    </span>} <span class="kw">else </span>{
+        <span class="macro">ready!</span>(Pin::new(writer).poll_write(cx, buf.chunk()))<span class="question-mark">?
+    </span>};
+    buf.advance(n);
+    <span class="prelude-val">Ok</span>(()).into()
 }
 
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">enum</span> <span class="ident">ControlFlow</span> {
-    <span class="ident">Continue</span>,
-    <span class="ident">Break</span>,
+<span class="attribute">#[must_use]
+</span><span class="kw">enum </span>ControlFlow {
+    Continue,
+    Break,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Encoder</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+<span class="kw">impl</span>&lt;B&gt; Encoder&lt;B&gt;
+<span class="kw">where
+    </span>B: Buf,
 {
-    <span class="kw">fn</span> <span class="ident">unset_frame</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ControlFlow</span> {
-        <span class="comment">// Clear internal buffer</span>
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">set_position</span>(<span class="number">0</span>);
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_mut</span>().<span class="ident">clear</span>();
+    <span class="kw">fn </span>unset_frame(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ControlFlow {
+        <span class="comment">// Clear internal buffer
+        </span><span class="self">self</span>.buf.set_position(<span class="number">0</span>);
+        <span class="self">self</span>.buf.get_mut().clear();
 
-        <span class="comment">// The data frame has been written, so unset it</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">take</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">Next::Data</span>(<span class="ident">frame</span>)) =&gt; {
-                <span class="self">self</span>.<span class="ident">last_data_frame</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">frame</span>);
-                <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">is_empty</span>());
-                <span class="ident">ControlFlow::Break</span>
+        <span class="comment">// The data frame has been written, so unset it
+        </span><span class="kw">match </span><span class="self">self</span>.next.take() {
+            <span class="prelude-val">Some</span>(Next::Data(frame)) =&gt; {
+                <span class="self">self</span>.last_data_frame = <span class="prelude-val">Some</span>(frame);
+                <span class="macro">debug_assert!</span>(<span class="self">self</span>.is_empty());
+                ControlFlow::Break
             }
-            <span class="prelude-val">Some</span>(<span class="ident">Next::Continuation</span>(<span class="ident">frame</span>)) =&gt; {
-                <span class="comment">// Buffer the continuation frame, then try to write again</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">limited_write_buf!</span>(<span class="self">self</span>);
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">continuation</span>) <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>) {
-                    <span class="self">self</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Next::Continuation</span>(<span class="ident">continuation</span>));
+            <span class="prelude-val">Some</span>(Next::Continuation(frame)) =&gt; {
+                <span class="comment">// Buffer the continuation frame, then try to write again
+                </span><span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">limited_write_buf!</span>(<span class="self">self</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(continuation) = frame.encode(<span class="kw-2">&amp;mut </span>buf) {
+                    <span class="self">self</span>.next = <span class="prelude-val">Some</span>(Next::Continuation(continuation));
                 }
-                <span class="ident">ControlFlow::Continue</span>
+                ControlFlow::Continue
             }
-            <span class="prelude-val">None</span> =&gt; <span class="ident">ControlFlow::Break</span>,
+            <span class="prelude-val">None </span>=&gt; ControlFlow::Break,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">buffer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
-        <span class="comment">// Ensure that we have enough capacity to accept the write.</span>
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">has_capacity</span>());
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;FramedWrite::buffer&quot;</span>, <span class="ident">frame</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">item</span>);
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+    <span class="kw">fn </span>buffer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: Frame&lt;B&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), UserError&gt; {
+        <span class="comment">// Ensure that we have enough capacity to accept the write.
+        </span><span class="macro">assert!</span>(<span class="self">self</span>.has_capacity());
+        <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;FramedWrite::buffer&quot;</span>, frame = <span class="question-mark">?</span>item);
+        <span class="kw">let </span>_e = span.enter();
 
-        <span class="macro">tracing::debug!</span>(<span class="ident">frame</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">item</span>, <span class="string">&quot;send&quot;</span>);
+        <span class="macro">tracing::debug!</span>(frame = <span class="question-mark">?</span>item, <span class="string">&quot;send&quot;</span>);
 
-        <span class="kw">match</span> <span class="ident">item</span> {
-            <span class="ident">Frame::Data</span>(<span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; {
-                <span class="comment">// Ensure that the payload is not greater than the max frame.</span>
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">payload</span>().<span class="ident">remaining</span>();
+        <span class="kw">match </span>item {
+            Frame::Data(<span class="kw-2">mut </span>v) =&gt; {
+                <span class="comment">// Ensure that the payload is not greater than the max frame.
+                </span><span class="kw">let </span>len = v.payload().remaining();
 
-                <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">max_frame_size</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PayloadTooBig</span>);
+                <span class="kw">if </span>len &gt; <span class="self">self</span>.max_frame_size() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(PayloadTooBig);
                 }
 
-                <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">CHAIN_THRESHOLD</span> {
-                    <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">head</span>();
+                <span class="kw">if </span>len &gt;= CHAIN_THRESHOLD {
+                    <span class="kw">let </span>head = v.head();
 
-                    <span class="comment">// Encode the frame head to the buffer</span>
-                    <span class="ident">head</span>.<span class="ident">encode</span>(<span class="ident">len</span>, <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_mut</span>());
+                    <span class="comment">// Encode the frame head to the buffer
+                    </span>head.encode(len, <span class="self">self</span>.buf.get_mut());
 
-                    <span class="comment">// Save the data frame</span>
-                    <span class="self">self</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Next::Data</span>(<span class="ident">v</span>));
-                } <span class="kw">else</span> {
-                    <span class="ident">v</span>.<span class="ident">encode_chunk</span>(<span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_mut</span>());
+                    <span class="comment">// Save the data frame
+                    </span><span class="self">self</span>.next = <span class="prelude-val">Some</span>(Next::Data(v));
+                } <span class="kw">else </span>{
+                    v.encode_chunk(<span class="self">self</span>.buf.get_mut());
 
-                    <span class="comment">// The chunk has been fully encoded, so there is no need to</span>
-                    <span class="comment">// keep it around</span>
-                    <span class="macro">assert_eq!</span>(<span class="ident">v</span>.<span class="ident">payload</span>().<span class="ident">remaining</span>(), <span class="number">0</span>, <span class="string">&quot;chunk not fully encoded&quot;</span>);
+                    <span class="comment">// The chunk has been fully encoded, so there is no need to
+                    // keep it around
+                    </span><span class="macro">assert_eq!</span>(v.payload().remaining(), <span class="number">0</span>, <span class="string">&quot;chunk not fully encoded&quot;</span>);
 
-                    <span class="comment">// Save off the last frame...</span>
-                    <span class="self">self</span>.<span class="ident">last_data_frame</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>);
+                    <span class="comment">// Save off the last frame...
+                    </span><span class="self">self</span>.last_data_frame = <span class="prelude-val">Some</span>(v);
                 }
             }
-            <span class="ident">Frame::Headers</span>(<span class="ident">v</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">limited_write_buf!</span>(<span class="self">self</span>);
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">continuation</span>) <span class="op">=</span> <span class="ident">v</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">hpack</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>) {
-                    <span class="self">self</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Next::Continuation</span>(<span class="ident">continuation</span>));
+            Frame::Headers(v) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">limited_write_buf!</span>(<span class="self">self</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(continuation) = v.encode(<span class="kw-2">&amp;mut </span><span class="self">self</span>.hpack, <span class="kw-2">&amp;mut </span>buf) {
+                    <span class="self">self</span>.next = <span class="prelude-val">Some</span>(Next::Continuation(continuation));
                 }
             }
-            <span class="ident">Frame::PushPromise</span>(<span class="ident">v</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">limited_write_buf!</span>(<span class="self">self</span>);
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">continuation</span>) <span class="op">=</span> <span class="ident">v</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">hpack</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>) {
-                    <span class="self">self</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Next::Continuation</span>(<span class="ident">continuation</span>));
+            Frame::PushPromise(v) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">limited_write_buf!</span>(<span class="self">self</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(continuation) = v.encode(<span class="kw-2">&amp;mut </span><span class="self">self</span>.hpack, <span class="kw-2">&amp;mut </span>buf) {
+                    <span class="self">self</span>.next = <span class="prelude-val">Some</span>(Next::Continuation(continuation));
                 }
             }
-            <span class="ident">Frame::Settings</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">v</span>.<span class="ident">encode</span>(<span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_mut</span>());
-                <span class="macro">tracing::trace!</span>(<span class="ident">rem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">remaining</span>(), <span class="string">&quot;encoded settings&quot;</span>);
+            Frame::Settings(v) =&gt; {
+                v.encode(<span class="self">self</span>.buf.get_mut());
+                <span class="macro">tracing::trace!</span>(rem = <span class="self">self</span>.buf.remaining(), <span class="string">&quot;encoded settings&quot;</span>);
             }
-            <span class="ident">Frame::GoAway</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">v</span>.<span class="ident">encode</span>(<span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_mut</span>());
-                <span class="macro">tracing::trace!</span>(<span class="ident">rem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">remaining</span>(), <span class="string">&quot;encoded go_away&quot;</span>);
+            Frame::GoAway(v) =&gt; {
+                v.encode(<span class="self">self</span>.buf.get_mut());
+                <span class="macro">tracing::trace!</span>(rem = <span class="self">self</span>.buf.remaining(), <span class="string">&quot;encoded go_away&quot;</span>);
             }
-            <span class="ident">Frame::Ping</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">v</span>.<span class="ident">encode</span>(<span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_mut</span>());
-                <span class="macro">tracing::trace!</span>(<span class="ident">rem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">remaining</span>(), <span class="string">&quot;encoded ping&quot;</span>);
+            Frame::Ping(v) =&gt; {
+                v.encode(<span class="self">self</span>.buf.get_mut());
+                <span class="macro">tracing::trace!</span>(rem = <span class="self">self</span>.buf.remaining(), <span class="string">&quot;encoded ping&quot;</span>);
             }
-            <span class="ident">Frame::WindowUpdate</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">v</span>.<span class="ident">encode</span>(<span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_mut</span>());
-                <span class="macro">tracing::trace!</span>(<span class="ident">rem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">remaining</span>(), <span class="string">&quot;encoded window_update&quot;</span>);
+            Frame::WindowUpdate(v) =&gt; {
+                v.encode(<span class="self">self</span>.buf.get_mut());
+                <span class="macro">tracing::trace!</span>(rem = <span class="self">self</span>.buf.remaining(), <span class="string">&quot;encoded window_update&quot;</span>);
             }
 
-            <span class="ident">Frame::Priority</span>(<span class="kw">_</span>) =&gt; {
+            Frame::Priority(<span class="kw">_</span>) =&gt; {
                 <span class="comment">/*
                 v.encode(self.buf.get_mut());
                 tracing::trace!(&quot;encoded priority; rem={:?}&quot;, self.buf.remaining());
-                */</span>
-                <span class="macro">unimplemented!</span>();
+                */
+                </span><span class="macro">unimplemented!</span>();
             }
-            <span class="ident">Frame::Reset</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">v</span>.<span class="ident">encode</span>(<span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_mut</span>());
-                <span class="macro">tracing::trace!</span>(<span class="ident">rem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">remaining</span>(), <span class="string">&quot;encoded reset&quot;</span>);
+            Frame::Reset(v) =&gt; {
+                v.encode(<span class="self">self</span>.buf.get_mut());
+                <span class="macro">tracing::trace!</span>(rem = <span class="self">self</span>.buf.remaining(), <span class="string">&quot;encoded reset&quot;</span>);
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">has_capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_ref</span>().<span class="ident">remaining_mut</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">MIN_BUFFER_CAPACITY</span>
+    <span class="kw">fn </span>has_capacity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.next.is_none() &amp;&amp; <span class="self">self</span>.buf.get_ref().remaining_mut() &gt;= MIN_BUFFER_CAPACITY
     }
 
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">next</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">Next::Data</span>(<span class="kw-2">ref</span> <span class="ident">frame</span>)) =&gt; <span class="op">!</span><span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">has_remaining</span>(),
-            <span class="kw">_</span> =&gt; <span class="op">!</span><span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">has_remaining</span>(),
+    <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.next {
+            <span class="prelude-val">Some</span>(Next::Data(<span class="kw-2">ref </span>frame)) =&gt; !frame.payload().has_remaining(),
+            <span class="kw">_ </span>=&gt; !<span class="self">self</span>.buf.has_remaining(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Encoder</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">max_frame_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">max_frame_size</span> <span class="kw">as</span> <span class="ident">usize</span>
+<span class="kw">impl</span>&lt;B&gt; Encoder&lt;B&gt; {
+    <span class="kw">fn </span>max_frame_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.max_frame_size <span class="kw">as </span>usize
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">FramedWrite</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns the max frame size that can be sent</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_frame_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">max_frame_size</span>()
+<span class="kw">impl</span>&lt;T, B&gt; FramedWrite&lt;T, B&gt; {
+    <span class="doccomment">/// Returns the max frame size that can be sent
+    </span><span class="kw">pub fn </span>max_frame_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.encoder.max_frame_size()
     }
 
-    <span class="doccomment">/// Set the peer&#39;s max frame size.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_frame_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) {
-        <span class="macro">assert!</span>(<span class="ident">val</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">frame::MAX_MAX_FRAME_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">max_frame_size</span> <span class="op">=</span> <span class="ident">val</span> <span class="kw">as</span> <span class="ident">FrameSize</span>;
+    <span class="doccomment">/// Set the peer&#39;s max frame size.
+    </span><span class="kw">pub fn </span>set_max_frame_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: usize) {
+        <span class="macro">assert!</span>(val &lt;= frame::MAX_MAX_FRAME_SIZE <span class="kw">as </span>usize);
+        <span class="self">self</span>.encoder.max_frame_size = val <span class="kw">as </span>FrameSize;
     }
 
-    <span class="doccomment">/// Set the peer&#39;s header table size.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_header_table_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">hpack</span>.<span class="ident">update_max_size</span>(<span class="ident">val</span>);
+    <span class="doccomment">/// Set the peer&#39;s header table size.
+    </span><span class="kw">pub fn </span>set_header_table_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: usize) {
+        <span class="self">self</span>.encoder.hpack.update_max_size(val);
     }
 
-    <span class="doccomment">/// Retrieve the last data frame that has been sent</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_last_data_frame</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">frame::Data</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">encoder</span>.<span class="ident">last_data_frame</span>.<span class="ident">take</span>()
+    <span class="doccomment">/// Retrieve the last data frame that has been sent
+    </span><span class="kw">pub fn </span>take_last_data_frame(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;frame::Data&lt;B&gt;&gt; {
+        <span class="self">self</span>.encoder.last_data_frame.take()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">Unpin</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">FramedWrite</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+    <span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner
     }
 }
 
-<span class="comment">// We never project the Pin to `B`.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Unpin</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">FramedWrite</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;T: AsyncRead + Unpin, B&gt; AsyncRead <span class="kw">for </span>FramedWrite&lt;T, B&gt; {
+    <span class="kw">fn </span>poll_read(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>ReadBuf,
+    ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_read(cx, buf)
+    }
+}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">unstable</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="comment">// We never project the Pin to `B`.
+</span><span class="kw">impl</span>&lt;T: Unpin, B&gt; Unpin <span class="kw">for </span>FramedWrite&lt;T, B&gt; {}
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">FramedWrite</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;unstable&quot;</span>)]
+</span><span class="kw">mod </span>unstable {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="kw">impl</span>&lt;T, B&gt; FramedWrite&lt;T, B&gt; {
+        <span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+            <span class="kw-2">&amp;</span><span class="self">self</span>.inner
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/pragma.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pragma.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/pragma.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pragma.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -439,446 +439,446 @@
 <span id="439">439</span>
 <span id="440">440</span>
 <span id="441">441</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Pragma helpers</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Pragma helpers
 
-<span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
+</span><span class="kw">use </span>std::ops::Deref;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">ToSql</span>, <span class="ident">ToSqlOutput</span>, <span class="ident">ValueRef</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Connection</span>, <span class="ident">DatabaseName</span>, <span class="prelude-ty">Result</span>, <span class="ident">Row</span>};
+<span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span><span class="kw">crate</span>::types::{ToSql, ToSqlOutput, ValueRef};
+<span class="kw">use crate</span>::{Connection, DatabaseName, <span class="prelude-ty">Result</span>, Row};
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Sql</span> {
-    <span class="ident">buf</span>: <span class="ident">String</span>,
+<span class="kw">pub struct </span>Sql {
+    buf: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Sql</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Sql</span> {
-        <span class="ident">Sql</span> { <span class="ident">buf</span>: <span class="ident">String::new</span>() }
+<span class="kw">impl </span>Sql {
+    <span class="kw">pub fn </span>new() -&gt; Sql {
+        Sql { buf: String::new() }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_pragma</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">schema_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DatabaseName</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">pragma_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">push_keyword</span>(<span class="string">&quot;PRAGMA&quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">push_space</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">schema_name</span>) <span class="op">=</span> <span class="ident">schema_name</span> {
-            <span class="self">self</span>.<span class="ident">push_schema_name</span>(<span class="ident">schema_name</span>);
-            <span class="self">self</span>.<span class="ident">push_dot</span>();
+    <span class="kw">pub fn </span>push_pragma(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        schema_name: <span class="prelude-ty">Option</span>&lt;DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        pragma_name: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.push_keyword(<span class="string">&quot;PRAGMA&quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.push_space();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_name) = schema_name {
+            <span class="self">self</span>.push_schema_name(schema_name);
+            <span class="self">self</span>.push_dot();
         }
-        <span class="self">self</span>.<span class="ident">push_keyword</span>(<span class="ident">pragma_name</span>)
+        <span class="self">self</span>.push_keyword(pragma_name)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_keyword</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">keyword</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">keyword</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">is_identifier</span>(<span class="ident">keyword</span>) {
-            <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="ident">keyword</span>);
+    <span class="kw">pub fn </span>push_keyword(<span class="kw-2">&amp;mut </span><span class="self">self</span>, keyword: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if </span>!keyword.is_empty() &amp;&amp; is_identifier(keyword) {
+            <span class="self">self</span>.buf.push_str(keyword);
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::SqliteFailure</span>(
-                <span class="ident">ffi::Error::new</span>(<span class="ident">ffi::SQLITE_MISUSE</span>),
-                <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid keyword \&quot;{}\&quot;&quot;</span>, <span class="ident">keyword</span>)),
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(Error::SqliteFailure(
+                ffi::Error::new(ffi::SQLITE_MISUSE),
+                <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid keyword \&quot;{}\&quot;&quot;</span>, keyword)),
             ))
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_schema_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">schema_name</span>: <span class="ident">DatabaseName</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="ident">schema_name</span> {
-            <span class="ident">DatabaseName::Main</span> =&gt; <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="string">&quot;main&quot;</span>),
-            <span class="ident">DatabaseName::Temp</span> =&gt; <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="string">&quot;temp&quot;</span>),
-            <span class="ident">DatabaseName::Attached</span>(<span class="ident">s</span>) =&gt; <span class="self">self</span>.<span class="ident">push_identifier</span>(<span class="ident">s</span>),
+    <span class="kw">pub fn </span>push_schema_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, schema_name: DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">match </span>schema_name {
+            DatabaseName::Main =&gt; <span class="self">self</span>.buf.push_str(<span class="string">&quot;main&quot;</span>),
+            DatabaseName::Temp =&gt; <span class="self">self</span>.buf.push_str(<span class="string">&quot;temp&quot;</span>),
+            DatabaseName::Attached(s) =&gt; <span class="self">self</span>.push_identifier(s),
         };
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_identifier</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">if</span> <span class="ident">is_identifier</span>(<span class="ident">s</span>) {
-            <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="ident">s</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">wrap_and_escape</span>(<span class="ident">s</span>, <span class="string">&#39;&quot;&#39;</span>);
+    <span class="kw">pub fn </span>push_identifier(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">if </span>is_identifier(s) {
+            <span class="self">self</span>.buf.push_str(s);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.wrap_and_escape(s, <span class="string">&#39;&quot;&#39;</span>);
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_sql</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ToSqlOutput::Borrowed</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="ident">ToSqlOutput::Owned</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">ValueRef::from</span>(<span class="ident">v</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;blob&quot;</span>)]</span>
-            <span class="ident">ToSqlOutput::ZeroBlob</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::SqliteFailure</span>(
-                    <span class="ident">ffi::Error::new</span>(<span class="ident">ffi::SQLITE_MISUSE</span>),
-                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{:?}\&quot;&quot;</span>, <span class="ident">value</span>)),
+    <span class="kw">pub fn </span>push_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>value = value.to_sql()<span class="question-mark">?</span>;
+        <span class="kw">let </span>value = <span class="kw">match </span>value {
+            ToSqlOutput::Borrowed(v) =&gt; v,
+            ToSqlOutput::Owned(<span class="kw-2">ref </span>v) =&gt; ValueRef::from(v),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
+            </span>ToSqlOutput::ZeroBlob(<span class="kw">_</span>) =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::SqliteFailure(
+                    ffi::Error::new(ffi::SQLITE_MISUSE),
+                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{:?}\&quot;&quot;</span>, value)),
                 ));
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;array&quot;</span>)]</span>
-            <span class="ident">ToSqlOutput::Array</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::SqliteFailure</span>(
-                    <span class="ident">ffi::Error::new</span>(<span class="ident">ffi::SQLITE_MISUSE</span>),
-                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{:?}\&quot;&quot;</span>, <span class="ident">value</span>)),
-                ));
-            }
-        };
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">ValueRef::Integer</span>(<span class="ident">i</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">push_int</span>(<span class="ident">i</span>);
-            }
-            <span class="ident">ValueRef::Real</span>(<span class="ident">r</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">push_real</span>(<span class="ident">r</span>);
-            }
-            <span class="ident">ValueRef::Text</span>(<span class="ident">s</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">std::str::from_utf8</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">push_string_literal</span>(<span class="ident">s</span>);
-            }
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::SqliteFailure</span>(
-                    <span class="ident">ffi::Error::new</span>(<span class="ident">ffi::SQLITE_MISUSE</span>),
-                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{:?}\&quot;&quot;</span>, <span class="ident">value</span>)),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;array&quot;</span>)]
+            </span>ToSqlOutput::Array(<span class="kw">_</span>) =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::SqliteFailure(
+                    ffi::Error::new(ffi::SQLITE_MISUSE),
+                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{:?}\&quot;&quot;</span>, value)),
                 ));
             }
         };
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_string_literal</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">wrap_and_escape</span>(<span class="ident">s</span>, <span class="string">&#39;\&#39;&#39;</span>);
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_int</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">i64</span>) {
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">to_string</span>());
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_real</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">f64</span>) {
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">to_string</span>());
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_space</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_dot</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;.&#39;</span>);
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_equal_sign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;=&#39;</span>);
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_brace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;(&#39;</span>);
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close_brace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;)&#39;</span>);
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">wrap_and_escape</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">quote</span>: <span class="ident">char</span>) {
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">quote</span>);
-        <span class="kw">let</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">chars</span>();
-        <span class="kw">for</span> <span class="ident">ch</span> <span class="kw">in</span> <span class="ident">chars</span> {
-            <span class="comment">// escape `quote` by doubling it</span>
-            <span class="kw">if</span> <span class="ident">ch</span> <span class="op">==</span> <span class="ident">quote</span> {
-                <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
+        <span class="kw">match </span>value {
+            ValueRef::Integer(i) =&gt; {
+                <span class="self">self</span>.push_int(i);
             }
-            <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">ch</span>)
-        }
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">quote</span>);
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Sql</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">str</span>;
-
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">as_str</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Connection</span> {
-    <span class="doccomment">/// Query the current value of `pragma_name`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Some pragmas will return multiple rows/values which cannot be retrieved</span>
-    <span class="doccomment">/// with this method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prefer [PRAGMA function](https://sqlite.org/pragma.html#pragfunc) introduced in SQLite 3.20:</span>
-    <span class="doccomment">/// `SELECT user_version FROM pragma_user_version;`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pragma_query_value</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">schema_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DatabaseName</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">pragma_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Sql::new</span>();
-        <span class="ident">query</span>.<span class="ident">push_pragma</span>(<span class="ident">schema_name</span>, <span class="ident">pragma_name</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">query_row</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, [], <span class="ident">f</span>)
-    }
-
-    <span class="doccomment">/// Query the current rows/values of `pragma_name`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prefer [PRAGMA function](https://sqlite.org/pragma.html#pragfunc) introduced in SQLite 3.20:</span>
-    <span class="doccomment">/// `SELECT * FROM pragma_collation_list;`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pragma_query</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">schema_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DatabaseName</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">pragma_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Sql::new</span>();
-        <span class="ident">query</span>.<span class="ident">push_pragma</span>(<span class="ident">schema_name</span>, <span class="ident">pragma_name</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">prepare</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">query</span>([])<span class="question-mark">?</span>;
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">result_row</span>) <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
-            <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">result_row</span>;
-            <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">row</span>)<span class="question-mark">?</span>;
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Query the current value(s) of `pragma_name` associated to</span>
-    <span class="doccomment">/// `pragma_value`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be used with query-only pragmas which need an argument</span>
-    <span class="doccomment">/// (e.g. `table_info(&#39;one_tbl&#39;)`) or pragmas which returns value(s)</span>
-    <span class="doccomment">/// (e.g. `integrity_check`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prefer [PRAGMA function](https://sqlite.org/pragma.html#pragfunc) introduced in SQLite 3.20:</span>
-    <span class="doccomment">/// `SELECT * FROM pragma_table_info(?);`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pragma</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">schema_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DatabaseName</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">pragma_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">pragma_value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>,
-        <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql</span> <span class="op">=</span> <span class="ident">Sql::new</span>();
-        <span class="ident">sql</span>.<span class="ident">push_pragma</span>(<span class="ident">schema_name</span>, <span class="ident">pragma_name</span>)<span class="question-mark">?</span>;
-        <span class="comment">// The argument may be either in parentheses</span>
-        <span class="comment">// or it may be separated from the pragma name by an equal sign.</span>
-        <span class="comment">// The two syntaxes yield identical results.</span>
-        <span class="ident">sql</span>.<span class="ident">open_brace</span>();
-        <span class="ident">sql</span>.<span class="ident">push_value</span>(<span class="ident">pragma_value</span>)<span class="question-mark">?</span>;
-        <span class="ident">sql</span>.<span class="ident">close_brace</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">prepare</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">query</span>([])<span class="question-mark">?</span>;
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">result_row</span>) <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
-            <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">result_row</span>;
-            <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">row</span>)<span class="question-mark">?</span>;
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Set a new value to `pragma_name`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Some pragmas will return the updated value which cannot be retrieved</span>
-    <span class="doccomment">/// with this method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pragma_update</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">schema_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DatabaseName</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">pragma_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">pragma_value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql</span> <span class="op">=</span> <span class="ident">Sql::new</span>();
-        <span class="ident">sql</span>.<span class="ident">push_pragma</span>(<span class="ident">schema_name</span>, <span class="ident">pragma_name</span>)<span class="question-mark">?</span>;
-        <span class="comment">// The argument may be either in parentheses</span>
-        <span class="comment">// or it may be separated from the pragma name by an equal sign.</span>
-        <span class="comment">// The two syntaxes yield identical results.</span>
-        <span class="ident">sql</span>.<span class="ident">push_equal_sign</span>();
-        <span class="ident">sql</span>.<span class="ident">push_value</span>(<span class="ident">pragma_value</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">execute_batch</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>)
-    }
-
-    <span class="doccomment">/// Set a new value to `pragma_name` and return the updated value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only few pragmas automatically return the updated value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pragma_update_and_check</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">schema_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DatabaseName</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">pragma_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">pragma_value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql</span> <span class="op">=</span> <span class="ident">Sql::new</span>();
-        <span class="ident">sql</span>.<span class="ident">push_pragma</span>(<span class="ident">schema_name</span>, <span class="ident">pragma_name</span>)<span class="question-mark">?</span>;
-        <span class="comment">// The argument may be either in parentheses</span>
-        <span class="comment">// or it may be separated from the pragma name by an equal sign.</span>
-        <span class="comment">// The two syntaxes yield identical results.</span>
-        <span class="ident">sql</span>.<span class="ident">push_equal_sign</span>();
-        <span class="ident">sql</span>.<span class="ident">push_value</span>(<span class="ident">pragma_value</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">query_row</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>, [], <span class="ident">f</span>)
-    }
-}
-
-<span class="kw">fn</span> <span class="ident">is_identifier</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">char_indices</span>();
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">chars</span> {
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">is_identifier_start</span>(<span class="ident">ch</span>) {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+            ValueRef::Real(r) =&gt; {
+                <span class="self">self</span>.push_real(r);
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">is_identifier_continue</span>(<span class="ident">ch</span>) {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
-        }
-    }
-    <span class="bool-val">true</span>
-}
-
-<span class="kw">fn</span> <span class="ident">is_identifier_start</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    (<span class="string">&#39;A&#39;</span>..<span class="op">=</span><span class="string">&#39;Z&#39;</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;_&#39;</span> <span class="op">|</span><span class="op">|</span> (<span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">&gt;</span> <span class="string">&#39;\x7F&#39;</span>
-}
-
-<span class="kw">fn</span> <span class="ident">is_identifier_continue</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;$&#39;</span>
-        <span class="op">|</span><span class="op">|</span> (<span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>)
-        <span class="op">|</span><span class="op">|</span> (<span class="string">&#39;A&#39;</span>..<span class="op">=</span><span class="string">&#39;Z&#39;</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>)
-        <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;_&#39;</span>
-        <span class="op">|</span><span class="op">|</span> (<span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>)
-        <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">&gt;</span> <span class="string">&#39;\x7F&#39;</span>
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Sql</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pragma</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Connection</span>, <span class="ident">DatabaseName</span>, <span class="prelude-ty">Result</span>};
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pragma_query_value</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">user_version</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">pragma_query_value</span>(<span class="prelude-val">None</span>, <span class="string">&quot;user_version&quot;</span>, <span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">user_version</span>);
+            ValueRef::Text(s) =&gt; {
+                <span class="kw">let </span>s = std::str::from_utf8(s)<span class="question-mark">?</span>;
+                <span class="self">self</span>.push_string_literal(s);
+            }
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::SqliteFailure(
+                    ffi::Error::new(ffi::SQLITE_MISUSE),
+                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{:?}\&quot;&quot;</span>, value)),
+                ));
+            }
+        };
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">pragma_func_query_value</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">user_version</span>: <span class="ident">i32</span> <span class="op">=</span>
-            <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT user_version FROM pragma_user_version&quot;</span>, [], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> {
-                <span class="ident">row</span>.<span class="ident">get</span>(<span class="number">0</span>)
+    <span class="kw">pub fn </span>push_string_literal(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.wrap_and_escape(s, <span class="string">&#39;\&#39;&#39;</span>);
+    }
+
+    <span class="kw">pub fn </span>push_int(<span class="kw-2">&amp;mut </span><span class="self">self</span>, i: i64) {
+        <span class="self">self</span>.buf.push_str(<span class="kw-2">&amp;</span>i.to_string());
+    }
+
+    <span class="kw">pub fn </span>push_real(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: f64) {
+        <span class="self">self</span>.buf.push_str(<span class="kw-2">&amp;</span>f.to_string());
+    }
+
+    <span class="kw">pub fn </span>push_space(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.buf.push(<span class="string">&#39; &#39;</span>);
+    }
+
+    <span class="kw">pub fn </span>push_dot(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.buf.push(<span class="string">&#39;.&#39;</span>);
+    }
+
+    <span class="kw">pub fn </span>push_equal_sign(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.buf.push(<span class="string">&#39;=&#39;</span>);
+    }
+
+    <span class="kw">pub fn </span>open_brace(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.buf.push(<span class="string">&#39;(&#39;</span>);
+    }
+
+    <span class="kw">pub fn </span>close_brace(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.buf.push(<span class="string">&#39;)&#39;</span>);
+    }
+
+    <span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.buf
+    }
+
+    <span class="kw">fn </span>wrap_and_escape(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str, quote: char) {
+        <span class="self">self</span>.buf.push(quote);
+        <span class="kw">let </span>chars = s.chars();
+        <span class="kw">for </span>ch <span class="kw">in </span>chars {
+            <span class="comment">// escape `quote` by doubling it
+            </span><span class="kw">if </span>ch == quote {
+                <span class="self">self</span>.buf.push(ch);
+            }
+            <span class="self">self</span>.buf.push(ch)
+        }
+        <span class="self">self</span>.buf.push(quote);
+    }
+}
+
+<span class="kw">impl </span>Deref <span class="kw">for </span>Sql {
+    <span class="kw">type </span>Target = str;
+
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.as_str()
+    }
+}
+
+<span class="kw">impl </span>Connection {
+    <span class="doccomment">/// Query the current value of `pragma_name`.
+    ///
+    /// Some pragmas will return multiple rows/values which cannot be retrieved
+    /// with this method.
+    ///
+    /// Prefer [PRAGMA function](https://sqlite.org/pragma.html#pragfunc) introduced in SQLite 3.20:
+    /// `SELECT user_version FROM pragma_user_version;`
+    </span><span class="kw">pub fn </span>pragma_query_value&lt;T, F&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        schema_name: <span class="prelude-ty">Option</span>&lt;DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        pragma_name: <span class="kw-2">&amp;</span>str,
+        f: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;,
+    {
+        <span class="kw">let </span><span class="kw-2">mut </span>query = Sql::new();
+        query.push_pragma(schema_name, pragma_name)<span class="question-mark">?</span>;
+        <span class="self">self</span>.query_row(<span class="kw-2">&amp;</span>query, [], f)
+    }
+
+    <span class="doccomment">/// Query the current rows/values of `pragma_name`.
+    ///
+    /// Prefer [PRAGMA function](https://sqlite.org/pragma.html#pragfunc) introduced in SQLite 3.20:
+    /// `SELECT * FROM pragma_collation_list;`
+    </span><span class="kw">pub fn </span>pragma_query&lt;F&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        schema_name: <span class="prelude-ty">Option</span>&lt;DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        pragma_name: <span class="kw-2">&amp;</span>str,
+        <span class="kw-2">mut </span>f: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;,
+    {
+        <span class="kw">let </span><span class="kw-2">mut </span>query = Sql::new();
+        query.push_pragma(schema_name, pragma_name)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>stmt = <span class="self">self</span>.prepare(<span class="kw-2">&amp;</span>query)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query([])<span class="question-mark">?</span>;
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(result_row) = rows.next()<span class="question-mark">? </span>{
+            <span class="kw">let </span>row = result_row;
+            f(<span class="kw-2">&amp;</span>row)<span class="question-mark">?</span>;
+        }
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Query the current value(s) of `pragma_name` associated to
+    /// `pragma_value`.
+    ///
+    /// This method can be used with query-only pragmas which need an argument
+    /// (e.g. `table_info(&#39;one_tbl&#39;)`) or pragmas which returns value(s)
+    /// (e.g. `integrity_check`).
+    ///
+    /// Prefer [PRAGMA function](https://sqlite.org/pragma.html#pragfunc) introduced in SQLite 3.20:
+    /// `SELECT * FROM pragma_table_info(?);`
+    </span><span class="kw">pub fn </span>pragma&lt;F&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        schema_name: <span class="prelude-ty">Option</span>&lt;DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        pragma_name: <span class="kw-2">&amp;</span>str,
+        pragma_value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql,
+        <span class="kw-2">mut </span>f: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;,
+    {
+        <span class="kw">let </span><span class="kw-2">mut </span>sql = Sql::new();
+        sql.push_pragma(schema_name, pragma_name)<span class="question-mark">?</span>;
+        <span class="comment">// The argument may be either in parentheses
+        // or it may be separated from the pragma name by an equal sign.
+        // The two syntaxes yield identical results.
+        </span>sql.open_brace();
+        sql.push_value(pragma_value)<span class="question-mark">?</span>;
+        sql.close_brace();
+        <span class="kw">let </span><span class="kw-2">mut </span>stmt = <span class="self">self</span>.prepare(<span class="kw-2">&amp;</span>sql)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query([])<span class="question-mark">?</span>;
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(result_row) = rows.next()<span class="question-mark">? </span>{
+            <span class="kw">let </span>row = result_row;
+            f(<span class="kw-2">&amp;</span>row)<span class="question-mark">?</span>;
+        }
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Set a new value to `pragma_name`.
+    ///
+    /// Some pragmas will return the updated value which cannot be retrieved
+    /// with this method.
+    </span><span class="kw">pub fn </span>pragma_update(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        schema_name: <span class="prelude-ty">Option</span>&lt;DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        pragma_name: <span class="kw-2">&amp;</span>str,
+        pragma_value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>sql = Sql::new();
+        sql.push_pragma(schema_name, pragma_name)<span class="question-mark">?</span>;
+        <span class="comment">// The argument may be either in parentheses
+        // or it may be separated from the pragma name by an equal sign.
+        // The two syntaxes yield identical results.
+        </span>sql.push_equal_sign();
+        sql.push_value(pragma_value)<span class="question-mark">?</span>;
+        <span class="self">self</span>.execute_batch(<span class="kw-2">&amp;</span>sql)
+    }
+
+    <span class="doccomment">/// Set a new value to `pragma_name` and return the updated value.
+    ///
+    /// Only few pragmas automatically return the updated value.
+    </span><span class="kw">pub fn </span>pragma_update_and_check&lt;F, T&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        schema_name: <span class="prelude-ty">Option</span>&lt;DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        pragma_name: <span class="kw-2">&amp;</span>str,
+        pragma_value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql,
+        f: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;,
+    {
+        <span class="kw">let </span><span class="kw-2">mut </span>sql = Sql::new();
+        sql.push_pragma(schema_name, pragma_name)<span class="question-mark">?</span>;
+        <span class="comment">// The argument may be either in parentheses
+        // or it may be separated from the pragma name by an equal sign.
+        // The two syntaxes yield identical results.
+        </span>sql.push_equal_sign();
+        sql.push_value(pragma_value)<span class="question-mark">?</span>;
+        <span class="self">self</span>.query_row(<span class="kw-2">&amp;</span>sql, [], f)
+    }
+}
+
+<span class="kw">fn </span>is_identifier(s: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">let </span>chars = s.char_indices();
+    <span class="kw">for </span>(i, ch) <span class="kw">in </span>chars {
+        <span class="kw">if </span>i == <span class="number">0 </span>{
+            <span class="kw">if </span>!is_identifier_start(ch) {
+                <span class="kw">return </span><span class="bool-val">false</span>;
+            }
+        } <span class="kw">else if </span>!is_identifier_continue(ch) {
+            <span class="kw">return </span><span class="bool-val">false</span>;
+        }
+    }
+    <span class="bool-val">true
+</span>}
+
+<span class="kw">fn </span>is_identifier_start(c: char) -&gt; bool {
+    (<span class="string">&#39;A&#39;</span>..=<span class="string">&#39;Z&#39;</span>).contains(<span class="kw-2">&amp;</span>c) || c == <span class="string">&#39;_&#39; </span>|| (<span class="string">&#39;a&#39;</span>..=<span class="string">&#39;z&#39;</span>).contains(<span class="kw-2">&amp;</span>c) || c &gt; <span class="string">&#39;\x7F&#39;
+</span>}
+
+<span class="kw">fn </span>is_identifier_continue(c: char) -&gt; bool {
+    c == <span class="string">&#39;$&#39;
+        </span>|| (<span class="string">&#39;0&#39;</span>..=<span class="string">&#39;9&#39;</span>).contains(<span class="kw-2">&amp;</span>c)
+        || (<span class="string">&#39;A&#39;</span>..=<span class="string">&#39;Z&#39;</span>).contains(<span class="kw-2">&amp;</span>c)
+        || c == <span class="string">&#39;_&#39;
+        </span>|| (<span class="string">&#39;a&#39;</span>..=<span class="string">&#39;z&#39;</span>).contains(<span class="kw-2">&amp;</span>c)
+        || c &gt; <span class="string">&#39;\x7F&#39;
+</span>}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::Sql;
+    <span class="kw">use </span><span class="kw">crate</span>::pragma;
+    <span class="kw">use crate</span>::{Connection, DatabaseName, <span class="prelude-ty">Result</span>};
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>pragma_query_value() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span>user_version: i32 = db.pragma_query_value(<span class="prelude-val">None</span>, <span class="string">&quot;user_version&quot;</span>, |row| row.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, user_version);
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+    </span><span class="kw">fn </span>pragma_func_query_value() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span>user_version: i32 =
+            db.query_row(<span class="string">&quot;SELECT user_version FROM pragma_user_version&quot;</span>, [], |row| {
+                row.get(<span class="number">0</span>)
             })<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">user_version</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, user_version);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pragma_query_no_schema</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user_version</span> <span class="op">=</span> <span class="op">-</span><span class="number">1</span>;
-        <span class="ident">db</span>.<span class="ident">pragma_query</span>(<span class="prelude-val">None</span>, <span class="string">&quot;user_version&quot;</span>, <span class="op">|</span><span class="ident">row</span><span class="op">|</span> {
-            <span class="ident">user_version</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="number">0</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>pragma_query_no_schema() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>user_version = -<span class="number">1</span>;
+        db.pragma_query(<span class="prelude-val">None</span>, <span class="string">&quot;user_version&quot;</span>, |row| {
+            user_version = row.get(<span class="number">0</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(())
         })<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">user_version</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, user_version);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pragma_query_with_schema</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user_version</span> <span class="op">=</span> <span class="op">-</span><span class="number">1</span>;
-        <span class="ident">db</span>.<span class="ident">pragma_query</span>(<span class="prelude-val">Some</span>(<span class="ident">DatabaseName::Main</span>), <span class="string">&quot;user_version&quot;</span>, <span class="op">|</span><span class="ident">row</span><span class="op">|</span> {
-            <span class="ident">user_version</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="number">0</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>pragma_query_with_schema() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>user_version = -<span class="number">1</span>;
+        db.pragma_query(<span class="prelude-val">Some</span>(DatabaseName::Main), <span class="string">&quot;user_version&quot;</span>, |row| {
+            user_version = row.get(<span class="number">0</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(())
         })<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">user_version</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, user_version);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pragma</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">db</span>.<span class="ident">pragma</span>(<span class="prelude-val">None</span>, <span class="string">&quot;table_info&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;sqlite_master&quot;</span>, <span class="op">|</span><span class="ident">row</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">column</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="number">1</span>)<span class="question-mark">?</span>;
-            <span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">column</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>pragma() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>columns = Vec::new();
+        db.pragma(<span class="prelude-val">None</span>, <span class="string">&quot;table_info&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;sqlite_master&quot;</span>, |row| {
+            <span class="kw">let </span>column: String = row.get(<span class="number">1</span>)<span class="question-mark">?</span>;
+            columns.push(column);
             <span class="prelude-val">Ok</span>(())
         })<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">5</span>, <span class="ident">columns</span>.<span class="ident">len</span>());
+        <span class="macro">assert_eq!</span>(<span class="number">5</span>, columns.len());
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">pragma_func</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table_info</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">prepare</span>(<span class="string">&quot;SELECT * FROM pragma_table_info(?)&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">table_info</span>.<span class="ident">query</span>([<span class="string">&quot;sqlite_master&quot;</span>])<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+    </span><span class="kw">fn </span>pragma_func() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>table_info = db.prepare(<span class="string">&quot;SELECT * FROM pragma_table_info(?)&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>columns = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>rows = table_info.query([<span class="string">&quot;sqlite_master&quot;</span>])<span class="question-mark">?</span>;
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">row</span>) <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
-            <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">row</span>;
-            <span class="kw">let</span> <span class="ident">column</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="number">1</span>)<span class="question-mark">?</span>;
-            <span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">column</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(row) = rows.next()<span class="question-mark">? </span>{
+            <span class="kw">let </span>row = row;
+            <span class="kw">let </span>column: String = row.get(<span class="number">1</span>)<span class="question-mark">?</span>;
+            columns.push(column);
         }
-        <span class="macro">assert_eq!</span>(<span class="number">5</span>, <span class="ident">columns</span>.<span class="ident">len</span>());
+        <span class="macro">assert_eq!</span>(<span class="number">5</span>, columns.len());
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pragma_update</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="ident">db</span>.<span class="ident">pragma_update</span>(<span class="prelude-val">None</span>, <span class="string">&quot;user_version&quot;</span>, <span class="kw-2">&amp;</span><span class="number">1</span>)
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>pragma_update() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        db.pragma_update(<span class="prelude-val">None</span>, <span class="string">&quot;user_version&quot;</span>, <span class="kw-2">&amp;</span><span class="number">1</span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pragma_update_and_check</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">journal_mode</span>: <span class="ident">String</span> <span class="op">=</span>
-            <span class="ident">db</span>.<span class="ident">pragma_update_and_check</span>(<span class="prelude-val">None</span>, <span class="string">&quot;journal_mode&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;OFF&quot;</span>, <span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;off&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">journal_mode</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>pragma_update_and_check() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span>journal_mode: String =
+            db.pragma_update_and_check(<span class="prelude-val">None</span>, <span class="string">&quot;journal_mode&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;OFF&quot;</span>, |row| row.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;off&quot;</span>, <span class="kw-2">&amp;</span>journal_mode);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_identifier</span>() {
-        <span class="macro">assert!</span>(<span class="ident">pragma::is_identifier</span>(<span class="string">&quot;full&quot;</span>));
-        <span class="macro">assert!</span>(<span class="ident">pragma::is_identifier</span>(<span class="string">&quot;r2d2&quot;</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">pragma::is_identifier</span>(<span class="string">&quot;sp ce&quot;</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">pragma::is_identifier</span>(<span class="string">&quot;semi;colon&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_identifier() {
+        <span class="macro">assert!</span>(pragma::is_identifier(<span class="string">&quot;full&quot;</span>));
+        <span class="macro">assert!</span>(pragma::is_identifier(<span class="string">&quot;r2d2&quot;</span>));
+        <span class="macro">assert!</span>(!pragma::is_identifier(<span class="string">&quot;sp ce&quot;</span>));
+        <span class="macro">assert!</span>(!pragma::is_identifier(<span class="string">&quot;semi;colon&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">double_quote</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql</span> <span class="op">=</span> <span class="ident">Sql::new</span>();
-        <span class="ident">sql</span>.<span class="ident">push_schema_name</span>(<span class="ident">DatabaseName::Attached</span>(<span class="string">r#&quot;schema&quot;;--&quot;#</span>));
-        <span class="macro">assert_eq!</span>(<span class="string">r#&quot;&quot;schema&quot;&quot;;--&quot;&quot;#</span>, <span class="ident">sql</span>.<span class="ident">as_str</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>double_quote() {
+        <span class="kw">let </span><span class="kw-2">mut </span>sql = Sql::new();
+        sql.push_schema_name(DatabaseName::Attached(<span class="string">r#&quot;schema&quot;;--&quot;#</span>));
+        <span class="macro">assert_eq!</span>(<span class="string">r#&quot;&quot;schema&quot;&quot;;--&quot;&quot;#</span>, sql.as_str());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wrap_and_escape</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql</span> <span class="op">=</span> <span class="ident">Sql::new</span>();
-        <span class="ident">sql</span>.<span class="ident">push_string_literal</span>(<span class="string">&quot;value&#39;; --&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;&#39;value&#39;&#39;; --&#39;&quot;</span>, <span class="ident">sql</span>.<span class="ident">as_str</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>wrap_and_escape() {
+        <span class="kw">let </span><span class="kw-2">mut </span>sql = Sql::new();
+        sql.push_string_literal(<span class="string">&quot;value&#39;; --&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;&#39;value&#39;&#39;; --&#39;&quot;</span>, sql.as_str());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">locking_mode</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">pragma_update</span>(<span class="prelude-val">None</span>, <span class="string">&quot;locking_mode&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;exclusive&quot;</span>);
-        <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra_check&quot;</span>) {
-            <span class="ident">r</span>.<span class="ident">unwrap_err</span>();
-        } <span class="kw">else</span> {
-            <span class="ident">r</span><span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>locking_mode() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span>r = db.pragma_update(<span class="prelude-val">None</span>, <span class="string">&quot;locking_mode&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;exclusive&quot;</span>);
+        <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;extra_check&quot;</span>) {
+            r.unwrap_err();
+        } <span class="kw">else </span>{
+            r<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

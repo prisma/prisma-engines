@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/backtrace-0.3.66/src/symbolize/gimli/elf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>elf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../backtrace/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../backtrace/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../backtrace/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/backtrace-0.3.66/src/symbolize/gimli/elf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>elf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../backtrace/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../backtrace/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../backtrace/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -421,428 +421,428 @@
 <span id="421">421</span>
 <span id="422">422</span>
 <span id="423">423</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::mystd::ffi</span>::{<span class="ident">OsStr</span>, <span class="ident">OsString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::mystd::fs</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::mystd::os::unix::ffi</span>::{<span class="ident">OsStrExt</span>, <span class="ident">OsStringExt</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::mystd::path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Either</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Context</span>, <span class="ident">Mapping</span>, <span class="ident">Stash</span>, <span class="ident">Vec</span>};
-<span class="kw">use</span> <span class="ident">core::convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>};
-<span class="kw">use</span> <span class="ident">core::str</span>;
-<span class="kw">use</span> <span class="ident">object::elf</span>::{<span class="ident">ELFCOMPRESS_ZLIB</span>, <span class="ident">ELF_NOTE_GNU</span>, <span class="ident">NT_GNU_BUILD_ID</span>, <span class="ident">SHF_COMPRESSED</span>};
-<span class="kw">use</span> <span class="ident">object::read::elf</span>::{<span class="ident">CompressionHeader</span>, <span class="ident">FileHeader</span>, <span class="ident">SectionHeader</span>, <span class="ident">SectionTable</span>, <span class="ident">Sym</span>};
-<span class="kw">use</span> <span class="ident">object::read::StringTable</span>;
-<span class="kw">use</span> <span class="ident">object</span>::{<span class="ident">BigEndian</span>, <span class="ident">Bytes</span>, <span class="ident">NativeEndian</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::mystd::ffi::{OsStr, OsString};
+<span class="kw">use </span><span class="kw">super</span>::mystd::fs;
+<span class="kw">use </span><span class="kw">super</span>::mystd::os::unix::ffi::{OsStrExt, OsStringExt};
+<span class="kw">use </span><span class="kw">super</span>::mystd::path::{Path, PathBuf};
+<span class="kw">use </span><span class="kw">super</span>::Either;
+<span class="kw">use super</span>::{Context, Mapping, Stash, Vec};
+<span class="kw">use </span>core::convert::{TryFrom, TryInto};
+<span class="kw">use </span>core::str;
+<span class="kw">use </span>object::elf::{ELFCOMPRESS_ZLIB, ELF_NOTE_GNU, NT_GNU_BUILD_ID, SHF_COMPRESSED};
+<span class="kw">use </span>object::read::elf::{CompressionHeader, FileHeader, SectionHeader, SectionTable, Sym};
+<span class="kw">use </span>object::read::StringTable;
+<span class="kw">use </span>object::{BigEndian, Bytes, NativeEndian};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>)]</span>
-<span class="kw">type</span> <span class="ident">Elf</span> <span class="op">=</span> <span class="ident">object::elf::FileHeader32</span><span class="op">&lt;</span><span class="ident">NativeEndian</span><span class="op">&gt;</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="kw">type</span> <span class="ident">Elf</span> <span class="op">=</span> <span class="ident">object::elf::FileHeader64</span><span class="op">&lt;</span><span class="ident">NativeEndian</span><span class="op">&gt;</span>;
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;32&quot;</span>)]
+</span><span class="kw">type </span>Elf = object::elf::FileHeader32&lt;NativeEndian&gt;;
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+</span><span class="kw">type </span>Elf = object::elf::FileHeader64&lt;NativeEndian&gt;;
 
-<span class="kw">impl</span> <span class="ident">Mapping</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mapping</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::mmap</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
-        <span class="ident">Mapping::mk_or_other</span>(<span class="ident">map</span>, <span class="op">|</span><span class="ident">map</span>, <span class="ident">stash</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">object</span> <span class="op">=</span> <span class="ident">Object::parse</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Mapping {
+    <span class="kw">pub fn </span>new(path: <span class="kw-2">&amp;</span>Path) -&gt; <span class="prelude-ty">Option</span>&lt;Mapping&gt; {
+        <span class="kw">let </span>map = <span class="kw">super</span>::mmap(path)<span class="question-mark">?</span>;
+        Mapping::mk_or_other(map, |map, stash| {
+            <span class="kw">let </span>object = Object::parse(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>;
 
-            <span class="comment">// Try to locate an external debug file using the build ID.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path_debug</span>) <span class="op">=</span> <span class="ident">object</span>.<span class="ident">build_id</span>().<span class="ident">and_then</span>(<span class="ident">locate_build_id</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mapping</span>) <span class="op">=</span> <span class="ident">Mapping::new_debug</span>(<span class="ident">path_debug</span>, <span class="prelude-val">None</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Either::A</span>(<span class="ident">mapping</span>));
+            <span class="comment">// Try to locate an external debug file using the build ID.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(path_debug) = object.build_id().and_then(locate_build_id) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(mapping) = Mapping::new_debug(path_debug, <span class="prelude-val">None</span>) {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(Either::A(mapping));
                 }
             }
 
-            <span class="comment">// Try to locate an external debug file using the GNU debug link section.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">path_debug</span>, <span class="ident">crc</span>)) <span class="op">=</span> <span class="ident">object</span>.<span class="ident">gnu_debuglink_path</span>(<span class="ident">path</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mapping</span>) <span class="op">=</span> <span class="ident">Mapping::new_debug</span>(<span class="ident">path_debug</span>, <span class="prelude-val">Some</span>(<span class="ident">crc</span>)) {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Either::A</span>(<span class="ident">mapping</span>));
+            <span class="comment">// Try to locate an external debug file using the GNU debug link section.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>((path_debug, crc)) = object.gnu_debuglink_path(path) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(mapping) = Mapping::new_debug(path_debug, <span class="prelude-val">Some</span>(crc)) {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(Either::A(mapping));
                 }
             }
 
-            <span class="ident">Context::new</span>(<span class="ident">stash</span>, <span class="ident">object</span>, <span class="prelude-val">None</span>).<span class="ident">map</span>(<span class="ident">Either::B</span>)
+            Context::new(stash, object, <span class="prelude-val">None</span>).map(Either::B)
         })
     }
 
-    <span class="doccomment">/// Load debuginfo from an external debug file.</span>
-    <span class="kw">fn</span> <span class="ident">new_debug</span>(<span class="ident">path</span>: <span class="ident">PathBuf</span>, <span class="ident">crc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mapping</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::mmap</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>;
-        <span class="ident">Mapping::mk</span>(<span class="ident">map</span>, <span class="op">|</span><span class="ident">map</span>, <span class="ident">stash</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">object</span> <span class="op">=</span> <span class="ident">Object::parse</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Load debuginfo from an external debug file.
+    </span><span class="kw">fn </span>new_debug(path: PathBuf, crc: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Mapping&gt; {
+        <span class="kw">let </span>map = <span class="kw">super</span>::mmap(<span class="kw-2">&amp;</span>path)<span class="question-mark">?</span>;
+        Mapping::mk(map, |map, stash| {
+            <span class="kw">let </span>object = Object::parse(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">_crc</span>) <span class="op">=</span> <span class="ident">crc</span> {
-                <span class="comment">// TODO: check crc</span>
-            }
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(_crc) = crc {
+                <span class="comment">// TODO: check crc
+            </span>}
 
-            <span class="comment">// Try to locate a supplementary object file.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">path_sup</span>, <span class="ident">build_id_sup</span>)) <span class="op">=</span> <span class="ident">object</span>.<span class="ident">gnu_debugaltlink_path</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map_sup</span>) <span class="op">=</span> <span class="ident"><span class="kw">super</span>::mmap</span>(<span class="kw-2">&amp;</span><span class="ident">path_sup</span>) {
-                    <span class="kw">let</span> <span class="ident">map_sup</span> <span class="op">=</span> <span class="ident">stash</span>.<span class="ident">set_mmap_aux</span>(<span class="ident">map_sup</span>);
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sup</span>) <span class="op">=</span> <span class="ident">Object::parse</span>(<span class="ident">map_sup</span>) {
-                        <span class="kw">if</span> <span class="ident">sup</span>.<span class="ident">build_id</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">build_id_sup</span>) {
-                            <span class="kw">return</span> <span class="ident">Context::new</span>(<span class="ident">stash</span>, <span class="ident">object</span>, <span class="prelude-val">Some</span>(<span class="ident">sup</span>));
+            <span class="comment">// Try to locate a supplementary object file.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>((path_sup, build_id_sup)) = object.gnu_debugaltlink_path(<span class="kw-2">&amp;</span>path) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(map_sup) = <span class="kw">super</span>::mmap(<span class="kw-2">&amp;</span>path_sup) {
+                    <span class="kw">let </span>map_sup = stash.set_mmap_aux(map_sup);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(sup) = Object::parse(map_sup) {
+                        <span class="kw">if </span>sup.build_id() == <span class="prelude-val">Some</span>(build_id_sup) {
+                            <span class="kw">return </span>Context::new(stash, object, <span class="prelude-val">Some</span>(sup));
                         }
                     }
                 }
             }
 
-            <span class="ident">Context::new</span>(<span class="ident">stash</span>, <span class="ident">object</span>, <span class="prelude-val">None</span>)
+            Context::new(stash, object, <span class="prelude-val">None</span>)
         })
     }
 }
 
-<span class="kw">struct</span> <span class="ident">ParsedSym</span> {
-    <span class="ident">address</span>: <span class="ident">u64</span>,
-    <span class="ident">size</span>: <span class="ident">u64</span>,
-    <span class="ident">name</span>: <span class="ident">u32</span>,
+<span class="kw">struct </span>ParsedSym {
+    address: u64,
+    size: u64,
+    name: u32,
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Object</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Zero-sized type representing the native endianness.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// We could use a literal instead, but this helps ensure correctness.</span>
-    <span class="ident">endian</span>: <span class="ident">NativeEndian</span>,
-    <span class="doccomment">/// The entire file data.</span>
-    <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="ident">sections</span>: <span class="ident">SectionTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Elf</span><span class="op">&gt;</span>,
-    <span class="ident">strings</span>: <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// List of pre-parsed and sorted symbols by base address.</span>
-    <span class="ident">syms</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParsedSym</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>Object&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Zero-sized type representing the native endianness.
+    ///
+    /// We could use a literal instead, but this helps ensure correctness.
+    </span>endian: NativeEndian,
+    <span class="doccomment">/// The entire file data.
+    </span>data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    sections: SectionTable&lt;<span class="lifetime">&#39;a</span>, Elf&gt;,
+    strings: StringTable&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="doccomment">/// List of pre-parsed and sorted symbols by base address.
+    </span>syms: Vec&lt;ParsedSym&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Object</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Object</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">elf</span> <span class="op">=</span> <span class="ident">Elf::parse</span>(<span class="ident">data</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">endian</span> <span class="op">=</span> <span class="ident">elf</span>.<span class="ident">endian</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">sections</span> <span class="op">=</span> <span class="ident">elf</span>.<span class="ident">sections</span>(<span class="ident">endian</span>, <span class="ident">data</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">syms</span> <span class="op">=</span> <span class="ident">sections</span>
-            .<span class="ident">symbols</span>(<span class="ident">endian</span>, <span class="ident">data</span>, <span class="ident">object::elf::SHT_SYMTAB</span>)
-            .<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">syms</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">syms</span> <span class="op">=</span> <span class="ident">sections</span>
-                .<span class="ident">symbols</span>(<span class="ident">endian</span>, <span class="ident">data</span>, <span class="ident">object::elf::SHT_DYNSYM</span>)
-                .<span class="ident">ok</span>()<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Object&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>parse(data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Object&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span>elf = Elf::parse(data).ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span>endian = elf.endian().ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span>sections = elf.sections(endian, data).ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>syms = sections
+            .symbols(endian, data, object::elf::SHT_SYMTAB)
+            .ok()<span class="question-mark">?</span>;
+        <span class="kw">if </span>syms.is_empty() {
+            syms = sections
+                .symbols(endian, data, object::elf::SHT_DYNSYM)
+                .ok()<span class="question-mark">?</span>;
         }
-        <span class="kw">let</span> <span class="ident">strings</span> <span class="op">=</span> <span class="ident">syms</span>.<span class="ident">strings</span>();
+        <span class="kw">let </span>strings = syms.strings();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">syms</span> <span class="op">=</span> <span class="ident">syms</span>
-            .<span class="ident">iter</span>()
-            <span class="comment">// Only look at function/object symbols. This mirrors what</span>
-            <span class="comment">// libbacktrace does and in general we&#39;re only symbolicating</span>
-            <span class="comment">// function addresses in theory. Object symbols correspond</span>
-            <span class="comment">// to data, and maybe someone&#39;s crazy enough to have a</span>
-            <span class="comment">// function go into static data?</span>
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">sym</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">st_type</span> <span class="op">=</span> <span class="ident">sym</span>.<span class="ident">st_type</span>();
-                <span class="ident">st_type</span> <span class="op">==</span> <span class="ident">object::elf::STT_FUNC</span> <span class="op">|</span><span class="op">|</span> <span class="ident">st_type</span> <span class="op">==</span> <span class="ident">object::elf::STT_OBJECT</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>syms = syms
+            .iter()
+            <span class="comment">// Only look at function/object symbols. This mirrors what
+            // libbacktrace does and in general we&#39;re only symbolicating
+            // function addresses in theory. Object symbols correspond
+            // to data, and maybe someone&#39;s crazy enough to have a
+            // function go into static data?
+            </span>.filter(|sym| {
+                <span class="kw">let </span>st_type = sym.st_type();
+                st_type == object::elf::STT_FUNC || st_type == object::elf::STT_OBJECT
             })
-            <span class="comment">// skip anything that&#39;s in an undefined section header,</span>
-            <span class="comment">// since it means it&#39;s an imported function and we&#39;re only</span>
-            <span class="comment">// symbolicating with locally defined functions.</span>
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">sym</span><span class="op">|</span> <span class="ident">sym</span>.<span class="ident">st_shndx</span>(<span class="ident">endian</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">object::elf::SHN_UNDEF</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sym</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">sym</span>.<span class="ident">st_value</span>(<span class="ident">endian</span>).<span class="ident">into</span>();
-                <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">sym</span>.<span class="ident">st_size</span>(<span class="ident">endian</span>).<span class="ident">into</span>();
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">sym</span>.<span class="ident">st_name</span>(<span class="ident">endian</span>);
-                <span class="ident">ParsedSym</span> {
-                    <span class="ident">address</span>,
-                    <span class="ident">size</span>,
-                    <span class="ident">name</span>,
+            <span class="comment">// skip anything that&#39;s in an undefined section header,
+            // since it means it&#39;s an imported function and we&#39;re only
+            // symbolicating with locally defined functions.
+            </span>.filter(|sym| sym.st_shndx(endian) != object::elf::SHN_UNDEF)
+            .map(|sym| {
+                <span class="kw">let </span>address = sym.st_value(endian).into();
+                <span class="kw">let </span>size = sym.st_size(endian).into();
+                <span class="kw">let </span>name = sym.st_name(endian);
+                ParsedSym {
+                    address,
+                    size,
+                    name,
                 }
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="ident">syms</span>.<span class="ident">sort_unstable_by_key</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">address</span>);
-        <span class="prelude-val">Some</span>(<span class="ident">Object</span> {
-            <span class="ident">endian</span>,
-            <span class="ident">data</span>,
-            <span class="ident">sections</span>,
-            <span class="ident">strings</span>,
-            <span class="ident">syms</span>,
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+        syms.sort_unstable_by_key(|s| s.address);
+        <span class="prelude-val">Some</span>(Object {
+            endian,
+            data,
+            sections,
+            strings,
+            syms,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">section</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stash</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Stash</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">section</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">section_header</span>(<span class="ident">name</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Bytes</span>(<span class="ident">section</span>.<span class="ident">data</span>(<span class="self">self</span>.<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">data</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>);
+    <span class="kw">pub fn </span>section(<span class="kw-2">&amp;</span><span class="self">self</span>, stash: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Stash, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(section) = <span class="self">self</span>.section_header(name) {
+            <span class="kw">let </span><span class="kw-2">mut </span>data = Bytes(section.data(<span class="self">self</span>.endian, <span class="self">self</span>.data).ok()<span class="question-mark">?</span>);
 
-            <span class="comment">// Check for DWARF-standard (gABI) compression, i.e., as generated</span>
-            <span class="comment">// by ld&#39;s `--compress-debug-sections=zlib-gabi` flag.</span>
-            <span class="kw">let</span> <span class="ident">flags</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">sh_flags</span>(<span class="self">self</span>.<span class="ident">endian</span>).<span class="ident">into</span>();
-            <span class="kw">if</span> (<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">u64::from</span>(<span class="ident">SHF_COMPRESSED</span>)) <span class="op">==</span> <span class="number">0</span> {
-                <span class="comment">// Not compressed.</span>
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>.<span class="number">0</span>);
+            <span class="comment">// Check for DWARF-standard (gABI) compression, i.e., as generated
+            // by ld&#39;s `--compress-debug-sections=zlib-gabi` flag.
+            </span><span class="kw">let </span>flags: u64 = section.sh_flags(<span class="self">self</span>.endian).into();
+            <span class="kw">if </span>(flags &amp; u64::from(SHF_COMPRESSED)) == <span class="number">0 </span>{
+                <span class="comment">// Not compressed.
+                </span><span class="kw">return </span><span class="prelude-val">Some</span>(data.<span class="number">0</span>);
             }
 
-            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">read</span>::<span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">Elf</span> <span class="kw">as</span> <span class="ident">FileHeader</span><span class="op">&gt;</span><span class="ident">::CompressionHeader</span><span class="op">&gt;</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">header</span>.<span class="ident">ch_type</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">ELFCOMPRESS_ZLIB</span> {
-                <span class="comment">// Zlib compression is the only known type.</span>
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+            <span class="kw">let </span>header = data.read::&lt;&lt;Elf <span class="kw">as </span>FileHeader&gt;::CompressionHeader&gt;().ok()<span class="question-mark">?</span>;
+            <span class="kw">if </span>header.ch_type(<span class="self">self</span>.endian) != ELFCOMPRESS_ZLIB {
+                <span class="comment">// Zlib compression is the only known type.
+                </span><span class="kw">return </span><span class="prelude-val">None</span>;
             }
-            <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">usize::try_from</span>(<span class="ident">header</span>.<span class="ident">ch_size</span>(<span class="self">self</span>.<span class="ident">endian</span>)).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">stash</span>.<span class="ident">allocate</span>(<span class="ident">size</span>);
-            <span class="ident">decompress_zlib</span>(<span class="ident">data</span>.<span class="number">0</span>, <span class="ident">buf</span>)<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">buf</span>);
+            <span class="kw">let </span>size = usize::try_from(header.ch_size(<span class="self">self</span>.endian)).ok()<span class="question-mark">?</span>;
+            <span class="kw">let </span>buf = stash.allocate(size);
+            decompress_zlib(data.<span class="number">0</span>, buf)<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Some</span>(buf);
         }
 
-        <span class="comment">// Check for the nonstandard GNU compression format, i.e., as generated</span>
-        <span class="comment">// by ld&#39;s `--compress-debug-sections=zlib-gnu` flag. This means that if</span>
-        <span class="comment">// we&#39;re actually asking for `.debug_info` then we need to look up a</span>
-        <span class="comment">// section named `.zdebug_info`.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;.debug_&quot;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="comment">// Check for the nonstandard GNU compression format, i.e., as generated
+        // by ld&#39;s `--compress-debug-sections=zlib-gnu` flag. This means that if
+        // we&#39;re actually asking for `.debug_info` then we need to look up a
+        // section named `.zdebug_info`.
+        </span><span class="kw">if </span>!name.starts_with(<span class="string">&quot;.debug_&quot;</span>) {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">debug_name</span> <span class="op">=</span> <span class="ident">name</span>[<span class="number">7</span>..].<span class="ident">as_bytes</span>();
-        <span class="kw">let</span> <span class="ident">compressed_section</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">sections</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">header</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sections</span>.<span class="ident">section_name</span>(<span class="self">self</span>.<span class="ident">endian</span>, <span class="ident">header</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">b&quot;.zdebug_&quot;</span>) <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">name</span>[<span class="number">8</span>..] <span class="op">==</span> <span class="ident">debug_name</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">header</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+        <span class="kw">let </span>debug_name = name[<span class="number">7</span>..].as_bytes();
+        <span class="kw">let </span>compressed_section = <span class="self">self
+            </span>.sections
+            .iter()
+            .filter_map(|header| {
+                <span class="kw">let </span>name = <span class="self">self</span>.sections.section_name(<span class="self">self</span>.endian, header).ok()<span class="question-mark">?</span>;
+                <span class="kw">if </span>name.starts_with(<span class="string">b&quot;.zdebug_&quot;</span>) &amp;&amp; <span class="kw-2">&amp;</span>name[<span class="number">8</span>..] == debug_name {
+                    <span class="prelude-val">Some</span>(header)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
             })
-            .<span class="ident">next</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Bytes</span>(<span class="ident">compressed_section</span>.<span class="ident">data</span>(<span class="self">self</span>.<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">data</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>);
-        <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">read_bytes</span>(<span class="number">8</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&quot;ZLIB\0\0\0\0&quot;</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+            .next()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>data = Bytes(compressed_section.data(<span class="self">self</span>.endian, <span class="self">self</span>.data).ok()<span class="question-mark">?</span>);
+        <span class="kw">if </span>data.read_bytes(<span class="number">8</span>).ok()<span class="question-mark">?</span>.<span class="number">0 </span>!= <span class="string">b&quot;ZLIB\0\0\0\0&quot; </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">usize::try_from</span>(<span class="ident">data</span>.<span class="ident">read</span>::<span class="op">&lt;</span><span class="ident">object::U32Bytes</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">get</span>(<span class="ident">BigEndian</span>)).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">stash</span>.<span class="ident">allocate</span>(<span class="ident">size</span>);
-        <span class="ident">decompress_zlib</span>(<span class="ident">data</span>.<span class="number">0</span>, <span class="ident">buf</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">buf</span>)
+        <span class="kw">let </span>size = usize::try_from(data.read::&lt;object::U32Bytes&lt;<span class="kw">_</span>&gt;&gt;().ok()<span class="question-mark">?</span>.get(BigEndian)).ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span>buf = stash.allocate(size);
+        decompress_zlib(data.<span class="number">0</span>, buf)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(buf)
     }
 
-    <span class="kw">fn</span> <span class="ident">section_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="ident">Elf</span> <span class="kw">as</span> <span class="ident">FileHeader</span><span class="op">&gt;</span><span class="ident">::SectionHeader</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">sections</span>
-            .<span class="ident">section_by_name</span>(<span class="self">self</span>.<span class="ident">endian</span>, <span class="ident">name</span>.<span class="ident">as_bytes</span>())
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">_index</span>, <span class="ident">section</span>)<span class="op">|</span> <span class="ident">section</span>)
+    <span class="kw">fn </span>section_header(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>&lt;Elf <span class="kw">as </span>FileHeader&gt;::SectionHeader&gt; {
+        <span class="self">self</span>.sections
+            .section_by_name(<span class="self">self</span>.endian, name.as_bytes())
+            .map(|(_index, section)| section)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">search_symtab</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="comment">// Same sort of binary search as Windows above</span>
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">syms</span>.<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>, <span class="op">|</span><span class="ident">sym</span><span class="op">|</span> <span class="ident">sym</span>.<span class="ident">address</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">checked_sub</span>(<span class="number">1</span>)<span class="question-mark">?</span>,
+    <span class="kw">pub fn </span>search_symtab&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="self">self</span>, addr: u64) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[u8]&gt; {
+        <span class="comment">// Same sort of binary search as Windows above
+        </span><span class="kw">let </span>i = <span class="kw">match </span><span class="self">self</span>.syms.binary_search_by_key(<span class="kw-2">&amp;</span>addr, |sym| sym.address) {
+            <span class="prelude-val">Ok</span>(i) =&gt; i,
+            <span class="prelude-val">Err</span>(i) =&gt; i.checked_sub(<span class="number">1</span>)<span class="question-mark">?</span>,
         };
-        <span class="kw">let</span> <span class="ident">sym</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">syms</span>.<span class="ident">get</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">sym</span>.<span class="ident">address</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">addr</span> <span class="op">&amp;&amp;</span> <span class="ident">addr</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">sym</span>.<span class="ident">address</span> <span class="op">+</span> <span class="ident">sym</span>.<span class="ident">size</span> {
-            <span class="self">self</span>.<span class="ident">strings</span>.<span class="ident">get</span>(<span class="ident">sym</span>.<span class="ident">name</span>).<span class="ident">ok</span>()
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+        <span class="kw">let </span>sym = <span class="self">self</span>.syms.get(i)<span class="question-mark">?</span>;
+        <span class="kw">if </span>sym.address &lt;= addr &amp;&amp; addr &lt;= sym.address + sym.size {
+            <span class="self">self</span>.strings.get(sym.name).ok()
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">search_object_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_addr</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">u64</span>)<span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>search_object_map(<span class="kw-2">&amp;</span><span class="self">self</span>, _addr: u64) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;, u64)&gt; {
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">build_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">section</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">sections</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">notes</span>)) <span class="op">=</span> <span class="ident">section</span>.<span class="ident">notes</span>(<span class="self">self</span>.<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">data</span>) {
-                <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">note</span>)) <span class="op">=</span> <span class="ident">notes</span>.<span class="ident">next</span>() {
-                    <span class="kw">if</span> <span class="ident">note</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">ELF_NOTE_GNU</span> <span class="op">&amp;&amp;</span> <span class="ident">note</span>.<span class="ident">n_type</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">NT_GNU_BUILD_ID</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">note</span>.<span class="ident">desc</span>());
+    <span class="kw">fn </span>build_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+        <span class="kw">for </span>section <span class="kw">in </span><span class="self">self</span>.sections.iter() {
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw-2">mut </span>notes)) = section.notes(<span class="self">self</span>.endian, <span class="self">self</span>.data) {
+                <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(note)) = notes.next() {
+                    <span class="kw">if </span>note.name() == ELF_NOTE_GNU &amp;&amp; note.n_type(<span class="self">self</span>.endian) == NT_GNU_BUILD_ID {
+                        <span class="kw">return </span><span class="prelude-val">Some</span>(note.desc());
                     }
                 }
             }
         }
-        <span class="prelude-val">None</span>
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="comment">// The contents of the &quot;.gnu_debuglink&quot; section is documented at:
+    // https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html
+    </span><span class="kw">fn </span>gnu_debuglink_path(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>Path) -&gt; <span class="prelude-ty">Option</span>&lt;(PathBuf, u32)&gt; {
+        <span class="kw">let </span>section = <span class="self">self</span>.section_header(<span class="string">&quot;.gnu_debuglink&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>data = section.data(<span class="self">self</span>.endian, <span class="self">self</span>.data).ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span>len = data.iter().position(|x| <span class="kw-2">*</span>x == <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>filename = <span class="kw-2">&amp;</span>data[..len];
+        <span class="kw">let </span>offset = (len + <span class="number">1 </span>+ <span class="number">3</span>) &amp; !<span class="number">3</span>;
+        <span class="kw">let </span>crc_bytes = data
+            .get(offset..offset + <span class="number">4</span>)
+            .and_then(|bytes| bytes.try_into().ok())<span class="question-mark">?</span>;
+        <span class="kw">let </span>crc = u32::from_ne_bytes(crc_bytes);
+        <span class="kw">let </span>path_debug = locate_debuglink(path, filename)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>((path_debug, crc))
     }
 
-    <span class="comment">// The contents of the &quot;.gnu_debuglink&quot; section is documented at:</span>
-    <span class="comment">// https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html</span>
-    <span class="kw">fn</span> <span class="ident">gnu_debuglink_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">PathBuf</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">section_header</span>(<span class="string">&quot;.gnu_debuglink&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">data</span>(<span class="self">self</span>.<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">data</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">data</span>[..<span class="ident">len</span>];
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">len</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">3</span>) <span class="op">&amp;</span> <span class="op">!</span><span class="number">3</span>;
-        <span class="kw">let</span> <span class="ident">crc_bytes</span> <span class="op">=</span> <span class="ident">data</span>
-            .<span class="ident">get</span>(<span class="ident">offset</span>..<span class="ident">offset</span> <span class="op">+</span> <span class="number">4</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">bytes</span><span class="op">|</span> <span class="ident">bytes</span>.<span class="ident">try_into</span>().<span class="ident">ok</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">crc</span> <span class="op">=</span> <span class="ident">u32::from_ne_bytes</span>(<span class="ident">crc_bytes</span>);
-        <span class="kw">let</span> <span class="ident">path_debug</span> <span class="op">=</span> <span class="ident">locate_debuglink</span>(<span class="ident">path</span>, <span class="ident">filename</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>((<span class="ident">path_debug</span>, <span class="ident">crc</span>))
-    }
-
-    <span class="comment">// The format of the &quot;.gnu_debugaltlink&quot; section is based on gdb.</span>
-    <span class="kw">fn</span> <span class="ident">gnu_debugaltlink_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">PathBuf</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>])<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">section_header</span>(<span class="string">&quot;.gnu_debugaltlink&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">data</span>(<span class="self">self</span>.<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">data</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">data</span>[..<span class="ident">len</span>];
-        <span class="kw">let</span> <span class="ident">build_id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">data</span>[<span class="ident">len</span> <span class="op">+</span> <span class="number">1</span>..];
-        <span class="kw">let</span> <span class="ident">path_sup</span> <span class="op">=</span> <span class="ident">locate_debugaltlink</span>(<span class="ident">path</span>, <span class="ident">filename</span>, <span class="ident">build_id</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>((<span class="ident">path_sup</span>, <span class="ident">build_id</span>))
+    <span class="comment">// The format of the &quot;.gnu_debugaltlink&quot; section is based on gdb.
+    </span><span class="kw">fn </span>gnu_debugaltlink_path(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>Path) -&gt; <span class="prelude-ty">Option</span>&lt;(PathBuf, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8])&gt; {
+        <span class="kw">let </span>section = <span class="self">self</span>.section_header(<span class="string">&quot;.gnu_debugaltlink&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>data = section.data(<span class="self">self</span>.endian, <span class="self">self</span>.data).ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span>len = data.iter().position(|x| <span class="kw-2">*</span>x == <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>filename = <span class="kw-2">&amp;</span>data[..len];
+        <span class="kw">let </span>build_id = <span class="kw-2">&amp;</span>data[len + <span class="number">1</span>..];
+        <span class="kw">let </span>path_sup = locate_debugaltlink(path, filename, build_id)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>((path_sup, build_id))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">decompress_zlib</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">miniz_oxide::inflate::core::inflate_flags</span>::{
-        <span class="ident">TINFL_FLAG_PARSE_ZLIB_HEADER</span>, <span class="ident">TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF</span>,
+<span class="kw">fn </span>decompress_zlib(input: <span class="kw-2">&amp;</span>[u8], output: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+    <span class="kw">use </span>miniz_oxide::inflate::core::inflate_flags::{
+        TINFL_FLAG_PARSE_ZLIB_HEADER, TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF,
     };
-    <span class="kw">use</span> <span class="ident">miniz_oxide::inflate::core</span>::{<span class="ident">decompress</span>, <span class="ident">DecompressorOxide</span>};
-    <span class="kw">use</span> <span class="ident">miniz_oxide::inflate::TINFLStatus</span>;
+    <span class="kw">use </span>miniz_oxide::inflate::core::{decompress, DecompressorOxide};
+    <span class="kw">use </span>miniz_oxide::inflate::TINFLStatus;
 
-    <span class="kw">let</span> (<span class="ident">status</span>, <span class="ident">in_read</span>, <span class="ident">out_read</span>) <span class="op">=</span> <span class="ident">decompress</span>(
-        <span class="kw-2">&amp;mut</span> <span class="ident">DecompressorOxide::new</span>(),
-        <span class="ident">input</span>,
-        <span class="ident">output</span>,
+    <span class="kw">let </span>(status, in_read, out_read) = decompress(
+        <span class="kw-2">&amp;mut </span>DecompressorOxide::new(),
+        input,
+        output,
         <span class="number">0</span>,
-        <span class="ident">TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF</span> <span class="op">|</span> <span class="ident">TINFL_FLAG_PARSE_ZLIB_HEADER</span>,
+        TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF | TINFL_FLAG_PARSE_ZLIB_HEADER,
     );
-    <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">TINFLStatus::Done</span> <span class="op">&amp;&amp;</span> <span class="ident">in_read</span> <span class="op">==</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">out_read</span> <span class="op">==</span> <span class="ident">output</span>.<span class="ident">len</span>() {
+    <span class="kw">if </span>status == TINFLStatus::Done &amp;&amp; in_read == input.len() &amp;&amp; out_read == output.len() {
         <span class="prelude-val">Some</span>(())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">const</span> <span class="ident">DEBUG_PATH</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;/usr/lib/debug&quot;</span>;
+<span class="kw">const </span>DEBUG_PATH: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;/usr/lib/debug&quot;</span>;
 
-<span class="kw">fn</span> <span class="ident">debug_path_exists</span>() -&gt; <span class="ident">bool</span> {
-    <span class="macro">cfg_if::cfg_if!</span> {
-        <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>))]</span> {
-            <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicU8</span>, <span class="ident">Ordering</span>};
-            <span class="kw">static</span> <span class="ident">DEBUG_PATH_EXISTS</span>: <span class="ident">AtomicU8</span> <span class="op">=</span> <span class="ident">AtomicU8::new</span>(<span class="number">0</span>);
+<span class="kw">fn </span>debug_path_exists() -&gt; bool {
+    <span class="macro">cfg_if::cfg_if! </span>{
+        <span class="kw">if </span><span class="attribute">#[cfg(any(target_os = <span class="string">&quot;freebsd&quot;</span>, target_os = <span class="string">&quot;linux&quot;</span>))] </span>{
+            <span class="kw">use </span>core::sync::atomic::{AtomicU8, Ordering};
+            <span class="kw">static </span>DEBUG_PATH_EXISTS: AtomicU8 = AtomicU8::new(<span class="number">0</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exists</span> <span class="op">=</span> <span class="ident">DEBUG_PATH_EXISTS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-            <span class="kw">if</span> <span class="ident">exists</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="ident">exists</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">Path::new</span>(<span class="ident">OsStr::from_bytes</span>(<span class="ident">DEBUG_PATH</span>)).<span class="ident">is_dir</span>() {
-                    <span class="number">1</span>
-                } <span class="kw">else</span> {
-                    <span class="number">2</span>
-                };
-                <span class="ident">DEBUG_PATH_EXISTS</span>.<span class="ident">store</span>(<span class="ident">exists</span>, <span class="ident">Ordering::Relaxed</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>exists = DEBUG_PATH_EXISTS.load(Ordering::Relaxed);
+            <span class="kw">if </span>exists == <span class="number">0 </span>{
+                exists = <span class="kw">if </span>Path::new(OsStr::from_bytes(DEBUG_PATH)).is_dir() {
+                    <span class="number">1
+                </span>} <span class="kw">else </span>{
+                    <span class="number">2
+                </span>};
+                DEBUG_PATH_EXISTS.store(exists, Ordering::Relaxed);
             }
-            <span class="ident">exists</span> <span class="op">==</span> <span class="number">1</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+            exists == <span class="number">1
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 }
 
-<span class="doccomment">/// Locate a debug file based on its build ID.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The format of build id paths is documented at:</span>
-<span class="doccomment">/// https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html</span>
-<span class="kw">fn</span> <span class="ident">locate_build_id</span>(<span class="ident">build_id</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">BUILD_ID_PATH</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;/usr/lib/debug/.build-id/&quot;</span>;
-    <span class="kw">const</span> <span class="ident">BUILD_ID_SUFFIX</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;.debug&quot;</span>;
+<span class="doccomment">/// Locate a debug file based on its build ID.
+///
+/// The format of build id paths is documented at:
+/// https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html
+</span><span class="kw">fn </span>locate_build_id(build_id: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;PathBuf&gt; {
+    <span class="kw">const </span>BUILD_ID_PATH: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;/usr/lib/debug/.build-id/&quot;</span>;
+    <span class="kw">const </span>BUILD_ID_SUFFIX: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;.debug&quot;</span>;
 
-    <span class="kw">if</span> <span class="ident">build_id</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">2</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>build_id.len() &lt; <span class="number">2 </span>{
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">debug_path_exists</span>() {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>!debug_path_exists() {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span>
-        <span class="ident">Vec::with_capacity</span>(<span class="ident">BUILD_ID_PATH</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">BUILD_ID_SUFFIX</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">build_id</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">1</span>);
-    <span class="ident">path</span>.<span class="ident">extend</span>(<span class="ident">BUILD_ID_PATH</span>);
-    <span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">hex</span>(<span class="ident">build_id</span>[<span class="number">0</span>] <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>));
-    <span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">hex</span>(<span class="ident">build_id</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">0xf</span>));
-    <span class="ident">path</span>.<span class="ident">push</span>(<span class="string">b&#39;/&#39;</span>);
-    <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">build_id</span>[<span class="number">1</span>..] {
-        <span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">hex</span>(<span class="ident">byte</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>));
-        <span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">hex</span>(<span class="ident">byte</span> <span class="op">&amp;</span> <span class="number">0xf</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>path =
+        Vec::with_capacity(BUILD_ID_PATH.len() + BUILD_ID_SUFFIX.len() + build_id.len() * <span class="number">2 </span>+ <span class="number">1</span>);
+    path.extend(BUILD_ID_PATH);
+    path.push(hex(build_id[<span class="number">0</span>] &gt;&gt; <span class="number">4</span>));
+    path.push(hex(build_id[<span class="number">0</span>] &amp; <span class="number">0xf</span>));
+    path.push(<span class="string">b&#39;/&#39;</span>);
+    <span class="kw">for </span>byte <span class="kw">in </span><span class="kw-2">&amp;</span>build_id[<span class="number">1</span>..] {
+        path.push(hex(byte &gt;&gt; <span class="number">4</span>));
+        path.push(hex(byte &amp; <span class="number">0xf</span>));
     }
-    <span class="ident">path</span>.<span class="ident">extend</span>(<span class="ident">BUILD_ID_SUFFIX</span>);
-    <span class="prelude-val">Some</span>(<span class="ident">PathBuf::from</span>(<span class="ident">OsString::from_vec</span>(<span class="ident">path</span>)))
+    path.extend(BUILD_ID_SUFFIX);
+    <span class="prelude-val">Some</span>(PathBuf::from(OsString::from_vec(path)))
 }
 
-<span class="kw">fn</span> <span class="ident">hex</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u8</span> {
-    <span class="kw">if</span> <span class="ident">byte</span> <span class="op">&lt;</span> <span class="number">10</span> {
-        <span class="string">b&#39;0&#39;</span> <span class="op">+</span> <span class="ident">byte</span>
-    } <span class="kw">else</span> {
-        <span class="string">b&#39;a&#39;</span> <span class="op">+</span> <span class="ident">byte</span> <span class="op">-</span> <span class="number">10</span>
-    }
+<span class="kw">fn </span>hex(byte: u8) -&gt; u8 {
+    <span class="kw">if </span>byte &lt; <span class="number">10 </span>{
+        <span class="string">b&#39;0&#39; </span>+ byte
+    } <span class="kw">else </span>{
+        <span class="string">b&#39;a&#39; </span>+ byte - <span class="number">10
+    </span>}
 }
 
-<span class="doccomment">/// Locate a file specified in a `.gnu_debuglink` section.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `path` is the file containing the section.</span>
-<span class="doccomment">/// `filename` is from the contents of the section.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Search order is based on gdb, documented at:</span>
-<span class="doccomment">/// https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// gdb also allows the user to customize the debug search path, but we don&#39;t.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// gdb also supports debuginfod, but we don&#39;t yet.</span>
-<span class="kw">fn</span> <span class="ident">locate_debuglink</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>, <span class="ident">filename</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">fs::canonicalize</span>(<span class="ident">path</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">parent</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">PathBuf::from</span>(<span class="ident">OsString::with_capacity</span>(
-        <span class="ident">DEBUG_PATH</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">parent</span>.<span class="ident">as_os_str</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="ident">filename</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">2</span>,
+<span class="doccomment">/// Locate a file specified in a `.gnu_debuglink` section.
+///
+/// `path` is the file containing the section.
+/// `filename` is from the contents of the section.
+///
+/// Search order is based on gdb, documented at:
+/// https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html
+///
+/// gdb also allows the user to customize the debug search path, but we don&#39;t.
+///
+/// gdb also supports debuginfod, but we don&#39;t yet.
+</span><span class="kw">fn </span>locate_debuglink(path: <span class="kw-2">&amp;</span>Path, filename: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;PathBuf&gt; {
+    <span class="kw">let </span>path = fs::canonicalize(path).ok()<span class="question-mark">?</span>;
+    <span class="kw">let </span>parent = path.parent()<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>f = PathBuf::from(OsString::with_capacity(
+        DEBUG_PATH.len() + parent.as_os_str().len() + filename.len() + <span class="number">2</span>,
     ));
-    <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">OsStr::from_bytes</span>(<span class="ident">filename</span>));
+    <span class="kw">let </span>filename = Path::new(OsStr::from_bytes(filename));
 
-    <span class="comment">// Try &quot;/parent/filename&quot; if it differs from &quot;path&quot;</span>
-    <span class="ident">f</span>.<span class="ident">push</span>(<span class="ident">parent</span>);
-    <span class="ident">f</span>.<span class="ident">push</span>(<span class="ident">filename</span>);
-    <span class="kw">if</span> <span class="ident">f</span> <span class="op">!</span><span class="op">=</span> <span class="ident">path</span> <span class="op">&amp;&amp;</span> <span class="ident">f</span>.<span class="ident">is_file</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
+    <span class="comment">// Try &quot;/parent/filename&quot; if it differs from &quot;path&quot;
+    </span>f.push(parent);
+    f.push(filename);
+    <span class="kw">if </span>f != path &amp;&amp; f.is_file() {
+        <span class="kw">return </span><span class="prelude-val">Some</span>(f);
     }
 
-    <span class="comment">// Try &quot;/parent/.debug/filename&quot;</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">OsString::from</span>(<span class="ident">f</span>);
-    <span class="ident">s</span>.<span class="ident">clear</span>();
-    <span class="ident">f</span> <span class="op">=</span> <span class="ident">PathBuf::from</span>(<span class="ident">s</span>);
-    <span class="ident">f</span>.<span class="ident">push</span>(<span class="ident">parent</span>);
-    <span class="ident">f</span>.<span class="ident">push</span>(<span class="string">&quot;.debug&quot;</span>);
-    <span class="ident">f</span>.<span class="ident">push</span>(<span class="ident">filename</span>);
-    <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_file</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
+    <span class="comment">// Try &quot;/parent/.debug/filename&quot;
+    </span><span class="kw">let </span><span class="kw-2">mut </span>s = OsString::from(f);
+    s.clear();
+    f = PathBuf::from(s);
+    f.push(parent);
+    f.push(<span class="string">&quot;.debug&quot;</span>);
+    f.push(filename);
+    <span class="kw">if </span>f.is_file() {
+        <span class="kw">return </span><span class="prelude-val">Some</span>(f);
     }
 
-    <span class="kw">if</span> <span class="ident">debug_path_exists</span>() {
-        <span class="comment">// Try &quot;/usr/lib/debug/parent/filename&quot;</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">OsString::from</span>(<span class="ident">f</span>);
-        <span class="ident">s</span>.<span class="ident">clear</span>();
-        <span class="ident">f</span> <span class="op">=</span> <span class="ident">PathBuf::from</span>(<span class="ident">s</span>);
-        <span class="ident">f</span>.<span class="ident">push</span>(<span class="ident">OsStr::from_bytes</span>(<span class="ident">DEBUG_PATH</span>));
-        <span class="ident">f</span>.<span class="ident">push</span>(<span class="ident">parent</span>.<span class="ident">strip_prefix</span>(<span class="string">&quot;/&quot;</span>).<span class="ident">unwrap</span>());
-        <span class="ident">f</span>.<span class="ident">push</span>(<span class="ident">filename</span>);
-        <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_file</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
+    <span class="kw">if </span>debug_path_exists() {
+        <span class="comment">// Try &quot;/usr/lib/debug/parent/filename&quot;
+        </span><span class="kw">let </span><span class="kw-2">mut </span>s = OsString::from(f);
+        s.clear();
+        f = PathBuf::from(s);
+        f.push(OsStr::from_bytes(DEBUG_PATH));
+        f.push(parent.strip_prefix(<span class="string">&quot;/&quot;</span>).unwrap());
+        f.push(filename);
+        <span class="kw">if </span>f.is_file() {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(f);
         }
     }
 
-    <span class="prelude-val">None</span>
-}
+    <span class="prelude-val">None
+</span>}
 
-<span class="doccomment">/// Locate a file specified in a `.gnu_debugaltlink` section.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `path` is the file containing the section.</span>
-<span class="doccomment">/// `filename` and `build_id` are the contents of the section.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Search order is based on gdb:</span>
-<span class="doccomment">/// - filename, which is either absolute or relative to `path`</span>
-<span class="doccomment">/// - the build ID path under `BUILD_ID_PATH`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// gdb also allows the user to customize the debug search path, but we don&#39;t.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// gdb also supports debuginfod, but we don&#39;t yet.</span>
-<span class="kw">fn</span> <span class="ident">locate_debugaltlink</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>, <span class="ident">filename</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">build_id</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">OsStr::from_bytes</span>(<span class="ident">filename</span>));
-    <span class="kw">if</span> <span class="ident">filename</span>.<span class="ident">is_absolute</span>() {
-        <span class="kw">if</span> <span class="ident">filename</span>.<span class="ident">is_file</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">filename</span>.<span class="ident">into</span>());
+<span class="doccomment">/// Locate a file specified in a `.gnu_debugaltlink` section.
+///
+/// `path` is the file containing the section.
+/// `filename` and `build_id` are the contents of the section.
+///
+/// Search order is based on gdb:
+/// - filename, which is either absolute or relative to `path`
+/// - the build ID path under `BUILD_ID_PATH`
+///
+/// gdb also allows the user to customize the debug search path, but we don&#39;t.
+///
+/// gdb also supports debuginfod, but we don&#39;t yet.
+</span><span class="kw">fn </span>locate_debugaltlink(path: <span class="kw-2">&amp;</span>Path, filename: <span class="kw-2">&amp;</span>[u8], build_id: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;PathBuf&gt; {
+    <span class="kw">let </span>filename = Path::new(OsStr::from_bytes(filename));
+    <span class="kw">if </span>filename.is_absolute() {
+        <span class="kw">if </span>filename.is_file() {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(filename.into());
         }
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">fs::canonicalize</span>(<span class="ident">path</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">parent</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">PathBuf::from</span>(<span class="ident">parent</span>);
-        <span class="ident">f</span>.<span class="ident">push</span>(<span class="ident">filename</span>);
-        <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_file</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>path = fs::canonicalize(path).ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span>parent = path.parent()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>f = PathBuf::from(parent);
+        f.push(filename);
+        <span class="kw">if </span>f.is_file() {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(f);
         }
     }
 
-    <span class="ident">locate_build_id</span>(<span class="ident">build_id</span>)
+    locate_build_id(build_id)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="backtrace" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="backtrace" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/untrusted-0.7.1/src/untrusted.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>untrusted.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../untrusted/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../untrusted/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../untrusted/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/untrusted-0.7.1/src/untrusted.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>untrusted.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../untrusted/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../untrusted/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../untrusted/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -372,379 +372,379 @@
 <span id="372">372</span>
 <span id="373">373</span>
 <span id="374">374</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR</span>
-<span class="comment">// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN</span>
-<span class="comment">// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF</span>
-<span class="comment">// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! untrusted.rs: Safe, fast, zero-panic, zero-crashing, zero-allocation</span>
-<span class="doccomment">//! parsing of untrusted inputs in Rust.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;code&gt;git clone https://github.com/briansmith/untrusted&lt;/code&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! untrusted.rs goes beyond Rust&#39;s normal safety guarantees by  also</span>
-<span class="doccomment">//! guaranteeing that parsing will be panic-free, as long as</span>
-<span class="doccomment">//! `untrusted::Input::as_slice_less_safe()` is not used. It avoids copying</span>
-<span class="doccomment">//! data and heap allocation and strives to prevent common pitfalls such as</span>
-<span class="doccomment">//! accidentally parsing input bytes multiple times. In order to meet these</span>
-<span class="doccomment">//! goals, untrusted.rs is limited in functionality such that it works best for</span>
-<span class="doccomment">//! input languages with a small fixed amount of lookahead such as ASN.1, TLS,</span>
-<span class="doccomment">//! TCP/IP, and many other networking, IPC, and related protocols. Languages</span>
-<span class="doccomment">//! that require more lookahead and/or backtracking require some significant</span>
-<span class="doccomment">//! contortions to parse using this framework. It would not be realistic to use</span>
-<span class="doccomment">//! it for parsing programming language code, for example.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The overall pattern for using untrusted.rs is:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! 1. Write a recursive-descent-style parser for the input language, where the</span>
-<span class="doccomment">//!    input data is given as a `&amp;mut untrusted::Reader` parameter to each</span>
-<span class="doccomment">//!    function. Each function should have a return type of `Result&lt;V, E&gt;` for</span>
-<span class="doccomment">//!    some value type `V` and some error type `E`, either or both of which may</span>
-<span class="doccomment">//!    be `()`. Functions for parsing the lowest-level language constructs</span>
-<span class="doccomment">//!    should be defined. Those lowest-level functions will parse their inputs</span>
-<span class="doccomment">//!    using `::read_byte()`, `Reader::peek()`, and similar functions.</span>
-<span class="doccomment">//!    Higher-level language constructs are then parsed by calling the</span>
-<span class="doccomment">//!    lower-level functions in sequence.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! 2. Wrap the top-most functions of your recursive-descent parser in</span>
-<span class="doccomment">//!    functions that take their input data as an `untrusted::Input`. The</span>
-<span class="doccomment">//!    wrapper functions should call the `Input`&#39;s `read_all` (or a variant</span>
-<span class="doccomment">//!    thereof) method. The wrapper functions are the only ones that should be</span>
-<span class="doccomment">//!    exposed outside the parser&#39;s module.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! 3. After receiving the input data to parse, wrap it in an `untrusted::Input`</span>
-<span class="doccomment">//!    using `untrusted::Input::from()` as early as possible. Pass the</span>
-<span class="doccomment">//!    `untrusted::Input` to the wrapper functions when they need to be parsed.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In general parsers built using `untrusted::Reader` do not need to explicitly</span>
-<span class="doccomment">//! check for end-of-input unless they are parsing optional constructs, because</span>
-<span class="doccomment">//! `Reader::read_byte()` will return `Err(EndOfInput)` on end-of-input.</span>
-<span class="doccomment">//! Similarly, parsers using `untrusted::Reader` generally don&#39;t need to check</span>
-<span class="doccomment">//! for extra junk at the end of the input as long as the parser&#39;s API uses the</span>
-<span class="doccomment">//! pattern described above, as `read_all` and its variants automatically check</span>
-<span class="doccomment">//! for trailing junk. `Reader::skip_to_end()` must be used when any remaining</span>
-<span class="doccomment">//! unread input should be ignored without triggering an error.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! untrusted.rs works best when all processing of the input data is done</span>
-<span class="doccomment">//! through the `untrusted::Input` and `untrusted::Reader` types. In</span>
-<span class="doccomment">//! particular, avoid trying to parse input data using functions that take</span>
-<span class="doccomment">//! byte slices. However, when you need to access a part of the input data as</span>
-<span class="doccomment">//! a slice to use a function that isn&#39;t written using untrusted.rs,</span>
-<span class="doccomment">//! `Input::as_slice_less_safe()` can be used.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It is recommend to use `use untrusted;` and then `untrusted::Input`,</span>
-<span class="doccomment">//! `untrusted::Reader`, etc., instead of using `use untrusted::*`. Qualifying</span>
-<span class="doccomment">//! the names with `untrusted` helps remind the reader of the code that it is</span>
-<span class="doccomment">//! dealing with *untrusted* input.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [*ring*](https://github.com/briansmith/ring)&#39;s parser for the subset of</span>
-<span class="doccomment">//! ASN.1 DER it needs to understand,</span>
-<span class="doccomment">//! [`ring::der`](https://github.com/briansmith/ring/blob/master/src/der.rs),</span>
-<span class="doccomment">//! is built on top of untrusted.rs. *ring* also uses untrusted.rs to parse ECC</span>
-<span class="doccomment">//! public keys, RSA PKCS#1 1.5 padding, and for all other parsing it does.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! All of [webpki](https://github.com/briansmith/webpki)&#39;s parsing of X.509</span>
-<span class="doccomment">//! certificates (also ASN.1 DER) is done using untrusted.rs.</span>
+</span><span class="doccomment">//! untrusted.rs: Safe, fast, zero-panic, zero-crashing, zero-allocation
+//! parsing of untrusted inputs in Rust.
+//!
+//! &lt;code&gt;git clone https://github.com/briansmith/untrusted&lt;/code&gt;
+//!
+//! untrusted.rs goes beyond Rust&#39;s normal safety guarantees by  also
+//! guaranteeing that parsing will be panic-free, as long as
+//! `untrusted::Input::as_slice_less_safe()` is not used. It avoids copying
+//! data and heap allocation and strives to prevent common pitfalls such as
+//! accidentally parsing input bytes multiple times. In order to meet these
+//! goals, untrusted.rs is limited in functionality such that it works best for
+//! input languages with a small fixed amount of lookahead such as ASN.1, TLS,
+//! TCP/IP, and many other networking, IPC, and related protocols. Languages
+//! that require more lookahead and/or backtracking require some significant
+//! contortions to parse using this framework. It would not be realistic to use
+//! it for parsing programming language code, for example.
+//!
+//! The overall pattern for using untrusted.rs is:
+//!
+//! 1. Write a recursive-descent-style parser for the input language, where the
+//!    input data is given as a `&amp;mut untrusted::Reader` parameter to each
+//!    function. Each function should have a return type of `Result&lt;V, E&gt;` for
+//!    some value type `V` and some error type `E`, either or both of which may
+//!    be `()`. Functions for parsing the lowest-level language constructs
+//!    should be defined. Those lowest-level functions will parse their inputs
+//!    using `::read_byte()`, `Reader::peek()`, and similar functions.
+//!    Higher-level language constructs are then parsed by calling the
+//!    lower-level functions in sequence.
+//!
+//! 2. Wrap the top-most functions of your recursive-descent parser in
+//!    functions that take their input data as an `untrusted::Input`. The
+//!    wrapper functions should call the `Input`&#39;s `read_all` (or a variant
+//!    thereof) method. The wrapper functions are the only ones that should be
+//!    exposed outside the parser&#39;s module.
+//!
+//! 3. After receiving the input data to parse, wrap it in an `untrusted::Input`
+//!    using `untrusted::Input::from()` as early as possible. Pass the
+//!    `untrusted::Input` to the wrapper functions when they need to be parsed.
+//!
+//! In general parsers built using `untrusted::Reader` do not need to explicitly
+//! check for end-of-input unless they are parsing optional constructs, because
+//! `Reader::read_byte()` will return `Err(EndOfInput)` on end-of-input.
+//! Similarly, parsers using `untrusted::Reader` generally don&#39;t need to check
+//! for extra junk at the end of the input as long as the parser&#39;s API uses the
+//! pattern described above, as `read_all` and its variants automatically check
+//! for trailing junk. `Reader::skip_to_end()` must be used when any remaining
+//! unread input should be ignored without triggering an error.
+//!
+//! untrusted.rs works best when all processing of the input data is done
+//! through the `untrusted::Input` and `untrusted::Reader` types. In
+//! particular, avoid trying to parse input data using functions that take
+//! byte slices. However, when you need to access a part of the input data as
+//! a slice to use a function that isn&#39;t written using untrusted.rs,
+//! `Input::as_slice_less_safe()` can be used.
+//!
+//! It is recommend to use `use untrusted;` and then `untrusted::Input`,
+//! `untrusted::Reader`, etc., instead of using `use untrusted::*`. Qualifying
+//! the names with `untrusted` helps remind the reader of the code that it is
+//! dealing with *untrusted* input.
+//!
+//! # Examples
+//!
+//! [*ring*](https://github.com/briansmith/ring)&#39;s parser for the subset of
+//! ASN.1 DER it needs to understand,
+//! [`ring::der`](https://github.com/briansmith/ring/blob/master/src/der.rs),
+//! is built on top of untrusted.rs. *ring* also uses untrusted.rs to parse ECC
+//! public keys, RSA PKCS#1 1.5 padding, and for all other parsing it does.
+//!
+//! All of [webpki](https://github.com/briansmith/webpki)&#39;s parsing of X.509
+//! certificates (also ASN.1 DER) is done using untrusted.rs.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://briansmith.org/rustdoc/&quot;</span>)]</span>
-<span class="comment">// `#[derive(...)]` uses `#[allow(unused_qualifications)]` internally.</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unused_qualifications</span>)]</span>
-<span class="attribute">#![<span class="ident">forbid</span>(
-    <span class="ident">anonymous_parameters</span>,
-    <span class="ident">box_pointers</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">trivial_casts</span>,
-    <span class="ident">trivial_numeric_casts</span>,
-    <span class="ident">unsafe_code</span>,
-    <span class="ident">unstable_features</span>,
-    <span class="ident">unused_extern_crates</span>,
-    <span class="ident">unused_import_braces</span>,
-    <span class="ident">unused_results</span>,
-    <span class="ident">variant_size_differences</span>,
-    <span class="ident">warnings</span>
-)]</span>
-<span class="attribute">#![<span class="ident">no_std</span>]</span>
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://briansmith.org/rustdoc/&quot;</span>)]
+</span><span class="comment">// `#[derive(...)]` uses `#[allow(unused_qualifications)]` internally.
+</span><span class="attribute">#![deny(unused_qualifications)]
+#![forbid(
+    anonymous_parameters,
+    box_pointers,
+    missing_docs,
+    trivial_casts,
+    trivial_numeric_casts,
+    unsafe_code,
+    unstable_features,
+    unused_extern_crates,
+    unused_import_braces,
+    unused_results,
+    variant_size_differences,
+    warnings
+)]
+#![no_std]
 
-<span class="doccomment">/// A wrapper around `&amp;&#39;a [u8]` that helps in writing panic-free code.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// No methods of `Input` will ever panic.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="ident">no_panic::Slice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+</span><span class="doccomment">/// A wrapper around `&amp;&#39;a [u8]` that helps in writing panic-free code.
+///
+/// No methods of `Input` will ever panic.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq)]
+</span><span class="kw">pub struct </span>Input&lt;<span class="lifetime">&#39;a</span>&gt; {
+    value: no_panic::Slice&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct a new `Input` for the given input `bytes`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="comment">// This limit is important for avoiding integer overflow. In particular,</span>
-        <span class="comment">// `Reader` assumes that an `i + 1 &gt; i` if `input.value.get(i)` does</span>
-        <span class="comment">// not return `None`. According to the Rust language reference, the</span>
-        <span class="comment">// maximum object size is `core::isize::MAX`, and in practice it is</span>
-        <span class="comment">// impossible to create an object of size `core::usize::MAX` or larger.</span>
-        <span class="self">Self</span> {
-            <span class="ident">value</span>: <span class="ident">no_panic::Slice::new</span>(<span class="ident">bytes</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Input&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Construct a new `Input` for the given input `bytes`.
+    </span><span class="kw">pub const fn </span>from(bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="self">Self </span>{
+        <span class="comment">// This limit is important for avoiding integer overflow. In particular,
+        // `Reader` assumes that an `i + 1 &gt; i` if `input.value.get(i)` does
+        // not return `None`. According to the Rust language reference, the
+        // maximum object size is `core::isize::MAX`, and in practice it is
+        // impossible to create an object of size `core::usize::MAX` or larger.
+        </span><span class="self">Self </span>{
+            value: no_panic::Slice::new(bytes),
         }
     }
 
-    <span class="doccomment">/// Returns `true` if the input is empty and false otherwise.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">is_empty</span>() }
+    <span class="doccomment">/// Returns `true` if the input is empty and false otherwise.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool { <span class="self">self</span>.value.is_empty() }
 
-    <span class="doccomment">/// Returns the length of the `Input`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">len</span>() }
+    <span class="doccomment">/// Returns the length of the `Input`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize { <span class="self">self</span>.value.len() }
 
-    <span class="doccomment">/// Calls `read` with the given input as a `Reader`, ensuring that `read`</span>
-    <span class="doccomment">/// consumed the entire input. If `read` does not consume the entire input,</span>
-    <span class="doccomment">/// `incomplete_read` is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_all</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">incomplete_read</span>: <span class="ident">E</span>, <span class="ident">read</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Calls `read` with the given input as a `Reader`, ensuring that `read`
+    /// consumed the entire input. If `read` does not consume the entire input,
+    /// `incomplete_read` is returned.
+    </span><span class="kw">pub fn </span>read_all&lt;F, R, E&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, incomplete_read: E, read: F) -&gt; <span class="prelude-ty">Result</span>&lt;R, E&gt;
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;R, E&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">Reader::new</span>(<span class="kw-2">*</span><span class="self">self</span>);
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">input</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">at_end</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">incomplete_read</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>input = Reader::new(<span class="kw-2">*</span><span class="self">self</span>);
+        <span class="kw">let </span>result = read(<span class="kw-2">&amp;mut </span>input)<span class="question-mark">?</span>;
+        <span class="kw">if </span>input.at_end() {
+            <span class="prelude-val">Ok</span>(result)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(incomplete_read)
         }
     }
 
-    <span class="doccomment">/// Access the input as a slice so it can be processed by functions that</span>
-    <span class="doccomment">/// are not written using the Input/Reader framework.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice_less_safe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] { <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_slice_less_safe</span>() }
+    <span class="doccomment">/// Access the input as a slice so it can be processed by functions that
+    /// are not written using the Input/Reader framework.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_slice_less_safe(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] { <span class="self">self</span>.value.as_slice_less_safe() }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> { <span class="self">Self</span> { <span class="ident">value</span>: <span class="ident">no_panic::Slice::new</span>(<span class="ident">value</span>)} }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; <span class="kw">for </span>Input&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="self">Self </span>{ <span class="self">Self </span>{ value: no_panic::Slice::new(value)} }
 }
 
-<span class="comment">// #[derive(PartialEq)] would result in lifetime bounds that are</span>
-<span class="comment">// unnecessarily restrictive; see</span>
-<span class="comment">// https://github.com/rust-lang/rust/issues/26925.</span>
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Input</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_slice_less_safe</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">as_slice_less_safe</span>()
+<span class="comment">// #[derive(PartialEq)] would result in lifetime bounds that are
+// unnecessarily restrictive; see
+// https://github.com/rust-lang/rust/issues/26925.
+</span><span class="kw">impl </span>PartialEq&lt;Input&lt;<span class="lifetime">&#39;_</span>&gt;&gt; <span class="kw">for </span>Input&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Input) -&gt; bool {
+        <span class="self">self</span>.as_slice_less_safe() == other.as_slice_less_safe()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> { <span class="self">self</span>.<span class="ident">as_slice_less_safe</span>() <span class="op">==</span> <span class="ident">other</span> }
+<span class="kw">impl </span>PartialEq&lt;[u8]&gt; <span class="kw">for </span>Input&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>[u8]) -&gt; bool { <span class="self">self</span>.as_slice_less_safe() == other }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Input</span>) -&gt; <span class="ident">bool</span> { <span class="ident">other</span>.<span class="ident">as_slice_less_safe</span>() <span class="op">==</span> <span class="self">self</span> }
+<span class="kw">impl </span>PartialEq&lt;Input&lt;<span class="lifetime">&#39;_</span>&gt;&gt; <span class="kw">for </span>[u8] {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Input) -&gt; bool { other.as_slice_less_safe() == <span class="self">self </span>}
 }
 
-<span class="doccomment">/// Calls `read` with the given input as a `Reader`, ensuring that `read`</span>
-<span class="doccomment">/// consumed the entire input. When `input` is `None`, `read` will be</span>
-<span class="doccomment">/// called with `None`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_all_optional</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">incomplete_read</span>: <span class="ident">E</span>, <span class="ident">read</span>: <span class="ident">F</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Calls `read` with the given input as a `Reader`, ensuring that `read`
+/// consumed the entire input. When `input` is `None`, `read` will be
+/// called with `None`.
+</span><span class="kw">pub fn </span>read_all_optional&lt;<span class="lifetime">&#39;a</span>, F, R, E&gt;(
+    input: <span class="prelude-ty">Option</span>&lt;Input&lt;<span class="lifetime">&#39;a</span>&gt;&gt;, incomplete_read: E, read: F,
+) -&gt; <span class="prelude-ty">Result</span>&lt;R, E&gt;
+<span class="kw">where
+    </span>F: FnOnce(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;R, E&gt;,
 {
-    <span class="kw">match</span> <span class="ident">input</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">input</span>) =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">Reader::new</span>(<span class="ident">input</span>);
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">read</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">input</span>))<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">at_end</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">incomplete_read</span>)
+    <span class="kw">match </span>input {
+        <span class="prelude-val">Some</span>(input) =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>input = Reader::new(input);
+            <span class="kw">let </span>result = read(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>input))<span class="question-mark">?</span>;
+            <span class="kw">if </span>input.at_end() {
+                <span class="prelude-val">Ok</span>(result)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Err</span>(incomplete_read)
             }
         },
-        <span class="prelude-val">None</span> =&gt; <span class="ident">read</span>(<span class="prelude-val">None</span>),
+        <span class="prelude-val">None </span>=&gt; read(<span class="prelude-val">None</span>),
     }
 }
 
-<span class="doccomment">/// A read-only, forward-only* cursor into the data in an `Input`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using `Reader` to parse input helps to ensure that no byte of the input</span>
-<span class="doccomment">/// will be accidentally processed more than once. Using `Reader` in</span>
-<span class="doccomment">/// conjunction with `read_all` and `read_all_optional` helps ensure that no</span>
-<span class="doccomment">/// byte of the input is accidentally left unprocessed. The methods of `Reader`</span>
-<span class="doccomment">/// never panic, so `Reader` also assists the writing of panic-free code.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// \* `Reader` is not strictly forward-only because of the method</span>
-<span class="doccomment">/// `get_input_between_marks`, which is provided mainly to support calculating</span>
-<span class="doccomment">/// digests over parsed data.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">input</span>: <span class="ident">no_panic::Slice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">i</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// A read-only, forward-only* cursor into the data in an `Input`.
+///
+/// Using `Reader` to parse input helps to ensure that no byte of the input
+/// will be accidentally processed more than once. Using `Reader` in
+/// conjunction with `read_all` and `read_all_optional` helps ensure that no
+/// byte of the input is accidentally left unprocessed. The methods of `Reader`
+/// never panic, so `Reader` also assists the writing of panic-free code.
+///
+/// \* `Reader` is not strictly forward-only because of the method
+/// `get_input_between_marks`, which is provided mainly to support calculating
+/// digests over parsed data.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Reader&lt;<span class="lifetime">&#39;a</span>&gt; {
+    input: no_panic::Slice&lt;<span class="lifetime">&#39;a</span>&gt;,
+    i: usize,
 }
 
-<span class="doccomment">/// An index into the already-parsed input of a `Reader`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Mark</span> {
-    <span class="ident">i</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// An index into the already-parsed input of a `Reader`.
+</span><span class="kw">pub struct </span>Mark {
+    i: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct a new Reader for the given input. Use `read_all` or</span>
-    <span class="doccomment">/// `read_all_optional` instead of `Reader::new` whenever possible.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">input</span>: <span class="ident">input</span>.<span class="ident">value</span>,
-            <span class="ident">i</span>: <span class="number">0</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Reader&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Construct a new Reader for the given input. Use `read_all` or
+    /// `read_all_optional` instead of `Reader::new` whenever possible.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>new(input: Input&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            input: input.value,
+            i: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Returns `true` if the reader is at the end of the input, and `false`</span>
-    <span class="doccomment">/// otherwise.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">at_end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="self">self</span>.<span class="ident">i</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>() }
+    <span class="doccomment">/// Returns `true` if the reader is at the end of the input, and `false`
+    /// otherwise.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>at_end(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool { <span class="self">self</span>.i == <span class="self">self</span>.input.len() }
 
-    <span class="doccomment">/// Returns an `Input` for already-parsed input that has had its boundaries</span>
-    <span class="doccomment">/// marked using `mark`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_input_between_marks</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mark1</span>: <span class="ident">Mark</span>, <span class="ident">mark2</span>: <span class="ident">Mark</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">EndOfInput</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">input</span>
-            .<span class="ident">subslice</span>(<span class="ident">mark1</span>.<span class="ident">i</span>..<span class="ident">mark2</span>.<span class="ident">i</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">subslice</span><span class="op">|</span> <span class="ident">Input</span> { <span class="ident">value</span>: <span class="ident">subslice</span> })
-            .<span class="ident">ok_or</span>(<span class="ident">EndOfInput</span>)
+    <span class="doccomment">/// Returns an `Input` for already-parsed input that has had its boundaries
+    /// marked using `mark`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>get_input_between_marks(
+        <span class="kw-2">&amp;</span><span class="self">self</span>, mark1: Mark, mark2: Mark,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Input&lt;<span class="lifetime">&#39;a</span>&gt;, EndOfInput&gt; {
+        <span class="self">self</span>.input
+            .subslice(mark1.i..mark2.i)
+            .map(|subslice| Input { value: subslice })
+            .ok_or(EndOfInput)
     }
 
-    <span class="doccomment">/// Return the current position of the `Reader` for future use in a call</span>
-    <span class="doccomment">/// to `get_input_between_marks`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Mark</span> { <span class="ident">Mark</span> { <span class="ident">i</span>: <span class="self">self</span>.<span class="ident">i</span> } }
+    <span class="doccomment">/// Return the current position of the `Reader` for future use in a call
+    /// to `get_input_between_marks`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>mark(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Mark { Mark { i: <span class="self">self</span>.i } }
 
-    <span class="doccomment">/// Returns `true` if there is at least one more byte in the input and that</span>
-    <span class="doccomment">/// byte is equal to `b`, and false otherwise.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">i</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">actual_b</span>) =&gt; <span class="ident">b</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">actual_b</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+    <span class="doccomment">/// Returns `true` if there is at least one more byte in the input and that
+    /// byte is equal to `b`, and false otherwise.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>peek(<span class="kw-2">&amp;</span><span class="self">self</span>, b: u8) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.input.get(<span class="self">self</span>.i) {
+            <span class="prelude-val">Some</span>(actual_b) =&gt; b == <span class="kw-2">*</span>actual_b,
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Reads the next input byte.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `Ok(b)` where `b` is the next input byte, or `Err(EndOfInput)`</span>
-    <span class="doccomment">/// if the `Reader` is at the end of the input.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_byte</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">EndOfInput</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">i</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>; <span class="comment">// safe from overflow; see Input::from().</span>
-                <span class="prelude-val">Ok</span>(<span class="kw-2">*</span><span class="ident">b</span>)
+    <span class="doccomment">/// Reads the next input byte.
+    ///
+    /// Returns `Ok(b)` where `b` is the next input byte, or `Err(EndOfInput)`
+    /// if the `Reader` is at the end of the input.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>read_byte(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u8, EndOfInput&gt; {
+        <span class="kw">match </span><span class="self">self</span>.input.get(<span class="self">self</span>.i) {
+            <span class="prelude-val">Some</span>(b) =&gt; {
+                <span class="self">self</span>.i += <span class="number">1</span>; <span class="comment">// safe from overflow; see Input::from().
+                </span><span class="prelude-val">Ok</span>(<span class="kw-2">*</span>b)
             },
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">EndOfInput</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(EndOfInput),
         }
     }
 
-    <span class="doccomment">/// Skips `num_bytes` of the input, returning the skipped input as an</span>
-    <span class="doccomment">/// `Input`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `Ok(i)` if there are at least `num_bytes` of input remaining,</span>
-    <span class="doccomment">/// and `Err(EndOfInput)` otherwise.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">num_bytes</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">EndOfInput</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">new_i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">i</span>.<span class="ident">checked_add</span>(<span class="ident">num_bytes</span>).<span class="ident">ok_or</span>(<span class="ident">EndOfInput</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">input</span>
-            .<span class="ident">subslice</span>(<span class="self">self</span>.<span class="ident">i</span>..<span class="ident">new_i</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">subslice</span><span class="op">|</span> <span class="ident">Input</span> { <span class="ident">value</span>: <span class="ident">subslice</span> })
-            .<span class="ident">ok_or</span>(<span class="ident">EndOfInput</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">i</span> <span class="op">=</span> <span class="ident">new_i</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
+    <span class="doccomment">/// Skips `num_bytes` of the input, returning the skipped input as an
+    /// `Input`.
+    ///
+    /// Returns `Ok(i)` if there are at least `num_bytes` of input remaining,
+    /// and `Err(EndOfInput)` otherwise.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>read_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num_bytes: usize) -&gt; <span class="prelude-ty">Result</span>&lt;Input&lt;<span class="lifetime">&#39;a</span>&gt;, EndOfInput&gt; {
+        <span class="kw">let </span>new_i = <span class="self">self</span>.i.checked_add(num_bytes).ok_or(EndOfInput)<span class="question-mark">?</span>;
+        <span class="kw">let </span>ret = <span class="self">self
+            </span>.input
+            .subslice(<span class="self">self</span>.i..new_i)
+            .map(|subslice| Input { value: subslice })
+            .ok_or(EndOfInput)<span class="question-mark">?</span>;
+        <span class="self">self</span>.i = new_i;
+        <span class="prelude-val">Ok</span>(ret)
     }
 
-    <span class="doccomment">/// Skips the reader to the end of the input, returning the skipped input</span>
-    <span class="doccomment">/// as an `Input`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_bytes_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">to_skip</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">i</span>;
-        <span class="self">self</span>.<span class="ident">read_bytes</span>(<span class="ident">to_skip</span>).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Skips the reader to the end of the input, returning the skipped input
+    /// as an `Input`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>read_bytes_to_end(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Input&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>to_skip = <span class="self">self</span>.input.len() - <span class="self">self</span>.i;
+        <span class="self">self</span>.read_bytes(to_skip).unwrap()
     }
 
-    <span class="doccomment">/// Calls `read()` with the given input as a `Reader`. On success, returns a</span>
-    <span class="doccomment">/// pair `(bytes_read, r)` where `bytes_read` is what `read()` consumed and</span>
-    <span class="doccomment">/// `r` is `read()`&#39;s return value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_partial</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">read</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">R</span>), <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Calls `read()` with the given input as a `Reader`. On success, returns a
+    /// pair `(bytes_read, r)` where `bytes_read` is what `read()` consumed and
+    /// `r` is `read()`&#39;s return value.
+    </span><span class="kw">pub fn </span>read_partial&lt;F, R, E&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, read: F) -&gt; <span class="prelude-ty">Result</span>&lt;(Input&lt;<span class="lifetime">&#39;a</span>&gt;, R), E&gt;
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;R, E&gt;,
     {
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">i</span>;
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">read</span>(<span class="self">self</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">bytes_read</span> <span class="op">=</span> <span class="ident">Input</span> {
-            <span class="ident">value</span>: <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">subslice</span>(<span class="ident">start</span>..<span class="self">self</span>.<span class="ident">i</span>).<span class="ident">unwrap</span>()
+        <span class="kw">let </span>start = <span class="self">self</span>.i;
+        <span class="kw">let </span>r = read(<span class="self">self</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>bytes_read = Input {
+            value: <span class="self">self</span>.input.subslice(start..<span class="self">self</span>.i).unwrap()
         };
-        <span class="prelude-val">Ok</span>((<span class="ident">bytes_read</span>, <span class="ident">r</span>))
+        <span class="prelude-val">Ok</span>((bytes_read, r))
     }
 
-    <span class="doccomment">/// Skips `num_bytes` of the input.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `Ok(i)` if there are at least `num_bytes` of input remaining,</span>
-    <span class="doccomment">/// and `Err(EndOfInput)` otherwise.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">num_bytes</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">EndOfInput</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">read_bytes</span>(<span class="ident">num_bytes</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+    <span class="doccomment">/// Skips `num_bytes` of the input.
+    ///
+    /// Returns `Ok(i)` if there are at least `num_bytes` of input remaining,
+    /// and `Err(EndOfInput)` otherwise.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>skip(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num_bytes: usize) -&gt; <span class="prelude-ty">Result</span>&lt;(), EndOfInput&gt; {
+        <span class="self">self</span>.read_bytes(num_bytes).map(|<span class="kw">_</span>| ())
     }
 
-    <span class="doccomment">/// Skips the reader to the end of the input.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; () { <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_bytes_to_end</span>(); }
+    <span class="doccomment">/// Skips the reader to the end of the input.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>skip_to_end(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; () { <span class="kw">let _ </span>= <span class="self">self</span>.read_bytes_to_end(); }
 }
 
-<span class="doccomment">/// The error type used to indicate the end of the input was reached before the</span>
-<span class="doccomment">/// operation could be completed.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EndOfInput</span>;
+<span class="doccomment">/// The error type used to indicate the end of the input was reached before the
+/// operation could be completed.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>EndOfInput;
 
-<span class="kw">mod</span> <span class="ident">no_panic</span> {
-    <span class="kw">use</span> <span class="ident">core</span>;
+<span class="kw">mod </span>no_panic {
+    <span class="kw">use </span>core;
 
-    <span class="doccomment">/// A wrapper around a slice that exposes no functions that can panic.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Slice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
+    <span class="doccomment">/// A wrapper around a slice that exposes no functions that can panic.
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+    </span><span class="kw">pub struct </span>Slice&lt;<span class="lifetime">&#39;a</span>&gt; {
+        bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Slice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> { <span class="self">Self</span> { <span class="ident">bytes</span> } }
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Slice&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="attribute">#[inline]
+        </span><span class="kw">pub const fn </span>new(bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="self">Self </span>{ <span class="self">Self </span>{ bytes } }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">u8</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">get</span>(<span class="ident">i</span>) }
+        <span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>u8&gt; { <span class="self">self</span>.bytes.get(i) }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subslice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">r</span>: <span class="ident">core::ops::Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">get</span>(<span class="ident">r</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">bytes</span><span class="op">|</span> <span class="self">Self</span> { <span class="ident">bytes</span> })
+        <span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span>subslice(<span class="kw-2">&amp;</span><span class="self">self</span>, r: core::ops::Range&lt;usize&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+            <span class="self">self</span>.bytes.get(r).map(|bytes| <span class="self">Self </span>{ bytes })
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">is_empty</span>() }
+        <span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool { <span class="self">self</span>.bytes.is_empty() }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>() }
+        <span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize { <span class="self">self</span>.bytes.len() }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice_less_safe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] { <span class="self">self</span>.<span class="ident">bytes</span> }
+        <span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span>as_slice_less_safe(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] { <span class="self">self</span>.bytes }
     }
 
-} <span class="comment">// mod no_panic</span>
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="untrusted" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+} <span class="comment">// mod no_panic
+</span></code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="untrusted" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

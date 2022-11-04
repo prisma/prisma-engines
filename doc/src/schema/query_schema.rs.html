@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema/src/query_schema.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema/src/query_schema.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -255,262 +255,262 @@
 <span id="255">255</span>
 <span id="256">256</span>
 <span id="257">257</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">fmt::Debug</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">psl::PreviewFeature</span>, <span class="ident">InternalDataModelRef</span>, <span class="ident">ModelRef</span>};
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector</span>::{<span class="ident">ConnectorCapability</span>, <span class="ident">RelationMode</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">fmt</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>fmt::Debug;
+<span class="kw">use </span>prisma_models::{psl::PreviewFeature, InternalDataModelRef, ModelRef};
+<span class="kw">use </span>psl::datamodel_connector::{ConnectorCapability, RelationMode};
+<span class="kw">use </span>std::{borrow::Borrow, fmt};
 
-<span class="doccomment">/// The query schema.</span>
-<span class="doccomment">/// Defines which operations (query/mutations) are possible on a database, based on the (internal) data model.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Conceptually, a query schema stores two trees (query / mutation) that consist of</span>
-<span class="doccomment">/// input and output types. Special consideration is required when dealing with object types.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Object types can be referenced multiple times throughout the schema, also recursively, which requires the use</span>
-<span class="doccomment">/// of weak references to prevent memory leaks. To simplify the overall management of Arcs and weaks, the</span>
-<span class="doccomment">/// query schema is subject to a number of invariants.</span>
-<span class="doccomment">/// The most important one is that the only strong references (Arc) to a single object types</span>
-<span class="doccomment">/// is only ever held by the top-level QuerySchema struct, never by the trees, which only ever hold weak refs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using a QuerySchema should never involve dealing with the strong references.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QuerySchema</span> {
-    <span class="doccomment">/// Root query object (read queries).</span>
-    <span class="kw">pub</span> <span class="ident">query</span>: <span class="ident">OutputTypeRef</span>,
+<span class="doccomment">/// The query schema.
+/// Defines which operations (query/mutations) are possible on a database, based on the (internal) data model.
+///
+/// Conceptually, a query schema stores two trees (query / mutation) that consist of
+/// input and output types. Special consideration is required when dealing with object types.
+///
+/// Object types can be referenced multiple times throughout the schema, also recursively, which requires the use
+/// of weak references to prevent memory leaks. To simplify the overall management of Arcs and weaks, the
+/// query schema is subject to a number of invariants.
+/// The most important one is that the only strong references (Arc) to a single object types
+/// is only ever held by the top-level QuerySchema struct, never by the trees, which only ever hold weak refs.
+///
+/// Using a QuerySchema should never involve dealing with the strong references.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>QuerySchema {
+    <span class="doccomment">/// Root query object (read queries).
+    </span><span class="kw">pub </span>query: OutputTypeRef,
 
-    <span class="doccomment">/// Root mutation object (write queries).</span>
-    <span class="kw">pub</span> <span class="ident">mutation</span>: <span class="ident">OutputTypeRef</span>,
+    <span class="doccomment">/// Root mutation object (write queries).
+    </span><span class="kw">pub </span>mutation: OutputTypeRef,
 
-    <span class="doccomment">/// Internal abstraction over the datamodel AST.</span>
-    <span class="kw">pub</span> <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelRef</span>,
+    <span class="doccomment">/// Internal abstraction over the datamodel AST.
+    </span><span class="kw">pub </span>internal_data_model: InternalDataModelRef,
 
-    <span class="doccomment">/// Information about the connector this schema was build for.</span>
-    <span class="kw">pub</span> <span class="ident">context</span>: <span class="ident">ConnectorContext</span>,
+    <span class="doccomment">/// Information about the connector this schema was build for.
+    </span><span class="kw">pub </span>context: ConnectorContext,
 
-    <span class="doccomment">/// Internal. Stores all strong Arc refs to the input object types.</span>
-    <span class="ident">_input_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputObjectTypeStrongRef</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Internal. Stores all strong Arc refs to the input object types.
+    </span>_input_object_types: Vec&lt;InputObjectTypeStrongRef&gt;,
 
-    <span class="doccomment">/// Internal. Stores all strong Arc refs to the output object types.</span>
-    <span class="ident">_output_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ObjectTypeStrongRef</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Internal. Stores all strong Arc refs to the output object types.
+    </span>_output_object_types: Vec&lt;ObjectTypeStrongRef&gt;,
 
-    <span class="doccomment">/// Internal. Stores all enum refs.</span>
-    <span class="ident">_enum_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EnumTypeRef</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Internal. Stores all enum refs.
+    </span>_enum_types: Vec&lt;EnumTypeRef&gt;,
 }
 
-<span class="doccomment">/// Connector meta information, to be used in query execution if necessary.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectorContext</span> {
-    <span class="doccomment">/// Capabilities of the provider.</span>
-    <span class="kw">pub</span> <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Connector meta information, to be used in query execution if necessary.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ConnectorContext {
+    <span class="doccomment">/// Capabilities of the provider.
+    </span><span class="kw">pub </span>capabilities: Vec&lt;ConnectorCapability&gt;,
 
-    <span class="doccomment">/// Enabled preview features.</span>
-    <span class="kw">pub</span> <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Enabled preview features.
+    </span><span class="kw">pub </span>features: Vec&lt;PreviewFeature&gt;,
 
-    <span class="doccomment">/// Relation mode of the provider</span>
-    <span class="kw">pub</span> <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
+    <span class="doccomment">/// Relation mode of the provider
+    </span><span class="kw">pub </span>relation_mode: RelationMode,
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectorContext</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
-        <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-        <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">capabilities</span>,
-            <span class="ident">features</span>,
-            <span class="ident">relation_mode</span>,
+<span class="kw">impl </span>ConnectorContext {
+    <span class="kw">pub fn </span>new(
+        capabilities: Vec&lt;ConnectorCapability&gt;,
+        features: Vec&lt;PreviewFeature&gt;,
+        relation_mode: RelationMode,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            capabilities,
+            features,
+            relation_mode,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_native_upsert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ConnectorCapability::NativeUpsert</span>)
+    <span class="kw">pub fn </span>can_native_upsert(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.capabilities.contains(<span class="kw-2">&amp;</span>ConnectorCapability::NativeUpsert)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">QuerySchema</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">query</span>: <span class="ident">OutputTypeRef</span>,
-        <span class="ident">mutation</span>: <span class="ident">OutputTypeRef</span>,
-        <span class="ident">_input_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputObjectTypeStrongRef</span><span class="op">&gt;</span>,
-        <span class="ident">_output_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ObjectTypeStrongRef</span><span class="op">&gt;</span>,
-        <span class="ident">_enum_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EnumTypeRef</span><span class="op">&gt;</span>,
-        <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelRef</span>,
-        <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
-        <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-        <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident">QuerySchema</span> {
-            <span class="ident">query</span>,
-            <span class="ident">mutation</span>,
-            <span class="ident">_input_object_types</span>,
-            <span class="ident">_output_object_types</span>,
-            <span class="ident">_enum_types</span>,
-            <span class="ident">internal_data_model</span>,
-            <span class="ident">context</span>: <span class="ident">ConnectorContext::new</span>(<span class="ident">capabilities</span>, <span class="ident">features</span>, <span class="ident">relation_mode</span>),
+<span class="kw">impl </span>QuerySchema {
+    <span class="attribute">#[allow(clippy::too_many_arguments)]
+    </span><span class="kw">pub fn </span>new(
+        query: OutputTypeRef,
+        mutation: OutputTypeRef,
+        _input_object_types: Vec&lt;InputObjectTypeStrongRef&gt;,
+        _output_object_types: Vec&lt;ObjectTypeStrongRef&gt;,
+        _enum_types: Vec&lt;EnumTypeRef&gt;,
+        internal_data_model: InternalDataModelRef,
+        capabilities: Vec&lt;ConnectorCapability&gt;,
+        features: Vec&lt;PreviewFeature&gt;,
+        relation_mode: RelationMode,
+    ) -&gt; <span class="self">Self </span>{
+        QuerySchema {
+            query,
+            mutation,
+            _input_object_types,
+            _output_object_types,
+            _enum_types,
+            internal_data_model,
+            context: ConnectorContext::new(capabilities, features, relation_mode),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_mutation_field</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputFieldRef</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>find_mutation_field&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="prelude-ty">Option</span>&lt;OutputFieldRef&gt;
+    <span class="kw">where
+        </span>T: Into&lt;String&gt;,
     {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">mutation</span>().<span class="ident">get_fields</span>().<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>).<span class="ident">cloned</span>()
+        <span class="kw">let </span>name = name.into();
+        <span class="self">self</span>.mutation().get_fields().iter().find(|f| f.name == name).cloned()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_query_field</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputFieldRef</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>find_query_field&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="prelude-ty">Option</span>&lt;OutputFieldRef&gt;
+    <span class="kw">where
+        </span>T: Into&lt;String&gt;,
     {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">query</span>().<span class="ident">get_fields</span>().<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>).<span class="ident">cloned</span>()
+        <span class="kw">let </span>name = name.into();
+        <span class="self">self</span>.query().get_fields().iter().find(|f| f.name == name).cloned()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mutation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ObjectTypeStrongRef</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">mutation</span>.<span class="ident">borrow</span>() {
-            <span class="ident">OutputType::Object</span>(<span class="kw-2">ref</span> <span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">into_arc</span>(),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="kw">pub fn </span>mutation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ObjectTypeStrongRef {
+        <span class="kw">match </span><span class="self">self</span>.mutation.borrow() {
+            OutputType::Object(<span class="kw-2">ref </span>o) =&gt; o.into_arc(),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ObjectTypeStrongRef</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">borrow</span>() {
-            <span class="ident">OutputType::Object</span>(<span class="kw-2">ref</span> <span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">into_arc</span>(),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="kw">pub fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ObjectTypeStrongRef {
+        <span class="kw">match </span><span class="self">self</span>.query.borrow() {
+            OutputType::Object(<span class="kw-2">ref </span>o) =&gt; o.into_arc(),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">EnumTypeRef</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">_enum_types</span>
+    <span class="kw">pub fn </span>enum_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[EnumTypeRef] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>._enum_types
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">context</span>
+    <span class="kw">pub fn </span>context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ConnectorContext {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.context
     }
 }
 
-<span class="doccomment">/// Designates a specific top-level operation on a corresponding model.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryInfo</span> {
-    <span class="kw">pub</span> <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">tag</span>: <span class="ident">QueryTag</span>,
+<span class="doccomment">/// Designates a specific top-level operation on a corresponding model.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>QueryInfo {
+    <span class="kw">pub </span>model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;,
+    <span class="kw">pub </span>tag: QueryTag,
 }
 
-<span class="doccomment">/// A `QueryTag` designates a top level query possible with Prisma.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QueryTag</span> {
-    <span class="ident">FindUnique</span>,
-    <span class="ident">FindFirst</span>,
-    <span class="ident">FindMany</span>,
-    <span class="ident">CreateOne</span>,
-    <span class="ident">CreateMany</span>,
-    <span class="ident">UpdateOne</span>,
-    <span class="ident">UpdateMany</span>,
-    <span class="ident">DeleteOne</span>,
-    <span class="ident">DeleteMany</span>,
-    <span class="ident">UpsertOne</span>,
-    <span class="ident">Aggregate</span>,
-    <span class="ident">GroupBy</span>,
-    <span class="ident">ExecuteRaw</span>,
-    <span class="ident">QueryRaw</span> { <span class="ident">query_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> },
+<span class="doccomment">/// A `QueryTag` designates a top level query possible with Prisma.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>QueryTag {
+    FindUnique,
+    FindFirst,
+    FindMany,
+    CreateOne,
+    CreateMany,
+    UpdateOne,
+    UpdateMany,
+    DeleteOne,
+    DeleteMany,
+    UpsertOne,
+    Aggregate,
+    GroupBy,
+    ExecuteRaw,
+    QueryRaw { query_type: <span class="prelude-ty">Option</span>&lt;String&gt; },
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">QueryTag</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::FindUnique</span> =&gt; <span class="string">&quot;findUnique&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::FindFirst</span> =&gt; <span class="string">&quot;findFirst&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::FindMany</span> =&gt; <span class="string">&quot;findMany&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::CreateOne</span> =&gt; <span class="string">&quot;createOne&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::CreateMany</span> =&gt; <span class="string">&quot;createMany&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::UpdateOne</span> =&gt; <span class="string">&quot;updateOne&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::UpdateMany</span> =&gt; <span class="string">&quot;updateMany&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::DeleteOne</span> =&gt; <span class="string">&quot;deleteOne&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::DeleteMany</span> =&gt; <span class="string">&quot;deleteMany&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::UpsertOne</span> =&gt; <span class="string">&quot;upsertOne&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Aggregate</span> =&gt; <span class="string">&quot;aggregate&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::GroupBy</span> =&gt; <span class="string">&quot;groupBy&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::ExecuteRaw</span> =&gt; <span class="string">&quot;executeRaw&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::QueryRaw</span> { <span class="ident">query_type</span>: <span class="kw">_</span> } =&gt; <span class="string">&quot;queryRaw&quot;</span>,
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>QueryTag {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span>s = <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::FindUnique =&gt; <span class="string">&quot;findUnique&quot;</span>,
+            <span class="self">Self</span>::FindFirst =&gt; <span class="string">&quot;findFirst&quot;</span>,
+            <span class="self">Self</span>::FindMany =&gt; <span class="string">&quot;findMany&quot;</span>,
+            <span class="self">Self</span>::CreateOne =&gt; <span class="string">&quot;createOne&quot;</span>,
+            <span class="self">Self</span>::CreateMany =&gt; <span class="string">&quot;createMany&quot;</span>,
+            <span class="self">Self</span>::UpdateOne =&gt; <span class="string">&quot;updateOne&quot;</span>,
+            <span class="self">Self</span>::UpdateMany =&gt; <span class="string">&quot;updateMany&quot;</span>,
+            <span class="self">Self</span>::DeleteOne =&gt; <span class="string">&quot;deleteOne&quot;</span>,
+            <span class="self">Self</span>::DeleteMany =&gt; <span class="string">&quot;deleteMany&quot;</span>,
+            <span class="self">Self</span>::UpsertOne =&gt; <span class="string">&quot;upsertOne&quot;</span>,
+            <span class="self">Self</span>::Aggregate =&gt; <span class="string">&quot;aggregate&quot;</span>,
+            <span class="self">Self</span>::GroupBy =&gt; <span class="string">&quot;groupBy&quot;</span>,
+            <span class="self">Self</span>::ExecuteRaw =&gt; <span class="string">&quot;executeRaw&quot;</span>,
+            <span class="self">Self</span>::QueryRaw { query_type: <span class="kw">_ </span>} =&gt; <span class="string">&quot;queryRaw&quot;</span>,
         };
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">s</span>)
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, s)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Identifier</span> {
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">namespace</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(PartialEq, Hash, Eq, Debug, Clone)]
+</span><span class="kw">pub struct </span>Identifier {
+    name: String,
+    namespace: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Identifier</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">namespace</span>: <span class="ident">U</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>Identifier {
+    <span class="kw">pub fn </span>new&lt;T, U&gt;(name: T, namespace: U) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;String&gt;,
+        U: Into&lt;String&gt;,
     {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">namespace</span>: <span class="ident">namespace</span>.<span class="ident">into</span>(),
+        <span class="self">Self </span>{
+            name: name.into(),
+            namespace: namespace.into(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+    <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">namespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">namespace</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ToString</span> <span class="kw">for</span> <span class="ident">Identifier</span> {
-    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.<span class="ident">namespace</span>(), <span class="self">self</span>.<span class="ident">name</span>())
+    <span class="kw">pub fn </span>namespace(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.namespace
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScalarType</span> {
-    <span class="ident">Null</span>,
-    <span class="ident">String</span>,
-    <span class="ident">Int</span>,
-    <span class="ident">BigInt</span>,
-    <span class="ident">Float</span>,
-    <span class="ident">Decimal</span>,
-    <span class="ident">Boolean</span>,
-    <span class="ident">DateTime</span>,
-    <span class="ident">Json</span>,
-    <span class="ident">JsonList</span>,
-    <span class="ident">UUID</span>,
-    <span class="ident">Xml</span>,
-    <span class="ident">Bytes</span>,
+<span class="kw">impl </span>ToString <span class="kw">for </span>Identifier {
+    <span class="kw">fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.namespace(), <span class="self">self</span>.name())
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">ScalarType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScalarType::Null</span> =&gt; <span class="string">&quot;Null&quot;</span>,
-            <span class="ident">ScalarType::String</span> =&gt; <span class="string">&quot;String&quot;</span>,
-            <span class="ident">ScalarType::Int</span> =&gt; <span class="string">&quot;Int&quot;</span>,
-            <span class="ident">ScalarType::BigInt</span> =&gt; <span class="string">&quot;BigInt&quot;</span>,
-            <span class="ident">ScalarType::Boolean</span> =&gt; <span class="string">&quot;Boolean&quot;</span>,
-            <span class="ident">ScalarType::Float</span> =&gt; <span class="string">&quot;Float&quot;</span>,
-            <span class="ident">ScalarType::Decimal</span> =&gt; <span class="string">&quot;Decimal&quot;</span>,
-            <span class="ident">ScalarType::DateTime</span> =&gt; <span class="string">&quot;DateTime&quot;</span>,
-            <span class="ident">ScalarType::Json</span> =&gt; <span class="string">&quot;Json&quot;</span>,
-            <span class="ident">ScalarType::UUID</span> =&gt; <span class="string">&quot;UUID&quot;</span>,
-            <span class="ident">ScalarType::JsonList</span> =&gt; <span class="string">&quot;Json&quot;</span>,
-            <span class="ident">ScalarType::Xml</span> =&gt; <span class="string">&quot;Xml&quot;</span>,
-            <span class="ident">ScalarType::Bytes</span> =&gt; <span class="string">&quot;Bytes&quot;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>ScalarType {
+    Null,
+    String,
+    Int,
+    BigInt,
+    Float,
+    Decimal,
+    Boolean,
+    DateTime,
+    Json,
+    JsonList,
+    UUID,
+    Xml,
+    Bytes,
+}
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>ScalarType {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>typ = <span class="kw">match </span><span class="self">self </span>{
+            ScalarType::Null =&gt; <span class="string">&quot;Null&quot;</span>,
+            ScalarType::String =&gt; <span class="string">&quot;String&quot;</span>,
+            ScalarType::Int =&gt; <span class="string">&quot;Int&quot;</span>,
+            ScalarType::BigInt =&gt; <span class="string">&quot;BigInt&quot;</span>,
+            ScalarType::Boolean =&gt; <span class="string">&quot;Boolean&quot;</span>,
+            ScalarType::Float =&gt; <span class="string">&quot;Float&quot;</span>,
+            ScalarType::Decimal =&gt; <span class="string">&quot;Decimal&quot;</span>,
+            ScalarType::DateTime =&gt; <span class="string">&quot;DateTime&quot;</span>,
+            ScalarType::Json =&gt; <span class="string">&quot;Json&quot;</span>,
+            ScalarType::UUID =&gt; <span class="string">&quot;UUID&quot;</span>,
+            ScalarType::JsonList =&gt; <span class="string">&quot;Json&quot;</span>,
+            ScalarType::Xml =&gt; <span class="string">&quot;Xml&quot;</span>,
+            ScalarType::Bytes =&gt; <span class="string">&quot;Bytes&quot;</span>,
         };
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">typ</span>)
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, typ)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

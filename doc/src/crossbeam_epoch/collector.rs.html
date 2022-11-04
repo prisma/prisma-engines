@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.9.10/src/collector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>collector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_epoch/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.9.10/src/collector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>collector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_epoch/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -461,468 +461,468 @@
 <span id="461">461</span>
 <span id="462">462</span>
 <span id="463">463</span>
-</pre><pre class="rust"><code><span class="doccomment">/// Epoch-based garbage collector.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use crossbeam_epoch::Collector;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let collector = Collector::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let handle = collector.register();</span>
-<span class="doccomment">/// drop(collector); // `handle` still works after dropping `collector`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// handle.pin().flush();</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
+</pre><pre class="rust"><code><span class="doccomment">/// Epoch-based garbage collector.
+///
+/// # Examples
+///
+/// ```
+/// use crossbeam_epoch::Collector;
+///
+/// let collector = Collector::new();
+///
+/// let handle = collector.register();
+/// drop(collector); // `handle` still works after dropping `collector`
+///
+/// handle.pin().flush();
+/// ```
+</span><span class="kw">use </span>core::fmt;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::guard::Guard</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal</span>::{<span class="ident">Global</span>, <span class="ident">Local</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::primitive::sync::Arc</span>;
+<span class="kw">use </span><span class="kw">crate</span>::guard::Guard;
+<span class="kw">use </span><span class="kw">crate</span>::internal::{Global, Local};
+<span class="kw">use </span><span class="kw">crate</span>::primitive::sync::Arc;
 
-<span class="doccomment">/// An epoch-based garbage collector.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Collector</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">global</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Global</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An epoch-based garbage collector.
+</span><span class="kw">pub struct </span>Collector {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) global: Arc&lt;Global&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Collector</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Collector</span> {}
+<span class="kw">unsafe impl </span>Send <span class="kw">for </span>Collector {}
+<span class="kw">unsafe impl </span>Sync <span class="kw">for </span>Collector {}
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Collector</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">global</span>: <span class="ident">Arc::new</span>(<span class="ident">Global::new</span>()),
+<span class="kw">impl </span>Default <span class="kw">for </span>Collector {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            global: Arc::new(Global::new()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Collector</span> {
-    <span class="doccomment">/// Creates a new collector.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>Collector {
+    <span class="doccomment">/// Creates a new collector.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Registers a new handle for the collector.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LocalHandle</span> {
-        <span class="ident">Local::register</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Registers a new handle for the collector.
+    </span><span class="kw">pub fn </span>register(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LocalHandle {
+        Local::register(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Collector</span> {
-    <span class="doccomment">/// Creates another reference to the same garbage collector.</span>
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Collector</span> {
-            <span class="ident">global</span>: <span class="self">self</span>.<span class="ident">global</span>.<span class="ident">clone</span>(),
+<span class="kw">impl </span>Clone <span class="kw">for </span>Collector {
+    <span class="doccomment">/// Creates another reference to the same garbage collector.
+    </span><span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        Collector {
+            global: <span class="self">self</span>.global.clone(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Collector</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Collector { .. }&quot;</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Collector {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.pad(<span class="string">&quot;Collector { .. }&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Collector</span> {
-    <span class="doccomment">/// Checks if both handles point to the same collector.</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">Collector</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">Arc::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">global</span>, <span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">global</span>)
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Collector {
+    <span class="doccomment">/// Checks if both handles point to the same collector.
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>Collector) -&gt; bool {
+        Arc::ptr_eq(<span class="kw-2">&amp;</span><span class="self">self</span>.global, <span class="kw-2">&amp;</span>rhs.global)
     }
 }
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Collector</span> {}
+<span class="kw">impl </span>Eq <span class="kw">for </span>Collector {}
 
-<span class="doccomment">/// A handle to a garbage collector.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LocalHandle</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">local</span>: <span class="kw-2">*const</span> <span class="ident">Local</span>,
+<span class="doccomment">/// A handle to a garbage collector.
+</span><span class="kw">pub struct </span>LocalHandle {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) local: <span class="kw-2">*const </span>Local,
 }
 
-<span class="kw">impl</span> <span class="ident">LocalHandle</span> {
-    <span class="doccomment">/// Pins the handle.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Guard</span> {
-        <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">local</span>).<span class="ident">pin</span>() }
+<span class="kw">impl </span>LocalHandle {
+    <span class="doccomment">/// Pins the handle.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>pin(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Guard {
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.local).pin() }
     }
 
-    <span class="doccomment">/// Returns `true` if the handle is pinned.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_pinned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">local</span>).<span class="ident">is_pinned</span>() }
+    <span class="doccomment">/// Returns `true` if the handle is pinned.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_pinned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.local).is_pinned() }
     }
 
-    <span class="doccomment">/// Returns the `Collector` associated with this handle.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Collector</span> {
-        <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">local</span>).<span class="ident">collector</span>() }
+    <span class="doccomment">/// Returns the `Collector` associated with this handle.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>collector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Collector {
+        <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.local).collector() }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">LocalHandle</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">Local::release_handle</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">local</span>);
+<span class="kw">impl </span>Drop <span class="kw">for </span>LocalHandle {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            Local::release_handle(<span class="kw-2">&amp;*</span><span class="self">self</span>.local);
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">LocalHandle</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;LocalHandle { .. }&quot;</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>LocalHandle {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.pad(<span class="string">&quot;LocalHandle { .. }&quot;</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">crossbeam_loom</span>)))]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std::mem::ManuallyDrop</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
+<span class="attribute">#[cfg(all(test, not(crossbeam_loom)))]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::mem::ManuallyDrop;
+    <span class="kw">use </span>std::sync::atomic::{AtomicUsize, Ordering};
 
-    <span class="kw">use</span> <span class="ident">crossbeam_utils::thread</span>;
+    <span class="kw">use </span>crossbeam_utils::thread;
 
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Collector</span>, <span class="ident">Owned</span>};
+    <span class="kw">use crate</span>::{Collector, Owned};
 
-    <span class="kw">const</span> <span class="ident">NUM_THREADS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
+    <span class="kw">const </span>NUM_THREADS: usize = <span class="number">8</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pin_reentrant</span>() {
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-        <span class="ident">drop</span>(<span class="ident">collector</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>pin_reentrant() {
+        <span class="kw">let </span>collector = Collector::new();
+        <span class="kw">let </span>handle = collector.register();
+        drop(collector);
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">handle</span>.<span class="ident">is_pinned</span>());
+        <span class="macro">assert!</span>(!handle.is_pinned());
         {
-            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-            <span class="macro">assert!</span>(<span class="ident">handle</span>.<span class="ident">is_pinned</span>());
+            <span class="kw">let </span>_guard = <span class="kw-2">&amp;</span>handle.pin();
+            <span class="macro">assert!</span>(handle.is_pinned());
             {
-                <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-                <span class="macro">assert!</span>(<span class="ident">handle</span>.<span class="ident">is_pinned</span>());
+                <span class="kw">let </span>_guard = <span class="kw-2">&amp;</span>handle.pin();
+                <span class="macro">assert!</span>(handle.is_pinned());
             }
-            <span class="macro">assert!</span>(<span class="ident">handle</span>.<span class="ident">is_pinned</span>());
+            <span class="macro">assert!</span>(handle.is_pinned());
         }
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">handle</span>.<span class="ident">is_pinned</span>());
+        <span class="macro">assert!</span>(!handle.is_pinned());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">flush_local_bag</span>() {
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-        <span class="ident">drop</span>(<span class="ident">collector</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>flush_local_bag() {
+        <span class="kw">let </span>collector = Collector::new();
+        <span class="kw">let </span>handle = collector.register();
+        drop(collector);
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-            <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="number">7</span>).<span class="ident">into_shared</span>(<span class="ident">guard</span>);
-                <span class="ident">guard</span>.<span class="ident">defer_destroy</span>(<span class="ident">a</span>);
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
+            <span class="kw">unsafe </span>{
+                <span class="kw">let </span>a = Owned::new(<span class="number">7</span>).into_shared(guard);
+                guard.defer_destroy(a);
 
-                <span class="macro">assert!</span>(<span class="op">!</span>(<span class="kw-2">*</span><span class="ident">guard</span>.<span class="ident">local</span>).<span class="ident">bag</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">b</span>).<span class="ident">is_empty</span>()));
+                <span class="macro">assert!</span>(!(<span class="kw-2">*</span>guard.local).bag.with(|b| (<span class="kw-2">*</span>b).is_empty()));
 
-                <span class="kw">while</span> <span class="op">!</span>(<span class="kw-2">*</span><span class="ident">guard</span>.<span class="ident">local</span>).<span class="ident">bag</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">b</span>).<span class="ident">is_empty</span>()) {
-                    <span class="ident">guard</span>.<span class="ident">flush</span>();
+                <span class="kw">while </span>!(<span class="kw-2">*</span>guard.local).bag.with(|b| (<span class="kw-2">*</span>b).is_empty()) {
+                    guard.flush();
                 }
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">garbage_buffering</span>() {
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-        <span class="ident">drop</span>(<span class="ident">collector</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>garbage_buffering() {
+        <span class="kw">let </span>collector = Collector::new();
+        <span class="kw">let </span>handle = collector.register();
+        drop(collector);
 
-        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-        <span class="kw">unsafe</span> {
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">10</span> {
-                <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="number">7</span>).<span class="ident">into_shared</span>(<span class="ident">guard</span>);
-                <span class="ident">guard</span>.<span class="ident">defer_destroy</span>(<span class="ident">a</span>);
+        <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
+        <span class="kw">unsafe </span>{
+            <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">10 </span>{
+                <span class="kw">let </span>a = Owned::new(<span class="number">7</span>).into_shared(guard);
+                guard.defer_destroy(a);
             }
-            <span class="macro">assert!</span>(<span class="op">!</span>(<span class="kw-2">*</span><span class="ident">guard</span>.<span class="ident">local</span>).<span class="ident">bag</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">b</span>).<span class="ident">is_empty</span>()));
+            <span class="macro">assert!</span>(!(<span class="kw-2">*</span>guard.local).bag.with(|b| (<span class="kw-2">*</span>b).is_empty()));
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pin_holds_advance</span>() {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">miri</span>)]</span>
-        <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">500</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">miri</span>))]</span>
-        <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">500_000</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>pin_holds_advance() {
+        <span class="attribute">#[cfg(miri)]
+        </span><span class="kw">const </span>N: usize = <span class="number">500</span>;
+        <span class="attribute">#[cfg(not(miri))]
+        </span><span class="kw">const </span>N: usize = <span class="number">500_000</span>;
 
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
+        <span class="kw">let </span>collector = Collector::new();
 
-        <span class="ident">thread::scope</span>(<span class="op">|</span><span class="ident">scope</span><span class="op">|</span> {
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">NUM_THREADS</span> {
-                <span class="ident">scope</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-                    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">N</span> {
-                        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
+        thread::scope(|scope| {
+            <span class="kw">for _ in </span><span class="number">0</span>..NUM_THREADS {
+                scope.spawn(|<span class="kw">_</span>| {
+                    <span class="kw">let </span>handle = collector.register();
+                    <span class="kw">for _ in </span><span class="number">0</span>..N {
+                        <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
 
-                        <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">global</span>.<span class="ident">epoch</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-                        <span class="ident">collector</span>.<span class="ident">global</span>.<span class="ident">collect</span>(<span class="ident">guard</span>);
-                        <span class="kw">let</span> <span class="ident">after</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">global</span>.<span class="ident">epoch</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+                        <span class="kw">let </span>before = collector.global.epoch.load(Ordering::Relaxed);
+                        collector.global.collect(guard);
+                        <span class="kw">let </span>after = collector.global.epoch.load(Ordering::Relaxed);
 
-                        <span class="macro">assert!</span>(<span class="ident">after</span>.<span class="ident">wrapping_sub</span>(<span class="ident">before</span>) <span class="op">&lt;</span><span class="op">=</span> <span class="number">2</span>);
+                        <span class="macro">assert!</span>(after.wrapping_sub(before) &lt;= <span class="number">2</span>);
                     }
                 });
             }
         })
-        .<span class="ident">unwrap</span>();
+        .unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">crossbeam_sanitize</span>))]</span> <span class="comment">// TODO: assertions failed due to `cfg(crossbeam_sanitize)` reduce `internal::MAX_OBJECTS`</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">incremental</span>() {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">miri</span>)]</span>
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">500</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">miri</span>))]</span>
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">100_000</span>;
-        <span class="kw">static</span> <span class="ident">DESTROYS</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+    <span class="attribute">#[cfg(not(crossbeam_sanitize))] </span><span class="comment">// TODO: assertions failed due to `cfg(crossbeam_sanitize)` reduce `internal::MAX_OBJECTS`
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>incremental() {
+        <span class="attribute">#[cfg(miri)]
+        </span><span class="kw">const </span>COUNT: usize = <span class="number">500</span>;
+        <span class="attribute">#[cfg(not(miri))]
+        </span><span class="kw">const </span>COUNT: usize = <span class="number">100_000</span>;
+        <span class="kw">static </span>DESTROYS: AtomicUsize = AtomicUsize::new(<span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
+        <span class="kw">let </span>collector = Collector::new();
+        <span class="kw">let </span>handle = collector.register();
 
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">COUNT</span> {
-                <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="number">7i32</span>).<span class="ident">into_shared</span>(<span class="ident">guard</span>);
-                <span class="ident">guard</span>.<span class="ident">defer_unchecked</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                    <span class="ident">drop</span>(<span class="ident">a</span>.<span class="ident">into_owned</span>());
-                    <span class="ident">DESTROYS</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
+            <span class="kw">for _ in </span><span class="number">0</span>..COUNT {
+                <span class="kw">let </span>a = Owned::new(<span class="number">7i32</span>).into_shared(guard);
+                guard.defer_unchecked(<span class="kw">move </span>|| {
+                    drop(a.into_owned());
+                    DESTROYS.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
                 });
             }
-            <span class="ident">guard</span>.<span class="ident">flush</span>();
+            guard.flush();
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>last = <span class="number">0</span>;
 
-        <span class="kw">while</span> <span class="ident">last</span> <span class="op">&lt;</span> <span class="ident">COUNT</span> {
-            <span class="kw">let</span> <span class="ident">curr</span> <span class="op">=</span> <span class="ident">DESTROYS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-            <span class="macro">assert!</span>(<span class="ident">curr</span> <span class="op">-</span> <span class="ident">last</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1024</span>);
-            <span class="ident">last</span> <span class="op">=</span> <span class="ident">curr</span>;
+        <span class="kw">while </span>last &lt; COUNT {
+            <span class="kw">let </span>curr = DESTROYS.load(Ordering::Relaxed);
+            <span class="macro">assert!</span>(curr - last &lt;= <span class="number">1024</span>);
+            last = curr;
 
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-            <span class="ident">collector</span>.<span class="ident">global</span>.<span class="ident">collect</span>(<span class="ident">guard</span>);
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
+            collector.global.collect(guard);
         }
-        <span class="macro">assert!</span>(<span class="ident">DESTROYS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">==</span> <span class="ident">COUNT</span>);
+        <span class="macro">assert!</span>(DESTROYS.load(Ordering::Relaxed) == COUNT);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">buffering</span>() {
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">miri</span>)]</span>
-        <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">500</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">miri</span>))]</span>
-        <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">100_000</span>;
-        <span class="kw">static</span> <span class="ident">DESTROYS</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>buffering() {
+        <span class="kw">const </span>COUNT: usize = <span class="number">10</span>;
+        <span class="attribute">#[cfg(miri)]
+        </span><span class="kw">const </span>N: usize = <span class="number">500</span>;
+        <span class="attribute">#[cfg(not(miri))]
+        </span><span class="kw">const </span>N: usize = <span class="number">100_000</span>;
+        <span class="kw">static </span>DESTROYS: AtomicUsize = AtomicUsize::new(<span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
+        <span class="kw">let </span>collector = Collector::new();
+        <span class="kw">let </span>handle = collector.register();
 
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">COUNT</span> {
-                <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="number">7i32</span>).<span class="ident">into_shared</span>(<span class="ident">guard</span>);
-                <span class="ident">guard</span>.<span class="ident">defer_unchecked</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                    <span class="ident">drop</span>(<span class="ident">a</span>.<span class="ident">into_owned</span>());
-                    <span class="ident">DESTROYS</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
+            <span class="kw">for _ in </span><span class="number">0</span>..COUNT {
+                <span class="kw">let </span>a = Owned::new(<span class="number">7i32</span>).into_shared(guard);
+                guard.defer_unchecked(<span class="kw">move </span>|| {
+                    drop(a.into_owned());
+                    DESTROYS.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
                 });
             }
         }
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">N</span> {
-            <span class="ident">collector</span>.<span class="ident">global</span>.<span class="ident">collect</span>(<span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>());
+        <span class="kw">for _ in </span><span class="number">0</span>..N {
+            collector.global.collect(<span class="kw-2">&amp;</span>handle.pin());
         }
-        <span class="macro">assert!</span>(<span class="ident">DESTROYS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">&lt;</span> <span class="ident">COUNT</span>);
+        <span class="macro">assert!</span>(DESTROYS.load(Ordering::Relaxed) &lt; COUNT);
 
-        <span class="ident">handle</span>.<span class="ident">pin</span>().<span class="ident">flush</span>();
+        handle.pin().flush();
 
-        <span class="kw">while</span> <span class="ident">DESTROYS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">&lt;</span> <span class="ident">COUNT</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-            <span class="ident">collector</span>.<span class="ident">global</span>.<span class="ident">collect</span>(<span class="ident">guard</span>);
+        <span class="kw">while </span>DESTROYS.load(Ordering::Relaxed) &lt; COUNT {
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
+            collector.global.collect(guard);
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">DESTROYS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>), <span class="ident">COUNT</span>);
+        <span class="macro">assert_eq!</span>(DESTROYS.load(Ordering::Relaxed), COUNT);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">count_drops</span>() {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">miri</span>)]</span>
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">500</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">miri</span>))]</span>
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">100_000</span>;
-        <span class="kw">static</span> <span class="ident">DROPS</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>count_drops() {
+        <span class="attribute">#[cfg(miri)]
+        </span><span class="kw">const </span>COUNT: usize = <span class="number">500</span>;
+        <span class="attribute">#[cfg(not(miri))]
+        </span><span class="kw">const </span>COUNT: usize = <span class="number">100_000</span>;
+        <span class="kw">static </span>DROPS: AtomicUsize = AtomicUsize::new(<span class="number">0</span>);
 
-        <span class="kw">struct</span> <span class="ident">Elem</span>(<span class="ident">i32</span>);
+        <span class="kw">struct </span>Elem(i32);
 
-        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Elem</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="ident">DROPS</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
+        <span class="kw">impl </span>Drop <span class="kw">for </span>Elem {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                DROPS.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
             }
         }
 
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
+        <span class="kw">let </span>collector = Collector::new();
+        <span class="kw">let </span>handle = collector.register();
 
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
 
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">COUNT</span> {
-                <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Elem</span>(<span class="number">7i32</span>)).<span class="ident">into_shared</span>(<span class="ident">guard</span>);
-                <span class="ident">guard</span>.<span class="ident">defer_destroy</span>(<span class="ident">a</span>);
+            <span class="kw">for _ in </span><span class="number">0</span>..COUNT {
+                <span class="kw">let </span>a = Owned::new(Elem(<span class="number">7i32</span>)).into_shared(guard);
+                guard.defer_destroy(a);
             }
-            <span class="ident">guard</span>.<span class="ident">flush</span>();
+            guard.flush();
         }
 
-        <span class="kw">while</span> <span class="ident">DROPS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">&lt;</span> <span class="ident">COUNT</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-            <span class="ident">collector</span>.<span class="ident">global</span>.<span class="ident">collect</span>(<span class="ident">guard</span>);
+        <span class="kw">while </span>DROPS.load(Ordering::Relaxed) &lt; COUNT {
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
+            collector.global.collect(guard);
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">DROPS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>), <span class="ident">COUNT</span>);
+        <span class="macro">assert_eq!</span>(DROPS.load(Ordering::Relaxed), COUNT);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">count_destroy</span>() {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">miri</span>)]</span>
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">500</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">miri</span>))]</span>
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">100_000</span>;
-        <span class="kw">static</span> <span class="ident">DESTROYS</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>count_destroy() {
+        <span class="attribute">#[cfg(miri)]
+        </span><span class="kw">const </span>COUNT: usize = <span class="number">500</span>;
+        <span class="attribute">#[cfg(not(miri))]
+        </span><span class="kw">const </span>COUNT: usize = <span class="number">100_000</span>;
+        <span class="kw">static </span>DESTROYS: AtomicUsize = AtomicUsize::new(<span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
+        <span class="kw">let </span>collector = Collector::new();
+        <span class="kw">let </span>handle = collector.register();
 
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
 
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">COUNT</span> {
-                <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="number">7i32</span>).<span class="ident">into_shared</span>(<span class="ident">guard</span>);
-                <span class="ident">guard</span>.<span class="ident">defer_unchecked</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                    <span class="ident">drop</span>(<span class="ident">a</span>.<span class="ident">into_owned</span>());
-                    <span class="ident">DESTROYS</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
+            <span class="kw">for _ in </span><span class="number">0</span>..COUNT {
+                <span class="kw">let </span>a = Owned::new(<span class="number">7i32</span>).into_shared(guard);
+                guard.defer_unchecked(<span class="kw">move </span>|| {
+                    drop(a.into_owned());
+                    DESTROYS.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
                 });
             }
-            <span class="ident">guard</span>.<span class="ident">flush</span>();
+            guard.flush();
         }
 
-        <span class="kw">while</span> <span class="ident">DESTROYS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">&lt;</span> <span class="ident">COUNT</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-            <span class="ident">collector</span>.<span class="ident">global</span>.<span class="ident">collect</span>(<span class="ident">guard</span>);
+        <span class="kw">while </span>DESTROYS.load(Ordering::Relaxed) &lt; COUNT {
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
+            collector.global.collect(guard);
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">DESTROYS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>), <span class="ident">COUNT</span>);
+        <span class="macro">assert_eq!</span>(DESTROYS.load(Ordering::Relaxed), COUNT);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop_array</span>() {
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">700</span>;
-        <span class="kw">static</span> <span class="ident">DROPS</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>drop_array() {
+        <span class="kw">const </span>COUNT: usize = <span class="number">700</span>;
+        <span class="kw">static </span>DROPS: AtomicUsize = AtomicUsize::new(<span class="number">0</span>);
 
-        <span class="kw">struct</span> <span class="ident">Elem</span>(<span class="ident">i32</span>);
+        <span class="kw">struct </span>Elem(i32);
 
-        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Elem</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="ident">DROPS</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
+        <span class="kw">impl </span>Drop <span class="kw">for </span>Elem {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                DROPS.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
             }
         }
 
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
+        <span class="kw">let </span>collector = Collector::new();
+        <span class="kw">let </span>handle = collector.register();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">pin</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>guard = handle.pin();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">COUNT</span>);
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">COUNT</span> {
-            <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">Elem</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i32</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>v = Vec::with_capacity(COUNT);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..COUNT {
+            v.push(Elem(i <span class="kw">as </span>i32));
         }
 
         {
-            <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">v</span>).<span class="ident">into_shared</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-            <span class="kw">unsafe</span> {
-                <span class="ident">guard</span>.<span class="ident">defer_destroy</span>(<span class="ident">a</span>);
+            <span class="kw">let </span>a = Owned::new(v).into_shared(<span class="kw-2">&amp;</span>guard);
+            <span class="kw">unsafe </span>{
+                guard.defer_destroy(a);
             }
-            <span class="ident">guard</span>.<span class="ident">flush</span>();
+            guard.flush();
         }
 
-        <span class="kw">while</span> <span class="ident">DROPS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">&lt;</span> <span class="ident">COUNT</span> {
-            <span class="ident">guard</span>.<span class="ident">repin</span>();
-            <span class="ident">collector</span>.<span class="ident">global</span>.<span class="ident">collect</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
+        <span class="kw">while </span>DROPS.load(Ordering::Relaxed) &lt; COUNT {
+            guard.repin();
+            collector.global.collect(<span class="kw-2">&amp;</span>guard);
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">DROPS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>), <span class="ident">COUNT</span>);
+        <span class="macro">assert_eq!</span>(DROPS.load(Ordering::Relaxed), COUNT);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">destroy_array</span>() {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">miri</span>)]</span>
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">500</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">miri</span>))]</span>
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">100_000</span>;
-        <span class="kw">static</span> <span class="ident">DESTROYS</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>destroy_array() {
+        <span class="attribute">#[cfg(miri)]
+        </span><span class="kw">const </span>COUNT: usize = <span class="number">500</span>;
+        <span class="attribute">#[cfg(not(miri))]
+        </span><span class="kw">const </span>COUNT: usize = <span class="number">100_000</span>;
+        <span class="kw">static </span>DESTROYS: AtomicUsize = AtomicUsize::new(<span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
+        <span class="kw">let </span>collector = Collector::new();
+        <span class="kw">let </span>handle = collector.register();
 
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">COUNT</span>);
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">COUNT</span> {
-                <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i32</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>v = Vec::with_capacity(COUNT);
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..COUNT {
+                v.push(i <span class="kw">as </span>i32);
             }
 
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">len</span>();
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="ident">v</span>).<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="ident">guard</span>.<span class="ident">defer_unchecked</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="ident">drop</span>(<span class="ident">Vec::from_raw_parts</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">i32</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">i32</span>, <span class="ident">len</span>, <span class="ident">len</span>));
-                <span class="ident">DESTROYS</span>.<span class="ident">fetch_add</span>(<span class="ident">len</span>, <span class="ident">Ordering::Relaxed</span>);
+            <span class="kw">let </span>len = v.len();
+            <span class="kw">let </span>ptr = ManuallyDrop::new(v).as_mut_ptr() <span class="kw">as </span>usize;
+            guard.defer_unchecked(<span class="kw">move </span>|| {
+                drop(Vec::from_raw_parts(ptr <span class="kw">as </span><span class="kw-2">*const </span>i32 <span class="kw">as </span><span class="kw-2">*mut </span>i32, len, len));
+                DESTROYS.fetch_add(len, Ordering::Relaxed);
             });
-            <span class="ident">guard</span>.<span class="ident">flush</span>();
+            guard.flush();
         }
 
-        <span class="kw">while</span> <span class="ident">DESTROYS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">&lt;</span> <span class="ident">COUNT</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-            <span class="ident">collector</span>.<span class="ident">global</span>.<span class="ident">collect</span>(<span class="ident">guard</span>);
+        <span class="kw">while </span>DESTROYS.load(Ordering::Relaxed) &lt; COUNT {
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
+            collector.global.collect(guard);
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">DESTROYS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>), <span class="ident">COUNT</span>);
+        <span class="macro">assert_eq!</span>(DESTROYS.load(Ordering::Relaxed), COUNT);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">stress</span>() {
-        <span class="kw">const</span> <span class="ident">THREADS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">miri</span>)]</span>
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">500</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">miri</span>))]</span>
-        <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">100_000</span>;
-        <span class="kw">static</span> <span class="ident">DROPS</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>stress() {
+        <span class="kw">const </span>THREADS: usize = <span class="number">8</span>;
+        <span class="attribute">#[cfg(miri)]
+        </span><span class="kw">const </span>COUNT: usize = <span class="number">500</span>;
+        <span class="attribute">#[cfg(not(miri))]
+        </span><span class="kw">const </span>COUNT: usize = <span class="number">100_000</span>;
+        <span class="kw">static </span>DROPS: AtomicUsize = AtomicUsize::new(<span class="number">0</span>);
 
-        <span class="kw">struct</span> <span class="ident">Elem</span>(<span class="ident">i32</span>);
+        <span class="kw">struct </span>Elem(i32);
 
-        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Elem</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="ident">DROPS</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
+        <span class="kw">impl </span>Drop <span class="kw">for </span>Elem {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                DROPS.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
             }
         }
 
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
+        <span class="kw">let </span>collector = Collector::new();
 
-        <span class="ident">thread::scope</span>(<span class="op">|</span><span class="ident">scope</span><span class="op">|</span> {
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">THREADS</span> {
-                <span class="ident">scope</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-                    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">COUNT</span> {
-                        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-                        <span class="kw">unsafe</span> {
-                            <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Elem</span>(<span class="number">7i32</span>)).<span class="ident">into_shared</span>(<span class="ident">guard</span>);
-                            <span class="ident">guard</span>.<span class="ident">defer_destroy</span>(<span class="ident">a</span>);
+        thread::scope(|scope| {
+            <span class="kw">for _ in </span><span class="number">0</span>..THREADS {
+                scope.spawn(|<span class="kw">_</span>| {
+                    <span class="kw">let </span>handle = collector.register();
+                    <span class="kw">for _ in </span><span class="number">0</span>..COUNT {
+                        <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
+                        <span class="kw">unsafe </span>{
+                            <span class="kw">let </span>a = Owned::new(Elem(<span class="number">7i32</span>)).into_shared(guard);
+                            guard.defer_destroy(a);
                         }
                     }
                 });
             }
         })
-        .<span class="ident">unwrap</span>();
+        .unwrap();
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-        <span class="kw">while</span> <span class="ident">DROPS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">&lt;</span> <span class="ident">COUNT</span> <span class="op">*</span> <span class="ident">THREADS</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">handle</span>.<span class="ident">pin</span>();
-            <span class="ident">collector</span>.<span class="ident">global</span>.<span class="ident">collect</span>(<span class="ident">guard</span>);
+        <span class="kw">let </span>handle = collector.register();
+        <span class="kw">while </span>DROPS.load(Ordering::Relaxed) &lt; COUNT * THREADS {
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>handle.pin();
+            collector.global.collect(guard);
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">DROPS</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>), <span class="ident">COUNT</span> <span class="op">*</span> <span class="ident">THREADS</span>);
+        <span class="macro">assert_eq!</span>(DROPS.load(Ordering::Relaxed), COUNT * THREADS);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_epoch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_epoch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

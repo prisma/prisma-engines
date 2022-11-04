@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-attributes-0.1.22/src/expand.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>expand.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_attributes/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_attributes/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-attributes-0.1.22/src/expand.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>expand.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_attributes/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_attributes/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tracing_attributes/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -760,374 +760,374 @@
 <span id="758">758</span>
 <span id="759">759</span>
 <span id="760">760</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::iter</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::iter;
 
-<span class="kw">use</span> <span class="ident">proc_macro2::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote</span>, <span class="ident">quote_spanned</span>, <span class="ident">ToTokens</span>};
-<span class="kw">use</span> <span class="ident">syn</span>::{
-    <span class="ident">punctuated::Punctuated</span>, <span class="ident">spanned::Spanned</span>, <span class="ident">Block</span>, <span class="ident">Expr</span>, <span class="ident">ExprAsync</span>, <span class="ident">ExprCall</span>, <span class="ident">FieldPat</span>, <span class="ident">FnArg</span>,
-    <span class="ident">Ident</span>, <span class="ident">Item</span>, <span class="ident">ItemFn</span>, <span class="ident">Pat</span>, <span class="ident">PatIdent</span>, <span class="ident">PatReference</span>, <span class="ident">PatStruct</span>, <span class="ident">PatTuple</span>, <span class="ident">PatTupleStruct</span>, <span class="ident">PatType</span>,
-    <span class="ident">Path</span>, <span class="ident">Signature</span>, <span class="ident">Stmt</span>, <span class="ident">Token</span>, <span class="ident">TypePath</span>,
+<span class="kw">use </span>proc_macro2::TokenStream;
+<span class="kw">use </span>quote::{quote, quote_spanned, ToTokens};
+<span class="kw">use </span>syn::{
+    punctuated::Punctuated, spanned::Spanned, Block, Expr, ExprAsync, ExprCall, FieldPat, FnArg,
+    Ident, Item, ItemFn, Pat, PatIdent, PatReference, PatStruct, PatTuple, PatTupleStruct, PatType,
+    Path, Signature, Stmt, Token, TypePath,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">attr</span>::{<span class="ident">Field</span>, <span class="ident">Fields</span>, <span class="ident">FormatMode</span>, <span class="ident">InstrumentArgs</span>},
-    <span class="ident">MaybeItemFnRef</span>,
+<span class="kw">use crate</span>::{
+    attr::{Field, Fields, FormatMode, InstrumentArgs},
+    MaybeItemFnRef,
 };
 
-<span class="doccomment">/// Given an existing function, generate an instrumented version of that function</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">gen_function</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">B</span>: <span class="ident">ToTokens</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="ident">MaybeItemFnRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">B</span><span class="op">&gt;</span>,
-    <span class="ident">args</span>: <span class="ident">InstrumentArgs</span>,
-    <span class="ident">instrumented_function_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">self_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">syn::TypePath</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
-    <span class="comment">// these are needed ahead of time, as ItemFn contains the function body _and_</span>
-    <span class="comment">// isn&#39;t representable inside a quote!/quote_spanned! macro</span>
-    <span class="comment">// (Syn&#39;s ToTokens isn&#39;t implemented for ItemFn)</span>
-    <span class="kw">let</span> <span class="ident">MaybeItemFnRef</span> {
-        <span class="ident">attrs</span>,
-        <span class="ident">vis</span>,
-        <span class="ident">sig</span>,
-        <span class="ident">block</span>,
-    } <span class="op">=</span> <span class="ident">input</span>;
+<span class="doccomment">/// Given an existing function, generate an instrumented version of that function
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>gen_function&lt;<span class="lifetime">&#39;a</span>, B: ToTokens + <span class="lifetime">&#39;a</span>&gt;(
+    input: MaybeItemFnRef&lt;<span class="lifetime">&#39;a</span>, B&gt;,
+    args: InstrumentArgs,
+    instrumented_function_name: <span class="kw-2">&amp;</span>str,
+    self_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>syn::TypePath&gt;,
+) -&gt; proc_macro2::TokenStream {
+    <span class="comment">// these are needed ahead of time, as ItemFn contains the function body _and_
+    // isn&#39;t representable inside a quote!/quote_spanned! macro
+    // (Syn&#39;s ToTokens isn&#39;t implemented for ItemFn)
+    </span><span class="kw">let </span>MaybeItemFnRef {
+        attrs,
+        vis,
+        sig,
+        block,
+    } = input;
 
-    <span class="kw">let</span> <span class="ident">Signature</span> {
-        <span class="ident">output</span>: <span class="ident">return_type</span>,
-        <span class="ident">inputs</span>: <span class="ident">params</span>,
-        <span class="ident">unsafety</span>,
-        <span class="ident">asyncness</span>,
-        <span class="ident">constness</span>,
-        <span class="ident">abi</span>,
-        <span class="ident">ident</span>,
-        <span class="ident">generics</span>:
-            <span class="ident">syn::Generics</span> {
-                <span class="ident">params</span>: <span class="ident">gen_params</span>,
-                <span class="ident">where_clause</span>,
+    <span class="kw">let </span>Signature {
+        output: return_type,
+        inputs: params,
+        unsafety,
+        asyncness,
+        constness,
+        abi,
+        ident,
+        generics:
+            syn::Generics {
+                params: gen_params,
+                where_clause,
                 ..
             },
         ..
-    } <span class="op">=</span> <span class="ident">sig</span>;
+    } = sig;
 
-    <span class="kw">let</span> <span class="ident">warnings</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">warnings</span>();
+    <span class="kw">let </span>warnings = args.warnings();
 
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">gen_block</span>(
-        <span class="ident">block</span>,
-        <span class="ident">params</span>,
-        <span class="ident">asyncness</span>.<span class="ident">is_some</span>(),
-        <span class="ident">args</span>,
-        <span class="ident">instrumented_function_name</span>,
-        <span class="ident">self_type</span>,
+    <span class="kw">let </span>body = gen_block(
+        block,
+        params,
+        asyncness.is_some(),
+        args,
+        instrumented_function_name,
+        self_type,
     );
 
     <span class="macro">quote!</span>(
-        #(#<span class="ident">attrs</span>) <span class="op">*</span>
-        #<span class="ident">vis</span> #<span class="ident">constness</span> #<span class="ident">unsafety</span> #<span class="ident">asyncness</span> #<span class="ident">abi</span> <span class="kw">fn</span> #<span class="ident">ident</span><span class="op">&lt;</span>#<span class="ident">gen_params</span><span class="op">&gt;</span>(#<span class="ident">params</span>) #<span class="ident">return_type</span>
-        #<span class="ident">where_clause</span>
+        #(#attrs) *
+        #vis #constness #unsafety #asyncness #abi <span class="kw">fn </span>#ident&lt;#gen_params&gt;(#params) #return_type
+        #where_clause
         {
-            #<span class="ident">warnings</span>
-            #<span class="ident">body</span>
+            #warnings
+            #body
         }
     )
 }
 
-<span class="doccomment">/// Instrument a block</span>
-<span class="kw">fn</span> <span class="ident">gen_block</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">ToTokens</span><span class="op">&gt;</span>(
-    <span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="ident">B</span>,
-    <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">FnArg</span>, <span class="macro">Token!</span>[,]<span class="op">&gt;</span>,
-    <span class="ident">async_context</span>: <span class="ident">bool</span>,
-    <span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">InstrumentArgs</span>,
-    <span class="ident">instrumented_function_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">self_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">syn::TypePath</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
-    <span class="comment">// generate the span&#39;s name</span>
-    <span class="kw">let</span> <span class="ident">span_name</span> <span class="op">=</span> <span class="ident">args</span>
-        <span class="comment">// did the user override the span&#39;s name?</span>
-        .<span class="ident">name</span>
-        .<span class="ident">as_ref</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="macro">quote!</span>(#<span class="ident">name</span>))
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">quote!</span>(#<span class="ident">instrumented_function_name</span>));
+<span class="doccomment">/// Instrument a block
+</span><span class="kw">fn </span>gen_block&lt;B: ToTokens&gt;(
+    block: <span class="kw-2">&amp;</span>B,
+    params: <span class="kw-2">&amp;</span>Punctuated&lt;FnArg, <span class="macro">Token!</span>[,]&gt;,
+    async_context: bool,
+    <span class="kw-2">mut </span>args: InstrumentArgs,
+    instrumented_function_name: <span class="kw-2">&amp;</span>str,
+    self_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>syn::TypePath&gt;,
+) -&gt; proc_macro2::TokenStream {
+    <span class="comment">// generate the span&#39;s name
+    </span><span class="kw">let </span>span_name = args
+        <span class="comment">// did the user override the span&#39;s name?
+        </span>.name
+        .as_ref()
+        .map(|name| <span class="macro">quote!</span>(#name))
+        .unwrap_or_else(|| <span class="macro">quote!</span>(#instrumented_function_name));
 
-    <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">level</span>();
+    <span class="kw">let </span>level = args.level();
 
-    <span class="kw">let</span> <span class="ident">follows_from</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">follows_from</span>.<span class="ident">iter</span>();
-    <span class="kw">let</span> <span class="ident">follows_from</span> <span class="op">=</span> <span class="macro">quote!</span> {
-        #(<span class="kw">for</span> <span class="ident">cause</span> <span class="kw">in</span> #<span class="ident">follows_from</span> {
-            <span class="ident">__tracing_attr_span</span>.<span class="ident">follows_from</span>(<span class="ident">cause</span>);
-        })<span class="op">*</span>
+    <span class="kw">let </span>follows_from = args.follows_from.iter();
+    <span class="kw">let </span>follows_from = <span class="macro">quote! </span>{
+        #(<span class="kw">for </span>cause <span class="kw">in </span>#follows_from {
+            __tracing_attr_span.follows_from(cause);
+        })*
     };
 
-    <span class="comment">// generate this inside a closure, so we can return early on errors.</span>
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> (<span class="op">|</span><span class="op">|</span> {
-        <span class="comment">// Pull out the arguments-to-be-skipped first, so we can filter results</span>
-        <span class="comment">// below.</span>
-        <span class="kw">let</span> <span class="ident">param_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Ident</span>, (<span class="ident">Ident</span>, <span class="ident">RecordType</span>))<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">params</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">param</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">param</span> {
-                <span class="ident">FnArg::Typed</span>(<span class="ident">PatType</span> { <span class="ident">pat</span>, <span class="ident">ty</span>, .. }) =&gt; {
-                    <span class="ident">param_names</span>(<span class="kw-2">*</span><span class="ident">pat</span>, <span class="ident">RecordType::parse_from_ty</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ty</span>))
+    <span class="comment">// generate this inside a closure, so we can return early on errors.
+    </span><span class="kw">let </span>span = (|| {
+        <span class="comment">// Pull out the arguments-to-be-skipped first, so we can filter results
+        // below.
+        </span><span class="kw">let </span>param_names: Vec&lt;(Ident, (Ident, RecordType))&gt; = params
+            .clone()
+            .into_iter()
+            .flat_map(|param| <span class="kw">match </span>param {
+                FnArg::Typed(PatType { pat, ty, .. }) =&gt; {
+                    param_names(<span class="kw-2">*</span>pat, RecordType::parse_from_ty(<span class="kw-2">&amp;*</span>ty))
                 }
-                <span class="ident">FnArg::Receiver</span>(<span class="kw">_</span>) =&gt; <span class="ident">Box::new</span>(<span class="ident">iter::once</span>((
-                    <span class="ident">Ident::new</span>(<span class="string">&quot;self&quot;</span>, <span class="ident">param</span>.<span class="ident">span</span>()),
-                    <span class="ident">RecordType::Debug</span>,
+                FnArg::Receiver(<span class="kw">_</span>) =&gt; Box::new(iter::once((
+                    Ident::new(<span class="string">&quot;self&quot;</span>, param.span()),
+                    RecordType::Debug,
                 ))),
             })
-            <span class="comment">// Little dance with new (user-exposed) names and old (internal)</span>
-            <span class="comment">// names of identifiers. That way, we could do the following</span>
-            <span class="comment">// even though async_trait (&lt;=0.1.43) rewrites &quot;self&quot; as &quot;_self&quot;:</span>
-            <span class="comment">// ```</span>
-            <span class="comment">// #[async_trait]</span>
-            <span class="comment">// impl Foo for FooImpl {</span>
-            <span class="comment">//     #[instrument(skip(self))]</span>
-            <span class="comment">//     async fn foo(&amp;self, v: usize) {}</span>
-            <span class="comment">// }</span>
-            <span class="comment">// ```</span>
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">x</span>, <span class="ident">record_type</span>)<span class="op">|</span> {
-                <span class="comment">// if we are inside a function generated by async-trait &lt;=0.1.43, we need to</span>
-                <span class="comment">// take care to rewrite &quot;_self&quot; as &quot;self&quot; for &#39;user convenience&#39;</span>
-                <span class="kw">if</span> <span class="ident">self_type</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&quot;_self&quot;</span> {
-                    (<span class="ident">Ident::new</span>(<span class="string">&quot;self&quot;</span>, <span class="ident">x</span>.<span class="ident">span</span>()), (<span class="ident">x</span>, <span class="ident">record_type</span>))
-                } <span class="kw">else</span> {
-                    (<span class="ident">x</span>.<span class="ident">clone</span>(), (<span class="ident">x</span>, <span class="ident">record_type</span>))
+            <span class="comment">// Little dance with new (user-exposed) names and old (internal)
+            // names of identifiers. That way, we could do the following
+            // even though async_trait (&lt;=0.1.43) rewrites &quot;self&quot; as &quot;_self&quot;:
+            // ```
+            // #[async_trait]
+            // impl Foo for FooImpl {
+            //     #[instrument(skip(self))]
+            //     async fn foo(&amp;self, v: usize) {}
+            // }
+            // ```
+            </span>.map(|(x, record_type)| {
+                <span class="comment">// if we are inside a function generated by async-trait &lt;=0.1.43, we need to
+                // take care to rewrite &quot;_self&quot; as &quot;self&quot; for &#39;user convenience&#39;
+                </span><span class="kw">if </span>self_type.is_some() &amp;&amp; x == <span class="string">&quot;_self&quot; </span>{
+                    (Ident::new(<span class="string">&quot;self&quot;</span>, x.span()), (x, record_type))
+                } <span class="kw">else </span>{
+                    (x.clone(), (x, record_type))
                 }
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">for</span> <span class="ident">skip</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">args</span>.<span class="ident">skips</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">param_names</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">user</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">user</span>).<span class="ident">any</span>(<span class="op">|</span><span class="ident">y</span><span class="op">|</span> <span class="ident">y</span> <span class="op">==</span> <span class="ident">skip</span>) {
-                <span class="kw">return</span> <span class="macro">quote_spanned!</span> {<span class="ident">skip</span>.<span class="ident">span</span>()=&gt;
+        <span class="kw">for </span>skip <span class="kw">in </span><span class="kw-2">&amp;</span>args.skips {
+            <span class="kw">if </span>!param_names.iter().map(|(user, <span class="kw">_</span>)| user).any(|y| y == skip) {
+                <span class="kw">return </span><span class="macro">quote_spanned! </span>{skip.span()=&gt;
                     <span class="macro">compile_error!</span>(<span class="string">&quot;attempting to skip non-existent parameter&quot;</span>)
                 };
             }
         }
 
-        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">target</span>();
+        <span class="kw">let </span>target = args.target();
 
-        <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">parent</span>.<span class="ident">iter</span>();
+        <span class="kw">let </span>parent = args.parent.iter();
 
-        <span class="comment">// filter out skipped fields</span>
-        <span class="kw">let</span> <span class="ident">quoted_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">param_names</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">param</span>, <span class="kw">_</span>)<span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">skip_all</span> <span class="op">|</span><span class="op">|</span> <span class="ident">args</span>.<span class="ident">skips</span>.<span class="ident">contains</span>(<span class="ident">param</span>) {
-                    <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="comment">// filter out skipped fields
+        </span><span class="kw">let </span>quoted_fields: Vec&lt;<span class="kw">_</span>&gt; = param_names
+            .iter()
+            .filter(|(param, <span class="kw">_</span>)| {
+                <span class="kw">if </span>args.skip_all || args.skips.contains(param) {
+                    <span class="kw">return </span><span class="bool-val">false</span>;
                 }
 
-                <span class="comment">// If any parameters have the same name as a custom field, skip</span>
-                <span class="comment">// and allow them to be formatted by the custom field.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">fields</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">fields</span> {
-                    <span class="ident">fields</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">Field</span> { <span class="kw-2">ref</span> <span class="ident">name</span>, .. }<span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">first</span>();
-                        <span class="ident">first</span> <span class="op">!</span><span class="op">=</span> <span class="ident">name</span>.<span class="ident">last</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">first</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">param</span>)
+                <span class="comment">// If any parameters have the same name as a custom field, skip
+                // and allow them to be formatted by the custom field.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>fields) = args.fields {
+                    fields.<span class="number">0</span>.iter().all(|Field { <span class="kw-2">ref </span>name, .. }| {
+                        <span class="kw">let </span>first = name.first();
+                        first != name.last() || !first.iter().any(|name| name == <span class="kw-2">&amp;</span>param)
                     })
-                } <span class="kw">else</span> {
-                    <span class="bool-val">true</span>
-                }
+                } <span class="kw">else </span>{
+                    <span class="bool-val">true
+                </span>}
             })
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">user_name</span>, (<span class="ident">real_name</span>, <span class="ident">record_type</span>))<span class="op">|</span> <span class="kw">match</span> <span class="ident">record_type</span> {
-                <span class="ident">RecordType::Value</span> =&gt; <span class="macro">quote!</span>(#<span class="ident">user_name</span> <span class="op">=</span> #<span class="ident">real_name</span>),
-                <span class="ident">RecordType::Debug</span> =&gt; <span class="macro">quote!</span>(#<span class="ident">user_name</span> <span class="op">=</span> <span class="ident">tracing::field::debug</span>(<span class="kw-2">&amp;</span>#<span class="ident">real_name</span>)),
+            .map(|(user_name, (real_name, record_type))| <span class="kw">match </span>record_type {
+                RecordType::Value =&gt; <span class="macro">quote!</span>(#user_name = #real_name),
+                RecordType::Debug =&gt; <span class="macro">quote!</span>(#user_name = tracing::field::debug(<span class="kw-2">&amp;</span>#real_name)),
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="comment">// replace every use of a variable with its original name</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Fields</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>)) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">fields</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">replacer</span> <span class="op">=</span> <span class="ident">IdentAndTypesRenamer</span> {
-                <span class="ident">idents</span>: <span class="ident">param_names</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, (<span class="ident">b</span>, <span class="kw">_</span>))<span class="op">|</span> (<span class="ident">a</span>, <span class="ident">b</span>)).<span class="ident">collect</span>(),
-                <span class="ident">types</span>: <span class="ident">Vec::new</span>(),
+        <span class="comment">// replace every use of a variable with its original name
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(Fields(<span class="kw-2">ref mut </span>fields)) = args.fields {
+            <span class="kw">let </span><span class="kw-2">mut </span>replacer = IdentAndTypesRenamer {
+                idents: param_names.into_iter().map(|(a, (b, <span class="kw">_</span>))| (a, b)).collect(),
+                types: Vec::new(),
             };
 
-            <span class="comment">// when async-trait &lt;=0.1.43 is in use, replace instances</span>
-            <span class="comment">// of the &quot;Self&quot; type inside the fields values</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">self_type</span>) <span class="op">=</span> <span class="ident">self_type</span> {
-                <span class="ident">replacer</span>.<span class="ident">types</span>.<span class="ident">push</span>((<span class="string">&quot;Self&quot;</span>, <span class="ident">self_type</span>.<span class="ident">clone</span>()));
+            <span class="comment">// when async-trait &lt;=0.1.43 is in use, replace instances
+            // of the &quot;Self&quot; type inside the fields values
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(self_type) = self_type {
+                replacer.types.push((<span class="string">&quot;Self&quot;</span>, self_type.clone()));
             }
 
-            <span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">fields</span>.<span class="ident">iter_mut</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">value</span>.<span class="ident">as_mut</span>()) {
-                <span class="ident">syn::visit_mut::visit_expr_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">replacer</span>, <span class="ident">e</span>);
+            <span class="kw">for </span>e <span class="kw">in </span>fields.iter_mut().filter_map(|f| f.value.as_mut()) {
+                syn::visit_mut::visit_expr_mut(<span class="kw-2">&amp;mut </span>replacer, e);
             }
         }
 
-        <span class="kw">let</span> <span class="ident">custom_fields</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">args</span>.<span class="ident">fields</span>;
+        <span class="kw">let </span>custom_fields = <span class="kw-2">&amp;</span>args.fields;
 
         <span class="macro">quote!</span>(<span class="macro">tracing::span!</span>(
-            <span class="ident">target</span>: #<span class="ident">target</span>,
-            #(<span class="ident">parent</span>: #<span class="ident">parent</span>,)<span class="op">*</span>
-            #<span class="ident">level</span>,
-            #<span class="ident">span_name</span>,
-            #(#<span class="ident">quoted_fields</span>,)<span class="op">*</span>
-            #<span class="ident">custom_fields</span>
+            target: #target,
+            #(parent: #parent,)*
+            #level,
+            #span_name,
+            #(#quoted_fields,)*
+            #custom_fields
 
         ))
     })();
 
-    <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">target</span>();
+    <span class="kw">let </span>target = args.target();
 
-    <span class="kw">let</span> <span class="ident">err_event</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">err_mode</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">FormatMode::Default</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">FormatMode::Display</span>) =&gt; {
-            <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(<span class="macro">tracing::error!</span>(<span class="ident">target</span>: #<span class="ident">target</span>, <span class="ident">error</span> <span class="op">=</span> <span class="op">%</span><span class="ident">e</span>)))
+    <span class="kw">let </span>err_event = <span class="kw">match </span>args.err_mode {
+        <span class="prelude-val">Some</span>(FormatMode::Default) | <span class="prelude-val">Some</span>(FormatMode::Display) =&gt; {
+            <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(<span class="macro">tracing::error!</span>(target: #target, error = %e)))
         }
-        <span class="prelude-val">Some</span>(<span class="ident">FormatMode::Debug</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(<span class="macro">tracing::error!</span>(<span class="ident">target</span>: #<span class="ident">target</span>, <span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">e</span>))),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>(FormatMode::Debug) =&gt; <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(<span class="macro">tracing::error!</span>(target: #target, error = <span class="question-mark">?</span>e))),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">ret_event</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">ret_mode</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">FormatMode::Display</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(
-            <span class="macro">tracing::event!</span>(<span class="ident">target</span>: #<span class="ident">target</span>, #<span class="ident">level</span>, <span class="kw">return</span> <span class="op">=</span> <span class="op">%</span><span class="ident">x</span>)
+    <span class="kw">let </span>ret_event = <span class="kw">match </span>args.ret_mode {
+        <span class="prelude-val">Some</span>(FormatMode::Display) =&gt; <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(
+            <span class="macro">tracing::event!</span>(target: #target, #level, <span class="kw">return </span>= %x)
         )),
-        <span class="prelude-val">Some</span>(<span class="ident">FormatMode::Default</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">FormatMode::Debug</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(
-            <span class="macro">tracing::event!</span>(<span class="ident">target</span>: #<span class="ident">target</span>, #<span class="ident">level</span>, <span class="kw">return</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">x</span>)
+        <span class="prelude-val">Some</span>(FormatMode::Default) | <span class="prelude-val">Some</span>(FormatMode::Debug) =&gt; <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(
+            <span class="macro">tracing::event!</span>(target: #target, #level, <span class="kw">return </span>= <span class="question-mark">?</span>x)
         )),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="comment">// Generate the instrumented function body.</span>
-    <span class="comment">// If the function is an `async fn`, this will wrap it in an async block,</span>
-    <span class="comment">// which is `instrument`ed using `tracing-futures`. Otherwise, this will</span>
-    <span class="comment">// enter the span and then perform the rest of the body.</span>
-    <span class="comment">// If `err` is in args, instrument any resulting `Err`s.</span>
-    <span class="comment">// If `ret` is in args, instrument any resulting `Ok`s when the function</span>
-    <span class="comment">// returns `Result`s, otherwise instrument any resulting values.</span>
-    <span class="kw">if</span> <span class="ident">async_context</span> {
-        <span class="kw">let</span> <span class="ident">mk_fut</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">err_event</span>, <span class="ident">ret_event</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">err_event</span>), <span class="prelude-val">Some</span>(<span class="ident">ret_event</span>)) =&gt; <span class="macro">quote_spanned!</span>(<span class="ident">block</span>.<span class="ident">span</span>()=&gt;
-                <span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">match</span> <span class="kw">async</span> <span class="kw">move</span> #<span class="ident">block</span>.<span class="kw">await</span> {
-                        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unit_arg</span>)]</span>
-                        <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; {
-                            #<span class="ident">ret_event</span>;
-                            <span class="prelude-val">Ok</span>(<span class="ident">x</span>)
+    <span class="comment">// Generate the instrumented function body.
+    // If the function is an `async fn`, this will wrap it in an async block,
+    // which is `instrument`ed using `tracing-futures`. Otherwise, this will
+    // enter the span and then perform the rest of the body.
+    // If `err` is in args, instrument any resulting `Err`s.
+    // If `ret` is in args, instrument any resulting `Ok`s when the function
+    // returns `Result`s, otherwise instrument any resulting values.
+    </span><span class="kw">if </span>async_context {
+        <span class="kw">let </span>mk_fut = <span class="kw">match </span>(err_event, ret_event) {
+            (<span class="prelude-val">Some</span>(err_event), <span class="prelude-val">Some</span>(ret_event)) =&gt; <span class="macro">quote_spanned!</span>(block.span()=&gt;
+                <span class="kw">async move </span>{
+                    <span class="kw">match async move </span>#block.<span class="kw">await </span>{
+                        <span class="attribute">#[allow(clippy::unit_arg)]
+                        </span><span class="prelude-val">Ok</span>(x) =&gt; {
+                            #ret_event;
+                            <span class="prelude-val">Ok</span>(x)
                         },
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                            #<span class="ident">err_event</span>;
-                            <span class="prelude-val">Err</span>(<span class="ident">e</span>)
+                        <span class="prelude-val">Err</span>(e) =&gt; {
+                            #err_event;
+                            <span class="prelude-val">Err</span>(e)
                         }
                     }
                 }
             ),
-            (<span class="prelude-val">Some</span>(<span class="ident">err_event</span>), <span class="prelude-val">None</span>) =&gt; <span class="macro">quote_spanned!</span>(<span class="ident">block</span>.<span class="ident">span</span>()=&gt;
-                <span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">match</span> <span class="kw">async</span> <span class="kw">move</span> #<span class="ident">block</span>.<span class="kw">await</span> {
-                        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unit_arg</span>)]</span>
-                        <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>),
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                            #<span class="ident">err_event</span>;
-                            <span class="prelude-val">Err</span>(<span class="ident">e</span>)
+            (<span class="prelude-val">Some</span>(err_event), <span class="prelude-val">None</span>) =&gt; <span class="macro">quote_spanned!</span>(block.span()=&gt;
+                <span class="kw">async move </span>{
+                    <span class="kw">match async move </span>#block.<span class="kw">await </span>{
+                        <span class="attribute">#[allow(clippy::unit_arg)]
+                        </span><span class="prelude-val">Ok</span>(x) =&gt; <span class="prelude-val">Ok</span>(x),
+                        <span class="prelude-val">Err</span>(e) =&gt; {
+                            #err_event;
+                            <span class="prelude-val">Err</span>(e)
                         }
                     }
                 }
             ),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">ret_event</span>)) =&gt; <span class="macro">quote_spanned!</span>(<span class="ident">block</span>.<span class="ident">span</span>()=&gt;
-                <span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> #<span class="ident">block</span>.<span class="kw">await</span>;
-                    #<span class="ident">ret_event</span>;
-                    <span class="ident">x</span>
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(ret_event)) =&gt; <span class="macro">quote_spanned!</span>(block.span()=&gt;
+                <span class="kw">async move </span>{
+                    <span class="kw">let </span>x = <span class="kw">async move </span>#block.<span class="kw">await</span>;
+                    #ret_event;
+                    x
                 }
             ),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="macro">quote_spanned!</span>(<span class="ident">block</span>.<span class="ident">span</span>()=&gt;
-                <span class="kw">async</span> <span class="kw">move</span> #<span class="ident">block</span>
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="macro">quote_spanned!</span>(block.span()=&gt;
+                <span class="kw">async move </span>#block
             ),
         };
 
-        <span class="kw">return</span> <span class="macro">quote!</span>(
-            <span class="kw">let</span> <span class="ident">__tracing_attr_span</span> <span class="op">=</span> #<span class="ident">span</span>;
-            <span class="kw">let</span> <span class="ident">__tracing_instrument_future</span> <span class="op">=</span> #<span class="ident">mk_fut</span>;
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">__tracing_attr_span</span>.<span class="ident">is_disabled</span>() {
-                #<span class="ident">follows_from</span>
-                <span class="ident">tracing::Instrument::instrument</span>(
-                    <span class="ident">__tracing_instrument_future</span>,
-                    <span class="ident">__tracing_attr_span</span>
+        <span class="kw">return </span><span class="macro">quote!</span>(
+            <span class="kw">let </span>__tracing_attr_span = #span;
+            <span class="kw">let </span>__tracing_instrument_future = #mk_fut;
+            <span class="kw">if </span>!__tracing_attr_span.is_disabled() {
+                #follows_from
+                tracing::Instrument::instrument(
+                    __tracing_instrument_future,
+                    __tracing_attr_span
                 )
-                .<span class="kw">await</span>
-            } <span class="kw">else</span> {
-                <span class="ident">__tracing_instrument_future</span>.<span class="kw">await</span>
-            }
+                .<span class="kw">await
+            </span>} <span class="kw">else </span>{
+                __tracing_instrument_future.<span class="kw">await
+            </span>}
         );
     }
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">quote!</span>(
-        <span class="comment">// These variables are left uninitialized and initialized only</span>
-        <span class="comment">// if the tracing level is statically enabled at this point.</span>
-        <span class="comment">// While the tracing level is also checked at span creation</span>
-        <span class="comment">// time, that will still create a dummy span, and a dummy guard</span>
-        <span class="comment">// and drop the dummy guard later. By lazily initializing these</span>
-        <span class="comment">// variables, Rust will generate a drop flag for them and thus</span>
-        <span class="comment">// only drop the guard if it was created. This creates code that</span>
-        <span class="comment">// is very straightforward for LLVM to optimize out if the tracing</span>
-        <span class="comment">// level is statically disabled, while not causing any performance</span>
-        <span class="comment">// regression in case the level is enabled.</span>
-        <span class="kw">let</span> <span class="ident">__tracing_attr_span</span>;
-        <span class="kw">let</span> <span class="ident">__tracing_attr_guard</span>;
-        <span class="kw">if</span> <span class="macro">tracing::level_enabled!</span>(#<span class="ident">level</span>) {
-            <span class="ident">__tracing_attr_span</span> <span class="op">=</span> #<span class="ident">span</span>;
-            #<span class="ident">follows_from</span>
-            <span class="ident">__tracing_attr_guard</span> <span class="op">=</span> <span class="ident">__tracing_attr_span</span>.<span class="ident">enter</span>();
+    <span class="kw">let </span>span = <span class="macro">quote!</span>(
+        <span class="comment">// These variables are left uninitialized and initialized only
+        // if the tracing level is statically enabled at this point.
+        // While the tracing level is also checked at span creation
+        // time, that will still create a dummy span, and a dummy guard
+        // and drop the dummy guard later. By lazily initializing these
+        // variables, Rust will generate a drop flag for them and thus
+        // only drop the guard if it was created. This creates code that
+        // is very straightforward for LLVM to optimize out if the tracing
+        // level is statically disabled, while not causing any performance
+        // regression in case the level is enabled.
+        </span><span class="kw">let </span>__tracing_attr_span;
+        <span class="kw">let </span>__tracing_attr_guard;
+        <span class="kw">if </span><span class="macro">tracing::level_enabled!</span>(#level) {
+            __tracing_attr_span = #span;
+            #follows_from
+            __tracing_attr_guard = __tracing_attr_span.enter();
         }
     );
 
-    <span class="kw">match</span> (<span class="ident">err_event</span>, <span class="ident">ret_event</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">err_event</span>), <span class="prelude-val">Some</span>(<span class="ident">ret_event</span>)) =&gt; <span class="macro">quote_spanned!</span> {<span class="ident">block</span>.<span class="ident">span</span>()=&gt;
-            #<span class="ident">span</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure_call</span>)]</span>
-            <span class="kw">match</span> (<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> #<span class="ident">block</span>)() {
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unit_arg</span>)]</span>
-                <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; {
-                    #<span class="ident">ret_event</span>;
-                    <span class="prelude-val">Ok</span>(<span class="ident">x</span>)
+    <span class="kw">match </span>(err_event, ret_event) {
+        (<span class="prelude-val">Some</span>(err_event), <span class="prelude-val">Some</span>(ret_event)) =&gt; <span class="macro">quote_spanned! </span>{block.span()=&gt;
+            #span
+            <span class="attribute">#[allow(clippy::redundant_closure_call)]
+            </span><span class="kw">match </span>(<span class="kw">move </span>|| #block)() {
+                <span class="attribute">#[allow(clippy::unit_arg)]
+                </span><span class="prelude-val">Ok</span>(x) =&gt; {
+                    #ret_event;
+                    <span class="prelude-val">Ok</span>(x)
                 },
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                    #<span class="ident">err_event</span>;
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>)
+                <span class="prelude-val">Err</span>(e) =&gt; {
+                    #err_event;
+                    <span class="prelude-val">Err</span>(e)
                 }
             }
         },
-        (<span class="prelude-val">Some</span>(<span class="ident">err_event</span>), <span class="prelude-val">None</span>) =&gt; <span class="macro">quote_spanned!</span>(<span class="ident">block</span>.<span class="ident">span</span>()=&gt;
-            #<span class="ident">span</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure_call</span>)]</span>
-            <span class="kw">match</span> (<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> #<span class="ident">block</span>)() {
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unit_arg</span>)]</span>
-                <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                    #<span class="ident">err_event</span>;
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>)
+        (<span class="prelude-val">Some</span>(err_event), <span class="prelude-val">None</span>) =&gt; <span class="macro">quote_spanned!</span>(block.span()=&gt;
+            #span
+            <span class="attribute">#[allow(clippy::redundant_closure_call)]
+            </span><span class="kw">match </span>(<span class="kw">move </span>|| #block)() {
+                <span class="attribute">#[allow(clippy::unit_arg)]
+                </span><span class="prelude-val">Ok</span>(x) =&gt; <span class="prelude-val">Ok</span>(x),
+                <span class="prelude-val">Err</span>(e) =&gt; {
+                    #err_event;
+                    <span class="prelude-val">Err</span>(e)
                 }
             }
         ),
-        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">ret_event</span>)) =&gt; <span class="macro">quote_spanned!</span>(<span class="ident">block</span>.<span class="ident">span</span>()=&gt;
-            #<span class="ident">span</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure_call</span>)]</span>
-            <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> (<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> #<span class="ident">block</span>)();
-            #<span class="ident">ret_event</span>;
-            <span class="ident">x</span>
+        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(ret_event)) =&gt; <span class="macro">quote_spanned!</span>(block.span()=&gt;
+            #span
+            <span class="attribute">#[allow(clippy::redundant_closure_call)]
+            </span><span class="kw">let </span>x = (<span class="kw">move </span>|| #block)();
+            #ret_event;
+            x
         ),
-        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="macro">quote_spanned!</span>(<span class="ident">block</span>.<span class="ident">span</span>() =&gt;
-            <span class="comment">// Because `quote` produces a stream of tokens _without_ whitespace, the</span>
-            <span class="comment">// `if` and the block will appear directly next to each other. This</span>
-            <span class="comment">// generates a clippy lint about suspicious `if/else` formatting.</span>
-            <span class="comment">// Therefore, suppress the lint inside the generated code...</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::suspicious_else_formatting</span>)]</span>
-            {
-                #<span class="ident">span</span>
-                <span class="comment">// ...but turn the lint back on inside the function body.</span>
-                <span class="attribute">#[<span class="ident">warn</span>(<span class="ident">clippy::suspicious_else_formatting</span>)]</span>
-                #<span class="ident">block</span>
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="macro">quote_spanned!</span>(block.span() =&gt;
+            <span class="comment">// Because `quote` produces a stream of tokens _without_ whitespace, the
+            // `if` and the block will appear directly next to each other. This
+            // generates a clippy lint about suspicious `if/else` formatting.
+            // Therefore, suppress the lint inside the generated code...
+            </span><span class="attribute">#[allow(clippy::suspicious_else_formatting)]
+            </span>{
+                #span
+                <span class="comment">// ...but turn the lint back on inside the function body.
+                </span><span class="attribute">#[warn(clippy::suspicious_else_formatting)]
+                </span>#block
             }
         ),
     }
 }
 
-<span class="doccomment">/// Indicates whether a field should be recorded as `Value` or `Debug`.</span>
-<span class="kw">enum</span> <span class="ident">RecordType</span> {
-    <span class="doccomment">/// The field should be recorded using its `Value` implementation.</span>
-    <span class="ident">Value</span>,
-    <span class="doccomment">/// The field should be recorded using `tracing::field::debug()`.</span>
-    <span class="ident">Debug</span>,
+<span class="doccomment">/// Indicates whether a field should be recorded as `Value` or `Debug`.
+</span><span class="kw">enum </span>RecordType {
+    <span class="doccomment">/// The field should be recorded using its `Value` implementation.
+    </span>Value,
+    <span class="doccomment">/// The field should be recorded using `tracing::field::debug()`.
+    </span>Debug,
 }
 
-<span class="kw">impl</span> <span class="ident">RecordType</span> {
-    <span class="doccomment">/// Array of primitive types which should be recorded as [RecordType::Value].</span>
-    <span class="kw">const</span> <span class="ident">TYPES_FOR_VALUE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">impl </span>RecordType {
+    <span class="doccomment">/// Array of primitive types which should be recorded as [RecordType::Value].
+    </span><span class="kw">const </span>TYPES_FOR_VALUE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str] = <span class="kw-2">&amp;</span>[
         <span class="string">&quot;bool&quot;</span>,
         <span class="string">&quot;str&quot;</span>,
         <span class="string">&quot;u8&quot;</span>,
@@ -1155,225 +1155,225 @@
         <span class="string">&quot;Wrapping&quot;</span>,
     ];
 
-    <span class="doccomment">/// Parse `RecordType` from [syn::Type] by looking up</span>
-    <span class="doccomment">/// the [RecordType::TYPES_FOR_VALUE] array.</span>
-    <span class="kw">fn</span> <span class="ident">parse_from_ty</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Type</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">ty</span> {
-            <span class="ident">syn::Type::Path</span>(<span class="ident">syn::TypePath</span> { <span class="ident">path</span>, .. })
-                <span class="kw">if</span> <span class="ident">path</span>
-                    .<span class="ident">segments</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">last</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">path_segment</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">path_segment</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>();
-                        <span class="ident"><span class="self">Self</span>::TYPES_FOR_VALUE</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">==</span> <span class="ident">ident</span>)
+    <span class="doccomment">/// Parse `RecordType` from [syn::Type] by looking up
+    /// the [RecordType::TYPES_FOR_VALUE] array.
+    </span><span class="kw">fn </span>parse_from_ty(ty: <span class="kw-2">&amp;</span>syn::Type) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>ty {
+            syn::Type::Path(syn::TypePath { path, .. })
+                <span class="kw">if </span>path
+                    .segments
+                    .iter()
+                    .last()
+                    .map(|path_segment| {
+                        <span class="kw">let </span>ident = path_segment.ident.to_string();
+                        <span class="self">Self</span>::TYPES_FOR_VALUE.iter().any(|<span class="kw-2">&amp;</span>t| t == ident)
                     })
-                    .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) =&gt;
+                    .unwrap_or(<span class="bool-val">false</span>) =&gt;
             {
-                <span class="ident">RecordType::Value</span>
+                RecordType::Value
             }
-            <span class="ident">syn::Type::Reference</span>(<span class="ident">syn::TypeReference</span> { <span class="ident">elem</span>, .. }) =&gt; {
-                <span class="ident">RecordType::parse_from_ty</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">elem</span>)
+            syn::Type::Reference(syn::TypeReference { elem, .. }) =&gt; {
+                RecordType::parse_from_ty(<span class="kw-2">&amp;*</span>elem)
             }
-            <span class="kw">_</span> =&gt; <span class="ident">RecordType::Debug</span>,
+            <span class="kw">_ </span>=&gt; RecordType::Debug,
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">param_names</span>(<span class="ident">pat</span>: <span class="ident">Pat</span>, <span class="ident">record_type</span>: <span class="ident">RecordType</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">Ident</span>, <span class="ident">RecordType</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">pat</span> {
-        <span class="ident">Pat::Ident</span>(<span class="ident">PatIdent</span> { <span class="ident">ident</span>, .. }) =&gt; <span class="ident">Box::new</span>(<span class="ident">iter::once</span>((<span class="ident">ident</span>, <span class="ident">record_type</span>))),
-        <span class="ident">Pat::Reference</span>(<span class="ident">PatReference</span> { <span class="ident">pat</span>, .. }) =&gt; <span class="ident">param_names</span>(<span class="kw-2">*</span><span class="ident">pat</span>, <span class="ident">record_type</span>),
-        <span class="comment">// We can&#39;t get the concrete type of fields in the struct/tuple</span>
-        <span class="comment">// patterns by using `syn`. e.g. `fn foo(Foo { x, y }: Foo) {}`.</span>
-        <span class="comment">// Therefore, the struct/tuple patterns in the arguments will just</span>
-        <span class="comment">// always be recorded as `RecordType::Debug`.</span>
-        <span class="ident">Pat::Struct</span>(<span class="ident">PatStruct</span> { <span class="ident">fields</span>, .. }) =&gt; <span class="ident">Box::new</span>(
-            <span class="ident">fields</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">FieldPat</span> { <span class="ident">pat</span>, .. }<span class="op">|</span> <span class="ident">param_names</span>(<span class="kw-2">*</span><span class="ident">pat</span>, <span class="ident">RecordType::Debug</span>)),
+<span class="kw">fn </span>param_names(pat: Pat, record_type: RecordType) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = (Ident, RecordType)&gt;&gt; {
+    <span class="kw">match </span>pat {
+        Pat::Ident(PatIdent { ident, .. }) =&gt; Box::new(iter::once((ident, record_type))),
+        Pat::Reference(PatReference { pat, .. }) =&gt; param_names(<span class="kw-2">*</span>pat, record_type),
+        <span class="comment">// We can&#39;t get the concrete type of fields in the struct/tuple
+        // patterns by using `syn`. e.g. `fn foo(Foo { x, y }: Foo) {}`.
+        // Therefore, the struct/tuple patterns in the arguments will just
+        // always be recorded as `RecordType::Debug`.
+        </span>Pat::Struct(PatStruct { fields, .. }) =&gt; Box::new(
+            fields
+                .into_iter()
+                .flat_map(|FieldPat { pat, .. }| param_names(<span class="kw-2">*</span>pat, RecordType::Debug)),
         ),
-        <span class="ident">Pat::Tuple</span>(<span class="ident">PatTuple</span> { <span class="ident">elems</span>, .. }) =&gt; <span class="ident">Box::new</span>(
-            <span class="ident">elems</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">param_names</span>(<span class="ident">p</span>, <span class="ident">RecordType::Debug</span>)),
+        Pat::Tuple(PatTuple { elems, .. }) =&gt; Box::new(
+            elems
+                .into_iter()
+                .flat_map(|p| param_names(p, RecordType::Debug)),
         ),
-        <span class="ident">Pat::TupleStruct</span>(<span class="ident">PatTupleStruct</span> {
-            <span class="ident">pat</span>: <span class="ident">PatTuple</span> { <span class="ident">elems</span>, .. },
+        Pat::TupleStruct(PatTupleStruct {
+            pat: PatTuple { elems, .. },
             ..
-        }) =&gt; <span class="ident">Box::new</span>(
-            <span class="ident">elems</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">param_names</span>(<span class="ident">p</span>, <span class="ident">RecordType::Debug</span>)),
+        }) =&gt; Box::new(
+            elems
+                .into_iter()
+                .flat_map(|p| param_names(p, RecordType::Debug)),
         ),
 
-        <span class="comment">// The above *should* cover all cases of irrefutable patterns,</span>
-        <span class="comment">// but we purposefully don&#39;t do any funny business here</span>
-        <span class="comment">// (such as panicking) because that would obscure rustc&#39;s</span>
-        <span class="comment">// much more informative error message.</span>
-        <span class="kw">_</span> =&gt; <span class="ident">Box::new</span>(<span class="ident">iter::empty</span>()),
+        <span class="comment">// The above *should* cover all cases of irrefutable patterns,
+        // but we purposefully don&#39;t do any funny business here
+        // (such as panicking) because that would obscure rustc&#39;s
+        // much more informative error message.
+        </span><span class="kw">_ </span>=&gt; Box::new(iter::empty()),
     }
 }
 
-<span class="doccomment">/// The specific async code pattern that was detected</span>
-<span class="kw">enum</span> <span class="ident">AsyncKind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Immediately-invoked async fn, as generated by `async-trait &lt;= 0.1.43`:</span>
-    <span class="doccomment">/// `async fn foo&lt;...&gt;(...) {...}; Box::pin(foo&lt;...&gt;(...))`</span>
-    <span class="ident">Function</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ItemFn</span>),
-    <span class="doccomment">/// A function returning an async (move) block, optionally `Box::pin`-ed,</span>
-    <span class="doccomment">/// as generated by `async-trait &gt;= 0.1.44`:</span>
-    <span class="doccomment">/// `Box::pin(async move { ... })`</span>
-    <span class="ident">Async</span> {
-        <span class="ident">async_expr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ExprAsync</span>,
-        <span class="ident">pinned_box</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// The specific async code pattern that was detected
+</span><span class="kw">enum </span>AsyncKind&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Immediately-invoked async fn, as generated by `async-trait &lt;= 0.1.43`:
+    /// `async fn foo&lt;...&gt;(...) {...}; Box::pin(foo&lt;...&gt;(...))`
+    </span>Function(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ItemFn),
+    <span class="doccomment">/// A function returning an async (move) block, optionally `Box::pin`-ed,
+    /// as generated by `async-trait &gt;= 0.1.44`:
+    /// `Box::pin(async move { ... })`
+    </span>Async {
+        async_expr: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ExprAsync,
+        pinned_box: bool,
     },
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AsyncInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;block</span><span class="op">&gt;</span> {
-    <span class="comment">// statement that must be patched</span>
-    <span class="ident">source_stmt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;block</span> <span class="ident">Stmt</span>,
-    <span class="ident">kind</span>: <span class="ident">AsyncKind</span><span class="op">&lt;</span><span class="lifetime">&#39;block</span><span class="op">&gt;</span>,
-    <span class="ident">self_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::TypePath</span><span class="op">&gt;</span>,
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;block</span> <span class="ident">ItemFn</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AsyncInfo&lt;<span class="lifetime">&#39;block</span>&gt; {
+    <span class="comment">// statement that must be patched
+    </span>source_stmt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;block </span>Stmt,
+    kind: AsyncKind&lt;<span class="lifetime">&#39;block</span>&gt;,
+    self_type: <span class="prelude-ty">Option</span>&lt;syn::TypePath&gt;,
+    input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;block </span>ItemFn,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;block</span><span class="op">&gt;</span> <span class="ident">AsyncInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;block</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Get the AST of the inner function we need to hook, if it looks like a</span>
-    <span class="doccomment">/// manual future implementation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When we are given a function that returns a (pinned) future containing the</span>
-    <span class="doccomment">/// user logic, it is that (pinned) future that needs to be instrumented.</span>
-    <span class="doccomment">/// Were we to instrument its parent, we would only collect information</span>
-    <span class="doccomment">/// regarding the allocation of that future, and not its own span of execution.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// We inspect the block of the function to find if it matches any of the</span>
-    <span class="doccomment">/// following patterns:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Immediately-invoked async fn, as generated by `async-trait &lt;= 0.1.43`:</span>
-    <span class="doccomment">///   `async fn foo&lt;...&gt;(...) {...}; Box::pin(foo&lt;...&gt;(...))`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - A function returning an async (move) block, optionally `Box::pin`-ed,</span>
-    <span class="doccomment">///   as generated by `async-trait &gt;= 0.1.44`:</span>
-    <span class="doccomment">///   `Box::pin(async move { ... })`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// We the return the statement that must be instrumented, along with some</span>
-    <span class="doccomment">/// other information.</span>
-    <span class="doccomment">/// &#39;gen_body&#39; will then be able to use that information to instrument the</span>
-    <span class="doccomment">/// proper function/future.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// (this follows the approach suggested in</span>
-    <span class="doccomment">/// https://github.com/dtolnay/async-trait/issues/45#issuecomment-571245673)</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_fn</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;block</span> <span class="ident">ItemFn</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="comment">// are we in an async context? If yes, this isn&#39;t a manual async-like pattern</span>
-        <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">asyncness</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;block</span>&gt; AsyncInfo&lt;<span class="lifetime">&#39;block</span>&gt; {
+    <span class="doccomment">/// Get the AST of the inner function we need to hook, if it looks like a
+    /// manual future implementation.
+    ///
+    /// When we are given a function that returns a (pinned) future containing the
+    /// user logic, it is that (pinned) future that needs to be instrumented.
+    /// Were we to instrument its parent, we would only collect information
+    /// regarding the allocation of that future, and not its own span of execution.
+    ///
+    /// We inspect the block of the function to find if it matches any of the
+    /// following patterns:
+    ///
+    /// - Immediately-invoked async fn, as generated by `async-trait &lt;= 0.1.43`:
+    ///   `async fn foo&lt;...&gt;(...) {...}; Box::pin(foo&lt;...&gt;(...))`
+    ///
+    /// - A function returning an async (move) block, optionally `Box::pin`-ed,
+    ///   as generated by `async-trait &gt;= 0.1.44`:
+    ///   `Box::pin(async move { ... })`
+    ///
+    /// We the return the statement that must be instrumented, along with some
+    /// other information.
+    /// &#39;gen_body&#39; will then be able to use that information to instrument the
+    /// proper function/future.
+    ///
+    /// (this follows the approach suggested in
+    /// https://github.com/dtolnay/async-trait/issues/45#issuecomment-571245673)
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_fn(input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;block </span>ItemFn) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="comment">// are we in an async context? If yes, this isn&#39;t a manual async-like pattern
+        </span><span class="kw">if </span>input.sig.asyncness.is_some() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">block</span>;
+        <span class="kw">let </span>block = <span class="kw-2">&amp;</span>input.block;
 
-        <span class="comment">// list of async functions declared inside the block</span>
-        <span class="kw">let</span> <span class="ident">inside_funs</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">stmts</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Stmt::Item</span>(<span class="ident">Item::Fn</span>(<span class="ident">fun</span>)) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">stmt</span> {
-                <span class="comment">// If the function is async, this is a candidate</span>
-                <span class="kw">if</span> <span class="ident">fun</span>.<span class="ident">sig</span>.<span class="ident">asyncness</span>.<span class="ident">is_some</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">stmt</span>, <span class="ident">fun</span>));
+        <span class="comment">// list of async functions declared inside the block
+        </span><span class="kw">let </span>inside_funs = block.stmts.iter().filter_map(|stmt| {
+            <span class="kw">if let </span>Stmt::Item(Item::Fn(fun)) = <span class="kw-2">&amp;</span>stmt {
+                <span class="comment">// If the function is async, this is a candidate
+                </span><span class="kw">if </span>fun.sig.asyncness.is_some() {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>((stmt, fun));
                 }
             }
-            <span class="prelude-val">None</span>
-        });
+            <span class="prelude-val">None
+        </span>});
 
-        <span class="comment">// last expression of the block: it determines the return value of the</span>
-        <span class="comment">// block, this is quite likely a `Box::pin` statement or an async block</span>
-        <span class="kw">let</span> (<span class="ident">last_expr_stmt</span>, <span class="ident">last_expr</span>) <span class="op">=</span> <span class="ident">block</span>.<span class="ident">stmts</span>.<span class="ident">iter</span>().<span class="ident">rev</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Stmt::Expr</span>(<span class="ident">expr</span>) <span class="op">=</span> <span class="ident">stmt</span> {
-                <span class="prelude-val">Some</span>((<span class="ident">stmt</span>, <span class="ident">expr</span>))
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
+        <span class="comment">// last expression of the block: it determines the return value of the
+        // block, this is quite likely a `Box::pin` statement or an async block
+        </span><span class="kw">let </span>(last_expr_stmt, last_expr) = block.stmts.iter().rev().find_map(|stmt| {
+            <span class="kw">if let </span>Stmt::Expr(expr) = stmt {
+                <span class="prelude-val">Some</span>((stmt, expr))
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
         })<span class="question-mark">?</span>;
 
-        <span class="comment">// is the last expression an async block?</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Expr::Async</span>(<span class="ident">async_expr</span>) <span class="op">=</span> <span class="ident">last_expr</span> {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">AsyncInfo</span> {
-                <span class="ident">source_stmt</span>: <span class="ident">last_expr_stmt</span>,
-                <span class="ident">kind</span>: <span class="ident">AsyncKind::Async</span> {
-                    <span class="ident">async_expr</span>,
-                    <span class="ident">pinned_box</span>: <span class="bool-val">false</span>,
+        <span class="comment">// is the last expression an async block?
+        </span><span class="kw">if let </span>Expr::Async(async_expr) = last_expr {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(AsyncInfo {
+                source_stmt: last_expr_stmt,
+                kind: AsyncKind::Async {
+                    async_expr,
+                    pinned_box: <span class="bool-val">false</span>,
                 },
-                <span class="ident">self_type</span>: <span class="prelude-val">None</span>,
-                <span class="ident">input</span>,
+                self_type: <span class="prelude-val">None</span>,
+                input,
             });
         }
 
-        <span class="comment">// is the last expression a function call?</span>
-        <span class="kw">let</span> (<span class="ident">outside_func</span>, <span class="ident">outside_args</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">last_expr</span> {
-            <span class="ident">Expr::Call</span>(<span class="ident">ExprCall</span> { <span class="ident">func</span>, <span class="ident">args</span>, .. }) =&gt; (<span class="ident">func</span>, <span class="ident">args</span>),
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        <span class="comment">// is the last expression a function call?
+        </span><span class="kw">let </span>(outside_func, outside_args) = <span class="kw">match </span>last_expr {
+            Expr::Call(ExprCall { func, args, .. }) =&gt; (func, args),
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
         };
 
-        <span class="comment">// is it a call to `Box::pin()`?</span>
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">outside_func</span>.<span class="ident">as_ref</span>() {
-            <span class="ident">Expr::Path</span>(<span class="ident">path</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">path</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        <span class="comment">// is it a call to `Box::pin()`?
+        </span><span class="kw">let </span>path = <span class="kw">match </span>outside_func.as_ref() {
+            Expr::Path(path) =&gt; <span class="kw-2">&amp;</span>path.path,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
         };
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">path_to_string</span>(<span class="ident">path</span>).<span class="ident">ends_with</span>(<span class="string">&quot;Box::pin&quot;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">if </span>!path_to_string(path).ends_with(<span class="string">&quot;Box::pin&quot;</span>) {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="comment">// Does the call take an argument? If it doesn&#39;t,</span>
-        <span class="comment">// it&#39;s not gonna compile anyway, but that&#39;s no reason</span>
-        <span class="comment">// to (try to) perform an out of bounds access</span>
-        <span class="kw">if</span> <span class="ident">outside_args</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="comment">// Does the call take an argument? If it doesn&#39;t,
+        // it&#39;s not gonna compile anyway, but that&#39;s no reason
+        // to (try to) perform an out of bounds access
+        </span><span class="kw">if </span>outside_args.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="comment">// Is the argument to Box::pin an async block that</span>
-        <span class="comment">// captures its arguments?</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Expr::Async</span>(<span class="ident">async_expr</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">outside_args</span>[<span class="number">0</span>] {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">AsyncInfo</span> {
-                <span class="ident">source_stmt</span>: <span class="ident">last_expr_stmt</span>,
-                <span class="ident">kind</span>: <span class="ident">AsyncKind::Async</span> {
-                    <span class="ident">async_expr</span>,
-                    <span class="ident">pinned_box</span>: <span class="bool-val">true</span>,
+        <span class="comment">// Is the argument to Box::pin an async block that
+        // captures its arguments?
+        </span><span class="kw">if let </span>Expr::Async(async_expr) = <span class="kw-2">&amp;</span>outside_args[<span class="number">0</span>] {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(AsyncInfo {
+                source_stmt: last_expr_stmt,
+                kind: AsyncKind::Async {
+                    async_expr,
+                    pinned_box: <span class="bool-val">true</span>,
                 },
-                <span class="ident">self_type</span>: <span class="prelude-val">None</span>,
-                <span class="ident">input</span>,
+                self_type: <span class="prelude-val">None</span>,
+                input,
             });
         }
 
-        <span class="comment">// Is the argument to Box::pin a function call itself?</span>
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">outside_args</span>[<span class="number">0</span>] {
-            <span class="ident">Expr::Call</span>(<span class="ident">ExprCall</span> { <span class="ident">func</span>, .. }) =&gt; <span class="ident">func</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        <span class="comment">// Is the argument to Box::pin a function call itself?
+        </span><span class="kw">let </span>func = <span class="kw">match </span><span class="kw-2">&amp;</span>outside_args[<span class="number">0</span>] {
+            Expr::Call(ExprCall { func, .. }) =&gt; func,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
         };
 
-        <span class="comment">// &quot;stringify&quot; the path of the function called</span>
-        <span class="kw">let</span> <span class="ident">func_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">func</span> {
-            <span class="ident">Expr::Path</span>(<span class="kw-2">ref</span> <span class="ident">func_path</span>) =&gt; <span class="ident">path_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">func_path</span>.<span class="ident">path</span>),
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        <span class="comment">// &quot;stringify&quot; the path of the function called
+        </span><span class="kw">let </span>func_name = <span class="kw">match </span><span class="kw-2">**</span>func {
+            Expr::Path(<span class="kw-2">ref </span>func_path) =&gt; path_to_string(<span class="kw-2">&amp;</span>func_path.path),
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
         };
 
-        <span class="comment">// Was that function defined inside of the current block?</span>
-        <span class="comment">// If so, retrieve the statement where it was declared and the function itself</span>
-        <span class="kw">let</span> (<span class="ident">stmt_func_declaration</span>, <span class="ident">func</span>) <span class="op">=</span> <span class="ident">inside_funs</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">fun</span>)<span class="op">|</span> <span class="ident">fun</span>.<span class="ident">sig</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="ident">func_name</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Was that function defined inside of the current block?
+        // If so, retrieve the statement where it was declared and the function itself
+        </span><span class="kw">let </span>(stmt_func_declaration, func) = inside_funs
+            .into_iter()
+            .find(|(<span class="kw">_</span>, fun)| fun.sig.ident == func_name)<span class="question-mark">?</span>;
 
-        <span class="comment">// If &quot;_self&quot; is present as an argument, we store its type to be able to rewrite &quot;Self&quot; (the</span>
-        <span class="comment">// parameter type) with the type of &quot;_self&quot;</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">self_type</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">func</span>.<span class="ident">sig</span>.<span class="ident">inputs</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FnArg::Typed</span>(<span class="ident">ty</span>) <span class="op">=</span> <span class="ident">arg</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Pat::Ident</span>(<span class="ident">PatIdent</span> { <span class="kw-2">ref</span> <span class="ident">ident</span>, .. }) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">ty</span>.<span class="ident">pat</span> {
-                    <span class="kw">if</span> <span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;_self&quot;</span> {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">ty</span>.<span class="ident">ty</span>.<span class="ident">clone</span>();
-                        <span class="comment">// extract the inner type if the argument is &quot;&amp;self&quot; or &quot;&amp;mut self&quot;</span>
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Type::Reference</span>(<span class="ident">syn::TypeReference</span> { <span class="ident">elem</span>, .. }) <span class="op">=</span> <span class="ident">ty</span> {
-                            <span class="ident">ty</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">elem</span>;
+        <span class="comment">// If &quot;_self&quot; is present as an argument, we store its type to be able to rewrite &quot;Self&quot; (the
+        // parameter type) with the type of &quot;_self&quot;
+        </span><span class="kw">let </span><span class="kw-2">mut </span>self_type = <span class="prelude-val">None</span>;
+        <span class="kw">for </span>arg <span class="kw">in </span><span class="kw-2">&amp;</span>func.sig.inputs {
+            <span class="kw">if let </span>FnArg::Typed(ty) = arg {
+                <span class="kw">if let </span>Pat::Ident(PatIdent { <span class="kw-2">ref </span>ident, .. }) = <span class="kw-2">*</span>ty.pat {
+                    <span class="kw">if </span>ident == <span class="string">&quot;_self&quot; </span>{
+                        <span class="kw">let </span><span class="kw-2">mut </span>ty = <span class="kw-2">*</span>ty.ty.clone();
+                        <span class="comment">// extract the inner type if the argument is &quot;&amp;self&quot; or &quot;&amp;mut self&quot;
+                        </span><span class="kw">if let </span>syn::Type::Reference(syn::TypeReference { elem, .. }) = ty {
+                            ty = <span class="kw-2">*</span>elem;
                         }
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) <span class="op">=</span> <span class="ident">ty</span> {
-                            <span class="ident">self_type</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tp</span>);
+                        <span class="kw">if let </span>syn::Type::Path(tp) = ty {
+                            self_type = <span class="prelude-val">Some</span>(tp);
                             <span class="kw">break</span>;
                         }
                     }
@@ -1381,144 +1381,144 @@
             }
         }
 
-        <span class="prelude-val">Some</span>(<span class="ident">AsyncInfo</span> {
-            <span class="ident">source_stmt</span>: <span class="ident">stmt_func_declaration</span>,
-            <span class="ident">kind</span>: <span class="ident">AsyncKind::Function</span>(<span class="ident">func</span>),
-            <span class="ident">self_type</span>,
-            <span class="ident">input</span>,
+        <span class="prelude-val">Some</span>(AsyncInfo {
+            source_stmt: stmt_func_declaration,
+            kind: AsyncKind::Function(func),
+            self_type,
+            input,
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">gen_async</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>gen_async(
         <span class="self">self</span>,
-        <span class="ident">args</span>: <span class="ident">InstrumentArgs</span>,
-        <span class="ident">instrumented_function_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="ident">proc_macro::TokenStream</span> {
-        <span class="comment">// let&#39;s rewrite some statements!</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out_stmts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">input</span>
-            .<span class="ident">block</span>
-            .<span class="ident">stmts</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> <span class="ident">stmt</span>.<span class="ident">to_token_stream</span>())
-            .<span class="ident">collect</span>();
+        args: InstrumentArgs,
+        instrumented_function_name: <span class="kw-2">&amp;</span>str,
+    ) -&gt; proc_macro::TokenStream {
+        <span class="comment">// let&#39;s rewrite some statements!
+        </span><span class="kw">let </span><span class="kw-2">mut </span>out_stmts: Vec&lt;TokenStream&gt; = <span class="self">self
+            </span>.input
+            .block
+            .stmts
+            .iter()
+            .map(|stmt| stmt.to_token_stream())
+            .collect();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">iter</span>, <span class="ident">_stmt</span>)) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">input</span>
-            .<span class="ident">block</span>
-            .<span class="ident">stmts</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">_iter</span>, <span class="ident">stmt</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">stmt</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">source_stmt</span>)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((iter, _stmt)) = <span class="self">self
+            </span>.input
+            .block
+            .stmts
+            .iter()
+            .enumerate()
+            .find(|(_iter, stmt)| <span class="kw-2">*</span>stmt == <span class="self">self</span>.source_stmt)
         {
-            <span class="comment">// instrument the future by rewriting the corresponding statement</span>
-            <span class="ident">out_stmts</span>[<span class="ident">iter</span>] <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-                <span class="comment">// `Box::pin(immediately_invoked_async_fn())`</span>
-                <span class="ident">AsyncKind::Function</span>(<span class="ident">fun</span>) =&gt; <span class="ident">gen_function</span>(
-                    <span class="ident">fun</span>.<span class="ident">into</span>(),
-                    <span class="ident">args</span>,
-                    <span class="ident">instrumented_function_name</span>,
-                    <span class="self">self</span>.<span class="ident">self_type</span>.<span class="ident">as_ref</span>(),
+            <span class="comment">// instrument the future by rewriting the corresponding statement
+            </span>out_stmts[iter] = <span class="kw">match </span><span class="self">self</span>.kind {
+                <span class="comment">// `Box::pin(immediately_invoked_async_fn())`
+                </span>AsyncKind::Function(fun) =&gt; gen_function(
+                    fun.into(),
+                    args,
+                    instrumented_function_name,
+                    <span class="self">self</span>.self_type.as_ref(),
                 ),
-                <span class="comment">// `async move { ... }`, optionally pinned</span>
-                <span class="ident">AsyncKind::Async</span> {
-                    <span class="ident">async_expr</span>,
-                    <span class="ident">pinned_box</span>,
+                <span class="comment">// `async move { ... }`, optionally pinned
+                </span>AsyncKind::Async {
+                    async_expr,
+                    pinned_box,
                 } =&gt; {
-                    <span class="kw">let</span> <span class="ident">instrumented_block</span> <span class="op">=</span> <span class="ident">gen_block</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">async_expr</span>.<span class="ident">block</span>,
-                        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">inputs</span>,
+                    <span class="kw">let </span>instrumented_block = gen_block(
+                        <span class="kw-2">&amp;</span>async_expr.block,
+                        <span class="kw-2">&amp;</span><span class="self">self</span>.input.sig.inputs,
                         <span class="bool-val">true</span>,
-                        <span class="ident">args</span>,
-                        <span class="ident">instrumented_function_name</span>,
+                        args,
+                        instrumented_function_name,
                         <span class="prelude-val">None</span>,
                     );
-                    <span class="kw">let</span> <span class="ident">async_attrs</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">async_expr</span>.<span class="ident">attrs</span>;
-                    <span class="kw">if</span> <span class="ident">pinned_box</span> {
-                        <span class="macro">quote!</span> {
-                            <span class="ident">Box::pin</span>(#(#<span class="ident">async_attrs</span>) <span class="op">*</span> <span class="kw">async</span> <span class="kw">move</span> { #<span class="ident">instrumented_block</span> })
+                    <span class="kw">let </span>async_attrs = <span class="kw-2">&amp;</span>async_expr.attrs;
+                    <span class="kw">if </span>pinned_box {
+                        <span class="macro">quote! </span>{
+                            Box::pin(#(#async_attrs) * <span class="kw">async move </span>{ #instrumented_block })
                         }
-                    } <span class="kw">else</span> {
-                        <span class="macro">quote!</span> {
-                            #(#<span class="ident">async_attrs</span>) <span class="op">*</span> <span class="kw">async</span> <span class="kw">move</span> { #<span class="ident">instrumented_block</span> }
+                    } <span class="kw">else </span>{
+                        <span class="macro">quote! </span>{
+                            #(#async_attrs) * <span class="kw">async move </span>{ #instrumented_block }
                         }
                     }
                 }
             };
         }
 
-        <span class="kw">let</span> <span class="ident">vis</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>.<span class="ident">vis</span>;
-        <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>.<span class="ident">sig</span>;
-        <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>.<span class="ident">attrs</span>;
+        <span class="kw">let </span>vis = <span class="kw-2">&amp;</span><span class="self">self</span>.input.vis;
+        <span class="kw">let </span>sig = <span class="kw-2">&amp;</span><span class="self">self</span>.input.sig;
+        <span class="kw">let </span>attrs = <span class="kw-2">&amp;</span><span class="self">self</span>.input.attrs;
         <span class="macro">quote!</span>(
-            #(#<span class="ident">attrs</span>) <span class="op">*</span>
-            #<span class="ident">vis</span> #<span class="ident">sig</span> {
-                #(#<span class="ident">out_stmts</span>) <span class="op">*</span>
+            #(#attrs) *
+            #vis #sig {
+                #(#out_stmts) *
             }
         )
-        .<span class="ident">into</span>()
+        .into()
     }
 }
 
-<span class="comment">// Return a path as a String</span>
-<span class="kw">fn</span> <span class="ident">path_to_string</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
-    <span class="comment">// some heuristic to prevent too many allocations</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">5</span>);
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() {
-        <span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">res</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">path</span>.<span class="ident">segments</span>[<span class="ident">i</span>].<span class="ident">ident</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;writing to a String should never fail&quot;</span>);
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
-            <span class="ident">res</span>.<span class="ident">push_str</span>(<span class="string">&quot;::&quot;</span>);
+<span class="comment">// Return a path as a String
+</span><span class="kw">fn </span>path_to_string(path: <span class="kw-2">&amp;</span>Path) -&gt; String {
+    <span class="kw">use </span>std::fmt::Write;
+    <span class="comment">// some heuristic to prevent too many allocations
+    </span><span class="kw">let </span><span class="kw-2">mut </span>res = String::with_capacity(path.segments.len() * <span class="number">5</span>);
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..path.segments.len() {
+        <span class="macro">write!</span>(<span class="kw-2">&amp;mut </span>res, <span class="string">&quot;{}&quot;</span>, path.segments[i].ident)
+            .expect(<span class="string">&quot;writing to a String should never fail&quot;</span>);
+        <span class="kw">if </span>i &lt; path.segments.len() - <span class="number">1 </span>{
+            res.push_str(<span class="string">&quot;::&quot;</span>);
         }
     }
-    <span class="ident">res</span>
+    res
 }
 
-<span class="doccomment">/// A visitor struct to replace idents and types in some piece</span>
-<span class="doccomment">/// of code (e.g. the &quot;self&quot; and &quot;Self&quot; tokens in user-supplied</span>
-<span class="doccomment">/// fields expressions when the function is generated by an old</span>
-<span class="doccomment">/// version of async-trait).</span>
-<span class="kw">struct</span> <span class="ident">IdentAndTypesRenamer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">types</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">TypePath</span>)<span class="op">&gt;</span>,
-    <span class="ident">idents</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Ident</span>, <span class="ident">Ident</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// A visitor struct to replace idents and types in some piece
+/// of code (e.g. the &quot;self&quot; and &quot;Self&quot; tokens in user-supplied
+/// fields expressions when the function is generated by an old
+/// version of async-trait).
+</span><span class="kw">struct </span>IdentAndTypesRenamer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    types: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, TypePath)&gt;,
+    idents: Vec&lt;(Ident, Ident)&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">syn::visit_mut::VisitMut</span> <span class="kw">for</span> <span class="ident">IdentAndTypesRenamer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="comment">// we deliberately compare strings because we want to ignore the spans</span>
-    <span class="comment">// If we apply clippy&#39;s lint, the behavior changes</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::cmp_owned</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">visit_ident_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Ident</span>) {
-        <span class="kw">for</span> (<span class="ident">old_ident</span>, <span class="ident">new_ident</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">idents</span> {
-            <span class="kw">if</span> <span class="ident">id</span>.<span class="ident">to_string</span>() <span class="op">==</span> <span class="ident">old_ident</span>.<span class="ident">to_string</span>() {
-                <span class="kw-2">*</span><span class="ident">id</span> <span class="op">=</span> <span class="ident">new_ident</span>.<span class="ident">clone</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; syn::visit_mut::VisitMut <span class="kw">for </span>IdentAndTypesRenamer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="comment">// we deliberately compare strings because we want to ignore the spans
+    // If we apply clippy&#39;s lint, the behavior changes
+    </span><span class="attribute">#[allow(clippy::cmp_owned)]
+    </span><span class="kw">fn </span>visit_ident_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: <span class="kw-2">&amp;mut </span>Ident) {
+        <span class="kw">for </span>(old_ident, new_ident) <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.idents {
+            <span class="kw">if </span>id.to_string() == old_ident.to_string() {
+                <span class="kw-2">*</span>id = new_ident.clone();
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_type_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;mut</span> <span class="ident">syn::Type</span>) {
-        <span class="kw">for</span> (<span class="ident">type_name</span>, <span class="ident">new_type</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">types</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Type::Path</span>(<span class="ident">TypePath</span> { <span class="ident">path</span>, .. }) <span class="op">=</span> <span class="ident">ty</span> {
-                <span class="kw">if</span> <span class="ident">path_to_string</span>(<span class="ident">path</span>) <span class="op">==</span> <span class="kw-2">*</span><span class="ident">type_name</span> {
-                    <span class="kw-2">*</span><span class="ident">ty</span> <span class="op">=</span> <span class="ident">syn::Type::Path</span>(<span class="ident">new_type</span>.<span class="ident">clone</span>());
+    <span class="kw">fn </span>visit_type_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: <span class="kw-2">&amp;mut </span>syn::Type) {
+        <span class="kw">for </span>(type_name, new_type) <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.types {
+            <span class="kw">if let </span>syn::Type::Path(TypePath { path, .. }) = ty {
+                <span class="kw">if </span>path_to_string(path) == <span class="kw-2">*</span>type_name {
+                    <span class="kw-2">*</span>ty = syn::Type::Path(new_type.clone());
                 }
             }
         }
     }
 }
 
-<span class="comment">// A visitor struct that replace an async block by its patched version</span>
-<span class="kw">struct</span> <span class="ident">AsyncTraitBlockReplacer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Block</span>,
-    <span class="ident">patched_block</span>: <span class="ident">Block</span>,
+<span class="comment">// A visitor struct that replace an async block by its patched version
+</span><span class="kw">struct </span>AsyncTraitBlockReplacer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    block: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Block,
+    patched_block: Block,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">syn::visit_mut::VisitMut</span> <span class="kw">for</span> <span class="ident">AsyncTraitBlockReplacer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">visit_block_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Block</span>) {
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">block</span> {
-            <span class="kw-2">*</span><span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">patched_block</span>.<span class="ident">clone</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; syn::visit_mut::VisitMut <span class="kw">for </span>AsyncTraitBlockReplacer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>visit_block_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, i: <span class="kw-2">&amp;mut </span>Block) {
+        <span class="kw">if </span>i == <span class="self">self</span>.block {
+            <span class="kw-2">*</span>i = <span class="self">self</span>.patched_block.clone();
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_attributes" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_attributes" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_calculator/sql_schema_calculator_flavour.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sql_schema_calculator_flavour.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_calculator/sql_schema_calculator_flavour.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sql_schema_calculator_flavour.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -40,47 +40,47 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mssql</span>;
-<span class="kw">mod</span> <span class="ident">mysql</span>;
-<span class="kw">mod</span> <span class="ident">postgres</span>;
-<span class="kw">mod</span> <span class="ident">sqlite</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>mssql;
+<span class="kw">mod </span>mysql;
+<span class="kw">mod </span>postgres;
+<span class="kw">mod </span>sqlite;
 
-<span class="kw">use</span> <span class="ident">psl::parser_database</span>::{<span class="ident">ast::FieldArity</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>};
+<span class="kw">use </span>psl::parser_database::{ast::FieldArity, walkers::<span class="kw-2">*</span>};
+<span class="kw">use </span>sql_schema_describer::{<span class="self">self </span><span class="kw">as </span>sql, ColumnArity, ColumnType, ColumnTypeFamily};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">SqlSchemaCalculatorFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">calculate_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>SqlSchemaCalculatorFlavour {
+    <span class="kw">fn </span>calculate_enums(<span class="kw-2">&amp;</span><span class="self">self</span>, _ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;) {}
 
-    <span class="kw">fn</span> <span class="ident">column_default_value_for_autoincrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">sql::DefaultValue</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
+    <span class="kw">fn </span>column_default_value_for_autoincrement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;sql::DefaultValue&gt; {
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">column_type_for_unsupported_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">description</span>: <span class="ident">String</span>) -&gt; <span class="ident">sql::ColumnType</span> {
-        <span class="ident">ColumnType</span> {
-            <span class="ident">full_data_type</span>: <span class="ident">description</span>.<span class="ident">clone</span>(),
-            <span class="ident">family</span>: <span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="ident">description</span>),
-            <span class="ident">arity</span>: <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span> {
-                <span class="ident">FieldArity::Required</span> =&gt; <span class="ident">ColumnArity::Required</span>,
-                <span class="ident">FieldArity::Optional</span> =&gt; <span class="ident">ColumnArity::Nullable</span>,
-                <span class="ident">FieldArity::List</span> =&gt; <span class="ident">ColumnArity::List</span>,
+    <span class="kw">fn </span>column_type_for_unsupported_type(<span class="kw-2">&amp;</span><span class="self">self</span>, field: ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;, description: String) -&gt; sql::ColumnType {
+        ColumnType {
+            full_data_type: description.clone(),
+            family: ColumnTypeFamily::Unsupported(description),
+            arity: <span class="kw">match </span>field.ast_field().arity {
+                FieldArity::Required =&gt; ColumnArity::Required,
+                FieldArity::Optional =&gt; ColumnArity::Nullable,
+                FieldArity::List =&gt; ColumnArity::List,
             },
-            <span class="ident">native_type</span>: <span class="prelude-val">None</span>,
+            native_type: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">default_constraint_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_default_value</span>: <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+    <span class="kw">fn </span>default_constraint_name(<span class="kw-2">&amp;</span><span class="self">self</span>, _default_value: DefaultValueWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="kw">fn </span>field_is_implicit_autoincrement_primary_key(<span class="kw-2">&amp;</span><span class="self">self</span>, _field: ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="kw">fn </span>m2m_foreign_key_action(<span class="kw-2">&amp;</span><span class="self">self</span>, _model_a: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, _model_b: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; sql::ForeignKeyAction {
+        sql::ForeignKeyAction::Cascade
     }
 
-    <span class="kw">fn</span> <span class="ident">field_is_implicit_autoincrement_primary_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">m2m_foreign_key_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_model_a</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">_model_b</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">sql::ForeignKeyAction</span> {
-        <span class="ident">sql::ForeignKeyAction::Cascade</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">push_connector_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_context</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
+    <span class="kw">fn </span>push_connector_data(<span class="kw-2">&amp;</span><span class="self">self</span>, _context: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;) {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

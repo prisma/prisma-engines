@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enum_dispatch-0.3.8/src/cache.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cache.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container"><img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enum_dispatch-0.3.8/src/cache.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cache.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container"><img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container">
                     <img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../enum_dispatch/index.html">
                         <img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -151,156 +151,156 @@
 <span id="149">149</span>
 <span id="150">150</span>
 <span id="151">151</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Procedural macros don&#39;t offer a good way to store information between macro invocations.  In</span>
-<span class="doccomment">//! addition, all syntax-related structures implement `!Send` and `!Sync`, making it impossible to</span>
-<span class="doccomment">//! keep them in any sort of static storage. This module uses some workarounds to add that</span>
-<span class="doccomment">//! functionality.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Fortunately, `TokenStream`s can be converted to and from `String`s, which can be stored</span>
-<span class="doccomment">//! statically. Unfortunately, doing so strips any related `Span` information, preventing error</span>
-<span class="doccomment">//! messages from being as informative as they could be. For now, it seems this is the best option</span>
-<span class="doccomment">//! available.</span>
-<span class="kw">use</span> <span class="ident">quote::ToTokens</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Procedural macros don&#39;t offer a good way to store information between macro invocations.  In
+//! addition, all syntax-related structures implement `!Send` and `!Sync`, making it impossible to
+//! keep them in any sort of static storage. This module uses some workarounds to add that
+//! functionality.
+//!
+//! Fortunately, `TokenStream`s can be converted to and from `String`s, which can be stored
+//! statically. Unfortunately, doing so strips any related `Span` information, preventing error
+//! messages from being as informative as they could be. For now, it seems this is the best option
+//! available.
+</span><span class="kw">use </span>quote::ToTokens;
 
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+<span class="kw">use </span>once_cell::sync::Lazy;
 
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
-<span class="kw">use</span> <span class="ident">std::sync::Mutex</span>;
+<span class="kw">use </span>std::collections::{HashMap, HashSet};
+<span class="kw">use </span>std::sync::Mutex;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::enum_dispatch_item</span>;
+<span class="kw">use </span><span class="kw">crate</span>::enum_dispatch_item;
 
-<span class="doccomment">/// Uniquely identifies a trait or an enum. This is based on its name and number of arguments.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">struct</span> <span class="ident">UniqueItemId</span> {
-    <span class="ident">item_name</span>: <span class="ident">String</span>,
-    <span class="ident">num_generics</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Uniquely identifies a trait or an enum. This is based on its name and number of arguments.
+</span><span class="attribute">#[derive(PartialEq, Eq, Hash, Clone)]
+</span><span class="kw">struct </span>UniqueItemId {
+    item_name: String,
+    num_generics: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">UniqueItemId</span> {
-    <span class="doccomment">/// Convenience constructor for UniqueItemId.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">item_name</span>: <span class="ident">String</span>, <span class="ident">num_generics</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">item_name</span>,
-            <span class="ident">num_generics</span>,
+<span class="kw">impl </span>UniqueItemId {
+    <span class="doccomment">/// Convenience constructor for UniqueItemId.
+    </span><span class="kw">pub fn </span>new(item_name: String, num_generics: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            item_name,
+            num_generics,
         }
     }
 }
 
-<span class="comment">// Magical storage for trait definitions so that they can be used when parsing other syntax</span>
-<span class="comment">// structures.</span>
-<span class="kw">static</span> <span class="ident">TRAIT_DEFS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UniqueItemId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Mutex::new</span>(<span class="ident">HashMap::new</span>()));
-<span class="kw">static</span> <span class="ident">ENUM_DEFS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UniqueItemId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Mutex::new</span>(<span class="ident">HashMap::new</span>()));
-<span class="kw">static</span> <span class="ident">DEFERRED_LINKS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UniqueItemId</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UniqueItemId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Mutex::new</span>(<span class="ident">HashMap::new</span>()));
-<span class="kw">static</span> <span class="ident">ENUM_CONVERSION_IMPLS_DEFS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UniqueItemId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Mutex::new</span>(<span class="ident">HashSet::new</span>()));
+<span class="comment">// Magical storage for trait definitions so that they can be used when parsing other syntax
+// structures.
+</span><span class="kw">static </span>TRAIT_DEFS: Lazy&lt;Mutex&lt;HashMap&lt;UniqueItemId, String&gt;&gt;&gt; =
+    Lazy::new(|| Mutex::new(HashMap::new()));
+<span class="kw">static </span>ENUM_DEFS: Lazy&lt;Mutex&lt;HashMap&lt;UniqueItemId, String&gt;&gt;&gt; =
+    Lazy::new(|| Mutex::new(HashMap::new()));
+<span class="kw">static </span>DEFERRED_LINKS: Lazy&lt;Mutex&lt;HashMap&lt;UniqueItemId, Vec&lt;UniqueItemId&gt;&gt;&gt;&gt; =
+    Lazy::new(|| Mutex::new(HashMap::new()));
+<span class="kw">static </span>ENUM_CONVERSION_IMPLS_DEFS: Lazy&lt;Mutex&lt;HashSet&lt;UniqueItemId&gt;&gt;&gt; =
+    Lazy::new(|| Mutex::new(HashSet::new()));
 
-<span class="doccomment">/// Store a trait definition for future reference.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_trait</span>(<span class="ident">item</span>: <span class="ident">syn::ItemTrait</span>) {
-    <span class="kw">let</span> <span class="ident">uid</span> <span class="op">=</span> <span class="ident">UniqueItemId::new</span>(<span class="ident">item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>(), <span class="ident">item</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>());
-    <span class="ident">TRAIT_DEFS</span>
-        .<span class="ident">lock</span>()
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">insert</span>(<span class="ident">uid</span>, <span class="ident">item</span>.<span class="ident">into_token_stream</span>().<span class="ident">to_string</span>());
+<span class="doccomment">/// Store a trait definition for future reference.
+</span><span class="kw">pub fn </span>cache_trait(item: syn::ItemTrait) {
+    <span class="kw">let </span>uid = UniqueItemId::new(item.ident.to_string(), item.generics.type_params().count());
+    TRAIT_DEFS
+        .lock()
+        .unwrap()
+        .insert(uid, item.into_token_stream().to_string());
 }
 
-<span class="doccomment">/// Store an enum definition for future reference.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_enum_dispatch</span>(<span class="ident">item</span>: <span class="ident">enum_dispatch_item::EnumDispatchItem</span>) {
-    <span class="kw">let</span> <span class="ident">uid</span> <span class="op">=</span> <span class="ident">UniqueItemId::new</span>(<span class="ident">item</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>(), <span class="ident">item</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>());
-    <span class="ident">ENUM_DEFS</span>
-        .<span class="ident">lock</span>()
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">insert</span>(<span class="ident">uid</span>, <span class="ident">item</span>.<span class="ident">into_token_stream</span>().<span class="ident">to_string</span>());
+<span class="doccomment">/// Store an enum definition for future reference.
+</span><span class="kw">pub fn </span>cache_enum_dispatch(item: enum_dispatch_item::EnumDispatchItem) {
+    <span class="kw">let </span>uid = UniqueItemId::new(item.ident.to_string(), item.generics.type_params().count());
+    ENUM_DEFS
+        .lock()
+        .unwrap()
+        .insert(uid, item.into_token_stream().to_string());
 }
 
-<span class="doccomment">/// Store whether a From/TryInto definition has been defined once for an enum.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_enum_conversion_impls_defined</span>(<span class="ident">item</span>: <span class="ident">syn::Ident</span>, <span class="ident">num_generics</span>: <span class="ident">usize</span>) {
-    <span class="kw">let</span> <span class="ident">uid</span> <span class="op">=</span> <span class="ident">UniqueItemId::new</span>(<span class="ident">item</span>.<span class="ident">to_string</span>(), <span class="ident">num_generics</span>);
-    <span class="ident">ENUM_CONVERSION_IMPLS_DEFS</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">insert</span>(<span class="ident">uid</span>);
+<span class="doccomment">/// Store whether a From/TryInto definition has been defined once for an enum.
+</span><span class="kw">pub fn </span>cache_enum_conversion_impls_defined(item: syn::Ident, num_generics: usize) {
+    <span class="kw">let </span>uid = UniqueItemId::new(item.to_string(), num_generics);
+    ENUM_CONVERSION_IMPLS_DEFS.lock().unwrap().insert(uid);
 }
 
-<span class="doccomment">/// Cache a &quot;link&quot; to be fulfilled once the needed definition is also cached.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The number of generic arguments is also cached and must be equal in order to fulfill a link,</span>
-<span class="doccomment">/// however the actual generic arguments themselves may have different names.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">defer_link</span>(
-    (<span class="ident">needed</span>, <span class="ident">needed_num_generics</span>): (<span class="kw-2">&amp;</span><span class="ident">::proc_macro2::Ident</span>, <span class="ident">usize</span>),
-    (<span class="ident">cached</span>, <span class="ident">cached_num_generics</span>): (<span class="kw-2">&amp;</span><span class="ident">::proc_macro2::Ident</span>, <span class="ident">usize</span>),
+<span class="doccomment">/// Cache a &quot;link&quot; to be fulfilled once the needed definition is also cached.
+///
+/// The number of generic arguments is also cached and must be equal in order to fulfill a link,
+/// however the actual generic arguments themselves may have different names.
+</span><span class="kw">pub fn </span>defer_link(
+    (needed, needed_num_generics): (<span class="kw-2">&amp;</span>::proc_macro2::Ident, usize),
+    (cached, cached_num_generics): (<span class="kw-2">&amp;</span>::proc_macro2::Ident, usize),
 ) {
-    <span class="kw">use</span> <span class="ident">std::collections::hash_map::Entry</span>;
+    <span class="kw">use </span>std::collections::hash_map::Entry;
 
-    <span class="kw">let</span> (<span class="ident">needed</span>, <span class="ident">cached</span>) <span class="op">=</span> (
-        <span class="ident">UniqueItemId::new</span>(<span class="ident">needed</span>.<span class="ident">to_string</span>(), <span class="ident">needed_num_generics</span>),
-        <span class="ident">UniqueItemId::new</span>(<span class="ident">cached</span>.<span class="ident">to_string</span>(), <span class="ident">cached_num_generics</span>),
+    <span class="kw">let </span>(needed, cached) = (
+        UniqueItemId::new(needed.to_string(), needed_num_generics),
+        UniqueItemId::new(cached.to_string(), cached_num_generics),
     );
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">deferred_links</span> <span class="op">=</span> <span class="ident">DEFERRED_LINKS</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-    <span class="kw">if</span> <span class="ident">deferred_links</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">needed</span>) {
-        <span class="ident">deferred_links</span>
-            .<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">needed</span>)
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">push</span>(<span class="ident">cached</span>.<span class="ident">to_owned</span>());
-    } <span class="kw">else</span> {
-        <span class="ident">deferred_links</span>.<span class="ident">insert</span>(<span class="ident">needed</span>.<span class="ident">to_owned</span>(), <span class="macro">vec!</span>[<span class="ident">cached</span>.<span class="ident">to_owned</span>()]);
+    <span class="kw">let </span><span class="kw-2">mut </span>deferred_links = DEFERRED_LINKS.lock().unwrap();
+    <span class="kw">if </span>deferred_links.contains_key(<span class="kw-2">&amp;</span>needed) {
+        deferred_links
+            .get_mut(<span class="kw-2">&amp;</span>needed)
+            .unwrap()
+            .push(cached.to_owned());
+    } <span class="kw">else </span>{
+        deferred_links.insert(needed.to_owned(), <span class="macro">vec!</span>[cached.to_owned()]);
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Entry::Vacant</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">deferred_links</span>.<span class="ident">entry</span>(<span class="ident">cached</span>.<span class="ident">clone</span>()) {
-        <span class="ident">e</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="ident">needed</span>]);
-    } <span class="kw">else</span> {
-        <span class="ident">deferred_links</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">cached</span>).<span class="ident">unwrap</span>().<span class="ident">push</span>(<span class="ident">needed</span>);
+    <span class="kw">if let </span>Entry::Vacant(e) = deferred_links.entry(cached.clone()) {
+        e.insert(<span class="macro">vec!</span>[needed]);
+    } <span class="kw">else </span>{
+        deferred_links.get_mut(<span class="kw-2">&amp;</span>cached).unwrap().push(needed);
     }
 }
 
-<span class="doccomment">/// Returns a list of all of the trait definitions that were previously linked to the supplied enum</span>
-<span class="doccomment">/// name.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fulfilled_by_enum</span>(
-    <span class="ident">defname</span>: <span class="kw-2">&amp;</span><span class="ident">::proc_macro2::Ident</span>,
-    <span class="ident">num_generic_args</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::ItemTrait</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">idents</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">DEFERRED_LINKS</span>
-        .<span class="ident">lock</span>()
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">remove_entry</span>(<span class="kw-2">&amp;</span><span class="ident">UniqueItemId::new</span>(<span class="ident">defname</span>.<span class="ident">to_string</span>(), <span class="ident">num_generic_args</span>))
+<span class="doccomment">/// Returns a list of all of the trait definitions that were previously linked to the supplied enum
+/// name.
+</span><span class="kw">pub fn </span>fulfilled_by_enum(
+    defname: <span class="kw-2">&amp;</span>::proc_macro2::Ident,
+    num_generic_args: usize,
+) -&gt; Vec&lt;syn::ItemTrait&gt; {
+    <span class="kw">let </span>idents = <span class="kw">match </span>DEFERRED_LINKS
+        .lock()
+        .unwrap()
+        .remove_entry(<span class="kw-2">&amp;</span>UniqueItemId::new(defname.to_string(), num_generic_args))
     {
-        <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">links</span>)) =&gt; <span class="ident">links</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
+        <span class="prelude-val">Some</span>((<span class="kw">_</span>, links)) =&gt; links,
+        <span class="prelude-val">None </span>=&gt; <span class="macro">vec!</span>[],
     };
-    <span class="ident">idents</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(
-            <span class="op">|</span><span class="ident">ident_string</span><span class="op">|</span> <span class="ident">TRAIT_DEFS</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">get</span>(<span class="ident">ident_string</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">entry</span><span class="op">|</span> <span class="ident">syn::parse</span>(<span class="ident">entry</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>())
+    idents
+        .iter()
+        .filter_map(
+            |ident_string| TRAIT_DEFS.lock().unwrap().get(ident_string).map(|entry| syn::parse(entry.parse().unwrap()).unwrap())
         )
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="doccomment">/// Returns a list of all of the enum definitions that were previously linked to the supplied trait</span>
-<span class="doccomment">/// name.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fulfilled_by_trait</span>(
-    <span class="ident">defname</span>: <span class="kw-2">&amp;</span><span class="ident">::proc_macro2::Ident</span>,
-    <span class="ident">num_generic_args</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">enum_dispatch_item::EnumDispatchItem</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">idents</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">DEFERRED_LINKS</span>
-        .<span class="ident">lock</span>()
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">remove_entry</span>(<span class="kw-2">&amp;</span><span class="ident">UniqueItemId::new</span>(<span class="ident">defname</span>.<span class="ident">to_string</span>(), <span class="ident">num_generic_args</span>))
+<span class="doccomment">/// Returns a list of all of the enum definitions that were previously linked to the supplied trait
+/// name.
+</span><span class="kw">pub fn </span>fulfilled_by_trait(
+    defname: <span class="kw-2">&amp;</span>::proc_macro2::Ident,
+    num_generic_args: usize,
+) -&gt; Vec&lt;enum_dispatch_item::EnumDispatchItem&gt; {
+    <span class="kw">let </span>idents = <span class="kw">match </span>DEFERRED_LINKS
+        .lock()
+        .unwrap()
+        .remove_entry(<span class="kw-2">&amp;</span>UniqueItemId::new(defname.to_string(), num_generic_args))
     {
-        <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">links</span>)) =&gt; <span class="ident">links</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
+        <span class="prelude-val">Some</span>((<span class="kw">_</span>, links)) =&gt; links,
+        <span class="prelude-val">None </span>=&gt; <span class="macro">vec!</span>[],
     };
-    <span class="ident">idents</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(
-            <span class="op">|</span><span class="ident">ident_string</span><span class="op">|</span> <span class="ident">ENUM_DEFS</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">get</span>(<span class="ident">ident_string</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">entry</span><span class="op">|</span> <span class="ident">syn::parse</span>(<span class="ident">entry</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>())
+    idents
+        .iter()
+        .filter_map(
+            |ident_string| ENUM_DEFS.lock().unwrap().get(ident_string).map(|entry| syn::parse(entry.parse().unwrap()).unwrap())
         )
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="doccomment">/// Returns true if From/TryInto was already defined for this enum</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">conversion_impls_def_by_enum</span>(<span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>, <span class="ident">num_generics</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">ENUM_CONVERSION_IMPLS_DEFS</span>
-        .<span class="ident">lock</span>()
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">UniqueItemId::new</span>(<span class="ident">item</span>.<span class="ident">to_string</span>(), <span class="ident">num_generics</span>))
+<span class="doccomment">/// Returns true if From/TryInto was already defined for this enum
+</span><span class="kw">pub fn </span>conversion_impls_def_by_enum(item: <span class="kw-2">&amp;</span>syn::Ident, num_generics: usize) -&gt; bool {
+    ENUM_CONVERSION_IMPLS_DEFS
+        .lock()
+        .unwrap()
+        .contains(<span class="kw-2">&amp;</span>UniqueItemId::new(item.to_string(), num_generics))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="enum_dispatch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="enum_dispatch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

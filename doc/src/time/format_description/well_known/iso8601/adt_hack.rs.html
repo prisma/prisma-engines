@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/format_description/well_known/iso8601/adt_hack.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>adt_hack.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/format_description/well_known/iso8601/adt_hack.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>adt_hack.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -249,246 +249,246 @@
 <span id="247">247</span>
 <span id="248">248</span>
 <span id="249">249</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Hackery to work around not being able to use ADTs in const generics on stable.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Hackery to work around not being able to use ADTs in const generics on stable.
 
-<span class="kw">use</span> <span class="ident">core::num::NonZeroU8</span>;
+</span><span class="kw">use </span>core::num::NonZeroU8;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Iso8601</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Config</span>, <span class="ident">DateKind</span>, <span class="ident">FormattedComponents</span> <span class="kw">as</span> <span class="ident">FC</span>, <span class="ident">OffsetPrecision</span>, <span class="ident">TimePrecision</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">super</span>::Iso8601;
+<span class="kw">use super</span>::{Config, DateKind, FormattedComponents <span class="kw">as </span>FC, OffsetPrecision, TimePrecision};
 
-<span class="comment">// This provides a way to include `EncodedConfig` in documentation without displaying the type it is</span>
-<span class="comment">// aliased to.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DoNotRelyOnWhatThisIs</span> <span class="op">=</span> <span class="ident">u128</span>;
+<span class="comment">// This provides a way to include `EncodedConfig` in documentation without displaying the type it is
+// aliased to.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub type </span>DoNotRelyOnWhatThisIs = u128;
 
-<span class="doccomment">/// An encoded [`Config`] that can be used as a const parameter to [`Iso8601`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The type this is aliased to must not be relied upon. It can change in any release without</span>
-<span class="doccomment">/// notice.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">EncodedConfig</span> <span class="op">=</span> <span class="ident">DoNotRelyOnWhatThisIs</span>;
+<span class="doccomment">/// An encoded [`Config`] that can be used as a const parameter to [`Iso8601`].
+///
+/// The type this is aliased to must not be relied upon. It can change in any release without
+/// notice.
+</span><span class="kw">pub type </span>EncodedConfig = DoNotRelyOnWhatThisIs;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">CONFIG</span>: <span class="ident">EncodedConfig</span><span class="op">&gt;</span> <span class="ident">Iso8601</span><span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The user-provided configuration for the ISO 8601 format.</span>
-    <span class="kw">const</span> <span class="ident">CONFIG</span>: <span class="ident">Config</span> <span class="op">=</span> <span class="ident">Config::decode</span>(<span class="ident">CONFIG</span>);
-    <span class="doccomment">/// Whether the date should be formatted.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">FORMAT_DATE</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="macro">matches!</span>(
-        <span class="ident"><span class="self">Self</span>::CONFIG</span>.<span class="ident">formatted_components</span>,
-        <span class="ident">FC::Date</span> <span class="op">|</span> <span class="ident">FC::DateTime</span> <span class="op">|</span> <span class="ident">FC::DateTimeOffset</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="kw">const </span>CONFIG: EncodedConfig&gt; Iso8601&lt;CONFIG&gt; {
+    <span class="doccomment">/// The user-provided configuration for the ISO 8601 format.
+    </span><span class="kw">const </span>CONFIG: Config = Config::decode(CONFIG);
+    <span class="doccomment">/// Whether the date should be formatted.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>FORMAT_DATE: bool = <span class="macro">matches!</span>(
+        <span class="self">Self</span>::CONFIG.formatted_components,
+        FC::Date | FC::DateTime | FC::DateTimeOffset
     );
-    <span class="doccomment">/// Whether the time should be formatted.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">FORMAT_TIME</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="macro">matches!</span>(
-        <span class="ident"><span class="self">Self</span>::CONFIG</span>.<span class="ident">formatted_components</span>,
-        <span class="ident">FC::Time</span> <span class="op">|</span> <span class="ident">FC::DateTime</span> <span class="op">|</span> <span class="ident">FC::DateTimeOffset</span> <span class="op">|</span> <span class="ident">FC::TimeOffset</span>
+    <span class="doccomment">/// Whether the time should be formatted.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>FORMAT_TIME: bool = <span class="macro">matches!</span>(
+        <span class="self">Self</span>::CONFIG.formatted_components,
+        FC::Time | FC::DateTime | FC::DateTimeOffset | FC::TimeOffset
     );
-    <span class="doccomment">/// Whether the UTC offset should be formatted.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">FORMAT_OFFSET</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="macro">matches!</span>(
-        <span class="ident"><span class="self">Self</span>::CONFIG</span>.<span class="ident">formatted_components</span>,
-        <span class="ident">FC::Offset</span> <span class="op">|</span> <span class="ident">FC::DateTimeOffset</span> <span class="op">|</span> <span class="ident">FC::TimeOffset</span>
+    <span class="doccomment">/// Whether the UTC offset should be formatted.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>FORMAT_OFFSET: bool = <span class="macro">matches!</span>(
+        <span class="self">Self</span>::CONFIG.formatted_components,
+        FC::Offset | FC::DateTimeOffset | FC::TimeOffset
     );
-    <span class="doccomment">/// Whether the year is six digits.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">YEAR_IS_SIX_DIGITS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::CONFIG</span>.<span class="ident">year_is_six_digits</span>;
-    <span class="doccomment">/// Whether the format contains separators (such as `-` or `:`).</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">USE_SEPARATORS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::CONFIG</span>.<span class="ident">use_separators</span>;
-    <span class="doccomment">/// Which format to use for the date.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">DATE_KIND</span>: <span class="ident">DateKind</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::CONFIG</span>.<span class="ident">date_kind</span>;
-    <span class="doccomment">/// The precision and number of decimal digits to use for the time.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">TIME_PRECISION</span>: <span class="ident">TimePrecision</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::CONFIG</span>.<span class="ident">time_precision</span>;
-    <span class="doccomment">/// The precision for the UTC offset.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">OFFSET_PRECISION</span>: <span class="ident">OffsetPrecision</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::CONFIG</span>.<span class="ident">offset_precision</span>;
+    <span class="doccomment">/// Whether the year is six digits.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>YEAR_IS_SIX_DIGITS: bool = <span class="self">Self</span>::CONFIG.year_is_six_digits;
+    <span class="doccomment">/// Whether the format contains separators (such as `-` or `:`).
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>USE_SEPARATORS: bool = <span class="self">Self</span>::CONFIG.use_separators;
+    <span class="doccomment">/// Which format to use for the date.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DATE_KIND: DateKind = <span class="self">Self</span>::CONFIG.date_kind;
+    <span class="doccomment">/// The precision and number of decimal digits to use for the time.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>TIME_PRECISION: TimePrecision = <span class="self">Self</span>::CONFIG.time_precision;
+    <span class="doccomment">/// The precision for the UTC offset.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>OFFSET_PRECISION: OffsetPrecision = <span class="self">Self</span>::CONFIG.offset_precision;
 }
 
-<span class="kw">impl</span> <span class="ident">Config</span> {
-    <span class="doccomment">/// Encode the configuration, permitting it to be used as a const parameter of [`Iso8601`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The value returned by this method must only be used as a const parameter to [`Iso8601`]. Any</span>
-    <span class="doccomment">/// other usage is unspecified behavior.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">EncodedConfig</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">EncodedConfig::BITS</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">/</span> <span class="number">8</span>];
+<span class="kw">impl </span>Config {
+    <span class="doccomment">/// Encode the configuration, permitting it to be used as a const parameter of [`Iso8601`].
+    ///
+    /// The value returned by this method must only be used as a const parameter to [`Iso8601`]. Any
+    /// other usage is unspecified behavior.
+    </span><span class="kw">pub const fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EncodedConfig {
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = [<span class="number">0</span>; EncodedConfig::BITS <span class="kw">as </span>usize / <span class="number">8</span>];
 
-        <span class="ident">bytes</span>[<span class="number">0</span>] <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">formatted_components</span> {
-            <span class="ident">FC::None</span> =&gt; <span class="number">0</span>,
-            <span class="ident">FC::Date</span> =&gt; <span class="number">1</span>,
-            <span class="ident">FC::Time</span> =&gt; <span class="number">2</span>,
-            <span class="ident">FC::Offset</span> =&gt; <span class="number">3</span>,
-            <span class="ident">FC::DateTime</span> =&gt; <span class="number">4</span>,
-            <span class="ident">FC::DateTimeOffset</span> =&gt; <span class="number">5</span>,
-            <span class="ident">FC::TimeOffset</span> =&gt; <span class="number">6</span>,
+        bytes[<span class="number">0</span>] = <span class="kw">match </span><span class="self">self</span>.formatted_components {
+            FC::None =&gt; <span class="number">0</span>,
+            FC::Date =&gt; <span class="number">1</span>,
+            FC::Time =&gt; <span class="number">2</span>,
+            FC::Offset =&gt; <span class="number">3</span>,
+            FC::DateTime =&gt; <span class="number">4</span>,
+            FC::DateTimeOffset =&gt; <span class="number">5</span>,
+            FC::TimeOffset =&gt; <span class="number">6</span>,
         };
-        <span class="ident">bytes</span>[<span class="number">1</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">use_separators</span> <span class="kw">as</span> <span class="kw">_</span>;
-        <span class="ident">bytes</span>[<span class="number">2</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">year_is_six_digits</span> <span class="kw">as</span> <span class="kw">_</span>;
-        <span class="ident">bytes</span>[<span class="number">3</span>] <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">date_kind</span> {
-            <span class="ident">DateKind::Calendar</span> =&gt; <span class="number">0</span>,
-            <span class="ident">DateKind::Week</span> =&gt; <span class="number">1</span>,
-            <span class="ident">DateKind::Ordinal</span> =&gt; <span class="number">2</span>,
+        bytes[<span class="number">1</span>] = <span class="self">self</span>.use_separators <span class="kw">as _</span>;
+        bytes[<span class="number">2</span>] = <span class="self">self</span>.year_is_six_digits <span class="kw">as _</span>;
+        bytes[<span class="number">3</span>] = <span class="kw">match </span><span class="self">self</span>.date_kind {
+            DateKind::Calendar =&gt; <span class="number">0</span>,
+            DateKind::Week =&gt; <span class="number">1</span>,
+            DateKind::Ordinal =&gt; <span class="number">2</span>,
         };
-        <span class="ident">bytes</span>[<span class="number">4</span>] <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">time_precision</span> {
-            <span class="ident">TimePrecision::Hour</span> { .. } =&gt; <span class="number">0</span>,
-            <span class="ident">TimePrecision::Minute</span> { .. } =&gt; <span class="number">1</span>,
-            <span class="ident">TimePrecision::Second</span> { .. } =&gt; <span class="number">2</span>,
+        bytes[<span class="number">4</span>] = <span class="kw">match </span><span class="self">self</span>.time_precision {
+            TimePrecision::Hour { .. } =&gt; <span class="number">0</span>,
+            TimePrecision::Minute { .. } =&gt; <span class="number">1</span>,
+            TimePrecision::Second { .. } =&gt; <span class="number">2</span>,
         };
-        <span class="ident">bytes</span>[<span class="number">5</span>] <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">time_precision</span> {
-            <span class="ident">TimePrecision::Hour</span> { <span class="ident">decimal_digits</span> }
-            <span class="op">|</span> <span class="ident">TimePrecision::Minute</span> { <span class="ident">decimal_digits</span> }
-            <span class="op">|</span> <span class="ident">TimePrecision::Second</span> { <span class="ident">decimal_digits</span> } =&gt; <span class="kw">match</span> <span class="ident">decimal_digits</span> {
-                <span class="prelude-val">None</span> =&gt; <span class="number">0</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">decimal_digits</span>) =&gt; <span class="ident">decimal_digits</span>.<span class="ident">get</span>(),
+        bytes[<span class="number">5</span>] = <span class="kw">match </span><span class="self">self</span>.time_precision {
+            TimePrecision::Hour { decimal_digits }
+            | TimePrecision::Minute { decimal_digits }
+            | TimePrecision::Second { decimal_digits } =&gt; <span class="kw">match </span>decimal_digits {
+                <span class="prelude-val">None </span>=&gt; <span class="number">0</span>,
+                <span class="prelude-val">Some</span>(decimal_digits) =&gt; decimal_digits.get(),
             },
         };
-        <span class="ident">bytes</span>[<span class="number">6</span>] <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">offset_precision</span> {
-            <span class="ident">OffsetPrecision::Hour</span> =&gt; <span class="number">0</span>,
-            <span class="ident">OffsetPrecision::Minute</span> =&gt; <span class="number">1</span>,
+        bytes[<span class="number">6</span>] = <span class="kw">match </span><span class="self">self</span>.offset_precision {
+            OffsetPrecision::Hour =&gt; <span class="number">0</span>,
+            OffsetPrecision::Minute =&gt; <span class="number">1</span>,
         };
 
-        <span class="ident">EncodedConfig::from_be_bytes</span>(<span class="ident">bytes</span>)
+        EncodedConfig::from_be_bytes(bytes)
     }
 
-    <span class="doccomment">/// Decode the configuration. The configuration must have been generated from</span>
-    <span class="doccomment">/// [`Config::encode`].</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">encoded</span>: <span class="ident">EncodedConfig</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoded</span>.<span class="ident">to_be_bytes</span>();
+    <span class="doccomment">/// Decode the configuration. The configuration must have been generated from
+    /// [`Config::encode`].
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const fn </span>decode(encoded: EncodedConfig) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>bytes = encoded.to_be_bytes();
 
-        <span class="kw">let</span> <span class="ident">formatted_components</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bytes</span>[<span class="number">0</span>] {
-            <span class="number">0</span> =&gt; <span class="ident">FC::None</span>,
-            <span class="number">1</span> =&gt; <span class="ident">FC::Date</span>,
-            <span class="number">2</span> =&gt; <span class="ident">FC::Time</span>,
-            <span class="number">3</span> =&gt; <span class="ident">FC::Offset</span>,
-            <span class="number">4</span> =&gt; <span class="ident">FC::DateTime</span>,
-            <span class="number">5</span> =&gt; <span class="ident">FC::DateTimeOffset</span>,
-            <span class="number">6</span> =&gt; <span class="ident">FC::TimeOffset</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
+        <span class="kw">let </span>formatted_components = <span class="kw">match </span>bytes[<span class="number">0</span>] {
+            <span class="number">0 </span>=&gt; FC::None,
+            <span class="number">1 </span>=&gt; FC::Date,
+            <span class="number">2 </span>=&gt; FC::Time,
+            <span class="number">3 </span>=&gt; FC::Offset,
+            <span class="number">4 </span>=&gt; FC::DateTime,
+            <span class="number">5 </span>=&gt; FC::DateTimeOffset,
+            <span class="number">6 </span>=&gt; FC::TimeOffset,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
         };
-        <span class="kw">let</span> <span class="ident">use_separators</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bytes</span>[<span class="number">1</span>] {
-            <span class="number">0</span> =&gt; <span class="bool-val">false</span>,
-            <span class="number">1</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
+        <span class="kw">let </span>use_separators = <span class="kw">match </span>bytes[<span class="number">1</span>] {
+            <span class="number">0 </span>=&gt; <span class="bool-val">false</span>,
+            <span class="number">1 </span>=&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
         };
-        <span class="kw">let</span> <span class="ident">year_is_six_digits</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bytes</span>[<span class="number">2</span>] {
-            <span class="number">0</span> =&gt; <span class="bool-val">false</span>,
-            <span class="number">1</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
+        <span class="kw">let </span>year_is_six_digits = <span class="kw">match </span>bytes[<span class="number">2</span>] {
+            <span class="number">0 </span>=&gt; <span class="bool-val">false</span>,
+            <span class="number">1 </span>=&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
         };
-        <span class="kw">let</span> <span class="ident">date_kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bytes</span>[<span class="number">3</span>] {
-            <span class="number">0</span> =&gt; <span class="ident">DateKind::Calendar</span>,
-            <span class="number">1</span> =&gt; <span class="ident">DateKind::Week</span>,
-            <span class="number">2</span> =&gt; <span class="ident">DateKind::Ordinal</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
+        <span class="kw">let </span>date_kind = <span class="kw">match </span>bytes[<span class="number">3</span>] {
+            <span class="number">0 </span>=&gt; DateKind::Calendar,
+            <span class="number">1 </span>=&gt; DateKind::Week,
+            <span class="number">2 </span>=&gt; DateKind::Ordinal,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
         };
-        <span class="kw">let</span> <span class="ident">time_precision</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bytes</span>[<span class="number">4</span>] {
-            <span class="number">0</span> =&gt; <span class="ident">TimePrecision::Hour</span> {
-                <span class="ident">decimal_digits</span>: <span class="ident">NonZeroU8::new</span>(<span class="ident">bytes</span>[<span class="number">5</span>]),
+        <span class="kw">let </span>time_precision = <span class="kw">match </span>bytes[<span class="number">4</span>] {
+            <span class="number">0 </span>=&gt; TimePrecision::Hour {
+                decimal_digits: NonZeroU8::new(bytes[<span class="number">5</span>]),
             },
-            <span class="number">1</span> =&gt; <span class="ident">TimePrecision::Minute</span> {
-                <span class="ident">decimal_digits</span>: <span class="ident">NonZeroU8::new</span>(<span class="ident">bytes</span>[<span class="number">5</span>]),
+            <span class="number">1 </span>=&gt; TimePrecision::Minute {
+                decimal_digits: NonZeroU8::new(bytes[<span class="number">5</span>]),
             },
-            <span class="number">2</span> =&gt; <span class="ident">TimePrecision::Second</span> {
-                <span class="ident">decimal_digits</span>: <span class="ident">NonZeroU8::new</span>(<span class="ident">bytes</span>[<span class="number">5</span>]),
+            <span class="number">2 </span>=&gt; TimePrecision::Second {
+                decimal_digits: NonZeroU8::new(bytes[<span class="number">5</span>]),
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
         };
-        <span class="kw">let</span> <span class="ident">offset_precision</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bytes</span>[<span class="number">6</span>] {
-            <span class="number">0</span> =&gt; <span class="ident">OffsetPrecision::Hour</span>,
-            <span class="number">1</span> =&gt; <span class="ident">OffsetPrecision::Minute</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
+        <span class="kw">let </span>offset_precision = <span class="kw">match </span>bytes[<span class="number">6</span>] {
+            <span class="number">0 </span>=&gt; OffsetPrecision::Hour,
+            <span class="number">1 </span>=&gt; OffsetPrecision::Minute,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid configuration&quot;</span>),
         };
 
-        <span class="comment">// No `for` loops in `const fn`.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span> <span class="op">=</span> <span class="number">7</span>; <span class="comment">// first unused byte</span>
-        <span class="kw">while</span> <span class="ident">idx</span> <span class="op">&lt;</span> <span class="ident">EncodedConfig::BITS</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">/</span> <span class="number">8</span> {
-            <span class="macro">assert!</span>(<span class="ident">bytes</span>[<span class="ident">idx</span>] <span class="op">==</span> <span class="number">0</span>, <span class="string">&quot;invalid configuration&quot;</span>);
-            <span class="ident">idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="comment">// No `for` loops in `const fn`.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>idx = <span class="number">7</span>; <span class="comment">// first unused byte
+        </span><span class="kw">while </span>idx &lt; EncodedConfig::BITS <span class="kw">as </span>usize / <span class="number">8 </span>{
+            <span class="macro">assert!</span>(bytes[idx] == <span class="number">0</span>, <span class="string">&quot;invalid configuration&quot;</span>);
+            idx += <span class="number">1</span>;
         }
 
-        <span class="self">Self</span> {
-            <span class="ident">formatted_components</span>,
-            <span class="ident">use_separators</span>,
-            <span class="ident">year_is_six_digits</span>,
-            <span class="ident">date_kind</span>,
-            <span class="ident">time_precision</span>,
-            <span class="ident">offset_precision</span>,
+        <span class="self">Self </span>{
+            formatted_components,
+            use_separators,
+            year_is_six_digits,
+            date_kind,
+            time_precision,
+            offset_precision,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="macro">macro_rules!</span> <span class="ident">eq</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>) =&gt; {{
-            <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>;
-            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>;
-            <span class="ident">a</span>.<span class="ident">formatted_components</span> <span class="op">==</span> <span class="ident">b</span>.<span class="ident">formatted_components</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">a</span>.<span class="ident">use_separators</span> <span class="op">==</span> <span class="ident">b</span>.<span class="ident">use_separators</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">a</span>.<span class="ident">year_is_six_digits</span> <span class="op">==</span> <span class="ident">b</span>.<span class="ident">year_is_six_digits</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">a</span>.<span class="ident">date_kind</span> <span class="op">==</span> <span class="ident">b</span>.<span class="ident">date_kind</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">a</span>.<span class="ident">time_precision</span> <span class="op">==</span> <span class="ident">b</span>.<span class="ident">time_precision</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">a</span>.<span class="ident">offset_precision</span> <span class="op">==</span> <span class="ident">b</span>.<span class="ident">offset_precision</span>
+    <span class="macro">macro_rules! </span>eq {
+        (<span class="macro-nonterminal">$a</span>:expr, <span class="macro-nonterminal">$b</span>:expr) =&gt; {{
+            <span class="kw">let </span>a = <span class="macro-nonterminal">$a</span>;
+            <span class="kw">let </span>b = <span class="macro-nonterminal">$b</span>;
+            a.formatted_components == b.formatted_components
+                &amp;&amp; a.use_separators == b.use_separators
+                &amp;&amp; a.year_is_six_digits == b.year_is_six_digits
+                &amp;&amp; a.date_kind == b.date_kind
+                &amp;&amp; a.time_precision == b.time_precision
+                &amp;&amp; a.offset_precision == b.offset_precision
         }};
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">encoding_roundtrip</span>() {
-        <span class="macro">macro_rules!</span> <span class="ident">assert_roundtrip</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">config</span>:<span class="ident">expr</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">config</span>;
-                <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">encode</span>();
-                <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">Config::decode</span>(<span class="ident">encoded</span>);
-                <span class="macro">assert!</span>(<span class="macro">eq!</span>(<span class="ident">config</span>, <span class="ident">decoded</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>encoding_roundtrip() {
+        <span class="macro">macro_rules! </span>assert_roundtrip {
+            (<span class="macro-nonterminal">$config</span>:expr) =&gt; {
+                <span class="kw">let </span>config = <span class="macro-nonterminal">$config</span>;
+                <span class="kw">let </span>encoded = config.encode();
+                <span class="kw">let </span>decoded = Config::decode(encoded);
+                <span class="macro">assert!</span>(<span class="macro">eq!</span>(config, decoded));
             };
         }
 
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>);
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_formatted_components</span>(<span class="ident">FC::None</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_formatted_components</span>(<span class="ident">FC::Date</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_formatted_components</span>(<span class="ident">FC::Time</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_formatted_components</span>(<span class="ident">FC::Offset</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_formatted_components</span>(<span class="ident">FC::DateTime</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_formatted_components</span>(<span class="ident">FC::DateTimeOffset</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_formatted_components</span>(<span class="ident">FC::TimeOffset</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_use_separators</span>(<span class="bool-val">false</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_use_separators</span>(<span class="bool-val">true</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_year_is_six_digits</span>(<span class="bool-val">false</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_year_is_six_digits</span>(<span class="bool-val">true</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_date_kind</span>(<span class="ident">DateKind::Calendar</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_date_kind</span>(<span class="ident">DateKind::Week</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_date_kind</span>(<span class="ident">DateKind::Ordinal</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_time_precision</span>(<span class="ident">TimePrecision::Hour</span> {
-            <span class="ident">decimal_digits</span>: <span class="prelude-val">None</span>,
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT);
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_formatted_components(FC::None));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_formatted_components(FC::Date));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_formatted_components(FC::Time));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_formatted_components(FC::Offset));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_formatted_components(FC::DateTime));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_formatted_components(FC::DateTimeOffset));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_formatted_components(FC::TimeOffset));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_use_separators(<span class="bool-val">false</span>));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_use_separators(<span class="bool-val">true</span>));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_year_is_six_digits(<span class="bool-val">false</span>));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_year_is_six_digits(<span class="bool-val">true</span>));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_date_kind(DateKind::Calendar));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_date_kind(DateKind::Week));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_date_kind(DateKind::Ordinal));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_time_precision(TimePrecision::Hour {
+            decimal_digits: <span class="prelude-val">None</span>,
         }));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_time_precision</span>(<span class="ident">TimePrecision::Minute</span> {
-            <span class="ident">decimal_digits</span>: <span class="prelude-val">None</span>,
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_time_precision(TimePrecision::Minute {
+            decimal_digits: <span class="prelude-val">None</span>,
         }));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_time_precision</span>(<span class="ident">TimePrecision::Second</span> {
-            <span class="ident">decimal_digits</span>: <span class="prelude-val">None</span>,
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_time_precision(TimePrecision::Second {
+            decimal_digits: <span class="prelude-val">None</span>,
         }));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_time_precision</span>(<span class="ident">TimePrecision::Hour</span> {
-            <span class="ident">decimal_digits</span>: <span class="ident">NonZeroU8::new</span>(<span class="number">1</span>),
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_time_precision(TimePrecision::Hour {
+            decimal_digits: NonZeroU8::new(<span class="number">1</span>),
         }));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_time_precision</span>(<span class="ident">TimePrecision::Minute</span> {
-            <span class="ident">decimal_digits</span>: <span class="ident">NonZeroU8::new</span>(<span class="number">1</span>),
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_time_precision(TimePrecision::Minute {
+            decimal_digits: NonZeroU8::new(<span class="number">1</span>),
         }));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_time_precision</span>(<span class="ident">TimePrecision::Second</span> {
-            <span class="ident">decimal_digits</span>: <span class="ident">NonZeroU8::new</span>(<span class="number">1</span>),
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_time_precision(TimePrecision::Second {
+            decimal_digits: NonZeroU8::new(<span class="number">1</span>),
         }));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_offset_precision</span>(<span class="ident">OffsetPrecision::Hour</span>));
-        <span class="macro">assert_roundtrip!</span>(<span class="ident">Config::DEFAULT</span>.<span class="ident">set_offset_precision</span>(<span class="ident">OffsetPrecision::Minute</span>));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_offset_precision(OffsetPrecision::Hour));
+        <span class="macro">assert_roundtrip!</span>(Config::DEFAULT.set_offset_precision(OffsetPrecision::Minute));
     }
 
-    <span class="macro">macro_rules!</span> <span class="ident">assert_decode_fail</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encoding</span>:<span class="ident">expr</span>) =&gt; {
+    <span class="macro">macro_rules! </span>assert_decode_fail {
+        (<span class="macro-nonterminal">$encoding</span>:expr) =&gt; {
             <span class="macro">assert!</span>(
-                <span class="ident">std::panic::catch_unwind</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="ident">Config::decode</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encoding</span>);
+                std::panic::catch_unwind(|| {
+                    Config::decode(<span class="macro-nonterminal">$encoding</span>);
                 })
-                .<span class="ident">is_err</span>()
+                .is_err()
             );
         };
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">decode_fail</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>decode_fail() {
         <span class="macro">assert_decode_fail!</span>(<span class="number">0x07_00_00_00_00_00_00_00_00_00_00_00_00_00_00_00</span>);
         <span class="macro">assert_decode_fail!</span>(<span class="number">0x00_02_00_00_00_00_00_00_00_00_00_00_00_00_00_00</span>);
         <span class="macro">assert_decode_fail!</span>(<span class="number">0x00_00_02_00_00_00_00_00_00_00_00_00_00_00_00_00</span>);
@@ -499,4 +499,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

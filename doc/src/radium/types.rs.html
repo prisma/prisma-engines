@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/radium-0.7.0/src/types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../radium/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/radium-0.7.0/src/types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../radium/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -76,83 +76,83 @@
 <span id="76">76</span>
 <span id="77">77</span>
 <span id="78">78</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Best-effort atomic types</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module exports `RadiumType` aliases that map to the `AtomicType` on</span>
-<span class="doccomment">//! targets that have it, or `Cell&lt;type&gt;` on targets that do not. This alias can</span>
-<span class="doccomment">//! be used as a consistent name for crates that need portable names for</span>
-<span class="doccomment">//! non-portable types.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Best-effort atomic types
+//!
+//! This module exports `RadiumType` aliases that map to the `AtomicType` on
+//! targets that have it, or `Cell&lt;type&gt;` on targets that do not. This alias can
+//! be used as a consistent name for crates that need portable names for
+//! non-portable types.
 
-<span class="doccomment">/// Best-effort atomic `bool` type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumBool</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">bool</span>) { <span class="ident">core::sync::atomic::AtomicBool</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> }
+/// Best-effort atomic `bool` type.
+</span><span class="kw">pub type </span>RadiumBool = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(bool) { core::sync::atomic::AtomicBool }
+    <span class="kw">else </span>{ core::cell::Cell&lt;bool&gt; }
 };
 
-<span class="doccomment">/// Best-effort atomic `i8` type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumI8</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">8</span>) { <span class="ident">core::sync::atomic::AtomicI8</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span> }
+<span class="doccomment">/// Best-effort atomic `i8` type.
+</span><span class="kw">pub type </span>RadiumI8 = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(<span class="number">8</span>) { core::sync::atomic::AtomicI8 }
+    <span class="kw">else </span>{ core::cell::Cell&lt;i8&gt; }
 };
 
-<span class="doccomment">/// Best-effort atomic `u8` type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumU8</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">8</span>) { <span class="ident">core::sync::atomic::AtomicU8</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> }
+<span class="doccomment">/// Best-effort atomic `u8` type.
+</span><span class="kw">pub type </span>RadiumU8 = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(<span class="number">8</span>) { core::sync::atomic::AtomicU8 }
+    <span class="kw">else </span>{ core::cell::Cell&lt;u8&gt; }
 };
 
-<span class="doccomment">/// Best-effort atomic `i16` type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumI16</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">16</span>) { <span class="ident">core::sync::atomic::AtomicI16</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span> }
+<span class="doccomment">/// Best-effort atomic `i16` type.
+</span><span class="kw">pub type </span>RadiumI16 = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(<span class="number">16</span>) { core::sync::atomic::AtomicI16 }
+    <span class="kw">else </span>{ core::cell::Cell&lt;i16&gt; }
 };
 
-<span class="doccomment">/// Best-effort atomic `u16` type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumU16</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">16</span>) { <span class="ident">core::sync::atomic::AtomicU16</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> }
+<span class="doccomment">/// Best-effort atomic `u16` type.
+</span><span class="kw">pub type </span>RadiumU16 = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(<span class="number">16</span>) { core::sync::atomic::AtomicU16 }
+    <span class="kw">else </span>{ core::cell::Cell&lt;u16&gt; }
 };
 
-<span class="doccomment">/// Best-effort atomic `i32` type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumI32</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">32</span>) { <span class="ident">core::sync::atomic::AtomicI32</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> }
+<span class="doccomment">/// Best-effort atomic `i32` type.
+</span><span class="kw">pub type </span>RadiumI32 = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(<span class="number">32</span>) { core::sync::atomic::AtomicI32 }
+    <span class="kw">else </span>{ core::cell::Cell&lt;i32&gt; }
 };
 
-<span class="doccomment">/// Best-effort atomic `u32` type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumU32</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">32</span>) { <span class="ident">core::sync::atomic::AtomicU32</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> }
+<span class="doccomment">/// Best-effort atomic `u32` type.
+</span><span class="kw">pub type </span>RadiumU32 = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(<span class="number">32</span>) { core::sync::atomic::AtomicU32 }
+    <span class="kw">else </span>{ core::cell::Cell&lt;u32&gt; }
 };
 
-<span class="doccomment">/// Best-effort atomic `i64` type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumI64</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">64</span>) { <span class="ident">core::sync::atomic::AtomicI64</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> }
+<span class="doccomment">/// Best-effort atomic `i64` type.
+</span><span class="kw">pub type </span>RadiumI64 = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(<span class="number">64</span>) { core::sync::atomic::AtomicI64 }
+    <span class="kw">else </span>{ core::cell::Cell&lt;i64&gt; }
 };
 
-<span class="doccomment">/// Best-effort atomic `u64` type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumU64</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">64</span>) { <span class="ident">core::sync::atomic::AtomicU64</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> }
+<span class="doccomment">/// Best-effort atomic `u64` type.
+</span><span class="kw">pub type </span>RadiumU64 = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(<span class="number">64</span>) { core::sync::atomic::AtomicU64 }
+    <span class="kw">else </span>{ core::cell::Cell&lt;u64&gt; }
 };
 
-<span class="doccomment">/// Best-effort atomic `isize` type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumIsize</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">size</span>) { <span class="ident">core::sync::atomic::AtomicIsize</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span> }
+<span class="doccomment">/// Best-effort atomic `isize` type.
+</span><span class="kw">pub type </span>RadiumIsize = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(size) { core::sync::atomic::AtomicIsize }
+    <span class="kw">else </span>{ core::cell::Cell&lt;isize&gt; }
 };
 
-<span class="doccomment">/// Best-effort atomic `usize` type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumUsize</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">size</span>) { <span class="ident">core::sync::atomic::AtomicUsize</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> }
+<span class="doccomment">/// Best-effort atomic `usize` type.
+</span><span class="kw">pub type </span>RadiumUsize = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(size) { core::sync::atomic::AtomicUsize }
+    <span class="kw">else </span>{ core::cell::Cell&lt;usize&gt; }
 };
 
-<span class="doccomment">/// Best-effort atomic pointer type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RadiumPtr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">ptr</span>) { <span class="ident">core::sync::atomic::AtomicPtr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> }
-    <span class="kw">else</span> { <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="ident">T</span><span class="op">&gt;</span> }
+<span class="doccomment">/// Best-effort atomic pointer type.
+</span><span class="kw">pub type </span>RadiumPtr&lt;T&gt; = <span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(ptr) { core::sync::atomic::AtomicPtr&lt;T&gt; }
+    <span class="kw">else </span>{ core::cell::Cell&lt;<span class="kw-2">*mut </span>T&gt; }
 };
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="radium" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="radium" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

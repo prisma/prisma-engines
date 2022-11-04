@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/gtid_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gtid_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/gtid_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gtid_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -386,393 +386,393 @@
 <span id="386">386</span>
 <span id="387">387</span>
 <span id="388">388</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp::min</span>, <span class="ident">io</span>};
+</span><span class="kw">use </span>std::{cmp::min, io};
 
-<span class="kw">use</span> <span class="ident">saturating::Saturating</span> <span class="kw">as</span> <span class="ident">S</span>;
+<span class="kw">use </span>saturating::Saturating <span class="kw">as </span>S;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">binlog</span>::{
-        <span class="ident">consts</span>::{<span class="ident">BinlogVersion</span>, <span class="ident">EventType</span>, <span class="ident">Gno</span>, <span class="ident">GtidFlags</span>},
-        <span class="ident">BinlogCtx</span>, <span class="ident">BinlogEvent</span>, <span class="ident">BinlogStruct</span>,
+<span class="kw">use crate</span>::{
+    binlog::{
+        consts::{BinlogVersion, EventType, Gno, GtidFlags},
+        BinlogCtx, BinlogEvent, BinlogStruct,
     },
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">misc::raw</span>::{<span class="ident">int</span>::<span class="kw-2">*</span>, <span class="ident">RawConst</span>, <span class="ident">RawFlags</span>},
-    <span class="ident">proto</span>::{<span class="ident">MyDeserialize</span>, <span class="ident">MySerialize</span>},
+    io::ParseBuf,
+    misc::raw::{int::<span class="kw-2">*</span>, RawConst, RawFlags},
+    proto::{MyDeserialize, MySerialize},
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BinlogEventHeader</span>;
+<span class="kw">use </span><span class="kw">super</span>::BinlogEventHeader;
 
 <span class="macro">define_const!</span>(
-    <span class="ident">ConstU8</span>,
-    <span class="ident">LogicalTimestampTypecode</span>,
-    <span class="ident">InvalidLogicalTimestampTypecode</span>(<span class="string">&quot;Invalid logical timestamp typecode value for GTID event&quot;</span>),
-    <span class="number">2</span>
-);
+    ConstU8,
+    LogicalTimestampTypecode,
+    InvalidLogicalTimestampTypecode(<span class="string">&quot;Invalid logical timestamp typecode value for GTID event&quot;</span>),
+    <span class="number">2
+</span>);
 
-<span class="doccomment">/// GTID stands for Global Transaction IDentifier.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GtidEvent</span> {
-    <span class="doccomment">/// Raw flags value.</span>
-    <span class="ident">flags</span>: <span class="ident">RawFlags</span><span class="op">&lt;</span><span class="ident">GtidFlags</span>, <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// UUID representing the SID.</span>
-    <span class="ident">sid</span>: [<span class="ident">u8</span>; <span class="ident"><span class="self">Self</span>::ENCODED_SID_LENGTH</span>],
-    <span class="doccomment">/// Group number, second component of GTID.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Should be an integer between `MIN_GNO` and `MAX_GNO` for GtidEvent</span>
-    <span class="doccomment">/// or `0` for AnonymousGtidEvent.</span>
-    <span class="ident">gno</span>: <span class="ident">RawConst</span><span class="op">&lt;</span><span class="ident">LeU64</span>, <span class="ident">Gno</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// If defined, then always equal to the constant [`GtidEvent::LOGICAL_TIMESTAMP_TYPECODE`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May be missing for 5.6. Will have different value on 5.7.4 and earlier (ignored).</span>
-    <span class="ident">lc_typecode</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LogicalTimestampTypecode</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Store the transaction&#39;s commit parent `sequence_number`.</span>
-    <span class="ident">last_committed</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The transaction&#39;s logical timestamp assigned at prepare phase.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If it isn&#39;t `0` then it must be greater than `last_committed` timestamp.</span>
-    <span class="ident">sequence_number</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Timestamp when the transaction was committed on the nearest master.</span>
-    <span class="ident">immediate_commit_timestamp</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU56</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Timestamp when the transaction was committed on the originating master.</span>
-    <span class="ident">original_commit_timestamp</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU56</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The packed transaction&#39;s length in bytes, including the Gtid.</span>
-    <span class="ident">tx_length</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LenEnc</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The version of the server where the transaction was originally executed.</span>
-    <span class="ident">original_server_version</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The version of the immediate server.</span>
-    <span class="ident">immediate_server_version</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
+<span class="doccomment">/// GTID stands for Global Transaction IDentifier.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>GtidEvent {
+    <span class="doccomment">/// Raw flags value.
+    </span>flags: RawFlags&lt;GtidFlags, u8&gt;,
+    <span class="doccomment">/// UUID representing the SID.
+    </span>sid: [u8; <span class="self">Self</span>::ENCODED_SID_LENGTH],
+    <span class="doccomment">/// Group number, second component of GTID.
+    ///
+    ///
+    /// Should be an integer between `MIN_GNO` and `MAX_GNO` for GtidEvent
+    /// or `0` for AnonymousGtidEvent.
+    </span>gno: RawConst&lt;LeU64, Gno&gt;,
+    <span class="doccomment">/// If defined, then always equal to the constant [`GtidEvent::LOGICAL_TIMESTAMP_TYPECODE`].
+    ///
+    /// May be missing for 5.6. Will have different value on 5.7.4 and earlier (ignored).
+    </span>lc_typecode: <span class="prelude-ty">Option</span>&lt;LogicalTimestampTypecode&gt;,
+    <span class="doccomment">/// Store the transaction&#39;s commit parent `sequence_number`.
+    </span>last_committed: RawInt&lt;LeU64&gt;,
+    <span class="doccomment">/// The transaction&#39;s logical timestamp assigned at prepare phase.
+    ///
+    /// If it isn&#39;t `0` then it must be greater than `last_committed` timestamp.
+    </span>sequence_number: RawInt&lt;LeU64&gt;,
+    <span class="doccomment">/// Timestamp when the transaction was committed on the nearest master.
+    </span>immediate_commit_timestamp: RawInt&lt;LeU56&gt;,
+    <span class="doccomment">/// Timestamp when the transaction was committed on the originating master.
+    </span>original_commit_timestamp: RawInt&lt;LeU56&gt;,
+    <span class="doccomment">/// The packed transaction&#39;s length in bytes, including the Gtid.
+    </span>tx_length: RawInt&lt;LenEnc&gt;,
+    <span class="doccomment">/// The version of the server where the transaction was originally executed.
+    </span>original_server_version: RawInt&lt;LeU32&gt;,
+    <span class="doccomment">/// The version of the immediate server.
+    </span>immediate_server_version: RawInt&lt;LeU32&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">GtidEvent</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">POST_HEADER_LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::ENCODED_SID_LENGTH</span> <span class="op">+</span> <span class="number">8</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">16</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ENCODED_SID_LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LOGICAL_TIMESTAMP_TYPECODE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">2</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IMMEDIATE_COMMIT_TIMESTAMP_LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">7</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ORIGINAL_COMMIT_TIMESTAMP_LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">7</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UNDEFINED_SERVER_VERSION</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">999_999</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IMMEDIATE_SERVER_VERSION_LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
+<span class="kw">impl </span>GtidEvent {
+    <span class="kw">pub const </span>POST_HEADER_LENGTH: usize = <span class="number">1 </span>+ <span class="self">Self</span>::ENCODED_SID_LENGTH + <span class="number">8 </span>+ <span class="number">1 </span>+ <span class="number">16</span>;
+    <span class="kw">pub const </span>ENCODED_SID_LENGTH: usize = <span class="number">16</span>;
+    <span class="kw">pub const </span>LOGICAL_TIMESTAMP_TYPECODE: u8 = <span class="number">2</span>;
+    <span class="kw">pub const </span>IMMEDIATE_COMMIT_TIMESTAMP_LENGTH: usize = <span class="number">7</span>;
+    <span class="kw">pub const </span>ORIGINAL_COMMIT_TIMESTAMP_LENGTH: usize = <span class="number">7</span>;
+    <span class="kw">pub const </span>UNDEFINED_SERVER_VERSION: u32 = <span class="number">999_999</span>;
+    <span class="kw">pub const </span>IMMEDIATE_SERVER_VERSION_LENGTH: usize = <span class="number">4</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">sid</span>: [<span class="ident">u8</span>; <span class="ident"><span class="self">Self</span>::ENCODED_SID_LENGTH</span>], <span class="ident">gno</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">flags</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">sid</span>,
-            <span class="ident">gno</span>: <span class="ident">RawConst::new</span>(<span class="ident">gno</span>),
-            <span class="ident">lc_typecode</span>: <span class="prelude-val">Some</span>(<span class="ident">LogicalTimestampTypecode::default</span>()),
-            <span class="ident">last_committed</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">sequence_number</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">immediate_commit_timestamp</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">original_commit_timestamp</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">tx_length</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">original_server_version</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">immediate_server_version</span>: <span class="ident">Default::default</span>(),
+    <span class="kw">pub fn </span>new(sid: [u8; <span class="self">Self</span>::ENCODED_SID_LENGTH], gno: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            flags: Default::default(),
+            sid,
+            gno: RawConst::new(gno),
+            lc_typecode: <span class="prelude-val">Some</span>(LogicalTimestampTypecode::default()),
+            last_committed: Default::default(),
+            sequence_number: Default::default(),
+            immediate_commit_timestamp: Default::default(),
+            original_commit_timestamp: Default::default(),
+            tx_length: Default::default(),
+            original_server_version: Default::default(),
+            immediate_server_version: Default::default(),
         }
     }
 
-    <span class="doccomment">/// Defines the `flags` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_flags</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">GtidFlags</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">=</span> <span class="ident">RawFlags::new</span>(<span class="ident">flags</span>.<span class="ident">bits</span>());
-        <span class="self">self</span>
+    <span class="doccomment">/// Defines the `flags` value.
+    </span><span class="kw">pub fn </span>with_flags(<span class="kw-2">mut </span><span class="self">self</span>, flags: GtidFlags) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.flags = RawFlags::new(flags.bits());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Returns the raw `flags` value.
+    </span><span class="kw">pub fn </span>flags_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.flags.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `flags` value. Unknown bits will be truncated.
+    ///
+    /// `00000001` – Transaction may have changes logged with SBR.
+    ///
+    /// In 5.6, 5.7.0-5.7.18, and 8.0.0-8.0.1, this flag is always set. Starting in 5.7.19 and
+    /// 8.0.2, this flag is cleared if the transaction only contains row events.
+    /// It is set if any part of the transaction is written in statement format.
+    </span><span class="kw">pub fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GtidFlags {
+        <span class="self">self</span>.flags.get()
     }
 
-    <span class="doccomment">/// Returns the raw `flags` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">flags</span>.<span class="number">0</span>
+    <span class="doccomment">/// Defines the `sid` value.
+    </span><span class="kw">pub fn </span>with_sid(<span class="kw-2">mut </span><span class="self">self</span>, sid: [u8; <span class="self">Self</span>::ENCODED_SID_LENGTH]) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.sid = sid;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Returns the `sid` value.
+    ///
+    /// `sid` is the UUID representing the SID.
+    </span><span class="kw">pub fn </span>sid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [u8; <span class="self">Self</span>::ENCODED_SID_LENGTH] {
+        <span class="self">self</span>.sid
     }
 
-    <span class="doccomment">/// Returns the `flags` value. Unknown bits will be truncated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `00000001` – Transaction may have changes logged with SBR.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In 5.6, 5.7.0-5.7.18, and 8.0.0-8.0.1, this flag is always set. Starting in 5.7.19 and</span>
-    <span class="doccomment">/// 8.0.2, this flag is cleared if the transaction only contains row events.</span>
-    <span class="doccomment">/// It is set if any part of the transaction is written in statement format.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GtidFlags</span> {
-        <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">get</span>()
+    <span class="doccomment">/// Defines the `gno` value.
+    </span><span class="kw">pub fn </span>with_gno(<span class="kw-2">mut </span><span class="self">self</span>, gno: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.gno = RawConst::new(gno);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Returns the `gno` value.
+    ///
+    /// `gno` is a group number, second component of GTID.
+    </span><span class="kw">pub fn </span>gno(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.gno.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `lc_typecode` value.
+    ///
+    /// `lc_typecode` is the type of logical timestamp used in the logical clock fields.
+    </span><span class="kw">pub fn </span>lc_typecode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
+        <span class="self">self</span>.lc_typecode.as_ref().map(|x| x.value())
     }
 
-    <span class="doccomment">/// Defines the `sid` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_sid</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sid</span>: [<span class="ident">u8</span>; <span class="ident"><span class="self">Self</span>::ENCODED_SID_LENGTH</span>]) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">sid</span> <span class="op">=</span> <span class="ident">sid</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the `lc_typecode` value to [`GtidEvent::LOGICAL_TIMESTAMP_TYPECODE`].
+    ///
+    /// This is already by default, but `lc_typecode` might be `None` if `Self` is obtained
+    /// from an old MySql server via [`MyDeserialize::deserialize`].
+    </span><span class="kw">pub fn </span>with_lc_typecode(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.lc_typecode = <span class="prelude-val">Some</span>(LogicalTimestampTypecode::default());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Returns the `sid` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `sid` is the UUID representing the SID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="ident"><span class="self">Self</span>::ENCODED_SID_LENGTH</span>] {
-        <span class="self">self</span>.<span class="ident">sid</span>
-    }
+    <span class="doccomment">/// Sets the `last_committed` value.
+    </span><span class="kw">pub fn </span>with_last_committed(<span class="kw-2">mut </span><span class="self">self</span>, last_committed: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.last_committed = RawInt::new(last_committed);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Defines the `gno` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_gno</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gno</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">gno</span> <span class="op">=</span> <span class="ident">RawConst::new</span>(<span class="ident">gno</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Returns the `last_committed` value.
+    ///
+    /// `last_committed` stores the transaction&#39;s commit parent `sequence_number`.
+    </span><span class="kw">pub fn </span>last_committed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.last_committed.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns the `gno` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `gno` is a group number, second component of GTID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gno</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">gno</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Sets the `sequence_number` value.
+    </span><span class="kw">pub fn </span>with_sequence_number(<span class="kw-2">mut </span><span class="self">self</span>, sequence_number: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.sequence_number = RawInt::new(sequence_number);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Returns the `lc_typecode` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `lc_typecode` is the type of logical timestamp used in the logical clock fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lc_typecode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">lc_typecode</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">value</span>())
-    }
+    <span class="doccomment">/// Returns the `sequence_number` value.
+    ///
+    /// `sequence_number` is the transaction&#39;s logical timestamp assigned at prepare phase.
+    </span><span class="kw">pub fn </span>sequence_number(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.sequence_number.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Sets the `lc_typecode` value to [`GtidEvent::LOGICAL_TIMESTAMP_TYPECODE`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is already by default, but `lc_typecode` might be `None` if `Self` is obtained</span>
-    <span class="doccomment">/// from an old MySql server via [`MyDeserialize::deserialize`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_lc_typecode</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">lc_typecode</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">LogicalTimestampTypecode::default</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the `immediate_commit_timestamp` value.
+    </span><span class="kw">pub fn </span>with_immediate_commit_timestamp(<span class="kw-2">mut </span><span class="self">self</span>, immediate_commit_timestamp: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.immediate_commit_timestamp = RawInt::new(immediate_commit_timestamp);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the `last_committed` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_last_committed</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">last_committed</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">last_committed</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">last_committed</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Returns the `immediate_commit_timestamp` value.
+    ///
+    /// `immediate_commit_timestamp` is a timestamp of commit on the immediate master.
+    </span><span class="kw">pub fn </span>immediate_commit_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.immediate_commit_timestamp.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns the `last_committed` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `last_committed` stores the transaction&#39;s commit parent `sequence_number`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_committed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">last_committed</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Sets the `original_commit_timestamp` value.
+    </span><span class="kw">pub fn </span>with_original_commit_timestamp(<span class="kw-2">mut </span><span class="self">self</span>, original_commit_timestamp: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.original_commit_timestamp = RawInt::new(original_commit_timestamp);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the `sequence_number` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_sequence_number</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sequence_number</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">sequence_number</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">sequence_number</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Returns the `original_commit_timestamp` value.
+    ///
+    /// `original_commit_timestamp` is the timestamp of commit on the originating master.
+    </span><span class="kw">pub fn </span>original_commit_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.original_commit_timestamp.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns the `sequence_number` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `sequence_number` is the transaction&#39;s logical timestamp assigned at prepare phase.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sequence_number</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">sequence_number</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Sets the `tx_length` value.
+    </span><span class="kw">pub fn </span>with_tx_length(<span class="kw-2">mut </span><span class="self">self</span>, tx_length: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.tx_length = RawInt::new(tx_length);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the `immediate_commit_timestamp` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_immediate_commit_timestamp</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">immediate_commit_timestamp</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">immediate_commit_timestamp</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">immediate_commit_timestamp</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Returns the `tx_length` value.
+    ///
+    /// `tx_length` is the packed transaction&#39;s length in bytes, including the Gtid.
+    </span><span class="kw">pub fn </span>tx_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.tx_length.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns the `immediate_commit_timestamp` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `immediate_commit_timestamp` is a timestamp of commit on the immediate master.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">immediate_commit_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">immediate_commit_timestamp</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Sets the `original_server_version` value.
+    </span><span class="kw">pub fn </span>with_original_server_version(<span class="kw-2">mut </span><span class="self">self</span>, original_server_version: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.original_server_version = RawInt::new(original_server_version);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the `original_commit_timestamp` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_original_commit_timestamp</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">original_commit_timestamp</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">original_commit_timestamp</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">original_commit_timestamp</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Returns the `original_server_version` value.
+    ///
+    /// `original_server_version` is the version of the server where the transaction was originally
+    /// executed.
+    </span><span class="kw">pub fn </span>original_server_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.original_server_version.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns the `original_commit_timestamp` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `original_commit_timestamp` is the timestamp of commit on the originating master.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">original_commit_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">original_commit_timestamp</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Sets the `immediate_server_version` value.
+    </span><span class="kw">pub fn </span>with_immediate_server_version(<span class="kw-2">mut </span><span class="self">self</span>, immediate_server_version: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.immediate_server_version = RawInt::new(immediate_server_version);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the `tx_length` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tx_length</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tx_length</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">tx_length</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">tx_length</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Returns the `tx_length` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `tx_length` is the packed transaction&#39;s length in bytes, including the Gtid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tx_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">tx_length</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Sets the `original_server_version` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_original_server_version</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">original_server_version</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">original_server_version</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">original_server_version</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Returns the `original_server_version` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `original_server_version` is the version of the server where the transaction was originally</span>
-    <span class="doccomment">/// executed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">original_server_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">original_server_version</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Sets the `immediate_server_version` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_immediate_server_version</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">immediate_server_version</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">immediate_server_version</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">immediate_server_version</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Returns the `immediate_server_version` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `immediate_server_version` is the server version of the immediate server.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">immediate_server_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">immediate_server_version</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Returns the `immediate_server_version` value.
+    ///
+    /// `immediate_server_version` is the server version of the immediate server.
+    </span><span class="kw">pub fn </span>immediate_server_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.immediate_server_version.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GtidEvent</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">BinlogCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>GtidEvent {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = BinlogCtx&lt;<span class="lifetime">&#39;de</span>&gt;;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">_ctx</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sbuf</span>: <span class="ident">ParseBuf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="number">1</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::ENCODED_SID_LENGTH</span> <span class="op">+</span> <span class="number">8</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">sid</span>: [<span class="ident">u8</span>; <span class="ident"><span class="self">Self</span>::ENCODED_SID_LENGTH</span>] <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">gno</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
+    <span class="kw">fn </span>deserialize(_ctx: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>sbuf: ParseBuf = buf.parse(<span class="number">1 </span>+ <span class="self">Self</span>::ENCODED_SID_LENGTH + <span class="number">8</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>flags = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>sid: [u8; <span class="self">Self</span>::ENCODED_SID_LENGTH] = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>gno = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lc_typecode</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_committed</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sequence_number</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">immediate_commit_timestamp</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">original_commit_timestamp</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx_length</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="number">0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>lc_typecode = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>last_committed = RawInt::new(<span class="number">0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>sequence_number = RawInt::new(<span class="number">0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>immediate_commit_timestamp = RawInt::new(<span class="number">0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>original_commit_timestamp = RawInt::new(<span class="number">0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>tx_length = RawInt::new(<span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">original_server_version</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident"><span class="self">Self</span>::UNDEFINED_SERVER_VERSION</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">immediate_server_version</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident"><span class="self">Self</span>::UNDEFINED_SERVER_VERSION</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>original_server_version = RawInt::new(<span class="self">Self</span>::UNDEFINED_SERVER_VERSION);
+        <span class="kw">let </span><span class="kw-2">mut </span>immediate_server_version = RawInt::new(<span class="self">Self</span>::UNDEFINED_SERVER_VERSION);
 
-        <span class="comment">// Buf will be empty for MySql 5.6. Condition will be false for MySql &lt;= 5.7.4</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">buf</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">buf</span>.<span class="number">0</span>[<span class="number">0</span>] <span class="op">==</span> <span class="ident"><span class="self">Self</span>::LOGICAL_TIMESTAMP_TYPECODE</span> {
-            <span class="ident">lc_typecode</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>);
+        <span class="comment">// Buf will be empty for MySql 5.6. Condition will be false for MySql &lt;= 5.7.4
+        </span><span class="kw">if </span>!buf.is_empty() &amp;&amp; buf.<span class="number">0</span>[<span class="number">0</span>] == <span class="self">Self</span>::LOGICAL_TIMESTAMP_TYPECODE {
+            lc_typecode = <span class="prelude-val">Some</span>(buf.parse_unchecked(())<span class="question-mark">?</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sbuf</span>: <span class="ident">ParseBuf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="number">16</span>)<span class="question-mark">?</span>;
-            <span class="ident">last_committed</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-            <span class="ident">sequence_number</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>sbuf: ParseBuf = buf.parse(<span class="number">16</span>)<span class="question-mark">?</span>;
+            last_committed = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+            sequence_number = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::IMMEDIATE_COMMIT_TIMESTAMP_LENGTH</span> {
-                <span class="ident">immediate_commit_timestamp</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">immediate_commit_timestamp</span>.<span class="number">0</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">55</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">immediate_commit_timestamp</span>.<span class="number">0</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">55</span>);
-                    <span class="ident">original_commit_timestamp</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
-                } <span class="kw">else</span> {
-                    <span class="comment">// The transaction originated in the previous server</span>
-                    <span class="ident">original_commit_timestamp</span> <span class="op">=</span> <span class="ident">immediate_commit_timestamp</span>;
+            <span class="kw">if </span>buf.len() &gt;= <span class="self">Self</span>::IMMEDIATE_COMMIT_TIMESTAMP_LENGTH {
+                immediate_commit_timestamp = buf.parse_unchecked(())<span class="question-mark">?</span>;
+                <span class="kw">if </span>immediate_commit_timestamp.<span class="number">0 </span>&amp; (<span class="number">1 </span>&lt;&lt; <span class="number">55</span>) != <span class="number">0 </span>{
+                    immediate_commit_timestamp.<span class="number">0 </span>&amp;= !(<span class="number">1 </span>&lt;&lt; <span class="number">55</span>);
+                    original_commit_timestamp = buf.parse(())<span class="question-mark">?</span>;
+                } <span class="kw">else </span>{
+                    <span class="comment">// The transaction originated in the previous server
+                    </span>original_commit_timestamp = immediate_commit_timestamp;
                 }
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">buf</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">tx_length</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
+            <span class="kw">if </span>!buf.is_empty() {
+                tx_length = buf.parse_unchecked(())<span class="question-mark">?</span>;
             }
 
-            <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::IMMEDIATE_SERVER_VERSION_LENGTH</span> {
-                <span class="ident">immediate_server_version</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">immediate_server_version</span>.<span class="number">0</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">immediate_server_version</span>.<span class="number">0</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>);
-                    <span class="ident">original_server_version</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">original_server_version</span> <span class="op">=</span> <span class="ident">immediate_server_version</span>;
+            <span class="kw">if </span>buf.len() &gt;= <span class="self">Self</span>::IMMEDIATE_SERVER_VERSION_LENGTH {
+                immediate_server_version = buf.parse_unchecked(())<span class="question-mark">?</span>;
+                <span class="kw">if </span>immediate_server_version.<span class="number">0 </span>&amp; (<span class="number">1 </span>&lt;&lt; <span class="number">31</span>) != <span class="number">0 </span>{
+                    immediate_server_version.<span class="number">0 </span>&amp;= !(<span class="number">1 </span>&lt;&lt; <span class="number">31</span>);
+                    original_server_version = buf.parse(())<span class="question-mark">?</span>;
+                } <span class="kw">else </span>{
+                    original_server_version = immediate_server_version;
                 }
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">flags</span>,
-            <span class="ident">sid</span>,
-            <span class="ident">gno</span>,
-            <span class="ident">lc_typecode</span>,
-            <span class="ident">last_committed</span>,
-            <span class="ident">sequence_number</span>,
-            <span class="ident">immediate_commit_timestamp</span>,
-            <span class="ident">original_commit_timestamp</span>,
-            <span class="ident">tx_length</span>,
-            <span class="ident">original_server_version</span>,
-            <span class="ident">immediate_server_version</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            flags,
+            sid,
+            gno,
+            lc_typecode,
+            last_committed,
+            sequence_number,
+            immediate_commit_timestamp,
+            original_commit_timestamp,
+            tx_length,
+            original_server_version,
+            immediate_server_version,
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">GtidEvent</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">sid</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">gno</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">lc_typecode</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">lc_typecode</span>) =&gt; <span class="ident">lc_typecode</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MySerialize <span class="kw">for </span>GtidEvent {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="self">self</span>.flags.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.sid.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.gno.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="kw">match </span><span class="self">self</span>.lc_typecode {
+            <span class="prelude-val">Some</span>(lc_typecode) =&gt; lc_typecode.serialize(<span class="kw-2">&amp;mut *</span>buf),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
         };
-        <span class="self">self</span>.<span class="ident">last_committed</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">sequence_number</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+        <span class="self">self</span>.last_committed.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.sequence_number.serialize(<span class="kw-2">&amp;mut *</span>buf);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">immediate_commit_timestamp_with_flag</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">immediate_commit_timestamp</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">immediate_commit_timestamp</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">original_commit_timestamp</span> {
-            <span class="ident">immediate_commit_timestamp_with_flag</span> <span class="op">|</span><span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">55</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">immediate_commit_timestamp_with_flag</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">55</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>immediate_commit_timestamp_with_flag = <span class="kw-2">*</span><span class="self">self</span>.immediate_commit_timestamp;
+        <span class="kw">if </span><span class="self">self</span>.immediate_commit_timestamp != <span class="self">self</span>.original_commit_timestamp {
+            immediate_commit_timestamp_with_flag |= <span class="number">1 </span>&lt;&lt; <span class="number">55</span>;
+        } <span class="kw">else </span>{
+            immediate_commit_timestamp_with_flag &amp;= !(<span class="number">1 </span>&lt;&lt; <span class="number">55</span>);
         }
-        <span class="ident">RawInt</span>::<span class="op">&lt;</span><span class="ident">LeU56</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">immediate_commit_timestamp_with_flag</span>).<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+        RawInt::&lt;LeU56&gt;::new(immediate_commit_timestamp_with_flag).serialize(<span class="kw-2">&amp;mut *</span>buf);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">immediate_commit_timestamp</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">original_commit_timestamp</span> {
-            <span class="self">self</span>.<span class="ident">original_commit_timestamp</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+        <span class="kw">if </span><span class="self">self</span>.immediate_commit_timestamp != <span class="self">self</span>.original_commit_timestamp {
+            <span class="self">self</span>.original_commit_timestamp.serialize(<span class="kw-2">&amp;mut *</span>buf);
         }
 
-        <span class="self">self</span>.<span class="ident">tx_length</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+        <span class="self">self</span>.tx_length.serialize(<span class="kw-2">&amp;mut *</span>buf);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">immediate_server_version_with_flag</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">immediate_server_version</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">immediate_server_version</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">original_server_version</span> {
-            <span class="ident">immediate_server_version_with_flag</span> <span class="op">|</span><span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">immediate_server_version_with_flag</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>immediate_server_version_with_flag = <span class="kw-2">*</span><span class="self">self</span>.immediate_server_version;
+        <span class="kw">if </span><span class="self">self</span>.immediate_server_version != <span class="self">self</span>.original_server_version {
+            immediate_server_version_with_flag |= <span class="number">1 </span>&lt;&lt; <span class="number">31</span>;
+        } <span class="kw">else </span>{
+            immediate_server_version_with_flag &amp;= !(<span class="number">1 </span>&lt;&lt; <span class="number">31</span>);
         }
-        <span class="ident">RawInt</span>::<span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">immediate_server_version_with_flag</span>).<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+        RawInt::&lt;LeU32&gt;::new(immediate_server_version_with_flag).serialize(<span class="kw-2">&amp;mut *</span>buf);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">immediate_server_version</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">original_server_version</span> {
-            <span class="self">self</span>.<span class="ident">original_server_version</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+        <span class="kw">if </span><span class="self">self</span>.immediate_server_version != <span class="self">self</span>.original_server_version {
+            <span class="self">self</span>.original_server_version.serialize(<span class="kw-2">&amp;mut *</span>buf);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BinlogStruct</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GtidEvent</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_version</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">S</span>(<span class="number">0</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BinlogStruct&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>GtidEvent {
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>, _version: BinlogVersion) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>len = S(<span class="number">0</span>);
 
-        <span class="comment">// post header</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">1</span>); <span class="comment">// flags</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident"><span class="self">Self</span>::ENCODED_SID_LENGTH</span>); <span class="comment">// sid</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">8</span>); <span class="comment">// gno</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">1</span>); <span class="comment">// lc_typecode</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">8</span>); <span class="comment">// last_committed</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">8</span>); <span class="comment">// sequence_number</span>
+        <span class="comment">// post header
+        </span>len += S(<span class="number">1</span>); <span class="comment">// flags
+        </span>len += S(<span class="self">Self</span>::ENCODED_SID_LENGTH); <span class="comment">// sid
+        </span>len += S(<span class="number">8</span>); <span class="comment">// gno
+        </span>len += S(<span class="number">1</span>); <span class="comment">// lc_typecode
+        </span>len += S(<span class="number">8</span>); <span class="comment">// last_committed
+        </span>len += S(<span class="number">8</span>); <span class="comment">// sequence_number
 
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">7</span>); <span class="comment">// immediate_commit_timestamp</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">immediate_commit_timestamp</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">original_commit_timestamp</span> {
-            <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">7</span>); <span class="comment">// original_commit_timestamp</span>
-        }
+        </span>len += S(<span class="number">7</span>); <span class="comment">// immediate_commit_timestamp
+        </span><span class="kw">if </span><span class="self">self</span>.immediate_commit_timestamp != <span class="self">self</span>.original_commit_timestamp {
+            len += S(<span class="number">7</span>); <span class="comment">// original_commit_timestamp
+        </span>}
 
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident"><span class="kw">crate</span>::misc::lenenc_int_len</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tx_length</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="kw">as</span> <span class="ident">usize</span>); <span class="comment">// tx_length</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">4</span>); <span class="comment">// immediate_server_version</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">immediate_server_version</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">original_server_version</span> {
-            <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">4</span>); <span class="comment">// original_server_version</span>
-        }
+        len += S(<span class="kw">crate</span>::misc::lenenc_int_len(<span class="kw-2">*</span><span class="self">self</span>.tx_length <span class="kw">as </span>u64) <span class="kw">as </span>usize); <span class="comment">// tx_length
+        </span>len += S(<span class="number">4</span>); <span class="comment">// immediate_server_version
+        </span><span class="kw">if </span><span class="self">self</span>.immediate_server_version != <span class="self">self</span>.original_server_version {
+            len += S(<span class="number">4</span>); <span class="comment">// original_server_version
+        </span>}
 
-        <span class="ident">min</span>(<span class="ident">len</span>.<span class="number">0</span>, <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">BinlogEventHeader::LEN</span>)
+        min(len.<span class="number">0</span>, u32::MAX <span class="kw">as </span>usize - BinlogEventHeader::LEN)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BinlogEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GtidEvent</span> {
-    <span class="kw">const</span> <span class="ident">EVENT_TYPE</span>: <span class="ident">EventType</span> <span class="op">=</span> <span class="ident">EventType::GTID_EVENT</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BinlogEvent&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>GtidEvent {
+    <span class="kw">const </span>EVENT_TYPE: EventType = EventType::GTID_EVENT;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

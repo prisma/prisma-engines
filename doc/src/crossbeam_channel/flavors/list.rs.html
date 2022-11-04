@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-channel-0.5.6/src/flavors/list.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>list.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../crossbeam_channel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-channel-0.5.6/src/flavors/list.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>list.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../crossbeam_channel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -743,750 +743,750 @@
 <span id="743">743</span>
 <span id="744">744</span>
 <span id="745">745</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Unbounded channel implemented as a linked list.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Unbounded channel implemented as a linked list.
 
-<span class="kw">use</span> <span class="ident">std::cell::UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::mem::MaybeUninit</span>;
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="self">self</span>, <span class="ident">AtomicPtr</span>, <span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
-<span class="kw">use</span> <span class="ident">std::time::Instant</span>;
+</span><span class="kw">use </span>std::cell::UnsafeCell;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::mem::MaybeUninit;
+<span class="kw">use </span>std::ptr;
+<span class="kw">use </span>std::sync::atomic::{<span class="self">self</span>, AtomicPtr, AtomicUsize, Ordering};
+<span class="kw">use </span>std::time::Instant;
 
-<span class="kw">use</span> <span class="ident">crossbeam_utils</span>::{<span class="ident">Backoff</span>, <span class="ident">CachePadded</span>};
+<span class="kw">use </span>crossbeam_utils::{Backoff, CachePadded};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::context::Context</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err</span>::{<span class="ident">RecvTimeoutError</span>, <span class="ident">SendTimeoutError</span>, <span class="ident">TryRecvError</span>, <span class="ident">TrySendError</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::select</span>::{<span class="ident">Operation</span>, <span class="ident">SelectHandle</span>, <span class="ident">Selected</span>, <span class="ident">Token</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::waker::SyncWaker</span>;
+<span class="kw">use </span><span class="kw">crate</span>::context::Context;
+<span class="kw">use </span><span class="kw">crate</span>::err::{RecvTimeoutError, SendTimeoutError, TryRecvError, TrySendError};
+<span class="kw">use </span><span class="kw">crate</span>::select::{Operation, SelectHandle, Selected, Token};
+<span class="kw">use </span><span class="kw">crate</span>::waker::SyncWaker;
 
-<span class="comment">// TODO(stjepang): Once we bump the minimum required Rust version to 1.28 or newer, re-apply the</span>
-<span class="comment">// following changes by @kleimkuhler:</span>
-<span class="comment">//</span>
-<span class="comment">// 1. https://github.com/crossbeam-rs/crossbeam-channel/pull/100</span>
-<span class="comment">// 2. https://github.com/crossbeam-rs/crossbeam-channel/pull/101</span>
+<span class="comment">// TODO(stjepang): Once we bump the minimum required Rust version to 1.28 or newer, re-apply the
+// following changes by @kleimkuhler:
+//
+// 1. https://github.com/crossbeam-rs/crossbeam-channel/pull/100
+// 2. https://github.com/crossbeam-rs/crossbeam-channel/pull/101
 
-<span class="comment">// Bits indicating the state of a slot:</span>
-<span class="comment">// * If a message has been written into the slot, `WRITE` is set.</span>
-<span class="comment">// * If a message has been read from the slot, `READ` is set.</span>
-<span class="comment">// * If the block is being destroyed, `DESTROY` is set.</span>
-<span class="kw">const</span> <span class="ident">WRITE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="kw">const</span> <span class="ident">READ</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">const</span> <span class="ident">DESTROY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
+// Bits indicating the state of a slot:
+// * If a message has been written into the slot, `WRITE` is set.
+// * If a message has been read from the slot, `READ` is set.
+// * If the block is being destroyed, `DESTROY` is set.
+</span><span class="kw">const </span>WRITE: usize = <span class="number">1</span>;
+<span class="kw">const </span>READ: usize = <span class="number">2</span>;
+<span class="kw">const </span>DESTROY: usize = <span class="number">4</span>;
 
-<span class="comment">// Each block covers one &quot;lap&quot; of indices.</span>
-<span class="kw">const</span> <span class="ident">LAP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
-<span class="comment">// The maximum number of messages a block can hold.</span>
-<span class="kw">const</span> <span class="ident">BLOCK_CAP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span>;
-<span class="comment">// How many lower bits are reserved for metadata.</span>
-<span class="kw">const</span> <span class="ident">SHIFT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="comment">// Has two different purposes:</span>
-<span class="comment">// * If set in head, indicates that the block is not the last one.</span>
-<span class="comment">// * If set in tail, indicates that the channel is disconnected.</span>
-<span class="kw">const</span> <span class="ident">MARK_BIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="comment">// Each block covers one &quot;lap&quot; of indices.
+</span><span class="kw">const </span>LAP: usize = <span class="number">32</span>;
+<span class="comment">// The maximum number of messages a block can hold.
+</span><span class="kw">const </span>BLOCK_CAP: usize = LAP - <span class="number">1</span>;
+<span class="comment">// How many lower bits are reserved for metadata.
+</span><span class="kw">const </span>SHIFT: usize = <span class="number">1</span>;
+<span class="comment">// Has two different purposes:
+// * If set in head, indicates that the block is not the last one.
+// * If set in tail, indicates that the channel is disconnected.
+</span><span class="kw">const </span>MARK_BIT: usize = <span class="number">1</span>;
 
-<span class="doccomment">/// A slot in a block.</span>
-<span class="kw">struct</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The message.</span>
-    <span class="ident">msg</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A slot in a block.
+</span><span class="kw">struct </span>Slot&lt;T&gt; {
+    <span class="doccomment">/// The message.
+    </span>msg: UnsafeCell&lt;MaybeUninit&lt;T&gt;&gt;,
 
-    <span class="doccomment">/// The state of the slot.</span>
-    <span class="ident">state</span>: <span class="ident">AtomicUsize</span>,
+    <span class="doccomment">/// The state of the slot.
+    </span>state: AtomicUsize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">UNINIT</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span> {
-        <span class="ident">msg</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">MaybeUninit::uninit</span>()),
-        <span class="ident">state</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>),
+<span class="kw">impl</span>&lt;T&gt; Slot&lt;T&gt; {
+    <span class="kw">const </span>UNINIT: <span class="self">Self </span>= <span class="self">Self </span>{
+        msg: UnsafeCell::new(MaybeUninit::uninit()),
+        state: AtomicUsize::new(<span class="number">0</span>),
     };
 
-    <span class="doccomment">/// Waits until a message is written into the slot.</span>
-    <span class="kw">fn</span> <span class="ident">wait_write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>) <span class="op">&amp;</span> <span class="ident">WRITE</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+    <span class="doccomment">/// Waits until a message is written into the slot.
+    </span><span class="kw">fn </span>wait_write(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">while </span><span class="self">self</span>.state.load(Ordering::Acquire) &amp; WRITE == <span class="number">0 </span>{
+            backoff.snooze();
         }
     }
 }
 
-<span class="doccomment">/// A block in a linked list.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Each block in the list can hold up to `BLOCK_CAP` messages.</span>
-<span class="kw">struct</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The next block in the linked list.</span>
-    <span class="ident">next</span>: <span class="ident">AtomicPtr</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A block in a linked list.
+///
+/// Each block in the list can hold up to `BLOCK_CAP` messages.
+</span><span class="kw">struct </span>Block&lt;T&gt; {
+    <span class="doccomment">/// The next block in the linked list.
+    </span>next: AtomicPtr&lt;Block&lt;T&gt;&gt;,
 
-    <span class="doccomment">/// Slots for messages.</span>
-    <span class="ident">slots</span>: [<span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>; <span class="ident">BLOCK_CAP</span>],
+    <span class="doccomment">/// Slots for messages.
+    </span>slots: [Slot&lt;T&gt;; BLOCK_CAP],
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates an empty block.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">Self</span> {
-            <span class="ident">next</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()),
-            <span class="ident">slots</span>: [<span class="ident">Slot::UNINIT</span>; <span class="ident">BLOCK_CAP</span>],
+<span class="kw">impl</span>&lt;T&gt; Block&lt;T&gt; {
+    <span class="doccomment">/// Creates an empty block.
+    </span><span class="kw">fn </span>new() -&gt; Block&lt;T&gt; {
+        <span class="self">Self </span>{
+            next: AtomicPtr::new(ptr::null_mut()),
+            slots: [Slot::UNINIT; BLOCK_CAP],
         }
     }
 
-    <span class="doccomment">/// Waits until the next pointer is set.</span>
-    <span class="kw">fn</span> <span class="ident">wait_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_null</span>() {
-                <span class="kw">return</span> <span class="ident">next</span>;
+    <span class="doccomment">/// Waits until the next pointer is set.
+    </span><span class="kw">fn </span>wait_next(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>Block&lt;T&gt; {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>next = <span class="self">self</span>.next.load(Ordering::Acquire);
+            <span class="kw">if </span>!next.is_null() {
+                <span class="kw">return </span>next;
             }
-            <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+            backoff.snooze();
         }
     }
 
-    <span class="doccomment">/// Sets the `DESTROY` bit in slots starting from `start` and destroys the block.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">destroy</span>(<span class="ident">this</span>: <span class="kw-2">*mut</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">start</span>: <span class="ident">usize</span>) {
-        <span class="comment">// It is not necessary to set the `DESTROY` bit in the last slot because that slot has</span>
-        <span class="comment">// begun destruction of the block.</span>
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">start</span>..<span class="ident">BLOCK_CAP</span> <span class="op">-</span> <span class="number">1</span> {
-            <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">this</span>).<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">i</span>);
+    <span class="doccomment">/// Sets the `DESTROY` bit in slots starting from `start` and destroys the block.
+    </span><span class="kw">unsafe fn </span>destroy(this: <span class="kw-2">*mut </span>Block&lt;T&gt;, start: usize) {
+        <span class="comment">// It is not necessary to set the `DESTROY` bit in the last slot because that slot has
+        // begun destruction of the block.
+        </span><span class="kw">for </span>i <span class="kw">in </span>start..BLOCK_CAP - <span class="number">1 </span>{
+            <span class="kw">let </span>slot = (<span class="kw-2">*</span>this).slots.get_unchecked(i);
 
-            <span class="comment">// Mark the `DESTROY` bit if a thread is still using the slot.</span>
-            <span class="kw">if</span> <span class="ident">slot</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>) <span class="op">&amp;</span> <span class="ident">READ</span> <span class="op">==</span> <span class="number">0</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">slot</span>.<span class="ident">state</span>.<span class="ident">fetch_or</span>(<span class="ident">DESTROY</span>, <span class="ident">Ordering::AcqRel</span>) <span class="op">&amp;</span> <span class="ident">READ</span> <span class="op">==</span> <span class="number">0</span>
-            {
-                <span class="comment">// If a thread is still using the slot, it will continue destruction of the block.</span>
-                <span class="kw">return</span>;
+            <span class="comment">// Mark the `DESTROY` bit if a thread is still using the slot.
+            </span><span class="kw">if </span>slot.state.load(Ordering::Acquire) &amp; READ == <span class="number">0
+                </span>&amp;&amp; slot.state.fetch_or(DESTROY, Ordering::AcqRel) &amp; READ == <span class="number">0
+            </span>{
+                <span class="comment">// If a thread is still using the slot, it will continue destruction of the block.
+                </span><span class="kw">return</span>;
             }
         }
 
-        <span class="comment">// No thread is using the block, now it is safe to destroy it.</span>
-        <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">this</span>));
+        <span class="comment">// No thread is using the block, now it is safe to destroy it.
+        </span>drop(Box::from_raw(this));
     }
 }
 
-<span class="doccomment">/// A position in a channel.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The index in the channel.</span>
-    <span class="ident">index</span>: <span class="ident">AtomicUsize</span>,
+<span class="doccomment">/// A position in a channel.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Position&lt;T&gt; {
+    <span class="doccomment">/// The index in the channel.
+    </span>index: AtomicUsize,
 
-    <span class="doccomment">/// The block in the linked list.</span>
-    <span class="ident">block</span>: <span class="ident">AtomicPtr</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The block in the linked list.
+    </span>block: AtomicPtr&lt;Block&lt;T&gt;&gt;,
 }
 
-<span class="doccomment">/// The token type for the list flavor.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ListToken</span> {
-    <span class="doccomment">/// The block of slots.</span>
-    <span class="ident">block</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
+<span class="doccomment">/// The token type for the list flavor.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ListToken {
+    <span class="doccomment">/// The block of slots.
+    </span>block: <span class="kw-2">*const </span>u8,
 
-    <span class="doccomment">/// The offset into the block.</span>
-    <span class="ident">offset</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The offset into the block.
+    </span>offset: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ListToken</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ListToken</span> {
-            <span class="ident">block</span>: <span class="ident">ptr::null</span>(),
-            <span class="ident">offset</span>: <span class="number">0</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>ListToken {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        ListToken {
+            block: ptr::null(),
+            offset: <span class="number">0</span>,
         }
     }
 }
 
-<span class="doccomment">/// Unbounded channel implemented as a linked list.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Each message sent into the channel is assigned a sequence number, i.e. an index. Indices are</span>
-<span class="doccomment">/// represented as numbers of type `usize` and wrap on overflow.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Consecutive messages are grouped into blocks in order to put less pressure on the allocator and</span>
-<span class="doccomment">/// improve cache efficiency.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The head of the channel.</span>
-    <span class="ident">head</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">Position</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Unbounded channel implemented as a linked list.
+///
+/// Each message sent into the channel is assigned a sequence number, i.e. an index. Indices are
+/// represented as numbers of type `usize` and wrap on overflow.
+///
+/// Consecutive messages are grouped into blocks in order to put less pressure on the allocator and
+/// improve cache efficiency.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Channel&lt;T&gt; {
+    <span class="doccomment">/// The head of the channel.
+    </span>head: CachePadded&lt;Position&lt;T&gt;&gt;,
 
-    <span class="doccomment">/// The tail of the channel.</span>
-    <span class="ident">tail</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">Position</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The tail of the channel.
+    </span>tail: CachePadded&lt;Position&lt;T&gt;&gt;,
 
-    <span class="doccomment">/// Receivers waiting while the channel is empty and not disconnected.</span>
-    <span class="ident">receivers</span>: <span class="ident">SyncWaker</span>,
+    <span class="doccomment">/// Receivers waiting while the channel is empty and not disconnected.
+    </span>receivers: SyncWaker,
 
-    <span class="doccomment">/// Indicates that dropping a `Channel&lt;T&gt;` may drop messages of type `T`.</span>
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Indicates that dropping a `Channel&lt;T&gt;` may drop messages of type `T`.
+    </span>_marker: PhantomData&lt;T&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new unbounded channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Channel</span> {
-            <span class="ident">head</span>: <span class="ident">CachePadded::new</span>(<span class="ident">Position</span> {
-                <span class="ident">block</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()),
-                <span class="ident">index</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>),
+<span class="kw">impl</span>&lt;T&gt; Channel&lt;T&gt; {
+    <span class="doccomment">/// Creates a new unbounded channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        Channel {
+            head: CachePadded::new(Position {
+                block: AtomicPtr::new(ptr::null_mut()),
+                index: AtomicUsize::new(<span class="number">0</span>),
             }),
-            <span class="ident">tail</span>: <span class="ident">CachePadded::new</span>(<span class="ident">Position</span> {
-                <span class="ident">block</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()),
-                <span class="ident">index</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>),
+            tail: CachePadded::new(Position {
+                block: AtomicPtr::new(ptr::null_mut()),
+                index: AtomicUsize::new(<span class="number">0</span>),
             }),
-            <span class="ident">receivers</span>: <span class="ident">SyncWaker::new</span>(),
-            <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+            receivers: SyncWaker::new(),
+            _marker: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Returns a receiver handle to the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">receiver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Receiver</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Receiver</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Returns a receiver handle to the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>receiver(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Receiver&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+        Receiver(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Returns a sender handle to the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sender</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Sender</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Sender</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Returns a sender handle to the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sender(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sender&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+        Sender(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Attempts to reserve a slot for sending a message.</span>
-    <span class="kw">fn</span> <span class="ident">start_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_block</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Attempts to reserve a slot for sending a message.
+    </span><span class="kw">fn </span>start_send(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="self">self</span>.tail.index.load(Ordering::Acquire);
+        <span class="kw">let </span><span class="kw-2">mut </span>block = <span class="self">self</span>.tail.block.load(Ordering::Acquire);
+        <span class="kw">let </span><span class="kw-2">mut </span>next_block = <span class="prelude-val">None</span>;
 
-        <span class="kw">loop</span> {
-            <span class="comment">// Check if the channel is disconnected.</span>
-            <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="ident">MARK_BIT</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">block</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
-                <span class="kw">return</span> <span class="bool-val">true</span>;
+        <span class="kw">loop </span>{
+            <span class="comment">// Check if the channel is disconnected.
+            </span><span class="kw">if </span>tail &amp; MARK_BIT != <span class="number">0 </span>{
+                token.list.block = ptr::null();
+                <span class="kw">return </span><span class="bool-val">true</span>;
             }
 
-            <span class="comment">// Calculate the offset of the index into the block.</span>
-            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>;
+            <span class="comment">// Calculate the offset of the index into the block.
+            </span><span class="kw">let </span>offset = (tail &gt;&gt; SHIFT) % LAP;
 
-            <span class="comment">// If we reached the end of the block, wait until the next one is installed.</span>
-            <span class="kw">if</span> <span class="ident">offset</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
-                <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+            <span class="comment">// If we reached the end of the block, wait until the next one is installed.
+            </span><span class="kw">if </span>offset == BLOCK_CAP {
+                backoff.snooze();
+                tail = <span class="self">self</span>.tail.index.load(Ordering::Acquire);
+                block = <span class="self">self</span>.tail.block.load(Ordering::Acquire);
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// If we&#39;re going to have to install the next block, allocate it in advance in order to</span>
-            <span class="comment">// make the wait for other threads as short as possible.</span>
-            <span class="kw">if</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> <span class="op">&amp;&amp;</span> <span class="ident">next_block</span>.<span class="ident">is_none</span>() {
-                <span class="ident">next_block</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">Block</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new</span>()));
+            <span class="comment">// If we&#39;re going to have to install the next block, allocate it in advance in order to
+            // make the wait for other threads as short as possible.
+            </span><span class="kw">if </span>offset + <span class="number">1 </span>== BLOCK_CAP &amp;&amp; next_block.is_none() {
+                next_block = <span class="prelude-val">Some</span>(Box::new(Block::&lt;T&gt;::new()));
             }
 
-            <span class="comment">// If this is the first message to be sent into the channel, we need to allocate the</span>
-            <span class="comment">// first block and install it.</span>
-            <span class="kw">if</span> <span class="ident">block</span>.<span class="ident">is_null</span>() {
-                <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">Box::new</span>(<span class="ident">Block</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new</span>()));
+            <span class="comment">// If this is the first message to be sent into the channel, we need to allocate the
+            // first block and install it.
+            </span><span class="kw">if </span>block.is_null() {
+                <span class="kw">let </span>new = Box::into_raw(Box::new(Block::&lt;T&gt;::new()));
 
-                <span class="kw">if</span> <span class="self">self</span>
-                    .<span class="ident">tail</span>
-                    .<span class="ident">block</span>
-                    .<span class="ident">compare_exchange</span>(<span class="ident">block</span>, <span class="ident">new</span>, <span class="ident">Ordering::Release</span>, <span class="ident">Ordering::Relaxed</span>)
-                    .<span class="ident">is_ok</span>()
+                <span class="kw">if </span><span class="self">self
+                    </span>.tail
+                    .block
+                    .compare_exchange(block, new, Ordering::Release, Ordering::Relaxed)
+                    .is_ok()
                 {
-                    <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">store</span>(<span class="ident">new</span>, <span class="ident">Ordering::Release</span>);
-                    <span class="ident">block</span> <span class="op">=</span> <span class="ident">new</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">next_block</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="prelude-val">Some</span>(<span class="ident">Box::from_raw</span>(<span class="ident">new</span>)) };
-                    <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                    <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+                    <span class="self">self</span>.head.block.store(new, Ordering::Release);
+                    block = new;
+                } <span class="kw">else </span>{
+                    next_block = <span class="kw">unsafe </span>{ <span class="prelude-val">Some</span>(Box::from_raw(new)) };
+                    tail = <span class="self">self</span>.tail.index.load(Ordering::Acquire);
+                    block = <span class="self">self</span>.tail.block.load(Ordering::Acquire);
                     <span class="kw">continue</span>;
                 }
             }
 
-            <span class="kw">let</span> <span class="ident">new_tail</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">+</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+            <span class="kw">let </span>new_tail = tail + (<span class="number">1 </span>&lt;&lt; SHIFT);
 
-            <span class="comment">// Try advancing the tail forward.</span>
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">compare_exchange_weak</span>(
-                <span class="ident">tail</span>,
-                <span class="ident">new_tail</span>,
-                <span class="ident">Ordering::SeqCst</span>,
-                <span class="ident">Ordering::Acquire</span>,
+            <span class="comment">// Try advancing the tail forward.
+            </span><span class="kw">match </span><span class="self">self</span>.tail.index.compare_exchange_weak(
+                tail,
+                new_tail,
+                Ordering::SeqCst,
+                Ordering::Acquire,
             ) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">unsafe</span> {
-                    <span class="comment">// If we&#39;ve reached the end of the block, install the next one.</span>
-                    <span class="kw">if</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                        <span class="kw">let</span> <span class="ident">next_block</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">next_block</span>.<span class="ident">unwrap</span>());
-                        <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">block</span>.<span class="ident">store</span>(<span class="ident">next_block</span>, <span class="ident">Ordering::Release</span>);
-                        <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">fetch_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>, <span class="ident">Ordering::Release</span>);
-                        (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">next</span>.<span class="ident">store</span>(<span class="ident">next_block</span>, <span class="ident">Ordering::Release</span>);
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">unsafe </span>{
+                    <span class="comment">// If we&#39;ve reached the end of the block, install the next one.
+                    </span><span class="kw">if </span>offset + <span class="number">1 </span>== BLOCK_CAP {
+                        <span class="kw">let </span>next_block = Box::into_raw(next_block.unwrap());
+                        <span class="self">self</span>.tail.block.store(next_block, Ordering::Release);
+                        <span class="self">self</span>.tail.index.fetch_add(<span class="number">1 </span>&lt;&lt; SHIFT, Ordering::Release);
+                        (<span class="kw-2">*</span>block).next.store(next_block, Ordering::Release);
                     }
 
-                    <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">block</span> <span class="op">=</span> <span class="ident">block</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>;
-                    <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset</span>;
-                    <span class="kw">return</span> <span class="bool-val">true</span>;
+                    token.list.block = block <span class="kw">as </span><span class="kw-2">*const </span>u8;
+                    token.list.offset = offset;
+                    <span class="kw">return </span><span class="bool-val">true</span>;
                 },
-                <span class="prelude-val">Err</span>(<span class="ident">t</span>) =&gt; {
-                    <span class="ident">tail</span> <span class="op">=</span> <span class="ident">t</span>;
-                    <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                    <span class="ident">backoff</span>.<span class="ident">spin</span>();
+                <span class="prelude-val">Err</span>(t) =&gt; {
+                    tail = t;
+                    block = <span class="self">self</span>.tail.block.load(Ordering::Acquire);
+                    backoff.spin();
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Writes a message into the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>, <span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="comment">// If there is no slot, the channel is disconnected.</span>
-        <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">block</span>.<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
+    <span class="doccomment">/// Writes a message into the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>write(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token, msg: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), T&gt; {
+        <span class="comment">// If there is no slot, the channel is disconnected.
+        </span><span class="kw">if </span>token.list.block.is_null() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(msg);
         }
 
-        <span class="comment">// Write the message into the slot.</span>
-        <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">block</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">offset</span>;
-        <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">offset</span>);
-        <span class="ident">slot</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">write</span>(<span class="ident">MaybeUninit::new</span>(<span class="ident">msg</span>));
-        <span class="ident">slot</span>.<span class="ident">state</span>.<span class="ident">fetch_or</span>(<span class="ident">WRITE</span>, <span class="ident">Ordering::Release</span>);
+        <span class="comment">// Write the message into the slot.
+        </span><span class="kw">let </span>block = token.list.block.cast::&lt;Block&lt;T&gt;&gt;();
+        <span class="kw">let </span>offset = token.list.offset;
+        <span class="kw">let </span>slot = (<span class="kw-2">*</span>block).slots.get_unchecked(offset);
+        slot.msg.get().write(MaybeUninit::new(msg));
+        slot.state.fetch_or(WRITE, Ordering::Release);
 
-        <span class="comment">// Wake a sleeping receiver.</span>
-        <span class="self">self</span>.<span class="ident">receivers</span>.<span class="ident">notify</span>();
+        <span class="comment">// Wake a sleeping receiver.
+        </span><span class="self">self</span>.receivers.notify();
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Attempts to reserve a slot for receiving a message.</span>
-    <span class="kw">fn</span> <span class="ident">start_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+    <span class="doccomment">/// Attempts to reserve a slot for receiving a message.
+    </span><span class="kw">fn </span>start_recv(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>head = <span class="self">self</span>.head.index.load(Ordering::Acquire);
+        <span class="kw">let </span><span class="kw-2">mut </span>block = <span class="self">self</span>.head.block.load(Ordering::Acquire);
 
-        <span class="kw">loop</span> {
-            <span class="comment">// Calculate the offset of the index into the block.</span>
-            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>;
+        <span class="kw">loop </span>{
+            <span class="comment">// Calculate the offset of the index into the block.
+            </span><span class="kw">let </span>offset = (head &gt;&gt; SHIFT) % LAP;
 
-            <span class="comment">// If we reached the end of the block, wait until the next one is installed.</span>
-            <span class="kw">if</span> <span class="ident">offset</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
-                <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+            <span class="comment">// If we reached the end of the block, wait until the next one is installed.
+            </span><span class="kw">if </span>offset == BLOCK_CAP {
+                backoff.snooze();
+                head = <span class="self">self</span>.head.index.load(Ordering::Acquire);
+                block = <span class="self">self</span>.head.block.load(Ordering::Acquire);
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_head</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">+</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>new_head = head + (<span class="number">1 </span>&lt;&lt; SHIFT);
 
-            <span class="kw">if</span> <span class="ident">new_head</span> <span class="op">&amp;</span> <span class="ident">MARK_BIT</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="ident">atomic::fence</span>(<span class="ident">Ordering::SeqCst</span>);
-                <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+            <span class="kw">if </span>new_head &amp; MARK_BIT == <span class="number">0 </span>{
+                atomic::fence(Ordering::SeqCst);
+                <span class="kw">let </span>tail = <span class="self">self</span>.tail.index.load(Ordering::Relaxed);
 
-                <span class="comment">// If the tail equals the head, that means the channel is empty.</span>
-                <span class="kw">if</span> <span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> <span class="op">==</span> <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> {
-                    <span class="comment">// If the channel is disconnected...</span>
-                    <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="ident">MARK_BIT</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                        <span class="comment">// ...then receive an error.</span>
-                        <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">block</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
-                        <span class="kw">return</span> <span class="bool-val">true</span>;
-                    } <span class="kw">else</span> {
-                        <span class="comment">// Otherwise, the receive operation is not ready.</span>
-                        <span class="kw">return</span> <span class="bool-val">false</span>;
+                <span class="comment">// If the tail equals the head, that means the channel is empty.
+                </span><span class="kw">if </span>head &gt;&gt; SHIFT == tail &gt;&gt; SHIFT {
+                    <span class="comment">// If the channel is disconnected...
+                    </span><span class="kw">if </span>tail &amp; MARK_BIT != <span class="number">0 </span>{
+                        <span class="comment">// ...then receive an error.
+                        </span>token.list.block = ptr::null();
+                        <span class="kw">return </span><span class="bool-val">true</span>;
+                    } <span class="kw">else </span>{
+                        <span class="comment">// Otherwise, the receive operation is not ready.
+                        </span><span class="kw">return </span><span class="bool-val">false</span>;
                     }
                 }
 
-                <span class="comment">// If head and tail are not in the same block, set `MARK_BIT` in head.</span>
-                <span class="kw">if</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">/</span> <span class="ident">LAP</span> <span class="op">!</span><span class="op">=</span> (<span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">/</span> <span class="ident">LAP</span> {
-                    <span class="ident">new_head</span> <span class="op">|</span><span class="op">=</span> <span class="ident">MARK_BIT</span>;
+                <span class="comment">// If head and tail are not in the same block, set `MARK_BIT` in head.
+                </span><span class="kw">if </span>(head &gt;&gt; SHIFT) / LAP != (tail &gt;&gt; SHIFT) / LAP {
+                    new_head |= MARK_BIT;
                 }
             }
 
-            <span class="comment">// The block can be null here only if the first message is being sent into the channel.</span>
-            <span class="comment">// In that case, just wait until it gets initialized.</span>
-            <span class="kw">if</span> <span class="ident">block</span>.<span class="ident">is_null</span>() {
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
-                <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+            <span class="comment">// The block can be null here only if the first message is being sent into the channel.
+            // In that case, just wait until it gets initialized.
+            </span><span class="kw">if </span>block.is_null() {
+                backoff.snooze();
+                head = <span class="self">self</span>.head.index.load(Ordering::Acquire);
+                block = <span class="self">self</span>.head.block.load(Ordering::Acquire);
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// Try moving the head index forward.</span>
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">compare_exchange_weak</span>(
-                <span class="ident">head</span>,
-                <span class="ident">new_head</span>,
-                <span class="ident">Ordering::SeqCst</span>,
-                <span class="ident">Ordering::Acquire</span>,
+            <span class="comment">// Try moving the head index forward.
+            </span><span class="kw">match </span><span class="self">self</span>.head.index.compare_exchange_weak(
+                head,
+                new_head,
+                Ordering::SeqCst,
+                Ordering::Acquire,
             ) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">unsafe</span> {
-                    <span class="comment">// If we&#39;ve reached the end of the block, move to the next one.</span>
-                    <span class="kw">if</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                        <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">wait_next</span>();
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_index</span> <span class="op">=</span> (<span class="ident">new_head</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">MARK_BIT</span>).<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
-                        <span class="kw">if</span> <span class="op">!</span>(<span class="kw-2">*</span><span class="ident">next</span>).<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>).<span class="ident">is_null</span>() {
-                            <span class="ident">next_index</span> <span class="op">|</span><span class="op">=</span> <span class="ident">MARK_BIT</span>;
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">unsafe </span>{
+                    <span class="comment">// If we&#39;ve reached the end of the block, move to the next one.
+                    </span><span class="kw">if </span>offset + <span class="number">1 </span>== BLOCK_CAP {
+                        <span class="kw">let </span>next = (<span class="kw-2">*</span>block).wait_next();
+                        <span class="kw">let </span><span class="kw-2">mut </span>next_index = (new_head &amp; !MARK_BIT).wrapping_add(<span class="number">1 </span>&lt;&lt; SHIFT);
+                        <span class="kw">if </span>!(<span class="kw-2">*</span>next).next.load(Ordering::Relaxed).is_null() {
+                            next_index |= MARK_BIT;
                         }
 
-                        <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">store</span>(<span class="ident">next</span>, <span class="ident">Ordering::Release</span>);
-                        <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">store</span>(<span class="ident">next_index</span>, <span class="ident">Ordering::Release</span>);
+                        <span class="self">self</span>.head.block.store(next, Ordering::Release);
+                        <span class="self">self</span>.head.index.store(next_index, Ordering::Release);
                     }
 
-                    <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">block</span> <span class="op">=</span> <span class="ident">block</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>;
-                    <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset</span>;
-                    <span class="kw">return</span> <span class="bool-val">true</span>;
+                    token.list.block = block <span class="kw">as </span><span class="kw-2">*const </span>u8;
+                    token.list.offset = offset;
+                    <span class="kw">return </span><span class="bool-val">true</span>;
                 },
-                <span class="prelude-val">Err</span>(<span class="ident">h</span>) =&gt; {
-                    <span class="ident">head</span> <span class="op">=</span> <span class="ident">h</span>;
-                    <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                    <span class="ident">backoff</span>.<span class="ident">spin</span>();
+                <span class="prelude-val">Err</span>(h) =&gt; {
+                    head = h;
+                    block = <span class="self">self</span>.head.block.load(Ordering::Acquire);
+                    backoff.spin();
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Reads a message from the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, ()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">block</span>.<span class="ident">is_null</span>() {
-            <span class="comment">// The channel is disconnected.</span>
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(());
+    <span class="doccomment">/// Reads a message from the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; <span class="prelude-ty">Result</span>&lt;T, ()&gt; {
+        <span class="kw">if </span>token.list.block.is_null() {
+            <span class="comment">// The channel is disconnected.
+            </span><span class="kw">return </span><span class="prelude-val">Err</span>(());
         }
 
-        <span class="comment">// Read the message.</span>
-        <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">block</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">list</span>.<span class="ident">offset</span>;
-        <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">offset</span>);
-        <span class="ident">slot</span>.<span class="ident">wait_write</span>();
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">read</span>().<span class="ident">assume_init</span>();
+        <span class="comment">// Read the message.
+        </span><span class="kw">let </span>block = token.list.block <span class="kw">as </span><span class="kw-2">*mut </span>Block&lt;T&gt;;
+        <span class="kw">let </span>offset = token.list.offset;
+        <span class="kw">let </span>slot = (<span class="kw-2">*</span>block).slots.get_unchecked(offset);
+        slot.wait_write();
+        <span class="kw">let </span>msg = slot.msg.get().read().assume_init();
 
-        <span class="comment">// Destroy the block if we&#39;ve reached the end, or if another thread wanted to destroy but</span>
-        <span class="comment">// couldn&#39;t because we were busy reading from the slot.</span>
-        <span class="kw">if</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-            <span class="ident">Block::destroy</span>(<span class="ident">block</span>, <span class="number">0</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">slot</span>.<span class="ident">state</span>.<span class="ident">fetch_or</span>(<span class="ident">READ</span>, <span class="ident">Ordering::AcqRel</span>) <span class="op">&amp;</span> <span class="ident">DESTROY</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">Block::destroy</span>(<span class="ident">block</span>, <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>);
+        <span class="comment">// Destroy the block if we&#39;ve reached the end, or if another thread wanted to destroy but
+        // couldn&#39;t because we were busy reading from the slot.
+        </span><span class="kw">if </span>offset + <span class="number">1 </span>== BLOCK_CAP {
+            Block::destroy(block, <span class="number">0</span>);
+        } <span class="kw">else if </span>slot.state.fetch_or(READ, Ordering::AcqRel) &amp; DESTROY != <span class="number">0 </span>{
+            Block::destroy(block, offset + <span class="number">1</span>);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">msg</span>)
+        <span class="prelude-val">Ok</span>(msg)
     }
 
-    <span class="doccomment">/// Attempts to send a message into the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">msg</span>, <span class="prelude-val">None</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">SendTimeoutError::Disconnected</span>(<span class="ident">msg</span>) =&gt; <span class="ident">TrySendError::Disconnected</span>(<span class="ident">msg</span>),
-            <span class="ident">SendTimeoutError::Timeout</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+    <span class="doccomment">/// Attempts to send a message into the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_send(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), TrySendError&lt;T&gt;&gt; {
+        <span class="self">self</span>.send(msg, <span class="prelude-val">None</span>).map_err(|err| <span class="kw">match </span>err {
+            SendTimeoutError::Disconnected(msg) =&gt; TrySendError::Disconnected(msg),
+            SendTimeoutError::Timeout(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         })
     }
 
-    <span class="doccomment">/// Sends a message into the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send</span>(
+    <span class="doccomment">/// Sends a message into the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>send(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">msg</span>: <span class="ident">T</span>,
-        <span class="ident">_deadline</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SendTimeoutError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Token::default</span>();
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">start_send</span>(<span class="ident">token</span>));
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">token</span>, <span class="ident">msg</span>)
-                .<span class="ident">map_err</span>(<span class="ident">SendTimeoutError::Disconnected</span>)
+        msg: T,
+        _deadline: <span class="prelude-ty">Option</span>&lt;Instant&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), SendTimeoutError&lt;T&gt;&gt; {
+        <span class="kw">let </span>token = <span class="kw-2">&amp;mut </span>Token::default();
+        <span class="macro">assert!</span>(<span class="self">self</span>.start_send(token));
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.write(token, msg)
+                .map_err(SendTimeoutError::Disconnected)
         }
     }
 
-    <span class="doccomment">/// Attempts to receive a message without blocking.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TryRecvError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Token::default</span>();
+    <span class="doccomment">/// Attempts to receive a message without blocking.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_recv(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, TryRecvError&gt; {
+        <span class="kw">let </span>token = <span class="kw-2">&amp;mut </span>Token::default();
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start_recv</span>(<span class="ident">token</span>) {
-            <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read</span>(<span class="ident">token</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">TryRecvError::Disconnected</span>) }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Empty</span>)
+        <span class="kw">if </span><span class="self">self</span>.start_recv(token) {
+            <span class="kw">unsafe </span>{ <span class="self">self</span>.read(token).map_err(|<span class="kw">_</span>| TryRecvError::Disconnected) }
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(TryRecvError::Empty)
         }
     }
 
-    <span class="doccomment">/// Receives a message from the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">deadline</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RecvTimeoutError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Token::default</span>();
-        <span class="kw">loop</span> {
-            <span class="comment">// Try receiving a message several times.</span>
-            <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-            <span class="kw">loop</span> {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start_recv</span>(<span class="ident">token</span>) {
-                    <span class="kw">unsafe</span> {
-                        <span class="kw">return</span> <span class="self">self</span>.<span class="ident">read</span>(<span class="ident">token</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RecvTimeoutError::Disconnected</span>);
+    <span class="doccomment">/// Receives a message from the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>recv(<span class="kw-2">&amp;</span><span class="self">self</span>, deadline: <span class="prelude-ty">Option</span>&lt;Instant&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, RecvTimeoutError&gt; {
+        <span class="kw">let </span>token = <span class="kw-2">&amp;mut </span>Token::default();
+        <span class="kw">loop </span>{
+            <span class="comment">// Try receiving a message several times.
+            </span><span class="kw">let </span>backoff = Backoff::new();
+            <span class="kw">loop </span>{
+                <span class="kw">if </span><span class="self">self</span>.start_recv(token) {
+                    <span class="kw">unsafe </span>{
+                        <span class="kw">return </span><span class="self">self</span>.read(token).map_err(|<span class="kw">_</span>| RecvTimeoutError::Disconnected);
                     }
                 }
 
-                <span class="kw">if</span> <span class="ident">backoff</span>.<span class="ident">is_completed</span>() {
+                <span class="kw">if </span>backoff.is_completed() {
                     <span class="kw">break</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+                } <span class="kw">else </span>{
+                    backoff.snooze();
                 }
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span> <span class="ident">deadline</span> {
-                <span class="kw">if</span> <span class="ident">Instant::now</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">d</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">RecvTimeoutError::Timeout</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(d) = deadline {
+                <span class="kw">if </span>Instant::now() &gt;= d {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(RecvTimeoutError::Timeout);
                 }
             }
 
-            <span class="comment">// Prepare for blocking until a sender wakes us up.</span>
-            <span class="ident">Context::with</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">oper</span> <span class="op">=</span> <span class="ident">Operation::hook</span>(<span class="ident">token</span>);
-                <span class="self">self</span>.<span class="ident">receivers</span>.<span class="ident">register</span>(<span class="ident">oper</span>, <span class="ident">cx</span>);
+            <span class="comment">// Prepare for blocking until a sender wakes us up.
+            </span>Context::with(|cx| {
+                <span class="kw">let </span>oper = Operation::hook(token);
+                <span class="self">self</span>.receivers.register(oper, cx);
 
-                <span class="comment">// Has the channel become ready just now?</span>
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_disconnected</span>() {
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">try_select</span>(<span class="ident">Selected::Aborted</span>);
+                <span class="comment">// Has the channel become ready just now?
+                </span><span class="kw">if </span>!<span class="self">self</span>.is_empty() || <span class="self">self</span>.is_disconnected() {
+                    <span class="kw">let _ </span>= cx.try_select(Selected::Aborted);
                 }
 
-                <span class="comment">// Block the current thread.</span>
-                <span class="kw">let</span> <span class="ident">sel</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">wait_until</span>(<span class="ident">deadline</span>);
+                <span class="comment">// Block the current thread.
+                </span><span class="kw">let </span>sel = cx.wait_until(deadline);
 
-                <span class="kw">match</span> <span class="ident">sel</span> {
-                    <span class="ident">Selected::Waiting</span> =&gt; <span class="macro">unreachable!</span>(),
-                    <span class="ident">Selected::Aborted</span> <span class="op">|</span> <span class="ident">Selected::Disconnected</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">receivers</span>.<span class="ident">unregister</span>(<span class="ident">oper</span>).<span class="ident">unwrap</span>();
-                        <span class="comment">// If the channel was disconnected, we still have to check for remaining</span>
-                        <span class="comment">// messages.</span>
-                    }
-                    <span class="ident">Selected::Operation</span>(<span class="kw">_</span>) =&gt; {}
+                <span class="kw">match </span>sel {
+                    Selected::Waiting =&gt; <span class="macro">unreachable!</span>(),
+                    Selected::Aborted | Selected::Disconnected =&gt; {
+                        <span class="self">self</span>.receivers.unregister(oper).unwrap();
+                        <span class="comment">// If the channel was disconnected, we still have to check for remaining
+                        // messages.
+                    </span>}
+                    Selected::Operation(<span class="kw">_</span>) =&gt; {}
                 }
             });
         }
     }
 
-    <span class="doccomment">/// Returns the current number of messages inside the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">loop</span> {
-            <span class="comment">// Load the tail index, then load the head index.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
+    <span class="doccomment">/// Returns the current number of messages inside the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">loop </span>{
+            <span class="comment">// Load the tail index, then load the head index.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="self">self</span>.tail.index.load(Ordering::SeqCst);
+            <span class="kw">let </span><span class="kw-2">mut </span>head = <span class="self">self</span>.head.index.load(Ordering::SeqCst);
 
-            <span class="comment">// If the tail index didn&#39;t change, we&#39;ve got consistent indices to work with.</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">==</span> <span class="ident">tail</span> {
-                <span class="comment">// Erase the lower bits.</span>
-                <span class="ident">tail</span> <span class="op">&amp;=</span> <span class="op">!</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>) <span class="op">-</span> <span class="number">1</span>);
-                <span class="ident">head</span> <span class="op">&amp;=</span> <span class="op">!</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>) <span class="op">-</span> <span class="number">1</span>);
+            <span class="comment">// If the tail index didn&#39;t change, we&#39;ve got consistent indices to work with.
+            </span><span class="kw">if </span><span class="self">self</span>.tail.index.load(Ordering::SeqCst) == tail {
+                <span class="comment">// Erase the lower bits.
+                </span>tail &amp;= !((<span class="number">1 </span>&lt;&lt; SHIFT) - <span class="number">1</span>);
+                head &amp;= !((<span class="number">1 </span>&lt;&lt; SHIFT) - <span class="number">1</span>);
 
-                <span class="comment">// Fix up indices if they fall onto block ends.</span>
-                <span class="kw">if</span> (<span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">&amp;</span> (<span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">==</span> <span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span> {
-                    <span class="ident">tail</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                <span class="comment">// Fix up indices if they fall onto block ends.
+                </span><span class="kw">if </span>(tail &gt;&gt; SHIFT) &amp; (LAP - <span class="number">1</span>) == LAP - <span class="number">1 </span>{
+                    tail = tail.wrapping_add(<span class="number">1 </span>&lt;&lt; SHIFT);
                 }
-                <span class="kw">if</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">&amp;</span> (<span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">==</span> <span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span> {
-                    <span class="ident">head</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                <span class="kw">if </span>(head &gt;&gt; SHIFT) &amp; (LAP - <span class="number">1</span>) == LAP - <span class="number">1 </span>{
+                    head = head.wrapping_add(<span class="number">1 </span>&lt;&lt; SHIFT);
                 }
 
-                <span class="comment">// Rotate indices so that head falls into the first block.</span>
-                <span class="kw">let</span> <span class="ident">lap</span> <span class="op">=</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">/</span> <span class="ident">LAP</span>;
-                <span class="ident">tail</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">wrapping_sub</span>((<span class="ident">lap</span> <span class="op">*</span> <span class="ident">LAP</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
-                <span class="ident">head</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_sub</span>((<span class="ident">lap</span> <span class="op">*</span> <span class="ident">LAP</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                <span class="comment">// Rotate indices so that head falls into the first block.
+                </span><span class="kw">let </span>lap = (head &gt;&gt; SHIFT) / LAP;
+                tail = tail.wrapping_sub((lap * LAP) &lt;&lt; SHIFT);
+                head = head.wrapping_sub((lap * LAP) &lt;&lt; SHIFT);
 
-                <span class="comment">// Remove the lower bits.</span>
-                <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">SHIFT</span>;
-                <span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">SHIFT</span>;
+                <span class="comment">// Remove the lower bits.
+                </span>tail &gt;&gt;= SHIFT;
+                head &gt;&gt;= SHIFT;
 
-                <span class="comment">// Return the difference minus the number of blocks between tail and head.</span>
-                <span class="kw">return</span> <span class="ident">tail</span> <span class="op">-</span> <span class="ident">head</span> <span class="op">-</span> <span class="ident">tail</span> <span class="op">/</span> <span class="ident">LAP</span>;
+                <span class="comment">// Return the difference minus the number of blocks between tail and head.
+                </span><span class="kw">return </span>tail - head - tail / LAP;
             }
         }
     }
 
-    <span class="doccomment">/// Returns the capacity of the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+    <span class="doccomment">/// Returns the capacity of the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>capacity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="doccomment">/// Disconnects senders and wakes up all blocked receivers.
+    ///
+    /// Returns `true` if this call disconnected the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>disconnect_senders(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>tail = <span class="self">self</span>.tail.index.fetch_or(MARK_BIT, Ordering::SeqCst);
+
+        <span class="kw">if </span>tail &amp; MARK_BIT == <span class="number">0 </span>{
+            <span class="self">self</span>.receivers.disconnect();
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 
-    <span class="doccomment">/// Disconnects senders and wakes up all blocked receivers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `true` if this call disconnected the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">disconnect_senders</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">fetch_or</span>(<span class="ident">MARK_BIT</span>, <span class="ident">Ordering::SeqCst</span>);
+    <span class="doccomment">/// Disconnects receivers.
+    ///
+    /// Returns `true` if this call disconnected the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>disconnect_receivers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>tail = <span class="self">self</span>.tail.index.fetch_or(MARK_BIT, Ordering::SeqCst);
 
-        <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="ident">MARK_BIT</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">receivers</span>.<span class="ident">disconnect</span>();
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+        <span class="kw">if </span>tail &amp; MARK_BIT == <span class="number">0 </span>{
+            <span class="comment">// If receivers are dropped first, discard all messages to free
+            // memory eagerly.
+            </span><span class="self">self</span>.discard_all_messages();
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 
-    <span class="doccomment">/// Disconnects receivers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `true` if this call disconnected the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">disconnect_receivers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">fetch_or</span>(<span class="ident">MARK_BIT</span>, <span class="ident">Ordering::SeqCst</span>);
-
-        <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="ident">MARK_BIT</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// If receivers are dropped first, discard all messages to free</span>
-            <span class="comment">// memory eagerly.</span>
-            <span class="self">self</span>.<span class="ident">discard_all_messages</span>();
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
-    }
-
-    <span class="doccomment">/// Discards all messages.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method should only be called when all receivers are dropped.</span>
-    <span class="kw">fn</span> <span class="ident">discard_all_messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>;
-            <span class="kw">if</span> <span class="ident">offset</span> <span class="op">!</span><span class="op">=</span> <span class="ident">BLOCK_CAP</span> {
+    <span class="doccomment">/// Discards all messages.
+    ///
+    /// This method should only be called when all receivers are dropped.
+    </span><span class="kw">fn </span>discard_all_messages(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="self">self</span>.tail.index.load(Ordering::Acquire);
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>offset = (tail &gt;&gt; SHIFT) % LAP;
+            <span class="kw">if </span>offset != BLOCK_CAP {
                 <span class="kw">break</span>;
             }
 
-            <span class="comment">// New updates to tail will be rejected by MARK_BIT and aborted unless it&#39;s</span>
-            <span class="comment">// at boundary. We need to wait for the updates take affect otherwise there</span>
-            <span class="comment">// can be memory leaks.</span>
-            <span class="ident">backoff</span>.<span class="ident">snooze</span>();
-            <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+            <span class="comment">// New updates to tail will be rejected by MARK_BIT and aborted unless it&#39;s
+            // at boundary. We need to wait for the updates take affect otherwise there
+            // can be memory leaks.
+            </span>backoff.snooze();
+            tail = <span class="self">self</span>.tail.index.load(Ordering::Acquire);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>head = <span class="self">self</span>.head.index.load(Ordering::Acquire);
+        <span class="kw">let </span><span class="kw-2">mut </span>block = <span class="self">self</span>.head.block.load(Ordering::Acquire);
 
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Drop all messages between head and tail and deallocate the heap-allocated blocks.</span>
-            <span class="kw">while</span> <span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> <span class="op">!</span><span class="op">=</span> <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> {
-                <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>;
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Drop all messages between head and tail and deallocate the heap-allocated blocks.
+            </span><span class="kw">while </span>head &gt;&gt; SHIFT != tail &gt;&gt; SHIFT {
+                <span class="kw">let </span>offset = (head &gt;&gt; SHIFT) % LAP;
 
-                <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="ident">BLOCK_CAP</span> {
-                    <span class="comment">// Drop the message in the slot.</span>
-                    <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">offset</span>);
-                    <span class="ident">slot</span>.<span class="ident">wait_write</span>();
-                    <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">slot</span>.<span class="ident">msg</span>.<span class="ident">get</span>();
-                    <span class="ident">p</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">drop_in_place</span>();
-                } <span class="kw">else</span> {
-                    (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">wait_next</span>();
-                    <span class="comment">// Deallocate the block and move to the next one.</span>
-                    <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                    <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">block</span>));
-                    <span class="ident">block</span> <span class="op">=</span> <span class="ident">next</span>;
+                <span class="kw">if </span>offset &lt; BLOCK_CAP {
+                    <span class="comment">// Drop the message in the slot.
+                    </span><span class="kw">let </span>slot = (<span class="kw-2">*</span>block).slots.get_unchecked(offset);
+                    slot.wait_write();
+                    <span class="kw">let </span>p = <span class="kw-2">&amp;mut *</span>slot.msg.get();
+                    p.as_mut_ptr().drop_in_place();
+                } <span class="kw">else </span>{
+                    (<span class="kw-2">*</span>block).wait_next();
+                    <span class="comment">// Deallocate the block and move to the next one.
+                    </span><span class="kw">let </span>next = (<span class="kw-2">*</span>block).next.load(Ordering::Acquire);
+                    drop(Box::from_raw(block));
+                    block = next;
                 }
 
-                <span class="ident">head</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                head = head.wrapping_add(<span class="number">1 </span>&lt;&lt; SHIFT);
             }
 
-            <span class="comment">// Deallocate the last remaining block.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">block</span>.<span class="ident">is_null</span>() {
-                <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">block</span>));
+            <span class="comment">// Deallocate the last remaining block.
+            </span><span class="kw">if </span>!block.is_null() {
+                drop(Box::from_raw(block));
             }
         }
-        <span class="ident">head</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">MARK_BIT</span>;
-        <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">store</span>(<span class="ident">ptr::null_mut</span>(), <span class="ident">Ordering::Release</span>);
-        <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">store</span>(<span class="ident">head</span>, <span class="ident">Ordering::Release</span>);
+        head &amp;= !MARK_BIT;
+        <span class="self">self</span>.head.block.store(ptr::null_mut(), Ordering::Release);
+        <span class="self">self</span>.head.index.store(head, Ordering::Release);
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is disconnected.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_disconnected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">&amp;</span> <span class="ident">MARK_BIT</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+    <span class="doccomment">/// Returns `true` if the channel is disconnected.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_disconnected(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tail.index.load(Ordering::SeqCst) &amp; MARK_BIT != <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns `true` if the channel is empty.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>head = <span class="self">self</span>.head.index.load(Ordering::SeqCst);
+        <span class="kw">let </span>tail = <span class="self">self</span>.tail.index.load(Ordering::SeqCst);
+        head &gt;&gt; SHIFT == tail &gt;&gt; SHIFT
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is empty.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        <span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> <span class="op">==</span> <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>
-    }
-
-    <span class="doccomment">/// Returns `true` if the channel is full.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="doccomment">/// Returns `true` if the channel is full.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_full(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">get_mut</span>();
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>Channel&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>head = <span class="kw-2">*</span><span class="self">self</span>.head.index.get_mut();
+        <span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="kw-2">*</span><span class="self">self</span>.tail.index.get_mut();
+        <span class="kw">let </span><span class="kw-2">mut </span>block = <span class="kw-2">*</span><span class="self">self</span>.head.block.get_mut();
 
-        <span class="comment">// Erase the lower bits.</span>
-        <span class="ident">head</span> <span class="op">&amp;=</span> <span class="op">!</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>) <span class="op">-</span> <span class="number">1</span>);
-        <span class="ident">tail</span> <span class="op">&amp;=</span> <span class="op">!</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>) <span class="op">-</span> <span class="number">1</span>);
+        <span class="comment">// Erase the lower bits.
+        </span>head &amp;= !((<span class="number">1 </span>&lt;&lt; SHIFT) - <span class="number">1</span>);
+        tail &amp;= !((<span class="number">1 </span>&lt;&lt; SHIFT) - <span class="number">1</span>);
 
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Drop all messages between head and tail and deallocate the heap-allocated blocks.</span>
-            <span class="kw">while</span> <span class="ident">head</span> <span class="op">!</span><span class="op">=</span> <span class="ident">tail</span> {
-                <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>;
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Drop all messages between head and tail and deallocate the heap-allocated blocks.
+            </span><span class="kw">while </span>head != tail {
+                <span class="kw">let </span>offset = (head &gt;&gt; SHIFT) % LAP;
 
-                <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="ident">BLOCK_CAP</span> {
-                    <span class="comment">// Drop the message in the slot.</span>
-                    <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">offset</span>);
-                    <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">slot</span>.<span class="ident">msg</span>.<span class="ident">get</span>();
-                    <span class="ident">p</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">drop_in_place</span>();
-                } <span class="kw">else</span> {
-                    <span class="comment">// Deallocate the block and move to the next one.</span>
-                    <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">next</span>.<span class="ident">get_mut</span>();
-                    <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">block</span>));
-                    <span class="ident">block</span> <span class="op">=</span> <span class="ident">next</span>;
+                <span class="kw">if </span>offset &lt; BLOCK_CAP {
+                    <span class="comment">// Drop the message in the slot.
+                    </span><span class="kw">let </span>slot = (<span class="kw-2">*</span>block).slots.get_unchecked(offset);
+                    <span class="kw">let </span>p = <span class="kw-2">&amp;mut *</span>slot.msg.get();
+                    p.as_mut_ptr().drop_in_place();
+                } <span class="kw">else </span>{
+                    <span class="comment">// Deallocate the block and move to the next one.
+                    </span><span class="kw">let </span>next = <span class="kw-2">*</span>(<span class="kw-2">*</span>block).next.get_mut();
+                    drop(Box::from_raw(block));
+                    block = next;
                 }
 
-                <span class="ident">head</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                head = head.wrapping_add(<span class="number">1 </span>&lt;&lt; SHIFT);
             }
 
-            <span class="comment">// Deallocate the last remaining block.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">block</span>.<span class="ident">is_null</span>() {
-                <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">block</span>));
+            <span class="comment">// Deallocate the last remaining block.
+            </span><span class="kw">if </span>!block.is_null() {
+                drop(Box::from_raw(block));
             }
         }
     }
 }
 
-<span class="doccomment">/// Receiver handle to a channel.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Receiver handle to a channel.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Receiver&lt;<span class="lifetime">&#39;a</span>, T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Channel&lt;T&gt;);
 
-<span class="doccomment">/// Sender handle to a channel.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Sender handle to a channel.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Sender&lt;<span class="lifetime">&#39;a</span>, T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Channel&lt;T&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SelectHandle</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">try_select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">start_recv</span>(<span class="ident">token</span>)
+<span class="kw">impl</span>&lt;T&gt; SelectHandle <span class="kw">for </span>Receiver&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+    <span class="kw">fn </span>try_select(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.start_recv(token)
     }
 
-    <span class="kw">fn</span> <span class="ident">deadline</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+    <span class="kw">fn </span>deadline(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Instant&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="kw">fn </span>register(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.receivers.register(oper, cx);
+        <span class="self">self</span>.is_ready()
     }
 
-    <span class="kw">fn</span> <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">receivers</span>.<span class="ident">register</span>(<span class="ident">oper</span>, <span class="ident">cx</span>);
-        <span class="self">self</span>.<span class="ident">is_ready</span>()
+    <span class="kw">fn </span>unregister(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation) {
+        <span class="self">self</span>.<span class="number">0</span>.receivers.unregister(oper);
     }
 
-    <span class="kw">fn</span> <span class="ident">unregister</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">receivers</span>.<span class="ident">unregister</span>(<span class="ident">oper</span>);
+    <span class="kw">fn </span>accept(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token, _cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.try_select(token)
     }
 
-    <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">try_select</span>(<span class="ident">token</span>)
+    <span class="kw">fn </span>is_ready(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.<span class="number">0</span>.is_empty() || <span class="self">self</span>.<span class="number">0</span>.is_disconnected()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_disconnected</span>()
+    <span class="kw">fn </span>watch(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.receivers.watch(oper, cx);
+        <span class="self">self</span>.is_ready()
     }
 
-    <span class="kw">fn</span> <span class="ident">watch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">receivers</span>.<span class="ident">watch</span>(<span class="ident">oper</span>, <span class="ident">cx</span>);
-        <span class="self">self</span>.<span class="ident">is_ready</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">unwatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">receivers</span>.<span class="ident">unwatch</span>(<span class="ident">oper</span>);
+    <span class="kw">fn </span>unwatch(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation) {
+        <span class="self">self</span>.<span class="number">0</span>.receivers.unwatch(oper);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SelectHandle</span> <span class="kw">for</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">try_select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">start_send</span>(<span class="ident">token</span>)
+<span class="kw">impl</span>&lt;T&gt; SelectHandle <span class="kw">for </span>Sender&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+    <span class="kw">fn </span>try_select(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.start_send(token)
     }
 
-    <span class="kw">fn</span> <span class="ident">deadline</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+    <span class="kw">fn </span>deadline(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Instant&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="kw">fn </span>register(<span class="kw-2">&amp;</span><span class="self">self</span>, _oper: Operation, _cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.is_ready()
     }
 
-    <span class="kw">fn</span> <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_oper</span>: <span class="ident">Operation</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_ready</span>()
+    <span class="kw">fn </span>unregister(<span class="kw-2">&amp;</span><span class="self">self</span>, _oper: Operation) {}
+
+    <span class="kw">fn </span>accept(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token, _cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.try_select(token)
     }
 
-    <span class="kw">fn</span> <span class="ident">unregister</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_oper</span>: <span class="ident">Operation</span>) {}
+    <span class="kw">fn </span>is_ready(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">try_select</span>(<span class="ident">token</span>)
+    <span class="kw">fn </span>watch(<span class="kw-2">&amp;</span><span class="self">self</span>, _oper: Operation, _cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.is_ready()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">watch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_oper</span>: <span class="ident">Operation</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_ready</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">unwatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_oper</span>: <span class="ident">Operation</span>) {}
+    <span class="kw">fn </span>unwatch(<span class="kw-2">&amp;</span><span class="self">self</span>, _oper: Operation) {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="crossbeam_channel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="crossbeam_channel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

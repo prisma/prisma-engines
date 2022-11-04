@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-otlp-0.10.0/src/transform/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry_otlp/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-otlp-0.10.0/src/transform/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry_otlp/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -243,250 +243,250 @@
 <span id="243">243</span>
 <span id="244">244</span>
 <span id="245">245</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">opentelemetry::sdk::trace::EvictedHashMap</span>;
-<span class="kw">use</span> <span class="ident">opentelemetry</span>::{<span class="ident">Array</span>, <span class="ident">Value</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>opentelemetry::sdk::trace::EvictedHashMap;
+<span class="kw">use </span>opentelemetry::{Array, Value};
 
-<span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">SystemTime</span>, <span class="ident">UNIX_EPOCH</span>};
+<span class="kw">use </span>std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">tonic</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::common::v1</span>::{
-        <span class="ident">any_value</span>, <span class="ident">AnyValue</span>, <span class="ident">ArrayValue</span>, <span class="ident">InstrumentationLibrary</span>, <span class="ident">KeyValue</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>tonic {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::proto::common::v1::{
+        any_value, AnyValue, ArrayValue, InstrumentationLibrary, KeyValue,
     };
-    <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+    <span class="kw">use </span>std::borrow::Cow;
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">opentelemetry::sdk::InstrumentationLibrary</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InstrumentationLibrary</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">library</span>: <span class="ident">opentelemetry::sdk::InstrumentationLibrary</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">InstrumentationLibrary</span> {
-                <span class="ident">name</span>: <span class="ident">library</span>.<span class="ident">name</span>.<span class="ident">to_string</span>(),
-                <span class="ident">version</span>: <span class="ident">library</span>.<span class="ident">version</span>.<span class="ident">unwrap_or</span>(<span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>)).<span class="ident">to_string</span>(),
+    <span class="kw">impl </span>From&lt;opentelemetry::sdk::InstrumentationLibrary&gt; <span class="kw">for </span>InstrumentationLibrary {
+        <span class="kw">fn </span>from(library: opentelemetry::sdk::InstrumentationLibrary) -&gt; <span class="self">Self </span>{
+            InstrumentationLibrary {
+                name: library.name.to_string(),
+                version: library.version.unwrap_or(Cow::Borrowed(<span class="string">&quot;&quot;</span>)).to_string(),
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Attributes</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">::std::vec::Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::proto::common::v1::KeyValue</span><span class="op">&gt;</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Attributes(<span class="kw">pub</span>(<span class="kw">crate</span>) ::std::vec::Vec&lt;<span class="kw">crate</span>::proto::common::v1::KeyValue&gt;);
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EvictedHashMap</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Attributes</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">attributes</span>: <span class="ident">EvictedHashMap</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">Attributes</span>(
-                <span class="ident">attributes</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">value</span>)<span class="op">|</span> <span class="ident">KeyValue</span> {
-                        <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>(),
-                        <span class="ident">value</span>: <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">into</span>()),
+    <span class="kw">impl </span>From&lt;EvictedHashMap&gt; <span class="kw">for </span>Attributes {
+        <span class="kw">fn </span>from(attributes: EvictedHashMap) -&gt; <span class="self">Self </span>{
+            Attributes(
+                attributes
+                    .into_iter()
+                    .map(|(key, value)| KeyValue {
+                        key: key.as_str().to_string(),
+                        value: <span class="prelude-val">Some</span>(value.into()),
                     })
-                    .<span class="ident">collect</span>(),
+                    .collect(),
             )
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">opentelemetry::KeyValue</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Attributes</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">kvs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">opentelemetry::KeyValue</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">Attributes</span>(
-                <span class="ident">kvs</span>.<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">api_kv</span><span class="op">|</span> <span class="ident">KeyValue</span> {
-                        <span class="ident">key</span>: <span class="ident">api_kv</span>.<span class="ident">key</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>(),
-                        <span class="ident">value</span>: <span class="prelude-val">Some</span>(<span class="ident">api_kv</span>.<span class="ident">value</span>.<span class="ident">into</span>()),
+    <span class="kw">impl </span>From&lt;Vec&lt;opentelemetry::KeyValue&gt;&gt; <span class="kw">for </span>Attributes {
+        <span class="kw">fn </span>from(kvs: Vec&lt;opentelemetry::KeyValue&gt;) -&gt; <span class="self">Self </span>{
+            Attributes(
+                kvs.into_iter()
+                    .map(|api_kv| KeyValue {
+                        key: api_kv.key.as_str().to_string(),
+                        value: <span class="prelude-val">Some</span>(api_kv.value.into()),
                     })
-                    .<span class="ident">collect</span>(),
+                    .collect(),
             )
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AnyValue</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">Value</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">AnyValue</span> {
-                <span class="ident">value</span>: <span class="kw">match</span> <span class="ident">value</span> {
-                    <span class="ident">Value::Bool</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">any_value::Value::BoolValue</span>(<span class="ident">val</span>)),
-                    <span class="ident">Value::I64</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">any_value::Value::IntValue</span>(<span class="ident">val</span>)),
-                    <span class="ident">Value::F64</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">any_value::Value::DoubleValue</span>(<span class="ident">val</span>)),
-                    <span class="ident">Value::String</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">any_value::Value::StringValue</span>(<span class="ident">val</span>.<span class="ident">into_owned</span>())),
-                    <span class="ident">Value::Array</span>(<span class="ident">array</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">any_value::Value::ArrayValue</span>(<span class="kw">match</span> <span class="ident">array</span> {
-                        <span class="ident">Array::Bool</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
-                        <span class="ident">Array::I64</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
-                        <span class="ident">Array::F64</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
-                        <span class="ident">Array::String</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
+    <span class="kw">impl </span>From&lt;Value&gt; <span class="kw">for </span>AnyValue {
+        <span class="kw">fn </span>from(value: Value) -&gt; <span class="self">Self </span>{
+            AnyValue {
+                value: <span class="kw">match </span>value {
+                    Value::Bool(val) =&gt; <span class="prelude-val">Some</span>(any_value::Value::BoolValue(val)),
+                    Value::I64(val) =&gt; <span class="prelude-val">Some</span>(any_value::Value::IntValue(val)),
+                    Value::F64(val) =&gt; <span class="prelude-val">Some</span>(any_value::Value::DoubleValue(val)),
+                    Value::String(val) =&gt; <span class="prelude-val">Some</span>(any_value::Value::StringValue(val.into_owned())),
+                    Value::Array(array) =&gt; <span class="prelude-val">Some</span>(any_value::Value::ArrayValue(<span class="kw">match </span>array {
+                        Array::Bool(vals) =&gt; array_into_proto(vals),
+                        Array::I64(vals) =&gt; array_into_proto(vals),
+                        Array::F64(vals) =&gt; array_into_proto(vals),
+                        Array::String(vals) =&gt; array_into_proto(vals),
                     })),
                 },
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">array_into_proto</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">vals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">ArrayValue</span>
-    <span class="kw">where</span>
-        <span class="ident">Value</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>array_into_proto&lt;T&gt;(vals: Vec&lt;T&gt;) -&gt; ArrayValue
+    <span class="kw">where
+        </span>Value: From&lt;T&gt;,
     {
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">vals</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">AnyValue::from</span>(<span class="ident">Value::from</span>(<span class="ident">val</span>)))
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>values = vals
+            .into_iter()
+            .map(|val| AnyValue::from(Value::from(val)))
+            .collect();
 
-        <span class="ident">ArrayValue</span> { <span class="ident">values</span> }
+        ArrayValue { values }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">prost</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::prost::common::v1</span>::{
-        <span class="ident">any_value</span>, <span class="ident">AnyValue</span>, <span class="ident">ArrayValue</span>, <span class="ident">InstrumentationLibrary</span>, <span class="ident">KeyValue</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>prost {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::proto::prost::common::v1::{
+        any_value, AnyValue, ArrayValue, InstrumentationLibrary, KeyValue,
     };
-    <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+    <span class="kw">use </span>std::borrow::Cow;
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">opentelemetry::sdk::InstrumentationLibrary</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InstrumentationLibrary</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">library</span>: <span class="ident">opentelemetry::sdk::InstrumentationLibrary</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">InstrumentationLibrary</span> {
-                <span class="ident">name</span>: <span class="ident">library</span>.<span class="ident">name</span>.<span class="ident">to_string</span>(),
-                <span class="ident">version</span>: <span class="ident">library</span>.<span class="ident">version</span>.<span class="ident">unwrap_or</span>(<span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>)).<span class="ident">to_string</span>(),
+    <span class="kw">impl </span>From&lt;opentelemetry::sdk::InstrumentationLibrary&gt; <span class="kw">for </span>InstrumentationLibrary {
+        <span class="kw">fn </span>from(library: opentelemetry::sdk::InstrumentationLibrary) -&gt; <span class="self">Self </span>{
+            InstrumentationLibrary {
+                name: library.name.to_string(),
+                version: library.version.unwrap_or(Cow::Borrowed(<span class="string">&quot;&quot;</span>)).to_string(),
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Attributes</span>(
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">::std::vec::Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::proto::prost::common::v1::KeyValue</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Attributes(
+        <span class="kw">pub</span>(<span class="kw">crate</span>) ::std::vec::Vec&lt;<span class="kw">crate</span>::proto::prost::common::v1::KeyValue&gt;,
     );
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EvictedHashMap</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Attributes</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">attributes</span>: <span class="ident">EvictedHashMap</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">Attributes</span>(
-                <span class="ident">attributes</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">value</span>)<span class="op">|</span> <span class="ident">KeyValue</span> {
-                        <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>(),
-                        <span class="ident">value</span>: <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">into</span>()),
+    <span class="kw">impl </span>From&lt;EvictedHashMap&gt; <span class="kw">for </span>Attributes {
+        <span class="kw">fn </span>from(attributes: EvictedHashMap) -&gt; <span class="self">Self </span>{
+            Attributes(
+                attributes
+                    .into_iter()
+                    .map(|(key, value)| KeyValue {
+                        key: key.as_str().to_string(),
+                        value: <span class="prelude-val">Some</span>(value.into()),
                     })
-                    .<span class="ident">collect</span>(),
+                    .collect(),
             )
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">opentelemetry::KeyValue</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Attributes</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">kvs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">opentelemetry::KeyValue</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">Attributes</span>(
-                <span class="ident">kvs</span>.<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">api_kv</span><span class="op">|</span> <span class="ident">KeyValue</span> {
-                        <span class="ident">key</span>: <span class="ident">api_kv</span>.<span class="ident">key</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>(),
-                        <span class="ident">value</span>: <span class="prelude-val">Some</span>(<span class="ident">api_kv</span>.<span class="ident">value</span>.<span class="ident">into</span>()),
+    <span class="kw">impl </span>From&lt;Vec&lt;opentelemetry::KeyValue&gt;&gt; <span class="kw">for </span>Attributes {
+        <span class="kw">fn </span>from(kvs: Vec&lt;opentelemetry::KeyValue&gt;) -&gt; <span class="self">Self </span>{
+            Attributes(
+                kvs.into_iter()
+                    .map(|api_kv| KeyValue {
+                        key: api_kv.key.as_str().to_string(),
+                        value: <span class="prelude-val">Some</span>(api_kv.value.into()),
                     })
-                    .<span class="ident">collect</span>(),
+                    .collect(),
             )
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AnyValue</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">Value</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">AnyValue</span> {
-                <span class="ident">value</span>: <span class="kw">match</span> <span class="ident">value</span> {
-                    <span class="ident">Value::Bool</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">any_value::Value::BoolValue</span>(<span class="ident">val</span>)),
-                    <span class="ident">Value::I64</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">any_value::Value::IntValue</span>(<span class="ident">val</span>)),
-                    <span class="ident">Value::F64</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">any_value::Value::DoubleValue</span>(<span class="ident">val</span>)),
-                    <span class="ident">Value::String</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">any_value::Value::StringValue</span>(<span class="ident">val</span>.<span class="ident">into_owned</span>())),
-                    <span class="ident">Value::Array</span>(<span class="ident">array</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">any_value::Value::ArrayValue</span>(<span class="kw">match</span> <span class="ident">array</span> {
-                        <span class="ident">Array::Bool</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
-                        <span class="ident">Array::I64</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
-                        <span class="ident">Array::F64</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
-                        <span class="ident">Array::String</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
+    <span class="kw">impl </span>From&lt;Value&gt; <span class="kw">for </span>AnyValue {
+        <span class="kw">fn </span>from(value: Value) -&gt; <span class="self">Self </span>{
+            AnyValue {
+                value: <span class="kw">match </span>value {
+                    Value::Bool(val) =&gt; <span class="prelude-val">Some</span>(any_value::Value::BoolValue(val)),
+                    Value::I64(val) =&gt; <span class="prelude-val">Some</span>(any_value::Value::IntValue(val)),
+                    Value::F64(val) =&gt; <span class="prelude-val">Some</span>(any_value::Value::DoubleValue(val)),
+                    Value::String(val) =&gt; <span class="prelude-val">Some</span>(any_value::Value::StringValue(val.into_owned())),
+                    Value::Array(array) =&gt; <span class="prelude-val">Some</span>(any_value::Value::ArrayValue(<span class="kw">match </span>array {
+                        Array::Bool(vals) =&gt; array_into_proto(vals),
+                        Array::I64(vals) =&gt; array_into_proto(vals),
+                        Array::F64(vals) =&gt; array_into_proto(vals),
+                        Array::String(vals) =&gt; array_into_proto(vals),
                     })),
                 },
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">array_into_proto</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">vals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">ArrayValue</span>
-    <span class="kw">where</span>
-        <span class="ident">Value</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>array_into_proto&lt;T&gt;(vals: Vec&lt;T&gt;) -&gt; ArrayValue
+    <span class="kw">where
+        </span>Value: From&lt;T&gt;,
     {
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">vals</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">AnyValue::from</span>(<span class="ident">Value::from</span>(<span class="ident">val</span>)))
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>values = vals
+            .into_iter()
+            .map(|val| AnyValue::from(Value::from(val)))
+            .collect();
 
-        <span class="ident">ArrayValue</span> { <span class="ident">values</span> }
+        ArrayValue { values }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">grpcio</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::grpcio::common</span>::{<span class="ident">AnyValue</span>, <span class="ident">ArrayValue</span>, <span class="ident">KeyValue</span>};
-    <span class="kw">use</span> <span class="ident">protobuf::RepeatedField</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>grpcio {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::proto::grpcio::common::{AnyValue, ArrayValue, KeyValue};
+    <span class="kw">use </span>protobuf::RepeatedField;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Attributes</span>(
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">::protobuf::RepeatedField</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::proto::grpcio::common::KeyValue</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Attributes(
+        <span class="kw">pub</span>(<span class="kw">crate</span>) ::protobuf::RepeatedField&lt;<span class="kw">crate</span>::proto::grpcio::common::KeyValue&gt;,
     );
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EvictedHashMap</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Attributes</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">attributes</span>: <span class="ident">EvictedHashMap</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">Attributes</span>(<span class="ident">RepeatedField::from_vec</span>(
-                <span class="ident">attributes</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">value</span>)<span class="op">|</span> {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">kv</span>: <span class="ident">KeyValue</span> <span class="op">=</span> <span class="ident">KeyValue::new</span>();
-                        <span class="ident">kv</span>.<span class="ident">set_key</span>(<span class="ident">key</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>());
-                        <span class="ident">kv</span>.<span class="ident">set_value</span>(<span class="ident">value</span>.<span class="ident">into</span>());
-                        <span class="ident">kv</span>
+    <span class="kw">impl </span>From&lt;EvictedHashMap&gt; <span class="kw">for </span>Attributes {
+        <span class="kw">fn </span>from(attributes: EvictedHashMap) -&gt; <span class="self">Self </span>{
+            Attributes(RepeatedField::from_vec(
+                attributes
+                    .into_iter()
+                    .map(|(key, value)| {
+                        <span class="kw">let </span><span class="kw-2">mut </span>kv: KeyValue = KeyValue::new();
+                        kv.set_key(key.as_str().to_string());
+                        kv.set_value(value.into());
+                        kv
                     })
-                    .<span class="ident">collect</span>(),
+                    .collect(),
             ))
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">opentelemetry::KeyValue</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Attributes</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">kvs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">opentelemetry::KeyValue</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">Attributes</span>(<span class="ident">RepeatedField::from_vec</span>(
-                <span class="ident">kvs</span>.<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">api_kv</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">kv</span>: <span class="ident">KeyValue</span> <span class="op">=</span> <span class="ident">KeyValue::new</span>();
-                        <span class="ident">kv</span>.<span class="ident">set_key</span>(<span class="ident">api_kv</span>.<span class="ident">key</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>());
-                        <span class="ident">kv</span>.<span class="ident">set_value</span>(<span class="ident">api_kv</span>.<span class="ident">value</span>.<span class="ident">into</span>());
-                        <span class="ident">kv</span>
+    <span class="kw">impl </span>From&lt;Vec&lt;opentelemetry::KeyValue&gt;&gt; <span class="kw">for </span>Attributes {
+        <span class="kw">fn </span>from(kvs: Vec&lt;opentelemetry::KeyValue&gt;) -&gt; <span class="self">Self </span>{
+            Attributes(RepeatedField::from_vec(
+                kvs.into_iter()
+                    .map(|api_kv| {
+                        <span class="kw">let </span><span class="kw-2">mut </span>kv: KeyValue = KeyValue::new();
+                        kv.set_key(api_kv.key.as_str().to_string());
+                        kv.set_value(api_kv.value.into());
+                        kv
                     })
-                    .<span class="ident">collect</span>(),
+                    .collect(),
             ))
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AnyValue</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">Value</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">any_value</span> <span class="op">=</span> <span class="ident">AnyValue::new</span>();
-            <span class="kw">match</span> <span class="ident">value</span> {
-                <span class="ident">Value::Bool</span>(<span class="ident">val</span>) =&gt; <span class="ident">any_value</span>.<span class="ident">set_bool_value</span>(<span class="ident">val</span>),
-                <span class="ident">Value::I64</span>(<span class="ident">val</span>) =&gt; <span class="ident">any_value</span>.<span class="ident">set_int_value</span>(<span class="ident">val</span>),
-                <span class="ident">Value::F64</span>(<span class="ident">val</span>) =&gt; <span class="ident">any_value</span>.<span class="ident">set_double_value</span>(<span class="ident">val</span>),
-                <span class="ident">Value::String</span>(<span class="ident">val</span>) =&gt; <span class="ident">any_value</span>.<span class="ident">set_string_value</span>(<span class="ident">val</span>.<span class="ident">into_owned</span>()),
-                <span class="ident">Value::Array</span>(<span class="ident">array</span>) =&gt; <span class="ident">any_value</span>.<span class="ident">set_array_value</span>(<span class="kw">match</span> <span class="ident">array</span> {
-                    <span class="ident">Array::Bool</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
-                    <span class="ident">Array::I64</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
-                    <span class="ident">Array::F64</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
-                    <span class="ident">Array::String</span>(<span class="ident">vals</span>) =&gt; <span class="ident">array_into_proto</span>(<span class="ident">vals</span>),
+    <span class="kw">impl </span>From&lt;Value&gt; <span class="kw">for </span>AnyValue {
+        <span class="kw">fn </span>from(value: Value) -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>any_value = AnyValue::new();
+            <span class="kw">match </span>value {
+                Value::Bool(val) =&gt; any_value.set_bool_value(val),
+                Value::I64(val) =&gt; any_value.set_int_value(val),
+                Value::F64(val) =&gt; any_value.set_double_value(val),
+                Value::String(val) =&gt; any_value.set_string_value(val.into_owned()),
+                Value::Array(array) =&gt; any_value.set_array_value(<span class="kw">match </span>array {
+                    Array::Bool(vals) =&gt; array_into_proto(vals),
+                    Array::I64(vals) =&gt; array_into_proto(vals),
+                    Array::F64(vals) =&gt; array_into_proto(vals),
+                    Array::String(vals) =&gt; array_into_proto(vals),
                 }),
             };
 
-            <span class="ident">any_value</span>
+            any_value
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">array_into_proto</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">vals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">ArrayValue</span>
-    <span class="kw">where</span>
-        <span class="ident">Value</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>array_into_proto&lt;T&gt;(vals: Vec&lt;T&gt;) -&gt; ArrayValue
+    <span class="kw">where
+        </span>Value: From&lt;T&gt;,
     {
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">RepeatedField::from_vec</span>(
-            <span class="ident">vals</span>.<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">AnyValue::from</span>(<span class="ident">Value::from</span>(<span class="ident">val</span>)))
-                .<span class="ident">collect</span>(),
+        <span class="kw">let </span>values = RepeatedField::from_vec(
+            vals.into_iter()
+                .map(|val| AnyValue::from(Value::from(val)))
+                .collect(),
         );
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">array_value</span> <span class="op">=</span> <span class="ident">ArrayValue::new</span>();
-        <span class="ident">array_value</span>.<span class="ident">set_values</span>(<span class="ident">values</span>);
-        <span class="ident">array_value</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>array_value = ArrayValue::new();
+        array_value.set_values(values);
+        array_value
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_nanos</span>(<span class="ident">time</span>: <span class="ident">SystemTime</span>) -&gt; <span class="ident">u64</span> {
-    <span class="ident">time</span>.<span class="ident">duration_since</span>(<span class="ident">UNIX_EPOCH</span>)
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>))
-        .<span class="ident">as_nanos</span>() <span class="kw">as</span> <span class="ident">u64</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_nanos(time: SystemTime) -&gt; u64 {
+    time.duration_since(UNIX_EPOCH)
+        .unwrap_or_else(|<span class="kw">_</span>| Duration::from_secs(<span class="number">0</span>))
+        .as_nanos() <span class="kw">as </span>u64
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry_otlp" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry_otlp" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

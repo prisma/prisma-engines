@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/uuid/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/uuid/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -576,583 +576,583 @@
 <span id="576">576</span>
 <span id="577">577</span>
 <span id="578">578</span>
-</pre><pre class="rust"><code><span class="doccomment">//! UUID support for BSON.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## The [`crate::Uuid`] type</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The BSON format supports UUIDs via the &quot;binary&quot; type with the UUID subtype (4).</span>
-<span class="doccomment">//! To facilitate working with these UUID-subtyped binary values, this crate provides a</span>
-<span class="doccomment">//! [`crate::Uuid`] type, whose `serde` implementation automatically serializes to and deserializes</span>
-<span class="doccomment">//! from binary values with subtype 4.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The popular [`uuid`](https://docs.rs/uuid) crate also provides a</span>
-<span class="doccomment">//! [UUID type](https://docs.rs/uuid/latest/uuid/struct.Uuid.html),</span>
-<span class="doccomment">//! though its `serde` implementation does not produce or parse subtype 4</span>
-<span class="doccomment">//! binary values. Instead, when serialized with `bson::to_bson`, it produces as a string, and when</span>
-<span class="doccomment">//! serialized with `bson::to_vec`, it produces a binary value with subtype _0_ rather than 4.</span>
-<span class="doccomment">//! Because of this, it is highly recommended to use the [`crate::Uuid`] type when working with BSON</span>
-<span class="doccomment">//! instead of the `uuid` crate&#39;s `Uuid`, since [`crate::Uuid`] correctly produces subtype 4 binary</span>
-<span class="doccomment">//! values via either serialization function.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! e.g.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ``` rust</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;uuid-1&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! # use uuid as uuid;</span>
-<span class="doccomment">//! use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">//! use bson::doc;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">//! struct Foo {</span>
-<span class="doccomment">//!     /// serializes as a String or subtype 0 BSON binary, depending</span>
-<span class="doccomment">//!     /// on whether `bson::to_bson` or `bson::to_vec` is used.</span>
-<span class="doccomment">//!     uuid: uuid::Uuid,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// serializes as a BSON binary with subtype 4 when either is used.</span>
-<span class="doccomment">//!     bson_uuid: bson::Uuid,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// serializes as a BSON binary with subtype 4 when either is used.</span>
-<span class="doccomment">//!     /// this requires the &quot;uuid-1&quot; feature flag</span>
-<span class="doccomment">//!     #[serde(with = &quot;bson::serde_helpers::uuid_1_as_binary&quot;)]</span>
-<span class="doccomment">//!     uuid_as_bson: uuid::Uuid,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # };</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## The `uuid-1` feature flag</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To facilitate the conversion between [`crate::Uuid`] values and the `uuid` crate&#39;s `Uuid`</span>
-<span class="doccomment">//! values, the `uuid-1` feature flag can be enabled. This flag exposes a number of convenient</span>
-<span class="doccomment">//! conversions, including the `crate::Uuid::to_uuid_1` method and the `From&lt;uuid::Uuid&gt;`</span>
-<span class="doccomment">//! implementation for `Bson`, which allows the `uuid` crate&#39;s `Uuid` values to be used in the</span>
-<span class="doccomment">//! `doc!` and `bson!` macros.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;uuid-1&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! # use uuid as uuid;</span>
-<span class="doccomment">//! use bson::doc;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // this automatic conversion does not require any feature flags</span>
-<span class="doccomment">//! let query = doc! {</span>
-<span class="doccomment">//!     &quot;uuid&quot;: bson::Uuid::new(),</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // but this automatic conversion requires the &quot;uuid-1&quot; feature flag</span>
-<span class="doccomment">//! let query = doc! {</span>
-<span class="doccomment">//!     &quot;uuid&quot;: uuid::Uuid::new_v4(),</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // this also requires the &quot;uuid-1&quot; feature flag.</span>
-<span class="doccomment">//! let uuid = bson::Uuid::new().to_uuid_1();</span>
-<span class="doccomment">//! # };</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For backwards compatibility, a `uuid-0_8` feature flag can be enabled, which provides the same</span>
-<span class="doccomment">//! API for interoperation with version 0.8 of the `uuid` crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## The `serde_with` feature flag</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `serde_with` feature can be enabled to support more ergonomic serde attributes for</span>
-<span class="doccomment">//! (de)serializing `uuid::Uuid` from/to BSON via the [`serde_with`](https://docs.rs/serde_with/1.11.0/serde_with/)</span>
-<span class="doccomment">//! crate. The main benefit of this compared to the regular `serde_helpers` is that `serde_with` can</span>
-<span class="doccomment">//! handle nested `uuid::Uuid` values (e.g. in `Option`), whereas the former only works on fields</span>
-<span class="doccomment">//! that are exactly `uuid::Uuid`.</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(all(feature = &quot;uuid-1&quot;, feature = &quot;serde_with&quot;))]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! # use uuid as uuid;</span>
-<span class="doccomment">//! use serde::{Deserialize, Serialize};</span>
-<span class="doccomment">//! use bson::doc;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[serde_with::serde_as]</span>
-<span class="doccomment">//! #[derive(Deserialize, Serialize, PartialEq, Debug)]</span>
-<span class="doccomment">//! struct Foo {</span>
-<span class="doccomment">//!   /// Serializes as a BSON binary rather than using `uuid::Uuid`&#39;s serialization</span>
-<span class="doccomment">//!   #[serde_as(as = &quot;Option&lt;bson::Uuid&gt;&quot;)]</span>
-<span class="doccomment">//!   as_bson: Option&lt;uuid::Uuid&gt;,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let foo = Foo {</span>
-<span class="doccomment">//!   as_bson: Some(uuid::Uuid::new_v4()),</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let expected = doc! {</span>
-<span class="doccomment">//!   &quot;as_bson&quot;: bson::Uuid::from(foo.as_bson.unwrap()),</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(bson::to_document(&amp;foo)?, expected);</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Using `crate::Uuid` with non-BSON formats</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`crate::Uuid`]&#39;s `serde` implementation is the same as `uuid::Uuid`&#39;s</span>
-<span class="doccomment">//! for non-BSON formats such as JSON:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ``` rust</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;uuid-1&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! # use uuid as uuid;</span>
-<span class="doccomment">//! # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">//! # #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">//! # struct Foo {</span>
-<span class="doccomment">//! #   uuid: uuid::Uuid,</span>
-<span class="doccomment">//! #   bson_uuid: bson::Uuid,</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! use serde_json::json;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let uuid = uuid::Uuid::new_v4();</span>
-<span class="doccomment">//! let bson_uuid: bson::Uuid = uuid.into();</span>
-<span class="doccomment">//! let foo = Foo { uuid, bson_uuid, };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let json = serde_json::to_value(&amp;foo)?;</span>
-<span class="doccomment">//! assert_eq!(json, json!({ &quot;uuid&quot;: uuid.to_string(), &quot;bson_uuid&quot;: uuid.to_string() }));</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! # Ok::&lt;(), Box::&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">//! ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! UUID support for BSON.
+//!
+//! ## The [`crate::Uuid`] type
+//!
+//! The BSON format supports UUIDs via the &quot;binary&quot; type with the UUID subtype (4).
+//! To facilitate working with these UUID-subtyped binary values, this crate provides a
+//! [`crate::Uuid`] type, whose `serde` implementation automatically serializes to and deserializes
+//! from binary values with subtype 4.
+//!
+//! The popular [`uuid`](https://docs.rs/uuid) crate also provides a
+//! [UUID type](https://docs.rs/uuid/latest/uuid/struct.Uuid.html),
+//! though its `serde` implementation does not produce or parse subtype 4
+//! binary values. Instead, when serialized with `bson::to_bson`, it produces as a string, and when
+//! serialized with `bson::to_vec`, it produces a binary value with subtype _0_ rather than 4.
+//! Because of this, it is highly recommended to use the [`crate::Uuid`] type when working with BSON
+//! instead of the `uuid` crate&#39;s `Uuid`, since [`crate::Uuid`] correctly produces subtype 4 binary
+//! values via either serialization function.
+//!
+//! e.g.
+//!
+//! ``` rust
+//! # #[cfg(feature = &quot;uuid-1&quot;)]
+//! # {
+//! # use uuid as uuid;
+//! use serde::{Serialize, Deserialize};
+//! use bson::doc;
+//!
+//! #[derive(Serialize, Deserialize)]
+//! struct Foo {
+//!     /// serializes as a String or subtype 0 BSON binary, depending
+//!     /// on whether `bson::to_bson` or `bson::to_vec` is used.
+//!     uuid: uuid::Uuid,
+//!
+//!     /// serializes as a BSON binary with subtype 4 when either is used.
+//!     bson_uuid: bson::Uuid,
+//!
+//!     /// serializes as a BSON binary with subtype 4 when either is used.
+//!     /// this requires the &quot;uuid-1&quot; feature flag
+//!     #[serde(with = &quot;bson::serde_helpers::uuid_1_as_binary&quot;)]
+//!     uuid_as_bson: uuid::Uuid,
+//! }
+//! # };
+//! ```
+//!
+//! ## The `uuid-1` feature flag
+//!
+//! To facilitate the conversion between [`crate::Uuid`] values and the `uuid` crate&#39;s `Uuid`
+//! values, the `uuid-1` feature flag can be enabled. This flag exposes a number of convenient
+//! conversions, including the `crate::Uuid::to_uuid_1` method and the `From&lt;uuid::Uuid&gt;`
+//! implementation for `Bson`, which allows the `uuid` crate&#39;s `Uuid` values to be used in the
+//! `doc!` and `bson!` macros.
+//!
+//! ```
+//! # #[cfg(feature = &quot;uuid-1&quot;)]
+//! # {
+//! # use uuid as uuid;
+//! use bson::doc;
+//!
+//! // this automatic conversion does not require any feature flags
+//! let query = doc! {
+//!     &quot;uuid&quot;: bson::Uuid::new(),
+//! };
+//!
+//! // but this automatic conversion requires the &quot;uuid-1&quot; feature flag
+//! let query = doc! {
+//!     &quot;uuid&quot;: uuid::Uuid::new_v4(),
+//! };
+//!
+//! // this also requires the &quot;uuid-1&quot; feature flag.
+//! let uuid = bson::Uuid::new().to_uuid_1();
+//! # };
+//! ```
+//!
+//! For backwards compatibility, a `uuid-0_8` feature flag can be enabled, which provides the same
+//! API for interoperation with version 0.8 of the `uuid` crate.
+//!
+//! ## The `serde_with` feature flag
+//!
+//! The `serde_with` feature can be enabled to support more ergonomic serde attributes for
+//! (de)serializing `uuid::Uuid` from/to BSON via the [`serde_with`](https://docs.rs/serde_with/1.11.0/serde_with/)
+//! crate. The main benefit of this compared to the regular `serde_helpers` is that `serde_with` can
+//! handle nested `uuid::Uuid` values (e.g. in `Option`), whereas the former only works on fields
+//! that are exactly `uuid::Uuid`.
+//! ```
+//! # #[cfg(all(feature = &quot;uuid-1&quot;, feature = &quot;serde_with&quot;))]
+//! # {
+//! # use uuid as uuid;
+//! use serde::{Deserialize, Serialize};
+//! use bson::doc;
+//!
+//! #[serde_with::serde_as]
+//! #[derive(Deserialize, Serialize, PartialEq, Debug)]
+//! struct Foo {
+//!   /// Serializes as a BSON binary rather than using `uuid::Uuid`&#39;s serialization
+//!   #[serde_as(as = &quot;Option&lt;bson::Uuid&gt;&quot;)]
+//!   as_bson: Option&lt;uuid::Uuid&gt;,
+//! }
+//!
+//! let foo = Foo {
+//!   as_bson: Some(uuid::Uuid::new_v4()),
+//! };
+//!
+//! let expected = doc! {
+//!   &quot;as_bson&quot;: bson::Uuid::from(foo.as_bson.unwrap()),
+//! };
+//!
+//! assert_eq!(bson::to_document(&amp;foo)?, expected);
+//! # }
+//! # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+//! ```
+//!
+//! ## Using `crate::Uuid` with non-BSON formats
+//!
+//! [`crate::Uuid`]&#39;s `serde` implementation is the same as `uuid::Uuid`&#39;s
+//! for non-BSON formats such as JSON:
+//!
+//! ``` rust
+//! # #[cfg(feature = &quot;uuid-1&quot;)]
+//! # {
+//! # use uuid as uuid;
+//! # use serde::{Serialize, Deserialize};
+//! # #[derive(Serialize, Deserialize)]
+//! # struct Foo {
+//! #   uuid: uuid::Uuid,
+//! #   bson_uuid: bson::Uuid,
+//! # }
+//! use serde_json::json;
+//!
+//! let uuid = uuid::Uuid::new_v4();
+//! let bson_uuid: bson::Uuid = uuid.into();
+//! let foo = Foo { uuid, bson_uuid, };
+//!
+//! let json = serde_json::to_value(&amp;foo)?;
+//! assert_eq!(json, json!({ &quot;uuid&quot;: uuid.to_string(), &quot;bson_uuid&quot;: uuid.to_string() }));
+//! # }
+//! # Ok::&lt;(), Box::&lt;dyn std::error::Error&gt;&gt;(())
+//! ```
+</span><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>},
-    <span class="ident">str::FromStr</span>,
+<span class="kw">use </span>std::{
+    fmt::{<span class="self">self</span>, Display},
+    str::FromStr,
 };
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">de::BsonVisitor</span>, <span class="ident">spec::BinarySubtype</span>, <span class="ident">Binary</span>, <span class="ident">Bson</span>};
+<span class="kw">use crate</span>::{de::BsonVisitor, spec::BinarySubtype, Binary, Bson};
 
-<span class="doccomment">/// Special type name used in the `Uuid` serialization implementation to indicate a BSON</span>
-<span class="doccomment">/// UUID is being serialized or deserialized. The BSON serializers/deserializers will handle this</span>
-<span class="doccomment">/// name specially, but other serializers/deserializers will just ignore it and use `uuid::Uuid`&#39;s</span>
-<span class="doccomment">/// serde integration.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">UUID_NEWTYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;$__bson_private_uuid&quot;</span>;
+<span class="doccomment">/// Special type name used in the `Uuid` serialization implementation to indicate a BSON
+/// UUID is being serialized or deserialized. The BSON serializers/deserializers will handle this
+/// name specially, but other serializers/deserializers will just ignore it and use `uuid::Uuid`&#39;s
+/// serde integration.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>UUID_NEWTYPE_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;$__bson_private_uuid&quot;</span>;
 
-<span class="doccomment">/// A struct modeling a BSON UUID value (i.e. a Binary value with subtype 4).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type should be used instead of [`uuid::Uuid`](https://docs.rs/uuid/latest/uuid/struct.Uuid.html)</span>
-<span class="doccomment">/// when serializing to or deserializing from BSON, since</span>
-<span class="doccomment">/// [`uuid::Uuid`](https://docs.rs/uuid/latest/uuid/struct.Uuid.html)&#39;s `serde` implementation doesn&#39;t</span>
-<span class="doccomment">/// produce or parse BSON UUIDs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To enable interop with the `Uuid` type from the `uuid` crate, enable the `uuid-0_8` feature</span>
-<span class="doccomment">/// flag.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For more information on the usage of this type, see the [`uuid`] module-level documentation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: due to an issue in serde (see [here](https://github.com/serde-rs/serde/issues/2106)), this type</span>
-<span class="doccomment">/// will also allow deserialization from 16 byte + subtype 0 Binary values in BSON if part of a</span>
-<span class="doccomment">/// `#[serde(flatten)]` chain. This behavior shouldn&#39;t be relied upon as it may be fixed at some</span>
-<span class="doccomment">/// point in the future.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Uuid</span> {
-    <span class="ident">uuid</span>: <span class="ident">uuid::Uuid</span>,
+<span class="doccomment">/// A struct modeling a BSON UUID value (i.e. a Binary value with subtype 4).
+///
+/// This type should be used instead of [`uuid::Uuid`](https://docs.rs/uuid/latest/uuid/struct.Uuid.html)
+/// when serializing to or deserializing from BSON, since
+/// [`uuid::Uuid`](https://docs.rs/uuid/latest/uuid/struct.Uuid.html)&#39;s `serde` implementation doesn&#39;t
+/// produce or parse BSON UUIDs.
+///
+/// To enable interop with the `Uuid` type from the `uuid` crate, enable the `uuid-0_8` feature
+/// flag.
+///
+/// For more information on the usage of this type, see the [`uuid`] module-level documentation.
+///
+/// Note: due to an issue in serde (see [here](https://github.com/serde-rs/serde/issues/2106)), this type
+/// will also allow deserialization from 16 byte + subtype 0 Binary values in BSON if part of a
+/// `#[serde(flatten)]` chain. This behavior shouldn&#39;t be relied upon as it may be fixed at some
+/// point in the future.
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Hash, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub struct </span>Uuid {
+    uuid: uuid::Uuid,
 }
 
-<span class="kw">impl</span> <span class="ident">Uuid</span> {
-    <span class="doccomment">/// Creates a random UUID.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This uses the operating system&#39;s RNG as the source of random numbers. If you&#39;d like to use a</span>
-    <span class="doccomment">/// custom generator, generate random bytes and pass them to [`Uuid::from_bytes`] instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">uuid</span>: <span class="ident">uuid::Uuid::new_v4</span>(),
+<span class="kw">impl </span>Uuid {
+    <span class="doccomment">/// Creates a random UUID.
+    ///
+    /// This uses the operating system&#39;s RNG as the source of random numbers. If you&#39;d like to use a
+    /// custom generator, generate random bytes and pass them to [`Uuid::from_bytes`] instead.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            uuid: uuid::Uuid::new_v4(),
         }
     }
 
-    <span class="doccomment">/// Creates a [`Uuid`] using the supplied big-endian bytes.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">16</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">uuid::Uuid::from_bytes</span>(<span class="ident">bytes</span>))
+    <span class="doccomment">/// Creates a [`Uuid`] using the supplied big-endian bytes.
+    </span><span class="kw">pub const fn </span>from_bytes(bytes: [u8; <span class="number">16</span>]) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_external_uuid(uuid::Uuid::from_bytes(bytes))
     }
 
-    <span class="doccomment">/// Creates a [`Uuid`] from the provided hex string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_str</span>(<span class="ident">input</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">uuid::Uuid::parse_str</span>(<span class="ident">input</span>.<span class="ident">as_ref</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::InvalidUuidString</span> {
-            <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
+    <span class="doccomment">/// Creates a [`Uuid`] from the provided hex string.
+    </span><span class="kw">pub fn </span>parse_str(input: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>uuid = uuid::Uuid::parse_str(input.as_ref()).map_err(|e| Error::InvalidUuidString {
+            message: e.to_string(),
         })<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">uuid</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_external_uuid(uuid))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_external_uuid</span>(<span class="ident">uuid</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">uuid</span> }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>from_external_uuid(uuid: uuid::Uuid) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ uuid }
     }
 
-    <span class="doccomment">/// Returns an array of 16 bytes containing the [`Uuid`]&#39;s data.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">bytes</span>(<span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">16</span>] {
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">uuid</span>.<span class="ident">as_bytes</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+    <span class="doccomment">/// Returns an array of 16 bytes containing the [`Uuid`]&#39;s data.
+    </span><span class="kw">pub const fn </span>bytes(<span class="self">self</span>) -&gt; [u8; <span class="number">16</span>] {
+        <span class="kw-2">*</span><span class="self">self</span>.uuid.as_bytes()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">Uuid</span> {
-    <span class="doccomment">/// Create a [`Uuid`] from a [`uuid::Uuid`](https://docs.rs/uuid/0.8/uuid/struct.Uuid.html) from</span>
-    <span class="doccomment">/// the [`uuid`](https://docs.rs/uuid/0.8) crate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_uuid_0_8</span>(<span class="ident">uuid</span>: <span class="ident">uuid_0_8::Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">uuid::Uuid::from_u128</span>(<span class="ident">uuid</span>.<span class="ident">as_u128</span>()))
-    }
-
-    <span class="doccomment">/// Convert this [`Uuid`] to a [`uuid::Uuid`](https://docs.rs/uuid/0.8/uuid/struct.Uuid.html) from</span>
-    <span class="doccomment">/// the [`uuid`](https://docs.rs/uuid/0.8) crate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_uuid_0_8</span>(<span class="self">self</span>) -&gt; <span class="ident">uuid_0_8::Uuid</span> {
-        <span class="ident">uuid_0_8::Uuid::from_bytes</span>(<span class="self">self</span>.<span class="ident">uuid</span>.<span class="ident">into_bytes</span>())
+<span class="kw">impl </span>Default <span class="kw">for </span>Uuid {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">Uuid</span> {
-    <span class="doccomment">/// Create a [`Uuid`] from a [`uuid::Uuid`](https://docs.rs/uuid/0.8/uuid/struct.Uuid.html) from</span>
-    <span class="doccomment">/// the [`uuid`](https://docs.rs/uuid/0.8) crate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_uuid_1</span>(<span class="ident">uuid</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">uuid</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)))]
+</span><span class="kw">impl </span>Uuid {
+    <span class="doccomment">/// Create a [`Uuid`] from a [`uuid::Uuid`](https://docs.rs/uuid/0.8/uuid/struct.Uuid.html) from
+    /// the [`uuid`](https://docs.rs/uuid/0.8) crate.
+    </span><span class="kw">pub fn </span>from_uuid_0_8(uuid: uuid_0_8::Uuid) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_external_uuid(uuid::Uuid::from_u128(uuid.as_u128()))
     }
 
-    <span class="doccomment">/// Convert this [`Uuid`] to a [`uuid::Uuid`](https://docs.rs/uuid/0.8/uuid/struct.Uuid.html) from</span>
-    <span class="doccomment">/// the [`uuid`](https://docs.rs/uuid/0.8) crate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_uuid_1</span>(<span class="self">self</span>) -&gt; <span class="ident">uuid::Uuid</span> {
-        <span class="self">self</span>.<span class="ident">uuid</span>
+    <span class="doccomment">/// Convert this [`Uuid`] to a [`uuid::Uuid`](https://docs.rs/uuid/0.8/uuid/struct.Uuid.html) from
+    /// the [`uuid`](https://docs.rs/uuid/0.8) crate.
+    </span><span class="kw">pub fn </span>to_uuid_0_8(<span class="self">self</span>) -&gt; uuid_0_8::Uuid {
+        uuid_0_8::Uuid::from_bytes(<span class="self">self</span>.uuid.into_bytes())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)))]
+</span><span class="kw">impl </span>Uuid {
+    <span class="doccomment">/// Create a [`Uuid`] from a [`uuid::Uuid`](https://docs.rs/uuid/0.8/uuid/struct.Uuid.html) from
+    /// the [`uuid`](https://docs.rs/uuid/0.8) crate.
+    </span><span class="kw">pub fn </span>from_uuid_1(uuid: uuid::Uuid) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_external_uuid(uuid)
+    }
+
+    <span class="doccomment">/// Convert this [`Uuid`] to a [`uuid::Uuid`](https://docs.rs/uuid/0.8/uuid/struct.Uuid.html) from
+    /// the [`uuid`](https://docs.rs/uuid/0.8) crate.
+    </span><span class="kw">pub fn </span>to_uuid_1(<span class="self">self</span>) -&gt; uuid::Uuid {
+        <span class="self">self</span>.uuid
+    }
+}
+
+<span class="kw">impl </span>Serialize <span class="kw">for </span>Uuid {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="ident">serializer</span>.<span class="ident">serialize_newtype_struct</span>(<span class="ident">UUID_NEWTYPE_NAME</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">uuid</span>)
+        serializer.serialize_newtype_struct(UUID_NEWTYPE_NAME, <span class="kw-2">&amp;</span><span class="self">self</span>.uuid)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Uuid {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">match</span> <span class="ident">deserializer</span>.<span class="ident">deserialize_newtype_struct</span>(<span class="ident">UUID_NEWTYPE_NAME</span>, <span class="ident">BsonVisitor</span>)<span class="question-mark">?</span> {
-            <span class="comment">// Need to support deserializing from generic subtypes for non-BSON formats.</span>
-            <span class="comment">// When using the BSON deserializer, the newtype name will ensure the subtype is only</span>
-            <span class="comment">// ever BinarySubtype::Uuid.</span>
-            <span class="ident">Bson::Binary</span>(<span class="ident">b</span>)
-                <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">b</span>.<span class="ident">subtype</span>, <span class="ident">BinarySubtype::Uuid</span> <span class="op">|</span> <span class="ident">BinarySubtype::Generic</span>) =&gt;
+        <span class="kw">match </span>deserializer.deserialize_newtype_struct(UUID_NEWTYPE_NAME, BsonVisitor)<span class="question-mark">? </span>{
+            <span class="comment">// Need to support deserializing from generic subtypes for non-BSON formats.
+            // When using the BSON deserializer, the newtype name will ensure the subtype is only
+            // ever BinarySubtype::Uuid.
+            </span>Bson::Binary(b)
+                <span class="kw">if </span><span class="macro">matches!</span>(b.subtype, BinarySubtype::Uuid | BinarySubtype::Generic) =&gt;
             {
-                <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span>
-                    <span class="ident">uuid::Uuid::from_slice</span>(<span class="ident">b</span>.<span class="ident">bytes</span>.<span class="ident">as_slice</span>()).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">uuid</span>))
+                <span class="kw">let </span>uuid =
+                    uuid::Uuid::from_slice(b.bytes.as_slice()).map_err(serde::de::Error::custom)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_external_uuid(uuid))
             }
-            <span class="ident">Bson::Binary</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">subtype</span> <span class="op">==</span> <span class="ident">BinarySubtype::UuidOld</span> =&gt; {
-                <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::custom</span>(
+            Bson::Binary(b) <span class="kw">if </span>b.subtype == BinarySubtype::UuidOld =&gt; {
+                <span class="prelude-val">Err</span>(serde::de::Error::custom(
                     <span class="string">&quot;received legacy UUID (subtype 3) but expected regular UUID (subtype 4)&quot;</span>,
                 ))
             }
-            <span class="ident">Bson::String</span>(<span class="ident">s</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">uuid::Uuid::from_str</span>(<span class="ident">s</span>.<span class="ident">as_str</span>()).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">uuid</span>))
+            Bson::String(s) =&gt; {
+                <span class="kw">let </span>uuid = uuid::Uuid::from_str(s.as_str()).map_err(serde::de::Error::custom)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_external_uuid(uuid))
             }
-            <span class="ident">b</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::invalid_type</span>(<span class="ident">b</span>.<span class="ident">as_unexpected</span>(), <span class="kw-2">&amp;</span><span class="string">&quot;a UUID&quot;</span>)),
+            b =&gt; <span class="prelude-val">Err</span>(serde::de::Error::invalid_type(b.as_unexpected(), <span class="kw-2">&amp;</span><span class="string">&quot;a UUID&quot;</span>)),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">uuid</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>Display <span class="kw">for </span>Uuid {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.uuid.fmt(f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">std::fmt::Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">uuid</span>, <span class="ident">f</span>)
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>Uuid {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        std::fmt::Debug::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.uuid, f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Binary</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uuid</span>: <span class="ident">Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Binary</span> {
-            <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Uuid</span>,
-            <span class="ident">bytes</span>: <span class="ident">uuid</span>.<span class="ident">bytes</span>().<span class="ident">to_vec</span>(),
+<span class="kw">impl </span>From&lt;Uuid&gt; <span class="kw">for </span>Binary {
+    <span class="kw">fn </span>from(uuid: Uuid) -&gt; <span class="self">Self </span>{
+        Binary {
+            subtype: BinarySubtype::Uuid,
+            bytes: uuid.bytes().to_vec(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">u</span>: <span class="ident">Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bson::Binary</span>(<span class="ident">u</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;Uuid&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(u: Uuid) -&gt; <span class="self">Self </span>{
+        Bson::Binary(u.into())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">uuid_0_8::Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">u</span>: <span class="ident">uuid_0_8::Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_uuid_0_8</span>(<span class="ident">u</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;uuid_0_8::Uuid&gt; <span class="kw">for </span>Uuid {
+    <span class="kw">fn </span>from(u: uuid_0_8::Uuid) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_uuid_0_8(u)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">uuid_0_8::Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">s</span>.<span class="ident">to_uuid_0_8</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;Uuid&gt; <span class="kw">for </span>uuid_0_8::Uuid {
+    <span class="kw">fn </span>from(s: Uuid) -&gt; <span class="self">Self </span>{
+        s.to_uuid_0_8()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">uuid::Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">u</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_uuid_1</span>(<span class="ident">u</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;uuid::Uuid&gt; <span class="kw">for </span>Uuid {
+    <span class="kw">fn </span>from(u: uuid::Uuid) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_uuid_1(u)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">uuid::Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">s</span>.<span class="ident">to_uuid_1</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;Uuid&gt; <span class="kw">for </span>uuid::Uuid {
+    <span class="kw">fn </span>from(s: Uuid) -&gt; <span class="self">Self </span>{
+        s.to_uuid_1()
     }
 }
 
-<span class="doccomment">/// Enum of the possible representations to use when converting between [`Uuid`] and [`Binary`].</span>
-<span class="doccomment">/// This enum is necessary because the different drivers used to have different ways of encoding</span>
-<span class="doccomment">/// UUIDs, with the BSON subtype: 0x03 (UUID old).</span>
-<span class="doccomment">/// If a UUID has been serialized with a particular representation, it MUST</span>
-<span class="doccomment">/// be deserialized with the same representation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use bson::{Binary, uuid::{Uuid, UuidRepresentation}};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let uuid = Uuid::parse_str(&quot;00112233445566778899AABBCCDDEEFF&quot;)?;</span>
-<span class="doccomment">/// let bin = Binary::from_uuid_with_representation(uuid, UuidRepresentation::PythonLegacy);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // This conversion fails, since the binary holds a PythonLegacy UUID, so we&#39;re required to specify</span>
-<span class="doccomment">/// // that.</span>
-<span class="doccomment">/// assert!(bin.to_uuid().is_err());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // This conversion succeeds, since we specified the correct representation.</span>
-<span class="doccomment">/// let new_uuid = bin.to_uuid_with_representation(UuidRepresentation::PythonLegacy)?;</span>
-<span class="doccomment">/// assert_eq!(new_uuid, uuid);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Ok::&lt;(), Box::&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UuidRepresentation</span> {
-    <span class="doccomment">/// The canonical representation of UUIDs in BSON (binary with subtype 0x04)</span>
-    <span class="ident">Standard</span>,
-    <span class="doccomment">/// The legacy representation of UUIDs in BSON used by the C# driver (binary subtype 0x03)</span>
-    <span class="ident">CSharpLegacy</span>,
-    <span class="doccomment">/// The legacy representation of UUIDs in BSON used by the Java driver (binary subtype 0x03)</span>
-    <span class="ident">JavaLegacy</span>,
-    <span class="doccomment">/// The legacy representation of UUIDs in BSON used by the Python driver, which is the same</span>
-    <span class="doccomment">/// format as STANDARD, but has binary subtype 0x03</span>
-    <span class="ident">PythonLegacy</span>,
+<span class="doccomment">/// Enum of the possible representations to use when converting between [`Uuid`] and [`Binary`].
+/// This enum is necessary because the different drivers used to have different ways of encoding
+/// UUIDs, with the BSON subtype: 0x03 (UUID old).
+/// If a UUID has been serialized with a particular representation, it MUST
+/// be deserialized with the same representation.
+///
+/// Example:
+/// ```
+/// use bson::{Binary, uuid::{Uuid, UuidRepresentation}};
+///
+/// let uuid = Uuid::parse_str(&quot;00112233445566778899AABBCCDDEEFF&quot;)?;
+/// let bin = Binary::from_uuid_with_representation(uuid, UuidRepresentation::PythonLegacy);
+///
+/// // This conversion fails, since the binary holds a PythonLegacy UUID, so we&#39;re required to specify
+/// // that.
+/// assert!(bin.to_uuid().is_err());
+///
+/// // This conversion succeeds, since we specified the correct representation.
+/// let new_uuid = bin.to_uuid_with_representation(UuidRepresentation::PythonLegacy)?;
+/// assert_eq!(new_uuid, uuid);
+///
+/// # Ok::&lt;(), Box::&lt;dyn std::error::Error&gt;&gt;(())
+/// ```
+</span><span class="attribute">#[non_exhaustive]
+#[derive(PartialEq, Clone, Copy, Debug)]
+</span><span class="kw">pub enum </span>UuidRepresentation {
+    <span class="doccomment">/// The canonical representation of UUIDs in BSON (binary with subtype 0x04)
+    </span>Standard,
+    <span class="doccomment">/// The legacy representation of UUIDs in BSON used by the C# driver (binary subtype 0x03)
+    </span>CSharpLegacy,
+    <span class="doccomment">/// The legacy representation of UUIDs in BSON used by the Java driver (binary subtype 0x03)
+    </span>JavaLegacy,
+    <span class="doccomment">/// The legacy representation of UUIDs in BSON used by the Python driver, which is the same
+    /// format as STANDARD, but has binary subtype 0x03
+    </span>PythonLegacy,
 }
 
-<span class="kw">impl</span> <span class="ident">Binary</span> {
-    <span class="doccomment">/// Serializes a [`Uuid`] into BSON [`Binary`] type</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_uuid</span>(<span class="ident">uuid</span>: <span class="ident">Uuid</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Binary::from</span>(<span class="ident">uuid</span>)
+<span class="kw">impl </span>Binary {
+    <span class="doccomment">/// Serializes a [`Uuid`] into BSON [`Binary`] type
+    </span><span class="kw">pub fn </span>from_uuid(uuid: Uuid) -&gt; <span class="self">Self </span>{
+        Binary::from(uuid)
     }
 
-    <span class="doccomment">/// Serializes a [`Uuid`] into BSON binary type and takes the desired representation as a</span>
-    <span class="doccomment">/// parameter. `Binary::from_uuid_with_representation(uuid, UuidRepresentation::Standard)` is</span>
-    <span class="doccomment">/// equivalent to `Binary::from_uuid(uuid)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation for [`UuidRepresentation`] for more information on the possible</span>
-    <span class="doccomment">/// representations.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_uuid_with_representation</span>(<span class="ident">uuid</span>: <span class="ident">Uuid</span>, <span class="ident">rep</span>: <span class="ident">UuidRepresentation</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">rep</span> {
-            <span class="ident">UuidRepresentation::Standard</span> =&gt; <span class="ident">Binary::from_uuid</span>(<span class="ident">uuid</span>),
-            <span class="ident">UuidRepresentation::CSharpLegacy</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">uuid</span>.<span class="ident">bytes</span>().<span class="ident">to_vec</span>();
-                <span class="ident">bytes</span>[<span class="number">0</span>..<span class="number">4</span>].<span class="ident">reverse</span>();
-                <span class="ident">bytes</span>[<span class="number">4</span>..<span class="number">6</span>].<span class="ident">reverse</span>();
-                <span class="ident">bytes</span>[<span class="number">6</span>..<span class="number">8</span>].<span class="ident">reverse</span>();
-                <span class="ident">Binary</span> {
-                    <span class="ident">subtype</span>: <span class="ident">BinarySubtype::UuidOld</span>,
-                    <span class="ident">bytes</span>,
+    <span class="doccomment">/// Serializes a [`Uuid`] into BSON binary type and takes the desired representation as a
+    /// parameter. `Binary::from_uuid_with_representation(uuid, UuidRepresentation::Standard)` is
+    /// equivalent to `Binary::from_uuid(uuid)`.
+    ///
+    /// See the documentation for [`UuidRepresentation`] for more information on the possible
+    /// representations.
+    </span><span class="kw">pub fn </span>from_uuid_with_representation(uuid: Uuid, rep: UuidRepresentation) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>rep {
+            UuidRepresentation::Standard =&gt; Binary::from_uuid(uuid),
+            UuidRepresentation::CSharpLegacy =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>bytes = uuid.bytes().to_vec();
+                bytes[<span class="number">0</span>..<span class="number">4</span>].reverse();
+                bytes[<span class="number">4</span>..<span class="number">6</span>].reverse();
+                bytes[<span class="number">6</span>..<span class="number">8</span>].reverse();
+                Binary {
+                    subtype: BinarySubtype::UuidOld,
+                    bytes,
                 }
             }
-            <span class="ident">UuidRepresentation::PythonLegacy</span> =&gt; <span class="ident">Binary</span> {
-                <span class="ident">subtype</span>: <span class="ident">BinarySubtype::UuidOld</span>,
-                <span class="ident">bytes</span>: <span class="ident">uuid</span>.<span class="ident">bytes</span>().<span class="ident">to_vec</span>(),
+            UuidRepresentation::PythonLegacy =&gt; Binary {
+                subtype: BinarySubtype::UuidOld,
+                bytes: uuid.bytes().to_vec(),
             },
-            <span class="ident">UuidRepresentation::JavaLegacy</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">uuid</span>.<span class="ident">bytes</span>().<span class="ident">to_vec</span>();
-                <span class="ident">bytes</span>[<span class="number">0</span>..<span class="number">8</span>].<span class="ident">reverse</span>();
-                <span class="ident">bytes</span>[<span class="number">8</span>..<span class="number">16</span>].<span class="ident">reverse</span>();
-                <span class="ident">Binary</span> {
-                    <span class="ident">subtype</span>: <span class="ident">BinarySubtype::UuidOld</span>,
-                    <span class="ident">bytes</span>,
+            UuidRepresentation::JavaLegacy =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>bytes = uuid.bytes().to_vec();
+                bytes[<span class="number">0</span>..<span class="number">8</span>].reverse();
+                bytes[<span class="number">8</span>..<span class="number">16</span>].reverse();
+                Binary {
+                    subtype: BinarySubtype::UuidOld,
+                    bytes,
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Deserializes a BSON [`Binary`] type into a [`Uuid`] according to the provided</span>
-    <span class="doccomment">/// representation. If the representation does not match the [`Binary`], an error will be</span>
-    <span class="doccomment">/// returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation for [`UuidRepresentation`] for more information on the possible</span>
-    <span class="doccomment">/// representations.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_uuid_with_representation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rep</span>: <span class="ident">UuidRepresentation</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> {
-        <span class="comment">// If representation is non-standard, then its subtype must be UuidOld</span>
-        <span class="kw">if</span> <span class="ident">rep</span> <span class="op">!</span><span class="op">=</span> <span class="ident">UuidRepresentation::Standard</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">subtype</span> <span class="op">!</span><span class="op">=</span> <span class="ident">BinarySubtype::UuidOld</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::RepresentationMismatch</span> {
-                <span class="ident">requested_representation</span>: <span class="ident">rep</span>,
-                <span class="ident">actual_binary_subtype</span>: <span class="self">self</span>.<span class="ident">subtype</span>,
-                <span class="ident">expected_binary_subtype</span>: <span class="ident">BinarySubtype::UuidOld</span>,
+    <span class="doccomment">/// Deserializes a BSON [`Binary`] type into a [`Uuid`] according to the provided
+    /// representation. If the representation does not match the [`Binary`], an error will be
+    /// returned.
+    ///
+    /// See the documentation for [`UuidRepresentation`] for more information on the possible
+    /// representations.
+    </span><span class="kw">pub fn </span>to_uuid_with_representation(<span class="kw-2">&amp;</span><span class="self">self</span>, rep: UuidRepresentation) -&gt; <span class="prelude-ty">Result</span>&lt;Uuid&gt; {
+        <span class="comment">// If representation is non-standard, then its subtype must be UuidOld
+        </span><span class="kw">if </span>rep != UuidRepresentation::Standard &amp;&amp; <span class="self">self</span>.subtype != BinarySubtype::UuidOld {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::RepresentationMismatch {
+                requested_representation: rep,
+                actual_binary_subtype: <span class="self">self</span>.subtype,
+                expected_binary_subtype: BinarySubtype::UuidOld,
             });
         }
-        <span class="comment">// If representation is standard, then its subtype must be Uuid</span>
-        <span class="kw">if</span> <span class="ident">rep</span> <span class="op">==</span> <span class="ident">UuidRepresentation::Standard</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">subtype</span> <span class="op">!</span><span class="op">=</span> <span class="ident">BinarySubtype::Uuid</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::RepresentationMismatch</span> {
-                <span class="ident">requested_representation</span>: <span class="ident">rep</span>,
-                <span class="ident">actual_binary_subtype</span>: <span class="self">self</span>.<span class="ident">subtype</span>,
-                <span class="ident">expected_binary_subtype</span>: <span class="ident">BinarySubtype::Uuid</span>,
+        <span class="comment">// If representation is standard, then its subtype must be Uuid
+        </span><span class="kw">if </span>rep == UuidRepresentation::Standard &amp;&amp; <span class="self">self</span>.subtype != BinarySubtype::Uuid {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::RepresentationMismatch {
+                requested_representation: rep,
+                actual_binary_subtype: <span class="self">self</span>.subtype,
+                expected_binary_subtype: BinarySubtype::Uuid,
             });
         }
-        <span class="comment">// Must be 16 bytes long</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">16</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidLength</span> {
-                <span class="ident">length</span>: <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>(),
+        <span class="comment">// Must be 16 bytes long
+        </span><span class="kw">if </span><span class="self">self</span>.bytes.len() != <span class="number">16 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidLength {
+                length: <span class="self">self</span>.bytes.len(),
             });
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
-        <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>);
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">rep</span> {
-            <span class="ident">UuidRepresentation::Standard</span> =&gt; <span class="ident">Uuid::from_bytes</span>(<span class="ident">buf</span>),
-            <span class="ident">UuidRepresentation::CSharpLegacy</span> =&gt; {
-                <span class="ident">buf</span>[<span class="number">0</span>..<span class="number">4</span>].<span class="ident">reverse</span>();
-                <span class="ident">buf</span>[<span class="number">4</span>..<span class="number">6</span>].<span class="ident">reverse</span>();
-                <span class="ident">buf</span>[<span class="number">6</span>..<span class="number">8</span>].<span class="ident">reverse</span>();
-                <span class="ident">Uuid::from_bytes</span>(<span class="ident">buf</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0u8</span>; <span class="number">16</span>];
+        buf.copy_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.bytes);
+        <span class="prelude-val">Ok</span>(<span class="kw">match </span>rep {
+            UuidRepresentation::Standard =&gt; Uuid::from_bytes(buf),
+            UuidRepresentation::CSharpLegacy =&gt; {
+                buf[<span class="number">0</span>..<span class="number">4</span>].reverse();
+                buf[<span class="number">4</span>..<span class="number">6</span>].reverse();
+                buf[<span class="number">6</span>..<span class="number">8</span>].reverse();
+                Uuid::from_bytes(buf)
             }
-            <span class="ident">UuidRepresentation::PythonLegacy</span> =&gt; <span class="ident">Uuid::from_bytes</span>(<span class="ident">buf</span>),
-            <span class="ident">UuidRepresentation::JavaLegacy</span> =&gt; {
-                <span class="ident">buf</span>[<span class="number">0</span>..<span class="number">8</span>].<span class="ident">reverse</span>();
-                <span class="ident">buf</span>[<span class="number">8</span>..<span class="number">16</span>].<span class="ident">reverse</span>();
-                <span class="ident">Uuid::from_bytes</span>(<span class="ident">buf</span>)
+            UuidRepresentation::PythonLegacy =&gt; Uuid::from_bytes(buf),
+            UuidRepresentation::JavaLegacy =&gt; {
+                buf[<span class="number">0</span>..<span class="number">8</span>].reverse();
+                buf[<span class="number">8</span>..<span class="number">16</span>].reverse();
+                Uuid::from_bytes(buf)
             }
         })
     }
 
-    <span class="doccomment">/// Deserializes a BSON [`Binary`] type into a [`Uuid`] using the standard</span>
-    <span class="doccomment">/// representation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_uuid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">to_uuid_with_representation</span>(<span class="ident">UuidRepresentation::Standard</span>)
+    <span class="doccomment">/// Deserializes a BSON [`Binary`] type into a [`Uuid`] using the standard
+    /// representation.
+    </span><span class="kw">pub fn </span>to_uuid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Uuid&gt; {
+        <span class="self">self</span>.to_uuid_with_representation(UuidRepresentation::Standard)
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">trait_impls</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>:<span class="ident">meta</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>)]</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>)))]</span>
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Binary</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uuid</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>) -&gt; <span class="self">Self</span> {
-                <span class="ident">Binary</span> {
-                    <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Uuid</span>,
-                    <span class="ident">bytes</span>: <span class="ident">uuid</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>(),
+<span class="macro">macro_rules! </span>trait_impls {
+    (<span class="macro-nonterminal">$feat</span>:meta, <span class="macro-nonterminal">$u</span>:ty) =&gt; {
+        <span class="attribute">#[cfg(<span class="macro-nonterminal">$feat</span>)]
+        #[cfg_attr(docsrs, doc(cfg(<span class="macro-nonterminal">$feat</span>)))]
+        </span><span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$u</span>&gt; <span class="kw">for </span>Binary {
+            <span class="kw">fn </span>from(uuid: <span class="macro-nonterminal">$u</span>) -&gt; <span class="self">Self </span>{
+                Binary {
+                    subtype: BinarySubtype::Uuid,
+                    bytes: uuid.as_bytes().to_vec(),
                 }
             }
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>))]</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>))))]</span>
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde_with::DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::Uuid</span> {
-            <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+        <span class="attribute">#[cfg(all(<span class="macro-nonterminal">$feat</span>, feature = <span class="string">&quot;serde_with&quot;</span>))]
+        #[cfg_attr(docsrs, doc(cfg(all(<span class="macro-nonterminal">$feat</span>, feature = <span class="string">&quot;serde_with&quot;</span>))))]
+        </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde_with::DeserializeAs&lt;<span class="lifetime">&#39;de</span>, <span class="macro-nonterminal">$u</span>&gt; <span class="kw">for </span><span class="kw">crate</span>::Uuid {
+            <span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="macro-nonterminal">$u</span>, D::Error&gt;
+            <span class="kw">where
+                </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
             {
-                <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">Uuid::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">uuid</span>.<span class="ident">into</span>())
+                <span class="kw">let </span>uuid = Uuid::deserialize(deserializer)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(uuid.into())
             }
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>))]</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>))))]</span>
-        <span class="kw">impl</span> <span class="ident">serde_with::SerializeAs</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::Uuid</span> {
-            <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+        <span class="attribute">#[cfg(all(<span class="macro-nonterminal">$feat</span>, feature = <span class="string">&quot;serde_with&quot;</span>))]
+        #[cfg_attr(docsrs, doc(cfg(all(<span class="macro-nonterminal">$feat</span>, feature = <span class="string">&quot;serde_with&quot;</span>))))]
+        </span><span class="kw">impl </span>serde_with::SerializeAs&lt;<span class="macro-nonterminal">$u</span>&gt; <span class="kw">for </span><span class="kw">crate</span>::Uuid {
+            <span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$u</span>, serializer: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+            <span class="kw">where
+                </span>S: serde::Serializer,
             {
-                <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">Uuid::from</span>(<span class="kw-2">*</span><span class="ident">source</span>);
-                <span class="ident">uuid</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+                <span class="kw">let </span>uuid = Uuid::from(<span class="kw-2">*</span>source);
+                uuid.serialize(serializer)
             }
         }
     };
 }
-<span class="macro">trait_impls!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>, <span class="ident">uuid_0_8::Uuid</span>);
-<span class="macro">trait_impls!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>, <span class="ident">uuid::Uuid</span>);
+<span class="macro">trait_impls!</span>(feature = <span class="string">&quot;uuid-0_8&quot;</span>, uuid_0_8::Uuid);
+<span class="macro">trait_impls!</span>(feature = <span class="string">&quot;uuid-1&quot;</span>, uuid::Uuid);
 
-<span class="doccomment">/// Errors that can occur during [`Uuid`] construction and generation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// Error returned when an invalid string is provided to [`Uuid::parse_str`].</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="ident">InvalidUuidString</span> { <span class="ident">message</span>: <span class="ident">String</span> },
+<span class="doccomment">/// Errors that can occur during [`Uuid`] construction and generation.
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// Error returned when an invalid string is provided to [`Uuid::parse_str`].
+    </span><span class="attribute">#[non_exhaustive]
+    </span>InvalidUuidString { message: String },
 
-    <span class="doccomment">/// Error returned when the representation specified does not match the underlying</span>
-    <span class="doccomment">/// [`crate::Binary`] value in [`crate::Binary::to_uuid_with_representation`].</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="ident">RepresentationMismatch</span> {
-        <span class="doccomment">/// The subtype that was expected given the requested representation.</span>
-        <span class="ident">expected_binary_subtype</span>: <span class="ident">BinarySubtype</span>,
+    <span class="doccomment">/// Error returned when the representation specified does not match the underlying
+    /// [`crate::Binary`] value in [`crate::Binary::to_uuid_with_representation`].
+    </span><span class="attribute">#[non_exhaustive]
+    </span>RepresentationMismatch {
+        <span class="doccomment">/// The subtype that was expected given the requested representation.
+        </span>expected_binary_subtype: BinarySubtype,
 
-        <span class="doccomment">/// The actual subtype of the binary value.</span>
-        <span class="ident">actual_binary_subtype</span>: <span class="ident">BinarySubtype</span>,
+        <span class="doccomment">/// The actual subtype of the binary value.
+        </span>actual_binary_subtype: BinarySubtype,
 
-        <span class="doccomment">/// The requested representation.</span>
-        <span class="ident">requested_representation</span>: <span class="ident">UuidRepresentation</span>,
+        <span class="doccomment">/// The requested representation.
+        </span>requested_representation: UuidRepresentation,
     },
 
-    <span class="doccomment">/// Error returned from [`crate::Binary::to_uuid`] if the underling data is not 16 bytes long.</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="ident">InvalidLength</span> {
-        <span class="doccomment">/// The actual length of the data.</span>
-        <span class="ident">length</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Error returned from [`crate::Binary::to_uuid`] if the underling data is not 16 bytes long.
+    </span><span class="attribute">#[non_exhaustive]
+    </span>InvalidLength {
+        <span class="doccomment">/// The actual length of the data.
+        </span>length: usize,
     },
 }
 
-<span class="doccomment">/// Alias for `Result&lt;T, bson::uuid::Error&gt;`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Alias for `Result&lt;T, bson::uuid::Error&gt;`.
+</span><span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, Error&gt;;
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::InvalidUuidString</span> { <span class="ident">message</span> } =&gt; {
-                <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">message</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            Error::InvalidUuidString { message } =&gt; {
+                <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, message)
             }
-            <span class="ident">Error::RepresentationMismatch</span> {
-                <span class="ident">expected_binary_subtype</span>,
-                <span class="ident">actual_binary_subtype</span>,
-                <span class="ident">requested_representation</span>,
+            Error::RepresentationMismatch {
+                expected_binary_subtype,
+                actual_binary_subtype,
+                requested_representation,
             } =&gt; {
                 <span class="macro">write!</span>(
-                    <span class="ident">fmt</span>,
+                    fmt,
                     <span class="string">&quot;expected {:?} when converting to UUID with {:?}, isntead got {:?}&quot;</span>,
-                    <span class="ident">expected_binary_subtype</span>, <span class="ident">requested_representation</span>, <span class="ident">actual_binary_subtype</span>
+                    expected_binary_subtype, requested_representation, actual_binary_subtype
                 )
             }
-            <span class="ident">Error::InvalidLength</span> { <span class="ident">length</span> } =&gt; {
+            Error::InvalidLength { length } =&gt; {
                 <span class="macro">write!</span>(
-                    <span class="ident">fmt</span>,
+                    fmt,
                     <span class="string">&quot;expected UUID to contain 16 bytes, instead got {}&quot;</span>,
-                    <span class="ident">length</span>
+                    length
                 )
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>Error {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

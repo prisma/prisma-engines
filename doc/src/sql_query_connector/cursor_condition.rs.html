@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/cursor_condition.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cursor_condition.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/cursor_condition.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cursor_condition.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -553,560 +553,560 @@
 <span id="553">553</span>
 <span id="554">554</span>
 <span id="555">555</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">join_utils::AliasedJoin</span>,
-    <span class="ident">model_extensions</span>::{<span class="ident">AsColumn</span>, <span class="ident">AsColumns</span>, <span class="ident">AsTable</span>, <span class="ident">SelectionResultExt</span>},
-    <span class="ident">ordering::OrderByDefinition</span>,
-    <span class="ident">query_arguments_ext::QueryArgumentsExt</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    join_utils::AliasedJoin,
+    model_extensions::{AsColumn, AsColumns, AsTable, SelectionResultExt},
+    ordering::OrderByDefinition,
+    query_arguments_ext::QueryArgumentsExt,
 };
-<span class="kw">use</span> <span class="ident">connector_interface::QueryArguments</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">quaint::ast</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>connector_interface::QueryArguments;
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
+<span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
 
-<span class="kw">static</span> <span class="ident">ORDER_TABLE_ALIAS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;order_cmp&quot;</span>;
+<span class="kw">static </span>ORDER_TABLE_ALIAS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;order_cmp&quot;</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CursorOrderDefinition</span> {
-    <span class="doccomment">/// Direction of the sort</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>,
-    <span class="doccomment">/// Column on which the top-level ORDER BY is performed</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">order_column</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Foreign keys of the relations on which the order is performed</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">order_fks</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CursorOrderForeignKey</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Column selected from the ORDER_TABLE_ALIAS cmp table and compared against the order_column</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">cmp_column</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Alias of the cmp_column</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">cmp_column_alias</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Indicates whether the ordering is performed on nullable field(s)</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">on_nullable_fields</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>CursorOrderDefinition {
+    <span class="doccomment">/// Direction of the sort
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) sort_order: SortOrder,
+    <span class="doccomment">/// Column on which the top-level ORDER BY is performed
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) order_column: Expression&lt;<span class="lifetime">&#39;static</span>&gt;,
+    <span class="doccomment">/// Foreign keys of the relations on which the order is performed
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) order_fks: <span class="prelude-ty">Option</span>&lt;Vec&lt;CursorOrderForeignKey&gt;&gt;,
+    <span class="doccomment">/// Column selected from the ORDER_TABLE_ALIAS cmp table and compared against the order_column
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) cmp_column: Expression&lt;<span class="lifetime">&#39;static</span>&gt;,
+    <span class="doccomment">/// Alias of the cmp_column
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) cmp_column_alias: String,
+    <span class="doccomment">/// Indicates whether the ordering is performed on nullable field(s)
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) on_nullable_fields: bool,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CursorOrderForeignKey</span> {
-    <span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>,
-    <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>CursorOrderForeignKey {
+    field: ScalarFieldRef,
+    alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="doccomment">/// Builds a cursor query condition based on the cursor arguments and if necessary a table that the condition depends on.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An example query for 4 order-by fields (where the last field is one2m relation) is:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```sql</span>
-<span class="doccomment">/// SELECT</span>
-<span class="doccomment">///   `ModelA`.`id`</span>
-<span class="doccomment">/// FROM</span>
-<span class="doccomment">///   `ModelA`</span>
-<span class="doccomment">///   LEFT JOIN `ModelB` AS `orderby_3_ModelB` ON (</span>
-<span class="doccomment">///     `ModelA`.`modelB_id` = `orderby_3_ModelB`.`fieldD`</span>
-<span class="doccomment">///   ),</span>
-<span class="doccomment">///   -- &gt;&gt;&gt; Begin Part #1</span>
-<span class="doccomment">///   (</span>
-<span class="doccomment">///     SELECT</span>
-<span class="doccomment">///       `ModelA`.`fieldA` AS `ModelA_fieldA_0`,</span>
-<span class="doccomment">///       `ModelA`.`fieldB` AS `ModelA_fieldB_1`,</span>
-<span class="doccomment">///       `ModelA`.`fieldC` AS `ModelA_fieldC_2`,</span>
-<span class="doccomment">///       `orderby_3_ModelB`.`fieldD` AS `ModelB_fieldD_3`</span>
-<span class="doccomment">///     FROM</span>
-<span class="doccomment">///       `ModelA`</span>
-<span class="doccomment">///       LEFT JOIN `ModelB` AS `orderby_3_ModelB` ON (</span>
-<span class="doccomment">///         `ModelA`.`modelB_id` = `orderby_3_ModelB`.`fieldD`</span>
-<span class="doccomment">///       )</span>
-<span class="doccomment">///     WHERE</span>
-<span class="doccomment">///       (`ModelA`.`id`) = (?)</span>
-<span class="doccomment">///   ) AS `order_cmp` -- &lt;&lt;&lt; End Part #1</span>
-<span class="doccomment">/// WHERE</span>
-<span class="doccomment">///   -- &gt;&gt;&gt; Begin Part #2</span>
-<span class="doccomment">///   (</span>
-<span class="doccomment">///     (</span>
-<span class="doccomment">///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`</span>
-<span class="doccomment">///       AND `ModelA`.`fieldB` = `order_cmp`.`ModelA_fieldB_1`</span>
-<span class="doccomment">///       AND `ModelA`.`fieldC` = `order_cmp`.`ModelA_fieldC_2`</span>
-<span class="doccomment">///       AND `orderby_3_ModelB`.`fieldD` &lt;= `order_cmp`.`ModelB_fieldD_3`</span>
-<span class="doccomment">///     )</span>
-<span class="doccomment">///     OR (</span>
-<span class="doccomment">///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`</span>
-<span class="doccomment">///       AND `ModelA`.`fieldB` = `order_cmp`.`ModelA_fieldB_1`</span>
-<span class="doccomment">///       AND `ModelA`.`fieldC` &gt; `order_cmp`.`ModelA_fieldC_2`</span>
-<span class="doccomment">///     )</span>
-<span class="doccomment">///     OR (</span>
-<span class="doccomment">///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`</span>
-<span class="doccomment">///       AND `ModelA`.`fieldB` &gt; `order_cmp`.`ModelA_fieldB_1`</span>
-<span class="doccomment">///     )</span>
-<span class="doccomment">///     OR (</span>
-<span class="doccomment">///       `ModelA`.`fieldA` &lt; `order_cmp`.`ModelA_fieldA_0`</span>
-<span class="doccomment">///     )</span>
-<span class="doccomment">///   )</span>
-<span class="doccomment">///   -- &lt;&lt;&lt; End Part #2</span>
-<span class="doccomment">/// ORDER BY</span>
-<span class="doccomment">///   `ModelA`.`fieldA` DESC,</span>
-<span class="doccomment">///   `ModelA`.`fieldB` ASC,</span>
-<span class="doccomment">///   `ModelA`.`fieldC` ASC,</span>
-<span class="doccomment">///   `orderby_3_ModelB`.`fieldD` DESC</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The above assumes that all field are non-nullable. If a field is nullable, #2 conditions slighty change:</span>
-<span class="doccomment">/// ```sql</span>
-<span class="doccomment">///   -- ... The first (4 - condition) block:</span>
-<span class="doccomment">///   (</span>
-<span class="doccomment">///     (</span>
-<span class="doccomment">///       `TestModel`.`fieldA` = `order_cmp`.`fieldA`</span>
-<span class="doccomment">///       OR `order_cmp`.`fieldA` IS NULL</span>
-<span class="doccomment">///       OR `TestModel`.`fieldA` IS NULL</span>
-<span class="doccomment">///     )</span>
-<span class="doccomment">///     AND -- ...</span>
-<span class="doccomment">///   )</span>
-<span class="doccomment">///   -- ...The other blocks (3, 2) in between, then the single condition block:</span>
-<span class="doccomment">///   OR (</span>
-<span class="doccomment">///     `TestModel`.`fieldA` &lt; `order_cmp`.`fieldA`</span>
-<span class="doccomment">///     OR `order_cmp`.`fieldA` IS NULL</span>
-<span class="doccomment">///     OR `TestModel`.`fieldA` IS NULL</span>
-<span class="doccomment">///   )</span>
-<span class="doccomment">///   -- ...</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// When the ordering is performed on a nullable _relation_,</span>
-<span class="doccomment">/// the conditions change in the same way as above, with the addition that foreign keys are also compared to NULL:</span>
-<span class="doccomment">/// ```sql</span>
-<span class="doccomment">///   -- ... The first (4 - condition) block:</span>
-<span class="doccomment">///   AND (</span>
-<span class="doccomment">///     `orderby_3_ModelB`.`id` &lt;= `order_cmp`.`ModelB_fieldD_3`</span>
-<span class="doccomment">///     OR `ModelA`.`modelB_id` IS NULL -- &gt;&gt;&gt; Additional check for the nullable foreign key</span>
-<span class="doccomment">///   )</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(
-    <span class="ident">query_arguments</span>: <span class="kw-2">&amp;</span><span class="ident">QueryArguments</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">order_by_defs</span>: <span class="kw-2">&amp;</span>[<span class="ident">OrderByDefinition</span>],
-) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
-    <span class="kw">match</span> <span class="ident">query_arguments</span>.<span class="ident">cursor</span> {
-        <span class="prelude-val">None</span> =&gt; (<span class="prelude-val">None</span>, <span class="ident">ConditionTree::NoCondition</span>),
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">cursor</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">cursor_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">as_scalar_fields</span>().<span class="ident">expect</span>(<span class="string">&quot;Cursor fields contain non-scalars.&quot;</span>);
-            <span class="kw">let</span> <span class="ident">cursor_values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">db_values</span>();
-            <span class="kw">let</span> <span class="ident">cursor_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">cursor_fields</span>.<span class="ident">as_slice</span>().<span class="ident">as_columns</span>().<span class="ident">collect</span>();
-            <span class="kw">let</span> <span class="ident">cursor_row</span> <span class="op">=</span> <span class="ident">Row::from</span>(<span class="ident">cursor_columns</span>);
+<span class="doccomment">/// Builds a cursor query condition based on the cursor arguments and if necessary a table that the condition depends on.
+///
+/// An example query for 4 order-by fields (where the last field is one2m relation) is:
+///
+/// ```sql
+/// SELECT
+///   `ModelA`.`id`
+/// FROM
+///   `ModelA`
+///   LEFT JOIN `ModelB` AS `orderby_3_ModelB` ON (
+///     `ModelA`.`modelB_id` = `orderby_3_ModelB`.`fieldD`
+///   ),
+///   -- &gt;&gt;&gt; Begin Part #1
+///   (
+///     SELECT
+///       `ModelA`.`fieldA` AS `ModelA_fieldA_0`,
+///       `ModelA`.`fieldB` AS `ModelA_fieldB_1`,
+///       `ModelA`.`fieldC` AS `ModelA_fieldC_2`,
+///       `orderby_3_ModelB`.`fieldD` AS `ModelB_fieldD_3`
+///     FROM
+///       `ModelA`
+///       LEFT JOIN `ModelB` AS `orderby_3_ModelB` ON (
+///         `ModelA`.`modelB_id` = `orderby_3_ModelB`.`fieldD`
+///       )
+///     WHERE
+///       (`ModelA`.`id`) = (?)
+///   ) AS `order_cmp` -- &lt;&lt;&lt; End Part #1
+/// WHERE
+///   -- &gt;&gt;&gt; Begin Part #2
+///   (
+///     (
+///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`
+///       AND `ModelA`.`fieldB` = `order_cmp`.`ModelA_fieldB_1`
+///       AND `ModelA`.`fieldC` = `order_cmp`.`ModelA_fieldC_2`
+///       AND `orderby_3_ModelB`.`fieldD` &lt;= `order_cmp`.`ModelB_fieldD_3`
+///     )
+///     OR (
+///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`
+///       AND `ModelA`.`fieldB` = `order_cmp`.`ModelA_fieldB_1`
+///       AND `ModelA`.`fieldC` &gt; `order_cmp`.`ModelA_fieldC_2`
+///     )
+///     OR (
+///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`
+///       AND `ModelA`.`fieldB` &gt; `order_cmp`.`ModelA_fieldB_1`
+///     )
+///     OR (
+///       `ModelA`.`fieldA` &lt; `order_cmp`.`ModelA_fieldA_0`
+///     )
+///   )
+///   -- &lt;&lt;&lt; End Part #2
+/// ORDER BY
+///   `ModelA`.`fieldA` DESC,
+///   `ModelA`.`fieldB` ASC,
+///   `ModelA`.`fieldC` ASC,
+///   `orderby_3_ModelB`.`fieldD` DESC
+/// ```
+///
+/// The above assumes that all field are non-nullable. If a field is nullable, #2 conditions slighty change:
+/// ```sql
+///   -- ... The first (4 - condition) block:
+///   (
+///     (
+///       `TestModel`.`fieldA` = `order_cmp`.`fieldA`
+///       OR `order_cmp`.`fieldA` IS NULL
+///       OR `TestModel`.`fieldA` IS NULL
+///     )
+///     AND -- ...
+///   )
+///   -- ...The other blocks (3, 2) in between, then the single condition block:
+///   OR (
+///     `TestModel`.`fieldA` &lt; `order_cmp`.`fieldA`
+///     OR `order_cmp`.`fieldA` IS NULL
+///     OR `TestModel`.`fieldA` IS NULL
+///   )
+///   -- ...
+/// ```
+/// When the ordering is performed on a nullable _relation_,
+/// the conditions change in the same way as above, with the addition that foreign keys are also compared to NULL:
+/// ```sql
+///   -- ... The first (4 - condition) block:
+///   AND (
+///     `orderby_3_ModelB`.`id` &lt;= `order_cmp`.`ModelB_fieldD_3`
+///     OR `ModelA`.`modelB_id` IS NULL -- &gt;&gt;&gt; Additional check for the nullable foreign key
+///   )
+/// ```
+</span><span class="kw">pub fn </span>build(
+    query_arguments: <span class="kw-2">&amp;</span>QueryArguments,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    order_by_defs: <span class="kw-2">&amp;</span>[OrderByDefinition],
+) -&gt; (<span class="prelude-ty">Option</span>&lt;Table&lt;<span class="lifetime">&#39;static</span>&gt;&gt;, ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt;) {
+    <span class="kw">match </span>query_arguments.cursor {
+        <span class="prelude-val">None </span>=&gt; (<span class="prelude-val">None</span>, ConditionTree::NoCondition),
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>cursor) =&gt; {
+            <span class="kw">let </span>cursor_fields: Vec&lt;<span class="kw">_</span>&gt; = cursor.as_scalar_fields().expect(<span class="string">&quot;Cursor fields contain non-scalars.&quot;</span>);
+            <span class="kw">let </span>cursor_values: Vec&lt;<span class="kw">_</span>&gt; = cursor.db_values();
+            <span class="kw">let </span>cursor_columns: Vec&lt;<span class="kw">_</span>&gt; = cursor_fields.as_slice().as_columns().collect();
+            <span class="kw">let </span>cursor_row = Row::from(cursor_columns);
 
-            <span class="comment">// Invariant: Cursors are unique. This means we can create a subquery to find at most one row</span>
-            <span class="comment">// that contains all the values required for the ordering row comparison (order_subquery).</span>
-            <span class="comment">// That does _not_ mean that this retrieved row has an ordering unique across all records, because</span>
-            <span class="comment">// that can only be true if the orderBy contains a combination of fields that are unique, or a single unique field.</span>
-            <span class="kw">let</span> <span class="ident">cursor_condition</span> <span class="op">=</span> <span class="ident">cursor_row</span>.<span class="ident">clone</span>().<span class="ident">equals</span>(<span class="ident">cursor_values</span>.<span class="ident">clone</span>());
+            <span class="comment">// Invariant: Cursors are unique. This means we can create a subquery to find at most one row
+            // that contains all the values required for the ordering row comparison (order_subquery).
+            // That does _not_ mean that this retrieved row has an ordering unique across all records, because
+            // that can only be true if the orderBy contains a combination of fields that are unique, or a single unique field.
+            </span><span class="kw">let </span>cursor_condition = cursor_row.clone().equals(cursor_values.clone());
 
-            <span class="comment">// Orderings for this query. Influences which fields we need to fetch for comparing order fields.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">definitions</span> <span class="op">=</span> <span class="ident">order_definitions</span>(<span class="ident">query_arguments</span>, <span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">order_by_defs</span>);
+            <span class="comment">// Orderings for this query. Influences which fields we need to fetch for comparing order fields.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>definitions = order_definitions(query_arguments, model, <span class="kw-2">&amp;</span>order_by_defs);
 
-            <span class="comment">// Subquery to find the value of the order field(s) that we need for comparison. Builds part #1 of the query example in the docs.</span>
-            <span class="kw">let</span> <span class="ident">order_subquery</span> <span class="op">=</span> <span class="ident">definitions</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">fold</span>(<span class="ident">Select::from_table</span>(<span class="ident">model</span>.<span class="ident">as_table</span>()), <span class="op">|</span><span class="ident">select</span>, <span class="ident">definition</span><span class="op">|</span> {
-                    <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">definition</span>.<span class="ident">cmp_column</span>.<span class="ident">clone</span>())
+            <span class="comment">// Subquery to find the value of the order field(s) that we need for comparison. Builds part #1 of the query example in the docs.
+            </span><span class="kw">let </span>order_subquery = definitions
+                .iter()
+                .fold(Select::from_table(model.as_table()), |select, definition| {
+                    select.value(definition.cmp_column.clone())
                 })
-                .<span class="ident">so_that</span>(<span class="ident">cursor_condition</span>);
+                .so_that(cursor_condition);
 
-            <span class="kw">let</span> <span class="ident">order_subquery</span> <span class="op">=</span> <span class="ident">order_by_defs</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">j</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">j</span>.<span class="ident">joins</span>)
-                .<span class="ident">fold</span>(<span class="ident">order_subquery</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">join</span><span class="op">|</span> <span class="ident">acc</span>.<span class="ident">left_join</span>(<span class="ident">join</span>.<span class="ident">data</span>.<span class="ident">clone</span>()));
+            <span class="kw">let </span>order_subquery = order_by_defs
+                .iter()
+                .flat_map(|j| <span class="kw-2">&amp;</span>j.joins)
+                .fold(order_subquery, |acc, join| acc.left_join(join.data.clone()));
 
-            <span class="kw">let</span> <span class="ident">subquery_table</span> <span class="op">=</span> <span class="ident">Table::from</span>(<span class="ident">order_subquery</span>).<span class="ident">alias</span>(<span class="ident">ORDER_TABLE_ALIAS</span>);
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">definitions</span>.<span class="ident">len</span>();
-            <span class="kw">let</span> <span class="ident">reverse</span> <span class="op">=</span> <span class="ident">query_arguments</span>.<span class="ident">needs_reversed_order</span>();
+            <span class="kw">let </span>subquery_table = Table::from(order_subquery).alias(ORDER_TABLE_ALIAS);
+            <span class="kw">let </span>len = definitions.len();
+            <span class="kw">let </span>reverse = query_arguments.needs_reversed_order();
 
-            <span class="comment">// Builds part #2 of the example query.</span>
-            <span class="comment">// If we only have one ordering, we only want a single, slightly different, condition of (orderField [&lt;= / &gt;=] cmp_field).</span>
-            <span class="kw">let</span> <span class="ident">condition_tree</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">1</span> {
-                <span class="kw">let</span> <span class="ident">order_definition</span> <span class="op">=</span> <span class="ident">definitions</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-                <span class="ident">ConditionTree::Single</span>(<span class="ident">Box::new</span>(<span class="ident">map_orderby_condition</span>(<span class="kw-2">&amp;</span><span class="ident">order_definition</span>, <span class="ident">reverse</span>, <span class="bool-val">true</span>)))
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">or_conditions</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">len</span>).<span class="ident">fold</span>(<span class="ident">Vec::with_capacity</span>(<span class="ident">len</span>), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">conditions_acc</span>, <span class="ident">n</span><span class="op">|</span> {
-                    <span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">tail</span>) <span class="op">=</span> <span class="ident">definitions</span>.<span class="ident">split_at</span>(<span class="ident">len</span> <span class="op">-</span> <span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>);
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">and_conditions</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">head</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>);
+            <span class="comment">// Builds part #2 of the example query.
+            // If we only have one ordering, we only want a single, slightly different, condition of (orderField [&lt;= / &gt;=] cmp_field).
+            </span><span class="kw">let </span>condition_tree = <span class="kw">if </span>len == <span class="number">1 </span>{
+                <span class="kw">let </span>order_definition = definitions.pop().unwrap();
+                ConditionTree::Single(Box::new(map_orderby_condition(<span class="kw-2">&amp;</span>order_definition, reverse, <span class="bool-val">true</span>)))
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>or_conditions = (<span class="number">0</span>..len).fold(Vec::with_capacity(len), |<span class="kw-2">mut </span>conditions_acc, n| {
+                    <span class="kw">let </span>(head, tail) = definitions.split_at(len - n - <span class="number">1</span>);
+                    <span class="kw">let </span><span class="kw-2">mut </span>and_conditions = Vec::with_capacity(head.len() + <span class="number">1</span>);
 
-                    <span class="kw">for</span> <span class="ident">order_definition</span> <span class="kw">in</span> <span class="ident">head</span> {
-                        <span class="ident">and_conditions</span>.<span class="ident">push</span>(<span class="ident">map_equality_condition</span>(<span class="kw-2">&amp;</span><span class="ident">order_definition</span>));
+                    <span class="kw">for </span>order_definition <span class="kw">in </span>head {
+                        and_conditions.push(map_equality_condition(<span class="kw-2">&amp;</span>order_definition));
                     }
 
-                    <span class="kw">let</span> <span class="ident">order_definition</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>();
+                    <span class="kw">let </span>order_definition = tail.first().unwrap();
 
-                    <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">len</span> <span class="op">-</span> <span class="number">1</span> {
-                        <span class="comment">// Special case where we build lte / gte, not lt / gt.</span>
-                        <span class="comment">// - We use the combination of all order-by fields as comparator for the the cursor.</span>
-                        <span class="comment">// - This isn&#39;t necessarily unique as a combination, i.e. doesn&#39;t guarantee stable sort order.</span>
-                        <span class="comment">// - Only the first condition, which is done over the full length of the fields, can have the leniency</span>
-                        <span class="comment">//   of equality, because if _all_ sorting fields up until the last one are identical _and_ the last field is identical,</span>
-                        <span class="comment">//   then the comparison row has multiple identical records and we need to retrieve those for post-processing later (throwing</span>
-                        <span class="comment">//   away records up until the cursor ID, but we can&#39;t do that in SQL, because we can&#39;t assume IDs to be linear).</span>
-                        <span class="comment">//</span>
-                        <span class="comment">// Example to illustrate the above:</span>
-                        <span class="comment">// OrderBy: A ASC | B ASC | C DESC, cursor on 2.</span>
-                        <span class="comment">// ID A B C</span>
-                        <span class="comment">// 1  2 2 3</span>
-                        <span class="comment">// 2  2 2 2 &lt;- cursor</span>
-                        <span class="comment">// 3  3 1 4</span>
-                        <span class="comment">// 4  5 7 1</span>
-                        <span class="comment">//</span>
-                        <span class="comment">// The conditions we build to make sure that we only get (2, 2, 2), (3, 1, 4) and (5, 7, 1):</span>
-                        <span class="comment">// `(A = 2 AND B = 2 AND C &gt;= 2) OR (A = 2 AND B &gt; 2) OR (A &gt; 2)`</span>
-                        <span class="comment">// If we would do `(A = 2 AND B &gt;= 2)` as the middle statement, we suddenly get record with ID 1 a well. However, we can&#39;t do</span>
-                        <span class="comment">// `(A = 2 AND B = 2 AND C &gt; 2)` either, because then we&#39;d miss out on the cursor row as well as possible duplicates coming after the cursor,</span>
-                        <span class="comment">// which also need to be included in the result.</span>
-                        <span class="comment">//</span>
-                        <span class="comment">// Said differently, we handle all the cases in which the prefixes are equal to len - 1 to account for possible identical comparators,</span>
-                        <span class="comment">// but everything else must come strictly &quot;after&quot; the cursor.</span>
-                        <span class="ident">and_conditions</span>.<span class="ident">push</span>(<span class="ident">map_orderby_condition</span>(<span class="ident">order_definition</span>, <span class="ident">reverse</span>, <span class="bool-val">true</span>));
-                    } <span class="kw">else</span> {
-                        <span class="ident">and_conditions</span>.<span class="ident">push</span>(<span class="ident">map_orderby_condition</span>(<span class="ident">order_definition</span>, <span class="ident">reverse</span>, <span class="bool-val">false</span>));
+                    <span class="kw">if </span>head.len() == len - <span class="number">1 </span>{
+                        <span class="comment">// Special case where we build lte / gte, not lt / gt.
+                        // - We use the combination of all order-by fields as comparator for the the cursor.
+                        // - This isn&#39;t necessarily unique as a combination, i.e. doesn&#39;t guarantee stable sort order.
+                        // - Only the first condition, which is done over the full length of the fields, can have the leniency
+                        //   of equality, because if _all_ sorting fields up until the last one are identical _and_ the last field is identical,
+                        //   then the comparison row has multiple identical records and we need to retrieve those for post-processing later (throwing
+                        //   away records up until the cursor ID, but we can&#39;t do that in SQL, because we can&#39;t assume IDs to be linear).
+                        //
+                        // Example to illustrate the above:
+                        // OrderBy: A ASC | B ASC | C DESC, cursor on 2.
+                        // ID A B C
+                        // 1  2 2 3
+                        // 2  2 2 2 &lt;- cursor
+                        // 3  3 1 4
+                        // 4  5 7 1
+                        //
+                        // The conditions we build to make sure that we only get (2, 2, 2), (3, 1, 4) and (5, 7, 1):
+                        // `(A = 2 AND B = 2 AND C &gt;= 2) OR (A = 2 AND B &gt; 2) OR (A &gt; 2)`
+                        // If we would do `(A = 2 AND B &gt;= 2)` as the middle statement, we suddenly get record with ID 1 a well. However, we can&#39;t do
+                        // `(A = 2 AND B = 2 AND C &gt; 2)` either, because then we&#39;d miss out on the cursor row as well as possible duplicates coming after the cursor,
+                        // which also need to be included in the result.
+                        //
+                        // Said differently, we handle all the cases in which the prefixes are equal to len - 1 to account for possible identical comparators,
+                        // but everything else must come strictly &quot;after&quot; the cursor.
+                        </span>and_conditions.push(map_orderby_condition(order_definition, reverse, <span class="bool-val">true</span>));
+                    } <span class="kw">else </span>{
+                        and_conditions.push(map_orderby_condition(order_definition, reverse, <span class="bool-val">false</span>));
                     }
 
-                    <span class="ident">conditions_acc</span>.<span class="ident">push</span>(<span class="ident">ConditionTree::And</span>(<span class="ident">and_conditions</span>));
-                    <span class="ident">conditions_acc</span>
+                    conditions_acc.push(ConditionTree::And(and_conditions));
+                    conditions_acc
                 });
 
-                <span class="ident">ConditionTree::Or</span>(<span class="ident">or_conditions</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>())
+                ConditionTree::Or(or_conditions.into_iter().map(Into::into).collect())
             };
 
-            (<span class="prelude-val">Some</span>(<span class="ident">subquery_table</span>), <span class="ident">condition_tree</span>)
+            (<span class="prelude-val">Some</span>(subquery_table), condition_tree)
         }
     }
 }
 
-<span class="comment">// A negative `take` value signifies that values should be taken before the cursor,</span>
-<span class="comment">// requiring the correct comparison operator to be used to fit the reversed order.</span>
-<span class="kw">fn</span> <span class="ident">map_orderby_condition</span>(
-    <span class="ident">order_definition</span>: <span class="kw-2">&amp;</span><span class="ident">CursorOrderDefinition</span>,
-    <span class="ident">reverse</span>: <span class="ident">bool</span>,
-    <span class="ident">include_eq</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">cmp_column</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">ORDER_TABLE_ALIAS</span>, <span class="ident">order_definition</span>.<span class="ident">cmp_column_alias</span>.<span class="ident">to_owned</span>()));
-    <span class="kw">let</span> <span class="ident">cloned_cmp_column</span> <span class="op">=</span> <span class="ident">cmp_column</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">order_column</span> <span class="op">=</span> <span class="ident">order_definition</span>.<span class="ident">order_column</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">cloned_order_column</span> <span class="op">=</span> <span class="ident">order_column</span>.<span class="ident">clone</span>();
+<span class="comment">// A negative `take` value signifies that values should be taken before the cursor,
+// requiring the correct comparison operator to be used to fit the reversed order.
+</span><span class="kw">fn </span>map_orderby_condition(
+    order_definition: <span class="kw-2">&amp;</span>CursorOrderDefinition,
+    reverse: bool,
+    include_eq: bool,
+) -&gt; Expression&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">let </span>cmp_column = Column::from((ORDER_TABLE_ALIAS, order_definition.cmp_column_alias.to_owned()));
+    <span class="kw">let </span>cloned_cmp_column = cmp_column.clone();
+    <span class="kw">let </span>order_column = order_definition.order_column.clone();
+    <span class="kw">let </span>cloned_order_column = order_column.clone();
 
-    <span class="kw">let</span> <span class="ident">order_expr</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_definition</span>.<span class="ident">sort_order</span> {
-        <span class="comment">// If it&#39;s ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).</span>
-        <span class="ident">SortOrder::Ascending</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">include_eq</span> {
-                <span class="ident">order_column</span>.<span class="ident">less_than_or_equals</span>(<span class="ident">cmp_column</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">order_column</span>.<span class="ident">less_than</span>(<span class="ident">cmp_column</span>)
+    <span class="kw">let </span>order_expr: Expression&lt;<span class="lifetime">&#39;static</span>&gt; = <span class="kw">match </span>order_definition.sort_order {
+        <span class="comment">// If it&#39;s ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).
+        </span>SortOrder::Ascending <span class="kw">if </span>reverse =&gt; {
+            <span class="kw">if </span>include_eq {
+                order_column.less_than_or_equals(cmp_column)
+            } <span class="kw">else </span>{
+                order_column.less_than(cmp_column)
             }
         }
 
-        <span class="comment">// If it&#39;s DESC but we want to take from the back, the ORDER BY will be ASC, meaning that comparisons done need to be gt(e).</span>
-        <span class="ident">SortOrder::Descending</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">include_eq</span> {
-                <span class="ident">order_column</span>.<span class="ident">greater_than_or_equals</span>(<span class="ident">cmp_column</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">order_column</span>.<span class="ident">greater_than</span>(<span class="ident">cmp_column</span>)
+        <span class="comment">// If it&#39;s DESC but we want to take from the back, the ORDER BY will be ASC, meaning that comparisons done need to be gt(e).
+        </span>SortOrder::Descending <span class="kw">if </span>reverse =&gt; {
+            <span class="kw">if </span>include_eq {
+                order_column.greater_than_or_equals(cmp_column)
+            } <span class="kw">else </span>{
+                order_column.greater_than(cmp_column)
             }
         }
 
-        <span class="ident">SortOrder::Ascending</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">include_eq</span> {
-                <span class="ident">order_column</span>.<span class="ident">greater_than_or_equals</span>(<span class="ident">cmp_column</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">order_column</span>.<span class="ident">greater_than</span>(<span class="ident">cmp_column</span>)
+        SortOrder::Ascending =&gt; {
+            <span class="kw">if </span>include_eq {
+                order_column.greater_than_or_equals(cmp_column)
+            } <span class="kw">else </span>{
+                order_column.greater_than(cmp_column)
             }
         }
 
-        <span class="ident">SortOrder::Descending</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">include_eq</span> {
-                <span class="ident">order_column</span>.<span class="ident">less_than_or_equals</span>(<span class="ident">cmp_column</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">order_column</span>.<span class="ident">less_than</span>(<span class="ident">cmp_column</span>)
+        SortOrder::Descending =&gt; {
+            <span class="kw">if </span>include_eq {
+                order_column.less_than_or_equals(cmp_column)
+            } <span class="kw">else </span>{
+                order_column.less_than(cmp_column)
             }
         }
     }
-    .<span class="ident">into</span>();
+    .into();
 
-    <span class="comment">// If we have null values in the ordering or comparison row, those are automatically included because we can&#39;t make a</span>
-    <span class="comment">// statement over their order relative to the cursor.</span>
-    <span class="kw">let</span> <span class="ident">order_expr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">order_definition</span>.<span class="ident">on_nullable_fields</span> {
-        <span class="ident">order_expr</span>
-            .<span class="ident">or</span>(<span class="ident">cloned_order_column</span>.<span class="ident">is_null</span>())
-            .<span class="ident">or</span>(<span class="ident">cloned_cmp_column</span>.<span class="ident">is_null</span>())
-            .<span class="ident">into</span>()
-    } <span class="kw">else</span> {
-        <span class="ident">order_expr</span>
+    <span class="comment">// If we have null values in the ordering or comparison row, those are automatically included because we can&#39;t make a
+    // statement over their order relative to the cursor.
+    </span><span class="kw">let </span>order_expr = <span class="kw">if </span>order_definition.on_nullable_fields {
+        order_expr
+            .or(cloned_order_column.is_null())
+            .or(cloned_cmp_column.is_null())
+            .into()
+    } <span class="kw">else </span>{
+        order_expr
     };
 
-    <span class="comment">// Add OR statements for the foreign key fields too if they are nullable</span>
-    <span class="kw">let</span> <span class="ident">order_expr</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fks</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">order_definition</span>.<span class="ident">order_fks</span> {
-        <span class="ident">fks</span>.<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="op">!</span><span class="ident">fk</span>.<span class="ident">field</span>.<span class="ident">is_required</span>())
-            .<span class="ident">fold</span>(<span class="ident">order_expr</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">fk</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">col</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">alias</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">fk</span>.<span class="ident">alias</span> {
-                    <span class="ident">Column::from</span>((<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">fk</span>.<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>()))
-                } <span class="kw">else</span> {
-                    <span class="ident">fk</span>.<span class="ident">field</span>.<span class="ident">as_column</span>()
+    <span class="comment">// Add OR statements for the foreign key fields too if they are nullable
+    </span><span class="kw">let </span>order_expr = <span class="kw">if let </span><span class="prelude-val">Some</span>(fks) = <span class="kw-2">&amp;</span>order_definition.order_fks {
+        fks.iter()
+            .filter(|fk| !fk.field.is_required())
+            .fold(order_expr, |acc, fk| {
+                <span class="kw">let </span>col = <span class="kw">if let </span><span class="prelude-val">Some</span>(alias) = <span class="kw-2">&amp;</span>fk.alias {
+                    Column::from((alias.to_owned(), fk.field.db_name().to_owned()))
+                } <span class="kw">else </span>{
+                    fk.field.as_column()
                 }
-                .<span class="ident">is_null</span>();
+                .is_null();
 
-                <span class="ident">acc</span>.<span class="ident">or</span>(<span class="ident">col</span>).<span class="ident">into</span>()
+                acc.or(col).into()
             })
-    } <span class="kw">else</span> {
-        <span class="ident">order_expr</span>
+    } <span class="kw">else </span>{
+        order_expr
     };
 
-    <span class="ident">order_expr</span>
+    order_expr
 }
 
-<span class="kw">fn</span> <span class="ident">map_equality_condition</span>(<span class="ident">order_definition</span>: <span class="kw-2">&amp;</span><span class="ident">CursorOrderDefinition</span>) -&gt; <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">cmp_column</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">ORDER_TABLE_ALIAS</span>, <span class="ident">order_definition</span>.<span class="ident">cmp_column_alias</span>.<span class="ident">to_owned</span>()));
-    <span class="kw">let</span> <span class="ident">order_column</span> <span class="op">=</span> <span class="ident">order_definition</span>.<span class="ident">order_column</span>.<span class="ident">to_owned</span>();
+<span class="kw">fn </span>map_equality_condition(order_definition: <span class="kw-2">&amp;</span>CursorOrderDefinition) -&gt; Expression&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">let </span>cmp_column = Column::from((ORDER_TABLE_ALIAS, order_definition.cmp_column_alias.to_owned()));
+    <span class="kw">let </span>order_column = order_definition.order_column.to_owned();
 
-    <span class="comment">// If we have null values in the ordering or comparison row, those are automatically included because we can&#39;t make a</span>
-    <span class="comment">// statement over their order relative to the cursor.</span>
-    <span class="kw">if</span> <span class="ident">order_definition</span>.<span class="ident">on_nullable_fields</span> {
-        <span class="ident">order_column</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">equals</span>(<span class="ident">cmp_column</span>.<span class="ident">clone</span>())
-            .<span class="ident">or</span>(<span class="ident">cmp_column</span>.<span class="ident">is_null</span>())
-            .<span class="ident">or</span>(<span class="ident">order_column</span>.<span class="ident">is_null</span>())
-            .<span class="ident">into</span>()
-    } <span class="kw">else</span> {
-        <span class="ident">order_column</span>.<span class="ident">equals</span>(<span class="ident">cmp_column</span>).<span class="ident">into</span>()
+    <span class="comment">// If we have null values in the ordering or comparison row, those are automatically included because we can&#39;t make a
+    // statement over their order relative to the cursor.
+    </span><span class="kw">if </span>order_definition.on_nullable_fields {
+        order_column
+            .clone()
+            .equals(cmp_column.clone())
+            .or(cmp_column.is_null())
+            .or(order_column.is_null())
+            .into()
+    } <span class="kw">else </span>{
+        order_column.equals(cmp_column).into()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">order_definitions</span>(
-    <span class="ident">query_arguments</span>: <span class="kw-2">&amp;</span><span class="ident">QueryArguments</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">order_by_defs</span>: <span class="kw-2">&amp;</span>[<span class="ident">OrderByDefinition</span>],
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CursorOrderDefinition</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">query_arguments</span>.<span class="ident">order_by</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">order_by_defs</span>.<span class="ident">len</span>() {
+<span class="kw">fn </span>order_definitions(
+    query_arguments: <span class="kw-2">&amp;</span>QueryArguments,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    order_by_defs: <span class="kw-2">&amp;</span>[OrderByDefinition],
+) -&gt; Vec&lt;CursorOrderDefinition&gt; {
+    <span class="kw">if </span>query_arguments.order_by.len() != order_by_defs.len() {
         <span class="macro">unreachable!</span>(<span class="string">&quot;There must be an equal amount of order by definition than there are order bys&quot;</span>)
     }
 
-    <span class="kw">if</span> <span class="ident">query_arguments</span>.<span class="ident">order_by</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="ident">model</span>
-            .<span class="ident">primary_identifier</span>()
-            .<span class="ident">as_scalar_fields</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Primary identifier has non-scalar fields.&quot;</span>)
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">CursorOrderDefinition</span> {
-                <span class="ident">sort_order</span>: <span class="ident">SortOrder::Ascending</span>,
-                <span class="ident">order_column</span>: <span class="ident">f</span>.<span class="ident">as_column</span>().<span class="ident">into</span>(),
-                <span class="ident">order_fks</span>: <span class="prelude-val">None</span>,
-                <span class="ident">cmp_column</span>: <span class="ident">f</span>.<span class="ident">as_column</span>().<span class="ident">into</span>(),
-                <span class="ident">cmp_column_alias</span>: <span class="ident">f</span>.<span class="ident">db_name</span>().<span class="ident">to_string</span>(),
-                <span class="ident">on_nullable_fields</span>: <span class="op">!</span><span class="ident">f</span>.<span class="ident">is_required</span>(),
+    <span class="kw">if </span>query_arguments.order_by.is_empty() {
+        <span class="kw">return </span>model
+            .primary_identifier()
+            .as_scalar_fields()
+            .expect(<span class="string">&quot;Primary identifier has non-scalar fields.&quot;</span>)
+            .into_iter()
+            .map(|f| CursorOrderDefinition {
+                sort_order: SortOrder::Ascending,
+                order_column: f.as_column().into(),
+                order_fks: <span class="prelude-val">None</span>,
+                cmp_column: f.as_column().into(),
+                cmp_column_alias: f.db_name().to_string(),
+                on_nullable_fields: !f.is_required(),
             })
-            .<span class="ident">collect</span>();
+            .collect();
     }
 
-    <span class="ident">query_arguments</span>
-        .<span class="ident">order_by</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">enumerate</span>()
-        .<span class="ident">zip</span>(<span class="ident">order_by_defs</span>.<span class="ident">iter</span>())
-        .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">index</span>, <span class="ident">order_by</span>), <span class="ident">order_by_def</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">order_by</span> {
-            <span class="ident">OrderBy::Scalar</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">cursor_order_def_scalar</span>(<span class="ident">order_by</span>, <span class="ident">order_by_def</span>, <span class="ident">index</span>),
-            <span class="ident">OrderBy::ScalarAggregation</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">cursor_order_def_aggregation_scalar</span>(<span class="ident">order_by</span>, <span class="ident">order_by_def</span>, <span class="ident">index</span>),
-            <span class="ident">OrderBy::ToManyAggregation</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">cursor_order_def_aggregation_rel</span>(<span class="ident">order_by</span>, <span class="ident">order_by_def</span>, <span class="ident">index</span>),
-            <span class="ident">OrderBy::Relevance</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">cursor_order_def_relevance</span>(<span class="ident">order_by</span>, <span class="ident">order_by_def</span>, <span class="ident">index</span>),
+    query_arguments
+        .order_by
+        .iter()
+        .enumerate()
+        .zip(order_by_defs.iter())
+        .map(|((index, order_by), order_by_def)| <span class="kw">match </span>order_by {
+            OrderBy::Scalar(order_by) =&gt; cursor_order_def_scalar(order_by, order_by_def, index),
+            OrderBy::ScalarAggregation(order_by) =&gt; cursor_order_def_aggregation_scalar(order_by, order_by_def, index),
+            OrderBy::ToManyAggregation(order_by) =&gt; cursor_order_def_aggregation_rel(order_by, order_by_def, index),
+            OrderBy::Relevance(order_by) =&gt; cursor_order_def_relevance(order_by, order_by_def, index),
         })
-        .<span class="ident">collect_vec</span>()
+        .collect_vec()
 }
 
-<span class="doccomment">/// Build a CursorOrderDefinition for an order by scalar</span>
-<span class="kw">fn</span> <span class="ident">cursor_order_def_scalar</span>(
-    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByScalar</span>,
-    <span class="ident">order_by_def</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByDefinition</span>,
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">CursorOrderDefinition</span> {
-    <span class="comment">// If there are any ordering hops, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).</span>
-    <span class="comment">// These fk fields are needed to check whether they are nullable</span>
-    <span class="comment">// cf: part #2 of the SQL query above, when a field is nullable.</span>
-    <span class="kw">let</span> <span class="ident">fks</span> <span class="op">=</span> <span class="ident">foreign_keys_from_order_path</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">path</span>, <span class="kw-2">&amp;</span><span class="ident">order_by_def</span>.<span class="ident">joins</span>);
+<span class="doccomment">/// Build a CursorOrderDefinition for an order by scalar
+</span><span class="kw">fn </span>cursor_order_def_scalar(
+    order_by: <span class="kw-2">&amp;</span>OrderByScalar,
+    order_by_def: <span class="kw-2">&amp;</span>OrderByDefinition,
+    index: usize,
+) -&gt; CursorOrderDefinition {
+    <span class="comment">// If there are any ordering hops, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
+    // These fk fields are needed to check whether they are nullable
+    // cf: part #2 of the SQL query above, when a field is nullable.
+    </span><span class="kw">let </span>fks = foreign_keys_from_order_path(<span class="kw-2">&amp;</span>order_by.path, <span class="kw-2">&amp;</span>order_by_def.joins);
 
-    <span class="comment">// Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.</span>
-    <span class="comment">// eg: orderBy: [{ id: asc }, { b: { id: asc } }]</span>
-    <span class="comment">// Without these aliases, selecting from the &lt;ORDER_TABLE_ALIAS&gt; tmp table would result in ambiguous field name</span>
-    <span class="comment">// Unwrap is safe: SQL connectors do not anything other than models as field containers.</span>
-    <span class="kw">let</span> <span class="ident">cmp_column_alias</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="comment">// Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
+    // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
+    // Without these aliases, selecting from the &lt;ORDER_TABLE_ALIAS&gt; tmp table would result in ambiguous field name
+    // Unwrap is safe: SQL connectors do not anything other than models as field containers.
+    </span><span class="kw">let </span>cmp_column_alias = <span class="macro">format!</span>(
         <span class="string">&quot;{}_{}_{}&quot;</span>,
-        <span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">container</span>.<span class="ident">as_model</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>,
-        <span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">name</span>,
-        <span class="ident">index</span>
+        <span class="kw-2">&amp;</span>order_by.field.container.as_model().unwrap().name,
+        <span class="kw-2">&amp;</span>order_by.field.name,
+        index
     );
 
-    <span class="ident">CursorOrderDefinition</span> {
-        <span class="ident">sort_order</span>: <span class="ident">order_by</span>.<span class="ident">sort_order</span>,
-        <span class="ident">order_column</span>: <span class="ident">order_by_def</span>.<span class="ident">order_column</span>.<span class="ident">clone</span>(),
-        <span class="ident">order_fks</span>: <span class="ident">fks</span>,
-        <span class="ident">cmp_column</span>: <span class="ident">order_by_def</span>.<span class="ident">order_column</span>.<span class="ident">clone</span>().<span class="ident">alias</span>(<span class="ident">cmp_column_alias</span>.<span class="ident">clone</span>()),
-        <span class="ident">cmp_column_alias</span>,
-        <span class="ident">on_nullable_fields</span>: <span class="op">!</span><span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">is_required</span>(),
+    CursorOrderDefinition {
+        sort_order: order_by.sort_order,
+        order_column: order_by_def.order_column.clone(),
+        order_fks: fks,
+        cmp_column: order_by_def.order_column.clone().alias(cmp_column_alias.clone()),
+        cmp_column_alias,
+        on_nullable_fields: !order_by.field.is_required(),
     }
 }
 
-<span class="doccomment">/// Build a CursorOrderDefinition for an order by aggregation scalar</span>
-<span class="kw">fn</span> <span class="ident">cursor_order_def_aggregation_scalar</span>(
-    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByScalarAggregation</span>,
-    <span class="ident">order_by_def</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByDefinition</span>,
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">CursorOrderDefinition</span> {
-    <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">field</span>;
+<span class="doccomment">/// Build a CursorOrderDefinition for an order by aggregation scalar
+</span><span class="kw">fn </span>cursor_order_def_aggregation_scalar(
+    order_by: <span class="kw-2">&amp;</span>OrderByScalarAggregation,
+    order_by_def: <span class="kw-2">&amp;</span>OrderByDefinition,
+    index: usize,
+) -&gt; CursorOrderDefinition {
+    <span class="kw">let </span>field = <span class="kw-2">&amp;</span>order_by.field;
 
-    <span class="comment">// Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.</span>
-    <span class="comment">// eg: orderBy: [{ id: asc }, { b: { id: asc } }]</span>
-    <span class="comment">// Without these aliases, selecting from the &lt;ORDER_TABLE_ALIAS&gt; cmp table would result in ambiguous field name</span>
-    <span class="comment">// Unwrap is safe: SQL connectors do not anything other than models as field containers.</span>
-    <span class="kw">let</span> <span class="ident">cmp_column_alias</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="comment">// Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
+    // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
+    // Without these aliases, selecting from the &lt;ORDER_TABLE_ALIAS&gt; cmp table would result in ambiguous field name
+    // Unwrap is safe: SQL connectors do not anything other than models as field containers.
+    </span><span class="kw">let </span>cmp_column_alias = <span class="macro">format!</span>(
         <span class="string">&quot;aggr_{}_{}_{}&quot;</span>,
-        <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">container</span>.<span class="ident">as_model</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>,
-        <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>,
-        <span class="ident">index</span>
+        <span class="kw-2">&amp;</span>field.container.as_model().unwrap().name,
+        <span class="kw-2">&amp;</span>field.name,
+        index
     );
 
-    <span class="kw">let</span> <span class="ident">coalesce_exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">order_by_def</span>.<span class="ident">order_column</span>.<span class="ident">clone</span>(), <span class="ident">Value::integer</span>(<span class="number">0</span>).<span class="ident">into</span>()];
+    <span class="kw">let </span>coalesce_exprs: Vec&lt;Expression&gt; = <span class="macro">vec!</span>[order_by_def.order_column.clone(), Value::integer(<span class="number">0</span>).into()];
 
-    <span class="comment">// We coalesce the order column to 0 when it&#39;s compared to the cmp table since the aggregations joins</span>
-    <span class="comment">// might return NULL on relations that have no connected records</span>
-    <span class="kw">let</span> <span class="ident">order_column</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">coalesce</span>(<span class="ident">coalesce_exprs</span>).<span class="ident">into</span>();
+    <span class="comment">// We coalesce the order column to 0 when it&#39;s compared to the cmp table since the aggregations joins
+    // might return NULL on relations that have no connected records
+    </span><span class="kw">let </span>order_column: Expression = coalesce(coalesce_exprs).into();
 
-    <span class="ident">CursorOrderDefinition</span> {
-        <span class="ident">sort_order</span>: <span class="ident">order_by</span>.<span class="ident">sort_order</span>,
-        <span class="ident">order_column</span>: <span class="ident">order_column</span>.<span class="ident">clone</span>(),
-        <span class="ident">order_fks</span>: <span class="prelude-val">None</span>,
-        <span class="ident">cmp_column</span>: <span class="ident">order_column</span>.<span class="ident">alias</span>(<span class="ident">cmp_column_alias</span>.<span class="ident">clone</span>()),
-        <span class="ident">cmp_column_alias</span>,
-        <span class="ident">on_nullable_fields</span>: <span class="bool-val">false</span>,
+    CursorOrderDefinition {
+        sort_order: order_by.sort_order,
+        order_column: order_column.clone(),
+        order_fks: <span class="prelude-val">None</span>,
+        cmp_column: order_column.alias(cmp_column_alias.clone()),
+        cmp_column_alias,
+        on_nullable_fields: <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// Build a CursorOrderDefinition for an order by aggregation on relations</span>
-<span class="kw">fn</span> <span class="ident">cursor_order_def_aggregation_rel</span>(
-    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByToManyAggregation</span>,
-    <span class="ident">order_by_def</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByDefinition</span>,
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">CursorOrderDefinition</span> {
-    <span class="comment">// If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).</span>
-    <span class="comment">// These fk fields are needed to check whether they are nullable</span>
-    <span class="comment">// cf: part #2 of the SQL query above, when a field is nullable.</span>
-    <span class="kw">let</span> <span class="ident">fks</span> <span class="op">=</span> <span class="ident">foreign_keys_from_order_path</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">path</span>, <span class="kw-2">&amp;</span><span class="ident">order_by_def</span>.<span class="ident">joins</span>);
+<span class="doccomment">/// Build a CursorOrderDefinition for an order by aggregation on relations
+</span><span class="kw">fn </span>cursor_order_def_aggregation_rel(
+    order_by: <span class="kw-2">&amp;</span>OrderByToManyAggregation,
+    order_by_def: <span class="kw-2">&amp;</span>OrderByDefinition,
+    index: usize,
+) -&gt; CursorOrderDefinition {
+    <span class="comment">// If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
+    // These fk fields are needed to check whether they are nullable
+    // cf: part #2 of the SQL query above, when a field is nullable.
+    </span><span class="kw">let </span>fks = foreign_keys_from_order_path(<span class="kw-2">&amp;</span>order_by.path, <span class="kw-2">&amp;</span>order_by_def.joins);
 
-    <span class="comment">// Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.</span>
-    <span class="comment">// eg: orderBy: [{ id: asc }, { b: { id: asc } }]</span>
-    <span class="comment">// Without these aliases, selecting from the &lt;ORDER_TABLE_ALIAS&gt; cmp table would result in ambiguous field name</span>
-    <span class="kw">let</span> <span class="ident">cmp_column_alias</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="comment">// Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
+    // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
+    // Without these aliases, selecting from the &lt;ORDER_TABLE_ALIAS&gt; cmp table would result in ambiguous field name
+    </span><span class="kw">let </span>cmp_column_alias = <span class="macro">format!</span>(
         <span class="string">&quot;aggr_{}_{}&quot;</span>,
-        <span class="ident">order_by</span>
-            .<span class="ident">path</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">hop</span> {
-                <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">model</span>().<span class="ident">name</span>.<span class="ident">to_owned</span>(),
-                <span class="ident">OrderByHop::Composite</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;SQL connectors don&#39;t have composite support.&quot;</span>),
+        order_by
+            .path
+            .iter()
+            .map(|hop| <span class="kw">match </span>hop {
+                OrderByHop::Relation(rf) =&gt; rf.model().name.to_owned(),
+                OrderByHop::Composite(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;SQL connectors don&#39;t have composite support.&quot;</span>),
             })
-            .<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>),
-        <span class="ident">index</span>
+            .join(<span class="string">&quot;_&quot;</span>),
+        index
     );
 
-    <span class="kw">let</span> <span class="ident">coalesce_exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">order_by_def</span>.<span class="ident">order_column</span>.<span class="ident">clone</span>(), <span class="ident">Value::integer</span>(<span class="number">0</span>).<span class="ident">into</span>()];
-    <span class="comment">// We coalesce the order column to 0 when it&#39;s compared to the cmp table since the aggregations joins</span>
-    <span class="comment">// might return NULL on relations that have no connected records</span>
-    <span class="kw">let</span> <span class="ident">order_column</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">coalesce</span>(<span class="ident">coalesce_exprs</span>).<span class="ident">into</span>();
+    <span class="kw">let </span>coalesce_exprs: Vec&lt;Expression&gt; = <span class="macro">vec!</span>[order_by_def.order_column.clone(), Value::integer(<span class="number">0</span>).into()];
+    <span class="comment">// We coalesce the order column to 0 when it&#39;s compared to the cmp table since the aggregations joins
+    // might return NULL on relations that have no connected records
+    </span><span class="kw">let </span>order_column: Expression = coalesce(coalesce_exprs).into();
 
-    <span class="ident">CursorOrderDefinition</span> {
-        <span class="ident">sort_order</span>: <span class="ident">order_by</span>.<span class="ident">sort_order</span>,
-        <span class="ident">order_column</span>: <span class="ident">order_column</span>.<span class="ident">clone</span>(),
-        <span class="ident">order_fks</span>: <span class="ident">fks</span>,
-        <span class="ident">cmp_column</span>: <span class="ident">order_column</span>.<span class="ident">alias</span>(<span class="ident">cmp_column_alias</span>.<span class="ident">clone</span>()),
-        <span class="ident">cmp_column_alias</span>,
-        <span class="ident">on_nullable_fields</span>: <span class="bool-val">false</span>,
+    CursorOrderDefinition {
+        sort_order: order_by.sort_order,
+        order_column: order_column.clone(),
+        order_fks: fks,
+        cmp_column: order_column.alias(cmp_column_alias.clone()),
+        cmp_column_alias,
+        on_nullable_fields: <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// Build a CursorOrderDefinition for an order by relevance</span>
-<span class="kw">fn</span> <span class="ident">cursor_order_def_relevance</span>(
-    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByRelevance</span>,
-    <span class="ident">order_by_def</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByDefinition</span>,
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">CursorOrderDefinition</span> {
-    <span class="kw">let</span> <span class="ident">order_column</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">order_by_def</span>.<span class="ident">order_column</span>;
-    <span class="kw">let</span> <span class="ident">cmp_column_alias</span> <span class="op">=</span> <span class="macro">format!</span>(
+<span class="doccomment">/// Build a CursorOrderDefinition for an order by relevance
+</span><span class="kw">fn </span>cursor_order_def_relevance(
+    order_by: <span class="kw-2">&amp;</span>OrderByRelevance,
+    order_by_def: <span class="kw-2">&amp;</span>OrderByDefinition,
+    index: usize,
+) -&gt; CursorOrderDefinition {
+    <span class="kw">let </span>order_column = <span class="kw-2">&amp;</span>order_by_def.order_column;
+    <span class="kw">let </span>cmp_column_alias = <span class="macro">format!</span>(
         <span class="string">&quot;relevance_{}_{}&quot;</span>,
-        <span class="ident">order_by</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()).<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>),
-        <span class="ident">index</span>
+        order_by.fields.iter().map(|sf| sf.name.as_str()).join(<span class="string">&quot;_&quot;</span>),
+        index
     );
 
-    <span class="ident">CursorOrderDefinition</span> {
-        <span class="ident">sort_order</span>: <span class="ident">order_by</span>.<span class="ident">sort_order</span>,
-        <span class="ident">order_column</span>: <span class="ident">order_column</span>.<span class="ident">clone</span>(),
-        <span class="ident">order_fks</span>: <span class="prelude-val">None</span>,
-        <span class="ident">cmp_column</span>: <span class="ident">order_column</span>.<span class="ident">clone</span>().<span class="ident">alias</span>(<span class="ident">cmp_column_alias</span>.<span class="ident">clone</span>()),
-        <span class="ident">cmp_column_alias</span>,
-        <span class="ident">on_nullable_fields</span>: <span class="bool-val">false</span>,
+    CursorOrderDefinition {
+        sort_order: order_by.sort_order,
+        order_column: order_column.clone(),
+        order_fks: <span class="prelude-val">None</span>,
+        cmp_column: order_column.clone().alias(cmp_column_alias.clone()),
+        cmp_column_alias,
+        on_nullable_fields: <span class="bool-val">false</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">foreign_keys_from_order_path</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="ident">OrderByHop</span>], <span class="ident">joins</span>: <span class="kw-2">&amp;</span>[<span class="ident">AliasedJoin</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CursorOrderForeignKey</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">before_last_hop</span>, <span class="ident">last_hop</span>) <span class="op">=</span> <span class="ident">take_last_two_elem</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>);
+<span class="kw">fn </span>foreign_keys_from_order_path(path: <span class="kw-2">&amp;</span>[OrderByHop], joins: <span class="kw-2">&amp;</span>[AliasedJoin]) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;CursorOrderForeignKey&gt;&gt; {
+    <span class="kw">let </span>(before_last_hop, last_hop) = take_last_two_elem(<span class="kw-2">&amp;</span>path);
 
-    <span class="ident">last_hop</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> {
-        <span class="kw">match</span> <span class="ident">hop</span> {
-            <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) =&gt; {
-                <span class="ident">rf</span>.<span class="ident">relation_info</span>
-                    .<span class="ident">fields</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fk_name</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">fk_field</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">model</span>().<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="ident">fk_name</span>).<span class="ident">unwrap</span>();
+    last_hop.map(|hop| {
+        <span class="kw">match </span>hop {
+            OrderByHop::Relation(rf) =&gt; {
+                rf.relation_info
+                    .fields
+                    .iter()
+                    .map(|fk_name| {
+                        <span class="kw">let </span>fk_field = rf.model().fields().find_from_scalar(fk_name).unwrap();
 
-                        <span class="comment">// If there are _more than one_ hop, we need to refer to the fk fields using the</span>
-                        <span class="comment">// join alias of the hop _before_ the last hop. eg:</span>
-                        <span class="comment">//</span>
-                        <span class="comment">// ```sql</span>
-                        <span class="comment">// SELECT ...</span>
-                        <span class="comment">// FROM</span>
-                        <span class="comment">//  &quot;public&quot;.&quot;ModelA&quot;</span>
-                        <span class="comment">//   LEFT JOIN &quot;public&quot;.&quot;ModelB&quot; AS &quot;orderby_0_ModelB&quot; ON (</span>
-                        <span class="comment">//     &quot;public&quot;.&quot;ModelA&quot;.&quot;b_id&quot; = &quot;orderby_0_ModelB&quot;.&quot;id&quot;</span>
-                        <span class="comment">//   )</span>
-                        <span class="comment">//   LEFT JOIN &quot;public&quot;.&quot;ModelC&quot; AS &quot;orderby_0_ModelC&quot; ON (</span>
-                        <span class="comment">//     &quot;orderby_0_ModelB&quot;.&quot;c_id&quot; = &quot;orderby_0_ModelC&quot;.&quot;id&quot;</span>
-                        <span class="comment">//   )</span>
-                        <span class="comment">// WHERE</span>
-                        <span class="comment">// ( ... OR &lt;before_last_join_alias&gt;.&lt;foreign_key_db_name&gt; IS NULL )</span>
-                        <span class="comment">// ```</span>
-                        <span class="comment">// In the example above, &lt;before_last_join_alias&gt; == &quot;orderby_0_ModelB&quot;</span>
-                        <span class="comment">//                          &lt;foreign_key_db_name&gt; == &quot;c_id&quot;</span>
-                        <span class="kw">match</span> <span class="ident">before_last_hop</span> {
+                        <span class="comment">// If there are _more than one_ hop, we need to refer to the fk fields using the
+                        // join alias of the hop _before_ the last hop. eg:
+                        //
+                        // ```sql
+                        // SELECT ...
+                        // FROM
+                        //  &quot;public&quot;.&quot;ModelA&quot;
+                        //   LEFT JOIN &quot;public&quot;.&quot;ModelB&quot; AS &quot;orderby_0_ModelB&quot; ON (
+                        //     &quot;public&quot;.&quot;ModelA&quot;.&quot;b_id&quot; = &quot;orderby_0_ModelB&quot;.&quot;id&quot;
+                        //   )
+                        //   LEFT JOIN &quot;public&quot;.&quot;ModelC&quot; AS &quot;orderby_0_ModelC&quot; ON (
+                        //     &quot;orderby_0_ModelB&quot;.&quot;c_id&quot; = &quot;orderby_0_ModelC&quot;.&quot;id&quot;
+                        //   )
+                        // WHERE
+                        // ( ... OR &lt;before_last_join_alias&gt;.&lt;foreign_key_db_name&gt; IS NULL )
+                        // ```
+                        // In the example above, &lt;before_last_join_alias&gt; == &quot;orderby_0_ModelB&quot;
+                        //                          &lt;foreign_key_db_name&gt; == &quot;c_id&quot;
+                        </span><span class="kw">match </span>before_last_hop {
                             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                                <span class="kw">let</span> (<span class="ident">before_last_join</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">take_last_two_elem</span>(<span class="ident">joins</span>);
-                                <span class="kw">let</span> <span class="ident">before_last_join</span> <span class="op">=</span> <span class="ident">before_last_join</span>
-                                    .<span class="ident">expect</span>(<span class="string">&quot;There should be an equal amount of order by hops and joins&quot;</span>);
+                                <span class="kw">let </span>(before_last_join, <span class="kw">_</span>) = take_last_two_elem(joins);
+                                <span class="kw">let </span>before_last_join = before_last_join
+                                    .expect(<span class="string">&quot;There should be an equal amount of order by hops and joins&quot;</span>);
 
-                                <span class="ident">CursorOrderForeignKey</span> {
-                                    <span class="ident">field</span>: <span class="ident">fk_field</span>,
-                                    <span class="ident">alias</span>: <span class="prelude-val">Some</span>(<span class="ident">before_last_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>()),
+                                CursorOrderForeignKey {
+                                    field: fk_field,
+                                    alias: <span class="prelude-val">Some</span>(before_last_join.alias.to_owned()),
                                 }
                             }
-                            <span class="prelude-val">None</span> =&gt; {
-                                <span class="comment">// If there is not more than one hop, then there&#39;s no need to alias the fk field</span>
-                                <span class="ident">CursorOrderForeignKey</span> {
-                                    <span class="ident">field</span>: <span class="ident">fk_field</span>,
-                                    <span class="ident">alias</span>: <span class="prelude-val">None</span>,
+                            <span class="prelude-val">None </span>=&gt; {
+                                <span class="comment">// If there is not more than one hop, then there&#39;s no need to alias the fk field
+                                </span>CursorOrderForeignKey {
+                                    field: fk_field,
+                                    alias: <span class="prelude-val">None</span>,
                                 }
                             }
                         }
                     })
-                    .<span class="ident">collect_vec</span>()
+                    .collect_vec()
             }
-            <span class="ident">OrderByHop::Composite</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;SQL connectors don&#39;t have composite support.&quot;</span>),
+            OrderByHop::Composite(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;SQL connectors don&#39;t have composite support.&quot;</span>),
         }
     })
 }
 
-<span class="comment">// Returns (before_last_elem, last_elem)</span>
-<span class="kw">fn</span> <span class="ident">take_last_two_elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">len</span>();
+<span class="comment">// Returns (before_last_elem, last_elem)
+</span><span class="kw">fn </span>take_last_two_elem&lt;T&gt;(slice: <span class="kw-2">&amp;</span>[T]) -&gt; (<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt;, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt;) {
+    <span class="kw">let </span>len = slice.len();
 
-    <span class="kw">match</span> <span class="ident">len</span> {
-        <span class="number">0</span> =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="number">1</span> =&gt; (<span class="prelude-val">None</span>, <span class="ident">slice</span>.<span class="ident">get</span>(<span class="number">0</span>)),
-        <span class="kw">_</span> =&gt; (<span class="ident">slice</span>.<span class="ident">get</span>(<span class="ident">len</span> <span class="op">-</span> <span class="number">2</span>), <span class="ident">slice</span>.<span class="ident">get</span>(<span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>)),
+    <span class="kw">match </span>len {
+        <span class="number">0 </span>=&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        <span class="number">1 </span>=&gt; (<span class="prelude-val">None</span>, slice.get(<span class="number">0</span>)),
+        <span class="kw">_ </span>=&gt; (slice.get(len - <span class="number">2</span>), slice.get(len - <span class="number">1</span>)),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

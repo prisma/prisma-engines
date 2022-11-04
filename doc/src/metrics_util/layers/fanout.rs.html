@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/layers/fanout.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fanout.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../metrics_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/layers/fanout.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fanout.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../metrics_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -198,205 +198,205 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">metrics</span>::{
-    <span class="ident">Counter</span>, <span class="ident">CounterFn</span>, <span class="ident">Gauge</span>, <span class="ident">GaugeFn</span>, <span class="ident">Histogram</span>, <span class="ident">HistogramFn</span>, <span class="ident">Key</span>, <span class="ident">KeyName</span>, <span class="ident">Recorder</span>, <span class="ident">Unit</span>,
+<span class="kw">use </span>metrics::{
+    Counter, CounterFn, Gauge, GaugeFn, Histogram, HistogramFn, Key, KeyName, Recorder, Unit,
 };
 
-<span class="kw">struct</span> <span class="ident">FanoutCounter</span> {
-    <span class="ident">counters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Counter</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>FanoutCounter {
+    counters: Vec&lt;Counter&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">FanoutCounter</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_counters</span>(<span class="ident">counters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Counter</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">counters</span> }
+<span class="kw">impl </span>FanoutCounter {
+    <span class="kw">pub fn </span>from_counters(counters: Vec&lt;Counter&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ counters }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CounterFn</span> <span class="kw">for</span> <span class="ident">FanoutCounter</span> {
-    <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="kw">for</span> <span class="ident">counter</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">counters</span> {
-            <span class="ident">counter</span>.<span class="ident">increment</span>(<span class="ident">value</span>);
+<span class="kw">impl </span>CounterFn <span class="kw">for </span>FanoutCounter {
+    <span class="kw">fn </span>increment(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64) {
+        <span class="kw">for </span>counter <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.counters {
+            counter.increment(value);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">absolute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="kw">for</span> <span class="ident">counter</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">counters</span> {
-            <span class="ident">counter</span>.<span class="ident">absolute</span>(<span class="ident">value</span>);
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FanoutCounter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Counter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">counter</span>: <span class="ident">FanoutCounter</span>) -&gt; <span class="ident">Counter</span> {
-        <span class="ident">Counter::from_arc</span>(<span class="ident">Arc::new</span>(<span class="ident">counter</span>))
-    }
-}
-
-<span class="kw">struct</span> <span class="ident">FanoutGauge</span> {
-    <span class="ident">gauges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Gauge</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">FanoutGauge</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_gauges</span>(<span class="ident">gauges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Gauge</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">gauges</span> }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">GaugeFn</span> <span class="kw">for</span> <span class="ident">FanoutGauge</span> {
-    <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">for</span> <span class="ident">gauge</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">gauges</span> {
-            <span class="ident">gauge</span>.<span class="ident">increment</span>(<span class="ident">value</span>);
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">decrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">for</span> <span class="ident">gauge</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">gauges</span> {
-            <span class="ident">gauge</span>.<span class="ident">decrement</span>(<span class="ident">value</span>);
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">for</span> <span class="ident">gauge</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">gauges</span> {
-            <span class="ident">gauge</span>.<span class="ident">set</span>(<span class="ident">value</span>);
+    <span class="kw">fn </span>absolute(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64) {
+        <span class="kw">for </span>counter <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.counters {
+            counter.absolute(value);
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FanoutGauge</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Gauge</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">gauge</span>: <span class="ident">FanoutGauge</span>) -&gt; <span class="ident">Gauge</span> {
-        <span class="ident">Gauge::from_arc</span>(<span class="ident">Arc::new</span>(<span class="ident">gauge</span>))
+<span class="kw">impl </span>From&lt;FanoutCounter&gt; <span class="kw">for </span>Counter {
+    <span class="kw">fn </span>from(counter: FanoutCounter) -&gt; Counter {
+        Counter::from_arc(Arc::new(counter))
     }
 }
 
-<span class="kw">struct</span> <span class="ident">FanoutHistogram</span> {
-    <span class="ident">histograms</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Histogram</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>FanoutGauge {
+    gauges: Vec&lt;Gauge&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">FanoutHistogram</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_histograms</span>(<span class="ident">histograms</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Histogram</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">histograms</span> }
+<span class="kw">impl </span>FanoutGauge {
+    <span class="kw">pub fn </span>from_gauges(gauges: Vec&lt;Gauge&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ gauges }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">HistogramFn</span> <span class="kw">for</span> <span class="ident">FanoutHistogram</span> {
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">for</span> <span class="ident">histogram</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">histograms</span> {
-            <span class="ident">histogram</span>.<span class="ident">record</span>(<span class="ident">value</span>);
+<span class="kw">impl </span>GaugeFn <span class="kw">for </span>FanoutGauge {
+    <span class="kw">fn </span>increment(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        <span class="kw">for </span>gauge <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.gauges {
+            gauge.increment(value);
+        }
+    }
+
+    <span class="kw">fn </span>decrement(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        <span class="kw">for </span>gauge <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.gauges {
+            gauge.decrement(value);
+        }
+    }
+
+    <span class="kw">fn </span>set(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        <span class="kw">for </span>gauge <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.gauges {
+            gauge.set(value);
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FanoutHistogram</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Histogram</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">histogram</span>: <span class="ident">FanoutHistogram</span>) -&gt; <span class="ident">Histogram</span> {
-        <span class="ident">Histogram::from_arc</span>(<span class="ident">Arc::new</span>(<span class="ident">histogram</span>))
+<span class="kw">impl </span>From&lt;FanoutGauge&gt; <span class="kw">for </span>Gauge {
+    <span class="kw">fn </span>from(gauge: FanoutGauge) -&gt; Gauge {
+        Gauge::from_arc(Arc::new(gauge))
     }
 }
 
-<span class="doccomment">/// Fans out metrics to multiple recorders.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Fanout</span> {
-    <span class="ident">recorders</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Recorder</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>FanoutHistogram {
+    histograms: Vec&lt;Histogram&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Recorder</span> <span class="kw">for</span> <span class="ident">Fanout</span> {
-    <span class="kw">fn</span> <span class="ident">describe_counter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_name</span>: <span class="ident">KeyName</span>, <span class="ident">unit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Unit</span><span class="op">&gt;</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="kw">for</span> <span class="ident">recorder</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">recorders</span> {
-            <span class="ident">recorder</span>.<span class="ident">describe_counter</span>(<span class="ident">key_name</span>.<span class="ident">clone</span>(), <span class="ident">unit</span>, <span class="ident">description</span>);
+<span class="kw">impl </span>FanoutHistogram {
+    <span class="kw">pub fn </span>from_histograms(histograms: Vec&lt;Histogram&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ histograms }
+    }
+}
+
+<span class="kw">impl </span>HistogramFn <span class="kw">for </span>FanoutHistogram {
+    <span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        <span class="kw">for </span>histogram <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.histograms {
+            histogram.record(value);
+        }
+    }
+}
+
+<span class="kw">impl </span>From&lt;FanoutHistogram&gt; <span class="kw">for </span>Histogram {
+    <span class="kw">fn </span>from(histogram: FanoutHistogram) -&gt; Histogram {
+        Histogram::from_arc(Arc::new(histogram))
+    }
+}
+
+<span class="doccomment">/// Fans out metrics to multiple recorders.
+</span><span class="kw">pub struct </span>Fanout {
+    recorders: Vec&lt;Box&lt;<span class="kw">dyn </span>Recorder&gt;&gt;,
+}
+
+<span class="kw">impl </span>Recorder <span class="kw">for </span>Fanout {
+    <span class="kw">fn </span>describe_counter(<span class="kw-2">&amp;</span><span class="self">self</span>, key_name: KeyName, unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;, description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+        <span class="kw">for </span>recorder <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.recorders {
+            recorder.describe_counter(key_name.clone(), unit, description);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">describe_gauge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_name</span>: <span class="ident">KeyName</span>, <span class="ident">unit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Unit</span><span class="op">&gt;</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="kw">for</span> <span class="ident">recorder</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">recorders</span> {
-            <span class="ident">recorder</span>.<span class="ident">describe_gauge</span>(<span class="ident">key_name</span>.<span class="ident">clone</span>(), <span class="ident">unit</span>, <span class="ident">description</span>);
+    <span class="kw">fn </span>describe_gauge(<span class="kw-2">&amp;</span><span class="self">self</span>, key_name: KeyName, unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;, description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+        <span class="kw">for </span>recorder <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.recorders {
+            recorder.describe_gauge(key_name.clone(), unit, description);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">describe_histogram</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_name</span>: <span class="ident">KeyName</span>, <span class="ident">unit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Unit</span><span class="op">&gt;</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="kw">for</span> <span class="ident">recorder</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">recorders</span> {
-            <span class="ident">recorder</span>.<span class="ident">describe_histogram</span>(<span class="ident">key_name</span>.<span class="ident">clone</span>(), <span class="ident">unit</span>, <span class="ident">description</span>);
+    <span class="kw">fn </span>describe_histogram(<span class="kw-2">&amp;</span><span class="self">self</span>, key_name: KeyName, unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;, description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+        <span class="kw">for </span>recorder <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.recorders {
+            recorder.describe_histogram(key_name.clone(), unit, description);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="ident">Counter</span> {
-        <span class="kw">let</span> <span class="ident">counters</span> <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">recorders</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">recorder</span><span class="op">|</span> <span class="ident">recorder</span>.<span class="ident">register_counter</span>(<span class="ident">key</span>)).<span class="ident">collect</span>();
+    <span class="kw">fn </span>register_counter(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Counter {
+        <span class="kw">let </span>counters =
+            <span class="self">self</span>.recorders.iter().map(|recorder| recorder.register_counter(key)).collect();
 
-        <span class="ident">FanoutCounter::from_counters</span>(<span class="ident">counters</span>).<span class="ident">into</span>()
+        FanoutCounter::from_counters(counters).into()
     }
 
-    <span class="kw">fn</span> <span class="ident">register_gauge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="ident">Gauge</span> {
-        <span class="kw">let</span> <span class="ident">gauges</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">recorders</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">recorder</span><span class="op">|</span> <span class="ident">recorder</span>.<span class="ident">register_gauge</span>(<span class="ident">key</span>)).<span class="ident">collect</span>();
+    <span class="kw">fn </span>register_gauge(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Gauge {
+        <span class="kw">let </span>gauges = <span class="self">self</span>.recorders.iter().map(|recorder| recorder.register_gauge(key)).collect();
 
-        <span class="ident">FanoutGauge::from_gauges</span>(<span class="ident">gauges</span>).<span class="ident">into</span>()
+        FanoutGauge::from_gauges(gauges).into()
     }
 
-    <span class="kw">fn</span> <span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="ident">Histogram</span> {
-        <span class="kw">let</span> <span class="ident">histograms</span> <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">recorders</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">recorder</span><span class="op">|</span> <span class="ident">recorder</span>.<span class="ident">register_histogram</span>(<span class="ident">key</span>)).<span class="ident">collect</span>();
+    <span class="kw">fn </span>register_histogram(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Histogram {
+        <span class="kw">let </span>histograms =
+            <span class="self">self</span>.recorders.iter().map(|recorder| recorder.register_histogram(key)).collect();
 
-        <span class="ident">FanoutHistogram::from_histograms</span>(<span class="ident">histograms</span>).<span class="ident">into</span>()
+        FanoutHistogram::from_histograms(histograms).into()
     }
 }
 
-<span class="doccomment">/// A layer for fanning out metrics to multiple recorders.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// More information on the behavior of the layer can be found in [`Fanout`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FanoutBuilder</span> {
-    <span class="ident">recorders</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Recorder</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A layer for fanning out metrics to multiple recorders.
+///
+/// More information on the behavior of the layer can be found in [`Fanout`].
+</span><span class="attribute">#[derive(Default)]
+</span><span class="kw">pub struct </span>FanoutBuilder {
+    recorders: Vec&lt;Box&lt;<span class="kw">dyn </span>Recorder&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">FanoutBuilder</span> {
-    <span class="doccomment">/// Adds a recorder to the fanout list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_recorder</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">recorder</span>: <span class="ident">R</span>) -&gt; <span class="ident">FanoutBuilder</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">Recorder</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl </span>FanoutBuilder {
+    <span class="doccomment">/// Adds a recorder to the fanout list.
+    </span><span class="kw">pub fn </span>add_recorder&lt;R&gt;(<span class="kw-2">mut </span><span class="self">self</span>, recorder: R) -&gt; FanoutBuilder
+    <span class="kw">where
+        </span>R: Recorder + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">recorders</span>.<span class="ident">push</span>(<span class="ident">Box::new</span>(<span class="ident">recorder</span>));
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.recorders.push(Box::new(recorder));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Builds the `Fanout` layer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">Fanout</span> {
-        <span class="ident">Fanout</span> { <span class="ident">recorders</span>: <span class="self">self</span>.<span class="ident">recorders</span> }
+    <span class="doccomment">/// Builds the `Fanout` layer.
+    </span><span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; Fanout {
+        Fanout { recorders: <span class="self">self</span>.recorders }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::FanoutBuilder</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_util</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">Counter</span>, <span class="ident">Gauge</span>, <span class="ident">Histogram</span>, <span class="ident">Unit</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::FanoutBuilder;
+    <span class="kw">use </span><span class="kw">crate</span>::test_util::<span class="kw-2">*</span>;
+    <span class="kw">use </span>metrics::{Counter, Gauge, Histogram, Unit};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_basic_functionality</span>() {
-        <span class="kw">let</span> <span class="ident">operations</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">RecorderOperation::DescribeCounter</span>(
-                <span class="string">&quot;counter_key&quot;</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">Some</span>(<span class="ident">Unit::Count</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_basic_functionality() {
+        <span class="kw">let </span>operations = <span class="macro">vec!</span>[
+            RecorderOperation::DescribeCounter(
+                <span class="string">&quot;counter_key&quot;</span>.into(),
+                <span class="prelude-val">Some</span>(Unit::Count),
                 <span class="string">&quot;counter desc&quot;</span>,
             ),
-            <span class="ident">RecorderOperation::DescribeGauge</span>(<span class="string">&quot;gauge_key&quot;</span>.<span class="ident">into</span>(), <span class="prelude-val">Some</span>(<span class="ident">Unit::Bytes</span>), <span class="string">&quot;gauge desc&quot;</span>),
-            <span class="ident">RecorderOperation::DescribeHistogram</span>(
-                <span class="string">&quot;histogram_key&quot;</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">Some</span>(<span class="ident">Unit::Nanoseconds</span>),
+            RecorderOperation::DescribeGauge(<span class="string">&quot;gauge_key&quot;</span>.into(), <span class="prelude-val">Some</span>(Unit::Bytes), <span class="string">&quot;gauge desc&quot;</span>),
+            RecorderOperation::DescribeHistogram(
+                <span class="string">&quot;histogram_key&quot;</span>.into(),
+                <span class="prelude-val">Some</span>(Unit::Nanoseconds),
                 <span class="string">&quot;histogram desc&quot;</span>,
             ),
-            <span class="ident">RecorderOperation::RegisterCounter</span>(<span class="string">&quot;counter_key&quot;</span>.<span class="ident">into</span>(), <span class="ident">Counter::noop</span>()),
-            <span class="ident">RecorderOperation::RegisterGauge</span>(<span class="string">&quot;gauge_key&quot;</span>.<span class="ident">into</span>(), <span class="ident">Gauge::noop</span>()),
-            <span class="ident">RecorderOperation::RegisterHistogram</span>(<span class="string">&quot;histogram_key&quot;</span>.<span class="ident">into</span>(), <span class="ident">Histogram::noop</span>()),
+            RecorderOperation::RegisterCounter(<span class="string">&quot;counter_key&quot;</span>.into(), Counter::noop()),
+            RecorderOperation::RegisterGauge(<span class="string">&quot;gauge_key&quot;</span>.into(), Gauge::noop()),
+            RecorderOperation::RegisterHistogram(<span class="string">&quot;histogram_key&quot;</span>.into(), Histogram::noop()),
         ];
 
-        <span class="kw">let</span> <span class="ident">recorder1</span> <span class="op">=</span> <span class="ident">MockBasicRecorder::from_operations</span>(<span class="ident">operations</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">recorder2</span> <span class="op">=</span> <span class="ident">MockBasicRecorder::from_operations</span>(<span class="ident">operations</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">fanout</span> <span class="op">=</span>
-            <span class="ident">FanoutBuilder::default</span>().<span class="ident">add_recorder</span>(<span class="ident">recorder1</span>).<span class="ident">add_recorder</span>(<span class="ident">recorder2</span>).<span class="ident">build</span>();
+        <span class="kw">let </span>recorder1 = MockBasicRecorder::from_operations(operations.clone());
+        <span class="kw">let </span>recorder2 = MockBasicRecorder::from_operations(operations.clone());
+        <span class="kw">let </span>fanout =
+            FanoutBuilder::default().add_recorder(recorder1).add_recorder(recorder2).build();
 
-        <span class="kw">for</span> <span class="ident">operation</span> <span class="kw">in</span> <span class="ident">operations</span> {
-            <span class="ident">operation</span>.<span class="ident">apply_to_recorder</span>(<span class="kw-2">&amp;</span><span class="ident">fanout</span>);
+        <span class="kw">for </span>operation <span class="kw">in </span>operations {
+            operation.apply_to_recorder(<span class="kw-2">&amp;</span>fanout);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/future/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../futures_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/future/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../futures_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -129,136 +129,136 @@
 <span id="129">129</span>
 <span id="130">130</span>
 <span id="131">131</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Asynchronous values.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module contains:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - The [`Future`] trait.</span>
-<span class="doccomment">//! - The [`FutureExt`] and [`TryFutureExt`] trait, which provides adapters for</span>
-<span class="doccomment">//!   chaining and composing futures.</span>
-<span class="doccomment">//! - Top-level future combinators like [`lazy`](lazy()) which creates a future</span>
-<span class="doccomment">//!   from a closure that defines its return value, and [`ready`](ready()),</span>
-<span class="doccomment">//!   which constructs a future with an immediate defined value.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Asynchronous values.
+//!
+//! This module contains:
+//!
+//! - The [`Future`] trait.
+//! - The [`FutureExt`] and [`TryFutureExt`] trait, which provides adapters for
+//!   chaining and composing futures.
+//! - Top-level future combinators like [`lazy`](lazy()) which creates a future
+//!   from a closure that defines its return value, and [`ready`](ready()),
+//!   which constructs a future with an immediate defined value.
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">core::future::Future</span>;
+</span><span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>core::future::Future;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures_core::future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">LocalBoxFuture</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures_core::future</span>::{<span class="ident">FusedFuture</span>, <span class="ident">TryFuture</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures_task</span>::{<span class="ident">FutureObj</span>, <span class="ident">LocalFutureObj</span>, <span class="ident">UnsafeFutureObj</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub use </span>futures_core::future::{BoxFuture, LocalBoxFuture};
+<span class="kw">pub use </span>futures_core::future::{FusedFuture, TryFuture};
+<span class="kw">pub use </span>futures_task::{FutureObj, LocalFutureObj, UnsafeFutureObj};
 
-<span class="comment">// Extension traits and combinators</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::module_inception</span>)]</span>
-<span class="kw">mod</span> <span class="ident">future</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::future</span>::{
-    <span class="ident">Flatten</span>, <span class="ident">Fuse</span>, <span class="ident">FutureExt</span>, <span class="ident">Inspect</span>, <span class="ident">IntoStream</span>, <span class="ident">Map</span>, <span class="ident">MapInto</span>, <span class="ident">NeverError</span>, <span class="ident">Then</span>, <span class="ident">UnitError</span>,
+<span class="comment">// Extension traits and combinators
+</span><span class="attribute">#[allow(clippy::module_inception)]
+</span><span class="kw">mod </span>future;
+<span class="kw">pub use </span><span class="self">self</span>::future::{
+    Flatten, Fuse, FutureExt, Inspect, IntoStream, Map, MapInto, NeverError, Then, UnitError,
 };
 
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;This is now an alias for [Flatten](Flatten)&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::future::FlattenStream</span>;
+<span class="attribute">#[deprecated(note = <span class="string">&quot;This is now an alias for [Flatten](Flatten)&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::future::FlattenStream;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::future::CatchUnwind</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::future::CatchUnwind;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;channel&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;channel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::future</span>::{<span class="ident">Remote</span>, <span class="ident">RemoteHandle</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;channel&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;channel&quot;</span>)))]
+#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::future::{Remote, RemoteHandle};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::future</span>::{<span class="ident">Shared</span>, <span class="ident">WeakShared</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::future::{Shared, WeakShared};
 
-<span class="kw">mod</span> <span class="ident">try_future</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::try_future</span>::{
-    <span class="ident">AndThen</span>, <span class="ident">ErrInto</span>, <span class="ident">InspectErr</span>, <span class="ident">InspectOk</span>, <span class="ident">IntoFuture</span>, <span class="ident">MapErr</span>, <span class="ident">MapOk</span>, <span class="ident">MapOkOrElse</span>, <span class="ident">OkInto</span>,
-    <span class="ident">OrElse</span>, <span class="ident">TryFlatten</span>, <span class="ident">TryFlattenStream</span>, <span class="ident">TryFutureExt</span>, <span class="ident">UnwrapOrElse</span>,
+<span class="kw">mod </span>try_future;
+<span class="kw">pub use </span><span class="self">self</span>::try_future::{
+    AndThen, ErrInto, InspectErr, InspectOk, IntoFuture, MapErr, MapOk, MapOkOrElse, OkInto,
+    OrElse, TryFlatten, TryFlattenStream, TryFutureExt, UnwrapOrElse,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::try_future::FlattenSink</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;sink&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;sink&quot;</span>)))]
+</span><span class="kw">pub use </span><span class="self">self</span>::try_future::FlattenSink;
 
-<span class="comment">// Primitive futures</span>
+<span class="comment">// Primitive futures
 
-<span class="kw">mod</span> <span class="ident">lazy</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::lazy</span>::{<span class="ident">lazy</span>, <span class="ident">Lazy</span>};
+</span><span class="kw">mod </span>lazy;
+<span class="kw">pub use </span><span class="self">self</span>::lazy::{lazy, Lazy};
 
-<span class="kw">mod</span> <span class="ident">pending</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::pending</span>::{<span class="ident">pending</span>, <span class="ident">Pending</span>};
+<span class="kw">mod </span>pending;
+<span class="kw">pub use </span><span class="self">self</span>::pending::{pending, Pending};
 
-<span class="kw">mod</span> <span class="ident">maybe_done</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::maybe_done</span>::{<span class="ident">maybe_done</span>, <span class="ident">MaybeDone</span>};
+<span class="kw">mod </span>maybe_done;
+<span class="kw">pub use </span><span class="self">self</span>::maybe_done::{maybe_done, MaybeDone};
 
-<span class="kw">mod</span> <span class="ident">try_maybe_done</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::try_maybe_done</span>::{<span class="ident">try_maybe_done</span>, <span class="ident">TryMaybeDone</span>};
+<span class="kw">mod </span>try_maybe_done;
+<span class="kw">pub use </span><span class="self">self</span>::try_maybe_done::{try_maybe_done, TryMaybeDone};
 
-<span class="kw">mod</span> <span class="ident">option</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::option::OptionFuture</span>;
+<span class="kw">mod </span>option;
+<span class="kw">pub use </span><span class="self">self</span>::option::OptionFuture;
 
-<span class="kw">mod</span> <span class="ident">poll_fn</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::poll_fn</span>::{<span class="ident">poll_fn</span>, <span class="ident">PollFn</span>};
+<span class="kw">mod </span>poll_fn;
+<span class="kw">pub use </span><span class="self">self</span>::poll_fn::{poll_fn, PollFn};
 
-<span class="kw">mod</span> <span class="ident">poll_immediate</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::poll_immediate</span>::{<span class="ident">poll_immediate</span>, <span class="ident">PollImmediate</span>};
+<span class="kw">mod </span>poll_immediate;
+<span class="kw">pub use </span><span class="self">self</span>::poll_immediate::{poll_immediate, PollImmediate};
 
-<span class="kw">mod</span> <span class="ident">ready</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ready</span>::{<span class="ident">err</span>, <span class="ident">ok</span>, <span class="ident">ready</span>, <span class="ident">Ready</span>};
+<span class="kw">mod </span>ready;
+<span class="kw">pub use </span><span class="self">self</span>::ready::{err, ok, ready, Ready};
 
-<span class="kw">mod</span> <span class="ident">join</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::join</span>::{<span class="ident">join</span>, <span class="ident">join3</span>, <span class="ident">join4</span>, <span class="ident">join5</span>, <span class="ident">Join</span>, <span class="ident">Join3</span>, <span class="ident">Join4</span>, <span class="ident">Join5</span>};
+<span class="kw">mod </span>join;
+<span class="kw">pub use </span><span class="self">self</span>::join::{join, join3, join4, join5, Join, Join3, Join4, Join5};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">join_all</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::join_all</span>::{<span class="ident">join_all</span>, <span class="ident">JoinAll</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">mod </span>join_all;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::join_all::{join_all, JoinAll};
 
-<span class="kw">mod</span> <span class="ident">select</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::select</span>::{<span class="ident">select</span>, <span class="ident">Select</span>};
+<span class="kw">mod </span>select;
+<span class="kw">pub use </span><span class="self">self</span>::select::{select, Select};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">select_all</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::select_all</span>::{<span class="ident">select_all</span>, <span class="ident">SelectAll</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">mod </span>select_all;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::select_all::{select_all, SelectAll};
 
-<span class="kw">mod</span> <span class="ident">try_join</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::try_join</span>::{
-    <span class="ident">try_join</span>, <span class="ident">try_join3</span>, <span class="ident">try_join4</span>, <span class="ident">try_join5</span>, <span class="ident">TryJoin</span>, <span class="ident">TryJoin3</span>, <span class="ident">TryJoin4</span>, <span class="ident">TryJoin5</span>,
+<span class="kw">mod </span>try_join;
+<span class="kw">pub use </span><span class="self">self</span>::try_join::{
+    try_join, try_join3, try_join4, try_join5, TryJoin, TryJoin3, TryJoin4, TryJoin5,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">try_join_all</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::try_join_all</span>::{<span class="ident">try_join_all</span>, <span class="ident">TryJoinAll</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">mod </span>try_join_all;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::try_join_all::{try_join_all, TryJoinAll};
 
-<span class="kw">mod</span> <span class="ident">try_select</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::try_select</span>::{<span class="ident">try_select</span>, <span class="ident">TrySelect</span>};
+<span class="kw">mod </span>try_select;
+<span class="kw">pub use </span><span class="self">self</span>::try_select::{try_select, TrySelect};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">select_ok</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::select_ok</span>::{<span class="ident">select_ok</span>, <span class="ident">SelectOk</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">mod </span>select_ok;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::select_ok::{select_ok, SelectOk};
 
-<span class="kw">mod</span> <span class="ident">either</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::either::Either</span>;
+<span class="kw">mod </span>either;
+<span class="kw">pub use </span><span class="self">self</span>::either::Either;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">futures_no_atomic_cas</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">abortable</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">futures_no_atomic_cas</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::abortable</span>::{<span class="ident">AbortHandle</span>, <span class="ident">AbortRegistration</span>, <span class="ident">Abortable</span>, <span class="ident">Aborted</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">futures_no_atomic_cas</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">abortable::abortable</span>;
+<span class="attribute">#[cfg(not(futures_no_atomic_cas))]
+#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">mod </span>abortable;
+<span class="attribute">#[cfg(not(futures_no_atomic_cas))]
+#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::abortable::{AbortHandle, AbortRegistration, Abortable, Aborted};
+<span class="attribute">#[cfg(not(futures_no_atomic_cas))]
+#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub use </span>abortable::abortable;
 
-<span class="comment">// Just a helper function to ensure the futures we&#39;re returning all have the</span>
-<span class="comment">// right implementations.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">assert_future</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="ident">F</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="comment">// Just a helper function to ensure the futures we&#39;re returning all have the
+// right implementations.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>assert_future&lt;T, F&gt;(future: F) -&gt; F
+<span class="kw">where
+    </span>F: Future&lt;Output = T&gt;,
 {
-    <span class="ident">future</span>
+    future
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

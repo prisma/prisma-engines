@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../combine/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../combine/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -775,782 +775,782 @@
 <span id="775">775</span>
 <span id="776">776</span>
 <span id="777">777</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">lib::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>lib::fmt;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::FastResult</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="self">self</span>::FastResult::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">ErrorOffset</span>;
+<span class="kw">use </span>ErrorOffset;
 
-<span class="kw">use</span> <span class="ident">stream::StreamOnce</span>;
+<span class="kw">use </span>stream::StreamOnce;
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">ctry</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::FastResult::ConsumedOk</span>(<span class="ident">x</span>) =&gt; (<span class="ident">x</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::Consumed::Consumed</span>(())),
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::FastResult::EmptyOk</span>(<span class="ident">x</span>) =&gt; (<span class="ident">x</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::Consumed::Empty</span>(())),
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::FastResult::ConsumedErr</span>(<span class="ident">err</span>) =&gt; {
-                <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::FastResult::ConsumedErr</span>(<span class="ident">err</span>.<span class="ident">into</span>())
+<span class="attribute">#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>ctry {
+    (<span class="macro-nonterminal">$result</span>:expr) =&gt; {
+        <span class="kw">match </span><span class="macro-nonterminal">$result </span>{
+            <span class="macro-nonterminal">$crate::error::FastResult::ConsumedOk</span>(x) =&gt; (x, <span class="macro-nonterminal">$crate::error::Consumed::Consumed</span>(())),
+            <span class="macro-nonterminal">$crate::error::FastResult::EmptyOk</span>(x) =&gt; (x, <span class="macro-nonterminal">$crate::error::Consumed::Empty</span>(())),
+            <span class="macro-nonterminal">$crate::error::FastResult::ConsumedErr</span>(err) =&gt; {
+                <span class="kw">return </span><span class="macro-nonterminal">$crate::error::FastResult::ConsumedErr</span>(err.into())
             }
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::FastResult::EmptyErr</span>(<span class="ident">err</span>) =&gt; {
-                <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::FastResult::EmptyErr</span>(<span class="ident">err</span>.<span class="ident">into</span>())
+            <span class="macro-nonterminal">$crate::error::FastResult::EmptyErr</span>(err) =&gt; {
+                <span class="kw">return </span><span class="macro-nonterminal">$crate::error::FastResult::EmptyErr</span>(err.into())
             }
         }
     };
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="ident">Token</span>(<span class="ident">T</span>),
-    <span class="ident">Range</span>(<span class="ident">R</span>),
-    <span class="ident">Borrowed</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>Info&lt;T, R&gt; {
+    Token(T),
+    Range(R),
+    Borrowed(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">char</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">char</span>) -&gt; <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">char</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">Info::Token</span>(<span class="ident">s</span>)
+<span class="kw">impl</span>&lt;R&gt; From&lt;char&gt; <span class="kw">for </span>Info&lt;char, R&gt; {
+    <span class="kw">fn </span>from(s: char) -&gt; Info&lt;char, R&gt; {
+        Info::Token(s)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">Info::Borrowed</span>(<span class="ident">s</span>)
+<span class="kw">impl</span>&lt;T, R&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>Info&lt;T, R&gt; {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; Info&lt;T, R&gt; {
+        Info::Borrowed(s)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">Info::Token</span>(<span class="ident">s</span>)
+<span class="kw">impl</span>&lt;R&gt; From&lt;u8&gt; <span class="kw">for </span>Info&lt;u8, R&gt; {
+    <span class="kw">fn </span>from(s: u8) -&gt; Info&lt;u8, R&gt; {
+        Info::Token(s)
     }
 }
 
-<span class="doccomment">/// Enum used to indicate if a parser consumed any items of the stream it was given as an input.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is used by parsers such as `or` and `choice` to determine if they should try to parse</span>
-<span class="doccomment">/// with another parser as they will only be able to provide good error reporting if the preceding</span>
-<span class="doccomment">/// parser did not consume any tokens.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructor indicating that the parser has consumed elements</span>
-    <span class="ident">Consumed</span>(<span class="ident">T</span>),
-    <span class="doccomment">/// Constructor indicating that the parser did not consume any elements</span>
-    <span class="ident">Empty</span>(<span class="ident">T</span>),
+<span class="doccomment">/// Enum used to indicate if a parser consumed any items of the stream it was given as an input.
+///
+/// This is used by parsers such as `or` and `choice` to determine if they should try to parse
+/// with another parser as they will only be able to provide good error reporting if the preceding
+/// parser did not consume any tokens.
+</span><span class="attribute">#[derive(Clone, PartialEq, Debug, Copy)]
+</span><span class="kw">pub enum </span>Consumed&lt;T&gt; {
+    <span class="doccomment">/// Constructor indicating that the parser has consumed elements
+    </span>Consumed(T),
+    <span class="doccomment">/// Constructor indicating that the parser did not consume any elements
+    </span>Empty(T),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Consumed::Empty</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">t</span>) <span class="op">|</span> <span class="ident">Consumed::Consumed</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">t</span>) =&gt; <span class="ident">t</span>,
+<span class="kw">impl</span>&lt;T&gt; AsMut&lt;T&gt; <span class="kw">for </span>Consumed&lt;T&gt; {
+    <span class="kw">fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Consumed::Empty(<span class="kw-2">ref mut </span>t) | Consumed::Consumed(<span class="kw-2">ref mut </span>t) =&gt; t,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Consumed::Empty</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) <span class="op">|</span> <span class="ident">Consumed::Consumed</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; <span class="ident">t</span>,
+<span class="kw">impl</span>&lt;T&gt; AsRef&lt;T&gt; <span class="kw">for </span>Consumed&lt;T&gt; {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Consumed::Empty(<span class="kw-2">ref </span>t) | Consumed::Consumed(<span class="kw-2">ref </span>t) =&gt; t,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns true if `self` is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Consumed::Empty</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="ident">Consumed::Consumed</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+<span class="kw">impl</span>&lt;T&gt; Consumed&lt;T&gt; {
+    <span class="doccomment">/// Returns true if `self` is empty.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Consumed::Empty(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            Consumed::Consumed(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Extracts the contained value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Consumed::Empty</span>(<span class="ident">x</span>) <span class="op">|</span> <span class="ident">Consumed::Consumed</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+    <span class="doccomment">/// Extracts the contained value.
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; T {
+        <span class="kw">match </span><span class="self">self </span>{
+            Consumed::Empty(x) | Consumed::Consumed(x) =&gt; x,
         }
     }
 
-    <span class="doccomment">/// Converts `self` into the `Consumed` state.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_consumed</span>(<span class="self">self</span>) -&gt; <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Consumed::Consumed</span>(<span class="self">self</span>.<span class="ident">into_inner</span>())
+    <span class="doccomment">/// Converts `self` into the `Consumed` state.
+    </span><span class="kw">pub fn </span>into_consumed(<span class="self">self</span>) -&gt; Consumed&lt;T&gt; {
+        Consumed::Consumed(<span class="self">self</span>.into_inner())
     }
 
-    <span class="doccomment">/// Converts `self` into the `Empty` state.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_empty</span>(<span class="self">self</span>) -&gt; <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Consumed::Empty</span>(<span class="self">self</span>.<span class="ident">into_inner</span>())
+    <span class="doccomment">/// Converts `self` into the `Empty` state.
+    </span><span class="kw">pub fn </span>into_empty(<span class="self">self</span>) -&gt; Consumed&lt;T&gt; {
+        Consumed::Empty(<span class="self">self</span>.into_inner())
     }
 
-    <span class="doccomment">/// Maps over the contained value without changing the consumed state.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">U</span>,
+    <span class="doccomment">/// Maps over the contained value without changing the consumed state.
+    </span><span class="kw">pub fn </span>map&lt;F, U&gt;(<span class="self">self</span>, f: F) -&gt; Consumed&lt;U&gt;
+    <span class="kw">where
+        </span>F: FnOnce(T) -&gt; U,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Consumed::Empty</span>(<span class="ident">x</span>) =&gt; <span class="ident">Consumed::Empty</span>(<span class="ident">f</span>(<span class="ident">x</span>)),
-            <span class="ident">Consumed::Consumed</span>(<span class="ident">x</span>) =&gt; <span class="ident">Consumed::Consumed</span>(<span class="ident">f</span>(<span class="ident">x</span>)),
+        <span class="kw">match </span><span class="self">self </span>{
+            Consumed::Empty(x) =&gt; Consumed::Empty(f(x)),
+            Consumed::Consumed(x) =&gt; Consumed::Consumed(f(x)),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current</span>: <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Consumed::Empty</span>(<span class="kw">_</span>) =&gt; <span class="ident">current</span>,
-            <span class="ident">Consumed::Consumed</span>(<span class="kw">_</span>) =&gt; <span class="ident">current</span>.<span class="ident">into_consumed</span>(),
+    <span class="kw">pub fn </span>merge(<span class="kw-2">&amp;</span><span class="self">self</span>, current: Consumed&lt;T&gt;) -&gt; Consumed&lt;T&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Consumed::Empty(<span class="kw">_</span>) =&gt; current,
+            Consumed::Consumed(<span class="kw">_</span>) =&gt; current.into_consumed(),
         }
     }
 
-    <span class="doccomment">/// Combines the `Consumed` flags from `self` and the result of `f`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// Empty    &lt;&gt; Empty    -&gt; Empty</span>
-    <span class="doccomment">/// Consumed &lt;&gt; Empty    -&gt; Consumed</span>
-    <span class="doccomment">/// Empty    &lt;&gt; Consumed -&gt; Consumed</span>
-    <span class="doccomment">/// Consumed &lt;&gt; Consumed -&gt; Consumed</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate combine as pc;</span>
-    <span class="doccomment">/// # use pc::*;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// //Parses a character of string literal and handles the escaped characters \\ and \&quot; as \</span>
-    <span class="doccomment">/// //and &quot; respectively</span>
-    <span class="doccomment">/// fn char&lt;I&gt;(input: &amp;mut I) -&gt; ParseResult&lt;char, I&gt;</span>
-    <span class="doccomment">///     where I: Stream&lt;Item = char&gt;,</span>
-    <span class="doccomment">///           I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     let (c, consumed) = try!(satisfy(|c| c != &#39;&quot;&#39;).parse_stream(input));</span>
-    <span class="doccomment">///     match c {</span>
-    <span class="doccomment">///         //Since the `char` parser has already consumed some of the input `combine` is used</span>
-    <span class="doccomment">///         //propagate the consumed state to the next part of the parser</span>
-    <span class="doccomment">///         &#39;\\&#39; =&gt; consumed.combine(|_| {</span>
-    <span class="doccomment">///             satisfy(|c| c == &#39;&quot;&#39; || c == &#39;\\&#39;)</span>
-    <span class="doccomment">///                 .map(|c| {</span>
-    <span class="doccomment">///                     match c {</span>
-    <span class="doccomment">///                         &#39;&quot;&#39; =&gt; &#39;&quot;&#39;,</span>
-    <span class="doccomment">///                         &#39;\\&#39; =&gt; &#39;\\&#39;,</span>
-    <span class="doccomment">///                         c =&gt; c</span>
-    <span class="doccomment">///                     }</span>
-    <span class="doccomment">///                 })</span>
-    <span class="doccomment">///                 .parse_stream(input)</span>
-    <span class="doccomment">///             }),</span>
-    <span class="doccomment">///         _ =&gt; Ok((c, consumed))</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// let result = many(parser(char))</span>
-    <span class="doccomment">///     .easy_parse(r#&quot;abc\&quot;\\&quot;#);</span>
-    <span class="doccomment">/// assert_eq!(result, Ok((r#&quot;abc&quot;\&quot;#.to_string(), &quot;&quot;)));</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">combine</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult2</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">ParseResult2</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Combines the `Consumed` flags from `self` and the result of `f`.
+    ///
+    /// ```text
+    /// Empty    &lt;&gt; Empty    -&gt; Empty
+    /// Consumed &lt;&gt; Empty    -&gt; Consumed
+    /// Empty    &lt;&gt; Consumed -&gt; Consumed
+    /// Consumed &lt;&gt; Consumed -&gt; Consumed
+    /// ```
+    ///
+    /// ```
+    /// # extern crate combine as pc;
+    /// # use pc::*;
+    /// # fn main() {
+    /// //Parses a character of string literal and handles the escaped characters \\ and \&quot; as \
+    /// //and &quot; respectively
+    /// fn char&lt;I&gt;(input: &amp;mut I) -&gt; ParseResult&lt;char, I&gt;
+    ///     where I: Stream&lt;Item = char&gt;,
+    ///           I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
+    /// {
+    ///     let (c, consumed) = try!(satisfy(|c| c != &#39;&quot;&#39;).parse_stream(input));
+    ///     match c {
+    ///         //Since the `char` parser has already consumed some of the input `combine` is used
+    ///         //propagate the consumed state to the next part of the parser
+    ///         &#39;\\&#39; =&gt; consumed.combine(|_| {
+    ///             satisfy(|c| c == &#39;&quot;&#39; || c == &#39;\\&#39;)
+    ///                 .map(|c| {
+    ///                     match c {
+    ///                         &#39;&quot;&#39; =&gt; &#39;&quot;&#39;,
+    ///                         &#39;\\&#39; =&gt; &#39;\\&#39;,
+    ///                         c =&gt; c
+    ///                     }
+    ///                 })
+    ///                 .parse_stream(input)
+    ///             }),
+    ///         _ =&gt; Ok((c, consumed))
+    ///     }
+    /// }
+    /// let result = many(parser(char))
+    ///     .easy_parse(r#&quot;abc\&quot;\\&quot;#);
+    /// assert_eq!(result, Ok((r#&quot;abc&quot;\&quot;#.to_string(), &quot;&quot;)));
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>combine&lt;F, U, E&gt;(<span class="self">self</span>, f: F) -&gt; ParseResult2&lt;U, E&gt;
+    <span class="kw">where
+        </span>F: FnOnce(T) -&gt; ParseResult2&lt;U, E&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Consumed::Consumed</span>(<span class="ident">x</span>) =&gt; <span class="kw">match</span> <span class="ident">f</span>(<span class="ident">x</span>) {
-                <span class="prelude-val">Ok</span>((<span class="ident">v</span>, <span class="ident">Consumed::Empty</span>(<span class="ident">rest</span>))) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">v</span>, <span class="ident">Consumed::Consumed</span>(<span class="ident">rest</span>))),
-                <span class="prelude-val">Err</span>(<span class="ident">Consumed::Empty</span>(<span class="ident">err</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Consumed::Consumed</span>(<span class="ident">err</span>)),
-                <span class="ident">y</span> =&gt; <span class="ident">y</span>,
+        <span class="kw">match </span><span class="self">self </span>{
+            Consumed::Consumed(x) =&gt; <span class="kw">match </span>f(x) {
+                <span class="prelude-val">Ok</span>((v, Consumed::Empty(rest))) =&gt; <span class="prelude-val">Ok</span>((v, Consumed::Consumed(rest))),
+                <span class="prelude-val">Err</span>(Consumed::Empty(err)) =&gt; <span class="prelude-val">Err</span>(Consumed::Consumed(err)),
+                y =&gt; y,
             },
-            <span class="ident">Consumed::Empty</span>(<span class="ident">x</span>) =&gt; <span class="ident">f</span>(<span class="ident">x</span>),
+            Consumed::Empty(x) =&gt; f(x),
         }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">combine_consumed</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>combine_consumed&lt;F, U, E&gt;(<span class="self">self</span>, f: F) -&gt; FastResult&lt;U, E&gt;
+    <span class="kw">where
+        </span>F: FnOnce(T) -&gt; FastResult&lt;U, E&gt;,
     {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::FastResult</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Consumed::Consumed</span>(<span class="ident">x</span>) =&gt; <span class="kw">match</span> <span class="ident">f</span>(<span class="ident">x</span>) {
-                <span class="ident">EmptyOk</span>(<span class="ident">v</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">v</span>),
-                <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">err</span>.<span class="ident">error</span>),
-                <span class="ident">y</span> =&gt; <span class="ident">y</span>,
+        <span class="kw">use </span><span class="self">self</span>::FastResult::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Consumed::Consumed(x) =&gt; <span class="kw">match </span>f(x) {
+                EmptyOk(v) =&gt; ConsumedOk(v),
+                EmptyErr(err) =&gt; ConsumedErr(err.error),
+                y =&gt; y,
             },
-            <span class="ident">Consumed::Empty</span>(<span class="ident">x</span>) =&gt; <span class="ident">f</span>(<span class="ident">x</span>),
+            Consumed::Empty(x) =&gt; f(x),
         }
     }
 }
 
-<span class="doccomment">/// A type alias over the specific `Result` type used by parsers to indicate whether they were</span>
-<span class="doccomment">/// successful or not.</span>
-<span class="doccomment">/// `O` is the type that is output on success.</span>
-<span class="doccomment">/// `I` is the specific stream type used in the parser.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">O</span>, <span class="ident">Consumed</span><span class="op">&lt;</span>()<span class="op">&gt;</span>), <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParseResult2</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">O</span>, <span class="ident">Consumed</span><span class="op">&lt;</span>()<span class="op">&gt;</span>), <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">Tracked</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A type alias over the specific `Result` type used by parsers to indicate whether they were
+/// successful or not.
+/// `O` is the type that is output on success.
+/// `I` is the specific stream type used in the parser.
+</span><span class="kw">pub type </span>ParseResult&lt;O, I&gt; = <span class="prelude-ty">Result</span>&lt;(O, Consumed&lt;()&gt;), Consumed&lt;Tracked&lt;&lt;I <span class="kw">as </span>StreamOnce&gt;::Error&gt;&gt;&gt;;
+<span class="kw">pub type </span>ParseResult2&lt;O, E&gt; = <span class="prelude-ty">Result</span>&lt;(O, Consumed&lt;()&gt;), Consumed&lt;Tracked&lt;E&gt;&gt;&gt;;
 
-<span class="doccomment">/// `StreamError` represents a single error returned from a `Stream` or a `Parser`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Usually multiple instances of `StreamError` is composed into a `ParseError` to build the final</span>
-<span class="doccomment">/// error value.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">PartialEq</span> {
-    <span class="kw">fn</span> <span class="ident">unexpected_token</span>(<span class="ident">token</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">unexpected_range</span>(<span class="ident">token</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">unexpected_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>;
-    <span class="kw">fn</span> <span class="ident">unexpected</span>(<span class="ident">info</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">info</span> {
-            <span class="ident">Info::Token</span>(<span class="ident">b</span>) =&gt; <span class="ident"><span class="self">Self</span>::unexpected_token</span>(<span class="ident">b</span>),
-            <span class="ident">Info::Range</span>(<span class="ident">b</span>) =&gt; <span class="ident"><span class="self">Self</span>::unexpected_range</span>(<span class="ident">b</span>),
-            <span class="ident">Info::Borrowed</span>(<span class="ident">b</span>) =&gt; <span class="ident"><span class="self">Self</span>::unexpected_static_message</span>(<span class="ident">b</span>),
+<span class="doccomment">/// `StreamError` represents a single error returned from a `Stream` or a `Parser`.
+///
+/// Usually multiple instances of `StreamError` is composed into a `ParseError` to build the final
+/// error value.
+</span><span class="kw">pub trait </span>StreamError&lt;Item, Range&gt;: Sized + PartialEq {
+    <span class="kw">fn </span>unexpected_token(token: Item) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>unexpected_range(token: Range) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>unexpected_message&lt;T&gt;(msg: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display;
+    <span class="kw">fn </span>unexpected(info: Info&lt;Item, Range&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>info {
+            Info::Token(b) =&gt; <span class="self">Self</span>::unexpected_token(b),
+            Info::Range(b) =&gt; <span class="self">Self</span>::unexpected_range(b),
+            Info::Borrowed(b) =&gt; <span class="self">Self</span>::unexpected_static_message(b),
         }
     }
-    <span class="kw">fn</span> <span class="ident">unexpected_static_message</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::unexpected_message</span>(<span class="ident">msg</span>)
+    <span class="kw">fn </span>unexpected_static_message(msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::unexpected_message(msg)
     }
 
-    <span class="kw">fn</span> <span class="ident">expected_token</span>(<span class="ident">token</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">expected_range</span>(<span class="ident">token</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">expected_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>;
-    <span class="kw">fn</span> <span class="ident">expected</span>(<span class="ident">info</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">info</span> {
-            <span class="ident">Info::Token</span>(<span class="ident">b</span>) =&gt; <span class="ident"><span class="self">Self</span>::expected_token</span>(<span class="ident">b</span>),
-            <span class="ident">Info::Range</span>(<span class="ident">b</span>) =&gt; <span class="ident"><span class="self">Self</span>::expected_range</span>(<span class="ident">b</span>),
-            <span class="ident">Info::Borrowed</span>(<span class="ident">b</span>) =&gt; <span class="ident"><span class="self">Self</span>::expected_static_message</span>(<span class="ident">b</span>),
+    <span class="kw">fn </span>expected_token(token: Item) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>expected_range(token: Range) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>expected_message&lt;T&gt;(msg: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display;
+    <span class="kw">fn </span>expected(info: Info&lt;Item, Range&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>info {
+            Info::Token(b) =&gt; <span class="self">Self</span>::expected_token(b),
+            Info::Range(b) =&gt; <span class="self">Self</span>::expected_range(b),
+            Info::Borrowed(b) =&gt; <span class="self">Self</span>::expected_static_message(b),
         }
     }
-    <span class="kw">fn</span> <span class="ident">expected_static_message</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::expected_message</span>(<span class="ident">msg</span>)
+    <span class="kw">fn </span>expected_static_message(msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::expected_message(msg)
     }
 
-    <span class="kw">fn</span> <span class="ident">message_token</span>(<span class="ident">token</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">message_range</span>(<span class="ident">token</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">message_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>;
-    <span class="kw">fn</span> <span class="ident">message_static_message</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::message_message</span>(<span class="ident">msg</span>)
+    <span class="kw">fn </span>message_token(token: Item) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>message_range(token: Range) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>message_message&lt;T&gt;(msg: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display;
+    <span class="kw">fn </span>message_static_message(msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::message_message(msg)
     }
-    <span class="kw">fn</span> <span class="ident">message</span>(<span class="ident">info</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">info</span> {
-            <span class="ident">Info::Token</span>(<span class="ident">b</span>) =&gt; <span class="ident"><span class="self">Self</span>::message_token</span>(<span class="ident">b</span>),
-            <span class="ident">Info::Range</span>(<span class="ident">b</span>) =&gt; <span class="ident"><span class="self">Self</span>::message_range</span>(<span class="ident">b</span>),
-            <span class="ident">Info::Borrowed</span>(<span class="ident">b</span>) =&gt; <span class="ident"><span class="self">Self</span>::message_static_message</span>(<span class="ident">b</span>),
+    <span class="kw">fn </span>message(info: Info&lt;Item, Range&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>info {
+            Info::Token(b) =&gt; <span class="self">Self</span>::message_token(b),
+            Info::Range(b) =&gt; <span class="self">Self</span>::message_range(b),
+            Info::Borrowed(b) =&gt; <span class="self">Self</span>::message_static_message(b),
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">other</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">err</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>other&lt;E&gt;(err: E) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>E: StdError + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident"><span class="self">Self</span>::message_message</span>(<span class="ident">err</span>)
+        <span class="self">Self</span>::message_message(err)
     }
 
-    <span class="kw">fn</span> <span class="ident">end_of_input</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::unexpected_static_message</span>(<span class="string">&quot;end of input&quot;</span>)
+    <span class="kw">fn </span>end_of_input() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::unexpected_static_message(<span class="string">&quot;end of input&quot;</span>)
     }
 
-    <span class="doccomment">/// Converts `self` into a different `StreamError` type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should aim to preserve as much information as possible into the returned `T` value but</span>
-    <span class="doccomment">/// if `Self` ignores some information passed to it using one of the constructors that</span>
-    <span class="doccomment">/// information is naturally lost.</span>
-    <span class="kw">fn</span> <span class="ident">into_other</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Converts `self` into a different `StreamError` type.
+    ///
+    /// This should aim to preserve as much information as possible into the returned `T` value but
+    /// if `Self` ignores some information passed to it using one of the constructors that
+    /// information is naturally lost.
+    </span><span class="kw">fn </span>into_other&lt;T&gt;(<span class="self">self</span>) -&gt; T
+    <span class="kw">where
+        </span>T: StreamError&lt;Item, Range&gt;;
 }
 
-<span class="doccomment">/// Trait which defines a combine parse error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A parse error is composed of zero or more `StreamError` instances which gets added to it as</span>
-<span class="doccomment">/// errors are encountered during parsing.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">PartialEq</span> {
-    <span class="kw">type</span> <span class="ident">StreamError</span>: <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Trait which defines a combine parse error.
+///
+/// A parse error is composed of zero or more `StreamError` instances which gets added to it as
+/// errors are encountered during parsing.
+</span><span class="kw">pub trait </span>ParseError&lt;Item, Range, Position&gt;: Sized + PartialEq {
+    <span class="kw">type </span>StreamError: StreamError&lt;Item, Range&gt;;
 
-    <span class="doccomment">/// Constructs an empty error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An empty error is expected to be cheap to create as it is frequently created and discarded.</span>
-    <span class="kw">fn</span> <span class="ident">empty</span>(<span class="ident">position</span>: <span class="ident">Position</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Constructs an empty error.
+    ///
+    /// An empty error is expected to be cheap to create as it is frequently created and discarded.
+    </span><span class="kw">fn </span>empty(position: Position) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Creates a `ParseError` from a single `Self::StreamError`</span>
-    <span class="kw">fn</span> <span class="ident">from_error</span>(<span class="ident">position</span>: <span class="ident">Position</span>, <span class="ident">err</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Creates a `ParseError` from a single `Self::StreamError`
+    </span><span class="kw">fn </span>from_error(position: Position, err: <span class="self">Self</span>::StreamError) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Sets the position of this `ParseError`</span>
-    <span class="kw">fn</span> <span class="ident">set_position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">Position</span>);
+    <span class="doccomment">/// Sets the position of this `ParseError`
+    </span><span class="kw">fn </span>set_position(<span class="kw-2">&amp;mut </span><span class="self">self</span>, position: Position);
 
-    <span class="doccomment">/// Merges two errors. If they exist at the same position the errors of `other` are</span>
-    <span class="doccomment">/// added to `self` (using the semantics of `add`). If they are not at the same</span>
-    <span class="doccomment">/// position the error furthest ahead are returned, ignoring the other `ParseError`.</span>
-    <span class="kw">fn</span> <span class="ident">merge</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">other</span>
+    <span class="doccomment">/// Merges two errors. If they exist at the same position the errors of `other` are
+    /// added to `self` (using the semantics of `add`). If they are not at the same
+    /// position the error furthest ahead are returned, ignoring the other `ParseError`.
+    </span><span class="kw">fn </span>merge(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        other
     }
 
-    <span class="doccomment">/// Adds a `StreamError` to `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is up to each individual error type to define what adding an error does, some may push</span>
-    <span class="doccomment">/// it to a vector while others may only keep `self` or `err` to avoid allocation</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>);
+    <span class="doccomment">/// Adds a `StreamError` to `self`.
+    ///
+    /// It is up to each individual error type to define what adding an error does, some may push
+    /// it to a vector while others may only keep `self` or `err` to avoid allocation
+    </span><span class="kw">fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, err: <span class="self">Self</span>::StreamError);
 
-    <span class="kw">fn</span> <span class="ident">add_expected</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">info</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">add</span>(<span class="ident"><span class="self">Self</span>::StreamError::expected</span>(<span class="ident">info</span>))
+    <span class="kw">fn </span>add_expected(<span class="kw-2">&amp;mut </span><span class="self">self</span>, info: Info&lt;Item, Range&gt;) {
+        <span class="self">self</span>.add(<span class="self">Self</span>::StreamError::expected(info))
     }
 
-    <span class="kw">fn</span> <span class="ident">add_unexpected</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">info</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">add</span>(<span class="ident"><span class="self">Self</span>::StreamError::unexpected</span>(<span class="ident">info</span>))
+    <span class="kw">fn </span>add_unexpected(<span class="kw-2">&amp;mut </span><span class="self">self</span>, info: Info&lt;Item, Range&gt;) {
+        <span class="self">self</span>.add(<span class="self">Self</span>::StreamError::unexpected(info))
     }
 
-    <span class="kw">fn</span> <span class="ident">add_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">info</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">add</span>(<span class="ident"><span class="self">Self</span>::StreamError::message</span>(<span class="ident">info</span>))
+    <span class="kw">fn </span>add_message(<span class="kw-2">&amp;mut </span><span class="self">self</span>, info: Info&lt;Item, Range&gt;) {
+        <span class="self">self</span>.add(<span class="self">Self</span>::StreamError::message(info))
     }
 
-    <span class="doccomment">/// Sets `info` as the *only* `Expected` error of `self`</span>
-    <span class="kw">fn</span> <span class="ident">set_expected</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">self_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">info</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>, <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
+    <span class="doccomment">/// Sets `info` as the *only* `Expected` error of `self`
+    </span><span class="kw">fn </span>set_expected&lt;F&gt;(self_: <span class="kw-2">&amp;mut </span>Tracked&lt;<span class="self">Self</span>&gt;, info: <span class="self">Self</span>::StreamError, f: F)
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Tracked&lt;<span class="self">Self</span>&gt;);
 
-    <span class="doccomment">/// Removes any expected errors currently in `self`</span>
-    <span class="kw">fn</span> <span class="ident">clear_expected</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {}
+    <span class="doccomment">/// Removes any expected errors currently in `self`
+    </span><span class="kw">fn </span>clear_expected(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {}
 
-    <span class="kw">fn</span> <span class="ident">is_unexpected_end_of_input</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="kw">fn </span>is_unexpected_end_of_input(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Does a best-effort conversion of `self` into another `ParseError`</span>
-    <span class="kw">fn</span> <span class="ident">into_other</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Does a best-effort conversion of `self` into another `ParseError`
+    </span><span class="kw">fn </span>into_other&lt;T&gt;(<span class="self">self</span>) -&gt; T
+    <span class="kw">where
+        </span>T: ParseError&lt;Item, Range, Position&gt;;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UnexpectedParse</span> {
-    <span class="ident">Eoi</span>,
-    <span class="ident">Unexpected</span>,
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+</span><span class="kw">pub enum </span>UnexpectedParse {
+    Eoi,
+    Unexpected,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">UnexpectedParse</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::UnexpectedParse</span>::<span class="kw-2">*</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>UnexpectedParse {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">use </span><span class="self">self</span>::UnexpectedParse::<span class="kw-2">*</span>;
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{}&quot;</span>,
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                <span class="ident">Unexpected</span> =&gt; <span class="string">&quot;unexpected parse&quot;</span>,
-                <span class="ident">Eoi</span> =&gt; <span class="string">&quot;unexpected end of input&quot;</span>,
+            <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+                Unexpected =&gt; <span class="string">&quot;unexpected parse&quot;</span>,
+                Eoi =&gt; <span class="string">&quot;unexpected end of input&quot;</span>,
             }
         )
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span> <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UnexpectedParse</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unexpected_token</span>(<span class="kw">_</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">UnexpectedParse::Unexpected</span>
+<span class="kw">impl</span>&lt;Item, Range&gt; StreamError&lt;Item, Range&gt; <span class="kw">for </span>UnexpectedParse {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>unexpected_token(<span class="kw">_</span>: Item) -&gt; <span class="self">Self </span>{
+        UnexpectedParse::Unexpected
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unexpected_range</span>(<span class="kw">_</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">UnexpectedParse::Unexpected</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>unexpected_range(<span class="kw">_</span>: Range) -&gt; <span class="self">Self </span>{
+        UnexpectedParse::Unexpected
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unexpected_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>unexpected_message&lt;T&gt;(<span class="kw">_</span>: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display,
     {
-        <span class="ident">UnexpectedParse::Unexpected</span>
+        UnexpectedParse::Unexpected
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">expected_token</span>(<span class="kw">_</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">UnexpectedParse::Unexpected</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>expected_token(<span class="kw">_</span>: Item) -&gt; <span class="self">Self </span>{
+        UnexpectedParse::Unexpected
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">expected_range</span>(<span class="kw">_</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">UnexpectedParse::Unexpected</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>expected_range(<span class="kw">_</span>: Range) -&gt; <span class="self">Self </span>{
+        UnexpectedParse::Unexpected
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">expected_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>expected_message&lt;T&gt;(<span class="kw">_</span>: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display,
     {
-        <span class="ident">UnexpectedParse::Unexpected</span>
+        UnexpectedParse::Unexpected
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">message_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>message_message&lt;T&gt;(<span class="kw">_</span>: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display,
     {
-        <span class="ident">UnexpectedParse::Unexpected</span>
+        UnexpectedParse::Unexpected
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">message_token</span>(<span class="kw">_</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">UnexpectedParse::Unexpected</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>message_token(<span class="kw">_</span>: Item) -&gt; <span class="self">Self </span>{
+        UnexpectedParse::Unexpected
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">message_range</span>(<span class="kw">_</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">UnexpectedParse::Unexpected</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>message_range(<span class="kw">_</span>: Range) -&gt; <span class="self">Self </span>{
+        UnexpectedParse::Unexpected
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">end_of_input</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">UnexpectedParse::Eoi</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>end_of_input() -&gt; <span class="self">Self </span>{
+        UnexpectedParse::Eoi
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_other</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_other&lt;T&gt;(<span class="self">self</span>) -&gt; T
+    <span class="kw">where
+        </span>T: StreamError&lt;Item, Range&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">UnexpectedParse::Unexpected</span> =&gt; <span class="ident">T::unexpected_static_message</span>(<span class="string">&quot;parse&quot;</span>),
-            <span class="ident">UnexpectedParse::Eoi</span> =&gt; <span class="ident">T::end_of_input</span>(),
+        <span class="kw">match </span><span class="self">self </span>{
+            UnexpectedParse::Unexpected =&gt; T::unexpected_static_message(<span class="string">&quot;parse&quot;</span>),
+            UnexpectedParse::Eoi =&gt; T::end_of_input(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UnexpectedParse</span>
-<span class="kw">where</span>
-    <span class="ident">Position</span>: <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;Item, Range, Position&gt; ParseError&lt;Item, Range, Position&gt; <span class="kw">for </span>UnexpectedParse
+<span class="kw">where
+    </span>Position: Default,
 {
-    <span class="kw">type</span> <span class="ident">StreamError</span> <span class="op">=</span> <span class="self">Self</span>;
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">empty</span>(<span class="ident">_position</span>: <span class="ident">Position</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">UnexpectedParse::Unexpected</span>
+    <span class="kw">type </span>StreamError = <span class="self">Self</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>empty(_position: Position) -&gt; <span class="self">Self </span>{
+        UnexpectedParse::Unexpected
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_error</span>(<span class="kw">_</span>: <span class="ident">Position</span>, <span class="ident">err</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">err</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_error(<span class="kw">_</span>: Position, err: <span class="self">Self</span>::StreamError) -&gt; <span class="self">Self </span>{
+        err
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_position</span>: <span class="ident">Position</span>) {}
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set_position(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _position: Position) {}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw">match</span> (<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">err</span>) {
-            (<span class="ident">UnexpectedParse::Eoi</span>, <span class="kw">_</span>) =&gt; <span class="ident">UnexpectedParse::Eoi</span>,
-            (<span class="kw">_</span>, <span class="ident">err</span>) =&gt; <span class="ident">err</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, err: <span class="self">Self</span>::StreamError) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw">match </span>(<span class="kw-2">*</span><span class="self">self</span>, err) {
+            (UnexpectedParse::Eoi, <span class="kw">_</span>) =&gt; UnexpectedParse::Eoi,
+            (<span class="kw">_</span>, err) =&gt; err,
         };
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_expected</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">self_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">info</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>, <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set_expected&lt;F&gt;(self_: <span class="kw-2">&amp;mut </span>Tracked&lt;<span class="self">Self</span>&gt;, info: <span class="self">Self</span>::StreamError, f: F)
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Tracked&lt;<span class="self">Self</span>&gt;),
     {
-        <span class="ident">f</span>(<span class="ident">self_</span>);
-        <span class="ident">self_</span>.<span class="ident">error</span> <span class="op">=</span> <span class="ident">info</span>;
+        f(self_);
+        self_.error = info;
     }
 
-    <span class="kw">fn</span> <span class="ident">is_unexpected_end_of_input</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="ident">UnexpectedParse::Eoi</span>
+    <span class="kw">fn </span>is_unexpected_end_of_input(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self </span>== UnexpectedParse::Eoi
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_other</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_other&lt;T&gt;(<span class="self">self</span>) -&gt; T
+    <span class="kw">where
+        </span>T: ParseError&lt;Item, Range, Position&gt;,
     {
-        <span class="ident">T::from_error</span>(<span class="ident">Position::default</span>(), <span class="ident">StreamError::into_other</span>(<span class="self">self</span>))
+        T::from_error(Position::default(), StreamError::into_other(<span class="self">self</span>))
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StringStreamError</span> {
-    <span class="ident">UnexpectedParse</span>,
-    <span class="ident">Eoi</span>,
-    <span class="ident">CharacterBoundary</span>,
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+</span><span class="kw">pub enum </span>StringStreamError {
+    UnexpectedParse,
+    Eoi,
+    CharacterBoundary,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">CHAR_BOUNDARY_ERROR_MESSAGE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;unexpected slice on character boundary&quot;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>CHAR_BOUNDARY_ERROR_MESSAGE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;unexpected slice on character boundary&quot;</span>;
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">StringStreamError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::StringStreamError</span>::<span class="kw-2">*</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>StringStreamError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">use </span><span class="self">self</span>::StringStreamError::<span class="kw-2">*</span>;
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{}&quot;</span>,
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                <span class="ident">UnexpectedParse</span> =&gt; <span class="string">&quot;unexpected parse&quot;</span>,
-                <span class="ident">Eoi</span> =&gt; <span class="string">&quot;unexpected end of input&quot;</span>,
-                <span class="ident">CharacterBoundary</span> =&gt; <span class="ident">CHAR_BOUNDARY_ERROR_MESSAGE</span>,
+            <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+                UnexpectedParse =&gt; <span class="string">&quot;unexpected parse&quot;</span>,
+                Eoi =&gt; <span class="string">&quot;unexpected end of input&quot;</span>,
+                CharacterBoundary =&gt; CHAR_BOUNDARY_ERROR_MESSAGE,
             }
         )
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span> <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StringStreamError</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unexpected_token</span>(<span class="kw">_</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">StringStreamError::UnexpectedParse</span>
+<span class="kw">impl</span>&lt;Item, Range&gt; StreamError&lt;Item, Range&gt; <span class="kw">for </span>StringStreamError {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>unexpected_token(<span class="kw">_</span>: Item) -&gt; <span class="self">Self </span>{
+        StringStreamError::UnexpectedParse
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unexpected_range</span>(<span class="kw">_</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">StringStreamError::UnexpectedParse</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>unexpected_range(<span class="kw">_</span>: Range) -&gt; <span class="self">Self </span>{
+        StringStreamError::UnexpectedParse
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unexpected_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">_msg</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>unexpected_message&lt;T&gt;(_msg: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display,
     {
-        <span class="ident">StringStreamError::UnexpectedParse</span>
+        StringStreamError::UnexpectedParse
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">expected_token</span>(<span class="kw">_</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">StringStreamError::UnexpectedParse</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>expected_token(<span class="kw">_</span>: Item) -&gt; <span class="self">Self </span>{
+        StringStreamError::UnexpectedParse
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">expected_range</span>(<span class="kw">_</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">StringStreamError::UnexpectedParse</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>expected_range(<span class="kw">_</span>: Range) -&gt; <span class="self">Self </span>{
+        StringStreamError::UnexpectedParse
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">expected_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>expected_message&lt;T&gt;(<span class="kw">_</span>: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display,
     {
-        <span class="ident">StringStreamError::UnexpectedParse</span>
+        StringStreamError::UnexpectedParse
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">message_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>message_message&lt;T&gt;(<span class="kw">_</span>: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display,
     {
-        <span class="ident">StringStreamError::UnexpectedParse</span>
+        StringStreamError::UnexpectedParse
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">message_token</span>(<span class="kw">_</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">StringStreamError::UnexpectedParse</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>message_token(<span class="kw">_</span>: Item) -&gt; <span class="self">Self </span>{
+        StringStreamError::UnexpectedParse
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">message_range</span>(<span class="kw">_</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">StringStreamError::UnexpectedParse</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>message_range(<span class="kw">_</span>: Range) -&gt; <span class="self">Self </span>{
+        StringStreamError::UnexpectedParse
     }
-    <span class="kw">fn</span> <span class="ident">message_static_message</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">msg</span> <span class="op">==</span> <span class="ident">CHAR_BOUNDARY_ERROR_MESSAGE</span> {
-            <span class="ident">StringStreamError::CharacterBoundary</span>
-        } <span class="kw">else</span> {
-            <span class="ident">StringStreamError::UnexpectedParse</span>
+    <span class="kw">fn </span>message_static_message(msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>msg == CHAR_BOUNDARY_ERROR_MESSAGE {
+            StringStreamError::CharacterBoundary
+        } <span class="kw">else </span>{
+            StringStreamError::UnexpectedParse
         }
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">end_of_input</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">StringStreamError::Eoi</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>end_of_input() -&gt; <span class="self">Self </span>{
+        StringStreamError::Eoi
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_other</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_other&lt;T&gt;(<span class="self">self</span>) -&gt; T
+    <span class="kw">where
+        </span>T: StreamError&lt;Item, Range&gt;,
     {
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">StringStreamError::CharacterBoundary</span> =&gt; <span class="ident">CHAR_BOUNDARY_ERROR_MESSAGE</span>,
-            <span class="ident">StringStreamError::UnexpectedParse</span> =&gt; <span class="string">&quot;parse&quot;</span>,
-            <span class="ident">StringStreamError::Eoi</span> =&gt; <span class="kw">return</span> <span class="ident">T::end_of_input</span>(),
+        <span class="kw">let </span>msg = <span class="kw">match </span><span class="self">self </span>{
+            StringStreamError::CharacterBoundary =&gt; CHAR_BOUNDARY_ERROR_MESSAGE,
+            StringStreamError::UnexpectedParse =&gt; <span class="string">&quot;parse&quot;</span>,
+            StringStreamError::Eoi =&gt; <span class="kw">return </span>T::end_of_input(),
         };
-        <span class="ident">T::unexpected_static_message</span>(<span class="ident">msg</span>)
+        T::unexpected_static_message(msg)
     }
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StringStreamError</span>
-<span class="kw">where</span>
-    <span class="ident">Position</span>: <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;Item, Range, Position&gt; ParseError&lt;Item, Range, Position&gt; <span class="kw">for </span>StringStreamError
+<span class="kw">where
+    </span>Position: Default,
 {
-    <span class="kw">type</span> <span class="ident">StreamError</span> <span class="op">=</span> <span class="self">Self</span>;
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">empty</span>(<span class="ident">_position</span>: <span class="ident">Position</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">StringStreamError::UnexpectedParse</span>
+    <span class="kw">type </span>StreamError = <span class="self">Self</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>empty(_position: Position) -&gt; <span class="self">Self </span>{
+        StringStreamError::UnexpectedParse
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_error</span>(<span class="kw">_</span>: <span class="ident">Position</span>, <span class="ident">err</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">err</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_error(<span class="kw">_</span>: Position, err: <span class="self">Self</span>::StreamError) -&gt; <span class="self">Self </span>{
+        err
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_position</span>: <span class="ident">Position</span>) {}
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set_position(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _position: Position) {}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw">match</span> (<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">err</span>) {
-            (<span class="ident">StringStreamError::Eoi</span>, <span class="kw">_</span>) =&gt; <span class="ident">StringStreamError::Eoi</span>,
-            (<span class="kw">_</span>, <span class="ident">err</span>) =&gt; <span class="ident">err</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, err: <span class="self">Self</span>::StreamError) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw">match </span>(<span class="kw-2">*</span><span class="self">self</span>, err) {
+            (StringStreamError::Eoi, <span class="kw">_</span>) =&gt; StringStreamError::Eoi,
+            (<span class="kw">_</span>, err) =&gt; err,
         };
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_expected</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">self_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">info</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>, <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set_expected&lt;F&gt;(self_: <span class="kw-2">&amp;mut </span>Tracked&lt;<span class="self">Self</span>&gt;, info: <span class="self">Self</span>::StreamError, f: F)
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Tracked&lt;<span class="self">Self</span>&gt;),
     {
-        <span class="ident">f</span>(<span class="ident">self_</span>);
-        <span class="ident">self_</span>.<span class="ident">error</span> <span class="op">=</span> <span class="ident">info</span>;
+        f(self_);
+        self_.error = info;
     }
 
-    <span class="kw">fn</span> <span class="ident">is_unexpected_end_of_input</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="ident">StringStreamError::Eoi</span>
+    <span class="kw">fn </span>is_unexpected_end_of_input(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self </span>== StringStreamError::Eoi
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_other</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_other&lt;T&gt;(<span class="self">self</span>) -&gt; T
+    <span class="kw">where
+        </span>T: ParseError&lt;Item, Range, Position&gt;,
     {
-        <span class="ident">T::from_error</span>(<span class="ident">Position::default</span>(), <span class="ident">StreamError::into_other</span>(<span class="self">self</span>))
+        T::from_error(Position::default(), StreamError::into_other(<span class="self">self</span>))
     }
 }
 
-<span class="doccomment">/// Error wrapper which lets parsers track which parser in a sequence of sub-parsers has emitted</span>
-<span class="doccomment">/// the error. `Tracked::from` can be used to construct this and it should otherwise be</span>
-<span class="doccomment">/// ignored outside of combine.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The error returned</span>
-    <span class="kw">pub</span> <span class="ident">error</span>: <span class="ident">E</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">offset</span>: <span class="ident">ErrorOffset</span>,
+<span class="doccomment">/// Error wrapper which lets parsers track which parser in a sequence of sub-parsers has emitted
+/// the error. `Tracked::from` can be used to construct this and it should otherwise be
+/// ignored outside of combine.
+</span><span class="attribute">#[derive(Clone, PartialEq, Debug, Copy)]
+</span><span class="kw">pub struct </span>Tracked&lt;E&gt; {
+    <span class="doccomment">/// The error returned
+    </span><span class="kw">pub </span>error: E,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>offset: ErrorOffset,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Tracked</span> {
-            <span class="ident">error</span>: <span class="ident">error</span>,
-            <span class="ident">offset</span>: <span class="ident">ErrorOffset</span>(<span class="number">1</span>),
+<span class="kw">impl</span>&lt;E&gt; From&lt;E&gt; <span class="kw">for </span>Tracked&lt;E&gt; {
+    <span class="kw">fn </span>from(error: E) -&gt; <span class="self">Self </span>{
+        Tracked {
+            error: error,
+            offset: ErrorOffset(<span class="number">1</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="ident">ConsumedOk</span>(<span class="ident">T</span>),
-    <span class="ident">EmptyOk</span>(<span class="ident">T</span>),
-    <span class="ident">ConsumedErr</span>(<span class="ident">E</span>),
-    <span class="ident">EmptyErr</span>(<span class="ident">Tracked</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Clone, PartialEq, Debug, Copy)]
+</span><span class="kw">pub enum </span>FastResult&lt;T, E&gt; {
+    ConsumedOk(T),
+    EmptyOk(T),
+    ConsumedErr(E),
+    EmptyErr(Tracked&lt;E&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ConsumedOk</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="ident">ConsumedErr</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">EmptyErr</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+<span class="kw">impl</span>&lt;T, E&gt; FastResult&lt;T, E&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_ok(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ConsumedOk(<span class="kw">_</span>) | EmptyOk(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            ConsumedErr(<span class="kw">_</span>) | EmptyErr(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ConsumedOk</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">t</span>),
-            <span class="ident">EmptyOk</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; <span class="ident">EmptyOk</span>(<span class="ident">t</span>),
-            <span class="ident">ConsumedErr</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">e</span>),
-            <span class="ident">EmptyErr</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="ident">EmptyErr</span>(<span class="ident">Tracked</span> {
-                <span class="ident">error</span>: <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">error</span>,
-                <span class="ident">offset</span>: <span class="ident">e</span>.<span class="ident">offset</span>,
+    <span class="kw">pub fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FastResult&lt;<span class="kw-2">&amp;</span>T, <span class="kw-2">&amp;</span>E&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ConsumedOk(<span class="kw-2">ref </span>t) =&gt; ConsumedOk(t),
+            EmptyOk(<span class="kw-2">ref </span>t) =&gt; EmptyOk(t),
+            ConsumedErr(<span class="kw-2">ref </span>e) =&gt; ConsumedErr(e),
+            EmptyErr(<span class="kw-2">ref </span>e) =&gt; EmptyErr(Tracked {
+                error: <span class="kw-2">&amp;</span>e.error,
+                offset: e.offset,
             }),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_then</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">F::Output</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>and_then&lt;F, T2&gt;(<span class="self">self</span>, f: F) -&gt; F::Output
+    <span class="kw">where
+        </span>F: FnOnce(T) -&gt; FastResult&lt;T2, E&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConsumedOk</span>(<span class="ident">t</span>) =&gt; <span class="kw">match</span> <span class="ident">f</span>(<span class="ident">t</span>) {
-                <span class="ident">ConsumedOk</span>(<span class="ident">t2</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="ident">t2</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">t2</span>),
-                <span class="ident">EmptyErr</span>(<span class="ident">e</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">e</span>.<span class="ident">error</span>),
-                <span class="ident">ConsumedErr</span>(<span class="ident">e</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">e</span>),
+        <span class="kw">match </span><span class="self">self </span>{
+            ConsumedOk(t) =&gt; <span class="kw">match </span>f(t) {
+                ConsumedOk(t2) | EmptyOk(t2) =&gt; ConsumedOk(t2),
+                EmptyErr(e) =&gt; ConsumedErr(e.error),
+                ConsumedErr(e) =&gt; ConsumedErr(e),
             },
-            <span class="ident">EmptyOk</span>(<span class="ident">t</span>) =&gt; <span class="ident">f</span>(<span class="ident">t</span>),
-            <span class="ident">ConsumedErr</span>(<span class="ident">e</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">e</span>),
-            <span class="ident">EmptyErr</span>(<span class="ident">e</span>) =&gt; <span class="ident">EmptyErr</span>(<span class="ident">e</span>),
+            EmptyOk(t) =&gt; f(t),
+            ConsumedErr(e) =&gt; ConsumedErr(e),
+            EmptyErr(e) =&gt; EmptyErr(e),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_err</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F::Output</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">E</span>) -&gt; <span class="ident">E2</span>,
+    <span class="kw">pub fn </span>map_err&lt;F, E2&gt;(<span class="self">self</span>, f: F) -&gt; FastResult&lt;T, F::Output&gt;
+    <span class="kw">where
+        </span>F: FnOnce(E) -&gt; E2,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConsumedOk</span>(<span class="ident">t</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">t</span>),
-            <span class="ident">EmptyOk</span>(<span class="ident">t</span>) =&gt; <span class="ident">EmptyOk</span>(<span class="ident">t</span>),
-            <span class="ident">ConsumedErr</span>(<span class="ident">e</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">f</span>(<span class="ident">e</span>)),
-            <span class="ident">EmptyErr</span>(<span class="ident">e</span>) =&gt; <span class="ident">EmptyErr</span>(<span class="ident">Tracked</span> {
-                <span class="ident">error</span>: <span class="ident">f</span>(<span class="ident">e</span>.<span class="ident">error</span>),
-                <span class="ident">offset</span>: <span class="ident">e</span>.<span class="ident">offset</span>,
+        <span class="kw">match </span><span class="self">self </span>{
+            ConsumedOk(t) =&gt; ConsumedOk(t),
+            EmptyOk(t) =&gt; EmptyOk(t),
+            ConsumedErr(e) =&gt; ConsumedErr(f(e)),
+            EmptyErr(e) =&gt; EmptyErr(Tracked {
+                error: f(e.error),
+                offset: e.offset,
             }),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">F::Output</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">T2</span>,
+<span class="kw">impl</span>&lt;T, E&gt; FastResult&lt;T, E&gt; {
+    <span class="kw">pub fn </span>map&lt;F, T2&gt;(<span class="self">self</span>, f: F) -&gt; FastResult&lt;F::Output, E&gt;
+    <span class="kw">where
+        </span>F: FnOnce(T) -&gt; T2,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConsumedOk</span>(<span class="ident">t</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">f</span>(<span class="ident">t</span>)),
-            <span class="ident">EmptyOk</span>(<span class="ident">t</span>) =&gt; <span class="ident">EmptyOk</span>(<span class="ident">f</span>(<span class="ident">t</span>)),
-            <span class="ident">ConsumedErr</span>(<span class="ident">e</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">e</span>),
-            <span class="ident">EmptyErr</span>(<span class="ident">e</span>) =&gt; <span class="ident">EmptyErr</span>(<span class="ident">e</span>),
+        <span class="kw">match </span><span class="self">self </span>{
+            ConsumedOk(t) =&gt; ConsumedOk(f(t)),
+            EmptyOk(t) =&gt; EmptyOk(f(t)),
+            ConsumedErr(e) =&gt; ConsumedErr(e),
+            EmptyErr(e) =&gt; EmptyErr(e),
         }
     }
 }
 
-<span class="doccomment">/// A `Result` type which has the consumed status flattened into the result.</span>
-<span class="doccomment">/// Conversions to and from `std::result::Result` can be done using `result.into()` or</span>
-<span class="doccomment">/// `From::from(result)`</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A `Result` type which has the consumed status flattened into the result.
+/// Conversions to and from `std::result::Result` can be done using `result.into()` or
+/// `From::from(result)`
+</span><span class="kw">pub type </span>ConsumedResult&lt;O, I&gt; = FastResult&lt;O, &lt;I <span class="kw">as </span>StreamOnce&gt;::Error&gt;;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">Tracked</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Consumed</span><span class="op">&lt;</span><span class="ident">Tracked</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConsumedOk</span>(<span class="ident">t</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Consumed::Consumed</span>(<span class="ident">t</span>)),
-            <span class="ident">EmptyOk</span>(<span class="ident">t</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Consumed::Empty</span>(<span class="ident">t</span>)),
-            <span class="ident">ConsumedErr</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Consumed::Consumed</span>(<span class="ident">e</span>.<span class="ident">into</span>())),
-            <span class="ident">EmptyErr</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Consumed::Empty</span>(<span class="ident">e</span>)),
+<span class="kw">impl</span>&lt;T, E&gt; Into&lt;<span class="prelude-ty">Result</span>&lt;Consumed&lt;T&gt;, Consumed&lt;Tracked&lt;E&gt;&gt;&gt;&gt; <span class="kw">for </span>FastResult&lt;T, E&gt; {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>into(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Consumed&lt;T&gt;, Consumed&lt;Tracked&lt;E&gt;&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ConsumedOk(t) =&gt; <span class="prelude-val">Ok</span>(Consumed::Consumed(t)),
+            EmptyOk(t) =&gt; <span class="prelude-val">Ok</span>(Consumed::Empty(t)),
+            ConsumedErr(e) =&gt; <span class="prelude-val">Err</span>(Consumed::Consumed(e.into())),
+            EmptyErr(e) =&gt; <span class="prelude-val">Err</span>(Consumed::Empty(e)),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ParseResult2</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">ParseResult2</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::FastResult</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConsumedOk</span>(<span class="ident">t</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">t</span>, <span class="ident">Consumed::Consumed</span>(()))),
-            <span class="ident">EmptyOk</span>(<span class="ident">t</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">t</span>, <span class="ident">Consumed::Empty</span>(()))),
-            <span class="ident">ConsumedErr</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Consumed::Consumed</span>(<span class="ident">e</span>.<span class="ident">into</span>())),
-            <span class="ident">EmptyErr</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Consumed::Empty</span>(<span class="ident">e</span>)),
+<span class="kw">impl</span>&lt;O, E&gt; Into&lt;ParseResult2&lt;O, E&gt;&gt; <span class="kw">for </span>FastResult&lt;O, E&gt; {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>into(<span class="self">self</span>) -&gt; ParseResult2&lt;O, E&gt; {
+        <span class="kw">use </span><span class="self">self</span>::FastResult::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            ConsumedOk(t) =&gt; <span class="prelude-val">Ok</span>((t, Consumed::Consumed(()))),
+            EmptyOk(t) =&gt; <span class="prelude-val">Ok</span>((t, Consumed::Empty(()))),
+            ConsumedErr(e) =&gt; <span class="prelude-val">Err</span>(Consumed::Consumed(e.into())),
+            EmptyErr(e) =&gt; <span class="prelude-val">Err</span>(Consumed::Empty(e)),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ParseResult2</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">result</span>: <span class="ident">ParseResult2</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::FastResult</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="prelude-val">Ok</span>((<span class="ident">t</span>, <span class="ident">Consumed::Consumed</span>(()))) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">t</span>),
-            <span class="prelude-val">Ok</span>((<span class="ident">t</span>, <span class="ident">Consumed::Empty</span>(()))) =&gt; <span class="ident">EmptyOk</span>(<span class="ident">t</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">Consumed::Consumed</span>(<span class="ident">e</span>)) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">e</span>.<span class="ident">error</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">Consumed::Empty</span>(<span class="ident">e</span>)) =&gt; <span class="ident">EmptyErr</span>(<span class="ident">e</span>),
+<span class="kw">impl</span>&lt;O, E&gt; From&lt;ParseResult2&lt;O, E&gt;&gt; <span class="kw">for </span>FastResult&lt;O, E&gt; {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>from(result: ParseResult2&lt;O, E&gt;) -&gt; FastResult&lt;O, E&gt; {
+        <span class="kw">use </span><span class="self">self</span>::FastResult::<span class="kw-2">*</span>;
+        <span class="kw">match </span>result {
+            <span class="prelude-val">Ok</span>((t, Consumed::Consumed(()))) =&gt; ConsumedOk(t),
+            <span class="prelude-val">Ok</span>((t, Consumed::Empty(()))) =&gt; EmptyOk(t),
+            <span class="prelude-val">Err</span>(Consumed::Consumed(e)) =&gt; ConsumedErr(e.error),
+            <span class="prelude-val">Err</span>(Consumed::Empty(e)) =&gt; EmptyErr(e),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">mod</span> <span class="ident">tests_std</span> {
-    <span class="kw">use</span> <span class="ident">Parser</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">mod </span>tests_std {
+    <span class="kw">use </span>Parser;
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">CloneOnly</span> {
-        <span class="ident">s</span>: <span class="ident">String</span>,
+    <span class="attribute">#[derive(Clone, PartialEq, Debug)]
+    </span><span class="kw">struct </span>CloneOnly {
+        s: String,
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_clone_but_not_copy</span>() {
-        <span class="comment">// This verifies we can parse slice references with an item type that is Clone but not Copy.</span>
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
-            <span class="ident">CloneOnly</span> { <span class="ident">s</span>: <span class="string">&quot;x&quot;</span>.<span class="ident">to_string</span>() },
-            <span class="ident">CloneOnly</span> { <span class="ident">s</span>: <span class="string">&quot;y&quot;</span>.<span class="ident">to_string</span>() },
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_clone_but_not_copy() {
+        <span class="comment">// This verifies we can parse slice references with an item type that is Clone but not Copy.
+        </span><span class="kw">let </span>input = <span class="kw-2">&amp;</span>[
+            CloneOnly { s: <span class="string">&quot;x&quot;</span>.to_string() },
+            CloneOnly { s: <span class="string">&quot;y&quot;</span>.to_string() },
         ][..];
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span>
-            <span class="ident">::parser::range::take_while</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">CloneOnly</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">s</span> <span class="op">==</span> <span class="string">&quot;x&quot;</span>.<span class="ident">to_string</span>()).<span class="ident">parse</span>(<span class="ident">input</span>);
+        <span class="kw">let </span>result =
+            ::parser::range::take_while(|c: CloneOnly| c.s == <span class="string">&quot;x&quot;</span>.to_string()).parse(input);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">result</span>,
+            result,
             <span class="prelude-val">Ok</span>((
-                <span class="kw-2">&amp;</span>[<span class="ident">CloneOnly</span> { <span class="ident">s</span>: <span class="string">&quot;x&quot;</span>.<span class="ident">to_string</span>() }][..],
-                <span class="kw-2">&amp;</span>[<span class="ident">CloneOnly</span> { <span class="ident">s</span>: <span class="string">&quot;y&quot;</span>.<span class="ident">to_string</span>() }][..]
+                <span class="kw-2">&amp;</span>[CloneOnly { s: <span class="string">&quot;x&quot;</span>.to_string() }][..],
+                <span class="kw-2">&amp;</span>[CloneOnly { s: <span class="string">&quot;y&quot;</span>.to_string() }][..]
             ))
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

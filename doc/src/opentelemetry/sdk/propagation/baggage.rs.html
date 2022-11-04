@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/propagation/baggage.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>baggage.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/propagation/baggage.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>baggage.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -342,241 +342,241 @@
 <span id="340">340</span>
 <span id="341">341</span>
 <span id="342">342</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # OpenTelemetry Baggage API</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Baggage is used to annotate telemetry, adding context and</span>
-<span class="doccomment">//! information to metrics, traces, and logs. It is an abstract data type</span>
-<span class="doccomment">//! represented by a set of name-value pairs describing user-defined properties.</span>
-<span class="doccomment">//! Each name in a [`Baggage`] is associated with exactly one value.</span>
-<span class="doccomment">//! `Baggage`s are serialized according to the editor&#39;s draft of</span>
-<span class="doccomment">//! the [W3C Baggage] specification.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Baggage`]: crate::baggage::Baggage</span>
-<span class="doccomment">//! [W3C Baggage]: https://w3c.github.io/baggage/</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use opentelemetry::{baggage::BaggageExt, Key, propagation::TextMapPropagator};</span>
-<span class="doccomment">//! use opentelemetry::sdk::propagation::BaggagePropagator;</span>
-<span class="doccomment">//! use std::collections::HashMap;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Example baggage value passed in externally via http headers</span>
-<span class="doccomment">//! let mut headers = HashMap::new();</span>
-<span class="doccomment">//! headers.insert(&quot;baggage&quot;.to_string(), &quot;user_id=1&quot;.to_string());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let propagator = BaggagePropagator::new();</span>
-<span class="doccomment">//! // can extract from any type that impls `Extractor`, usually an HTTP header map</span>
-<span class="doccomment">//! let cx = propagator.extract(&amp;headers);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Iterate over extracted name-value pairs</span>
-<span class="doccomment">//! for (name, value) in cx.baggage() {</span>
-<span class="doccomment">//!     // ...</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Add new baggage</span>
-<span class="doccomment">//! let cx_with_additions = cx.with_baggage(vec![Key::new(&quot;server_id&quot;).i64(42)]);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Inject baggage into http request</span>
-<span class="doccomment">//! propagator.inject_context(&amp;cx_with_additions, &amp;mut headers);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let header_value = headers.get(&quot;baggage&quot;).expect(&quot;header is injected&quot;);</span>
-<span class="doccomment">//! assert!(header_value.contains(&quot;user_id=1&quot;), &quot;still contains previous name-value&quot;);</span>
-<span class="doccomment">//! assert!(header_value.contains(&quot;server_id=42&quot;), &quot;contains new name-value pair&quot;);</span>
-<span class="doccomment">//! ```</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">baggage</span>::{<span class="ident">BaggageExt</span>, <span class="ident">KeyValueMetadata</span>},
-    <span class="ident">propagation</span>::{<span class="ident">text_map_propagator::FieldIter</span>, <span class="ident">Extractor</span>, <span class="ident">Injector</span>, <span class="ident">TextMapPropagator</span>},
-    <span class="ident">Context</span>,
+</pre><pre class="rust"><code><span class="doccomment">//! # OpenTelemetry Baggage API
+//!
+//! Baggage is used to annotate telemetry, adding context and
+//! information to metrics, traces, and logs. It is an abstract data type
+//! represented by a set of name-value pairs describing user-defined properties.
+//! Each name in a [`Baggage`] is associated with exactly one value.
+//! `Baggage`s are serialized according to the editor&#39;s draft of
+//! the [W3C Baggage] specification.
+//!
+//! [`Baggage`]: crate::baggage::Baggage
+//! [W3C Baggage]: https://w3c.github.io/baggage/
+//!
+//! # Examples
+//!
+//! ```
+//! use opentelemetry::{baggage::BaggageExt, Key, propagation::TextMapPropagator};
+//! use opentelemetry::sdk::propagation::BaggagePropagator;
+//! use std::collections::HashMap;
+//!
+//! // Example baggage value passed in externally via http headers
+//! let mut headers = HashMap::new();
+//! headers.insert(&quot;baggage&quot;.to_string(), &quot;user_id=1&quot;.to_string());
+//!
+//! let propagator = BaggagePropagator::new();
+//! // can extract from any type that impls `Extractor`, usually an HTTP header map
+//! let cx = propagator.extract(&amp;headers);
+//!
+//! // Iterate over extracted name-value pairs
+//! for (name, value) in cx.baggage() {
+//!     // ...
+//! }
+//!
+//! // Add new baggage
+//! let cx_with_additions = cx.with_baggage(vec![Key::new(&quot;server_id&quot;).i64(42)]);
+//!
+//! // Inject baggage into http request
+//! propagator.inject_context(&amp;cx_with_additions, &amp;mut headers);
+//!
+//! let header_value = headers.get(&quot;baggage&quot;).expect(&quot;header is injected&quot;);
+//! assert!(header_value.contains(&quot;user_id=1&quot;), &quot;still contains previous name-value&quot;);
+//! assert!(header_value.contains(&quot;server_id=42&quot;), &quot;contains new name-value pair&quot;);
+//! ```
+</span><span class="kw">use crate</span>::{
+    baggage::{BaggageExt, KeyValueMetadata},
+    propagation::{text_map_propagator::FieldIter, Extractor, Injector, TextMapPropagator},
+    Context,
 };
-<span class="kw">use</span> <span class="ident">percent_encoding</span>::{<span class="ident">percent_decode_str</span>, <span class="ident">utf8_percent_encode</span>, <span class="ident">AsciiSet</span>, <span class="ident">CONTROLS</span>};
-<span class="kw">use</span> <span class="ident">std::iter</span>;
+<span class="kw">use </span>percent_encoding::{percent_decode_str, utf8_percent_encode, AsciiSet, CONTROLS};
+<span class="kw">use </span>std::iter;
 
-<span class="kw">static</span> <span class="ident">BAGGAGE_HEADER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;baggage&quot;</span>;
-<span class="kw">const</span> <span class="ident">FRAGMENT</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiSet</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">CONTROLS</span>.<span class="ident">add</span>(<span class="string">b&#39; &#39;</span>).<span class="ident">add</span>(<span class="string">b&#39;&quot;&#39;</span>).<span class="ident">add</span>(<span class="string">b&#39;;&#39;</span>).<span class="ident">add</span>(<span class="string">b&#39;,&#39;</span>).<span class="ident">add</span>(<span class="string">b&#39;=&#39;</span>);
+<span class="kw">static </span>BAGGAGE_HEADER: <span class="kw-2">&amp;</span>str = <span class="string">&quot;baggage&quot;</span>;
+<span class="kw">const </span>FRAGMENT: <span class="kw-2">&amp;</span>AsciiSet = <span class="kw-2">&amp;</span>CONTROLS.add(<span class="string">b&#39; &#39;</span>).add(<span class="string">b&#39;&quot;&#39;</span>).add(<span class="string">b&#39;;&#39;</span>).add(<span class="string">b&#39;,&#39;</span>).add(<span class="string">b&#39;=&#39;</span>);
 
-<span class="macro">lazy_static::lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BAGGAGE_FIELDS</span>: [<span class="ident">String</span>; <span class="number">1</span>] <span class="op">=</span> [<span class="ident">BAGGAGE_HEADER</span>.<span class="ident">to_string</span>()];
+<span class="macro">lazy_static::lazy_static! </span>{
+    <span class="kw">static </span><span class="kw-2">ref </span>BAGGAGE_FIELDS: [String; <span class="number">1</span>] = [BAGGAGE_HEADER.to_string()];
 }
 
-<span class="doccomment">/// Propagates name-value pairs in [W3C Baggage] format.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Baggage is used to annotate telemetry, adding context and</span>
-<span class="doccomment">/// information to metrics, traces, and logs. It is an abstract data type</span>
-<span class="doccomment">/// represented by a set of name-value pairs describing user-defined properties.</span>
-<span class="doccomment">/// Each name in a [`Baggage`] is associated with exactly one value.</span>
-<span class="doccomment">/// `Baggage`s are serialized according to the editor&#39;s draft of</span>
-<span class="doccomment">/// the [W3C Baggage] specification.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use opentelemetry::{baggage::BaggageExt, Key, propagation::TextMapPropagator};</span>
-<span class="doccomment">/// use opentelemetry::sdk::propagation::BaggagePropagator;</span>
-<span class="doccomment">/// use std::collections::HashMap;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Example baggage value passed in externally via http headers</span>
-<span class="doccomment">/// let mut headers = HashMap::new();</span>
-<span class="doccomment">/// headers.insert(&quot;baggage&quot;.to_string(), &quot;user_id=1&quot;.to_string());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let propagator = BaggagePropagator::new();</span>
-<span class="doccomment">/// // can extract from any type that impls `Extractor`, usually an HTTP header map</span>
-<span class="doccomment">/// let cx = propagator.extract(&amp;headers);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Iterate over extracted name-value pairs</span>
-<span class="doccomment">/// for (name, value) in cx.baggage() {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Add new baggage</span>
-<span class="doccomment">/// let cx_with_additions = cx.with_baggage(vec![Key::new(&quot;server_id&quot;).i64(42)]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Inject baggage into http request</span>
-<span class="doccomment">/// propagator.inject_context(&amp;cx_with_additions, &amp;mut headers);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let header_value = headers.get(&quot;baggage&quot;).expect(&quot;header is injected&quot;);</span>
-<span class="doccomment">/// assert!(header_value.contains(&quot;user_id=1&quot;), &quot;still contains previous name-value&quot;);</span>
-<span class="doccomment">/// assert!(header_value.contains(&quot;server_id=42&quot;), &quot;contains new name-value pair&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [W3C Baggage]: https://w3c.github.io/baggage</span>
-<span class="doccomment">/// [`Baggage`]: crate::baggage::Baggage</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BaggagePropagator</span> {
-    <span class="ident">_private</span>: (),
+<span class="doccomment">/// Propagates name-value pairs in [W3C Baggage] format.
+///
+/// Baggage is used to annotate telemetry, adding context and
+/// information to metrics, traces, and logs. It is an abstract data type
+/// represented by a set of name-value pairs describing user-defined properties.
+/// Each name in a [`Baggage`] is associated with exactly one value.
+/// `Baggage`s are serialized according to the editor&#39;s draft of
+/// the [W3C Baggage] specification.
+///
+/// # Examples
+///
+/// ```
+/// use opentelemetry::{baggage::BaggageExt, Key, propagation::TextMapPropagator};
+/// use opentelemetry::sdk::propagation::BaggagePropagator;
+/// use std::collections::HashMap;
+///
+/// // Example baggage value passed in externally via http headers
+/// let mut headers = HashMap::new();
+/// headers.insert(&quot;baggage&quot;.to_string(), &quot;user_id=1&quot;.to_string());
+///
+/// let propagator = BaggagePropagator::new();
+/// // can extract from any type that impls `Extractor`, usually an HTTP header map
+/// let cx = propagator.extract(&amp;headers);
+///
+/// // Iterate over extracted name-value pairs
+/// for (name, value) in cx.baggage() {
+///     // ...
+/// }
+///
+/// // Add new baggage
+/// let cx_with_additions = cx.with_baggage(vec![Key::new(&quot;server_id&quot;).i64(42)]);
+///
+/// // Inject baggage into http request
+/// propagator.inject_context(&amp;cx_with_additions, &amp;mut headers);
+///
+/// let header_value = headers.get(&quot;baggage&quot;).expect(&quot;header is injected&quot;);
+/// assert!(header_value.contains(&quot;user_id=1&quot;), &quot;still contains previous name-value&quot;);
+/// assert!(header_value.contains(&quot;server_id=42&quot;), &quot;contains new name-value pair&quot;);
+/// ```
+///
+/// [W3C Baggage]: https://w3c.github.io/baggage
+/// [`Baggage`]: crate::baggage::Baggage
+</span><span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>BaggagePropagator {
+    _private: (),
 }
 
-<span class="kw">impl</span> <span class="ident">BaggagePropagator</span> {
-    <span class="doccomment">/// Construct a new baggage propagator.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">BaggagePropagator</span> { <span class="ident">_private</span>: () }
+<span class="kw">impl </span>BaggagePropagator {
+    <span class="doccomment">/// Construct a new baggage propagator.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        BaggagePropagator { _private: () }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TextMapPropagator</span> <span class="kw">for</span> <span class="ident">BaggagePropagator</span> {
-    <span class="doccomment">/// Encodes the values of the `Context` and injects them into the provided `Injector`.</span>
-    <span class="kw">fn</span> <span class="ident">inject_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">injector</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Injector</span>) {
-        <span class="kw">let</span> <span class="ident">baggage</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">baggage</span>();
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">baggage</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">header_value</span> <span class="op">=</span> <span class="ident">baggage</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">name</span>, (<span class="ident">value</span>, <span class="ident">metadata</span>))<span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">metadata_str</span> <span class="op">=</span> <span class="ident">metadata</span>.<span class="ident">as_str</span>().<span class="ident">trim</span>();
-                    <span class="kw">let</span> <span class="ident">metadata_prefix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">metadata_str</span>.<span class="ident">is_empty</span>() { <span class="string">&quot;&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;;&quot;</span> };
-                    <span class="ident">utf8_percent_encode</span>(<span class="ident">name</span>.<span class="ident">as_str</span>().<span class="ident">trim</span>(), <span class="ident">FRAGMENT</span>)
-                        .<span class="ident">chain</span>(<span class="ident">iter::once</span>(<span class="string">&quot;=&quot;</span>))
-                        .<span class="ident">chain</span>(<span class="ident">utf8_percent_encode</span>(<span class="ident">value</span>.<span class="ident">as_str</span>().<span class="ident">trim</span>(), <span class="ident">FRAGMENT</span>))
-                        .<span class="ident">chain</span>(<span class="ident">iter::once</span>(<span class="ident">metadata_prefix</span>))
-                        .<span class="ident">chain</span>(<span class="ident">iter::once</span>(<span class="ident">metadata_str</span>))
-                        .<span class="ident">collect</span>()
+<span class="kw">impl </span>TextMapPropagator <span class="kw">for </span>BaggagePropagator {
+    <span class="doccomment">/// Encodes the values of the `Context` and injects them into the provided `Injector`.
+    </span><span class="kw">fn </span>inject_context(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;</span>Context, injector: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Injector) {
+        <span class="kw">let </span>baggage = cx.baggage();
+        <span class="kw">if </span>!baggage.is_empty() {
+            <span class="kw">let </span>header_value = baggage
+                .iter()
+                .map(|(name, (value, metadata))| {
+                    <span class="kw">let </span>metadata_str = metadata.as_str().trim();
+                    <span class="kw">let </span>metadata_prefix = <span class="kw">if </span>metadata_str.is_empty() { <span class="string">&quot;&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;;&quot; </span>};
+                    utf8_percent_encode(name.as_str().trim(), FRAGMENT)
+                        .chain(iter::once(<span class="string">&quot;=&quot;</span>))
+                        .chain(utf8_percent_encode(value.as_str().trim(), FRAGMENT))
+                        .chain(iter::once(metadata_prefix))
+                        .chain(iter::once(metadata_str))
+                        .collect()
                 })
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                .<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
-            <span class="ident">injector</span>.<span class="ident">set</span>(<span class="ident">BAGGAGE_HEADER</span>, <span class="ident">header_value</span>);
+                .collect::&lt;Vec&lt;String&gt;&gt;()
+                .join(<span class="string">&quot;,&quot;</span>);
+            injector.set(BAGGAGE_HEADER, header_value);
         }
     }
 
-    <span class="doccomment">/// Extracts a `Context` with baggage values from a `Extractor`.</span>
-    <span class="kw">fn</span> <span class="ident">extract_with_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">extractor</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Extractor</span>) -&gt; <span class="ident">Context</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">header_value</span>) <span class="op">=</span> <span class="ident">extractor</span>.<span class="ident">get</span>(<span class="ident">BAGGAGE_HEADER</span>) {
-            <span class="kw">let</span> <span class="ident">baggage</span> <span class="op">=</span> <span class="ident">header_value</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">context_value</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">name_and_value</span>, <span class="ident">props</span>)) <span class="op">=</span> <span class="ident">context_value</span>
-                    .<span class="ident">split</span>(<span class="string">&#39;;&#39;</span>)
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                    .<span class="ident">split_first</span>()
+    <span class="doccomment">/// Extracts a `Context` with baggage values from a `Extractor`.
+    </span><span class="kw">fn </span>extract_with_context(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;</span>Context, extractor: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Extractor) -&gt; Context {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(header_value) = extractor.get(BAGGAGE_HEADER) {
+            <span class="kw">let </span>baggage = header_value.split(<span class="string">&#39;,&#39;</span>).flat_map(|context_value| {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>((name_and_value, props)) = context_value
+                    .split(<span class="string">&#39;;&#39;</span>)
+                    .collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;()
+                    .split_first()
                 {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">name_and_value</span>.<span class="ident">split</span>(<span class="string">&#39;=&#39;</span>);
-                    <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">name</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>)) <span class="op">=</span> (<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="ident">iter</span>.<span class="ident">next</span>()) {
-                        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">percent_decode_str</span>(<span class="ident">name</span>).<span class="ident">decode_utf8</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())<span class="question-mark">?</span>;
-                        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">percent_decode_str</span>(<span class="ident">value</span>).<span class="ident">decode_utf8</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())<span class="question-mark">?</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>iter = name_and_value.split(<span class="string">&#39;=&#39;</span>);
+                    <span class="kw">if let </span>(<span class="prelude-val">Some</span>(name), <span class="prelude-val">Some</span>(value)) = (iter.next(), iter.next()) {
+                        <span class="kw">let </span>name = percent_decode_str(name).decode_utf8().map_err(|<span class="kw">_</span>| ())<span class="question-mark">?</span>;
+                        <span class="kw">let </span>value = percent_decode_str(value).decode_utf8().map_err(|<span class="kw">_</span>| ())<span class="question-mark">?</span>;
 
-                        <span class="comment">// Here we don&#39;t store the first ; into baggage since it should be treated</span>
-                        <span class="comment">// as separator rather part of metadata</span>
-                        <span class="kw">let</span> <span class="ident">decoded_props</span> <span class="op">=</span> <span class="ident">props</span>
-                            .<span class="ident">iter</span>()
-                            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">prop</span><span class="op">|</span> <span class="ident">percent_decode_str</span>(<span class="ident">prop</span>).<span class="ident">decode_utf8</span>())
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">prop</span><span class="op">|</span> <span class="ident">prop</span>.<span class="ident">trim</span>().<span class="ident">to_string</span>())
-                            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                            .<span class="ident">join</span>(<span class="string">&quot;;&quot;</span>); <span class="comment">// join with ; because we deleted all ; when calling split above</span>
+                        <span class="comment">// Here we don&#39;t store the first ; into baggage since it should be treated
+                        // as separator rather part of metadata
+                        </span><span class="kw">let </span>decoded_props = props
+                            .iter()
+                            .flat_map(|prop| percent_decode_str(prop).decode_utf8())
+                            .map(|prop| prop.trim().to_string())
+                            .collect::&lt;Vec&lt;String&gt;&gt;()
+                            .join(<span class="string">&quot;;&quot;</span>); <span class="comment">// join with ; because we deleted all ; when calling split above
 
-                        <span class="prelude-val">Ok</span>(<span class="ident">KeyValueMetadata::new</span>(
-                            <span class="ident">name</span>.<span class="ident">trim</span>().<span class="ident">to_owned</span>(),
-                            <span class="ident">value</span>.<span class="ident">trim</span>().<span class="ident">to_string</span>(),
-                            <span class="ident">decoded_props</span>.<span class="ident">as_str</span>(),
+                        </span><span class="prelude-val">Ok</span>(KeyValueMetadata::new(
+                            name.trim().to_owned(),
+                            value.trim().to_string(),
+                            decoded_props.as_str(),
                         ))
-                    } <span class="kw">else</span> {
-                        <span class="comment">// Invalid name-value format</span>
-                        <span class="prelude-val">Err</span>(())
+                    } <span class="kw">else </span>{
+                        <span class="comment">// Invalid name-value format
+                        </span><span class="prelude-val">Err</span>(())
                     }
-                } <span class="kw">else</span> {
-                    <span class="comment">// Invalid baggage value format</span>
-                    <span class="prelude-val">Err</span>(())
+                } <span class="kw">else </span>{
+                    <span class="comment">// Invalid baggage value format
+                    </span><span class="prelude-val">Err</span>(())
                 }
             });
-            <span class="ident">cx</span>.<span class="ident">with_baggage</span>(<span class="ident">baggage</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">cx</span>.<span class="ident">clone</span>()
+            cx.with_baggage(baggage)
+        } <span class="kw">else </span>{
+            cx.clone()
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FieldIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">FieldIter::new</span>(<span class="ident">BAGGAGE_FIELDS</span>.<span class="ident">as_ref</span>())
+    <span class="kw">fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldIter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        FieldIter::new(BAGGAGE_FIELDS.as_ref())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">baggage::BaggageMetadata</span>, <span class="ident">propagation::TextMapPropagator</span>, <span class="ident">Key</span>, <span class="ident">KeyValue</span>, <span class="ident">Value</span>};
-    <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use crate</span>::{baggage::BaggageMetadata, propagation::TextMapPropagator, Key, KeyValue, Value};
+    <span class="kw">use </span>std::borrow::Cow;
+    <span class="kw">use </span>std::collections::HashMap;
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">valid_extract_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Key</span>, <span class="ident">Value</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>valid_extract_data() -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, HashMap&lt;Key, Value&gt;)&gt; {
         <span class="macro">vec!</span>[
-            <span class="comment">// &quot;valid w3cHeader&quot;</span>
-            (<span class="string">&quot;key1=val1,key2=val2&quot;</span>, <span class="macro">vec!</span>[(<span class="ident">Key::new</span>(<span class="string">&quot;key1&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;val1&quot;</span>)), (<span class="ident">Key::new</span>(<span class="string">&quot;key2&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;val2&quot;</span>))].<span class="ident">into_iter</span>().<span class="ident">collect</span>()),
-            <span class="comment">// &quot;valid w3cHeader with spaces&quot;</span>
-            (<span class="string">&quot;key1 =   val1,  key2 =val2   &quot;</span>, <span class="macro">vec!</span>[(<span class="ident">Key::new</span>(<span class="string">&quot;key1&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;val1&quot;</span>)), (<span class="ident">Key::new</span>(<span class="string">&quot;key2&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;val2&quot;</span>))].<span class="ident">into_iter</span>().<span class="ident">collect</span>()),
-            <span class="comment">// &quot;valid header with url-escaped comma&quot;</span>
-            (<span class="string">&quot;key1=val1,key2=val2%2Cval3&quot;</span>, <span class="macro">vec!</span>[(<span class="ident">Key::new</span>(<span class="string">&quot;key1&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;val1&quot;</span>)), (<span class="ident">Key::new</span>(<span class="string">&quot;key2&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;val2,val3&quot;</span>))].<span class="ident">into_iter</span>().<span class="ident">collect</span>()),
-            <span class="comment">// &quot;valid header with an invalid header&quot;</span>
-            (<span class="string">&quot;key1=val1,key2=val2,a,val3&quot;</span>, <span class="macro">vec!</span>[(<span class="ident">Key::new</span>(<span class="string">&quot;key1&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;val1&quot;</span>)), (<span class="ident">Key::new</span>(<span class="string">&quot;key2&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;val2&quot;</span>))].<span class="ident">into_iter</span>().<span class="ident">collect</span>()),
-            <span class="comment">// &quot;valid header with no value&quot;</span>
-            (<span class="string">&quot;key1=,key2=val2&quot;</span>, <span class="macro">vec!</span>[(<span class="ident">Key::new</span>(<span class="string">&quot;key1&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;&quot;</span>)), (<span class="ident">Key::new</span>(<span class="string">&quot;key2&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;val2&quot;</span>))].<span class="ident">into_iter</span>().<span class="ident">collect</span>()),
+            <span class="comment">// &quot;valid w3cHeader&quot;
+            </span>(<span class="string">&quot;key1=val1,key2=val2&quot;</span>, <span class="macro">vec!</span>[(Key::new(<span class="string">&quot;key1&quot;</span>), Value::from(<span class="string">&quot;val1&quot;</span>)), (Key::new(<span class="string">&quot;key2&quot;</span>), Value::from(<span class="string">&quot;val2&quot;</span>))].into_iter().collect()),
+            <span class="comment">// &quot;valid w3cHeader with spaces&quot;
+            </span>(<span class="string">&quot;key1 =   val1,  key2 =val2   &quot;</span>, <span class="macro">vec!</span>[(Key::new(<span class="string">&quot;key1&quot;</span>), Value::from(<span class="string">&quot;val1&quot;</span>)), (Key::new(<span class="string">&quot;key2&quot;</span>), Value::from(<span class="string">&quot;val2&quot;</span>))].into_iter().collect()),
+            <span class="comment">// &quot;valid header with url-escaped comma&quot;
+            </span>(<span class="string">&quot;key1=val1,key2=val2%2Cval3&quot;</span>, <span class="macro">vec!</span>[(Key::new(<span class="string">&quot;key1&quot;</span>), Value::from(<span class="string">&quot;val1&quot;</span>)), (Key::new(<span class="string">&quot;key2&quot;</span>), Value::from(<span class="string">&quot;val2,val3&quot;</span>))].into_iter().collect()),
+            <span class="comment">// &quot;valid header with an invalid header&quot;
+            </span>(<span class="string">&quot;key1=val1,key2=val2,a,val3&quot;</span>, <span class="macro">vec!</span>[(Key::new(<span class="string">&quot;key1&quot;</span>), Value::from(<span class="string">&quot;val1&quot;</span>)), (Key::new(<span class="string">&quot;key2&quot;</span>), Value::from(<span class="string">&quot;val2&quot;</span>))].into_iter().collect()),
+            <span class="comment">// &quot;valid header with no value&quot;
+            </span>(<span class="string">&quot;key1=,key2=val2&quot;</span>, <span class="macro">vec!</span>[(Key::new(<span class="string">&quot;key1&quot;</span>), Value::from(<span class="string">&quot;&quot;</span>)), (Key::new(<span class="string">&quot;key2&quot;</span>), Value::from(<span class="string">&quot;val2&quot;</span>))].into_iter().collect()),
         ]
     }
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">valid_extract_data_with_metadata</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Key</span>, (<span class="ident">Value</span>, <span class="ident">BaggageMetadata</span>)<span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    <span class="attribute">#[rustfmt::skip]
+    #[allow(clippy::type_complexity)]
+    </span><span class="kw">fn </span>valid_extract_data_with_metadata() -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, HashMap&lt;Key, (Value, BaggageMetadata)&gt;)&gt; {
         <span class="macro">vec!</span>[
-            <span class="comment">// &quot;valid w3cHeader with properties&quot;</span>
-            (<span class="string">&quot;key1=val1,key2=val2;prop=1&quot;</span>, <span class="macro">vec!</span>[(<span class="ident">Key::new</span>(<span class="string">&quot;key1&quot;</span>), (<span class="ident">Value::from</span>(<span class="string">&quot;val1&quot;</span>), <span class="ident">BaggageMetadata::default</span>())), (<span class="ident">Key::new</span>(<span class="string">&quot;key2&quot;</span>), (<span class="ident">Value::from</span>(<span class="string">&quot;val2&quot;</span>), <span class="ident">BaggageMetadata::from</span>(<span class="string">&quot;prop=1&quot;</span>)))].<span class="ident">into_iter</span>().<span class="ident">collect</span>()),
-            <span class="comment">// prop can don&#39;t need to be key value pair</span>
-            (<span class="string">&quot;key1=val1,key2=val2;prop1&quot;</span>, <span class="macro">vec!</span>[(<span class="ident">Key::new</span>(<span class="string">&quot;key1&quot;</span>), (<span class="ident">Value::from</span>(<span class="string">&quot;val1&quot;</span>), <span class="ident">BaggageMetadata::default</span>())), (<span class="ident">Key::new</span>(<span class="string">&quot;key2&quot;</span>), (<span class="ident">Value::from</span>(<span class="string">&quot;val2&quot;</span>), <span class="ident">BaggageMetadata::from</span>(<span class="string">&quot;prop1&quot;</span>)))].<span class="ident">into_iter</span>().<span class="ident">collect</span>()),
+            <span class="comment">// &quot;valid w3cHeader with properties&quot;
+            </span>(<span class="string">&quot;key1=val1,key2=val2;prop=1&quot;</span>, <span class="macro">vec!</span>[(Key::new(<span class="string">&quot;key1&quot;</span>), (Value::from(<span class="string">&quot;val1&quot;</span>), BaggageMetadata::default())), (Key::new(<span class="string">&quot;key2&quot;</span>), (Value::from(<span class="string">&quot;val2&quot;</span>), BaggageMetadata::from(<span class="string">&quot;prop=1&quot;</span>)))].into_iter().collect()),
+            <span class="comment">// prop can don&#39;t need to be key value pair
+            </span>(<span class="string">&quot;key1=val1,key2=val2;prop1&quot;</span>, <span class="macro">vec!</span>[(Key::new(<span class="string">&quot;key1&quot;</span>), (Value::from(<span class="string">&quot;val1&quot;</span>), BaggageMetadata::default())), (Key::new(<span class="string">&quot;key2&quot;</span>), (Value::from(<span class="string">&quot;val2&quot;</span>), BaggageMetadata::from(<span class="string">&quot;prop1&quot;</span>)))].into_iter().collect()),
             (<span class="string">&quot;key1=value1;property1;property2, key2 = value2, key3=value3; propertyKey=propertyValue&quot;</span>,
              <span class="macro">vec!</span>[
-                 (<span class="ident">Key::new</span>(<span class="string">&quot;key1&quot;</span>), (<span class="ident">Value::from</span>(<span class="string">&quot;value1&quot;</span>), <span class="ident">BaggageMetadata::from</span>(<span class="string">&quot;property1;property2&quot;</span>))),
-                 (<span class="ident">Key::new</span>(<span class="string">&quot;key2&quot;</span>), (<span class="ident">Value::from</span>(<span class="string">&quot;value2&quot;</span>), <span class="ident">BaggageMetadata::default</span>())),
-                 (<span class="ident">Key::new</span>(<span class="string">&quot;key3&quot;</span>), (<span class="ident">Value::from</span>(<span class="string">&quot;value3&quot;</span>), <span class="ident">BaggageMetadata::from</span>(<span class="string">&quot;propertyKey=propertyValue&quot;</span>)))
-             ].<span class="ident">into_iter</span>().<span class="ident">collect</span>()),
+                 (Key::new(<span class="string">&quot;key1&quot;</span>), (Value::from(<span class="string">&quot;value1&quot;</span>), BaggageMetadata::from(<span class="string">&quot;property1;property2&quot;</span>))),
+                 (Key::new(<span class="string">&quot;key2&quot;</span>), (Value::from(<span class="string">&quot;value2&quot;</span>), BaggageMetadata::default())),
+                 (Key::new(<span class="string">&quot;key3&quot;</span>), (Value::from(<span class="string">&quot;value3&quot;</span>), BaggageMetadata::from(<span class="string">&quot;propertyKey=propertyValue&quot;</span>)))
+             ].into_iter().collect()),
         ]
     }
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">valid_inject_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>valid_inject_data() -&gt; Vec&lt;(Vec&lt;KeyValue&gt;, Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;)&gt; {
         <span class="macro">vec!</span>[
-            <span class="comment">// &quot;two simple values&quot;</span>
-            (<span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;key1&quot;</span>, <span class="string">&quot;val1&quot;</span>), <span class="ident">KeyValue::new</span>(<span class="string">&quot;key2&quot;</span>, <span class="string">&quot;val2&quot;</span>)], <span class="macro">vec!</span>[<span class="string">&quot;key1=val1&quot;</span>, <span class="string">&quot;key2=val2&quot;</span>]),
-            <span class="comment">// &quot;two values with escaped chars&quot;</span>
-            (<span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;key1&quot;</span>, <span class="string">&quot;val1,val2&quot;</span>), <span class="ident">KeyValue::new</span>(<span class="string">&quot;key2&quot;</span>, <span class="string">&quot;val3=4&quot;</span>)], <span class="macro">vec!</span>[<span class="string">&quot;key1=val1%2Cval2&quot;</span>, <span class="string">&quot;key2=val3%3D4&quot;</span>]),
-            <span class="comment">// &quot;values of non-string non-array types&quot;</span>
-            (
+            <span class="comment">// &quot;two simple values&quot;
+            </span>(<span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;key1&quot;</span>, <span class="string">&quot;val1&quot;</span>), KeyValue::new(<span class="string">&quot;key2&quot;</span>, <span class="string">&quot;val2&quot;</span>)], <span class="macro">vec!</span>[<span class="string">&quot;key1=val1&quot;</span>, <span class="string">&quot;key2=val2&quot;</span>]),
+            <span class="comment">// &quot;two values with escaped chars&quot;
+            </span>(<span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;key1&quot;</span>, <span class="string">&quot;val1,val2&quot;</span>), KeyValue::new(<span class="string">&quot;key2&quot;</span>, <span class="string">&quot;val3=4&quot;</span>)], <span class="macro">vec!</span>[<span class="string">&quot;key1=val1%2Cval2&quot;</span>, <span class="string">&quot;key2=val3%3D4&quot;</span>]),
+            <span class="comment">// &quot;values of non-string non-array types&quot;
+            </span>(
                 <span class="macro">vec!</span>[
-                    <span class="ident">KeyValue::new</span>(<span class="string">&quot;key1&quot;</span>, <span class="bool-val">true</span>),
-                    <span class="ident">KeyValue::new</span>(<span class="string">&quot;key2&quot;</span>, <span class="ident">Value::I64</span>(<span class="number">123</span>)),
-                    <span class="ident">KeyValue::new</span>(<span class="string">&quot;key3&quot;</span>, <span class="ident">Value::F64</span>(<span class="number">123.567</span>)),
+                    KeyValue::new(<span class="string">&quot;key1&quot;</span>, <span class="bool-val">true</span>),
+                    KeyValue::new(<span class="string">&quot;key2&quot;</span>, Value::I64(<span class="number">123</span>)),
+                    KeyValue::new(<span class="string">&quot;key3&quot;</span>, Value::F64(<span class="number">123.567</span>)),
                 ],
                 <span class="macro">vec!</span>[
                     <span class="string">&quot;key1=true&quot;</span>,
@@ -584,12 +584,12 @@
                     <span class="string">&quot;key3=123.567&quot;</span>,
                 ],
             ),
-            <span class="comment">// &quot;values of array types&quot;</span>
-            (
+            <span class="comment">// &quot;values of array types&quot;
+            </span>(
                 <span class="macro">vec!</span>[
-                    <span class="ident">KeyValue::new</span>(<span class="string">&quot;key1&quot;</span>, <span class="ident">Value::Array</span>(<span class="macro">vec!</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>].<span class="ident">into</span>())),
-                    <span class="ident">KeyValue::new</span>(<span class="string">&quot;key2&quot;</span>, <span class="ident">Value::Array</span>(<span class="macro">vec!</span>[<span class="number">123</span>, <span class="number">456</span>].<span class="ident">into</span>())),
-                    <span class="ident">KeyValue::new</span>(<span class="string">&quot;key3&quot;</span>, <span class="ident">Value::Array</span>(<span class="macro">vec!</span>[<span class="ident">Cow::from</span>(<span class="string">&quot;val1&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;val2&quot;</span>)].<span class="ident">into</span>())),
+                    KeyValue::new(<span class="string">&quot;key1&quot;</span>, Value::Array(<span class="macro">vec!</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>].into())),
+                    KeyValue::new(<span class="string">&quot;key2&quot;</span>, Value::Array(<span class="macro">vec!</span>[<span class="number">123</span>, <span class="number">456</span>].into())),
+                    KeyValue::new(<span class="string">&quot;key3&quot;</span>, Value::Array(<span class="macro">vec!</span>[Cow::from(<span class="string">&quot;val1&quot;</span>), Cow::from(<span class="string">&quot;val2&quot;</span>)].into())),
                 ],
                 <span class="macro">vec!</span>[
                     <span class="string">&quot;key1=[true%2Cfalse]&quot;</span>,
@@ -600,89 +600,89 @@
         ]
     }
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">valid_inject_data_metadata</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValueMetadata</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>valid_inject_data_metadata() -&gt; Vec&lt;(Vec&lt;KeyValueMetadata&gt;, Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;)&gt; {
         <span class="macro">vec!</span>[
             (
                 <span class="macro">vec!</span>[
-                    <span class="ident">KeyValueMetadata::new</span>(<span class="string">&quot;key1&quot;</span>, <span class="string">&quot;val1&quot;</span>, <span class="string">&quot;prop1&quot;</span>),
-                    <span class="ident">KeyValue::new</span>(<span class="string">&quot;key2&quot;</span>, <span class="string">&quot;val2&quot;</span>).<span class="ident">into</span>(),
-                    <span class="ident">KeyValueMetadata::new</span>(<span class="string">&quot;key3&quot;</span>, <span class="string">&quot;val3&quot;</span>, <span class="string">&quot;anykey=anyvalue&quot;</span>)
+                    KeyValueMetadata::new(<span class="string">&quot;key1&quot;</span>, <span class="string">&quot;val1&quot;</span>, <span class="string">&quot;prop1&quot;</span>),
+                    KeyValue::new(<span class="string">&quot;key2&quot;</span>, <span class="string">&quot;val2&quot;</span>).into(),
+                    KeyValueMetadata::new(<span class="string">&quot;key3&quot;</span>, <span class="string">&quot;val3&quot;</span>, <span class="string">&quot;anykey=anyvalue&quot;</span>)
                 ],
                 <span class="macro">vec!</span>[
                     <span class="string">&quot;key1=val1;prop1&quot;</span>,
                     <span class="string">&quot;key2=val2&quot;</span>,
-                    <span class="string">&quot;key3=val3;anykey=anyvalue&quot;</span>
-                ],
+                    <span class="string">&quot;key3=val3;anykey=anyvalue&quot;
+                </span>],
             )
         ]
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extract_baggage</span>() {
-        <span class="kw">let</span> <span class="ident">propagator</span> <span class="op">=</span> <span class="ident">BaggagePropagator::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>extract_baggage() {
+        <span class="kw">let </span>propagator = BaggagePropagator::new();
 
-        <span class="kw">for</span> (<span class="ident">header_value</span>, <span class="ident">kvs</span>) <span class="kw">in</span> <span class="ident">valid_extract_data</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extractor</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-            <span class="ident">extractor</span>.<span class="ident">insert</span>(<span class="ident">BAGGAGE_HEADER</span>.<span class="ident">to_string</span>(), <span class="ident">header_value</span>.<span class="ident">to_string</span>());
-            <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">propagator</span>.<span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="ident">extractor</span>);
-            <span class="kw">let</span> <span class="ident">baggage</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">baggage</span>();
+        <span class="kw">for </span>(header_value, kvs) <span class="kw">in </span>valid_extract_data() {
+            <span class="kw">let </span><span class="kw-2">mut </span>extractor: HashMap&lt;String, String&gt; = HashMap::new();
+            extractor.insert(BAGGAGE_HEADER.to_string(), header_value.to_string());
+            <span class="kw">let </span>context = propagator.extract(<span class="kw-2">&amp;</span>extractor);
+            <span class="kw">let </span>baggage = context.baggage();
 
-            <span class="macro">assert_eq!</span>(<span class="ident">kvs</span>.<span class="ident">len</span>(), <span class="ident">baggage</span>.<span class="ident">len</span>());
-            <span class="kw">for</span> (<span class="ident">key</span>, (<span class="ident">value</span>, <span class="ident">_metadata</span>)) <span class="kw">in</span> <span class="ident">baggage</span> {
-                <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>), <span class="ident">kvs</span>.<span class="ident">get</span>(<span class="ident">key</span>))
+            <span class="macro">assert_eq!</span>(kvs.len(), baggage.len());
+            <span class="kw">for </span>(key, (value, _metadata)) <span class="kw">in </span>baggage {
+                <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(value), kvs.get(key))
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inject_baggage</span>() {
-        <span class="kw">let</span> <span class="ident">propagator</span> <span class="op">=</span> <span class="ident">BaggagePropagator::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>inject_baggage() {
+        <span class="kw">let </span>propagator = BaggagePropagator::new();
 
-        <span class="kw">for</span> (<span class="ident">kvm</span>, <span class="ident">header_parts</span>) <span class="kw">in</span> <span class="ident">valid_inject_data</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">injector</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-            <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::current_with_baggage</span>(<span class="ident">kvm</span>);
-            <span class="ident">propagator</span>.<span class="ident">inject_context</span>(<span class="kw-2">&amp;</span><span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">injector</span>);
-            <span class="kw">let</span> <span class="ident">header_value</span> <span class="op">=</span> <span class="ident">injector</span>.<span class="ident">get</span>(<span class="ident">BAGGAGE_HEADER</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">header_parts</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>).<span class="ident">len</span>(), <span class="ident">header_value</span>.<span class="ident">len</span>(),);
-            <span class="kw">for</span> <span class="ident">header_part</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">header_parts</span> {
-                <span class="macro">assert!</span>(<span class="ident">header_value</span>.<span class="ident">contains</span>(<span class="ident">header_part</span>),)
+        <span class="kw">for </span>(kvm, header_parts) <span class="kw">in </span>valid_inject_data() {
+            <span class="kw">let </span><span class="kw-2">mut </span>injector = HashMap::new();
+            <span class="kw">let </span>cx = Context::current_with_baggage(kvm);
+            propagator.inject_context(<span class="kw-2">&amp;</span>cx, <span class="kw-2">&amp;mut </span>injector);
+            <span class="kw">let </span>header_value = injector.get(BAGGAGE_HEADER).unwrap();
+            <span class="macro">assert_eq!</span>(header_parts.join(<span class="string">&quot;,&quot;</span>).len(), header_value.len(),);
+            <span class="kw">for </span>header_part <span class="kw">in </span><span class="kw-2">&amp;</span>header_parts {
+                <span class="macro">assert!</span>(header_value.contains(header_part),)
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extract_baggage_with_metadata</span>() {
-        <span class="kw">let</span> <span class="ident">propagator</span> <span class="op">=</span> <span class="ident">BaggagePropagator::new</span>();
-        <span class="kw">for</span> (<span class="ident">header_value</span>, <span class="ident">kvm</span>) <span class="kw">in</span> <span class="ident">valid_extract_data_with_metadata</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extractor</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-            <span class="ident">extractor</span>.<span class="ident">insert</span>(<span class="ident">BAGGAGE_HEADER</span>.<span class="ident">to_string</span>(), <span class="ident">header_value</span>.<span class="ident">to_string</span>());
-            <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">propagator</span>.<span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="ident">extractor</span>);
-            <span class="kw">let</span> <span class="ident">baggage</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">baggage</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>extract_baggage_with_metadata() {
+        <span class="kw">let </span>propagator = BaggagePropagator::new();
+        <span class="kw">for </span>(header_value, kvm) <span class="kw">in </span>valid_extract_data_with_metadata() {
+            <span class="kw">let </span><span class="kw-2">mut </span>extractor: HashMap&lt;String, String&gt; = HashMap::new();
+            extractor.insert(BAGGAGE_HEADER.to_string(), header_value.to_string());
+            <span class="kw">let </span>context = propagator.extract(<span class="kw-2">&amp;</span>extractor);
+            <span class="kw">let </span>baggage = context.baggage();
 
-            <span class="macro">assert_eq!</span>(<span class="ident">kvm</span>.<span class="ident">len</span>(), <span class="ident">baggage</span>.<span class="ident">len</span>());
-            <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value_and_prop</span>) <span class="kw">in</span> <span class="ident">baggage</span> {
-                <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="ident">value_and_prop</span>), <span class="ident">kvm</span>.<span class="ident">get</span>(<span class="ident">key</span>))
+            <span class="macro">assert_eq!</span>(kvm.len(), baggage.len());
+            <span class="kw">for </span>(key, value_and_prop) <span class="kw">in </span>baggage {
+                <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(value_and_prop), kvm.get(key))
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inject_baggage_with_metadata</span>() {
-        <span class="kw">let</span> <span class="ident">propagator</span> <span class="op">=</span> <span class="ident">BaggagePropagator::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>inject_baggage_with_metadata() {
+        <span class="kw">let </span>propagator = BaggagePropagator::new();
 
-        <span class="kw">for</span> (<span class="ident">kvm</span>, <span class="ident">header_parts</span>) <span class="kw">in</span> <span class="ident">valid_inject_data_metadata</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">injector</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-            <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::current_with_baggage</span>(<span class="ident">kvm</span>);
-            <span class="ident">propagator</span>.<span class="ident">inject_context</span>(<span class="kw-2">&amp;</span><span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">injector</span>);
-            <span class="kw">let</span> <span class="ident">header_value</span> <span class="op">=</span> <span class="ident">injector</span>.<span class="ident">get</span>(<span class="ident">BAGGAGE_HEADER</span>).<span class="ident">unwrap</span>();
+        <span class="kw">for </span>(kvm, header_parts) <span class="kw">in </span>valid_inject_data_metadata() {
+            <span class="kw">let </span><span class="kw-2">mut </span>injector = HashMap::new();
+            <span class="kw">let </span>cx = Context::current_with_baggage(kvm);
+            propagator.inject_context(<span class="kw-2">&amp;</span>cx, <span class="kw-2">&amp;mut </span>injector);
+            <span class="kw">let </span>header_value = injector.get(BAGGAGE_HEADER).unwrap();
 
-            <span class="macro">assert_eq!</span>(<span class="ident">header_parts</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>).<span class="ident">len</span>(), <span class="ident">header_value</span>.<span class="ident">len</span>());
-            <span class="kw">for</span> <span class="ident">header_part</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">header_parts</span> {
-                <span class="macro">assert!</span>(<span class="ident">header_value</span>.<span class="ident">contains</span>(<span class="ident">header_part</span>),)
+            <span class="macro">assert_eq!</span>(header_parts.join(<span class="string">&quot;,&quot;</span>).len(), header_value.len());
+            <span class="kw">for </span>header_part <span class="kw">in </span><span class="kw-2">&amp;</span>header_parts {
+                <span class="macro">assert!</span>(header_value.contains(header_part),)
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

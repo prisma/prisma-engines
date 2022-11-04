@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/load/completion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>completion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/load/completion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>completion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -93,100 +93,100 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Application-specific request completion semantics.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Application-specific request completion semantics.
 
-<span class="kw">use</span> <span class="ident">futures_core::ready</span>;
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+</span><span class="kw">use </span>futures_core::ready;
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>std::{
+    future::Future,
+    pin::Pin,
+    task::{Context, Poll},
 };
 
-<span class="doccomment">/// Attaches `H`-typed completion tracker to `V` typed values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Handles (of type `H`) are intended to be RAII guards that primarily implement [`Drop`] and update</span>
-<span class="doccomment">/// load metric state as they are dropped. This trait allows implementors to &quot;forward&quot; the handle</span>
-<span class="doccomment">/// to later parts of the request-handling pipeline, so that the handle is only dropped when the</span>
-<span class="doccomment">/// request has truly completed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This utility allows load metrics to have a protocol-agnostic means to track streams past their</span>
-<span class="doccomment">/// initial response future. For example, if `V` represents an HTTP response type, an</span>
-<span class="doccomment">/// implementation could add `H`-typed handles to each response&#39;s extensions to detect when all the</span>
-<span class="doccomment">/// response&#39;s extensions have been dropped.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A base `impl&lt;H, V&gt; TrackCompletion&lt;H, V&gt; for CompleteOnResponse` is provided to drop the handle</span>
-<span class="doccomment">/// once the response future is resolved. This is appropriate when a response is discrete and</span>
-<span class="doccomment">/// cannot comprise multiple messages.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In many cases, the `Output` type is simply `V`. However, [`TrackCompletion`] may alter the type</span>
-<span class="doccomment">/// in order to instrument it appropriately. For example, an HTTP [`TrackCompletion`] may modify</span>
-<span class="doccomment">/// the body type: so a [`TrackCompletion`] that takes values of type</span>
-<span class="doccomment">/// [`http::Response&lt;A&gt;`][response] may output values of type [`http::Response&lt;B&gt;`][response].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [response]: https://docs.rs/http/latest/http/response/struct.Response.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TrackCompletion</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">V</span><span class="op">&gt;</span>: <span class="ident">Clone</span> {
-    <span class="doccomment">/// The instrumented value type.</span>
-    <span class="kw">type</span> <span class="ident">Output</span>;
+<span class="doccomment">/// Attaches `H`-typed completion tracker to `V` typed values.
+///
+/// Handles (of type `H`) are intended to be RAII guards that primarily implement [`Drop`] and update
+/// load metric state as they are dropped. This trait allows implementors to &quot;forward&quot; the handle
+/// to later parts of the request-handling pipeline, so that the handle is only dropped when the
+/// request has truly completed.
+///
+/// This utility allows load metrics to have a protocol-agnostic means to track streams past their
+/// initial response future. For example, if `V` represents an HTTP response type, an
+/// implementation could add `H`-typed handles to each response&#39;s extensions to detect when all the
+/// response&#39;s extensions have been dropped.
+///
+/// A base `impl&lt;H, V&gt; TrackCompletion&lt;H, V&gt; for CompleteOnResponse` is provided to drop the handle
+/// once the response future is resolved. This is appropriate when a response is discrete and
+/// cannot comprise multiple messages.
+///
+/// In many cases, the `Output` type is simply `V`. However, [`TrackCompletion`] may alter the type
+/// in order to instrument it appropriately. For example, an HTTP [`TrackCompletion`] may modify
+/// the body type: so a [`TrackCompletion`] that takes values of type
+/// [`http::Response&lt;A&gt;`][response] may output values of type [`http::Response&lt;B&gt;`][response].
+///
+/// [response]: https://docs.rs/http/latest/http/response/struct.Response.html
+</span><span class="kw">pub trait </span>TrackCompletion&lt;H, V&gt;: Clone {
+    <span class="doccomment">/// The instrumented value type.
+    </span><span class="kw">type </span>Output;
 
-    <span class="doccomment">/// Attaches a `H`-typed handle to a `V`-typed value.</span>
-    <span class="kw">fn</span> <span class="ident">track_completion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handle</span>: <span class="ident">H</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span>;
+    <span class="doccomment">/// Attaches a `H`-typed handle to a `V`-typed value.
+    </span><span class="kw">fn </span>track_completion(<span class="kw-2">&amp;</span><span class="self">self</span>, handle: H, value: V) -&gt; <span class="self">Self</span>::Output;
 }
 
-<span class="doccomment">/// A [`TrackCompletion`] implementation that considers the request completed when the response</span>
-<span class="doccomment">/// future is resolved.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompleteOnResponse</span>;
+<span class="doccomment">/// A [`TrackCompletion`] implementation that considers the request completed when the response
+/// future is resolved.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Default)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CompleteOnResponse;
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// Attaches a `C`-typed completion tracker to the result of an `F`-typed [`Future`].</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TrackCompletionFuture</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">C</span>, <span class="ident">H</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">future</span>: <span class="ident">F</span>,
-        <span class="ident">handle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>,
-        <span class="ident">completion</span>: <span class="ident">C</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// Attaches a `C`-typed completion tracker to the result of an `F`-typed [`Future`].
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>TrackCompletionFuture&lt;F, C, H&gt; {
+        <span class="attribute">#[pin]
+        </span>future: F,
+        handle: <span class="prelude-ty">Option</span>&lt;H&gt;,
+        completion: C,
     }
 }
 
-<span class="comment">// ===== impl InstrumentFuture =====</span>
+<span class="comment">// ===== impl InstrumentFuture =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">C</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">TrackCompletionFuture</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">C</span>, <span class="ident">H</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Wraps a future, propagating the tracker into its value if successful.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">completion</span>: <span class="ident">C</span>, <span class="ident">handle</span>: <span class="ident">H</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TrackCompletionFuture</span> {
-            <span class="ident">future</span>,
-            <span class="ident">completion</span>,
-            <span class="ident">handle</span>: <span class="prelude-val">Some</span>(<span class="ident">handle</span>),
+</span><span class="kw">impl</span>&lt;F, C, H&gt; TrackCompletionFuture&lt;F, C, H&gt; {
+    <span class="doccomment">/// Wraps a future, propagating the tracker into its value if successful.
+    </span><span class="kw">pub fn </span>new(completion: C, handle: H, future: F) -&gt; <span class="self">Self </span>{
+        TrackCompletionFuture {
+            future,
+            completion,
+            handle: <span class="prelude-val">Some</span>(handle),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">C</span>, <span class="ident">H</span>, <span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">TrackCompletionFuture</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">C</span>, <span class="ident">H</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">C</span>: <span class="ident">TrackCompletion</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;F, C, H, T, E&gt; Future <span class="kw">for </span>TrackCompletionFuture&lt;F, C, H&gt;
+<span class="kw">where
+    </span>F: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
+    C: TrackCompletion&lt;H, T&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">C::Output</span>, <span class="ident">E</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;C::Output, E&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">let</span> <span class="ident">rsp</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">future</span>.<span class="ident">poll</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">handle</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;handle&quot;</span>);
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">this</span>.<span class="ident">completion</span>.<span class="ident">track_completion</span>(<span class="ident">h</span>, <span class="ident">rsp</span>)))
+    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span>rsp = <span class="macro">ready!</span>(this.future.poll(cx))<span class="question-mark">?</span>;
+        <span class="kw">let </span>h = this.handle.take().expect(<span class="string">&quot;handle&quot;</span>);
+        Poll::Ready(<span class="prelude-val">Ok</span>(this.completion.track_completion(h, rsp)))
     }
 }
 
-<span class="comment">// ===== CompleteOnResponse =====</span>
+<span class="comment">// ===== CompleteOnResponse =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">TrackCompletion</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CompleteOnResponse</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">V</span>;
+</span><span class="kw">impl</span>&lt;H, V&gt; TrackCompletion&lt;H, V&gt; <span class="kw">for </span>CompleteOnResponse {
+    <span class="kw">type </span>Output = V;
 
-    <span class="kw">fn</span> <span class="ident">track_completion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handle</span>: <span class="ident">H</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="ident">V</span> {
-        <span class="ident">drop</span>(<span class="ident">handle</span>);
-        <span class="ident">value</span>
+    <span class="kw">fn </span>track_completion(<span class="kw-2">&amp;</span><span class="self">self</span>, handle: H, value: V) -&gt; V {
+        drop(handle);
+        value
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

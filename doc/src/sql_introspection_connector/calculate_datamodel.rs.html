@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/calculate_datamodel.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>calculate_datamodel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/calculate_datamodel.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>calculate_datamodel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -126,133 +126,133 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">introspection::introspect</span>, <span class="ident">SqlFamilyTrait</span>, <span class="ident">SqlIntrospectionResult</span>};
-<span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">IntrospectionContext</span>, <span class="ident">IntrospectionResult</span>, <span class="ident">Warning</span>};
-<span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">builtin_connectors</span>::<span class="kw-2">*</span>, <span class="ident">datamodel_connector::Connector</span>, <span class="ident">dml::Datamodel</span>, <span class="ident">parser_database::walkers</span>, <span class="ident">Configuration</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{introspection::introspect, SqlFamilyTrait, SqlIntrospectionResult};
+<span class="kw">use </span>introspection_connector::{IntrospectionContext, IntrospectionResult, Warning};
+<span class="kw">use </span>psl::{
+    builtin_connectors::<span class="kw-2">*</span>, datamodel_connector::Connector, dml::Datamodel, parser_database::walkers, Configuration,
 };
-<span class="kw">use</span> <span class="ident">quaint::prelude::SqlFamily</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span> <span class="kw">as</span> <span class="ident">sql</span>;
+<span class="kw">use </span>quaint::prelude::SqlFamily;
+<span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CalculateDatamodelContext</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Configuration</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">render_config</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">previous_datamodel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Datamodel</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">sql::SqlSchema</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sql_family</span>: <span class="ident">SqlFamily</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">warnings</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">previous_schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">psl::ValidatedSchema</span>,
-    <span class="ident">introspection_map</span>: <span class="ident"><span class="kw">crate</span>::introspection_map::IntrospectionMap</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CalculateDatamodelContext&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) render_config: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) previous_datamodel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Datamodel,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>sql::SqlSchema,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) sql_family: SqlFamily,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) warnings: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;Warning&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) previous_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::ValidatedSchema,
+    introspection_map: <span class="kw">crate</span>::introspection_map::IntrospectionMap,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CalculateDatamodelContext</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_cockroach</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">active_connector</span>().<span class="ident">provider_name</span>() <span class="op">==</span> <span class="ident">COCKROACH</span>.<span class="ident">provider_name</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; CalculateDatamodelContext&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_cockroach(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.active_connector().provider_name() == COCKROACH.provider_name()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">foreign_keys_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">config</span>
-            .<span class="ident">datasources</span>
-            .<span class="ident">first</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">relation_mode</span>()
-            .<span class="ident">uses_foreign_keys</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>foreign_keys_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.config
+            .datasources
+            .first()
+            .unwrap()
+            .relation_mode()
+            .uses_foreign_keys()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">active_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span> {
-        <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">datasources</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">active_connector</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>active_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector {
+        <span class="self">self</span>.config.datasources.first().unwrap().active_connector
     }
 
-    <span class="doccomment">/// Given a SQL enum from the database, this method returns the enum that matches it (by name)</span>
-    <span class="doccomment">/// in the Prisma schema.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">existing_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">sql::EnumId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">walkers::EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">introspection_map</span>
-            .<span class="ident">existing_enums</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">id</span>))
+    <span class="doccomment">/// Given a SQL enum from the database, this method returns the enum that matches it (by name)
+    /// in the Prisma schema.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::EnumId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.introspection_map
+            .existing_enums
+            .get(<span class="kw-2">&amp;</span>id)
+            .map(|id| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>id))
     }
 
-    <span class="doccomment">/// Given a SQL enum from the database, this method returns the name it will be given in the</span>
-    <span class="doccomment">/// introspected schema. If it matches a remapped enum in the Prisma schema, it is taken into</span>
-    <span class="doccomment">/// account.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">enum_prisma_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">sql::EnumId</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">existing_enum</span>(<span class="ident">id</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">name</span>())
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">id</span>).<span class="ident">name</span>())
+    <span class="doccomment">/// Given a SQL enum from the database, this method returns the name it will be given in the
+    /// introspected schema. If it matches a remapped enum in the Prisma schema, it is taken into
+    /// account.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::EnumId) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="self">self</span>.existing_enum(id)
+            .map(|enm| enm.name())
+            .unwrap_or_else(|| <span class="self">self</span>.schema.walk(id).name())
     }
 
-    <span class="doccomment">/// Given a foreign key from the database, this methods returns the existing relation in the</span>
-    <span class="doccomment">/// Prisma schema that matches it.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">existing_inline_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">sql::ForeignKeyId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">introspection_map</span>
-            .<span class="ident">existing_inline_relations</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">relation_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">relation_id</span>).<span class="ident">refine</span>().<span class="ident">as_inline</span>().<span class="ident">unwrap</span>())
+    <span class="doccomment">/// Given a foreign key from the database, this methods returns the existing relation in the
+    /// Prisma schema that matches it.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_inline_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::ForeignKeyId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.introspection_map
+            .existing_inline_relations
+            .get(<span class="kw-2">&amp;</span>id)
+            .map(|relation_id| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>relation_id).refine().as_inline().unwrap())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">existing_m2m_relation</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_m2m_relation(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">id</span>: <span class="ident">sql::TableId</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">walkers::ImplicitManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">introspection_map</span>
-            .<span class="ident">existing_m2m_relations</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">relation_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">relation_id</span>))
+        id: sql::TableId,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::ImplicitManyToManyRelationWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.introspection_map
+            .existing_m2m_relations
+            .get(<span class="kw-2">&amp;</span>id)
+            .map(|relation_id| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>relation_id))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">existing_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">sql::TableId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">walkers::ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">introspection_map</span>
-            .<span class="ident">existing_models</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">id</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_model(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::TableId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::ModelWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.introspection_map
+            .existing_models
+            .get(<span class="kw-2">&amp;</span>id)
+            .map(|id| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>id))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">existing_scalar_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">sql::ColumnId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">walkers::ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">introspection_map</span>
-            .<span class="ident">existing_scalar_fields</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>)<span class="op">|</span> <span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">model_id</span>).<span class="ident">scalar_field</span>(<span class="kw-2">*</span><span class="ident">field_id</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_scalar_field(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::ColumnId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::ScalarFieldWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.introspection_map
+            .existing_scalar_fields
+            .get(<span class="kw-2">&amp;</span>id)
+            .map(|(model_id, field_id)| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>model_id).scalar_field(<span class="kw-2">*</span>field_id))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">column_prisma_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">sql::ColumnId</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">existing_scalar_field</span>(<span class="ident">id</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>())
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">id</span>).<span class="ident">name</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column_prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::ColumnId) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="self">self</span>.existing_scalar_field(id)
+            .map(|sf| sf.name())
+            .unwrap_or_else(|| <span class="self">self</span>.schema.walk(id).name())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">model_prisma_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">sql::TableId</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">existing_model</span>(<span class="ident">id</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span>())
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">id</span>).<span class="ident">name</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model_prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::TableId) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="self">self</span>.existing_model(id)
+            .map(|model| model.name())
+            .unwrap_or_else(|| <span class="self">self</span>.schema.walk(id).name())
     }
 }
 
-<span class="doccomment">/// Calculate a data model from a database schema.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calculate_datamodel</span>(
-    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">sql::SqlSchema</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>,
-) -&gt; <span class="ident">SqlIntrospectionResult</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">warnings</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="doccomment">/// Calculate a data model from a database schema.
+</span><span class="kw">pub fn </span>calculate_datamodel(
+    schema: <span class="kw-2">&amp;</span>sql::SqlSchema,
+    ctx: <span class="kw-2">&amp;</span>IntrospectionContext,
+) -&gt; SqlIntrospectionResult&lt;IntrospectionResult&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>warnings = Vec::new();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">CalculateDatamodelContext</span> {
-        <span class="ident">config</span>: <span class="ident">ctx</span>.<span class="ident">configuration</span>(),
-        <span class="ident">render_config</span>: <span class="ident">ctx</span>.<span class="ident">render_config</span>,
-        <span class="ident">previous_datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">previous_data_model</span>,
-        <span class="ident">schema</span>,
-        <span class="ident">sql_family</span>: <span class="ident">ctx</span>.<span class="ident">sql_family</span>(),
-        <span class="ident">previous_schema</span>: <span class="ident">ctx</span>.<span class="ident">previous_schema</span>(),
-        <span class="ident">warnings</span>: <span class="kw-2">&amp;mut</span> <span class="ident">warnings</span>,
-        <span class="ident">introspection_map</span>: <span class="ident"><span class="kw">crate</span>::introspection_map::IntrospectionMap::new</span>(<span class="ident">schema</span>, <span class="ident">ctx</span>.<span class="ident">previous_schema</span>()),
+    <span class="kw">let </span><span class="kw-2">mut </span>context = CalculateDatamodelContext {
+        config: ctx.configuration(),
+        render_config: ctx.render_config,
+        previous_datamodel: <span class="kw-2">&amp;</span>ctx.previous_data_model,
+        schema,
+        sql_family: ctx.sql_family(),
+        previous_schema: ctx.previous_schema(),
+        warnings: <span class="kw-2">&amp;mut </span>warnings,
+        introspection_map: <span class="kw">crate</span>::introspection_map::IntrospectionMap::new(schema, ctx.previous_schema()),
     };
 
-    <span class="kw">let</span> (<span class="ident">version</span>, <span class="ident">data_model</span>, <span class="ident">is_empty</span>) <span class="op">=</span> <span class="ident">introspect</span>(<span class="kw-2">&amp;mut</span> <span class="ident">context</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(version, data_model, is_empty) = introspect(<span class="kw-2">&amp;mut </span>context)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">IntrospectionResult</span> {
-        <span class="ident">data_model</span>,
-        <span class="ident">is_empty</span>,
-        <span class="ident">warnings</span>,
-        <span class="ident">version</span>,
+    <span class="prelude-val">Ok</span>(IntrospectionResult {
+        data_model,
+        is_empty,
+        warnings,
+        version,
     })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

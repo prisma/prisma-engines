@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/test-setup/src/test_api_args.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test_api_args.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../test_setup/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/test-setup/src/test_api_args.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test_api_args.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../test_setup/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -247,22 +247,22 @@
 <span id="247">247</span>
 <span id="248">248</span>
 <span id="249">249</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">logging</span>, <span class="ident">mssql</span>, <span class="ident">mysql</span>, <span class="ident">postgres</span>, <span class="ident">Capabilities</span>, <span class="ident">Tags</span>};
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">quaint::single::Quaint</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt::Display</span>, <span class="ident">io::Write</span> <span class="kw">as</span> <span class="kw">_</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{logging, mssql, mysql, postgres, Capabilities, Tags};
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>once_cell::sync::Lazy;
+<span class="kw">use </span>quaint::single::Quaint;
+<span class="kw">use </span>std::{fmt::Display, io::Write <span class="kw">as _</span>};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DbUnderTest</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">capabilities</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Capabilities</span><span class="op">&gt;</span>,
-    <span class="ident">database_url</span>: <span class="ident">String</span>,
-    <span class="ident">shadow_database_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DbUnderTest {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) capabilities: BitFlags&lt;Capabilities&gt;,
+    database_url: String,
+    shadow_database_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    provider: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tags: BitFlags&lt;Tags&gt;,
 }
 
-<span class="kw">const</span> <span class="ident">MISSING_TEST_DATABASE_URL_MSG</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
+<span class="kw">const </span>MISSING_TEST_DATABASE_URL_MSG: <span class="kw-2">&amp;</span>str = <span class="string">r#&quot;
 Missing TEST_DATABASE_URL from environment.
 
 If you are developing with the docker-compose based setup, you can find the environment variables under .test_database_urls at the project root.
@@ -272,229 +272,229 @@ Example usage:
 source .test_database_urls/mysql_5_6
 &quot;#</span>;
 
-<span class="kw">static</span> <span class="ident">DB_UNDER_TEST</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DbUnderTest</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
-    <span class="kw">let</span> <span class="ident">database_url</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">std::env::var</span>(<span class="string">&quot;IS_BUILDKITE&quot;</span>).<span class="ident">is_ok</span>() {
-        <span class="string">&quot;sqlite&quot;</span>.<span class="ident">to_owned</span>()
-    } <span class="kw">else</span> {
-        <span class="ident">std::env::var</span>(<span class="string">&quot;TEST_DATABASE_URL&quot;</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">MISSING_TEST_DATABASE_URL_MSG</span>.<span class="ident">to_owned</span>())<span class="question-mark">?</span>
-    };
-    <span class="kw">let</span> <span class="ident">shadow_database_url</span> <span class="op">=</span> <span class="ident">std::env::var</span>(<span class="string">&quot;TEST_SHADOW_DATABASE_URL&quot;</span>).<span class="ident">ok</span>();
-    <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">database_url</span>
-        .<span class="ident">find</span>(<span class="string">&#39;:&#39;</span>)
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">prefix_end</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">database_url</span>[..<span class="ident">prefix_end</span>])
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">database_url</span>.<span class="ident">as_str</span>());
+<span class="kw">static </span>DB_UNDER_TEST: Lazy&lt;<span class="prelude-ty">Result</span>&lt;DbUnderTest, String&gt;&gt; = Lazy::new(|| {
+    <span class="kw">let </span>database_url = <span class="kw">if </span>std::env::var(<span class="string">&quot;IS_BUILDKITE&quot;</span>).is_ok() {
+        <span class="string">&quot;sqlite&quot;</span>.to_owned()
+    } <span class="kw">else </span>{
+        std::env::var(<span class="string">&quot;TEST_DATABASE_URL&quot;</span>).map_err(|<span class="kw">_</span>| MISSING_TEST_DATABASE_URL_MSG.to_owned())<span class="question-mark">?
+    </span>};
+    <span class="kw">let </span>shadow_database_url = std::env::var(<span class="string">&quot;TEST_SHADOW_DATABASE_URL&quot;</span>).ok();
+    <span class="kw">let </span>prefix = database_url
+        .find(<span class="string">&#39;:&#39;</span>)
+        .map(|prefix_end| <span class="kw-2">&amp;</span>database_url[..prefix_end])
+        .unwrap_or_else(|| database_url.as_str());
 
-    <span class="ident">logging::init_logger</span>();
+    logging::init_logger();
 
-    <span class="kw">match</span> <span class="ident">prefix</span> {
-        <span class="string">&quot;file&quot;</span> <span class="op">|</span> <span class="string">&quot;sqlite&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DbUnderTest</span> {
-            <span class="ident">database_url</span>,
-            <span class="ident">tags</span>: <span class="ident">Tags::Sqlite</span>.<span class="ident">into</span>(),
-            <span class="ident">capabilities</span>: <span class="ident">Capabilities::CreateDatabase</span>.<span class="ident">into</span>(),
-            <span class="ident">provider</span>: <span class="string">&quot;sqlite&quot;</span>,
-            <span class="ident">shadow_database_url</span>,
+    <span class="kw">match </span>prefix {
+        <span class="string">&quot;file&quot; </span>| <span class="string">&quot;sqlite&quot; </span>=&gt; <span class="prelude-val">Ok</span>(DbUnderTest {
+            database_url,
+            tags: Tags::Sqlite.into(),
+            capabilities: Capabilities::CreateDatabase.into(),
+            provider: <span class="string">&quot;sqlite&quot;</span>,
+            shadow_database_url,
         }),
-        <span class="string">&quot;mysql&quot;</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">tags</span> <span class="op">=</span> <span class="ident">mysql::get_mysql_tags</span>(<span class="kw-2">&amp;</span><span class="ident">database_url</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">Capabilities::Enums</span> <span class="op">|</span> <span class="ident">Capabilities::Json</span>;
+        <span class="string">&quot;mysql&quot; </span>=&gt; {
+            <span class="kw">let </span>tags = mysql::get_mysql_tags(<span class="kw-2">&amp;</span>database_url)<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>capabilities = Capabilities::Enums | Capabilities::Json;
 
-            <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Vitess</span>) {
-                <span class="ident">capabilities</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Capabilities::CreateDatabase</span>;
+            <span class="kw">if </span>tags.contains(Tags::Vitess) {
+                capabilities |= Capabilities::CreateDatabase;
             }
 
-            <span class="prelude-val">Ok</span>(<span class="ident">DbUnderTest</span> {
-                <span class="ident">tags</span>,
-                <span class="ident">database_url</span>,
-                <span class="ident">capabilities</span>,
-                <span class="ident">provider</span>: <span class="string">&quot;mysql&quot;</span>,
-                <span class="ident">shadow_database_url</span>,
+            <span class="prelude-val">Ok</span>(DbUnderTest {
+                tags,
+                database_url,
+                capabilities,
+                provider: <span class="string">&quot;mysql&quot;</span>,
+                shadow_database_url,
             })
         }
-        <span class="string">&quot;postgresql&quot;</span> <span class="op">|</span> <span class="string">&quot;postgres&quot;</span> =&gt; <span class="prelude-val">Ok</span>({
-            <span class="kw">let</span> <span class="ident">tags</span> <span class="op">=</span> <span class="ident">postgres::get_postgres_tags</span>(<span class="kw-2">&amp;</span><span class="ident">database_url</span>)<span class="question-mark">?</span>;
+        <span class="string">&quot;postgresql&quot; </span>| <span class="string">&quot;postgres&quot; </span>=&gt; <span class="prelude-val">Ok</span>({
+            <span class="kw">let </span>tags = postgres::get_postgres_tags(<span class="kw-2">&amp;</span>database_url)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::CockroachDb</span>) {
-                <span class="string">&quot;cockroachdb&quot;</span>
-            } <span class="kw">else</span> {
-                <span class="string">&quot;postgresql&quot;</span>
-            };
+            <span class="kw">let </span>provider = <span class="kw">if </span>tags.contains(Tags::CockroachDb) {
+                <span class="string">&quot;cockroachdb&quot;
+            </span>} <span class="kw">else </span>{
+                <span class="string">&quot;postgresql&quot;
+            </span>};
 
-            <span class="ident">DbUnderTest</span> {
-                <span class="ident">tags</span>,
-                <span class="ident">database_url</span>,
-                <span class="ident">capabilities</span>: <span class="ident">Capabilities::Enums</span>
-                    <span class="op">|</span> <span class="ident">Capabilities::Json</span>
-                    <span class="op">|</span> <span class="ident">Capabilities::ScalarLists</span>
-                    <span class="op">|</span> <span class="ident">Capabilities::CreateDatabase</span>,
-                <span class="ident">provider</span>,
-                <span class="ident">shadow_database_url</span>,
+            DbUnderTest {
+                tags,
+                database_url,
+                capabilities: Capabilities::Enums
+                    | Capabilities::Json
+                    | Capabilities::ScalarLists
+                    | Capabilities::CreateDatabase,
+                provider,
+                shadow_database_url,
             }
         }),
-        <span class="string">&quot;sqlserver&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DbUnderTest</span> {
-            <span class="ident">tags</span>: <span class="ident">mssql::get_mssql_tags</span>(<span class="kw-2">&amp;</span><span class="ident">database_url</span>)<span class="question-mark">?</span>,
-            <span class="ident">database_url</span>,
-            <span class="ident">capabilities</span>: <span class="ident">Capabilities::CreateDatabase</span>.<span class="ident">into</span>(),
-            <span class="ident">provider</span>: <span class="string">&quot;sqlserver&quot;</span>,
-            <span class="ident">shadow_database_url</span>,
+        <span class="string">&quot;sqlserver&quot; </span>=&gt; <span class="prelude-val">Ok</span>(DbUnderTest {
+            tags: mssql::get_mssql_tags(<span class="kw-2">&amp;</span>database_url)<span class="question-mark">?</span>,
+            database_url,
+            capabilities: Capabilities::CreateDatabase.into(),
+            provider: <span class="string">&quot;sqlserver&quot;</span>,
+            shadow_database_url,
         }),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Unknown database URL&quot;</span>.<span class="ident">into</span>()),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Unknown database URL&quot;</span>.into()),
     }
 });
 
-<span class="doccomment">/// Crate-public interface to the global test database state.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">db_under_test</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">DbUnderTest</span> {
-    <span class="kw">match</span> <span class="ident">DB_UNDER_TEST</span>.<span class="ident">as_ref</span>() {
-        <span class="prelude-val">Ok</span>(<span class="ident">db</span>) =&gt; <span class="ident">db</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">explanation</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">stderr</span> <span class="op">=</span> <span class="ident">std::io::stderr</span>();
+<span class="doccomment">/// Crate-public interface to the global test database state.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>db_under_test() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>DbUnderTest {
+    <span class="kw">match </span>DB_UNDER_TEST.as_ref() {
+        <span class="prelude-val">Ok</span>(db) =&gt; db,
+        <span class="prelude-val">Err</span>(explanation) =&gt; {
+            <span class="kw">let </span>stderr = std::io::stderr();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sink</span> <span class="op">=</span> <span class="ident">stderr</span>.<span class="ident">lock</span>();
-            <span class="ident">sink</span>.<span class="ident">write_all</span>(<span class="ident">explanation</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
-            <span class="ident">sink</span>.<span class="ident">write_all</span>(<span class="string">b&quot;\n&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>sink = stderr.lock();
+            sink.write_all(explanation.as_bytes()).unwrap();
+            sink.write_all(<span class="string">b&quot;\n&quot;</span>).unwrap();
 
-            <span class="ident">std::process::exit</span>(<span class="number">1</span>)
+            std::process::exit(<span class="number">1</span>)
         }
     }
 }
 
-<span class="doccomment">/// Context for test initialization.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestApiArgs</span> {
-    <span class="ident">test_function_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="ident">preview_features</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-    <span class="ident">namespaces</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">DbUnderTest</span>,
+<span class="doccomment">/// Context for test initialization.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>TestApiArgs {
+    test_function_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    preview_features: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+    namespaces: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+    db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>DbUnderTest,
 }
 
-<span class="kw">const</span> <span class="ident">EMPTY_PREVIEW_FEATURES</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[];
+<span class="kw">const </span>EMPTY_PREVIEW_FEATURES: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[];
 
-<span class="kw">impl</span> <span class="ident">TestApiArgs</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">test_function_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">preview_features</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-        <span class="ident">namespaces</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident">TestApiArgs</span> {
-            <span class="ident">test_function_name</span>,
-            <span class="ident">preview_features</span>,
-            <span class="ident">namespaces</span>,
-            <span class="ident">db</span>: <span class="ident">db_under_test</span>(),
+<span class="kw">impl </span>TestApiArgs {
+    <span class="kw">pub fn </span>new(
+        test_function_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        preview_features: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+        namespaces: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+    ) -&gt; <span class="self">Self </span>{
+        TestApiArgs {
+            test_function_name,
+            preview_features,
+            namespaces,
+            db: db_under_test(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] {
-        <span class="self">self</span>.<span class="ident">preview_features</span>
+    <span class="kw">pub fn </span>preview_features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str] {
+        <span class="self">self</span>.preview_features
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">namespaces</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] {
-        <span class="self">self</span>.<span class="ident">namespaces</span>
+    <span class="kw">pub fn </span>namespaces(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str] {
+        <span class="self">self</span>.namespaces
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_function_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">test_function_name</span>
+    <span class="kw">pub fn </span>test_function_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="self">self</span>.test_function_name
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Capabilities</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">capabilities</span>
+    <span class="kw">pub fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;Capabilities&gt; {
+        <span class="self">self</span>.db.capabilities
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_mssql_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">Quaint</span>, <span class="ident">String</span>) {
-        <span class="ident">mssql::init_mssql_database</span>(<span class="self">self</span>.<span class="ident">database_url</span>(), <span class="self">self</span>.<span class="ident">test_function_name</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>()
+    <span class="kw">pub async fn </span>create_mssql_database(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Quaint, String) {
+        mssql::init_mssql_database(<span class="self">self</span>.database_url(), <span class="self">self</span>.test_function_name)
+            .<span class="kw">await
+            </span>.unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_mysql_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">String</span>) {
-        <span class="ident">mysql::create_mysql_database</span>(<span class="self">self</span>.<span class="ident">database_url</span>(), <span class="self">self</span>.<span class="ident">test_function_name</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>()
+    <span class="kw">pub async fn </span>create_mysql_database(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String) {
+        mysql::create_mysql_database(<span class="self">self</span>.database_url(), <span class="self">self</span>.test_function_name)
+            .<span class="kw">await
+            </span>.unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_postgres_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Quaint</span>, <span class="ident">String</span>) {
-        <span class="kw">let</span> (<span class="ident">q</span>, <span class="ident">cs</span>) <span class="op">=</span> <span class="ident">postgres::create_postgres_database</span>(<span class="self">self</span>.<span class="ident">database_url</span>(), <span class="self">self</span>.<span class="ident">test_function_name</span>())
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>();
-        (<span class="self">self</span>.<span class="ident">test_function_name</span>(), <span class="ident">q</span>, <span class="ident">cs</span>)
+    <span class="kw">pub async fn </span>create_postgres_database(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Quaint, String) {
+        <span class="kw">let </span>(q, cs) = postgres::create_postgres_database(<span class="self">self</span>.database_url(), <span class="self">self</span>.test_function_name())
+            .<span class="kw">await
+            </span>.unwrap();
+        (<span class="self">self</span>.test_function_name(), q, cs)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">database_url</span>.<span class="ident">as_str</span>()
+    <span class="kw">pub fn </span>database_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.db.database_url.as_str()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datasource_block</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)]) -&gt; <span class="ident">DatasourceBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">DatasourceBlock</span> {
-            <span class="ident">provider</span>: <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">provider</span>,
-            <span class="ident">url</span>,
-            <span class="ident">params</span>,
-            <span class="ident">preview_features</span>: <span class="ident">EMPTY_PREVIEW_FEATURES</span>,
+    <span class="kw">pub fn </span>datasource_block&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, url: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str)]) -&gt; DatasourceBlock&lt;<span class="lifetime">&#39;a</span>&gt; {
+        DatasourceBlock {
+            provider: <span class="self">self</span>.db.provider,
+            url,
+            params,
+            preview_features: EMPTY_PREVIEW_FEATURES,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">provider</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">provider</span>
+    <span class="kw">pub fn </span>provider(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.db.provider
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shadow_database_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">shadow_database_url</span>.<span class="ident">as_deref</span>()
+    <span class="kw">pub fn </span>shadow_database_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+        <span class="self">self</span>.db.shadow_database_url.as_deref()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">tags</span>
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatasourceBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)],
-    <span class="ident">preview_features</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DatasourceBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">url</span>
+    <span class="kw">pub fn </span>tags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;Tags&gt; {
+        <span class="self">self</span>.db.tags
     }
 }
-<span class="kw">fn</span> <span class="ident">generator_block</span>(<span class="ident">preview_features</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>]) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">preview_features</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, <span class="ident">pf</span>)).<span class="ident">collect</span>();
 
-    <span class="kw">let</span> <span class="ident">preview_feature_string</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">preview_features</span>.<span class="ident">is_empty</span>() {
-        <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()
-    } <span class="kw">else</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;\npreviewFeatures = [{}]&quot;</span>, <span class="ident">preview_features</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
+<span class="kw">pub struct </span>DatasourceBlock&lt;<span class="lifetime">&#39;a</span>&gt; {
+    provider: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    url: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str)],
+    preview_features: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DatasourceBlock&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.url
+    }
+}
+<span class="kw">fn </span>generator_block(preview_features: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str]) -&gt; String {
+    <span class="kw">let </span>preview_features: Vec&lt;String&gt; = preview_features.iter().map(|pf| <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, pf)).collect();
+
+    <span class="kw">let </span>preview_feature_string = <span class="kw">if </span>preview_features.is_empty() {
+        <span class="string">&quot;&quot;</span>.to_string()
+    } <span class="kw">else </span>{
+        <span class="macro">format!</span>(<span class="string">&quot;\npreviewFeatures = [{}]&quot;</span>, preview_features.join(<span class="string">&quot;, &quot;</span>))
     };
 
     <span class="macro">format!</span>(
         <span class="string">r#&quot;generator generated_test_preview_flags {{
                  provider = &quot;prisma-client-js&quot;{}
                }}&quot;#</span>,
-        <span class="ident">preview_feature_string</span>
+        preview_feature_string
     )
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DatasourceBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">preview_features</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">generator_block</span>(<span class="self">self</span>.<span class="ident">preview_features</span>))<span class="question-mark">?</span>;
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\n&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Display <span class="kw">for </span>DatasourceBlock&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">if </span>!<span class="self">self</span>.preview_features.is_empty() {
+            f.write_str(<span class="kw-2">&amp;</span>generator_block(<span class="self">self</span>.preview_features))<span class="question-mark">?</span>;
+            f.write_str(<span class="string">&quot;\n&quot;</span>)<span class="question-mark">?</span>;
         };
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;datasource db {\n    provider = \&quot;&quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">provider</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\&quot;\n    url = \&quot;&quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">url</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\&quot;\n&quot;</span>)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;datasource db {\n    provider = \&quot;&quot;</span>)<span class="question-mark">?</span>;
+        f.write_str(<span class="self">self</span>.provider)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;\&quot;\n    url = \&quot;&quot;</span>)<span class="question-mark">?</span>;
+        f.write_str(<span class="self">self</span>.url)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;\&quot;\n&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">for</span> (<span class="ident">param_name</span>, <span class="ident">param_value</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">params</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;    &quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">param_name</span>)<span class="question-mark">?</span>;
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; = &quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">param_value</span>)<span class="question-mark">?</span>;
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\n&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>(param_name, param_value) <span class="kw">in </span><span class="self">self</span>.params {
+            f.write_str(<span class="string">&quot;    &quot;</span>)<span class="question-mark">?</span>;
+            f.write_str(param_name)<span class="question-mark">?</span>;
+            f.write_str(<span class="string">&quot; = &quot;</span>)<span class="question-mark">?</span>;
+            f.write_str(param_value)<span class="question-mark">?</span>;
+            f.write_str(<span class="string">&quot;\n&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;}&quot;</span>)
+        f.write_str(<span class="string">&quot;}&quot;</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="test_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="test_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

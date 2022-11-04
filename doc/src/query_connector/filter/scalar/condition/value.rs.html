@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/filter/scalar/condition/value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_connector/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/filter/scalar/condition/value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_connector/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -115,122 +115,122 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">PrismaListValue</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>prisma_models::{PrismaListValue, PrismaValue, ScalarFieldRef};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConditionValue</span> {
-    <span class="ident">Value</span>(<span class="ident">PrismaValue</span>),
-    <span class="ident">FieldRef</span>(<span class="ident">ScalarFieldRef</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>ConditionValue {
+    Value(PrismaValue),
+    FieldRef(ScalarFieldRef),
 }
 
-<span class="kw">impl</span> <span class="ident">ConditionValue</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Value</span>(<span class="ident">pv</span>)
+<span class="kw">impl </span>ConditionValue {
+    <span class="kw">pub fn </span>value(pv: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Value(pv)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reference</span>(<span class="ident">sf</span>: <span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::FieldRef</span>(<span class="ident">sf</span>)
+    <span class="kw">pub fn </span>reference(sf: ScalarFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::FieldRef(sf)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_value</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Value</span>(<span class="ident">pv</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">pv</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub fn </span>into_value(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Value(pv) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(pv)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_reference</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::FieldRef</span>(<span class="ident">sf</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">sf</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub fn </span>into_reference(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarFieldRef&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::FieldRef(sf) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(sf)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Value</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub fn </span>as_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PrismaValue&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Value(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_field_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::FieldRef</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConditionValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::value</span>(<span class="ident">pv</span>)
+    <span class="kw">pub fn </span>as_field_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::FieldRef(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConditionValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sf</span>: <span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::reference</span>(<span class="ident">sf</span>)
+<span class="kw">impl </span>From&lt;PrismaValue&gt; <span class="kw">for </span>ConditionValue {
+    <span class="kw">fn </span>from(pv: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::value(pv)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConditionValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::reference</span>(<span class="ident">sf</span>.<span class="ident">clone</span>())
+<span class="kw">impl </span>From&lt;ScalarFieldRef&gt; <span class="kw">for </span>ConditionValue {
+    <span class="kw">fn </span>from(sf: ScalarFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::reference(sf)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConditionListValue</span> {
-    <span class="ident">List</span>(<span class="ident">PrismaListValue</span>),
-    <span class="ident">FieldRef</span>(<span class="ident">ScalarFieldRef</span>),
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; <span class="kw">for </span>ConditionValue {
+    <span class="kw">fn </span>from(sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::reference(sf.clone())
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">ConditionListValue</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">vals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>ConditionListValue {
+    List(PrismaListValue),
+    FieldRef(ScalarFieldRef),
+}
+
+<span class="kw">impl </span>ConditionListValue {
+    <span class="kw">pub fn </span>list&lt;T&gt;(vals: Vec&lt;T&gt;) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;PrismaValue&gt;,
     {
-        <span class="ident"><span class="self">Self</span>::List</span>(<span class="ident">vals</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>())
+        <span class="self">Self</span>::List(vals.into_iter().map(Into::into).collect())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reference</span>(<span class="ident">sf</span>: <span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::FieldRef</span>(<span class="ident">sf</span>)
+    <span class="kw">pub fn </span>reference(sf: ScalarFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::FieldRef(sf)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConditionListValue::List</span>(<span class="ident">list</span>) =&gt; <span class="ident">list</span>.<span class="ident">len</span>(),
-            <span class="ident">ConditionListValue::FieldRef</span>(<span class="kw">_</span>) =&gt; <span class="number">1</span>,
+    <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">match </span><span class="self">self </span>{
+            ConditionListValue::List(list) =&gt; list.len(),
+            ConditionListValue::FieldRef(<span class="kw">_</span>) =&gt; <span class="number">1</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
-    }
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_field_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::FieldRef</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PrismaListValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConditionListValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pv</span>: <span class="ident">PrismaListValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::list</span>(<span class="ident">pv</span>)
+    <span class="kw">pub fn </span>as_field_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::FieldRef(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConditionListValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sf</span>: <span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::reference</span>(<span class="ident">sf</span>)
+<span class="kw">impl </span>From&lt;PrismaListValue&gt; <span class="kw">for </span>ConditionListValue {
+    <span class="kw">fn </span>from(pv: PrismaListValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::list(pv)
+    }
+}
+
+<span class="kw">impl </span>From&lt;ScalarFieldRef&gt; <span class="kw">for </span>ConditionListValue {
+    <span class="kw">fn </span>from(sf: ScalarFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::reference(sf)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

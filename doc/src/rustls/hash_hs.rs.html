@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/hash_hs.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hash_hs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/hash_hs.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hash_hs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -238,245 +238,245 @@
 <span id="238">238</span>
 <span id="239">239</span>
 <span id="240">240</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::codec::Codec</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::HandshakeMessagePayload</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::message</span>::{<span class="ident">Message</span>, <span class="ident">MessagePayload</span>};
-<span class="kw">use</span> <span class="ident">ring::digest</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::msgs::codec::Codec;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::HandshakeMessagePayload;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::message::{Message, MessagePayload};
+<span class="kw">use </span>ring::digest;
+<span class="kw">use </span>std::mem;
 
-<span class="doccomment">/// Early stage buffering of handshake payloads.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Before we know the hash algorithm to use to verify the handshake, we just buffer the messages.</span>
-<span class="doccomment">/// During the handshake, we may restart the transcript due to a HelloRetryRequest, reverting</span>
-<span class="doccomment">/// from the `HandshakeHash` to a `HandshakeHashBuffer` again.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">HandshakeHashBuffer</span> {
-    <span class="ident">buffer</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">client_auth_enabled</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Early stage buffering of handshake payloads.
+///
+/// Before we know the hash algorithm to use to verify the handshake, we just buffer the messages.
+/// During the handshake, we may restart the transcript due to a HelloRetryRequest, reverting
+/// from the `HandshakeHash` to a `HandshakeHashBuffer` again.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>HandshakeHashBuffer {
+    buffer: Vec&lt;u8&gt;,
+    client_auth_enabled: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">HandshakeHashBuffer</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">buffer</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">client_auth_enabled</span>: <span class="bool-val">false</span>,
+<span class="kw">impl </span>HandshakeHashBuffer {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            buffer: Vec::new(),
+            client_auth_enabled: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// We might be doing client auth, so need to keep a full</span>
-    <span class="doccomment">/// log of the handshake.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_client_auth_enabled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">client_auth_enabled</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// We might be doing client auth, so need to keep a full
+    /// log of the handshake.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_client_auth_enabled(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.client_auth_enabled = <span class="bool-val">true</span>;
     }
 
-    <span class="doccomment">/// Hash/buffer a handshake message.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">add_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessagePayload::Handshake</span> { <span class="ident">encoded</span>, .. } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">payload</span> {
-            <span class="self">self</span>.<span class="ident">buffer</span>
-                .<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>.<span class="number">0</span>);
+    <span class="doccomment">/// Hash/buffer a handshake message.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add_message(<span class="kw-2">&amp;mut </span><span class="self">self</span>, m: <span class="kw-2">&amp;</span>Message) {
+        <span class="kw">if let </span>MessagePayload::Handshake { encoded, .. } = <span class="kw-2">&amp;</span>m.payload {
+            <span class="self">self</span>.buffer
+                .extend_from_slice(<span class="kw-2">&amp;</span>encoded.<span class="number">0</span>);
         }
     }
 
-    <span class="doccomment">/// Hash or buffer a byte slice.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">update_raw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">extend_from_slice</span>(<span class="ident">buf</span>);
+    <span class="doccomment">/// Hash or buffer a byte slice.
+    </span><span class="attribute">#[cfg(test)]
+    </span><span class="kw">fn </span>update_raw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="self">self</span>.buffer.extend_from_slice(buf);
     }
 
-    <span class="doccomment">/// Get the hash value if we were to hash `extra` too.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_hash_given</span>(
+    <span class="doccomment">/// Get the hash value if we were to hash `extra` too.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_hash_given(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">hash</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>,
-        <span class="ident">extra</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">digest::Digest</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">digest::Context::new</span>(<span class="ident">hash</span>);
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buffer</span>);
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">extra</span>);
-        <span class="ident">ctx</span>.<span class="ident">finish</span>()
+        hash: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm,
+        extra: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; digest::Digest {
+        <span class="kw">let </span><span class="kw-2">mut </span>ctx = digest::Context::new(hash);
+        ctx.update(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer);
+        ctx.update(extra);
+        ctx.finish()
     }
 
-    <span class="doccomment">/// We now know what hash function the verify_data will use.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start_hash</span>(<span class="self">self</span>, <span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>) -&gt; <span class="ident">HandshakeHash</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">digest::Context::new</span>(<span class="ident">alg</span>);
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buffer</span>);
-        <span class="ident">HandshakeHash</span> {
-            <span class="ident">ctx</span>,
-            <span class="ident">client_auth</span>: <span class="kw">match</span> <span class="self">self</span>.<span class="ident">client_auth_enabled</span> {
-                <span class="bool-val">true</span> =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">buffer</span>),
-                <span class="bool-val">false</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// We now know what hash function the verify_data will use.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>start_hash(<span class="self">self</span>, alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm) -&gt; HandshakeHash {
+        <span class="kw">let </span><span class="kw-2">mut </span>ctx = digest::Context::new(alg);
+        ctx.update(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer);
+        HandshakeHash {
+            ctx,
+            client_auth: <span class="kw">match </span><span class="self">self</span>.client_auth_enabled {
+                <span class="bool-val">true </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.buffer),
+                <span class="bool-val">false </span>=&gt; <span class="prelude-val">None</span>,
             },
         }
     }
 }
 
-<span class="doccomment">/// This deals with keeping a running hash of the handshake</span>
-<span class="doccomment">/// payloads.  This is computed by buffering initially.  Once</span>
-<span class="doccomment">/// we know what hash function we need to use we switch to</span>
-<span class="doccomment">/// incremental hashing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For client auth, we also need to buffer all the messages.</span>
-<span class="doccomment">/// This is disabled in cases where client auth is not possible.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">HandshakeHash</span> {
-    <span class="doccomment">/// None before we know what hash function we&#39;re using</span>
-    <span class="ident">ctx</span>: <span class="ident">digest::Context</span>,
+<span class="doccomment">/// This deals with keeping a running hash of the handshake
+/// payloads.  This is computed by buffering initially.  Once
+/// we know what hash function we need to use we switch to
+/// incremental hashing.
+///
+/// For client auth, we also need to buffer all the messages.
+/// This is disabled in cases where client auth is not possible.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>HandshakeHash {
+    <span class="doccomment">/// None before we know what hash function we&#39;re using
+    </span>ctx: digest::Context,
 
-    <span class="doccomment">/// buffer for client-auth.</span>
-    <span class="ident">client_auth</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// buffer for client-auth.
+    </span>client_auth: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">HandshakeHash</span> {
-    <span class="doccomment">/// We decided not to do client auth after all, so discard</span>
-    <span class="doccomment">/// the transcript.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">abandon_client_auth</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">client_auth</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+<span class="kw">impl </span>HandshakeHash {
+    <span class="doccomment">/// We decided not to do client auth after all, so discard
+    /// the transcript.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>abandon_client_auth(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.client_auth = <span class="prelude-val">None</span>;
     }
 
-    <span class="doccomment">/// Hash/buffer a handshake message.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">add_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessagePayload::Handshake</span> { <span class="ident">encoded</span>, .. } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">payload</span> {
-            <span class="self">self</span>.<span class="ident">update_raw</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>.<span class="number">0</span>);
+    <span class="doccomment">/// Hash/buffer a handshake message.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add_message(<span class="kw-2">&amp;mut </span><span class="self">self</span>, m: <span class="kw-2">&amp;</span>Message) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="kw">if let </span>MessagePayload::Handshake { encoded, .. } = <span class="kw-2">&amp;</span>m.payload {
+            <span class="self">self</span>.update_raw(<span class="kw-2">&amp;</span>encoded.<span class="number">0</span>);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Hash or buffer a byte slice.</span>
-    <span class="kw">fn</span> <span class="ident">update_raw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">buf</span>);
+    <span class="doccomment">/// Hash or buffer a byte slice.
+    </span><span class="kw">fn </span>update_raw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.ctx.update(buf);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">buffer</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">client_auth</span> {
-            <span class="ident">buffer</span>.<span class="ident">extend_from_slice</span>(<span class="ident">buf</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(buffer) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.client_auth {
+            buffer.extend_from_slice(buf);
         }
 
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Get the hash value if we were to hash `extra` too,
+    /// using hash function `hash`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_hash_given(<span class="kw-2">&amp;</span><span class="self">self</span>, extra: <span class="kw-2">&amp;</span>[u8]) -&gt; digest::Digest {
+        <span class="kw">let </span><span class="kw-2">mut </span>ctx = <span class="self">self</span>.ctx.clone();
+        ctx.update(extra);
+        ctx.finish()
     }
 
-    <span class="doccomment">/// Get the hash value if we were to hash `extra` too,</span>
-    <span class="doccomment">/// using hash function `hash`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_hash_given</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">extra</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">digest::Digest</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">clone</span>();
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">extra</span>);
-        <span class="ident">ctx</span>.<span class="ident">finish</span>()
-    }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_hrr_buffer(<span class="self">self</span>) -&gt; HandshakeHashBuffer {
+        <span class="kw">let </span>old_hash = <span class="self">self</span>.ctx.finish();
+        <span class="kw">let </span>old_handshake_hash_msg =
+            HandshakeMessagePayload::build_handshake_hash(old_hash.as_ref());
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_hrr_buffer</span>(<span class="self">self</span>) -&gt; <span class="ident">HandshakeHashBuffer</span> {
-        <span class="kw">let</span> <span class="ident">old_hash</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">finish</span>();
-        <span class="kw">let</span> <span class="ident">old_handshake_hash_msg</span> <span class="op">=</span>
-            <span class="ident">HandshakeMessagePayload::build_handshake_hash</span>(<span class="ident">old_hash</span>.<span class="ident">as_ref</span>());
-
-        <span class="ident">HandshakeHashBuffer</span> {
-            <span class="ident">client_auth_enabled</span>: <span class="self">self</span>.<span class="ident">client_auth</span>.<span class="ident">is_some</span>(),
-            <span class="ident">buffer</span>: <span class="ident">old_handshake_hash_msg</span>.<span class="ident">get_encoding</span>(),
+        HandshakeHashBuffer {
+            client_auth_enabled: <span class="self">self</span>.client_auth.is_some(),
+            buffer: old_handshake_hash_msg.get_encoding(),
         }
     }
 
-    <span class="doccomment">/// Take the current hash value, and encapsulate it in a</span>
-    <span class="doccomment">/// &#39;handshake_hash&#39; handshake message.  Start this hash</span>
-    <span class="doccomment">/// again, with that message at the front.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">rollup_for_hrr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">ctx</span>;
+    <span class="doccomment">/// Take the current hash value, and encapsulate it in a
+    /// &#39;handshake_hash&#39; handshake message.  Start this hash
+    /// again, with that message at the front.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>rollup_for_hrr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>ctx = <span class="kw-2">&amp;mut </span><span class="self">self</span>.ctx;
 
-        <span class="kw">let</span> <span class="ident">old_ctx</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="ident">ctx</span>, <span class="ident">digest::Context::new</span>(<span class="ident">ctx</span>.<span class="ident">algorithm</span>()));
-        <span class="kw">let</span> <span class="ident">old_hash</span> <span class="op">=</span> <span class="ident">old_ctx</span>.<span class="ident">finish</span>();
-        <span class="kw">let</span> <span class="ident">old_handshake_hash_msg</span> <span class="op">=</span>
-            <span class="ident">HandshakeMessagePayload::build_handshake_hash</span>(<span class="ident">old_hash</span>.<span class="ident">as_ref</span>());
+        <span class="kw">let </span>old_ctx = mem::replace(ctx, digest::Context::new(ctx.algorithm()));
+        <span class="kw">let </span>old_hash = old_ctx.finish();
+        <span class="kw">let </span>old_handshake_hash_msg =
+            HandshakeMessagePayload::build_handshake_hash(old_hash.as_ref());
 
-        <span class="self">self</span>.<span class="ident">update_raw</span>(<span class="kw-2">&amp;</span><span class="ident">old_handshake_hash_msg</span>.<span class="ident">get_encoding</span>());
+        <span class="self">self</span>.update_raw(<span class="kw-2">&amp;</span>old_handshake_hash_msg.get_encoding());
     }
 
-    <span class="doccomment">/// Get the current hash value.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_current_hash</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">digest::Digest</span> {
-        <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">clone</span>().<span class="ident">finish</span>()
+    <span class="doccomment">/// Get the current hash value.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_current_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; digest::Digest {
+        <span class="self">self</span>.ctx.clone().finish()
     }
 
-    <span class="doccomment">/// Takes this object&#39;s buffer containing all handshake messages</span>
-    <span class="doccomment">/// so far.  This method only works once; it resets the buffer</span>
-    <span class="doccomment">/// to empty.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_handshake_buf</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">client_auth</span>.<span class="ident">take</span>()
+    <span class="doccomment">/// Takes this object&#39;s buffer containing all handshake messages
+    /// so far.  This method only works once; it resets the buffer
+    /// to empty.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>take_handshake_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="self">self</span>.client_auth.take()
     }
 
-    <span class="doccomment">/// The digest algorithm</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span> {
-        <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">algorithm</span>()
+    <span class="doccomment">/// The digest algorithm
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm {
+        <span class="self">self</span>.ctx.algorithm()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::HandshakeHashBuffer</span>;
-    <span class="kw">use</span> <span class="ident">ring::digest</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::HandshakeHashBuffer;
+    <span class="kw">use </span>ring::digest;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hashes_correctly</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hhb</span> <span class="op">=</span> <span class="ident">HandshakeHashBuffer::new</span>();
-        <span class="ident">hhb</span>.<span class="ident">update_raw</span>(<span class="string">b&quot;hello&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">hhb</span>.<span class="ident">buffer</span>.<span class="ident">len</span>(), <span class="number">5</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hh</span> <span class="op">=</span> <span class="ident">hhb</span>.<span class="ident">start_hash</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>);
-        <span class="macro">assert!</span>(<span class="ident">hh</span>.<span class="ident">client_auth</span>.<span class="ident">is_none</span>());
-        <span class="ident">hh</span>.<span class="ident">update_raw</span>(<span class="string">b&quot;world&quot;</span>);
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">hh</span>.<span class="ident">get_current_hash</span>();
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">h</span>.<span class="ident">as_ref</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">0</span>], <span class="number">0x93</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">1</span>], <span class="number">0x6a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">2</span>], <span class="number">0x18</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">3</span>], <span class="number">0x5c</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hashes_correctly() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hhb = HandshakeHashBuffer::new();
+        hhb.update_raw(<span class="string">b&quot;hello&quot;</span>);
+        <span class="macro">assert_eq!</span>(hhb.buffer.len(), <span class="number">5</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>hh = hhb.start_hash(<span class="kw-2">&amp;</span>digest::SHA256);
+        <span class="macro">assert!</span>(hh.client_auth.is_none());
+        hh.update_raw(<span class="string">b&quot;world&quot;</span>);
+        <span class="kw">let </span>h = hh.get_current_hash();
+        <span class="kw">let </span>h = h.as_ref();
+        <span class="macro">assert_eq!</span>(h[<span class="number">0</span>], <span class="number">0x93</span>);
+        <span class="macro">assert_eq!</span>(h[<span class="number">1</span>], <span class="number">0x6a</span>);
+        <span class="macro">assert_eq!</span>(h[<span class="number">2</span>], <span class="number">0x18</span>);
+        <span class="macro">assert_eq!</span>(h[<span class="number">3</span>], <span class="number">0x5c</span>);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">buffers_correctly</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hhb</span> <span class="op">=</span> <span class="ident">HandshakeHashBuffer::new</span>();
-        <span class="ident">hhb</span>.<span class="ident">set_client_auth_enabled</span>();
-        <span class="ident">hhb</span>.<span class="ident">update_raw</span>(<span class="string">b&quot;hello&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">hhb</span>.<span class="ident">buffer</span>.<span class="ident">len</span>(), <span class="number">5</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hh</span> <span class="op">=</span> <span class="ident">hhb</span>.<span class="ident">start_hash</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>);
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>buffers_correctly() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hhb = HandshakeHashBuffer::new();
+        hhb.set_client_auth_enabled();
+        hhb.update_raw(<span class="string">b&quot;hello&quot;</span>);
+        <span class="macro">assert_eq!</span>(hhb.buffer.len(), <span class="number">5</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>hh = hhb.start_hash(<span class="kw-2">&amp;</span>digest::SHA256);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">hh</span>.<span class="ident">client_auth</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">len</span>()),
+            hh.client_auth
+                .as_ref()
+                .map(|buf| buf.len()),
             <span class="prelude-val">Some</span>(<span class="number">5</span>)
         );
-        <span class="ident">hh</span>.<span class="ident">update_raw</span>(<span class="string">b&quot;world&quot;</span>);
+        hh.update_raw(<span class="string">b&quot;world&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">hh</span>.<span class="ident">client_auth</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">len</span>()),
+            hh.client_auth
+                .as_ref()
+                .map(|buf| buf.len()),
             <span class="prelude-val">Some</span>(<span class="number">10</span>)
         );
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">hh</span>.<span class="ident">get_current_hash</span>();
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">h</span>.<span class="ident">as_ref</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">0</span>], <span class="number">0x93</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">1</span>], <span class="number">0x6a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">2</span>], <span class="number">0x18</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">3</span>], <span class="number">0x5c</span>);
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">hh</span>.<span class="ident">take_handshake_buf</span>();
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">b&quot;helloworld&quot;</span>.<span class="ident">to_vec</span>()), <span class="ident">buf</span>);
+        <span class="kw">let </span>h = hh.get_current_hash();
+        <span class="kw">let </span>h = h.as_ref();
+        <span class="macro">assert_eq!</span>(h[<span class="number">0</span>], <span class="number">0x93</span>);
+        <span class="macro">assert_eq!</span>(h[<span class="number">1</span>], <span class="number">0x6a</span>);
+        <span class="macro">assert_eq!</span>(h[<span class="number">2</span>], <span class="number">0x18</span>);
+        <span class="macro">assert_eq!</span>(h[<span class="number">3</span>], <span class="number">0x5c</span>);
+        <span class="kw">let </span>buf = hh.take_handshake_buf();
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">b&quot;helloworld&quot;</span>.to_vec()), buf);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">abandon</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hhb</span> <span class="op">=</span> <span class="ident">HandshakeHashBuffer::new</span>();
-        <span class="ident">hhb</span>.<span class="ident">set_client_auth_enabled</span>();
-        <span class="ident">hhb</span>.<span class="ident">update_raw</span>(<span class="string">b&quot;hello&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">hhb</span>.<span class="ident">buffer</span>.<span class="ident">len</span>(), <span class="number">5</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hh</span> <span class="op">=</span> <span class="ident">hhb</span>.<span class="ident">start_hash</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>abandon() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hhb = HandshakeHashBuffer::new();
+        hhb.set_client_auth_enabled();
+        hhb.update_raw(<span class="string">b&quot;hello&quot;</span>);
+        <span class="macro">assert_eq!</span>(hhb.buffer.len(), <span class="number">5</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>hh = hhb.start_hash(<span class="kw-2">&amp;</span>digest::SHA256);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">hh</span>.<span class="ident">client_auth</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">len</span>()),
+            hh.client_auth
+                .as_ref()
+                .map(|buf| buf.len()),
             <span class="prelude-val">Some</span>(<span class="number">5</span>)
         );
-        <span class="ident">hh</span>.<span class="ident">abandon_client_auth</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">hh</span>.<span class="ident">client_auth</span>, <span class="prelude-val">None</span>);
-        <span class="ident">hh</span>.<span class="ident">update_raw</span>(<span class="string">b&quot;world&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">hh</span>.<span class="ident">client_auth</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">hh</span>.<span class="ident">get_current_hash</span>();
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">h</span>.<span class="ident">as_ref</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">0</span>], <span class="number">0x93</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">1</span>], <span class="number">0x6a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">2</span>], <span class="number">0x18</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>[<span class="number">3</span>], <span class="number">0x5c</span>);
+        hh.abandon_client_auth();
+        <span class="macro">assert_eq!</span>(hh.client_auth, <span class="prelude-val">None</span>);
+        hh.update_raw(<span class="string">b&quot;world&quot;</span>);
+        <span class="macro">assert_eq!</span>(hh.client_auth, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>h = hh.get_current_hash();
+        <span class="kw">let </span>h = h.as_ref();
+        <span class="macro">assert_eq!</span>(h[<span class="number">0</span>], <span class="number">0x93</span>);
+        <span class="macro">assert_eq!</span>(h[<span class="number">1</span>], <span class="number">0x6a</span>);
+        <span class="macro">assert_eq!</span>(h[<span class="number">2</span>], <span class="number">0x18</span>);
+        <span class="macro">assert_eq!</span>(h[<span class="number">3</span>], <span class="number">0x5c</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

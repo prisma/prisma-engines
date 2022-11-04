@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/biguint/multiplication.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>multiplication.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/biguint/multiplication.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>multiplication.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -566,573 +566,573 @@
 <span id="566">566</span>
 <span id="567">567</span>
 <span id="568">568</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::addition</span>::{<span class="ident">__add2</span>, <span class="ident">add2</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::subtraction::sub2</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::u32_from_u128</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">biguint_from_vec</span>, <span class="ident">cmp_slice</span>, <span class="ident">BigUint</span>, <span class="ident">IntDigits</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::addition::{__add2, add2};
+<span class="kw">use </span><span class="kw">super</span>::subtraction::sub2;
+<span class="attribute">#[cfg(not(u64_digit))]
+</span><span class="kw">use </span><span class="kw">super</span>::u32_from_u128;
+<span class="kw">use super</span>::{biguint_from_vec, cmp_slice, BigUint, IntDigits};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::big_digit</span>::{<span class="self">self</span>, <span class="ident">BigDigit</span>, <span class="ident">DoubleBigDigit</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Sign</span>::{<span class="self">self</span>, <span class="ident">Minus</span>, <span class="ident">NoSign</span>, <span class="ident">Plus</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">BigInt</span>, <span class="ident">UsizePromotion</span>};
+<span class="kw">use </span><span class="kw">crate</span>::big_digit::{<span class="self">self</span>, BigDigit, DoubleBigDigit};
+<span class="kw">use </span><span class="kw">crate</span>::Sign::{<span class="self">self</span>, Minus, NoSign, Plus};
+<span class="kw">use crate</span>::{BigInt, UsizePromotion};
 
-<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">core::iter::Product</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Mul</span>, <span class="ident">MulAssign</span>};
-<span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">CheckedMul</span>, <span class="ident">FromPrimitive</span>, <span class="ident">One</span>, <span class="ident">Zero</span>};
+<span class="kw">use </span>core::cmp::Ordering;
+<span class="kw">use </span>core::iter::Product;
+<span class="kw">use </span>core::ops::{Mul, MulAssign};
+<span class="kw">use </span>num_traits::{CheckedMul, FromPrimitive, One, Zero};
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">mac_with_carry</span>(
-    <span class="ident">a</span>: <span class="ident">BigDigit</span>,
-    <span class="ident">b</span>: <span class="ident">BigDigit</span>,
-    <span class="ident">c</span>: <span class="ident">BigDigit</span>,
-    <span class="ident">acc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DoubleBigDigit</span>,
-) -&gt; <span class="ident">BigDigit</span> {
-    <span class="kw-2">*</span><span class="ident">acc</span> <span class="op">+</span><span class="op">=</span> <span class="ident">DoubleBigDigit::from</span>(<span class="ident">a</span>);
-    <span class="kw-2">*</span><span class="ident">acc</span> <span class="op">+</span><span class="op">=</span> <span class="ident">DoubleBigDigit::from</span>(<span class="ident">b</span>) <span class="op">*</span> <span class="ident">DoubleBigDigit::from</span>(<span class="ident">c</span>);
-    <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">acc</span> <span class="kw">as</span> <span class="ident">BigDigit</span>;
-    <span class="kw-2">*</span><span class="ident">acc</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">big_digit::BITS</span>;
-    <span class="ident">lo</span>
+<span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>mac_with_carry(
+    a: BigDigit,
+    b: BigDigit,
+    c: BigDigit,
+    acc: <span class="kw-2">&amp;mut </span>DoubleBigDigit,
+) -&gt; BigDigit {
+    <span class="kw-2">*</span>acc += DoubleBigDigit::from(a);
+    <span class="kw-2">*</span>acc += DoubleBigDigit::from(b) * DoubleBigDigit::from(c);
+    <span class="kw">let </span>lo = <span class="kw-2">*</span>acc <span class="kw">as </span>BigDigit;
+    <span class="kw-2">*</span>acc &gt;&gt;= big_digit::BITS;
+    lo
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">mul_with_carry</span>(<span class="ident">a</span>: <span class="ident">BigDigit</span>, <span class="ident">b</span>: <span class="ident">BigDigit</span>, <span class="ident">acc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DoubleBigDigit</span>) -&gt; <span class="ident">BigDigit</span> {
-    <span class="kw-2">*</span><span class="ident">acc</span> <span class="op">+</span><span class="op">=</span> <span class="ident">DoubleBigDigit::from</span>(<span class="ident">a</span>) <span class="op">*</span> <span class="ident">DoubleBigDigit::from</span>(<span class="ident">b</span>);
-    <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">acc</span> <span class="kw">as</span> <span class="ident">BigDigit</span>;
-    <span class="kw-2">*</span><span class="ident">acc</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">big_digit::BITS</span>;
-    <span class="ident">lo</span>
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>mul_with_carry(a: BigDigit, b: BigDigit, acc: <span class="kw-2">&amp;mut </span>DoubleBigDigit) -&gt; BigDigit {
+    <span class="kw-2">*</span>acc += DoubleBigDigit::from(a) * DoubleBigDigit::from(b);
+    <span class="kw">let </span>lo = <span class="kw-2">*</span>acc <span class="kw">as </span>BigDigit;
+    <span class="kw-2">*</span>acc &gt;&gt;= big_digit::BITS;
+    lo
 }
 
-<span class="doccomment">/// Three argument multiply accumulate:</span>
-<span class="doccomment">/// acc += b * c</span>
-<span class="kw">fn</span> <span class="ident">mac_digit</span>(<span class="ident">acc</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">BigDigit</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>], <span class="ident">c</span>: <span class="ident">BigDigit</span>) {
-    <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="number">0</span> {
+<span class="doccomment">/// Three argument multiply accumulate:
+/// acc += b * c
+</span><span class="kw">fn </span>mac_digit(acc: <span class="kw-2">&amp;mut </span>[BigDigit], b: <span class="kw-2">&amp;</span>[BigDigit], c: BigDigit) {
+    <span class="kw">if </span>c == <span class="number">0 </span>{
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> (<span class="ident">a_lo</span>, <span class="ident">a_hi</span>) <span class="op">=</span> <span class="ident">acc</span>.<span class="ident">split_at_mut</span>(<span class="ident">b</span>.<span class="ident">len</span>());
+    <span class="kw">let </span><span class="kw-2">mut </span>carry = <span class="number">0</span>;
+    <span class="kw">let </span>(a_lo, a_hi) = acc.split_at_mut(b.len());
 
-    <span class="kw">for</span> (<span class="ident">a</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>) <span class="kw">in</span> <span class="ident">a_lo</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b</span>) {
-        <span class="kw-2">*</span><span class="ident">a</span> <span class="op">=</span> <span class="ident">mac_with_carry</span>(<span class="kw-2">*</span><span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry</span>);
+    <span class="kw">for </span>(a, <span class="kw-2">&amp;</span>b) <span class="kw">in </span>a_lo.iter_mut().zip(b) {
+        <span class="kw-2">*</span>a = mac_with_carry(<span class="kw-2">*</span>a, b, c, <span class="kw-2">&amp;mut </span>carry);
     }
 
-    <span class="kw">let</span> (<span class="ident">carry_hi</span>, <span class="ident">carry_lo</span>) <span class="op">=</span> <span class="ident">big_digit::from_doublebigdigit</span>(<span class="ident">carry</span>);
+    <span class="kw">let </span>(carry_hi, carry_lo) = big_digit::from_doublebigdigit(carry);
 
-    <span class="kw">let</span> <span class="ident">final_carry</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">carry_hi</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="ident">__add2</span>(<span class="ident">a_hi</span>, <span class="kw-2">&amp;</span>[<span class="ident">carry_lo</span>])
-    } <span class="kw">else</span> {
-        <span class="ident">__add2</span>(<span class="ident">a_hi</span>, <span class="kw-2">&amp;</span>[<span class="ident">carry_hi</span>, <span class="ident">carry_lo</span>])
+    <span class="kw">let </span>final_carry = <span class="kw">if </span>carry_hi == <span class="number">0 </span>{
+        __add2(a_hi, <span class="kw-2">&amp;</span>[carry_lo])
+    } <span class="kw">else </span>{
+        __add2(a_hi, <span class="kw-2">&amp;</span>[carry_hi, carry_lo])
     };
-    <span class="macro">assert_eq!</span>(<span class="ident">final_carry</span>, <span class="number">0</span>, <span class="string">&quot;carry overflow during multiplication!&quot;</span>);
+    <span class="macro">assert_eq!</span>(final_carry, <span class="number">0</span>, <span class="string">&quot;carry overflow during multiplication!&quot;</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">bigint_from_slice</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) -&gt; <span class="ident">BigInt</span> {
-    <span class="ident">BigInt::from</span>(<span class="ident">biguint_from_vec</span>(<span class="ident">slice</span>.<span class="ident">to_vec</span>()))
+<span class="kw">fn </span>bigint_from_slice(slice: <span class="kw-2">&amp;</span>[BigDigit]) -&gt; BigInt {
+    BigInt::from(biguint_from_vec(slice.to_vec()))
 }
 
-<span class="doccomment">/// Three argument multiply accumulate:</span>
-<span class="doccomment">/// acc += b * c</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::many_single_char_names</span>)]</span>
-<span class="kw">fn</span> <span class="ident">mac3</span>(<span class="kw-2">mut</span> <span class="ident">acc</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">BigDigit</span>], <span class="kw-2">mut</span> <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>], <span class="kw-2">mut</span> <span class="ident">c</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) {
-    <span class="comment">// Least-significant zeros have no effect on the output.</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) <span class="op">=</span> <span class="ident">b</span>.<span class="ident">first</span>() {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">nz</span>) <span class="op">=</span> <span class="ident">b</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-            <span class="ident">b</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">b</span>[<span class="ident">nz</span>..];
-            <span class="ident">acc</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">acc</span>[<span class="ident">nz</span>..];
-        } <span class="kw">else</span> {
+<span class="doccomment">/// Three argument multiply accumulate:
+/// acc += b * c
+</span><span class="attribute">#[allow(clippy::many_single_char_names)]
+</span><span class="kw">fn </span>mac3(<span class="kw-2">mut </span>acc: <span class="kw-2">&amp;mut </span>[BigDigit], <span class="kw-2">mut </span>b: <span class="kw-2">&amp;</span>[BigDigit], <span class="kw-2">mut </span>c: <span class="kw-2">&amp;</span>[BigDigit]) {
+    <span class="comment">// Least-significant zeros have no effect on the output.
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) = b.first() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(nz) = b.iter().position(|<span class="kw-2">&amp;</span>d| d != <span class="number">0</span>) {
+            b = <span class="kw-2">&amp;</span>b[nz..];
+            acc = <span class="kw-2">&amp;mut </span>acc[nz..];
+        } <span class="kw">else </span>{
             <span class="kw">return</span>;
         }
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) <span class="op">=</span> <span class="ident">c</span>.<span class="ident">first</span>() {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">nz</span>) <span class="op">=</span> <span class="ident">c</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-            <span class="ident">c</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">c</span>[<span class="ident">nz</span>..];
-            <span class="ident">acc</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">acc</span>[<span class="ident">nz</span>..];
-        } <span class="kw">else</span> {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) = c.first() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(nz) = c.iter().position(|<span class="kw-2">&amp;</span>d| d != <span class="number">0</span>) {
+            c = <span class="kw-2">&amp;</span>c[nz..];
+            acc = <span class="kw-2">&amp;mut </span>acc[nz..];
+        } <span class="kw">else </span>{
             <span class="kw">return</span>;
         }
     }
 
-    <span class="kw">let</span> <span class="ident">acc</span> <span class="op">=</span> <span class="ident">acc</span>;
-    <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">c</span>.<span class="ident">len</span>() { (<span class="ident">b</span>, <span class="ident">c</span>) } <span class="kw">else</span> { (<span class="ident">c</span>, <span class="ident">b</span>) };
+    <span class="kw">let </span>acc = acc;
+    <span class="kw">let </span>(x, y) = <span class="kw">if </span>b.len() &lt; c.len() { (b, c) } <span class="kw">else </span>{ (c, b) };
 
-    <span class="comment">// We use three algorithms for different input sizes.</span>
-    <span class="comment">//</span>
-    <span class="comment">// - For small inputs, long multiplication is fastest.</span>
-    <span class="comment">// - Next we use Karatsuba multiplication (Toom-2), which we have optimized</span>
-    <span class="comment">//   to avoid unnecessary allocations for intermediate values.</span>
-    <span class="comment">// - For the largest inputs we use Toom-3, which better optimizes the</span>
-    <span class="comment">//   number of operations, but uses more temporary allocations.</span>
-    <span class="comment">//</span>
-    <span class="comment">// The thresholds are somewhat arbitrary, chosen by evaluating the results</span>
-    <span class="comment">// of `cargo bench --bench bigint multiply`.</span>
+    <span class="comment">// We use three algorithms for different input sizes.
+    //
+    // - For small inputs, long multiplication is fastest.
+    // - Next we use Karatsuba multiplication (Toom-2), which we have optimized
+    //   to avoid unnecessary allocations for intermediate values.
+    // - For the largest inputs we use Toom-3, which better optimizes the
+    //   number of operations, but uses more temporary allocations.
+    //
+    // The thresholds are somewhat arbitrary, chosen by evaluating the results
+    // of `cargo bench --bench bigint multiply`.
 
-    <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">32</span> {
-        <span class="comment">// Long multiplication:</span>
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">xi</span>) <span class="kw">in</span> <span class="ident">x</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="ident">mac_digit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>[<span class="ident">i</span>..], <span class="ident">y</span>, <span class="kw-2">*</span><span class="ident">xi</span>);
+    </span><span class="kw">if </span>x.len() &lt;= <span class="number">32 </span>{
+        <span class="comment">// Long multiplication:
+        </span><span class="kw">for </span>(i, xi) <span class="kw">in </span>x.iter().enumerate() {
+            mac_digit(<span class="kw-2">&amp;mut </span>acc[i..], y, <span class="kw-2">*</span>xi);
         }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">256</span> {
-        <span class="comment">// Karatsuba multiplication:</span>
-        <span class="comment">//</span>
-        <span class="comment">// The idea is that we break x and y up into two smaller numbers that each have about half</span>
-        <span class="comment">// as many digits, like so (note that multiplying by b is just a shift):</span>
-        <span class="comment">//</span>
-        <span class="comment">// x = x0 + x1 * b</span>
-        <span class="comment">// y = y0 + y1 * b</span>
-        <span class="comment">//</span>
-        <span class="comment">// With some algebra, we can compute x * y with three smaller products, where the inputs to</span>
-        <span class="comment">// each of the smaller products have only about half as many digits as x and y:</span>
-        <span class="comment">//</span>
-        <span class="comment">// x * y = (x0 + x1 * b) * (y0 + y1 * b)</span>
-        <span class="comment">//</span>
-        <span class="comment">// x * y = x0 * y0</span>
-        <span class="comment">//       + x0 * y1 * b</span>
-        <span class="comment">//       + x1 * y0 * b</span>
-        <span class="comment">//       + x1 * y1 * b^2</span>
-        <span class="comment">//</span>
-        <span class="comment">// Let p0 = x0 * y0 and p2 = x1 * y1:</span>
-        <span class="comment">//</span>
-        <span class="comment">// x * y = p0</span>
-        <span class="comment">//       + (x0 * y1 + x1 * y0) * b</span>
-        <span class="comment">//       + p2 * b^2</span>
-        <span class="comment">//</span>
-        <span class="comment">// The real trick is that middle term:</span>
-        <span class="comment">//</span>
-        <span class="comment">//         x0 * y1 + x1 * y0</span>
-        <span class="comment">//</span>
-        <span class="comment">//       = x0 * y1 + x1 * y0 - p0 + p0 - p2 + p2</span>
-        <span class="comment">//</span>
-        <span class="comment">//       = x0 * y1 + x1 * y0 - x0 * y0 - x1 * y1 + p0 + p2</span>
-        <span class="comment">//</span>
-        <span class="comment">// Now we complete the square:</span>
-        <span class="comment">//</span>
-        <span class="comment">//       = -(x0 * y0 - x0 * y1 - x1 * y0 + x1 * y1) + p0 + p2</span>
-        <span class="comment">//</span>
-        <span class="comment">//       = -((x1 - x0) * (y1 - y0)) + p0 + p2</span>
-        <span class="comment">//</span>
-        <span class="comment">// Let p1 = (x1 - x0) * (y1 - y0), and substitute back into our original formula:</span>
-        <span class="comment">//</span>
-        <span class="comment">// x * y = p0</span>
-        <span class="comment">//       + (p0 + p2 - p1) * b</span>
-        <span class="comment">//       + p2 * b^2</span>
-        <span class="comment">//</span>
-        <span class="comment">// Where the three intermediate products are:</span>
-        <span class="comment">//</span>
-        <span class="comment">// p0 = x0 * y0</span>
-        <span class="comment">// p1 = (x1 - x0) * (y1 - y0)</span>
-        <span class="comment">// p2 = x1 * y1</span>
-        <span class="comment">//</span>
-        <span class="comment">// In doing the computation, we take great care to avoid unnecessary temporary variables</span>
-        <span class="comment">// (since creating a BigUint requires a heap allocation): thus, we rearrange the formula a</span>
-        <span class="comment">// bit so we can use the same temporary variable for all the intermediate products:</span>
-        <span class="comment">//</span>
-        <span class="comment">// x * y = p2 * b^2 + p2 * b</span>
-        <span class="comment">//       + p0 * b + p0</span>
-        <span class="comment">//       - p1 * b</span>
-        <span class="comment">//</span>
-        <span class="comment">// The other trick we use is instead of doing explicit shifts, we slice acc at the</span>
-        <span class="comment">// appropriate offset when doing the add.</span>
+    } <span class="kw">else if </span>x.len() &lt;= <span class="number">256 </span>{
+        <span class="comment">// Karatsuba multiplication:
+        //
+        // The idea is that we break x and y up into two smaller numbers that each have about half
+        // as many digits, like so (note that multiplying by b is just a shift):
+        //
+        // x = x0 + x1 * b
+        // y = y0 + y1 * b
+        //
+        // With some algebra, we can compute x * y with three smaller products, where the inputs to
+        // each of the smaller products have only about half as many digits as x and y:
+        //
+        // x * y = (x0 + x1 * b) * (y0 + y1 * b)
+        //
+        // x * y = x0 * y0
+        //       + x0 * y1 * b
+        //       + x1 * y0 * b
+        //       + x1 * y1 * b^2
+        //
+        // Let p0 = x0 * y0 and p2 = x1 * y1:
+        //
+        // x * y = p0
+        //       + (x0 * y1 + x1 * y0) * b
+        //       + p2 * b^2
+        //
+        // The real trick is that middle term:
+        //
+        //         x0 * y1 + x1 * y0
+        //
+        //       = x0 * y1 + x1 * y0 - p0 + p0 - p2 + p2
+        //
+        //       = x0 * y1 + x1 * y0 - x0 * y0 - x1 * y1 + p0 + p2
+        //
+        // Now we complete the square:
+        //
+        //       = -(x0 * y0 - x0 * y1 - x1 * y0 + x1 * y1) + p0 + p2
+        //
+        //       = -((x1 - x0) * (y1 - y0)) + p0 + p2
+        //
+        // Let p1 = (x1 - x0) * (y1 - y0), and substitute back into our original formula:
+        //
+        // x * y = p0
+        //       + (p0 + p2 - p1) * b
+        //       + p2 * b^2
+        //
+        // Where the three intermediate products are:
+        //
+        // p0 = x0 * y0
+        // p1 = (x1 - x0) * (y1 - y0)
+        // p2 = x1 * y1
+        //
+        // In doing the computation, we take great care to avoid unnecessary temporary variables
+        // (since creating a BigUint requires a heap allocation): thus, we rearrange the formula a
+        // bit so we can use the same temporary variable for all the intermediate products:
+        //
+        // x * y = p2 * b^2 + p2 * b
+        //       + p0 * b + p0
+        //       - p1 * b
+        //
+        // The other trick we use is instead of doing explicit shifts, we slice acc at the
+        // appropriate offset when doing the add.
 
-        <span class="comment">// When x is smaller than y, it&#39;s significantly faster to pick b such that x is split in</span>
-        <span class="comment">// half, not y:</span>
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">2</span>;
-        <span class="kw">let</span> (<span class="ident">x0</span>, <span class="ident">x1</span>) <span class="op">=</span> <span class="ident">x</span>.<span class="ident">split_at</span>(<span class="ident">b</span>);
-        <span class="kw">let</span> (<span class="ident">y0</span>, <span class="ident">y1</span>) <span class="op">=</span> <span class="ident">y</span>.<span class="ident">split_at</span>(<span class="ident">b</span>);
+        // When x is smaller than y, it&#39;s significantly faster to pick b such that x is split in
+        // half, not y:
+        </span><span class="kw">let </span>b = x.len() / <span class="number">2</span>;
+        <span class="kw">let </span>(x0, x1) = x.split_at(b);
+        <span class="kw">let </span>(y0, y1) = y.split_at(b);
 
-        <span class="comment">// We reuse the same BigUint for all the intermediate multiplies and have to size p</span>
-        <span class="comment">// appropriately here: x1.len() &gt;= x0.len and y1.len() &gt;= y0.len():</span>
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">x1</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">y1</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">BigUint</span> { <span class="ident">data</span>: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">len</span>] };
+        <span class="comment">// We reuse the same BigUint for all the intermediate multiplies and have to size p
+        // appropriately here: x1.len() &gt;= x0.len and y1.len() &gt;= y0.len():
+        </span><span class="kw">let </span>len = x1.len() + y1.len() + <span class="number">1</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>p = BigUint { data: <span class="macro">vec!</span>[<span class="number">0</span>; len] };
 
-        <span class="comment">// p2 = x1 * y1</span>
-        <span class="ident">mac3</span>(<span class="kw-2">&amp;mut</span> <span class="ident">p</span>.<span class="ident">data</span>, <span class="ident">x1</span>, <span class="ident">y1</span>);
+        <span class="comment">// p2 = x1 * y1
+        </span>mac3(<span class="kw-2">&amp;mut </span>p.data, x1, y1);
 
-        <span class="comment">// Not required, but the adds go faster if we drop any unneeded 0s from the end:</span>
-        <span class="ident">p</span>.<span class="ident">normalize</span>();
+        <span class="comment">// Not required, but the adds go faster if we drop any unneeded 0s from the end:
+        </span>p.normalize();
 
-        <span class="ident">add2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>[<span class="ident">b</span>..], <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">data</span>);
-        <span class="ident">add2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>[<span class="ident">b</span> <span class="op">*</span> <span class="number">2</span>..], <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">data</span>);
+        add2(<span class="kw-2">&amp;mut </span>acc[b..], <span class="kw-2">&amp;</span>p.data);
+        add2(<span class="kw-2">&amp;mut </span>acc[b * <span class="number">2</span>..], <span class="kw-2">&amp;</span>p.data);
 
-        <span class="comment">// Zero out p before the next multiply:</span>
-        <span class="ident">p</span>.<span class="ident">data</span>.<span class="ident">truncate</span>(<span class="number">0</span>);
-        <span class="ident">p</span>.<span class="ident">data</span>.<span class="ident">resize</span>(<span class="ident">len</span>, <span class="number">0</span>);
+        <span class="comment">// Zero out p before the next multiply:
+        </span>p.data.truncate(<span class="number">0</span>);
+        p.data.resize(len, <span class="number">0</span>);
 
-        <span class="comment">// p0 = x0 * y0</span>
-        <span class="ident">mac3</span>(<span class="kw-2">&amp;mut</span> <span class="ident">p</span>.<span class="ident">data</span>, <span class="ident">x0</span>, <span class="ident">y0</span>);
-        <span class="ident">p</span>.<span class="ident">normalize</span>();
+        <span class="comment">// p0 = x0 * y0
+        </span>mac3(<span class="kw-2">&amp;mut </span>p.data, x0, y0);
+        p.normalize();
 
-        <span class="ident">add2</span>(<span class="ident">acc</span>, <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">data</span>);
-        <span class="ident">add2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>[<span class="ident">b</span>..], <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">data</span>);
+        add2(acc, <span class="kw-2">&amp;</span>p.data);
+        add2(<span class="kw-2">&amp;mut </span>acc[b..], <span class="kw-2">&amp;</span>p.data);
 
-        <span class="comment">// p1 = (x1 - x0) * (y1 - y0)</span>
-        <span class="comment">// We do this one last, since it may be negative and acc can&#39;t ever be negative:</span>
-        <span class="kw">let</span> (<span class="ident">j0_sign</span>, <span class="ident">j0</span>) <span class="op">=</span> <span class="ident">sub_sign</span>(<span class="ident">x1</span>, <span class="ident">x0</span>);
-        <span class="kw">let</span> (<span class="ident">j1_sign</span>, <span class="ident">j1</span>) <span class="op">=</span> <span class="ident">sub_sign</span>(<span class="ident">y1</span>, <span class="ident">y0</span>);
+        <span class="comment">// p1 = (x1 - x0) * (y1 - y0)
+        // We do this one last, since it may be negative and acc can&#39;t ever be negative:
+        </span><span class="kw">let </span>(j0_sign, j0) = sub_sign(x1, x0);
+        <span class="kw">let </span>(j1_sign, j1) = sub_sign(y1, y0);
 
-        <span class="kw">match</span> <span class="ident">j0_sign</span> <span class="op">*</span> <span class="ident">j1_sign</span> {
-            <span class="ident">Plus</span> =&gt; {
-                <span class="ident">p</span>.<span class="ident">data</span>.<span class="ident">truncate</span>(<span class="number">0</span>);
-                <span class="ident">p</span>.<span class="ident">data</span>.<span class="ident">resize</span>(<span class="ident">len</span>, <span class="number">0</span>);
+        <span class="kw">match </span>j0_sign * j1_sign {
+            Plus =&gt; {
+                p.data.truncate(<span class="number">0</span>);
+                p.data.resize(len, <span class="number">0</span>);
 
-                <span class="ident">mac3</span>(<span class="kw-2">&amp;mut</span> <span class="ident">p</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">j0</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">j1</span>.<span class="ident">data</span>);
-                <span class="ident">p</span>.<span class="ident">normalize</span>();
+                mac3(<span class="kw-2">&amp;mut </span>p.data, <span class="kw-2">&amp;</span>j0.data, <span class="kw-2">&amp;</span>j1.data);
+                p.normalize();
 
-                <span class="ident">sub2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>[<span class="ident">b</span>..], <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">data</span>);
+                sub2(<span class="kw-2">&amp;mut </span>acc[b..], <span class="kw-2">&amp;</span>p.data);
             }
-            <span class="ident">Minus</span> =&gt; {
-                <span class="ident">mac3</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>[<span class="ident">b</span>..], <span class="kw-2">&amp;</span><span class="ident">j0</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">j1</span>.<span class="ident">data</span>);
+            Minus =&gt; {
+                mac3(<span class="kw-2">&amp;mut </span>acc[b..], <span class="kw-2">&amp;</span>j0.data, <span class="kw-2">&amp;</span>j1.data);
             }
-            <span class="ident">NoSign</span> =&gt; (),
+            NoSign =&gt; (),
         }
-    } <span class="kw">else</span> {
-        <span class="comment">// Toom-3 multiplication:</span>
-        <span class="comment">//</span>
-        <span class="comment">// Toom-3 is like Karatsuba above, but dividing the inputs into three parts.</span>
-        <span class="comment">// Both are instances of Toom-Cook, using `k=3` and `k=2` respectively.</span>
-        <span class="comment">//</span>
-        <span class="comment">// The general idea is to treat the large integers digits as</span>
-        <span class="comment">// polynomials of a certain degree and determine the coefficients/digits</span>
-        <span class="comment">// of the product of the two via interpolation of the polynomial product.</span>
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">y</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">3</span> <span class="op">+</span> <span class="number">1</span>;
+    } <span class="kw">else </span>{
+        <span class="comment">// Toom-3 multiplication:
+        //
+        // Toom-3 is like Karatsuba above, but dividing the inputs into three parts.
+        // Both are instances of Toom-Cook, using `k=3` and `k=2` respectively.
+        //
+        // The general idea is to treat the large integers digits as
+        // polynomials of a certain degree and determine the coefficients/digits
+        // of the product of the two via interpolation of the polynomial product.
+        </span><span class="kw">let </span>i = y.len() / <span class="number">3 </span>+ <span class="number">1</span>;
 
-        <span class="kw">let</span> <span class="ident">x0_len</span> <span class="op">=</span> <span class="ident">Ord::min</span>(<span class="ident">x</span>.<span class="ident">len</span>(), <span class="ident">i</span>);
-        <span class="kw">let</span> <span class="ident">x1_len</span> <span class="op">=</span> <span class="ident">Ord::min</span>(<span class="ident">x</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">x0_len</span>, <span class="ident">i</span>);
+        <span class="kw">let </span>x0_len = Ord::min(x.len(), i);
+        <span class="kw">let </span>x1_len = Ord::min(x.len() - x0_len, i);
 
-        <span class="kw">let</span> <span class="ident">y0_len</span> <span class="op">=</span> <span class="ident">i</span>;
-        <span class="kw">let</span> <span class="ident">y1_len</span> <span class="op">=</span> <span class="ident">Ord::min</span>(<span class="ident">y</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">y0_len</span>, <span class="ident">i</span>);
+        <span class="kw">let </span>y0_len = i;
+        <span class="kw">let </span>y1_len = Ord::min(y.len() - y0_len, i);
 
-        <span class="comment">// Break x and y into three parts, representating an order two polynomial.</span>
-        <span class="comment">// t is chosen to be the size of a digit so we can use faster shifts</span>
-        <span class="comment">// in place of multiplications.</span>
-        <span class="comment">//</span>
-        <span class="comment">// x(t) = x2*t^2 + x1*t + x0</span>
-        <span class="kw">let</span> <span class="ident">x0</span> <span class="op">=</span> <span class="ident">bigint_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>[..<span class="ident">x0_len</span>]);
-        <span class="kw">let</span> <span class="ident">x1</span> <span class="op">=</span> <span class="ident">bigint_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>[<span class="ident">x0_len</span>..<span class="ident">x0_len</span> <span class="op">+</span> <span class="ident">x1_len</span>]);
-        <span class="kw">let</span> <span class="ident">x2</span> <span class="op">=</span> <span class="ident">bigint_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>[<span class="ident">x0_len</span> <span class="op">+</span> <span class="ident">x1_len</span>..]);
+        <span class="comment">// Break x and y into three parts, representating an order two polynomial.
+        // t is chosen to be the size of a digit so we can use faster shifts
+        // in place of multiplications.
+        //
+        // x(t) = x2*t^2 + x1*t + x0
+        </span><span class="kw">let </span>x0 = bigint_from_slice(<span class="kw-2">&amp;</span>x[..x0_len]);
+        <span class="kw">let </span>x1 = bigint_from_slice(<span class="kw-2">&amp;</span>x[x0_len..x0_len + x1_len]);
+        <span class="kw">let </span>x2 = bigint_from_slice(<span class="kw-2">&amp;</span>x[x0_len + x1_len..]);
 
-        <span class="comment">// y(t) = y2*t^2 + y1*t + y0</span>
-        <span class="kw">let</span> <span class="ident">y0</span> <span class="op">=</span> <span class="ident">bigint_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">y</span>[..<span class="ident">y0_len</span>]);
-        <span class="kw">let</span> <span class="ident">y1</span> <span class="op">=</span> <span class="ident">bigint_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">y</span>[<span class="ident">y0_len</span>..<span class="ident">y0_len</span> <span class="op">+</span> <span class="ident">y1_len</span>]);
-        <span class="kw">let</span> <span class="ident">y2</span> <span class="op">=</span> <span class="ident">bigint_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">y</span>[<span class="ident">y0_len</span> <span class="op">+</span> <span class="ident">y1_len</span>..]);
+        <span class="comment">// y(t) = y2*t^2 + y1*t + y0
+        </span><span class="kw">let </span>y0 = bigint_from_slice(<span class="kw-2">&amp;</span>y[..y0_len]);
+        <span class="kw">let </span>y1 = bigint_from_slice(<span class="kw-2">&amp;</span>y[y0_len..y0_len + y1_len]);
+        <span class="kw">let </span>y2 = bigint_from_slice(<span class="kw-2">&amp;</span>y[y0_len + y1_len..]);
 
-        <span class="comment">// Let w(t) = x(t) * y(t)</span>
-        <span class="comment">//</span>
-        <span class="comment">// This gives us the following order-4 polynomial.</span>
-        <span class="comment">//</span>
-        <span class="comment">// w(t) = w4*t^4 + w3*t^3 + w2*t^2 + w1*t + w0</span>
-        <span class="comment">//</span>
-        <span class="comment">// We need to find the coefficients w4, w3, w2, w1 and w0. Instead</span>
-        <span class="comment">// of simply multiplying the x and y in total, we can evaluate w</span>
-        <span class="comment">// at 5 points. An n-degree polynomial is uniquely identified by (n + 1)</span>
-        <span class="comment">// points.</span>
-        <span class="comment">//</span>
-        <span class="comment">// It is arbitrary as to what points we evaluate w at but we use the</span>
-        <span class="comment">// following.</span>
-        <span class="comment">//</span>
-        <span class="comment">// w(t) at t = 0, 1, -1, -2 and inf</span>
-        <span class="comment">//</span>
-        <span class="comment">// The values for w(t) in terms of x(t)*y(t) at these points are:</span>
-        <span class="comment">//</span>
-        <span class="comment">// let a = w(0)   = x0 * y0</span>
-        <span class="comment">// let b = w(1)   = (x2 + x1 + x0) * (y2 + y1 + y0)</span>
-        <span class="comment">// let c = w(-1)  = (x2 - x1 + x0) * (y2 - y1 + y0)</span>
-        <span class="comment">// let d = w(-2)  = (4*x2 - 2*x1 + x0) * (4*y2 - 2*y1 + y0)</span>
-        <span class="comment">// let e = w(inf) = x2 * y2 as t -&gt; inf</span>
+        <span class="comment">// Let w(t) = x(t) * y(t)
+        //
+        // This gives us the following order-4 polynomial.
+        //
+        // w(t) = w4*t^4 + w3*t^3 + w2*t^2 + w1*t + w0
+        //
+        // We need to find the coefficients w4, w3, w2, w1 and w0. Instead
+        // of simply multiplying the x and y in total, we can evaluate w
+        // at 5 points. An n-degree polynomial is uniquely identified by (n + 1)
+        // points.
+        //
+        // It is arbitrary as to what points we evaluate w at but we use the
+        // following.
+        //
+        // w(t) at t = 0, 1, -1, -2 and inf
+        //
+        // The values for w(t) in terms of x(t)*y(t) at these points are:
+        //
+        // let a = w(0)   = x0 * y0
+        // let b = w(1)   = (x2 + x1 + x0) * (y2 + y1 + y0)
+        // let c = w(-1)  = (x2 - x1 + x0) * (y2 - y1 + y0)
+        // let d = w(-2)  = (4*x2 - 2*x1 + x0) * (4*y2 - 2*y1 + y0)
+        // let e = w(inf) = x2 * y2 as t -&gt; inf
 
-        <span class="comment">// x0 + x2, avoiding temporaries</span>
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">x0</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">x2</span>;
+        // x0 + x2, avoiding temporaries
+        </span><span class="kw">let </span>p = <span class="kw-2">&amp;</span>x0 + <span class="kw-2">&amp;</span>x2;
 
-        <span class="comment">// y0 + y2, avoiding temporaries</span>
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">y0</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">y2</span>;
+        <span class="comment">// y0 + y2, avoiding temporaries
+        </span><span class="kw">let </span>q = <span class="kw-2">&amp;</span>y0 + <span class="kw-2">&amp;</span>y2;
 
-        <span class="comment">// x2 - x1 + x0, avoiding temporaries</span>
-        <span class="kw">let</span> <span class="ident">p2</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">p</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="ident">x1</span>;
+        <span class="comment">// x2 - x1 + x0, avoiding temporaries
+        </span><span class="kw">let </span>p2 = <span class="kw-2">&amp;</span>p - <span class="kw-2">&amp;</span>x1;
 
-        <span class="comment">// y2 - y1 + y0, avoiding temporaries</span>
-        <span class="kw">let</span> <span class="ident">q2</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">q</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="ident">y1</span>;
+        <span class="comment">// y2 - y1 + y0, avoiding temporaries
+        </span><span class="kw">let </span>q2 = <span class="kw-2">&amp;</span>q - <span class="kw-2">&amp;</span>y1;
 
-        <span class="comment">// w(0)</span>
-        <span class="kw">let</span> <span class="ident">r0</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">x0</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">y0</span>;
+        <span class="comment">// w(0)
+        </span><span class="kw">let </span>r0 = <span class="kw-2">&amp;</span>x0 * <span class="kw-2">&amp;</span>y0;
 
-        <span class="comment">// w(inf)</span>
-        <span class="kw">let</span> <span class="ident">r4</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">x2</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">y2</span>;
+        <span class="comment">// w(inf)
+        </span><span class="kw">let </span>r4 = <span class="kw-2">&amp;</span>x2 * <span class="kw-2">&amp;</span>y2;
 
-        <span class="comment">// w(1)</span>
-        <span class="kw">let</span> <span class="ident">r1</span> <span class="op">=</span> (<span class="ident">p</span> <span class="op">+</span> <span class="ident">x1</span>) <span class="op">*</span> (<span class="ident">q</span> <span class="op">+</span> <span class="ident">y1</span>);
+        <span class="comment">// w(1)
+        </span><span class="kw">let </span>r1 = (p + x1) * (q + y1);
 
-        <span class="comment">// w(-1)</span>
-        <span class="kw">let</span> <span class="ident">r2</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">p2</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">q2</span>;
+        <span class="comment">// w(-1)
+        </span><span class="kw">let </span>r2 = <span class="kw-2">&amp;</span>p2 * <span class="kw-2">&amp;</span>q2;
 
-        <span class="comment">// w(-2)</span>
-        <span class="kw">let</span> <span class="ident">r3</span> <span class="op">=</span> ((<span class="ident">p2</span> <span class="op">+</span> <span class="ident">x2</span>) <span class="op">*</span> <span class="number">2</span> <span class="op">-</span> <span class="ident">x0</span>) <span class="op">*</span> ((<span class="ident">q2</span> <span class="op">+</span> <span class="ident">y2</span>) <span class="op">*</span> <span class="number">2</span> <span class="op">-</span> <span class="ident">y0</span>);
+        <span class="comment">// w(-2)
+        </span><span class="kw">let </span>r3 = ((p2 + x2) * <span class="number">2 </span>- x0) * ((q2 + y2) * <span class="number">2 </span>- y0);
 
-        <span class="comment">// Evaluating these points gives us the following system of linear equations.</span>
-        <span class="comment">//</span>
-        <span class="comment">//  0  0  0  0  1 | a</span>
-        <span class="comment">//  1  1  1  1  1 | b</span>
-        <span class="comment">//  1 -1  1 -1  1 | c</span>
-        <span class="comment">// 16 -8  4 -2  1 | d</span>
-        <span class="comment">//  1  0  0  0  0 | e</span>
-        <span class="comment">//</span>
-        <span class="comment">// The solved equation (after gaussian elimination or similar)</span>
-        <span class="comment">// in terms of its coefficients:</span>
-        <span class="comment">//</span>
-        <span class="comment">// w0 = w(0)</span>
-        <span class="comment">// w1 = w(0)/2 + w(1)/3 - w(-1) + w(2)/6 - 2*w(inf)</span>
-        <span class="comment">// w2 = -w(0) + w(1)/2 + w(-1)/2 - w(inf)</span>
-        <span class="comment">// w3 = -w(0)/2 + w(1)/6 + w(-1)/2 - w(1)/6</span>
-        <span class="comment">// w4 = w(inf)</span>
-        <span class="comment">//</span>
-        <span class="comment">// This particular sequence is given by Bodrato and is an interpolation</span>
-        <span class="comment">// of the above equations.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comp3</span>: <span class="ident">BigInt</span> <span class="op">=</span> (<span class="ident">r3</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="ident">r1</span>) <span class="op">/</span> <span class="number">3u32</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comp1</span>: <span class="ident">BigInt</span> <span class="op">=</span> (<span class="ident">r1</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="ident">r2</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comp2</span>: <span class="ident">BigInt</span> <span class="op">=</span> <span class="ident">r2</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="ident">r0</span>;
-        <span class="ident">comp3</span> <span class="op">=</span> ((<span class="kw-2">&amp;</span><span class="ident">comp2</span> <span class="op">-</span> <span class="ident">comp3</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>) <span class="op">+</span> (<span class="kw-2">&amp;</span><span class="ident">r4</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>);
-        <span class="ident">comp2</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">comp1</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="ident">r4</span>;
-        <span class="ident">comp1</span> <span class="op">-</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">comp3</span>;
+        <span class="comment">// Evaluating these points gives us the following system of linear equations.
+        //
+        //  0  0  0  0  1 | a
+        //  1  1  1  1  1 | b
+        //  1 -1  1 -1  1 | c
+        // 16 -8  4 -2  1 | d
+        //  1  0  0  0  0 | e
+        //
+        // The solved equation (after gaussian elimination or similar)
+        // in terms of its coefficients:
+        //
+        // w0 = w(0)
+        // w1 = w(0)/2 + w(1)/3 - w(-1) + w(2)/6 - 2*w(inf)
+        // w2 = -w(0) + w(1)/2 + w(-1)/2 - w(inf)
+        // w3 = -w(0)/2 + w(1)/6 + w(-1)/2 - w(1)/6
+        // w4 = w(inf)
+        //
+        // This particular sequence is given by Bodrato and is an interpolation
+        // of the above equations.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>comp3: BigInt = (r3 - <span class="kw-2">&amp;</span>r1) / <span class="number">3u32</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>comp1: BigInt = (r1 - <span class="kw-2">&amp;</span>r2) &gt;&gt; <span class="number">1</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>comp2: BigInt = r2 - <span class="kw-2">&amp;</span>r0;
+        comp3 = ((<span class="kw-2">&amp;</span>comp2 - comp3) &gt;&gt; <span class="number">1</span>) + (<span class="kw-2">&amp;</span>r4 &lt;&lt; <span class="number">1</span>);
+        comp2 += <span class="kw-2">&amp;</span>comp1 - <span class="kw-2">&amp;</span>r4;
+        comp1 -= <span class="kw-2">&amp;</span>comp3;
 
-        <span class="comment">// Recomposition. The coefficients of the polynomial are now known.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Evaluate at w(t) where t is our given base to get the result.</span>
-        <span class="comment">//</span>
-        <span class="comment">//     let bits = u64::from(big_digit::BITS) * i as u64;</span>
-        <span class="comment">//     let result = r0</span>
-        <span class="comment">//         + (comp1 &lt;&lt; bits)</span>
-        <span class="comment">//         + (comp2 &lt;&lt; (2 * bits))</span>
-        <span class="comment">//         + (comp3 &lt;&lt; (3 * bits))</span>
-        <span class="comment">//         + (r4 &lt;&lt; (4 * bits));</span>
-        <span class="comment">//     let result_pos = result.to_biguint().unwrap();</span>
-        <span class="comment">//     add2(&amp;mut acc[..], &amp;result_pos.data);</span>
-        <span class="comment">//</span>
-        <span class="comment">// But with less intermediate copying:</span>
-        <span class="kw">for</span> (<span class="ident">j</span>, <span class="ident">result</span>) <span class="kw">in</span> [<span class="kw-2">&amp;</span><span class="ident">r0</span>, <span class="kw-2">&amp;</span><span class="ident">comp1</span>, <span class="kw-2">&amp;</span><span class="ident">comp2</span>, <span class="kw-2">&amp;</span><span class="ident">comp3</span>, <span class="kw-2">&amp;</span><span class="ident">r4</span>].<span class="ident">iter</span>().<span class="ident">enumerate</span>().<span class="ident">rev</span>() {
-            <span class="kw">match</span> <span class="ident">result</span>.<span class="ident">sign</span>() {
-                <span class="ident">Plus</span> =&gt; <span class="ident">add2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>[<span class="ident">i</span> <span class="op">*</span> <span class="ident">j</span>..], <span class="ident">result</span>.<span class="ident">digits</span>()),
-                <span class="ident">Minus</span> =&gt; <span class="ident">sub2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>[<span class="ident">i</span> <span class="op">*</span> <span class="ident">j</span>..], <span class="ident">result</span>.<span class="ident">digits</span>()),
-                <span class="ident">NoSign</span> =&gt; {}
+        <span class="comment">// Recomposition. The coefficients of the polynomial are now known.
+        //
+        // Evaluate at w(t) where t is our given base to get the result.
+        //
+        //     let bits = u64::from(big_digit::BITS) * i as u64;
+        //     let result = r0
+        //         + (comp1 &lt;&lt; bits)
+        //         + (comp2 &lt;&lt; (2 * bits))
+        //         + (comp3 &lt;&lt; (3 * bits))
+        //         + (r4 &lt;&lt; (4 * bits));
+        //     let result_pos = result.to_biguint().unwrap();
+        //     add2(&amp;mut acc[..], &amp;result_pos.data);
+        //
+        // But with less intermediate copying:
+        </span><span class="kw">for </span>(j, result) <span class="kw">in </span>[<span class="kw-2">&amp;</span>r0, <span class="kw-2">&amp;</span>comp1, <span class="kw-2">&amp;</span>comp2, <span class="kw-2">&amp;</span>comp3, <span class="kw-2">&amp;</span>r4].iter().enumerate().rev() {
+            <span class="kw">match </span>result.sign() {
+                Plus =&gt; add2(<span class="kw-2">&amp;mut </span>acc[i * j..], result.digits()),
+                Minus =&gt; sub2(<span class="kw-2">&amp;mut </span>acc[i * j..], result.digits()),
+                NoSign =&gt; {}
             }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">mul3</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>], <span class="ident">y</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) -&gt; <span class="ident">BigUint</span> {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">y</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prod</span> <span class="op">=</span> <span class="ident">BigUint</span> { <span class="ident">data</span>: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">len</span>] };
+<span class="kw">fn </span>mul3(x: <span class="kw-2">&amp;</span>[BigDigit], y: <span class="kw-2">&amp;</span>[BigDigit]) -&gt; BigUint {
+    <span class="kw">let </span>len = x.len() + y.len() + <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>prod = BigUint { data: <span class="macro">vec!</span>[<span class="number">0</span>; len] };
 
-    <span class="ident">mac3</span>(<span class="kw-2">&amp;mut</span> <span class="ident">prod</span>.<span class="ident">data</span>, <span class="ident">x</span>, <span class="ident">y</span>);
-    <span class="ident">prod</span>.<span class="ident">normalized</span>()
+    mac3(<span class="kw-2">&amp;mut </span>prod.data, x, y);
+    prod.normalized()
 }
 
-<span class="kw">fn</span> <span class="ident">scalar_mul</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BigUint</span>, <span class="ident">b</span>: <span class="ident">BigDigit</span>) {
-    <span class="kw">match</span> <span class="ident">b</span> {
-        <span class="number">0</span> =&gt; <span class="ident">a</span>.<span class="ident">set_zero</span>(),
-        <span class="number">1</span> =&gt; {}
-        <span class="kw">_</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_power_of_two</span>() {
-                <span class="kw-2">*</span><span class="ident">a</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="ident">b</span>.<span class="ident">trailing_zeros</span>();
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">for</span> <span class="ident">a</span> <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">iter_mut</span>() {
-                    <span class="kw-2">*</span><span class="ident">a</span> <span class="op">=</span> <span class="ident">mul_with_carry</span>(<span class="kw-2">*</span><span class="ident">a</span>, <span class="ident">b</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry</span>);
+<span class="kw">fn </span>scalar_mul(a: <span class="kw-2">&amp;mut </span>BigUint, b: BigDigit) {
+    <span class="kw">match </span>b {
+        <span class="number">0 </span>=&gt; a.set_zero(),
+        <span class="number">1 </span>=&gt; {}
+        <span class="kw">_ </span>=&gt; {
+            <span class="kw">if </span>b.is_power_of_two() {
+                <span class="kw-2">*</span>a &lt;&lt;= b.trailing_zeros();
+            } <span class="kw">else </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>carry = <span class="number">0</span>;
+                <span class="kw">for </span>a <span class="kw">in </span>a.data.iter_mut() {
+                    <span class="kw-2">*</span>a = mul_with_carry(<span class="kw-2">*</span>a, b, <span class="kw-2">&amp;mut </span>carry);
                 }
-                <span class="kw">if</span> <span class="ident">carry</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">carry</span> <span class="kw">as</span> <span class="ident">BigDigit</span>);
+                <span class="kw">if </span>carry != <span class="number">0 </span>{
+                    a.data.push(carry <span class="kw">as </span>BigDigit);
                 }
             }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">sub_sign</span>(<span class="kw-2">mut</span> <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>], <span class="kw-2">mut</span> <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) -&gt; (<span class="ident">Sign</span>, <span class="ident">BigUint</span>) {
-    <span class="comment">// Normalize:</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) <span class="op">=</span> <span class="ident">a</span>.<span class="ident">last</span>() {
-        <span class="ident">a</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">a</span>[..<span class="ident">a</span>.<span class="ident">iter</span>().<span class="ident">rposition</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>).<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>)];
+<span class="kw">fn </span>sub_sign(<span class="kw-2">mut </span>a: <span class="kw-2">&amp;</span>[BigDigit], <span class="kw-2">mut </span>b: <span class="kw-2">&amp;</span>[BigDigit]) -&gt; (Sign, BigUint) {
+    <span class="comment">// Normalize:
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) = a.last() {
+        a = <span class="kw-2">&amp;</span>a[..a.iter().rposition(|<span class="kw-2">&amp;</span>x| x != <span class="number">0</span>).map_or(<span class="number">0</span>, |i| i + <span class="number">1</span>)];
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) <span class="op">=</span> <span class="ident">b</span>.<span class="ident">last</span>() {
-        <span class="ident">b</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">b</span>[..<span class="ident">b</span>.<span class="ident">iter</span>().<span class="ident">rposition</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>).<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>)];
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) = b.last() {
+        b = <span class="kw-2">&amp;</span>b[..b.iter().rposition(|<span class="kw-2">&amp;</span>x| x != <span class="number">0</span>).map_or(<span class="number">0</span>, |i| i + <span class="number">1</span>)];
     }
 
-    <span class="kw">match</span> <span class="ident">cmp_slice</span>(<span class="ident">a</span>, <span class="ident">b</span>) {
-        <span class="ident">Ordering::Greater</span> =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">to_vec</span>();
-            <span class="ident">sub2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">a</span>, <span class="ident">b</span>);
-            (<span class="ident">Plus</span>, <span class="ident">biguint_from_vec</span>(<span class="ident">a</span>))
+    <span class="kw">match </span>cmp_slice(a, b) {
+        Ordering::Greater =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>a = a.to_vec();
+            sub2(<span class="kw-2">&amp;mut </span>a, b);
+            (Plus, biguint_from_vec(a))
         }
-        <span class="ident">Ordering::Less</span> =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">to_vec</span>();
-            <span class="ident">sub2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>, <span class="ident">a</span>);
-            (<span class="ident">Minus</span>, <span class="ident">biguint_from_vec</span>(<span class="ident">b</span>))
+        Ordering::Less =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>b = b.to_vec();
+            sub2(<span class="kw-2">&amp;mut </span>b, a);
+            (Minus, biguint_from_vec(b))
         }
-        <span class="ident">Ordering::Equal</span> =&gt; (<span class="ident">NoSign</span>, <span class="ident">Zero::zero</span>()),
+        Ordering::Equal =&gt; (NoSign, Zero::zero()),
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_mul</span> {
-    ($(<span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">lifetime</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">Other</span>:<span class="ident">ty</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Self</span>:<span class="ident">ty</span>;)<span class="kw-2">*</span>) =&gt; {$(
-        <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">Other</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Self</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="macro">macro_rules! </span>impl_mul {
+    ($(<span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$a</span>:lifetime),<span class="kw-2">*</span>&gt; Mul&lt;<span class="macro-nonterminal">$Other</span>:ty&gt; <span class="kw">for </span><span class="macro-nonterminal">$Self</span>:ty;)<span class="kw-2">*</span>) =&gt; {$(
+        <span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$a</span>),<span class="kw-2">*</span>&gt; Mul&lt;<span class="macro-nonterminal">$Other</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$Self </span>{
+            <span class="kw">type </span>Output = BigUint;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Other</span>) -&gt; <span class="ident">BigUint</span> {
-                <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">other</span>.<span class="ident">data</span>) {
-                    <span class="comment">// multiply by zero</span>
-                    (<span class="kw-2">&amp;</span>[], <span class="kw">_</span>) <span class="op">|</span> (<span class="kw">_</span>, <span class="kw-2">&amp;</span>[]) =&gt; <span class="ident">BigUint::zero</span>(),
-                    <span class="comment">// multiply by a scalar</span>
-                    (<span class="kw">_</span>, <span class="kw-2">&amp;</span>[<span class="ident">digit</span>]) =&gt; <span class="self">self</span> <span class="op">*</span> <span class="ident">digit</span>,
-                    (<span class="kw-2">&amp;</span>[<span class="ident">digit</span>], <span class="kw">_</span>) =&gt; <span class="ident">other</span> <span class="op">*</span> <span class="ident">digit</span>,
-                    <span class="comment">// full multiplication</span>
-                    (<span class="ident">x</span>, <span class="ident">y</span>) =&gt; <span class="ident">mul3</span>(<span class="ident">x</span>, <span class="ident">y</span>),
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>mul(<span class="self">self</span>, other: <span class="macro-nonterminal">$Other</span>) -&gt; BigUint {
+                <span class="kw">match </span>(<span class="kw-2">&amp;*</span><span class="self">self</span>.data, <span class="kw-2">&amp;*</span>other.data) {
+                    <span class="comment">// multiply by zero
+                    </span>(<span class="kw-2">&amp;</span>[], <span class="kw">_</span>) | (<span class="kw">_</span>, <span class="kw-2">&amp;</span>[]) =&gt; BigUint::zero(),
+                    <span class="comment">// multiply by a scalar
+                    </span>(<span class="kw">_</span>, <span class="kw-2">&amp;</span>[digit]) =&gt; <span class="self">self </span>* digit,
+                    (<span class="kw-2">&amp;</span>[digit], <span class="kw">_</span>) =&gt; other * digit,
+                    <span class="comment">// full multiplication
+                    </span>(x, y) =&gt; mul3(x, y),
                 }
             }
         }
     )<span class="kw-2">*</span>}
 }
-<span class="macro">impl_mul!</span> {
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="op">&gt;</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>;
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>;
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span>;
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span>;
+<span class="macro">impl_mul! </span>{
+    <span class="kw">impl</span>&lt;&gt; Mul&lt;BigUint&gt; <span class="kw">for </span>BigUint;
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>&gt; Mul&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>BigUint&gt; <span class="kw">for </span>BigUint;
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Mul&lt;BigUint&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint;
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Mul&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>BigUint&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint;
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_mul_assign</span> {
-    ($(<span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">lifetime</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">MulAssign</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">Other</span>:<span class="ident">ty</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>;)<span class="kw-2">*</span>) =&gt; {$(
-        <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">MulAssign</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">Other</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Other</span>) {
-                <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">other</span>.<span class="ident">data</span>) {
-                    <span class="comment">// multiply by zero</span>
-                    (<span class="kw-2">&amp;</span>[], <span class="kw">_</span>) =&gt; {},
-                    (<span class="kw">_</span>, <span class="kw-2">&amp;</span>[]) =&gt; <span class="self">self</span>.<span class="ident">set_zero</span>(),
-                    <span class="comment">// multiply by a scalar</span>
-                    (<span class="kw">_</span>, <span class="kw-2">&amp;</span>[<span class="ident">digit</span>]) =&gt; <span class="kw-2">*</span><span class="self">self</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">digit</span>,
-                    (<span class="kw-2">&amp;</span>[<span class="ident">digit</span>], <span class="kw">_</span>) =&gt; <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">other</span> <span class="op">*</span> <span class="ident">digit</span>,
-                    <span class="comment">// full multiplication</span>
-                    (<span class="ident">x</span>, <span class="ident">y</span>) =&gt; <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">mul3</span>(<span class="ident">x</span>, <span class="ident">y</span>),
+<span class="macro">macro_rules! </span>impl_mul_assign {
+    ($(<span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$a</span>:lifetime),<span class="kw-2">*</span>&gt; MulAssign&lt;<span class="macro-nonterminal">$Other</span>:ty&gt; <span class="kw">for </span>BigUint;)<span class="kw-2">*</span>) =&gt; {$(
+        <span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$a</span>),<span class="kw-2">*</span>&gt; MulAssign&lt;<span class="macro-nonterminal">$Other</span>&gt; <span class="kw">for </span>BigUint {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="macro-nonterminal">$Other</span>) {
+                <span class="kw">match </span>(<span class="kw-2">&amp;*</span><span class="self">self</span>.data, <span class="kw-2">&amp;*</span>other.data) {
+                    <span class="comment">// multiply by zero
+                    </span>(<span class="kw-2">&amp;</span>[], <span class="kw">_</span>) =&gt; {},
+                    (<span class="kw">_</span>, <span class="kw-2">&amp;</span>[]) =&gt; <span class="self">self</span>.set_zero(),
+                    <span class="comment">// multiply by a scalar
+                    </span>(<span class="kw">_</span>, <span class="kw-2">&amp;</span>[digit]) =&gt; <span class="kw-2">*</span><span class="self">self </span><span class="kw-2">*</span>= digit,
+                    (<span class="kw-2">&amp;</span>[digit], <span class="kw">_</span>) =&gt; <span class="kw-2">*</span><span class="self">self </span>= other * digit,
+                    <span class="comment">// full multiplication
+                    </span>(x, y) =&gt; <span class="kw-2">*</span><span class="self">self </span>= mul3(x, y),
                 }
             }
         }
     )<span class="kw-2">*</span>}
 }
-<span class="macro">impl_mul_assign!</span> {
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="op">&gt;</span> <span class="ident">MulAssign</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>;
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MulAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>;
+<span class="macro">impl_mul_assign! </span>{
+    <span class="kw">impl</span>&lt;&gt; MulAssign&lt;BigUint&gt; <span class="kw">for </span>BigUint;
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MulAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint&gt; <span class="kw">for </span>BigUint;
 }
 
-<span class="macro">promote_unsigned_scalars!</span>(<span class="kw">impl</span> <span class="ident">Mul</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">mul</span>);
-<span class="macro">promote_unsigned_scalars_assign!</span>(<span class="kw">impl</span> <span class="ident">MulAssign</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">mul_assign</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val_commutative!</span>(<span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">mul</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val_commutative!</span>(<span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">mul</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val_commutative!</span>(<span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">mul</span>);
+<span class="macro">promote_unsigned_scalars!</span>(<span class="kw">impl </span>Mul <span class="kw">for </span>BigUint, mul);
+<span class="macro">promote_unsigned_scalars_assign!</span>(<span class="kw">impl </span>MulAssign <span class="kw">for </span>BigUint, mul_assign);
+<span class="macro">forward_all_scalar_binop_to_val_val_commutative!</span>(<span class="kw">impl </span>Mul&lt;u32&gt; <span class="kw">for </span>BigUint, mul);
+<span class="macro">forward_all_scalar_binop_to_val_val_commutative!</span>(<span class="kw">impl </span>Mul&lt;u64&gt; <span class="kw">for </span>BigUint, mul);
+<span class="macro">forward_all_scalar_binop_to_val_val_commutative!</span>(<span class="kw">impl </span>Mul&lt;u128&gt; <span class="kw">for </span>BigUint, mul);
 
-<span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl </span>Mul&lt;u32&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="self">self</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="self">self</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>mul(<span class="kw-2">mut </span><span class="self">self</span>, other: u32) -&gt; BigUint {
+        <span class="self">self </span><span class="kw-2">*</span>= other;
+        <span class="self">self
+    </span>}
+}
+<span class="kw">impl </span>MulAssign&lt;u32&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u32) {
+        scalar_mul(<span class="self">self</span>, other <span class="kw">as </span>BigDigit);
     }
 }
-<span class="kw">impl</span> <span class="ident">MulAssign</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) {
-        <span class="ident">scalar_mul</span>(<span class="self">self</span>, <span class="ident">other</span> <span class="kw">as</span> <span class="ident">BigDigit</span>);
-    }
-}
 
-<span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl </span>Mul&lt;u64&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="self">self</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="self">self</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>mul(<span class="kw-2">mut </span><span class="self">self</span>, other: u64) -&gt; BigUint {
+        <span class="self">self </span><span class="kw-2">*</span>= other;
+        <span class="self">self
+    </span>}
 }
-<span class="kw">impl</span> <span class="ident">MulAssign</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">other</span>) <span class="op">=</span> <span class="ident">BigDigit::from_u64</span>(<span class="ident">other</span>) {
-            <span class="ident">scalar_mul</span>(<span class="self">self</span>, <span class="ident">other</span>);
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> (<span class="ident">hi</span>, <span class="ident">lo</span>) <span class="op">=</span> <span class="ident">big_digit::from_doublebigdigit</span>(<span class="ident">other</span>);
-            <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">mul3</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span>[<span class="ident">lo</span>, <span class="ident">hi</span>]);
+<span class="kw">impl </span>MulAssign&lt;u64&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[cfg(not(u64_digit))]
+    #[inline]
+    </span><span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u64) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(other) = BigDigit::from_u64(other) {
+            scalar_mul(<span class="self">self</span>, other);
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>(hi, lo) = big_digit::from_doublebigdigit(other);
+            <span class="kw-2">*</span><span class="self">self </span>= mul3(<span class="kw-2">&amp;</span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>[lo, hi]);
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">u64_digit</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) {
-        <span class="ident">scalar_mul</span>(<span class="self">self</span>, <span class="ident">other</span>);
+    <span class="attribute">#[cfg(u64_digit)]
+    #[inline]
+    </span><span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u64) {
+        scalar_mul(<span class="self">self</span>, other);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl </span>Mul&lt;u128&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="self">self</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="self">self</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>mul(<span class="kw-2">mut </span><span class="self">self</span>, other: u128) -&gt; BigUint {
+        <span class="self">self </span><span class="kw-2">*</span>= other;
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">MulAssign</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">other</span>) <span class="op">=</span> <span class="ident">BigDigit::from_u128</span>(<span class="ident">other</span>) {
-            <span class="ident">scalar_mul</span>(<span class="self">self</span>, <span class="ident">other</span>);
-        } <span class="kw">else</span> {
-            <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">u32_from_u128</span>(<span class="ident">other</span>) {
-                (<span class="number">0</span>, <span class="number">0</span>, <span class="ident">c</span>, <span class="ident">d</span>) =&gt; <span class="ident">mul3</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span>[<span class="ident">d</span>, <span class="ident">c</span>]),
-                (<span class="number">0</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>) =&gt; <span class="ident">mul3</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span>[<span class="ident">d</span>, <span class="ident">c</span>, <span class="ident">b</span>]),
-                (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>) =&gt; <span class="ident">mul3</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span>[<span class="ident">d</span>, <span class="ident">c</span>, <span class="ident">b</span>, <span class="ident">a</span>]),
+<span class="kw">impl </span>MulAssign&lt;u128&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[cfg(not(u64_digit))]
+    #[inline]
+    </span><span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u128) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(other) = BigDigit::from_u128(other) {
+            scalar_mul(<span class="self">self</span>, other);
+        } <span class="kw">else </span>{
+            <span class="kw-2">*</span><span class="self">self </span>= <span class="kw">match </span>u32_from_u128(other) {
+                (<span class="number">0</span>, <span class="number">0</span>, c, d) =&gt; mul3(<span class="kw-2">&amp;</span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>[d, c]),
+                (<span class="number">0</span>, b, c, d) =&gt; mul3(<span class="kw-2">&amp;</span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>[d, c, b]),
+                (a, b, c, d) =&gt; mul3(<span class="kw-2">&amp;</span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>[d, c, b, a]),
             };
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">u64_digit</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">other</span>) <span class="op">=</span> <span class="ident">BigDigit::from_u128</span>(<span class="ident">other</span>) {
-            <span class="ident">scalar_mul</span>(<span class="self">self</span>, <span class="ident">other</span>);
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> (<span class="ident">hi</span>, <span class="ident">lo</span>) <span class="op">=</span> <span class="ident">big_digit::from_doublebigdigit</span>(<span class="ident">other</span>);
-            <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">mul3</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span>[<span class="ident">lo</span>, <span class="ident">hi</span>]);
+    <span class="attribute">#[cfg(u64_digit)]
+    #[inline]
+    </span><span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u128) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(other) = BigDigit::from_u128(other) {
+            scalar_mul(<span class="self">self</span>, other);
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>(hi, lo) = big_digit::from_doublebigdigit(other);
+            <span class="kw-2">*</span><span class="self">self </span>= mul3(<span class="kw-2">&amp;</span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>[lo, hi]);
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CheckedMul</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">BigUint</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">mul</span>(<span class="ident">v</span>))
+<span class="kw">impl </span>CheckedMul <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_mul(<span class="kw-2">&amp;</span><span class="self">self</span>, v: <span class="kw-2">&amp;</span>BigUint) -&gt; <span class="prelude-ty">Option</span>&lt;BigUint&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.mul(v))
     }
 }
 
-<span class="macro">impl_product_iter_type!</span>(<span class="ident">BigUint</span>);
+<span class="macro">impl_product_iter_type!</span>(BigUint);
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_sub_sign</span>() {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::BigInt</span>;
-    <span class="kw">use</span> <span class="ident">num_traits::Num</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_sub_sign() {
+    <span class="kw">use </span><span class="kw">crate</span>::BigInt;
+    <span class="kw">use </span>num_traits::Num;
 
-    <span class="kw">fn</span> <span class="ident">sub_sign_i</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">let</span> (<span class="ident">sign</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">sub_sign</span>(<span class="ident">a</span>, <span class="ident">b</span>);
-        <span class="ident">BigInt::from_biguint</span>(<span class="ident">sign</span>, <span class="ident">val</span>)
+    <span class="kw">fn </span>sub_sign_i(a: <span class="kw-2">&amp;</span>[BigDigit], b: <span class="kw-2">&amp;</span>[BigDigit]) -&gt; BigInt {
+        <span class="kw">let </span>(sign, val) = sub_sign(a, b);
+        BigInt::from_biguint(sign, val)
     }
 
-    <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">BigUint::from_str_radix</span>(<span class="string">&quot;265252859812191058636308480000000&quot;</span>, <span class="number">10</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">BigUint::from_str_radix</span>(<span class="string">&quot;26525285981219105863630848000000&quot;</span>, <span class="number">10</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">a_i</span> <span class="op">=</span> <span class="ident">BigInt::from</span>(<span class="ident">a</span>.<span class="ident">clone</span>());
-    <span class="kw">let</span> <span class="ident">b_i</span> <span class="op">=</span> <span class="ident">BigInt::from</span>(<span class="ident">b</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>a = BigUint::from_str_radix(<span class="string">&quot;265252859812191058636308480000000&quot;</span>, <span class="number">10</span>).unwrap();
+    <span class="kw">let </span>b = BigUint::from_str_radix(<span class="string">&quot;26525285981219105863630848000000&quot;</span>, <span class="number">10</span>).unwrap();
+    <span class="kw">let </span>a_i = BigInt::from(a.clone());
+    <span class="kw">let </span>b_i = BigInt::from(b.clone());
 
-    <span class="macro">assert_eq!</span>(<span class="ident">sub_sign_i</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">data</span>), <span class="kw-2">&amp;</span><span class="ident">a_i</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="ident">b_i</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">sub_sign_i</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">data</span>), <span class="kw-2">&amp;</span><span class="ident">b_i</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="ident">a_i</span>);
+    <span class="macro">assert_eq!</span>(sub_sign_i(<span class="kw-2">&amp;</span>a.data, <span class="kw-2">&amp;</span>b.data), <span class="kw-2">&amp;</span>a_i - <span class="kw-2">&amp;</span>b_i);
+    <span class="macro">assert_eq!</span>(sub_sign_i(<span class="kw-2">&amp;</span>b.data, <span class="kw-2">&amp;</span>a.data), <span class="kw-2">&amp;</span>b_i - <span class="kw-2">&amp;</span>a_i);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

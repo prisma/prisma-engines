@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rust_decimal-1.26.1/src/ops/add.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>add.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rust_decimal/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rust_decimal-1.26.1/src/ops/add.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>add.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rust_decimal/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -380,387 +380,387 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="ident">MAX_I32_SCALE</span>, <span class="ident">POWERS_10</span>, <span class="ident">SCALE_MASK</span>, <span class="ident">SCALE_SHIFT</span>, <span class="ident">SIGN_MASK</span>, <span class="ident">U32_MASK</span>, <span class="ident">U32_MAX</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::decimal</span>::{<span class="ident">CalculationResult</span>, <span class="ident">Decimal</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ops::common</span>::{<span class="ident">Buf24</span>, <span class="ident">Dec64</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::constants::{MAX_I32_SCALE, POWERS_10, SCALE_MASK, SCALE_SHIFT, SIGN_MASK, U32_MASK, U32_MAX};
+<span class="kw">use </span><span class="kw">crate</span>::decimal::{CalculationResult, Decimal};
+<span class="kw">use </span><span class="kw">crate</span>::ops::common::{Buf24, Dec64};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">add_impl</span>(<span class="ident">d1</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>, <span class="ident">d2</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="ident">CalculationResult</span> {
-    <span class="ident">add_sub_internal</span>(<span class="ident">d1</span>, <span class="ident">d2</span>, <span class="bool-val">false</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add_impl(d1: <span class="kw-2">&amp;</span>Decimal, d2: <span class="kw-2">&amp;</span>Decimal) -&gt; CalculationResult {
+    add_sub_internal(d1, d2, <span class="bool-val">false</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sub_impl</span>(<span class="ident">d1</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>, <span class="ident">d2</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="ident">CalculationResult</span> {
-    <span class="ident">add_sub_internal</span>(<span class="ident">d1</span>, <span class="ident">d2</span>, <span class="bool-val">true</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sub_impl(d1: <span class="kw-2">&amp;</span>Decimal, d2: <span class="kw-2">&amp;</span>Decimal) -&gt; CalculationResult {
+    add_sub_internal(d1, d2, <span class="bool-val">true</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">add_sub_internal</span>(<span class="ident">d1</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>, <span class="ident">d2</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>, <span class="ident">subtract</span>: <span class="ident">bool</span>) -&gt; <span class="ident">CalculationResult</span> {
-    <span class="kw">if</span> <span class="ident">d1</span>.<span class="ident">is_zero</span>() {
-        <span class="comment">// 0 - x or 0 + x</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">d2</span>;
-        <span class="kw">if</span> <span class="ident">subtract</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">d2</span>.<span class="ident">is_zero</span>() {
-            <span class="ident">result</span>.<span class="ident">set_sign_negative</span>(<span class="ident">d2</span>.<span class="ident">is_sign_positive</span>());
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>add_sub_internal(d1: <span class="kw-2">&amp;</span>Decimal, d2: <span class="kw-2">&amp;</span>Decimal, subtract: bool) -&gt; CalculationResult {
+    <span class="kw">if </span>d1.is_zero() {
+        <span class="comment">// 0 - x or 0 + x
+        </span><span class="kw">let </span><span class="kw-2">mut </span>result = <span class="kw-2">*</span>d2;
+        <span class="kw">if </span>subtract &amp;&amp; !d2.is_zero() {
+            result.set_sign_negative(d2.is_sign_positive());
         }
-        <span class="kw">return</span> <span class="ident">CalculationResult::Ok</span>(<span class="ident">result</span>);
+        <span class="kw">return </span>CalculationResult::Ok(result);
     }
-    <span class="kw">if</span> <span class="ident">d2</span>.<span class="ident">is_zero</span>() {
-        <span class="comment">// x - 0 or x + 0</span>
-        <span class="kw">return</span> <span class="ident">CalculationResult::Ok</span>(<span class="kw-2">*</span><span class="ident">d1</span>);
+    <span class="kw">if </span>d2.is_zero() {
+        <span class="comment">// x - 0 or x + 0
+        </span><span class="kw">return </span>CalculationResult::Ok(<span class="kw-2">*</span>d1);
     }
 
-    <span class="comment">// Work out whether we need to rescale and/or if it&#39;s a subtract still given the signs of the</span>
-    <span class="comment">// numbers.</span>
-    <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">d1</span>.<span class="ident">flags</span>() <span class="op">^</span> <span class="ident">d2</span>.<span class="ident">flags</span>();
-    <span class="kw">let</span> <span class="ident">subtract</span> <span class="op">=</span> <span class="ident">subtract</span> <span class="op">^</span> ((<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">SIGN_MASK</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
-    <span class="kw">let</span> <span class="ident">rescale</span> <span class="op">=</span> (<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">SCALE_MASK</span>) <span class="op">&gt;</span> <span class="number">0</span>;
+    <span class="comment">// Work out whether we need to rescale and/or if it&#39;s a subtract still given the signs of the
+    // numbers.
+    </span><span class="kw">let </span>flags = d1.flags() ^ d2.flags();
+    <span class="kw">let </span>subtract = subtract ^ ((flags &amp; SIGN_MASK) != <span class="number">0</span>);
+    <span class="kw">let </span>rescale = (flags &amp; SCALE_MASK) &gt; <span class="number">0</span>;
 
-    <span class="comment">// We optimize towards using 32 bit logic as much as possible. It&#39;s noticeably faster at</span>
-    <span class="comment">// scale, even on 64 bit machines</span>
-    <span class="kw">if</span> <span class="ident">d1</span>.<span class="ident">mid</span>() <span class="op">|</span> <span class="ident">d1</span>.<span class="ident">hi</span>() <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">d2</span>.<span class="ident">mid</span>() <span class="op">|</span> <span class="ident">d2</span>.<span class="ident">hi</span>() <span class="op">==</span> <span class="number">0</span> {
-        <span class="comment">// We&#39;ll try to rescale, however we may end up with 64 bit (or more) numbers</span>
-        <span class="comment">// If we do, we&#39;ll choose a different flow than fast_add</span>
-        <span class="kw">if</span> <span class="ident">rescale</span> {
-            <span class="comment">// This is less optimized if we scale to a 64 bit integer. We can add some further logic</span>
-            <span class="comment">// here later on.</span>
-            <span class="kw">let</span> <span class="ident">rescale_factor</span> <span class="op">=</span> ((<span class="ident">d2</span>.<span class="ident">flags</span>() <span class="op">&amp;</span> <span class="ident">SCALE_MASK</span>) <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> (<span class="ident">d1</span>.<span class="ident">flags</span>() <span class="op">&amp;</span> <span class="ident">SCALE_MASK</span>) <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SCALE_SHIFT</span>;
-            <span class="kw">if</span> <span class="ident">rescale_factor</span> <span class="op">&lt;</span> <span class="number">0</span> {
-                <span class="comment">// We try to rescale the rhs</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rescaled</span>) <span class="op">=</span> <span class="ident">rescale32</span>(<span class="ident">d2</span>.<span class="ident">lo</span>(), <span class="op">-</span><span class="ident">rescale_factor</span>) {
-                    <span class="kw">return</span> <span class="ident">fast_add</span>(<span class="ident">d1</span>.<span class="ident">lo</span>(), <span class="ident">rescaled</span>, <span class="ident">d1</span>.<span class="ident">flags</span>(), <span class="ident">subtract</span>);
+    <span class="comment">// We optimize towards using 32 bit logic as much as possible. It&#39;s noticeably faster at
+    // scale, even on 64 bit machines
+    </span><span class="kw">if </span>d1.mid() | d1.hi() == <span class="number">0 </span>&amp;&amp; d2.mid() | d2.hi() == <span class="number">0 </span>{
+        <span class="comment">// We&#39;ll try to rescale, however we may end up with 64 bit (or more) numbers
+        // If we do, we&#39;ll choose a different flow than fast_add
+        </span><span class="kw">if </span>rescale {
+            <span class="comment">// This is less optimized if we scale to a 64 bit integer. We can add some further logic
+            // here later on.
+            </span><span class="kw">let </span>rescale_factor = ((d2.flags() &amp; SCALE_MASK) <span class="kw">as </span>i32 - (d1.flags() &amp; SCALE_MASK) <span class="kw">as </span>i32) &gt;&gt; SCALE_SHIFT;
+            <span class="kw">if </span>rescale_factor &lt; <span class="number">0 </span>{
+                <span class="comment">// We try to rescale the rhs
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(rescaled) = rescale32(d2.lo(), -rescale_factor) {
+                    <span class="kw">return </span>fast_add(d1.lo(), rescaled, d1.flags(), subtract);
                 }
-            } <span class="kw">else</span> {
-                <span class="comment">// We try to rescale the lhs</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rescaled</span>) <span class="op">=</span> <span class="ident">rescale32</span>(<span class="ident">d1</span>.<span class="ident">lo</span>(), <span class="ident">rescale_factor</span>) {
-                    <span class="kw">return</span> <span class="ident">fast_add</span>(
-                        <span class="ident">rescaled</span>,
-                        <span class="ident">d2</span>.<span class="ident">lo</span>(),
-                        (<span class="ident">d2</span>.<span class="ident">flags</span>() <span class="op">&amp;</span> <span class="ident">SCALE_MASK</span>) <span class="op">|</span> (<span class="ident">d1</span>.<span class="ident">flags</span>() <span class="op">&amp;</span> <span class="ident">SIGN_MASK</span>),
-                        <span class="ident">subtract</span>,
+            } <span class="kw">else </span>{
+                <span class="comment">// We try to rescale the lhs
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(rescaled) = rescale32(d1.lo(), rescale_factor) {
+                    <span class="kw">return </span>fast_add(
+                        rescaled,
+                        d2.lo(),
+                        (d2.flags() &amp; SCALE_MASK) | (d1.flags() &amp; SIGN_MASK),
+                        subtract,
                     );
                 }
             }
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="ident">fast_add</span>(<span class="ident">d1</span>.<span class="ident">lo</span>(), <span class="ident">d2</span>.<span class="ident">lo</span>(), <span class="ident">d1</span>.<span class="ident">flags</span>(), <span class="ident">subtract</span>);
+        } <span class="kw">else </span>{
+            <span class="kw">return </span>fast_add(d1.lo(), d2.lo(), d1.flags(), subtract);
         }
     }
 
-    <span class="comment">// Continue on with the slower 64 bit method</span>
-    <span class="kw">let</span> <span class="ident">d1</span> <span class="op">=</span> <span class="ident">Dec64::new</span>(<span class="ident">d1</span>);
-    <span class="kw">let</span> <span class="ident">d2</span> <span class="op">=</span> <span class="ident">Dec64::new</span>(<span class="ident">d2</span>);
+    <span class="comment">// Continue on with the slower 64 bit method
+    </span><span class="kw">let </span>d1 = Dec64::new(d1);
+    <span class="kw">let </span>d2 = Dec64::new(d2);
 
-    <span class="comment">// If we&#39;re not the same scale then make sure we&#39;re there first before starting addition</span>
-    <span class="kw">if</span> <span class="ident">rescale</span> {
-        <span class="kw">let</span> <span class="ident">rescale_factor</span> <span class="op">=</span> <span class="ident">d2</span>.<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="ident">d1</span>.<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="kw">if</span> <span class="ident">rescale_factor</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">negative</span> <span class="op">=</span> <span class="ident">subtract</span> <span class="op">^</span> <span class="ident">d1</span>.<span class="ident">negative</span>;
-            <span class="kw">let</span> <span class="ident">scale</span> <span class="op">=</span> <span class="ident">d1</span>.<span class="ident">scale</span>;
-            <span class="ident">unaligned_add</span>(<span class="ident">d2</span>, <span class="ident">d1</span>, <span class="ident">negative</span>, <span class="ident">scale</span>, <span class="op">-</span><span class="ident">rescale_factor</span>, <span class="ident">subtract</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">negative</span> <span class="op">=</span> <span class="ident">d1</span>.<span class="ident">negative</span>;
-            <span class="kw">let</span> <span class="ident">scale</span> <span class="op">=</span> <span class="ident">d2</span>.<span class="ident">scale</span>;
-            <span class="ident">unaligned_add</span>(<span class="ident">d1</span>, <span class="ident">d2</span>, <span class="ident">negative</span>, <span class="ident">scale</span>, <span class="ident">rescale_factor</span>, <span class="ident">subtract</span>)
+    <span class="comment">// If we&#39;re not the same scale then make sure we&#39;re there first before starting addition
+    </span><span class="kw">if </span>rescale {
+        <span class="kw">let </span>rescale_factor = d2.scale <span class="kw">as </span>i32 - d1.scale <span class="kw">as </span>i32;
+        <span class="kw">if </span>rescale_factor &lt; <span class="number">0 </span>{
+            <span class="kw">let </span>negative = subtract ^ d1.negative;
+            <span class="kw">let </span>scale = d1.scale;
+            unaligned_add(d2, d1, negative, scale, -rescale_factor, subtract)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>negative = d1.negative;
+            <span class="kw">let </span>scale = d2.scale;
+            unaligned_add(d1, d2, negative, scale, rescale_factor, subtract)
         }
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">neg</span> <span class="op">=</span> <span class="ident">d1</span>.<span class="ident">negative</span>;
-        <span class="kw">let</span> <span class="ident">scale</span> <span class="op">=</span> <span class="ident">d1</span>.<span class="ident">scale</span>;
-        <span class="ident">aligned_add</span>(<span class="ident">d1</span>, <span class="ident">d2</span>, <span class="ident">neg</span>, <span class="ident">scale</span>, <span class="ident">subtract</span>)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>neg = d1.negative;
+        <span class="kw">let </span>scale = d1.scale;
+        aligned_add(d1, d2, neg, scale, subtract)
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">rescale32</span>(<span class="ident">num</span>: <span class="ident">u32</span>, <span class="ident">rescale_factor</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">rescale_factor</span> <span class="op">&gt;</span> <span class="ident">MAX_I32_SCALE</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>rescale32(num: u32, rescale_factor: i32) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+    <span class="kw">if </span>rescale_factor &gt; MAX_I32_SCALE {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
-    <span class="ident">num</span>.<span class="ident">checked_mul</span>(<span class="ident">POWERS_10</span>[<span class="ident">rescale_factor</span> <span class="kw">as</span> <span class="ident">usize</span>])
+    num.checked_mul(POWERS_10[rescale_factor <span class="kw">as </span>usize])
 }
 
-<span class="kw">fn</span> <span class="ident">fast_add</span>(<span class="ident">lo1</span>: <span class="ident">u32</span>, <span class="ident">lo2</span>: <span class="ident">u32</span>, <span class="ident">flags</span>: <span class="ident">u32</span>, <span class="ident">subtract</span>: <span class="ident">bool</span>) -&gt; <span class="ident">CalculationResult</span> {
-    <span class="kw">if</span> <span class="ident">subtract</span> {
-        <span class="comment">// Sub can&#39;t overflow because we&#39;re ensuring the bigger number always subtracts the smaller number</span>
-        <span class="kw">if</span> <span class="ident">lo1</span> <span class="op">&lt;</span> <span class="ident">lo2</span> {
-            <span class="kw">return</span> <span class="ident">CalculationResult::Ok</span>(<span class="ident">Decimal::from_parts_raw</span>(<span class="ident">lo2</span> <span class="op">-</span> <span class="ident">lo1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="ident">flags</span> <span class="op">^</span> <span class="ident">SIGN_MASK</span>));
+<span class="kw">fn </span>fast_add(lo1: u32, lo2: u32, flags: u32, subtract: bool) -&gt; CalculationResult {
+    <span class="kw">if </span>subtract {
+        <span class="comment">// Sub can&#39;t overflow because we&#39;re ensuring the bigger number always subtracts the smaller number
+        </span><span class="kw">if </span>lo1 &lt; lo2 {
+            <span class="kw">return </span>CalculationResult::Ok(Decimal::from_parts_raw(lo2 - lo1, <span class="number">0</span>, <span class="number">0</span>, flags ^ SIGN_MASK));
         }
-        <span class="kw">return</span> <span class="ident">CalculationResult::Ok</span>(<span class="ident">Decimal::from_parts_raw</span>(<span class="ident">lo1</span> <span class="op">-</span> <span class="ident">lo2</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="ident">flags</span>));
+        <span class="kw">return </span>CalculationResult::Ok(Decimal::from_parts_raw(lo1 - lo2, <span class="number">0</span>, <span class="number">0</span>, flags));
     }
-    <span class="comment">// Add can overflow however, so we check for that explicitly</span>
-    <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">lo1</span>.<span class="ident">wrapping_add</span>(<span class="ident">lo2</span>);
-    <span class="kw">let</span> <span class="ident">mid</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">lo</span> <span class="op">&lt;</span> <span class="ident">lo1</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> };
-    <span class="ident">CalculationResult::Ok</span>(<span class="ident">Decimal::from_parts_raw</span>(<span class="ident">lo</span>, <span class="ident">mid</span>, <span class="number">0</span>, <span class="ident">flags</span>))
+    <span class="comment">// Add can overflow however, so we check for that explicitly
+    </span><span class="kw">let </span>lo = lo1.wrapping_add(lo2);
+    <span class="kw">let </span>mid = <span class="kw">if </span>lo &lt; lo1 { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>};
+    CalculationResult::Ok(Decimal::from_parts_raw(lo, mid, <span class="number">0</span>, flags))
 }
 
-<span class="kw">fn</span> <span class="ident">aligned_add</span>(<span class="ident">lhs</span>: <span class="ident">Dec64</span>, <span class="ident">rhs</span>: <span class="ident">Dec64</span>, <span class="ident">negative</span>: <span class="ident">bool</span>, <span class="ident">scale</span>: <span class="ident">u32</span>, <span class="ident">subtract</span>: <span class="ident">bool</span>) -&gt; <span class="ident">CalculationResult</span> {
-    <span class="kw">if</span> <span class="ident">subtract</span> {
-        <span class="comment">// Signs differ, so subtract</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Dec64</span> {
-            <span class="ident">negative</span>,
-            <span class="ident">scale</span>,
-            <span class="ident">low64</span>: <span class="ident">lhs</span>.<span class="ident">low64</span>.<span class="ident">wrapping_sub</span>(<span class="ident">rhs</span>.<span class="ident">low64</span>),
-            <span class="ident">hi</span>: <span class="ident">lhs</span>.<span class="ident">hi</span>.<span class="ident">wrapping_sub</span>(<span class="ident">rhs</span>.<span class="ident">hi</span>),
+<span class="kw">fn </span>aligned_add(lhs: Dec64, rhs: Dec64, negative: bool, scale: u32, subtract: bool) -&gt; CalculationResult {
+    <span class="kw">if </span>subtract {
+        <span class="comment">// Signs differ, so subtract
+        </span><span class="kw">let </span><span class="kw-2">mut </span>result = Dec64 {
+            negative,
+            scale,
+            low64: lhs.low64.wrapping_sub(rhs.low64),
+            hi: lhs.hi.wrapping_sub(rhs.hi),
         };
 
-        <span class="comment">// Check for carry</span>
-        <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">low64</span> <span class="op">&gt;</span> <span class="ident">lhs</span>.<span class="ident">low64</span> {
-            <span class="ident">result</span>.<span class="ident">hi</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">hi</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>);
-            <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">hi</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">lhs</span>.<span class="ident">hi</span> {
-                <span class="ident">flip_sign</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>);
+        <span class="comment">// Check for carry
+        </span><span class="kw">if </span>result.low64 &gt; lhs.low64 {
+            result.hi = result.hi.wrapping_sub(<span class="number">1</span>);
+            <span class="kw">if </span>result.hi &gt;= lhs.hi {
+                flip_sign(<span class="kw-2">&amp;mut </span>result);
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">hi</span> <span class="op">&gt;</span> <span class="ident">lhs</span>.<span class="ident">hi</span> {
-            <span class="ident">flip_sign</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>);
+        } <span class="kw">else if </span>result.hi &gt; lhs.hi {
+            flip_sign(<span class="kw-2">&amp;mut </span>result);
         }
-        <span class="ident">CalculationResult::Ok</span>(<span class="ident">result</span>.<span class="ident">to_decimal</span>())
-    } <span class="kw">else</span> {
-        <span class="comment">// Signs are the same, so add</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Dec64</span> {
-            <span class="ident">negative</span>,
-            <span class="ident">scale</span>,
-            <span class="ident">low64</span>: <span class="ident">lhs</span>.<span class="ident">low64</span>.<span class="ident">wrapping_add</span>(<span class="ident">rhs</span>.<span class="ident">low64</span>),
-            <span class="ident">hi</span>: <span class="ident">lhs</span>.<span class="ident">hi</span>.<span class="ident">wrapping_add</span>(<span class="ident">rhs</span>.<span class="ident">hi</span>),
+        CalculationResult::Ok(result.to_decimal())
+    } <span class="kw">else </span>{
+        <span class="comment">// Signs are the same, so add
+        </span><span class="kw">let </span><span class="kw-2">mut </span>result = Dec64 {
+            negative,
+            scale,
+            low64: lhs.low64.wrapping_add(rhs.low64),
+            hi: lhs.hi.wrapping_add(rhs.hi),
         };
 
-        <span class="comment">// Check for carry</span>
-        <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">low64</span> <span class="op">&lt;</span> <span class="ident">lhs</span>.<span class="ident">low64</span> {
-            <span class="ident">result</span>.<span class="ident">hi</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">hi</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-            <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">hi</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">lhs</span>.<span class="ident">hi</span> {
-                <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">scale</span> <span class="op">==</span> <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+        <span class="comment">// Check for carry
+        </span><span class="kw">if </span>result.low64 &lt; lhs.low64 {
+            result.hi = result.hi.wrapping_add(<span class="number">1</span>);
+            <span class="kw">if </span>result.hi &lt;= lhs.hi {
+                <span class="kw">if </span>result.scale == <span class="number">0 </span>{
+                    <span class="kw">return </span>CalculationResult::Overflow;
                 }
-                <span class="ident">reduce_scale</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>);
+                reduce_scale(<span class="kw-2">&amp;mut </span>result);
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">hi</span> <span class="op">&lt;</span> <span class="ident">lhs</span>.<span class="ident">hi</span> {
-            <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">scale</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+        } <span class="kw">else if </span>result.hi &lt; lhs.hi {
+            <span class="kw">if </span>result.scale == <span class="number">0 </span>{
+                <span class="kw">return </span>CalculationResult::Overflow;
             }
-            <span class="ident">reduce_scale</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>);
+            reduce_scale(<span class="kw-2">&amp;mut </span>result);
         }
-        <span class="ident">CalculationResult::Ok</span>(<span class="ident">result</span>.<span class="ident">to_decimal</span>())
+        CalculationResult::Ok(result.to_decimal())
     }
 }
 
-<span class="kw">fn</span> <span class="ident">flip_sign</span>(<span class="ident">result</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Dec64</span>) {
-    <span class="comment">// Bitwise not the high portion</span>
-    <span class="ident">result</span>.<span class="ident">hi</span> <span class="op">=</span> <span class="op">!</span><span class="ident">result</span>.<span class="ident">hi</span>;
-    <span class="kw">let</span> <span class="ident">low64</span> <span class="op">=</span> ((<span class="ident">result</span>.<span class="ident">low64</span> <span class="kw">as</span> <span class="ident">i64</span>).<span class="ident">wrapping_neg</span>()) <span class="kw">as</span> <span class="ident">u64</span>;
-    <span class="kw">if</span> <span class="ident">low64</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="ident">result</span>.<span class="ident">hi</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+<span class="kw">fn </span>flip_sign(result: <span class="kw-2">&amp;mut </span>Dec64) {
+    <span class="comment">// Bitwise not the high portion
+    </span>result.hi = !result.hi;
+    <span class="kw">let </span>low64 = ((result.low64 <span class="kw">as </span>i64).wrapping_neg()) <span class="kw">as </span>u64;
+    <span class="kw">if </span>low64 == <span class="number">0 </span>{
+        result.hi += <span class="number">1</span>;
     }
-    <span class="ident">result</span>.<span class="ident">low64</span> <span class="op">=</span> <span class="ident">low64</span>;
-    <span class="ident">result</span>.<span class="ident">negative</span> <span class="op">=</span> <span class="op">!</span><span class="ident">result</span>.<span class="ident">negative</span>;
+    result.low64 = low64;
+    result.negative = !result.negative;
 }
 
-<span class="kw">fn</span> <span class="ident">reduce_scale</span>(<span class="ident">result</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Dec64</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">low64</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">low64</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">hi</span>;
+<span class="kw">fn </span>reduce_scale(result: <span class="kw-2">&amp;mut </span>Dec64) {
+    <span class="kw">let </span><span class="kw-2">mut </span>low64 = result.low64;
+    <span class="kw">let </span><span class="kw-2">mut </span>hi = result.hi;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">num</span> <span class="op">=</span> (<span class="ident">hi</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">+</span> (<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>);
-    <span class="ident">hi</span> <span class="op">=</span> (<span class="ident">num</span> <span class="op">/</span> <span class="number">10u64</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-    <span class="ident">num</span> <span class="op">=</span> ((<span class="ident">num</span> <span class="op">-</span> (<span class="ident">hi</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> <span class="number">10u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">+</span> (<span class="ident">low64</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">div</span> <span class="op">=</span> (<span class="ident">num</span> <span class="op">/</span> <span class="number">10</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-    <span class="ident">num</span> <span class="op">=</span> ((<span class="ident">num</span> <span class="op">-</span> (<span class="ident">div</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> <span class="number">10u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">+</span> (<span class="ident">low64</span> <span class="op">&amp;</span> <span class="ident">U32_MASK</span>);
-    <span class="ident">low64</span> <span class="op">=</span> (<span class="ident">div</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>;
-    <span class="ident">div</span> <span class="op">=</span> (<span class="ident">num</span> <span class="op">/</span> <span class="number">10u64</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-    <span class="ident">low64</span> <span class="op">=</span> <span class="ident">low64</span>.<span class="ident">wrapping_add</span>(<span class="ident">div</span> <span class="kw">as</span> <span class="ident">u64</span>);
-    <span class="kw">let</span> <span class="ident">remainder</span> <span class="op">=</span> (<span class="ident">num</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">wrapping_sub</span>(<span class="ident">div</span>.<span class="ident">wrapping_mul</span>(<span class="number">10</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>num = (hi <span class="kw">as </span>u64) + (<span class="number">1u64 </span>&lt;&lt; <span class="number">32</span>);
+    hi = (num / <span class="number">10u64</span>) <span class="kw">as </span>u32;
+    num = ((num - (hi <span class="kw">as </span>u64) * <span class="number">10u64</span>) &lt;&lt; <span class="number">32</span>) + (low64 &gt;&gt; <span class="number">32</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>div = (num / <span class="number">10</span>) <span class="kw">as </span>u32;
+    num = ((num - (div <span class="kw">as </span>u64) * <span class="number">10u64</span>) &lt;&lt; <span class="number">32</span>) + (low64 &amp; U32_MASK);
+    low64 = (div <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>;
+    div = (num / <span class="number">10u64</span>) <span class="kw">as </span>u32;
+    low64 = low64.wrapping_add(div <span class="kw">as </span>u64);
+    <span class="kw">let </span>remainder = (num <span class="kw">as </span>u32).wrapping_sub(div.wrapping_mul(<span class="number">10</span>));
 
-    <span class="comment">// Finally, round. This is optimizing slightly toward non-rounded numbers</span>
-    <span class="kw">if</span> <span class="ident">remainder</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">5</span> <span class="op">&amp;&amp;</span> (<span class="ident">remainder</span> <span class="op">&gt;</span> <span class="number">5</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">low64</span> <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">&gt;</span> <span class="number">0</span>) {
-        <span class="ident">low64</span> <span class="op">=</span> <span class="ident">low64</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-        <span class="kw">if</span> <span class="ident">low64</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">hi</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="comment">// Finally, round. This is optimizing slightly toward non-rounded numbers
+    </span><span class="kw">if </span>remainder &gt;= <span class="number">5 </span>&amp;&amp; (remainder &gt; <span class="number">5 </span>|| (low64 &amp; <span class="number">1</span>) &gt; <span class="number">0</span>) {
+        low64 = low64.wrapping_add(<span class="number">1</span>);
+        <span class="kw">if </span>low64 == <span class="number">0 </span>{
+            hi += <span class="number">1</span>;
         }
     }
 
-    <span class="ident">result</span>.<span class="ident">low64</span> <span class="op">=</span> <span class="ident">low64</span>;
-    <span class="ident">result</span>.<span class="ident">hi</span> <span class="op">=</span> <span class="ident">hi</span>;
-    <span class="ident">result</span>.<span class="ident">scale</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+    result.low64 = low64;
+    result.hi = hi;
+    result.scale -= <span class="number">1</span>;
 }
 
-<span class="comment">// Assumption going into this function is that the LHS is the larger number and will &quot;absorb&quot; the</span>
-<span class="comment">// smaller number.</span>
-<span class="kw">fn</span> <span class="ident">unaligned_add</span>(
-    <span class="ident">lhs</span>: <span class="ident">Dec64</span>,
-    <span class="ident">rhs</span>: <span class="ident">Dec64</span>,
-    <span class="ident">negative</span>: <span class="ident">bool</span>,
-    <span class="ident">scale</span>: <span class="ident">u32</span>,
-    <span class="ident">rescale_factor</span>: <span class="ident">i32</span>,
-    <span class="ident">subtract</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">CalculationResult</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">lhs</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">low64</span> <span class="op">=</span> <span class="ident">lhs</span>.<span class="ident">low64</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">high</span> <span class="op">=</span> <span class="ident">lhs</span>.<span class="ident">hi</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rescale_factor</span> <span class="op">=</span> <span class="ident">rescale_factor</span>;
+<span class="comment">// Assumption going into this function is that the LHS is the larger number and will &quot;absorb&quot; the
+// smaller number.
+</span><span class="kw">fn </span>unaligned_add(
+    lhs: Dec64,
+    rhs: Dec64,
+    negative: bool,
+    scale: u32,
+    rescale_factor: i32,
+    subtract: bool,
+) -&gt; CalculationResult {
+    <span class="kw">let </span><span class="kw-2">mut </span>lhs = lhs;
+    <span class="kw">let </span><span class="kw-2">mut </span>low64 = lhs.low64;
+    <span class="kw">let </span><span class="kw-2">mut </span>high = lhs.hi;
+    <span class="kw">let </span><span class="kw-2">mut </span>rescale_factor = rescale_factor;
 
-    <span class="comment">// First off, we see if we can get away with scaling small amounts (or none at all)</span>
-    <span class="kw">if</span> <span class="ident">high</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">if</span> <span class="ident">low64</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">U32_MAX</span> {
-            <span class="comment">// We know it&#39;s not zero, so we start scaling.</span>
-            <span class="comment">// Start with reducing the scale down for the low portion</span>
-            <span class="kw">while</span> <span class="ident">low64</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">U32_MAX</span> {
-                <span class="kw">if</span> <span class="ident">rescale_factor</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_I32_SCALE</span> {
-                    <span class="ident">low64</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">POWERS_10</span>[<span class="ident">rescale_factor</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="ident">u64</span>;
-                    <span class="ident">lhs</span>.<span class="ident">low64</span> <span class="op">=</span> <span class="ident">low64</span>;
-                    <span class="kw">return</span> <span class="ident">aligned_add</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>, <span class="ident">negative</span>, <span class="ident">scale</span>, <span class="ident">subtract</span>);
+    <span class="comment">// First off, we see if we can get away with scaling small amounts (or none at all)
+    </span><span class="kw">if </span>high == <span class="number">0 </span>{
+        <span class="kw">if </span>low64 &lt;= U32_MAX {
+            <span class="comment">// We know it&#39;s not zero, so we start scaling.
+            // Start with reducing the scale down for the low portion
+            </span><span class="kw">while </span>low64 &lt;= U32_MAX {
+                <span class="kw">if </span>rescale_factor &lt;= MAX_I32_SCALE {
+                    low64 <span class="kw-2">*</span>= POWERS_10[rescale_factor <span class="kw">as </span>usize] <span class="kw">as </span>u64;
+                    lhs.low64 = low64;
+                    <span class="kw">return </span>aligned_add(lhs, rhs, negative, scale, subtract);
                 }
-                <span class="ident">rescale_factor</span> <span class="op">-</span><span class="op">=</span> <span class="ident">MAX_I32_SCALE</span>;
-                <span class="ident">low64</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">POWERS_10</span>[<span class="number">9</span>] <span class="kw">as</span> <span class="ident">u64</span>;
+                rescale_factor -= MAX_I32_SCALE;
+                low64 <span class="kw-2">*</span>= POWERS_10[<span class="number">9</span>] <span class="kw">as </span>u64;
             }
         }
 
-        <span class="comment">// Reduce the scale for the high portion</span>
-        <span class="kw">while</span> <span class="ident">high</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">power</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">rescale_factor</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_I32_SCALE</span> {
-                <span class="ident">POWERS_10</span>[<span class="ident">rescale_factor</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="ident">u64</span>
-            } <span class="kw">else</span> {
-                <span class="ident">POWERS_10</span>[<span class="number">9</span>] <span class="kw">as</span> <span class="ident">u64</span>
+        <span class="comment">// Reduce the scale for the high portion
+        </span><span class="kw">while </span>high == <span class="number">0 </span>{
+            <span class="kw">let </span>power = <span class="kw">if </span>rescale_factor &lt;= MAX_I32_SCALE {
+                POWERS_10[rescale_factor <span class="kw">as </span>usize] <span class="kw">as </span>u64
+            } <span class="kw">else </span>{
+                POWERS_10[<span class="number">9</span>] <span class="kw">as </span>u64
             };
 
-            <span class="kw">let</span> <span class="ident">tmp_low</span> <span class="op">=</span> (<span class="ident">low64</span> <span class="op">&amp;</span> <span class="ident">U32_MASK</span>) <span class="op">*</span> <span class="ident">power</span>;
-            <span class="kw">let</span> <span class="ident">tmp_hi</span> <span class="op">=</span> (<span class="ident">low64</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="op">*</span> <span class="ident">power</span> <span class="op">+</span> (<span class="ident">tmp_low</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>);
-            <span class="ident">low64</span> <span class="op">=</span> (<span class="ident">tmp_low</span> <span class="op">&amp;</span> <span class="ident">U32_MASK</span>) <span class="op">+</span> (<span class="ident">tmp_hi</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>);
-            <span class="ident">high</span> <span class="op">=</span> (<span class="ident">tmp_hi</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-            <span class="ident">rescale_factor</span> <span class="op">-</span><span class="op">=</span> <span class="ident">MAX_I32_SCALE</span>;
-            <span class="kw">if</span> <span class="ident">rescale_factor</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">lhs</span>.<span class="ident">low64</span> <span class="op">=</span> <span class="ident">low64</span>;
-                <span class="ident">lhs</span>.<span class="ident">hi</span> <span class="op">=</span> <span class="ident">high</span>;
-                <span class="kw">return</span> <span class="ident">aligned_add</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>, <span class="ident">negative</span>, <span class="ident">scale</span>, <span class="ident">subtract</span>);
+            <span class="kw">let </span>tmp_low = (low64 &amp; U32_MASK) * power;
+            <span class="kw">let </span>tmp_hi = (low64 &gt;&gt; <span class="number">32</span>) * power + (tmp_low &gt;&gt; <span class="number">32</span>);
+            low64 = (tmp_low &amp; U32_MASK) + (tmp_hi &lt;&lt; <span class="number">32</span>);
+            high = (tmp_hi &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32;
+            rescale_factor -= MAX_I32_SCALE;
+            <span class="kw">if </span>rescale_factor &lt;= <span class="number">0 </span>{
+                lhs.low64 = low64;
+                lhs.hi = high;
+                <span class="kw">return </span>aligned_add(lhs, rhs, negative, scale, subtract);
             }
         }
     }
 
-    <span class="comment">// See if we can get away with keeping it in the 96 bits. Otherwise, we need a buffer</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp64</span>: <span class="ident">u64</span>;
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">power</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">rescale_factor</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_I32_SCALE</span> {
-            <span class="ident">POWERS_10</span>[<span class="ident">rescale_factor</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="ident">u64</span>
-        } <span class="kw">else</span> {
-            <span class="ident">POWERS_10</span>[<span class="number">9</span>] <span class="kw">as</span> <span class="ident">u64</span>
+    <span class="comment">// See if we can get away with keeping it in the 96 bits. Otherwise, we need a buffer
+    </span><span class="kw">let </span><span class="kw-2">mut </span>tmp64: u64;
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>power = <span class="kw">if </span>rescale_factor &lt;= MAX_I32_SCALE {
+            POWERS_10[rescale_factor <span class="kw">as </span>usize] <span class="kw">as </span>u64
+        } <span class="kw">else </span>{
+            POWERS_10[<span class="number">9</span>] <span class="kw">as </span>u64
         };
 
-        <span class="kw">let</span> <span class="ident">tmp_low</span> <span class="op">=</span> (<span class="ident">low64</span> <span class="op">&amp;</span> <span class="ident">U32_MASK</span>) <span class="op">*</span> <span class="ident">power</span>;
-        <span class="ident">tmp64</span> <span class="op">=</span> (<span class="ident">low64</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="op">*</span> <span class="ident">power</span> <span class="op">+</span> (<span class="ident">tmp_low</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>);
-        <span class="ident">low64</span> <span class="op">=</span> (<span class="ident">tmp_low</span> <span class="op">&amp;</span> <span class="ident">U32_MASK</span>) <span class="op">+</span> (<span class="ident">tmp64</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>);
-        <span class="ident">tmp64</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span>;
-        <span class="ident">tmp64</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">high</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> <span class="ident">power</span>;
+        <span class="kw">let </span>tmp_low = (low64 &amp; U32_MASK) * power;
+        tmp64 = (low64 &gt;&gt; <span class="number">32</span>) * power + (tmp_low &gt;&gt; <span class="number">32</span>);
+        low64 = (tmp_low &amp; U32_MASK) + (tmp64 &lt;&lt; <span class="number">32</span>);
+        tmp64 &gt;&gt;= <span class="number">32</span>;
+        tmp64 += (high <span class="kw">as </span>u64) * power;
 
-        <span class="ident">rescale_factor</span> <span class="op">-</span><span class="op">=</span> <span class="ident">MAX_I32_SCALE</span>;
+        rescale_factor -= MAX_I32_SCALE;
 
-        <span class="kw">if</span> <span class="ident">tmp64</span> <span class="op">&gt;</span> <span class="ident">U32_MAX</span> {
+        <span class="kw">if </span>tmp64 &gt; U32_MAX {
             <span class="kw">break</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">high</span> <span class="op">=</span> <span class="ident">tmp64</span> <span class="kw">as</span> <span class="ident">u32</span>;
-            <span class="kw">if</span> <span class="ident">rescale_factor</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">lhs</span>.<span class="ident">low64</span> <span class="op">=</span> <span class="ident">low64</span>;
-                <span class="ident">lhs</span>.<span class="ident">hi</span> <span class="op">=</span> <span class="ident">high</span>;
-                <span class="kw">return</span> <span class="ident">aligned_add</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>, <span class="ident">negative</span>, <span class="ident">scale</span>, <span class="ident">subtract</span>);
+        } <span class="kw">else </span>{
+            high = tmp64 <span class="kw">as </span>u32;
+            <span class="kw">if </span>rescale_factor &lt;= <span class="number">0 </span>{
+                lhs.low64 = low64;
+                lhs.hi = high;
+                <span class="kw">return </span>aligned_add(lhs, rhs, negative, scale, subtract);
             }
         }
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">Buf24::zero</span>();
-    <span class="ident">buffer</span>.<span class="ident">set_low64</span>(<span class="ident">low64</span>);
-    <span class="ident">buffer</span>.<span class="ident">set_mid64</span>(<span class="ident">tmp64</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buf24::zero();
+    buffer.set_low64(low64);
+    buffer.set_mid64(tmp64);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">upper_word</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">upper_word</span>();
-    <span class="kw">while</span> <span class="ident">rescale_factor</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="kw">let</span> <span class="ident">power</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">rescale_factor</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_I32_SCALE</span> {
-            <span class="ident">POWERS_10</span>[<span class="ident">rescale_factor</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="ident">u64</span>
-        } <span class="kw">else</span> {
-            <span class="ident">POWERS_10</span>[<span class="number">9</span>] <span class="kw">as</span> <span class="ident">u64</span>
+    <span class="kw">let </span><span class="kw-2">mut </span>upper_word = buffer.upper_word();
+    <span class="kw">while </span>rescale_factor &gt; <span class="number">0 </span>{
+        <span class="kw">let </span>power = <span class="kw">if </span>rescale_factor &lt;= MAX_I32_SCALE {
+            POWERS_10[rescale_factor <span class="kw">as </span>usize] <span class="kw">as </span>u64
+        } <span class="kw">else </span>{
+            POWERS_10[<span class="number">9</span>] <span class="kw">as </span>u64
         };
-        <span class="ident">tmp64</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">part</span>) <span class="kw">in</span> <span class="ident">buffer</span>.<span class="ident">data</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>() {
-            <span class="ident">tmp64</span> <span class="op">=</span> <span class="ident">tmp64</span>.<span class="ident">wrapping_add</span>((<span class="kw-2">*</span><span class="ident">part</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> <span class="ident">power</span>);
-            <span class="kw-2">*</span><span class="ident">part</span> <span class="op">=</span> <span class="ident">tmp64</span> <span class="kw">as</span> <span class="ident">u32</span>;
-            <span class="ident">tmp64</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span>;
-            <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&gt;</span> <span class="ident">upper_word</span> {
+        tmp64 = <span class="number">0</span>;
+        <span class="kw">for </span>(index, part) <span class="kw">in </span>buffer.data.iter_mut().enumerate() {
+            tmp64 = tmp64.wrapping_add((<span class="kw-2">*</span>part <span class="kw">as </span>u64) * power);
+            <span class="kw-2">*</span>part = tmp64 <span class="kw">as </span>u32;
+            tmp64 &gt;&gt;= <span class="number">32</span>;
+            <span class="kw">if </span>index + <span class="number">1 </span>&gt; upper_word {
                 <span class="kw">break</span>;
             }
         }
 
-        <span class="kw">if</span> <span class="ident">tmp64</span> <span class="op">&amp;</span> <span class="ident">U32_MASK</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="comment">// Extend the result</span>
-            <span class="ident">upper_word</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">buffer</span>.<span class="ident">data</span>[<span class="ident">upper_word</span>] <span class="op">=</span> <span class="ident">tmp64</span> <span class="kw">as</span> <span class="ident">u32</span>;
+        <span class="kw">if </span>tmp64 &amp; U32_MASK &gt; <span class="number">0 </span>{
+            <span class="comment">// Extend the result
+            </span>upper_word += <span class="number">1</span>;
+            buffer.data[upper_word] = tmp64 <span class="kw">as </span>u32;
         }
 
-        <span class="ident">rescale_factor</span> <span class="op">-</span><span class="op">=</span> <span class="ident">MAX_I32_SCALE</span>;
+        rescale_factor -= MAX_I32_SCALE;
     }
 
-    <span class="comment">// Do the add</span>
-    <span class="ident">tmp64</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">low64</span>();
-    <span class="ident">low64</span> <span class="op">=</span> <span class="ident">rhs</span>.<span class="ident">low64</span>;
-    <span class="kw">let</span> <span class="ident">tmp_hi</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">data</span>[<span class="number">2</span>];
-    <span class="ident">high</span> <span class="op">=</span> <span class="ident">rhs</span>.<span class="ident">hi</span>;
+    <span class="comment">// Do the add
+    </span>tmp64 = buffer.low64();
+    low64 = rhs.low64;
+    <span class="kw">let </span>tmp_hi = buffer.data[<span class="number">2</span>];
+    high = rhs.hi;
 
-    <span class="kw">if</span> <span class="ident">subtract</span> {
-        <span class="ident">low64</span> <span class="op">=</span> <span class="ident">tmp64</span>.<span class="ident">wrapping_sub</span>(<span class="ident">low64</span>);
-        <span class="ident">high</span> <span class="op">=</span> <span class="ident">tmp_hi</span>.<span class="ident">wrapping_sub</span>(<span class="ident">high</span>);
+    <span class="kw">if </span>subtract {
+        low64 = tmp64.wrapping_sub(low64);
+        high = tmp_hi.wrapping_sub(high);
 
-        <span class="comment">// Check for carry</span>
-        <span class="kw">let</span> <span class="ident">carry</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">low64</span> <span class="op">&gt;</span> <span class="ident">tmp64</span> {
-            <span class="ident">high</span> <span class="op">=</span> <span class="ident">high</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>);
-            <span class="ident">high</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">tmp_hi</span>
-        } <span class="kw">else</span> {
-            <span class="ident">high</span> <span class="op">&gt;</span> <span class="ident">tmp_hi</span>
+        <span class="comment">// Check for carry
+        </span><span class="kw">let </span>carry = <span class="kw">if </span>low64 &gt; tmp64 {
+            high = high.wrapping_sub(<span class="number">1</span>);
+            high &gt;= tmp_hi
+        } <span class="kw">else </span>{
+            high &gt; tmp_hi
         };
 
-        <span class="kw">if</span> <span class="ident">carry</span> {
-            <span class="kw">for</span> <span class="ident">part</span> <span class="kw">in</span> <span class="ident">buffer</span>.<span class="ident">data</span>.<span class="ident">iter_mut</span>().<span class="ident">skip</span>(<span class="number">3</span>) {
-                <span class="kw-2">*</span><span class="ident">part</span> <span class="op">=</span> <span class="ident">part</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>);
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">part</span> <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="kw">if </span>carry {
+            <span class="kw">for </span>part <span class="kw">in </span>buffer.data.iter_mut().skip(<span class="number">3</span>) {
+                <span class="kw-2">*</span>part = part.wrapping_sub(<span class="number">1</span>);
+                <span class="kw">if </span><span class="kw-2">*</span>part &gt; <span class="number">0 </span>{
                     <span class="kw">break</span>;
                 }
             }
 
-            <span class="kw">if</span> <span class="ident">buffer</span>.<span class="ident">data</span>[<span class="ident">upper_word</span>] <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">upper_word</span> <span class="op">&lt;</span> <span class="number">3</span> {
-                <span class="kw">return</span> <span class="ident">CalculationResult::Ok</span>(<span class="ident">Decimal::from_parts</span>(
-                    <span class="ident">low64</span> <span class="kw">as</span> <span class="ident">u32</span>,
-                    (<span class="ident">low64</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>,
-                    <span class="ident">high</span>,
-                    <span class="ident">negative</span>,
-                    <span class="ident">scale</span>,
+            <span class="kw">if </span>buffer.data[upper_word] == <span class="number">0 </span>&amp;&amp; upper_word &lt; <span class="number">3 </span>{
+                <span class="kw">return </span>CalculationResult::Ok(Decimal::from_parts(
+                    low64 <span class="kw">as </span>u32,
+                    (low64 &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32,
+                    high,
+                    negative,
+                    scale,
                 ));
             }
         }
-    } <span class="kw">else</span> {
-        <span class="ident">low64</span> <span class="op">=</span> <span class="ident">low64</span>.<span class="ident">wrapping_add</span>(<span class="ident">tmp64</span>);
-        <span class="ident">high</span> <span class="op">=</span> <span class="ident">high</span>.<span class="ident">wrapping_add</span>(<span class="ident">tmp_hi</span>);
+    } <span class="kw">else </span>{
+        low64 = low64.wrapping_add(tmp64);
+        high = high.wrapping_add(tmp_hi);
 
-        <span class="comment">// Check for carry</span>
-        <span class="kw">let</span> <span class="ident">carry</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">low64</span> <span class="op">&lt;</span> <span class="ident">tmp64</span> {
-            <span class="ident">high</span> <span class="op">=</span> <span class="ident">high</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-            <span class="ident">high</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">tmp_hi</span>
-        } <span class="kw">else</span> {
-            <span class="ident">high</span> <span class="op">&lt;</span> <span class="ident">tmp_hi</span>
+        <span class="comment">// Check for carry
+        </span><span class="kw">let </span>carry = <span class="kw">if </span>low64 &lt; tmp64 {
+            high = high.wrapping_add(<span class="number">1</span>);
+            high &lt;= tmp_hi
+        } <span class="kw">else </span>{
+            high &lt; tmp_hi
         };
 
-        <span class="kw">if</span> <span class="ident">carry</span> {
-            <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">part</span>) <span class="kw">in</span> <span class="ident">buffer</span>.<span class="ident">data</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>().<span class="ident">skip</span>(<span class="number">3</span>) {
-                <span class="kw">if</span> <span class="ident">upper_word</span> <span class="op">&lt;</span> <span class="ident">index</span> {
-                    <span class="kw-2">*</span><span class="ident">part</span> <span class="op">=</span> <span class="number">1</span>;
-                    <span class="ident">upper_word</span> <span class="op">=</span> <span class="ident">index</span>;
+        <span class="kw">if </span>carry {
+            <span class="kw">for </span>(index, part) <span class="kw">in </span>buffer.data.iter_mut().enumerate().skip(<span class="number">3</span>) {
+                <span class="kw">if </span>upper_word &lt; index {
+                    <span class="kw-2">*</span>part = <span class="number">1</span>;
+                    upper_word = index;
                     <span class="kw">break</span>;
                 }
-                <span class="kw-2">*</span><span class="ident">part</span> <span class="op">=</span> <span class="ident">part</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">part</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                <span class="kw-2">*</span>part = part.wrapping_add(<span class="number">1</span>);
+                <span class="kw">if </span><span class="kw-2">*</span>part &gt; <span class="number">0 </span>{
                     <span class="kw">break</span>;
                 }
             }
         }
     }
 
-    <span class="ident">buffer</span>.<span class="ident">set_low64</span>(<span class="ident">low64</span>);
-    <span class="ident">buffer</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">high</span>;
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">scale</span>) <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">rescale</span>(<span class="ident">upper_word</span>, <span class="ident">scale</span>) {
-        <span class="ident">CalculationResult::Ok</span>(<span class="ident">Decimal::from_parts</span>(
-            <span class="ident">buffer</span>.<span class="ident">data</span>[<span class="number">0</span>],
-            <span class="ident">buffer</span>.<span class="ident">data</span>[<span class="number">1</span>],
-            <span class="ident">buffer</span>.<span class="ident">data</span>[<span class="number">2</span>],
-            <span class="ident">negative</span>,
-            <span class="ident">scale</span>,
+    buffer.set_low64(low64);
+    buffer.data[<span class="number">2</span>] = high;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(scale) = buffer.rescale(upper_word, scale) {
+        CalculationResult::Ok(Decimal::from_parts(
+            buffer.data[<span class="number">0</span>],
+            buffer.data[<span class="number">1</span>],
+            buffer.data[<span class="number">2</span>],
+            negative,
+            scale,
         ))
-    } <span class="kw">else</span> {
-        <span class="ident">CalculationResult::Overflow</span>
+    } <span class="kw">else </span>{
+        CalculationResult::Overflow
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rust_decimal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rust_decimal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

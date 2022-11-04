@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/mx.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mx.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/mx.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mx.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -200,179 +200,179 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */</span>
+ */
 
-<span class="doccomment">//! mail exchange, email, record</span>
+</span><span class="doccomment">//! mail exchange, email, record
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</span><span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-config&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::domain::Name</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::rr::domain::Name;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 3.3.9. MX RDATA format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                  PREFERENCE                   |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     /                   EXCHANGE                    /</span>
-<span class="doccomment">///     /                                               /</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// MX records cause type A additional section processing for the host</span>
-<span class="doccomment">/// specified by EXCHANGE.  The use of MX RRs is explained in detail in</span>
-<span class="doccomment">/// [RFC-974].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MX</span> {
-    <span class="ident">preference</span>: <span class="ident">u16</span>,
-    <span class="ident">exchange</span>: <span class="ident">Name</span>,
+<span class="doccomment">/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)
+///
+/// ```text
+/// 3.3.9. MX RDATA format
+///
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                  PREFERENCE                   |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     /                   EXCHANGE                    /
+///     /                                               /
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///
+/// MX records cause type A additional section processing for the host
+/// specified by EXCHANGE.  The use of MX RRs is explained in detail in
+/// [RFC-974].
+///
+/// ```
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+</span><span class="kw">pub struct </span>MX {
+    preference: u16,
+    exchange: Name,
 }
 
-<span class="kw">impl</span> <span class="ident">MX</span> {
-    <span class="doccomment">/// Constructs a new MX RData</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `preference` - weight of this MX record as opposed to others, lower values have the higher preference</span>
-    <span class="doccomment">/// * `exchange` - Name labels for the mail server</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A new MX RData for use in a Resource Record</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">preference</span>: <span class="ident">u16</span>, <span class="ident">exchange</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">preference</span>,
-            <span class="ident">exchange</span>,
+<span class="kw">impl </span>MX {
+    <span class="doccomment">/// Constructs a new MX RData
+    ///
+    /// # Arguments
+    ///
+    /// * `preference` - weight of this MX record as opposed to others, lower values have the higher preference
+    /// * `exchange` - Name labels for the mail server
+    ///
+    /// # Returns
+    ///
+    /// A new MX RData for use in a Resource Record
+    </span><span class="kw">pub fn </span>new(preference: u16, exchange: Name) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            preference,
+            exchange,
         }
     }
 
-    <span class="doccomment">/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// PREFERENCE      A 16 bit integer which specifies the preference given to</span>
-    <span class="doccomment">///                 this RR among others at the same owner.  Lower values</span>
-    <span class="doccomment">///                 are preferred.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preference</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">preference</span>
+    <span class="doccomment">/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)
+    ///
+    /// ```text
+    /// PREFERENCE      A 16 bit integer which specifies the preference given to
+    ///                 this RR among others at the same owner.  Lower values
+    ///                 are preferred.
+    /// ```
+    </span><span class="kw">pub fn </span>preference(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.preference
     }
 
-    <span class="doccomment">/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// EXCHANGE        A &lt;domain-name&gt; which specifies a host willing to act as</span>
-    <span class="doccomment">///                 a mail exchange for the owner name.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exchange</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Name</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">exchange</span>
+    <span class="doccomment">/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)
+    ///
+    /// ```text
+    /// EXCHANGE        A &lt;domain-name&gt; which specifies a host willing to act as
+    ///                 a mail exchange for the owner name.
+    /// ```
+    </span><span class="kw">pub fn </span>exchange(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Name {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.exchange
     }
 }
 
-<span class="doccomment">/// Read the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">MX</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">MX::new</span>(
-        <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any u16 is valid*/</span>),
-        <span class="ident">Name::read</span>(<span class="ident">decoder</span>)<span class="question-mark">?</span>,
+<span class="doccomment">/// Read the RData from the given Decoder
+</span><span class="kw">pub fn </span>read(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ProtoResult&lt;MX&gt; {
+    <span class="prelude-val">Ok</span>(MX::new(
+        decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*any u16 is valid*/</span>),
+        Name::read(decoder)<span class="question-mark">?</span>,
     ))
 }
 
-<span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034#section-6), DNSSEC Resource Records, March 2005</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 6.2.  Canonical RR Form</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    For the purposes of DNS security, the canonical form of an RR is the</span>
-<span class="doccomment">///    wire format of the RR where:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    ...</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    3.  if the type of the RR is NS, MD, MF, CNAME, SOA, MB, MG, MR, PTR,</span>
-<span class="doccomment">///        HINFO, MINFO, MX, HINFO, RP, AFSDB, RT, SIG, PX, NXT, NAPTR, KX,</span>
-<span class="doccomment">///        SRV, DNAME, A6, RRSIG, or NSEC (rfc6840 removes NSEC), all uppercase</span>
-<span class="doccomment">///        US-ASCII letters in the DNS names contained within the RDATA are replaced</span>
-<span class="doccomment">///        by the corresponding lowercase US-ASCII letters;</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">mx</span>: <span class="kw-2">&amp;</span><span class="ident">MX</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">is_canonical_names</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">is_canonical_names</span>();
-    <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="ident">mx</span>.<span class="ident">preference</span>())<span class="question-mark">?</span>;
-    <span class="ident">mx</span>.<span class="ident">exchange</span>()
-        .<span class="ident">emit_with_lowercase</span>(<span class="ident">encoder</span>, <span class="ident">is_canonical_names</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034#section-6), DNSSEC Resource Records, March 2005
+///
+/// ```text
+/// 6.2.  Canonical RR Form
+///
+///    For the purposes of DNS security, the canonical form of an RR is the
+///    wire format of the RR where:
+///
+///    ...
+///
+///    3.  if the type of the RR is NS, MD, MF, CNAME, SOA, MB, MG, MR, PTR,
+///        HINFO, MINFO, MX, HINFO, RP, AFSDB, RT, SIG, PX, NXT, NAPTR, KX,
+///        SRV, DNAME, A6, RRSIG, or NSEC (rfc6840 removes NSEC), all uppercase
+///        US-ASCII letters in the DNS names contained within the RDATA are replaced
+///        by the corresponding lowercase US-ASCII letters;
+/// ```
+</span><span class="kw">pub fn </span>emit(encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;, mx: <span class="kw-2">&amp;</span>MX) -&gt; ProtoResult&lt;()&gt; {
+    <span class="kw">let </span>is_canonical_names = encoder.is_canonical_names();
+    encoder.emit_u16(mx.preference())<span class="question-mark">?</span>;
+    mx.exchange()
+        .emit_with_lowercase(encoder, is_canonical_names)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// [RFC 1033](https://tools.ietf.org/html/rfc1033), DOMAIN OPERATIONS GUIDE, November 1987</span>
+<span class="doccomment">/// [RFC 1033](https://tools.ietf.org/html/rfc1033), DOMAIN OPERATIONS GUIDE, November 1987
 
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///   MX (Mail Exchanger)  (See RFC-974 for more details.)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///           &lt;name&gt;   [&lt;ttl&gt;] [&lt;class&gt;]   MX   &lt;preference&gt;   &lt;host&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   MX records specify where mail for a domain name should be delivered.</span>
-<span class="doccomment">///   There may be multiple MX records for a particular name.  The</span>
-<span class="doccomment">///   preference value specifies the order a mailer should try multiple MX</span>
-<span class="doccomment">///   records when delivering mail.  Zero is the highest preference.</span>
-<span class="doccomment">///   Multiple records for the same name may have the same preference.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   A host BAR.FOO.COM may want its mail to be delivered to the host</span>
-<span class="doccomment">///   PO.FOO.COM and would then use the MX record:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///           BAR.FOO.COM.    MX      10      PO.FOO.COM.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   A host BAZ.FOO.COM may want its mail to be delivered to one of three</span>
-<span class="doccomment">///   different machines, in the following order:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///           BAZ.FOO.COM.    MX      10      PO1.FOO.COM.</span>
-<span class="doccomment">///                           MX      20      PO2.FOO.COM.</span>
-<span class="doccomment">///                           MX      30      PO3.FOO.COM.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   An entire domain of hosts not connected to the Internet may want</span>
-<span class="doccomment">///   their mail to go through a mail gateway that knows how to deliver</span>
-<span class="doccomment">///   mail to them.  If they would like mail addressed to any host in the</span>
-<span class="doccomment">///   domain FOO.COM to go through the mail gateway they might use:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///           FOO.COM.        MX       10     RELAY.CS.NET.</span>
-<span class="doccomment">///           *.FOO.COM.      MX       20     RELAY.CS.NET.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Note that you can specify a wildcard in the MX record to match on</span>
-<span class="doccomment">///   anything in FOO.COM, but that it won&#39;t match a plain FOO.COM.</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">MX</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{pref} {ex}&quot;</span>, <span class="ident">pref</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">preference</span>, <span class="ident">ex</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exchange</span>)
+/// ```text
+///   MX (Mail Exchanger)  (See RFC-974 for more details.)
+///
+///           &lt;name&gt;   [&lt;ttl&gt;] [&lt;class&gt;]   MX   &lt;preference&gt;   &lt;host&gt;
+///
+///   MX records specify where mail for a domain name should be delivered.
+///   There may be multiple MX records for a particular name.  The
+///   preference value specifies the order a mailer should try multiple MX
+///   records when delivering mail.  Zero is the highest preference.
+///   Multiple records for the same name may have the same preference.
+///
+///   A host BAR.FOO.COM may want its mail to be delivered to the host
+///   PO.FOO.COM and would then use the MX record:
+///
+///           BAR.FOO.COM.    MX      10      PO.FOO.COM.
+///
+///   A host BAZ.FOO.COM may want its mail to be delivered to one of three
+///   different machines, in the following order:
+///
+///           BAZ.FOO.COM.    MX      10      PO1.FOO.COM.
+///                           MX      20      PO2.FOO.COM.
+///                           MX      30      PO3.FOO.COM.
+///
+///   An entire domain of hosts not connected to the Internet may want
+///   their mail to go through a mail gateway that knows how to deliver
+///   mail to them.  If they would like mail addressed to any host in the
+///   domain FOO.COM to go through the mail gateway they might use:
+///
+///           FOO.COM.        MX       10     RELAY.CS.NET.
+///           *.FOO.COM.      MX       20     RELAY.CS.NET.
+///
+///   Note that you can specify a wildcard in the MX record to match on
+///   anything in FOO.COM, but that it won&#39;t match a plain FOO.COM.
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>MX {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{pref} {ex}&quot;</span>, pref = <span class="self">self</span>.preference, ex = <span class="self">self</span>.exchange)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test</span>() {
-        <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test() {
+        <span class="kw">use </span>std::str::FromStr;
 
-        <span class="kw">let</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="ident">MX::new</span>(<span class="number">16</span>, <span class="ident">Name::from_str</span>(<span class="string">&quot;mail.example.com&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="kw">let </span>rdata = MX::new(<span class="number">16</span>, Name::from_str(<span class="string">&quot;mail.example.com&quot;</span>).unwrap());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="macro">assert!</span>(<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">rdata</span>).<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">into_bytes</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="macro">assert!</span>(emit(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;</span>rdata).is_ok());
+        <span class="kw">let </span>bytes = encoder.into_bytes();
 
-        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, <span class="ident">bytes</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, bytes);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">bytes</span>);
-        <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>).<span class="ident">expect</span>(<span class="string">&quot;Decoding error&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">rdata</span>, <span class="ident">read_rdata</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder: BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinDecoder::new(bytes);
+        <span class="kw">let </span>read_rdata = read(<span class="kw-2">&amp;mut </span>decoder).expect(<span class="string">&quot;Decoding error&quot;</span>);
+        <span class="macro">assert_eq!</span>(rdata, read_rdata);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

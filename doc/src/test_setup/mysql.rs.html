@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/test-setup/src/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../test_setup/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/test-setup/src/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../test_setup/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -116,123 +116,123 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">runtime::run_with_thread_local_runtime</span> <span class="kw">as</span> <span class="ident">tok</span>, <span class="ident">AnyError</span>, <span class="ident">Tags</span>};
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::Queryable</span>, <span class="ident">single::Quaint</span>};
-<span class="kw">use</span> <span class="ident">url::Url</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{runtime::run_with_thread_local_runtime <span class="kw">as </span>tok, AnyError, Tags};
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>quaint::{prelude::Queryable, single::Quaint};
+<span class="kw">use </span>url::Url;
 
-<span class="doccomment">/// The maximum length of identifiers on mysql is 64 bytes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html</span>
-<span class="kw">fn</span> <span class="ident">mysql_safe_identifier</span>(<span class="ident">identifier</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-    <span class="kw">if</span> <span class="ident">identifier</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">64</span> {
-        <span class="ident">identifier</span>
-    } <span class="kw">else</span> {
-        <span class="ident">identifier</span>.<span class="ident">get</span>(<span class="number">0</span>..<span class="number">64</span>).<span class="ident">expect</span>(<span class="string">&quot;mysql identifier truncation&quot;</span>)
+<span class="doccomment">/// The maximum length of identifiers on mysql is 64 bytes.
+///
+/// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html
+</span><span class="kw">fn </span>mysql_safe_identifier(identifier: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {
+    <span class="kw">if </span>identifier.len() &lt;= <span class="number">64 </span>{
+        identifier
+    } <span class="kw">else </span>{
+        identifier.get(<span class="number">0</span>..<span class="number">64</span>).expect(<span class="string">&quot;mysql identifier truncation&quot;</span>)
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_mysql_tags</span>(<span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> {
-        <span class="kw">let</span> <span class="ident">quaint</span> <span class="op">=</span> <span class="ident">Quaint::new</span>(<span class="ident">database_url</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">to_string</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Tags::Mysql</span>.<span class="ident">into</span>();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_mysql_tags(database_url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;BitFlags&lt;Tags&gt;, String&gt; {
+    <span class="kw">let </span>fut = <span class="kw">async </span>{
+        <span class="kw">let </span>quaint = Quaint::new(database_url).<span class="kw">await</span>.map_err(|err| err.to_string())<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>tags: BitFlags&lt;Tags&gt; = Tags::Mysql.into();
 
-        <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">quaint</span>
-            .<span class="ident">query_raw</span>(
+        <span class="kw">let </span>metadata = quaint
+            .query_raw(
                 <span class="string">&quot;SELECT @@lower_case_table_names lower_cases_table_names, @@version version&quot;</span>,
                 <span class="kw-2">&amp;</span>[],
             )
-            .<span class="kw">await</span>
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">to_string</span>())<span class="question-mark">?</span>;
+            .<span class="kw">await
+            </span>.map_err(|err| err.to_string())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">first_row</span> <span class="op">=</span> <span class="ident">metadata</span>
-            .<span class="ident">first</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;Got an empty result set when fetching metadata&quot;</span>.<span class="ident">to_owned</span>())<span class="question-mark">?</span>;
+        <span class="kw">let </span>first_row = metadata
+            .first()
+            .ok_or_else(|| <span class="string">&quot;Got an empty result set when fetching metadata&quot;</span>.to_owned())<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="number">1</span>) <span class="op">=</span> <span class="ident">first_row</span>
-            .<span class="ident">get</span>(<span class="string">&quot;lower_cases_table_names&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">lctn</span><span class="op">|</span> <span class="ident">lctn</span>.<span class="ident">as_integer</span>())
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="number">1</span>) = first_row
+            .get(<span class="string">&quot;lower_cases_table_names&quot;</span>)
+            .and_then(|lctn| lctn.as_integer())
         {
-            <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::LowerCasesTableNames</span>;
+            tags |= Tags::LowerCasesTableNames;
         }
 
-        <span class="kw">match</span> <span class="ident">first_row</span>.<span class="ident">get</span>(<span class="string">&quot;version&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">version</span><span class="op">|</span> <span class="ident">version</span>.<span class="ident">to_string</span>()) {
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">tags</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">version</span>) =&gt; {
-                <span class="macro">eprintln!</span>(<span class="string">&quot;Version: {:?}&quot;</span>, <span class="ident">version</span>);
+        <span class="kw">match </span>first_row.get(<span class="string">&quot;version&quot;</span>).and_then(|version| version.to_string()) {
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(tags),
+            <span class="prelude-val">Some</span>(version) =&gt; {
+                <span class="macro">eprintln!</span>(<span class="string">&quot;Version: {:?}&quot;</span>, version);
 
-                <span class="comment">// order matters...</span>
+                <span class="comment">// order matters...
 
-                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;MariaDB&quot;</span>) {
-                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Mariadb</span>
-                } <span class="kw">else</span> {
-                    <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;vitess&quot;</span>) {
-                        <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Vitess</span>;
+                </span><span class="kw">if </span>version.contains(<span class="string">&quot;MariaDB&quot;</span>) {
+                    tags |= Tags::Mariadb
+                } <span class="kw">else </span>{
+                    <span class="kw">if </span>version.contains(<span class="string">&quot;vitess&quot;</span>) {
+                        tags |= Tags::Vitess;
                     }
 
-                    <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;5.6&quot;</span>) {
-                        <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Mysql56</span>
+                    <span class="kw">if </span>version.contains(<span class="string">&quot;5.6&quot;</span>) {
+                        tags |= Tags::Mysql56
                     }
 
-                    <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;5.7&quot;</span>) {
-                        <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Mysql57</span>
+                    <span class="kw">if </span>version.contains(<span class="string">&quot;5.7&quot;</span>) {
+                        tags |= Tags::Mysql57
                     }
 
-                    <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;8.&quot;</span>) {
-                        <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Mysql8</span>
+                    <span class="kw">if </span>version.contains(<span class="string">&quot;8.&quot;</span>) {
+                        tags |= Tags::Mysql8
                     }
                 }
 
-                <span class="macro">eprintln!</span>(<span class="string">&quot;Inferred tags: {:?}&quot;</span>, <span class="ident">tags</span>);
+                <span class="macro">eprintln!</span>(<span class="string">&quot;Inferred tags: {:?}&quot;</span>, tags);
 
-                <span class="prelude-val">Ok</span>(<span class="ident">tags</span>)
+                <span class="prelude-val">Ok</span>(tags)
             }
         }
     };
 
-    <span class="ident">tok</span>(<span class="ident">fut</span>)
+    tok(fut)
 }
 
-<span class="doccomment">/// Returns a connection to the new database, as well as the corresponding</span>
-<span class="doccomment">/// complete connection string.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_lifetimes</span>)]</span> <span class="comment">// clippy is wrong</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_mysql_database</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">String</span>), <span class="ident">AnyError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span>: <span class="ident">Url</span> <span class="op">=</span> <span class="ident">database_url</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mysql_db_url</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">mysql_safe_identifier</span>(<span class="ident">db_name</span>);
+<span class="doccomment">/// Returns a connection to the new database, as well as the corresponding
+/// complete connection string.
+</span><span class="attribute">#[allow(clippy::needless_lifetimes)] </span><span class="comment">// clippy is wrong
+</span><span class="kw">pub async fn </span>create_mysql_database&lt;<span class="lifetime">&#39;a</span>&gt;(database_url: <span class="kw-2">&amp;</span>str, db_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, String), AnyError&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>url: Url = database_url.parse()<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>mysql_db_url = url.clone();
+    <span class="kw">let </span>db_name = mysql_safe_identifier(db_name);
 
-    <span class="ident">mysql_db_url</span>.<span class="ident">set_path</span>(<span class="string">&quot;/mysql&quot;</span>);
-    <span class="ident">url</span>.<span class="ident">set_path</span>(<span class="ident">db_name</span>);
+    mysql_db_url.set_path(<span class="string">&quot;/mysql&quot;</span>);
+    url.set_path(db_name);
 
-    <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">db_name</span>.<span class="ident">is_empty</span>());
+    <span class="macro">debug_assert!</span>(!db_name.is_empty());
     <span class="macro">debug_assert!</span>(
-        <span class="ident">db_name</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">64</span>,
+        db_name.len() &lt;= <span class="number">64</span>,
         <span class="string">&quot;db_name should be at most 64 characters, got {:?}&quot;</span>,
-        <span class="ident">db_name</span>.<span class="ident">len</span>()
+        db_name.len()
     );
 
-    <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Quaint::new</span>(<span class="ident">mysql_db_url</span>.<span class="ident">as_ref</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>conn = Quaint::new(mysql_db_url.as_ref()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">drop</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>drop = <span class="macro">format!</span>(
         <span class="string">r#&quot;
         DROP DATABASE IF EXISTS `{db_name}`;
         &quot;#</span>,
-        <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">db_name</span>,
+        db_name = db_name,
     );
 
-    <span class="kw">let</span> <span class="ident">recreate</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>recreate = <span class="macro">format!</span>(
         <span class="string">r#&quot;
         CREATE DATABASE `{db_name}`;
         &quot;#</span>,
-        <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">db_name</span>,
+        db_name = db_name,
     );
 
-    <span class="comment">// The two commands have to be run separately on mariadb.</span>
-    <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">recreate</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">url_str</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">to_string</span>();
+    <span class="comment">// The two commands have to be run separately on mariadb.
+    </span>conn.raw_cmd(<span class="kw-2">&amp;</span>drop).<span class="kw">await</span><span class="question-mark">?</span>;
+    conn.raw_cmd(<span class="kw-2">&amp;</span>recreate).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>url_str = url.to_string();
 
-    <span class="prelude-val">Ok</span>((<span class="ident">db_name</span>, <span class="ident">url_str</span>))
+    <span class="prelude-val">Ok</span>((db_name, url_str))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="test_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="test_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

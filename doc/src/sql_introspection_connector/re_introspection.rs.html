@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/re_introspection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>re_introspection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/re_introspection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>re_introspection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -176,183 +176,183 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">calculate_datamodel::CalculateDatamodelContext</span>, <span class="ident">introspection_helpers::compare_options_none_last</span>, <span class="ident">warnings</span>::<span class="kw-2">*</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    calculate_datamodel::CalculateDatamodelContext, introspection_helpers::compare_options_none_last, warnings::<span class="kw-2">*</span>,
 };
-<span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
-<span class="kw">use</span> <span class="ident">psl::dml</span>::{<span class="ident">Datamodel</span>, <span class="ident">DefaultValue</span>, <span class="ident">ValueGenerator</span>, <span class="ident">WithName</span>};
+<span class="kw">use </span>introspection_connector::Warning;
+<span class="kw">use </span>psl::dml::{Datamodel, DefaultValue, ValueGenerator, WithName};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">enrich</span>(<span class="ident">old_data_model</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>, <span class="ident">new_data_model</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CalculateDatamodelContext</span>) {
-    <span class="kw">let</span> <span class="ident">warnings</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>.<span class="ident">warnings</span>;
-    <span class="ident">merge_pre_3_0_index_names</span>(<span class="ident">old_data_model</span>, <span class="ident">new_data_model</span>, <span class="ident">warnings</span>);
-    <span class="ident">merge_custom_index_names</span>(<span class="ident">old_data_model</span>, <span class="ident">new_data_model</span>, <span class="ident">warnings</span>);
-    <span class="ident">merge_prisma_level_defaults</span>(<span class="ident">old_data_model</span>, <span class="ident">new_data_model</span>, <span class="ident">warnings</span>);
-    <span class="ident">keep_index_ordering</span>(<span class="ident">old_data_model</span>, <span class="ident">new_data_model</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enrich(old_data_model: <span class="kw-2">&amp;</span>Datamodel, new_data_model: <span class="kw-2">&amp;mut </span>Datamodel, ctx: <span class="kw-2">&amp;mut </span>CalculateDatamodelContext) {
+    <span class="kw">let </span>warnings = <span class="kw-2">&amp;mut </span>ctx.warnings;
+    merge_pre_3_0_index_names(old_data_model, new_data_model, warnings);
+    merge_custom_index_names(old_data_model, new_data_model, warnings);
+    merge_prisma_level_defaults(old_data_model, new_data_model, warnings);
+    keep_index_ordering(old_data_model, new_data_model);
 }
 
-<span class="kw">fn</span> <span class="ident">keep_index_ordering</span>(<span class="ident">old_data_model</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>, <span class="ident">new_data_model</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>) {
-    <span class="kw">for</span> <span class="ident">old_model</span> <span class="kw">in</span> <span class="ident">old_data_model</span>.<span class="ident">models</span>() {
-        <span class="kw">let</span> <span class="ident">new_model</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">new_data_model</span>.<span class="ident">models_mut</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">old_model</span>.<span class="ident">name</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">m</span>) =&gt; <span class="ident">m</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>,
+<span class="kw">fn </span>keep_index_ordering(old_data_model: <span class="kw-2">&amp;</span>Datamodel, new_data_model: <span class="kw-2">&amp;mut </span>Datamodel) {
+    <span class="kw">for </span>old_model <span class="kw">in </span>old_data_model.models() {
+        <span class="kw">let </span>new_model = <span class="kw">match </span>new_data_model.models_mut().find(|m| m.name == <span class="kw-2">*</span>old_model.name()) {
+            <span class="prelude-val">Some</span>(m) =&gt; m,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
         };
 
-        <span class="ident">new_model</span>.<span class="ident">indices</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">idx_a</span>, <span class="ident">idx_b</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">idx_a_idx</span> <span class="op">=</span> <span class="ident">old_model</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">db_name</span> <span class="op">==</span> <span class="ident">idx_a</span>.<span class="ident">db_name</span>);
-            <span class="kw">let</span> <span class="ident">idx_b_idx</span> <span class="op">=</span> <span class="ident">old_model</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">db_name</span> <span class="op">==</span> <span class="ident">idx_b</span>.<span class="ident">db_name</span>);
+        new_model.indices.sort_by(|idx_a, idx_b| {
+            <span class="kw">let </span>idx_a_idx = old_model.indices.iter().position(|idx| idx.db_name == idx_a.db_name);
+            <span class="kw">let </span>idx_b_idx = old_model.indices.iter().position(|idx| idx.db_name == idx_b.db_name);
 
-            <span class="ident">compare_options_none_last</span>(<span class="ident">idx_a_idx</span>, <span class="ident">idx_b_idx</span>)
+            compare_options_none_last(idx_a_idx, idx_b_idx)
         });
     }
 }
 
-<span class="comment">//custom compound index `name` from pre-3.0 datamodels</span>
-<span class="kw">fn</span> <span class="ident">merge_pre_3_0_index_names</span>(<span class="ident">old_data_model</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>, <span class="ident">new_data_model</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">warnings</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">retained_legacy_index_name_args</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="comment">//custom compound index `name` from pre-3.0 datamodels
+</span><span class="kw">fn </span>merge_pre_3_0_index_names(old_data_model: <span class="kw-2">&amp;</span>Datamodel, new_data_model: <span class="kw-2">&amp;mut </span>Datamodel, warnings: <span class="kw-2">&amp;mut </span>Vec&lt;Warning&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>retained_legacy_index_name_args = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">new_data_model</span>.<span class="ident">models</span>() {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">old_model</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">old_data_model</span>.<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>) {
-            <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">indices</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">old_index</span>) <span class="op">=</span> <span class="ident">old_model</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">old</span><span class="op">|</span> {
-                    <span class="ident">old</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">index</span>.<span class="ident">db_name</span>
-                        <span class="op">&amp;&amp;</span> <span class="ident">old</span>
-                            .<span class="ident">fields</span>
-                            .<span class="ident">iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="number">0</span>)
-                            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                            <span class="op">==</span> <span class="ident">index</span>
-                                .<span class="ident">fields</span>
-                                .<span class="ident">iter</span>()
-                                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="number">0</span>)
-                                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+    <span class="kw">for </span>model <span class="kw">in </span>new_data_model.models() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(old_model) = <span class="kw-2">&amp;</span>old_data_model.find_model(<span class="kw-2">&amp;</span>model.name) {
+            <span class="kw">for </span>index <span class="kw">in </span><span class="kw-2">&amp;</span>model.indices {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(old_index) = old_model.indices.iter().find(|old| {
+                    old.name == index.db_name
+                        &amp;&amp; old
+                            .fields
+                            .iter()
+                            .map(|f| <span class="kw-2">&amp;</span>f.path.first().unwrap().<span class="number">0</span>)
+                            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                            == index
+                                .fields
+                                .iter()
+                                .map(|f| <span class="kw-2">&amp;</span>f.path.first().unwrap().<span class="number">0</span>)
+                                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                 }) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">old_name</span>) <span class="op">=</span> <span class="ident">old_index</span>.<span class="ident">name</span> {
-                        <span class="ident">retained_legacy_index_name_args</span>.<span class="ident">push</span>(<span class="ident">ModelAndIndex::new</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">old_name</span>))
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>old_name) = old_index.name {
+                        retained_legacy_index_name_args.push(ModelAndIndex::new(<span class="kw-2">&amp;</span>model.name, old_name))
                     }
                 }
             }
         }
     }
 
-    <span class="comment">//change index name</span>
-    <span class="kw">for</span> <span class="ident">changed_index_name</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">retained_legacy_index_name_args</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">new_data_model</span>
-            .<span class="ident">find_model_mut</span>(<span class="kw-2">&amp;</span><span class="ident">changed_index_name</span>.<span class="ident">model</span>)
-            .<span class="ident">indices</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">db_name</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">changed_index_name</span>.<span class="ident">index_db_name</span>.<span class="ident">to_string</span>()))
-            .<span class="ident">unwrap</span>();
-        <span class="ident">index</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">changed_index_name</span>.<span class="ident">index_db_name</span>.<span class="ident">clone</span>());
+    <span class="comment">//change index name
+    </span><span class="kw">for </span>changed_index_name <span class="kw">in </span><span class="kw-2">&amp;</span>retained_legacy_index_name_args {
+        <span class="kw">let </span>index = new_data_model
+            .find_model_mut(<span class="kw-2">&amp;</span>changed_index_name.model)
+            .indices
+            .iter_mut()
+            .find(|i| i.db_name == <span class="prelude-val">Some</span>(changed_index_name.index_db_name.to_string()))
+            .unwrap();
+        index.name = <span class="prelude-val">Some</span>(changed_index_name.index_db_name.clone());
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">retained_legacy_index_name_args</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">let</span> <span class="ident">index</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelAndIndex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">retained_legacy_index_name_args</span>.<span class="ident">to_vec</span>();
-        <span class="ident">warnings</span>.<span class="ident">push</span>(<span class="ident">warning_enriched_with_custom_index_names</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>));
+    <span class="kw">if </span>!retained_legacy_index_name_args.is_empty() {
+        <span class="kw">let </span>index: Vec&lt;ModelAndIndex&gt; = retained_legacy_index_name_args.to_vec();
+        warnings.push(warning_enriched_with_custom_index_names(<span class="kw-2">&amp;</span>index));
     }
 }
 
-<span class="comment">//custom index names</span>
-<span class="kw">fn</span> <span class="ident">merge_custom_index_names</span>(<span class="ident">old_data_model</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>, <span class="ident">new_data_model</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">warnings</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changed_index_names</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="comment">//custom index names
+</span><span class="kw">fn </span>merge_custom_index_names(old_data_model: <span class="kw-2">&amp;</span>Datamodel, new_data_model: <span class="kw-2">&amp;mut </span>Datamodel, warnings: <span class="kw-2">&amp;mut </span>Vec&lt;Warning&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>changed_index_names = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">new_data_model</span>.<span class="ident">models</span>() {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">old_model</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">old_data_model</span>.<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>) {
-            <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">indices</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">old_index</span>) <span class="op">=</span> <span class="ident">old_model</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">old</span><span class="op">|</span> <span class="ident">old</span>.<span class="ident">db_name</span> <span class="op">==</span> <span class="ident">index</span>.<span class="ident">db_name</span>) {
-                    <span class="kw">if</span> <span class="ident">old_index</span>.<span class="ident">name</span>.<span class="ident">is_some</span>() {
-                        <span class="kw">let</span> <span class="ident">mf</span> <span class="op">=</span> <span class="ident">ModelAndIndex::new</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">old_index</span>.<span class="ident">db_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
-                        <span class="ident">changed_index_names</span>.<span class="ident">push</span>((<span class="ident">mf</span>, <span class="ident">old_index</span>.<span class="ident">name</span>.<span class="ident">clone</span>()))
+    <span class="kw">for </span>model <span class="kw">in </span>new_data_model.models() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(old_model) = <span class="kw-2">&amp;</span>old_data_model.find_model(<span class="kw-2">&amp;</span>model.name) {
+            <span class="kw">for </span>index <span class="kw">in </span><span class="kw-2">&amp;</span>model.indices {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(old_index) = old_model.indices.iter().find(|old| old.db_name == index.db_name) {
+                    <span class="kw">if </span>old_index.name.is_some() {
+                        <span class="kw">let </span>mf = ModelAndIndex::new(<span class="kw-2">&amp;</span>model.name, old_index.db_name.as_ref().unwrap());
+                        changed_index_names.push((mf, old_index.name.clone()))
                     }
                 }
             }
         }
     }
 
-    <span class="comment">//change index name</span>
-    <span class="kw">for</span> <span class="ident">changed_index_name</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">changed_index_names</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">new_data_model</span>
-            .<span class="ident">find_model_mut</span>(<span class="kw-2">&amp;</span><span class="ident">changed_index_name</span>.<span class="number">0</span>.<span class="ident">model</span>)
-            .<span class="ident">indices</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">db_name</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">changed_index_name</span>.<span class="number">0</span>.<span class="ident">index_db_name</span>.<span class="ident">clone</span>()))
-            .<span class="ident">unwrap</span>();
-        <span class="ident">index</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">changed_index_name</span>.<span class="number">1</span>.<span class="ident">clone</span>();
+    <span class="comment">//change index name
+    </span><span class="kw">for </span>changed_index_name <span class="kw">in </span><span class="kw-2">&amp;</span>changed_index_names {
+        <span class="kw">let </span>index = new_data_model
+            .find_model_mut(<span class="kw-2">&amp;</span>changed_index_name.<span class="number">0</span>.model)
+            .indices
+            .iter_mut()
+            .find(|i| i.db_name == <span class="prelude-val">Some</span>(changed_index_name.<span class="number">0</span>.index_db_name.clone()))
+            .unwrap();
+        index.name = changed_index_name.<span class="number">1</span>.clone();
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">changed_index_names</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">let</span> <span class="ident">index</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">changed_index_names</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">collect</span>();
-        <span class="ident">warnings</span>.<span class="ident">push</span>(<span class="ident">warning_enriched_with_custom_index_names</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>));
+    <span class="kw">if </span>!changed_index_names.is_empty() {
+        <span class="kw">let </span>index: Vec&lt;<span class="kw">_</span>&gt; = changed_index_names.iter().map(|c| c.<span class="number">0</span>.clone()).collect();
+        warnings.push(warning_enriched_with_custom_index_names(<span class="kw-2">&amp;</span>index));
     }
 }
 
-<span class="comment">// Prisma Level Only concepts</span>
-<span class="comment">// @default(cuid) / @default(uuid) / @updatedAt</span>
-<span class="kw">fn</span> <span class="ident">merge_prisma_level_defaults</span>(
-    <span class="ident">old_data_model</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>,
-    <span class="ident">new_data_model</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>,
-    <span class="ident">warnings</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>,
+<span class="comment">// Prisma Level Only concepts
+// @default(cuid) / @default(uuid) / @updatedAt
+</span><span class="kw">fn </span>merge_prisma_level_defaults(
+    old_data_model: <span class="kw-2">&amp;</span>Datamodel,
+    new_data_model: <span class="kw-2">&amp;mut </span>Datamodel,
+    warnings: <span class="kw-2">&amp;mut </span>Vec&lt;Warning&gt;,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">re_introspected_prisma_level_cuids</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">re_introspected_prisma_level_uuids</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">re_introspected_updated_at</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>re_introspected_prisma_level_cuids = <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>re_introspected_prisma_level_uuids = <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>re_introspected_updated_at = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">new_data_model</span>.<span class="ident">models</span>() {
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>() {
-            <span class="kw">let</span> <span class="ident">old_model</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">old_data_model</span>.<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">old_model</span>) =&gt; <span class="ident">old_model</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>,
+    <span class="kw">for </span>model <span class="kw">in </span>new_data_model.models() {
+        <span class="kw">for </span>field <span class="kw">in </span>model.scalar_fields() {
+            <span class="kw">let </span>old_model = <span class="kw">match </span>old_data_model.find_model(<span class="kw-2">&amp;</span>model.name) {
+                <span class="prelude-val">Some</span>(old_model) =&gt; old_model,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
             };
 
-            <span class="kw">let</span> <span class="ident">old_field</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">old_model</span>.<span class="ident">find_scalar_field</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">mike</span>) =&gt; <span class="ident">mike</span>, <span class="comment">// oldfield</span>
-                <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>,
+            <span class="kw">let </span>old_field = <span class="kw">match </span>old_model.find_scalar_field(<span class="kw-2">&amp;</span>field.name) {
+                <span class="prelude-val">Some</span>(mike) =&gt; mike, <span class="comment">// oldfield
+                </span><span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
             };
 
-            <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">default_value</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">field</span>.<span class="ident">field_type</span>.<span class="ident">is_string</span>() {
-                <span class="kw">if</span> <span class="ident">old_field</span>.<span class="ident">default_value</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_cuid</span>())) {
-                    <span class="ident">re_introspected_prisma_level_cuids</span>.<span class="ident">push</span>(<span class="ident">ModelAndField::new</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>));
+            <span class="kw">if </span>field.default_value.is_none() &amp;&amp; field.field_type.is_string() {
+                <span class="kw">if </span>old_field.default_value == <span class="prelude-val">Some</span>(DefaultValue::new_expression(ValueGenerator::new_cuid())) {
+                    re_introspected_prisma_level_cuids.push(ModelAndField::new(<span class="kw-2">&amp;</span>model.name, <span class="kw-2">&amp;</span>field.name));
                 }
 
-                <span class="kw">if</span> <span class="ident">old_field</span>.<span class="ident">default_value</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_uuid</span>())) {
-                    <span class="ident">re_introspected_prisma_level_uuids</span>.<span class="ident">push</span>(<span class="ident">ModelAndField::new</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>));
+                <span class="kw">if </span>old_field.default_value == <span class="prelude-val">Some</span>(DefaultValue::new_expression(ValueGenerator::new_uuid())) {
+                    re_introspected_prisma_level_uuids.push(ModelAndField::new(<span class="kw-2">&amp;</span>model.name, <span class="kw-2">&amp;</span>field.name));
                 }
             }
 
-            <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">field_type</span>.<span class="ident">is_datetime</span>() <span class="op">&amp;&amp;</span> <span class="ident">old_field</span>.<span class="ident">is_updated_at</span> {
-                <span class="ident">re_introspected_updated_at</span>.<span class="ident">push</span>(<span class="ident">ModelAndField::new</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>));
+            <span class="kw">if </span>field.field_type.is_datetime() &amp;&amp; old_field.is_updated_at {
+                re_introspected_updated_at.push(ModelAndField::new(<span class="kw-2">&amp;</span>model.name, <span class="kw-2">&amp;</span>field.name));
             }
         }
     }
 
-    <span class="kw">for</span> <span class="ident">cuid</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">re_introspected_prisma_level_cuids</span> {
-        <span class="ident">new_data_model</span>
-            .<span class="ident">find_scalar_field_mut</span>(<span class="kw-2">&amp;</span><span class="ident">cuid</span>.<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">cuid</span>.<span class="ident">field</span>)
-            .<span class="ident">default_value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_cuid</span>()));
+    <span class="kw">for </span>cuid <span class="kw">in </span><span class="kw-2">&amp;</span>re_introspected_prisma_level_cuids {
+        new_data_model
+            .find_scalar_field_mut(<span class="kw-2">&amp;</span>cuid.model, <span class="kw-2">&amp;</span>cuid.field)
+            .default_value = <span class="prelude-val">Some</span>(DefaultValue::new_expression(ValueGenerator::new_cuid()));
     }
 
-    <span class="kw">for</span> <span class="ident">uuid</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">re_introspected_prisma_level_uuids</span> {
-        <span class="ident">new_data_model</span>
-            .<span class="ident">find_scalar_field_mut</span>(<span class="kw-2">&amp;</span><span class="ident">uuid</span>.<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">uuid</span>.<span class="ident">field</span>)
-            .<span class="ident">default_value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_uuid</span>()));
+    <span class="kw">for </span>uuid <span class="kw">in </span><span class="kw-2">&amp;</span>re_introspected_prisma_level_uuids {
+        new_data_model
+            .find_scalar_field_mut(<span class="kw-2">&amp;</span>uuid.model, <span class="kw-2">&amp;</span>uuid.field)
+            .default_value = <span class="prelude-val">Some</span>(DefaultValue::new_expression(ValueGenerator::new_uuid()));
     }
 
-    <span class="kw">for</span> <span class="ident">updated_at</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">re_introspected_updated_at</span> {
-        <span class="ident">new_data_model</span>
-            .<span class="ident">find_scalar_field_mut</span>(<span class="kw-2">&amp;</span><span class="ident">updated_at</span>.<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">updated_at</span>.<span class="ident">field</span>)
-            .<span class="ident">is_updated_at</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">for </span>updated_at <span class="kw">in </span><span class="kw-2">&amp;</span>re_introspected_updated_at {
+        new_data_model
+            .find_scalar_field_mut(<span class="kw-2">&amp;</span>updated_at.model, <span class="kw-2">&amp;</span>updated_at.field)
+            .is_updated_at = <span class="bool-val">true</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">re_introspected_prisma_level_cuids</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">warnings</span>.<span class="ident">push</span>(<span class="ident">warning_enriched_with_cuid</span>(<span class="kw-2">&amp;</span><span class="ident">re_introspected_prisma_level_cuids</span>));
+    <span class="kw">if </span>!re_introspected_prisma_level_cuids.is_empty() {
+        warnings.push(warning_enriched_with_cuid(<span class="kw-2">&amp;</span>re_introspected_prisma_level_cuids));
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">re_introspected_prisma_level_uuids</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">warnings</span>.<span class="ident">push</span>(<span class="ident">warning_enriched_with_uuid</span>(<span class="kw-2">&amp;</span><span class="ident">re_introspected_prisma_level_uuids</span>));
+    <span class="kw">if </span>!re_introspected_prisma_level_uuids.is_empty() {
+        warnings.push(warning_enriched_with_uuid(<span class="kw-2">&amp;</span>re_introspected_prisma_level_uuids));
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">re_introspected_updated_at</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">warnings</span>.<span class="ident">push</span>(<span class="ident">warning_enriched_with_updated_at</span>(<span class="kw-2">&amp;</span><span class="ident">re_introspected_updated_at</span>));
+    <span class="kw">if </span>!re_introspected_updated_at.is_empty() {
+        warnings.push(warning_enriched_with_updated_at(<span class="kw-2">&amp;</span>re_introspected_updated_at));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

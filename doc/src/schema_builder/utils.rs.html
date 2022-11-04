@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema_builder/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema_builder/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -119,126 +119,126 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::pk::PrimaryKey</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">dml</span>, <span class="ident">ModelRef</span>};
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>prisma_models::pk::PrimaryKey;
+<span class="kw">use </span>prisma_models::{dml, ModelRef};
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="doccomment">/// Object type convenience wrapper function.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object_type</span>(<span class="ident">ident</span>: <span class="ident">Identifier</span>, <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span>, <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>) -&gt; <span class="ident">ObjectType</span> {
-    <span class="kw">let</span> <span class="ident">object_type</span> <span class="op">=</span> <span class="ident">ObjectType::new</span>(<span class="ident">ident</span>, <span class="ident">model</span>);
+<span class="doccomment">/// Object type convenience wrapper function.
+</span><span class="kw">pub fn </span>object_type(ident: Identifier, fields: Vec&lt;OutputField&gt;, model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;) -&gt; ObjectType {
+    <span class="kw">let </span>object_type = ObjectType::new(ident, model);
 
-    <span class="ident">object_type</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
-    <span class="ident">object_type</span>
+    object_type.set_fields(fields);
+    object_type
 }
 
-<span class="doccomment">/// Input object type convenience wrapper function.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">input_object_type</span>(<span class="ident">ident</span>: <span class="ident">Identifier</span>, <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span>) -&gt; <span class="ident">InputObjectType</span> {
-    <span class="kw">let</span> <span class="ident">object_type</span> <span class="op">=</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>);
+<span class="doccomment">/// Input object type convenience wrapper function.
+</span><span class="kw">pub fn </span>input_object_type(ident: Identifier, fields: Vec&lt;InputField&gt;) -&gt; InputObjectType {
+    <span class="kw">let </span>object_type = init_input_object_type(ident);
 
-    <span class="ident">object_type</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
-    <span class="ident">object_type</span>
+    object_type.set_fields(fields);
+    object_type
 }
 
-<span class="doccomment">/// Input object type initializer for cases where only the name is known, and fields are computed later.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>: <span class="ident">Identifier</span>) -&gt; <span class="ident">InputObjectType</span> {
-    <span class="ident">InputObjectType</span> {
-        <span class="ident">identifier</span>: <span class="ident">ident</span>,
-        <span class="ident">constraints</span>: <span class="ident">InputObjectTypeConstraints::default</span>(),
-        <span class="ident">fields</span>: <span class="ident">OnceCell::new</span>(),
-        <span class="ident">tag</span>: <span class="prelude-val">None</span>,
+<span class="doccomment">/// Input object type initializer for cases where only the name is known, and fields are computed later.
+</span><span class="kw">pub fn </span>init_input_object_type(ident: Identifier) -&gt; InputObjectType {
+    InputObjectType {
+        identifier: ident,
+        constraints: InputObjectTypeConstraints::default(),
+        fields: OnceCell::new(),
+        tag: <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Field convenience wrapper function.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">name</span>: <span class="ident">T</span>,
-    <span class="ident">arguments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span>,
-    <span class="ident">field_type</span>: <span class="ident">OutputType</span>,
-    <span class="ident">query_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QueryInfo</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">OutputField</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Field convenience wrapper function.
+</span><span class="kw">pub fn </span>field&lt;T&gt;(
+    name: T,
+    arguments: Vec&lt;InputField&gt;,
+    field_type: OutputType,
+    query_info: <span class="prelude-ty">Option</span>&lt;QueryInfo&gt;,
+) -&gt; OutputField
+<span class="kw">where
+    </span>T: Into&lt;String&gt;,
 {
-    <span class="ident">OutputField</span> {
-        <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-        <span class="ident">arguments</span>: <span class="ident">arguments</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Arc::new</span>).<span class="ident">collect</span>(),
-        <span class="ident">field_type</span>: <span class="ident">Arc::new</span>(<span class="ident">field_type</span>),
-        <span class="ident">query_info</span>,
-        <span class="ident">is_nullable</span>: <span class="bool-val">false</span>,
-        <span class="ident">deprecation</span>: <span class="prelude-val">None</span>,
+    OutputField {
+        name: name.into(),
+        arguments: arguments.into_iter().map(Arc::new).collect(),
+        field_type: Arc::new(field_type),
+        query_info,
+        is_nullable: <span class="bool-val">false</span>,
+        deprecation: <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Field convenience wrapper function.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">input_field</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">field_types</span>: <span class="ident">S</span>, <span class="ident">default_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::DefaultValue</span><span class="op">&gt;</span>) -&gt; <span class="ident">InputField</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputType</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Field convenience wrapper function.
+</span><span class="kw">pub fn </span>input_field&lt;T, S&gt;(name: T, field_types: S, default_value: <span class="prelude-ty">Option</span>&lt;dml::DefaultValue&gt;) -&gt; InputField
+<span class="kw">where
+    </span>T: Into&lt;String&gt;,
+    S: Into&lt;Vec&lt;InputType&gt;&gt;,
 {
-    <span class="ident">InputField</span> {
-        <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-        <span class="ident">field_types</span>: <span class="ident">field_types</span>.<span class="ident">into</span>(),
-        <span class="ident">default_value</span>,
-        <span class="ident">is_required</span>: <span class="bool-val">true</span>,
-        <span class="ident">deprecation</span>: <span class="prelude-val">None</span>,
+    InputField {
+        name: name.into(),
+        field_types: field_types.into(),
+        default_value,
+        is_required: <span class="bool-val">true</span>,
+        deprecation: <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Lowercases first letter, essentially.</span>
-<span class="doccomment">/// Assumes 1-byte characters, panics otherwise.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">camel_case</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="ident">T</span>) -&gt; <span class="ident">String</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Lowercases first letter, essentially.
+/// Assumes 1-byte characters, panics otherwise.
+</span><span class="kw">pub fn </span>camel_case&lt;T&gt;(s: T) -&gt; String
+<span class="kw">where
+    </span>T: Into&lt;String&gt;,
 {
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">into</span>();
+    <span class="kw">let </span>s = s.into();
 
-    <span class="comment">// This is safe to unwrap, as the validation regex for model / field</span>
-    <span class="comment">// names used in the data model essentially guarantees ASCII.</span>
-    <span class="kw">let</span> <span class="ident">first_char</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
+    <span class="comment">// This is safe to unwrap, as the validation regex for model / field
+    // names used in the data model essentially guarantees ASCII.
+    </span><span class="kw">let </span>first_char = s.chars().next().unwrap();
 
-    <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">first_char</span>.<span class="ident">to_lowercase</span>(), <span class="ident">s</span>[<span class="number">1</span>..].<span class="ident">to_owned</span>())
+    <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, first_char.to_lowercase(), s[<span class="number">1</span>..].to_owned())
 }
 
-<span class="doccomment">/// Capitalizes first character.</span>
-<span class="doccomment">/// Assumes 1-byte characters.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capitalize</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="ident">T</span>) -&gt; <span class="ident">String</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Capitalizes first character.
+/// Assumes 1-byte characters.
+</span><span class="kw">pub fn </span>capitalize&lt;T&gt;(s: T) -&gt; String
+<span class="kw">where
+    </span>T: Into&lt;String&gt;,
 {
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">into</span>();
+    <span class="kw">let </span>s = s.into();
 
-    <span class="comment">// This is safe to unwrap, as the validation regex for model / field</span>
-    <span class="comment">// names used in the data model essentially guarantees ASCII.</span>
-    <span class="kw">let</span> <span class="ident">first_char</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
+    <span class="comment">// This is safe to unwrap, as the validation regex for model / field
+    // names used in the data model essentially guarantees ASCII.
+    </span><span class="kw">let </span>first_char = s.chars().next().unwrap();
 
-    <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">first_char</span>.<span class="ident">to_uppercase</span>(), <span class="ident">s</span>[<span class="number">1</span>..].<span class="ident">to_owned</span>())
+    <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, first_char.to_uppercase(), s[<span class="number">1</span>..].to_owned())
 }
 
-<span class="doccomment">/// Appends an option of type T to a vector over T if the option is Some.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_opt</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">vec</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
-    <span class="ident">vec</span>.<span class="ident">extend</span>(<span class="ident">opt</span>.<span class="ident">into_iter</span>())
+<span class="doccomment">/// Appends an option of type T to a vector over T if the option is Some.
+</span><span class="kw">pub fn </span>append_opt&lt;T&gt;(vec: <span class="kw-2">&amp;mut </span>Vec&lt;T&gt;, opt: <span class="prelude-ty">Option</span>&lt;T&gt;) {
+    vec.extend(opt.into_iter())
 }
 
-<span class="doccomment">/// Computes a compound field name based on an index.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compound_index_field_name</span>(<span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">Index</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">index</span>.<span class="ident">name</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">index_fields</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">fields</span>();
-        <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">index_fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>()).<span class="ident">collect</span>();
+<span class="doccomment">/// Computes a compound field name based on an index.
+</span><span class="kw">pub fn </span>compound_index_field_name(index: <span class="kw-2">&amp;</span>Index) -&gt; String {
+    index.name.clone().unwrap_or_else(|| {
+        <span class="kw">let </span>index_fields = index.fields();
+        <span class="kw">let </span>field_names: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = index_fields.iter().map(|sf| sf.name.as_ref()).collect();
 
-        <span class="ident">field_names</span>.<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>)
+        field_names.join(<span class="string">&quot;_&quot;</span>)
     })
 }
 
-<span class="doccomment">/// Computes a compound field name based on a multi-field id.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compound_id_field_name</span>(<span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="ident">PrimaryKey</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">pk</span>.<span class="ident">alias</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">pk_fields</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">fields</span>();
-        <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pk_fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>()).<span class="ident">collect</span>();
+<span class="doccomment">/// Computes a compound field name based on a multi-field id.
+</span><span class="kw">pub fn </span>compound_id_field_name(pk: <span class="kw-2">&amp;</span>PrimaryKey) -&gt; String {
+    pk.alias.clone().unwrap_or_else(|| {
+        <span class="kw">let </span>pk_fields = pk.fields();
+        <span class="kw">let </span>field_names: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = pk_fields.iter().map(|sf| sf.name.as_ref()).collect();
 
-        <span class="ident">field_names</span>.<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>)
+        field_names.join(<span class="string">&quot;_&quot;</span>)
     })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

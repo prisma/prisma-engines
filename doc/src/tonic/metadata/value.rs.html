@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/metadata/value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/metadata/value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -899,904 +899,904 @@
 <span id="897">897</span>
 <span id="898">898</span>
 <span id="899">899</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::upper_case_acronyms</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(clippy::upper_case_acronyms)]
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::encoding</span>::{
-    <span class="ident">Ascii</span>, <span class="ident">Binary</span>, <span class="ident">InvalidMetadataValue</span>, <span class="ident">InvalidMetadataValueBytes</span>, <span class="ident">ValueEncoding</span>,
+</span><span class="kw">use </span><span class="kw">super</span>::encoding::{
+    Ascii, Binary, InvalidMetadataValue, InvalidMetadataValueBytes, ValueEncoding,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::key::MetadataKey</span>;
+<span class="kw">use </span><span class="kw">super</span>::key::MetadataKey;
 
-<span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
-<span class="kw">use</span> <span class="ident">http::header::HeaderValue</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>};
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp</span>, <span class="ident">fmt</span>};
+<span class="kw">use </span>bytes::Bytes;
+<span class="kw">use </span>http::header::HeaderValue;
+<span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::hash::{Hash, Hasher};
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::str::FromStr;
+<span class="kw">use </span>std::{cmp, fmt};
 
-<span class="doccomment">/// Represents a custom metadata field value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `MetadataValue` is used as the [`MetadataMap`] value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`HeaderMap`]: struct.HeaderMap.html</span>
-<span class="doccomment">/// [`MetadataMap`]: struct.MetadataMap.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> {
-    <span class="comment">// Note: There are unsafe transmutes that assume that the memory layout</span>
-    <span class="comment">// of MetadataValue is identical to HeaderValue</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">HeaderValue</span>,
-    <span class="ident">phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represents a custom metadata field value.
+///
+/// `MetadataValue` is used as the [`MetadataMap`] value.
+///
+/// [`HeaderMap`]: struct.HeaderMap.html
+/// [`MetadataMap`]: struct.MetadataMap.html
+</span><span class="attribute">#[derive(Clone)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>MetadataValue&lt;VE: ValueEncoding&gt; {
+    <span class="comment">// Note: There are unsafe transmutes that assume that the memory layout
+    // of MetadataValue is identical to HeaderValue
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) inner: HeaderValue,
+    phantom: PhantomData&lt;VE&gt;,
 }
 
-<span class="doccomment">/// A possible error when converting a `MetadataValue` to a string representation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metadata field values may contain opaque bytes, in which case it is not</span>
-<span class="doccomment">/// possible to represent the value as a string.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ToStrError</span> {
-    <span class="ident">_priv</span>: (),
+<span class="doccomment">/// A possible error when converting a `MetadataValue` to a string representation.
+///
+/// Metadata field values may contain opaque bytes, in which case it is not
+/// possible to represent the value as a string.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ToStrError {
+    _priv: (),
 }
 
-<span class="doccomment">/// An ascii metadata value.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AsciiMetadataValue</span> <span class="op">=</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span>;
-<span class="doccomment">/// A binary metadata value.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BinaryMetadataValue</span> <span class="op">=</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Binary</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An ascii metadata value.
+</span><span class="kw">pub type </span>AsciiMetadataValue = MetadataValue&lt;Ascii&gt;;
+<span class="doccomment">/// A binary metadata value.
+</span><span class="kw">pub type </span>BinaryMetadataValue = MetadataValue&lt;Binary&gt;;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Convert a static string to a `MetadataValue`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will not perform any copying, however the string is</span>
-    <span class="doccomment">/// checked to ensure that no invalid characters are present.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For Ascii values, only visible ASCII characters (32-127) are permitted.</span>
-    <span class="doccomment">/// For Binary values, the string must be valid base64.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if the argument contains invalid metadata value</span>
-    <span class="doccomment">/// characters.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);</span>
-    <span class="doccomment">/// assert_eq!(val, &quot;hello&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = BinaryMetadataValue::from_static(&quot;SGVsbG8hIQ==&quot;);</span>
-    <span class="doccomment">/// assert_eq!(val, &quot;Hello!!&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">MetadataValue</span> {
-            <span class="ident">inner</span>: <span class="ident">VE::from_static</span>(<span class="ident">src</span>),
-            <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; MetadataValue&lt;VE&gt; {
+    <span class="doccomment">/// Convert a static string to a `MetadataValue`.
+    ///
+    /// This function will not perform any copying, however the string is
+    /// checked to ensure that no invalid characters are present.
+    ///
+    /// For Ascii values, only visible ASCII characters (32-127) are permitted.
+    /// For Binary values, the string must be valid base64.
+    ///
+    /// # Panics
+    ///
+    /// This function panics if the argument contains invalid metadata value
+    /// characters.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);
+    /// assert_eq!(val, &quot;hello&quot;);
+    /// ```
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = BinaryMetadataValue::from_static(&quot;SGVsbG8hIQ==&quot;);
+    /// assert_eq!(val, &quot;Hello!!&quot;);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>from_static(src: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        MetadataValue {
+            inner: VE::from_static(src),
+            phantom: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Attempt to convert a byte slice to a `MetadataValue`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For Ascii metadata values, If the argument contains invalid metadata</span>
-    <span class="doccomment">/// value bytes, an error is returned. Only byte values between 32 and 255</span>
-    <span class="doccomment">/// (inclusive) are permitted, excluding byte 127 (DEL).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For Binary metadata values this method cannot fail. See also the Binary</span>
-    <span class="doccomment">/// only version of this method `from_bytes`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is intended to be replaced in the future by a `TryFrom`</span>
-    <span class="doccomment">/// implementation once the trait is stabilized in std.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::try_from_bytes(b&quot;hello\xfa&quot;).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(val, &amp;b&quot;hello\xfa&quot;[..]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An invalid value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::try_from_bytes(b&quot;\n&quot;);</span>
-    <span class="doccomment">/// assert!(val.is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_bytes</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
-        <span class="ident">VE::from_bytes</span>(<span class="ident">src</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">MetadataValue</span> {
-            <span class="ident">inner</span>: <span class="ident">value</span>,
-            <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Attempt to convert a byte slice to a `MetadataValue`.
+    ///
+    /// For Ascii metadata values, If the argument contains invalid metadata
+    /// value bytes, an error is returned. Only byte values between 32 and 255
+    /// (inclusive) are permitted, excluding byte 127 (DEL).
+    ///
+    /// For Binary metadata values this method cannot fail. See also the Binary
+    /// only version of this method `from_bytes`.
+    ///
+    /// This function is intended to be replaced in the future by a `TryFrom`
+    /// implementation once the trait is stabilized in std.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::try_from_bytes(b&quot;hello\xfa&quot;).unwrap();
+    /// assert_eq!(val, &amp;b&quot;hello\xfa&quot;[..]);
+    /// ```
+    ///
+    /// An invalid value
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::try_from_bytes(b&quot;\n&quot;);
+    /// assert!(val.is_err());
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>try_from_bytes(src: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMetadataValueBytes&gt; {
+        VE::from_bytes(src).map(|value| MetadataValue {
+            inner: value,
+            phantom: PhantomData,
         })
     }
 
-    <span class="doccomment">/// Attempt to convert a `Bytes` buffer to a `MetadataValue`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For `MetadataValue&lt;Ascii&gt;`, if the argument contains invalid metadata</span>
-    <span class="doccomment">/// value bytes, an error is returned. Only byte values between 32 and 255</span>
-    <span class="doccomment">/// (inclusive) are permitted, excluding byte 127 (DEL).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For `MetadataValue&lt;Binary&gt;`, if the argument is not valid base64, an</span>
-    <span class="doccomment">/// error is returned. In use cases where the input is not base64 encoded,</span>
-    <span class="doccomment">/// use `from_bytes`; if the value has to be encoded it&#39;s not possible to</span>
-    <span class="doccomment">/// share the memory anyways.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is intended to be replaced in the future by a `TryFrom`</span>
-    <span class="doccomment">/// implementation once the trait is stabilized in std.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">src</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
-        <span class="ident">VE::from_shared</span>(<span class="ident">src</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">MetadataValue</span> {
-            <span class="ident">inner</span>: <span class="ident">value</span>,
-            <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Attempt to convert a `Bytes` buffer to a `MetadataValue`.
+    ///
+    /// For `MetadataValue&lt;Ascii&gt;`, if the argument contains invalid metadata
+    /// value bytes, an error is returned. Only byte values between 32 and 255
+    /// (inclusive) are permitted, excluding byte 127 (DEL).
+    ///
+    /// For `MetadataValue&lt;Binary&gt;`, if the argument is not valid base64, an
+    /// error is returned. In use cases where the input is not base64 encoded,
+    /// use `from_bytes`; if the value has to be encoded it&#39;s not possible to
+    /// share the memory anyways.
+    ///
+    /// This function is intended to be replaced in the future by a `TryFrom`
+    /// implementation once the trait is stabilized in std.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>from_shared(src: Bytes) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMetadataValueBytes&gt; {
+        VE::from_shared(src).map(|value| MetadataValue {
+            inner: value,
+            phantom: PhantomData,
         })
     }
 
-    <span class="doccomment">/// Convert a `Bytes` directly into a `MetadataValue` without validating.</span>
-    <span class="doccomment">/// For MetadataValue&lt;Binary&gt; the provided parameter must be base64</span>
-    <span class="doccomment">/// encoded without padding bytes at the end.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function does NOT validate that illegal bytes are not contained</span>
-    <span class="doccomment">/// within the buffer.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_shared_unchecked</span>(<span class="ident">src</span>: <span class="ident">Bytes</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">MetadataValue</span> {
-            <span class="ident">inner</span>: <span class="ident">HeaderValue::from_maybe_shared_unchecked</span>(<span class="ident">src</span>),
-            <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Convert a `Bytes` directly into a `MetadataValue` without validating.
+    /// For MetadataValue&lt;Binary&gt; the provided parameter must be base64
+    /// encoded without padding bytes at the end.
+    ///
+    /// # Safety
+    ///
+    /// This function does NOT validate that illegal bytes are not contained
+    /// within the buffer.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub unsafe fn </span>from_shared_unchecked(src: Bytes) -&gt; <span class="self">Self </span>{
+        MetadataValue {
+            inner: HeaderValue::from_maybe_shared_unchecked(src),
+            phantom: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Returns true if the `MetadataValue` has a length of zero bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::from_static(&quot;&quot;);</span>
-    <span class="doccomment">/// assert!(val.is_empty());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);</span>
-    <span class="doccomment">/// assert!(!val.is_empty());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">VE::is_empty</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_bytes</span>())
+    <span class="doccomment">/// Returns true if the `MetadataValue` has a length of zero bytes.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::from_static(&quot;&quot;);
+    /// assert!(val.is_empty());
+    ///
+    /// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);
+    /// assert!(!val.is_empty());
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        VE::is_empty(<span class="self">self</span>.inner.as_bytes())
     }
 
-    <span class="doccomment">/// Converts a `MetadataValue` to a Bytes buffer. This method cannot</span>
-    <span class="doccomment">/// fail for Ascii values. For Ascii values, `as_bytes` is more convenient</span>
-    <span class="doccomment">/// to use.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);</span>
-    <span class="doccomment">/// assert_eq!(val.to_bytes().unwrap().as_ref(), b&quot;hello&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = BinaryMetadataValue::from_bytes(b&quot;hello&quot;);</span>
-    <span class="doccomment">/// assert_eq!(val.to_bytes().unwrap().as_ref(), b&quot;hello&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
-        <span class="ident">VE::decode</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_bytes</span>())
+    <span class="doccomment">/// Converts a `MetadataValue` to a Bytes buffer. This method cannot
+    /// fail for Ascii values. For Ascii values, `as_bytes` is more convenient
+    /// to use.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);
+    /// assert_eq!(val.to_bytes().unwrap().as_ref(), b&quot;hello&quot;);
+    /// ```
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = BinaryMetadataValue::from_bytes(b&quot;hello&quot;);
+    /// assert_eq!(val.to_bytes().unwrap().as_ref(), b&quot;hello&quot;);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>to_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Bytes, InvalidMetadataValueBytes&gt; {
+        VE::decode(<span class="self">self</span>.inner.as_bytes())
     }
 
-    <span class="doccomment">/// Mark that the metadata value represents sensitive information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let mut val = AsciiMetadataValue::from_static(&quot;my secret&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// val.set_sensitive(true);</span>
-    <span class="doccomment">/// assert!(val.is_sensitive());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// val.set_sensitive(false);</span>
-    <span class="doccomment">/// assert!(!val.is_sensitive());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_sensitive</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_sensitive</span>(<span class="ident">val</span>);
+    <span class="doccomment">/// Mark that the metadata value represents sensitive information.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let mut val = AsciiMetadataValue::from_static(&quot;my secret&quot;);
+    ///
+    /// val.set_sensitive(true);
+    /// assert!(val.is_sensitive());
+    ///
+    /// val.set_sensitive(false);
+    /// assert!(!val.is_sensitive());
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>set_sensitive(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: bool) {
+        <span class="self">self</span>.inner.set_sensitive(val);
     }
 
-    <span class="doccomment">/// Returns `true` if the value represents sensitive data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Sensitive data could represent passwords or other data that should not</span>
-    <span class="doccomment">/// be stored on disk or in memory. This setting can be used by components</span>
-    <span class="doccomment">/// like caches to avoid storing the value. HPACK encoders must set the</span>
-    <span class="doccomment">/// metadata field to never index when `is_sensitive` returns true.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that sensitivity is not factored into equality or ordering.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let mut val = AsciiMetadataValue::from_static(&quot;my secret&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// val.set_sensitive(true);</span>
-    <span class="doccomment">/// assert!(val.is_sensitive());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// val.set_sensitive(false);</span>
-    <span class="doccomment">/// assert!(!val.is_sensitive());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_sensitive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">is_sensitive</span>()
+    <span class="doccomment">/// Returns `true` if the value represents sensitive data.
+    ///
+    /// Sensitive data could represent passwords or other data that should not
+    /// be stored on disk or in memory. This setting can be used by components
+    /// like caches to avoid storing the value. HPACK encoders must set the
+    /// metadata field to never index when `is_sensitive` returns true.
+    ///
+    /// Note that sensitivity is not factored into equality or ordering.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let mut val = AsciiMetadataValue::from_static(&quot;my secret&quot;);
+    ///
+    /// val.set_sensitive(true);
+    /// assert!(val.is_sensitive());
+    ///
+    /// val.set_sensitive(false);
+    /// assert!(!val.is_sensitive());
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_sensitive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.inner.is_sensitive()
     }
 
-    <span class="doccomment">/// Converts a `MetadataValue` to a byte slice. For Binary values, the</span>
-    <span class="doccomment">/// return value is base64 encoded.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);</span>
-    <span class="doccomment">/// assert_eq!(val.as_encoded_bytes(), b&quot;hello&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = BinaryMetadataValue::from_bytes(b&quot;Hello!&quot;);</span>
-    <span class="doccomment">/// assert_eq!(val.as_encoded_bytes(), b&quot;SGVsbG8h&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_encoded_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_bytes</span>()
+    <span class="doccomment">/// Converts a `MetadataValue` to a byte slice. For Binary values, the
+    /// return value is base64 encoded.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);
+    /// assert_eq!(val.as_encoded_bytes(), b&quot;hello&quot;);
+    /// ```
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = BinaryMetadataValue::from_bytes(b&quot;Hello!&quot;);
+    /// assert_eq!(val.as_encoded_bytes(), b&quot;SGVsbG8h&quot;);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_encoded_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.inner.as_bytes()
     }
 
-    <span class="doccomment">/// Converts a HeaderValue to a MetadataValue. This method assumes that the</span>
-    <span class="doccomment">/// caller has made sure that the value is of the correct Ascii or Binary</span>
-    <span class="doccomment">/// value encoding.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unchecked_from_header_value</span>(<span class="ident">value</span>: <span class="ident">HeaderValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">MetadataValue</span> {
-            <span class="ident">inner</span>: <span class="ident">value</span>,
-            <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Converts a HeaderValue to a MetadataValue. This method assumes that the
+    /// caller has made sure that the value is of the correct Ascii or Binary
+    /// value encoding.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unchecked_from_header_value(value: HeaderValue) -&gt; <span class="self">Self </span>{
+        MetadataValue {
+            inner: value,
+            phantom: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Converts a HeaderValue reference to a MetadataValue. This method assumes</span>
-    <span class="doccomment">/// that the caller has made sure that the value is of the correct Ascii or</span>
-    <span class="doccomment">/// Binary value encoding.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unchecked_from_header_value_ref</span>(<span class="ident">header_value</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">header_value</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">HeaderValue</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="self">Self</span>) }
+    <span class="doccomment">/// Converts a HeaderValue reference to a MetadataValue. This method assumes
+    /// that the caller has made sure that the value is of the correct Ascii or
+    /// Binary value encoding.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unchecked_from_header_value_ref(header_value: <span class="kw-2">&amp;</span>HeaderValue) -&gt; <span class="kw-2">&amp;</span><span class="self">Self </span>{
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(header_value <span class="kw">as </span><span class="kw-2">*const </span>HeaderValue <span class="kw">as </span><span class="kw-2">*const </span><span class="self">Self</span>) }
     }
 
-    <span class="doccomment">/// Converts a HeaderValue reference to a MetadataValue. This method assumes</span>
-    <span class="doccomment">/// that the caller has made sure that the value is of the correct Ascii or</span>
-    <span class="doccomment">/// Binary value encoding.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unchecked_from_mut_header_value_ref</span>(<span class="ident">header_value</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HeaderValue</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">header_value</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">HeaderValue</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="self">Self</span>) }
+    <span class="doccomment">/// Converts a HeaderValue reference to a MetadataValue. This method assumes
+    /// that the caller has made sure that the value is of the correct Ascii or
+    /// Binary value encoding.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unchecked_from_mut_header_value_ref(header_value: <span class="kw-2">&amp;mut </span>HeaderValue) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>(header_value <span class="kw">as </span><span class="kw-2">*mut </span>HeaderValue <span class="kw">as </span><span class="kw-2">*mut </span><span class="self">Self</span>) }
     }
 }
 
-<span class="comment">// is_empty is defined in the generic impl block above</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::len_without_is_empty</span>)]</span>
-<span class="kw">impl</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Attempt to convert a string to a `MetadataValue&lt;Ascii&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the argument contains invalid metadata value characters, an error is</span>
-    <span class="doccomment">/// returned. Only visible ASCII characters (32-127) are permitted. Use</span>
-    <span class="doccomment">/// `from_bytes` to create a `MetadataValue` that includes opaque octets</span>
-    <span class="doccomment">/// (128-255).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is intended to be replaced in the future by a `TryFrom`</span>
-    <span class="doccomment">/// implementation once the trait is stabilized in std.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::from_str(&quot;hello&quot;).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(val, &quot;hello&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An invalid value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::from_str(&quot;\n&quot;);</span>
-    <span class="doccomment">/// assert!(val.is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::should_implement_trait</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidMetadataValue</span><span class="op">&gt;</span> {
-        <span class="ident">HeaderValue::from_str</span>(<span class="ident">src</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">MetadataValue</span> {
-                <span class="ident">inner</span>: <span class="ident">value</span>,
-                <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
+<span class="comment">// is_empty is defined in the generic impl block above
+</span><span class="attribute">#[allow(clippy::len_without_is_empty)]
+</span><span class="kw">impl </span>MetadataValue&lt;Ascii&gt; {
+    <span class="doccomment">/// Attempt to convert a string to a `MetadataValue&lt;Ascii&gt;`.
+    ///
+    /// If the argument contains invalid metadata value characters, an error is
+    /// returned. Only visible ASCII characters (32-127) are permitted. Use
+    /// `from_bytes` to create a `MetadataValue` that includes opaque octets
+    /// (128-255).
+    ///
+    /// This function is intended to be replaced in the future by a `TryFrom`
+    /// implementation once the trait is stabilized in std.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::from_str(&quot;hello&quot;).unwrap();
+    /// assert_eq!(val, &quot;hello&quot;);
+    /// ```
+    ///
+    /// An invalid value
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::from_str(&quot;\n&quot;);
+    /// assert!(val.is_err());
+    /// ```
+    </span><span class="attribute">#[allow(clippy::should_implement_trait)]
+    #[inline]
+    </span><span class="kw">pub fn </span>from_str(src: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMetadataValue&gt; {
+        HeaderValue::from_str(src)
+            .map(|value| MetadataValue {
+                inner: value,
+                phantom: PhantomData,
             })
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidMetadataValue::new</span>())
+            .map_err(|<span class="kw">_</span>| InvalidMetadataValue::new())
     }
 
-    <span class="doccomment">/// Converts a MetadataKey into a MetadataValue&lt;Ascii&gt;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Since every valid MetadataKey is a valid MetadataValue this is done</span>
-    <span class="doccomment">/// infallibly.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::from_key::&lt;Ascii&gt;(&quot;accept&quot;.parse().unwrap());</span>
-    <span class="doccomment">/// assert_eq!(val, AsciiMetadataValue::try_from_bytes(b&quot;accept&quot;).unwrap());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_key</span><span class="op">&lt;</span><span class="ident">KeyVE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span>(<span class="ident">key</span>: <span class="ident">MetadataKey</span><span class="op">&lt;</span><span class="ident">KeyVE</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">key</span>.<span class="ident">into</span>()
+    <span class="doccomment">/// Converts a MetadataKey into a MetadataValue&lt;Ascii&gt;.
+    ///
+    /// Since every valid MetadataKey is a valid MetadataValue this is done
+    /// infallibly.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::from_key::&lt;Ascii&gt;(&quot;accept&quot;.parse().unwrap());
+    /// assert_eq!(val, AsciiMetadataValue::try_from_bytes(b&quot;accept&quot;).unwrap());
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>from_key&lt;KeyVE: ValueEncoding&gt;(key: MetadataKey&lt;KeyVE&gt;) -&gt; <span class="self">Self </span>{
+        key.into()
     }
 
-    <span class="doccomment">/// Returns the length of `self`, in bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is not available for MetadataValue&lt;Binary&gt; because that</span>
-    <span class="doccomment">/// cannot be implemented in constant time, which most people would probably</span>
-    <span class="doccomment">/// expect. To get the length of MetadataValue&lt;Binary&gt;, convert it to a</span>
-    <span class="doccomment">/// Bytes value and measure its length.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);</span>
-    <span class="doccomment">/// assert_eq!(val.len(), 5);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Returns the length of `self`, in bytes.
+    ///
+    /// This method is not available for MetadataValue&lt;Binary&gt; because that
+    /// cannot be implemented in constant time, which most people would probably
+    /// expect. To get the length of MetadataValue&lt;Binary&gt;, convert it to a
+    /// Bytes value and measure its length.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);
+    /// assert_eq!(val.len(), 5);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.inner.len()
     }
 
-    <span class="doccomment">/// Yields a `&amp;str` slice if the `MetadataValue` only contains visible ASCII</span>
-    <span class="doccomment">/// chars.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will perform a scan of the metadata value, checking all the</span>
-    <span class="doccomment">/// characters.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);</span>
-    <span class="doccomment">/// assert_eq!(val.to_str().unwrap(), &quot;hello&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ToStrError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">to_str</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ToStrError::new</span>())
+    <span class="doccomment">/// Yields a `&amp;str` slice if the `MetadataValue` only contains visible ASCII
+    /// chars.
+    ///
+    /// This function will perform a scan of the metadata value, checking all the
+    /// characters.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);
+    /// assert_eq!(val.to_str().unwrap(), &quot;hello&quot;);
+    /// ```
+    </span><span class="kw">pub fn </span>to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>str, ToStrError&gt; {
+        <span class="self">self</span>.inner.to_str().map_err(|<span class="kw">_</span>| ToStrError::new())
     }
 
-    <span class="doccomment">/// Converts a `MetadataValue` to a byte slice. For Binary values, use</span>
-    <span class="doccomment">/// `to_bytes`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);</span>
-    <span class="doccomment">/// assert_eq!(val.as_bytes(), b&quot;hello&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_bytes</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Binary</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Convert a byte slice to a `MetadataValue&lt;Binary&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::metadata::*;</span>
-    <span class="doccomment">/// let val = BinaryMetadataValue::from_bytes(b&quot;hello\xfa&quot;);</span>
-    <span class="doccomment">/// assert_eq!(val, &amp;b&quot;hello\xfa&quot;[..]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="comment">// Only the Ascii version of try_from_bytes can fail.</span>
-        <span class="ident"><span class="self">Self</span>::try_from_bytes</span>(<span class="ident">src</span>).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Converts a `MetadataValue` to a byte slice. For Binary values, use
+    /// `to_bytes`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = AsciiMetadataValue::from_static(&quot;hello&quot;);
+    /// assert_eq!(val.as_bytes(), b&quot;hello&quot;);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.inner.as_bytes()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ref</span>()
+<span class="kw">impl </span>MetadataValue&lt;Binary&gt; {
+    <span class="doccomment">/// Convert a byte slice to a `MetadataValue&lt;Binary&gt;`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tonic::metadata::*;
+    /// let val = BinaryMetadataValue::from_bytes(b&quot;hello\xfa&quot;);
+    /// assert_eq!(val, &amp;b&quot;hello\xfa&quot;[..]);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>from_bytes(src: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
+        <span class="comment">// Only the Ascii version of try_from_bytes can fail.
+        </span><span class="self">Self</span>::try_from_bytes(src).unwrap()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">VE::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">f</span>)
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; AsRef&lt;[u8]&gt; <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.inner.as_ref()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">KeyVE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MetadataKey</span><span class="op">&lt;</span><span class="ident">KeyVE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">h</span>: <span class="ident">MetadataKey</span><span class="op">&lt;</span><span class="ident">KeyVE</span><span class="op">&gt;</span>) -&gt; <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span> {
-        <span class="ident">MetadataValue</span> {
-            <span class="ident">inner</span>: <span class="ident">h</span>.<span class="ident">inner</span>.<span class="ident">into</span>(),
-            <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; fmt::Debug <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        VE::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, f)
+    }
+}
+
+<span class="kw">impl</span>&lt;KeyVE: ValueEncoding&gt; From&lt;MetadataKey&lt;KeyVE&gt;&gt; <span class="kw">for </span>MetadataValue&lt;Ascii&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(h: MetadataKey&lt;KeyVE&gt;) -&gt; MetadataValue&lt;Ascii&gt; {
+        MetadataValue {
+            inner: h.inner.into(),
+            phantom: PhantomData,
         }
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">from_integers</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max_len</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) =&gt; {$(
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">num</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span> {
-                <span class="ident">MetadataValue</span> {
-                    <span class="ident">inner</span>: <span class="ident">HeaderValue::from</span>(<span class="ident">num</span>),
-                    <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
+<span class="macro">macro_rules! </span>from_integers {
+    ($(<span class="macro-nonterminal">$name</span>:ident: <span class="macro-nonterminal">$t</span>:ident =&gt; <span class="macro-nonterminal">$max_len</span>:expr),<span class="kw-2">*</span>) =&gt; {$(
+        <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">for </span>MetadataValue&lt;Ascii&gt; {
+            <span class="kw">fn </span>from(num: <span class="macro-nonterminal">$t</span>) -&gt; MetadataValue&lt;Ascii&gt; {
+                MetadataValue {
+                    inner: HeaderValue::from(num),
+                    phantom: PhantomData,
                 }
             }
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
-            <span class="kw">let</span> <span class="ident">n</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">=</span> <span class="number">55</span>;
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">AsciiMetadataValue::from</span>(<span class="ident">n</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">val</span>, <span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_string</span>());
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>() {
+            <span class="kw">let </span>n: <span class="macro-nonterminal">$t </span>= <span class="number">55</span>;
+            <span class="kw">let </span>val = AsciiMetadataValue::from(n);
+            <span class="macro">assert_eq!</span>(val, <span class="kw-2">&amp;</span>n.to_string());
 
-            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">::std</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::MAX</span>;
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">AsciiMetadataValue::from</span>(<span class="ident">n</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">val</span>, <span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_string</span>());
+            <span class="kw">let </span>n = ::std::<span class="macro-nonterminal">$t::MAX</span>;
+            <span class="kw">let </span>val = AsciiMetadataValue::from(n);
+            <span class="macro">assert_eq!</span>(val, <span class="kw-2">&amp;</span>n.to_string());
         }
     )<span class="kw-2">*</span>};
 }
 
-<span class="macro">from_integers!</span> {
-    <span class="comment">// integer type =&gt; maximum decimal length</span>
+<span class="macro">from_integers! </span>{
+    <span class="comment">// integer type =&gt; maximum decimal length
 
-    <span class="comment">// u8 purposely left off... AsciiMetadataValue::from(b&#39;3&#39;) could be confusing</span>
-    <span class="ident">from_u16</span>: <span class="ident">u16</span> =&gt; <span class="number">5</span>,
-    <span class="ident">from_i16</span>: <span class="ident">i16</span> =&gt; <span class="number">6</span>,
-    <span class="ident">from_u32</span>: <span class="ident">u32</span> =&gt; <span class="number">10</span>,
-    <span class="ident">from_i32</span>: <span class="ident">i32</span> =&gt; <span class="number">11</span>,
-    <span class="ident">from_u64</span>: <span class="ident">u64</span> =&gt; <span class="number">20</span>,
-    <span class="ident">from_i64</span>: <span class="ident">i64</span> =&gt; <span class="number">20</span>
-}
+    // u8 purposely left off... AsciiMetadataValue::from(b&#39;3&#39;) could be confusing
+    </span>from_u16: u16 =&gt; <span class="number">5</span>,
+    from_i16: i16 =&gt; <span class="number">6</span>,
+    from_u32: u32 =&gt; <span class="number">10</span>,
+    from_i32: i32 =&gt; <span class="number">11</span>,
+    from_u64: u64 =&gt; <span class="number">20</span>,
+    from_i64: i64 =&gt; <span class="number">20
+</span>}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;16&quot;</span>)]</span>
-<span class="macro">from_integers!</span> {
-    <span class="ident">from_usize</span>: <span class="ident">usize</span> =&gt; <span class="number">5</span>,
-    <span class="ident">from_isize</span>: <span class="ident">isize</span> =&gt; <span class="number">6</span>
-}
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;16&quot;</span>)]
+</span><span class="macro">from_integers! </span>{
+    from_usize: usize =&gt; <span class="number">5</span>,
+    from_isize: isize =&gt; <span class="number">6
+</span>}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>)]</span>
-<span class="macro">from_integers!</span> {
-    <span class="ident">from_usize</span>: <span class="ident">usize</span> =&gt; <span class="number">10</span>,
-    <span class="ident">from_isize</span>: <span class="ident">isize</span> =&gt; <span class="number">11</span>
-}
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;32&quot;</span>)]
+</span><span class="macro">from_integers! </span>{
+    from_usize: usize =&gt; <span class="number">10</span>,
+    from_isize: isize =&gt; <span class="number">11
+</span>}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="macro">from_integers!</span> {
-    <span class="ident">from_usize</span>: <span class="ident">usize</span> =&gt; <span class="number">20</span>,
-    <span class="ident">from_isize</span>: <span class="ident">isize</span> =&gt; <span class="number">20</span>
-}
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+</span><span class="macro">from_integers! </span>{
+    from_usize: usize =&gt; <span class="number">20</span>,
+    from_isize: isize =&gt; <span class="number">20
+</span>}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">from_metadata_value_tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metadata::map::MetadataMap</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>from_metadata_value_tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::metadata::map::MetadataMap;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">it_can_insert_metadata_key_as_metadata_value</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">MetadataMap::new</span>();
-        <span class="ident">map</span>.<span class="ident">insert</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>it_can_insert_metadata_key_as_metadata_value() {
+        <span class="kw">let </span><span class="kw-2">mut </span>map = MetadataMap::new();
+        map.insert(
             <span class="string">&quot;accept&quot;</span>,
-            <span class="ident">MetadataKey</span>::<span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span><span class="ident">::from_bytes</span>(<span class="string">b&quot;hello-world&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">into</span>(),
+            MetadataKey::&lt;Ascii&gt;::from_bytes(<span class="string">b&quot;hello-world&quot;</span>)
+                .unwrap()
+                .into(),
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;accept&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">AsciiMetadataValue::try_from_bytes</span>(<span class="string">b&quot;hello-world&quot;</span>).<span class="ident">unwrap</span>()
+            map.get(<span class="string">&quot;accept&quot;</span>).unwrap(),
+            AsciiMetadataValue::try_from_bytes(<span class="string">b&quot;hello-world&quot;</span>).unwrap()
         );
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">InvalidMetadataValue</span>;
+<span class="kw">impl </span>FromStr <span class="kw">for </span>MetadataValue&lt;Ascii&gt; {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= InvalidMetadataValue;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="ident">MetadataValue</span>::<span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span><span class="ident">::from_str</span>(<span class="ident">s</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;MetadataValue&lt;Ascii&gt;, <span class="self">Self</span>::Err&gt; {
+        MetadataValue::&lt;Ascii&gt;::from_str(s)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="ident">Bytes</span> {
-        <span class="ident">Bytes::copy_from_slice</span>(<span class="ident">value</span>.<span class="ident">inner</span>.<span class="ident">as_bytes</span>())
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; From&lt;MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span>Bytes {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(value: MetadataValue&lt;VE&gt;) -&gt; Bytes {
+        Bytes::copy_from_slice(value.inner.as_bytes())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">t</span>.<span class="ident">clone</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, VE: ValueEncoding&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(t: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MetadataValue&lt;VE&gt;) -&gt; <span class="self">Self </span>{
+        t.clone()
     }
 }
 
-<span class="comment">// ===== ToStrError =====</span>
+<span class="comment">// ===== ToStrError =====
 
-<span class="kw">impl</span> <span class="ident">ToStrError</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ToStrError</span> { <span class="ident">_priv</span>: () }
+</span><span class="kw">impl </span>ToStrError {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        ToStrError { _priv: () }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ToStrError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;failed to convert metadata to a str&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ToStrError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;failed to convert metadata to a str&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">ToStrError</span> {}
+<span class="kw">impl </span>Error <span class="kw">for </span>ToStrError {}
 
-<span class="kw">impl</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">hash</span>(<span class="ident">state</span>)
+<span class="kw">impl </span>Hash <span class="kw">for </span>MetadataValue&lt;Ascii&gt; {
+    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+        <span class="self">self</span>.inner.hash(state)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">Binary</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">to_bytes</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">hash</span>(<span class="ident">state</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">hash</span>(<span class="ident">state</span>),
+<span class="kw">impl </span>Hash <span class="kw">for </span>MetadataValue&lt;Binary&gt; {
+    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+        <span class="kw">match </span><span class="self">self</span>.to_bytes() {
+            <span class="prelude-val">Ok</span>(b) =&gt; b.hash(state),
+            <span class="prelude-val">Err</span>(e) =&gt; e.hash(state),
         }
     }
 }
 
-<span class="comment">// ===== PartialEq / PartialOrd =====</span>
+<span class="comment">// ===== PartialEq / PartialOrd =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Note: Different binary strings that after base64 decoding</span>
-        <span class="comment">// will count as the same value for Binary values. Also,</span>
-        <span class="comment">// different invalid base64 values count as equal for Binary</span>
-        <span class="comment">// values.</span>
-        <span class="ident">VE::values_equal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">inner</span>)
+</span><span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialEq <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; bool {
+        <span class="comment">// Note: Different binary strings that after base64 decoding
+        // will count as the same value for Binary values. Also,
+        // different invalid base64 values count as equal for Binary
+        // values.
+        </span>VE::values_equal(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, <span class="kw-2">&amp;</span>other.inner)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; Eq <span class="kw">for </span>MetadataValue&lt;VE&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">inner</span>)
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialOrd <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.inner.partial_cmp(<span class="kw-2">&amp;</span>other.inner)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">cmp::Ordering</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">inner</span>)
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; Ord <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; cmp::Ordering {
+        <span class="self">self</span>.inner.cmp(<span class="kw-2">&amp;</span>other.inner)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">VE::equals</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">other</span>.<span class="ident">as_bytes</span>())
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialEq&lt;str&gt; <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        VE::equals(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, other.as_bytes())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="ident">VE::equals</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">other</span>)
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialEq&lt;[u8]&gt; <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+        VE::equals(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, other)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">as_bytes</span>())
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialOrd&lt;str&gt; <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.inner.partial_cmp(other.as_bytes())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">partial_cmp</span>(<span class="ident">other</span>)
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialOrd&lt;[u8]&gt; <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.inner.partial_cmp(other)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="ident">other</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialEq&lt;MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span>str {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; bool {
+        <span class="kw-2">*</span>other == <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialEq&lt;MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span>[u8] {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; bool {
+        <span class="kw-2">*</span>other == <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialOrd&lt;MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span>str {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.as_bytes().partial_cmp(other.inner.as_bytes())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="ident">other</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialOrd&lt;MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span>[u8] {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.partial_cmp(other.inner.as_bytes())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">inner</span>.<span class="ident">as_bytes</span>())
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialEq&lt;String&gt; <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>String) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self </span>== other[..]
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">inner</span>.<span class="ident">as_bytes</span>())
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialOrd&lt;String&gt; <span class="kw">for </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>String) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.inner.partial_cmp(other.as_bytes())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">String</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="ident">other</span>[..]
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialEq&lt;MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span>String {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; bool {
+        <span class="kw-2">*</span>other == <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;VE: ValueEncoding&gt; PartialOrd&lt;MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span>String {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.as_bytes().partial_cmp(other.inner.as_bytes())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">String</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">as_bytes</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, VE: ValueEncoding&gt; PartialEq&lt;MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; bool {
+        <span class="kw-2">**</span><span class="self">self </span>== <span class="kw-2">*</span>other
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="ident">other</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, VE: ValueEncoding&gt; PartialOrd&lt;MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MetadataValue&lt;VE&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        (<span class="kw-2">**</span><span class="self">self</span>).partial_cmp(other)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">inner</span>.<span class="ident">as_bytes</span>())
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">partial_cmp</span>(<span class="ident">other</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">VE</span>: <span class="ident">ValueEncoding</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, VE: ValueEncoding, T: <span class="question-mark">?</span>Sized&gt; PartialEq&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span>MetadataValue&lt;VE&gt;
+<span class="kw">where
+    </span>MetadataValue&lt;VE&gt;: PartialEq&lt;T&gt;,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">other</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: &amp;&amp;<span class="lifetime">&#39;a </span>T) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self </span>== <span class="kw-2">**</span>other
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">VE</span>: <span class="ident">ValueEncoding</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>: <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, VE: ValueEncoding, T: <span class="question-mark">?</span>Sized&gt; PartialOrd&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span>MetadataValue&lt;VE&gt;
+<span class="kw">where
+    </span>MetadataValue&lt;VE&gt;: PartialOrd&lt;T&gt;,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">*</span><span class="ident">other</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: &amp;&amp;<span class="lifetime">&#39;a </span>T) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.partial_cmp(<span class="kw-2">*</span>other)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="ident">other</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, VE: ValueEncoding&gt; PartialEq&lt;MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; bool {
+        <span class="kw-2">*</span>other == <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, VE: ValueEncoding&gt; PartialOrd&lt;MetadataValue&lt;VE&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>MetadataValue&lt;VE&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.as_bytes().partial_cmp(other.inner.as_bytes())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">inner</span>.<span class="ident">as_bytes</span>())
-    }
-}
-
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_debug</span>() {
-    <span class="kw">let</span> <span class="ident">cases</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_debug() {
+    <span class="kw">let </span>cases = <span class="kw-2">&amp;</span>[
         (<span class="string">&quot;hello&quot;</span>, <span class="string">&quot;\&quot;hello\&quot;&quot;</span>),
         (<span class="string">&quot;hello \&quot;world\&quot;&quot;</span>, <span class="string">&quot;\&quot;hello \\\&quot;world\\\&quot;\&quot;&quot;</span>),
         (<span class="string">&quot;\u{7FFF}hello&quot;</span>, <span class="string">&quot;\&quot;\\xe7\\xbf\\xbfhello\&quot;&quot;</span>),
     ];
 
-    <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">value</span>, <span class="ident">expected</span>) <span class="kw">in</span> <span class="ident">cases</span> {
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">AsciiMetadataValue::try_from_bytes</span>(<span class="ident">value</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">val</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">actual</span>);
+    <span class="kw">for </span><span class="kw-2">&amp;</span>(value, expected) <span class="kw">in </span>cases {
+        <span class="kw">let </span>val = AsciiMetadataValue::try_from_bytes(value.as_bytes()).unwrap();
+        <span class="kw">let </span>actual = <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, val);
+        <span class="macro">assert_eq!</span>(expected, actual);
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sensitive</span> <span class="op">=</span> <span class="ident">AsciiMetadataValue::from_static</span>(<span class="string">&quot;password&quot;</span>);
-    <span class="ident">sensitive</span>.<span class="ident">set_sensitive</span>(<span class="bool-val">true</span>);
-    <span class="macro">assert_eq!</span>(<span class="string">&quot;Sensitive&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">sensitive</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>sensitive = AsciiMetadataValue::from_static(<span class="string">&quot;password&quot;</span>);
+    sensitive.set_sensitive(<span class="bool-val">true</span>);
+    <span class="macro">assert_eq!</span>(<span class="string">&quot;Sensitive&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, sensitive));
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_is_empty</span>() {
-    <span class="kw">fn</span> <span class="ident">from_str</span><span class="op">&lt;</span><span class="ident">VE</span>: <span class="ident">ValueEncoding</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">MetadataValue</span><span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span> {
-        <span class="ident">MetadataValue</span>::<span class="op">&lt;</span><span class="ident">VE</span><span class="op">&gt;</span><span class="ident">::unchecked_from_header_value</span>(<span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_is_empty() {
+    <span class="kw">fn </span>from_str&lt;VE: ValueEncoding&gt;(s: <span class="kw-2">&amp;</span>str) -&gt; MetadataValue&lt;VE&gt; {
+        MetadataValue::&lt;VE&gt;::unchecked_from_header_value(s.parse().unwrap())
     }
 
-    <span class="macro">assert!</span>(<span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span>(<span class="string">&quot;&quot;</span>).<span class="ident">is_empty</span>());
-    <span class="macro">assert!</span>(<span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Binary</span><span class="op">&gt;</span>(<span class="string">&quot;&quot;</span>).<span class="ident">is_empty</span>());
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span>(<span class="string">&quot;a&quot;</span>).<span class="ident">is_empty</span>());
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Binary</span><span class="op">&gt;</span>(<span class="string">&quot;a&quot;</span>).<span class="ident">is_empty</span>());
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span>(<span class="string">&quot;=&quot;</span>).<span class="ident">is_empty</span>());
-    <span class="macro">assert!</span>(<span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Binary</span><span class="op">&gt;</span>(<span class="string">&quot;=&quot;</span>).<span class="ident">is_empty</span>());
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span>(<span class="string">&quot;===&quot;</span>).<span class="ident">is_empty</span>());
-    <span class="macro">assert!</span>(<span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Binary</span><span class="op">&gt;</span>(<span class="string">&quot;===&quot;</span>).<span class="ident">is_empty</span>());
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Ascii</span><span class="op">&gt;</span>(<span class="string">&quot;=====&quot;</span>).<span class="ident">is_empty</span>());
-    <span class="macro">assert!</span>(<span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">Binary</span><span class="op">&gt;</span>(<span class="string">&quot;=====&quot;</span>).<span class="ident">is_empty</span>());
+    <span class="macro">assert!</span>(from_str::&lt;Ascii&gt;(<span class="string">&quot;&quot;</span>).is_empty());
+    <span class="macro">assert!</span>(from_str::&lt;Binary&gt;(<span class="string">&quot;&quot;</span>).is_empty());
+    <span class="macro">assert!</span>(!from_str::&lt;Ascii&gt;(<span class="string">&quot;a&quot;</span>).is_empty());
+    <span class="macro">assert!</span>(!from_str::&lt;Binary&gt;(<span class="string">&quot;a&quot;</span>).is_empty());
+    <span class="macro">assert!</span>(!from_str::&lt;Ascii&gt;(<span class="string">&quot;=&quot;</span>).is_empty());
+    <span class="macro">assert!</span>(from_str::&lt;Binary&gt;(<span class="string">&quot;=&quot;</span>).is_empty());
+    <span class="macro">assert!</span>(!from_str::&lt;Ascii&gt;(<span class="string">&quot;===&quot;</span>).is_empty());
+    <span class="macro">assert!</span>(from_str::&lt;Binary&gt;(<span class="string">&quot;===&quot;</span>).is_empty());
+    <span class="macro">assert!</span>(!from_str::&lt;Ascii&gt;(<span class="string">&quot;=====&quot;</span>).is_empty());
+    <span class="macro">assert!</span>(from_str::&lt;Binary&gt;(<span class="string">&quot;=====&quot;</span>).is_empty());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_from_shared_base64_encodes</span>() {
-    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">BinaryMetadataValue::from_shared</span>(<span class="ident">Bytes::from_static</span>(<span class="string">b&quot;Hello&quot;</span>)).<span class="ident">unwrap</span>();
-    <span class="macro">assert_eq!</span>(<span class="ident">value</span>.<span class="ident">as_encoded_bytes</span>(), <span class="string">b&quot;SGVsbG8&quot;</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_from_shared_base64_encodes() {
+    <span class="kw">let </span>value = BinaryMetadataValue::from_shared(Bytes::from_static(<span class="string">b&quot;Hello&quot;</span>)).unwrap();
+    <span class="macro">assert_eq!</span>(value.as_encoded_bytes(), <span class="string">b&quot;SGVsbG8&quot;</span>);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_value_eq_value</span>() {
-    <span class="kw">type</span> <span class="ident">BMV</span> <span class="op">=</span> <span class="ident">BinaryMetadataValue</span>;
-    <span class="kw">type</span> <span class="ident">AMV</span> <span class="op">=</span> <span class="ident">AsciiMetadataValue</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_value_eq_value() {
+    <span class="kw">type </span>BMV = BinaryMetadataValue;
+    <span class="kw">type </span>AMV = AsciiMetadataValue;
 
-    <span class="macro">assert_eq!</span>(<span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>), <span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>));
-    <span class="macro">assert_ne!</span>(<span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>), <span class="ident">AMV::from_static</span>(<span class="string">&quot;ABC&quot;</span>));
+    <span class="macro">assert_eq!</span>(AMV::from_static(<span class="string">&quot;abc&quot;</span>), AMV::from_static(<span class="string">&quot;abc&quot;</span>));
+    <span class="macro">assert_ne!</span>(AMV::from_static(<span class="string">&quot;abc&quot;</span>), AMV::from_static(<span class="string">&quot;ABC&quot;</span>));
 
-    <span class="macro">assert_eq!</span>(<span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>), <span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>));
-    <span class="macro">assert_ne!</span>(<span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>), <span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;ABC&quot;</span>));
+    <span class="macro">assert_eq!</span>(BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>), BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>));
+    <span class="macro">assert_ne!</span>(BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>), BMV::from_bytes(<span class="string">b&quot;ABC&quot;</span>));
 
-    <span class="comment">// Padding is ignored.</span>
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">BMV::from_static</span>(<span class="string">&quot;SGVsbG8hIQ==&quot;</span>),
-        <span class="ident">BMV::from_static</span>(<span class="string">&quot;SGVsbG8hIQ&quot;</span>)
+    <span class="comment">// Padding is ignored.
+    </span><span class="macro">assert_eq!</span>(
+        BMV::from_static(<span class="string">&quot;SGVsbG8hIQ==&quot;</span>),
+        BMV::from_static(<span class="string">&quot;SGVsbG8hIQ&quot;</span>)
     );
-    <span class="comment">// Invalid values are all just invalid from this point of view.</span>
-    <span class="kw">unsafe</span> {
+    <span class="comment">// Invalid values are all just invalid from this point of view.
+    </span><span class="kw">unsafe </span>{
         <span class="macro">assert_eq!</span>(
-            <span class="ident">BMV::from_shared_unchecked</span>(<span class="ident">Bytes::from_static</span>(<span class="string">b&quot;..{}&quot;</span>)),
-            <span class="ident">BMV::from_shared_unchecked</span>(<span class="ident">Bytes::from_static</span>(<span class="string">b&quot;{}..&quot;</span>))
+            BMV::from_shared_unchecked(Bytes::from_static(<span class="string">b&quot;..{}&quot;</span>)),
+            BMV::from_shared_unchecked(Bytes::from_static(<span class="string">b&quot;{}..&quot;</span>))
         );
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_value_eq_str</span>() {
-    <span class="kw">type</span> <span class="ident">BMV</span> <span class="op">=</span> <span class="ident">BinaryMetadataValue</span>;
-    <span class="kw">type</span> <span class="ident">AMV</span> <span class="op">=</span> <span class="ident">AsciiMetadataValue</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_value_eq_str() {
+    <span class="kw">type </span>BMV = BinaryMetadataValue;
+    <span class="kw">type </span>AMV = AsciiMetadataValue;
 
-    <span class="macro">assert_eq!</span>(<span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-    <span class="macro">assert_ne!</span>(<span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>), <span class="string">&quot;ABC&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="string">&quot;abc&quot;</span>, <span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>));
-    <span class="macro">assert_ne!</span>(<span class="string">&quot;ABC&quot;</span>, <span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>));
+    <span class="macro">assert_eq!</span>(AMV::from_static(<span class="string">&quot;abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
+    <span class="macro">assert_ne!</span>(AMV::from_static(<span class="string">&quot;abc&quot;</span>), <span class="string">&quot;ABC&quot;</span>);
+    <span class="macro">assert_eq!</span>(<span class="string">&quot;abc&quot;</span>, AMV::from_static(<span class="string">&quot;abc&quot;</span>));
+    <span class="macro">assert_ne!</span>(<span class="string">&quot;ABC&quot;</span>, AMV::from_static(<span class="string">&quot;abc&quot;</span>));
 
-    <span class="macro">assert_eq!</span>(<span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-    <span class="macro">assert_ne!</span>(<span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>), <span class="string">&quot;ABC&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="string">&quot;abc&quot;</span>, <span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>));
-    <span class="macro">assert_ne!</span>(<span class="string">&quot;ABC&quot;</span>, <span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>));
+    <span class="macro">assert_eq!</span>(BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
+    <span class="macro">assert_ne!</span>(BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>), <span class="string">&quot;ABC&quot;</span>);
+    <span class="macro">assert_eq!</span>(<span class="string">&quot;abc&quot;</span>, BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>));
+    <span class="macro">assert_ne!</span>(<span class="string">&quot;ABC&quot;</span>, BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>));
 
-    <span class="comment">// Padding is ignored.</span>
-    <span class="macro">assert_eq!</span>(<span class="ident">BMV::from_static</span>(<span class="string">&quot;SGVsbG8hIQ==&quot;</span>), <span class="string">&quot;Hello!!&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="string">&quot;Hello!!&quot;</span>, <span class="ident">BMV::from_static</span>(<span class="string">&quot;SGVsbG8hIQ==&quot;</span>));
+    <span class="comment">// Padding is ignored.
+    </span><span class="macro">assert_eq!</span>(BMV::from_static(<span class="string">&quot;SGVsbG8hIQ==&quot;</span>), <span class="string">&quot;Hello!!&quot;</span>);
+    <span class="macro">assert_eq!</span>(<span class="string">&quot;Hello!!&quot;</span>, BMV::from_static(<span class="string">&quot;SGVsbG8hIQ==&quot;</span>));
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_value_eq_bytes</span>() {
-    <span class="kw">type</span> <span class="ident">BMV</span> <span class="op">=</span> <span class="ident">BinaryMetadataValue</span>;
-    <span class="kw">type</span> <span class="ident">AMV</span> <span class="op">=</span> <span class="ident">AsciiMetadataValue</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_value_eq_bytes() {
+    <span class="kw">type </span>BMV = BinaryMetadataValue;
+    <span class="kw">type </span>AMV = AsciiMetadataValue;
 
-    <span class="macro">assert_eq!</span>(<span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>), <span class="string">&quot;abc&quot;</span>.<span class="ident">as_bytes</span>());
-    <span class="macro">assert_ne!</span>(<span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>), <span class="string">&quot;ABC&quot;</span>.<span class="ident">as_bytes</span>());
-    <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="string">&quot;abc&quot;</span>.<span class="ident">as_bytes</span>(), <span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>));
-    <span class="macro">assert_ne!</span>(<span class="kw-2">*</span><span class="string">&quot;ABC&quot;</span>.<span class="ident">as_bytes</span>(), <span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>));
+    <span class="macro">assert_eq!</span>(AMV::from_static(<span class="string">&quot;abc&quot;</span>), <span class="string">&quot;abc&quot;</span>.as_bytes());
+    <span class="macro">assert_ne!</span>(AMV::from_static(<span class="string">&quot;abc&quot;</span>), <span class="string">&quot;ABC&quot;</span>.as_bytes());
+    <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="string">&quot;abc&quot;</span>.as_bytes(), AMV::from_static(<span class="string">&quot;abc&quot;</span>));
+    <span class="macro">assert_ne!</span>(<span class="kw-2">*</span><span class="string">&quot;ABC&quot;</span>.as_bytes(), AMV::from_static(<span class="string">&quot;abc&quot;</span>));
 
-    <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="string">&quot;abc&quot;</span>.<span class="ident">as_bytes</span>(), <span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>));
-    <span class="macro">assert_ne!</span>(<span class="kw-2">*</span><span class="string">&quot;ABC&quot;</span>.<span class="ident">as_bytes</span>(), <span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>));
+    <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="string">&quot;abc&quot;</span>.as_bytes(), BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>));
+    <span class="macro">assert_ne!</span>(<span class="kw-2">*</span><span class="string">&quot;ABC&quot;</span>.as_bytes(), BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>));
 
-    <span class="comment">// Padding is ignored.</span>
-    <span class="macro">assert_eq!</span>(<span class="ident">BMV::from_static</span>(<span class="string">&quot;SGVsbG8hIQ==&quot;</span>), <span class="string">&quot;Hello!!&quot;</span>.<span class="ident">as_bytes</span>());
-    <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="string">&quot;Hello!!&quot;</span>.<span class="ident">as_bytes</span>(), <span class="ident">BMV::from_static</span>(<span class="string">&quot;SGVsbG8hIQ==&quot;</span>));
+    <span class="comment">// Padding is ignored.
+    </span><span class="macro">assert_eq!</span>(BMV::from_static(<span class="string">&quot;SGVsbG8hIQ==&quot;</span>), <span class="string">&quot;Hello!!&quot;</span>.as_bytes());
+    <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="string">&quot;Hello!!&quot;</span>.as_bytes(), BMV::from_static(<span class="string">&quot;SGVsbG8hIQ==&quot;</span>));
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_ascii_value_hash</span>() {
-    <span class="kw">use</span> <span class="ident">std::collections::hash_map::DefaultHasher</span>;
-    <span class="kw">type</span> <span class="ident">AMV</span> <span class="op">=</span> <span class="ident">AsciiMetadataValue</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_ascii_value_hash() {
+    <span class="kw">use </span>std::collections::hash_map::DefaultHasher;
+    <span class="kw">type </span>AMV = AsciiMetadataValue;
 
-    <span class="kw">fn</span> <span class="ident">hash</span>(<span class="ident">value</span>: <span class="ident">AMV</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">DefaultHasher::new</span>();
-        <span class="ident">value</span>.<span class="ident">hash</span>(<span class="kw-2">&amp;mut</span> <span class="ident">hasher</span>);
-        <span class="ident">hasher</span>.<span class="ident">finish</span>()
+    <span class="kw">fn </span>hash(value: AMV) -&gt; u64 {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = DefaultHasher::new();
+        value.hash(<span class="kw-2">&amp;mut </span>hasher);
+        hasher.finish()
     }
 
-    <span class="kw">let</span> <span class="ident">value1</span> <span class="op">=</span> <span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>);
-    <span class="kw">let</span> <span class="ident">value2</span> <span class="op">=</span> <span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">value1</span>, <span class="ident">value2</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">hash</span>(<span class="ident">value1</span>), <span class="ident">hash</span>(<span class="ident">value2</span>));
+    <span class="kw">let </span>value1 = AMV::from_static(<span class="string">&quot;abc&quot;</span>);
+    <span class="kw">let </span>value2 = AMV::from_static(<span class="string">&quot;abc&quot;</span>);
+    <span class="macro">assert_eq!</span>(value1, value2);
+    <span class="macro">assert_eq!</span>(hash(value1), hash(value2));
 
-    <span class="kw">let</span> <span class="ident">value1</span> <span class="op">=</span> <span class="ident">AMV::from_static</span>(<span class="string">&quot;abc&quot;</span>);
-    <span class="kw">let</span> <span class="ident">value2</span> <span class="op">=</span> <span class="ident">AMV::from_static</span>(<span class="string">&quot;xyz&quot;</span>);
+    <span class="kw">let </span>value1 = AMV::from_static(<span class="string">&quot;abc&quot;</span>);
+    <span class="kw">let </span>value2 = AMV::from_static(<span class="string">&quot;xyz&quot;</span>);
 
-    <span class="macro">assert_ne!</span>(<span class="ident">value1</span>, <span class="ident">value2</span>);
-    <span class="macro">assert_ne!</span>(<span class="ident">hash</span>(<span class="ident">value1</span>), <span class="ident">hash</span>(<span class="ident">value2</span>));
+    <span class="macro">assert_ne!</span>(value1, value2);
+    <span class="macro">assert_ne!</span>(hash(value1), hash(value2));
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_valid_binary_value_hash</span>() {
-    <span class="kw">use</span> <span class="ident">std::collections::hash_map::DefaultHasher</span>;
-    <span class="kw">type</span> <span class="ident">BMV</span> <span class="op">=</span> <span class="ident">BinaryMetadataValue</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_valid_binary_value_hash() {
+    <span class="kw">use </span>std::collections::hash_map::DefaultHasher;
+    <span class="kw">type </span>BMV = BinaryMetadataValue;
 
-    <span class="kw">fn</span> <span class="ident">hash</span>(<span class="ident">value</span>: <span class="ident">BMV</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">DefaultHasher::new</span>();
-        <span class="ident">value</span>.<span class="ident">hash</span>(<span class="kw-2">&amp;mut</span> <span class="ident">hasher</span>);
-        <span class="ident">hasher</span>.<span class="ident">finish</span>()
+    <span class="kw">fn </span>hash(value: BMV) -&gt; u64 {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = DefaultHasher::new();
+        value.hash(<span class="kw-2">&amp;mut </span>hasher);
+        hasher.finish()
     }
 
-    <span class="kw">let</span> <span class="ident">value1</span> <span class="op">=</span> <span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>);
-    <span class="kw">let</span> <span class="ident">value2</span> <span class="op">=</span> <span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">value1</span>, <span class="ident">value2</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">hash</span>(<span class="ident">value1</span>), <span class="ident">hash</span>(<span class="ident">value2</span>));
+    <span class="kw">let </span>value1 = BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>);
+    <span class="kw">let </span>value2 = BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>);
+    <span class="macro">assert_eq!</span>(value1, value2);
+    <span class="macro">assert_eq!</span>(hash(value1), hash(value2));
 
-    <span class="kw">let</span> <span class="ident">value1</span> <span class="op">=</span> <span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>);
-    <span class="kw">let</span> <span class="ident">value2</span> <span class="op">=</span> <span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;xyz&quot;</span>);
-    <span class="macro">assert_ne!</span>(<span class="ident">value1</span>, <span class="ident">value2</span>);
-    <span class="macro">assert_ne!</span>(<span class="ident">hash</span>(<span class="ident">value1</span>), <span class="ident">hash</span>(<span class="ident">value2</span>));
+    <span class="kw">let </span>value1 = BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>);
+    <span class="kw">let </span>value2 = BMV::from_bytes(<span class="string">b&quot;xyz&quot;</span>);
+    <span class="macro">assert_ne!</span>(value1, value2);
+    <span class="macro">assert_ne!</span>(hash(value1), hash(value2));
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_invalid_binary_value_hash</span>() {
-    <span class="kw">use</span> <span class="ident">std::collections::hash_map::DefaultHasher</span>;
-    <span class="kw">type</span> <span class="ident">BMV</span> <span class="op">=</span> <span class="ident">BinaryMetadataValue</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_invalid_binary_value_hash() {
+    <span class="kw">use </span>std::collections::hash_map::DefaultHasher;
+    <span class="kw">type </span>BMV = BinaryMetadataValue;
 
-    <span class="kw">fn</span> <span class="ident">hash</span>(<span class="ident">value</span>: <span class="ident">BMV</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">DefaultHasher::new</span>();
-        <span class="ident">value</span>.<span class="ident">hash</span>(<span class="kw-2">&amp;mut</span> <span class="ident">hasher</span>);
-        <span class="ident">hasher</span>.<span class="ident">finish</span>()
+    <span class="kw">fn </span>hash(value: BMV) -&gt; u64 {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = DefaultHasher::new();
+        value.hash(<span class="kw-2">&amp;mut </span>hasher);
+        hasher.finish()
     }
 
-    <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="ident">value1</span> <span class="op">=</span> <span class="ident">BMV::from_shared_unchecked</span>(<span class="ident">Bytes::from_static</span>(<span class="string">b&quot;..{}&quot;</span>));
-        <span class="kw">let</span> <span class="ident">value2</span> <span class="op">=</span> <span class="ident">BMV::from_shared_unchecked</span>(<span class="ident">Bytes::from_static</span>(<span class="string">b&quot;{}..&quot;</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">value1</span>, <span class="ident">value2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">hash</span>(<span class="ident">value1</span>), <span class="ident">hash</span>(<span class="ident">value2</span>));
+    <span class="kw">unsafe </span>{
+        <span class="kw">let </span>value1 = BMV::from_shared_unchecked(Bytes::from_static(<span class="string">b&quot;..{}&quot;</span>));
+        <span class="kw">let </span>value2 = BMV::from_shared_unchecked(Bytes::from_static(<span class="string">b&quot;{}..&quot;</span>));
+        <span class="macro">assert_eq!</span>(value1, value2);
+        <span class="macro">assert_eq!</span>(hash(value1), hash(value2));
     }
 
-    <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="ident">valid</span> <span class="op">=</span> <span class="ident">BMV::from_bytes</span>(<span class="string">b&quot;abc&quot;</span>);
-        <span class="kw">let</span> <span class="ident">invalid</span> <span class="op">=</span> <span class="ident">BMV::from_shared_unchecked</span>(<span class="ident">Bytes::from_static</span>(<span class="string">b&quot;{}..&quot;</span>));
-        <span class="macro">assert_ne!</span>(<span class="ident">valid</span>, <span class="ident">invalid</span>);
-        <span class="macro">assert_ne!</span>(<span class="ident">hash</span>(<span class="ident">valid</span>), <span class="ident">hash</span>(<span class="ident">invalid</span>));
+    <span class="kw">unsafe </span>{
+        <span class="kw">let </span>valid = BMV::from_bytes(<span class="string">b&quot;abc&quot;</span>);
+        <span class="kw">let </span>invalid = BMV::from_shared_unchecked(Bytes::from_static(<span class="string">b&quot;{}..&quot;</span>));
+        <span class="macro">assert_ne!</span>(valid, invalid);
+        <span class="macro">assert_ne!</span>(hash(valid), hash(invalid));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

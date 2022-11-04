@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/migration-engine-tests/src/assertions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>assertions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../migration_engine_tests/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/migration-engine-tests/src/assertions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>assertions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../migration_engine_tests/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -887,894 +887,894 @@
 <span id="887">887</span>
 <span id="888">888</span>
 <span id="889">889</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">migration_assertions</span>;
-<span class="kw">mod</span> <span class="ident">quaint_result_set_ext</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>migration_assertions;
+<span class="kw">mod </span>quaint_result_set_ext;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_assertions</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">quaint_result_set_ext</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>migration_assertions::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>quaint_result_set_ext::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
-<span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector::Connector</span>;
-<span class="kw">use</span> <span class="ident">sql</span>::{
-    <span class="ident">postgres</span>::{<span class="ident">ExtensionWalker</span>, <span class="ident">PostgresSchemaExt</span>},
-    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">ForeignKeyWalker</span>, <span class="ident">IndexWalker</span>, <span class="ident">TableWalker</span>},
+<span class="kw">use </span>pretty_assertions::assert_eq;
+<span class="kw">use </span>prisma_value::PrismaValue;
+<span class="kw">use </span>psl::datamodel_connector::Connector;
+<span class="kw">use </span>sql::{
+    postgres::{ExtensionWalker, PostgresSchemaExt},
+    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
 };
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>,
-    <span class="ident">postgres</span>::{<span class="ident">SQLOperatorClassKind</span>, <span class="ident">SqlIndexAlgorithm</span>},
-    <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">IndexType</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>,
+<span class="kw">use </span>sql_schema_describer::{
+    <span class="self">self </span><span class="kw">as </span>sql,
+    postgres::{SQLOperatorClassKind, SqlIndexAlgorithm},
+    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, IndexType, SQLSortOrder, SqlSchema,
 };
-<span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">BitFlags</span>, <span class="ident">Tags</span>};
+<span class="kw">use </span>test_setup::{BitFlags, Tags};
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SqlSchemaExt</span> {
-    <span class="kw">fn</span> <span class="ident">assert_table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">TableAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="kw">pub trait </span>SqlSchemaExt {
+    <span class="kw">fn </span>assert_table&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; TableAssertion&lt;<span class="lifetime">&#39;a</span>&gt;;
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SchemaAssertion</span> {
-    <span class="ident">schema</span>: <span class="ident">SqlSchema</span>,
-    <span class="ident">tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>SchemaAssertion {
+    schema: SqlSchema,
+    tags: BitFlags&lt;Tags&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">SchemaAssertion</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">schema</span>: <span class="ident">SqlSchema</span>, <span class="ident">tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">schema</span>, <span class="ident">tags</span> }
+<span class="kw">impl </span>SchemaAssertion {
+    <span class="kw">pub fn </span>new(schema: SqlSchema, tags: BitFlags&lt;Tags&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ schema, tags }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_schema</span>(<span class="self">self</span>) -&gt; <span class="ident">SqlSchema</span> {
-        <span class="self">self</span>.<span class="ident">schema</span>
+    <span class="kw">pub fn </span>into_schema(<span class="self">self</span>) -&gt; SqlSchema {
+        <span class="self">self</span>.schema
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">fn</span> <span class="ident">find_table_option</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">table_walkers</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::LowerCasesTableNames</span>) {
-                <span class="ident">t</span>.<span class="ident">name</span>().<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">table_name</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">t</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">table_name</span>
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">fn </span>find_table_option&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;TableWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.schema.table_walkers().find(|t| {
+            <span class="kw">if </span><span class="self">self</span>.tags.contains(Tags::LowerCasesTableNames) {
+                t.name().eq_ignore_ascii_case(table_name)
+            } <span class="kw">else </span>{
+                t.name() == table_name
             }
         })
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">fn</span> <span class="ident">find_table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">find_table_option</span>(<span class="ident">table_name</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">table</span>) =&gt; <span class="ident">table</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">fn </span>find_table&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; TableWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">match </span><span class="self">self</span>.find_table_option(table_name) {
+            <span class="prelude-val">Some</span>(table) =&gt; table,
+            <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(
                 <span class="string">&quot;assert_has_table failed. Table {} not found. Tables in database: {:?}&quot;</span>,
-                <span class="ident">table_name</span>,
-                <span class="self">self</span>.<span class="ident">schema</span>
-                    .<span class="ident">table_walkers</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span>())
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                table_name,
+                <span class="self">self</span>.schema
+                    .table_walkers()
+                    .map(|table| table.name())
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
             ),
         }
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_extension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">PostgresExtensionAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Postgres</span>) {
-            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_has_extension&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; PostgresExtensionAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">if </span><span class="self">self</span>.tags.contains(Tags::Postgres) {
+            <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = <span class="self">self</span>.schema.downcast_connector_data();
 
-            <span class="kw">let</span> <span class="ident">extension</span> <span class="op">=</span> <span class="ident">ext</span>
-                .<span class="ident">extension_walker</span>(<span class="ident">name</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;Could not find extension with name {name}&quot;</span>);
+            <span class="kw">let </span>extension = ext
+                .extension_walker(name)
+                .expect(<span class="string">&quot;Could not find extension with name {name}&quot;</span>);
 
-            <span class="ident">PostgresExtensionAssertion</span> { <span class="ident">extension</span> }
-        } <span class="kw">else</span> {
+            PostgresExtensionAssertion { extension }
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;PostgreSQL extensions are only allowed on PostgreSQL.&quot;</span>)
         }
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_table</span>(<span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">find_table</span>(<span class="ident">table_name</span>);
-        <span class="self">self</span>
-    }
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_has_table(<span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.find_table(table_name);
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_no_table</span>(<span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">find_table_option</span>(<span class="ident">table_name</span>)
-            .<span class="ident">and_then</span>::<span class="op">&lt;</span>(), <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;assert_has_no_table failed. Table {} was found.&quot;</span>, <span class="ident">table_name</span>));
-        <span class="self">self</span>
-    }
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_has_no_table(<span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.find_table_option(table_name)
+            .and_then::&lt;(), <span class="kw">_</span>&gt;(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;assert_has_no_table failed. Table {} was found.&quot;</span>, table_name));
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_table</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">table_assertions</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="ident">TableAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">TableAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_table&lt;F&gt;(<span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str, table_assertions: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; FnOnce(TableAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; TableAssertion&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_table</span>(<span class="ident">table_name</span>);
-        <span class="ident">table_assertions</span>(<span class="ident">TableAssertion</span> { <span class="ident">table</span>, <span class="ident">tags</span>: <span class="self">self</span>.<span class="ident">tags</span> });
-        <span class="self">self</span>
-    }
+        <span class="kw">let </span>table = <span class="self">self</span>.find_table(table_name);
+        table_assertions(TableAssertion { table, tags: <span class="self">self</span>.tags });
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_no_enum</span>(<span class="self">self</span>, <span class="ident">enum_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">has_matching_enum</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">enum_walkers</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::LowerCasesTableNames</span>) {
-                <span class="ident">enm</span>.<span class="ident">name</span>().<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">enum_name</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">enm</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">enum_name</span>
+    <span class="kw">pub fn </span>assert_has_no_enum(<span class="self">self</span>, enum_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>has_matching_enum = <span class="self">self</span>.schema.enum_walkers().any(|enm| {
+            <span class="kw">if </span><span class="self">self</span>.tags.contains(Tags::LowerCasesTableNames) {
+                enm.name().eq_ignore_ascii_case(enum_name)
+            } <span class="kw">else </span>{
+                enm.name() == enum_name
             }
         });
 
-        <span class="kw">if</span> <span class="ident">has_matching_enum</span> {
-            <span class="macro">panic!</span>(<span class="string">&quot;Expected no enum named {}, found one&quot;</span>, <span class="ident">enum_name</span>);
+        <span class="kw">if </span>has_matching_enum {
+            <span class="macro">panic!</span>(<span class="string">&quot;Expected no enum named {}, found one&quot;</span>, enum_name);
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_enum</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">enum_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">enum_assertions</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="ident">EnumAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">EnumAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>assert_enum&lt;F&gt;(<span class="self">self</span>, enum_name: <span class="kw-2">&amp;</span>str, enum_assertions: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; FnOnce(EnumAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; EnumAssertion&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">r#enum</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">find_enum</span>(<span class="ident">enum_name</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">enm</span>) =&gt; <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">enm</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Assertion failed. Enum `{}` not found&quot;</span>, <span class="ident">enum_name</span>),
+        <span class="kw">let </span>r#enum = <span class="kw">match </span><span class="self">self</span>.schema.find_enum(enum_name) {
+            <span class="prelude-val">Some</span>(enm) =&gt; <span class="self">self</span>.schema.walk(enm),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Assertion failed. Enum `{}` not found&quot;</span>, enum_name),
         };
 
-        <span class="ident">enum_assertions</span>(<span class="ident">EnumAssertion</span>(<span class="ident">r#enum</span>));
-        <span class="self">self</span>
-    }
+        enum_assertions(EnumAssertion(r#enum));
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_tables_count</span>(<span class="self">self</span>, <span class="ident">expected_count</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">actual_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">tables_count</span>();
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_tables_count(<span class="self">self</span>, expected_count: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>actual_count = <span class="self">self</span>.schema.tables_count();
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">actual_count</span>, <span class="ident">expected_count</span>,
+            actual_count, expected_count,
             <span class="string">&quot;Assertion failed. Expected the schema to have {expected_count} tables, found {actual_count}. ({table_names:?})&quot;</span>,
-            <span class="ident">expected_count</span> <span class="op">=</span> <span class="ident">expected_count</span>,
-            <span class="ident">actual_count</span> <span class="op">=</span> <span class="ident">actual_count</span>,
-            <span class="ident">table_names</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">table_walkers</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+            expected_count = expected_count,
+            actual_count = actual_count,
+            table_names = <span class="self">self</span>.schema.table_walkers().map(|t| t.name()).collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;(),
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_views_count</span>(<span class="self">self</span>, <span class="ident">expected_count</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">actual_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">view_walkers</span>().<span class="ident">count</span>();
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_views_count(<span class="self">self</span>, expected_count: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>actual_count = <span class="self">self</span>.schema.view_walkers().count();
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">actual_count</span>, <span class="ident">expected_count</span>,
+            actual_count, expected_count,
             <span class="string">&quot;Assertion failed. Expected the schema to have {expected_count} views, found {actual_count}. ({table_names:?})&quot;</span>,
-            <span class="ident">expected_count</span> <span class="op">=</span> <span class="ident">expected_count</span>,
-            <span class="ident">actual_count</span> <span class="op">=</span> <span class="ident">actual_count</span>,
-            <span class="ident">table_names</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">view_walkers</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+            expected_count = expected_count,
+            actual_count = actual_count,
+            table_names = <span class="self">self</span>.schema.view_walkers().map(|t| t.name()).collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;(),
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug_print</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>);
+    <span class="kw">pub fn </span>debug_print(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.schema);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EnumAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">sql::EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>);
+<span class="kw">pub struct </span>EnumAssertion&lt;<span class="lifetime">&#39;a</span>&gt;(sql::EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EnumAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_values</span>(<span class="self">self</span>, <span class="ident">expected_values</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>]) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>assert_values(<span class="self">self</span>, expected_values: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str]) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">values</span>() <span class="op">==</span> <span class="ident">expected_values</span>,
+            <span class="self">self</span>.<span class="number">0</span>.values() == expected_values,
             <span class="string">&quot;Assertion failed. The `{}` enum does not contain the expected variants.\nExpected:\n{:#?}\n\nFound:\n{:#?}\n&quot;</span>,
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span>(),
-            <span class="ident">expected_values</span>,
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">values</span>(),
+            <span class="self">self</span>.<span class="number">0</span>.name(),
+            expected_values,
+            <span class="self">self</span>.<span class="number">0</span>.values(),
         );
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TableAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>TableAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    table: TableWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
+    tags: BitFlags&lt;Tags&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TableAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_column_count</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">columns_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">count</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TableAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>assert_column_count(<span class="self">self</span>, n: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>columns_count = <span class="self">self</span>.table.columns().count();
 
         <span class="macro">assert!</span>(
-            <span class="ident">columns_count</span> <span class="op">==</span> <span class="ident">n</span>,
+            columns_count == n,
             <span class="string">&quot;Assertion failed. Expected {n} columns, found {columns_count}.&quot;</span>,
-            <span class="ident">n</span> <span class="op">=</span> <span class="ident">n</span>,
-            <span class="ident">columns_count</span> <span class="op">=</span> <span class="ident">columns_count</span>,
+            n = n,
+            columns_count = columns_count,
         );
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_foreign_keys_count</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">fk_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">foreign_key_count</span>();
-        <span class="macro">assert!</span>(<span class="ident">fk_count</span> <span class="op">==</span> <span class="ident">n</span>, <span class="string">&quot;Expected {} foreign keys, found {}.&quot;</span>, <span class="ident">n</span>, <span class="ident">fk_count</span>);
-        <span class="self">self</span>
-    }
+    <span class="kw">pub fn </span>assert_foreign_keys_count(<span class="self">self</span>, n: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>fk_count = <span class="self">self</span>.table.foreign_key_count();
+        <span class="macro">assert!</span>(fk_count == n, <span class="string">&quot;Expected {} foreign keys, found {}.&quot;</span>, n, fk_count);
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_fk_on_columns</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">fk_assertions</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">ForeignKeyAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ForeignKeyAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_fk_on_columns&lt;F&gt;(<span class="self">self</span>, columns: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str], fk_assertions: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: FnOnce(ForeignKeyAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ForeignKeyAssertion&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fk</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">table</span>
-            .<span class="ident">foreign_keys</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="ident">fk</span>.<span class="ident">constrained_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">columns</span>)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(fk) = <span class="self">self
+            </span>.table
+            .foreign_keys()
+            .find(|fk| fk.constrained_columns().map(|c| c.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;() == columns)
         {
-            <span class="ident">fk_assertions</span>(<span class="ident">ForeignKeyAssertion</span> { <span class="ident">fk</span>, <span class="ident">tags</span>: <span class="self">self</span>.<span class="ident">tags</span> });
-        } <span class="kw">else</span> {
-            <span class="macro">panic!</span>(<span class="string">&quot;Could not find foreign key on {}.{:?}&quot;</span>, <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">name</span>(), <span class="ident">columns</span>);
+            fk_assertions(ForeignKeyAssertion { fk, tags: <span class="self">self</span>.tags });
+        } <span class="kw">else </span>{
+            <span class="macro">panic!</span>(<span class="string">&quot;Could not find foreign key on {}.{:?}&quot;</span>, <span class="self">self</span>.table.name(), columns);
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_fk_with_name</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">matching_fk</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">table</span>
-            .<span class="ident">foreign_keys</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">found</span><span class="op">|</span> <span class="ident">found</span>.<span class="ident">constraint_name</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>));
-        <span class="macro">assert!</span>(<span class="ident">matching_fk</span>, <span class="string">&quot;Assertion failed. Could not find fk with name.&quot;</span>);
-        <span class="self">self</span>
-    }
+    <span class="kw">pub fn </span>assert_fk_with_name(<span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>matching_fk = <span class="self">self
+            </span>.table
+            .foreign_keys()
+            .any(|found| found.constraint_name() == <span class="prelude-val">Some</span>(name));
+        <span class="macro">assert!</span>(matching_fk, <span class="string">&quot;Assertion failed. Could not find fk with name.&quot;</span>);
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_does_not_have_column</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">column</span>(<span class="ident">column_name</span>).<span class="ident">is_some</span>() {
+    <span class="kw">pub fn </span>assert_does_not_have_column(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span><span class="self">self</span>.table.column(column_name).is_some() {
             <span class="macro">panic!</span>(
                 <span class="string">&quot;Assertion failed: found column `{}` on `{}`.&quot;</span>,
-                <span class="ident">column_name</span>,
-                <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">name</span>()
+                column_name,
+                <span class="self">self</span>.table.name()
             );
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_column</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">column</span>(<span class="ident">column_name</span>) {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_has_column(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="self">self</span>.table.column(column_name) {
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="self">self</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(
+            <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(
                 <span class="string">&quot;Assertion failed: column {} not found. Existing columns: {:?}&quot;</span>,
-                <span class="ident">column_name</span>,
-                <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                column_name,
+                <span class="self">self</span>.table.columns().map(|col| col.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
             ),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_column</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">column_assertions</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">ColumnAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ColumnAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>assert_column&lt;F&gt;(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str, column_assertions: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: FnOnce(ColumnAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ColumnAssertion&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">assert_has_column</span>(<span class="ident">column_name</span>);
-        <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">table</span>.<span class="ident">column</span>(<span class="ident">column_name</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>this = <span class="self">self</span>.assert_has_column(column_name);
+        <span class="kw">let </span>column = this.table.column(column_name).unwrap();
 
-        <span class="ident">column_assertions</span>(<span class="ident">ColumnAssertion</span> { <span class="ident">column</span> });
-        <span class="ident">this</span>
+        column_assertions(ColumnAssertion { column });
+        this
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_columns_count</span>(<span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">actual_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">count</span>();
+    <span class="kw">pub fn </span>assert_columns_count(<span class="self">self</span>, count: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>actual_count = <span class="self">self</span>.table.columns().count();
 
         <span class="macro">assert!</span>(
-            <span class="ident">actual_count</span> <span class="op">==</span> <span class="ident">count</span>,
+            actual_count == count,
             <span class="string">&quot;Assertion failed: expected {} columns, found {}&quot;</span>,
-            <span class="ident">count</span>,
-            <span class="ident">actual_count</span>,
+            count,
+            actual_count,
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_no_pk</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub fn </span>assert_has_no_pk(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">primary_key</span>().<span class="ident">is_none</span>(),
+            <span class="self">self</span>.table.primary_key().is_none(),
             <span class="string">&quot;Assertion failed: expected no primary key on {}, but found one.&quot;</span>,
-            <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">name</span>(),
+            <span class="self">self</span>.table.name(),
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_pk</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">pk_assertions</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">PrimaryKeyAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">PrimaryKeyAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>assert_pk&lt;F&gt;(<span class="self">self</span>, pk_assertions: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: FnOnce(PrimaryKeyAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; PrimaryKeyAssertion&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">primary_key</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">pk</span>) =&gt; {
-                <span class="ident">pk_assertions</span>(<span class="ident">PrimaryKeyAssertion</span> { <span class="ident">pk</span>, <span class="ident">tags</span>: <span class="self">self</span>.<span class="ident">tags</span> });
-                <span class="self">self</span>
-            }
-            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Primary key not found on {}.&quot;</span>, <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">name</span>()),
+        <span class="kw">match </span><span class="self">self</span>.table.primary_key() {
+            <span class="prelude-val">Some</span>(pk) =&gt; {
+                pk_assertions(PrimaryKeyAssertion { pk, tags: <span class="self">self</span>.tags });
+                <span class="self">self
+            </span>}
+            <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Primary key not found on {}.&quot;</span>, <span class="self">self</span>.table.name()),
         }
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_indexes_count</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">idx_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">indexes</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="op">!</span><span class="ident">idx</span>.<span class="ident">is_primary_key</span>()).<span class="ident">count</span>();
-        <span class="macro">assert!</span>(<span class="ident">idx_count</span> <span class="op">==</span> <span class="ident">n</span>, <span class="string">&quot;Expected {} indexes, found {}.&quot;</span>, <span class="ident">n</span>, <span class="ident">idx_count</span>);
-        <span class="self">self</span>
-    }
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_indexes_count(<span class="self">self</span>, n: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>idx_count = <span class="self">self</span>.table.indexes().filter(|idx| !idx.is_primary_key()).count();
+        <span class="macro">assert!</span>(idx_count == n, <span class="string">&quot;Expected {} indexes, found {}.&quot;</span>, n, idx_count);
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_index_on_columns</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">index_assertions</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">IndexAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">IndexAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>assert_index_on_columns&lt;F&gt;(<span class="self">self</span>, columns: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str], index_assertions: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: FnOnce(IndexAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; IndexAssertion&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">idx</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">table</span>
-            .<span class="ident">indexes</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="op">!</span><span class="ident">idx</span>.<span class="ident">is_primary_key</span>())
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">column_names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">columns</span>)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(idx) = <span class="self">self
+            </span>.table
+            .indexes()
+            .filter(|idx| !idx.is_primary_key())
+            .find(|idx| idx.column_names().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;() == columns)
         {
-            <span class="ident">index_assertions</span>(<span class="ident">IndexAssertion</span> {
-                <span class="ident">index</span>: <span class="ident">idx</span>,
-                <span class="ident">tags</span>: <span class="self">self</span>.<span class="ident">tags</span>,
+            index_assertions(IndexAssertion {
+                index: idx,
+                tags: <span class="self">self</span>.tags,
             });
-        } <span class="kw">else</span> {
-            <span class="macro">panic!</span>(<span class="string">&quot;Could not find index on {}.{:?}&quot;</span>, <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">name</span>(), <span class="ident">columns</span>);
+        } <span class="kw">else </span>{
+            <span class="macro">panic!</span>(<span class="string">&quot;Could not find index on {}.{:?}&quot;</span>, <span class="self">self</span>.table.name(), columns);
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_index_name_and_type</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">unique</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="self">self</span>
-            .<span class="ident">table</span>
-            .<span class="ident">indexes</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span> <span class="op">&amp;&amp;</span> <span class="ident">idx</span>.<span class="ident">is_unique</span>() <span class="op">==</span> <span class="ident">unique</span>)
+    <span class="kw">pub fn </span>assert_has_index_name_and_type(<span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, unique: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span><span class="self">self
+            </span>.table
+            .indexes()
+            .any(|idx| idx.name() == name &amp;&amp; idx.is_unique() == unique)
         {
-            <span class="self">self</span>
-        } <span class="kw">else</span> {
-            <span class="macro">panic!</span>(<span class="string">&quot;Could not find index with name {} and correct type&quot;</span>, <span class="ident">name</span>);
+            <span class="self">self
+        </span>} <span class="kw">else </span>{
+            <span class="macro">panic!</span>(<span class="string">&quot;Could not find index with name {} and correct type&quot;</span>, name);
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ColumnAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>ColumnAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    column: ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ColumnAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_auto_increments</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ColumnAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>assert_auto_increments(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">is_autoincrement</span>(),
+            <span class="self">self</span>.column.is_autoincrement(),
             <span class="string">&quot;Assertion failed. Expected column `{}` to be auto-incrementing.&quot;</span>,
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">name</span>(),
+            <span class="self">self</span>.column.name(),
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_no_auto_increment</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub fn </span>assert_no_auto_increment(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="op">!</span><span class="self">self</span>.<span class="ident">column</span>.<span class="ident">is_autoincrement</span>(),
+            !<span class="self">self</span>.column.is_autoincrement(),
             <span class="string">&quot;Assertion failed. Expected column `{}` not to be auto-incrementing.&quot;</span>,
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">name</span>(),
+            <span class="self">self</span>.column.name(),
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_default_kind</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultKind</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>());
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_default_kind(<span class="self">self</span>, expected: <span class="prelude-ty">Option</span>&lt;DefaultKind&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = <span class="kw-2">&amp;</span><span class="self">self</span>.column.default().map(|d| d.kind());
 
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()) <span class="op">==</span> <span class="ident">expected</span>.<span class="ident">as_ref</span>(),
+            <span class="self">self</span>.column.default().map(|d| d.kind()) == expected.as_ref(),
             <span class="string">&quot;Assertion failed. Expected default: {:?}, but found {:?}&quot;</span>,
-            <span class="ident">expected</span>,
-            <span class="ident">found</span>
+            expected,
+            found
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_default</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">assert_default_kind</span>(<span class="ident">expected</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">into_kind</span>()));
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">constraint_name</span>());
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">constraint_name</span>());
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_default(<span class="self">self</span>, expected: <span class="prelude-ty">Option</span>&lt;DefaultValue&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>this = <span class="self">self</span>.assert_default_kind(expected.clone().map(|val| val.into_kind()));
+        <span class="kw">let </span>found = this.column.default().map(|d| d.constraint_name());
+        <span class="kw">let </span>expected = expected.as_ref().map(|d| d.constraint_name());
 
         <span class="macro">assert!</span>(
-            <span class="ident">found</span> <span class="op">==</span> <span class="ident">expected</span>,
+            found == expected,
             <span class="string">&quot;Assertion failed. Expected default constraint name: {:?}, but found {:?}&quot;</span>,
-            <span class="ident">expected</span>,
-            <span class="ident">found</span>
+            expected,
+            found
         );
 
-        <span class="ident">this</span>
+        this
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_full_data_type</span>(<span class="self">self</span>, <span class="ident">full_data_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span>;
+    <span class="kw">pub fn </span>assert_full_data_type(<span class="self">self</span>, full_data_type: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = <span class="kw-2">&amp;</span><span class="self">self</span>.column.column_type().full_data_type;
 
         <span class="macro">assert!</span>(
-            <span class="ident">found</span> <span class="op">==</span> <span class="ident">full_data_type</span>,
+            found == full_data_type,
             <span class="string">&quot;Assertion failed: expected the full_data_type for the `{}` column to be `{}`, found `{}`&quot;</span>,
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">name</span>(),
-            <span class="ident">full_data_type</span>,
-            <span class="ident">found</span>
+            <span class="self">self</span>.column.name(),
+            full_data_type,
+            found
         );
 
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="kw">pub fn </span>assert_has_no_default(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.assert_default(<span class="prelude-val">None</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_no_default</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">assert_default</span>(<span class="prelude-val">None</span>)
+    <span class="kw">pub fn </span>assert_int_default(<span class="self">self</span>, expected: i64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.assert_default_kind(<span class="prelude-val">Some</span>(DefaultKind::Value(expected.into())))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_int_default</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">assert_default_kind</span>(<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">expected</span>.<span class="ident">into</span>())))
-    }
+    <span class="kw">pub fn </span>assert_default_value(<span class="self">self</span>, expected: <span class="kw-2">&amp;</span>prisma_value::PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = <span class="self">self</span>.column.default();
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_default_value</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">prisma_value::PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">default</span>();
-
-        <span class="kw">match</span> <span class="ident">found</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="kw-2">ref</span> <span class="ident">val</span>)) =&gt; <span class="macro">assert!</span>(
-                <span class="ident">val</span> <span class="op">==</span> <span class="ident">expected</span>,
+        <span class="kw">match </span>found.as_ref().map(|d| d.kind()) {
+            <span class="prelude-val">Some</span>(DefaultKind::Value(<span class="kw-2">ref </span>val)) =&gt; <span class="macro">assert!</span>(
+                val == expected,
                 <span class="string">&quot;Assertion failed. Expected the default value for `{}` to be `{:?}`, got `{:?}`&quot;</span>,
-                <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">name</span>(),
-                <span class="ident">expected</span>,
-                <span class="ident">val</span>
+                <span class="self">self</span>.column.name(),
+                expected,
+                val
             ),
-            <span class="ident">other</span> =&gt; <span class="macro">panic!</span>(
+            other =&gt; <span class="macro">panic!</span>(
                 <span class="string">&quot;Assertion failed. Expected default: {:?}, but found {:?}&quot;</span>,
-                <span class="ident">expected</span>, <span class="ident">other</span>
+                expected, other
             ),
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_dbgenerated</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">default</span>();
+    <span class="kw">pub fn </span>assert_dbgenerated(<span class="self">self</span>, expected: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = <span class="self">self</span>.column.default();
 
-        <span class="kw">match</span> <span class="ident">found</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>))) =&gt; <span class="macro">assert!</span>(
-                <span class="ident">val</span> <span class="op">==</span> <span class="ident">expected</span>,
+        <span class="kw">match </span>found.map(|d| d.kind()) {
+            <span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="prelude-val">Some</span>(val))) =&gt; <span class="macro">assert!</span>(
+                val == expected,
                 <span class="string">&quot;Assertion failed. Expected the default value for `{}` to be dbgenerated with `{:?}`, got `{:?}`&quot;</span>,
-                <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">name</span>(),
-                <span class="ident">expected</span>,
-                <span class="ident">val</span>
+                <span class="self">self</span>.column.name(),
+                expected,
+                val
             ),
-            <span class="ident">other</span> =&gt; <span class="macro">panic!</span>(
+            other =&gt; <span class="macro">panic!</span>(
                 <span class="string">&quot;Assertion failed. Expected default: {:?}, but found {:?}&quot;</span>,
-                <span class="ident">expected</span>, <span class="ident">other</span>
+                expected, other
             ),
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_enum_default</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">unwrap</span>();
+    <span class="kw">pub fn </span>assert_enum_default(<span class="self">self</span>, expected: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>default = <span class="self">self</span>.column.default().unwrap();
 
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">default</span>.<span class="ident">kind</span>(), <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="ident">expected</span>));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(default.kind(), DefaultKind::Value(PrismaValue::Enum(s)) <span class="kw">if </span>s == expected));
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_native_type</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">native_type_to_string</span>(<span class="self">self</span>.<span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">native_type</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
+    <span class="kw">pub fn </span>assert_native_type(<span class="self">self</span>, expected: <span class="kw-2">&amp;</span>str, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = connector.native_type_to_string(<span class="self">self</span>.column.column_type().native_type.as_ref().unwrap());
         <span class="macro">assert!</span>(
-            <span class="ident">found</span> <span class="op">==</span> <span class="ident">expected</span>,
+            found == expected,
             <span class="string">&quot;Assertion failed. Expected the column native type for `{}` to be `{:?}`, found `{:?}`&quot;</span>,
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">name</span>(),
-            <span class="ident">expected</span>,
-            <span class="ident">found</span>,
+            <span class="self">self</span>.column.name(),
+            expected,
+            found,
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_type_family</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="ident">ColumnTypeFamily</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">column_type_family</span>();
+    <span class="kw">pub fn </span>assert_type_family(<span class="self">self</span>, expected: ColumnTypeFamily) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = <span class="self">self</span>.column.column_type_family();
 
         <span class="macro">assert!</span>(
-            <span class="ident">found</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">expected</span>,
+            found == <span class="kw-2">&amp;</span>expected,
             <span class="string">&quot;Assertion failed. Expected the column type family for `{}` to be `{:?}`, found `{:?}`&quot;</span>,
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">name</span>(),
-            <span class="ident">expected</span>,
-            <span class="ident">found</span>,
+            <span class="self">self</span>.column.name(),
+            expected,
+            found,
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_type_is_bigint</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">column_type_family</span>();
+    <span class="kw">pub fn </span>assert_type_is_bigint(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = <span class="self">self</span>.column.column_type_family();
 
         <span class="macro">assert!</span>(
-            <span class="ident">found</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema_describer::ColumnTypeFamily::BigInt</span>,
+            found == <span class="kw-2">&amp;</span>sql_schema_describer::ColumnTypeFamily::BigInt,
             <span class="string">&quot;Assertion failed. Expected a BigInt column, got {:?}.&quot;</span>,
-            <span class="ident">found</span>
+            found
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_type_is_bytes</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">column_type_family</span>();
+    <span class="kw">pub fn </span>assert_type_is_bytes(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = <span class="self">self</span>.column.column_type_family();
 
         <span class="macro">assert!</span>(
-            <span class="ident">found</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema_describer::ColumnTypeFamily::Binary</span>,
+            found == <span class="kw-2">&amp;</span>sql_schema_describer::ColumnTypeFamily::Binary,
             <span class="string">&quot;Assertion failed. Expected a bytes column, got {:?}.&quot;</span>,
-            <span class="ident">found</span>
+            found
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_type_is_decimal</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">column_type_family</span>();
+    <span class="kw">pub fn </span>assert_type_is_decimal(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = <span class="self">self</span>.column.column_type_family();
 
         <span class="macro">assert!</span>(
-            <span class="ident">found</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema_describer::ColumnTypeFamily::Decimal</span>,
+            found == <span class="kw-2">&amp;</span>sql_schema_describer::ColumnTypeFamily::Decimal,
             <span class="string">&quot;Assertion failed. Expected a decimal column, got {:?}.&quot;</span>,
-            <span class="ident">found</span>
+            found
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_type_is_enum</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">column</span>.<span class="ident">column_type_family</span>();
+    <span class="kw">pub fn </span>assert_type_is_enum(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = <span class="kw-2">&amp;</span><span class="self">self</span>.column.column_type_family();
 
         <span class="macro">assert!</span>(
-            <span class="macro">matches!</span>(<span class="ident">found</span>, <span class="ident">sql_schema_describer::ColumnTypeFamily::Enum</span>(<span class="kw">_</span>)),
+            <span class="macro">matches!</span>(found, sql_schema_describer::ColumnTypeFamily::Enum(<span class="kw">_</span>)),
             <span class="string">&quot;Assertion failed. Expected an enum column, got {:?}.&quot;</span>,
-            <span class="ident">found</span>
+            found
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_type_is_string</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">column_type_family</span>();
+    <span class="kw">pub fn </span>assert_type_is_string(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = <span class="self">self</span>.column.column_type_family();
 
         <span class="macro">assert!</span>(
-            <span class="ident">found</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema_describer::ColumnTypeFamily::String</span>,
+            found == <span class="kw-2">&amp;</span>sql_schema_describer::ColumnTypeFamily::String,
             <span class="string">&quot;Assertion failed. Expected a string column, got {:?}.&quot;</span>,
-            <span class="ident">found</span>
+            found
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_type_is_int</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">column_type_family</span>();
+    <span class="kw">pub fn </span>assert_type_is_int(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>found = <span class="self">self</span>.column.column_type_family();
 
         <span class="macro">assert!</span>(
-            <span class="ident">found</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema_describer::ColumnTypeFamily::Int</span>,
+            found == <span class="kw-2">&amp;</span>sql_schema_describer::ColumnTypeFamily::Int,
             <span class="string">&quot;Assertion failed. Expected an integer column, got {:?}.&quot;</span>,
-            <span class="ident">found</span>
+            found
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_is_list</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub fn </span>assert_is_list(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>(),
+            <span class="self">self</span>.column.arity().is_list(),
             <span class="string">&quot;Assertion failed. Expected column `{}` to be a list, got {:?}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">name</span>(),
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">arity</span>(),
+            <span class="self">self</span>.column.name(),
+            <span class="self">self</span>.column.arity(),
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_is_nullable</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub fn </span>assert_is_nullable(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">arity</span>().<span class="ident">is_nullable</span>(),
+            <span class="self">self</span>.column.arity().is_nullable(),
             <span class="string">&quot;Assertion failed. Expected column `{}` to be nullable, got {:?}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">name</span>(),
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">arity</span>(),
+            <span class="self">self</span>.column.name(),
+            <span class="self">self</span>.column.arity(),
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_is_required</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub fn </span>assert_is_required(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>(),
+            <span class="self">self</span>.column.arity().is_required(),
             <span class="string">&quot;Assertion failed. Expected column `{}` to be NOT NULL, got {:?}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">name</span>(),
-            <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">arity</span>(),
+            <span class="self">self</span>.column.name(),
+            <span class="self">self</span>.column.arity(),
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexColumnAssertion</span> {
-    <span class="ident">sort_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SQLSortOrder</span><span class="op">&gt;</span>,
-    <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">operator_class</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SQLOperatorClassKind</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>IndexColumnAssertion {
+    sort_order: <span class="prelude-ty">Option</span>&lt;SQLSortOrder&gt;,
+    length: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    operator_class: <span class="prelude-ty">Option</span>&lt;SQLOperatorClassKind&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">IndexColumnAssertion</span> {
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_sort_order</span>(<span class="self">self</span>, <span class="ident">sort_order</span>: <span class="ident">SQLSortOrder</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">sort_order</span>, <span class="prelude-val">Some</span>(<span class="ident">sort_order</span>));
+<span class="kw">impl </span>IndexColumnAssertion {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_sort_order(<span class="self">self</span>, sort_order: SQLSortOrder) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.sort_order, <span class="prelude-val">Some</span>(sort_order));
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_length_prefix</span>(<span class="self">self</span>, <span class="ident">length</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">length</span>, <span class="prelude-val">Some</span>(<span class="ident">length</span>));
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_length_prefix(<span class="self">self</span>, length: u32) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.length, <span class="prelude-val">Some</span>(length));
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_no_length_prefix</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">length</span>, <span class="prelude-val">None</span>);
-        <span class="self">self</span>
-    }
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_no_length_prefix(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.length, <span class="prelude-val">None</span>);
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_ops</span>(<span class="self">self</span>, <span class="ident">ops</span>: <span class="ident">SQLOperatorClassKind</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">operator_class</span>, <span class="prelude-val">Some</span>(<span class="ident">ops</span>));
-        <span class="self">self</span>
-    }
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_ops(<span class="self">self</span>, ops: SQLOperatorClassKind) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.operator_class, <span class="prelude-val">Some</span>(ops));
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrimaryKeyAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">pk</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>PrimaryKeyAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    pk: IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
+    tags: BitFlags&lt;Tags&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PrimaryKeyAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_columns</span>(<span class="self">self</span>, <span class="ident">column_names</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">column_names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), <span class="ident">column_names</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PrimaryKeyAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>assert_columns(<span class="self">self</span>, column_names: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.pk.column_names().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(), column_names);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_column</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">IndexColumnAssertion</span>) -&gt; <span class="ident">IndexColumnAssertion</span>,
+    <span class="kw">pub fn </span>assert_column&lt;F&gt;(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str, f: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: FnOnce(IndexColumnAssertion) -&gt; IndexColumnAssertion,
     {
-        <span class="kw">let</span> <span class="ident">col</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">pk</span>
-            .<span class="ident">columns</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">column_name</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Could not find column {}&quot;</span>, <span class="ident">column_name</span>));
+        <span class="kw">let </span>col = <span class="self">self
+            </span>.pk
+            .columns()
+            .find(|c| c.name() == column_name)
+            .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;Could not find column {}&quot;</span>, column_name));
 
-        <span class="ident">f</span>(<span class="ident">IndexColumnAssertion</span> {
-            <span class="ident">length</span>: <span class="ident">col</span>.<span class="ident">length</span>(),
-            <span class="ident">sort_order</span>: <span class="ident">col</span>.<span class="ident">sort_order</span>(),
-            <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
+        f(IndexColumnAssertion {
+            length: col.length(),
+            sort_order: col.sort_order(),
+            operator_class: <span class="prelude-val">None</span>,
         });
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_autoincrement</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_has_autoincrement(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="ident">column</span>.<span class="ident">as_column</span>().<span class="ident">is_autoincrement</span>()
-                <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(
-                    <span class="ident">column</span>.<span class="ident">as_column</span>().<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()),
-                    <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::UniqueRowid</span>)
+            <span class="self">self</span>.pk.columns().any(|column| column.as_column().is_autoincrement()
+                || <span class="macro">matches!</span>(
+                    column.as_column().default().map(|d| d.kind()),
+                    <span class="prelude-val">Some</span>(DefaultKind::UniqueRowid)
                 )),
-            <span class="string">&quot;Assertion failed: expected a sequence on the primary key, found none.&quot;</span>
-        );
+            <span class="string">&quot;Assertion failed: expected a sequence on the primary key, found none.&quot;
+        </span>);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_no_autoincrement</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub fn </span>assert_has_no_autoincrement(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="op">!</span><span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="ident">column</span>.<span class="ident">as_column</span>().<span class="ident">is_autoincrement</span>()),
-            <span class="string">&quot;Assertion failed: expected no sequence on the primary key, but found one.&quot;</span>
-        );
+            !<span class="self">self</span>.pk.columns().any(|column| column.as_column().is_autoincrement()),
+            <span class="string">&quot;Assertion failed: expected no sequence on the primary key, but found one.&quot;
+        </span>);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_constraint_name</span>(<span class="self">self</span>, <span class="ident">constraint_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">name</span>(), <span class="ident">constraint_name</span>);
-        <span class="self">self</span>
-    }
+    <span class="kw">pub fn </span>assert_constraint_name(<span class="self">self</span>, constraint_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.pk.name(), constraint_name);
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_non_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mssql</span>) {
-            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">id</span>))
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_non_clustered(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span><span class="self">self</span>.tags.contains(Tags::Mssql) {
+            <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>sql::mssql::MssqlSchemaExt = <span class="self">self</span>.pk.schema.downcast_connector_data();
+            <span class="macro">assert!</span>(!ext.index_is_clustered(<span class="self">self</span>.pk.id))
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mssql</span>) {
-            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
-            <span class="macro">assert!</span>(<span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">id</span>))
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_clustered(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span><span class="self">self</span>.tags.contains(Tags::Mssql) {
+            <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>sql::mssql::MssqlSchemaExt = <span class="self">self</span>.pk.schema.downcast_connector_data();
+            <span class="macro">assert!</span>(ext.index_is_clustered(<span class="self">self</span>.pk.id))
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ForeignKeyAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">fk</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>ForeignKeyAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    fk: ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
+    tags: BitFlags&lt;Tags&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ForeignKeyAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_references</span>(<span class="self">self</span>, <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ForeignKeyAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_references(<span class="self">self</span>, table: <span class="kw-2">&amp;</span>str, columns: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">is_same_table_name</span>(<span class="self">self</span>.<span class="ident">fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>(), <span class="ident">table</span>)
-                <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">fk</span>.<span class="ident">referenced_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">columns</span>,
+            <span class="self">self</span>.is_same_table_name(<span class="self">self</span>.fk.referenced_table().name(), table)
+                &amp;&amp; <span class="self">self</span>.fk.referenced_columns().map(|c| c.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;() == columns,
             <span class="string">r#&quot;Assertion failed. Expected reference to &quot;{}&quot; ({:?}).&quot;#</span>,
-            <span class="ident">table</span>,
-            <span class="ident">columns</span>,
+            table,
+            columns,
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_referential_action_on_delete</span>(<span class="self">self</span>, <span class="ident">action</span>: <span class="ident">ForeignKeyAction</span>) -&gt; <span class="self">Self</span> {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_referential_action_on_delete(<span class="self">self</span>, action: ForeignKeyAction) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">fk</span>.<span class="ident">on_delete_action</span>() <span class="op">==</span> <span class="ident">action</span>,
+            <span class="self">self</span>.fk.on_delete_action() == action,
             <span class="string">&quot;Assertion failed: expected foreign key to {:?} on delete, but got {:?}.&quot;</span>,
-            <span class="ident">action</span>,
-            <span class="self">self</span>.<span class="ident">fk</span>.<span class="ident">on_delete_action</span>()
+            action,
+            <span class="self">self</span>.fk.on_delete_action()
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_referential_action_on_update</span>(<span class="self">self</span>, <span class="ident">action</span>: <span class="ident">ForeignKeyAction</span>) -&gt; <span class="self">Self</span> {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_referential_action_on_update(<span class="self">self</span>, action: ForeignKeyAction) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">fk</span>.<span class="ident">on_update_action</span>() <span class="op">==</span> <span class="ident">action</span>,
+            <span class="self">self</span>.fk.on_update_action() == action,
             <span class="string">&quot;Assertion failed: expected foreign key to {:?} on update, but got {:?}.&quot;</span>,
-            <span class="ident">action</span>,
-            <span class="self">self</span>.<span class="ident">fk</span>.<span class="ident">on_update_action</span>()
+            action,
+            <span class="self">self</span>.fk.on_update_action()
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">is_same_table_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fst</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">snd</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::LowerCasesTableNames</span>) {
-            <span class="ident">fst</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">snd</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">fst</span> <span class="op">==</span> <span class="ident">snd</span>
+    <span class="kw">fn </span>is_same_table_name(<span class="kw-2">&amp;</span><span class="self">self</span>, fst: <span class="kw-2">&amp;</span>str, snd: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.tags.contains(Tags::LowerCasesTableNames) {
+            fst.eq_ignore_ascii_case(snd)
+        } <span class="kw">else </span>{
+            fst == snd
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>IndexAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    index: IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
+    tags: BitFlags&lt;Tags&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IndexAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_name</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">name</span>(), <span class="ident">name</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IndexAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_name(<span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.index.name(), name);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_is_fulltext</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">index_type</span>(), <span class="ident">IndexType::Fulltext</span>);
+    <span class="kw">pub fn </span>assert_is_fulltext(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.index.index_type(), IndexType::Fulltext);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_is_normal</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">index_type</span>(), <span class="ident">IndexType::Normal</span>);
+    <span class="kw">pub fn </span>assert_is_normal(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.index.index_type(), IndexType::Normal);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_is_unique</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">index_type</span>(), <span class="ident">IndexType::Unique</span>);
+    <span class="kw">pub fn </span>assert_is_unique(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.index.index_type(), IndexType::Unique);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mssql</span>) {
-            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
-            <span class="macro">assert!</span>(<span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">id</span>))
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_clustered(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span><span class="self">self</span>.tags.contains(Tags::Mssql) {
+            <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>sql::mssql::MssqlSchemaExt = <span class="self">self</span>.index.schema.downcast_connector_data();
+            <span class="macro">assert!</span>(ext.index_is_clustered(<span class="self">self</span>.index.id))
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_non_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mssql</span>) {
-            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">id</span>))
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_non_clustered(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span><span class="self">self</span>.tags.contains(Tags::Mssql) {
+            <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>sql::mssql::MssqlSchemaExt = <span class="self">self</span>.index.schema.downcast_connector_data();
+            <span class="macro">assert!</span>(!ext.index_is_clustered(<span class="self">self</span>.index.id))
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_is_not_unique</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">index_type</span>(), <span class="ident">IndexType::Normal</span>);
+    <span class="kw">pub fn </span>assert_is_not_unique(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.index.index_type(), IndexType::Normal);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_algorithm</span>(<span class="self">self</span>, <span class="ident">algo</span>: <span class="ident">SqlIndexAlgorithm</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">postgres_ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
-        <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">postgres_ext</span>.<span class="ident">index_algorithm</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">id</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">algorithm</span>, <span class="ident">algo</span>);
+    <span class="kw">pub fn </span>assert_algorithm(<span class="self">self</span>, algo: SqlIndexAlgorithm) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>postgres_ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = <span class="self">self</span>.index.schema.downcast_connector_data();
+        <span class="kw">let </span>algorithm = postgres_ext.index_algorithm(<span class="self">self</span>.index.id);
+        <span class="macro">assert_eq!</span>(algorithm, algo);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_column</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">IndexColumnAssertion</span>) -&gt; <span class="ident">IndexColumnAssertion</span>,
+    <span class="kw">pub fn </span>assert_column&lt;F&gt;(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str, f: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: FnOnce(IndexColumnAssertion) -&gt; IndexColumnAssertion,
     {
-        <span class="kw">let</span> <span class="ident">col</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">index</span>
-            .<span class="ident">columns</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>() <span class="op">==</span> <span class="ident">column_name</span>)
-            .<span class="ident">unwrap</span>();
+        <span class="kw">let </span>col = <span class="self">self
+            </span>.index
+            .columns()
+            .find(|c| c.as_column().name() == column_name)
+            .unwrap();
 
-        <span class="kw">let</span> <span class="ident">operator_class</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Postgres</span>) {
-            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+        <span class="kw">let </span>operator_class = <span class="kw">if </span><span class="self">self</span>.tags.contains(Tags::Postgres) {
+            <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = <span class="self">self</span>.index.schema.downcast_connector_data();
 
-            <span class="ident">ext</span>.<span class="ident">get_opclass</span>(<span class="ident">col</span>.<span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">kind</span>.<span class="ident">clone</span>())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
+            ext.get_opclass(col.id).map(|c| c.kind.clone())
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
 
-        <span class="ident">f</span>(<span class="ident">IndexColumnAssertion</span> {
-            <span class="ident">sort_order</span>: <span class="ident">col</span>.<span class="ident">sort_order</span>(),
-            <span class="ident">length</span>: <span class="ident">col</span>.<span class="ident">length</span>(),
-            <span class="ident">operator_class</span>,
+        f(IndexColumnAssertion {
+            sort_order: col.sort_order(),
+            length: col.length(),
+            operator_class,
         });
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresExtensionAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">extension</span>: <span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>PostgresExtensionAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    extension: ExtensionWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PostgresExtensionAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_schema</span>(<span class="self">self</span>, <span class="ident">expected_schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PostgresExtensionAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>assert_schema(<span class="self">self</span>, expected_schema: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="macro">assert_eq!</span>(
-            <span class="self">self</span>.<span class="ident">extension</span>.<span class="ident">schema</span>(), <span class="ident">expected_schema</span>,
+            <span class="self">self</span>.extension.schema(), expected_schema,
             <span class="string">&quot;Assertion failed. Expected the extension to be in the {expected_schema} schema, but was in {} schema instead.&quot;</span>,
-            <span class="self">self</span>.<span class="ident">extension</span>.<span class="ident">schema</span>()
+            <span class="self">self</span>.extension.schema()
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_version</span>(<span class="self">self</span>, <span class="ident">expected_version</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub fn </span>assert_version(<span class="self">self</span>, expected_version: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="macro">assert_eq!</span>(
-            <span class="self">self</span>.<span class="ident">extension</span>.<span class="ident">version</span>(), <span class="ident">expected_version</span>,
+            <span class="self">self</span>.extension.version(), expected_version,
             <span class="string">&quot;Assertion failed. Expected the extension to be of version {expected_version}, but was of version {} instead.&quot;</span>,
-            <span class="self">self</span>.<span class="ident">extension</span>.<span class="ident">version</span>()
+            <span class="self">self</span>.extension.version()
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

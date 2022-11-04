@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/stream/easy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>easy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/stream/easy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>easy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -813,820 +813,820 @@
 <span id="813">813</span>
 <span id="814">814</span>
 <span id="815">815</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Stream wrapper which provides an informative and easy to use error type.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Unless you have specific constraints preventing you from using this error type (such as being</span>
-<span class="doccomment">//! a `no_std` environment) you probably want to use this stream type. It can easily be used</span>
-<span class="doccomment">//! through the [`Parser::easy_parse`][] method.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The provided `Errors` type is roughly the same as `ParseError` in combine 1.x and 2.x.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! #[macro_use]</span>
-<span class="doccomment">//! extern crate combine;</span>
-<span class="doccomment">//! use combine::{easy, Parser, Stream, many1};</span>
-<span class="doccomment">//! use combine::parser::char::letter;</span>
-<span class="doccomment">//! use combine::stream::StreamErrorFor;</span>
-<span class="doccomment">//! use combine::error::{ParseError, StreamError};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     parser!{</span>
-<span class="doccomment">//!        fn parser[I]()(I) -&gt; String</span>
-<span class="doccomment">//!         where [</span>
-<span class="doccomment">//!             I: Stream&lt;Item=char, Error = easy::ParseError&lt;I&gt;&gt;,</span>
-<span class="doccomment">//!             // If we want to use the error type explicitly we need to help rustc infer</span>
-<span class="doccomment">//!             // `StreamError` to `easy::Error` (rust-lang/rust#24159)</span>
-<span class="doccomment">//!             I::Error: ParseError&lt;</span>
-<span class="doccomment">//!                 I::Item,</span>
-<span class="doccomment">//!                 I::Range,</span>
-<span class="doccomment">//!                 I::Position,</span>
-<span class="doccomment">//!                 StreamError = easy::Error&lt;I::Item, I::Range&gt;</span>
-<span class="doccomment">//!             &gt;</span>
-<span class="doccomment">//!         ]</span>
-<span class="doccomment">//!         {</span>
-<span class="doccomment">//!             many1(letter()).and_then(|word: String| {</span>
-<span class="doccomment">//!                 if word == &quot;combine&quot; {</span>
-<span class="doccomment">//!                     Ok(word)</span>
-<span class="doccomment">//!                 } else {</span>
-<span class="doccomment">//!                     Err(easy::Error::Expected(easy::Info::Borrowed(&quot;combine&quot;)))</span>
-<span class="doccomment">//!                 }</span>
-<span class="doccomment">//!             })</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     parser!{</span>
-<span class="doccomment">//!        fn parser2[I]()(I) -&gt; String</span>
-<span class="doccomment">//!         where [</span>
-<span class="doccomment">//!             I: Stream&lt;Item=char&gt;,</span>
-<span class="doccomment">//!         ]</span>
-<span class="doccomment">//!         {</span>
-<span class="doccomment">//!             many1(letter()).and_then(|word: String| {</span>
-<span class="doccomment">//!                 if word == &quot;combine&quot; {</span>
-<span class="doccomment">//!                     Ok(word)</span>
-<span class="doccomment">//!                 } else {</span>
-<span class="doccomment">//!                     // Alternatively it is possible to only use the methods provided by the</span>
-<span class="doccomment">//!                     // `StreamError` trait.</span>
-<span class="doccomment">//!                     // In that case the extra bound is not necessary (and this method will work</span>
-<span class="doccomment">//!                     // for other errors than `easy::Errors`)</span>
-<span class="doccomment">//!                     Err(StreamErrorFor::&lt;I&gt;::expected_static_message(&quot;combine&quot;))</span>
-<span class="doccomment">//!                 }</span>
-<span class="doccomment">//!             })</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     let input = &quot;combin&quot;;</span>
-<span class="doccomment">//!     let expected_error = Err(easy::Errors {</span>
-<span class="doccomment">//!         errors: vec![</span>
-<span class="doccomment">//!             easy::Error::Expected(&quot;combine&quot;.into())</span>
-<span class="doccomment">//!         ],</span>
-<span class="doccomment">//!         position: 0,</span>
-<span class="doccomment">//!     });</span>
-<span class="doccomment">//!     assert_eq!(</span>
-<span class="doccomment">//!         parser().easy_parse(input).map_err(|err| err.map_position(|p| p.translate_position(input))),</span>
-<span class="doccomment">//!         expected_error</span>
-<span class="doccomment">//!     );</span>
-<span class="doccomment">//!     assert_eq!(</span>
-<span class="doccomment">//!         parser2().easy_parse(input).map_err(|err| err.map_position(|p| p.translate_position(input))),</span>
-<span class="doccomment">//!         expected_error</span>
-<span class="doccomment">//!     );</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Parser::easy_parse`]: ../parser/trait.Parser.html#method.easy_parse</span>
-<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Stream wrapper which provides an informative and easy to use error type.
+//!
+//! Unless you have specific constraints preventing you from using this error type (such as being
+//! a `no_std` environment) you probably want to use this stream type. It can easily be used
+//! through the [`Parser::easy_parse`][] method.
+//!
+//! The provided `Errors` type is roughly the same as `ParseError` in combine 1.x and 2.x.
+//!
+//! ```
+//! #[macro_use]
+//! extern crate combine;
+//! use combine::{easy, Parser, Stream, many1};
+//! use combine::parser::char::letter;
+//! use combine::stream::StreamErrorFor;
+//! use combine::error::{ParseError, StreamError};
+//!
+//! fn main() {
+//!     parser!{
+//!        fn parser[I]()(I) -&gt; String
+//!         where [
+//!             I: Stream&lt;Item=char, Error = easy::ParseError&lt;I&gt;&gt;,
+//!             // If we want to use the error type explicitly we need to help rustc infer
+//!             // `StreamError` to `easy::Error` (rust-lang/rust#24159)
+//!             I::Error: ParseError&lt;
+//!                 I::Item,
+//!                 I::Range,
+//!                 I::Position,
+//!                 StreamError = easy::Error&lt;I::Item, I::Range&gt;
+//!             &gt;
+//!         ]
+//!         {
+//!             many1(letter()).and_then(|word: String| {
+//!                 if word == &quot;combine&quot; {
+//!                     Ok(word)
+//!                 } else {
+//!                     Err(easy::Error::Expected(easy::Info::Borrowed(&quot;combine&quot;)))
+//!                 }
+//!             })
+//!         }
+//!     }
+//!
+//!     parser!{
+//!        fn parser2[I]()(I) -&gt; String
+//!         where [
+//!             I: Stream&lt;Item=char&gt;,
+//!         ]
+//!         {
+//!             many1(letter()).and_then(|word: String| {
+//!                 if word == &quot;combine&quot; {
+//!                     Ok(word)
+//!                 } else {
+//!                     // Alternatively it is possible to only use the methods provided by the
+//!                     // `StreamError` trait.
+//!                     // In that case the extra bound is not necessary (and this method will work
+//!                     // for other errors than `easy::Errors`)
+//!                     Err(StreamErrorFor::&lt;I&gt;::expected_static_message(&quot;combine&quot;))
+//!                 }
+//!             })
+//!         }
+//!     }
+//!
+//!     let input = &quot;combin&quot;;
+//!     let expected_error = Err(easy::Errors {
+//!         errors: vec![
+//!             easy::Error::Expected(&quot;combine&quot;.into())
+//!         ],
+//!         position: 0,
+//!     });
+//!     assert_eq!(
+//!         parser().easy_parse(input).map_err(|err| err.map_position(|p| p.translate_position(input))),
+//!         expected_error
+//!     );
+//!     assert_eq!(
+//!         parser2().easy_parse(input).map_err(|err| err.map_position(|p| p.translate_position(input))),
+//!         expected_error
+//!     );
+//! }
+//!
+//! ```
+//!
+//! [`Parser::easy_parse`]: ../parser/trait.Parser.html#method.easy_parse
+</span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+<span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">FastResult</span>, <span class="ident">Info</span> <span class="kw">as</span> <span class="ident">PrimitiveInfo</span>, <span class="ident">StreamError</span>, <span class="ident">Tracked</span>};
-<span class="kw">use</span> <span class="ident">stream</span>::{
-    <span class="ident">FullRangeStream</span>, <span class="ident">Positioned</span>, <span class="ident">RangeStream</span>, <span class="ident">RangeStreamOnce</span>, <span class="ident">Resetable</span>, <span class="ident">StreamErrorFor</span>,
-    <span class="ident">StreamOnce</span>,
+<span class="kw">use </span>error::{FastResult, Info <span class="kw">as </span>PrimitiveInfo, StreamError, Tracked};
+<span class="kw">use </span>stream::{
+    FullRangeStream, Positioned, RangeStream, RangeStreamOnce, Resetable, StreamErrorFor,
+    StreamOnce,
 };
 
-<span class="doccomment">/// Enum holding error information. Variants are defined for `Stream::Item` and `Stream::Range` as</span>
-<span class="doccomment">/// well as string variants holding easy descriptions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As there is implementations of `From` for `String` and `&amp;&#39;static str` the</span>
-<span class="doccomment">/// constructor need not be used directly as calling `msg.into()` should turn a message into the</span>
-<span class="doccomment">/// correct `Info` variant.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="ident">Token</span>(<span class="ident">T</span>),
-    <span class="ident">Range</span>(<span class="ident">R</span>),
-    <span class="ident">Owned</span>(<span class="ident">String</span>),
-    <span class="ident">Borrowed</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
+<span class="doccomment">/// Enum holding error information. Variants are defined for `Stream::Item` and `Stream::Range` as
+/// well as string variants holding easy descriptions.
+///
+/// As there is implementations of `From` for `String` and `&amp;&#39;static str` the
+/// constructor need not be used directly as calling `msg.into()` should turn a message into the
+/// correct `Info` variant.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>Info&lt;T, R&gt; {
+    Token(T),
+    Range(R),
+    Owned(String),
+    Borrowed(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PrimitiveInfo</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">info</span>: <span class="ident">PrimitiveInfo</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">info</span> {
-            <span class="ident">PrimitiveInfo::Token</span>(<span class="ident">b</span>) =&gt; <span class="ident">Info::Token</span>(<span class="ident">b</span>),
-            <span class="ident">PrimitiveInfo::Range</span>(<span class="ident">b</span>) =&gt; <span class="ident">Info::Range</span>(<span class="ident">b</span>),
-            <span class="ident">PrimitiveInfo::Borrowed</span>(<span class="ident">b</span>) =&gt; <span class="ident">Info::Borrowed</span>(<span class="ident">b</span>),
+<span class="kw">impl</span>&lt;T, R&gt; From&lt;PrimitiveInfo&lt;T, R&gt;&gt; <span class="kw">for </span>Info&lt;T, R&gt; {
+    <span class="kw">fn </span>from(info: PrimitiveInfo&lt;T, R&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>info {
+            PrimitiveInfo::Token(b) =&gt; Info::Token(b),
+            PrimitiveInfo::Range(b) =&gt; Info::Range(b),
+            PrimitiveInfo::Borrowed(b) =&gt; Info::Borrowed(b),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_token</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">R</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">U</span>,
+<span class="kw">impl</span>&lt;T, R&gt; Info&lt;T, R&gt; {
+    <span class="kw">pub fn </span>map_token&lt;F, U&gt;(<span class="self">self</span>, f: F) -&gt; Info&lt;U, R&gt;
+    <span class="kw">where
+        </span>F: FnOnce(T) -&gt; U,
     {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Info</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Token</span>(<span class="ident">t</span>) =&gt; <span class="ident">Token</span>(<span class="ident">f</span>(<span class="ident">t</span>)),
-            <span class="ident">Range</span>(<span class="ident">r</span>) =&gt; <span class="ident">Range</span>(<span class="ident">r</span>),
-            <span class="ident">Owned</span>(<span class="ident">s</span>) =&gt; <span class="ident">Owned</span>(<span class="ident">s</span>),
-            <span class="ident">Borrowed</span>(<span class="ident">x</span>) =&gt; <span class="ident">Borrowed</span>(<span class="ident">x</span>),
+        <span class="kw">use </span><span class="self">self</span>::Info::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Token(t) =&gt; Token(f(t)),
+            Range(r) =&gt; Range(r),
+            Owned(s) =&gt; Owned(s),
+            Borrowed(x) =&gt; Borrowed(x),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_range</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">R</span>) -&gt; <span class="ident">S</span>,
+    <span class="kw">pub fn </span>map_range&lt;F, S&gt;(<span class="self">self</span>, f: F) -&gt; Info&lt;T, S&gt;
+    <span class="kw">where
+        </span>F: FnOnce(R) -&gt; S,
     {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Info</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Token</span>(<span class="ident">t</span>) =&gt; <span class="ident">Token</span>(<span class="ident">t</span>),
-            <span class="ident">Range</span>(<span class="ident">r</span>) =&gt; <span class="ident">Range</span>(<span class="ident">f</span>(<span class="ident">r</span>)),
-            <span class="ident">Owned</span>(<span class="ident">s</span>) =&gt; <span class="ident">Owned</span>(<span class="ident">s</span>),
-            <span class="ident">Borrowed</span>(<span class="ident">x</span>) =&gt; <span class="ident">Borrowed</span>(<span class="ident">x</span>),
+        <span class="kw">use </span><span class="self">self</span>::Info::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Token(t) =&gt; Token(t),
+            Range(r) =&gt; Range(f(r)),
+            Owned(s) =&gt; Owned(s),
+            Borrowed(x) =&gt; Borrowed(x),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">PartialEq</span>, <span class="ident">R</span>: <span class="ident">PartialEq</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="kw-2">&amp;</span><span class="ident">Info::Token</span>(<span class="kw-2">ref</span> <span class="ident">l</span>), <span class="kw-2">&amp;</span><span class="ident">Info::Token</span>(<span class="kw-2">ref</span> <span class="ident">r</span>)) =&gt; <span class="ident">l</span> <span class="op">==</span> <span class="ident">r</span>,
-            (<span class="kw-2">&amp;</span><span class="ident">Info::Range</span>(<span class="kw-2">ref</span> <span class="ident">l</span>), <span class="kw-2">&amp;</span><span class="ident">Info::Range</span>(<span class="kw-2">ref</span> <span class="ident">r</span>)) =&gt; <span class="ident">l</span> <span class="op">==</span> <span class="ident">r</span>,
-            (<span class="kw-2">&amp;</span><span class="ident">Info::Owned</span>(<span class="kw-2">ref</span> <span class="ident">l</span>), <span class="kw-2">&amp;</span><span class="ident">Info::Owned</span>(<span class="kw-2">ref</span> <span class="ident">r</span>)) =&gt; <span class="ident">l</span> <span class="op">==</span> <span class="ident">r</span>,
-            (<span class="kw-2">&amp;</span><span class="ident">Info::Borrowed</span>(<span class="ident">l</span>), <span class="kw-2">&amp;</span><span class="ident">Info::Owned</span>(<span class="kw-2">ref</span> <span class="ident">r</span>)) =&gt; <span class="ident">l</span> <span class="op">==</span> <span class="ident">r</span>,
-            (<span class="kw-2">&amp;</span><span class="ident">Info::Owned</span>(<span class="kw-2">ref</span> <span class="ident">l</span>), <span class="kw-2">&amp;</span><span class="ident">Info::Borrowed</span>(<span class="ident">r</span>)) =&gt; <span class="ident">l</span> <span class="op">==</span> <span class="ident">r</span>,
-            (<span class="kw-2">&amp;</span><span class="ident">Info::Borrowed</span>(<span class="ident">l</span>), <span class="kw-2">&amp;</span><span class="ident">Info::Borrowed</span>(<span class="ident">r</span>)) =&gt; <span class="ident">l</span> <span class="op">==</span> <span class="ident">r</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="kw">impl</span>&lt;T: PartialEq, R: PartialEq&gt; PartialEq <span class="kw">for </span>Info&lt;T, R&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Info&lt;T, R&gt;) -&gt; bool {
+        <span class="kw">match </span>(<span class="self">self</span>, other) {
+            (<span class="kw-2">&amp;</span>Info::Token(<span class="kw-2">ref </span>l), <span class="kw-2">&amp;</span>Info::Token(<span class="kw-2">ref </span>r)) =&gt; l == r,
+            (<span class="kw-2">&amp;</span>Info::Range(<span class="kw-2">ref </span>l), <span class="kw-2">&amp;</span>Info::Range(<span class="kw-2">ref </span>r)) =&gt; l == r,
+            (<span class="kw-2">&amp;</span>Info::Owned(<span class="kw-2">ref </span>l), <span class="kw-2">&amp;</span>Info::Owned(<span class="kw-2">ref </span>r)) =&gt; l == r,
+            (<span class="kw-2">&amp;</span>Info::Borrowed(l), <span class="kw-2">&amp;</span>Info::Owned(<span class="kw-2">ref </span>r)) =&gt; l == r,
+            (<span class="kw-2">&amp;</span>Info::Owned(<span class="kw-2">ref </span>l), <span class="kw-2">&amp;</span>Info::Borrowed(r)) =&gt; l == r,
+            (<span class="kw-2">&amp;</span>Info::Borrowed(l), <span class="kw-2">&amp;</span>Info::Borrowed(r)) =&gt; l == r,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Display</span>, <span class="ident">R</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Info::Token</span>(<span class="kw-2">ref</span> <span class="ident">c</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">c</span>),
-            <span class="ident">Info::Range</span>(<span class="kw-2">ref</span> <span class="ident">c</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">c</span>),
-            <span class="ident">Info::Owned</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">s</span>),
-            <span class="ident">Info::Borrowed</span>(<span class="ident">s</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">s</span>),
+<span class="kw">impl</span>&lt;T: fmt::Display, R: fmt::Display&gt; fmt::Display <span class="kw">for </span>Info&lt;T, R&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Info::Token(<span class="kw-2">ref </span>c) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, c),
+            Info::Range(<span class="kw-2">ref </span>c) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, c),
+            Info::Owned(<span class="kw-2">ref </span>s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, s),
+            Info::Borrowed(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, s),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">char</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">char</span>) -&gt; <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">char</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">Info::Token</span>(<span class="ident">s</span>)
+<span class="kw">impl</span>&lt;R&gt; From&lt;char&gt; <span class="kw">for </span>Info&lt;char, R&gt; {
+    <span class="kw">fn </span>from(s: char) -&gt; Info&lt;char, R&gt; {
+        Info::Token(s)
     }
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">Info::Owned</span>(<span class="ident">s</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">Info::Borrowed</span>(<span class="ident">s</span>)
+<span class="kw">impl</span>&lt;T, R&gt; From&lt;String&gt; <span class="kw">for </span>Info&lt;T, R&gt; {
+    <span class="kw">fn </span>from(s: String) -&gt; Info&lt;T, R&gt; {
+        Info::Owned(s)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">Info::Token</span>(<span class="ident">s</span>)
+<span class="kw">impl</span>&lt;T, R&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>Info&lt;T, R&gt; {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; Info&lt;T, R&gt; {
+        Info::Borrowed(s)
     }
 }
 
-<span class="doccomment">/// Enum used to store information about an error that has occurred during parsing.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Error indicating an unexpected token has been encountered in the stream</span>
-    <span class="ident">Unexpected</span>(<span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Error indicating that the parser expected something else</span>
-    <span class="ident">Expected</span>(<span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Generic message</span>
-    <span class="ident">Message</span>(<span class="ident">Info</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Variant for containing other types of errors</span>
-    <span class="ident">Other</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>),
+<span class="kw">impl</span>&lt;R&gt; From&lt;u8&gt; <span class="kw">for </span>Info&lt;u8, R&gt; {
+    <span class="kw">fn </span>from(s: u8) -&gt; Info&lt;u8, R&gt; {
+        Info::Token(s)
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span> <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Item</span>: <span class="ident">PartialEq</span>,
-    <span class="ident">Range</span>: <span class="ident">PartialEq</span>,
+<span class="doccomment">/// Enum used to store information about an error that has occurred during parsing.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Error&lt;T, R&gt; {
+    <span class="doccomment">/// Error indicating an unexpected token has been encountered in the stream
+    </span>Unexpected(Info&lt;T, R&gt;),
+    <span class="doccomment">/// Error indicating that the parser expected something else
+    </span>Expected(Info&lt;T, R&gt;),
+    <span class="doccomment">/// Generic message
+    </span>Message(Info&lt;T, R&gt;),
+    <span class="doccomment">/// Variant for containing other types of errors
+    </span>Other(Box&lt;StdError + Send + Sync&gt;),
+}
+
+<span class="kw">impl</span>&lt;Item, Range&gt; StreamError&lt;Item, Range&gt; <span class="kw">for </span>Error&lt;Item, Range&gt;
+<span class="kw">where
+    </span>Item: PartialEq,
+    Range: PartialEq,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unexpected_token</span>(<span class="ident">token</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Unexpected</span>(<span class="ident">Info::Token</span>(<span class="ident">token</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>unexpected_token(token: Item) -&gt; <span class="self">Self </span>{
+        Error::Unexpected(Info::Token(token))
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unexpected_range</span>(<span class="ident">token</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Unexpected</span>(<span class="ident">Info::Range</span>(<span class="ident">token</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>unexpected_range(token: Range) -&gt; <span class="self">Self </span>{
+        Error::Unexpected(Info::Range(token))
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unexpected_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>unexpected_message&lt;T&gt;(msg: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display,
     {
-        <span class="ident">Error::Unexpected</span>(<span class="ident">Info::Owned</span>(<span class="ident">msg</span>.<span class="ident">to_string</span>()))
+        Error::Unexpected(Info::Owned(msg.to_string()))
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unexpected_static_message</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Unexpected</span>(<span class="ident">Info::Borrowed</span>(<span class="ident">msg</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>unexpected_static_message(msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        Error::Unexpected(Info::Borrowed(msg))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">expected_token</span>(<span class="ident">token</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Expected</span>(<span class="ident">Info::Token</span>(<span class="ident">token</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>expected_token(token: Item) -&gt; <span class="self">Self </span>{
+        Error::Expected(Info::Token(token))
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">expected_range</span>(<span class="ident">token</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Expected</span>(<span class="ident">Info::Range</span>(<span class="ident">token</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>expected_range(token: Range) -&gt; <span class="self">Self </span>{
+        Error::Expected(Info::Range(token))
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">expected_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>expected_message&lt;T&gt;(msg: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display,
     {
-        <span class="ident">Error::Expected</span>(<span class="ident">Info::Owned</span>(<span class="ident">msg</span>.<span class="ident">to_string</span>()))
+        Error::Expected(Info::Owned(msg.to_string()))
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">expected_static_message</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Expected</span>(<span class="ident">Info::Borrowed</span>(<span class="ident">msg</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>expected_static_message(msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        Error::Expected(Info::Borrowed(msg))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">message_message</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>message_message&lt;T&gt;(msg: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: fmt::Display,
     {
-        <span class="ident">Error::Message</span>(<span class="ident">Info::Owned</span>(<span class="ident">msg</span>.<span class="ident">to_string</span>()))
+        Error::Message(Info::Owned(msg.to_string()))
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">message_static_message</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Message</span>(<span class="ident">Info::Borrowed</span>(<span class="ident">msg</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>message_static_message(msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        Error::Message(Info::Borrowed(msg))
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">message_token</span>(<span class="ident">token</span>: <span class="ident">Item</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Message</span>(<span class="ident">Info::Token</span>(<span class="ident">token</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>message_token(token: Item) -&gt; <span class="self">Self </span>{
+        Error::Message(Info::Token(token))
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">message_range</span>(<span class="ident">token</span>: <span class="ident">Range</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Message</span>(<span class="ident">Info::Range</span>(<span class="ident">token</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>message_range(token: Range) -&gt; <span class="self">Self </span>{
+        Error::Message(Info::Range(token))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">other</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">err</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>other&lt;E&gt;(err: E) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>E: StdError + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">err</span>.<span class="ident">into</span>()
+        err.into()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_other</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_other&lt;T&gt;(<span class="self">self</span>) -&gt; T
+    <span class="kw">where
+        </span>T: StreamError&lt;Item, Range&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::Unexpected</span>(<span class="ident">info</span>) =&gt; <span class="kw">match</span> <span class="ident">info</span> {
-                <span class="ident">Info::Token</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::unexpected_token</span>(<span class="ident">x</span>),
-                <span class="ident">Info::Range</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::unexpected_range</span>(<span class="ident">x</span>),
-                <span class="ident">Info::Borrowed</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::unexpected_static_message</span>(<span class="ident">x</span>),
-                <span class="ident">Info::Owned</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::unexpected_message</span>(<span class="ident">x</span>),
+        <span class="kw">match </span><span class="self">self </span>{
+            Error::Unexpected(info) =&gt; <span class="kw">match </span>info {
+                Info::Token(x) =&gt; T::unexpected_token(x),
+                Info::Range(x) =&gt; T::unexpected_range(x),
+                Info::Borrowed(x) =&gt; T::unexpected_static_message(x),
+                Info::Owned(x) =&gt; T::unexpected_message(x),
             },
-            <span class="ident">Error::Expected</span>(<span class="ident">info</span>) =&gt; <span class="kw">match</span> <span class="ident">info</span> {
-                <span class="ident">Info::Token</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::expected_token</span>(<span class="ident">x</span>),
-                <span class="ident">Info::Range</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::expected_range</span>(<span class="ident">x</span>),
-                <span class="ident">Info::Borrowed</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::expected_static_message</span>(<span class="ident">x</span>),
-                <span class="ident">Info::Owned</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::expected_message</span>(<span class="ident">x</span>),
+            Error::Expected(info) =&gt; <span class="kw">match </span>info {
+                Info::Token(x) =&gt; T::expected_token(x),
+                Info::Range(x) =&gt; T::expected_range(x),
+                Info::Borrowed(x) =&gt; T::expected_static_message(x),
+                Info::Owned(x) =&gt; T::expected_message(x),
             },
-            <span class="ident">Error::Message</span>(<span class="ident">info</span>) =&gt; <span class="kw">match</span> <span class="ident">info</span> {
-                <span class="ident">Info::Token</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::expected_token</span>(<span class="ident">x</span>),
-                <span class="ident">Info::Range</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::expected_range</span>(<span class="ident">x</span>),
-                <span class="ident">Info::Borrowed</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::expected_static_message</span>(<span class="ident">x</span>),
-                <span class="ident">Info::Owned</span>(<span class="ident">x</span>) =&gt; <span class="ident">T::expected_message</span>(<span class="ident">x</span>),
+            Error::Message(info) =&gt; <span class="kw">match </span>info {
+                Info::Token(x) =&gt; T::expected_token(x),
+                Info::Range(x) =&gt; T::expected_range(x),
+                Info::Borrowed(x) =&gt; T::expected_static_message(x),
+                Info::Owned(x) =&gt; T::expected_message(x),
             },
-            <span class="ident">Error::Other</span>(<span class="ident">err</span>) =&gt; <span class="ident">T::message_message</span>(<span class="ident">err</span>),
+            Error::Other(err) =&gt; T::message_message(err),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span> <span class="ident">::error::ParseError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Item</span>: <span class="ident">PartialEq</span>,
-    <span class="ident">Range</span>: <span class="ident">PartialEq</span>,
-    <span class="ident">Position</span>: <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;Item, Range, Position&gt; ::error::ParseError&lt;Item, Range, Position&gt; <span class="kw">for </span>Error&lt;Item, Range&gt;
+<span class="kw">where
+    </span>Item: PartialEq,
+    Range: PartialEq,
+    Position: Default,
 {
-    <span class="kw">type</span> <span class="ident">StreamError</span> <span class="op">=</span> <span class="self">Self</span>;
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">empty</span>(<span class="kw">_</span>: <span class="ident">Position</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::message_static_message</span>(<span class="string">&quot;&quot;</span>)
+    <span class="kw">type </span>StreamError = <span class="self">Self</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>empty(<span class="kw">_</span>: Position) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::message_static_message(<span class="string">&quot;&quot;</span>)
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_error</span>(<span class="kw">_</span>: <span class="ident">Position</span>, <span class="ident">err</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">err</span>
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_position</span>: <span class="ident">Position</span>) {}
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">err</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_error(<span class="kw">_</span>: Position, err: <span class="self">Self</span>::StreamError) -&gt; <span class="self">Self </span>{
+        err
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_expected</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">self_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">info</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>, <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set_position(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _position: Position) {}
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, err: <span class="self">Self</span>::StreamError) {
+        <span class="kw-2">*</span><span class="self">self </span>= err;
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set_expected&lt;F&gt;(self_: <span class="kw-2">&amp;mut </span>Tracked&lt;<span class="self">Self</span>&gt;, info: <span class="self">Self</span>::StreamError, f: F)
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Tracked&lt;<span class="self">Self</span>&gt;),
     {
-        <span class="ident">f</span>(<span class="ident">self_</span>);
-        <span class="ident">self_</span>.<span class="ident">error</span> <span class="op">=</span> <span class="ident">info</span>;
+        f(self_);
+        self_.error = info;
     }
 
-    <span class="kw">fn</span> <span class="ident">is_unexpected_end_of_input</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::end_of_input</span>()
+    <span class="kw">fn </span>is_unexpected_end_of_input(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self </span>== <span class="self">Self</span>::end_of_input()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_other</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">::error::ParseError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_other&lt;T&gt;(<span class="self">self</span>) -&gt; T
+    <span class="kw">where
+        </span>T: ::error::ParseError&lt;Item, Range, Position&gt;,
     {
-        <span class="ident">T::from_error</span>(<span class="ident">Position::default</span>(), <span class="ident">StreamError::into_other</span>(<span class="self">self</span>))
+        T::from_error(Position::default(), StreamError::into_other(<span class="self">self</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span> <span class="ident">::error::ParseError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span>
-    <span class="kw">for</span> <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Item</span>: <span class="ident">PartialEq</span>,
-    <span class="ident">Range</span>: <span class="ident">PartialEq</span>,
-    <span class="ident">Position</span>: <span class="ident">Ord</span>,
+<span class="kw">impl</span>&lt;Item, Range, Position&gt; ::error::ParseError&lt;Item, Range, Position&gt;
+    <span class="kw">for </span>Errors&lt;Item, Range, Position&gt;
+<span class="kw">where
+    </span>Item: PartialEq,
+    Range: PartialEq,
+    Position: Ord,
 {
-    <span class="kw">type</span> <span class="ident">StreamError</span> <span class="op">=</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>;
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">empty</span>(<span class="ident">pos</span>: <span class="ident">Position</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Errors::empty</span>(<span class="ident">pos</span>)
+    <span class="kw">type </span>StreamError = Error&lt;Item, Range&gt;;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>empty(pos: Position) -&gt; <span class="self">Self </span>{
+        Errors::empty(pos)
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_error</span>(<span class="ident">position</span>: <span class="ident">Position</span>, <span class="ident">err</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">position</span>, <span class="ident">Error::from</span>(<span class="ident">err</span>))
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">Position</span>) {
-        <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">position</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_error(position: Position, err: <span class="self">Self</span>::StreamError) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(position, Error::from(err))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">merge</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Errors::merge</span>(<span class="self">self</span>, <span class="ident">other</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set_position(<span class="kw-2">&amp;mut </span><span class="self">self</span>, position: Position) {
+        <span class="self">self</span>.position = position;
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>) {
-        <span class="self">self</span>.<span class="ident">add_error</span>(<span class="ident">err</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>merge(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        Errors::merge(<span class="self">self</span>, other)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_expected</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">self_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">info</span>: <span class="ident"><span class="self">Self</span>::StreamError</span>, <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, err: <span class="self">Self</span>::StreamError) {
+        <span class="self">self</span>.add_error(err);
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set_expected&lt;F&gt;(self_: <span class="kw-2">&amp;mut </span>Tracked&lt;<span class="self">Self</span>&gt;, info: <span class="self">Self</span>::StreamError, f: F)
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Tracked&lt;<span class="self">Self</span>&gt;),
     {
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">self_</span>.<span class="ident">error</span>.<span class="ident">errors</span>.<span class="ident">len</span>();
-        <span class="ident">f</span>(<span class="ident">self_</span>);
-        <span class="comment">// Replace all expected errors that were added from the previous add_error</span>
-        <span class="comment">// with this expected error</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="ident">self_</span>.<span class="ident">error</span>.<span class="ident">errors</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">start</span> {
-                <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="bool-val">true</span>
-            } <span class="kw">else</span> {
-                <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span> {
-                    <span class="ident">Error::Expected</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-                    <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
+        <span class="kw">let </span>start = self_.error.errors.len();
+        f(self_);
+        <span class="comment">// Replace all expected errors that were added from the previous add_error
+        // with this expected error
+        </span><span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+        self_.error.errors.retain(|e| {
+            <span class="kw">if </span>i &lt; start {
+                i += <span class="number">1</span>;
+                <span class="bool-val">true
+            </span>} <span class="kw">else </span>{
+                <span class="kw">match </span><span class="kw-2">*</span>e {
+                    Error::Expected(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+                    <span class="kw">_ </span>=&gt; <span class="bool-val">true</span>,
                 }
             }
         });
-        <span class="ident">self_</span>.<span class="ident">error</span>.<span class="ident">add</span>(<span class="ident">info</span>);
+        self_.error.add(info);
     }
 
-    <span class="kw">fn</span> <span class="ident">clear_expected</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span> {
-            <span class="ident">Error::Expected</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
+    <span class="kw">fn </span>clear_expected(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.errors.retain(|e| <span class="kw">match </span><span class="kw-2">*</span>e {
+            Error::Expected(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">true</span>,
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">is_unexpected_end_of_input</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">err</span> <span class="op">==</span> <span class="ident">Error::end_of_input</span>())
+    <span class="kw">fn </span>is_unexpected_end_of_input(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.errors.iter().any(|err| <span class="kw-2">*</span>err == Error::end_of_input())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_other</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">::error::ParseError</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span>, <span class="ident">Position</span><span class="op">&gt;</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_other&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; T
+    <span class="kw">where
+        </span>T: ::error::ParseError&lt;Item, Range, Position&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">pop</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">err</span>) =&gt; <span class="ident">T::from_error</span>(<span class="self">self</span>.<span class="ident">position</span>, <span class="ident">StreamError::into_other</span>(<span class="ident">err</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">T::empty</span>(<span class="self">self</span>.<span class="ident">position</span>),
+        <span class="kw">match </span><span class="self">self</span>.errors.pop() {
+            <span class="prelude-val">Some</span>(err) =&gt; T::from_error(<span class="self">self</span>.position, StreamError::into_other(err)),
+            <span class="prelude-val">None </span>=&gt; T::empty(<span class="self">self</span>.position),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_token</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">R</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">U</span>,
+<span class="kw">impl</span>&lt;T, R&gt; Error&lt;T, R&gt; {
+    <span class="kw">pub fn </span>map_token&lt;F, U&gt;(<span class="self">self</span>, f: F) -&gt; Error&lt;U, R&gt;
+    <span class="kw">where
+        </span>F: FnOnce(T) -&gt; U,
     {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Error</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Unexpected</span>(<span class="ident">x</span>) =&gt; <span class="ident">Unexpected</span>(<span class="ident">x</span>.<span class="ident">map_token</span>(<span class="ident">f</span>)),
-            <span class="ident">Expected</span>(<span class="ident">x</span>) =&gt; <span class="ident">Expected</span>(<span class="ident">x</span>.<span class="ident">map_token</span>(<span class="ident">f</span>)),
-            <span class="ident">Message</span>(<span class="ident">x</span>) =&gt; <span class="ident">Message</span>(<span class="ident">x</span>.<span class="ident">map_token</span>(<span class="ident">f</span>)),
-            <span class="ident">Other</span>(<span class="ident">x</span>) =&gt; <span class="ident">Other</span>(<span class="ident">x</span>),
+        <span class="kw">use </span><span class="self">self</span>::Error::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Unexpected(x) =&gt; Unexpected(x.map_token(f)),
+            Expected(x) =&gt; Expected(x.map_token(f)),
+            Message(x) =&gt; Message(x.map_token(f)),
+            Other(x) =&gt; Other(x),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_range</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">R</span>) -&gt; <span class="ident">S</span>,
+    <span class="kw">pub fn </span>map_range&lt;F, S&gt;(<span class="self">self</span>, f: F) -&gt; Error&lt;T, S&gt;
+    <span class="kw">where
+        </span>F: FnOnce(R) -&gt; S,
     {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Error</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Unexpected</span>(<span class="ident">x</span>) =&gt; <span class="ident">Unexpected</span>(<span class="ident">x</span>.<span class="ident">map_range</span>(<span class="ident">f</span>)),
-            <span class="ident">Expected</span>(<span class="ident">x</span>) =&gt; <span class="ident">Expected</span>(<span class="ident">x</span>.<span class="ident">map_range</span>(<span class="ident">f</span>)),
-            <span class="ident">Message</span>(<span class="ident">x</span>) =&gt; <span class="ident">Message</span>(<span class="ident">x</span>.<span class="ident">map_range</span>(<span class="ident">f</span>)),
-            <span class="ident">Other</span>(<span class="ident">x</span>) =&gt; <span class="ident">Other</span>(<span class="ident">x</span>),
+        <span class="kw">use </span><span class="self">self</span>::Error::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Unexpected(x) =&gt; Unexpected(x.map_range(f)),
+            Expected(x) =&gt; Expected(x.map_range(f)),
+            Message(x) =&gt; Message(x.map_range(f)),
+            Other(x) =&gt; Other(x),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">PartialEq</span>, <span class="ident">R</span>: <span class="ident">PartialEq</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="kw-2">&amp;</span><span class="ident">Error::Unexpected</span>(<span class="kw-2">ref</span> <span class="ident">l</span>), <span class="kw-2">&amp;</span><span class="ident">Error::Unexpected</span>(<span class="kw-2">ref</span> <span class="ident">r</span>))
-            <span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">Error::Expected</span>(<span class="kw-2">ref</span> <span class="ident">l</span>), <span class="kw-2">&amp;</span><span class="ident">Error::Expected</span>(<span class="kw-2">ref</span> <span class="ident">r</span>))
-            <span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">Error::Message</span>(<span class="kw-2">ref</span> <span class="ident">l</span>), <span class="kw-2">&amp;</span><span class="ident">Error::Message</span>(<span class="kw-2">ref</span> <span class="ident">r</span>)) =&gt; <span class="ident">l</span> <span class="op">==</span> <span class="ident">r</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="kw">impl</span>&lt;T: PartialEq, R: PartialEq&gt; PartialEq <span class="kw">for </span>Error&lt;T, R&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Error&lt;T, R&gt;) -&gt; bool {
+        <span class="kw">match </span>(<span class="self">self</span>, other) {
+            (<span class="kw-2">&amp;</span>Error::Unexpected(<span class="kw-2">ref </span>l), <span class="kw-2">&amp;</span>Error::Unexpected(<span class="kw-2">ref </span>r))
+            | (<span class="kw-2">&amp;</span>Error::Expected(<span class="kw-2">ref </span>l), <span class="kw-2">&amp;</span>Error::Expected(<span class="kw-2">ref </span>r))
+            | (<span class="kw-2">&amp;</span>Error::Message(<span class="kw-2">ref </span>l), <span class="kw-2">&amp;</span>Error::Message(<span class="kw-2">ref </span>r)) =&gt; l == r,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+<span class="kw">impl</span>&lt;T, R, E&gt; From&lt;E&gt; <span class="kw">for </span>Error&lt;T, R&gt;
+<span class="kw">where
+    </span>E: StdError + <span class="lifetime">&#39;static </span>+ Send + Sync,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">E</span>) -&gt; <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">Error::Other</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>))
+    <span class="kw">fn </span>from(e: E) -&gt; Error&lt;T, R&gt; {
+        Error::Other(Box::new(e))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns the `end_of_input` error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_of_input</span>() -&gt; <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">Error::Unexpected</span>(<span class="string">&quot;end of input&quot;</span>.<span class="ident">into</span>())
+<span class="kw">impl</span>&lt;T, R&gt; Error&lt;T, R&gt; {
+    <span class="doccomment">/// Returns the `end_of_input` error.
+    </span><span class="kw">pub fn </span>end_of_input() -&gt; Error&lt;T, R&gt; {
+        Error::Unexpected(<span class="string">&quot;end of input&quot;</span>.into())
     }
 
-    <span class="doccomment">/// Formats a slice of errors in a human readable way.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate combine;</span>
-    <span class="doccomment">/// # use combine::*;</span>
-    <span class="doccomment">/// # use combine::parser::char::*;</span>
-    <span class="doccomment">/// # use combine::stream::state::{State, SourcePosition};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let input = r&quot;</span>
-    <span class="doccomment">///   ,123</span>
-    <span class="doccomment">/// &quot;;</span>
-    <span class="doccomment">/// let result = spaces().silent().with(char(&#39;.&#39;).or(char(&#39;a&#39;)).or(digit()))</span>
-    <span class="doccomment">///     .easy_parse(State::new(input));</span>
-    <span class="doccomment">/// let m = format!(&quot;{}&quot;, result.unwrap_err());</span>
-    <span class="doccomment">/// let expected = r&quot;Parse error at line: 2, column: 3</span>
-    <span class="doccomment">/// Unexpected `,`</span>
-    <span class="doccomment">/// Expected `.`, `a` or `digit`</span>
-    <span class="doccomment">/// &quot;;</span>
-    <span class="doccomment">/// assert_eq!(m, expected);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fmt_errors</span>(<span class="ident">errors</span>: <span class="kw-2">&amp;</span>[<span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>], <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">fmt::Display</span>,
-        <span class="ident">R</span>: <span class="ident">fmt::Display</span>,
+    <span class="doccomment">/// Formats a slice of errors in a human readable way.
+    ///
+    /// ```rust
+    /// # extern crate combine;
+    /// # use combine::*;
+    /// # use combine::parser::char::*;
+    /// # use combine::stream::state::{State, SourcePosition};
+    ///
+    /// # fn main() {
+    /// let input = r&quot;
+    ///   ,123
+    /// &quot;;
+    /// let result = spaces().silent().with(char(&#39;.&#39;).or(char(&#39;a&#39;)).or(digit()))
+    ///     .easy_parse(State::new(input));
+    /// let m = format!(&quot;{}&quot;, result.unwrap_err());
+    /// let expected = r&quot;Parse error at line: 2, column: 3
+    /// Unexpected `,`
+    /// Expected `.`, `a` or `digit`
+    /// &quot;;
+    /// assert_eq!(m, expected);
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>fmt_errors(errors: <span class="kw-2">&amp;</span>[Error&lt;T, R&gt;], f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result
+    <span class="kw">where
+        </span>T: fmt::Display,
+        R: fmt::Display,
     {
-        <span class="comment">// First print the token that we did not expect</span>
-        <span class="comment">// There should really just be one unexpected message at this point though we print them</span>
-        <span class="comment">// all to be safe</span>
-        <span class="kw">let</span> <span class="ident">unexpected</span> <span class="op">=</span> <span class="ident">errors</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">e</span> {
-            <span class="ident">Error::Unexpected</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+        <span class="comment">// First print the token that we did not expect
+        // There should really just be one unexpected message at this point though we print them
+        // all to be safe
+        </span><span class="kw">let </span>unexpected = errors.iter().filter(|e| <span class="kw">match </span><span class="kw-2">**</span>e {
+            Error::Unexpected(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         });
-        <span class="kw">for</span> <span class="ident">error</span> <span class="kw">in</span> <span class="ident">unexpected</span> {
-            <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">error</span>));
+        <span class="kw">for </span>error <span class="kw">in </span>unexpected {
+            <span class="macro">try!</span>(<span class="macro">writeln!</span>(f, <span class="string">&quot;{}&quot;</span>, error));
         }
 
-        <span class="comment">// Then we print out all the things that were expected in a comma separated list</span>
-        <span class="comment">// &#39;Expected &#39;a&#39;, &#39;expression&#39; or &#39;let&#39;</span>
-        <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="ident">errors</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span> {
-                <span class="ident">Error::Expected</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="comment">// Then we print out all the things that were expected in a comma separated list
+        // &#39;Expected &#39;a&#39;, &#39;expression&#39; or &#39;let&#39;
+        </span><span class="kw">let </span>iter = || {
+            errors.iter().filter_map(|e| <span class="kw">match </span><span class="kw-2">*</span>e {
+                Error::Expected(<span class="kw-2">ref </span>err) =&gt; <span class="prelude-val">Some</span>(err),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             })
         };
-        <span class="kw">let</span> <span class="ident">expected_count</span> <span class="op">=</span> <span class="ident">iter</span>().<span class="ident">count</span>();
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">message</span>) <span class="kw">in</span> <span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">i</span> {
-                <span class="number">0</span> =&gt; <span class="string">&quot;Expected&quot;</span>,
-                <span class="kw">_</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">expected_count</span> <span class="op">-</span> <span class="number">1</span> =&gt; <span class="string">&quot;,&quot;</span>,
-                <span class="comment">// Last expected message to be written</span>
-                <span class="kw">_</span> =&gt; <span class="string">&quot; or&quot;</span>,
+        <span class="kw">let </span>expected_count = iter().count();
+        <span class="kw">for </span>(i, message) <span class="kw">in </span>iter().enumerate() {
+            <span class="kw">let </span>s = <span class="kw">match </span>i {
+                <span class="number">0 </span>=&gt; <span class="string">&quot;Expected&quot;</span>,
+                <span class="kw">_ if </span>i &lt; expected_count - <span class="number">1 </span>=&gt; <span class="string">&quot;,&quot;</span>,
+                <span class="comment">// Last expected message to be written
+                </span><span class="kw">_ </span>=&gt; <span class="string">&quot; or&quot;</span>,
             };
-            <span class="macro">try!</span>(<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} `{}`&quot;</span>, <span class="ident">s</span>, <span class="ident">message</span>));
+            <span class="macro">try!</span>(<span class="macro">write!</span>(f, <span class="string">&quot;{} `{}`&quot;</span>, s, message));
         }
-        <span class="kw">if</span> <span class="ident">expected_count</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;&quot;</span>));
+        <span class="kw">if </span>expected_count != <span class="number">0 </span>{
+            <span class="macro">try!</span>(<span class="macro">writeln!</span>(f, <span class="string">&quot;&quot;</span>));
         }
-        <span class="comment">// If there are any generic messages we print them out last</span>
-        <span class="kw">let</span> <span class="ident">messages</span> <span class="op">=</span> <span class="ident">errors</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">e</span> {
-            <span class="ident">Error::Message</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Error::Other</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+        <span class="comment">// If there are any generic messages we print them out last
+        </span><span class="kw">let </span>messages = errors.iter().filter(|e| <span class="kw">match </span><span class="kw-2">**</span>e {
+            Error::Message(<span class="kw">_</span>) | Error::Other(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         });
-        <span class="kw">for</span> <span class="ident">error</span> <span class="kw">in</span> <span class="ident">messages</span> {
-            <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">error</span>));
+        <span class="kw">for </span>error <span class="kw">in </span>messages {
+            <span class="macro">try!</span>(<span class="macro">writeln!</span>(f, <span class="string">&quot;{}&quot;</span>, error));
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="doccomment">/// Convenience alias over `Errors` for `StreamOnce` types which makes it possible to specify the</span>
-<span class="doccomment">/// `Errors` type from a `StreamOnce` by writing `ParseError&lt;I&gt;` instead of `Errors&lt;I::Item,</span>
-<span class="doccomment">/// I::Range, I::Position&gt;`</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">Errors</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Item</span>, <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span>, <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Position</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Convenience alias over `Errors` for `StreamOnce` types which makes it possible to specify the
+/// `Errors` type from a `StreamOnce` by writing `ParseError&lt;I&gt;` instead of `Errors&lt;I::Item,
+/// I::Range, I::Position&gt;`
+</span><span class="kw">pub type </span>ParseError&lt;S&gt; =
+    Errors&lt;&lt;S <span class="kw">as </span>StreamOnce&gt;::Item, &lt;S <span class="kw">as </span>StreamOnce&gt;::Range, &lt;S <span class="kw">as </span>StreamOnce&gt;::Position&gt;;
 
-<span class="doccomment">/// Struct which hold information about an error that occurred at a specific position.</span>
-<span class="doccomment">/// Can hold multiple instances of `Error` if more that one error occurred in the same position.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The position where the error occurred</span>
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">P</span>,
-    <span class="doccomment">/// A vector containing specific information on what errors occurred at `position`. Usually</span>
-    <span class="doccomment">/// a fully formed message contains one `Unexpected` error and one or more `Expected` errors.</span>
-    <span class="doccomment">/// `Message` and `Other` may also appear (`combine` never generates these errors on its own)</span>
-    <span class="doccomment">/// and may warrant custom handling.</span>
-    <span class="kw">pub</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Struct which hold information about an error that occurred at a specific position.
+/// Can hold multiple instances of `Error` if more that one error occurred in the same position.
+</span><span class="attribute">#[derive(Debug, PartialEq)]
+</span><span class="kw">pub struct </span>Errors&lt;I, R, P&gt; {
+    <span class="doccomment">/// The position where the error occurred
+    </span><span class="kw">pub </span>position: P,
+    <span class="doccomment">/// A vector containing specific information on what errors occurred at `position`. Usually
+    /// a fully formed message contains one `Unexpected` error and one or more `Expected` errors.
+    /// `Message` and `Other` may also appear (`combine` never generates these errors on its own)
+    /// and may warrant custom handling.
+    </span><span class="kw">pub </span>errors: Vec&lt;Error&lt;I, R&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructs a new `ParseError` which occurred at `position`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">position</span>: <span class="ident">P</span>, <span class="ident">error</span>: <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::from_errors</span>(<span class="ident">position</span>, <span class="macro">vec!</span>[<span class="ident">error</span>])
+<span class="kw">impl</span>&lt;I, R, P&gt; Errors&lt;I, R, P&gt; {
+    <span class="doccomment">/// Constructs a new `ParseError` which occurred at `position`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>new(position: P, error: Error&lt;I, R&gt;) -&gt; Errors&lt;I, R, P&gt; {
+        <span class="self">Self</span>::from_errors(position, <span class="macro">vec!</span>[error])
     }
 
-    <span class="doccomment">/// Constructs an error with no other information than the position it occurred at.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>(<span class="ident">position</span>: <span class="ident">P</span>) -&gt; <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::from_errors</span>(<span class="ident">position</span>, <span class="macro">vec!</span>[])
+    <span class="doccomment">/// Constructs an error with no other information than the position it occurred at.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>empty(position: P) -&gt; Errors&lt;I, R, P&gt; {
+        <span class="self">Self</span>::from_errors(position, <span class="macro">vec!</span>[])
     }
 
-    <span class="doccomment">/// Constructs a `ParseError` with multiple causes.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_errors</span>(<span class="ident">position</span>: <span class="ident">P</span>, <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-        <span class="ident">Errors</span> {
-            <span class="ident">position</span>: <span class="ident">position</span>,
-            <span class="ident">errors</span>: <span class="ident">errors</span>,
+    <span class="doccomment">/// Constructs a `ParseError` with multiple causes.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>from_errors(position: P, errors: Vec&lt;Error&lt;I, R&gt;&gt;) -&gt; Errors&lt;I, R, P&gt; {
+        Errors {
+            position: position,
+            errors: errors,
         }
     }
 
-    <span class="doccomment">/// Constructs an end of input error. Should be returned by parsers which encounter end of</span>
-    <span class="doccomment">/// input unexpectedly.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_of_input</span>(<span class="ident">position</span>: <span class="ident">P</span>) -&gt; <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">position</span>, <span class="ident">Error::end_of_input</span>())
+    <span class="doccomment">/// Constructs an end of input error. Should be returned by parsers which encounter end of
+    /// input unexpectedly.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>end_of_input(position: P) -&gt; Errors&lt;I, R, P&gt; {
+        <span class="self">Self</span>::new(position, Error::end_of_input())
     }
 
-    <span class="doccomment">/// Adds an error if `error` does not exist in this `ParseError` already (as determined byte</span>
-    <span class="doccomment">/// `PartialEq`).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span><span class="op">&gt;</span>)
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">PartialEq</span>,
-        <span class="ident">R</span>: <span class="ident">PartialEq</span>,
+    <span class="doccomment">/// Adds an error if `error` does not exist in this `ParseError` already (as determined byte
+    /// `PartialEq`).
+    </span><span class="kw">pub fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, error: Error&lt;I, R&gt;)
+    <span class="kw">where
+        </span>I: PartialEq,
+        R: PartialEq,
     {
-        <span class="comment">// Don&#39;t add duplicate errors</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">err</span> <span class="op">!</span><span class="op">=</span> <span class="ident">error</span>) {
-            <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>);
+        <span class="comment">// Don&#39;t add duplicate errors
+        </span><span class="kw">if </span><span class="self">self</span>.errors.iter().all(|err| <span class="kw-2">*</span>err != error) {
+            <span class="self">self</span>.errors.push(error);
         }
     }
 
-    <span class="doccomment">/// Removes all `Expected` errors in `self` and adds `info` instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_expected</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">info</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span><span class="op">&gt;</span>) {
-        <span class="comment">// Remove all other expected messages</span>
-        <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span> {
-            <span class="ident">Error::Expected</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
+    <span class="doccomment">/// Removes all `Expected` errors in `self` and adds `info` instead.
+    </span><span class="kw">pub fn </span>set_expected(<span class="kw-2">&amp;mut </span><span class="self">self</span>, info: Info&lt;I, R&gt;) {
+        <span class="comment">// Remove all other expected messages
+        </span><span class="self">self</span>.errors.retain(|e| <span class="kw">match </span><span class="kw-2">*</span>e {
+            Error::Expected(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">true</span>,
         });
-        <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">Error::Expected</span>(<span class="ident">info</span>));
+        <span class="self">self</span>.errors.push(Error::Expected(info));
     }
 
-    <span class="doccomment">/// Merges two `ParseError`s. If they exist at the same position the errors of `other` are</span>
-    <span class="doccomment">/// added to `self` (using `add_error` to skip duplicates). If they are not at the same</span>
-    <span class="doccomment">/// position the error furthest ahead are returned, ignoring the other `ParseError`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span>) -&gt; <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">Ord</span>,
-        <span class="ident">I</span>: <span class="ident">PartialEq</span>,
-        <span class="ident">R</span>: <span class="ident">PartialEq</span>,
+    <span class="doccomment">/// Merges two `ParseError`s. If they exist at the same position the errors of `other` are
+    /// added to `self` (using `add_error` to skip duplicates). If they are not at the same
+    /// position the error furthest ahead are returned, ignoring the other `ParseError`.
+    </span><span class="kw">pub fn </span>merge(<span class="kw-2">mut </span><span class="self">self</span>, <span class="kw-2">mut </span>other: Errors&lt;I, R, P&gt;) -&gt; Errors&lt;I, R, P&gt;
+    <span class="kw">where
+        </span>P: Ord,
+        I: PartialEq,
+        R: PartialEq,
     {
-        <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-        <span class="comment">// Only keep the errors which occurred after consuming the most amount of data</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">position</span>) {
-            <span class="ident">Ordering::Less</span> =&gt; <span class="ident">other</span>,
-            <span class="ident">Ordering::Greater</span> =&gt; <span class="self">self</span>,
-            <span class="ident">Ordering::Equal</span> =&gt; {
-                <span class="kw">for</span> <span class="ident">message</span> <span class="kw">in</span> <span class="ident">other</span>.<span class="ident">errors</span>.<span class="ident">drain</span>(..) {
-                    <span class="self">self</span>.<span class="ident">add_error</span>(<span class="ident">message</span>);
+        <span class="kw">use </span>std::cmp::Ordering;
+        <span class="comment">// Only keep the errors which occurred after consuming the most amount of data
+        </span><span class="kw">match </span><span class="self">self</span>.position.cmp(<span class="kw-2">&amp;</span>other.position) {
+            Ordering::Less =&gt; other,
+            Ordering::Greater =&gt; <span class="self">self</span>,
+            Ordering::Equal =&gt; {
+                <span class="kw">for </span>message <span class="kw">in </span>other.errors.drain(..) {
+                    <span class="self">self</span>.add_error(message);
                 }
-                <span class="self">self</span>
-            }
+                <span class="self">self
+            </span>}
         }
     }
 
-    <span class="doccomment">/// Maps the position to a new value</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_position</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Q</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">Q</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">P</span>) -&gt; <span class="ident">Q</span>,
+    <span class="doccomment">/// Maps the position to a new value
+    </span><span class="kw">pub fn </span>map_position&lt;F, Q&gt;(<span class="self">self</span>, f: F) -&gt; Errors&lt;I, R, Q&gt;
+    <span class="kw">where
+        </span>F: FnOnce(P) -&gt; Q,
     {
-        <span class="ident">Errors::from_errors</span>(<span class="ident">f</span>(<span class="self">self</span>.<span class="ident">position</span>), <span class="self">self</span>.<span class="ident">errors</span>)
+        Errors::from_errors(f(<span class="self">self</span>.position), <span class="self">self</span>.errors)
     }
 
-    <span class="doccomment">/// Maps all token variants to a new value</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_token</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I</span>) -&gt; <span class="ident">U</span>,
+    <span class="doccomment">/// Maps all token variants to a new value
+    </span><span class="kw">pub fn </span>map_token&lt;F, U&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>f: F) -&gt; Errors&lt;U, R, P&gt;
+    <span class="kw">where
+        </span>F: FnMut(I) -&gt; U,
     {
-        <span class="ident">Errors::from_errors</span>(
-            <span class="self">self</span>.<span class="ident">position</span>,
-            <span class="self">self</span>.<span class="ident">errors</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">error</span>.<span class="ident">map_token</span>(<span class="kw-2">&amp;mut</span> <span class="ident">f</span>))
-                .<span class="ident">collect</span>(),
+        Errors::from_errors(
+            <span class="self">self</span>.position,
+            <span class="self">self</span>.errors
+                .into_iter()
+                .map(|error| error.map_token(<span class="kw-2">&amp;mut </span>f))
+                .collect(),
         )
     }
 
-    <span class="doccomment">/// Maps all range variants to a new value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use combine::Parser;</span>
-    <span class="doccomment">/// use combine::parser::range::range;</span>
-    <span class="doccomment">/// println!(</span>
-    <span class="doccomment">///     &quot;{}&quot;,</span>
-    <span class="doccomment">///     range(&amp;&quot;HTTP&quot;[..])</span>
-    <span class="doccomment">///         .easy_parse(&quot;HTT&quot;)</span>
-    <span class="doccomment">///         .unwrap_err()</span>
-    <span class="doccomment">///         .map_range(|bytes| format!(&quot;{:?}&quot;, bytes))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_range</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">P</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">R</span>) -&gt; <span class="ident">S</span>,
+    <span class="doccomment">/// Maps all range variants to a new value.
+    ///
+    /// ```
+    /// use combine::Parser;
+    /// use combine::parser::range::range;
+    /// println!(
+    ///     &quot;{}&quot;,
+    ///     range(&amp;&quot;HTTP&quot;[..])
+    ///         .easy_parse(&quot;HTT&quot;)
+    ///         .unwrap_err()
+    ///         .map_range(|bytes| format!(&quot;{:?}&quot;, bytes))
+    /// );
+    /// ```
+    </span><span class="kw">pub fn </span>map_range&lt;F, S&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>f: F) -&gt; Errors&lt;I, S, P&gt;
+    <span class="kw">where
+        </span>F: FnMut(R) -&gt; S,
     {
-        <span class="ident">Errors::from_errors</span>(
-            <span class="self">self</span>.<span class="ident">position</span>,
-            <span class="self">self</span>.<span class="ident">errors</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">error</span>.<span class="ident">map_range</span>(<span class="kw-2">&amp;mut</span> <span class="ident">f</span>))
-                .<span class="ident">collect</span>(),
+        Errors::from_errors(
+            <span class="self">self</span>.position,
+            <span class="self">self</span>.errors
+                .into_iter()
+                .map(|error| error.map_range(<span class="kw-2">&amp;mut </span>f))
+                .collect(),
         )
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">fmt::Display</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
-    <span class="ident">I</span>: <span class="ident">fmt::Display</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
-    <span class="ident">R</span>: <span class="ident">fmt::Display</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;I, R, P&gt; StdError <span class="kw">for </span>Errors&lt;I, R, P&gt;
+<span class="kw">where
+    </span>P: fmt::Display + fmt::Debug,
+    I: fmt::Display + fmt::Debug,
+    R: fmt::Display + fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="string">&quot;parse error&quot;</span>
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">&quot;parse error&quot;
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;I, R, P&gt; fmt::Display <span class="kw">for </span>Errors&lt;I, R, P&gt;
+<span class="kw">where
+    </span>P: fmt::Display,
+    I: fmt::Display,
+    R: fmt::Display,
+{
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">try!</span>(<span class="macro">writeln!</span>(f, <span class="string">&quot;Parse error at {}&quot;</span>, <span class="self">self</span>.position));
+        Error::fmt_errors(<span class="kw-2">&amp;</span><span class="self">self</span>.errors, f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">fmt::Display</span>,
-    <span class="ident">I</span>: <span class="ident">fmt::Display</span>,
-    <span class="ident">R</span>: <span class="ident">fmt::Display</span>,
-{
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;Parse error at {}&quot;</span>, <span class="self">self</span>.<span class="ident">position</span>));
-        <span class="ident">Error::fmt_errors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">errors</span>, <span class="ident">f</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Display</span>, <span class="ident">R</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::Unexpected</span>(<span class="kw-2">ref</span> <span class="ident">c</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Unexpected `{}`&quot;</span>, <span class="ident">c</span>),
-            <span class="ident">Error::Expected</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Expected `{}`&quot;</span>, <span class="ident">s</span>),
-            <span class="ident">Error::Message</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) =&gt; <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error::Other</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+<span class="kw">impl</span>&lt;T: fmt::Display, R: fmt::Display&gt; fmt::Display <span class="kw">for </span>Error&lt;T, R&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Error::Unexpected(<span class="kw-2">ref </span>c) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Unexpected `{}`&quot;</span>, c),
+            Error::Expected(<span class="kw-2">ref </span>s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Expected `{}`&quot;</span>, s),
+            Error::Message(<span class="kw-2">ref </span>msg) =&gt; msg.fmt(f),
+            Error::Other(<span class="kw-2">ref </span>err) =&gt; err.fmt(f),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">S</span>);
+<span class="attribute">#[derive(Copy, Clone, Debug)]
+</span><span class="kw">pub struct </span>Stream&lt;S&gt;(<span class="kw">pub </span>S);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Resetable</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Resetable</span>,
+<span class="kw">impl</span>&lt;S&gt; Resetable <span class="kw">for </span>Stream&lt;S&gt;
+<span class="kw">where
+    </span>S: Resetable,
 {
-    <span class="kw">type</span> <span class="ident">Checkpoint</span> <span class="op">=</span> <span class="ident">S::Checkpoint</span>;
+    <span class="kw">type </span>Checkpoint = S::Checkpoint;
 
-    <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Checkpoint</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">checkpoint</span>()
+    <span class="kw">fn </span>checkpoint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Checkpoint {
+        <span class="self">self</span>.<span class="number">0</span>.checkpoint()
     }
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">checkpoint</span>: <span class="ident"><span class="self">Self</span>::Checkpoint</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">reset</span>(<span class="ident">checkpoint</span>);
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, checkpoint: <span class="self">Self</span>::Checkpoint) {
+        <span class="self">self</span>.<span class="number">0</span>.reset(checkpoint);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">StreamOnce</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">StreamOnce</span> <span class="op">+</span> <span class="ident">Positioned</span>,
+<span class="kw">impl</span>&lt;S&gt; StreamOnce <span class="kw">for </span>Stream&lt;S&gt;
+<span class="kw">where
+    </span>S: StreamOnce + Positioned,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">S::Item</span>;
-    <span class="kw">type</span> <span class="ident">Range</span> <span class="op">=</span> <span class="ident">S::Range</span>;
-    <span class="kw">type</span> <span class="ident">Position</span> <span class="op">=</span> <span class="ident">S::Position</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = S::Item;
+    <span class="kw">type </span>Range = S::Range;
+    <span class="kw">type </span>Position = S::Position;
+    <span class="kw">type </span>Error = ParseError&lt;S&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">uncons</span>().<span class="ident">map_err</span>(<span class="ident">StreamError::into_other</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>uncons(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Item, StreamErrorFor&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.uncons().map_err(StreamError::into_other)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_partial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_partial</span>()
+    <span class="kw">fn </span>is_partial(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.is_partial()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">RangeStreamOnce</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">RangeStream</span>,
+<span class="kw">impl</span>&lt;S&gt; RangeStreamOnce <span class="kw">for </span>Stream&lt;S&gt;
+<span class="kw">where
+    </span>S: RangeStream,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">uncons_range</span>(<span class="ident">size</span>).<span class="ident">map_err</span>(<span class="ident">StreamError::into_other</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>uncons_range(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Range, StreamErrorFor&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.uncons_range(size).map_err(StreamError::into_other)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>uncons_while&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Range, StreamErrorFor&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnMut(<span class="self">Self</span>::Item) -&gt; bool,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">uncons_while</span>(<span class="ident">f</span>).<span class="ident">map_err</span>(<span class="ident">StreamError::into_other</span>)
+        <span class="self">self</span>.<span class="number">0</span>.uncons_while(f).map_err(StreamError::into_other)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>uncons_while1&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; FastResult&lt;<span class="self">Self</span>::Range, StreamErrorFor&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnMut(<span class="self">Self</span>::Item) -&gt; bool,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">uncons_while1</span>(<span class="ident">f</span>).<span class="ident">map_err</span>(<span class="ident">StreamError::into_other</span>)
+        <span class="self">self</span>.<span class="number">0</span>.uncons_while1(f).map_err(StreamError::into_other)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Checkpoint</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">distance</span>(<span class="ident">end</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Positioned</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">StreamOnce</span> <span class="op">+</span> <span class="ident">Positioned</span>,
-{
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">S::Position</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">position</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>distance(<span class="kw-2">&amp;</span><span class="self">self</span>, end: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0</span>.distance(end)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">FullRangeStream</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">FullRangeStream</span>,
+<span class="kw">impl</span>&lt;S&gt; Positioned <span class="kw">for </span>Stream&lt;S&gt;
+<span class="kw">where
+    </span>S: StreamOnce + Positioned,
 {
-    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Range</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">range</span>()
+    <span class="kw">fn </span>position(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; S::Position {
+        <span class="self">self</span>.<span class="number">0</span>.position()
+    }
+}
+
+<span class="kw">impl</span>&lt;S&gt; FullRangeStream <span class="kw">for </span>Stream&lt;S&gt;
+<span class="kw">where
+    </span>S: FullRangeStream,
+{
+    <span class="kw">fn </span>range(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Range {
+        <span class="self">self</span>.<span class="number">0</span>.range()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

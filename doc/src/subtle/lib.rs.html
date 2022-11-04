@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/subtle-2.4.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../subtle/index.html"><div class="logo-container"><img src="https://doc.dalek.rs/assets/dalek-logo-clear.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../subtle/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/subtle-2.4.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../subtle/index.html"><div class="logo-container"><img src="https://doc.dalek.rs/assets/dalek-logo-clear.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../subtle/index.html"><div class="logo-container">
                     <img src="https://doc.dalek.rs/assets/dalek-logo-clear.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../subtle/index.html">
                         <img src="https://doc.dalek.rs/assets/dalek-logo-clear.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -864,869 +864,869 @@
 <span id="862">862</span>
 <span id="863">863</span>
 <span id="864">864</span>
-</pre><pre class="rust"><code><span class="comment">// -*- mode: rust; -*-</span>
-<span class="comment">//</span>
-<span class="comment">// This file is part of subtle, part of the dalek cryptography project.</span>
-<span class="comment">// Copyright (c) 2016-2018 isis lovecruft, Henry de Valence</span>
-<span class="comment">// See LICENSE for licensing information.</span>
-<span class="comment">//</span>
-<span class="comment">// Authors:</span>
-<span class="comment">// - isis agora lovecruft &lt;isis@patternsinthevoid.net&gt;</span>
-<span class="comment">// - Henry de Valence &lt;hdevalence@hdevalence.ca&gt;</span>
+</pre><pre class="rust"><code><span class="comment">// -*- mode: rust; -*-
+//
+// This file is part of subtle, part of the dalek cryptography project.
+// Copyright (c) 2016-2018 isis lovecruft, Henry de Valence
+// See LICENSE for licensing information.
+//
+// Authors:
+// - isis agora lovecruft &lt;isis@patternsinthevoid.net&gt;
+// - Henry de Valence &lt;hdevalence@hdevalence.ca&gt;
 
-<span class="attribute">#![<span class="ident">no_std</span>]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://doc.dalek.rs/assets/dalek-logo-clear.png&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/subtle/2.4.1&quot;</span>)]</span>
+</span><span class="attribute">#![no_std]
+#![deny(missing_docs)]
+#![doc(html_logo_url = <span class="string">&quot;https://doc.dalek.rs/assets/dalek-logo-clear.png&quot;</span>)]
+#![doc(html_root_url = <span class="string">&quot;https://docs.rs/subtle/2.4.1&quot;</span>)]
 
-<span class="doccomment">//! # subtle [![](https://img.shields.io/crates/v/subtle.svg)](https://crates.io/crates/subtle) [![](https://img.shields.io/badge/dynamic/json.svg?label=docs&amp;uri=https%3A%2F%2Fcrates.io%2Fapi%2Fv1%2Fcrates%2Fsubtle%2Fversions&amp;query=%24.versions%5B0%5D.num&amp;colorB=4F74A6)](https://doc.dalek.rs/subtle) [![](https://travis-ci.org/dalek-cryptography/subtle.svg?branch=master)](https://travis-ci.org/dalek-cryptography/subtle)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **Pure-Rust traits and utilities for constant-time cryptographic implementations.**</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It consists of a `Choice` type, and a collection of traits using `Choice`</span>
-<span class="doccomment">//! instead of `bool` which are intended to execute in constant-time.  The `Choice`</span>
-<span class="doccomment">//! type is a wrapper around a `u8` that holds a `0` or `1`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! subtle = &quot;2.4&quot;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate represents a “best-effort” attempt, since side-channels</span>
-<span class="doccomment">//! are ultimately a property of a deployed cryptographic system</span>
-<span class="doccomment">//! including the hardware it runs on, not just of software.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The traits are implemented using bitwise operations, and should execute in</span>
-<span class="doccomment">//! constant time provided that a) the bitwise operations are constant-time and</span>
-<span class="doccomment">//! b) the bitwise operations are not recognized as a conditional assignment and</span>
-<span class="doccomment">//! optimized back into a branch.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For a compiler to recognize that bitwise operations represent a conditional</span>
-<span class="doccomment">//! assignment, it needs to know that the value used to generate the bitmasks is</span>
-<span class="doccomment">//! really a boolean `i1` rather than an `i8` byte value. In an attempt to</span>
-<span class="doccomment">//! prevent this refinement, the crate tries to hide the value of a `Choice`&#39;s</span>
-<span class="doccomment">//! inner `u8` by passing it through a volatile read. For more information, see</span>
-<span class="doccomment">//! the _About_ section below.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Versions prior to `2.2` recommended use of the `nightly` feature to enable an</span>
-<span class="doccomment">//! optimization barrier; this is not required in versions `2.2` and above.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note: the `subtle` crate contains `debug_assert`s to check invariants during</span>
-<span class="doccomment">//! debug builds. These invariant checks involve secret-dependent branches, and</span>
-<span class="doccomment">//! are not present when compiled in release mode. This crate is intended to be</span>
-<span class="doccomment">//! used in release mode.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Documentation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Documentation is available [here][docs].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Minimum Supported Rust Version</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Rust **1.41** or higher.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Minimum supported Rust version can be changed in the future, but it will be done with a minor version bump.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## About</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This library aims to be the Rust equivalent of Go’s `crypto/subtle` module.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The optimization barrier in `impl From&lt;u8&gt; for Choice` was based on Tim</span>
-<span class="doccomment">//! Maclean&#39;s [work on `rust-timing-shield`][rust-timing-shield], which attempts to</span>
-<span class="doccomment">//! provide a more comprehensive approach for preventing software side-channels in</span>
-<span class="doccomment">//! Rust code.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `subtle` is authored by isis agora lovecruft and Henry de Valence.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Warning</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This code is a low-level library, intended for specific use-cases implementing</span>
-<span class="doccomment">//! cryptographic protocols.  It represents a best-effort attempt to protect</span>
-<span class="doccomment">//! against some software side-channels.  Because side-channel resistance is not a</span>
-<span class="doccomment">//! property of software alone, but of software together with hardware, any such</span>
-<span class="doccomment">//! effort is fundamentally limited.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **USE AT YOUR OWN RISK**</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [docs]: https://docs.rs/subtle</span>
-<span class="doccomment">//! [rust-timing-shield]: https://www.chosenplaintext.ca/open-source/rust-timing-shield/security</span>
+</span><span class="doccomment">//! # subtle [![](https://img.shields.io/crates/v/subtle.svg)](https://crates.io/crates/subtle) [![](https://img.shields.io/badge/dynamic/json.svg?label=docs&amp;uri=https%3A%2F%2Fcrates.io%2Fapi%2Fv1%2Fcrates%2Fsubtle%2Fversions&amp;query=%24.versions%5B0%5D.num&amp;colorB=4F74A6)](https://doc.dalek.rs/subtle) [![](https://travis-ci.org/dalek-cryptography/subtle.svg?branch=master)](https://travis-ci.org/dalek-cryptography/subtle)
+//!
+//! **Pure-Rust traits and utilities for constant-time cryptographic implementations.**
+//!
+//! It consists of a `Choice` type, and a collection of traits using `Choice`
+//! instead of `bool` which are intended to execute in constant-time.  The `Choice`
+//! type is a wrapper around a `u8` that holds a `0` or `1`.
+//!
+//! ```toml
+//! subtle = &quot;2.4&quot;
+//! ```
+//!
+//! This crate represents a “best-effort” attempt, since side-channels
+//! are ultimately a property of a deployed cryptographic system
+//! including the hardware it runs on, not just of software.
+//!
+//! The traits are implemented using bitwise operations, and should execute in
+//! constant time provided that a) the bitwise operations are constant-time and
+//! b) the bitwise operations are not recognized as a conditional assignment and
+//! optimized back into a branch.
+//!
+//! For a compiler to recognize that bitwise operations represent a conditional
+//! assignment, it needs to know that the value used to generate the bitmasks is
+//! really a boolean `i1` rather than an `i8` byte value. In an attempt to
+//! prevent this refinement, the crate tries to hide the value of a `Choice`&#39;s
+//! inner `u8` by passing it through a volatile read. For more information, see
+//! the _About_ section below.
+//!
+//! Versions prior to `2.2` recommended use of the `nightly` feature to enable an
+//! optimization barrier; this is not required in versions `2.2` and above.
+//!
+//! Note: the `subtle` crate contains `debug_assert`s to check invariants during
+//! debug builds. These invariant checks involve secret-dependent branches, and
+//! are not present when compiled in release mode. This crate is intended to be
+//! used in release mode.
+//!
+//! ## Documentation
+//!
+//! Documentation is available [here][docs].
+//!
+//! ## Minimum Supported Rust Version
+//!
+//! Rust **1.41** or higher.
+//!
+//! Minimum supported Rust version can be changed in the future, but it will be done with a minor version bump.
+//!
+//! ## About
+//!
+//! This library aims to be the Rust equivalent of Go’s `crypto/subtle` module.
+//!
+//! The optimization barrier in `impl From&lt;u8&gt; for Choice` was based on Tim
+//! Maclean&#39;s [work on `rust-timing-shield`][rust-timing-shield], which attempts to
+//! provide a more comprehensive approach for preventing software side-channels in
+//! Rust code.
+//!
+//! `subtle` is authored by isis agora lovecruft and Henry de Valence.
+//!
+//! ## Warning
+//!
+//! This code is a low-level library, intended for specific use-cases implementing
+//! cryptographic protocols.  It represents a best-effort attempt to protect
+//! against some software side-channels.  Because side-channel resistance is not a
+//! property of software alone, but of software together with hardware, any such
+//! effort is fundamentally limited.
+//!
+//! **USE AT YOUR OWN RISK**
+//!
+//! [docs]: https://docs.rs/subtle
+//! [rust-timing-shield]: https://www.chosenplaintext.ca/open-source/rust-timing-shield/security
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+#[macro_use]
+</span><span class="kw">extern crate </span>std;
 
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">BitAnd</span>, <span class="ident">BitAndAssign</span>, <span class="ident">BitOr</span>, <span class="ident">BitOrAssign</span>, <span class="ident">BitXor</span>, <span class="ident">BitXorAssign</span>, <span class="ident">Neg</span>, <span class="ident">Not</span>};
-<span class="kw">use</span> <span class="ident">core::option::Option</span>;
+<span class="kw">use </span>core::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Neg, Not};
+<span class="kw">use </span>core::option::Option;
 
-<span class="doccomment">/// The `Choice` struct represents a choice for use in conditional assignment.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is a wrapper around a `u8`, which should have the value either `1` (true)</span>
-<span class="doccomment">/// or `0` (false).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The conversion from `u8` to `Choice` passes the value through an optimization</span>
-<span class="doccomment">/// barrier, as a best-effort attempt to prevent the compiler from inferring that</span>
-<span class="doccomment">/// the `Choice` value is a boolean. This strategy is based on Tim Maclean&#39;s</span>
-<span class="doccomment">/// [work on `rust-timing-shield`][rust-timing-shield], which attempts to provide</span>
-<span class="doccomment">/// a more comprehensive approach for preventing software side-channels in Rust</span>
-<span class="doccomment">/// code.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Choice` struct implements operators for AND, OR, XOR, and NOT, to allow</span>
-<span class="doccomment">/// combining `Choice` values. These operations do not short-circuit.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [rust-timing-shield]:</span>
-<span class="doccomment">/// https://www.chosenplaintext.ca/open-source/rust-timing-shield/security</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Choice</span>(<span class="ident">u8</span>);
+<span class="doccomment">/// The `Choice` struct represents a choice for use in conditional assignment.
+///
+/// It is a wrapper around a `u8`, which should have the value either `1` (true)
+/// or `0` (false).
+///
+/// The conversion from `u8` to `Choice` passes the value through an optimization
+/// barrier, as a best-effort attempt to prevent the compiler from inferring that
+/// the `Choice` value is a boolean. This strategy is based on Tim Maclean&#39;s
+/// [work on `rust-timing-shield`][rust-timing-shield], which attempts to provide
+/// a more comprehensive approach for preventing software side-channels in Rust
+/// code.
+///
+/// The `Choice` struct implements operators for AND, OR, XOR, and NOT, to allow
+/// combining `Choice` values. These operations do not short-circuit.
+///
+/// [rust-timing-shield]:
+/// https://www.chosenplaintext.ca/open-source/rust-timing-shield/security
+</span><span class="attribute">#[derive(Copy, Clone, Debug)]
+</span><span class="kw">pub struct </span>Choice(u8);
 
-<span class="kw">impl</span> <span class="ident">Choice</span> {
-    <span class="doccomment">/// Unwrap the `Choice` wrapper to reveal the underlying `u8`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function only exists as an **escape hatch** for the rare case</span>
-    <span class="doccomment">/// where it&#39;s not possible to use one of the `subtle`-provided</span>
-    <span class="doccomment">/// trait impls.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **To convert a `Choice` to a `bool`, use the `From` implementation instead.**</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_u8</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl </span>Choice {
+    <span class="doccomment">/// Unwrap the `Choice` wrapper to reveal the underlying `u8`.
+    ///
+    /// # Note
+    ///
+    /// This function only exists as an **escape hatch** for the rare case
+    /// where it&#39;s not possible to use one of the `subtle`-provided
+    /// trait impls.
+    ///
+    /// **To convert a `Choice` to a `bool`, use the `From` implementation instead.**
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>unwrap_u8(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;Choice&gt; <span class="kw">for </span>bool {
+    <span class="doccomment">/// Convert the `Choice` wrapper into a `bool`, depending on whether
+    /// the underlying `u8` was a `0` or a `1`.
+    ///
+    /// # Note
+    ///
+    /// This function exists to avoid having higher-level cryptographic protocol
+    /// implementations duplicating this pattern.
+    ///
+    /// The intended use case for this conversion is at the _end_ of a
+    /// higher-level primitive implementation: for example, in checking a keyed
+    /// MAC, where the verification should happen in constant-time (and thus use
+    /// a `Choice`) but it is safe to return a `bool` at the end of the
+    /// verification.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(source: Choice) -&gt; bool {
+        <span class="macro">debug_assert!</span>((source.<span class="number">0 </span>== <span class="number">0u8</span>) | (source.<span class="number">0 </span>== <span class="number">1u8</span>));
+        source.<span class="number">0 </span>!= <span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>BitAnd <span class="kw">for </span>Choice {
+    <span class="kw">type </span>Output = Choice;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitand(<span class="self">self</span>, rhs: Choice) -&gt; Choice {
+        (<span class="self">self</span>.<span class="number">0 </span>&amp; rhs.<span class="number">0</span>).into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Choice</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">bool</span> {
-    <span class="doccomment">/// Convert the `Choice` wrapper into a `bool`, depending on whether</span>
-    <span class="doccomment">/// the underlying `u8` was a `0` or a `1`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function exists to avoid having higher-level cryptographic protocol</span>
-    <span class="doccomment">/// implementations duplicating this pattern.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The intended use case for this conversion is at the _end_ of a</span>
-    <span class="doccomment">/// higher-level primitive implementation: for example, in checking a keyed</span>
-    <span class="doccomment">/// MAC, where the verification should happen in constant-time (and thus use</span>
-    <span class="doccomment">/// a `Choice`) but it is safe to return a `bool` at the end of the</span>
-    <span class="doccomment">/// verification.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">source</span>: <span class="ident">Choice</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">debug_assert!</span>((<span class="ident">source</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">0u8</span>) <span class="op">|</span> (<span class="ident">source</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">1u8</span>));
-        <span class="ident">source</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+<span class="kw">impl </span>BitAndAssign <span class="kw">for </span>Choice {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitand_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: Choice) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">*</span><span class="self">self </span>&amp; rhs;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BitAnd</span> <span class="kw">for</span> <span class="ident">Choice</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Choice</span>;
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Choice</span>) -&gt; <span class="ident">Choice</span> {
-        (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">rhs</span>.<span class="number">0</span>).<span class="ident">into</span>()
+<span class="kw">impl </span>BitOr <span class="kw">for </span>Choice {
+    <span class="kw">type </span>Output = Choice;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitor(<span class="self">self</span>, rhs: Choice) -&gt; Choice {
+        (<span class="self">self</span>.<span class="number">0 </span>| rhs.<span class="number">0</span>).into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BitAndAssign</span> <span class="kw">for</span> <span class="ident">Choice</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitand_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Choice</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">&amp;</span> <span class="ident">rhs</span>;
+<span class="kw">impl </span>BitOrAssign <span class="kw">for </span>Choice {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitor_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: Choice) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">*</span><span class="self">self </span>| rhs;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BitOr</span> <span class="kw">for</span> <span class="ident">Choice</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Choice</span>;
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Choice</span>) -&gt; <span class="ident">Choice</span> {
-        (<span class="self">self</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">rhs</span>.<span class="number">0</span>).<span class="ident">into</span>()
+<span class="kw">impl </span>BitXor <span class="kw">for </span>Choice {
+    <span class="kw">type </span>Output = Choice;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitxor(<span class="self">self</span>, rhs: Choice) -&gt; Choice {
+        (<span class="self">self</span>.<span class="number">0 </span>^ rhs.<span class="number">0</span>).into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BitOrAssign</span> <span class="kw">for</span> <span class="ident">Choice</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Choice</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">|</span> <span class="ident">rhs</span>;
+<span class="kw">impl </span>BitXorAssign <span class="kw">for </span>Choice {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitxor_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: Choice) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">*</span><span class="self">self </span>^ rhs;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BitXor</span> <span class="kw">for</span> <span class="ident">Choice</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Choice</span>;
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitxor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Choice</span>) -&gt; <span class="ident">Choice</span> {
-        (<span class="self">self</span>.<span class="number">0</span> <span class="op">^</span> <span class="ident">rhs</span>.<span class="number">0</span>).<span class="ident">into</span>()
+<span class="kw">impl </span>Not <span class="kw">for </span>Choice {
+    <span class="kw">type </span>Output = Choice;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>not(<span class="self">self</span>) -&gt; Choice {
+        (<span class="number">1u8 </span>&amp; (!<span class="self">self</span>.<span class="number">0</span>)).into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BitXorAssign</span> <span class="kw">for</span> <span class="ident">Choice</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitxor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Choice</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">^</span> <span class="ident">rhs</span>;
+<span class="doccomment">/// This function is a best-effort attempt to prevent the compiler from knowing
+/// anything about the value of the returned `u8`, other than its type.
+///
+/// Because we want to support stable Rust, we don&#39;t have access to inline
+/// assembly or test::black_box, so we use the fact that volatile values will
+/// never be elided to register values.
+///
+/// Note: Rust&#39;s notion of &quot;volatile&quot; is subject to change over time. While this
+/// code may break in a non-destructive way in the future, “constant-time” code
+/// is a continually moving target, and this is better than doing nothing.
+</span><span class="attribute">#[inline(never)]
+</span><span class="kw">fn </span>black_box(input: u8) -&gt; u8 {
+    <span class="macro">debug_assert!</span>((input == <span class="number">0u8</span>) | (input == <span class="number">1u8</span>));
+
+    <span class="kw">unsafe </span>{
+        <span class="comment">// Optimization barrier
+        //
+        // Unsafe is ok, because:
+        //   - &amp;input is not NULL;
+        //   - size of input is not zero;
+        //   - u8 is neither Sync, nor Send;
+        //   - u8 is Copy, so input is always live;
+        //   - u8 type is always properly aligned.
+        </span>core::ptr::read_volatile(<span class="kw-2">&amp;</span>input <span class="kw">as </span><span class="kw-2">*const </span>u8)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Not</span> <span class="kw">for</span> <span class="ident">Choice</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Choice</span>;
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">not</span>(<span class="self">self</span>) -&gt; <span class="ident">Choice</span> {
-        (<span class="number">1u8</span> <span class="op">&amp;</span> (<span class="op">!</span><span class="self">self</span>.<span class="number">0</span>)).<span class="ident">into</span>()
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>Choice {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(input: u8) -&gt; Choice {
+        <span class="comment">// Our goal is to prevent the compiler from inferring that the value held inside the
+        // resulting `Choice` struct is really an `i1` instead of an `i8`.
+        </span>Choice(black_box(input))
     }
 }
 
-<span class="doccomment">/// This function is a best-effort attempt to prevent the compiler from knowing</span>
-<span class="doccomment">/// anything about the value of the returned `u8`, other than its type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Because we want to support stable Rust, we don&#39;t have access to inline</span>
-<span class="doccomment">/// assembly or test::black_box, so we use the fact that volatile values will</span>
-<span class="doccomment">/// never be elided to register values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: Rust&#39;s notion of &quot;volatile&quot; is subject to change over time. While this</span>
-<span class="doccomment">/// code may break in a non-destructive way in the future, “constant-time” code</span>
-<span class="doccomment">/// is a continually moving target, and this is better than doing nothing.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
-<span class="kw">fn</span> <span class="ident">black_box</span>(<span class="ident">input</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u8</span> {
-    <span class="macro">debug_assert!</span>((<span class="ident">input</span> <span class="op">==</span> <span class="number">0u8</span>) <span class="op">|</span> (<span class="ident">input</span> <span class="op">==</span> <span class="number">1u8</span>));
-
-    <span class="kw">unsafe</span> {
-        <span class="comment">// Optimization barrier</span>
-        <span class="comment">//</span>
-        <span class="comment">// Unsafe is ok, because:</span>
-        <span class="comment">//   - &amp;input is not NULL;</span>
-        <span class="comment">//   - size of input is not zero;</span>
-        <span class="comment">//   - u8 is neither Sync, nor Send;</span>
-        <span class="comment">//   - u8 is Copy, so input is always live;</span>
-        <span class="comment">//   - u8 type is always properly aligned.</span>
-        <span class="ident">core::ptr::read_volatile</span>(<span class="kw-2">&amp;</span><span class="ident">input</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>)
-    }
+<span class="doccomment">/// An `Eq`-like trait that produces a `Choice` instead of a `bool`.
+///
+/// # Example
+///
+/// ```
+/// use subtle::ConstantTimeEq;
+/// let x: u8 = 5;
+/// let y: u8 = 13;
+///
+/// assert_eq!(x.ct_eq(&amp;y).unwrap_u8(), 0);
+/// assert_eq!(x.ct_eq(&amp;x).unwrap_u8(), 1);
+/// ```
+</span><span class="kw">pub trait </span>ConstantTimeEq {
+    <span class="doccomment">/// Determine if two items are equal.
+    ///
+    /// The `ct_eq` function should execute in constant time.
+    ///
+    /// # Returns
+    ///
+    /// * `Choice(1u8)` if `self == other`;
+    /// * `Choice(0u8)` if `self != other`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>ct_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Choice;
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Choice</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">input</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Choice</span> {
-        <span class="comment">// Our goal is to prevent the compiler from inferring that the value held inside the</span>
-        <span class="comment">// resulting `Choice` struct is really an `i1` instead of an `i8`.</span>
-        <span class="ident">Choice</span>(<span class="ident">black_box</span>(<span class="ident">input</span>))
-    }
-}
+<span class="kw">impl</span>&lt;T: ConstantTimeEq&gt; ConstantTimeEq <span class="kw">for </span>[T] {
+    <span class="doccomment">/// Check whether two slices of `ConstantTimeEq` types are equal.
+    ///
+    /// # Note
+    ///
+    /// This function short-circuits if the lengths of the input slices
+    /// are different.  Otherwise, it should execute in time independent
+    /// of the slice contents.
+    ///
+    /// Since arrays coerce to slices, this function works with fixed-size arrays:
+    ///
+    /// ```
+    /// # use subtle::ConstantTimeEq;
+    /// #
+    /// let a: [u8; 8] = [0,1,2,3,4,5,6,7];
+    /// let b: [u8; 8] = [0,1,2,3,0,1,2,3];
+    ///
+    /// let a_eq_a = a.ct_eq(&amp;a);
+    /// let a_eq_b = a.ct_eq(&amp;b);
+    ///
+    /// assert_eq!(a_eq_a.unwrap_u8(), 1);
+    /// assert_eq!(a_eq_b.unwrap_u8(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>ct_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, _rhs: <span class="kw-2">&amp;</span>[T]) -&gt; Choice {
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
 
-<span class="doccomment">/// An `Eq`-like trait that produces a `Choice` instead of a `bool`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use subtle::ConstantTimeEq;</span>
-<span class="doccomment">/// let x: u8 = 5;</span>
-<span class="doccomment">/// let y: u8 = 13;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(x.ct_eq(&amp;y).unwrap_u8(), 0);</span>
-<span class="doccomment">/// assert_eq!(x.ct_eq(&amp;x).unwrap_u8(), 1);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConstantTimeEq</span> {
-    <span class="doccomment">/// Determine if two items are equal.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `ct_eq` function should execute in constant time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `Choice(1u8)` if `self == other`;</span>
-    <span class="doccomment">/// * `Choice(0u8)` if `self != other`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Choice</span>;
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ConstantTimeEq</span><span class="op">&gt;</span> <span class="ident">ConstantTimeEq</span> <span class="kw">for</span> [<span class="ident">T</span>] {
-    <span class="doccomment">/// Check whether two slices of `ConstantTimeEq` types are equal.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function short-circuits if the lengths of the input slices</span>
-    <span class="doccomment">/// are different.  Otherwise, it should execute in time independent</span>
-    <span class="doccomment">/// of the slice contents.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Since arrays coerce to slices, this function works with fixed-size arrays:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use subtle::ConstantTimeEq;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let a: [u8; 8] = [0,1,2,3,4,5,6,7];</span>
-    <span class="doccomment">/// let b: [u8; 8] = [0,1,2,3,0,1,2,3];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let a_eq_a = a.ct_eq(&amp;a);</span>
-    <span class="doccomment">/// let a_eq_b = a.ct_eq(&amp;b);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(a_eq_a.unwrap_u8(), 1);</span>
-    <span class="doccomment">/// assert_eq!(a_eq_b.unwrap_u8(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_rhs</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) -&gt; <span class="ident">Choice</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-
-        <span class="comment">// Short-circuit on the *lengths* of the slices, not their</span>
-        <span class="comment">// contents.</span>
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">!</span><span class="op">=</span> <span class="ident">_rhs</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="ident">Choice::from</span>(<span class="number">0</span>);
+        <span class="comment">// Short-circuit on the *lengths* of the slices, not their
+        // contents.
+        </span><span class="kw">if </span>len != _rhs.len() {
+            <span class="kw">return </span>Choice::from(<span class="number">0</span>);
         }
 
-        <span class="comment">// This loop shouldn&#39;t be shortcircuitable, since the compiler</span>
-        <span class="comment">// shouldn&#39;t be able to reason about the value of the `u8`</span>
-        <span class="comment">// unwrapped from the `ct_eq` result.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">1u8</span>;
-        <span class="kw">for</span> (<span class="ident">ai</span>, <span class="ident">bi</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">_rhs</span>.<span class="ident">iter</span>()) {
-            <span class="ident">x</span> <span class="op">&amp;=</span> <span class="ident">ai</span>.<span class="ident">ct_eq</span>(<span class="ident">bi</span>).<span class="ident">unwrap_u8</span>();
+        <span class="comment">// This loop shouldn&#39;t be shortcircuitable, since the compiler
+        // shouldn&#39;t be able to reason about the value of the `u8`
+        // unwrapped from the `ct_eq` result.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>x = <span class="number">1u8</span>;
+        <span class="kw">for </span>(ai, bi) <span class="kw">in </span><span class="self">self</span>.iter().zip(_rhs.iter()) {
+            x &amp;= ai.ct_eq(bi).unwrap_u8();
         }
 
-        <span class="ident">x</span>.<span class="ident">into</span>()
+        x.into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ConstantTimeEq</span> <span class="kw">for</span> <span class="ident">Choice</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">Choice</span>) -&gt; <span class="ident">Choice</span> {
-        <span class="op">!</span>(<span class="kw-2">*</span><span class="self">self</span> <span class="op">^</span> <span class="kw-2">*</span><span class="ident">rhs</span>)
+<span class="kw">impl </span>ConstantTimeEq <span class="kw">for </span>Choice {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>ct_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>Choice) -&gt; Choice {
+        !(<span class="kw-2">*</span><span class="self">self </span>^ <span class="kw-2">*</span>rhs)
     }
 }
 
-<span class="doccomment">/// Given the bit-width `$bit_width` and the corresponding primitive</span>
-<span class="doccomment">/// unsigned and signed types `$t_u` and `$t_i` respectively, generate</span>
-<span class="doccomment">/// an `ConstantTimeEq` implementation.</span>
-<span class="macro">macro_rules!</span> <span class="ident">generate_integer_equal</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_u</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_i</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bit_width</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">ConstantTimeEq</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_u</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_u</span>) -&gt; <span class="ident">Choice</span> {
-                <span class="comment">// x == 0 if and only if self == other</span>
-                <span class="kw">let</span> <span class="ident">x</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_u</span> <span class="op">=</span> <span class="self">self</span> <span class="op">^</span> <span class="ident">other</span>;
+<span class="doccomment">/// Given the bit-width `$bit_width` and the corresponding primitive
+/// unsigned and signed types `$t_u` and `$t_i` respectively, generate
+/// an `ConstantTimeEq` implementation.
+</span><span class="macro">macro_rules! </span>generate_integer_equal {
+    (<span class="macro-nonterminal">$t_u</span>:ty, <span class="macro-nonterminal">$t_i</span>:ty, <span class="macro-nonterminal">$bit_width</span>:expr) =&gt; {
+        <span class="kw">impl </span>ConstantTimeEq <span class="kw">for </span><span class="macro-nonterminal">$t_u </span>{
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>ct_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$t_u</span>) -&gt; Choice {
+                <span class="comment">// x == 0 if and only if self == other
+                </span><span class="kw">let </span>x: <span class="macro-nonterminal">$t_u </span>= <span class="self">self </span>^ other;
 
-                <span class="comment">// If x == 0, then x and -x are both equal to zero;</span>
-                <span class="comment">// otherwise, one or both will have its high bit set.</span>
-                <span class="kw">let</span> <span class="ident">y</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_u</span> <span class="op">=</span> (<span class="ident">x</span> <span class="op">|</span> <span class="ident">x</span>.<span class="ident">wrapping_neg</span>()) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bit_width</span> <span class="op">-</span> <span class="number">1</span>);
+                <span class="comment">// If x == 0, then x and -x are both equal to zero;
+                // otherwise, one or both will have its high bit set.
+                </span><span class="kw">let </span>y: <span class="macro-nonterminal">$t_u </span>= (x | x.wrapping_neg()) &gt;&gt; (<span class="macro-nonterminal">$bit_width </span>- <span class="number">1</span>);
 
-                <span class="comment">// Result is the opposite of the high bit (now shifted to low).</span>
-                ((<span class="ident">y</span> <span class="op">^</span> (<span class="number">1</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_u</span>)) <span class="kw">as</span> <span class="ident">u8</span>).<span class="ident">into</span>()
+                <span class="comment">// Result is the opposite of the high bit (now shifted to low).
+                </span>((y ^ (<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t_u</span>)) <span class="kw">as </span>u8).into()
             }
         }
-        <span class="kw">impl</span> <span class="ident">ConstantTimeEq</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_i</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_i</span>) -&gt; <span class="ident">Choice</span> {
-                <span class="comment">// Bitcast to unsigned and call that implementation.</span>
-                (<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_u</span>).<span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">other</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_u</span>))
+        <span class="kw">impl </span>ConstantTimeEq <span class="kw">for </span><span class="macro-nonterminal">$t_i </span>{
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>ct_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$t_i</span>) -&gt; Choice {
+                <span class="comment">// Bitcast to unsigned and call that implementation.
+                </span>(<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span><span class="macro-nonterminal">$t_u</span>).ct_eq(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span>other <span class="kw">as </span><span class="macro-nonterminal">$t_u</span>))
             }
         }
     };
 }
 
-<span class="macro">generate_integer_equal!</span>(<span class="ident">u8</span>, <span class="ident">i8</span>, <span class="number">8</span>);
-<span class="macro">generate_integer_equal!</span>(<span class="ident">u16</span>, <span class="ident">i16</span>, <span class="number">16</span>);
-<span class="macro">generate_integer_equal!</span>(<span class="ident">u32</span>, <span class="ident">i32</span>, <span class="number">32</span>);
-<span class="macro">generate_integer_equal!</span>(<span class="ident">u64</span>, <span class="ident">i64</span>, <span class="number">64</span>);
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;i128&quot;</span>)]</span>
-<span class="macro">generate_integer_equal!</span>(<span class="ident">u128</span>, <span class="ident">i128</span>, <span class="number">128</span>);
-<span class="macro">generate_integer_equal!</span>(<span class="ident">usize</span>, <span class="ident">isize</span>, <span class="ident">::core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="number">8</span>);
+<span class="macro">generate_integer_equal!</span>(u8, i8, <span class="number">8</span>);
+<span class="macro">generate_integer_equal!</span>(u16, i16, <span class="number">16</span>);
+<span class="macro">generate_integer_equal!</span>(u32, i32, <span class="number">32</span>);
+<span class="macro">generate_integer_equal!</span>(u64, i64, <span class="number">64</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;i128&quot;</span>)]
+</span><span class="macro">generate_integer_equal!</span>(u128, i128, <span class="number">128</span>);
+<span class="macro">generate_integer_equal!</span>(usize, isize, ::core::mem::size_of::&lt;usize&gt;() * <span class="number">8</span>);
 
-<span class="doccomment">/// A type which can be conditionally selected in constant time.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait also provides generic implementations of conditional</span>
-<span class="doccomment">/// assignment and conditional swaps.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConditionallySelectable</span>: <span class="ident">Copy</span> {
-    <span class="doccomment">/// Select `a` or `b` according to `choice`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `a` if `choice == Choice(0)`;</span>
-    <span class="doccomment">/// * `b` if `choice == Choice(1)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should execute in constant time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate subtle;</span>
-    <span class="doccomment">/// use subtle::ConditionallySelectable;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let x: u8 = 13;</span>
-    <span class="doccomment">/// let y: u8 = 42;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let z = u8::conditional_select(&amp;x, &amp;y, 0.into());</span>
-    <span class="doccomment">/// assert_eq!(z, x);</span>
-    <span class="doccomment">/// let z = u8::conditional_select(&amp;x, &amp;y, 1.into());</span>
-    <span class="doccomment">/// assert_eq!(z, y);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">conditional_select</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">choice</span>: <span class="ident">Choice</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// A type which can be conditionally selected in constant time.
+///
+/// This trait also provides generic implementations of conditional
+/// assignment and conditional swaps.
+</span><span class="kw">pub trait </span>ConditionallySelectable: Copy {
+    <span class="doccomment">/// Select `a` or `b` according to `choice`.
+    ///
+    /// # Returns
+    ///
+    /// * `a` if `choice == Choice(0)`;
+    /// * `b` if `choice == Choice(1)`.
+    ///
+    /// This function should execute in constant time.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate subtle;
+    /// use subtle::ConditionallySelectable;
+    /// #
+    /// # fn main() {
+    /// let x: u8 = 13;
+    /// let y: u8 = 42;
+    ///
+    /// let z = u8::conditional_select(&amp;x, &amp;y, 0.into());
+    /// assert_eq!(z, x);
+    /// let z = u8::conditional_select(&amp;x, &amp;y, 1.into());
+    /// assert_eq!(z, y);
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>conditional_select(a: <span class="kw-2">&amp;</span><span class="self">Self</span>, b: <span class="kw-2">&amp;</span><span class="self">Self</span>, choice: Choice) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Conditionally assign `other` to `self`, according to `choice`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should execute in constant time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate subtle;</span>
-    <span class="doccomment">/// use subtle::ConditionallySelectable;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let mut x: u8 = 13;</span>
-    <span class="doccomment">/// let mut y: u8 = 42;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// x.conditional_assign(&amp;y, 0.into());</span>
-    <span class="doccomment">/// assert_eq!(x, 13);</span>
-    <span class="doccomment">/// x.conditional_assign(&amp;y, 1.into());</span>
-    <span class="doccomment">/// assert_eq!(x, 42);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">conditional_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">choice</span>: <span class="ident">Choice</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::conditional_select</span>(<span class="self">self</span>, <span class="ident">other</span>, <span class="ident">choice</span>);
+    <span class="doccomment">/// Conditionally assign `other` to `self`, according to `choice`.
+    ///
+    /// This function should execute in constant time.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate subtle;
+    /// use subtle::ConditionallySelectable;
+    /// #
+    /// # fn main() {
+    /// let mut x: u8 = 13;
+    /// let mut y: u8 = 42;
+    ///
+    /// x.conditional_assign(&amp;y, 0.into());
+    /// assert_eq!(x, 13);
+    /// x.conditional_assign(&amp;y, 1.into());
+    /// assert_eq!(x, 42);
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>conditional_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>, choice: Choice) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">Self</span>::conditional_select(<span class="self">self</span>, other, choice);
     }
 
-    <span class="doccomment">/// Conditionally swap `self` and `other` if `choice == 1`; otherwise,</span>
-    <span class="doccomment">/// reassign both unto themselves.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should execute in constant time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate subtle;</span>
-    <span class="doccomment">/// use subtle::ConditionallySelectable;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let mut x: u8 = 13;</span>
-    <span class="doccomment">/// let mut y: u8 = 42;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// u8::conditional_swap(&amp;mut x, &amp;mut y, 0.into());</span>
-    <span class="doccomment">/// assert_eq!(x, 13);</span>
-    <span class="doccomment">/// assert_eq!(y, 42);</span>
-    <span class="doccomment">/// u8::conditional_swap(&amp;mut x, &amp;mut y, 1.into());</span>
-    <span class="doccomment">/// assert_eq!(x, 42);</span>
-    <span class="doccomment">/// assert_eq!(y, 13);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">conditional_swap</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="self">Self</span>, <span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="self">Self</span>, <span class="ident">choice</span>: <span class="ident">Choice</span>) {
-        <span class="kw">let</span> <span class="ident">t</span>: <span class="self">Self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">a</span>;
-        <span class="ident">a</span>.<span class="ident">conditional_assign</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>, <span class="ident">choice</span>);
-        <span class="ident">b</span>.<span class="ident">conditional_assign</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>, <span class="ident">choice</span>);
+    <span class="doccomment">/// Conditionally swap `self` and `other` if `choice == 1`; otherwise,
+    /// reassign both unto themselves.
+    ///
+    /// This function should execute in constant time.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate subtle;
+    /// use subtle::ConditionallySelectable;
+    /// #
+    /// # fn main() {
+    /// let mut x: u8 = 13;
+    /// let mut y: u8 = 42;
+    ///
+    /// u8::conditional_swap(&amp;mut x, &amp;mut y, 0.into());
+    /// assert_eq!(x, 13);
+    /// assert_eq!(y, 42);
+    /// u8::conditional_swap(&amp;mut x, &amp;mut y, 1.into());
+    /// assert_eq!(x, 42);
+    /// assert_eq!(y, 13);
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>conditional_swap(a: <span class="kw-2">&amp;mut </span><span class="self">Self</span>, b: <span class="kw-2">&amp;mut </span><span class="self">Self</span>, choice: Choice) {
+        <span class="kw">let </span>t: <span class="self">Self </span>= <span class="kw-2">*</span>a;
+        a.conditional_assign(<span class="kw-2">&amp;</span>b, choice);
+        b.conditional_assign(<span class="kw-2">&amp;</span>t, choice);
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">to_signed_int</span> {
-    (<span class="ident">u8</span>) =&gt; {
-        <span class="ident">i8</span>
+<span class="macro">macro_rules! </span>to_signed_int {
+    (u8) =&gt; {
+        i8
     };
-    (<span class="ident">u16</span>) =&gt; {
-        <span class="ident">i16</span>
+    (u16) =&gt; {
+        i16
     };
-    (<span class="ident">u32</span>) =&gt; {
-        <span class="ident">i32</span>
+    (u32) =&gt; {
+        i32
     };
-    (<span class="ident">u64</span>) =&gt; {
-        <span class="ident">i64</span>
+    (u64) =&gt; {
+        i64
     };
-    (<span class="ident">u128</span>) =&gt; {
-        <span class="ident">i128</span>
+    (u128) =&gt; {
+        i128
     };
-    (<span class="ident">i8</span>) =&gt; {
-        <span class="ident">i8</span>
+    (i8) =&gt; {
+        i8
     };
-    (<span class="ident">i16</span>) =&gt; {
-        <span class="ident">i16</span>
+    (i16) =&gt; {
+        i16
     };
-    (<span class="ident">i32</span>) =&gt; {
-        <span class="ident">i32</span>
+    (i32) =&gt; {
+        i32
     };
-    (<span class="ident">i64</span>) =&gt; {
-        <span class="ident">i64</span>
+    (i64) =&gt; {
+        i64
     };
-    (<span class="ident">i128</span>) =&gt; {
-        <span class="ident">i128</span>
+    (i128) =&gt; {
+        i128
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">generate_integer_conditional_select</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="kw">impl</span> <span class="ident">ConditionallySelectable</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">conditional_select</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">choice</span>: <span class="ident">Choice</span>) -&gt; <span class="self">Self</span> {
-                <span class="comment">// if choice = 0, mask = (-0) = 0000...0000</span>
-                <span class="comment">// if choice = 1, mask = (-1) = 1111...1111</span>
-                <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">choice</span>.<span class="ident">unwrap_u8</span>() <span class="kw">as</span> <span class="macro">to_signed_int!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)) <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>;
-                <span class="ident">a</span> <span class="op">^</span> (<span class="ident">mask</span> <span class="op">&amp;</span> (<span class="ident">a</span> <span class="op">^</span> <span class="ident">b</span>))
+<span class="macro">macro_rules! </span>generate_integer_conditional_select {
+    ($(<span class="macro-nonterminal">$t</span>:tt)<span class="kw-2">*</span>) =&gt; ($(
+        <span class="kw">impl </span>ConditionallySelectable <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>conditional_select(a: <span class="kw-2">&amp;</span><span class="self">Self</span>, b: <span class="kw-2">&amp;</span><span class="self">Self</span>, choice: Choice) -&gt; <span class="self">Self </span>{
+                <span class="comment">// if choice = 0, mask = (-0) = 0000...0000
+                // if choice = 1, mask = (-1) = 1111...1111
+                </span><span class="kw">let </span>mask = -(choice.unwrap_u8() <span class="kw">as </span><span class="macro">to_signed_int!</span>(<span class="macro-nonterminal">$t</span>)) <span class="kw">as </span><span class="macro-nonterminal">$t</span>;
+                a ^ (mask &amp; (a ^ b))
             }
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">conditional_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">choice</span>: <span class="ident">Choice</span>) {
-                <span class="comment">// if choice = 0, mask = (-0) = 0000...0000</span>
-                <span class="comment">// if choice = 1, mask = (-1) = 1111...1111</span>
-                <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">choice</span>.<span class="ident">unwrap_u8</span>() <span class="kw">as</span> <span class="macro">to_signed_int!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)) <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>;
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">^</span><span class="op">=</span> <span class="ident">mask</span> <span class="op">&amp;</span> (<span class="kw-2">*</span><span class="self">self</span> <span class="op">^</span> <span class="kw-2">*</span><span class="ident">other</span>);
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>conditional_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>, choice: Choice) {
+                <span class="comment">// if choice = 0, mask = (-0) = 0000...0000
+                // if choice = 1, mask = (-1) = 1111...1111
+                </span><span class="kw">let </span>mask = -(choice.unwrap_u8() <span class="kw">as </span><span class="macro">to_signed_int!</span>(<span class="macro-nonterminal">$t</span>)) <span class="kw">as </span><span class="macro-nonterminal">$t</span>;
+                <span class="kw-2">*</span><span class="self">self </span>^= mask &amp; (<span class="kw-2">*</span><span class="self">self </span>^ <span class="kw-2">*</span>other);
             }
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">conditional_swap</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="self">Self</span>, <span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="self">Self</span>, <span class="ident">choice</span>: <span class="ident">Choice</span>) {
-                <span class="comment">// if choice = 0, mask = (-0) = 0000...0000</span>
-                <span class="comment">// if choice = 1, mask = (-1) = 1111...1111</span>
-                <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">choice</span>.<span class="ident">unwrap_u8</span>() <span class="kw">as</span> <span class="macro">to_signed_int!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)) <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>;
-                <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">mask</span> <span class="op">&amp;</span> (<span class="kw-2">*</span><span class="ident">a</span> <span class="op">^</span> <span class="kw-2">*</span><span class="ident">b</span>);
-                <span class="kw-2">*</span><span class="ident">a</span> <span class="op">^</span><span class="op">=</span> <span class="ident">t</span>;
-                <span class="kw-2">*</span><span class="ident">b</span> <span class="op">^</span><span class="op">=</span> <span class="ident">t</span>;
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>conditional_swap(a: <span class="kw-2">&amp;mut </span><span class="self">Self</span>, b: <span class="kw-2">&amp;mut </span><span class="self">Self</span>, choice: Choice) {
+                <span class="comment">// if choice = 0, mask = (-0) = 0000...0000
+                // if choice = 1, mask = (-1) = 1111...1111
+                </span><span class="kw">let </span>mask = -(choice.unwrap_u8() <span class="kw">as </span><span class="macro">to_signed_int!</span>(<span class="macro-nonterminal">$t</span>)) <span class="kw">as </span><span class="macro-nonterminal">$t</span>;
+                <span class="kw">let </span>t = mask &amp; (<span class="kw-2">*</span>a ^ <span class="kw-2">*</span>b);
+                <span class="kw-2">*</span>a ^= t;
+                <span class="kw-2">*</span>b ^= t;
             }
          }
     )<span class="kw-2">*</span>)
 }
 
-<span class="macro">generate_integer_conditional_select!</span>(  <span class="ident">u8</span>   <span class="ident">i8</span>);
-<span class="macro">generate_integer_conditional_select!</span>( <span class="ident">u16</span>  <span class="ident">i16</span>);
-<span class="macro">generate_integer_conditional_select!</span>( <span class="ident">u32</span>  <span class="ident">i32</span>);
-<span class="macro">generate_integer_conditional_select!</span>( <span class="ident">u64</span>  <span class="ident">i64</span>);
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;i128&quot;</span>)]</span>
-<span class="macro">generate_integer_conditional_select!</span>(<span class="ident">u128</span> <span class="ident">i128</span>);
+<span class="macro">generate_integer_conditional_select!</span>(  u8   i8);
+<span class="macro">generate_integer_conditional_select!</span>( u16  i16);
+<span class="macro">generate_integer_conditional_select!</span>( u32  i32);
+<span class="macro">generate_integer_conditional_select!</span>( u64  i64);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;i128&quot;</span>)]
+</span><span class="macro">generate_integer_conditional_select!</span>(u128 i128);
 
-<span class="kw">impl</span> <span class="ident">ConditionallySelectable</span> <span class="kw">for</span> <span class="ident">Choice</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">conditional_select</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">choice</span>: <span class="ident">Choice</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Choice</span>(<span class="ident">u8::conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">0</span>, <span class="ident">choice</span>))
+<span class="kw">impl </span>ConditionallySelectable <span class="kw">for </span>Choice {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>conditional_select(a: <span class="kw-2">&amp;</span><span class="self">Self</span>, b: <span class="kw-2">&amp;</span><span class="self">Self</span>, choice: Choice) -&gt; <span class="self">Self </span>{
+        Choice(u8::conditional_select(<span class="kw-2">&amp;</span>a.<span class="number">0</span>, <span class="kw-2">&amp;</span>b.<span class="number">0</span>, choice))
     }
 }
 
-<span class="doccomment">/// A type which can be conditionally negated in constant time.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Note</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A generic implementation of `ConditionallyNegatable` is provided</span>
-<span class="doccomment">/// for types `T` which are `ConditionallySelectable` and have `Neg`</span>
-<span class="doccomment">/// implemented on `&amp;T`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConditionallyNegatable</span> {
-    <span class="doccomment">/// Negate `self` if `choice == Choice(1)`; otherwise, leave it</span>
-    <span class="doccomment">/// unchanged.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should execute in constant time.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">conditional_negate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">choice</span>: <span class="ident">Choice</span>);
+<span class="doccomment">/// A type which can be conditionally negated in constant time.
+///
+/// # Note
+///
+/// A generic implementation of `ConditionallyNegatable` is provided
+/// for types `T` which are `ConditionallySelectable` and have `Neg`
+/// implemented on `&amp;T`.
+</span><span class="kw">pub trait </span>ConditionallyNegatable {
+    <span class="doccomment">/// Negate `self` if `choice == Choice(1)`; otherwise, leave it
+    /// unchanged.
+    ///
+    /// This function should execute in constant time.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>conditional_negate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, choice: Choice);
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ConditionallyNegatable</span> <span class="kw">for</span> <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">ConditionallySelectable</span>,
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">Neg</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T&gt; ConditionallyNegatable <span class="kw">for </span>T
+<span class="kw">where
+    </span>T: ConditionallySelectable,
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: Neg&lt;Output = T&gt;,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">conditional_negate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">choice</span>: <span class="ident">Choice</span>) {
-        <span class="comment">// Need to cast to eliminate mutability</span>
-        <span class="kw">let</span> <span class="ident">self_neg</span>: <span class="ident">T</span> <span class="op">=</span> <span class="op">-</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">T</span>);
-        <span class="self">self</span>.<span class="ident">conditional_assign</span>(<span class="kw-2">&amp;</span><span class="ident">self_neg</span>, <span class="ident">choice</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>conditional_negate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, choice: Choice) {
+        <span class="comment">// Need to cast to eliminate mutability
+        </span><span class="kw">let </span>self_neg: T = -(<span class="self">self </span><span class="kw">as </span><span class="kw-2">&amp;</span>T);
+        <span class="self">self</span>.conditional_assign(<span class="kw-2">&amp;</span>self_neg, choice);
     }
 }
 
-<span class="doccomment">/// The `CtOption&lt;T&gt;` type represents an optional value similar to the</span>
-<span class="doccomment">/// [`Option&lt;T&gt;`](core::option::Option) type but is intended for</span>
-<span class="doccomment">/// use in constant time APIs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Any given `CtOption&lt;T&gt;` is either `Some` or `None`, but unlike</span>
-<span class="doccomment">/// `Option&lt;T&gt;` these variants are not exposed. The</span>
-<span class="doccomment">/// [`is_some()`](CtOption::is_some) method is used to determine if</span>
-<span class="doccomment">/// the value is `Some`, and [`unwrap_or()`](CtOption::unwrap_or) and</span>
-<span class="doccomment">/// [`unwrap_or_else()`](CtOption::unwrap_or_else) methods are</span>
-<span class="doccomment">/// provided to access the underlying value. The value can also be</span>
-<span class="doccomment">/// obtained with [`unwrap()`](CtOption::unwrap) but this will panic</span>
-<span class="doccomment">/// if it is `None`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Functions that are intended to be constant time may not produce</span>
-<span class="doccomment">/// valid results for all inputs, such as square root and inversion</span>
-<span class="doccomment">/// operations in finite field arithmetic. Returning an `Option&lt;T&gt;`</span>
-<span class="doccomment">/// from these functions makes it difficult for the caller to reason</span>
-<span class="doccomment">/// about the result in constant time, and returning an incorrect</span>
-<span class="doccomment">/// value burdens the caller and increases the chance of bugs.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="ident">T</span>,
-    <span class="ident">is_some</span>: <span class="ident">Choice</span>,
+<span class="doccomment">/// The `CtOption&lt;T&gt;` type represents an optional value similar to the
+/// [`Option&lt;T&gt;`](core::option::Option) type but is intended for
+/// use in constant time APIs.
+///
+/// Any given `CtOption&lt;T&gt;` is either `Some` or `None`, but unlike
+/// `Option&lt;T&gt;` these variants are not exposed. The
+/// [`is_some()`](CtOption::is_some) method is used to determine if
+/// the value is `Some`, and [`unwrap_or()`](CtOption::unwrap_or) and
+/// [`unwrap_or_else()`](CtOption::unwrap_or_else) methods are
+/// provided to access the underlying value. The value can also be
+/// obtained with [`unwrap()`](CtOption::unwrap) but this will panic
+/// if it is `None`.
+///
+/// Functions that are intended to be constant time may not produce
+/// valid results for all inputs, such as square root and inversion
+/// operations in finite field arithmetic. Returning an `Option&lt;T&gt;`
+/// from these functions makes it difficult for the caller to reason
+/// about the result in constant time, and returning an incorrect
+/// value burdens the caller and increases the chance of bugs.
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>CtOption&lt;T&gt; {
+    value: T,
+    is_some: Choice,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Convert the `CtOption&lt;T&gt;` wrapper into an `Option&lt;T&gt;`, depending on whether</span>
-    <span class="doccomment">/// the underlying `is_some` `Choice` was a `0` or a `1` once unwrapped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function exists to avoid ending up with ugly, verbose and/or bad handled</span>
-    <span class="doccomment">/// conversions from the `CtOption&lt;T&gt;` wraps to an `Option&lt;T&gt;` or `Result&lt;T, E&gt;`.</span>
-    <span class="doccomment">/// This implementation doesn&#39;t intend to be constant-time nor try to protect the</span>
-    <span class="doccomment">/// leakage of the `T` since the `Option&lt;T&gt;` will do it anyways.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">source</span>: <span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">source</span>.<span class="ident">is_some</span>().<span class="ident">unwrap_u8</span>() <span class="op">==</span> <span class="number">1u8</span> {
-            <span class="ident">Option::Some</span>(<span class="ident">source</span>.<span class="ident">value</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+<span class="kw">impl</span>&lt;T&gt; From&lt;CtOption&lt;T&gt;&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt; {
+    <span class="doccomment">/// Convert the `CtOption&lt;T&gt;` wrapper into an `Option&lt;T&gt;`, depending on whether
+    /// the underlying `is_some` `Choice` was a `0` or a `1` once unwrapped.
+    ///
+    /// # Note
+    ///
+    /// This function exists to avoid ending up with ugly, verbose and/or bad handled
+    /// conversions from the `CtOption&lt;T&gt;` wraps to an `Option&lt;T&gt;` or `Result&lt;T, E&gt;`.
+    /// This implementation doesn&#39;t intend to be constant-time nor try to protect the
+    /// leakage of the `T` since the `Option&lt;T&gt;` will do it anyways.
+    </span><span class="kw">fn </span>from(source: CtOption&lt;T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="kw">if </span>source.is_some().unwrap_u8() == <span class="number">1u8 </span>{
+            Option::Some(source.value)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+}
+
+<span class="kw">impl</span>&lt;T&gt; CtOption&lt;T&gt; {
+    <span class="doccomment">/// This method is used to construct a new `CtOption&lt;T&gt;` and takes
+    /// a value of type `T`, and a `Choice` that determines whether
+    /// the optional value should be `Some` or not. If `is_some` is
+    /// false, the value will still be stored but its value is never
+    /// exposed.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>new(value: T, is_some: Choice) -&gt; CtOption&lt;T&gt; {
+        CtOption {
+            value: value,
+            is_some: is_some,
         }
     }
-}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// This method is used to construct a new `CtOption&lt;T&gt;` and takes</span>
-    <span class="doccomment">/// a value of type `T`, and a `Choice` that determines whether</span>
-    <span class="doccomment">/// the optional value should be `Some` or not. If `is_some` is</span>
-    <span class="doccomment">/// false, the value will still be stored but its value is never</span>
-    <span class="doccomment">/// exposed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">is_some</span>: <span class="ident">Choice</span>) -&gt; <span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">CtOption</span> {
-            <span class="ident">value</span>: <span class="ident">value</span>,
-            <span class="ident">is_some</span>: <span class="ident">is_some</span>,
-        }
+    <span class="doccomment">/// This returns the underlying value but panics if it
+    /// is not `Some`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>unwrap(<span class="self">self</span>) -&gt; T {
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.is_some.unwrap_u8(), <span class="number">1</span>);
+
+        <span class="self">self</span>.value
     }
 
-    <span class="doccomment">/// This returns the underlying value but panics if it</span>
-    <span class="doccomment">/// is not `Some`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">is_some</span>.<span class="ident">unwrap_u8</span>(), <span class="number">1</span>);
-
-        <span class="self">self</span>.<span class="ident">value</span>
-    }
-
-    <span class="doccomment">/// This returns the underlying value if it is `Some`</span>
-    <span class="doccomment">/// or the provided value otherwise.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_or</span>(<span class="self">self</span>, <span class="ident">def</span>: <span class="ident">T</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">ConditionallySelectable</span>,
+    <span class="doccomment">/// This returns the underlying value if it is `Some`
+    /// or the provided value otherwise.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>unwrap_or(<span class="self">self</span>, def: T) -&gt; T
+    <span class="kw">where
+        </span>T: ConditionallySelectable,
     {
-        <span class="ident">T::conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">def</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>, <span class="self">self</span>.<span class="ident">is_some</span>)
+        T::conditional_select(<span class="kw-2">&amp;</span>def, <span class="kw-2">&amp;</span><span class="self">self</span>.value, <span class="self">self</span>.is_some)
     }
 
-    <span class="doccomment">/// This returns the underlying value if it is `Some`</span>
-    <span class="doccomment">/// or the value produced by the provided closure otherwise.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_or_else</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">ConditionallySelectable</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span>,
+    <span class="doccomment">/// This returns the underlying value if it is `Some`
+    /// or the value produced by the provided closure otherwise.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>unwrap_or_else&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; T
+    <span class="kw">where
+        </span>T: ConditionallySelectable,
+        F: FnOnce() -&gt; T,
     {
-        <span class="ident">T::conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">f</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>, <span class="self">self</span>.<span class="ident">is_some</span>)
+        T::conditional_select(<span class="kw-2">&amp;</span>f(), <span class="kw-2">&amp;</span><span class="self">self</span>.value, <span class="self">self</span>.is_some)
     }
 
-    <span class="doccomment">/// Returns a true `Choice` if this value is `Some`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Choice</span> {
-        <span class="self">self</span>.<span class="ident">is_some</span>
+    <span class="doccomment">/// Returns a true `Choice` if this value is `Some`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_some(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Choice {
+        <span class="self">self</span>.is_some
     }
 
-    <span class="doccomment">/// Returns a true `Choice` if this value is `None`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_none</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Choice</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_some</span>
+    <span class="doccomment">/// Returns a true `Choice` if this value is `None`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_none(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Choice {
+        !<span class="self">self</span>.is_some
     }
 
-    <span class="doccomment">/// Returns a `None` value if the option is `None`, otherwise</span>
-    <span class="doccomment">/// returns a `CtOption` enclosing the value of the provided closure.</span>
-    <span class="doccomment">/// The closure is given the enclosed value or, if the option is</span>
-    <span class="doccomment">/// `None`, it is provided a dummy value computed using</span>
-    <span class="doccomment">/// `Default::default()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operates in constant time, because the provided closure</span>
-    <span class="doccomment">/// is always called.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">ConditionallySelectable</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">U</span>,
+    <span class="doccomment">/// Returns a `None` value if the option is `None`, otherwise
+    /// returns a `CtOption` enclosing the value of the provided closure.
+    /// The closure is given the enclosed value or, if the option is
+    /// `None`, it is provided a dummy value computed using
+    /// `Default::default()`.
+    ///
+    /// This operates in constant time, because the provided closure
+    /// is always called.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>map&lt;U, F&gt;(<span class="self">self</span>, f: F) -&gt; CtOption&lt;U&gt;
+    <span class="kw">where
+        </span>T: Default + ConditionallySelectable,
+        F: FnOnce(T) -&gt; U,
     {
-        <span class="ident">CtOption::new</span>(
-            <span class="ident">f</span>(<span class="ident">T::conditional_select</span>(
-                <span class="kw-2">&amp;</span><span class="ident">T::default</span>(),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>,
-                <span class="self">self</span>.<span class="ident">is_some</span>,
+        CtOption::new(
+            f(T::conditional_select(
+                <span class="kw-2">&amp;</span>T::default(),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.value,
+                <span class="self">self</span>.is_some,
             )),
-            <span class="self">self</span>.<span class="ident">is_some</span>,
+            <span class="self">self</span>.is_some,
         )
     }
 
-    <span class="doccomment">/// Returns a `None` value if the option is `None`, otherwise</span>
-    <span class="doccomment">/// returns the result of the provided closure. The closure is</span>
-    <span class="doccomment">/// given the enclosed value or, if the option is `None`, it</span>
-    <span class="doccomment">/// is provided a dummy value computed using `Default::default()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operates in constant time, because the provided closure</span>
-    <span class="doccomment">/// is always called.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_then</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">ConditionallySelectable</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Returns a `None` value if the option is `None`, otherwise
+    /// returns the result of the provided closure. The closure is
+    /// given the enclosed value or, if the option is `None`, it
+    /// is provided a dummy value computed using `Default::default()`.
+    ///
+    /// This operates in constant time, because the provided closure
+    /// is always called.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>and_then&lt;U, F&gt;(<span class="self">self</span>, f: F) -&gt; CtOption&lt;U&gt;
+    <span class="kw">where
+        </span>T: Default + ConditionallySelectable,
+        F: FnOnce(T) -&gt; CtOption&lt;U&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">T::conditional_select</span>(
-            <span class="kw-2">&amp;</span><span class="ident">T::default</span>(),
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>,
-            <span class="self">self</span>.<span class="ident">is_some</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>tmp = f(T::conditional_select(
+            <span class="kw-2">&amp;</span>T::default(),
+            <span class="kw-2">&amp;</span><span class="self">self</span>.value,
+            <span class="self">self</span>.is_some,
         ));
-        <span class="ident">tmp</span>.<span class="ident">is_some</span> <span class="op">&amp;=</span> <span class="self">self</span>.<span class="ident">is_some</span>;
+        tmp.is_some &amp;= <span class="self">self</span>.is_some;
 
-        <span class="ident">tmp</span>
+        tmp
     }
 
-    <span class="doccomment">/// Returns `self` if it contains a value, and otherwise returns the result of</span>
-    <span class="doccomment">/// calling `f`. The provided function `f` is always called.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or_else</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">ConditionallySelectable</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Returns `self` if it contains a value, and otherwise returns the result of
+    /// calling `f`. The provided function `f` is always called.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>or_else&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; CtOption&lt;T&gt;
+    <span class="kw">where
+        </span>T: ConditionallySelectable,
+        F: FnOnce() -&gt; CtOption&lt;T&gt;,
     {
-        <span class="kw">let</span> <span class="ident">is_none</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">is_none</span>();
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">f</span>();
+        <span class="kw">let </span>is_none = <span class="self">self</span>.is_none();
+        <span class="kw">let </span>f = f();
 
-        <span class="ident"><span class="self">Self</span>::conditional_select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="ident">is_none</span>)
+        <span class="self">Self</span>::conditional_select(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span>f, is_none)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ConditionallySelectable</span><span class="op">&gt;</span> <span class="ident">ConditionallySelectable</span> <span class="kw">for</span> <span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">conditional_select</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">choice</span>: <span class="ident">Choice</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">CtOption::new</span>(
-            <span class="ident">T::conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">value</span>, <span class="ident">choice</span>),
-            <span class="ident">Choice::conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">is_some</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">is_some</span>, <span class="ident">choice</span>),
+<span class="kw">impl</span>&lt;T: ConditionallySelectable&gt; ConditionallySelectable <span class="kw">for </span>CtOption&lt;T&gt; {
+    <span class="kw">fn </span>conditional_select(a: <span class="kw-2">&amp;</span><span class="self">Self</span>, b: <span class="kw-2">&amp;</span><span class="self">Self</span>, choice: Choice) -&gt; <span class="self">Self </span>{
+        CtOption::new(
+            T::conditional_select(<span class="kw-2">&amp;</span>a.value, <span class="kw-2">&amp;</span>b.value, choice),
+            Choice::conditional_select(<span class="kw-2">&amp;</span>a.is_some, <span class="kw-2">&amp;</span>b.is_some, choice),
         )
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ConstantTimeEq</span><span class="op">&gt;</span> <span class="ident">ConstantTimeEq</span> <span class="kw">for</span> <span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Two `CtOption&lt;T&gt;`s are equal if they are both `Some` and</span>
-    <span class="doccomment">/// their values are equal, or both `None`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">CtOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Choice</span> {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">is_some</span>();
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">rhs</span>.<span class="ident">is_some</span>();
+<span class="kw">impl</span>&lt;T: ConstantTimeEq&gt; ConstantTimeEq <span class="kw">for </span>CtOption&lt;T&gt; {
+    <span class="doccomment">/// Two `CtOption&lt;T&gt;`s are equal if they are both `Some` and
+    /// their values are equal, or both `None`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>ct_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>CtOption&lt;T&gt;) -&gt; Choice {
+        <span class="kw">let </span>a = <span class="self">self</span>.is_some();
+        <span class="kw">let </span>b = rhs.is_some();
 
-        (<span class="ident">a</span> <span class="op">&amp;</span> <span class="ident">b</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">value</span>)) <span class="op">|</span> (<span class="op">!</span><span class="ident">a</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">b</span>)
+        (a &amp; b &amp; <span class="self">self</span>.value.ct_eq(<span class="kw-2">&amp;</span>rhs.value)) | (!a &amp; !b)
     }
 }
 
-<span class="doccomment">/// A type which can be compared in some manner and be determined to be greater</span>
-<span class="doccomment">/// than another of the same type.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConstantTimeGreater</span> {
-    <span class="doccomment">/// Determine whether `self &gt; other`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The bitwise-NOT of the return value of this function should be usable to</span>
-    <span class="doccomment">/// determine if `self &lt;= other`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should execute in constant time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A `Choice` with a set bit if `self &gt; other`, and with no set bits</span>
-    <span class="doccomment">/// otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate subtle;</span>
-    <span class="doccomment">/// use subtle::ConstantTimeGreater;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let x: u8 = 13;</span>
-    <span class="doccomment">/// let y: u8 = 42;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let x_gt_y = x.ct_gt(&amp;y);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(x_gt_y.unwrap_u8(), 0);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let y_gt_x = y.ct_gt(&amp;x);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(y_gt_x.unwrap_u8(), 1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let x_gt_x = x.ct_gt(&amp;x);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(x_gt_x.unwrap_u8(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">ct_gt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Choice</span>;
+<span class="doccomment">/// A type which can be compared in some manner and be determined to be greater
+/// than another of the same type.
+</span><span class="kw">pub trait </span>ConstantTimeGreater {
+    <span class="doccomment">/// Determine whether `self &gt; other`.
+    ///
+    /// The bitwise-NOT of the return value of this function should be usable to
+    /// determine if `self &lt;= other`.
+    ///
+    /// This function should execute in constant time.
+    ///
+    /// # Returns
+    ///
+    /// A `Choice` with a set bit if `self &gt; other`, and with no set bits
+    /// otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate subtle;
+    /// use subtle::ConstantTimeGreater;
+    ///
+    /// let x: u8 = 13;
+    /// let y: u8 = 42;
+    ///
+    /// let x_gt_y = x.ct_gt(&amp;y);
+    ///
+    /// assert_eq!(x_gt_y.unwrap_u8(), 0);
+    ///
+    /// let y_gt_x = y.ct_gt(&amp;x);
+    ///
+    /// assert_eq!(y_gt_x.unwrap_u8(), 1);
+    ///
+    /// let x_gt_x = x.ct_gt(&amp;x);
+    ///
+    /// assert_eq!(x_gt_x.unwrap_u8(), 0);
+    /// ```
+    </span><span class="kw">fn </span>ct_gt(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Choice;
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">generate_unsigned_integer_greater</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_u</span>: <span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bit_width</span>: <span class="ident">expr</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">ConstantTimeGreater</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_u</span> {
-            <span class="doccomment">/// Returns Choice::from(1) iff x &gt; y, and Choice::from(0) iff x &lt;= y.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// # Note</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// This algoritm would also work for signed integers if we first</span>
-            <span class="doccomment">/// flip the top bit, e.g. `let x: u8 = x ^ 0x80`, etc.</span>
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">ct_gt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t_u</span>) -&gt; <span class="ident">Choice</span> {
-                <span class="kw">let</span> <span class="ident">gtb</span> <span class="op">=</span> <span class="self">self</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">other</span>; <span class="comment">// All the bits in self that are greater than their corresponding bits in other.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ltb</span> <span class="op">=</span> <span class="op">!</span><span class="self">self</span> <span class="op">&amp;</span> <span class="ident">other</span>; <span class="comment">// All the bits in self that are less than their corresponding bits in other.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pow</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="macro">macro_rules! </span>generate_unsigned_integer_greater {
+    (<span class="macro-nonterminal">$t_u</span>: ty, <span class="macro-nonterminal">$bit_width</span>: expr) =&gt; {
+        <span class="kw">impl </span>ConstantTimeGreater <span class="kw">for </span><span class="macro-nonterminal">$t_u </span>{
+            <span class="doccomment">/// Returns Choice::from(1) iff x &gt; y, and Choice::from(0) iff x &lt;= y.
+            ///
+            /// # Note
+            ///
+            /// This algoritm would also work for signed integers if we first
+            /// flip the top bit, e.g. `let x: u8 = x ^ 0x80`, etc.
+            </span><span class="attribute">#[inline]
+            </span><span class="kw">fn </span>ct_gt(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$t_u</span>) -&gt; Choice {
+                <span class="kw">let </span>gtb = <span class="self">self </span>&amp; !other; <span class="comment">// All the bits in self that are greater than their corresponding bits in other.
+                </span><span class="kw">let </span><span class="kw-2">mut </span>ltb = !<span class="self">self </span>&amp; other; <span class="comment">// All the bits in self that are less than their corresponding bits in other.
+                </span><span class="kw">let </span><span class="kw-2">mut </span>pow = <span class="number">1</span>;
 
-                <span class="comment">// Less-than operator is okay here because it&#39;s dependent on the bit-width.</span>
-                <span class="kw">while</span> <span class="ident">pow</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bit_width</span> {
-                    <span class="ident">ltb</span> <span class="op">|</span><span class="op">=</span> <span class="ident">ltb</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">pow</span>; <span class="comment">// Bit-smear the highest set bit to the right.</span>
-                    <span class="ident">pow</span> <span class="op">+</span><span class="op">=</span> <span class="ident">pow</span>;
+                <span class="comment">// Less-than operator is okay here because it&#39;s dependent on the bit-width.
+                </span><span class="kw">while </span>pow &lt; <span class="macro-nonterminal">$bit_width </span>{
+                    ltb |= ltb &gt;&gt; pow; <span class="comment">// Bit-smear the highest set bit to the right.
+                    </span>pow += pow;
                 }
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">gtb</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">ltb</span>; <span class="comment">// Select the highest set bit.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pow</span> <span class="op">=</span> <span class="number">1</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>bit = gtb &amp; !ltb; <span class="comment">// Select the highest set bit.
+                </span><span class="kw">let </span><span class="kw-2">mut </span>pow = <span class="number">1</span>;
 
-                <span class="kw">while</span> <span class="ident">pow</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bit_width</span> {
-                    <span class="ident">bit</span> <span class="op">|</span><span class="op">=</span> <span class="ident">bit</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">pow</span>; <span class="comment">// Shift it to the right until we end up with either 0 or 1.</span>
-                    <span class="ident">pow</span> <span class="op">+</span><span class="op">=</span> <span class="ident">pow</span>;
+                <span class="kw">while </span>pow &lt; <span class="macro-nonterminal">$bit_width </span>{
+                    bit |= bit &gt;&gt; pow; <span class="comment">// Shift it to the right until we end up with either 0 or 1.
+                    </span>pow += pow;
                 }
-                <span class="comment">// XXX We should possibly do the above flattening to 0 or 1 in the</span>
-                <span class="comment">//     Choice constructor rather than making it a debug error?</span>
-                <span class="ident">Choice::from</span>((<span class="ident">bit</span> <span class="op">&amp;</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u8</span>)
+                <span class="comment">// XXX We should possibly do the above flattening to 0 or 1 in the
+                //     Choice constructor rather than making it a debug error?
+                </span>Choice::from((bit &amp; <span class="number">1</span>) <span class="kw">as </span>u8)
             }
         }
     }
 }
 
-<span class="macro">generate_unsigned_integer_greater!</span>(<span class="ident">u8</span>, <span class="number">8</span>);
-<span class="macro">generate_unsigned_integer_greater!</span>(<span class="ident">u16</span>, <span class="number">16</span>);
-<span class="macro">generate_unsigned_integer_greater!</span>(<span class="ident">u32</span>, <span class="number">32</span>);
-<span class="macro">generate_unsigned_integer_greater!</span>(<span class="ident">u64</span>, <span class="number">64</span>);
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;i128&quot;</span>)]</span>
-<span class="macro">generate_unsigned_integer_greater!</span>(<span class="ident">u128</span>, <span class="number">128</span>);
+<span class="macro">generate_unsigned_integer_greater!</span>(u8, <span class="number">8</span>);
+<span class="macro">generate_unsigned_integer_greater!</span>(u16, <span class="number">16</span>);
+<span class="macro">generate_unsigned_integer_greater!</span>(u32, <span class="number">32</span>);
+<span class="macro">generate_unsigned_integer_greater!</span>(u64, <span class="number">64</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;i128&quot;</span>)]
+</span><span class="macro">generate_unsigned_integer_greater!</span>(u128, <span class="number">128</span>);
 
-<span class="doccomment">/// A type which can be compared in some manner and be determined to be less</span>
-<span class="doccomment">/// than another of the same type.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConstantTimeLess</span>: <span class="ident">ConstantTimeEq</span> <span class="op">+</span> <span class="ident">ConstantTimeGreater</span> {
-    <span class="doccomment">/// Determine whether `self &lt; other`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The bitwise-NOT of the return value of this function should be usable to</span>
-    <span class="doccomment">/// determine if `self &gt;= other`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A default implementation is provided and implemented for the unsigned</span>
-    <span class="doccomment">/// integer types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should execute in constant time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A `Choice` with a set bit if `self &lt; other`, and with no set bits</span>
-    <span class="doccomment">/// otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate subtle;</span>
-    <span class="doccomment">/// use subtle::ConstantTimeLess;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let x: u8 = 13;</span>
-    <span class="doccomment">/// let y: u8 = 42;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let x_lt_y = x.ct_lt(&amp;y);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(x_lt_y.unwrap_u8(), 1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let y_lt_x = y.ct_lt(&amp;x);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(y_lt_x.unwrap_u8(), 0);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let x_lt_x = x.ct_lt(&amp;x);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(x_lt_x.unwrap_u8(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ct_lt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Choice</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">ct_gt</span>(<span class="ident">other</span>) <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">ct_eq</span>(<span class="ident">other</span>)
+<span class="doccomment">/// A type which can be compared in some manner and be determined to be less
+/// than another of the same type.
+</span><span class="kw">pub trait </span>ConstantTimeLess: ConstantTimeEq + ConstantTimeGreater {
+    <span class="doccomment">/// Determine whether `self &lt; other`.
+    ///
+    /// The bitwise-NOT of the return value of this function should be usable to
+    /// determine if `self &gt;= other`.
+    ///
+    /// A default implementation is provided and implemented for the unsigned
+    /// integer types.
+    ///
+    /// This function should execute in constant time.
+    ///
+    /// # Returns
+    ///
+    /// A `Choice` with a set bit if `self &lt; other`, and with no set bits
+    /// otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate subtle;
+    /// use subtle::ConstantTimeLess;
+    ///
+    /// let x: u8 = 13;
+    /// let y: u8 = 42;
+    ///
+    /// let x_lt_y = x.ct_lt(&amp;y);
+    ///
+    /// assert_eq!(x_lt_y.unwrap_u8(), 1);
+    ///
+    /// let y_lt_x = y.ct_lt(&amp;x);
+    ///
+    /// assert_eq!(y_lt_x.unwrap_u8(), 0);
+    ///
+    /// let x_lt_x = x.ct_lt(&amp;x);
+    ///
+    /// assert_eq!(x_lt_x.unwrap_u8(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>ct_lt(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Choice {
+        !<span class="self">self</span>.ct_gt(other) &amp; !<span class="self">self</span>.ct_eq(other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ConstantTimeLess</span> <span class="kw">for</span> <span class="ident">u8</span> {}
-<span class="kw">impl</span> <span class="ident">ConstantTimeLess</span> <span class="kw">for</span> <span class="ident">u16</span> {}
-<span class="kw">impl</span> <span class="ident">ConstantTimeLess</span> <span class="kw">for</span> <span class="ident">u32</span> {}
-<span class="kw">impl</span> <span class="ident">ConstantTimeLess</span> <span class="kw">for</span> <span class="ident">u64</span> {}
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;i128&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">ConstantTimeLess</span> <span class="kw">for</span> <span class="ident">u128</span> {}
+<span class="kw">impl </span>ConstantTimeLess <span class="kw">for </span>u8 {}
+<span class="kw">impl </span>ConstantTimeLess <span class="kw">for </span>u16 {}
+<span class="kw">impl </span>ConstantTimeLess <span class="kw">for </span>u32 {}
+<span class="kw">impl </span>ConstantTimeLess <span class="kw">for </span>u64 {}
+<span class="attribute">#[cfg(feature = <span class="string">&quot;i128&quot;</span>)]
+</span><span class="kw">impl </span>ConstantTimeLess <span class="kw">for </span>u128 {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="subtle" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="subtle" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

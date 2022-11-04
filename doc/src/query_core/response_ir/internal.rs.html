@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/response_ir/internal.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>internal.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/response_ir/internal.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>internal.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -603,610 +603,610 @@
 <span id="603">603</span>
 <span id="604">604</span>
 <span id="605">605</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CoreError</span>, <span class="ident">QueryResult</span>, <span class="ident">RecordAggregations</span>, <span class="ident">RecordSelection</span>};
-<span class="kw">use</span> <span class="ident">bigdecimal::ToPrimitive</span>;
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">AggregationResult</span>, <span class="ident">RelAggregationResult</span>, <span class="ident">RelAggregationRow</span>};
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">PrismaValue</span>, <span class="ident">SelectionResult</span>};
-<span class="kw">use</span> <span class="ident">schema</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">schema_builder::constants</span>::{<span class="ident">aggregations</span>::<span class="kw-2">*</span>, <span class="ident">output_fields</span>::<span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">collections::HashMap</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{CoreError, QueryResult, RecordAggregations, RecordSelection};
+<span class="kw">use </span>bigdecimal::ToPrimitive;
+<span class="kw">use </span>connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>prisma_models::{CompositeFieldRef, Field, PrismaValue, SelectionResult};
+<span class="kw">use </span>schema::<span class="kw-2">*</span>;
+<span class="kw">use </span>schema_builder::constants::{aggregations::<span class="kw-2">*</span>, output_fields::<span class="kw-2">*</span>};
+<span class="kw">use </span>std::{borrow::Borrow, collections::HashMap};
 
-<span class="doccomment">/// A grouping of items to their parent record.</span>
-<span class="doccomment">/// The item implicitly holds the information of the type of item contained.</span>
-<span class="doccomment">/// E.g., if the output type of a field designates a single object, the item will be</span>
-<span class="doccomment">/// Item::Map(map), if it&#39;s a list, Item::List(list), etc. (hence &quot;checked&quot;)</span>
-<span class="kw">type</span> <span class="ident">CheckedItemsWithParents</span> <span class="op">=</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>, <span class="ident">Item</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A grouping of items to their parent record.
+/// The item implicitly holds the information of the type of item contained.
+/// E.g., if the output type of a field designates a single object, the item will be
+/// Item::Map(map), if it&#39;s a list, Item::List(list), etc. (hence &quot;checked&quot;)
+</span><span class="kw">type </span>CheckedItemsWithParents = IndexMap&lt;<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;, Item&gt;;
 
-<span class="doccomment">/// A grouping of items to their parent record.</span>
-<span class="doccomment">/// As opposed to the checked mapping, this map isn&#39;t holding final information about</span>
-<span class="doccomment">/// the contained items, i.e. the Items are all unchecked.</span>
-<span class="kw">type</span> <span class="ident">UncheckedItemsWithParents</span> <span class="op">=</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A grouping of items to their parent record.
+/// As opposed to the checked mapping, this map isn&#39;t holding final information about
+/// the contained items, i.e. the Items are all unchecked.
+</span><span class="kw">type </span>UncheckedItemsWithParents = IndexMap&lt;<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;, Vec&lt;Item&gt;&gt;;
 
-<span class="doccomment">/// The query validation makes sure that the output selection already has the correct shape.</span>
-<span class="doccomment">/// This means that we can make the following assumptions:</span>
-<span class="doccomment">/// - Objects don&#39;t need to check required fields.</span>
-<span class="doccomment">/// - Objects don&#39;t need to check extra fields - just pick the selected ones and ignore the rest.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The output validation has to make sure that returned values:</span>
-<span class="doccomment">/// - Are of the correct type.</span>
-<span class="doccomment">/// - Are nullable if not present.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The is_list and is_optional flags dictate how object checks are done.</span>
-<span class="doccomment">/// // todo more here</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns a map of pairs of (parent ID, response)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_internal</span>(
-    <span class="ident">result</span>: <span class="ident">QueryResult</span>,
-    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>,
-    <span class="ident">is_list</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">CheckedItemsWithParents</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">result</span> {
-        <span class="ident">QueryResult::RecordSelection</span>(<span class="ident">rs</span>) =&gt; <span class="ident">serialize_record_selection</span>(<span class="kw-2">*</span><span class="ident">rs</span>, <span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">field_type</span>, <span class="ident">is_list</span>),
-        <span class="ident">QueryResult::RecordAggregations</span>(<span class="ident">ras</span>) =&gt; <span class="ident">serialize_aggregations</span>(<span class="ident">field</span>, <span class="ident">ras</span>),
-        <span class="ident">QueryResult::Count</span>(<span class="ident">c</span>) =&gt; {
-            <span class="comment">// Todo needs a real implementation or needs to move to RecordAggregation</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">Map</span> <span class="op">=</span> <span class="ident">IndexMap::with_capacity</span>(<span class="number">1</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">CheckedItemsWithParents::new</span>();
+<span class="doccomment">/// The query validation makes sure that the output selection already has the correct shape.
+/// This means that we can make the following assumptions:
+/// - Objects don&#39;t need to check required fields.
+/// - Objects don&#39;t need to check extra fields - just pick the selected ones and ignore the rest.
+///
+/// The output validation has to make sure that returned values:
+/// - Are of the correct type.
+/// - Are nullable if not present.
+///
+/// The is_list and is_optional flags dictate how object checks are done.
+/// // todo more here
+///
+/// Returns a map of pairs of (parent ID, response)
+</span><span class="kw">pub fn </span>serialize_internal(
+    result: QueryResult,
+    field: <span class="kw-2">&amp;</span>OutputFieldRef,
+    is_list: bool,
+) -&gt; <span class="kw">crate</span>::Result&lt;CheckedItemsWithParents&gt; {
+    <span class="kw">match </span>result {
+        QueryResult::RecordSelection(rs) =&gt; serialize_record_selection(<span class="kw-2">*</span>rs, field, <span class="kw-2">&amp;</span>field.field_type, is_list),
+        QueryResult::RecordAggregations(ras) =&gt; serialize_aggregations(field, ras),
+        QueryResult::Count(c) =&gt; {
+            <span class="comment">// Todo needs a real implementation or needs to move to RecordAggregation
+            </span><span class="kw">let </span><span class="kw-2">mut </span>map: Map = IndexMap::with_capacity(<span class="number">1</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>result = CheckedItemsWithParents::new();
 
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">AFFECTED_COUNT</span>.<span class="ident">into</span>(), <span class="ident">Item::Value</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">c</span> <span class="kw">as</span> <span class="ident">i64</span>)));
-            <span class="ident">result</span>.<span class="ident">insert</span>(<span class="prelude-val">None</span>, <span class="ident">Item::Map</span>(<span class="ident">map</span>));
+            map.insert(AFFECTED_COUNT.into(), Item::Value(PrismaValue::Int(c <span class="kw">as </span>i64)));
+            result.insert(<span class="prelude-val">None</span>, Item::Map(map));
 
-            <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+            <span class="prelude-val">Ok</span>(result)
         }
 
-        <span class="ident">QueryResult::Json</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
-        <span class="ident">QueryResult::Id</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
-        <span class="ident">QueryResult::Unit</span> =&gt; <span class="macro">unimplemented!</span>(),
+        QueryResult::Json(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
+        QueryResult::Id(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
+        QueryResult::Unit =&gt; <span class="macro">unimplemented!</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">serialize_aggregations</span>(
-    <span class="ident">output_field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>,
-    <span class="ident">record_aggregations</span>: <span class="ident">RecordAggregations</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">CheckedItemsWithParents</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">ordering</span> <span class="op">=</span> <span class="ident">record_aggregations</span>.<span class="ident">selection_order</span>;
-    <span class="kw">let</span> <span class="ident">aggregate_object_type</span> <span class="op">=</span> <span class="ident">extract_aggregate_object_type</span>(<span class="ident">output_field</span>.<span class="ident">field_type</span>.<span class="ident">borrow</span>());
+<span class="kw">fn </span>serialize_aggregations(
+    output_field: <span class="kw-2">&amp;</span>OutputFieldRef,
+    record_aggregations: RecordAggregations,
+) -&gt; <span class="kw">crate</span>::Result&lt;CheckedItemsWithParents&gt; {
+    <span class="kw">let </span>ordering = record_aggregations.selection_order;
+    <span class="kw">let </span>aggregate_object_type = extract_aggregate_object_type(output_field.field_type.borrow());
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>results = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">record_aggregations</span>.<span class="ident">results</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flattened</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="ident">ordering</span>.<span class="ident">len</span>());
+    <span class="kw">for </span>row <span class="kw">in </span>record_aggregations.results {
+        <span class="kw">let </span><span class="kw-2">mut </span>flattened = HashMap::with_capacity(ordering.len());
 
-        <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">row</span> {
-            <span class="kw">match</span> <span class="ident">result</span> {
-                <span class="ident">AggregationResult::Field</span>(<span class="ident">field</span>, <span class="ident">value</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">output_field</span> <span class="op">=</span> <span class="ident">aggregate_object_type</span>.<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>).<span class="ident">unwrap</span>();
-                    <span class="ident">flattened</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">serialize_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">output_field</span>, <span class="ident">value</span>)<span class="question-mark">?</span>);
+        <span class="kw">for </span>result <span class="kw">in </span>row {
+            <span class="kw">match </span>result {
+                AggregationResult::Field(field, value) =&gt; {
+                    <span class="kw">let </span>output_field = aggregate_object_type.find_field(<span class="kw-2">&amp;</span>field.name).unwrap();
+                    flattened.insert(field.name.clone(), serialize_scalar(<span class="kw-2">&amp;</span>output_field, value)<span class="question-mark">?</span>);
                 }
 
-                <span class="ident">AggregationResult::Count</span>(<span class="ident">field</span>, <span class="ident">count</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">field</span> {
-                        <span class="ident">flattened</span>.<span class="ident">insert</span>(<span class="macro">format!</span>(<span class="string">&quot;_count_{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">name</span>), <span class="ident">Item::Value</span>(<span class="ident">count</span>));
-                    } <span class="kw">else</span> {
-                        <span class="ident">flattened</span>.<span class="ident">insert</span>(<span class="string">&quot;_count__all&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">Item::Value</span>(<span class="ident">count</span>));
+                AggregationResult::Count(field, count) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(f) = field {
+                        flattened.insert(<span class="macro">format!</span>(<span class="string">&quot;_count_{}&quot;</span>, <span class="kw-2">&amp;</span>f.name), Item::Value(count));
+                    } <span class="kw">else </span>{
+                        flattened.insert(<span class="string">&quot;_count__all&quot;</span>.to_owned(), Item::Value(count));
                     }
                 }
 
-                <span class="ident">AggregationResult::Average</span>(<span class="ident">field</span>, <span class="ident">value</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">output_field</span> <span class="op">=</span>
-                        <span class="ident">find_nested_aggregate_output_field</span>(<span class="kw-2">&amp;</span><span class="ident">aggregate_object_type</span>, <span class="ident">UNDERSCORE_AVG</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>);
-                    <span class="ident">flattened</span>.<span class="ident">insert</span>(<span class="macro">format!</span>(<span class="string">&quot;_avg_{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>), <span class="ident">serialize_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">output_field</span>, <span class="ident">value</span>)<span class="question-mark">?</span>);
+                AggregationResult::Average(field, value) =&gt; {
+                    <span class="kw">let </span>output_field =
+                        find_nested_aggregate_output_field(<span class="kw-2">&amp;</span>aggregate_object_type, UNDERSCORE_AVG, <span class="kw-2">&amp;</span>field.name);
+                    flattened.insert(<span class="macro">format!</span>(<span class="string">&quot;_avg_{}&quot;</span>, <span class="kw-2">&amp;</span>field.name), serialize_scalar(<span class="kw-2">&amp;</span>output_field, value)<span class="question-mark">?</span>);
                 }
 
-                <span class="ident">AggregationResult::Sum</span>(<span class="ident">field</span>, <span class="ident">value</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">output_field</span> <span class="op">=</span>
-                        <span class="ident">find_nested_aggregate_output_field</span>(<span class="kw-2">&amp;</span><span class="ident">aggregate_object_type</span>, <span class="ident">UNDERSCORE_SUM</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>);
-                    <span class="ident">flattened</span>.<span class="ident">insert</span>(<span class="macro">format!</span>(<span class="string">&quot;_sum_{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>), <span class="ident">serialize_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">output_field</span>, <span class="ident">value</span>)<span class="question-mark">?</span>);
+                AggregationResult::Sum(field, value) =&gt; {
+                    <span class="kw">let </span>output_field =
+                        find_nested_aggregate_output_field(<span class="kw-2">&amp;</span>aggregate_object_type, UNDERSCORE_SUM, <span class="kw-2">&amp;</span>field.name);
+                    flattened.insert(<span class="macro">format!</span>(<span class="string">&quot;_sum_{}&quot;</span>, <span class="kw-2">&amp;</span>field.name), serialize_scalar(<span class="kw-2">&amp;</span>output_field, value)<span class="question-mark">?</span>);
                 }
 
-                <span class="ident">AggregationResult::Min</span>(<span class="ident">field</span>, <span class="ident">value</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">output_field</span> <span class="op">=</span>
-                        <span class="ident">find_nested_aggregate_output_field</span>(<span class="kw-2">&amp;</span><span class="ident">aggregate_object_type</span>, <span class="ident">UNDERSCORE_MIN</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>);
-                    <span class="ident">flattened</span>.<span class="ident">insert</span>(
-                        <span class="macro">format!</span>(<span class="string">&quot;_min_{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>),
-                        <span class="ident">serialize_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">output_field</span>, <span class="ident">coerce_non_numeric</span>(<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">output_field</span>.<span class="ident">field_type</span>))<span class="question-mark">?</span>,
+                AggregationResult::Min(field, value) =&gt; {
+                    <span class="kw">let </span>output_field =
+                        find_nested_aggregate_output_field(<span class="kw-2">&amp;</span>aggregate_object_type, UNDERSCORE_MIN, <span class="kw-2">&amp;</span>field.name);
+                    flattened.insert(
+                        <span class="macro">format!</span>(<span class="string">&quot;_min_{}&quot;</span>, <span class="kw-2">&amp;</span>field.name),
+                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, coerce_non_numeric(value, <span class="kw-2">&amp;</span>output_field.field_type))<span class="question-mark">?</span>,
                     );
                 }
 
-                <span class="ident">AggregationResult::Max</span>(<span class="ident">field</span>, <span class="ident">value</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">output_field</span> <span class="op">=</span>
-                        <span class="ident">find_nested_aggregate_output_field</span>(<span class="kw-2">&amp;</span><span class="ident">aggregate_object_type</span>, <span class="ident">UNDERSCORE_MAX</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>);
-                    <span class="ident">flattened</span>.<span class="ident">insert</span>(
-                        <span class="macro">format!</span>(<span class="string">&quot;_max_{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>),
-                        <span class="ident">serialize_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">output_field</span>, <span class="ident">coerce_non_numeric</span>(<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">output_field</span>.<span class="ident">field_type</span>))<span class="question-mark">?</span>,
+                AggregationResult::Max(field, value) =&gt; {
+                    <span class="kw">let </span>output_field =
+                        find_nested_aggregate_output_field(<span class="kw-2">&amp;</span>aggregate_object_type, UNDERSCORE_MAX, <span class="kw-2">&amp;</span>field.name);
+                    flattened.insert(
+                        <span class="macro">format!</span>(<span class="string">&quot;_max_{}&quot;</span>, <span class="kw-2">&amp;</span>field.name),
+                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, coerce_non_numeric(value, <span class="kw-2">&amp;</span>output_field.field_type))<span class="question-mark">?</span>,
                     );
                 }
             }
         }
 
-        <span class="comment">// Reorder fields based on the original query selection.</span>
-        <span class="comment">// Temporary: The original selection may be done with _ or no underscore (deprecated).</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner_map</span>: <span class="ident">Map</span> <span class="op">=</span> <span class="ident">IndexMap::with_capacity</span>(<span class="ident">ordering</span>.<span class="ident">len</span>());
-        <span class="kw">for</span> (<span class="ident">query</span>, <span class="ident">field_order</span>) <span class="kw">in</span> <span class="ident">ordering</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">order</span>) <span class="op">=</span> <span class="ident">field_order</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nested_map</span> <span class="op">=</span> <span class="ident">Map::new</span>();
+        <span class="comment">// Reorder fields based on the original query selection.
+        // Temporary: The original selection may be done with _ or no underscore (deprecated).
+        </span><span class="kw">let </span><span class="kw-2">mut </span>inner_map: Map = IndexMap::with_capacity(ordering.len());
+        <span class="kw">for </span>(query, field_order) <span class="kw">in </span>ordering.iter() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(order) = field_order {
+                <span class="kw">let </span><span class="kw-2">mut </span>nested_map = Map::new();
 
-                <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">order</span> {
-                    <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">flattened</span>
-                        .<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">query</span>, <span class="ident">field</span>))
-                        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">flattened</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;_{}_{}&quot;</span>, <span class="ident">query</span>, <span class="ident">field</span>)))
-                        .<span class="ident">unwrap</span>();
+                <span class="kw">for </span>field <span class="kw">in </span>order {
+                    <span class="kw">let </span>item = flattened
+                        .remove(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, query, field))
+                        .or_else(|| flattened.remove(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;_{}_{}&quot;</span>, query, field)))
+                        .unwrap();
 
-                    <span class="ident">nested_map</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">item</span>);
+                    nested_map.insert(field.clone(), item);
                 }
 
-                <span class="ident">inner_map</span>.<span class="ident">insert</span>(<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">Item::Map</span>(<span class="ident">nested_map</span>));
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">flattened</span>
-                    .<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">clone</span>())
-                    .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">flattened</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="ident">query</span>)))
-                    .<span class="ident">unwrap</span>();
+                inner_map.insert(query.clone(), Item::Map(nested_map));
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>item = flattened
+                    .remove(<span class="kw-2">&amp;</span>query.clone())
+                    .or_else(|| flattened.remove(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, query)))
+                    .unwrap();
 
-                <span class="ident">inner_map</span>.<span class="ident">insert</span>(<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">item</span>);
+                inner_map.insert(query.clone(), item);
             }
         }
 
-        <span class="ident">results</span>.<span class="ident">push</span>(<span class="ident">Item::Map</span>(<span class="ident">inner_map</span>));
+        results.push(Item::Map(inner_map));
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">envelope</span> <span class="op">=</span> <span class="ident">CheckedItemsWithParents::new</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>envelope = CheckedItemsWithParents::new();
 
-    <span class="kw">match</span> <span class="ident">output_field</span>.<span class="ident">field_type</span>.<span class="ident">borrow</span>() {
-        <span class="ident">OutputType::List</span>(<span class="kw">_</span>) =&gt; {
-            <span class="ident">envelope</span>.<span class="ident">insert</span>(<span class="prelude-val">None</span>, <span class="ident">Item::List</span>(<span class="ident">results</span>.<span class="ident">into</span>()));
+    <span class="kw">match </span>output_field.field_type.borrow() {
+        OutputType::List(<span class="kw">_</span>) =&gt; {
+            envelope.insert(<span class="prelude-val">None</span>, Item::List(results.into()));
         }
-        <span class="ident">OutputType::Object</span>(<span class="kw">_</span>) =&gt; {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span> <span class="ident">results</span>.<span class="ident">pop</span>() {
-                <span class="ident">envelope</span>.<span class="ident">insert</span>(<span class="prelude-val">None</span>, <span class="ident">item</span>);
+        OutputType::Object(<span class="kw">_</span>) =&gt; {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(item) = results.pop() {
+                envelope.insert(<span class="prelude-val">None</span>, item);
             };
         }
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     };
 
-    <span class="prelude-val">Ok</span>(<span class="ident">envelope</span>)
+    <span class="prelude-val">Ok</span>(envelope)
 }
 
-<span class="kw">fn</span> <span class="ident">write_rel_aggregation_row</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">RelAggregationRow</span>, <span class="ident">map</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Item</span><span class="op">&gt;</span>) {
-    <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">row</span>.<span class="ident">iter</span>() {
-        <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="ident">RelAggregationResult::Count</span>(<span class="ident">rf</span>, <span class="ident">count</span>) =&gt; <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="ident">UNDERSCORE_COUNT</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">item</span>) =&gt; <span class="kw">match</span> <span class="ident">item</span> {
-                    <span class="ident">Item::Map</span>(<span class="ident">inner_map</span>) =&gt; <span class="ident">inner_map</span>.<span class="ident">insert</span>(<span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">Item::Value</span>(<span class="ident">count</span>.<span class="ident">clone</span>())),
-                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+<span class="kw">fn </span>write_rel_aggregation_row(row: <span class="kw-2">&amp;</span>RelAggregationRow, map: <span class="kw-2">&amp;mut </span>HashMap&lt;String, Item&gt;) {
+    <span class="kw">for </span>result <span class="kw">in </span>row.iter() {
+        <span class="kw">match </span>result {
+            RelAggregationResult::Count(rf, count) =&gt; <span class="kw">match </span>map.get_mut(UNDERSCORE_COUNT) {
+                <span class="prelude-val">Some</span>(item) =&gt; <span class="kw">match </span>item {
+                    Item::Map(inner_map) =&gt; inner_map.insert(rf.name.clone(), Item::Value(count.clone())),
+                    <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                 },
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner_map</span>: <span class="ident">Map</span> <span class="op">=</span> <span class="ident">Map::new</span>();
-                    <span class="ident">inner_map</span>.<span class="ident">insert</span>(<span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">Item::Value</span>(<span class="ident">count</span>.<span class="ident">clone</span>()));
-                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">UNDERSCORE_COUNT</span>.<span class="ident">to_owned</span>(), <span class="ident">Item::Map</span>(<span class="ident">inner_map</span>))
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>inner_map: Map = Map::new();
+                    inner_map.insert(rf.name.clone(), Item::Value(count.clone()));
+                    map.insert(UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
                 }
             },
         };
     }
 }
 
-<span class="kw">fn</span> <span class="ident">extract_aggregate_object_type</span>(<span class="ident">output_type</span>: <span class="kw-2">&amp;</span><span class="ident">OutputType</span>) -&gt; <span class="ident">ObjectTypeStrongRef</span> {
-    <span class="kw">match</span> <span class="ident">output_type</span> {
-        <span class="ident">OutputType::Object</span>(<span class="ident">obj</span>) =&gt; <span class="ident">obj</span>.<span class="ident">into_arc</span>(),
-        <span class="ident">OutputType::List</span>(<span class="ident">inner</span>) =&gt; <span class="ident">extract_aggregate_object_type</span>(<span class="ident">inner</span>),
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Aggregate output must be a list or an object.&quot;</span>),
+<span class="kw">fn </span>extract_aggregate_object_type(output_type: <span class="kw-2">&amp;</span>OutputType) -&gt; ObjectTypeStrongRef {
+    <span class="kw">match </span>output_type {
+        OutputType::Object(obj) =&gt; obj.into_arc(),
+        OutputType::List(inner) =&gt; extract_aggregate_object_type(inner),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Aggregate output must be a list or an object.&quot;</span>),
     }
 }
 
-<span class="comment">// Workaround until we streamline serialization.</span>
-<span class="kw">fn</span> <span class="ident">find_nested_aggregate_output_field</span>(
-    <span class="ident">object_type</span>: <span class="kw-2">&amp;</span><span class="ident">ObjectTypeStrongRef</span>,
-    <span class="ident">nested_obj_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">nested_field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-) -&gt; <span class="ident">OutputFieldRef</span> {
-    <span class="kw">let</span> <span class="ident">nested_field</span> <span class="op">=</span> <span class="ident">object_type</span>.<span class="ident">find_field</span>(<span class="ident">nested_obj_name</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">nested_object_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">nested_field</span>.<span class="ident">field_type</span>.<span class="ident">borrow</span>() {
-        <span class="ident">OutputType::Object</span>(<span class="ident">obj</span>) =&gt; <span class="ident">obj</span>.<span class="ident">into_arc</span>(),
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{} output must be an object.&quot;</span>, <span class="ident">nested_obj_name</span>),
+<span class="comment">// Workaround until we streamline serialization.
+</span><span class="kw">fn </span>find_nested_aggregate_output_field(
+    object_type: <span class="kw-2">&amp;</span>ObjectTypeStrongRef,
+    nested_obj_name: <span class="kw-2">&amp;</span>str,
+    nested_field_name: <span class="kw-2">&amp;</span>str,
+) -&gt; OutputFieldRef {
+    <span class="kw">let </span>nested_field = object_type.find_field(nested_obj_name).unwrap();
+    <span class="kw">let </span>nested_object_type = <span class="kw">match </span>nested_field.field_type.borrow() {
+        OutputType::Object(obj) =&gt; obj.into_arc(),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{} output must be an object.&quot;</span>, nested_obj_name),
     };
 
-    <span class="ident">nested_object_type</span>.<span class="ident">find_field</span>(<span class="ident">nested_field_name</span>).<span class="ident">unwrap</span>()
+    nested_object_type.find_field(nested_field_name).unwrap()
 }
 
-<span class="kw">fn</span> <span class="ident">coerce_non_numeric</span>(<span class="ident">value</span>: <span class="ident">PrismaValue</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">OutputType</span>) -&gt; <span class="ident">PrismaValue</span> {
-    <span class="kw">match</span> (<span class="ident">value</span>, <span class="ident">output</span>.<span class="ident">borrow</span>()) {
-        (<span class="ident">PrismaValue::Int</span>(<span class="ident">x</span>), <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::String</span>)) <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">PrismaValue::Null</span>,
-        (<span class="ident">x</span>, <span class="kw">_</span>) =&gt; <span class="ident">x</span>,
+<span class="kw">fn </span>coerce_non_numeric(value: PrismaValue, output: <span class="kw-2">&amp;</span>OutputType) -&gt; PrismaValue {
+    <span class="kw">match </span>(value, output.borrow()) {
+        (PrismaValue::Int(x), OutputType::Scalar(ScalarType::String)) <span class="kw">if </span>x == <span class="number">0 </span>=&gt; PrismaValue::Null,
+        (x, <span class="kw">_</span>) =&gt; x,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">serialize_record_selection</span>(
-    <span class="ident">record_selection</span>: <span class="ident">RecordSelection</span>,
-    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>,
-    <span class="ident">typ</span>: <span class="kw-2">&amp;</span><span class="ident">OutputTypeRef</span>, <span class="comment">// We additionally pass the type to allow recursing into nested type definitions of a field.</span>
-    <span class="ident">is_list</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">CheckedItemsWithParents</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">record_selection</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
+<span class="kw">fn </span>serialize_record_selection(
+    record_selection: RecordSelection,
+    field: <span class="kw-2">&amp;</span>OutputFieldRef,
+    typ: <span class="kw-2">&amp;</span>OutputTypeRef, <span class="comment">// We additionally pass the type to allow recursing into nested type definitions of a field.
+    </span>is_list: bool,
+) -&gt; <span class="kw">crate</span>::Result&lt;CheckedItemsWithParents&gt; {
+    <span class="kw">let </span>name = record_selection.name.clone();
 
-    <span class="kw">match</span> <span class="ident">typ</span>.<span class="ident">borrow</span>() {
-        <span class="ident">OutputType::List</span>(<span class="ident">inner</span>) =&gt; <span class="ident">serialize_record_selection</span>(<span class="ident">record_selection</span>, <span class="ident">field</span>, <span class="ident">inner</span>, <span class="bool-val">true</span>),
-        <span class="ident">OutputType::Object</span>(<span class="ident">obj</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">serialize_objects</span>(<span class="ident">record_selection</span>, <span class="ident">obj</span>.<span class="ident">into_arc</span>())<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">is_optional</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">is_nullable</span>;
+    <span class="kw">match </span>typ.borrow() {
+        OutputType::List(inner) =&gt; serialize_record_selection(record_selection, field, inner, <span class="bool-val">true</span>),
+        OutputType::Object(obj) =&gt; {
+            <span class="kw">let </span>result = serialize_objects(record_selection, obj.into_arc())<span class="question-mark">?</span>;
+            <span class="kw">let </span>is_optional = field.is_nullable;
 
-            <span class="comment">// Items will be ref&#39;ed on the top level to allow cheap clones in nested scenarios.</span>
-            <span class="kw">match</span> (<span class="ident">is_list</span>, <span class="ident">is_optional</span>) {
-                <span class="comment">// List(Opt(_)) | List(_)</span>
-                (<span class="bool-val">true</span>, <span class="ident">opt</span>) =&gt; {
-                    <span class="ident">result</span>
-                        .<span class="ident">into_iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">parent</span>, <span class="ident">items</span>)<span class="op">|</span> {
-                            <span class="kw">if</span> <span class="op">!</span><span class="ident">opt</span> {
-                                <span class="comment">// Check that all items are non-null</span>
-                                <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">item</span>, <span class="ident">Item::Value</span>(<span class="ident">PrismaValue::Null</span>))) {
-                                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">CoreError::null_serialization_error</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>));
+            <span class="comment">// Items will be ref&#39;ed on the top level to allow cheap clones in nested scenarios.
+            </span><span class="kw">match </span>(is_list, is_optional) {
+                <span class="comment">// List(Opt(_)) | List(_)
+                </span>(<span class="bool-val">true</span>, opt) =&gt; {
+                    result
+                        .into_iter()
+                        .map(|(parent, items)| {
+                            <span class="kw">if </span>!opt {
+                                <span class="comment">// Check that all items are non-null
+                                </span><span class="kw">if </span>items.iter().any(|item| <span class="macro">matches!</span>(item, Item::Value(PrismaValue::Null))) {
+                                    <span class="kw">return </span><span class="prelude-val">Err</span>(CoreError::null_serialization_error(<span class="kw-2">&amp;</span>name));
                                 }
                             }
 
-                            <span class="prelude-val">Ok</span>((<span class="ident">parent</span>, <span class="ident">Item::Ref</span>(<span class="ident">ItemRef::new</span>(<span class="ident">Item::list</span>(<span class="ident">items</span>)))))
+                            <span class="prelude-val">Ok</span>((parent, Item::Ref(ItemRef::new(Item::list(items)))))
                         })
-                        .<span class="ident">collect</span>()
+                        .collect()
                 }
 
-                <span class="comment">// Opt(_)</span>
-                (<span class="bool-val">false</span>, <span class="ident">opt</span>) =&gt; {
-                    <span class="ident">result</span>
-                        .<span class="ident">into_iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">parent</span>, <span class="kw-2">mut</span> <span class="ident">items</span>)<span class="op">|</span> {
-                            <span class="comment">// As it&#39;s not a list, we require a single result</span>
-                            <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-                                <span class="ident">items</span>.<span class="ident">reverse</span>();
-                                <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
+                <span class="comment">// Opt(_)
+                </span>(<span class="bool-val">false</span>, opt) =&gt; {
+                    result
+                        .into_iter()
+                        .map(|(parent, <span class="kw-2">mut </span>items)| {
+                            <span class="comment">// As it&#39;s not a list, we require a single result
+                            </span><span class="kw">if </span>items.len() &gt; <span class="number">1 </span>{
+                                items.reverse();
+                                <span class="kw">let </span>first = items.pop().unwrap();
 
-                                <span class="comment">// Simple return the first record in the list.</span>
-                                <span class="prelude-val">Ok</span>((<span class="ident">parent</span>, <span class="ident">Item::Ref</span>(<span class="ident">ItemRef::new</span>(<span class="ident">first</span>))))
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">opt</span> {
-                                <span class="prelude-val">Ok</span>((<span class="ident">parent</span>, <span class="ident">Item::Ref</span>(<span class="ident">ItemRef::new</span>(<span class="ident">Item::Value</span>(<span class="ident">PrismaValue::Null</span>)))))
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">opt</span> {
-                                <span class="prelude-val">Err</span>(<span class="ident">CoreError::null_serialization_error</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>))
-                            } <span class="kw">else</span> {
-                                <span class="prelude-val">Ok</span>((<span class="ident">parent</span>, <span class="ident">Item::Ref</span>(<span class="ident">ItemRef::new</span>(<span class="ident">items</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>()))))
+                                <span class="comment">// Simple return the first record in the list.
+                                </span><span class="prelude-val">Ok</span>((parent, Item::Ref(ItemRef::new(first))))
+                            } <span class="kw">else if </span>items.is_empty() &amp;&amp; opt {
+                                <span class="prelude-val">Ok</span>((parent, Item::Ref(ItemRef::new(Item::Value(PrismaValue::Null)))))
+                            } <span class="kw">else if </span>items.is_empty() &amp;&amp; opt {
+                                <span class="prelude-val">Err</span>(CoreError::null_serialization_error(<span class="kw-2">&amp;</span>name))
+                            } <span class="kw">else </span>{
+                                <span class="prelude-val">Ok</span>((parent, Item::Ref(ItemRef::new(items.pop().unwrap()))))
                             }
                         })
-                        .<span class="ident">collect</span>()
+                        .collect()
                 }
             }
         }
 
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// We always serialize record selections into objects or lists on the top levels. Scalars and enums are handled separately.</span>
-    }
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(), <span class="comment">// We always serialize record selections into objects or lists on the top levels. Scalars and enums are handled separately.
+    </span>}
 }
 
-<span class="doccomment">/// Serializes the given result into objects of given type.</span>
-<span class="doccomment">/// Doesn&#39;t validate the shape of the result set (&quot;unchecked&quot; result).</span>
-<span class="doccomment">/// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.</span>
-<span class="kw">fn</span> <span class="ident">serialize_objects</span>(
-    <span class="kw-2">mut</span> <span class="ident">result</span>: <span class="ident">RecordSelection</span>,
-    <span class="ident">typ</span>: <span class="ident">ObjectTypeStrongRef</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">UncheckedItemsWithParents</span><span class="op">&gt;</span> {
-    <span class="comment">// The way our query execution works, we only need to look at nested + lists if we hit an object.</span>
-    <span class="comment">// Move nested out of result for separate processing.</span>
-    <span class="kw">let</span> <span class="ident">nested</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>.<span class="ident">nested</span>);
+<span class="doccomment">/// Serializes the given result into objects of given type.
+/// Doesn&#39;t validate the shape of the result set (&quot;unchecked&quot; result).
+/// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.
+</span><span class="kw">fn </span>serialize_objects(
+    <span class="kw-2">mut </span>result: RecordSelection,
+    typ: ObjectTypeStrongRef,
+) -&gt; <span class="kw">crate</span>::Result&lt;UncheckedItemsWithParents&gt; {
+    <span class="comment">// The way our query execution works, we only need to look at nested + lists if we hit an object.
+    // Move nested out of result for separate processing.
+    </span><span class="kw">let </span>nested = std::mem::take(<span class="kw-2">&amp;mut </span>result.nested);
 
-    <span class="comment">// { &lt;nested field name&gt; -&gt; { parent ID -&gt; items } }</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nested_mapping</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CheckedItemsWithParents</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">process_nested_results</span>(<span class="ident">nested</span>, <span class="kw-2">&amp;</span><span class="ident">typ</span>)<span class="question-mark">?</span>;
+    <span class="comment">// { &lt;nested field name&gt; -&gt; { parent ID -&gt; items } }
+    </span><span class="kw">let </span><span class="kw-2">mut </span>nested_mapping: HashMap&lt;String, CheckedItemsWithParents&gt; = process_nested_results(nested, <span class="kw-2">&amp;</span>typ)<span class="question-mark">?</span>;
 
-    <span class="comment">// We need the Arcs to solve the issue where we have multiple parents claiming the same data (we want to move the data out of the nested structure</span>
-    <span class="comment">// to prevent expensive copying during serialization).</span>
+    <span class="comment">// We need the Arcs to solve the issue where we have multiple parents claiming the same data (we want to move the data out of the nested structure
+    // to prevent expensive copying during serialization).
 
-    <span class="comment">// Finally, serialize the objects based on the selected fields.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">object_mapping</span> <span class="op">=</span> <span class="ident">UncheckedItemsWithParents::with_capacity</span>(<span class="ident">result</span>.<span class="ident">scalars</span>.<span class="ident">records</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> <span class="ident">db_field_names</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">scalars</span>.<span class="ident">field_names</span>;
-    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">model</span>;
+    // Finally, serialize the objects based on the selected fields.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>object_mapping = UncheckedItemsWithParents::with_capacity(result.scalars.records.len());
+    <span class="kw">let </span>db_field_names = result.scalars.field_names;
+    <span class="kw">let </span>model = result.model;
 
-    <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db_field_names</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_non_virtual_by_db_name</span>(<span class="ident">f</span>).<span class="ident">ok</span>())
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = db_field_names
+        .iter()
+        .filter_map(|f| model.fields().find_from_non_virtual_by_db_name(f).ok())
+        .collect();
 
-    <span class="comment">// Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.</span>
-    <span class="comment">// If nothing is written to the object, write null instead.</span>
-    <span class="kw">for</span> (<span class="ident">r_index</span>, <span class="ident">record</span>) <span class="kw">in</span> <span class="ident">result</span>.<span class="ident">scalars</span>.<span class="ident">records</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">let</span> <span class="ident">record_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">record</span>.<span class="ident">extract_selection_result</span>(<span class="kw-2">&amp;</span><span class="ident">db_field_names</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_identifier</span>())<span class="question-mark">?</span>);
+    <span class="comment">// Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
+    // If nothing is written to the object, write null instead.
+    </span><span class="kw">for </span>(r_index, record) <span class="kw">in </span>result.scalars.records.into_iter().enumerate() {
+        <span class="kw">let </span>record_id = <span class="prelude-val">Some</span>(record.extract_selection_result(<span class="kw-2">&amp;</span>db_field_names, <span class="kw-2">&amp;</span>model.primary_identifier())<span class="question-mark">?</span>);
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">object_mapping</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">record</span>.<span class="ident">parent_id</span>) {
-            <span class="ident">object_mapping</span>.<span class="ident">insert</span>(<span class="ident">record</span>.<span class="ident">parent_id</span>.<span class="ident">clone</span>(), <span class="ident">Vec::new</span>());
+        <span class="kw">if </span>!object_mapping.contains_key(<span class="kw-2">&amp;</span>record.parent_id) {
+            object_mapping.insert(record.parent_id.clone(), Vec::new());
         }
 
-        <span class="comment">// Write scalars and composites, but skip objects (relations) and scalar lists, which while they are in the selection, are handled separately.</span>
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">values</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">object</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="ident">values</span>.<span class="ident">len</span>());
+        <span class="comment">// Write scalars and composites, but skip objects (relations) and scalar lists, which while they are in the selection, are handled separately.
+        </span><span class="kw">let </span>values = record.values;
+        <span class="kw">let </span><span class="kw-2">mut </span>object = HashMap::with_capacity(values.len());
 
-        <span class="kw">for</span> (<span class="ident">val</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">fields</span>.<span class="ident">iter</span>()) {
-            <span class="kw">let</span> <span class="ident">out_field</span> <span class="op">=</span> <span class="ident">typ</span>.<span class="ident">find_field</span>(<span class="ident">field</span>.<span class="ident">name</span>()).<span class="ident">unwrap</span>();
+        <span class="kw">for </span>(val, field) <span class="kw">in </span>values.into_iter().zip(fields.iter()) {
+            <span class="kw">let </span>out_field = typ.find_field(field.name()).unwrap();
 
-            <span class="kw">match</span> <span class="ident">field</span> {
-                <span class="ident">Field::Composite</span>(<span class="ident">cf</span>) =&gt; {
-                    <span class="ident">object</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(), <span class="ident">serialize_composite</span>(<span class="ident">cf</span>, <span class="kw-2">&amp;</span><span class="ident">out_field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>);
+            <span class="kw">match </span>field {
+                Field::Composite(cf) =&gt; {
+                    object.insert(field.name().to_owned(), serialize_composite(cf, <span class="kw-2">&amp;</span>out_field, val)<span class="question-mark">?</span>);
                 }
 
-                <span class="kw">_</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">out_field</span>.<span class="ident">field_type</span>.<span class="ident">is_object</span>() =&gt; {
-                    <span class="ident">object</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(), <span class="ident">serialize_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">out_field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>);
+                <span class="kw">_ if </span>!out_field.field_type.is_object() =&gt; {
+                    object.insert(field.name().to_owned(), serialize_scalar(<span class="kw-2">&amp;</span>out_field, val)<span class="question-mark">?</span>);
                 }
 
-                <span class="kw">_</span> =&gt; (),
+                <span class="kw">_ </span>=&gt; (),
             }
         }
 
-        <span class="comment">// Write nested results</span>
-        <span class="ident">write_nested_items</span>(<span class="kw-2">&amp;</span><span class="ident">record_id</span>, <span class="kw-2">&amp;mut</span> <span class="ident">nested_mapping</span>, <span class="kw-2">&amp;mut</span> <span class="ident">object</span>, <span class="kw-2">&amp;</span><span class="ident">typ</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Write nested results
+        </span>write_nested_items(<span class="kw-2">&amp;</span>record_id, <span class="kw-2">&amp;mut </span>nested_mapping, <span class="kw-2">&amp;mut </span>object, <span class="kw-2">&amp;</span>typ)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">aggr_row</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">aggregation_rows</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">rows</span><span class="op">|</span> <span class="ident">rows</span>.<span class="ident">get</span>(<span class="ident">r_index</span>).<span class="ident">unwrap</span>());
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">aggr_row</span>) <span class="op">=</span> <span class="ident">aggr_row</span> {
-            <span class="ident">write_rel_aggregation_row</span>(<span class="ident">aggr_row</span>, <span class="kw-2">&amp;mut</span> <span class="ident">object</span>);
+        <span class="kw">let </span>aggr_row = result.aggregation_rows.as_ref().map(|rows| rows.get(r_index).unwrap());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(aggr_row) = aggr_row {
+            write_rel_aggregation_row(aggr_row, <span class="kw-2">&amp;mut </span>object);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aggr_fields</span> <span class="op">=</span> <span class="ident">aggr_row</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> {
-                <span class="ident">row</span>.<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">aggr_result</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">aggr_result</span> {
-                        <span class="ident">RelAggregationResult::Count</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">UNDERSCORE_COUNT</span>.<span class="ident">to_owned</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>aggr_fields = aggr_row
+            .map(|row| {
+                row.iter()
+                    .map(|aggr_result| <span class="kw">match </span>aggr_result {
+                        RelAggregationResult::Count(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; UNDERSCORE_COUNT.to_owned(),
                     })
-                    .<span class="ident">unique</span>()
-                    .<span class="ident">collect</span>()
+                    .unique()
+                    .collect()
             })
-            .<span class="ident">unwrap_or</span>(<span class="macro">vec!</span>[]);
+            .unwrap_or(<span class="macro">vec!</span>[]);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">all_fields</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">fields</span>.<span class="ident">clone</span>();
-        <span class="ident">all_fields</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">aggr_fields</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>all_fields = result.fields.clone();
+        all_fields.append(<span class="kw-2">&amp;mut </span>aggr_fields);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">all_fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">fold</span>(<span class="ident">Map::with_capacity</span>(<span class="ident">all_fields</span>.<span class="ident">len</span>()), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">field_name</span><span class="op">|</span> {
-                <span class="ident">acc</span>.<span class="ident">insert</span>(<span class="ident">field_name</span>.<span class="ident">to_owned</span>(), <span class="ident">object</span>.<span class="ident">remove</span>(<span class="ident">field_name</span>).<span class="ident">unwrap</span>());
-                <span class="ident">acc</span>
+        <span class="kw">let </span>map = all_fields
+            .iter()
+            .fold(Map::with_capacity(all_fields.len()), |<span class="kw-2">mut </span>acc, field_name| {
+                acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
+                acc
             });
 
-        <span class="comment">// TODO: Find out how to easily determine when a result is null.</span>
-        <span class="comment">// If the object is null or completely empty, coerce into null instead.</span>
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Item::Map</span>(<span class="ident">map</span>);
-        <span class="comment">// let result = if result.is_null_or_empty() {</span>
-        <span class="comment">//     Item::Value(PrismaValue::Null)</span>
-        <span class="comment">// } else {</span>
-        <span class="comment">//     result</span>
-        <span class="comment">// };</span>
+        <span class="comment">// TODO: Find out how to easily determine when a result is null.
+        // If the object is null or completely empty, coerce into null instead.
+        </span><span class="kw">let </span>result = Item::Map(map);
+        <span class="comment">// let result = if result.is_null_or_empty() {
+        //     Item::Value(PrismaValue::Null)
+        // } else {
+        //     result
+        // };
 
-        <span class="ident">object_mapping</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">record</span>.<span class="ident">parent_id</span>).<span class="ident">unwrap</span>().<span class="ident">push</span>(<span class="ident">result</span>);
+        </span>object_mapping.get_mut(<span class="kw-2">&amp;</span>record.parent_id).unwrap().push(result);
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">object_mapping</span>)
+    <span class="prelude-val">Ok</span>(object_mapping)
 }
 
-<span class="doccomment">/// Unwraps are safe due to query validation.</span>
-<span class="kw">fn</span> <span class="ident">write_nested_items</span>(
-    <span class="ident">record_id</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
-    <span class="ident">items_with_parent</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CheckedItemsWithParents</span><span class="op">&gt;</span>,
-    <span class="ident">into</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Item</span><span class="op">&gt;</span>,
-    <span class="ident">enclosing_type</span>: <span class="kw-2">&amp;</span><span class="ident">ObjectTypeStrongRef</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">for</span> (<span class="ident">field_name</span>, <span class="ident">inner</span>) <span class="kw">in</span> <span class="ident">items_with_parent</span>.<span class="ident">iter_mut</span>() {
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">get</span>(<span class="ident">record_id</span>);
+<span class="doccomment">/// Unwraps are safe due to query validation.
+</span><span class="kw">fn </span>write_nested_items(
+    record_id: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SelectionResult&gt;,
+    items_with_parent: <span class="kw-2">&amp;mut </span>HashMap&lt;String, CheckedItemsWithParents&gt;,
+    into: <span class="kw-2">&amp;mut </span>HashMap&lt;String, Item&gt;,
+    enclosing_type: <span class="kw-2">&amp;</span>ObjectTypeStrongRef,
+) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    <span class="kw">for </span>(field_name, inner) <span class="kw">in </span>items_with_parent.iter_mut() {
+        <span class="kw">let </span>val = inner.get(record_id);
 
-        <span class="comment">// The value must be a reference (or None - handle default), everything else is an error in the serialization logic.</span>
-        <span class="kw">match</span> <span class="ident">val</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">Item::Ref</span>(<span class="kw-2">ref</span> <span class="ident">r</span>)) =&gt; {
-                <span class="ident">into</span>.<span class="ident">insert</span>(<span class="ident">field_name</span>.<span class="ident">to_owned</span>(), <span class="ident">Item::Ref</span>(<span class="ident">ItemRef::clone</span>(<span class="ident">r</span>)));
+        <span class="comment">// The value must be a reference (or None - handle default), everything else is an error in the serialization logic.
+        </span><span class="kw">match </span>val {
+            <span class="prelude-val">Some</span>(Item::Ref(<span class="kw-2">ref </span>r)) =&gt; {
+                into.insert(field_name.to_owned(), Item::Ref(ItemRef::clone(r)));
             }
 
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">enclosing_type</span>.<span class="ident">find_field</span>(<span class="ident">field_name</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">field_type</span>.<span class="ident">borrow</span>() {
-                    <span class="ident">OutputType::List</span>(<span class="kw">_</span>) =&gt; <span class="ident">Item::list</span>(<span class="ident">Vec::new</span>()),
-                    <span class="kw">_</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_nullable</span> =&gt; <span class="ident">Item::Value</span>(<span class="ident">PrismaValue::Null</span>),
-                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">CoreError::null_serialization_error</span>(<span class="ident">field_name</span>)),
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">let </span>field = enclosing_type.find_field(field_name).unwrap();
+                <span class="kw">let </span>default = <span class="kw">match </span>field.field_type.borrow() {
+                    OutputType::List(<span class="kw">_</span>) =&gt; Item::list(Vec::new()),
+                    <span class="kw">_ if </span>field.is_nullable =&gt; Item::Value(PrismaValue::Null),
+                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(CoreError::null_serialization_error(field_name)),
                 };
 
-                <span class="ident">into</span>.<span class="ident">insert</span>(<span class="ident">field_name</span>.<span class="ident">to_owned</span>(), <span class="ident">Item::Ref</span>(<span class="ident">ItemRef::new</span>(<span class="ident">default</span>)));
+                into.insert(field_name.to_owned(), Item::Ref(ItemRef::new(default)));
             }
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invariant error: Nested items have to be wrapped as a Item::Ref.&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invariant error: Nested items have to be wrapped as a Item::Ref.&quot;</span>),
         };
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Processes nested results into a more ergonomic structure of { &lt;nested field name&gt; -&gt; { parent ID -&gt; item (list, map, ...) } }.</span>
-<span class="kw">fn</span> <span class="ident">process_nested_results</span>(
-    <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span>,
-    <span class="ident">enclosing_type</span>: <span class="kw-2">&amp;</span><span class="ident">ObjectTypeStrongRef</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CheckedItemsWithParents</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="comment">// For each nested selected field we need to map the parents to their items.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nested_mapping</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="ident">nested</span>.<span class="ident">len</span>());
+<span class="doccomment">/// Processes nested results into a more ergonomic structure of { &lt;nested field name&gt; -&gt; { parent ID -&gt; item (list, map, ...) } }.
+</span><span class="kw">fn </span>process_nested_results(
+    nested: Vec&lt;QueryResult&gt;,
+    enclosing_type: <span class="kw-2">&amp;</span>ObjectTypeStrongRef,
+) -&gt; <span class="kw">crate</span>::Result&lt;HashMap&lt;String, CheckedItemsWithParents&gt;&gt; {
+    <span class="comment">// For each nested selected field we need to map the parents to their items.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>nested_mapping = HashMap::with_capacity(nested.len());
 
-    <span class="comment">// Parse and validate all nested objects with their respective output type.</span>
-    <span class="comment">// Unwraps are safe due to query validation.</span>
-    <span class="kw">for</span> <span class="ident">nested_result</span> <span class="kw">in</span> <span class="ident">nested</span> {
-        <span class="comment">// todo Workaround, tb changed with flat reads.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">QueryResult::RecordSelection</span>(<span class="kw-2">ref</span> <span class="ident">rs</span>) <span class="op">=</span> <span class="ident">nested_result</span> {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">rs</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">enclosing_type</span>.<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">serialize_internal</span>(<span class="ident">nested_result</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
+    <span class="comment">// Parse and validate all nested objects with their respective output type.
+    // Unwraps are safe due to query validation.
+    </span><span class="kw">for </span>nested_result <span class="kw">in </span>nested {
+        <span class="comment">// todo Workaround, tb changed with flat reads.
+        </span><span class="kw">if let </span>QueryResult::RecordSelection(<span class="kw-2">ref </span>rs) = nested_result {
+            <span class="kw">let </span>name = rs.name.clone();
+            <span class="kw">let </span>field = enclosing_type.find_field(<span class="kw-2">&amp;</span>name).unwrap();
+            <span class="kw">let </span>result = serialize_internal(nested_result, <span class="kw-2">&amp;</span>field, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
 
-            <span class="ident">nested_mapping</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">result</span>);
+            nested_mapping.insert(name, result);
         }
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">nested_mapping</span>)
+    <span class="prelude-val">Ok</span>(nested_mapping)
 }
 
-<span class="comment">// Problem: order of selections</span>
-<span class="kw">fn</span> <span class="ident">serialize_composite</span>(<span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>, <span class="ident">out_field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>, <span class="ident">value</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">PrismaValue::Null</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">cf</span>.<span class="ident">is_required</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Item::Value</span>(<span class="ident">PrismaValue::Null</span>)),
+<span class="comment">// Problem: order of selections
+</span><span class="kw">fn </span>serialize_composite(cf: <span class="kw-2">&amp;</span>CompositeFieldRef, out_field: <span class="kw-2">&amp;</span>OutputFieldRef, value: PrismaValue) -&gt; <span class="kw">crate</span>::Result&lt;Item&gt; {
+    <span class="kw">match </span>value {
+        PrismaValue::Null <span class="kw">if </span>!cf.is_required() =&gt; <span class="prelude-val">Ok</span>(Item::Value(PrismaValue::Null)),
 
-        <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() =&gt; {
-            <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">values</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">serialize_composite</span>(<span class="ident">cf</span>, <span class="ident">out_field</span>, <span class="ident">value</span>))
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        PrismaValue::List(values) <span class="kw">if </span>cf.is_list() =&gt; {
+            <span class="kw">let </span>values = values
+                .into_iter()
+                .map(|value| serialize_composite(cf, out_field, value))
+                .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;();
 
-            <span class="prelude-val">Ok</span>(<span class="ident">Item::List</span>(<span class="ident">values</span><span class="question-mark">?</span>.<span class="ident">into</span>()))
+            <span class="prelude-val">Ok</span>(Item::List(values<span class="question-mark">?</span>.into()))
         }
 
-        <span class="ident">PrismaValue::Object</span>(<span class="ident">pairs</span>) =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Map::new</span>();
-            <span class="kw">let</span> <span class="ident">object_type</span> <span class="op">=</span> <span class="ident">out_field</span>
-                .<span class="ident">field_type</span>
-                .<span class="ident">as_object_type</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;Composite output field is not an object.&quot;</span>);
+        PrismaValue::Object(pairs) =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>map = Map::new();
+            <span class="kw">let </span>object_type = out_field
+                .field_type
+                .as_object_type()
+                .expect(<span class="string">&quot;Composite output field is not an object.&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">composite_type</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">typ</span>;
+            <span class="kw">let </span>composite_type = <span class="kw-2">&amp;</span>cf.typ;
 
-            <span class="kw">for</span> (<span class="ident">field_name</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">pairs</span> {
-                <span class="comment">// The field on the composite type.</span>
-                <span class="comment">// This will cause clashes if one field has an @map(&quot;name&quot;) and the other field is named &quot;field&quot; directly.</span>
-                <span class="kw">let</span> <span class="ident">inner_field</span> <span class="op">=</span> <span class="ident">composite_type</span>
-                    .<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>)
-                    .<span class="ident">or</span>(<span class="ident">composite_type</span>.<span class="ident">find_field_by_db_name</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>))
-                    .<span class="ident">unwrap</span>();
+            <span class="kw">for </span>(field_name, value) <span class="kw">in </span>pairs {
+                <span class="comment">// The field on the composite type.
+                // This will cause clashes if one field has an @map(&quot;name&quot;) and the other field is named &quot;field&quot; directly.
+                </span><span class="kw">let </span>inner_field = composite_type
+                    .find_field(<span class="kw-2">&amp;</span>field_name)
+                    .or(composite_type.find_field_by_db_name(<span class="kw-2">&amp;</span>field_name))
+                    .unwrap();
 
-                <span class="comment">// The field on the output object type. Used for the actual serialization process.</span>
-                <span class="kw">let</span> <span class="ident">inner_out_field</span> <span class="op">=</span> <span class="ident">object_type</span>.<span class="ident">find_field</span>(<span class="ident">inner_field</span>.<span class="ident">name</span>()).<span class="ident">unwrap</span>();
+                <span class="comment">// The field on the output object type. Used for the actual serialization process.
+                </span><span class="kw">let </span>inner_out_field = object_type.find_field(inner_field.name()).unwrap();
 
-                <span class="kw">match</span> <span class="ident">inner_field</span> {
-                    <span class="ident">Field::Composite</span>(<span class="ident">cf</span>) =&gt; {
-                        <span class="ident">map</span>.<span class="ident">insert</span>(
-                            <span class="ident">inner_field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                            <span class="ident">serialize_composite</span>(<span class="ident">cf</span>, <span class="kw-2">&amp;</span><span class="ident">inner_out_field</span>, <span class="ident">value</span>)<span class="question-mark">?</span>,
+                <span class="kw">match </span>inner_field {
+                    Field::Composite(cf) =&gt; {
+                        map.insert(
+                            inner_field.name().to_owned(),
+                            serialize_composite(cf, <span class="kw-2">&amp;</span>inner_out_field, value)<span class="question-mark">?</span>,
                         );
                     }
 
-                    <span class="kw">_</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">inner_out_field</span>.<span class="ident">field_type</span>.<span class="ident">is_object</span>() =&gt; {
-                        <span class="ident">map</span>.<span class="ident">insert</span>(
-                            <span class="ident">inner_field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                            <span class="ident">serialize_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">inner_out_field</span>, <span class="ident">value</span>)<span class="question-mark">?</span>,
+                    <span class="kw">_ if </span>!inner_out_field.field_type.is_object() =&gt; {
+                        map.insert(
+                            inner_field.name().to_owned(),
+                            serialize_scalar(<span class="kw-2">&amp;</span>inner_out_field, value)<span class="question-mark">?</span>,
                         );
                     }
 
-                    <span class="kw">_</span> =&gt; (),
+                    <span class="kw">_ </span>=&gt; (),
                 }
             }
 
-            <span class="prelude-val">Ok</span>(<span class="ident">Item::Map</span>(<span class="ident">map</span>))
+            <span class="prelude-val">Ok</span>(Item::Map(map))
         }
 
-        <span class="ident">val</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::SerializationError</span>(<span class="macro">format!</span>(
+        val =&gt; <span class="prelude-val">Err</span>(CoreError::SerializationError(<span class="macro">format!</span>(
             <span class="string">&quot;Attempted to serialize &#39;{}&#39; with non-composite compatible type &#39;{:?}&#39; for field {}.&quot;</span>,
-            <span class="ident">val</span>, <span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">name</span>, <span class="ident">cf</span>.<span class="ident">name</span>
+            val, cf.typ.name, cf.name
         ))),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">serialize_scalar</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>, <span class="ident">value</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="ident">field</span>.<span class="ident">field_type</span>.<span class="ident">as_ref</span>()) {
-        (<span class="ident">PrismaValue::Null</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_nullable</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Item::Value</span>(<span class="ident">PrismaValue::Null</span>)),
-        (<span class="kw">_</span>, <span class="ident">OutputType::Enum</span>(<span class="ident">et</span>)) =&gt; <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">et</span>.<span class="ident">into_arc</span>() {
-            <span class="ident">EnumType::Database</span>(<span class="kw-2">ref</span> <span class="ident">db</span>) =&gt; <span class="ident">convert_enum</span>(<span class="ident">value</span>, <span class="ident">db</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+<span class="kw">fn </span>serialize_scalar(field: <span class="kw-2">&amp;</span>OutputFieldRef, value: PrismaValue) -&gt; <span class="kw">crate</span>::Result&lt;Item&gt; {
+    <span class="kw">match </span>(<span class="kw-2">&amp;</span>value, field.field_type.as_ref()) {
+        (PrismaValue::Null, <span class="kw">_</span>) <span class="kw">if </span>field.is_nullable =&gt; <span class="prelude-val">Ok</span>(Item::Value(PrismaValue::Null)),
+        (<span class="kw">_</span>, OutputType::Enum(et)) =&gt; <span class="kw">match </span><span class="kw-2">*</span>et.into_arc() {
+            EnumType::Database(<span class="kw-2">ref </span>db) =&gt; convert_enum(value, db),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         },
-        (<span class="ident">PrismaValue::List</span>(<span class="kw">_</span>), <span class="ident">OutputType::List</span>(<span class="ident">arc_type</span>)) =&gt; <span class="kw">match</span> <span class="ident">arc_type</span>.<span class="ident">as_ref</span>() {
-            <span class="ident">OutputType::Scalar</span>(<span class="ident">subtype</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">unwrap_prisma_value</span>(<span class="ident">value</span>)
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">convert_prisma_value</span>(<span class="ident">field</span>, <span class="ident">v</span>, <span class="ident">subtype</span>))
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pv</span><span class="op">|</span> <span class="ident">pv</span>.<span class="ident">map</span>(<span class="ident">Item::Value</span>))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>, <span class="ident">CoreError</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">Item::list</span>(<span class="ident">items</span>))
+        (PrismaValue::List(<span class="kw">_</span>), OutputType::List(arc_type)) =&gt; <span class="kw">match </span>arc_type.as_ref() {
+            OutputType::Scalar(subtype) =&gt; {
+                <span class="kw">let </span>items = unwrap_prisma_value(value)
+                    .into_iter()
+                    .map(|v| convert_prisma_value(field, v, subtype))
+                    .map(|pv| pv.map(Item::Value))
+                    .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;Item&gt;, CoreError&gt;&gt;()<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(Item::list(items))
             }
-            <span class="ident">OutputType::Enum</span>(<span class="ident">et</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">unwrap_prisma_value</span>(<span class="ident">value</span>)
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">et</span>.<span class="ident">into_arc</span>() {
-                        <span class="ident">EnumType::Database</span>(<span class="kw-2">ref</span> <span class="ident">dbt</span>) =&gt; <span class="ident">convert_enum</span>(<span class="ident">v</span>, <span class="ident">dbt</span>),
-                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            OutputType::Enum(et) =&gt; {
+                <span class="kw">let </span>items = unwrap_prisma_value(value)
+                    .into_iter()
+                    .map(|v| <span class="kw">match </span><span class="kw-2">*</span>et.into_arc() {
+                        EnumType::Database(<span class="kw-2">ref </span>dbt) =&gt; convert_enum(v, dbt),
+                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                     })
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>, <span class="ident">CoreError</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">Item::list</span>(<span class="ident">items</span>))
+                    .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;Item&gt;, CoreError&gt;&gt;()<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(Item::list(items))
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::SerializationError</span>(<span class="macro">format!</span>(
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(CoreError::SerializationError(<span class="macro">format!</span>(
                 <span class="string">&quot;Attempted to serialize scalar list which contained non-scalar items of type &#39;{:?}&#39; for field {}.&quot;</span>,
-                <span class="ident">arc_type</span>, <span class="ident">field</span>.<span class="ident">name</span>
+                arc_type, field.name
             ))),
         },
-        (<span class="kw">_</span>, <span class="ident">OutputType::Scalar</span>(<span class="ident">st</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Item::Value</span>(<span class="ident">convert_prisma_value</span>(<span class="ident">field</span>, <span class="ident">value</span>, <span class="ident">st</span>)<span class="question-mark">?</span>)),
-        (<span class="ident">pv</span>, <span class="ident">ot</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::SerializationError</span>(<span class="macro">format!</span>(
+        (<span class="kw">_</span>, OutputType::Scalar(st)) =&gt; <span class="prelude-val">Ok</span>(Item::Value(convert_prisma_value(field, value, st)<span class="question-mark">?</span>)),
+        (pv, ot) =&gt; <span class="prelude-val">Err</span>(CoreError::SerializationError(<span class="macro">format!</span>(
             <span class="string">&quot;Attempted to serialize scalar &#39;{}&#39; with non-scalar compatible type &#39;{:?}&#39; for field {}.&quot;</span>,
-            <span class="ident">pv</span>, <span class="ident">ot</span>, <span class="ident">field</span>.<span class="ident">name</span>
+            pv, ot, field.name
         ))),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">convert_prisma_value</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>, <span class="ident">value</span>: <span class="ident">PrismaValue</span>, <span class="ident">st</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span>, <span class="ident">CoreError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">item_value</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">st</span>, <span class="ident">value</span>) {
-        (<span class="ident">ScalarType::String</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>),
+<span class="kw">fn </span>convert_prisma_value(field: <span class="kw-2">&amp;</span>OutputFieldRef, value: PrismaValue, st: <span class="kw-2">&amp;</span>ScalarType) -&gt; <span class="prelude-ty">Result</span>&lt;PrismaValue, CoreError&gt; {
+    <span class="kw">let </span>item_value = <span class="kw">match </span>(st, value) {
+        (ScalarType::String, PrismaValue::String(s)) =&gt; PrismaValue::String(s),
 
-        (<span class="ident">ScalarType::Json</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::Json</span>(<span class="ident">s</span>),
-        (<span class="ident">ScalarType::Json</span>, <span class="ident">PrismaValue::Json</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::Json</span>(<span class="ident">s</span>),
+        (ScalarType::Json, PrismaValue::String(s)) =&gt; PrismaValue::Json(s),
+        (ScalarType::Json, PrismaValue::Json(s)) =&gt; PrismaValue::Json(s),
 
-        (<span class="ident">ScalarType::Int</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)) =&gt; {
-            <span class="ident">PrismaValue::Int</span>(<span class="ident">f</span>.<span class="ident">to_i64</span>().<span class="ident">ok_or</span>(<span class="ident">CoreError::decimal_conversion_error</span>(<span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="string">&quot;i64&quot;</span>))<span class="question-mark">?</span>)
+        (ScalarType::Int, PrismaValue::Float(f)) =&gt; {
+            PrismaValue::Int(f.to_i64().ok_or(CoreError::decimal_conversion_error(<span class="kw-2">&amp;</span>f, <span class="string">&quot;i64&quot;</span>))<span class="question-mark">?</span>)
         }
-        (<span class="ident">ScalarType::Int</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
+        (ScalarType::Int, PrismaValue::Int(i)) =&gt; PrismaValue::Int(i),
 
-        (<span class="ident">ScalarType::Float</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)) =&gt; <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>),
-        (<span class="ident">ScalarType::Float</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
+        (ScalarType::Float, PrismaValue::Float(f)) =&gt; PrismaValue::Float(f),
+        (ScalarType::Float, PrismaValue::Int(i)) =&gt; PrismaValue::Int(i),
 
-        (<span class="ident">ScalarType::Decimal</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">i</span>.<span class="ident">to_string</span>()),
-        (<span class="ident">ScalarType::Decimal</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">f</span>.<span class="ident">to_string</span>()),
+        (ScalarType::Decimal, PrismaValue::Int(i)) =&gt; PrismaValue::String(i.to_string()),
+        (ScalarType::Decimal, PrismaValue::Float(f)) =&gt; PrismaValue::String(f.to_string()),
 
-        (<span class="ident">ScalarType::BigInt</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>),
-        (<span class="ident">ScalarType::BigInt</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>),
-        (<span class="ident">ScalarType::BigInt</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)) =&gt; {
-            <span class="ident">PrismaValue::BigInt</span>(<span class="ident">f</span>.<span class="ident">to_i64</span>().<span class="ident">ok_or</span>(<span class="ident">CoreError::decimal_conversion_error</span>(<span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="string">&quot;i64&quot;</span>))<span class="question-mark">?</span>)
+        (ScalarType::BigInt, PrismaValue::BigInt(i)) =&gt; PrismaValue::BigInt(i),
+        (ScalarType::BigInt, PrismaValue::Int(i)) =&gt; PrismaValue::BigInt(i),
+        (ScalarType::BigInt, PrismaValue::Float(f)) =&gt; {
+            PrismaValue::BigInt(f.to_i64().ok_or(CoreError::decimal_conversion_error(<span class="kw-2">&amp;</span>f, <span class="string">&quot;i64&quot;</span>))<span class="question-mark">?</span>)
         }
 
-        (<span class="ident">ScalarType::Boolean</span>, <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)) =&gt; <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>),
-        (<span class="ident">ScalarType::Int</span>, <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">i64</span>),
-        (<span class="ident">ScalarType::DateTime</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) =&gt; <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>),
-        (<span class="ident">ScalarType::UUID</span>, <span class="ident">PrismaValue::Uuid</span>(<span class="ident">u</span>)) =&gt; <span class="ident">PrismaValue::Uuid</span>(<span class="ident">u</span>),
-        (<span class="ident">ScalarType::Bytes</span>, <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>)) =&gt; <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>),
+        (ScalarType::Boolean, PrismaValue::Boolean(b)) =&gt; PrismaValue::Boolean(b),
+        (ScalarType::Int, PrismaValue::Boolean(b)) =&gt; PrismaValue::Int(b <span class="kw">as </span>i64),
+        (ScalarType::DateTime, PrismaValue::DateTime(dt)) =&gt; PrismaValue::DateTime(dt),
+        (ScalarType::UUID, PrismaValue::Uuid(u)) =&gt; PrismaValue::Uuid(u),
+        (ScalarType::Bytes, PrismaValue::Bytes(b)) =&gt; PrismaValue::Bytes(b),
 
-        (<span class="ident">ScalarType::Xml</span>, <span class="ident">PrismaValue::Xml</span>(<span class="ident">b</span>)) =&gt; <span class="ident">PrismaValue::Xml</span>(<span class="ident">b</span>),
-        (<span class="ident">ScalarType::String</span>, <span class="ident">PrismaValue::Xml</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>),
+        (ScalarType::Xml, PrismaValue::Xml(b)) =&gt; PrismaValue::Xml(b),
+        (ScalarType::String, PrismaValue::Xml(s)) =&gt; PrismaValue::String(s),
 
-        (<span class="ident">st</span>, <span class="ident">pv</span>) =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::FieldConversionError::create</span>(
-                <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">st</span>),
-                <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">pv</span>),
+        (st, pv) =&gt; {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::FieldConversionError::create(
+                field.name.clone(),
+                <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, st),
+                <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, pv),
             ))
         }
     };
 
-    <span class="prelude-val">Ok</span>(<span class="ident">item_value</span>)
+    <span class="prelude-val">Ok</span>(item_value)
 }
 
-<span class="kw">fn</span> <span class="ident">convert_enum</span>(<span class="ident">value</span>: <span class="ident">PrismaValue</span>, <span class="ident">dbt</span>: <span class="kw-2">&amp;</span><span class="ident">DatabaseEnumType</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">CoreError</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>) <span class="op">|</span> <span class="ident">PrismaValue::Enum</span>(<span class="ident">s</span>) =&gt; <span class="kw">match</span> <span class="ident">dbt</span>.<span class="ident">map_output_value</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">inum</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Item::Value</span>(<span class="ident">inum</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::SerializationError</span>(<span class="macro">format!</span>(
+<span class="kw">fn </span>convert_enum(value: PrismaValue, dbt: <span class="kw-2">&amp;</span>DatabaseEnumType) -&gt; <span class="prelude-ty">Result</span>&lt;Item, CoreError&gt; {
+    <span class="kw">match </span>value {
+        PrismaValue::String(s) | PrismaValue::Enum(s) =&gt; <span class="kw">match </span>dbt.map_output_value(<span class="kw-2">&amp;</span>s) {
+            <span class="prelude-val">Some</span>(inum) =&gt; <span class="prelude-val">Ok</span>(Item::Value(inum)),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(CoreError::SerializationError(<span class="macro">format!</span>(
                 <span class="string">&quot;Value &#39;{}&#39; not found in enum &#39;{}&#39;&quot;</span>,
-                <span class="ident">s</span>,
-                <span class="ident">dbt</span>.<span class="ident">identifier</span>().<span class="ident">name</span>()
+                s,
+                dbt.identifier().name()
             ))),
         },
 
-        <span class="ident">val</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::SerializationError</span>(<span class="macro">format!</span>(
+        val =&gt; <span class="prelude-val">Err</span>(CoreError::SerializationError(<span class="macro">format!</span>(
             <span class="string">&quot;Attempted to serialize non-enum-compatible value &#39;{}&#39; for enum &#39;{}&#39;&quot;</span>,
-            <span class="ident">val</span>,
-            <span class="ident">dbt</span>.<span class="ident">identifier</span>().<span class="ident">name</span>()
+            val,
+            dbt.identifier().name()
         ))),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">unwrap_prisma_value</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">pv</span> {
-        <span class="ident">PrismaValue::List</span>(<span class="ident">l</span>) =&gt; <span class="ident">l</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invariant error: Called unwrap list value on non-list.&quot;</span>),
+<span class="kw">fn </span>unwrap_prisma_value(pv: PrismaValue) -&gt; Vec&lt;PrismaValue&gt; {
+    <span class="kw">match </span>pv {
+        PrismaValue::List(l) =&gt; l,
+        <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invariant error: Called unwrap list value on non-list.&quot;</span>),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

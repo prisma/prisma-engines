@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/compression/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/compression/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -324,331 +324,331 @@
 <span id="324">324</span>
 <span id="325">325</span>
 <span id="326">326</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>
-))]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(any(
+    feature = <span class="string">&quot;zstd-compression&quot;</span>,
+    feature = <span class="string">&quot;zlib-compression&quot;</span>,
+    feature = <span class="string">&quot;snappy-compression&quot;
+</span>))]
+#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">flate2</span>::{
-    <span class="ident">write</span>::{<span class="ident">ZlibDecoder</span>, <span class="ident">ZlibEncoder</span>},
-    <span class="ident">Compression</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+</span><span class="kw">use </span>flate2::{
+    write::{ZlibDecoder, ZlibEncoder},
+    Compression,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+</span><span class="kw">use </span>std::convert::TryInto;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>
-))]</span>
-<span class="kw">use</span> <span class="ident">std::io::Write</span>;
+<span class="attribute">#[cfg(any(
+    feature = <span class="string">&quot;zstd-compression&quot;</span>,
+    feature = <span class="string">&quot;zlib-compression&quot;</span>,
+    feature = <span class="string">&quot;snappy-compression&quot;
+</span>))]
+</span><span class="kw">use </span>std::io::Write;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span><span class="kw">crate</span>::error::{Error, ErrorKind, <span class="prelude-ty">Result</span>};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">CompressorId</span> {
-    <span class="ident">Noop</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-    <span class="ident">Snappy</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-    <span class="ident">Zlib</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-    <span class="ident">Zstd</span> <span class="op">=</span> <span class="number">3</span>,
+<span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>CompressorId {
+    Noop = <span class="number">0</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+    </span>Snappy = <span class="number">1</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+    </span>Zlib = <span class="number">2</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+    </span>Zstd = <span class="number">3</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">CompressorId</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">id</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">id</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Noop</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Snappy</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Zlib</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Zstd</span>),
-            <span class="ident">other</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Invalid compressor id: {}&quot;</span>, <span class="ident">other</span>),
+<span class="kw">impl </span>CompressorId {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_u8(id: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>id {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(CompressorId::Noop),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+            </span><span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(CompressorId::Snappy),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+            </span><span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(CompressorId::Zlib),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+            </span><span class="number">3 </span>=&gt; <span class="prelude-val">Ok</span>(CompressorId::Zstd),
+            other =&gt; <span class="prelude-val">Err</span>(ErrorKind::InvalidResponse {
+                message: <span class="macro">format!</span>(<span class="string">&quot;Invalid compressor id: {}&quot;</span>, other),
             }
-            .<span class="ident">into</span>()),
+            .into()),
         }
     }
 }
 
-<span class="doccomment">/// Enum representing supported compressor algorithms.</span>
-<span class="doccomment">/// Used for compressing and decompressing messages sent to and read from the server.</span>
-<span class="doccomment">/// For compressors that take a `level`, use `None` to indicate the default level.</span>
-<span class="doccomment">/// Higher `level` indicates more compression (and slower).</span>
-<span class="doccomment">/// Requires `zstd-compression` feature flag to use `Zstd` compressor,</span>
-<span class="doccomment">/// `zlib-compression` feature flag to use `Zlib` compressor, and</span>
-<span class="doccomment">/// `snappy-compression` feature flag to use `Snappy` Compressor.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Compressor</span> {
-    <span class="doccomment">/// Zstd compressor.  Requires Rust version 1.54.</span>
-    <span class="doccomment">/// See [`Zstd`](http://facebook.github.io/zstd/zstd_manual.html) for more information</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>, <span class="ident">docsrs</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)))]</span>
-    <span class="ident">Zstd</span> {
-        <span class="doccomment">/// Zstd compression level</span>
-        <span class="ident">level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Enum representing supported compressor algorithms.
+/// Used for compressing and decompressing messages sent to and read from the server.
+/// For compressors that take a `level`, use `None` to indicate the default level.
+/// Higher `level` indicates more compression (and slower).
+/// Requires `zstd-compression` feature flag to use `Zstd` compressor,
+/// `zlib-compression` feature flag to use `Zlib` compressor, and
+/// `snappy-compression` feature flag to use `Snappy` Compressor.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Compressor {
+    <span class="doccomment">/// Zstd compressor.  Requires Rust version 1.54.
+    /// See [`Zstd`](http://facebook.github.io/zstd/zstd_manual.html) for more information
+    </span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;zstd-compression&quot;</span>, docsrs))]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)))]
+    </span>Zstd {
+        <span class="doccomment">/// Zstd compression level
+        </span>level: <span class="prelude-ty">Option</span>&lt;i32&gt;,
     },
-    <span class="doccomment">/// Zlib compressor.</span>
-    <span class="doccomment">/// See [`Zlib`](https://zlib.net/) for more information.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>, <span class="ident">docsrs</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)))]</span>
-    <span class="ident">Zlib</span> {
-        <span class="doccomment">/// Zlib compression level</span>
-        <span class="ident">level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Zlib compressor.
+    /// See [`Zlib`](https://zlib.net/) for more information.
+    </span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;zlib-compression&quot;</span>, docsrs))]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)))]
+    </span>Zlib {
+        <span class="doccomment">/// Zlib compression level
+        </span>level: <span class="prelude-ty">Option</span>&lt;i32&gt;,
     },
-    <span class="doccomment">/// Snappy compressor.</span>
-    <span class="doccomment">/// See [`Snappy`](http://google.github.io/snappy/) for more information.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>, <span class="ident">docsrs</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)))]</span>
-    <span class="ident">Snappy</span>,
+    <span class="doccomment">/// Snappy compressor.
+    /// See [`Snappy`](http://google.github.io/snappy/) for more information.
+    </span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;snappy-compression&quot;</span>, docsrs))]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)))]
+    </span>Snappy,
 }
 
-<span class="kw">impl</span> <span class="ident">Compressor</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_zlib_level</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="ident">i32</span>) {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Compressor::Zlib</span> {
-            <span class="ident">level</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">zlib_level</span>,
-        } <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>
-        {
-            <span class="kw-2">*</span><span class="ident">zlib_level</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">level</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> { <span class="prelude-val">None</span> } <span class="kw">else</span> { <span class="prelude-val">Some</span>(<span class="ident">level</span>) }
+<span class="kw">impl </span>Compressor {
+    <span class="attribute">#[allow(unused_variables)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>write_zlib_level(<span class="kw-2">&amp;mut </span><span class="self">self</span>, level: i32) {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+        </span><span class="kw">if let </span>Compressor::Zlib {
+            level: <span class="kw-2">ref mut </span>zlib_level,
+        } = <span class="kw-2">*</span><span class="self">self
+        </span>{
+            <span class="kw-2">*</span>zlib_level = <span class="kw">if </span>level == -<span class="number">1 </span>{ <span class="prelude-val">None </span>} <span class="kw">else </span>{ <span class="prelude-val">Some</span>(level) }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="string">&quot;zlib&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Compressor::Zlib</span> { <span class="ident">level</span>: <span class="prelude-val">None</span> }),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="string">&quot;zstd&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Compressor::Zstd</span> { <span class="ident">level</span>: <span class="prelude-val">None</span> }),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="string">&quot;snappy&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Compressor::Snappy</span>),
-            <span class="ident">other</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Invalid compressor: {} was supplied but is invalid&quot;</span>, <span class="ident">other</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>s.to_lowercase().as_str() {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+            </span><span class="string">&quot;zlib&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Compressor::Zlib { level: <span class="prelude-val">None </span>}),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+            </span><span class="string">&quot;zstd&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Compressor::Zstd { level: <span class="prelude-val">None </span>}),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+            </span><span class="string">&quot;snappy&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Compressor::Snappy),
+            other =&gt; <span class="prelude-val">Err</span>(Error::from(ErrorKind::InvalidArgument {
+                message: <span class="macro">format!</span>(<span class="string">&quot;Invalid compressor: {} was supplied but is invalid&quot;</span>, other),
             })),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zstd</span> { .. } =&gt; <span class="string">&quot;zstd&quot;</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zlib</span> { .. } =&gt; <span class="string">&quot;zlib&quot;</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Snappy</span> =&gt; <span class="string">&quot;snappy&quot;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+            </span>Compressor::Zstd { .. } =&gt; <span class="string">&quot;zstd&quot;</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+            </span>Compressor::Zlib { .. } =&gt; <span class="string">&quot;zlib&quot;</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+            </span>Compressor::Snappy =&gt; <span class="string">&quot;snappy&quot;</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CompressorId</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zstd</span> { <span class="ident">level</span>: <span class="kw">_</span> } =&gt; <span class="ident">CompressorId::Zstd</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zlib</span> { <span class="ident">level</span>: <span class="kw">_</span> } =&gt; <span class="ident">CompressorId::Zlib</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Snappy</span> =&gt; <span class="ident">CompressorId::Snappy</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CompressorId {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+            </span>Compressor::Zstd { level: <span class="kw">_ </span>} =&gt; CompressorId::Zstd,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+            </span>Compressor::Zlib { level: <span class="kw">_ </span>} =&gt; CompressorId::Zlib,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+            </span>Compressor::Snappy =&gt; CompressorId::Snappy,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_patterns</span>)]</span>
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zstd</span> { <span class="ident">level</span>: <span class="prelude-val">Some</span>(<span class="ident">level</span>) }
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">zstd::compression_level_range</span>().<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">level</span>) =&gt;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="attribute">#[allow(unreachable_patterns)]
+        </span><span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+            </span>Compressor::Zstd { level: <span class="prelude-val">Some</span>(level) }
+                <span class="kw">if </span>!zstd::compression_level_range().contains(<span class="kw-2">&amp;</span>level) =&gt;
             {
-                <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid zstd level: {}&quot;</span>, <span class="ident">level</span>),
+                <span class="prelude-val">Err</span>(Error::from(ErrorKind::InvalidArgument {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;invalid zstd level: {}&quot;</span>, level),
                 }))
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zlib</span> { <span class="ident">level</span>: <span class="prelude-val">Some</span>(<span class="ident">level</span>) } <span class="kw">if</span> <span class="op">!</span>(<span class="op">-</span><span class="number">1</span>..<span class="number">10</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">level</span>) =&gt; {
-                <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid zlib level: {}&quot;</span>, <span class="ident">level</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+            </span>Compressor::Zlib { level: <span class="prelude-val">Some</span>(level) } <span class="kw">if </span>!(-<span class="number">1</span>..<span class="number">10</span>).contains(<span class="kw-2">&amp;</span>level) =&gt; {
+                <span class="prelude-val">Err</span>(Error::from(ErrorKind::InvalidArgument {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;invalid zlib level: {}&quot;</span>, level),
                 }))
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Encoder</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zstd</span> { <span class="ident">level</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">encoder</span> <span class="op">=</span>
-                    <span class="ident">zstd::Encoder::new</span>(<span class="macro">vec!</span>[], <span class="ident">level</span>.<span class="ident">unwrap_or</span>(<span class="ident">zstd::DEFAULT_COMPRESSION_LEVEL</span>))
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                            <span class="ident">Error::from</span>(<span class="ident">ErrorKind::Internal</span> {
-                                <span class="ident">message</span>: <span class="macro">format!</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_encoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Encoder&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+            </span>Compressor::Zstd { level } =&gt; {
+                <span class="kw">let </span>encoder =
+                    zstd::Encoder::new(<span class="macro">vec!</span>[], level.unwrap_or(zstd::DEFAULT_COMPRESSION_LEVEL))
+                        .map_err(|e| {
+                            Error::from(ErrorKind::Internal {
+                                message: <span class="macro">format!</span>(
                                     <span class="string">&quot;an error occurred getting a new zstd encoder: {}&quot;</span>,
-                                    <span class="ident">e</span>
+                                    e
                                 ),
                             })
                         })<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">Encoder::Zstd</span> { <span class="ident">encoder</span> })
+                <span class="prelude-val">Ok</span>(Encoder::Zstd { encoder })
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zlib</span> { <span class="ident">level</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">level</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">level</span>) =&gt; <span class="ident">Compression::new</span>(<span class="ident">level</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                        <span class="ident">Error::from</span>(<span class="ident">ErrorKind::Internal</span> {
-                            <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an invalid zlib compression level was given: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+            </span>Compressor::Zlib { level } =&gt; {
+                <span class="kw">let </span>level = <span class="kw">match </span>level {
+                    <span class="prelude-val">Some</span>(level) =&gt; Compression::new(level.try_into().map_err(|e| {
+                        Error::from(ErrorKind::Internal {
+                            message: <span class="macro">format!</span>(<span class="string">&quot;an invalid zlib compression level was given: {}&quot;</span>, e),
                         })
                     })<span class="question-mark">?</span>),
-                    <span class="kw">_</span> =&gt; <span class="ident">Compression::default</span>(),
+                    <span class="kw">_ </span>=&gt; Compression::default(),
                 };
-                <span class="kw">let</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">ZlibEncoder::new</span>(<span class="macro">vec!</span>[], <span class="ident">level</span>);
-                <span class="prelude-val">Ok</span>(<span class="ident">Encoder::Zlib</span> { <span class="ident">encoder</span> })
+                <span class="kw">let </span>encoder = ZlibEncoder::new(<span class="macro">vec!</span>[], level);
+                <span class="prelude-val">Ok</span>(Encoder::Zlib { encoder })
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Snappy</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Encoder::Snappy</span> { <span class="ident">bytes</span>: <span class="macro">vec!</span>[] }),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+            </span>Compressor::Snappy =&gt; <span class="prelude-val">Ok</span>(Encoder::Snappy { bytes: <span class="macro">vec!</span>[] }),
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Encoder</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-    <span class="ident">Zstd</span> {
-        <span class="ident">encoder</span>: <span class="ident">zstd::Encoder</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Encoder {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+    </span>Zstd {
+        encoder: zstd::Encoder&lt;<span class="lifetime">&#39;static</span>, Vec&lt;u8&gt;&gt;,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-    <span class="ident">Zlib</span> { <span class="ident">encoder</span>: <span class="ident">ZlibEncoder</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-    <span class="ident">Snappy</span> { <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> },
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+    </span>Zlib { encoder: ZlibEncoder&lt;Vec&lt;u8&gt;&gt; },
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+    </span>Snappy { bytes: Vec&lt;u8&gt; },
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Encoder</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_all</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Zstd</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> } =&gt; <span class="ident">encoder</span>.<span class="ident">write_all</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                <span class="ident">ErrorKind::Internal</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an error occurred writing to the zstd encoder: {}&quot;</span>, <span class="ident">e</span>),
+<span class="attribute">#[allow(unused_variables)]
+</span><span class="kw">impl </span>Encoder {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>write_all(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+            </span>Encoder::Zstd { <span class="kw-2">ref mut </span>encoder } =&gt; encoder.write_all(buf).map_err(|e| {
+                ErrorKind::Internal {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;an error occurred writing to the zstd encoder: {}&quot;</span>, e),
                 }
-                .<span class="ident">into</span>()
+                .into()
             }),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Zlib</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> } =&gt; <span class="ident">encoder</span>.<span class="ident">write_all</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                <span class="ident">ErrorKind::Internal</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an error occurred writing to the zlib encoder: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+            </span>Encoder::Zlib { <span class="kw-2">ref mut </span>encoder } =&gt; encoder.write_all(buf).map_err(|e| {
+                ErrorKind::Internal {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;an error occurred writing to the zlib encoder: {}&quot;</span>, e),
                 }
-                .<span class="ident">into</span>()
+                .into()
             }),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Snappy</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> } =&gt; <span class="ident">bytes</span>.<span class="ident">write_all</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                <span class="ident">ErrorKind::Internal</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an error occurred writing to the snappy encoder: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+            </span>Encoder::Snappy { <span class="kw-2">ref mut </span>bytes } =&gt; bytes.write_all(buf).map_err(|e| {
+                ErrorKind::Internal {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;an error occurred writing to the snappy encoder: {}&quot;</span>, e),
                 }
-                .<span class="ident">into</span>()
+                .into()
             }),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Zstd</span> { <span class="ident">encoder</span> } =&gt; <span class="ident">encoder</span>.<span class="ident">finish</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                <span class="ident">ErrorKind::Internal</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an error occurred finishing zstd encoder: {}&quot;</span>, <span class="ident">e</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>finish(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+            </span>Encoder::Zstd { encoder } =&gt; encoder.finish().map_err(|e| {
+                ErrorKind::Internal {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;an error occurred finishing zstd encoder: {}&quot;</span>, e),
                 }
-                .<span class="ident">into</span>()
+                .into()
             }),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Zlib</span> { <span class="ident">encoder</span> } =&gt; <span class="ident">encoder</span>.<span class="ident">finish</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                <span class="ident">ErrorKind::Internal</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an error occurred finishing zlib encoder: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+            </span>Encoder::Zlib { encoder } =&gt; encoder.finish().map_err(|e| {
+                ErrorKind::Internal {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;an error occurred finishing zlib encoder: {}&quot;</span>, e),
                 }
-                .<span class="ident">into</span>()
+                .into()
             }),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Snappy</span> { <span class="ident">bytes</span> } =&gt; {
-                <span class="comment">// The server doesn&#39;t use snappy frame format, so we need to use snap::raw::Encoder</span>
-                <span class="comment">// rather than snap::write::FrameEncoder.  Likewise for decoding.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">compressor</span> <span class="op">=</span> <span class="ident">snap::raw::Encoder::new</span>();
-                <span class="ident">compressor</span>.<span class="ident">compress_vec</span>(<span class="ident">bytes</span>.<span class="ident">as_slice</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                    <span class="ident">ErrorKind::Internal</span> {
-                        <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an error occurred finishing snappy encoder: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+            </span>Encoder::Snappy { bytes } =&gt; {
+                <span class="comment">// The server doesn&#39;t use snappy frame format, so we need to use snap::raw::Encoder
+                // rather than snap::write::FrameEncoder.  Likewise for decoding.
+                </span><span class="kw">let </span><span class="kw-2">mut </span>compressor = snap::raw::Encoder::new();
+                compressor.compress_vec(bytes.as_slice()).map_err(|e| {
+                    ErrorKind::Internal {
+                        message: <span class="macro">format!</span>(<span class="string">&quot;an error occurred finishing snappy encoder: {}&quot;</span>, e),
                     }
-                    .<span class="ident">into</span>()
+                    .into()
                 })
             }
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Decoder</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-    <span class="ident">Zstd</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-    <span class="ident">Zlib</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-    <span class="ident">Snappy</span>,
-    <span class="ident">Noop</span>,
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Decoder {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+    </span>Zstd,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+    </span>Zlib,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+    </span>Snappy,
+    Noop,
 }
 
-<span class="kw">impl</span> <span class="ident">Decoder</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">decode</span>(<span class="self">self</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Decoder::Zstd</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                <span class="ident">zstd::stream::copy_decode</span>(<span class="ident">source</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ret</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                    <span class="ident">Error::from</span>(<span class="ident">ErrorKind::Internal</span> {
-                        <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Could not decode using zstd decoder: {}&quot;</span>, <span class="ident">e</span>),
+<span class="kw">impl </span>Decoder {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>decode(<span class="self">self</span>, source: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+            </span>Decoder::Zstd =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>ret = Vec::new();
+                zstd::stream::copy_decode(source, <span class="kw-2">&amp;mut </span>ret).map_err(|e| {
+                    Error::from(ErrorKind::Internal {
+                        message: <span class="macro">format!</span>(<span class="string">&quot;Could not decode using zstd decoder: {}&quot;</span>, e),
                     })
                 })<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
+                <span class="prelude-val">Ok</span>(ret)
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Decoder::Zlib</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">ZlibDecoder::new</span>(<span class="macro">vec!</span>[]);
-                <span class="ident">decoder</span>.<span class="ident">write_all</span>(<span class="ident">source</span>)<span class="question-mark">?</span>;
-                <span class="ident">decoder</span>.<span class="ident">finish</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                    <span class="ident">ErrorKind::Internal</span> {
-                        <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Could not decode using zlib decoder: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+            </span>Decoder::Zlib =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>decoder = ZlibDecoder::new(<span class="macro">vec!</span>[]);
+                decoder.write_all(source)<span class="question-mark">?</span>;
+                decoder.finish().map_err(|e| {
+                    ErrorKind::Internal {
+                        message: <span class="macro">format!</span>(<span class="string">&quot;Could not decode using zlib decoder: {}&quot;</span>, e),
                     }
-                    .<span class="ident">into</span>()
+                    .into()
                 })
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Decoder::Snappy</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decompressor</span> <span class="op">=</span> <span class="ident">snap::raw::Decoder::new</span>();
-                <span class="ident">decompressor</span>.<span class="ident">decompress_vec</span>(<span class="ident">source</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                    <span class="ident">ErrorKind::Internal</span> {
-                        <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Could not decode using snappy decoder: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+            </span>Decoder::Snappy =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>decompressor = snap::raw::Decoder::new();
+                decompressor.decompress_vec(source).map_err(|e| {
+                    ErrorKind::Internal {
+                        message: <span class="macro">format!</span>(<span class="string">&quot;Could not decode using snappy decoder: {}&quot;</span>, e),
                     }
-                    .<span class="ident">into</span>()
+                    .into()
                 })
             }
-            <span class="ident">Decoder::Noop</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">source</span>.<span class="ident">to_vec</span>()),
+            Decoder::Noop =&gt; <span class="prelude-val">Ok</span>(source.to_vec()),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">id</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">compressor_id</span> <span class="op">=</span> <span class="ident">CompressorId::from_u8</span>(<span class="ident">id</span>)<span class="question-mark">?</span>;
-        <span class="kw">match</span> <span class="ident">compressor_id</span> {
-            <span class="ident">CompressorId::Noop</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Noop</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">CompressorId::Snappy</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Snappy</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">CompressorId::Zlib</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Zlib</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">CompressorId::Zstd</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Zstd</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_u8(id: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>compressor_id = CompressorId::from_u8(id)<span class="question-mark">?</span>;
+        <span class="kw">match </span>compressor_id {
+            CompressorId::Noop =&gt; <span class="prelude-val">Ok</span>(Decoder::Noop),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;snappy-compression&quot;</span>)]
+            </span>CompressorId::Snappy =&gt; <span class="prelude-val">Ok</span>(Decoder::Snappy),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-compression&quot;</span>)]
+            </span>CompressorId::Zlib =&gt; <span class="prelude-val">Ok</span>(Decoder::Zlib),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;zstd-compression&quot;</span>)]
+            </span>CompressorId::Zstd =&gt; <span class="prelude-val">Ok</span>(Decoder::Zstd),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

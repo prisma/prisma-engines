@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/suites.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>suites.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/suites.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>suites.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -276,283 +276,283 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums::ProtocolVersion</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">CipherSuite</span>, <span class="ident">SignatureAlgorithm</span>, <span class="ident">SignatureScheme</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::DecomposedSignatureScheme</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls12::Tls12CipherSuite</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls12</span>::{
-    <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</span>,
-    <span class="comment">// TLS1.2 suites</span>
-    <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</span>,
-    <span class="ident">TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256</span>,
-    <span class="ident">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</span>,
-    <span class="ident">TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span>,
-    <span class="ident">TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256</span>,
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::ProtocolVersion;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{CipherSuite, SignatureAlgorithm, SignatureScheme};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::DecomposedSignatureScheme;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::tls12::Tls12CipherSuite;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::tls12::{
+    TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+    <span class="comment">// TLS1.2 suites
+    </span>TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+    TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+    TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+    TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+    TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls13::Tls13CipherSuite</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls13</span>::{
-    <span class="ident">TLS13_AES_128_GCM_SHA256</span>, <span class="ident">TLS13_AES_256_GCM_SHA384</span>, <span class="ident">TLS13_CHACHA20_POLY1305_SHA256</span>,
+<span class="kw">use </span><span class="kw">crate</span>::tls13::Tls13CipherSuite;
+<span class="kw">use </span><span class="kw">crate</span>::tls13::{
+    TLS13_AES_128_GCM_SHA256, TLS13_AES_256_GCM_SHA384, TLS13_CHACHA20_POLY1305_SHA256,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::versions::TLS12</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::versions</span>::{<span class="ident">SupportedProtocolVersion</span>, <span class="ident">TLS13</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::versions::TLS12;
+<span class="kw">use </span><span class="kw">crate</span>::versions::{SupportedProtocolVersion, TLS13};
 
-<span class="doccomment">/// Bulk symmetric encryption scheme used by a cipher suite.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BulkAlgorithm</span> {
-    <span class="doccomment">/// AES with 128-bit keys in Galois counter mode.</span>
-    <span class="ident">Aes128Gcm</span>,
+<span class="doccomment">/// Bulk symmetric encryption scheme used by a cipher suite.
+</span><span class="attribute">#[allow(non_camel_case_types)]
+#[derive(Debug, PartialEq)]
+</span><span class="kw">pub enum </span>BulkAlgorithm {
+    <span class="doccomment">/// AES with 128-bit keys in Galois counter mode.
+    </span>Aes128Gcm,
 
-    <span class="doccomment">/// AES with 256-bit keys in Galois counter mode.</span>
-    <span class="ident">Aes256Gcm</span>,
+    <span class="doccomment">/// AES with 256-bit keys in Galois counter mode.
+    </span>Aes256Gcm,
 
-    <span class="doccomment">/// Chacha20 for confidentiality with poly1305 for authenticity.</span>
-    <span class="ident">Chacha20Poly1305</span>,
+    <span class="doccomment">/// Chacha20 for confidentiality with poly1305 for authenticity.
+    </span>Chacha20Poly1305,
 }
 
-<span class="doccomment">/// Common state for cipher suites (both for TLS 1.2 and TLS 1.3)</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CipherSuiteCommon</span> {
-    <span class="doccomment">/// The TLS enumeration naming this cipher suite.</span>
-    <span class="kw">pub</span> <span class="ident">suite</span>: <span class="ident">CipherSuite</span>,
+<span class="doccomment">/// Common state for cipher suites (both for TLS 1.2 and TLS 1.3)
+</span><span class="kw">pub struct </span>CipherSuiteCommon {
+    <span class="doccomment">/// The TLS enumeration naming this cipher suite.
+    </span><span class="kw">pub </span>suite: CipherSuite,
 
-    <span class="doccomment">/// How to do bulk encryption.</span>
-    <span class="kw">pub</span> <span class="ident">bulk</span>: <span class="ident">BulkAlgorithm</span>,
+    <span class="doccomment">/// How to do bulk encryption.
+    </span><span class="kw">pub </span>bulk: BulkAlgorithm,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">aead_algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ring::aead::Algorithm</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) aead_algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ring::aead::Algorithm,
 }
 
-<span class="doccomment">/// A cipher suite supported by rustls.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All possible instances of this type are provided by the library in</span>
-<span class="doccomment">/// the [`ALL_CIPHER_SUITES`] array.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SupportedCipherSuite</span> {
-    <span class="doccomment">/// A TLS 1.2 cipher suite</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="ident">Tls12</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls12CipherSuite</span>),
-    <span class="doccomment">/// A TLS 1.3 cipher suite</span>
-    <span class="ident">Tls13</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>),
+<span class="doccomment">/// A cipher suite supported by rustls.
+///
+/// All possible instances of this type are provided by the library in
+/// the [`ALL_CIPHER_SUITES`] array.
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq)]
+</span><span class="kw">pub enum </span>SupportedCipherSuite {
+    <span class="doccomment">/// A TLS 1.2 cipher suite
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span>Tls12(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite),
+    <span class="doccomment">/// A TLS 1.3 cipher suite
+    </span>Tls13(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite),
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SupportedCipherSuite</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">suite</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">SupportedCipherSuite</span> {
-    <span class="doccomment">/// Which hash function to use with this suite.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash_algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ring::digest::Algorithm</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-            <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">hash_algorithm</span>(),
-            <span class="ident">SupportedCipherSuite::Tls13</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">hash_algorithm</span>(),
-        }
-    }
-
-    <span class="doccomment">/// The cipher suite&#39;s identifier</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">suite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CipherSuite</span> {
-        <span class="self">self</span>.<span class="ident">common</span>().<span class="ident">suite</span>
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">common</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">CipherSuiteCommon</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-            <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="ident">inner</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">common</span>,
-            <span class="ident">SupportedCipherSuite::Tls13</span>(<span class="ident">inner</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">common</span>,
-        }
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls13</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-            <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">SupportedCipherSuite::Tls13</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
-        }
-    }
-
-    <span class="doccomment">/// Return supported protocol version for the cipher suite.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedProtocolVersion</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-            <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">TLS12</span>,
-            <span class="ident">SupportedCipherSuite::Tls13</span>(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">TLS13</span>,
-        }
-    }
-
-    <span class="doccomment">/// Return true if this suite is usable for a key only offering `sig_alg`</span>
-    <span class="doccomment">/// signatures.  This resolves to true for all TLS1.3 suites.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">usable_for_signature_algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_sig_alg</span>: <span class="ident">SignatureAlgorithm</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SupportedCipherSuite::Tls13</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>, <span class="comment">// no constraint expressed by ciphersuite (e.g., TLS1.3)</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-            <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>
-                .<span class="ident">sign</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">scheme</span><span class="op">|</span> <span class="ident">scheme</span>.<span class="ident">sign</span>() <span class="op">==</span> <span class="ident">_sig_alg</span>),
-        }
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>SupportedCipherSuite {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.suite().fmt(f)
     }
 }
 
-<span class="doccomment">/// A list of all the cipher suites supported by rustls.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ALL_CIPHER_SUITES</span>: <span class="kw-2">&amp;</span>[<span class="ident">SupportedCipherSuite</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="comment">// TLS1.3 suites</span>
-    <span class="ident">TLS13_AES_256_GCM_SHA384</span>,
-    <span class="ident">TLS13_AES_128_GCM_SHA256</span>,
-    <span class="ident">TLS13_CHACHA20_POLY1305_SHA256</span>,
-    <span class="comment">// TLS1.2 suites</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="ident">TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="ident">TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="ident">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="ident">TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256</span>,
+<span class="kw">impl </span>SupportedCipherSuite {
+    <span class="doccomment">/// Which hash function to use with this suite.
+    </span><span class="kw">pub fn </span>hash_algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ring::digest::Algorithm {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+            </span>SupportedCipherSuite::Tls12(inner) =&gt; inner.hash_algorithm(),
+            SupportedCipherSuite::Tls13(inner) =&gt; inner.hash_algorithm(),
+        }
+    }
+
+    <span class="doccomment">/// The cipher suite&#39;s identifier
+    </span><span class="kw">pub fn </span>suite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CipherSuite {
+        <span class="self">self</span>.common().suite
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>common(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>CipherSuiteCommon {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+            </span>SupportedCipherSuite::Tls12(inner) =&gt; <span class="kw-2">&amp;</span>inner.common,
+            SupportedCipherSuite::Tls13(inner) =&gt; <span class="kw-2">&amp;</span>inner.common,
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tls13(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+            </span>SupportedCipherSuite::Tls12(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            SupportedCipherSuite::Tls13(inner) =&gt; <span class="prelude-val">Some</span>(inner),
+        }
+    }
+
+    <span class="doccomment">/// Return supported protocol version for the cipher suite.
+    </span><span class="kw">pub fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>SupportedProtocolVersion {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+            </span>SupportedCipherSuite::Tls12(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>TLS12,
+            SupportedCipherSuite::Tls13(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>TLS13,
+        }
+    }
+
+    <span class="doccomment">/// Return true if this suite is usable for a key only offering `sig_alg`
+    /// signatures.  This resolves to true for all TLS1.3 suites.
+    </span><span class="kw">pub fn </span>usable_for_signature_algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>, _sig_alg: SignatureAlgorithm) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            SupportedCipherSuite::Tls13(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>, <span class="comment">// no constraint expressed by ciphersuite (e.g., TLS1.3)
+            </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+            </span>SupportedCipherSuite::Tls12(inner) =&gt; inner
+                .sign
+                .iter()
+                .any(|scheme| scheme.sign() == _sig_alg),
+        }
+    }
+}
+
+<span class="doccomment">/// A list of all the cipher suites supported by rustls.
+</span><span class="kw">pub static </span>ALL_CIPHER_SUITES: <span class="kw-2">&amp;</span>[SupportedCipherSuite] = <span class="kw-2">&amp;</span>[
+    <span class="comment">// TLS1.3 suites
+    </span>TLS13_AES_256_GCM_SHA384,
+    TLS13_AES_128_GCM_SHA256,
+    TLS13_CHACHA20_POLY1305_SHA256,
+    <span class="comment">// TLS1.2 suites
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span>TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span>TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span>TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span>TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span>TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
 ];
 
-<span class="doccomment">/// The cipher suite configuration that an application should use by default.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This will be [`ALL_CIPHER_SUITES`] sans any supported cipher suites that</span>
-<span class="doccomment">/// shouldn&#39;t be enabled by most applications.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">DEFAULT_CIPHER_SUITES</span>: <span class="kw-2">&amp;</span>[<span class="ident">SupportedCipherSuite</span>] <span class="op">=</span> <span class="ident">ALL_CIPHER_SUITES</span>;
+<span class="doccomment">/// The cipher suite configuration that an application should use by default.
+///
+/// This will be [`ALL_CIPHER_SUITES`] sans any supported cipher suites that
+/// shouldn&#39;t be enabled by most applications.
+</span><span class="kw">pub static </span>DEFAULT_CIPHER_SUITES: <span class="kw-2">&amp;</span>[SupportedCipherSuite] = ALL_CIPHER_SUITES;
 
-<span class="comment">// These both O(N^2)!</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">choose_ciphersuite_preferring_client</span>(
-    <span class="ident">client_suites</span>: <span class="kw-2">&amp;</span>[<span class="ident">CipherSuite</span>],
-    <span class="ident">server_suites</span>: <span class="kw-2">&amp;</span>[<span class="ident">SupportedCipherSuite</span>],
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span> {
-    <span class="kw">for</span> <span class="ident">client_suite</span> <span class="kw">in</span> <span class="ident">client_suites</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">selected</span>) <span class="op">=</span> <span class="ident">server_suites</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">client_suite</span> <span class="op">==</span> <span class="ident">x</span>.<span class="ident">suite</span>())
+<span class="comment">// These both O(N^2)!
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>choose_ciphersuite_preferring_client(
+    client_suites: <span class="kw-2">&amp;</span>[CipherSuite],
+    server_suites: <span class="kw-2">&amp;</span>[SupportedCipherSuite],
+) -&gt; <span class="prelude-ty">Option</span>&lt;SupportedCipherSuite&gt; {
+    <span class="kw">for </span>client_suite <span class="kw">in </span>client_suites {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(selected) = server_suites
+            .iter()
+            .find(|x| <span class="kw-2">*</span>client_suite == x.suite())
         {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">selected</span>);
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="kw-2">*</span>selected);
         }
     }
 
-    <span class="prelude-val">None</span>
-}
+    <span class="prelude-val">None
+</span>}
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">choose_ciphersuite_preferring_server</span>(
-    <span class="ident">client_suites</span>: <span class="kw-2">&amp;</span>[<span class="ident">CipherSuite</span>],
-    <span class="ident">server_suites</span>: <span class="kw-2">&amp;</span>[<span class="ident">SupportedCipherSuite</span>],
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">selected</span>) <span class="op">=</span> <span class="ident">server_suites</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">client_suites</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">suite</span>()))
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>choose_ciphersuite_preferring_server(
+    client_suites: <span class="kw-2">&amp;</span>[CipherSuite],
+    server_suites: <span class="kw-2">&amp;</span>[SupportedCipherSuite],
+) -&gt; <span class="prelude-ty">Option</span>&lt;SupportedCipherSuite&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(selected) = server_suites
+        .iter()
+        .find(|x| client_suites.contains(<span class="kw-2">&amp;</span>x.suite()))
     {
-        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">selected</span>);
+        <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="kw-2">*</span>selected);
     }
 
-    <span class="prelude-val">None</span>
+    <span class="prelude-val">None
+</span>}
+
+<span class="doccomment">/// Return a list of the ciphersuites in `all` with the suites
+/// incompatible with `SignatureAlgorithm` `sigalg` removed.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>reduce_given_sigalg(
+    all: <span class="kw-2">&amp;</span>[SupportedCipherSuite],
+    sigalg: SignatureAlgorithm,
+) -&gt; Vec&lt;SupportedCipherSuite&gt; {
+    all.iter()
+        .filter(|&amp;&amp;suite| suite.usable_for_signature_algorithm(sigalg))
+        .copied()
+        .collect()
 }
 
-<span class="doccomment">/// Return a list of the ciphersuites in `all` with the suites</span>
-<span class="doccomment">/// incompatible with `SignatureAlgorithm` `sigalg` removed.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">reduce_given_sigalg</span>(
-    <span class="ident">all</span>: <span class="kw-2">&amp;</span>[<span class="ident">SupportedCipherSuite</span>],
-    <span class="ident">sigalg</span>: <span class="ident">SignatureAlgorithm</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span> {
-    <span class="ident">all</span>.<span class="ident">iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="op">&amp;&amp;</span><span class="ident">suite</span><span class="op">|</span> <span class="ident">suite</span>.<span class="ident">usable_for_signature_algorithm</span>(<span class="ident">sigalg</span>))
-        .<span class="ident">copied</span>()
-        .<span class="ident">collect</span>()
+<span class="doccomment">/// Return a list of the ciphersuites in `all` with the suites
+/// incompatible with the chosen `version` removed.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>reduce_given_version(
+    all: <span class="kw-2">&amp;</span>[SupportedCipherSuite],
+    version: ProtocolVersion,
+) -&gt; Vec&lt;SupportedCipherSuite&gt; {
+    all.iter()
+        .filter(|&amp;&amp;suite| suite.version().version == version)
+        .copied()
+        .collect()
 }
 
-<span class="doccomment">/// Return a list of the ciphersuites in `all` with the suites</span>
-<span class="doccomment">/// incompatible with the chosen `version` removed.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">reduce_given_version</span>(
-    <span class="ident">all</span>: <span class="kw-2">&amp;</span>[<span class="ident">SupportedCipherSuite</span>],
-    <span class="ident">version</span>: <span class="ident">ProtocolVersion</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span> {
-    <span class="ident">all</span>.<span class="ident">iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="op">&amp;&amp;</span><span class="ident">suite</span><span class="op">|</span> <span class="ident">suite</span>.<span class="ident">version</span>().<span class="ident">version</span> <span class="op">==</span> <span class="ident">version</span>)
-        .<span class="ident">copied</span>()
-        .<span class="ident">collect</span>()
+<span class="doccomment">/// Return true if `sigscheme` is usable by any of the given suites.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>compatible_sigscheme_for_suites(
+    sigscheme: SignatureScheme,
+    common_suites: <span class="kw-2">&amp;</span>[SupportedCipherSuite],
+) -&gt; bool {
+    <span class="kw">let </span>sigalg = sigscheme.sign();
+    common_suites
+        .iter()
+        .any(|<span class="kw-2">&amp;</span>suite| suite.usable_for_signature_algorithm(sigalg))
 }
 
-<span class="doccomment">/// Return true if `sigscheme` is usable by any of the given suites.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">compatible_sigscheme_for_suites</span>(
-    <span class="ident">sigscheme</span>: <span class="ident">SignatureScheme</span>,
-    <span class="ident">common_suites</span>: <span class="kw-2">&amp;</span>[<span class="ident">SupportedCipherSuite</span>],
-) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">sigalg</span> <span class="op">=</span> <span class="ident">sigscheme</span>.<span class="ident">sign</span>();
-    <span class="ident">common_suites</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">any</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">suite</span><span class="op">|</span> <span class="ident">suite</span>.<span class="ident">usable_for_signature_algorithm</span>(<span class="ident">sigalg</span>))
-}
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::enums::CipherSuite;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums::CipherSuite</span>;
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_client_pref</span>() {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">CipherSuite::TLS13_AES_128_GCM_SHA256</span>,
-            <span class="ident">CipherSuite::TLS13_AES_256_GCM_SHA384</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_client_pref() {
+        <span class="kw">let </span>client = <span class="macro">vec!</span>[
+            CipherSuite::TLS13_AES_128_GCM_SHA256,
+            CipherSuite::TLS13_AES_256_GCM_SHA384,
         ];
-        <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">TLS13_AES_256_GCM_SHA384</span>, <span class="ident">TLS13_AES_128_GCM_SHA256</span>];
-        <span class="kw">let</span> <span class="ident">chosen</span> <span class="op">=</span> <span class="ident">choose_ciphersuite_preferring_client</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">server</span>);
-        <span class="macro">assert!</span>(<span class="ident">chosen</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">chosen</span>.<span class="ident">unwrap</span>(), <span class="ident">TLS13_AES_128_GCM_SHA256</span>);
+        <span class="kw">let </span>server = <span class="macro">vec!</span>[TLS13_AES_256_GCM_SHA384, TLS13_AES_128_GCM_SHA256];
+        <span class="kw">let </span>chosen = choose_ciphersuite_preferring_client(<span class="kw-2">&amp;</span>client, <span class="kw-2">&amp;</span>server);
+        <span class="macro">assert!</span>(chosen.is_some());
+        <span class="macro">assert_eq!</span>(chosen.unwrap(), TLS13_AES_128_GCM_SHA256);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_server_pref</span>() {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">CipherSuite::TLS13_AES_128_GCM_SHA256</span>,
-            <span class="ident">CipherSuite::TLS13_AES_256_GCM_SHA384</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_server_pref() {
+        <span class="kw">let </span>client = <span class="macro">vec!</span>[
+            CipherSuite::TLS13_AES_128_GCM_SHA256,
+            CipherSuite::TLS13_AES_256_GCM_SHA384,
         ];
-        <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">TLS13_AES_256_GCM_SHA384</span>, <span class="ident">TLS13_AES_128_GCM_SHA256</span>];
-        <span class="kw">let</span> <span class="ident">chosen</span> <span class="op">=</span> <span class="ident">choose_ciphersuite_preferring_server</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">server</span>);
-        <span class="macro">assert!</span>(<span class="ident">chosen</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">chosen</span>.<span class="ident">unwrap</span>(), <span class="ident">TLS13_AES_256_GCM_SHA384</span>);
+        <span class="kw">let </span>server = <span class="macro">vec!</span>[TLS13_AES_256_GCM_SHA384, TLS13_AES_128_GCM_SHA256];
+        <span class="kw">let </span>chosen = choose_ciphersuite_preferring_server(<span class="kw-2">&amp;</span>client, <span class="kw-2">&amp;</span>server);
+        <span class="macro">assert!</span>(chosen.is_some());
+        <span class="macro">assert_eq!</span>(chosen.unwrap(), TLS13_AES_256_GCM_SHA384);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_pref_fails</span>() {
-        <span class="macro">assert!</span>(<span class="ident">choose_ciphersuite_preferring_client</span>(
-            <span class="kw-2">&amp;</span>[<span class="ident">CipherSuite::TLS_NULL_WITH_NULL_NULL</span>],
-            <span class="ident">ALL_CIPHER_SUITES</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_pref_fails() {
+        <span class="macro">assert!</span>(choose_ciphersuite_preferring_client(
+            <span class="kw-2">&amp;</span>[CipherSuite::TLS_NULL_WITH_NULL_NULL],
+            ALL_CIPHER_SUITES
         )
-        .<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">choose_ciphersuite_preferring_server</span>(
-            <span class="kw-2">&amp;</span>[<span class="ident">CipherSuite::TLS_NULL_WITH_NULL_NULL</span>],
-            <span class="ident">ALL_CIPHER_SUITES</span>
+        .is_none());
+        <span class="macro">assert!</span>(choose_ciphersuite_preferring_server(
+            <span class="kw-2">&amp;</span>[CipherSuite::TLS_NULL_WITH_NULL_NULL],
+            ALL_CIPHER_SUITES
         )
-        .<span class="ident">is_none</span>());
+        .is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_scs_is_debug</span>() {
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">ALL_CIPHER_SUITES</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_scs_is_debug() {
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, ALL_CIPHER_SUITES);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_can_resume_to</span>() {
-        <span class="macro">assert!</span>(<span class="ident">TLS13_AES_128_GCM_SHA256</span>
-            .<span class="ident">tls13</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">can_resume_from</span>(<span class="ident"><span class="kw">crate</span>::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL</span>)
-            .<span class="ident">is_some</span>());
-        <span class="macro">assert!</span>(<span class="ident">TLS13_AES_256_GCM_SHA384</span>
-            .<span class="ident">tls13</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">can_resume_from</span>(<span class="ident"><span class="kw">crate</span>::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL</span>)
-            .<span class="ident">is_none</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_can_resume_to() {
+        <span class="macro">assert!</span>(TLS13_AES_128_GCM_SHA256
+            .tls13()
+            .unwrap()
+            .can_resume_from(<span class="kw">crate</span>::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL)
+            .is_some());
+        <span class="macro">assert!</span>(TLS13_AES_256_GCM_SHA384
+            .tls13()
+            .unwrap()
+            .can_resume_from(<span class="kw">crate</span>::tls13::TLS13_CHACHA20_POLY1305_SHA256_INTERNAL)
+            .is_none());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

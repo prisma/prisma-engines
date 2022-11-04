@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/static_assertions-1.1.0/src/assert_impl.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>assert_impl.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../static_assertions/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/nvzqz/static-assertions-rs/assets/Icon.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../static_assertions/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/static_assertions-1.1.0/src/assert_impl.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>assert_impl.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../static_assertions/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/nvzqz/static-assertions-rs/assets/Icon.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../static_assertions/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/nvzqz/static-assertions-rs/assets/Icon.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../static_assertions/index.html">
                         <img src="https://raw.githubusercontent.com/nvzqz/static-assertions-rs/assets/Icon.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -356,361 +356,361 @@
 <span id="354">354</span>
 <span id="355">355</span>
 <span id="356">356</span>
-</pre><pre class="rust"><code><span class="doccomment">/// Asserts that the type implements exactly one in a set of traits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Related:</span>
-<span class="doccomment">/// - [`assert_impl_any!`]</span>
-<span class="doccomment">/// - [`assert_impl_all!`]</span>
-<span class="doccomment">/// - [`assert_not_impl_all!`]</span>
-<span class="doccomment">/// - [`assert_not_impl_any!`]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Given some type `Foo`, it is expected to implement either `Snap`, `Crackle`,</span>
-<span class="doccomment">/// or `Pop`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// # use static_assertions::assert_impl_one; fn main() {}</span>
-<span class="doccomment">/// struct Foo;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// trait Snap {}</span>
-<span class="doccomment">/// trait Crackle {}</span>
-<span class="doccomment">/// trait Pop {}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_impl_one!(Foo: Snap, Crackle, Pop);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If _only_ `Crackle` is implemented, the assertion passes:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use static_assertions::assert_impl_one; fn main() {}</span>
-<span class="doccomment">/// # struct Foo;</span>
-<span class="doccomment">/// # trait Snap {}</span>
-<span class="doccomment">/// # trait Crackle {}</span>
-<span class="doccomment">/// # trait Pop {}</span>
-<span class="doccomment">/// impl Crackle for Foo {}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_impl_one!(Foo: Snap, Crackle, Pop);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If `Snap` or `Pop` is _also_ implemented, the assertion fails:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// # use static_assertions::assert_impl_one; fn main() {}</span>
-<span class="doccomment">/// # struct Foo;</span>
-<span class="doccomment">/// # trait Snap {}</span>
-<span class="doccomment">/// # trait Crackle {}</span>
-<span class="doccomment">/// # trait Pop {}</span>
-<span class="doccomment">/// # impl Crackle for Foo {}</span>
-<span class="doccomment">/// impl Pop for Foo {}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_impl_one!(Foo: Snap, Crackle, Pop);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`assert_impl_any!`]:     macro.assert_impl_any.html</span>
-<span class="doccomment">/// [`assert_impl_all!`]:     macro.assert_impl_all.html</span>
-<span class="doccomment">/// [`assert_not_impl_all!`]: macro.assert_not_impl_all.html</span>
-<span class="doccomment">/// [`assert_not_impl_any!`]: macro.assert_not_impl_any.html</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_impl_one</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ty</span>: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">path</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="kw">const</span> <span class="kw">_</span>: <span class="kw">fn</span>() <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="comment">// Generic trait that must be implemented for `$x` exactly once.</span>
-            <span class="kw">trait</span> <span class="ident">AmbiguousIfMoreThanOne</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-                <span class="comment">// Required for actually being able to reference the trait.</span>
-                <span class="kw">fn</span> <span class="ident">some_item</span>() {}
+</pre><pre class="rust"><code><span class="doccomment">/// Asserts that the type implements exactly one in a set of traits.
+///
+/// Related:
+/// - [`assert_impl_any!`]
+/// - [`assert_impl_all!`]
+/// - [`assert_not_impl_all!`]
+/// - [`assert_not_impl_any!`]
+///
+/// # Examples
+///
+/// Given some type `Foo`, it is expected to implement either `Snap`, `Crackle`,
+/// or `Pop`:
+///
+/// ```compile_fail
+/// # use static_assertions::assert_impl_one; fn main() {}
+/// struct Foo;
+///
+/// trait Snap {}
+/// trait Crackle {}
+/// trait Pop {}
+///
+/// assert_impl_one!(Foo: Snap, Crackle, Pop);
+/// ```
+///
+/// If _only_ `Crackle` is implemented, the assertion passes:
+///
+/// ```
+/// # use static_assertions::assert_impl_one; fn main() {}
+/// # struct Foo;
+/// # trait Snap {}
+/// # trait Crackle {}
+/// # trait Pop {}
+/// impl Crackle for Foo {}
+///
+/// assert_impl_one!(Foo: Snap, Crackle, Pop);
+/// ```
+///
+/// If `Snap` or `Pop` is _also_ implemented, the assertion fails:
+///
+/// ```compile_fail
+/// # use static_assertions::assert_impl_one; fn main() {}
+/// # struct Foo;
+/// # trait Snap {}
+/// # trait Crackle {}
+/// # trait Pop {}
+/// # impl Crackle for Foo {}
+/// impl Pop for Foo {}
+///
+/// assert_impl_one!(Foo: Snap, Crackle, Pop);
+/// ```
+///
+/// [`assert_impl_any!`]:     macro.assert_impl_any.html
+/// [`assert_impl_all!`]:     macro.assert_impl_all.html
+/// [`assert_not_impl_all!`]: macro.assert_not_impl_all.html
+/// [`assert_not_impl_any!`]: macro.assert_not_impl_any.html
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>assert_impl_one {
+    (<span class="macro-nonterminal">$x</span>:ty: $(<span class="macro-nonterminal">$t</span>:path),+ $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="kw">const _</span>: <span class="kw">fn</span>() = || {
+            <span class="comment">// Generic trait that must be implemented for `$x` exactly once.
+            </span><span class="kw">trait </span>AmbiguousIfMoreThanOne&lt;A&gt; {
+                <span class="comment">// Required for actually being able to reference the trait.
+                </span><span class="kw">fn </span>some_item() {}
             }
 
-            <span class="comment">// Creates multiple scoped `Token` types for each trait `$t`, over</span>
-            <span class="comment">// which a specialized `AmbiguousIfMoreThanOne&lt;Token&gt;` is</span>
-            <span class="comment">// implemented for every type that implements `$t`.</span>
-            $({
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-                <span class="kw">struct</span> <span class="ident">Token</span>;
+            <span class="comment">// Creates multiple scoped `Token` types for each trait `$t`, over
+            // which a specialized `AmbiguousIfMoreThanOne&lt;Token&gt;` is
+            // implemented for every type that implements `$t`.
+            </span>$({
+                <span class="attribute">#[allow(dead_code)]
+                </span><span class="kw">struct </span>Token;
 
-                <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="ident">AmbiguousIfMoreThanOne</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span> {}
-            })<span class="op">+</span>
+                <span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized + <span class="macro-nonterminal">$t</span>&gt; AmbiguousIfMoreThanOne&lt;Token&gt; <span class="kw">for </span>T {}
+            })+
 
-            <span class="comment">// If there is only one specialized trait impl, type inference with</span>
-            <span class="comment">// `_` can be resolved and this can compile. Fails to compile if</span>
-            <span class="comment">// `$x` implements more than one `AmbiguousIfMoreThanOne&lt;Token&gt;` or</span>
-            <span class="comment">// does not implement any at all.</span>
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span> <span class="kw">as</span> <span class="ident">AmbiguousIfMoreThanOne</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::some_item</span>;
+            <span class="comment">// If there is only one specialized trait impl, type inference with
+            // `_` can be resolved and this can compile. Fails to compile if
+            // `$x` implements more than one `AmbiguousIfMoreThanOne&lt;Token&gt;` or
+            // does not implement any at all.
+            </span><span class="kw">let _ </span>= &lt;<span class="macro-nonterminal">$x </span><span class="kw">as </span>AmbiguousIfMoreThanOne&lt;<span class="kw">_</span>&gt;&gt;::some_item;
         };
     };
 }
 
-<span class="doccomment">/// Asserts that the type implements _all_ of the given traits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [`assert_not_impl_all!`] for achieving the opposite effect.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This can be used to ensure types implement auto traits such as [`Send`] and</span>
-<span class="doccomment">/// [`Sync`], as well as traits with [blanket `impl`s][blanket].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// assert_impl_all!(u32: Copy, Send);</span>
-<span class="doccomment">/// assert_impl_all!(&amp;str: Into&lt;String&gt;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following example fails to compile because raw pointers do not implement</span>
-<span class="doccomment">/// [`Send`] since they cannot be moved between threads safely:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// assert_impl_all!(*const u8: Send);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`assert_not_impl_all!`]: macro.assert_not_impl_all.html</span>
-<span class="doccomment">/// [`Send`]: https://doc.rust-lang.org/std/marker/trait.Send.html</span>
-<span class="doccomment">/// [`Sync`]: https://doc.rust-lang.org/std/marker/trait.Sync.html</span>
-<span class="doccomment">/// [blanket]: https://doc.rust-lang.org/book/ch10-02-traits.html#using-trait-bounds-to-conditionally-implement-methods</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_impl_all</span> {
-    (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>: $(<span class="macro-nonterminal">$</span><span class="kw">trait</span>:<span class="macro-nonterminal">path</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="kw">const</span> <span class="kw">_</span>: <span class="kw">fn</span>() <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="comment">// Only callable when `$type` implements all traits in `$($trait)+`.</span>
-            <span class="kw">fn</span> <span class="ident">assert_impl_all</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> $(<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="kw">trait</span>)<span class="op">+</span><span class="op">&gt;</span>() {}
-            <span class="macro-nonterminal">assert_impl_all</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span>();
+<span class="doccomment">/// Asserts that the type implements _all_ of the given traits.
+///
+/// See [`assert_not_impl_all!`] for achieving the opposite effect.
+///
+/// # Examples
+///
+/// This can be used to ensure types implement auto traits such as [`Send`] and
+/// [`Sync`], as well as traits with [blanket `impl`s][blanket].
+///
+/// ```
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// assert_impl_all!(u32: Copy, Send);
+/// assert_impl_all!(&amp;str: Into&lt;String&gt;);
+/// ```
+///
+/// The following example fails to compile because raw pointers do not implement
+/// [`Send`] since they cannot be moved between threads safely:
+///
+/// ```compile_fail
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// assert_impl_all!(*const u8: Send);
+/// ```
+///
+/// [`assert_not_impl_all!`]: macro.assert_not_impl_all.html
+/// [`Send`]: https://doc.rust-lang.org/std/marker/trait.Send.html
+/// [`Sync`]: https://doc.rust-lang.org/std/marker/trait.Sync.html
+/// [blanket]: https://doc.rust-lang.org/book/ch10-02-traits.html#using-trait-bounds-to-conditionally-implement-methods
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>assert_impl_all {
+    (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>: $(<span class="macro-nonterminal">$</span><span class="kw">trait</span>:<span class="macro-nonterminal">path</span>),+ $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="kw">const _</span>: <span class="kw">fn</span>() = || {
+            <span class="comment">// Only callable when `$type` implements all traits in `$($trait)+`.
+            </span><span class="kw">fn </span>assert_impl_all&lt;T: <span class="question-mark">?</span>Sized $(+ <span class="macro-nonterminal">$</span><span class="kw">trait</span>)+&gt;() {}
+            <span class="macro-nonterminal">assert_impl_all</span>::&lt;<span class="macro-nonterminal">$</span><span class="kw">type</span>&gt;();
         };
     };
 }
 
-<span class="doccomment">/// Asserts that the type implements _any_ of the given traits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [`assert_not_impl_any!`] for achieving the opposite effect.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `u8` cannot be converted from `u16`, but it can be converted into `u16`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// assert_impl_any!(u8: From&lt;u16&gt;, Into&lt;u16&gt;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The unit type cannot be converted from `u8` or `u16`, but it does implement</span>
-<span class="doccomment">/// [`Send`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// assert_impl_any!((): From&lt;u8&gt;, From&lt;u16&gt;, Send);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following example fails to compile because raw pointers do not implement</span>
-<span class="doccomment">/// [`Send`] or [`Sync`] since they cannot be moved or shared between threads</span>
-<span class="doccomment">/// safely:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// assert_impl_any!(*const u8: Send, Sync);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`assert_not_impl_any!`]: macro.assert_not_impl_any.html</span>
-<span class="doccomment">/// [`Send`]: https://doc.rust-lang.org/std/marker/trait.Send.html</span>
-<span class="doccomment">/// [`Sync`]: https://doc.rust-lang.org/std/marker/trait.Sync.html</span>
-<span class="attribute">#[<span class="macro-nonterminal">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_impl_any</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ty</span>: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">path</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="kw">const</span> <span class="kw">_</span>: <span class="kw">fn</span>() <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::_core::marker::PhantomData</span>;
-            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::_core::ops::Deref</span>;
+<span class="doccomment">/// Asserts that the type implements _any_ of the given traits.
+///
+/// See [`assert_not_impl_any!`] for achieving the opposite effect.
+///
+/// # Examples
+///
+/// `u8` cannot be converted from `u16`, but it can be converted into `u16`:
+///
+/// ```
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// assert_impl_any!(u8: From&lt;u16&gt;, Into&lt;u16&gt;);
+/// ```
+///
+/// The unit type cannot be converted from `u8` or `u16`, but it does implement
+/// [`Send`]:
+///
+/// ```
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// assert_impl_any!((): From&lt;u8&gt;, From&lt;u16&gt;, Send);
+/// ```
+///
+/// The following example fails to compile because raw pointers do not implement
+/// [`Send`] or [`Sync`] since they cannot be moved or shared between threads
+/// safely:
+///
+/// ```compile_fail
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// assert_impl_any!(*const u8: Send, Sync);
+/// ```
+///
+/// [`assert_not_impl_any!`]: macro.assert_not_impl_any.html
+/// [`Send`]: https://doc.rust-lang.org/std/marker/trait.Send.html
+/// [`Sync`]: https://doc.rust-lang.org/std/marker/trait.Sync.html
+</span><span class="attribute">#[<span class="macro-nonterminal">macro_export</span>]
+</span><span class="macro">macro_rules! </span>assert_impl_any {
+    (<span class="macro-nonterminal">$x</span>:ty: $(<span class="macro-nonterminal">$t</span>:path),+ $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="kw">const _</span>: <span class="kw">fn</span>() = || {
+            <span class="kw">use </span><span class="macro-nonterminal">$crate::_core::marker::PhantomData</span>;
+            <span class="kw">use </span><span class="macro-nonterminal">$crate::_core::ops::Deref</span>;
 
-            <span class="comment">// Fallback to use as the first iterative assignment to `previous`.</span>
-            <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="ident">AssertImplAnyFallback</span>;
-            <span class="kw">struct</span> <span class="ident">AssertImplAnyFallback</span>;
+            <span class="comment">// Fallback to use as the first iterative assignment to `previous`.
+            </span><span class="kw">let </span>previous = AssertImplAnyFallback;
+            <span class="kw">struct </span>AssertImplAnyFallback;
 
-            <span class="comment">// Ensures that blanket traits can&#39;t impersonate the method. This</span>
-            <span class="comment">// prevents a false positive attack where---if a blanket trait is in</span>
-            <span class="comment">// scope that has `_static_assertions_impl_any`---the macro will</span>
-            <span class="comment">// compile when it shouldn&#39;t.</span>
-            <span class="comment">//</span>
-            <span class="comment">// See https://github.com/nvzqz/static-assertions-rs/issues/19 for</span>
-            <span class="comment">// more info.</span>
-            <span class="kw">struct</span> <span class="ident">ActualAssertImplAnyToken</span>;
-            <span class="kw">trait</span> <span class="ident">AssertImplAnyToken</span> {}
-            <span class="kw">impl</span> <span class="ident">AssertImplAnyToken</span> <span class="kw">for</span> <span class="ident">ActualAssertImplAnyToken</span> {}
-            <span class="kw">fn</span> <span class="ident">assert_impl_any_token</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AssertImplAnyToken</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="ident">T</span>) {}
+            <span class="comment">// Ensures that blanket traits can&#39;t impersonate the method. This
+            // prevents a false positive attack where---if a blanket trait is in
+            // scope that has `_static_assertions_impl_any`---the macro will
+            // compile when it shouldn&#39;t.
+            //
+            // See https://github.com/nvzqz/static-assertions-rs/issues/19 for
+            // more info.
+            </span><span class="kw">struct </span>ActualAssertImplAnyToken;
+            <span class="kw">trait </span>AssertImplAnyToken {}
+            <span class="kw">impl </span>AssertImplAnyToken <span class="kw">for </span>ActualAssertImplAnyToken {}
+            <span class="kw">fn </span>assert_impl_any_token&lt;T: AssertImplAnyToken&gt;(<span class="kw">_</span>: T) {}
 
-            $(<span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> {
-                <span class="kw">struct</span> <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">N</span>);
+            $(<span class="kw">let </span>previous = {
+                <span class="kw">struct </span>Wrapper&lt;T, N&gt;(PhantomData&lt;T&gt;, N);
 
-                <span class="comment">// If the method for this wrapper can&#39;t be called then the</span>
-                <span class="comment">// compiler will insert a deref and try again. This forwards the</span>
-                <span class="comment">// compiler&#39;s next attempt to the previous wrapper.</span>
-                <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-                    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">N</span>;
+                <span class="comment">// If the method for this wrapper can&#39;t be called then the
+                // compiler will insert a deref and try again. This forwards the
+                // compiler&#39;s next attempt to the previous wrapper.
+                </span><span class="kw">impl</span>&lt;T, N&gt; Deref <span class="kw">for </span>Wrapper&lt;T, N&gt; {
+                    <span class="kw">type </span>Target = N;
 
-                    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-                        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>
+                    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+                        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1
+                    </span>}
+                }
+
+                <span class="comment">// This impl is bounded on the `$t` trait, so the method can
+                // only be called if `$x` implements `$t`. This is why a new
+                // `Wrapper` is defined for each `previous`.
+                </span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t</span>, N&gt; Wrapper&lt;T, N&gt; {
+                    <span class="kw">fn </span>_static_assertions_impl_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ActualAssertImplAnyToken {
+                        ActualAssertImplAnyToken
                     }
                 }
 
-                <span class="comment">// This impl is bounded on the `$t` trait, so the method can</span>
-                <span class="comment">// only be called if `$x` implements `$t`. This is why a new</span>
-                <span class="comment">// `Wrapper` is defined for each `previous`.</span>
-                <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-                    <span class="kw">fn</span> <span class="ident">_static_assertions_impl_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ActualAssertImplAnyToken</span> {
-                        <span class="ident">ActualAssertImplAnyToken</span>
-                    }
-                }
+                Wrapper::&lt;<span class="macro-nonterminal">$x</span>, <span class="kw">_</span>&gt;(PhantomData, previous)
+            };)+
 
-                <span class="ident">Wrapper</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span>, <span class="ident">previous</span>)
-            };)<span class="op">+</span>
-
-            <span class="comment">// Attempt to find the method that can actually be called. The found</span>
-            <span class="comment">// method must return a type that implements the sealed `Token`</span>
-            <span class="comment">// trait, this ensures that blanket trait methods can&#39;t cause this</span>
-            <span class="comment">// macro to compile.</span>
-            <span class="ident">assert_impl_any_token</span>(<span class="ident">previous</span>.<span class="ident">_static_assertions_impl_any</span>());
+            <span class="comment">// Attempt to find the method that can actually be called. The found
+            // method must return a type that implements the sealed `Token`
+            // trait, this ensures that blanket trait methods can&#39;t cause this
+            // macro to compile.
+            </span>assert_impl_any_token(previous._static_assertions_impl_any());
         };
     };
 }
 
-<span class="doccomment">/// Asserts that the type does **not** implement _all_ of the given traits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This can be used to ensure types do not implement auto traits such as</span>
-<span class="doccomment">/// [`Send`] and [`Sync`], as well as traits with [blanket `impl`s][blanket].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that the combination of all provided traits is required to not be</span>
-<span class="doccomment">/// implemented. If you want to check that none of multiple traits are</span>
-<span class="doccomment">/// implemented you should invoke [`assert_not_impl_any!`] instead.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Although `u32` implements `From&lt;u16&gt;`, it does not implement `Into&lt;usize&gt;`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// assert_not_impl_all!(u32: From&lt;u16&gt;, Into&lt;usize&gt;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following example fails to compile since `u32` can be converted into</span>
-<span class="doccomment">/// `u64`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// assert_not_impl_all!(u32: Into&lt;u64&gt;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following compiles because [`Cell`] is not both [`Sync`] _and_ [`Send`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// use std::cell::Cell;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_not_impl_all!(Cell&lt;u32&gt;: Sync, Send);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// But it is [`Send`], so this fails to compile:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// # std::cell::Cell;</span>
-<span class="doccomment">/// assert_not_impl_all!(Cell&lt;u32&gt;: Send);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Send`]: https://doc.rust-lang.org/std/marker/trait.Send.html</span>
-<span class="doccomment">/// [`Sync`]: https://doc.rust-lang.org/std/marker/trait.Sync.html</span>
-<span class="doccomment">/// [`assert_not_impl_any!`]: macro.assert_not_impl_any.html</span>
-<span class="doccomment">/// [`Cell`]: https://doc.rust-lang.org/std/cell/struct.Cell.html</span>
-<span class="doccomment">/// [blanket]: https://doc.rust-lang.org/book/ch10-02-traits.html#using-trait-bounds-to-conditionally-implement-methods</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_not_impl_all</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ty</span>: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">path</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="kw">const</span> <span class="kw">_</span>: <span class="kw">fn</span>() <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="comment">// Generic trait with a blanket impl over `()` for all types.</span>
-            <span class="kw">trait</span> <span class="ident">AmbiguousIfImpl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-                <span class="comment">// Required for actually being able to reference the trait.</span>
-                <span class="kw">fn</span> <span class="ident">some_item</span>() {}
+<span class="doccomment">/// Asserts that the type does **not** implement _all_ of the given traits.
+///
+/// This can be used to ensure types do not implement auto traits such as
+/// [`Send`] and [`Sync`], as well as traits with [blanket `impl`s][blanket].
+///
+/// Note that the combination of all provided traits is required to not be
+/// implemented. If you want to check that none of multiple traits are
+/// implemented you should invoke [`assert_not_impl_any!`] instead.
+///
+/// # Examples
+///
+/// Although `u32` implements `From&lt;u16&gt;`, it does not implement `Into&lt;usize&gt;`:
+///
+/// ```
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// assert_not_impl_all!(u32: From&lt;u16&gt;, Into&lt;usize&gt;);
+/// ```
+///
+/// The following example fails to compile since `u32` can be converted into
+/// `u64`.
+///
+/// ```compile_fail
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// assert_not_impl_all!(u32: Into&lt;u64&gt;);
+/// ```
+///
+/// The following compiles because [`Cell`] is not both [`Sync`] _and_ [`Send`]:
+///
+/// ```
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// use std::cell::Cell;
+///
+/// assert_not_impl_all!(Cell&lt;u32&gt;: Sync, Send);
+/// ```
+///
+/// But it is [`Send`], so this fails to compile:
+///
+/// ```compile_fail
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// # std::cell::Cell;
+/// assert_not_impl_all!(Cell&lt;u32&gt;: Send);
+/// ```
+///
+/// [`Send`]: https://doc.rust-lang.org/std/marker/trait.Send.html
+/// [`Sync`]: https://doc.rust-lang.org/std/marker/trait.Sync.html
+/// [`assert_not_impl_any!`]: macro.assert_not_impl_any.html
+/// [`Cell`]: https://doc.rust-lang.org/std/cell/struct.Cell.html
+/// [blanket]: https://doc.rust-lang.org/book/ch10-02-traits.html#using-trait-bounds-to-conditionally-implement-methods
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>assert_not_impl_all {
+    (<span class="macro-nonterminal">$x</span>:ty: $(<span class="macro-nonterminal">$t</span>:path),+ $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="kw">const _</span>: <span class="kw">fn</span>() = || {
+            <span class="comment">// Generic trait with a blanket impl over `()` for all types.
+            </span><span class="kw">trait </span>AmbiguousIfImpl&lt;A&gt; {
+                <span class="comment">// Required for actually being able to reference the trait.
+                </span><span class="kw">fn </span>some_item() {}
             }
 
-            <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">AmbiguousIfImpl</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span> {}
+            <span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized&gt; AmbiguousIfImpl&lt;()&gt; <span class="kw">for </span>T {}
 
-            <span class="comment">// Used for the specialized impl when *all* traits in</span>
-            <span class="comment">// `$($t)+` are implemented.</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-            <span class="kw">struct</span> <span class="ident">Invalid</span>;
+            <span class="comment">// Used for the specialized impl when *all* traits in
+            // `$($t)+` are implemented.
+            </span><span class="attribute">#[allow(dead_code)]
+            </span><span class="kw">struct </span>Invalid;
 
-            <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> $(<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="op">+</span><span class="op">&gt;</span> <span class="ident">AmbiguousIfImpl</span><span class="op">&lt;</span><span class="ident">Invalid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span> {}
+            <span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized $(+ <span class="macro-nonterminal">$t</span>)+&gt; AmbiguousIfImpl&lt;Invalid&gt; <span class="kw">for </span>T {}
 
-            <span class="comment">// If there is only one specialized trait impl, type inference with</span>
-            <span class="comment">// `_` can be resolved and this can compile. Fails to compile if</span>
-            <span class="comment">// `$x` implements `AmbiguousIfImpl&lt;Invalid&gt;`.</span>
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span> <span class="kw">as</span> <span class="ident">AmbiguousIfImpl</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::some_item</span>;
+            <span class="comment">// If there is only one specialized trait impl, type inference with
+            // `_` can be resolved and this can compile. Fails to compile if
+            // `$x` implements `AmbiguousIfImpl&lt;Invalid&gt;`.
+            </span><span class="kw">let _ </span>= &lt;<span class="macro-nonterminal">$x </span><span class="kw">as </span>AmbiguousIfImpl&lt;<span class="kw">_</span>&gt;&gt;::some_item;
         };
     };
 }
 
-<span class="doccomment">/// Asserts that the type does **not** implement _any_ of the given traits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This can be used to ensure types do not implement auto traits such as</span>
-<span class="doccomment">/// [`Send`] and [`Sync`], as well as traits with [blanket `impl`s][blanket].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This macro causes a compilation failure if any of the provided individual</span>
-<span class="doccomment">/// traits are implemented for the type. If you want to check that a combination</span>
-<span class="doccomment">/// of traits is not implemented you should invoke [`assert_not_impl_all!`]</span>
-<span class="doccomment">/// instead. For single traits both macros behave the same.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If `u32` were to implement `Into` conversions for `usize` _and_ for `u8`,</span>
-<span class="doccomment">/// the following would fail to compile:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// assert_not_impl_any!(u32: Into&lt;usize&gt;, Into&lt;u8&gt;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is also good for simple one-off cases:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// assert_not_impl_any!(&amp;&#39;static mut u8: Copy);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following example fails to compile since `u32` can be converted into</span>
-<span class="doccomment">/// `u64` even though it can not be converted into a `u16`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// assert_not_impl_any!(u32: Into&lt;u64&gt;, Into&lt;u16&gt;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Send`]: https://doc.rust-lang.org/std/marker/trait.Send.html</span>
-<span class="doccomment">/// [`Sync`]: https://doc.rust-lang.org/std/marker/trait.Sync.html</span>
-<span class="doccomment">/// [`assert_not_impl_all!`]: macro.assert_not_impl_all.html</span>
-<span class="doccomment">/// [blanket]: https://doc.rust-lang.org/book/ch10-02-traits.html#using-trait-bounds-to-conditionally-implement-methods</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_not_impl_any</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ty</span>: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">path</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="kw">const</span> <span class="kw">_</span>: <span class="kw">fn</span>() <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="comment">// Generic trait with a blanket impl over `()` for all types.</span>
-            <span class="kw">trait</span> <span class="ident">AmbiguousIfImpl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-                <span class="comment">// Required for actually being able to reference the trait.</span>
-                <span class="kw">fn</span> <span class="ident">some_item</span>() {}
+<span class="doccomment">/// Asserts that the type does **not** implement _any_ of the given traits.
+///
+/// This can be used to ensure types do not implement auto traits such as
+/// [`Send`] and [`Sync`], as well as traits with [blanket `impl`s][blanket].
+///
+/// This macro causes a compilation failure if any of the provided individual
+/// traits are implemented for the type. If you want to check that a combination
+/// of traits is not implemented you should invoke [`assert_not_impl_all!`]
+/// instead. For single traits both macros behave the same.
+///
+/// # Examples
+///
+/// If `u32` were to implement `Into` conversions for `usize` _and_ for `u8`,
+/// the following would fail to compile:
+///
+/// ```
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// assert_not_impl_any!(u32: Into&lt;usize&gt;, Into&lt;u8&gt;);
+/// ```
+///
+/// This is also good for simple one-off cases:
+///
+/// ```
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// assert_not_impl_any!(&amp;&#39;static mut u8: Copy);
+/// ```
+///
+/// The following example fails to compile since `u32` can be converted into
+/// `u64` even though it can not be converted into a `u16`:
+///
+/// ```compile_fail
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// assert_not_impl_any!(u32: Into&lt;u64&gt;, Into&lt;u16&gt;);
+/// ```
+///
+/// [`Send`]: https://doc.rust-lang.org/std/marker/trait.Send.html
+/// [`Sync`]: https://doc.rust-lang.org/std/marker/trait.Sync.html
+/// [`assert_not_impl_all!`]: macro.assert_not_impl_all.html
+/// [blanket]: https://doc.rust-lang.org/book/ch10-02-traits.html#using-trait-bounds-to-conditionally-implement-methods
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>assert_not_impl_any {
+    (<span class="macro-nonterminal">$x</span>:ty: $(<span class="macro-nonterminal">$t</span>:path),+ $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="kw">const _</span>: <span class="kw">fn</span>() = || {
+            <span class="comment">// Generic trait with a blanket impl over `()` for all types.
+            </span><span class="kw">trait </span>AmbiguousIfImpl&lt;A&gt; {
+                <span class="comment">// Required for actually being able to reference the trait.
+                </span><span class="kw">fn </span>some_item() {}
             }
 
-            <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">AmbiguousIfImpl</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span> {}
+            <span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized&gt; AmbiguousIfImpl&lt;()&gt; <span class="kw">for </span>T {}
 
-            <span class="comment">// Creates multiple scoped `Invalid` types for each trait `$t`, over</span>
-            <span class="comment">// which a specialized `AmbiguousIfImpl&lt;Invalid&gt;` is implemented for</span>
-            <span class="comment">// every type that implements `$t`.</span>
-            $({
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-                <span class="kw">struct</span> <span class="ident">Invalid</span>;
+            <span class="comment">// Creates multiple scoped `Invalid` types for each trait `$t`, over
+            // which a specialized `AmbiguousIfImpl&lt;Invalid&gt;` is implemented for
+            // every type that implements `$t`.
+            </span>$({
+                <span class="attribute">#[allow(dead_code)]
+                </span><span class="kw">struct </span>Invalid;
 
-                <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="ident">AmbiguousIfImpl</span><span class="op">&lt;</span><span class="ident">Invalid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span> {}
-            })<span class="op">+</span>
+                <span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized + <span class="macro-nonterminal">$t</span>&gt; AmbiguousIfImpl&lt;Invalid&gt; <span class="kw">for </span>T {}
+            })+
 
-            <span class="comment">// If there is only one specialized trait impl, type inference with</span>
-            <span class="comment">// `_` can be resolved and this can compile. Fails to compile if</span>
-            <span class="comment">// `$x` implements any `AmbiguousIfImpl&lt;Invalid&gt;`.</span>
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span> <span class="kw">as</span> <span class="ident">AmbiguousIfImpl</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::some_item</span>;
+            <span class="comment">// If there is only one specialized trait impl, type inference with
+            // `_` can be resolved and this can compile. Fails to compile if
+            // `$x` implements any `AmbiguousIfImpl&lt;Invalid&gt;`.
+            </span><span class="kw">let _ </span>= &lt;<span class="macro-nonterminal">$x </span><span class="kw">as </span>AmbiguousIfImpl&lt;<span class="kw">_</span>&gt;&gt;::some_item;
         };
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="static_assertions" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="static_assertions" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

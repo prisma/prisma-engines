@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/quanta-0.9.3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../quanta/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../quanta/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../quanta/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/quanta-0.9.3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../quanta/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../quanta/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../quanta/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -789,796 +789,796 @@
 <span id="789">789</span>
 <span id="790">790</span>
 <span id="791">791</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Performant cross-platform timing with goodies.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `quanta` provides a simple and fast API for measuring the current time and the duration between</span>
-<span class="doccomment">//! events.  It does this by providing a thin layer on top of native OS timing functions, or, if</span>
-<span class="doccomment">//! available, using the Time Stamp Counter feature found on modern CPUs.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Design</span>
-<span class="doccomment">//! Internally, `quanta` maintains the concept of two potential clock sources: a reference clock and</span>
-<span class="doccomment">//! a source clock.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The reference clock is provided by the OS, and always available.  It is equivalent to what is</span>
-<span class="doccomment">//! provided by the standard library in terms of the underlying system calls being made.  As it</span>
-<span class="doccomment">//! uses the native timing facilities provided by the operating system, we ultimately depend on the</span>
-<span class="doccomment">//! OS itself to give us a stable and correct value.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The source clock is a potential clock source based on the Time Stamp Counter feature found on</span>
-<span class="doccomment">//! modern CPUs.  If the TSC feature is not present or is not reliable enough, `quanta` will</span>
-<span class="doccomment">//! transparently utilize the reference clock instead.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Depending on the underlying processor(s) in the system, `quanta` will figure out the most</span>
-<span class="doccomment">//! accurate/efficient way to calibrate the source clock to the reference clock in order to provide</span>
-<span class="doccomment">//! measurements scaled to wall clock time.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Details on TSC support, and calibration, are detailed below.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Features</span>
-<span class="doccomment">//! Beyond simply taking measurements of the current time, `quanta` provides features for more easily</span>
-<span class="doccomment">//! working with clocks, as well as being able to enhance performance further:</span>
-<span class="doccomment">//! - `Clock` can be mocked for testing</span>
-<span class="doccomment">//! - globally accessible &quot;recent&quot; time with amortized overhead</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For any code that uses a `Clock`, a mocked version can be substituted.  This allows for</span>
-<span class="doccomment">//! application authors to control the time in tests, which allows simulating not only the normal</span>
-<span class="doccomment">//! passage of time but provides the ability to warp time forwards and backwards in order to test</span>
-<span class="doccomment">//! corner cases in logic, etc.  Creating a mocked clock can be acheived with [`Clock::mock`], and</span>
-<span class="doccomment">//! [`Mock`] contains more details on mock usage.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `quanta` also provides a &quot;recent&quot; time feature, which allows a slightly-delayed version of time</span>
-<span class="doccomment">//! to be provided to callers, trading accuracy for speed of access.  An upkeep thread is spawned,</span>
-<span class="doccomment">//! which is responsible for taking measurements and updating the global recent time. Callers then</span>
-<span class="doccomment">//! can access the cached value by calling `Clock::recent`.  This interface can be 4-10x faster</span>
-<span class="doccomment">//! than directly calling `Clock::now`, even when TSC support is available.  As the upkeep thread</span>
-<span class="doccomment">//! is the only code updating the recent time, the accuracy of the value given to callers is</span>
-<span class="doccomment">//! limited by how often the upkeep thread updates the time, thus the trade off between accuracy</span>
-<span class="doccomment">//! and speed of access.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Feature Flags</span>
-<span class="doccomment">//! `quanta` comes with feature flags that enable convenient conversions to time types in</span>
-<span class="doccomment">//! other popular crates, such as:</span>
-<span class="doccomment">//! - `prost` - provides an implementation into [`Timestamp`][prost_types_timestamp] from</span>
-<span class="doccomment">//! `prost_types`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Platform Support</span>
-<span class="doccomment">//! At a high level, `quanta` carries support for most major operating systems out of the box:</span>
-<span class="doccomment">//! - Windows ([QueryPerformanceCounter])</span>
-<span class="doccomment">//! - macOS/OS X/iOS ([mach_continuous_time])</span>
-<span class="doccomment">//! - Linux/*BSD/Solaris ([clock_gettime])</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These platforms are supported in the &quot;reference&quot; clock sense, and support for using the Time</span>
-<span class="doccomment">//! Stamp Counter as a clocksource is more subtle, and explained below.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Time Stamp Counter support</span>
-<span class="doccomment">//! Accessing the TSC requires being on the x86_64 architecture, with access to SSE2. Additionally,</span>
-<span class="doccomment">//! the processor must support either constant or nonstop/invariant TSC.  This ensures that the TSC</span>
-<span class="doccomment">//! ticks at a constant rate which can be easily scaled.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A caveat is that &quot;constant&quot; TSC doesn&#39;t account for all possible power states (levels of power</span>
-<span class="doccomment">//! down or sleep that a CPU can enter to save power under light load, etc) and so a constant TSC</span>
-<span class="doccomment">//! can lead to drift in measurements over time, after they&#39;ve been scaled to reference time.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This is a limitation of the TSC mode, as well as the nature of `quanta` not being able to know,</span>
-<span class="doccomment">//! as the OS would, when a power state transition has happened, and thus compensate with a</span>
-<span class="doccomment">//! recalibration. Nonstop/invariant TSC does not have this limitation and is stable over long</span>
-<span class="doccomment">//! periods of time.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Roughly speaking, the following list contains the beginning model/generation of processors</span>
-<span class="doccomment">//! where you should be able to expect having invariant TSC support:</span>
-<span class="doccomment">//! - Intel Nehalem and newer for server-grade</span>
-<span class="doccomment">//! - Intel Skylake and newer for desktop-grade</span>
-<span class="doccomment">//! - VIA Centaur Nano and newer (circumstantial evidence here)</span>
-<span class="doccomment">//! - AMD Phenom and newer</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Ultimately, `quanta` will query CPUID information to determine if the processor has the</span>
-<span class="doccomment">//! required features to use the TSC.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Calibration</span>
-<span class="doccomment">//! As the TSC doesn&#39;t necessarily tick at reference scale -- i.e. one tick isn&#39;t always one</span>
-<span class="doccomment">//! nanosecond -- we have to apply a scaling factor when converting from source to reference time</span>
-<span class="doccomment">//! scale.  We acquire this scaling factor by querying the processor or calibrating our source</span>
-<span class="doccomment">//! clock to the reference clock.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In some cases, on newer processors, the frequency of the TSC can be queried directly, providing</span>
-<span class="doccomment">//! a fixed scaling factor with no further calibration necessary.  In other cases, `quanta` will</span>
-<span class="doccomment">//! have to run its own calibration before the clock is ready to be used: repeatedly taking</span>
-<span class="doccomment">//! measurements from both the reference and source clocks until a stable scaling factor has been</span>
-<span class="doccomment">//! established.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This calibration is stored globally and reused.  However, the first `Clock` that is created in</span>
-<span class="doccomment">//! an application will block for a small period of time as it runs this calibration loop.  The</span>
-<span class="doccomment">//! time spent in the calibration loop is limited to 200ms overall.  In practice, `quanta` will</span>
-<span class="doccomment">//! reach a stable calibration quickly (usually 10-20ms, if not less) and so this deadline is</span>
-<span class="doccomment">//! unlikely to be reached.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Caveats</span>
-<span class="doccomment">//! Utilizing the TSC can be a tricky affair, and so here is a list of caveats that may or may not</span>
-<span class="doccomment">//! apply, and is in no way exhaustive:</span>
-<span class="doccomment">//! - CPU hotplug behavior is undefined</span>
-<span class="doccomment">//! - raw values may time warp</span>
-<span class="doccomment">//! - measurements from the TSC may drift past or behind the comparable reference clock</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # WASM support</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This library can be built for WASM targets, but in this case the resolution</span>
-<span class="doccomment">//! and accuracy of measurements can be limited by the WASM environment. In</span>
-<span class="doccomment">//! particular, when running on the `wasm32-unknown-unknown` target in browsers,</span>
-<span class="doccomment">//! `quanta` will use [windows.performance.now] as a clock. This mean the</span>
-<span class="doccomment">//! accuracy is limited to milliseconds instead of the usual nanoseconds on</span>
-<span class="doccomment">//! other targets. When running within a WASI environment (target</span>
-<span class="doccomment">//! `wasm32-wasi`), the accuracy of the clock depends on the VM implementation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [QueryPerformanceCounter]: https://msdn.microsoft.com/en-us/library/ms644904(v=VS.85).aspx</span>
-<span class="doccomment">//! [mach_continuous_time]: https://developer.apple.com/documentation/kernel/1646199-mach_continuous_time</span>
-<span class="doccomment">//! [clock_gettime]: https://linux.die.net/man/3/clock_gettime</span>
-<span class="doccomment">//! [prost_types_timestamp]: https://docs.rs/prost-types/0.7.0/prost_types/struct.Timestamp.html</span>
-<span class="doccomment">//! [windows.performance.now]: https://developer.mozilla.org/en-US/docs/Web/API/Performance/now</span>
-<span class="kw">use</span> <span class="ident">crossbeam_utils::atomic::AtomicCell</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cell::RefCell</span>, <span class="ident">sync::Arc</span>};
+</pre><pre class="rust"><code><span class="doccomment">//! Performant cross-platform timing with goodies.
+//!
+//! `quanta` provides a simple and fast API for measuring the current time and the duration between
+//! events.  It does this by providing a thin layer on top of native OS timing functions, or, if
+//! available, using the Time Stamp Counter feature found on modern CPUs.
+//!
+//! # Design
+//! Internally, `quanta` maintains the concept of two potential clock sources: a reference clock and
+//! a source clock.
+//!
+//! The reference clock is provided by the OS, and always available.  It is equivalent to what is
+//! provided by the standard library in terms of the underlying system calls being made.  As it
+//! uses the native timing facilities provided by the operating system, we ultimately depend on the
+//! OS itself to give us a stable and correct value.
+//!
+//! The source clock is a potential clock source based on the Time Stamp Counter feature found on
+//! modern CPUs.  If the TSC feature is not present or is not reliable enough, `quanta` will
+//! transparently utilize the reference clock instead.
+//!
+//! Depending on the underlying processor(s) in the system, `quanta` will figure out the most
+//! accurate/efficient way to calibrate the source clock to the reference clock in order to provide
+//! measurements scaled to wall clock time.
+//!
+//! Details on TSC support, and calibration, are detailed below.
+//!
+//! # Features
+//! Beyond simply taking measurements of the current time, `quanta` provides features for more easily
+//! working with clocks, as well as being able to enhance performance further:
+//! - `Clock` can be mocked for testing
+//! - globally accessible &quot;recent&quot; time with amortized overhead
+//!
+//! For any code that uses a `Clock`, a mocked version can be substituted.  This allows for
+//! application authors to control the time in tests, which allows simulating not only the normal
+//! passage of time but provides the ability to warp time forwards and backwards in order to test
+//! corner cases in logic, etc.  Creating a mocked clock can be acheived with [`Clock::mock`], and
+//! [`Mock`] contains more details on mock usage.
+//!
+//! `quanta` also provides a &quot;recent&quot; time feature, which allows a slightly-delayed version of time
+//! to be provided to callers, trading accuracy for speed of access.  An upkeep thread is spawned,
+//! which is responsible for taking measurements and updating the global recent time. Callers then
+//! can access the cached value by calling `Clock::recent`.  This interface can be 4-10x faster
+//! than directly calling `Clock::now`, even when TSC support is available.  As the upkeep thread
+//! is the only code updating the recent time, the accuracy of the value given to callers is
+//! limited by how often the upkeep thread updates the time, thus the trade off between accuracy
+//! and speed of access.
+//!
+//! # Feature Flags
+//! `quanta` comes with feature flags that enable convenient conversions to time types in
+//! other popular crates, such as:
+//! - `prost` - provides an implementation into [`Timestamp`][prost_types_timestamp] from
+//! `prost_types`
+//!
+//! # Platform Support
+//! At a high level, `quanta` carries support for most major operating systems out of the box:
+//! - Windows ([QueryPerformanceCounter])
+//! - macOS/OS X/iOS ([mach_continuous_time])
+//! - Linux/*BSD/Solaris ([clock_gettime])
+//!
+//! These platforms are supported in the &quot;reference&quot; clock sense, and support for using the Time
+//! Stamp Counter as a clocksource is more subtle, and explained below.
+//!
+//! # Time Stamp Counter support
+//! Accessing the TSC requires being on the x86_64 architecture, with access to SSE2. Additionally,
+//! the processor must support either constant or nonstop/invariant TSC.  This ensures that the TSC
+//! ticks at a constant rate which can be easily scaled.
+//!
+//! A caveat is that &quot;constant&quot; TSC doesn&#39;t account for all possible power states (levels of power
+//! down or sleep that a CPU can enter to save power under light load, etc) and so a constant TSC
+//! can lead to drift in measurements over time, after they&#39;ve been scaled to reference time.
+//!
+//! This is a limitation of the TSC mode, as well as the nature of `quanta` not being able to know,
+//! as the OS would, when a power state transition has happened, and thus compensate with a
+//! recalibration. Nonstop/invariant TSC does not have this limitation and is stable over long
+//! periods of time.
+//!
+//! Roughly speaking, the following list contains the beginning model/generation of processors
+//! where you should be able to expect having invariant TSC support:
+//! - Intel Nehalem and newer for server-grade
+//! - Intel Skylake and newer for desktop-grade
+//! - VIA Centaur Nano and newer (circumstantial evidence here)
+//! - AMD Phenom and newer
+//!
+//! Ultimately, `quanta` will query CPUID information to determine if the processor has the
+//! required features to use the TSC.
+//!
+//! # Calibration
+//! As the TSC doesn&#39;t necessarily tick at reference scale -- i.e. one tick isn&#39;t always one
+//! nanosecond -- we have to apply a scaling factor when converting from source to reference time
+//! scale.  We acquire this scaling factor by querying the processor or calibrating our source
+//! clock to the reference clock.
+//!
+//! In some cases, on newer processors, the frequency of the TSC can be queried directly, providing
+//! a fixed scaling factor with no further calibration necessary.  In other cases, `quanta` will
+//! have to run its own calibration before the clock is ready to be used: repeatedly taking
+//! measurements from both the reference and source clocks until a stable scaling factor has been
+//! established.
+//!
+//! This calibration is stored globally and reused.  However, the first `Clock` that is created in
+//! an application will block for a small period of time as it runs this calibration loop.  The
+//! time spent in the calibration loop is limited to 200ms overall.  In practice, `quanta` will
+//! reach a stable calibration quickly (usually 10-20ms, if not less) and so this deadline is
+//! unlikely to be reached.
+//!
+//! # Caveats
+//! Utilizing the TSC can be a tricky affair, and so here is a list of caveats that may or may not
+//! apply, and is in no way exhaustive:
+//! - CPU hotplug behavior is undefined
+//! - raw values may time warp
+//! - measurements from the TSC may drift past or behind the comparable reference clock
+//!
+//! # WASM support
+//!
+//! This library can be built for WASM targets, but in this case the resolution
+//! and accuracy of measurements can be limited by the WASM environment. In
+//! particular, when running on the `wasm32-unknown-unknown` target in browsers,
+//! `quanta` will use [windows.performance.now] as a clock. This mean the
+//! accuracy is limited to milliseconds instead of the usual nanoseconds on
+//! other targets. When running within a WASI environment (target
+//! `wasm32-wasi`), the accuracy of the clock depends on the VM implementation.
+//!
+//! [QueryPerformanceCounter]: https://msdn.microsoft.com/en-us/library/ms644904(v=VS.85).aspx
+//! [mach_continuous_time]: https://developer.apple.com/documentation/kernel/1646199-mach_continuous_time
+//! [clock_gettime]: https://linux.die.net/man/3/clock_gettime
+//! [prost_types_timestamp]: https://docs.rs/prost-types/0.7.0/prost_types/struct.Timestamp.html
+//! [windows.performance.now]: https://developer.mozilla.org/en-US/docs/Web/API/Performance/now
+</span><span class="kw">use </span>crossbeam_utils::atomic::AtomicCell;
+<span class="kw">use </span>std::time::Duration;
+<span class="kw">use </span>std::{cell::RefCell, sync::Arc};
 
-<span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">raw_cpuid::CpuId</span>;
+<span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+</span><span class="kw">use </span>raw_cpuid::CpuId;
 
-<span class="kw">mod</span> <span class="ident">monotonic</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::monotonic::Monotonic</span>;
-<span class="kw">mod</span> <span class="ident">counter</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::counter::Counter</span>;
-<span class="kw">mod</span> <span class="ident">mock</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::mock</span>::{<span class="ident">IntoNanoseconds</span>, <span class="ident">Mock</span>};
-<span class="kw">mod</span> <span class="ident">instant</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::instant::Instant</span>;
-<span class="kw">mod</span> <span class="ident">upkeep</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::upkeep</span>::{<span class="ident">Error</span>, <span class="ident">Handle</span>, <span class="ident">Upkeep</span>};
-<span class="kw">mod</span> <span class="ident">stats</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::stats::Variance</span>;
+<span class="kw">mod </span>monotonic;
+<span class="kw">use </span><span class="self">self</span>::monotonic::Monotonic;
+<span class="kw">mod </span>counter;
+<span class="kw">use </span><span class="self">self</span>::counter::Counter;
+<span class="kw">mod </span>mock;
+<span class="kw">pub use </span><span class="self">self</span>::mock::{IntoNanoseconds, Mock};
+<span class="kw">mod </span>instant;
+<span class="kw">pub use </span><span class="self">self</span>::instant::Instant;
+<span class="kw">mod </span>upkeep;
+<span class="kw">pub use </span><span class="self">self</span>::upkeep::{Error, Handle, Upkeep};
+<span class="kw">mod </span>stats;
+<span class="kw">use </span><span class="self">self</span>::stats::Variance;
 
-<span class="kw">static</span> <span class="ident">GLOBAL_CLOCK</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Clock</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">OnceCell::new</span>();
+<span class="kw">static </span>GLOBAL_CLOCK: OnceCell&lt;Clock&gt; = OnceCell::new();
 
-<span class="kw">static</span> <span class="ident">GLOBAL_RECENT</span>: <span class="ident">AtomicCell</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">AtomicCell::new</span>(<span class="number">0</span>);
+<span class="kw">static </span>GLOBAL_RECENT: AtomicCell&lt;u64&gt; = AtomicCell::new(<span class="number">0</span>);
 
-<span class="kw">static</span> <span class="ident">GLOBAL_CALIBRATION</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Calibration</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">OnceCell::new</span>();
+<span class="kw">static </span>GLOBAL_CALIBRATION: OnceCell&lt;Calibration&gt; = OnceCell::new();
 
-<span class="macro">thread_local!</span> {
-    <span class="kw">static</span> <span class="ident">CLOCK_OVERRIDE</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Clock</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">RefCell::new</span>(<span class="prelude-val">None</span>);
+<span class="macro">thread_local! </span>{
+    <span class="kw">static </span>CLOCK_OVERRIDE: RefCell&lt;<span class="prelude-ty">Option</span>&lt;Clock&gt;&gt; = RefCell::new(<span class="prelude-val">None</span>);
 }
 
-<span class="comment">// Run 500 rounds of calibration before we start actually seeing what the numbers look like.</span>
-<span class="kw">const</span> <span class="ident">MINIMUM_CAL_ROUNDS</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">500</span>;
+<span class="comment">// Run 500 rounds of calibration before we start actually seeing what the numbers look like.
+</span><span class="kw">const </span>MINIMUM_CAL_ROUNDS: u64 = <span class="number">500</span>;
 
-<span class="comment">// We want our maximum error to be 10 nanoseconds.</span>
-<span class="kw">const</span> <span class="ident">MAXIMUM_CAL_ERROR_NS</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">10</span>;
+<span class="comment">// We want our maximum error to be 10 nanoseconds.
+</span><span class="kw">const </span>MAXIMUM_CAL_ERROR_NS: u64 = <span class="number">10</span>;
 
-<span class="comment">// Don&#39;t run the calibration loop for longer than 200ms of wall time.</span>
-<span class="kw">const</span> <span class="ident">MAXIMUM_CAL_TIME</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">200</span>);
+<span class="comment">// Don&#39;t run the calibration loop for longer than 200ms of wall time.
+</span><span class="kw">const </span>MAXIMUM_CAL_TIME: Duration = Duration::from_millis(<span class="number">200</span>);
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">ClockType</span> {
-    <span class="ident">Monotonic</span>(<span class="ident">Monotonic</span>),
-    <span class="ident">Counter</span>(<span class="ident">AtomicCell</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">Monotonic</span>, <span class="ident">Counter</span>, <span class="ident">Calibration</span>),
-    <span class="ident">Mock</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mock</span><span class="op">&gt;</span>),
+<span class="attribute">#[allow(dead_code)]
+#[derive(Debug)]
+</span><span class="kw">enum </span>ClockType {
+    Monotonic(Monotonic),
+    Counter(AtomicCell&lt;u64&gt;, Monotonic, Counter, Calibration),
+    Mock(Arc&lt;Mock&gt;),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Calibration</span> {
-    <span class="ident">ref_time</span>: <span class="ident">u64</span>,
-    <span class="ident">src_time</span>: <span class="ident">u64</span>,
-    <span class="ident">scale_factor</span>: <span class="ident">u64</span>,
-    <span class="ident">scale_shift</span>: <span class="ident">u32</span>,
+<span class="attribute">#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Calibration {
+    ref_time: u64,
+    src_time: u64,
+    scale_factor: u64,
+    scale_shift: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">Calibration</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Calibration</span> {
-        <span class="ident">Calibration</span> {
-            <span class="ident">ref_time</span>: <span class="number">0</span>,
-            <span class="ident">src_time</span>: <span class="number">0</span>,
-            <span class="ident">scale_factor</span>: <span class="number">1</span>,
-            <span class="ident">scale_shift</span>: <span class="number">1</span>,
+<span class="kw">impl </span>Calibration {
+    <span class="kw">pub fn </span>new() -&gt; Calibration {
+        Calibration {
+            ref_time: <span class="number">0</span>,
+            src_time: <span class="number">0</span>,
+            scale_factor: <span class="number">1</span>,
+            scale_shift: <span class="number">1</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">scale_src_to_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">src_raw</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="ident">src_raw</span>.<span class="ident">saturating_sub</span>(<span class="self">self</span>.<span class="ident">src_time</span>);
-        <span class="kw">let</span> <span class="ident">scaled</span> <span class="op">=</span> <span class="ident">mul_div_po2_u64</span>(<span class="ident">delta</span>, <span class="self">self</span>.<span class="ident">scale_factor</span>, <span class="self">self</span>.<span class="ident">scale_shift</span>);
-        <span class="ident">scaled</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">ref_time</span>
+    <span class="kw">fn </span>scale_src_to_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, src_raw: u64) -&gt; u64 {
+        <span class="kw">let </span>delta = src_raw.saturating_sub(<span class="self">self</span>.src_time);
+        <span class="kw">let </span>scaled = mul_div_po2_u64(delta, <span class="self">self</span>.scale_factor, <span class="self">self</span>.scale_shift);
+        scaled + <span class="self">self</span>.ref_time
     }
 
-    <span class="kw">fn</span> <span class="ident">calibrate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">reference</span>: <span class="kw-2">&amp;</span><span class="ident">Monotonic</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Counter</span>) {
-        <span class="comment">// future improvement: read the TSC frequency directly with something like the</span>
-        <span class="comment">// code in this PR: https://github.com/hermitcore/uhyve/pull/24</span>
+    <span class="kw">fn </span>calibrate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, reference: <span class="kw-2">&amp;</span>Monotonic, source: <span class="kw-2">&amp;</span>Counter) {
+        <span class="comment">// future improvement: read the TSC frequency directly with something like the
+        // code in this PR: https://github.com/hermitcore/uhyve/pull/24
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">variance</span> <span class="op">=</span> <span class="ident">Variance::default</span>();
-        <span class="kw">let</span> <span class="ident">deadline</span> <span class="op">=</span> <span class="ident">reference</span>.<span class="ident">now</span>() <span class="op">+</span> <span class="ident">MAXIMUM_CAL_TIME</span>.<span class="ident">as_nanos</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+        </span><span class="kw">let </span><span class="kw-2">mut </span>variance = Variance::default();
+        <span class="kw">let </span>deadline = reference.now() + MAXIMUM_CAL_TIME.as_nanos() <span class="kw">as </span>u64;
 
-        <span class="self">self</span>.<span class="ident">ref_time</span> <span class="op">=</span> <span class="ident">reference</span>.<span class="ident">now</span>();
-        <span class="self">self</span>.<span class="ident">src_time</span> <span class="op">=</span> <span class="ident">source</span>.<span class="ident">now</span>();
+        <span class="self">self</span>.ref_time = reference.now();
+        <span class="self">self</span>.src_time = source.now();
 
-        <span class="kw">let</span> <span class="ident">loop_delta</span> <span class="op">=</span> <span class="number">1000</span>;
-        <span class="kw">loop</span> {
-            <span class="comment">// Busy loop to burn some time.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">reference</span>.<span class="ident">now</span>();
-            <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">last</span> <span class="op">+</span> <span class="ident">loop_delta</span>;
-            <span class="kw">while</span> <span class="ident">last</span> <span class="op">&lt;</span> <span class="ident">target</span> {
-                <span class="ident">last</span> <span class="op">=</span> <span class="ident">reference</span>.<span class="ident">now</span>();
+        <span class="kw">let </span>loop_delta = <span class="number">1000</span>;
+        <span class="kw">loop </span>{
+            <span class="comment">// Busy loop to burn some time.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>last = reference.now();
+            <span class="kw">let </span>target = last + loop_delta;
+            <span class="kw">while </span>last &lt; target {
+                last = reference.now();
             }
 
-            <span class="comment">// We put an upper bound on how long we run calibration before to provide a predictable</span>
-            <span class="comment">// overhead to the calibration process.  In practice, even if we hit the calibration</span>
-            <span class="comment">// deadline, we should still have run a sufficient number of rounds to get an accurate</span>
-            <span class="comment">// calibration.</span>
-            <span class="kw">if</span> <span class="ident">last</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">deadline</span> {
+            <span class="comment">// We put an upper bound on how long we run calibration before to provide a predictable
+            // overhead to the calibration process.  In practice, even if we hit the calibration
+            // deadline, we should still have run a sufficient number of rounds to get an accurate
+            // calibration.
+            </span><span class="kw">if </span>last &gt;= deadline {
                 <span class="kw">break</span>;
             }
 
-            <span class="comment">// Adjust our calibration before we take our measurement.</span>
-            <span class="self">self</span>.<span class="ident">adjust_cal_ratio</span>(<span class="ident">reference</span>, <span class="ident">source</span>);
+            <span class="comment">// Adjust our calibration before we take our measurement.
+            </span><span class="self">self</span>.adjust_cal_ratio(reference, source);
 
-            <span class="kw">let</span> <span class="ident">r_time</span> <span class="op">=</span> <span class="ident">reference</span>.<span class="ident">now</span>();
-            <span class="kw">let</span> <span class="ident">s_raw</span> <span class="op">=</span> <span class="ident">source</span>.<span class="ident">now</span>();
-            <span class="kw">let</span> <span class="ident">s_time</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">scale_src_to_ref</span>(<span class="ident">s_raw</span>);
-            <span class="ident">variance</span>.<span class="ident">add</span>(<span class="ident">s_time</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="op">-</span> <span class="ident">r_time</span> <span class="kw">as</span> <span class="ident">f64</span>);
+            <span class="kw">let </span>r_time = reference.now();
+            <span class="kw">let </span>s_raw = source.now();
+            <span class="kw">let </span>s_time = <span class="self">self</span>.scale_src_to_ref(s_raw);
+            variance.add(s_time <span class="kw">as </span>f64 - r_time <span class="kw">as </span>f64);
 
-            <span class="comment">// If we&#39;ve collected enough samples, check what the mean and mean error are.  If we&#39;re</span>
-            <span class="comment">// already within the target bounds, we can break out of the calibration loop early.</span>
-            <span class="kw">if</span> <span class="ident">variance</span>.<span class="ident">has_significant_result</span>() {
-                <span class="kw">let</span> <span class="ident">mean</span> <span class="op">=</span> <span class="ident">variance</span>.<span class="ident">mean</span>().<span class="ident">abs</span>();
-                <span class="kw">let</span> <span class="ident">mean_error</span> <span class="op">=</span> <span class="ident">variance</span>.<span class="ident">mean_error</span>().<span class="ident">abs</span>();
-                <span class="kw">let</span> <span class="ident">mwe</span> <span class="op">=</span> <span class="ident">variance</span>.<span class="ident">mean_with_error</span>();
-                <span class="kw">let</span> <span class="ident">samples</span> <span class="op">=</span> <span class="ident">variance</span>.<span class="ident">samples</span>();
+            <span class="comment">// If we&#39;ve collected enough samples, check what the mean and mean error are.  If we&#39;re
+            // already within the target bounds, we can break out of the calibration loop early.
+            </span><span class="kw">if </span>variance.has_significant_result() {
+                <span class="kw">let </span>mean = variance.mean().abs();
+                <span class="kw">let </span>mean_error = variance.mean_error().abs();
+                <span class="kw">let </span>mwe = variance.mean_with_error();
+                <span class="kw">let </span>samples = variance.samples();
 
-                <span class="kw">if</span> <span class="ident">samples</span> <span class="op">&gt;</span> <span class="ident">MINIMUM_CAL_ROUNDS</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">mwe</span> <span class="op">&lt;</span> <span class="ident">MAXIMUM_CAL_ERROR_NS</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">mean_error</span> <span class="op">/</span> <span class="ident">mean</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1.0</span>
-                {
+                <span class="kw">if </span>samples &gt; MINIMUM_CAL_ROUNDS
+                    &amp;&amp; mwe &lt; MAXIMUM_CAL_ERROR_NS
+                    &amp;&amp; mean_error / mean &lt;= <span class="number">1.0
+                </span>{
                     <span class="kw">break</span>;
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">adjust_cal_ratio</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">reference</span>: <span class="kw-2">&amp;</span><span class="ident">Monotonic</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Counter</span>) {
-        <span class="comment">// Overall algorithm: measure the delta between our ref/src_time values and &quot;now&quot; versions</span>
-        <span class="comment">// of them, calculate the ratio between the deltas, and then find a numerator and</span>
-        <span class="comment">// denominator to express that ratio such that the denominator is always a power of two.</span>
-        <span class="comment">//</span>
-        <span class="comment">// In practice, this means we take the &quot;source&quot; delta, and find the next biggest number that</span>
-        <span class="comment">// is a power of two.  We then figure out the ratio that describes the difference between</span>
-        <span class="comment">// _those_ two values, and multiple the &quot;reference&quot; delta by that much, which becomes our</span>
-        <span class="comment">// numerator while the power-of-two &quot;source&quot; delta becomes our denominator.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Then, conversion from a raw value simply becomes a multiply and a bit shift instead of a</span>
-        <span class="comment">// multiply and full-blown divide.</span>
-        <span class="kw">let</span> <span class="ident">ref_end</span> <span class="op">=</span> <span class="ident">reference</span>.<span class="ident">now</span>();
-        <span class="kw">let</span> <span class="ident">src_end</span> <span class="op">=</span> <span class="ident">source</span>.<span class="ident">end</span>();
+    <span class="kw">fn </span>adjust_cal_ratio(<span class="kw-2">&amp;mut </span><span class="self">self</span>, reference: <span class="kw-2">&amp;</span>Monotonic, source: <span class="kw-2">&amp;</span>Counter) {
+        <span class="comment">// Overall algorithm: measure the delta between our ref/src_time values and &quot;now&quot; versions
+        // of them, calculate the ratio between the deltas, and then find a numerator and
+        // denominator to express that ratio such that the denominator is always a power of two.
+        //
+        // In practice, this means we take the &quot;source&quot; delta, and find the next biggest number that
+        // is a power of two.  We then figure out the ratio that describes the difference between
+        // _those_ two values, and multiple the &quot;reference&quot; delta by that much, which becomes our
+        // numerator while the power-of-two &quot;source&quot; delta becomes our denominator.
+        //
+        // Then, conversion from a raw value simply becomes a multiply and a bit shift instead of a
+        // multiply and full-blown divide.
+        </span><span class="kw">let </span>ref_end = reference.now();
+        <span class="kw">let </span>src_end = source.end();
 
-        <span class="kw">let</span> <span class="ident">ref_d</span> <span class="op">=</span> <span class="ident">ref_end</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">ref_time</span>);
-        <span class="kw">let</span> <span class="ident">src_d</span> <span class="op">=</span> <span class="ident">src_end</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">src_time</span>);
+        <span class="kw">let </span>ref_d = ref_end.wrapping_sub(<span class="self">self</span>.ref_time);
+        <span class="kw">let </span>src_d = src_end.wrapping_sub(<span class="self">self</span>.src_time);
 
-        <span class="comment">// TODO: we should almost never get a zero here because that would mean denom was greater</span>
-        <span class="comment">// than 2^63 which is already a red flag.. but i&#39;m not 100% sure if we can prove it well</span>
-        <span class="comment">// enough to simply keep the panic around? gotta think on this</span>
-        <span class="kw">let</span> <span class="ident">src_d_po2</span> <span class="op">=</span> <span class="ident">src_d</span>.<span class="ident">next_power_of_two</span>();
-        <span class="kw">if</span> <span class="ident">src_d_po2</span> <span class="op">==</span> <span class="number">0</span> {
+        <span class="comment">// TODO: we should almost never get a zero here because that would mean denom was greater
+        // than 2^63 which is already a red flag.. but i&#39;m not 100% sure if we can prove it well
+        // enough to simply keep the panic around? gotta think on this
+        </span><span class="kw">let </span>src_d_po2 = src_d.next_power_of_two();
+        <span class="kw">if </span>src_d_po2 == <span class="number">0 </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;po2_denom was zero!&quot;</span>);
         }
 
-        <span class="comment">// TODO: lossy conversion back and forth just to get an approximate value, can we do better</span>
-        <span class="comment">// with integer math? not sure</span>
-        <span class="kw">let</span> <span class="ident">po2_ratio</span> <span class="op">=</span> <span class="ident">src_d_po2</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="ident">src_d</span> <span class="kw">as</span> <span class="ident">f64</span>;
-        <span class="self">self</span>.<span class="ident">scale_factor</span> <span class="op">=</span> (<span class="ident">ref_d</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="op">*</span> <span class="ident">po2_ratio</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="self">self</span>.<span class="ident">scale_shift</span> <span class="op">=</span> <span class="ident">src_d_po2</span>.<span class="ident">trailing_zeros</span>();
+        <span class="comment">// TODO: lossy conversion back and forth just to get an approximate value, can we do better
+        // with integer math? not sure
+        </span><span class="kw">let </span>po2_ratio = src_d_po2 <span class="kw">as </span>f64 / src_d <span class="kw">as </span>f64;
+        <span class="self">self</span>.scale_factor = (ref_d <span class="kw">as </span>f64 * po2_ratio) <span class="kw">as </span>u64;
+        <span class="self">self</span>.scale_shift = src_d_po2.trailing_zeros();
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Calibration</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>Calibration {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="doccomment">/// Unified clock for taking measurements.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Clock</span> {
-    <span class="ident">inner</span>: <span class="ident">ClockType</span>,
+<span class="doccomment">/// Unified clock for taking measurements.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Clock {
+    inner: ClockType,
 }
 
-<span class="kw">impl</span> <span class="ident">Clock</span> {
-    <span class="doccomment">/// Creates a new clock with the optimal reference and source clocks.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Support for TSC, etc, are checked at the time of creation, not compile-time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Clock</span> {
-        <span class="kw">let</span> <span class="ident">reference</span> <span class="op">=</span> <span class="ident">Monotonic::new</span>();
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_tsc_support</span>() {
-            <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">Counter::new</span>();
-            <span class="kw">let</span> <span class="ident">calibration</span> <span class="op">=</span> <span class="ident">GLOBAL_CALIBRATION</span>.<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">calibration</span> <span class="op">=</span> <span class="ident">Calibration::new</span>();
-                <span class="ident">calibration</span>.<span class="ident">calibrate</span>(<span class="kw-2">&amp;</span><span class="ident">reference</span>, <span class="kw-2">&amp;</span><span class="ident">source</span>);
-                <span class="ident">calibration</span>
+<span class="kw">impl </span>Clock {
+    <span class="doccomment">/// Creates a new clock with the optimal reference and source clocks.
+    ///
+    /// Support for TSC, etc, are checked at the time of creation, not compile-time.
+    </span><span class="kw">pub fn </span>new() -&gt; Clock {
+        <span class="kw">let </span>reference = Monotonic::new();
+        <span class="kw">let </span>inner = <span class="kw">if </span>has_tsc_support() {
+            <span class="kw">let </span>source = Counter::new();
+            <span class="kw">let </span>calibration = GLOBAL_CALIBRATION.get_or_init(|| {
+                <span class="kw">let </span><span class="kw-2">mut </span>calibration = Calibration::new();
+                calibration.calibrate(<span class="kw-2">&amp;</span>reference, <span class="kw-2">&amp;</span>source);
+                calibration
             });
-            <span class="ident">ClockType::Counter</span>(<span class="ident">AtomicCell::new</span>(<span class="number">0</span>), <span class="ident">reference</span>, <span class="ident">source</span>, <span class="kw-2">*</span><span class="ident">calibration</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">ClockType::Monotonic</span>(<span class="ident">reference</span>)
+            ClockType::Counter(AtomicCell::new(<span class="number">0</span>), reference, source, <span class="kw-2">*</span>calibration)
+        } <span class="kw">else </span>{
+            ClockType::Monotonic(reference)
         };
 
-        <span class="ident">Clock</span> { <span class="ident">inner</span> }
+        Clock { inner }
     }
 
-    <span class="doccomment">/// Creates a new clock that is mocked for controlling the underlying time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`Clock`] instance and a handle to the underlying [`Mock`] source so that the</span>
-    <span class="doccomment">/// caller can control the passage of time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mock</span>() -&gt; (<span class="ident">Clock</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mock</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">mock</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mock::new</span>());
-        <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">Clock</span> {
-            <span class="ident">inner</span>: <span class="ident">ClockType::Mock</span>(<span class="ident">mock</span>.<span class="ident">clone</span>()),
+    <span class="doccomment">/// Creates a new clock that is mocked for controlling the underlying time.
+    ///
+    /// Returns a [`Clock`] instance and a handle to the underlying [`Mock`] source so that the
+    /// caller can control the passage of time.
+    </span><span class="kw">pub fn </span>mock() -&gt; (Clock, Arc&lt;Mock&gt;) {
+        <span class="kw">let </span>mock = Arc::new(Mock::new());
+        <span class="kw">let </span>clock = Clock {
+            inner: ClockType::Mock(mock.clone()),
         };
 
-        (<span class="ident">clock</span>, <span class="ident">mock</span>)
+        (clock, mock)
     }
 
-    <span class="doccomment">/// Gets the current time, scaled to reference time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is the spiritual equivalent of [`std::time::Instant::now`].  It is guaranteed</span>
-    <span class="doccomment">/// to return a monotonically increasing value between calls to the same `Clock` instance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Instant`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Instant</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ClockType::Monotonic</span>(<span class="ident">monotonic</span>) =&gt; <span class="ident">Instant</span>(<span class="ident">monotonic</span>.<span class="ident">now</span>()),
-            <span class="ident">ClockType::Counter</span>(<span class="ident">last</span>, <span class="kw">_</span>, <span class="ident">counter</span>, <span class="kw">_</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">counter</span>.<span class="ident">now</span>();
-                <span class="comment">// Update the last timestamp with `now`, if `now` is greater</span>
-                <span class="comment">// than the current value.</span>
-                <span class="comment">// TODO: replace with `AtomicCell::fetch_max` once `crossbeam-utils` implements it.</span>
-                <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">last</span>.<span class="ident">fetch_update</span>(<span class="op">|</span><span class="ident">current</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">max</span>(<span class="ident">now</span>))).<span class="ident">unwrap</span>();
-                <span class="comment">// `fetch_max` always returns the previous value, so we need to</span>
-                <span class="comment">// see which is *actually* the max.</span>
-                <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(<span class="ident">now</span>, <span class="ident">last</span>);
-                <span class="self">self</span>.<span class="ident">scaled</span>(<span class="ident">actual</span>)
+    <span class="doccomment">/// Gets the current time, scaled to reference time.
+    ///
+    /// This method is the spiritual equivalent of [`std::time::Instant::now`].  It is guaranteed
+    /// to return a monotonically increasing value between calls to the same `Clock` instance.
+    ///
+    /// Returns an [`Instant`].
+    </span><span class="kw">pub fn </span>now(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Instant {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            ClockType::Monotonic(monotonic) =&gt; Instant(monotonic.now()),
+            ClockType::Counter(last, <span class="kw">_</span>, counter, <span class="kw">_</span>) =&gt; {
+                <span class="kw">let </span>now = counter.now();
+                <span class="comment">// Update the last timestamp with `now`, if `now` is greater
+                // than the current value.
+                // TODO: replace with `AtomicCell::fetch_max` once `crossbeam-utils` implements it.
+                </span><span class="kw">let </span>last = last.fetch_update(|current| <span class="prelude-val">Some</span>(current.max(now))).unwrap();
+                <span class="comment">// `fetch_max` always returns the previous value, so we need to
+                // see which is *actually* the max.
+                </span><span class="kw">let </span>actual = std::cmp::max(now, last);
+                <span class="self">self</span>.scaled(actual)
             }
-            <span class="ident">ClockType::Mock</span>(<span class="ident">mock</span>) =&gt; <span class="ident">Instant</span>(<span class="ident">mock</span>.<span class="ident">value</span>()),
+            ClockType::Mock(mock) =&gt; Instant(mock.value()),
         }
     }
 
-    <span class="doccomment">/// Gets the underlying time from the fastest available clock source.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// As the clock source may or may not be the TSC, value is not guaranteed to be in nanoseconds</span>
-    <span class="doccomment">/// or to be monotonic.  Value can be scaled to reference time by calling either [`scaled`]</span>
-    <span class="doccomment">/// or [`delta`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you need maximum accuracy in your measurements, consider using [`start`] and [`end`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`scaled`]: Clock::scaled</span>
-    <span class="doccomment">/// [`delta`]: Clock::delta</span>
-    <span class="doccomment">/// [`start`]: Clock::start</span>
-    <span class="doccomment">/// [`end`]: Clock::end</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ClockType::Monotonic</span>(<span class="ident">monotonic</span>) =&gt; <span class="ident">monotonic</span>.<span class="ident">now</span>(),
-            <span class="ident">ClockType::Counter</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">counter</span>, <span class="kw">_</span>) =&gt; <span class="ident">counter</span>.<span class="ident">now</span>(),
-            <span class="ident">ClockType::Mock</span>(<span class="ident">mock</span>) =&gt; <span class="ident">mock</span>.<span class="ident">value</span>(),
+    <span class="doccomment">/// Gets the underlying time from the fastest available clock source.
+    ///
+    /// As the clock source may or may not be the TSC, value is not guaranteed to be in nanoseconds
+    /// or to be monotonic.  Value can be scaled to reference time by calling either [`scaled`]
+    /// or [`delta`].
+    ///
+    /// If you need maximum accuracy in your measurements, consider using [`start`] and [`end`].
+    ///
+    /// [`scaled`]: Clock::scaled
+    /// [`delta`]: Clock::delta
+    /// [`start`]: Clock::start
+    /// [`end`]: Clock::end
+    </span><span class="kw">pub fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            ClockType::Monotonic(monotonic) =&gt; monotonic.now(),
+            ClockType::Counter(<span class="kw">_</span>, <span class="kw">_</span>, counter, <span class="kw">_</span>) =&gt; counter.now(),
+            ClockType::Mock(mock) =&gt; mock.value(),
         }
     }
 
-    <span class="doccomment">/// Gets the underlying time from the source clock, specific to starting an operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Value is not guaranteed to be in nanoseconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the same functionality as [`raw`], but tries to ensure that no extra CPU</span>
-    <span class="doccomment">/// instructions end up executing after the measurement is taken.  Since normal processors are</span>
-    <span class="doccomment">/// typically out-of-order, other operations that logically come before a call to this method</span>
-    <span class="doccomment">/// could be reordered to come after the measurement, thereby skewing the overall time</span>
-    <span class="doccomment">/// measured.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`raw`]: Clock::raw</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ClockType::Monotonic</span>(<span class="ident">monotonic</span>) =&gt; <span class="ident">monotonic</span>.<span class="ident">now</span>(),
-            <span class="ident">ClockType::Counter</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">counter</span>, <span class="kw">_</span>) =&gt; <span class="ident">counter</span>.<span class="ident">start</span>(),
-            <span class="ident">ClockType::Mock</span>(<span class="ident">mock</span>) =&gt; <span class="ident">mock</span>.<span class="ident">value</span>(),
+    <span class="doccomment">/// Gets the underlying time from the source clock, specific to starting an operation.
+    ///
+    /// Value is not guaranteed to be in nanoseconds.
+    ///
+    /// Provides the same functionality as [`raw`], but tries to ensure that no extra CPU
+    /// instructions end up executing after the measurement is taken.  Since normal processors are
+    /// typically out-of-order, other operations that logically come before a call to this method
+    /// could be reordered to come after the measurement, thereby skewing the overall time
+    /// measured.
+    ///
+    /// [`raw`]: Clock::raw
+    </span><span class="kw">pub fn </span>start(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            ClockType::Monotonic(monotonic) =&gt; monotonic.now(),
+            ClockType::Counter(<span class="kw">_</span>, <span class="kw">_</span>, counter, <span class="kw">_</span>) =&gt; counter.start(),
+            ClockType::Mock(mock) =&gt; mock.value(),
         }
     }
 
-    <span class="doccomment">/// Gets the underlying time from the source clock, specific to ending an operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Value is not guaranteed to be in nanoseconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the same functionality as [`raw`], but tries to ensure that no extra CPU</span>
-    <span class="doccomment">/// instructions end up executing before the measurement is taken.  Since normal processors are</span>
-    <span class="doccomment">/// typically out-of-order, other operations that logically come after a call to this method</span>
-    <span class="doccomment">/// could be reordered to come before the measurement, thereby skewing the overall time</span>
-    <span class="doccomment">/// measured.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`raw`]: Clock::raw</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ClockType::Monotonic</span>(<span class="ident">monotonic</span>) =&gt; <span class="ident">monotonic</span>.<span class="ident">now</span>(),
-            <span class="ident">ClockType::Counter</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">counter</span>, <span class="kw">_</span>) =&gt; <span class="ident">counter</span>.<span class="ident">end</span>(),
-            <span class="ident">ClockType::Mock</span>(<span class="ident">mock</span>) =&gt; <span class="ident">mock</span>.<span class="ident">value</span>(),
+    <span class="doccomment">/// Gets the underlying time from the source clock, specific to ending an operation.
+    ///
+    /// Value is not guaranteed to be in nanoseconds.
+    ///
+    /// Provides the same functionality as [`raw`], but tries to ensure that no extra CPU
+    /// instructions end up executing before the measurement is taken.  Since normal processors are
+    /// typically out-of-order, other operations that logically come after a call to this method
+    /// could be reordered to come before the measurement, thereby skewing the overall time
+    /// measured.
+    ///
+    /// [`raw`]: Clock::raw
+    </span><span class="kw">pub fn </span>end(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            ClockType::Monotonic(monotonic) =&gt; monotonic.now(),
+            ClockType::Counter(<span class="kw">_</span>, <span class="kw">_</span>, counter, <span class="kw">_</span>) =&gt; counter.end(),
+            ClockType::Mock(mock) =&gt; mock.value(),
         }
     }
 
-    <span class="doccomment">/// Scales a raw measurement to reference time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You must scale raw measurements to ensure your result is in nanoseconds.  The raw</span>
-    <span class="doccomment">/// measurement is not guaranteed to be in nanoseconds and may vary.  It is only OK to avoid</span>
-    <span class="doccomment">/// scaling raw measurements if you don&#39;t need actual nanoseconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Instant`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scaled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="ident">Instant</span> {
-        <span class="kw">let</span> <span class="ident">scaled</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ClockType::Counter</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">calibration</span>) =&gt; <span class="ident">scale_src_to_ref</span>(<span class="ident">value</span>, <span class="ident">calibration</span>),
-            <span class="kw">_</span> =&gt; <span class="ident">value</span>,
+    <span class="doccomment">/// Scales a raw measurement to reference time.
+    ///
+    /// You must scale raw measurements to ensure your result is in nanoseconds.  The raw
+    /// measurement is not guaranteed to be in nanoseconds and may vary.  It is only OK to avoid
+    /// scaling raw measurements if you don&#39;t need actual nanoseconds.
+    ///
+    /// Returns an [`Instant`].
+    </span><span class="kw">pub fn </span>scaled(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64) -&gt; Instant {
+        <span class="kw">let </span>scaled = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            ClockType::Counter(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, calibration) =&gt; scale_src_to_ref(value, calibration),
+            <span class="kw">_ </span>=&gt; value,
         };
 
-        <span class="ident">Instant</span>(<span class="ident">scaled</span>)
+        Instant(scaled)
     }
 
-    <span class="doccomment">/// Calculates the delta between two measurements, and scales to reference time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is slightly faster when you know you need the delta between two raw</span>
-    <span class="doccomment">/// measurements, or a start/end measurement, than using [`scaled`] for both conversions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`scaled`]: Clock::scaled</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delta</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">u64</span>, <span class="ident">end</span>: <span class="ident">u64</span>) -&gt; <span class="ident">Duration</span> {
-        <span class="comment">// Safety: we want wrapping_sub on the end/start delta calculation so that two measurements</span>
-        <span class="comment">// split across a rollover boundary still return the right result.  However, we also know</span>
-        <span class="comment">// the TSC could potentially give us different values between cores/sockets, so we&#39;re just</span>
-        <span class="comment">// doing our due diligence here to make sure we&#39;re not about to create some wacky duration.</span>
-        <span class="kw">if</span> <span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">start</span> {
-            <span class="kw">return</span> <span class="ident">Duration::new</span>(<span class="number">0</span>, <span class="number">0</span>);
+    <span class="doccomment">/// Calculates the delta between two measurements, and scales to reference time.
+    ///
+    /// This method is slightly faster when you know you need the delta between two raw
+    /// measurements, or a start/end measurement, than using [`scaled`] for both conversions.
+    ///
+    /// [`scaled`]: Clock::scaled
+    </span><span class="kw">pub fn </span>delta(<span class="kw-2">&amp;</span><span class="self">self</span>, start: u64, end: u64) -&gt; Duration {
+        <span class="comment">// Safety: we want wrapping_sub on the end/start delta calculation so that two measurements
+        // split across a rollover boundary still return the right result.  However, we also know
+        // the TSC could potentially give us different values between cores/sockets, so we&#39;re just
+        // doing our due diligence here to make sure we&#39;re not about to create some wacky duration.
+        </span><span class="kw">if </span>end &lt;= start {
+            <span class="kw">return </span>Duration::new(<span class="number">0</span>, <span class="number">0</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="ident">end</span>.<span class="ident">wrapping_sub</span>(<span class="ident">start</span>);
-        <span class="kw">let</span> <span class="ident">scaled</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ClockType::Counter</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">calibration</span>) =&gt; {
-                <span class="ident">mul_div_po2_u64</span>(<span class="ident">delta</span>, <span class="ident">calibration</span>.<span class="ident">scale_factor</span>, <span class="ident">calibration</span>.<span class="ident">scale_shift</span>)
+        <span class="kw">let </span>delta = end.wrapping_sub(start);
+        <span class="kw">let </span>scaled = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            ClockType::Counter(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, calibration) =&gt; {
+                mul_div_po2_u64(delta, calibration.scale_factor, calibration.scale_shift)
             }
-            <span class="kw">_</span> =&gt; <span class="ident">delta</span>,
+            <span class="kw">_ </span>=&gt; delta,
         };
-        <span class="ident">Duration::from_nanos</span>(<span class="ident">scaled</span>)
+        Duration::from_nanos(scaled)
     }
 
-    <span class="doccomment">/// Gets the most recent current time, scaled to reference time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method provides ultra-low-overhead access to a slightly-delayed version of the current</span>
-    <span class="doccomment">/// time.  Instead of querying the underlying source clock directly, a shared, global value is</span>
-    <span class="doccomment">/// read directly without the need to scale to reference time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The upkeep thread must be started in order to update the time.  You can read the</span>
-    <span class="doccomment">/// documentation for [`Builder`] for more information on starting the upkeep thread, as well</span>
-    <span class="doccomment">/// as the details of the &quot;current time&quot; mechanism.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the upkeep thread has not been started, the return value will be `0`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Instant`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Instant</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">ClockType::Mock</span>(<span class="ident">mock</span>) =&gt; <span class="ident">Instant</span>(<span class="ident">mock</span>.<span class="ident">value</span>()),
-            <span class="kw">_</span> =&gt; <span class="ident">Instant</span>(<span class="ident">GLOBAL_RECENT</span>.<span class="ident">load</span>()),
+    <span class="doccomment">/// Gets the most recent current time, scaled to reference time.
+    ///
+    /// This method provides ultra-low-overhead access to a slightly-delayed version of the current
+    /// time.  Instead of querying the underlying source clock directly, a shared, global value is
+    /// read directly without the need to scale to reference time.
+    ///
+    /// The upkeep thread must be started in order to update the time.  You can read the
+    /// documentation for [`Builder`] for more information on starting the upkeep thread, as well
+    /// as the details of the &quot;current time&quot; mechanism.
+    ///
+    /// If the upkeep thread has not been started, the return value will be `0`.
+    ///
+    /// Returns an [`Instant`].
+    </span><span class="kw">pub fn </span>recent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Instant {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            ClockType::Mock(mock) =&gt; Instant(mock.value()),
+            <span class="kw">_ </span>=&gt; Instant(GLOBAL_RECENT.load()),
         }
     }
 
-    <span class="doccomment">/// Updates the recent current time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Most callers should use the existing [`Builder`] machinery for spawning a background thread</span>
-    <span class="doccomment">/// to handle upkeep, rather than calling [`upkeep`] directly.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upkeep</span>(<span class="ident">value</span>: <span class="ident">Instant</span>) {
-        <span class="ident">GLOBAL_RECENT</span>.<span class="ident">store</span>(<span class="ident">value</span>.<span class="number">0</span>);
+    <span class="doccomment">/// Updates the recent current time.
+    ///
+    /// Most callers should use the existing [`Builder`] machinery for spawning a background thread
+    /// to handle upkeep, rather than calling [`upkeep`] directly.
+    </span><span class="kw">pub fn </span>upkeep(value: Instant) {
+        GLOBAL_RECENT.store(value.<span class="number">0</span>);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Clock</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Clock</span> {
-        <span class="ident">Clock::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>Clock {
+    <span class="kw">fn </span>default() -&gt; Clock {
+        Clock::new()
     }
 }
 
-<span class="comment">// A manual `Clone` impl is required because `atomic_shim`&#39;s `AtomicU64` is not `Clone`.</span>
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">ClockType</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ClockType::Mock</span>(<span class="ident">mock</span>) =&gt; <span class="ident">ClockType::Mock</span>(<span class="ident">mock</span>.<span class="ident">clone</span>()),
-            <span class="ident">ClockType::Monotonic</span>(<span class="ident">monotonic</span>) =&gt; <span class="ident">ClockType::Monotonic</span>(<span class="ident">monotonic</span>.<span class="ident">clone</span>()),
-            <span class="ident">ClockType::Counter</span>(<span class="ident">last</span>, <span class="ident">monotonic</span>, <span class="ident">counter</span>, <span class="ident">calibration</span>) =&gt; <span class="ident">ClockType::Counter</span>(
-                <span class="ident">AtomicCell::new</span>(<span class="ident">last</span>.<span class="ident">load</span>()),
-                <span class="ident">monotonic</span>.<span class="ident">clone</span>(),
-                <span class="ident">counter</span>.<span class="ident">clone</span>(),
-                <span class="kw-2">*</span><span class="ident">calibration</span>,
+<span class="comment">// A manual `Clone` impl is required because `atomic_shim`&#39;s `AtomicU64` is not `Clone`.
+</span><span class="kw">impl </span>Clone <span class="kw">for </span>ClockType {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="self">self </span>{
+            ClockType::Mock(mock) =&gt; ClockType::Mock(mock.clone()),
+            ClockType::Monotonic(monotonic) =&gt; ClockType::Monotonic(monotonic.clone()),
+            ClockType::Counter(last, monotonic, counter, calibration) =&gt; ClockType::Counter(
+                AtomicCell::new(last.load()),
+                monotonic.clone(),
+                counter.clone(),
+                <span class="kw-2">*</span>calibration,
             ),
         }
     }
 }
 
-<span class="doccomment">/// Sets this clock as the default for the duration of a closure.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This will only affect calls made against [`Instant`].  [`Clock`] is always self-contained.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_clock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">clock</span>: <span class="kw-2">&amp;</span><span class="ident">Clock</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span>) -&gt; <span class="ident">T</span> {
-    <span class="ident">CLOCK_OVERRIDE</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">current</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">replace</span>(<span class="prelude-val">Some</span>(<span class="ident">clock</span>.<span class="ident">clone</span>()));
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>();
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">replace</span>(<span class="ident">old</span>);
-        <span class="ident">result</span>
+<span class="doccomment">/// Sets this clock as the default for the duration of a closure.
+///
+/// This will only affect calls made against [`Instant`].  [`Clock`] is always self-contained.
+</span><span class="kw">pub fn </span>with_clock&lt;T&gt;(clock: <span class="kw-2">&amp;</span>Clock, f: <span class="kw">impl </span>FnOnce() -&gt; T) -&gt; T {
+    CLOCK_OVERRIDE.with(|current| {
+        <span class="kw">let </span>old = current.replace(<span class="prelude-val">Some</span>(clock.clone()));
+        <span class="kw">let </span>result = f();
+        <span class="kw">let _ </span>= current.replace(old);
+        result
     })
 }
 
-<span class="doccomment">/// Sets the global recent time.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// While callers should typically prefer to use [`Upkeep`] to establish a background thread in</span>
-<span class="doccomment">/// order to drive the global recent time, this function allows callers to customize how the global</span>
-<span class="doccomment">/// recent time is updated.  For example, programs using an asynchronous runtime may prefer to</span>
-<span class="doccomment">/// schedule a task that does the updating, avoiding an extra thread.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_recent</span>(<span class="ident">instant</span>: <span class="ident">Instant</span>) {
-    <span class="ident">GLOBAL_RECENT</span>.<span class="ident">store</span>(<span class="ident">instant</span>.<span class="ident">as_u64</span>());
+<span class="doccomment">/// Sets the global recent time.
+///
+/// While callers should typically prefer to use [`Upkeep`] to establish a background thread in
+/// order to drive the global recent time, this function allows callers to customize how the global
+/// recent time is updated.  For example, programs using an asynchronous runtime may prefer to
+/// schedule a task that does the updating, avoiding an extra thread.
+</span><span class="kw">pub fn </span>set_recent(instant: Instant) {
+    GLOBAL_RECENT.store(instant.as_u64());
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_now</span>() -&gt; <span class="ident">Instant</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">instant</span>) <span class="op">=</span> <span class="ident">CLOCK_OVERRIDE</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">clock</span><span class="op">|</span> <span class="ident">clock</span>.<span class="ident">borrow</span>().<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">now</span>())) {
-        <span class="ident">instant</span>
-    } <span class="kw">else</span> {
-        <span class="ident">GLOBAL_CLOCK</span>.<span class="ident">get_or_init</span>(<span class="ident">Clock::new</span>).<span class="ident">now</span>()
+<span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_now() -&gt; Instant {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(instant) = CLOCK_OVERRIDE.with(|clock| clock.borrow().as_ref().map(|c| c.now())) {
+        instant
+    } <span class="kw">else </span>{
+        GLOBAL_CLOCK.get_or_init(Clock::new).now()
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_recent</span>() -&gt; <span class="ident">Instant</span> {
-    <span class="comment">// We make a small trade-off here where if the global recent time isn&#39;t zero, we use that,</span>
-    <span class="comment">// regardless of whether or not there&#39;s a thread-specific clock override.  Otherwise, we would</span>
-    <span class="comment">// blow our performance budget.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Given that global recent time shouldn&#39;t ever be getting _actually_ updated in tests, this</span>
-    <span class="comment">// should be a reasonable trade-off.</span>
-    <span class="kw">let</span> <span class="ident">recent</span> <span class="op">=</span> <span class="ident">GLOBAL_RECENT</span>.<span class="ident">load</span>();
-    <span class="kw">if</span> <span class="ident">recent</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">Instant</span>(<span class="ident">recent</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">get_now</span>()
+<span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_recent() -&gt; Instant {
+    <span class="comment">// We make a small trade-off here where if the global recent time isn&#39;t zero, we use that,
+    // regardless of whether or not there&#39;s a thread-specific clock override.  Otherwise, we would
+    // blow our performance budget.
+    //
+    // Given that global recent time shouldn&#39;t ever be getting _actually_ updated in tests, this
+    // should be a reasonable trade-off.
+    </span><span class="kw">let </span>recent = GLOBAL_RECENT.load();
+    <span class="kw">if </span>recent != <span class="number">0 </span>{
+        Instant(recent)
+    } <span class="kw">else </span>{
+        get_now()
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">scale_src_to_ref</span>(<span class="ident">src_raw</span>: <span class="ident">u64</span>, <span class="ident">cal</span>: <span class="kw-2">&amp;</span><span class="ident">Calibration</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="ident">src_raw</span>.<span class="ident">saturating_sub</span>(<span class="ident">cal</span>.<span class="ident">src_time</span>);
-    <span class="kw">let</span> <span class="ident">scaled</span> <span class="op">=</span> <span class="ident">mul_div_po2_u64</span>(<span class="ident">delta</span>, <span class="ident">cal</span>.<span class="ident">scale_factor</span>, <span class="ident">cal</span>.<span class="ident">scale_shift</span>);
-    <span class="ident">scaled</span> <span class="op">+</span> <span class="ident">cal</span>.<span class="ident">ref_time</span>
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>scale_src_to_ref(src_raw: u64, cal: <span class="kw-2">&amp;</span>Calibration) -&gt; u64 {
+    <span class="kw">let </span>delta = src_raw.saturating_sub(cal.src_time);
+    <span class="kw">let </span>scaled = mul_div_po2_u64(delta, cal.scale_factor, cal.scale_shift);
+    scaled + cal.ref_time
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">mul_div_po2_u64</span>(<span class="ident">value</span>: <span class="ident">u64</span>, <span class="ident">numer</span>: <span class="ident">u64</span>, <span class="ident">denom</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u64</span> {
-    <span class="comment">// Modified muldiv routine where the denominator has to be a power of two. `denom` is expected</span>
-    <span class="comment">// to be the number of bits to shift, not the actual decimal value.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u128</span>;
-    <span class="ident">v</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">numer</span> <span class="kw">as</span> <span class="ident">u128</span>;
-    <span class="ident">v</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">denom</span>;
-    <span class="ident">v</span> <span class="kw">as</span> <span class="ident">u64</span>
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>mul_div_po2_u64(value: u64, numer: u64, denom: u32) -&gt; u64 {
+    <span class="comment">// Modified muldiv routine where the denominator has to be a power of two. `denom` is expected
+    // to be the number of bits to shift, not the actual decimal value.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>v: u128 = value <span class="kw">as </span>u128;
+    v <span class="kw-2">*</span>= numer <span class="kw">as </span>u128;
+    v &gt;&gt;= denom;
+    v <span class="kw">as </span>u64
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">has_tsc_support</span>() -&gt; <span class="ident">bool</span> {
-    <span class="ident">read_cpuid_nonstop_tsc</span>() <span class="op">&amp;&amp;</span> <span class="ident">read_cpuid_rdtscp_support</span>()
+<span class="attribute">#[allow(dead_code)]
+#[cfg(all(target_arch = <span class="string">&quot;x86_64&quot;</span>, target_feature = <span class="string">&quot;sse2&quot;</span>))]
+</span><span class="kw">fn </span>has_tsc_support() -&gt; bool {
+    read_cpuid_nonstop_tsc() &amp;&amp; read_cpuid_rdtscp_support()
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>)))]</span>
-<span class="kw">fn</span> <span class="ident">has_tsc_support</span>() -&gt; <span class="ident">bool</span> {
-    <span class="bool-val">false</span>
+<span class="attribute">#[allow(dead_code)]
+#[cfg(not(all(target_arch = <span class="string">&quot;x86_64&quot;</span>, target_feature = <span class="string">&quot;sse2&quot;</span>)))]
+</span><span class="kw">fn </span>has_tsc_support() -&gt; bool {
+    <span class="bool-val">false
+</span>}
+
+<span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+</span><span class="kw">fn </span>read_cpuid_nonstop_tsc() -&gt; bool {
+    <span class="kw">let </span>cpuid = CpuId::new();
+    cpuid
+        .get_advanced_power_mgmt_info()
+        .map_or(<span class="bool-val">false</span>, |efi| efi.has_invariant_tsc())
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">read_cpuid_nonstop_tsc</span>() -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">cpuid</span> <span class="op">=</span> <span class="ident">CpuId::new</span>();
-    <span class="ident">cpuid</span>
-        .<span class="ident">get_advanced_power_mgmt_info</span>()
-        .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">efi</span><span class="op">|</span> <span class="ident">efi</span>.<span class="ident">has_invariant_tsc</span>())
+<span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+</span><span class="kw">fn </span>read_cpuid_rdtscp_support() -&gt; bool {
+    <span class="kw">let </span>cpuid = CpuId::new();
+    cpuid
+        .get_extended_processor_and_feature_identifiers()
+        .map_or(<span class="bool-val">false</span>, |efi| efi.has_rdtscp())
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">read_cpuid_rdtscp_support</span>() -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">cpuid</span> <span class="op">=</span> <span class="ident">CpuId::new</span>();
-    <span class="ident">cpuid</span>
-        .<span class="ident">get_extended_processor_and_feature_identifiers</span>()
-        .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">efi</span><span class="op">|</span> <span class="ident">efi</span>.<span class="ident">has_rdtscp</span>())
-}
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">pub mod </span>tests {
+    <span class="kw">use super</span>::{Clock, Monotonic};
+    <span class="kw">use </span>average::{Merge, Variance};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Clock</span>, <span class="ident">Monotonic</span>};
-    <span class="kw">use</span> <span class="ident">average</span>::{<span class="ident">Merge</span>, <span class="ident">Variance</span>};
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>))]</span>
-    <span class="kw">mod</span> <span class="ident">configure_wasm_tests</span> {
-        <span class="comment">// until https://github.com/rustwasm/wasm-bindgen/issues/2571 is resolved</span>
-        <span class="comment">// these tests will only run in browsers</span>
-        <span class="macro">wasm_bindgen_test::wasm_bindgen_test_configure!</span>(<span class="ident">run_in_browser</span>);
+    <span class="attribute">#[cfg(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, target_os = <span class="string">&quot;unknown&quot;</span>))]
+    </span><span class="kw">mod </span>configure_wasm_tests {
+        <span class="comment">// until https://github.com/rustwasm/wasm-bindgen/issues/2571 is resolved
+        // these tests will only run in browsers
+        </span><span class="macro">wasm_bindgen_test::wasm_bindgen_test_configure!</span>(run_in_browser);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(
-        <span class="ident">all</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>),
-        <span class="ident">wasm_bindgen_test::wasm_bindgen_test</span>
-    )]</span>
-    <span class="kw">fn</span> <span class="ident">test_mock</span>() {
-        <span class="kw">let</span> (<span class="ident">clock</span>, <span class="ident">mock</span>) <span class="op">=</span> <span class="ident">Clock::mock</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">clock</span>.<span class="ident">now</span>().<span class="ident">as_u64</span>(), <span class="number">0</span>);
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="number">42</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">clock</span>.<span class="ident">now</span>().<span class="ident">as_u64</span>(), <span class="number">42</span>);
+    <span class="attribute">#[test]
+    #[cfg_attr(
+        all(target_arch = <span class="string">&quot;wasm32&quot;</span>, target_os = <span class="string">&quot;unknown&quot;</span>),
+        wasm_bindgen_test::wasm_bindgen_test
+    )]
+    </span><span class="kw">fn </span>test_mock() {
+        <span class="kw">let </span>(clock, mock) = Clock::mock();
+        <span class="macro">assert_eq!</span>(clock.now().as_u64(), <span class="number">0</span>);
+        mock.increment(<span class="number">42</span>);
+        <span class="macro">assert_eq!</span>(clock.now().as_u64(), <span class="number">42</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(
-        <span class="ident">all</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>),
-        <span class="ident">wasm_bindgen_test::wasm_bindgen_test</span>
-    )]</span>
-    <span class="kw">fn</span> <span class="ident">test_now</span>() {
-        <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">Clock::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">clock</span>.<span class="ident">now</span>().<span class="ident">as_u64</span>() <span class="op">&gt;</span> <span class="number">0</span>);
+    <span class="attribute">#[test]
+    #[cfg_attr(
+        all(target_arch = <span class="string">&quot;wasm32&quot;</span>, target_os = <span class="string">&quot;unknown&quot;</span>),
+        wasm_bindgen_test::wasm_bindgen_test
+    )]
+    </span><span class="kw">fn </span>test_now() {
+        <span class="kw">let </span>clock = Clock::new();
+        <span class="macro">assert!</span>(clock.now().as_u64() &gt; <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(
-        <span class="ident">all</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>),
-        <span class="ident">wasm_bindgen_test::wasm_bindgen_test</span>
-    )]</span>
-    <span class="kw">fn</span> <span class="ident">test_raw</span>() {
-        <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">Clock::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">clock</span>.<span class="ident">raw</span>() <span class="op">&gt;</span> <span class="number">0</span>);
+    <span class="attribute">#[test]
+    #[cfg_attr(
+        all(target_arch = <span class="string">&quot;wasm32&quot;</span>, target_os = <span class="string">&quot;unknown&quot;</span>),
+        wasm_bindgen_test::wasm_bindgen_test
+    )]
+    </span><span class="kw">fn </span>test_raw() {
+        <span class="kw">let </span>clock = Clock::new();
+        <span class="macro">assert!</span>(clock.raw() &gt; <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(
-        <span class="ident">all</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>),
-        <span class="ident">wasm_bindgen_test::wasm_bindgen_test</span>
-    )]</span>
-    <span class="kw">fn</span> <span class="ident">test_start</span>() {
-        <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">Clock::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">clock</span>.<span class="ident">start</span>() <span class="op">&gt;</span> <span class="number">0</span>);
+    <span class="attribute">#[test]
+    #[cfg_attr(
+        all(target_arch = <span class="string">&quot;wasm32&quot;</span>, target_os = <span class="string">&quot;unknown&quot;</span>),
+        wasm_bindgen_test::wasm_bindgen_test
+    )]
+    </span><span class="kw">fn </span>test_start() {
+        <span class="kw">let </span>clock = Clock::new();
+        <span class="macro">assert!</span>(clock.start() &gt; <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(
-        <span class="ident">all</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>),
-        <span class="ident">wasm_bindgen_test::wasm_bindgen_test</span>
-    )]</span>
-    <span class="kw">fn</span> <span class="ident">test_end</span>() {
-        <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">Clock::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">clock</span>.<span class="ident">end</span>() <span class="op">&gt;</span> <span class="number">0</span>);
+    <span class="attribute">#[test]
+    #[cfg_attr(
+        all(target_arch = <span class="string">&quot;wasm32&quot;</span>, target_os = <span class="string">&quot;unknown&quot;</span>),
+        wasm_bindgen_test::wasm_bindgen_test
+    )]
+    </span><span class="kw">fn </span>test_end() {
+        <span class="kw">let </span>clock = Clock::new();
+        <span class="macro">assert!</span>(clock.end() &gt; <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(
-        <span class="ident">all</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>),
-        <span class="ident">wasm_bindgen_test::wasm_bindgen_test</span>
-    )]</span>
-    <span class="kw">fn</span> <span class="ident">test_scaled</span>() {
-        <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">Clock::new</span>();
-        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">clock</span>.<span class="ident">raw</span>();
-        <span class="kw">let</span> <span class="ident">scaled</span> <span class="op">=</span> <span class="ident">clock</span>.<span class="ident">scaled</span>(<span class="ident">raw</span>);
-        <span class="macro">assert!</span>(<span class="ident">scaled</span>.<span class="ident">as_u64</span>() <span class="op">&gt;</span> <span class="number">0</span>);
+    <span class="attribute">#[test]
+    #[cfg_attr(
+        all(target_arch = <span class="string">&quot;wasm32&quot;</span>, target_os = <span class="string">&quot;unknown&quot;</span>),
+        wasm_bindgen_test::wasm_bindgen_test
+    )]
+    </span><span class="kw">fn </span>test_scaled() {
+        <span class="kw">let </span>clock = Clock::new();
+        <span class="kw">let </span>raw = clock.raw();
+        <span class="kw">let </span>scaled = clock.scaled(raw);
+        <span class="macro">assert!</span>(scaled.as_u64() &gt; <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;flaky_tests&quot;</span>), <span class="ident">ignore</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(
-        <span class="ident">all</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>),
-        <span class="ident">wasm_bindgen_test::wasm_bindgen_test</span>
-    )]</span>
-    <span class="kw">fn</span> <span class="ident">test_reference_source_calibration</span>() {
-        <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">Clock::new</span>();
-        <span class="kw">let</span> <span class="ident">reference</span> <span class="op">=</span> <span class="ident">Monotonic::new</span>();
+    <span class="attribute">#[test]
+    #[cfg_attr(not(feature = <span class="string">&quot;flaky_tests&quot;</span>), ignore)]
+    #[cfg_attr(
+        all(target_arch = <span class="string">&quot;wasm32&quot;</span>, target_os = <span class="string">&quot;unknown&quot;</span>),
+        wasm_bindgen_test::wasm_bindgen_test
+    )]
+    </span><span class="kw">fn </span>test_reference_source_calibration() {
+        <span class="kw">let </span>clock = Clock::new();
+        <span class="kw">let </span>reference = Monotonic::new();
 
-        <span class="kw">let</span> <span class="ident">loops</span> <span class="op">=</span> <span class="number">10000</span>;
+        <span class="kw">let </span>loops = <span class="number">10000</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">overall</span> <span class="op">=</span> <span class="ident">Variance::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src_samples</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="number">1024</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ref_samples</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="number">1024</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>overall = Variance::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>src_samples = [<span class="number">0u64</span>; <span class="number">1024</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>ref_samples = [<span class="number">0u64</span>; <span class="number">1024</span>];
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">loops</span> {
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1024</span> {
-                <span class="ident">src_samples</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">clock</span>.<span class="ident">now</span>().<span class="ident">as_u64</span>();
-                <span class="ident">ref_samples</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">reference</span>.<span class="ident">now</span>();
+        <span class="kw">for _ in </span><span class="number">0</span>..loops {
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">1024 </span>{
+                src_samples[i] = clock.now().as_u64();
+                ref_samples[i] = reference.now();
             }
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">let</span> <span class="ident">is_src_monotonic</span> <span class="op">=</span> <span class="ident">src_samples</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">last</span> {
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="ident">last</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">n</span>);
-                    <span class="bool-val">true</span>
-                }
-                <span class="prelude-val">Some</span>(<span class="ident">on</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">on</span> {
-                        <span class="ident">last</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">n</span>);
-                        <span class="bool-val">true</span>
-                    } <span class="kw">else</span> {
-                        <span class="bool-val">false</span>
-                    }
-                }
-            });
-            <span class="macro">assert!</span>(<span class="ident">is_src_monotonic</span>);
-
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">let</span> <span class="ident">is_ref_monotonic</span> <span class="op">=</span> <span class="ident">ref_samples</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">last</span> {
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="ident">last</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">n</span>);
-                    <span class="bool-val">true</span>
-                }
-                <span class="prelude-val">Some</span>(<span class="ident">on</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">on</span> {
-                        <span class="ident">last</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">n</span>);
-                        <span class="bool-val">true</span>
-                    } <span class="kw">else</span> {
-                        <span class="bool-val">false</span>
-                    }
+            <span class="kw">let </span><span class="kw-2">mut </span>last = <span class="prelude-val">None</span>;
+            <span class="kw">let </span>is_src_monotonic = src_samples.iter().all(|n| <span class="kw">match </span>last {
+                <span class="prelude-val">None </span>=&gt; {
+                    last = <span class="prelude-val">Some</span>(n);
+                    <span class="bool-val">true
+                </span>}
+                <span class="prelude-val">Some</span>(on) =&gt; {
+                    <span class="kw">if </span>n &gt;= on {
+                        last = <span class="prelude-val">Some</span>(n);
+                        <span class="bool-val">true
+                    </span>} <span class="kw">else </span>{
+                        <span class="bool-val">false
+                    </span>}
                 }
             });
-            <span class="macro">assert!</span>(<span class="ident">is_ref_monotonic</span>);
+            <span class="macro">assert!</span>(is_src_monotonic);
 
-            <span class="kw">let</span> <span class="ident">local</span> <span class="op">=</span> <span class="ident">src_samples</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">zip</span>(<span class="ident">ref_samples</span>.<span class="ident">iter</span>())
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">s</span>, <span class="ident">r</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">s</span> <span class="kw">as</span> <span class="ident">f64</span>, <span class="kw-2">*</span><span class="ident">r</span> <span class="kw">as</span> <span class="ident">f64</span>))
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">s</span>, <span class="ident">r</span>)<span class="op">|</span> (<span class="ident">r</span> <span class="op">-</span> <span class="ident">s</span>).<span class="ident">abs</span>())
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Variance</span><span class="op">&gt;</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>last = <span class="prelude-val">None</span>;
+            <span class="kw">let </span>is_ref_monotonic = ref_samples.iter().all(|n| <span class="kw">match </span>last {
+                <span class="prelude-val">None </span>=&gt; {
+                    last = <span class="prelude-val">Some</span>(n);
+                    <span class="bool-val">true
+                </span>}
+                <span class="prelude-val">Some</span>(on) =&gt; {
+                    <span class="kw">if </span>n &gt;= on {
+                        last = <span class="prelude-val">Some</span>(n);
+                        <span class="bool-val">true
+                    </span>} <span class="kw">else </span>{
+                        <span class="bool-val">false
+                    </span>}
+                }
+            });
+            <span class="macro">assert!</span>(is_ref_monotonic);
 
-            <span class="ident">overall</span>.<span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="ident">local</span>);
+            <span class="kw">let </span>local = src_samples
+                .iter()
+                .zip(ref_samples.iter())
+                .map(|(s, r)| (<span class="kw-2">*</span>s <span class="kw">as </span>f64, <span class="kw-2">*</span>r <span class="kw">as </span>f64))
+                .map(|(s, r)| (r - s).abs())
+                .collect::&lt;Variance&gt;();
+
+            overall.merge(<span class="kw-2">&amp;</span>local);
         }
 
         <span class="macro">println!</span>(
             <span class="string">&quot;reference/source delta: mean={} error={} mean-var={} samples={}&quot;</span>,
-            <span class="ident">overall</span>.<span class="ident">mean</span>(),
-            <span class="ident">overall</span>.<span class="ident">error</span>(),
-            <span class="ident">overall</span>.<span class="ident">variance_of_mean</span>(),
-            <span class="ident">overall</span>.<span class="ident">len</span>(),
+            overall.mean(),
+            overall.error(),
+            overall.variance_of_mean(),
+            overall.len(),
         );
 
-        <span class="comment">// If things are out of sync more than 1000ns, something is likely scaled wrong.</span>
-        <span class="macro">assert!</span>(<span class="ident">overall</span>.<span class="ident">mean</span>() <span class="op">&lt;</span> <span class="number">1000.0</span>);
+        <span class="comment">// If things are out of sync more than 1000ns, something is likely scaled wrong.
+        </span><span class="macro">assert!</span>(overall.mean() &lt; <span class="number">1000.0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;flaky_tests&quot;</span>), <span class="ident">ignore</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(
-        <span class="ident">all</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>),
-        <span class="ident">wasm_bindgen_test::wasm_bindgen_test</span>
-    )]</span>
-    <span class="kw">fn</span> <span class="ident">test_reference_self_calibration</span>() {
-        <span class="kw">let</span> <span class="ident">reference</span> <span class="op">=</span> <span class="ident">Monotonic::new</span>();
+    <span class="attribute">#[test]
+    #[cfg_attr(not(feature = <span class="string">&quot;flaky_tests&quot;</span>), ignore)]
+    #[cfg_attr(
+        all(target_arch = <span class="string">&quot;wasm32&quot;</span>, target_os = <span class="string">&quot;unknown&quot;</span>),
+        wasm_bindgen_test::wasm_bindgen_test
+    )]
+    </span><span class="kw">fn </span>test_reference_self_calibration() {
+        <span class="kw">let </span>reference = Monotonic::new();
 
-        <span class="kw">let</span> <span class="ident">loops</span> <span class="op">=</span> <span class="number">10000</span>;
-        <span class="kw">let</span> <span class="ident">samples</span> <span class="op">=</span> <span class="number">1024</span>;
+        <span class="kw">let </span>loops = <span class="number">10000</span>;
+        <span class="kw">let </span>samples = <span class="number">1024</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">overall</span> <span class="op">=</span> <span class="ident">Variance::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">deltas</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">samples</span>);
-        <span class="ident">deltas</span>.<span class="ident">reserve</span>(<span class="ident">samples</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>overall = Variance::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>deltas = Vec::with_capacity(samples);
+        deltas.reserve(samples);
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">loops</span> {
-            <span class="ident">deltas</span>.<span class="ident">clear</span>();
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">samples</span> {
-                <span class="kw">let</span> <span class="ident">rstart</span> <span class="op">=</span> <span class="ident">reference</span>.<span class="ident">now</span>();
-                <span class="kw">let</span> <span class="ident">rend</span> <span class="op">=</span> <span class="ident">reference</span>.<span class="ident">now</span>();
+        <span class="kw">for _ in </span><span class="number">0</span>..loops {
+            deltas.clear();
+            <span class="kw">for _ in </span><span class="number">0</span>..samples {
+                <span class="kw">let </span>rstart = reference.now();
+                <span class="kw">let </span>rend = reference.now();
 
-                <span class="ident">deltas</span>.<span class="ident">push</span>(<span class="ident">rend</span> <span class="op">-</span> <span class="ident">rstart</span>);
+                deltas.push(rend - rstart);
             }
 
-            <span class="kw">let</span> <span class="ident">local</span> <span class="op">=</span> <span class="ident">deltas</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Variance</span><span class="op">&gt;</span>();
-            <span class="ident">overall</span>.<span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="ident">local</span>);
+            <span class="kw">let </span>local = deltas.iter().map(|i| <span class="kw-2">*</span>i <span class="kw">as </span>f64).collect::&lt;Variance&gt;();
+            overall.merge(<span class="kw-2">&amp;</span>local);
         }
 
         <span class="macro">println!</span>(
             <span class="string">&quot;reference/reference inter-call delta: mean={} error={} mean-var={}&quot;</span>,
-            <span class="ident">overall</span>.<span class="ident">mean</span>(),
-            <span class="ident">overall</span>.<span class="ident">error</span>(),
-            <span class="ident">overall</span>.<span class="ident">variance_of_mean</span>()
+            overall.mean(),
+            overall.error(),
+            overall.variance_of_mean()
         );
 
-        <span class="comment">// We should be able to call the reference clock, back-to-back, within 2000 nanoseconds.  If</span>
-        <span class="comment">// it&#39;s slower than that, something is probably amiss on the system the test is running under.</span>
-        <span class="macro">assert!</span>(<span class="ident">overall</span>.<span class="ident">mean</span>() <span class="op">&lt;</span> <span class="number">2000.0</span>);
+        <span class="comment">// We should be able to call the reference clock, back-to-back, within 2000 nanoseconds.  If
+        // it&#39;s slower than that, something is probably amiss on the system the test is running under.
+        </span><span class="macro">assert!</span>(overall.mean() &lt; <span class="number">2000.0</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="quanta" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="quanta" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/connect_raw.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connect_raw.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/connect_raw.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connect_raw.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -350,357 +350,357 @@
 <span id="350">350</span>
 <span id="351">351</span>
 <span id="352">352</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec</span>::{<span class="ident">BackendMessage</span>, <span class="ident">BackendMessages</span>, <span class="ident">FrontendMessage</span>, <span class="ident">PostgresCodec</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="self">self</span>, <span class="ident">Config</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connect_tls::connect_tls</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::maybe_tls_stream::MaybeTlsStream</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls</span>::{<span class="ident">TlsConnect</span>, <span class="ident">TlsStream</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Client</span>, <span class="ident">Connection</span>, <span class="ident">Error</span>};
-<span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
-<span class="kw">use</span> <span class="ident">fallible_iterator::FallibleIterator</span>;
-<span class="kw">use</span> <span class="ident">futures_channel::mpsc</span>;
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">ready</span>, <span class="ident">Sink</span>, <span class="ident">SinkExt</span>, <span class="ident">Stream</span>, <span class="ident">TryStreamExt</span>};
-<span class="kw">use</span> <span class="ident">postgres_protocol::authentication</span>;
-<span class="kw">use</span> <span class="ident">postgres_protocol::authentication::sasl</span>;
-<span class="kw">use</span> <span class="ident">postgres_protocol::authentication::sasl::ScramSha256</span>;
-<span class="kw">use</span> <span class="ident">postgres_protocol::message::backend</span>::{<span class="ident">AuthenticationSaslBody</span>, <span class="ident">Message</span>};
-<span class="kw">use</span> <span class="ident">postgres_protocol::message::frontend</span>;
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-<span class="kw">use</span> <span class="ident">tokio_util::codec::Framed</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::codec::{BackendMessage, BackendMessages, FrontendMessage, PostgresCodec};
+<span class="kw">use </span><span class="kw">crate</span>::config::{<span class="self">self</span>, Config};
+<span class="kw">use </span><span class="kw">crate</span>::connect_tls::connect_tls;
+<span class="kw">use </span><span class="kw">crate</span>::maybe_tls_stream::MaybeTlsStream;
+<span class="kw">use </span><span class="kw">crate</span>::tls::{TlsConnect, TlsStream};
+<span class="kw">use crate</span>::{Client, Connection, Error};
+<span class="kw">use </span>bytes::BytesMut;
+<span class="kw">use </span>fallible_iterator::FallibleIterator;
+<span class="kw">use </span>futures_channel::mpsc;
+<span class="kw">use </span>futures_util::{ready, Sink, SinkExt, Stream, TryStreamExt};
+<span class="kw">use </span>postgres_protocol::authentication;
+<span class="kw">use </span>postgres_protocol::authentication::sasl;
+<span class="kw">use </span>postgres_protocol::authentication::sasl::ScramSha256;
+<span class="kw">use </span>postgres_protocol::message::backend::{AuthenticationSaslBody, Message};
+<span class="kw">use </span>postgres_protocol::message::frontend;
+<span class="kw">use </span>std::collections::{HashMap, VecDeque};
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
+<span class="kw">use </span>tokio_util::codec::Framed;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StartupStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">Framed</span><span class="op">&lt;</span><span class="ident">MaybeTlsStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">PostgresCodec</span><span class="op">&gt;</span>,
-    <span class="ident">buf</span>: <span class="ident">BackendMessages</span>,
-    <span class="ident">delayed</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">BackendMessage</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>StartupStream&lt;S, T&gt; {
+    inner: Framed&lt;MaybeTlsStream&lt;S, T&gt;, PostgresCodec&gt;,
+    buf: BackendMessages,
+    delayed: VecDeque&lt;BackendMessage&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Sink</span><span class="op">&lt;</span><span class="ident">FrontendMessage</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StartupStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;S, T&gt; Sink&lt;FrontendMessage&gt; <span class="kw">for </span>StartupStream&lt;S, T&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin,
+    T: AsyncRead + AsyncWrite + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
+    <span class="kw">type </span>Error = io::Error;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_ready(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">start_send</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">item</span>: <span class="ident">FrontendMessage</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">start_send</span>(<span class="ident">item</span>)
+    <span class="kw">fn </span>start_send(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, item: FrontendMessage) -&gt; io::Result&lt;()&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).start_send(item)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_flush(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_flush(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_close</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_close(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_close(cx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">StartupStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;S, T&gt; Stream <span class="kw">for </span>StartupStream&lt;S, T&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin,
+    T: AsyncRead + AsyncWrite + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = io::Result&lt;Message&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">message</span>)) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">message</span>))),
+    <span class="kw">fn </span>poll_next(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;io::Result&lt;Message&gt;&gt;&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.buf.next() {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(message)) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(message))),
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {}
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))),
+                <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))),
             }
 
-            <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_next</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">BackendMessage::Normal</span> { <span class="ident">messages</span>, .. })) =&gt; <span class="self">self</span>.<span class="ident">buf</span> <span class="op">=</span> <span class="ident">messages</span>,
-                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">BackendMessage::Async</span>(<span class="ident">message</span>))) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">message</span>))),
-                <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))),
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+            <span class="kw">match </span><span class="macro">ready!</span>(Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_next(cx)) {
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(BackendMessage::Normal { messages, .. })) =&gt; <span class="self">self</span>.buf = messages,
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(BackendMessage::Async(message))) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(message))),
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))),
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>),
             }
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_raw</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">stream</span>: <span class="ident">S</span>,
-    <span class="ident">tls</span>: <span class="ident">T</span>,
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Client</span>, <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T::Stream</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">TlsConnect</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">pub async fn </span>connect_raw&lt;S, T&gt;(
+    stream: S,
+    tls: T,
+    config: <span class="kw-2">&amp;</span>Config,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(Client, Connection&lt;S, T::Stream&gt;), Error&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin,
+    T: TlsConnect&lt;S&gt;,
 {
-    <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">connect_tls</span>(<span class="ident">stream</span>, <span class="ident">config</span>.<span class="ident">ssl_mode</span>, <span class="ident">tls</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>stream = connect_tls(stream, config.ssl_mode, tls).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">StartupStream</span> {
-        <span class="ident">inner</span>: <span class="ident">Framed::new</span>(<span class="ident">stream</span>, <span class="ident">PostgresCodec</span>),
-        <span class="ident">buf</span>: <span class="ident">BackendMessages::empty</span>(),
-        <span class="ident">delayed</span>: <span class="ident">VecDeque::new</span>(),
+    <span class="kw">let </span><span class="kw-2">mut </span>stream = StartupStream {
+        inner: Framed::new(stream, PostgresCodec),
+        buf: BackendMessages::empty(),
+        delayed: VecDeque::new(),
     };
 
-    <span class="ident">startup</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stream</span>, <span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="ident">authenticate</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stream</span>, <span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> (<span class="ident">process_id</span>, <span class="ident">secret_key</span>, <span class="ident">parameters</span>) <span class="op">=</span> <span class="ident">read_info</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stream</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    startup(<span class="kw-2">&amp;mut </span>stream, config).<span class="kw">await</span><span class="question-mark">?</span>;
+    authenticate(<span class="kw-2">&amp;mut </span>stream, config).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>(process_id, secret_key, parameters) = read_info(<span class="kw-2">&amp;mut </span>stream).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded</span>();
-    <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(
-        <span class="ident">sender</span>,
-        <span class="ident">config</span>.<span class="ident">ssl_mode</span>,
-        <span class="ident">process_id</span>,
-        <span class="ident">secret_key</span>,
-        <span class="ident">config</span>.<span class="ident">pgbouncer_mode</span>,
+    <span class="kw">let </span>(sender, receiver) = mpsc::unbounded();
+    <span class="kw">let </span>client = Client::new(
+        sender,
+        config.ssl_mode,
+        process_id,
+        secret_key,
+        config.pgbouncer_mode,
     );
-    <span class="kw">let</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">Connection::new</span>(<span class="ident">stream</span>.<span class="ident">inner</span>, <span class="ident">stream</span>.<span class="ident">delayed</span>, <span class="ident">parameters</span>, <span class="ident">receiver</span>);
+    <span class="kw">let </span>connection = Connection::new(stream.inner, stream.delayed, parameters, receiver);
 
-    <span class="prelude-val">Ok</span>((<span class="ident">client</span>, <span class="ident">connection</span>))
+    <span class="prelude-val">Ok</span>((client, connection))
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">startup</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StartupStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">async fn </span>startup&lt;S, T&gt;(stream: <span class="kw-2">&amp;mut </span>StartupStream&lt;S, T&gt;, config: <span class="kw-2">&amp;</span>Config) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin,
+    T: AsyncRead + AsyncWrite + Unpin,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="string">&quot;client_encoding&quot;</span>, <span class="string">&quot;UTF8&quot;</span>)];
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">user</span> {
-        <span class="ident">params</span>.<span class="ident">push</span>((<span class="string">&quot;user&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">user</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[(<span class="string">&quot;client_encoding&quot;</span>, <span class="string">&quot;UTF8&quot;</span>)];
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = <span class="kw-2">&amp;</span>config.user {
+        params.push((<span class="string">&quot;user&quot;</span>, <span class="kw-2">&amp;**</span>user));
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dbname</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">dbname</span> {
-        <span class="ident">params</span>.<span class="ident">push</span>((<span class="string">&quot;database&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">dbname</span>));
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(dbname) = <span class="kw-2">&amp;</span>config.dbname {
+        params.push((<span class="string">&quot;database&quot;</span>, <span class="kw-2">&amp;**</span>dbname));
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">options</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">options</span> {
-        <span class="ident">params</span>.<span class="ident">push</span>((<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">options</span>));
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(options) = <span class="kw-2">&amp;</span>config.options {
+        params.push((<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;**</span>options));
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">application_name</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">application_name</span> {
-        <span class="ident">params</span>.<span class="ident">push</span>((<span class="string">&quot;application_name&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">application_name</span>));
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(application_name) = <span class="kw-2">&amp;</span>config.application_name {
+        params.push((<span class="string">&quot;application_name&quot;</span>, <span class="kw-2">&amp;**</span>application_name));
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-    <span class="ident">frontend::startup_message</span>(<span class="ident">params</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="ident">Error::encode</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = BytesMut::new();
+    frontend::startup_message(params, <span class="kw-2">&amp;mut </span>buf).map_err(Error::encode)<span class="question-mark">?</span>;
 
-    <span class="ident">stream</span>
-        .<span class="ident">send</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">buf</span>.<span class="ident">freeze</span>()))
-        .<span class="kw">await</span>
-        .<span class="ident">map_err</span>(<span class="ident">Error::io</span>)
+    stream
+        .send(FrontendMessage::Raw(buf.freeze()))
+        .<span class="kw">await
+        </span>.map_err(Error::io)
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">authenticate</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StartupStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">TlsStream</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">async fn </span>authenticate&lt;S, T&gt;(stream: <span class="kw-2">&amp;mut </span>StartupStream&lt;S, T&gt;, config: <span class="kw-2">&amp;</span>Config) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin,
+    T: TlsStream + Unpin,
 {
-    <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">Message::AuthenticationOk</span>) =&gt; {
-            <span class="ident">can_skip_channel_binding</span>(<span class="ident">config</span>)<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="kw">match </span>stream.try_next().<span class="kw">await</span>.map_err(Error::io)<span class="question-mark">? </span>{
+        <span class="prelude-val">Some</span>(Message::AuthenticationOk) =&gt; {
+            can_skip_channel_binding(config)<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
-        <span class="prelude-val">Some</span>(<span class="ident">Message::AuthenticationCleartextPassword</span>) =&gt; {
-            <span class="ident">can_skip_channel_binding</span>(<span class="ident">config</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(Message::AuthenticationCleartextPassword) =&gt; {
+            can_skip_channel_binding(config)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">pass</span> <span class="op">=</span> <span class="ident">config</span>
-                .<span class="ident">password</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::config</span>(<span class="string">&quot;password missing&quot;</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
+            <span class="kw">let </span>pass = config
+                .password
+                .as_ref()
+                .ok_or_else(|| Error::config(<span class="string">&quot;password missing&quot;</span>.into()))<span class="question-mark">?</span>;
 
-            <span class="ident">authenticate_password</span>(<span class="ident">stream</span>, <span class="ident">pass</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            authenticate_password(stream, pass).<span class="kw">await</span><span class="question-mark">?</span>;
         }
-        <span class="prelude-val">Some</span>(<span class="ident">Message::AuthenticationMd5Password</span>(<span class="ident">body</span>)) =&gt; {
-            <span class="ident">can_skip_channel_binding</span>(<span class="ident">config</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(Message::AuthenticationMd5Password(body)) =&gt; {
+            can_skip_channel_binding(config)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">config</span>
-                .<span class="ident">user</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::config</span>(<span class="string">&quot;user missing&quot;</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">pass</span> <span class="op">=</span> <span class="ident">config</span>
-                .<span class="ident">password</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::config</span>(<span class="string">&quot;password missing&quot;</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
+            <span class="kw">let </span>user = config
+                .user
+                .as_ref()
+                .ok_or_else(|| Error::config(<span class="string">&quot;user missing&quot;</span>.into()))<span class="question-mark">?</span>;
+            <span class="kw">let </span>pass = config
+                .password
+                .as_ref()
+                .ok_or_else(|| Error::config(<span class="string">&quot;password missing&quot;</span>.into()))<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">authentication::md5_hash</span>(<span class="ident">user</span>.<span class="ident">as_bytes</span>(), <span class="ident">pass</span>, <span class="ident">body</span>.<span class="ident">salt</span>());
-            <span class="ident">authenticate_password</span>(<span class="ident">stream</span>, <span class="ident">output</span>.<span class="ident">as_bytes</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>output = authentication::md5_hash(user.as_bytes(), pass, body.salt());
+            authenticate_password(stream, output.as_bytes()).<span class="kw">await</span><span class="question-mark">?</span>;
         }
-        <span class="prelude-val">Some</span>(<span class="ident">Message::AuthenticationSasl</span>(<span class="ident">body</span>)) =&gt; {
-            <span class="ident">authenticate_sasl</span>(<span class="ident">stream</span>, <span class="ident">body</span>, <span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(Message::AuthenticationSasl(body)) =&gt; {
+            authenticate_sasl(stream, body, config).<span class="kw">await</span><span class="question-mark">?</span>;
         }
-        <span class="prelude-val">Some</span>(<span class="ident">Message::AuthenticationKerberosV5</span>)
-        <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Message::AuthenticationScmCredential</span>)
-        <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Message::AuthenticationGss</span>)
-        <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Message::AuthenticationSspi</span>) =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::authentication</span>(
-                <span class="string">&quot;unsupported authentication method&quot;</span>.<span class="ident">into</span>(),
+        <span class="prelude-val">Some</span>(Message::AuthenticationKerberosV5)
+        | <span class="prelude-val">Some</span>(Message::AuthenticationScmCredential)
+        | <span class="prelude-val">Some</span>(Message::AuthenticationGss)
+        | <span class="prelude-val">Some</span>(Message::AuthenticationSspi) =&gt; {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::authentication(
+                <span class="string">&quot;unsupported authentication method&quot;</span>.into(),
             ))
         }
-        <span class="prelude-val">Some</span>(<span class="ident">Message::ErrorResponse</span>(<span class="ident">body</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::db</span>(<span class="ident">body</span>)),
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::closed</span>()),
+        <span class="prelude-val">Some</span>(Message::ErrorResponse(body)) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::db(body)),
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unexpected_message()),
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::closed()),
     }
 
-    <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">Message::AuthenticationOk</span>) =&gt; <span class="prelude-val">Ok</span>(()),
-        <span class="prelude-val">Some</span>(<span class="ident">Message::ErrorResponse</span>(<span class="ident">body</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::db</span>(<span class="ident">body</span>)),
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::closed</span>()),
+    <span class="kw">match </span>stream.try_next().<span class="kw">await</span>.map_err(Error::io)<span class="question-mark">? </span>{
+        <span class="prelude-val">Some</span>(Message::AuthenticationOk) =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="prelude-val">Some</span>(Message::ErrorResponse(body)) =&gt; <span class="prelude-val">Err</span>(Error::db(body)),
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(Error::unexpected_message()),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(Error::closed()),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">can_skip_channel_binding</span>(<span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">config</span>.<span class="ident">channel_binding</span> {
-        <span class="ident">config::ChannelBinding::Disable</span> <span class="op">|</span> <span class="ident">config::ChannelBinding::Prefer</span> =&gt; <span class="prelude-val">Ok</span>(()),
-        <span class="ident">config::ChannelBinding::Require</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::authentication</span>(
-            <span class="string">&quot;server did not use channel binding&quot;</span>.<span class="ident">into</span>(),
+<span class="kw">fn </span>can_skip_channel_binding(config: <span class="kw-2">&amp;</span>Config) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">match </span>config.channel_binding {
+        config::ChannelBinding::Disable | config::ChannelBinding::Prefer =&gt; <span class="prelude-val">Ok</span>(()),
+        config::ChannelBinding::Require =&gt; <span class="prelude-val">Err</span>(Error::authentication(
+            <span class="string">&quot;server did not use channel binding&quot;</span>.into(),
         )),
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">authenticate_password</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StartupStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">async fn </span>authenticate_password&lt;S, T&gt;(
+    stream: <span class="kw-2">&amp;mut </span>StartupStream&lt;S, T&gt;,
+    password: <span class="kw-2">&amp;</span>[u8],
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin,
+    T: AsyncRead + AsyncWrite + Unpin,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-    <span class="ident">frontend::password_message</span>(<span class="ident">password</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="ident">Error::encode</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = BytesMut::new();
+    frontend::password_message(password, <span class="kw-2">&amp;mut </span>buf).map_err(Error::encode)<span class="question-mark">?</span>;
 
-    <span class="ident">stream</span>
-        .<span class="ident">send</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">buf</span>.<span class="ident">freeze</span>()))
-        .<span class="kw">await</span>
-        .<span class="ident">map_err</span>(<span class="ident">Error::io</span>)
+    stream
+        .send(FrontendMessage::Raw(buf.freeze()))
+        .<span class="kw">await
+        </span>.map_err(Error::io)
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">authenticate_sasl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StartupStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">body</span>: <span class="ident">AuthenticationSaslBody</span>,
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">TlsStream</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">async fn </span>authenticate_sasl&lt;S, T&gt;(
+    stream: <span class="kw-2">&amp;mut </span>StartupStream&lt;S, T&gt;,
+    body: AuthenticationSaslBody,
+    config: <span class="kw-2">&amp;</span>Config,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin,
+    T: TlsStream + Unpin,
 {
-    <span class="kw">let</span> <span class="ident">password</span> <span class="op">=</span> <span class="ident">config</span>
-        .<span class="ident">password</span>
-        .<span class="ident">as_ref</span>()
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::config</span>(<span class="string">&quot;password missing&quot;</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
+    <span class="kw">let </span>password = config
+        .password
+        .as_ref()
+        .ok_or_else(|| Error::config(<span class="string">&quot;password missing&quot;</span>.into()))<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">has_scram</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">has_scram_plus</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mechanisms</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">mechanisms</span>();
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mechanism</span>) <span class="op">=</span> <span class="ident">mechanisms</span>.<span class="ident">next</span>().<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span> {
-        <span class="kw">match</span> <span class="ident">mechanism</span> {
-            <span class="ident">sasl::SCRAM_SHA_256</span> =&gt; <span class="ident">has_scram</span> <span class="op">=</span> <span class="bool-val">true</span>,
-            <span class="ident">sasl::SCRAM_SHA_256_PLUS</span> =&gt; <span class="ident">has_scram_plus</span> <span class="op">=</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; {}
+    <span class="kw">let </span><span class="kw-2">mut </span>has_scram = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>has_scram_plus = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>mechanisms = body.mechanisms();
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(mechanism) = mechanisms.next().map_err(Error::parse)<span class="question-mark">? </span>{
+        <span class="kw">match </span>mechanism {
+            sasl::SCRAM_SHA_256 =&gt; has_scram = <span class="bool-val">true</span>,
+            sasl::SCRAM_SHA_256_PLUS =&gt; has_scram_plus = <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; {}
         }
     }
 
-    <span class="kw">let</span> <span class="ident">channel_binding</span> <span class="op">=</span> <span class="ident">stream</span>
-        .<span class="ident">inner</span>
-        .<span class="ident">get_ref</span>()
-        .<span class="ident">channel_binding</span>()
-        .<span class="ident">tls_server_end_point</span>
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">channel_binding</span> <span class="op">!</span><span class="op">=</span> <span class="ident">config::ChannelBinding::Disable</span>)
-        .<span class="ident">map</span>(<span class="ident">sasl::ChannelBinding::tls_server_end_point</span>);
+    <span class="kw">let </span>channel_binding = stream
+        .inner
+        .get_ref()
+        .channel_binding()
+        .tls_server_end_point
+        .filter(|<span class="kw">_</span>| config.channel_binding != config::ChannelBinding::Disable)
+        .map(sasl::ChannelBinding::tls_server_end_point);
 
-    <span class="kw">let</span> (<span class="ident">channel_binding</span>, <span class="ident">mechanism</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_scram_plus</span> {
-        <span class="kw">match</span> <span class="ident">channel_binding</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">channel_binding</span>) =&gt; (<span class="ident">channel_binding</span>, <span class="ident">sasl::SCRAM_SHA_256_PLUS</span>),
-            <span class="prelude-val">None</span> =&gt; (<span class="ident">sasl::ChannelBinding::unsupported</span>(), <span class="ident">sasl::SCRAM_SHA_256</span>),
+    <span class="kw">let </span>(channel_binding, mechanism) = <span class="kw">if </span>has_scram_plus {
+        <span class="kw">match </span>channel_binding {
+            <span class="prelude-val">Some</span>(channel_binding) =&gt; (channel_binding, sasl::SCRAM_SHA_256_PLUS),
+            <span class="prelude-val">None </span>=&gt; (sasl::ChannelBinding::unsupported(), sasl::SCRAM_SHA_256),
         }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">has_scram</span> {
-        <span class="kw">match</span> <span class="ident">channel_binding</span> {
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; (<span class="ident">sasl::ChannelBinding::unrequested</span>(), <span class="ident">sasl::SCRAM_SHA_256</span>),
-            <span class="prelude-val">None</span> =&gt; (<span class="ident">sasl::ChannelBinding::unsupported</span>(), <span class="ident">sasl::SCRAM_SHA_256</span>),
+    } <span class="kw">else if </span>has_scram {
+        <span class="kw">match </span>channel_binding {
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; (sasl::ChannelBinding::unrequested(), sasl::SCRAM_SHA_256),
+            <span class="prelude-val">None </span>=&gt; (sasl::ChannelBinding::unsupported(), sasl::SCRAM_SHA_256),
         }
-    } <span class="kw">else</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::authentication</span>(<span class="string">&quot;unsupported SASL mechanism&quot;</span>.<span class="ident">into</span>()));
+    } <span class="kw">else </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::authentication(<span class="string">&quot;unsupported SASL mechanism&quot;</span>.into()));
     };
 
-    <span class="kw">if</span> <span class="ident">mechanism</span> <span class="op">!</span><span class="op">=</span> <span class="ident">sasl::SCRAM_SHA_256_PLUS</span> {
-        <span class="ident">can_skip_channel_binding</span>(<span class="ident">config</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>mechanism != sasl::SCRAM_SHA_256_PLUS {
+        can_skip_channel_binding(config)<span class="question-mark">?</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scram</span> <span class="op">=</span> <span class="ident">ScramSha256::new</span>(<span class="ident">password</span>, <span class="ident">channel_binding</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>scram = ScramSha256::new(password, channel_binding);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-    <span class="ident">frontend::sasl_initial_response</span>(<span class="ident">mechanism</span>, <span class="ident">scram</span>.<span class="ident">message</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="ident">Error::encode</span>)<span class="question-mark">?</span>;
-    <span class="ident">stream</span>
-        .<span class="ident">send</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">buf</span>.<span class="ident">freeze</span>()))
-        .<span class="kw">await</span>
-        .<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = BytesMut::new();
+    frontend::sasl_initial_response(mechanism, scram.message(), <span class="kw-2">&amp;mut </span>buf).map_err(Error::encode)<span class="question-mark">?</span>;
+    stream
+        .send(FrontendMessage::Raw(buf.freeze()))
+        .<span class="kw">await
+        </span>.map_err(Error::io)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">Message::AuthenticationSaslContinue</span>(<span class="ident">body</span>)) =&gt; <span class="ident">body</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">Message::ErrorResponse</span>(<span class="ident">body</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::db</span>(<span class="ident">body</span>)),
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::closed</span>()),
+    <span class="kw">let </span>body = <span class="kw">match </span>stream.try_next().<span class="kw">await</span>.map_err(Error::io)<span class="question-mark">? </span>{
+        <span class="prelude-val">Some</span>(Message::AuthenticationSaslContinue(body)) =&gt; body,
+        <span class="prelude-val">Some</span>(Message::ErrorResponse(body)) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::db(body)),
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unexpected_message()),
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::closed()),
     };
 
-    <span class="ident">scram</span>
-        .<span class="ident">update</span>(<span class="ident">body</span>.<span class="ident">data</span>())
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::authentication</span>(<span class="ident">e</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
+    scram
+        .update(body.data())
+        .map_err(|e| Error::authentication(e.into()))<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-    <span class="ident">frontend::sasl_response</span>(<span class="ident">scram</span>.<span class="ident">message</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="ident">Error::encode</span>)<span class="question-mark">?</span>;
-    <span class="ident">stream</span>
-        .<span class="ident">send</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">buf</span>.<span class="ident">freeze</span>()))
-        .<span class="kw">await</span>
-        .<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = BytesMut::new();
+    frontend::sasl_response(scram.message(), <span class="kw-2">&amp;mut </span>buf).map_err(Error::encode)<span class="question-mark">?</span>;
+    stream
+        .send(FrontendMessage::Raw(buf.freeze()))
+        .<span class="kw">await
+        </span>.map_err(Error::io)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">Message::AuthenticationSaslFinal</span>(<span class="ident">body</span>)) =&gt; <span class="ident">body</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">Message::ErrorResponse</span>(<span class="ident">body</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::db</span>(<span class="ident">body</span>)),
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::closed</span>()),
+    <span class="kw">let </span>body = <span class="kw">match </span>stream.try_next().<span class="kw">await</span>.map_err(Error::io)<span class="question-mark">? </span>{
+        <span class="prelude-val">Some</span>(Message::AuthenticationSaslFinal(body)) =&gt; body,
+        <span class="prelude-val">Some</span>(Message::ErrorResponse(body)) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::db(body)),
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unexpected_message()),
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::closed()),
     };
 
-    <span class="ident">scram</span>
-        .<span class="ident">finish</span>(<span class="ident">body</span>.<span class="ident">data</span>())
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::authentication</span>(<span class="ident">e</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
+    scram
+        .finish(body.data())
+        .map_err(|e| Error::authentication(e.into()))<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_info</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StartupStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">i32</span>, <span class="ident">i32</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">async fn </span>read_info&lt;S, T&gt;(
+    stream: <span class="kw-2">&amp;mut </span>StartupStream&lt;S, T&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(i32, i32, HashMap&lt;String, String&gt;), Error&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin,
+    T: AsyncRead + AsyncWrite + Unpin,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">process_id</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">secret_key</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parameters</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>process_id = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>secret_key = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>parameters = HashMap::new();
 
-    <span class="kw">loop</span> {
-        <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">Message::BackendKeyData</span>(<span class="ident">body</span>)) =&gt; {
-                <span class="ident">process_id</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">process_id</span>();
-                <span class="ident">secret_key</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">secret_key</span>();
+    <span class="kw">loop </span>{
+        <span class="kw">match </span>stream.try_next().<span class="kw">await</span>.map_err(Error::io)<span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(Message::BackendKeyData(body)) =&gt; {
+                process_id = body.process_id();
+                secret_key = body.secret_key();
             }
-            <span class="prelude-val">Some</span>(<span class="ident">Message::ParameterStatus</span>(<span class="ident">body</span>)) =&gt; {
-                <span class="ident">parameters</span>.<span class="ident">insert</span>(
-                    <span class="ident">body</span>.<span class="ident">name</span>().<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">body</span>.<span class="ident">value</span>().<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>(),
+            <span class="prelude-val">Some</span>(Message::ParameterStatus(body)) =&gt; {
+                parameters.insert(
+                    body.name().map_err(Error::parse)<span class="question-mark">?</span>.to_string(),
+                    body.value().map_err(Error::parse)<span class="question-mark">?</span>.to_string(),
                 );
             }
-            <span class="prelude-val">Some</span>(<span class="ident">msg</span> @ <span class="ident">Message::NoticeResponse</span>(<span class="kw">_</span>)) =&gt; {
-                <span class="ident">stream</span>.<span class="ident">delayed</span>.<span class="ident">push_back</span>(<span class="ident">BackendMessage::Async</span>(<span class="ident">msg</span>))
+            <span class="prelude-val">Some</span>(msg @ Message::NoticeResponse(<span class="kw">_</span>)) =&gt; {
+                stream.delayed.push_back(BackendMessage::Async(msg))
             }
-            <span class="prelude-val">Some</span>(<span class="ident">Message::ReadyForQuery</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">process_id</span>, <span class="ident">secret_key</span>, <span class="ident">parameters</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">Message::ErrorResponse</span>(<span class="ident">body</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::db</span>(<span class="ident">body</span>)),
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::closed</span>()),
+            <span class="prelude-val">Some</span>(Message::ReadyForQuery(<span class="kw">_</span>)) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>((process_id, secret_key, parameters)),
+            <span class="prelude-val">Some</span>(Message::ErrorResponse(body)) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::db(body)),
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unexpected_message()),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::closed()),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

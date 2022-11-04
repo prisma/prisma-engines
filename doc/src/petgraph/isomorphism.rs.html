@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/isomorphism.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>isomorphism.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/isomorphism.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>isomorphism.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -454,461 +454,461 @@
 <span id="454">454</span>
 <span id="455">455</span>
 <span id="456">456</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::marker</span>;
-<span class="kw">use</span> <span class="ident">fixedbitset::FixedBitSet</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::marker;
+<span class="kw">use </span>fixedbitset::FixedBitSet;
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">EdgeType</span>,
-    <span class="ident">Incoming</span>,
+<span class="kw">use super</span>::{
+    EdgeType,
+    Incoming,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::graph</span>::{
-    <span class="ident">Graph</span>,
-    <span class="ident">IndexType</span>,
-    <span class="ident">NodeIndex</span>,
+<span class="kw">use </span><span class="kw">super</span>::graph::{
+    Graph,
+    IndexType,
+    NodeIndex,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::visit::GetAdjacencyMatrix</span>;
+<span class="kw">use </span><span class="kw">super</span>::visit::GetAdjacencyMatrix;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Vf2State</span><span class="op">&lt;</span><span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The current mapping M(s) of nodes from G0 → G1 and G1 → G0,</span>
-    <span class="doccomment">/// NodeIndex::end() for no mapping.</span>
-    <span class="ident">mapping</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// out[i] is non-zero if i is in either M_0(s) or Tout_0(s)</span>
-    <span class="doccomment">/// These are all the next vertices that are not mapped yet, but</span>
-    <span class="doccomment">/// have an outgoing edge from the mapping.</span>
-    <span class="ident">out</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// ins[i] is non-zero if i is in either M_0(s) or Tin_0(s)</span>
-    <span class="doccomment">/// These are all the incoming vertices, those not mapped yet, but</span>
-    <span class="doccomment">/// have an edge from them into the mapping.</span>
-    <span class="doccomment">/// Unused if graph is undirected -- it&#39;s identical with out in that case.</span>
-    <span class="ident">ins</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">out_size</span>: <span class="ident">usize</span>,
-    <span class="ident">ins_size</span>: <span class="ident">usize</span>,
-    <span class="ident">adjacency_matrix</span>: <span class="ident">FixedBitSet</span>,
-    <span class="ident">generation</span>: <span class="ident">usize</span>,
-    <span class="ident">_etype</span>: <span class="ident">marker::PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Vf2State&lt;Ty, Ix&gt; {
+    <span class="doccomment">/// The current mapping M(s) of nodes from G0 → G1 and G1 → G0,
+    /// NodeIndex::end() for no mapping.
+    </span>mapping: Vec&lt;NodeIndex&lt;Ix&gt;&gt;,
+    <span class="doccomment">/// out[i] is non-zero if i is in either M_0(s) or Tout_0(s)
+    /// These are all the next vertices that are not mapped yet, but
+    /// have an outgoing edge from the mapping.
+    </span>out: Vec&lt;usize&gt;,
+    <span class="doccomment">/// ins[i] is non-zero if i is in either M_0(s) or Tin_0(s)
+    /// These are all the incoming vertices, those not mapped yet, but
+    /// have an edge from them into the mapping.
+    /// Unused if graph is undirected -- it&#39;s identical with out in that case.
+    </span>ins: Vec&lt;usize&gt;,
+    out_size: usize,
+    ins_size: usize,
+    adjacency_matrix: FixedBitSet,
+    generation: usize,
+    _etype: marker::PhantomData&lt;Ty&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Vf2State</span><span class="op">&lt;</span><span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;Ty, Ix&gt; Vf2State&lt;Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">c0</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">node_count</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Vf2State</span> {
-            <span class="ident">mapping</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">c0</span>),
-            <span class="ident">out</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">c0</span>),
-            <span class="ident">ins</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">c0</span> <span class="op">*</span> (<span class="ident">g</span>.<span class="ident">is_directed</span>() <span class="kw">as</span> <span class="ident">usize</span>)),
-            <span class="ident">out_size</span>: <span class="number">0</span>,
-            <span class="ident">ins_size</span>: <span class="number">0</span>,
-            <span class="ident">adjacency_matrix</span>: <span class="ident">g</span>.<span class="ident">adjacency_matrix</span>(),
-            <span class="ident">generation</span>: <span class="number">0</span>,
-            <span class="ident">_etype</span>: <span class="ident">marker::PhantomData</span>,
+    <span class="kw">pub fn </span>new&lt;N, E&gt;(g: <span class="kw-2">&amp;</span>Graph&lt;N, E, Ty, Ix&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>c0 = g.node_count();
+        <span class="kw">let </span><span class="kw-2">mut </span>state = Vf2State {
+            mapping: Vec::with_capacity(c0),
+            out: Vec::with_capacity(c0),
+            ins: Vec::with_capacity(c0 * (g.is_directed() <span class="kw">as </span>usize)),
+            out_size: <span class="number">0</span>,
+            ins_size: <span class="number">0</span>,
+            adjacency_matrix: g.adjacency_matrix(),
+            generation: <span class="number">0</span>,
+            _etype: marker::PhantomData,
         };
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">c0</span> {
-            <span class="ident">state</span>.<span class="ident">mapping</span>.<span class="ident">push</span>(<span class="ident">NodeIndex::end</span>());
-            <span class="ident">state</span>.<span class="ident">out</span>.<span class="ident">push</span>(<span class="number">0</span>);
-            <span class="kw">if</span> <span class="ident">Ty::is_directed</span>() {
-                <span class="ident">state</span>.<span class="ident">ins</span>.<span class="ident">push</span>(<span class="number">0</span>);
+        <span class="kw">for _ in </span><span class="number">0</span>..c0 {
+            state.mapping.push(NodeIndex::end());
+            state.out.push(<span class="number">0</span>);
+            <span class="kw">if </span>Ty::is_directed() {
+                state.ins.push(<span class="number">0</span>);
             }
         }
-        <span class="ident">state</span>
+        state
     }
 
-    <span class="doccomment">/// Return **true** if we have a complete mapping</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">generation</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">mapping</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Return **true** if we have a complete mapping
+    </span><span class="kw">pub fn </span>is_complete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.generation == <span class="self">self</span>.mapping.len()
     }
 
-    <span class="doccomment">/// Add mapping **from** &lt;-&gt; **to** to the state.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_mapping</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">from</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">to</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>,
-                              <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>)
+    <span class="doccomment">/// Add mapping **from** &lt;-&gt; **to** to the state.
+    </span><span class="kw">pub fn </span>push_mapping&lt;N, E&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, from: NodeIndex&lt;Ix&gt;, to: NodeIndex&lt;Ix&gt;,
+                              g: <span class="kw-2">&amp;</span>Graph&lt;N, E, Ty, Ix&gt;)
     {
-        <span class="self">self</span>.<span class="ident">generation</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">generation</span>;
-        <span class="self">self</span>.<span class="ident">mapping</span>[<span class="ident">from</span>.<span class="ident">index</span>()] <span class="op">=</span> <span class="ident">to</span>;
-        <span class="comment">// update T0 &amp; T1 ins/outs</span>
-        <span class="comment">// T0out: Node in G0 not in M0 but successor of a node in M0.</span>
-        <span class="comment">// st.out[0]: Node either in M0 or successor of M0</span>
-        <span class="kw">for</span> <span class="ident">ix</span> <span class="kw">in</span> <span class="ident">g</span>.<span class="ident">neighbors</span>(<span class="ident">from</span>) {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">==</span> <span class="number">0</span> {
-                <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span> <span class="ident">s</span>;
-                <span class="self">self</span>.<span class="ident">out_size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="self">self</span>.generation += <span class="number">1</span>;
+        <span class="kw">let </span>s = <span class="self">self</span>.generation;
+        <span class="self">self</span>.mapping[from.index()] = to;
+        <span class="comment">// update T0 &amp; T1 ins/outs
+        // T0out: Node in G0 not in M0 but successor of a node in M0.
+        // st.out[0]: Node either in M0 or successor of M0
+        </span><span class="kw">for </span>ix <span class="kw">in </span>g.neighbors(from) {
+            <span class="kw">if </span><span class="self">self</span>.out[ix.index()] == <span class="number">0 </span>{
+                <span class="self">self</span>.out[ix.index()] = s;
+                <span class="self">self</span>.out_size += <span class="number">1</span>;
             }
         }
-        <span class="kw">if</span> <span class="ident">g</span>.<span class="ident">is_directed</span>() {
-            <span class="kw">for</span> <span class="ident">ix</span> <span class="kw">in</span> <span class="ident">g</span>.<span class="ident">neighbors_directed</span>(<span class="ident">from</span>, <span class="ident">Incoming</span>) {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">==</span> <span class="number">0</span> {
-                    <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span> <span class="ident">s</span>;
-                    <span class="self">self</span>.<span class="ident">ins_size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">if </span>g.is_directed() {
+            <span class="kw">for </span>ix <span class="kw">in </span>g.neighbors_directed(from, Incoming) {
+                <span class="kw">if </span><span class="self">self</span>.ins[ix.index()] == <span class="number">0 </span>{
+                    <span class="self">self</span>.ins[ix.index()] = s;
+                    <span class="self">self</span>.ins_size += <span class="number">1</span>;
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Restore the state to before the last added mapping</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_mapping</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">from</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>,
-                             <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>)
+    <span class="doccomment">/// Restore the state to before the last added mapping
+    </span><span class="kw">pub fn </span>pop_mapping&lt;N, E&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, from: NodeIndex&lt;Ix&gt;,
+                             g: <span class="kw-2">&amp;</span>Graph&lt;N, E, Ty, Ix&gt;)
     {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">generation</span>;
-        <span class="self">self</span>.<span class="ident">generation</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">let </span>s = <span class="self">self</span>.generation;
+        <span class="self">self</span>.generation -= <span class="number">1</span>;
 
-        <span class="comment">// undo (n, m) mapping</span>
-        <span class="self">self</span>.<span class="ident">mapping</span>[<span class="ident">from</span>.<span class="ident">index</span>()] <span class="op">=</span> <span class="ident">NodeIndex::end</span>();
+        <span class="comment">// undo (n, m) mapping
+        </span><span class="self">self</span>.mapping[from.index()] = NodeIndex::end();
 
-        <span class="comment">// unmark in ins and outs</span>
-        <span class="kw">for</span> <span class="ident">ix</span> <span class="kw">in</span> <span class="ident">g</span>.<span class="ident">neighbors</span>(<span class="ident">from</span>) {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">==</span> <span class="ident">s</span> {
-                <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span> <span class="number">0</span>;
-                <span class="self">self</span>.<span class="ident">out_size</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="comment">// unmark in ins and outs
+        </span><span class="kw">for </span>ix <span class="kw">in </span>g.neighbors(from) {
+            <span class="kw">if </span><span class="self">self</span>.out[ix.index()] == s {
+                <span class="self">self</span>.out[ix.index()] = <span class="number">0</span>;
+                <span class="self">self</span>.out_size -= <span class="number">1</span>;
             }
         }
-        <span class="kw">if</span> <span class="ident">g</span>.<span class="ident">is_directed</span>() {
-            <span class="kw">for</span> <span class="ident">ix</span> <span class="kw">in</span> <span class="ident">g</span>.<span class="ident">neighbors_directed</span>(<span class="ident">from</span>, <span class="ident">Incoming</span>) {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">==</span> <span class="ident">s</span> {
-                    <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span> <span class="number">0</span>;
-                    <span class="self">self</span>.<span class="ident">ins_size</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">if </span>g.is_directed() {
+            <span class="kw">for </span>ix <span class="kw">in </span>g.neighbors_directed(from, Incoming) {
+                <span class="kw">if </span><span class="self">self</span>.ins[ix.index()] == s {
+                    <span class="self">self</span>.ins[ix.index()] = <span class="number">0</span>;
+                    <span class="self">self</span>.ins_size -= <span class="number">1</span>;
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Find the next (least) node in the Tout set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_out_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from_index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Find the next (least) node in the Tout set.
+    </span><span class="kw">pub fn </span>next_out_index(<span class="kw-2">&amp;</span><span class="self">self</span>, from_index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt;
     {
-        <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">from_index</span>..].<span class="ident">iter</span>()
-                    .<span class="ident">enumerate</span>()
-                    .<span class="ident">find</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">index</span>, <span class="ident">elt</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span>
-                          <span class="self">self</span>.<span class="ident">mapping</span>[<span class="ident">from_index</span> <span class="op">+</span> <span class="ident">index</span>] <span class="op">==</span> <span class="ident">NodeIndex::end</span>())
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">index</span>)
+        <span class="self">self</span>.out[from_index..].iter()
+                    .enumerate()
+                    .find(<span class="kw">move </span>|<span class="kw-2">&amp;</span>(index, elt)| <span class="kw-2">*</span>elt &gt; <span class="number">0 </span>&amp;&amp;
+                          <span class="self">self</span>.mapping[from_index + index] == NodeIndex::end())
+                    .map(|(index, <span class="kw">_</span>)| index)
     }
 
-    <span class="doccomment">/// Find the next (least) node in the Tin set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_in_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from_index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Find the next (least) node in the Tin set.
+    </span><span class="kw">pub fn </span>next_in_index(<span class="kw-2">&amp;</span><span class="self">self</span>, from_index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt;
     {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">Ty::is_directed</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>
-        }
-        <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">from_index</span>..].<span class="ident">iter</span>()
-                    .<span class="ident">enumerate</span>()
-                    .<span class="ident">find</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">index</span>, <span class="ident">elt</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">&gt;</span> <span class="number">0</span>
-                          <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">mapping</span>[<span class="ident">from_index</span> <span class="op">+</span> <span class="ident">index</span>] <span class="op">==</span> <span class="ident">NodeIndex::end</span>())
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">index</span>)
+        <span class="kw">if </span>!Ty::is_directed() {
+            <span class="kw">return </span><span class="prelude-val">None
+        </span>}
+        <span class="self">self</span>.ins[from_index..].iter()
+                    .enumerate()
+                    .find(<span class="kw">move </span>|<span class="kw-2">&amp;</span>(index, elt)| <span class="kw-2">*</span>elt &gt; <span class="number">0
+                          </span>&amp;&amp; <span class="self">self</span>.mapping[from_index + index] == NodeIndex::end())
+                    .map(|(index, <span class="kw">_</span>)| index)
     }
 
-    <span class="doccomment">/// Find the next (least) node in the N - M set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_rest_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from_index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Find the next (least) node in the N - M set.
+    </span><span class="kw">pub fn </span>next_rest_index(<span class="kw-2">&amp;</span><span class="self">self</span>, from_index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt;
     {
-        <span class="self">self</span>.<span class="ident">mapping</span>[<span class="ident">from_index</span>..].<span class="ident">iter</span>()
-               .<span class="ident">enumerate</span>()
-               .<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">elt</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">==</span> <span class="ident">NodeIndex::end</span>())
-               .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">index</span>)
+        <span class="self">self</span>.mapping[from_index..].iter()
+               .enumerate()
+               .find(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, elt)| <span class="kw-2">*</span>elt == NodeIndex::end())
+               .map(|(index, <span class="kw">_</span>)| index)
     }
 }
 
 
-<span class="doccomment">/// [Graph] Return `true` if the graphs `g0` and `g1` are isomorphic.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using the VF2 algorithm, only matching graph syntactically (graph</span>
-<span class="doccomment">/// structure).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The graphs should not be multigraphs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Reference**</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * Luigi P. Cordella, Pasquale Foggia, Carlo Sansone, Mario Vento;</span>
-<span class="doccomment">///   *A (Sub)Graph Isomorphism Algorithm for Matching Large Graphs*</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_isomorphic</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>(<span class="ident">g0</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>,
-                                   <span class="ident">g1</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="doccomment">/// [Graph] Return `true` if the graphs `g0` and `g1` are isomorphic.
+///
+/// Using the VF2 algorithm, only matching graph syntactically (graph
+/// structure).
+///
+/// The graphs should not be multigraphs.
+///
+/// **Reference**
+///
+/// * Luigi P. Cordella, Pasquale Foggia, Carlo Sansone, Mario Vento;
+///   *A (Sub)Graph Isomorphism Algorithm for Matching Large Graphs*
+</span><span class="kw">pub fn </span>is_isomorphic&lt;N, E, Ty, Ix&gt;(g0: <span class="kw-2">&amp;</span>Graph&lt;N, E, Ty, Ix&gt;,
+                                   g1: <span class="kw-2">&amp;</span>Graph&lt;N, E, Ty, Ix&gt;) -&gt; bool
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">if</span> <span class="ident">g0</span>.<span class="ident">node_count</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">g1</span>.<span class="ident">node_count</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">g0</span>.<span class="ident">edge_count</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">g1</span>.<span class="ident">edge_count</span>() {
-        <span class="kw">return</span> <span class="bool-val">false</span>
-    }
+    <span class="kw">if </span>g0.node_count() != g1.node_count() || g0.edge_count() != g1.edge_count() {
+        <span class="kw">return </span><span class="bool-val">false
+    </span>}
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">st</span> <span class="op">=</span> [<span class="ident">Vf2State::new</span>(<span class="ident">g0</span>), <span class="ident">Vf2State::new</span>(<span class="ident">g1</span>)];
-    <span class="ident">try_match</span>(<span class="kw-2">&amp;mut</span> <span class="ident">st</span>, <span class="ident">g0</span>, <span class="ident">g1</span>, <span class="kw-2">&amp;mut</span> <span class="ident">NoSemanticMatch</span>, <span class="kw-2">&amp;mut</span> <span class="ident">NoSemanticMatch</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="kw">let </span><span class="kw-2">mut </span>st = [Vf2State::new(g0), Vf2State::new(g1)];
+    try_match(<span class="kw-2">&amp;mut </span>st, g0, g1, <span class="kw-2">&amp;mut </span>NoSemanticMatch, <span class="kw-2">&amp;mut </span>NoSemanticMatch).unwrap_or(<span class="bool-val">false</span>)
 }
 
-<span class="doccomment">/// [Graph] Return `true` if the graphs `g0` and `g1` are isomorphic.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using the VF2 algorithm, examining both syntactic and semantic</span>
-<span class="doccomment">/// graph isomorphism (graph structure and matching node and edge weights).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The graphs should not be multigraphs.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_isomorphic_matching</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span>, <span class="ident">F</span>, <span class="ident">G</span><span class="op">&gt;</span>(<span class="ident">g0</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>,
-                                                  <span class="ident">g1</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>,
-                                                  <span class="kw-2">mut</span> <span class="ident">node_match</span>: <span class="ident">F</span>,
-                                                  <span class="kw-2">mut</span> <span class="ident">edge_match</span>: <span class="ident">G</span>) -&gt; <span class="ident">bool</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
-          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="ident">N</span>) -&gt; <span class="ident">bool</span>,
-          <span class="ident">G</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">E</span>, <span class="kw-2">&amp;</span><span class="ident">E</span>) -&gt; <span class="ident">bool</span>,
+<span class="doccomment">/// [Graph] Return `true` if the graphs `g0` and `g1` are isomorphic.
+///
+/// Using the VF2 algorithm, examining both syntactic and semantic
+/// graph isomorphism (graph structure and matching node and edge weights).
+///
+/// The graphs should not be multigraphs.
+</span><span class="kw">pub fn </span>is_isomorphic_matching&lt;N, E, Ty, Ix, F, G&gt;(g0: <span class="kw-2">&amp;</span>Graph&lt;N, E, Ty, Ix&gt;,
+                                                  g1: <span class="kw-2">&amp;</span>Graph&lt;N, E, Ty, Ix&gt;,
+                                                  <span class="kw-2">mut </span>node_match: F,
+                                                  <span class="kw-2">mut </span>edge_match: G) -&gt; bool
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
+          F: FnMut(<span class="kw-2">&amp;</span>N, <span class="kw-2">&amp;</span>N) -&gt; bool,
+          G: FnMut(<span class="kw-2">&amp;</span>E, <span class="kw-2">&amp;</span>E) -&gt; bool,
 {
-    <span class="kw">if</span> <span class="ident">g0</span>.<span class="ident">node_count</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">g1</span>.<span class="ident">node_count</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">g0</span>.<span class="ident">edge_count</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">g1</span>.<span class="ident">edge_count</span>() {
-        <span class="kw">return</span> <span class="bool-val">false</span>
-    }
+    <span class="kw">if </span>g0.node_count() != g1.node_count() || g0.edge_count() != g1.edge_count() {
+        <span class="kw">return </span><span class="bool-val">false
+    </span>}
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">st</span> <span class="op">=</span> [<span class="ident">Vf2State::new</span>(<span class="ident">g0</span>), <span class="ident">Vf2State::new</span>(<span class="ident">g1</span>)];
-    <span class="ident">try_match</span>(<span class="kw-2">&amp;mut</span> <span class="ident">st</span>, <span class="ident">g0</span>, <span class="ident">g1</span>, <span class="kw-2">&amp;mut</span> <span class="ident">node_match</span>, <span class="kw-2">&amp;mut</span> <span class="ident">edge_match</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="kw">let </span><span class="kw-2">mut </span>st = [Vf2State::new(g0), Vf2State::new(g1)];
+    try_match(<span class="kw-2">&amp;mut </span>st, g0, g1, <span class="kw-2">&amp;mut </span>node_match, <span class="kw-2">&amp;mut </span>edge_match).unwrap_or(<span class="bool-val">false</span>)
 }
 
-<span class="kw">trait</span> <span class="ident">SemanticMatcher</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">enabled</span>() -&gt; <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span>;
+<span class="kw">trait </span>SemanticMatcher&lt;T&gt; {
+    <span class="kw">fn </span>enabled() -&gt; bool;
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">&amp;</span>T, <span class="kw-2">&amp;</span>T) -&gt; bool;
 }
 
-<span class="kw">struct</span> <span class="ident">NoSemanticMatch</span>;
+<span class="kw">struct </span>NoSemanticMatch;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SemanticMatcher</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NoSemanticMatch</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>() -&gt; <span class="ident">bool</span> { <span class="bool-val">false</span> }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
+<span class="kw">impl</span>&lt;T&gt; SemanticMatcher&lt;T&gt; <span class="kw">for </span>NoSemanticMatch {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>enabled() -&gt; bool { <span class="bool-val">false </span>}
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>T, <span class="kw">_</span>: <span class="kw-2">&amp;</span>T) -&gt; bool { <span class="bool-val">true </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">SemanticMatcher</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span> <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>() -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> { <span class="self">self</span>(<span class="ident">a</span>, <span class="ident">b</span>) }
+<span class="kw">impl</span>&lt;T, F&gt; SemanticMatcher&lt;T&gt; <span class="kw">for </span>F <span class="kw">where </span>F: FnMut(<span class="kw-2">&amp;</span>T, <span class="kw-2">&amp;</span>T) -&gt; bool {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>enabled() -&gt; bool { <span class="bool-val">true </span>}
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: <span class="kw-2">&amp;</span>T, b: <span class="kw-2">&amp;</span>T) -&gt; bool { <span class="self">self</span>(a, b) }
 }
 
-<span class="doccomment">/// Return Some(bool) if isomorphism is decided, else None.</span>
-<span class="kw">fn</span> <span class="ident">try_match</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span>, <span class="ident">F</span>, <span class="ident">G</span><span class="op">&gt;</span>(<span class="ident">st</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Vf2State</span><span class="op">&lt;</span><span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>; <span class="number">2</span>],
-                                 <span class="ident">g0</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>,
-                                 <span class="ident">g1</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>,
-                                 <span class="ident">node_match</span>: <span class="kw-2">&amp;mut</span> <span class="ident">F</span>,
-                                 <span class="ident">edge_match</span>: <span class="kw-2">&amp;mut</span> <span class="ident">G</span>)
-    -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
-          <span class="ident">F</span>: <span class="ident">SemanticMatcher</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
-          <span class="ident">G</span>: <span class="ident">SemanticMatcher</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Return Some(bool) if isomorphism is decided, else None.
+</span><span class="kw">fn </span>try_match&lt;N, E, Ty, Ix, F, G&gt;(st: <span class="kw-2">&amp;mut </span>[Vf2State&lt;Ty, Ix&gt;; <span class="number">2</span>],
+                                 g0: <span class="kw-2">&amp;</span>Graph&lt;N, E, Ty, Ix&gt;,
+                                 g1: <span class="kw-2">&amp;</span>Graph&lt;N, E, Ty, Ix&gt;,
+                                 node_match: <span class="kw-2">&amp;mut </span>F,
+                                 edge_match: <span class="kw-2">&amp;mut </span>G)
+    -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
+          F: SemanticMatcher&lt;N&gt;,
+          G: SemanticMatcher&lt;E&gt;,
 {
-    <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> [<span class="ident">g0</span>, <span class="ident">g1</span>];
-    <span class="kw">let</span> <span class="ident">graph_indices</span> <span class="op">=</span> <span class="number">0</span>..<span class="number">2</span>;
-    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">NodeIndex::end</span>();
+    <span class="kw">let </span>g = [g0, g1];
+    <span class="kw">let </span>graph_indices = <span class="number">0</span>..<span class="number">2</span>;
+    <span class="kw">let </span>end = NodeIndex::end();
 
-    <span class="comment">// if all are mapped -- we are done and have an iso</span>
-    <span class="kw">if</span> <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">is_complete</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)
+    <span class="comment">// if all are mapped -- we are done and have an iso
+    </span><span class="kw">if </span>st[<span class="number">0</span>].is_complete() {
+        <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>)
     }
 
-    <span class="comment">// A &quot;depth first&quot; search of a valid mapping from graph 1 to graph 2</span>
+    <span class="comment">// A &quot;depth first&quot; search of a valid mapping from graph 1 to graph 2
 
-    <span class="comment">// F(s, n, m) -- evaluate state s and add mapping n &lt;-&gt; m</span>
+    // F(s, n, m) -- evaluate state s and add mapping n &lt;-&gt; m
 
-    <span class="comment">// Find least T1out node (in st.out[1] but not in M[1])</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">enum</span> <span class="ident">OpenList</span> {
-        <span class="ident">Out</span>,
-        <span class="ident">In</span>,
-        <span class="ident">Other</span>,
+    // Find least T1out node (in st.out[1] but not in M[1])
+    </span><span class="attribute">#[derive(Copy, Clone, PartialEq, Debug)]
+    </span><span class="kw">enum </span>OpenList {
+        Out,
+        In,
+        Other,
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">open_list</span> <span class="op">=</span> <span class="ident">OpenList::Out</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>open_list = OpenList::Out;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">to_index</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">from_index</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="comment">// Try the out list</span>
-    <span class="ident">to_index</span> <span class="op">=</span> <span class="ident">st</span>[<span class="number">1</span>].<span class="ident">next_out_index</span>(<span class="number">0</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>to_index;
+    <span class="kw">let </span><span class="kw-2">mut </span>from_index = <span class="prelude-val">None</span>;
+    <span class="comment">// Try the out list
+    </span>to_index = st[<span class="number">1</span>].next_out_index(<span class="number">0</span>);
 
-    <span class="kw">if</span> <span class="ident">to_index</span>.<span class="ident">is_some</span>() {
-        <span class="ident">from_index</span> <span class="op">=</span> <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_out_index</span>(<span class="number">0</span>);
-        <span class="ident">open_list</span> <span class="op">=</span> <span class="ident">OpenList::Out</span>;
-    }
-
-    <span class="comment">// Try the in list</span>
-    <span class="kw">if</span> <span class="ident">to_index</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">from_index</span>.<span class="ident">is_none</span>() {
-        <span class="ident">to_index</span> <span class="op">=</span> <span class="ident">st</span>[<span class="number">1</span>].<span class="ident">next_in_index</span>(<span class="number">0</span>);
-
-        <span class="kw">if</span> <span class="ident">to_index</span>.<span class="ident">is_some</span>() {
-            <span class="ident">from_index</span> <span class="op">=</span> <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_in_index</span>(<span class="number">0</span>);
-            <span class="ident">open_list</span> <span class="op">=</span> <span class="ident">OpenList::In</span>;
-        }
+    <span class="kw">if </span>to_index.is_some() {
+        from_index = st[<span class="number">0</span>].next_out_index(<span class="number">0</span>);
+        open_list = OpenList::Out;
     }
 
-    <span class="comment">// Try the other list -- disconnected graph</span>
-    <span class="kw">if</span> <span class="ident">to_index</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">from_index</span>.<span class="ident">is_none</span>() {
-        <span class="ident">to_index</span> <span class="op">=</span> <span class="ident">st</span>[<span class="number">1</span>].<span class="ident">next_rest_index</span>(<span class="number">0</span>);
-        <span class="kw">if</span> <span class="ident">to_index</span>.<span class="ident">is_some</span>() {
-            <span class="ident">from_index</span> <span class="op">=</span> <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_rest_index</span>(<span class="number">0</span>);
-            <span class="ident">open_list</span> <span class="op">=</span> <span class="ident">OpenList::Other</span>;
+    <span class="comment">// Try the in list
+    </span><span class="kw">if </span>to_index.is_none() || from_index.is_none() {
+        to_index = st[<span class="number">1</span>].next_in_index(<span class="number">0</span>);
+
+        <span class="kw">if </span>to_index.is_some() {
+            from_index = st[<span class="number">0</span>].next_in_index(<span class="number">0</span>);
+            open_list = OpenList::In;
         }
     }
 
-    <span class="kw">let</span> (<span class="ident">cand0</span>, <span class="ident">cand1</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">from_index</span>, <span class="ident">to_index</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">n</span>), <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; (<span class="ident">n</span>, <span class="ident">m</span>),
-        <span class="comment">// No more candidates</span>
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+    <span class="comment">// Try the other list -- disconnected graph
+    </span><span class="kw">if </span>to_index.is_none() || from_index.is_none() {
+        to_index = st[<span class="number">1</span>].next_rest_index(<span class="number">0</span>);
+        <span class="kw">if </span>to_index.is_some() {
+            from_index = st[<span class="number">0</span>].next_rest_index(<span class="number">0</span>);
+            open_list = OpenList::Other;
+        }
+    }
+
+    <span class="kw">let </span>(cand0, cand1) = <span class="kw">match </span>(from_index, to_index) {
+        (<span class="prelude-val">Some</span>(n), <span class="prelude-val">Some</span>(m)) =&gt; (n, m),
+        <span class="comment">// No more candidates
+        </span><span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nx</span> <span class="op">=</span> <span class="ident">NodeIndex::new</span>(<span class="ident">cand0</span>);
-    <span class="kw">let</span> <span class="ident">mx</span> <span class="op">=</span> <span class="ident">NodeIndex::new</span>(<span class="ident">cand1</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>nx = NodeIndex::new(cand0);
+    <span class="kw">let </span>mx = NodeIndex::new(cand1);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
 
-    <span class="lifetime">&#39;candidates</span>: <span class="kw">loop</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">first</span> {
-            <span class="comment">// Find the next node index to try on the `from` side of the mapping</span>
-            <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">nx</span>.<span class="ident">index</span>() <span class="op">+</span> <span class="number">1</span>;
-            <span class="kw">let</span> <span class="ident">cand0</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">open_list</span> {
-                <span class="ident">OpenList::Out</span> =&gt; <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_out_index</span>(<span class="ident">start</span>),
-                <span class="ident">OpenList::In</span> =&gt; <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_in_index</span>(<span class="ident">start</span>),
-                <span class="ident">OpenList::Other</span> =&gt; <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_rest_index</span>(<span class="ident">start</span>),
-            }.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">+</span> <span class="ident">start</span>); <span class="comment">// compensate for start offset.</span>
-            <span class="ident">nx</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cand0</span> {
-                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>, <span class="comment">// no more candidates</span>
-                <span class="prelude-val">Some</span>(<span class="ident">ix</span>) =&gt; <span class="ident">NodeIndex::new</span>(<span class="ident">ix</span>),
+    <span class="lifetime">&#39;candidates</span>: <span class="kw">loop </span>{
+        <span class="kw">if </span>!first {
+            <span class="comment">// Find the next node index to try on the `from` side of the mapping
+            </span><span class="kw">let </span>start = nx.index() + <span class="number">1</span>;
+            <span class="kw">let </span>cand0 = <span class="kw">match </span>open_list {
+                OpenList::Out =&gt; st[<span class="number">0</span>].next_out_index(start),
+                OpenList::In =&gt; st[<span class="number">0</span>].next_in_index(start),
+                OpenList::Other =&gt; st[<span class="number">0</span>].next_rest_index(start),
+            }.map(|c| c + start); <span class="comment">// compensate for start offset.
+            </span>nx = <span class="kw">match </span>cand0 {
+                <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>, <span class="comment">// no more candidates
+                </span><span class="prelude-val">Some</span>(ix) =&gt; NodeIndex::new(ix),
             };
-            <span class="macro">debug_assert!</span>(<span class="ident">nx</span>.<span class="ident">index</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">start</span>);
+            <span class="macro">debug_assert!</span>(nx.index() &gt;= start);
         }
-        <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        first = <span class="bool-val">false</span>;
 
-        <span class="kw">let</span> <span class="ident">nodes</span> <span class="op">=</span> [<span class="ident">nx</span>, <span class="ident">mx</span>];
+        <span class="kw">let </span>nodes = [nx, mx];
 
-        <span class="comment">// Check syntactic feasibility of mapping by ensuring adjacencies</span>
-        <span class="comment">// of nx map to adjacencies of mx.</span>
-        <span class="comment">//</span>
-        <span class="comment">// nx == map to =&gt; mx</span>
-        <span class="comment">//</span>
-        <span class="comment">// R_succ</span>
-        <span class="comment">//</span>
-        <span class="comment">// Check that every neighbor of nx is mapped to a neighbor of mx,</span>
-        <span class="comment">// then check the reverse, from mx to nx. Check that they have the same</span>
-        <span class="comment">// count of edges.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Note: We want to check the lookahead measures here if we can,</span>
-        <span class="comment">// R_out: Equal for G0, G1: Card(Succ(G, n) ^ Tout); for both Succ and Pred</span>
-        <span class="comment">// R_in: Same with Tin</span>
-        <span class="comment">// R_new: Equal for G0, G1: Ñ n Pred(G, n); both Succ and Pred,</span>
-        <span class="comment">//      Ñ is G0 - M - Tin - Tout</span>
-        <span class="comment">// last attempt to add these did not speed up any of the testcases</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">succ_count</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>];
-        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="ident">graph_indices</span>.<span class="ident">clone</span>() {
-            <span class="kw">for</span> <span class="ident">n_neigh</span> <span class="kw">in</span> <span class="ident">g</span>[<span class="ident">j</span>].<span class="ident">neighbors</span>(<span class="ident">nodes</span>[<span class="ident">j</span>]) {
-                <span class="ident">succ_count</span>[<span class="ident">j</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="comment">// handle the self loop case; it&#39;s not in the mapping (yet)</span>
-                <span class="kw">let</span> <span class="ident">m_neigh</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">nodes</span>[<span class="ident">j</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">n_neigh</span> {
-                    <span class="ident">st</span>[<span class="ident">j</span>].<span class="ident">mapping</span>[<span class="ident">n_neigh</span>.<span class="ident">index</span>()]
-                } <span class="kw">else</span> {
-                    <span class="ident">nodes</span>[<span class="number">1</span> <span class="op">-</span> <span class="ident">j</span>]
+        <span class="comment">// Check syntactic feasibility of mapping by ensuring adjacencies
+        // of nx map to adjacencies of mx.
+        //
+        // nx == map to =&gt; mx
+        //
+        // R_succ
+        //
+        // Check that every neighbor of nx is mapped to a neighbor of mx,
+        // then check the reverse, from mx to nx. Check that they have the same
+        // count of edges.
+        //
+        // Note: We want to check the lookahead measures here if we can,
+        // R_out: Equal for G0, G1: Card(Succ(G, n) ^ Tout); for both Succ and Pred
+        // R_in: Same with Tin
+        // R_new: Equal for G0, G1: Ñ n Pred(G, n); both Succ and Pred,
+        //      Ñ is G0 - M - Tin - Tout
+        // last attempt to add these did not speed up any of the testcases
+        </span><span class="kw">let </span><span class="kw-2">mut </span>succ_count = [<span class="number">0</span>, <span class="number">0</span>];
+        <span class="kw">for </span>j <span class="kw">in </span>graph_indices.clone() {
+            <span class="kw">for </span>n_neigh <span class="kw">in </span>g[j].neighbors(nodes[j]) {
+                succ_count[j] += <span class="number">1</span>;
+                <span class="comment">// handle the self loop case; it&#39;s not in the mapping (yet)
+                </span><span class="kw">let </span>m_neigh = <span class="kw">if </span>nodes[j] != n_neigh {
+                    st[j].mapping[n_neigh.index()]
+                } <span class="kw">else </span>{
+                    nodes[<span class="number">1 </span>- j]
                 };
-                <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">==</span> <span class="ident">end</span> {
+                <span class="kw">if </span>m_neigh == end {
                     <span class="kw">continue</span>;
                 }
-                <span class="kw">let</span> <span class="ident">has_edge</span> <span class="op">=</span> <span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">is_adjacent</span>(<span class="kw-2">&amp;</span><span class="ident">st</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">adjacency_matrix</span>, <span class="ident">nodes</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>], <span class="ident">m_neigh</span>);
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">has_edge</span> {
-                    <span class="kw">continue</span> <span class="lifetime">&#39;candidates</span>;
+                <span class="kw">let </span>has_edge = g[<span class="number">1</span>-j].is_adjacent(<span class="kw-2">&amp;</span>st[<span class="number">1</span>-j].adjacency_matrix, nodes[<span class="number">1</span>-j], m_neigh);
+                <span class="kw">if </span>!has_edge {
+                    <span class="kw">continue </span><span class="lifetime">&#39;candidates</span>;
                 }
             }
         }
-        <span class="kw">if</span> <span class="ident">succ_count</span>[<span class="number">0</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">succ_count</span>[<span class="number">1</span>] {
-            <span class="kw">continue</span> <span class="lifetime">&#39;candidates</span>;
+        <span class="kw">if </span>succ_count[<span class="number">0</span>] != succ_count[<span class="number">1</span>] {
+            <span class="kw">continue </span><span class="lifetime">&#39;candidates</span>;
         }
 
-        <span class="comment">// R_pred</span>
-        <span class="kw">if</span> <span class="ident">g</span>[<span class="number">0</span>].<span class="ident">is_directed</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pred_count</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>];
-            <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="ident">graph_indices</span>.<span class="ident">clone</span>() {
-                <span class="kw">for</span> <span class="ident">n_neigh</span> <span class="kw">in</span> <span class="ident">g</span>[<span class="ident">j</span>].<span class="ident">neighbors_directed</span>(<span class="ident">nodes</span>[<span class="ident">j</span>], <span class="ident">Incoming</span>) {
-                    <span class="ident">pred_count</span>[<span class="ident">j</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="comment">// the self loop case is handled in outgoing</span>
-                    <span class="kw">let</span> <span class="ident">m_neigh</span> <span class="op">=</span> <span class="ident">st</span>[<span class="ident">j</span>].<span class="ident">mapping</span>[<span class="ident">n_neigh</span>.<span class="ident">index</span>()];
-                    <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">==</span> <span class="ident">end</span> {
+        <span class="comment">// R_pred
+        </span><span class="kw">if </span>g[<span class="number">0</span>].is_directed() {
+            <span class="kw">let </span><span class="kw-2">mut </span>pred_count = [<span class="number">0</span>, <span class="number">0</span>];
+            <span class="kw">for </span>j <span class="kw">in </span>graph_indices.clone() {
+                <span class="kw">for </span>n_neigh <span class="kw">in </span>g[j].neighbors_directed(nodes[j], Incoming) {
+                    pred_count[j] += <span class="number">1</span>;
+                    <span class="comment">// the self loop case is handled in outgoing
+                    </span><span class="kw">let </span>m_neigh = st[j].mapping[n_neigh.index()];
+                    <span class="kw">if </span>m_neigh == end {
                         <span class="kw">continue</span>;
                     }
-                    <span class="kw">let</span> <span class="ident">has_edge</span> <span class="op">=</span> <span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">is_adjacent</span>(<span class="kw-2">&amp;</span><span class="ident">st</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">adjacency_matrix</span>, <span class="ident">m_neigh</span>, <span class="ident">nodes</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>]);
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">has_edge</span> {
-                        <span class="kw">continue</span> <span class="lifetime">&#39;candidates</span>;
+                    <span class="kw">let </span>has_edge = g[<span class="number">1</span>-j].is_adjacent(<span class="kw-2">&amp;</span>st[<span class="number">1</span>-j].adjacency_matrix, m_neigh, nodes[<span class="number">1</span>-j]);
+                    <span class="kw">if </span>!has_edge {
+                        <span class="kw">continue </span><span class="lifetime">&#39;candidates</span>;
                     }
                 }
             }
-            <span class="kw">if</span> <span class="ident">pred_count</span>[<span class="number">0</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">pred_count</span>[<span class="number">1</span>] {
-                <span class="kw">continue</span> <span class="lifetime">&#39;candidates</span>;
+            <span class="kw">if </span>pred_count[<span class="number">0</span>] != pred_count[<span class="number">1</span>] {
+                <span class="kw">continue </span><span class="lifetime">&#39;candidates</span>;
             }
         }
 
-        <span class="comment">// semantic feasibility: compare associated data for nodes</span>
-        <span class="kw">if</span> <span class="ident">F::enabled</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">node_match</span>.<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>[<span class="number">0</span>][<span class="ident">nodes</span>[<span class="number">0</span>]], <span class="kw-2">&amp;</span><span class="ident">g</span>[<span class="number">1</span>][<span class="ident">nodes</span>[<span class="number">1</span>]]) {
-            <span class="kw">continue</span> <span class="lifetime">&#39;candidates</span>;
+        <span class="comment">// semantic feasibility: compare associated data for nodes
+        </span><span class="kw">if </span>F::enabled() &amp;&amp; !node_match.eq(<span class="kw-2">&amp;</span>g[<span class="number">0</span>][nodes[<span class="number">0</span>]], <span class="kw-2">&amp;</span>g[<span class="number">1</span>][nodes[<span class="number">1</span>]]) {
+            <span class="kw">continue </span><span class="lifetime">&#39;candidates</span>;
         }
 
-        <span class="comment">// semantic feasibility: compare associated data for edges</span>
-        <span class="kw">if</span> <span class="ident">G::enabled</span>() {
-            <span class="comment">// outgoing edges</span>
-            <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="ident">graph_indices</span>.<span class="ident">clone</span>() {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edges</span> <span class="op">=</span> <span class="ident">g</span>[<span class="ident">j</span>].<span class="ident">neighbors</span>(<span class="ident">nodes</span>[<span class="ident">j</span>]).<span class="ident">detach</span>();
-                <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">n_edge</span>, <span class="ident">n_neigh</span>)) <span class="op">=</span> <span class="ident">edges</span>.<span class="ident">next</span>(<span class="ident">g</span>[<span class="ident">j</span>]) {
-                    <span class="comment">// handle the self loop case; it&#39;s not in the mapping (yet)</span>
-                    <span class="kw">let</span> <span class="ident">m_neigh</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">nodes</span>[<span class="ident">j</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">n_neigh</span> {
-                        <span class="ident">st</span>[<span class="ident">j</span>].<span class="ident">mapping</span>[<span class="ident">n_neigh</span>.<span class="ident">index</span>()]
-                    } <span class="kw">else</span> {
-                        <span class="ident">nodes</span>[<span class="number">1</span> <span class="op">-</span> <span class="ident">j</span>]
+        <span class="comment">// semantic feasibility: compare associated data for edges
+        </span><span class="kw">if </span>G::enabled() {
+            <span class="comment">// outgoing edges
+            </span><span class="kw">for </span>j <span class="kw">in </span>graph_indices.clone() {
+                <span class="kw">let </span><span class="kw-2">mut </span>edges = g[j].neighbors(nodes[j]).detach();
+                <span class="kw">while let </span><span class="prelude-val">Some</span>((n_edge, n_neigh)) = edges.next(g[j]) {
+                    <span class="comment">// handle the self loop case; it&#39;s not in the mapping (yet)
+                    </span><span class="kw">let </span>m_neigh = <span class="kw">if </span>nodes[j] != n_neigh {
+                        st[j].mapping[n_neigh.index()]
+                    } <span class="kw">else </span>{
+                        nodes[<span class="number">1 </span>- j]
                     };
-                    <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">==</span> <span class="ident">end</span> {
+                    <span class="kw">if </span>m_neigh == end {
                         <span class="kw">continue</span>;
                     }
-                    <span class="kw">match</span> <span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">find_edge</span>(<span class="ident">nodes</span>[<span class="number">1</span> <span class="op">-</span> <span class="ident">j</span>], <span class="ident">m_neigh</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">m_edge</span>) =&gt; {
-                            <span class="kw">if</span> <span class="op">!</span><span class="ident">edge_match</span>.<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>[<span class="ident">j</span>][<span class="ident">n_edge</span>], <span class="kw-2">&amp;</span><span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>][<span class="ident">m_edge</span>]) {
-                                <span class="kw">continue</span> <span class="lifetime">&#39;candidates</span>;
+                    <span class="kw">match </span>g[<span class="number">1</span>-j].find_edge(nodes[<span class="number">1 </span>- j], m_neigh) {
+                        <span class="prelude-val">Some</span>(m_edge) =&gt; {
+                            <span class="kw">if </span>!edge_match.eq(<span class="kw-2">&amp;</span>g[j][n_edge], <span class="kw-2">&amp;</span>g[<span class="number">1</span>-j][m_edge]) {
+                                <span class="kw">continue </span><span class="lifetime">&#39;candidates</span>;
                             }
                         }
-                        <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>() <span class="comment">// covered by syntactic check</span>
-                    }
+                        <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>() <span class="comment">// covered by syntactic check
+                    </span>}
                 }
             }
 
-            <span class="comment">// incoming edges</span>
-            <span class="kw">if</span> <span class="ident">g</span>[<span class="number">0</span>].<span class="ident">is_directed</span>() {
-                <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="ident">graph_indices</span>.<span class="ident">clone</span>() {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edges</span> <span class="op">=</span> <span class="ident">g</span>[<span class="ident">j</span>].<span class="ident">neighbors_directed</span>(<span class="ident">nodes</span>[<span class="ident">j</span>], <span class="ident">Incoming</span>).<span class="ident">detach</span>();
-                    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">n_edge</span>, <span class="ident">n_neigh</span>)) <span class="op">=</span> <span class="ident">edges</span>.<span class="ident">next</span>(<span class="ident">g</span>[<span class="ident">j</span>]) {
-                        <span class="comment">// the self loop case is handled in outgoing</span>
-                        <span class="kw">let</span> <span class="ident">m_neigh</span> <span class="op">=</span> <span class="ident">st</span>[<span class="ident">j</span>].<span class="ident">mapping</span>[<span class="ident">n_neigh</span>.<span class="ident">index</span>()];
-                        <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">==</span> <span class="ident">end</span> {
+            <span class="comment">// incoming edges
+            </span><span class="kw">if </span>g[<span class="number">0</span>].is_directed() {
+                <span class="kw">for </span>j <span class="kw">in </span>graph_indices.clone() {
+                    <span class="kw">let </span><span class="kw-2">mut </span>edges = g[j].neighbors_directed(nodes[j], Incoming).detach();
+                    <span class="kw">while let </span><span class="prelude-val">Some</span>((n_edge, n_neigh)) = edges.next(g[j]) {
+                        <span class="comment">// the self loop case is handled in outgoing
+                        </span><span class="kw">let </span>m_neigh = st[j].mapping[n_neigh.index()];
+                        <span class="kw">if </span>m_neigh == end {
                             <span class="kw">continue</span>;
                         }
-                        <span class="kw">match</span> <span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">find_edge</span>(<span class="ident">m_neigh</span>, <span class="ident">nodes</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>]) {
-                            <span class="prelude-val">Some</span>(<span class="ident">m_edge</span>) =&gt; {
-                                <span class="kw">if</span> <span class="op">!</span><span class="ident">edge_match</span>.<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>[<span class="ident">j</span>][<span class="ident">n_edge</span>], <span class="kw-2">&amp;</span><span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>][<span class="ident">m_edge</span>]) {
-                                    <span class="kw">continue</span> <span class="lifetime">&#39;candidates</span>;
+                        <span class="kw">match </span>g[<span class="number">1</span>-j].find_edge(m_neigh, nodes[<span class="number">1</span>-j]) {
+                            <span class="prelude-val">Some</span>(m_edge) =&gt; {
+                                <span class="kw">if </span>!edge_match.eq(<span class="kw-2">&amp;</span>g[j][n_edge], <span class="kw-2">&amp;</span>g[<span class="number">1</span>-j][m_edge]) {
+                                    <span class="kw">continue </span><span class="lifetime">&#39;candidates</span>;
                                 }
                             }
-                            <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>() <span class="comment">// covered by syntactic check</span>
-                        }
+                            <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>() <span class="comment">// covered by syntactic check
+                        </span>}
                     }
                 }
             }
         }
 
-        <span class="comment">// Add mapping nx &lt;-&gt; mx to the state</span>
-        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="ident">graph_indices</span>.<span class="ident">clone</span>() {
-            <span class="ident">st</span>[<span class="ident">j</span>].<span class="ident">push_mapping</span>(<span class="ident">nodes</span>[<span class="ident">j</span>], <span class="ident">nodes</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>], <span class="ident">g</span>[<span class="ident">j</span>]);
+        <span class="comment">// Add mapping nx &lt;-&gt; mx to the state
+        </span><span class="kw">for </span>j <span class="kw">in </span>graph_indices.clone() {
+            st[j].push_mapping(nodes[j], nodes[<span class="number">1</span>-j], g[j]);
         }
 
-        <span class="comment">// Check cardinalities of Tin, Tout sets</span>
-        <span class="kw">if</span> <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">out_size</span> <span class="op">==</span> <span class="ident">st</span>[<span class="number">1</span>].<span class="ident">out_size</span> <span class="op">&amp;&amp;</span>
-           <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">ins_size</span> <span class="op">==</span> <span class="ident">st</span>[<span class="number">1</span>].<span class="ident">ins_size</span>
+        <span class="comment">// Check cardinalities of Tin, Tout sets
+        </span><span class="kw">if </span>st[<span class="number">0</span>].out_size == st[<span class="number">1</span>].out_size &amp;&amp;
+           st[<span class="number">0</span>].ins_size == st[<span class="number">1</span>].ins_size
         {
 
-            <span class="comment">// Recurse</span>
-            <span class="kw">match</span> <span class="ident">try_match</span>(<span class="ident">st</span>, <span class="ident">g0</span>, <span class="ident">g1</span>, <span class="ident">node_match</span>, <span class="ident">edge_match</span>) {
-                <span class="prelude-val">None</span> =&gt; {}
-                <span class="ident">result</span> =&gt; <span class="kw">return</span> <span class="ident">result</span>,
+            <span class="comment">// Recurse
+            </span><span class="kw">match </span>try_match(st, g0, g1, node_match, edge_match) {
+                <span class="prelude-val">None </span>=&gt; {}
+                result =&gt; <span class="kw">return </span>result,
             }
         }
 
-        <span class="comment">// Restore state.</span>
-        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="ident">graph_indices</span>.<span class="ident">clone</span>() {
-            <span class="ident">st</span>[<span class="ident">j</span>].<span class="ident">pop_mapping</span>(<span class="ident">nodes</span>[<span class="ident">j</span>], <span class="ident">g</span>[<span class="ident">j</span>]);
+        <span class="comment">// Restore state.
+        </span><span class="kw">for </span>j <span class="kw">in </span>graph_indices.clone() {
+            st[j].pop_mapping(nodes[j], g[j]);
         }
     }
-    <span class="prelude-val">None</span>
-}
+    <span class="prelude-val">None
+</span>}
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

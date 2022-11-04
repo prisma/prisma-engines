@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/global/trace.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>trace.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/global/trace.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>trace.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -654,659 +654,659 @@
 <span id="652">652</span>
 <span id="653">653</span>
 <span id="654">654</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::global::handle_error</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trace</span>::{<span class="ident">noop::NoopTracerProvider</span>, <span class="ident">SpanContext</span>, <span class="ident">StatusCode</span>, <span class="ident">TraceResult</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">trace</span>, <span class="ident">trace::TracerProvider</span>, <span class="ident">Context</span>, <span class="ident">KeyValue</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span>};
-<span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::global::handle_error;
+<span class="kw">use </span><span class="kw">crate</span>::trace::{noop::NoopTracerProvider, SpanContext, StatusCode, TraceResult};
+<span class="kw">use crate</span>::{trace, trace::TracerProvider, Context, KeyValue};
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::mem;
+<span class="kw">use </span>std::sync::{Arc, RwLock};
+<span class="kw">use </span>std::time::SystemTime;
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ObjectSafeSpan</span> {
-    <span class="doccomment">/// An API to record events at a specific time in the context of a given `Span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Events SHOULD preserve the order in which they&#39;re set. This will typically match</span>
-    <span class="doccomment">/// the ordering of the events&#39; timestamps.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the OpenTelemetry project documents certain [&quot;standard event names and</span>
-    <span class="doccomment">/// keys&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)</span>
-    <span class="doccomment">/// which have prescribed semantic meanings.</span>
-    <span class="kw">fn</span> <span class="ident">add_event_with_timestamp</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">timestamp</span>: <span class="ident">SystemTime</span>,
-        <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
+<span class="kw">pub trait </span>ObjectSafeSpan {
+    <span class="doccomment">/// An API to record events at a specific time in the context of a given `Span`.
+    ///
+    /// Events SHOULD preserve the order in which they&#39;re set. This will typically match
+    /// the ordering of the events&#39; timestamps.
+    ///
+    /// Note that the OpenTelemetry project documents certain [&quot;standard event names and
+    /// keys&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)
+    /// which have prescribed semantic meanings.
+    </span><span class="kw">fn </span>add_event_with_timestamp(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+        timestamp: SystemTime,
+        attributes: Vec&lt;KeyValue&gt;,
     );
 
-    <span class="doccomment">/// Returns the `SpanContext` for the given `Span`. The returned value may be used even after</span>
-    <span class="doccomment">/// the `Span is finished. The returned value MUST be the same for the entire `Span` lifetime.</span>
-    <span class="kw">fn</span> <span class="ident">span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SpanContext</span>;
+    <span class="doccomment">/// Returns the `SpanContext` for the given `Span`. The returned value may be used even after
+    /// the `Span is finished. The returned value MUST be the same for the entire `Span` lifetime.
+    </span><span class="kw">fn </span>span_context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>SpanContext;
 
-    <span class="doccomment">/// Returns true if this `Span` is recording information like events with the `add_event`</span>
-    <span class="doccomment">/// operation, attributes using `set_attributes`, status with `set_status`, etc.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This flag SHOULD be used to avoid expensive computations of a `Span` attributes or events in</span>
-    <span class="doccomment">/// case when a `Span` is definitely not recorded. Note that any child span&#39;s recording is</span>
-    <span class="doccomment">/// determined independently from the value of this flag (typically based on the sampled flag of</span>
-    <span class="doccomment">/// a `TraceFlag` on `SpanContext`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This flag may be true despite the entire trace being sampled out. This allows to record and</span>
-    <span class="doccomment">/// process information about the individual Span without sending it to the backend. An example</span>
-    <span class="doccomment">/// of this scenario may be recording and processing of all incoming requests for the processing</span>
-    <span class="doccomment">/// and building of SLA/SLO latency charts while sending only a subset - sampled spans - to the</span>
-    <span class="doccomment">/// backend. See also the sampling section of SDK design.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Users of the API should only access the `is_recording` property when instrumenting code and</span>
-    <span class="doccomment">/// never access `SampledFlag` unless used in context propagators.</span>
-    <span class="kw">fn</span> <span class="ident">is_recording</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this `Span` is recording information like events with the `add_event`
+    /// operation, attributes using `set_attributes`, status with `set_status`, etc.
+    ///
+    /// This flag SHOULD be used to avoid expensive computations of a `Span` attributes or events in
+    /// case when a `Span` is definitely not recorded. Note that any child span&#39;s recording is
+    /// determined independently from the value of this flag (typically based on the sampled flag of
+    /// a `TraceFlag` on `SpanContext`).
+    ///
+    /// This flag may be true despite the entire trace being sampled out. This allows to record and
+    /// process information about the individual Span without sending it to the backend. An example
+    /// of this scenario may be recording and processing of all incoming requests for the processing
+    /// and building of SLA/SLO latency charts while sending only a subset - sampled spans - to the
+    /// backend. See also the sampling section of SDK design.
+    ///
+    /// Users of the API should only access the `is_recording` property when instrumenting code and
+    /// never access `SampledFlag` unless used in context propagators.
+    </span><span class="kw">fn </span>is_recording(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// An API to set a single `Attribute` where the attribute properties are passed</span>
-    <span class="doccomment">/// as arguments. To avoid extra allocations some implementations may offer a separate API for</span>
-    <span class="doccomment">/// each of the possible value types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An `Attribute` is defined as a `KeyValue` pair.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Attributes SHOULD preserve the order in which they&#39;re set. Setting an attribute</span>
-    <span class="doccomment">/// with the same key as an existing attribute SHOULD overwrite the existing</span>
-    <span class="doccomment">/// attribute&#39;s value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the OpenTelemetry project documents certain [&quot;standard</span>
-    <span class="doccomment">/// attributes&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)</span>
-    <span class="doccomment">/// that have prescribed semantic meanings.</span>
-    <span class="kw">fn</span> <span class="ident">set_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">attribute</span>: <span class="ident">KeyValue</span>);
+    <span class="doccomment">/// An API to set a single `Attribute` where the attribute properties are passed
+    /// as arguments. To avoid extra allocations some implementations may offer a separate API for
+    /// each of the possible value types.
+    ///
+    /// An `Attribute` is defined as a `KeyValue` pair.
+    ///
+    /// Attributes SHOULD preserve the order in which they&#39;re set. Setting an attribute
+    /// with the same key as an existing attribute SHOULD overwrite the existing
+    /// attribute&#39;s value.
+    ///
+    /// Note that the OpenTelemetry project documents certain [&quot;standard
+    /// attributes&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)
+    /// that have prescribed semantic meanings.
+    </span><span class="kw">fn </span>set_attribute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attribute: KeyValue);
 
-    <span class="doccomment">/// Sets the status of the `Span`. `message` MUST be ignored when the status is `OK` or</span>
-    <span class="doccomment">/// `Unset`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order of status is `Ok` &gt; `Error` &gt; `Unset`. That&#39;s means set the status</span>
-    <span class="doccomment">/// to `Unset` will always be ignore, set the status to `Error` only works when current</span>
-    <span class="doccomment">/// status is `Unset`, set the status to `Ok` will be consider final and any further call</span>
-    <span class="doccomment">/// to this function will be ignore.</span>
-    <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">code</span>: <span class="ident">StatusCode</span>, <span class="ident">message</span>: <span class="ident">String</span>);
+    <span class="doccomment">/// Sets the status of the `Span`. `message` MUST be ignored when the status is `OK` or
+    /// `Unset`.
+    ///
+    /// The order of status is `Ok` &gt; `Error` &gt; `Unset`. That&#39;s means set the status
+    /// to `Unset` will always be ignore, set the status to `Error` only works when current
+    /// status is `Unset`, set the status to `Ok` will be consider final and any further call
+    /// to this function will be ignore.
+    </span><span class="kw">fn </span>set_status(<span class="kw-2">&amp;mut </span><span class="self">self</span>, code: StatusCode, message: String);
 
-    <span class="doccomment">/// Updates the `Span`&#39;s name. After this update, any sampling behavior based on the</span>
-    <span class="doccomment">/// name will depend on the implementation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is highly discouraged to update the name of a `Span` after its creation.</span>
-    <span class="doccomment">/// `Span` name is often used to group, filter and identify the logical groups of</span>
-    <span class="doccomment">/// spans. Often, filtering logic will be implemented before the `Span` creation</span>
-    <span class="doccomment">/// for performance reasons, and the name update may interfere with this logic.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The method name is called `update_name` to differentiate this method from the</span>
-    <span class="doccomment">/// regular property. It emphasizes that this operation signifies a</span>
-    <span class="doccomment">/// major change for a `Span` and may lead to re-calculation of sampling or</span>
-    <span class="doccomment">/// filtering decisions made previously depending on the implementation.</span>
-    <span class="kw">fn</span> <span class="ident">update_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>);
+    <span class="doccomment">/// Updates the `Span`&#39;s name. After this update, any sampling behavior based on the
+    /// name will depend on the implementation.
+    ///
+    /// It is highly discouraged to update the name of a `Span` after its creation.
+    /// `Span` name is often used to group, filter and identify the logical groups of
+    /// spans. Often, filtering logic will be implemented before the `Span` creation
+    /// for performance reasons, and the name update may interfere with this logic.
+    ///
+    /// The method name is called `update_name` to differentiate this method from the
+    /// regular property. It emphasizes that this operation signifies a
+    /// major change for a `Span` and may lead to re-calculation of sampling or
+    /// filtering decisions made previously depending on the implementation.
+    </span><span class="kw">fn </span>update_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;);
 
-    <span class="doccomment">/// Finishes the `Span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implementations MUST ignore all subsequent calls to `end` (there might be</span>
-    <span class="doccomment">/// exceptions when the tracer is streaming events and has no mutable state</span>
-    <span class="doccomment">/// associated with the Span).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calls to `end` a Span MUST not have any effects on child `Span`s as they may</span>
-    <span class="doccomment">/// still be running and can be ended later.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This API MUST be non-blocking.</span>
-    <span class="kw">fn</span> <span class="ident">end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">end_with_timestamp</span>(<span class="ident"><span class="kw">crate</span>::time::now</span>());
+    <span class="doccomment">/// Finishes the `Span`.
+    ///
+    /// Implementations MUST ignore all subsequent calls to `end` (there might be
+    /// exceptions when the tracer is streaming events and has no mutable state
+    /// associated with the Span).
+    ///
+    /// Calls to `end` a Span MUST not have any effects on child `Span`s as they may
+    /// still be running and can be ended later.
+    ///
+    /// This API MUST be non-blocking.
+    </span><span class="kw">fn </span>end(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.end_with_timestamp(<span class="kw">crate</span>::time::now());
     }
 
-    <span class="doccomment">/// Finishes the `Span` with given timestamp</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For more details, refer to [`Span::end`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Span::end`]: Span::end()</span>
-    <span class="kw">fn</span> <span class="ident">end_with_timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">SystemTime</span>);
+    <span class="doccomment">/// Finishes the `Span` with given timestamp
+    ///
+    /// For more details, refer to [`Span::end`]
+    ///
+    /// [`Span::end`]: Span::end()
+    </span><span class="kw">fn </span>end_with_timestamp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timestamp: SystemTime);
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">trace::Span</span><span class="op">&gt;</span> <span class="ident">ObjectSafeSpan</span> <span class="kw">for</span> <span class="ident">T</span> {
-    <span class="kw">fn</span> <span class="ident">add_event_with_timestamp</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">timestamp</span>: <span class="ident">SystemTime</span>,
-        <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T: trace::Span&gt; ObjectSafeSpan <span class="kw">for </span>T {
+    <span class="kw">fn </span>add_event_with_timestamp(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+        timestamp: SystemTime,
+        attributes: Vec&lt;KeyValue&gt;,
     ) {
-        <span class="self">self</span>.<span class="ident">add_event_with_timestamp</span>(<span class="ident">name</span>, <span class="ident">timestamp</span>, <span class="ident">attributes</span>)
+        <span class="self">self</span>.add_event_with_timestamp(name, timestamp, attributes)
     }
 
-    <span class="kw">fn</span> <span class="ident">span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SpanContext</span> {
-        <span class="self">self</span>.<span class="ident">span_context</span>()
+    <span class="kw">fn </span>span_context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>SpanContext {
+        <span class="self">self</span>.span_context()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_recording</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_recording</span>()
+    <span class="kw">fn </span>is_recording(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_recording()
     }
 
-    <span class="kw">fn</span> <span class="ident">set_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">attribute</span>: <span class="ident">KeyValue</span>) {
-        <span class="self">self</span>.<span class="ident">set_attribute</span>(<span class="ident">attribute</span>)
+    <span class="kw">fn </span>set_attribute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attribute: KeyValue) {
+        <span class="self">self</span>.set_attribute(attribute)
     }
 
-    <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">code</span>: <span class="ident">StatusCode</span>, <span class="ident">message</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">set_status</span>(<span class="ident">code</span>, <span class="ident">message</span>)
+    <span class="kw">fn </span>set_status(<span class="kw-2">&amp;mut </span><span class="self">self</span>, code: StatusCode, message: String) {
+        <span class="self">self</span>.set_status(code, message)
     }
 
-    <span class="kw">fn</span> <span class="ident">update_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">update_name</span>(<span class="ident">new_name</span>)
+    <span class="kw">fn </span>update_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;) {
+        <span class="self">self</span>.update_name(new_name)
     }
 
-    <span class="kw">fn</span> <span class="ident">end_with_timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">SystemTime</span>) {
-        <span class="self">self</span>.<span class="ident">end_with_timestamp</span>(<span class="ident">timestamp</span>)
+    <span class="kw">fn </span>end_with_timestamp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timestamp: SystemTime) {
+        <span class="self">self</span>.end_with_timestamp(timestamp)
     }
 }
 
-<span class="doccomment">/// Wraps the [`BoxedTracer`]&#39;s [`Span`] so it can be used generically by</span>
-<span class="doccomment">/// applications without knowing the underlying type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Span`]: crate::trace::Span</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BoxedSpan</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ObjectSafeSpan</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Wraps the [`BoxedTracer`]&#39;s [`Span`] so it can be used generically by
+/// applications without knowing the underlying type.
+///
+/// [`Span`]: crate::trace::Span
+</span><span class="kw">pub struct </span>BoxedSpan(Box&lt;<span class="kw">dyn </span>ObjectSafeSpan + Send + Sync&gt;);
 
-<span class="kw">impl</span> <span class="ident">BoxedSpan</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">span</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">ObjectSafeSpan</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl </span>BoxedSpan {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new&lt;T&gt;(span: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: ObjectSafeSpan + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">BoxedSpan</span>(<span class="ident">Box::new</span>(<span class="ident">span</span>))
+        BoxedSpan(Box::new(span))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">BoxedSpan</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;BoxedSpan&quot;</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>BoxedSpan {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;BoxedSpan&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">trace::Span</span> <span class="kw">for</span> <span class="ident">BoxedSpan</span> {
-    <span class="doccomment">/// Records events at a specific time in the context of a given `Span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the OpenTelemetry project documents certain [&quot;standard event names and</span>
-    <span class="doccomment">/// keys&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)</span>
-    <span class="doccomment">/// which have prescribed semantic meanings.</span>
-    <span class="kw">fn</span> <span class="ident">add_event_with_timestamp</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">T</span>,
-        <span class="ident">timestamp</span>: <span class="ident">SystemTime</span>,
-        <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
-    ) <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>trace::Span <span class="kw">for </span>BoxedSpan {
+    <span class="doccomment">/// Records events at a specific time in the context of a given `Span`.
+    ///
+    /// Note that the OpenTelemetry project documents certain [&quot;standard event names and
+    /// keys&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)
+    /// which have prescribed semantic meanings.
+    </span><span class="kw">fn </span>add_event_with_timestamp&lt;T&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        name: T,
+        timestamp: SystemTime,
+        attributes: Vec&lt;KeyValue&gt;,
+    ) <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="number">0</span>
-            .<span class="ident">add_event_with_timestamp</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">timestamp</span>, <span class="ident">attributes</span>)
+        <span class="self">self</span>.<span class="number">0
+            </span>.add_event_with_timestamp(name.into(), timestamp, attributes)
     }
 
-    <span class="doccomment">/// Returns the `SpanContext` for the given `Span`.</span>
-    <span class="kw">fn</span> <span class="ident">span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">trace::SpanContext</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">span_context</span>()
+    <span class="doccomment">/// Returns the `SpanContext` for the given `Span`.
+    </span><span class="kw">fn </span>span_context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>trace::SpanContext {
+        <span class="self">self</span>.<span class="number">0</span>.span_context()
     }
 
-    <span class="doccomment">/// Returns true if this `Span` is recording information like events with the `add_event`</span>
-    <span class="doccomment">/// operation, attributes using `set_attributes`, status with `set_status`, etc.</span>
-    <span class="kw">fn</span> <span class="ident">is_recording</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_recording</span>()
+    <span class="doccomment">/// Returns true if this `Span` is recording information like events with the `add_event`
+    /// operation, attributes using `set_attributes`, status with `set_status`, etc.
+    </span><span class="kw">fn </span>is_recording(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.is_recording()
     }
 
-    <span class="doccomment">/// Sets a single `Attribute` where the attribute properties are passed as arguments.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the OpenTelemetry project documents certain [&quot;standard</span>
-    <span class="doccomment">/// attributes&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)</span>
-    <span class="doccomment">/// that have prescribed semantic meanings.</span>
-    <span class="kw">fn</span> <span class="ident">set_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">attribute</span>: <span class="ident">KeyValue</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">set_attribute</span>(<span class="ident">attribute</span>)
+    <span class="doccomment">/// Sets a single `Attribute` where the attribute properties are passed as arguments.
+    ///
+    /// Note that the OpenTelemetry project documents certain [&quot;standard
+    /// attributes&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)
+    /// that have prescribed semantic meanings.
+    </span><span class="kw">fn </span>set_attribute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attribute: KeyValue) {
+        <span class="self">self</span>.<span class="number">0</span>.set_attribute(attribute)
     }
 
-    <span class="doccomment">/// Sets the status of the `Span`. If used, this will override the default `Span`</span>
-    <span class="doccomment">/// status, which is `Unset`.</span>
-    <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">code</span>: <span class="ident">trace::StatusCode</span>, <span class="ident">message</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">set_status</span>(<span class="ident">code</span>, <span class="ident">message</span>)
+    <span class="doccomment">/// Sets the status of the `Span`. If used, this will override the default `Span`
+    /// status, which is `Unset`.
+    </span><span class="kw">fn </span>set_status(<span class="kw-2">&amp;mut </span><span class="self">self</span>, code: trace::StatusCode, message: String) {
+        <span class="self">self</span>.<span class="number">0</span>.set_status(code, message)
     }
 
-    <span class="doccomment">/// Updates the `Span`&#39;s name.</span>
-    <span class="kw">fn</span> <span class="ident">update_name</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_name</span>: <span class="ident">T</span>)
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Updates the `Span`&#39;s name.
+    </span><span class="kw">fn </span>update_name&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_name: T)
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">update_name</span>(<span class="ident">new_name</span>.<span class="ident">into</span>())
+        <span class="self">self</span>.<span class="number">0</span>.update_name(new_name.into())
     }
 
-    <span class="doccomment">/// Finishes the span with given timestamp.</span>
-    <span class="kw">fn</span> <span class="ident">end_with_timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">SystemTime</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">end_with_timestamp</span>(<span class="ident">timestamp</span>);
+    <span class="doccomment">/// Finishes the span with given timestamp.
+    </span><span class="kw">fn </span>end_with_timestamp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timestamp: SystemTime) {
+        <span class="self">self</span>.<span class="number">0</span>.end_with_timestamp(timestamp);
     }
 }
 
-<span class="doccomment">/// Wraps the [`GlobalTracerProvider`]&#39;s [`Tracer`] so it can be used generically by</span>
-<span class="doccomment">/// applications without knowing the underlying type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Tracer`]: crate::trace::Tracer</span>
-<span class="doccomment">/// [`GlobalTracerProvider`]: crate::global::GlobalTracerProvider</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BoxedTracer</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ObjectSafeTracer</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Wraps the [`GlobalTracerProvider`]&#39;s [`Tracer`] so it can be used generically by
+/// applications without knowing the underlying type.
+///
+/// [`Tracer`]: crate::trace::Tracer
+/// [`GlobalTracerProvider`]: crate::global::GlobalTracerProvider
+</span><span class="kw">pub struct </span>BoxedTracer(Box&lt;<span class="kw">dyn </span>ObjectSafeTracer + Send + Sync&gt;);
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">BoxedTracer</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;BoxedTracer&quot;</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>BoxedTracer {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;BoxedTracer&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">trace::Tracer</span> <span class="kw">for</span> <span class="ident">BoxedTracer</span> {
-    <span class="doccomment">/// Global tracer uses `BoxedSpan`s so that it can be a global singleton,</span>
-    <span class="doccomment">/// which is not possible if it takes generic type parameters.</span>
-    <span class="kw">type</span> <span class="ident">Span</span> <span class="op">=</span> <span class="ident">BoxedSpan</span>;
+<span class="kw">impl </span>trace::Tracer <span class="kw">for </span>BoxedTracer {
+    <span class="doccomment">/// Global tracer uses `BoxedSpan`s so that it can be a global singleton,
+    /// which is not possible if it takes generic type parameters.
+    </span><span class="kw">type </span>Span = BoxedSpan;
 
-    <span class="doccomment">/// Starts a new `Span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each span has zero or one parent spans and zero or more child spans, which</span>
-    <span class="doccomment">/// represent causally related operations. A tree of related spans comprises a</span>
-    <span class="doccomment">/// trace. A span is said to be a _root span_ if it does not have a parent. Each</span>
-    <span class="doccomment">/// trace includes a single root span, which is the shared ancestor of all other</span>
-    <span class="doccomment">/// spans in the trace.</span>
-    <span class="kw">fn</span> <span class="ident">start_with_context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">parent_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Starts a new `Span`.
+    ///
+    /// Each span has zero or one parent spans and zero or more child spans, which
+    /// represent causally related operations. A tree of related spans comprises a
+    /// trace. A span is said to be a _root span_ if it does not have a parent. Each
+    /// trace includes a single root span, which is the shared ancestor of all other
+    /// spans in the trace.
+    </span><span class="kw">fn </span>start_with_context&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T, parent_cx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="self">Self</span>::Span
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
     {
-        <span class="ident">BoxedSpan</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">start_with_context_boxed</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">parent_cx</span>))
+        BoxedSpan(<span class="self">self</span>.<span class="number">0</span>.start_with_context_boxed(name.into(), parent_cx))
     }
 
-    <span class="doccomment">/// Creates a span builder</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An ergonomic way for attributes to be configured before the `Span` is started.</span>
-    <span class="kw">fn</span> <span class="ident">span_builder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="ident">trace::SpanBuilder</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Creates a span builder
+    ///
+    /// An ergonomic way for attributes to be configured before the `Span` is started.
+    </span><span class="kw">fn </span>span_builder&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; trace::SpanBuilder
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
     {
-        <span class="ident">trace::SpanBuilder::from_name</span>(<span class="ident">name</span>)
+        trace::SpanBuilder::from_name(name)
     }
 
-    <span class="doccomment">/// Create a span from a `SpanBuilder`</span>
-    <span class="kw">fn</span> <span class="ident">build_with_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">builder</span>: <span class="ident">trace::SpanBuilder</span>, <span class="ident">parent_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span> {
-        <span class="ident">BoxedSpan</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">build_with_context_boxed</span>(<span class="ident">builder</span>, <span class="ident">parent_cx</span>))
+    <span class="doccomment">/// Create a span from a `SpanBuilder`
+    </span><span class="kw">fn </span>build_with_context(<span class="kw-2">&amp;</span><span class="self">self</span>, builder: trace::SpanBuilder, parent_cx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="self">Self</span>::Span {
+        BoxedSpan(<span class="self">self</span>.<span class="number">0</span>.build_with_context_boxed(builder, parent_cx))
     }
 }
 
-<span class="doccomment">/// Allows a specific [`Tracer`] to be used generically by [`BoxedTracer`]</span>
-<span class="doccomment">/// instances by mirroring the interface and boxing the return types.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Tracer`]: crate::trace::Tracer</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ObjectSafeTracer</span> {
-    <span class="doccomment">/// Returns a trait object so the underlying implementation can be swapped</span>
-    <span class="doccomment">/// out at runtime.</span>
-    <span class="kw">fn</span> <span class="ident">start_with_context_boxed</span>(
+<span class="doccomment">/// Allows a specific [`Tracer`] to be used generically by [`BoxedTracer`]
+/// instances by mirroring the interface and boxing the return types.
+///
+/// [`Tracer`]: crate::trace::Tracer
+</span><span class="kw">pub trait </span>ObjectSafeTracer {
+    <span class="doccomment">/// Returns a trait object so the underlying implementation can be swapped
+    /// out at runtime.
+    </span><span class="kw">fn </span>start_with_context_boxed(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">parent_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-    ) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ObjectSafeSpan</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
+        name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+        parent_cx: <span class="kw-2">&amp;</span>Context,
+    ) -&gt; Box&lt;<span class="kw">dyn </span>ObjectSafeSpan + Send + Sync&gt;;
 
-    <span class="doccomment">/// Returns a trait object so the underlying implementation can be swapped</span>
-    <span class="doccomment">/// out at runtime.</span>
-    <span class="kw">fn</span> <span class="ident">build_with_context_boxed</span>(
+    <span class="doccomment">/// Returns a trait object so the underlying implementation can be swapped
+    /// out at runtime.
+    </span><span class="kw">fn </span>build_with_context_boxed(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">builder</span>: <span class="ident">trace::SpanBuilder</span>,
-        <span class="ident">parent_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-    ) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ObjectSafeSpan</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
+        builder: trace::SpanBuilder,
+        parent_cx: <span class="kw-2">&amp;</span>Context,
+    ) -&gt; Box&lt;<span class="kw">dyn </span>ObjectSafeSpan + Send + Sync&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ObjectSafeTracer</span> <span class="kw">for</span> <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">trace::Span</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">T</span>: <span class="ident">trace::Tracer</span><span class="op">&lt;</span><span class="ident">Span</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, T&gt; ObjectSafeTracer <span class="kw">for </span>T
+<span class="kw">where
+    </span>S: trace::Span + Send + Sync + <span class="lifetime">&#39;static</span>,
+    T: trace::Tracer&lt;Span = S&gt;,
 {
-    <span class="doccomment">/// Returns a trait object so the underlying implementation can be swapped</span>
-    <span class="doccomment">/// out at runtime.</span>
-    <span class="kw">fn</span> <span class="ident">start_with_context_boxed</span>(
+    <span class="doccomment">/// Returns a trait object so the underlying implementation can be swapped
+    /// out at runtime.
+    </span><span class="kw">fn </span>start_with_context_boxed(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">parent_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-    ) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ObjectSafeSpan</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> {
-        <span class="ident">Box::new</span>(<span class="self">self</span>.<span class="ident">start_with_context</span>(<span class="ident">name</span>, <span class="ident">parent_cx</span>))
+        name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+        parent_cx: <span class="kw-2">&amp;</span>Context,
+    ) -&gt; Box&lt;<span class="kw">dyn </span>ObjectSafeSpan + Send + Sync&gt; {
+        Box::new(<span class="self">self</span>.start_with_context(name, parent_cx))
     }
 
-    <span class="doccomment">/// Returns a trait object so the underlying implementation can be swapped</span>
-    <span class="doccomment">/// out at runtime.</span>
-    <span class="kw">fn</span> <span class="ident">build_with_context_boxed</span>(
+    <span class="doccomment">/// Returns a trait object so the underlying implementation can be swapped
+    /// out at runtime.
+    </span><span class="kw">fn </span>build_with_context_boxed(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">builder</span>: <span class="ident">trace::SpanBuilder</span>,
-        <span class="ident">parent_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-    ) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ObjectSafeSpan</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> {
-        <span class="ident">Box::new</span>(<span class="self">self</span>.<span class="ident">build_with_context</span>(<span class="ident">builder</span>, <span class="ident">parent_cx</span>))
+        builder: trace::SpanBuilder,
+        parent_cx: <span class="kw-2">&amp;</span>Context,
+    ) -&gt; Box&lt;<span class="kw">dyn </span>ObjectSafeSpan + Send + Sync&gt; {
+        Box::new(<span class="self">self</span>.build_with_context(builder, parent_cx))
     }
 }
 
-<span class="doccomment">/// Allows a specific [`TracerProvider`] to be used generically by the</span>
-<span class="doccomment">/// [`GlobalTracerProvider`] by mirroring the interface and boxing the return types.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`TracerProvider`]: crate::trace::TracerProvider</span>
-<span class="doccomment">/// [`GlobalTracerProvider`]: crate::global::GlobalTracerProvider</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ObjectSafeTracerProvider</span> {
-    <span class="doccomment">/// Creates a versioned named tracer instance that is a trait object through the underlying</span>
-    <span class="doccomment">/// `TracerProvider`.</span>
-    <span class="kw">fn</span> <span class="ident">versioned_tracer_boxed</span>(
+<span class="doccomment">/// Allows a specific [`TracerProvider`] to be used generically by the
+/// [`GlobalTracerProvider`] by mirroring the interface and boxing the return types.
+///
+/// [`TracerProvider`]: crate::trace::TracerProvider
+/// [`GlobalTracerProvider`]: crate::global::GlobalTracerProvider
+</span><span class="kw">pub trait </span>ObjectSafeTracerProvider {
+    <span class="doccomment">/// Creates a versioned named tracer instance that is a trait object through the underlying
+    /// `TracerProvider`.
+    </span><span class="kw">fn </span>versioned_tracer_boxed(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">schema_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ObjectSafeTracer</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
+        name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+        version: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+        schema_url: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    ) -&gt; Box&lt;<span class="kw">dyn </span>ObjectSafeTracer + Send + Sync&gt;;
 
-    <span class="doccomment">/// Force flush all remaining spans in span processors and return results.</span>
-    <span class="kw">fn</span> <span class="ident">force_flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TraceResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Force flush all remaining spans in span processors and return results.
+    </span><span class="kw">fn </span>force_flush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TraceResult&lt;()&gt;&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">ObjectSafeTracerProvider</span> <span class="kw">for</span> <span class="ident">P</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">trace::Span</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">T</span>: <span class="ident">trace::Tracer</span><span class="op">&lt;</span><span class="ident">Span</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">P</span>: <span class="ident">trace::TracerProvider</span><span class="op">&lt;</span><span class="ident">Tracer</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, T, P&gt; ObjectSafeTracerProvider <span class="kw">for </span>P
+<span class="kw">where
+    </span>S: trace::Span + Send + Sync + <span class="lifetime">&#39;static</span>,
+    T: trace::Tracer&lt;Span = S&gt; + Send + Sync + <span class="lifetime">&#39;static</span>,
+    P: trace::TracerProvider&lt;Tracer = T&gt;,
 {
-    <span class="doccomment">/// Return a versioned boxed tracer</span>
-    <span class="kw">fn</span> <span class="ident">versioned_tracer_boxed</span>(
+    <span class="doccomment">/// Return a versioned boxed tracer
+    </span><span class="kw">fn </span>versioned_tracer_boxed(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">schema_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ObjectSafeTracer</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> {
-        <span class="ident">Box::new</span>(<span class="self">self</span>.<span class="ident">versioned_tracer</span>(<span class="ident">name</span>, <span class="ident">version</span>, <span class="ident">schema_url</span>))
+        name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+        version: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+        schema_url: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    ) -&gt; Box&lt;<span class="kw">dyn </span>ObjectSafeTracer + Send + Sync&gt; {
+        Box::new(<span class="self">self</span>.versioned_tracer(name, version, schema_url))
     }
 
-    <span class="kw">fn</span> <span class="ident">force_flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TraceResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">force_flush</span>()
-    }
-}
-
-<span class="doccomment">/// Represents the globally configured [`TracerProvider`] instance for this</span>
-<span class="doccomment">/// application. This allows generic tracing through the returned</span>
-<span class="doccomment">/// [`BoxedTracer`] instances.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`TracerProvider`]: crate::trace::TracerProvider</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GlobalTracerProvider</span> {
-    <span class="ident">provider</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ObjectSafeTracerProvider</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">GlobalTracerProvider</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;GlobalTracerProvider&quot;</span>)
+    <span class="kw">fn </span>force_flush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TraceResult&lt;()&gt;&gt; {
+        <span class="self">self</span>.force_flush()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">GlobalTracerProvider</span> {
-    <span class="doccomment">/// Create a new GlobalTracerProvider instance from a struct that implements `TracerProvider`.</span>
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">provider</span>: <span class="ident">P</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">trace::Span</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">T</span>: <span class="ident">trace::Tracer</span><span class="op">&lt;</span><span class="ident">Span</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">P</span>: <span class="ident">trace::TracerProvider</span><span class="op">&lt;</span><span class="ident">Tracer</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// Represents the globally configured [`TracerProvider`] instance for this
+/// application. This allows generic tracing through the returned
+/// [`BoxedTracer`] instances.
+///
+/// [`TracerProvider`]: crate::trace::TracerProvider
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>GlobalTracerProvider {
+    provider: Arc&lt;<span class="kw">dyn </span>ObjectSafeTracerProvider + Send + Sync&gt;,
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>GlobalTracerProvider {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;GlobalTracerProvider&quot;</span>)
+    }
+}
+
+<span class="kw">impl </span>GlobalTracerProvider {
+    <span class="doccomment">/// Create a new GlobalTracerProvider instance from a struct that implements `TracerProvider`.
+    </span><span class="kw">fn </span>new&lt;P, T, S&gt;(provider: P) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>S: trace::Span + Send + Sync + <span class="lifetime">&#39;static</span>,
+        T: trace::Tracer&lt;Span = S&gt; + Send + Sync + <span class="lifetime">&#39;static</span>,
+        P: trace::TracerProvider&lt;Tracer = T&gt; + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">GlobalTracerProvider</span> {
-            <span class="ident">provider</span>: <span class="ident">Arc::new</span>(<span class="ident">provider</span>),
+        GlobalTracerProvider {
+            provider: Arc::new(provider),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">trace::TracerProvider</span> <span class="kw">for</span> <span class="ident">GlobalTracerProvider</span> {
-    <span class="kw">type</span> <span class="ident">Tracer</span> <span class="op">=</span> <span class="ident">BoxedTracer</span>;
+<span class="kw">impl </span>trace::TracerProvider <span class="kw">for </span>GlobalTracerProvider {
+    <span class="kw">type </span>Tracer = BoxedTracer;
 
-    <span class="doccomment">/// Create a versioned tracer using the global provider.</span>
-    <span class="kw">fn</span> <span class="ident">versioned_tracer</span>(
+    <span class="doccomment">/// Create a versioned tracer using the global provider.
+    </span><span class="kw">fn </span>versioned_tracer(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">schema_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="self">Self</span>::Tracer</span> {
-        <span class="ident">BoxedTracer</span>(
-            <span class="self">self</span>.<span class="ident">provider</span>
-                .<span class="ident">versioned_tracer_boxed</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">version</span>, <span class="ident">schema_url</span>),
+        name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
+        version: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+        schema_url: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    ) -&gt; <span class="self">Self</span>::Tracer {
+        BoxedTracer(
+            <span class="self">self</span>.provider
+                .versioned_tracer_boxed(name.into(), version, schema_url),
         )
     }
 
-    <span class="doccomment">/// Force flush all remaining spans in span processors and return results.</span>
-    <span class="kw">fn</span> <span class="ident">force_flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TraceResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">provider</span>.<span class="ident">force_flush</span>()
+    <span class="doccomment">/// Force flush all remaining spans in span processors and return results.
+    </span><span class="kw">fn </span>force_flush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TraceResult&lt;()&gt;&gt; {
+        <span class="self">self</span>.provider.force_flush()
     }
 }
 
-<span class="macro">lazy_static::lazy_static!</span> {
-    <span class="doccomment">/// The global `Tracer` provider singleton.</span>
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">GLOBAL_TRACER_PROVIDER</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">GlobalTracerProvider</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">RwLock::new</span>(<span class="ident">GlobalTracerProvider::new</span>(<span class="ident">trace::noop::NoopTracerProvider::new</span>()));
+<span class="macro">lazy_static::lazy_static! </span>{
+    <span class="doccomment">/// The global `Tracer` provider singleton.
+    </span><span class="kw">static </span><span class="kw-2">ref </span>GLOBAL_TRACER_PROVIDER: RwLock&lt;GlobalTracerProvider&gt; = RwLock::new(GlobalTracerProvider::new(trace::noop::NoopTracerProvider::new()));
 }
 
-<span class="doccomment">/// Returns an instance of the currently configured global [`TracerProvider`] through</span>
-<span class="doccomment">/// [`GlobalTracerProvider`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`TracerProvider`]: crate::trace::TracerProvider</span>
-<span class="doccomment">/// [`GlobalTracerProvider`]: crate::global::GlobalTracerProvider</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tracer_provider</span>() -&gt; <span class="ident">GlobalTracerProvider</span> {
-    <span class="ident">GLOBAL_TRACER_PROVIDER</span>
-        .<span class="ident">read</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;GLOBAL_TRACER_PROVIDER RwLock poisoned&quot;</span>)
-        .<span class="ident">clone</span>()
+<span class="doccomment">/// Returns an instance of the currently configured global [`TracerProvider`] through
+/// [`GlobalTracerProvider`].
+///
+/// [`TracerProvider`]: crate::trace::TracerProvider
+/// [`GlobalTracerProvider`]: crate::global::GlobalTracerProvider
+</span><span class="kw">pub fn </span>tracer_provider() -&gt; GlobalTracerProvider {
+    GLOBAL_TRACER_PROVIDER
+        .read()
+        .expect(<span class="string">&quot;GLOBAL_TRACER_PROVIDER RwLock poisoned&quot;</span>)
+        .clone()
 }
 
-<span class="doccomment">/// Creates a named instance of [`Tracer`] via the configured [`GlobalTracerProvider`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the name is an empty string, the provider will use a default name.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is a more convenient way of expressing `global::tracer_provider().tracer(name)`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Tracer`]: crate::trace::Tracer</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tracer</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">BoxedTracer</span> {
-    <span class="ident">tracer_provider</span>().<span class="ident">tracer</span>(<span class="ident">name</span>.<span class="ident">into</span>())
+<span class="doccomment">/// Creates a named instance of [`Tracer`] via the configured [`GlobalTracerProvider`].
+///
+/// If the name is an empty string, the provider will use a default name.
+///
+/// This is a more convenient way of expressing `global::tracer_provider().tracer(name)`.
+///
+/// [`Tracer`]: crate::trace::Tracer
+</span><span class="kw">pub fn </span>tracer(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;) -&gt; BoxedTracer {
+    tracer_provider().tracer(name.into())
 }
 
-<span class="doccomment">/// Sets the given [`TracerProvider`] instance as the current global provider.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It returns the [`TracerProvider`] instance that was previously mounted as global provider</span>
-<span class="doccomment">/// (e.g. [`NoopTracerProvider`] if a provider had not been set before).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`TracerProvider`]: crate::trace::TracerProvider</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tracer_provider</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">new_provider</span>: <span class="ident">P</span>) -&gt; <span class="ident">GlobalTracerProvider</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">trace::Span</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">T</span>: <span class="ident">trace::Tracer</span><span class="op">&lt;</span><span class="ident">Span</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">P</span>: <span class="ident">trace::TracerProvider</span><span class="op">&lt;</span><span class="ident">Tracer</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// Sets the given [`TracerProvider`] instance as the current global provider.
+///
+/// It returns the [`TracerProvider`] instance that was previously mounted as global provider
+/// (e.g. [`NoopTracerProvider`] if a provider had not been set before).
+///
+/// [`TracerProvider`]: crate::trace::TracerProvider
+</span><span class="kw">pub fn </span>set_tracer_provider&lt;P, T, S&gt;(new_provider: P) -&gt; GlobalTracerProvider
+<span class="kw">where
+    </span>S: trace::Span + Send + Sync + <span class="lifetime">&#39;static</span>,
+    T: trace::Tracer&lt;Span = S&gt; + Send + Sync + <span class="lifetime">&#39;static</span>,
+    P: trace::TracerProvider&lt;Tracer = T&gt; + Send + Sync + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tracer_provider</span> <span class="op">=</span> <span class="ident">GLOBAL_TRACER_PROVIDER</span>
-        .<span class="ident">write</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;GLOBAL_TRACER_PROVIDER RwLock poisoned&quot;</span>);
-    <span class="ident">mem::replace</span>(
-        <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">tracer_provider</span>,
-        <span class="ident">GlobalTracerProvider::new</span>(<span class="ident">new_provider</span>),
+    <span class="kw">let </span><span class="kw-2">mut </span>tracer_provider = GLOBAL_TRACER_PROVIDER
+        .write()
+        .expect(<span class="string">&quot;GLOBAL_TRACER_PROVIDER RwLock poisoned&quot;</span>);
+    mem::replace(
+        <span class="kw-2">&amp;mut *</span>tracer_provider,
+        GlobalTracerProvider::new(new_provider),
     )
 }
 
-<span class="doccomment">/// Shut down the current tracer provider. This will invoke the shutdown method on all span processors.</span>
-<span class="doccomment">/// span processors should export remaining spans before return</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown_tracer_provider</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tracer_provider</span> <span class="op">=</span> <span class="ident">GLOBAL_TRACER_PROVIDER</span>
-        .<span class="ident">write</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;GLOBAL_TRACER_PROVIDER RwLock poisoned&quot;</span>);
+<span class="doccomment">/// Shut down the current tracer provider. This will invoke the shutdown method on all span processors.
+/// span processors should export remaining spans before return
+</span><span class="kw">pub fn </span>shutdown_tracer_provider() {
+    <span class="kw">let </span><span class="kw-2">mut </span>tracer_provider = GLOBAL_TRACER_PROVIDER
+        .write()
+        .expect(<span class="string">&quot;GLOBAL_TRACER_PROVIDER RwLock poisoned&quot;</span>);
 
-    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">mem::replace</span>(
-        <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">tracer_provider</span>,
-        <span class="ident">GlobalTracerProvider::new</span>(<span class="ident">NoopTracerProvider::new</span>()),
+    <span class="kw">let _ </span>= mem::replace(
+        <span class="kw-2">&amp;mut *</span>tracer_provider,
+        GlobalTracerProvider::new(NoopTracerProvider::new()),
     );
 }
 
-<span class="doccomment">/// Force flush all remaining spans in span processors.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Use the [`global::handle_error`] to handle errors happened during force flush.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`global::handle_error`]: crate::global::handle_error</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_flush_tracer_provider</span>() {
-    <span class="kw">let</span> <span class="ident">tracer_provider</span> <span class="op">=</span> <span class="ident">GLOBAL_TRACER_PROVIDER</span>
-        .<span class="ident">write</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;GLOBAL_TRACER_PROVIDER RwLock poisoned&quot;</span>);
+<span class="doccomment">/// Force flush all remaining spans in span processors.
+///
+/// Use the [`global::handle_error`] to handle errors happened during force flush.
+///
+/// [`global::handle_error`]: crate::global::handle_error
+</span><span class="kw">pub fn </span>force_flush_tracer_provider() {
+    <span class="kw">let </span>tracer_provider = GLOBAL_TRACER_PROVIDER
+        .write()
+        .expect(<span class="string">&quot;GLOBAL_TRACER_PROVIDER RwLock poisoned&quot;</span>);
 
-    <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> <span class="ident">trace::TracerProvider::force_flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">tracer_provider</span>);
-    <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">results</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">result</span> {
-            <span class="ident">handle_error</span>(<span class="ident">err</span>)
+    <span class="kw">let </span>results = trace::TracerProvider::force_flush(<span class="kw-2">&amp;*</span>tracer_provider);
+    <span class="kw">for </span>result <span class="kw">in </span>results {
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = result {
+            handle_error(err)
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="comment">// Note that all tests here should be marked as ignore so that it won&#39;t be picked up by default We</span>
-<span class="comment">// need to run those tests one by one as the GlobalTracerProvider is a shared object between</span>
-<span class="comment">// threads Use cargo test -- --ignored --test-threads=1 to run those tests.</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]</span>
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]</span>
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::trace::TraceRuntime</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]</span>
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trace::Tracer</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt::Debug</span>, <span class="ident">io::Write</span>, <span class="ident">sync::Mutex</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="comment">// Note that all tests here should be marked as ignore so that it won&#39;t be picked up by default We
+// need to run those tests one by one as the GlobalTracerProvider is a shared object between
+// threads Use cargo test -- --ignored --test-threads=1 to run those tests.
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[cfg(any(feature = <span class="string">&quot;rt-tokio&quot;</span>, feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]
+    </span><span class="kw">use </span><span class="kw">crate</span>::runtime;
+    <span class="attribute">#[cfg(any(feature = <span class="string">&quot;rt-tokio&quot;</span>, feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]
+    </span><span class="kw">use </span><span class="kw">crate</span>::sdk::trace::TraceRuntime;
+    <span class="attribute">#[cfg(any(feature = <span class="string">&quot;rt-tokio&quot;</span>, feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]
+    </span><span class="kw">use </span><span class="kw">crate</span>::trace::Tracer;
+    <span class="kw">use </span>std::{fmt::Debug, io::Write, sync::Mutex};
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">AssertWriter</span> {
-        <span class="ident">buf</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[derive(Debug)]
+    </span><span class="kw">struct </span>AssertWriter {
+        buf: Arc&lt;Mutex&lt;Vec&lt;u8&gt;&gt;&gt;,
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]</span>
-    <span class="kw">impl</span> <span class="ident">AssertWriter</span> {
-        <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">AssertWriter</span> {
-            <span class="ident">AssertWriter</span> {
-                <span class="ident">buf</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>())),
+    <span class="attribute">#[cfg(any(feature = <span class="string">&quot;rt-tokio&quot;</span>, feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]
+    </span><span class="kw">impl </span>AssertWriter {
+        <span class="kw">fn </span>new() -&gt; AssertWriter {
+            AssertWriter {
+                buf: Arc::new(Mutex::new(Vec::new())),
             }
         }
 
-        <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-            <span class="self">self</span>.<span class="ident">buf</span>
-                .<span class="ident">lock</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;cannot acquire the lock of assert writer&quot;</span>)
-                .<span class="ident">len</span>()
+        <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+            <span class="self">self</span>.buf
+                .lock()
+                .expect(<span class="string">&quot;cannot acquire the lock of assert writer&quot;</span>)
+                .len()
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">Write</span> <span class="kw">for</span> <span class="ident">AssertWriter</span> {
-        <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">buf</span>
-                .<span class="ident">lock</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;cannot acquire the lock of assert writer&quot;</span>);
-            <span class="ident">buffer</span>.<span class="ident">write</span>(<span class="ident">buf</span>)
+    <span class="kw">impl </span>Write <span class="kw">for </span>AssertWriter {
+        <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; std::io::Result&lt;usize&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>buffer = <span class="self">self
+                </span>.buf
+                .lock()
+                .expect(<span class="string">&quot;cannot acquire the lock of assert writer&quot;</span>);
+            buffer.write(buf)
         }
 
-        <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">buf</span>
-                .<span class="ident">lock</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;cannot acquire the lock of assert writer&quot;</span>);
-            <span class="ident">buffer</span>.<span class="ident">flush</span>()
+        <span class="kw">fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; std::io::Result&lt;()&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>buffer = <span class="self">self
+                </span>.buf
+                .lock()
+                .expect(<span class="string">&quot;cannot acquire the lock of assert writer&quot;</span>);
+            buffer.flush()
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">AssertWriter</span> {
-        <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">AssertWriter</span> {
-                <span class="ident">buf</span>: <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">clone</span>(),
+    <span class="kw">impl </span>Clone <span class="kw">for </span>AssertWriter {
+        <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+            AssertWriter {
+                buf: <span class="self">self</span>.buf.clone(),
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">build_batch_tracer_provider</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">TraceRuntime</span><span class="op">&gt;</span>(
-        <span class="ident">assert_writer</span>: <span class="ident">AssertWriter</span>,
-        <span class="ident">runtime</span>: <span class="ident">R</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::sdk::trace::TracerProvider</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::trace::TracerProvider</span>;
-        <span class="kw">let</span> <span class="ident">exporter</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::sdk::export::trace::stdout::Exporter::new</span>(<span class="ident">assert_writer</span>, <span class="bool-val">true</span>);
-        <span class="ident">TracerProvider::builder</span>()
-            .<span class="ident">with_batch_exporter</span>(<span class="ident">exporter</span>, <span class="ident">runtime</span>)
-            .<span class="ident">build</span>()
+    <span class="attribute">#[cfg(any(feature = <span class="string">&quot;rt-tokio&quot;</span>, feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]
+    </span><span class="kw">fn </span>build_batch_tracer_provider&lt;R: TraceRuntime&gt;(
+        assert_writer: AssertWriter,
+        runtime: R,
+    ) -&gt; <span class="kw">crate</span>::sdk::trace::TracerProvider {
+        <span class="kw">use </span><span class="kw">crate</span>::sdk::trace::TracerProvider;
+        <span class="kw">let </span>exporter = <span class="kw">crate</span>::sdk::export::trace::stdout::Exporter::new(assert_writer, <span class="bool-val">true</span>);
+        TracerProvider::builder()
+            .with_batch_exporter(exporter, runtime)
+            .build()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">build_simple_tracer_provider</span>(
-        <span class="ident">assert_writer</span>: <span class="ident">AssertWriter</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::sdk::trace::TracerProvider</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::trace::TracerProvider</span>;
-        <span class="kw">let</span> <span class="ident">exporter</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::sdk::export::trace::stdout::Exporter::new</span>(<span class="ident">assert_writer</span>, <span class="bool-val">true</span>);
-        <span class="ident">TracerProvider::builder</span>()
-            .<span class="ident">with_simple_exporter</span>(<span class="ident">exporter</span>)
-            .<span class="ident">build</span>()
+    <span class="attribute">#[cfg(any(feature = <span class="string">&quot;rt-tokio&quot;</span>, feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]
+    </span><span class="kw">fn </span>build_simple_tracer_provider(
+        assert_writer: AssertWriter,
+    ) -&gt; <span class="kw">crate</span>::sdk::trace::TracerProvider {
+        <span class="kw">use </span><span class="kw">crate</span>::sdk::trace::TracerProvider;
+        <span class="kw">let </span>exporter = <span class="kw">crate</span>::sdk::export::trace::stdout::Exporter::new(assert_writer, <span class="bool-val">true</span>);
+        TracerProvider::builder()
+            .with_simple_exporter(exporter)
+            .build()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_set_provider_in_tokio</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">TraceRuntime</span><span class="op">&gt;</span>(<span class="ident">runtime</span>: <span class="ident">R</span>) -&gt; <span class="ident">AssertWriter</span> {
-        <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">AssertWriter::new</span>();
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">set_tracer_provider</span>(<span class="ident">build_batch_tracer_provider</span>(<span class="ident">buffer</span>.<span class="ident">clone</span>(), <span class="ident">runtime</span>));
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">tracer</span>(<span class="string">&quot;opentelemetery&quot;</span>);
+    <span class="attribute">#[cfg(any(feature = <span class="string">&quot;rt-tokio&quot;</span>, feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]
+    </span><span class="kw">async fn </span>test_set_provider_in_tokio&lt;R: TraceRuntime&gt;(runtime: R) -&gt; AssertWriter {
+        <span class="kw">let </span>buffer = AssertWriter::new();
+        <span class="kw">let _ </span>= set_tracer_provider(build_batch_tracer_provider(buffer.clone(), runtime));
+        <span class="kw">let </span>tracer = tracer(<span class="string">&quot;opentelemetery&quot;</span>);
 
-        <span class="ident">tracer</span>.<span class="ident">in_span</span>(<span class="string">&quot;test&quot;</span>, <span class="op">|</span><span class="ident">_cx</span><span class="op">|</span> {});
+        tracer.in_span(<span class="string">&quot;test&quot;</span>, |_cx| {});
 
-        <span class="ident">buffer</span>
+        buffer
     }
 
-    <span class="comment">// When using `tokio::spawn` to spawn the worker task in batch processor</span>
-    <span class="comment">//</span>
-    <span class="comment">// multiple -&gt; no shut down -&gt; not export</span>
-    <span class="comment">// multiple -&gt; shut down -&gt; export</span>
-    <span class="comment">// single -&gt; no shutdown -&gt; not export</span>
-    <span class="comment">// single -&gt; shutdown -&gt; hang forever</span>
+    <span class="comment">// When using `tokio::spawn` to spawn the worker task in batch processor
+    //
+    // multiple -&gt; no shut down -&gt; not export
+    // multiple -&gt; shut down -&gt; export
+    // single -&gt; no shutdown -&gt; not export
+    // single -&gt; shutdown -&gt; hang forever
 
-    <span class="comment">// When using |fut| tokio::task::spawn_blocking(|| futures::executor::block_on(fut))</span>
-    <span class="comment">// to spawn the worker task in batch processor</span>
-    <span class="comment">//</span>
-    <span class="comment">// multiple -&gt; no shutdown -&gt; hang forever</span>
-    <span class="comment">// multiple -&gt; shut down -&gt; export</span>
-    <span class="comment">// single -&gt; shut down -&gt; export</span>
-    <span class="comment">// single -&gt; no shutdown -&gt; hang forever</span>
+    // When using |fut| tokio::task::spawn_blocking(|| futures::executor::block_on(fut))
+    // to spawn the worker task in batch processor
+    //
+    // multiple -&gt; no shutdown -&gt; hang forever
+    // multiple -&gt; shut down -&gt; export
+    // single -&gt; shut down -&gt; export
+    // single -&gt; no shutdown -&gt; hang forever
 
-    <span class="comment">// Test if the multiple thread tokio runtime could exit successfully when not force flushing spans</span>
-    <span class="attribute">#[<span class="ident">tokio::test</span>(<span class="ident">flavor</span> <span class="op">=</span> <span class="string">&quot;multi_thread&quot;</span>, <span class="ident">worker_threads</span> <span class="op">=</span> <span class="number">2</span>)]</span>
-    <span class="attribute">#[<span class="ident">ignore</span> <span class="op">=</span> <span class="string">&quot;requires --test-threads=1&quot;</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_set_provider_multiple_thread_tokio</span>() {
-        <span class="kw">let</span> <span class="ident">assert_writer</span> <span class="op">=</span> <span class="ident">test_set_provider_in_tokio</span>(<span class="ident">runtime::Tokio</span>).<span class="kw">await</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">assert_writer</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+    // Test if the multiple thread tokio runtime could exit successfully when not force flushing spans
+    </span><span class="attribute">#[tokio::test(flavor = <span class="string">&quot;multi_thread&quot;</span>, worker_threads = <span class="number">2</span>)]
+    #[ignore = <span class="string">&quot;requires --test-threads=1&quot;</span>]
+    #[cfg(feature = <span class="string">&quot;rt-tokio&quot;</span>)]
+    </span><span class="kw">async fn </span>test_set_provider_multiple_thread_tokio() {
+        <span class="kw">let </span>assert_writer = test_set_provider_in_tokio(runtime::Tokio).<span class="kw">await</span>;
+        <span class="macro">assert_eq!</span>(assert_writer.len(), <span class="number">0</span>);
     }
 
-    <span class="comment">// Test if the multiple thread tokio runtime could exit successfully when force flushing spans</span>
-    <span class="attribute">#[<span class="ident">tokio::test</span>(<span class="ident">flavor</span> <span class="op">=</span> <span class="string">&quot;multi_thread&quot;</span>, <span class="ident">worker_threads</span> <span class="op">=</span> <span class="number">2</span>)]</span>
-    <span class="attribute">#[<span class="ident">ignore</span> <span class="op">=</span> <span class="string">&quot;requires --test-threads=1&quot;</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_set_provider_multiple_thread_tokio_shutdown</span>() {
-        <span class="kw">let</span> <span class="ident">assert_writer</span> <span class="op">=</span> <span class="ident">test_set_provider_in_tokio</span>(<span class="ident">runtime::Tokio</span>).<span class="kw">await</span>;
-        <span class="ident">shutdown_tracer_provider</span>();
-        <span class="macro">assert!</span>(<span class="ident">assert_writer</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>);
+    <span class="comment">// Test if the multiple thread tokio runtime could exit successfully when force flushing spans
+    </span><span class="attribute">#[tokio::test(flavor = <span class="string">&quot;multi_thread&quot;</span>, worker_threads = <span class="number">2</span>)]
+    #[ignore = <span class="string">&quot;requires --test-threads=1&quot;</span>]
+    #[cfg(feature = <span class="string">&quot;rt-tokio&quot;</span>)]
+    </span><span class="kw">async fn </span>test_set_provider_multiple_thread_tokio_shutdown() {
+        <span class="kw">let </span>assert_writer = test_set_provider_in_tokio(runtime::Tokio).<span class="kw">await</span>;
+        shutdown_tracer_provider();
+        <span class="macro">assert!</span>(assert_writer.len() &gt; <span class="number">0</span>);
     }
 
-    <span class="comment">// Test use simple processor in single thread tokio runtime.</span>
-    <span class="comment">// Expected to see the spans being exported to buffer</span>
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">ignore</span> <span class="op">=</span> <span class="string">&quot;requires --test-threads=1&quot;</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_set_provider_single_thread_tokio_with_simple_processor</span>() {
-        <span class="kw">let</span> <span class="ident">assert_writer</span> <span class="op">=</span> <span class="ident">AssertWriter::new</span>();
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">set_tracer_provider</span>(<span class="ident">build_simple_tracer_provider</span>(<span class="ident">assert_writer</span>.<span class="ident">clone</span>()));
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">tracer</span>(<span class="string">&quot;opentelemetry&quot;</span>);
+    <span class="comment">// Test use simple processor in single thread tokio runtime.
+    // Expected to see the spans being exported to buffer
+    </span><span class="attribute">#[tokio::test]
+    #[ignore = <span class="string">&quot;requires --test-threads=1&quot;</span>]
+    #[cfg(feature = <span class="string">&quot;rt-tokio&quot;</span>)]
+    </span><span class="kw">async fn </span>test_set_provider_single_thread_tokio_with_simple_processor() {
+        <span class="kw">let </span>assert_writer = AssertWriter::new();
+        <span class="kw">let _ </span>= set_tracer_provider(build_simple_tracer_provider(assert_writer.clone()));
+        <span class="kw">let </span>tracer = tracer(<span class="string">&quot;opentelemetry&quot;</span>);
 
-        <span class="ident">tracer</span>.<span class="ident">in_span</span>(<span class="string">&quot;test&quot;</span>, <span class="op">|</span><span class="ident">_cx</span><span class="op">|</span> {});
+        tracer.in_span(<span class="string">&quot;test&quot;</span>, |_cx| {});
 
-        <span class="ident">shutdown_tracer_provider</span>();
+        shutdown_tracer_provider();
 
-        <span class="macro">assert!</span>(<span class="ident">assert_writer</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>);
+        <span class="macro">assert!</span>(assert_writer.len() &gt; <span class="number">0</span>);
     }
 
-    <span class="comment">// Test if the single thread tokio runtime could exit successfully when not force flushing spans</span>
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">ignore</span> <span class="op">=</span> <span class="string">&quot;requires --test-threads=1&quot;</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_set_provider_single_thread_tokio</span>() {
-        <span class="kw">let</span> <span class="ident">assert_writer</span> <span class="op">=</span> <span class="ident">test_set_provider_in_tokio</span>(<span class="ident">runtime::TokioCurrentThread</span>).<span class="kw">await</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">assert_writer</span>.<span class="ident">len</span>(), <span class="number">0</span>)
+    <span class="comment">// Test if the single thread tokio runtime could exit successfully when not force flushing spans
+    </span><span class="attribute">#[tokio::test]
+    #[ignore = <span class="string">&quot;requires --test-threads=1&quot;</span>]
+    #[cfg(feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>)]
+    </span><span class="kw">async fn </span>test_set_provider_single_thread_tokio() {
+        <span class="kw">let </span>assert_writer = test_set_provider_in_tokio(runtime::TokioCurrentThread).<span class="kw">await</span>;
+        <span class="macro">assert_eq!</span>(assert_writer.len(), <span class="number">0</span>)
     }
 
-    <span class="comment">// Test if the single thread tokio runtime could exit successfully when force flushing spans.</span>
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">ignore</span> <span class="op">=</span> <span class="string">&quot;requires --test-threads=1&quot;</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_set_provider_single_thread_tokio_shutdown</span>() {
-        <span class="kw">let</span> <span class="ident">assert_writer</span> <span class="op">=</span> <span class="ident">test_set_provider_in_tokio</span>(<span class="ident">runtime::TokioCurrentThread</span>).<span class="kw">await</span>;
-        <span class="ident">shutdown_tracer_provider</span>();
-        <span class="macro">assert!</span>(<span class="ident">assert_writer</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>);
+    <span class="comment">// Test if the single thread tokio runtime could exit successfully when force flushing spans.
+    </span><span class="attribute">#[tokio::test]
+    #[ignore = <span class="string">&quot;requires --test-threads=1&quot;</span>]
+    #[cfg(feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>)]
+    </span><span class="kw">async fn </span>test_set_provider_single_thread_tokio_shutdown() {
+        <span class="kw">let </span>assert_writer = test_set_provider_in_tokio(runtime::TokioCurrentThread).<span class="kw">await</span>;
+        shutdown_tracer_provider();
+        <span class="macro">assert!</span>(assert_writer.len() &gt; <span class="number">0</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

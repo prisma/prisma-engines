@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/migration-engine-tests/src/commands/schema_push.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>schema_push.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../migration_engine_tests/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/migration-engine-tests/src/commands/schema_push.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>schema_push.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../migration_engine_tests/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -159,166 +159,166 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{
-    <span class="ident">commands::schema_push</span>, <span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">migration_connector::MigrationConnector</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>migration_core::{
+    commands::schema_push, json_rpc::types::<span class="kw-2">*</span>, migration_connector::MigrationConnector, CoreError, CoreResult,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Debug</span>};
-<span class="kw">use</span> <span class="ident">tracing_futures::Instrument</span>;
+<span class="kw">use </span>std::{borrow::Cow, fmt::Debug};
+<span class="kw">use </span>tracing_futures::Instrument;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
-    <span class="ident">schema</span>: <span class="ident">String</span>,
-    <span class="ident">force</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Purely for logging diagnostics.</span>
-    <span class="ident">migration_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>SchemaPush&lt;<span class="lifetime">&#39;a</span>&gt; {
+    api: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">dyn </span>MigrationConnector,
+    schema: String,
+    force: bool,
+    <span class="doccomment">/// Purely for logging diagnostics.
+    </span>migration_id: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>, <span class="ident">schema</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SchemaPush</span> {
-            <span class="ident">api</span>,
-            <span class="ident">schema</span>,
-            <span class="ident">force</span>: <span class="bool-val">false</span>,
-            <span class="ident">migration_id</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SchemaPush&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(api: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">dyn </span>MigrationConnector, schema: String) -&gt; <span class="self">Self </span>{
+        SchemaPush {
+            api,
+            schema,
+            force: <span class="bool-val">false</span>,
+            migration_id: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">force</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">force</span> <span class="op">=</span> <span class="ident">force</span>;
-        <span class="self">self</span>
-    }
+    <span class="kw">pub fn </span>force(<span class="kw-2">mut </span><span class="self">self</span>, force: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.force = force;
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">migration_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">migration_id</span> <span class="op">=</span> <span class="ident">migration_id</span>;
-        <span class="self">self</span>
-    }
+    <span class="kw">pub fn </span>migration_id(<span class="kw-2">mut </span><span class="self">self</span>, migration_id: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.migration_id = migration_id;
+        <span class="self">self
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">send_impl</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushAssertion</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">SchemaPushInput</span> {
-            <span class="ident">schema</span>: <span class="self">self</span>.<span class="ident">schema</span>,
-            <span class="ident">force</span>: <span class="self">self</span>.<span class="ident">force</span>,
+    <span class="kw">fn </span>send_impl(<span class="self">self</span>) -&gt; CoreResult&lt;SchemaPushAssertion&gt; {
+        <span class="kw">let </span>input = SchemaPushInput {
+            schema: <span class="self">self</span>.schema,
+            force: <span class="self">self</span>.force,
         };
 
-        <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">schema_push</span>(<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">api</span>)
-            .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;SchemaPush&quot;</span>, <span class="ident">migration_id</span> <span class="op">=</span> <span class="question-mark">?</span><span class="self">self</span>.<span class="ident">migration_id</span>));
+        <span class="kw">let </span>fut = schema_push(input, <span class="self">self</span>.api)
+            .instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;SchemaPush&quot;</span>, migration_id = <span class="question-mark">?</span><span class="self">self</span>.migration_id));
 
-        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">test_setup::runtime::run_with_thread_local_runtime</span>(<span class="ident">fut</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>output = test_setup::runtime::run_with_thread_local_runtime(fut)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">SchemaPushAssertion</span> { <span class="ident">result</span>: <span class="ident">output</span> })
+        <span class="prelude-val">Ok</span>(SchemaPushAssertion { result: output })
     }
 
-    <span class="doccomment">/// Execute the command and expect it to succeed.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) -&gt; <span class="ident">SchemaPushAssertion</span> {
-        <span class="self">self</span>.<span class="ident">send_impl</span>().<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Execute the command and expect it to succeed.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>send(<span class="self">self</span>) -&gt; SchemaPushAssertion {
+        <span class="self">self</span>.send_impl().unwrap()
     }
 
-    <span class="doccomment">/// Execute the command and expect it to fail, returning the error.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_unwrap_err</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreError</span> {
-        <span class="self">self</span>.<span class="ident">send_impl</span>().<span class="ident">unwrap_err</span>()
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SchemaPushAssertion</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">result</span>: <span class="ident">SchemaPushOutput</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SchemaPushAssertion</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+    <span class="doccomment">/// Execute the command and expect it to fail, returning the error.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>send_unwrap_err(<span class="self">self</span>) -&gt; CoreError {
+        <span class="self">self</span>.send_impl().unwrap_err()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SchemaPushAssertion</span> {
-    <span class="doccomment">/// Asserts that the command produced no warning and no unexecutable migration message.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_green</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">assert_no_warning</span>().<span class="ident">assert_executable</span>()
+<span class="kw">pub struct </span>SchemaPushAssertion {
+    <span class="kw">pub</span>(<span class="kw">super</span>) result: SchemaPushOutput,
+}
+
+<span class="kw">impl </span>Debug <span class="kw">for </span>SchemaPushAssertion {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="self">self</span>.result.fmt(f)
+    }
+}
+
+<span class="kw">impl </span>SchemaPushAssertion {
+    <span class="doccomment">/// Asserts that the command produced no warning and no unexecutable migration message.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_green(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.assert_no_warning().assert_executable()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_no_warning</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub fn </span>assert_no_warning(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">warnings</span>.<span class="ident">is_empty</span>(),
+            <span class="self">self</span>.result.warnings.is_empty(),
             <span class="string">&quot;Assertion failed. Expected no warning, got {:?}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">warnings</span>
+            <span class="self">self</span>.result.warnings
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_warnings</span>(<span class="self">self</span>, <span class="ident">warnings</span>: <span class="kw-2">&amp;</span>[<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>]) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub fn </span>assert_warnings(<span class="self">self</span>, warnings: <span class="kw-2">&amp;</span>[Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;]) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">warnings</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">warnings</span>.<span class="ident">len</span>(),
+            <span class="self">self</span>.result.warnings.len() == warnings.len(),
             <span class="string">&quot;Expected {} warnings, got {}.\n{:#?}&quot;</span>,
-            <span class="ident">warnings</span>.<span class="ident">len</span>(),
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">warnings</span>.<span class="ident">len</span>(),
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">warnings</span>
+            warnings.len(),
+            <span class="self">self</span>.result.warnings.len(),
+            <span class="self">self</span>.result.warnings
         );
 
-        <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">warning</span>) <span class="kw">in</span> <span class="ident">warnings</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
+        <span class="kw">for </span>(idx, warning) <span class="kw">in </span>warnings.iter().enumerate() {
             <span class="macro">assert_eq!</span>(
-                <span class="prelude-val">Some</span>(<span class="ident">warning</span>.<span class="ident">as_ref</span>()),
-                <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">warnings</span>.<span class="ident">get</span>(<span class="ident">idx</span>).<span class="ident">map</span>(<span class="ident">String::as_str</span>)
+                <span class="prelude-val">Some</span>(warning.as_ref()),
+                <span class="self">self</span>.result.warnings.get(idx).map(String::as_str)
             );
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_no_steps</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_no_steps(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">executed_steps</span> <span class="op">==</span> <span class="number">0</span>,
+            <span class="self">self</span>.result.executed_steps == <span class="number">0</span>,
             <span class="string">&quot;Assertion failed. Executed steps should be zero, but found {}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">executed_steps</span>,
+            <span class="self">self</span>.result.executed_steps,
         );
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_executed_steps</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub fn </span>assert_has_executed_steps(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">executed_steps</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+            <span class="self">self</span>.result.executed_steps != <span class="number">0</span>,
             <span class="string">&quot;Assertion failed. Executed steps should be not zero.&quot;</span>,
         );
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_executable</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_executable(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">unexecutable</span>.<span class="ident">is_empty</span>(),
+            <span class="self">self</span>.result.unexecutable.is_empty(),
             <span class="string">&quot;Expected an executable migration, got following: {:?}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">unexecutable</span>
+            <span class="self">self</span>.result.unexecutable
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_unexecutable</span>(<span class="self">self</span>, <span class="ident">expected_messages</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub fn </span>assert_unexecutable(<span class="self">self</span>, expected_messages: <span class="kw-2">&amp;</span>[String]) -&gt; <span class="self">Self </span>{
         <span class="macro">assert_eq!</span>(
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">unexecutable</span>.<span class="ident">len</span>(),
-            <span class="ident">expected_messages</span>.<span class="ident">len</span>(),
+            <span class="self">self</span>.result.unexecutable.len(),
+            expected_messages.len(),
             <span class="string">&quot;Expected {} unexecutable step errors, got {}.\n({:#?})&quot;</span>,
-            <span class="ident">expected_messages</span>.<span class="ident">len</span>(),
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">unexecutable</span>.<span class="ident">len</span>(),
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">unexecutable</span>,
+            expected_messages.len(),
+            <span class="self">self</span>.result.unexecutable.len(),
+            <span class="self">self</span>.result.unexecutable,
         );
 
-        <span class="kw">for</span> (<span class="ident">expected</span>, <span class="ident">actual</span>) <span class="kw">in</span> <span class="ident">expected_messages</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">result</span>.<span class="ident">unexecutable</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">String::as_str</span>))
+        <span class="kw">for </span>(expected, actual) <span class="kw">in </span>expected_messages
+            .iter()
+            .zip(<span class="self">self</span>.result.unexecutable.iter().map(String::as_str))
         {
-            <span class="macro">assert_eq!</span>(<span class="ident">actual</span>, <span class="ident">expected</span>);
+            <span class="macro">assert_eq!</span>(actual, expected);
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expect_unexecutable</span>(<span class="self">self</span>, <span class="ident">expectation</span>: <span class="ident">expect_test::Expect</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">expectation</span>.<span class="ident">assert_debug_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">result</span>.<span class="ident">unexecutable</span>);
-        <span class="self">self</span>
-    }
+    <span class="kw">pub fn </span>expect_unexecutable(<span class="self">self</span>, expectation: expect_test::Expect) -&gt; <span class="self">Self </span>{
+        expectation.assert_debug_eq(<span class="kw-2">&amp;</span><span class="self">self</span>.result.unexecutable);
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="migration_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="migration_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

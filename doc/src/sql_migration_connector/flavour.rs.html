@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/flavour.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>flavour.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_migration_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/flavour.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>flavour.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_migration_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -307,314 +307,314 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
-</pre><pre class="rust"><code><span class="doccomment">//! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),</span>
-<span class="doccomment">//! in order to avoid cluttering the connector with conditionals. This is a private implementation</span>
-<span class="doccomment">//! detail of the SQL connector.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),
+//! in order to avoid cluttering the connector with conditionals. This is a private implementation
+//! detail of the SQL connector.
 
-<span class="kw">mod</span> <span class="ident">mssql</span>;
-<span class="kw">mod</span> <span class="ident">mysql</span>;
-<span class="kw">mod</span> <span class="ident">postgres</span>;
-<span class="kw">mod</span> <span class="ident">sqlite</span>;
+</span><span class="kw">mod </span>mssql;
+<span class="kw">mod </span>mysql;
+<span class="kw">mod </span>postgres;
+<span class="kw">mod </span>sqlite;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">mssql::MssqlFlavour</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">mysql::MysqlFlavour</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">postgres::PostgresFlavour</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">sqlite::SqliteFlavour</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>mssql::MssqlFlavour;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>mysql::MysqlFlavour;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>postgres::PostgresFlavour;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>sqlite::SqliteFlavour;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">sql_destructive_change_checker::DestructiveChangeCheckerFlavour</span>, <span class="ident">sql_renderer::SqlRenderer</span>,
-    <span class="ident">sql_schema_calculator::SqlSchemaCalculatorFlavour</span>, <span class="ident">sql_schema_differ::SqlSchemaDifferFlavour</span>,
+<span class="kw">use crate</span>::{
+    sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
+    sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
 };
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{
-    <span class="ident">migrations_directory::MigrationDirectory</span>, <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorParams</span>, <span class="ident">ConnectorResult</span>,
-    <span class="ident">MigrationRecord</span>, <span class="ident">Namespaces</span>, <span class="ident">PersistenceNotInitializedError</span>,
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>migration_connector::{
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
+    MigrationRecord, Namespaces, PersistenceNotInitializedError,
 };
-<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">PreviewFeature</span>, <span class="ident">ValidatedSchema</span>};
-<span class="kw">use</span> <span class="ident">quaint::prelude</span>::{<span class="ident">ConnectionInfo</span>, <span class="ident">Table</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
+<span class="kw">use </span>psl::{PreviewFeature, ValidatedSchema};
+<span class="kw">use </span>quaint::prelude::{ConnectionInfo, Table};
+<span class="kw">use </span>sql_schema_describer::SqlSchema;
+<span class="kw">use </span>std::fmt::Debug;
 
-<span class="doccomment">/// P is the params, C is a connection.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="ident">Initial</span>,
-    <span class="ident">WithParams</span>(<span class="ident">P</span>),
-    <span class="ident">Connected</span>(<span class="ident">P</span>, <span class="ident">C</span>),
+<span class="doccomment">/// P is the params, C is a connection.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>State&lt;P, C&gt; {
+    Initial,
+    WithParams(P),
+    Connected(P, C),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">State::Initial</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;State::Initial&quot;</span>),
-            <span class="ident">State::WithParams</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;State::Params(&lt;CONFIDENTIAL&gt;)&quot;</span>),
-            <span class="ident">State::Connected</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;State::Connected(&lt;CONFIDENTIAL&gt;)&quot;</span>),
+<span class="kw">impl</span>&lt;P, C&gt; Debug <span class="kw">for </span>State&lt;P, C&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            State::Initial =&gt; f.write_str(<span class="string">&quot;State::Initial&quot;</span>),
+            State::WithParams(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;State::Params(&lt;CONFIDENTIAL&gt;)&quot;</span>),
+            State::Connected(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;State::Connected(&lt;CONFIDENTIAL&gt;)&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="lifetime">&#39;static</span>,
-    <span class="ident">C</span>: <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;P, C&gt; State&lt;P, C&gt;
+<span class="kw">where
+    </span>P: <span class="lifetime">&#39;static</span>,
+    C: <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">P</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">State::Initial</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">State::WithParams</span>(<span class="ident">p</span>) <span class="op">|</span> <span class="ident">State::Connected</span>(<span class="ident">p</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">p</span>),
+    <span class="kw">fn </span>params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>P&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            State::Initial =&gt; <span class="prelude-val">None</span>,
+            State::WithParams(p) | State::Connected(p, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(p),
         }
     }
 
-    <span class="doccomment">/// Unwrap the state&#39;s params. We do not return an error because we want to trigger a panic if</span>
-    <span class="doccomment">/// that happens, because it means an internal logic error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is useful when you want the params, but you do not care if a connection has been</span>
-    <span class="doccomment">/// started or not.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get_unwrapped_params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">P</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">State::Initial</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Internal logic error: get_unwrapped_params() on State::Initial&quot;</span>),
-            <span class="ident">State::WithParams</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>,
-            <span class="ident">State::Connected</span>(<span class="ident">p</span>, <span class="kw">_</span>) =&gt; <span class="ident">p</span>,
+    <span class="doccomment">/// Unwrap the state&#39;s params. We do not return an error because we want to trigger a panic if
+    /// that happens, because it means an internal logic error.
+    ///
+    /// This is useful when you want the params, but you do not care if a connection has been
+    /// started or not.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">fn </span>get_unwrapped_params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>P {
+        <span class="kw">match </span><span class="self">self </span>{
+            State::Initial =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Internal logic error: get_unwrapped_params() on State::Initial&quot;</span>),
+            State::WithParams(p) =&gt; p,
+            State::Connected(p, <span class="kw">_</span>) =&gt; p,
         }
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">State::WithParams</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">State::Connected</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;state error&quot;</span>),
-            <span class="ident">State::Initial</span> =&gt; <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">State::WithParams</span>(<span class="ident">params</span>),
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">fn </span>set_params(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: P) {
+        <span class="kw">match </span><span class="self">self </span>{
+            State::WithParams(<span class="kw">_</span>) | State::Connected(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;state error&quot;</span>),
+            State::Initial =&gt; <span class="kw-2">*</span><span class="self">self </span>= State::WithParams(params),
         }
     }
 
-    <span class="doccomment">/// Convenience wrapper to transition from WithParams to Connected.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">try_connect</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">P</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">std::mem::replace</span>(<span class="self">self</span>, <span class="ident">State::Initial</span>) {
-            <span class="ident">State::Initial</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Attempted to connect from State::Initial&quot;</span>),
-            <span class="ident">State::Connected</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Attempted to connect from State::Connected&quot;</span>),
-            <span class="ident">State::WithParams</span>(<span class="ident">p</span>) =&gt; <span class="kw">match</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">State::Connected</span>(<span class="ident">p</span>, <span class="ident">c</span>);
+    <span class="doccomment">/// Convenience wrapper to transition from WithParams to Connected.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">async fn </span>try_connect(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        f: <span class="kw">impl for</span>&lt;<span class="lifetime">&#39;b</span>&gt; FnOnce(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>P) -&gt; BoxFuture&lt;<span class="lifetime">&#39;b</span>, ConnectorResult&lt;C&gt;&gt;,
+    ) -&gt; ConnectorResult&lt;()&gt; {
+        <span class="kw">match </span>std::mem::replace(<span class="self">self</span>, State::Initial) {
+            State::Initial =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Attempted to connect from State::Initial&quot;</span>),
+            State::Connected(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Attempted to connect from State::Connected&quot;</span>),
+            State::WithParams(p) =&gt; <span class="kw">match </span>f(<span class="kw-2">&amp;</span>p).<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(c) =&gt; {
+                    <span class="kw-2">*</span><span class="self">self </span>= State::Connected(p, c);
                     <span class="prelude-val">Ok</span>(())
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">State::WithParams</span>(<span class="ident">p</span>);
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>)
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="kw-2">*</span><span class="self">self </span>= State::WithParams(p);
+                    <span class="prelude-val">Err</span>(err)
                 }
             },
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">SqlFlavour</span>:
-    <span class="ident">DestructiveChangeCheckerFlavour</span>
-    <span class="op">+</span> <span class="ident">SqlRenderer</span>
-    <span class="op">+</span> <span class="ident">SqlSchemaDifferFlavour</span>
-    <span class="op">+</span> <span class="ident">SqlSchemaCalculatorFlavour</span>
-    <span class="op">+</span> <span class="ident">Send</span>
-    <span class="op">+</span> <span class="ident">Sync</span>
-    <span class="op">+</span> <span class="ident">Debug</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>SqlFlavour:
+    DestructiveChangeCheckerFlavour
+    + SqlRenderer
+    + SqlSchemaDifferFlavour
+    + SqlSchemaCalculatorFlavour
+    + Send
+    + Sync
+    + Debug
 {
-    <span class="kw">fn</span> <span class="ident">acquire_lock</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>acquire_lock(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">apply_migration_script</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>apply_migration_script&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        migration_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        script: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;()&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">check_database_version_compatibility</span>(
+    <span class="kw">fn </span>check_database_version_compatibility(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">user_facing_errors::common::DatabaseVersionIncompatibility</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+        _datamodel: <span class="kw-2">&amp;</span>ValidatedSchema,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;user_facing_errors::common::DatabaseVersionIncompatibility&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="doccomment">/// The connection string received in set_params().
+    </span><span class="kw">fn </span>connection_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;;
+
+    <span class="doccomment">/// See MigrationConnector::connector_type()
+    </span><span class="kw">fn </span>connector_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
+
+    <span class="doccomment">/// Create a database for the given URL on the server, if applicable.
+    </span><span class="kw">fn </span>create_database(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;String&gt;&gt;;
+
+    <span class="doccomment">/// Initialize the `_prisma_migrations` table.
+    </span><span class="kw">fn </span>create_migrations_table(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt;;
+
+    <span class="doccomment">/// The datamodel connector corresponding to the flavour
+    </span><span class="kw">fn </span>datamodel_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>psl::datamodel_connector::Connector;
+
+    <span class="kw">fn </span>describe_schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;SqlSchema&gt;&gt;;
+
+    <span class="doccomment">/// Drop the database.
+    </span><span class="kw">fn </span>drop_database(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt;;
+
+    <span class="doccomment">/// Drop the migrations table
+    </span><span class="kw">fn </span>drop_migrations_table(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt;;
+
+    <span class="doccomment">/// Return an empty database schema. This happens in the flavour, because we need
+    /// SqlSchema::connector_data to be set.
+    </span><span class="kw">fn </span>empty_database_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlSchema {
+        SqlSchema::default()
     }
 
-    <span class="doccomment">/// The connection string received in set_params().</span>
-    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Check a connection to make sure it is usable by the migration engine.
+    /// This can include some set up on the database, like ensuring that the
+    /// schema we connect to exists.
+    </span><span class="kw">fn </span>ensure_connection_validity(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt;;
 
-    <span class="doccomment">/// See MigrationConnector::connector_type()</span>
-    <span class="kw">fn</span> <span class="ident">connector_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+    <span class="kw">fn </span>load_migrations_table(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;MigrationRecord&gt;, PersistenceNotInitializedError&gt;&gt;&gt; {
+        <span class="kw">use </span>quaint::prelude::<span class="kw-2">*</span>;
+        Box::pin(<span class="kw">async move </span>{
+            <span class="kw">let </span>select = Select::from_table(<span class="self">self</span>.migrations_table())
+                .column(<span class="string">&quot;id&quot;</span>)
+                .column(<span class="string">&quot;checksum&quot;</span>)
+                .column(<span class="string">&quot;finished_at&quot;</span>)
+                .column(<span class="string">&quot;migration_name&quot;</span>)
+                .column(<span class="string">&quot;logs&quot;</span>)
+                .column(<span class="string">&quot;rolled_back_at&quot;</span>)
+                .column(<span class="string">&quot;started_at&quot;</span>)
+                .column(<span class="string">&quot;applied_steps_count&quot;</span>)
+                .order_by(<span class="string">&quot;started_at&quot;</span>.ascend());
 
-    <span class="doccomment">/// Create a database for the given URL on the server, if applicable.</span>
-    <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Initialize the `_prisma_migrations` table.</span>
-    <span class="kw">fn</span> <span class="ident">create_migrations_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// The datamodel connector corresponding to the flavour</span>
-    <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">psl::datamodel_connector::Connector</span>;
-
-    <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Drop the database.</span>
-    <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Drop the migrations table</span>
-    <span class="kw">fn</span> <span class="ident">drop_migrations_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Return an empty database schema. This happens in the flavour, because we need</span>
-    <span class="doccomment">/// SqlSchema::connector_data to be set.</span>
-    <span class="kw">fn</span> <span class="ident">empty_database_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlSchema</span> {
-        <span class="ident">SqlSchema::default</span>()
-    }
-
-    <span class="doccomment">/// Check a connection to make sure it is usable by the migration engine.</span>
-    <span class="doccomment">/// This can include some set up on the database, like ensuring that the</span>
-    <span class="doccomment">/// schema we connect to exists.</span>
-    <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">load_migrations_table</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MigrationRecord</span><span class="op">&gt;</span>, <span class="ident">PersistenceNotInitializedError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">quaint::prelude</span>::<span class="kw-2">*</span>;
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="self">self</span>.<span class="ident">migrations_table</span>())
-                .<span class="ident">column</span>(<span class="string">&quot;id&quot;</span>)
-                .<span class="ident">column</span>(<span class="string">&quot;checksum&quot;</span>)
-                .<span class="ident">column</span>(<span class="string">&quot;finished_at&quot;</span>)
-                .<span class="ident">column</span>(<span class="string">&quot;migration_name&quot;</span>)
-                .<span class="ident">column</span>(<span class="string">&quot;logs&quot;</span>)
-                .<span class="ident">column</span>(<span class="string">&quot;rolled_back_at&quot;</span>)
-                .<span class="ident">column</span>(<span class="string">&quot;started_at&quot;</span>)
-                .<span class="ident">column</span>(<span class="string">&quot;applied_steps_count&quot;</span>)
-                .<span class="ident">order_by</span>(<span class="string">&quot;started_at&quot;</span>.<span class="ident">ascend</span>());
-
-            <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">query</span>(<span class="ident">select</span>.<span class="ident">into</span>()).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">result</span>) =&gt; <span class="ident">result</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>)
-                    <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::query_engine::TableDoesNotExist</span><span class="op">&gt;</span>()
-                        <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::common::InvalidModel</span><span class="op">&gt;</span>() =&gt;
+            <span class="kw">let </span>rows = <span class="kw">match </span><span class="self">self</span>.query(select.into()).<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(result) =&gt; result,
+                <span class="prelude-val">Err</span>(err)
+                    <span class="kw">if </span>err.is_user_facing_error::&lt;user_facing_errors::query_engine::TableDoesNotExist&gt;()
+                        || err.is_user_facing_error::&lt;user_facing_errors::common::InvalidModel&gt;() =&gt;
                 {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">PersistenceNotInitializedError</span>))
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(PersistenceNotInitializedError))
                 }
-                <span class="ident">err</span> @ <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">err</span><span class="question-mark">?</span>,
+                err @ <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; err<span class="question-mark">?</span>,
             };
 
-            <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">rows</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">MigrationRecord</span> {
-                        <span class="ident">id</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>()).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                            <span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;Failed to extract `id` from `_prisma_migrations` row.&quot;</span>.<span class="ident">into</span>())
+            <span class="kw">let </span>rows = rows
+                .into_iter()
+                .map(|row| -&gt; ConnectorResult&lt;<span class="kw">_</span>&gt; {
+                    <span class="prelude-val">Ok</span>(MigrationRecord {
+                        id: row.get(<span class="string">&quot;id&quot;</span>).and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg(<span class="string">&quot;Failed to extract `id` from `_prisma_migrations` row.&quot;</span>.into())
                         })<span class="question-mark">?</span>,
-                        <span class="ident">checksum</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;checksum&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>()).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                            <span class="ident">ConnectorError::from_msg</span>(
-                                <span class="string">&quot;Failed to extract `checksum` from `_prisma_migrations` row.&quot;</span>.<span class="ident">into</span>(),
+                        checksum: row.get(<span class="string">&quot;checksum&quot;</span>).and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                <span class="string">&quot;Failed to extract `checksum` from `_prisma_migrations` row.&quot;</span>.into(),
                             )
                         })<span class="question-mark">?</span>,
-                        <span class="ident">finished_at</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;finished_at&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_datetime</span>()),
-                        <span class="ident">migration_name</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;migration_name&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>()).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                            <span class="ident">ConnectorError::from_msg</span>(
-                                <span class="string">&quot;Failed to extract `migration_name` from `_prisma_migrations` row.&quot;</span>.<span class="ident">into</span>(),
+                        finished_at: row.get(<span class="string">&quot;finished_at&quot;</span>).and_then(|v| v.as_datetime()),
+                        migration_name: row.get(<span class="string">&quot;migration_name&quot;</span>).and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                <span class="string">&quot;Failed to extract `migration_name` from `_prisma_migrations` row.&quot;</span>.into(),
                             )
                         })<span class="question-mark">?</span>,
-                        <span class="ident">logs</span>: <span class="prelude-val">None</span>,
-                        <span class="ident">rolled_back_at</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;rolled_back_at&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_datetime</span>()),
-                        <span class="ident">started_at</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;started_at&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_datetime</span>()).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                            <span class="ident">ConnectorError::from_msg</span>(
-                                <span class="string">&quot;Failed to extract `started_at` from `_prisma_migrations` row.&quot;</span>.<span class="ident">into</span>(),
+                        logs: <span class="prelude-val">None</span>,
+                        rolled_back_at: row.get(<span class="string">&quot;rolled_back_at&quot;</span>).and_then(|v| v.as_datetime()),
+                        started_at: row.get(<span class="string">&quot;started_at&quot;</span>).and_then(|v| v.as_datetime()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                <span class="string">&quot;Failed to extract `started_at` from `_prisma_migrations` row.&quot;</span>.into(),
                             )
                         })<span class="question-mark">?</span>,
-                        <span class="ident">applied_steps_count</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;applied_steps_count&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_integer</span>()).<span class="ident">ok_or_else</span>(
-                            <span class="op">|</span><span class="op">|</span> {
-                                <span class="ident">ConnectorError::from_msg</span>(
-                                    <span class="string">&quot;Failed to extract `applied_steps_count` from `_prisma_migrations` row.&quot;</span>.<span class="ident">into</span>(),
+                        applied_steps_count: row.get(<span class="string">&quot;applied_steps_count&quot;</span>).and_then(|v| v.as_integer()).ok_or_else(
+                            || {
+                                ConnectorError::from_msg(
+                                    <span class="string">&quot;Failed to extract `applied_steps_count` from `_prisma_migrations` row.&quot;</span>.into(),
                                 )
                             },
-                        )<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">u32</span>,
+                        )<span class="question-mark">? </span><span class="kw">as </span>u32,
                     })
                 })
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
-            <span class="macro">tracing::debug!</span>(<span class="string">&quot;Found {} migrations in the migrations table.&quot;</span>, <span class="ident">rows</span>.<span class="ident">len</span>());
+            <span class="macro">tracing::debug!</span>(<span class="string">&quot;Found {} migrations in the migrations table.&quot;</span>, rows.len());
 
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">rows</span>))
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(rows))
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">query</span>: <span class="ident">quaint::ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>query&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        query: quaint::ast::Query&lt;<span class="lifetime">&#39;a</span>&gt;,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;quaint::prelude::ResultSet&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">query_raw</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">quaint::prelude::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>],
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>query_raw&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        sql: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[quaint::prelude::Value&lt;<span class="lifetime">&#39;a</span>&gt;],
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;quaint::prelude::ResultSet&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">raw_cmd</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>raw_cmd&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;()&gt;&gt;;
 
-    <span class="doccomment">/// Drop the database and recreate it empty.</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Drop the database and recreate it empty.
+    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt;;
 
-    <span class="doccomment">/// Optionally scan a migration script that could have been altered by users and emit warnings.</span>
-    <span class="kw">fn</span> <span class="ident">scan_migration_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {}
+    <span class="doccomment">/// Optionally scan a migration script that could have been altered by users and emit warnings.
+    </span><span class="kw">fn </span>scan_migration_script(<span class="kw-2">&amp;</span><span class="self">self</span>, _script: <span class="kw-2">&amp;</span>str) {}
 
-    <span class="doccomment">/// Apply the given migration history to a shadow database, and return</span>
-    <span class="doccomment">/// the final introspected SQL schema. The third parameter is an optional shadow database url</span>
-    <span class="doccomment">/// in case there is one at this point of the command, but not earlier in set_params().</span>
-    <span class="kw">fn</span> <span class="ident">sql_schema_from_migration_history</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">migrations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">MigrationDirectory</span>],
-        <span class="ident">shadow_database_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Apply the given migration history to a shadow database, and return
+    /// the final introspected SQL schema. The third parameter is an optional shadow database url
+    /// in case there is one at this point of the command, but not earlier in set_params().
+    </span><span class="kw">fn </span>sql_schema_from_migration_history&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        migrations: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[MigrationDirectory],
+        shadow_database_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;SqlSchema&gt;&gt;;
 
-    <span class="doccomment">/// Receive and validate connector params.</span>
-    <span class="kw">fn</span> <span class="ident">set_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">connector_params</span>: <span class="ident">ConnectorParams</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="doccomment">/// Receive and validate connector params.
+    </span><span class="kw">fn </span>set_params(<span class="kw-2">&amp;mut </span><span class="self">self</span>, connector_params: ConnectorParams) -&gt; ConnectorResult&lt;()&gt;;
 
-    <span class="doccomment">/// Sets the preview features. This is currently useful for MultiSchema, as we want to</span>
-    <span class="doccomment">/// grab the namespaces we&#39;re expected to diff/work on, which are generally set in</span>
-    <span class="doccomment">/// the schema.</span>
-    <span class="doccomment">/// WARNING: This may silently not do anything if the connector is in the initial state.</span>
-    <span class="doccomment">/// If this is ever a problem, considering returning an indicator of success.</span>
-    <span class="kw">fn</span> <span class="ident">set_preview_features</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">psl::PreviewFeature</span><span class="op">&gt;</span>);
+    <span class="doccomment">/// Sets the preview features. This is currently useful for MultiSchema, as we want to
+    /// grab the namespaces we&#39;re expected to diff/work on, which are generally set in
+    /// the schema.
+    /// WARNING: This may silently not do anything if the connector is in the initial state.
+    /// If this is ever a problem, considering returning an indicator of success.
+    </span><span class="kw">fn </span>set_preview_features(<span class="kw-2">&amp;mut </span><span class="self">self</span>, preview_features: BitFlags&lt;psl::PreviewFeature&gt;);
 
-    <span class="doccomment">/// Table to store applied migrations.</span>
-    <span class="kw">fn</span> <span class="ident">migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="kw">crate</span>::MIGRATIONS_TABLE_NAME</span>.<span class="ident">into</span>()
+    <span class="doccomment">/// Table to store applied migrations.
+    </span><span class="kw">fn </span>migrations_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Table&lt;<span class="lifetime">&#39;static</span>&gt; {
+        <span class="kw">crate</span>::MIGRATIONS_TABLE_NAME.into()
     }
 
-    <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>version(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;&gt;;
 }
 
-<span class="comment">// Utility function shared by multiple flavours to compare shadow database and main connection.</span>
-<span class="kw">fn</span> <span class="ident">validate_connection_infos_do_not_match</span>(<span class="ident">previous</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">next</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">previous</span> <span class="op">==</span> <span class="ident">next</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;The shadow database you configured appears to be the same as the main database. Please specify another shadow database.&quot;</span>.<span class="ident">into</span>()))
-    } <span class="kw">else</span> {
+<span class="comment">// Utility function shared by multiple flavours to compare shadow database and main connection.
+</span><span class="kw">fn </span>validate_connection_infos_do_not_match(previous: <span class="kw-2">&amp;</span>str, next: <span class="kw-2">&amp;</span>str) -&gt; ConnectorResult&lt;()&gt; {
+    <span class="kw">if </span>previous == next {
+        <span class="prelude-val">Err</span>(ConnectorError::from_msg(<span class="string">&quot;The shadow database you configured appears to be the same as the main database. Please specify another shadow database.&quot;</span>.into()))
+    } <span class="kw">else </span>{
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="doccomment">/// Remove all usage of non-enabled preview feature elements from the SqlSchema.</span>
-<span class="kw">fn</span> <span class="ident">normalize_sql_schema</span>(<span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>) {
-    <span class="comment">// Remove this when the feature is GA</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
-        <span class="ident">sql_schema</span>.<span class="ident">make_fulltext_indexes_normal</span>();
+<span class="doccomment">/// Remove all usage of non-enabled preview feature elements from the SqlSchema.
+</span><span class="kw">fn </span>normalize_sql_schema(sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema, preview_features: BitFlags&lt;PreviewFeature&gt;) {
+    <span class="comment">// Remove this when the feature is GA
+    </span><span class="kw">if </span>!preview_features.contains(PreviewFeature::FullTextIndex) {
+        sql_schema.make_fulltext_indexes_normal();
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::MultiSchema</span>) {
-        <span class="ident">sql_schema</span>.<span class="ident">clear_namespaces</span>();
+    <span class="kw">if </span>!preview_features.contains(PreviewFeature::MultiSchema) {
+        sql_schema.clear_namespaces();
     }
 }
 
-<span class="kw">fn</span> <span class="ident">quaint_error_to_connector_error</span>(<span class="ident">error</span>: <span class="ident">quaint::error::Error</span>, <span class="ident">connection_info</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectionInfo</span>) -&gt; <span class="ident">ConnectorError</span> {
-    <span class="kw">match</span> <span class="ident">user_facing_errors::quaint::render_quaint_error</span>(<span class="ident">error</span>.<span class="ident">kind</span>(), <span class="ident">connection_info</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">user_facing_error</span>) =&gt; <span class="ident">user_facing_error</span>.<span class="ident">into</span>(),
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">error</span>
-                .<span class="ident">original_message</span>()
-                .<span class="ident">map</span>(<span class="ident">String::from</span>)
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">error</span>.<span class="ident">to_string</span>());
-            <span class="ident">ConnectorError::from_msg</span>(<span class="ident">msg</span>)
+<span class="kw">fn </span>quaint_error_to_connector_error(error: quaint::error::Error, connection_info: <span class="kw-2">&amp;</span>ConnectionInfo) -&gt; ConnectorError {
+    <span class="kw">match </span>user_facing_errors::quaint::render_quaint_error(error.kind(), connection_info) {
+        <span class="prelude-val">Some</span>(user_facing_error) =&gt; user_facing_error.into(),
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="kw">let </span>msg = error
+                .original_message()
+                .map(String::from)
+                .unwrap_or_else(|| error.to_string());
+            ConnectorError::from_msg(msg)
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

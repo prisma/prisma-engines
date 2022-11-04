@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-stream-0.3.3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../async_stream/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../async_stream/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../async_stream/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-stream-0.3.3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../async_stream/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../async_stream/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../async_stream/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -243,250 +243,250 @@
 <span id="243">243</span>
 <span id="244">244</span>
 <span id="245">245</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">warn</span>(
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">unreachable_pub</span>
-)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">no_crate_inject</span>, <span class="ident">attr</span>(<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>))))]</span>
+</pre><pre class="rust"><code><span class="attribute">#![warn(
+    missing_debug_implementations,
+    missing_docs,
+    rust_2018_idioms,
+    unreachable_pub
+)]
+#![doc(test(no_crate_inject, attr(deny(rust_2018_idioms))))]
 
-<span class="doccomment">//! Asynchronous stream of elements.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Provides two macros, `stream!` and `try_stream!`, allowing the caller to</span>
-<span class="doccomment">//! define asynchronous streams of elements. These are implemented using `async`</span>
-<span class="doccomment">//! &amp; `await` notation. This crate works without unstable features.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `stream!` macro returns an anonymous type implementing the [`Stream`]</span>
-<span class="doccomment">//! trait. The `Item` associated type is the type of the values yielded from the</span>
-<span class="doccomment">//! stream. The `try_stream!` also returns an anonymous type implementing the</span>
-<span class="doccomment">//! [`Stream`] trait, but the `Item` associated type is `Result&lt;T, Error&gt;`. The</span>
-<span class="doccomment">//! `try_stream!` macro supports using `?` notiation as part of the</span>
-<span class="doccomment">//! implementation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Usage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A basic stream yielding numbers. Values are yielded using the `yield`</span>
-<span class="doccomment">//! keyword. The stream block must return `()`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use async_stream::stream;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! use futures_util::pin_mut;</span>
-<span class="doccomment">//! use futures_util::stream::StreamExt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[tokio::main]</span>
-<span class="doccomment">//! async fn main() {</span>
-<span class="doccomment">//!     let s = stream! {</span>
-<span class="doccomment">//!         for i in 0..3 {</span>
-<span class="doccomment">//!             yield i;</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     pin_mut!(s); // needed for iteration</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     while let Some(value) = s.next().await {</span>
-<span class="doccomment">//!         println!(&quot;got {}&quot;, value);</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Streams may be returned by using `impl Stream&lt;Item = T&gt;`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use async_stream::stream;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! use futures_core::stream::Stream;</span>
-<span class="doccomment">//! use futures_util::pin_mut;</span>
-<span class="doccomment">//! use futures_util::stream::StreamExt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn zero_to_three() -&gt; impl Stream&lt;Item = u32&gt; {</span>
-<span class="doccomment">//!     stream! {</span>
-<span class="doccomment">//!         for i in 0..3 {</span>
-<span class="doccomment">//!             yield i;</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[tokio::main]</span>
-<span class="doccomment">//! async fn main() {</span>
-<span class="doccomment">//!     let s = zero_to_three();</span>
-<span class="doccomment">//!     pin_mut!(s); // needed for iteration</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     while let Some(value) = s.next().await {</span>
-<span class="doccomment">//!         println!(&quot;got {}&quot;, value);</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Streams may be implemented in terms of other streams - `async-stream` provides `for await`</span>
-<span class="doccomment">//! syntax to assist with this:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use async_stream::stream;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! use futures_core::stream::Stream;</span>
-<span class="doccomment">//! use futures_util::pin_mut;</span>
-<span class="doccomment">//! use futures_util::stream::StreamExt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn zero_to_three() -&gt; impl Stream&lt;Item = u32&gt; {</span>
-<span class="doccomment">//!     stream! {</span>
-<span class="doccomment">//!         for i in 0..3 {</span>
-<span class="doccomment">//!             yield i;</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn double&lt;S: Stream&lt;Item = u32&gt;&gt;(input: S)</span>
-<span class="doccomment">//!     -&gt; impl Stream&lt;Item = u32&gt;</span>
-<span class="doccomment">//! {</span>
-<span class="doccomment">//!     stream! {</span>
-<span class="doccomment">//!         for await value in input {</span>
-<span class="doccomment">//!             yield value * 2;</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[tokio::main]</span>
-<span class="doccomment">//! async fn main() {</span>
-<span class="doccomment">//!     let s = double(zero_to_three());</span>
-<span class="doccomment">//!     pin_mut!(s); // needed for iteration</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     while let Some(value) = s.next().await {</span>
-<span class="doccomment">//!         println!(&quot;got {}&quot;, value);</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Rust try notation (`?`) can be used with the `try_stream!` macro. The `Item`</span>
-<span class="doccomment">//! of the returned stream is `Result` with `Ok` being the value yielded and</span>
-<span class="doccomment">//! `Err` the error type returned by `?`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use tokio::net::{TcpListener, TcpStream};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! use async_stream::try_stream;</span>
-<span class="doccomment">//! use futures_core::stream::Stream;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! use std::io;</span>
-<span class="doccomment">//! use std::net::SocketAddr;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn bind_and_accept(addr: SocketAddr)</span>
-<span class="doccomment">//!     -&gt; impl Stream&lt;Item = io::Result&lt;TcpStream&gt;&gt;</span>
-<span class="doccomment">//! {</span>
-<span class="doccomment">//!     try_stream! {</span>
-<span class="doccomment">//!         let mut listener = TcpListener::bind(addr).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!         loop {</span>
-<span class="doccomment">//!             let (stream, addr) = listener.accept().await?;</span>
-<span class="doccomment">//!             println!(&quot;received on {:?}&quot;, addr);</span>
-<span class="doccomment">//!             yield stream;</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Implementation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `stream!` and `try_stream!` macros are implemented using proc macros.</span>
-<span class="doccomment">//! The macro searches the syntax tree for instances of `sender.send($expr)` and</span>
-<span class="doccomment">//! transforms them into `sender.send($expr).await`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The stream uses a lightweight sender to send values from the stream</span>
-<span class="doccomment">//! implementation to the caller. When entering the stream, an `Option&lt;T&gt;` is</span>
-<span class="doccomment">//! stored on the stack. A pointer to the cell is stored in a thread local and</span>
-<span class="doccomment">//! `poll` is called on the async block. When `poll` returns.</span>
-<span class="doccomment">//! `sender.send(value)` stores the value that cell and yields back to the</span>
-<span class="doccomment">//! caller.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Stream`]: https://docs.rs/futures-core/*/futures_core/stream/trait.Stream.html</span>
+</span><span class="doccomment">//! Asynchronous stream of elements.
+//!
+//! Provides two macros, `stream!` and `try_stream!`, allowing the caller to
+//! define asynchronous streams of elements. These are implemented using `async`
+//! &amp; `await` notation. This crate works without unstable features.
+//!
+//! The `stream!` macro returns an anonymous type implementing the [`Stream`]
+//! trait. The `Item` associated type is the type of the values yielded from the
+//! stream. The `try_stream!` also returns an anonymous type implementing the
+//! [`Stream`] trait, but the `Item` associated type is `Result&lt;T, Error&gt;`. The
+//! `try_stream!` macro supports using `?` notiation as part of the
+//! implementation.
+//!
+//! # Usage
+//!
+//! A basic stream yielding numbers. Values are yielded using the `yield`
+//! keyword. The stream block must return `()`.
+//!
+//! ```rust
+//! use async_stream::stream;
+//!
+//! use futures_util::pin_mut;
+//! use futures_util::stream::StreamExt;
+//!
+//! #[tokio::main]
+//! async fn main() {
+//!     let s = stream! {
+//!         for i in 0..3 {
+//!             yield i;
+//!         }
+//!     };
+//!
+//!     pin_mut!(s); // needed for iteration
+//!
+//!     while let Some(value) = s.next().await {
+//!         println!(&quot;got {}&quot;, value);
+//!     }
+//! }
+//! ```
+//!
+//! Streams may be returned by using `impl Stream&lt;Item = T&gt;`:
+//!
+//! ```rust
+//! use async_stream::stream;
+//!
+//! use futures_core::stream::Stream;
+//! use futures_util::pin_mut;
+//! use futures_util::stream::StreamExt;
+//!
+//! fn zero_to_three() -&gt; impl Stream&lt;Item = u32&gt; {
+//!     stream! {
+//!         for i in 0..3 {
+//!             yield i;
+//!         }
+//!     }
+//! }
+//!
+//! #[tokio::main]
+//! async fn main() {
+//!     let s = zero_to_three();
+//!     pin_mut!(s); // needed for iteration
+//!
+//!     while let Some(value) = s.next().await {
+//!         println!(&quot;got {}&quot;, value);
+//!     }
+//! }
+//! ```
+//!
+//! Streams may be implemented in terms of other streams - `async-stream` provides `for await`
+//! syntax to assist with this:
+//!
+//! ```rust
+//! use async_stream::stream;
+//!
+//! use futures_core::stream::Stream;
+//! use futures_util::pin_mut;
+//! use futures_util::stream::StreamExt;
+//!
+//! fn zero_to_three() -&gt; impl Stream&lt;Item = u32&gt; {
+//!     stream! {
+//!         for i in 0..3 {
+//!             yield i;
+//!         }
+//!     }
+//! }
+//!
+//! fn double&lt;S: Stream&lt;Item = u32&gt;&gt;(input: S)
+//!     -&gt; impl Stream&lt;Item = u32&gt;
+//! {
+//!     stream! {
+//!         for await value in input {
+//!             yield value * 2;
+//!         }
+//!     }
+//! }
+//!
+//! #[tokio::main]
+//! async fn main() {
+//!     let s = double(zero_to_three());
+//!     pin_mut!(s); // needed for iteration
+//!
+//!     while let Some(value) = s.next().await {
+//!         println!(&quot;got {}&quot;, value);
+//!     }
+//! }
+//! ```
+//!
+//! Rust try notation (`?`) can be used with the `try_stream!` macro. The `Item`
+//! of the returned stream is `Result` with `Ok` being the value yielded and
+//! `Err` the error type returned by `?`.
+//!
+//! ```rust
+//! use tokio::net::{TcpListener, TcpStream};
+//!
+//! use async_stream::try_stream;
+//! use futures_core::stream::Stream;
+//!
+//! use std::io;
+//! use std::net::SocketAddr;
+//!
+//! fn bind_and_accept(addr: SocketAddr)
+//!     -&gt; impl Stream&lt;Item = io::Result&lt;TcpStream&gt;&gt;
+//! {
+//!     try_stream! {
+//!         let mut listener = TcpListener::bind(addr).await?;
+//!
+//!         loop {
+//!             let (stream, addr) = listener.accept().await?;
+//!             println!(&quot;received on {:?}&quot;, addr);
+//!             yield stream;
+//!         }
+//!     }
+//! }
+//! ```
+//!
+//! # Implementation
+//!
+//! The `stream!` and `try_stream!` macros are implemented using proc macros.
+//! The macro searches the syntax tree for instances of `sender.send($expr)` and
+//! transforms them into `sender.send($expr).await`.
+//!
+//! The stream uses a lightweight sender to send values from the stream
+//! implementation to the caller. When entering the stream, an `Option&lt;T&gt;` is
+//! stored on the stack. A pointer to the cell is stored in a thread local and
+//! `poll` is called on the async block. When `poll` returns.
+//! `sender.send(value)` stores the value that cell and yields back to the
+//! caller.
+//!
+//! [`Stream`]: https://docs.rs/futures-core/*/futures_core/stream/trait.Stream.html
 
-<span class="kw">mod</span> <span class="ident">async_stream</span>;
-<span class="kw">mod</span> <span class="ident">next</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">yielder</span>;
+</span><span class="kw">mod </span>async_stream;
+<span class="kw">mod </span>next;
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub mod </span>yielder;
 
-<span class="comment">// Used by the macro, but not intended to be accessed publicly.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::async_stream::AsyncStream</span>;
+<span class="comment">// Used by the macro, but not intended to be accessed publicly.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::async_stream::AsyncStream;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">async_stream_impl</span>;
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub use </span>async_stream_impl;
 
-<span class="doccomment">/// Asynchronous stream</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [crate](index.html) documentation for more details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use async_stream::stream;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// use futures_util::pin_mut;</span>
-<span class="doccomment">/// use futures_util::stream::StreamExt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[tokio::main]</span>
-<span class="doccomment">/// async fn main() {</span>
-<span class="doccomment">///     let s = stream! {</span>
-<span class="doccomment">///         for i in 0..3 {</span>
-<span class="doccomment">///             yield i;</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///     };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     pin_mut!(s); // needed for iteration</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     while let Some(value) = s.next().await {</span>
-<span class="doccomment">///         println!(&quot;got {}&quot;, value);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">stream</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::async_stream_impl::stream_inner!</span>((<span class="macro-nonterminal">$</span><span class="kw">crate</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="kw-2">*</span>)
+<span class="doccomment">/// Asynchronous stream
+///
+/// See [crate](index.html) documentation for more details.
+///
+/// # Examples
+///
+/// ```
+/// use async_stream::stream;
+///
+/// use futures_util::pin_mut;
+/// use futures_util::stream::StreamExt;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let s = stream! {
+///         for i in 0..3 {
+///             yield i;
+///         }
+///     };
+///
+///     pin_mut!(s); // needed for iteration
+///
+///     while let Some(value) = s.next().await {
+///         println!(&quot;got {}&quot;, value);
+///     }
+/// }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>stream {
+    ($(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::async_stream_impl::stream_inner!</span>((<span class="macro-nonterminal">$</span><span class="kw">crate</span>) $(<span class="macro-nonterminal">$tt</span>)<span class="kw-2">*</span>)
     }
 }
 
-<span class="doccomment">/// Asynchronous fallible stream</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [crate](index.html) documentation for more details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tokio::net::{TcpListener, TcpStream};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// use async_stream::try_stream;</span>
-<span class="doccomment">/// use futures_core::stream::Stream;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// use std::io;</span>
-<span class="doccomment">/// use std::net::SocketAddr;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn bind_and_accept(addr: SocketAddr)</span>
-<span class="doccomment">///     -&gt; impl Stream&lt;Item = io::Result&lt;TcpStream&gt;&gt;</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     try_stream! {</span>
-<span class="doccomment">///         let mut listener = TcpListener::bind(addr).await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///         loop {</span>
-<span class="doccomment">///             let (stream, addr) = listener.accept().await?;</span>
-<span class="doccomment">///             println!(&quot;received on {:?}&quot;, addr);</span>
-<span class="doccomment">///             yield stream;</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">try_stream</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::async_stream_impl::try_stream_inner!</span>((<span class="macro-nonterminal">$</span><span class="kw">crate</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="kw-2">*</span>)
+<span class="doccomment">/// Asynchronous fallible stream
+///
+/// See [crate](index.html) documentation for more details.
+///
+/// # Examples
+///
+/// ```
+/// use tokio::net::{TcpListener, TcpStream};
+///
+/// use async_stream::try_stream;
+/// use futures_core::stream::Stream;
+///
+/// use std::io;
+/// use std::net::SocketAddr;
+///
+/// fn bind_and_accept(addr: SocketAddr)
+///     -&gt; impl Stream&lt;Item = io::Result&lt;TcpStream&gt;&gt;
+/// {
+///     try_stream! {
+///         let mut listener = TcpListener::bind(addr).await?;
+///
+///         loop {
+///             let (stream, addr) = listener.accept().await?;
+///             println!(&quot;received on {:?}&quot;, addr);
+///             yield stream;
+///         }
+///     }
+/// }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>try_stream {
+    ($(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::async_stream_impl::try_stream_inner!</span>((<span class="macro-nonterminal">$</span><span class="kw">crate</span>) $(<span class="macro-nonterminal">$tt</span>)<span class="kw-2">*</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">reexport</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::next::next</span>;
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub mod </span>reexport {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::next::next;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="async_stream" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="async_stream" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

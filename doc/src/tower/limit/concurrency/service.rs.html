@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/limit/concurrency/service.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>service.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tower/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/limit/concurrency/service.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>service.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tower/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -117,124 +117,124 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::future::ResponseFuture</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">OwnedSemaphorePermit</span>, <span class="ident">Semaphore</span>};
-<span class="kw">use</span> <span class="ident">tokio_util::sync::PollSemaphore</span>;
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::future::ResponseFuture;
+<span class="kw">use </span>tokio::sync::{OwnedSemaphorePermit, Semaphore};
+<span class="kw">use </span>tokio_util::sync::PollSemaphore;
+<span class="kw">use </span>tower_service::Service;
 
-<span class="kw">use</span> <span class="ident">futures_core::ready</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+<span class="kw">use </span>futures_core::ready;
+<span class="kw">use </span>std::{
+    sync::Arc,
+    task::{Context, Poll},
 };
 
-<span class="doccomment">/// Enforces a limit on the concurrent number of requests the underlying</span>
-<span class="doccomment">/// service can handle.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConcurrencyLimit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">T</span>,
-    <span class="ident">semaphore</span>: <span class="ident">PollSemaphore</span>,
-    <span class="doccomment">/// The currently acquired semaphore permit, if there is sufficient</span>
-    <span class="doccomment">/// concurrency to send a new request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The permit is acquired in `poll_ready`, and taken in `call` when sending</span>
-    <span class="doccomment">/// a new request.</span>
-    <span class="ident">permit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedSemaphorePermit</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Enforces a limit on the concurrent number of requests the underlying
+/// service can handle.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ConcurrencyLimit&lt;T&gt; {
+    inner: T,
+    semaphore: PollSemaphore,
+    <span class="doccomment">/// The currently acquired semaphore permit, if there is sufficient
+    /// concurrency to send a new request.
+    ///
+    /// The permit is acquired in `poll_ready`, and taken in `call` when sending
+    /// a new request.
+    </span>permit: <span class="prelude-ty">Option</span>&lt;OwnedSemaphorePermit&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ConcurrencyLimit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new concurrency limiter.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">T</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::with_semaphore</span>(<span class="ident">inner</span>, <span class="ident">Arc::new</span>(<span class="ident">Semaphore::new</span>(<span class="ident">max</span>)))
+<span class="kw">impl</span>&lt;T&gt; ConcurrencyLimit&lt;T&gt; {
+    <span class="doccomment">/// Create a new concurrency limiter.
+    </span><span class="kw">pub fn </span>new(inner: T, max: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::with_semaphore(inner, Arc::new(Semaphore::new(max)))
     }
 
-    <span class="doccomment">/// Create a new concurrency limiter with a provided shared semaphore</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_semaphore</span>(<span class="ident">inner</span>: <span class="ident">T</span>, <span class="ident">semaphore</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Semaphore</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ConcurrencyLimit</span> {
-            <span class="ident">inner</span>,
-            <span class="ident">semaphore</span>: <span class="ident">PollSemaphore::new</span>(<span class="ident">semaphore</span>),
-            <span class="ident">permit</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Create a new concurrency limiter with a provided shared semaphore
+    </span><span class="kw">pub fn </span>with_semaphore(inner: T, semaphore: Arc&lt;Semaphore&gt;) -&gt; <span class="self">Self </span>{
+        ConcurrencyLimit {
+            inner,
+            semaphore: PollSemaphore::new(semaphore),
+            permit: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Get a reference to the inner service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
+    <span class="doccomment">/// Get a reference to the inner service
+    </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner
     }
 
-    <span class="doccomment">/// Get a mutable reference to the inner service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>
+    <span class="doccomment">/// Get a mutable reference to the inner service
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner
     }
 
-    <span class="doccomment">/// Consume `self`, returning the inner service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>
+    <span class="doccomment">/// Consume `self`, returning the inner service
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; T {
+        <span class="self">self</span>.inner
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConcurrencyLimit</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, Request&gt; Service&lt;Request&gt; <span class="kw">for </span>ConcurrencyLimit&lt;S&gt;
+<span class="kw">where
+    </span>S: Service&lt;Request&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">S::Response</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ResponseFuture</span><span class="op">&lt;</span><span class="ident">S::Future</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Response = S::Response;
+    <span class="kw">type </span>Error = S::Error;
+    <span class="kw">type </span>Future = ResponseFuture&lt;S::Future&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// If we haven&#39;t already acquired a permit from the semaphore, try to</span>
-        <span class="comment">// acquire one first.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">permit</span>.<span class="ident">is_none</span>() {
-            <span class="self">self</span>.<span class="ident">permit</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">semaphore</span>.<span class="ident">poll_acquire</span>(<span class="ident">cx</span>));
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="comment">// If we haven&#39;t already acquired a permit from the semaphore, try to
+        // acquire one first.
+        </span><span class="kw">if </span><span class="self">self</span>.permit.is_none() {
+            <span class="self">self</span>.permit = <span class="macro">ready!</span>(<span class="self">self</span>.semaphore.poll_acquire(cx));
             <span class="macro">debug_assert!</span>(
-                <span class="self">self</span>.<span class="ident">permit</span>.<span class="ident">is_some</span>(),
+                <span class="self">self</span>.permit.is_some(),
                 <span class="string">&quot;ConcurrencyLimit semaphore is never closed, so `poll_acquire` \
                  should never fail&quot;</span>,
             );
         }
 
-        <span class="comment">// Once we&#39;ve acquired a permit (or if we already had one), poll the</span>
-        <span class="comment">// inner service.</span>
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
+        <span class="comment">// Once we&#39;ve acquired a permit (or if we already had one), poll the
+        // inner service.
+        </span><span class="self">self</span>.inner.poll_ready(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">Request</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="comment">// Take the permit</span>
-        <span class="kw">let</span> <span class="ident">permit</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">permit</span>
-            .<span class="ident">take</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;max requests in-flight; poll_ready must be called first&quot;</span>);
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request: Request) -&gt; <span class="self">Self</span>::Future {
+        <span class="comment">// Take the permit
+        </span><span class="kw">let </span>permit = <span class="self">self
+            </span>.permit
+            .take()
+            .expect(<span class="string">&quot;max requests in-flight; poll_ready must be called first&quot;</span>);
 
-        <span class="comment">// Call the inner service</span>
-        <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">call</span>(<span class="ident">request</span>);
+        <span class="comment">// Call the inner service
+        </span><span class="kw">let </span>future = <span class="self">self</span>.inner.call(request);
 
-        <span class="ident">ResponseFuture::new</span>(<span class="ident">future</span>, <span class="ident">permit</span>)
+        ResponseFuture::new(future, permit)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">ConcurrencyLimit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// Since we hold an `OwnedSemaphorePermit`, we can&#39;t derive `Clone`.</span>
-        <span class="comment">// Instead, when cloning the service, create a new service with the</span>
-        <span class="comment">// same semaphore, but with the permit in the un-acquired state.</span>
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(),
-            <span class="ident">semaphore</span>: <span class="self">self</span>.<span class="ident">semaphore</span>.<span class="ident">clone</span>(),
-            <span class="ident">permit</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;T: Clone&gt; Clone <span class="kw">for </span>ConcurrencyLimit&lt;T&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="comment">// Since we hold an `OwnedSemaphorePermit`, we can&#39;t derive `Clone`.
+        // Instead, when cloning the service, create a new service with the
+        // same semaphore, but with the permit in the un-acquired state.
+        </span><span class="self">Self </span>{
+            inner: <span class="self">self</span>.inner.clone(),
+            semaphore: <span class="self">self</span>.semaphore.clone(),
+            permit: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::load::Load</span> <span class="kw">for</span> <span class="ident">ConcurrencyLimit</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident"><span class="kw">crate</span>::load::Load</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;load&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;load&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;S&gt; <span class="kw">crate</span>::load::Load <span class="kw">for </span>ConcurrencyLimit&lt;S&gt;
+<span class="kw">where
+    </span>S: <span class="kw">crate</span>::load::Load,
 {
-    <span class="kw">type</span> <span class="ident">Metric</span> <span class="op">=</span> <span class="ident">S::Metric</span>;
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Metric</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">load</span>()
+    <span class="kw">type </span>Metric = S::Metric;
+    <span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Metric {
+        <span class="self">self</span>.inner.load()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

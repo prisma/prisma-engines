@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/codec/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/codec/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -81,86 +81,86 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Generic encoding and decoding.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module contains the generic `Codec`, `Encoder` and `Decoder` traits</span>
-<span class="doccomment">//! and a protobuf codec based on prost.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Generic encoding and decoding.
+//!
+//! This module contains the generic `Codec`, `Encoder` and `Decoder` traits
+//! and a protobuf codec based on prost.
 
-<span class="kw">mod</span> <span class="ident">buffer</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">compression</span>;
-<span class="kw">mod</span> <span class="ident">decode</span>;
-<span class="kw">mod</span> <span class="ident">encode</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;prost&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">prost</span>;
+</span><span class="kw">mod </span>buffer;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>compression;
+<span class="kw">mod </span>decode;
+<span class="kw">mod </span>encode;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;prost&quot;</span>)]
+</span><span class="kw">mod </span>prost;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Status</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Status;
+<span class="kw">use </span>std::io;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::encode</span>::{<span class="ident">encode_client</span>, <span class="ident">encode_server</span>};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::encode::{encode_client, encode_server};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::buffer</span>::{<span class="ident">DecodeBuf</span>, <span class="ident">EncodeBuf</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::compression</span>::{<span class="ident">CompressionEncoding</span>, <span class="ident">EnabledCompressionEncodings</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::decode::Streaming</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;prost&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;prost&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::prost::ProstCodec</span>;
+<span class="kw">pub use </span><span class="self">self</span>::buffer::{DecodeBuf, EncodeBuf};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;compression&quot;</span>)))]
+</span><span class="kw">pub use </span><span class="self">self</span>::compression::{CompressionEncoding, EnabledCompressionEncodings};
+<span class="kw">pub use </span><span class="self">self</span>::decode::Streaming;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;prost&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;prost&quot;</span>)))]
+</span><span class="kw">pub use </span><span class="self">self</span>::prost::ProstCodec;
 
-<span class="comment">// 5 bytes</span>
-<span class="kw">const</span> <span class="ident">HEADER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span>
-    <span class="comment">// compression flag</span>
-    <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>() <span class="op">+</span>
-    <span class="comment">// data length</span>
-    <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>();
+<span class="comment">// 5 bytes
+</span><span class="kw">const </span>HEADER_SIZE: usize =
+    <span class="comment">// compression flag
+    </span>std::mem::size_of::&lt;u8&gt;() +
+    <span class="comment">// data length
+    </span>std::mem::size_of::&lt;u32&gt;();
 
-<span class="doccomment">/// Trait that knows how to encode and decode gRPC messages.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Codec</span>: <span class="ident">Default</span> {
-    <span class="doccomment">/// The encodable message.</span>
-    <span class="kw">type</span> <span class="ident">Encode</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
-    <span class="doccomment">/// The decodable message.</span>
-    <span class="kw">type</span> <span class="ident">Decode</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+<span class="doccomment">/// Trait that knows how to encode and decode gRPC messages.
+</span><span class="kw">pub trait </span>Codec: Default {
+    <span class="doccomment">/// The encodable message.
+    </span><span class="kw">type </span>Encode: Send + <span class="lifetime">&#39;static</span>;
+    <span class="doccomment">/// The decodable message.
+    </span><span class="kw">type </span>Decode: Send + <span class="lifetime">&#39;static</span>;
 
-    <span class="doccomment">/// The encoder that can encode a message.</span>
-    <span class="kw">type</span> <span class="ident">Encoder</span>: <span class="ident">Encoder</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Encode</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
-    <span class="doccomment">/// The encoder that can decode a message.</span>
-    <span class="kw">type</span> <span class="ident">Decoder</span>: <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Decode</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+    <span class="doccomment">/// The encoder that can encode a message.
+    </span><span class="kw">type </span>Encoder: Encoder&lt;Item = <span class="self">Self</span>::Encode, Error = Status&gt; + Send + <span class="lifetime">&#39;static</span>;
+    <span class="doccomment">/// The encoder that can decode a message.
+    </span><span class="kw">type </span>Decoder: Decoder&lt;Item = <span class="self">Self</span>::Decode, Error = Status&gt; + Send + <span class="lifetime">&#39;static</span>;
 
-    <span class="doccomment">/// Fetch the encoder.</span>
-    <span class="kw">fn</span> <span class="ident">encoder</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Encoder</span>;
-    <span class="doccomment">/// Fetch the decoder.</span>
-    <span class="kw">fn</span> <span class="ident">decoder</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Decoder</span>;
+    <span class="doccomment">/// Fetch the encoder.
+    </span><span class="kw">fn </span>encoder(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Encoder;
+    <span class="doccomment">/// Fetch the decoder.
+    </span><span class="kw">fn </span>decoder(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Decoder;
 }
 
-<span class="doccomment">/// Encodes gRPC message types</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Encoder</span> {
-    <span class="doccomment">/// The type that is encoded.</span>
-    <span class="kw">type</span> <span class="ident">Item</span>;
+<span class="doccomment">/// Encodes gRPC message types
+</span><span class="kw">pub trait </span>Encoder {
+    <span class="doccomment">/// The type that is encoded.
+    </span><span class="kw">type </span>Item;
 
-    <span class="doccomment">/// The type of encoding errors.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The type of unrecoverable frame encoding errors.</span>
-    <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// The type of encoding errors.
+    ///
+    /// The type of unrecoverable frame encoding errors.
+    </span><span class="kw">type </span>Error: From&lt;io::Error&gt;;
 
-    <span class="doccomment">/// Encodes a message into the provided buffer.</span>
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EncodeBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Encodes a message into the provided buffer.
+    </span><span class="kw">fn </span>encode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="self">Self</span>::Item, dst: <span class="kw-2">&amp;mut </span>EncodeBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;;
 }
 
-<span class="doccomment">/// Decodes gRPC message types</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Decoder</span> {
-    <span class="doccomment">/// The type that is decoded.</span>
-    <span class="kw">type</span> <span class="ident">Item</span>;
+<span class="doccomment">/// Decodes gRPC message types
+</span><span class="kw">pub trait </span>Decoder {
+    <span class="doccomment">/// The type that is decoded.
+    </span><span class="kw">type </span>Item;
 
-    <span class="doccomment">/// The type of unrecoverable frame decoding errors.</span>
-    <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// The type of unrecoverable frame decoding errors.
+    </span><span class="kw">type </span>Error: From&lt;io::Error&gt;;
 
-    <span class="doccomment">/// Decode a message from the buffer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The buffer will contain exactly the bytes of a full message. There</span>
-    <span class="doccomment">/// is no need to get the length from the bytes, gRPC framing is handled</span>
-    <span class="doccomment">/// for you.</span>
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DecodeBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Decode a message from the buffer.
+    ///
+    /// The buffer will contain exactly the bytes of a full message. There
+    /// is no need to get the length from the bytes, gRPC framing is handled
+    /// for you.
+    </span><span class="kw">fn </span>decode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, src: <span class="kw-2">&amp;mut </span>DecodeBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;, <span class="self">Self</span>::Error&gt;;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

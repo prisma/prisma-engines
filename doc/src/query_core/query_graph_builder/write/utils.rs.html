@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1073,1080 +1073,1080 @@
 <span id="1073">1073</span>
 <span id="1074">1074</span>
 <span id="1075">1075</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">query_ast</span>::<span class="kw-2">*</span>,
-    <span class="ident">query_graph</span>::{<span class="ident">Flow</span>, <span class="ident">Node</span>, <span class="ident">NodeRef</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
-    <span class="ident">ParsedInputValue</span>, <span class="ident">QueryGraphBuilderError</span>, <span class="ident">QueryGraphBuilderResult</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    query_ast::<span class="kw-2">*</span>,
+    query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
+    ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">DatasourceFieldName</span>, <span class="ident">Filter</span>, <span class="ident">RecordFilter</span>, <span class="ident">WriteArgs</span>, <span class="ident">WriteOperation</span>};
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">SelectionResult</span>};
-<span class="kw">use</span> <span class="ident">psl::dml::ReferentialAction</span>;
-<span class="kw">use</span> <span class="ident">schema::ConnectorContext</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOperation};
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
+<span class="kw">use </span>psl::dml::ReferentialAction;
+<span class="kw">use </span>schema::ConnectorContext;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="doccomment">/// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.</span>
-<span class="doccomment">/// Simply unpacks `ParsedInputValue::List`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coerce_vec</span>(<span class="ident">val</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="ident">ParsedInputValue::List</span>(<span class="ident">l</span>) =&gt; <span class="ident">l</span>,
-        <span class="ident">m</span> @ <span class="ident">ParsedInputValue::Map</span>(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">m</span>],
-        <span class="ident">single</span> =&gt; <span class="macro">vec!</span>[<span class="ident">single</span>],
+<span class="doccomment">/// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
+/// Simply unpacks `ParsedInputValue::List`.
+</span><span class="kw">pub fn </span>coerce_vec(val: ParsedInputValue) -&gt; Vec&lt;ParsedInputValue&gt; {
+    <span class="kw">match </span>val {
+        ParsedInputValue::List(l) =&gt; l,
+        m @ ParsedInputValue::Map(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[m],
+        single =&gt; <span class="macro">vec!</span>[single],
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_is_create</span>(<span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="ident">QueryGraph</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">bool</span> {
+<span class="kw">pub fn </span>node_is_create(graph: <span class="kw-2">&amp;</span>QueryGraph, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; bool {
     <span class="macro">matches!</span>(
-        <span class="ident">graph</span>.<span class="ident">node_content</span>(<span class="ident">node</span>).<span class="ident">unwrap</span>(),
-        <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::CreateRecord</span>(<span class="kw">_</span>)))
+        graph.node_content(node).unwrap(),
+        Node::Query(Query::Write(WriteQuery::CreateRecord(<span class="kw">_</span>)))
     )
 }
 
-<span class="doccomment">/// Produces a non-failing read query that fetches the requested selection of records for a given filterable.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_ids_infallible</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">model</span>: <span class="ident">ModelRef</span>, <span class="ident">selection</span>: <span class="ident">FieldSelection</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Query</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Produces a non-failing read query that fetches the requested selection of records for a given filterable.
+</span><span class="kw">pub fn </span>read_ids_infallible&lt;T&gt;(model: ModelRef, selection: FieldSelection, filter: T) -&gt; Query
+<span class="kw">where
+    </span>T: Into&lt;Filter&gt;,
 {
-    <span class="kw">let</span> <span class="ident">selected_fields</span> <span class="op">=</span> <span class="ident">get_selected_fields</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">selection</span>);
-    <span class="kw">let</span> <span class="ident">filter</span>: <span class="ident">Filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
+    <span class="kw">let </span>selected_fields = get_selected_fields(<span class="kw-2">&amp;</span>model, selection);
+    <span class="kw">let </span>filter: Filter = filter.into();
 
-    <span class="kw">let</span> <span class="ident">read_query</span> <span class="op">=</span> <span class="ident">ReadQuery::ManyRecordsQuery</span>(<span class="ident">ManyRecordsQuery</span> {
-        <span class="ident">name</span>: <span class="string">&quot;read_ids_infallible&quot;</span>.<span class="ident">into</span>(), <span class="comment">// this name only eases debugging</span>
-        <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-        <span class="ident">model</span>: <span class="ident">model</span>.<span class="ident">clone</span>(),
-        <span class="ident">args</span>: (<span class="ident">model</span>, <span class="ident">filter</span>).<span class="ident">into</span>(),
-        <span class="ident">selected_fields</span>,
-        <span class="ident">nested</span>: <span class="macro">vec!</span>[],
-        <span class="ident">selection_order</span>: <span class="macro">vec!</span>[],
-        <span class="ident">aggregation_selections</span>: <span class="macro">vec!</span>[],
+    <span class="kw">let </span>read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
+        name: <span class="string">&quot;read_ids_infallible&quot;</span>.into(), <span class="comment">// this name only eases debugging
+        </span>alias: <span class="prelude-val">None</span>,
+        model: model.clone(),
+        args: (model, filter).into(),
+        selected_fields,
+        nested: <span class="macro">vec!</span>[],
+        selection_order: <span class="macro">vec!</span>[],
+        aggregation_selections: <span class="macro">vec!</span>[],
     });
 
-    <span class="ident">Query::Read</span>(<span class="ident">read_query</span>)
+    Query::Read(read_query)
 }
 
-<span class="kw">fn</span> <span class="ident">get_selected_fields</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">selection</span>: <span class="ident">FieldSelection</span>) -&gt; <span class="ident">FieldSelection</span> {
-    <span class="comment">// Always fetch the primary identifier as well.</span>
-    <span class="kw">let</span> <span class="ident">primary_model_id</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>();
+<span class="kw">fn </span>get_selected_fields(model: <span class="kw-2">&amp;</span>ModelRef, selection: FieldSelection) -&gt; FieldSelection {
+    <span class="comment">// Always fetch the primary identifier as well.
+    </span><span class="kw">let </span>primary_model_id = model.primary_identifier();
 
-    <span class="kw">if</span> <span class="ident">selection</span> <span class="op">!</span><span class="op">=</span> <span class="ident">primary_model_id</span> {
-        <span class="ident">primary_model_id</span>.<span class="ident">merge</span>(<span class="ident">selection</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">selection</span>
+    <span class="kw">if </span>selection != primary_model_id {
+        primary_model_id.merge(selection)
+    } <span class="kw">else </span>{
+        selection
     }
 }
 
-<span class="doccomment">/// Adds a read query to the query graph that finds related records by parent ID.</span>
-<span class="doccomment">/// Connects the parent node and the read node with an edge, which takes care of the</span>
-<span class="doccomment">/// node transformation based on the parent ID.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Optionally, a filter can be passed that narrows down the child selection.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns a `NodeRef` to the newly created read node.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐</span>
-<span class="doccomment">///       Parent</span>
-<span class="doccomment">/// └ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">///          │</span>
-<span class="doccomment">///          ▼</span>
-<span class="doccomment">/// ┌─────────────────┐</span>
-<span class="doccomment">/// │  Read Children  │</span>
-<span class="doccomment">/// └─────────────────┘</span>
-<span class="doccomment">///```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Example</span>
-<span class="doccomment">/// Given two models, `Blog` and `Post`, where a blog has many posts, and a post has one block.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the caller wants to query posts by blog ID:</span>
-<span class="doccomment">/// - `parent_node` needs to return a blog ID during execution.</span>
-<span class="doccomment">/// - `parent_relation_field` is the field on the `Blog` model, e.g. `posts`.</span>
-<span class="doccomment">/// - `filter` narrows down posts, e.g. posts where their titles start with a given string.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_find_children_by_parent_node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">filter</span>: <span class="ident">T</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Adds a read query to the query graph that finds related records by parent ID.
+/// Connects the parent node and the read node with an edge, which takes care of the
+/// node transformation based on the parent ID.
+///
+/// Optionally, a filter can be passed that narrows down the child selection.
+///
+/// Returns a `NodeRef` to the newly created read node.
+///
+/// ```text
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///       Parent
+/// └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///          │
+///          ▼
+/// ┌─────────────────┐
+/// │  Read Children  │
+/// └─────────────────┘
+///```
+///
+/// ## Example
+/// Given two models, `Blog` and `Post`, where a blog has many posts, and a post has one block.
+///
+/// If the caller wants to query posts by blog ID:
+/// - `parent_node` needs to return a blog ID during execution.
+/// - `parent_relation_field` is the field on the `Blog` model, e.g. `posts`.
+/// - `filter` narrows down posts, e.g. posts where their titles start with a given string.
+</span><span class="kw">pub fn </span>insert_find_children_by_parent_node&lt;T&gt;(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    filter: T,
+) -&gt; QueryGraphBuilderResult&lt;NodeRef&gt;
+<span class="kw">where
+    </span>T: Into&lt;Filter&gt;,
 {
-    <span class="kw">let</span> <span class="ident">parent_model_id</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> <span class="ident">parent_linking_fields</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">linking_fields</span>();
-    <span class="kw">let</span> <span class="ident">selection</span> <span class="op">=</span> <span class="ident">parent_model_id</span>.<span class="ident">merge</span>(<span class="ident">parent_linking_fields</span>);
-    <span class="kw">let</span> <span class="ident">child_model</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>();
+    <span class="kw">let </span>parent_model_id = parent_relation_field.model().primary_identifier();
+    <span class="kw">let </span>parent_linking_fields = parent_relation_field.linking_fields();
+    <span class="kw">let </span>selection = parent_model_id.merge(parent_linking_fields);
+    <span class="kw">let </span>child_model = parent_relation_field.related_model();
 
-    <span class="kw">let</span> <span class="ident">selected_fields</span> <span class="op">=</span> <span class="ident">get_selected_fields</span>(
-        <span class="kw-2">&amp;</span><span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>(),
-        <span class="ident">parent_relation_field</span>.<span class="ident">related_field</span>().<span class="ident">linking_fields</span>(),
+    <span class="kw">let </span>selected_fields = get_selected_fields(
+        <span class="kw-2">&amp;</span>parent_relation_field.related_model(),
+        parent_relation_field.related_field().linking_fields(),
     );
 
-    <span class="kw">let</span> <span class="ident">read_children_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Read</span>(<span class="ident">ReadQuery::RelatedRecordsQuery</span>(<span class="ident">RelatedRecordsQuery</span> {
-        <span class="ident">name</span>: <span class="string">&quot;find_children_by_parent&quot;</span>.<span class="ident">to_owned</span>(),
-        <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-        <span class="ident">parent_field</span>: <span class="ident">Arc::clone</span>(<span class="ident">parent_relation_field</span>),
-        <span class="ident">parent_results</span>: <span class="prelude-val">None</span>,
-        <span class="ident">args</span>: (<span class="ident">child_model</span>, <span class="ident">filter</span>).<span class="ident">into</span>(),
-        <span class="ident">selected_fields</span>,
-        <span class="ident">aggregation_selections</span>: <span class="macro">vec!</span>[],
-        <span class="ident">nested</span>: <span class="macro">vec!</span>[],
-        <span class="ident">selection_order</span>: <span class="macro">vec!</span>[],
+    <span class="kw">let </span>read_children_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
+        name: <span class="string">&quot;find_children_by_parent&quot;</span>.to_owned(),
+        alias: <span class="prelude-val">None</span>,
+        parent_field: Arc::clone(parent_relation_field),
+        parent_results: <span class="prelude-val">None</span>,
+        args: (child_model, filter).into(),
+        selected_fields,
+        aggregation_selections: <span class="macro">vec!</span>[],
+        nested: <span class="macro">vec!</span>[],
+        selection_order: <span class="macro">vec!</span>[],
     })));
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="ident">parent_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">read_children_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">selection</span>,
-            <span class="ident">Box::new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">read_children_node</span>, <span class="ident">selections</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Read</span>(<span class="ident">ReadQuery::RelatedRecordsQuery</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rq</span>))) <span class="op">=</span> <span class="ident">read_children_node</span> {
-                    <span class="ident">rq</span>.<span class="ident">parent_results</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">selections</span>);
+    graph.create_edge(
+        parent_node,
+        <span class="kw-2">&amp;</span>read_children_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            selection,
+            Box::new(|<span class="kw-2">mut </span>read_children_node, selections| {
+                <span class="kw">if let </span>Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(<span class="kw-2">ref mut </span>rq))) = read_children_node {
+                    rq.parent_results = <span class="prelude-val">Some</span>(selections);
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">read_children_node</span>)
+                <span class="prelude-val">Ok</span>(read_children_node)
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">read_children_node</span>)
+    <span class="prelude-val">Ok</span>(read_children_node)
 }
 
-<span class="doccomment">/// Creates an update many records query node and adds it to the query graph.</span>
-<span class="doccomment">/// Used to have a skeleton update node in the graph that can be further transformed during query execution based</span>
-<span class="doccomment">/// on available information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// No edges are created.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_records_node_placeholder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>, <span class="ident">filter</span>: <span class="ident">T</span>, <span class="ident">model</span>: <span class="ident">ModelRef</span>) -&gt; <span class="ident">NodeRef</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Creates an update many records query node and adds it to the query graph.
+/// Used to have a skeleton update node in the graph that can be further transformed during query execution based
+/// on available information.
+///
+/// No edges are created.
+</span><span class="kw">pub fn </span>update_records_node_placeholder&lt;T&gt;(graph: <span class="kw-2">&amp;mut </span>QueryGraph, filter: T, model: ModelRef) -&gt; NodeRef
+<span class="kw">where
+    </span>T: Into&lt;Filter&gt;,
 {
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">WriteArgs::new_empty</span>(<span class="ident"><span class="kw">crate</span>::executor::get_request_now</span>());
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">record_filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
+    <span class="kw">let </span>args = WriteArgs::new_empty(<span class="kw">crate</span>::executor::get_request_now());
+    <span class="kw">let </span>filter = filter.into();
+    <span class="kw">let </span>record_filter = filter.into();
 
-    <span class="kw">let</span> <span class="ident">ur</span> <span class="op">=</span> <span class="ident">UpdateManyRecords</span> {
-        <span class="ident">model</span>,
-        <span class="ident">record_filter</span>,
-        <span class="ident">args</span>,
+    <span class="kw">let </span>ur = UpdateManyRecords {
+        model,
+        record_filter,
+        args,
     };
 
-    <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="ident">ur</span>)))
+    graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(ur)))
 }
 
-<span class="doccomment">/// Inserts checks and disconnects for existing models for a 1:1 relation.</span>
-<span class="doccomment">/// Expects that the parent node returns a valid ID for the model the `parent_relation_field` is located on.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Params:</span>
-<span class="doccomment">/// `parent_node`: Node that provides the parent id for the find query and where the checks are appended to in the graph.</span>
-<span class="doccomment">/// `parent_relation_field`: Field on the parent model to find children.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///           Parent         │</span>
-<span class="doccomment">/// └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///              :</span>
-<span class="doccomment">///              ▼</span>
-<span class="doccomment">/// ┌────────────────────────┐</span>
-<span class="doccomment">/// │      Read related      │──┐</span>
-<span class="doccomment">/// └────────────────────────┘  │</span>
-<span class="doccomment">///              │              │</span>
-<span class="doccomment">///              ▼              │</span>
-<span class="doccomment">/// ┌────────────────────────┐  │</span>
-<span class="doccomment">/// │ If p &gt; 0 &amp;&amp; c. inlined │  │</span>
-<span class="doccomment">/// └────────────────────────┘  │</span>
-<span class="doccomment">///         then │              │</span>
-<span class="doccomment">///              ▼              │</span>
-<span class="doccomment">/// ┌────────────────────────┐  │</span>
-<span class="doccomment">/// │    Update ex. child    │◀─┘</span>
-<span class="doccomment">/// └────────────────────────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The edge between `Read Related` and `If` fails on node count &gt; 0 if child side is required.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// We only need to actually update (&quot;disconnect&quot;) the existing model if</span>
-<span class="doccomment">/// the relation is also inlined on that models side, so we put that check into the if flow.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns a `NodeRef` to the &quot;Read Related&quot; node in the graph illustrated above.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_existing_1to1_related_model_checks</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">child_model_identifier</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> <span class="ident">child_linking_fields</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_field</span>().<span class="ident">linking_fields</span>();
+<span class="doccomment">/// Inserts checks and disconnects for existing models for a 1:1 relation.
+/// Expects that the parent node returns a valid ID for the model the `parent_relation_field` is located on.
+///
+/// Params:
+/// `parent_node`: Node that provides the parent id for the find query and where the checks are appended to in the graph.
+/// `parent_relation_field`: Field on the parent model to find children.
+///
+/// ```text
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///           Parent         │
+/// └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///              :
+///              ▼
+/// ┌────────────────────────┐
+/// │      Read related      │──┐
+/// └────────────────────────┘  │
+///              │              │
+///              ▼              │
+/// ┌────────────────────────┐  │
+/// │ If p &gt; 0 &amp;&amp; c. inlined │  │
+/// └────────────────────────┘  │
+///         then │              │
+///              ▼              │
+/// ┌────────────────────────┐  │
+/// │    Update ex. child    │◀─┘
+/// └────────────────────────┘
+/// ```
+///
+/// The edge between `Read Related` and `If` fails on node count &gt; 0 if child side is required.
+///
+/// We only need to actually update (&quot;disconnect&quot;) the existing model if
+/// the relation is also inlined on that models side, so we put that check into the if flow.
+///
+/// Returns a `NodeRef` to the &quot;Read Related&quot; node in the graph illustrated above.
+</span><span class="kw">pub fn </span>insert_existing_1to1_related_model_checks(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+) -&gt; QueryGraphBuilderResult&lt;NodeRef&gt; {
+    <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    <span class="kw">let </span>child_linking_fields = parent_relation_field.related_field().linking_fields();
 
-    <span class="kw">let</span> <span class="ident">child_model</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>();
-    <span class="kw">let</span> <span class="ident">child_side_required</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_field</span>().<span class="ident">is_required</span>();
-    <span class="kw">let</span> <span class="ident">relation_inlined_parent</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation_is_inlined_in_parent</span>();
-    <span class="kw">let</span> <span class="ident">rf</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">parent_relation_field</span>);
+    <span class="kw">let </span>child_model = parent_relation_field.related_model();
+    <span class="kw">let </span>child_side_required = parent_relation_field.related_field().is_required();
+    <span class="kw">let </span>relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
+    <span class="kw">let </span>rf = Arc::clone(<span class="kw-2">&amp;</span>parent_relation_field);
 
-    <span class="comment">// Note: Also creates the edge between `parent` and the new node.</span>
-    <span class="kw">let</span> <span class="ident">read_existing_children</span> <span class="op">=</span>
-        <span class="ident">insert_find_children_by_parent_node</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">parent_relation_field</span>, <span class="ident">Filter::empty</span>())<span class="question-mark">?</span>;
+    <span class="comment">// Note: Also creates the edge between `parent` and the new node.
+    </span><span class="kw">let </span>read_existing_children =
+        insert_find_children_by_parent_node(graph, <span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>parent_relation_field, Filter::empty())<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">update_existing_child</span> <span class="op">=</span> <span class="ident">update_records_node_placeholder</span>(<span class="ident">graph</span>, <span class="ident">Filter::empty</span>(), <span class="ident">child_model</span>);
-    <span class="kw">let</span> <span class="ident">if_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Flow::default_if</span>());
+    <span class="kw">let </span>update_existing_child = update_records_node_placeholder(graph, Filter::empty(), child_model);
+    <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">read_existing_children</span>,
-        <span class="kw-2">&amp;</span><span class="ident">if_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">child_model_identifier</span>.<span class="ident">clone</span>(),
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">if_node</span>, <span class="ident">child_ids</span><span class="op">|</span> {
-                <span class="comment">// If the other side (&quot;child&quot;) requires the connection, we need to make sure that there isn&#39;t a child already connected</span>
-                <span class="comment">// to the parent, as that would violate the other childs relation side.</span>
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">child_ids</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">child_side_required</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RelationViolation</span>(<span class="ident">rf</span>.<span class="ident">into</span>()));
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>read_existing_children,
+        <span class="kw-2">&amp;</span>if_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier.clone(),
+            Box::new(<span class="kw">move </span>|if_node, child_ids| {
+                <span class="comment">// If the other side (&quot;child&quot;) requires the connection, we need to make sure that there isn&#39;t a child already connected
+                // to the parent, as that would violate the other childs relation side.
+                </span><span class="kw">if </span>!child_ids.is_empty() &amp;&amp; child_side_required {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(QueryGraphBuilderError::RelationViolation(rf.into()));
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Flow</span>(<span class="ident">Flow::If</span>(<span class="kw">_</span>)) <span class="op">=</span> <span class="ident">if_node</span> {
-                    <span class="comment">// If the relation is inlined in the parent, we need to update the old parent and null out the relation (i.e. &quot;disconnect&quot;).</span>
-                    <span class="prelude-val">Ok</span>(<span class="ident">Node::Flow</span>(<span class="ident">Flow::If</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                        <span class="op">!</span><span class="ident">relation_inlined_parent</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">child_ids</span>.<span class="ident">is_empty</span>()
+                <span class="kw">if let </span>Node::Flow(Flow::If(<span class="kw">_</span>)) = if_node {
+                    <span class="comment">// If the relation is inlined in the parent, we need to update the old parent and null out the relation (i.e. &quot;disconnect&quot;).
+                    </span><span class="prelude-val">Ok</span>(Node::Flow(Flow::If(Box::new(<span class="kw">move </span>|| {
+                        !relation_inlined_parent &amp;&amp; !child_ids.is_empty()
                     }))))
-                } <span class="kw">else</span> {
+                } <span class="kw">else </span>{
                     <span class="macro">unreachable!</span>()
                 }
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">if_node</span>, <span class="kw-2">&amp;</span><span class="ident">update_existing_child</span>, <span class="ident">QueryGraphDependency::Then</span>)<span class="question-mark">?</span>;
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">read_existing_children</span>,
-        <span class="kw-2">&amp;</span><span class="ident">update_existing_child</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">child_model_identifier</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_existing_child</span>, <span class="kw-2">mut</span> <span class="ident">child_ids</span><span class="op">|</span> {
-            <span class="comment">// This has to succeed or the if-then node wouldn&#39;t trigger.</span>
-            <span class="kw">let</span> <span class="ident">child_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child_ids</span>.<span class="ident">pop</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">pid</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+    graph.create_edge(<span class="kw-2">&amp;</span>if_node, <span class="kw-2">&amp;</span>update_existing_child, QueryGraphDependency::Then)<span class="question-mark">?</span>;
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>read_existing_children,
+        <span class="kw-2">&amp;</span>update_existing_child,
+        QueryGraphDependency::ProjectedDataDependency(child_model_identifier, Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>update_existing_child, <span class="kw-2">mut </span>child_ids| {
+            <span class="comment">// This has to succeed or the if-then node wouldn&#39;t trigger.
+            </span><span class="kw">let </span>child_id = <span class="kw">match </span>child_ids.pop() {
+                <span class="prelude-val">Some</span>(pid) =&gt; <span class="prelude-val">Ok</span>(pid),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(<span class="macro">format!</span>(
                     <span class="string">&quot;No parent record (needed to update the previous parent) was found for a nested connect on relation &#39;{}&#39; .&quot;</span>,
-                    <span class="ident">relation_name</span>
+                    relation_name
                 ))),
             }<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>)) <span class="op">=</span> <span class="ident">update_existing_child</span> {
-                <span class="ident">wq</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">SelectionResult::from</span>(<span class="kw-2">&amp;</span><span class="ident">child_linking_fields</span>));
+            <span class="kw">if let </span>Node::Query(Query::Write(<span class="kw-2">ref mut </span>wq)) = update_existing_child {
+                wq.inject_result_into_args(SelectionResult::from(<span class="kw-2">&amp;</span>child_linking_fields));
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">ur</span>))) <span class="op">=</span> <span class="ident">update_existing_child</span> {
-                <span class="ident">ur</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="ident">child_id</span>.<span class="ident">into</span>();
+            <span class="kw">if let </span>Node::Query(Query::Write(WriteQuery::UpdateManyRecords(<span class="kw-2">ref mut </span>ur))) = update_existing_child {
+                ur.record_filter = child_id.into();
             }
 
-            <span class="prelude-val">Ok</span>(<span class="ident">update_existing_child</span>)
+            <span class="prelude-val">Ok</span>(update_existing_child)
          })))<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">read_existing_children</span>)
+    <span class="prelude-val">Ok</span>(read_existing_children)
 }
 
-<span class="doccomment">/// Inserts emulated referential actions for `onDelete` into the graph.</span>
-<span class="doccomment">/// All relations that refer to the `model` row(s) being deleted are checked for their desired emulation and inserted accordingly.</span>
-<span class="doccomment">/// Right now, supported modes are `Restrict` and `SetNull` (cascade will follow).</span>
-<span class="doccomment">/// Those checks fail at runtime and are inserted between `parent_node` and `child_node`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function is usually part of a delete (`deleteOne` or `deleteMany`).</span>
-<span class="doccomment">/// Expects `parent_node` to return one or more IDs (for records of `model`) to be checked.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Resulting graph (all emulations):</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///            Parent       │</span>
-<span class="doccomment">/// ┌ ─│  (ids to delete)    ─────────────────┬─────────────────────────────┬────────────────────────────────────────┐</span>
-<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘                 │                             │                                        │</span>
-<span class="doccomment">/// │             │                           │                             │                                        │</span>
-<span class="doccomment">///               ▼                           ▼                             ▼                                        ▼</span>
-<span class="doccomment">/// │  ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐</span>
-<span class="doccomment">///    │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│</span>
-<span class="doccomment">/// │  │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │</span>
-<span class="doccomment">///    └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘</span>
-<span class="doccomment">/// │             │                           │               │             │                          │             │</span>
-<span class="doccomment">///        Fail if│&gt; 0                 Fail if│&gt; 0            │             ▼                          │             │</span>
-<span class="doccomment">/// │             │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼</span>
-<span class="doccomment">///               ▼                           ▼               │  ┌────────────────────┐ │              │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │  ┌────────────────────┐      ┌────────────────────┐     ││ │  Insert onUpdate   │                │  ┌────────────────────┐ │</span>
-<span class="doccomment">///    │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onDelete   │</span>
-<span class="doccomment">/// │  └────────────────────┘      └────────────────────┘     ││ │for relations using │                │  │ emulation subtree  │ │</span>
-<span class="doccomment">///               │                           │               │  │the foreign key that│ │              ││ │ for all relations  │</span>
-<span class="doccomment">/// │             │                           │               ││ │    was updated.    │                │  │   pointing to D.   │ │</span>
-<span class="doccomment">///               │                           │               │  └────────────────────┘ │              ││ └────────────────────┘</span>
-<span class="doccomment">/// │             │                           │               │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">///               │                           │               │             │                          │             │</span>
-<span class="doccomment">/// │             │                           │               │             │                          │             │</span>
-<span class="doccomment">///               ▼                           │               │             ▼                          │             ▼</span>
-<span class="doccomment">/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐</span>
-<span class="doccomment">///  ─▶        Delete       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Delete Cs      │</span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘</span>
-<span class="doccomment">///               ▲                                              └────────────────────┘                              │</span>
-<span class="doccomment">///               │                                                         │                                        │</span>
-<span class="doccomment">///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_emulated_on_delete</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">model_to_delete</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="comment">// If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.</span>
-    <span class="kw">if</span> <span class="ident">connector_ctx</span>.<span class="ident">relation_mode</span>.<span class="ident">uses_foreign_keys</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+<span class="doccomment">/// Inserts emulated referential actions for `onDelete` into the graph.
+/// All relations that refer to the `model` row(s) being deleted are checked for their desired emulation and inserted accordingly.
+/// Right now, supported modes are `Restrict` and `SetNull` (cascade will follow).
+/// Those checks fail at runtime and are inserted between `parent_node` and `child_node`.
+///
+/// This function is usually part of a delete (`deleteOne` or `deleteMany`).
+/// Expects `parent_node` to return one or more IDs (for records of `model`) to be checked.
+///
+/// Resulting graph (all emulations):
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+/// ┌ ─│  (ids to delete)    ─────────────────┬─────────────────────────────┬────────────────────────────────────────┐
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘                 │                             │                                        │
+/// │             │                           │                             │                                        │
+///               ▼                           ▼                             ▼                                        ▼
+/// │  ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐
+///    │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│
+/// │  │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │
+///    └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘
+/// │             │                           │               │             │                          │             │
+///        Fail if│&gt; 0                 Fail if│&gt; 0            │             ▼                          │             │
+/// │             │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼
+///               ▼                           ▼               │  ┌────────────────────┐ │              │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// │  ┌────────────────────┐      ┌────────────────────┐     ││ │  Insert onUpdate   │                │  ┌────────────────────┐ │
+///    │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onDelete   │
+/// │  └────────────────────┘      └────────────────────┘     ││ │for relations using │                │  │ emulation subtree  │ │
+///               │                           │               │  │the foreign key that│ │              ││ │ for all relations  │
+/// │             │                           │               ││ │    was updated.    │                │  │   pointing to D.   │ │
+///               │                           │               │  └────────────────────┘ │              ││ └────────────────────┘
+/// │             │                           │               │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │                           │               │             │                          │             │
+/// │             │                           │               │             │                          │             │
+///               ▼                           │               │             ▼                          │             ▼
+/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐
+///  ─▶        Delete       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Delete Cs      │
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘
+///               ▲                                              └────────────────────┘                              │
+///               │                                                         │                                        │
+///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘
+/// ```
+</span><span class="kw">pub fn </span>insert_emulated_on_delete(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    model_to_delete: <span class="kw-2">&amp;</span>ModelRef,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    child_node: <span class="kw-2">&amp;</span>NodeRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="comment">// If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
+    </span><span class="kw">if </span>connector_ctx.relation_mode.uses_foreign_keys() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
 
-    <span class="comment">// If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.</span>
-    <span class="kw">let</span> <span class="ident">internal_model</span> <span class="op">=</span> <span class="ident">model_to_delete</span>.<span class="ident">internal_data_model</span>();
-    <span class="kw">let</span> <span class="ident">relation_fields</span> <span class="op">=</span> <span class="ident">internal_model</span>.<span class="ident">fields_pointing_to_model</span>(<span class="ident">model_to_delete</span>, <span class="bool-val">false</span>);
+    <span class="comment">// If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
+    </span><span class="kw">let </span>internal_model = model_to_delete.internal_data_model();
+    <span class="kw">let </span>relation_fields = internal_model.fields_pointing_to_model(model_to_delete, <span class="bool-val">false</span>);
 
-    <span class="kw">for</span> <span class="ident">rf</span> <span class="kw">in</span> <span class="ident">relation_fields</span> {
-        <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">relation</span>().<span class="ident">on_delete</span>() {
-            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="kw">continue</span>, <span class="comment">// Explicitly do nothing.</span>
-            <span class="ident">ReferentialAction::Restrict</span> =&gt; <span class="ident">emulate_on_delete_restrict</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="ident">parent_node</span>, <span class="ident">child_node</span>)<span class="question-mark">?</span>,
-            <span class="ident">ReferentialAction::SetNull</span> =&gt; {
-                <span class="ident">emulate_on_delete_set_null</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="ident">parent_node</span>, <span class="ident">child_node</span>)<span class="question-mark">?</span>
-            }
-            <span class="ident">ReferentialAction::Cascade</span> =&gt; {
-                <span class="ident">emulate_on_delete_cascade</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="ident">connector_ctx</span>, <span class="ident">model_to_delete</span>, <span class="ident">parent_node</span>, <span class="ident">child_node</span>)<span class="question-mark">?</span>
-            }
-            <span class="ident">x</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported referential action emulation: {}&quot;</span>, <span class="ident">x</span>),
+    <span class="kw">for </span>rf <span class="kw">in </span>relation_fields {
+        <span class="kw">match </span>rf.relation().on_delete() {
+            ReferentialAction::NoAction =&gt; <span class="kw">continue</span>, <span class="comment">// Explicitly do nothing.
+            </span>ReferentialAction::Restrict =&gt; emulate_on_delete_restrict(graph, <span class="kw-2">&amp;</span>rf, parent_node, child_node)<span class="question-mark">?</span>,
+            ReferentialAction::SetNull =&gt; {
+                emulate_on_delete_set_null(graph, connector_ctx, <span class="kw-2">&amp;</span>rf, parent_node, child_node)<span class="question-mark">?
+            </span>}
+            ReferentialAction::Cascade =&gt; {
+                emulate_on_delete_cascade(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, model_to_delete, parent_node, child_node)<span class="question-mark">?
+            </span>}
+            x =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported referential action emulation: {}&quot;</span>, x),
         }
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Inserts restrict emulations into the graph between `parent_node` and `child_node`.</span>
-<span class="doccomment">/// `relation_field` is the relation field pointing to the model to be deleted/updated.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///            Parent       │</span>
-<span class="doccomment">/// ┌ ─│  (ids to del/upd)</span>
-<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">/// │             │</span>
-<span class="doccomment">///               ▼</span>
-<span class="doccomment">/// │  ┌────────────────────┐</span>
-<span class="doccomment">///    │Find Connected Model│</span>
-<span class="doccomment">/// │  │     (Restrict)     │</span>
-<span class="doccomment">///    └────────────────────┘</span>
-<span class="doccomment">/// │             │</span>
-<span class="doccomment">///        Fail if│&gt; 0</span>
-<span class="doccomment">/// │             │</span>
-<span class="doccomment">///               ▼</span>
-<span class="doccomment">/// │  ┌────────────────────┐</span>
-<span class="doccomment">///    │       Empty        │</span>
-<span class="doccomment">/// │  └────────────────────┘</span>
-<span class="doccomment">///               │</span>
-<span class="doccomment">/// │             ▼</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// └ ▶   Delete / Update   │</span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emulate_on_delete_restrict</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">noop_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Node::Empty</span>);
-    <span class="kw">let</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">related_field</span>();
-    <span class="kw">let</span> <span class="ident">child_model_identifier</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> <span class="ident">read_node</span> <span class="op">=</span> <span class="ident">insert_find_children_by_parent_node</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">relation_field</span>, <span class="ident">Filter::empty</span>())<span class="question-mark">?</span>;
+<span class="doccomment">/// Inserts restrict emulations into the graph between `parent_node` and `child_node`.
+/// `relation_field` is the relation field pointing to the model to be deleted/updated.
+///
+///
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+/// ┌ ─│  (ids to del/upd)
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │             │
+///               ▼
+/// │  ┌────────────────────┐
+///    │Find Connected Model│
+/// │  │     (Restrict)     │
+///    └────────────────────┘
+/// │             │
+///        Fail if│&gt; 0
+/// │             │
+///               ▼
+/// │  ┌────────────────────┐
+///    │       Empty        │
+/// │  └────────────────────┘
+///               │
+/// │             ▼
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// └ ▶   Delete / Update   │
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// ```
+</span><span class="kw">pub fn </span>emulate_on_delete_restrict(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    child_node: <span class="kw-2">&amp;</span>NodeRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span>noop_node = graph.create_node(Node::Empty);
+    <span class="kw">let </span>relation_field = relation_field.related_field();
+    <span class="kw">let </span>child_model_identifier = relation_field.related_model().primary_identifier();
+    <span class="kw">let </span>read_node = insert_find_children_by_parent_node(graph, parent_node, <span class="kw-2">&amp;</span>relation_field, Filter::empty())<span class="question-mark">?</span>;
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">read_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">noop_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">child_model_identifier</span>,
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">noop_node</span>, <span class="ident">child_ids</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">child_ids</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RelationViolation</span>((<span class="ident">relation_field</span>).<span class="ident">into</span>()));
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>read_node,
+        <span class="kw-2">&amp;</span>noop_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier,
+            Box::new(<span class="kw">move </span>|noop_node, child_ids| {
+                <span class="kw">if </span>!child_ids.is_empty() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(QueryGraphBuilderError::RelationViolation((relation_field).into()));
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">noop_node</span>)
+                <span class="prelude-val">Ok</span>(noop_node)
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="comment">// Edge from empty node to the child (delete).</span>
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">noop_node</span>, <span class="ident">child_node</span>, <span class="ident">QueryGraphDependency::ExecutionOrder</span>)<span class="question-mark">?</span>;
+    <span class="comment">// Edge from empty node to the child (delete).
+    </span>graph.create_edge(<span class="kw-2">&amp;</span>noop_node, child_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Inserts cascade emulations into the graph between `parent_node` and `child_node`.</span>
-<span class="doccomment">/// `relation_field` is the relation field pointing to the model to be deleted.</span>
-<span class="doccomment">/// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///            Parent       │</span>
-<span class="doccomment">///    │  (ids to delete)    ─ ┐</span>
-<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">///               │            │</span>
-<span class="doccomment">///               ▼</span>
-<span class="doccomment">///    ┌────────────────────┐  │</span>
-<span class="doccomment">///    │Find Connected Model│</span>
-<span class="doccomment">/// ┌──│     (Cascade)      │  │</span>
-<span class="doccomment">/// │  └────────────────────┘</span>
-<span class="doccomment">/// │             │            │</span>
-<span class="doccomment">/// │             ▼</span>
-<span class="doccomment">/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │</span>
-<span class="doccomment">/// │  ┌────────────────────┐ │</span>
-<span class="doccomment">/// ││ │  Insert onDelete   │  │</span>
-<span class="doccomment">/// │  │ emulation subtree  │ │</span>
-<span class="doccomment">/// ││ │ for all relations  │  │</span>
-<span class="doccomment">/// │  │  pointing to the   │ │</span>
-<span class="doccomment">/// ││ │  Connected Model.  │  │</span>
-<span class="doccomment">/// │  └────────────────────┘ │</span>
-<span class="doccomment">/// │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │</span>
-<span class="doccomment">/// │             │</span>
-<span class="doccomment">/// │             ▼            │</span>
-<span class="doccomment">/// │  ┌────────────────────┐</span>
-<span class="doccomment">/// └─▶│  Delete children   │  │</span>
-<span class="doccomment">///    └────────────────────┘</span>
-<span class="doccomment">///               │            │</span>
-<span class="doccomment">///               ▼</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │</span>
-<span class="doccomment">///            Delete       │◀─</span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emulate_on_delete_cascade</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>, <span class="comment">// This is the field _on the other model_ for cascade.</span>
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">dependent_model</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">model</span>();
-    <span class="kw">let</span> <span class="ident">parent_relation_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">related_field</span>();
-    <span class="kw">let</span> <span class="ident">child_model_identifier</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
+<span class="doccomment">/// Inserts cascade emulations into the graph between `parent_node` and `child_node`.
+/// `relation_field` is the relation field pointing to the model to be deleted.
+/// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.
+///
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+///    │  (ids to delete)    ─ ┐
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │            │
+///               ▼
+///    ┌────────────────────┐  │
+///    │Find Connected Model│
+/// ┌──│     (Cascade)      │  │
+/// │  └────────────────────┘
+/// │             │            │
+/// │             ▼
+/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │  ┌────────────────────┐ │
+/// ││ │  Insert onDelete   │  │
+/// │  │ emulation subtree  │ │
+/// ││ │ for all relations  │  │
+/// │  │  pointing to the   │ │
+/// ││ │  Connected Model.  │  │
+/// │  └────────────────────┘ │
+/// │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │             │
+/// │             ▼            │
+/// │  ┌────────────────────┐
+/// └─▶│  Delete children   │  │
+///    └────────────────────┘
+///               │            │
+///               ▼
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+///            Delete       │◀─
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// ```
+</span><span class="kw">pub fn </span>emulate_on_delete_cascade(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    relation_field: <span class="kw-2">&amp;</span>RelationFieldRef, <span class="comment">// This is the field _on the other model_ for cascade.
+    </span>connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    _model: <span class="kw-2">&amp;</span>ModelRef,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    child_node: <span class="kw-2">&amp;</span>NodeRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span>dependent_model = relation_field.model();
+    <span class="kw">let </span>parent_relation_field = relation_field.related_field();
+    <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-    <span class="comment">// Records that need to be deleted for the cascade.</span>
-    <span class="kw">let</span> <span class="ident">dependent_records_node</span> <span class="op">=</span>
-        <span class="ident">insert_find_children_by_parent_node</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">parent_relation_field</span>, <span class="ident">Filter::empty</span>())<span class="question-mark">?</span>;
+    <span class="comment">// Records that need to be deleted for the cascade.
+    </span><span class="kw">let </span>dependent_records_node =
+        insert_find_children_by_parent_node(graph, parent_node, <span class="kw-2">&amp;</span>parent_relation_field, Filter::empty())<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">delete_query</span> <span class="op">=</span> <span class="ident">WriteQuery::DeleteManyRecords</span>(<span class="ident">DeleteManyRecords</span> {
-        <span class="ident">model</span>: <span class="ident">dependent_model</span>.<span class="ident">clone</span>(),
-        <span class="ident">record_filter</span>: <span class="ident">RecordFilter::empty</span>(),
+    <span class="kw">let </span>delete_query = WriteQuery::DeleteManyRecords(DeleteManyRecords {
+        model: dependent_model.clone(),
+        record_filter: RecordFilter::empty(),
     });
 
-    <span class="kw">let</span> <span class="ident">delete_dependents_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">delete_query</span>));
+    <span class="kw">let </span>delete_dependents_node = graph.create_node(Query::Write(delete_query));
 
-    <span class="ident">insert_emulated_on_delete</span>(
-        <span class="ident">graph</span>,
-        <span class="ident">connector_ctx</span>,
-        <span class="kw-2">&amp;</span><span class="ident">dependent_model</span>,
-        <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">delete_dependents_node</span>,
+    insert_emulated_on_delete(
+        graph,
+        connector_ctx,
+        <span class="kw-2">&amp;</span>dependent_model,
+        <span class="kw-2">&amp;</span>dependent_records_node,
+        <span class="kw-2">&amp;</span>delete_dependents_node,
     )<span class="question-mark">?</span>;
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">delete_dependents_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">child_model_identifier</span>,
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">delete_dependents_node</span>, <span class="ident">dependent_ids</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::DeleteManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">dmr</span>))) <span class="op">=</span> <span class="ident">delete_dependents_node</span> {
-                    <span class="ident">dmr</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="ident">dependent_ids</span>.<span class="ident">into</span>();
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>dependent_records_node,
+        <span class="kw-2">&amp;</span>delete_dependents_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier,
+            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>delete_dependents_node, dependent_ids| {
+                <span class="kw">if let </span>Node::Query(Query::Write(WriteQuery::DeleteManyRecords(<span class="kw-2">ref mut </span>dmr))) = delete_dependents_node {
+                    dmr.record_filter = dependent_ids.into();
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">delete_dependents_node</span>)
+                <span class="prelude-val">Ok</span>(delete_dependents_node)
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">delete_dependents_node</span>,
-        <span class="ident">child_node</span>,
-        <span class="ident">QueryGraphDependency::ExecutionOrder</span>,
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>delete_dependents_node,
+        child_node,
+        QueryGraphDependency::ExecutionOrder,
     )<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Inserts set null emulations into the graph between `parent_node` and `child_node`.</span>
-<span class="doccomment">/// `relation_field` is the relation field pointing to the model to be deleted.</span>
-<span class="doccomment">/// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///            Parent       │</span>
-<span class="doccomment">///    │  (ids to del/upd)   ─ ┐</span>
-<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">///               │            │</span>
-<span class="doccomment">///               ▼</span>
-<span class="doccomment">///    ┌────────────────────┐  │</span>
-<span class="doccomment">///    │Find Connected Model│</span>
-<span class="doccomment">/// ┌──│     (SetNull)      │  │</span>
-<span class="doccomment">/// │  └────────────────────┘</span>
-<span class="doccomment">/// │             │            │</span>
-<span class="doccomment">/// │             ▼</span>
-<span class="doccomment">/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │</span>
-<span class="doccomment">/// │  ┌────────────────────┐ │</span>
-<span class="doccomment">/// ││ │  Insert onUpdate   │  │</span>
-<span class="doccomment">/// │  │ emulation subtree  │ │</span>
-<span class="doccomment">/// ││ │for relations using │  │</span>
-<span class="doccomment">/// │  │the foreign key that│ │</span>
-<span class="doccomment">/// ││ │    was updated.    │  │</span>
-<span class="doccomment">/// │  └────────────────────┘ │</span>
-<span class="doccomment">/// │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │</span>
-<span class="doccomment">/// │             │</span>
-<span class="doccomment">/// │             ▼            │</span>
-<span class="doccomment">/// │  ┌────────────────────┐</span>
-<span class="doccomment">/// │  │Update children (set│  │</span>
-<span class="doccomment">/// └─▶│      FK null)      │</span>
-<span class="doccomment">///    └────────────────────┘  │</span>
-<span class="doccomment">///               │</span>
-<span class="doccomment">///               ▼            │</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///       Delete / Update   │◀ ┘</span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emulate_on_delete_set_null</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">dependent_model</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">model</span>();
-    <span class="kw">let</span> <span class="ident">parent_relation_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">related_field</span>();
-    <span class="kw">let</span> <span class="ident">child_model_identifier</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> <span class="ident">child_fks</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">relation_field</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-        <span class="ident">relation_field</span>.<span class="ident">scalar_fields</span>()
-    } <span class="kw">else</span> {
-        <span class="ident">relation_field</span>.<span class="ident">related_field</span>().<span class="ident">referenced_fields</span>()
+<span class="doccomment">/// Inserts set null emulations into the graph between `parent_node` and `child_node`.
+/// `relation_field` is the relation field pointing to the model to be deleted.
+/// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.
+///
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+///    │  (ids to del/upd)   ─ ┐
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │            │
+///               ▼
+///    ┌────────────────────┐  │
+///    │Find Connected Model│
+/// ┌──│     (SetNull)      │  │
+/// │  └────────────────────┘
+/// │             │            │
+/// │             ▼
+/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │  ┌────────────────────┐ │
+/// ││ │  Insert onUpdate   │  │
+/// │  │ emulation subtree  │ │
+/// ││ │for relations using │  │
+/// │  │the foreign key that│ │
+/// ││ │    was updated.    │  │
+/// │  └────────────────────┘ │
+/// │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │             │
+/// │             ▼            │
+/// │  ┌────────────────────┐
+/// │  │Update children (set│  │
+/// └─▶│      FK null)      │
+///    └────────────────────┘  │
+///               │
+///               ▼            │
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///       Delete / Update   │◀ ┘
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// ```
+</span><span class="kw">pub fn </span>emulate_on_delete_set_null(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    child_node: <span class="kw-2">&amp;</span>NodeRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span>dependent_model = relation_field.model();
+    <span class="kw">let </span>parent_relation_field = relation_field.related_field();
+    <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    <span class="kw">let </span>child_fks = <span class="kw">if </span>relation_field.is_inlined_on_enclosing_model() {
+        relation_field.scalar_fields()
+    } <span class="kw">else </span>{
+        relation_field.related_field().referenced_fields()
     };
 
-    <span class="kw">let</span> <span class="ident">child_update_args</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">child_fks</span>
-        .<span class="ident">into_iter</span>()
-        <span class="comment">// Only the nullable fks should be updated to null</span>
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">child_fk</span><span class="op">|</span> {
+    <span class="kw">let </span>child_update_args: IndexMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = child_fks
+        .into_iter()
+        <span class="comment">// Only the nullable fks should be updated to null
+        </span>.filter(|sf| !sf.is_required())
+        .map(|child_fk| {
             (
-                <span class="ident">DatasourceFieldName::from</span>(<span class="kw-2">&amp;</span><span class="ident">child_fk</span>),
-                <span class="ident">WriteOperation::scalar_set</span>(<span class="ident">PrismaValue::Null</span>),
+                DatasourceFieldName::from(<span class="kw-2">&amp;</span>child_fk),
+                WriteOperation::scalar_set(PrismaValue::Null),
             )
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="kw">if</span> <span class="ident">child_update_args</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="kw">if </span>child_update_args.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
 
-    <span class="comment">// Records that need to be updated for the cascade.</span>
-    <span class="kw">let</span> <span class="ident">dependent_records_node</span> <span class="op">=</span>
-        <span class="ident">insert_find_children_by_parent_node</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">parent_relation_field</span>, <span class="ident">Filter::empty</span>())<span class="question-mark">?</span>;
+    <span class="comment">// Records that need to be updated for the cascade.
+    </span><span class="kw">let </span>dependent_records_node =
+        insert_find_children_by_parent_node(graph, parent_node, <span class="kw-2">&amp;</span>parent_relation_field, Filter::empty())<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">set_null_query</span> <span class="op">=</span> <span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="ident">UpdateManyRecords</span> {
-        <span class="ident">model</span>: <span class="ident">dependent_model</span>.<span class="ident">clone</span>(),
-        <span class="ident">record_filter</span>: <span class="ident">RecordFilter::empty</span>(),
-        <span class="ident">args</span>: <span class="ident">WriteArgs::new</span>(<span class="ident">child_update_args</span>, <span class="ident"><span class="kw">crate</span>::executor::get_request_now</span>()),
+    <span class="kw">let </span>set_null_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
+        model: dependent_model.clone(),
+        record_filter: RecordFilter::empty(),
+        args: WriteArgs::new(child_update_args, <span class="kw">crate</span>::executor::get_request_now()),
     });
 
-    <span class="kw">let</span> <span class="ident">set_null_dependents_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">set_null_query</span>));
+    <span class="kw">let </span>set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">set_null_dependents_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">child_model_identifier</span>.<span class="ident">clone</span>(),
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">set_null_dependents_node</span>, <span class="ident">dependent_ids</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">dmr</span>))) <span class="op">=</span> <span class="ident">set_null_dependents_node</span>
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>dependent_records_node,
+        <span class="kw-2">&amp;</span>set_null_dependents_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier.clone(),
+            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>set_null_dependents_node, dependent_ids| {
+                <span class="kw">if let </span>Node::Query(Query::Write(WriteQuery::UpdateManyRecords(<span class="kw-2">ref mut </span>dmr))) = set_null_dependents_node
                 {
-                    <span class="ident">dmr</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="ident">dependent_ids</span>.<span class="ident">into</span>();
+                    dmr.record_filter = dependent_ids.into();
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">set_null_dependents_node</span>)
+                <span class="prelude-val">Ok</span>(set_null_dependents_node)
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">set_null_dependents_node</span>,
-        <span class="ident">child_node</span>,
-        <span class="ident">QueryGraphDependency::ExecutionOrder</span>,
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>set_null_dependents_node,
+        child_node,
+        QueryGraphDependency::ExecutionOrder,
     )<span class="question-mark">?</span>;
 
-    <span class="ident">insert_emulated_on_delete</span>(
-        <span class="ident">graph</span>,
-        <span class="ident">connector_ctx</span>,
-        <span class="kw-2">&amp;</span><span class="ident">dependent_model</span>,
-        <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">set_null_dependents_node</span>,
+    insert_emulated_on_delete(
+        graph,
+        connector_ctx,
+        <span class="kw-2">&amp;</span>dependent_model,
+        <span class="kw-2">&amp;</span>dependent_records_node,
+        <span class="kw-2">&amp;</span>set_null_dependents_node,
     )<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Inserts set null emulations into the graph between `parent_node` and `child_node`.</span>
-<span class="doccomment">/// `relation_field` is the relation field pointing to the model to be deleted.</span>
-<span class="doccomment">/// Recurses into the update emulation to ensure that subsequent updates are handled correctly as well.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///            Parent       │</span>
-<span class="doccomment">///    │  (ids to del/upd)   ─ ┐</span>
-<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">///               │            │</span>
-<span class="doccomment">///               ▼</span>
-<span class="doccomment">///    ┌────────────────────┐  │</span>
-<span class="doccomment">///    │Find Connected Model│</span>
-<span class="doccomment">/// ┌──│     (SetNull)      │  │</span>
-<span class="doccomment">/// │  └────────────────────┘</span>
-<span class="doccomment">/// │             │            │</span>
-<span class="doccomment">/// │             ▼</span>
-<span class="doccomment">/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │</span>
-<span class="doccomment">/// │  ┌────────────────────┐  │</span>
-<span class="doccomment">/// ││ │  Insert onUpdate   │  │</span>
-<span class="doccomment">/// │  │ emulation subtree  │  │</span>
-<span class="doccomment">/// ││ │for relations using │  │</span>
-<span class="doccomment">/// │  │the foreign key that│  │</span>
-<span class="doccomment">/// ││ │    was updated.    │  │</span>
-<span class="doccomment">/// │  └────────────────────┘  │</span>
-<span class="doccomment">/// │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │</span>
-<span class="doccomment">/// │             │</span>
-<span class="doccomment">/// │             ▼            │</span>
-<span class="doccomment">/// │  ┌────────────────────┐</span>
-<span class="doccomment">/// │  │Update children (set│  │</span>
-<span class="doccomment">/// └─▶│      FK null)      │</span>
-<span class="doccomment">///    └────────────────────┘  │</span>
-<span class="doccomment">///               │</span>
-<span class="doccomment">///               ▼            │</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///           Update        │◀ ┘</span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emulate_on_update_set_null</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">dependent_model</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">model</span>();
-    <span class="kw">let</span> <span class="ident">parent_relation_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">related_field</span>();
-    <span class="kw">let</span> <span class="ident">child_model_identifier</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
+<span class="doccomment">/// Inserts set null emulations into the graph between `parent_node` and `child_node`.
+/// `relation_field` is the relation field pointing to the model to be deleted.
+/// Recurses into the update emulation to ensure that subsequent updates are handled correctly as well.
+///
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+///    │  (ids to del/upd)   ─ ┐
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │            │
+///               ▼
+///    ┌────────────────────┐  │
+///    │Find Connected Model│
+/// ┌──│     (SetNull)      │  │
+/// │  └────────────────────┘
+/// │             │            │
+/// │             ▼
+/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │  ┌────────────────────┐  │
+/// ││ │  Insert onUpdate   │  │
+/// │  │ emulation subtree  │  │
+/// ││ │for relations using │  │
+/// │  │the foreign key that│  │
+/// ││ │    was updated.    │  │
+/// │  └────────────────────┘  │
+/// │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │             │
+/// │             ▼            │
+/// │  ┌────────────────────┐
+/// │  │Update children (set│  │
+/// └─▶│      FK null)      │
+///    └────────────────────┘  │
+///               │
+///               ▼            │
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///           Update        │◀ ┘
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// ```
+</span><span class="kw">pub fn </span>emulate_on_update_set_null(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    child_node: <span class="kw-2">&amp;</span>NodeRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span>dependent_model = relation_field.model();
+    <span class="kw">let </span>parent_relation_field = relation_field.related_field();
+    <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-    <span class="comment">// Only the nullable fks should be updated to null</span>
-    <span class="kw">let</span> (<span class="ident">parent_pks</span>, <span class="ident">child_fks</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">relation_field</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-        (<span class="ident">relation_field</span>.<span class="ident">referenced_fields</span>(), <span class="ident">relation_field</span>.<span class="ident">scalar_fields</span>())
-    } <span class="kw">else</span> {
+    <span class="comment">// Only the nullable fks should be updated to null
+    </span><span class="kw">let </span>(parent_pks, child_fks) = <span class="kw">if </span>relation_field.is_inlined_on_enclosing_model() {
+        (relation_field.referenced_fields(), relation_field.scalar_fields())
+    } <span class="kw">else </span>{
         (
-            <span class="ident">relation_field</span>.<span class="ident">related_field</span>().<span class="ident">scalar_fields</span>(),
-            <span class="ident">relation_field</span>.<span class="ident">related_field</span>().<span class="ident">referenced_fields</span>(),
+            relation_field.related_field().scalar_fields(),
+            relation_field.related_field().referenced_fields(),
         )
     };
 
-    <span class="comment">// Unwraps are safe as in this stage, no node content can be replaced.</span>
-    <span class="kw">let</span> <span class="ident">parent_update_args</span> <span class="op">=</span> <span class="ident">extract_update_args</span>(<span class="ident">graph</span>.<span class="ident">node_content</span>(<span class="ident">child_node</span>).<span class="ident">unwrap</span>());
-    <span class="kw">let</span> <span class="ident">parent_updates_pk</span> <span class="op">=</span> <span class="ident">parent_pks</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">parent_pk</span><span class="op">|</span> <span class="ident">parent_update_args</span>.<span class="ident">get_field_value</span>(<span class="ident">parent_pk</span>.<span class="ident">db_name</span>()).<span class="ident">is_some</span>());
+    <span class="comment">// Unwraps are safe as in this stage, no node content can be replaced.
+    </span><span class="kw">let </span>parent_update_args = extract_update_args(graph.node_content(child_node).unwrap());
+    <span class="kw">let </span>parent_updates_pk = parent_pks
+        .into_iter()
+        .any(|parent_pk| parent_update_args.get_field_value(parent_pk.db_name()).is_some());
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">parent_updates_pk</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="kw">if </span>!parent_updates_pk {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
 
-    <span class="kw">let</span> <span class="ident">child_update_args</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">child_fks</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">child_fk</span><span class="op">|</span> <span class="op">!</span><span class="ident">child_fk</span>.<span class="ident">is_required</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">child_fk</span><span class="op">|</span> {
+    <span class="kw">let </span>child_update_args: IndexMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = child_fks
+        .iter()
+        .filter(|child_fk| !child_fk.is_required())
+        .map(|child_fk| {
             (
-                <span class="ident">DatasourceFieldName::from</span>(<span class="ident">child_fk</span>),
-                <span class="ident">WriteOperation::scalar_set</span>(<span class="ident">PrismaValue::Null</span>),
+                DatasourceFieldName::from(child_fk),
+                WriteOperation::scalar_set(PrismaValue::Null),
             )
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="comment">// Records that need to be updated for the cascade.</span>
-    <span class="kw">let</span> <span class="ident">dependent_records_node</span> <span class="op">=</span>
-        <span class="ident">insert_find_children_by_parent_node</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">parent_relation_field</span>, <span class="ident">Filter::empty</span>())<span class="question-mark">?</span>;
+    <span class="comment">// Records that need to be updated for the cascade.
+    </span><span class="kw">let </span>dependent_records_node =
+        insert_find_children_by_parent_node(graph, parent_node, <span class="kw-2">&amp;</span>parent_relation_field, Filter::empty())<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">set_null_query</span> <span class="op">=</span> <span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="ident">UpdateManyRecords</span> {
-        <span class="ident">model</span>: <span class="ident">dependent_model</span>.<span class="ident">clone</span>(),
-        <span class="ident">record_filter</span>: <span class="ident">RecordFilter::empty</span>(),
-        <span class="ident">args</span>: <span class="ident">WriteArgs::new</span>(<span class="ident">child_update_args</span>, <span class="ident"><span class="kw">crate</span>::executor::get_request_now</span>()),
+    <span class="kw">let </span>set_null_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
+        model: dependent_model.clone(),
+        record_filter: RecordFilter::empty(),
+        args: WriteArgs::new(child_update_args, <span class="kw">crate</span>::executor::get_request_now()),
     });
 
-    <span class="kw">let</span> <span class="ident">set_null_dependents_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">set_null_query</span>));
+    <span class="kw">let </span>set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">set_null_dependents_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">child_model_identifier</span>.<span class="ident">clone</span>(),
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">set_null_dependents_node</span>, <span class="ident">dependent_ids</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">dmr</span>))) <span class="op">=</span> <span class="ident">set_null_dependents_node</span>
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>dependent_records_node,
+        <span class="kw-2">&amp;</span>set_null_dependents_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier.clone(),
+            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>set_null_dependents_node, dependent_ids| {
+                <span class="kw">if let </span>Node::Query(Query::Write(WriteQuery::UpdateManyRecords(<span class="kw-2">ref mut </span>dmr))) = set_null_dependents_node
                 {
-                    <span class="ident">dmr</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="ident">dependent_ids</span>.<span class="ident">into</span>();
+                    dmr.record_filter = dependent_ids.into();
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">set_null_dependents_node</span>)
+                <span class="prelude-val">Ok</span>(set_null_dependents_node)
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">set_null_dependents_node</span>,
-        <span class="ident">child_node</span>,
-        <span class="ident">QueryGraphDependency::ExecutionOrder</span>,
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>set_null_dependents_node,
+        child_node,
+        QueryGraphDependency::ExecutionOrder,
     )<span class="question-mark">?</span>;
 
-    <span class="comment">// Collect other relation fields that share at least one common foreign key with the relation key we&#39;re dealing with</span>
-    <span class="kw">let</span> <span class="ident">dependent_relation_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">dependent_model</span>
-        .<span class="ident">fields</span>()
-        .<span class="ident">relation</span>()
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span> <span class="op">!</span><span class="op">=</span> <span class="ident">relation_field</span>)
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">fks</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-                <span class="ident">rf</span>.<span class="ident">scalar_fields</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">rf</span>.<span class="ident">related_field</span>().<span class="ident">referenced_fields</span>()
+    <span class="comment">// Collect other relation fields that share at least one common foreign key with the relation key we&#39;re dealing with
+    </span><span class="kw">let </span>dependent_relation_fields: Vec&lt;<span class="kw">_</span>&gt; = dependent_model
+        .fields()
+        .relation()
+        .into_iter()
+        .filter(|rf| rf != relation_field)
+        .filter(|rf| {
+            <span class="kw">let </span>fks = <span class="kw">if </span>rf.is_inlined_on_enclosing_model() {
+                rf.scalar_fields()
+            } <span class="kw">else </span>{
+                rf.related_field().referenced_fields()
             };
 
-            <span class="ident">fks</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="ident">child_fks</span>.<span class="ident">contains</span>(<span class="ident">fk</span>))
+            fks.iter().any(|fk| child_fks.contains(fk))
         })
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-            <span class="bool-val">true</span> =&gt; <span class="ident">rf</span>,
-            <span class="bool-val">false</span> =&gt; <span class="ident">rf</span>.<span class="ident">related_field</span>(),
+        .map(|rf| <span class="kw">match </span>rf.is_inlined_on_enclosing_model() {
+            <span class="bool-val">true </span>=&gt; rf,
+            <span class="bool-val">false </span>=&gt; rf.related_field(),
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="comment">// If there are any relation fields sharing one common foreign key, recurse</span>
-    <span class="kw">for</span> <span class="ident">rf</span> <span class="kw">in</span> <span class="ident">dependent_relation_fields</span> {
-        <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">relation</span>().<span class="ident">on_update</span>() {
-            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="kw">continue</span>,
-            <span class="ident">ReferentialAction::Restrict</span> =&gt; {
-                <span class="ident">emulate_on_delete_restrict</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>, <span class="kw-2">&amp;</span><span class="ident">set_null_dependents_node</span>)<span class="question-mark">?</span>
-            }
-            <span class="ident">ReferentialAction::SetNull</span> =&gt; <span class="ident">emulate_on_update_set_null</span>(
-                <span class="ident">graph</span>,
-                <span class="kw-2">&amp;</span><span class="ident">rf</span>,
-                <span class="ident">connector_ctx</span>,
-                <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
-                <span class="kw-2">&amp;</span><span class="ident">set_null_dependents_node</span>,
+    <span class="comment">// If there are any relation fields sharing one common foreign key, recurse
+    </span><span class="kw">for </span>rf <span class="kw">in </span>dependent_relation_fields {
+        <span class="kw">match </span>rf.relation().on_update() {
+            ReferentialAction::NoAction =&gt; <span class="kw">continue</span>,
+            ReferentialAction::Restrict =&gt; {
+                emulate_on_delete_restrict(graph, <span class="kw-2">&amp;</span>rf, <span class="kw-2">&amp;</span>dependent_records_node, <span class="kw-2">&amp;</span>set_null_dependents_node)<span class="question-mark">?
+            </span>}
+            ReferentialAction::SetNull =&gt; emulate_on_update_set_null(
+                graph,
+                <span class="kw-2">&amp;</span>rf,
+                connector_ctx,
+                <span class="kw-2">&amp;</span>dependent_records_node,
+                <span class="kw-2">&amp;</span>set_null_dependents_node,
             )<span class="question-mark">?</span>,
-            <span class="ident">ReferentialAction::Cascade</span> =&gt; <span class="ident">emulate_on_update_cascade</span>(
-                <span class="ident">graph</span>,
-                <span class="kw-2">&amp;</span><span class="ident">rf</span>,
-                <span class="ident">connector_ctx</span>,
-                <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
-                <span class="kw-2">&amp;</span><span class="ident">set_null_dependents_node</span>,
+            ReferentialAction::Cascade =&gt; emulate_on_update_cascade(
+                graph,
+                <span class="kw-2">&amp;</span>rf,
+                connector_ctx,
+                <span class="kw-2">&amp;</span>dependent_records_node,
+                <span class="kw-2">&amp;</span>set_null_dependents_node,
             )<span class="question-mark">?</span>,
-            <span class="ident">x</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported referential action emulation: {}&quot;</span>, <span class="ident">x</span>),
+            x =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported referential action emulation: {}&quot;</span>, x),
         }
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emulate_on_update_restrict</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">noop_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Node::Empty</span>);
-    <span class="kw">let</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">related_field</span>();
-    <span class="kw">let</span> <span class="ident">child_model_identifier</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> <span class="ident">read_node</span> <span class="op">=</span> <span class="ident">insert_find_children_by_parent_node</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">relation_field</span>, <span class="ident">Filter::empty</span>())<span class="question-mark">?</span>;
+<span class="kw">pub fn </span>emulate_on_update_restrict(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    child_node: <span class="kw-2">&amp;</span>NodeRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span>noop_node = graph.create_node(Node::Empty);
+    <span class="kw">let </span>relation_field = relation_field.related_field();
+    <span class="kw">let </span>child_model_identifier = relation_field.related_model().primary_identifier();
+    <span class="kw">let </span>read_node = insert_find_children_by_parent_node(graph, parent_node, <span class="kw-2">&amp;</span>relation_field, Filter::empty())<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">linking_fields</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">linking_fields</span>();
+    <span class="kw">let </span>linking_fields = relation_field.linking_fields();
 
-    <span class="comment">// Unwraps are safe as in this stage, no node content can be replaced.</span>
-    <span class="kw">let</span> <span class="ident">parent_update_args</span> <span class="op">=</span> <span class="ident">extract_update_args</span>(<span class="ident">graph</span>.<span class="ident">node_content</span>(<span class="ident">child_node</span>).<span class="ident">unwrap</span>());
+    <span class="comment">// Unwraps are safe as in this stage, no node content can be replaced.
+    </span><span class="kw">let </span>parent_update_args = extract_update_args(graph.node_content(child_node).unwrap());
 
-    <span class="kw">let</span> <span class="ident">linking_fields_updated</span> <span class="op">=</span> <span class="ident">linking_fields</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">parent_pk</span><span class="op">|</span> <span class="ident">parent_update_args</span>.<span class="ident">get_field_value</span>(<span class="ident">parent_pk</span>.<span class="ident">db_name</span>()).<span class="ident">is_some</span>());
+    <span class="kw">let </span>linking_fields_updated = linking_fields
+        .into_iter()
+        .any(|parent_pk| parent_update_args.get_field_value(parent_pk.db_name()).is_some());
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">read_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">noop_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">child_model_identifier</span>,
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">noop_node</span>, <span class="ident">child_ids</span><span class="op">|</span> {
-                <span class="comment">// If any linking fields are to be updated and there are already connected children, then fail</span>
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">child_ids</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">linking_fields_updated</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RelationViolation</span>((<span class="ident">relation_field</span>).<span class="ident">into</span>()));
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>read_node,
+        <span class="kw-2">&amp;</span>noop_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier,
+            Box::new(<span class="kw">move </span>|noop_node, child_ids| {
+                <span class="comment">// If any linking fields are to be updated and there are already connected children, then fail
+                </span><span class="kw">if </span>!child_ids.is_empty() &amp;&amp; linking_fields_updated {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(QueryGraphBuilderError::RelationViolation((relation_field).into()));
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">noop_node</span>)
+                <span class="prelude-val">Ok</span>(noop_node)
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="comment">// Edge from empty node to the child (delete).</span>
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">noop_node</span>, <span class="ident">child_node</span>, <span class="ident">QueryGraphDependency::ExecutionOrder</span>)<span class="question-mark">?</span>;
+    <span class="comment">// Edge from empty node to the child (delete).
+    </span>graph.create_edge(<span class="kw-2">&amp;</span>noop_node, child_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Inserts emulated referential actions for `onUpdate` into the graph.</span>
-<span class="doccomment">/// All relations that refer to the `model` row(s) being deleted are checked for their desired emulation and inserted accordingly.</span>
-<span class="doccomment">/// Right now, supported modes are `Restrict` and `SetNull` (cascade will follow).</span>
-<span class="doccomment">/// Those checks fail at runtime and are inserted between `parent_node` and `child_node`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function is usually part of a delete (`deleteOne` or `deleteMany`).</span>
-<span class="doccomment">/// Expects `parent_node` to return one or more IDs (for records of `model`) to be checked.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Resulting graph (all emulations):</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///            Parent       │</span>
-<span class="doccomment">///    │  (ids to update)</span>
-<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">///               │</span>
-<span class="doccomment">///               ▼</span>
-<span class="doccomment">///    ┌────────────────────┐</span>
-<span class="doccomment">/// ┌ ─│     Join node      │─────────────────┬─────────────────────────────┬────────────────────────────────────────┐</span>
-<span class="doccomment">///    └────────────────────┘                 │                             │                                        │</span>
-<span class="doccomment">/// │             │                           │                             │                                        │</span>
-<span class="doccomment">///               │                           │                             │                                        │</span>
-<span class="doccomment">/// │             ▼                           ▼                             ▼                                        ▼</span>
-<span class="doccomment">///    ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐</span>
-<span class="doccomment">/// │  │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│</span>
-<span class="doccomment">///    │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │</span>
-<span class="doccomment">/// │  └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘</span>
-<span class="doccomment">///               │                           │               │             │                          │             │</span>
-<span class="doccomment">/// │      Fail if│&gt; 0                 Fail if│&gt; 0            │             ▼                          │             │</span>
-<span class="doccomment">///               │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼</span>
-<span class="doccomment">/// │             ▼                           ▼               │  ┌────────────────────┐ │              │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///    ┌────────────────────┐      ┌────────────────────┐     ││ │  Insert onUpdate   │                │  ┌────────────────────┐ │</span>
-<span class="doccomment">/// │  │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onUpdate   │</span>
-<span class="doccomment">///    └────────────────────┘      └────────────────────┘     ││ │for relations using │                │  │ emulation subtree  │ │</span>
-<span class="doccomment">/// │             │                           │               │  │the foreign key that│ │              ││ │ for all relations  │</span>
-<span class="doccomment">///               │                           │               ││ │    was updated.    │                │  │   pointing to D.   │ │</span>
-<span class="doccomment">/// │             │                           │               │  └────────────────────┘ │              ││ └────────────────────┘</span>
-<span class="doccomment">///               │                           │               │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">/// │             │                           │               │             │                          │             │</span>
-<span class="doccomment">///               │                           │               │             │                          │             │</span>
-<span class="doccomment">/// │             ▼                           │               │             ▼                          │             ▼</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐</span>
-<span class="doccomment">/// └ ▶        Update       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Update Cs      │</span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘</span>
-<span class="doccomment">///               ▲                                              └────────────────────┘                              │</span>
-<span class="doccomment">///               │                                                         │                                        │</span>
-<span class="doccomment">///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_emulated_on_update_with_intermediary_node</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">model_to_update</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="comment">// If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.</span>
-    <span class="kw">if</span> <span class="ident">connector_ctx</span>.<span class="ident">relation_mode</span>.<span class="ident">uses_foreign_keys</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+<span class="doccomment">/// Inserts emulated referential actions for `onUpdate` into the graph.
+/// All relations that refer to the `model` row(s) being deleted are checked for their desired emulation and inserted accordingly.
+/// Right now, supported modes are `Restrict` and `SetNull` (cascade will follow).
+/// Those checks fail at runtime and are inserted between `parent_node` and `child_node`.
+///
+/// This function is usually part of a delete (`deleteOne` or `deleteMany`).
+/// Expects `parent_node` to return one or more IDs (for records of `model`) to be checked.
+///
+/// Resulting graph (all emulations):
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+///    │  (ids to update)
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │
+///               ▼
+///    ┌────────────────────┐
+/// ┌ ─│     Join node      │─────────────────┬─────────────────────────────┬────────────────────────────────────────┐
+///    └────────────────────┘                 │                             │                                        │
+/// │             │                           │                             │                                        │
+///               │                           │                             │                                        │
+/// │             ▼                           ▼                             ▼                                        ▼
+///    ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐
+/// │  │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│
+///    │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │
+/// │  └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘
+///               │                           │               │             │                          │             │
+/// │      Fail if│&gt; 0                 Fail if│&gt; 0            │             ▼                          │             │
+///               │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼
+/// │             ▼                           ▼               │  ┌────────────────────┐ │              │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///    ┌────────────────────┐      ┌────────────────────┐     ││ │  Insert onUpdate   │                │  ┌────────────────────┐ │
+/// │  │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onUpdate   │
+///    └────────────────────┘      └────────────────────┘     ││ │for relations using │                │  │ emulation subtree  │ │
+/// │             │                           │               │  │the foreign key that│ │              ││ │ for all relations  │
+///               │                           │               ││ │    was updated.    │                │  │   pointing to D.   │ │
+/// │             │                           │               │  └────────────────────┘ │              ││ └────────────────────┘
+///               │                           │               │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │             │                           │               │             │                          │             │
+///               │                           │               │             │                          │             │
+/// │             ▼                           │               │             ▼                          │             ▼
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐
+/// └ ▶        Update       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Update Cs      │
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘
+///               ▲                                              └────────────────────┘                              │
+///               │                                                         │                                        │
+///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘
+/// ```
+</span><span class="kw">pub fn </span>insert_emulated_on_update_with_intermediary_node(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    model_to_update: <span class="kw-2">&amp;</span>ModelRef,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    child_node: <span class="kw-2">&amp;</span>NodeRef,
+) -&gt; QueryGraphBuilderResult&lt;<span class="prelude-ty">Option</span>&lt;NodeRef&gt;&gt; {
+    <span class="comment">// If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
+    </span><span class="kw">if </span>connector_ctx.relation_mode.uses_foreign_keys() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
     }
 
-    <span class="comment">// If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.</span>
-    <span class="kw">let</span> <span class="ident">internal_model</span> <span class="op">=</span> <span class="ident">model_to_update</span>.<span class="ident">internal_data_model</span>();
-    <span class="kw">let</span> <span class="ident">relation_fields</span> <span class="op">=</span> <span class="ident">internal_model</span>.<span class="ident">fields_pointing_to_model</span>(<span class="ident">model_to_update</span>, <span class="bool-val">false</span>);
+    <span class="comment">// If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
+    </span><span class="kw">let </span>internal_model = model_to_update.internal_data_model();
+    <span class="kw">let </span>relation_fields = internal_model.fields_pointing_to_model(model_to_update, <span class="bool-val">false</span>);
 
-    <span class="kw">let</span> <span class="ident">join_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Flow::Return</span>(<span class="prelude-val">None</span>));
+    <span class="kw">let </span>join_node = graph.create_node(Flow::Return(<span class="prelude-val">None</span>));
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">join_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">model_to_update</span>.<span class="ident">primary_identifier</span>(),
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">return_node</span>, <span class="ident">parent_ids</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Flow</span>(<span class="ident">Flow::Return</span>(<span class="kw">_</span>)) <span class="op">=</span> <span class="ident">return_node</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">Node::Flow</span>(<span class="ident">Flow::Return</span>(<span class="prelude-val">Some</span>(<span class="ident">parent_ids</span>))))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">return_node</span>)
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>parent_node,
+        <span class="kw-2">&amp;</span>join_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            model_to_update.primary_identifier(),
+            Box::new(<span class="kw">move </span>|return_node, parent_ids| {
+                <span class="kw">if let </span>Node::Flow(Flow::Return(<span class="kw">_</span>)) = return_node {
+                    <span class="prelude-val">Ok</span>(Node::Flow(Flow::Return(<span class="prelude-val">Some</span>(parent_ids))))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Ok</span>(return_node)
                 }
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="kw">for</span> <span class="ident">rf</span> <span class="kw">in</span> <span class="ident">relation_fields</span> {
-        <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">relation</span>().<span class="ident">on_update</span>() {
-            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="kw">continue</span>, <span class="comment">// Explicitly do nothing.</span>
-            <span class="ident">ReferentialAction::Restrict</span> =&gt; <span class="ident">emulate_on_update_restrict</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="kw-2">&amp;</span><span class="ident">join_node</span>, <span class="ident">child_node</span>)<span class="question-mark">?</span>,
-            <span class="ident">ReferentialAction::SetNull</span> =&gt; {
-                <span class="ident">emulate_on_update_set_null</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="ident">connector_ctx</span>, <span class="kw-2">&amp;</span><span class="ident">join_node</span>, <span class="ident">child_node</span>)<span class="question-mark">?</span>
-            }
-            <span class="ident">ReferentialAction::Cascade</span> =&gt; <span class="ident">emulate_on_update_cascade</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="ident">connector_ctx</span>, <span class="kw-2">&amp;</span><span class="ident">join_node</span>, <span class="ident">child_node</span>)<span class="question-mark">?</span>,
-            <span class="ident">x</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported referential action emulation: {}&quot;</span>, <span class="ident">x</span>),
+    <span class="kw">for </span>rf <span class="kw">in </span>relation_fields {
+        <span class="kw">match </span>rf.relation().on_update() {
+            ReferentialAction::NoAction =&gt; <span class="kw">continue</span>, <span class="comment">// Explicitly do nothing.
+            </span>ReferentialAction::Restrict =&gt; emulate_on_update_restrict(graph, <span class="kw-2">&amp;</span>rf, <span class="kw-2">&amp;</span>join_node, child_node)<span class="question-mark">?</span>,
+            ReferentialAction::SetNull =&gt; {
+                emulate_on_update_set_null(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, <span class="kw-2">&amp;</span>join_node, child_node)<span class="question-mark">?
+            </span>}
+            ReferentialAction::Cascade =&gt; emulate_on_update_cascade(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, <span class="kw-2">&amp;</span>join_node, child_node)<span class="question-mark">?</span>,
+            x =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported referential action emulation: {}&quot;</span>, x),
         }
     }
 
-    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">join_node</span>))
+    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(join_node))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_emulated_on_update</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">model_to_update</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="comment">// If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.</span>
-    <span class="kw">if</span> <span class="ident">connector_ctx</span>.<span class="ident">relation_mode</span>.<span class="ident">uses_foreign_keys</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+<span class="kw">pub fn </span>insert_emulated_on_update(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    model_to_update: <span class="kw-2">&amp;</span>ModelRef,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    child_node: <span class="kw-2">&amp;</span>NodeRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="comment">// If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
+    </span><span class="kw">if </span>connector_ctx.relation_mode.uses_foreign_keys() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
 
-    <span class="comment">// If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.</span>
-    <span class="kw">let</span> <span class="ident">internal_model</span> <span class="op">=</span> <span class="ident">model_to_update</span>.<span class="ident">internal_data_model</span>();
-    <span class="kw">let</span> <span class="ident">relation_fields</span> <span class="op">=</span> <span class="ident">internal_model</span>.<span class="ident">fields_pointing_to_model</span>(<span class="ident">model_to_update</span>, <span class="bool-val">false</span>);
+    <span class="comment">// If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
+    </span><span class="kw">let </span>internal_model = model_to_update.internal_data_model();
+    <span class="kw">let </span>relation_fields = internal_model.fields_pointing_to_model(model_to_update, <span class="bool-val">false</span>);
 
-    <span class="kw">for</span> <span class="ident">rf</span> <span class="kw">in</span> <span class="ident">relation_fields</span> {
-        <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">relation</span>().<span class="ident">on_update</span>() {
-            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="kw">continue</span>, <span class="comment">// Explicitly do nothing.</span>
-            <span class="ident">ReferentialAction::Restrict</span> =&gt; <span class="ident">emulate_on_update_restrict</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="ident">child_node</span>)<span class="question-mark">?</span>,
-            <span class="ident">ReferentialAction::SetNull</span> =&gt; {
-                <span class="ident">emulate_on_update_set_null</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="ident">connector_ctx</span>, <span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="ident">child_node</span>)<span class="question-mark">?</span>
-            }
-            <span class="ident">ReferentialAction::Cascade</span> =&gt; {
-                <span class="ident">emulate_on_update_cascade</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="ident">connector_ctx</span>, <span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="ident">child_node</span>)<span class="question-mark">?</span>
-            }
-            <span class="ident">x</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported referential action emulation: {}&quot;</span>, <span class="ident">x</span>),
+    <span class="kw">for </span>rf <span class="kw">in </span>relation_fields {
+        <span class="kw">match </span>rf.relation().on_update() {
+            ReferentialAction::NoAction =&gt; <span class="kw">continue</span>, <span class="comment">// Explicitly do nothing.
+            </span>ReferentialAction::Restrict =&gt; emulate_on_update_restrict(graph, <span class="kw-2">&amp;</span>rf, <span class="kw-2">&amp;</span>parent_node, child_node)<span class="question-mark">?</span>,
+            ReferentialAction::SetNull =&gt; {
+                emulate_on_update_set_null(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, <span class="kw-2">&amp;</span>parent_node, child_node)<span class="question-mark">?
+            </span>}
+            ReferentialAction::Cascade =&gt; {
+                emulate_on_update_cascade(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, <span class="kw-2">&amp;</span>parent_node, child_node)<span class="question-mark">?
+            </span>}
+            x =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported referential action emulation: {}&quot;</span>, x),
         }
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">extract_update_args</span>(<span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">Node</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">WriteArgs</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">q</span>)) <span class="op">=</span> <span class="ident">parent_node</span> {
-        <span class="kw">match</span> <span class="ident">q</span> {
-            <span class="ident">WriteQuery::UpdateRecord</span>(<span class="ident">one</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">one</span>.<span class="ident">args</span>,
-            <span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="ident">many</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">many</span>.<span class="ident">args</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Parent operation for update emulation is not an update.&quot;</span>),
+<span class="kw">fn </span>extract_update_args(parent_node: <span class="kw-2">&amp;</span>Node) -&gt; <span class="kw-2">&amp;</span>WriteArgs {
+    <span class="kw">if let </span>Node::Query(Query::Write(q)) = parent_node {
+        <span class="kw">match </span>q {
+            WriteQuery::UpdateRecord(one) =&gt; <span class="kw-2">&amp;</span>one.args,
+            WriteQuery::UpdateManyRecords(many) =&gt; <span class="kw-2">&amp;</span>many.args,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Parent operation for update emulation is not an update.&quot;</span>),
         }
-    } <span class="kw">else</span> {
+    } <span class="kw">else </span>{
         <span class="macro">panic!</span>(<span class="string">&quot;Parent operation for update emulation is not a query.&quot;</span>)
     }
 }
 
-<span class="doccomment">/// Inserts cascade emulations into the graph between `parent_node` and `child_node`.</span>
-<span class="doccomment">/// `relation_field` is the relation field pointing to the model to be deleted.</span>
-<span class="doccomment">/// Recurses into the update emulation to ensure that subsequent updates are handled correctly as well.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="comment">//    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///            Parent       │</span>
-<span class="doccomment">///    │  (ids to update)    ─ ┐</span>
-<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">///               │            │</span>
-<span class="doccomment">///               ▼</span>
-<span class="doccomment">///    ┌────────────────────┐  │</span>
-<span class="doccomment">///    │Find Connected Model│</span>
-<span class="doccomment">/// ┌──│     (Cascade)      │  │</span>
-<span class="doccomment">/// │  └────────────────────┘</span>
-<span class="doccomment">/// │             │            │</span>
-<span class="doccomment">/// │             ▼</span>
-<span class="doccomment">/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │</span>
-<span class="doccomment">/// │  ┌────────────────────┐ │</span>
-<span class="doccomment">/// ││ │  Insert onUpdate   │  │</span>
-<span class="doccomment">/// │  │ emulation subtree  │ │</span>
-<span class="doccomment">/// ││ │ for all relations  │  │</span>
-<span class="doccomment">/// │  │  pointing to the   │ │</span>
-<span class="doccomment">/// ││ │  Connected Model.  │  │</span>
-<span class="doccomment">/// │  └────────────────────┘ │</span>
-<span class="doccomment">/// │└ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ │</span>
-<span class="doccomment">/// │             │</span>
-<span class="doccomment">/// │             │            │</span>
-<span class="doccomment">/// │             ▼</span>
-<span class="doccomment">/// │  ┌────────────────────┐  │</span>
-<span class="doccomment">/// └─▶│  Update children   │</span>
-<span class="doccomment">///    └────────────────────┘  │</span>
-<span class="doccomment">///               │</span>
-<span class="doccomment">///               ▼            │</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///            Update       │◀ ┘</span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emulate_on_update_cascade</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>, <span class="comment">// This is the field _on the other model_ for cascade.</span>
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">dependent_model</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">model</span>();
-    <span class="kw">let</span> <span class="ident">parent_relation_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">related_field</span>();
-    <span class="kw">let</span> <span class="ident">child_model_identifier</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> (<span class="ident">parent_pks</span>, <span class="ident">child_fks</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">relation_field</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-        (<span class="ident">relation_field</span>.<span class="ident">referenced_fields</span>(), <span class="ident">relation_field</span>.<span class="ident">scalar_fields</span>())
-    } <span class="kw">else</span> {
+<span class="doccomment">/// Inserts cascade emulations into the graph between `parent_node` and `child_node`.
+/// `relation_field` is the relation field pointing to the model to be deleted.
+/// Recurses into the update emulation to ensure that subsequent updates are handled correctly as well.
+///
+/// ```text
+</span><span class="comment">//    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+</span><span class="doccomment">///            Parent       │
+///    │  (ids to update)    ─ ┐
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │            │
+///               ▼
+///    ┌────────────────────┐  │
+///    │Find Connected Model│
+/// ┌──│     (Cascade)      │  │
+/// │  └────────────────────┘
+/// │             │            │
+/// │             ▼
+/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │  ┌────────────────────┐ │
+/// ││ │  Insert onUpdate   │  │
+/// │  │ emulation subtree  │ │
+/// ││ │ for all relations  │  │
+/// │  │  pointing to the   │ │
+/// ││ │  Connected Model.  │  │
+/// │  └────────────────────┘ │
+/// │└ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ │
+/// │             │
+/// │             │            │
+/// │             ▼
+/// │  ┌────────────────────┐  │
+/// └─▶│  Update children   │
+///    └────────────────────┘  │
+///               │
+///               ▼            │
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Update       │◀ ┘
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// ```
+</span><span class="kw">pub fn </span>emulate_on_update_cascade(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    relation_field: <span class="kw-2">&amp;</span>RelationFieldRef, <span class="comment">// This is the field _on the other model_ for cascade.
+    </span>connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    child_node: <span class="kw-2">&amp;</span>NodeRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span>dependent_model = relation_field.model();
+    <span class="kw">let </span>parent_relation_field = relation_field.related_field();
+    <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    <span class="kw">let </span>(parent_pks, child_fks) = <span class="kw">if </span>relation_field.is_inlined_on_enclosing_model() {
+        (relation_field.referenced_fields(), relation_field.scalar_fields())
+    } <span class="kw">else </span>{
         (
-            <span class="ident">relation_field</span>.<span class="ident">related_field</span>().<span class="ident">scalar_fields</span>(),
-            <span class="ident">relation_field</span>.<span class="ident">related_field</span>().<span class="ident">referenced_fields</span>(),
+            relation_field.related_field().scalar_fields(),
+            relation_field.related_field().referenced_fields(),
         )
     };
 
-    <span class="comment">// Unwraps are safe as in this stage, no node content can be replaced.</span>
-    <span class="kw">let</span> <span class="ident">parent_update_args</span> <span class="op">=</span> <span class="ident">extract_update_args</span>(<span class="ident">graph</span>.<span class="ident">node_content</span>(<span class="ident">child_node</span>).<span class="ident">unwrap</span>());
+    <span class="comment">// Unwraps are safe as in this stage, no node content can be replaced.
+    </span><span class="kw">let </span>parent_update_args = extract_update_args(graph.node_content(child_node).unwrap());
 
-    <span class="comment">// Computes update arguments for child based on parent update arguments</span>
-    <span class="kw">let</span> <span class="ident">child_update_args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">parent_pks</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">zip</span>(<span class="ident">child_fks</span>)
-        .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">parent_pk</span>, <span class="ident">child_fk</span>)<span class="op">|</span> {
-            <span class="ident">parent_update_args</span>
-                .<span class="ident">get_field_value</span>(<span class="ident">parent_pk</span>.<span class="ident">db_name</span>())
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> (<span class="ident">DatasourceFieldName::from</span>(<span class="kw-2">&amp;</span><span class="ident">child_fk</span>), <span class="ident">value</span>.<span class="ident">clone</span>()))
+    <span class="comment">// Computes update arguments for child based on parent update arguments
+    </span><span class="kw">let </span>child_update_args: Vec&lt;<span class="kw">_</span>&gt; = parent_pks
+        .into_iter()
+        .zip(child_fks)
+        .filter_map(|(parent_pk, child_fk)| {
+            parent_update_args
+                .get_field_value(parent_pk.db_name())
+                .map(|value| (DatasourceFieldName::from(<span class="kw-2">&amp;</span>child_fk), value.clone()))
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="comment">// If nothing was found to be updated for the child, stop here</span>
-    <span class="kw">if</span> <span class="ident">child_update_args</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="comment">// If nothing was found to be updated for the child, stop here
+    </span><span class="kw">if </span>child_update_args.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
 
-    <span class="comment">// Records that need to be updated for the cascade.</span>
-    <span class="kw">let</span> <span class="ident">dependent_records_node</span> <span class="op">=</span>
-        <span class="ident">insert_find_children_by_parent_node</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">parent_relation_field</span>, <span class="ident">Filter::empty</span>())<span class="question-mark">?</span>;
+    <span class="comment">// Records that need to be updated for the cascade.
+    </span><span class="kw">let </span>dependent_records_node =
+        insert_find_children_by_parent_node(graph, parent_node, <span class="kw-2">&amp;</span>parent_relation_field, Filter::empty())<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">update_query</span> <span class="op">=</span> <span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="ident">UpdateManyRecords</span> {
-        <span class="ident">model</span>: <span class="ident">dependent_model</span>.<span class="ident">clone</span>(),
-        <span class="ident">record_filter</span>: <span class="ident">RecordFilter::empty</span>(),
-        <span class="ident">args</span>: <span class="ident">WriteArgs::new</span>(
-            <span class="ident">child_update_args</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>(),
-            <span class="ident"><span class="kw">crate</span>::executor::get_request_now</span>(),
+    <span class="kw">let </span>update_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
+        model: dependent_model.clone(),
+        record_filter: RecordFilter::empty(),
+        args: WriteArgs::new(
+            child_update_args.into_iter().collect(),
+            <span class="kw">crate</span>::executor::get_request_now(),
         ),
     });
 
-    <span class="kw">let</span> <span class="ident">update_dependents_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">update_query</span>));
+    <span class="kw">let </span>update_dependents_node = graph.create_node(Query::Write(update_query));
 
-    <span class="ident">insert_emulated_on_update</span>(
-        <span class="ident">graph</span>,
-        <span class="ident">connector_ctx</span>,
-        <span class="kw-2">&amp;</span><span class="ident">dependent_model</span>,
-        <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">update_dependents_node</span>,
+    insert_emulated_on_update(
+        graph,
+        connector_ctx,
+        <span class="kw-2">&amp;</span>dependent_model,
+        <span class="kw-2">&amp;</span>dependent_records_node,
+        <span class="kw-2">&amp;</span>update_dependents_node,
     )<span class="question-mark">?</span>;
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">update_dependents_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">child_model_identifier</span>,
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_dependents_node</span>, <span class="ident">dependent_ids</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">dmr</span>))) <span class="op">=</span> <span class="ident">update_dependents_node</span> {
-                    <span class="ident">dmr</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="ident">dependent_ids</span>.<span class="ident">into</span>();
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>dependent_records_node,
+        <span class="kw-2">&amp;</span>update_dependents_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier,
+            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>update_dependents_node, dependent_ids| {
+                <span class="kw">if let </span>Node::Query(Query::Write(WriteQuery::UpdateManyRecords(<span class="kw-2">ref mut </span>dmr))) = update_dependents_node {
+                    dmr.record_filter = dependent_ids.into();
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">update_dependents_node</span>)
+                <span class="prelude-val">Ok</span>(update_dependents_node)
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">update_dependents_node</span>,
-        <span class="ident">child_node</span>,
-        <span class="ident">QueryGraphDependency::ExecutionOrder</span>,
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>update_dependents_node,
+        child_node,
+        QueryGraphDependency::ExecutionOrder,
     )<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/datamodel.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datamodel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../datamodel_renderer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/datamodel.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datamodel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../datamodel_renderer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -173,157 +173,157 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Types related to the _datamodel section_ in the PSL.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Includes the `model`, `enum` and `type` definitions.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Types related to the _datamodel section_ in the PSL.
+//!
+//! Includes the `model`, `enum` and `type` definitions.
 
-<span class="kw">mod</span> <span class="ident">attributes</span>;
-<span class="kw">mod</span> <span class="ident">composite_type</span>;
-<span class="kw">mod</span> <span class="ident">default</span>;
-<span class="kw">mod</span> <span class="ident">enumerator</span>;
-<span class="kw">mod</span> <span class="ident">field_type</span>;
-<span class="kw">mod</span> <span class="ident">model</span>;
+</span><span class="kw">mod </span>attributes;
+<span class="kw">mod </span>composite_type;
+<span class="kw">mod </span>default;
+<span class="kw">mod </span>enumerator;
+<span class="kw">mod </span>field_type;
+<span class="kw">mod </span>model;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">composite_type</span>::{<span class="ident">CompositeType</span>, <span class="ident">CompositeTypeField</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">default::DefaultValue</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">enumerator</span>::{<span class="ident">Enum</span>, <span class="ident">EnumVariant</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">field_type::FieldType</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">model</span>::{
-    <span class="ident">IdDefinition</span>, <span class="ident">IdFieldDefinition</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexFieldInput</span>, <span class="ident">IndexFieldOptions</span>, <span class="ident">IndexOps</span>, <span class="ident">Model</span>, <span class="ident">ModelField</span>,
-    <span class="ident">Relation</span>,
+<span class="kw">pub use </span>composite_type::{CompositeType, CompositeTypeField};
+<span class="kw">pub use </span>default::DefaultValue;
+<span class="kw">pub use </span>enumerator::{Enum, EnumVariant};
+<span class="kw">pub use </span>field_type::FieldType;
+<span class="kw">pub use </span>model::{
+    IdDefinition, IdFieldDefinition, IndexDefinition, IndexFieldInput, IndexFieldOptions, IndexOps, Model, ModelField,
+    Relation,
 };
-<span class="kw">use</span> <span class="ident">psl::dml</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span>psl::dml;
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// The PSL data model declaration.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Datamodel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">models</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Model</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">enums</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Enum</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">composite_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CompositeType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The PSL data model declaration.
+</span><span class="attribute">#[derive(Default, Debug)]
+</span><span class="kw">pub struct </span>Datamodel&lt;<span class="lifetime">&#39;a</span>&gt; {
+    models: Vec&lt;Model&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    enums: Vec&lt;Enum&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    composite_types: Vec&lt;CompositeType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Datamodel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new empty data model.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Datamodel&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Create a new empty data model.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Add a model block to the data model.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// model Foo {  // &lt;</span>
-    <span class="doccomment">///   id Int @id // &lt; this</span>
-    <span class="doccomment">/// }            // &lt;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_model</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="ident">Model</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">push</span>(<span class="ident">model</span>);
+    <span class="doccomment">/// Add a model block to the data model.
+    ///
+    /// ```ignore
+    /// model Foo {  // &lt;
+    ///   id Int @id // &lt; this
+    /// }            // &lt;
+    /// ```
+    </span><span class="kw">pub fn </span>push_model(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: Model&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.models.push(model);
     }
 
-    <span class="doccomment">/// Add an enum block to the data model.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// enum Foo { // &lt;</span>
-    <span class="doccomment">///   Bar      // &lt; this</span>
-    <span class="doccomment">/// }          // &lt;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_enum</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">r#enum</span>: <span class="ident">Enum</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">enums</span>.<span class="ident">push</span>(<span class="ident">r#enum</span>);
+    <span class="doccomment">/// Add an enum block to the data model.
+    ///
+    /// ```ignore
+    /// enum Foo { // &lt;
+    ///   Bar      // &lt; this
+    /// }          // &lt;
+    /// ```
+    </span><span class="kw">pub fn </span>push_enum(<span class="kw-2">&amp;mut </span><span class="self">self</span>, r#enum: Enum&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.enums.push(r#enum);
     }
 
-    <span class="doccomment">/// Add a composite type block to the data model.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Address {  // &lt;</span>
-    <span class="doccomment">///   street String // &lt; this</span>
-    <span class="doccomment">/// }               // &lt;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_composite_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">composite_type</span>: <span class="ident">CompositeType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">composite_types</span>.<span class="ident">push</span>(<span class="ident">composite_type</span>);
+    <span class="doccomment">/// Add a composite type block to the data model.
+    ///
+    /// ```ignore
+    /// type Address {  // &lt;
+    ///   street String // &lt; this
+    /// }               // &lt;
+    /// ```
+    </span><span class="kw">pub fn </span>push_composite_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, composite_type: CompositeType&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.composite_types.push(composite_type);
     }
 
-    <span class="doccomment">/// A throwaway function to help generate a rendering from the DML structures.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Delete when removing DML.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_dml</span>(<span class="ident">datasource</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">psl::Datasource</span>, <span class="ident">dml_data_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">dml::Datamodel</span>) -&gt; <span class="ident">Datamodel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
+    <span class="doccomment">/// A throwaway function to help generate a rendering from the DML structures.
+    ///
+    /// Delete when removing DML.
+    </span><span class="kw">pub fn </span>from_dml(datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource, dml_data_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::Datamodel) -&gt; Datamodel&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>data_model = <span class="self">Self</span>::new();
 
-        <span class="kw">for</span> <span class="ident">dml_model</span> <span class="kw">in</span> <span class="ident">dml_data_model</span>.<span class="ident">models</span>() {
-            <span class="ident">data_model</span>.<span class="ident">push_model</span>(<span class="ident">Model::from_dml</span>(<span class="ident">datasource</span>, <span class="ident">dml_model</span>));
+        <span class="kw">for </span>dml_model <span class="kw">in </span>dml_data_model.models() {
+            data_model.push_model(Model::from_dml(datasource, dml_model));
         }
 
-        <span class="kw">for</span> <span class="ident">dml_ct</span> <span class="kw">in</span> <span class="ident">dml_data_model</span>.<span class="ident">composite_types</span>() {
-            <span class="ident">data_model</span>.<span class="ident">push_composite_type</span>(<span class="ident">CompositeType::from_dml</span>(<span class="ident">datasource</span>, <span class="ident">dml_ct</span>));
+        <span class="kw">for </span>dml_ct <span class="kw">in </span>dml_data_model.composite_types() {
+            data_model.push_composite_type(CompositeType::from_dml(datasource, dml_ct));
         }
 
-        <span class="kw">for</span> <span class="ident">dml_enum</span> <span class="kw">in</span> <span class="ident">dml_data_model</span>.<span class="ident">enums</span>() {
-            <span class="ident">data_model</span>.<span class="ident">push_enum</span>(<span class="ident">Enum::from_dml</span>(<span class="ident">dml_enum</span>));
+        <span class="kw">for </span>dml_enum <span class="kw">in </span>dml_data_model.enums() {
+            data_model.push_enum(Enum::from_dml(dml_enum));
         }
 
-        <span class="ident">data_model</span>
+        data_model
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Datamodel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">for</span> <span class="ident">ct</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">composite_types</span>.<span class="ident">iter</span>() {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{ct}&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>Datamodel&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">for </span>ct <span class="kw">in </span><span class="self">self</span>.composite_types.iter() {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{ct}&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">iter</span>() {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{model}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>model <span class="kw">in </span><span class="self">self</span>.models.iter() {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{model}&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">for</span> <span class="ident">r#enum</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">enums</span>.<span class="ident">iter</span>() {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{enum}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>r#enum <span class="kw">in </span><span class="self">self</span>.enums.iter() {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{enum}&quot;</span>)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::value::Function</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::value::Function;
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>expect_test::expect;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">simple_data_model</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="ident">Datamodel::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>simple_data_model() {
+        <span class="kw">let </span><span class="kw-2">mut </span>data_model = Datamodel::new();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">composite</span> <span class="op">=</span> <span class="ident">CompositeType::new</span>(<span class="string">&quot;Address&quot;</span>);
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField::new_required</span>(<span class="string">&quot;street&quot;</span>, <span class="string">&quot;String&quot;</span>);
-        <span class="ident">composite</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>composite = CompositeType::new(<span class="string">&quot;Address&quot;</span>);
+        <span class="kw">let </span>field = CompositeTypeField::new_required(<span class="string">&quot;street&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        composite.push_field(field);
 
-        <span class="ident">data_model</span>.<span class="ident">push_composite_type</span>(<span class="ident">composite</span>);
+        data_model.push_composite_type(composite);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Model::new</span>(<span class="string">&quot;User&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>model = Model::new(<span class="string">&quot;User&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ModelField::new_required</span>(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;Int&quot;</span>);
-        <span class="ident">field</span>.<span class="ident">id</span>(<span class="ident">IdFieldDefinition::default</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;Int&quot;</span>);
+        field.id(IdFieldDefinition::default());
 
-        <span class="kw">let</span> <span class="ident">dv</span> <span class="op">=</span> <span class="ident">DefaultValue::function</span>(<span class="ident">Function::new</span>(<span class="string">&quot;autoincrement&quot;</span>));
-        <span class="ident">field</span>.<span class="ident">default</span>(<span class="ident">dv</span>);
+        <span class="kw">let </span>dv = DefaultValue::function(Function::new(<span class="string">&quot;autoincrement&quot;</span>));
+        field.default(dv);
 
-        <span class="ident">model</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
-        <span class="ident">data_model</span>.<span class="ident">push_model</span>(<span class="ident">model</span>);
+        model.push_field(field);
+        data_model.push_model(model);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">traffic_light</span> <span class="op">=</span> <span class="ident">Enum::new</span>(<span class="string">&quot;TrafficLight&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>traffic_light = Enum::new(<span class="string">&quot;TrafficLight&quot;</span>);
 
-        <span class="ident">traffic_light</span>.<span class="ident">push_variant</span>(<span class="string">&quot;Red&quot;</span>);
-        <span class="ident">traffic_light</span>.<span class="ident">push_variant</span>(<span class="string">&quot;Yellow&quot;</span>);
-        <span class="ident">traffic_light</span>.<span class="ident">push_variant</span>(<span class="string">&quot;Green&quot;</span>);
+        traffic_light.push_variant(<span class="string">&quot;Red&quot;</span>);
+        traffic_light.push_variant(<span class="string">&quot;Yellow&quot;</span>);
+        traffic_light.push_variant(<span class="string">&quot;Green&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cat</span> <span class="op">=</span> <span class="ident">Enum::new</span>(<span class="string">&quot;Cat&quot;</span>);
-        <span class="ident">cat</span>.<span class="ident">push_variant</span>(<span class="string">&quot;Asleep&quot;</span>);
-        <span class="ident">cat</span>.<span class="ident">push_variant</span>(<span class="string">&quot;Hungry&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>cat = Enum::new(<span class="string">&quot;Cat&quot;</span>);
+        cat.push_variant(<span class="string">&quot;Asleep&quot;</span>);
+        cat.push_variant(<span class="string">&quot;Hungry&quot;</span>);
 
-        <span class="ident">data_model</span>.<span class="ident">push_enum</span>(<span class="ident">traffic_light</span>);
-        <span class="ident">data_model</span>.<span class="ident">push_enum</span>(<span class="ident">cat</span>);
+        data_model.push_enum(traffic_light);
+        data_model.push_enum(cat);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[<span class="string">r#&quot;
+        <span class="kw">let </span>expected = <span class="macro">expect!</span>[[<span class="string">r#&quot;
             type Address {
               street String
             }
@@ -344,9 +344,9 @@
             }
         &quot;#</span>]];
 
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">psl::reformat</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{data_model}&quot;</span>), <span class="number">2</span>).<span class="ident">unwrap</span>();
-        <span class="ident">expected</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">rendered</span>);
+        <span class="kw">let </span>rendered = psl::reformat(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{data_model}&quot;</span>), <span class="number">2</span>).unwrap();
+        expected.assert_eq(<span class="kw-2">&amp;</span>rendered);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

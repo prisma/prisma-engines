@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -224,231 +224,231 @@
 <span id="224">224</span>
 <span id="225">225</span>
 <span id="226">226</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! Error reporting.</span>
+</span><span class="doccomment">//! Error reporting.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">extern crate </span>std;
 
-<span class="doccomment">/// An error with absolutely no details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// *ring* uses this unit type as the error type in most of its results</span>
-<span class="doccomment">/// because (a) usually the specific reasons for a failure are obvious or are</span>
-<span class="doccomment">/// not useful to know, and/or (b) providing more details about a failure might</span>
-<span class="doccomment">/// provide a dangerous side channel, and/or (c) it greatly simplifies the</span>
-<span class="doccomment">/// error handling logic.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Result&lt;T, ring::error::Unspecified&gt;` is mostly equivalent to</span>
-<span class="doccomment">/// `Result&lt;T, ()&gt;`. However, `ring::error::Unspecified` implements</span>
-<span class="doccomment">/// [`std::error::Error`] and users of *ring* can implement</span>
-<span class="doccomment">/// `From&lt;ring::error::Unspecified&gt;` to map this to their own error types, as</span>
-<span class="doccomment">/// described in [“Error Handling” in the Rust Book]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use ring::rand::{self, SecureRandom};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// enum Error {</span>
-<span class="doccomment">///     CryptoError,</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #  #[cfg(feature = &quot;alloc&quot;)]</span>
-<span class="doccomment">///     IOError(std::io::Error),</span>
-<span class="doccomment">///     // [...]</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl From&lt;ring::error::Unspecified&gt; for Error {</span>
-<span class="doccomment">///     fn from(_: ring::error::Unspecified) -&gt; Self { Error::CryptoError }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn eight_random_bytes() -&gt; Result&lt;[u8; 8], Error&gt; {</span>
-<span class="doccomment">///     let rng = rand::SystemRandom::new();</span>
-<span class="doccomment">///     let mut bytes = [0; 8];</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // The `From&lt;ring::error::Unspecified&gt;` implementation above makes this</span>
-<span class="doccomment">///     // equivalent to</span>
-<span class="doccomment">///     // `rng.fill(&amp;mut bytes).map_err(|_| Error::CryptoError)?`.</span>
-<span class="doccomment">///     rng.fill(&amp;mut bytes)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     Ok(bytes)</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert!(eight_random_bytes().is_ok());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Experience with using and implementing other crypto libraries like has</span>
-<span class="doccomment">/// shown that sophisticated error reporting facilities often cause significant</span>
-<span class="doccomment">/// bugs themselves, both within the crypto library and within users of the</span>
-<span class="doccomment">/// crypto library. This approach attempts to minimize complexity in the hopes</span>
-<span class="doccomment">/// of avoiding such problems. In some cases, this approach may be too extreme,</span>
-<span class="doccomment">/// and it may be important for an operation to provide some details about the</span>
-<span class="doccomment">/// cause of a failure. Users of *ring* are encouraged to report such cases so</span>
-<span class="doccomment">/// that they can be addressed individually.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`std::error::Error`]: https://doc.rust-lang.org/std/error/trait.Error.html</span>
-<span class="doccomment">/// [“Error Handling” in the Rust Book]:</span>
-<span class="doccomment">///     https://doc.rust-lang.org/book/first-edition/error-handling.html#the-from-trait</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Unspecified</span>;
+<span class="doccomment">/// An error with absolutely no details.
+///
+/// *ring* uses this unit type as the error type in most of its results
+/// because (a) usually the specific reasons for a failure are obvious or are
+/// not useful to know, and/or (b) providing more details about a failure might
+/// provide a dangerous side channel, and/or (c) it greatly simplifies the
+/// error handling logic.
+///
+/// `Result&lt;T, ring::error::Unspecified&gt;` is mostly equivalent to
+/// `Result&lt;T, ()&gt;`. However, `ring::error::Unspecified` implements
+/// [`std::error::Error`] and users of *ring* can implement
+/// `From&lt;ring::error::Unspecified&gt;` to map this to their own error types, as
+/// described in [“Error Handling” in the Rust Book]:
+///
+/// ```
+/// use ring::rand::{self, SecureRandom};
+///
+/// enum Error {
+///     CryptoError,
+///
+/// #  #[cfg(feature = &quot;alloc&quot;)]
+///     IOError(std::io::Error),
+///     // [...]
+/// }
+///
+/// impl From&lt;ring::error::Unspecified&gt; for Error {
+///     fn from(_: ring::error::Unspecified) -&gt; Self { Error::CryptoError }
+/// }
+///
+/// fn eight_random_bytes() -&gt; Result&lt;[u8; 8], Error&gt; {
+///     let rng = rand::SystemRandom::new();
+///     let mut bytes = [0; 8];
+///
+///     // The `From&lt;ring::error::Unspecified&gt;` implementation above makes this
+///     // equivalent to
+///     // `rng.fill(&amp;mut bytes).map_err(|_| Error::CryptoError)?`.
+///     rng.fill(&amp;mut bytes)?;
+///
+///     Ok(bytes)
+/// }
+///
+/// assert!(eight_random_bytes().is_ok());
+/// ```
+///
+/// Experience with using and implementing other crypto libraries like has
+/// shown that sophisticated error reporting facilities often cause significant
+/// bugs themselves, both within the crypto library and within users of the
+/// crypto library. This approach attempts to minimize complexity in the hopes
+/// of avoiding such problems. In some cases, this approach may be too extreme,
+/// and it may be important for an operation to provide some details about the
+/// cause of a failure. Users of *ring* are encouraged to report such cases so
+/// that they can be addressed individually.
+///
+/// [`std::error::Error`]: https://doc.rust-lang.org/std/error/trait.Error.html
+/// [“Error Handling” in the Rust Book]:
+///     https://doc.rust-lang.org/book/first-edition/error-handling.html#the-from-trait
+</span><span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>Unspecified;
 
-<span class="kw">impl</span> <span class="ident">Unspecified</span> {
-    <span class="kw">fn</span> <span class="ident">description_</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;ring::error::Unspecified&quot;</span>
+<span class="kw">impl </span>Unspecified {
+    <span class="kw">fn </span>description_() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;ring::error::Unspecified&quot;
+    </span>}
+}
+
+<span class="comment">// This is required for the implementation of `std::error::Error`.
+</span><span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>Unspecified {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
+        f.write_str(<span class="self">Self</span>::description_())
     }
 }
 
-<span class="comment">// This is required for the implementation of `std::error::Error`.</span>
-<span class="kw">impl</span> <span class="ident">core::fmt::Display</span> <span class="kw">for</span> <span class="ident">Unspecified</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident"><span class="self">Self</span>::description_</span>())
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>Unspecified {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>cause(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">dyn </span>std::error::Error&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">Self</span>::description_()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">Unspecified</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="ident"><span class="self">Self</span>::description_</span>()
+<span class="kw">impl </span>From&lt;untrusted::EndOfInput&gt; <span class="kw">for </span>Unspecified {
+    <span class="kw">fn </span>from(<span class="kw">_</span>: untrusted::EndOfInput) -&gt; <span class="self">Self </span>{
+        Unspecified
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">untrusted::EndOfInput</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Unspecified</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">untrusted::EndOfInput</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Unspecified</span>
+<span class="kw">impl </span>From&lt;core::array::TryFromSliceError&gt; <span class="kw">for </span>Unspecified {
+    <span class="kw">fn </span>from(<span class="kw">_</span>: core::array::TryFromSliceError) -&gt; <span class="self">Self </span>{
+        Unspecified
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">core::array::TryFromSliceError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Unspecified</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">core::array::TryFromSliceError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Unspecified</span>
+<span class="doccomment">/// An error parsing or validating a key.
+///
+/// The `Display` implementation and `&lt;KeyRejected as Error&gt;::description()`
+/// will return a string that will help you better understand why a key was
+/// rejected change which errors are reported in which situations while
+/// minimizing the likelihood that any applications will be broken.
+///
+/// Here is an incomplete list of reasons a key may be unsupported:
+///
+/// * Invalid or Inconsistent Components: A component of the key has an invalid
+///   value, or the mathematical relationship between two (or more) components
+///   required for a valid key does not hold.
+///
+/// * The encoding of the key is invalid. Perhaps the key isn&#39;t in the correct
+///   format; e.g. it may be Base64 (&quot;PEM&quot;) encoded, in which case   the Base64
+///   encoding needs to be undone first.
+///
+/// * The encoding includes a versioning mechanism and that mechanism indicates
+///   that the key is encoded in a version of the encoding that isn&#39;t supported.
+///   This might happen for multi-prime RSA keys (keys with more than two
+///   private   prime factors), which aren&#39;t supported, for example.
+///
+/// * Too small or too Large: One of the primary components of the key is too
+///   small or two large. Too-small keys are rejected for security reasons. Some
+///   unnecessarily large keys are rejected for performance reasons.
+///
+///  * Wrong algorithm: The key is not valid for the algorithm in which it was
+///    being used.
+///
+///  * Unexpected errors: Report this as a bug.
+</span><span class="attribute">#[derive(Copy, Clone, Debug)]
+</span><span class="kw">pub struct </span>KeyRejected(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str);
+
+<span class="kw">impl </span>KeyRejected {
+    <span class="doccomment">/// The value returned from &lt;Self as std::error::Error&gt;::description()
+    </span><span class="kw">pub fn </span>description_(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>inconsistent_components() -&gt; <span class="self">Self </span>{
+        KeyRejected(<span class="string">&quot;InconsistentComponents&quot;</span>)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>invalid_component() -&gt; <span class="self">Self </span>{
+        KeyRejected(<span class="string">&quot;InvalidComponent&quot;</span>)
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>invalid_encoding() -&gt; <span class="self">Self </span>{
+        KeyRejected(<span class="string">&quot;InvalidEncoding&quot;</span>)
+    }
+
+    <span class="comment">// XXX: See the comment at the call site.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>rng_failed() -&gt; <span class="self">Self </span>{
+        KeyRejected(<span class="string">&quot;RNG failed&quot;</span>)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>public_key_is_missing() -&gt; <span class="self">Self </span>{
+        KeyRejected(<span class="string">&quot;PublicKeyIsMissing&quot;</span>)
+    }
+
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>too_small() -&gt; <span class="self">Self </span>{
+        KeyRejected(<span class="string">&quot;TooSmall&quot;</span>)
+    }
+
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>too_large() -&gt; <span class="self">Self </span>{
+        KeyRejected(<span class="string">&quot;TooLarge&quot;</span>)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>version_not_supported() -&gt; <span class="self">Self </span>{
+        KeyRejected(<span class="string">&quot;VersionNotSupported&quot;</span>)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>wrong_algorithm() -&gt; <span class="self">Self </span>{
+        KeyRejected(<span class="string">&quot;WrongAlgorithm&quot;</span>)
+    }
+
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>private_modulus_len_not_multiple_of_512_bits() -&gt; <span class="self">Self </span>{
+        KeyRejected(<span class="string">&quot;PrivateModulusLenNotMultipleOf512Bits&quot;</span>)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unexpected_error() -&gt; <span class="self">Self </span>{
+        KeyRejected(<span class="string">&quot;UnexpectedError&quot;</span>)
     }
 }
 
-<span class="doccomment">/// An error parsing or validating a key.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Display` implementation and `&lt;KeyRejected as Error&gt;::description()`</span>
-<span class="doccomment">/// will return a string that will help you better understand why a key was</span>
-<span class="doccomment">/// rejected change which errors are reported in which situations while</span>
-<span class="doccomment">/// minimizing the likelihood that any applications will be broken.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Here is an incomplete list of reasons a key may be unsupported:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * Invalid or Inconsistent Components: A component of the key has an invalid</span>
-<span class="doccomment">///   value, or the mathematical relationship between two (or more) components</span>
-<span class="doccomment">///   required for a valid key does not hold.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * The encoding of the key is invalid. Perhaps the key isn&#39;t in the correct</span>
-<span class="doccomment">///   format; e.g. it may be Base64 (&quot;PEM&quot;) encoded, in which case   the Base64</span>
-<span class="doccomment">///   encoding needs to be undone first.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * The encoding includes a versioning mechanism and that mechanism indicates</span>
-<span class="doccomment">///   that the key is encoded in a version of the encoding that isn&#39;t supported.</span>
-<span class="doccomment">///   This might happen for multi-prime RSA keys (keys with more than two</span>
-<span class="doccomment">///   private   prime factors), which aren&#39;t supported, for example.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * Too small or too Large: One of the primary components of the key is too</span>
-<span class="doccomment">///   small or two large. Too-small keys are rejected for security reasons. Some</span>
-<span class="doccomment">///   unnecessarily large keys are rejected for performance reasons.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  * Wrong algorithm: The key is not valid for the algorithm in which it was</span>
-<span class="doccomment">///    being used.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  * Unexpected errors: Report this as a bug.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">KeyRejected</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>KeyRejected {
+    <span class="kw">fn </span>cause(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">dyn </span>std::error::Error&gt; {
+        <span class="prelude-val">None
+    </span>}
 
-<span class="kw">impl</span> <span class="ident">KeyRejected</span> {
-    <span class="doccomment">/// The value returned from &lt;Self as std::error::Error&gt;::description()</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">inconsistent_components</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyRejected</span>(<span class="string">&quot;InconsistentComponents&quot;</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">invalid_component</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyRejected</span>(<span class="string">&quot;InvalidComponent&quot;</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">invalid_encoding</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyRejected</span>(<span class="string">&quot;InvalidEncoding&quot;</span>)
-    }
-
-    <span class="comment">// XXX: See the comment at the call site.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">rng_failed</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyRejected</span>(<span class="string">&quot;RNG failed&quot;</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">public_key_is_missing</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyRejected</span>(<span class="string">&quot;PublicKeyIsMissing&quot;</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">too_small</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyRejected</span>(<span class="string">&quot;TooSmall&quot;</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">too_large</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyRejected</span>(<span class="string">&quot;TooLarge&quot;</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">version_not_supported</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyRejected</span>(<span class="string">&quot;VersionNotSupported&quot;</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wrong_algorithm</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyRejected</span>(<span class="string">&quot;WrongAlgorithm&quot;</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">private_modulus_len_not_multiple_of_512_bits</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyRejected</span>(<span class="string">&quot;PrivateModulusLenNotMultipleOf512Bits&quot;</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unexpected_error</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyRejected</span>(<span class="string">&quot;UnexpectedError&quot;</span>)
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.description_()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">KeyRejected</span> {
-    <span class="kw">fn</span> <span class="ident">cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">description_</span>()
+<span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>KeyRejected {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
+        f.write_str(<span class="self">self</span>.description_())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">core::fmt::Display</span> <span class="kw">for</span> <span class="ident">KeyRejected</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">description_</span>())
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KeyRejected</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Unspecified</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">KeyRejected</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Unspecified</span>
+<span class="kw">impl </span>From&lt;KeyRejected&gt; <span class="kw">for </span>Unspecified {
+    <span class="kw">fn </span>from(<span class="kw">_</span>: KeyRejected) -&gt; <span class="self">Self </span>{
+        Unspecified
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/sign.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sign.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/sign.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sign.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -520,122 +520,122 @@
 <span id="520">520</span>
 <span id="521">521</span>
 <span id="522">522</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::key</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">SignatureAlgorithm</span>, <span class="ident">SignatureScheme</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::x509</span>::{<span class="ident">wrap_in_asn1_len</span>, <span class="ident">wrap_in_sequence</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::key;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{SignatureAlgorithm, SignatureScheme};
+<span class="kw">use </span><span class="kw">crate</span>::x509::{wrap_in_asn1_len, wrap_in_sequence};
 
-<span class="kw">use</span> <span class="ident">ring::io::der</span>;
-<span class="kw">use</span> <span class="ident">ring::signature</span>::{<span class="self">self</span>, <span class="ident">EcdsaKeyPair</span>, <span class="ident">Ed25519KeyPair</span>, <span class="ident">RsaKeyPair</span>};
+<span class="kw">use </span>ring::io::der;
+<span class="kw">use </span>ring::signature::{<span class="self">self</span>, EcdsaKeyPair, Ed25519KeyPair, RsaKeyPair};
 
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>std::convert::TryFrom;
+<span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="doccomment">/// An abstract signing key.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SigningKey</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="doccomment">/// Choose a `SignatureScheme` from those offered.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Expresses the choice by returning something that implements `Signer`,</span>
-    <span class="doccomment">/// using the chosen scheme.</span>
-    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An abstract signing key.
+</span><span class="kw">pub trait </span>SigningKey: Send + Sync {
+    <span class="doccomment">/// Choose a `SignatureScheme` from those offered.
+    ///
+    /// Expresses the choice by returning something that implements `Signer`,
+    /// using the chosen scheme.
+    </span><span class="kw">fn </span>choose_scheme(<span class="kw-2">&amp;</span><span class="self">self</span>, offered: <span class="kw-2">&amp;</span>[SignatureScheme]) -&gt; <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Signer&gt;&gt;;
 
-    <span class="doccomment">/// What kind of key we have.</span>
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureAlgorithm</span>;
+    <span class="doccomment">/// What kind of key we have.
+    </span><span class="kw">fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SignatureAlgorithm;
 }
 
-<span class="doccomment">/// A thing that can sign a message.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Signer</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="doccomment">/// Signs `message` using the selected scheme.</span>
-    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A thing that can sign a message.
+</span><span class="kw">pub trait </span>Signer: Send + Sync {
+    <span class="doccomment">/// Signs `message` using the selected scheme.
+    </span><span class="kw">fn </span>sign(<span class="kw-2">&amp;</span><span class="self">self</span>, message: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Error&gt;;
 
-    <span class="doccomment">/// Reveals which scheme will be used when you call `sign()`.</span>
-    <span class="kw">fn</span> <span class="ident">scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureScheme</span>;
+    <span class="doccomment">/// Reveals which scheme will be used when you call `sign()`.
+    </span><span class="kw">fn </span>scheme(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SignatureScheme;
 }
 
-<span class="doccomment">/// A packaged-together certificate chain, matching `SigningKey` and</span>
-<span class="doccomment">/// optional stapled OCSP response and/or SCT list.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CertifiedKey</span> {
-    <span class="doccomment">/// The certificate chain.</span>
-    <span class="kw">pub</span> <span class="ident">cert</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A packaged-together certificate chain, matching `SigningKey` and
+/// optional stapled OCSP response and/or SCT list.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>CertifiedKey {
+    <span class="doccomment">/// The certificate chain.
+    </span><span class="kw">pub </span>cert: Vec&lt;key::Certificate&gt;,
 
-    <span class="doccomment">/// The certified key.</span>
-    <span class="kw">pub</span> <span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The certified key.
+    </span><span class="kw">pub </span>key: Arc&lt;<span class="kw">dyn </span>SigningKey&gt;,
 
-    <span class="doccomment">/// An optional OCSP response from the certificate issuer,</span>
-    <span class="doccomment">/// attesting to its continued validity.</span>
-    <span class="kw">pub</span> <span class="ident">ocsp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An optional OCSP response from the certificate issuer,
+    /// attesting to its continued validity.
+    </span><span class="kw">pub </span>ocsp: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
 
-    <span class="doccomment">/// An optional collection of SCTs from CT logs, proving the</span>
-    <span class="doccomment">/// certificate is included on those logs.  This must be</span>
-    <span class="doccomment">/// a `SignedCertificateTimestampList` encoding; see RFC6962.</span>
-    <span class="kw">pub</span> <span class="ident">sct_list</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An optional collection of SCTs from CT logs, proving the
+    /// certificate is included on those logs.  This must be
+    /// a `SignedCertificateTimestampList` encoding; see RFC6962.
+    </span><span class="kw">pub </span>sct_list: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CertifiedKey</span> {
-    <span class="doccomment">/// Make a new CertifiedKey, with the given chain and key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The cert chain must not be empty. The first certificate in the chain</span>
-    <span class="doccomment">/// must be the end-entity certificate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cert</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>, <span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">cert</span>,
-            <span class="ident">key</span>,
-            <span class="ident">ocsp</span>: <span class="prelude-val">None</span>,
-            <span class="ident">sct_list</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>CertifiedKey {
+    <span class="doccomment">/// Make a new CertifiedKey, with the given chain and key.
+    ///
+    /// The cert chain must not be empty. The first certificate in the chain
+    /// must be the end-entity certificate.
+    </span><span class="kw">pub fn </span>new(cert: Vec&lt;key::Certificate&gt;, key: Arc&lt;<span class="kw">dyn </span>SigningKey&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            cert,
+            key,
+            ocsp: <span class="prelude-val">None</span>,
+            sct_list: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// The end-entity certificate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_entity_cert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">key::Certificate</span>, <span class="ident">SignError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cert</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">ok_or</span>(<span class="ident">SignError</span>(()))
+    <span class="doccomment">/// The end-entity certificate.
+    </span><span class="kw">pub fn </span>end_entity_cert(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>key::Certificate, SignError&gt; {
+        <span class="self">self</span>.cert.get(<span class="number">0</span>).ok_or(SignError(()))
     }
 
-    <span class="doccomment">/// Check the certificate chain for validity:</span>
-    <span class="doccomment">/// - it should be non-empty list</span>
-    <span class="doccomment">/// - the first certificate should be parsable as a x509v3,</span>
-    <span class="doccomment">/// - the first certificate should quote the given server name</span>
-    <span class="doccomment">///   (if provided)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// These checks are not security-sensitive.  They are the</span>
-    <span class="doccomment">/// *server* attempting to detect accidental misconfiguration.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cross_check_end_entity_cert</span>(
+    <span class="doccomment">/// Check the certificate chain for validity:
+    /// - it should be non-empty list
+    /// - the first certificate should be parsable as a x509v3,
+    /// - the first certificate should quote the given server name
+    ///   (if provided)
+    ///
+    /// These checks are not security-sensitive.  They are the
+    /// *server* attempting to detect accidental misconfiguration.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>cross_check_end_entity_cert(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">webpki::DnsNameRef</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// Always reject an empty certificate chain.</span>
-        <span class="kw">let</span> <span class="ident">end_entity_cert</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">end_entity_cert</span>()
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">SignError</span>(())<span class="op">|</span> {
-                <span class="ident">Error::General</span>(<span class="string">&quot;No end-entity certificate in certificate chain&quot;</span>.<span class="ident">to_string</span>())
+        name: <span class="prelude-ty">Option</span>&lt;webpki::DnsNameRef&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="comment">// Always reject an empty certificate chain.
+        </span><span class="kw">let </span>end_entity_cert = <span class="self">self
+            </span>.end_entity_cert()
+            .map_err(|SignError(())| {
+                Error::General(<span class="string">&quot;No end-entity certificate in certificate chain&quot;</span>.to_string())
             })<span class="question-mark">?</span>;
 
-        <span class="comment">// Reject syntactically-invalid end-entity certificates.</span>
-        <span class="kw">let</span> <span class="ident">end_entity_cert</span> <span class="op">=</span>
-            <span class="ident">webpki::EndEntityCert::try_from</span>(<span class="ident">end_entity_cert</span>.<span class="ident">as_ref</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="ident">Error::General</span>(
+        <span class="comment">// Reject syntactically-invalid end-entity certificates.
+        </span><span class="kw">let </span>end_entity_cert =
+            webpki::EndEntityCert::try_from(end_entity_cert.as_ref()).map_err(|<span class="kw">_</span>| {
+                Error::General(
                     <span class="string">&quot;End-entity certificate in certificate \
-                                  chain is syntactically invalid&quot;</span>
-                        .<span class="ident">to_string</span>(),
+                                  chain is syntactically invalid&quot;
+                        </span>.to_string(),
                 )
             })<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">name</span> {
-            <span class="comment">// If SNI was offered then the certificate must be valid for</span>
-            <span class="comment">// that hostname. Note that this doesn&#39;t fully validate that the</span>
-            <span class="comment">// certificate is valid; it only validates that the name is one</span>
-            <span class="comment">// that the certificate is valid for, if the certificate is</span>
-            <span class="comment">// valid.</span>
-            <span class="kw">if</span> <span class="ident">end_entity_cert</span>
-                .<span class="ident">verify_is_valid_for_dns_name</span>(<span class="ident">name</span>)
-                .<span class="ident">is_err</span>()
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = name {
+            <span class="comment">// If SNI was offered then the certificate must be valid for
+            // that hostname. Note that this doesn&#39;t fully validate that the
+            // certificate is valid; it only validates that the name is one
+            // that the certificate is valid for, if the certificate is
+            // valid.
+            </span><span class="kw">if </span>end_entity_cert
+                .verify_is_valid_for_dns_name(name)
+                .is_err()
             {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::General</span>(
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::General(
                     <span class="string">&quot;The server certificate is not \
-                                             valid for the given name&quot;</span>
-                        .<span class="ident">to_string</span>(),
+                                             valid for the given name&quot;
+                        </span>.to_string(),
                 ));
             }
         }
@@ -644,403 +644,403 @@
     }
 }
 
-<span class="doccomment">/// Parse `der` as any supported key encoding/type, returning</span>
-<span class="doccomment">/// the first which works.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any_supported_type</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span>, <span class="ident">SignError</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">rsa</span>) <span class="op">=</span> <span class="ident">RsaSigningKey::new</span>(<span class="ident">der</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">Arc::new</span>(<span class="ident">rsa</span>))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ecdsa</span>) <span class="op">=</span> <span class="ident">any_ecdsa_type</span>(<span class="ident">der</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">ecdsa</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">any_eddsa_type</span>(<span class="ident">der</span>)
+<span class="doccomment">/// Parse `der` as any supported key encoding/type, returning
+/// the first which works.
+</span><span class="kw">pub fn </span>any_supported_type(der: <span class="kw-2">&amp;</span>key::PrivateKey) -&gt; <span class="prelude-ty">Result</span>&lt;Arc&lt;<span class="kw">dyn </span>SigningKey&gt;, SignError&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Ok</span>(rsa) = RsaSigningKey::new(der) {
+        <span class="prelude-val">Ok</span>(Arc::new(rsa))
+    } <span class="kw">else if let </span><span class="prelude-val">Ok</span>(ecdsa) = any_ecdsa_type(der) {
+        <span class="prelude-val">Ok</span>(ecdsa)
+    } <span class="kw">else </span>{
+        any_eddsa_type(der)
     }
 }
 
-<span class="doccomment">/// Parse `der` as any ECDSA key type, returning the first which works.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Both SEC1 (PEM section starting with &#39;BEGIN EC PRIVATE KEY&#39;) and PKCS8</span>
-<span class="doccomment">/// (PEM section starting with &#39;BEGIN PRIVATE KEY&#39;) encodings are supported.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any_ecdsa_type</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span>, <span class="ident">SignError</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ecdsa_p256</span>) <span class="op">=</span> <span class="ident">EcdsaSigningKey::new</span>(
-        <span class="ident">der</span>,
-        <span class="ident">SignatureScheme::ECDSA_NISTP256_SHA256</span>,
-        <span class="kw-2">&amp;</span><span class="ident">signature::ECDSA_P256_SHA256_ASN1_SIGNING</span>,
+<span class="doccomment">/// Parse `der` as any ECDSA key type, returning the first which works.
+///
+/// Both SEC1 (PEM section starting with &#39;BEGIN EC PRIVATE KEY&#39;) and PKCS8
+/// (PEM section starting with &#39;BEGIN PRIVATE KEY&#39;) encodings are supported.
+</span><span class="kw">pub fn </span>any_ecdsa_type(der: <span class="kw-2">&amp;</span>key::PrivateKey) -&gt; <span class="prelude-ty">Result</span>&lt;Arc&lt;<span class="kw">dyn </span>SigningKey&gt;, SignError&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Ok</span>(ecdsa_p256) = EcdsaSigningKey::new(
+        der,
+        SignatureScheme::ECDSA_NISTP256_SHA256,
+        <span class="kw-2">&amp;</span>signature::ECDSA_P256_SHA256_ASN1_SIGNING,
     ) {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Arc::new</span>(<span class="ident">ecdsa_p256</span>));
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(Arc::new(ecdsa_p256));
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ecdsa_p384</span>) <span class="op">=</span> <span class="ident">EcdsaSigningKey::new</span>(
-        <span class="ident">der</span>,
-        <span class="ident">SignatureScheme::ECDSA_NISTP384_SHA384</span>,
-        <span class="kw-2">&amp;</span><span class="ident">signature::ECDSA_P384_SHA384_ASN1_SIGNING</span>,
+    <span class="kw">if let </span><span class="prelude-val">Ok</span>(ecdsa_p384) = EcdsaSigningKey::new(
+        der,
+        SignatureScheme::ECDSA_NISTP384_SHA384,
+        <span class="kw-2">&amp;</span>signature::ECDSA_P384_SHA384_ASN1_SIGNING,
     ) {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Arc::new</span>(<span class="ident">ecdsa_p384</span>));
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(Arc::new(ecdsa_p384));
     }
 
-    <span class="prelude-val">Err</span>(<span class="ident">SignError</span>(()))
+    <span class="prelude-val">Err</span>(SignError(()))
 }
 
-<span class="doccomment">/// Parse `der` as any EdDSA key type, returning the first which works.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any_eddsa_type</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span>, <span class="ident">SignError</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ed25519</span>) <span class="op">=</span> <span class="ident">Ed25519SigningKey::new</span>(<span class="ident">der</span>, <span class="ident">SignatureScheme::ED25519</span>) {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Arc::new</span>(<span class="ident">ed25519</span>));
+<span class="doccomment">/// Parse `der` as any EdDSA key type, returning the first which works.
+</span><span class="kw">pub fn </span>any_eddsa_type(der: <span class="kw-2">&amp;</span>key::PrivateKey) -&gt; <span class="prelude-ty">Result</span>&lt;Arc&lt;<span class="kw">dyn </span>SigningKey&gt;, SignError&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Ok</span>(ed25519) = Ed25519SigningKey::new(der, SignatureScheme::ED25519) {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(Arc::new(ed25519));
     }
 
-    <span class="comment">// TODO: Add support for Ed448</span>
+    <span class="comment">// TODO: Add support for Ed448
 
-    <span class="prelude-val">Err</span>(<span class="ident">SignError</span>(()))
+    </span><span class="prelude-val">Err</span>(SignError(()))
 }
 
-<span class="doccomment">/// A `SigningKey` for RSA-PKCS1 or RSA-PSS.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is used by the test suite, so it must be `pub`, but it isn&#39;t part of</span>
-<span class="doccomment">/// the public, stable, API.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RsaSigningKey</span> {
-    <span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RsaKeyPair</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A `SigningKey` for RSA-PKCS1 or RSA-PSS.
+///
+/// This is used by the test suite, so it must be `pub`, but it isn&#39;t part of
+/// the public, stable, API.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub struct </span>RsaSigningKey {
+    key: Arc&lt;RsaKeyPair&gt;,
 }
 
-<span class="kw">static</span> <span class="ident">ALL_RSA_SCHEMES</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">SignatureScheme::RSA_PSS_SHA512</span>,
-    <span class="ident">SignatureScheme::RSA_PSS_SHA384</span>,
-    <span class="ident">SignatureScheme::RSA_PSS_SHA256</span>,
-    <span class="ident">SignatureScheme::RSA_PKCS1_SHA512</span>,
-    <span class="ident">SignatureScheme::RSA_PKCS1_SHA384</span>,
-    <span class="ident">SignatureScheme::RSA_PKCS1_SHA256</span>,
+<span class="kw">static </span>ALL_RSA_SCHEMES: <span class="kw-2">&amp;</span>[SignatureScheme] = <span class="kw-2">&amp;</span>[
+    SignatureScheme::RSA_PSS_SHA512,
+    SignatureScheme::RSA_PSS_SHA384,
+    SignatureScheme::RSA_PSS_SHA256,
+    SignatureScheme::RSA_PKCS1_SHA512,
+    SignatureScheme::RSA_PKCS1_SHA384,
+    SignatureScheme::RSA_PKCS1_SHA256,
 ];
 
-<span class="kw">impl</span> <span class="ident">RsaSigningKey</span> {
-    <span class="doccomment">/// Make a new `RsaSigningKey` from a DER encoding, in either</span>
-    <span class="doccomment">/// PKCS#1 or PKCS#8 format.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SignError</span><span class="op">&gt;</span> {
-        <span class="ident">RsaKeyPair::from_der</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>.<span class="number">0</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RsaKeyPair::from_pkcs8</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>.<span class="number">0</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="self">Self</span> { <span class="ident">key</span>: <span class="ident">Arc::new</span>(<span class="ident">s</span>) })
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">SignError</span>(()))
+<span class="kw">impl </span>RsaSigningKey {
+    <span class="doccomment">/// Make a new `RsaSigningKey` from a DER encoding, in either
+    /// PKCS#1 or PKCS#8 format.
+    </span><span class="kw">pub fn </span>new(der: <span class="kw-2">&amp;</span>key::PrivateKey) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SignError&gt; {
+        RsaKeyPair::from_der(<span class="kw-2">&amp;</span>der.<span class="number">0</span>)
+            .or_else(|<span class="kw">_</span>| RsaKeyPair::from_pkcs8(<span class="kw-2">&amp;</span>der.<span class="number">0</span>))
+            .map(|s| <span class="self">Self </span>{ key: Arc::new(s) })
+            .map_err(|<span class="kw">_</span>| SignError(()))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SigningKey</span> <span class="kw">for</span> <span class="ident">RsaSigningKey</span> {
-    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">ALL_RSA_SCHEMES</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">scheme</span><span class="op">|</span> <span class="ident">offered</span>.<span class="ident">contains</span>(<span class="ident">scheme</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">scheme</span><span class="op">|</span> <span class="ident">RsaSigner::new</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>), <span class="kw-2">*</span><span class="ident">scheme</span>))
+<span class="kw">impl </span>SigningKey <span class="kw">for </span>RsaSigningKey {
+    <span class="kw">fn </span>choose_scheme(<span class="kw-2">&amp;</span><span class="self">self</span>, offered: <span class="kw-2">&amp;</span>[SignatureScheme]) -&gt; <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Signer&gt;&gt; {
+        ALL_RSA_SCHEMES
+            .iter()
+            .find(|scheme| offered.contains(scheme))
+            .map(|scheme| RsaSigner::new(Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.key), <span class="kw-2">*</span>scheme))
     }
 
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureAlgorithm</span> {
-        <span class="ident">SignatureAlgorithm::RSA</span>
+    <span class="kw">fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SignatureAlgorithm {
+        SignatureAlgorithm::RSA
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::upper_case_acronyms</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.20.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use RsaSigningKey&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RSASigningKey</span> <span class="op">=</span> <span class="ident">RsaSigningKey</span>;
+<span class="attribute">#[allow(clippy::upper_case_acronyms)]
+#[doc(hidden)]
+#[deprecated(since = <span class="string">&quot;0.20.0&quot;</span>, note = <span class="string">&quot;Use RsaSigningKey&quot;</span>)]
+</span><span class="kw">pub type </span>RSASigningKey = RsaSigningKey;
 
-<span class="kw">struct</span> <span class="ident">RsaSigner</span> {
-    <span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RsaKeyPair</span><span class="op">&gt;</span>,
-    <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>,
-    <span class="ident">encoding</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">signature::RsaEncoding</span>,
+<span class="kw">struct </span>RsaSigner {
+    key: Arc&lt;RsaKeyPair&gt;,
+    scheme: SignatureScheme,
+    encoding: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>signature::RsaEncoding,
 }
 
-<span class="kw">impl</span> <span class="ident">RsaSigner</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RsaKeyPair</span><span class="op">&gt;</span>, <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">encoding</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">signature::RsaEncoding</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">scheme</span> {
-            <span class="ident">SignatureScheme::RSA_PKCS1_SHA256</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PKCS1_SHA256</span>,
-            <span class="ident">SignatureScheme::RSA_PKCS1_SHA384</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PKCS1_SHA384</span>,
-            <span class="ident">SignatureScheme::RSA_PKCS1_SHA512</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PKCS1_SHA512</span>,
-            <span class="ident">SignatureScheme::RSA_PSS_SHA256</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PSS_SHA256</span>,
-            <span class="ident">SignatureScheme::RSA_PSS_SHA384</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PSS_SHA384</span>,
-            <span class="ident">SignatureScheme::RSA_PSS_SHA512</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PSS_SHA512</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+<span class="kw">impl </span>RsaSigner {
+    <span class="kw">fn </span>new(key: Arc&lt;RsaKeyPair&gt;, scheme: SignatureScheme) -&gt; Box&lt;<span class="kw">dyn </span>Signer&gt; {
+        <span class="kw">let </span>encoding: <span class="kw-2">&amp;</span><span class="kw">dyn </span>signature::RsaEncoding = <span class="kw">match </span>scheme {
+            SignatureScheme::RSA_PKCS1_SHA256 =&gt; <span class="kw-2">&amp;</span>signature::RSA_PKCS1_SHA256,
+            SignatureScheme::RSA_PKCS1_SHA384 =&gt; <span class="kw-2">&amp;</span>signature::RSA_PKCS1_SHA384,
+            SignatureScheme::RSA_PKCS1_SHA512 =&gt; <span class="kw-2">&amp;</span>signature::RSA_PKCS1_SHA512,
+            SignatureScheme::RSA_PSS_SHA256 =&gt; <span class="kw-2">&amp;</span>signature::RSA_PSS_SHA256,
+            SignatureScheme::RSA_PSS_SHA384 =&gt; <span class="kw-2">&amp;</span>signature::RSA_PSS_SHA384,
+            SignatureScheme::RSA_PSS_SHA512 =&gt; <span class="kw-2">&amp;</span>signature::RSA_PSS_SHA512,
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         };
 
-        <span class="ident">Box::new</span>(<span class="self">Self</span> {
-            <span class="ident">key</span>,
-            <span class="ident">scheme</span>,
-            <span class="ident">encoding</span>,
+        Box::new(<span class="self">Self </span>{
+            key,
+            scheme,
+            encoding,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Signer</span> <span class="kw">for</span> <span class="ident">RsaSigner</span> {
-    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sig</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">public_modulus_len</span>()];
+<span class="kw">impl </span>Signer <span class="kw">for </span>RsaSigner {
+    <span class="kw">fn </span>sign(<span class="kw-2">&amp;</span><span class="self">self</span>, message: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>sig = <span class="macro">vec!</span>[<span class="number">0</span>; <span class="self">self</span>.key.public_modulus_len()];
 
-        <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">ring::rand::SystemRandom::new</span>();
-        <span class="self">self</span>.<span class="ident">key</span>
-            .<span class="ident">sign</span>(<span class="self">self</span>.<span class="ident">encoding</span>, <span class="kw-2">&amp;</span><span class="ident">rng</span>, <span class="ident">message</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sig</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">sig</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::General</span>(<span class="string">&quot;signing failed&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let </span>rng = ring::rand::SystemRandom::new();
+        <span class="self">self</span>.key
+            .sign(<span class="self">self</span>.encoding, <span class="kw-2">&amp;</span>rng, message, <span class="kw-2">&amp;mut </span>sig)
+            .map(|<span class="kw">_</span>| sig)
+            .map_err(|<span class="kw">_</span>| Error::General(<span class="string">&quot;signing failed&quot;</span>.to_string()))
     }
 
-    <span class="kw">fn</span> <span class="ident">scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureScheme</span> {
-        <span class="self">self</span>.<span class="ident">scheme</span>
+    <span class="kw">fn </span>scheme(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SignatureScheme {
+        <span class="self">self</span>.scheme
     }
 }
 
-<span class="doccomment">/// A SigningKey that uses exactly one TLS-level SignatureScheme</span>
-<span class="doccomment">/// and one ring-level signature::SigningAlgorithm.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Compare this to RsaSigningKey, which for a particular key is</span>
-<span class="doccomment">/// willing to sign with several algorithms.  This is quite poor</span>
-<span class="doccomment">/// cryptography practice, but is necessary because a given RSA key</span>
-<span class="doccomment">/// is expected to work in TLS1.2 (PKCS#1 signatures) and TLS1.3</span>
-<span class="doccomment">/// (PSS signatures) -- nobody is willing to obtain certificates for</span>
-<span class="doccomment">/// different protocol versions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Currently this is only implemented for ECDSA keys.</span>
-<span class="kw">struct</span> <span class="ident">EcdsaSigningKey</span> {
-    <span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">EcdsaKeyPair</span><span class="op">&gt;</span>,
-    <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>,
+<span class="doccomment">/// A SigningKey that uses exactly one TLS-level SignatureScheme
+/// and one ring-level signature::SigningAlgorithm.
+///
+/// Compare this to RsaSigningKey, which for a particular key is
+/// willing to sign with several algorithms.  This is quite poor
+/// cryptography practice, but is necessary because a given RSA key
+/// is expected to work in TLS1.2 (PKCS#1 signatures) and TLS1.3
+/// (PSS signatures) -- nobody is willing to obtain certificates for
+/// different protocol versions.
+///
+/// Currently this is only implemented for ECDSA keys.
+</span><span class="kw">struct </span>EcdsaSigningKey {
+    key: Arc&lt;EcdsaKeyPair&gt;,
+    scheme: SignatureScheme,
 }
 
-<span class="kw">impl</span> <span class="ident">EcdsaSigningKey</span> {
-    <span class="doccomment">/// Make a new `ECDSASigningKey` from a DER encoding in PKCS#8 or SEC1</span>
-    <span class="doccomment">/// format, expecting a key usable with precisely the given signature</span>
-    <span class="doccomment">/// scheme.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>,
-        <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>,
-        <span class="ident">sigalg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">signature::EcdsaSigningAlgorithm</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, ()<span class="op">&gt;</span> {
-        <span class="ident">EcdsaKeyPair::from_pkcs8</span>(<span class="ident">sigalg</span>, <span class="kw-2">&amp;</span><span class="ident">der</span>.<span class="number">0</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::convert_sec1_to_pkcs8</span>(<span class="ident">scheme</span>, <span class="ident">sigalg</span>, <span class="kw-2">&amp;</span><span class="ident">der</span>.<span class="number">0</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">kp</span><span class="op">|</span> <span class="self">Self</span> {
-                <span class="ident">key</span>: <span class="ident">Arc::new</span>(<span class="ident">kp</span>),
-                <span class="ident">scheme</span>,
+<span class="kw">impl </span>EcdsaSigningKey {
+    <span class="doccomment">/// Make a new `ECDSASigningKey` from a DER encoding in PKCS#8 or SEC1
+    /// format, expecting a key usable with precisely the given signature
+    /// scheme.
+    </span><span class="kw">fn </span>new(
+        der: <span class="kw-2">&amp;</span>key::PrivateKey,
+        scheme: SignatureScheme,
+        sigalg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>signature::EcdsaSigningAlgorithm,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ()&gt; {
+        EcdsaKeyPair::from_pkcs8(sigalg, <span class="kw-2">&amp;</span>der.<span class="number">0</span>)
+            .map_err(|<span class="kw">_</span>| ())
+            .or_else(|<span class="kw">_</span>| <span class="self">Self</span>::convert_sec1_to_pkcs8(scheme, sigalg, <span class="kw-2">&amp;</span>der.<span class="number">0</span>))
+            .map(|kp| <span class="self">Self </span>{
+                key: Arc::new(kp),
+                scheme,
             })
     }
 
-    <span class="doccomment">/// Convert a SEC1 encoding to PKCS8, and ask ring to parse it.  This</span>
-    <span class="doccomment">/// can be removed once https://github.com/briansmith/ring/pull/1456</span>
-    <span class="doccomment">/// (or equivalent) is landed.</span>
-    <span class="kw">fn</span> <span class="ident">convert_sec1_to_pkcs8</span>(
-        <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>,
-        <span class="ident">sigalg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">signature::EcdsaSigningAlgorithm</span>,
-        <span class="ident">maybe_sec1_der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EcdsaKeyPair</span>, ()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pkcs8_prefix</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">scheme</span> {
-            <span class="ident">SignatureScheme::ECDSA_NISTP256_SHA256</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">PKCS8_PREFIX_ECDSA_NISTP256</span>,
-            <span class="ident">SignatureScheme::ECDSA_NISTP384_SHA384</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">PKCS8_PREFIX_ECDSA_NISTP384</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// all callers are in this file</span>
-        };
+    <span class="doccomment">/// Convert a SEC1 encoding to PKCS8, and ask ring to parse it.  This
+    /// can be removed once https://github.com/briansmith/ring/pull/1456
+    /// (or equivalent) is landed.
+    </span><span class="kw">fn </span>convert_sec1_to_pkcs8(
+        scheme: SignatureScheme,
+        sigalg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>signature::EcdsaSigningAlgorithm,
+        maybe_sec1_der: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;EcdsaKeyPair, ()&gt; {
+        <span class="kw">let </span>pkcs8_prefix = <span class="kw">match </span>scheme {
+            SignatureScheme::ECDSA_NISTP256_SHA256 =&gt; <span class="kw-2">&amp;</span>PKCS8_PREFIX_ECDSA_NISTP256,
+            SignatureScheme::ECDSA_NISTP384_SHA384 =&gt; <span class="kw-2">&amp;</span>PKCS8_PREFIX_ECDSA_NISTP384,
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(), <span class="comment">// all callers are in this file
+        </span>};
 
-        <span class="comment">// wrap sec1 encoding in an OCTET STRING</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sec1_wrap</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">maybe_sec1_der</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">8</span>);
-        <span class="ident">sec1_wrap</span>.<span class="ident">extend_from_slice</span>(<span class="ident">maybe_sec1_der</span>);
-        <span class="ident">wrap_in_asn1_len</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sec1_wrap</span>);
-        <span class="ident">sec1_wrap</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">der::Tag::OctetString</span> <span class="kw">as</span> <span class="ident">u8</span>);
+        <span class="comment">// wrap sec1 encoding in an OCTET STRING
+        </span><span class="kw">let </span><span class="kw-2">mut </span>sec1_wrap = Vec::with_capacity(maybe_sec1_der.len() + <span class="number">8</span>);
+        sec1_wrap.extend_from_slice(maybe_sec1_der);
+        wrap_in_asn1_len(<span class="kw-2">&amp;mut </span>sec1_wrap);
+        sec1_wrap.insert(<span class="number">0</span>, der::Tag::OctetString <span class="kw">as </span>u8);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pkcs8</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">pkcs8_prefix</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">sec1_wrap</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">4</span>);
-        <span class="ident">pkcs8</span>.<span class="ident">extend_from_slice</span>(<span class="ident">pkcs8_prefix</span>);
-        <span class="ident">pkcs8</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">sec1_wrap</span>);
-        <span class="ident">wrap_in_sequence</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pkcs8</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>pkcs8 = Vec::with_capacity(pkcs8_prefix.len() + sec1_wrap.len() + <span class="number">4</span>);
+        pkcs8.extend_from_slice(pkcs8_prefix);
+        pkcs8.extend_from_slice(<span class="kw-2">&amp;</span>sec1_wrap);
+        wrap_in_sequence(<span class="kw-2">&amp;mut </span>pkcs8);
 
-        <span class="ident">EcdsaKeyPair::from_pkcs8</span>(<span class="ident">sigalg</span>, <span class="kw-2">&amp;</span><span class="ident">pkcs8</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+        EcdsaKeyPair::from_pkcs8(sigalg, <span class="kw-2">&amp;</span>pkcs8).map_err(|<span class="kw">_</span>| ())
     }
 }
 
-<span class="comment">// This is (line-by-line):</span>
-<span class="comment">// - INTEGER Version = 0</span>
-<span class="comment">// - SEQUENCE (privateKeyAlgorithm)</span>
-<span class="comment">//   - id-ecPublicKey OID</span>
-<span class="comment">//   - prime256v1 OID</span>
-<span class="kw">const</span> <span class="ident">PKCS8_PREFIX_ECDSA_NISTP256</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x02\x01\x00\
+<span class="comment">// This is (line-by-line):
+// - INTEGER Version = 0
+// - SEQUENCE (privateKeyAlgorithm)
+//   - id-ecPublicKey OID
+//   - prime256v1 OID
+</span><span class="kw">const </span>PKCS8_PREFIX_ECDSA_NISTP256: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x02\x01\x00\
       \x30\x13\
       \x06\x07\x2a\x86\x48\xce\x3d\x02\x01\
       \x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07&quot;</span>;
 
-<span class="comment">// This is (line-by-line):</span>
-<span class="comment">// - INTEGER Version = 0</span>
-<span class="comment">// - SEQUENCE (privateKeyAlgorithm)</span>
-<span class="comment">//   - id-ecPublicKey OID</span>
-<span class="comment">//   - secp384r1 OID</span>
-<span class="kw">const</span> <span class="ident">PKCS8_PREFIX_ECDSA_NISTP384</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x02\x01\x00\
+<span class="comment">// This is (line-by-line):
+// - INTEGER Version = 0
+// - SEQUENCE (privateKeyAlgorithm)
+//   - id-ecPublicKey OID
+//   - secp384r1 OID
+</span><span class="kw">const </span>PKCS8_PREFIX_ECDSA_NISTP384: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x02\x01\x00\
      \x30\x10\
      \x06\x07\x2a\x86\x48\xce\x3d\x02\x01\
      \x06\x05\x2b\x81\x04\x00\x22&quot;</span>;
 
-<span class="kw">impl</span> <span class="ident">SigningKey</span> <span class="kw">for</span> <span class="ident">EcdsaSigningKey</span> {
-    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">offered</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">scheme</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">EcdsaSigner</span> {
-                <span class="ident">key</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>),
-                <span class="ident">scheme</span>: <span class="self">self</span>.<span class="ident">scheme</span>,
+<span class="kw">impl </span>SigningKey <span class="kw">for </span>EcdsaSigningKey {
+    <span class="kw">fn </span>choose_scheme(<span class="kw-2">&amp;</span><span class="self">self</span>, offered: <span class="kw-2">&amp;</span>[SignatureScheme]) -&gt; <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Signer&gt;&gt; {
+        <span class="kw">if </span>offered.contains(<span class="kw-2">&amp;</span><span class="self">self</span>.scheme) {
+            <span class="prelude-val">Some</span>(Box::new(EcdsaSigner {
+                key: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.key),
+                scheme: <span class="self">self</span>.scheme,
             }))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureAlgorithm</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::DecomposedSignatureScheme</span>;
-        <span class="self">self</span>.<span class="ident">scheme</span>.<span class="ident">sign</span>()
-    }
-}
-
-<span class="kw">struct</span> <span class="ident">EcdsaSigner</span> {
-    <span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">EcdsaKeyPair</span><span class="op">&gt;</span>,
-    <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Signer</span> <span class="kw">for</span> <span class="ident">EcdsaSigner</span> {
-    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">ring::rand::SystemRandom::new</span>();
-        <span class="self">self</span>.<span class="ident">key</span>
-            .<span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="ident">rng</span>, <span class="ident">message</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::General</span>(<span class="string">&quot;signing failed&quot;</span>.<span class="ident">into</span>()))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sig</span><span class="op">|</span> <span class="ident">sig</span>.<span class="ident">as_ref</span>().<span class="ident">into</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureScheme</span> {
-        <span class="self">self</span>.<span class="ident">scheme</span>
+    <span class="kw">fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SignatureAlgorithm {
+        <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::DecomposedSignatureScheme;
+        <span class="self">self</span>.scheme.sign()
     }
 }
 
-<span class="doccomment">/// A SigningKey that uses exactly one TLS-level SignatureScheme</span>
-<span class="doccomment">/// and one ring-level signature::SigningAlgorithm.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Compare this to RsaSigningKey, which for a particular key is</span>
-<span class="doccomment">/// willing to sign with several algorithms.  This is quite poor</span>
-<span class="doccomment">/// cryptography practice, but is necessary because a given RSA key</span>
-<span class="doccomment">/// is expected to work in TLS1.2 (PKCS#1 signatures) and TLS1.3</span>
-<span class="doccomment">/// (PSS signatures) -- nobody is willing to obtain certificates for</span>
-<span class="doccomment">/// different protocol versions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Currently this is only implemented for Ed25519 keys.</span>
-<span class="kw">struct</span> <span class="ident">Ed25519SigningKey</span> {
-    <span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Ed25519KeyPair</span><span class="op">&gt;</span>,
-    <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>,
+<span class="kw">struct </span>EcdsaSigner {
+    key: Arc&lt;EcdsaKeyPair&gt;,
+    scheme: SignatureScheme,
 }
 
-<span class="kw">impl</span> <span class="ident">Ed25519SigningKey</span> {
-    <span class="doccomment">/// Make a new `Ed25519SigningKey` from a DER encoding in PKCS#8 format,</span>
-    <span class="doccomment">/// expecting a key usable with precisely the given signature scheme.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>, <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SignError</span><span class="op">&gt;</span> {
-        <span class="ident">Ed25519KeyPair::from_pkcs8_maybe_unchecked</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>.<span class="number">0</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">kp</span><span class="op">|</span> <span class="self">Self</span> {
-                <span class="ident">key</span>: <span class="ident">Arc::new</span>(<span class="ident">kp</span>),
-                <span class="ident">scheme</span>,
+<span class="kw">impl </span>Signer <span class="kw">for </span>EcdsaSigner {
+    <span class="kw">fn </span>sign(<span class="kw-2">&amp;</span><span class="self">self</span>, message: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Error&gt; {
+        <span class="kw">let </span>rng = ring::rand::SystemRandom::new();
+        <span class="self">self</span>.key
+            .sign(<span class="kw-2">&amp;</span>rng, message)
+            .map_err(|<span class="kw">_</span>| Error::General(<span class="string">&quot;signing failed&quot;</span>.into()))
+            .map(|sig| sig.as_ref().into())
+    }
+
+    <span class="kw">fn </span>scheme(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SignatureScheme {
+        <span class="self">self</span>.scheme
+    }
+}
+
+<span class="doccomment">/// A SigningKey that uses exactly one TLS-level SignatureScheme
+/// and one ring-level signature::SigningAlgorithm.
+///
+/// Compare this to RsaSigningKey, which for a particular key is
+/// willing to sign with several algorithms.  This is quite poor
+/// cryptography practice, but is necessary because a given RSA key
+/// is expected to work in TLS1.2 (PKCS#1 signatures) and TLS1.3
+/// (PSS signatures) -- nobody is willing to obtain certificates for
+/// different protocol versions.
+///
+/// Currently this is only implemented for Ed25519 keys.
+</span><span class="kw">struct </span>Ed25519SigningKey {
+    key: Arc&lt;Ed25519KeyPair&gt;,
+    scheme: SignatureScheme,
+}
+
+<span class="kw">impl </span>Ed25519SigningKey {
+    <span class="doccomment">/// Make a new `Ed25519SigningKey` from a DER encoding in PKCS#8 format,
+    /// expecting a key usable with precisely the given signature scheme.
+    </span><span class="kw">fn </span>new(der: <span class="kw-2">&amp;</span>key::PrivateKey, scheme: SignatureScheme) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SignError&gt; {
+        Ed25519KeyPair::from_pkcs8_maybe_unchecked(<span class="kw-2">&amp;</span>der.<span class="number">0</span>)
+            .map(|kp| <span class="self">Self </span>{
+                key: Arc::new(kp),
+                scheme,
             })
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">SignError</span>(()))
+            .map_err(|<span class="kw">_</span>| SignError(()))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SigningKey</span> <span class="kw">for</span> <span class="ident">Ed25519SigningKey</span> {
-    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">offered</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">scheme</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">Ed25519Signer</span> {
-                <span class="ident">key</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>),
-                <span class="ident">scheme</span>: <span class="self">self</span>.<span class="ident">scheme</span>,
+<span class="kw">impl </span>SigningKey <span class="kw">for </span>Ed25519SigningKey {
+    <span class="kw">fn </span>choose_scheme(<span class="kw-2">&amp;</span><span class="self">self</span>, offered: <span class="kw-2">&amp;</span>[SignatureScheme]) -&gt; <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Signer&gt;&gt; {
+        <span class="kw">if </span>offered.contains(<span class="kw-2">&amp;</span><span class="self">self</span>.scheme) {
+            <span class="prelude-val">Some</span>(Box::new(Ed25519Signer {
+                key: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.key),
+                scheme: <span class="self">self</span>.scheme,
             }))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureAlgorithm</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::DecomposedSignatureScheme</span>;
-        <span class="self">self</span>.<span class="ident">scheme</span>.<span class="ident">sign</span>()
-    }
-}
-
-<span class="kw">struct</span> <span class="ident">Ed25519Signer</span> {
-    <span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Ed25519KeyPair</span><span class="op">&gt;</span>,
-    <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Signer</span> <span class="kw">for</span> <span class="ident">Ed25519Signer</span> {
-    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">key</span>.<span class="ident">sign</span>(<span class="ident">message</span>).<span class="ident">as_ref</span>().<span class="ident">into</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureScheme</span> {
-        <span class="self">self</span>.<span class="ident">scheme</span>
+    <span class="kw">fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SignatureAlgorithm {
+        <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::DecomposedSignatureScheme;
+        <span class="self">self</span>.scheme.sign()
     }
 }
 
-<span class="doccomment">/// The set of schemes we support for signatures and</span>
-<span class="doccomment">/// that are allowed for TLS1.3.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supported_sign_tls13</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">SignatureScheme</span>] {
+<span class="kw">struct </span>Ed25519Signer {
+    key: Arc&lt;Ed25519KeyPair&gt;,
+    scheme: SignatureScheme,
+}
+
+<span class="kw">impl </span>Signer <span class="kw">for </span>Ed25519Signer {
+    <span class="kw">fn </span>sign(<span class="kw-2">&amp;</span><span class="self">self</span>, message: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.key.sign(message).as_ref().into())
+    }
+
+    <span class="kw">fn </span>scheme(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SignatureScheme {
+        <span class="self">self</span>.scheme
+    }
+}
+
+<span class="doccomment">/// The set of schemes we support for signatures and
+/// that are allowed for TLS1.3.
+</span><span class="kw">pub fn </span>supported_sign_tls13() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[SignatureScheme] {
     <span class="kw-2">&amp;</span>[
-        <span class="ident">SignatureScheme::ECDSA_NISTP384_SHA384</span>,
-        <span class="ident">SignatureScheme::ECDSA_NISTP256_SHA256</span>,
-        <span class="ident">SignatureScheme::RSA_PSS_SHA512</span>,
-        <span class="ident">SignatureScheme::RSA_PSS_SHA384</span>,
-        <span class="ident">SignatureScheme::RSA_PSS_SHA256</span>,
-        <span class="ident">SignatureScheme::ED25519</span>,
+        SignatureScheme::ECDSA_NISTP384_SHA384,
+        SignatureScheme::ECDSA_NISTP256_SHA256,
+        SignatureScheme::RSA_PSS_SHA512,
+        SignatureScheme::RSA_PSS_SHA384,
+        SignatureScheme::RSA_PSS_SHA256,
+        SignatureScheme::ED25519,
     ]
 }
 
-<span class="doccomment">/// Errors while signing</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignError</span>(());
+<span class="doccomment">/// Errors while signing
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>SignError(());
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SignError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;sign error&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>SignError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;sign error&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">SignError</span> {}
+<span class="kw">impl </span>StdError <span class="kw">for </span>SignError {}
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">can_load_ecdsa_nistp256_pkcs8</span>() {
-    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">key::PrivateKey</span>(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/nistp256key.pkcs8.der&quot;</span>).<span class="ident">to_vec</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_supported_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_ecdsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_eddsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_err</span>());
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>can_load_ecdsa_nistp256_pkcs8() {
+    <span class="kw">let </span>key = key::PrivateKey(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/nistp256key.pkcs8.der&quot;</span>).to_vec());
+    <span class="macro">assert!</span>(any_supported_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_ecdsa_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_eddsa_type(<span class="kw-2">&amp;</span>key).is_err());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">can_load_ecdsa_nistp256_sec1</span>() {
-    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">key::PrivateKey</span>(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/nistp256key.der&quot;</span>).<span class="ident">to_vec</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_supported_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_ecdsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_eddsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_err</span>());
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>can_load_ecdsa_nistp256_sec1() {
+    <span class="kw">let </span>key = key::PrivateKey(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/nistp256key.der&quot;</span>).to_vec());
+    <span class="macro">assert!</span>(any_supported_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_ecdsa_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_eddsa_type(<span class="kw-2">&amp;</span>key).is_err());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">can_load_ecdsa_nistp384_pkcs8</span>() {
-    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">key::PrivateKey</span>(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/nistp384key.pkcs8.der&quot;</span>).<span class="ident">to_vec</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_supported_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_ecdsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_eddsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_err</span>());
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>can_load_ecdsa_nistp384_pkcs8() {
+    <span class="kw">let </span>key = key::PrivateKey(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/nistp384key.pkcs8.der&quot;</span>).to_vec());
+    <span class="macro">assert!</span>(any_supported_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_ecdsa_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_eddsa_type(<span class="kw-2">&amp;</span>key).is_err());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">can_load_ecdsa_nistp384_sec1</span>() {
-    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">key::PrivateKey</span>(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/nistp384key.der&quot;</span>).<span class="ident">to_vec</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_supported_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_ecdsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_eddsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_err</span>());
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>can_load_ecdsa_nistp384_sec1() {
+    <span class="kw">let </span>key = key::PrivateKey(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/nistp384key.der&quot;</span>).to_vec());
+    <span class="macro">assert!</span>(any_supported_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_ecdsa_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_eddsa_type(<span class="kw-2">&amp;</span>key).is_err());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">can_load_eddsa_pkcs8</span>() {
-    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">key::PrivateKey</span>(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/eddsakey.der&quot;</span>).<span class="ident">to_vec</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_supported_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_eddsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_ecdsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_err</span>());
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>can_load_eddsa_pkcs8() {
+    <span class="kw">let </span>key = key::PrivateKey(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/eddsakey.der&quot;</span>).to_vec());
+    <span class="macro">assert!</span>(any_supported_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_eddsa_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_ecdsa_type(<span class="kw-2">&amp;</span>key).is_err());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">can_load_rsa2048_pkcs8</span>() {
-    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">key::PrivateKey</span>(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/rsa2048key.pkcs8.der&quot;</span>).<span class="ident">to_vec</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_supported_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_eddsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_err</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_ecdsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_err</span>());
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>can_load_rsa2048_pkcs8() {
+    <span class="kw">let </span>key = key::PrivateKey(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/rsa2048key.pkcs8.der&quot;</span>).to_vec());
+    <span class="macro">assert!</span>(any_supported_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_eddsa_type(<span class="kw-2">&amp;</span>key).is_err());
+    <span class="macro">assert!</span>(any_ecdsa_type(<span class="kw-2">&amp;</span>key).is_err());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">can_load_rsa2048_pkcs1</span>() {
-    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">key::PrivateKey</span>(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/rsa2048key.pkcs1.der&quot;</span>).<span class="ident">to_vec</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_supported_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_ok</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_eddsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_err</span>());
-    <span class="macro">assert!</span>(<span class="ident">any_ecdsa_type</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_err</span>());
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>can_load_rsa2048_pkcs1() {
+    <span class="kw">let </span>key = key::PrivateKey(<span class="macro">include_bytes!</span>(<span class="string">&quot;testdata/rsa2048key.pkcs1.der&quot;</span>).to_vec());
+    <span class="macro">assert!</span>(any_supported_type(<span class="kw-2">&amp;</span>key).is_ok());
+    <span class="macro">assert!</span>(any_eddsa_type(<span class="kw-2">&amp;</span>key).is_err());
+    <span class="macro">assert!</span>(any_ecdsa_type(<span class="kw-2">&amp;</span>key).is_err());
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

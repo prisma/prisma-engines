@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/model.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>model.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/model.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>model.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -132,139 +132,139 @@
 <span id="132">132</span>
 <span id="133">133</span>
 <span id="134">134</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt::Debug</span>,
-    <span class="ident">hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>},
-    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>},
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>std::{
+    fmt::Debug,
+    hash::{Hash, Hasher},
+    sync::{Arc, Weak},
 };
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ModelRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Model</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ModelWeakRef</span> <span class="op">=</span> <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Model</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>ModelRef = Arc&lt;Model&gt;;
+<span class="kw">pub type </span>ModelWeakRef = Weak&lt;Model&gt;;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Model</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">manifestation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Fields</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">indexes</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Index</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">primary_identifier</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">dml_model</span>: <span class="ident">dml::Model</span>,
+<span class="kw">pub struct </span>Model {
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) manifestation: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: OnceCell&lt;Fields&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) indexes: OnceCell&lt;Vec&lt;Index&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) primary_identifier: OnceCell&lt;FieldSelection&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) dml_model: dml::Model,
 
-    <span class="kw">pub</span> <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelWeakRef</span>,
-    <span class="kw">pub</span> <span class="ident">supports_create_operation</span>: <span class="ident">bool</span>,
+    <span class="kw">pub </span>internal_data_model: InternalDataModelWeakRef,
+    <span class="kw">pub </span>supports_create_operation: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Model</span> {
-    <span class="doccomment">/// Returns the schema name for the model</span>
-    <span class="doccomment">/// which is the contents of the @@schema(&quot;...&quot;) attribute</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">dml_model</span>.<span class="ident">schema</span>.<span class="ident">clone</span>()
+<span class="kw">impl </span>Model {
+    <span class="doccomment">/// Returns the schema name for the model
+    /// which is the contents of the @@schema(&quot;...&quot;) attribute
+    </span><span class="kw">pub fn </span>schema_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="self">self</span>.dml_model.schema.clone()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name_with_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">String</span>, <span class="ident">String</span>) {
-        <span class="kw">let</span> <span class="ident">schema_prefix</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">schema_name</span>()
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">internal_data_model</span>().<span class="ident">db_name</span>.<span class="ident">clone</span>());
+    <span class="kw">pub fn </span>db_name_with_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (String, String) {
+        <span class="kw">let </span>schema_prefix = <span class="self">self
+            </span>.schema_name()
+            .unwrap_or_else(|| <span class="self">self</span>.internal_data_model().db_name.clone());
 
-        <span class="kw">let</span> <span class="ident">model_db_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db_name</span>().<span class="ident">to_string</span>();
+        <span class="kw">let </span>model_db_name = <span class="self">self</span>.db_name().to_string();
 
-        (<span class="ident">schema_prefix</span>, <span class="ident">model_db_name</span>)
+        (schema_prefix, model_db_name)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">get</span>().<span class="ident">unwrap</span>().<span class="ident">finalize</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>finalize(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.fields.get().unwrap().finalize();
     }
 
-    <span class="doccomment">/// Returns the set of fields to be used as the primary identifier for a record of that model.</span>
-    <span class="doccomment">/// The identifier is nothing but an internal convention to have an anchor point for querying, or in other words,</span>
-    <span class="doccomment">/// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as</span>
-    <span class="doccomment">/// implementation detail that is used to reason over a fixed set of fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FieldSelection</span> {
-        <span class="self">self</span>.<span class="ident">primary_identifier</span>.<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span>{
-            <span class="kw">let</span> <span class="ident">dml_fields</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dml_model</span>.<span class="ident">first_unique_criterion</span>();
-            <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">dml_fields</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">dml_field</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields</span>().<span class="ident">find_from_all</span>(<span class="kw-2">&amp;</span><span class="ident">dml_field</span>.<span class="ident">name</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">dml_field</span>.<span class="ident">name</span>));
-                    <span class="ident">field</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Returns the set of fields to be used as the primary identifier for a record of that model.
+    /// The identifier is nothing but an internal convention to have an anchor point for querying, or in other words,
+    /// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as
+    /// implementation detail that is used to reason over a fixed set of fields.
+    </span><span class="kw">pub fn </span>primary_identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldSelection {
+        <span class="self">self</span>.primary_identifier.get_or_init(||{
+            <span class="kw">let </span>dml_fields = <span class="self">self</span>.dml_model.first_unique_criterion();
+            <span class="kw">let </span>fields: Vec&lt;Field&gt; = dml_fields
+                .iter()
+                .map(|dml_field| {
+                    <span class="kw">let </span>field = <span class="self">self</span>.fields().find_from_all(<span class="kw-2">&amp;</span>dml_field.name).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.&quot;</span>, <span class="kw-2">&amp;</span>dml_field.name));
+                    field.clone()
                 })
-                .<span class="ident">collect</span>();
+                .collect();
 
-            <span class="ident">FieldSelection::from</span>(<span class="ident">fields</span>)
-        }).<span class="ident">clone</span>()
+            FieldSelection::from(fields)
+        }).clone()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Fields</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>
-            .<span class="ident">get</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">String::from</span>(<span class="string">&quot;Model fields must be set!&quot;</span>))
-            .<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Fields {
+        <span class="self">self</span>.fields
+            .get()
+            .ok_or_else(|| String::from(<span class="string">&quot;Model fields must be set!&quot;</span>))
+            .unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_create_operation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">supports_create_operation</span>
+    <span class="kw">pub fn </span>supports_create_operation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.supports_create_operation
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Index</span>] {
-        <span class="self">self</span>.<span class="ident">indexes</span>
-            .<span class="ident">get</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">String::from</span>(<span class="string">&quot;Model indexes must be set!&quot;</span>))
-            .<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Index] {
+        <span class="self">self</span>.indexes
+            .get()
+            .ok_or_else(|| String::from(<span class="string">&quot;Model indexes must be set!&quot;</span>))
+            .unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Index</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">indexes</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">typ</span> <span class="op">==</span> <span class="ident">IndexType::Unique</span>)
-            .<span class="ident">collect</span>()
+    <span class="kw">pub fn </span>unique_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span>Index&gt; {
+        <span class="self">self</span>.indexes()
+            .iter()
+            .filter(|index| index.typ == IndexType::Unique)
+            .collect()
     }
 
-    <span class="doccomment">/// The name of the model in the database</span>
-    <span class="doccomment">/// For a sql database this will be the Table name for this model</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">db_name_opt</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>())
+    <span class="doccomment">/// The name of the model in the database
+    /// For a sql database this will be the Table name for this model
+    </span><span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.db_name_opt().unwrap_or_else(|| <span class="self">self</span>.name.as_ref())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name_opt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">manifestation</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_ref</span>())
+    <span class="kw">pub fn </span>db_name_opt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.manifestation.as_ref().map(|m| m.as_ref())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_data_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InternalDataModelRef</span> {
-        <span class="self">self</span>.<span class="ident">internal_data_model</span>
-            .<span class="ident">upgrade</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.&quot;</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Model</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Model&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;schema&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema_name</span>().<span class="ident">unwrap_or_default</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;manifestation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">manifestation</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fields</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;indexes&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">indexes</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;primary_identifier&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">primary_identifier</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;dml_model&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dml_model</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;internal_data_model&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#InternalDataModelWeakRef#&quot;</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">pub fn </span>internal_data_model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InternalDataModelRef {
+        <span class="self">self</span>.internal_data_model
+            .upgrade()
+            .expect(<span class="string">&quot;InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">Model</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-        <span class="comment">// Names are unique in the data model.</span>
-        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
+<span class="kw">impl </span>Debug <span class="kw">for </span>Model {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_struct(<span class="string">&quot;Model&quot;</span>)
+            .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
+            .field(<span class="string">&quot;schema&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.schema_name().unwrap_or_default())
+            .field(<span class="string">&quot;manifestation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.manifestation)
+            .field(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.fields)
+            .field(<span class="string">&quot;indexes&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.indexes)
+            .field(<span class="string">&quot;primary_identifier&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.primary_identifier)
+            .field(<span class="string">&quot;dml_model&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.dml_model)
+            .field(<span class="string">&quot;internal_data_model&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#InternalDataModelWeakRef#&quot;</span>)
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Model</span> {}
+<span class="kw">impl </span>Hash <span class="kw">for </span>Model {
+    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+        <span class="comment">// Names are unique in the data model.
+        </span><span class="self">self</span>.name.hash(state);
+    }
+}
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Model</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Model</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span>
+<span class="kw">impl </span>Eq <span class="kw">for </span>Model {}
+
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Model {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Model) -&gt; bool {
+        <span class="self">self</span>.name == other.name
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

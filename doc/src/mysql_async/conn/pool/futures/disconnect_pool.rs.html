@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/conn/pool/futures/disconnect_pool.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>disconnect_pool.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/conn/pool/futures/disconnect_pool.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>disconnect_pool.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -72,79 +72,79 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+</span><span class="kw">use </span>std::{
+    future::Future,
+    pin::Pin,
+    task::{Context, Poll},
 };
 
-<span class="kw">use</span> <span class="ident">futures_core::ready</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync::mpsc::UnboundedSender</span>;
+<span class="kw">use </span>futures_core::ready;
+<span class="kw">use </span>tokio::sync::mpsc::UnboundedSender;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">conn::pool</span>::{<span class="ident">Inner</span>, <span class="ident">Pool</span>},
-    <span class="ident">error::Error</span>,
-    <span class="ident">Conn</span>,
+<span class="kw">use crate</span>::{
+    conn::pool::{Inner, Pool},
+    error::Error,
+    Conn,
 };
 
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">atomic</span>, <span class="ident">Arc</span>};
+<span class="kw">use </span>std::sync::{atomic, Arc};
 
-<span class="doccomment">/// Future that disconnects this pool from a server and resolves to `()`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note:** This Future won&#39;t resolve until all active connections, taken from it,</span>
-<span class="doccomment">/// are dropped or disonnected. Also all pending and new `GetConn`&#39;s will resolve to error.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DisconnectPool</span> {
-    <span class="ident">pool_inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>,
-    <span class="ident">drop</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnboundedSender</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Future that disconnects this pool from a server and resolves to `()`.
+///
+/// **Note:** This Future won&#39;t resolve until all active connections, taken from it,
+/// are dropped or disonnected. Also all pending and new `GetConn`&#39;s will resolve to error.
+</span><span class="attribute">#[derive(Debug)]
+#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
+</span><span class="kw">pub struct </span>DisconnectPool {
+    pool_inner: Arc&lt;Inner&gt;,
+    drop: <span class="prelude-ty">Option</span>&lt;UnboundedSender&lt;<span class="prelude-ty">Option</span>&lt;Conn&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">DisconnectPool</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">pool</span>: <span class="ident">Pool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">pool_inner</span>: <span class="ident">pool</span>.<span class="ident">inner</span>,
-            <span class="ident">drop</span>: <span class="prelude-val">Some</span>(<span class="ident">pool</span>.<span class="ident">drop</span>),
+<span class="kw">impl </span>DisconnectPool {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(pool: Pool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            pool_inner: pool.inner,
+            drop: <span class="prelude-val">Some</span>(pool.drop),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">DisconnectPool</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>Future <span class="kw">for </span>DisconnectPool {
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;(), Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">pool_inner</span>.<span class="ident">close</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">atomic::Ordering::Release</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exchange</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool_inner</span>.<span class="ident">exchange</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">exchange</span>.<span class="ident">spawn_futures_if_needed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool_inner</span>);
-        <span class="ident">exchange</span>.<span class="ident">waiting</span>.<span class="ident">push_back</span>(<span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">clone</span>());
-        <span class="ident">drop</span>(<span class="ident">exchange</span>);
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="self">self</span>.pool_inner.close.store(<span class="bool-val">true</span>, atomic::Ordering::Release);
+        <span class="kw">let </span><span class="kw-2">mut </span>exchange = <span class="self">self</span>.pool_inner.exchange.lock().unwrap();
+        exchange.spawn_futures_if_needed(<span class="kw-2">&amp;</span><span class="self">self</span>.pool_inner);
+        exchange.waiting.push_back(cx.waker().clone());
+        drop(exchange);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pool_inner</span>.<span class="ident">closed</span>.<span class="ident">load</span>(<span class="ident">atomic::Ordering::Acquire</span>) {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">drop</span>.<span class="ident">take</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">drop</span>) =&gt; <span class="kw">match</span> <span class="ident">drop</span>.<span class="ident">send</span>(<span class="prelude-val">None</span>) {
+        <span class="kw">if </span><span class="self">self</span>.pool_inner.closed.load(atomic::Ordering::Acquire) {
+            Poll::Ready(<span class="prelude-val">Ok</span>(()))
+        } <span class="kw">else </span>{
+            <span class="kw">match </span><span class="self">self</span>.drop.take() {
+                <span class="prelude-val">Some</span>(drop) =&gt; <span class="kw">match </span>drop.send(<span class="prelude-val">None</span>) {
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="comment">// Recycler is alive. Waiting for it to finish.</span>
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="macro">ready!</span>(<span class="ident">Box::pin</span>(<span class="ident">drop</span>.<span class="ident">closed</span>()).<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>))))
+                        <span class="comment">// Recycler is alive. Waiting for it to finish.
+                        </span>Poll::Ready(<span class="prelude-val">Ok</span>(<span class="macro">ready!</span>(Box::pin(drop.closed()).as_mut().poll(cx))))
                     }
                     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="comment">// Recycler seem dead. No one will wake us.</span>
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+                        <span class="comment">// Recycler seem dead. No one will wake us.
+                        </span>Poll::Ready(<span class="prelude-val">Ok</span>(()))
                     }
                 },
-                <span class="prelude-val">None</span> =&gt; <span class="ident">Poll::Pending</span>,
+                <span class="prelude-val">None </span>=&gt; Poll::Pending,
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

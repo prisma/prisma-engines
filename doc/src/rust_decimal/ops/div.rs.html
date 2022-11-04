@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rust_decimal-1.26.1/src/ops/div.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>div.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rust_decimal/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rust_decimal-1.26.1/src/ops/div.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>div.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rust_decimal/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -656,663 +656,663 @@
 <span id="656">656</span>
 <span id="657">657</span>
 <span id="658">658</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="ident">MAX_PRECISION_I32</span>, <span class="ident">POWERS_10</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::decimal</span>::{<span class="ident">CalculationResult</span>, <span class="ident">Decimal</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ops::common</span>::{<span class="ident">Buf12</span>, <span class="ident">Buf16</span>, <span class="ident">Dec64</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::constants::{MAX_PRECISION_I32, POWERS_10};
+<span class="kw">use </span><span class="kw">crate</span>::decimal::{CalculationResult, Decimal};
+<span class="kw">use </span><span class="kw">crate</span>::ops::common::{Buf12, Buf16, Dec64};
 
-<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">core::ops::BitXor</span>;
+<span class="kw">use </span>core::cmp::Ordering;
+<span class="kw">use </span>core::ops::BitXor;
 
-<span class="kw">impl</span> <span class="ident">Buf12</span> {
-    <span class="comment">// Returns true if successful, else false for an overflow</span>
-    <span class="kw">fn</span> <span class="ident">add32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DivError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">low64</span>().<span class="ident">wrapping_add</span>(<span class="ident">value</span>);
-        <span class="self">self</span>.<span class="ident">set_low64</span>(<span class="ident">new</span>);
-        <span class="kw">if</span> <span class="ident">new</span> <span class="op">&lt;</span> <span class="ident">value</span> {
-            <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>].<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">==</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DivError::Overflow</span>);
+<span class="kw">impl </span>Buf12 {
+    <span class="comment">// Returns true if successful, else false for an overflow
+    </span><span class="kw">fn </span>add32(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u32) -&gt; <span class="prelude-ty">Result</span>&lt;(), DivError&gt; {
+        <span class="kw">let </span>value = value <span class="kw">as </span>u64;
+        <span class="kw">let </span>new = <span class="self">self</span>.low64().wrapping_add(value);
+        <span class="self">self</span>.set_low64(new);
+        <span class="kw">if </span>new &lt; value {
+            <span class="self">self</span>.data[<span class="number">2</span>] = <span class="self">self</span>.data[<span class="number">2</span>].wrapping_add(<span class="number">1</span>);
+            <span class="kw">if </span><span class="self">self</span>.data[<span class="number">2</span>] == <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(DivError::Overflow);
             }
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="comment">// Divide a Decimal union by a 32 bit divisor.</span>
-    <span class="comment">// Self is overwritten with the quotient.</span>
-    <span class="comment">// Return value is a 32 bit remainder.</span>
-    <span class="kw">fn</span> <span class="ident">div32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">divisor</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">let</span> <span class="ident">divisor64</span> <span class="op">=</span> <span class="ident">divisor</span> <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="comment">// See if we can get by using a simple u64 division</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">temp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">high64</span>();
-            <span class="kw">let</span> <span class="ident">q64</span> <span class="op">=</span> <span class="ident">temp</span> <span class="op">/</span> <span class="ident">divisor64</span>;
-            <span class="self">self</span>.<span class="ident">set_high64</span>(<span class="ident">q64</span>);
+    <span class="comment">// Divide a Decimal union by a 32 bit divisor.
+    // Self is overwritten with the quotient.
+    // Return value is a 32 bit remainder.
+    </span><span class="kw">fn </span>div32(<span class="kw-2">&amp;mut </span><span class="self">self</span>, divisor: u32) -&gt; u32 {
+        <span class="kw">let </span>divisor64 = divisor <span class="kw">as </span>u64;
+        <span class="comment">// See if we can get by using a simple u64 division
+        </span><span class="kw">if </span><span class="self">self</span>.data[<span class="number">2</span>] != <span class="number">0 </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>temp = <span class="self">self</span>.high64();
+            <span class="kw">let </span>q64 = temp / divisor64;
+            <span class="self">self</span>.set_high64(q64);
 
-            <span class="comment">// Calculate the &quot;remainder&quot;</span>
-            <span class="ident">temp</span> <span class="op">=</span> ((<span class="ident">temp</span> <span class="op">-</span> <span class="ident">q64</span> <span class="op">*</span> <span class="ident">divisor64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>);
-            <span class="kw">if</span> <span class="ident">temp</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="number">0</span>;
+            <span class="comment">// Calculate the &quot;remainder&quot;
+            </span>temp = ((temp - q64 * divisor64) &lt;&lt; <span class="number">32</span>) | (<span class="self">self</span>.data[<span class="number">0</span>] <span class="kw">as </span>u64);
+            <span class="kw">if </span>temp == <span class="number">0 </span>{
+                <span class="kw">return </span><span class="number">0</span>;
             }
-            <span class="kw">let</span> <span class="ident">q32</span> <span class="op">=</span> (<span class="ident">temp</span> <span class="op">/</span> <span class="ident">divisor64</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-            <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">q32</span>;
-            ((<span class="ident">temp</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">wrapping_sub</span>(<span class="ident">q32</span>.<span class="ident">wrapping_mul</span>(<span class="ident">divisor</span>))) <span class="kw">as</span> <span class="ident">u32</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// Super easy divisor</span>
-            <span class="kw">let</span> <span class="ident">low64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">low64</span>();
-            <span class="kw">if</span> <span class="ident">low64</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="comment">// Nothing to do</span>
-                <span class="kw">return</span> <span class="number">0</span>;
+            <span class="kw">let </span>q32 = (temp / divisor64) <span class="kw">as </span>u32;
+            <span class="self">self</span>.data[<span class="number">0</span>] = q32;
+            ((temp <span class="kw">as </span>u32).wrapping_sub(q32.wrapping_mul(divisor))) <span class="kw">as </span>u32
+        } <span class="kw">else </span>{
+            <span class="comment">// Super easy divisor
+            </span><span class="kw">let </span>low64 = <span class="self">self</span>.low64();
+            <span class="kw">if </span>low64 == <span class="number">0 </span>{
+                <span class="comment">// Nothing to do
+                </span><span class="kw">return </span><span class="number">0</span>;
             }
-            <span class="comment">// Do the calc</span>
-            <span class="kw">let</span> <span class="ident">quotient</span> <span class="op">=</span> <span class="ident">low64</span> <span class="op">/</span> <span class="ident">divisor64</span>;
-            <span class="self">self</span>.<span class="ident">set_low64</span>(<span class="ident">quotient</span>);
-            <span class="comment">// Remainder is the leftover that wasn&#39;t used</span>
-            (<span class="ident">low64</span>.<span class="ident">wrapping_sub</span>(<span class="ident">quotient</span>.<span class="ident">wrapping_mul</span>(<span class="ident">divisor64</span>))) <span class="kw">as</span> <span class="ident">u32</span>
+            <span class="comment">// Do the calc
+            </span><span class="kw">let </span>quotient = low64 / divisor64;
+            <span class="self">self</span>.set_low64(quotient);
+            <span class="comment">// Remainder is the leftover that wasn&#39;t used
+            </span>(low64.wrapping_sub(quotient.wrapping_mul(divisor64))) <span class="kw">as </span>u32
         }
     }
 
-    <span class="comment">// Divide the number by a power constant</span>
-    <span class="comment">// Returns true if division was successful</span>
-    <span class="kw">fn</span> <span class="ident">div32_const</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pow</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">pow64</span> <span class="op">=</span> <span class="ident">pow</span> <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="kw">let</span> <span class="ident">high64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">high64</span>();
-        <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="kw">let</span> <span class="ident">div64</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">high64</span> <span class="op">/</span> <span class="ident">pow64</span>;
-        <span class="kw">let</span> <span class="ident">div</span> <span class="op">=</span> ((((<span class="ident">high64</span> <span class="op">-</span> <span class="ident">div64</span> <span class="op">*</span> <span class="ident">pow64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">+</span> <span class="ident">lo</span>) <span class="op">/</span> <span class="ident">pow64</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">==</span> <span class="ident">div</span>.<span class="ident">wrapping_mul</span>(<span class="ident">pow</span>) {
-            <span class="self">self</span>.<span class="ident">set_high64</span>(<span class="ident">div64</span>);
-            <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">div</span>;
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Buf16</span> {
-    <span class="comment">// Does a partial divide with a 64 bit divisor. The divisor in this case must be 64 bits</span>
-    <span class="comment">// otherwise various assumptions fail (e.g. 32 bit quotient).</span>
-    <span class="comment">// To assist, the upper 64 bits must be greater than the divisor for this to succeed.</span>
-    <span class="comment">// Consequently, it will return the quotient as a 32 bit number and overwrite self with the</span>
-    <span class="comment">// 64 bit remainder.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">partial_divide_64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">divisor</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u32</span> {
-        <span class="comment">// We make this assertion here, however below we pivot based on the data</span>
-        <span class="macro">debug_assert!</span>(<span class="ident">divisor</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">mid64</span>());
-
-        <span class="comment">// If we have an empty high bit, then divisor must be greater than the dividend due to</span>
-        <span class="comment">// the assumption that the divisor REQUIRES 64 bits.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">low64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">low64</span>();
-            <span class="kw">if</span> <span class="ident">low64</span> <span class="op">&lt;</span> <span class="ident">divisor</span> {
-                <span class="comment">// We can&#39;t divide at at all so result is 0. The dividend remains untouched since</span>
-                <span class="comment">// the full amount is the remainder.</span>
-                <span class="kw">return</span> <span class="number">0</span>;
-            }
-
-            <span class="kw">let</span> <span class="ident">quotient</span> <span class="op">=</span> <span class="ident">low64</span> <span class="op">/</span> <span class="ident">divisor</span>;
-            <span class="self">self</span>.<span class="ident">set_low64</span>(<span class="ident">low64</span> <span class="op">-</span> (<span class="ident">quotient</span> <span class="op">*</span> <span class="ident">divisor</span>));
-            <span class="kw">return</span> <span class="ident">quotient</span> <span class="kw">as</span> <span class="ident">u32</span>;
-        }
-
-        <span class="comment">// Do a simple check to see if the hi portion of the dividend is greater than the hi</span>
-        <span class="comment">// portion of the divisor.</span>
-        <span class="kw">let</span> <span class="ident">divisor_hi32</span> <span class="op">=</span> (<span class="ident">divisor</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">&gt;</span><span class="op">=</span> <span class="ident">divisor_hi32</span> {
-            <span class="comment">// We know that the divisor goes into this at MOST u32::max times.</span>
-            <span class="comment">// So we kick things off, with that assumption</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">low64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">low64</span>();
-            <span class="ident">low64</span> <span class="op">=</span> <span class="ident">low64</span>.<span class="ident">wrapping_sub</span>(<span class="ident">divisor</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>).<span class="ident">wrapping_add</span>(<span class="ident">divisor</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quotient</span> <span class="op">=</span> <span class="ident">u32::MAX</span>;
-
-            <span class="comment">// If we went negative then keep adding it back in</span>
-            <span class="kw">loop</span> {
-                <span class="kw">if</span> <span class="ident">low64</span> <span class="op">&lt;</span> <span class="ident">divisor</span> {
-                    <span class="kw">break</span>;
-                }
-                <span class="ident">quotient</span> <span class="op">=</span> <span class="ident">quotient</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>);
-                <span class="ident">low64</span> <span class="op">=</span> <span class="ident">low64</span>.<span class="ident">wrapping_add</span>(<span class="ident">divisor</span>);
-            }
-            <span class="self">self</span>.<span class="ident">set_low64</span>(<span class="ident">low64</span>);
-            <span class="kw">return</span> <span class="ident">quotient</span>;
-        }
-
-        <span class="kw">let</span> <span class="ident">mid64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mid64</span>();
-        <span class="kw">let</span> <span class="ident">divisor_hi32_64</span> <span class="op">=</span> <span class="ident">divisor_hi32</span> <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="kw">if</span> <span class="ident">mid64</span> <span class="op">&lt;</span> <span class="ident">divisor_hi32_64</span> <span class="kw">as</span> <span class="ident">u64</span> {
-            <span class="comment">// similar situation as above where we&#39;ve got nothing left to divide</span>
-            <span class="kw">return</span> <span class="number">0</span>;
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quotient</span> <span class="op">=</span> <span class="ident">mid64</span> <span class="op">/</span> <span class="ident">divisor_hi32_64</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remainder</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span> <span class="op">|</span> ((<span class="ident">mid64</span> <span class="op">-</span> <span class="ident">quotient</span> <span class="op">*</span> <span class="ident">divisor_hi32_64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>);
-
-        <span class="comment">// Do quotient * lo divisor</span>
-        <span class="kw">let</span> <span class="ident">product</span> <span class="op">=</span> <span class="ident">quotient</span> <span class="op">*</span> (<span class="ident">divisor</span> <span class="op">&amp;</span> <span class="number">0xFFFF_FFFF</span>);
-        <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">wrapping_sub</span>(<span class="ident">product</span>);
-
-        <span class="comment">// Check if we&#39;ve gone negative. If so, add it back</span>
-        <span class="kw">if</span> <span class="ident">remainder</span> <span class="op">&gt;</span> <span class="ident">product</span>.<span class="ident">bitxor</span>(<span class="ident">u64::MAX</span>) {
-            <span class="kw">loop</span> {
-                <span class="ident">quotient</span> <span class="op">=</span> <span class="ident">quotient</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>);
-                <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">wrapping_add</span>(<span class="ident">divisor</span>);
-                <span class="kw">if</span> <span class="ident">remainder</span> <span class="op">&lt;</span> <span class="ident">divisor</span> {
-                    <span class="kw">break</span>;
-                }
-            }
-        }
-
-        <span class="self">self</span>.<span class="ident">set_low64</span>(<span class="ident">remainder</span>);
-        <span class="ident">quotient</span> <span class="kw">as</span> <span class="ident">u32</span>
-    }
-
-    <span class="comment">// Does a partial divide with a 96 bit divisor. The divisor in this case must require 96 bits</span>
-    <span class="comment">// otherwise various assumptions fail (e.g. 32 bit quotient).</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">partial_divide_96</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">divisor</span>: <span class="kw-2">&amp;</span><span class="ident">Buf12</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">let</span> <span class="ident">dividend</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">high64</span>();
-        <span class="kw">let</span> <span class="ident">divisor_hi</span> <span class="op">=</span> <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">2</span>];
-        <span class="kw">if</span> <span class="ident">dividend</span> <span class="op">&lt;</span> <span class="ident">divisor_hi</span> <span class="kw">as</span> <span class="ident">u64</span> {
-            <span class="comment">// Dividend is too small - entire number is remainder</span>
-            <span class="kw">return</span> <span class="number">0</span>;
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quo</span> <span class="op">=</span> (<span class="ident">dividend</span> <span class="op">/</span> <span class="ident">divisor_hi</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remainder</span> <span class="op">=</span> (<span class="ident">dividend</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">wrapping_sub</span>(<span class="ident">quo</span>.<span class="ident">wrapping_mul</span>(<span class="ident">divisor_hi</span>));
-
-        <span class="comment">// Compute full remainder</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prod1</span> <span class="op">=</span> <span class="ident">quo</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prod2</span> <span class="op">=</span> <span class="ident">quo</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="ident">prod2</span> <span class="op">+</span><span class="op">=</span> <span class="ident">prod1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>;
-        <span class="ident">prod1</span> <span class="op">=</span> (<span class="ident">prod1</span> <span class="op">&amp;</span> <span class="number">0xFFFF_FFFF</span>) <span class="op">|</span> (<span class="ident">prod2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>);
-        <span class="ident">prod2</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span>;
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">num</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">low64</span>();
-        <span class="ident">num</span> <span class="op">=</span> <span class="ident">num</span>.<span class="ident">wrapping_sub</span>(<span class="ident">prod1</span>);
-        <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">wrapping_sub</span>(<span class="ident">prod2</span> <span class="kw">as</span> <span class="ident">u32</span>);
-
-        <span class="comment">// If there are carries make sure they are propagated</span>
-        <span class="kw">if</span> <span class="ident">num</span> <span class="op">&gt;</span> <span class="ident">prod1</span>.<span class="ident">bitxor</span>(<span class="ident">u64::MAX</span>) {
-            <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>);
-            <span class="kw">if</span> <span class="ident">remainder</span> <span class="op">&lt;</span> (<span class="ident">prod2</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">bitxor</span>(<span class="ident">u32::MAX</span>) {
-                <span class="self">self</span>.<span class="ident">set_low64</span>(<span class="ident">num</span>);
-                <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">remainder</span>;
-                <span class="kw">return</span> <span class="ident">quo</span>;
-            }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">remainder</span> <span class="op">&lt;</span><span class="op">=</span> (<span class="ident">prod2</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">bitxor</span>(<span class="ident">u32::MAX</span>) {
-            <span class="self">self</span>.<span class="ident">set_low64</span>(<span class="ident">num</span>);
-            <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">remainder</span>;
-            <span class="kw">return</span> <span class="ident">quo</span>;
-        }
-
-        <span class="comment">// Remainder went negative, add divisor back until it&#39;s positive</span>
-        <span class="ident">prod1</span> <span class="op">=</span> <span class="ident">divisor</span>.<span class="ident">low64</span>();
-        <span class="kw">loop</span> {
-            <span class="ident">quo</span> <span class="op">=</span> <span class="ident">quo</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>);
-            <span class="ident">num</span> <span class="op">=</span> <span class="ident">num</span>.<span class="ident">wrapping_add</span>(<span class="ident">prod1</span>);
-            <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">wrapping_add</span>(<span class="ident">divisor_hi</span>);
-
-            <span class="kw">if</span> <span class="ident">num</span> <span class="op">&lt;</span> <span class="ident">prod1</span> {
-                <span class="comment">// Detected carry.</span>
-                <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">remainder</span>;
-                <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-                <span class="kw">if</span> <span class="ident">tmp</span> <span class="op">&lt;</span> <span class="ident">divisor_hi</span> {
-                    <span class="kw">break</span>;
-                }
-            }
-            <span class="kw">if</span> <span class="ident">remainder</span> <span class="op">&lt;</span> <span class="ident">divisor_hi</span> {
-                <span class="kw">break</span>; <span class="comment">// detected carry</span>
-            }
-        }
-
-        <span class="self">self</span>.<span class="ident">set_low64</span>(<span class="ident">num</span>);
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">remainder</span>;
-        <span class="ident">quo</span>
+    <span class="comment">// Divide the number by a power constant
+    // Returns true if division was successful
+    </span><span class="kw">fn </span>div32_const(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pow: u32) -&gt; bool {
+        <span class="kw">let </span>pow64 = pow <span class="kw">as </span>u64;
+        <span class="kw">let </span>high64 = <span class="self">self</span>.high64();
+        <span class="kw">let </span>lo = <span class="self">self</span>.data[<span class="number">0</span>] <span class="kw">as </span>u64;
+        <span class="kw">let </span>div64: u64 = high64 / pow64;
+        <span class="kw">let </span>div = ((((high64 - div64 * pow64) &lt;&lt; <span class="number">32</span>) + lo) / pow64) <span class="kw">as </span>u32;
+        <span class="kw">if </span><span class="self">self</span>.data[<span class="number">0</span>] == div.wrapping_mul(pow) {
+            <span class="self">self</span>.set_high64(div64);
+            <span class="self">self</span>.data[<span class="number">0</span>] = div;
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 }
 
-<span class="kw">enum</span> <span class="ident">DivError</span> {
-    <span class="ident">Overflow</span>,
-}
+<span class="kw">impl </span>Buf16 {
+    <span class="comment">// Does a partial divide with a 64 bit divisor. The divisor in this case must be 64 bits
+    // otherwise various assumptions fail (e.g. 32 bit quotient).
+    // To assist, the upper 64 bits must be greater than the divisor for this to succeed.
+    // Consequently, it will return the quotient as a 32 bit number and overwrite self with the
+    // 64 bit remainder.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>partial_divide_64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, divisor: u64) -&gt; u32 {
+        <span class="comment">// We make this assertion here, however below we pivot based on the data
+        </span><span class="macro">debug_assert!</span>(divisor &gt; <span class="self">self</span>.mid64());
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">div_impl</span>(<span class="ident">dividend</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>, <span class="ident">divisor</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="ident">CalculationResult</span> {
-    <span class="kw">if</span> <span class="ident">divisor</span>.<span class="ident">is_zero</span>() {
-        <span class="kw">return</span> <span class="ident">CalculationResult::DivByZero</span>;
-    }
-    <span class="kw">if</span> <span class="ident">dividend</span>.<span class="ident">is_zero</span>() {
-        <span class="kw">return</span> <span class="ident">CalculationResult::Ok</span>(<span class="ident">Decimal::ZERO</span>);
-    }
-    <span class="kw">let</span> <span class="ident">dividend</span> <span class="op">=</span> <span class="ident">Dec64::new</span>(<span class="ident">dividend</span>);
-    <span class="kw">let</span> <span class="ident">divisor</span> <span class="op">=</span> <span class="ident">Dec64::new</span>(<span class="ident">divisor</span>);
+        <span class="comment">// If we have an empty high bit, then divisor must be greater than the dividend due to
+        // the assumption that the divisor REQUIRES 64 bits.
+        </span><span class="kw">if </span><span class="self">self</span>.data[<span class="number">2</span>] == <span class="number">0 </span>{
+            <span class="kw">let </span>low64 = <span class="self">self</span>.low64();
+            <span class="kw">if </span>low64 &lt; divisor {
+                <span class="comment">// We can&#39;t divide at at all so result is 0. The dividend remains untouched since
+                // the full amount is the remainder.
+                </span><span class="kw">return </span><span class="number">0</span>;
+            }
 
-    <span class="comment">// Pre calculate the scale and the sign</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scale</span> <span class="op">=</span> (<span class="ident">dividend</span>.<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">-</span> (<span class="ident">divisor</span>.<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">i32</span>);
-    <span class="kw">let</span> <span class="ident">sign_negative</span> <span class="op">=</span> <span class="ident">dividend</span>.<span class="ident">negative</span> <span class="op">^</span> <span class="ident">divisor</span>.<span class="ident">negative</span>;
+            <span class="kw">let </span>quotient = low64 / divisor;
+            <span class="self">self</span>.set_low64(low64 - (quotient * divisor));
+            <span class="kw">return </span>quotient <span class="kw">as </span>u32;
+        }
 
-    <span class="comment">// Set up some variables for modification throughout</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">require_unscale</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quotient</span> <span class="op">=</span> <span class="ident">Buf12::from_dec64</span>(<span class="kw-2">&amp;</span><span class="ident">dividend</span>);
-    <span class="kw">let</span> <span class="ident">divisor</span> <span class="op">=</span> <span class="ident">Buf12::from_dec64</span>(<span class="kw-2">&amp;</span><span class="ident">divisor</span>);
+        <span class="comment">// Do a simple check to see if the hi portion of the dividend is greater than the hi
+        // portion of the divisor.
+        </span><span class="kw">let </span>divisor_hi32 = (divisor &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32;
+        <span class="kw">if </span><span class="self">self</span>.data[<span class="number">2</span>] &gt;= divisor_hi32 {
+            <span class="comment">// We know that the divisor goes into this at MOST u32::max times.
+            // So we kick things off, with that assumption
+            </span><span class="kw">let </span><span class="kw-2">mut </span>low64 = <span class="self">self</span>.low64();
+            low64 = low64.wrapping_sub(divisor &lt;&lt; <span class="number">32</span>).wrapping_add(divisor);
+            <span class="kw">let </span><span class="kw-2">mut </span>quotient = u32::MAX;
 
-    <span class="comment">// Branch depending on the complexity of the divisor</span>
-    <span class="kw">if</span> <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">|</span> <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">==</span> <span class="number">0</span> {
-        <span class="comment">// We have a simple(r) divisor (32 bit)</span>
-        <span class="kw">let</span> <span class="ident">divisor32</span> <span class="op">=</span> <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">0</span>];
-
-        <span class="comment">// Remainder can only be 32 bits since the divisor is 32 bits.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">quotient</span>.<span class="ident">div32</span>(<span class="ident">divisor32</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">power_scale</span> <span class="op">=</span> <span class="number">0</span>;
-
-        <span class="comment">// Figure out how to apply the remainder (i.e. we may have performed something like 10/3 or 8/5)</span>
-        <span class="kw">loop</span> {
-            <span class="comment">// Remainder is 0 so we have a simple situation</span>
-            <span class="kw">if</span> <span class="ident">remainder</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="comment">// If the scale is positive then we&#39;re actually done</span>
-                <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="comment">// If we went negative then keep adding it back in
+            </span><span class="kw">loop </span>{
+                <span class="kw">if </span>low64 &lt; divisor {
                     <span class="kw">break</span>;
                 }
-                <span class="ident">power_scale</span> <span class="op">=</span> <span class="number">9usize</span>.<span class="ident">min</span>((<span class="op">-</span><span class="ident">scale</span>) <span class="kw">as</span> <span class="ident">usize</span>);
-            } <span class="kw">else</span> {
-                <span class="comment">// We may need to normalize later, so set the flag appropriately</span>
-                <span class="ident">require_unscale</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                quotient = quotient.wrapping_sub(<span class="number">1</span>);
+                low64 = low64.wrapping_add(divisor);
+            }
+            <span class="self">self</span>.set_low64(low64);
+            <span class="kw">return </span>quotient;
+        }
 
-                <span class="comment">// We have a remainder so we effectively want to try to adjust the quotient and add</span>
-                <span class="comment">// the remainder into the quotient. We do this below, however first of all we want</span>
-                <span class="comment">// to try to avoid overflowing so we do that check first.</span>
-                <span class="kw">let</span> <span class="ident">will_overflow</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">scale</span> <span class="op">==</span> <span class="ident">MAX_PRECISION_I32</span> {
-                    <span class="bool-val">true</span>
-                } <span class="kw">else</span> {
-                    <span class="comment">// Figure out how much we can scale by</span>
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">quotient</span>.<span class="ident">find_scale</span>(<span class="ident">scale</span>) {
-                        <span class="ident">power_scale</span> <span class="op">=</span> <span class="ident">s</span>;
-                    } <span class="kw">else</span> {
-                        <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+        <span class="kw">let </span>mid64 = <span class="self">self</span>.mid64();
+        <span class="kw">let </span>divisor_hi32_64 = divisor_hi32 <span class="kw">as </span>u64;
+        <span class="kw">if </span>mid64 &lt; divisor_hi32_64 <span class="kw">as </span>u64 {
+            <span class="comment">// similar situation as above where we&#39;ve got nothing left to divide
+            </span><span class="kw">return </span><span class="number">0</span>;
+        }
+
+        <span class="kw">let </span><span class="kw-2">mut </span>quotient = mid64 / divisor_hi32_64;
+        <span class="kw">let </span><span class="kw-2">mut </span>remainder = <span class="self">self</span>.data[<span class="number">0</span>] <span class="kw">as </span>u64 | ((mid64 - quotient * divisor_hi32_64) &lt;&lt; <span class="number">32</span>);
+
+        <span class="comment">// Do quotient * lo divisor
+        </span><span class="kw">let </span>product = quotient * (divisor &amp; <span class="number">0xFFFF_FFFF</span>);
+        remainder = remainder.wrapping_sub(product);
+
+        <span class="comment">// Check if we&#39;ve gone negative. If so, add it back
+        </span><span class="kw">if </span>remainder &gt; product.bitxor(u64::MAX) {
+            <span class="kw">loop </span>{
+                quotient = quotient.wrapping_sub(<span class="number">1</span>);
+                remainder = remainder.wrapping_add(divisor);
+                <span class="kw">if </span>remainder &lt; divisor {
+                    <span class="kw">break</span>;
+                }
+            }
+        }
+
+        <span class="self">self</span>.set_low64(remainder);
+        quotient <span class="kw">as </span>u32
+    }
+
+    <span class="comment">// Does a partial divide with a 96 bit divisor. The divisor in this case must require 96 bits
+    // otherwise various assumptions fail (e.g. 32 bit quotient).
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>partial_divide_96(<span class="kw-2">&amp;mut </span><span class="self">self</span>, divisor: <span class="kw-2">&amp;</span>Buf12) -&gt; u32 {
+        <span class="kw">let </span>dividend = <span class="self">self</span>.high64();
+        <span class="kw">let </span>divisor_hi = divisor.data[<span class="number">2</span>];
+        <span class="kw">if </span>dividend &lt; divisor_hi <span class="kw">as </span>u64 {
+            <span class="comment">// Dividend is too small - entire number is remainder
+            </span><span class="kw">return </span><span class="number">0</span>;
+        }
+
+        <span class="kw">let </span><span class="kw-2">mut </span>quo = (dividend / divisor_hi <span class="kw">as </span>u64) <span class="kw">as </span>u32;
+        <span class="kw">let </span><span class="kw-2">mut </span>remainder = (dividend <span class="kw">as </span>u32).wrapping_sub(quo.wrapping_mul(divisor_hi));
+
+        <span class="comment">// Compute full remainder
+        </span><span class="kw">let </span><span class="kw-2">mut </span>prod1 = quo <span class="kw">as </span>u64 * divisor.data[<span class="number">0</span>] <span class="kw">as </span>u64;
+        <span class="kw">let </span><span class="kw-2">mut </span>prod2 = quo <span class="kw">as </span>u64 * divisor.data[<span class="number">1</span>] <span class="kw">as </span>u64;
+        prod2 += prod1 &gt;&gt; <span class="number">32</span>;
+        prod1 = (prod1 &amp; <span class="number">0xFFFF_FFFF</span>) | (prod2 &lt;&lt; <span class="number">32</span>);
+        prod2 &gt;&gt;= <span class="number">32</span>;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>num = <span class="self">self</span>.low64();
+        num = num.wrapping_sub(prod1);
+        remainder = remainder.wrapping_sub(prod2 <span class="kw">as </span>u32);
+
+        <span class="comment">// If there are carries make sure they are propagated
+        </span><span class="kw">if </span>num &gt; prod1.bitxor(u64::MAX) {
+            remainder = remainder.wrapping_sub(<span class="number">1</span>);
+            <span class="kw">if </span>remainder &lt; (prod2 <span class="kw">as </span>u32).bitxor(u32::MAX) {
+                <span class="self">self</span>.set_low64(num);
+                <span class="self">self</span>.data[<span class="number">2</span>] = remainder;
+                <span class="kw">return </span>quo;
+            }
+        } <span class="kw">else if </span>remainder &lt;= (prod2 <span class="kw">as </span>u32).bitxor(u32::MAX) {
+            <span class="self">self</span>.set_low64(num);
+            <span class="self">self</span>.data[<span class="number">2</span>] = remainder;
+            <span class="kw">return </span>quo;
+        }
+
+        <span class="comment">// Remainder went negative, add divisor back until it&#39;s positive
+        </span>prod1 = divisor.low64();
+        <span class="kw">loop </span>{
+            quo = quo.wrapping_sub(<span class="number">1</span>);
+            num = num.wrapping_add(prod1);
+            remainder = remainder.wrapping_add(divisor_hi);
+
+            <span class="kw">if </span>num &lt; prod1 {
+                <span class="comment">// Detected carry.
+                </span><span class="kw">let </span>tmp = remainder;
+                remainder = remainder.wrapping_add(<span class="number">1</span>);
+                <span class="kw">if </span>tmp &lt; divisor_hi {
+                    <span class="kw">break</span>;
+                }
+            }
+            <span class="kw">if </span>remainder &lt; divisor_hi {
+                <span class="kw">break</span>; <span class="comment">// detected carry
+            </span>}
+        }
+
+        <span class="self">self</span>.set_low64(num);
+        <span class="self">self</span>.data[<span class="number">2</span>] = remainder;
+        quo
+    }
+}
+
+<span class="kw">enum </span>DivError {
+    Overflow,
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>div_impl(dividend: <span class="kw-2">&amp;</span>Decimal, divisor: <span class="kw-2">&amp;</span>Decimal) -&gt; CalculationResult {
+    <span class="kw">if </span>divisor.is_zero() {
+        <span class="kw">return </span>CalculationResult::DivByZero;
+    }
+    <span class="kw">if </span>dividend.is_zero() {
+        <span class="kw">return </span>CalculationResult::Ok(Decimal::ZERO);
+    }
+    <span class="kw">let </span>dividend = Dec64::new(dividend);
+    <span class="kw">let </span>divisor = Dec64::new(divisor);
+
+    <span class="comment">// Pre calculate the scale and the sign
+    </span><span class="kw">let </span><span class="kw-2">mut </span>scale = (dividend.scale <span class="kw">as </span>i32) - (divisor.scale <span class="kw">as </span>i32);
+    <span class="kw">let </span>sign_negative = dividend.negative ^ divisor.negative;
+
+    <span class="comment">// Set up some variables for modification throughout
+    </span><span class="kw">let </span><span class="kw-2">mut </span>require_unscale = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>quotient = Buf12::from_dec64(<span class="kw-2">&amp;</span>dividend);
+    <span class="kw">let </span>divisor = Buf12::from_dec64(<span class="kw-2">&amp;</span>divisor);
+
+    <span class="comment">// Branch depending on the complexity of the divisor
+    </span><span class="kw">if </span>divisor.data[<span class="number">2</span>] | divisor.data[<span class="number">1</span>] == <span class="number">0 </span>{
+        <span class="comment">// We have a simple(r) divisor (32 bit)
+        </span><span class="kw">let </span>divisor32 = divisor.data[<span class="number">0</span>];
+
+        <span class="comment">// Remainder can only be 32 bits since the divisor is 32 bits.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>remainder = quotient.div32(divisor32);
+        <span class="kw">let </span><span class="kw-2">mut </span>power_scale = <span class="number">0</span>;
+
+        <span class="comment">// Figure out how to apply the remainder (i.e. we may have performed something like 10/3 or 8/5)
+        </span><span class="kw">loop </span>{
+            <span class="comment">// Remainder is 0 so we have a simple situation
+            </span><span class="kw">if </span>remainder == <span class="number">0 </span>{
+                <span class="comment">// If the scale is positive then we&#39;re actually done
+                </span><span class="kw">if </span>scale &gt;= <span class="number">0 </span>{
+                    <span class="kw">break</span>;
+                }
+                power_scale = <span class="number">9usize</span>.min((-scale) <span class="kw">as </span>usize);
+            } <span class="kw">else </span>{
+                <span class="comment">// We may need to normalize later, so set the flag appropriately
+                </span>require_unscale = <span class="bool-val">true</span>;
+
+                <span class="comment">// We have a remainder so we effectively want to try to adjust the quotient and add
+                // the remainder into the quotient. We do this below, however first of all we want
+                // to try to avoid overflowing so we do that check first.
+                </span><span class="kw">let </span>will_overflow = <span class="kw">if </span>scale == MAX_PRECISION_I32 {
+                    <span class="bool-val">true
+                </span>} <span class="kw">else </span>{
+                    <span class="comment">// Figure out how much we can scale by
+                    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(s) = quotient.find_scale(scale) {
+                        power_scale = s;
+                    } <span class="kw">else </span>{
+                        <span class="kw">return </span>CalculationResult::Overflow;
                     }
-                    <span class="comment">// If it comes back as 0 (i.e. 10^0 = 1) then we&#39;re going to overflow since</span>
-                    <span class="comment">// we&#39;re doing nothing.</span>
-                    <span class="ident">power_scale</span> <span class="op">==</span> <span class="number">0</span>
-                };
-                <span class="kw">if</span> <span class="ident">will_overflow</span> {
-                    <span class="comment">// No more scaling can be done, but remainder is non-zero so we round if necessary.</span>
-                    <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">remainder</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-                    <span class="kw">let</span> <span class="ident">round</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">tmp</span> <span class="op">&lt;</span> <span class="ident">remainder</span> {
-                        <span class="comment">// We round if we wrapped around</span>
-                        <span class="bool-val">true</span>
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tmp</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">divisor32</span> {
-                        <span class="comment">// If we&#39;re greater than the divisor (i.e. underflow)</span>
-                        <span class="comment">// or if there is a lo bit set, we round</span>
-                        <span class="ident">tmp</span> <span class="op">&gt;</span> <span class="ident">divisor32</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">0x1</span>) <span class="op">&gt;</span> <span class="number">0</span>
-                    } <span class="kw">else</span> {
-                        <span class="bool-val">false</span>
-                    };
+                    <span class="comment">// If it comes back as 0 (i.e. 10^0 = 1) then we&#39;re going to overflow since
+                    // we&#39;re doing nothing.
+                    </span>power_scale == <span class="number">0
+                </span>};
+                <span class="kw">if </span>will_overflow {
+                    <span class="comment">// No more scaling can be done, but remainder is non-zero so we round if necessary.
+                    </span><span class="kw">let </span>tmp = remainder &lt;&lt; <span class="number">1</span>;
+                    <span class="kw">let </span>round = <span class="kw">if </span>tmp &lt; remainder {
+                        <span class="comment">// We round if we wrapped around
+                        </span><span class="bool-val">true
+                    </span>} <span class="kw">else if </span>tmp &gt;= divisor32 {
+                        <span class="comment">// If we&#39;re greater than the divisor (i.e. underflow)
+                        // or if there is a lo bit set, we round
+                        </span>tmp &gt; divisor32 || (quotient.data[<span class="number">0</span>] &amp; <span class="number">0x1</span>) &gt; <span class="number">0
+                    </span>} <span class="kw">else </span>{
+                        <span class="bool-val">false
+                    </span>};
 
-                    <span class="comment">// If we need to round, try to do so.</span>
-                    <span class="kw">if</span> <span class="ident">round</span> {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">new_scale</span>) <span class="op">=</span> <span class="ident">round_up</span>(<span class="kw-2">&amp;mut</span> <span class="ident">quotient</span>, <span class="ident">scale</span>) {
-                            <span class="ident">scale</span> <span class="op">=</span> <span class="ident">new_scale</span>;
-                        } <span class="kw">else</span> {
-                            <span class="comment">// Overflowed</span>
-                            <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+                    <span class="comment">// If we need to round, try to do so.
+                    </span><span class="kw">if </span>round {
+                        <span class="kw">if let </span><span class="prelude-val">Ok</span>(new_scale) = round_up(<span class="kw-2">&amp;mut </span>quotient, scale) {
+                            scale = new_scale;
+                        } <span class="kw">else </span>{
+                            <span class="comment">// Overflowed
+                            </span><span class="kw">return </span>CalculationResult::Overflow;
                         }
                     }
                     <span class="kw">break</span>;
                 }
             }
 
-            <span class="comment">// Do some scaling</span>
-            <span class="kw">let</span> <span class="ident">power</span> <span class="op">=</span> <span class="ident">POWERS_10</span>[<span class="ident">power_scale</span>];
-            <span class="ident">scale</span> <span class="op">+</span><span class="op">=</span> <span class="ident">power_scale</span> <span class="kw">as</span> <span class="ident">i32</span>;
-            <span class="comment">// Increase the quotient by the power that was looked up</span>
-            <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">increase_scale</span>(<span class="kw-2">&amp;mut</span> <span class="ident">quotient</span>, <span class="ident">power</span> <span class="kw">as</span> <span class="ident">u64</span>);
-            <span class="kw">if</span> <span class="ident">overflow</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+            <span class="comment">// Do some scaling
+            </span><span class="kw">let </span>power = POWERS_10[power_scale];
+            scale += power_scale <span class="kw">as </span>i32;
+            <span class="comment">// Increase the quotient by the power that was looked up
+            </span><span class="kw">let </span>overflow = increase_scale(<span class="kw-2">&amp;mut </span>quotient, power <span class="kw">as </span>u64);
+            <span class="kw">if </span>overflow &gt; <span class="number">0 </span>{
+                <span class="kw">return </span>CalculationResult::Overflow;
             }
 
-            <span class="kw">let</span> <span class="ident">remainder_scaled</span> <span class="op">=</span> (<span class="ident">remainder</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> (<span class="ident">power</span> <span class="kw">as</span> <span class="ident">u64</span>);
-            <span class="kw">let</span> <span class="ident">remainder_quotient</span> <span class="op">=</span> (<span class="ident">remainder_scaled</span> <span class="op">/</span> (<span class="ident">divisor32</span> <span class="kw">as</span> <span class="ident">u64</span>)) <span class="kw">as</span> <span class="ident">u32</span>;
-            <span class="ident">remainder</span> <span class="op">=</span> (<span class="ident">remainder_scaled</span> <span class="op">-</span> <span class="ident">remainder_quotient</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="ident">divisor32</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">DivError::Overflow</span>) <span class="op">=</span> <span class="ident">quotient</span>.<span class="ident">add32</span>(<span class="ident">remainder_quotient</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">adj</span>) <span class="op">=</span> <span class="ident">unscale_from_overflow</span>(<span class="kw-2">&amp;mut</span> <span class="ident">quotient</span>, <span class="ident">scale</span>, <span class="ident">remainder</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-                    <span class="ident">scale</span> <span class="op">=</span> <span class="ident">adj</span>;
-                } <span class="kw">else</span> {
-                    <span class="comment">// Still overflowing</span>
-                    <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+            <span class="kw">let </span>remainder_scaled = (remainder <span class="kw">as </span>u64) * (power <span class="kw">as </span>u64);
+            <span class="kw">let </span>remainder_quotient = (remainder_scaled / (divisor32 <span class="kw">as </span>u64)) <span class="kw">as </span>u32;
+            remainder = (remainder_scaled - remainder_quotient <span class="kw">as </span>u64 * divisor32 <span class="kw">as </span>u64) <span class="kw">as </span>u32;
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(DivError::Overflow) = quotient.add32(remainder_quotient) {
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(adj) = unscale_from_overflow(<span class="kw-2">&amp;mut </span>quotient, scale, remainder != <span class="number">0</span>) {
+                    scale = adj;
+                } <span class="kw">else </span>{
+                    <span class="comment">// Still overflowing
+                    </span><span class="kw">return </span>CalculationResult::Overflow;
                 }
                 <span class="kw">break</span>;
             }
         }
-    } <span class="kw">else</span> {
-        <span class="comment">// We have a divisor greater than 32 bits. Both of these share some quick calculation wins</span>
-        <span class="comment">// so we&#39;ll do those before branching into separate logic.</span>
-        <span class="comment">// The win we can do is shifting the bits to the left as much as possible. We do this to both</span>
-        <span class="comment">// the dividend and the divisor to ensure the quotient is not changed.</span>
-        <span class="comment">// As a simple contrived example: if we have 4 / 2 then we could bit shift all the way to the</span>
-        <span class="comment">// left meaning that the lo portion would have nothing inside of it. Of course, shifting these</span>
-        <span class="comment">// left one has the same result (8/4) etc.</span>
-        <span class="comment">// The advantage is that we may be able to write off lower portions of the number making things</span>
-        <span class="comment">// easier.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">power_scale</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">1</span>].<span class="ident">leading_zeros</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">2</span>].<span class="ident">leading_zeros</span>()
-        } <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">Buf16::zero</span>();
-        <span class="ident">remainder</span>.<span class="ident">set_low64</span>(<span class="ident">quotient</span>.<span class="ident">low64</span>() <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">power_scale</span>);
-        <span class="kw">let</span> <span class="ident">tmp_high</span> <span class="op">=</span> ((<span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">+</span> ((<span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>)) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">power_scale</span>);
-        <span class="ident">remainder</span>.<span class="ident">set_high64</span>(<span class="ident">tmp_high</span>);
+    } <span class="kw">else </span>{
+        <span class="comment">// We have a divisor greater than 32 bits. Both of these share some quick calculation wins
+        // so we&#39;ll do those before branching into separate logic.
+        // The win we can do is shifting the bits to the left as much as possible. We do this to both
+        // the dividend and the divisor to ensure the quotient is not changed.
+        // As a simple contrived example: if we have 4 / 2 then we could bit shift all the way to the
+        // left meaning that the lo portion would have nothing inside of it. Of course, shifting these
+        // left one has the same result (8/4) etc.
+        // The advantage is that we may be able to write off lower portions of the number making things
+        // easier.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>power_scale = <span class="kw">if </span>divisor.data[<span class="number">2</span>] == <span class="number">0 </span>{
+            divisor.data[<span class="number">1</span>].leading_zeros()
+        } <span class="kw">else </span>{
+            divisor.data[<span class="number">2</span>].leading_zeros()
+        } <span class="kw">as </span>usize;
+        <span class="kw">let </span><span class="kw-2">mut </span>remainder = Buf16::zero();
+        remainder.set_low64(quotient.low64() &lt;&lt; power_scale);
+        <span class="kw">let </span>tmp_high = ((quotient.data[<span class="number">1</span>] <span class="kw">as </span>u64) + ((quotient.data[<span class="number">2</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>)) &gt;&gt; (<span class="number">32 </span>- power_scale);
+        remainder.set_high64(tmp_high);
 
-        <span class="comment">// Work out the divisor after it&#39;s shifted</span>
-        <span class="kw">let</span> <span class="ident">divisor64</span> <span class="op">=</span> <span class="ident">divisor</span>.<span class="ident">low64</span>() <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">power_scale</span>;
-        <span class="comment">// Check if the divisor is 64 bit or the full 96 bits</span>
-        <span class="kw">if</span> <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// It&#39;s 64 bits</span>
-            <span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="number">0</span>;
+        <span class="comment">// Work out the divisor after it&#39;s shifted
+        </span><span class="kw">let </span>divisor64 = divisor.low64() &lt;&lt; power_scale;
+        <span class="comment">// Check if the divisor is 64 bit or the full 96 bits
+        </span><span class="kw">if </span>divisor.data[<span class="number">2</span>] == <span class="number">0 </span>{
+            <span class="comment">// It&#39;s 64 bits
+            </span>quotient.data[<span class="number">2</span>] = <span class="number">0</span>;
 
-            <span class="comment">// Calc mid/lo by shifting accordingly</span>
-            <span class="kw">let</span> <span class="ident">rem_lo</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">0</span>];
-            <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">1</span>];
-            <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">2</span>];
-            <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">3</span>];
-            <span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">partial_divide_64</span>(<span class="ident">divisor64</span>);
+            <span class="comment">// Calc mid/lo by shifting accordingly
+            </span><span class="kw">let </span>rem_lo = remainder.data[<span class="number">0</span>];
+            remainder.data[<span class="number">0</span>] = remainder.data[<span class="number">1</span>];
+            remainder.data[<span class="number">1</span>] = remainder.data[<span class="number">2</span>];
+            remainder.data[<span class="number">2</span>] = remainder.data[<span class="number">3</span>];
+            quotient.data[<span class="number">1</span>] = remainder.partial_divide_64(divisor64);
 
-            <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">1</span>];
-            <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">0</span>];
-            <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">rem_lo</span>;
-            <span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">partial_divide_64</span>(<span class="ident">divisor64</span>);
+            remainder.data[<span class="number">2</span>] = remainder.data[<span class="number">1</span>];
+            remainder.data[<span class="number">1</span>] = remainder.data[<span class="number">0</span>];
+            remainder.data[<span class="number">0</span>] = rem_lo;
+            quotient.data[<span class="number">0</span>] = remainder.partial_divide_64(divisor64);
 
-            <span class="kw">loop</span> {
-                <span class="kw">let</span> <span class="ident">rem_low64</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">low64</span>();
-                <span class="kw">if</span> <span class="ident">rem_low64</span> <span class="op">==</span> <span class="number">0</span> {
-                    <span class="comment">// If the scale is positive then we&#39;re actually done</span>
-                    <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">loop </span>{
+                <span class="kw">let </span>rem_low64 = remainder.low64();
+                <span class="kw">if </span>rem_low64 == <span class="number">0 </span>{
+                    <span class="comment">// If the scale is positive then we&#39;re actually done
+                    </span><span class="kw">if </span>scale &gt;= <span class="number">0 </span>{
                         <span class="kw">break</span>;
                     }
-                    <span class="ident">power_scale</span> <span class="op">=</span> <span class="number">9usize</span>.<span class="ident">min</span>((<span class="op">-</span><span class="ident">scale</span>) <span class="kw">as</span> <span class="ident">usize</span>);
-                } <span class="kw">else</span> {
-                    <span class="comment">// We may need to normalize later, so set the flag appropriately</span>
-                    <span class="ident">require_unscale</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    power_scale = <span class="number">9usize</span>.min((-scale) <span class="kw">as </span>usize);
+                } <span class="kw">else </span>{
+                    <span class="comment">// We may need to normalize later, so set the flag appropriately
+                    </span>require_unscale = <span class="bool-val">true</span>;
 
-                    <span class="comment">// We have a remainder so we effectively want to try to adjust the quotient and add</span>
-                    <span class="comment">// the remainder into the quotient. We do this below, however first of all we want</span>
-                    <span class="comment">// to try to avoid overflowing so we do that check first.</span>
-                    <span class="kw">let</span> <span class="ident">will_overflow</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">scale</span> <span class="op">==</span> <span class="ident">MAX_PRECISION_I32</span> {
-                        <span class="bool-val">true</span>
-                    } <span class="kw">else</span> {
-                        <span class="comment">// Figure out how much we can scale by</span>
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">quotient</span>.<span class="ident">find_scale</span>(<span class="ident">scale</span>) {
-                            <span class="ident">power_scale</span> <span class="op">=</span> <span class="ident">s</span>;
-                        } <span class="kw">else</span> {
-                            <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+                    <span class="comment">// We have a remainder so we effectively want to try to adjust the quotient and add
+                    // the remainder into the quotient. We do this below, however first of all we want
+                    // to try to avoid overflowing so we do that check first.
+                    </span><span class="kw">let </span>will_overflow = <span class="kw">if </span>scale == MAX_PRECISION_I32 {
+                        <span class="bool-val">true
+                    </span>} <span class="kw">else </span>{
+                        <span class="comment">// Figure out how much we can scale by
+                        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(s) = quotient.find_scale(scale) {
+                            power_scale = s;
+                        } <span class="kw">else </span>{
+                            <span class="kw">return </span>CalculationResult::Overflow;
                         }
-                        <span class="comment">// If it comes back as 0 (i.e. 10^0 = 1) then we&#39;re going to overflow since</span>
-                        <span class="comment">// we&#39;re doing nothing.</span>
-                        <span class="ident">power_scale</span> <span class="op">==</span> <span class="number">0</span>
-                    };
-                    <span class="kw">if</span> <span class="ident">will_overflow</span> {
-                        <span class="comment">// No more scaling can be done, but remainder is non-zero so we round if necessary.</span>
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">low64</span>();
-                        <span class="kw">let</span> <span class="ident">round</span> <span class="op">=</span> <span class="kw">if</span> (<span class="ident">tmp</span> <span class="kw">as</span> <span class="ident">i64</span>) <span class="op">&lt;</span> <span class="number">0</span> {
-                            <span class="comment">// We round if we wrapped around</span>
-                            <span class="bool-val">true</span>
-                        } <span class="kw">else</span> {
-                            <span class="ident">tmp</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>;
-                            <span class="kw">if</span> <span class="ident">tmp</span> <span class="op">&gt;</span> <span class="ident">divisor64</span> {
-                                <span class="bool-val">true</span>
-                            } <span class="kw">else</span> {
-                                <span class="ident">tmp</span> <span class="op">==</span> <span class="ident">divisor64</span> <span class="op">&amp;&amp;</span> <span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">0x1</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-                            }
+                        <span class="comment">// If it comes back as 0 (i.e. 10^0 = 1) then we&#39;re going to overflow since
+                        // we&#39;re doing nothing.
+                        </span>power_scale == <span class="number">0
+                    </span>};
+                    <span class="kw">if </span>will_overflow {
+                        <span class="comment">// No more scaling can be done, but remainder is non-zero so we round if necessary.
+                        </span><span class="kw">let </span><span class="kw-2">mut </span>tmp = remainder.low64();
+                        <span class="kw">let </span>round = <span class="kw">if </span>(tmp <span class="kw">as </span>i64) &lt; <span class="number">0 </span>{
+                            <span class="comment">// We round if we wrapped around
+                            </span><span class="bool-val">true
+                        </span>} <span class="kw">else </span>{
+                            tmp &lt;&lt;= <span class="number">1</span>;
+                            <span class="kw">if </span>tmp &gt; divisor64 {
+                                <span class="bool-val">true
+                            </span>} <span class="kw">else </span>{
+                                tmp == divisor64 &amp;&amp; quotient.data[<span class="number">0</span>] &amp; <span class="number">0x1 </span>!= <span class="number">0
+                            </span>}
                         };
 
-                        <span class="comment">// If we need to round, try to do so.</span>
-                        <span class="kw">if</span> <span class="ident">round</span> {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">new_scale</span>) <span class="op">=</span> <span class="ident">round_up</span>(<span class="kw-2">&amp;mut</span> <span class="ident">quotient</span>, <span class="ident">scale</span>) {
-                                <span class="ident">scale</span> <span class="op">=</span> <span class="ident">new_scale</span>;
-                            } <span class="kw">else</span> {
-                                <span class="comment">// Overflowed</span>
-                                <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+                        <span class="comment">// If we need to round, try to do so.
+                        </span><span class="kw">if </span>round {
+                            <span class="kw">if let </span><span class="prelude-val">Ok</span>(new_scale) = round_up(<span class="kw-2">&amp;mut </span>quotient, scale) {
+                                scale = new_scale;
+                            } <span class="kw">else </span>{
+                                <span class="comment">// Overflowed
+                                </span><span class="kw">return </span>CalculationResult::Overflow;
                             }
                         }
                         <span class="kw">break</span>;
                     }
                 }
 
-                <span class="comment">// Do some scaling</span>
-                <span class="kw">let</span> <span class="ident">power</span> <span class="op">=</span> <span class="ident">POWERS_10</span>[<span class="ident">power_scale</span>];
-                <span class="ident">scale</span> <span class="op">+</span><span class="op">=</span> <span class="ident">power_scale</span> <span class="kw">as</span> <span class="ident">i32</span>;
+                <span class="comment">// Do some scaling
+                </span><span class="kw">let </span>power = POWERS_10[power_scale];
+                scale += power_scale <span class="kw">as </span>i32;
 
-                <span class="comment">// Increase the quotient by the power that was looked up</span>
-                <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">increase_scale</span>(<span class="kw-2">&amp;mut</span> <span class="ident">quotient</span>, <span class="ident">power</span> <span class="kw">as</span> <span class="ident">u64</span>);
-                <span class="kw">if</span> <span class="ident">overflow</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+                <span class="comment">// Increase the quotient by the power that was looked up
+                </span><span class="kw">let </span>overflow = increase_scale(<span class="kw-2">&amp;mut </span>quotient, power <span class="kw">as </span>u64);
+                <span class="kw">if </span>overflow &gt; <span class="number">0 </span>{
+                    <span class="kw">return </span>CalculationResult::Overflow;
                 }
-                <span class="ident">increase_scale64</span>(<span class="kw-2">&amp;mut</span> <span class="ident">remainder</span>, <span class="ident">power</span> <span class="kw">as</span> <span class="ident">u64</span>);
+                increase_scale64(<span class="kw-2">&amp;mut </span>remainder, power <span class="kw">as </span>u64);
 
-                <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">partial_divide_64</span>(<span class="ident">divisor64</span>);
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">DivError::Overflow</span>) <span class="op">=</span> <span class="ident">quotient</span>.<span class="ident">add32</span>(<span class="ident">tmp</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">adj</span>) <span class="op">=</span> <span class="ident">unscale_from_overflow</span>(<span class="kw-2">&amp;mut</span> <span class="ident">quotient</span>, <span class="ident">scale</span>, <span class="ident">remainder</span>.<span class="ident">low64</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-                        <span class="ident">scale</span> <span class="op">=</span> <span class="ident">adj</span>;
-                    } <span class="kw">else</span> {
-                        <span class="comment">// Still overflowing</span>
-                        <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+                <span class="kw">let </span>tmp = remainder.partial_divide_64(divisor64);
+                <span class="kw">if let </span><span class="prelude-val">Err</span>(DivError::Overflow) = quotient.add32(tmp) {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(adj) = unscale_from_overflow(<span class="kw-2">&amp;mut </span>quotient, scale, remainder.low64() != <span class="number">0</span>) {
+                        scale = adj;
+                    } <span class="kw">else </span>{
+                        <span class="comment">// Still overflowing
+                        </span><span class="kw">return </span>CalculationResult::Overflow;
                     }
                     <span class="kw">break</span>;
                 }
             }
-        } <span class="kw">else</span> {
-            <span class="comment">// It&#39;s 96 bits</span>
-            <span class="comment">// Start by finishing the shift left</span>
-            <span class="kw">let</span> <span class="ident">divisor_mid</span> <span class="op">=</span> <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">1</span>];
-            <span class="kw">let</span> <span class="ident">divisor_hi</span> <span class="op">=</span> <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">2</span>];
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">divisor</span> <span class="op">=</span> <span class="ident">divisor</span>;
-            <span class="ident">divisor</span>.<span class="ident">set_low64</span>(<span class="ident">divisor64</span>);
-            <span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> ((<span class="ident">divisor_mid</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">+</span> ((<span class="ident">divisor_hi</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>)) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">power_scale</span>)) <span class="kw">as</span> <span class="ident">u32</span>;
+        } <span class="kw">else </span>{
+            <span class="comment">// It&#39;s 96 bits
+            // Start by finishing the shift left
+            </span><span class="kw">let </span>divisor_mid = divisor.data[<span class="number">1</span>];
+            <span class="kw">let </span>divisor_hi = divisor.data[<span class="number">2</span>];
+            <span class="kw">let </span><span class="kw-2">mut </span>divisor = divisor;
+            divisor.set_low64(divisor64);
+            divisor.data[<span class="number">2</span>] = ((divisor_mid <span class="kw">as </span>u64 + ((divisor_hi <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>)) &gt;&gt; (<span class="number">32 </span>- power_scale)) <span class="kw">as </span>u32;
 
-            <span class="kw">let</span> <span class="ident">quo</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">partial_divide_96</span>(<span class="kw-2">&amp;</span><span class="ident">divisor</span>);
-            <span class="ident">quotient</span>.<span class="ident">set_low64</span>(<span class="ident">quo</span> <span class="kw">as</span> <span class="ident">u64</span>);
-            <span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">let </span>quo = remainder.partial_divide_96(<span class="kw-2">&amp;</span>divisor);
+            quotient.set_low64(quo <span class="kw">as </span>u64);
+            quotient.data[<span class="number">2</span>] = <span class="number">0</span>;
 
-            <span class="kw">loop</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rem_low64</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">low64</span>();
-                <span class="kw">if</span> <span class="ident">rem_low64</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">==</span> <span class="number">0</span> {
-                    <span class="comment">// If the scale is positive then we&#39;re actually done</span>
-                    <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">loop </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>rem_low64 = remainder.low64();
+                <span class="kw">if </span>rem_low64 == <span class="number">0 </span>&amp;&amp; remainder.data[<span class="number">2</span>] == <span class="number">0 </span>{
+                    <span class="comment">// If the scale is positive then we&#39;re actually done
+                    </span><span class="kw">if </span>scale &gt;= <span class="number">0 </span>{
                         <span class="kw">break</span>;
                     }
-                    <span class="ident">power_scale</span> <span class="op">=</span> <span class="number">9usize</span>.<span class="ident">min</span>((<span class="op">-</span><span class="ident">scale</span>) <span class="kw">as</span> <span class="ident">usize</span>);
-                } <span class="kw">else</span> {
-                    <span class="comment">// We may need to normalize later, so set the flag appropriately</span>
-                    <span class="ident">require_unscale</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    power_scale = <span class="number">9usize</span>.min((-scale) <span class="kw">as </span>usize);
+                } <span class="kw">else </span>{
+                    <span class="comment">// We may need to normalize later, so set the flag appropriately
+                    </span>require_unscale = <span class="bool-val">true</span>;
 
-                    <span class="comment">// We have a remainder so we effectively want to try to adjust the quotient and add</span>
-                    <span class="comment">// the remainder into the quotient. We do this below, however first of all we want</span>
-                    <span class="comment">// to try to avoid overflowing so we do that check first.</span>
-                    <span class="kw">let</span> <span class="ident">will_overflow</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">scale</span> <span class="op">==</span> <span class="ident">MAX_PRECISION_I32</span> {
-                        <span class="bool-val">true</span>
-                    } <span class="kw">else</span> {
-                        <span class="comment">// Figure out how much we can scale by</span>
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">quotient</span>.<span class="ident">find_scale</span>(<span class="ident">scale</span>) {
-                            <span class="ident">power_scale</span> <span class="op">=</span> <span class="ident">s</span>;
-                        } <span class="kw">else</span> {
-                            <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+                    <span class="comment">// We have a remainder so we effectively want to try to adjust the quotient and add
+                    // the remainder into the quotient. We do this below, however first of all we want
+                    // to try to avoid overflowing so we do that check first.
+                    </span><span class="kw">let </span>will_overflow = <span class="kw">if </span>scale == MAX_PRECISION_I32 {
+                        <span class="bool-val">true
+                    </span>} <span class="kw">else </span>{
+                        <span class="comment">// Figure out how much we can scale by
+                        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(s) = quotient.find_scale(scale) {
+                            power_scale = s;
+                        } <span class="kw">else </span>{
+                            <span class="kw">return </span>CalculationResult::Overflow;
                         }
-                        <span class="comment">// If it comes back as 0 (i.e. 10^0 = 1) then we&#39;re going to overflow since</span>
-                        <span class="comment">// we&#39;re doing nothing.</span>
-                        <span class="ident">power_scale</span> <span class="op">==</span> <span class="number">0</span>
-                    };
-                    <span class="kw">if</span> <span class="ident">will_overflow</span> {
-                        <span class="comment">// No more scaling can be done, but remainder is non-zero so we round if necessary.</span>
-                        <span class="kw">let</span> <span class="ident">round</span> <span class="op">=</span> <span class="kw">if</span> (<span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">&lt;</span> <span class="number">0</span> {
-                            <span class="comment">// We round if we wrapped around</span>
-                            <span class="bool-val">true</span>
-                        } <span class="kw">else</span> {
-                            <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">31</span>;
-                            <span class="ident">rem_low64</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>;
-                            <span class="ident">remainder</span>.<span class="ident">set_low64</span>(<span class="ident">rem_low64</span>);
-                            <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>) <span class="op">+</span> <span class="ident">tmp</span>;
+                        <span class="comment">// If it comes back as 0 (i.e. 10^0 = 1) then we&#39;re going to overflow since
+                        // we&#39;re doing nothing.
+                        </span>power_scale == <span class="number">0
+                    </span>};
+                    <span class="kw">if </span>will_overflow {
+                        <span class="comment">// No more scaling can be done, but remainder is non-zero so we round if necessary.
+                        </span><span class="kw">let </span>round = <span class="kw">if </span>(remainder.data[<span class="number">2</span>] <span class="kw">as </span>i32) &lt; <span class="number">0 </span>{
+                            <span class="comment">// We round if we wrapped around
+                            </span><span class="bool-val">true
+                        </span>} <span class="kw">else </span>{
+                            <span class="kw">let </span>tmp = remainder.data[<span class="number">1</span>] &gt;&gt; <span class="number">31</span>;
+                            rem_low64 &lt;&lt;= <span class="number">1</span>;
+                            remainder.set_low64(rem_low64);
+                            remainder.data[<span class="number">2</span>] = (<span class="kw-2">&amp;</span>remainder.data[<span class="number">2</span>] &lt;&lt; <span class="number">1</span>) + tmp;
 
-                            <span class="kw">match</span> <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">2</span>].<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">divisor</span>.<span class="ident">data</span>[<span class="number">2</span>]) {
-                                <span class="ident">Ordering::Less</span> =&gt; <span class="bool-val">false</span>,
-                                <span class="ident">Ordering::Equal</span> =&gt; {
-                                    <span class="kw">let</span> <span class="ident">divisor_low64</span> <span class="op">=</span> <span class="ident">divisor</span>.<span class="ident">low64</span>();
-                                    <span class="kw">if</span> <span class="ident">rem_low64</span> <span class="op">&gt;</span> <span class="ident">divisor_low64</span> {
-                                        <span class="bool-val">true</span>
-                                    } <span class="kw">else</span> {
-                                        <span class="ident">rem_low64</span> <span class="op">==</span> <span class="ident">divisor_low64</span> <span class="op">&amp;&amp;</span> (<span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-                                    }
+                            <span class="kw">match </span>remainder.data[<span class="number">2</span>].cmp(<span class="kw-2">&amp;</span>divisor.data[<span class="number">2</span>]) {
+                                Ordering::Less =&gt; <span class="bool-val">false</span>,
+                                Ordering::Equal =&gt; {
+                                    <span class="kw">let </span>divisor_low64 = divisor.low64();
+                                    <span class="kw">if </span>rem_low64 &gt; divisor_low64 {
+                                        <span class="bool-val">true
+                                    </span>} <span class="kw">else </span>{
+                                        rem_low64 == divisor_low64 &amp;&amp; (quotient.data[<span class="number">0</span>] &amp; <span class="number">1</span>) != <span class="number">0
+                                    </span>}
                                 }
-                                <span class="ident">Ordering::Greater</span> =&gt; <span class="bool-val">true</span>,
+                                Ordering::Greater =&gt; <span class="bool-val">true</span>,
                             }
                         };
 
-                        <span class="comment">// If we need to round, try to do so.</span>
-                        <span class="kw">if</span> <span class="ident">round</span> {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">new_scale</span>) <span class="op">=</span> <span class="ident">round_up</span>(<span class="kw-2">&amp;mut</span> <span class="ident">quotient</span>, <span class="ident">scale</span>) {
-                                <span class="ident">scale</span> <span class="op">=</span> <span class="ident">new_scale</span>;
-                            } <span class="kw">else</span> {
-                                <span class="comment">// Overflowed</span>
-                                <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+                        <span class="comment">// If we need to round, try to do so.
+                        </span><span class="kw">if </span>round {
+                            <span class="kw">if let </span><span class="prelude-val">Ok</span>(new_scale) = round_up(<span class="kw-2">&amp;mut </span>quotient, scale) {
+                                scale = new_scale;
+                            } <span class="kw">else </span>{
+                                <span class="comment">// Overflowed
+                                </span><span class="kw">return </span>CalculationResult::Overflow;
                             }
                         }
                         <span class="kw">break</span>;
                     }
                 }
 
-                <span class="comment">// Do some scaling</span>
-                <span class="kw">let</span> <span class="ident">power</span> <span class="op">=</span> <span class="ident">POWERS_10</span>[<span class="ident">power_scale</span>];
-                <span class="ident">scale</span> <span class="op">+</span><span class="op">=</span> <span class="ident">power_scale</span> <span class="kw">as</span> <span class="ident">i32</span>;
+                <span class="comment">// Do some scaling
+                </span><span class="kw">let </span>power = POWERS_10[power_scale];
+                scale += power_scale <span class="kw">as </span>i32;
 
-                <span class="comment">// Increase the quotient by the power that was looked up</span>
-                <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">increase_scale</span>(<span class="kw-2">&amp;mut</span> <span class="ident">quotient</span>, <span class="ident">power</span> <span class="kw">as</span> <span class="ident">u64</span>);
-                <span class="kw">if</span> <span class="ident">overflow</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+                <span class="comment">// Increase the quotient by the power that was looked up
+                </span><span class="kw">let </span>overflow = increase_scale(<span class="kw-2">&amp;mut </span>quotient, power <span class="kw">as </span>u64);
+                <span class="kw">if </span>overflow &gt; <span class="number">0 </span>{
+                    <span class="kw">return </span>CalculationResult::Overflow;
                 }
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp_remainder</span> <span class="op">=</span> <span class="ident">Buf12</span> {
-                    <span class="ident">data</span>: [<span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">0</span>], <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">1</span>], <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">2</span>]],
+                <span class="kw">let </span><span class="kw-2">mut </span>tmp_remainder = Buf12 {
+                    data: [remainder.data[<span class="number">0</span>], remainder.data[<span class="number">1</span>], remainder.data[<span class="number">2</span>]],
                 };
-                <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">increase_scale</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tmp_remainder</span>, <span class="ident">power</span> <span class="kw">as</span> <span class="ident">u64</span>);
-                <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">tmp_remainder</span>.<span class="ident">data</span>[<span class="number">0</span>];
-                <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">tmp_remainder</span>.<span class="ident">data</span>[<span class="number">1</span>];
-                <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">tmp_remainder</span>.<span class="ident">data</span>[<span class="number">2</span>];
-                <span class="ident">remainder</span>.<span class="ident">data</span>[<span class="number">3</span>] <span class="op">=</span> <span class="ident">overflow</span>;
+                <span class="kw">let </span>overflow = increase_scale(<span class="kw-2">&amp;mut </span>tmp_remainder, power <span class="kw">as </span>u64);
+                remainder.data[<span class="number">0</span>] = tmp_remainder.data[<span class="number">0</span>];
+                remainder.data[<span class="number">1</span>] = tmp_remainder.data[<span class="number">1</span>];
+                remainder.data[<span class="number">2</span>] = tmp_remainder.data[<span class="number">2</span>];
+                remainder.data[<span class="number">3</span>] = overflow;
 
-                <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">remainder</span>.<span class="ident">partial_divide_96</span>(<span class="kw-2">&amp;</span><span class="ident">divisor</span>);
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">DivError::Overflow</span>) <span class="op">=</span> <span class="ident">quotient</span>.<span class="ident">add32</span>(<span class="ident">tmp</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">adj</span>) <span class="op">=</span>
-                        <span class="ident">unscale_from_overflow</span>(<span class="kw-2">&amp;mut</span> <span class="ident">quotient</span>, <span class="ident">scale</span>, (<span class="ident">remainder</span>.<span class="ident">low64</span>() <span class="op">|</span> <span class="ident">remainder</span>.<span class="ident">high64</span>()) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
+                <span class="kw">let </span>tmp = remainder.partial_divide_96(<span class="kw-2">&amp;</span>divisor);
+                <span class="kw">if let </span><span class="prelude-val">Err</span>(DivError::Overflow) = quotient.add32(tmp) {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(adj) =
+                        unscale_from_overflow(<span class="kw-2">&amp;mut </span>quotient, scale, (remainder.low64() | remainder.high64()) != <span class="number">0</span>)
                     {
-                        <span class="ident">scale</span> <span class="op">=</span> <span class="ident">adj</span>;
-                    } <span class="kw">else</span> {
-                        <span class="comment">// Still overflowing</span>
-                        <span class="kw">return</span> <span class="ident">CalculationResult::Overflow</span>;
+                        scale = adj;
+                    } <span class="kw">else </span>{
+                        <span class="comment">// Still overflowing
+                        </span><span class="kw">return </span>CalculationResult::Overflow;
                     }
                     <span class="kw">break</span>;
                 }
             }
         }
     }
-    <span class="kw">if</span> <span class="ident">require_unscale</span> {
-        <span class="ident">scale</span> <span class="op">=</span> <span class="ident">unscale</span>(<span class="kw-2">&amp;mut</span> <span class="ident">quotient</span>, <span class="ident">scale</span>);
+    <span class="kw">if </span>require_unscale {
+        scale = unscale(<span class="kw-2">&amp;mut </span>quotient, scale);
     }
-    <span class="ident">CalculationResult::Ok</span>(<span class="ident">Decimal::from_parts</span>(
-        <span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">0</span>],
-        <span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">1</span>],
-        <span class="ident">quotient</span>.<span class="ident">data</span>[<span class="number">2</span>],
-        <span class="ident">sign_negative</span>,
-        <span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u32</span>,
+    CalculationResult::Ok(Decimal::from_parts(
+        quotient.data[<span class="number">0</span>],
+        quotient.data[<span class="number">1</span>],
+        quotient.data[<span class="number">2</span>],
+        sign_negative,
+        scale <span class="kw">as </span>u32,
     ))
 }
 
-<span class="comment">// Multiply num by power (multiple of 10). Power must be 32 bits.</span>
-<span class="comment">// Returns the overflow, if any</span>
-<span class="kw">fn</span> <span class="ident">increase_scale</span>(<span class="ident">num</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buf12</span>, <span class="ident">power</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u32</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> (<span class="ident">num</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> <span class="ident">power</span>;
-    <span class="ident">num</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">tmp</span> <span class="kw">as</span> <span class="ident">u32</span>;
-    <span class="ident">tmp</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span>;
-    <span class="ident">tmp</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">num</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> <span class="ident">power</span>;
-    <span class="ident">num</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">tmp</span> <span class="kw">as</span> <span class="ident">u32</span>;
-    <span class="ident">tmp</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span>;
-    <span class="ident">tmp</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">num</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> <span class="ident">power</span>;
-    <span class="ident">num</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">tmp</span> <span class="kw">as</span> <span class="ident">u32</span>;
-    (<span class="ident">tmp</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>
+<span class="comment">// Multiply num by power (multiple of 10). Power must be 32 bits.
+// Returns the overflow, if any
+</span><span class="kw">fn </span>increase_scale(num: <span class="kw-2">&amp;mut </span>Buf12, power: u64) -&gt; u32 {
+    <span class="kw">let </span><span class="kw-2">mut </span>tmp = (num.data[<span class="number">0</span>] <span class="kw">as </span>u64) * power;
+    num.data[<span class="number">0</span>] = tmp <span class="kw">as </span>u32;
+    tmp &gt;&gt;= <span class="number">32</span>;
+    tmp += (num.data[<span class="number">1</span>] <span class="kw">as </span>u64) * power;
+    num.data[<span class="number">1</span>] = tmp <span class="kw">as </span>u32;
+    tmp &gt;&gt;= <span class="number">32</span>;
+    tmp += (num.data[<span class="number">2</span>] <span class="kw">as </span>u64) * power;
+    num.data[<span class="number">2</span>] = tmp <span class="kw">as </span>u32;
+    (tmp &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32
 }
 
-<span class="comment">// Multiply num by power (multiple of 10). Power must be 32 bits.</span>
-<span class="kw">fn</span> <span class="ident">increase_scale64</span>(<span class="ident">num</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buf16</span>, <span class="ident">power</span>: <span class="ident">u64</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> (<span class="ident">num</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> <span class="ident">power</span>;
-    <span class="ident">num</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">tmp</span> <span class="kw">as</span> <span class="ident">u32</span>;
-    <span class="ident">tmp</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span>;
-    <span class="ident">tmp</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">num</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> <span class="ident">power</span>;
-    <span class="ident">num</span>.<span class="ident">set_mid64</span>(<span class="ident">tmp</span>)
+<span class="comment">// Multiply num by power (multiple of 10). Power must be 32 bits.
+</span><span class="kw">fn </span>increase_scale64(num: <span class="kw-2">&amp;mut </span>Buf16, power: u64) {
+    <span class="kw">let </span><span class="kw-2">mut </span>tmp = (num.data[<span class="number">0</span>] <span class="kw">as </span>u64) * power;
+    num.data[<span class="number">0</span>] = tmp <span class="kw">as </span>u32;
+    tmp &gt;&gt;= <span class="number">32</span>;
+    tmp += (num.data[<span class="number">1</span>] <span class="kw">as </span>u64) * power;
+    num.set_mid64(tmp)
 }
 
-<span class="comment">// Adjust the number to deal with an overflow. This function follows being scaled up (i.e. multiplied</span>
-<span class="comment">// by 10, so this effectively tries to reverse that by dividing by 10 then feeding in the high bit</span>
-<span class="comment">// to undo the overflow and rounding instead.</span>
-<span class="comment">// Returns the updated scale.</span>
-<span class="kw">fn</span> <span class="ident">unscale_from_overflow</span>(<span class="ident">num</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buf12</span>, <span class="ident">scale</span>: <span class="ident">i32</span>, <span class="ident">sticky</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="ident">DivError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">scale</span> <span class="op">=</span> <span class="ident">scale</span> <span class="op">-</span> <span class="number">1</span>;
-    <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&lt;</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DivError::Overflow</span>);
+<span class="comment">// Adjust the number to deal with an overflow. This function follows being scaled up (i.e. multiplied
+// by 10, so this effectively tries to reverse that by dividing by 10 then feeding in the high bit
+// to undo the overflow and rounding instead.
+// Returns the updated scale.
+</span><span class="kw">fn </span>unscale_from_overflow(num: <span class="kw-2">&amp;mut </span>Buf12, scale: i32, sticky: bool) -&gt; <span class="prelude-ty">Result</span>&lt;i32, DivError&gt; {
+    <span class="kw">let </span>scale = scale - <span class="number">1</span>;
+    <span class="kw">if </span>scale &lt; <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(DivError::Overflow);
     }
 
-    <span class="comment">// This function is called when the hi portion has &quot;overflowed&quot; upon adding one and has wrapped</span>
-    <span class="comment">// back around to 0. Consequently, we need to &quot;feed&quot; that back in, but also rescaling down</span>
-    <span class="comment">// to reverse out the overflow.</span>
-    <span class="kw">const</span> <span class="ident">HIGH_BIT</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x1_0000_0000</span>;
-    <span class="ident">num</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> (<span class="ident">HIGH_BIT</span> <span class="op">/</span> <span class="number">10</span>) <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="comment">// This function is called when the hi portion has &quot;overflowed&quot; upon adding one and has wrapped
+    // back around to 0. Consequently, we need to &quot;feed&quot; that back in, but also rescaling down
+    // to reverse out the overflow.
+    </span><span class="kw">const </span>HIGH_BIT: u64 = <span class="number">0x1_0000_0000</span>;
+    num.data[<span class="number">2</span>] = (HIGH_BIT / <span class="number">10</span>) <span class="kw">as </span>u32;
 
-    <span class="comment">// Calc the mid</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> ((<span class="ident">HIGH_BIT</span> <span class="op">%</span> <span class="number">10</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">+</span> (<span class="ident">num</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> (<span class="ident">tmp</span> <span class="op">/</span> <span class="number">10</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-    <span class="ident">num</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">val</span>;
+    <span class="comment">// Calc the mid
+    </span><span class="kw">let </span><span class="kw-2">mut </span>tmp = ((HIGH_BIT % <span class="number">10</span>) &lt;&lt; <span class="number">32</span>) + (num.data[<span class="number">1</span>] <span class="kw">as </span>u64);
+    <span class="kw">let </span><span class="kw-2">mut </span>val = (tmp / <span class="number">10</span>) <span class="kw">as </span>u32;
+    num.data[<span class="number">1</span>] = val;
 
-    <span class="comment">// Calc the lo using a similar method</span>
-    <span class="ident">tmp</span> <span class="op">=</span> ((<span class="ident">tmp</span> <span class="op">-</span> (<span class="ident">val</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> <span class="number">10</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">+</span> (<span class="ident">num</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>);
-    <span class="ident">val</span> <span class="op">=</span> (<span class="ident">tmp</span> <span class="op">/</span> <span class="number">10</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-    <span class="ident">num</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">val</span>;
+    <span class="comment">// Calc the lo using a similar method
+    </span>tmp = ((tmp - (val <span class="kw">as </span>u64) * <span class="number">10</span>) &lt;&lt; <span class="number">32</span>) + (num.data[<span class="number">0</span>] <span class="kw">as </span>u64);
+    val = (tmp / <span class="number">10</span>) <span class="kw">as </span>u32;
+    num.data[<span class="number">0</span>] = val;
 
-    <span class="comment">// Work out the remainder, and round if we have one (since it doesn&#39;t fit)</span>
-    <span class="kw">let</span> <span class="ident">remainder</span> <span class="op">=</span> (<span class="ident">tmp</span> <span class="op">-</span> (<span class="ident">val</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> <span class="number">10</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-    <span class="kw">if</span> <span class="ident">remainder</span> <span class="op">&gt;</span> <span class="number">5</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">remainder</span> <span class="op">==</span> <span class="number">5</span> <span class="op">&amp;&amp;</span> (<span class="ident">sticky</span> <span class="op">|</span><span class="op">|</span> <span class="ident">num</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">0x1</span> <span class="op">&gt;</span> <span class="number">0</span>)) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">num</span>.<span class="ident">add32</span>(<span class="number">1</span>);
+    <span class="comment">// Work out the remainder, and round if we have one (since it doesn&#39;t fit)
+    </span><span class="kw">let </span>remainder = (tmp - (val <span class="kw">as </span>u64) * <span class="number">10</span>) <span class="kw">as </span>u32;
+    <span class="kw">if </span>remainder &gt; <span class="number">5 </span>|| (remainder == <span class="number">5 </span>&amp;&amp; (sticky || num.data[<span class="number">0</span>] &amp; <span class="number">0x1 </span>&gt; <span class="number">0</span>)) {
+        <span class="kw">let _ </span>= num.add32(<span class="number">1</span>);
     }
-    <span class="prelude-val">Ok</span>(<span class="ident">scale</span>)
+    <span class="prelude-val">Ok</span>(scale)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">round_up</span>(<span class="ident">num</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buf12</span>, <span class="ident">scale</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="ident">DivError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">low64</span> <span class="op">=</span> <span class="ident">num</span>.<span class="ident">low64</span>().<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-    <span class="ident">num</span>.<span class="ident">set_low64</span>(<span class="ident">low64</span>);
-    <span class="kw">if</span> <span class="ident">low64</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">scale</span>);
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>round_up(num: <span class="kw-2">&amp;mut </span>Buf12, scale: i32) -&gt; <span class="prelude-ty">Result</span>&lt;i32, DivError&gt; {
+    <span class="kw">let </span>low64 = num.low64().wrapping_add(<span class="number">1</span>);
+    num.set_low64(low64);
+    <span class="kw">if </span>low64 != <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(scale);
     }
-    <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">num</span>.<span class="ident">data</span>[<span class="number">2</span>].<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-    <span class="ident">num</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">hi</span>;
-    <span class="kw">if</span> <span class="ident">hi</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">scale</span>);
+    <span class="kw">let </span>hi = num.data[<span class="number">2</span>].wrapping_add(<span class="number">1</span>);
+    num.data[<span class="number">2</span>] = hi;
+    <span class="kw">if </span>hi != <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(scale);
     }
-    <span class="ident">unscale_from_overflow</span>(<span class="ident">num</span>, <span class="ident">scale</span>, <span class="bool-val">true</span>)
+    unscale_from_overflow(num, scale, <span class="bool-val">true</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">unscale</span>(<span class="ident">num</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buf12</span>, <span class="ident">scale</span>: <span class="ident">i32</span>) -&gt; <span class="ident">i32</span> {
-    <span class="comment">// Since 10 = 2 * 5, there must be a factor of 2 for every power of 10 we can extract.</span>
-    <span class="comment">// We use this as a quick test on whether to try a given power.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scale</span> <span class="op">=</span> <span class="ident">scale</span>;
-    <span class="kw">while</span> <span class="ident">num</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">scale</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> <span class="op">&amp;&amp;</span> <span class="ident">num</span>.<span class="ident">div32_const</span>(<span class="number">100000000</span>) {
-        <span class="ident">scale</span> <span class="op">-</span><span class="op">=</span> <span class="number">8</span>;
+<span class="kw">fn </span>unscale(num: <span class="kw-2">&amp;mut </span>Buf12, scale: i32) -&gt; i32 {
+    <span class="comment">// Since 10 = 2 * 5, there must be a factor of 2 for every power of 10 we can extract.
+    // We use this as a quick test on whether to try a given power.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>scale = scale;
+    <span class="kw">while </span>num.data[<span class="number">0</span>] == <span class="number">0 </span>&amp;&amp; scale &gt;= <span class="number">8 </span>&amp;&amp; num.div32_const(<span class="number">100000000</span>) {
+        scale -= <span class="number">8</span>;
     }
 
-    <span class="kw">if</span> (<span class="ident">num</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">0xF</span>) <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">scale</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> <span class="op">&amp;&amp;</span> <span class="ident">num</span>.<span class="ident">div32_const</span>(<span class="number">10000</span>) {
-        <span class="ident">scale</span> <span class="op">-</span><span class="op">=</span> <span class="number">4</span>;
+    <span class="kw">if </span>(num.data[<span class="number">0</span>] &amp; <span class="number">0xF</span>) == <span class="number">0 </span>&amp;&amp; scale &gt;= <span class="number">4 </span>&amp;&amp; num.div32_const(<span class="number">10000</span>) {
+        scale -= <span class="number">4</span>;
     }
 
-    <span class="kw">if</span> (<span class="ident">num</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">0x3</span>) <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">scale</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="ident">num</span>.<span class="ident">div32_const</span>(<span class="number">100</span>) {
-        <span class="ident">scale</span> <span class="op">-</span><span class="op">=</span> <span class="number">2</span>;
+    <span class="kw">if </span>(num.data[<span class="number">0</span>] &amp; <span class="number">0x3</span>) == <span class="number">0 </span>&amp;&amp; scale &gt;= <span class="number">2 </span>&amp;&amp; num.div32_const(<span class="number">100</span>) {
+        scale -= <span class="number">2</span>;
     }
 
-    <span class="kw">if</span> (<span class="ident">num</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">0x1</span>) <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">scale</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">num</span>.<span class="ident">div32_const</span>(<span class="number">10</span>) {
-        <span class="ident">scale</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">if </span>(num.data[<span class="number">0</span>] &amp; <span class="number">0x1</span>) == <span class="number">0 </span>&amp;&amp; scale &gt;= <span class="number">1 </span>&amp;&amp; num.div32_const(<span class="number">10</span>) {
+        scale -= <span class="number">1</span>;
     }
-    <span class="ident">scale</span>
+    scale
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rust_decimal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rust_decimal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

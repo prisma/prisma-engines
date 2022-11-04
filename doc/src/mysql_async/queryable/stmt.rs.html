@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/queryable/stmt.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stmt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/queryable/stmt.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stmt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -353,360 +353,360 @@
 <span id="353">353</span>
 <span id="354">354</span>
 <span id="355">355</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">futures_util::FutureExt</span>;
-<span class="kw">use</span> <span class="ident">mysql_common</span>::{
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">named_params::parse_named_params</span>,
-    <span class="ident">packets</span>::{<span class="ident">ComStmtClose</span>, <span class="ident">StmtPacket</span>},
+</span><span class="kw">use </span>futures_util::FutureExt;
+<span class="kw">use </span>mysql_common::{
+    io::ParseBuf,
+    named_params::parse_named_params,
+    packets::{ComStmtClose, StmtPacket},
 };
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>std::{borrow::Cow, sync::Arc};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">conn::routines</span>::{<span class="ident">ExecRoutine</span>, <span class="ident">PrepareRoutine</span>},
-    <span class="ident">consts::CapabilityFlags</span>,
-    <span class="ident">error</span>::<span class="kw-2">*</span>,
-    <span class="ident">Column</span>, <span class="ident">Params</span>,
+<span class="kw">use crate</span>::{
+    conn::routines::{ExecRoutine, PrepareRoutine},
+    consts::CapabilityFlags,
+    error::<span class="kw-2">*</span>,
+    Column, Params,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::AsQuery</span>;
+<span class="kw">use </span><span class="kw">super</span>::AsQuery;
 
-<span class="doccomment">/// Result of a `StatementLike::to_statement` call.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Statement is immediately available.</span>
-    <span class="ident">Immediate</span>(<span class="ident">Statement</span>),
-    <span class="doccomment">/// We need some time to get a statement and the operation itself may fail.</span>
-    <span class="ident">Mediate</span>(<span class="ident"><span class="kw">crate</span>::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Statement</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Result of a `StatementLike::to_statement` call.
+</span><span class="kw">pub enum </span>ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Statement is immediately available.
+    </span>Immediate(Statement),
+    <span class="doccomment">/// We need some time to get a statement and the operation itself may fail.
+    </span>Mediate(<span class="kw">crate</span>::BoxFuture&lt;<span class="lifetime">&#39;a</span>, Statement&gt;),
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">StatementLike</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="doccomment">/// Returns a statement.</span>
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>;
+<span class="kw">pub trait </span>StatementLike: Send + Sync {
+    <span class="doccomment">/// Returns a statement.
+    </span><span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>;
 }
 
-<span class="kw">fn</span> <span class="ident">to_statement_move</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">stmt</span>: <span class="ident">T</span>,
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>,
-) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">as_query</span>();
-        <span class="kw">let</span> (<span class="ident">named_params</span>, <span class="ident">raw_query</span>) <span class="op">=</span> <span class="ident">parse_named_params</span>(<span class="ident">query</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">inner_stmt</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">get_cached_stmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">raw_query</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">inner_stmt</span>) =&gt; <span class="ident">inner_stmt</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="ident">conn</span>.<span class="ident">prepare_statement</span>(<span class="ident">raw_query</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+<span class="kw">fn </span>to_statement_move&lt;<span class="lifetime">&#39;a</span>, T: AsQuery + <span class="lifetime">&#39;a</span>&gt;(
+    stmt: T,
+    conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn,
+) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">let </span>fut = <span class="kw">async move </span>{
+        <span class="kw">let </span>query = stmt.as_query();
+        <span class="kw">let </span>(named_params, raw_query) = parse_named_params(query.as_ref())<span class="question-mark">?</span>;
+        <span class="kw">let </span>inner_stmt = <span class="kw">match </span>conn.get_cached_stmt(<span class="kw-2">&amp;*</span>raw_query) {
+            <span class="prelude-val">Some</span>(inner_stmt) =&gt; inner_stmt,
+            <span class="prelude-val">None </span>=&gt; conn.prepare_statement(raw_query).<span class="kw">await</span><span class="question-mark">?</span>,
         };
-        <span class="prelude-val">Ok</span>(<span class="ident">Statement::new</span>(<span class="ident">inner_stmt</span>, <span class="ident">named_params</span>))
+        <span class="prelude-val">Ok</span>(Statement::new(inner_stmt, named_params))
     }
-    .<span class="ident">boxed</span>();
-    <span class="ident">ToStatementResult::Mediate</span>(<span class="ident">fut</span>)
+    .boxed();
+    ToStatementResult::Mediate(fut)
 }
 
-<span class="kw">impl</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl </span>StatementLike <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="ident">to_statement_move</span>(<span class="self">self</span>, <span class="ident">conn</span>)
+        to_statement_move(<span class="self">self</span>, conn)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl </span>StatementLike <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>str {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="ident">to_statement_move</span>(<span class="self">self</span>, <span class="ident">conn</span>)
+        to_statement_move(<span class="self">self</span>, conn)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl </span>StatementLike <span class="kw">for </span>String {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="ident">to_statement_move</span>(<span class="self">self</span>, <span class="ident">conn</span>)
+        to_statement_move(<span class="self">self</span>, conn)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl </span>StatementLike <span class="kw">for </span>Box&lt;str&gt; {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="ident">to_statement_move</span>(<span class="self">self</span>, <span class="ident">conn</span>)
+        to_statement_move(<span class="self">self</span>, conn)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl </span>StatementLike <span class="kw">for </span>Arc&lt;str&gt; {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="ident">to_statement_move</span>(<span class="self">self</span>, <span class="ident">conn</span>)
+        to_statement_move(<span class="self">self</span>, conn)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl </span>StatementLike <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, [u8]&gt; {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="ident">to_statement_move</span>(<span class="self">self</span>, <span class="ident">conn</span>)
+        to_statement_move(<span class="self">self</span>, conn)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl </span>StatementLike <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>[u8] {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="ident">to_statement_move</span>(<span class="self">self</span>, <span class="ident">conn</span>)
+        to_statement_move(<span class="self">self</span>, conn)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl </span>StatementLike <span class="kw">for </span>Vec&lt;u8&gt; {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="ident">to_statement_move</span>(<span class="self">self</span>, <span class="ident">conn</span>)
+        to_statement_move(<span class="self">self</span>, conn)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl </span>StatementLike <span class="kw">for </span>Box&lt;[u8]&gt; {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="ident">to_statement_move</span>(<span class="self">self</span>, <span class="ident">conn</span>)
+        to_statement_move(<span class="self">self</span>, conn)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl </span>StatementLike <span class="kw">for </span>Arc&lt;[u8]&gt; {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="ident">to_statement_move</span>(<span class="self">self</span>, <span class="ident">conn</span>)
+        to_statement_move(<span class="self">self</span>, conn)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="ident">Statement</span> {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">_conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl </span>StatementLike <span class="kw">for </span>Statement {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, _conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;static</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="ident">ToStatementResult::Immediate</span>(<span class="self">self</span>.<span class="ident">clone</span>())
+        ToStatementResult::Immediate(<span class="self">self</span>.clone())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">StatementLike</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">T</span> {
-    <span class="kw">fn</span> <span class="ident">to_statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>) -&gt; <span class="ident">ToStatementResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl</span>&lt;T: StatementLike + Clone&gt; StatementLike <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>T {
+    <span class="kw">fn </span>to_statement&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">crate</span>::Conn) -&gt; ToStatementResult&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
     {
-        <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">to_statement</span>(<span class="ident">conn</span>)
+        <span class="self">self</span>.clone().to_statement(conn)
     }
 }
 
-<span class="doccomment">/// Statement data.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StmtInner</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">raw_query</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">columns</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">params</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">stmt_packet</span>: <span class="ident">StmtPacket</span>,
-    <span class="ident">connection_id</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// Statement data.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>StmtInner {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) raw_query: Arc&lt;[u8]&gt;,
+    columns: <span class="prelude-ty">Option</span>&lt;Box&lt;[Column]&gt;&gt;,
+    params: <span class="prelude-ty">Option</span>&lt;Box&lt;[Column]&gt;&gt;,
+    stmt_packet: StmtPacket,
+    connection_id: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">StmtInner</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_payload</span>(
-        <span class="ident">pld</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">connection_id</span>: <span class="ident">u32</span>,
-        <span class="ident">raw_query</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">stmt_packet</span> <span class="op">=</span> <span class="ident">ParseBuf</span>(<span class="ident">pld</span>).<span class="ident">parse</span>(())<span class="question-mark">?</span>;
+<span class="kw">impl </span>StmtInner {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_payload(
+        pld: <span class="kw-2">&amp;</span>[u8],
+        connection_id: u32,
+        raw_query: Arc&lt;[u8]&gt;,
+    ) -&gt; std::io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>stmt_packet = ParseBuf(pld).parse(())<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">raw_query</span>,
-            <span class="ident">columns</span>: <span class="prelude-val">None</span>,
-            <span class="ident">params</span>: <span class="prelude-val">None</span>,
-            <span class="ident">stmt_packet</span>,
-            <span class="ident">connection_id</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            raw_query,
+            columns: <span class="prelude-val">None</span>,
+            params: <span class="prelude-val">None</span>,
+            stmt_packet,
+            connection_id,
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_params</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">params</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">params</span>.<span class="ident">is_empty</span>() {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">params</span>.<span class="ident">into_boxed_slice</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_params(<span class="kw-2">mut </span><span class="self">self</span>, params: Vec&lt;Column&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.params = <span class="kw">if </span>params.is_empty() {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(params.into_boxed_slice())
         };
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_columns</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">columns</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">is_empty</span>() {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">columns</span>.<span class="ident">into_boxed_slice</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_columns(<span class="kw-2">mut </span><span class="self">self</span>, columns: Vec&lt;Column&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.columns = <span class="kw">if </span>columns.is_empty() {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(columns.into_boxed_slice())
         };
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Column] {
+        <span class="self">self</span>.columns.as_ref().map(AsRef::as_ref).unwrap_or(<span class="kw-2">&amp;</span>[])
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
-        <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">AsRef::as_ref</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[])
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Column] {
+        <span class="self">self</span>.params.as_ref().map(AsRef::as_ref).unwrap_or(<span class="kw-2">&amp;</span>[])
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
-        <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">AsRef::as_ref</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[])
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.stmt_packet.statement_id()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">stmt_packet</span>.<span class="ident">statement_id</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>connection_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.connection_id
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">connection_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">connection_id</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>num_params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.stmt_packet.num_params()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">num_params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">stmt_packet</span>.<span class="ident">num_params</span>()
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">num_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">stmt_packet</span>.<span class="ident">num_columns</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>num_columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.stmt_packet.num_columns()
     }
 }
 
-<span class="doccomment">/// Prepared statement.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Statement is only valid for connection with id `Statement::connection_id()`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Statement</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">StmtInner</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">named_params</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Prepared statement.
+///
+/// Statement is only valid for connection with id `Statement::connection_id()`.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>Statement {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) inner: Arc&lt;StmtInner&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) named_params: <span class="prelude-ty">Option</span>&lt;Vec&lt;Vec&lt;u8&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Statement</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">StmtInner</span><span class="op">&gt;</span>, <span class="ident">named_params</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>,
-            <span class="ident">named_params</span>,
+<span class="kw">impl </span>Statement {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(inner: Arc&lt;StmtInner&gt;, named_params: <span class="prelude-ty">Option</span>&lt;Vec&lt;Vec&lt;u8&gt;&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner,
+            named_params,
         }
     }
 
-    <span class="doccomment">/// Returned columns.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">columns</span>()
+    <span class="doccomment">/// Returned columns.
+    </span><span class="kw">pub fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Column] {
+        <span class="self">self</span>.inner.columns()
     }
 
-    <span class="doccomment">/// Required parameters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">params</span>()
+    <span class="doccomment">/// Required parameters.
+    </span><span class="kw">pub fn </span>params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Column] {
+        <span class="self">self</span>.inner.params()
     }
 
-    <span class="doccomment">/// MySql statement identifier.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">id</span>()
+    <span class="doccomment">/// MySql statement identifier.
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.inner.id()
     }
 
-    <span class="doccomment">/// MySql connection identifier.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">connection_id</span>()
+    <span class="doccomment">/// MySql connection identifier.
+    </span><span class="kw">pub fn </span>connection_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.inner.connection_id()
     }
 
-    <span class="doccomment">/// Number of parameters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">num_params</span>()
+    <span class="doccomment">/// Number of parameters.
+    </span><span class="kw">pub fn </span>num_params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.inner.num_params()
     }
 
-    <span class="doccomment">/// Number of columns.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">num_columns</span>()
+    <span class="doccomment">/// Number of columns.
+    </span><span class="kw">pub fn </span>num_columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.inner.num_columns()
     }
 }
 
-<span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::Conn</span> {
-    <span class="doccomment">/// Low-level helpers, that reads the given number of column packets terminated by EOF packet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires `num &gt; 0`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_column_defs</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">num</span>: <span class="ident">U</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+<span class="kw">impl </span><span class="kw">crate</span>::Conn {
+    <span class="doccomment">/// Low-level helpers, that reads the given number of column packets terminated by EOF packet.
+    ///
+    /// Requires `num &gt; 0`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>read_column_defs&lt;U&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num: U) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Column&gt;&gt;
+    <span class="kw">where
+        </span>U: Into&lt;usize&gt;,
     {
-        <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="ident">num</span>.<span class="ident">into</span>();
-        <span class="macro">debug_assert!</span>(<span class="ident">num</span> <span class="op">&gt;</span> <span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">packets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_packets</span>(<span class="ident">num</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">defs</span> <span class="op">=</span> <span class="ident">packets</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">x</span>).<span class="ident">parse</span>(()))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">map_err</span>(<span class="ident">Error::from</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>num = num.into();
+        <span class="macro">debug_assert!</span>(num &gt; <span class="number">0</span>);
+        <span class="kw">let </span>packets = <span class="self">self</span>.read_packets(num).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>defs = packets
+            .into_iter()
+            .map(|x| ParseBuf(<span class="kw-2">&amp;*</span>x).parse(()))
+            .collect::&lt;std::result::Result&lt;Vec&lt;Column&gt;, <span class="kw">_</span>&gt;&gt;()
+            .map_err(Error::from)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>
-            .<span class="ident">capabilities</span>()
-            .<span class="ident">contains</span>(<span class="ident">CapabilityFlags::CLIENT_DEPRECATE_EOF</span>)
+        <span class="kw">if </span>!<span class="self">self
+            </span>.capabilities()
+            .contains(CapabilityFlags::CLIENT_DEPRECATE_EOF)
         {
-            <span class="self">self</span>.<span class="ident">read_packet</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.read_packet().<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">defs</span>)
+        <span class="prelude-val">Ok</span>(defs)
     }
 
-    <span class="doccomment">/// Helper, that retrieves `Statement` from `StatementLike`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_statement</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stmt_like</span>: <span class="ident">U</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">U</span>: <span class="ident">StatementLike</span>,
+    <span class="doccomment">/// Helper, that retrieves `Statement` from `StatementLike`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>get_statement&lt;U&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stmt_like: U) -&gt; <span class="prelude-ty">Result</span>&lt;Statement&gt;
+    <span class="kw">where
+        </span>U: StatementLike,
     {
-        <span class="kw">match</span> <span class="ident">stmt_like</span>.<span class="ident">to_statement</span>(<span class="self">self</span>) {
-            <span class="ident">ToStatementResult::Immediate</span>(<span class="ident">statement</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">statement</span>),
-            <span class="ident">ToStatementResult::Mediate</span>(<span class="ident">statement</span>) =&gt; <span class="ident">statement</span>.<span class="kw">await</span>,
+        <span class="kw">match </span>stmt_like.to_statement(<span class="self">self</span>) {
+            ToStatementResult::Immediate(statement) =&gt; <span class="prelude-val">Ok</span>(statement),
+            ToStatementResult::Mediate(statement) =&gt; statement.<span class="kw">await</span>,
         }
     }
 
-    <span class="doccomment">/// Low-level helper, that prepares the given statement.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `raw_query` is a query with `?` placeholders (if any).</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prepare_statement</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">raw_query</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">StmtInner</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner_stmt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">routine</span>(<span class="ident">PrepareRoutine::new</span>(<span class="ident">raw_query</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="doccomment">/// Low-level helper, that prepares the given statement.
+    ///
+    /// `raw_query` is a query with `?` placeholders (if any).
+    </span><span class="kw">async fn </span>prepare_statement(<span class="kw-2">&amp;mut </span><span class="self">self</span>, raw_query: Cow&lt;<span class="lifetime">&#39;_</span>, [u8]&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Arc&lt;StmtInner&gt;&gt; {
+        <span class="kw">let </span>inner_stmt = <span class="self">self</span>.routine(PrepareRoutine::new(raw_query)).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">old_stmt</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache_stmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner_stmt</span>) {
-            <span class="self">self</span>.<span class="ident">close_statement</span>(<span class="ident">old_stmt</span>.<span class="ident">id</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(old_stmt) = <span class="self">self</span>.cache_stmt(<span class="kw-2">&amp;</span>inner_stmt) {
+            <span class="self">self</span>.close_statement(old_stmt.id()).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">inner_stmt</span>)
+        <span class="prelude-val">Ok</span>(inner_stmt)
     }
 
-    <span class="doccomment">/// Helper, that executes the given statement with the given params.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_statement</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span>,
-        <span class="ident">params</span>: <span class="ident">P</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Helper, that executes the given statement with the given params.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>execute_statement&lt;P&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        statement: <span class="kw-2">&amp;</span>Statement,
+        params: P,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+    <span class="kw">where
+        </span>P: Into&lt;Params&gt;,
     {
-        <span class="self">self</span>.<span class="ident">routine</span>(<span class="ident">ExecRoutine::new</span>(<span class="ident">statement</span>, <span class="ident">params</span>.<span class="ident">into</span>()))
+        <span class="self">self</span>.routine(ExecRoutine::new(statement, params.into()))
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Helper, that closes statement with the given id.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">close_statement</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stmt_cache_mut</span>().<span class="ident">remove</span>(<span class="ident">id</span>);
-        <span class="self">self</span>.<span class="ident">write_command</span>(<span class="kw-2">&amp;</span><span class="ident">ComStmtClose::new</span>(<span class="ident">id</span>)).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Helper, that closes statement with the given id.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>close_statement(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: u32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.stmt_cache_mut().remove(id);
+        <span class="self">self</span>.write_command(<span class="kw-2">&amp;</span>ComStmtClose::new(id)).<span class="kw">await
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

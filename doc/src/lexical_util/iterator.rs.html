@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/iterator.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iterator.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/iterator.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iterator.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -142,149 +142,149 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Specialized iterator traits.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The traits are iterable, and provide optimizations for contiguous</span>
-<span class="doccomment">//! iterators, while still working for non-contiguous data.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Specialized iterator traits.
+//!
+//! The traits are iterable, and provide optimizations for contiguous
+//! iterators, while still working for non-contiguous data.
 
-<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
+</span><span class="attribute">#![cfg(feature = <span class="string">&quot;parse&quot;</span>)]
 
-<span class="comment">// Re-export our digit iterators.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::noskip</span>::{<span class="ident">AsBytes</span>, <span class="ident">Bytes</span>};
+</span><span class="comment">// Re-export our digit iterators.
+</span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;format&quot;</span>))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::noskip::{AsBytes, Bytes};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::skip</span>::{<span class="ident">AsBytes</span>, <span class="ident">Bytes</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::skip::{AsBytes, Bytes};
 
-<span class="doccomment">/// Iterator over a contiguous block of bytes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This allows us to convert to-and-from-slices, raw pointers, and</span>
-<span class="doccomment">/// peek/query the data from either end cheaply.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A default implementation is provided for slice iterators.</span>
-<span class="doccomment">/// This trait **should never** return `null` from `as_ptr`, or be</span>
-<span class="doccomment">/// implemented for non-contiguous data.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BytesIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Determine if each yielded value is adjacent in memory.</span>
-    <span class="kw">const</span> <span class="ident">IS_CONTIGUOUS</span>: <span class="ident">bool</span>;
+<span class="doccomment">/// Iterator over a contiguous block of bytes.
+///
+/// This allows us to convert to-and-from-slices, raw pointers, and
+/// peek/query the data from either end cheaply.
+///
+/// A default implementation is provided for slice iterators.
+/// This trait **should never** return `null` from `as_ptr`, or be
+/// implemented for non-contiguous data.
+</span><span class="kw">pub trait </span>BytesIter&lt;<span class="lifetime">&#39;a</span>&gt;: Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8&gt; {
+    <span class="doccomment">/// Determine if each yielded value is adjacent in memory.
+    </span><span class="kw">const </span>IS_CONTIGUOUS: bool;
 
-    <span class="doccomment">/// Get a ptr to the current start of the iterator.</span>
-    <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u8</span>;
+    <span class="doccomment">/// Get a ptr to the current start of the iterator.
+    </span><span class="kw">fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u8;
 
-    <span class="doccomment">/// Get a slice to the current start of the iterator.</span>
-    <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>];
+    <span class="doccomment">/// Get a slice to the current start of the iterator.
+    </span><span class="kw">fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8];
 
-    <span class="doccomment">/// Get the total number of elements in the underlying slice.</span>
-    <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
+    <span class="doccomment">/// Get the total number of elements in the underlying slice.
+    </span><span class="kw">fn </span>length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 
-    <span class="doccomment">/// Get the current index of the iterator in the slice.</span>
-    <span class="kw">fn</span> <span class="ident">cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
+    <span class="doccomment">/// Get the current index of the iterator in the slice.
+    </span><span class="kw">fn </span>cursor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 
-    <span class="doccomment">/// Set the current index of the iterator in the slice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Safe if `index &lt;= self.length()`.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">set_cursor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>);
+    <span class="doccomment">/// Set the current index of the iterator in the slice.
+    ///
+    /// # Safety
+    ///
+    /// Safe if `index &lt;= self.length()`.
+    </span><span class="kw">unsafe fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize);
 
-    <span class="doccomment">/// Get the current number of values returned by the iterator.</span>
-    <span class="kw">fn</span> <span class="ident">current_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
+    <span class="doccomment">/// Get the current number of values returned by the iterator.
+    </span><span class="kw">fn </span>current_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 
-    <span class="doccomment">/// Get if the iterator cannot return any more elements.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This may advance the internal iterator state, but not</span>
-    <span class="doccomment">/// modify the next returned value.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_consumed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Get if the iterator cannot return any more elements.
+    ///
+    /// This may advance the internal iterator state, but not
+    /// modify the next returned value.
+    </span><span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>is_consumed(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Get if the buffer underlying the iterator is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This might not be the same thing as `is_consumed`: `is_consumed`</span>
-    <span class="doccomment">/// checks if any more elements may be returned, which may require</span>
-    <span class="doccomment">/// peeking the next value. Consumed merely checks if the</span>
-    <span class="doccomment">/// iterator has an empty slice. It is effectively a cheaper,</span>
-    <span class="doccomment">/// but weaker variant of `is_consumed()`.</span>
-    <span class="kw">fn</span> <span class="ident">is_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Get if the buffer underlying the iterator is empty.
+    ///
+    /// This might not be the same thing as `is_consumed`: `is_consumed`
+    /// checks if any more elements may be returned, which may require
+    /// peeking the next value. Consumed merely checks if the
+    /// iterator has an empty slice. It is effectively a cheaper,
+    /// but weaker variant of `is_consumed()`.
+    </span><span class="kw">fn </span>is_done(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Determine if the iterator is contiguous.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_contiguous</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident"><span class="self">Self</span>::IS_CONTIGUOUS</span>
+    <span class="doccomment">/// Determine if the iterator is contiguous.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_contiguous(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">Self</span>::IS_CONTIGUOUS
     }
 
-    <span class="doccomment">/// Peek the next value of the iterator, without checking bounds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Safe as long as there is at least a single valid value left in</span>
-    <span class="doccomment">/// the iterator. Note that the behavior of this may lead to out-of-bounds</span>
-    <span class="doccomment">/// access (for contiguous iterators) or panics (for non-contiguous</span>
-    <span class="doccomment">/// iterators).</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">peek_unchecked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="doccomment">/// Peek the next value of the iterator, without checking bounds.
+    ///
+    /// # Safety
+    ///
+    /// Safe as long as there is at least a single valid value left in
+    /// the iterator. Note that the behavior of this may lead to out-of-bounds
+    /// access (for contiguous iterators) or panics (for non-contiguous
+    /// iterators).
+    </span><span class="kw">unsafe fn </span>peek_unchecked(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Item;
 
-    <span class="doccomment">/// Peek the next value of the iterator, without consuming it.</span>
-    <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Peek the next value of the iterator, without consuming it.
+    </span><span class="kw">fn </span>peek(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;;
 
-    <span class="doccomment">/// Check if the next element is a given value.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">peek_is</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">peek</span>() {
-            <span class="ident">c</span> <span class="op">==</span> <span class="ident">value</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
+    <span class="doccomment">/// Check if the next element is a given value.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>peek_is(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u8) -&gt; bool {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = <span class="self">self</span>.peek() {
+            c == value
+        } <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
+    }
+
+    <span class="doccomment">/// Check if the next element is a given value without case sensitivity.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>case_insensitive_peek_is(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u8) -&gt; bool {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = <span class="self">self</span>.peek() {
+            c.to_ascii_lowercase() == value.to_ascii_lowercase()
+        } <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
+    }
+
+    <span class="doccomment">/// Skip zeros from the start of the iterator
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>skip_zeros(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">let </span>start = <span class="self">self</span>.cursor();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;0&#39;</span>) = <span class="self">self</span>.peek() {
+            <span class="self">self</span>.next();
         }
+        <span class="self">self</span>.cursor() - start
     }
 
-    <span class="doccomment">/// Check if the next element is a given value without case sensitivity.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">case_insensitive_peek_is</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">peek</span>() {
-            <span class="ident">c</span>.<span class="ident">to_ascii_lowercase</span>() <span class="op">==</span> <span class="ident">value</span>.<span class="ident">to_ascii_lowercase</span>()
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
-    }
+    <span class="doccomment">/// Read a value of a difference type from the iterator.
+    /// This advances the internal state of the iterator.
+    ///
+    /// # Safety
+    ///
+    /// Safe as long as the number of the buffer is contains as least as
+    /// many bytes as the size of V.
+    </span><span class="kw">unsafe fn </span>read_unchecked&lt;V&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; V;
 
-    <span class="doccomment">/// Skip zeros from the start of the iterator</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">skip_zeros</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cursor</span>();
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;0&#39;</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">peek</span>() {
-            <span class="self">self</span>.<span class="ident">next</span>();
-        }
-        <span class="self">self</span>.<span class="ident">cursor</span>() <span class="op">-</span> <span class="ident">start</span>
-    }
+    <span class="doccomment">/// Try to read a value of a different type from the iterator.
+    /// This advances the internal state of the iterator.
+    </span><span class="kw">fn </span>read&lt;V&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;V&gt;;
 
-    <span class="doccomment">/// Read a value of a difference type from the iterator.</span>
-    <span class="doccomment">/// This advances the internal state of the iterator.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Safe as long as the number of the buffer is contains as least as</span>
-    <span class="doccomment">/// many bytes as the size of V.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read_unchecked</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">V</span>;
+    <span class="doccomment">/// Advance the internal slice by `N` elements.
+    ///
+    /// # Safety
+    ///
+    /// As long as the iterator is at least `N` elements, this
+    /// is safe.
+    </span><span class="kw">unsafe fn </span>step_by_unchecked(<span class="kw-2">&amp;mut </span><span class="self">self</span>, count: usize);
 
-    <span class="doccomment">/// Try to read a value of a different type from the iterator.</span>
-    <span class="doccomment">/// This advances the internal state of the iterator.</span>
-    <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Advance the internal slice by `N` elements.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// As long as the iterator is at least `N` elements, this</span>
-    <span class="doccomment">/// is safe.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">step_by_unchecked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>);
-
-    <span class="doccomment">/// Advance the internal slice by 1 element.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Safe as long as the iterator is not empty.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">step_unchecked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">step_by_unchecked</span>(<span class="number">1</span>) };
+    <span class="doccomment">/// Advance the internal slice by 1 element.
+    ///
+    /// # Safety
+    ///
+    /// Safe as long as the iterator is not empty.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>step_unchecked(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ <span class="self">self</span>.step_by_unchecked(<span class="number">1</span>) };
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

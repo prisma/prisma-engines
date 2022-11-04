@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/udp/udp_client_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>udp_client_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/udp/udp_client_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>udp_client_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -355,325 +355,325 @@
 <span id="355">355</span>
 <span id="356">356</span>
 <span id="357">357</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std::borrow::Borrow</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>};
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::net::SocketAddr</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">SystemTime</span>, <span class="ident">UNIX_EPOCH</span>};
+</span><span class="kw">use </span>std::borrow::Borrow;
+<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Display};
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::net::SocketAddr;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">future::Future</span>, <span class="ident">stream::Stream</span>};
-<span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">debug</span>, <span class="ident">warn</span>};
+<span class="kw">use </span>futures_util::{future::Future, stream::Stream};
+<span class="kw">use </span>log::{debug, warn};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::ProtoError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::op::message::NoopMessageFinalizer</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::op</span>::{<span class="ident">MessageFinalizer</span>, <span class="ident">MessageVerifier</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::udp::udp_stream</span>::{<span class="ident">NextRandomUdpSocket</span>, <span class="ident">UdpSocket</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer</span>::{<span class="ident">DnsRequest</span>, <span class="ident">DnsRequestSender</span>, <span class="ident">DnsResponse</span>, <span class="ident">DnsResponseStream</span>, <span class="ident">SerialMessage</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Time</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::ProtoError;
+<span class="kw">use </span><span class="kw">crate</span>::op::message::NoopMessageFinalizer;
+<span class="kw">use </span><span class="kw">crate</span>::op::{MessageFinalizer, MessageVerifier};
+<span class="kw">use </span><span class="kw">crate</span>::udp::udp_stream::{NextRandomUdpSocket, UdpSocket};
+<span class="kw">use </span><span class="kw">crate</span>::xfer::{DnsRequest, DnsRequestSender, DnsResponse, DnsResponseStream, SerialMessage};
+<span class="kw">use </span><span class="kw">crate</span>::Time;
 
-<span class="doccomment">/// A UDP client stream of DNS binary packets</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This stream will create a new UDP socket for every request. This is to avoid potential cache</span>
-<span class="doccomment">///   poisoning during use by UDP based attacks.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UdpClientStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span> <span class="op">=</span> <span class="ident">NoopMessageFinalizer</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Send</span>,
-    <span class="ident">MF</span>: <span class="ident">MessageFinalizer</span>,
+<span class="doccomment">/// A UDP client stream of DNS binary packets
+///
+/// This stream will create a new UDP socket for every request. This is to avoid potential cache
+///   poisoning during use by UDP based attacks.
+</span><span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless polled&quot;</span>]
+</span><span class="kw">pub struct </span>UdpClientStream&lt;S, MF = NoopMessageFinalizer&gt;
+<span class="kw">where
+    </span>S: Send,
+    MF: MessageFinalizer,
 {
-    <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
-    <span class="ident">bind_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>,
-    <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-    <span class="ident">is_shutdown</span>: <span class="ident">bool</span>,
-    <span class="ident">signer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MF</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+    name_server: SocketAddr,
+    bind_addr: <span class="prelude-ty">Option</span>&lt;SocketAddr&gt;,
+    timeout: Duration,
+    is_shutdown: bool,
+    signer: <span class="prelude-ty">Option</span>&lt;Arc&lt;MF&gt;&gt;,
+    marker: PhantomData&lt;S&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">UdpClientStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">NoopMessageFinalizer</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// it is expected that the resolver wrapper will be responsible for creating and managing</span>
-    <span class="doccomment">///  new UdpClients such that each new client would have a random port (reduce chance of cache</span>
-    <span class="doccomment">///  poisoning)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// a tuple of a Future Stream which will handle sending and receiving messages, and a</span>
-    <span class="doccomment">///  handle which can be used to send messages into the stream.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::new_ret_no_self</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name_server</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">UdpClientConnect</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">NoopMessageFinalizer</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::with_timeout</span>(<span class="ident">name_server</span>, <span class="ident">Duration::from_secs</span>(<span class="number">5</span>))
+<span class="kw">impl</span>&lt;S: Send&gt; UdpClientStream&lt;S, NoopMessageFinalizer&gt; {
+    <span class="doccomment">/// it is expected that the resolver wrapper will be responsible for creating and managing
+    ///  new UdpClients such that each new client would have a random port (reduce chance of cache
+    ///  poisoning)
+    ///
+    /// # Return
+    ///
+    /// a tuple of a Future Stream which will handle sending and receiving messages, and a
+    ///  handle which can be used to send messages into the stream.
+    </span><span class="attribute">#[allow(clippy::new_ret_no_self)]
+    </span><span class="kw">pub fn </span>new(name_server: SocketAddr) -&gt; UdpClientConnect&lt;S, NoopMessageFinalizer&gt; {
+        <span class="self">Self</span>::with_timeout(name_server, Duration::from_secs(<span class="number">5</span>))
     }
 
-    <span class="doccomment">/// Constructs a new UdpStream for a client to the specified SocketAddr.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `name_server` - the IP and Port of the DNS server to connect to</span>
-    <span class="doccomment">/// * `timeout` - connection timeout</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_timeout</span>(
-        <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
-        <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-    ) -&gt; <span class="ident">UdpClientConnect</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">NoopMessageFinalizer</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::with_bind_addr_and_timeout</span>(<span class="ident">name_server</span>, <span class="prelude-val">None</span>, <span class="ident">timeout</span>)
+    <span class="doccomment">/// Constructs a new UdpStream for a client to the specified SocketAddr.
+    ///
+    /// # Arguments
+    ///
+    /// * `name_server` - the IP and Port of the DNS server to connect to
+    /// * `timeout` - connection timeout
+    </span><span class="kw">pub fn </span>with_timeout(
+        name_server: SocketAddr,
+        timeout: Duration,
+    ) -&gt; UdpClientConnect&lt;S, NoopMessageFinalizer&gt; {
+        <span class="self">Self</span>::with_bind_addr_and_timeout(name_server, <span class="prelude-val">None</span>, timeout)
     }
 
-    <span class="doccomment">/// Constructs a new UdpStream for a client to the specified SocketAddr.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `name_server` - the IP and Port of the DNS server to connect to</span>
-    <span class="doccomment">/// * `bind_addr` - the IP and port to connect from</span>
-    <span class="doccomment">/// * `timeout` - connection timeout</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_bind_addr_and_timeout</span>(
-        <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
-        <span class="ident">bind_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>,
-        <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-    ) -&gt; <span class="ident">UdpClientConnect</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">NoopMessageFinalizer</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::with_timeout_and_signer_and_bind_addr</span>(<span class="ident">name_server</span>, <span class="ident">timeout</span>, <span class="prelude-val">None</span>, <span class="ident">bind_addr</span>)
+    <span class="doccomment">/// Constructs a new UdpStream for a client to the specified SocketAddr.
+    ///
+    /// # Arguments
+    ///
+    /// * `name_server` - the IP and Port of the DNS server to connect to
+    /// * `bind_addr` - the IP and port to connect from
+    /// * `timeout` - connection timeout
+    </span><span class="kw">pub fn </span>with_bind_addr_and_timeout(
+        name_server: SocketAddr,
+        bind_addr: <span class="prelude-ty">Option</span>&lt;SocketAddr&gt;,
+        timeout: Duration,
+    ) -&gt; UdpClientConnect&lt;S, NoopMessageFinalizer&gt; {
+        <span class="self">Self</span>::with_timeout_and_signer_and_bind_addr(name_server, timeout, <span class="prelude-val">None</span>, bind_addr)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Send</span>, <span class="ident">MF</span>: <span class="ident">MessageFinalizer</span><span class="op">&gt;</span> <span class="ident">UdpClientStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructs a new TcpStream for a client to the specified SocketAddr.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `name_server` - the IP and Port of the DNS server to connect to</span>
-    <span class="doccomment">/// * `timeout` - connection timeout</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_timeout_and_signer</span>(
-        <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
-        <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-        <span class="ident">signer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MF</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">UdpClientConnect</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span><span class="op">&gt;</span> {
-        <span class="ident">UdpClientConnect</span> {
-            <span class="ident">name_server</span>,
-            <span class="ident">bind_addr</span>: <span class="prelude-val">None</span>,
-            <span class="ident">timeout</span>,
-            <span class="ident">signer</span>,
-            <span class="ident">marker</span>: <span class="ident">PhantomData</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S: Send, MF: MessageFinalizer&gt; UdpClientStream&lt;S, MF&gt; {
+    <span class="doccomment">/// Constructs a new TcpStream for a client to the specified SocketAddr.
+    ///
+    /// # Arguments
+    ///
+    /// * `name_server` - the IP and Port of the DNS server to connect to
+    /// * `timeout` - connection timeout
+    </span><span class="kw">pub fn </span>with_timeout_and_signer(
+        name_server: SocketAddr,
+        timeout: Duration,
+        signer: <span class="prelude-ty">Option</span>&lt;Arc&lt;MF&gt;&gt;,
+    ) -&gt; UdpClientConnect&lt;S, MF&gt; {
+        UdpClientConnect {
+            name_server,
+            bind_addr: <span class="prelude-val">None</span>,
+            timeout,
+            signer,
+            marker: PhantomData::&lt;S&gt;,
         }
     }
 
-    <span class="doccomment">/// Constructs a new TcpStream for a client to the specified SocketAddr.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `name_server` - the IP and Port of the DNS server to connect to</span>
-    <span class="doccomment">/// * `timeout` - connection timeout</span>
-    <span class="doccomment">/// * `bind_addr` - the IP address and port to connect from</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_timeout_and_signer_and_bind_addr</span>(
-        <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
-        <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-        <span class="ident">signer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MF</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">bind_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">UdpClientConnect</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span><span class="op">&gt;</span> {
-        <span class="ident">UdpClientConnect</span> {
-            <span class="ident">name_server</span>,
-            <span class="ident">bind_addr</span>,
-            <span class="ident">timeout</span>,
-            <span class="ident">signer</span>,
-            <span class="ident">marker</span>: <span class="ident">PhantomData</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Constructs a new TcpStream for a client to the specified SocketAddr.
+    ///
+    /// # Arguments
+    ///
+    /// * `name_server` - the IP and Port of the DNS server to connect to
+    /// * `timeout` - connection timeout
+    /// * `bind_addr` - the IP address and port to connect from
+    </span><span class="kw">pub fn </span>with_timeout_and_signer_and_bind_addr(
+        name_server: SocketAddr,
+        timeout: Duration,
+        signer: <span class="prelude-ty">Option</span>&lt;Arc&lt;MF&gt;&gt;,
+        bind_addr: <span class="prelude-ty">Option</span>&lt;SocketAddr&gt;,
+    ) -&gt; UdpClientConnect&lt;S, MF&gt; {
+        UdpClientConnect {
+            name_server,
+            bind_addr,
+            timeout,
+            signer,
+            marker: PhantomData::&lt;S&gt;,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Send</span>, <span class="ident">MF</span>: <span class="ident">MessageFinalizer</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">UdpClientStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;UDP({})&quot;</span>, <span class="self">self</span>.<span class="ident">name_server</span>)
+<span class="kw">impl</span>&lt;S: Send, MF: MessageFinalizer&gt; Display <span class="kw">for </span>UdpClientStream&lt;S, MF&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="macro">write!</span>(formatter, <span class="string">&quot;UDP({})&quot;</span>, <span class="self">self</span>.name_server)
     }
 }
 
-<span class="doccomment">/// creates random query_id, each socket is unique, no need for global uniqueness</span>
-<span class="kw">fn</span> <span class="ident">random_query_id</span>() -&gt; <span class="ident">u16</span> {
-    <span class="kw">use</span> <span class="ident">rand::distributions</span>::{<span class="ident">Distribution</span>, <span class="ident">Standard</span>};
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rand</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
+<span class="doccomment">/// creates random query_id, each socket is unique, no need for global uniqueness
+</span><span class="kw">fn </span>random_query_id() -&gt; u16 {
+    <span class="kw">use </span>rand::distributions::{Distribution, Standard};
+    <span class="kw">let </span><span class="kw-2">mut </span>rand = rand::thread_rng();
 
-    <span class="ident">Standard</span>.<span class="ident">sample</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rand</span>)
+    Standard.sample(<span class="kw-2">&amp;mut </span>rand)
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">UdpSocket</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>, <span class="ident">MF</span>: <span class="ident">MessageFinalizer</span><span class="op">&gt;</span> <span class="ident">DnsRequestSender</span>
-    <span class="kw">for</span> <span class="ident">UdpClientStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;S: UdpSocket + Send + <span class="lifetime">&#39;static</span>, MF: MessageFinalizer&gt; DnsRequestSender
+    <span class="kw">for </span>UdpClientStream&lt;S, MF&gt;
 {
-    <span class="kw">fn</span> <span class="ident">send_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">message</span>: <span class="ident">DnsRequest</span>) -&gt; <span class="ident">DnsResponseStream</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_shutdown</span> {
+    <span class="kw">fn </span>send_message(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>message: DnsRequest) -&gt; DnsResponseStream {
+        <span class="kw">if </span><span class="self">self</span>.is_shutdown {
             <span class="macro">panic!</span>(<span class="string">&quot;can not send messages after stream is shutdown&quot;</span>)
         }
 
-        <span class="comment">// associated the ID for this request, b/c this connection is unique to socket port, the ID</span>
-        <span class="comment">//   does not need to be globally unique</span>
-        <span class="ident">message</span>.<span class="ident">set_id</span>(<span class="ident">random_query_id</span>());
+        <span class="comment">// associated the ID for this request, b/c this connection is unique to socket port, the ID
+        //   does not need to be globally unique
+        </span>message.set_id(random_query_id());
 
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">SystemTime::now</span>().<span class="ident">duration_since</span>(<span class="ident">UNIX_EPOCH</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">now</span>) =&gt; <span class="ident">now</span>.<span class="ident">as_secs</span>(),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">ProtoError::from</span>(<span class="string">&quot;Current time is before the Unix epoch.&quot;</span>).<span class="ident">into</span>(),
+        <span class="kw">let </span>now = <span class="kw">match </span>SystemTime::now().duration_since(UNIX_EPOCH) {
+            <span class="prelude-val">Ok</span>(now) =&gt; now.as_secs(),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span>ProtoError::from(<span class="string">&quot;Current time is before the Unix epoch.&quot;</span>).into(),
         };
 
-        <span class="comment">// TODO: truncates u64 to u32, error on overflow?</span>
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">now</span> <span class="kw">as</span> <span class="ident">u32</span>;
+        <span class="comment">// TODO: truncates u64 to u32, error on overflow?
+        </span><span class="kw">let </span>now = now <span class="kw">as </span>u32;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">verifier</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">signer</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">signer</span> {
-            <span class="kw">if</span> <span class="ident">signer</span>.<span class="ident">should_finalize_message</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>) {
-                <span class="kw">match</span> <span class="ident">message</span>.<span class="ident">finalize</span>::<span class="op">&lt;</span><span class="ident">MF</span><span class="op">&gt;</span>(<span class="ident">signer</span>.<span class="ident">borrow</span>(), <span class="ident">now</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">answer_verifier</span>) =&gt; <span class="ident">verifier</span> <span class="op">=</span> <span class="ident">answer_verifier</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                        <span class="macro">debug!</span>(<span class="string">&quot;could not sign message: {}&quot;</span>, <span class="ident">e</span>);
-                        <span class="kw">return</span> <span class="ident">e</span>.<span class="ident">into</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>verifier = <span class="prelude-val">None</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>signer) = <span class="self">self</span>.signer {
+            <span class="kw">if </span>signer.should_finalize_message(<span class="kw-2">&amp;</span>message) {
+                <span class="kw">match </span>message.finalize::&lt;MF&gt;(signer.borrow(), now) {
+                    <span class="prelude-val">Ok</span>(answer_verifier) =&gt; verifier = answer_verifier,
+                    <span class="prelude-val">Err</span>(e) =&gt; {
+                        <span class="macro">debug!</span>(<span class="string">&quot;could not sign message: {}&quot;</span>, e);
+                        <span class="kw">return </span>e.into();
                     }
                 }
             }
         }
 
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">message</span>.<span class="ident">to_vec</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) =&gt; <span class="ident">bytes</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                <span class="kw">return</span> <span class="ident">err</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>bytes = <span class="kw">match </span>message.to_vec() {
+            <span class="prelude-val">Ok</span>(bytes) =&gt; bytes,
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="kw">return </span>err.into();
             }
         };
 
-        <span class="kw">let</span> <span class="ident">message_id</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">id</span>();
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">SerialMessage::new</span>(<span class="ident">bytes</span>, <span class="self">self</span>.<span class="ident">name_server</span>);
-        <span class="kw">let</span> <span class="ident">bind_addr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bind_addr</span>;
+        <span class="kw">let </span>message_id = message.id();
+        <span class="kw">let </span>message = SerialMessage::new(bytes, <span class="self">self</span>.name_server);
+        <span class="kw">let </span>bind_addr = <span class="self">self</span>.bind_addr;
 
-        <span class="ident">S::Time::timeout</span>::<span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-            <span class="self">self</span>.<span class="ident">timeout</span>,
-            <span class="ident">Box::pin</span>(<span class="ident">send_serial_message</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
-                <span class="ident">message</span>, <span class="ident">message_id</span>, <span class="ident">verifier</span>, <span class="ident">bind_addr</span>,
+        S::Time::timeout::&lt;Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;DnsResponse, ProtoError&gt;&gt; + Send&gt;&gt;&gt;(
+            <span class="self">self</span>.timeout,
+            Box::pin(send_serial_message::&lt;S&gt;(
+                message, message_id, verifier, bind_addr,
             )),
         )
-        .<span class="ident">into</span>()
+        .into()
     }
 
-    <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">is_shutdown</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.is_shutdown = <span class="bool-val">true</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">is_shutdown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_shutdown</span>
+    <span class="kw">fn </span>is_shutdown(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_shutdown
     }
 }
 
-<span class="comment">// TODO: is this impl necessary? there&#39;s nothing being driven here...</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Send</span>, <span class="ident">MF</span>: <span class="ident">MessageFinalizer</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">UdpClientStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ProtoError</span><span class="op">&gt;</span>;
+<span class="comment">// TODO: is this impl necessary? there&#39;s nothing being driven here...
+</span><span class="kw">impl</span>&lt;S: Send, MF: MessageFinalizer&gt; Stream <span class="kw">for </span>UdpClientStream&lt;S, MF&gt; {
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;(), ProtoError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// Technically the Stream doesn&#39;t actually do anything.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_shutdown</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(())))
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="comment">// Technically the Stream doesn&#39;t actually do anything.
+        </span><span class="kw">if </span><span class="self">self</span>.is_shutdown {
+            Poll::Ready(<span class="prelude-val">None</span>)
+        } <span class="kw">else </span>{
+            Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(())))
         }
     }
 }
 
-<span class="doccomment">/// A future that resolves to an UdpClientStream</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UdpClientConnect</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span> <span class="op">=</span> <span class="ident">NoopMessageFinalizer</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Send</span>,
-    <span class="ident">MF</span>: <span class="ident">MessageFinalizer</span>,
+<span class="doccomment">/// A future that resolves to an UdpClientStream
+</span><span class="kw">pub struct </span>UdpClientConnect&lt;S, MF = NoopMessageFinalizer&gt;
+<span class="kw">where
+    </span>S: Send,
+    MF: MessageFinalizer,
 {
-    <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
-    <span class="ident">bind_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>,
-    <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-    <span class="ident">signer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MF</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+    name_server: SocketAddr,
+    bind_addr: <span class="prelude-ty">Option</span>&lt;SocketAddr&gt;,
+    timeout: Duration,
+    signer: <span class="prelude-ty">Option</span>&lt;Arc&lt;MF&gt;&gt;,
+    marker: PhantomData&lt;S&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span>, <span class="ident">MF</span>: <span class="ident">MessageFinalizer</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">UdpClientConnect</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UdpClientStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span><span class="op">&gt;</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;S: Send + Unpin, MF: MessageFinalizer&gt; Future <span class="kw">for </span>UdpClientConnect&lt;S, MF&gt; {
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;UdpClientStream&lt;S, MF&gt;, ProtoError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="comment">// TODO: this doesn&#39;t need to be a future?</span>
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">UdpClientStream</span>::<span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span><span class="op">&gt;</span> {
-            <span class="ident">name_server</span>: <span class="self">self</span>.<span class="ident">name_server</span>,
-            <span class="ident">bind_addr</span>: <span class="self">self</span>.<span class="ident">bind_addr</span>,
-            <span class="ident">is_shutdown</span>: <span class="bool-val">false</span>,
-            <span class="ident">timeout</span>: <span class="self">self</span>.<span class="ident">timeout</span>,
-            <span class="ident">signer</span>: <span class="self">self</span>.<span class="ident">signer</span>.<span class="ident">take</span>(),
-            <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="comment">// TODO: this doesn&#39;t need to be a future?
+        </span>Poll::Ready(<span class="prelude-val">Ok</span>(UdpClientStream::&lt;S, MF&gt; {
+            name_server: <span class="self">self</span>.name_server,
+            bind_addr: <span class="self">self</span>.bind_addr,
+            is_shutdown: <span class="bool-val">false</span>,
+            timeout: <span class="self">self</span>.timeout,
+            signer: <span class="self">self</span>.signer.take(),
+            marker: PhantomData,
         }))
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_serial_message</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">UdpSocket</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>(
-    <span class="ident">msg</span>: <span class="ident">SerialMessage</span>,
-    <span class="ident">msg_id</span>: <span class="ident">u16</span>,
-    <span class="ident">verifier</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageVerifier</span><span class="op">&gt;</span>,
-    <span class="ident">bind_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">name_server</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">addr</span>();
-    <span class="kw">let</span> <span class="ident">socket</span>: <span class="ident">S</span> <span class="op">=</span> <span class="ident">NextRandomUdpSocket::new</span>(<span class="kw-2">&amp;</span><span class="ident">name_server</span>, <span class="kw-2">&amp;</span><span class="ident">bind_addr</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">bytes</span>();
-    <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">addr</span>();
-    <span class="kw">let</span> <span class="ident">len_sent</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">socket</span>.<span class="ident">send_to</span>(<span class="ident">bytes</span>, <span class="ident">addr</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">async fn </span>send_serial_message&lt;S: UdpSocket + Send&gt;(
+    msg: SerialMessage,
+    msg_id: u16,
+    verifier: <span class="prelude-ty">Option</span>&lt;MessageVerifier&gt;,
+    bind_addr: <span class="prelude-ty">Option</span>&lt;SocketAddr&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;DnsResponse, ProtoError&gt; {
+    <span class="kw">let </span>name_server = msg.addr();
+    <span class="kw">let </span>socket: S = NextRandomUdpSocket::new(<span class="kw-2">&amp;</span>name_server, <span class="kw-2">&amp;</span>bind_addr).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>bytes = msg.bytes();
+    <span class="kw">let </span>addr = msg.addr();
+    <span class="kw">let </span>len_sent: usize = socket.send_to(bytes, addr).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">len_sent</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoError::from</span>(<span class="macro">format!</span>(
+    <span class="kw">if </span>bytes.len() != len_sent {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(ProtoError::from(<span class="macro">format!</span>(
             <span class="string">&quot;Not all bytes of message sent, {} of {}&quot;</span>,
-            <span class="ident">len_sent</span>,
-            <span class="ident">bytes</span>.<span class="ident">len</span>()
+            len_sent,
+            bytes.len()
         )));
     }
 
-    <span class="comment">// TODO: limit the max number of attempted messages? this relies on a timeout to die...</span>
-    <span class="kw">loop</span> {
-        <span class="comment">// TODO: consider making this heap based? need to verify it matches EDNS settings</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">recv_buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">2048</span>];
+    <span class="comment">// TODO: limit the max number of attempted messages? this relies on a timeout to die...
+    </span><span class="kw">loop </span>{
+        <span class="comment">// TODO: consider making this heap based? need to verify it matches EDNS settings
+        </span><span class="kw">let </span><span class="kw-2">mut </span>recv_buf = [<span class="number">0u8</span>; <span class="number">2048</span>];
 
-        <span class="kw">let</span> (<span class="ident">len</span>, <span class="ident">src</span>) <span class="op">=</span> <span class="ident">socket</span>.<span class="ident">recv_from</span>(<span class="kw-2">&amp;mut</span> <span class="ident">recv_buf</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">SerialMessage::new</span>(<span class="ident">recv_buf</span>.<span class="ident">iter</span>().<span class="ident">take</span>(<span class="ident">len</span>).<span class="ident">cloned</span>().<span class="ident">collect</span>(), <span class="ident">src</span>);
+        <span class="kw">let </span>(len, src) = socket.recv_from(<span class="kw-2">&amp;mut </span>recv_buf).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>response = SerialMessage::new(recv_buf.iter().take(len).cloned().collect(), src);
 
-        <span class="comment">// compare expected src to received packet</span>
-        <span class="kw">let</span> <span class="ident">request_target</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">addr</span>();
+        <span class="comment">// compare expected src to received packet
+        </span><span class="kw">let </span>request_target = msg.addr();
 
-        <span class="kw">if</span> <span class="ident">response</span>.<span class="ident">addr</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">request_target</span> {
+        <span class="kw">if </span>response.addr() != request_target {
             <span class="macro">warn!</span>(
                 <span class="string">&quot;ignoring response from {} because it does not match name_server: {}.&quot;</span>,
-                <span class="ident">response</span>.<span class="ident">addr</span>(),
-                <span class="ident">request_target</span>,
+                response.addr(),
+                request_target,
             );
 
-            <span class="comment">// await an answer from the correct NameServer</span>
-            <span class="kw">continue</span>;
+            <span class="comment">// await an answer from the correct NameServer
+            </span><span class="kw">continue</span>;
         }
 
-        <span class="comment">// TODO: match query strings from request and response?</span>
+        <span class="comment">// TODO: match query strings from request and response?
 
-        <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">to_message</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">message</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">msg_id</span> <span class="op">==</span> <span class="ident">message</span>.<span class="ident">id</span>() {
-                    <span class="macro">debug!</span>(<span class="string">&quot;received message id: {}&quot;</span>, <span class="ident">message</span>.<span class="ident">id</span>());
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">verifier</span>) <span class="op">=</span> <span class="ident">verifier</span> {
-                        <span class="kw">return</span> <span class="ident">verifier</span>(<span class="ident">response</span>.<span class="ident">bytes</span>());
-                    } <span class="kw">else</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">DnsResponse::from</span>(<span class="ident">message</span>));
+        </span><span class="kw">match </span>response.to_message() {
+            <span class="prelude-val">Ok</span>(message) =&gt; {
+                <span class="kw">if </span>msg_id == message.id() {
+                    <span class="macro">debug!</span>(<span class="string">&quot;received message id: {}&quot;</span>, message.id());
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>verifier) = verifier {
+                        <span class="kw">return </span>verifier(response.bytes());
+                    } <span class="kw">else </span>{
+                        <span class="kw">return </span><span class="prelude-val">Ok</span>(DnsResponse::from(message));
                     }
-                } <span class="kw">else</span> {
-                    <span class="comment">// on wrong id, attempted poison?</span>
-                    <span class="macro">warn!</span>(
+                } <span class="kw">else </span>{
+                    <span class="comment">// on wrong id, attempted poison?
+                    </span><span class="macro">warn!</span>(
                         <span class="string">&quot;expected message id: {} got: {}, dropped&quot;</span>,
-                        <span class="ident">msg_id</span>,
-                        <span class="ident">message</span>.<span class="ident">id</span>()
+                        msg_id,
+                        message.id()
                     );
 
                     <span class="kw">continue</span>;
                 }
             }
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                <span class="comment">// on errors deserializing, continue</span>
-                <span class="macro">warn!</span>(
+            <span class="prelude-val">Err</span>(e) =&gt; {
+                <span class="comment">// on errors deserializing, continue
+                </span><span class="macro">warn!</span>(
                     <span class="string">&quot;dropped malformed message waiting for id: {} err: {}&quot;</span>,
-                    <span class="ident">msg_id</span>, <span class="ident">e</span>
+                    msg_id, e
                 );
 
                 <span class="kw">continue</span>;
@@ -682,35 +682,35 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tests::udp_client_stream_test</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::TokioTime</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>))]</span>
-    <span class="kw">use</span> <span class="ident">std::net::Ipv6Addr</span>;
-    <span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">IpAddr</span>, <span class="ident">Ipv4Addr</span>};
-    <span class="kw">use</span> <span class="ident">tokio</span>::{<span class="ident">net::UdpSocket</span> <span class="kw">as</span> <span class="ident">TokioUdpSocket</span>, <span class="ident">runtime::Runtime</span>};
+<span class="attribute">#[cfg(test)]
+#[cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
+    </span><span class="kw">use </span><span class="kw">crate</span>::tests::udp_client_stream_test;
+    <span class="kw">use </span><span class="kw">crate</span>::TokioTime;
+    <span class="attribute">#[cfg(not(target_os = <span class="string">&quot;linux&quot;</span>))]
+    </span><span class="kw">use </span>std::net::Ipv6Addr;
+    <span class="kw">use </span>std::net::{IpAddr, Ipv4Addr};
+    <span class="kw">use </span>tokio::{net::UdpSocket <span class="kw">as </span>TokioUdpSocket, runtime::Runtime};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_udp_client_stream_ipv4</span>() {
-        <span class="kw">let</span> <span class="ident">io_loop</span> <span class="op">=</span> <span class="ident">Runtime::new</span>().<span class="ident">expect</span>(<span class="string">&quot;failed to create tokio runtime&quot;</span>);
-        <span class="ident">udp_client_stream_test</span>::<span class="op">&lt;</span><span class="ident">TokioUdpSocket</span>, <span class="ident">Runtime</span>, <span class="ident">TokioTime</span><span class="op">&gt;</span>(
-            <span class="ident">IpAddr::V4</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
-            <span class="ident">io_loop</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_udp_client_stream_ipv4() {
+        <span class="kw">let </span>io_loop = Runtime::new().expect(<span class="string">&quot;failed to create tokio runtime&quot;</span>);
+        udp_client_stream_test::&lt;TokioUdpSocket, Runtime, TokioTime&gt;(
+            IpAddr::V4(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+            io_loop,
         )
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>))]</span> <span class="comment">// ignored until Travis-CI fixes IPv6</span>
-    <span class="kw">fn</span> <span class="ident">test_udp_client_stream_ipv6</span>() {
-        <span class="kw">let</span> <span class="ident">io_loop</span> <span class="op">=</span> <span class="ident">Runtime::new</span>().<span class="ident">expect</span>(<span class="string">&quot;failed to create tokio runtime&quot;</span>);
-        <span class="ident">udp_client_stream_test</span>::<span class="op">&lt;</span><span class="ident">TokioUdpSocket</span>, <span class="ident">Runtime</span>, <span class="ident">TokioTime</span><span class="op">&gt;</span>(
-            <span class="ident">IpAddr::V6</span>(<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
-            <span class="ident">io_loop</span>,
+    <span class="attribute">#[test]
+    #[cfg(not(target_os = <span class="string">&quot;linux&quot;</span>))] </span><span class="comment">// ignored until Travis-CI fixes IPv6
+    </span><span class="kw">fn </span>test_udp_client_stream_ipv6() {
+        <span class="kw">let </span>io_loop = Runtime::new().expect(<span class="string">&quot;failed to create tokio runtime&quot;</span>);
+        udp_client_stream_test::&lt;TokioUdpSocket, Runtime, TokioTime&gt;(
+            IpAddr::V6(Ipv6Addr::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+            io_loop,
         )
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

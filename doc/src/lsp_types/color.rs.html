@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/color.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>color.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/color.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>color.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -120,127 +120,127 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">DocumentSelector</span>, <span class="ident">DynamicRegistrationClientCapabilities</span>, <span class="ident">PartialResultParams</span>, <span class="ident">Range</span>,
-    <span class="ident">TextDocumentIdentifier</span>, <span class="ident">TextEdit</span>, <span class="ident">WorkDoneProgressParams</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    DocumentSelector, DynamicRegistrationClientCapabilities, PartialResultParams, Range,
+    TextDocumentIdentifier, TextEdit, WorkDoneProgressParams,
 };
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DocumentColorClientCapabilities</span> <span class="op">=</span> <span class="ident">DynamicRegistrationClientCapabilities</span>;
+<span class="kw">pub type </span>DocumentColorClientCapabilities = DynamicRegistrationClientCapabilities;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ColorProviderOptions</span> {}
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ColorProviderOptions {}
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StaticTextDocumentColorProviderOptions</span> {
-    <span class="doccomment">/// A document selector to identify the scope of the registration. If set to null</span>
-    <span class="doccomment">/// the document selector provided on the client side will be used.</span>
-    <span class="kw">pub</span> <span class="ident">document_selector</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DocumentSelector</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>StaticTextDocumentColorProviderOptions {
+    <span class="doccomment">/// A document selector to identify the scope of the registration. If set to null
+    /// the document selector provided on the client side will be used.
+    </span><span class="kw">pub </span>document_selector: <span class="prelude-ty">Option</span>&lt;DocumentSelector&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ColorProviderCapability</span> {
-    <span class="ident">Simple</span>(<span class="ident">bool</span>),
-    <span class="ident">ColorProvider</span>(<span class="ident">ColorProviderOptions</span>),
-    <span class="ident">Options</span>(<span class="ident">StaticTextDocumentColorProviderOptions</span>),
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>ColorProviderCapability {
+    Simple(bool),
+    ColorProvider(ColorProviderOptions),
+    Options(StaticTextDocumentColorProviderOptions),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ColorProviderOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ColorProviderCapability</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">ColorProviderOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::ColorProvider</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;ColorProviderOptions&gt; <span class="kw">for </span>ColorProviderCapability {
+    <span class="kw">fn </span>from(from: ColorProviderOptions) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::ColorProvider(from)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StaticTextDocumentColorProviderOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ColorProviderCapability</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">StaticTextDocumentColorProviderOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Options</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;StaticTextDocumentColorProviderOptions&gt; <span class="kw">for </span>ColorProviderCapability {
+    <span class="kw">fn </span>from(from: StaticTextDocumentColorProviderOptions) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Options(from)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ColorProviderCapability</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Simple</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>ColorProviderCapability {
+    <span class="kw">fn </span>from(from: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Simple(from)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DocumentColorParams</span> {
-    <span class="doccomment">/// The text document</span>
-    <span class="kw">pub</span> <span class="ident">text_document</span>: <span class="ident">TextDocumentIdentifier</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DocumentColorParams {
+    <span class="doccomment">/// The text document
+    </span><span class="kw">pub </span>text_document: TextDocumentIdentifier,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_params</span>: <span class="ident">WorkDoneProgressParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_params: WorkDoneProgressParams,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">partial_result_params</span>: <span class="ident">PartialResultParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>partial_result_params: PartialResultParams,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ColorInformation</span> {
-    <span class="doccomment">/// The range in the document where this color appears.</span>
-    <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">Range</span>,
-    <span class="doccomment">/// The actual color value for this color range.</span>
-    <span class="kw">pub</span> <span class="ident">color</span>: <span class="ident">Color</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ColorInformation {
+    <span class="doccomment">/// The range in the document where this color appears.
+    </span><span class="kw">pub </span>range: Range,
+    <span class="doccomment">/// The actual color value for this color range.
+    </span><span class="kw">pub </span>color: Color,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Color</span> {
-    <span class="doccomment">/// The red component of this color in the range [0-1].</span>
-    <span class="kw">pub</span> <span class="ident">red</span>: <span class="ident">f32</span>,
-    <span class="doccomment">/// The green component of this color in the range [0-1].</span>
-    <span class="kw">pub</span> <span class="ident">green</span>: <span class="ident">f32</span>,
-    <span class="doccomment">/// The blue component of this color in the range [0-1].</span>
-    <span class="kw">pub</span> <span class="ident">blue</span>: <span class="ident">f32</span>,
-    <span class="doccomment">/// The alpha component of this color in the range [0-1].</span>
-    <span class="kw">pub</span> <span class="ident">alpha</span>: <span class="ident">f32</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>Color {
+    <span class="doccomment">/// The red component of this color in the range [0-1].
+    </span><span class="kw">pub </span>red: f32,
+    <span class="doccomment">/// The green component of this color in the range [0-1].
+    </span><span class="kw">pub </span>green: f32,
+    <span class="doccomment">/// The blue component of this color in the range [0-1].
+    </span><span class="kw">pub </span>blue: f32,
+    <span class="doccomment">/// The alpha component of this color in the range [0-1].
+    </span><span class="kw">pub </span>alpha: f32,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ColorPresentationParams</span> {
-    <span class="doccomment">/// The text document.</span>
-    <span class="kw">pub</span> <span class="ident">text_document</span>: <span class="ident">TextDocumentIdentifier</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ColorPresentationParams {
+    <span class="doccomment">/// The text document.
+    </span><span class="kw">pub </span>text_document: TextDocumentIdentifier,
 
-    <span class="doccomment">/// The color information to request presentations for.</span>
-    <span class="kw">pub</span> <span class="ident">color</span>: <span class="ident">Color</span>,
+    <span class="doccomment">/// The color information to request presentations for.
+    </span><span class="kw">pub </span>color: Color,
 
-    <span class="doccomment">/// The range where the color would be inserted. Serves as a context.</span>
-    <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">Range</span>,
+    <span class="doccomment">/// The range where the color would be inserted. Serves as a context.
+    </span><span class="kw">pub </span>range: Range,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_params</span>: <span class="ident">WorkDoneProgressParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_params: WorkDoneProgressParams,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">partial_result_params</span>: <span class="ident">PartialResultParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>partial_result_params: PartialResultParams,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ColorPresentation</span> {
-    <span class="doccomment">/// The label of this color presentation. It will be shown on the color</span>
-    <span class="doccomment">/// picker header. By default this is also the text that is inserted when selecting</span>
-    <span class="doccomment">/// this color presentation.</span>
-    <span class="kw">pub</span> <span class="ident">label</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Default, Clone)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ColorPresentation {
+    <span class="doccomment">/// The label of this color presentation. It will be shown on the color
+    /// picker header. By default this is also the text that is inserted when selecting
+    /// this color presentation.
+    </span><span class="kw">pub </span>label: String,
 
-    <span class="doccomment">/// An [edit](#TextEdit) which is applied to a document when selecting</span>
-    <span class="doccomment">/// this presentation for the color.  When `falsy` the [label](#ColorPresentation.label)</span>
-    <span class="doccomment">/// is used.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">text_edit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TextEdit</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An [edit](#TextEdit) which is applied to a document when selecting
+    /// this presentation for the color.  When `falsy` the [label](#ColorPresentation.label)
+    /// is used.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>text_edit: <span class="prelude-ty">Option</span>&lt;TextEdit&gt;,
 
-    <span class="doccomment">/// An optional array of additional [text edits](#TextEdit) that are applied when</span>
-    <span class="doccomment">/// selecting this color presentation. Edits must not overlap with the main [edit](#ColorPresentation.textEdit) nor with themselves.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">additional_text_edits</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TextEdit</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An optional array of additional [text edits](#TextEdit) that are applied when
+    /// selecting this color presentation. Edits must not overlap with the main [edit](#ColorPresentation.textEdit) nor with themselves.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>additional_text_edits: <span class="prelude-ty">Option</span>&lt;Vec&lt;TextEdit&gt;&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

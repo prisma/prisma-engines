@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/domain/usage.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>usage.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/domain/usage.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>usage.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -587,594 +587,594 @@
 <span id="587">587</span>
 <span id="588">588</span>
 <span id="589">589</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2018 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2018 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! Reserved zone names.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! see [Special-Use Domain Names](https://tools.ietf.org/html/rfc6761), RFC 6761 February, 2013</span>
+</span><span class="doccomment">//! Reserved zone names.
+//!
+//! see [Special-Use Domain Names](https://tools.ietf.org/html/rfc6761), RFC 6761 February, 2013
 
-<span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
+</span><span class="kw">use </span>std::ops::Deref;
 
-<span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
+<span class="kw">use </span>lazy_static::lazy_static;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::domain::Name</span>;
+<span class="kw">use </span><span class="kw">crate</span>::rr::domain::Name;
 
-<span class="macro">lazy_static!</span> {
-    <span class="doccomment">/// Default Name usage, everything is normal...</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DEFAULT</span>: <span class="ident">ZoneUsage</span> <span class="op">=</span> <span class="ident">ZoneUsage::default</span>();
+<span class="macro">lazy_static! </span>{
+    <span class="doccomment">/// Default Name usage, everything is normal...
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>DEFAULT: ZoneUsage = ZoneUsage::default();
 }
 
-<span class="macro">lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">ARPA</span>: <span class="ident">Name</span> <span class="op">=</span> <span class="ident">Name::from_ascii</span>(<span class="string">&quot;arpa.&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="doccomment">/// zone for ipv4 reverse addresses</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">IN_ADDR_ARPA</span>: <span class="ident">Name</span> <span class="op">=</span> <span class="ident">Name::from_ascii</span>(<span class="string">&quot;in-addr&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">append_domain</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ARPA</span>).<span class="ident">unwrap</span>();
-    <span class="doccomment">/// zone for ipv6 reverse addresses</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">IP6_ARPA</span>: <span class="ident">Name</span> <span class="op">=</span> <span class="ident">Name::from_ascii</span>(<span class="string">&quot;ip6&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">append_domain</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ARPA</span>).<span class="ident">unwrap</span>();
+<span class="macro">lazy_static! </span>{
+    <span class="kw">static </span><span class="kw-2">ref </span>ARPA: Name = Name::from_ascii(<span class="string">&quot;arpa.&quot;</span>).unwrap();
+    <span class="doccomment">/// zone for ipv4 reverse addresses
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>IN_ADDR_ARPA: Name = Name::from_ascii(<span class="string">&quot;in-addr&quot;</span>).unwrap().append_domain(<span class="kw-2">&amp;*</span>ARPA).unwrap();
+    <span class="doccomment">/// zone for ipv6 reverse addresses
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>IP6_ARPA: Name = Name::from_ascii(<span class="string">&quot;ip6&quot;</span>).unwrap().append_domain(<span class="kw-2">&amp;*</span>ARPA).unwrap();
 }
 
-<span class="macro">lazy_static!</span> {
-    <span class="doccomment">/// localhost.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Special-Use Domain Names](https://tools.ietf.org/html/rfc6761), RFC 6761 February, 2013</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 6.3.  Domain Name Reservation Considerations for &quot;localhost.&quot;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The domain &quot;localhost.&quot; and any names falling within &quot;.localhost.&quot;</span>
-    <span class="doccomment">///    are special in the following ways:</span>
-    <span class="doccomment">/// ```</span>
+<span class="macro">lazy_static! </span>{
+    <span class="doccomment">/// localhost.
+    ///
+    /// [Special-Use Domain Names](https://tools.ietf.org/html/rfc6761), RFC 6761 February, 2013
+    ///
+    /// ```text
+    /// 6.3.  Domain Name Reservation Considerations for &quot;localhost.&quot;
+    ///
+    ///    The domain &quot;localhost.&quot; and any names falling within &quot;.localhost.&quot;
+    ///    are special in the following ways:
+    /// ```
 
-    <span class="doccomment">/// localhost. usage</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">LOCALHOST</span>: <span class="ident">ZoneUsage</span> <span class="op">=</span> <span class="ident">ZoneUsage::localhost</span>(<span class="ident">Name::from_ascii</span>(<span class="string">&quot;localhost.&quot;</span>).<span class="ident">unwrap</span>());
+    /// localhost. usage
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>LOCALHOST: ZoneUsage = ZoneUsage::localhost(Name::from_ascii(<span class="string">&quot;localhost.&quot;</span>).unwrap());
 
-    <span class="doccomment">/// 127.in-addr.arpa. usage; 127/8 is reserved for loopback</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">IN_ADDR_ARPA_127</span>: <span class="ident">ZoneUsage</span> <span class="op">=</span> <span class="ident">ZoneUsage::localhost</span>(<span class="ident">Name::from_ascii</span>(<span class="string">&quot;127&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">append_domain</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">IN_ADDR_ARPA</span>).<span class="ident">unwrap</span>());
+    <span class="doccomment">/// 127.in-addr.arpa. usage; 127/8 is reserved for loopback
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>IN_ADDR_ARPA_127: ZoneUsage = ZoneUsage::localhost(Name::from_ascii(<span class="string">&quot;127&quot;</span>).unwrap().append_domain(<span class="kw-2">&amp;*</span>IN_ADDR_ARPA).unwrap());
 
-    <span class="doccomment">/// 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. usage; 1/128 is the only address in ipv6 loopback</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">IP6_ARPA_1</span>: <span class="ident">ZoneUsage</span> <span class="op">=</span> <span class="ident">ZoneUsage::localhost</span>(<span class="ident">Name::from_ascii</span>(<span class="string">&quot;1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">append_domain</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">IP6_ARPA</span>).<span class="ident">unwrap</span>());
+    <span class="doccomment">/// 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. usage; 1/128 is the only address in ipv6 loopback
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>IP6_ARPA_1: ZoneUsage = ZoneUsage::localhost(Name::from_ascii(<span class="string">&quot;1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0&quot;</span>).unwrap().append_domain(<span class="kw-2">&amp;*</span>IP6_ARPA).unwrap());
 }
 
-<span class="macro">lazy_static!</span> {
-    <span class="doccomment">/// .local.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Multicast DNS](https://tools.ietf.org/html/rfc6762), RFC 6762  February 2013</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// This document specifies that the DNS top-level domain &quot;.local.&quot; is a</span>
-    <span class="doccomment">///   special domain with special semantics, namely that any fully</span>
-    <span class="doccomment">///   qualified name ending in &quot;.local.&quot; is link-local, and names within</span>
-    <span class="doccomment">///   this domain are meaningful only on the link where they originate.</span>
-    <span class="doccomment">///   This is analogous to IPv4 addresses in the 169.254/16 prefix or IPv6</span>
-    <span class="doccomment">///   addresses in the FE80::/10 prefix, which are link-local and</span>
-    <span class="doccomment">///   meaningful only on the link where they originate.</span>
-    <span class="doccomment">/// ```</span>
+<span class="macro">lazy_static! </span>{
+    <span class="doccomment">/// .local.
+    ///
+    /// [Multicast DNS](https://tools.ietf.org/html/rfc6762), RFC 6762  February 2013
+    ///
+    /// ```text
+    /// This document specifies that the DNS top-level domain &quot;.local.&quot; is a
+    ///   special domain with special semantics, namely that any fully
+    ///   qualified name ending in &quot;.local.&quot; is link-local, and names within
+    ///   this domain are meaningful only on the link where they originate.
+    ///   This is analogous to IPv4 addresses in the 169.254/16 prefix or IPv6
+    ///   addresses in the FE80::/10 prefix, which are link-local and
+    ///   meaningful only on the link where they originate.
+    /// ```
 
-    <span class="doccomment">/// localhost. usage</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">LOCAL</span>: <span class="ident">ZoneUsage</span> <span class="op">=</span> <span class="ident">ZoneUsage::local</span>(<span class="ident">Name::from_ascii</span>(<span class="string">&quot;local.&quot;</span>).<span class="ident">unwrap</span>());
+    /// localhost. usage
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>LOCAL: ZoneUsage = ZoneUsage::local(Name::from_ascii(<span class="string">&quot;local.&quot;</span>).unwrap());
 
-    <span class="comment">// RFC 6762                      Multicast DNS                February 2013</span>
+    <span class="comment">// RFC 6762                      Multicast DNS                February 2013
 
-    <span class="comment">// Any DNS query for a name ending with &quot;254.169.in-addr.arpa.&quot; MUST</span>
-    <span class="comment">//  be sent to the mDNS IPv4 link-local multicast address 224.0.0.251</span>
-    <span class="comment">//  or the mDNS IPv6 multicast address FF02::FB.  Since names under</span>
-    <span class="comment">//  this domain correspond to IPv4 link-local addresses, it is logical</span>
-    <span class="comment">//  that the local link is the best place to find information</span>
-    <span class="comment">//  pertaining to those names.</span>
-    <span class="comment">//</span>
-    <span class="comment">//  Likewise, any DNS query for a name within the reverse mapping</span>
-    <span class="comment">//  domains for IPv6 link-local addresses (&quot;8.e.f.ip6.arpa.&quot;,</span>
-    <span class="comment">//  &quot;9.e.f.ip6.arpa.&quot;, &quot;a.e.f.ip6.arpa.&quot;, and &quot;b.e.f.ip6.arpa.&quot;) MUST</span>
-    <span class="comment">//  be sent to the mDNS IPv6 link-local multicast address FF02::FB or</span>
-    <span class="comment">//  the mDNS IPv4 link-local multicast address 224.0.0.251.</span>
+    // Any DNS query for a name ending with &quot;254.169.in-addr.arpa.&quot; MUST
+    //  be sent to the mDNS IPv4 link-local multicast address 224.0.0.251
+    //  or the mDNS IPv6 multicast address FF02::FB.  Since names under
+    //  this domain correspond to IPv4 link-local addresses, it is logical
+    //  that the local link is the best place to find information
+    //  pertaining to those names.
+    //
+    //  Likewise, any DNS query for a name within the reverse mapping
+    //  domains for IPv6 link-local addresses (&quot;8.e.f.ip6.arpa.&quot;,
+    //  &quot;9.e.f.ip6.arpa.&quot;, &quot;a.e.f.ip6.arpa.&quot;, and &quot;b.e.f.ip6.arpa.&quot;) MUST
+    //  be sent to the mDNS IPv6 link-local multicast address FF02::FB or
+    //  the mDNS IPv4 link-local multicast address 224.0.0.251.
 
-    <span class="doccomment">/// 254.169.in-addr.arpa. usage link-local, i.e. mDNS</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">IN_ADDR_ARPA_169_254</span>: <span class="ident">ZoneUsage</span> <span class="op">=</span> <span class="ident">ZoneUsage::local</span>(<span class="ident">Name::from_ascii</span>(<span class="string">&quot;254.169&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">append_domain</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">IN_ADDR_ARPA</span>).<span class="ident">unwrap</span>());
+    </span><span class="doccomment">/// 254.169.in-addr.arpa. usage link-local, i.e. mDNS
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>IN_ADDR_ARPA_169_254: ZoneUsage = ZoneUsage::local(Name::from_ascii(<span class="string">&quot;254.169&quot;</span>).unwrap().append_domain(<span class="kw-2">&amp;*</span>IN_ADDR_ARPA).unwrap());
 
-    <span class="doccomment">/// 254.169.in-addr.arpa. usage link-local, i.e. mDNS</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">IP6_ARPA_FE_8</span>: <span class="ident">ZoneUsage</span> <span class="op">=</span> <span class="ident">ZoneUsage::local</span>(<span class="ident">Name::from_ascii</span>(<span class="string">&quot;8.e.f&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">append_domain</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">IP6_ARPA</span>).<span class="ident">unwrap</span>());
-    <span class="doccomment">/// 254.169.in-addr.arpa. usage link-local, i.e. mDNS</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">IP6_ARPA_FE_9</span>: <span class="ident">ZoneUsage</span> <span class="op">=</span> <span class="ident">ZoneUsage::local</span>(<span class="ident">Name::from_ascii</span>(<span class="string">&quot;9.e.f&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">append_domain</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">IP6_ARPA</span>).<span class="ident">unwrap</span>());
-    <span class="doccomment">/// 254.169.in-addr.arpa. usage link-local, i.e. mDNS</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">IP6_ARPA_FE_B</span>: <span class="ident">ZoneUsage</span> <span class="op">=</span> <span class="ident">ZoneUsage::local</span>(<span class="ident">Name::from_ascii</span>(<span class="string">&quot;b.e.f&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">append_domain</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">IP6_ARPA</span>).<span class="ident">unwrap</span>());
+    <span class="doccomment">/// 254.169.in-addr.arpa. usage link-local, i.e. mDNS
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>IP6_ARPA_FE_8: ZoneUsage = ZoneUsage::local(Name::from_ascii(<span class="string">&quot;8.e.f&quot;</span>).unwrap().append_domain(<span class="kw-2">&amp;*</span>IP6_ARPA).unwrap());
+    <span class="doccomment">/// 254.169.in-addr.arpa. usage link-local, i.e. mDNS
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>IP6_ARPA_FE_9: ZoneUsage = ZoneUsage::local(Name::from_ascii(<span class="string">&quot;9.e.f&quot;</span>).unwrap().append_domain(<span class="kw-2">&amp;*</span>IP6_ARPA).unwrap());
+    <span class="doccomment">/// 254.169.in-addr.arpa. usage link-local, i.e. mDNS
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>IP6_ARPA_FE_B: ZoneUsage = ZoneUsage::local(Name::from_ascii(<span class="string">&quot;b.e.f&quot;</span>).unwrap().append_domain(<span class="kw-2">&amp;*</span>IP6_ARPA).unwrap());
 }
 
-<span class="macro">lazy_static!</span> {
-    <span class="doccomment">/// invalid.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Special-Use Domain Names](https://tools.ietf.org/html/rfc6761), RFC 6761 February, 2013</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 6.4.  Domain Name Reservation Considerations for &quot;invalid.&quot;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The domain &quot;invalid.&quot; and any names falling within &quot;.invalid.&quot; are</span>
-    <span class="doccomment">///    special in the ways listed below.  In the text below, the term</span>
-    <span class="doccomment">///    &quot;invalid&quot; is used in quotes to signify such names, as opposed to</span>
-    <span class="doccomment">///    names that may be invalid for other reasons (e.g., being too long).</span>
-    <span class="doccomment">/// ```</span>
+<span class="macro">lazy_static! </span>{
+    <span class="doccomment">/// invalid.
+    ///
+    /// [Special-Use Domain Names](https://tools.ietf.org/html/rfc6761), RFC 6761 February, 2013
+    ///
+    /// ```text
+    /// 6.4.  Domain Name Reservation Considerations for &quot;invalid.&quot;
+    ///
+    ///    The domain &quot;invalid.&quot; and any names falling within &quot;.invalid.&quot; are
+    ///    special in the ways listed below.  In the text below, the term
+    ///    &quot;invalid&quot; is used in quotes to signify such names, as opposed to
+    ///    names that may be invalid for other reasons (e.g., being too long).
+    /// ```
 
-    <span class="doccomment">/// invalid. name usage</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">INVALID</span>: <span class="ident">ZoneUsage</span> <span class="op">=</span> <span class="ident">ZoneUsage::invalid</span>(<span class="ident">Name::from_ascii</span>(<span class="string">&quot;invalid.&quot;</span>).<span class="ident">unwrap</span>());
+    /// invalid. name usage
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>INVALID: ZoneUsage = ZoneUsage::invalid(Name::from_ascii(<span class="string">&quot;invalid.&quot;</span>).unwrap());
 }
 
-<span class="macro">lazy_static!</span> {
-    <span class="doccomment">/// invalid.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [The &quot;.onion&quot; Special-Use Domain Name](https://tools.ietf.org/html/rfc7686), RFC 7686 October, 2015</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 1.  Introduction</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   The Tor network has the ability to host network</span>
-    <span class="doccomment">///   services using the &quot;.onion&quot; Special-Use Top-Level Domain Name.  Such</span>
-    <span class="doccomment">///   names can be used as other domain names would be (e.g., in URLs</span>
-    <span class="doccomment">///   [RFC3986]), but instead of using the DNS infrastructure, .onion names</span>
-    <span class="doccomment">///   functionally correspond to the identity of a given service, thereby</span>
-    <span class="doccomment">///   combining location and authentication.</span>
-    <span class="doccomment">/// ```</span>
+<span class="macro">lazy_static! </span>{
+    <span class="doccomment">/// invalid.
+    ///
+    /// [The &quot;.onion&quot; Special-Use Domain Name](https://tools.ietf.org/html/rfc7686), RFC 7686 October, 2015
+    ///
+    /// ```text
+    /// 1.  Introduction
+    ///
+    ///   The Tor network has the ability to host network
+    ///   services using the &quot;.onion&quot; Special-Use Top-Level Domain Name.  Such
+    ///   names can be used as other domain names would be (e.g., in URLs
+    ///   [RFC3986]), but instead of using the DNS infrastructure, .onion names
+    ///   functionally correspond to the identity of a given service, thereby
+    ///   combining location and authentication.
+    /// ```
 
-    <span class="doccomment">/// onion. name usage</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">ONION</span>: <span class="ident">ZoneUsage</span> <span class="op">=</span> <span class="ident">ZoneUsage</span> {
-        <span class="ident">user</span>: <span class="ident">UserUsage::Normal</span>, <span class="comment">// the domain is special, but this is what seems to match the most</span>
-        <span class="ident">app</span>: <span class="ident">AppUsage::Normal</span>, <span class="comment">// the domain is special, but this is what seems to match the most</span>
-        .. <span class="ident">ZoneUsage::invalid</span>(<span class="ident">Name::from_ascii</span>(<span class="string">&quot;onion.&quot;</span>).<span class="ident">unwrap</span>())
+    /// onion. name usage
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>ONION: ZoneUsage = ZoneUsage {
+        user: UserUsage::Normal, <span class="comment">// the domain is special, but this is what seems to match the most
+        </span>app: AppUsage::Normal, <span class="comment">// the domain is special, but this is what seems to match the most
+        </span>.. ZoneUsage::invalid(Name::from_ascii(<span class="string">&quot;onion.&quot;</span>).unwrap())
     };
 }
 
-<span class="doccomment">/// Users:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Are human users expected to recognize these names as special and</span>
-<span class="doccomment">///   use them differently?  In what way?</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UserUsage</span> {
-    <span class="doccomment">/// Users are free to use these names as they would any other</span>
-    <span class="doccomment">/// reverse-mapping names.  However, since there is no central</span>
-    <span class="doccomment">/// authority responsible for use of private addresses, users SHOULD</span>
-    <span class="doccomment">/// be aware that these names are likely to yield different results</span>
-    <span class="doccomment">/// on different networks.</span>
-    <span class="ident">Normal</span>,
+<span class="doccomment">/// Users:
+///
+///   Are human users expected to recognize these names as special and
+///   use them differently?  In what way?
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>UserUsage {
+    <span class="doccomment">/// Users are free to use these names as they would any other
+    /// reverse-mapping names.  However, since there is no central
+    /// authority responsible for use of private addresses, users SHOULD
+    /// be aware that these names are likely to yield different results
+    /// on different networks.
+    </span>Normal,
 
-    <span class="doccomment">/// Users are free to use localhost names as they would any other</span>
-    <span class="doccomment">/// domain names.  Users may assume that IPv4 and IPv6 address</span>
-    <span class="doccomment">/// queries for localhost names will always resolve to the respective</span>
-    <span class="doccomment">/// IP loopback address.</span>
-    <span class="ident">Loopback</span>,
+    <span class="doccomment">/// Users are free to use localhost names as they would any other
+    /// domain names.  Users may assume that IPv4 and IPv6 address
+    /// queries for localhost names will always resolve to the respective
+    /// IP loopback address.
+    </span>Loopback,
 
-    <span class="doccomment">/// Multi-cast link-local usage</span>
-    <span class="ident">LinkLocal</span>,
+    <span class="doccomment">/// Multi-cast link-local usage
+    </span>LinkLocal,
 
-    <span class="doccomment">/// Users are free to use &quot;invalid&quot; names as they would any other</span>
-    <span class="doccomment">/// domain names.  Users MAY assume that queries for &quot;invalid&quot; names</span>
-    <span class="doccomment">/// will always return NXDOMAIN responses.</span>
-    <span class="ident">NxDomain</span>,
+    <span class="doccomment">/// Users are free to use &quot;invalid&quot; names as they would any other
+    /// domain names.  Users MAY assume that queries for &quot;invalid&quot; names
+    /// will always return NXDOMAIN responses.
+    </span>NxDomain,
 }
 
-<span class="doccomment">/// Application Software:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Are writers of application software expected to make their</span>
-<span class="doccomment">///   software recognize these names as special and treat them</span>
-<span class="doccomment">///   differently?  In what way?  (For example, if a human user enters</span>
-<span class="doccomment">///   such a name, should the application software reject it with an</span>
-<span class="doccomment">///   error message?)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AppUsage</span> {
-    <span class="doccomment">/// Application software SHOULD NOT recognize these names as special,</span>
-    <span class="doccomment">/// and SHOULD use these names as they would other reverse-mapping</span>
-    <span class="doccomment">/// names.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Application software SHOULD NOT recognize test names as special,</span>
-    <span class="doccomment">/// and SHOULD use test names as they would other domain names.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Application software SHOULD NOT recognize example names as</span>
-    <span class="doccomment">/// special and SHOULD use example names as they would other domain</span>
-    <span class="doccomment">/// names.</span>
-    <span class="ident">Normal</span>,
+<span class="doccomment">/// Application Software:
+///
+///   Are writers of application software expected to make their
+///   software recognize these names as special and treat them
+///   differently?  In what way?  (For example, if a human user enters
+///   such a name, should the application software reject it with an
+///   error message?)
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>AppUsage {
+    <span class="doccomment">/// Application software SHOULD NOT recognize these names as special,
+    /// and SHOULD use these names as they would other reverse-mapping
+    /// names.
+    ///
+    /// Application software SHOULD NOT recognize test names as special,
+    /// and SHOULD use test names as they would other domain names.
+    ///
+    /// Application software SHOULD NOT recognize example names as
+    /// special and SHOULD use example names as they would other domain
+    /// names.
+    </span>Normal,
 
-    <span class="doccomment">/// Application software MAY recognize localhost names as special, or</span>
-    <span class="doccomment">/// MAY pass them to name resolution APIs as they would for other</span>
-    <span class="doccomment">/// domain names.</span>
-    <span class="ident">Loopback</span>,
+    <span class="doccomment">/// Application software MAY recognize localhost names as special, or
+    /// MAY pass them to name resolution APIs as they would for other
+    /// domain names.
+    </span>Loopback,
 
-    <span class="doccomment">/// Link local, generally for mDNS</span>
-    <span class="ident">LinkLocal</span>,
+    <span class="doccomment">/// Link local, generally for mDNS
+    </span>LinkLocal,
 
-    <span class="doccomment">/// Application software MAY recognize &quot;invalid&quot; names as special or</span>
-    <span class="doccomment">/// MAY pass them to name resolution APIs as they would for other</span>
-    <span class="doccomment">/// domain names.</span>
-    <span class="ident">NxDomain</span>,
+    <span class="doccomment">/// Application software MAY recognize &quot;invalid&quot; names as special or
+    /// MAY pass them to name resolution APIs as they would for other
+    /// domain names.
+    </span>NxDomain,
 }
 
-<span class="doccomment">/// Name Resolution APIs and Libraries:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Are writers of name resolution APIs and libraries expected to</span>
-<span class="doccomment">///   make their software recognize these names as special and treat</span>
-<span class="doccomment">///   them differently?  If so, how?</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResolverUsage</span> {
-    <span class="doccomment">/// Name resolution APIs and libraries SHOULD NOT recognize these</span>
-    <span class="doccomment">/// names as special and SHOULD NOT treat them differently.  Name</span>
-    <span class="doccomment">/// resolution APIs SHOULD send queries for these names to their</span>
-    <span class="doccomment">/// configured caching DNS server(s).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Name resolution APIs and libraries SHOULD NOT recognize test</span>
-    <span class="doccomment">/// names as special and SHOULD NOT treat them differently.  Name</span>
-    <span class="doccomment">/// resolution APIs SHOULD send queries for test names to their</span>
-    <span class="doccomment">/// configured caching DNS server(s).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Name resolution APIs and libraries SHOULD NOT recognize example</span>
-    <span class="doccomment">/// names as special and SHOULD NOT treat them differently.  Name</span>
-    <span class="doccomment">/// resolution APIs SHOULD send queries for example names to their</span>
-    <span class="doccomment">/// configured caching DNS server(s).</span>
-    <span class="ident">Normal</span>,
+<span class="doccomment">/// Name Resolution APIs and Libraries:
+///
+///   Are writers of name resolution APIs and libraries expected to
+///   make their software recognize these names as special and treat
+///   them differently?  If so, how?
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>ResolverUsage {
+    <span class="doccomment">/// Name resolution APIs and libraries SHOULD NOT recognize these
+    /// names as special and SHOULD NOT treat them differently.  Name
+    /// resolution APIs SHOULD send queries for these names to their
+    /// configured caching DNS server(s).
+    ///
+    /// Name resolution APIs and libraries SHOULD NOT recognize test
+    /// names as special and SHOULD NOT treat them differently.  Name
+    /// resolution APIs SHOULD send queries for test names to their
+    /// configured caching DNS server(s).
+    ///
+    /// Name resolution APIs and libraries SHOULD NOT recognize example
+    /// names as special and SHOULD NOT treat them differently.  Name
+    /// resolution APIs SHOULD send queries for example names to their
+    /// configured caching DNS server(s).
+    </span>Normal,
 
-    <span class="doccomment">/// Name resolution APIs and libraries SHOULD recognize localhost</span>
-    <span class="doccomment">/// names as special and SHOULD always return the IP loopback address</span>
-    <span class="doccomment">/// for address queries and negative responses for all other query</span>
-    <span class="doccomment">/// types.  Name resolution APIs SHOULD NOT send queries for</span>
-    <span class="doccomment">/// localhost names to their configured caching DNS server(s).</span>
-    <span class="ident">Loopback</span>,
+    <span class="doccomment">/// Name resolution APIs and libraries SHOULD recognize localhost
+    /// names as special and SHOULD always return the IP loopback address
+    /// for address queries and negative responses for all other query
+    /// types.  Name resolution APIs SHOULD NOT send queries for
+    /// localhost names to their configured caching DNS server(s).
+    </span>Loopback,
 
-    <span class="doccomment">/// Link local, generally for mDNS</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Any DNS query for a name ending with &quot;.local.&quot; MUST be sent to the</span>
-    <span class="doccomment">/// mDNS IPv4 link-local multicast address 224.0.0.251 (or its IPv6</span>
-    <span class="doccomment">/// equivalent FF02::FB).  The design rationale for using a fixed</span>
-    <span class="doccomment">/// multicast address instead of selecting from a range of multicast</span>
-    <span class="doccomment">/// addresses using a hash function is discussed in Appendix B.</span>
-    <span class="doccomment">/// Implementers MAY choose to look up such names concurrently via other</span>
-    <span class="doccomment">/// mechanisms (e.g., Unicast DNS) and coalesce the results in some</span>
-    <span class="doccomment">/// fashion.  Implementers choosing to do this should be aware of the</span>
-    <span class="doccomment">/// potential for user confusion when a given name can produce different</span>
-    <span class="doccomment">/// results depending on external network conditions (such as, but not</span>
-    <span class="doccomment">/// limited to, which name lookup mechanism responds faster).</span>
-    <span class="ident">LinkLocal</span>,
+    <span class="doccomment">/// Link local, generally for mDNS
+    ///
+    /// Any DNS query for a name ending with &quot;.local.&quot; MUST be sent to the
+    /// mDNS IPv4 link-local multicast address 224.0.0.251 (or its IPv6
+    /// equivalent FF02::FB).  The design rationale for using a fixed
+    /// multicast address instead of selecting from a range of multicast
+    /// addresses using a hash function is discussed in Appendix B.
+    /// Implementers MAY choose to look up such names concurrently via other
+    /// mechanisms (e.g., Unicast DNS) and coalesce the results in some
+    /// fashion.  Implementers choosing to do this should be aware of the
+    /// potential for user confusion when a given name can produce different
+    /// results depending on external network conditions (such as, but not
+    /// limited to, which name lookup mechanism responds faster).
+    </span>LinkLocal,
 
-    <span class="doccomment">/// Name resolution APIs and libraries SHOULD recognize &quot;invalid&quot;</span>
-    <span class="doccomment">/// names as special and SHOULD always return immediate negative</span>
-    <span class="doccomment">/// responses.  Name resolution APIs SHOULD NOT send queries for</span>
-    <span class="doccomment">/// &quot;invalid&quot; names to their configured caching DNS server(s).</span>
-    <span class="ident">NxDomain</span>,
+    <span class="doccomment">/// Name resolution APIs and libraries SHOULD recognize &quot;invalid&quot;
+    /// names as special and SHOULD always return immediate negative
+    /// responses.  Name resolution APIs SHOULD NOT send queries for
+    /// &quot;invalid&quot; names to their configured caching DNS server(s).
+    </span>NxDomain,
 }
 
-<span class="doccomment">/// Caching DNS Servers:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Are developers of caching domain name servers expected to make</span>
-<span class="doccomment">///   their implementations recognize these names as special and treat</span>
-<span class="doccomment">///   them differently?  If so, how?</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CacheUsage</span> {
-    <span class="doccomment">/// Caching DNS servers SHOULD recognize these names as special and</span>
-    <span class="doccomment">/// SHOULD NOT, by default, attempt to look up NS records for them,</span>
-    <span class="doccomment">/// or otherwise query authoritative DNS servers in an attempt to</span>
-    <span class="doccomment">/// resolve these names.  Instead, caching DNS servers SHOULD, by</span>
-    <span class="doccomment">/// default, generate immediate (positive or negative) responses for</span>
-    <span class="doccomment">/// all such queries.  This is to avoid unnecessary load on the root</span>
-    <span class="doccomment">/// name servers and other name servers.  Caching DNS servers SHOULD</span>
-    <span class="doccomment">/// offer a configuration option (disabled by default) to enable</span>
-    <span class="doccomment">/// upstream resolution of such names, for use in private networks</span>
-    <span class="doccomment">/// where private-address reverse-mapping names are known to be</span>
-    <span class="doccomment">/// handled by an authoritative DNS server in said private network.</span>
-    <span class="ident">NonRecursive</span>,
+<span class="doccomment">/// Caching DNS Servers:
+///
+///   Are developers of caching domain name servers expected to make
+///   their implementations recognize these names as special and treat
+///   them differently?  If so, how?
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>CacheUsage {
+    <span class="doccomment">/// Caching DNS servers SHOULD recognize these names as special and
+    /// SHOULD NOT, by default, attempt to look up NS records for them,
+    /// or otherwise query authoritative DNS servers in an attempt to
+    /// resolve these names.  Instead, caching DNS servers SHOULD, by
+    /// default, generate immediate (positive or negative) responses for
+    /// all such queries.  This is to avoid unnecessary load on the root
+    /// name servers and other name servers.  Caching DNS servers SHOULD
+    /// offer a configuration option (disabled by default) to enable
+    /// upstream resolution of such names, for use in private networks
+    /// where private-address reverse-mapping names are known to be
+    /// handled by an authoritative DNS server in said private network.
+    </span>NonRecursive,
 
-    <span class="doccomment">/// Caching DNS servers SHOULD recognize &quot;invalid&quot; names as special</span>
-    <span class="doccomment">/// and SHOULD NOT attempt to look up NS records for them, or</span>
-    <span class="doccomment">/// otherwise query authoritative DNS servers in an attempt to</span>
-    <span class="doccomment">/// resolve &quot;invalid&quot; names.  Instead, caching DNS servers SHOULD</span>
-    <span class="doccomment">/// generate immediate NXDOMAIN responses for all such queries.  This</span>
-    <span class="doccomment">/// is to avoid unnecessary load on the root name servers and other</span>
-    <span class="doccomment">/// name servers.</span>
-    <span class="ident">NxDomain</span>,
+    <span class="doccomment">/// Caching DNS servers SHOULD recognize &quot;invalid&quot; names as special
+    /// and SHOULD NOT attempt to look up NS records for them, or
+    /// otherwise query authoritative DNS servers in an attempt to
+    /// resolve &quot;invalid&quot; names.  Instead, caching DNS servers SHOULD
+    /// generate immediate NXDOMAIN responses for all such queries.  This
+    /// is to avoid unnecessary load on the root name servers and other
+    /// name servers.
+    </span>NxDomain,
 
-    <span class="doccomment">/// Caching DNS servers SHOULD recognize localhost names as special</span>
-    <span class="doccomment">/// and SHOULD NOT attempt to look up NS records for them, or</span>
-    <span class="doccomment">/// otherwise query authoritative DNS servers in an attempt to</span>
-    <span class="doccomment">/// resolve localhost names.  Instead, caching DNS servers SHOULD,</span>
-    <span class="doccomment">/// for all such address queries, generate an immediate positive</span>
-    <span class="doccomment">/// response giving the IP loopback address, and for all other query</span>
-    <span class="doccomment">/// types, generate an immediate negative response.  This is to avoid</span>
-    <span class="doccomment">/// unnecessary load on the root name servers and other name servers.</span>
-    <span class="ident">Loopback</span>,
+    <span class="doccomment">/// Caching DNS servers SHOULD recognize localhost names as special
+    /// and SHOULD NOT attempt to look up NS records for them, or
+    /// otherwise query authoritative DNS servers in an attempt to
+    /// resolve localhost names.  Instead, caching DNS servers SHOULD,
+    /// for all such address queries, generate an immediate positive
+    /// response giving the IP loopback address, and for all other query
+    /// types, generate an immediate negative response.  This is to avoid
+    /// unnecessary load on the root name servers and other name servers.
+    </span>Loopback,
 
-    <span class="doccomment">/// Caching DNS servers SHOULD NOT recognize example names as special</span>
-    <span class="doccomment">/// and SHOULD resolve them normally.</span>
-    <span class="ident">Normal</span>,
+    <span class="doccomment">/// Caching DNS servers SHOULD NOT recognize example names as special
+    /// and SHOULD resolve them normally.
+    </span>Normal,
 }
 
-<span class="doccomment">/// Authoritative DNS Servers:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Are developers of authoritative domain name servers expected to</span>
-<span class="doccomment">///   make their implementations recognize these names as special and</span>
-<span class="doccomment">///   treat them differently?  If so, how?</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AuthUsage</span> {
-    <span class="doccomment">/// Authoritative DNS servers SHOULD recognize these names as special</span>
-    <span class="doccomment">/// and SHOULD, by default, generate immediate negative responses for</span>
-    <span class="doccomment">/// all such queries, unless explicitly configured by the</span>
-    <span class="doccomment">/// administrator to give positive answers for private-address</span>
-    <span class="doccomment">/// reverse-mapping names.</span>
-    <span class="ident">Local</span>,
+<span class="doccomment">/// Authoritative DNS Servers:
+///
+///   Are developers of authoritative domain name servers expected to
+///   make their implementations recognize these names as special and
+///   treat them differently?  If so, how?
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>AuthUsage {
+    <span class="doccomment">/// Authoritative DNS servers SHOULD recognize these names as special
+    /// and SHOULD, by default, generate immediate negative responses for
+    /// all such queries, unless explicitly configured by the
+    /// administrator to give positive answers for private-address
+    /// reverse-mapping names.
+    </span>Local,
 
-    <span class="doccomment">/// Authoritative DNS servers SHOULD recognize these names as special</span>
-    <span class="doccomment">/// and SHOULD, by default, generate immediate negative responses for</span>
-    <span class="doccomment">/// all such queries, unless explicitly configured by the</span>
-    <span class="doccomment">/// administrator to give positive answers for private-address</span>
-    <span class="doccomment">/// reverse-mapping names.</span>
-    <span class="ident">NxDomain</span>,
+    <span class="doccomment">/// Authoritative DNS servers SHOULD recognize these names as special
+    /// and SHOULD, by default, generate immediate negative responses for
+    /// all such queries, unless explicitly configured by the
+    /// administrator to give positive answers for private-address
+    /// reverse-mapping names.
+    </span>NxDomain,
 
-    <span class="doccomment">/// Authoritative DNS servers SHOULD recognize localhost names as</span>
-    <span class="doccomment">/// special and handle them as described above for caching DNS</span>
-    <span class="doccomment">/// servers.</span>
-    <span class="ident">Loopback</span>,
+    <span class="doccomment">/// Authoritative DNS servers SHOULD recognize localhost names as
+    /// special and handle them as described above for caching DNS
+    /// servers.
+    </span>Loopback,
 
-    <span class="doccomment">/// Authoritative DNS servers SHOULD NOT recognize example names as</span>
-    <span class="doccomment">/// special.</span>
-    <span class="ident">Normal</span>,
+    <span class="doccomment">/// Authoritative DNS servers SHOULD NOT recognize example names as
+    /// special.
+    </span>Normal,
 }
 
-<span class="doccomment">/// DNS Server Operators:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Does this reserved Special-Use Domain Name have any potential</span>
-<span class="doccomment">///   impact on DNS server operators?  If they try to configure their</span>
-<span class="doccomment">///   authoritative DNS server as authoritative for this reserved name,</span>
-<span class="doccomment">///   will compliant name server software reject it as invalid?  Do DNS</span>
-<span class="doccomment">///   server operators need to know about that and understand why?</span>
-<span class="doccomment">///   Even if the name server software doesn&#39;t prevent them from using</span>
-<span class="doccomment">///   this reserved name, are there other ways that it may not work as</span>
-<span class="doccomment">///  expected, of which the DNS server operator should be aware?</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OpUsage</span> {
-    <span class="doccomment">/// DNS server operators SHOULD, if they are using private addresses,</span>
-    <span class="doccomment">/// configure their authoritative DNS servers to act as authoritative</span>
-    <span class="doccomment">/// for these names.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// DNS server operators SHOULD, if they are using test names,</span>
-    <span class="doccomment">/// configure their authoritative DNS servers to act as authoritative</span>
-    <span class="doccomment">/// for test names.</span>
-    <span class="ident">Normal</span>,
+<span class="doccomment">/// DNS Server Operators:
+///
+///   Does this reserved Special-Use Domain Name have any potential
+///   impact on DNS server operators?  If they try to configure their
+///   authoritative DNS server as authoritative for this reserved name,
+///   will compliant name server software reject it as invalid?  Do DNS
+///   server operators need to know about that and understand why?
+///   Even if the name server software doesn&#39;t prevent them from using
+///   this reserved name, are there other ways that it may not work as
+///  expected, of which the DNS server operator should be aware?
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>OpUsage {
+    <span class="doccomment">/// DNS server operators SHOULD, if they are using private addresses,
+    /// configure their authoritative DNS servers to act as authoritative
+    /// for these names.
+    ///
+    /// DNS server operators SHOULD, if they are using test names,
+    /// configure their authoritative DNS servers to act as authoritative
+    /// for test names.
+    </span>Normal,
 
-    <span class="doccomment">/// DNS server operators SHOULD be aware that the effective RDATA for</span>
-    <span class="doccomment">/// localhost names is defined by protocol specification and cannot</span>
-    <span class="doccomment">/// be modified by local configuration.</span>
-    <span class="ident">Loopback</span>,
+    <span class="doccomment">/// DNS server operators SHOULD be aware that the effective RDATA for
+    /// localhost names is defined by protocol specification and cannot
+    /// be modified by local configuration.
+    </span>Loopback,
 
-    <span class="doccomment">/// DNS server operators SHOULD be aware that the effective RDATA for</span>
-    <span class="doccomment">/// &quot;invalid&quot; names is defined by protocol specification to be</span>
-    <span class="doccomment">/// nonexistent and cannot be modified by local configuration.</span>
-    <span class="ident">NxDomain</span>,
+    <span class="doccomment">/// DNS server operators SHOULD be aware that the effective RDATA for
+    /// &quot;invalid&quot; names is defined by protocol specification to be
+    /// nonexistent and cannot be modified by local configuration.
+    </span>NxDomain,
 }
 
-<span class="doccomment">/// DNS Registries/Registrars:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   How should DNS Registries/Registrars treat requests to register</span>
-<span class="doccomment">///   this reserved domain name?  Should such requests be denied?</span>
-<span class="doccomment">///   Should such requests be allowed, but only to a specially-</span>
-<span class="doccomment">///   designated entity?  (For example, the name &quot;www.example.org&quot; is</span>
-<span class="doccomment">///   reserved for documentation examples and is not available for</span>
-<span class="doccomment">///   registration; however, the name is in fact registered; and there</span>
-<span class="doccomment">///   is even a web site at that name, which states circularly that the</span>
-<span class="doccomment">///   name is reserved for use in documentation and cannot be</span>
-<span class="doccomment">///   registered!)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RegistryUsage</span> {
-    <span class="doccomment">/// Stanard checks apply</span>
-    <span class="ident">Normal</span>,
+<span class="doccomment">/// DNS Registries/Registrars:
+///
+///   How should DNS Registries/Registrars treat requests to register
+///   this reserved domain name?  Should such requests be denied?
+///   Should such requests be allowed, but only to a specially-
+///   designated entity?  (For example, the name &quot;www.example.org&quot; is
+///   reserved for documentation examples and is not available for
+///   registration; however, the name is in fact registered; and there
+///   is even a web site at that name, which states circularly that the
+///   name is reserved for use in documentation and cannot be
+///   registered!)
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>RegistryUsage {
+    <span class="doccomment">/// Stanard checks apply
+    </span>Normal,
 
-    <span class="doccomment">/// DNS Registries/Registrars MUST NOT grant requests to register</span>
-    <span class="doccomment">/// test names in the normal way to any person or entity.  Test names</span>
-    <span class="doccomment">/// are reserved for use in private networks and fall outside the set</span>
-    <span class="doccomment">/// of names available for allocation by registries/registrars.</span>
-    <span class="doccomment">/// Attempting to allocate a test name as if it were a normal DNS</span>
-    <span class="doccomment">/// domain name will probably not work as desired, for reasons 4, 5,</span>
-    <span class="doccomment">/// and 6 above.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// DNS Registries/Registrars MUST NOT grant requests to register</span>
-    <span class="doccomment">/// localhost names in the normal way to any person or entity.</span>
-    <span class="doccomment">/// Localhost names are defined by protocol specification and fall</span>
-    <span class="doccomment">/// outside the set of names available for allocation by registries/</span>
-    <span class="doccomment">/// registrars.  Attempting to allocate a localhost name as if it</span>
-    <span class="doccomment">/// were a normal DNS domain name will probably not work as desired,</span>
-    <span class="doccomment">/// for reasons 2, 3, 4, and 5 above.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// DNS Registries/Registrars MUST NOT grant requests to register</span>
-    <span class="doccomment">/// &quot;invalid&quot; names in the normal way to any person or entity.  These</span>
-    <span class="doccomment">/// &quot;invalid&quot; names are defined by protocol specification to be</span>
-    <span class="doccomment">/// nonexistent, and they fall outside the set of names available for</span>
-    <span class="doccomment">/// allocation by registries/registrars.  Attempting to allocate a</span>
-    <span class="doccomment">/// &quot;invalid&quot; name as if it were a normal DNS domain name will</span>
-    <span class="doccomment">/// probably not work as desired, for reasons 2, 3, 4, and 5 above.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// DNS Registries/Registrars MUST NOT grant requests to register</span>
-    <span class="doccomment">/// example names in the normal way to any person or entity.  All</span>
-    <span class="doccomment">/// example names are registered in perpetuity to IANA:</span>
-    <span class="ident">Reserved</span>,
+    <span class="doccomment">/// DNS Registries/Registrars MUST NOT grant requests to register
+    /// test names in the normal way to any person or entity.  Test names
+    /// are reserved for use in private networks and fall outside the set
+    /// of names available for allocation by registries/registrars.
+    /// Attempting to allocate a test name as if it were a normal DNS
+    /// domain name will probably not work as desired, for reasons 4, 5,
+    /// and 6 above.
+    ///
+    /// DNS Registries/Registrars MUST NOT grant requests to register
+    /// localhost names in the normal way to any person or entity.
+    /// Localhost names are defined by protocol specification and fall
+    /// outside the set of names available for allocation by registries/
+    /// registrars.  Attempting to allocate a localhost name as if it
+    /// were a normal DNS domain name will probably not work as desired,
+    /// for reasons 2, 3, 4, and 5 above.
+    ///
+    /// DNS Registries/Registrars MUST NOT grant requests to register
+    /// &quot;invalid&quot; names in the normal way to any person or entity.  These
+    /// &quot;invalid&quot; names are defined by protocol specification to be
+    /// nonexistent, and they fall outside the set of names available for
+    /// allocation by registries/registrars.  Attempting to allocate a
+    /// &quot;invalid&quot; name as if it were a normal DNS domain name will
+    /// probably not work as desired, for reasons 2, 3, 4, and 5 above.
+    ///
+    /// DNS Registries/Registrars MUST NOT grant requests to register
+    /// example names in the normal way to any person or entity.  All
+    /// example names are registered in perpetuity to IANA:
+    </span>Reserved,
 }
 
-<span class="doccomment">/// ZoneUsage represents information about how a name falling in a given zone should be treated</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ZoneUsage</span> {
-    <span class="ident">name</span>: <span class="ident">Name</span>,
-    <span class="ident">user</span>: <span class="ident">UserUsage</span>,
-    <span class="ident">app</span>: <span class="ident">AppUsage</span>,
-    <span class="ident">resolver</span>: <span class="ident">ResolverUsage</span>,
-    <span class="ident">cache</span>: <span class="ident">CacheUsage</span>,
-    <span class="ident">auth</span>: <span class="ident">AuthUsage</span>,
-    <span class="ident">op</span>: <span class="ident">OpUsage</span>,
-    <span class="ident">registry</span>: <span class="ident">RegistryUsage</span>,
+<span class="doccomment">/// ZoneUsage represents information about how a name falling in a given zone should be treated
+</span><span class="kw">pub struct </span>ZoneUsage {
+    name: Name,
+    user: UserUsage,
+    app: AppUsage,
+    resolver: ResolverUsage,
+    cache: CacheUsage,
+    auth: AuthUsage,
+    op: OpUsage,
+    registry: RegistryUsage,
 }
 
-<span class="kw">impl</span> <span class="ident">ZoneUsage</span> {
-    <span class="doccomment">/// Constructs a new ZoneUsage with the associated values</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">name</span>: <span class="ident">Name</span>,
-        <span class="ident">user</span>: <span class="ident">UserUsage</span>,
-        <span class="ident">app</span>: <span class="ident">AppUsage</span>,
-        <span class="ident">resolver</span>: <span class="ident">ResolverUsage</span>,
-        <span class="ident">cache</span>: <span class="ident">CacheUsage</span>,
-        <span class="ident">auth</span>: <span class="ident">AuthUsage</span>,
-        <span class="ident">op</span>: <span class="ident">OpUsage</span>,
-        <span class="ident">registry</span>: <span class="ident">RegistryUsage</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">user</span>,
-            <span class="ident">app</span>,
-            <span class="ident">resolver</span>,
-            <span class="ident">cache</span>,
-            <span class="ident">auth</span>,
-            <span class="ident">op</span>,
-            <span class="ident">registry</span>,
+<span class="kw">impl </span>ZoneUsage {
+    <span class="doccomment">/// Constructs a new ZoneUsage with the associated values
+    </span><span class="attribute">#[allow(clippy::too_many_arguments)]
+    </span><span class="kw">pub fn </span>new(
+        name: Name,
+        user: UserUsage,
+        app: AppUsage,
+        resolver: ResolverUsage,
+        cache: CacheUsage,
+        auth: AuthUsage,
+        op: OpUsage,
+        registry: RegistryUsage,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name,
+            user,
+            app,
+            resolver,
+            cache,
+            auth,
+            op,
+            registry,
         }
     }
 
-    <span class="doccomment">/// Constructs a new Default, with all no restrictions</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">Name::root</span>(),
-            <span class="ident">UserUsage::Normal</span>,
-            <span class="ident">AppUsage::Normal</span>,
-            <span class="ident">ResolverUsage::Normal</span>,
-            <span class="ident">CacheUsage::Normal</span>,
-            <span class="ident">AuthUsage::Normal</span>,
-            <span class="ident">OpUsage::Normal</span>,
-            <span class="ident">RegistryUsage::Normal</span>,
+    <span class="doccomment">/// Constructs a new Default, with all no restrictions
+    </span><span class="kw">pub fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(
+            Name::root(),
+            UserUsage::Normal,
+            AppUsage::Normal,
+            ResolverUsage::Normal,
+            CacheUsage::Normal,
+            AuthUsage::Normal,
+            OpUsage::Normal,
+            RegistryUsage::Normal,
         )
     }
 
-    <span class="doccomment">/// Restrictions for reverse zones</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">name</span>,
-            <span class="ident">UserUsage::Normal</span>,
-            <span class="ident">AppUsage::Normal</span>,
-            <span class="ident">ResolverUsage::Normal</span>,
-            <span class="ident">CacheUsage::NonRecursive</span>,
-            <span class="ident">AuthUsage::Local</span>,
-            <span class="ident">OpUsage::Normal</span>,
-            <span class="ident">RegistryUsage::Reserved</span>,
+    <span class="doccomment">/// Restrictions for reverse zones
+    </span><span class="kw">pub fn </span>reverse(name: Name) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(
+            name,
+            UserUsage::Normal,
+            AppUsage::Normal,
+            ResolverUsage::Normal,
+            CacheUsage::NonRecursive,
+            AuthUsage::Local,
+            OpUsage::Normal,
+            RegistryUsage::Reserved,
         )
     }
 
-    <span class="doccomment">/// Restrictions for the .test. zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">name</span>,
-            <span class="ident">UserUsage::Normal</span>,
-            <span class="ident">AppUsage::Normal</span>,
-            <span class="ident">ResolverUsage::Normal</span>,
-            <span class="ident">CacheUsage::NonRecursive</span>,
-            <span class="ident">AuthUsage::Local</span>,
-            <span class="ident">OpUsage::Normal</span>,
-            <span class="ident">RegistryUsage::Reserved</span>,
+    <span class="doccomment">/// Restrictions for the .test. zone
+    </span><span class="kw">pub fn </span>test(name: Name) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(
+            name,
+            UserUsage::Normal,
+            AppUsage::Normal,
+            ResolverUsage::Normal,
+            CacheUsage::NonRecursive,
+            AuthUsage::Local,
+            OpUsage::Normal,
+            RegistryUsage::Reserved,
         )
     }
 
-    <span class="doccomment">/// Restrictions for the .localhost. zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">localhost</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">name</span>,
-            <span class="ident">UserUsage::Loopback</span>,
-            <span class="ident">AppUsage::Loopback</span>,
-            <span class="ident">ResolverUsage::Loopback</span>,
-            <span class="ident">CacheUsage::Loopback</span>,
-            <span class="ident">AuthUsage::Loopback</span>,
-            <span class="ident">OpUsage::Loopback</span>,
-            <span class="ident">RegistryUsage::Reserved</span>,
+    <span class="doccomment">/// Restrictions for the .localhost. zone
+    </span><span class="kw">pub fn </span>localhost(name: Name) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(
+            name,
+            UserUsage::Loopback,
+            AppUsage::Loopback,
+            ResolverUsage::Loopback,
+            CacheUsage::Loopback,
+            AuthUsage::Loopback,
+            OpUsage::Loopback,
+            RegistryUsage::Reserved,
         )
     }
 
-    <span class="doccomment">/// Restrictions for the .local. zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">name</span>,
-            <span class="ident">UserUsage::LinkLocal</span>,
-            <span class="ident">AppUsage::LinkLocal</span>,
-            <span class="ident">ResolverUsage::LinkLocal</span>,
-            <span class="ident">CacheUsage::Normal</span>,
-            <span class="ident">AuthUsage::Local</span>,
-            <span class="ident">OpUsage::Normal</span>,
-            <span class="ident">RegistryUsage::Reserved</span>,
+    <span class="doccomment">/// Restrictions for the .local. zone
+    </span><span class="kw">pub fn </span>local(name: Name) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(
+            name,
+            UserUsage::LinkLocal,
+            AppUsage::LinkLocal,
+            ResolverUsage::LinkLocal,
+            CacheUsage::Normal,
+            AuthUsage::Local,
+            OpUsage::Normal,
+            RegistryUsage::Reserved,
         )
     }
 
-    <span class="doccomment">/// Restrictions for the .invalid. zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">name</span>,
-            <span class="ident">UserUsage::NxDomain</span>,
-            <span class="ident">AppUsage::NxDomain</span>,
-            <span class="ident">ResolverUsage::NxDomain</span>,
-            <span class="ident">CacheUsage::NxDomain</span>,
-            <span class="ident">AuthUsage::NxDomain</span>,
-            <span class="ident">OpUsage::NxDomain</span>,
-            <span class="ident">RegistryUsage::Reserved</span>,
+    <span class="doccomment">/// Restrictions for the .invalid. zone
+    </span><span class="kw">pub fn </span>invalid(name: Name) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(
+            name,
+            UserUsage::NxDomain,
+            AppUsage::NxDomain,
+            ResolverUsage::NxDomain,
+            CacheUsage::NxDomain,
+            AuthUsage::NxDomain,
+            OpUsage::NxDomain,
+            RegistryUsage::Reserved,
         )
     }
 
-    <span class="doccomment">/// Restrictions for the .example. zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">example</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">name</span>,
-            <span class="ident">UserUsage::Normal</span>,
-            <span class="ident">AppUsage::Normal</span>,
-            <span class="ident">ResolverUsage::Normal</span>,
-            <span class="ident">CacheUsage::Normal</span>,
-            <span class="ident">AuthUsage::Normal</span>,
-            <span class="ident">OpUsage::Normal</span>,
-            <span class="ident">RegistryUsage::Reserved</span>,
+    <span class="doccomment">/// Restrictions for the .example. zone
+    </span><span class="kw">pub fn </span>example(name: Name) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(
+            name,
+            UserUsage::Normal,
+            AppUsage::Normal,
+            ResolverUsage::Normal,
+            CacheUsage::Normal,
+            AuthUsage::Normal,
+            OpUsage::Normal,
+            RegistryUsage::Reserved,
         )
     }
 
-    <span class="doccomment">/// A reference to this zone name</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Name</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+    <span class="doccomment">/// A reference to this zone name
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Name {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 
-    <span class="doccomment">/// Returns the UserUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">UserUsage</span> {
-        <span class="self">self</span>.<span class="ident">user</span>
+    <span class="doccomment">/// Returns the UserUsage of this zone
+    </span><span class="kw">pub fn </span>user(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; UserUsage {
+        <span class="self">self</span>.user
     }
 
-    <span class="doccomment">/// Returns the AppUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">app</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AppUsage</span> {
-        <span class="self">self</span>.<span class="ident">app</span>
+    <span class="doccomment">/// Returns the AppUsage of this zone
+    </span><span class="kw">pub fn </span>app(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AppUsage {
+        <span class="self">self</span>.app
     }
 
-    <span class="doccomment">/// Returns the ResolverUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ResolverUsage</span> {
-        <span class="self">self</span>.<span class="ident">resolver</span>
+    <span class="doccomment">/// Returns the ResolverUsage of this zone
+    </span><span class="kw">pub fn </span>resolver(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ResolverUsage {
+        <span class="self">self</span>.resolver
     }
 
-    <span class="doccomment">/// Returns the CacheUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CacheUsage</span> {
-        <span class="self">self</span>.<span class="ident">cache</span>
+    <span class="doccomment">/// Returns the CacheUsage of this zone
+    </span><span class="kw">pub fn </span>cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CacheUsage {
+        <span class="self">self</span>.cache
     }
 
-    <span class="doccomment">/// Returns the AuthUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auth</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AuthUsage</span> {
-        <span class="self">self</span>.<span class="ident">auth</span>
+    <span class="doccomment">/// Returns the AuthUsage of this zone
+    </span><span class="kw">pub fn </span>auth(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AuthUsage {
+        <span class="self">self</span>.auth
     }
 
-    <span class="doccomment">/// Returns the OpUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">op</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OpUsage</span> {
-        <span class="self">self</span>.<span class="ident">op</span>
+    <span class="doccomment">/// Returns the OpUsage of this zone
+    </span><span class="kw">pub fn </span>op(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OpUsage {
+        <span class="self">self</span>.op
     }
 
-    <span class="doccomment">/// Returns the RegistryUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">registry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RegistryUsage</span> {
-        <span class="self">self</span>.<span class="ident">registry</span>
+    <span class="doccomment">/// Returns the RegistryUsage of this zone
+    </span><span class="kw">pub fn </span>registry(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RegistryUsage {
+        <span class="self">self</span>.registry
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">ZoneUsage</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Name</span>;
+<span class="kw">impl </span>Deref <span class="kw">for </span>ZoneUsage {
+    <span class="kw">type </span>Target = Name;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

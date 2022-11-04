@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/layer_filters/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/layer_filters/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -1135,1140 +1135,1140 @@
 <span id="1133">1133</span>
 <span id="1134">1134</span>
 <span id="1135">1135</span>
-</pre><pre class="rust"><code><span class="doccomment">//! ## Per-Layer Filtering</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Per-layer filters permit individual `Layer`s to have their own filter</span>
-<span class="doccomment">//! configurations without interfering with other `Layer`s.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module is not public; the public APIs defined in this module are</span>
-<span class="doccomment">//! re-exported in the top-level `filter` module. Therefore, this documentation</span>
-<span class="doccomment">//! primarily concerns the internal implementation details. For the user-facing</span>
-<span class="doccomment">//! public API documentation, see the individual public types in this module, as</span>
-<span class="doccomment">//! well as the, see the `Layer` trait documentation&#39;s [per-layer filtering</span>
-<span class="doccomment">//! section]][1].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## How does per-layer filtering work?</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! As described in the API documentation, the [`Filter`] trait defines a</span>
-<span class="doccomment">//! filtering strategy for a per-layer filter. We expect there will be a variety</span>
-<span class="doccomment">//! of implementations of [`Filter`], both in `tracing-subscriber` and in user</span>
-<span class="doccomment">//! code.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To actually *use* a [`Filter`] implementation, it is combined with a</span>
-<span class="doccomment">//! [`Layer`] by the [`Filtered`] struct defined in this module. [`Filtered`]</span>
-<span class="doccomment">//! implements [`Layer`] by calling into the wrapped [`Layer`], or not, based on</span>
-<span class="doccomment">//! the filtering strategy. While there will be a variety of types that implement</span>
-<span class="doccomment">//! [`Filter`], all actual *uses* of per-layer filtering will occur through the</span>
-<span class="doccomment">//! [`Filtered`] struct. Therefore, most of the implementation details live</span>
-<span class="doccomment">//! there.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [1]: crate::layer#per-layer-filtering</span>
-<span class="doccomment">//! [`Filter`]: crate::layer::Filter</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">filter::LevelFilter</span>,
-    <span class="ident">layer</span>::{<span class="self">self</span>, <span class="ident">Context</span>, <span class="ident">Layer</span>},
-    <span class="ident">registry</span>,
+</pre><pre class="rust"><code><span class="doccomment">//! ## Per-Layer Filtering
+//!
+//! Per-layer filters permit individual `Layer`s to have their own filter
+//! configurations without interfering with other `Layer`s.
+//!
+//! This module is not public; the public APIs defined in this module are
+//! re-exported in the top-level `filter` module. Therefore, this documentation
+//! primarily concerns the internal implementation details. For the user-facing
+//! public API documentation, see the individual public types in this module, as
+//! well as the, see the `Layer` trait documentation&#39;s [per-layer filtering
+//! section]][1].
+//!
+//! ## How does per-layer filtering work?
+//!
+//! As described in the API documentation, the [`Filter`] trait defines a
+//! filtering strategy for a per-layer filter. We expect there will be a variety
+//! of implementations of [`Filter`], both in `tracing-subscriber` and in user
+//! code.
+//!
+//! To actually *use* a [`Filter`] implementation, it is combined with a
+//! [`Layer`] by the [`Filtered`] struct defined in this module. [`Filtered`]
+//! implements [`Layer`] by calling into the wrapped [`Layer`], or not, based on
+//! the filtering strategy. While there will be a variety of types that implement
+//! [`Filter`], all actual *uses* of per-layer filtering will occur through the
+//! [`Filtered`] struct. Therefore, most of the implementation details live
+//! there.
+//!
+//! [1]: crate::layer#per-layer-filtering
+//! [`Filter`]: crate::layer::Filter
+</span><span class="kw">use crate</span>::{
+    filter::LevelFilter,
+    layer::{<span class="self">self</span>, Context, Layer},
+    registry,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">any::TypeId</span>,
-    <span class="ident">cell</span>::{<span class="ident">Cell</span>, <span class="ident">RefCell</span>},
-    <span class="ident">fmt</span>,
-    <span class="ident">marker::PhantomData</span>,
-    <span class="ident">ops::Deref</span>,
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">thread_local</span>,
+<span class="kw">use </span>std::{
+    any::TypeId,
+    cell::{Cell, RefCell},
+    fmt,
+    marker::PhantomData,
+    ops::Deref,
+    sync::Arc,
+    thread_local,
 };
-<span class="kw">use</span> <span class="ident">tracing_core</span>::{
-    <span class="ident">span</span>,
-    <span class="ident">subscriber</span>::{<span class="ident">Interest</span>, <span class="ident">Subscriber</span>},
-    <span class="ident">Event</span>, <span class="ident">Metadata</span>,
+<span class="kw">use </span>tracing_core::{
+    span,
+    subscriber::{Interest, Subscriber},
+    Event, Metadata,
 };
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">combinator</span>;
+<span class="kw">pub mod </span>combinator;
 
-<span class="doccomment">/// A [`Layer`] that wraps an inner [`Layer`] and adds a [`Filter`] which</span>
-<span class="doccomment">/// controls what spans and events are enabled for that layer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is returned by the [`Layer::with_filter`] method. See the</span>
-<span class="doccomment">/// [documentation on per-layer filtering][plf] for details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-<span class="doccomment">/// [plf]: crate::layer#per-layer-filtering</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Filtered</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">filter</span>: <span class="ident">F</span>,
-    <span class="ident">layer</span>: <span class="ident">L</span>,
-    <span class="ident">id</span>: <span class="ident">MagicPlfDowncastMarker</span>,
-    <span class="ident">_s</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">S</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// A [`Layer`] that wraps an inner [`Layer`] and adds a [`Filter`] which
+/// controls what spans and events are enabled for that layer.
+///
+/// This is returned by the [`Layer::with_filter`] method. See the
+/// [documentation on per-layer filtering][plf] for details.
+///
+/// [`Filter`]: crate::layer::Filter
+/// [plf]: crate::layer#per-layer-filtering
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;registry&quot;</span>)))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>Filtered&lt;L, F, S&gt; {
+    filter: F,
+    layer: L,
+    id: MagicPlfDowncastMarker,
+    _s: PhantomData&lt;<span class="kw">fn</span>(S)&gt;,
 }
 
-<span class="doccomment">/// Uniquely identifies an individual [`Filter`] instance in the context of</span>
-<span class="doccomment">/// a [`Subscriber`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When adding a [`Filtered`] [`Layer`] to a [`Subscriber`], the [`Subscriber`]</span>
-<span class="doccomment">/// generates a `FilterId` for that [`Filtered`] layer. The [`Filtered`] layer</span>
-<span class="doccomment">/// will then use the generated ID to query whether a particular span was</span>
-<span class="doccomment">/// previously enabled by that layer&#39;s [`Filter`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note**: Currently, the [`Registry`] type provided by this crate is the</span>
-<span class="doccomment">/// **only** [`Subscriber`] implementation capable of participating in per-layer</span>
-<span class="doccomment">/// filtering. Therefore, the `FilterId` type cannot currently be constructed by</span>
-<span class="doccomment">/// code outside of `tracing-subscriber`. In the future, new APIs will be added to `tracing-subscriber` to</span>
-<span class="doccomment">/// allow non-Registry [`Subscriber`]s to also participate in per-layer</span>
-<span class="doccomment">/// filtering. When those APIs are added, subscribers will be responsible</span>
-<span class="doccomment">/// for generating and assigning `FilterId`s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-<span class="doccomment">/// [`Subscriber`]: tracing_core::Subscriber</span>
-<span class="doccomment">/// [`Layer`]: crate::layer::Layer</span>
-<span class="doccomment">/// [`Registry`]: crate::registry::Registry</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FilterId</span>(<span class="ident">u64</span>);
+<span class="doccomment">/// Uniquely identifies an individual [`Filter`] instance in the context of
+/// a [`Subscriber`].
+///
+/// When adding a [`Filtered`] [`Layer`] to a [`Subscriber`], the [`Subscriber`]
+/// generates a `FilterId` for that [`Filtered`] layer. The [`Filtered`] layer
+/// will then use the generated ID to query whether a particular span was
+/// previously enabled by that layer&#39;s [`Filter`].
+///
+/// **Note**: Currently, the [`Registry`] type provided by this crate is the
+/// **only** [`Subscriber`] implementation capable of participating in per-layer
+/// filtering. Therefore, the `FilterId` type cannot currently be constructed by
+/// code outside of `tracing-subscriber`. In the future, new APIs will be added to `tracing-subscriber` to
+/// allow non-Registry [`Subscriber`]s to also participate in per-layer
+/// filtering. When those APIs are added, subscribers will be responsible
+/// for generating and assigning `FilterId`s.
+///
+/// [`Filter`]: crate::layer::Filter
+/// [`Subscriber`]: tracing_core::Subscriber
+/// [`Layer`]: crate::layer::Layer
+/// [`Registry`]: crate::registry::Registry
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;registry&quot;</span>)))]
+#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>FilterId(u64);
 
-<span class="doccomment">/// A bitmap tracking which [`FilterId`]s have enabled a given span or</span>
-<span class="doccomment">/// event.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is currently a private type that&#39;s used exclusively by the</span>
-<span class="doccomment">/// [`Registry`]. However, in the future, this may become a public API, in order</span>
-<span class="doccomment">/// to allow user subscribers to host [`Filter`]s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Registry`]: crate::Registry</span>
-<span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">FilterMap</span> {
-    <span class="ident">bits</span>: <span class="ident">u64</span>,
+<span class="doccomment">/// A bitmap tracking which [`FilterId`]s have enabled a given span or
+/// event.
+///
+/// This is currently a private type that&#39;s used exclusively by the
+/// [`Registry`]. However, in the future, this may become a public API, in order
+/// to allow user subscribers to host [`Filter`]s.
+///
+/// [`Registry`]: crate::Registry
+/// [`Filter`]: crate::layer::Filter
+</span><span class="attribute">#[derive(Default, Copy, Clone, Eq, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>FilterMap {
+    bits: u64,
 }
 
-<span class="doccomment">/// The current state of `enabled` calls to per-layer filters on this</span>
-<span class="doccomment">/// thread.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When `Filtered::enabled` is called, the filter will set the bit</span>
-<span class="doccomment">/// corresponding to its ID if the filter will disable the event/span being</span>
-<span class="doccomment">/// filtered. When the event or span is recorded, the per-layer filter will</span>
-<span class="doccomment">/// check its bit to determine if it disabled that event or span, and skip</span>
-<span class="doccomment">/// forwarding the event or span to the inner layer if the bit is set. Once</span>
-<span class="doccomment">/// a span or event has been skipped by a per-layer filter, it unsets its</span>
-<span class="doccomment">/// bit, so that the `FilterMap` has been cleared for the next set of</span>
-<span class="doccomment">/// `enabled` calls.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// FilterState is also read by the `Registry`, for two reasons:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 1. When filtering a span, the Registry must store the `FilterMap`</span>
-<span class="doccomment">///    generated by `Filtered::enabled` calls for that span as part of the</span>
-<span class="doccomment">///    span&#39;s per-span data. This allows `Filtered` layers to determine</span>
-<span class="doccomment">///    whether they had previously disabled a given span, and avoid showing it</span>
-<span class="doccomment">///    to the wrapped layer if it was disabled.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    This allows `Filtered` layers to also filter out the spans they</span>
-<span class="doccomment">///    disable from span traversals (such as iterating over parents, etc).</span>
-<span class="doccomment">/// 2. If all the bits are set, then every per-layer filter has decided it</span>
-<span class="doccomment">///    doesn&#39;t want to enable that span or event. In that case, the</span>
-<span class="doccomment">///    `Registry`&#39;s `enabled` method will return `false`, so that</span>
-<span class="doccomment">///     recording a span or event can be skipped entirely.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">FilterState</span> {
-    <span class="ident">enabled</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">FilterMap</span><span class="op">&gt;</span>,
-    <span class="comment">// TODO(eliza): `Interest`s should _probably_ be `Copy`. The only reason</span>
-    <span class="comment">// they&#39;re not is our Obsessive Commitment to Forwards-Compatibility. If</span>
-    <span class="comment">// this changes in tracing-core`, we can make this a `Cell` rather than</span>
-    <span class="comment">// `RefCell`...</span>
-    <span class="ident">interest</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Interest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The current state of `enabled` calls to per-layer filters on this
+/// thread.
+///
+/// When `Filtered::enabled` is called, the filter will set the bit
+/// corresponding to its ID if the filter will disable the event/span being
+/// filtered. When the event or span is recorded, the per-layer filter will
+/// check its bit to determine if it disabled that event or span, and skip
+/// forwarding the event or span to the inner layer if the bit is set. Once
+/// a span or event has been skipped by a per-layer filter, it unsets its
+/// bit, so that the `FilterMap` has been cleared for the next set of
+/// `enabled` calls.
+///
+/// FilterState is also read by the `Registry`, for two reasons:
+///
+/// 1. When filtering a span, the Registry must store the `FilterMap`
+///    generated by `Filtered::enabled` calls for that span as part of the
+///    span&#39;s per-span data. This allows `Filtered` layers to determine
+///    whether they had previously disabled a given span, and avoid showing it
+///    to the wrapped layer if it was disabled.
+///
+///    This allows `Filtered` layers to also filter out the spans they
+///    disable from span traversals (such as iterating over parents, etc).
+/// 2. If all the bits are set, then every per-layer filter has decided it
+///    doesn&#39;t want to enable that span or event. In that case, the
+///    `Registry`&#39;s `enabled` method will return `false`, so that
+///     recording a span or event can be skipped entirely.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>FilterState {
+    enabled: Cell&lt;FilterMap&gt;,
+    <span class="comment">// TODO(eliza): `Interest`s should _probably_ be `Copy`. The only reason
+    // they&#39;re not is our Obsessive Commitment to Forwards-Compatibility. If
+    // this changes in tracing-core`, we can make this a `Cell` rather than
+    // `RefCell`...
+    </span>interest: RefCell&lt;<span class="prelude-ty">Option</span>&lt;Interest&gt;&gt;,
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-    <span class="ident">counters</span>: <span class="ident">DebugCounters</span>,
+    <span class="attribute">#[cfg(debug_assertions)]
+    </span>counters: DebugCounters,
 }
 
-<span class="doccomment">/// Extra counters added to `FilterState` used only to make debug assertions.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">struct</span> <span class="ident">DebugCounters</span> {
-    <span class="doccomment">/// How many per-layer filters have participated in the current `enabled`</span>
-    <span class="doccomment">/// call?</span>
-    <span class="ident">in_filter_pass</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Extra counters added to `FilterState` used only to make debug assertions.
+</span><span class="attribute">#[cfg(debug_assertions)]
+#[derive(Debug, Default)]
+</span><span class="kw">struct </span>DebugCounters {
+    <span class="doccomment">/// How many per-layer filters have participated in the current `enabled`
+    /// call?
+    </span>in_filter_pass: Cell&lt;usize&gt;,
 
-    <span class="doccomment">/// How many per-layer filters have participated in the current `register_callsite`</span>
-    <span class="doccomment">/// call?</span>
-    <span class="ident">in_interest_pass</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// How many per-layer filters have participated in the current `register_callsite`
+    /// call?
+    </span>in_interest_pass: Cell&lt;usize&gt;,
 }
 
-<span class="macro">thread_local!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static</span> <span class="ident">FILTERING</span>: <span class="ident">FilterState</span> <span class="op">=</span> <span class="ident">FilterState::new</span>();
+<span class="macro">thread_local! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span>FILTERING: FilterState = FilterState::new();
 }
 
-<span class="doccomment">/// Extension trait adding [combinators] for combining [`Filter`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [combinators]: crate::filter::combinator</span>
-<span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FilterExt</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Combines this [`Filter`] with another [`Filter`] s so that spans and</span>
-    <span class="doccomment">/// events are enabled if and only if *both* filters return `true`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Enabling spans or events if they have both a particular target *and* are</span>
-    <span class="doccomment">/// above a certain level:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::{</span>
-    <span class="doccomment">///     filter::{filter_fn, LevelFilter, FilterExt},</span>
-    <span class="doccomment">///     prelude::*,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Enables spans and events with targets starting with `interesting_target`:</span>
-    <span class="doccomment">/// let target_filter = filter_fn(|meta| {</span>
-    <span class="doccomment">///     meta.target().starts_with(&quot;interesting_target&quot;)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Enables spans and events with levels `INFO` and below:</span>
-    <span class="doccomment">/// let level_filter = LevelFilter::INFO;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Combine the two filters together, returning a filter that only enables</span>
-    <span class="doccomment">/// // spans and events that *both* filters will enable:</span>
-    <span class="doccomment">/// let filter = target_filter.and(level_filter);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// tracing_subscriber::registry()</span>
-    <span class="doccomment">///     .with(tracing_subscriber::fmt::layer().with_filter(filter))</span>
-    <span class="doccomment">///     .init();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event will *not* be enabled:</span>
-    <span class="doccomment">/// tracing::info!(&quot;an event with an uninteresting target&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event *will* be enabled:</span>
-    <span class="doccomment">/// tracing::info!(target: &quot;interesting_target&quot;, &quot;a very interesting event&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event will *not* be enabled:</span>
-    <span class="doccomment">/// tracing::debug!(target: &quot;interesting_target&quot;, &quot;interesting debug event...&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-    <span class="kw">fn</span> <span class="ident">and</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">B</span>) -&gt; <span class="ident">combinator::And</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">B</span>: <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Extension trait adding [combinators] for combining [`Filter`].
+///
+/// [combinators]: crate::filter::combinator
+/// [`Filter`]: crate::layer::Filter
+</span><span class="kw">pub trait </span>FilterExt&lt;S&gt;: layer::Filter&lt;S&gt; {
+    <span class="doccomment">/// Combines this [`Filter`] with another [`Filter`] s so that spans and
+    /// events are enabled if and only if *both* filters return `true`.
+    ///
+    /// # Examples
+    ///
+    /// Enabling spans or events if they have both a particular target *and* are
+    /// above a certain level:
+    ///
+    /// ```
+    /// use tracing_subscriber::{
+    ///     filter::{filter_fn, LevelFilter, FilterExt},
+    ///     prelude::*,
+    /// };
+    ///
+    /// // Enables spans and events with targets starting with `interesting_target`:
+    /// let target_filter = filter_fn(|meta| {
+    ///     meta.target().starts_with(&quot;interesting_target&quot;)
+    /// });
+    ///
+    /// // Enables spans and events with levels `INFO` and below:
+    /// let level_filter = LevelFilter::INFO;
+    ///
+    /// // Combine the two filters together, returning a filter that only enables
+    /// // spans and events that *both* filters will enable:
+    /// let filter = target_filter.and(level_filter);
+    ///
+    /// tracing_subscriber::registry()
+    ///     .with(tracing_subscriber::fmt::layer().with_filter(filter))
+    ///     .init();
+    ///
+    /// // This event will *not* be enabled:
+    /// tracing::info!(&quot;an event with an uninteresting target&quot;);
+    ///
+    /// // This event *will* be enabled:
+    /// tracing::info!(target: &quot;interesting_target&quot;, &quot;a very interesting event&quot;);
+    ///
+    /// // This event will *not* be enabled:
+    /// tracing::debug!(target: &quot;interesting_target&quot;, &quot;interesting debug event...&quot;);
+    /// ```
+    ///
+    /// [`Filter`]: crate::layer::Filter
+    </span><span class="kw">fn </span>and&lt;B&gt;(<span class="self">self</span>, other: B) -&gt; combinator::And&lt;<span class="self">Self</span>, B, S&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        B: layer::Filter&lt;S&gt;,
     {
-        <span class="ident">combinator::And::new</span>(<span class="self">self</span>, <span class="ident">other</span>)
+        combinator::And::new(<span class="self">self</span>, other)
     }
 
-    <span class="doccomment">/// Combines two [`Filter`]s so that spans and events are enabled if *either* filter</span>
-    <span class="doccomment">/// returns `true`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Enabling spans and events at the `INFO` level and above, and all spans</span>
-    <span class="doccomment">/// and events with a particular target:</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::{</span>
-    <span class="doccomment">///     filter::{filter_fn, LevelFilter, FilterExt},</span>
-    <span class="doccomment">///     prelude::*,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Enables spans and events with targets starting with `interesting_target`:</span>
-    <span class="doccomment">/// let target_filter = filter_fn(|meta| {</span>
-    <span class="doccomment">///     meta.target().starts_with(&quot;interesting_target&quot;)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Enables spans and events with levels `INFO` and below:</span>
-    <span class="doccomment">/// let level_filter = LevelFilter::INFO;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Combine the two filters together so that a span or event is enabled</span>
-    <span class="doccomment">/// // if it is at INFO or lower, or if it has a target starting with</span>
-    <span class="doccomment">/// // `interesting_target`.</span>
-    <span class="doccomment">/// let filter = level_filter.or(target_filter);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// tracing_subscriber::registry()</span>
-    <span class="doccomment">///     .with(tracing_subscriber::fmt::layer().with_filter(filter))</span>
-    <span class="doccomment">///     .init();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event will *not* be enabled:</span>
-    <span class="doccomment">/// tracing::debug!(&quot;an uninteresting event&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event *will* be enabled:</span>
-    <span class="doccomment">/// tracing::info!(&quot;an uninteresting INFO event&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event *will* be enabled:</span>
-    <span class="doccomment">/// tracing::info!(target: &quot;interesting_target&quot;, &quot;a very interesting event&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event *will* be enabled:</span>
-    <span class="doccomment">/// tracing::debug!(target: &quot;interesting_target&quot;, &quot;interesting debug event...&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Enabling a higher level for a particular target by using `or` in</span>
-    <span class="doccomment">/// conjunction with the [`and`] combinator:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::{</span>
-    <span class="doccomment">///     filter::{filter_fn, LevelFilter, FilterExt},</span>
-    <span class="doccomment">///     prelude::*,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This filter will enable spans and events with targets beginning with</span>
-    <span class="doccomment">/// // `my_crate`:</span>
-    <span class="doccomment">/// let my_crate = filter_fn(|meta| {</span>
-    <span class="doccomment">///     meta.target().starts_with(&quot;my_crate&quot;)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = my_crate</span>
-    <span class="doccomment">///     // Combine the `my_crate` filter with a `LevelFilter` to produce a</span>
-    <span class="doccomment">///     // filter that will enable the `INFO` level and lower for spans and</span>
-    <span class="doccomment">///     // events with `my_crate` targets:</span>
-    <span class="doccomment">///     .and(LevelFilter::INFO)</span>
-    <span class="doccomment">///     // If a span or event *doesn&#39;t* have a target beginning with</span>
-    <span class="doccomment">///     // `my_crate`, enable it if it has the `WARN` level or lower:</span>
-    <span class="doccomment">///     .or(LevelFilter::WARN);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// tracing_subscriber::registry()</span>
-    <span class="doccomment">///     .with(tracing_subscriber::fmt::layer().with_filter(filter))</span>
-    <span class="doccomment">///     .init();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-    <span class="doccomment">/// [`and`]: FilterExt::and</span>
-    <span class="kw">fn</span> <span class="ident">or</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">B</span>) -&gt; <span class="ident">combinator::Or</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">B</span>: <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Combines two [`Filter`]s so that spans and events are enabled if *either* filter
+    /// returns `true`.
+    ///
+    /// # Examples
+    ///
+    /// Enabling spans and events at the `INFO` level and above, and all spans
+    /// and events with a particular target:
+    /// ```
+    /// use tracing_subscriber::{
+    ///     filter::{filter_fn, LevelFilter, FilterExt},
+    ///     prelude::*,
+    /// };
+    ///
+    /// // Enables spans and events with targets starting with `interesting_target`:
+    /// let target_filter = filter_fn(|meta| {
+    ///     meta.target().starts_with(&quot;interesting_target&quot;)
+    /// });
+    ///
+    /// // Enables spans and events with levels `INFO` and below:
+    /// let level_filter = LevelFilter::INFO;
+    ///
+    /// // Combine the two filters together so that a span or event is enabled
+    /// // if it is at INFO or lower, or if it has a target starting with
+    /// // `interesting_target`.
+    /// let filter = level_filter.or(target_filter);
+    ///
+    /// tracing_subscriber::registry()
+    ///     .with(tracing_subscriber::fmt::layer().with_filter(filter))
+    ///     .init();
+    ///
+    /// // This event will *not* be enabled:
+    /// tracing::debug!(&quot;an uninteresting event&quot;);
+    ///
+    /// // This event *will* be enabled:
+    /// tracing::info!(&quot;an uninteresting INFO event&quot;);
+    ///
+    /// // This event *will* be enabled:
+    /// tracing::info!(target: &quot;interesting_target&quot;, &quot;a very interesting event&quot;);
+    ///
+    /// // This event *will* be enabled:
+    /// tracing::debug!(target: &quot;interesting_target&quot;, &quot;interesting debug event...&quot;);
+    /// ```
+    ///
+    /// Enabling a higher level for a particular target by using `or` in
+    /// conjunction with the [`and`] combinator:
+    ///
+    /// ```
+    /// use tracing_subscriber::{
+    ///     filter::{filter_fn, LevelFilter, FilterExt},
+    ///     prelude::*,
+    /// };
+    ///
+    /// // This filter will enable spans and events with targets beginning with
+    /// // `my_crate`:
+    /// let my_crate = filter_fn(|meta| {
+    ///     meta.target().starts_with(&quot;my_crate&quot;)
+    /// });
+    ///
+    /// let filter = my_crate
+    ///     // Combine the `my_crate` filter with a `LevelFilter` to produce a
+    ///     // filter that will enable the `INFO` level and lower for spans and
+    ///     // events with `my_crate` targets:
+    ///     .and(LevelFilter::INFO)
+    ///     // If a span or event *doesn&#39;t* have a target beginning with
+    ///     // `my_crate`, enable it if it has the `WARN` level or lower:
+    ///     .or(LevelFilter::WARN);
+    ///
+    /// tracing_subscriber::registry()
+    ///     .with(tracing_subscriber::fmt::layer().with_filter(filter))
+    ///     .init();
+    /// ```
+    ///
+    /// [`Filter`]: crate::layer::Filter
+    /// [`and`]: FilterExt::and
+    </span><span class="kw">fn </span>or&lt;B&gt;(<span class="self">self</span>, other: B) -&gt; combinator::Or&lt;<span class="self">Self</span>, B, S&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        B: layer::Filter&lt;S&gt;,
     {
-        <span class="ident">combinator::Or::new</span>(<span class="self">self</span>, <span class="ident">other</span>)
+        combinator::Or::new(<span class="self">self</span>, other)
     }
 
-    <span class="doccomment">/// Inverts `self`, returning a filter that enables spans and events only if</span>
-    <span class="doccomment">/// `self` would *not* enable them.</span>
-    <span class="kw">fn</span> <span class="ident">not</span>(<span class="self">self</span>) -&gt; <span class="ident">combinator::Not</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Inverts `self`, returning a filter that enables spans and events only if
+    /// `self` would *not* enable them.
+    </span><span class="kw">fn </span>not(<span class="self">self</span>) -&gt; combinator::Not&lt;<span class="self">Self</span>, S&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">combinator::Not::new</span>(<span class="self">self</span>)
+        combinator::Not::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// [Boxes] `self`, erasing its concrete type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to calling [`Box::new`], but in method form, so that</span>
-    <span class="doccomment">/// it can be used when chaining combinator methods.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When different combinations of filters are used conditionally, they may</span>
-    <span class="doccomment">/// have different types. For example, the following code won&#39;t compile,</span>
-    <span class="doccomment">/// since the `if` and `else` clause produce filters of different types:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```compile_fail</span>
-    <span class="doccomment">/// use tracing_subscriber::{</span>
-    <span class="doccomment">///     filter::{filter_fn, LevelFilter, FilterExt},</span>
-    <span class="doccomment">///     prelude::*,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let enable_bar_target: bool = // ...</span>
-    <span class="doccomment">/// # false;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = if enable_bar_target {</span>
-    <span class="doccomment">///     filter_fn(|meta| meta.target().starts_with(&quot;foo&quot;))</span>
-    <span class="doccomment">///         // If `enable_bar_target` is true, add a `filter_fn` enabling</span>
-    <span class="doccomment">///         // spans and events with the target `bar`:</span>
-    <span class="doccomment">///         .or(filter_fn(|meta| meta.target().starts_with(&quot;bar&quot;)))</span>
-    <span class="doccomment">///         .and(LevelFilter::INFO)</span>
-    <span class="doccomment">/// } else {</span>
-    <span class="doccomment">///     filter_fn(|meta| meta.target().starts_with(&quot;foo&quot;))</span>
-    <span class="doccomment">///         .and(LevelFilter::INFO)</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// tracing_subscriber::registry()</span>
-    <span class="doccomment">///     .with(tracing_subscriber::fmt::layer().with_filter(filter))</span>
-    <span class="doccomment">///     .init();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By using `boxed`, the types of the two different branches can be erased,</span>
-    <span class="doccomment">/// so the assignment to the `filter` variable is valid (as both branches</span>
-    <span class="doccomment">/// have the type `Box&lt;dyn Filter&lt;S&gt; + Send + Sync + &#39;static&gt;`). The</span>
-    <span class="doccomment">/// following code *does* compile:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::{</span>
-    <span class="doccomment">///     filter::{filter_fn, LevelFilter, FilterExt},</span>
-    <span class="doccomment">///     prelude::*,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let enable_bar_target: bool = // ...</span>
-    <span class="doccomment">/// # false;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = if enable_bar_target {</span>
-    <span class="doccomment">///     filter_fn(|meta| meta.target().starts_with(&quot;foo&quot;))</span>
-    <span class="doccomment">///         .or(filter_fn(|meta| meta.target().starts_with(&quot;bar&quot;)))</span>
-    <span class="doccomment">///         .and(LevelFilter::INFO)</span>
-    <span class="doccomment">///         // Boxing the filter erases its type, so both branches now</span>
-    <span class="doccomment">///         // have the same type.</span>
-    <span class="doccomment">///         .boxed()</span>
-    <span class="doccomment">/// } else {</span>
-    <span class="doccomment">///     filter_fn(|meta| meta.target().starts_with(&quot;foo&quot;))</span>
-    <span class="doccomment">///         .and(LevelFilter::INFO)</span>
-    <span class="doccomment">///         .boxed()</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// tracing_subscriber::registry()</span>
-    <span class="doccomment">///     .with(tracing_subscriber::fmt::layer().with_filter(filter))</span>
-    <span class="doccomment">///     .init();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Boxes]: std::boxed</span>
-    <span class="doccomment">/// [`Box::new`]: std::boxed::Box::new</span>
-    <span class="kw">fn</span> <span class="ident">boxed</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// [Boxes] `self`, erasing its concrete type.
+    ///
+    /// This is equivalent to calling [`Box::new`], but in method form, so that
+    /// it can be used when chaining combinator methods.
+    ///
+    /// # Examples
+    ///
+    /// When different combinations of filters are used conditionally, they may
+    /// have different types. For example, the following code won&#39;t compile,
+    /// since the `if` and `else` clause produce filters of different types:
+    ///
+    /// ```compile_fail
+    /// use tracing_subscriber::{
+    ///     filter::{filter_fn, LevelFilter, FilterExt},
+    ///     prelude::*,
+    /// };
+    ///
+    /// let enable_bar_target: bool = // ...
+    /// # false;
+    ///
+    /// let filter = if enable_bar_target {
+    ///     filter_fn(|meta| meta.target().starts_with(&quot;foo&quot;))
+    ///         // If `enable_bar_target` is true, add a `filter_fn` enabling
+    ///         // spans and events with the target `bar`:
+    ///         .or(filter_fn(|meta| meta.target().starts_with(&quot;bar&quot;)))
+    ///         .and(LevelFilter::INFO)
+    /// } else {
+    ///     filter_fn(|meta| meta.target().starts_with(&quot;foo&quot;))
+    ///         .and(LevelFilter::INFO)
+    /// };
+    ///
+    /// tracing_subscriber::registry()
+    ///     .with(tracing_subscriber::fmt::layer().with_filter(filter))
+    ///     .init();
+    /// ```
+    ///
+    /// By using `boxed`, the types of the two different branches can be erased,
+    /// so the assignment to the `filter` variable is valid (as both branches
+    /// have the type `Box&lt;dyn Filter&lt;S&gt; + Send + Sync + &#39;static&gt;`). The
+    /// following code *does* compile:
+    ///
+    /// ```
+    /// use tracing_subscriber::{
+    ///     filter::{filter_fn, LevelFilter, FilterExt},
+    ///     prelude::*,
+    /// };
+    ///
+    /// let enable_bar_target: bool = // ...
+    /// # false;
+    ///
+    /// let filter = if enable_bar_target {
+    ///     filter_fn(|meta| meta.target().starts_with(&quot;foo&quot;))
+    ///         .or(filter_fn(|meta| meta.target().starts_with(&quot;bar&quot;)))
+    ///         .and(LevelFilter::INFO)
+    ///         // Boxing the filter erases its type, so both branches now
+    ///         // have the same type.
+    ///         .boxed()
+    /// } else {
+    ///     filter_fn(|meta| meta.target().starts_with(&quot;foo&quot;))
+    ///         .and(LevelFilter::INFO)
+    ///         .boxed()
+    /// };
+    ///
+    /// tracing_subscriber::registry()
+    ///     .with(tracing_subscriber::fmt::layer().with_filter(filter))
+    ///     .init();
+    /// ```
+    ///
+    /// [Boxes]: std::boxed
+    /// [`Box::new`]: std::boxed::Box::new
+    </span><span class="kw">fn </span>boxed(<span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>layer::Filter&lt;S&gt; + Send + Sync + <span class="lifetime">&#39;static</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">Box::new</span>(<span class="self">self</span>)
+        Box::new(<span class="self">self</span>)
     }
 }
 
-<span class="comment">// === impl Filter ===</span>
+<span class="comment">// === impl Filter ===
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LevelFilter</span> {
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">meta</span>.<span class="ident">level</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>
-    }
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;registry&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;S&gt; layer::Filter&lt;S&gt; <span class="kw">for </span>LevelFilter {
+    <span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        meta.level() &lt;= <span class="self">self
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="kw">if</span> <span class="ident">meta</span>.<span class="ident">level</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span> {
-            <span class="ident">Interest::always</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">Interest::never</span>()
+    <span class="kw">fn </span>callsite_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="kw">if </span>meta.level() &lt;= <span class="self">self </span>{
+            Interest::always()
+        } <span class="kw">else </span>{
+            Interest::never()
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
         <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">filter_impl_body</span> {
+<span class="macro">macro_rules! </span>filter_impl_body {
     () =&gt; {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">enabled</span>(<span class="ident">meta</span>, <span class="ident">cx</span>)
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, cx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+            <span class="self">self</span>.deref().enabled(meta, cx)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">callsite_enabled</span>(<span class="ident">meta</span>)
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>callsite_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+            <span class="self">self</span>.deref().callsite_enabled(meta)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">max_level_hint</span>()
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+            <span class="self">self</span>.deref().max_level_hint()
         }
     };
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+<span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;registry&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;S&gt; layer::Filter&lt;S&gt; <span class="kw">for </span>Arc&lt;<span class="kw">dyn </span>layer::Filter&lt;S&gt; + Send + Sync + <span class="lifetime">&#39;static</span>&gt; {
     <span class="macro">filter_impl_body!</span>();
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+<span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;registry&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;S&gt; layer::Filter&lt;S&gt; <span class="kw">for </span>Box&lt;<span class="kw">dyn </span>layer::Filter&lt;S&gt; + Send + Sync + <span class="lifetime">&#39;static</span>&gt; {
     <span class="macro">filter_impl_body!</span>();
 }
 
-<span class="comment">// === impl Filtered ===</span>
+<span class="comment">// === impl Filtered ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Filtered</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Wraps the provided [`Layer`] so that it is filtered by the given</span>
-    <span class="doccomment">/// [`Filter`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to calling the [`Layer::with_filter`] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the [documentation on per-layer filtering][plf] for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-    <span class="doccomment">/// [plf]: crate::layer#per-layer-filtering</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">layer</span>: <span class="ident">L</span>, <span class="ident">filter</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">layer</span>,
-            <span class="ident">filter</span>,
-            <span class="ident">id</span>: <span class="ident">MagicPlfDowncastMarker</span>(<span class="ident">FilterId::disabled</span>()),
-            <span class="ident">_s</span>: <span class="ident">PhantomData</span>,
+</span><span class="kw">impl</span>&lt;L, F, S&gt; Filtered&lt;L, F, S&gt; {
+    <span class="doccomment">/// Wraps the provided [`Layer`] so that it is filtered by the given
+    /// [`Filter`].
+    ///
+    /// This is equivalent to calling the [`Layer::with_filter`] method.
+    ///
+    /// See the [documentation on per-layer filtering][plf] for details.
+    ///
+    /// [`Filter`]: crate::layer::Filter
+    /// [plf]: crate::layer#per-layer-filtering
+    </span><span class="kw">pub fn </span>new(layer: L, filter: F) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            layer,
+            filter,
+            id: MagicPlfDowncastMarker(FilterId::disabled()),
+            _s: PhantomData,
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FilterId</span> {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FilterId {
         <span class="macro">debug_assert!</span>(
-            <span class="op">!</span><span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>.<span class="ident">is_disabled</span>(),
+            !<span class="self">self</span>.id.<span class="number">0</span>.is_disabled(),
             <span class="string">&quot;a `Filtered` layer was used, but it had no `FilterId`; \
-            was it registered with the subscriber?&quot;</span>
-        );
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>
+            was it registered with the subscriber?&quot;
+        </span>);
+        <span class="self">self</span>.id.<span class="number">0
+    </span>}
+
+    <span class="kw">fn </span>did_enable(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce()) {
+        FILTERING.with(|filtering| filtering.did_enable(<span class="self">self</span>.id(), f))
     }
 
-    <span class="kw">fn</span> <span class="ident">did_enable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>()) {
-        <span class="ident">FILTERING</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">filtering</span><span class="op">|</span> <span class="ident">filtering</span>.<span class="ident">did_enable</span>(<span class="self">self</span>.<span class="ident">id</span>(), <span class="ident">f</span>))
+    <span class="doccomment">/// Borrows the [`Filter`](crate::layer::Filter) used by this layer.
+    </span><span class="kw">pub fn </span>filter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>F {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.filter
     }
 
-    <span class="doccomment">/// Borrows the [`Filter`](crate::layer::Filter) used by this layer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">F</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span>
+    <span class="doccomment">/// Mutably borrows the [`Filter`](crate::layer::Filter) used by this layer.
+    ///
+    /// When this layer can be mutably borrowed, this may be used to mutate the filter.
+    /// Generally, this will primarily be used with the
+    /// [`reload::Handle::modify`](crate::reload::Handle::modify) method.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tracing::info;
+    /// # use tracing_subscriber::{filter,fmt,reload,Registry,prelude::*};
+    /// # fn main() {
+    /// let filtered_layer = fmt::Layer::default().with_filter(filter::LevelFilter::WARN);
+    /// let (filtered_layer, reload_handle) = reload::Layer::new(filtered_layer);
+    /// #
+    /// # // specifying the Registry type is required
+    /// # let _: &amp;reload::Handle&lt;filter::Filtered&lt;fmt::Layer&lt;Registry&gt;,
+    /// # filter::LevelFilter, Registry&gt;,Registry&gt;
+    /// # = &amp;reload_handle;
+    /// #
+    /// info!(&quot;This will be ignored&quot;);
+    /// reload_handle.modify(|layer| *layer.filter_mut() = filter::LevelFilter::INFO);
+    /// info!(&quot;This will be logged&quot;);
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>filter_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>F {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.filter
     }
 
-    <span class="doccomment">/// Mutably borrows the [`Filter`](crate::layer::Filter) used by this layer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When this layer can be mutably borrowed, this may be used to mutate the filter.</span>
-    <span class="doccomment">/// Generally, this will primarily be used with the</span>
-    <span class="doccomment">/// [`reload::Handle::modify`](crate::reload::Handle::modify) method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tracing::info;</span>
-    <span class="doccomment">/// # use tracing_subscriber::{filter,fmt,reload,Registry,prelude::*};</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let filtered_layer = fmt::Layer::default().with_filter(filter::LevelFilter::WARN);</span>
-    <span class="doccomment">/// let (filtered_layer, reload_handle) = reload::Layer::new(filtered_layer);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # // specifying the Registry type is required</span>
-    <span class="doccomment">/// # let _: &amp;reload::Handle&lt;filter::Filtered&lt;fmt::Layer&lt;Registry&gt;,</span>
-    <span class="doccomment">/// # filter::LevelFilter, Registry&gt;,Registry&gt;</span>
-    <span class="doccomment">/// # = &amp;reload_handle;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// info!(&quot;This will be ignored&quot;);</span>
-    <span class="doccomment">/// reload_handle.modify(|layer| *layer.filter_mut() = filter::LevelFilter::INFO);</span>
-    <span class="doccomment">/// info!(&quot;This will be logged&quot;);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">F</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">filter</span>
+    <span class="doccomment">/// Borrows the inner [`Layer`] wrapped by this `Filtered` layer.
+    </span><span class="kw">pub fn </span>inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>L {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.layer
     }
 
-    <span class="doccomment">/// Borrows the inner [`Layer`] wrapped by this `Filtered` layer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">L</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">layer</span>
-    }
-
-    <span class="doccomment">/// Mutably borrows the inner [`Layer`] wrapped by this `Filtered` layer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is primarily expected to be used with the</span>
-    <span class="doccomment">/// [`reload::Handle::modify`](crate::reload::Handle::modify) method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tracing::info;</span>
-    <span class="doccomment">/// # use tracing_subscriber::{filter,fmt,reload,Registry,prelude::*};</span>
-    <span class="doccomment">/// # fn non_blocking&lt;T: std::io::Write&gt;(writer: T) -&gt; (fn() -&gt; std::io::Stdout) {</span>
-    <span class="doccomment">/// #   std::io::stdout</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let filtered_layer = fmt::layer().with_writer(non_blocking(std::io::stderr())).with_filter(filter::LevelFilter::INFO);</span>
-    <span class="doccomment">/// let (filtered_layer, reload_handle) = reload::Layer::new(filtered_layer);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # // specifying the Registry type is required</span>
-    <span class="doccomment">/// # let _: &amp;reload::Handle&lt;filter::Filtered&lt;fmt::Layer&lt;Registry, _, _, fn() -&gt; std::io::Stdout&gt;,</span>
-    <span class="doccomment">/// # filter::LevelFilter, Registry&gt;, _&gt;</span>
-    <span class="doccomment">/// # = &amp;reload_handle;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// info!(&quot;This will be logged to stderr&quot;);</span>
-    <span class="doccomment">/// reload_handle.modify(|layer| *layer.inner_mut().writer_mut() = non_blocking(std::io::stdout()));</span>
-    <span class="doccomment">/// info!(&quot;This will be logged to stdout&quot;);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [subscriber]: Subscribe</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">L</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">layer</span>
+    <span class="doccomment">/// Mutably borrows the inner [`Layer`] wrapped by this `Filtered` layer.
+    ///
+    /// This method is primarily expected to be used with the
+    /// [`reload::Handle::modify`](crate::reload::Handle::modify) method.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tracing::info;
+    /// # use tracing_subscriber::{filter,fmt,reload,Registry,prelude::*};
+    /// # fn non_blocking&lt;T: std::io::Write&gt;(writer: T) -&gt; (fn() -&gt; std::io::Stdout) {
+    /// #   std::io::stdout
+    /// # }
+    /// # fn main() {
+    /// let filtered_layer = fmt::layer().with_writer(non_blocking(std::io::stderr())).with_filter(filter::LevelFilter::INFO);
+    /// let (filtered_layer, reload_handle) = reload::Layer::new(filtered_layer);
+    /// #
+    /// # // specifying the Registry type is required
+    /// # let _: &amp;reload::Handle&lt;filter::Filtered&lt;fmt::Layer&lt;Registry, _, _, fn() -&gt; std::io::Stdout&gt;,
+    /// # filter::LevelFilter, Registry&gt;, _&gt;
+    /// # = &amp;reload_handle;
+    /// #
+    /// info!(&quot;This will be logged to stderr&quot;);
+    /// reload_handle.modify(|layer| *layer.inner_mut().writer_mut() = non_blocking(std::io::stdout()));
+    /// info!(&quot;This will be logged to stdout&quot;);
+    /// # }
+    /// ```
+    ///
+    /// [subscriber]: Subscribe
+    </span><span class="kw">pub fn </span>inner_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>L {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.layer
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Filtered</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span> <span class="ident">registry::LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">F</span>: <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L, F&gt; Layer&lt;S&gt; <span class="kw">for </span>Filtered&lt;L, F, S&gt;
+<span class="kw">where
+    </span>S: Subscriber + <span class="kw">for</span>&lt;<span class="lifetime">&#39;span</span>&gt; registry::LookupSpan&lt;<span class="lifetime">&#39;span</span>&gt; + <span class="lifetime">&#39;static</span>,
+    F: layer::Filter&lt;S&gt; + <span class="lifetime">&#39;static</span>,
+    L: Layer&lt;S&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">on_layer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">subscriber</span>: <span class="kw-2">&amp;mut</span> <span class="ident">S</span>) {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span> <span class="ident">MagicPlfDowncastMarker</span>(<span class="ident">subscriber</span>.<span class="ident">register_filter</span>());
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_layer</span>(<span class="ident">subscriber</span>);
+    <span class="kw">fn </span>on_layer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, subscriber: <span class="kw-2">&amp;mut </span>S) {
+        <span class="self">self</span>.id = MagicPlfDowncastMarker(subscriber.register_filter());
+        <span class="self">self</span>.layer.on_layer(subscriber);
     }
 
-    <span class="comment">// TODO(eliza): can we figure out a nice way to make the `Filtered` layer</span>
-    <span class="comment">// not call `is_enabled_for` in hooks that the inner layer doesn&#39;t actually</span>
-    <span class="comment">// have real implementations of? probably not...</span>
-    <span class="comment">//</span>
-    <span class="comment">// it would be cool if there was some wild rust reflection way of checking</span>
-    <span class="comment">// if a trait impl has the default impl of a trait method or not, but that&#39;s</span>
-    <span class="comment">// almsot certainly impossible...right?</span>
+    <span class="comment">// TODO(eliza): can we figure out a nice way to make the `Filtered` layer
+    // not call `is_enabled_for` in hooks that the inner layer doesn&#39;t actually
+    // have real implementations of? probably not...
+    //
+    // it would be cool if there was some wild rust reflection way of checking
+    // if a trait impl has the default impl of a trait method or not, but that&#39;s
+    // almsot certainly impossible...right?
 
-    <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="kw">let</span> <span class="ident">interest</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">callsite_enabled</span>(<span class="ident">metadata</span>);
+    </span><span class="kw">fn </span>register_callsite(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="kw">let </span>interest = <span class="self">self</span>.filter.callsite_enabled(metadata);
 
-        <span class="comment">// If the filter didn&#39;t disable the callsite, allow the inner layer to</span>
-        <span class="comment">// register it — since `register_callsite` is also used for purposes</span>
-        <span class="comment">// such as reserving/caching per-callsite data, we want the inner layer</span>
-        <span class="comment">// to be able to perform any other registration steps. However, we&#39;ll</span>
-        <span class="comment">// ignore its `Interest`.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">interest</span>.<span class="ident">is_never</span>() {
-            <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">register_callsite</span>(<span class="ident">metadata</span>);
+        <span class="comment">// If the filter didn&#39;t disable the callsite, allow the inner layer to
+        // register it — since `register_callsite` is also used for purposes
+        // such as reserving/caching per-callsite data, we want the inner layer
+        // to be able to perform any other registration steps. However, we&#39;ll
+        // ignore its `Interest`.
+        </span><span class="kw">if </span>!interest.is_never() {
+            <span class="self">self</span>.layer.register_callsite(metadata);
         }
 
-        <span class="comment">// Add our `Interest` to the current sum of per-layer filter `Interest`s</span>
-        <span class="comment">// for this callsite.</span>
-        <span class="ident">FILTERING</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">filtering</span><span class="op">|</span> <span class="ident">filtering</span>.<span class="ident">add_interest</span>(<span class="ident">interest</span>));
+        <span class="comment">// Add our `Interest` to the current sum of per-layer filter `Interest`s
+        // for this callsite.
+        </span>FILTERING.with(|filtering| filtering.add_interest(interest));
 
-        <span class="comment">// don&#39;t short circuit! if the stack consists entirely of `Layer`s with</span>
-        <span class="comment">// per-layer filters, the `Registry` will return the actual `Interest`</span>
-        <span class="comment">// value that&#39;s the sum of all the `register_callsite` calls to those</span>
-        <span class="comment">// per-layer filters. if we returned an actual `never` interest here, a</span>
-        <span class="comment">// `Layered` layer would short-circuit and not allow any `Filtered`</span>
-        <span class="comment">// layers below us if _they_ are interested in the callsite.</span>
-        <span class="ident">Interest::always</span>()
+        <span class="comment">// don&#39;t short circuit! if the stack consists entirely of `Layer`s with
+        // per-layer filters, the `Registry` will return the actual `Interest`
+        // value that&#39;s the sum of all the `register_callsite` calls to those
+        // per-layer filters. if we returned an actual `never` interest here, a
+        // `Layered` layer would short-circuit and not allow any `Filtered`
+        // layers below us if _they_ are interested in the callsite.
+        </span>Interest::always()
     }
 
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">with_filter</span>(<span class="self">self</span>.<span class="ident">id</span>());
-        <span class="kw">let</span> <span class="ident">enabled</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="kw-2">&amp;</span><span class="ident">cx</span>);
-        <span class="ident">FILTERING</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">filtering</span><span class="op">|</span> <span class="ident">filtering</span>.<span class="ident">set</span>(<span class="self">self</span>.<span class="ident">id</span>(), <span class="ident">enabled</span>));
+    <span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, cx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="kw">let </span>cx = cx.with_filter(<span class="self">self</span>.id());
+        <span class="kw">let </span>enabled = <span class="self">self</span>.filter.enabled(metadata, <span class="kw-2">&amp;</span>cx);
+        FILTERING.with(|filtering| filtering.set(<span class="self">self</span>.id(), enabled));
 
-        <span class="kw">if</span> <span class="ident">enabled</span> {
-            <span class="comment">// If the filter enabled this metadata, ask the wrapped layer if</span>
-            <span class="comment">// _it_ wants it --- it might have a global filter.</span>
-            <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="ident">cx</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// Otherwise, return `true`. The _per-layer_ filter disabled this</span>
-            <span class="comment">// metadata, but returning `false` in `Layer::enabled` will</span>
-            <span class="comment">// short-circuit and globally disable the span or event. This is</span>
-            <span class="comment">// *not* what we want for per-layer filters, as other layers may</span>
-            <span class="comment">// still want this event. Returning `true` here means we&#39;ll continue</span>
-            <span class="comment">// asking the next layer in the stack.</span>
-            <span class="comment">//</span>
-            <span class="comment">// Once all per-layer filters have been evaluated, the `Registry`</span>
-            <span class="comment">// at the root of the stack will return `false` from its `enabled`</span>
-            <span class="comment">// method if *every* per-layer  filter disabled this metadata.</span>
-            <span class="comment">// Otherwise, the individual per-layer filters will skip the next</span>
-            <span class="comment">// `new_span` or `on_event` call for their layer if *they* disabled</span>
-            <span class="comment">// the span or event, but it was not globally disabled.</span>
-            <span class="bool-val">true</span>
-        }
+        <span class="kw">if </span>enabled {
+            <span class="comment">// If the filter enabled this metadata, ask the wrapped layer if
+            // _it_ wants it --- it might have a global filter.
+            </span><span class="self">self</span>.layer.enabled(metadata, cx)
+        } <span class="kw">else </span>{
+            <span class="comment">// Otherwise, return `true`. The _per-layer_ filter disabled this
+            // metadata, but returning `false` in `Layer::enabled` will
+            // short-circuit and globally disable the span or event. This is
+            // *not* what we want for per-layer filters, as other layers may
+            // still want this event. Returning `true` here means we&#39;ll continue
+            // asking the next layer in the stack.
+            //
+            // Once all per-layer filters have been evaluated, the `Registry`
+            // at the root of the stack will return `false` from its `enabled`
+            // method if *every* per-layer  filter disabled this metadata.
+            // Otherwise, the individual per-layer filters will skip the next
+            // `new_span` or `on_event` call for their layer if *they* disabled
+            // the span or event, but it was not globally disabled.
+            </span><span class="bool-val">true
+        </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">did_enable</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">with_filter</span>(<span class="self">self</span>.<span class="ident">id</span>());
-            <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">cx</span>.<span class="ident">clone</span>());
-            <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">cx</span>);
+    <span class="kw">fn </span>on_new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>span::Attributes&lt;<span class="lifetime">&#39;_</span>&gt;, id: <span class="kw-2">&amp;</span>span::Id, cx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.did_enable(|| {
+            <span class="kw">let </span>cx = cx.with_filter(<span class="self">self</span>.id());
+            <span class="self">self</span>.filter.on_new_span(attrs, id, cx.clone());
+            <span class="self">self</span>.layer.on_new_span(attrs, id, cx);
         })
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">max_level_hint</span>()
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="self">self</span>.filter.max_level_hint()
     }
 
-    <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">if_enabled_for</span>(<span class="ident">span</span>, <span class="self">self</span>.<span class="ident">id</span>()) {
-            <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">on_record</span>(<span class="ident">span</span>, <span class="ident">values</span>, <span class="ident">cx</span>.<span class="ident">clone</span>());
-            <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_record</span>(<span class="ident">span</span>, <span class="ident">values</span>, <span class="ident">cx</span>)
+    <span class="kw">fn </span>on_record(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id, values: <span class="kw-2">&amp;</span>span::Record&lt;<span class="lifetime">&#39;_</span>&gt;, cx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(cx) = cx.if_enabled_for(span, <span class="self">self</span>.id()) {
+            <span class="self">self</span>.filter.on_record(span, values, cx.clone());
+            <span class="self">self</span>.layer.on_record(span, values, cx)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">on_follows_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">follows</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="comment">// only call `on_follows_from` if both spans are enabled by us</span>
-        <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">is_enabled_for</span>(<span class="ident">span</span>, <span class="self">self</span>.<span class="ident">id</span>()) <span class="op">&amp;&amp;</span> <span class="ident">cx</span>.<span class="ident">is_enabled_for</span>(<span class="ident">follows</span>, <span class="self">self</span>.<span class="ident">id</span>()) {
-            <span class="self">self</span>.<span class="ident">layer</span>
-                .<span class="ident">on_follows_from</span>(<span class="ident">span</span>, <span class="ident">follows</span>, <span class="ident">cx</span>.<span class="ident">with_filter</span>(<span class="self">self</span>.<span class="ident">id</span>()))
+    <span class="kw">fn </span>on_follows_from(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id, follows: <span class="kw-2">&amp;</span>span::Id, cx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="comment">// only call `on_follows_from` if both spans are enabled by us
+        </span><span class="kw">if </span>cx.is_enabled_for(span, <span class="self">self</span>.id()) &amp;&amp; cx.is_enabled_for(follows, <span class="self">self</span>.id()) {
+            <span class="self">self</span>.layer
+                .on_follows_from(span, follows, cx.with_filter(<span class="self">self</span>.id()))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">did_enable</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_event</span>(<span class="ident">event</span>, <span class="ident">cx</span>.<span class="ident">with_filter</span>(<span class="self">self</span>.<span class="ident">id</span>()));
+    <span class="kw">fn </span>on_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>Event&lt;<span class="lifetime">&#39;_</span>&gt;, cx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.did_enable(|| {
+            <span class="self">self</span>.layer.on_event(event, cx.with_filter(<span class="self">self</span>.id()));
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">if_enabled_for</span>(<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">id</span>()) {
-            <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">cx</span>.<span class="ident">clone</span>());
-            <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">cx</span>);
+    <span class="kw">fn </span>on_enter(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, cx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(cx) = cx.if_enabled_for(id, <span class="self">self</span>.id()) {
+            <span class="self">self</span>.filter.on_enter(id, cx.clone());
+            <span class="self">self</span>.layer.on_enter(id, cx);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">if_enabled_for</span>(<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">id</span>()) {
-            <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">cx</span>.<span class="ident">clone</span>());
-            <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">cx</span>);
+    <span class="kw">fn </span>on_exit(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, cx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(cx) = cx.if_enabled_for(id, <span class="self">self</span>.id()) {
+            <span class="self">self</span>.filter.on_exit(id, cx.clone());
+            <span class="self">self</span>.layer.on_exit(id, cx);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">if_enabled_for</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>, <span class="self">self</span>.<span class="ident">id</span>()) {
-            <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">on_close</span>(<span class="ident">id</span>.<span class="ident">clone</span>(), <span class="ident">cx</span>.<span class="ident">clone</span>());
-            <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="ident">cx</span>);
+    <span class="kw">fn </span>on_close(<span class="kw-2">&amp;</span><span class="self">self</span>, id: span::Id, cx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(cx) = cx.if_enabled_for(<span class="kw-2">&amp;</span>id, <span class="self">self</span>.id()) {
+            <span class="self">self</span>.filter.on_close(id.clone(), cx.clone());
+            <span class="self">self</span>.layer.on_close(id, cx);
         }
     }
 
-    <span class="comment">// XXX(eliza): the existence of this method still makes me sad...</span>
-    <span class="kw">fn</span> <span class="ident">on_id_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">if_enabled_for</span>(<span class="ident">old</span>, <span class="self">self</span>.<span class="ident">id</span>()) {
-            <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_id_change</span>(<span class="ident">old</span>, <span class="ident">new</span>, <span class="ident">cx</span>)
+    <span class="comment">// XXX(eliza): the existence of this method still makes me sad...
+    </span><span class="kw">fn </span>on_id_change(<span class="kw-2">&amp;</span><span class="self">self</span>, old: <span class="kw-2">&amp;</span>span::Id, new: <span class="kw-2">&amp;</span>span::Id, cx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(cx) = cx.if_enabled_for(old, <span class="self">self</span>.id()) {
+            <span class="self">self</span>.layer.on_id_change(old, new, cx)
         }
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*const</span> ()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">id</span> {
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> ()),
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>() =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">layer</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> ()),
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>() =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> ()),
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">MagicPlfDowncastMarker</span><span class="op">&gt;</span>() =&gt; {
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> ())
+    <span class="attribute">#[doc(hidden)]
+    #[inline]
+    </span><span class="kw">unsafe fn </span>downcast_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, id: TypeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>()&gt; {
+        <span class="kw">match </span>id {
+            id <span class="kw">if </span>id == TypeId::of::&lt;<span class="self">Self</span>&gt;() =&gt; <span class="prelude-val">Some</span>(<span class="self">self </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>()),
+            id <span class="kw">if </span>id == TypeId::of::&lt;L&gt;() =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.layer <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>()),
+            id <span class="kw">if </span>id == TypeId::of::&lt;F&gt;() =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.filter <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>()),
+            id <span class="kw">if </span>id == TypeId::of::&lt;MagicPlfDowncastMarker&gt;() =&gt; {
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.id <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>())
             }
-            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">downcast_raw</span>(<span class="ident">id</span>),
+            <span class="kw">_ </span>=&gt; <span class="self">self</span>.layer.downcast_raw(id),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Filtered</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">fmt::Debug</span>,
-    <span class="ident">L</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;F, L, S&gt; fmt::Debug <span class="kw">for </span>Filtered&lt;F, L, S&gt;
+<span class="kw">where
+    </span>F: fmt::Debug,
+    L: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Filtered&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;layer&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">layer</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Filtered&quot;</span>)
+            .field(<span class="string">&quot;filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.filter)
+            .field(<span class="string">&quot;layer&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.layer)
+            .field(<span class="string">&quot;id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.id)
+            .finish()
     }
 }
 
-<span class="comment">// === impl FilterId ===</span>
+<span class="comment">// === impl FilterId ===
 
-<span class="kw">impl</span> <span class="ident">FilterId</span> {
-    <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">disabled</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">std::u64::MAX</span>)
+</span><span class="kw">impl </span>FilterId {
+    <span class="kw">const fn </span>disabled() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(std::u64::MAX)
     }
 
-    <span class="doccomment">/// Returns a `FilterId` that will consider _all_ spans enabled.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="self">Self</span> {
+    <span class="doccomment">/// Returns a `FilterId` that will consider _all_ spans enabled.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>none() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(<span class="number">0</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="ident">id</span> <span class="op">&lt;</span> <span class="number">64</span>, <span class="string">&quot;filter IDs may not be greater than 64&quot;</span>);
-        <span class="self">Self</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">id</span> <span class="kw">as</span> <span class="ident">usize</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(id: u8) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert!</span>(id &lt; <span class="number">64</span>, <span class="string">&quot;filter IDs may not be greater than 64&quot;</span>);
+        <span class="self">Self</span>(<span class="number">1 </span>&lt;&lt; id <span class="kw">as </span>usize)
     }
 
-    <span class="doccomment">/// Combines two `FilterId`s, returning a new `FilterId` that will match a</span>
-    <span class="doccomment">/// [`FilterMap`] where the span was disabled by _either_ this `FilterId`</span>
-    <span class="doccomment">/// *or* the combined `FilterId`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is called by [`Context`]s when adding the `FilterId` of a</span>
-    <span class="doccomment">/// [`Filtered`] layer to the context.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is necessary for cases where we have a tree of nested [`Filtered`]</span>
-    <span class="doccomment">/// layers, like this:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// Filtered {</span>
-    <span class="doccomment">///     filter1,</span>
-    <span class="doccomment">///     Layered {</span>
-    <span class="doccomment">///         layer1,</span>
-    <span class="doccomment">///         Filtered {</span>
-    <span class="doccomment">///              filter2,</span>
-    <span class="doccomment">///              layer2,</span>
-    <span class="doccomment">///         },</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// We want `layer2` to be affected by both `filter1` _and_ `filter2`.</span>
-    <span class="doccomment">/// Without combining `FilterId`s, this works fine when filtering</span>
-    <span class="doccomment">/// `on_event`/`new_span`, because the outer `Filtered` layer (`filter1`)</span>
-    <span class="doccomment">/// won&#39;t call the inner layer&#39;s `on_event` or `new_span` callbacks if it</span>
-    <span class="doccomment">/// disabled the event/span.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// However, it _doesn&#39;t_ work when filtering span lookups and traversals</span>
-    <span class="doccomment">/// (e.g. `scope`). This is because the [`Context`] passed to `layer2`</span>
-    <span class="doccomment">/// would set its filter ID to the filter ID of `filter2`, and would skip</span>
-    <span class="doccomment">/// spans that were disabled by `filter2`. However, what if a span was</span>
-    <span class="doccomment">/// disabled by `filter1`? We wouldn&#39;t see it in `new_span`, but we _would_</span>
-    <span class="doccomment">/// see it in lookups and traversals...which we don&#39;t want.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When a [`Filtered`] layer adds its ID to a [`Context`], it _combines_ it</span>
-    <span class="doccomment">/// with any previous filter ID that the context had, rather than replacing</span>
-    <span class="doccomment">/// it. That way, `layer2`&#39;s context will check if a span was disabled by</span>
-    <span class="doccomment">/// `filter1` _or_ `filter2`. The way we do this, instead of representing</span>
-    <span class="doccomment">/// `FilterId`s as a number number that we shift a 1 over by to get a mask,</span>
-    <span class="doccomment">/// we just store the actual mask,so we can combine them with a bitwise-OR.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, if we consider the following case (pretending that the</span>
-    <span class="doccomment">/// masks are 8 bits instead of 64 just so i don&#39;t have to write out a bunch</span>
-    <span class="doccomment">/// of extra zeroes):</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `filter1` has the filter id 1 (`0b0000_0001`)</span>
-    <span class="doccomment">/// - `filter2` has the filter id 2 (`0b0000_0010`)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A span that gets disabled by filter 1 would have the [`FilterMap`] with</span>
-    <span class="doccomment">/// bits `0b0000_0001`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `FilterId` was internally represented as `(bits to shift + 1),</span>
-    <span class="doccomment">/// when `layer2`&#39;s [`Context`] checked if it enabled the  span, it would</span>
-    <span class="doccomment">/// make the mask `0b0000_0010` (`1 &lt;&lt; 1`). That bit would not be set in the</span>
-    <span class="doccomment">/// [`FilterMap`], so it would see that it _didn&#39;t_ disable  the span. Which</span>
-    <span class="doccomment">/// is *true*, it just doesn&#39;t reflect the tree-like shape of the actual</span>
-    <span class="doccomment">/// subscriber.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By having the IDs be masks instead of shifts, though, when the</span>
-    <span class="doccomment">/// [`Filtered`] with `filter2` gets the [`Context`] with `filter1`&#39;s filter ID,</span>
-    <span class="doccomment">/// instead of replacing it, it ors them together:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// 0b0000_0001 | 0b0000_0010 == 0b0000_0011;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// We then test if the span was disabled by  seeing if _any_ bits in the</span>
-    <span class="doccomment">/// mask are `1`:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// filtermap &amp; mask != 0;</span>
-    <span class="doccomment">/// 0b0000_0001 &amp; 0b0000_0011 != 0;</span>
-    <span class="doccomment">/// 0b0000_0001 != 0;</span>
-    <span class="doccomment">/// true;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Context`]: crate::layer::Context</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">and</span>(<span class="self">self</span>, <span class="ident">FilterId</span>(<span class="ident">other</span>): <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// If this mask is disabled, just return the other --- otherwise, we</span>
-        <span class="comment">// would always see that every span is disabled.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::disabled</span>().<span class="number">0</span> {
-            <span class="kw">return</span> <span class="self">Self</span>(<span class="ident">other</span>);
+    <span class="doccomment">/// Combines two `FilterId`s, returning a new `FilterId` that will match a
+    /// [`FilterMap`] where the span was disabled by _either_ this `FilterId`
+    /// *or* the combined `FilterId`.
+    ///
+    /// This method is called by [`Context`]s when adding the `FilterId` of a
+    /// [`Filtered`] layer to the context.
+    ///
+    /// This is necessary for cases where we have a tree of nested [`Filtered`]
+    /// layers, like this:
+    ///
+    /// ```text
+    /// Filtered {
+    ///     filter1,
+    ///     Layered {
+    ///         layer1,
+    ///         Filtered {
+    ///              filter2,
+    ///              layer2,
+    ///         },
+    /// }
+    /// ```
+    ///
+    /// We want `layer2` to be affected by both `filter1` _and_ `filter2`.
+    /// Without combining `FilterId`s, this works fine when filtering
+    /// `on_event`/`new_span`, because the outer `Filtered` layer (`filter1`)
+    /// won&#39;t call the inner layer&#39;s `on_event` or `new_span` callbacks if it
+    /// disabled the event/span.
+    ///
+    /// However, it _doesn&#39;t_ work when filtering span lookups and traversals
+    /// (e.g. `scope`). This is because the [`Context`] passed to `layer2`
+    /// would set its filter ID to the filter ID of `filter2`, and would skip
+    /// spans that were disabled by `filter2`. However, what if a span was
+    /// disabled by `filter1`? We wouldn&#39;t see it in `new_span`, but we _would_
+    /// see it in lookups and traversals...which we don&#39;t want.
+    ///
+    /// When a [`Filtered`] layer adds its ID to a [`Context`], it _combines_ it
+    /// with any previous filter ID that the context had, rather than replacing
+    /// it. That way, `layer2`&#39;s context will check if a span was disabled by
+    /// `filter1` _or_ `filter2`. The way we do this, instead of representing
+    /// `FilterId`s as a number number that we shift a 1 over by to get a mask,
+    /// we just store the actual mask,so we can combine them with a bitwise-OR.
+    ///
+    /// For example, if we consider the following case (pretending that the
+    /// masks are 8 bits instead of 64 just so i don&#39;t have to write out a bunch
+    /// of extra zeroes):
+    ///
+    /// - `filter1` has the filter id 1 (`0b0000_0001`)
+    /// - `filter2` has the filter id 2 (`0b0000_0010`)
+    ///
+    /// A span that gets disabled by filter 1 would have the [`FilterMap`] with
+    /// bits `0b0000_0001`.
+    ///
+    /// If the `FilterId` was internally represented as `(bits to shift + 1),
+    /// when `layer2`&#39;s [`Context`] checked if it enabled the  span, it would
+    /// make the mask `0b0000_0010` (`1 &lt;&lt; 1`). That bit would not be set in the
+    /// [`FilterMap`], so it would see that it _didn&#39;t_ disable  the span. Which
+    /// is *true*, it just doesn&#39;t reflect the tree-like shape of the actual
+    /// subscriber.
+    ///
+    /// By having the IDs be masks instead of shifts, though, when the
+    /// [`Filtered`] with `filter2` gets the [`Context`] with `filter1`&#39;s filter ID,
+    /// instead of replacing it, it ors them together:
+    ///
+    /// ```ignore
+    /// 0b0000_0001 | 0b0000_0010 == 0b0000_0011;
+    /// ```
+    ///
+    /// We then test if the span was disabled by  seeing if _any_ bits in the
+    /// mask are `1`:
+    ///
+    /// ```ignore
+    /// filtermap &amp; mask != 0;
+    /// 0b0000_0001 &amp; 0b0000_0011 != 0;
+    /// 0b0000_0001 != 0;
+    /// true;
+    /// ```
+    ///
+    /// [`Context`]: crate::layer::Context
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>and(<span class="self">self</span>, FilterId(other): <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="comment">// If this mask is disabled, just return the other --- otherwise, we
+        // would always see that every span is disabled.
+        </span><span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>== <span class="self">Self</span>::disabled().<span class="number">0 </span>{
+            <span class="kw">return </span><span class="self">Self</span>(other);
         }
 
-        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">other</span>)
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0 </span>| other)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_disabled</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::disabled</span>().<span class="number">0</span>
+    <span class="kw">fn </span>is_disabled(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0 </span>== <span class="self">Self</span>::disabled().<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>FilterId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="comment">// don&#39;t print a giant set of the numbers 0..63 if the filter ID is disabled.
+        </span><span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>== <span class="self">Self</span>::disabled().<span class="number">0 </span>{
+            <span class="kw">return </span>f
+                .debug_tuple(<span class="string">&quot;FilterId&quot;</span>)
+                .field(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;DISABLED&quot;</span>))
+                .finish();
+        }
+
+        <span class="kw">if </span>f.alternate() {
+            f.debug_struct(<span class="string">&quot;FilterId&quot;</span>)
+                .field(<span class="string">&quot;ids&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:?}&quot;</span>, FmtBitset(<span class="self">self</span>.<span class="number">0</span>)))
+                .field(<span class="string">&quot;bits&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
+                .finish()
+        } <span class="kw">else </span>{
+            f.debug_tuple(<span class="string">&quot;FilterId&quot;</span>).field(<span class="kw-2">&amp;</span>FmtBitset(<span class="self">self</span>.<span class="number">0</span>)).finish()
+        }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FilterId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="comment">// don&#39;t print a giant set of the numbers 0..63 if the filter ID is disabled.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::disabled</span>().<span class="number">0</span> {
-            <span class="kw">return</span> <span class="ident">f</span>
-                .<span class="ident">debug_tuple</span>(<span class="string">&quot;FilterId&quot;</span>)
-                .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;DISABLED&quot;</span>))
-                .<span class="ident">finish</span>();
-        }
-
-        <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-            <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;FilterId&quot;</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;ids&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">FmtBitset</span>(<span class="self">self</span>.<span class="number">0</span>)))
-                .<span class="ident">field</span>(<span class="string">&quot;bits&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
-                .<span class="ident">finish</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;FilterId&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">FmtBitset</span>(<span class="self">self</span>.<span class="number">0</span>)).<span class="ident">finish</span>()
-        }
+<span class="kw">impl </span>fmt::Binary <span class="kw">for </span>FilterId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_tuple(<span class="string">&quot;FilterId&quot;</span>)
+            .field(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Binary</span> <span class="kw">for</span> <span class="ident">FilterId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;FilterId&quot;</span>)
-            .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
-            .<span class="ident">finish</span>()
-    }
-}
+<span class="comment">// === impl FilterExt ===
 
-<span class="comment">// === impl FilterExt ===</span>
+</span><span class="kw">impl</span>&lt;F, S&gt; FilterExt&lt;S&gt; <span class="kw">for </span>F <span class="kw">where </span>F: layer::Filter&lt;S&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">FilterExt</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span> <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {}
+<span class="comment">// === impl FilterMap ===
 
-<span class="comment">// === impl FilterMap ===</span>
-
-<span class="kw">impl</span> <span class="ident">FilterMap</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set</span>(<span class="self">self</span>, <span class="ident">FilterId</span>(<span class="ident">mask</span>): <span class="ident">FilterId</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">mask</span> <span class="op">==</span> <span class="ident">std::u64::MAX</span> {
-            <span class="kw">return</span> <span class="self">self</span>;
+</span><span class="kw">impl </span>FilterMap {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set(<span class="self">self</span>, FilterId(mask): FilterId, enabled: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>mask == std::u64::MAX {
+            <span class="kw">return </span><span class="self">self</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">enabled</span> {
-            <span class="self">Self</span> {
-                <span class="ident">bits</span>: <span class="self">self</span>.<span class="ident">bits</span> <span class="op">&amp;</span> (<span class="op">!</span><span class="ident">mask</span>),
+        <span class="kw">if </span>enabled {
+            <span class="self">Self </span>{
+                bits: <span class="self">self</span>.bits &amp; (!mask),
             }
-        } <span class="kw">else</span> {
-            <span class="self">Self</span> {
-                <span class="ident">bits</span>: <span class="self">self</span>.<span class="ident">bits</span> <span class="op">|</span> <span class="ident">mask</span>,
+        } <span class="kw">else </span>{
+            <span class="self">Self </span>{
+                bits: <span class="self">self</span>.bits | mask,
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_enabled</span>(<span class="self">self</span>, <span class="ident">FilterId</span>(<span class="ident">mask</span>): <span class="ident">FilterId</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">bits</span> <span class="op">&amp;</span> <span class="ident">mask</span> <span class="op">==</span> <span class="number">0</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_enabled(<span class="self">self</span>, FilterId(mask): FilterId) -&gt; bool {
+        <span class="self">self</span>.bits &amp; mask == <span class="number">0
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">any_enabled</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">bits</span> <span class="op">!</span><span class="op">=</span> <span class="ident">std::u64::MAX</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>any_enabled(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.bits != std::u64::MAX
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FilterMap</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">alt</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">alternate</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;FilterMap&quot;</span>);
-        <span class="ident">s</span>.<span class="ident">field</span>(<span class="string">&quot;disabled_by&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">FmtBitset</span>(<span class="self">self</span>.<span class="ident">bits</span>)));
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>FilterMap {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>alt = f.alternate();
+        <span class="kw">let </span><span class="kw-2">mut </span>s = f.debug_struct(<span class="string">&quot;FilterMap&quot;</span>);
+        s.field(<span class="string">&quot;disabled_by&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span>FmtBitset(<span class="self">self</span>.bits)));
 
-        <span class="kw">if</span> <span class="ident">alt</span> {
-            <span class="ident">s</span>.<span class="ident">field</span>(<span class="string">&quot;bits&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, <span class="self">self</span>.<span class="ident">bits</span>));
+        <span class="kw">if </span>alt {
+            s.field(<span class="string">&quot;bits&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, <span class="self">self</span>.bits));
         }
 
-        <span class="ident">s</span>.<span class="ident">finish</span>()
+        s.finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Binary</span> <span class="kw">for</span> <span class="ident">FilterMap</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;FilterMap&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;bits&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, <span class="self">self</span>.<span class="ident">bits</span>))
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Binary <span class="kw">for </span>FilterMap {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;FilterMap&quot;</span>)
+            .field(<span class="string">&quot;bits&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, <span class="self">self</span>.bits))
+            .finish()
     }
 }
 
-<span class="comment">// === impl FilterState ===</span>
+<span class="comment">// === impl FilterState ===
 
-<span class="kw">impl</span> <span class="ident">FilterState</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">enabled</span>: <span class="ident">Cell::new</span>(<span class="ident">FilterMap::default</span>()),
-            <span class="ident">interest</span>: <span class="ident">RefCell::new</span>(<span class="prelude-val">None</span>),
+</span><span class="kw">impl </span>FilterState {
+    <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            enabled: Cell::new(FilterMap::default()),
+            interest: RefCell::new(<span class="prelude-val">None</span>),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-            <span class="ident">counters</span>: <span class="ident">DebugCounters::default</span>(),
+            <span class="attribute">#[cfg(debug_assertions)]
+            </span>counters: DebugCounters::default(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">FilterId</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-        {
-            <span class="kw">let</span> <span class="ident">in_current_pass</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">get</span>();
-            <span class="kw">if</span> <span class="ident">in_current_pass</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">enabled</span>.<span class="ident">get</span>(), <span class="ident">FilterMap::default</span>());
+    <span class="kw">fn </span>set(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: FilterId, enabled: bool) {
+        <span class="attribute">#[cfg(debug_assertions)]
+        </span>{
+            <span class="kw">let </span>in_current_pass = <span class="self">self</span>.counters.in_filter_pass.get();
+            <span class="kw">if </span>in_current_pass == <span class="number">0 </span>{
+                <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.enabled.get(), FilterMap::default());
             }
-            <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">set</span>(<span class="ident">in_current_pass</span> <span class="op">+</span> <span class="number">1</span>);
+            <span class="self">self</span>.counters.in_filter_pass.set(in_current_pass + <span class="number">1</span>);
             <span class="macro">debug_assert_eq!</span>(
-                <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_interest_pass</span>.<span class="ident">get</span>(),
+                <span class="self">self</span>.counters.in_interest_pass.get(),
                 <span class="number">0</span>,
-                <span class="string">&quot;if we are in or starting a filter pass, we must not be in an interest pass.&quot;</span>
-            )
+                <span class="string">&quot;if we are in or starting a filter pass, we must not be in an interest pass.&quot;
+            </span>)
         }
 
-        <span class="self">self</span>.<span class="ident">enabled</span>.<span class="ident">set</span>(<span class="self">self</span>.<span class="ident">enabled</span>.<span class="ident">get</span>().<span class="ident">set</span>(<span class="ident">filter</span>, <span class="ident">enabled</span>))
+        <span class="self">self</span>.enabled.set(<span class="self">self</span>.enabled.get().set(filter, enabled))
     }
 
-    <span class="kw">fn</span> <span class="ident">add_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">interest</span>: <span class="ident">Interest</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">curr_interest</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interest</span>.<span class="ident">borrow_mut</span>();
+    <span class="kw">fn </span>add_interest(<span class="kw-2">&amp;</span><span class="self">self</span>, interest: Interest) {
+        <span class="kw">let </span><span class="kw-2">mut </span>curr_interest = <span class="self">self</span>.interest.borrow_mut();
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-        {
-            <span class="kw">let</span> <span class="ident">in_current_pass</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_interest_pass</span>.<span class="ident">get</span>();
-            <span class="kw">if</span> <span class="ident">in_current_pass</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="macro">debug_assert!</span>(<span class="ident">curr_interest</span>.<span class="ident">is_none</span>());
+        <span class="attribute">#[cfg(debug_assertions)]
+        </span>{
+            <span class="kw">let </span>in_current_pass = <span class="self">self</span>.counters.in_interest_pass.get();
+            <span class="kw">if </span>in_current_pass == <span class="number">0 </span>{
+                <span class="macro">debug_assert!</span>(curr_interest.is_none());
             }
-            <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_interest_pass</span>.<span class="ident">set</span>(<span class="ident">in_current_pass</span> <span class="op">+</span> <span class="number">1</span>);
+            <span class="self">self</span>.counters.in_interest_pass.set(in_current_pass + <span class="number">1</span>);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">curr_interest</span>) <span class="op">=</span> <span class="ident">curr_interest</span>.<span class="ident">as_mut</span>() {
-            <span class="kw">if</span> (<span class="ident">curr_interest</span>.<span class="ident">is_always</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">interest</span>.<span class="ident">is_always</span>())
-                <span class="op">|</span><span class="op">|</span> (<span class="ident">curr_interest</span>.<span class="ident">is_never</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">interest</span>.<span class="ident">is_never</span>())
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(curr_interest) = curr_interest.as_mut() {
+            <span class="kw">if </span>(curr_interest.is_always() &amp;&amp; !interest.is_always())
+                || (curr_interest.is_never() &amp;&amp; !interest.is_never())
             {
-                <span class="kw-2">*</span><span class="ident">curr_interest</span> <span class="op">=</span> <span class="ident">Interest::sometimes</span>();
+                <span class="kw-2">*</span>curr_interest = Interest::sometimes();
             }
-            <span class="comment">// If the two interests are the same, do nothing. If the current</span>
-            <span class="comment">// interest is `sometimes`, stay sometimes.</span>
-        } <span class="kw">else</span> {
-            <span class="kw-2">*</span><span class="ident">curr_interest</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">interest</span>);
+            <span class="comment">// If the two interests are the same, do nothing. If the current
+            // interest is `sometimes`, stay sometimes.
+        </span>} <span class="kw">else </span>{
+            <span class="kw-2">*</span>curr_interest = <span class="prelude-val">Some</span>(interest);
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">event_enabled</span>() -&gt; <span class="ident">bool</span> {
-        <span class="ident">FILTERING</span>
-            .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">this</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">enabled</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">enabled</span>.<span class="ident">get</span>().<span class="ident">any_enabled</span>();
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-                {
-                    <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="number">0</span> {
-                        <span class="macro">debug_assert_eq!</span>(<span class="ident">this</span>.<span class="ident">enabled</span>.<span class="ident">get</span>(), <span class="ident">FilterMap::default</span>());
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>event_enabled() -&gt; bool {
+        FILTERING
+            .try_with(|this| {
+                <span class="kw">let </span>enabled = this.enabled.get().any_enabled();
+                <span class="attribute">#[cfg(debug_assertions)]
+                </span>{
+                    <span class="kw">if </span>this.counters.in_filter_pass.get() == <span class="number">0 </span>{
+                        <span class="macro">debug_assert_eq!</span>(this.enabled.get(), FilterMap::default());
                     }
 
-                    <span class="comment">// Nothing enabled this event, we won&#39;t tick back down the</span>
-                    <span class="comment">// counter in `did_enable`. Reset it.</span>
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">enabled</span> {
-                        <span class="ident">this</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">set</span>(<span class="number">0</span>);
+                    <span class="comment">// Nothing enabled this event, we won&#39;t tick back down the
+                    // counter in `did_enable`. Reset it.
+                    </span><span class="kw">if </span>!enabled {
+                        this.counters.in_filter_pass.set(<span class="number">0</span>);
                     }
                 }
-                <span class="ident">enabled</span>
+                enabled
             })
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
+            .unwrap_or(<span class="bool-val">true</span>)
     }
 
-    <span class="doccomment">/// Executes a closure if the filter with the provided ID did not disable</span>
-    <span class="doccomment">/// the current span/event.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used to implement the `on_event` and `new_span` methods for</span>
-    <span class="doccomment">/// `Filtered`.</span>
-    <span class="kw">fn</span> <span class="ident">did_enable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">FilterId</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>()) {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">enabled</span>.<span class="ident">get</span>();
-        <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">is_enabled</span>(<span class="ident">filter</span>) {
-            <span class="comment">// If the filter didn&#39;t disable the current span/event, run the</span>
-            <span class="comment">// callback.</span>
-            <span class="ident">f</span>();
-        } <span class="kw">else</span> {
-            <span class="comment">// Otherwise, if this filter _did_ disable the span or event</span>
-            <span class="comment">// currently being processed, clear its bit from this thread&#39;s</span>
-            <span class="comment">// `FilterState`. The bit has already been &quot;consumed&quot; by skipping</span>
-            <span class="comment">// this callback, and we need to ensure that the `FilterMap` for</span>
-            <span class="comment">// this thread is reset when the *next* `enabled` call occurs.</span>
-            <span class="self">self</span>.<span class="ident">enabled</span>.<span class="ident">set</span>(<span class="ident">map</span>.<span class="ident">set</span>(<span class="ident">filter</span>, <span class="bool-val">true</span>));
+    <span class="doccomment">/// Executes a closure if the filter with the provided ID did not disable
+    /// the current span/event.
+    ///
+    /// This is used to implement the `on_event` and `new_span` methods for
+    /// `Filtered`.
+    </span><span class="kw">fn </span>did_enable(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: FilterId, f: <span class="kw">impl </span>FnOnce()) {
+        <span class="kw">let </span>map = <span class="self">self</span>.enabled.get();
+        <span class="kw">if </span>map.is_enabled(filter) {
+            <span class="comment">// If the filter didn&#39;t disable the current span/event, run the
+            // callback.
+            </span>f();
+        } <span class="kw">else </span>{
+            <span class="comment">// Otherwise, if this filter _did_ disable the span or event
+            // currently being processed, clear its bit from this thread&#39;s
+            // `FilterState`. The bit has already been &quot;consumed&quot; by skipping
+            // this callback, and we need to ensure that the `FilterMap` for
+            // this thread is reset when the *next* `enabled` call occurs.
+            </span><span class="self">self</span>.enabled.set(map.set(filter, <span class="bool-val">true</span>));
         }
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-        {
-            <span class="kw">let</span> <span class="ident">in_current_pass</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">get</span>();
-            <span class="kw">if</span> <span class="ident">in_current_pass</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span> {
-                <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">enabled</span>.<span class="ident">get</span>(), <span class="ident">FilterMap::default</span>());
+        <span class="attribute">#[cfg(debug_assertions)]
+        </span>{
+            <span class="kw">let </span>in_current_pass = <span class="self">self</span>.counters.in_filter_pass.get();
+            <span class="kw">if </span>in_current_pass &lt;= <span class="number">1 </span>{
+                <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.enabled.get(), FilterMap::default());
             }
-            <span class="self">self</span>.<span class="ident">counters</span>
-                .<span class="ident">in_filter_pass</span>
-                .<span class="ident">set</span>(<span class="ident">in_current_pass</span>.<span class="ident">saturating_sub</span>(<span class="number">1</span>));
+            <span class="self">self</span>.counters
+                .in_filter_pass
+                .set(in_current_pass.saturating_sub(<span class="number">1</span>));
             <span class="macro">debug_assert_eq!</span>(
-                <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_interest_pass</span>.<span class="ident">get</span>(),
+                <span class="self">self</span>.counters.in_interest_pass.get(),
                 <span class="number">0</span>,
-                <span class="string">&quot;if we are in a filter pass, we must not be in an interest pass.&quot;</span>
-            )
+                <span class="string">&quot;if we are in a filter pass, we must not be in an interest pass.&quot;
+            </span>)
         }
     }
 
-    <span class="doccomment">/// Clears the current in-progress filter state.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This resets the [`FilterMap`] and current [`Interest`] as well as</span>
-    <span class="doccomment">/// clearing the debug counters.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clear_enabled</span>() {
-        <span class="comment">// Drop the `Result` returned by `try_with` --- if we are in the middle</span>
-        <span class="comment">// a panic and the thread-local has been torn down, that&#39;s fine, just</span>
-        <span class="comment">// ignore it ratehr than panicking.</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">FILTERING</span>.<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">filtering</span><span class="op">|</span> {
-            <span class="ident">filtering</span>.<span class="ident">enabled</span>.<span class="ident">set</span>(<span class="ident">FilterMap::default</span>());
+    <span class="doccomment">/// Clears the current in-progress filter state.
+    ///
+    /// This resets the [`FilterMap`] and current [`Interest`] as well as
+    /// clearing the debug counters.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clear_enabled() {
+        <span class="comment">// Drop the `Result` returned by `try_with` --- if we are in the middle
+        // a panic and the thread-local has been torn down, that&#39;s fine, just
+        // ignore it ratehr than panicking.
+        </span><span class="kw">let _ </span>= FILTERING.try_with(|filtering| {
+            filtering.enabled.set(FilterMap::default());
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-            <span class="ident">filtering</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">set</span>(<span class="number">0</span>);
+            <span class="attribute">#[cfg(debug_assertions)]
+            </span>filtering.counters.in_filter_pass.set(<span class="number">0</span>);
         });
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_interest</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Interest</span><span class="op">&gt;</span> {
-        <span class="ident">FILTERING</span>
-            .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">filtering</span><span class="op">|</span> {
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-                {
-                    <span class="kw">if</span> <span class="ident">filtering</span>.<span class="ident">counters</span>.<span class="ident">in_interest_pass</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="number">0</span> {
-                        <span class="macro">debug_assert!</span>(<span class="ident">filtering</span>.<span class="ident">interest</span>.<span class="ident">try_borrow</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">is_none</span>());
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>take_interest() -&gt; <span class="prelude-ty">Option</span>&lt;Interest&gt; {
+        FILTERING
+            .try_with(|filtering| {
+                <span class="attribute">#[cfg(debug_assertions)]
+                </span>{
+                    <span class="kw">if </span>filtering.counters.in_interest_pass.get() == <span class="number">0 </span>{
+                        <span class="macro">debug_assert!</span>(filtering.interest.try_borrow().ok()<span class="question-mark">?</span>.is_none());
                     }
-                    <span class="ident">filtering</span>.<span class="ident">counters</span>.<span class="ident">in_interest_pass</span>.<span class="ident">set</span>(<span class="number">0</span>);
+                    filtering.counters.in_interest_pass.set(<span class="number">0</span>);
                 }
-                <span class="ident">filtering</span>.<span class="ident">interest</span>.<span class="ident">try_borrow_mut</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">take</span>()
+                filtering.interest.try_borrow_mut().ok()<span class="question-mark">?</span>.take()
             })
-            .<span class="ident">ok</span>()<span class="question-mark">?</span>
-    }
+            .ok()<span class="question-mark">?
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">filter_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FilterMap</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">enabled</span>.<span class="ident">get</span>();
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="number">0</span> {
-                <span class="macro">debug_assert_eq!</span>(<span class="ident">map</span>, <span class="ident">FilterMap::default</span>());
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>filter_map(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FilterMap {
+        <span class="kw">let </span>map = <span class="self">self</span>.enabled.get();
+        <span class="attribute">#[cfg(debug_assertions)]
+        </span>{
+            <span class="kw">if </span><span class="self">self</span>.counters.in_filter_pass.get() == <span class="number">0 </span>{
+                <span class="macro">debug_assert_eq!</span>(map, FilterMap::default());
             }
         }
 
-        <span class="ident">map</span>
+        map
     }
 }
-<span class="doccomment">/// This is a horrible and bad abuse of the downcasting system to expose</span>
-<span class="doccomment">/// *internally* whether a layer has per-layer filtering, within</span>
-<span class="doccomment">/// `tracing-subscriber`, without exposing a public API for it.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If a `Layer` has per-layer filtering, it will downcast to a</span>
-<span class="doccomment">/// `MagicPlfDowncastMarker`. Since layers which contain other layers permit</span>
-<span class="doccomment">/// downcasting to recurse to their children, this will do the Right Thing with</span>
-<span class="doccomment">/// layers like Reload, Option, etc.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Why is this a wrapper around the `FilterId`, you may ask? Because</span>
-<span class="doccomment">/// downcasting works by returning a pointer, and we don&#39;t want to risk</span>
-<span class="doccomment">/// introducing UB by  constructing pointers that _don&#39;t_ point to a valid</span>
-<span class="doccomment">/// instance of the type they claim to be. In this case, we don&#39;t _intend_ for</span>
-<span class="doccomment">/// this pointer to be dereferenced, so it would actually be fine to return one</span>
-<span class="doccomment">/// that isn&#39;t a valid pointer...but we can&#39;t guarantee that the caller won&#39;t</span>
-<span class="doccomment">/// (accidentally) dereference it, so it&#39;s better to be safe than sorry. We</span>
-<span class="doccomment">/// could, alternatively, add an additional field to the type that&#39;s used only</span>
-<span class="doccomment">/// for returning pointers to as as part of the evil downcasting hack, but I</span>
-<span class="doccomment">/// thought it was nicer to just add a `repr(transparent)` wrapper to the</span>
-<span class="doccomment">/// existing `FilterId` field, since it won&#39;t make the struct any bigger.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Don&#39;t worry, this isn&#39;t on the test. :)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">struct</span> <span class="ident">MagicPlfDowncastMarker</span>(<span class="ident">FilterId</span>);
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">MagicPlfDowncastMarker</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="comment">// Just pretend that `MagicPlfDowncastMarker` doesn&#39;t exist for</span>
-        <span class="comment">// `fmt::Debug` purposes...if no one *sees* it in their `Debug` output,</span>
-        <span class="comment">// they don&#39;t have to know I thought this code would be a good idea.</span>
-        <span class="ident">fmt::Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>)
+<span class="doccomment">/// This is a horrible and bad abuse of the downcasting system to expose
+/// *internally* whether a layer has per-layer filtering, within
+/// `tracing-subscriber`, without exposing a public API for it.
+///
+/// If a `Layer` has per-layer filtering, it will downcast to a
+/// `MagicPlfDowncastMarker`. Since layers which contain other layers permit
+/// downcasting to recurse to their children, this will do the Right Thing with
+/// layers like Reload, Option, etc.
+///
+/// Why is this a wrapper around the `FilterId`, you may ask? Because
+/// downcasting works by returning a pointer, and we don&#39;t want to risk
+/// introducing UB by  constructing pointers that _don&#39;t_ point to a valid
+/// instance of the type they claim to be. In this case, we don&#39;t _intend_ for
+/// this pointer to be dereferenced, so it would actually be fine to return one
+/// that isn&#39;t a valid pointer...but we can&#39;t guarantee that the caller won&#39;t
+/// (accidentally) dereference it, so it&#39;s better to be safe than sorry. We
+/// could, alternatively, add an additional field to the type that&#39;s used only
+/// for returning pointers to as as part of the evil downcasting hack, but I
+/// thought it was nicer to just add a `repr(transparent)` wrapper to the
+/// existing `FilterId` field, since it won&#39;t make the struct any bigger.
+///
+/// Don&#39;t worry, this isn&#39;t on the test. :)
+</span><span class="attribute">#[derive(Clone, Copy)]
+#[repr(transparent)]
+</span><span class="kw">struct </span>MagicPlfDowncastMarker(FilterId);
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>MagicPlfDowncastMarker {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="comment">// Just pretend that `MagicPlfDowncastMarker` doesn&#39;t exist for
+        // `fmt::Debug` purposes...if no one *sees* it in their `Debug` output,
+        // they don&#39;t have to know I thought this code would be a good idea.
+        </span>fmt::Debug::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_plf_downcast_marker</span>(<span class="ident">type_id</span>: <span class="ident">TypeId</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">type_id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">MagicPlfDowncastMarker</span><span class="op">&gt;</span>()
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_plf_downcast_marker(type_id: TypeId) -&gt; bool {
+    type_id == TypeId::of::&lt;MagicPlfDowncastMarker&gt;()
 }
 
-<span class="doccomment">/// Does a type implementing `Subscriber` contain any per-layer filters?</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">subscriber_has_plf</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">subscriber</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) -&gt; <span class="ident">bool</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+<span class="doccomment">/// Does a type implementing `Subscriber` contain any per-layer filters?
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>subscriber_has_plf&lt;S&gt;(subscriber: <span class="kw-2">&amp;</span>S) -&gt; bool
+<span class="kw">where
+    </span>S: Subscriber,
 {
-    (<span class="ident">subscriber</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Subscriber</span>).<span class="ident">is</span>::<span class="op">&lt;</span><span class="ident">MagicPlfDowncastMarker</span><span class="op">&gt;</span>()
+    (subscriber <span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>Subscriber).is::&lt;MagicPlfDowncastMarker&gt;()
 }
 
-<span class="doccomment">/// Does a type implementing `Layer` contain any per-layer filters?</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">layer_has_plf</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">layer</span>: <span class="kw-2">&amp;</span><span class="ident">L</span>) -&gt; <span class="ident">bool</span>
-<span class="kw">where</span>
-    <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+<span class="doccomment">/// Does a type implementing `Layer` contain any per-layer filters?
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>layer_has_plf&lt;L, S&gt;(layer: <span class="kw-2">&amp;</span>L) -&gt; bool
+<span class="kw">where
+    </span>L: Layer&lt;S&gt;,
+    S: Subscriber,
 {
-    <span class="kw">unsafe</span> {
-        <span class="comment">// Safety: we&#39;re not actually *doing* anything with this pointer --- we</span>
-        <span class="comment">// only care about the `Option`, which we&#39;re turning into a `bool`. So</span>
-        <span class="comment">// even if the layer decides to be evil and give us some kind of invalid</span>
-        <span class="comment">// pointer, we don&#39;t ever dereference it, so this is always safe.</span>
-        <span class="ident">layer</span>.<span class="ident">downcast_raw</span>(<span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">MagicPlfDowncastMarker</span><span class="op">&gt;</span>())
+    <span class="kw">unsafe </span>{
+        <span class="comment">// Safety: we&#39;re not actually *doing* anything with this pointer --- we
+        // only care about the `Option`, which we&#39;re turning into a `bool`. So
+        // even if the layer decides to be evil and give us some kind of invalid
+        // pointer, we don&#39;t ever dereference it, so this is always safe.
+        </span>layer.downcast_raw(TypeId::of::&lt;MagicPlfDowncastMarker&gt;())
     }
-    .<span class="ident">is_some</span>()
+    .is_some()
 }
 
-<span class="kw">struct</span> <span class="ident">FmtBitset</span>(<span class="ident">u64</span>);
+<span class="kw">struct </span>FmtBitset(u64);
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FmtBitset</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_set</span>();
-        <span class="kw">for</span> <span class="ident">bit</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">64</span> {
-            <span class="comment">// if the `bit`-th bit is set, add it to the debug set</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">bit</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">set</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="ident">bit</span>);
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>FmtBitset {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>set = f.debug_set();
+        <span class="kw">for </span>bit <span class="kw">in </span><span class="number">0</span>..<span class="number">64 </span>{
+            <span class="comment">// if the `bit`-th bit is set, add it to the debug set
+            </span><span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>&amp; (<span class="number">1 </span>&lt;&lt; bit) != <span class="number">0 </span>{
+                set.entry(<span class="kw-2">&amp;</span>bit);
             }
         }
-        <span class="ident">set</span>.<span class="ident">finish</span>()
+        set.finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

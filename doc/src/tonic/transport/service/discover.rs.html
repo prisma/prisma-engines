@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/service/discover.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>discover.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/service/discover.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>discover.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -55,60 +55,60 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::service</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::connection::Connection</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transport::Endpoint</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::service;
+<span class="kw">use </span><span class="kw">super</span>::connection::Connection;
+<span class="kw">use </span><span class="kw">crate</span>::transport::Endpoint;
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">hash::Hash</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+<span class="kw">use </span>std::{
+    hash::Hash,
+    pin::Pin,
+    task::{Context, Poll},
 };
-<span class="kw">use</span> <span class="ident">tokio::sync::mpsc::Receiver</span>;
+<span class="kw">use </span>tokio::sync::mpsc::Receiver;
 
-<span class="kw">use</span> <span class="ident">tokio_stream::Stream</span>;
-<span class="kw">use</span> <span class="ident">tower::discover::Change</span>;
+<span class="kw">use </span>tokio_stream::Stream;
+<span class="kw">use </span>tower::discover::Change;
 
-<span class="kw">type</span> <span class="ident">DiscoverResult</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span>;
+<span class="kw">type </span>DiscoverResult&lt;K, S, E&gt; = <span class="prelude-ty">Result</span>&lt;Change&lt;K, S&gt;, E&gt;;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DynamicServiceStream</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> {
-    <span class="ident">changes</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">Endpoint</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DynamicServiceStream&lt;K: Hash + Eq + Clone&gt; {
+    changes: Receiver&lt;Change&lt;K, Endpoint&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">DynamicServiceStream</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">changes</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">Endpoint</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">changes</span> }
+<span class="kw">impl</span>&lt;K: Hash + Eq + Clone&gt; DynamicServiceStream&lt;K&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(changes: Receiver&lt;Change&lt;K, Endpoint&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ changes }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">DynamicServiceStream</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">DiscoverResult</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">Connection</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;K: Hash + Eq + Clone&gt; Stream <span class="kw">for </span>DynamicServiceStream&lt;K&gt; {
+    <span class="kw">type </span>Item = DiscoverResult&lt;K, Connection, <span class="kw">crate</span>::Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">changes</span>;
-        <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">c</span>).<span class="ident">poll_recv</span>(<span class="ident">cx</span>) {
-            <span class="ident">Poll::Pending</span> <span class="op">|</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">Poll::Pending</span>,
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">change</span>)) =&gt; <span class="kw">match</span> <span class="ident">change</span> {
-                <span class="ident">Change::Insert</span>(<span class="ident">k</span>, <span class="ident">endpoint</span>) =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">hyper::client::connect::HttpConnector::new</span>();
-                    <span class="ident">http</span>.<span class="ident">set_nodelay</span>(<span class="ident">endpoint</span>.<span class="ident">tcp_nodelay</span>);
-                    <span class="ident">http</span>.<span class="ident">set_keepalive</span>(<span class="ident">endpoint</span>.<span class="ident">tcp_keepalive</span>);
-                    <span class="ident">http</span>.<span class="ident">enforce_http</span>(<span class="bool-val">false</span>);
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-                    <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">service::connector</span>(<span class="ident">http</span>, <span class="ident">endpoint</span>.<span class="ident">tls</span>.<span class="ident">clone</span>());
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span>c = <span class="kw-2">&amp;mut </span><span class="self">self</span>.changes;
+        <span class="kw">match </span>Pin::new(<span class="kw-2">&amp;mut *</span>c).poll_recv(cx) {
+            Poll::Pending | Poll::Ready(<span class="prelude-val">None</span>) =&gt; Poll::Pending,
+            Poll::Ready(<span class="prelude-val">Some</span>(change)) =&gt; <span class="kw">match </span>change {
+                Change::Insert(k, endpoint) =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>http = hyper::client::connect::HttpConnector::new();
+                    http.set_nodelay(endpoint.tcp_nodelay);
+                    http.set_keepalive(endpoint.tcp_keepalive);
+                    http.enforce_http(<span class="bool-val">false</span>);
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+                    </span><span class="kw">let </span>connector = service::connector(http, endpoint.tls.clone());
 
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>))]</span>
-                    <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">service::connector</span>(<span class="ident">http</span>);
-                    <span class="kw">let</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">Connection::lazy</span>(<span class="ident">connector</span>, <span class="ident">endpoint</span>);
-                    <span class="kw">let</span> <span class="ident">change</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(<span class="ident">Change::Insert</span>(<span class="ident">k</span>, <span class="ident">connection</span>));
-                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">change</span>))
+                    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;tls&quot;</span>))]
+                    </span><span class="kw">let </span>connector = service::connector(http);
+                    <span class="kw">let </span>connection = Connection::lazy(connector, endpoint);
+                    <span class="kw">let </span>change = <span class="prelude-val">Ok</span>(Change::Insert(k, connection));
+                    Poll::Ready(<span class="prelude-val">Some</span>(change))
                 }
-                <span class="ident">Change::Remove</span>(<span class="ident">k</span>) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">Change::Remove</span>(<span class="ident">k</span>)))),
+                Change::Remove(k) =&gt; Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(Change::Remove(k)))),
             },
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">DynamicServiceStream</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;K: Hash + Eq + Clone&gt; Unpin <span class="kw">for </span>DynamicServiceStream&lt;K&gt; {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

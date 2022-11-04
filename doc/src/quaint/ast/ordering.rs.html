@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/ordering.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ordering.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/ordering.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ordering.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -122,129 +122,129 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">Column</span>, <span class="ident">Expression</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{Column, Expression};
 
-<span class="doccomment">/// Defines ordering for an `ORDER BY` statement.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Defines ordering for an `ORDER BY` statement.
+</span><span class="kw">pub type </span>OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; = (Expression&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="prelude-ty">Option</span>&lt;Order&gt;);
 
-<span class="doccomment">/// A list of definitions for the `ORDER BY` statement.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ordering</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A list of definitions for the `ORDER BY` statement.
+</span><span class="attribute">#[derive(Debug, Default, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>Ordering&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub </span>Vec&lt;OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt;&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Ordering</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">value</span>);
-        <span class="self">self</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Ordering&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>append(<span class="kw-2">mut </span><span class="self">self</span>, value: OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0</span>.push(value);
+        <span class="self">self
+    </span>}
+
+    <span class="kw">pub fn </span>new(values: Vec&lt;OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(values)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">values</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>()
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.is_empty()
     }
 }
 
-<span class="doccomment">/// The ordering direction</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Order</span> {
-    <span class="doccomment">/// Ascending</span>
-    <span class="ident">Asc</span>,
-    <span class="doccomment">/// Descending</span>
-    <span class="ident">Desc</span>,
-    <span class="doccomment">/// Ascending Nulls First</span>
-    <span class="ident">AscNullsFirst</span>,
-    <span class="doccomment">/// Ascending Nulls Last</span>
-    <span class="ident">AscNullsLast</span>,
-    <span class="doccomment">/// Descending Nulls First</span>
-    <span class="ident">DescNullsFirst</span>,
-    <span class="doccomment">/// Descending Nulls Last</span>
-    <span class="ident">DescNullsLast</span>,
+<span class="doccomment">/// The ordering direction
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>Order {
+    <span class="doccomment">/// Ascending
+    </span>Asc,
+    <span class="doccomment">/// Descending
+    </span>Desc,
+    <span class="doccomment">/// Ascending Nulls First
+    </span>AscNullsFirst,
+    <span class="doccomment">/// Ascending Nulls Last
+    </span>AscNullsLast,
+    <span class="doccomment">/// Descending Nulls First
+    </span>DescNullsFirst,
+    <span class="doccomment">/// Descending Nulls Last
+    </span>DescNullsLast,
 }
 
-<span class="doccomment">/// An item that can be used in the `ORDER BY` statement</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Orderable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="self">Self</span>: <span class="ident">Sized</span>,
+<span class="doccomment">/// An item that can be used in the `ORDER BY` statement
+</span><span class="kw">pub trait </span>Orderable&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">where
+    </span><span class="self">Self</span>: Sized,
 {
-    <span class="doccomment">/// Order by `self` in the given order</span>
-    <span class="kw">fn</span> <span class="ident">order</span>(<span class="self">self</span>, <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Order by `self` in the given order
+    </span><span class="kw">fn </span>order(<span class="self">self</span>, order: <span class="prelude-ty">Option</span>&lt;Order&gt;) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt;;
 
-    <span class="doccomment">/// Change the order to `ASC`</span>
-    <span class="kw">fn</span> <span class="ident">ascend</span>(<span class="self">self</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">order</span>(<span class="prelude-val">Some</span>(<span class="ident">Order::Asc</span>))
+    <span class="doccomment">/// Change the order to `ASC`
+    </span><span class="kw">fn </span>ascend(<span class="self">self</span>) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.order(<span class="prelude-val">Some</span>(Order::Asc))
     }
 
-    <span class="doccomment">/// Change the order to `DESC`</span>
-    <span class="kw">fn</span> <span class="ident">descend</span>(<span class="self">self</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">order</span>(<span class="prelude-val">Some</span>(<span class="ident">Order::Desc</span>))
+    <span class="doccomment">/// Change the order to `DESC`
+    </span><span class="kw">fn </span>descend(<span class="self">self</span>) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.order(<span class="prelude-val">Some</span>(Order::Desc))
     }
 
-    <span class="doccomment">/// Change the order to `ASC NULLS FIRST`</span>
-    <span class="kw">fn</span> <span class="ident">ascend_nulls_first</span>(<span class="self">self</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">order</span>(<span class="prelude-val">Some</span>(<span class="ident">Order::AscNullsFirst</span>))
+    <span class="doccomment">/// Change the order to `ASC NULLS FIRST`
+    </span><span class="kw">fn </span>ascend_nulls_first(<span class="self">self</span>) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.order(<span class="prelude-val">Some</span>(Order::AscNullsFirst))
     }
 
-    <span class="doccomment">/// Change the order to `ASC NULLS LAST`</span>
-    <span class="kw">fn</span> <span class="ident">ascend_nulls_last</span>(<span class="self">self</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">order</span>(<span class="prelude-val">Some</span>(<span class="ident">Order::AscNullsLast</span>))
+    <span class="doccomment">/// Change the order to `ASC NULLS LAST`
+    </span><span class="kw">fn </span>ascend_nulls_last(<span class="self">self</span>) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.order(<span class="prelude-val">Some</span>(Order::AscNullsLast))
     }
 
-    <span class="doccomment">/// Change the order to `DESC NULLS FIRST`</span>
-    <span class="kw">fn</span> <span class="ident">descend_nulls_first</span>(<span class="self">self</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">order</span>(<span class="prelude-val">Some</span>(<span class="ident">Order::DescNullsFirst</span>))
+    <span class="doccomment">/// Change the order to `DESC NULLS FIRST`
+    </span><span class="kw">fn </span>descend_nulls_first(<span class="self">self</span>) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.order(<span class="prelude-val">Some</span>(Order::DescNullsFirst))
     }
 
-    <span class="doccomment">/// Change the order to `ASC NULLS LAST`</span>
-    <span class="kw">fn</span> <span class="ident">descend_nulls_last</span>(<span class="self">self</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">order</span>(<span class="prelude-val">Some</span>(<span class="ident">Order::DescNullsLast</span>))
-    }
-}
-
-<span class="doccomment">/// Convert the value into an order definition with order item and direction</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoOrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_order_definition</span>(<span class="self">self</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoOrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">into_order_definition</span>(<span class="self">self</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">column</span>: <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        (<span class="ident">column</span>.<span class="ident">into</span>(), <span class="prelude-val">None</span>)
+    <span class="doccomment">/// Change the order to `ASC NULLS LAST`
+    </span><span class="kw">fn </span>descend_nulls_last(<span class="self">self</span>) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.order(<span class="prelude-val">Some</span>(Order::DescNullsLast))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoOrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_order_definition</span>(<span class="self">self</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        (<span class="self">self</span>.<span class="ident">into</span>(), <span class="prelude-val">None</span>)
+<span class="doccomment">/// Convert the value into an order definition with order item and direction
+</span><span class="kw">pub trait </span>IntoOrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>into_order_definition(<span class="self">self</span>) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt;;
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoOrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="kw">fn </span>into_order_definition(<span class="self">self</span>) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>column: Column&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        (column.into(), <span class="prelude-val">None</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoOrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_order_definition</span>(<span class="self">self</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoOrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Column&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>into_order_definition(<span class="self">self</span>) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        (<span class="self">self</span>.into(), <span class="prelude-val">None</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Orderable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">order</span>(<span class="self">self</span>, <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        (<span class="self">self</span>.<span class="ident">into</span>(), <span class="ident">order</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoOrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>into_order_definition(<span class="self">self</span>) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Orderable&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Column&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>order(<span class="self">self</span>, order: <span class="prelude-ty">Option</span>&lt;Order&gt;) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        (<span class="self">self</span>.into(), order)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Orderable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">order</span>(<span class="self">self</span>, <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">column</span>: <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">column</span>.<span class="ident">order</span>(<span class="ident">order</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Orderable&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="kw">fn </span>order(<span class="self">self</span>, order: <span class="prelude-ty">Option</span>&lt;Order&gt;) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>column: Column&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        column.order(order)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Orderable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
-    <span class="kw">fn</span> <span class="ident">order</span>(<span class="self">self</span>, <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span>) -&gt; <span class="ident">OrderDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">column</span>: <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">column</span>.<span class="ident">order</span>(<span class="ident">order</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Orderable&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+    <span class="kw">fn </span>order(<span class="self">self</span>, order: <span class="prelude-ty">Option</span>&lt;Order&gt;) -&gt; OrderDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>column: Column&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        column.order(order)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

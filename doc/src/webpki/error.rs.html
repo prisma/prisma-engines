@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -106,113 +106,113 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR</span>
-<span class="comment">// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN</span>
-<span class="comment">// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF</span>
-<span class="comment">// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
+</span><span class="kw">use </span>core::fmt;
 
-<span class="doccomment">/// An error that occurs during certificate validation or name validation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// The encoding of some ASN.1 DER-encoded item is invalid.</span>
-    <span class="ident">BadDer</span>,
+<span class="doccomment">/// An error that occurs during certificate validation or name validation.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// The encoding of some ASN.1 DER-encoded item is invalid.
+    </span>BadDer,
 
-    <span class="doccomment">/// The encoding of an ASN.1 DER-encoded time is invalid.</span>
-    <span class="ident">BadDerTime</span>,
+    <span class="doccomment">/// The encoding of an ASN.1 DER-encoded time is invalid.
+    </span>BadDerTime,
 
-    <span class="doccomment">/// A CA certificate is being used as an end-entity certificate.</span>
-    <span class="ident">CaUsedAsEndEntity</span>,
+    <span class="doccomment">/// A CA certificate is being used as an end-entity certificate.
+    </span>CaUsedAsEndEntity,
 
-    <span class="doccomment">/// The certificate is expired; i.e. the time it is being validated for is</span>
-    <span class="doccomment">/// later than the certificate&#39;s notAfter time.</span>
-    <span class="ident">CertExpired</span>,
+    <span class="doccomment">/// The certificate is expired; i.e. the time it is being validated for is
+    /// later than the certificate&#39;s notAfter time.
+    </span>CertExpired,
 
-    <span class="doccomment">/// The certificate is not valid for the name it is being validated for.</span>
-    <span class="ident">CertNotValidForName</span>,
+    <span class="doccomment">/// The certificate is not valid for the name it is being validated for.
+    </span>CertNotValidForName,
 
-    <span class="doccomment">/// The certificate is not valid yet; i.e. the time it is being validated</span>
-    <span class="doccomment">/// for is earlier than the certificate&#39;s notBefore time.</span>
-    <span class="ident">CertNotValidYet</span>,
+    <span class="doccomment">/// The certificate is not valid yet; i.e. the time it is being validated
+    /// for is earlier than the certificate&#39;s notBefore time.
+    </span>CertNotValidYet,
 
-    <span class="doccomment">/// An end-entity certificate is being used as a CA certificate.</span>
-    <span class="ident">EndEntityUsedAsCa</span>,
+    <span class="doccomment">/// An end-entity certificate is being used as a CA certificate.
+    </span>EndEntityUsedAsCa,
 
-    <span class="doccomment">/// An X.509 extension is invalid.</span>
-    <span class="ident">ExtensionValueInvalid</span>,
+    <span class="doccomment">/// An X.509 extension is invalid.
+    </span>ExtensionValueInvalid,
 
-    <span class="doccomment">/// The certificate validity period (notBefore, notAfter) is invalid; e.g.</span>
-    <span class="doccomment">/// the notAfter time is earlier than the notBefore time.</span>
-    <span class="ident">InvalidCertValidity</span>,
+    <span class="doccomment">/// The certificate validity period (notBefore, notAfter) is invalid; e.g.
+    /// the notAfter time is earlier than the notBefore time.
+    </span>InvalidCertValidity,
 
-    <span class="doccomment">/// The signature is invalid for the given public key.</span>
-    <span class="ident">InvalidSignatureForPublicKey</span>,
+    <span class="doccomment">/// The signature is invalid for the given public key.
+    </span>InvalidSignatureForPublicKey,
 
-    <span class="doccomment">/// The certificate violates one or more name constraints.</span>
-    <span class="ident">NameConstraintViolation</span>,
+    <span class="doccomment">/// The certificate violates one or more name constraints.
+    </span>NameConstraintViolation,
 
-    <span class="doccomment">/// The certificate violates one or more path length constraints.</span>
-    <span class="ident">PathLenConstraintViolated</span>,
+    <span class="doccomment">/// The certificate violates one or more path length constraints.
+    </span>PathLenConstraintViolated,
 
-    <span class="doccomment">/// The algorithm in the TBSCertificate &quot;signature&quot; field of a certificate</span>
-    <span class="doccomment">/// does not match the algorithm in the signature of the certificate.</span>
-    <span class="ident">SignatureAlgorithmMismatch</span>,
+    <span class="doccomment">/// The algorithm in the TBSCertificate &quot;signature&quot; field of a certificate
+    /// does not match the algorithm in the signature of the certificate.
+    </span>SignatureAlgorithmMismatch,
 
-    <span class="doccomment">/// The certificate is not valid for the Extended Key Usage for which it is</span>
-    <span class="doccomment">/// being validated.</span>
-    <span class="ident">RequiredEkuNotFound</span>,
+    <span class="doccomment">/// The certificate is not valid for the Extended Key Usage for which it is
+    /// being validated.
+    </span>RequiredEkuNotFound,
 
-    <span class="doccomment">/// A valid issuer for the certificate could not be found.</span>
-    <span class="ident">UnknownIssuer</span>,
+    <span class="doccomment">/// A valid issuer for the certificate could not be found.
+    </span>UnknownIssuer,
 
-    <span class="doccomment">/// The certificate is not a v3 X.509 certificate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This error may be also reported if the certificate version field</span>
-    <span class="doccomment">/// is malformed.</span>
-    <span class="ident">UnsupportedCertVersion</span>,
+    <span class="doccomment">/// The certificate is not a v3 X.509 certificate.
+    ///
+    /// This error may be also reported if the certificate version field
+    /// is malformed.
+    </span>UnsupportedCertVersion,
 
-    <span class="doccomment">/// The certificate extensions are missing or malformed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In particular, webpki requires the DNS name(s) be in the subjectAltName</span>
-    <span class="doccomment">/// extension as required by the CA/Browser Forum Baseline Requirements</span>
-    <span class="doccomment">/// and as recommended by RFC6125.</span>
-    <span class="ident">MissingOrMalformedExtensions</span>,
+    <span class="doccomment">/// The certificate extensions are missing or malformed.
+    ///
+    /// In particular, webpki requires the DNS name(s) be in the subjectAltName
+    /// extension as required by the CA/Browser Forum Baseline Requirements
+    /// and as recommended by RFC6125.
+    </span>MissingOrMalformedExtensions,
 
-    <span class="doccomment">/// The certificate contains an unsupported critical extension.</span>
-    <span class="ident">UnsupportedCriticalExtension</span>,
+    <span class="doccomment">/// The certificate contains an unsupported critical extension.
+    </span>UnsupportedCriticalExtension,
 
-    <span class="doccomment">/// The signature&#39;s algorithm does not match the algorithm of the public</span>
-    <span class="doccomment">/// key it is being validated for. This may be because the public key</span>
-    <span class="doccomment">/// algorithm&#39;s OID isn&#39;t recognized (e.g. DSA), or the public key</span>
-    <span class="doccomment">/// algorithm&#39;s parameters don&#39;t match the supported parameters for that</span>
-    <span class="doccomment">/// algorithm (e.g. ECC keys for unsupported curves), or the public key</span>
-    <span class="doccomment">/// algorithm and the signature algorithm simply don&#39;t match (e.g.</span>
-    <span class="doccomment">/// verifying an RSA signature with an ECC public key).</span>
-    <span class="ident">UnsupportedSignatureAlgorithmForPublicKey</span>,
+    <span class="doccomment">/// The signature&#39;s algorithm does not match the algorithm of the public
+    /// key it is being validated for. This may be because the public key
+    /// algorithm&#39;s OID isn&#39;t recognized (e.g. DSA), or the public key
+    /// algorithm&#39;s parameters don&#39;t match the supported parameters for that
+    /// algorithm (e.g. ECC keys for unsupported curves), or the public key
+    /// algorithm and the signature algorithm simply don&#39;t match (e.g.
+    /// verifying an RSA signature with an ECC public key).
+    </span>UnsupportedSignatureAlgorithmForPublicKey,
 
-    <span class="doccomment">/// The signature algorithm for a signature is not in the set of supported</span>
-    <span class="doccomment">/// signature algorithms given.</span>
-    <span class="ident">UnsupportedSignatureAlgorithm</span>,
+    <span class="doccomment">/// The signature algorithm for a signature is not in the set of supported
+    /// signature algorithms given.
+    </span>UnsupportedSignatureAlgorithm,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>)
     }
 }
 
-<span class="doccomment">/// Requires the `std` feature.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">::std::error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+<span class="doccomment">/// Requires the `std` feature.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>::std::error::Error <span class="kw">for </span>Error {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

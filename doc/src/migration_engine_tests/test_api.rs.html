@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/migration-engine-tests/src/test_api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test_api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../migration_engine_tests/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/migration-engine-tests/src/test_api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test_api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../migration_engine_tests/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -419,426 +419,426 @@
 <span id="419">419</span>
 <span id="420">420</span>
 <span id="421">421</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::assertions</span>::{<span class="ident">MigrationsAssertions</span>, <span class="ident">ResultSetExt</span>, <span class="ident">SchemaAssertion</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_core::json_rpc::types</span>::{
-    <span class="ident">DbExecuteDatasourceType</span>, <span class="ident">DbExecuteParams</span>, <span class="ident">DiffParams</span>, <span class="ident">DiffResult</span>, <span class="ident">SchemaContainer</span>, <span class="ident">UrlContainer</span>,
+</pre><pre class="rust"><code><span class="kw">pub use </span><span class="kw">crate</span>::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
+<span class="kw">pub use </span>expect_test::expect;
+<span class="kw">pub use </span>migration_core::json_rpc::types::{
+    DbExecuteDatasourceType, DbExecuteParams, DiffParams, DiffResult, SchemaContainer, UrlContainer,
 };
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_macros::test_connector</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">runtime::run_with_thread_local_runtime</span> <span class="kw">as</span> <span class="ident">tok</span>, <span class="ident">BitFlags</span>, <span class="ident">Capabilities</span>, <span class="ident">Tags</span>};
+<span class="kw">pub use </span>test_macros::test_connector;
+<span class="kw">pub use </span>test_setup::{runtime::run_with_thread_local_runtime <span class="kw">as </span>tok, BitFlags, Capabilities, Tags};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">commands</span>::<span class="kw-2">*</span>, <span class="ident">multi_engine_test_api::TestApi</span> <span class="kw">as</span> <span class="ident">RootTestApi</span>};
-<span class="kw">use</span> <span class="ident">migration_core</span>::{
-    <span class="ident">commands::diff</span>,
-    <span class="ident">migration_connector</span>::{
-        <span class="ident">BoxFuture</span>, <span class="ident">ConnectorHost</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DiffTarget</span>, <span class="ident">MigrationConnector</span>, <span class="ident">MigrationPersistence</span>, <span class="ident">Namespaces</span>,
+<span class="kw">use crate</span>::{commands::<span class="kw-2">*</span>, multi_engine_test_api::TestApi <span class="kw">as </span>RootTestApi};
+<span class="kw">use </span>migration_core::{
+    commands::diff,
+    migration_connector::{
+        BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence, Namespaces,
     },
 };
-<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">parser_database::SourceFile</span>, <span class="ident">PreviewFeature</span>};
-<span class="kw">use</span> <span class="ident">quaint</span>::{
-    <span class="ident">prelude</span>::{<span class="ident">ConnectionInfo</span>, <span class="ident">ResultSet</span>},
-    <span class="ident">Value</span>,
+<span class="kw">use </span>psl::{parser_database::SourceFile, PreviewFeature};
+<span class="kw">use </span>quaint::{
+    prelude::{ConnectionInfo, ResultSet},
+    Value,
 };
-<span class="kw">use</span> <span class="ident">sql_migration_connector::SqlMigrationConnector</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
+<span class="kw">use </span>sql_migration_connector::SqlMigrationConnector;
+<span class="kw">use </span>sql_schema_describer::SqlSchema;
+<span class="kw">use </span>std::{
+    borrow::Cow,
+    fmt::{Display, Write},
 };
-<span class="kw">use</span> <span class="ident">tempfile::TempDir</span>;
-<span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">DatasourceBlock</span>, <span class="ident">TestApiArgs</span>};
+<span class="kw">use </span>tempfile::TempDir;
+<span class="kw">use </span>test_setup::{DatasourceBlock, TestApiArgs};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestConnectorHost</span> {
-    <span class="kw">pub</span> <span class="ident">printed_messages</span>: <span class="ident">std::sync::Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>TestConnectorHost {
+    <span class="kw">pub </span>printed_messages: std::sync::Mutex&lt;Vec&lt;String&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectorHost</span> <span class="kw">for</span> <span class="ident">TestConnectorHost</span> {
-    <span class="kw">fn</span> <span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// https://github.com/prisma/prisma/issues/11761</span>
-        <span class="macro">assert!</span>(<span class="ident">message</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\n&#39;</span>));
-        <span class="self">self</span>.<span class="ident">printed_messages</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">push</span>(<span class="ident">message</span>.<span class="ident">to_owned</span>());
-        <span class="ident">Box::pin</span>(<span class="ident">std::future::ready</span>(<span class="prelude-val">Ok</span>(())))
+<span class="kw">impl </span>ConnectorHost <span class="kw">for </span>TestConnectorHost {
+    <span class="kw">fn </span>print(<span class="kw-2">&amp;</span><span class="self">self</span>, message: <span class="kw-2">&amp;</span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+        <span class="comment">// https://github.com/prisma/prisma/issues/11761
+        </span><span class="macro">assert!</span>(message.ends_with(<span class="string">&#39;\n&#39;</span>));
+        <span class="self">self</span>.printed_messages.lock().unwrap().push(message.to_owned());
+        Box::pin(std::future::ready(<span class="prelude-val">Ok</span>(())))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestApi</span> {
-    <span class="ident">root</span>: <span class="ident">RootTestApi</span>,
-    <span class="kw">pub</span> <span class="ident">connector</span>: <span class="ident">SqlMigrationConnector</span>,
+<span class="kw">pub struct </span>TestApi {
+    root: RootTestApi,
+    <span class="kw">pub </span>connector: SqlMigrationConnector,
 }
 
-<span class="kw">impl</span> <span class="ident">TestApi</span> {
-    <span class="doccomment">/// Initializer, called by the test macros.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">args</span>: <span class="ident">TestApiArgs</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">RootTestApi::new</span>(<span class="ident">args</span>);
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">new_engine</span>().<span class="ident">connector</span>;
+<span class="kw">impl </span>TestApi {
+    <span class="doccomment">/// Initializer, called by the test macros.
+    </span><span class="kw">pub fn </span>new(args: TestApiArgs) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>root = RootTestApi::new(args);
+        <span class="kw">let </span>connector = root.new_engine().connector;
 
-        <span class="ident">TestApi</span> { <span class="ident">root</span>, <span class="ident">connector</span> }
+        TestApi { root, connector }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">args</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">TestApiArgs</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">args</span>
+    <span class="kw">pub fn </span>args(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>TestApiArgs {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.root.args
     }
 
-    <span class="doccomment">/// Plan an `applyMigrations` command</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="ident">ApplyMigrations</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ApplyMigrations::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>)
+    <span class="doccomment">/// Plan an `applyMigrations` command
+    </span><span class="kw">pub fn </span>apply_migrations&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, migrations_directory: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TempDir) -&gt; ApplyMigrations&lt;<span class="lifetime">&#39;a</span>&gt; {
+        ApplyMigrations::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, migrations_directory)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">connection_string</span>()
+    <span class="kw">pub fn </span>connection_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.root.connection_string()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionInfo</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">connection_info</span>()
+    <span class="kw">pub fn </span>connection_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectionInfo {
+        <span class="self">self</span>.root.connection_info()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">ensure_connection_validity</span>())
+    <span class="kw">pub fn </span>ensure_connection_validity(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ConnectorResult&lt;()&gt; {
+        tok(<span class="self">self</span>.connector.ensure_connection_validity())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>().<span class="ident">to_owned</span>()
+    <span class="kw">pub fn </span>schema_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.connection_info().schema_name().to_owned()
     }
 
-    <span class="doccomment">/// Plan a `createMigration` command</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_migration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
-    ) -&gt; <span class="ident">CreateMigration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">CreateMigration::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">name</span>, <span class="ident">schema</span>, <span class="ident">migrations_directory</span>)
+    <span class="doccomment">/// Plan a `createMigration` command
+    </span><span class="kw">pub fn </span>create_migration&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        migrations_directory: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TempDir,
+    ) -&gt; CreateMigration&lt;<span class="lifetime">&#39;a</span>&gt; {
+        CreateMigration::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, name, schema, migrations_directory)
     }
 
-    <span class="doccomment">/// Create a temporary directory to serve as a test migrations directory.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_migrations_directory</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TempDir</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">create_migrations_directory</span>()
+    <span class="doccomment">/// Create a temporary directory to serve as a test migrations directory.
+    </span><span class="kw">pub fn </span>create_migrations_directory(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TempDir {
+        <span class="self">self</span>.root.create_migrations_directory()
     }
 
-    <span class="doccomment">/// Builder and assertions to call the `devDiagnostic` command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dev_diagnostic</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="ident">DevDiagnostic</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">DevDiagnostic::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>)
+    <span class="doccomment">/// Builder and assertions to call the `devDiagnostic` command.
+    </span><span class="kw">pub fn </span>dev_diagnostic&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, migrations_directory: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TempDir) -&gt; DevDiagnostic&lt;<span class="lifetime">&#39;a</span>&gt; {
+        DevDiagnostic::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, migrations_directory)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diagnose_migration_history</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
-    ) -&gt; <span class="ident">DiagnoseMigrationHistory</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">DiagnoseMigrationHistory::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>)
+    <span class="kw">pub fn </span>diagnose_migration_history&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        migrations_directory: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TempDir,
+    ) -&gt; DiagnoseMigrationHistory&lt;<span class="lifetime">&#39;a</span>&gt; {
+        DiagnoseMigrationHistory::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, migrations_directory)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">DiffParams</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DiffResult</span><span class="op">&gt;</span> {
-        <span class="ident">test_setup::runtime::run_with_thread_local_runtime</span>(<span class="ident">diff</span>(<span class="ident">params</span>, <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">host</span>().<span class="ident">clone</span>()))
+    <span class="kw">pub fn </span>diff(<span class="kw-2">&amp;</span><span class="self">self</span>, params: DiffParams) -&gt; ConnectorResult&lt;DiffResult&gt; {
+        test_setup::runtime::run_with_thread_local_runtime(diff(params, <span class="self">self</span>.connector.host().clone()))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dump_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ResultSet</span> {
-        <span class="kw">let</span> <span class="ident">select_star</span> <span class="op">=</span>
-            <span class="ident">quaint::ast::Select::from_table</span>(<span class="self">self</span>.<span class="ident">render_table_name</span>(<span class="ident">table_name</span>)).<span class="ident">value</span>(<span class="ident">quaint::ast::asterisk</span>());
+    <span class="kw">pub fn </span>dump_table(<span class="kw-2">&amp;mut </span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; ResultSet {
+        <span class="kw">let </span>select_star =
+            quaint::ast::Select::from_table(<span class="self">self</span>.render_table_name(table_name)).value(quaint::ast::asterisk());
 
-        <span class="self">self</span>.<span class="ident">query</span>(<span class="ident">select_star</span>.<span class="ident">into</span>())
+        <span class="self">self</span>.query(select_star.into())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">evaluate_data_loss</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
-        <span class="ident">schema</span>: <span class="ident">String</span>,
-    ) -&gt; <span class="ident">EvaluateDataLoss</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">EvaluateDataLoss::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>, <span class="ident">schema</span>)
+    <span class="kw">pub fn </span>evaluate_data_loss&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        migrations_directory: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TempDir,
+        schema: String,
+    ) -&gt; EvaluateDataLoss&lt;<span class="lifetime">&#39;a</span>&gt; {
+        EvaluateDataLoss::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, migrations_directory, schema)
     }
 
-    <span class="doccomment">/// Returns true only when testing on MSSQL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mssql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_mssql</span>()
+    <span class="doccomment">/// Returns true only when testing on MSSQL.
+    </span><span class="kw">pub fn </span>is_mssql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.is_mssql()
     }
 
-    <span class="doccomment">/// Returns true only when testing on MariaDB.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mariadb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_mysql_mariadb</span>()
+    <span class="doccomment">/// Returns true only when testing on MariaDB.
+    </span><span class="kw">pub fn </span>is_mariadb(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.is_mysql_mariadb()
     }
 
-    <span class="doccomment">/// Returns true only when testing on MySQL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mysql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_mysql</span>()
+    <span class="doccomment">/// Returns true only when testing on MySQL.
+    </span><span class="kw">pub fn </span>is_mysql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.is_mysql()
     }
 
-    <span class="doccomment">/// Returns true only when testing on MariaDB.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mysql_mariadb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_mysql_mariadb</span>()
+    <span class="doccomment">/// Returns true only when testing on MariaDB.
+    </span><span class="kw">pub fn </span>is_mysql_mariadb(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.is_mysql_mariadb()
     }
 
-    <span class="doccomment">/// Returns true only when testing on MySQL 5.6.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mysql_5_6</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_mysql_5_6</span>()
+    <span class="doccomment">/// Returns true only when testing on MySQL 5.6.
+    </span><span class="kw">pub fn </span>is_mysql_5_6(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.is_mysql_5_6()
     }
 
-    <span class="doccomment">/// Returns true only when testing on MySQL 8.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mysql_8</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_mysql_8</span>()
+    <span class="doccomment">/// Returns true only when testing on MySQL 8.
+    </span><span class="kw">pub fn </span>is_mysql_8(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.is_mysql_8()
     }
 
-    <span class="doccomment">/// Returns true only when testing on postgres.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_postgres</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_postgres</span>()
+    <span class="doccomment">/// Returns true only when testing on postgres.
+    </span><span class="kw">pub fn </span>is_postgres(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.is_postgres()
     }
 
-    <span class="doccomment">/// Returns true only when testing on postgres version 15.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_postgres_15</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_postgres_15</span>()
+    <span class="doccomment">/// Returns true only when testing on postgres version 15.
+    </span><span class="kw">pub fn </span>is_postgres_15(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.is_postgres_15()
     }
 
-    <span class="doccomment">/// Returns true only when testing on cockroach.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cockroach</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_cockroach</span>()
+    <span class="doccomment">/// Returns true only when testing on cockroach.
+    </span><span class="kw">pub fn </span>is_cockroach(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.is_cockroach()
     }
 
-    <span class="doccomment">/// Returns true only when testing on sqlite.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_sqlite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_sqlite</span>()
+    <span class="doccomment">/// Returns true only when testing on sqlite.
+    </span><span class="kw">pub fn </span>is_sqlite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.is_sqlite()
     }
 
-    <span class="doccomment">/// Returns true only when testing on vitess.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_vitess</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_vitess</span>()
+    <span class="doccomment">/// Returns true only when testing on vitess.
+    </span><span class="kw">pub fn </span>is_vitess(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.is_vitess()
     }
 
-    <span class="doccomment">/// Insert test values</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">SingleRowInsert</span> {
-            <span class="ident">insert</span>: <span class="ident">quaint::ast::Insert::single_into</span>(<span class="self">self</span>.<span class="ident">render_table_name</span>(<span class="ident">table_name</span>)),
-            <span class="ident">api</span>: <span class="self">self</span>,
+    <span class="doccomment">/// Insert test values
+    </span><span class="kw">pub fn </span>insert&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt; {
+        SingleRowInsert {
+            insert: quaint::ast::Insert::single_into(<span class="self">self</span>.render_table_name(table_name)),
+            api: <span class="self">self</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list_migration_directories</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
-    ) -&gt; <span class="ident">ListMigrationDirectories</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ListMigrationDirectories::new</span>(<span class="ident">migrations_directory</span>)
+    <span class="kw">pub fn </span>list_migration_directories&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        migrations_directory: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TempDir,
+    ) -&gt; ListMigrationDirectories&lt;<span class="lifetime">&#39;a</span>&gt; {
+        ListMigrationDirectories::new(migrations_directory)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lower_cases_table_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">lower_cases_table_names</span>()
+    <span class="kw">pub fn </span>lower_cases_table_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.root.lower_cases_table_names()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">migration_name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
-    ) -&gt; <span class="ident">MarkMigrationApplied</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">MarkMigrationApplied::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migration_name</span>.<span class="ident">into</span>(), <span class="ident">migrations_directory</span>)
+    <span class="kw">pub fn </span>mark_migration_applied&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        migration_name: <span class="kw">impl </span>Into&lt;String&gt;,
+        migrations_directory: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TempDir,
+    ) -&gt; MarkMigrationApplied&lt;<span class="lifetime">&#39;a</span>&gt; {
+        MarkMigrationApplied::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, migration_name.into(), migrations_directory)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">MarkMigrationRolledBack</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">MarkMigrationRolledBack::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migration_name</span>.<span class="ident">into</span>())
+    <span class="kw">pub fn </span>mark_migration_rolled_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>, migration_name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; MarkMigrationRolledBack&lt;<span class="lifetime">&#39;_</span>&gt; {
+        MarkMigrationRolledBack::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, migration_name.into())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_persistence</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> (<span class="kw">dyn</span> <span class="ident">MigrationPersistence</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>) {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>
+    <span class="kw">pub fn </span>migration_persistence&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>(<span class="kw">dyn </span>MigrationPersistence + <span class="lifetime">&#39;a</span>) {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.connector
     }
 
-    <span class="doccomment">/// Assert facts about the database schema</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">SchemaAssertion</span> {
-        <span class="kw">let</span> <span class="ident">schema</span>: <span class="ident">SqlSchema</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">describe_schema</span>(<span class="prelude-val">None</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">SchemaAssertion::new</span>(<span class="ident">schema</span>, <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">args</span>.<span class="ident">tags</span>())
+    <span class="doccomment">/// Assert facts about the database schema
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SchemaAssertion {
+        <span class="kw">let </span>schema: SqlSchema = tok(<span class="self">self</span>.connector.describe_schema(<span class="prelude-val">None</span>)).unwrap();
+        SchemaAssertion::new(schema, <span class="self">self</span>.root.args.tags())
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_schema_with_namespaces</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>) -&gt; <span class="ident">SchemaAssertion</span> {
-        <span class="kw">let</span> <span class="ident">schema</span>: <span class="ident">SqlSchema</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">describe_schema</span>(<span class="ident">namespaces</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">SchemaAssertion::new</span>(<span class="ident">schema</span>, <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">args</span>.<span class="ident">tags</span>())
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_schema_with_namespaces(<span class="kw-2">&amp;mut </span><span class="self">self</span>, namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; SchemaAssertion {
+        <span class="kw">let </span>schema: SqlSchema = tok(<span class="self">self</span>.connector.describe_schema(namespaces)).unwrap();
+        SchemaAssertion::new(schema, <span class="self">self</span>.root.args.tags())
     }
 
-    <span class="doccomment">/// Render a valid datasource block, including database URL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datasource_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DatasourceBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">datasource_block</span>()
+    <span class="doccomment">/// Render a valid datasource block, including database URL.
+    </span><span class="kw">pub fn </span>datasource_block(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DatasourceBlock&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.root.datasource_block()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datasource_block_with</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)]) -&gt; <span class="ident">DatasourceBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">args</span>.<span class="ident">datasource_block</span>(<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">connection_string</span>(), <span class="ident">params</span>)
+    <span class="kw">pub fn </span>datasource_block_with&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str)]) -&gt; DatasourceBlock&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.root.args.datasource_block(<span class="self">self</span>.root.connection_string(), params)
     }
 
-    <span class="doccomment">/// Generate a migration script using `MigrationConnector::diff()`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connector_diff</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">from</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">to</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>
-            .<span class="ident">connector</span>
-            .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">from</span>, <span class="prelude-val">None</span>, <span class="ident">namespaces</span>.<span class="ident">clone</span>()))
-        .<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">database_schema_from_diff_target</span>(<span class="ident">to</span>, <span class="prelude-val">None</span>, <span class="ident">namespaces</span>)).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">migration</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">diff</span>(<span class="ident">from</span>, <span class="ident">to</span>);
-        <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">render_script</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>, <span class="kw-2">&amp;</span><span class="ident">Default::default</span>()).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Generate a migration script using `MigrationConnector::diff()`.
+    </span><span class="kw">pub fn </span>connector_diff(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        from: DiffTarget&lt;<span class="lifetime">&#39;_</span>&gt;,
+        to: DiffTarget&lt;<span class="lifetime">&#39;_</span>&gt;,
+        namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;,
+    ) -&gt; String {
+        <span class="kw">let </span>from = tok(<span class="self">self
+            </span>.connector
+            .database_schema_from_diff_target(from, <span class="prelude-val">None</span>, namespaces.clone()))
+        .unwrap();
+        <span class="kw">let </span>to = tok(<span class="self">self</span>.connector.database_schema_from_diff_target(to, <span class="prelude-val">None</span>, namespaces)).unwrap();
+        <span class="kw">let </span>migration = <span class="self">self</span>.connector.diff(from, to);
+        <span class="self">self</span>.connector.render_script(<span class="kw-2">&amp;</span>migration, <span class="kw-2">&amp;</span>Default::default()).unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalize_identifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">identifier</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">lower_cases_table_names</span>() {
-            <span class="ident">identifier</span>.<span class="ident">to_ascii_lowercase</span>().<span class="ident">into</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">identifier</span>.<span class="ident">into</span>()
+    <span class="kw">pub fn </span>normalize_identifier&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, identifier: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="kw">if </span><span class="self">self</span>.lower_cases_table_names() {
+            identifier.to_ascii_lowercase().into()
+        } <span class="kw">else </span>{
+            identifier.into()
         }
     }
 
-    <span class="doccomment">/// Like quaint::Queryable::query()</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">q</span>: <span class="ident">quaint::ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ResultSet</span> {
-        <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">query</span>(<span class="ident">q</span>)).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Like quaint::Queryable::query()
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>query(<span class="kw-2">&amp;mut </span><span class="self">self</span>, q: quaint::ast::Query&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ResultSet {
+        tok(<span class="self">self</span>.connector.query(q)).unwrap()
     }
 
-    <span class="doccomment">/// Like quaint::Queryable::query_raw()</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">q</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>]) -&gt; <span class="ident">ResultSet</span> {
-        <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">query_raw</span>(<span class="ident">q</span>, <span class="ident">params</span>)).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Like quaint::Queryable::query_raw()
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>query_raw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, q: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;static</span>&gt;]) -&gt; ResultSet {
+        tok(<span class="self">self</span>.connector.query_raw(q, params)).unwrap()
     }
 
-    <span class="doccomment">/// Send a SQL command to the database, and expect it to succeed.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>)).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Send a SQL command to the database, and expect it to succeed.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>raw_cmd(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str) {
+        tok(<span class="self">self</span>.connector.raw_cmd(sql)).unwrap()
     }
 
-    <span class="doccomment">/// Render a table name with the required prefixing for use with quaint query building.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_table_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">quaint::ast::Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_sqlite</span>() {
-            <span class="ident">table_name</span>.<span class="ident">to_owned</span>().<span class="ident">into</span>()
-        } <span class="kw">else</span> {
-            (<span class="self">self</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>().<span class="ident">to_owned</span>(), <span class="ident">table_name</span>.<span class="ident">to_owned</span>()).<span class="ident">into</span>()
+    <span class="doccomment">/// Render a table name with the required prefixing for use with quaint query building.
+    </span><span class="kw">pub fn </span>render_table_name(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; quaint::ast::Table&lt;<span class="lifetime">&#39;static</span>&gt; {
+        <span class="kw">if </span><span class="self">self</span>.root.is_sqlite() {
+            table_name.to_owned().into()
+        } <span class="kw">else </span>{
+            (<span class="self">self</span>.connection_info().schema_name().to_owned(), table_name.to_owned()).into()
         }
     }
 
-    <span class="doccomment">/// Plan a `reset` command</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Reset</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">Reset::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>)
+    <span class="doccomment">/// Plan a `reset` command
+    </span><span class="kw">pub fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Reset&lt;<span class="lifetime">&#39;_</span>&gt; {
+        Reset::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expect_sql_for_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">expect_test::Expect</span>) {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector_diff</span>(
-            <span class="ident">DiffTarget::Empty</span>,
-            <span class="ident">DiffTarget::Datamodel</span>(<span class="ident">SourceFile::new_static</span>(<span class="ident">schema</span>)),
+    <span class="kw">pub fn </span>expect_sql_for_schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, sql: <span class="kw-2">&amp;</span>expect_test::Expect) {
+        <span class="kw">let </span>found = <span class="self">self</span>.connector_diff(
+            DiffTarget::Empty,
+            DiffTarget::Datamodel(SourceFile::new_static(schema)),
             <span class="prelude-val">None</span>,
         );
-        <span class="ident">sql</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">found</span>);
+        sql.assert_eq(<span class="kw-2">&amp;</span>found);
     }
 
-    <span class="doccomment">/// Plan a `schemaPush` command adding the datasource</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_push_w_datasource</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dm</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">datamodel_with_provider</span>(<span class="kw-2">&amp;</span><span class="ident">dm</span>.<span class="ident">into</span>());
-        <span class="ident">SchemaPush::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">schema</span>)
+    <span class="doccomment">/// Plan a `schemaPush` command adding the datasource
+    </span><span class="kw">pub fn </span>schema_push_w_datasource(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dm: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; SchemaPush&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="kw">let </span>schema = <span class="self">self</span>.datamodel_with_provider(<span class="kw-2">&amp;</span>dm.into());
+        SchemaPush::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, schema)
     }
 
-    <span class="doccomment">/// Plan a `schemaPush` command</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dm</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">SchemaPush::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">dm</span>.<span class="ident">into</span>())
+    <span class="doccomment">/// Plan a `schemaPush` command
+    </span><span class="kw">pub fn </span>schema_push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dm: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; SchemaPush&lt;<span class="lifetime">&#39;_</span>&gt; {
+        SchemaPush::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, dm.into())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">args</span>.<span class="ident">tags</span>()
+    <span class="kw">pub fn </span>tags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;Tags&gt; {
+        <span class="self">self</span>.root.args.tags()
     }
 
-    <span class="doccomment">/// Render a valid datasource block, including database URL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_datasource_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">std::fmt::Write</span>) {
-        <span class="kw">let</span> <span class="ident">no_foreign_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">is_vitess</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>
-                .<span class="ident">root</span>
-                .<span class="ident">preview_features</span>()
-                .<span class="ident">contains</span>(<span class="ident">PreviewFeature::ReferentialIntegrity</span>);
+    <span class="doccomment">/// Render a valid datasource block, including database URL.
+    </span><span class="kw">pub fn </span>write_datasource_block(<span class="kw-2">&amp;</span><span class="self">self</span>, out: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>std::fmt::Write) {
+        <span class="kw">let </span>no_foreign_keys = <span class="self">self</span>.is_vitess()
+            &amp;&amp; <span class="self">self
+                </span>.root
+                .preview_features()
+                .contains(PreviewFeature::ReferentialIntegrity);
 
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">no_foreign_keys</span> {
+        <span class="kw">let </span>params = <span class="kw">if </span>no_foreign_keys {
             <span class="macro">vec!</span>[(<span class="string">&quot;relationMode&quot;</span>, <span class="string">r#&quot;&quot;prisma&quot;&quot;#</span>)]
-        } <span class="kw">else</span> {
-            <span class="ident">Vec::new</span>()
+        } <span class="kw">else </span>{
+            Vec::new()
         };
 
         <span class="macro">write!</span>(
-            <span class="ident">out</span>,
+            out,
             <span class="string">&quot;{}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">args</span>.<span class="ident">datasource_block</span>(<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">args</span>.<span class="ident">database_url</span>(), <span class="kw-2">&amp;</span><span class="ident">params</span>)
+            <span class="self">self</span>.root.args.datasource_block(<span class="self">self</span>.root.args.database_url(), <span class="kw-2">&amp;</span>params)
         )
-        .<span class="ident">unwrap</span>()
+        .unwrap()
     }
 
-    <span class="kw">fn</span> <span class="ident">generator_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">preview_feature_string</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">preview_features</span>().<span class="ident">is_empty</span>() {
-            <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">features</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">root</span>
-                .<span class="ident">preview_features</span>()
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, <span class="ident">f</span>))
-                .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+    <span class="kw">fn </span>generator_block(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span>preview_feature_string = <span class="kw">if </span><span class="self">self</span>.root.preview_features().is_empty() {
+            <span class="string">&quot;&quot;</span>.to_string()
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>features = <span class="self">self
+                </span>.root
+                .preview_features()
+                .iter()
+                .map(|f| <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, f))
+                .join(<span class="string">&quot;, &quot;</span>);
 
-            <span class="macro">format!</span>(<span class="string">&quot;\npreviewFeatures = [{}]&quot;</span>, <span class="ident">features</span>)
+            <span class="macro">format!</span>(<span class="string">&quot;\npreviewFeatures = [{}]&quot;</span>, features)
         };
 
-        <span class="kw">let</span> <span class="ident">generator_block</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>generator_block = <span class="macro">format!</span>(
             <span class="string">r#&quot;generator client {{
                  provider = &quot;prisma-client-js&quot;{}
                }}&quot;#</span>,
-            <span class="ident">preview_feature_string</span>
+            preview_feature_string
         );
-        <span class="ident">generator_block</span>
+        generator_block
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datamodel_with_provider</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">320</span> <span class="op">+</span> <span class="ident">schema</span>.<span class="ident">len</span>());
+    <span class="kw">pub fn </span>datamodel_with_provider(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>out = String::with_capacity(<span class="number">320 </span>+ schema.len());
 
-        <span class="self">self</span>.<span class="ident">write_datasource_block</span>(<span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
-        <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
-        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generator_block</span>());
-        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">schema</span>);
+        <span class="self">self</span>.write_datasource_block(<span class="kw-2">&amp;mut </span>out);
+        out.push(<span class="string">&#39;\n&#39;</span>);
+        out.push_str(<span class="kw-2">&amp;</span><span class="self">self</span>.generator_block());
+        out.push_str(schema);
 
-        <span class="ident">out</span>
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">insert</span>: <span class="ident">quaint::ast::SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">TestApi</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Add a value to the row</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">quaint::ast::Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">insert</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">insert</span>.<span class="ident">value</span>(<span class="ident">name</span>, <span class="ident">value</span>);
-
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Execute the request and return the result set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">result_raw</span>(<span class="self">self</span>) -&gt; <span class="ident">quaint::connector::ResultSet</span> {
-        <span class="self">self</span>.<span class="ident">api</span>.<span class="ident">query</span>(<span class="self">self</span>.<span class="ident">insert</span>.<span class="ident">into</span>())
+        out
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">IteratorJoin</span> {
-    <span class="kw">fn</span> <span class="ident">join</span>(<span class="self">self</span>, <span class="ident">sep</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span>;
+<span class="kw">pub struct </span>SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt; {
+    insert: quaint::ast::SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;,
+    api: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>TestApi,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">IteratorJoin</span> <span class="kw">for</span> <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>,
-    <span class="ident">I</span>: <span class="ident">Display</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Add a value to the row
+    </span><span class="kw">pub fn </span>value(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, value: <span class="kw">impl </span>Into&lt;quaint::ast::Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.insert = <span class="self">self</span>.insert.value(name, value);
+
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Execute the request and return the result set.
+    </span><span class="kw">pub fn </span>result_raw(<span class="self">self</span>) -&gt; quaint::connector::ResultSet {
+        <span class="self">self</span>.api.query(<span class="self">self</span>.insert.into())
+    }
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>IteratorJoin {
+    <span class="kw">fn </span>join(<span class="self">self</span>, sep: <span class="kw-2">&amp;</span>str) -&gt; String;
+}
+
+<span class="kw">impl</span>&lt;T, I&gt; IteratorJoin <span class="kw">for </span>T
+<span class="kw">where
+    </span>T: Iterator&lt;Item = I&gt;,
+    I: Display,
 {
-    <span class="kw">fn</span> <span class="ident">join</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sep</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> (<span class="ident">lower_bound</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">size_hint</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">sep</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">lower_bound</span>);
+    <span class="kw">fn </span>join(<span class="kw-2">mut </span><span class="self">self</span>, sep: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="kw">let </span>(lower_bound, <span class="kw">_</span>) = <span class="self">self</span>.size_hint();
+        <span class="kw">let </span><span class="kw-2">mut </span>out = String::with_capacity(sep.len() * lower_bound);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">first_item</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>() {
-            <span class="macro">write!</span>(<span class="ident">out</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">first_item</span>).<span class="ident">unwrap</span>();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(first_item) = <span class="self">self</span>.next() {
+            <span class="macro">write!</span>(out, <span class="string">&quot;{}&quot;</span>, first_item).unwrap();
         }
 
-        <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="self">self</span> {
-            <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">sep</span>);
-            <span class="macro">write!</span>(<span class="ident">out</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">item</span>).<span class="ident">unwrap</span>();
+        <span class="kw">for </span>item <span class="kw">in </span><span class="self">self </span>{
+            out.push_str(sep);
+            <span class="macro">write!</span>(out, <span class="string">&quot;{}&quot;</span>, item).unwrap();
         }
 
-        <span class="ident">out</span>
+        out
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

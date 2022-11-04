@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/ready_cache/cache.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cache.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/ready_cache/cache.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cache.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -491,498 +491,498 @@
 <span id="491">491</span>
 <span id="492">492</span>
 <span id="493">493</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A cache of services.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A cache of services.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::error</span>;
-<span class="kw">use</span> <span class="ident">futures_core::Stream</span>;
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">stream::FuturesUnordered</span>, <span class="ident">task::AtomicWaker</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indexmap::Equivalent</span>;
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
+</span><span class="kw">use </span><span class="kw">super</span>::error;
+<span class="kw">use </span>futures_core::Stream;
+<span class="kw">use </span>futures_util::{stream::FuturesUnordered, task::AtomicWaker};
+<span class="kw">pub use </span>indexmap::Equivalent;
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::hash::Hash;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>tower_service::Service;
+<span class="kw">use </span>tracing::{debug, trace};
 
-<span class="doccomment">/// Drives readiness over a set of services.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The cache maintains two internal data structures:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * a set of _pending_ services that have not yet become ready; and</span>
-<span class="doccomment">/// * a set of _ready_ services that have previously polled ready.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As each `S` typed [`Service`] is added to the cache via [`ReadyCache::push`], it</span>
-<span class="doccomment">/// is added to the _pending set_. As [`ReadyCache::poll_pending`] is invoked,</span>
-<span class="doccomment">/// pending services are polled and added to the _ready set_.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ReadyCache::call_ready`] (or [`ReadyCache::call_ready_index`]) dispatches a</span>
-<span class="doccomment">/// request to the specified service, but panics if the specified service is not</span>
-<span class="doccomment">/// in the ready set. The `ReadyCache::check_*` functions can be used to ensure</span>
-<span class="doccomment">/// that a service is ready before dispatching a request.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The ready set can hold services for an abitrarily long time. During this</span>
-<span class="doccomment">/// time, the runtime may process events that invalidate that ready state (for</span>
-<span class="doccomment">/// instance, if a keepalive detects a lost connection). In such cases, callers</span>
-<span class="doccomment">/// should use [`ReadyCache::check_ready`] (or [`ReadyCache::check_ready_index`])</span>
-<span class="doccomment">/// immediately before dispatching a request to ensure that the service has not</span>
-<span class="doccomment">/// become unavailable.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Once `ReadyCache::call_ready*` is invoked, the service is placed back into</span>
-<span class="doccomment">/// the _pending_ set to be driven to readiness again.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When `ReadyCache::check_ready*` returns `false`, it indicates that the</span>
-<span class="doccomment">/// specified service is _not_ ready. If an error is returned, this indicats that</span>
-<span class="doccomment">/// the server failed and has been removed from the cache entirely.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ReadyCache::evict`] can be used to remove a service from the cache (by key),</span>
-<span class="doccomment">/// though the service may not be dropped (if it is currently pending) until</span>
-<span class="doccomment">/// [`ReadyCache::poll_pending`] is invoked.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that the by-index accessors are provided to support use cases (like</span>
-<span class="doccomment">/// power-of-two-choices load balancing) where the caller does not care to keep</span>
-<span class="doccomment">/// track of each service&#39;s key. Instead, it needs only to access _some_ ready</span>
-<span class="doccomment">/// service. In such a case, it should be noted that calls to</span>
-<span class="doccomment">/// [`ReadyCache::poll_pending`] and [`ReadyCache::evict`] may perturb the order of</span>
-<span class="doccomment">/// the ready set, so any cached indexes should be discarded after such a call.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReadyCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
+<span class="doccomment">/// Drives readiness over a set of services.
+///
+/// The cache maintains two internal data structures:
+///
+/// * a set of _pending_ services that have not yet become ready; and
+/// * a set of _ready_ services that have previously polled ready.
+///
+/// As each `S` typed [`Service`] is added to the cache via [`ReadyCache::push`], it
+/// is added to the _pending set_. As [`ReadyCache::poll_pending`] is invoked,
+/// pending services are polled and added to the _ready set_.
+///
+/// [`ReadyCache::call_ready`] (or [`ReadyCache::call_ready_index`]) dispatches a
+/// request to the specified service, but panics if the specified service is not
+/// in the ready set. The `ReadyCache::check_*` functions can be used to ensure
+/// that a service is ready before dispatching a request.
+///
+/// The ready set can hold services for an abitrarily long time. During this
+/// time, the runtime may process events that invalidate that ready state (for
+/// instance, if a keepalive detects a lost connection). In such cases, callers
+/// should use [`ReadyCache::check_ready`] (or [`ReadyCache::check_ready_index`])
+/// immediately before dispatching a request to ensure that the service has not
+/// become unavailable.
+///
+/// Once `ReadyCache::call_ready*` is invoked, the service is placed back into
+/// the _pending_ set to be driven to readiness again.
+///
+/// When `ReadyCache::check_ready*` returns `false`, it indicates that the
+/// specified service is _not_ ready. If an error is returned, this indicats that
+/// the server failed and has been removed from the cache entirely.
+///
+/// [`ReadyCache::evict`] can be used to remove a service from the cache (by key),
+/// though the service may not be dropped (if it is currently pending) until
+/// [`ReadyCache::poll_pending`] is invoked.
+///
+/// Note that the by-index accessors are provided to support use cases (like
+/// power-of-two-choices load balancing) where the caller does not care to keep
+/// track of each service&#39;s key. Instead, it needs only to access _some_ ready
+/// service. In such a case, it should be noted that calls to
+/// [`ReadyCache::poll_pending`] and [`ReadyCache::evict`] may perturb the order of
+/// the ready set, so any cached indexes should be discarded after such a call.
+</span><span class="kw">pub struct </span>ReadyCache&lt;K, S, Req&gt;
+<span class="kw">where
+    </span>K: Eq + Hash,
 {
-    <span class="doccomment">/// A stream of services that are not yet ready.</span>
-    <span class="ident">pending</span>: <span class="ident">FuturesUnordered</span><span class="op">&lt;</span><span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// An index of cancelation handles for pending streams.</span>
-    <span class="ident">pending_cancel_txs</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">CancelTx</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A stream of services that are not yet ready.
+    </span>pending: FuturesUnordered&lt;Pending&lt;K, S, Req&gt;&gt;,
+    <span class="doccomment">/// An index of cancelation handles for pending streams.
+    </span>pending_cancel_txs: IndexMap&lt;K, CancelTx&gt;,
 
-    <span class="doccomment">/// Services that have previously become ready. Readiness can become stale,</span>
-    <span class="doccomment">/// so a given service should be polled immediately before use.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The cancelation oneshot is preserved (though unused) while the service is</span>
-    <span class="doccomment">/// ready so that it need not be reallocated each time a request is</span>
-    <span class="doccomment">/// dispatched.</span>
-    <span class="ident">ready</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">K</span>, (<span class="ident">S</span>, <span class="ident">CancelPair</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// Services that have previously become ready. Readiness can become stale,
+    /// so a given service should be polled immediately before use.
+    ///
+    /// The cancelation oneshot is preserved (though unused) while the service is
+    /// ready so that it need not be reallocated each time a request is
+    /// dispatched.
+    </span>ready: IndexMap&lt;K, (S, CancelPair)&gt;,
 }
 
-<span class="comment">// Safety: This is safe because we do not use `Pin::new_unchecked`.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">K</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">ReadyCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span> {}
+<span class="comment">// Safety: This is safe because we do not use `Pin::new_unchecked`.
+</span><span class="kw">impl</span>&lt;S, K: Eq + Hash, Req&gt; Unpin <span class="kw">for </span>ReadyCache&lt;K, S, Req&gt; {}
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Cancel</span> {
-    <span class="ident">waker</span>: <span class="ident">AtomicWaker</span>,
-    <span class="ident">canceled</span>: <span class="ident">AtomicBool</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Cancel {
+    waker: AtomicWaker,
+    canceled: AtomicBool,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CancelRx</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cancel</span><span class="op">&gt;</span>);
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>CancelRx(Arc&lt;Cancel&gt;);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CancelTx</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cancel</span><span class="op">&gt;</span>);
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>CancelTx(Arc&lt;Cancel&gt;);
 
-<span class="kw">type</span> <span class="ident">CancelPair</span> <span class="op">=</span> (<span class="ident">CancelTx</span>, <span class="ident">CancelRx</span>);
+<span class="kw">type </span>CancelPair = (CancelTx, CancelRx);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">PendingError</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="ident">Canceled</span>(<span class="ident">K</span>),
-    <span class="ident">Inner</span>(<span class="ident">K</span>, <span class="ident">E</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>PendingError&lt;K, E&gt; {
+    Canceled(K),
+    Inner(K, E),
 }
 
-<span class="macro">pin_project_lite::pin_project!</span> {
-    <span class="doccomment">/// A [`Future`] that becomes satisfied when an `S`-typed service is ready.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May fail due to cancelation, i.e. if the service is evicted from the balancer.</span>
-    <span class="kw">struct</span> <span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span> {
-        <span class="ident">key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
-        <span class="ident">cancel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CancelRx</span><span class="op">&gt;</span>,
-        <span class="ident">ready</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-        <span class="ident">_pd</span>: <span class="ident">std::marker::PhantomData</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span>,
+<span class="macro">pin_project_lite::pin_project! </span>{
+    <span class="doccomment">/// A [`Future`] that becomes satisfied when an `S`-typed service is ready.
+    ///
+    /// May fail due to cancelation, i.e. if the service is evicted from the balancer.
+    </span><span class="kw">struct </span>Pending&lt;K, S, Req&gt; {
+        key: <span class="prelude-ty">Option</span>&lt;K&gt;,
+        cancel: <span class="prelude-ty">Option</span>&lt;CancelRx&gt;,
+        ready: <span class="prelude-ty">Option</span>&lt;S&gt;,
+        _pd: std::marker::PhantomData&lt;Req&gt;,
     }
 }
 
-<span class="comment">// === ReadyCache ===</span>
+<span class="comment">// === ReadyCache ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ReadyCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span>,
+</span><span class="kw">impl</span>&lt;K, S, Req&gt; Default <span class="kw">for </span>ReadyCache&lt;K, S, Req&gt;
+<span class="kw">where
+    </span>K: Eq + Hash,
+    S: Service&lt;Req&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">ready</span>: <span class="ident">IndexMap::default</span>(),
-            <span class="ident">pending</span>: <span class="ident">FuturesUnordered::new</span>(),
-            <span class="ident">pending_cancel_txs</span>: <span class="ident">IndexMap::default</span>(),
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            ready: IndexMap::default(),
+            pending: FuturesUnordered::new(),
+            pending_cancel_txs: IndexMap::default(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ReadyCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
-    <span class="ident">S</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;K, S, Req&gt; fmt::Debug <span class="kw">for </span>ReadyCache&lt;K, S, Req&gt;
+<span class="kw">where
+    </span>K: fmt::Debug + Eq + Hash,
+    S: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="self">Self</span> {
-            <span class="ident">pending</span>,
-            <span class="ident">pending_cancel_txs</span>,
-            <span class="ident">ready</span>,
-        } <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ReadyCache&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;pending&quot;</span>, <span class="ident">pending</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;pending_cancel_txs&quot;</span>, <span class="ident">pending_cancel_txs</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;ready&quot;</span>, <span class="ident">ready</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="self">Self </span>{
+            pending,
+            pending_cancel_txs,
+            ready,
+        } = <span class="self">self</span>;
+        f.debug_struct(<span class="string">&quot;ReadyCache&quot;</span>)
+            .field(<span class="string">&quot;pending&quot;</span>, pending)
+            .field(<span class="string">&quot;pending_cancel_txs&quot;</span>, pending_cancel_txs)
+            .field(<span class="string">&quot;ready&quot;</span>, ready)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="ident">ReadyCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
+<span class="kw">impl</span>&lt;K, S, Req&gt; ReadyCache&lt;K, S, Req&gt;
+<span class="kw">where
+    </span>K: Eq + Hash,
 {
-    <span class="doccomment">/// Returns the total number of services in the cache.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">ready_len</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">pending_len</span>()
+    <span class="doccomment">/// Returns the total number of services in the cache.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.ready_len() + <span class="self">self</span>.pending_len()
     }
 
-    <span class="doccomment">/// Returns whether or not there are any services in the cache.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">pending</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// Returns whether or not there are any services in the cache.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.ready.is_empty() &amp;&amp; <span class="self">self</span>.pending.is_empty()
     }
 
-    <span class="doccomment">/// Returns the number of services in the ready set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ready_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Returns the number of services in the ready set.
+    </span><span class="kw">pub fn </span>ready_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.ready.len()
     }
 
-    <span class="doccomment">/// Returns the number of services in the unready set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pending_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">pending</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Returns the number of services in the unready set.
+    </span><span class="kw">pub fn </span>pending_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.pending.len()
     }
 
-    <span class="doccomment">/// Returns true iff the given key is in the unready set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pending_contains</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">pending_cancel_txs</span>.<span class="ident">contains_key</span>(<span class="ident">key</span>)
+    <span class="doccomment">/// Returns true iff the given key is in the unready set.
+    </span><span class="kw">pub fn </span>pending_contains&lt;Q: Hash + Equivalent&lt;K&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Q) -&gt; bool {
+        <span class="self">self</span>.pending_cancel_txs.contains_key(key)
     }
 
-    <span class="doccomment">/// Obtains a reference to a service in the ready set by key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ready</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">S</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">get_full</span>(<span class="ident">key</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">i</span>, <span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="number">0</span>))
+    <span class="doccomment">/// Obtains a reference to a service in the ready set by key.
+    </span><span class="kw">pub fn </span>get_ready&lt;Q: Hash + Equivalent&lt;K&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>S)&gt; {
+        <span class="self">self</span>.ready.get_full(key).map(|(i, k, v)| (i, k, <span class="kw-2">&amp;</span>v.<span class="number">0</span>))
     }
 
-    <span class="doccomment">/// Obtains a mutable reference to a service in the ready set by key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ready_mut</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;mut</span> <span class="ident">S</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">ready</span>
-            .<span class="ident">get_full_mut</span>(<span class="ident">key</span>)
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">i</span>, <span class="ident">k</span>, <span class="kw-2">&amp;mut</span> <span class="ident">v</span>.<span class="number">0</span>))
+    <span class="doccomment">/// Obtains a mutable reference to a service in the ready set by key.
+    </span><span class="kw">pub fn </span>get_ready_mut&lt;Q: Hash + Equivalent&lt;K&gt;&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        key: <span class="kw-2">&amp;</span>Q,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;mut </span>S)&gt; {
+        <span class="self">self</span>.ready
+            .get_full_mut(key)
+            .map(|(i, k, v)| (i, k, <span class="kw-2">&amp;mut </span>v.<span class="number">0</span>))
     }
 
-    <span class="doccomment">/// Obtains a reference to a service in the ready set by index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ready_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">S</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">get_index</span>(<span class="ident">idx</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="number">0</span>))
+    <span class="doccomment">/// Obtains a reference to a service in the ready set by index.
+    </span><span class="kw">pub fn </span>get_ready_index(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>S)&gt; {
+        <span class="self">self</span>.ready.get_index(idx).map(|(k, v)| (k, <span class="kw-2">&amp;</span>v.<span class="number">0</span>))
     }
 
-    <span class="doccomment">/// Obtains a mutable reference to a service in the ready set by index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ready_index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">K</span>, <span class="kw-2">&amp;mut</span> <span class="ident">S</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">get_index_mut</span>(<span class="ident">idx</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>, <span class="kw-2">&amp;mut</span> <span class="ident">v</span>.<span class="number">0</span>))
+    <span class="doccomment">/// Obtains a mutable reference to a service in the ready set by index.
+    </span><span class="kw">pub fn </span>get_ready_index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, idx: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;mut </span>K, <span class="kw-2">&amp;mut </span>S)&gt; {
+        <span class="self">self</span>.ready.get_index_mut(idx).map(|(k, v)| (k, <span class="kw-2">&amp;mut </span>v.<span class="number">0</span>))
     }
 
-    <span class="doccomment">/// Evicts an item from the cache.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if a service was marked for eviction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Services are dropped from the ready set immediately. Services in the</span>
-    <span class="doccomment">/// pending set are marked for cancellation, but [`ReadyCache::poll_pending`]</span>
-    <span class="doccomment">/// must be called to cause the service to be dropped.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">evict</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">canceled</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_cancel_txs</span>.<span class="ident">swap_remove</span>(<span class="ident">key</span>) {
-            <span class="ident">c</span>.<span class="ident">cancel</span>();
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        };
+    <span class="doccomment">/// Evicts an item from the cache.
+    ///
+    /// Returns true if a service was marked for eviction.
+    ///
+    /// Services are dropped from the ready set immediately. Services in the
+    /// pending set are marked for cancellation, but [`ReadyCache::poll_pending`]
+    /// must be called to cause the service to be dropped.
+    </span><span class="kw">pub fn </span>evict&lt;Q: Hash + Equivalent&lt;K&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Q) -&gt; bool {
+        <span class="kw">let </span>canceled = <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = <span class="self">self</span>.pending_cancel_txs.swap_remove(key) {
+            c.cancel();
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>};
 
-        <span class="self">self</span>.<span class="ident">ready</span>
-            .<span class="ident">swap_remove_full</span>(<span class="ident">key</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>)
-            .<span class="ident">unwrap_or</span>(<span class="ident">canceled</span>)
+        <span class="self">self</span>.ready
+            .swap_remove_full(key)
+            .map(|<span class="kw">_</span>| <span class="bool-val">true</span>)
+            .unwrap_or(canceled)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="ident">ReadyCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span>,
-    <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;K, S, Req&gt; ReadyCache&lt;K, S, Req&gt;
+<span class="kw">where
+    </span>K: Clone + Eq + Hash,
+    S: Service&lt;Req&gt;,
+    &lt;S <span class="kw">as </span>Service&lt;Req&gt;&gt;::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    S::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
 {
-    <span class="doccomment">/// Pushes a new service onto the pending set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The service will be promoted to the ready set as [`poll_pending`] is invoked.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this does **not** remove services from the ready set. Once the</span>
-    <span class="doccomment">/// old service is used, it will be dropped instead of being added back to</span>
-    <span class="doccomment">/// the pending set; OR, when the new service becomes ready, it will replace</span>
-    <span class="doccomment">/// the prior service in the ready set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`poll_pending`]: crate::ready_cache::cache::ReadyCache::poll_pending</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">svc</span>: <span class="ident">S</span>) {
-        <span class="kw">let</span> <span class="ident">cancel</span> <span class="op">=</span> <span class="ident">cancelable</span>();
-        <span class="self">self</span>.<span class="ident">push_pending</span>(<span class="ident">key</span>, <span class="ident">svc</span>, <span class="ident">cancel</span>);
+    <span class="doccomment">/// Pushes a new service onto the pending set.
+    ///
+    /// The service will be promoted to the ready set as [`poll_pending`] is invoked.
+    ///
+    /// Note that this does **not** remove services from the ready set. Once the
+    /// old service is used, it will be dropped instead of being added back to
+    /// the pending set; OR, when the new service becomes ready, it will replace
+    /// the prior service in the ready set.
+    ///
+    /// [`poll_pending`]: crate::ready_cache::cache::ReadyCache::poll_pending
+    </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: K, svc: S) {
+        <span class="kw">let </span>cancel = cancelable();
+        <span class="self">self</span>.push_pending(key, svc, cancel);
     }
 
-    <span class="kw">fn</span> <span class="ident">push_pending</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">svc</span>: <span class="ident">S</span>, (<span class="ident">cancel_tx</span>, <span class="ident">cancel_rx</span>): <span class="ident">CancelPair</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_cancel_txs</span>.<span class="ident">insert</span>(<span class="ident">key</span>.<span class="ident">clone</span>(), <span class="ident">cancel_tx</span>) {
-            <span class="comment">// If there is already a service for this key, cancel it.</span>
-            <span class="ident">c</span>.<span class="ident">cancel</span>();
+    <span class="kw">fn </span>push_pending(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: K, svc: S, (cancel_tx, cancel_rx): CancelPair) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = <span class="self">self</span>.pending_cancel_txs.insert(key.clone(), cancel_tx) {
+            <span class="comment">// If there is already a service for this key, cancel it.
+            </span>c.cancel();
         }
-        <span class="self">self</span>.<span class="ident">pending</span>.<span class="ident">push</span>(<span class="ident">Pending</span> {
-            <span class="ident">key</span>: <span class="prelude-val">Some</span>(<span class="ident">key</span>),
-            <span class="ident">cancel</span>: <span class="prelude-val">Some</span>(<span class="ident">cancel_rx</span>),
-            <span class="ident">ready</span>: <span class="prelude-val">Some</span>(<span class="ident">svc</span>),
-            <span class="ident">_pd</span>: <span class="ident">std::marker::PhantomData</span>,
+        <span class="self">self</span>.pending.push(Pending {
+            key: <span class="prelude-val">Some</span>(key),
+            cancel: <span class="prelude-val">Some</span>(cancel_rx),
+            ready: <span class="prelude-val">Some</span>(svc),
+            _pd: std::marker::PhantomData,
         });
     }
 
-    <span class="doccomment">/// Polls services pending readiness, adding ready services to the ready set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Poll::Ready`] when there are no remaining unready services.</span>
-    <span class="doccomment">/// [`poll_pending`] should be called again after [`push`] or</span>
-    <span class="doccomment">/// [`call_ready_index`] are invoked.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Failures indicate that an individual pending service failed to become</span>
-    <span class="doccomment">/// ready (and has been removed from the cache). In such a case,</span>
-    <span class="doccomment">/// [`poll_pending`] should typically be called again to continue driving</span>
-    <span class="doccomment">/// pending services to readiness.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`poll_pending`]: crate::ready_cache::cache::ReadyCache::poll_pending</span>
-    <span class="doccomment">/// [`push`]: crate::ready_cache::cache::ReadyCache::push</span>
-    <span class="doccomment">/// [`call_ready_index`]: crate::ready_cache::cache::ReadyCache::call_ready_index</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_pending</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Failed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">pending</span>).<span class="ident">poll_next</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((<span class="ident">key</span>, <span class="ident">svc</span>, <span class="ident">cancel_rx</span>)))) =&gt; {
+    <span class="doccomment">/// Polls services pending readiness, adding ready services to the ready set.
+    ///
+    /// Returns [`Poll::Ready`] when there are no remaining unready services.
+    /// [`poll_pending`] should be called again after [`push`] or
+    /// [`call_ready_index`] are invoked.
+    ///
+    /// Failures indicate that an individual pending service failed to become
+    /// ready (and has been removed from the cache). In such a case,
+    /// [`poll_pending`] should typically be called again to continue driving
+    /// pending services to readiness.
+    ///
+    /// [`poll_pending`]: crate::ready_cache::cache::ReadyCache::poll_pending
+    /// [`push`]: crate::ready_cache::cache::ReadyCache::push
+    /// [`call_ready_index`]: crate::ready_cache::cache::ReadyCache::call_ready_index
+    </span><span class="kw">pub fn </span>poll_pending(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), error::Failed&lt;K&gt;&gt;&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span>Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.pending).poll_next(cx) {
+                Poll::Pending =&gt; <span class="kw">return </span>Poll::Pending,
+                Poll::Ready(<span class="prelude-val">None</span>) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(())),
+                Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((key, svc, cancel_rx)))) =&gt; {
                     <span class="macro">trace!</span>(<span class="string">&quot;endpoint ready&quot;</span>);
-                    <span class="kw">let</span> <span class="ident">cancel_tx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_cancel_txs</span>.<span class="ident">swap_remove</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cancel_tx</span>) <span class="op">=</span> <span class="ident">cancel_tx</span> {
-                        <span class="comment">// Keep track of the cancelation so that it need not be</span>
-                        <span class="comment">// recreated after the service is used.</span>
-                        <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">insert</span>(<span class="ident">key</span>, (<span class="ident">svc</span>, (<span class="ident">cancel_tx</span>, <span class="ident">cancel_rx</span>)));
-                    } <span class="kw">else</span> {
+                    <span class="kw">let </span>cancel_tx = <span class="self">self</span>.pending_cancel_txs.swap_remove(<span class="kw-2">&amp;</span>key);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(cancel_tx) = cancel_tx {
+                        <span class="comment">// Keep track of the cancelation so that it need not be
+                        // recreated after the service is used.
+                        </span><span class="self">self</span>.ready.insert(key, (svc, (cancel_tx, cancel_rx)));
+                    } <span class="kw">else </span>{
                         <span class="macro">assert!</span>(
-                            <span class="ident">cancel_tx</span>.<span class="ident">is_some</span>(),
-                            <span class="string">&quot;services that become ready must have a pending cancelation&quot;</span>
-                        );
+                            cancel_tx.is_some(),
+                            <span class="string">&quot;services that become ready must have a pending cancelation&quot;
+                        </span>);
                     }
                 }
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">PendingError::Canceled</span>(<span class="kw">_</span>)))) =&gt; {
+                Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(PendingError::Canceled(<span class="kw">_</span>)))) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;endpoint canceled&quot;</span>);
-                    <span class="comment">// The cancellation for this service was removed in order to</span>
-                    <span class="comment">// cause this cancellation.</span>
-                }
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">PendingError::Inner</span>(<span class="ident">key</span>, <span class="ident">e</span>)))) =&gt; {
-                    <span class="kw">let</span> <span class="ident">cancel_tx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_cancel_txs</span>.<span class="ident">swap_remove</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
+                    <span class="comment">// The cancellation for this service was removed in order to
+                    // cause this cancellation.
+                </span>}
+                Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(PendingError::Inner(key, e)))) =&gt; {
+                    <span class="kw">let </span>cancel_tx = <span class="self">self</span>.pending_cancel_txs.swap_remove(<span class="kw-2">&amp;</span>key);
                     <span class="macro">assert!</span>(
-                        <span class="ident">cancel_tx</span>.<span class="ident">is_some</span>(),
-                        <span class="string">&quot;services that return an error must have a pending cancelation&quot;</span>
-                    );
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Failed</span>(<span class="ident">key</span>, <span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">into</span>();
+                        cancel_tx.is_some(),
+                        <span class="string">&quot;services that return an error must have a pending cancelation&quot;
+                    </span>);
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(error::Failed(key, e.into())).into();
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Checks whether the referenced endpoint is ready.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the endpoint is ready and false if it is not. An error is</span>
-    <span class="doccomment">/// returned if the endpoint fails.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_ready</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">error::Failed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">get_full_mut</span>(<span class="ident">key</span>) {
-            <span class="prelude-val">Some</span>((<span class="ident">index</span>, <span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="self">self</span>.<span class="ident">check_ready_index</span>(<span class="ident">cx</span>, <span class="ident">index</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+    <span class="doccomment">/// Checks whether the referenced endpoint is ready.
+    ///
+    /// Returns true if the endpoint is ready and false if it is not. An error is
+    /// returned if the endpoint fails.
+    </span><span class="kw">pub fn </span>check_ready&lt;Q: Hash + Equivalent&lt;K&gt;&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        key: <span class="kw-2">&amp;</span>Q,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;bool, error::Failed&lt;K&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.ready.get_full_mut(key) {
+            <span class="prelude-val">Some</span>((index, <span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="self">self</span>.check_ready_index(cx, index),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
         }
     }
 
-    <span class="doccomment">/// Checks whether the referenced endpoint is ready.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the service is no longer ready, it is moved back into the pending set</span>
-    <span class="doccomment">/// and `false` is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the service errors, it is removed and dropped and the error is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_ready_index</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">index</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">error::Failed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">get_index_mut</span>(<span class="ident">index</span>) {
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-            <span class="prelude-val">Some</span>((<span class="kw">_</span>, (<span class="ident">svc</span>, <span class="kw">_</span>))) =&gt; <span class="ident">svc</span>,
+    <span class="doccomment">/// Checks whether the referenced endpoint is ready.
+    ///
+    /// If the service is no longer ready, it is moved back into the pending set
+    /// and `false` is returned.
+    ///
+    /// If the service errors, it is removed and dropped and the error is returned.
+    </span><span class="kw">pub fn </span>check_ready_index(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        index: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;bool, error::Failed&lt;K&gt;&gt; {
+        <span class="kw">let </span>svc = <span class="kw">match </span><span class="self">self</span>.ready.get_index_mut(index) {
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">Some</span>((<span class="kw">_</span>, (svc, <span class="kw">_</span>))) =&gt; svc,
         };
-        <span class="kw">match</span> <span class="ident">svc</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>) {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
-            <span class="ident">Poll::Pending</span> =&gt; {
-                <span class="comment">// became unready; so move it back there.</span>
-                <span class="kw">let</span> (<span class="ident">key</span>, (<span class="ident">svc</span>, <span class="ident">cancel</span>)) <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">ready</span>
-                    .<span class="ident">swap_remove_index</span>(<span class="ident">index</span>)
-                    .<span class="ident">expect</span>(<span class="string">&quot;invalid ready index&quot;</span>);
+        <span class="kw">match </span>svc.poll_ready(cx) {
+            Poll::Ready(<span class="prelude-val">Ok</span>(())) =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+            Poll::Pending =&gt; {
+                <span class="comment">// became unready; so move it back there.
+                </span><span class="kw">let </span>(key, (svc, cancel)) = <span class="self">self
+                    </span>.ready
+                    .swap_remove_index(index)
+                    .expect(<span class="string">&quot;invalid ready index&quot;</span>);
 
-                <span class="comment">// If a new version of this service has been added to the</span>
-                <span class="comment">// unready set, don&#39;t overwrite it.</span>
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pending_contains</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>) {
-                    <span class="self">self</span>.<span class="ident">push_pending</span>(<span class="ident">key</span>, <span class="ident">svc</span>, <span class="ident">cancel</span>);
+                <span class="comment">// If a new version of this service has been added to the
+                // unready set, don&#39;t overwrite it.
+                </span><span class="kw">if </span>!<span class="self">self</span>.pending_contains(<span class="kw-2">&amp;</span>key) {
+                    <span class="self">self</span>.push_pending(key, svc, cancel);
                 }
 
                 <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
             }
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; {
-                <span class="comment">// failed, so drop it.</span>
-                <span class="kw">let</span> (<span class="ident">key</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">ready</span>
-                    .<span class="ident">swap_remove_index</span>(<span class="ident">index</span>)
-                    .<span class="ident">expect</span>(<span class="string">&quot;invalid ready index&quot;</span>);
-                <span class="prelude-val">Err</span>(<span class="ident">error::Failed</span>(<span class="ident">key</span>, <span class="ident">e</span>.<span class="ident">into</span>()))
+            Poll::Ready(<span class="prelude-val">Err</span>(e)) =&gt; {
+                <span class="comment">// failed, so drop it.
+                </span><span class="kw">let </span>(key, <span class="kw">_</span>) = <span class="self">self
+                    </span>.ready
+                    .swap_remove_index(index)
+                    .expect(<span class="string">&quot;invalid ready index&quot;</span>);
+                <span class="prelude-val">Err</span>(error::Failed(key, e.into()))
             }
         }
     }
 
-    <span class="doccomment">/// Calls a ready service by key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the specified key does not exist in the ready</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call_ready</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>, <span class="ident">req</span>: <span class="ident">Req</span>) -&gt; <span class="ident">S::Future</span> {
-        <span class="kw">let</span> (<span class="ident">index</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">ready</span>
-            .<span class="ident">get_full_mut</span>(<span class="ident">key</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;check_ready was not called&quot;</span>);
-        <span class="self">self</span>.<span class="ident">call_ready_index</span>(<span class="ident">index</span>, <span class="ident">req</span>)
+    <span class="doccomment">/// Calls a ready service by key.
+    ///
+    /// # Panics
+    ///
+    /// If the specified key does not exist in the ready
+    </span><span class="kw">pub fn </span>call_ready&lt;Q: Hash + Equivalent&lt;K&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Q, req: Req) -&gt; S::Future {
+        <span class="kw">let </span>(index, <span class="kw">_</span>, <span class="kw">_</span>) = <span class="self">self
+            </span>.ready
+            .get_full_mut(key)
+            .expect(<span class="string">&quot;check_ready was not called&quot;</span>);
+        <span class="self">self</span>.call_ready_index(index, req)
     }
 
-    <span class="doccomment">/// Calls a ready service by index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the specified index is out of range.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call_ready_index</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">req</span>: <span class="ident">Req</span>) -&gt; <span class="ident">S::Future</span> {
-        <span class="kw">let</span> (<span class="ident">key</span>, (<span class="kw-2">mut</span> <span class="ident">svc</span>, <span class="ident">cancel</span>)) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">ready</span>
-            .<span class="ident">swap_remove_index</span>(<span class="ident">index</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;check_ready_index was not called&quot;</span>);
+    <span class="doccomment">/// Calls a ready service by index.
+    ///
+    /// # Panics
+    ///
+    /// If the specified index is out of range.
+    </span><span class="kw">pub fn </span>call_ready_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize, req: Req) -&gt; S::Future {
+        <span class="kw">let </span>(key, (<span class="kw-2">mut </span>svc, cancel)) = <span class="self">self
+            </span>.ready
+            .swap_remove_index(index)
+            .expect(<span class="string">&quot;check_ready_index was not called&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">svc</span>.<span class="ident">call</span>(<span class="ident">req</span>);
+        <span class="kw">let </span>fut = svc.call(req);
 
-        <span class="comment">// If a new version of this service has been added to the</span>
-        <span class="comment">// unready set, don&#39;t overwrite it.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pending_contains</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>) {
-            <span class="self">self</span>.<span class="ident">push_pending</span>(<span class="ident">key</span>, <span class="ident">svc</span>, <span class="ident">cancel</span>);
+        <span class="comment">// If a new version of this service has been added to the
+        // unready set, don&#39;t overwrite it.
+        </span><span class="kw">if </span>!<span class="self">self</span>.pending_contains(<span class="kw-2">&amp;</span>key) {
+            <span class="self">self</span>.push_pending(key, svc, cancel);
         }
 
-        <span class="ident">fut</span>
+        fut
     }
 }
 
-<span class="comment">// === impl Cancel ===</span>
+<span class="comment">// === impl Cancel ===
 
-<span class="doccomment">/// Creates a cancelation sender and receiver.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `tokio::sync::oneshot` is NOT used, as a `Receiver` is not guaranteed to</span>
-<span class="doccomment">/// observe results as soon as a `Sender` fires. Using an `AtomicBool` allows</span>
-<span class="doccomment">/// the state to be observed as soon as the cancelation is triggered.</span>
-<span class="kw">fn</span> <span class="ident">cancelable</span>() -&gt; <span class="ident">CancelPair</span> {
-    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Cancel</span> {
-        <span class="ident">waker</span>: <span class="ident">AtomicWaker::new</span>(),
-        <span class="ident">canceled</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
+</span><span class="doccomment">/// Creates a cancelation sender and receiver.
+///
+/// A `tokio::sync::oneshot` is NOT used, as a `Receiver` is not guaranteed to
+/// observe results as soon as a `Sender` fires. Using an `AtomicBool` allows
+/// the state to be observed as soon as the cancelation is triggered.
+</span><span class="kw">fn </span>cancelable() -&gt; CancelPair {
+    <span class="kw">let </span>cx = Arc::new(Cancel {
+        waker: AtomicWaker::new(),
+        canceled: AtomicBool::new(<span class="bool-val">false</span>),
     });
-    (<span class="ident">CancelTx</span>(<span class="ident">cx</span>.<span class="ident">clone</span>()), <span class="ident">CancelRx</span>(<span class="ident">cx</span>))
+    (CancelTx(cx.clone()), CancelRx(cx))
 }
 
-<span class="kw">impl</span> <span class="ident">CancelTx</span> {
-    <span class="kw">fn</span> <span class="ident">cancel</span>(<span class="self">self</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">canceled</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::SeqCst</span>);
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">waker</span>.<span class="ident">wake</span>();
+<span class="kw">impl </span>CancelTx {
+    <span class="kw">fn </span>cancel(<span class="self">self</span>) {
+        <span class="self">self</span>.<span class="number">0</span>.canceled.store(<span class="bool-val">true</span>, Ordering::SeqCst);
+        <span class="self">self</span>.<span class="number">0</span>.waker.wake();
     }
 }
 
-<span class="comment">// === Pending ===</span>
+<span class="comment">// === Pending ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span>,
+</span><span class="kw">impl</span>&lt;K, S, Req&gt; Future <span class="kw">for </span>Pending&lt;K, S, Req&gt;
+<span class="kw">where
+    </span>S: Service&lt;Req&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">CancelRx</span>), <span class="ident">PendingError</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;(K, S, CancelRx), PendingError&lt;K, S::Error&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="comment">// Before checking whether the service is ready, check to see whether</span>
-        <span class="comment">// readiness has been canceled.</span>
-        <span class="kw">let</span> <span class="ident">CancelRx</span>(<span class="ident">cancel</span>) <span class="op">=</span> <span class="ident">this</span>.<span class="ident">cancel</span>.<span class="ident">as_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;polled after complete&quot;</span>);
-        <span class="kw">if</span> <span class="ident">cancel</span>.<span class="ident">canceled</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) {
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">key</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;polled after complete&quot;</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PendingError::Canceled</span>(<span class="ident">key</span>)).<span class="ident">into</span>();
+    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="comment">// Before checking whether the service is ready, check to see whether
+        // readiness has been canceled.
+        </span><span class="kw">let </span>CancelRx(cancel) = this.cancel.as_mut().expect(<span class="string">&quot;polled after complete&quot;</span>);
+        <span class="kw">if </span>cancel.canceled.load(Ordering::SeqCst) {
+            <span class="kw">let </span>key = this.key.take().expect(<span class="string">&quot;polled after complete&quot;</span>);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(PendingError::Canceled(key)).into();
         }
 
-        <span class="kw">match</span> <span class="ident">this</span>
-            .<span class="ident">ready</span>
-            .<span class="ident">as_mut</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;polled after ready&quot;</span>)
-            .<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
+        <span class="kw">match </span>this
+            .ready
+            .as_mut()
+            .expect(<span class="string">&quot;polled after ready&quot;</span>)
+            .poll_ready(cx)
         {
-            <span class="ident">Poll::Pending</span> =&gt; {
-                <span class="comment">// Before returning Pending, register interest in cancelation so</span>
-                <span class="comment">// that this future is polled again if the state changes.</span>
-                <span class="kw">let</span> <span class="ident">CancelRx</span>(<span class="ident">cancel</span>) <span class="op">=</span> <span class="ident">this</span>.<span class="ident">cancel</span>.<span class="ident">as_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;polled after complete&quot;</span>);
-                <span class="ident">cancel</span>.<span class="ident">waker</span>.<span class="ident">register</span>(<span class="ident">cx</span>.<span class="ident">waker</span>());
-                <span class="comment">// Because both the cancel receiver and cancel sender are held</span>
-                <span class="comment">// by the `ReadyCache` (i.e., on a single task), then it must</span>
-                <span class="comment">// not be possible for the cancelation state to change while</span>
-                <span class="comment">// polling a `Pending` service.</span>
-                <span class="macro">assert!</span>(
-                    <span class="op">!</span><span class="ident">cancel</span>.<span class="ident">canceled</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>),
-                    <span class="string">&quot;cancelation cannot be notified while polling a pending service&quot;</span>
-                );
-                <span class="ident">Poll::Pending</span>
+            Poll::Pending =&gt; {
+                <span class="comment">// Before returning Pending, register interest in cancelation so
+                // that this future is polled again if the state changes.
+                </span><span class="kw">let </span>CancelRx(cancel) = this.cancel.as_mut().expect(<span class="string">&quot;polled after complete&quot;</span>);
+                cancel.waker.register(cx.waker());
+                <span class="comment">// Because both the cancel receiver and cancel sender are held
+                // by the `ReadyCache` (i.e., on a single task), then it must
+                // not be possible for the cancelation state to change while
+                // polling a `Pending` service.
+                </span><span class="macro">assert!</span>(
+                    !cancel.canceled.load(Ordering::SeqCst),
+                    <span class="string">&quot;cancelation cannot be notified while polling a pending service&quot;
+                </span>);
+                Poll::Pending
             }
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) =&gt; {
-                <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">key</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;polled after complete&quot;</span>);
-                <span class="kw">let</span> <span class="ident">cancel</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">cancel</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;polled after complete&quot;</span>);
-                <span class="prelude-val">Ok</span>((<span class="ident">key</span>, <span class="ident">this</span>.<span class="ident">ready</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;polled after ready&quot;</span>), <span class="ident">cancel</span>)).<span class="ident">into</span>()
+            Poll::Ready(<span class="prelude-val">Ok</span>(())) =&gt; {
+                <span class="kw">let </span>key = this.key.take().expect(<span class="string">&quot;polled after complete&quot;</span>);
+                <span class="kw">let </span>cancel = this.cancel.take().expect(<span class="string">&quot;polled after complete&quot;</span>);
+                <span class="prelude-val">Ok</span>((key, this.ready.take().expect(<span class="string">&quot;polled after ready&quot;</span>), cancel)).into()
             }
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">key</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;polled after compete&quot;</span>);
-                <span class="prelude-val">Err</span>(<span class="ident">PendingError::Inner</span>(<span class="ident">key</span>, <span class="ident">e</span>)).<span class="ident">into</span>()
+            Poll::Ready(<span class="prelude-val">Err</span>(e)) =&gt; {
+                <span class="kw">let </span>key = this.key.take().expect(<span class="string">&quot;polled after compete&quot;</span>);
+                <span class="prelude-val">Err</span>(PendingError::Inner(key, e)).into()
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">fmt::Debug</span>,
-    <span class="ident">S</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;K, S, Req&gt; fmt::Debug <span class="kw">for </span>Pending&lt;K, S, Req&gt;
+<span class="kw">where
+    </span>K: fmt::Debug,
+    S: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="self">Self</span> {
-            <span class="ident">key</span>,
-            <span class="ident">cancel</span>,
-            <span class="ident">ready</span>,
-            <span class="ident">_pd</span>,
-        } <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Pending&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;key&quot;</span>, <span class="ident">key</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;cancel&quot;</span>, <span class="ident">cancel</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;ready&quot;</span>, <span class="ident">ready</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="self">Self </span>{
+            key,
+            cancel,
+            ready,
+            _pd,
+        } = <span class="self">self</span>;
+        f.debug_struct(<span class="string">&quot;Pending&quot;</span>)
+            .field(<span class="string">&quot;key&quot;</span>, key)
+            .field(<span class="string">&quot;cancel&quot;</span>, cancel)
+            .field(<span class="string">&quot;ready&quot;</span>, ready)
+            .finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/format/strftime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>strftime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/format/strftime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>strftime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -640,10 +640,10 @@
 <span id="640">640</span>
 <span id="641">641</span>
 <span id="642">642</span>
-</pre><pre class="rust"><code><span class="comment">// This is a part of Chrono.</span>
-<span class="comment">// See README.md and LICENSE.txt for details.</span>
+</pre><pre class="rust"><code><span class="comment">// This is a part of Chrono.
+// See README.md and LICENSE.txt for details.
 
-<span class="doccomment">/*!
+</span><span class="doccomment">/*!
 `strftime`/`strptime`-inspired date and time formatting syntax.
 
 ## Specifiers
@@ -808,479 +808,479 @@ Notes:
    It is not possible to reliably convert from an abbreviation to an offset,
    for example CDT can mean either Central Daylight Time (North America) or
    China Daylight Time.
-*/</span>
+*/
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">locales</span>, <span class="ident">Locale</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Fixed</span>, <span class="ident">InternalFixed</span>, <span class="ident">InternalInternal</span>, <span class="ident">Item</span>, <span class="ident">Numeric</span>, <span class="ident">Pad</span>};
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+</span><span class="kw">use super</span>::{locales, Locale};
+<span class="kw">use super</span>::{Fixed, InternalFixed, InternalInternal, Item, Numeric, Pad};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-<span class="kw">type</span> <span class="ident">Fmt</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>))]</span>
-<span class="kw">type</span> <span class="ident">Fmt</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>];
+<span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+</span><span class="kw">type </span>Fmt&lt;<span class="lifetime">&#39;a</span>&gt; = Vec&lt;Item&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;unstable-locales&quot;</span>))]
+</span><span class="kw">type </span>Fmt&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[Item&lt;<span class="lifetime">&#39;static</span>&gt;];
 
-<span class="kw">static</span> <span class="ident">D_FMT</span>: <span class="kw-2">&amp;</span>[<span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>] <span class="op">=</span>
-    <span class="kw-2">&amp;</span>[<span class="macro">num0!</span>(<span class="ident">Month</span>), <span class="macro">lit!</span>(<span class="string">&quot;/&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Day</span>), <span class="macro">lit!</span>(<span class="string">&quot;/&quot;</span>), <span class="macro">num0!</span>(<span class="ident">YearMod100</span>)];
-<span class="kw">static</span> <span class="ident">D_T_FMT</span>: <span class="kw-2">&amp;</span>[<span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="macro">fix!</span>(<span class="ident">ShortWeekdayName</span>),
+<span class="kw">static </span>D_FMT: <span class="kw-2">&amp;</span>[Item&lt;<span class="lifetime">&#39;static</span>&gt;] =
+    <span class="kw-2">&amp;</span>[<span class="macro">num0!</span>(Month), <span class="macro">lit!</span>(<span class="string">&quot;/&quot;</span>), <span class="macro">num0!</span>(Day), <span class="macro">lit!</span>(<span class="string">&quot;/&quot;</span>), <span class="macro">num0!</span>(YearMod100)];
+<span class="kw">static </span>D_T_FMT: <span class="kw-2">&amp;</span>[Item&lt;<span class="lifetime">&#39;static</span>&gt;] = <span class="kw-2">&amp;</span>[
+    <span class="macro">fix!</span>(ShortWeekdayName),
     <span class="macro">sp!</span>(<span class="string">&quot; &quot;</span>),
-    <span class="macro">fix!</span>(<span class="ident">ShortMonthName</span>),
+    <span class="macro">fix!</span>(ShortMonthName),
     <span class="macro">sp!</span>(<span class="string">&quot; &quot;</span>),
-    <span class="macro">nums!</span>(<span class="ident">Day</span>),
+    <span class="macro">nums!</span>(Day),
     <span class="macro">sp!</span>(<span class="string">&quot; &quot;</span>),
-    <span class="macro">num0!</span>(<span class="ident">Hour</span>),
+    <span class="macro">num0!</span>(Hour),
     <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>),
-    <span class="macro">num0!</span>(<span class="ident">Minute</span>),
+    <span class="macro">num0!</span>(Minute),
     <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>),
-    <span class="macro">num0!</span>(<span class="ident">Second</span>),
+    <span class="macro">num0!</span>(Second),
     <span class="macro">sp!</span>(<span class="string">&quot; &quot;</span>),
-    <span class="macro">num0!</span>(<span class="ident">Year</span>),
+    <span class="macro">num0!</span>(Year),
 ];
-<span class="kw">static</span> <span class="ident">T_FMT</span>: <span class="kw-2">&amp;</span>[<span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="macro">num0!</span>(<span class="ident">Hour</span>), <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Minute</span>), <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Second</span>)];
+<span class="kw">static </span>T_FMT: <span class="kw-2">&amp;</span>[Item&lt;<span class="lifetime">&#39;static</span>&gt;] = <span class="kw-2">&amp;</span>[<span class="macro">num0!</span>(Hour), <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>), <span class="macro">num0!</span>(Minute), <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>), <span class="macro">num0!</span>(Second)];
 
-<span class="doccomment">/// Parsing iterator for `strftime`-like format strings.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StrftimeItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Remaining portion of the string.</span>
-    <span class="ident">remainder</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="doccomment">/// If the current specifier is composed of multiple formatting items (e.g. `%+`),</span>
-    <span class="doccomment">/// parser refers to the statically reconstructed slice of them.</span>
-    <span class="doccomment">/// If `recons` is not empty they have to be returned earlier than the `remainder`.</span>
-    <span class="ident">recons</span>: <span class="ident">Fmt</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Date format</span>
-    <span class="ident">d_fmt</span>: <span class="ident">Fmt</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Date and time format</span>
-    <span class="ident">d_t_fmt</span>: <span class="ident">Fmt</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Time format</span>
-    <span class="ident">t_fmt</span>: <span class="ident">Fmt</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parsing iterator for `strftime`-like format strings.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Remaining portion of the string.
+    </span>remainder: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="doccomment">/// If the current specifier is composed of multiple formatting items (e.g. `%+`),
+    /// parser refers to the statically reconstructed slice of them.
+    /// If `recons` is not empty they have to be returned earlier than the `remainder`.
+    </span>recons: Fmt&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="doccomment">/// Date format
+    </span>d_fmt: Fmt&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="doccomment">/// Date and time format
+    </span>d_t_fmt: Fmt&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="doccomment">/// Time format
+    </span>t_fmt: Fmt&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">StrftimeItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new parsing iterator from the `strftime`-like format string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">StrftimeItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::with_remainer</span>(<span class="ident">s</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Creates a new parsing iterator from the `strftime`-like format string.
+    </span><span class="kw">pub fn </span>new(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">Self</span>::with_remainer(s)
     }
 
-    <span class="doccomment">/// Creates a new parsing iterator from the `strftime`-like format string.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_locale</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">locale</span>: <span class="ident">Locale</span>) -&gt; <span class="ident">StrftimeItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">d_fmt</span> <span class="op">=</span> <span class="ident">StrftimeItems::new</span>(<span class="ident">locales::d_fmt</span>(<span class="ident">locale</span>)).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">d_t_fmt</span> <span class="op">=</span> <span class="ident">StrftimeItems::new</span>(<span class="ident">locales::d_t_fmt</span>(<span class="ident">locale</span>)).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">t_fmt</span> <span class="op">=</span> <span class="ident">StrftimeItems::new</span>(<span class="ident">locales::t_fmt</span>(<span class="ident">locale</span>)).<span class="ident">collect</span>();
+    <span class="doccomment">/// Creates a new parsing iterator from the `strftime`-like format string.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+    </span><span class="kw">pub fn </span>new_with_locale(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, locale: Locale) -&gt; StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>d_fmt = StrftimeItems::new(locales::d_fmt(locale)).collect();
+        <span class="kw">let </span>d_t_fmt = StrftimeItems::new(locales::d_t_fmt(locale)).collect();
+        <span class="kw">let </span>t_fmt = StrftimeItems::new(locales::t_fmt(locale)).collect();
 
-        <span class="ident">StrftimeItems</span> { <span class="ident">remainder</span>: <span class="ident">s</span>, <span class="ident">recons</span>: <span class="ident">Vec::new</span>(), <span class="ident">d_fmt</span>, <span class="ident">d_t_fmt</span>, <span class="ident">t_fmt</span> }
+        StrftimeItems { remainder: s, recons: Vec::new(), d_fmt, d_t_fmt, t_fmt }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">with_remainer</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">StrftimeItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">static</span> <span class="ident">FMT_NONE</span>: <span class="kw-2">&amp;</span>[<span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>; <span class="number">0</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[];
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;unstable-locales&quot;</span>))]
+    </span><span class="kw">fn </span>with_remainer(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">static </span>FMT_NONE: <span class="kw-2">&amp;</span>[Item&lt;<span class="lifetime">&#39;static</span>&gt;; <span class="number">0</span>] = <span class="kw-2">&amp;</span>[];
 
-        <span class="ident">StrftimeItems</span> {
-            <span class="ident">remainder</span>: <span class="ident">s</span>,
-            <span class="ident">recons</span>: <span class="ident">FMT_NONE</span>,
-            <span class="ident">d_fmt</span>: <span class="ident">D_FMT</span>,
-            <span class="ident">d_t_fmt</span>: <span class="ident">D_T_FMT</span>,
-            <span class="ident">t_fmt</span>: <span class="ident">T_FMT</span>,
+        StrftimeItems {
+            remainder: s,
+            recons: FMT_NONE,
+            d_fmt: D_FMT,
+            d_t_fmt: D_T_FMT,
+            t_fmt: T_FMT,
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">with_remainer</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">StrftimeItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">StrftimeItems</span> {
-            <span class="ident">remainder</span>: <span class="ident">s</span>,
-            <span class="ident">recons</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">d_fmt</span>: <span class="ident">D_FMT</span>.<span class="ident">to_vec</span>(),
-            <span class="ident">d_t_fmt</span>: <span class="ident">D_T_FMT</span>.<span class="ident">to_vec</span>(),
-            <span class="ident">t_fmt</span>: <span class="ident">T_FMT</span>.<span class="ident">to_vec</span>(),
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+    </span><span class="kw">fn </span>with_remainer(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+        StrftimeItems {
+            remainder: s,
+            recons: Vec::new(),
+            d_fmt: D_FMT.to_vec(),
+            d_t_fmt: D_T_FMT.to_vec(),
+            t_fmt: T_FMT.to_vec(),
         }
     }
 }
 
-<span class="kw">const</span> <span class="ident">HAVE_ALTERNATES</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;z&quot;</span>;
+<span class="kw">const </span>HAVE_ALTERNATES: <span class="kw-2">&amp;</span>str = <span class="string">&quot;z&quot;</span>;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">StrftimeItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = Item&lt;<span class="lifetime">&#39;a</span>&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// we have some reconstructed items to return</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">recons</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">item</span>;
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-            {
-                <span class="ident">item</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">recons</span>.<span class="ident">remove</span>(<span class="number">0</span>);
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Item&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="comment">// we have some reconstructed items to return
+        </span><span class="kw">if </span>!<span class="self">self</span>.recons.is_empty() {
+            <span class="kw">let </span>item;
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+            </span>{
+                item = <span class="self">self</span>.recons.remove(<span class="number">0</span>);
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>))]</span>
-            {
-                <span class="ident">item</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">recons</span>[<span class="number">0</span>].<span class="ident">clone</span>();
-                <span class="self">self</span>.<span class="ident">recons</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">recons</span>[<span class="number">1</span>..];
+            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;unstable-locales&quot;</span>))]
+            </span>{
+                item = <span class="self">self</span>.recons[<span class="number">0</span>].clone();
+                <span class="self">self</span>.recons = <span class="kw-2">&amp;</span><span class="self">self</span>.recons[<span class="number">1</span>..];
             }
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>);
+            <span class="kw">return </span><span class="prelude-val">Some</span>(item);
         }
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">remainder</span>.<span class="ident">chars</span>().<span class="ident">next</span>() {
-            <span class="comment">// we are done</span>
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">match </span><span class="self">self</span>.remainder.chars().next() {
+            <span class="comment">// we are done
+            </span><span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
 
-            <span class="comment">// the next item is a specifier</span>
-            <span class="prelude-val">Some</span>(<span class="string">&#39;%&#39;</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">remainder</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">remainder</span>[<span class="number">1</span>..];
+            <span class="comment">// the next item is a specifier
+            </span><span class="prelude-val">Some</span>(<span class="string">&#39;%&#39;</span>) =&gt; {
+                <span class="self">self</span>.remainder = <span class="kw-2">&amp;</span><span class="self">self</span>.remainder[<span class="number">1</span>..];
 
-                <span class="macro">macro_rules!</span> <span class="ident">next</span> {
+                <span class="macro">macro_rules! </span>next {
                     () =&gt; {
-                        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">remainder</span>.<span class="ident">chars</span>().<span class="ident">next</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; {
-                                <span class="self">self</span>.<span class="ident">remainder</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">remainder</span>[<span class="ident">x</span>.<span class="ident">len_utf8</span>()..];
-                                <span class="ident">x</span>
+                        <span class="kw">match </span><span class="self">self</span>.remainder.chars().next() {
+                            <span class="prelude-val">Some</span>(x) =&gt; {
+                                <span class="self">self</span>.remainder = <span class="kw-2">&amp;</span><span class="self">self</span>.remainder[x.len_utf8()..];
+                                x
                             }
-                            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Item::Error</span>), <span class="comment">// premature end of string</span>
-                        }
+                            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(Item::Error), <span class="comment">// premature end of string
+                        </span>}
                     };
                 }
 
-                <span class="kw">let</span> <span class="ident">spec</span> <span class="op">=</span> <span class="macro">next!</span>();
-                <span class="kw">let</span> <span class="ident">pad_override</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">spec</span> {
-                    <span class="string">&#39;-&#39;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Pad::None</span>),
-                    <span class="string">&#39;0&#39;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Pad::Zero</span>),
-                    <span class="string">&#39;_&#39;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Pad::Space</span>),
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="kw">let </span>spec = <span class="macro">next!</span>();
+                <span class="kw">let </span>pad_override = <span class="kw">match </span>spec {
+                    <span class="string">&#39;-&#39; </span>=&gt; <span class="prelude-val">Some</span>(Pad::None),
+                    <span class="string">&#39;0&#39; </span>=&gt; <span class="prelude-val">Some</span>(Pad::Zero),
+                    <span class="string">&#39;_&#39; </span>=&gt; <span class="prelude-val">Some</span>(Pad::Space),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                 };
-                <span class="kw">let</span> <span class="ident">is_alternate</span> <span class="op">=</span> <span class="ident">spec</span> <span class="op">==</span> <span class="string">&#39;#&#39;</span>;
-                <span class="kw">let</span> <span class="ident">spec</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">pad_override</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">is_alternate</span> { <span class="macro">next!</span>() } <span class="kw">else</span> { <span class="ident">spec</span> };
-                <span class="kw">if</span> <span class="ident">is_alternate</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">HAVE_ALTERNATES</span>.<span class="ident">contains</span>(<span class="ident">spec</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Item::Error</span>);
+                <span class="kw">let </span>is_alternate = spec == <span class="string">&#39;#&#39;</span>;
+                <span class="kw">let </span>spec = <span class="kw">if </span>pad_override.is_some() || is_alternate { <span class="macro">next!</span>() } <span class="kw">else </span>{ spec };
+                <span class="kw">if </span>is_alternate &amp;&amp; !HAVE_ALTERNATES.contains(spec) {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(Item::Error);
                 }
 
-                <span class="macro">macro_rules!</span> <span class="ident">recons</span> {
-                    [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="kw-2">*</span>] =&gt; ({
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-                        {
-                            <span class="self">self</span>.<span class="ident">recons</span>.<span class="ident">clear</span>();
-                            $(<span class="self">self</span>.<span class="ident">recons</span>.<span class="ident">push</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>);)<span class="op">+</span>
+                <span class="macro">macro_rules! </span>recons {
+                    [<span class="macro-nonterminal">$head</span>:expr, $(<span class="macro-nonterminal">$tail</span>:expr),+ $(,)<span class="kw-2">*</span>] =&gt; ({
+                        <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+                        </span>{
+                            <span class="self">self</span>.recons.clear();
+                            $(<span class="self">self</span>.recons.push(<span class="macro-nonterminal">$tail</span>);)+
                         }
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>))]</span>
-                        {
-                            <span class="kw">const</span> <span class="ident">RECONS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>),<span class="op">+</span>];
-                            <span class="self">self</span>.<span class="ident">recons</span> <span class="op">=</span> <span class="ident">RECONS</span>;
+                        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;unstable-locales&quot;</span>))]
+                        </span>{
+                            <span class="kw">const </span>RECONS: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[Item&lt;<span class="lifetime">&#39;static</span>&gt;] = <span class="kw-2">&amp;</span>[$(<span class="macro-nonterminal">$tail</span>),+];
+                            <span class="self">self</span>.recons = RECONS;
                         }
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>
-                    })
+                        <span class="macro-nonterminal">$head
+                    </span>})
                 }
 
-                <span class="macro">macro_rules!</span> <span class="ident">recons_from_slice</span> {
-                    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">slice</span>:<span class="ident">expr</span>) =&gt; {{
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-                        {
-                            <span class="self">self</span>.<span class="ident">recons</span>.<span class="ident">clear</span>();
-                            <span class="self">self</span>.<span class="ident">recons</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">slice</span>[<span class="number">1</span>..]);
+                <span class="macro">macro_rules! </span>recons_from_slice {
+                    (<span class="macro-nonterminal">$slice</span>:expr) =&gt; {{
+                        <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+                        </span>{
+                            <span class="self">self</span>.recons.clear();
+                            <span class="self">self</span>.recons.extend_from_slice(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$slice</span>[<span class="number">1</span>..]);
                         }
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>))]</span>
-                        {
-                            <span class="self">self</span>.<span class="ident">recons</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">slice</span>[<span class="number">1</span>..];
+                        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;unstable-locales&quot;</span>))]
+                        </span>{
+                            <span class="self">self</span>.recons = <span class="kw-2">&amp;</span><span class="macro-nonterminal">$slice</span>[<span class="number">1</span>..];
                         }
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">slice</span>[<span class="number">0</span>].<span class="ident">clone</span>()
+                        <span class="macro-nonterminal">$slice</span>[<span class="number">0</span>].clone()
                     }};
                 }
 
-                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">spec</span> {
-                    <span class="string">&#39;A&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">LongWeekdayName</span>),
-                    <span class="string">&#39;B&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">LongMonthName</span>),
-                    <span class="string">&#39;C&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">YearDiv100</span>),
-                    <span class="string">&#39;D&#39;</span> =&gt; {
-                        <span class="macro">recons!</span>[<span class="macro">num0!</span>(<span class="ident">Month</span>), <span class="macro">lit!</span>(<span class="string">&quot;/&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Day</span>), <span class="macro">lit!</span>(<span class="string">&quot;/&quot;</span>), <span class="macro">num0!</span>(<span class="ident">YearMod100</span>)]
+                <span class="kw">let </span>item = <span class="kw">match </span>spec {
+                    <span class="string">&#39;A&#39; </span>=&gt; <span class="macro">fix!</span>(LongWeekdayName),
+                    <span class="string">&#39;B&#39; </span>=&gt; <span class="macro">fix!</span>(LongMonthName),
+                    <span class="string">&#39;C&#39; </span>=&gt; <span class="macro">num0!</span>(YearDiv100),
+                    <span class="string">&#39;D&#39; </span>=&gt; {
+                        <span class="macro">recons!</span>[<span class="macro">num0!</span>(Month), <span class="macro">lit!</span>(<span class="string">&quot;/&quot;</span>), <span class="macro">num0!</span>(Day), <span class="macro">lit!</span>(<span class="string">&quot;/&quot;</span>), <span class="macro">num0!</span>(YearMod100)]
                     }
-                    <span class="string">&#39;F&#39;</span> =&gt; <span class="macro">recons!</span>[<span class="macro">num0!</span>(<span class="ident">Year</span>), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Month</span>), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Day</span>)],
-                    <span class="string">&#39;G&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">IsoYear</span>),
-                    <span class="string">&#39;H&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">Hour</span>),
-                    <span class="string">&#39;I&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">Hour12</span>),
-                    <span class="string">&#39;M&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">Minute</span>),
-                    <span class="string">&#39;P&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">LowerAmPm</span>),
-                    <span class="string">&#39;R&#39;</span> =&gt; <span class="macro">recons!</span>[<span class="macro">num0!</span>(<span class="ident">Hour</span>), <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Minute</span>)],
-                    <span class="string">&#39;S&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">Second</span>),
-                    <span class="string">&#39;T&#39;</span> =&gt; <span class="macro">recons!</span>[<span class="macro">num0!</span>(<span class="ident">Hour</span>), <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Minute</span>), <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Second</span>)],
-                    <span class="string">&#39;U&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">WeekFromSun</span>),
-                    <span class="string">&#39;V&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">IsoWeek</span>),
-                    <span class="string">&#39;W&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">WeekFromMon</span>),
-                    <span class="string">&#39;X&#39;</span> =&gt; <span class="macro">recons_from_slice!</span>(<span class="self">self</span>.<span class="ident">t_fmt</span>),
-                    <span class="string">&#39;Y&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">Year</span>),
-                    <span class="string">&#39;Z&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">TimezoneName</span>),
-                    <span class="string">&#39;a&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">ShortWeekdayName</span>),
-                    <span class="string">&#39;b&#39;</span> <span class="op">|</span> <span class="string">&#39;h&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">ShortMonthName</span>),
-                    <span class="string">&#39;c&#39;</span> =&gt; <span class="macro">recons_from_slice!</span>(<span class="self">self</span>.<span class="ident">d_t_fmt</span>),
-                    <span class="string">&#39;d&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">Day</span>),
-                    <span class="string">&#39;e&#39;</span> =&gt; <span class="macro">nums!</span>(<span class="ident">Day</span>),
-                    <span class="string">&#39;f&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">Nanosecond</span>),
-                    <span class="string">&#39;g&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">IsoYearMod100</span>),
-                    <span class="string">&#39;j&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">Ordinal</span>),
-                    <span class="string">&#39;k&#39;</span> =&gt; <span class="macro">nums!</span>(<span class="ident">Hour</span>),
-                    <span class="string">&#39;l&#39;</span> =&gt; <span class="macro">nums!</span>(<span class="ident">Hour12</span>),
-                    <span class="string">&#39;m&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">Month</span>),
-                    <span class="string">&#39;n&#39;</span> =&gt; <span class="macro">sp!</span>(<span class="string">&quot;\n&quot;</span>),
-                    <span class="string">&#39;p&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">UpperAmPm</span>),
-                    <span class="string">&#39;r&#39;</span> =&gt; <span class="macro">recons!</span>[
-                        <span class="macro">num0!</span>(<span class="ident">Hour12</span>),
+                    <span class="string">&#39;F&#39; </span>=&gt; <span class="macro">recons!</span>[<span class="macro">num0!</span>(Year), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">num0!</span>(Month), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">num0!</span>(Day)],
+                    <span class="string">&#39;G&#39; </span>=&gt; <span class="macro">num0!</span>(IsoYear),
+                    <span class="string">&#39;H&#39; </span>=&gt; <span class="macro">num0!</span>(Hour),
+                    <span class="string">&#39;I&#39; </span>=&gt; <span class="macro">num0!</span>(Hour12),
+                    <span class="string">&#39;M&#39; </span>=&gt; <span class="macro">num0!</span>(Minute),
+                    <span class="string">&#39;P&#39; </span>=&gt; <span class="macro">fix!</span>(LowerAmPm),
+                    <span class="string">&#39;R&#39; </span>=&gt; <span class="macro">recons!</span>[<span class="macro">num0!</span>(Hour), <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>), <span class="macro">num0!</span>(Minute)],
+                    <span class="string">&#39;S&#39; </span>=&gt; <span class="macro">num0!</span>(Second),
+                    <span class="string">&#39;T&#39; </span>=&gt; <span class="macro">recons!</span>[<span class="macro">num0!</span>(Hour), <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>), <span class="macro">num0!</span>(Minute), <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>), <span class="macro">num0!</span>(Second)],
+                    <span class="string">&#39;U&#39; </span>=&gt; <span class="macro">num0!</span>(WeekFromSun),
+                    <span class="string">&#39;V&#39; </span>=&gt; <span class="macro">num0!</span>(IsoWeek),
+                    <span class="string">&#39;W&#39; </span>=&gt; <span class="macro">num0!</span>(WeekFromMon),
+                    <span class="string">&#39;X&#39; </span>=&gt; <span class="macro">recons_from_slice!</span>(<span class="self">self</span>.t_fmt),
+                    <span class="string">&#39;Y&#39; </span>=&gt; <span class="macro">num0!</span>(Year),
+                    <span class="string">&#39;Z&#39; </span>=&gt; <span class="macro">fix!</span>(TimezoneName),
+                    <span class="string">&#39;a&#39; </span>=&gt; <span class="macro">fix!</span>(ShortWeekdayName),
+                    <span class="string">&#39;b&#39; </span>| <span class="string">&#39;h&#39; </span>=&gt; <span class="macro">fix!</span>(ShortMonthName),
+                    <span class="string">&#39;c&#39; </span>=&gt; <span class="macro">recons_from_slice!</span>(<span class="self">self</span>.d_t_fmt),
+                    <span class="string">&#39;d&#39; </span>=&gt; <span class="macro">num0!</span>(Day),
+                    <span class="string">&#39;e&#39; </span>=&gt; <span class="macro">nums!</span>(Day),
+                    <span class="string">&#39;f&#39; </span>=&gt; <span class="macro">num0!</span>(Nanosecond),
+                    <span class="string">&#39;g&#39; </span>=&gt; <span class="macro">num0!</span>(IsoYearMod100),
+                    <span class="string">&#39;j&#39; </span>=&gt; <span class="macro">num0!</span>(Ordinal),
+                    <span class="string">&#39;k&#39; </span>=&gt; <span class="macro">nums!</span>(Hour),
+                    <span class="string">&#39;l&#39; </span>=&gt; <span class="macro">nums!</span>(Hour12),
+                    <span class="string">&#39;m&#39; </span>=&gt; <span class="macro">num0!</span>(Month),
+                    <span class="string">&#39;n&#39; </span>=&gt; <span class="macro">sp!</span>(<span class="string">&quot;\n&quot;</span>),
+                    <span class="string">&#39;p&#39; </span>=&gt; <span class="macro">fix!</span>(UpperAmPm),
+                    <span class="string">&#39;r&#39; </span>=&gt; <span class="macro">recons!</span>[
+                        <span class="macro">num0!</span>(Hour12),
                         <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>),
-                        <span class="macro">num0!</span>(<span class="ident">Minute</span>),
+                        <span class="macro">num0!</span>(Minute),
                         <span class="macro">lit!</span>(<span class="string">&quot;:&quot;</span>),
-                        <span class="macro">num0!</span>(<span class="ident">Second</span>),
+                        <span class="macro">num0!</span>(Second),
                         <span class="macro">sp!</span>(<span class="string">&quot; &quot;</span>),
-                        <span class="macro">fix!</span>(<span class="ident">UpperAmPm</span>)
+                        <span class="macro">fix!</span>(UpperAmPm)
                     ],
-                    <span class="string">&#39;s&#39;</span> =&gt; <span class="macro">num!</span>(<span class="ident">Timestamp</span>),
-                    <span class="string">&#39;t&#39;</span> =&gt; <span class="macro">sp!</span>(<span class="string">&quot;\t&quot;</span>),
-                    <span class="string">&#39;u&#39;</span> =&gt; <span class="macro">num!</span>(<span class="ident">WeekdayFromMon</span>),
-                    <span class="string">&#39;v&#39;</span> =&gt; {
-                        <span class="macro">recons!</span>[<span class="macro">nums!</span>(<span class="ident">Day</span>), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">fix!</span>(<span class="ident">ShortMonthName</span>), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Year</span>)]
+                    <span class="string">&#39;s&#39; </span>=&gt; <span class="macro">num!</span>(Timestamp),
+                    <span class="string">&#39;t&#39; </span>=&gt; <span class="macro">sp!</span>(<span class="string">&quot;\t&quot;</span>),
+                    <span class="string">&#39;u&#39; </span>=&gt; <span class="macro">num!</span>(WeekdayFromMon),
+                    <span class="string">&#39;v&#39; </span>=&gt; {
+                        <span class="macro">recons!</span>[<span class="macro">nums!</span>(Day), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">fix!</span>(ShortMonthName), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">num0!</span>(Year)]
                     }
-                    <span class="string">&#39;w&#39;</span> =&gt; <span class="macro">num!</span>(<span class="ident">NumDaysFromSun</span>),
-                    <span class="string">&#39;x&#39;</span> =&gt; <span class="macro">recons_from_slice!</span>(<span class="self">self</span>.<span class="ident">d_fmt</span>),
-                    <span class="string">&#39;y&#39;</span> =&gt; <span class="macro">num0!</span>(<span class="ident">YearMod100</span>),
-                    <span class="string">&#39;z&#39;</span> =&gt; {
-                        <span class="kw">if</span> <span class="ident">is_alternate</span> {
-                            <span class="macro">internal_fix!</span>(<span class="ident">TimezoneOffsetPermissive</span>)
-                        } <span class="kw">else</span> {
-                            <span class="macro">fix!</span>(<span class="ident">TimezoneOffset</span>)
+                    <span class="string">&#39;w&#39; </span>=&gt; <span class="macro">num!</span>(NumDaysFromSun),
+                    <span class="string">&#39;x&#39; </span>=&gt; <span class="macro">recons_from_slice!</span>(<span class="self">self</span>.d_fmt),
+                    <span class="string">&#39;y&#39; </span>=&gt; <span class="macro">num0!</span>(YearMod100),
+                    <span class="string">&#39;z&#39; </span>=&gt; {
+                        <span class="kw">if </span>is_alternate {
+                            <span class="macro">internal_fix!</span>(TimezoneOffsetPermissive)
+                        } <span class="kw">else </span>{
+                            <span class="macro">fix!</span>(TimezoneOffset)
                         }
                     }
-                    <span class="string">&#39;+&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">RFC3339</span>),
-                    <span class="string">&#39;:&#39;</span> =&gt; <span class="kw">match</span> <span class="macro">next!</span>() {
-                        <span class="string">&#39;z&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">TimezoneOffsetColon</span>),
-                        <span class="kw">_</span> =&gt; <span class="ident">Item::Error</span>,
+                    <span class="string">&#39;+&#39; </span>=&gt; <span class="macro">fix!</span>(RFC3339),
+                    <span class="string">&#39;:&#39; </span>=&gt; <span class="kw">match </span><span class="macro">next!</span>() {
+                        <span class="string">&#39;z&#39; </span>=&gt; <span class="macro">fix!</span>(TimezoneOffsetColon),
+                        <span class="kw">_ </span>=&gt; Item::Error,
                     },
-                    <span class="string">&#39;.&#39;</span> =&gt; <span class="kw">match</span> <span class="macro">next!</span>() {
-                        <span class="string">&#39;3&#39;</span> =&gt; <span class="kw">match</span> <span class="macro">next!</span>() {
-                            <span class="string">&#39;f&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">Nanosecond3</span>),
-                            <span class="kw">_</span> =&gt; <span class="ident">Item::Error</span>,
+                    <span class="string">&#39;.&#39; </span>=&gt; <span class="kw">match </span><span class="macro">next!</span>() {
+                        <span class="string">&#39;3&#39; </span>=&gt; <span class="kw">match </span><span class="macro">next!</span>() {
+                            <span class="string">&#39;f&#39; </span>=&gt; <span class="macro">fix!</span>(Nanosecond3),
+                            <span class="kw">_ </span>=&gt; Item::Error,
                         },
-                        <span class="string">&#39;6&#39;</span> =&gt; <span class="kw">match</span> <span class="macro">next!</span>() {
-                            <span class="string">&#39;f&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">Nanosecond6</span>),
-                            <span class="kw">_</span> =&gt; <span class="ident">Item::Error</span>,
+                        <span class="string">&#39;6&#39; </span>=&gt; <span class="kw">match </span><span class="macro">next!</span>() {
+                            <span class="string">&#39;f&#39; </span>=&gt; <span class="macro">fix!</span>(Nanosecond6),
+                            <span class="kw">_ </span>=&gt; Item::Error,
                         },
-                        <span class="string">&#39;9&#39;</span> =&gt; <span class="kw">match</span> <span class="macro">next!</span>() {
-                            <span class="string">&#39;f&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">Nanosecond9</span>),
-                            <span class="kw">_</span> =&gt; <span class="ident">Item::Error</span>,
+                        <span class="string">&#39;9&#39; </span>=&gt; <span class="kw">match </span><span class="macro">next!</span>() {
+                            <span class="string">&#39;f&#39; </span>=&gt; <span class="macro">fix!</span>(Nanosecond9),
+                            <span class="kw">_ </span>=&gt; Item::Error,
                         },
-                        <span class="string">&#39;f&#39;</span> =&gt; <span class="macro">fix!</span>(<span class="ident">Nanosecond</span>),
-                        <span class="kw">_</span> =&gt; <span class="ident">Item::Error</span>,
+                        <span class="string">&#39;f&#39; </span>=&gt; <span class="macro">fix!</span>(Nanosecond),
+                        <span class="kw">_ </span>=&gt; Item::Error,
                     },
-                    <span class="string">&#39;3&#39;</span> =&gt; <span class="kw">match</span> <span class="macro">next!</span>() {
-                        <span class="string">&#39;f&#39;</span> =&gt; <span class="macro">internal_fix!</span>(<span class="ident">Nanosecond3NoDot</span>),
-                        <span class="kw">_</span> =&gt; <span class="ident">Item::Error</span>,
+                    <span class="string">&#39;3&#39; </span>=&gt; <span class="kw">match </span><span class="macro">next!</span>() {
+                        <span class="string">&#39;f&#39; </span>=&gt; <span class="macro">internal_fix!</span>(Nanosecond3NoDot),
+                        <span class="kw">_ </span>=&gt; Item::Error,
                     },
-                    <span class="string">&#39;6&#39;</span> =&gt; <span class="kw">match</span> <span class="macro">next!</span>() {
-                        <span class="string">&#39;f&#39;</span> =&gt; <span class="macro">internal_fix!</span>(<span class="ident">Nanosecond6NoDot</span>),
-                        <span class="kw">_</span> =&gt; <span class="ident">Item::Error</span>,
+                    <span class="string">&#39;6&#39; </span>=&gt; <span class="kw">match </span><span class="macro">next!</span>() {
+                        <span class="string">&#39;f&#39; </span>=&gt; <span class="macro">internal_fix!</span>(Nanosecond6NoDot),
+                        <span class="kw">_ </span>=&gt; Item::Error,
                     },
-                    <span class="string">&#39;9&#39;</span> =&gt; <span class="kw">match</span> <span class="macro">next!</span>() {
-                        <span class="string">&#39;f&#39;</span> =&gt; <span class="macro">internal_fix!</span>(<span class="ident">Nanosecond9NoDot</span>),
-                        <span class="kw">_</span> =&gt; <span class="ident">Item::Error</span>,
+                    <span class="string">&#39;9&#39; </span>=&gt; <span class="kw">match </span><span class="macro">next!</span>() {
+                        <span class="string">&#39;f&#39; </span>=&gt; <span class="macro">internal_fix!</span>(Nanosecond9NoDot),
+                        <span class="kw">_ </span>=&gt; Item::Error,
                     },
-                    <span class="string">&#39;%&#39;</span> =&gt; <span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>),
-                    <span class="kw">_</span> =&gt; <span class="ident">Item::Error</span>, <span class="comment">// no such specifier</span>
-                };
+                    <span class="string">&#39;%&#39; </span>=&gt; <span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>),
+                    <span class="kw">_ </span>=&gt; Item::Error, <span class="comment">// no such specifier
+                </span>};
 
-                <span class="comment">// adjust `item` if we have any padding modifier</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">new_pad</span>) <span class="op">=</span> <span class="ident">pad_override</span> {
-                    <span class="kw">match</span> <span class="ident">item</span> {
-                        <span class="ident">Item::Numeric</span>(<span class="kw-2">ref</span> <span class="ident">kind</span>, <span class="ident">_pad</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">recons</span>.<span class="ident">is_empty</span>() =&gt; {
-                            <span class="prelude-val">Some</span>(<span class="ident">Item::Numeric</span>(<span class="ident">kind</span>.<span class="ident">clone</span>(), <span class="ident">new_pad</span>))
+                <span class="comment">// adjust `item` if we have any padding modifier
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(new_pad) = pad_override {
+                    <span class="kw">match </span>item {
+                        Item::Numeric(<span class="kw-2">ref </span>kind, _pad) <span class="kw">if </span><span class="self">self</span>.recons.is_empty() =&gt; {
+                            <span class="prelude-val">Some</span>(Item::Numeric(kind.clone(), new_pad))
                         }
-                        <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Item::Error</span>), <span class="comment">// no reconstructed or non-numeric item allowed</span>
-                    }
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">item</span>)
+                        <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(Item::Error), <span class="comment">// no reconstructed or non-numeric item allowed
+                    </span>}
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(item)
                 }
             }
 
-            <span class="comment">// the next item is space</span>
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>() =&gt; {
-                <span class="comment">// `%` is not a whitespace, so `c != &#39;%&#39;` is redundant</span>
-                <span class="kw">let</span> <span class="ident">nextspec</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">remainder</span>
-                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">is_whitespace</span>())
-                    .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">remainder</span>.<span class="ident">len</span>());
-                <span class="macro">assert!</span>(<span class="ident">nextspec</span> <span class="op">&gt;</span> <span class="number">0</span>);
-                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="macro">sp!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">remainder</span>[..<span class="ident">nextspec</span>]);
-                <span class="self">self</span>.<span class="ident">remainder</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">remainder</span>[<span class="ident">nextspec</span>..];
-                <span class="prelude-val">Some</span>(<span class="ident">item</span>)
+            <span class="comment">// the next item is space
+            </span><span class="prelude-val">Some</span>(c) <span class="kw">if </span>c.is_whitespace() =&gt; {
+                <span class="comment">// `%` is not a whitespace, so `c != &#39;%&#39;` is redundant
+                </span><span class="kw">let </span>nextspec = <span class="self">self
+                    </span>.remainder
+                    .find(|c: char| !c.is_whitespace())
+                    .unwrap_or(<span class="self">self</span>.remainder.len());
+                <span class="macro">assert!</span>(nextspec &gt; <span class="number">0</span>);
+                <span class="kw">let </span>item = <span class="macro">sp!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.remainder[..nextspec]);
+                <span class="self">self</span>.remainder = <span class="kw-2">&amp;</span><span class="self">self</span>.remainder[nextspec..];
+                <span class="prelude-val">Some</span>(item)
             }
 
-            <span class="comment">// the next item is literal</span>
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">nextspec</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">remainder</span>
-                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;%&#39;</span>)
-                    .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">remainder</span>.<span class="ident">len</span>());
-                <span class="macro">assert!</span>(<span class="ident">nextspec</span> <span class="op">&gt;</span> <span class="number">0</span>);
-                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="macro">lit!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">remainder</span>[..<span class="ident">nextspec</span>]);
-                <span class="self">self</span>.<span class="ident">remainder</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">remainder</span>[<span class="ident">nextspec</span>..];
-                <span class="prelude-val">Some</span>(<span class="ident">item</span>)
+            <span class="comment">// the next item is literal
+            </span><span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>nextspec = <span class="self">self
+                    </span>.remainder
+                    .find(|c: char| c.is_whitespace() || c == <span class="string">&#39;%&#39;</span>)
+                    .unwrap_or(<span class="self">self</span>.remainder.len());
+                <span class="macro">assert!</span>(nextspec &gt; <span class="number">0</span>);
+                <span class="kw">let </span>item = <span class="macro">lit!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.remainder[..nextspec]);
+                <span class="self">self</span>.remainder = <span class="kw-2">&amp;</span><span class="self">self</span>.remainder[nextspec..];
+                <span class="prelude-val">Some</span>(item)
             }
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_strftime_items</span>() {
-    <span class="kw">fn</span> <span class="ident">parse_and_collect</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// map any error into `[Item::Error]`. useful for easy testing.</span>
-        <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">StrftimeItems::new</span>(<span class="ident">s</span>);
-        <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">spec</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">spec</span> <span class="op">==</span> <span class="ident">Item::Error</span> { <span class="prelude-val">None</span> } <span class="kw">else</span> { <span class="prelude-val">Some</span>(<span class="ident">spec</span>) });
-        <span class="ident">items</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">Item::Error</span>])
+<span class="attribute">#[cfg(test)]
+#[test]
+</span><span class="kw">fn </span>test_strftime_items() {
+    <span class="kw">fn </span>parse_and_collect(s: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;Item&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="comment">// map any error into `[Item::Error]`. useful for easy testing.
+        </span><span class="kw">let </span>items = StrftimeItems::new(s);
+        <span class="kw">let </span>items = items.map(|spec| <span class="kw">if </span>spec == Item::Error { <span class="prelude-val">None </span>} <span class="kw">else </span>{ <span class="prelude-val">Some</span>(spec) });
+        items.collect::&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;().unwrap_or_else(|| <span class="macro">vec!</span>[Item::Error])
     }
 
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;&quot;</span>), []);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot; \t\n\r &quot;</span>), [<span class="macro">sp!</span>(<span class="string">&quot; \t\n\r &quot;</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;hello?&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;hello?&quot;</span>)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;&quot;</span>), []);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot; \t\n\r &quot;</span>), [<span class="macro">sp!</span>(<span class="string">&quot; \t\n\r &quot;</span>)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;hello?&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;hello?&quot;</span>)]);
     <span class="macro">assert_eq!</span>(
-        <span class="ident">parse_and_collect</span>(<span class="string">&quot;a  b\t\nc&quot;</span>),
+        parse_and_collect(<span class="string">&quot;a  b\t\nc&quot;</span>),
         [<span class="macro">lit!</span>(<span class="string">&quot;a&quot;</span>), <span class="macro">sp!</span>(<span class="string">&quot;  &quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;b&quot;</span>), <span class="macro">sp!</span>(<span class="string">&quot;\t\n&quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;c&quot;</span>)]
     );
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;100%%&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;100&quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;100%% ok&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;100&quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>), <span class="macro">sp!</span>(<span class="string">&quot; &quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;ok&quot;</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%%PDF-1.0&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;PDF-1.0&quot;</span>)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;100%%&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;100&quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;100%% ok&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;100&quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>), <span class="macro">sp!</span>(<span class="string">&quot; &quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;ok&quot;</span>)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%%PDF-1.0&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;PDF-1.0&quot;</span>)]);
     <span class="macro">assert_eq!</span>(
-        <span class="ident">parse_and_collect</span>(<span class="string">&quot;%Y-%m-%d&quot;</span>),
-        [<span class="macro">num0!</span>(<span class="ident">Year</span>), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Month</span>), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">num0!</span>(<span class="ident">Day</span>)]
+        parse_and_collect(<span class="string">&quot;%Y-%m-%d&quot;</span>),
+        [<span class="macro">num0!</span>(Year), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">num0!</span>(Month), <span class="macro">lit!</span>(<span class="string">&quot;-&quot;</span>), <span class="macro">num0!</span>(Day)]
     );
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;[%F]&quot;</span>), <span class="ident">parse_and_collect</span>(<span class="string">&quot;[%Y-%m-%d]&quot;</span>));
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%m %d&quot;</span>), [<span class="macro">num0!</span>(<span class="ident">Month</span>), <span class="macro">sp!</span>(<span class="string">&quot; &quot;</span>), <span class="macro">num0!</span>(<span class="ident">Day</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%%&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%%%&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%%%%&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;foo%?&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;bar%42&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;quux% +&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%.Z&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%:Z&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%-Z&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%0Z&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%_Z&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%.j&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%:j&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%-j&quot;</span>), [<span class="macro">num!</span>(<span class="ident">Ordinal</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%0j&quot;</span>), [<span class="macro">num0!</span>(<span class="ident">Ordinal</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%_j&quot;</span>), [<span class="macro">nums!</span>(<span class="ident">Ordinal</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%.e&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%:e&quot;</span>), [<span class="ident">Item::Error</span>]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%-e&quot;</span>), [<span class="macro">num!</span>(<span class="ident">Day</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%0e&quot;</span>), [<span class="macro">num0!</span>(<span class="ident">Day</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%_e&quot;</span>), [<span class="macro">nums!</span>(<span class="ident">Day</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%z&quot;</span>), [<span class="macro">fix!</span>(<span class="ident">TimezoneOffset</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%#z&quot;</span>), [<span class="macro">internal_fix!</span>(<span class="ident">TimezoneOffsetPermissive</span>)]);
-    <span class="macro">assert_eq!</span>(<span class="ident">parse_and_collect</span>(<span class="string">&quot;%#m&quot;</span>), [<span class="ident">Item::Error</span>]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;[%F]&quot;</span>), parse_and_collect(<span class="string">&quot;[%Y-%m-%d]&quot;</span>));
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%m %d&quot;</span>), [<span class="macro">num0!</span>(Month), <span class="macro">sp!</span>(<span class="string">&quot; &quot;</span>), <span class="macro">num0!</span>(Day)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%%&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%%%&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%%%%&quot;</span>), [<span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>), <span class="macro">lit!</span>(<span class="string">&quot;%&quot;</span>)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;foo%?&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;bar%42&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;quux% +&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%.Z&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%:Z&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%-Z&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%0Z&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%_Z&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%.j&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%:j&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%-j&quot;</span>), [<span class="macro">num!</span>(Ordinal)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%0j&quot;</span>), [<span class="macro">num0!</span>(Ordinal)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%_j&quot;</span>), [<span class="macro">nums!</span>(Ordinal)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%.e&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%:e&quot;</span>), [Item::Error]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%-e&quot;</span>), [<span class="macro">num!</span>(Day)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%0e&quot;</span>), [<span class="macro">num0!</span>(Day)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%_e&quot;</span>), [<span class="macro">nums!</span>(Day)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%z&quot;</span>), [<span class="macro">fix!</span>(TimezoneOffset)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%#z&quot;</span>), [<span class="macro">internal_fix!</span>(TimezoneOffsetPermissive)]);
+    <span class="macro">assert_eq!</span>(parse_and_collect(<span class="string">&quot;%#m&quot;</span>), [Item::Error]);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_strftime_docs</span>() {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FixedOffset</span>, <span class="ident">TimeZone</span>, <span class="ident">Timelike</span>};
+<span class="attribute">#[cfg(test)]
+#[test]
+</span><span class="kw">fn </span>test_strftime_docs() {
+    <span class="kw">use crate</span>::{FixedOffset, TimeZone, Timelike};
 
-    <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">FixedOffset::east</span>(<span class="number">34200</span>).<span class="ident">ymd</span>(<span class="number">2001</span>, <span class="number">7</span>, <span class="number">8</span>).<span class="ident">and_hms_nano</span>(<span class="number">0</span>, <span class="number">34</span>, <span class="number">59</span>, <span class="number">1_026_490_708</span>);
+    <span class="kw">let </span>dt = FixedOffset::east(<span class="number">34200</span>).ymd(<span class="number">2001</span>, <span class="number">7</span>, <span class="number">8</span>).and_hms_nano(<span class="number">0</span>, <span class="number">34</span>, <span class="number">59</span>, <span class="number">1_026_490_708</span>);
 
-    <span class="comment">// date specifiers</span>
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%Y&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;2001&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%C&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;20&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%y&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;01&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%m&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;07&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%b&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;Jul&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%B&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;July&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%h&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;Jul&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%d&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;08&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%e&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot; 8&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%e&quot;</span>).<span class="ident">to_string</span>(), <span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%_d&quot;</span>).<span class="ident">to_string</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%a&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;Sun&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%A&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;Sunday&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%w&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%u&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;7&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%U&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;28&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%W&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;27&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%G&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;2001&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%g&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;01&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%V&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;27&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%j&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;189&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%D&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;07/08/01&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%x&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;07/08/01&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%F&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;2001-07-08&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%v&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot; 8-Jul-2001&quot;</span>);
+    <span class="comment">// date specifiers
+    </span><span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%Y&quot;</span>).to_string(), <span class="string">&quot;2001&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%C&quot;</span>).to_string(), <span class="string">&quot;20&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%y&quot;</span>).to_string(), <span class="string">&quot;01&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%m&quot;</span>).to_string(), <span class="string">&quot;07&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%b&quot;</span>).to_string(), <span class="string">&quot;Jul&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%B&quot;</span>).to_string(), <span class="string">&quot;July&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%h&quot;</span>).to_string(), <span class="string">&quot;Jul&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%d&quot;</span>).to_string(), <span class="string">&quot;08&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%e&quot;</span>).to_string(), <span class="string">&quot; 8&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%e&quot;</span>).to_string(), dt.format(<span class="string">&quot;%_d&quot;</span>).to_string());
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%a&quot;</span>).to_string(), <span class="string">&quot;Sun&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%A&quot;</span>).to_string(), <span class="string">&quot;Sunday&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%w&quot;</span>).to_string(), <span class="string">&quot;0&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%u&quot;</span>).to_string(), <span class="string">&quot;7&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%U&quot;</span>).to_string(), <span class="string">&quot;28&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%W&quot;</span>).to_string(), <span class="string">&quot;27&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%G&quot;</span>).to_string(), <span class="string">&quot;2001&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%g&quot;</span>).to_string(), <span class="string">&quot;01&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%V&quot;</span>).to_string(), <span class="string">&quot;27&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%j&quot;</span>).to_string(), <span class="string">&quot;189&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%D&quot;</span>).to_string(), <span class="string">&quot;07/08/01&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%x&quot;</span>).to_string(), <span class="string">&quot;07/08/01&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%F&quot;</span>).to_string(), <span class="string">&quot;2001-07-08&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%v&quot;</span>).to_string(), <span class="string">&quot; 8-Jul-2001&quot;</span>);
 
-    <span class="comment">// time specifiers</span>
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%H&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;00&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%k&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot; 0&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%k&quot;</span>).<span class="ident">to_string</span>(), <span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%_H&quot;</span>).<span class="ident">to_string</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%I&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;12&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%l&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;12&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%l&quot;</span>).<span class="ident">to_string</span>(), <span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%_I&quot;</span>).<span class="ident">to_string</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%P&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;am&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%p&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;AM&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%M&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;34&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%S&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;60&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%f&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;026490708&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%.f&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;.026490708&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">with_nanosecond</span>(<span class="number">1_026_490_000</span>).<span class="ident">unwrap</span>().<span class="ident">format</span>(<span class="string">&quot;%.f&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;.026490&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%.3f&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;.026&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%.6f&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;.026490&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%.9f&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;.026490708&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%3f&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;026&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%6f&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;026490&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%9f&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;026490708&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%R&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;00:34&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%T&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;00:34:60&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%X&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;00:34:60&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%r&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;12:34:60 AM&quot;</span>);
+    <span class="comment">// time specifiers
+    </span><span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%H&quot;</span>).to_string(), <span class="string">&quot;00&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%k&quot;</span>).to_string(), <span class="string">&quot; 0&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%k&quot;</span>).to_string(), dt.format(<span class="string">&quot;%_H&quot;</span>).to_string());
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%I&quot;</span>).to_string(), <span class="string">&quot;12&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%l&quot;</span>).to_string(), <span class="string">&quot;12&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%l&quot;</span>).to_string(), dt.format(<span class="string">&quot;%_I&quot;</span>).to_string());
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%P&quot;</span>).to_string(), <span class="string">&quot;am&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%p&quot;</span>).to_string(), <span class="string">&quot;AM&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%M&quot;</span>).to_string(), <span class="string">&quot;34&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%S&quot;</span>).to_string(), <span class="string">&quot;60&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%f&quot;</span>).to_string(), <span class="string">&quot;026490708&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%.f&quot;</span>).to_string(), <span class="string">&quot;.026490708&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.with_nanosecond(<span class="number">1_026_490_000</span>).unwrap().format(<span class="string">&quot;%.f&quot;</span>).to_string(), <span class="string">&quot;.026490&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%.3f&quot;</span>).to_string(), <span class="string">&quot;.026&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%.6f&quot;</span>).to_string(), <span class="string">&quot;.026490&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%.9f&quot;</span>).to_string(), <span class="string">&quot;.026490708&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%3f&quot;</span>).to_string(), <span class="string">&quot;026&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%6f&quot;</span>).to_string(), <span class="string">&quot;026490&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%9f&quot;</span>).to_string(), <span class="string">&quot;026490708&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%R&quot;</span>).to_string(), <span class="string">&quot;00:34&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%T&quot;</span>).to_string(), <span class="string">&quot;00:34:60&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%X&quot;</span>).to_string(), <span class="string">&quot;00:34:60&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%r&quot;</span>).to_string(), <span class="string">&quot;12:34:60 AM&quot;</span>);
 
-    <span class="comment">// time zone specifiers</span>
-    <span class="comment">//assert_eq!(dt.format(&quot;%Z&quot;).to_string(), &quot;ACST&quot;);</span>
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%z&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+0930&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%:z&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+09:30&quot;</span>);
+    <span class="comment">// time zone specifiers
+    //assert_eq!(dt.format(&quot;%Z&quot;).to_string(), &quot;ACST&quot;);
+    </span><span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%z&quot;</span>).to_string(), <span class="string">&quot;+0930&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%:z&quot;</span>).to_string(), <span class="string">&quot;+09:30&quot;</span>);
 
-    <span class="comment">// date &amp; time specifiers</span>
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%c&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;Sun Jul  8 00:34:60 2001&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%+&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;2001-07-08T00:34:60.026490708+09:30&quot;</span>);
+    <span class="comment">// date &amp; time specifiers
+    </span><span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%c&quot;</span>).to_string(), <span class="string">&quot;Sun Jul  8 00:34:60 2001&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%+&quot;</span>).to_string(), <span class="string">&quot;2001-07-08T00:34:60.026490708+09:30&quot;</span>);
     <span class="macro">assert_eq!</span>(
-        <span class="ident">dt</span>.<span class="ident">with_nanosecond</span>(<span class="number">1_026_490_000</span>).<span class="ident">unwrap</span>().<span class="ident">format</span>(<span class="string">&quot;%+&quot;</span>).<span class="ident">to_string</span>(),
-        <span class="string">&quot;2001-07-08T00:34:60.026490+09:30&quot;</span>
-    );
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%s&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;994518299&quot;</span>);
+        dt.with_nanosecond(<span class="number">1_026_490_000</span>).unwrap().format(<span class="string">&quot;%+&quot;</span>).to_string(),
+        <span class="string">&quot;2001-07-08T00:34:60.026490+09:30&quot;
+    </span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%s&quot;</span>).to_string(), <span class="string">&quot;994518299&quot;</span>);
 
-    <span class="comment">// special specifiers</span>
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%t&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;\t&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%n&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;\n&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format</span>(<span class="string">&quot;%%&quot;</span>).<span class="ident">to_string</span>(), <span class="string">&quot;%&quot;</span>);
+    <span class="comment">// special specifiers
+    </span><span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%t&quot;</span>).to_string(), <span class="string">&quot;\t&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%n&quot;</span>).to_string(), <span class="string">&quot;\n&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%%&quot;</span>).to_string(), <span class="string">&quot;%&quot;</span>);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_strftime_docs_localized</span>() {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FixedOffset</span>, <span class="ident">TimeZone</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+#[test]
+</span><span class="kw">fn </span>test_strftime_docs_localized() {
+    <span class="kw">use crate</span>::{FixedOffset, TimeZone};
 
-    <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">FixedOffset::east</span>(<span class="number">34200</span>).<span class="ident">ymd</span>(<span class="number">2001</span>, <span class="number">7</span>, <span class="number">8</span>).<span class="ident">and_hms_nano</span>(<span class="number">0</span>, <span class="number">34</span>, <span class="number">59</span>, <span class="number">1_026_490_708</span>);
+    <span class="kw">let </span>dt = FixedOffset::east(<span class="number">34200</span>).ymd(<span class="number">2001</span>, <span class="number">7</span>, <span class="number">8</span>).and_hms_nano(<span class="number">0</span>, <span class="number">34</span>, <span class="number">59</span>, <span class="number">1_026_490_708</span>);
 
-    <span class="comment">// date specifiers</span>
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%b&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;jui&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%B&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;juillet&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%h&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;jui&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%a&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;dim&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%A&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;dimanche&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%D&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;07/08/01&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%x&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;08/07/01&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%F&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;2001-07-08&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%v&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot; 8-jui-2001&quot;</span>);
+    <span class="comment">// date specifiers
+    </span><span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%b&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;jui&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%B&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;juillet&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%h&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;jui&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%a&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;dim&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%A&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;dimanche&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%D&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;07/08/01&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%x&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;08/07/01&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%F&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;2001-07-08&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%v&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot; 8-jui-2001&quot;</span>);
 
-    <span class="comment">// time specifiers</span>
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%P&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%p&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%R&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;00:34&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%T&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;00:34:60&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%X&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;00:34:60&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%r&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(), <span class="string">&quot;12:34:60 &quot;</span>);
+    <span class="comment">// time specifiers
+    </span><span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%P&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%p&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%R&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;00:34&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%T&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;00:34:60&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%X&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;00:34:60&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%r&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;12:34:60 &quot;</span>);
 
-    <span class="comment">// date &amp; time specifiers</span>
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">dt</span>.<span class="ident">format_localized</span>(<span class="string">&quot;%c&quot;</span>, <span class="ident">Locale::fr_BE</span>).<span class="ident">to_string</span>(),
-        <span class="string">&quot;dim 08 jui 2001 00:34:60 +09:30&quot;</span>
-    );
+    <span class="comment">// date &amp; time specifiers
+    </span><span class="macro">assert_eq!</span>(
+        dt.format_localized(<span class="string">&quot;%c&quot;</span>, Locale::fr_BE).to_string(),
+        <span class="string">&quot;dim 08 jui 2001 00:34:60 +09:30&quot;
+    </span>);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

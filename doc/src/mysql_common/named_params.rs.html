@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/named_params.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>named_params.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mysql_common/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/named_params.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>named_params.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mysql_common/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -202,209 +202,209 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</span><span class="kw">use </span>std::borrow::Cow;
 
-<span class="doccomment">/// Appears if a statement have both named and positional parameters.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MixedParamsError</span>;
+<span class="doccomment">/// Appears if a statement have both named and positional parameters.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>MixedParamsError;
 
-<span class="kw">enum</span> <span class="ident">ParserState</span> {
-    <span class="ident">TopLevel</span>,
-    <span class="comment">// (string_delimiter, last_char)</span>
-    <span class="ident">InStringLiteral</span>(<span class="ident">u8</span>, <span class="ident">u8</span>),
-    <span class="ident">MaybeInNamedParam</span>,
-    <span class="ident">InNamedParam</span>,
+<span class="kw">enum </span>ParserState {
+    TopLevel,
+    <span class="comment">// (string_delimiter, last_char)
+    </span>InStringLiteral(u8, u8),
+    MaybeInNamedParam,
+    InNamedParam,
 }
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::ParserState</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="self">self</span>::ParserState::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Returns pair of:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * names of named parameters (if any) in order of appearance in `query`. Same name may</span>
-<span class="doccomment">///   appear multiple times if named parameter used more than once.</span>
-<span class="doccomment">/// * query string to pass to MySql (named parameters replaced with `?`).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_named_params</span>(
-    <span class="ident">query</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>), <span class="ident">MixedParamsError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">TopLevel</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">have_positional</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur_param</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="comment">// Vec&lt;(start_offset, end_offset, name)&gt;</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">c</span>) <span class="kw">in</span> <span class="ident">query</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rematch</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="ident">TopLevel</span> =&gt; <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="string">b&#39;:&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">MaybeInNamedParam</span>,
-                <span class="string">b&#39;\&#39;&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">b&#39;\&#39;&#39;</span>, <span class="string">b&#39;\&#39;&#39;</span>),
-                <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">b&#39;&quot;&#39;</span>, <span class="string">b&#39;&quot;&#39;</span>),
-                <span class="string">b&#39;?&#39;</span> =&gt; <span class="ident">have_positional</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                <span class="kw">_</span> =&gt; (),
+<span class="doccomment">/// Returns pair of:
+///
+/// * names of named parameters (if any) in order of appearance in `query`. Same name may
+///   appear multiple times if named parameter used more than once.
+/// * query string to pass to MySql (named parameters replaced with `?`).
+</span><span class="kw">pub fn </span>parse_named_params(
+    query: <span class="kw-2">&amp;</span>[u8],
+) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;Vec&lt;Vec&lt;u8&gt;&gt;&gt;, Cow&lt;<span class="lifetime">&#39;_</span>, [u8]&gt;), MixedParamsError&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>state = TopLevel;
+    <span class="kw">let </span><span class="kw-2">mut </span>have_positional = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>cur_param = <span class="number">0</span>;
+    <span class="comment">// Vec&lt;(start_offset, end_offset, name)&gt;
+    </span><span class="kw">let </span><span class="kw-2">mut </span>params = Vec::new();
+    <span class="kw">for </span>(i, c) <span class="kw">in </span>query.iter().enumerate() {
+        <span class="kw">let </span><span class="kw-2">mut </span>rematch = <span class="bool-val">false</span>;
+        <span class="kw">match </span>state {
+            TopLevel =&gt; <span class="kw">match </span>c {
+                <span class="string">b&#39;:&#39; </span>=&gt; state = MaybeInNamedParam,
+                <span class="string">b&#39;\&#39;&#39; </span>=&gt; state = InStringLiteral(<span class="string">b&#39;\&#39;&#39;</span>, <span class="string">b&#39;\&#39;&#39;</span>),
+                <span class="string">b&#39;&quot;&#39; </span>=&gt; state = InStringLiteral(<span class="string">b&#39;&quot;&#39;</span>, <span class="string">b&#39;&quot;&#39;</span>),
+                <span class="string">b&#39;?&#39; </span>=&gt; have_positional = <span class="bool-val">true</span>,
+                <span class="kw">_ </span>=&gt; (),
             },
-            <span class="ident">InStringLiteral</span>(<span class="ident">separator</span>, <span class="ident">prev_char</span>) =&gt; <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="ident">x</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="ident">separator</span> <span class="op">&amp;&amp;</span> <span class="ident">prev_char</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;\\&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">TopLevel</span>,
-                <span class="ident">x</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="ident">separator</span>, <span class="kw-2">*</span><span class="ident">x</span>),
+            InStringLiteral(separator, prev_char) =&gt; <span class="kw">match </span>c {
+                x <span class="kw">if </span><span class="kw-2">*</span>x == separator &amp;&amp; prev_char != <span class="string">b&#39;\\&#39; </span>=&gt; state = TopLevel,
+                x =&gt; state = InStringLiteral(separator, <span class="kw-2">*</span>x),
             },
-            <span class="ident">MaybeInNamedParam</span> =&gt; <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;z&#39;</span> <span class="op">|</span> <span class="string">b&#39;_&#39;</span> =&gt; {
-                    <span class="ident">params</span>.<span class="ident">push</span>((<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>, <span class="number">0</span>, <span class="ident">Vec::with_capacity</span>(<span class="number">16</span>)));
-                    <span class="ident">params</span>[<span class="ident">cur_param</span>].<span class="number">2</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">c</span>);
-                    <span class="ident">state</span> <span class="op">=</span> <span class="ident">InNamedParam</span>;
+            MaybeInNamedParam =&gt; <span class="kw">match </span>c {
+                <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;z&#39; </span>| <span class="string">b&#39;_&#39; </span>=&gt; {
+                    params.push((i - <span class="number">1</span>, <span class="number">0</span>, Vec::with_capacity(<span class="number">16</span>)));
+                    params[cur_param].<span class="number">2</span>.push(<span class="kw-2">*</span>c);
+                    state = InNamedParam;
                 }
-                <span class="kw">_</span> =&gt; <span class="ident">rematch</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                <span class="kw">_ </span>=&gt; rematch = <span class="bool-val">true</span>,
             },
-            <span class="ident">InNamedParam</span> =&gt; <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;z&#39;</span> <span class="op">|</span> <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> <span class="op">|</span> <span class="string">b&#39;_&#39;</span> =&gt; <span class="ident">params</span>[<span class="ident">cur_param</span>].<span class="number">2</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">c</span>),
-                <span class="kw">_</span> =&gt; {
-                    <span class="ident">params</span>[<span class="ident">cur_param</span>].<span class="number">1</span> <span class="op">=</span> <span class="ident">i</span>;
-                    <span class="ident">cur_param</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="ident">rematch</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            InNamedParam =&gt; <span class="kw">match </span>c {
+                <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;z&#39; </span>| <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39; </span>| <span class="string">b&#39;_&#39; </span>=&gt; params[cur_param].<span class="number">2</span>.push(<span class="kw-2">*</span>c),
+                <span class="kw">_ </span>=&gt; {
+                    params[cur_param].<span class="number">1 </span>= i;
+                    cur_param += <span class="number">1</span>;
+                    rematch = <span class="bool-val">true</span>;
                 }
             },
         }
-        <span class="kw">if</span> <span class="ident">rematch</span> {
-            <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="string">b&#39;:&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">MaybeInNamedParam</span>,
-                <span class="string">b&#39;\&#39;&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">b&#39;\&#39;&#39;</span>, <span class="string">b&#39;\&#39;&#39;</span>),
-                <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">b&#39;&quot;&#39;</span>, <span class="string">b&#39;&quot;&#39;</span>),
-                <span class="kw">_</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">TopLevel</span>,
+        <span class="kw">if </span>rematch {
+            <span class="kw">match </span>c {
+                <span class="string">b&#39;:&#39; </span>=&gt; state = MaybeInNamedParam,
+                <span class="string">b&#39;\&#39;&#39; </span>=&gt; state = InStringLiteral(<span class="string">b&#39;\&#39;&#39;</span>, <span class="string">b&#39;\&#39;&#39;</span>),
+                <span class="string">b&#39;&quot;&#39; </span>=&gt; state = InStringLiteral(<span class="string">b&#39;&quot;&#39;</span>, <span class="string">b&#39;&quot;&#39;</span>),
+                <span class="kw">_ </span>=&gt; state = TopLevel,
             }
         }
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">InNamedParam</span> <span class="op">=</span> <span class="ident">state</span> {
-        <span class="ident">params</span>[<span class="ident">cur_param</span>].<span class="number">1</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">len</span>();
+    <span class="kw">if let </span>InNamedParam = state {
+        params[cur_param].<span class="number">1 </span>= query.len();
     }
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">params</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">if</span> <span class="ident">have_positional</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MixedParamsError</span>);
+    <span class="kw">if </span>!params.is_empty() {
+        <span class="kw">if </span>have_positional {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(MixedParamsError);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">real_query</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">query</span>.<span class="ident">len</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out_params</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">params</span>.<span class="ident">len</span>());
-        <span class="kw">for</span> (<span class="ident">start</span>, <span class="ident">end</span>, <span class="ident">name</span>) <span class="kw">in</span> <span class="ident">params</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">real_query</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>[<span class="ident">last</span>..<span class="ident">start</span>]);
-            <span class="ident">real_query</span>.<span class="ident">push</span>(<span class="string">b&#39;?&#39;</span>);
-            <span class="ident">last</span> <span class="op">=</span> <span class="ident">end</span>;
-            <span class="ident">out_params</span>.<span class="ident">push</span>(<span class="ident">name</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>real_query = Vec::with_capacity(query.len());
+        <span class="kw">let </span><span class="kw-2">mut </span>last = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>out_params = Vec::with_capacity(params.len());
+        <span class="kw">for </span>(start, end, name) <span class="kw">in </span>params.into_iter() {
+            real_query.extend(<span class="kw-2">&amp;</span>query[last..start]);
+            real_query.push(<span class="string">b&#39;?&#39;</span>);
+            last = end;
+            out_params.push(name);
         }
-        <span class="ident">real_query</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>[<span class="ident">last</span>..]);
-        <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="ident">out_params</span>), <span class="ident">real_query</span>.<span class="ident">into</span>()))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="ident">query</span>.<span class="ident">into</span>()))
+        real_query.extend(<span class="kw-2">&amp;</span>query[last..]);
+        <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(out_params), real_query.into()))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, query.into()))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::named_params::parse_named_params</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">crate</span>::named_params::parse_named_params;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">should_parse_named_params</span>() {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parse_named_params</span>(<span class="string">b&quot;:a :b&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>should_parse_named_params() {
+        <span class="kw">let </span>result = parse_named_params(<span class="string">b&quot;:a :b&quot;</span>).unwrap();
         <span class="macro">assert_eq!</span>(
             (
-                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;a&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;b&quot;</span>.<span class="ident">to_vec</span>()]),
-                (<span class="kw-2">&amp;</span><span class="string">b&quot;? ?&quot;</span>[..]).<span class="ident">into</span>()
+                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;a&quot;</span>.to_vec(), <span class="string">b&quot;b&quot;</span>.to_vec()]),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;? ?&quot;</span>[..]).into()
             ),
-            <span class="ident">result</span>
+            result
         );
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parse_named_params</span>(<span class="string">b&quot;SELECT (:a-10)&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>result = parse_named_params(<span class="string">b&quot;SELECT (:a-10)&quot;</span>).unwrap();
         <span class="macro">assert_eq!</span>(
-            (<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;a&quot;</span>.<span class="ident">to_vec</span>()]), (<span class="kw-2">&amp;</span><span class="string">b&quot;SELECT (?-10)&quot;</span>[..]).<span class="ident">into</span>()),
-            <span class="ident">result</span>
+            (<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;a&quot;</span>.to_vec()]), (<span class="kw-2">&amp;</span><span class="string">b&quot;SELECT (?-10)&quot;</span>[..]).into()),
+            result
         );
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parse_named_params</span>(<span class="string">br#&quot;SELECT &#39;&quot;\&#39;:a&#39; &quot;&#39;\&quot;&#39;:c&quot; :b&quot;#</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(
-            (
-                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;b&quot;</span>.<span class="ident">to_vec</span>()]),
-                (<span class="kw-2">&amp;</span><span class="string">br#&quot;SELECT &#39;&quot;\&#39;:a&#39; &quot;&#39;\&quot;&#39;:c&quot; ?&quot;#</span>[..]).<span class="ident">into</span>(),
-            ),
-            <span class="ident">result</span>
-        );
-
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parse_named_params</span>(<span class="string">br&quot;:a_Aa:b&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>result = parse_named_params(<span class="string">br#&quot;SELECT &#39;&quot;\&#39;:a&#39; &quot;&#39;\&quot;&#39;:c&quot; :b&quot;#</span>).unwrap();
         <span class="macro">assert_eq!</span>(
             (
-                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;a_&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;b&quot;</span>.<span class="ident">to_vec</span>()]),
-                (<span class="kw-2">&amp;</span><span class="string">br&quot;?Aa?&quot;</span>[..]).<span class="ident">into</span>()
+                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;b&quot;</span>.to_vec()]),
+                (<span class="kw-2">&amp;</span><span class="string">br#&quot;SELECT &#39;&quot;\&#39;:a&#39; &quot;&#39;\&quot;&#39;:c&quot; ?&quot;#</span>[..]).into(),
             ),
-            <span class="ident">result</span>
+            result
         );
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parse_named_params</span>(<span class="string">br&quot;::b&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>((<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;b&quot;</span>.<span class="ident">to_vec</span>()]), (<span class="kw-2">&amp;</span><span class="string">br&quot;:?&quot;</span>[..]).<span class="ident">into</span>()), <span class="ident">result</span>);
+        <span class="kw">let </span>result = parse_named_params(<span class="string">br&quot;:a_Aa:b&quot;</span>).unwrap();
+        <span class="macro">assert_eq!</span>(
+            (
+                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;a_&quot;</span>.to_vec(), <span class="string">b&quot;b&quot;</span>.to_vec()]),
+                (<span class="kw-2">&amp;</span><span class="string">br&quot;?Aa?&quot;</span>[..]).into()
+            ),
+            result
+        );
 
-        <span class="ident">parse_named_params</span>(<span class="string">br&quot;:a ?&quot;</span>).<span class="ident">unwrap_err</span>();
+        <span class="kw">let </span>result = parse_named_params(<span class="string">br&quot;::b&quot;</span>).unwrap();
+        <span class="macro">assert_eq!</span>((<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;b&quot;</span>.to_vec()]), (<span class="kw-2">&amp;</span><span class="string">br&quot;:?&quot;</span>[..]).into()), result);
+
+        parse_named_params(<span class="string">br&quot;:a ?&quot;</span>).unwrap_err();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">should_allow_numbers_in_param_name</span>() {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parse_named_params</span>(<span class="string">b&quot;:a1 :a2&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>should_allow_numbers_in_param_name() {
+        <span class="kw">let </span>result = parse_named_params(<span class="string">b&quot;:a1 :a2&quot;</span>).unwrap();
         <span class="macro">assert_eq!</span>(
             (
-                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;a1&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;a2&quot;</span>.<span class="ident">to_vec</span>()]),
-                (<span class="kw-2">&amp;</span><span class="string">b&quot;? ?&quot;</span>[..]).<span class="ident">into</span>()
+                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;a1&quot;</span>.to_vec(), <span class="string">b&quot;a2&quot;</span>.to_vec()]),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;? ?&quot;</span>[..]).into()
             ),
-            <span class="ident">result</span>
+            result
         );
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parse_named_params</span>(<span class="string">b&quot;:1a :2a&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>((<span class="prelude-val">None</span>, (<span class="kw-2">&amp;</span><span class="string">b&quot;:1a :2a&quot;</span>[..]).<span class="ident">into</span>()), <span class="ident">result</span>);
+        <span class="kw">let </span>result = parse_named_params(<span class="string">b&quot;:1a :2a&quot;</span>).unwrap();
+        <span class="macro">assert_eq!</span>((<span class="prelude-val">None</span>, (<span class="kw-2">&amp;</span><span class="string">b&quot;:1a :2a&quot;</span>[..]).into()), result);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">special_characters_in_query</span>() {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span>
-            <span class="ident">parse_named_params</span>(<span class="string">r&quot;SELECT 1 FROM été WHERE thing = :param;&quot;</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>special_characters_in_query() {
+        <span class="kw">let </span>result =
+            parse_named_params(<span class="string">r&quot;SELECT 1 FROM été WHERE thing = :param;&quot;</span>.as_bytes()).unwrap();
         <span class="macro">assert_eq!</span>(
             (
-                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;param&quot;</span>.<span class="ident">to_vec</span>()]),
-                <span class="string">&quot;SELECT 1 FROM été WHERE thing = ?;&quot;</span>.<span class="ident">as_bytes</span>().<span class="ident">into</span>(),
+                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">b&quot;param&quot;</span>.to_vec()]),
+                <span class="string">&quot;SELECT 1 FROM été WHERE thing = ?;&quot;</span>.as_bytes().into(),
             ),
-            <span class="ident">result</span>
+            result
         );
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
-    <span class="kw">mod</span> <span class="ident">bench</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::named_params::parse_named_params</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;nightly&quot;</span>)]
+    </span><span class="kw">mod </span>bench {
+        <span class="kw">use </span><span class="kw">crate</span>::named_params::parse_named_params;
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">parse_ten_named_params</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parse_named_params</span>(
+        <span class="attribute">#[bench]
+        </span><span class="kw">fn </span>parse_ten_named_params(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            bencher.iter(|| {
+                <span class="kw">let </span>result = parse_named_params(
                     <span class="string">r#&quot;
                 SELECT :one, :two, :three, :four, :five, :six, :seven, :eight, :nine, :ten
                 &quot;#</span>,
                 )
-                .<span class="ident">unwrap</span>();
-                <span class="ident">test::black_box</span>(<span class="ident">result</span>);
+                .unwrap();
+                test::black_box(result);
             });
         }
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">parse_zero_named_params</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parse_named_params</span>(
+        <span class="attribute">#[bench]
+        </span><span class="kw">fn </span>parse_zero_named_params(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            bencher.iter(|| {
+                <span class="kw">let </span>result = parse_named_params(
                     <span class="string">r&quot;
                 SELECT one, two, three, four, five, six, seven, eight, nine, ten
                 &quot;</span>,
                 )
-                .<span class="ident">unwrap</span>();
-                <span class="ident">test::black_box</span>(<span class="ident">result</span>);
+                .unwrap();
+                test::black_box(result);
             });
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

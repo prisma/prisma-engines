@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/extjson/models.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>models.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/extjson/models.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>models.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -352,359 +352,359 @@
 <span id="352">352</span>
 <span id="353">353</span>
 <span id="354">354</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A module defining serde models for the extended JSON representations of the various BSON types.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A module defining serde models for the extended JSON representations of the various BSON types.
 
-<span class="kw">use</span> <span class="ident">serde</span>::{
-    <span class="ident">de</span>::{<span class="ident">Error</span>, <span class="ident">Unexpected</span>},
-    <span class="ident">Deserialize</span>,
-    <span class="ident">Serialize</span>,
+</span><span class="kw">use </span>serde::{
+    de::{Error, Unexpected},
+    Deserialize,
+    Serialize,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">extjson</span>, <span class="ident">oid</span>, <span class="ident">spec::BinarySubtype</span>, <span class="ident">Bson</span>};
+<span class="kw">use crate</span>::{extjson, oid, spec::BinarySubtype, Bson};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Int32</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$numberInt&quot;</span>)]</span>
-    <span class="ident">value</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Int32 {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$numberInt&quot;</span>)]
+    </span>value: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Int32</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">i</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-            <span class="ident">extjson::de::Error::invalid_value</span>(
-                <span class="ident">Unexpected::Str</span>(<span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_str</span>()),
+<span class="kw">impl </span>Int32 {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; extjson::de::Result&lt;i32&gt; {
+        <span class="kw">let </span>i: i32 = <span class="self">self</span>.value.parse().map_err(|<span class="kw">_</span>| {
+            extjson::de::Error::invalid_value(
+                Unexpected::Str(<span class="self">self</span>.value.as_str()),
                 <span class="kw-2">&amp;</span><span class="string">&quot;expected i32 as a string&quot;</span>,
             )
         })<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">i</span>)
+        <span class="prelude-val">Ok</span>(i)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Int64</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$numberLong&quot;</span>)]</span>
-    <span class="ident">value</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Int64 {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$numberLong&quot;</span>)]
+    </span>value: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Int64</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">i</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-            <span class="ident">extjson::de::Error::invalid_value</span>(
-                <span class="ident">Unexpected::Str</span>(<span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_str</span>()),
+<span class="kw">impl </span>Int64 {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; extjson::de::Result&lt;i64&gt; {
+        <span class="kw">let </span>i: i64 = <span class="self">self</span>.value.parse().map_err(|<span class="kw">_</span>| {
+            extjson::de::Error::invalid_value(
+                Unexpected::Str(<span class="self">self</span>.value.as_str()),
                 <span class="kw-2">&amp;</span><span class="string">&quot;expected i64 as a string&quot;</span>,
             )
         })<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">i</span>)
+        <span class="prelude-val">Ok</span>(i)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Double</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$numberDouble&quot;</span>)]</span>
-    <span class="ident">value</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Double {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$numberDouble&quot;</span>)]
+    </span>value: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Double</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_str</span>() {
-            <span class="string">&quot;Infinity&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">std::f64::INFINITY</span>),
-            <span class="string">&quot;-Infinity&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">std::f64::NEG_INFINITY</span>),
-            <span class="string">&quot;NaN&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">std::f64::NAN</span>),
-            <span class="ident">other</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">d</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="ident">extjson::de::Error::invalid_value</span>(
-                        <span class="ident">Unexpected::Str</span>(<span class="ident">other</span>),
+<span class="kw">impl </span>Double {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; extjson::de::Result&lt;f64&gt; {
+        <span class="kw">match </span><span class="self">self</span>.value.as_str() {
+            <span class="string">&quot;Infinity&quot; </span>=&gt; <span class="prelude-val">Ok</span>(std::f64::INFINITY),
+            <span class="string">&quot;-Infinity&quot; </span>=&gt; <span class="prelude-val">Ok</span>(std::f64::NEG_INFINITY),
+            <span class="string">&quot;NaN&quot; </span>=&gt; <span class="prelude-val">Ok</span>(std::f64::NAN),
+            other =&gt; {
+                <span class="kw">let </span>d: f64 = other.parse().map_err(|<span class="kw">_</span>| {
+                    extjson::de::Error::invalid_value(
+                        Unexpected::Str(other),
                         <span class="kw-2">&amp;</span><span class="string">&quot;expected bson double as string&quot;</span>,
                     )
                 })<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">d</span>)
+                <span class="prelude-val">Ok</span>(d)
             }
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ObjectId</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$oid&quot;</span>)]</span>
-    <span class="ident">oid</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ObjectId {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$oid&quot;</span>)]
+    </span>oid: String,
 }
 
-<span class="kw">impl</span> <span class="ident">ObjectId</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">oid::ObjectId</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">oid::ObjectId::parse_str</span>(<span class="self">self</span>.<span class="ident">oid</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">oid</span>)
+<span class="kw">impl </span>ObjectId {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; extjson::de::Result&lt;oid::ObjectId&gt; {
+        <span class="kw">let </span>oid = oid::ObjectId::parse_str(<span class="self">self</span>.oid.as_str())<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(oid)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::oid::ObjectId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident"><span class="kw">crate</span>::oid::ObjectId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">oid</span>: <span class="ident">id</span>.<span class="ident">to_hex</span>() }
+<span class="kw">impl </span>From&lt;<span class="kw">crate</span>::oid::ObjectId&gt; <span class="kw">for </span>ObjectId {
+    <span class="kw">fn </span>from(id: <span class="kw">crate</span>::oid::ObjectId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ oid: id.to_hex() }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Symbol</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$symbol&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">value</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Symbol {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$symbol&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) value: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Regex</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$regularExpression&quot;</span>)]</span>
-    <span class="ident">body</span>: <span class="ident">RegexBody</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Regex {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$regularExpression&quot;</span>)]
+    </span>body: RegexBody,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">RegexBody</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">pattern</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">options</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RegexBody {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) pattern: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) options: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Regex</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Regex</span> {
-        <span class="ident"><span class="kw">crate</span>::Regex::new</span>(<span class="self">self</span>.<span class="ident">body</span>.<span class="ident">pattern</span>, <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">options</span>)
+<span class="kw">impl </span>Regex {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Regex {
+        <span class="kw">crate</span>::Regex::new(<span class="self">self</span>.body.pattern, <span class="self">self</span>.body.options)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Binary</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$binary&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">body</span>: <span class="ident">BinaryBody</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Binary {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$binary&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) body: BinaryBody,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">BinaryBody</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">base64</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>BinaryBody {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) base64: String,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;subType&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">subtype</span>: <span class="ident">String</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;subType&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) subtype: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Binary</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Binary</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">base64::decode</span>(<span class="self">self</span>.<span class="ident">body</span>.<span class="ident">base64</span>.<span class="ident">as_str</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-            <span class="ident">extjson::de::Error::invalid_value</span>(
-                <span class="ident">Unexpected::Str</span>(<span class="self">self</span>.<span class="ident">body</span>.<span class="ident">base64</span>.<span class="ident">as_str</span>()),
+<span class="kw">impl </span>Binary {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; extjson::de::Result&lt;<span class="kw">crate</span>::Binary&gt; {
+        <span class="kw">let </span>bytes = base64::decode(<span class="self">self</span>.body.base64.as_str()).map_err(|<span class="kw">_</span>| {
+            extjson::de::Error::invalid_value(
+                Unexpected::Str(<span class="self">self</span>.body.base64.as_str()),
                 <span class="kw-2">&amp;</span><span class="string">&quot;base64 encoded bytes&quot;</span>,
             )
         })<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">hex::decode</span>(<span class="self">self</span>.<span class="ident">body</span>.<span class="ident">subtype</span>.<span class="ident">as_str</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-            <span class="ident">extjson::de::Error::invalid_value</span>(
-                <span class="ident">Unexpected::Str</span>(<span class="self">self</span>.<span class="ident">body</span>.<span class="ident">subtype</span>.<span class="ident">as_str</span>()),
+        <span class="kw">let </span>subtype = hex::decode(<span class="self">self</span>.body.subtype.as_str()).map_err(|<span class="kw">_</span>| {
+            extjson::de::Error::invalid_value(
+                Unexpected::Str(<span class="self">self</span>.body.subtype.as_str()),
                 <span class="kw-2">&amp;</span><span class="string">&quot;hexadecimal number as a string&quot;</span>,
             )
         })<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">subtype</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::Binary</span> {
-                <span class="ident">bytes</span>,
-                <span class="ident">subtype</span>: <span class="ident">subtype</span>[<span class="number">0</span>].<span class="ident">into</span>(),
+        <span class="kw">if </span>subtype.len() == <span class="number">1 </span>{
+            <span class="prelude-val">Ok</span>(<span class="kw">crate</span>::Binary {
+                bytes,
+                subtype: subtype[<span class="number">0</span>].into(),
             })
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">extjson::de::Error::invalid_value</span>(
-                <span class="ident">Unexpected::Bytes</span>(<span class="ident">subtype</span>.<span class="ident">as_slice</span>()),
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(extjson::de::Error::invalid_value(
+                Unexpected::Bytes(subtype.as_slice()),
                 <span class="kw-2">&amp;</span><span class="string">&quot;one byte subtype&quot;</span>,
             ))
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Uuid</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$uuid&quot;</span>)]</span>
-    <span class="ident">value</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Uuid {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$uuid&quot;</span>)]
+    </span>value: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Uuid</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Binary</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">uuid::Uuid::parse_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-            <span class="ident">extjson::de::Error::invalid_value</span>(
-                <span class="ident">Unexpected::Str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>),
+<span class="kw">impl </span>Uuid {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; extjson::de::Result&lt;<span class="kw">crate</span>::Binary&gt; {
+        <span class="kw">let </span>uuid = uuid::Uuid::parse_str(<span class="kw-2">&amp;</span><span class="self">self</span>.value).map_err(|<span class="kw">_</span>| {
+            extjson::de::Error::invalid_value(
+                Unexpected::Str(<span class="kw-2">&amp;</span><span class="self">self</span>.value),
                 <span class="kw-2">&amp;</span><span class="string">&quot;$uuid value does not follow RFC 4122 format regarding length and hyphens&quot;</span>,
             )
         })<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::Binary</span> {
-            <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Uuid</span>,
-            <span class="ident">bytes</span>: <span class="ident">uuid</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>(),
+        <span class="prelude-val">Ok</span>(<span class="kw">crate</span>::Binary {
+            subtype: BinarySubtype::Uuid,
+            bytes: uuid.as_bytes().to_vec(),
         })
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">JavaScriptCodeWithScope</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$code&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">code</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>JavaScriptCodeWithScope {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$code&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) code: String,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$scope&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">scope</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Map</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$scope&quot;</span>)]
+    #[serde(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) scope: <span class="prelude-ty">Option</span>&lt;serde_json::Map&lt;String, serde_json::Value&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Timestamp</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$timestamp&quot;</span>)]</span>
-    <span class="ident">body</span>: <span class="ident">TimestampBody</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Timestamp {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$timestamp&quot;</span>)]
+    </span>body: TimestampBody,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TimestampBody</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;crate::serde_helpers::serialize_u32_as_i64&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">t</span>: <span class="ident">u32</span>,
+<span class="attribute">#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TimestampBody {
+    <span class="attribute">#[serde(serialize_with = <span class="string">&quot;crate::serde_helpers::serialize_u32_as_i64&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) t: u32,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;crate::serde_helpers::serialize_u32_as_i64&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">i</span>: <span class="ident">u32</span>,
+    <span class="attribute">#[serde(serialize_with = <span class="string">&quot;crate::serde_helpers::serialize_u32_as_i64&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) i: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">Timestamp</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Timestamp</span> {
-        <span class="ident"><span class="kw">crate</span>::Timestamp</span> {
-            <span class="ident">time</span>: <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">t</span>,
-            <span class="ident">increment</span>: <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">i</span>,
+<span class="kw">impl </span>Timestamp {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Timestamp {
+        <span class="kw">crate</span>::Timestamp {
+            time: <span class="self">self</span>.body.t,
+            increment: <span class="self">self</span>.body.i,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DateTime</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$date&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">body</span>: <span class="ident">DateTimeBody</span>,
+<span class="attribute">#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DateTime {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$date&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) body: DateTimeBody,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">DateTimeBody</span> {
-    <span class="ident">Canonical</span>(<span class="ident">Int64</span>),
-    <span class="ident">Relaxed</span>(<span class="ident">String</span>),
+<span class="attribute">#[derive(Deserialize, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>DateTimeBody {
+    Canonical(Int64),
+    Relaxed(String),
 }
 
-<span class="kw">impl</span> <span class="ident">DateTimeBody</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_millis</span>(<span class="ident">m</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">DateTimeBody::Canonical</span>(<span class="ident">Int64</span> {
-            <span class="ident">value</span>: <span class="ident">m</span>.<span class="ident">to_string</span>(),
+<span class="kw">impl </span>DateTimeBody {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_millis(m: i64) -&gt; <span class="self">Self </span>{
+        DateTimeBody::Canonical(Int64 {
+            value: m.to_string(),
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DateTime</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">body</span> {
-            <span class="ident">DateTimeBody::Canonical</span>(<span class="ident">date</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">date</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from_millis</span>(<span class="ident">date</span>))
+<span class="kw">impl </span>DateTime {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; extjson::de::Result&lt;<span class="kw">crate</span>::DateTime&gt; {
+        <span class="kw">match </span><span class="self">self</span>.body {
+            DateTimeBody::Canonical(date) =&gt; {
+                <span class="kw">let </span>date = date.parse()<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="kw">crate</span>::DateTime::from_millis(date))
             }
-            <span class="ident">DateTimeBody::Relaxed</span>(<span class="ident">date</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::DateTime::parse_rfc3339_str</span>(<span class="ident">date</span>.<span class="ident">as_str</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="ident">extjson::de::Error::invalid_value</span>(
-                        <span class="ident">Unexpected::Str</span>(<span class="ident">date</span>.<span class="ident">as_str</span>()),
+            DateTimeBody::Relaxed(date) =&gt; {
+                <span class="kw">let </span>datetime = <span class="kw">crate</span>::DateTime::parse_rfc3339_str(date.as_str()).map_err(|<span class="kw">_</span>| {
+                    extjson::de::Error::invalid_value(
+                        Unexpected::Str(date.as_str()),
                         <span class="kw-2">&amp;</span><span class="string">&quot;rfc3339 formatted utc datetime&quot;</span>,
                     )
                 })<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">datetime</span>)
+                <span class="prelude-val">Ok</span>(datetime)
             }
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MinKey</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$minKey&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">value</span>: <span class="ident">u8</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MinKey {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$minKey&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) value: u8,
 }
 
-<span class="kw">impl</span> <span class="ident">MinKey</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">==</span> <span class="number">1</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Bson::MinKey</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">extjson::de::Error::invalid_value</span>(
-                <span class="ident">Unexpected::Unsigned</span>(<span class="self">self</span>.<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>),
+<span class="kw">impl </span>MinKey {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; extjson::de::Result&lt;Bson&gt; {
+        <span class="kw">if </span><span class="self">self</span>.value == <span class="number">1 </span>{
+            <span class="prelude-val">Ok</span>(Bson::MinKey)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(extjson::de::Error::invalid_value(
+                Unexpected::Unsigned(<span class="self">self</span>.value <span class="kw">as </span>u64),
                 <span class="kw-2">&amp;</span><span class="string">&quot;value of $minKey should always be 1&quot;</span>,
             ))
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MaxKey</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$maxKey&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">value</span>: <span class="ident">u8</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MaxKey {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$maxKey&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) value: u8,
 }
 
-<span class="kw">impl</span> <span class="ident">MaxKey</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">==</span> <span class="number">1</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Bson::MaxKey</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">extjson::de::Error::invalid_value</span>(
-                <span class="ident">Unexpected::Unsigned</span>(<span class="self">self</span>.<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>),
+<span class="kw">impl </span>MaxKey {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; extjson::de::Result&lt;Bson&gt; {
+        <span class="kw">if </span><span class="self">self</span>.value == <span class="number">1 </span>{
+            <span class="prelude-val">Ok</span>(Bson::MaxKey)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(extjson::de::Error::invalid_value(
+                Unexpected::Unsigned(<span class="self">self</span>.value <span class="kw">as </span>u64),
                 <span class="kw-2">&amp;</span><span class="string">&quot;value of $maxKey should always be 1&quot;</span>,
             ))
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DbPointer</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$dbPointer&quot;</span>)]</span>
-    <span class="ident">body</span>: <span class="ident">DbPointerBody</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DbPointer {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$dbPointer&quot;</span>)]
+    </span>body: DbPointerBody,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DbPointerBody</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$ref&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">ref_ns</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DbPointerBody {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$ref&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) ref_ns: String,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$id&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">id</span>: <span class="ident">ObjectId</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$id&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) id: ObjectId,
 }
 
-<span class="kw">impl</span> <span class="ident">DbPointer</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DbPointer</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::DbPointer</span> {
-            <span class="ident">namespace</span>: <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">ref_ns</span>,
-            <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">id</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>,
+<span class="kw">impl </span>DbPointer {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; extjson::de::Result&lt;<span class="kw">crate</span>::DbPointer&gt; {
+        <span class="prelude-val">Ok</span>(<span class="kw">crate</span>::DbPointer {
+            namespace: <span class="self">self</span>.body.ref_ns,
+            id: <span class="self">self</span>.body.id.parse()<span class="question-mark">?</span>,
         })
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Undefined</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$undefined&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">value</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Undefined {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$undefined&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) value: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Undefined</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Bson::Undefined</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">extjson::de::Error::invalid_value</span>(
-                <span class="ident">Unexpected::Bool</span>(<span class="bool-val">false</span>),
+<span class="kw">impl </span>Undefined {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(<span class="self">self</span>) -&gt; extjson::de::Result&lt;Bson&gt; {
+        <span class="kw">if </span><span class="self">self</span>.value {
+            <span class="prelude-val">Ok</span>(Bson::Undefined)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(extjson::de::Error::invalid_value(
+                Unexpected::Bool(<span class="bool-val">false</span>),
                 <span class="kw-2">&amp;</span><span class="string">&quot;$undefined should always be true&quot;</span>,
             ))
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

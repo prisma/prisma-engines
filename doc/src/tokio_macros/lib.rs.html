@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-macros-1.8.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-macros-1.8.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -373,380 +373,380 @@
 <span id="373">373</span>
 <span id="374">374</span>
 <span id="375">375</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_doctest_main</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">unreachable_pub</span>
-)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(
-    <span class="ident">no_crate_inject</span>,
-    <span class="ident">attr</span>(<span class="ident">deny</span>(<span class="ident">warnings</span>, <span class="ident">rust_2018_idioms</span>), <span class="ident">allow</span>(<span class="ident">dead_code</span>, <span class="ident">unused_variables</span>))
-))]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(clippy::needless_doctest_main)]
+#![warn(
+    missing_debug_implementations,
+    missing_docs,
+    rust_2018_idioms,
+    unreachable_pub
+)]
+#![doc(test(
+    no_crate_inject,
+    attr(deny(warnings, rust_2018_idioms), allow(dead_code, unused_variables))
+))]
 
-<span class="doccomment">//! Macros for use with Tokio</span>
+</span><span class="doccomment">//! Macros for use with Tokio
 
-<span class="comment">// This `extern` is required for older `rustc` versions but newer `rustc`</span>
-<span class="comment">// versions warn about the unused `extern crate`.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_extern_crates</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+</span><span class="comment">// This `extern` is required for older `rustc` versions but newer `rustc`
+// versions warn about the unused `extern crate`.
+</span><span class="attribute">#[allow(unused_extern_crates)]
+</span><span class="kw">extern crate </span>proc_macro;
 
-<span class="kw">mod</span> <span class="ident">entry</span>;
-<span class="kw">mod</span> <span class="ident">select</span>;
+<span class="kw">mod </span>entry;
+<span class="kw">mod </span>select;
 
-<span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
+<span class="kw">use </span>proc_macro::TokenStream;
 
-<span class="doccomment">/// Marks async function to be executed by the selected runtime. This macro</span>
-<span class="doccomment">/// helps set up a `Runtime` without requiring the user to use</span>
-<span class="doccomment">/// [Runtime](../tokio/runtime/struct.Runtime.html) or</span>
-<span class="doccomment">/// [Builder](../tokio/runtime/struct.Builder.html) directly.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: This macro is designed to be simplistic and targets applications that</span>
-<span class="doccomment">/// do not require a complex setup. If the provided functionality is not</span>
-<span class="doccomment">/// sufficient, you may be interested in using</span>
-<span class="doccomment">/// [Builder](../tokio/runtime/struct.Builder.html), which provides a more</span>
-<span class="doccomment">/// powerful interface.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: This macro can be used on any function and not just the `main`</span>
-<span class="doccomment">/// function. Using it on a non-main function makes the function behave as if it</span>
-<span class="doccomment">/// was synchronous by starting a new runtime each time it is called. If the</span>
-<span class="doccomment">/// function is called often, it is preferable to create the runtime using the</span>
-<span class="doccomment">/// runtime builder so the runtime can be reused across calls.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Multi-threaded runtime</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To use the multi-threaded runtime, the macro can be configured using</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// #[tokio::main(flavor = &quot;multi_thread&quot;, worker_threads = 10)]</span>
-<span class="doccomment">/// # async fn main() {}</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `worker_threads` option configures the number of worker threads, and</span>
-<span class="doccomment">/// defaults to the number of cpus on the system. This is the default flavor.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: The multi-threaded runtime requires the `rt-multi-thread` feature</span>
-<span class="doccomment">/// flag.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Current thread runtime</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To use the single-threaded runtime known as the `current_thread` runtime,</span>
-<span class="doccomment">/// the macro can be configured using</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// #[tokio::main(flavor = &quot;current_thread&quot;)]</span>
-<span class="doccomment">/// # async fn main() {}</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Function arguments:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Arguments are allowed for any functions aside from `main` which is special</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Usage</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Using the multi-thread runtime</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// #[tokio::main]</span>
-<span class="doccomment">/// async fn main() {</span>
-<span class="doccomment">///     println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Equivalent code not using `#[tokio::main]`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     tokio::runtime::Builder::new_multi_thread()</span>
-<span class="doccomment">///         .enable_all()</span>
-<span class="doccomment">///         .build()</span>
-<span class="doccomment">///         .unwrap()</span>
-<span class="doccomment">///         .block_on(async {</span>
-<span class="doccomment">///             println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">///         })</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Using current thread runtime</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The basic scheduler is single-threaded.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// #[tokio::main(flavor = &quot;current_thread&quot;)]</span>
-<span class="doccomment">/// async fn main() {</span>
-<span class="doccomment">///     println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Equivalent code not using `#[tokio::main]`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     tokio::runtime::Builder::new_current_thread()</span>
-<span class="doccomment">///         .enable_all()</span>
-<span class="doccomment">///         .build()</span>
-<span class="doccomment">///         .unwrap()</span>
-<span class="doccomment">///         .block_on(async {</span>
-<span class="doccomment">///             println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">///         })</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Set number of worker threads</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// #[tokio::main(worker_threads = 2)]</span>
-<span class="doccomment">/// async fn main() {</span>
-<span class="doccomment">///     println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Equivalent code not using `#[tokio::main]`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     tokio::runtime::Builder::new_multi_thread()</span>
-<span class="doccomment">///         .worker_threads(2)</span>
-<span class="doccomment">///         .enable_all()</span>
-<span class="doccomment">///         .build()</span>
-<span class="doccomment">///         .unwrap()</span>
-<span class="doccomment">///         .block_on(async {</span>
-<span class="doccomment">///             println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">///         })</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Configure the runtime to start with time paused</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// #[tokio::main(flavor = &quot;current_thread&quot;, start_paused = true)]</span>
-<span class="doccomment">/// async fn main() {</span>
-<span class="doccomment">///     println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Equivalent code not using `#[tokio::main]`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     tokio::runtime::Builder::new_current_thread()</span>
-<span class="doccomment">///         .enable_all()</span>
-<span class="doccomment">///         .start_paused(true)</span>
-<span class="doccomment">///         .build()</span>
-<span class="doccomment">///         .unwrap()</span>
-<span class="doccomment">///         .block_on(async {</span>
-<span class="doccomment">///             println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">///         })</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that `start_paused` requires the `test-util` feature to be enabled.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rename package</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use tokio as tokio1;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[tokio1::main(crate = &quot;tokio1&quot;)]</span>
-<span class="doccomment">/// async fn main() {</span>
-<span class="doccomment">///     println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Equivalent code not using `#[tokio::main]`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use tokio as tokio1;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     tokio1::runtime::Builder::new_multi_thread()</span>
-<span class="doccomment">///         .enable_all()</span>
-<span class="doccomment">///         .build()</span>
-<span class="doccomment">///         .unwrap()</span>
-<span class="doccomment">///         .block_on(async {</span>
-<span class="doccomment">///             println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">///         })</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span> <span class="comment">// Work around for rust-lang/rust#62127</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">entry::main</span>(<span class="ident">args</span>, <span class="ident">item</span>, <span class="bool-val">true</span>)
+<span class="doccomment">/// Marks async function to be executed by the selected runtime. This macro
+/// helps set up a `Runtime` without requiring the user to use
+/// [Runtime](../tokio/runtime/struct.Runtime.html) or
+/// [Builder](../tokio/runtime/struct.Builder.html) directly.
+///
+/// Note: This macro is designed to be simplistic and targets applications that
+/// do not require a complex setup. If the provided functionality is not
+/// sufficient, you may be interested in using
+/// [Builder](../tokio/runtime/struct.Builder.html), which provides a more
+/// powerful interface.
+///
+/// Note: This macro can be used on any function and not just the `main`
+/// function. Using it on a non-main function makes the function behave as if it
+/// was synchronous by starting a new runtime each time it is called. If the
+/// function is called often, it is preferable to create the runtime using the
+/// runtime builder so the runtime can be reused across calls.
+///
+/// # Multi-threaded runtime
+///
+/// To use the multi-threaded runtime, the macro can be configured using
+///
+/// ```
+/// #[tokio::main(flavor = &quot;multi_thread&quot;, worker_threads = 10)]
+/// # async fn main() {}
+/// ```
+///
+/// The `worker_threads` option configures the number of worker threads, and
+/// defaults to the number of cpus on the system. This is the default flavor.
+///
+/// Note: The multi-threaded runtime requires the `rt-multi-thread` feature
+/// flag.
+///
+/// # Current thread runtime
+///
+/// To use the single-threaded runtime known as the `current_thread` runtime,
+/// the macro can be configured using
+///
+/// ```
+/// #[tokio::main(flavor = &quot;current_thread&quot;)]
+/// # async fn main() {}
+/// ```
+///
+/// ## Function arguments:
+///
+/// Arguments are allowed for any functions aside from `main` which is special
+///
+/// ## Usage
+///
+/// ### Using the multi-thread runtime
+///
+/// ```rust
+/// #[tokio::main]
+/// async fn main() {
+///     println!(&quot;Hello world&quot;);
+/// }
+/// ```
+///
+/// Equivalent code not using `#[tokio::main]`
+///
+/// ```rust
+/// fn main() {
+///     tokio::runtime::Builder::new_multi_thread()
+///         .enable_all()
+///         .build()
+///         .unwrap()
+///         .block_on(async {
+///             println!(&quot;Hello world&quot;);
+///         })
+/// }
+/// ```
+///
+/// ### Using current thread runtime
+///
+/// The basic scheduler is single-threaded.
+///
+/// ```rust
+/// #[tokio::main(flavor = &quot;current_thread&quot;)]
+/// async fn main() {
+///     println!(&quot;Hello world&quot;);
+/// }
+/// ```
+///
+/// Equivalent code not using `#[tokio::main]`
+///
+/// ```rust
+/// fn main() {
+///     tokio::runtime::Builder::new_current_thread()
+///         .enable_all()
+///         .build()
+///         .unwrap()
+///         .block_on(async {
+///             println!(&quot;Hello world&quot;);
+///         })
+/// }
+/// ```
+///
+/// ### Set number of worker threads
+///
+/// ```rust
+/// #[tokio::main(worker_threads = 2)]
+/// async fn main() {
+///     println!(&quot;Hello world&quot;);
+/// }
+/// ```
+///
+/// Equivalent code not using `#[tokio::main]`
+///
+/// ```rust
+/// fn main() {
+///     tokio::runtime::Builder::new_multi_thread()
+///         .worker_threads(2)
+///         .enable_all()
+///         .build()
+///         .unwrap()
+///         .block_on(async {
+///             println!(&quot;Hello world&quot;);
+///         })
+/// }
+/// ```
+///
+/// ### Configure the runtime to start with time paused
+///
+/// ```rust
+/// #[tokio::main(flavor = &quot;current_thread&quot;, start_paused = true)]
+/// async fn main() {
+///     println!(&quot;Hello world&quot;);
+/// }
+/// ```
+///
+/// Equivalent code not using `#[tokio::main]`
+///
+/// ```rust
+/// fn main() {
+///     tokio::runtime::Builder::new_current_thread()
+///         .enable_all()
+///         .start_paused(true)
+///         .build()
+///         .unwrap()
+///         .block_on(async {
+///             println!(&quot;Hello world&quot;);
+///         })
+/// }
+/// ```
+///
+/// Note that `start_paused` requires the `test-util` feature to be enabled.
+///
+/// ### Rename package
+///
+/// ```rust
+/// use tokio as tokio1;
+///
+/// #[tokio1::main(crate = &quot;tokio1&quot;)]
+/// async fn main() {
+///     println!(&quot;Hello world&quot;);
+/// }
+/// ```
+///
+/// Equivalent code not using `#[tokio::main]`
+///
+/// ```rust
+/// use tokio as tokio1;
+///
+/// fn main() {
+///     tokio1::runtime::Builder::new_multi_thread()
+///         .enable_all()
+///         .build()
+///         .unwrap()
+///         .block_on(async {
+///             println!(&quot;Hello world&quot;);
+///         })
+/// }
+/// ```
+</span><span class="attribute">#[proc_macro_attribute]
+#[cfg(not(test))] </span><span class="comment">// Work around for rust-lang/rust#62127
+</span><span class="kw">pub fn </span>main(args: TokenStream, item: TokenStream) -&gt; TokenStream {
+    entry::main(args, item, <span class="bool-val">true</span>)
 }
 
-<span class="doccomment">/// Marks async function to be executed by selected runtime. This macro helps set up a `Runtime`</span>
-<span class="doccomment">/// without requiring the user to use [Runtime](../tokio/runtime/struct.Runtime.html) or</span>
-<span class="doccomment">/// [Builder](../tokio/runtime/struct.builder.html) directly.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Function arguments:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Arguments are allowed for any functions aside from `main` which is special</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Usage</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Using default</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// #[tokio::main(flavor = &quot;current_thread&quot;)]</span>
-<span class="doccomment">/// async fn main() {</span>
-<span class="doccomment">///     println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Equivalent code not using `#[tokio::main]`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     tokio::runtime::Builder::new_current_thread()</span>
-<span class="doccomment">///         .enable_all()</span>
-<span class="doccomment">///         .build()</span>
-<span class="doccomment">///         .unwrap()</span>
-<span class="doccomment">///         .block_on(async {</span>
-<span class="doccomment">///             println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">///         })</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rename package</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use tokio as tokio1;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[tokio1::main(crate = &quot;tokio1&quot;)]</span>
-<span class="doccomment">/// async fn main() {</span>
-<span class="doccomment">///     println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Equivalent code not using `#[tokio::main]`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use tokio as tokio1;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     tokio1::runtime::Builder::new_multi_thread()</span>
-<span class="doccomment">///         .enable_all()</span>
-<span class="doccomment">///         .build()</span>
-<span class="doccomment">///         .unwrap()</span>
-<span class="doccomment">///         .block_on(async {</span>
-<span class="doccomment">///             println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">///         })</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span> <span class="comment">// Work around for rust-lang/rust#62127</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main_rt</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">entry::main</span>(<span class="ident">args</span>, <span class="ident">item</span>, <span class="bool-val">false</span>)
+<span class="doccomment">/// Marks async function to be executed by selected runtime. This macro helps set up a `Runtime`
+/// without requiring the user to use [Runtime](../tokio/runtime/struct.Runtime.html) or
+/// [Builder](../tokio/runtime/struct.builder.html) directly.
+///
+/// ## Function arguments:
+///
+/// Arguments are allowed for any functions aside from `main` which is special
+///
+/// ## Usage
+///
+/// ### Using default
+///
+/// ```rust
+/// #[tokio::main(flavor = &quot;current_thread&quot;)]
+/// async fn main() {
+///     println!(&quot;Hello world&quot;);
+/// }
+/// ```
+///
+/// Equivalent code not using `#[tokio::main]`
+///
+/// ```rust
+/// fn main() {
+///     tokio::runtime::Builder::new_current_thread()
+///         .enable_all()
+///         .build()
+///         .unwrap()
+///         .block_on(async {
+///             println!(&quot;Hello world&quot;);
+///         })
+/// }
+/// ```
+///
+/// ### Rename package
+///
+/// ```rust
+/// use tokio as tokio1;
+///
+/// #[tokio1::main(crate = &quot;tokio1&quot;)]
+/// async fn main() {
+///     println!(&quot;Hello world&quot;);
+/// }
+/// ```
+///
+/// Equivalent code not using `#[tokio::main]`
+///
+/// ```rust
+/// use tokio as tokio1;
+///
+/// fn main() {
+///     tokio1::runtime::Builder::new_multi_thread()
+///         .enable_all()
+///         .build()
+///         .unwrap()
+///         .block_on(async {
+///             println!(&quot;Hello world&quot;);
+///         })
+/// }
+/// ```
+</span><span class="attribute">#[proc_macro_attribute]
+#[cfg(not(test))] </span><span class="comment">// Work around for rust-lang/rust#62127
+</span><span class="kw">pub fn </span>main_rt(args: TokenStream, item: TokenStream) -&gt; TokenStream {
+    entry::main(args, item, <span class="bool-val">false</span>)
 }
 
-<span class="doccomment">/// Marks async function to be executed by runtime, suitable to test environment</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Usage</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Multi-thread runtime</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// #[tokio::test(flavor = &quot;multi_thread&quot;, worker_threads = 1)]</span>
-<span class="doccomment">/// async fn my_test() {</span>
-<span class="doccomment">///     assert!(true);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Using default</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The default test runtime is single-threaded.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// #[tokio::test]</span>
-<span class="doccomment">/// async fn my_test() {</span>
-<span class="doccomment">///     assert!(true);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Configure the runtime to start with time paused</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// #[tokio::test(start_paused = true)]</span>
-<span class="doccomment">/// async fn my_test() {</span>
-<span class="doccomment">///     assert!(true);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that `start_paused` requires the `test-util` feature to be enabled.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rename package</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use tokio as tokio1;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[tokio1::test(crate = &quot;tokio1&quot;)]</span>
-<span class="doccomment">/// async fn my_test() {</span>
-<span class="doccomment">///     println!(&quot;Hello world&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">entry::test</span>(<span class="ident">args</span>, <span class="ident">item</span>, <span class="bool-val">true</span>)
+<span class="doccomment">/// Marks async function to be executed by runtime, suitable to test environment
+///
+/// ## Usage
+///
+/// ### Multi-thread runtime
+///
+/// ```no_run
+/// #[tokio::test(flavor = &quot;multi_thread&quot;, worker_threads = 1)]
+/// async fn my_test() {
+///     assert!(true);
+/// }
+/// ```
+///
+/// ### Using default
+///
+/// The default test runtime is single-threaded.
+///
+/// ```no_run
+/// #[tokio::test]
+/// async fn my_test() {
+///     assert!(true);
+/// }
+/// ```
+///
+/// ### Configure the runtime to start with time paused
+///
+/// ```no_run
+/// #[tokio::test(start_paused = true)]
+/// async fn my_test() {
+///     assert!(true);
+/// }
+/// ```
+///
+/// Note that `start_paused` requires the `test-util` feature to be enabled.
+///
+/// ### Rename package
+///
+/// ```rust
+/// use tokio as tokio1;
+///
+/// #[tokio1::test(crate = &quot;tokio1&quot;)]
+/// async fn my_test() {
+///     println!(&quot;Hello world&quot;);
+/// }
+/// ```
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>test(args: TokenStream, item: TokenStream) -&gt; TokenStream {
+    entry::test(args, item, <span class="bool-val">true</span>)
 }
 
-<span class="doccomment">/// Marks async function to be executed by runtime, suitable to test environment</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Usage</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// #[tokio::test]</span>
-<span class="doccomment">/// async fn my_test() {</span>
-<span class="doccomment">///     assert!(true);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_rt</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">entry::test</span>(<span class="ident">args</span>, <span class="ident">item</span>, <span class="bool-val">false</span>)
+<span class="doccomment">/// Marks async function to be executed by runtime, suitable to test environment
+///
+/// ## Usage
+///
+/// ```no_run
+/// #[tokio::test]
+/// async fn my_test() {
+///     assert!(true);
+/// }
+/// ```
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>test_rt(args: TokenStream, item: TokenStream) -&gt; TokenStream {
+    entry::test(args, item, <span class="bool-val">false</span>)
 }
 
-<span class="doccomment">/// Always fails with the error message below.</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// The #[tokio::main] macro requires rt or rt-multi-thread.</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main_fail</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">_item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">syn::Error::new</span>(
-        <span class="ident">proc_macro2::Span::call_site</span>(),
+<span class="doccomment">/// Always fails with the error message below.
+/// ```text
+/// The #[tokio::main] macro requires rt or rt-multi-thread.
+/// ```
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>main_fail(_args: TokenStream, _item: TokenStream) -&gt; TokenStream {
+    syn::Error::new(
+        proc_macro2::Span::call_site(),
         <span class="string">&quot;The #[tokio::main] macro requires rt or rt-multi-thread.&quot;</span>,
     )
-    .<span class="ident">to_compile_error</span>()
-    .<span class="ident">into</span>()
+    .to_compile_error()
+    .into()
 }
 
-<span class="doccomment">/// Always fails with the error message below.</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// The #[tokio::test] macro requires rt or rt-multi-thread.</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_fail</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">_item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">syn::Error::new</span>(
-        <span class="ident">proc_macro2::Span::call_site</span>(),
+<span class="doccomment">/// Always fails with the error message below.
+/// ```text
+/// The #[tokio::test] macro requires rt or rt-multi-thread.
+/// ```
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>test_fail(_args: TokenStream, _item: TokenStream) -&gt; TokenStream {
+    syn::Error::new(
+        proc_macro2::Span::call_site(),
         <span class="string">&quot;The #[tokio::test] macro requires rt or rt-multi-thread.&quot;</span>,
     )
-    .<span class="ident">to_compile_error</span>()
-    .<span class="ident">into</span>()
+    .to_compile_error()
+    .into()
 }
 
-<span class="doccomment">/// Implementation detail of the `select!` macro. This macro is **not** intended</span>
-<span class="doccomment">/// to be used as part of the public API and is permitted to change.</span>
-<span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">select_priv_declare_output_enum</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">select::declare_output_enum</span>(<span class="ident">input</span>)
+<span class="doccomment">/// Implementation detail of the `select!` macro. This macro is **not** intended
+/// to be used as part of the public API and is permitted to change.
+</span><span class="attribute">#[proc_macro]
+#[doc(hidden)]
+</span><span class="kw">pub fn </span>select_priv_declare_output_enum(input: TokenStream) -&gt; TokenStream {
+    select::declare_output_enum(input)
 }
 
-<span class="doccomment">/// Implementation detail of the `select!` macro. This macro is **not** intended</span>
-<span class="doccomment">/// to be used as part of the public API and is permitted to change.</span>
-<span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">select_priv_clean_pattern</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">select::clean_pattern_macro</span>(<span class="ident">input</span>)
+<span class="doccomment">/// Implementation detail of the `select!` macro. This macro is **not** intended
+/// to be used as part of the public API and is permitted to change.
+</span><span class="attribute">#[proc_macro]
+#[doc(hidden)]
+</span><span class="kw">pub fn </span>select_priv_clean_pattern(input: TokenStream) -&gt; TokenStream {
+    select::clean_pattern_macro(input)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/serialize/binary/decoder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>decoder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/serialize/binary/decoder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>decoder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -303,282 +303,282 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */</span>
+ */
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary::Restrict</span>;
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::serialize::binary::Restrict;
+<span class="kw">use </span>thiserror::Error;
 
-<span class="doccomment">/// This is non-destructive to the inner buffer, b/c for pointer types we need to perform a reverse</span>
-<span class="doccomment">///  seek to lookup names</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A note on serialization, there was a thought to have this implement the Serde deserializer,</span>
-<span class="doccomment">///  but given that this is such a small subset of all the serialization which that performs</span>
-<span class="doccomment">///  this is a simpler implementation without the cruft, at least for serializing to/from the</span>
-<span class="doccomment">///  binary DNS protocols.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],    <span class="comment">// The entire original buffer</span>
-    <span class="ident">remaining</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="comment">// The unread section of the original buffer, so that reads do not cause a bounds check at the current seek offset</span>
-}
+<span class="doccomment">/// This is non-destructive to the inner buffer, b/c for pointer types we need to perform a reverse
+///  seek to lookup names
+///
+/// A note on serialization, there was a thought to have this implement the Serde deserializer,
+///  but given that this is such a small subset of all the serialization which that performs
+///  this is a simpler implementation without the cruft, at least for serializing to/from the
+///  binary DNS protocols.
+</span><span class="kw">pub struct </span>BinDecoder&lt;<span class="lifetime">&#39;a</span>&gt; {
+    buffer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],    <span class="comment">// The entire original buffer
+    </span>remaining: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], <span class="comment">// The unread section of the original buffer, so that reads do not cause a bounds check at the current seek offset
+</span>}
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>DecodeResult&lt;T&gt; = <span class="prelude-ty">Result</span>&lt;T, DecodeError&gt;;
 
-<span class="doccomment">/// An error that can occur deep in a decoder</span>
-<span class="doccomment">/// This type is kept very small so that function that use it inline often</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DecodeError</span> {
-    <span class="doccomment">/// Insufficient data in the buffer for a read operation</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;unexpected end of input reached&quot;</span>)]</span>
-    <span class="ident">InsufficientBytes</span>,
+<span class="doccomment">/// An error that can occur deep in a decoder
+/// This type is kept very small so that function that use it inline often
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Error)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>DecodeError {
+    <span class="doccomment">/// Insufficient data in the buffer for a read operation
+    </span><span class="attribute">#[error(<span class="string">&quot;unexpected end of input reached&quot;</span>)]
+    </span>InsufficientBytes,
 
-    <span class="doccomment">/// slice_from was called with an invalid index</span>
-    <span class="attribute">#[<span class="ident">error</span>(
-        <span class="string">&quot;the index passed to BinDecoder::slice_from must be greater than the decoder position&quot;</span>
-    )]</span>
-    <span class="ident">InvalidPreviousIndex</span>,
+    <span class="doccomment">/// slice_from was called with an invalid index
+    </span><span class="attribute">#[error(
+        <span class="string">&quot;the index passed to BinDecoder::slice_from must be greater than the decoder position&quot;
+    </span>)]
+    </span>InvalidPreviousIndex,
 
-    <span class="doccomment">/// Pointer points to an index within or after the current label</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;label points to data not prior to idx: {idx} ptr: {ptr}&quot;</span>)]</span>
-    <span class="ident">PointerNotPriorToLabel</span> {
-        <span class="doccomment">/// index of the label containing this pointer</span>
-        <span class="ident">idx</span>: <span class="ident">usize</span>,
-        <span class="doccomment">/// location to which the pointer is directing</span>
-        <span class="ident">ptr</span>: <span class="ident">u16</span>,
+    <span class="doccomment">/// Pointer points to an index within or after the current label
+    </span><span class="attribute">#[error(<span class="string">&quot;label points to data not prior to idx: {idx} ptr: {ptr}&quot;</span>)]
+    </span>PointerNotPriorToLabel {
+        <span class="doccomment">/// index of the label containing this pointer
+        </span>idx: usize,
+        <span class="doccomment">/// location to which the pointer is directing
+        </span>ptr: u16,
     },
 
-    <span class="doccomment">/// Label bytes exceeded the limit of 63</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;label bytes exceed 63: {0}&quot;</span>)]</span>
-    <span class="ident">LabelBytesTooLong</span>(<span class="ident">usize</span>),
+    <span class="doccomment">/// Label bytes exceeded the limit of 63
+    </span><span class="attribute">#[error(<span class="string">&quot;label bytes exceed 63: {0}&quot;</span>)]
+    </span>LabelBytesTooLong(usize),
 
-    <span class="doccomment">/// An unrecognized label code was found</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;unrecognized label code: {0:b}&quot;</span>)]</span>
-    <span class="ident">UnrecognizedLabelCode</span>(<span class="ident">u8</span>),
+    <span class="doccomment">/// An unrecognized label code was found
+    </span><span class="attribute">#[error(<span class="string">&quot;unrecognized label code: {0:b}&quot;</span>)]
+    </span>UnrecognizedLabelCode(u8),
 
-    <span class="doccomment">/// A domain name was too long</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;name label data exceed 255: {0}&quot;</span>)]</span>
-    <span class="ident">DomainNameTooLong</span>(<span class="ident">usize</span>),
+    <span class="doccomment">/// A domain name was too long
+    </span><span class="attribute">#[error(<span class="string">&quot;name label data exceed 255: {0}&quot;</span>)]
+    </span>DomainNameTooLong(usize),
 
-    <span class="doccomment">/// Overlapping labels</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;overlapping labels name {label} other {other}&quot;</span>)]</span>
-    <span class="ident">LabelOverlapsWithOther</span> {
-        <span class="doccomment">/// Start of the label that is overlaps</span>
-        <span class="ident">label</span>: <span class="ident">usize</span>,
-        <span class="doccomment">/// Start of the other label</span>
-        <span class="ident">other</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Overlapping labels
+    </span><span class="attribute">#[error(<span class="string">&quot;overlapping labels name {label} other {other}&quot;</span>)]
+    </span>LabelOverlapsWithOther {
+        <span class="doccomment">/// Start of the label that is overlaps
+        </span>label: usize,
+        <span class="doccomment">/// Start of the other label
+        </span>other: usize,
     },
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new BinDecoder</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `buffer` - buffer from which all data will be read</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">BinDecoder</span> {
-            <span class="ident">buffer</span>,
-            <span class="ident">remaining</span>: <span class="ident">buffer</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BinDecoder&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Creates a new BinDecoder
+    ///
+    /// # Arguments
+    ///
+    /// * `buffer` - buffer from which all data will be read
+    </span><span class="kw">pub fn </span>new(buffer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="self">Self </span>{
+        BinDecoder {
+            buffer,
+            remaining: buffer,
         }
     }
 
-    <span class="doccomment">/// Pop one byte from the buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">first</span>, <span class="ident">remaining</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">split_first</span>() {
-            <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">=</span> <span class="ident">remaining</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Restrict::new</span>(<span class="kw-2">*</span><span class="ident">first</span>));
+    <span class="doccomment">/// Pop one byte from the buffer
+    </span><span class="kw">pub fn </span>pop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; DecodeResult&lt;Restrict&lt;u8&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((first, remaining)) = <span class="self">self</span>.remaining.split_first() {
+            <span class="self">self</span>.remaining = remaining;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Restrict::new(<span class="kw-2">*</span>first));
         }
-        <span class="prelude-val">Err</span>(<span class="ident">DecodeError::InsufficientBytes</span>)
+        <span class="prelude-val">Err</span>(DecodeError::InsufficientBytes)
     }
 
-    <span class="doccomment">/// Returns the number of bytes in the buffer</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use trust_dns_proto::serialize::binary::BinDecoder;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let deadbeef = b&quot;deadbeef&quot;;</span>
-    <span class="doccomment">/// let mut decoder = BinDecoder::new(deadbeef);</span>
-    <span class="doccomment">/// assert_eq!(decoder.len(), 8);</span>
-    <span class="doccomment">/// decoder.read_slice(7).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(decoder.len(), 1);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Returns the number of bytes in the buffer
+    ///
+    /// ```
+    /// use trust_dns_proto::serialize::binary::BinDecoder;
+    ///
+    /// let deadbeef = b&quot;deadbeef&quot;;
+    /// let mut decoder = BinDecoder::new(deadbeef);
+    /// assert_eq!(decoder.len(), 8);
+    /// decoder.read_slice(7).unwrap();
+    /// assert_eq!(decoder.len(), 1);
+    /// ```
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.remaining.len()
     }
 
-    <span class="doccomment">/// Returns `true` if the buffer is empty</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
+    <span class="doccomment">/// Returns `true` if the buffer is empty
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Peed one byte forward, without moving the current index forward
+    </span><span class="kw">pub fn </span>peek(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Restrict&lt;u8&gt;&gt; {
+        <span class="prelude-val">Some</span>(Restrict::new(<span class="kw-2">*</span><span class="self">self</span>.remaining.get(<span class="number">0</span>)<span class="question-mark">?</span>))
     }
 
-    <span class="doccomment">/// Peed one byte forward, without moving the current index forward</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">Restrict::new</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">get</span>(<span class="number">0</span>)<span class="question-mark">?</span>))
+    <span class="doccomment">/// Returns the current index in the buffer
+    </span><span class="kw">pub fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.buffer.len() - <span class="self">self</span>.remaining.len()
     }
 
-    <span class="doccomment">/// Returns the current index in the buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">len</span>()
-    }
-
-    <span class="doccomment">/// This is a pretty efficient clone, as the buffer is never cloned, and only the index is set</span>
-    <span class="doccomment">///  to the value passed in</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index_at</span>: <span class="ident">u16</span>) -&gt; <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">BinDecoder</span> {
-            <span class="ident">buffer</span>: <span class="self">self</span>.<span class="ident">buffer</span>,
-            <span class="ident">remaining</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buffer</span>[<span class="ident">index_at</span> <span class="kw">as</span> <span class="ident">usize</span>..],
+    <span class="doccomment">/// This is a pretty efficient clone, as the buffer is never cloned, and only the index is set
+    ///  to the value passed in
+    </span><span class="kw">pub fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>, index_at: u16) -&gt; BinDecoder&lt;<span class="lifetime">&#39;a</span>&gt; {
+        BinDecoder {
+            buffer: <span class="self">self</span>.buffer,
+            remaining: <span class="kw-2">&amp;</span><span class="self">self</span>.buffer[index_at <span class="kw">as </span>usize..],
         }
     }
 
-    <span class="doccomment">/// Reads a String from the buffer</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// &lt;character-string&gt; is a single</span>
-    <span class="doccomment">/// length octet followed by that number of characters.  &lt;character-string&gt;</span>
-    <span class="doccomment">/// is treated as binary information, and can be up to 256 characters in</span>
-    <span class="doccomment">/// length (including the length octet).</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A String version of the character data</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_character_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pop</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="self">self</span>.<span class="ident">read_slice</span>(<span class="ident">length</span>)
+    <span class="doccomment">/// Reads a String from the buffer
+    ///
+    /// ```text
+    /// &lt;character-string&gt; is a single
+    /// length octet followed by that number of characters.  &lt;character-string&gt;
+    /// is treated as binary information, and can be up to 256 characters in
+    /// length (including the length octet).
+    /// ```
+    ///
+    /// # Returns
+    ///
+    /// A String version of the character data
+    </span><span class="kw">pub fn </span>read_character_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; DecodeResult&lt;Restrict&lt;<span class="kw-2">&amp;</span>[u8]&gt;&gt; {
+        <span class="kw">let </span>length = <span class="self">self</span>.pop()<span class="question-mark">?</span>.unverified() <span class="kw">as </span>usize;
+        <span class="self">self</span>.read_slice(length)
     }
 
-    <span class="doccomment">/// Reads a Vec out of the buffer</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `len` - number of bytes to read from the buffer</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The Vec of the specified length, otherwise an error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_vec</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">read_slice</span>(<span class="ident">len</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>))
+    <span class="doccomment">/// Reads a Vec out of the buffer
+    ///
+    /// # Arguments
+    ///
+    /// * `len` - number of bytes to read from the buffer
+    ///
+    /// # Returns
+    ///
+    /// The Vec of the specified length, otherwise an error
+    </span><span class="kw">pub fn </span>read_vec(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: usize) -&gt; DecodeResult&lt;Restrict&lt;Vec&lt;u8&gt;&gt;&gt; {
+        <span class="self">self</span>.read_slice(len).map(|s| s.map(ToOwned::to_owned))
     }
 
-    <span class="doccomment">/// Reads a slice out of the buffer, without allocating</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `len` - number of bytes to read from the buffer</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The slice of the specified length, otherwise an error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DecodeError::InsufficientBytes</span>);
+    <span class="doccomment">/// Reads a slice out of the buffer, without allocating
+    ///
+    /// # Arguments
+    ///
+    /// * `len` - number of bytes to read from the buffer
+    ///
+    /// # Returns
+    ///
+    /// The slice of the specified length, otherwise an error
+    </span><span class="kw">pub fn </span>read_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: usize) -&gt; DecodeResult&lt;Restrict&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;&gt; {
+        <span class="kw">if </span>len &gt; <span class="self">self</span>.remaining.len() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(DecodeError::InsufficientBytes);
         }
-        <span class="kw">let</span> (<span class="ident">read</span>, <span class="ident">remaining</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">split_at</span>(<span class="ident">len</span>);
-        <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">=</span> <span class="ident">remaining</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">Restrict::new</span>(<span class="ident">read</span>))
+        <span class="kw">let </span>(read, remaining) = <span class="self">self</span>.remaining.split_at(len);
+        <span class="self">self</span>.remaining = remaining;
+        <span class="prelude-val">Ok</span>(Restrict::new(read))
     }
 
-    <span class="doccomment">/// Reads a slice from a previous index to the current</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slice_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">index</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DecodeError::InvalidPreviousIndex</span>);
+    <span class="doccomment">/// Reads a slice from a previous index to the current
+    </span><span class="kw">pub fn </span>slice_from(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; DecodeResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+        <span class="kw">if </span>index &gt; <span class="self">self</span>.index() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(DecodeError::InvalidPreviousIndex);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buffer</span>[<span class="ident">index</span>..<span class="self">self</span>.<span class="ident">index</span>()])
+        <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer[index..<span class="self">self</span>.index()])
     }
 
-    <span class="doccomment">/// Reads a byte from the buffer, equivalent to `Self::pop()`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">pop</span>()
+    <span class="doccomment">/// Reads a byte from the buffer, equivalent to `Self::pop()`
+    </span><span class="kw">pub fn </span>read_u8(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; DecodeResult&lt;Restrict&lt;u8&gt;&gt; {
+        <span class="self">self</span>.pop()
     }
 
-    <span class="doccomment">/// Reads the next 2 bytes into u16</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This performs a byte-by-byte manipulation, there</span>
-    <span class="doccomment">///  which means endianness is implicitly handled (i.e. no network to little endian (intel), issues)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Return the u16 from the buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_u16</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>
-            .<span class="ident">read_slice</span>(<span class="number">2</span>)<span class="question-mark">?</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">u16::from_be_bytes</span>([<span class="ident">s</span>[<span class="number">0</span>], <span class="ident">s</span>[<span class="number">1</span>]])))
+    <span class="doccomment">/// Reads the next 2 bytes into u16
+    ///
+    /// This performs a byte-by-byte manipulation, there
+    ///  which means endianness is implicitly handled (i.e. no network to little endian (intel), issues)
+    ///
+    /// # Return
+    ///
+    /// Return the u16 from the buffer
+    </span><span class="kw">pub fn </span>read_u16(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; DecodeResult&lt;Restrict&lt;u16&gt;&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self
+            </span>.read_slice(<span class="number">2</span>)<span class="question-mark">?
+            </span>.map(|s| u16::from_be_bytes([s[<span class="number">0</span>], s[<span class="number">1</span>]])))
     }
 
-    <span class="doccomment">/// Reads the next four bytes into i32.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This performs a byte-by-byte manipulation, there</span>
-    <span class="doccomment">///  which means endianness is implicitly handled (i.e. no network to little endian (intel), issues)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Return the i32 from the buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">read_slice</span>(<span class="number">4</span>)<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="macro">assert!</span>(<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">4</span>);
-            <span class="ident">i32::from_be_bytes</span>([<span class="ident">s</span>[<span class="number">0</span>], <span class="ident">s</span>[<span class="number">1</span>], <span class="ident">s</span>[<span class="number">2</span>], <span class="ident">s</span>[<span class="number">3</span>]])
+    <span class="doccomment">/// Reads the next four bytes into i32.
+    ///
+    /// This performs a byte-by-byte manipulation, there
+    ///  which means endianness is implicitly handled (i.e. no network to little endian (intel), issues)
+    ///
+    /// # Return
+    ///
+    /// Return the i32 from the buffer
+    </span><span class="kw">pub fn </span>read_i32(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; DecodeResult&lt;Restrict&lt;i32&gt;&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.read_slice(<span class="number">4</span>)<span class="question-mark">?</span>.map(|s| {
+            <span class="macro">assert!</span>(s.len() == <span class="number">4</span>);
+            i32::from_be_bytes([s[<span class="number">0</span>], s[<span class="number">1</span>], s[<span class="number">2</span>], s[<span class="number">3</span>]])
         }))
     }
 
-    <span class="doccomment">/// Reads the next four bytes into u32.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This performs a byte-by-byte manipulation, there</span>
-    <span class="doccomment">///  which means endianness is implicitly handled (i.e. no network to little endian (intel), issues)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Return the u32 from the buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_u32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">read_slice</span>(<span class="number">4</span>)<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="macro">assert!</span>(<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">4</span>);
-            <span class="ident">u32::from_be_bytes</span>([<span class="ident">s</span>[<span class="number">0</span>], <span class="ident">s</span>[<span class="number">1</span>], <span class="ident">s</span>[<span class="number">2</span>], <span class="ident">s</span>[<span class="number">3</span>]])
+    <span class="doccomment">/// Reads the next four bytes into u32.
+    ///
+    /// This performs a byte-by-byte manipulation, there
+    ///  which means endianness is implicitly handled (i.e. no network to little endian (intel), issues)
+    ///
+    /// # Return
+    ///
+    /// Return the u32 from the buffer
+    </span><span class="kw">pub fn </span>read_u32(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; DecodeResult&lt;Restrict&lt;u32&gt;&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.read_slice(<span class="number">4</span>)<span class="question-mark">?</span>.map(|s| {
+            <span class="macro">assert!</span>(s.len() == <span class="number">4</span>);
+            u32::from_be_bytes([s[<span class="number">0</span>], s[<span class="number">1</span>], s[<span class="number">2</span>], s[<span class="number">3</span>]])
         }))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tests</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(tests)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_read_slice</span>() {
-        <span class="kw">let</span> <span class="ident">deadbeef</span> <span class="op">=</span> <span class="string">b&quot;deadbeef&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">deadbeef</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_read_slice() {
+        <span class="kw">let </span>deadbeef = <span class="string">b&quot;deadbeef&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = BinDecoder::new(deadbeef);
 
-        <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_slice</span>(<span class="number">4</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to read dead&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">read</span>, <span class="string">&quot;dead&quot;</span>);
+        <span class="kw">let </span>read = decoder.read_slice(<span class="number">4</span>).expect(<span class="string">&quot;failed to read dead&quot;</span>);
+        <span class="macro">assert_eq!</span>(read, <span class="string">&quot;dead&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_slice</span>(<span class="number">2</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to read be&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">read</span>, <span class="string">&quot;be&quot;</span>);
+        <span class="kw">let </span>read = decoder.read_slice(<span class="number">2</span>).expect(<span class="string">&quot;failed to read be&quot;</span>);
+        <span class="macro">assert_eq!</span>(read, <span class="string">&quot;be&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_slice</span>(<span class="number">0</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to read nothing&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">read</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>read = decoder.read_slice(<span class="number">0</span>).expect(<span class="string">&quot;failed to read nothing&quot;</span>);
+        <span class="macro">assert_eq!</span>(read, <span class="string">&quot;&quot;</span>);
 
-        <span class="comment">// this should fail</span>
-        <span class="macro">assert!</span>(<span class="ident">decoder</span>.<span class="ident">read_slice</span>(<span class="number">3</span>).<span class="ident">is_err</span>());
+        <span class="comment">// this should fail
+        </span><span class="macro">assert!</span>(decoder.read_slice(<span class="number">3</span>).is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_read_slice_from</span>() {
-        <span class="kw">let</span> <span class="ident">deadbeef</span> <span class="op">=</span> <span class="string">b&quot;deadbeef&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">deadbeef</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_read_slice_from() {
+        <span class="kw">let </span>deadbeef = <span class="string">b&quot;deadbeef&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = BinDecoder::new(deadbeef);
 
-        <span class="ident">decoder</span>.<span class="ident">read_slice_from</span>(<span class="number">4</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to read dead&quot;</span>);
-        <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">slice_from</span>(<span class="number">0</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to get slice&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">read</span>, <span class="string">&quot;dead&quot;</span>);
+        decoder.read_slice_from(<span class="number">4</span>).expect(<span class="string">&quot;failed to read dead&quot;</span>);
+        <span class="kw">let </span>read = decoder.slice_from(<span class="number">0</span>).expect(<span class="string">&quot;failed to get slice&quot;</span>);
+        <span class="macro">assert_eq!</span>(read, <span class="string">&quot;dead&quot;</span>);
 
-        <span class="ident">decoder</span>.<span class="ident">read_slice</span>(<span class="number">2</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to read be&quot;</span>);
-        <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">slice_from</span>(<span class="number">4</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to get slice&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">read</span>, <span class="string">&quot;be&quot;</span>);
+        decoder.read_slice(<span class="number">2</span>).expect(<span class="string">&quot;failed to read be&quot;</span>);
+        <span class="kw">let </span>read = decoder.slice_from(<span class="number">4</span>).expect(<span class="string">&quot;failed to get slice&quot;</span>);
+        <span class="macro">assert_eq!</span>(read, <span class="string">&quot;be&quot;</span>);
 
-        <span class="ident">decoder</span>.<span class="ident">read_slice</span>(<span class="number">0</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to read nothing&quot;</span>);
-        <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">slice_from</span>(<span class="number">4</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to get slice&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">read</span>, <span class="string">&quot;be&quot;</span>);
+        decoder.read_slice(<span class="number">0</span>).expect(<span class="string">&quot;failed to read nothing&quot;</span>);
+        <span class="kw">let </span>read = decoder.slice_from(<span class="number">4</span>).expect(<span class="string">&quot;failed to get slice&quot;</span>);
+        <span class="macro">assert_eq!</span>(read, <span class="string">&quot;be&quot;</span>);
 
-        <span class="comment">// this should fail</span>
-        <span class="macro">assert!</span>(<span class="ident">decoder</span>.<span class="ident">slice_from</span>(<span class="number">6</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">decoder</span>.<span class="ident">slice_from</span>(<span class="number">10</span>).<span class="ident">is_err</span>());
+        <span class="comment">// this should fail
+        </span><span class="macro">assert!</span>(decoder.slice_from(<span class="number">6</span>).is_err());
+        <span class="macro">assert!</span>(decoder.slice_from(<span class="number">10</span>).is_err());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

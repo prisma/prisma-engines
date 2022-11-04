@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/utf8parse-0.2.0/src/types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../utf8parse/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../utf8parse/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../utf8parse/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/utf8parse-0.2.0/src/types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../utf8parse/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../utf8parse/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../utf8parse/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -103,110 +103,110 @@
 <span id="103">103</span>
 <span id="104">104</span>
 <span id="105">105</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Types supporting the UTF-8 parser</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Types supporting the UTF-8 parser
 
-<span class="doccomment">/// Action to take when receiving a byte</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Action</span> {
-    <span class="doccomment">/// Unexpected byte; sequence is invalid</span>
-    <span class="ident">InvalidSequence</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// Received valid 7-bit ASCII byte which can be directly emitted.</span>
-    <span class="ident">EmitByte</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// Set the bottom continuation byte</span>
-    <span class="ident">SetByte1</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// Set the 2nd-from-last continuation byte</span>
-    <span class="ident">SetByte2</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="doccomment">/// Set the 2nd-from-last byte which is part of a two byte sequence</span>
-    <span class="ident">SetByte2Top</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="doccomment">/// Set the 3rd-from-last continuation byte</span>
-    <span class="ident">SetByte3</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="doccomment">/// Set the 3rd-from-last byte which is part of a three byte sequence</span>
-    <span class="ident">SetByte3Top</span> <span class="op">=</span> <span class="number">6</span>,
-    <span class="doccomment">/// Set the top byte of a four byte sequence.</span>
-    <span class="ident">SetByte4</span> <span class="op">=</span> <span class="number">7</span>,
+/// Action to take when receiving a byte
+</span><span class="attribute">#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub enum </span>Action {
+    <span class="doccomment">/// Unexpected byte; sequence is invalid
+    </span>InvalidSequence = <span class="number">0</span>,
+    <span class="doccomment">/// Received valid 7-bit ASCII byte which can be directly emitted.
+    </span>EmitByte = <span class="number">1</span>,
+    <span class="doccomment">/// Set the bottom continuation byte
+    </span>SetByte1 = <span class="number">2</span>,
+    <span class="doccomment">/// Set the 2nd-from-last continuation byte
+    </span>SetByte2 = <span class="number">3</span>,
+    <span class="doccomment">/// Set the 2nd-from-last byte which is part of a two byte sequence
+    </span>SetByte2Top = <span class="number">4</span>,
+    <span class="doccomment">/// Set the 3rd-from-last continuation byte
+    </span>SetByte3 = <span class="number">5</span>,
+    <span class="doccomment">/// Set the 3rd-from-last byte which is part of a three byte sequence
+    </span>SetByte3Top = <span class="number">6</span>,
+    <span class="doccomment">/// Set the top byte of a four byte sequence.
+    </span>SetByte4 = <span class="number">7</span>,
 }
 
-<span class="doccomment">/// States the parser can be in.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// There is a state for each initial input of the 3 and 4 byte sequences since</span>
-<span class="doccomment">/// the following bytes are subject to different conditions than a tail byte.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">State</span> {
-    <span class="doccomment">/// Ground state; expect anything</span>
-    <span class="ident">Ground</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// 3 tail bytes</span>
-    <span class="ident">Tail3</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// 2 tail bytes</span>
-    <span class="ident">Tail2</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// 1 tail byte</span>
-    <span class="ident">Tail1</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="doccomment">/// UTF8-3 starting with E0</span>
-    <span class="ident">U3_2_e0</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="doccomment">/// UTF8-3 starting with ED</span>
-    <span class="ident">U3_2_ed</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="doccomment">/// UTF8-4 starting with F0</span>
-    <span class="ident">Utf8_4_3_f0</span> <span class="op">=</span> <span class="number">6</span>,
-    <span class="doccomment">/// UTF8-4 starting with F4</span>
-    <span class="ident">Utf8_4_3_f4</span> <span class="op">=</span> <span class="number">7</span>,
+<span class="doccomment">/// States the parser can be in.
+///
+/// There is a state for each initial input of the 3 and 4 byte sequences since
+/// the following bytes are subject to different conditions than a tail byte.
+</span><span class="attribute">#[allow(non_camel_case_types)]
+#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub enum </span>State {
+    <span class="doccomment">/// Ground state; expect anything
+    </span>Ground = <span class="number">0</span>,
+    <span class="doccomment">/// 3 tail bytes
+    </span>Tail3 = <span class="number">1</span>,
+    <span class="doccomment">/// 2 tail bytes
+    </span>Tail2 = <span class="number">2</span>,
+    <span class="doccomment">/// 1 tail byte
+    </span>Tail1 = <span class="number">3</span>,
+    <span class="doccomment">/// UTF8-3 starting with E0
+    </span>U3_2_e0 = <span class="number">4</span>,
+    <span class="doccomment">/// UTF8-3 starting with ED
+    </span>U3_2_ed = <span class="number">5</span>,
+    <span class="doccomment">/// UTF8-4 starting with F0
+    </span>Utf8_4_3_f0 = <span class="number">6</span>,
+    <span class="doccomment">/// UTF8-4 starting with F4
+    </span>Utf8_4_3_f4 = <span class="number">7</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">State</span> {
-        <span class="ident">State::Ground</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>State {
+    <span class="kw">fn </span>default() -&gt; State {
+        State::Ground
     }
 }
 
-<span class="kw">impl</span> <span class="ident">State</span> {
-    <span class="doccomment">/// Advance the parser state.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This takes the current state and input byte into consideration, to determine the next state</span>
-    <span class="doccomment">/// and any action that should be taken.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; (<span class="ident">State</span>, <span class="ident">Action</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">State::Ground</span> =&gt; <span class="kw">match</span> <span class="ident">byte</span> {
-                <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x7f</span> =&gt; (<span class="ident">State::Ground</span>, <span class="ident">Action::EmitByte</span>),
-                <span class="number">0xc2</span>..<span class="op">=</span><span class="number">0xdf</span> =&gt; (<span class="ident">State::Tail1</span>, <span class="ident">Action::SetByte2Top</span>),
-                <span class="number">0xe0</span> =&gt; (<span class="ident">State::U3_2_e0</span>, <span class="ident">Action::SetByte3Top</span>),
-                <span class="number">0xe1</span>..<span class="op">=</span><span class="number">0xec</span> =&gt; (<span class="ident">State::Tail2</span>, <span class="ident">Action::SetByte3Top</span>),
-                <span class="number">0xed</span> =&gt; (<span class="ident">State::U3_2_ed</span>, <span class="ident">Action::SetByte3Top</span>),
-                <span class="number">0xee</span>..<span class="op">=</span><span class="number">0xef</span> =&gt; (<span class="ident">State::Tail2</span>, <span class="ident">Action::SetByte3Top</span>),
-                <span class="number">0xf0</span> =&gt; (<span class="ident">State::Utf8_4_3_f0</span>, <span class="ident">Action::SetByte4</span>),
-                <span class="number">0xf1</span>..<span class="op">=</span><span class="number">0xf3</span> =&gt; (<span class="ident">State::Tail3</span>, <span class="ident">Action::SetByte4</span>),
-                <span class="number">0xf4</span> =&gt; (<span class="ident">State::Utf8_4_3_f4</span>, <span class="ident">Action::SetByte4</span>),
-                <span class="kw">_</span> =&gt; (<span class="ident">State::Ground</span>, <span class="ident">Action::InvalidSequence</span>),
+<span class="kw">impl </span>State {
+    <span class="doccomment">/// Advance the parser state.
+    ///
+    /// This takes the current state and input byte into consideration, to determine the next state
+    /// and any action that should be taken.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>advance(<span class="kw-2">&amp;</span><span class="self">self</span>, byte: u8) -&gt; (State, Action) {
+        <span class="kw">match </span><span class="self">self </span>{
+            State::Ground =&gt; <span class="kw">match </span>byte {
+                <span class="number">0x00</span>..=<span class="number">0x7f </span>=&gt; (State::Ground, Action::EmitByte),
+                <span class="number">0xc2</span>..=<span class="number">0xdf </span>=&gt; (State::Tail1, Action::SetByte2Top),
+                <span class="number">0xe0 </span>=&gt; (State::U3_2_e0, Action::SetByte3Top),
+                <span class="number">0xe1</span>..=<span class="number">0xec </span>=&gt; (State::Tail2, Action::SetByte3Top),
+                <span class="number">0xed </span>=&gt; (State::U3_2_ed, Action::SetByte3Top),
+                <span class="number">0xee</span>..=<span class="number">0xef </span>=&gt; (State::Tail2, Action::SetByte3Top),
+                <span class="number">0xf0 </span>=&gt; (State::Utf8_4_3_f0, Action::SetByte4),
+                <span class="number">0xf1</span>..=<span class="number">0xf3 </span>=&gt; (State::Tail3, Action::SetByte4),
+                <span class="number">0xf4 </span>=&gt; (State::Utf8_4_3_f4, Action::SetByte4),
+                <span class="kw">_ </span>=&gt; (State::Ground, Action::InvalidSequence),
             },
-            <span class="ident">State::U3_2_e0</span> =&gt; <span class="kw">match</span> <span class="ident">byte</span> {
-                <span class="number">0xa0</span>..<span class="op">=</span><span class="number">0xbf</span> =&gt; (<span class="ident">State::Tail1</span>, <span class="ident">Action::SetByte2</span>),
-                <span class="kw">_</span> =&gt; (<span class="ident">State::Ground</span>, <span class="ident">Action::InvalidSequence</span>),
+            State::U3_2_e0 =&gt; <span class="kw">match </span>byte {
+                <span class="number">0xa0</span>..=<span class="number">0xbf </span>=&gt; (State::Tail1, Action::SetByte2),
+                <span class="kw">_ </span>=&gt; (State::Ground, Action::InvalidSequence),
             },
-            <span class="ident">State::U3_2_ed</span> =&gt; <span class="kw">match</span> <span class="ident">byte</span> {
-                <span class="number">0x80</span>..<span class="op">=</span><span class="number">0x9f</span> =&gt; (<span class="ident">State::Tail1</span>, <span class="ident">Action::SetByte2</span>),
-                <span class="kw">_</span> =&gt; (<span class="ident">State::Ground</span>, <span class="ident">Action::InvalidSequence</span>),
+            State::U3_2_ed =&gt; <span class="kw">match </span>byte {
+                <span class="number">0x80</span>..=<span class="number">0x9f </span>=&gt; (State::Tail1, Action::SetByte2),
+                <span class="kw">_ </span>=&gt; (State::Ground, Action::InvalidSequence),
             },
-            <span class="ident">State::Utf8_4_3_f0</span> =&gt; <span class="kw">match</span> <span class="ident">byte</span> {
-                <span class="number">0x90</span>..<span class="op">=</span><span class="number">0xbf</span> =&gt; (<span class="ident">State::Tail2</span>, <span class="ident">Action::SetByte3</span>),
-                <span class="kw">_</span> =&gt; (<span class="ident">State::Ground</span>, <span class="ident">Action::InvalidSequence</span>),
+            State::Utf8_4_3_f0 =&gt; <span class="kw">match </span>byte {
+                <span class="number">0x90</span>..=<span class="number">0xbf </span>=&gt; (State::Tail2, Action::SetByte3),
+                <span class="kw">_ </span>=&gt; (State::Ground, Action::InvalidSequence),
             },
-            <span class="ident">State::Utf8_4_3_f4</span> =&gt; <span class="kw">match</span> <span class="ident">byte</span> {
-                <span class="number">0x80</span>..<span class="op">=</span><span class="number">0x8f</span> =&gt; (<span class="ident">State::Tail2</span>, <span class="ident">Action::SetByte3</span>),
-                <span class="kw">_</span> =&gt; (<span class="ident">State::Ground</span>, <span class="ident">Action::InvalidSequence</span>),
+            State::Utf8_4_3_f4 =&gt; <span class="kw">match </span>byte {
+                <span class="number">0x80</span>..=<span class="number">0x8f </span>=&gt; (State::Tail2, Action::SetByte3),
+                <span class="kw">_ </span>=&gt; (State::Ground, Action::InvalidSequence),
             },
-            <span class="ident">State::Tail3</span> =&gt; <span class="kw">match</span> <span class="ident">byte</span> {
-                <span class="number">0x80</span>..<span class="op">=</span><span class="number">0xbf</span> =&gt; (<span class="ident">State::Tail2</span>, <span class="ident">Action::SetByte3</span>),
-                <span class="kw">_</span> =&gt; (<span class="ident">State::Ground</span>, <span class="ident">Action::InvalidSequence</span>),
+            State::Tail3 =&gt; <span class="kw">match </span>byte {
+                <span class="number">0x80</span>..=<span class="number">0xbf </span>=&gt; (State::Tail2, Action::SetByte3),
+                <span class="kw">_ </span>=&gt; (State::Ground, Action::InvalidSequence),
             },
-            <span class="ident">State::Tail2</span> =&gt; <span class="kw">match</span> <span class="ident">byte</span> {
-                <span class="number">0x80</span>..<span class="op">=</span><span class="number">0xbf</span> =&gt; (<span class="ident">State::Tail1</span>, <span class="ident">Action::SetByte2</span>),
-                <span class="kw">_</span> =&gt; (<span class="ident">State::Ground</span>, <span class="ident">Action::InvalidSequence</span>),
+            State::Tail2 =&gt; <span class="kw">match </span>byte {
+                <span class="number">0x80</span>..=<span class="number">0xbf </span>=&gt; (State::Tail1, Action::SetByte2),
+                <span class="kw">_ </span>=&gt; (State::Ground, Action::InvalidSequence),
             },
-            <span class="ident">State::Tail1</span> =&gt; <span class="kw">match</span> <span class="ident">byte</span> {
-                <span class="number">0x80</span>..<span class="op">=</span><span class="number">0xbf</span> =&gt; (<span class="ident">State::Ground</span>, <span class="ident">Action::SetByte1</span>),
-                <span class="kw">_</span> =&gt; (<span class="ident">State::Ground</span>, <span class="ident">Action::InvalidSequence</span>),
+            State::Tail1 =&gt; <span class="kw">match </span>byte {
+                <span class="number">0x80</span>..=<span class="number">0xbf </span>=&gt; (State::Ground, Action::SetByte1),
+                <span class="kw">_ </span>=&gt; (State::Ground, Action::InvalidSequence),
             },
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="utf8parse" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="utf8parse" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

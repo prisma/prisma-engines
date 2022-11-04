@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_repr-0.1.9/src/parse.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_repr/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../serde_repr/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serde_repr/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_repr-0.1.9/src/parse.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_repr/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../serde_repr/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serde_repr/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -112,119 +112,119 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">proc_macro2::Span</span>;
-<span class="kw">use</span> <span class="ident">syn::parse</span>::{<span class="ident">Error</span>, <span class="ident">Parse</span>, <span class="ident">ParseStream</span>, <span class="ident">Parser</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parenthesized</span>, <span class="ident">Data</span>, <span class="ident">DeriveInput</span>, <span class="ident">Fields</span>, <span class="ident">Ident</span>, <span class="ident">Meta</span>, <span class="ident">NestedMeta</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>proc_macro2::Span;
+<span class="kw">use </span>syn::parse::{Error, Parse, ParseStream, Parser, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span>syn::{parenthesized, Data, DeriveInput, Fields, Ident, Meta, NestedMeta};
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Input</span> {
-    <span class="kw">pub</span> <span class="ident">ident</span>: <span class="ident">Ident</span>,
-    <span class="kw">pub</span> <span class="ident">repr</span>: <span class="ident">Ident</span>,
-    <span class="kw">pub</span> <span class="ident">variants</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Variant</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">default_variant</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Variant</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>Input {
+    <span class="kw">pub </span>ident: Ident,
+    <span class="kw">pub </span>repr: Ident,
+    <span class="kw">pub </span>variants: Vec&lt;Variant&gt;,
+    <span class="kw">pub </span>default_variant: <span class="prelude-ty">Option</span>&lt;Variant&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Variant</span> {
-    <span class="kw">pub</span> <span class="ident">ident</span>: <span class="ident">Ident</span>,
-    <span class="kw">pub</span> <span class="ident">attrs</span>: <span class="ident">VariantAttrs</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Variant {
+    <span class="kw">pub </span>ident: Ident,
+    <span class="kw">pub </span>attrs: VariantAttrs,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VariantAttrs</span> {
-    <span class="kw">pub</span> <span class="ident">is_default</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>VariantAttrs {
+    <span class="kw">pub </span>is_default: bool,
 }
 
-<span class="kw">fn</span> <span class="ident">parse_meta</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;mut</span> <span class="ident">VariantAttrs</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Meta::List</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">meta</span> {
-        <span class="kw">for</span> <span class="ident">meta</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">nested</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="ident">path</span>)) <span class="op">=</span> <span class="ident">meta</span> {
-                <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;other&quot;</span>) {
-                    <span class="ident">attrs</span>.<span class="ident">is_default</span> <span class="op">=</span> <span class="bool-val">true</span>;
+<span class="kw">fn </span>parse_meta(attrs: <span class="kw-2">&amp;mut </span>VariantAttrs, meta: <span class="kw-2">&amp;</span>Meta) {
+    <span class="kw">if let </span>Meta::List(value) = meta {
+        <span class="kw">for </span>meta <span class="kw">in </span><span class="kw-2">&amp;</span>value.nested {
+            <span class="kw">if let </span>NestedMeta::Meta(Meta::Path(path)) = meta {
+                <span class="kw">if </span>path.is_ident(<span class="string">&quot;other&quot;</span>) {
+                    attrs.is_default = <span class="bool-val">true</span>;
                 }
             }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_attrs</span>(<span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Variant</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VariantAttrs</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">VariantAttrs</span> { <span class="ident">is_default</span>: <span class="bool-val">false</span> };
-    <span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">attrs</span> {
-        <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;serde&quot;</span>) {
-            <span class="ident">parse_meta</span>(<span class="kw-2">&amp;mut</span> <span class="ident">attrs</span>, <span class="kw-2">&amp;</span><span class="ident">attr</span>.<span class="ident">parse_meta</span>()<span class="question-mark">?</span>);
+<span class="kw">fn </span>parse_attrs(variant: <span class="kw-2">&amp;</span>syn::Variant) -&gt; <span class="prelude-ty">Result</span>&lt;VariantAttrs&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>attrs = VariantAttrs { is_default: <span class="bool-val">false </span>};
+    <span class="kw">for </span>attr <span class="kw">in </span><span class="kw-2">&amp;</span>variant.attrs {
+        <span class="kw">if </span>attr.path.is_ident(<span class="string">&quot;serde&quot;</span>) {
+            parse_meta(<span class="kw-2">&amp;mut </span>attrs, <span class="kw-2">&amp;</span>attr.parse_meta()<span class="question-mark">?</span>);
         }
     }
-    <span class="prelude-val">Ok</span>(<span class="ident">attrs</span>)
+    <span class="prelude-val">Ok</span>(attrs)
 }
 
-<span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Input</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">call_site</span> <span class="op">=</span> <span class="ident">Span::call_site</span>();
-        <span class="kw">let</span> <span class="ident">derive_input</span> <span class="op">=</span> <span class="ident">DeriveInput::parse</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Parse <span class="kw">for </span>Input {
+    <span class="kw">fn </span>parse(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>call_site = Span::call_site();
+        <span class="kw">let </span>derive_input = DeriveInput::parse(input)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">derive_input</span>.<span class="ident">data</span> {
-            <span class="ident">Data::Enum</span>(<span class="ident">data</span>) =&gt; <span class="ident">data</span>,
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">call_site</span>, <span class="string">&quot;input must be an enum&quot;</span>));
+        <span class="kw">let </span>data = <span class="kw">match </span>derive_input.data {
+            Data::Enum(data) =&gt; data,
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(call_site, <span class="string">&quot;input must be an enum&quot;</span>));
             }
         };
 
-        <span class="kw">let</span> <span class="ident">variants</span> <span class="op">=</span> <span class="ident">data</span>
-            .<span class="ident">variants</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">variant</span>.<span class="ident">fields</span> {
-                <span class="ident">Fields::Unit</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">parse_attrs</span>(<span class="kw-2">&amp;</span><span class="ident">variant</span>)<span class="question-mark">?</span>;
-                    <span class="prelude-val">Ok</span>(<span class="ident">Variant</span> {
-                        <span class="ident">ident</span>: <span class="ident">variant</span>.<span class="ident">ident</span>,
-                        <span class="ident">attrs</span>,
+        <span class="kw">let </span>variants = data
+            .variants
+            .into_iter()
+            .map(|variant| <span class="kw">match </span>variant.fields {
+                Fields::Unit =&gt; {
+                    <span class="kw">let </span>attrs = parse_attrs(<span class="kw-2">&amp;</span>variant)<span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(Variant {
+                        ident: variant.ident,
+                        attrs,
                     })
                 }
-                <span class="ident">Fields::Named</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Fields::Unnamed</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">variant</span>.<span class="ident">ident</span>.<span class="ident">span</span>(), <span class="string">&quot;must be a unit variant&quot;</span>))
+                Fields::Named(<span class="kw">_</span>) | Fields::Unnamed(<span class="kw">_</span>) =&gt; {
+                    <span class="prelude-val">Err</span>(Error::new(variant.ident.span(), <span class="string">&quot;must be a unit variant&quot;</span>))
                 }
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Variant</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;Variant&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">variants</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">call_site</span>, <span class="string">&quot;there must be at least one variant&quot;</span>));
+        <span class="kw">if </span>variants.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(call_site, <span class="string">&quot;there must be at least one variant&quot;</span>));
         }
 
-        <span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="ident">derive_input</span>.<span class="ident">generics</span>;
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">generics</span>.<span class="ident">params</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">generics</span>.<span class="ident">where_clause</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">call_site</span>, <span class="string">&quot;generic enum is not supported&quot;</span>));
+        <span class="kw">let </span>generics = derive_input.generics;
+        <span class="kw">if </span>!generics.params.is_empty() || generics.where_clause.is_some() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(call_site, <span class="string">&quot;generic enum is not supported&quot;</span>));
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">repr</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="ident">derive_input</span>.<span class="ident">attrs</span> {
-            <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;repr&quot;</span>) {
-                <span class="kw">fn</span> <span class="ident">repr_arg</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">content</span>;
-                    <span class="macro">parenthesized!</span>(<span class="ident">content</span> <span class="kw">in</span> <span class="ident">input</span>);
-                    <span class="ident">content</span>.<span class="ident">parse</span>()
+        <span class="kw">let </span><span class="kw-2">mut </span>repr = <span class="prelude-val">None</span>;
+        <span class="kw">for </span>attr <span class="kw">in </span>derive_input.attrs {
+            <span class="kw">if </span>attr.path.is_ident(<span class="string">&quot;repr&quot;</span>) {
+                <span class="kw">fn </span>repr_arg(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;Ident&gt; {
+                    <span class="kw">let </span>content;
+                    <span class="macro">parenthesized!</span>(content <span class="kw">in </span>input);
+                    content.parse()
                 }
-                <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">repr_arg</span>.<span class="ident">parse2</span>(<span class="ident">attr</span>.<span class="ident">tokens</span>)<span class="question-mark">?</span>;
-                <span class="ident">repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ty</span>);
+                <span class="kw">let </span>ty = repr_arg.parse2(attr.tokens)<span class="question-mark">?</span>;
+                repr = <span class="prelude-val">Some</span>(ty);
                 <span class="kw">break</span>;
             }
         }
-        <span class="kw">let</span> <span class="ident">repr</span> <span class="op">=</span> <span class="ident">repr</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::new</span>(<span class="ident">call_site</span>, <span class="string">&quot;missing #[repr(...)] attribute&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>repr = repr.ok_or_else(|| Error::new(call_site, <span class="string">&quot;missing #[repr(...)] attribute&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">default_variants</span> <span class="op">=</span> <span class="ident">variants</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">attrs</span>.<span class="ident">is_default</span>);
-        <span class="kw">let</span> <span class="ident">default_variant</span> <span class="op">=</span> <span class="ident">default_variants</span>.<span class="ident">next</span>().<span class="ident">cloned</span>();
-        <span class="kw">if</span> <span class="ident">default_variants</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
-                <span class="ident">call_site</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>default_variants = variants.iter().filter(|x| x.attrs.is_default);
+        <span class="kw">let </span>default_variant = default_variants.next().cloned();
+        <span class="kw">if </span>default_variants.next().is_some() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
+                call_site,
                 <span class="string">&quot;only one variant can be #[serde(other)]&quot;</span>,
             ));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Input</span> {
-            <span class="ident">ident</span>: <span class="ident">derive_input</span>.<span class="ident">ident</span>,
-            <span class="ident">repr</span>,
-            <span class="ident">variants</span>,
-            <span class="ident">default_variant</span>,
+        <span class="prelude-val">Ok</span>(Input {
+            ident: derive_input.ident,
+            repr,
+            variants,
+            default_variant,
         })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_repr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_repr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

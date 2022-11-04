@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.41/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.41/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -368,375 +368,375 @@
 <span id="368">368</span>
 <span id="369">369</span>
 <span id="370">370</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Errors returned by OpenSSL library.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! OpenSSL errors are stored in an `ErrorStack`.  Most methods in the crate</span>
-<span class="doccomment">//! returns a `Result&lt;T, ErrorStack&gt;` type.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use openssl::error::ErrorStack;</span>
-<span class="doccomment">//! use openssl::bn::BigNum;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let an_error = BigNum::from_dec_str(&quot;Cannot parse letters&quot;);</span>
-<span class="doccomment">//! match an_error {</span>
-<span class="doccomment">//!     Ok(_)  =&gt; (),</span>
-<span class="doccomment">//!     Err(e) =&gt; println!(&quot;Parsing Error: {:?}&quot;, e),</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="kw">use</span> <span class="ident">cfg_if::cfg_if</span>;
-<span class="kw">use</span> <span class="ident">libc</span>::{<span class="ident">c_char</span>, <span class="ident">c_int</span>, <span class="ident">c_ulong</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::error</span>;
-<span class="kw">use</span> <span class="ident">std::ffi::CStr</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
-<span class="kw">use</span> <span class="ident">std::str</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Errors returned by OpenSSL library.
+//!
+//! OpenSSL errors are stored in an `ErrorStack`.  Most methods in the crate
+//! returns a `Result&lt;T, ErrorStack&gt;` type.
+//!
+//! # Examples
+//!
+//! ```
+//! use openssl::error::ErrorStack;
+//! use openssl::bn::BigNum;
+//!
+//! let an_error = BigNum::from_dec_str(&quot;Cannot parse letters&quot;);
+//! match an_error {
+//!     Ok(_)  =&gt; (),
+//!     Err(e) =&gt; println!(&quot;Parsing Error: {:?}&quot;, e),
+//! }
+//! ```
+</span><span class="kw">use </span>cfg_if::cfg_if;
+<span class="kw">use </span>libc::{c_char, c_int, c_ulong};
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::error;
+<span class="kw">use </span>std::ffi::CStr;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::ptr;
+<span class="kw">use </span>std::str;
 
-<span class="doccomment">/// Collection of [`Error`]s from OpenSSL.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Error`]: struct.Error.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ErrorStack</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Collection of [`Error`]s from OpenSSL.
+///
+/// [`Error`]: struct.Error.html
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>ErrorStack(Vec&lt;Error&gt;);
 
-<span class="kw">impl</span> <span class="ident">ErrorStack</span> {
-    <span class="doccomment">/// Returns the contents of the OpenSSL error stack.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="ident">ErrorStack</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">Error::get</span>() {
-            <span class="ident">vec</span>.<span class="ident">push</span>(<span class="ident">err</span>);
+<span class="kw">impl </span>ErrorStack {
+    <span class="doccomment">/// Returns the contents of the OpenSSL error stack.
+    </span><span class="kw">pub fn </span>get() -&gt; ErrorStack {
+        <span class="kw">let </span><span class="kw-2">mut </span>vec = <span class="macro">vec!</span>[];
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(err) = Error::get() {
+            vec.push(err);
         }
-        <span class="ident">ErrorStack</span>(<span class="ident">vec</span>)
+        ErrorStack(vec)
     }
 
-    <span class="doccomment">/// Pushes the errors back onto the OpenSSL error stack.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">for</span> <span class="ident">error</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">errors</span>() {
-            <span class="ident">error</span>.<span class="ident">put</span>();
+    <span class="doccomment">/// Pushes the errors back onto the OpenSSL error stack.
+    </span><span class="kw">pub fn </span>put(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">for </span>error <span class="kw">in </span><span class="self">self</span>.errors() {
+            error.put();
         }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ErrorStack</span> {
-    <span class="doccomment">/// Returns the errors in the stack.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">errors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Error</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ErrorStack</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;OpenSSL error&quot;</span>);
+<span class="kw">impl </span>ErrorStack {
+    <span class="doccomment">/// Returns the errors in the stack.
+    </span><span class="kw">pub fn </span>errors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Error] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ErrorStack {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">if </span><span class="self">self</span>.<span class="number">0</span>.is_empty() {
+            <span class="kw">return </span>fmt.write_str(<span class="string">&quot;OpenSSL error&quot;</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">for</span> <span class="ident">err</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">first</span> {
-                <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
+        <span class="kw">for </span>err <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            <span class="kw">if </span>!first {
+                fmt.write_str(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
             }
-            <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>)<span class="question-mark">?</span>;
-            <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, err)<span class="question-mark">?</span>;
+            first = <span class="bool-val">false</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">ErrorStack</span> {}
+<span class="kw">impl </span>error::Error <span class="kw">for </span>ErrorStack {}
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ErrorStack</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">io::Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ErrorStack</span>) -&gt; <span class="ident">io::Error</span> {
-        <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="ident">e</span>)
+<span class="kw">impl </span>From&lt;ErrorStack&gt; <span class="kw">for </span>io::Error {
+    <span class="kw">fn </span>from(e: ErrorStack) -&gt; io::Error {
+        io::Error::new(io::ErrorKind::Other, e)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ErrorStack</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">fmt::Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">ErrorStack</span>) -&gt; <span class="ident">fmt::Error</span> {
-        <span class="ident">fmt::Error</span>
+<span class="kw">impl </span>From&lt;ErrorStack&gt; <span class="kw">for </span>fmt::Error {
+    <span class="kw">fn </span>from(<span class="kw">_</span>: ErrorStack) -&gt; fmt::Error {
+        fmt::Error
     }
 }
 
-<span class="doccomment">/// An error reported from OpenSSL.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Error</span> {
-    <span class="ident">code</span>: <span class="ident">c_ulong</span>,
-    <span class="ident">file</span>: <span class="ident">ShimStr</span>,
-    <span class="ident">line</span>: <span class="ident">c_int</span>,
-    <span class="ident">func</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShimStr</span><span class="op">&gt;</span>,
-    <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An error reported from OpenSSL.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Error {
+    code: c_ulong,
+    file: ShimStr,
+    line: c_int,
+    func: <span class="prelude-ty">Option</span>&lt;ShimStr&gt;,
+    data: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Error</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+<span class="kw">unsafe impl </span>Sync <span class="kw">for </span>Error {}
+<span class="kw">unsafe impl </span>Send <span class="kw">for </span>Error {}
 
-<span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// Returns the first error on the OpenSSL error stack.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::init</span>();
+<span class="kw">impl </span>Error {
+    <span class="doccomment">/// Returns the first error on the OpenSSL error stack.
+    </span><span class="kw">pub fn </span>get() -&gt; <span class="prelude-ty">Option</span>&lt;Error&gt; {
+        <span class="kw">unsafe </span>{
+            ffi::init();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">line</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flags</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">match</span> <span class="ident">ERR_get_error_all</span>(<span class="kw-2">&amp;mut</span> <span class="ident">file</span>, <span class="kw-2">&amp;mut</span> <span class="ident">line</span>, <span class="kw-2">&amp;mut</span> <span class="ident">func</span>, <span class="kw-2">&amp;mut</span> <span class="ident">data</span>, <span class="kw-2">&amp;mut</span> <span class="ident">flags</span>) {
-                <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
-                <span class="ident">code</span> =&gt; {
-                    <span class="comment">// The memory referenced by data is only valid until that slot is overwritten</span>
-                    <span class="comment">// in the error stack, so we&#39;ll need to copy it off if it&#39;s dynamic</span>
-                    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">ffi::ERR_TXT_STRING</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">CStr::from_ptr</span>(<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>).<span class="ident">to_bytes</span>();
-                        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">str::from_utf8</span>(<span class="ident">bytes</span>).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">ffi::ERR_TXT_MALLOCED</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                            <span class="ident">Cow::Owned</span>(<span class="ident">data</span>.<span class="ident">to_string</span>())
-                        } <span class="kw">else</span> {
-                            <span class="ident">Cow::Borrowed</span>(<span class="ident">data</span>)
+            <span class="kw">let </span><span class="kw-2">mut </span>file = ptr::null();
+            <span class="kw">let </span><span class="kw-2">mut </span>line = <span class="number">0</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>func = ptr::null();
+            <span class="kw">let </span><span class="kw-2">mut </span>data = ptr::null();
+            <span class="kw">let </span><span class="kw-2">mut </span>flags = <span class="number">0</span>;
+            <span class="kw">match </span>ERR_get_error_all(<span class="kw-2">&amp;mut </span>file, <span class="kw-2">&amp;mut </span>line, <span class="kw-2">&amp;mut </span>func, <span class="kw-2">&amp;mut </span>data, <span class="kw-2">&amp;mut </span>flags) {
+                <span class="number">0 </span>=&gt; <span class="prelude-val">None</span>,
+                code =&gt; {
+                    <span class="comment">// The memory referenced by data is only valid until that slot is overwritten
+                    // in the error stack, so we&#39;ll need to copy it off if it&#39;s dynamic
+                    </span><span class="kw">let </span>data = <span class="kw">if </span>flags &amp; ffi::ERR_TXT_STRING != <span class="number">0 </span>{
+                        <span class="kw">let </span>bytes = CStr::from_ptr(data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>).to_bytes();
+                        <span class="kw">let </span>data = str::from_utf8(bytes).unwrap();
+                        <span class="kw">let </span>data = <span class="kw">if </span>flags &amp; ffi::ERR_TXT_MALLOCED != <span class="number">0 </span>{
+                            Cow::Owned(data.to_string())
+                        } <span class="kw">else </span>{
+                            Cow::Borrowed(data)
                         };
-                        <span class="prelude-val">Some</span>(<span class="ident">data</span>)
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">None</span>
+                        <span class="prelude-val">Some</span>(data)
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">None
+                    </span>};
+
+                    <span class="kw">let </span>file = ShimStr::new(file);
+
+                    <span class="kw">let </span>func = <span class="kw">if </span>func.is_null() {
+                        <span class="prelude-val">None
+                    </span>} <span class="kw">else </span>{
+                        <span class="prelude-val">Some</span>(ShimStr::new(func))
                     };
 
-                    <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">ShimStr::new</span>(<span class="ident">file</span>);
-
-                    <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">func</span>.<span class="ident">is_null</span>() {
-                        <span class="prelude-val">None</span>
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">ShimStr::new</span>(<span class="ident">func</span>))
-                    };
-
-                    <span class="prelude-val">Some</span>(<span class="ident">Error</span> {
-                        <span class="ident">code</span>,
-                        <span class="ident">file</span>,
-                        <span class="ident">line</span>,
-                        <span class="ident">func</span>,
-                        <span class="ident">data</span>,
+                    <span class="prelude-val">Some</span>(Error {
+                        code,
+                        file,
+                        line,
+                        func,
+                        data,
                     })
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Pushes the error back onto the OpenSSL error stack.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">put_error</span>();
+    <span class="doccomment">/// Pushes the error back onto the OpenSSL error stack.
+    </span><span class="kw">pub fn </span>put(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.put_error();
 
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">data</span>)) =&gt; <span class="prelude-val">Some</span>((<span class="ident">data</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_char</span>, <span class="number">0</span>)),
-                <span class="prelude-val">Some</span>(<span class="ident">Cow::Owned</span>(<span class="kw-2">ref</span> <span class="ident">data</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ffi::CRYPTO_malloc</span>(
-                        (<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="kw">_</span>,
-                        <span class="macro">concat!</span>(<span class="macro">file!</span>(), <span class="string">&quot;\0&quot;</span>).<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>,
-                        <span class="macro">line!</span>() <span class="kw">as</span> <span class="kw">_</span>,
-                    ) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_char</span>;
-                    <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
-                        <span class="prelude-val">None</span>
-                    } <span class="kw">else</span> {
-                        <span class="ident">ptr::copy_nonoverlapping</span>(<span class="ident">data</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">data</span>.<span class="ident">len</span>());
-                        <span class="kw-2">*</span><span class="ident">ptr</span>.<span class="ident">add</span>(<span class="ident">data</span>.<span class="ident">len</span>()) <span class="op">=</span> <span class="number">0</span>;
-                        <span class="prelude-val">Some</span>((<span class="ident">ptr</span>, <span class="ident">ffi::ERR_TXT_MALLOCED</span>))
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>data = <span class="kw">match </span><span class="self">self</span>.data {
+                <span class="prelude-val">Some</span>(Cow::Borrowed(data)) =&gt; <span class="prelude-val">Some</span>((data.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>c_char, <span class="number">0</span>)),
+                <span class="prelude-val">Some</span>(Cow::Owned(<span class="kw-2">ref </span>data)) =&gt; {
+                    <span class="kw">let </span>ptr = ffi::CRYPTO_malloc(
+                        (data.len() + <span class="number">1</span>) <span class="kw">as _</span>,
+                        <span class="macro">concat!</span>(<span class="macro">file!</span>(), <span class="string">&quot;\0&quot;</span>).as_ptr() <span class="kw">as _</span>,
+                        <span class="macro">line!</span>() <span class="kw">as _</span>,
+                    ) <span class="kw">as </span><span class="kw-2">*mut </span>c_char;
+                    <span class="kw">if </span>ptr.is_null() {
+                        <span class="prelude-val">None
+                    </span>} <span class="kw">else </span>{
+                        ptr::copy_nonoverlapping(data.as_ptr(), ptr <span class="kw">as </span><span class="kw-2">*mut </span>u8, data.len());
+                        <span class="kw-2">*</span>ptr.add(data.len()) = <span class="number">0</span>;
+                        <span class="prelude-val">Some</span>((ptr, ffi::ERR_TXT_MALLOCED))
                     }
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
             };
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">ptr</span>, <span class="ident">flags</span>)) <span class="op">=</span> <span class="ident">data</span> {
-                <span class="ident">ffi::ERR_set_error_data</span>(<span class="ident">ptr</span>, <span class="ident">flags</span> <span class="op">|</span> <span class="ident">ffi::ERR_TXT_STRING</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>((ptr, flags)) = data {
+                ffi::ERR_set_error_data(ptr, flags | ffi::ERR_TXT_STRING);
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl300</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">put_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::ERR_new</span>();
-            <span class="ident">ffi::ERR_set_debug</span>(
-                <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">as_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">line</span>,
-                <span class="self">self</span>.<span class="ident">func</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="ident">ptr::null</span>(), <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_ptr</span>()),
+    <span class="attribute">#[cfg(ossl300)]
+    </span><span class="kw">fn </span>put_error(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            ffi::ERR_new();
+            ffi::ERR_set_debug(
+                <span class="self">self</span>.file.as_ptr(),
+                <span class="self">self</span>.line,
+                <span class="self">self</span>.func.as_ref().map_or(ptr::null(), |s| s.as_ptr()),
             );
-            <span class="ident">ffi::ERR_set_error</span>(
-                <span class="ident">ffi::ERR_GET_LIB</span>(<span class="self">self</span>.<span class="ident">code</span>),
-                <span class="ident">ffi::ERR_GET_REASON</span>(<span class="self">self</span>.<span class="ident">code</span>),
-                <span class="ident">ptr::null</span>(),
-            );
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">ossl300</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">put_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::ERR_put_error</span>(
-                <span class="ident">ffi::ERR_GET_LIB</span>(<span class="self">self</span>.<span class="ident">code</span>),
-                <span class="ident">ffi::ERR_GET_FUNC</span>(<span class="self">self</span>.<span class="ident">code</span>),
-                <span class="ident">ffi::ERR_GET_REASON</span>(<span class="self">self</span>.<span class="ident">code</span>),
-                <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">as_ptr</span>(),
-                <span class="self">self</span>.<span class="ident">line</span>,
+            ffi::ERR_set_error(
+                ffi::ERR_GET_LIB(<span class="self">self</span>.code),
+                ffi::ERR_GET_REASON(<span class="self">self</span>.code),
+                ptr::null(),
             );
         }
     }
 
-    <span class="doccomment">/// Returns the raw OpenSSL error code for this error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">c_ulong</span> {
-        <span class="self">self</span>.<span class="ident">code</span>
+    <span class="attribute">#[cfg(not(ossl300))]
+    </span><span class="kw">fn </span>put_error(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            ffi::ERR_put_error(
+                ffi::ERR_GET_LIB(<span class="self">self</span>.code),
+                ffi::ERR_GET_FUNC(<span class="self">self</span>.code),
+                ffi::ERR_GET_REASON(<span class="self">self</span>.code),
+                <span class="self">self</span>.file.as_ptr(),
+                <span class="self">self</span>.line,
+            );
+        }
     }
 
-    <span class="doccomment">/// Returns the name of the library reporting the error, if available.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">library</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">cstr</span> <span class="op">=</span> <span class="ident">ffi::ERR_lib_error_string</span>(<span class="self">self</span>.<span class="ident">code</span>);
-            <span class="kw">if</span> <span class="ident">cstr</span>.<span class="ident">is_null</span>() {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Returns the raw OpenSSL error code for this error.
+    </span><span class="kw">pub fn </span>code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; c_ulong {
+        <span class="self">self</span>.code
+    }
+
+    <span class="doccomment">/// Returns the name of the library reporting the error, if available.
+    </span><span class="kw">pub fn </span>library(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>cstr = ffi::ERR_lib_error_string(<span class="self">self</span>.code);
+            <span class="kw">if </span>cstr.is_null() {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
-            <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">CStr::from_ptr</span>(<span class="ident">cstr</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>).<span class="ident">to_bytes</span>();
-            <span class="prelude-val">Some</span>(<span class="ident">str::from_utf8</span>(<span class="ident">bytes</span>).<span class="ident">unwrap</span>())
+            <span class="kw">let </span>bytes = CStr::from_ptr(cstr <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>).to_bytes();
+            <span class="prelude-val">Some</span>(str::from_utf8(bytes).unwrap())
         }
     }
 
-    <span class="doccomment">/// Returns the name of the function reporting the error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">function</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RetStr</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">func</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>())
+    <span class="doccomment">/// Returns the name of the function reporting the error.
+    </span><span class="kw">pub fn </span>function(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RetStr&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.func.as_ref().map(|s| s.as_str())
     }
 
-    <span class="doccomment">/// Returns the reason for the error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reason</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">cstr</span> <span class="op">=</span> <span class="ident">ffi::ERR_reason_error_string</span>(<span class="self">self</span>.<span class="ident">code</span>);
-            <span class="kw">if</span> <span class="ident">cstr</span>.<span class="ident">is_null</span>() {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Returns the reason for the error.
+    </span><span class="kw">pub fn </span>reason(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>cstr = ffi::ERR_reason_error_string(<span class="self">self</span>.code);
+            <span class="kw">if </span>cstr.is_null() {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
-            <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">CStr::from_ptr</span>(<span class="ident">cstr</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>).<span class="ident">to_bytes</span>();
-            <span class="prelude-val">Some</span>(<span class="ident">str::from_utf8</span>(<span class="ident">bytes</span>).<span class="ident">unwrap</span>())
+            <span class="kw">let </span>bytes = CStr::from_ptr(cstr <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>).to_bytes();
+            <span class="prelude-val">Some</span>(str::from_utf8(bytes).unwrap())
         }
     }
 
-    <span class="doccomment">/// Returns the name of the source file which encountered the error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RetStr</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">as_str</span>()
+    <span class="doccomment">/// Returns the name of the source file which encountered the error.
+    </span><span class="kw">pub fn </span>file(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RetStr&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.file.as_str()
     }
 
-    <span class="doccomment">/// Returns the line in the source file which encountered the error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">line</span> <span class="kw">as</span> <span class="ident">u32</span>
+    <span class="doccomment">/// Returns the line in the source file which encountered the error.
+    </span><span class="kw">pub fn </span>line(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.line <span class="kw">as </span>u32
     }
 
-    <span class="doccomment">/// Returns additional data describing the error.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::option_as_ref_deref</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>)
+    <span class="doccomment">/// Returns additional data describing the error.
+    </span><span class="attribute">#[allow(clippy::option_as_ref_deref)]
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.data.as_ref().map(|s| <span class="kw-2">&amp;**</span>s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Error&quot;</span>);
-        <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;code&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">code</span>());
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">library</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">library</span>() {
-            <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;library&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">library</span>);
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = fmt.debug_struct(<span class="string">&quot;Error&quot;</span>);
+        builder.field(<span class="string">&quot;code&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.code());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(library) = <span class="self">self</span>.library() {
+            builder.field(<span class="string">&quot;library&quot;</span>, <span class="kw-2">&amp;</span>library);
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">function</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">function</span>() {
-            <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;function&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">function</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(function) = <span class="self">self</span>.function() {
+            builder.field(<span class="string">&quot;function&quot;</span>, <span class="kw-2">&amp;</span>function);
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">reason</span>() {
-            <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;reason&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">reason</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(reason) = <span class="self">self</span>.reason() {
+            builder.field(<span class="string">&quot;reason&quot;</span>, <span class="kw-2">&amp;</span>reason);
         }
-        <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;file&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">file</span>());
-        <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;line&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">line</span>());
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>() {
-            <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;data&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">data</span>);
+        builder.field(<span class="string">&quot;file&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.file());
+        builder.field(<span class="string">&quot;line&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.line());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = <span class="self">self</span>.data() {
+            builder.field(<span class="string">&quot;data&quot;</span>, <span class="kw-2">&amp;</span>data);
         }
-        <span class="ident">builder</span>.<span class="ident">finish</span>()
+        builder.finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;error:{:08X}&quot;</span>, <span class="self">self</span>.<span class="ident">code</span>())<span class="question-mark">?</span>;
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">library</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">l</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;:{}&quot;</span>, <span class="ident">l</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;:lib({})&quot;</span>, <span class="ident">ffi::ERR_GET_LIB</span>(<span class="self">self</span>.<span class="ident">code</span>()))<span class="question-mark">?</span>,
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(fmt, <span class="string">&quot;error:{:08X}&quot;</span>, <span class="self">self</span>.code())<span class="question-mark">?</span>;
+        <span class="kw">match </span><span class="self">self</span>.library() {
+            <span class="prelude-val">Some</span>(l) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:{}&quot;</span>, l)<span class="question-mark">?</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:lib({})&quot;</span>, ffi::ERR_GET_LIB(<span class="self">self</span>.code()))<span class="question-mark">?</span>,
         }
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">function</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">f</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;:{}&quot;</span>, <span class="ident">f</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;:func({})&quot;</span>, <span class="ident">ffi::ERR_GET_FUNC</span>(<span class="self">self</span>.<span class="ident">code</span>()))<span class="question-mark">?</span>,
+        <span class="kw">match </span><span class="self">self</span>.function() {
+            <span class="prelude-val">Some</span>(f) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:{}&quot;</span>, f)<span class="question-mark">?</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:func({})&quot;</span>, ffi::ERR_GET_FUNC(<span class="self">self</span>.code()))<span class="question-mark">?</span>,
         }
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">reason</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;:{}&quot;</span>, <span class="ident">r</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;:reason({})&quot;</span>, <span class="ident">ffi::ERR_GET_REASON</span>(<span class="self">self</span>.<span class="ident">code</span>()))<span class="question-mark">?</span>,
+        <span class="kw">match </span><span class="self">self</span>.reason() {
+            <span class="prelude-val">Some</span>(r) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:{}&quot;</span>, r)<span class="question-mark">?</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:reason({})&quot;</span>, ffi::ERR_GET_REASON(<span class="self">self</span>.code()))<span class="question-mark">?</span>,
         }
         <span class="macro">write!</span>(
-            <span class="ident">fmt</span>,
+            fmt,
             <span class="string">&quot;:{}:{}:{}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">file</span>(),
-            <span class="self">self</span>.<span class="ident">line</span>(),
-            <span class="self">self</span>.<span class="ident">data</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>)
+            <span class="self">self</span>.file(),
+            <span class="self">self</span>.line(),
+            <span class="self">self</span>.data().unwrap_or(<span class="string">&quot;&quot;</span>)
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+<span class="kw">impl </span>error::Error <span class="kw">for </span>Error {}
 
-<span class="macro">cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl300</span>)]</span> {
-        <span class="kw">use</span> <span class="ident">std::ffi</span>::{<span class="ident">CString</span>};
-        <span class="kw">use</span> <span class="ident">ffi::ERR_get_error_all</span>;
+<span class="macro">cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(ossl300)] </span>{
+        <span class="kw">use </span>std::ffi::{CString};
+        <span class="kw">use </span>ffi::ERR_get_error_all;
 
-        <span class="kw">type</span> <span class="ident">RetStr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>;
+        <span class="kw">type </span>RetStr&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str;
 
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">ShimStr</span>(<span class="ident">CString</span>);
+        <span class="attribute">#[derive(Clone)]
+        </span><span class="kw">struct </span>ShimStr(CString);
 
-        <span class="kw">impl</span> <span class="ident">ShimStr</span> {
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">s</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>) -&gt; <span class="self">Self</span> {
-                <span class="ident">ShimStr</span>(<span class="ident">CStr::from_ptr</span>(<span class="ident">s</span>).<span class="ident">to_owned</span>())
+        <span class="kw">impl </span>ShimStr {
+            <span class="kw">unsafe fn </span>new(s: <span class="kw-2">*const </span>c_char) -&gt; <span class="self">Self </span>{
+                ShimStr(CStr::from_ptr(s).to_owned())
             }
 
-            <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">c_char</span> {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ptr</span>()
+            <span class="kw">fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>c_char {
+                <span class="self">self</span>.<span class="number">0</span>.as_ptr()
             }
 
-            <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_str</span>().<span class="ident">unwrap</span>()
+            <span class="kw">fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+                <span class="self">self</span>.<span class="number">0</span>.to_str().unwrap()
             }
         }
-    } <span class="kw">else</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bad_style</span>)]</span>
-        <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">ERR_get_error_all</span>(
-            <span class="ident">file</span>: <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>,
-            <span class="ident">line</span>: <span class="kw-2">*mut</span> <span class="ident">c_int</span>,
-            <span class="ident">func</span>: <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>,
-            <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>,
-            <span class="ident">flags</span>: <span class="kw-2">*mut</span> <span class="ident">c_int</span>,
-        ) -&gt; <span class="ident">c_ulong</span> {
-            <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">ffi::ERR_get_error_line_data</span>(<span class="ident">file</span>, <span class="ident">line</span>, <span class="ident">data</span>, <span class="ident">flags</span>);
-            <span class="kw-2">*</span><span class="ident">func</span> <span class="op">=</span> <span class="ident">ffi::ERR_func_error_string</span>(<span class="ident">code</span>);
-            <span class="ident">code</span>
+    } <span class="kw">else </span>{
+        <span class="attribute">#[allow(bad_style)]
+        </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>ERR_get_error_all(
+            file: <span class="kw-2">*mut *const </span>c_char,
+            line: <span class="kw-2">*mut </span>c_int,
+            func: <span class="kw-2">*mut *const </span>c_char,
+            data: <span class="kw-2">*mut *const </span>c_char,
+            flags: <span class="kw-2">*mut </span>c_int,
+        ) -&gt; c_ulong {
+            <span class="kw">let </span>code = ffi::ERR_get_error_line_data(file, line, data, flags);
+            <span class="kw-2">*</span>func = ffi::ERR_func_error_string(code);
+            code
         }
 
-        <span class="kw">type</span> <span class="ident">RetStr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+        <span class="kw">type </span>RetStr&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
 
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">ShimStr</span>(<span class="kw-2">*const</span> <span class="ident">c_char</span>);
+        <span class="attribute">#[derive(Clone)]
+        </span><span class="kw">struct </span>ShimStr(<span class="kw-2">*const </span>c_char);
 
-        <span class="kw">impl</span> <span class="ident">ShimStr</span> {
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">s</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>) -&gt; <span class="self">Self</span> {
-                <span class="ident">ShimStr</span>(<span class="ident">s</span>)
+        <span class="kw">impl </span>ShimStr {
+            <span class="kw">unsafe fn </span>new(s: <span class="kw-2">*const </span>c_char) -&gt; <span class="self">Self </span>{
+                ShimStr(s)
             }
 
-            <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">c_char</span> {
-                <span class="self">self</span>.<span class="number">0</span>
-            }
+            <span class="kw">fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>c_char {
+                <span class="self">self</span>.<span class="number">0
+            </span>}
 
-            <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-                <span class="kw">unsafe</span> {
-                    <span class="ident">CStr::from_ptr</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">to_str</span>().<span class="ident">unwrap</span>()
+            <span class="kw">fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+                <span class="kw">unsafe </span>{
+                    CStr::from_ptr(<span class="self">self</span>.<span class="number">0</span>).to_str().unwrap()
                 }
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="openssl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="openssl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bytes-1.2.1/src/bytes.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bytes.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bytes/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bytes/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bytes/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bytes-1.2.1/src/bytes.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bytes.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bytes/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bytes/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bytes/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1274,1281 +1274,1281 @@
 <span id="1274">1274</span>
 <span id="1275">1275</span>
 <span id="1276">1276</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::iter::FromIterator</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Deref</span>, <span class="ident">RangeBounds</span>};
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">cmp</span>, <span class="ident">fmt</span>, <span class="ident">hash</span>, <span class="ident">mem</span>, <span class="ident">ptr</span>, <span class="ident">slice</span>, <span class="ident">usize</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>core::iter::FromIterator;
+<span class="kw">use </span>core::ops::{Deref, RangeBounds};
+<span class="kw">use </span>core::{cmp, fmt, hash, mem, ptr, slice, usize};
 
-<span class="kw">use</span> <span class="ident">alloc</span>::{
-    <span class="ident">alloc</span>::{<span class="ident">dealloc</span>, <span class="ident">Layout</span>},
-    <span class="ident">borrow::Borrow</span>,
-    <span class="ident">boxed::Box</span>,
-    <span class="ident">string::String</span>,
-    <span class="ident">vec::Vec</span>,
+<span class="kw">use </span>alloc::{
+    alloc::{dealloc, Layout},
+    borrow::Borrow,
+    boxed::Box,
+    string::String,
+    vec::Vec,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::buf::IntoIter</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync::atomic::AtomicMut</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync::atomic</span>::{<span class="ident">AtomicPtr</span>, <span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Buf</span>;
+<span class="kw">use </span><span class="kw">crate</span>::buf::IntoIter;
+<span class="attribute">#[allow(unused)]
+</span><span class="kw">use </span><span class="kw">crate</span>::loom::sync::atomic::AtomicMut;
+<span class="kw">use </span><span class="kw">crate</span>::loom::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
+<span class="kw">use </span><span class="kw">crate</span>::Buf;
 
-<span class="doccomment">/// A cheaply cloneable and sliceable chunk of contiguous memory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Bytes` is an efficient container for storing and operating on contiguous</span>
-<span class="doccomment">/// slices of memory. It is intended for use primarily in networking code, but</span>
-<span class="doccomment">/// could have applications elsewhere as well.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Bytes` values facilitate zero-copy network programming by allowing multiple</span>
-<span class="doccomment">/// `Bytes` objects to point to the same underlying memory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Bytes` does not have a single implementation. It is an interface, whose</span>
-<span class="doccomment">/// exact behavior is implemented through dynamic dispatch in several underlying</span>
-<span class="doccomment">/// implementations of `Bytes`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All `Bytes` implementations must fulfill the following requirements:</span>
-<span class="doccomment">/// - They are cheaply cloneable and thereby shareable between an unlimited amount</span>
-<span class="doccomment">///   of components, for example by modifying a reference count.</span>
-<span class="doccomment">/// - Instances can be sliced to refer to a subset of the the original buffer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use bytes::Bytes;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut mem = Bytes::from(&quot;Hello world&quot;);</span>
-<span class="doccomment">/// let a = mem.slice(0..5);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(a, &quot;Hello&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let b = mem.split_to(6);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(mem, &quot;world&quot;);</span>
-<span class="doccomment">/// assert_eq!(b, &quot;Hello &quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Memory layout</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Bytes` struct itself is fairly small, limited to 4 `usize` fields used</span>
-<span class="doccomment">/// to track information about which segment of the underlying memory the</span>
-<span class="doccomment">/// `Bytes` handle has access to.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Bytes` keeps both a pointer to the shared state containing the full memory</span>
-<span class="doccomment">/// slice and a pointer to the start of the region visible by the handle.</span>
-<span class="doccomment">/// `Bytes` also tracks the length of its view into the memory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Sharing</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Bytes` contains a vtable, which allows implementations of `Bytes` to define</span>
-<span class="doccomment">/// how sharing/cloning is implemented in detail.</span>
-<span class="doccomment">/// When `Bytes::clone()` is called, `Bytes` will call the vtable function for</span>
-<span class="doccomment">/// cloning the backing storage in order to share it behind between multiple</span>
-<span class="doccomment">/// `Bytes` instances.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For `Bytes` implementations which refer to constant memory (e.g. created</span>
-<span class="doccomment">/// via `Bytes::from_static()`) the cloning implementation will be a no-op.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For `Bytes` implementations which point to a reference counted shared storage</span>
-<span class="doccomment">/// (e.g. an `Arc&lt;[u8]&gt;`), sharing will be implemented by increasing the</span>
-<span class="doccomment">/// the reference count.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Due to this mechanism, multiple `Bytes` instances may point to the same</span>
-<span class="doccomment">/// shared memory region.</span>
-<span class="doccomment">/// Each `Bytes` instance can point to different sections within that</span>
-<span class="doccomment">/// memory region, and `Bytes` instances may or may not have overlapping views</span>
-<span class="doccomment">/// into the memory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following diagram visualizes a scenario where 2 `Bytes` instances make</span>
-<span class="doccomment">/// use of an `Arc`-based backing storage, and provide access to different views:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    Arc ptrs                   ┌─────────┐</span>
-<span class="doccomment">///    ________________________ / │ Bytes 2 │</span>
-<span class="doccomment">///   /                           └─────────┘</span>
-<span class="doccomment">///  /          ┌───────────┐     |         |</span>
-<span class="doccomment">/// |_________/ │  Bytes 1  │     |         |</span>
-<span class="doccomment">/// |           └───────────┘     |         |</span>
-<span class="doccomment">/// |           |           | ___/ data     | tail</span>
-<span class="doccomment">/// |      data |      tail |/              |</span>
-<span class="doccomment">/// v           v           v               v</span>
-<span class="doccomment">/// ┌─────┬─────┬───────────┬───────────────┬─────┐</span>
-<span class="doccomment">/// │ Arc │     │           │               │     │</span>
-<span class="doccomment">/// └─────┴─────┴───────────┴───────────────┴─────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Bytes</span> {
-    <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-    <span class="ident">len</span>: <span class="ident">usize</span>,
-    <span class="comment">// inlined &quot;trait object&quot;</span>
-    <span class="ident">data</span>: <span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-    <span class="ident">vtable</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Vtable</span>,
+<span class="doccomment">/// A cheaply cloneable and sliceable chunk of contiguous memory.
+///
+/// `Bytes` is an efficient container for storing and operating on contiguous
+/// slices of memory. It is intended for use primarily in networking code, but
+/// could have applications elsewhere as well.
+///
+/// `Bytes` values facilitate zero-copy network programming by allowing multiple
+/// `Bytes` objects to point to the same underlying memory.
+///
+/// `Bytes` does not have a single implementation. It is an interface, whose
+/// exact behavior is implemented through dynamic dispatch in several underlying
+/// implementations of `Bytes`.
+///
+/// All `Bytes` implementations must fulfill the following requirements:
+/// - They are cheaply cloneable and thereby shareable between an unlimited amount
+///   of components, for example by modifying a reference count.
+/// - Instances can be sliced to refer to a subset of the the original buffer.
+///
+/// ```
+/// use bytes::Bytes;
+///
+/// let mut mem = Bytes::from(&quot;Hello world&quot;);
+/// let a = mem.slice(0..5);
+///
+/// assert_eq!(a, &quot;Hello&quot;);
+///
+/// let b = mem.split_to(6);
+///
+/// assert_eq!(mem, &quot;world&quot;);
+/// assert_eq!(b, &quot;Hello &quot;);
+/// ```
+///
+/// # Memory layout
+///
+/// The `Bytes` struct itself is fairly small, limited to 4 `usize` fields used
+/// to track information about which segment of the underlying memory the
+/// `Bytes` handle has access to.
+///
+/// `Bytes` keeps both a pointer to the shared state containing the full memory
+/// slice and a pointer to the start of the region visible by the handle.
+/// `Bytes` also tracks the length of its view into the memory.
+///
+/// # Sharing
+///
+/// `Bytes` contains a vtable, which allows implementations of `Bytes` to define
+/// how sharing/cloning is implemented in detail.
+/// When `Bytes::clone()` is called, `Bytes` will call the vtable function for
+/// cloning the backing storage in order to share it behind between multiple
+/// `Bytes` instances.
+///
+/// For `Bytes` implementations which refer to constant memory (e.g. created
+/// via `Bytes::from_static()`) the cloning implementation will be a no-op.
+///
+/// For `Bytes` implementations which point to a reference counted shared storage
+/// (e.g. an `Arc&lt;[u8]&gt;`), sharing will be implemented by increasing the
+/// the reference count.
+///
+/// Due to this mechanism, multiple `Bytes` instances may point to the same
+/// shared memory region.
+/// Each `Bytes` instance can point to different sections within that
+/// memory region, and `Bytes` instances may or may not have overlapping views
+/// into the memory.
+///
+/// The following diagram visualizes a scenario where 2 `Bytes` instances make
+/// use of an `Arc`-based backing storage, and provide access to different views:
+///
+/// ```text
+///
+///    Arc ptrs                   ┌─────────┐
+///    ________________________ / │ Bytes 2 │
+///   /                           └─────────┘
+///  /          ┌───────────┐     |         |
+/// |_________/ │  Bytes 1  │     |         |
+/// |           └───────────┘     |         |
+/// |           |           | ___/ data     | tail
+/// |      data |      tail |/              |
+/// v           v           v               v
+/// ┌─────┬─────┬───────────┬───────────────┬─────┐
+/// │ Arc │     │           │               │     │
+/// └─────┴─────┴───────────┴───────────────┴─────┘
+/// ```
+</span><span class="kw">pub struct </span>Bytes {
+    ptr: <span class="kw-2">*const </span>u8,
+    len: usize,
+    <span class="comment">// inlined &quot;trait object&quot;
+    </span>data: AtomicPtr&lt;()&gt;,
+    vtable: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Vtable,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Vtable</span> {
-    <span class="doccomment">/// fn(data, ptr, len)</span>
-    <span class="kw">pub</span> <span class="ident">clone</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">usize</span>) -&gt; <span class="ident">Bytes</span>,
-    <span class="doccomment">/// fn(data, ptr, len)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// takes `Bytes` to value</span>
-    <span class="kw">pub</span> <span class="ident">to_vec</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// fn(data, ptr, len)</span>
-    <span class="kw">pub</span> <span class="ident">drop</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">usize</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Vtable {
+    <span class="doccomment">/// fn(data, ptr, len)
+    </span><span class="kw">pub </span>clone: <span class="kw">unsafe fn</span>(<span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;, <span class="kw-2">*const </span>u8, usize) -&gt; Bytes,
+    <span class="doccomment">/// fn(data, ptr, len)
+    ///
+    /// takes `Bytes` to value
+    </span><span class="kw">pub </span>to_vec: <span class="kw">unsafe fn</span>(<span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;, <span class="kw-2">*const </span>u8, usize) -&gt; Vec&lt;u8&gt;,
+    <span class="doccomment">/// fn(data, ptr, len)
+    </span><span class="kw">pub </span>drop: <span class="kw">unsafe fn</span>(<span class="kw-2">&amp;mut </span>AtomicPtr&lt;()&gt;, <span class="kw-2">*const </span>u8, usize),
 }
 
-<span class="kw">impl</span> <span class="ident">Bytes</span> {
-    <span class="doccomment">/// Creates a new empty `Bytes`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will not allocate and the returned `Bytes` handle will be empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::Bytes;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let b = Bytes::new();</span>
-    <span class="doccomment">/// assert_eq!(&amp;b[..], b&quot;&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">loom</span>, <span class="ident">test</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Bytes</span> {
-        <span class="comment">// Make it a named const to work around</span>
-        <span class="comment">// &quot;unsizing casts are not allowed in const fn&quot;</span>
-        <span class="kw">const</span> <span class="ident">EMPTY</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[];
-        <span class="ident">Bytes::from_static</span>(<span class="ident">EMPTY</span>)
+<span class="kw">impl </span>Bytes {
+    <span class="doccomment">/// Creates a new empty `Bytes`.
+    ///
+    /// This will not allocate and the returned `Bytes` handle will be empty.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::Bytes;
+    ///
+    /// let b = Bytes::new();
+    /// assert_eq!(&amp;b[..], b&quot;&quot;);
+    /// ```
+    </span><span class="attribute">#[inline]
+    #[cfg(not(all(loom, test)))]
+    </span><span class="kw">pub const fn </span>new() -&gt; Bytes {
+        <span class="comment">// Make it a named const to work around
+        // &quot;unsizing casts are not allowed in const fn&quot;
+        </span><span class="kw">const </span>EMPTY: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[];
+        Bytes::from_static(EMPTY)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">loom</span>, <span class="ident">test</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Bytes</span> {
-        <span class="kw">const</span> <span class="ident">EMPTY</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[];
-        <span class="ident">Bytes::from_static</span>(<span class="ident">EMPTY</span>)
+    <span class="attribute">#[cfg(all(loom, test))]
+    </span><span class="kw">pub fn </span>new() -&gt; Bytes {
+        <span class="kw">const </span>EMPTY: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[];
+        Bytes::from_static(EMPTY)
     }
 
-    <span class="doccomment">/// Creates a new `Bytes` from a static slice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned `Bytes` will point directly to the static slice. There is</span>
-    <span class="doccomment">/// no allocating or copying.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::Bytes;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let b = Bytes::from_static(b&quot;hello&quot;);</span>
-    <span class="doccomment">/// assert_eq!(&amp;b[..], b&quot;hello&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">loom</span>, <span class="ident">test</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">Bytes</span> {
-        <span class="ident">Bytes</span> {
-            <span class="ident">ptr</span>: <span class="ident">bytes</span>.<span class="ident">as_ptr</span>(),
-            <span class="ident">len</span>: <span class="ident">bytes</span>.<span class="ident">len</span>(),
-            <span class="ident">data</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()),
-            <span class="ident">vtable</span>: <span class="kw-2">&amp;</span><span class="ident">STATIC_VTABLE</span>,
+    <span class="doccomment">/// Creates a new `Bytes` from a static slice.
+    ///
+    /// The returned `Bytes` will point directly to the static slice. There is
+    /// no allocating or copying.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::Bytes;
+    ///
+    /// let b = Bytes::from_static(b&quot;hello&quot;);
+    /// assert_eq!(&amp;b[..], b&quot;hello&quot;);
+    /// ```
+    </span><span class="attribute">#[inline]
+    #[cfg(not(all(loom, test)))]
+    </span><span class="kw">pub const fn </span>from_static(bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8]) -&gt; Bytes {
+        Bytes {
+            ptr: bytes.as_ptr(),
+            len: bytes.len(),
+            data: AtomicPtr::new(ptr::null_mut()),
+            vtable: <span class="kw-2">&amp;</span>STATIC_VTABLE,
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">loom</span>, <span class="ident">test</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">Bytes</span> {
-        <span class="ident">Bytes</span> {
-            <span class="ident">ptr</span>: <span class="ident">bytes</span>.<span class="ident">as_ptr</span>(),
-            <span class="ident">len</span>: <span class="ident">bytes</span>.<span class="ident">len</span>(),
-            <span class="ident">data</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()),
-            <span class="ident">vtable</span>: <span class="kw-2">&amp;</span><span class="ident">STATIC_VTABLE</span>,
+    <span class="attribute">#[cfg(all(loom, test))]
+    </span><span class="kw">pub fn </span>from_static(bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8]) -&gt; Bytes {
+        Bytes {
+            ptr: bytes.as_ptr(),
+            len: bytes.len(),
+            data: AtomicPtr::new(ptr::null_mut()),
+            vtable: <span class="kw-2">&amp;</span>STATIC_VTABLE,
         }
     }
 
-    <span class="doccomment">/// Returns the number of bytes contained in this `Bytes`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::Bytes;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let b = Bytes::from(&amp;b&quot;hello&quot;[..]);</span>
-    <span class="doccomment">/// assert_eq!(b.len(), 5);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">len</span>
+    <span class="doccomment">/// Returns the number of bytes contained in this `Bytes`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::Bytes;
+    ///
+    /// let b = Bytes::from(&amp;b&quot;hello&quot;[..]);
+    /// assert_eq!(b.len(), 5);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub const fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.len
     }
 
-    <span class="doccomment">/// Returns true if the `Bytes` has a length of 0.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::Bytes;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let b = Bytes::new();</span>
-    <span class="doccomment">/// assert!(b.is_empty());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span>
+    <span class="doccomment">/// Returns true if the `Bytes` has a length of 0.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::Bytes;
+    ///
+    /// let b = Bytes::new();
+    /// assert!(b.is_empty());
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub const fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Creates `Bytes` instance from slice, by copying it.
+    </span><span class="kw">pub fn </span>copy_from_slice(data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
+        data.to_vec().into()
     }
 
-    <span class="doccomment">/// Creates `Bytes` instance from slice, by copying it.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copy_from_slice</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into</span>()
-    }
+    <span class="doccomment">/// Returns a slice of self for the provided range.
+    ///
+    /// This will increment the reference count for the underlying memory and
+    /// return a new `Bytes` handle set to the slice.
+    ///
+    /// This operation is `O(1)`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::Bytes;
+    ///
+    /// let a = Bytes::from(&amp;b&quot;hello world&quot;[..]);
+    /// let b = a.slice(2..5);
+    ///
+    /// assert_eq!(&amp;b[..], b&quot;llo&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// Requires that `begin &lt;= end` and `end &lt;= self.len()`, otherwise slicing
+    /// will panic.
+    </span><span class="kw">pub fn </span>slice(<span class="kw-2">&amp;</span><span class="self">self</span>, range: <span class="kw">impl </span>RangeBounds&lt;usize&gt;) -&gt; Bytes {
+        <span class="kw">use </span>core::ops::Bound;
 
-    <span class="doccomment">/// Returns a slice of self for the provided range.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will increment the reference count for the underlying memory and</span>
-    <span class="doccomment">/// return a new `Bytes` handle set to the slice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operation is `O(1)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::Bytes;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let a = Bytes::from(&amp;b&quot;hello world&quot;[..]);</span>
-    <span class="doccomment">/// let b = a.slice(2..5);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&amp;b[..], b&quot;llo&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires that `begin &lt;= end` and `end &lt;= self.len()`, otherwise slicing</span>
-    <span class="doccomment">/// will panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">Bytes</span> {
-        <span class="kw">use</span> <span class="ident">core::ops::Bound</span>;
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
 
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-
-        <span class="kw">let</span> <span class="ident">begin</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">start_bound</span>() {
-            <span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) =&gt; <span class="ident">n</span>,
-            <span class="ident">Bound::Excluded</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) =&gt; <span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>,
-            <span class="ident">Bound::Unbounded</span> =&gt; <span class="number">0</span>,
+        <span class="kw">let </span>begin = <span class="kw">match </span>range.start_bound() {
+            Bound::Included(<span class="kw-2">&amp;</span>n) =&gt; n,
+            Bound::Excluded(<span class="kw-2">&amp;</span>n) =&gt; n + <span class="number">1</span>,
+            Bound::Unbounded =&gt; <span class="number">0</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">end_bound</span>() {
-            <span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) =&gt; <span class="ident">n</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;out of range&quot;</span>),
-            <span class="ident">Bound::Excluded</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) =&gt; <span class="ident">n</span>,
-            <span class="ident">Bound::Unbounded</span> =&gt; <span class="ident">len</span>,
+        <span class="kw">let </span>end = <span class="kw">match </span>range.end_bound() {
+            Bound::Included(<span class="kw-2">&amp;</span>n) =&gt; n.checked_add(<span class="number">1</span>).expect(<span class="string">&quot;out of range&quot;</span>),
+            Bound::Excluded(<span class="kw-2">&amp;</span>n) =&gt; n,
+            Bound::Unbounded =&gt; len,
         };
 
         <span class="macro">assert!</span>(
-            <span class="ident">begin</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">end</span>,
+            begin &lt;= end,
             <span class="string">&quot;range start must not be greater than end: {:?} &lt;= {:?}&quot;</span>,
-            <span class="ident">begin</span>,
-            <span class="ident">end</span>,
+            begin,
+            end,
         );
         <span class="macro">assert!</span>(
-            <span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">len</span>,
+            end &lt;= len,
             <span class="string">&quot;range end out of bounds: {:?} &lt;= {:?}&quot;</span>,
-            <span class="ident">end</span>,
-            <span class="ident">len</span>,
+            end,
+            len,
         );
 
-        <span class="kw">if</span> <span class="ident">end</span> <span class="op">==</span> <span class="ident">begin</span> {
-            <span class="kw">return</span> <span class="ident">Bytes::new</span>();
+        <span class="kw">if </span>end == begin {
+            <span class="kw">return </span>Bytes::new();
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">self</span>.clone();
 
-        <span class="ident">ret</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">end</span> <span class="op">-</span> <span class="ident">begin</span>;
-        <span class="ident">ret</span>.<span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ret</span>.<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="ident">begin</span>) };
+        ret.len = end - begin;
+        ret.ptr = <span class="kw">unsafe </span>{ ret.ptr.add(begin) };
 
-        <span class="ident">ret</span>
+        ret
     }
 
-    <span class="doccomment">/// Returns a slice of self that is equivalent to the given `subset`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When processing a `Bytes` buffer with other tools, one often gets a</span>
-    <span class="doccomment">/// `&amp;[u8]` which is in fact a slice of the `Bytes`, i.e. a subset of it.</span>
-    <span class="doccomment">/// This function turns that `&amp;[u8]` into another `Bytes`, as if one had</span>
-    <span class="doccomment">/// called `self.slice()` with the offsets that correspond to `subset`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operation is `O(1)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::Bytes;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let bytes = Bytes::from(&amp;b&quot;012345678&quot;[..]);</span>
-    <span class="doccomment">/// let as_slice = bytes.as_ref();</span>
-    <span class="doccomment">/// let subset = &amp;as_slice[2..6];</span>
-    <span class="doccomment">/// let subslice = bytes.slice_ref(&amp;subset);</span>
-    <span class="doccomment">/// assert_eq!(&amp;subslice[..], b&quot;2345&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires that the given `sub` slice is in fact contained within the</span>
-    <span class="doccomment">/// `Bytes` buffer; otherwise this function will panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slice_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">subset</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Bytes</span> {
-        <span class="comment">// Empty slice and empty Bytes may have their pointers reset</span>
-        <span class="comment">// so explicitly allow empty slice to be a subslice of any slice.</span>
-        <span class="kw">if</span> <span class="ident">subset</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="ident">Bytes::new</span>();
+    <span class="doccomment">/// Returns a slice of self that is equivalent to the given `subset`.
+    ///
+    /// When processing a `Bytes` buffer with other tools, one often gets a
+    /// `&amp;[u8]` which is in fact a slice of the `Bytes`, i.e. a subset of it.
+    /// This function turns that `&amp;[u8]` into another `Bytes`, as if one had
+    /// called `self.slice()` with the offsets that correspond to `subset`.
+    ///
+    /// This operation is `O(1)`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::Bytes;
+    ///
+    /// let bytes = Bytes::from(&amp;b&quot;012345678&quot;[..]);
+    /// let as_slice = bytes.as_ref();
+    /// let subset = &amp;as_slice[2..6];
+    /// let subslice = bytes.slice_ref(&amp;subset);
+    /// assert_eq!(&amp;subslice[..], b&quot;2345&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// Requires that the given `sub` slice is in fact contained within the
+    /// `Bytes` buffer; otherwise this function will panic.
+    </span><span class="kw">pub fn </span>slice_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, subset: <span class="kw-2">&amp;</span>[u8]) -&gt; Bytes {
+        <span class="comment">// Empty slice and empty Bytes may have their pointers reset
+        // so explicitly allow empty slice to be a subslice of any slice.
+        </span><span class="kw">if </span>subset.is_empty() {
+            <span class="kw">return </span>Bytes::new();
         }
 
-        <span class="kw">let</span> <span class="ident">bytes_p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">let</span> <span class="ident">bytes_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
+        <span class="kw">let </span>bytes_p = <span class="self">self</span>.as_ptr() <span class="kw">as </span>usize;
+        <span class="kw">let </span>bytes_len = <span class="self">self</span>.len();
 
-        <span class="kw">let</span> <span class="ident">sub_p</span> <span class="op">=</span> <span class="ident">subset</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">let</span> <span class="ident">sub_len</span> <span class="op">=</span> <span class="ident">subset</span>.<span class="ident">len</span>();
+        <span class="kw">let </span>sub_p = subset.as_ptr() <span class="kw">as </span>usize;
+        <span class="kw">let </span>sub_len = subset.len();
 
         <span class="macro">assert!</span>(
-            <span class="ident">sub_p</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">bytes_p</span>,
+            sub_p &gt;= bytes_p,
             <span class="string">&quot;subset pointer ({:p}) is smaller than self pointer ({:p})&quot;</span>,
-            <span class="ident">subset</span>.<span class="ident">as_ptr</span>(),
-            <span class="self">self</span>.<span class="ident">as_ptr</span>(),
+            subset.as_ptr(),
+            <span class="self">self</span>.as_ptr(),
         );
         <span class="macro">assert!</span>(
-            <span class="ident">sub_p</span> <span class="op">+</span> <span class="ident">sub_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bytes_p</span> <span class="op">+</span> <span class="ident">bytes_len</span>,
+            sub_p + sub_len &lt;= bytes_p + bytes_len,
             <span class="string">&quot;subset is out of bounds: self = ({:p}, {}), subset = ({:p}, {})&quot;</span>,
-            <span class="self">self</span>.<span class="ident">as_ptr</span>(),
-            <span class="ident">bytes_len</span>,
-            <span class="ident">subset</span>.<span class="ident">as_ptr</span>(),
-            <span class="ident">sub_len</span>,
+            <span class="self">self</span>.as_ptr(),
+            bytes_len,
+            subset.as_ptr(),
+            sub_len,
         );
 
-        <span class="kw">let</span> <span class="ident">sub_offset</span> <span class="op">=</span> <span class="ident">sub_p</span> <span class="op">-</span> <span class="ident">bytes_p</span>;
+        <span class="kw">let </span>sub_offset = sub_p - bytes_p;
 
-        <span class="self">self</span>.<span class="ident">slice</span>(<span class="ident">sub_offset</span>..(<span class="ident">sub_offset</span> <span class="op">+</span> <span class="ident">sub_len</span>))
+        <span class="self">self</span>.slice(sub_offset..(sub_offset + sub_len))
     }
 
-    <span class="doccomment">/// Splits the bytes into two at the given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Afterwards `self` contains elements `[0, at)`, and the returned `Bytes`</span>
-    <span class="doccomment">/// contains elements `[at, len)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is an `O(1)` operation that just increases the reference count and</span>
-    <span class="doccomment">/// sets a few indices.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::Bytes;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut a = Bytes::from(&amp;b&quot;hello world&quot;[..]);</span>
-    <span class="doccomment">/// let b = a.split_off(5);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&amp;a[..], b&quot;hello&quot;);</span>
-    <span class="doccomment">/// assert_eq!(&amp;b[..], b&quot; world&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `at &gt; len`.</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;consider Bytes::truncate if you don&#39;t need the other half&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_off</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">at</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Bytes</span> {
+    <span class="doccomment">/// Splits the bytes into two at the given index.
+    ///
+    /// Afterwards `self` contains elements `[0, at)`, and the returned `Bytes`
+    /// contains elements `[at, len)`.
+    ///
+    /// This is an `O(1)` operation that just increases the reference count and
+    /// sets a few indices.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::Bytes;
+    ///
+    /// let mut a = Bytes::from(&amp;b&quot;hello world&quot;[..]);
+    /// let b = a.split_off(5);
+    ///
+    /// assert_eq!(&amp;a[..], b&quot;hello&quot;);
+    /// assert_eq!(&amp;b[..], b&quot; world&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// Panics if `at &gt; len`.
+    </span><span class="attribute">#[must_use = <span class="string">&quot;consider Bytes::truncate if you don&#39;t need the other half&quot;</span>]
+    </span><span class="kw">pub fn </span>split_off(<span class="kw-2">&amp;mut </span><span class="self">self</span>, at: usize) -&gt; Bytes {
         <span class="macro">assert!</span>(
-            <span class="ident">at</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>(),
+            at &lt;= <span class="self">self</span>.len(),
             <span class="string">&quot;split_off out of bounds: {:?} &lt;= {:?}&quot;</span>,
-            <span class="ident">at</span>,
-            <span class="self">self</span>.<span class="ident">len</span>(),
+            at,
+            <span class="self">self</span>.len(),
         );
 
-        <span class="kw">if</span> <span class="ident">at</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="ident">Bytes::new</span>();
+        <span class="kw">if </span>at == <span class="self">self</span>.len() {
+            <span class="kw">return </span>Bytes::new();
         }
 
-        <span class="kw">if</span> <span class="ident">at</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident">Bytes::new</span>());
+        <span class="kw">if </span>at == <span class="number">0 </span>{
+            <span class="kw">return </span>mem::replace(<span class="self">self</span>, Bytes::new());
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">self</span>.clone();
 
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">at</span>;
+        <span class="self">self</span>.len = at;
 
-        <span class="kw">unsafe</span> { <span class="ident">ret</span>.<span class="ident">inc_start</span>(<span class="ident">at</span>) };
+        <span class="kw">unsafe </span>{ ret.inc_start(at) };
 
-        <span class="ident">ret</span>
+        ret
     }
 
-    <span class="doccomment">/// Splits the bytes into two at the given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Afterwards `self` contains elements `[at, len)`, and the returned</span>
-    <span class="doccomment">/// `Bytes` contains elements `[0, at)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is an `O(1)` operation that just increases the reference count and</span>
-    <span class="doccomment">/// sets a few indices.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::Bytes;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut a = Bytes::from(&amp;b&quot;hello world&quot;[..]);</span>
-    <span class="doccomment">/// let b = a.split_to(5);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&amp;a[..], b&quot; world&quot;);</span>
-    <span class="doccomment">/// assert_eq!(&amp;b[..], b&quot;hello&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `at &gt; len`.</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;consider Bytes::advance if you don&#39;t need the other half&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">at</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Bytes</span> {
+    <span class="doccomment">/// Splits the bytes into two at the given index.
+    ///
+    /// Afterwards `self` contains elements `[at, len)`, and the returned
+    /// `Bytes` contains elements `[0, at)`.
+    ///
+    /// This is an `O(1)` operation that just increases the reference count and
+    /// sets a few indices.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::Bytes;
+    ///
+    /// let mut a = Bytes::from(&amp;b&quot;hello world&quot;[..]);
+    /// let b = a.split_to(5);
+    ///
+    /// assert_eq!(&amp;a[..], b&quot; world&quot;);
+    /// assert_eq!(&amp;b[..], b&quot;hello&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// Panics if `at &gt; len`.
+    </span><span class="attribute">#[must_use = <span class="string">&quot;consider Bytes::advance if you don&#39;t need the other half&quot;</span>]
+    </span><span class="kw">pub fn </span>split_to(<span class="kw-2">&amp;mut </span><span class="self">self</span>, at: usize) -&gt; Bytes {
         <span class="macro">assert!</span>(
-            <span class="ident">at</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>(),
+            at &lt;= <span class="self">self</span>.len(),
             <span class="string">&quot;split_to out of bounds: {:?} &lt;= {:?}&quot;</span>,
-            <span class="ident">at</span>,
-            <span class="self">self</span>.<span class="ident">len</span>(),
+            at,
+            <span class="self">self</span>.len(),
         );
 
-        <span class="kw">if</span> <span class="ident">at</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident">Bytes::new</span>());
+        <span class="kw">if </span>at == <span class="self">self</span>.len() {
+            <span class="kw">return </span>mem::replace(<span class="self">self</span>, Bytes::new());
         }
 
-        <span class="kw">if</span> <span class="ident">at</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="ident">Bytes::new</span>();
+        <span class="kw">if </span>at == <span class="number">0 </span>{
+            <span class="kw">return </span>Bytes::new();
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">self</span>.clone();
 
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">inc_start</span>(<span class="ident">at</span>) };
+        <span class="kw">unsafe </span>{ <span class="self">self</span>.inc_start(at) };
 
-        <span class="ident">ret</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">at</span>;
-        <span class="ident">ret</span>
+        ret.len = at;
+        ret
     }
 
-    <span class="doccomment">/// Shortens the buffer, keeping the first `len` bytes and dropping the</span>
-    <span class="doccomment">/// rest.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `len` is greater than the buffer&#39;s current length, this has no</span>
-    <span class="doccomment">/// effect.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`split_off`] method can emulate `truncate`, but this causes the</span>
-    <span class="doccomment">/// excess bytes to be returned instead of dropped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::Bytes;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = Bytes::from(&amp;b&quot;hello world&quot;[..]);</span>
-    <span class="doccomment">/// buf.truncate(5);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;hello&quot;[..]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`split_off`]: #method.split_off</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">truncate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">len</span> {
-            <span class="comment">// The Vec &quot;promotable&quot; vtables do not store the capacity,</span>
-            <span class="comment">// so we cannot truncate while using this repr. We *have* to</span>
-            <span class="comment">// promote using `split_off` so the capacity can be stored.</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">vtable</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Vtable</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">PROMOTABLE_EVEN_VTABLE</span>
-                <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">vtable</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Vtable</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">PROMOTABLE_ODD_VTABLE</span>
+    <span class="doccomment">/// Shortens the buffer, keeping the first `len` bytes and dropping the
+    /// rest.
+    ///
+    /// If `len` is greater than the buffer&#39;s current length, this has no
+    /// effect.
+    ///
+    /// The [`split_off`] method can emulate `truncate`, but this causes the
+    /// excess bytes to be returned instead of dropped.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::Bytes;
+    ///
+    /// let mut buf = Bytes::from(&amp;b&quot;hello world&quot;[..]);
+    /// buf.truncate(5);
+    /// assert_eq!(buf, b&quot;hello&quot;[..]);
+    /// ```
+    ///
+    /// [`split_off`]: #method.split_off
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>truncate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: usize) {
+        <span class="kw">if </span>len &lt; <span class="self">self</span>.len {
+            <span class="comment">// The Vec &quot;promotable&quot; vtables do not store the capacity,
+            // so we cannot truncate while using this repr. We *have* to
+            // promote using `split_off` so the capacity can be stored.
+            </span><span class="kw">if </span><span class="self">self</span>.vtable <span class="kw">as </span><span class="kw-2">*const </span>Vtable == <span class="kw-2">&amp;</span>PROMOTABLE_EVEN_VTABLE
+                || <span class="self">self</span>.vtable <span class="kw">as </span><span class="kw-2">*const </span>Vtable == <span class="kw-2">&amp;</span>PROMOTABLE_ODD_VTABLE
             {
-                <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">split_off</span>(<span class="ident">len</span>));
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">len</span>;
+                drop(<span class="self">self</span>.split_off(len));
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.len = len;
             }
         }
     }
 
-    <span class="doccomment">/// Clears the buffer, removing all data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::Bytes;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = Bytes::from(&amp;b&quot;hello world&quot;[..]);</span>
-    <span class="doccomment">/// buf.clear();</span>
-    <span class="doccomment">/// assert!(buf.is_empty());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">truncate</span>(<span class="number">0</span>);
+    <span class="doccomment">/// Clears the buffer, removing all data.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::Bytes;
+    ///
+    /// let mut buf = Bytes::from(&amp;b&quot;hello world&quot;[..]);
+    /// buf.clear();
+    /// assert!(buf.is_empty());
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.truncate(<span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">with_vtable</span>(
-        <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-        <span class="ident">len</span>: <span class="ident">usize</span>,
-        <span class="ident">data</span>: <span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-        <span class="ident">vtable</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Vtable</span>,
-    ) -&gt; <span class="ident">Bytes</span> {
-        <span class="ident">Bytes</span> {
-            <span class="ident">ptr</span>,
-            <span class="ident">len</span>,
-            <span class="ident">data</span>,
-            <span class="ident">vtable</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>with_vtable(
+        ptr: <span class="kw-2">*const </span>u8,
+        len: usize,
+        data: AtomicPtr&lt;()&gt;,
+        vtable: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Vtable,
+    ) -&gt; Bytes {
+        Bytes {
+            ptr,
+            len,
+            data,
+            vtable,
         }
     }
 
-    <span class="comment">// private</span>
+    <span class="comment">// private
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts</span>(<span class="self">self</span>.<span class="ident">ptr</span>, <span class="self">self</span>.<span class="ident">len</span>) }
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw">unsafe </span>{ slice::from_raw_parts(<span class="self">self</span>.ptr, <span class="self">self</span>.len) }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">inc_start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">by</span>: <span class="ident">usize</span>) {
-        <span class="comment">// should already be asserted, but debug assert for tests</span>
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">by</span>, <span class="string">&quot;internal: inc_start out of bounds&quot;</span>);
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">by</span>;
-        <span class="self">self</span>.<span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="ident">by</span>);
-    }
-}
-
-<span class="comment">// Vtable must enforce this behavior</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Bytes</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Bytes</span> {}
-
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { (<span class="self">self</span>.<span class="ident">vtable</span>.<span class="ident">drop</span>)(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="self">self</span>.<span class="ident">ptr</span>, <span class="self">self</span>.<span class="ident">len</span>) }
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>inc_start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, by: usize) {
+        <span class="comment">// should already be asserted, but debug assert for tests
+        </span><span class="macro">debug_assert!</span>(<span class="self">self</span>.len &gt;= by, <span class="string">&quot;internal: inc_start out of bounds&quot;</span>);
+        <span class="self">self</span>.len -= by;
+        <span class="self">self</span>.ptr = <span class="self">self</span>.ptr.add(by);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Bytes</span> {
-        <span class="kw">unsafe</span> { (<span class="self">self</span>.<span class="ident">vtable</span>.<span class="ident">clone</span>)(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>, <span class="self">self</span>.<span class="ident">ptr</span>, <span class="self">self</span>.<span class="ident">len</span>) }
+<span class="comment">// Vtable must enforce this behavior
+</span><span class="kw">unsafe impl </span>Send <span class="kw">for </span>Bytes {}
+<span class="kw">unsafe impl </span>Sync <span class="kw">for </span>Bytes {}
+
+<span class="kw">impl </span>Drop <span class="kw">for </span>Bytes {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ (<span class="self">self</span>.vtable.drop)(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data, <span class="self">self</span>.ptr, <span class="self">self</span>.len) }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Buf</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">len</span>()
+<span class="kw">impl </span>Clone <span class="kw">for </span>Bytes {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Bytes {
+        <span class="kw">unsafe </span>{ (<span class="self">self</span>.vtable.clone)(<span class="kw-2">&amp;</span><span class="self">self</span>.data, <span class="self">self</span>.ptr, <span class="self">self</span>.len) }
+    }
+}
+
+<span class="kw">impl </span>Buf <span class="kw">for </span>Bytes {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>remaining(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.len()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">as_slice</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>chunk(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.as_slice()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize) {
         <span class="macro">assert!</span>(
-            <span class="ident">cnt</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>(),
+            cnt &lt;= <span class="self">self</span>.len(),
             <span class="string">&quot;cannot advance past `remaining`: {:?} &lt;= {:?}&quot;</span>,
-            <span class="ident">cnt</span>,
-            <span class="self">self</span>.<span class="ident">len</span>(),
+            cnt,
+            <span class="self">self</span>.len(),
         );
 
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">inc_start</span>(<span class="ident">cnt</span>);
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.inc_start(cnt);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">copy_to_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Bytes</span> {
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">remaining</span>() {
-            <span class="ident">core::mem::replace</span>(<span class="self">self</span>, <span class="ident">Bytes::new</span>())
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">slice</span>(..<span class="ident">len</span>);
-            <span class="self">self</span>.<span class="ident">advance</span>(<span class="ident">len</span>);
-            <span class="ident">ret</span>
+    <span class="kw">fn </span>copy_to_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: usize) -&gt; <span class="kw">crate</span>::Bytes {
+        <span class="kw">if </span>len == <span class="self">self</span>.remaining() {
+            core::mem::replace(<span class="self">self</span>, Bytes::new())
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>ret = <span class="self">self</span>.slice(..len);
+            <span class="self">self</span>.advance(len);
+            ret
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> [<span class="ident">u8</span>];
+<span class="kw">impl </span>Deref <span class="kw">for </span>Bytes {
+    <span class="kw">type </span>Target = [u8];
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">as_slice</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.as_slice()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">as_slice</span>()
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>Bytes {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.as_slice()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">hash::Hash</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>)
-    <span class="kw">where</span>
-        <span class="ident">H</span>: <span class="ident">hash::Hasher</span>,
+<span class="kw">impl </span>hash::Hash <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>hash&lt;H&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H)
+    <span class="kw">where
+        </span>H: hash::Hasher,
     {
-        <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">hash</span>(<span class="ident">state</span>);
+        <span class="self">self</span>.as_slice().hash(state);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">as_slice</span>()
+<span class="kw">impl </span>Borrow&lt;[u8]&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.as_slice()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>IntoIterator <span class="kw">for </span>Bytes {
+    <span class="kw">type </span>Item = u8;
+    <span class="kw">type </span>IntoIter = IntoIter&lt;Bytes&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">IntoIter::new</span>(<span class="self">self</span>)
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        IntoIter::new(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Bytes</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">u8</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">core::slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Bytes {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8;
+    <span class="kw">type </span>IntoIter = core::slice::Iter&lt;<span class="lifetime">&#39;a</span>, u8&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">iter</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.as_slice().iter()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">into_iter</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Vec::from_iter</span>(<span class="ident">into_iter</span>).<span class="ident">into</span>()
+<span class="kw">impl </span>FromIterator&lt;u8&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>from_iter&lt;T: IntoIterator&lt;Item = u8&gt;&gt;(into_iter: T) -&gt; <span class="self">Self </span>{
+        Vec::from_iter(into_iter).into()
     }
 }
 
-<span class="comment">// impl Eq</span>
+<span class="comment">// impl Eq
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_slice</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">as_slice</span>()
+</span><span class="kw">impl </span>PartialEq <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; bool {
+        <span class="self">self</span>.as_slice() == other.as_slice()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">as_slice</span>())
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.as_slice().partial_cmp(other.as_slice())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="ident">cmp::Ordering</span> {
-        <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">cmp</span>(<span class="ident">other</span>.<span class="ident">as_slice</span>())
+<span class="kw">impl </span>Ord <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; cmp::Ordering {
+        <span class="self">self</span>.as_slice().cmp(other.as_slice())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Bytes</span> {}
+<span class="kw">impl </span>Eq <span class="kw">for </span>Bytes {}
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_slice</span>() <span class="op">==</span> <span class="ident">other</span>
+<span class="kw">impl </span>PartialEq&lt;[u8]&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+        <span class="self">self</span>.as_slice() == other
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>)
+<span class="kw">impl </span>PartialOrd&lt;[u8]&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.as_slice().partial_cmp(other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="ident">other</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
+<span class="kw">impl </span>PartialEq&lt;Bytes&gt; <span class="kw">for </span>[u8] {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; bool {
+        <span class="kw-2">*</span>other == <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>PartialOrd&lt;Bytes&gt; <span class="kw">for </span>[u8] {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        &lt;[u8] <span class="kw">as </span>PartialOrd&lt;[u8]&gt;&gt;::partial_cmp(<span class="self">self</span>, other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="op">&lt;</span>[<span class="ident">u8</span>] <span class="kw">as</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::partial_cmp</span>(<span class="self">self</span>, <span class="ident">other</span>)
+<span class="kw">impl </span>PartialEq&lt;str&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.as_slice() == other.as_bytes()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_slice</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">as_bytes</span>()
+<span class="kw">impl </span>PartialOrd&lt;str&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.as_slice().partial_cmp(other.as_bytes())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">as_bytes</span>())
+<span class="kw">impl </span>PartialEq&lt;Bytes&gt; <span class="kw">for </span>str {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; bool {
+        <span class="kw-2">*</span>other == <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>PartialOrd&lt;Bytes&gt; <span class="kw">for </span>str {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        &lt;[u8] <span class="kw">as </span>PartialOrd&lt;[u8]&gt;&gt;::partial_cmp(<span class="self">self</span>.as_bytes(), other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="ident">other</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
+<span class="kw">impl </span>PartialEq&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Vec&lt;u8&gt;) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self </span>== other[..]
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="op">&lt;</span>[<span class="ident">u8</span>] <span class="kw">as</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::partial_cmp</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>(), <span class="ident">other</span>)
+<span class="kw">impl </span>PartialOrd&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.as_slice().partial_cmp(<span class="kw-2">&amp;</span>other[..])
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="ident">other</span>[..]
+<span class="kw">impl </span>PartialEq&lt;Bytes&gt; <span class="kw">for </span>Vec&lt;u8&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; bool {
+        <span class="kw-2">*</span>other == <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>PartialOrd&lt;Bytes&gt; <span class="kw">for </span>Vec&lt;u8&gt; {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        &lt;[u8] <span class="kw">as </span>PartialOrd&lt;[u8]&gt;&gt;::partial_cmp(<span class="self">self</span>, other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>[..])
+<span class="kw">impl </span>PartialEq&lt;String&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>String) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self </span>== other[..]
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="ident">other</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
+<span class="kw">impl </span>PartialOrd&lt;String&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>String) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.as_slice().partial_cmp(other.as_bytes())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="op">&lt;</span>[<span class="ident">u8</span>] <span class="kw">as</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::partial_cmp</span>(<span class="self">self</span>, <span class="ident">other</span>)
+<span class="kw">impl </span>PartialEq&lt;Bytes&gt; <span class="kw">for </span>String {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; bool {
+        <span class="kw-2">*</span>other == <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>PartialOrd&lt;Bytes&gt; <span class="kw">for </span>String {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        &lt;[u8] <span class="kw">as </span>PartialOrd&lt;[u8]&gt;&gt;::partial_cmp(<span class="self">self</span>.as_bytes(), other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">String</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="ident">other</span>[..]
+<span class="kw">impl </span>PartialEq&lt;Bytes&gt; <span class="kw">for </span><span class="kw-2">&amp;</span>[u8] {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; bool {
+        <span class="kw-2">*</span>other == <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>PartialOrd&lt;Bytes&gt; <span class="kw">for </span><span class="kw-2">&amp;</span>[u8] {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        &lt;[u8] <span class="kw">as </span>PartialOrd&lt;[u8]&gt;&gt;::partial_cmp(<span class="self">self</span>, other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">String</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">as_bytes</span>())
+<span class="kw">impl </span>PartialEq&lt;Bytes&gt; <span class="kw">for </span><span class="kw-2">&amp;</span>str {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; bool {
+        <span class="kw-2">*</span>other == <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>PartialOrd&lt;Bytes&gt; <span class="kw">for </span><span class="kw-2">&amp;</span>str {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Bytes) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        &lt;[u8] <span class="kw">as </span>PartialOrd&lt;[u8]&gt;&gt;::partial_cmp(<span class="self">self</span>.as_bytes(), other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="ident">other</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="op">&lt;</span>[<span class="ident">u8</span>] <span class="kw">as</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::partial_cmp</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>(), <span class="ident">other</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="ident">other</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="op">&lt;</span>[<span class="ident">u8</span>] <span class="kw">as</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::partial_cmp</span>(<span class="self">self</span>, <span class="ident">other</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="ident">other</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="op">&lt;</span>[<span class="ident">u8</span>] <span class="kw">as</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::partial_cmp</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>(), <span class="ident">other</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span>
-<span class="kw">where</span>
-    <span class="ident">Bytes</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized&gt; PartialEq&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span>Bytes
+<span class="kw">where
+    </span>Bytes: PartialEq&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">other</span>
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: &amp;&amp;<span class="lifetime">&#39;a </span>T) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self </span>== <span class="kw-2">**</span>other
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span>
-<span class="kw">where</span>
-    <span class="ident">Bytes</span>: <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized&gt; PartialOrd&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span>Bytes
+<span class="kw">where
+    </span>Bytes: PartialOrd&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">other</span>)
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: &amp;&amp;<span class="lifetime">&#39;a </span>T) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="self">self</span>.partial_cmp(<span class="kw-2">&amp;**</span>other)
     }
 }
 
-<span class="comment">// impl From</span>
+<span class="comment">// impl From
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Bytes</span> {
-        <span class="ident">Bytes::new</span>()
+</span><span class="kw">impl </span>Default <span class="kw">for </span>Bytes {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>default() -&gt; Bytes {
+        Bytes::new()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">Bytes</span> {
-        <span class="ident">Bytes::from_static</span>(<span class="ident">slice</span>)
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8]&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>from(slice: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8]) -&gt; Bytes {
+        Bytes::from_static(slice)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">Bytes</span> {
-        <span class="ident">Bytes::from_static</span>(<span class="ident">slice</span>.<span class="ident">as_bytes</span>())
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>from(slice: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; Bytes {
+        Bytes::from_static(slice.as_bytes())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">Bytes</span> {
-        <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">vec</span>.<span class="ident">into_boxed_slice</span>();
-        <span class="ident">slice</span>.<span class="ident">into</span>()
+<span class="kw">impl </span>From&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>from(vec: Vec&lt;u8&gt;) -&gt; Bytes {
+        <span class="kw">let </span>slice = vec.into_boxed_slice();
+        slice.into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">Bytes</span> {
-        <span class="comment">// Box&lt;[u8]&gt; doesn&#39;t contain a heap allocation for empty slices,</span>
-        <span class="comment">// so the pointer isn&#39;t aligned enough for the KIND_VEC stashing to</span>
-        <span class="comment">// work.</span>
-        <span class="kw">if</span> <span class="ident">slice</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="ident">Bytes::new</span>();
+<span class="kw">impl </span>From&lt;Box&lt;[u8]&gt;&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>from(slice: Box&lt;[u8]&gt;) -&gt; Bytes {
+        <span class="comment">// Box&lt;[u8]&gt; doesn&#39;t contain a heap allocation for empty slices,
+        // so the pointer isn&#39;t aligned enough for the KIND_VEC stashing to
+        // work.
+        </span><span class="kw">if </span>slice.is_empty() {
+            <span class="kw">return </span>Bytes::new();
         }
 
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">slice</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>;
+        <span class="kw">let </span>len = slice.len();
+        <span class="kw">let </span>ptr = Box::into_raw(slice) <span class="kw">as </span><span class="kw-2">*mut </span>u8;
 
-        <span class="kw">if</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="number">0x1</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ptr_map</span>(<span class="ident">ptr</span>, <span class="op">|</span><span class="ident">addr</span><span class="op">|</span> <span class="ident">addr</span> <span class="op">|</span> <span class="ident">KIND_VEC</span>);
-            <span class="ident">Bytes</span> {
-                <span class="ident">ptr</span>,
-                <span class="ident">len</span>,
-                <span class="ident">data</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">data</span>.<span class="ident">cast</span>()),
-                <span class="ident">vtable</span>: <span class="kw-2">&amp;</span><span class="ident">PROMOTABLE_EVEN_VTABLE</span>,
+        <span class="kw">if </span>ptr <span class="kw">as </span>usize &amp; <span class="number">0x1 </span>== <span class="number">0 </span>{
+            <span class="kw">let </span>data = ptr_map(ptr, |addr| addr | KIND_VEC);
+            Bytes {
+                ptr,
+                len,
+                data: AtomicPtr::new(data.cast()),
+                vtable: <span class="kw-2">&amp;</span>PROMOTABLE_EVEN_VTABLE,
             }
-        } <span class="kw">else</span> {
-            <span class="ident">Bytes</span> {
-                <span class="ident">ptr</span>,
-                <span class="ident">len</span>,
-                <span class="ident">data</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr</span>.<span class="ident">cast</span>()),
-                <span class="ident">vtable</span>: <span class="kw-2">&amp;</span><span class="ident">PROMOTABLE_ODD_VTABLE</span>,
+        } <span class="kw">else </span>{
+            Bytes {
+                ptr,
+                len,
+                data: AtomicPtr::new(ptr.cast()),
+                vtable: <span class="kw-2">&amp;</span>PROMOTABLE_ODD_VTABLE,
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="ident">Bytes</span> {
-        <span class="ident">Bytes::from</span>(<span class="ident">s</span>.<span class="ident">into_bytes</span>())
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>from(s: String) -&gt; Bytes {
+        Bytes::from(s.into_bytes())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: <span class="ident">Bytes</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">mem::ManuallyDrop::new</span>(<span class="ident">bytes</span>);
-        <span class="kw">unsafe</span> { (<span class="ident">bytes</span>.<span class="ident">vtable</span>.<span class="ident">to_vec</span>)(<span class="kw-2">&amp;</span><span class="ident">bytes</span>.<span class="ident">data</span>, <span class="ident">bytes</span>.<span class="ident">ptr</span>, <span class="ident">bytes</span>.<span class="ident">len</span>) }
+<span class="kw">impl </span>From&lt;Bytes&gt; <span class="kw">for </span>Vec&lt;u8&gt; {
+    <span class="kw">fn </span>from(bytes: Bytes) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span>bytes = mem::ManuallyDrop::new(bytes);
+        <span class="kw">unsafe </span>{ (bytes.vtable.to_vec)(<span class="kw-2">&amp;</span>bytes.data, bytes.ptr, bytes.len) }
     }
 }
 
-<span class="comment">// ===== impl Vtable =====</span>
+<span class="comment">// ===== impl Vtable =====
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Vtable</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Vtable&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;clone&quot;</span>, <span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">clone</span> <span class="kw">as</span> <span class="kw-2">*const</span> ()))
-            .<span class="ident">field</span>(<span class="string">&quot;drop&quot;</span>, <span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">drop</span> <span class="kw">as</span> <span class="kw-2">*const</span> ()))
-            .<span class="ident">finish</span>()
+</span><span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Vtable {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Vtable&quot;</span>)
+            .field(<span class="string">&quot;clone&quot;</span>, <span class="kw-2">&amp;</span>(<span class="self">self</span>.clone <span class="kw">as </span><span class="kw-2">*const </span>()))
+            .field(<span class="string">&quot;drop&quot;</span>, <span class="kw-2">&amp;</span>(<span class="self">self</span>.drop <span class="kw">as </span><span class="kw-2">*const </span>()))
+            .finish()
     }
 }
 
-<span class="comment">// ===== impl StaticVtable =====</span>
+<span class="comment">// ===== impl StaticVtable =====
 
-<span class="kw">const</span> <span class="ident">STATIC_VTABLE</span>: <span class="ident">Vtable</span> <span class="op">=</span> <span class="ident">Vtable</span> {
-    <span class="ident">clone</span>: <span class="ident">static_clone</span>,
-    <span class="ident">to_vec</span>: <span class="ident">static_to_vec</span>,
-    <span class="ident">drop</span>: <span class="ident">static_drop</span>,
+</span><span class="kw">const </span>STATIC_VTABLE: Vtable = Vtable {
+    clone: static_clone,
+    to_vec: static_to_vec,
+    drop: static_drop,
 };
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">static_clone</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Bytes</span> {
-    <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">ptr</span>, <span class="ident">len</span>);
-    <span class="ident">Bytes::from_static</span>(<span class="ident">slice</span>)
+<span class="kw">unsafe fn </span>static_clone(<span class="kw">_</span>: <span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;, ptr: <span class="kw-2">*const </span>u8, len: usize) -&gt; Bytes {
+    <span class="kw">let </span>slice = slice::from_raw_parts(ptr, len);
+    Bytes::from_static(slice)
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">static_to_vec</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">ptr</span>, <span class="ident">len</span>);
-    <span class="ident">slice</span>.<span class="ident">to_vec</span>()
+<span class="kw">unsafe fn </span>static_to_vec(<span class="kw">_</span>: <span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;, ptr: <span class="kw-2">*const </span>u8, len: usize) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span>slice = slice::from_raw_parts(ptr, len);
+    slice.to_vec()
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">static_drop</span>(<span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="kw">_</span>: <span class="ident">usize</span>) {
-    <span class="comment">// nothing to drop for &amp;&#39;static [u8]</span>
-}
+<span class="kw">unsafe fn </span>static_drop(<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>AtomicPtr&lt;()&gt;, <span class="kw">_</span>: <span class="kw-2">*const </span>u8, <span class="kw">_</span>: usize) {
+    <span class="comment">// nothing to drop for &amp;&#39;static [u8]
+</span>}
 
-<span class="comment">// ===== impl PromotableVtable =====</span>
+<span class="comment">// ===== impl PromotableVtable =====
 
-<span class="kw">static</span> <span class="ident">PROMOTABLE_EVEN_VTABLE</span>: <span class="ident">Vtable</span> <span class="op">=</span> <span class="ident">Vtable</span> {
-    <span class="ident">clone</span>: <span class="ident">promotable_even_clone</span>,
-    <span class="ident">to_vec</span>: <span class="ident">promotable_even_to_vec</span>,
-    <span class="ident">drop</span>: <span class="ident">promotable_even_drop</span>,
+</span><span class="kw">static </span>PROMOTABLE_EVEN_VTABLE: Vtable = Vtable {
+    clone: promotable_even_clone,
+    to_vec: promotable_even_to_vec,
+    drop: promotable_even_drop,
 };
 
-<span class="kw">static</span> <span class="ident">PROMOTABLE_ODD_VTABLE</span>: <span class="ident">Vtable</span> <span class="op">=</span> <span class="ident">Vtable</span> {
-    <span class="ident">clone</span>: <span class="ident">promotable_odd_clone</span>,
-    <span class="ident">to_vec</span>: <span class="ident">promotable_odd_to_vec</span>,
-    <span class="ident">drop</span>: <span class="ident">promotable_odd_drop</span>,
+<span class="kw">static </span>PROMOTABLE_ODD_VTABLE: Vtable = Vtable {
+    clone: promotable_odd_clone,
+    to_vec: promotable_odd_to_vec,
+    drop: promotable_odd_drop,
 };
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">promotable_even_clone</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Bytes</span> {
-    <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">shared</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="ident">KIND_MASK</span>;
+<span class="kw">unsafe fn </span>promotable_even_clone(data: <span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;, ptr: <span class="kw-2">*const </span>u8, len: usize) -&gt; Bytes {
+    <span class="kw">let </span>shared = data.load(Ordering::Acquire);
+    <span class="kw">let </span>kind = shared <span class="kw">as </span>usize &amp; KIND_MASK;
 
-    <span class="kw">if</span> <span class="ident">kind</span> <span class="op">==</span> <span class="ident">KIND_ARC</span> {
-        <span class="ident">shallow_clone_arc</span>(<span class="ident">shared</span>.<span class="ident">cast</span>(), <span class="ident">ptr</span>, <span class="ident">len</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">debug_assert_eq!</span>(<span class="ident">kind</span>, <span class="ident">KIND_VEC</span>);
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ptr_map</span>(<span class="ident">shared</span>.<span class="ident">cast</span>(), <span class="op">|</span><span class="ident">addr</span><span class="op">|</span> <span class="ident">addr</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">KIND_MASK</span>);
-        <span class="ident">shallow_clone_vec</span>(<span class="ident">data</span>, <span class="ident">shared</span>, <span class="ident">buf</span>, <span class="ident">ptr</span>, <span class="ident">len</span>)
+    <span class="kw">if </span>kind == KIND_ARC {
+        shallow_clone_arc(shared.cast(), ptr, len)
+    } <span class="kw">else </span>{
+        <span class="macro">debug_assert_eq!</span>(kind, KIND_VEC);
+        <span class="kw">let </span>buf = ptr_map(shared.cast(), |addr| addr &amp; !KIND_MASK);
+        shallow_clone_vec(data, shared, buf, ptr, len)
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">promotable_to_vec</span>(
-    <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-    <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-    <span class="ident">len</span>: <span class="ident">usize</span>,
-    <span class="ident">f</span>: <span class="kw">fn</span>(<span class="kw-2">*mut</span> ()) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">shared</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="ident">KIND_MASK</span>;
+<span class="kw">unsafe fn </span>promotable_to_vec(
+    data: <span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;,
+    ptr: <span class="kw-2">*const </span>u8,
+    len: usize,
+    f: <span class="kw">fn</span>(<span class="kw-2">*mut </span>()) -&gt; <span class="kw-2">*mut </span>u8,
+) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span>shared = data.load(Ordering::Acquire);
+    <span class="kw">let </span>kind = shared <span class="kw">as </span>usize &amp; KIND_MASK;
 
-    <span class="kw">if</span> <span class="ident">kind</span> <span class="op">==</span> <span class="ident">KIND_ARC</span> {
-        <span class="ident">shared_to_vec_impl</span>(<span class="ident">shared</span>.<span class="ident">cast</span>(), <span class="ident">ptr</span>, <span class="ident">len</span>)
-    } <span class="kw">else</span> {
-        <span class="comment">// If Bytes holds a Vec, then the offset must be 0.</span>
-        <span class="macro">debug_assert_eq!</span>(<span class="ident">kind</span>, <span class="ident">KIND_VEC</span>);
+    <span class="kw">if </span>kind == KIND_ARC {
+        shared_to_vec_impl(shared.cast(), ptr, len)
+    } <span class="kw">else </span>{
+        <span class="comment">// If Bytes holds a Vec, then the offset must be 0.
+        </span><span class="macro">debug_assert_eq!</span>(kind, KIND_VEC);
 
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">shared</span>);
+        <span class="kw">let </span>buf = f(shared);
 
-        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> (<span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">buf</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">+</span> <span class="ident">len</span>;
+        <span class="kw">let </span>cap = (ptr <span class="kw">as </span>usize - buf <span class="kw">as </span>usize) + len;
 
-        <span class="comment">// Copy back buffer</span>
-        <span class="ident">ptr::copy</span>(<span class="ident">ptr</span>, <span class="ident">buf</span>, <span class="ident">len</span>);
+        <span class="comment">// Copy back buffer
+        </span>ptr::copy(ptr, buf, len);
 
-        <span class="ident">Vec::from_raw_parts</span>(<span class="ident">buf</span>, <span class="ident">len</span>, <span class="ident">cap</span>)
+        Vec::from_raw_parts(buf, len, cap)
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">promotable_even_to_vec</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="ident">promotable_to_vec</span>(<span class="ident">data</span>, <span class="ident">ptr</span>, <span class="ident">len</span>, <span class="op">|</span><span class="ident">shared</span><span class="op">|</span> {
-        <span class="ident">ptr_map</span>(<span class="ident">shared</span>.<span class="ident">cast</span>(), <span class="op">|</span><span class="ident">addr</span><span class="op">|</span> <span class="ident">addr</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">KIND_MASK</span>)
+<span class="kw">unsafe fn </span>promotable_even_to_vec(data: <span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;, ptr: <span class="kw-2">*const </span>u8, len: usize) -&gt; Vec&lt;u8&gt; {
+    promotable_to_vec(data, ptr, len, |shared| {
+        ptr_map(shared.cast(), |addr| addr &amp; !KIND_MASK)
     })
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">promotable_even_drop</span>(<span class="ident">data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
-    <span class="ident">data</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">shared</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">shared</span>;
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">shared</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="ident">KIND_MASK</span>;
+<span class="kw">unsafe fn </span>promotable_even_drop(data: <span class="kw-2">&amp;mut </span>AtomicPtr&lt;()&gt;, ptr: <span class="kw-2">*const </span>u8, len: usize) {
+    data.with_mut(|shared| {
+        <span class="kw">let </span>shared = <span class="kw-2">*</span>shared;
+        <span class="kw">let </span>kind = shared <span class="kw">as </span>usize &amp; KIND_MASK;
 
-        <span class="kw">if</span> <span class="ident">kind</span> <span class="op">==</span> <span class="ident">KIND_ARC</span> {
-            <span class="ident">release_shared</span>(<span class="ident">shared</span>.<span class="ident">cast</span>());
-        } <span class="kw">else</span> {
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">kind</span>, <span class="ident">KIND_VEC</span>);
-            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ptr_map</span>(<span class="ident">shared</span>.<span class="ident">cast</span>(), <span class="op">|</span><span class="ident">addr</span><span class="op">|</span> <span class="ident">addr</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">KIND_MASK</span>);
-            <span class="ident">free_boxed_slice</span>(<span class="ident">buf</span>, <span class="ident">ptr</span>, <span class="ident">len</span>);
+        <span class="kw">if </span>kind == KIND_ARC {
+            release_shared(shared.cast());
+        } <span class="kw">else </span>{
+            <span class="macro">debug_assert_eq!</span>(kind, KIND_VEC);
+            <span class="kw">let </span>buf = ptr_map(shared.cast(), |addr| addr &amp; !KIND_MASK);
+            free_boxed_slice(buf, ptr, len);
         }
     });
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">promotable_odd_clone</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Bytes</span> {
-    <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">shared</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="ident">KIND_MASK</span>;
+<span class="kw">unsafe fn </span>promotable_odd_clone(data: <span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;, ptr: <span class="kw-2">*const </span>u8, len: usize) -&gt; Bytes {
+    <span class="kw">let </span>shared = data.load(Ordering::Acquire);
+    <span class="kw">let </span>kind = shared <span class="kw">as </span>usize &amp; KIND_MASK;
 
-    <span class="kw">if</span> <span class="ident">kind</span> <span class="op">==</span> <span class="ident">KIND_ARC</span> {
-        <span class="ident">shallow_clone_arc</span>(<span class="ident">shared</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">ptr</span>, <span class="ident">len</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">debug_assert_eq!</span>(<span class="ident">kind</span>, <span class="ident">KIND_VEC</span>);
-        <span class="ident">shallow_clone_vec</span>(<span class="ident">data</span>, <span class="ident">shared</span>, <span class="ident">shared</span>.<span class="ident">cast</span>(), <span class="ident">ptr</span>, <span class="ident">len</span>)
+    <span class="kw">if </span>kind == KIND_ARC {
+        shallow_clone_arc(shared <span class="kw">as _</span>, ptr, len)
+    } <span class="kw">else </span>{
+        <span class="macro">debug_assert_eq!</span>(kind, KIND_VEC);
+        shallow_clone_vec(data, shared, shared.cast(), ptr, len)
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">promotable_odd_to_vec</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="ident">promotable_to_vec</span>(<span class="ident">data</span>, <span class="ident">ptr</span>, <span class="ident">len</span>, <span class="op">|</span><span class="ident">shared</span><span class="op">|</span> <span class="ident">shared</span>.<span class="ident">cast</span>())
+<span class="kw">unsafe fn </span>promotable_odd_to_vec(data: <span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;, ptr: <span class="kw-2">*const </span>u8, len: usize) -&gt; Vec&lt;u8&gt; {
+    promotable_to_vec(data, ptr, len, |shared| shared.cast())
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">promotable_odd_drop</span>(<span class="ident">data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
-    <span class="ident">data</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">shared</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">shared</span>;
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">shared</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="ident">KIND_MASK</span>;
+<span class="kw">unsafe fn </span>promotable_odd_drop(data: <span class="kw-2">&amp;mut </span>AtomicPtr&lt;()&gt;, ptr: <span class="kw-2">*const </span>u8, len: usize) {
+    data.with_mut(|shared| {
+        <span class="kw">let </span>shared = <span class="kw-2">*</span>shared;
+        <span class="kw">let </span>kind = shared <span class="kw">as </span>usize &amp; KIND_MASK;
 
-        <span class="kw">if</span> <span class="ident">kind</span> <span class="op">==</span> <span class="ident">KIND_ARC</span> {
-            <span class="ident">release_shared</span>(<span class="ident">shared</span>.<span class="ident">cast</span>());
-        } <span class="kw">else</span> {
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">kind</span>, <span class="ident">KIND_VEC</span>);
+        <span class="kw">if </span>kind == KIND_ARC {
+            release_shared(shared.cast());
+        } <span class="kw">else </span>{
+            <span class="macro">debug_assert_eq!</span>(kind, KIND_VEC);
 
-            <span class="ident">free_boxed_slice</span>(<span class="ident">shared</span>.<span class="ident">cast</span>(), <span class="ident">ptr</span>, <span class="ident">len</span>);
+            free_boxed_slice(shared.cast(), ptr, len);
         }
     });
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">free_boxed_slice</span>(<span class="ident">buf</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">offset</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
-    <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> (<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">buf</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">+</span> <span class="ident">len</span>;
-    <span class="ident">dealloc</span>(<span class="ident">buf</span>, <span class="ident">Layout::from_size_align</span>(<span class="ident">cap</span>, <span class="number">1</span>).<span class="ident">unwrap</span>())
+<span class="kw">unsafe fn </span>free_boxed_slice(buf: <span class="kw-2">*mut </span>u8, offset: <span class="kw-2">*const </span>u8, len: usize) {
+    <span class="kw">let </span>cap = (offset <span class="kw">as </span>usize - buf <span class="kw">as </span>usize) + len;
+    dealloc(buf, Layout::from_size_align(cap, <span class="number">1</span>).unwrap())
 }
 
-<span class="comment">// ===== impl SharedVtable =====</span>
+<span class="comment">// ===== impl SharedVtable =====
 
-<span class="kw">struct</span> <span class="ident">Shared</span> {
-    <span class="comment">// Holds arguments to dealloc upon Drop, but otherwise doesn&#39;t use them</span>
-    <span class="ident">buf</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>,
-    <span class="ident">cap</span>: <span class="ident">usize</span>,
-    <span class="ident">ref_cnt</span>: <span class="ident">AtomicUsize</span>,
+</span><span class="kw">struct </span>Shared {
+    <span class="comment">// Holds arguments to dealloc upon Drop, but otherwise doesn&#39;t use them
+    </span>buf: <span class="kw-2">*mut </span>u8,
+    cap: usize,
+    ref_cnt: AtomicUsize,
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Shared</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">dealloc</span>(<span class="self">self</span>.<span class="ident">buf</span>, <span class="ident">Layout::from_size_align</span>(<span class="self">self</span>.<span class="ident">cap</span>, <span class="number">1</span>).<span class="ident">unwrap</span>()) }
+<span class="kw">impl </span>Drop <span class="kw">for </span>Shared {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ dealloc(<span class="self">self</span>.buf, Layout::from_size_align(<span class="self">self</span>.cap, <span class="number">1</span>).unwrap()) }
     }
 }
 
-<span class="comment">// Assert that the alignment of `Shared` is divisible by 2.</span>
-<span class="comment">// This is a necessary invariant since we depend on allocating `Shared` a</span>
-<span class="comment">// shared object to implicitly carry the `KIND_ARC` flag in its pointer.</span>
-<span class="comment">// This flag is set when the LSB is 0.</span>
-<span class="kw">const</span> <span class="kw">_</span>: [(); <span class="number">0</span> <span class="op">-</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&gt;</span>() <span class="op">%</span> <span class="number">2</span>] <span class="op">=</span> []; <span class="comment">// Assert that the alignment of `Shared` is divisible by 2.</span>
+<span class="comment">// Assert that the alignment of `Shared` is divisible by 2.
+// This is a necessary invariant since we depend on allocating `Shared` a
+// shared object to implicitly carry the `KIND_ARC` flag in its pointer.
+// This flag is set when the LSB is 0.
+</span><span class="kw">const _</span>: [(); <span class="number">0 </span>- mem::align_of::&lt;Shared&gt;() % <span class="number">2</span>] = []; <span class="comment">// Assert that the alignment of `Shared` is divisible by 2.
 
-<span class="kw">static</span> <span class="ident">SHARED_VTABLE</span>: <span class="ident">Vtable</span> <span class="op">=</span> <span class="ident">Vtable</span> {
-    <span class="ident">clone</span>: <span class="ident">shared_clone</span>,
-    <span class="ident">to_vec</span>: <span class="ident">shared_to_vec</span>,
-    <span class="ident">drop</span>: <span class="ident">shared_drop</span>,
+</span><span class="kw">static </span>SHARED_VTABLE: Vtable = Vtable {
+    clone: shared_clone,
+    to_vec: shared_to_vec,
+    drop: shared_drop,
 };
 
-<span class="kw">const</span> <span class="ident">KIND_ARC</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0b0</span>;
-<span class="kw">const</span> <span class="ident">KIND_VEC</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0b1</span>;
-<span class="kw">const</span> <span class="ident">KIND_MASK</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0b1</span>;
+<span class="kw">const </span>KIND_ARC: usize = <span class="number">0b0</span>;
+<span class="kw">const </span>KIND_VEC: usize = <span class="number">0b1</span>;
+<span class="kw">const </span>KIND_MASK: usize = <span class="number">0b1</span>;
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">shared_clone</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Bytes</span> {
-    <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-    <span class="ident">shallow_clone_arc</span>(<span class="ident">shared</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">ptr</span>, <span class="ident">len</span>)
+<span class="kw">unsafe fn </span>shared_clone(data: <span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;, ptr: <span class="kw-2">*const </span>u8, len: usize) -&gt; Bytes {
+    <span class="kw">let </span>shared = data.load(Ordering::Relaxed);
+    shallow_clone_arc(shared <span class="kw">as _</span>, ptr, len)
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">shared_to_vec_impl</span>(<span class="ident">shared</span>: <span class="kw-2">*mut</span> <span class="ident">Shared</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="comment">// Check that the ref_cnt is 1 (unique).</span>
-    <span class="comment">//</span>
-    <span class="comment">// If it is unique, then it is set to 0 with AcqRel fence for the same</span>
-    <span class="comment">// reason in release_shared.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Otherwise, we take the other branch and call release_shared.</span>
-    <span class="kw">if</span> (<span class="kw-2">*</span><span class="ident">shared</span>)
-        .<span class="ident">ref_cnt</span>
-        .<span class="ident">compare_exchange</span>(<span class="number">1</span>, <span class="number">0</span>, <span class="ident">Ordering::AcqRel</span>, <span class="ident">Ordering::Relaxed</span>)
-        .<span class="ident">is_ok</span>()
+<span class="kw">unsafe fn </span>shared_to_vec_impl(shared: <span class="kw-2">*mut </span>Shared, ptr: <span class="kw-2">*const </span>u8, len: usize) -&gt; Vec&lt;u8&gt; {
+    <span class="comment">// Check that the ref_cnt is 1 (unique).
+    //
+    // If it is unique, then it is set to 0 with AcqRel fence for the same
+    // reason in release_shared.
+    //
+    // Otherwise, we take the other branch and call release_shared.
+    </span><span class="kw">if </span>(<span class="kw-2">*</span>shared)
+        .ref_cnt
+        .compare_exchange(<span class="number">1</span>, <span class="number">0</span>, Ordering::AcqRel, Ordering::Relaxed)
+        .is_ok()
     {
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">shared</span>).<span class="ident">buf</span>;
-        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">shared</span>).<span class="ident">cap</span>;
+        <span class="kw">let </span>buf = (<span class="kw-2">*</span>shared).buf;
+        <span class="kw">let </span>cap = (<span class="kw-2">*</span>shared).cap;
 
-        <span class="comment">// Deallocate Shared</span>
-        <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">shared</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">mem::ManuallyDrop</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&gt;</span>));
+        <span class="comment">// Deallocate Shared
+        </span>drop(Box::from_raw(shared <span class="kw">as </span><span class="kw-2">*mut </span>mem::ManuallyDrop&lt;Shared&gt;));
 
-        <span class="comment">// Copy back buffer</span>
-        <span class="ident">ptr::copy</span>(<span class="ident">ptr</span>, <span class="ident">buf</span>, <span class="ident">len</span>);
+        <span class="comment">// Copy back buffer
+        </span>ptr::copy(ptr, buf, len);
 
-        <span class="ident">Vec::from_raw_parts</span>(<span class="ident">buf</span>, <span class="ident">len</span>, <span class="ident">cap</span>)
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">ptr</span>, <span class="ident">len</span>).<span class="ident">to_vec</span>();
-        <span class="ident">release_shared</span>(<span class="ident">shared</span>);
-        <span class="ident">v</span>
+        Vec::from_raw_parts(buf, len, cap)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>v = slice::from_raw_parts(ptr, len).to_vec();
+        release_shared(shared);
+        v
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">shared_to_vec</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="ident">shared_to_vec_impl</span>(<span class="ident">data</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>).<span class="ident">cast</span>(), <span class="ident">ptr</span>, <span class="ident">len</span>)
+<span class="kw">unsafe fn </span>shared_to_vec(data: <span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;, ptr: <span class="kw-2">*const </span>u8, len: usize) -&gt; Vec&lt;u8&gt; {
+    shared_to_vec_impl(data.load(Ordering::Relaxed).cast(), ptr, len)
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">shared_drop</span>(<span class="ident">data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">_ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">_len</span>: <span class="ident">usize</span>) {
-    <span class="ident">data</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">shared</span><span class="op">|</span> {
-        <span class="ident">release_shared</span>(<span class="ident">shared</span>.<span class="ident">cast</span>());
+<span class="kw">unsafe fn </span>shared_drop(data: <span class="kw-2">&amp;mut </span>AtomicPtr&lt;()&gt;, _ptr: <span class="kw-2">*const </span>u8, _len: usize) {
+    data.with_mut(|shared| {
+        release_shared(shared.cast());
     });
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">shallow_clone_arc</span>(<span class="ident">shared</span>: <span class="kw-2">*mut</span> <span class="ident">Shared</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Bytes</span> {
-    <span class="kw">let</span> <span class="ident">old_size</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">shared</span>).<span class="ident">ref_cnt</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
+<span class="kw">unsafe fn </span>shallow_clone_arc(shared: <span class="kw-2">*mut </span>Shared, ptr: <span class="kw-2">*const </span>u8, len: usize) -&gt; Bytes {
+    <span class="kw">let </span>old_size = (<span class="kw-2">*</span>shared).ref_cnt.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
 
-    <span class="kw">if</span> <span class="ident">old_size</span> <span class="op">&gt;</span> <span class="ident">usize::MAX</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span> {
-        <span class="ident"><span class="kw">crate</span>::abort</span>();
+    <span class="kw">if </span>old_size &gt; usize::MAX &gt;&gt; <span class="number">1 </span>{
+        <span class="kw">crate</span>::abort();
     }
 
-    <span class="ident">Bytes</span> {
-        <span class="ident">ptr</span>,
-        <span class="ident">len</span>,
-        <span class="ident">data</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">shared</span> <span class="kw">as</span> <span class="kw">_</span>),
-        <span class="ident">vtable</span>: <span class="kw-2">&amp;</span><span class="ident">SHARED_VTABLE</span>,
+    Bytes {
+        ptr,
+        len,
+        data: AtomicPtr::new(shared <span class="kw">as _</span>),
+        vtable: <span class="kw-2">&amp;</span>SHARED_VTABLE,
     }
 }
 
-<span class="attribute">#[<span class="ident">cold</span>]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">shallow_clone_vec</span>(
-    <span class="ident">atom</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-    <span class="ident">ptr</span>: <span class="kw-2">*const</span> (),
-    <span class="ident">buf</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>,
-    <span class="ident">offset</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-    <span class="ident">len</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">Bytes</span> {
-    <span class="comment">// If  the buffer is still tracked in a `Vec&lt;u8&gt;`. It is time to</span>
-    <span class="comment">// promote the vec to an `Arc`. This could potentially be called</span>
-    <span class="comment">// concurrently, so some care must be taken.</span>
+<span class="attribute">#[cold]
+</span><span class="kw">unsafe fn </span>shallow_clone_vec(
+    atom: <span class="kw-2">&amp;</span>AtomicPtr&lt;()&gt;,
+    ptr: <span class="kw-2">*const </span>(),
+    buf: <span class="kw-2">*mut </span>u8,
+    offset: <span class="kw-2">*const </span>u8,
+    len: usize,
+) -&gt; Bytes {
+    <span class="comment">// If  the buffer is still tracked in a `Vec&lt;u8&gt;`. It is time to
+    // promote the vec to an `Arc`. This could potentially be called
+    // concurrently, so some care must be taken.
 
-    <span class="comment">// First, allocate a new `Shared` instance containing the</span>
-    <span class="comment">// `Vec` fields. It&#39;s important to note that `ptr`, `len`,</span>
-    <span class="comment">// and `cap` cannot be mutated without having `&amp;mut self`.</span>
-    <span class="comment">// This means that these fields will not be concurrently</span>
-    <span class="comment">// updated and since the buffer hasn&#39;t been promoted to an</span>
-    <span class="comment">// `Arc`, those three fields still are the components of the</span>
-    <span class="comment">// vector.</span>
-    <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">Shared</span> {
-        <span class="ident">buf</span>,
-        <span class="ident">cap</span>: (<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">buf</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">+</span> <span class="ident">len</span>,
-        <span class="comment">// Initialize refcount to 2. One for this reference, and one</span>
-        <span class="comment">// for the new clone that will be returned from</span>
-        <span class="comment">// `shallow_clone`.</span>
-        <span class="ident">ref_cnt</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">2</span>),
+    // First, allocate a new `Shared` instance containing the
+    // `Vec` fields. It&#39;s important to note that `ptr`, `len`,
+    // and `cap` cannot be mutated without having `&amp;mut self`.
+    // This means that these fields will not be concurrently
+    // updated and since the buffer hasn&#39;t been promoted to an
+    // `Arc`, those three fields still are the components of the
+    // vector.
+    </span><span class="kw">let </span>shared = Box::new(Shared {
+        buf,
+        cap: (offset <span class="kw">as </span>usize - buf <span class="kw">as </span>usize) + len,
+        <span class="comment">// Initialize refcount to 2. One for this reference, and one
+        // for the new clone that will be returned from
+        // `shallow_clone`.
+        </span>ref_cnt: AtomicUsize::new(<span class="number">2</span>),
     });
 
-    <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">shared</span>);
+    <span class="kw">let </span>shared = Box::into_raw(shared);
 
-    <span class="comment">// The pointer should be aligned, so this assert should</span>
-    <span class="comment">// always succeed.</span>
-    <span class="macro">debug_assert!</span>(
-        <span class="number">0</span> <span class="op">==</span> (<span class="ident">shared</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="ident">KIND_MASK</span>),
+    <span class="comment">// The pointer should be aligned, so this assert should
+    // always succeed.
+    </span><span class="macro">debug_assert!</span>(
+        <span class="number">0 </span>== (shared <span class="kw">as </span>usize &amp; KIND_MASK),
         <span class="string">&quot;internal: Box&lt;Shared&gt; should have an aligned pointer&quot;</span>,
     );
 
-    <span class="comment">// Try compare &amp; swapping the pointer into the `arc` field.</span>
-    <span class="comment">// `Release` is used synchronize with other threads that</span>
-    <span class="comment">// will load the `arc` field.</span>
-    <span class="comment">//</span>
-    <span class="comment">// If the `compare_exchange` fails, then the thread lost the</span>
-    <span class="comment">// race to promote the buffer to shared. The `Acquire`</span>
-    <span class="comment">// ordering will synchronize with the `compare_exchange`</span>
-    <span class="comment">// that happened in the other thread and the `Shared`</span>
-    <span class="comment">// pointed to by `actual` will be visible.</span>
-    <span class="kw">match</span> <span class="ident">atom</span>.<span class="ident">compare_exchange</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">shared</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">Ordering::AcqRel</span>, <span class="ident">Ordering::Acquire</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">actual</span>) =&gt; {
-            <span class="macro">debug_assert!</span>(<span class="ident">actual</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">==</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>);
-            <span class="comment">// The upgrade was successful, the new handle can be</span>
-            <span class="comment">// returned.</span>
-            <span class="ident">Bytes</span> {
-                <span class="ident">ptr</span>: <span class="ident">offset</span>,
-                <span class="ident">len</span>,
-                <span class="ident">data</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">shared</span> <span class="kw">as</span> <span class="kw">_</span>),
-                <span class="ident">vtable</span>: <span class="kw-2">&amp;</span><span class="ident">SHARED_VTABLE</span>,
+    <span class="comment">// Try compare &amp; swapping the pointer into the `arc` field.
+    // `Release` is used synchronize with other threads that
+    // will load the `arc` field.
+    //
+    // If the `compare_exchange` fails, then the thread lost the
+    // race to promote the buffer to shared. The `Acquire`
+    // ordering will synchronize with the `compare_exchange`
+    // that happened in the other thread and the `Shared`
+    // pointed to by `actual` will be visible.
+    </span><span class="kw">match </span>atom.compare_exchange(ptr <span class="kw">as _</span>, shared <span class="kw">as _</span>, Ordering::AcqRel, Ordering::Acquire) {
+        <span class="prelude-val">Ok</span>(actual) =&gt; {
+            <span class="macro">debug_assert!</span>(actual <span class="kw">as </span>usize == ptr <span class="kw">as </span>usize);
+            <span class="comment">// The upgrade was successful, the new handle can be
+            // returned.
+            </span>Bytes {
+                ptr: offset,
+                len,
+                data: AtomicPtr::new(shared <span class="kw">as _</span>),
+                vtable: <span class="kw-2">&amp;</span>SHARED_VTABLE,
             }
         }
-        <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; {
-            <span class="comment">// The upgrade failed, a concurrent clone happened. Release</span>
-            <span class="comment">// the allocation that was made in this thread, it will not</span>
-            <span class="comment">// be needed.</span>
-            <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="ident">Box::from_raw</span>(<span class="ident">shared</span>);
-            <span class="ident">mem::forget</span>(<span class="kw-2">*</span><span class="ident">shared</span>);
+        <span class="prelude-val">Err</span>(actual) =&gt; {
+            <span class="comment">// The upgrade failed, a concurrent clone happened. Release
+            // the allocation that was made in this thread, it will not
+            // be needed.
+            </span><span class="kw">let </span>shared = Box::from_raw(shared);
+            mem::forget(<span class="kw-2">*</span>shared);
 
-            <span class="comment">// Buffer already promoted to shared storage, so increment ref</span>
-            <span class="comment">// count.</span>
-            <span class="ident">shallow_clone_arc</span>(<span class="ident">actual</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">offset</span>, <span class="ident">len</span>)
+            <span class="comment">// Buffer already promoted to shared storage, so increment ref
+            // count.
+            </span>shallow_clone_arc(actual <span class="kw">as _</span>, offset, len)
         }
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">release_shared</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">Shared</span>) {
-    <span class="comment">// `Shared` storage... follow the drop steps from Arc.</span>
-    <span class="kw">if</span> (<span class="kw-2">*</span><span class="ident">ptr</span>).<span class="ident">ref_cnt</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering::Release</span>) <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+<span class="kw">unsafe fn </span>release_shared(ptr: <span class="kw-2">*mut </span>Shared) {
+    <span class="comment">// `Shared` storage... follow the drop steps from Arc.
+    </span><span class="kw">if </span>(<span class="kw-2">*</span>ptr).ref_cnt.fetch_sub(<span class="number">1</span>, Ordering::Release) != <span class="number">1 </span>{
         <span class="kw">return</span>;
     }
 
-    <span class="comment">// This fence is needed to prevent reordering of use of the data and</span>
-    <span class="comment">// deletion of the data.  Because it is marked `Release`, the decreasing</span>
-    <span class="comment">// of the reference count synchronizes with this `Acquire` fence. This</span>
-    <span class="comment">// means that use of the data happens before decreasing the reference</span>
-    <span class="comment">// count, which happens before this fence, which happens before the</span>
-    <span class="comment">// deletion of the data.</span>
-    <span class="comment">//</span>
-    <span class="comment">// As explained in the [Boost documentation][1],</span>
-    <span class="comment">//</span>
-    <span class="comment">// &gt; It is important to enforce any possible access to the object in one</span>
-    <span class="comment">// &gt; thread (through an existing reference) to *happen before* deleting</span>
-    <span class="comment">// &gt; the object in a different thread. This is achieved by a &quot;release&quot;</span>
-    <span class="comment">// &gt; operation after dropping a reference (any access to the object</span>
-    <span class="comment">// &gt; through this reference must obviously happened before), and an</span>
-    <span class="comment">// &gt; &quot;acquire&quot; operation before deleting the object.</span>
-    <span class="comment">//</span>
-    <span class="comment">// [1]: (www.boost.org/doc/libs/1_55_0/doc/html/atomic/usage_examples.html)</span>
-    <span class="comment">//</span>
-    <span class="comment">// Thread sanitizer does not support atomic fences. Use an atomic load</span>
-    <span class="comment">// instead.</span>
-    (<span class="kw-2">*</span><span class="ident">ptr</span>).<span class="ident">ref_cnt</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+    <span class="comment">// This fence is needed to prevent reordering of use of the data and
+    // deletion of the data.  Because it is marked `Release`, the decreasing
+    // of the reference count synchronizes with this `Acquire` fence. This
+    // means that use of the data happens before decreasing the reference
+    // count, which happens before this fence, which happens before the
+    // deletion of the data.
+    //
+    // As explained in the [Boost documentation][1],
+    //
+    // &gt; It is important to enforce any possible access to the object in one
+    // &gt; thread (through an existing reference) to *happen before* deleting
+    // &gt; the object in a different thread. This is achieved by a &quot;release&quot;
+    // &gt; operation after dropping a reference (any access to the object
+    // &gt; through this reference must obviously happened before), and an
+    // &gt; &quot;acquire&quot; operation before deleting the object.
+    //
+    // [1]: (www.boost.org/doc/libs/1_55_0/doc/html/atomic/usage_examples.html)
+    //
+    // Thread sanitizer does not support atomic fences. Use an atomic load
+    // instead.
+    </span>(<span class="kw-2">*</span>ptr).ref_cnt.load(Ordering::Acquire);
 
-    <span class="comment">// Drop the data</span>
-    <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">ptr</span>));
+    <span class="comment">// Drop the data
+    </span>drop(Box::from_raw(ptr));
 }
 
-<span class="comment">// Ideally we would always use this version of `ptr_map` since it is strict</span>
-<span class="comment">// provenance compatible, but it results in worse codegen. We will however still</span>
-<span class="comment">// use it on miri because it gives better diagnostics for people who test bytes</span>
-<span class="comment">// code with miri.</span>
-<span class="comment">//</span>
-<span class="comment">// See https://github.com/tokio-rs/bytes/pull/545 for more info.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">miri</span>)]</span>
-<span class="kw">fn</span> <span class="ident">ptr_map</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">usize</span>) -&gt; <span class="ident">usize</span>,
+<span class="comment">// Ideally we would always use this version of `ptr_map` since it is strict
+// provenance compatible, but it results in worse codegen. We will however still
+// use it on miri because it gives better diagnostics for people who test bytes
+// code with miri.
+//
+// See https://github.com/tokio-rs/bytes/pull/545 for more info.
+</span><span class="attribute">#[cfg(miri)]
+</span><span class="kw">fn </span>ptr_map&lt;F&gt;(ptr: <span class="kw-2">*mut </span>u8, f: F) -&gt; <span class="kw-2">*mut </span>u8
+<span class="kw">where
+    </span>F: FnOnce(usize) -&gt; usize,
 {
-    <span class="kw">let</span> <span class="ident">old_addr</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>;
-    <span class="kw">let</span> <span class="ident">new_addr</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">old_addr</span>);
-    <span class="kw">let</span> <span class="ident">diff</span> <span class="op">=</span> <span class="ident">new_addr</span>.<span class="ident">wrapping_sub</span>(<span class="ident">old_addr</span>);
-    <span class="ident">ptr</span>.<span class="ident">wrapping_add</span>(<span class="ident">diff</span>)
+    <span class="kw">let </span>old_addr = ptr <span class="kw">as </span>usize;
+    <span class="kw">let </span>new_addr = f(old_addr);
+    <span class="kw">let </span>diff = new_addr.wrapping_sub(old_addr);
+    ptr.wrapping_add(diff)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">miri</span>))]</span>
-<span class="kw">fn</span> <span class="ident">ptr_map</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">usize</span>) -&gt; <span class="ident">usize</span>,
+<span class="attribute">#[cfg(not(miri))]
+</span><span class="kw">fn </span>ptr_map&lt;F&gt;(ptr: <span class="kw-2">*mut </span>u8, f: F) -&gt; <span class="kw-2">*mut </span>u8
+<span class="kw">where
+    </span>F: FnOnce(usize) -&gt; usize,
 {
-    <span class="kw">let</span> <span class="ident">old_addr</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>;
-    <span class="kw">let</span> <span class="ident">new_addr</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">old_addr</span>);
-    <span class="ident">new_addr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>
+    <span class="kw">let </span>old_addr = ptr <span class="kw">as </span>usize;
+    <span class="kw">let </span>new_addr = f(old_addr);
+    new_addr <span class="kw">as </span><span class="kw-2">*mut </span>u8
 }
 
-<span class="comment">// compile-fails</span>
+<span class="comment">// compile-fails
 
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// use bytes::Bytes;</span>
-<span class="doccomment">/// #[deny(unused_must_use)]</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     let mut b1 = Bytes::from(&quot;hello world&quot;);</span>
-<span class="doccomment">///     b1.split_to(6);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">fn</span> <span class="ident">_split_to_must_use</span>() {}
+</span><span class="doccomment">/// ```compile_fail
+/// use bytes::Bytes;
+/// #[deny(unused_must_use)]
+/// {
+///     let mut b1 = Bytes::from(&quot;hello world&quot;);
+///     b1.split_to(6);
+/// }
+/// ```
+</span><span class="kw">fn </span>_split_to_must_use() {}
 
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// use bytes::Bytes;</span>
-<span class="doccomment">/// #[deny(unused_must_use)]</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     let mut b1 = Bytes::from(&quot;hello world&quot;);</span>
-<span class="doccomment">///     b1.split_off(6);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">fn</span> <span class="ident">_split_off_must_use</span>() {}
+<span class="doccomment">/// ```compile_fail
+/// use bytes::Bytes;
+/// #[deny(unused_must_use)]
+/// {
+///     let mut b1 = Bytes::from(&quot;hello world&quot;);
+///     b1.split_off(6);
+/// }
+/// ```
+</span><span class="kw">fn </span>_split_off_must_use() {}
 
-<span class="comment">// fuzz tests</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">loom</span>))]</span>
-<span class="kw">mod</span> <span class="ident">fuzz</span> {
-    <span class="kw">use</span> <span class="ident">loom::sync::Arc</span>;
-    <span class="kw">use</span> <span class="ident">loom::thread</span>;
+<span class="comment">// fuzz tests
+</span><span class="attribute">#[cfg(all(test, loom))]
+</span><span class="kw">mod </span>fuzz {
+    <span class="kw">use </span>loom::sync::Arc;
+    <span class="kw">use </span>loom::thread;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Bytes</span>;
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bytes_cloning_vec</span>() {
-        <span class="ident">loom::model</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Bytes::from</span>(<span class="string">b&quot;abcdefgh&quot;</span>.<span class="ident">to_vec</span>());
-            <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>;
+    <span class="kw">use </span><span class="kw">super</span>::Bytes;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>bytes_cloning_vec() {
+        loom::model(|| {
+            <span class="kw">let </span>a = Bytes::from(<span class="string">b&quot;abcdefgh&quot;</span>.to_vec());
+            <span class="kw">let </span>addr = a.as_ptr() <span class="kw">as </span>usize;
 
-            <span class="comment">// test the Bytes::clone is Sync by putting it in an Arc</span>
-            <span class="kw">let</span> <span class="ident">a1</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">a</span>);
-            <span class="kw">let</span> <span class="ident">a2</span> <span class="op">=</span> <span class="ident">a1</span>.<span class="ident">clone</span>();
+            <span class="comment">// test the Bytes::clone is Sync by putting it in an Arc
+            </span><span class="kw">let </span>a1 = Arc::new(a);
+            <span class="kw">let </span>a2 = a1.clone();
 
-            <span class="kw">let</span> <span class="ident">t1</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">b</span>: <span class="ident">Bytes</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">a1</span>).<span class="ident">clone</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">addr</span>);
+            <span class="kw">let </span>t1 = thread::spawn(<span class="kw">move </span>|| {
+                <span class="kw">let </span>b: Bytes = (<span class="kw-2">*</span>a1).clone();
+                <span class="macro">assert_eq!</span>(b.as_ptr() <span class="kw">as </span>usize, addr);
             });
 
-            <span class="kw">let</span> <span class="ident">t2</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">b</span>: <span class="ident">Bytes</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">a2</span>).<span class="ident">clone</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">addr</span>);
+            <span class="kw">let </span>t2 = thread::spawn(<span class="kw">move </span>|| {
+                <span class="kw">let </span>b: Bytes = (<span class="kw-2">*</span>a2).clone();
+                <span class="macro">assert_eq!</span>(b.as_ptr() <span class="kw">as </span>usize, addr);
             });
 
-            <span class="ident">t1</span>.<span class="ident">join</span>().<span class="ident">unwrap</span>();
-            <span class="ident">t2</span>.<span class="ident">join</span>().<span class="ident">unwrap</span>();
+            t1.join().unwrap();
+            t2.join().unwrap();
         });
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bytes" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bytes" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

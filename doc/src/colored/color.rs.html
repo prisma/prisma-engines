@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/colored-2.0.0/src/color.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>color.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../colored/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../colored/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../colored/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/colored-2.0.0/src/color.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>color.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../colored/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../colored/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../colored/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -213,220 +213,220 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">str::FromStr</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, str::FromStr};
 
-<span class="doccomment">/// The 8 standard colors.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Color</span> {
-    <span class="ident">Black</span>,
-    <span class="ident">Red</span>,
-    <span class="ident">Green</span>,
-    <span class="ident">Yellow</span>,
-    <span class="ident">Blue</span>,
-    <span class="ident">Magenta</span>,
-    <span class="ident">Cyan</span>,
-    <span class="ident">White</span>,
-    <span class="ident">BrightBlack</span>,
-    <span class="ident">BrightRed</span>,
-    <span class="ident">BrightGreen</span>,
-    <span class="ident">BrightYellow</span>,
-    <span class="ident">BrightBlue</span>,
-    <span class="ident">BrightMagenta</span>,
-    <span class="ident">BrightCyan</span>,
-    <span class="ident">BrightWhite</span>,
-    <span class="ident">TrueColor</span> { <span class="ident">r</span>: <span class="ident">u8</span>, <span class="ident">g</span>: <span class="ident">u8</span>, <span class="ident">b</span>: <span class="ident">u8</span> },
+<span class="doccomment">/// The 8 standard colors.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[allow(missing_docs)]
+</span><span class="kw">pub enum </span>Color {
+    Black,
+    Red,
+    Green,
+    Yellow,
+    Blue,
+    Magenta,
+    Cyan,
+    White,
+    BrightBlack,
+    BrightRed,
+    BrightGreen,
+    BrightYellow,
+    BrightBlue,
+    BrightMagenta,
+    BrightCyan,
+    BrightWhite,
+    TrueColor { r: u8, g: u8, b: u8 },
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Color</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_fg_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Color::Black</span> =&gt; <span class="string">&quot;30&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Red</span> =&gt; <span class="string">&quot;31&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Green</span> =&gt; <span class="string">&quot;32&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Yellow</span> =&gt; <span class="string">&quot;33&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Blue</span> =&gt; <span class="string">&quot;34&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Magenta</span> =&gt; <span class="string">&quot;35&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Cyan</span> =&gt; <span class="string">&quot;36&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::White</span> =&gt; <span class="string">&quot;37&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightBlack</span> =&gt; <span class="string">&quot;90&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightRed</span> =&gt; <span class="string">&quot;91&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightGreen</span> =&gt; <span class="string">&quot;92&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightYellow</span> =&gt; <span class="string">&quot;93&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightBlue</span> =&gt; <span class="string">&quot;94&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightMagenta</span> =&gt; <span class="string">&quot;95&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightCyan</span> =&gt; <span class="string">&quot;96&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightWhite</span> =&gt; <span class="string">&quot;97&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::TrueColor</span> { <span class="ident">r</span>, <span class="ident">g</span>, <span class="ident">b</span> } =&gt; <span class="macro">format!</span>(<span class="string">&quot;38;2;{};{};{}&quot;</span>, <span class="ident">r</span>, <span class="ident">g</span>, <span class="ident">b</span>).<span class="ident">into</span>(),
+<span class="attribute">#[allow(missing_docs)]
+</span><span class="kw">impl </span>Color {
+    <span class="kw">pub fn </span>to_fg_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;static</span>, str&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Color::Black =&gt; <span class="string">&quot;30&quot;</span>.into(),
+            Color::Red =&gt; <span class="string">&quot;31&quot;</span>.into(),
+            Color::Green =&gt; <span class="string">&quot;32&quot;</span>.into(),
+            Color::Yellow =&gt; <span class="string">&quot;33&quot;</span>.into(),
+            Color::Blue =&gt; <span class="string">&quot;34&quot;</span>.into(),
+            Color::Magenta =&gt; <span class="string">&quot;35&quot;</span>.into(),
+            Color::Cyan =&gt; <span class="string">&quot;36&quot;</span>.into(),
+            Color::White =&gt; <span class="string">&quot;37&quot;</span>.into(),
+            Color::BrightBlack =&gt; <span class="string">&quot;90&quot;</span>.into(),
+            Color::BrightRed =&gt; <span class="string">&quot;91&quot;</span>.into(),
+            Color::BrightGreen =&gt; <span class="string">&quot;92&quot;</span>.into(),
+            Color::BrightYellow =&gt; <span class="string">&quot;93&quot;</span>.into(),
+            Color::BrightBlue =&gt; <span class="string">&quot;94&quot;</span>.into(),
+            Color::BrightMagenta =&gt; <span class="string">&quot;95&quot;</span>.into(),
+            Color::BrightCyan =&gt; <span class="string">&quot;96&quot;</span>.into(),
+            Color::BrightWhite =&gt; <span class="string">&quot;97&quot;</span>.into(),
+            Color::TrueColor { r, g, b } =&gt; <span class="macro">format!</span>(<span class="string">&quot;38;2;{};{};{}&quot;</span>, r, g, b).into(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bg_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Color::Black</span> =&gt; <span class="string">&quot;40&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Red</span> =&gt; <span class="string">&quot;41&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Green</span> =&gt; <span class="string">&quot;42&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Yellow</span> =&gt; <span class="string">&quot;43&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Blue</span> =&gt; <span class="string">&quot;44&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Magenta</span> =&gt; <span class="string">&quot;45&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::Cyan</span> =&gt; <span class="string">&quot;46&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::White</span> =&gt; <span class="string">&quot;47&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightBlack</span> =&gt; <span class="string">&quot;100&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightRed</span> =&gt; <span class="string">&quot;101&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightGreen</span> =&gt; <span class="string">&quot;102&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightYellow</span> =&gt; <span class="string">&quot;103&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightBlue</span> =&gt; <span class="string">&quot;104&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightMagenta</span> =&gt; <span class="string">&quot;105&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightCyan</span> =&gt; <span class="string">&quot;106&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::BrightWhite</span> =&gt; <span class="string">&quot;107&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">Color::TrueColor</span> { <span class="ident">r</span>, <span class="ident">g</span>, <span class="ident">b</span> } =&gt; <span class="macro">format!</span>(<span class="string">&quot;48;2;{};{};{}&quot;</span>, <span class="ident">r</span>, <span class="ident">g</span>, <span class="ident">b</span>).<span class="ident">into</span>(),
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Color</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">src</span>.<span class="ident">parse</span>().<span class="ident">unwrap_or</span>(<span class="ident">Color::White</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Color</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">src</span>.<span class="ident">parse</span>().<span class="ident">unwrap_or</span>(<span class="ident">Color::White</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Color</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> ();
-
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">to_lowercase</span>();
-
-        <span class="kw">match</span> <span class="ident">src</span>.<span class="ident">as_ref</span>() {
-            <span class="string">&quot;black&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::Black</span>),
-            <span class="string">&quot;red&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::Red</span>),
-            <span class="string">&quot;green&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::Green</span>),
-            <span class="string">&quot;yellow&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::Yellow</span>),
-            <span class="string">&quot;blue&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::Blue</span>),
-            <span class="string">&quot;magenta&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::Magenta</span>),
-            <span class="string">&quot;purple&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::Magenta</span>),
-            <span class="string">&quot;cyan&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::Cyan</span>),
-            <span class="string">&quot;white&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::White</span>),
-            <span class="string">&quot;bright black&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::BrightBlack</span>),
-            <span class="string">&quot;bright red&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::BrightRed</span>),
-            <span class="string">&quot;bright green&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::BrightGreen</span>),
-            <span class="string">&quot;bright yellow&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::BrightYellow</span>),
-            <span class="string">&quot;bright blue&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::BrightBlue</span>),
-            <span class="string">&quot;bright magenta&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::BrightMagenta</span>),
-            <span class="string">&quot;bright cyan&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::BrightCyan</span>),
-            <span class="string">&quot;bright white&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Color::BrightWhite</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    <span class="kw">pub fn </span>to_bg_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;static</span>, str&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Color::Black =&gt; <span class="string">&quot;40&quot;</span>.into(),
+            Color::Red =&gt; <span class="string">&quot;41&quot;</span>.into(),
+            Color::Green =&gt; <span class="string">&quot;42&quot;</span>.into(),
+            Color::Yellow =&gt; <span class="string">&quot;43&quot;</span>.into(),
+            Color::Blue =&gt; <span class="string">&quot;44&quot;</span>.into(),
+            Color::Magenta =&gt; <span class="string">&quot;45&quot;</span>.into(),
+            Color::Cyan =&gt; <span class="string">&quot;46&quot;</span>.into(),
+            Color::White =&gt; <span class="string">&quot;47&quot;</span>.into(),
+            Color::BrightBlack =&gt; <span class="string">&quot;100&quot;</span>.into(),
+            Color::BrightRed =&gt; <span class="string">&quot;101&quot;</span>.into(),
+            Color::BrightGreen =&gt; <span class="string">&quot;102&quot;</span>.into(),
+            Color::BrightYellow =&gt; <span class="string">&quot;103&quot;</span>.into(),
+            Color::BrightBlue =&gt; <span class="string">&quot;104&quot;</span>.into(),
+            Color::BrightMagenta =&gt; <span class="string">&quot;105&quot;</span>.into(),
+            Color::BrightCyan =&gt; <span class="string">&quot;106&quot;</span>.into(),
+            Color::BrightWhite =&gt; <span class="string">&quot;107&quot;</span>.into(),
+            Color::TrueColor { r, g, b } =&gt; <span class="macro">format!</span>(<span class="string">&quot;48;2;{};{};{}&quot;</span>, r, g, b).into(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Color {
+    <span class="kw">fn </span>from(src: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        src.parse().unwrap_or(Color::White)
+    }
+}
 
-    <span class="kw">mod</span> <span class="ident">from_str</span> {
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Color {
+    <span class="kw">fn </span>from(src: String) -&gt; <span class="self">Self </span>{
+        src.parse().unwrap_or(Color::White)
+    }
+}
 
-        <span class="macro">macro_rules!</span> <span class="ident">make_test</span> {
-            ( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">src</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>:<span class="ident">expr</span>),<span class="op">*</span> ) =&gt; {
+<span class="kw">impl </span>FromStr <span class="kw">for </span>Color {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= ();
+
+    <span class="kw">fn </span>from_str(src: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">let </span>src = src.to_lowercase();
+
+        <span class="kw">match </span>src.as_ref() {
+            <span class="string">&quot;black&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::Black),
+            <span class="string">&quot;red&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::Red),
+            <span class="string">&quot;green&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::Green),
+            <span class="string">&quot;yellow&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::Yellow),
+            <span class="string">&quot;blue&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::Blue),
+            <span class="string">&quot;magenta&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::Magenta),
+            <span class="string">&quot;purple&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::Magenta),
+            <span class="string">&quot;cyan&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::Cyan),
+            <span class="string">&quot;white&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::White),
+            <span class="string">&quot;bright black&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::BrightBlack),
+            <span class="string">&quot;bright red&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::BrightRed),
+            <span class="string">&quot;bright green&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::BrightGreen),
+            <span class="string">&quot;bright yellow&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::BrightYellow),
+            <span class="string">&quot;bright blue&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::BrightBlue),
+            <span class="string">&quot;bright magenta&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::BrightMagenta),
+            <span class="string">&quot;bright cyan&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::BrightCyan),
+            <span class="string">&quot;bright white&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Color::BrightWhite),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(()),
+        }
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">pub use super</span>::<span class="kw-2">*</span>;
+
+    <span class="kw">mod </span>from_str {
+        <span class="kw">pub use super</span>::<span class="kw-2">*</span>;
+
+        <span class="macro">macro_rules! </span>make_test {
+            ( $( <span class="macro-nonterminal">$name</span>:ident: <span class="macro-nonterminal">$src</span>:expr =&gt; <span class="macro-nonterminal">$dst</span>:expr),* ) =&gt; {
 
                 $(
-                    <span class="attribute">#[<span class="ident">test</span>]</span>
-                    <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
-                        <span class="kw">let</span> <span class="ident">color</span> : <span class="ident">Color</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">src</span>.<span class="ident">into</span>();
-                        <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>, <span class="ident">color</span>)
+                    <span class="attribute">#[test]
+                    </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>() {
+                        <span class="kw">let </span>color : Color = <span class="macro-nonterminal">$src</span>.into();
+                        <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$dst</span>, color)
                     }
-                )<span class="op">*</span>
+                )*
             }
         }
 
         <span class="macro">make_test!</span>(
-            <span class="ident">black</span>: <span class="string">&quot;black&quot;</span> =&gt; <span class="ident">Color::Black</span>,
-            <span class="ident">red</span>: <span class="string">&quot;red&quot;</span> =&gt; <span class="ident">Color::Red</span>,
-            <span class="ident">green</span>: <span class="string">&quot;green&quot;</span> =&gt; <span class="ident">Color::Green</span>,
-            <span class="ident">yellow</span>: <span class="string">&quot;yellow&quot;</span> =&gt; <span class="ident">Color::Yellow</span>,
-            <span class="ident">blue</span>: <span class="string">&quot;blue&quot;</span> =&gt; <span class="ident">Color::Blue</span>,
-            <span class="ident">magenta</span>: <span class="string">&quot;magenta&quot;</span> =&gt; <span class="ident">Color::Magenta</span>,
-            <span class="ident">purple</span>: <span class="string">&quot;purple&quot;</span> =&gt; <span class="ident">Color::Magenta</span>,
-            <span class="ident">cyan</span>: <span class="string">&quot;cyan&quot;</span> =&gt; <span class="ident">Color::Cyan</span>,
-            <span class="ident">white</span>: <span class="string">&quot;white&quot;</span> =&gt; <span class="ident">Color::White</span>,
-            <span class="ident">brightblack</span>: <span class="string">&quot;bright black&quot;</span> =&gt; <span class="ident">Color::BrightBlack</span>,
-            <span class="ident">brightred</span>: <span class="string">&quot;bright red&quot;</span> =&gt; <span class="ident">Color::BrightRed</span>,
-            <span class="ident">brightgreen</span>: <span class="string">&quot;bright green&quot;</span> =&gt; <span class="ident">Color::BrightGreen</span>,
-            <span class="ident">brightyellow</span>: <span class="string">&quot;bright yellow&quot;</span> =&gt; <span class="ident">Color::BrightYellow</span>,
-            <span class="ident">brightblue</span>: <span class="string">&quot;bright blue&quot;</span> =&gt; <span class="ident">Color::BrightBlue</span>,
-            <span class="ident">brightmagenta</span>: <span class="string">&quot;bright magenta&quot;</span> =&gt; <span class="ident">Color::BrightMagenta</span>,
-            <span class="ident">brightcyan</span>: <span class="string">&quot;bright cyan&quot;</span> =&gt; <span class="ident">Color::BrightCyan</span>,
-            <span class="ident">brightwhite</span>: <span class="string">&quot;bright white&quot;</span> =&gt; <span class="ident">Color::BrightWhite</span>,
+            black: <span class="string">&quot;black&quot; </span>=&gt; Color::Black,
+            red: <span class="string">&quot;red&quot; </span>=&gt; Color::Red,
+            green: <span class="string">&quot;green&quot; </span>=&gt; Color::Green,
+            yellow: <span class="string">&quot;yellow&quot; </span>=&gt; Color::Yellow,
+            blue: <span class="string">&quot;blue&quot; </span>=&gt; Color::Blue,
+            magenta: <span class="string">&quot;magenta&quot; </span>=&gt; Color::Magenta,
+            purple: <span class="string">&quot;purple&quot; </span>=&gt; Color::Magenta,
+            cyan: <span class="string">&quot;cyan&quot; </span>=&gt; Color::Cyan,
+            white: <span class="string">&quot;white&quot; </span>=&gt; Color::White,
+            brightblack: <span class="string">&quot;bright black&quot; </span>=&gt; Color::BrightBlack,
+            brightred: <span class="string">&quot;bright red&quot; </span>=&gt; Color::BrightRed,
+            brightgreen: <span class="string">&quot;bright green&quot; </span>=&gt; Color::BrightGreen,
+            brightyellow: <span class="string">&quot;bright yellow&quot; </span>=&gt; Color::BrightYellow,
+            brightblue: <span class="string">&quot;bright blue&quot; </span>=&gt; Color::BrightBlue,
+            brightmagenta: <span class="string">&quot;bright magenta&quot; </span>=&gt; Color::BrightMagenta,
+            brightcyan: <span class="string">&quot;bright cyan&quot; </span>=&gt; Color::BrightCyan,
+            brightwhite: <span class="string">&quot;bright white&quot; </span>=&gt; Color::BrightWhite,
 
-            <span class="ident">invalid</span>: <span class="string">&quot;invalid&quot;</span> =&gt; <span class="ident">Color::White</span>,
-            <span class="ident">capitalized</span>: <span class="string">&quot;BLUE&quot;</span> =&gt; <span class="ident">Color::Blue</span>,
-            <span class="ident">mixed_case</span>: <span class="string">&quot;bLuE&quot;</span> =&gt; <span class="ident">Color::Blue</span>
+            invalid: <span class="string">&quot;invalid&quot; </span>=&gt; Color::White,
+            capitalized: <span class="string">&quot;BLUE&quot; </span>=&gt; Color::Blue,
+            mixed_case: <span class="string">&quot;bLuE&quot; </span>=&gt; Color::Blue
         );
     }
 
-    <span class="kw">mod</span> <span class="ident">from_string</span> {
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">mod </span>from_string {
+        <span class="kw">pub use super</span>::<span class="kw-2">*</span>;
 
-        <span class="macro">macro_rules!</span> <span class="ident">make_test</span> {
-            ( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">src</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>:<span class="ident">expr</span>),<span class="op">*</span> ) =&gt; {
+        <span class="macro">macro_rules! </span>make_test {
+            ( $( <span class="macro-nonterminal">$name</span>:ident: <span class="macro-nonterminal">$src</span>:expr =&gt; <span class="macro-nonterminal">$dst</span>:expr),* ) =&gt; {
 
                 $(
-                    <span class="attribute">#[<span class="ident">test</span>]</span>
-                    <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
-                        <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">src</span>);
-                        <span class="kw">let</span> <span class="ident">color</span> : <span class="ident">Color</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">into</span>();
-                        <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>, <span class="ident">color</span>)
+                    <span class="attribute">#[test]
+                    </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>() {
+                        <span class="kw">let </span>src = String::from(<span class="macro-nonterminal">$src</span>);
+                        <span class="kw">let </span>color : Color = src.into();
+                        <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$dst</span>, color)
                     }
-                )<span class="op">*</span>
+                )*
             }
         }
 
         <span class="macro">make_test!</span>(
-            <span class="ident">black</span>: <span class="string">&quot;black&quot;</span> =&gt; <span class="ident">Color::Black</span>,
-            <span class="ident">red</span>: <span class="string">&quot;red&quot;</span> =&gt; <span class="ident">Color::Red</span>,
-            <span class="ident">green</span>: <span class="string">&quot;green&quot;</span> =&gt; <span class="ident">Color::Green</span>,
-            <span class="ident">yellow</span>: <span class="string">&quot;yellow&quot;</span> =&gt; <span class="ident">Color::Yellow</span>,
-            <span class="ident">blue</span>: <span class="string">&quot;blue&quot;</span> =&gt; <span class="ident">Color::Blue</span>,
-            <span class="ident">magenta</span>: <span class="string">&quot;magenta&quot;</span> =&gt; <span class="ident">Color::Magenta</span>,
-            <span class="ident">cyan</span>: <span class="string">&quot;cyan&quot;</span> =&gt; <span class="ident">Color::Cyan</span>,
-            <span class="ident">white</span>: <span class="string">&quot;white&quot;</span> =&gt; <span class="ident">Color::White</span>,
-            <span class="ident">brightblack</span>: <span class="string">&quot;bright black&quot;</span> =&gt; <span class="ident">Color::BrightBlack</span>,
-            <span class="ident">brightred</span>: <span class="string">&quot;bright red&quot;</span> =&gt; <span class="ident">Color::BrightRed</span>,
-            <span class="ident">brightgreen</span>: <span class="string">&quot;bright green&quot;</span> =&gt; <span class="ident">Color::BrightGreen</span>,
-            <span class="ident">brightyellow</span>: <span class="string">&quot;bright yellow&quot;</span> =&gt; <span class="ident">Color::BrightYellow</span>,
-            <span class="ident">brightblue</span>: <span class="string">&quot;bright blue&quot;</span> =&gt; <span class="ident">Color::BrightBlue</span>,
-            <span class="ident">brightmagenta</span>: <span class="string">&quot;bright magenta&quot;</span> =&gt; <span class="ident">Color::BrightMagenta</span>,
-            <span class="ident">brightcyan</span>: <span class="string">&quot;bright cyan&quot;</span> =&gt; <span class="ident">Color::BrightCyan</span>,
-            <span class="ident">brightwhite</span>: <span class="string">&quot;bright white&quot;</span> =&gt; <span class="ident">Color::BrightWhite</span>,
+            black: <span class="string">&quot;black&quot; </span>=&gt; Color::Black,
+            red: <span class="string">&quot;red&quot; </span>=&gt; Color::Red,
+            green: <span class="string">&quot;green&quot; </span>=&gt; Color::Green,
+            yellow: <span class="string">&quot;yellow&quot; </span>=&gt; Color::Yellow,
+            blue: <span class="string">&quot;blue&quot; </span>=&gt; Color::Blue,
+            magenta: <span class="string">&quot;magenta&quot; </span>=&gt; Color::Magenta,
+            cyan: <span class="string">&quot;cyan&quot; </span>=&gt; Color::Cyan,
+            white: <span class="string">&quot;white&quot; </span>=&gt; Color::White,
+            brightblack: <span class="string">&quot;bright black&quot; </span>=&gt; Color::BrightBlack,
+            brightred: <span class="string">&quot;bright red&quot; </span>=&gt; Color::BrightRed,
+            brightgreen: <span class="string">&quot;bright green&quot; </span>=&gt; Color::BrightGreen,
+            brightyellow: <span class="string">&quot;bright yellow&quot; </span>=&gt; Color::BrightYellow,
+            brightblue: <span class="string">&quot;bright blue&quot; </span>=&gt; Color::BrightBlue,
+            brightmagenta: <span class="string">&quot;bright magenta&quot; </span>=&gt; Color::BrightMagenta,
+            brightcyan: <span class="string">&quot;bright cyan&quot; </span>=&gt; Color::BrightCyan,
+            brightwhite: <span class="string">&quot;bright white&quot; </span>=&gt; Color::BrightWhite,
 
-            <span class="ident">invalid</span>: <span class="string">&quot;invalid&quot;</span> =&gt; <span class="ident">Color::White</span>,
-            <span class="ident">capitalized</span>: <span class="string">&quot;BLUE&quot;</span> =&gt; <span class="ident">Color::Blue</span>,
-            <span class="ident">mixed_case</span>: <span class="string">&quot;bLuE&quot;</span> =&gt; <span class="ident">Color::Blue</span>
+            invalid: <span class="string">&quot;invalid&quot; </span>=&gt; Color::White,
+            capitalized: <span class="string">&quot;BLUE&quot; </span>=&gt; Color::Blue,
+            mixed_case: <span class="string">&quot;bLuE&quot; </span>=&gt; Color::Blue
         );
     }
 
-    <span class="kw">mod</span> <span class="ident">fromstr</span> {
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">mod </span>fromstr {
+        <span class="kw">pub use super</span>::<span class="kw-2">*</span>;
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">parse</span>() {
-            <span class="kw">let</span> <span class="ident">color</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Color</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="string">&quot;blue&quot;</span>.<span class="ident">parse</span>();
-            <span class="macro">assert_eq!</span>(<span class="prelude-val">Ok</span>(<span class="ident">Color::Blue</span>), <span class="ident">color</span>)
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>parse() {
+            <span class="kw">let </span>color: <span class="prelude-ty">Result</span>&lt;Color, <span class="kw">_</span>&gt; = <span class="string">&quot;blue&quot;</span>.parse();
+            <span class="macro">assert_eq!</span>(<span class="prelude-val">Ok</span>(Color::Blue), color)
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">error</span>() {
-            <span class="kw">let</span> <span class="ident">color</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Color</span>, ()<span class="op">&gt;</span> <span class="op">=</span> <span class="string">&quot;bloublou&quot;</span>.<span class="ident">parse</span>();
-            <span class="macro">assert_eq!</span>(<span class="prelude-val">Err</span>(()), <span class="ident">color</span>)
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>error() {
+            <span class="kw">let </span>color: <span class="prelude-ty">Result</span>&lt;Color, ()&gt; = <span class="string">&quot;bloublou&quot;</span>.parse();
+            <span class="macro">assert_eq!</span>(<span class="prelude-val">Err</span>(()), color)
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="colored" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="colored" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

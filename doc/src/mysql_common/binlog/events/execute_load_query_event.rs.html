@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/execute_load_query_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>execute_load_query_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/execute_load_query_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>execute_load_query_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -337,344 +337,344 @@
 <span id="337">337</span>
 <span id="338">338</span>
 <span id="339">339</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">cmp::min</span>, <span class="ident">io</span>};
+</span><span class="kw">use </span>std::{borrow::Cow, cmp::min, io};
 
-<span class="kw">use</span> <span class="ident">saturating::Saturating</span> <span class="kw">as</span> <span class="ident">S</span>;
+<span class="kw">use </span>saturating::Saturating <span class="kw">as </span>S;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">binlog</span>::{
-        <span class="ident">consts</span>::{<span class="ident">BinlogVersion</span>, <span class="ident">EventType</span>, <span class="ident">LoadDuplicateHandling</span>},
-        <span class="ident">BinlogCtx</span>, <span class="ident">BinlogEvent</span>, <span class="ident">BinlogStruct</span>,
+<span class="kw">use crate</span>::{
+    binlog::{
+        consts::{BinlogVersion, EventType, LoadDuplicateHandling},
+        BinlogCtx, BinlogEvent, BinlogStruct,
     },
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">misc::raw</span>::{
-        <span class="ident">bytes</span>::{<span class="ident">BareU8Bytes</span>, <span class="ident">EofBytes</span>},
-        <span class="ident">int</span>::<span class="kw-2">*</span>,
-        <span class="ident">Const</span>, <span class="ident">RawBytes</span>, <span class="ident">RawInt</span>, <span class="ident">Skip</span>,
+    io::ParseBuf,
+    misc::raw::{
+        bytes::{BareU8Bytes, EofBytes},
+        int::<span class="kw-2">*</span>,
+        Const, RawBytes, RawInt, Skip,
     },
-    <span class="ident">proto</span>::{<span class="ident">MyDeserialize</span>, <span class="ident">MySerialize</span>},
+    proto::{MyDeserialize, MySerialize},
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">BinlogEventHeader</span>, <span class="ident">StatusVars</span>};
+<span class="kw">use super</span>::{BinlogEventHeader, StatusVars};
 
-<span class="doccomment">/// Execute load query event.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Used for LOAD DATA INFILE statements as of MySQL 5.0.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It similar to Query_log_event but before executing the query it substitutes original filename</span>
-<span class="doccomment">/// in LOAD DATA query with name of temporary file.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExecuteLoadQueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="comment">// post-header</span>
-    <span class="ident">thread_id</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="ident">execution_time</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="ident">schema_len</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">error_code</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU16</span><span class="op">&gt;</span>,
-    <span class="ident">status_vars_len</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU16</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Execute load query event.
+///
+/// Used for LOAD DATA INFILE statements as of MySQL 5.0.
+///
+/// It similar to Query_log_event but before executing the query it substitutes original filename
+/// in LOAD DATA query with name of temporary file.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>ExecuteLoadQueryEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="comment">// post-header
+    </span>thread_id: RawInt&lt;LeU32&gt;,
+    execution_time: RawInt&lt;LeU32&gt;,
+    schema_len: RawInt&lt;u8&gt;,
+    error_code: RawInt&lt;LeU16&gt;,
+    status_vars_len: RawInt&lt;LeU16&gt;,
 
-    <span class="comment">// payload</span>
-    <span class="doccomment">/// File_id of a temporary file.</span>
-    <span class="ident">file_id</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Pointer to the part of the query that should be substituted.</span>
-    <span class="ident">start_pos</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Pointer to the end of this part of query</span>
-    <span class="ident">end_pos</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// How to handle duplicates.</span>
-    <span class="ident">dup_handling</span>: <span class="ident">Const</span><span class="op">&lt;</span><span class="ident">LoadDuplicateHandling</span>, <span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="comment">// payload
+    </span><span class="doccomment">/// File_id of a temporary file.
+    </span>file_id: RawInt&lt;LeU32&gt;,
+    <span class="doccomment">/// Pointer to the part of the query that should be substituted.
+    </span>start_pos: RawInt&lt;LeU32&gt;,
+    <span class="doccomment">/// Pointer to the end of this part of query
+    </span>end_pos: RawInt&lt;LeU32&gt;,
+    <span class="doccomment">/// How to handle duplicates.
+    </span>dup_handling: Const&lt;LoadDuplicateHandling, u8&gt;,
 
-    <span class="ident">status_vars</span>: <span class="ident">StatusVars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">schema</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">BareU8Bytes</span><span class="op">&gt;</span>,
-    <span class="ident">__skip</span>: <span class="ident">Skip</span><span class="op">&lt;</span><span class="number">1</span><span class="op">&gt;</span>,
-    <span class="ident">query</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">EofBytes</span><span class="op">&gt;</span>,
+    status_vars: StatusVars&lt;<span class="lifetime">&#39;a</span>&gt;,
+    schema: RawBytes&lt;<span class="lifetime">&#39;a</span>, BareU8Bytes&gt;,
+    __skip: Skip&lt;<span class="number">1</span>&gt;,
+    query: RawBytes&lt;<span class="lifetime">&#39;a</span>, EofBytes&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExecuteLoadQueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">file_id</span>: <span class="ident">u32</span>,
-        <span class="ident">dup_handling</span>: <span class="ident">LoadDuplicateHandling</span>,
-        <span class="ident">status_vars</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">schema</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">status_vars</span> <span class="op">=</span> <span class="ident">StatusVars</span>(<span class="ident">RawBytes::new</span>(<span class="ident">status_vars</span>));
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">RawBytes::new</span>(<span class="ident">schema</span>);
-        <span class="self">Self</span> {
-            <span class="ident">thread_id</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">execution_time</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">schema_len</span>: <span class="ident">RawInt::new</span>(<span class="ident">schema</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>),
-            <span class="ident">error_code</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">status_vars_len</span>: <span class="ident">RawInt::new</span>(<span class="ident">status_vars</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>),
-            <span class="ident">file_id</span>: <span class="ident">RawInt::new</span>(<span class="ident">file_id</span>),
-            <span class="ident">start_pos</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">end_pos</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">dup_handling</span>: <span class="ident">Const::new</span>(<span class="ident">dup_handling</span>),
-            <span class="ident">status_vars</span>,
-            <span class="ident">schema</span>,
-            <span class="ident">__skip</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">query</span>: <span class="ident">Default::default</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ExecuteLoadQueryEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Creates a new instance.
+    </span><span class="kw">pub fn </span>new(
+        file_id: u32,
+        dup_handling: LoadDuplicateHandling,
+        status_vars: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;,
+        schema: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>status_vars = StatusVars(RawBytes::new(status_vars));
+        <span class="kw">let </span>schema = RawBytes::new(schema);
+        <span class="self">Self </span>{
+            thread_id: Default::default(),
+            execution_time: Default::default(),
+            schema_len: RawInt::new(schema.len() <span class="kw">as </span>u8),
+            error_code: Default::default(),
+            status_vars_len: RawInt::new(status_vars.<span class="number">0</span>.len() <span class="kw">as </span>u16),
+            file_id: RawInt::new(file_id),
+            start_pos: Default::default(),
+            end_pos: Default::default(),
+            dup_handling: Const::new(dup_handling),
+            status_vars,
+            schema,
+            __skip: Default::default(),
+            query: Default::default(),
         }
     }
 
-    <span class="doccomment">/// Sets the `thread_id` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_thread_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">thread_id</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">thread_id</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">thread_id</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Sets the `thread_id` value.
+    </span><span class="kw">pub fn </span>with_thread_id(<span class="kw-2">mut </span><span class="self">self</span>, thread_id: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.thread_id = RawInt::new(thread_id);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `execution_time` value.
+    </span><span class="kw">pub fn </span>with_execution_time(<span class="kw-2">mut </span><span class="self">self</span>, execution_time: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.execution_time = RawInt::new(execution_time);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `error_code` value.
+    </span><span class="kw">pub fn </span>with_error_code(<span class="kw-2">mut </span><span class="self">self</span>, error_code: u16) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.error_code = RawInt::new(error_code);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `file_id` value.
+    </span><span class="kw">pub fn </span>with_file_id(<span class="kw-2">mut </span><span class="self">self</span>, file_id: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.file_id = RawInt::new(file_id);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `start_pos` value.
+    </span><span class="kw">pub fn </span>with_start_pos(<span class="kw-2">mut </span><span class="self">self</span>, start_pos: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.start_pos = RawInt::new(start_pos);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `end_pos` value.
+    </span><span class="kw">pub fn </span>with_end_pos(<span class="kw-2">mut </span><span class="self">self</span>, end_pos: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.end_pos = RawInt::new(end_pos);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `dup_handling` value.
+    </span><span class="kw">pub fn </span>with_dup_handling(<span class="kw-2">mut </span><span class="self">self</span>, dup_handling: LoadDuplicateHandling) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.dup_handling = Const::new(dup_handling);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `status_vars` value (max length is `u16::MAX).
+    </span><span class="kw">pub fn </span>with_status_vars(<span class="kw-2">mut </span><span class="self">self</span>, status_vars: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.status_vars = StatusVars(RawBytes::new(status_vars));
+        <span class="self">self</span>.status_vars_len.<span class="number">0 </span>= <span class="self">self</span>.status_vars.<span class="number">0</span>.len() <span class="kw">as </span>u16;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `schema` value (max length is `u8::MAX).
+    </span><span class="kw">pub fn </span>with_schema(<span class="kw-2">mut </span><span class="self">self</span>, schema: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.schema = RawBytes::new(schema);
+        <span class="self">self</span>.schema_len.<span class="number">0 </span>= <span class="self">self</span>.schema.len() <span class="kw">as </span>u8;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the `query` value.
+    </span><span class="kw">pub fn </span>with_query(<span class="kw-2">mut </span><span class="self">self</span>, query: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.query = RawBytes::new(query);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Returns the `thread_id` value.
+    ///
+    /// `thread_id` is the ID of the thread that issued this statement.
+    /// It is needed for temporary tables.
+    </span><span class="kw">pub fn </span>thread_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.thread_id.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `execution_time` value.
+    ///
+    /// `execution_time` is the time from when the query started to when it was logged
+    /// in the binlog, in seconds.
+    </span><span class="kw">pub fn </span>execution_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.execution_time.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `error_code` value.
+    ///
+    /// `error_code` is the error code generated by the master. If the master fails, the slave will
+    /// fail with the same error code.
+    </span><span class="kw">pub fn </span>error_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.error_code.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `file_id` value.
+    ///
+    /// `file_id` is the ID of the temporary file to load.
+    </span><span class="kw">pub fn </span>file_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.file_id.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `start_pos` value.
+    ///
+    /// `start_pos` is the start position within the statement for filename substitution.
+    </span><span class="kw">pub fn </span>start_pos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.start_pos.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `end_pos` value.
+    ///
+    /// `end_pos` is the end position within the statement for filename substitution.
+    </span><span class="kw">pub fn </span>end_pos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.end_pos.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `dup_handling` value.
+    ///
+    /// `dup_handling` represents the information on how to handle duplicates.
+    </span><span class="kw">pub fn </span>dup_handling(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LoadDuplicateHandling {
+        <span class="self">self</span>.dup_handling.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `status_vars` value.
+    ///
+    /// `status_vars` contains zero or more status variables. Each status variable consists of one
+    /// byte identifying the variable stored, followed by the value of the variable.
+    </span><span class="kw">pub fn </span>status_vars_raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.status_vars.<span class="number">0</span>.as_bytes()
     }
 
-    <span class="doccomment">/// Sets the `execution_time` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_execution_time</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">execution_time</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">execution_time</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">execution_time</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns an iterator over status variables.
+    </span><span class="kw">pub fn </span>status_vars(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>StatusVars&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.status_vars
     }
 
-    <span class="doccomment">/// Sets the `error_code` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_error_code</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">error_code</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">error_code</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">error_code</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `schema` value.
+    ///
+    /// `schema` is schema name.
+    </span><span class="kw">pub fn </span>schema_raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.schema.as_bytes()
     }
 
-    <span class="doccomment">/// Sets the `file_id` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_file_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">file_id</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">file_id</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">file_id</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `schema` value as a string (lossy converted).
+    </span><span class="kw">pub fn </span>schema(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="self">self</span>.schema.as_str()
     }
 
-    <span class="doccomment">/// Sets the `start_pos` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_start_pos</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start_pos</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">start_pos</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">start_pos</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `query` value.
+    ///
+    /// `query` is the corresponding LOAD DATA INFILE statement.
+    </span><span class="kw">pub fn </span>query_raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.query.as_bytes()
     }
 
-    <span class="doccomment">/// Sets the `end_pos` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_end_pos</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">end_pos</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">end_pos</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">end_pos</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `query` value as a string (lossy converted).
+    </span><span class="kw">pub fn </span>query(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="self">self</span>.query.as_str()
     }
 
-    <span class="doccomment">/// Sets the `dup_handling` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_dup_handling</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dup_handling</span>: <span class="ident">LoadDuplicateHandling</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">dup_handling</span> <span class="op">=</span> <span class="ident">Const::new</span>(<span class="ident">dup_handling</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Sets the `status_vars` value (max length is `u16::MAX).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_status_vars</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">status_vars</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">status_vars</span> <span class="op">=</span> <span class="ident">StatusVars</span>(<span class="ident">RawBytes::new</span>(<span class="ident">status_vars</span>));
-        <span class="self">self</span>.<span class="ident">status_vars_len</span>.<span class="number">0</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">status_vars</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Sets the `schema` value (max length is `u8::MAX).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_schema</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">schema</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">schema</span> <span class="op">=</span> <span class="ident">RawBytes::new</span>(<span class="ident">schema</span>);
-        <span class="self">self</span>.<span class="ident">schema_len</span>.<span class="number">0</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Sets the `query` value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_query</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">query</span> <span class="op">=</span> <span class="ident">RawBytes::new</span>(<span class="ident">query</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Returns the `thread_id` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `thread_id` is the ID of the thread that issued this statement.</span>
-    <span class="doccomment">/// It is needed for temporary tables.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">thread_id</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the `execution_time` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `execution_time` is the time from when the query started to when it was logged</span>
-    <span class="doccomment">/// in the binlog, in seconds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execution_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">execution_time</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the `error_code` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `error_code` is the error code generated by the master. If the master fails, the slave will</span>
-    <span class="doccomment">/// fail with the same error code.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">error_code</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the `file_id` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `file_id` is the ID of the temporary file to load.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">file_id</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the `start_pos` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `start_pos` is the start position within the statement for filename substitution.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_pos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">start_pos</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the `end_pos` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `end_pos` is the end position within the statement for filename substitution.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_pos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">end_pos</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the `dup_handling` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `dup_handling` represents the information on how to handle duplicates.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dup_handling</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LoadDuplicateHandling</span> {
-        <span class="self">self</span>.<span class="ident">dup_handling</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the `status_vars` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `status_vars` contains zero or more status variables. Each status variable consists of one</span>
-    <span class="doccomment">/// byte identifying the variable stored, followed by the value of the variable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_vars_raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">status_vars</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>()
-    }
-
-    <span class="doccomment">/// Returns an iterator over status variables.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_vars</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StatusVars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">status_vars</span>
-    }
-
-    <span class="doccomment">/// Returns the `schema` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `schema` is schema name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">as_bytes</span>()
-    }
-
-    <span class="doccomment">/// Returns the `schema` value as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">as_str</span>()
-    }
-
-    <span class="doccomment">/// Returns the `query` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `query` is the corresponding LOAD DATA INFILE statement.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">as_bytes</span>()
-    }
-
-    <span class="doccomment">/// Returns the `query` value as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">as_str</span>()
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">ExecuteLoadQueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="ident">ExecuteLoadQueryEvent</span> {
-            <span class="ident">thread_id</span>: <span class="self">self</span>.<span class="ident">thread_id</span>,
-            <span class="ident">execution_time</span>: <span class="self">self</span>.<span class="ident">execution_time</span>,
-            <span class="ident">schema_len</span>: <span class="self">self</span>.<span class="ident">schema_len</span>,
-            <span class="ident">error_code</span>: <span class="self">self</span>.<span class="ident">error_code</span>,
-            <span class="ident">status_vars_len</span>: <span class="self">self</span>.<span class="ident">status_vars_len</span>,
-            <span class="ident">file_id</span>: <span class="self">self</span>.<span class="ident">file_id</span>,
-            <span class="ident">start_pos</span>: <span class="self">self</span>.<span class="ident">start_pos</span>,
-            <span class="ident">end_pos</span>: <span class="self">self</span>.<span class="ident">end_pos</span>,
-            <span class="ident">dup_handling</span>: <span class="self">self</span>.<span class="ident">dup_handling</span>,
-            <span class="ident">status_vars</span>: <span class="self">self</span>.<span class="ident">status_vars</span>.<span class="ident">into_owned</span>(),
-            <span class="ident">schema</span>: <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">into_owned</span>(),
-            <span class="ident">__skip</span>: <span class="self">self</span>.<span class="ident">__skip</span>,
-            <span class="ident">query</span>: <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">into_owned</span>(),
+    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; ExecuteLoadQueryEvent&lt;<span class="lifetime">&#39;static</span>&gt; {
+        ExecuteLoadQueryEvent {
+            thread_id: <span class="self">self</span>.thread_id,
+            execution_time: <span class="self">self</span>.execution_time,
+            schema_len: <span class="self">self</span>.schema_len,
+            error_code: <span class="self">self</span>.error_code,
+            status_vars_len: <span class="self">self</span>.status_vars_len,
+            file_id: <span class="self">self</span>.file_id,
+            start_pos: <span class="self">self</span>.start_pos,
+            end_pos: <span class="self">self</span>.end_pos,
+            dup_handling: <span class="self">self</span>.dup_handling,
+            status_vars: <span class="self">self</span>.status_vars.into_owned(),
+            schema: <span class="self">self</span>.schema.into_owned(),
+            __skip: <span class="self">self</span>.__skip,
+            query: <span class="self">self</span>.query.into_owned(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExecuteLoadQueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">BinlogCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ExecuteLoadQueryEvent&lt;<span class="lifetime">&#39;de</span>&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = BinlogCtx&lt;<span class="lifetime">&#39;de</span>&gt;;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="kw">_</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sbuf</span>: <span class="ident">ParseBuf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="number">26</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>deserialize(<span class="kw">_</span>: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>sbuf: ParseBuf = buf.parse(<span class="number">26</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">thread_id</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">execution_time</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">schema_len</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">error_code</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">status_vars_len</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU16</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">file_id</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">start_pos</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">end_pos</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">dup_handling</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>thread_id = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>execution_time = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>schema_len: RawInt&lt;u8&gt; = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>error_code = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>status_vars_len: RawInt&lt;LeU16&gt; = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>file_id = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>start_pos = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>end_pos = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>dup_handling = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">status_vars</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="kw-2">*</span><span class="ident">status_vars_len</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="kw-2">*</span><span class="ident">schema_len</span> <span class="kw">as</span> <span class="ident">usize</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">__skip</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>status_vars = buf.parse(<span class="kw-2">*</span>status_vars_len)<span class="question-mark">?</span>;
+        <span class="kw">let </span>schema = buf.parse(<span class="kw-2">*</span>schema_len <span class="kw">as </span>usize)<span class="question-mark">?</span>;
+        <span class="kw">let </span>__skip = buf.parse(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>query = buf.parse(())<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">thread_id</span>,
-            <span class="ident">execution_time</span>,
-            <span class="ident">schema_len</span>,
-            <span class="ident">error_code</span>,
-            <span class="ident">status_vars_len</span>,
-            <span class="ident">file_id</span>,
-            <span class="ident">start_pos</span>,
-            <span class="ident">end_pos</span>,
-            <span class="ident">dup_handling</span>,
-            <span class="ident">status_vars</span>,
-            <span class="ident">schema</span>,
-            <span class="ident">__skip</span>,
-            <span class="ident">query</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            thread_id,
+            execution_time,
+            schema_len,
+            error_code,
+            status_vars_len,
+            file_id,
+            start_pos,
+            end_pos,
+            dup_handling,
+            status_vars,
+            schema,
+            __skip,
+            query,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">ExecuteLoadQueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">thread_id</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">execution_time</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">schema_len</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">error_code</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">status_vars_len</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">file_id</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">start_pos</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">end_pos</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">dup_handling</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">status_vars</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">__skip</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+<span class="kw">impl </span>MySerialize <span class="kw">for </span>ExecuteLoadQueryEvent&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="self">self</span>.thread_id.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.execution_time.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.schema_len.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.error_code.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.status_vars_len.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.file_id.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.start_pos.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.end_pos.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.dup_handling.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.status_vars.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.schema.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.__skip.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.query.serialize(<span class="kw-2">&amp;mut *</span>buf);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BinlogStruct</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExecuteLoadQueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_version</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">S</span>(<span class="number">0</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BinlogStruct&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>ExecuteLoadQueryEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>, _version: BinlogVersion) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>len = S(<span class="number">0</span>);
 
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">4</span>); <span class="comment">// thread_id</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">4</span>); <span class="comment">// query_exec_time</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">1</span>); <span class="comment">// db_len</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">2</span>); <span class="comment">// error_code</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">2</span>); <span class="comment">// status_vars_len</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">4</span>); <span class="comment">// file_id</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">4</span>); <span class="comment">// start_pos</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">4</span>); <span class="comment">// end_pos</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">1</span>); <span class="comment">// dup_handling_flags</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident">min</span>(<span class="self">self</span>.<span class="ident">status_vars</span>.<span class="number">0</span>.<span class="ident">len</span>(), <span class="ident">u16::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">13</span>)); <span class="comment">// status_vars</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident">min</span>(<span class="self">self</span>.<span class="ident">schema</span>.<span class="number">0</span>.<span class="ident">len</span>(), <span class="ident">u8::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>)); <span class="comment">// db_len</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">1</span>); <span class="comment">// null-byte</span>
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="self">self</span>.<span class="ident">query</span>.<span class="number">0</span>.<span class="ident">len</span>());
+        len += S(<span class="number">4</span>); <span class="comment">// thread_id
+        </span>len += S(<span class="number">4</span>); <span class="comment">// query_exec_time
+        </span>len += S(<span class="number">1</span>); <span class="comment">// db_len
+        </span>len += S(<span class="number">2</span>); <span class="comment">// error_code
+        </span>len += S(<span class="number">2</span>); <span class="comment">// status_vars_len
+        </span>len += S(<span class="number">4</span>); <span class="comment">// file_id
+        </span>len += S(<span class="number">4</span>); <span class="comment">// start_pos
+        </span>len += S(<span class="number">4</span>); <span class="comment">// end_pos
+        </span>len += S(<span class="number">1</span>); <span class="comment">// dup_handling_flags
+        </span>len += S(min(<span class="self">self</span>.status_vars.<span class="number">0</span>.len(), u16::MAX <span class="kw">as </span>usize - <span class="number">13</span>)); <span class="comment">// status_vars
+        </span>len += S(min(<span class="self">self</span>.schema.<span class="number">0</span>.len(), u8::MAX <span class="kw">as </span>usize)); <span class="comment">// db_len
+        </span>len += S(<span class="number">1</span>); <span class="comment">// null-byte
+        </span>len += S(<span class="self">self</span>.query.<span class="number">0</span>.len());
 
-        <span class="ident">min</span>(<span class="ident">len</span>.<span class="number">0</span>, <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">BinlogEventHeader::LEN</span>)
+        min(len.<span class="number">0</span>, u32::MAX <span class="kw">as </span>usize - BinlogEventHeader::LEN)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BinlogEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExecuteLoadQueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">EVENT_TYPE</span>: <span class="ident">EventType</span> <span class="op">=</span> <span class="ident">EventType::EXECUTE_LOAD_QUERY_EVENT</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BinlogEvent&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>ExecuteLoadQueryEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">const </span>EVENT_TYPE: EventType = EventType::EXECUTE_LOAD_QUERY_EVENT;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

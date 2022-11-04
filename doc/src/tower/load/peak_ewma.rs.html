@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/load/peak_ewma.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>peak_ewma.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/load/peak_ewma.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>peak_ewma.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -405,412 +405,412 @@
 <span id="405">405</span>
 <span id="406">406</span>
 <span id="407">407</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A `Load` implementation that measures load using the PeakEWMA response latency.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A `Load` implementation that measures load using the PeakEWMA response latency.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::discover</span>::{<span class="ident">Change</span>, <span class="ident">Discover</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">futures_core</span>::{<span class="ident">ready</span>, <span class="ident">Stream</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::discover::{Change, Discover};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">use </span>futures_core::{ready, Stream};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">use </span>pin_project_lite::pin_project;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">use </span>std::pin::Pin;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::completion</span>::{<span class="ident">CompleteOnResponse</span>, <span class="ident">TrackCompletion</span>, <span class="ident">TrackCompletionFuture</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Load</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>},
-    <span class="ident">time::Duration</span>,
+<span class="kw">use </span><span class="kw">super</span>::completion::{CompleteOnResponse, TrackCompletion, TrackCompletionFuture};
+<span class="kw">use </span><span class="kw">super</span>::Load;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>std::{
+    sync::{Arc, Mutex},
+    time::Duration,
 };
-<span class="kw">use</span> <span class="ident">tokio::time::Instant</span>;
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
-<span class="kw">use</span> <span class="ident">tracing::trace</span>;
+<span class="kw">use </span>tokio::time::Instant;
+<span class="kw">use </span>tower_service::Service;
+<span class="kw">use </span>tracing::trace;
 
-<span class="doccomment">/// Measures the load of the underlying service using Peak-EWMA load measurement.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`PeakEwma`] implements [`Load`] with the [`Cost`] metric that estimates the amount of</span>
-<span class="doccomment">/// pending work to an endpoint. Work is calculated by multiplying the</span>
-<span class="doccomment">/// exponentially-weighted moving average (EWMA) of response latencies by the number of</span>
-<span class="doccomment">/// pending requests. The Peak-EWMA algorithm is designed to be especially sensitive to</span>
-<span class="doccomment">/// worst-case latencies. Over time, the peak latency value decays towards the moving</span>
-<span class="doccomment">/// average of latencies to the endpoint.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When no latency information has been measured for an endpoint, an arbitrary default</span>
-<span class="doccomment">/// RTT of 1 second is used to prevent the endpoint from being overloaded before a</span>
-<span class="doccomment">/// meaningful baseline can be established..</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Note</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is derived from [Finagle][finagle], which is distributed under the Apache V2</span>
-<span class="doccomment">/// license. Copyright 2017, Twitter Inc.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [finagle]:</span>
-<span class="doccomment">/// https://github.com/twitter/finagle/blob/9cc08d15216497bb03a1cafda96b7266cfbbcff1/finagle-core/src/main/scala/com/twitter/finagle/loadbalancer/PeakEwma.scala</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PeakEwma</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span> <span class="op">=</span> <span class="ident">CompleteOnResponse</span><span class="op">&gt;</span> {
-    <span class="ident">service</span>: <span class="ident">S</span>,
-    <span class="ident">decay_ns</span>: <span class="ident">f64</span>,
-    <span class="ident">rtt_estimate</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">RttEstimate</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">completion</span>: <span class="ident">C</span>,
+<span class="doccomment">/// Measures the load of the underlying service using Peak-EWMA load measurement.
+///
+/// [`PeakEwma`] implements [`Load`] with the [`Cost`] metric that estimates the amount of
+/// pending work to an endpoint. Work is calculated by multiplying the
+/// exponentially-weighted moving average (EWMA) of response latencies by the number of
+/// pending requests. The Peak-EWMA algorithm is designed to be especially sensitive to
+/// worst-case latencies. Over time, the peak latency value decays towards the moving
+/// average of latencies to the endpoint.
+///
+/// When no latency information has been measured for an endpoint, an arbitrary default
+/// RTT of 1 second is used to prevent the endpoint from being overloaded before a
+/// meaningful baseline can be established..
+///
+/// ## Note
+///
+/// This is derived from [Finagle][finagle], which is distributed under the Apache V2
+/// license. Copyright 2017, Twitter Inc.
+///
+/// [finagle]:
+/// https://github.com/twitter/finagle/blob/9cc08d15216497bb03a1cafda96b7266cfbbcff1/finagle-core/src/main/scala/com/twitter/finagle/loadbalancer/PeakEwma.scala
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>PeakEwma&lt;S, C = CompleteOnResponse&gt; {
+    service: S,
+    decay_ns: f64,
+    rtt_estimate: Arc&lt;Mutex&lt;RttEstimate&gt;&gt;,
+    completion: C,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// Wraps a `D`-typed stream of discovered services with `PeakEwma`.</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)))]</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PeakEwmaDiscover</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span> <span class="op">=</span> <span class="ident">CompleteOnResponse</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">discover</span>: <span class="ident">D</span>,
-        <span class="ident">decay_ns</span>: <span class="ident">f64</span>,
-        <span class="ident">default_rtt</span>: <span class="ident">Duration</span>,
-        <span class="ident">completion</span>: <span class="ident">C</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="macro">pin_project! </span>{
+    <span class="doccomment">/// Wraps a `D`-typed stream of discovered services with `PeakEwma`.
+    </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;discover&quot;</span>)))]
+    #[derive(Debug)]
+    </span><span class="kw">pub struct </span>PeakEwmaDiscover&lt;D, C = CompleteOnResponse&gt; {
+        <span class="attribute">#[pin]
+        </span>discover: D,
+        decay_ns: f64,
+        default_rtt: Duration,
+        completion: C,
     }
 }
 
-<span class="doccomment">/// Represents the relative cost of communicating with a service.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The underlying value estimates the amount of pending work to a service: the Peak-EWMA</span>
-<span class="doccomment">/// latency estimate multiplied by the number of pending requests.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Cost</span>(<span class="ident">f64</span>);
+<span class="doccomment">/// Represents the relative cost of communicating with a service.
+///
+/// The underlying value estimates the amount of pending work to a service: the Peak-EWMA
+/// latency estimate multiplied by the number of pending requests.
+</span><span class="attribute">#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
+</span><span class="kw">pub struct </span>Cost(f64);
 
-<span class="doccomment">/// Tracks an in-flight request and updates the RTT-estimate on Drop.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Handle</span> {
-    <span class="ident">sent_at</span>: <span class="ident">Instant</span>,
-    <span class="ident">decay_ns</span>: <span class="ident">f64</span>,
-    <span class="ident">rtt_estimate</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">RttEstimate</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Tracks an in-flight request and updates the RTT-estimate on Drop.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Handle {
+    sent_at: Instant,
+    decay_ns: f64,
+    rtt_estimate: Arc&lt;Mutex&lt;RttEstimate&gt;&gt;,
 }
 
-<span class="doccomment">/// Holds the current RTT estimate and the last time this value was updated.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">RttEstimate</span> {
-    <span class="ident">update_at</span>: <span class="ident">Instant</span>,
-    <span class="ident">rtt_ns</span>: <span class="ident">f64</span>,
+<span class="doccomment">/// Holds the current RTT estimate and the last time this value was updated.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>RttEstimate {
+    update_at: Instant,
+    rtt_ns: f64,
 }
 
-<span class="kw">const</span> <span class="ident">NANOS_PER_MILLI</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1_000_000.0</span>;
+<span class="kw">const </span>NANOS_PER_MILLI: f64 = <span class="number">1_000_000.0</span>;
 
-<span class="comment">// ===== impl PeakEwma =====</span>
+<span class="comment">// ===== impl PeakEwma =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PeakEwma</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Wraps an `S`-typed service so that its load is tracked by the EWMA of its peak latency.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">service</span>: <span class="ident">S</span>, <span class="ident">default_rtt</span>: <span class="ident">Duration</span>, <span class="ident">decay_ns</span>: <span class="ident">f64</span>, <span class="ident">completion</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">decay_ns</span> <span class="op">&gt;</span> <span class="number">0.0</span>, <span class="string">&quot;decay_ns must be positive&quot;</span>);
-        <span class="self">Self</span> {
-            <span class="ident">service</span>,
-            <span class="ident">decay_ns</span>,
-            <span class="ident">rtt_estimate</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">RttEstimate::new</span>(<span class="ident">nanos</span>(<span class="ident">default_rtt</span>)))),
-            <span class="ident">completion</span>,
+</span><span class="kw">impl</span>&lt;S, C&gt; PeakEwma&lt;S, C&gt; {
+    <span class="doccomment">/// Wraps an `S`-typed service so that its load is tracked by the EWMA of its peak latency.
+    </span><span class="kw">pub fn </span>new(service: S, default_rtt: Duration, decay_ns: f64, completion: C) -&gt; <span class="self">Self </span>{
+        <span class="macro">debug_assert!</span>(decay_ns &gt; <span class="number">0.0</span>, <span class="string">&quot;decay_ns must be positive&quot;</span>);
+        <span class="self">Self </span>{
+            service,
+            decay_ns,
+            rtt_estimate: Arc::new(Mutex::new(RttEstimate::new(nanos(default_rtt)))),
+            completion,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Handle</span> {
-        <span class="ident">Handle</span> {
-            <span class="ident">decay_ns</span>: <span class="self">self</span>.<span class="ident">decay_ns</span>,
-            <span class="ident">sent_at</span>: <span class="ident">Instant::now</span>(),
-            <span class="ident">rtt_estimate</span>: <span class="self">self</span>.<span class="ident">rtt_estimate</span>.<span class="ident">clone</span>(),
+    <span class="kw">fn </span>handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Handle {
+        Handle {
+            decay_ns: <span class="self">self</span>.decay_ns,
+            sent_at: Instant::now(),
+            rtt_estimate: <span class="self">self</span>.rtt_estimate.clone(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PeakEwma</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">C</span>: <span class="ident">TrackCompletion</span><span class="op">&lt;</span><span class="ident">Handle</span>, <span class="ident">S::Response</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, C, Request&gt; Service&lt;Request&gt; <span class="kw">for </span>PeakEwma&lt;S, C&gt;
+<span class="kw">where
+    </span>S: Service&lt;Request&gt;,
+    C: TrackCompletion&lt;Handle, S::Response&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">C::Output</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">TrackCompletionFuture</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">C</span>, <span class="ident">Handle</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Response = C::Output;
+    <span class="kw">type </span>Error = S::Error;
+    <span class="kw">type </span>Future = TrackCompletionFuture&lt;S::Future, C, Handle&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">service</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.service.poll_ready(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="ident">TrackCompletionFuture::new</span>(
-            <span class="self">self</span>.<span class="ident">completion</span>.<span class="ident">clone</span>(),
-            <span class="self">self</span>.<span class="ident">handle</span>(),
-            <span class="self">self</span>.<span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">req</span>),
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, req: Request) -&gt; <span class="self">Self</span>::Future {
+        TrackCompletionFuture::new(
+            <span class="self">self</span>.completion.clone(),
+            <span class="self">self</span>.handle(),
+            <span class="self">self</span>.service.call(req),
         )
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Load</span> <span class="kw">for</span> <span class="ident">PeakEwma</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Metric</span> <span class="op">=</span> <span class="ident">Cost</span>;
+<span class="kw">impl</span>&lt;S, C&gt; Load <span class="kw">for </span>PeakEwma&lt;S, C&gt; {
+    <span class="kw">type </span>Metric = Cost;
 
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Metric</span> {
-        <span class="kw">let</span> <span class="ident">pending</span> <span class="op">=</span> <span class="ident">Arc::strong_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rtt_estimate</span>) <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">1</span>;
+    <span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Metric {
+        <span class="kw">let </span>pending = Arc::strong_count(<span class="kw-2">&amp;</span><span class="self">self</span>.rtt_estimate) <span class="kw">as </span>u32 - <span class="number">1</span>;
 
-        <span class="comment">// Update the RTT estimate to account for decay since the last update.</span>
-        <span class="comment">// If an estimate has not been established, a default is provided</span>
-        <span class="kw">let</span> <span class="ident">estimate</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">update_estimate</span>();
+        <span class="comment">// Update the RTT estimate to account for decay since the last update.
+        // If an estimate has not been established, a default is provided
+        </span><span class="kw">let </span>estimate = <span class="self">self</span>.update_estimate();
 
-        <span class="kw">let</span> <span class="ident">cost</span> <span class="op">=</span> <span class="ident">Cost</span>(<span class="ident">estimate</span> <span class="op">*</span> <span class="ident">f64::from</span>(<span class="ident">pending</span> <span class="op">+</span> <span class="number">1</span>));
+        <span class="kw">let </span>cost = Cost(estimate * f64::from(pending + <span class="number">1</span>));
         <span class="macro">trace!</span>(
             <span class="string">&quot;load estimate={:.0}ms pending={} cost={:?}&quot;</span>,
-            <span class="ident">estimate</span> <span class="op">/</span> <span class="ident">NANOS_PER_MILLI</span>,
-            <span class="ident">pending</span>,
-            <span class="ident">cost</span>,
+            estimate / NANOS_PER_MILLI,
+            pending,
+            cost,
         );
-        <span class="ident">cost</span>
+        cost
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PeakEwma</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">update_estimate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rtt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rtt_estimate</span>.<span class="ident">lock</span>().<span class="ident">expect</span>(<span class="string">&quot;peak ewma prior_estimate&quot;</span>);
-        <span class="ident">rtt</span>.<span class="ident">decay</span>(<span class="self">self</span>.<span class="ident">decay_ns</span>)
+<span class="kw">impl</span>&lt;S, C&gt; PeakEwma&lt;S, C&gt; {
+    <span class="kw">fn </span>update_estimate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+        <span class="kw">let </span><span class="kw-2">mut </span>rtt = <span class="self">self</span>.rtt_estimate.lock().expect(<span class="string">&quot;peak ewma prior_estimate&quot;</span>);
+        rtt.decay(<span class="self">self</span>.decay_ns)
     }
 }
 
-<span class="comment">// ===== impl PeakEwmaDiscover =====</span>
+<span class="comment">// ===== impl PeakEwmaDiscover =====
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PeakEwmaDiscover</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Wraps a `D`-typed [`Discover`] so that services have a [`PeakEwma`] load metric.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The provided `default_rtt` is used as the default RTT estimate for newly</span>
-    <span class="doccomment">/// added services.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// They `decay` value determines over what time period a RTT estimate should</span>
-    <span class="doccomment">/// decay.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>(<span class="ident">discover</span>: <span class="ident">D</span>, <span class="ident">default_rtt</span>: <span class="ident">Duration</span>, <span class="ident">decay</span>: <span class="ident">Duration</span>, <span class="ident">completion</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Discover</span>,
-        <span class="ident">D::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-        <span class="ident">C</span>: <span class="ident">TrackCompletion</span><span class="op">&lt;</span><span class="ident">Handle</span>, <span class="op">&lt;</span><span class="ident">D::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Response</span><span class="op">&gt;</span>,
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;D, C&gt; PeakEwmaDiscover&lt;D, C&gt; {
+    <span class="doccomment">/// Wraps a `D`-typed [`Discover`] so that services have a [`PeakEwma`] load metric.
+    ///
+    /// The provided `default_rtt` is used as the default RTT estimate for newly
+    /// added services.
+    ///
+    /// They `decay` value determines over what time period a RTT estimate should
+    /// decay.
+    </span><span class="kw">pub fn </span>new&lt;Request&gt;(discover: D, default_rtt: Duration, decay: Duration, completion: C) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>D: Discover,
+        D::Service: Service&lt;Request&gt;,
+        C: TrackCompletion&lt;Handle, &lt;D::Service <span class="kw">as </span>Service&lt;Request&gt;&gt;::Response&gt;,
     {
-        <span class="ident">PeakEwmaDiscover</span> {
-            <span class="ident">discover</span>,
-            <span class="ident">decay_ns</span>: <span class="ident">nanos</span>(<span class="ident">decay</span>),
-            <span class="ident">default_rtt</span>,
-            <span class="ident">completion</span>,
+        PeakEwmaDiscover {
+            discover,
+            decay_ns: nanos(decay),
+            default_rtt,
+            completion,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">PeakEwmaDiscover</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">Discover</span>,
-    <span class="ident">C</span>: <span class="ident">Clone</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;discover&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;D, C&gt; Stream <span class="kw">for </span>PeakEwmaDiscover&lt;D, C&gt;
+<span class="kw">where
+    </span>D: Discover,
+    C: Clone,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&lt;</span><span class="ident">D::Key</span>, <span class="ident">PeakEwma</span><span class="op">&lt;</span><span class="ident">D::Service</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;Change&lt;D::Key, PeakEwma&lt;D::Service, C&gt;&gt;, D::Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">let</span> <span class="ident">change</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">discover</span>.<span class="ident">poll_discover</span>(<span class="ident">cx</span>)).<span class="ident">transpose</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">Change::Remove</span>(<span class="ident">k</span>)) =&gt; <span class="ident">Change::Remove</span>(<span class="ident">k</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">Change::Insert</span>(<span class="ident">k</span>, <span class="ident">svc</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">peak_ewma</span> <span class="op">=</span> <span class="ident">PeakEwma::new</span>(
-                    <span class="ident">svc</span>,
-                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">default_rtt</span>,
-                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">decay_ns</span>,
-                    <span class="ident">this</span>.<span class="ident">completion</span>.<span class="ident">clone</span>(),
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span>change = <span class="kw">match </span><span class="macro">ready!</span>(this.discover.poll_discover(cx)).transpose()<span class="question-mark">? </span>{
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(Change::Remove(k)) =&gt; Change::Remove(k),
+            <span class="prelude-val">Some</span>(Change::Insert(k, svc)) =&gt; {
+                <span class="kw">let </span>peak_ewma = PeakEwma::new(
+                    svc,
+                    <span class="kw-2">*</span>this.default_rtt,
+                    <span class="kw-2">*</span>this.decay_ns,
+                    this.completion.clone(),
                 );
-                <span class="ident">Change::Insert</span>(<span class="ident">k</span>, <span class="ident">peak_ewma</span>)
+                Change::Insert(k, peak_ewma)
             }
         };
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">change</span>)))
+        Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(change)))
     }
 }
 
-<span class="comment">// ===== impl RttEstimate =====</span>
+<span class="comment">// ===== impl RttEstimate =====
 
-<span class="kw">impl</span> <span class="ident">RttEstimate</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">rtt_ns</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">debug_assert!</span>(<span class="number">0.0</span> <span class="op">&lt;</span> <span class="ident">rtt_ns</span>, <span class="string">&quot;rtt must be positive&quot;</span>);
-        <span class="self">Self</span> {
-            <span class="ident">rtt_ns</span>,
-            <span class="ident">update_at</span>: <span class="ident">Instant::now</span>(),
+</span><span class="kw">impl </span>RttEstimate {
+    <span class="kw">fn </span>new(rtt_ns: f64) -&gt; <span class="self">Self </span>{
+        <span class="macro">debug_assert!</span>(<span class="number">0.0 </span>&lt; rtt_ns, <span class="string">&quot;rtt must be positive&quot;</span>);
+        <span class="self">Self </span>{
+            rtt_ns,
+            update_at: Instant::now(),
         }
     }
 
-    <span class="doccomment">/// Decays the RTT estimate with a decay period of `decay_ns`.</span>
-    <span class="kw">fn</span> <span class="ident">decay</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">decay_ns</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
-        <span class="comment">// Updates with a 0 duration so that the estimate decays towards 0.</span>
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-        <span class="self">self</span>.<span class="ident">update</span>(<span class="ident">now</span>, <span class="ident">now</span>, <span class="ident">decay_ns</span>)
+    <span class="doccomment">/// Decays the RTT estimate with a decay period of `decay_ns`.
+    </span><span class="kw">fn </span>decay(<span class="kw-2">&amp;mut </span><span class="self">self</span>, decay_ns: f64) -&gt; f64 {
+        <span class="comment">// Updates with a 0 duration so that the estimate decays towards 0.
+        </span><span class="kw">let </span>now = Instant::now();
+        <span class="self">self</span>.update(now, now, decay_ns)
     }
 
-    <span class="doccomment">/// Updates the Peak-EWMA RTT estimate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The elapsed time from `sent_at` to `recv_at` is added</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sent_at</span>: <span class="ident">Instant</span>, <span class="ident">recv_at</span>: <span class="ident">Instant</span>, <span class="ident">decay_ns</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
+    <span class="doccomment">/// Updates the Peak-EWMA RTT estimate.
+    ///
+    /// The elapsed time from `sent_at` to `recv_at` is added
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sent_at: Instant, recv_at: Instant, decay_ns: f64) -&gt; f64 {
         <span class="macro">debug_assert!</span>(
-            <span class="ident">sent_at</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">recv_at</span>,
+            sent_at &lt;= recv_at,
             <span class="string">&quot;recv_at={:?} after sent_at={:?}&quot;</span>,
-            <span class="ident">recv_at</span>,
-            <span class="ident">sent_at</span>
+            recv_at,
+            sent_at
         );
-        <span class="kw">let</span> <span class="ident">rtt</span> <span class="op">=</span> <span class="ident">nanos</span>(<span class="ident">recv_at</span>.<span class="ident">saturating_duration_since</span>(<span class="ident">sent_at</span>));
+        <span class="kw">let </span>rtt = nanos(recv_at.saturating_duration_since(sent_at));
 
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+        <span class="kw">let </span>now = Instant::now();
         <span class="macro">debug_assert!</span>(
-            <span class="self">self</span>.<span class="ident">update_at</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">now</span>,
+            <span class="self">self</span>.update_at &lt;= now,
             <span class="string">&quot;update_at={:?} in the future&quot;</span>,
-            <span class="self">self</span>.<span class="ident">update_at</span>
+            <span class="self">self</span>.update_at
         );
 
-        <span class="self">self</span>.<span class="ident">rtt_ns</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">rtt_ns</span> <span class="op">&lt;</span> <span class="ident">rtt</span> {
-            <span class="comment">// For Peak-EWMA, always use the worst-case (peak) value as the estimate for</span>
-            <span class="comment">// subsequent requests.</span>
-            <span class="macro">trace!</span>(
+        <span class="self">self</span>.rtt_ns = <span class="kw">if </span><span class="self">self</span>.rtt_ns &lt; rtt {
+            <span class="comment">// For Peak-EWMA, always use the worst-case (peak) value as the estimate for
+            // subsequent requests.
+            </span><span class="macro">trace!</span>(
                 <span class="string">&quot;update peak rtt={}ms prior={}ms&quot;</span>,
-                <span class="ident">rtt</span> <span class="op">/</span> <span class="ident">NANOS_PER_MILLI</span>,
-                <span class="self">self</span>.<span class="ident">rtt_ns</span> <span class="op">/</span> <span class="ident">NANOS_PER_MILLI</span>,
+                rtt / NANOS_PER_MILLI,
+                <span class="self">self</span>.rtt_ns / NANOS_PER_MILLI,
             );
-            <span class="ident">rtt</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// When an RTT is observed that is less than the estimated RTT, we decay the</span>
-            <span class="comment">// prior estimate according to how much time has elapsed since the last</span>
-            <span class="comment">// update. The inverse of the decay is used to scale the estimate towards the</span>
-            <span class="comment">// observed RTT value.</span>
-            <span class="kw">let</span> <span class="ident">elapsed</span> <span class="op">=</span> <span class="ident">nanos</span>(<span class="ident">now</span>.<span class="ident">saturating_duration_since</span>(<span class="self">self</span>.<span class="ident">update_at</span>));
-            <span class="kw">let</span> <span class="ident">decay</span> <span class="op">=</span> (<span class="op">-</span><span class="ident">elapsed</span> <span class="op">/</span> <span class="ident">decay_ns</span>).<span class="ident">exp</span>();
-            <span class="kw">let</span> <span class="ident">recency</span> <span class="op">=</span> <span class="number">1.0</span> <span class="op">-</span> <span class="ident">decay</span>;
-            <span class="kw">let</span> <span class="ident">next_estimate</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">rtt_ns</span> <span class="op">*</span> <span class="ident">decay</span>) <span class="op">+</span> (<span class="ident">rtt</span> <span class="op">*</span> <span class="ident">recency</span>);
+            rtt
+        } <span class="kw">else </span>{
+            <span class="comment">// When an RTT is observed that is less than the estimated RTT, we decay the
+            // prior estimate according to how much time has elapsed since the last
+            // update. The inverse of the decay is used to scale the estimate towards the
+            // observed RTT value.
+            </span><span class="kw">let </span>elapsed = nanos(now.saturating_duration_since(<span class="self">self</span>.update_at));
+            <span class="kw">let </span>decay = (-elapsed / decay_ns).exp();
+            <span class="kw">let </span>recency = <span class="number">1.0 </span>- decay;
+            <span class="kw">let </span>next_estimate = (<span class="self">self</span>.rtt_ns * decay) + (rtt * recency);
             <span class="macro">trace!</span>(
                 <span class="string">&quot;update rtt={:03.0}ms decay={:06.0}ns; next={:03.0}ms&quot;</span>,
-                <span class="ident">rtt</span> <span class="op">/</span> <span class="ident">NANOS_PER_MILLI</span>,
-                <span class="self">self</span>.<span class="ident">rtt_ns</span> <span class="op">-</span> <span class="ident">next_estimate</span>,
-                <span class="ident">next_estimate</span> <span class="op">/</span> <span class="ident">NANOS_PER_MILLI</span>,
+                rtt / NANOS_PER_MILLI,
+                <span class="self">self</span>.rtt_ns - next_estimate,
+                next_estimate / NANOS_PER_MILLI,
             );
-            <span class="ident">next_estimate</span>
+            next_estimate
         };
-        <span class="self">self</span>.<span class="ident">update_at</span> <span class="op">=</span> <span class="ident">now</span>;
+        <span class="self">self</span>.update_at = now;
 
-        <span class="self">self</span>.<span class="ident">rtt_ns</span>
+        <span class="self">self</span>.rtt_ns
     }
 }
 
-<span class="comment">// ===== impl Handle =====</span>
+<span class="comment">// ===== impl Handle =====
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Handle</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">recv_at</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+</span><span class="kw">impl </span>Drop <span class="kw">for </span>Handle {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>recv_at = Instant::now();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">rtt</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">rtt_estimate</span>.<span class="ident">lock</span>() {
-            <span class="ident">rtt</span>.<span class="ident">update</span>(<span class="self">self</span>.<span class="ident">sent_at</span>, <span class="ident">recv_at</span>, <span class="self">self</span>.<span class="ident">decay_ns</span>);
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>rtt) = <span class="self">self</span>.rtt_estimate.lock() {
+            rtt.update(<span class="self">self</span>.sent_at, recv_at, <span class="self">self</span>.decay_ns);
         }
     }
 }
 
-<span class="comment">// ===== impl Cost =====</span>
+<span class="comment">// ===== impl Cost =====
 
-<span class="comment">// Utility that converts durations to nanos in f64.</span>
-<span class="comment">//</span>
-<span class="comment">// Due to a lossy transformation, the maximum value that can be represented is ~585 years,</span>
-<span class="comment">// which, I hope, is more than enough to represent request latencies.</span>
-<span class="kw">fn</span> <span class="ident">nanos</span>(<span class="ident">d</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">f64</span> {
-    <span class="kw">const</span> <span class="ident">NANOS_PER_SEC</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1_000_000_000</span>;
-    <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">f64::from</span>(<span class="ident">d</span>.<span class="ident">subsec_nanos</span>());
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">as_secs</span>().<span class="ident">saturating_mul</span>(<span class="ident">NANOS_PER_SEC</span>) <span class="kw">as</span> <span class="ident">f64</span>;
-    <span class="ident">n</span> <span class="op">+</span> <span class="ident">s</span>
+// Utility that converts durations to nanos in f64.
+//
+// Due to a lossy transformation, the maximum value that can be represented is ~585 years,
+// which, I hope, is more than enough to represent request latencies.
+</span><span class="kw">fn </span>nanos(d: Duration) -&gt; f64 {
+    <span class="kw">const </span>NANOS_PER_SEC: u64 = <span class="number">1_000_000_000</span>;
+    <span class="kw">let </span>n = f64::from(d.subsec_nanos());
+    <span class="kw">let </span>s = d.as_secs().saturating_mul(NANOS_PER_SEC) <span class="kw">as </span>f64;
+    n + s
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">futures_util::future</span>;
-    <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
-    <span class="kw">use</span> <span class="ident">tokio::time</span>;
-    <span class="kw">use</span> <span class="ident">tokio_test</span>::{<span class="ident">assert_ready</span>, <span class="ident">assert_ready_ok</span>, <span class="ident">task</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>futures_util::future;
+    <span class="kw">use </span>std::time::Duration;
+    <span class="kw">use </span>tokio::time;
+    <span class="kw">use </span>tokio_test::{assert_ready, assert_ready_ok, task};
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">struct</span> <span class="ident">Svc</span>;
-    <span class="kw">impl</span> <span class="ident">Service</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Svc</span> {
-        <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> ();
-        <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
-        <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">future::Ready</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">struct </span>Svc;
+    <span class="kw">impl </span>Service&lt;()&gt; <span class="kw">for </span>Svc {
+        <span class="kw">type </span>Response = ();
+        <span class="kw">type </span>Error = ();
+        <span class="kw">type </span>Future = future::Ready&lt;<span class="prelude-ty">Result</span>&lt;(), ()&gt;&gt;;
 
-        <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), ()&gt;&gt; {
+            Poll::Ready(<span class="prelude-val">Ok</span>(()))
         }
 
-        <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, (): ()) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-            <span class="ident">future::ok</span>(())
+        <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, (): ()) -&gt; <span class="self">Self</span>::Future {
+            future::ok(())
         }
     }
 
-    <span class="doccomment">/// The default RTT estimate decays, so that new nodes are considered if the</span>
-    <span class="doccomment">/// default RTT is too high.</span>
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">default_decay</span>() {
-        <span class="ident">time::pause</span>();
+    <span class="doccomment">/// The default RTT estimate decays, so that new nodes are considered if the
+    /// default RTT is too high.
+    </span><span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>default_decay() {
+        time::pause();
 
-        <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="ident">PeakEwma::new</span>(
-            <span class="ident">Svc</span>,
-            <span class="ident">Duration::from_millis</span>(<span class="number">10</span>),
-            <span class="ident">NANOS_PER_MILLI</span> <span class="op">*</span> <span class="number">1_000.0</span>,
-            <span class="ident">CompleteOnResponse</span>,
+        <span class="kw">let </span>svc = PeakEwma::new(
+            Svc,
+            Duration::from_millis(<span class="number">10</span>),
+            NANOS_PER_MILLI * <span class="number">1_000.0</span>,
+            CompleteOnResponse,
         );
-        <span class="kw">let</span> <span class="ident">Cost</span>(<span class="ident">load</span>) <span class="op">=</span> <span class="ident">svc</span>.<span class="ident">load</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">load</span>, <span class="number">10.0</span> <span class="op">*</span> <span class="ident">NANOS_PER_MILLI</span>);
+        <span class="kw">let </span>Cost(load) = svc.load();
+        <span class="macro">assert_eq!</span>(load, <span class="number">10.0 </span>* NANOS_PER_MILLI);
 
-        <span class="ident">time::advance</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>)).<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">Cost</span>(<span class="ident">load</span>) <span class="op">=</span> <span class="ident">svc</span>.<span class="ident">load</span>();
-        <span class="macro">assert!</span>(<span class="number">9.0</span> <span class="op">*</span> <span class="ident">NANOS_PER_MILLI</span> <span class="op">&lt;</span> <span class="ident">load</span> <span class="op">&amp;&amp;</span> <span class="ident">load</span> <span class="op">&lt;</span> <span class="number">10.0</span> <span class="op">*</span> <span class="ident">NANOS_PER_MILLI</span>);
+        time::advance(Duration::from_millis(<span class="number">100</span>)).<span class="kw">await</span>;
+        <span class="kw">let </span>Cost(load) = svc.load();
+        <span class="macro">assert!</span>(<span class="number">9.0 </span>* NANOS_PER_MILLI &lt; load &amp;&amp; load &lt; <span class="number">10.0 </span>* NANOS_PER_MILLI);
 
-        <span class="ident">time::advance</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>)).<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">Cost</span>(<span class="ident">load</span>) <span class="op">=</span> <span class="ident">svc</span>.<span class="ident">load</span>();
-        <span class="macro">assert!</span>(<span class="number">8.0</span> <span class="op">*</span> <span class="ident">NANOS_PER_MILLI</span> <span class="op">&lt;</span> <span class="ident">load</span> <span class="op">&amp;&amp;</span> <span class="ident">load</span> <span class="op">&lt;</span> <span class="number">9.0</span> <span class="op">*</span> <span class="ident">NANOS_PER_MILLI</span>);
+        time::advance(Duration::from_millis(<span class="number">100</span>)).<span class="kw">await</span>;
+        <span class="kw">let </span>Cost(load) = svc.load();
+        <span class="macro">assert!</span>(<span class="number">8.0 </span>* NANOS_PER_MILLI &lt; load &amp;&amp; load &lt; <span class="number">9.0 </span>* NANOS_PER_MILLI);
     }
 
-    <span class="comment">// The default RTT estimate decays, so that new nodes are considered if the default RTT is too</span>
-    <span class="comment">// high.</span>
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">compound_decay</span>() {
-        <span class="ident">time::pause</span>();
+    <span class="comment">// The default RTT estimate decays, so that new nodes are considered if the default RTT is too
+    // high.
+    </span><span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>compound_decay() {
+        time::pause();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">svc</span> <span class="op">=</span> <span class="ident">PeakEwma::new</span>(
-            <span class="ident">Svc</span>,
-            <span class="ident">Duration::from_millis</span>(<span class="number">20</span>),
-            <span class="ident">NANOS_PER_MILLI</span> <span class="op">*</span> <span class="number">1_000.0</span>,
-            <span class="ident">CompleteOnResponse</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>svc = PeakEwma::new(
+            Svc,
+            Duration::from_millis(<span class="number">20</span>),
+            NANOS_PER_MILLI * <span class="number">1_000.0</span>,
+            CompleteOnResponse,
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Cost</span>(<span class="number">20.0</span> <span class="op">*</span> <span class="ident">NANOS_PER_MILLI</span>));
+        <span class="macro">assert_eq!</span>(svc.load(), Cost(<span class="number">20.0 </span>* NANOS_PER_MILLI));
 
-        <span class="ident">time::advance</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>)).<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rsp0</span> <span class="op">=</span> <span class="ident">task::spawn</span>(<span class="ident">svc</span>.<span class="ident">call</span>(()));
-        <span class="macro">assert!</span>(<span class="ident">svc</span>.<span class="ident">load</span>() <span class="op">&gt;</span> <span class="ident">Cost</span>(<span class="number">20.0</span> <span class="op">*</span> <span class="ident">NANOS_PER_MILLI</span>));
+        time::advance(Duration::from_millis(<span class="number">100</span>)).<span class="kw">await</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>rsp0 = task::spawn(svc.call(()));
+        <span class="macro">assert!</span>(svc.load() &gt; Cost(<span class="number">20.0 </span>* NANOS_PER_MILLI));
 
-        <span class="ident">time::advance</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>)).<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rsp1</span> <span class="op">=</span> <span class="ident">task::spawn</span>(<span class="ident">svc</span>.<span class="ident">call</span>(()));
-        <span class="macro">assert!</span>(<span class="ident">svc</span>.<span class="ident">load</span>() <span class="op">&gt;</span> <span class="ident">Cost</span>(<span class="number">40.0</span> <span class="op">*</span> <span class="ident">NANOS_PER_MILLI</span>));
+        time::advance(Duration::from_millis(<span class="number">100</span>)).<span class="kw">await</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>rsp1 = task::spawn(svc.call(()));
+        <span class="macro">assert!</span>(svc.load() &gt; Cost(<span class="number">40.0 </span>* NANOS_PER_MILLI));
 
-        <span class="ident">time::advance</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>)).<span class="kw">await</span>;
-        <span class="kw">let</span> () <span class="op">=</span> <span class="macro">assert_ready_ok!</span>(<span class="ident">rsp0</span>.<span class="ident">poll</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Cost</span>(<span class="number">400_000_000.0</span>));
+        time::advance(Duration::from_millis(<span class="number">100</span>)).<span class="kw">await</span>;
+        <span class="kw">let </span>() = <span class="macro">assert_ready_ok!</span>(rsp0.poll());
+        <span class="macro">assert_eq!</span>(svc.load(), Cost(<span class="number">400_000_000.0</span>));
 
-        <span class="ident">time::advance</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>)).<span class="kw">await</span>;
-        <span class="kw">let</span> () <span class="op">=</span> <span class="macro">assert_ready_ok!</span>(<span class="ident">rsp1</span>.<span class="ident">poll</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Cost</span>(<span class="number">200_000_000.0</span>));
+        time::advance(Duration::from_millis(<span class="number">100</span>)).<span class="kw">await</span>;
+        <span class="kw">let </span>() = <span class="macro">assert_ready_ok!</span>(rsp1.poll());
+        <span class="macro">assert_eq!</span>(svc.load(), Cost(<span class="number">200_000_000.0</span>));
 
-        <span class="comment">// Check that values decay as time elapses</span>
-        <span class="ident">time::advance</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>)).<span class="kw">await</span>;
-        <span class="macro">assert!</span>(<span class="ident">svc</span>.<span class="ident">load</span>() <span class="op">&lt;</span> <span class="ident">Cost</span>(<span class="number">100_000_000.0</span>));
+        <span class="comment">// Check that values decay as time elapses
+        </span>time::advance(Duration::from_secs(<span class="number">1</span>)).<span class="kw">await</span>;
+        <span class="macro">assert!</span>(svc.load() &lt; Cost(<span class="number">100_000_000.0</span>));
 
-        <span class="ident">time::advance</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>)).<span class="kw">await</span>;
-        <span class="macro">assert!</span>(<span class="ident">svc</span>.<span class="ident">load</span>() <span class="op">&lt;</span> <span class="ident">Cost</span>(<span class="number">100_000.0</span>));
+        time::advance(Duration::from_secs(<span class="number">10</span>)).<span class="kw">await</span>;
+        <span class="macro">assert!</span>(svc.load() &lt; Cost(<span class="number">100_000.0</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">nanos</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::nanos</span>(<span class="ident">Duration::new</span>(<span class="number">0</span>, <span class="number">0</span>)), <span class="number">0.0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::nanos</span>(<span class="ident">Duration::new</span>(<span class="number">0</span>, <span class="number">123</span>)), <span class="number">123.0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::nanos</span>(<span class="ident">Duration::new</span>(<span class="number">1</span>, <span class="number">23</span>)), <span class="number">1_000_000_023.0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>nanos() {
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::nanos(Duration::new(<span class="number">0</span>, <span class="number">0</span>)), <span class="number">0.0</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::nanos(Duration::new(<span class="number">0</span>, <span class="number">123</span>)), <span class="number">123.0</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::nanos(Duration::new(<span class="number">1</span>, <span class="number">23</span>)), <span class="number">1_000_000_023.0</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident"><span class="kw">super</span>::nanos</span>(<span class="ident">Duration::new</span>(<span class="ident">::std::u64::MAX</span>, <span class="number">999_999_999</span>)),
-            <span class="number">18446744074709553000.0</span>
-        );
+            <span class="kw">super</span>::nanos(Duration::new(::std::u64::MAX, <span class="number">999_999_999</span>)),
+            <span class="number">18446744074709553000.0
+        </span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

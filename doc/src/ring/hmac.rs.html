@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/hmac.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hmac.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/hmac.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hmac.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -383,390 +383,390 @@
 <span id="383">383</span>
 <span id="384">384</span>
 <span id="385">385</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! HMAC is specified in [RFC 2104].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! After a `Key` is constructed, it can be used for multiple signing or</span>
-<span class="doccomment">//! verification operations. Separating the construction of the key from the</span>
-<span class="doccomment">//! rest of the HMAC operation allows the per-key precomputation to be done</span>
-<span class="doccomment">//! only once, instead of it being done in every HMAC operation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Frequently all the data to be signed in a message is available in a single</span>
-<span class="doccomment">//! contiguous piece. In that case, the module-level `sign` function can be</span>
-<span class="doccomment">//! used. Otherwise, if the input is in multiple parts, `Context` should be</span>
-<span class="doccomment">//! used.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Signing a value and verifying it wasn&#39;t tampered with</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use ring::{hmac, rand};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let rng = rand::SystemRandom::new();</span>
-<span class="doccomment">//! let key = hmac::Key::generate(hmac::HMAC_SHA256, &amp;rng)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let msg = &quot;hello, world&quot;;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let tag = hmac::sign(&amp;key, msg.as_bytes());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // [We give access to the message to an untrusted party, and they give it</span>
-<span class="doccomment">//! // back to us. We need to verify they didn&#39;t tamper with it.]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! hmac::verify(&amp;key, msg.as_bytes(), tag.as_ref())?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Ok::&lt;(), ring::error::Unspecified&gt;(())</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Using the one-shot API:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use ring::{digest, hmac, rand};</span>
-<span class="doccomment">//! use ring::rand::SecureRandom;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let msg = &quot;hello, world&quot;;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // The sender generates a secure key value and signs the message with it.</span>
-<span class="doccomment">//! // Note that in a real protocol, a key agreement protocol would be used to</span>
-<span class="doccomment">//! // derive `key_value`.</span>
-<span class="doccomment">//! let rng = rand::SystemRandom::new();</span>
-<span class="doccomment">//! let key_value: [u8; digest::SHA256_OUTPUT_LEN] = rand::generate(&amp;rng)?.expose();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let s_key = hmac::Key::new(hmac::HMAC_SHA256, key_value.as_ref());</span>
-<span class="doccomment">//! let tag = hmac::sign(&amp;s_key, msg.as_bytes());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // The receiver (somehow!) knows the key value, and uses it to verify the</span>
-<span class="doccomment">//! // integrity of the message.</span>
-<span class="doccomment">//! let v_key = hmac::Key::new(hmac::HMAC_SHA256, key_value.as_ref());</span>
-<span class="doccomment">//! hmac::verify(&amp;v_key, msg.as_bytes(), tag.as_ref())?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Ok::&lt;(), ring::error::Unspecified&gt;(())</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Using the multi-part API:</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use ring::{digest, hmac, rand};</span>
-<span class="doccomment">//! use ring::rand::SecureRandom;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let parts = [&quot;hello&quot;, &quot;, &quot;, &quot;world&quot;];</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // The sender generates a secure key value and signs the message with it.</span>
-<span class="doccomment">//! // Note that in a real protocol, a key agreement protocol would be used to</span>
-<span class="doccomment">//! // derive `key_value`.</span>
-<span class="doccomment">//! let rng = rand::SystemRandom::new();</span>
-<span class="doccomment">//! let mut key_value: [u8; digest::SHA384_OUTPUT_LEN] = rand::generate(&amp;rng)?.expose();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let s_key = hmac::Key::new(hmac::HMAC_SHA384, key_value.as_ref());</span>
-<span class="doccomment">//! let mut s_ctx = hmac::Context::with_key(&amp;s_key);</span>
-<span class="doccomment">//! for part in &amp;parts {</span>
-<span class="doccomment">//!     s_ctx.update(part.as_bytes());</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! let tag = s_ctx.sign();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // The receiver (somehow!) knows the key value, and uses it to verify the</span>
-<span class="doccomment">//! // integrity of the message.</span>
-<span class="doccomment">//! let v_key = hmac::Key::new(hmac::HMAC_SHA384, key_value.as_ref());</span>
-<span class="doccomment">//! let mut msg = Vec::&lt;u8&gt;::new();</span>
-<span class="doccomment">//! for part in &amp;parts {</span>
-<span class="doccomment">//!     msg.extend(part.as_bytes());</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! hmac::verify(&amp;v_key, &amp;msg.as_ref(), tag.as_ref())?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Ok::&lt;(), ring::error::Unspecified&gt;(())</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [RFC 2104]: https://tools.ietf.org/html/rfc2104</span>
-<span class="doccomment">//! [code for `ring::pbkdf2`]:</span>
-<span class="doccomment">//!     https://github.com/briansmith/ring/blob/main/src/pbkdf2.rs</span>
-<span class="doccomment">//! [code for `ring::hkdf`]:</span>
-<span class="doccomment">//!     https://github.com/briansmith/ring/blob/main/src/hkdf.rs</span>
+</span><span class="doccomment">//! HMAC is specified in [RFC 2104].
+//!
+//! After a `Key` is constructed, it can be used for multiple signing or
+//! verification operations. Separating the construction of the key from the
+//! rest of the HMAC operation allows the per-key precomputation to be done
+//! only once, instead of it being done in every HMAC operation.
+//!
+//! Frequently all the data to be signed in a message is available in a single
+//! contiguous piece. In that case, the module-level `sign` function can be
+//! used. Otherwise, if the input is in multiple parts, `Context` should be
+//! used.
+//!
+//! # Examples:
+//!
+//! ## Signing a value and verifying it wasn&#39;t tampered with
+//!
+//! ```
+//! use ring::{hmac, rand};
+//!
+//! let rng = rand::SystemRandom::new();
+//! let key = hmac::Key::generate(hmac::HMAC_SHA256, &amp;rng)?;
+//!
+//! let msg = &quot;hello, world&quot;;
+//!
+//! let tag = hmac::sign(&amp;key, msg.as_bytes());
+//!
+//! // [We give access to the message to an untrusted party, and they give it
+//! // back to us. We need to verify they didn&#39;t tamper with it.]
+//!
+//! hmac::verify(&amp;key, msg.as_bytes(), tag.as_ref())?;
+//!
+//! # Ok::&lt;(), ring::error::Unspecified&gt;(())
+//! ```
+//!
+//! ## Using the one-shot API:
+//!
+//! ```
+//! use ring::{digest, hmac, rand};
+//! use ring::rand::SecureRandom;
+//!
+//! let msg = &quot;hello, world&quot;;
+//!
+//! // The sender generates a secure key value and signs the message with it.
+//! // Note that in a real protocol, a key agreement protocol would be used to
+//! // derive `key_value`.
+//! let rng = rand::SystemRandom::new();
+//! let key_value: [u8; digest::SHA256_OUTPUT_LEN] = rand::generate(&amp;rng)?.expose();
+//!
+//! let s_key = hmac::Key::new(hmac::HMAC_SHA256, key_value.as_ref());
+//! let tag = hmac::sign(&amp;s_key, msg.as_bytes());
+//!
+//! // The receiver (somehow!) knows the key value, and uses it to verify the
+//! // integrity of the message.
+//! let v_key = hmac::Key::new(hmac::HMAC_SHA256, key_value.as_ref());
+//! hmac::verify(&amp;v_key, msg.as_bytes(), tag.as_ref())?;
+//!
+//! # Ok::&lt;(), ring::error::Unspecified&gt;(())
+//! ```
+//!
+//! ## Using the multi-part API:
+//! ```
+//! use ring::{digest, hmac, rand};
+//! use ring::rand::SecureRandom;
+//!
+//! let parts = [&quot;hello&quot;, &quot;, &quot;, &quot;world&quot;];
+//!
+//! // The sender generates a secure key value and signs the message with it.
+//! // Note that in a real protocol, a key agreement protocol would be used to
+//! // derive `key_value`.
+//! let rng = rand::SystemRandom::new();
+//! let mut key_value: [u8; digest::SHA384_OUTPUT_LEN] = rand::generate(&amp;rng)?.expose();
+//!
+//! let s_key = hmac::Key::new(hmac::HMAC_SHA384, key_value.as_ref());
+//! let mut s_ctx = hmac::Context::with_key(&amp;s_key);
+//! for part in &amp;parts {
+//!     s_ctx.update(part.as_bytes());
+//! }
+//! let tag = s_ctx.sign();
+//!
+//! // The receiver (somehow!) knows the key value, and uses it to verify the
+//! // integrity of the message.
+//! let v_key = hmac::Key::new(hmac::HMAC_SHA384, key_value.as_ref());
+//! let mut msg = Vec::&lt;u8&gt;::new();
+//! for part in &amp;parts {
+//!     msg.extend(part.as_bytes());
+//! }
+//! hmac::verify(&amp;v_key, &amp;msg.as_ref(), tag.as_ref())?;
+//!
+//! # Ok::&lt;(), ring::error::Unspecified&gt;(())
+//! ```
+//!
+//! [RFC 2104]: https://tools.ietf.org/html/rfc2104
+//! [code for `ring::pbkdf2`]:
+//!     https://github.com/briansmith/ring/blob/main/src/pbkdf2.rs
+//! [code for `ring::hkdf`]:
+//!     https://github.com/briansmith/ring/blob/main/src/hkdf.rs
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constant_time</span>, <span class="ident">digest</span>, <span class="ident">error</span>, <span class="ident">hkdf</span>, <span class="ident">rand</span>};
+</span><span class="kw">use crate</span>::{constant_time, digest, error, hkdf, rand};
 
-<span class="doccomment">/// An HMAC algorithm.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Algorithm</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>);
+<span class="doccomment">/// An HMAC algorithm.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>Algorithm(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm);
 
-<span class="kw">impl</span> <span class="ident">Algorithm</span> {
-    <span class="doccomment">/// The digest algorithm this HMAC algorithm is based on.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digest_algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl </span>Algorithm {
+    <span class="doccomment">/// The digest algorithm this HMAC algorithm is based on.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>digest_algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="doccomment">/// HMAC using SHA-1. Obsolete.
+</span><span class="kw">pub static </span>HMAC_SHA1_FOR_LEGACY_USE_ONLY: Algorithm = Algorithm(<span class="kw-2">&amp;</span>digest::SHA1_FOR_LEGACY_USE_ONLY);
+
+<span class="doccomment">/// HMAC using SHA-256.
+</span><span class="kw">pub static </span>HMAC_SHA256: Algorithm = Algorithm(<span class="kw-2">&amp;</span>digest::SHA256);
+
+<span class="doccomment">/// HMAC using SHA-384.
+</span><span class="kw">pub static </span>HMAC_SHA384: Algorithm = Algorithm(<span class="kw-2">&amp;</span>digest::SHA384);
+
+<span class="doccomment">/// HMAC using SHA-512.
+</span><span class="kw">pub static </span>HMAC_SHA512: Algorithm = Algorithm(<span class="kw-2">&amp;</span>digest::SHA512);
+
+<span class="doccomment">/// A deprecated alias for `Tag`.
+</span><span class="attribute">#[deprecated(note = <span class="string">&quot;`Signature` was renamed to `Tag`. This alias will be removed soon.&quot;</span>)]
+</span><span class="kw">pub type </span>Signature = Tag;
+
+<span class="doccomment">/// An HMAC tag.
+///
+/// For a given tag `t`, use `t.as_ref()` to get the tag value as a byte slice.
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>Tag(digest::Digest);
+
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>Tag {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.<span class="number">0</span>.as_ref()
     }
 }
 
-<span class="doccomment">/// HMAC using SHA-1. Obsolete.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">HMAC_SHA1_FOR_LEGACY_USE_ONLY</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA1_FOR_LEGACY_USE_ONLY</span>);
+<span class="doccomment">/// A key to use for HMAC signing.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Key {
+    inner: digest::BlockContext,
+    outer: digest::BlockContext,
+}
 
-<span class="doccomment">/// HMAC using SHA-256.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">HMAC_SHA256</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>);
+<span class="doccomment">/// `hmac::SigningKey` was renamed to `hmac::Key`.
+</span><span class="attribute">#[deprecated(note = <span class="string">&quot;Renamed to `hmac::Key`.&quot;</span>)]
+</span><span class="kw">pub type </span>SigningKey = Key;
 
-<span class="doccomment">/// HMAC using SHA-384.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">HMAC_SHA384</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span>);
+<span class="doccomment">/// `hmac::VerificationKey` was merged into `hmac::Key`.
+</span><span class="attribute">#[deprecated(
+    note = <span class="string">&quot;The distinction between verification &amp; signing keys was removed. Use `hmac::Key`.&quot;
+</span>)]
+</span><span class="kw">pub type </span>VerificationKey = Key;
 
-<span class="doccomment">/// HMAC using SHA-512.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">HMAC_SHA512</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA512</span>);
-
-<span class="doccomment">/// A deprecated alias for `Tag`.</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;`Signature` was renamed to `Tag`. This alias will be removed soon.&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Signature</span> <span class="op">=</span> <span class="ident">Tag</span>;
-
-<span class="doccomment">/// An HMAC tag.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For a given tag `t`, use `t.as_ref()` to get the tag value as a byte slice.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tag</span>(<span class="ident">digest::Digest</span>);
-
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Tag</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
+<span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>Key {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; <span class="prelude-ty">Result</span>&lt;(), core::fmt::Error&gt; {
+        f.debug_struct(<span class="string">&quot;Key&quot;</span>)
+            .field(<span class="string">&quot;algorithm&quot;</span>, <span class="self">self</span>.algorithm().digest_algorithm())
+            .finish()
     }
 }
 
-<span class="doccomment">/// A key to use for HMAC signing.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Key</span> {
-    <span class="ident">inner</span>: <span class="ident">digest::BlockContext</span>,
-    <span class="ident">outer</span>: <span class="ident">digest::BlockContext</span>,
-}
-
-<span class="doccomment">/// `hmac::SigningKey` was renamed to `hmac::Key`.</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Renamed to `hmac::Key`.&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SigningKey</span> <span class="op">=</span> <span class="ident">Key</span>;
-
-<span class="doccomment">/// `hmac::VerificationKey` was merged into `hmac::Key`.</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(
-    <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;The distinction between verification &amp; signing keys was removed. Use `hmac::Key`.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">VerificationKey</span> <span class="op">=</span> <span class="ident">Key</span>;
-
-<span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Key&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;algorithm&quot;</span>, <span class="self">self</span>.<span class="ident">algorithm</span>().<span class="ident">digest_algorithm</span>())
-            .<span class="ident">finish</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Key</span> {
-    <span class="doccomment">/// Generate an HMAC signing key using the given digest algorithm with a</span>
-    <span class="doccomment">/// random value generated from `rng`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The key will be `digest_alg.output_len` bytes long, based on the</span>
-    <span class="doccomment">/// recommendation in [RFC 2104 Section 3].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [RFC 2104 Section 3]: https://tools.ietf.org/html/rfc2104#section-3</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate</span>(
-        <span class="ident">algorithm</span>: <span class="ident">Algorithm</span>,
-        <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::construct</span>(<span class="ident">algorithm</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">rng</span>.<span class="ident">fill</span>(<span class="ident">buf</span>))
+<span class="kw">impl </span>Key {
+    <span class="doccomment">/// Generate an HMAC signing key using the given digest algorithm with a
+    /// random value generated from `rng`.
+    ///
+    /// The key will be `digest_alg.output_len` bytes long, based on the
+    /// recommendation in [RFC 2104 Section 3].
+    ///
+    /// [RFC 2104 Section 3]: https://tools.ietf.org/html/rfc2104#section-3
+    </span><span class="kw">pub fn </span>generate(
+        algorithm: Algorithm,
+        rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::Unspecified&gt; {
+        <span class="self">Self</span>::construct(algorithm, |buf| rng.fill(buf))
     }
 
-    <span class="kw">fn</span> <span class="ident">construct</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">algorithm</span>: <span class="ident">Algorithm</span>, <span class="ident">fill</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>construct&lt;F&gt;(algorithm: Algorithm, fill: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::Unspecified&gt;
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key_bytes</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">digest::MAX_OUTPUT_LEN</span>];
-        <span class="kw">let</span> <span class="ident">key_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">key_bytes</span>[..<span class="ident">algorithm</span>.<span class="number">0</span>.<span class="ident">output_len</span>];
-        <span class="ident">fill</span>(<span class="ident">key_bytes</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">algorithm</span>, <span class="ident">key_bytes</span>))
+        <span class="kw">let </span><span class="kw-2">mut </span>key_bytes = [<span class="number">0</span>; digest::MAX_OUTPUT_LEN];
+        <span class="kw">let </span>key_bytes = <span class="kw-2">&amp;mut </span>key_bytes[..algorithm.<span class="number">0</span>.output_len];
+        fill(key_bytes)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::new(algorithm, key_bytes))
     }
 
-    <span class="doccomment">/// Construct an HMAC signing key using the given digest algorithm and key</span>
-    <span class="doccomment">/// value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `key_value` should be a value generated using a secure random number</span>
-    <span class="doccomment">/// generator (e.g. the `key_value` output by</span>
-    <span class="doccomment">/// `SealingKey::generate_serializable()`) or derived from a random key by</span>
-    <span class="doccomment">/// a key derivation function (e.g. `ring::hkdf`). In particular,</span>
-    <span class="doccomment">/// `key_value` shouldn&#39;t be a password.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// As specified in RFC 2104, if `key_value` is shorter than the digest</span>
-    <span class="doccomment">/// algorithm&#39;s block length (as returned by `digest::Algorithm::block_len`,</span>
-    <span class="doccomment">/// not the digest length returned by `digest::Algorithm::output_len`) then</span>
-    <span class="doccomment">/// it will be padded with zeros. Similarly, if it is longer than the block</span>
-    <span class="doccomment">/// length then it will be compressed using the digest algorithm.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You should not use keys larger than the `digest_alg.block_len` because</span>
-    <span class="doccomment">/// the truncation described above reduces their strength to only</span>
-    <span class="doccomment">/// `digest_alg.output_len * 8` bits. Support for such keys is likely to be</span>
-    <span class="doccomment">/// removed in a future version of *ring*.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="ident">Algorithm</span>, <span class="ident">key_value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">digest_alg</span> <span class="op">=</span> <span class="ident">algorithm</span>.<span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">digest::BlockContext::new</span>(<span class="ident">digest_alg</span>),
-            <span class="ident">outer</span>: <span class="ident">digest::BlockContext::new</span>(<span class="ident">digest_alg</span>),
+    <span class="doccomment">/// Construct an HMAC signing key using the given digest algorithm and key
+    /// value.
+    ///
+    /// `key_value` should be a value generated using a secure random number
+    /// generator (e.g. the `key_value` output by
+    /// `SealingKey::generate_serializable()`) or derived from a random key by
+    /// a key derivation function (e.g. `ring::hkdf`). In particular,
+    /// `key_value` shouldn&#39;t be a password.
+    ///
+    /// As specified in RFC 2104, if `key_value` is shorter than the digest
+    /// algorithm&#39;s block length (as returned by `digest::Algorithm::block_len`,
+    /// not the digest length returned by `digest::Algorithm::output_len`) then
+    /// it will be padded with zeros. Similarly, if it is longer than the block
+    /// length then it will be compressed using the digest algorithm.
+    ///
+    /// You should not use keys larger than the `digest_alg.block_len` because
+    /// the truncation described above reduces their strength to only
+    /// `digest_alg.output_len * 8` bits. Support for such keys is likely to be
+    /// removed in a future version of *ring*.
+    </span><span class="kw">pub fn </span>new(algorithm: Algorithm, key_value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>digest_alg = algorithm.<span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>key = <span class="self">Self </span>{
+            inner: digest::BlockContext::new(digest_alg),
+            outer: digest::BlockContext::new(digest_alg),
         };
 
-        <span class="kw">let</span> <span class="ident">key_hash</span>;
-        <span class="kw">let</span> <span class="ident">key_value</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">key_value</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">digest_alg</span>.<span class="ident">block_len</span> {
-            <span class="ident">key_value</span>
-        } <span class="kw">else</span> {
-            <span class="ident">key_hash</span> <span class="op">=</span> <span class="ident">digest::digest</span>(<span class="ident">digest_alg</span>, <span class="ident">key_value</span>);
-            <span class="ident">key_hash</span>.<span class="ident">as_ref</span>()
+        <span class="kw">let </span>key_hash;
+        <span class="kw">let </span>key_value = <span class="kw">if </span>key_value.len() &lt;= digest_alg.block_len {
+            key_value
+        } <span class="kw">else </span>{
+            key_hash = digest::digest(digest_alg, key_value);
+            key_hash.as_ref()
         };
 
-        <span class="kw">const</span> <span class="ident">IPAD</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x36</span>;
+        <span class="kw">const </span>IPAD: u8 = <span class="number">0x36</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">padded_key</span> <span class="op">=</span> [<span class="ident">IPAD</span>; <span class="ident">digest::MAX_BLOCK_LEN</span>];
-        <span class="kw">let</span> <span class="ident">padded_key</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">padded_key</span>[..<span class="ident">digest_alg</span>.<span class="ident">block_len</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>padded_key = [IPAD; digest::MAX_BLOCK_LEN];
+        <span class="kw">let </span>padded_key = <span class="kw-2">&amp;mut </span>padded_key[..digest_alg.block_len];
 
-        <span class="comment">// If the key is shorter than one block then we&#39;re supposed to act like</span>
-        <span class="comment">// it is padded with zero bytes up to the block length. `x ^ 0 == x` so</span>
-        <span class="comment">// we can just leave the trailing bytes of `padded_key` untouched.</span>
-        <span class="kw">for</span> (<span class="ident">padded_key</span>, <span class="ident">key_value</span>) <span class="kw">in</span> <span class="ident">padded_key</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">key_value</span>.<span class="ident">iter</span>()) {
-            <span class="kw-2">*</span><span class="ident">padded_key</span> <span class="op">^</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">key_value</span>;
+        <span class="comment">// If the key is shorter than one block then we&#39;re supposed to act like
+        // it is padded with zero bytes up to the block length. `x ^ 0 == x` so
+        // we can just leave the trailing bytes of `padded_key` untouched.
+        </span><span class="kw">for </span>(padded_key, key_value) <span class="kw">in </span>padded_key.iter_mut().zip(key_value.iter()) {
+            <span class="kw-2">*</span>padded_key ^= <span class="kw-2">*</span>key_value;
         }
-        <span class="ident">key</span>.<span class="ident">inner</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">padded_key</span>);
+        key.inner.update(<span class="kw-2">&amp;</span>padded_key);
 
-        <span class="kw">const</span> <span class="ident">OPAD</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x5C</span>;
+        <span class="kw">const </span>OPAD: u8 = <span class="number">0x5C</span>;
 
-        <span class="comment">// Remove the `IPAD` masking, leaving the unmasked padded key, then</span>
-        <span class="comment">// mask with `OPAD`, all in one step.</span>
-        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="ident">padded_key</span>.<span class="ident">iter_mut</span>() {
-            <span class="kw-2">*</span><span class="ident">b</span> <span class="op">^</span><span class="op">=</span> <span class="ident">IPAD</span> <span class="op">^</span> <span class="ident">OPAD</span>;
+        <span class="comment">// Remove the `IPAD` masking, leaving the unmasked padded key, then
+        // mask with `OPAD`, all in one step.
+        </span><span class="kw">for </span>b <span class="kw">in </span>padded_key.iter_mut() {
+            <span class="kw-2">*</span>b ^= IPAD ^ OPAD;
         }
-        <span class="ident">key</span>.<span class="ident">outer</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">padded_key</span>);
+        key.outer.update(<span class="kw-2">&amp;</span>padded_key);
 
-        <span class="ident">key</span>
+        key
     }
 
-    <span class="doccomment">/// The digest algorithm for the key.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Algorithm</span> {
-        <span class="ident">Algorithm</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">algorithm</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">hkdf::KeyType</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">digest_algorithm</span>().<span class="ident">output_len</span>
+    <span class="doccomment">/// The digest algorithm for the key.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Algorithm {
+        Algorithm(<span class="self">self</span>.inner.algorithm)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Algorithm</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="ident">Algorithm</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Key::construct</span>(<span class="kw-2">*</span><span class="ident">okm</span>.<span class="ident">len</span>(), <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">okm</span>.<span class="ident">fill</span>(<span class="ident">buf</span>)).<span class="ident">unwrap</span>()
+<span class="kw">impl </span>hkdf::KeyType <span class="kw">for </span>Algorithm {
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.digest_algorithm().output_len
     }
 }
 
-<span class="doccomment">/// A context for multi-step (Init-Update-Finish) HMAC signing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Use `sign` for single-step HMAC signing.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span> {
-    <span class="ident">inner</span>: <span class="ident">digest::Context</span>,
-    <span class="ident">outer</span>: <span class="ident">digest::BlockContext</span>,
-}
-
-<span class="doccomment">/// `hmac::SigningContext` was renamed to `hmac::Context`.</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Renamed to `hmac::Context`.&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SigningContext</span> <span class="op">=</span> <span class="ident">Context</span>;
-
-<span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Context&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;algorithm&quot;</span>, <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">algorithm</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>From&lt;hkdf::Okm&lt;<span class="lifetime">&#39;_</span>, Algorithm&gt;&gt; <span class="kw">for </span>Key {
+    <span class="kw">fn </span>from(okm: hkdf::Okm&lt;Algorithm&gt;) -&gt; <span class="self">Self </span>{
+        Key::construct(<span class="kw-2">*</span>okm.len(), |buf| okm.fill(buf)).unwrap()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Context</span> {
-    <span class="doccomment">/// Constructs a new HMAC signing context using the given digest algorithm</span>
-    <span class="doccomment">/// and key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_key</span>(<span class="ident">signing_key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">digest::Context::clone_from</span>(<span class="kw-2">&amp;</span><span class="ident">signing_key</span>.<span class="ident">inner</span>),
-            <span class="ident">outer</span>: <span class="ident">signing_key</span>.<span class="ident">outer</span>.<span class="ident">clone</span>(),
+<span class="doccomment">/// A context for multi-step (Init-Update-Finish) HMAC signing.
+///
+/// Use `sign` for single-step HMAC signing.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Context {
+    inner: digest::Context,
+    outer: digest::BlockContext,
+}
+
+<span class="doccomment">/// `hmac::SigningContext` was renamed to `hmac::Context`.
+</span><span class="attribute">#[deprecated(note = <span class="string">&quot;Renamed to `hmac::Context`.&quot;</span>)]
+</span><span class="kw">pub type </span>SigningContext = Context;
+
+<span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>Context {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; <span class="prelude-ty">Result</span>&lt;(), core::fmt::Error&gt; {
+        f.debug_struct(<span class="string">&quot;Context&quot;</span>)
+            .field(<span class="string">&quot;algorithm&quot;</span>, <span class="self">self</span>.inner.algorithm())
+            .finish()
+    }
+}
+
+<span class="kw">impl </span>Context {
+    <span class="doccomment">/// Constructs a new HMAC signing context using the given digest algorithm
+    /// and key.
+    </span><span class="kw">pub fn </span>with_key(signing_key: <span class="kw-2">&amp;</span>Key) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: digest::Context::clone_from(<span class="kw-2">&amp;</span>signing_key.inner),
+            outer: signing_key.outer.clone(),
         }
     }
 
-    <span class="doccomment">/// Updates the HMAC with all the data in `data`. `update` may be called</span>
-    <span class="doccomment">/// zero or more times until `finish` is called.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">update</span>(<span class="ident">data</span>);
+    <span class="doccomment">/// Updates the HMAC with all the data in `data`. `update` may be called
+    /// zero or more times until `finish` is called.
+    </span><span class="kw">pub fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="self">self</span>.inner.update(data);
     }
 
-    <span class="doccomment">/// Finalizes the HMAC calculation and returns the HMAC value. `sign`</span>
-    <span class="doccomment">/// consumes the context so it cannot be (mis-)used after `sign` has been</span>
-    <span class="doccomment">/// called.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is generally not safe to implement HMAC verification by comparing</span>
-    <span class="doccomment">/// the return value of `sign` to a tag. Use `verify` for verification</span>
-    <span class="doccomment">/// instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="self">self</span>) -&gt; <span class="ident">Tag</span> {
-        <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">algorithm</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pending</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">digest::MAX_BLOCK_LEN</span>];
-        <span class="kw">let</span> <span class="ident">pending</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">pending</span>[..<span class="ident">algorithm</span>.<span class="ident">block_len</span>];
-        <span class="kw">let</span> <span class="ident">num_pending</span> <span class="op">=</span> <span class="ident">algorithm</span>.<span class="ident">output_len</span>;
-        <span class="ident">pending</span>[..<span class="ident">num_pending</span>].<span class="ident">copy_from_slice</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">finish</span>().<span class="ident">as_ref</span>());
-        <span class="ident">Tag</span>(<span class="self">self</span>.<span class="ident">outer</span>.<span class="ident">finish</span>(<span class="ident">pending</span>, <span class="ident">num_pending</span>))
+    <span class="doccomment">/// Finalizes the HMAC calculation and returns the HMAC value. `sign`
+    /// consumes the context so it cannot be (mis-)used after `sign` has been
+    /// called.
+    ///
+    /// It is generally not safe to implement HMAC verification by comparing
+    /// the return value of `sign` to a tag. Use `verify` for verification
+    /// instead.
+    </span><span class="kw">pub fn </span>sign(<span class="self">self</span>) -&gt; Tag {
+        <span class="kw">let </span>algorithm = <span class="self">self</span>.inner.algorithm();
+        <span class="kw">let </span><span class="kw-2">mut </span>pending = [<span class="number">0u8</span>; digest::MAX_BLOCK_LEN];
+        <span class="kw">let </span>pending = <span class="kw-2">&amp;mut </span>pending[..algorithm.block_len];
+        <span class="kw">let </span>num_pending = algorithm.output_len;
+        pending[..num_pending].copy_from_slice(<span class="self">self</span>.inner.finish().as_ref());
+        Tag(<span class="self">self</span>.outer.finish(pending, num_pending))
     }
 }
 
-<span class="doccomment">/// Calculates the HMAC of `data` using the key `key` in one step.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Use `Context` to calculate HMACs where the input is in multiple parts.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is generally not safe to implement HMAC verification by comparing the</span>
-<span class="doccomment">/// return value of `sign` to a tag. Use `verify` for verification instead.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Tag</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context::with_key</span>(<span class="ident">key</span>);
-    <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">data</span>);
-    <span class="ident">ctx</span>.<span class="ident">sign</span>()
+<span class="doccomment">/// Calculates the HMAC of `data` using the key `key` in one step.
+///
+/// Use `Context` to calculate HMACs where the input is in multiple parts.
+///
+/// It is generally not safe to implement HMAC verification by comparing the
+/// return value of `sign` to a tag. Use `verify` for verification instead.
+</span><span class="kw">pub fn </span>sign(key: <span class="kw-2">&amp;</span>Key, data: <span class="kw-2">&amp;</span>[u8]) -&gt; Tag {
+    <span class="kw">let </span><span class="kw-2">mut </span>ctx = Context::with_key(key);
+    ctx.update(data);
+    ctx.sign()
 }
 
-<span class="doccomment">/// Calculates the HMAC of `data` using the signing key `key`, and verifies</span>
-<span class="doccomment">/// whether the resultant value equals `tag`, in one step.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is logically equivalent to, but more efficient than, constructing a</span>
-<span class="doccomment">/// `Key` with the same value as `key` and then using `verify`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The verification will be done in constant time to prevent timing attacks.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">tag</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="ident">constant_time::verify_slices_are_equal</span>(<span class="ident">sign</span>(<span class="ident">key</span>, <span class="ident">data</span>).<span class="ident">as_ref</span>(), <span class="ident">tag</span>)
+<span class="doccomment">/// Calculates the HMAC of `data` using the signing key `key`, and verifies
+/// whether the resultant value equals `tag`, in one step.
+///
+/// This is logically equivalent to, but more efficient than, constructing a
+/// `Key` with the same value as `key` and then using `verify`.
+///
+/// The verification will be done in constant time to prevent timing attacks.
+</span><span class="kw">pub fn </span>verify(key: <span class="kw-2">&amp;</span>Key, data: <span class="kw-2">&amp;</span>[u8], tag: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+    constant_time::verify_slices_are_equal(sign(key, data).as_ref(), tag)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">hmac</span>, <span class="ident">rand</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use crate</span>::{hmac, rand};
 
-    <span class="comment">// Make sure that `Key::generate` and `verify_with_own_key` aren&#39;t</span>
-    <span class="comment">// completely wacky.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hmac_signing_key_coverage</span>() {
-        <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::SystemRandom::new</span>();
+    <span class="comment">// Make sure that `Key::generate` and `verify_with_own_key` aren&#39;t
+    // completely wacky.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>hmac_signing_key_coverage() {
+        <span class="kw">let </span>rng = rand::SystemRandom::new();
 
-        <span class="kw">const</span> <span class="ident">HELLO_WORLD_GOOD</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;hello, world&quot;</span>;
-        <span class="kw">const</span> <span class="ident">HELLO_WORLD_BAD</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;hello, worle&quot;</span>;
+        <span class="kw">const </span>HELLO_WORLD_GOOD: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;hello, world&quot;</span>;
+        <span class="kw">const </span>HELLO_WORLD_BAD: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;hello, worle&quot;</span>;
 
-        <span class="kw">for</span> <span class="ident">algorithm</span> <span class="kw">in</span> <span class="kw-2">&amp;</span>[
-            <span class="ident">hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY</span>,
-            <span class="ident">hmac::HMAC_SHA256</span>,
-            <span class="ident">hmac::HMAC_SHA384</span>,
-            <span class="ident">hmac::HMAC_SHA512</span>,
+        <span class="kw">for </span>algorithm <span class="kw">in </span><span class="kw-2">&amp;</span>[
+            hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY,
+            hmac::HMAC_SHA256,
+            hmac::HMAC_SHA384,
+            hmac::HMAC_SHA512,
         ] {
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">hmac::Key::generate</span>(<span class="kw-2">*</span><span class="ident">algorithm</span>, <span class="kw-2">&amp;</span><span class="ident">rng</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">hmac::sign</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">HELLO_WORLD_GOOD</span>);
-            <span class="macro">assert!</span>(<span class="ident">hmac::verify</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">HELLO_WORLD_GOOD</span>, <span class="ident">tag</span>.<span class="ident">as_ref</span>()).<span class="ident">is_ok</span>());
-            <span class="macro">assert!</span>(<span class="ident">hmac::verify</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">HELLO_WORLD_BAD</span>, <span class="ident">tag</span>.<span class="ident">as_ref</span>()).<span class="ident">is_err</span>())
+            <span class="kw">let </span>key = hmac::Key::generate(<span class="kw-2">*</span>algorithm, <span class="kw-2">&amp;</span>rng).unwrap();
+            <span class="kw">let </span>tag = hmac::sign(<span class="kw-2">&amp;</span>key, HELLO_WORLD_GOOD);
+            <span class="macro">assert!</span>(hmac::verify(<span class="kw-2">&amp;</span>key, HELLO_WORLD_GOOD, tag.as_ref()).is_ok());
+            <span class="macro">assert!</span>(hmac::verify(<span class="kw-2">&amp;</span>key, HELLO_WORLD_BAD, tag.as_ref()).is_err())
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

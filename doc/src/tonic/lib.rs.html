@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -122,127 +122,127 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A Rust implementation of [gRPC], a high performance, open source, general</span>
-<span class="doccomment">//! RPC framework that puts mobile and HTTP/2 first.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`tonic`] is a gRPC over HTTP/2 implementation focused on **high</span>
-<span class="doccomment">//! performance**, **interoperability**, and **flexibility**. This library was</span>
-<span class="doccomment">//! created to have first class support of async/await and to act as a core building</span>
-<span class="doccomment">//! block for production systems written in Rust.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Examples can be found in the [`tonic-examples`] crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Getting Started</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Follow the instructions in the [`tonic-build`] crate documentation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Feature Flags</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `transport`: Enables the fully featured, batteries included client and server</span>
-<span class="doccomment">//! implementation based on [`hyper`], [`tower`] and [`tokio`]. Enabled by default.</span>
-<span class="doccomment">//! - `codegen`: Enables all the required exports and optional dependencies required</span>
-<span class="doccomment">//! for [`tonic-build`]. Enabled by default.</span>
-<span class="doccomment">//! - `tls`: Enables the `rustls` based TLS options for the `transport` feature. Not</span>
-<span class="doccomment">//! enabled by default.</span>
-<span class="doccomment">//! - `tls-roots`: Adds system trust roots to `rustls`-based gRPC clients using the</span>
-<span class="doccomment">//! `rustls-native-certs` crate. Not enabled by default. `tls` must be enabled to use</span>
-<span class="doccomment">//! `tls-roots`.</span>
-<span class="doccomment">//! - `tls-webpki-roots`: Add the standard trust roots from the `webpki-roots` crate to</span>
-<span class="doccomment">//! `rustls`-based gRPC clients. Not enabled by default.</span>
-<span class="doccomment">//! - `prost`: Enables the [`prost`] based gRPC [`Codec`] implementation.</span>
-<span class="doccomment">//! - `compression`: Enables compressing requests, responses, and streams. Note</span>
-<span class="doccomment">//! that you must enable the `compression` feature on both `tonic` and</span>
-<span class="doccomment">//! `tonic-build` to use it. Depends on [flate2]. Not enabled by default.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Structure</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Generic implementation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The main goal of [`tonic`] is to provide a generic gRPC implementation over HTTP/2</span>
-<span class="doccomment">//! framing. This means at the lowest level this library provides the ability to use</span>
-<span class="doccomment">//! a generic HTTP/2 implementation with different types of gRPC encodings formats. Generally,</span>
-<span class="doccomment">//! some form of codegen should be used instead of interacting directly with the items in</span>
-<span class="doccomment">//! [`client`] and [`server`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Transport</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The [`transport`] module contains a fully featured HTTP/2.0 [`Channel`] (gRPC terminology)</span>
-<span class="doccomment">//! and [`Server`]. These implementations are built on top of [`tokio`], [`hyper`] and [`tower`].</span>
-<span class="doccomment">//! It also provides many of the features that the core gRPC libraries provide such as load balancing,</span>
-<span class="doccomment">//! tls, timeouts, and many more. This implementation can also be used as a reference implementation</span>
-<span class="doccomment">//! to build even more feature rich clients and servers. This module also provides the ability to</span>
-<span class="doccomment">//! enable TLS using [`rustls`], via the `tls` feature flag.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [gRPC]: https://grpc.io</span>
-<span class="doccomment">//! [`tonic`]: https://github.com/hyperium/tonic</span>
-<span class="doccomment">//! [`tokio`]: https://docs.rs/tokio</span>
-<span class="doccomment">//! [`prost`]: https://docs.rs/prost</span>
-<span class="doccomment">//! [`hyper`]: https://docs.rs/hyper</span>
-<span class="doccomment">//! [`tower`]: https://docs.rs/tower</span>
-<span class="doccomment">//! [`tonic-build`]: https://docs.rs/tonic-build</span>
-<span class="doccomment">//! [`tonic-examples`]: https://github.com/hyperium/tonic/tree/master/examples</span>
-<span class="doccomment">//! [`Codec`]: codec/trait.Codec.html</span>
-<span class="doccomment">//! [`Channel`]: transport/struct.Channel.html</span>
-<span class="doccomment">//! [`Server`]: transport/struct.Server.html</span>
-<span class="doccomment">//! [`rustls`]: https://docs.rs/rustls</span>
-<span class="doccomment">//! [`client`]: client/index.html</span>
-<span class="doccomment">//! [`transport`]: transport/index.html</span>
-<span class="doccomment">//! [flate2]: https://crates.io/crates/flate2</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A Rust implementation of [gRPC], a high performance, open source, general
+//! RPC framework that puts mobile and HTTP/2 first.
+//!
+//! [`tonic`] is a gRPC over HTTP/2 implementation focused on **high
+//! performance**, **interoperability**, and **flexibility**. This library was
+//! created to have first class support of async/await and to act as a core building
+//! block for production systems written in Rust.
+//!
+//! # Examples
+//!
+//! Examples can be found in the [`tonic-examples`] crate.
+//!
+//! # Getting Started
+//!
+//! Follow the instructions in the [`tonic-build`] crate documentation.
+//!
+//! # Feature Flags
+//!
+//! - `transport`: Enables the fully featured, batteries included client and server
+//! implementation based on [`hyper`], [`tower`] and [`tokio`]. Enabled by default.
+//! - `codegen`: Enables all the required exports and optional dependencies required
+//! for [`tonic-build`]. Enabled by default.
+//! - `tls`: Enables the `rustls` based TLS options for the `transport` feature. Not
+//! enabled by default.
+//! - `tls-roots`: Adds system trust roots to `rustls`-based gRPC clients using the
+//! `rustls-native-certs` crate. Not enabled by default. `tls` must be enabled to use
+//! `tls-roots`.
+//! - `tls-webpki-roots`: Add the standard trust roots from the `webpki-roots` crate to
+//! `rustls`-based gRPC clients. Not enabled by default.
+//! - `prost`: Enables the [`prost`] based gRPC [`Codec`] implementation.
+//! - `compression`: Enables compressing requests, responses, and streams. Note
+//! that you must enable the `compression` feature on both `tonic` and
+//! `tonic-build` to use it. Depends on [flate2]. Not enabled by default.
+//!
+//! # Structure
+//!
+//! ## Generic implementation
+//!
+//! The main goal of [`tonic`] is to provide a generic gRPC implementation over HTTP/2
+//! framing. This means at the lowest level this library provides the ability to use
+//! a generic HTTP/2 implementation with different types of gRPC encodings formats. Generally,
+//! some form of codegen should be used instead of interacting directly with the items in
+//! [`client`] and [`server`].
+//!
+//! ## Transport
+//!
+//! The [`transport`] module contains a fully featured HTTP/2.0 [`Channel`] (gRPC terminology)
+//! and [`Server`]. These implementations are built on top of [`tokio`], [`hyper`] and [`tower`].
+//! It also provides many of the features that the core gRPC libraries provide such as load balancing,
+//! tls, timeouts, and many more. This implementation can also be used as a reference implementation
+//! to build even more feature rich clients and servers. This module also provides the ability to
+//! enable TLS using [`rustls`], via the `tls` feature flag.
+//!
+//! [gRPC]: https://grpc.io
+//! [`tonic`]: https://github.com/hyperium/tonic
+//! [`tokio`]: https://docs.rs/tokio
+//! [`prost`]: https://docs.rs/prost
+//! [`hyper`]: https://docs.rs/hyper
+//! [`tower`]: https://docs.rs/tower
+//! [`tonic-build`]: https://docs.rs/tonic-build
+//! [`tonic-examples`]: https://github.com/hyperium/tonic/tree/master/examples
+//! [`Codec`]: codec/trait.Codec.html
+//! [`Channel`]: transport/struct.Channel.html
+//! [`Server`]: transport/struct.Server.html
+//! [`rustls`]: https://docs.rs/rustls
+//! [`client`]: client/index.html
+//! [`transport`]: transport/index.html
+//! [flate2]: https://crates.io/crates/flate2
 
-<span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;256&quot;</span>]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::inconsistent_struct_constructor</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">unreachable_pub</span>
-)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(
-    <span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tonic/0.6.2&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">issue_tracker_base_url</span> <span class="op">=</span> <span class="string">&quot;https://github.com/hyperium/tonic/issues/&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">no_crate_inject</span>, <span class="ident">attr</span>(<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>))))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
+</span><span class="attribute">#![recursion_limit = <span class="string">&quot;256&quot;</span>]
+#![allow(clippy::inconsistent_struct_constructor)]
+#![warn(
+    missing_debug_implementations,
+    missing_docs,
+    rust_2018_idioms,
+    unreachable_pub
+)]
+#![deny(broken_intra_doc_links)]
+#![doc(
+    html_logo_url = <span class="string">&quot;https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg&quot;
+</span>)]
+#![doc(html_root_url = <span class="string">&quot;https://docs.rs/tonic/0.6.2&quot;</span>)]
+#![doc(issue_tracker_base_url = <span class="string">&quot;https://github.com/hyperium/tonic/issues/&quot;</span>)]
+#![doc(test(no_crate_inject, attr(deny(rust_2018_idioms))))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">body</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">client</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">codec</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">metadata</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">server</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">service</span>;
+</span><span class="kw">pub mod </span>body;
+<span class="kw">pub mod </span>client;
+<span class="kw">pub mod </span>codec;
+<span class="kw">pub mod </span>metadata;
+<span class="kw">pub mod </span>server;
+<span class="kw">pub mod </span>service;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">transport</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;transport&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;transport&quot;</span>)))]
+</span><span class="kw">pub mod </span>transport;
 
-<span class="kw">mod</span> <span class="ident">extensions</span>;
-<span class="kw">mod</span> <span class="ident">macros</span>;
-<span class="kw">mod</span> <span class="ident">request</span>;
-<span class="kw">mod</span> <span class="ident">response</span>;
-<span class="kw">mod</span> <span class="ident">status</span>;
-<span class="kw">mod</span> <span class="ident">util</span>;
+<span class="kw">mod </span>extensions;
+<span class="kw">mod </span>macros;
+<span class="kw">mod </span>request;
+<span class="kw">mod </span>response;
+<span class="kw">mod </span>status;
+<span class="kw">mod </span>util;
 
-<span class="doccomment">/// A re-export of [`async-trait`](https://docs.rs/async-trait) for use with codegen.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;codegen&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;codegen&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
+<span class="doccomment">/// A re-export of [`async-trait`](https://docs.rs/async-trait) for use with codegen.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;codegen&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;codegen&quot;</span>)))]
+</span><span class="kw">pub use </span>async_trait::async_trait;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">codec::Streaming</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">extensions::Extensions</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">request</span>::{<span class="ident">IntoRequest</span>, <span class="ident">IntoStreamingRequest</span>, <span class="ident">Request</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">response::Response</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">status</span>::{<span class="ident">Code</span>, <span class="ident">Status</span>};
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span>codec::Streaming;
+<span class="kw">pub use </span>extensions::Extensions;
+<span class="kw">pub use </span>request::{IntoRequest, IntoStreamingRequest, Request};
+<span class="kw">pub use </span>response::Response;
+<span class="kw">pub use </span>status::{Code, Status};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Error = Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync&gt;;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;codegen&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;codegen&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">codegen</span>;
+<span class="attribute">#[doc(hidden)]
+#[cfg(feature = <span class="string">&quot;codegen&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;codegen&quot;</span>)))]
+</span><span class="kw">pub mod </span>codegen;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

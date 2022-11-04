@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/binary_copy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>binary_copy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/binary_copy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>binary_copy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -271,278 +271,278 @@
 <span id="271">271</span>
 <span id="272">272</span>
 <span id="273">273</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Utilities for working with the PostgreSQL binary copy format.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Utilities for working with the PostgreSQL binary copy format.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">FromSql</span>, <span class="ident">IsNull</span>, <span class="ident">ToSql</span>, <span class="ident">Type</span>, <span class="ident">WrongType</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">slice_iter</span>, <span class="ident">CopyInSink</span>, <span class="ident">CopyOutStream</span>, <span class="ident">Error</span>};
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span>, <span class="ident">ByteOrder</span>};
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BufMut</span>, <span class="ident">Bytes</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">ready</span>, <span class="ident">SinkExt</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">postgres_types::BorrowToSql</span>;
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::io::Cursor</span>;
-<span class="kw">use</span> <span class="ident">std::ops::Range</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+</span><span class="kw">use </span><span class="kw">crate</span>::types::{FromSql, IsNull, ToSql, Type, WrongType};
+<span class="kw">use crate</span>::{slice_iter, CopyInSink, CopyOutStream, Error};
+<span class="kw">use </span>byteorder::{BigEndian, ByteOrder};
+<span class="kw">use </span>bytes::{Buf, BufMut, Bytes, BytesMut};
+<span class="kw">use </span>futures_util::{ready, SinkExt, Stream};
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>postgres_types::BorrowToSql;
+<span class="kw">use </span>std::convert::TryFrom;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::io::Cursor;
+<span class="kw">use </span>std::ops::Range;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::task::{Context, Poll};
 
-<span class="kw">const</span> <span class="ident">MAGIC</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;PGCOPY\n\xff\r\n\0&quot;</span>;
-<span class="kw">const</span> <span class="ident">HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">MAGIC</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">4</span>;
+<span class="kw">const </span>MAGIC: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;PGCOPY\n\xff\r\n\0&quot;</span>;
+<span class="kw">const </span>HEADER_LEN: usize = MAGIC.len() + <span class="number">4 </span>+ <span class="number">4</span>;
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// A type which serializes rows into the PostgreSQL binary copy format.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The copy *must* be explicitly completed via the `finish` method. If it is not, the copy will be aborted.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinaryCopyInWriter</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">sink</span>: <span class="ident">CopyInSink</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
-        <span class="ident">types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="ident">BytesMut</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// A type which serializes rows into the PostgreSQL binary copy format.
+    ///
+    /// The copy *must* be explicitly completed via the `finish` method. If it is not, the copy will be aborted.
+    </span><span class="kw">pub struct </span>BinaryCopyInWriter {
+        <span class="attribute">#[pin]
+        </span>sink: CopyInSink&lt;Bytes&gt;,
+        types: Vec&lt;Type&gt;,
+        buf: BytesMut,
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BinaryCopyInWriter</span> {
-    <span class="doccomment">/// Creates a new writer which will write rows of the provided types to the provided sink.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">sink</span>: <span class="ident">CopyInSink</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>, <span class="ident">types</span>: <span class="kw-2">&amp;</span>[<span class="ident">Type</span>]) -&gt; <span class="ident">BinaryCopyInWriter</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-        <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="ident">MAGIC</span>);
-        <span class="ident">buf</span>.<span class="ident">put_i32</span>(<span class="number">0</span>); <span class="comment">// flags</span>
-        <span class="ident">buf</span>.<span class="ident">put_i32</span>(<span class="number">0</span>); <span class="comment">// header extension</span>
+<span class="kw">impl </span>BinaryCopyInWriter {
+    <span class="doccomment">/// Creates a new writer which will write rows of the provided types to the provided sink.
+    </span><span class="kw">pub fn </span>new(sink: CopyInSink&lt;Bytes&gt;, types: <span class="kw-2">&amp;</span>[Type]) -&gt; BinaryCopyInWriter {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = BytesMut::new();
+        buf.put_slice(MAGIC);
+        buf.put_i32(<span class="number">0</span>); <span class="comment">// flags
+        </span>buf.put_i32(<span class="number">0</span>); <span class="comment">// header extension
 
-        <span class="ident">BinaryCopyInWriter</span> {
-            <span class="ident">sink</span>,
-            <span class="ident">types</span>: <span class="ident">types</span>.<span class="ident">to_vec</span>(),
-            <span class="ident">buf</span>,
+        </span>BinaryCopyInWriter {
+            sink,
+            types: types.to_vec(),
+            buf,
         }
     }
 
-    <span class="doccomment">/// Writes a single row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the number of values provided does not match the number expected.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">ToSql</span> <span class="op">+</span> <span class="ident">Sync</span>)]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">write_raw</span>(<span class="ident">slice_iter</span>(<span class="ident">values</span>)).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Writes a single row.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the number of values provided does not match the number expected.
+    </span><span class="kw">pub async fn </span>write(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, values: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>ToSql + Sync)]) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="self">self</span>.write_raw(slice_iter(values)).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// A maximally-flexible version of `write`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the number of values provided does not match the number expected.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_raw</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">values</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">BorrowToSql</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span>,
-        <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="doccomment">/// A maximally-flexible version of `write`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the number of values provided does not match the number expected.
+    </span><span class="kw">pub async fn </span>write_raw&lt;P, I&gt;(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, values: I) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;
+    <span class="kw">where
+        </span>P: BorrowToSql,
+        I: IntoIterator&lt;Item = P&gt;,
+        I::IntoIter: ExactSizeIterator,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
 
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">into_iter</span>();
+        <span class="kw">let </span>values = values.into_iter();
         <span class="macro">assert!</span>(
-            <span class="ident">values</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">this</span>.<span class="ident">types</span>.<span class="ident">len</span>(),
+            values.len() == this.types.len(),
             <span class="string">&quot;expected {} values but got {}&quot;</span>,
-            <span class="ident">this</span>.<span class="ident">types</span>.<span class="ident">len</span>(),
-            <span class="ident">values</span>.<span class="ident">len</span>(),
+            this.types.len(),
+            values.len(),
         );
 
-        <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">put_i16</span>(<span class="ident">this</span>.<span class="ident">types</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i16</span>);
+        this.buf.put_i16(this.types.len() <span class="kw">as </span>i16);
 
-        <span class="kw">for</span> (<span class="ident">i</span>, (<span class="ident">value</span>, <span class="ident">type_</span>)) <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">zip</span>(<span class="ident">this</span>.<span class="ident">types</span>).<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">len</span>();
-            <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">put_i32</span>(<span class="number">0</span>);
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span>
-                .<span class="ident">borrow_to_sql</span>()
-                .<span class="ident">to_sql_checked</span>(<span class="ident">type_</span>, <span class="ident">this</span>.<span class="ident">buf</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::to_sql</span>(<span class="ident">e</span>, <span class="ident">i</span>))<span class="question-mark">?</span>
-            {
-                <span class="ident">IsNull::Yes</span> =&gt; <span class="op">-</span><span class="number">1</span>,
-                <span class="ident">IsNull::No</span> =&gt; <span class="ident">i32::try_from</span>(<span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">idx</span> <span class="op">-</span> <span class="number">4</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::encode</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">e</span>)))<span class="question-mark">?</span>,
+        <span class="kw">for </span>(i, (value, type_)) <span class="kw">in </span>values.zip(this.types).enumerate() {
+            <span class="kw">let </span>idx = this.buf.len();
+            this.buf.put_i32(<span class="number">0</span>);
+            <span class="kw">let </span>len = <span class="kw">match </span>value
+                .borrow_to_sql()
+                .to_sql_checked(type_, this.buf)
+                .map_err(|e| Error::to_sql(e, i))<span class="question-mark">?
+            </span>{
+                IsNull::Yes =&gt; -<span class="number">1</span>,
+                IsNull::No =&gt; i32::try_from(this.buf.len() - idx - <span class="number">4</span>)
+                    .map_err(|e| Error::encode(io::Error::new(io::ErrorKind::InvalidInput, e)))<span class="question-mark">?</span>,
             };
-            <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">this</span>.<span class="ident">buf</span>[<span class="ident">idx</span>..], <span class="ident">len</span>);
+            BigEndian::write_i32(<span class="kw-2">&amp;mut </span>this.buf[idx..], len);
         }
 
-        <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">4096</span> {
-            <span class="ident">this</span>.<span class="ident">sink</span>.<span class="ident">send</span>(<span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">split</span>().<span class="ident">freeze</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">if </span>this.buf.len() &gt; <span class="number">4096 </span>{
+            this.sink.send(this.buf.split().freeze()).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Completes the copy, returning the number of rows added.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method *must* be used to complete the copy process. If it is not, the copy will be aborted.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="doccomment">/// Completes the copy, returning the number of rows added.
+    ///
+    /// This method *must* be used to complete the copy process. If it is not, the copy will be aborted.
+    </span><span class="kw">pub async fn </span>finish(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;u64, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
 
-        <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">put_i16</span>(<span class="op">-</span><span class="number">1</span>);
-        <span class="ident">this</span>.<span class="ident">sink</span>.<span class="ident">send</span>(<span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">split</span>().<span class="ident">freeze</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">this</span>.<span class="ident">sink</span>.<span class="ident">finish</span>().<span class="kw">await</span>
+        this.buf.put_i16(-<span class="number">1</span>);
+        this.sink.send(this.buf.split().freeze()).<span class="kw">await</span><span class="question-mark">?</span>;
+        this.sink.finish().<span class="kw">await
+    </span>}
+}
+
+<span class="kw">struct </span>Header {
+    has_oids: bool,
+}
+
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// A stream of rows deserialized from the PostgreSQL binary copy format.
+    </span><span class="kw">pub struct </span>BinaryCopyOutStream {
+        <span class="attribute">#[pin]
+        </span>stream: CopyOutStream,
+        types: Arc&lt;Vec&lt;Type&gt;&gt;,
+        header: <span class="prelude-ty">Option</span>&lt;Header&gt;,
     }
 }
 
-<span class="kw">struct</span> <span class="ident">Header</span> {
-    <span class="ident">has_oids</span>: <span class="ident">bool</span>,
-}
-
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// A stream of rows deserialized from the PostgreSQL binary copy format.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinaryCopyOutStream</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">stream</span>: <span class="ident">CopyOutStream</span>,
-        <span class="ident">types</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">header</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>,
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">BinaryCopyOutStream</span> {
-    <span class="doccomment">/// Creates a stream from a raw copy out stream and the types of the columns being returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">CopyOutStream</span>, <span class="ident">types</span>: <span class="kw-2">&amp;</span>[<span class="ident">Type</span>]) -&gt; <span class="ident">BinaryCopyOutStream</span> {
-        <span class="ident">BinaryCopyOutStream</span> {
-            <span class="ident">stream</span>,
-            <span class="ident">types</span>: <span class="ident">Arc::new</span>(<span class="ident">types</span>.<span class="ident">to_vec</span>()),
-            <span class="ident">header</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>BinaryCopyOutStream {
+    <span class="doccomment">/// Creates a stream from a raw copy out stream and the types of the columns being returned.
+    </span><span class="kw">pub fn </span>new(stream: CopyOutStream, types: <span class="kw-2">&amp;</span>[Type]) -&gt; BinaryCopyOutStream {
+        BinaryCopyOutStream {
+            stream,
+            types: Arc::new(types.to_vec()),
+            header: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">BinaryCopyOutStream</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BinaryCopyOutRow</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>Stream <span class="kw">for </span>BinaryCopyOutStream {
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;BinaryCopyOutRow, Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
 
-        <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">stream</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>)) {
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">chunk</span>)) =&gt; <span class="ident">chunk</span>,
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))),
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::closed</span>()))),
+        <span class="kw">let </span>chunk = <span class="kw">match </span><span class="macro">ready!</span>(this.stream.poll_next(cx)) {
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(chunk)) =&gt; chunk,
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(Error::closed()))),
         };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">chunk</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk = Cursor::new(chunk);
 
-        <span class="kw">let</span> <span class="ident">has_oids</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">this</span>.<span class="ident">header</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">header</span>) =&gt; <span class="ident">header</span>.<span class="ident">has_oids</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="ident">check_remaining</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>, <span class="ident">HEADER_LEN</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">chunk</span>.<span class="ident">chunk</span>().<span class="ident">starts_with</span>(<span class="ident">MAGIC</span>) {
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::parse</span>(<span class="ident">io::Error::new</span>(
-                        <span class="ident">io::ErrorKind::InvalidData</span>,
+        <span class="kw">let </span>has_oids = <span class="kw">match </span><span class="kw-2">&amp;</span>this.header {
+            <span class="prelude-val">Some</span>(header) =&gt; header.has_oids,
+            <span class="prelude-val">None </span>=&gt; {
+                check_remaining(<span class="kw-2">&amp;</span>chunk, HEADER_LEN)<span class="question-mark">?</span>;
+                <span class="kw">if </span>!chunk.chunk().starts_with(MAGIC) {
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(Error::parse(io::Error::new(
+                        io::ErrorKind::InvalidData,
                         <span class="string">&quot;invalid magic value&quot;</span>,
                     )))));
                 }
-                <span class="ident">chunk</span>.<span class="ident">advance</span>(<span class="ident">MAGIC</span>.<span class="ident">len</span>());
+                chunk.advance(MAGIC.len());
 
-                <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">get_i32</span>();
-                <span class="kw">let</span> <span class="ident">has_oids</span> <span class="op">=</span> (<span class="ident">flags</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>)) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
+                <span class="kw">let </span>flags = chunk.get_i32();
+                <span class="kw">let </span>has_oids = (flags &amp; (<span class="number">1 </span>&lt;&lt; <span class="number">16</span>)) != <span class="number">0</span>;
 
-                <span class="kw">let</span> <span class="ident">header_extension</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">get_u32</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="ident">check_remaining</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>, <span class="ident">header_extension</span>)<span class="question-mark">?</span>;
-                <span class="ident">chunk</span>.<span class="ident">advance</span>(<span class="ident">header_extension</span>);
+                <span class="kw">let </span>header_extension = chunk.get_u32() <span class="kw">as </span>usize;
+                check_remaining(<span class="kw-2">&amp;</span>chunk, header_extension)<span class="question-mark">?</span>;
+                chunk.advance(header_extension);
 
-                <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">header</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Header</span> { <span class="ident">has_oids</span> });
-                <span class="ident">has_oids</span>
+                <span class="kw-2">*</span>this.header = <span class="prelude-val">Some</span>(Header { has_oids });
+                has_oids
             }
         };
 
-        <span class="ident">check_remaining</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>, <span class="number">2</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">get_i16</span>();
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> {
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
+        check_remaining(<span class="kw-2">&amp;</span>chunk, <span class="number">2</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>len = chunk.get_i16();
+        <span class="kw">if </span>len == -<span class="number">1 </span>{
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">if</span> <span class="ident">has_oids</span> {
-            <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">if </span>has_oids {
+            len += <span class="number">1</span>;
         }
-        <span class="kw">if</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">!</span><span class="op">=</span> <span class="ident">this</span>.<span class="ident">types</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::parse</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::InvalidInput</span>,
-                <span class="macro">format!</span>(<span class="string">&quot;expected {} values but got {}&quot;</span>, <span class="ident">this</span>.<span class="ident">types</span>.<span class="ident">len</span>(), <span class="ident">len</span>),
+        <span class="kw">if </span>len <span class="kw">as </span>usize != this.types.len() {
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(Error::parse(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                <span class="macro">format!</span>(<span class="string">&quot;expected {} values but got {}&quot;</span>, this.types.len(), len),
             )))));
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ranges</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">len</span> {
-            <span class="ident">check_remaining</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>, <span class="number">4</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">get_i32</span>();
-            <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> {
-                <span class="ident">ranges</span>.<span class="ident">push</span>(<span class="prelude-val">None</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="ident">check_remaining</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>, <span class="ident">len</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">position</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="ident">ranges</span>.<span class="ident">push</span>(<span class="prelude-val">Some</span>(<span class="ident">start</span>..<span class="ident">start</span> <span class="op">+</span> <span class="ident">len</span>));
-                <span class="ident">chunk</span>.<span class="ident">advance</span>(<span class="ident">len</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>ranges = <span class="macro">vec!</span>[];
+        <span class="kw">for _ in </span><span class="number">0</span>..len {
+            check_remaining(<span class="kw-2">&amp;</span>chunk, <span class="number">4</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>len = chunk.get_i32();
+            <span class="kw">if </span>len == -<span class="number">1 </span>{
+                ranges.push(<span class="prelude-val">None</span>);
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>len = len <span class="kw">as </span>usize;
+                check_remaining(<span class="kw-2">&amp;</span>chunk, len)<span class="question-mark">?</span>;
+                <span class="kw">let </span>start = chunk.position() <span class="kw">as </span>usize;
+                ranges.push(<span class="prelude-val">Some</span>(start..start + len));
+                chunk.advance(len);
             }
         }
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">BinaryCopyOutRow</span> {
-            <span class="ident">buf</span>: <span class="ident">chunk</span>.<span class="ident">into_inner</span>(),
-            <span class="ident">ranges</span>,
-            <span class="ident">types</span>: <span class="ident">this</span>.<span class="ident">types</span>.<span class="ident">clone</span>(),
+        Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(BinaryCopyOutRow {
+            buf: chunk.into_inner(),
+            ranges,
+            types: this.types.clone(),
         })))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">check_remaining</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">remaining</span>() <span class="op">&lt;</span> <span class="ident">len</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">Error::parse</span>(<span class="ident">io::Error::new</span>(
-            <span class="ident">io::ErrorKind::UnexpectedEof</span>,
+<span class="kw">fn </span>check_remaining(buf: <span class="kw-2">&amp;</span>Cursor&lt;Bytes&gt;, len: usize) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">if </span>buf.remaining() &lt; len {
+        <span class="prelude-val">Err</span>(Error::parse(io::Error::new(
+            io::ErrorKind::UnexpectedEof,
             <span class="string">&quot;unexpected EOF&quot;</span>,
         )))
-    } <span class="kw">else</span> {
+    } <span class="kw">else </span>{
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="doccomment">/// A row of data parsed from a binary copy out stream.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinaryCopyOutRow</span> {
-    <span class="ident">buf</span>: <span class="ident">Bytes</span>,
-    <span class="ident">ranges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">types</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A row of data parsed from a binary copy out stream.
+</span><span class="kw">pub struct </span>BinaryCopyOutRow {
+    buf: Bytes,
+    ranges: Vec&lt;<span class="prelude-ty">Option</span>&lt;Range&lt;usize&gt;&gt;&gt;,
+    types: Arc&lt;Vec&lt;Type&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">BinaryCopyOutRow</span> {
-    <span class="doccomment">/// Like `get`, but returns a `Result` rather than panicking.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_get</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>BinaryCopyOutRow {
+    <span class="doccomment">/// Like `get`, but returns a `Result` rather than panicking.
+    </span><span class="kw">pub fn </span>try_get&lt;<span class="lifetime">&#39;a</span>, T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, idx: usize) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;
+    <span class="kw">where
+        </span>T: FromSql&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">type_</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">types</span>.<span class="ident">get</span>(<span class="ident">idx</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">type_</span>) =&gt; <span class="ident">type_</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::column</span>(<span class="ident">idx</span>.<span class="ident">to_string</span>())),
+        <span class="kw">let </span>type_ = <span class="kw">match </span><span class="self">self</span>.types.get(idx) {
+            <span class="prelude-val">Some</span>(type_) =&gt; type_,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::column(idx.to_string())),
         };
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">T::accepts</span>(<span class="ident">type_</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from_sql</span>(
-                <span class="ident">Box::new</span>(<span class="ident">WrongType::new</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">type_</span>.<span class="ident">clone</span>())),
-                <span class="ident">idx</span>,
+        <span class="kw">if </span>!T::accepts(type_) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::from_sql(
+                Box::new(WrongType::new::&lt;T&gt;(type_.clone())),
+                idx,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ranges</span>[<span class="ident">idx</span>] {
-            <span class="prelude-val">Some</span>(<span class="ident">range</span>) =&gt; <span class="ident">T::from_sql</span>(<span class="ident">type_</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[<span class="ident">range</span>.<span class="ident">clone</span>()]),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">T::from_sql_null</span>(<span class="ident">type_</span>),
+        <span class="kw">let </span>r = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.ranges[idx] {
+            <span class="prelude-val">Some</span>(range) =&gt; T::from_sql(type_, <span class="kw-2">&amp;</span><span class="self">self</span>.buf[range.clone()]),
+            <span class="prelude-val">None </span>=&gt; T::from_sql_null(type_),
         };
 
-        <span class="ident">r</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::from_sql</span>(<span class="ident">e</span>, <span class="ident">idx</span>))
+        r.map_err(|e| Error::from_sql(e, idx))
     }
 
-    <span class="doccomment">/// Deserializes a value from the row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the index is out of bounds or if the value cannot be converted to the specified type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Deserializes a value from the row.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the index is out of bounds or if the value cannot be converted to the specified type.
+    </span><span class="kw">pub fn </span>get&lt;<span class="lifetime">&#39;a</span>, T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, idx: usize) -&gt; T
+    <span class="kw">where
+        </span>T: FromSql&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">try_get</span>(<span class="ident">idx</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;error retrieving column {}: {}&quot;</span>, <span class="ident">idx</span>, <span class="ident">e</span>),
+        <span class="kw">match </span><span class="self">self</span>.try_get(idx) {
+            <span class="prelude-val">Ok</span>(value) =&gt; value,
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;error retrieving column {}: {}&quot;</span>, idx, e),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

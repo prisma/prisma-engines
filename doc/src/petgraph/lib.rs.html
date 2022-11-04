@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -226,231 +226,231 @@
 <span id="226">226</span>
 <span id="227">227</span>
 </pre><pre class="rust"><code>
-<span class="doccomment">//! **petgraph** is a graph data structure library.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`Graph`](./graph/struct.Graph.html) which is an adjacency list graph with</span>
-<span class="doccomment">//! arbitrary associated data.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`StableGraph`](./stable_graph/struct.StableGraph.html) is similar</span>
-<span class="doccomment">//! to `Graph`, but it keeps indices stable across removals.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`GraphMap`](./graphmap/struct.GraphMap.html) is an adjacency list graph</span>
-<span class="doccomment">//! which is backed by a hash table and the node identifiers are the keys</span>
-<span class="doccomment">//! into the table.</span>
-<span class="doccomment">//! - [`CSR`](./csr/struct.Csr.html) is a sparse adjacency matrix graph with</span>
-<span class="doccomment">//! arbitrary associated data.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Optional crate feature: `&quot;serde-1&quot;`, see the Readme for more information.</span>
-<span class="doccomment">//!</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/petgraph/0.4/&quot;</span>)]</span>
+<span class="doccomment">//! **petgraph** is a graph data structure library.
+//!
+//! - [`Graph`](./graph/struct.Graph.html) which is an adjacency list graph with
+//! arbitrary associated data.
+//!
+//! - [`StableGraph`](./stable_graph/struct.StableGraph.html) is similar
+//! to `Graph`, but it keeps indices stable across removals.
+//!
+//! - [`GraphMap`](./graphmap/struct.GraphMap.html) is an adjacency list graph
+//! which is backed by a hash table and the node identifiers are the keys
+//! into the table.
+//! - [`CSR`](./csr/struct.Csr.html) is a sparse adjacency matrix graph with
+//! arbitrary associated data.
+//!
+//! Optional crate feature: `&quot;serde-1&quot;`, see the Readme for more information.
+//!
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/petgraph/0.4/&quot;</span>)]
 
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">fixedbitset</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ordermap</span>;
+</span><span class="kw">extern crate </span>fixedbitset;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">extern crate </span>ordermap;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-1&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-1&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_derive</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-1&quot;</span>)]
+</span><span class="kw">extern crate </span>serde;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-1&quot;</span>)]
+#[macro_use]
+</span><span class="kw">extern crate </span>serde_derive;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-1&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">itertools</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;serde-1&quot;</span>, test))]
+</span><span class="kw">extern crate </span>itertools;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">graph::Graph</span>;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>graph::Graph;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">Direction</span>::{<span class="ident">Outgoing</span>, <span class="ident">Incoming</span>};
+<span class="kw">pub use </span>Direction::{Outgoing, Incoming};
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">macros</span>;
-<span class="kw">mod</span> <span class="ident">scored</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">mod </span>macros;
+<span class="kw">mod </span>scored;
 
-<span class="comment">// these modules define trait-implementing macros</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">visit</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">data</span>;
+<span class="comment">// these modules define trait-implementing macros
+</span><span class="attribute">#[macro_use]
+</span><span class="kw">pub mod </span>visit;
+<span class="attribute">#[macro_use]
+</span><span class="kw">pub mod </span>data;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">algo</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;generate&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">generate</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">graphmap</span>;
-<span class="kw">mod</span> <span class="ident">graph_impl</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dot</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">unionfind</span>;
-<span class="kw">mod</span> <span class="ident">dijkstra</span>;
-<span class="kw">mod</span> <span class="ident">astar</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">csr</span>;
-<span class="kw">mod</span> <span class="ident">iter_format</span>;
-<span class="kw">mod</span> <span class="ident">iter_utils</span>;
-<span class="kw">mod</span> <span class="ident">isomorphism</span>;
-<span class="kw">mod</span> <span class="ident">traits_graph</span>;
-<span class="kw">mod</span> <span class="ident">util</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">quickcheck</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-1&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">serde_utils</span>;
+<span class="kw">pub mod </span>algo;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;generate&quot;</span>)]
+</span><span class="kw">pub mod </span>generate;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">pub mod </span>graphmap;
+<span class="kw">mod </span>graph_impl;
+<span class="kw">pub mod </span>dot;
+<span class="kw">pub mod </span>unionfind;
+<span class="kw">mod </span>dijkstra;
+<span class="kw">mod </span>astar;
+<span class="kw">pub mod </span>csr;
+<span class="kw">mod </span>iter_format;
+<span class="kw">mod </span>iter_utils;
+<span class="kw">mod </span>isomorphism;
+<span class="kw">mod </span>traits_graph;
+<span class="kw">mod </span>util;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;quickcheck&quot;</span>)]
+</span><span class="kw">mod </span>quickcheck;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-1&quot;</span>)]
+</span><span class="kw">mod </span>serde_utils;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
+<span class="kw">pub mod </span>prelude;
 
-<span class="doccomment">/// `Graph&lt;N, E, Ty, Ix&gt;` is a graph datastructure using an adjacency list representation.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">graph</span> {
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">graph_impl</span>::{
-        <span class="ident">Edge</span>,
-        <span class="ident">EdgeIndex</span>,
-        <span class="ident">EdgeIndices</span>,
-        <span class="ident">EdgeReference</span>,
-        <span class="ident">EdgeReferences</span>,
-        <span class="ident">EdgeWeightsMut</span>,
-        <span class="ident">Edges</span>,
-        <span class="ident">Externals</span>,
-        <span class="ident">Frozen</span>,
-        <span class="ident">Graph</span>,
-        <span class="ident">Neighbors</span>,
-        <span class="ident">Node</span>,
-        <span class="ident">NodeIndex</span>,
-        <span class="ident">NodeIndices</span>,
-        <span class="ident">NodeWeightsMut</span>,
-        <span class="ident">NodeReferences</span>,
-        <span class="ident">WalkNeighbors</span>,
-        <span class="ident">GraphIndex</span>,
-        <span class="ident">IndexType</span>,
-        <span class="ident">edge_index</span>,
-        <span class="ident">node_index</span>,
-        <span class="ident">DefaultIx</span>,
-        <span class="ident">DiGraph</span>,
-        <span class="ident">UnGraph</span>,
+<span class="doccomment">/// `Graph&lt;N, E, Ty, Ix&gt;` is a graph datastructure using an adjacency list representation.
+</span><span class="kw">pub mod </span>graph {
+    <span class="kw">pub use </span>graph_impl::{
+        Edge,
+        EdgeIndex,
+        EdgeIndices,
+        EdgeReference,
+        EdgeReferences,
+        EdgeWeightsMut,
+        Edges,
+        Externals,
+        Frozen,
+        Graph,
+        Neighbors,
+        Node,
+        NodeIndex,
+        NodeIndices,
+        NodeWeightsMut,
+        NodeReferences,
+        WalkNeighbors,
+        GraphIndex,
+        IndexType,
+        edge_index,
+        node_index,
+        DefaultIx,
+        DiGraph,
+        UnGraph,
     };
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">graph_impl::stable_graph</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">pub use </span>graph_impl::stable_graph;
 
-<span class="macro">macro_rules!</span> <span class="ident">copyclone</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> { <span class="kw-2">*</span><span class="self">self</span> }
+<span class="macro">macro_rules! </span>copyclone {
+    (<span class="macro-nonterminal">$name</span>:ident) =&gt; {
+        <span class="kw">impl </span>Clone <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{ <span class="kw-2">*</span><span class="self">self </span>}
         }
     }
 }
 
-<span class="comment">// Index into the NodeIndex and EdgeIndex arrays</span>
-<span class="doccomment">/// Edge direction.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">usize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Direction</span> {
-    <span class="doccomment">/// An `Outgoing` edge is an outward edge *from* the current node.</span>
-    <span class="ident">Outgoing</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// An `Incoming` edge is an inbound edge *to* the current node.</span>
-    <span class="ident">Incoming</span> <span class="op">=</span> <span class="number">1</span>
-}
+<span class="comment">// Index into the NodeIndex and EdgeIndex arrays
+</span><span class="doccomment">/// Edge direction.
+</span><span class="attribute">#[derive(Copy, Debug, PartialEq, PartialOrd, Ord, Eq, Hash)]
+#[repr(usize)]
+</span><span class="kw">pub enum </span>Direction {
+    <span class="doccomment">/// An `Outgoing` edge is an outward edge *from* the current node.
+    </span>Outgoing = <span class="number">0</span>,
+    <span class="doccomment">/// An `Incoming` edge is an inbound edge *to* the current node.
+    </span>Incoming = <span class="number">1
+</span>}
 
-<span class="macro">copyclone!</span>(<span class="ident">Direction</span>);
+<span class="macro">copyclone!</span>(Direction);
 
-<span class="kw">impl</span> <span class="ident">Direction</span> {
-    <span class="doccomment">/// Return the opposite `Direction`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opposite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Direction</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Outgoing</span> =&gt; <span class="ident">Incoming</span>,
-            <span class="ident">Incoming</span> =&gt; <span class="ident">Outgoing</span>,
+<span class="kw">impl </span>Direction {
+    <span class="doccomment">/// Return the opposite `Direction`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>opposite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Direction {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Outgoing =&gt; Incoming,
+            Incoming =&gt; Outgoing,
         }
     }
 
-    <span class="doccomment">/// Return `0` for `Outgoing` and `1` for `Incoming`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        (<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&amp;</span> <span class="number">0x1</span>
+    <span class="doccomment">/// Return `0` for `Outgoing` and `1` for `Incoming`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        (<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>usize) &amp; <span class="number">0x1
+    </span>}
+}
+
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub use </span>Direction <span class="kw">as </span>EdgeDirection;
+
+<span class="doccomment">/// Marker type for a directed graph.
+</span><span class="attribute">#[derive(Copy, Debug)]
+</span><span class="kw">pub enum </span>Directed { }
+<span class="macro">copyclone!</span>(Directed);
+
+<span class="doccomment">/// Marker type for an undirected graph.
+</span><span class="attribute">#[derive(Copy, Debug)]
+</span><span class="kw">pub enum </span>Undirected { }
+<span class="macro">copyclone!</span>(Undirected);
+
+<span class="doccomment">/// A graph&#39;s edge type determines whether is has directed edges or not.
+</span><span class="kw">pub trait </span>EdgeType {
+    <span class="kw">fn </span>is_directed() -&gt; bool;
+}
+
+<span class="kw">impl </span>EdgeType <span class="kw">for </span>Directed {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_directed() -&gt; bool { <span class="bool-val">true </span>}
+}
+
+<span class="kw">impl </span>EdgeType <span class="kw">for </span>Undirected {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_directed() -&gt; bool { <span class="bool-val">false </span>}
+}
+
+
+<span class="doccomment">/// Convert an element like `(i, j)` or `(i, j, w)` into
+/// a triple of source, target, edge weight.
+///
+/// For `Graph::from_edges` and `GraphMap::from_edges`.
+</span><span class="kw">pub trait </span>IntoWeightedEdge&lt;E&gt; {
+    <span class="kw">type </span>NodeId;
+    <span class="kw">fn </span>into_weighted_edge(<span class="self">self</span>) -&gt; (<span class="self">Self</span>::NodeId, <span class="self">Self</span>::NodeId, E);
+}
+
+<span class="kw">impl</span>&lt;Ix, E&gt; IntoWeightedEdge&lt;E&gt; <span class="kw">for </span>(Ix, Ix)
+    <span class="kw">where </span>E: Default
+{
+    <span class="kw">type </span>NodeId = Ix;
+
+    <span class="kw">fn </span>into_weighted_edge(<span class="self">self</span>) -&gt; (Ix, Ix, E) {
+        <span class="kw">let </span>(s, t) = <span class="self">self</span>;
+        (s, t, E::default())
     }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">Direction</span> <span class="kw">as</span> <span class="ident">EdgeDirection</span>;
-
-<span class="doccomment">/// Marker type for a directed graph.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Directed</span> { }
-<span class="macro">copyclone!</span>(<span class="ident">Directed</span>);
-
-<span class="doccomment">/// Marker type for an undirected graph.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Undirected</span> { }
-<span class="macro">copyclone!</span>(<span class="ident">Undirected</span>);
-
-<span class="doccomment">/// A graph&#39;s edge type determines whether is has directed edges or not.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">EdgeType</span> {
-    <span class="kw">fn</span> <span class="ident">is_directed</span>() -&gt; <span class="ident">bool</span>;
-}
-
-<span class="kw">impl</span> <span class="ident">EdgeType</span> <span class="kw">for</span> <span class="ident">Directed</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_directed</span>() -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
-}
-
-<span class="kw">impl</span> <span class="ident">EdgeType</span> <span class="kw">for</span> <span class="ident">Undirected</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_directed</span>() -&gt; <span class="ident">bool</span> { <span class="bool-val">false</span> }
-}
-
-
-<span class="doccomment">/// Convert an element like `(i, j)` or `(i, j, w)` into</span>
-<span class="doccomment">/// a triple of source, target, edge weight.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For `Graph::from_edges` and `GraphMap::from_edges`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">NodeId</span>;
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident"><span class="self">Self</span>::NodeId</span>, <span class="ident"><span class="self">Self</span>::NodeId</span>, <span class="ident">E</span>);
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>)
-    <span class="kw">where</span> <span class="ident">E</span>: <span class="ident">Default</span>
+<span class="kw">impl</span>&lt;Ix, E&gt; IntoWeightedEdge&lt;E&gt; <span class="kw">for </span>(Ix, Ix, E)
 {
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Ix</span>;
+    <span class="kw">type </span>NodeId = Ix;
+    <span class="kw">fn </span>into_weighted_edge(<span class="self">self</span>) -&gt; (Ix, Ix, E) {
+        <span class="self">self
+    </span>}
+}
 
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
-        <span class="kw">let</span> (<span class="ident">s</span>, <span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>;
-        (<span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">E::default</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Ix, E&gt; IntoWeightedEdge&lt;E&gt; <span class="kw">for </span>(Ix, Ix, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>E)
+    <span class="kw">where </span>E: Clone
+{
+    <span class="kw">type </span>NodeId = Ix;
+    <span class="kw">fn </span>into_weighted_edge(<span class="self">self</span>) -&gt; (Ix, Ix, E) {
+        <span class="kw">let </span>(a, b, c) = <span class="self">self</span>;
+        (a, b, c.clone())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Ix, E&gt; IntoWeightedEdge&lt;E&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(Ix, Ix)
+    <span class="kw">where </span>Ix: Copy, E: Default
 {
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Ix</span>;
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
-        <span class="self">self</span>
+    <span class="kw">type </span>NodeId = Ix;
+    <span class="kw">fn </span>into_weighted_edge(<span class="self">self</span>) -&gt; (Ix, Ix, E) {
+        <span class="kw">let </span>(s, t) = <span class="kw-2">*</span><span class="self">self</span>;
+        (s, t, E::default())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Ix</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">E</span>)
-    <span class="kw">where</span> <span class="ident">E</span>: <span class="ident">Clone</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Ix, E&gt; IntoWeightedEdge&lt;E&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(Ix, Ix, E)
+    <span class="kw">where </span>Ix: Copy, E: Clone
 {
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Ix</span>;
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
-        <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>) <span class="op">=</span> <span class="self">self</span>;
-        (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>.<span class="ident">clone</span>())
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Ix</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>)
-    <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">Copy</span>, <span class="ident">E</span>: <span class="ident">Default</span>
-{
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Ix</span>;
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
-        <span class="kw">let</span> (<span class="ident">s</span>, <span class="ident">t</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-        (<span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">E::default</span>())
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Ix</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>)
-    <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">Copy</span>, <span class="ident">E</span>: <span class="ident">Clone</span>
-{
-    <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Ix</span>;
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
-        <span class="self">self</span>.<span class="ident">clone</span>()
+    <span class="kw">type </span>NodeId = Ix;
+    <span class="kw">fn </span>into_weighted_edge(<span class="self">self</span>) -&gt; (Ix, Ix, E) {
+        <span class="self">self</span>.clone()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

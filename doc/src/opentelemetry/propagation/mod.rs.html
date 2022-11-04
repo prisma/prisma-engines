@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/propagation/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/propagation/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -232,237 +232,237 @@
 <span id="230">230</span>
 <span id="231">231</span>
 <span id="232">232</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # OpenTelemetry Propagator interface</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Propagators API consists of two main formats:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `BinaryFormat` is used to serialize and deserialize a value</span>
-<span class="doccomment">//! into a binary representation.</span>
-<span class="doccomment">//! - `TextMapFormat` is used to inject and extract a value as</span>
-<span class="doccomment">//! text into injectors and extractors that travel in-band across process boundaries.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Deserializing must set `is_remote` to true on the returned</span>
-<span class="doccomment">//! `SpanContext`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Binary Format</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `BinaryFormat` is a formatter to serialize and deserialize a value</span>
-<span class="doccomment">//! into a binary format.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `BinaryFormat` MUST expose the APIs that serializes values into bytes,</span>
-<span class="doccomment">//! and deserializes values from bytes.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### ToBytes</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Serializes the given value into the on-the-wire representation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Required arguments:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - the value to serialize, can be `SpanContext` or `DistributedContext`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Returns the on-the-wire byte representation of the value.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### FromBytes</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Creates a value from the given on-the-wire encoded representation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If the value could not be parsed, the underlying implementation</span>
-<span class="doccomment">//! SHOULD decide to return ether an empty value, an invalid value, or</span>
-<span class="doccomment">//! a valid value.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Required arguments:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - on-the-wire byte representation of the value.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Returns a value deserialized from bytes.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## TextMap Format</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `TextMapFormat` is a formatter that injects and extracts a value</span>
-<span class="doccomment">//! as text into injectors and extractors that travel in-band across process boundaries.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Encoding is expected to conform to the HTTP Header Field semantics.</span>
-<span class="doccomment">//! Values are often encoded as RPC/HTTP request headers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The carrier of propagated data on both the client (injector) and</span>
-<span class="doccomment">//! server (extractor) side is usually a http request. Propagation is</span>
-<span class="doccomment">//! usually implemented via library-specific request interceptors, where</span>
-<span class="doccomment">//! the client-side injects values and the server-side extracts them.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `TextMapFormat` MUST expose the APIs that injects values into injectors,</span>
-<span class="doccomment">//! and extracts values from extractors.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Fields</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The propagation fields defined. If your injector is reused, you should</span>
-<span class="doccomment">//! delete the fields here before calling `inject`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For example, if the injector is a single-use or immutable request object,</span>
-<span class="doccomment">//! you don&#39;t need to clear fields as they couldn&#39;t have been set before.</span>
-<span class="doccomment">//! If it is a mutable, retryable object, successive calls should clear</span>
-<span class="doccomment">//! these fields first.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The use cases of this are:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - allow pre-allocation of fields, especially in systems like gRPC</span>
-<span class="doccomment">//! Metadata</span>
-<span class="doccomment">//! - allow a single-pass over an iterator</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Returns list of fields that will be used by this formatter.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Inject</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Injects the value downstream. For example, as http headers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Required arguments:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - the `SpanContext` to be injected.</span>
-<span class="doccomment">//! - the injector that holds propagation fields. For example, an outgoing</span>
-<span class="doccomment">//! message or http request.</span>
-<span class="doccomment">//! - the `Setter` invoked for each propagation key to add or remove.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #### Setter argument</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Setter is an argument in `Inject` that puts value into given field.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `Setter` allows a `TextMapFormat` to set propagated fields into a</span>
-<span class="doccomment">//! injector.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `Setter` MUST be stateless and allowed to be saved as a constant to</span>
-<span class="doccomment">//! avoid runtime allocations. One of the ways to implement it is `Setter`</span>
-<span class="doccomment">//! class with `Put` method as described below.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ##### Put</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Replaces a propagated field with the given value.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Required arguments:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - the injector holds propagation fields. For example, an outgoing message</span>
-<span class="doccomment">//! or http request.</span>
-<span class="doccomment">//! - the key of the field.</span>
-<span class="doccomment">//! - the value of the field.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The implementation SHOULD preserve casing (e.g. it should not transform</span>
-<span class="doccomment">//! `Content-Type` to `content-type`) if the used protocol is case insensitive,</span>
-<span class="doccomment">//! otherwise it MUST preserve casing.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Extract</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Extracts the value from upstream. For example, as http headers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If the value could not be parsed, the underlying implementation will</span>
-<span class="doccomment">//! decide to return an object representing either an empty value, an invalid</span>
-<span class="doccomment">//! value, or a valid value.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Required arguments:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - the extractor holds propagation fields. For example, an outgoing message</span>
-<span class="doccomment">//! or http request.</span>
-<span class="doccomment">//! - the instance of `Getter` invoked for each propagation key to get.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Returns the non-null extracted value.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #### Getter argument</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Getter is an argument in `Extract` that get value from given field</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `Getter` allows a `TextMapFormat` to read propagated fields from a</span>
-<span class="doccomment">//! extractor.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `Getter` MUST be stateless and allowed to be saved as a constant to avoid</span>
-<span class="doccomment">//! runtime allocations. One of the ways to implement it is `Getter` class</span>
-<span class="doccomment">//! with `Get` method as described below.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ##### Get</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The Get function MUST return the first value of the given propagation</span>
-<span class="doccomment">//! key or return `None` if the key doesn&#39;t exist.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Required arguments:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - the extractor of propagation fields, such as an HTTP request.</span>
-<span class="doccomment">//! - the key of the field.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `get` function is responsible for handling case sensitivity. If</span>
-<span class="doccomment">//! the getter is intended to work with an HTTP request object, the getter</span>
-<span class="doccomment">//! MUST be case insensitive. To improve compatibility with other text-based</span>
-<span class="doccomment">//! protocols, text format implementations MUST ensure to always use the</span>
-<span class="doccomment">//! canonical casing for their attributes. NOTE: Canonical casing for HTTP</span>
-<span class="doccomment">//! headers is usually title case (e.g. `Content-Type` instead of `content-type`).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ##### Keys</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The Keys function returns a vector of the propagation keys.</span>
-<span class="doccomment">//!</span>
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! # OpenTelemetry Propagator interface
+//!
+//! Propagators API consists of two main formats:
+//!
+//! - `BinaryFormat` is used to serialize and deserialize a value
+//! into a binary representation.
+//! - `TextMapFormat` is used to inject and extract a value as
+//! text into injectors and extractors that travel in-band across process boundaries.
+//!
+//! Deserializing must set `is_remote` to true on the returned
+//! `SpanContext`.
+//!
+//! ## Binary Format
+//!
+//! `BinaryFormat` is a formatter to serialize and deserialize a value
+//! into a binary format.
+//!
+//! `BinaryFormat` MUST expose the APIs that serializes values into bytes,
+//! and deserializes values from bytes.
+//!
+//! ### ToBytes
+//!
+//! Serializes the given value into the on-the-wire representation.
+//!
+//! Required arguments:
+//!
+//! - the value to serialize, can be `SpanContext` or `DistributedContext`.
+//!
+//! Returns the on-the-wire byte representation of the value.
+//!
+//! ### FromBytes
+//!
+//! Creates a value from the given on-the-wire encoded representation.
+//!
+//! If the value could not be parsed, the underlying implementation
+//! SHOULD decide to return ether an empty value, an invalid value, or
+//! a valid value.
+//!
+//! Required arguments:
+//!
+//! - on-the-wire byte representation of the value.
+//!
+//! Returns a value deserialized from bytes.
+//!
+//! ## TextMap Format
+//!
+//! `TextMapFormat` is a formatter that injects and extracts a value
+//! as text into injectors and extractors that travel in-band across process boundaries.
+//!
+//! Encoding is expected to conform to the HTTP Header Field semantics.
+//! Values are often encoded as RPC/HTTP request headers.
+//!
+//! The carrier of propagated data on both the client (injector) and
+//! server (extractor) side is usually a http request. Propagation is
+//! usually implemented via library-specific request interceptors, where
+//! the client-side injects values and the server-side extracts them.
+//!
+//! `TextMapFormat` MUST expose the APIs that injects values into injectors,
+//! and extracts values from extractors.
+//!
+//! ### Fields
+//!
+//! The propagation fields defined. If your injector is reused, you should
+//! delete the fields here before calling `inject`.
+//!
+//! For example, if the injector is a single-use or immutable request object,
+//! you don&#39;t need to clear fields as they couldn&#39;t have been set before.
+//! If it is a mutable, retryable object, successive calls should clear
+//! these fields first.
+//!
+//! The use cases of this are:
+//!
+//! - allow pre-allocation of fields, especially in systems like gRPC
+//! Metadata
+//! - allow a single-pass over an iterator
+//!
+//! Returns list of fields that will be used by this formatter.
+//!
+//! ### Inject
+//!
+//! Injects the value downstream. For example, as http headers.
+//!
+//! Required arguments:
+//!
+//! - the `SpanContext` to be injected.
+//! - the injector that holds propagation fields. For example, an outgoing
+//! message or http request.
+//! - the `Setter` invoked for each propagation key to add or remove.
+//!
+//! #### Setter argument
+//!
+//! Setter is an argument in `Inject` that puts value into given field.
+//!
+//! `Setter` allows a `TextMapFormat` to set propagated fields into a
+//! injector.
+//!
+//! `Setter` MUST be stateless and allowed to be saved as a constant to
+//! avoid runtime allocations. One of the ways to implement it is `Setter`
+//! class with `Put` method as described below.
+//!
+//! ##### Put
+//!
+//! Replaces a propagated field with the given value.
+//!
+//! Required arguments:
+//!
+//! - the injector holds propagation fields. For example, an outgoing message
+//! or http request.
+//! - the key of the field.
+//! - the value of the field.
+//!
+//! The implementation SHOULD preserve casing (e.g. it should not transform
+//! `Content-Type` to `content-type`) if the used protocol is case insensitive,
+//! otherwise it MUST preserve casing.
+//!
+//! ### Extract
+//!
+//! Extracts the value from upstream. For example, as http headers.
+//!
+//! If the value could not be parsed, the underlying implementation will
+//! decide to return an object representing either an empty value, an invalid
+//! value, or a valid value.
+//!
+//! Required arguments:
+//!
+//! - the extractor holds propagation fields. For example, an outgoing message
+//! or http request.
+//! - the instance of `Getter` invoked for each propagation key to get.
+//!
+//! Returns the non-null extracted value.
+//!
+//! #### Getter argument
+//!
+//! Getter is an argument in `Extract` that get value from given field
+//!
+//! `Getter` allows a `TextMapFormat` to read propagated fields from a
+//! extractor.
+//!
+//! `Getter` MUST be stateless and allowed to be saved as a constant to avoid
+//! runtime allocations. One of the ways to implement it is `Getter` class
+//! with `Get` method as described below.
+//!
+//! ##### Get
+//!
+//! The Get function MUST return the first value of the given propagation
+//! key or return `None` if the key doesn&#39;t exist.
+//!
+//! Required arguments:
+//!
+//! - the extractor of propagation fields, such as an HTTP request.
+//! - the key of the field.
+//!
+//! The `get` function is responsible for handling case sensitivity. If
+//! the getter is intended to work with an HTTP request object, the getter
+//! MUST be case insensitive. To improve compatibility with other text-based
+//! protocols, text format implementations MUST ensure to always use the
+//! canonical casing for their attributes. NOTE: Canonical casing for HTTP
+//! headers is usually title case (e.g. `Content-Type` instead of `content-type`).
+//!
+//! ##### Keys
+//!
+//! The Keys function returns a vector of the propagation keys.
+//!
+</span><span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">text_map_propagator</span>;
+<span class="kw">pub mod </span>text_map_propagator;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">text_map_propagator::TextMapPropagator</span>;
+<span class="kw">pub use </span>text_map_propagator::TextMapPropagator;
 
-<span class="doccomment">/// Injector provides an interface for adding fields from an underlying struct like `HashMap`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Injector</span> {
-    <span class="doccomment">/// Add a key and value to the underlying data.</span>
-    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="ident">String</span>);
+<span class="doccomment">/// Injector provides an interface for adding fields from an underlying struct like `HashMap`
+</span><span class="kw">pub trait </span>Injector {
+    <span class="doccomment">/// Add a key and value to the underlying data.
+    </span><span class="kw">fn </span>set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str, value: String);
 }
 
-<span class="doccomment">/// Extractor provides an interface for removing fields from an underlying struct like `HashMap`</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Extractor</span> {
-    <span class="doccomment">/// Get a value from a key from the underlying data.</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Extractor provides an interface for removing fields from an underlying struct like `HashMap`
+</span><span class="kw">pub trait </span>Extractor {
+    <span class="doccomment">/// Get a value from a key from the underlying data.
+    </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;;
 
-    <span class="doccomment">/// Collect all the keys from the underlying data.</span>
-    <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Collect all the keys from the underlying data.
+    </span><span class="kw">fn </span>keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span>str&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">std::hash::BuildHasher</span><span class="op">&gt;</span> <span class="ident">Injector</span> <span class="kw">for</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Set a key and value in the HashMap.</span>
-    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">insert</span>(<span class="ident">key</span>.<span class="ident">to_lowercase</span>(), <span class="ident">value</span>);
+<span class="kw">impl</span>&lt;S: std::hash::BuildHasher&gt; Injector <span class="kw">for </span>HashMap&lt;String, String, S&gt; {
+    <span class="doccomment">/// Set a key and value in the HashMap.
+    </span><span class="kw">fn </span>set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str, value: String) {
+        <span class="self">self</span>.insert(key.to_lowercase(), value);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">std::hash::BuildHasher</span><span class="op">&gt;</span> <span class="ident">Extractor</span> <span class="kw">for</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Get a value for a key from the HashMap.</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">to_lowercase</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_str</span>())
+<span class="kw">impl</span>&lt;S: std::hash::BuildHasher&gt; Extractor <span class="kw">for </span>HashMap&lt;String, String, S&gt; {
+    <span class="doccomment">/// Get a value for a key from the HashMap.
+    </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.get(<span class="kw-2">&amp;</span>key.to_lowercase()).map(|v| v.as_str())
     }
 
-    <span class="doccomment">/// Collect all the keys from the HashMap.</span>
-    <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">keys</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+    <span class="doccomment">/// Collect all the keys from the HashMap.
+    </span><span class="kw">fn </span>keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.keys().map(|k| k.as_str()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::collections::HashMap;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hash_map_get</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carrier</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">carrier</span>.<span class="ident">set</span>(<span class="string">&quot;headerName&quot;</span>, <span class="string">&quot;value&quot;</span>.<span class="ident">to_string</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hash_map_get() {
+        <span class="kw">let </span><span class="kw-2">mut </span>carrier = HashMap::new();
+        carrier.set(<span class="string">&quot;headerName&quot;</span>, <span class="string">&quot;value&quot;</span>.to_string());
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Extractor::get</span>(<span class="kw-2">&amp;</span><span class="ident">carrier</span>, <span class="string">&quot;HEADERNAME&quot;</span>),
+            Extractor::get(<span class="kw-2">&amp;</span>carrier, <span class="string">&quot;HEADERNAME&quot;</span>),
             <span class="prelude-val">Some</span>(<span class="string">&quot;value&quot;</span>),
-            <span class="string">&quot;case insensitive extraction&quot;</span>
-        );
+            <span class="string">&quot;case insensitive extraction&quot;
+        </span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hash_map_keys</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carrier</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">carrier</span>.<span class="ident">set</span>(<span class="string">&quot;headerName1&quot;</span>, <span class="string">&quot;value1&quot;</span>.<span class="ident">to_string</span>());
-        <span class="ident">carrier</span>.<span class="ident">set</span>(<span class="string">&quot;headerName2&quot;</span>, <span class="string">&quot;value2&quot;</span>.<span class="ident">to_string</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hash_map_keys() {
+        <span class="kw">let </span><span class="kw-2">mut </span>carrier = HashMap::new();
+        carrier.set(<span class="string">&quot;headerName1&quot;</span>, <span class="string">&quot;value1&quot;</span>.to_string());
+        carrier.set(<span class="string">&quot;headerName2&quot;</span>, <span class="string">&quot;value2&quot;</span>.to_string());
 
-        <span class="kw">let</span> <span class="ident">got</span> <span class="op">=</span> <span class="ident">Extractor::keys</span>(<span class="kw-2">&amp;</span><span class="ident">carrier</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">got</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="macro">assert!</span>(<span class="ident">got</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">&quot;headername1&quot;</span>));
-        <span class="macro">assert!</span>(<span class="ident">got</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">&quot;headername2&quot;</span>));
+        <span class="kw">let </span>got = Extractor::keys(<span class="kw-2">&amp;</span>carrier);
+        <span class="macro">assert_eq!</span>(got.len(), <span class="number">2</span>);
+        <span class="macro">assert!</span>(got.contains(<span class="kw-2">&amp;</span><span class="string">&quot;headername1&quot;</span>));
+        <span class="macro">assert!</span>(got.contains(<span class="kw-2">&amp;</span><span class="string">&quot;headername2&quot;</span>));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

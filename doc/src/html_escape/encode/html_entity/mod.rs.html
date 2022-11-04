@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/html-escape-0.2.11/src/encode/html_entity/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../html_escape/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../html_escape/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../html_escape/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/html-escape-0.2.11/src/encode/html_entity/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../html_escape/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../html_escape/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../html_escape/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -300,307 +300,307 @@
 <span id="300">300</span>
 <span id="301">301</span>
 <span id="302">302</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">unquoted_attribute</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>unquoted_attribute;
 
-<span class="kw">use</span> <span class="ident">core::str::from_utf8_unchecked</span>;
+<span class="kw">use </span>core::str::from_utf8_unchecked;
 
-<span class="kw">use</span> <span class="ident">alloc::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">alloc::string::String</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">use </span>alloc::borrow::Cow;
+<span class="kw">use </span>alloc::string::String;
+<span class="kw">use </span>alloc::vec::Vec;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::io::{<span class="self">self</span>, Write};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">unquoted_attribute</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>unquoted_attribute::<span class="kw-2">*</span>;
 
-<span class="macro">macro_rules!</span> <span class="ident">escape_impl</span> {
-    (@<span class="ident">inner</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span>:<span class="ident">tt</span>] <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">macro_rules!</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span>:<span class="ident">expr</span>) =&gt; {
-                <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span> {
-                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> =&gt; <span class="kw">break</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,)<span class="op">+</span>
-                    <span class="kw">_</span> =&gt; (),
+<span class="macro">macro_rules! </span>escape_impl {
+    (@inner [<span class="macro-nonterminal">$dollar</span>:tt] <span class="macro-nonterminal">$name</span>:ident; $(<span class="macro-nonterminal">$l</span>:expr =&gt; <span class="macro-nonterminal">$r</span>:expr),+ $(,)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">macro_rules! </span><span class="macro-nonterminal">$name </span>{
+            (<span class="macro-nonterminal">$dollar </span>e:expr) =&gt; {
+                <span class="kw">match </span><span class="macro-nonterminal">$dollar </span>e {
+                    $(<span class="macro-nonterminal">$l </span>=&gt; <span class="kw">break </span><span class="macro-nonterminal">$r</span>,)+
+                    <span class="kw">_ </span>=&gt; (),
                 }
             };
-            (<span class="ident">vec</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">v</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">b</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span>:<span class="ident">ident</span>) =&gt; {
-                <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span> {
-                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> =&gt; {
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">v</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">b</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span>..<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span>]);
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span> <span class="op">+</span> <span class="number">1</span>;
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">v</span>.<span class="ident">extend_from_slice</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>);
-                    })<span class="op">+</span>
-                    <span class="kw">_</span> =&gt; (),
+            (vec <span class="macro-nonterminal">$dollar </span>e:expr, <span class="macro-nonterminal">$dollar </span>v:ident, <span class="macro-nonterminal">$dollar </span>b:ident, <span class="macro-nonterminal">$dollar </span>start:ident, <span class="macro-nonterminal">$dollar </span>end:ident) =&gt; {
+                <span class="kw">match </span><span class="macro-nonterminal">$dollar </span>e {
+                    $(<span class="macro-nonterminal">$l </span>=&gt; {
+                        <span class="macro-nonterminal">$dollar </span>v.extend_from_slice(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$dollar </span>b[<span class="macro-nonterminal">$dollar </span>start..<span class="macro-nonterminal">$dollar </span>end]);
+                        <span class="macro-nonterminal">$dollar </span>start = <span class="macro-nonterminal">$dollar </span>end + <span class="number">1</span>;
+                        <span class="macro-nonterminal">$dollar </span>v.extend_from_slice(<span class="macro-nonterminal">$r</span>);
+                    })+
+                    <span class="kw">_ </span>=&gt; (),
                 }
 
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="macro-nonterminal">$dollar </span>end += <span class="number">1</span>;
             };
-            (<span class="ident">writer</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">w</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">b</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span>:<span class="ident">ident</span>) =&gt; {
-                <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span> {
-                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> =&gt; {
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">w</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">b</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span>..<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span>])<span class="question-mark">?</span>;
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span> <span class="op">+</span> <span class="number">1</span>;
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">w</span>.<span class="ident">write_all</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>)<span class="question-mark">?</span>;
-                    })<span class="op">+</span>
-                    <span class="kw">_</span> =&gt; (),
+            (writer <span class="macro-nonterminal">$dollar </span>e:expr, <span class="macro-nonterminal">$dollar </span>w:ident, <span class="macro-nonterminal">$dollar </span>b:ident, <span class="macro-nonterminal">$dollar </span>start:ident, <span class="macro-nonterminal">$dollar </span>end:ident) =&gt; {
+                <span class="kw">match </span><span class="macro-nonterminal">$dollar </span>e {
+                    $(<span class="macro-nonterminal">$l </span>=&gt; {
+                        <span class="macro-nonterminal">$dollar </span>w.write_all(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$dollar </span>b[<span class="macro-nonterminal">$dollar </span>start..<span class="macro-nonterminal">$dollar </span>end])<span class="question-mark">?</span>;
+                        <span class="macro-nonterminal">$dollar </span>start = <span class="macro-nonterminal">$dollar </span>end + <span class="number">1</span>;
+                        <span class="macro-nonterminal">$dollar </span>w.write_all(<span class="macro-nonterminal">$r</span>)<span class="question-mark">?</span>;
+                    })+
+                    <span class="kw">_ </span>=&gt; (),
                 }
 
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="macro-nonterminal">$dollar </span>end += <span class="number">1</span>;
             };
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">escape_impl!</span> {
-            @<span class="ident">inner</span> [$]
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
-            $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>.<span class="ident">as_ref</span>(),)<span class="op">*</span>
+    (<span class="macro-nonterminal">$name</span>:ident; $(<span class="macro-nonterminal">$l</span>:expr =&gt; <span class="macro-nonterminal">$r</span>:expr),+ $(,)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">escape_impl! </span>{
+            @inner [$]
+            <span class="macro-nonterminal">$name</span>;
+            $(<span class="macro-nonterminal">$l </span>=&gt; <span class="macro-nonterminal">$r</span>.as_ref(),)*
         }
     };
 }
 
-<span class="macro">escape_impl!</span> {
-    <span class="ident">escape_text_minimal</span>;
-    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
+<span class="macro">escape_impl! </span>{
+    escape_text_minimal;
+    <span class="string">b&#39;&amp;&#39; </span>=&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39; </span>=&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
 }
 
-<span class="macro">escape_impl!</span> {
-    <span class="ident">escape_text</span>;
-    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
-    <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
+<span class="macro">escape_impl! </span>{
+    escape_text;
+    <span class="string">b&#39;&amp;&#39; </span>=&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39; </span>=&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
+    <span class="string">b&#39;&gt;&#39; </span>=&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
 }
 
-<span class="macro">escape_impl!</span> {
-    <span class="ident">escape_double_quote</span>;
-    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
-    <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
-    <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="string">b&quot;&amp;quot;&quot;</span>,
+<span class="macro">escape_impl! </span>{
+    escape_double_quote;
+    <span class="string">b&#39;&amp;&#39; </span>=&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39; </span>=&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
+    <span class="string">b&#39;&gt;&#39; </span>=&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
+    <span class="string">b&#39;&quot;&#39; </span>=&gt; <span class="string">b&quot;&amp;quot;&quot;</span>,
 }
 
-<span class="macro">escape_impl!</span> {
-    <span class="ident">escape_single_quote</span>;
-    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
-    <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
-    <span class="string">b&#39;\&#39;&#39;</span> =&gt; <span class="string">b&quot;&amp;#x27;&quot;</span>,
+<span class="macro">escape_impl! </span>{
+    escape_single_quote;
+    <span class="string">b&#39;&amp;&#39; </span>=&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39; </span>=&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
+    <span class="string">b&#39;&gt;&#39; </span>=&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
+    <span class="string">b&#39;\&#39;&#39; </span>=&gt; <span class="string">b&quot;&amp;#x27;&quot;</span>,
 }
 
-<span class="macro">escape_impl!</span> {
-    <span class="ident">escape_quote</span>;
-    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
-    <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
-    <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="string">b&quot;&amp;quot;&quot;</span>,
-    <span class="string">b&#39;\&#39;&#39;</span> =&gt; <span class="string">b&quot;&amp;#x27;&quot;</span>,
+<span class="macro">escape_impl! </span>{
+    escape_quote;
+    <span class="string">b&#39;&amp;&#39; </span>=&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39; </span>=&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
+    <span class="string">b&#39;&gt;&#39; </span>=&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
+    <span class="string">b&#39;&quot;&#39; </span>=&gt; <span class="string">b&quot;&amp;quot;&quot;</span>,
+    <span class="string">b&#39;\&#39;&#39; </span>=&gt; <span class="string">b&quot;&amp;#x27;&quot;</span>,
 }
 
-<span class="macro">escape_impl!</span> {
-    <span class="ident">escape_safe</span>;
-    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
-    <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
-    <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="string">b&quot;&amp;quot;&quot;</span>,
-    <span class="string">b&#39;\&#39;&#39;</span> =&gt; <span class="string">b&quot;&amp;#x27;&quot;</span>,
-    <span class="string">b&#39;/&#39;</span> =&gt; <span class="string">b&quot;&amp;#x2F;&quot;</span>,
+<span class="macro">escape_impl! </span>{
+    escape_safe;
+    <span class="string">b&#39;&amp;&#39; </span>=&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39; </span>=&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
+    <span class="string">b&#39;&gt;&#39; </span>=&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
+    <span class="string">b&#39;&quot;&#39; </span>=&gt; <span class="string">b&quot;&amp;quot;&quot;</span>,
+    <span class="string">b&#39;\&#39;&#39; </span>=&gt; <span class="string">b&quot;&amp;#x27;&quot;</span>,
+    <span class="string">b&#39;/&#39; </span>=&gt; <span class="string">b&quot;&amp;#x2F;&quot;</span>,
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">encode_impl</span> {
-    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">escape_macro</span>:<span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_name</span>: <span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_string_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_string_name</span>: <span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_name</span>: <span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_writer_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_writer_name</span>: <span class="ident">ident</span> $(;)<span class="kw-2">*</span>) =&gt; {
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_attr</span>]</span>)<span class="op">*</span>
-        <span class="doccomment">///</span>
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_ref</span>();
-            <span class="kw">let</span> <span class="ident">text_bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_bytes</span>();
-            <span class="kw">let</span> <span class="ident">text_length</span> <span class="op">=</span> <span class="ident">text_bytes</span>.<span class="ident">len</span>();
+<span class="macro">macro_rules! </span>encode_impl {
+    ($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>: meta]</span>)* <span class="macro-nonterminal">$escape_macro</span>:ident; $(<span class="attribute">#[<span class="macro-nonterminal">$encode_attr</span>: meta]</span>)* <span class="macro-nonterminal">$encode_name</span>: ident; $(<span class="attribute">#[<span class="macro-nonterminal">$encode_to_string_attr</span>: meta]</span>)* <span class="macro-nonterminal">$encode_to_string_name</span>: ident; $(<span class="attribute">#[<span class="macro-nonterminal">$encode_to_vec_attr</span>: meta]</span>)* <span class="macro-nonterminal">$encode_to_vec_name</span>: ident; $(<span class="attribute">#[<span class="macro-nonterminal">$encode_to_writer_attr</span>: meta]</span>)* <span class="macro-nonterminal">$encode_to_writer_name</span>: ident $(;)<span class="kw-2">*</span>) =&gt; {
+        $(<span class="attribute">#[<span class="macro-nonterminal">$encode_attr</span>]</span>)*
+        <span class="doccomment">///
+        </span>$(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)*
+        <span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$encode_name</span>&lt;S: <span class="question-mark">?</span>Sized + AsRef&lt;str&gt;&gt;(text: <span class="kw-2">&amp;</span>S) -&gt; Cow&lt;str&gt; {
+            <span class="kw">let </span>text = text.as_ref();
+            <span class="kw">let </span>text_bytes = text.as_bytes();
+            <span class="kw">let </span>text_length = text_bytes.len();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>p = <span class="number">0</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>e;
 
-            <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="kw">loop</span> {
-                <span class="kw">if</span> <span class="ident">p</span> <span class="op">==</span> <span class="ident">text_length</span> {
-                    <span class="kw">return</span> <span class="ident">Cow::from</span>(<span class="ident">text</span>);
+            <span class="kw">let </span>first = <span class="kw">loop </span>{
+                <span class="kw">if </span>p == text_length {
+                    <span class="kw">return </span>Cow::from(text);
                 }
 
-                <span class="ident">e</span> <span class="op">=</span> <span class="ident">text_bytes</span>[<span class="ident">p</span>];
+                e = text_bytes[p];
 
                 <span class="macro-nonterminal">$</span><span class="macro">escape_macro!</span>(<span class="macro-nonterminal">e</span>);
 
-                <span class="ident">p</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                p += <span class="number">1</span>;
             };
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">text_length</span> <span class="op">+</span> <span class="number">5</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>v = Vec::with_capacity(text_length + <span class="number">5</span>);
 
-            <span class="ident">v</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">text_bytes</span>[..<span class="ident">p</span>]);
-            <span class="ident">v</span>.<span class="ident">extend_from_slice</span>(<span class="ident">first</span>);
+            v.extend_from_slice(<span class="kw-2">&amp;</span>text_bytes[..p]);
+            v.extend_from_slice(first);
 
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_name</span>(<span class="kw">unsafe</span> { <span class="ident">from_utf8_unchecked</span>(<span class="kw-2">&amp;</span><span class="ident">text_bytes</span>[(<span class="ident">p</span> <span class="op">+</span> <span class="number">1</span>)..]) }, <span class="kw-2">&amp;mut</span> <span class="ident">v</span>);
+            <span class="macro-nonterminal">$encode_to_vec_name</span>(<span class="kw">unsafe </span>{ from_utf8_unchecked(<span class="kw-2">&amp;</span>text_bytes[(p + <span class="number">1</span>)..]) }, <span class="kw-2">&amp;mut </span>v);
 
-            <span class="ident">Cow::from</span>(<span class="kw">unsafe</span> { <span class="ident">String::from_utf8_unchecked</span>(<span class="ident">v</span>) })
+            Cow::from(<span class="kw">unsafe </span>{ String::from_utf8_unchecked(v) })
         }
 
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_string_attr</span>]</span>)<span class="op">*</span>
-        <span class="doccomment">///</span>
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_string_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-            <span class="kw">unsafe</span> { <span class="ident">from_utf8_unchecked</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_name</span>(<span class="ident">text</span>, <span class="ident">output</span>.<span class="ident">as_mut_vec</span>())) }
+        $(<span class="attribute">#[<span class="macro-nonterminal">$encode_to_string_attr</span>]</span>)*
+        <span class="doccomment">///
+        </span>$(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)*
+        <span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$encode_to_string_name</span>&lt;S: AsRef&lt;str&gt;&gt;(text: S, output: <span class="kw-2">&amp;mut </span>String) -&gt; <span class="kw-2">&amp;</span>str {
+            <span class="kw">unsafe </span>{ from_utf8_unchecked(<span class="macro-nonterminal">$encode_to_vec_name</span>(text, output.as_mut_vec())) }
         }
 
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_attr</span>]</span>)<span class="op">*</span>
-        <span class="doccomment">///</span>
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-            <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_ref</span>();
-            <span class="kw">let</span> <span class="ident">text_bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_bytes</span>();
-            <span class="kw">let</span> <span class="ident">text_length</span> <span class="op">=</span> <span class="ident">text_bytes</span>.<span class="ident">len</span>();
+        $(<span class="attribute">#[<span class="macro-nonterminal">$encode_to_vec_attr</span>]</span>)*
+        <span class="doccomment">///
+        </span>$(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)*
+        <span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$encode_to_vec_name</span>&lt;S: AsRef&lt;str&gt;&gt;(text: S, output: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) -&gt; <span class="kw-2">&amp;</span>[u8] {
+            <span class="kw">let </span>text = text.as_ref();
+            <span class="kw">let </span>text_bytes = text.as_bytes();
+            <span class="kw">let </span>text_length = text_bytes.len();
 
-            <span class="ident">output</span>.<span class="ident">reserve</span>(<span class="ident">text_length</span>);
+            output.reserve(text_length);
 
-            <span class="kw">let</span> <span class="ident">current_length</span> <span class="op">=</span> <span class="ident">output</span>.<span class="ident">len</span>();
+            <span class="kw">let </span>current_length = output.len();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">start</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">end</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>start = <span class="number">0</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>end = <span class="number">0</span>;
 
-            <span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">text_bytes</span>.<span class="ident">iter</span>().<span class="ident">copied</span>() {
-                <span class="macro-nonterminal">$</span><span class="macro">escape_macro!</span>(<span class="macro-nonterminal">vec</span> <span class="ident">e</span>, <span class="ident">output</span>, <span class="ident">text_bytes</span>, <span class="ident">start</span>, <span class="ident">end</span>);
+            <span class="kw">for </span>e <span class="kw">in </span>text_bytes.iter().copied() {
+                <span class="macro-nonterminal">$</span><span class="macro">escape_macro!</span>(<span class="macro-nonterminal">vec </span>e, output, text_bytes, start, end);
             }
 
-            <span class="ident">output</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">text_bytes</span>[<span class="ident">start</span>..<span class="ident">end</span>]);
+            output.extend_from_slice(<span class="kw-2">&amp;</span>text_bytes[start..end]);
 
-            <span class="kw-2">&amp;</span><span class="ident">output</span>[<span class="ident">current_length</span>..]
+            <span class="kw-2">&amp;</span>output[current_length..]
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_writer_attr</span>]</span>)<span class="op">*</span>
-        <span class="doccomment">///</span>
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_writer_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_ref</span>();
-            <span class="kw">let</span> <span class="ident">text_bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_bytes</span>();
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+        </span>$(<span class="attribute">#[<span class="macro-nonterminal">$encode_to_writer_attr</span>]</span>)*
+        <span class="doccomment">///
+        </span>$(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)*
+        <span class="attribute">#[inline]
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$encode_to_writer_name</span>&lt;S: AsRef&lt;str&gt;, W: Write&gt;(text: S, output: <span class="kw-2">&amp;mut </span>W) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+            <span class="kw">let </span>text = text.as_ref();
+            <span class="kw">let </span>text_bytes = text.as_bytes();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">start</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">end</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>start = <span class="number">0</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>end = <span class="number">0</span>;
 
-            <span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">text_bytes</span>.<span class="ident">iter</span>().<span class="ident">copied</span>() {
-                <span class="macro-nonterminal">$</span><span class="macro">escape_macro!</span>(<span class="macro-nonterminal">writer</span> <span class="ident">e</span>, <span class="ident">output</span>, <span class="ident">text_bytes</span>, <span class="ident">start</span>, <span class="ident">end</span>);
+            <span class="kw">for </span>e <span class="kw">in </span>text_bytes.iter().copied() {
+                <span class="macro-nonterminal">$</span><span class="macro">escape_macro!</span>(<span class="macro-nonterminal">writer </span>e, output, text_bytes, start, end);
             }
 
-            <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">text_bytes</span>[<span class="ident">start</span>..<span class="ident">end</span>])
+            output.write_all(<span class="kw-2">&amp;</span>text_bytes[start..end])
         }
     };
 }
 
-<span class="macro">encode_impl!</span> {
-    <span class="doccomment">/// The following characters are escaped:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `&amp;` =&gt; `&amp;amp;`</span>
-    <span class="doccomment">/// * `&lt;` =&gt; `&amp;lt;`</span>
-    <span class="ident">escape_text_minimal</span>;
-    <span class="doccomment">/// Encode text used as regular HTML text.</span>
-    <span class="ident">encode_text_minimal</span>;
-    <span class="doccomment">/// Write text used as regular HTML text to a mutable `String` reference and return the encoded string slice.</span>
-    <span class="ident">encode_text_minimal_to_string</span>;
-    <span class="doccomment">/// Write text used as regular HTML text to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.</span>
-    <span class="ident">encode_text_minimal_to_vec</span>;
-    <span class="doccomment">/// Write text used as regular HTML text to a writer.</span>
-    <span class="ident">encode_text_minimal_to_writer</span>;
+<span class="macro">encode_impl! </span>{
+    <span class="doccomment">/// The following characters are escaped:
+    ///
+    /// * `&amp;` =&gt; `&amp;amp;`
+    /// * `&lt;` =&gt; `&amp;lt;`
+    </span>escape_text_minimal;
+    <span class="doccomment">/// Encode text used as regular HTML text.
+    </span>encode_text_minimal;
+    <span class="doccomment">/// Write text used as regular HTML text to a mutable `String` reference and return the encoded string slice.
+    </span>encode_text_minimal_to_string;
+    <span class="doccomment">/// Write text used as regular HTML text to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.
+    </span>encode_text_minimal_to_vec;
+    <span class="doccomment">/// Write text used as regular HTML text to a writer.
+    </span>encode_text_minimal_to_writer;
 }
 
-<span class="macro">encode_impl!</span> {
-    <span class="doccomment">/// The following characters are escaped:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `&amp;` =&gt; `&amp;amp;`</span>
-    <span class="doccomment">/// * `&lt;` =&gt; `&amp;lt;`</span>
-    <span class="doccomment">/// * `&gt;` =&gt; `&amp;gt;`</span>
-    <span class="ident">escape_text</span>;
-    <span class="doccomment">/// Encode text used as regular HTML text.</span>
-    <span class="ident">encode_text</span>;
-    <span class="doccomment">/// Write text used as regular HTML text to a mutable `String` reference and return the encoded string slice.</span>
-    <span class="ident">encode_text_to_string</span>;
-    <span class="doccomment">/// Write text used as regular HTML text to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.</span>
-    <span class="ident">encode_text_to_vec</span>;
-    <span class="doccomment">/// Write text used as regular HTML text to a writer.</span>
-    <span class="ident">encode_text_to_writer</span>;
+<span class="macro">encode_impl! </span>{
+    <span class="doccomment">/// The following characters are escaped:
+    ///
+    /// * `&amp;` =&gt; `&amp;amp;`
+    /// * `&lt;` =&gt; `&amp;lt;`
+    /// * `&gt;` =&gt; `&amp;gt;`
+    </span>escape_text;
+    <span class="doccomment">/// Encode text used as regular HTML text.
+    </span>encode_text;
+    <span class="doccomment">/// Write text used as regular HTML text to a mutable `String` reference and return the encoded string slice.
+    </span>encode_text_to_string;
+    <span class="doccomment">/// Write text used as regular HTML text to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.
+    </span>encode_text_to_vec;
+    <span class="doccomment">/// Write text used as regular HTML text to a writer.
+    </span>encode_text_to_writer;
 }
 
-<span class="macro">encode_impl!</span> {
-    <span class="doccomment">/// The following characters are escaped:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `&amp;` =&gt; `&amp;amp;`</span>
-    <span class="doccomment">/// * `&lt;` =&gt; `&amp;lt;`</span>
-    <span class="doccomment">/// * `&gt;` =&gt; `&amp;gt;`</span>
-    <span class="doccomment">/// * `&quot;` =&gt; `&amp;quot;`</span>
-    <span class="ident">escape_double_quote</span>;
-    <span class="doccomment">/// Encode text used in a double-quoted attribute.</span>
-    <span class="ident">encode_double_quoted_attribute</span>;
-    <span class="doccomment">/// Write text used in a double-quoted attribute to a mutable `String` reference and return the encoded string slice.</span>
-    <span class="ident">encode_double_quoted_attribute_to_string</span>;
-    <span class="doccomment">/// Write text used in a double-quoted attribute to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.</span>
-    <span class="ident">encode_double_quoted_attribute_to_vec</span>;
-    <span class="doccomment">/// Write text used in a double-quoted attribute to a writer.</span>
-    <span class="ident">encode_double_quoted_attribute_to_writer</span>;
+<span class="macro">encode_impl! </span>{
+    <span class="doccomment">/// The following characters are escaped:
+    ///
+    /// * `&amp;` =&gt; `&amp;amp;`
+    /// * `&lt;` =&gt; `&amp;lt;`
+    /// * `&gt;` =&gt; `&amp;gt;`
+    /// * `&quot;` =&gt; `&amp;quot;`
+    </span>escape_double_quote;
+    <span class="doccomment">/// Encode text used in a double-quoted attribute.
+    </span>encode_double_quoted_attribute;
+    <span class="doccomment">/// Write text used in a double-quoted attribute to a mutable `String` reference and return the encoded string slice.
+    </span>encode_double_quoted_attribute_to_string;
+    <span class="doccomment">/// Write text used in a double-quoted attribute to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.
+    </span>encode_double_quoted_attribute_to_vec;
+    <span class="doccomment">/// Write text used in a double-quoted attribute to a writer.
+    </span>encode_double_quoted_attribute_to_writer;
 }
 
-<span class="macro">encode_impl!</span> {
-    <span class="doccomment">/// The following characters are escaped:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `&amp;` =&gt; `&amp;amp;`</span>
-    <span class="doccomment">/// * `&lt;` =&gt; `&amp;lt;`</span>
-    <span class="doccomment">/// * `&gt;` =&gt; `&amp;gt;`</span>
-    <span class="doccomment">/// * `&#39;` =&gt; `&amp;#x27;`</span>
-    <span class="ident">escape_single_quote</span>;
-    <span class="doccomment">/// Encode text used in a single-quoted attribute.</span>
-    <span class="ident">encode_single_quoted_attribute</span>;
-    <span class="doccomment">/// Write text used in a single-quoted attribute to a mutable `String` reference and return the encoded string slice.</span>
-    <span class="ident">encode_single_quoted_attribute_to_string</span>;
-    <span class="doccomment">/// Write text used in a single-quoted attribute to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.</span>
-    <span class="ident">encode_single_quoted_attribute_to_vec</span>;
-    <span class="doccomment">/// Write text used in a single-quoted attribute to a writer.</span>
-    <span class="ident">encode_single_quoted_attribute_to_writer</span>;
+<span class="macro">encode_impl! </span>{
+    <span class="doccomment">/// The following characters are escaped:
+    ///
+    /// * `&amp;` =&gt; `&amp;amp;`
+    /// * `&lt;` =&gt; `&amp;lt;`
+    /// * `&gt;` =&gt; `&amp;gt;`
+    /// * `&#39;` =&gt; `&amp;#x27;`
+    </span>escape_single_quote;
+    <span class="doccomment">/// Encode text used in a single-quoted attribute.
+    </span>encode_single_quoted_attribute;
+    <span class="doccomment">/// Write text used in a single-quoted attribute to a mutable `String` reference and return the encoded string slice.
+    </span>encode_single_quoted_attribute_to_string;
+    <span class="doccomment">/// Write text used in a single-quoted attribute to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.
+    </span>encode_single_quoted_attribute_to_vec;
+    <span class="doccomment">/// Write text used in a single-quoted attribute to a writer.
+    </span>encode_single_quoted_attribute_to_writer;
 }
 
-<span class="macro">encode_impl!</span> {
-    <span class="doccomment">/// The following characters (HTML reserved characters)  are escaped:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `&amp;` =&gt; `&amp;amp;`</span>
-    <span class="doccomment">/// * `&lt;` =&gt; `&amp;lt;`</span>
-    <span class="doccomment">/// * `&gt;` =&gt; `&amp;gt;`</span>
-    <span class="doccomment">/// * `&quot;` =&gt; `&amp;quot;`</span>
-    <span class="doccomment">/// * `&#39;` =&gt; `&amp;#x27;`</span>
-    <span class="ident">escape_quote</span>;
-    <span class="doccomment">/// Encode text used in a quoted attribute.</span>
-    <span class="ident">encode_quoted_attribute</span>;
-    <span class="doccomment">/// Write text used in a quoted attribute to a mutable `String` reference and return the encoded string slice.</span>
-    <span class="ident">encode_quoted_attribute_to_string</span>;
-    <span class="doccomment">/// Write text used in a quoted attribute to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.</span>
-    <span class="ident">encode_quoted_attribute_to_vec</span>;
-    <span class="doccomment">/// Write text used in a quoted attribute to a writer.</span>
-    <span class="ident">encode_quoted_attribute_to_writer</span>;
+<span class="macro">encode_impl! </span>{
+    <span class="doccomment">/// The following characters (HTML reserved characters)  are escaped:
+    ///
+    /// * `&amp;` =&gt; `&amp;amp;`
+    /// * `&lt;` =&gt; `&amp;lt;`
+    /// * `&gt;` =&gt; `&amp;gt;`
+    /// * `&quot;` =&gt; `&amp;quot;`
+    /// * `&#39;` =&gt; `&amp;#x27;`
+    </span>escape_quote;
+    <span class="doccomment">/// Encode text used in a quoted attribute.
+    </span>encode_quoted_attribute;
+    <span class="doccomment">/// Write text used in a quoted attribute to a mutable `String` reference and return the encoded string slice.
+    </span>encode_quoted_attribute_to_string;
+    <span class="doccomment">/// Write text used in a quoted attribute to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.
+    </span>encode_quoted_attribute_to_vec;
+    <span class="doccomment">/// Write text used in a quoted attribute to a writer.
+    </span>encode_quoted_attribute_to_writer;
 }
 
-<span class="macro">encode_impl!</span> {
-    <span class="doccomment">/// The following characters are escaped:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `&amp;` =&gt; `&amp;amp;`</span>
-    <span class="doccomment">/// * `&lt;` =&gt; `&amp;lt;`</span>
-    <span class="doccomment">/// * `&gt;` =&gt; `&amp;gt;`</span>
-    <span class="doccomment">/// * `&quot;` =&gt; `&amp;quot;`</span>
-    <span class="doccomment">/// * `&#39;` =&gt; `&amp;#x27;`</span>
-    <span class="doccomment">/// * `/` =&gt; `&amp;#x2F;`</span>
-    <span class="ident">escape_safe</span>;
-    <span class="doccomment">/// Encode text to prevent special characters functioning.</span>
-    <span class="ident">encode_safe</span>;
-    <span class="doccomment">/// Encode text to prevent special characters functioning and write it to a mutable `String` reference and return the encoded string slice.</span>
-    <span class="ident">encode_safe_to_string</span>;
-    <span class="doccomment">/// Encode text to prevent special characters functioning and write it to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.</span>
-    <span class="ident">encode_safe_to_vec</span>;
-    <span class="doccomment">/// Encode text to prevent special characters functioning and write it to a writer.</span>
-    <span class="ident">encode_safe_to_writer</span>;
+<span class="macro">encode_impl! </span>{
+    <span class="doccomment">/// The following characters are escaped:
+    ///
+    /// * `&amp;` =&gt; `&amp;amp;`
+    /// * `&lt;` =&gt; `&amp;lt;`
+    /// * `&gt;` =&gt; `&amp;gt;`
+    /// * `&quot;` =&gt; `&amp;quot;`
+    /// * `&#39;` =&gt; `&amp;#x27;`
+    /// * `/` =&gt; `&amp;#x2F;`
+    </span>escape_safe;
+    <span class="doccomment">/// Encode text to prevent special characters functioning.
+    </span>encode_safe;
+    <span class="doccomment">/// Encode text to prevent special characters functioning and write it to a mutable `String` reference and return the encoded string slice.
+    </span>encode_safe_to_string;
+    <span class="doccomment">/// Encode text to prevent special characters functioning and write it to a mutable `Vec&lt;u8&gt;` reference and return the encoded data slice.
+    </span>encode_safe_to_vec;
+    <span class="doccomment">/// Encode text to prevent special characters functioning and write it to a writer.
+    </span>encode_safe_to_writer;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="html_escape" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="html_escape" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

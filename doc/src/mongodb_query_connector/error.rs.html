@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -287,294 +287,294 @@
 <span id="287">287</span>
 <span id="288">288</span>
 <span id="289">289</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector_interface::error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>, <span class="ident">MultiError</span>};
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">mongodb</span>::{
-    <span class="ident">bson</span>::{<span class="self">self</span>, <span class="ident">extjson</span>},
-    <span class="ident">error</span>::{<span class="ident">CommandError</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DriverError</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>connector_interface::error::{ConnectorError, ErrorKind, MultiError};
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>mongodb::{
+    bson::{<span class="self">self</span>, extjson},
+    error::{CommandError, Error <span class="kw">as </span>DriverError},
 };
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">SelectedField</span>};
-<span class="kw">use</span> <span class="ident">regex::Regex</span>;
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
-<span class="kw">use</span> <span class="ident">user_facing_errors::query_engine::DatabaseConstraint</span>;
+<span class="kw">use </span>prisma_models::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
+<span class="kw">use </span>regex::Regex;
+<span class="kw">use </span>thiserror::Error;
+<span class="kw">use </span>user_facing_errors::query_engine::DatabaseConstraint;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MongoError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unsupported MongoDB feature: {0}.&quot;</span>)]</span>
-    <span class="ident">Unsupported</span>(<span class="ident">String</span>),
+<span class="attribute">#[derive(Debug, Error)]
+</span><span class="kw">pub enum </span>MongoError {
+    <span class="attribute">#[error(<span class="string">&quot;Unsupported MongoDB feature: {0}.&quot;</span>)]
+    </span>Unsupported(String),
 
-    <span class="doccomment">/// Generic conversion error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed to convert &#39;{}&#39; to &#39;{}&#39;.&quot;</span>, <span class="ident">from</span>, <span class="ident">to</span>)]</span>
-    <span class="ident">ConversionError</span> { <span class="ident">from</span>: <span class="ident">String</span>, <span class="ident">to</span>: <span class="ident">String</span> },
+    <span class="doccomment">/// Generic conversion error.
+    </span><span class="attribute">#[error(<span class="string">&quot;Failed to convert &#39;{}&#39; to &#39;{}&#39;.&quot;</span>, from, to)]
+    </span>ConversionError { from: String, to: String },
 
-    <span class="comment">// Unhandled conversion error. Mostly used for `#[non-exhaustive]` flagged Mongo errors.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unhandled conversion error: {0}.&quot;</span>)]</span>
-    <span class="ident">UnhandledConversionError</span>(<span class="ident">anyhow::Error</span>),
-    <span class="doccomment">/// Conversion error related to a datamodel field.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed to convert &#39;{}&#39; to &#39;{}&#39; for the field &#39;{}&#39;.&quot;</span>, <span class="ident">from</span>, <span class="ident">to</span>, <span class="ident">field_name</span>)]</span>
-    <span class="ident">FieldConversionError</span> {
-        <span class="ident">field_name</span>: <span class="ident">String</span>,
-        <span class="ident">from</span>: <span class="ident">String</span>,
-        <span class="ident">to</span>: <span class="ident">String</span>,
+    <span class="comment">// Unhandled conversion error. Mostly used for `#[non-exhaustive]` flagged Mongo errors.
+    </span><span class="attribute">#[error(<span class="string">&quot;Unhandled conversion error: {0}.&quot;</span>)]
+    </span>UnhandledConversionError(anyhow::Error),
+    <span class="doccomment">/// Conversion error related to a datamodel field.
+    </span><span class="attribute">#[error(<span class="string">&quot;Failed to convert &#39;{}&#39; to &#39;{}&#39; for the field &#39;{}&#39;.&quot;</span>, from, to, field_name)]
+    </span>FieldConversionError {
+        field_name: String,
+        from: String,
+        to: String,
     },
 
-    <span class="doccomment">/// ObjectID specific conversion error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Malformed ObjectID: {0}.&quot;</span>)]</span>
-    <span class="ident">MalformedObjectId</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// ObjectID specific conversion error.
+    </span><span class="attribute">#[error(<span class="string">&quot;Malformed ObjectID: {0}.&quot;</span>)]
+    </span>MalformedObjectId(String),
 
-    <span class="doccomment">/// ObjectID specific conversion error related to a datamodel field.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Malformed ObjectID: {} for the field &#39;{}&#39;.&quot;</span>, <span class="ident">reason</span>, <span class="ident">field_name</span>)]</span>
-    <span class="ident">FieldMalformedObjectId</span> { <span class="ident">field_name</span>: <span class="ident">String</span>, <span class="ident">reason</span>: <span class="ident">String</span> },
+    <span class="doccomment">/// ObjectID specific conversion error related to a datamodel field.
+    </span><span class="attribute">#[error(<span class="string">&quot;Malformed ObjectID: {} for the field &#39;{}&#39;.&quot;</span>, reason, field_name)]
+    </span>FieldMalformedObjectId { field_name: String, reason: String },
 
-    <span class="doccomment">/// Raw Mongo driver error</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
-    <span class="ident">DriverError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">DriverError</span>),
+    <span class="doccomment">/// Raw Mongo driver error
+    </span><span class="attribute">#[error(<span class="string">&quot;{0}&quot;</span>)]
+    </span>DriverError(<span class="attribute">#[from] </span>DriverError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
-    <span class="ident">UuidError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">uuid::Error</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{0}&quot;</span>)]
+    </span>UuidError(<span class="attribute">#[from] </span>uuid::Error),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
-    <span class="ident">JsonError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">serde_json::Error</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{0}&quot;</span>)]
+    </span>JsonError(<span class="attribute">#[from] </span>serde_json::Error),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
-    <span class="ident">BsonDeserializationError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">bson::de::Error</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{0}&quot;</span>)]
+    </span>BsonDeserializationError(<span class="attribute">#[from] </span>bson::de::Error),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Missing required argument: &#39;{}&#39;.&quot;</span>, <span class="ident">argument</span>)]</span>
-    <span class="ident">MissingRequiredArgumentError</span> { <span class="ident">argument</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Missing required argument: &#39;{}&#39;.&quot;</span>, argument)]
+    </span>MissingRequiredArgumentError { argument: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Argument type mismatch for &#39;{}&#39;. Have: {:?}, want: {}.&quot;</span>, <span class="ident">argument</span>, <span class="ident">have</span>, <span class="ident">want</span>)]</span>
-    <span class="ident">ArgumentTypeMismatchError</span> {
-        <span class="ident">argument</span>: <span class="ident">String</span>,
-        <span class="ident">have</span>: <span class="ident">String</span>,
-        <span class="ident">want</span>: <span class="ident">String</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Argument type mismatch for &#39;{}&#39;. Have: {:?}, want: {}.&quot;</span>, argument, have, want)]
+    </span>ArgumentTypeMismatchError {
+        argument: String,
+        have: String,
+        want: String,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">MongoError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">argument_type_mismatch</span>(<span class="ident">argument</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">have</span>: <span class="ident">String</span>, <span class="ident">want</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::ArgumentTypeMismatchError</span> {
-            <span class="ident">argument</span>: <span class="ident">argument</span>.<span class="ident">to_string</span>(),
-            <span class="ident">have</span>,
-            <span class="ident">want</span>: <span class="ident">want</span>.<span class="ident">to_string</span>(),
+<span class="kw">impl </span>MongoError {
+    <span class="kw">pub fn </span>argument_type_mismatch(argument: <span class="kw-2">&amp;</span>str, have: String, want: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::ArgumentTypeMismatchError {
+            argument: argument.to_string(),
+            have,
+            want: want.to_string(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decorate_with_field_name</span>(<span class="self">self</span>, <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">field_name</span>.<span class="ident">to_owned</span>();
+    <span class="kw">pub fn </span>decorate_with_field_name(<span class="self">self</span>, field_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>field_name = field_name.to_owned();
 
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">MongoError::ConversionError</span> { <span class="ident">from</span>, <span class="ident">to</span> } =&gt; <span class="ident">MongoError::FieldConversionError</span> { <span class="ident">field_name</span>, <span class="ident">from</span>, <span class="ident">to</span> },
-            <span class="ident">MongoError::MalformedObjectId</span>(<span class="ident">oid</span>) =&gt; <span class="ident">MongoError::FieldMalformedObjectId</span> {
-                <span class="ident">field_name</span>,
-                <span class="ident">reason</span>: <span class="ident">oid</span>,
+        <span class="kw">match </span><span class="self">self </span>{
+            MongoError::ConversionError { from, to } =&gt; MongoError::FieldConversionError { field_name, from, to },
+            MongoError::MalformedObjectId(oid) =&gt; MongoError::FieldMalformedObjectId {
+                field_name,
+                reason: oid,
             },
-            <span class="ident">err</span> =&gt; <span class="ident">err</span>,
+            err =&gt; err,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MongoError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_connector_error</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">MongoError::Unsupported</span>(<span class="ident">feature</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::UnsupportedFeature</span>(<span class="ident">feature</span>)),
-            <span class="ident">MongoError::UnhandledConversionError</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>)),
-            <span class="ident">MongoError::UuidError</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>())),
-            <span class="ident">MongoError::JsonError</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>())),
-            <span class="ident">MongoError::BsonDeserializationError</span>(<span class="ident">err</span>) =&gt; {
-                <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))
+<span class="kw">impl </span>MongoError {
+    <span class="kw">pub fn </span>into_connector_error(<span class="self">self</span>) -&gt; ConnectorError {
+        <span class="kw">match </span><span class="self">self </span>{
+            MongoError::Unsupported(feature) =&gt; ConnectorError::from_kind(ErrorKind::UnsupportedFeature(feature)),
+            MongoError::UnhandledConversionError(err) =&gt; ConnectorError::from_kind(ErrorKind::ConversionError(err)),
+            MongoError::UuidError(err) =&gt; ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
+            MongoError::JsonError(err) =&gt; ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
+            MongoError::BsonDeserializationError(err) =&gt; {
+                ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }
-            <span class="ident">MongoError::MissingRequiredArgumentError</span> { <span class="ident">argument</span> } =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawApiError</span>(
-                <span class="macro">format!</span>(<span class="string">&quot;Missing required argument: &#39;{}&#39;.&quot;</span>, <span class="ident">argument</span>),
+            MongoError::MissingRequiredArgumentError { argument } =&gt; ConnectorError::from_kind(ErrorKind::RawApiError(
+                <span class="macro">format!</span>(<span class="string">&quot;Missing required argument: &#39;{}&#39;.&quot;</span>, argument),
             )),
-            <span class="ident">MongoError::ArgumentTypeMismatchError</span> { <span class="ident">argument</span>, <span class="ident">have</span>, <span class="ident">want</span> } =&gt; {
-                <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawApiError</span>(<span class="macro">format!</span>(
+            MongoError::ArgumentTypeMismatchError { argument, have, want } =&gt; {
+                ConnectorError::from_kind(ErrorKind::RawApiError(<span class="macro">format!</span>(
                     <span class="string">&quot;Argument type mismatch for &#39;{}&#39;. Have: {}, want: {}.&quot;</span>,
-                    <span class="ident">argument</span>, <span class="ident">have</span>, <span class="ident">want</span>
+                    argument, have, want
                 )))
             }
 
-            <span class="ident">err</span> @ <span class="ident">MongoError::ConversionError</span> { .. } =&gt; {
-                <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))
+            err @ MongoError::ConversionError { .. } =&gt; {
+                ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }
 
-            <span class="ident">err</span> @ <span class="ident">MongoError::FieldConversionError</span> { .. } =&gt; {
-                <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))
+            err @ MongoError::FieldConversionError { .. } =&gt; {
+                ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }
 
-            <span class="ident">err</span> @ <span class="ident">MongoError::MalformedObjectId</span>(<span class="kw">_</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>())),
+            err @ MongoError::MalformedObjectId(<span class="kw">_</span>) =&gt; ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
 
-            <span class="ident">err</span> @ <span class="ident">MongoError::FieldMalformedObjectId</span> { .. } =&gt; {
-                <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))
+            err @ MongoError::FieldMalformedObjectId { .. } =&gt; {
+                ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }
 
-            <span class="ident">MongoError::DriverError</span>(<span class="ident">err</span>) =&gt; <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">kind</span>.<span class="ident">as_ref</span>() {
-                <span class="ident">mongodb::error::ErrorKind::InvalidArgument</span> { .. } =&gt; {
-                    <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>.<span class="ident">clone</span>())))
+            MongoError::DriverError(err) =&gt; <span class="kw">match </span>err.kind.as_ref() {
+                mongodb::error::ErrorKind::InvalidArgument { .. } =&gt; {
+                    ConnectorError::from_kind(ErrorKind::QueryError(Box::new(err.clone())))
                 }
-                <span class="ident">mongodb::error::ErrorKind::Authentication</span> { <span class="ident">message</span>, .. } =&gt; {
-                    <span class="comment">// Todo this mapping is only half correct.</span>
-                    <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::AuthenticationFailed</span> { <span class="ident">user</span>: <span class="ident">message</span>.<span class="ident">clone</span>() })
+                mongodb::error::ErrorKind::Authentication { message, .. } =&gt; {
+                    <span class="comment">// Todo this mapping is only half correct.
+                    </span>ConnectorError::from_kind(ErrorKind::AuthenticationFailed { user: message.clone() })
                 }
 
-                <span class="comment">// Transaction aborted error.</span>
-                <span class="ident">mongodb::error::ErrorKind::Command</span>(<span class="ident">CommandError</span> { <span class="ident">code</span>, <span class="ident">message</span>, .. }) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">code</span> <span class="op">==</span> <span class="number">251</span> =&gt; {
-                    <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::TransactionAborted</span> {
-                        <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">to_owned</span>(),
+                <span class="comment">// Transaction aborted error.
+                </span>mongodb::error::ErrorKind::Command(CommandError { code, message, .. }) <span class="kw">if </span><span class="kw-2">*</span>code == <span class="number">251 </span>=&gt; {
+                    ConnectorError::from_kind(ErrorKind::TransactionAborted {
+                        message: message.to_owned(),
                     })
                 }
 
-                <span class="ident">mongodb::error::ErrorKind::Command</span>(<span class="ident">CommandError</span> { <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">code</span> <span class="op">==</span> <span class="number">20</span> =&gt; {
-                    <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::MongoReplicaSetRequired</span>)
+                mongodb::error::ErrorKind::Command(CommandError { code, .. }) <span class="kw">if </span><span class="kw-2">*</span>code == <span class="number">20 </span>=&gt; {
+                    ConnectorError::from_kind(ErrorKind::MongoReplicaSetRequired)
                 }
 
-                <span class="ident">mongodb::error::ErrorKind::Command</span>(<span class="ident">CommandError</span> { <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">code</span> <span class="op">==</span> <span class="number">112</span> =&gt; {
-                    <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::TransactionWriteConflict</span>)
+                mongodb::error::ErrorKind::Command(CommandError { code, .. }) <span class="kw">if </span><span class="kw-2">*</span>code == <span class="number">112 </span>=&gt; {
+                    ConnectorError::from_kind(ErrorKind::TransactionWriteConflict)
                 }
 
-                <span class="ident">mongodb::error::ErrorKind::Write</span>(<span class="ident">write_failure</span>) =&gt; <span class="kw">match</span> <span class="ident">write_failure</span> {
-                    <span class="ident">mongodb::error::WriteFailure::WriteConcernError</span>(<span class="ident">concern_error</span>) =&gt; <span class="kw">match</span> <span class="ident">concern_error</span>.<span class="ident">code</span> {
-                        <span class="number">11000</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">unique_violation_error</span>(<span class="ident">concern_error</span>.<span class="ident">message</span>.<span class="ident">as_str</span>())),
-                        <span class="ident">code</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawDatabaseError</span> {
-                            <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">to_string</span>(),
-                            <span class="ident">message</span>: <span class="ident">concern_error</span>.<span class="ident">message</span>.<span class="ident">clone</span>(),
+                mongodb::error::ErrorKind::Write(write_failure) =&gt; <span class="kw">match </span>write_failure {
+                    mongodb::error::WriteFailure::WriteConcernError(concern_error) =&gt; <span class="kw">match </span>concern_error.code {
+                        <span class="number">11000 </span>=&gt; ConnectorError::from_kind(unique_violation_error(concern_error.message.as_str())),
+                        code =&gt; ConnectorError::from_kind(ErrorKind::RawDatabaseError {
+                            code: code.to_string(),
+                            message: concern_error.message.clone(),
                         }),
                     },
 
-                    <span class="ident">mongodb::error::WriteFailure::WriteError</span>(<span class="ident">write_error</span>) =&gt; <span class="kw">match</span> <span class="ident">write_error</span>.<span class="ident">code</span> {
-                        <span class="number">11000</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">unique_violation_error</span>(<span class="ident">write_error</span>.<span class="ident">message</span>.<span class="ident">as_str</span>())),
-                        <span class="ident">code</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawDatabaseError</span> {
-                            <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">to_string</span>(),
-                            <span class="ident">message</span>: <span class="ident">write_error</span>.<span class="ident">message</span>.<span class="ident">clone</span>(),
+                    mongodb::error::WriteFailure::WriteError(write_error) =&gt; <span class="kw">match </span>write_error.code {
+                        <span class="number">11000 </span>=&gt; ConnectorError::from_kind(unique_violation_error(write_error.message.as_str())),
+                        code =&gt; ConnectorError::from_kind(ErrorKind::RawDatabaseError {
+                            code: code.to_string(),
+                            message: write_error.message.clone(),
                         }),
                     },
 
-                    <span class="kw">_</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>.<span class="ident">clone</span>()))),
+                    <span class="kw">_ </span>=&gt; ConnectorError::from_kind(ErrorKind::QueryError(Box::new(err.clone()))),
                 },
 
-                <span class="ident">mongodb::error::ErrorKind::BulkWrite</span>(<span class="ident">err</span>) =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">write_errors</span> {
-                        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">errors</span>) =&gt; <span class="ident">errors</span>
-                            .<span class="ident">iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">code</span> {
-                                <span class="number">11000</span> =&gt; <span class="ident">unique_violation_error</span>(<span class="ident">err</span>.<span class="ident">message</span>.<span class="ident">as_str</span>()),
-                                <span class="kw">_</span> =&gt; <span class="ident">ErrorKind::RawDatabaseError</span> {
-                                    <span class="ident">code</span>: <span class="ident">err</span>.<span class="ident">code</span>.<span class="ident">to_string</span>(),
-                                    <span class="ident">message</span>: <span class="macro">format!</span>(
+                mongodb::error::ErrorKind::BulkWrite(err) =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>errors = <span class="kw">match </span>err.write_errors {
+                        <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>errors) =&gt; errors
+                            .iter()
+                            .map(|err| <span class="kw">match </span>err.code {
+                                <span class="number">11000 </span>=&gt; unique_violation_error(err.message.as_str()),
+                                <span class="kw">_ </span>=&gt; ErrorKind::RawDatabaseError {
+                                    code: err.code.to_string(),
+                                    message: <span class="macro">format!</span>(
                                         <span class="string">&quot;Bulk write error on write index &#39;{}&#39;: {}&quot;</span>,
-                                        <span class="ident">err</span>.<span class="ident">index</span>, <span class="ident">err</span>.<span class="ident">message</span>
+                                        err.index, err.message
                                     ),
                                 },
                             })
-                            .<span class="ident">collect_vec</span>(),
+                            .collect_vec(),
 
-                        <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
+                        <span class="prelude-val">None </span>=&gt; <span class="macro">vec!</span>[],
                     };
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span> <span class="ident">err</span>.<span class="ident">write_concern_error</span> {
-                        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">code</span> {
-                            <span class="number">11000</span> =&gt; <span class="ident">unique_violation_error</span>(<span class="ident">err</span>.<span class="ident">message</span>.<span class="ident">as_str</span>()),
-                            <span class="kw">_</span> =&gt; <span class="ident">ErrorKind::RawDatabaseError</span> {
-                                <span class="ident">code</span>: <span class="ident">err</span>.<span class="ident">code</span>.<span class="ident">to_string</span>(),
-                                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Bulk write concern error: {}&quot;</span>, <span class="ident">err</span>.<span class="ident">message</span>),
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>err) = err.write_concern_error {
+                        <span class="kw">let </span>kind = <span class="kw">match </span>err.code {
+                            <span class="number">11000 </span>=&gt; unique_violation_error(err.message.as_str()),
+                            <span class="kw">_ </span>=&gt; ErrorKind::RawDatabaseError {
+                                code: err.code.to_string(),
+                                message: <span class="macro">format!</span>(<span class="string">&quot;Bulk write concern error: {}&quot;</span>, err.message),
                             },
                         };
 
-                        <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">kind</span>);
+                        errors.push(kind);
                     };
 
-                    <span class="kw">if</span> <span class="ident">errors</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-                        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">errors</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>())
-                    } <span class="kw">else</span> {
-                        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::MultiError</span>(<span class="ident">MultiError</span> { <span class="ident">errors</span> }))
+                    <span class="kw">if </span>errors.len() == <span class="number">1 </span>{
+                        ConnectorError::from_kind(errors.into_iter().next().unwrap())
+                    } <span class="kw">else </span>{
+                        ConnectorError::from_kind(ErrorKind::MultiError(MultiError { errors }))
                     }
                 }
 
-                <span class="ident">mongodb::error::ErrorKind::BsonDeserialization</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(
-                    <span class="ident">ErrorKind::InternalConversionError</span>(<span class="macro">format!</span>(<span class="string">&quot;BSON decode error: {}&quot;</span>, <span class="ident">err</span>)),
+                mongodb::error::ErrorKind::BsonDeserialization(err) =&gt; ConnectorError::from_kind(
+                    ErrorKind::InternalConversionError(<span class="macro">format!</span>(<span class="string">&quot;BSON decode error: {}&quot;</span>, err)),
                 ),
 
-                <span class="ident">mongodb::error::ErrorKind::BsonSerialization</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(
-                    <span class="ident">ErrorKind::InternalConversionError</span>(<span class="macro">format!</span>(<span class="string">&quot;BSON encode error: {}&quot;</span>, <span class="ident">err</span>)),
+                mongodb::error::ErrorKind::BsonSerialization(err) =&gt; ConnectorError::from_kind(
+                    ErrorKind::InternalConversionError(<span class="macro">format!</span>(<span class="string">&quot;BSON encode error: {}&quot;</span>, err)),
                 ),
 
-                <span class="kw">_</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawDatabaseError</span> {
-                    <span class="ident">code</span>: <span class="string">&quot;unknown&quot;</span>.<span class="ident">to_owned</span>(),
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>),
+                <span class="kw">_ </span>=&gt; ConnectorError::from_kind(ErrorKind::RawDatabaseError {
+                    code: <span class="string">&quot;unknown&quot;</span>.to_owned(),
+                    message: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, err),
                 }),
             },
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">unique_violation_error</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ErrorKind</span> {
-    <span class="ident">ErrorKind::UniqueConstraintViolation</span> {
-        <span class="ident">constraint</span>: <span class="kw">match</span> <span class="ident">parse_unique_index_violation</span>(<span class="ident">message</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="ident">DatabaseConstraint::Index</span>(<span class="ident">index</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">DatabaseConstraint::CannotParse</span>,
+<span class="kw">fn </span>unique_violation_error(message: <span class="kw-2">&amp;</span>str) -&gt; ErrorKind {
+    ErrorKind::UniqueConstraintViolation {
+        constraint: <span class="kw">match </span>parse_unique_index_violation(message) {
+            <span class="prelude-val">Some</span>(index) =&gt; DatabaseConstraint::Index(index),
+            <span class="prelude-val">None </span>=&gt; DatabaseConstraint::CannotParse,
         },
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_unique_index_violation</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;duplicate\skey\serror\scollection:\s.*\sindex:\s(.*)\sdup\skey&quot;</span>).<span class="ident">unwrap</span>();
+<span class="kw">fn </span>parse_unique_index_violation(message: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+    <span class="kw">let </span>re = Regex::new(<span class="string">r&quot;duplicate\skey\serror\scollection:\s.*\sindex:\s(.*)\sdup\skey&quot;</span>).unwrap();
 
-    <span class="kw">match</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="ident">message</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">caps</span>) =&gt; <span class="ident">caps</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">cap</span><span class="op">|</span> <span class="ident">cap</span>.<span class="ident">as_str</span>().<span class="ident">to_owned</span>()),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">match </span>re.captures(message) {
+        <span class="prelude-val">Some</span>(caps) =&gt; caps.get(<span class="number">1</span>).map(|cap| cap.as_str().to_owned()),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">mongodb::bson::oid::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MongoError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">mongodb::bson::oid::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">MongoError::MalformedObjectId</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>))
+<span class="kw">impl </span>From&lt;mongodb::bson::oid::Error&gt; <span class="kw">for </span>MongoError {
+    <span class="kw">fn </span>from(err: mongodb::bson::oid::Error) -&gt; <span class="self">Self </span>{
+        MongoError::MalformedObjectId(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, err))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">extjson::de::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MongoError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">extjson::de::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">extjson::de::Error::InvalidObjectId</span>(<span class="ident">oid_err</span>) =&gt; <span class="ident">oid_err</span>.<span class="ident">into</span>(),
-            <span class="ident">extjson::de::Error::DeserializationError</span> { <span class="ident">message</span>: <span class="kw">_</span> } =&gt; <span class="ident">MongoError::ConversionError</span> {
-                <span class="ident">from</span>: <span class="string">&quot;JSON&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">to</span>: <span class="string">&quot;BSON&quot;</span>.<span class="ident">to_string</span>(),
+<span class="kw">impl </span>From&lt;extjson::de::Error&gt; <span class="kw">for </span>MongoError {
+    <span class="kw">fn </span>from(err: extjson::de::Error) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>err {
+            extjson::de::Error::InvalidObjectId(oid_err) =&gt; oid_err.into(),
+            extjson::de::Error::DeserializationError { message: <span class="kw">_ </span>} =&gt; MongoError::ConversionError {
+                from: <span class="string">&quot;JSON&quot;</span>.to_string(),
+                to: <span class="string">&quot;BSON&quot;</span>.to_string(),
             },
-            <span class="comment">// Needed because `extjson::de::Error` is flagged as #[non_exhaustive]</span>
-            <span class="ident">err</span> =&gt; <span class="ident">MongoError::UnhandledConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+            <span class="comment">// Needed because `extjson::de::Error` is flagged as #[non_exhaustive]
+            </span>err =&gt; MongoError::UnhandledConversionError(err.into()),
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DecorateErrorWithFieldInformationExtension</span> {
-    <span class="kw">fn</span> <span class="ident">decorate_with_field_info</span>(<span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">decorate_with_selected_field_info</span>(<span class="self">self</span>, <span class="ident">selected_field</span>: <span class="kw-2">&amp;</span><span class="ident">SelectedField</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">decorate_with_scalar_field_info</span>(<span class="self">self</span>, <span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">decorate_with_field_name</span>(<span class="self">self</span>, <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">decorate_with_composite_field_info</span>(<span class="self">self</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="self">Self</span>;
+<span class="kw">pub trait </span>DecorateErrorWithFieldInformationExtension {
+    <span class="kw">fn </span>decorate_with_field_info(<span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>decorate_with_selected_field_info(<span class="self">self</span>, selected_field: <span class="kw-2">&amp;</span>SelectedField) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>decorate_with_scalar_field_info(<span class="self">self</span>, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>decorate_with_field_name(<span class="self">self</span>, field_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>decorate_with_composite_field_info(<span class="self">self</span>, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="self">Self</span>;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DecorateErrorWithFieldInformationExtension</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">decorate_with_field_info</span>(<span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">decorate_with_field_name</span>(<span class="ident">field</span>.<span class="ident">name</span>()))
+<span class="kw">impl</span>&lt;T&gt; DecorateErrorWithFieldInformationExtension <span class="kw">for </span><span class="kw">crate</span>::Result&lt;T&gt; {
+    <span class="kw">fn </span>decorate_with_field_info(<span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.map_err(|err| err.decorate_with_field_name(field.name()))
     }
 
-    <span class="kw">fn</span> <span class="ident">decorate_with_selected_field_info</span>(<span class="self">self</span>, <span class="ident">selected_field</span>: <span class="kw-2">&amp;</span><span class="ident">SelectedField</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">selected_field</span> {
-            <span class="ident">SelectedField::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="self">self</span>.<span class="ident">decorate_with_scalar_field_info</span>(<span class="ident">sf</span>),
-            <span class="ident">SelectedField::Composite</span>(<span class="ident">composite_sel</span>) =&gt; <span class="self">self</span>.<span class="ident">decorate_with_composite_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">composite_sel</span>.<span class="ident">field</span>),
+    <span class="kw">fn </span>decorate_with_selected_field_info(<span class="self">self</span>, selected_field: <span class="kw-2">&amp;</span>SelectedField) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>selected_field {
+            SelectedField::Scalar(sf) =&gt; <span class="self">self</span>.decorate_with_scalar_field_info(sf),
+            SelectedField::Composite(composite_sel) =&gt; <span class="self">self</span>.decorate_with_composite_field_info(<span class="kw-2">&amp;</span>composite_sel.field),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">decorate_with_scalar_field_info</span>(<span class="self">self</span>, <span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">decorate_with_field_name</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>))
+    <span class="kw">fn </span>decorate_with_scalar_field_info(<span class="self">self</span>, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.map_err(|err| err.decorate_with_field_name(<span class="kw-2">&amp;</span>sf.name))
     }
 
-    <span class="kw">fn</span> <span class="ident">decorate_with_field_name</span>(<span class="self">self</span>, <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">decorate_with_field_name</span>(<span class="ident">field_name</span>))
+    <span class="kw">fn </span>decorate_with_field_name(<span class="self">self</span>, field_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.map_err(|err| err.decorate_with_field_name(field_name))
     }
 
-    <span class="kw">fn</span> <span class="ident">decorate_with_composite_field_info</span>(<span class="self">self</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">decorate_with_field_name</span>(<span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">name</span>))
+    <span class="kw">fn </span>decorate_with_composite_field_info(<span class="self">self</span>, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.map_err(|err| err.decorate_with_field_name(<span class="kw-2">&amp;</span>cf.name))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

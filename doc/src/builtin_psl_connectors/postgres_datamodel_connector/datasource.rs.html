@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/postgres_datamodel_connector/datasource.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datasource.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/postgres_datamodel_connector/datasource.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datasource.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -92,99 +92,99 @@
 <span id="92">92</span>
 <span id="93">93</span>
 <span id="94">94</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::PostgresExtensions</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::postgres_datamodel_connector::PostgresExtension</span>;
-<span class="kw">use</span> <span class="ident">psl_core</span>::{
-    <span class="ident">datamodel_connector::EXTENSIONS_KEY</span>,
-    <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
-    <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">coerce</span>, <span class="ident">coerce_array</span>},
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::PostgresExtensions;
+<span class="kw">use </span><span class="kw">crate</span>::postgres_datamodel_connector::PostgresExtension;
+<span class="kw">use </span>psl_core::{
+    datamodel_connector::EXTENSIONS_KEY,
+    diagnostics::{DatamodelError, Diagnostics},
+    parser_database::{ast, coerce, coerce_array},
 };
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
+<span class="kw">use </span>std::collections::{HashMap, HashSet};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse_extensions</span>(
-    <span class="ident">args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">ast::Span</span>, <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>)<span class="op">&gt;</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresExtensions</span><span class="op">&gt;</span> {
-    <span class="ident">args</span>.<span class="ident">remove</span>(<span class="ident">EXTENSIONS_KEY</span>).<span class="ident">and_then</span>(<span class="op">|</span>(<span class="ident">span</span>, <span class="ident">expr</span>)<span class="op">|</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>parse_extensions(
+    args: <span class="kw-2">&amp;mut </span>HashMap&lt;<span class="kw-2">&amp;</span>str, (ast::Span, <span class="kw-2">&amp;</span>ast::Expression)&gt;,
+    diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+) -&gt; <span class="prelude-ty">Option</span>&lt;PostgresExtensions&gt; {
+    args.remove(EXTENSIONS_KEY).and_then(|(span, expr)| {
+        <span class="kw">let </span><span class="kw-2">mut </span>extensions = Vec::new();
 
-        <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">span</span>) <span class="kw">in</span> <span class="ident">coerce_array</span>(<span class="ident">expr</span>, <span class="kw-2">&amp;</span><span class="ident">coerce::function_or_constant_with_span</span>, <span class="ident">diagnostics</span>)<span class="question-mark">?</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">filter_args</span>(<span class="ident">args</span>, <span class="ident">diagnostics</span>);
+        <span class="kw">for </span>(name, args, span) <span class="kw">in </span>coerce_array(expr, <span class="kw-2">&amp;</span>coerce::function_or_constant_with_span, diagnostics)<span class="question-mark">? </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>args = filter_args(args, diagnostics);
 
-            <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">fetch_string_arg</span>(<span class="kw-2">&amp;mut</span> <span class="ident">args</span>, <span class="string">&quot;map&quot;</span>, <span class="ident">diagnostics</span>);
-            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">fetch_string_arg</span>(<span class="kw-2">&amp;mut</span> <span class="ident">args</span>, <span class="string">&quot;schema&quot;</span>, <span class="ident">diagnostics</span>);
-            <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">fetch_string_arg</span>(<span class="kw-2">&amp;mut</span> <span class="ident">args</span>, <span class="string">&quot;version&quot;</span>, <span class="ident">diagnostics</span>);
+            <span class="kw">let </span>db_name = fetch_string_arg(<span class="kw-2">&amp;mut </span>args, <span class="string">&quot;map&quot;</span>, diagnostics);
+            <span class="kw">let </span>schema = fetch_string_arg(<span class="kw-2">&amp;mut </span>args, <span class="string">&quot;schema&quot;</span>, diagnostics);
+            <span class="kw">let </span>version = fetch_string_arg(<span class="kw-2">&amp;mut </span>args, <span class="string">&quot;version&quot;</span>, diagnostics);
 
-            <span class="kw">for</span> (<span class="ident">name</span>, (<span class="ident">span</span>, <span class="kw">_</span>)) <span class="kw">in</span> <span class="ident">args</span>.<span class="ident">into_iter</span>() {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_argument_not_known_error</span>(<span class="ident">name</span>, <span class="ident">span</span>));
+            <span class="kw">for </span>(name, (span, <span class="kw">_</span>)) <span class="kw">in </span>args.into_iter() {
+                diagnostics.push_error(DatamodelError::new_argument_not_known_error(name, span));
             }
 
-            <span class="kw">let</span> <span class="ident">extension</span> <span class="op">=</span> <span class="ident">PostgresExtension</span> {
-                <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-                <span class="ident">span</span>,
-                <span class="ident">db_name</span>,
-                <span class="ident">schema</span>,
-                <span class="ident">version</span>,
+            <span class="kw">let </span>extension = PostgresExtension {
+                name: name.to_string(),
+                span,
+                db_name,
+                schema,
+                version,
             };
 
-            <span class="ident">extensions</span>.<span class="ident">push</span>(<span class="ident">extension</span>)
+            extensions.push(extension)
         }
 
-        <span class="ident">extensions</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">name</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">name</span>));
+        extensions.sort_by(|a, b| a.name.cmp(<span class="kw-2">&amp;</span>b.name));
 
-        <span class="prelude-val">Some</span>(<span class="ident">PostgresExtensions</span> { <span class="ident">extensions</span>, <span class="ident">span</span> })
+        <span class="prelude-val">Some</span>(PostgresExtensions { extensions, span })
     })
 }
 
-<span class="kw">fn</span> <span class="ident">filter_args</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ast::Argument</span>],
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, (<span class="ident">ast::Span</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dups</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
+<span class="kw">fn </span>filter_args&lt;<span class="lifetime">&#39;a</span>&gt;(
+    args: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ast::Argument],
+    diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+) -&gt; HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, (ast::Span, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;)&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>dups = HashSet::new();
 
-    <span class="ident">args</span>.<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="kw">if</span> <span class="ident">dups</span>.<span class="ident">contains</span>(<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) =&gt; {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The argument `{}` can only be defined once&quot;</span>, <span class="ident">name</span>.<span class="ident">name</span>),
-                    <span class="ident">arg</span>.<span class="ident">span</span>,
+    args.iter()
+        .filter_map(|arg| <span class="kw">match </span>arg.name.as_ref() {
+            <span class="prelude-val">Some</span>(name) <span class="kw">if </span>dups.contains(name.name.as_str()) =&gt; {
+                diagnostics.push_error(DatamodelError::new_validation_error(
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The argument `{}` can only be defined once&quot;</span>, name.name),
+                    arg.span,
                 ));
 
-                <span class="prelude-val">None</span>
+                <span class="prelude-val">None
+            </span>}
+            <span class="prelude-val">Some</span>(name) =&gt; {
+                dups.insert(name.name.as_str());
+                <span class="prelude-val">Some</span>((name.name.as_str(), (arg.span, coerce::string(<span class="kw-2">&amp;</span>arg.value, diagnostics))))
             }
-            <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; {
-                <span class="ident">dups</span>.<span class="ident">insert</span>(<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>());
-                <span class="prelude-val">Some</span>((<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), (<span class="ident">arg</span>.<span class="ident">span</span>, <span class="ident">coerce::string</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">diagnostics</span>))))
-            }
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+            <span class="prelude-val">None </span>=&gt; {
+                diagnostics.push_error(DatamodelError::new_validation_error(
                     <span class="string">&quot;The argument must have a name&quot;</span>,
-                    <span class="ident">arg</span>.<span class="ident">span</span>,
+                    arg.span,
                 ));
 
-                <span class="prelude-val">None</span>
-            }
+                <span class="prelude-val">None
+            </span>}
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">fn</span> <span class="ident">fetch_string_arg</span>(
-    <span class="ident">args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">ast::Span</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">remove</span>(<span class="ident">name</span>) {
-        <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">val</span>))) =&gt; <span class="prelude-val">Some</span>(<span class="ident">val</span>.<span class="ident">to_string</span>()),
-        <span class="prelude-val">Some</span>((<span class="ident">span</span>, <span class="prelude-val">None</span>)) =&gt; {
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+<span class="kw">fn </span>fetch_string_arg(
+    args: <span class="kw-2">&amp;mut </span>HashMap&lt;<span class="kw-2">&amp;</span>str, (ast::Span, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)&gt;,
+    name: <span class="kw-2">&amp;</span>str,
+    diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+    <span class="kw">match </span>args.remove(name) {
+        <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="prelude-val">Some</span>(val))) =&gt; <span class="prelude-val">Some</span>(val.to_string()),
+        <span class="prelude-val">Some</span>((span, <span class="prelude-val">None</span>)) =&gt; {
+            diagnostics.push_error(DatamodelError::new_validation_error(
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The `{name}` argument must be a string literal&quot;</span>),
-                <span class="ident">span</span>,
+                span,
             ));
 
-            <span class="prelude-val">None</span>
-        }
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">None
+        </span>}
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

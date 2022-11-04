@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/data.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>data.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/data.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>data.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -433,440 +433,440 @@
 <span id="433">433</span>
 <span id="434">434</span>
 <span id="435">435</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Graph traits for associated data and graph construction.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Graph traits for associated data and graph construction.
 
 
-<span class="kw">use</span> <span class="ident">Graph</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">stable_graph::StableGraph</span>;
-<span class="kw">use</span> ::{
-    <span class="ident">EdgeType</span>,
+</span><span class="kw">use </span>Graph;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">use </span>stable_graph::StableGraph;
+<span class="kw">use </span>::{
+    EdgeType,
 };
-<span class="kw">use</span> <span class="ident">graph::IndexType</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">graphmap</span>::{<span class="ident">GraphMap</span>, <span class="ident">NodeTrait</span>};
-<span class="kw">use</span> <span class="ident">visit</span>::{
-    <span class="ident">Data</span>,
-    <span class="ident">NodeCount</span>,
-    <span class="ident">NodeIndexable</span>,
-    <span class="ident">Reversed</span>,
+<span class="kw">use </span>graph::IndexType;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">use </span>graphmap::{GraphMap, NodeTrait};
+<span class="kw">use </span>visit::{
+    Data,
+    NodeCount,
+    NodeIndexable,
+    Reversed,
 };
 
 <span class="macro">trait_template!</span>{
-    <span class="doccomment">/// Access node and edge weights (associated data).</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DataMap</span> : <span class="ident">Data</span> {
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="kw">fn</span> <span class="ident">node_weight</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Access node and edge weights (associated data).
+</span><span class="kw">pub trait </span>DataMap : Data {
+    @section <span class="self">self
+    </span><span class="kw">fn </span>node_weight(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, id: <span class="self">Self</span>::NodeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="self">Self</span>::NodeWeight&gt;;
+    <span class="kw">fn </span>edge_weight(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, id: <span class="self">Self</span>::EdgeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="self">Self</span>::EdgeWeight&gt;;
 }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">access0</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>.<span class="number">0</span>);
+<span class="macro">macro_rules! </span>access0 {
+    (<span class="macro-nonterminal">$e</span>:expr) =&gt; (<span class="macro-nonterminal">$e</span>.<span class="number">0</span>);
 }
 
-<span class="macro">DataMap!</span>{<span class="ident">delegate_impl</span> []}
-<span class="macro">DataMap!</span>{<span class="ident">delegate_impl</span> [[<span class="lifetime">&#39;a</span>, <span class="ident">G</span>], <span class="ident">G</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">G</span>, <span class="ident">deref_twice</span>]}
-<span class="macro">DataMap!</span>{<span class="ident">delegate_impl</span> [[<span class="ident">G</span>], <span class="ident">G</span>, <span class="ident">Reversed</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">access0</span>]}
+<span class="macro">DataMap!</span>{delegate_impl []}
+<span class="macro">DataMap!</span>{delegate_impl [[<span class="lifetime">&#39;a</span>, G], G, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>G, deref_twice]}
+<span class="macro">DataMap!</span>{delegate_impl [[G], G, Reversed&lt;G&gt;, access0]}
 
-<span class="macro">trait_template!</span> {
-    <span class="doccomment">/// Access node and edge weights mutably.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DataMapMut</span> : <span class="ident">DataMap</span> {
-    @<span class="ident">section</span> <span class="self">self</span>
-    <span class="kw">fn</span> <span class="ident">node_weight_mut</span>(<span class="self">self</span>: <span class="kw-2">&amp;mut</span> <span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="self">self</span>: <span class="kw-2">&amp;mut</span> <span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span>;
+<span class="macro">trait_template! </span>{
+    <span class="doccomment">/// Access node and edge weights mutably.
+</span><span class="kw">pub trait </span>DataMapMut : DataMap {
+    @section <span class="self">self
+    </span><span class="kw">fn </span>node_weight_mut(<span class="self">self</span>: <span class="kw-2">&amp;mut </span><span class="self">Self</span>, id: <span class="self">Self</span>::NodeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>::NodeWeight&gt;;
+    <span class="kw">fn </span>edge_weight_mut(<span class="self">self</span>: <span class="kw-2">&amp;mut </span><span class="self">Self</span>, id: <span class="self">Self</span>::EdgeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>::EdgeWeight&gt;;
 }
 }
 
-<span class="macro">DataMapMut!</span>{<span class="ident">delegate_impl</span> [[<span class="lifetime">&#39;a</span>, <span class="ident">G</span>], <span class="ident">G</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">G</span>, <span class="ident">deref_twice</span>]}
-<span class="macro">DataMapMut!</span>{<span class="ident">delegate_impl</span> [[<span class="ident">G</span>], <span class="ident">G</span>, <span class="ident">Reversed</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">access0</span>]}
+<span class="macro">DataMapMut!</span>{delegate_impl [[<span class="lifetime">&#39;a</span>, G], G, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>G, deref_twice]}
+<span class="macro">DataMapMut!</span>{delegate_impl [[G], G, Reversed&lt;G&gt;, access0]}
 
-<span class="doccomment">/// A graph that can be extended with further nodes and edges</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Build</span> : <span class="ident">Data</span> <span class="op">+</span> <span class="ident">NodeCount</span> {
-    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span>;
-    <span class="doccomment">/// Add a new edge. If parallel edges (duplicate) are not allowed and</span>
-    <span class="doccomment">/// the edge already exists, return `None`.</span>
-    <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">update_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>))
+<span class="doccomment">/// A graph that can be extended with further nodes and edges
+</span><span class="kw">pub trait </span>Build : Data + NodeCount {
+    <span class="kw">fn </span>add_node(<span class="kw-2">&amp;mut </span><span class="self">self</span>, weight: <span class="self">Self</span>::NodeWeight) -&gt; <span class="self">Self</span>::NodeId;
+    <span class="doccomment">/// Add a new edge. If parallel edges (duplicate) are not allowed and
+    /// the edge already exists, return `None`.
+    </span><span class="kw">fn </span>add_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                a: <span class="self">Self</span>::NodeId,
+                b: <span class="self">Self</span>::NodeId,
+                weight: <span class="self">Self</span>::EdgeWeight) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::EdgeId&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.update_edge(a, b, weight))
     }
-    <span class="doccomment">/// Add or update the edge from `a` to `b`. Return the id of the affected</span>
-    <span class="doccomment">/// edge.</span>
-    <span class="kw">fn</span> <span class="ident">update_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                   <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeId</span>;
+    <span class="doccomment">/// Add or update the edge from `a` to `b`. Return the id of the affected
+    /// edge.
+    </span><span class="kw">fn </span>update_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                   a: <span class="self">Self</span>::NodeId,
+                   b: <span class="self">Self</span>::NodeId,
+                   weight: <span class="self">Self</span>::EdgeWeight) -&gt; <span class="self">Self</span>::EdgeId;
 }
 
-<span class="doccomment">/// A graph that can be created</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Create</span> : <span class="ident">Build</span> <span class="op">+</span> <span class="ident">Default</span> {
-    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// A graph that can be created
+</span><span class="kw">pub trait </span>Create : Build + Default {
+    <span class="kw">fn </span>with_capacity(nodes: usize, edges: usize) -&gt; <span class="self">Self</span>;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Data</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Data <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ix: IndexType
 {
-    <span class="kw">type</span> <span class="ident">NodeWeight</span> <span class="op">=</span> <span class="ident">N</span>;
-    <span class="kw">type</span> <span class="ident">EdgeWeight</span> <span class="op">=</span> <span class="ident">E</span>;
+    <span class="kw">type </span>NodeWeight = N;
+    <span class="kw">type </span>EdgeWeight = E;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">DataMap</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; DataMap <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType
 {
-    <span class="kw">fn</span> <span class="ident">node_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">node_weight</span>(<span class="ident">id</span>)
+    <span class="kw">fn </span>node_weight(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="self">Self</span>::NodeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="self">Self</span>::NodeWeight&gt; {
+        <span class="self">self</span>.node_weight(id)
     }
-    <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edge_weight</span>(<span class="ident">id</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">DataMapMut</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>
-{
-    <span class="kw">fn</span> <span class="ident">node_weight_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">node_weight_mut</span>(<span class="ident">id</span>)
-    }
-    <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edge_weight_mut</span>(<span class="ident">id</span>)
+    <span class="kw">fn </span>edge_weight(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="self">Self</span>::EdgeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="self">Self</span>::EdgeWeight&gt; {
+        <span class="self">self</span>.edge_weight(id)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">DataMap</span> <span class="kw">for</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; DataMapMut <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType
 {
-    <span class="kw">fn</span> <span class="ident">node_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">node_weight</span>(<span class="ident">id</span>)
+    <span class="kw">fn </span>node_weight_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: <span class="self">Self</span>::NodeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>::NodeWeight&gt; {
+        <span class="self">self</span>.node_weight_mut(id)
     }
-    <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edge_weight</span>(<span class="ident">id</span>)
+    <span class="kw">fn </span>edge_weight_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: <span class="self">Self</span>::EdgeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>::EdgeWeight&gt; {
+        <span class="self">self</span>.edge_weight_mut(id)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">DataMapMut</span> <span class="kw">for</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; DataMap <span class="kw">for </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType
 {
-    <span class="kw">fn</span> <span class="ident">node_weight_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">node_weight_mut</span>(<span class="ident">id</span>)
+    <span class="kw">fn </span>node_weight(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="self">Self</span>::NodeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="self">Self</span>::NodeWeight&gt; {
+        <span class="self">self</span>.node_weight(id)
     }
-    <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edge_weight_mut</span>(<span class="ident">id</span>)
+    <span class="kw">fn </span>edge_weight(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="self">Self</span>::EdgeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="self">Self</span>::EdgeWeight&gt; {
+        <span class="self">self</span>.edge_weight(id)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Build</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; DataMapMut <span class="kw">for </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType
 {
-    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> {
-        <span class="self">self</span>.<span class="ident">add_node</span>(<span class="ident">weight</span>)
+    <span class="kw">fn </span>node_weight_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: <span class="self">Self</span>::NodeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>::NodeWeight&gt; {
+        <span class="self">self</span>.node_weight_mut(id)
     }
-    <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span>
+    <span class="kw">fn </span>edge_weight_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: <span class="self">Self</span>::EdgeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>::EdgeWeight&gt; {
+        <span class="self">self</span>.edge_weight_mut(id)
+    }
+}
+
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Build <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
+{
+    <span class="kw">fn </span>add_node(<span class="kw-2">&amp;mut </span><span class="self">self</span>, weight: <span class="self">Self</span>::NodeWeight) -&gt; <span class="self">Self</span>::NodeId {
+        <span class="self">self</span>.add_node(weight)
+    }
+    <span class="kw">fn </span>add_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                a: <span class="self">Self</span>::NodeId,
+                b: <span class="self">Self</span>::NodeId,
+                weight: <span class="self">Self</span>::EdgeWeight) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::EdgeId&gt;
     {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">add_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>))
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.add_edge(a, b, weight))
     }
-    <span class="kw">fn</span> <span class="ident">update_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                   <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeId</span>
+    <span class="kw">fn </span>update_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                   a: <span class="self">Self</span>::NodeId,
+                   b: <span class="self">Self</span>::NodeId,
+                   weight: <span class="self">Self</span>::EdgeWeight) -&gt; <span class="self">Self</span>::EdgeId
     {
-        <span class="self">self</span>.<span class="ident">update_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>)
+        <span class="self">self</span>.update_edge(a, b, weight)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Build</span> <span class="kw">for</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Build <span class="kw">for </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> {
-        <span class="self">self</span>.<span class="ident">add_node</span>(<span class="ident">weight</span>)
+    <span class="kw">fn </span>add_node(<span class="kw-2">&amp;mut </span><span class="self">self</span>, weight: <span class="self">Self</span>::NodeWeight) -&gt; <span class="self">Self</span>::NodeId {
+        <span class="self">self</span>.add_node(weight)
     }
-    <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span>
+    <span class="kw">fn </span>add_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                a: <span class="self">Self</span>::NodeId,
+                b: <span class="self">Self</span>::NodeId,
+                weight: <span class="self">Self</span>::EdgeWeight) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::EdgeId&gt;
     {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">add_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>))
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.add_edge(a, b, weight))
     }
-    <span class="kw">fn</span> <span class="ident">update_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                   <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeId</span>
+    <span class="kw">fn </span>update_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                   a: <span class="self">Self</span>::NodeId,
+                   b: <span class="self">Self</span>::NodeId,
+                   weight: <span class="self">Self</span>::EdgeWeight) -&gt; <span class="self">Self</span>::EdgeId
     {
-        <span class="self">self</span>.<span class="ident">update_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>)
+        <span class="self">self</span>.update_edge(a, b, weight)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Build</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty&gt; Build <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          N: NodeTrait,
 {
-    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> {
-        <span class="self">self</span>.<span class="ident">add_node</span>(<span class="ident">weight</span>)
+    <span class="kw">fn </span>add_node(<span class="kw-2">&amp;mut </span><span class="self">self</span>, weight: <span class="self">Self</span>::NodeWeight) -&gt; <span class="self">Self</span>::NodeId {
+        <span class="self">self</span>.add_node(weight)
     }
-    <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span>
+    <span class="kw">fn </span>add_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                a: <span class="self">Self</span>::NodeId,
+                b: <span class="self">Self</span>::NodeId,
+                weight: <span class="self">Self</span>::EdgeWeight) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::EdgeId&gt;
     {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">contains_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>) {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">add_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>);
-            <span class="macro">debug_assert!</span>(<span class="ident">r</span>.<span class="ident">is_none</span>());
-            <span class="prelude-val">Some</span>((<span class="ident">a</span>, <span class="ident">b</span>))
+        <span class="kw">if </span><span class="self">self</span>.contains_edge(a, b) {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="kw">let </span>r = <span class="self">self</span>.add_edge(a, b, weight);
+            <span class="macro">debug_assert!</span>(r.is_none());
+            <span class="prelude-val">Some</span>((a, b))
         }
     }
-    <span class="kw">fn</span> <span class="ident">update_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                   <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeId</span>
+    <span class="kw">fn </span>update_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                   a: <span class="self">Self</span>::NodeId,
+                   b: <span class="self">Self</span>::NodeId,
+                   weight: <span class="self">Self</span>::EdgeWeight) -&gt; <span class="self">Self</span>::EdgeId
     {
-        <span class="self">self</span>.<span class="ident">add_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>);
-        (<span class="ident">a</span>, <span class="ident">b</span>)
+        <span class="self">self</span>.add_edge(a, b, weight);
+        (a, b)
     }
 }
 
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Create</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Create <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="ident">nodes</span>, <span class="ident">edges</span>)
+    <span class="kw">fn </span>with_capacity(nodes: usize, edges: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::with_capacity(nodes, edges)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Create</span> <span class="kw">for</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; Create <span class="kw">for </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="ident">nodes</span>, <span class="ident">edges</span>)
+    <span class="kw">fn </span>with_capacity(nodes: usize, edges: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::with_capacity(nodes, edges)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Create</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty&gt; Create <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          N: NodeTrait,
 {
-    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="ident">nodes</span>, <span class="ident">edges</span>)
+    <span class="kw">fn </span>with_capacity(nodes: usize, edges: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::with_capacity(nodes, edges)
     }
 }
 
-<span class="doccomment">/// A graph element.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A sequence of Elements, for example an iterator, is laid out as follows:</span>
-<span class="doccomment">/// Nodes are implicitly given the index of their appearance in the sequence.</span>
-<span class="doccomment">/// The edges’ source and target fields refer to these indices.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Element</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// A graph node.</span>
-    <span class="ident">Node</span> {
-        <span class="ident">weight</span>: <span class="ident">N</span>,
+<span class="doccomment">/// A graph element.
+///
+/// A sequence of Elements, for example an iterator, is laid out as follows:
+/// Nodes are implicitly given the index of their appearance in the sequence.
+/// The edges’ source and target fields refer to these indices.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>Element&lt;N, E&gt; {
+    <span class="doccomment">/// A graph node.
+    </span>Node {
+        weight: N,
     },
-    <span class="doccomment">/// A graph edge.</span>
-    <span class="ident">Edge</span> {
-        <span class="ident">source</span>: <span class="ident">usize</span>,
-        <span class="ident">target</span>: <span class="ident">usize</span>,
-        <span class="ident">weight</span>: <span class="ident">E</span>,
+    <span class="doccomment">/// A graph edge.
+    </span>Edge {
+        source: usize,
+        target: usize,
+        weight: E,
     }
 }
 
-<span class="doccomment">/// Create a graph from an iterator of elements.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromElements</span> : <span class="ident">Create</span> {
-    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
-              <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span>, <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Create a graph from an iterator of elements.
+</span><span class="kw">pub trait </span>FromElements : Create {
+    <span class="kw">fn </span>from_elements&lt;I&gt;(iterable: I) -&gt; <span class="self">Self
+        </span><span class="kw">where </span><span class="self">Self</span>: Sized,
+              I: IntoIterator&lt;Item=Element&lt;<span class="self">Self</span>::NodeWeight, <span class="self">Self</span>::EdgeWeight&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gr</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="number">0</span>, <span class="number">0</span>);
-        <span class="comment">// usize -&gt; NodeId map</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">for</span> <span class="ident">element</span> <span class="kw">in</span> <span class="ident">iterable</span> {
-            <span class="kw">match</span> <span class="ident">element</span> {
-                <span class="ident">Element::Node</span> { <span class="ident">weight</span> } =&gt; {
-                    <span class="ident">map</span>.<span class="ident">push</span>(<span class="ident">gr</span>.<span class="ident">add_node</span>(<span class="ident">weight</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>gr = <span class="self">Self</span>::with_capacity(<span class="number">0</span>, <span class="number">0</span>);
+        <span class="comment">// usize -&gt; NodeId map
+        </span><span class="kw">let </span><span class="kw-2">mut </span>map = Vec::new();
+        <span class="kw">for </span>element <span class="kw">in </span>iterable {
+            <span class="kw">match </span>element {
+                Element::Node { weight } =&gt; {
+                    map.push(gr.add_node(weight));
                 }
-                <span class="ident">Element::Edge</span> { <span class="ident">source</span>, <span class="ident">target</span>, <span class="ident">weight</span> } =&gt; {
-                    <span class="ident">gr</span>.<span class="ident">add_edge</span>(<span class="ident">map</span>[<span class="ident">source</span>], <span class="ident">map</span>[<span class="ident">target</span>], <span class="ident">weight</span>);
+                Element::Edge { source, target, weight } =&gt; {
+                    gr.add_edge(map[source], map[target], weight);
                 }
             }
         }
-        <span class="ident">gr</span>
+        gr
     }
         
 }
 
-<span class="kw">fn</span> <span class="ident">from_elements_indexable</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="ident">G</span>
-    <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">Create</span> <span class="op">+</span> <span class="ident">NodeIndexable</span>,
-          <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident">G::NodeWeight</span>, <span class="ident">G::EdgeWeight</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">fn </span>from_elements_indexable&lt;G, I&gt;(iterable: I) -&gt; G
+    <span class="kw">where </span>G: Create + NodeIndexable,
+          I: IntoIterator&lt;Item=Element&lt;G::NodeWeight, G::EdgeWeight&gt;&gt;,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gr</span> <span class="op">=</span> <span class="ident">G::with_capacity</span>(<span class="number">0</span>, <span class="number">0</span>);
-    <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="op">|</span><span class="ident">gr</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">i</span><span class="op">|</span> <span class="ident">gr</span>.<span class="ident">from_index</span>(<span class="ident">i</span>);
-    <span class="kw">for</span> <span class="ident">element</span> <span class="kw">in</span> <span class="ident">iterable</span> {
-        <span class="kw">match</span> <span class="ident">element</span> {
-            <span class="ident">Element::Node</span> { <span class="ident">weight</span> } =&gt; {
-                <span class="ident">gr</span>.<span class="ident">add_node</span>(<span class="ident">weight</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>gr = G::with_capacity(<span class="number">0</span>, <span class="number">0</span>);
+    <span class="kw">let </span>map = |gr: <span class="kw-2">&amp;</span>G, i| gr.from_index(i);
+    <span class="kw">for </span>element <span class="kw">in </span>iterable {
+        <span class="kw">match </span>element {
+            Element::Node { weight } =&gt; {
+                gr.add_node(weight);
             }
-            <span class="ident">Element::Edge</span> { <span class="ident">source</span>, <span class="ident">target</span>, <span class="ident">weight</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">map</span>(<span class="kw-2">&amp;</span><span class="ident">gr</span>, <span class="ident">source</span>);
-                <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">map</span>(<span class="kw-2">&amp;</span><span class="ident">gr</span>, <span class="ident">target</span>);
-                <span class="ident">gr</span>.<span class="ident">add_edge</span>(<span class="ident">from</span>, <span class="ident">to</span>, <span class="ident">weight</span>);
+            Element::Edge { source, target, weight } =&gt; {
+                <span class="kw">let </span>from = map(<span class="kw-2">&amp;</span>gr, source);
+                <span class="kw">let </span>to = map(<span class="kw-2">&amp;</span>gr, target);
+                gr.add_edge(from, to, weight);
             }
         }
     }
-    <span class="ident">gr</span>
+    gr
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">FromElements</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; FromElements <span class="kw">for </span>Graph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
-              <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span>, <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>from_elements&lt;I&gt;(iterable: I) -&gt; <span class="self">Self
+        </span><span class="kw">where </span><span class="self">Self</span>: Sized,
+              I: IntoIterator&lt;Item=Element&lt;<span class="self">Self</span>::NodeWeight, <span class="self">Self</span>::EdgeWeight&gt;&gt;,
     {
-        <span class="ident">from_elements_indexable</span>(<span class="ident">iterable</span>)
+        from_elements_indexable(iterable)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stable_graph&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">FromElements</span> <span class="kw">for</span> <span class="ident">StableGraph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;stable_graph&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty, Ix&gt; FromElements <span class="kw">for </span>StableGraph&lt;N, E, Ty, Ix&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          Ix: IndexType,
 {
-    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
-              <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span>, <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>from_elements&lt;I&gt;(iterable: I) -&gt; <span class="self">Self
+        </span><span class="kw">where </span><span class="self">Self</span>: Sized,
+              I: IntoIterator&lt;Item=Element&lt;<span class="self">Self</span>::NodeWeight, <span class="self">Self</span>::EdgeWeight&gt;&gt;,
     {
-        <span class="ident">from_elements_indexable</span>(<span class="ident">iterable</span>)
+        from_elements_indexable(iterable)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;graphmap&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">FromElements</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-          <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;graphmap&quot;</span>)]
+</span><span class="kw">impl</span>&lt;N, E, Ty&gt; FromElements <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>Ty: EdgeType,
+          N: NodeTrait,
 {
-    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
-              <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span>, <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>from_elements&lt;I&gt;(iterable: I) -&gt; <span class="self">Self
+        </span><span class="kw">where </span><span class="self">Self</span>: Sized,
+              I: IntoIterator&lt;Item=Element&lt;<span class="self">Self</span>::NodeWeight, <span class="self">Self</span>::EdgeWeight&gt;&gt;,
     {
-        <span class="ident">from_elements_indexable</span>(<span class="ident">iterable</span>)
+        from_elements_indexable(iterable)
     }
 }
 
-<span class="doccomment">/// Iterator adaptors for iterators of `Element`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ElementIterator</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> : <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create an iterator adaptor that filters graph elements.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The function `f` is called with each element and if its return value</span>
-    <span class="doccomment">/// is `true` the element is accepted and if `false` it is removed.</span>
-    <span class="doccomment">/// `f` is called with mutable references to the node and edge weights,</span>
-    <span class="doccomment">/// so that they can be mutated (but the edge endpoints can not).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This filter adapts the edge source and target indices in the</span>
-    <span class="doccomment">/// stream so that they are correct after the removals.</span>
-    <span class="kw">fn</span> <span class="ident">filter_elements</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FilterElements</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
-              <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Element</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">N</span>, <span class="kw-2">&amp;mut</span> <span class="ident">E</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>,
+<span class="doccomment">/// Iterator adaptors for iterators of `Element`.
+</span><span class="kw">pub trait </span>ElementIterator&lt;N, E&gt; : Iterator&lt;Item=Element&lt;N, E&gt;&gt; {
+    <span class="doccomment">/// Create an iterator adaptor that filters graph elements.
+    ///
+    /// The function `f` is called with each element and if its return value
+    /// is `true` the element is accepted and if `false` it is removed.
+    /// `f` is called with mutable references to the node and edge weights,
+    /// so that they can be mutated (but the edge endpoints can not).
+    ///
+    /// This filter adapts the edge source and target indices in the
+    /// stream so that they are correct after the removals.
+    </span><span class="kw">fn </span>filter_elements&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; FilterElements&lt;<span class="self">Self</span>, F&gt;
+        <span class="kw">where </span><span class="self">Self</span>: Sized,
+              F: FnMut(Element&lt;<span class="kw-2">&amp;mut </span>N, <span class="kw-2">&amp;mut </span>E&gt;) -&gt; bool,
     {
-        <span class="ident">FilterElements</span> {
-            <span class="ident">iter</span>: <span class="self">self</span>,
-            <span class="ident">node_index</span>: <span class="number">0</span>,
-            <span class="ident">map</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">f</span>: <span class="ident">f</span>,
+        FilterElements {
+            iter: <span class="self">self</span>,
+            node_index: <span class="number">0</span>,
+            map: Vec::new(),
+            f: f,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">I</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">ElementIterator</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">I</span>
-    <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> { }
+<span class="kw">impl</span>&lt;N, E, I: <span class="question-mark">?</span>Sized&gt; ElementIterator&lt;N, E&gt; <span class="kw">for </span>I
+    <span class="kw">where </span>I: Iterator&lt;Item=Element&lt;N, E&gt;&gt; { }
 
-<span class="doccomment">/// An iterator that filters graph elements.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [`.filter_elements()`][1] for more information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [1]: trait.ElementIterator.html#method.filter_elements</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FilterElements</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="ident">iter</span>: <span class="ident">I</span>,
-    <span class="ident">node_index</span>: <span class="ident">usize</span>,
-    <span class="ident">map</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">f</span>: <span class="ident">F</span>,
+<span class="doccomment">/// An iterator that filters graph elements.
+///
+/// See [`.filter_elements()`][1] for more information.
+///
+/// [1]: trait.ElementIterator.html#method.filter_elements
+</span><span class="kw">pub struct </span>FilterElements&lt;I, F&gt; {
+    iter: I,
+    node_index: usize,
+    map: Vec&lt;usize&gt;,
+    f: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span>, <span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">FilterElements</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Element</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">N</span>, <span class="kw-2">&amp;mut</span> <span class="ident">E</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>,
+<span class="kw">impl</span>&lt;I, F, N, E&gt; Iterator <span class="kw">for </span>FilterElements&lt;I, F&gt;
+    <span class="kw">where </span>I: Iterator&lt;Item=Element&lt;N, E&gt;&gt;,
+          F: FnMut(Element&lt;<span class="kw-2">&amp;mut </span>N, <span class="kw-2">&amp;mut </span>E&gt;) -&gt; bool,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Element</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = Element&lt;N, E&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">elt</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">elt</span>) =&gt; <span class="ident">elt</span>,
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>elt = <span class="kw">match </span><span class="self">self</span>.iter.next() {
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                <span class="prelude-val">Some</span>(elt) =&gt; elt,
             };
-            <span class="kw">let</span> <span class="ident">keep</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">f</span>)(<span class="kw">match</span> <span class="ident">elt</span> {
-                <span class="ident">Element::Node</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">weight</span> } =&gt; <span class="ident">Element::Node</span> { <span class="ident">weight</span>: <span class="ident">weight</span> },
-                <span class="ident">Element::Edge</span> { <span class="ident">source</span>, <span class="ident">target</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">weight</span> }
-                    =&gt; <span class="ident">Element::Edge</span> { <span class="ident">source</span>: <span class="ident">source</span>, <span class="ident">target</span>: <span class="ident">target</span>, <span class="ident">weight</span>: <span class="ident">weight</span> },
+            <span class="kw">let </span>keep = (<span class="self">self</span>.f)(<span class="kw">match </span>elt {
+                Element::Node { <span class="kw-2">ref mut </span>weight } =&gt; Element::Node { weight: weight },
+                Element::Edge { source, target, <span class="kw-2">ref mut </span>weight }
+                    =&gt; Element::Edge { source: source, target: target, weight: weight },
             });
-            <span class="kw">let</span> <span class="ident">is_node</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Element::Node</span> { .. } <span class="op">=</span> <span class="ident">elt</span> { <span class="bool-val">true</span> } <span class="kw">else</span> { <span class="bool-val">false</span> };
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">keep</span> <span class="op">&amp;&amp;</span> <span class="ident">is_node</span> {
-                <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">node_index</span>);
+            <span class="kw">let </span>is_node = <span class="kw">if let </span>Element::Node { .. } = elt { <span class="bool-val">true </span>} <span class="kw">else </span>{ <span class="bool-val">false </span>};
+            <span class="kw">if </span>!keep &amp;&amp; is_node {
+                <span class="self">self</span>.map.push(<span class="self">self</span>.node_index);
             }
-            <span class="kw">if</span> <span class="ident">is_node</span> {
-                <span class="self">self</span>.<span class="ident">node_index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">if </span>is_node {
+                <span class="self">self</span>.node_index += <span class="number">1</span>;
             }
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">keep</span> {
+            <span class="kw">if </span>!keep {
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// map edge parts</span>
-            <span class="kw">match</span> <span class="ident">elt</span> {
-                <span class="ident">Element::Edge</span> {
-                    <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">source</span>,
-                    <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">target</span>,
+            <span class="comment">// map edge parts
+            </span><span class="kw">match </span>elt {
+                Element::Edge {
+                    <span class="kw-2">ref mut </span>source,
+                    <span class="kw-2">ref mut </span>target,
                     ..
                 } =&gt; {
-                    <span class="comment">// Find the node indices in the map of removed ones.</span>
-                    <span class="comment">// If a node was removed, the edge is as well.</span>
-                    <span class="comment">// Otherwise the counts are adjusted by the number of nodes</span>
-                    <span class="comment">// removed.</span>
-                    <span class="comment">// Example: map: [1, 3, 4, 6]</span>
-                    <span class="comment">// binary search for 2, result is Err(1). One node has been</span>
-                    <span class="comment">// removed before 2.</span>
-                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">binary_search</span>(<span class="ident">source</span>) {
+                    <span class="comment">// Find the node indices in the map of removed ones.
+                    // If a node was removed, the edge is as well.
+                    // Otherwise the counts are adjusted by the number of nodes
+                    // removed.
+                    // Example: map: [1, 3, 4, 6]
+                    // binary search for 2, result is Err(1). One node has been
+                    // removed before 2.
+                    </span><span class="kw">match </span><span class="self">self</span>.map.binary_search(source) {
                         <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
-                        <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">*</span><span class="ident">source</span> <span class="op">-</span><span class="op">=</span> <span class="ident">i</span>,
+                        <span class="prelude-val">Err</span>(i) =&gt; <span class="kw-2">*</span>source -= i,
                     }
-                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">binary_search</span>(<span class="ident">target</span>) {
+                    <span class="kw">match </span><span class="self">self</span>.map.binary_search(target) {
                         <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
-                        <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">*</span><span class="ident">target</span> <span class="op">-</span><span class="op">=</span> <span class="ident">i</span>,
+                        <span class="prelude-val">Err</span>(i) =&gt; <span class="kw-2">*</span>target -= i,
                     }
                 }
-                <span class="ident">Element::Node</span> { .. } =&gt; { }
+                Element::Node { .. } =&gt; { }
             }
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">elt</span>);
+            <span class="kw">return </span><span class="prelude-val">Some</span>(elt);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

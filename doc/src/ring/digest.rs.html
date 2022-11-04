@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/digest.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>digest.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/digest.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>digest.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -592,599 +592,599 @@
 <span id="592">592</span>
 <span id="593">593</span>
 <span id="594">594</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2019 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2019 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! SHA-2 and the legacy SHA-1 digest algorithm.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If all the data is available in a single contiguous slice then the `digest`</span>
-<span class="doccomment">//! function should be used. Otherwise, the digest can be calculated in</span>
-<span class="doccomment">//! multiple steps using `Context`.</span>
+</span><span class="doccomment">//! SHA-2 and the legacy SHA-1 digest algorithm.
+//!
+//! If all the data is available in a single contiguous slice then the `digest`
+//! function should be used. Otherwise, the digest can be calculated in
+//! multiple steps using `Context`.
 
-<span class="comment">// Note on why are we doing things the hard way: It would be easy to implement</span>
-<span class="comment">// this using the C `EVP_MD`/`EVP_MD_CTX` interface. However, if we were to do</span>
-<span class="comment">// things that way, we&#39;d have a hard dependency on `malloc` and other overhead.</span>
-<span class="comment">// The goal for this implementation is to drive the overhead as close to zero</span>
-<span class="comment">// as possible.</span>
+</span><span class="comment">// Note on why are we doing things the hard way: It would be easy to implement
+// this using the C `EVP_MD`/`EVP_MD_CTX` interface. However, if we were to do
+// things that way, we&#39;d have a hard dependency on `malloc` and other overhead.
+// The goal for this implementation is to drive the overhead as close to zero
+// as possible.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">c</span>, <span class="ident">cpu</span>, <span class="ident">debug</span>,
-    <span class="ident">endian</span>::{<span class="self">self</span>, <span class="ident">BigEndian</span>},
-    <span class="ident">polyfill</span>,
+</span><span class="kw">use crate</span>::{
+    c, cpu, debug,
+    endian::{<span class="self">self</span>, BigEndian},
+    polyfill,
 };
-<span class="kw">use</span> <span class="ident">core::num::Wrapping</span>;
+<span class="kw">use </span>core::num::Wrapping;
 
-<span class="kw">mod</span> <span class="ident">sha1</span>;
-<span class="kw">mod</span> <span class="ident">sha2</span>;
+<span class="kw">mod </span>sha1;
+<span class="kw">mod </span>sha2;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">BlockContext</span> {
-    <span class="ident">state</span>: <span class="ident">State</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>BlockContext {
+    state: State,
 
-    <span class="comment">// Note that SHA-512 has a 128-bit input bit counter, but this</span>
-    <span class="comment">// implementation only supports up to 2^64-1 input bits for all algorithms,</span>
-    <span class="comment">// so a 64-bit counter is more than sufficient.</span>
-    <span class="ident">completed_data_blocks</span>: <span class="ident">u64</span>,
+    <span class="comment">// Note that SHA-512 has a 128-bit input bit counter, but this
+    // implementation only supports up to 2^64-1 input bits for all algorithms,
+    // so a 64-bit counter is more than sufficient.
+    </span>completed_data_blocks: u64,
 
-    <span class="doccomment">/// The context&#39;s algorithm.</span>
-    <span class="kw">pub</span> <span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>,
+    <span class="doccomment">/// The context&#39;s algorithm.
+    </span><span class="kw">pub </span>algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm,
 
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
+    cpu_features: cpu::Features,
 }
 
-<span class="kw">impl</span> <span class="ident">BlockContext</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">state</span>: <span class="ident">algorithm</span>.<span class="ident">initial_state</span>,
-            <span class="ident">completed_data_blocks</span>: <span class="number">0</span>,
-            <span class="ident">algorithm</span>,
-            <span class="ident">cpu_features</span>: <span class="ident">cpu::features</span>(),
+<span class="kw">impl </span>BlockContext {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            state: algorithm.initial_state,
+            completed_data_blocks: <span class="number">0</span>,
+            algorithm,
+            cpu_features: cpu::features(),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="kw">let</span> <span class="ident">num_blocks</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">block_len</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">num_blocks</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">block_len</span>, <span class="ident">input</span>.<span class="ident">len</span>());
-        <span class="kw">if</span> <span class="ident">num_blocks</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">unsafe</span> {
-                (<span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">block_data_order</span>)(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="ident">input</span>.<span class="ident">as_ptr</span>(), <span class="ident">num_blocks</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="kw">let </span>num_blocks = input.len() / <span class="self">self</span>.algorithm.block_len;
+        <span class="macro">assert_eq!</span>(num_blocks * <span class="self">self</span>.algorithm.block_len, input.len());
+        <span class="kw">if </span>num_blocks &gt; <span class="number">0 </span>{
+            <span class="kw">unsafe </span>{
+                (<span class="self">self</span>.algorithm.block_data_order)(<span class="kw-2">&amp;mut </span><span class="self">self</span>.state, input.as_ptr(), num_blocks);
             }
-            <span class="self">self</span>.<span class="ident">completed_data_blocks</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">completed_data_blocks</span>
-                .<span class="ident">checked_add</span>(<span class="ident">polyfill::u64_from_usize</span>(<span class="ident">num_blocks</span>))
-                .<span class="ident">unwrap</span>();
+            <span class="self">self</span>.completed_data_blocks = <span class="self">self
+                </span>.completed_data_blocks
+                .checked_add(polyfill::u64_from_usize(num_blocks))
+                .unwrap();
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pending</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>], <span class="ident">num_pending</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Digest</span> {
-        <span class="kw">let</span> <span class="ident">block_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">block_len</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">pending</span>.<span class="ident">len</span>(), <span class="ident">block_len</span>);
-        <span class="macro">assert!</span>(<span class="ident">num_pending</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">pending</span>.<span class="ident">len</span>());
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>finish(<span class="kw-2">mut </span><span class="self">self</span>, pending: <span class="kw-2">&amp;mut </span>[u8], num_pending: usize) -&gt; Digest {
+        <span class="kw">let </span>block_len = <span class="self">self</span>.algorithm.block_len;
+        <span class="macro">assert_eq!</span>(pending.len(), block_len);
+        <span class="macro">assert!</span>(num_pending &lt;= pending.len());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">padding_pos</span> <span class="op">=</span> <span class="ident">num_pending</span>;
-        <span class="ident">pending</span>[<span class="ident">padding_pos</span>] <span class="op">=</span> <span class="number">0x80</span>;
-        <span class="ident">padding_pos</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>padding_pos = num_pending;
+        pending[padding_pos] = <span class="number">0x80</span>;
+        padding_pos += <span class="number">1</span>;
 
-        <span class="kw">if</span> <span class="ident">padding_pos</span> <span class="op">&gt;</span> <span class="ident">block_len</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">len_len</span> {
-            <span class="ident">polyfill::slice::fill</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pending</span>[<span class="ident">padding_pos</span>..<span class="ident">block_len</span>], <span class="number">0</span>);
-            <span class="kw">unsafe</span> {
-                (<span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">block_data_order</span>)(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="ident">pending</span>.<span class="ident">as_ptr</span>(), <span class="number">1</span>);
+        <span class="kw">if </span>padding_pos &gt; block_len - <span class="self">self</span>.algorithm.len_len {
+            polyfill::slice::fill(<span class="kw-2">&amp;mut </span>pending[padding_pos..block_len], <span class="number">0</span>);
+            <span class="kw">unsafe </span>{
+                (<span class="self">self</span>.algorithm.block_data_order)(<span class="kw-2">&amp;mut </span><span class="self">self</span>.state, pending.as_ptr(), <span class="number">1</span>);
             }
-            <span class="comment">// We don&#39;t increase |self.completed_data_blocks| because the</span>
-            <span class="comment">// padding isn&#39;t data, and so it isn&#39;t included in the data length.</span>
-            <span class="ident">padding_pos</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="comment">// We don&#39;t increase |self.completed_data_blocks| because the
+            // padding isn&#39;t data, and so it isn&#39;t included in the data length.
+            </span>padding_pos = <span class="number">0</span>;
         }
 
-        <span class="ident">polyfill::slice::fill</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pending</span>[<span class="ident">padding_pos</span>..(<span class="ident">block_len</span> <span class="op">-</span> <span class="number">8</span>)], <span class="number">0</span>);
+        polyfill::slice::fill(<span class="kw-2">&amp;mut </span>pending[padding_pos..(block_len - <span class="number">8</span>)], <span class="number">0</span>);
 
-        <span class="comment">// Output the length, in bits, in big endian order.</span>
-        <span class="kw">let</span> <span class="ident">completed_data_bits</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">completed_data_blocks</span>
-            .<span class="ident">checked_mul</span>(<span class="ident">polyfill::u64_from_usize</span>(<span class="ident">block_len</span>))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">checked_add</span>(<span class="ident">polyfill::u64_from_usize</span>(<span class="ident">num_pending</span>))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">checked_mul</span>(<span class="number">8</span>)
-            .<span class="ident">unwrap</span>();
-        <span class="ident">pending</span>[(<span class="ident">block_len</span> <span class="op">-</span> <span class="number">8</span>)..<span class="ident">block_len</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">u64::to_be_bytes</span>(<span class="ident">completed_data_bits</span>));
+        <span class="comment">// Output the length, in bits, in big endian order.
+        </span><span class="kw">let </span>completed_data_bits = <span class="self">self
+            </span>.completed_data_blocks
+            .checked_mul(polyfill::u64_from_usize(block_len))
+            .unwrap()
+            .checked_add(polyfill::u64_from_usize(num_pending))
+            .unwrap()
+            .checked_mul(<span class="number">8</span>)
+            .unwrap();
+        pending[(block_len - <span class="number">8</span>)..block_len].copy_from_slice(<span class="kw-2">&amp;</span>u64::to_be_bytes(completed_data_bits));
 
-        <span class="kw">unsafe</span> {
-            (<span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">block_data_order</span>)(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="ident">pending</span>.<span class="ident">as_ptr</span>(), <span class="number">1</span>);
+        <span class="kw">unsafe </span>{
+            (<span class="self">self</span>.algorithm.block_data_order)(<span class="kw-2">&amp;mut </span><span class="self">self</span>.state, pending.as_ptr(), <span class="number">1</span>);
         }
 
-        <span class="ident">Digest</span> {
-            <span class="ident">algorithm</span>: <span class="self">self</span>.<span class="ident">algorithm</span>,
-            <span class="ident">value</span>: (<span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">format_output</span>)(<span class="self">self</span>.<span class="ident">state</span>),
+        Digest {
+            algorithm: <span class="self">self</span>.algorithm,
+            value: (<span class="self">self</span>.algorithm.format_output)(<span class="self">self</span>.state),
         }
     }
 }
 
-<span class="doccomment">/// A context for multi-step (Init-Update-Finish) digest calculations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use ring::digest;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let one_shot = digest::digest(&amp;digest::SHA384, b&quot;hello, world&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut ctx = digest::Context::new(&amp;digest::SHA384);</span>
-<span class="doccomment">/// ctx.update(b&quot;hello&quot;);</span>
-<span class="doccomment">/// ctx.update(b&quot;, &quot;);</span>
-<span class="doccomment">/// ctx.update(b&quot;world&quot;);</span>
-<span class="doccomment">/// let multi_part = ctx.finish();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(&amp;one_shot.as_ref(), &amp;multi_part.as_ref());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span> {
-    <span class="ident">block</span>: <span class="ident">BlockContext</span>,
-    <span class="comment">// TODO: More explicitly force 64-bit alignment for |pending|.</span>
-    <span class="ident">pending</span>: [<span class="ident">u8</span>; <span class="ident">MAX_BLOCK_LEN</span>],
-    <span class="ident">num_pending</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// A context for multi-step (Init-Update-Finish) digest calculations.
+///
+/// # Examples
+///
+/// ```
+/// use ring::digest;
+///
+/// let one_shot = digest::digest(&amp;digest::SHA384, b&quot;hello, world&quot;);
+///
+/// let mut ctx = digest::Context::new(&amp;digest::SHA384);
+/// ctx.update(b&quot;hello&quot;);
+/// ctx.update(b&quot;, &quot;);
+/// ctx.update(b&quot;world&quot;);
+/// let multi_part = ctx.finish();
+///
+/// assert_eq!(&amp;one_shot.as_ref(), &amp;multi_part.as_ref());
+/// ```
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Context {
+    block: BlockContext,
+    <span class="comment">// TODO: More explicitly force 64-bit alignment for |pending|.
+    </span>pending: [u8; MAX_BLOCK_LEN],
+    num_pending: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Context</span> {
-    <span class="doccomment">/// Constructs a new context.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">block</span>: <span class="ident">BlockContext::new</span>(<span class="ident">algorithm</span>),
-            <span class="ident">pending</span>: [<span class="number">0u8</span>; <span class="ident">MAX_BLOCK_LEN</span>],
-            <span class="ident">num_pending</span>: <span class="number">0</span>,
+<span class="kw">impl </span>Context {
+    <span class="doccomment">/// Constructs a new context.
+    </span><span class="kw">pub fn </span>new(algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            block: BlockContext::new(algorithm),
+            pending: [<span class="number">0u8</span>; MAX_BLOCK_LEN],
+            num_pending: <span class="number">0</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clone_from</span>(<span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="ident">BlockContext</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">block</span>: <span class="ident">block</span>.<span class="ident">clone</span>(),
-            <span class="ident">pending</span>: [<span class="number">0u8</span>; <span class="ident">MAX_BLOCK_LEN</span>],
-            <span class="ident">num_pending</span>: <span class="number">0</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clone_from(block: <span class="kw-2">&amp;</span>BlockContext) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            block: block.clone(),
+            pending: [<span class="number">0u8</span>; MAX_BLOCK_LEN],
+            num_pending: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Updates the digest with all the data in `data`. `update` may be called</span>
-    <span class="doccomment">/// zero or more times until `finish` is called. It must not be called</span>
-    <span class="doccomment">/// after `finish` has been called.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="kw">let</span> <span class="ident">block_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">block</span>.<span class="ident">algorithm</span>.<span class="ident">block_len</span>;
-        <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">block_len</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">num_pending</span> {
-            <span class="self">self</span>.<span class="ident">pending</span>[<span class="self">self</span>.<span class="ident">num_pending</span>..(<span class="self">self</span>.<span class="ident">num_pending</span> <span class="op">+</span> <span class="ident">data</span>.<span class="ident">len</span>())].<span class="ident">copy_from_slice</span>(<span class="ident">data</span>);
-            <span class="self">self</span>.<span class="ident">num_pending</span> <span class="op">+</span><span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
+    <span class="doccomment">/// Updates the digest with all the data in `data`. `update` may be called
+    /// zero or more times until `finish` is called. It must not be called
+    /// after `finish` has been called.
+    </span><span class="kw">pub fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="kw">let </span>block_len = <span class="self">self</span>.block.algorithm.block_len;
+        <span class="kw">if </span>data.len() &lt; block_len - <span class="self">self</span>.num_pending {
+            <span class="self">self</span>.pending[<span class="self">self</span>.num_pending..(<span class="self">self</span>.num_pending + data.len())].copy_from_slice(data);
+            <span class="self">self</span>.num_pending += data.len();
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remaining</span> <span class="op">=</span> <span class="ident">data</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">num_pending</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">to_copy</span> <span class="op">=</span> <span class="ident">block_len</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">num_pending</span>;
-            <span class="self">self</span>.<span class="ident">pending</span>[<span class="self">self</span>.<span class="ident">num_pending</span>..<span class="ident">block_len</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[..<span class="ident">to_copy</span>]);
-            <span class="self">self</span>.<span class="ident">block</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pending</span>[..<span class="ident">block_len</span>]);
-            <span class="ident">remaining</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">remaining</span>[<span class="ident">to_copy</span>..];
-            <span class="self">self</span>.<span class="ident">num_pending</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>remaining = data;
+        <span class="kw">if </span><span class="self">self</span>.num_pending &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>to_copy = block_len - <span class="self">self</span>.num_pending;
+            <span class="self">self</span>.pending[<span class="self">self</span>.num_pending..block_len].copy_from_slice(<span class="kw-2">&amp;</span>data[..to_copy]);
+            <span class="self">self</span>.block.update(<span class="kw-2">&amp;</span><span class="self">self</span>.pending[..block_len]);
+            remaining = <span class="kw-2">&amp;</span>remaining[to_copy..];
+            <span class="self">self</span>.num_pending = <span class="number">0</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">num_blocks</span> <span class="op">=</span> <span class="ident">remaining</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="ident">block_len</span>;
-        <span class="kw">let</span> <span class="ident">num_to_save_for_later</span> <span class="op">=</span> <span class="ident">remaining</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">block_len</span>;
-        <span class="self">self</span>.<span class="ident">block</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">remaining</span>[..(<span class="ident">num_blocks</span> <span class="op">*</span> <span class="ident">block_len</span>)]);
-        <span class="kw">if</span> <span class="ident">num_to_save_for_later</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">pending</span>[..<span class="ident">num_to_save_for_later</span>]
-                .<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">remaining</span>[(<span class="ident">remaining</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">num_to_save_for_later</span>)..]);
-            <span class="self">self</span>.<span class="ident">num_pending</span> <span class="op">=</span> <span class="ident">num_to_save_for_later</span>;
+        <span class="kw">let </span>num_blocks = remaining.len() / block_len;
+        <span class="kw">let </span>num_to_save_for_later = remaining.len() % block_len;
+        <span class="self">self</span>.block.update(<span class="kw-2">&amp;</span>remaining[..(num_blocks * block_len)]);
+        <span class="kw">if </span>num_to_save_for_later &gt; <span class="number">0 </span>{
+            <span class="self">self</span>.pending[..num_to_save_for_later]
+                .copy_from_slice(<span class="kw-2">&amp;</span>remaining[(remaining.len() - num_to_save_for_later)..]);
+            <span class="self">self</span>.num_pending = num_to_save_for_later;
         }
     }
 
-    <span class="doccomment">/// Finalizes the digest calculation and returns the digest value. `finish`</span>
-    <span class="doccomment">/// consumes the context so it cannot be (mis-)used after `finish` has been</span>
-    <span class="doccomment">/// called.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Digest</span> {
-        <span class="kw">let</span> <span class="ident">block_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">block</span>.<span class="ident">algorithm</span>.<span class="ident">block_len</span>;
-        <span class="self">self</span>.<span class="ident">block</span>
-            .<span class="ident">finish</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">pending</span>[..<span class="ident">block_len</span>], <span class="self">self</span>.<span class="ident">num_pending</span>)
+    <span class="doccomment">/// Finalizes the digest calculation and returns the digest value. `finish`
+    /// consumes the context so it cannot be (mis-)used after `finish` has been
+    /// called.
+    </span><span class="kw">pub fn </span>finish(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; Digest {
+        <span class="kw">let </span>block_len = <span class="self">self</span>.block.algorithm.block_len;
+        <span class="self">self</span>.block
+            .finish(<span class="kw-2">&amp;mut </span><span class="self">self</span>.pending[..block_len], <span class="self">self</span>.num_pending)
     }
 
-    <span class="doccomment">/// The algorithm that this context is using.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
-        <span class="self">self</span>.<span class="ident">block</span>.<span class="ident">algorithm</span>
-    }
-}
-
-<span class="doccomment">/// Returns the digest of `data` using the given digest algorithm.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;alloc&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// use ring::{digest, test};</span>
-<span class="doccomment">/// let expected_hex = &quot;09ca7e4eaa6e8ae9c7d261167129184883644d07dfba7cbfbc4c8a2e08360d5b&quot;;</span>
-<span class="doccomment">/// let expected: Vec&lt;u8&gt; = test::from_hex(expected_hex).unwrap();</span>
-<span class="doccomment">/// let actual = digest::digest(&amp;digest::SHA256, b&quot;hello, world&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(&amp;expected, &amp;actual.as_ref());</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digest</span>(<span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Digest</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context::new</span>(<span class="ident">algorithm</span>);
-    <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">data</span>);
-    <span class="ident">ctx</span>.<span class="ident">finish</span>()
-}
-
-<span class="doccomment">/// A calculated digest value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Use `as_ref` to get the value as a `&amp;[u8]`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Digest</span> {
-    <span class="ident">value</span>: <span class="ident">Output</span>,
-    <span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Digest</span> {
-    <span class="doccomment">/// The algorithm that was used to calculate the digest value.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
-        <span class="self">self</span>.<span class="ident">algorithm</span>
+    <span class="doccomment">/// The algorithm that this context is using.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm {
+        <span class="self">self</span>.block.algorithm
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Digest</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw">let</span> <span class="ident">as64</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as64</span> };
-        <span class="kw-2">&amp;</span><span class="ident">endian::as_byte_slice</span>(<span class="ident">as64</span>)[..<span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">output_len</span>]
+<span class="doccomment">/// Returns the digest of `data` using the given digest algorithm.
+///
+/// # Examples:
+///
+/// ```
+/// # #[cfg(feature = &quot;alloc&quot;)]
+/// # {
+/// use ring::{digest, test};
+/// let expected_hex = &quot;09ca7e4eaa6e8ae9c7d261167129184883644d07dfba7cbfbc4c8a2e08360d5b&quot;;
+/// let expected: Vec&lt;u8&gt; = test::from_hex(expected_hex).unwrap();
+/// let actual = digest::digest(&amp;digest::SHA256, b&quot;hello, world&quot;);
+///
+/// assert_eq!(&amp;expected, &amp;actual.as_ref());
+/// # }
+/// ```
+</span><span class="kw">pub fn </span>digest(algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm, data: <span class="kw-2">&amp;</span>[u8]) -&gt; Digest {
+    <span class="kw">let </span><span class="kw-2">mut </span>ctx = Context::new(algorithm);
+    ctx.update(data);
+    ctx.finish()
+}
+
+<span class="doccomment">/// A calculated digest value.
+///
+/// Use `as_ref` to get the value as a `&amp;[u8]`.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>Digest {
+    value: Output,
+    algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm,
+}
+
+<span class="kw">impl </span>Digest {
+    <span class="doccomment">/// The algorithm that was used to calculate the digest value.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm {
+        <span class="self">self</span>.algorithm
     }
 }
 
-<span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Digest</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{:?}:&quot;</span>, <span class="self">self</span>.<span class="ident">algorithm</span>)<span class="question-mark">?</span>;
-        <span class="ident">debug::write_hex_bytes</span>(<span class="ident">fmt</span>, <span class="self">self</span>.<span class="ident">as_ref</span>())
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>Digest {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw">let </span>as64 = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span><span class="self">self</span>.value.as64 };
+        <span class="kw-2">&amp;</span>endian::as_byte_slice(as64)[..<span class="self">self</span>.algorithm.output_len]
     }
 }
 
-<span class="doccomment">/// A digest algorithm.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Algorithm</span> {
-    <span class="doccomment">/// The length of a finalized digest.</span>
-    <span class="kw">pub</span> <span class="ident">output_len</span>: <span class="ident">usize</span>,
-
-    <span class="doccomment">/// The size of the chaining value of the digest function, in bytes. For</span>
-    <span class="doccomment">/// non-truncated algorithms (SHA-1, SHA-256, SHA-512), this is equal to</span>
-    <span class="doccomment">/// `output_len`. For truncated algorithms (e.g. SHA-384, SHA-512/256),</span>
-    <span class="doccomment">/// this is equal to the length before truncation. This is mostly helpful</span>
-    <span class="doccomment">/// for determining the size of an HMAC key that is appropriate for the</span>
-    <span class="doccomment">/// digest algorithm.</span>
-    <span class="kw">pub</span> <span class="ident">chaining_len</span>: <span class="ident">usize</span>,
-
-    <span class="doccomment">/// The internal block length.</span>
-    <span class="kw">pub</span> <span class="ident">block_len</span>: <span class="ident">usize</span>,
-
-    <span class="doccomment">/// The length of the length in the padding.</span>
-    <span class="ident">len_len</span>: <span class="ident">usize</span>,
-
-    <span class="ident">block_data_order</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>, <span class="ident">data</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">num</span>: <span class="ident">c::size_t</span>),
-    <span class="ident">format_output</span>: <span class="kw">fn</span>(<span class="ident">input</span>: <span class="ident">State</span>) -&gt; <span class="ident">Output</span>,
-
-    <span class="ident">initial_state</span>: <span class="ident">State</span>,
-
-    <span class="ident">id</span>: <span class="ident">AlgorithmID</span>,
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">AlgorithmID</span> {
-    <span class="ident">SHA1</span>,
-    <span class="ident">SHA256</span>,
-    <span class="ident">SHA384</span>,
-    <span class="ident">SHA512</span>,
-    <span class="ident">SHA512_256</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">id</span>
+<span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>Digest {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
+        <span class="macro">write!</span>(fmt, <span class="string">&quot;{:?}:&quot;</span>, <span class="self">self</span>.algorithm)<span class="question-mark">?</span>;
+        debug::write_hex_bytes(fmt, <span class="self">self</span>.as_ref())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {}
+<span class="doccomment">/// A digest algorithm.
+</span><span class="kw">pub struct </span>Algorithm {
+    <span class="doccomment">/// The length of a finalized digest.
+    </span><span class="kw">pub </span>output_len: usize,
 
-<span class="macro">derive_debug_via_id!</span>(<span class="ident">Algorithm</span>);
+    <span class="doccomment">/// The size of the chaining value of the digest function, in bytes. For
+    /// non-truncated algorithms (SHA-1, SHA-256, SHA-512), this is equal to
+    /// `output_len`. For truncated algorithms (e.g. SHA-384, SHA-512/256),
+    /// this is equal to the length before truncation. This is mostly helpful
+    /// for determining the size of an HMAC key that is appropriate for the
+    /// digest algorithm.
+    </span><span class="kw">pub </span>chaining_len: usize,
 
-<span class="doccomment">/// SHA-1 as specified in [FIPS 180-4]. Deprecated.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [FIPS 180-4]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">SHA1_FOR_LEGACY_USE_ONLY</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span> {
-    <span class="ident">output_len</span>: <span class="ident">sha1::OUTPUT_LEN</span>,
-    <span class="ident">chaining_len</span>: <span class="ident">sha1::CHAINING_LEN</span>,
-    <span class="ident">block_len</span>: <span class="ident">sha1::BLOCK_LEN</span>,
-    <span class="ident">len_len</span>: <span class="number">64</span> <span class="op">/</span> <span class="number">8</span>,
-    <span class="ident">block_data_order</span>: <span class="ident">sha1::block_data_order</span>,
-    <span class="ident">format_output</span>: <span class="ident">sha256_format_output</span>,
-    <span class="ident">initial_state</span>: <span class="ident">State</span> {
-        <span class="ident">as32</span>: [
-            <span class="ident">Wrapping</span>(<span class="number">0x67452301u32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0xefcdab89u32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x98badcfeu32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x10325476u32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0xc3d2e1f0u32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0</span>),
+    <span class="doccomment">/// The internal block length.
+    </span><span class="kw">pub </span>block_len: usize,
+
+    <span class="doccomment">/// The length of the length in the padding.
+    </span>len_len: usize,
+
+    block_data_order: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(state: <span class="kw-2">&amp;mut </span>State, data: <span class="kw-2">*const </span>u8, num: c::size_t),
+    format_output: <span class="kw">fn</span>(input: State) -&gt; Output,
+
+    initial_state: State,
+
+    id: AlgorithmID,
+}
+
+<span class="attribute">#[derive(Debug, Eq, PartialEq)]
+</span><span class="kw">enum </span>AlgorithmID {
+    SHA1,
+    SHA256,
+    SHA384,
+    SHA512,
+    SHA512_256,
+}
+
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Algorithm {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.id == other.id
+    }
+}
+
+<span class="kw">impl </span>Eq <span class="kw">for </span>Algorithm {}
+
+<span class="macro">derive_debug_via_id!</span>(Algorithm);
+
+<span class="doccomment">/// SHA-1 as specified in [FIPS 180-4]. Deprecated.
+///
+/// [FIPS 180-4]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
+</span><span class="kw">pub static </span>SHA1_FOR_LEGACY_USE_ONLY: Algorithm = Algorithm {
+    output_len: sha1::OUTPUT_LEN,
+    chaining_len: sha1::CHAINING_LEN,
+    block_len: sha1::BLOCK_LEN,
+    len_len: <span class="number">64 </span>/ <span class="number">8</span>,
+    block_data_order: sha1::block_data_order,
+    format_output: sha256_format_output,
+    initial_state: State {
+        as32: [
+            Wrapping(<span class="number">0x67452301u32</span>),
+            Wrapping(<span class="number">0xefcdab89u32</span>),
+            Wrapping(<span class="number">0x98badcfeu32</span>),
+            Wrapping(<span class="number">0x10325476u32</span>),
+            Wrapping(<span class="number">0xc3d2e1f0u32</span>),
+            Wrapping(<span class="number">0</span>),
+            Wrapping(<span class="number">0</span>),
+            Wrapping(<span class="number">0</span>),
         ],
     },
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::SHA1</span>,
+    id: AlgorithmID::SHA1,
 };
 
-<span class="doccomment">/// SHA-256 as specified in [FIPS 180-4].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [FIPS 180-4]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">SHA256</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span> {
-    <span class="ident">output_len</span>: <span class="ident">SHA256_OUTPUT_LEN</span>,
-    <span class="ident">chaining_len</span>: <span class="ident">SHA256_OUTPUT_LEN</span>,
-    <span class="ident">block_len</span>: <span class="number">512</span> <span class="op">/</span> <span class="number">8</span>,
-    <span class="ident">len_len</span>: <span class="number">64</span> <span class="op">/</span> <span class="number">8</span>,
-    <span class="ident">block_data_order</span>: <span class="ident">sha2::GFp_sha256_block_data_order</span>,
-    <span class="ident">format_output</span>: <span class="ident">sha256_format_output</span>,
-    <span class="ident">initial_state</span>: <span class="ident">State</span> {
-        <span class="ident">as32</span>: [
-            <span class="ident">Wrapping</span>(<span class="number">0x6a09e667u32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0xbb67ae85u32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x3c6ef372u32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0xa54ff53au32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x510e527fu32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x9b05688cu32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x1f83d9abu32</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x5be0cd19u32</span>),
+<span class="doccomment">/// SHA-256 as specified in [FIPS 180-4].
+///
+/// [FIPS 180-4]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
+</span><span class="kw">pub static </span>SHA256: Algorithm = Algorithm {
+    output_len: SHA256_OUTPUT_LEN,
+    chaining_len: SHA256_OUTPUT_LEN,
+    block_len: <span class="number">512 </span>/ <span class="number">8</span>,
+    len_len: <span class="number">64 </span>/ <span class="number">8</span>,
+    block_data_order: sha2::GFp_sha256_block_data_order,
+    format_output: sha256_format_output,
+    initial_state: State {
+        as32: [
+            Wrapping(<span class="number">0x6a09e667u32</span>),
+            Wrapping(<span class="number">0xbb67ae85u32</span>),
+            Wrapping(<span class="number">0x3c6ef372u32</span>),
+            Wrapping(<span class="number">0xa54ff53au32</span>),
+            Wrapping(<span class="number">0x510e527fu32</span>),
+            Wrapping(<span class="number">0x9b05688cu32</span>),
+            Wrapping(<span class="number">0x1f83d9abu32</span>),
+            Wrapping(<span class="number">0x5be0cd19u32</span>),
         ],
     },
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::SHA256</span>,
+    id: AlgorithmID::SHA256,
 };
 
-<span class="doccomment">/// SHA-384 as specified in [FIPS 180-4].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [FIPS 180-4]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">SHA384</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span> {
-    <span class="ident">output_len</span>: <span class="ident">SHA384_OUTPUT_LEN</span>,
-    <span class="ident">chaining_len</span>: <span class="ident">SHA512_OUTPUT_LEN</span>,
-    <span class="ident">block_len</span>: <span class="ident">SHA512_BLOCK_LEN</span>,
-    <span class="ident">len_len</span>: <span class="ident">SHA512_LEN_LEN</span>,
-    <span class="ident">block_data_order</span>: <span class="ident">sha2::GFp_sha512_block_data_order</span>,
-    <span class="ident">format_output</span>: <span class="ident">sha512_format_output</span>,
-    <span class="ident">initial_state</span>: <span class="ident">State</span> {
-        <span class="ident">as64</span>: [
-            <span class="ident">Wrapping</span>(<span class="number">0xcbbb9d5dc1059ed8</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x629a292a367cd507</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x9159015a3070dd17</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x152fecd8f70e5939</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x67332667ffc00b31</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x8eb44a8768581511</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0xdb0c2e0d64f98fa7</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x47b5481dbefa4fa4</span>),
+<span class="doccomment">/// SHA-384 as specified in [FIPS 180-4].
+///
+/// [FIPS 180-4]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
+</span><span class="kw">pub static </span>SHA384: Algorithm = Algorithm {
+    output_len: SHA384_OUTPUT_LEN,
+    chaining_len: SHA512_OUTPUT_LEN,
+    block_len: SHA512_BLOCK_LEN,
+    len_len: SHA512_LEN_LEN,
+    block_data_order: sha2::GFp_sha512_block_data_order,
+    format_output: sha512_format_output,
+    initial_state: State {
+        as64: [
+            Wrapping(<span class="number">0xcbbb9d5dc1059ed8</span>),
+            Wrapping(<span class="number">0x629a292a367cd507</span>),
+            Wrapping(<span class="number">0x9159015a3070dd17</span>),
+            Wrapping(<span class="number">0x152fecd8f70e5939</span>),
+            Wrapping(<span class="number">0x67332667ffc00b31</span>),
+            Wrapping(<span class="number">0x8eb44a8768581511</span>),
+            Wrapping(<span class="number">0xdb0c2e0d64f98fa7</span>),
+            Wrapping(<span class="number">0x47b5481dbefa4fa4</span>),
         ],
     },
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::SHA384</span>,
+    id: AlgorithmID::SHA384,
 };
 
-<span class="doccomment">/// SHA-512 as specified in [FIPS 180-4].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [FIPS 180-4]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">SHA512</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span> {
-    <span class="ident">output_len</span>: <span class="ident">SHA512_OUTPUT_LEN</span>,
-    <span class="ident">chaining_len</span>: <span class="ident">SHA512_OUTPUT_LEN</span>,
-    <span class="ident">block_len</span>: <span class="ident">SHA512_BLOCK_LEN</span>,
-    <span class="ident">len_len</span>: <span class="ident">SHA512_LEN_LEN</span>,
-    <span class="ident">block_data_order</span>: <span class="ident">sha2::GFp_sha512_block_data_order</span>,
-    <span class="ident">format_output</span>: <span class="ident">sha512_format_output</span>,
-    <span class="ident">initial_state</span>: <span class="ident">State</span> {
-        <span class="ident">as64</span>: [
-            <span class="ident">Wrapping</span>(<span class="number">0x6a09e667f3bcc908</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0xbb67ae8584caa73b</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x3c6ef372fe94f82b</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0xa54ff53a5f1d36f1</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x510e527fade682d1</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x9b05688c2b3e6c1f</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x1f83d9abfb41bd6b</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x5be0cd19137e2179</span>),
+<span class="doccomment">/// SHA-512 as specified in [FIPS 180-4].
+///
+/// [FIPS 180-4]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
+</span><span class="kw">pub static </span>SHA512: Algorithm = Algorithm {
+    output_len: SHA512_OUTPUT_LEN,
+    chaining_len: SHA512_OUTPUT_LEN,
+    block_len: SHA512_BLOCK_LEN,
+    len_len: SHA512_LEN_LEN,
+    block_data_order: sha2::GFp_sha512_block_data_order,
+    format_output: sha512_format_output,
+    initial_state: State {
+        as64: [
+            Wrapping(<span class="number">0x6a09e667f3bcc908</span>),
+            Wrapping(<span class="number">0xbb67ae8584caa73b</span>),
+            Wrapping(<span class="number">0x3c6ef372fe94f82b</span>),
+            Wrapping(<span class="number">0xa54ff53a5f1d36f1</span>),
+            Wrapping(<span class="number">0x510e527fade682d1</span>),
+            Wrapping(<span class="number">0x9b05688c2b3e6c1f</span>),
+            Wrapping(<span class="number">0x1f83d9abfb41bd6b</span>),
+            Wrapping(<span class="number">0x5be0cd19137e2179</span>),
         ],
     },
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::SHA512</span>,
+    id: AlgorithmID::SHA512,
 };
 
-<span class="doccomment">/// SHA-512/256 as specified in [FIPS 180-4].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is *not* the same as just truncating the output of SHA-512, as</span>
-<span class="doccomment">/// SHA-512/256 has its own initial state distinct from SHA-512&#39;s initial</span>
-<span class="doccomment">/// state.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [FIPS 180-4]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">SHA512_256</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span> {
-    <span class="ident">output_len</span>: <span class="ident">SHA512_256_OUTPUT_LEN</span>,
-    <span class="ident">chaining_len</span>: <span class="ident">SHA512_OUTPUT_LEN</span>,
-    <span class="ident">block_len</span>: <span class="ident">SHA512_BLOCK_LEN</span>,
-    <span class="ident">len_len</span>: <span class="ident">SHA512_LEN_LEN</span>,
-    <span class="ident">block_data_order</span>: <span class="ident">sha2::GFp_sha512_block_data_order</span>,
-    <span class="ident">format_output</span>: <span class="ident">sha512_format_output</span>,
-    <span class="ident">initial_state</span>: <span class="ident">State</span> {
-        <span class="ident">as64</span>: [
-            <span class="ident">Wrapping</span>(<span class="number">0x22312194fc2bf72c</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x9f555fa3c84c64c2</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x2393b86b6f53b151</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x963877195940eabd</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x96283ee2a88effe3</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0xbe5e1e2553863992</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x2b0199fc2c85b8aa</span>),
-            <span class="ident">Wrapping</span>(<span class="number">0x0eb72ddc81c52ca2</span>),
+<span class="doccomment">/// SHA-512/256 as specified in [FIPS 180-4].
+///
+/// This is *not* the same as just truncating the output of SHA-512, as
+/// SHA-512/256 has its own initial state distinct from SHA-512&#39;s initial
+/// state.
+///
+/// [FIPS 180-4]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
+</span><span class="kw">pub static </span>SHA512_256: Algorithm = Algorithm {
+    output_len: SHA512_256_OUTPUT_LEN,
+    chaining_len: SHA512_OUTPUT_LEN,
+    block_len: SHA512_BLOCK_LEN,
+    len_len: SHA512_LEN_LEN,
+    block_data_order: sha2::GFp_sha512_block_data_order,
+    format_output: sha512_format_output,
+    initial_state: State {
+        as64: [
+            Wrapping(<span class="number">0x22312194fc2bf72c</span>),
+            Wrapping(<span class="number">0x9f555fa3c84c64c2</span>),
+            Wrapping(<span class="number">0x2393b86b6f53b151</span>),
+            Wrapping(<span class="number">0x963877195940eabd</span>),
+            Wrapping(<span class="number">0x96283ee2a88effe3</span>),
+            Wrapping(<span class="number">0xbe5e1e2553863992</span>),
+            Wrapping(<span class="number">0x2b0199fc2c85b8aa</span>),
+            Wrapping(<span class="number">0x0eb72ddc81c52ca2</span>),
         ],
     },
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::SHA512_256</span>,
+    id: AlgorithmID::SHA512_256,
 };
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span> <span class="comment">// XXX: Why do we need to be `Copy`?</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">union</span> <span class="ident">State</span> {
-    <span class="ident">as64</span>: [<span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>; <span class="ident">sha2::CHAINING_WORDS</span>],
-    <span class="ident">as32</span>: [<span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>; <span class="ident">sha2::CHAINING_WORDS</span>],
+<span class="attribute">#[derive(Clone, Copy)] </span><span class="comment">// XXX: Why do we need to be `Copy`?
+</span><span class="attribute">#[repr(C)]
+</span><span class="kw">union </span>State {
+    as64: [Wrapping&lt;u64&gt;; sha2::CHAINING_WORDS],
+    as32: [Wrapping&lt;u32&gt;; sha2::CHAINING_WORDS],
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">union</span> <span class="ident">Output</span> {
-    <span class="ident">as64</span>: [<span class="ident">BigEndian</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>; <span class="number">512</span> <span class="op">/</span> <span class="number">8</span> <span class="op">/</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>()],
-    <span class="ident">as32</span>: [<span class="ident">BigEndian</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>; <span class="number">256</span> <span class="op">/</span> <span class="number">8</span> <span class="op">/</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>()],
+<span class="attribute">#[derive(Clone, Copy)]
+#[repr(C)]
+</span><span class="kw">union </span>Output {
+    as64: [BigEndian&lt;u64&gt;; <span class="number">512 </span>/ <span class="number">8 </span>/ core::mem::size_of::&lt;BigEndian&lt;u64&gt;&gt;()],
+    as32: [BigEndian&lt;u32&gt;; <span class="number">256 </span>/ <span class="number">8 </span>/ core::mem::size_of::&lt;BigEndian&lt;u32&gt;&gt;()],
 }
 
-<span class="doccomment">/// The maximum block length (`Algorithm::block_len`) of all the algorithms in</span>
-<span class="doccomment">/// this module.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_BLOCK_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">/</span> <span class="number">8</span>;
+<span class="doccomment">/// The maximum block length (`Algorithm::block_len`) of all the algorithms in
+/// this module.
+</span><span class="kw">pub const </span>MAX_BLOCK_LEN: usize = <span class="number">1024 </span>/ <span class="number">8</span>;
 
-<span class="doccomment">/// The maximum output length (`Algorithm::output_len`) of all the algorithms</span>
-<span class="doccomment">/// in this module.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_OUTPUT_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">512</span> <span class="op">/</span> <span class="number">8</span>;
+<span class="doccomment">/// The maximum output length (`Algorithm::output_len`) of all the algorithms
+/// in this module.
+</span><span class="kw">pub const </span>MAX_OUTPUT_LEN: usize = <span class="number">512 </span>/ <span class="number">8</span>;
 
-<span class="doccomment">/// The maximum chaining length (`Algorithm::chaining_len`) of all the</span>
-<span class="doccomment">/// algorithms in this module.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_CHAINING_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">MAX_OUTPUT_LEN</span>;
+<span class="doccomment">/// The maximum chaining length (`Algorithm::chaining_len`) of all the
+/// algorithms in this module.
+</span><span class="kw">pub const </span>MAX_CHAINING_LEN: usize = MAX_OUTPUT_LEN;
 
-<span class="kw">fn</span> <span class="ident">sha256_format_output</span>(<span class="ident">input</span>: <span class="ident">State</span>) -&gt; <span class="ident">Output</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">as32</span> };
-    <span class="ident">Output</span> {
-        <span class="ident">as32</span>: [
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">0</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">1</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">2</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">3</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">4</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">5</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">6</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">7</span>]),
+<span class="kw">fn </span>sha256_format_output(input: State) -&gt; Output {
+    <span class="kw">let </span>input = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span>input.as32 };
+    Output {
+        as32: [
+            BigEndian::from(input[<span class="number">0</span>]),
+            BigEndian::from(input[<span class="number">1</span>]),
+            BigEndian::from(input[<span class="number">2</span>]),
+            BigEndian::from(input[<span class="number">3</span>]),
+            BigEndian::from(input[<span class="number">4</span>]),
+            BigEndian::from(input[<span class="number">5</span>]),
+            BigEndian::from(input[<span class="number">6</span>]),
+            BigEndian::from(input[<span class="number">7</span>]),
         ],
     }
 }
 
-<span class="kw">fn</span> <span class="ident">sha512_format_output</span>(<span class="ident">input</span>: <span class="ident">State</span>) -&gt; <span class="ident">Output</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">as64</span> };
-    <span class="ident">Output</span> {
-        <span class="ident">as64</span>: [
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">0</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">1</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">2</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">3</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">4</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">5</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">6</span>]),
-            <span class="ident">BigEndian::from</span>(<span class="ident">input</span>[<span class="number">7</span>]),
+<span class="kw">fn </span>sha512_format_output(input: State) -&gt; Output {
+    <span class="kw">let </span>input = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span>input.as64 };
+    Output {
+        as64: [
+            BigEndian::from(input[<span class="number">0</span>]),
+            BigEndian::from(input[<span class="number">1</span>]),
+            BigEndian::from(input[<span class="number">2</span>]),
+            BigEndian::from(input[<span class="number">3</span>]),
+            BigEndian::from(input[<span class="number">4</span>]),
+            BigEndian::from(input[<span class="number">5</span>]),
+            BigEndian::from(input[<span class="number">6</span>]),
+            BigEndian::from(input[<span class="number">7</span>]),
         ],
     }
 }
 
-<span class="doccomment">/// The length of the output of SHA-1, in bytes.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHA1_OUTPUT_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">sha1::OUTPUT_LEN</span>;
+<span class="doccomment">/// The length of the output of SHA-1, in bytes.
+</span><span class="kw">pub const </span>SHA1_OUTPUT_LEN: usize = sha1::OUTPUT_LEN;
 
-<span class="doccomment">/// The length of the output of SHA-256, in bytes.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHA256_OUTPUT_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">256</span> <span class="op">/</span> <span class="number">8</span>;
+<span class="doccomment">/// The length of the output of SHA-256, in bytes.
+</span><span class="kw">pub const </span>SHA256_OUTPUT_LEN: usize = <span class="number">256 </span>/ <span class="number">8</span>;
 
-<span class="doccomment">/// The length of the output of SHA-384, in bytes.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHA384_OUTPUT_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">384</span> <span class="op">/</span> <span class="number">8</span>;
+<span class="doccomment">/// The length of the output of SHA-384, in bytes.
+</span><span class="kw">pub const </span>SHA384_OUTPUT_LEN: usize = <span class="number">384 </span>/ <span class="number">8</span>;
 
-<span class="doccomment">/// The length of the output of SHA-512, in bytes.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHA512_OUTPUT_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">512</span> <span class="op">/</span> <span class="number">8</span>;
+<span class="doccomment">/// The length of the output of SHA-512, in bytes.
+</span><span class="kw">pub const </span>SHA512_OUTPUT_LEN: usize = <span class="number">512 </span>/ <span class="number">8</span>;
 
-<span class="doccomment">/// The length of the output of SHA-512/256, in bytes.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHA512_256_OUTPUT_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">256</span> <span class="op">/</span> <span class="number">8</span>;
+<span class="doccomment">/// The length of the output of SHA-512/256, in bytes.
+</span><span class="kw">pub const </span>SHA512_256_OUTPUT_LEN: usize = <span class="number">256 </span>/ <span class="number">8</span>;
 
-<span class="doccomment">/// The length of a block for SHA-512-based algorithms, in bytes.</span>
-<span class="kw">const</span> <span class="ident">SHA512_BLOCK_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">/</span> <span class="number">8</span>;
+<span class="doccomment">/// The length of a block for SHA-512-based algorithms, in bytes.
+</span><span class="kw">const </span>SHA512_BLOCK_LEN: usize = <span class="number">1024 </span>/ <span class="number">8</span>;
 
-<span class="doccomment">/// The length of the length field for SHA-512-based algorithms, in bytes.</span>
-<span class="kw">const</span> <span class="ident">SHA512_LEN_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">128</span> <span class="op">/</span> <span class="number">8</span>;
+<span class="doccomment">/// The length of the length field for SHA-512-based algorithms, in bytes.
+</span><span class="kw">const </span>SHA512_LEN_LEN: usize = <span class="number">128 </span>/ <span class="number">8</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
 
-    <span class="kw">mod</span> <span class="ident">max_input</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::digest</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::polyfill</span>;
-        <span class="kw">use</span> <span class="ident">alloc::vec</span>;
+    <span class="kw">mod </span>max_input {
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::digest;
+        <span class="kw">use </span><span class="kw">crate</span>::polyfill;
+        <span class="kw">use </span>alloc::vec;
 
-        <span class="macro">macro_rules!</span> <span class="ident">max_input_tests</span> {
-            ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">algorithm_name</span>:<span class="ident">ident</span> ) =&gt; {
-                <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">algorithm_name</span> {
-                    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::digest</span>;
+        <span class="macro">macro_rules! </span>max_input_tests {
+            ( <span class="macro-nonterminal">$algorithm_name</span>:ident ) =&gt; {
+                <span class="kw">mod </span><span class="macro-nonterminal">$algorithm_name </span>{
+                    <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::digest;
 
-                    <span class="attribute">#[<span class="ident">test</span>]</span>
-                    <span class="kw">fn</span> <span class="ident">max_input_test</span>() {
-                        <span class="ident"><span class="kw">super</span>::max_input_test</span>(<span class="kw-2">&amp;</span><span class="ident">digest</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">algorithm_name</span>);
+                    <span class="attribute">#[test]
+                    </span><span class="kw">fn </span>max_input_test() {
+                        <span class="kw">super</span>::max_input_test(<span class="kw-2">&amp;</span>digest::<span class="macro-nonterminal">$algorithm_name</span>);
                     }
 
-                    <span class="attribute">#[<span class="ident">test</span>]</span>
-                    <span class="attribute">#[<span class="ident">should_panic</span>]</span>
-                    <span class="kw">fn</span> <span class="ident">too_long_input_test_block</span>() {
-                        <span class="ident"><span class="kw">super</span>::too_long_input_test_block</span>(<span class="kw-2">&amp;</span><span class="ident">digest</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">algorithm_name</span>);
+                    <span class="attribute">#[test]
+                    #[should_panic]
+                    </span><span class="kw">fn </span>too_long_input_test_block() {
+                        <span class="kw">super</span>::too_long_input_test_block(<span class="kw-2">&amp;</span>digest::<span class="macro-nonterminal">$algorithm_name</span>);
                     }
 
-                    <span class="attribute">#[<span class="ident">test</span>]</span>
-                    <span class="attribute">#[<span class="ident">should_panic</span>]</span>
-                    <span class="kw">fn</span> <span class="ident">too_long_input_test_byte</span>() {
-                        <span class="ident"><span class="kw">super</span>::too_long_input_test_byte</span>(<span class="kw-2">&amp;</span><span class="ident">digest</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">algorithm_name</span>);
+                    <span class="attribute">#[test]
+                    #[should_panic]
+                    </span><span class="kw">fn </span>too_long_input_test_byte() {
+                        <span class="kw">super</span>::too_long_input_test_byte(<span class="kw-2">&amp;</span>digest::<span class="macro-nonterminal">$algorithm_name</span>);
                     }
                 }
             };
         }
 
-        <span class="kw">fn</span> <span class="ident">max_input_test</span>(<span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">nearly_full_context</span>(<span class="ident">alg</span>);
-            <span class="kw">let</span> <span class="ident">next_input</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">alg</span>.<span class="ident">block_len</span> <span class="op">-</span> <span class="number">1</span>];
-            <span class="ident">context</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">next_input</span>);
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">finish</span>(); <span class="comment">// no panic</span>
-        }
+        <span class="kw">fn </span>max_input_test(alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm) {
+            <span class="kw">let </span><span class="kw-2">mut </span>context = nearly_full_context(alg);
+            <span class="kw">let </span>next_input = <span class="macro">vec!</span>[<span class="number">0u8</span>; alg.block_len - <span class="number">1</span>];
+            context.update(<span class="kw-2">&amp;</span>next_input);
+            <span class="kw">let _ </span>= context.finish(); <span class="comment">// no panic
+        </span>}
 
-        <span class="kw">fn</span> <span class="ident">too_long_input_test_block</span>(<span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">nearly_full_context</span>(<span class="ident">alg</span>);
-            <span class="kw">let</span> <span class="ident">next_input</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">alg</span>.<span class="ident">block_len</span>];
-            <span class="ident">context</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">next_input</span>);
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">finish</span>(); <span class="comment">// should panic</span>
-        }
+        <span class="kw">fn </span>too_long_input_test_block(alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm) {
+            <span class="kw">let </span><span class="kw-2">mut </span>context = nearly_full_context(alg);
+            <span class="kw">let </span>next_input = <span class="macro">vec!</span>[<span class="number">0u8</span>; alg.block_len];
+            context.update(<span class="kw-2">&amp;</span>next_input);
+            <span class="kw">let _ </span>= context.finish(); <span class="comment">// should panic
+        </span>}
 
-        <span class="kw">fn</span> <span class="ident">too_long_input_test_byte</span>(<span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">nearly_full_context</span>(<span class="ident">alg</span>);
-            <span class="kw">let</span> <span class="ident">next_input</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">alg</span>.<span class="ident">block_len</span> <span class="op">-</span> <span class="number">1</span>];
-            <span class="ident">context</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">next_input</span>); <span class="comment">// no panic</span>
-            <span class="ident">context</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>]);
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">finish</span>(); <span class="comment">// should panic</span>
-        }
+        <span class="kw">fn </span>too_long_input_test_byte(alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm) {
+            <span class="kw">let </span><span class="kw-2">mut </span>context = nearly_full_context(alg);
+            <span class="kw">let </span>next_input = <span class="macro">vec!</span>[<span class="number">0u8</span>; alg.block_len - <span class="number">1</span>];
+            context.update(<span class="kw-2">&amp;</span>next_input); <span class="comment">// no panic
+            </span>context.update(<span class="kw-2">&amp;</span>[<span class="number">0</span>]);
+            <span class="kw">let _ </span>= context.finish(); <span class="comment">// should panic
+        </span>}
 
-        <span class="kw">fn</span> <span class="ident">nearly_full_context</span>(<span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>) -&gt; <span class="ident">digest::Context</span> {
-            <span class="comment">// All implementations currently support up to 2^64-1 bits</span>
-            <span class="comment">// of input; according to the spec, SHA-384 and SHA-512</span>
-            <span class="comment">// support up to 2^128-1, but that&#39;s not implemented yet.</span>
-            <span class="kw">let</span> <span class="ident">max_bytes</span> <span class="op">=</span> <span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="number">3</span>);
-            <span class="kw">let</span> <span class="ident">max_blocks</span> <span class="op">=</span> <span class="ident">max_bytes</span> <span class="op">/</span> <span class="ident">polyfill::u64_from_usize</span>(<span class="ident">alg</span>.<span class="ident">block_len</span>);
-            <span class="ident">digest::Context</span> {
-                <span class="ident">block</span>: <span class="ident">digest::BlockContext</span> {
-                    <span class="ident">state</span>: <span class="ident">alg</span>.<span class="ident">initial_state</span>,
-                    <span class="ident">completed_data_blocks</span>: <span class="ident">max_blocks</span> <span class="op">-</span> <span class="number">1</span>,
-                    <span class="ident">algorithm</span>: <span class="ident">alg</span>,
-                    <span class="ident">cpu_features</span>: <span class="ident"><span class="kw">crate</span>::cpu::features</span>(),
+        <span class="kw">fn </span>nearly_full_context(alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm) -&gt; digest::Context {
+            <span class="comment">// All implementations currently support up to 2^64-1 bits
+            // of input; according to the spec, SHA-384 and SHA-512
+            // support up to 2^128-1, but that&#39;s not implemented yet.
+            </span><span class="kw">let </span>max_bytes = <span class="number">1u64 </span>&lt;&lt; (<span class="number">64 </span>- <span class="number">3</span>);
+            <span class="kw">let </span>max_blocks = max_bytes / polyfill::u64_from_usize(alg.block_len);
+            digest::Context {
+                block: digest::BlockContext {
+                    state: alg.initial_state,
+                    completed_data_blocks: max_blocks - <span class="number">1</span>,
+                    algorithm: alg,
+                    cpu_features: <span class="kw">crate</span>::cpu::features(),
                 },
-                <span class="ident">pending</span>: [<span class="number">0u8</span>; <span class="ident">digest::MAX_BLOCK_LEN</span>],
-                <span class="ident">num_pending</span>: <span class="number">0</span>,
+                pending: [<span class="number">0u8</span>; digest::MAX_BLOCK_LEN],
+                num_pending: <span class="number">0</span>,
             }
         }
 
-        <span class="macro">max_input_tests!</span>(<span class="ident">SHA1_FOR_LEGACY_USE_ONLY</span>);
-        <span class="macro">max_input_tests!</span>(<span class="ident">SHA256</span>);
-        <span class="macro">max_input_tests!</span>(<span class="ident">SHA384</span>);
-        <span class="macro">max_input_tests!</span>(<span class="ident">SHA512</span>);
+        <span class="macro">max_input_tests!</span>(SHA1_FOR_LEGACY_USE_ONLY);
+        <span class="macro">max_input_tests!</span>(SHA256);
+        <span class="macro">max_input_tests!</span>(SHA384);
+        <span class="macro">max_input_tests!</span>(SHA512);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

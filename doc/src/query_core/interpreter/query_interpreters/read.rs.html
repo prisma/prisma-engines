@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interpreter/query_interpreters/read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interpreter/query_interpreters/read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -288,295 +288,295 @@
 <span id="288">288</span>
 <span id="289">289</span>
 <span id="290">290</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">interpreter::InterpretationResult</span>, <span class="ident">query_ast</span>::<span class="kw-2">*</span>, <span class="ident">result_ast</span>::<span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="self">self</span>, <span class="ident">ConnectionLike</span>, <span class="ident">QueryArguments</span>, <span class="ident">RelAggregationRow</span>, <span class="ident">RelAggregationSelection</span>};
-<span class="kw">use</span> <span class="ident">futures::future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
-<span class="kw">use</span> <span class="ident">inmemory_record_processor::InMemoryRecordProcessor</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::ManyRecords</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{interpreter::InterpretationResult, query_ast::<span class="kw-2">*</span>, result_ast::<span class="kw-2">*</span>};
+<span class="kw">use </span>connector::{<span class="self">self</span>, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection};
+<span class="kw">use </span>futures::future::{BoxFuture, FutureExt};
+<span class="kw">use </span>inmemory_record_processor::InMemoryRecordProcessor;
+<span class="kw">use </span>prisma_models::ManyRecords;
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="ident">query</span>: <span class="ident">ReadQuery</span>,
-    <span class="ident">parent_result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="ident">ManyRecords</span><span class="op">&gt;</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">match</span> <span class="ident">query</span> {
-            <span class="ident">ReadQuery::RecordQuery</span>(<span class="ident">q</span>) =&gt; <span class="ident">read_one</span>(<span class="ident">tx</span>, <span class="ident">q</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>,
-            <span class="ident">ReadQuery::ManyRecordsQuery</span>(<span class="ident">q</span>) =&gt; <span class="ident">read_many</span>(<span class="ident">tx</span>, <span class="ident">q</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>,
-            <span class="ident">ReadQuery::RelatedRecordsQuery</span>(<span class="ident">q</span>) =&gt; <span class="ident">read_related</span>(<span class="ident">tx</span>, <span class="ident">q</span>, <span class="ident">parent_result</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>,
-            <span class="ident">ReadQuery::AggregateRecordsQuery</span>(<span class="ident">q</span>) =&gt; <span class="ident">aggregate</span>(<span class="ident">tx</span>, <span class="ident">q</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>,
+<span class="kw">pub fn </span>execute&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    tx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike,
+    query: ReadQuery,
+    parent_result: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span>ManyRecords&gt;,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; BoxFuture&lt;<span class="lifetime">&#39;conn</span>, InterpretationResult&lt;QueryResult&gt;&gt; {
+    <span class="kw">let </span>fut = <span class="kw">async move </span>{
+        <span class="kw">match </span>query {
+            ReadQuery::RecordQuery(q) =&gt; read_one(tx, q, trace_id).<span class="kw">await</span>,
+            ReadQuery::ManyRecordsQuery(q) =&gt; read_many(tx, q, trace_id).<span class="kw">await</span>,
+            ReadQuery::RelatedRecordsQuery(q) =&gt; read_related(tx, q, parent_result, trace_id).<span class="kw">await</span>,
+            ReadQuery::AggregateRecordsQuery(q) =&gt; aggregate(tx, q, trace_id).<span class="kw">await</span>,
         }
     };
 
-    <span class="ident">fut</span>.<span class="ident">boxed</span>()
+    fut.boxed()
 }
 
-<span class="doccomment">/// Queries a single record.</span>
-<span class="kw">fn</span> <span class="ident">read_one</span>(
-    <span class="ident">tx</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="ident">query</span>: <span class="ident">RecordQuery</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">model</span>;
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">filter</span>.<span class="ident">expect</span>(<span class="string">&quot;Expected filter to be set for ReadOne query.&quot;</span>);
-        <span class="kw">let</span> <span class="ident">scalars</span> <span class="op">=</span> <span class="ident">tx</span>
-            .<span class="ident">get_single_record</span>(
-                <span class="kw-2">&amp;</span><span class="ident">model</span>,
-                <span class="kw-2">&amp;</span><span class="ident">filter</span>,
-                <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">selected_fields</span>,
-                <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">aggregation_selections</span>,
-                <span class="ident">trace_id</span>,
+<span class="doccomment">/// Queries a single record.
+</span><span class="kw">fn </span>read_one(
+    tx: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
+    query: RecordQuery,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, InterpretationResult&lt;QueryResult&gt;&gt; {
+    <span class="kw">let </span>fut = <span class="kw">async move </span>{
+        <span class="kw">let </span>model = query.model;
+        <span class="kw">let </span>filter = query.filter.expect(<span class="string">&quot;Expected filter to be set for ReadOne query.&quot;</span>);
+        <span class="kw">let </span>scalars = tx
+            .get_single_record(
+                <span class="kw-2">&amp;</span>model,
+                <span class="kw-2">&amp;</span>filter,
+                <span class="kw-2">&amp;</span>query.selected_fields,
+                <span class="kw-2">&amp;</span>query.aggregation_selections,
+                trace_id,
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">scalars</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">record</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">scalars</span>: <span class="ident">ManyRecords</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">into</span>();
-                <span class="kw">let</span> (<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>) <span class="op">=</span>
-                    <span class="ident">extract_aggregation_rows_from_scalars</span>(<span class="ident">scalars</span>, <span class="ident">query</span>.<span class="ident">aggregation_selections</span>);
-                <span class="kw">let</span> <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">process_nested</span>(<span class="ident">tx</span>, <span class="ident">query</span>.<span class="ident">nested</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">scalars</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">match </span>scalars {
+            <span class="prelude-val">Some</span>(record) =&gt; {
+                <span class="kw">let </span>scalars: ManyRecords = record.into();
+                <span class="kw">let </span>(scalars, aggregation_rows) =
+                    extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
+                <span class="kw">let </span>nested: Vec&lt;QueryResult&gt; = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>scalars)).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">RecordSelection</span> {
-                    <span class="ident">name</span>: <span class="ident">query</span>.<span class="ident">name</span>,
-                    <span class="ident">fields</span>: <span class="ident">query</span>.<span class="ident">selection_order</span>,
-                    <span class="ident">scalars</span>,
-                    <span class="ident">nested</span>,
-                    <span class="ident">query_arguments</span>: <span class="ident">QueryArguments::new</span>(<span class="ident">model</span>.<span class="ident">clone</span>()),
-                    <span class="ident">model</span>,
-                    <span class="ident">aggregation_rows</span>,
+                <span class="prelude-val">Ok</span>(RecordSelection {
+                    name: query.name,
+                    fields: query.selection_order,
+                    scalars,
+                    nested,
+                    query_arguments: QueryArguments::new(model.clone()),
+                    model,
+                    aggregation_rows,
                 }
-                .<span class="ident">into</span>())
+                .into())
             }
 
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryResult::RecordSelection</span>(<span class="ident">Box::new</span>(<span class="ident">RecordSelection</span> {
-                <span class="ident">name</span>: <span class="ident">query</span>.<span class="ident">name</span>,
-                <span class="ident">fields</span>: <span class="ident">query</span>.<span class="ident">selection_order</span>,
-                <span class="ident">scalars</span>: <span class="ident">ManyRecords::default</span>(),
-                <span class="ident">nested</span>: <span class="macro">vec!</span>[],
-                <span class="ident">query_arguments</span>: <span class="ident">QueryArguments::new</span>(<span class="ident">model</span>.<span class="ident">clone</span>()),
-                <span class="ident">model</span>,
-                <span class="ident">aggregation_rows</span>: <span class="prelude-val">None</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(Box::new(RecordSelection {
+                name: query.name,
+                fields: query.selection_order,
+                scalars: ManyRecords::default(),
+                nested: <span class="macro">vec!</span>[],
+                query_arguments: QueryArguments::new(model.clone()),
+                model,
+                aggregation_rows: <span class="prelude-val">None</span>,
             }))),
         }
     };
 
-    <span class="ident">fut</span>.<span class="ident">boxed</span>()
+    fut.boxed()
 }
 
-<span class="doccomment">/// Queries a set of records.</span>
-<span class="doccomment">/// If the query specifies distinct, we need to lift up pagination (and distinct) processing to the core with in-memory record processing.</span>
-<span class="doccomment">/// -&gt; Distinct can&#39;t be processed in the DB with our current query API model.</span>
-<span class="doccomment">///    We need to select IDs / uniques alongside the distincts, which doesn&#39;t work in SQL, as all records</span>
-<span class="doccomment">///    are distinct by definition if a unique is in the selection set.</span>
-<span class="doccomment">/// -&gt; Unstable cursors can&#39;t reliably be fetched by the underlying datasource, so we need to process part of it in-memory.</span>
-<span class="kw">fn</span> <span class="ident">read_many</span>(
-    <span class="ident">tx</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="kw-2">mut</span> <span class="ident">query</span>: <span class="ident">ManyRecordsQuery</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">let</span> (<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">query</span>.<span class="ident">args</span>.<span class="ident">requires_inmemory_processing</span>() {
-            <span class="kw">let</span> <span class="ident">processor</span> <span class="op">=</span> <span class="ident">InMemoryRecordProcessor::new_from_query_args</span>(<span class="kw-2">&amp;mut</span> <span class="ident">query</span>.<span class="ident">args</span>);
-            <span class="kw">let</span> <span class="ident">scalars</span> <span class="op">=</span> <span class="ident">tx</span>
-                .<span class="ident">get_many_records</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">model</span>,
-                    <span class="ident">query</span>.<span class="ident">args</span>.<span class="ident">clone</span>(),
-                    <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">selected_fields</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">aggregation_selections</span>,
-                    <span class="ident">trace_id</span>,
+<span class="doccomment">/// Queries a set of records.
+/// If the query specifies distinct, we need to lift up pagination (and distinct) processing to the core with in-memory record processing.
+/// -&gt; Distinct can&#39;t be processed in the DB with our current query API model.
+///    We need to select IDs / uniques alongside the distincts, which doesn&#39;t work in SQL, as all records
+///    are distinct by definition if a unique is in the selection set.
+/// -&gt; Unstable cursors can&#39;t reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
+</span><span class="kw">fn </span>read_many(
+    tx: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
+    <span class="kw-2">mut </span>query: ManyRecordsQuery,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, InterpretationResult&lt;QueryResult&gt;&gt; {
+    <span class="kw">let </span>fut = <span class="kw">async move </span>{
+        <span class="kw">let </span>(scalars, aggregation_rows) = <span class="kw">if </span>query.args.requires_inmemory_processing() {
+            <span class="kw">let </span>processor = InMemoryRecordProcessor::new_from_query_args(<span class="kw-2">&amp;mut </span>query.args);
+            <span class="kw">let </span>scalars = tx
+                .get_many_records(
+                    <span class="kw-2">&amp;</span>query.model,
+                    query.args.clone(),
+                    <span class="kw-2">&amp;</span>query.selected_fields,
+                    <span class="kw-2">&amp;</span>query.aggregation_selections,
+                    trace_id,
                 )
                 .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">scalars</span> <span class="op">=</span> <span class="ident">processor</span>.<span class="ident">apply</span>(<span class="ident">scalars</span>);
-            <span class="kw">let</span> (<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>) <span class="op">=</span>
-                <span class="ident">extract_aggregation_rows_from_scalars</span>(<span class="ident">scalars</span>, <span class="ident">query</span>.<span class="ident">aggregation_selections</span>);
+            <span class="kw">let </span>scalars = processor.apply(scalars);
+            <span class="kw">let </span>(scalars, aggregation_rows) =
+                extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
 
-            (<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">scalars</span> <span class="op">=</span> <span class="ident">tx</span>
-                .<span class="ident">get_many_records</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">model</span>,
-                    <span class="ident">query</span>.<span class="ident">args</span>.<span class="ident">clone</span>(),
-                    <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">selected_fields</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">aggregation_selections</span>,
-                    <span class="ident">trace_id</span>,
+            (scalars, aggregation_rows)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>scalars = tx
+                .get_many_records(
+                    <span class="kw-2">&amp;</span>query.model,
+                    query.args.clone(),
+                    <span class="kw-2">&amp;</span>query.selected_fields,
+                    <span class="kw-2">&amp;</span>query.aggregation_selections,
+                    trace_id,
                 )
                 .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let</span> (<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>) <span class="op">=</span>
-                <span class="ident">extract_aggregation_rows_from_scalars</span>(<span class="ident">scalars</span>, <span class="ident">query</span>.<span class="ident">aggregation_selections</span>);
-            (<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>)
+            <span class="kw">let </span>(scalars, aggregation_rows) =
+                extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
+            (scalars, aggregation_rows)
         };
 
-        <span class="kw">let</span> <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">process_nested</span>(<span class="ident">tx</span>, <span class="ident">query</span>.<span class="ident">nested</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">scalars</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>nested: Vec&lt;QueryResult&gt; = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>scalars)).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">RecordSelection</span> {
-            <span class="ident">name</span>: <span class="ident">query</span>.<span class="ident">name</span>,
-            <span class="ident">fields</span>: <span class="ident">query</span>.<span class="ident">selection_order</span>,
-            <span class="ident">scalars</span>,
-            <span class="ident">nested</span>,
-            <span class="ident">query_arguments</span>: <span class="ident">query</span>.<span class="ident">args</span>,
-            <span class="ident">model</span>: <span class="ident">query</span>.<span class="ident">model</span>,
-            <span class="ident">aggregation_rows</span>,
+        <span class="prelude-val">Ok</span>(RecordSelection {
+            name: query.name,
+            fields: query.selection_order,
+            scalars,
+            nested,
+            query_arguments: query.args,
+            model: query.model,
+            aggregation_rows,
         }
-        .<span class="ident">into</span>())
+        .into())
     };
 
-    <span class="ident">fut</span>.<span class="ident">boxed</span>()
+    fut.boxed()
 }
 
-<span class="doccomment">/// Queries related records for a set of parent IDs.</span>
-<span class="kw">fn</span> <span class="ident">read_related</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="kw-2">mut</span> <span class="ident">query</span>: <span class="ident">RelatedRecordsQuery</span>,
-    <span class="ident">parent_result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="ident">ManyRecords</span><span class="op">&gt;</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">parent_field</span>.<span class="ident">relation</span>();
-        <span class="kw">let</span> <span class="ident">is_m2m</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">is_many_to_many</span>();
-        <span class="kw">let</span> <span class="ident">processor</span> <span class="op">=</span> <span class="ident">InMemoryRecordProcessor::new_from_query_args</span>(<span class="kw-2">&amp;mut</span> <span class="ident">query</span>.<span class="ident">args</span>);
+<span class="doccomment">/// Queries related records for a set of parent IDs.
+</span><span class="kw">fn </span>read_related&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    tx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike,
+    <span class="kw-2">mut </span>query: RelatedRecordsQuery,
+    parent_result: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span>ManyRecords&gt;,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; BoxFuture&lt;<span class="lifetime">&#39;conn</span>, InterpretationResult&lt;QueryResult&gt;&gt; {
+    <span class="kw">let </span>fut = <span class="kw">async move </span>{
+        <span class="kw">let </span>relation = query.parent_field.relation();
+        <span class="kw">let </span>is_m2m = relation.is_many_to_many();
+        <span class="kw">let </span>processor = InMemoryRecordProcessor::new_from_query_args(<span class="kw-2">&amp;mut </span>query.args);
 
-        <span class="kw">let</span> (<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_m2m</span> {
-            <span class="ident">nested_read::m2m</span>(<span class="ident">tx</span>, <span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="ident">parent_result</span>, <span class="ident">processor</span>, <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">nested_read::one2m</span>(
-                <span class="ident">tx</span>,
-                <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">parent_field</span>,
-                <span class="ident">query</span>.<span class="ident">parent_results</span>,
-                <span class="ident">parent_result</span>,
-                <span class="ident">query</span>.<span class="ident">args</span>.<span class="ident">clone</span>(),
-                <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">selected_fields</span>,
-                <span class="ident">query</span>.<span class="ident">aggregation_selections</span>,
-                <span class="ident">processor</span>,
-                <span class="ident">trace_id</span>,
+        <span class="kw">let </span>(scalars, aggregation_rows) = <span class="kw">if </span>is_m2m {
+            nested_read::m2m(tx, <span class="kw-2">&amp;</span>query, parent_result, processor, trace_id).<span class="kw">await</span><span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            nested_read::one2m(
+                tx,
+                <span class="kw-2">&amp;</span>query.parent_field,
+                query.parent_results,
+                parent_result,
+                query.args.clone(),
+                <span class="kw-2">&amp;</span>query.selected_fields,
+                query.aggregation_selections,
+                processor,
+                trace_id,
             )
-            .<span class="kw">await</span><span class="question-mark">?</span>
-        };
+            .<span class="kw">await</span><span class="question-mark">?
+        </span>};
 
-        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">parent_field</span>.<span class="ident">related_model</span>();
-        <span class="kw">let</span> <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">process_nested</span>(<span class="ident">tx</span>, <span class="ident">query</span>.<span class="ident">nested</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">scalars</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>model = query.parent_field.related_model();
+        <span class="kw">let </span>nested: Vec&lt;QueryResult&gt; = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>scalars)).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">RecordSelection</span> {
-            <span class="ident">name</span>: <span class="ident">query</span>.<span class="ident">name</span>,
-            <span class="ident">fields</span>: <span class="ident">query</span>.<span class="ident">selection_order</span>,
-            <span class="ident">scalars</span>,
-            <span class="ident">nested</span>,
-            <span class="ident">query_arguments</span>: <span class="ident">query</span>.<span class="ident">args</span>,
-            <span class="ident">model</span>,
-            <span class="ident">aggregation_rows</span>,
+        <span class="prelude-val">Ok</span>(RecordSelection {
+            name: query.name,
+            fields: query.selection_order,
+            scalars,
+            nested,
+            query_arguments: query.args,
+            model,
+            aggregation_rows,
         }
-        .<span class="ident">into</span>())
+        .into())
     };
 
-    <span class="ident">fut</span>.<span class="ident">boxed</span>()
+    fut.boxed()
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">aggregate</span>(
-    <span class="ident">tx</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="ident">query</span>: <span class="ident">AggregateRecordsQuery</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">selection_order</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">selection_order</span>;
+<span class="kw">async fn </span>aggregate(
+    tx: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
+    query: AggregateRecordsQuery,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; InterpretationResult&lt;QueryResult&gt; {
+    <span class="kw">let </span>selection_order = query.selection_order;
 
-    <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> <span class="ident">tx</span>
-        .<span class="ident">aggregate_records</span>(
-            <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">model</span>,
-            <span class="ident">query</span>.<span class="ident">args</span>,
-            <span class="ident">query</span>.<span class="ident">selectors</span>,
-            <span class="ident">query</span>.<span class="ident">group_by</span>,
-            <span class="ident">query</span>.<span class="ident">having</span>,
-            <span class="ident">trace_id</span>,
+    <span class="kw">let </span>results = tx
+        .aggregate_records(
+            <span class="kw-2">&amp;</span>query.model,
+            query.args,
+            query.selectors,
+            query.group_by,
+            query.having,
+            trace_id,
         )
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">QueryResult::RecordAggregations</span>(<span class="ident">RecordAggregations</span> {
-        <span class="ident">selection_order</span>,
-        <span class="ident">results</span>,
+    <span class="prelude-val">Ok</span>(QueryResult::RecordAggregations(RecordAggregations {
+        selection_order,
+        results,
     }))
 }
 
-<span class="kw">fn</span> <span class="ident">process_nested</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadQuery</span><span class="op">&gt;</span>,
-    <span class="ident">parent_result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="ident">ManyRecords</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">parent_result</span>, <span class="prelude-val">Some</span>(<span class="ident">parent_records</span>) <span class="kw">if</span> <span class="ident">parent_records</span>.<span class="ident">records</span>.<span class="ident">is_empty</span>()) {
-            <span class="comment">// This catches most cases where there is no parent to cause a nested query. but sometimes even with parent records,</span>
-            <span class="comment">// we do not need to do roundtrips which is why the nested_reads contain additional logic</span>
-            <span class="macro">vec!</span>[]
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nested_results</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">nested</span>.<span class="ident">len</span>());
+<span class="kw">fn </span>process_nested&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    tx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike,
+    nested: Vec&lt;ReadQuery&gt;,
+    parent_result: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span>ManyRecords&gt;,
+) -&gt; BoxFuture&lt;<span class="lifetime">&#39;conn</span>, InterpretationResult&lt;Vec&lt;QueryResult&gt;&gt;&gt; {
+    <span class="kw">let </span>fut = <span class="kw">async move </span>{
+        <span class="kw">let </span>results = <span class="kw">if </span><span class="macro">matches!</span>(parent_result, <span class="prelude-val">Some</span>(parent_records) <span class="kw">if </span>parent_records.records.is_empty()) {
+            <span class="comment">// This catches most cases where there is no parent to cause a nested query. but sometimes even with parent records,
+            // we do not need to do roundtrips which is why the nested_reads contain additional logic
+            </span><span class="macro">vec!</span>[]
+        } <span class="kw">else </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>nested_results = Vec::with_capacity(nested.len());
 
-            <span class="kw">for</span> <span class="ident">query</span> <span class="kw">in</span> <span class="ident">nested</span> {
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">execute</span>(<span class="ident">tx</span>, <span class="ident">query</span>, <span class="ident">parent_result</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="ident">nested_results</span>.<span class="ident">push</span>(<span class="ident">result</span>);
+            <span class="kw">for </span>query <span class="kw">in </span>nested {
+                <span class="kw">let </span>result = execute(tx, query, parent_result, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                nested_results.push(result);
             }
 
-            <span class="ident">nested_results</span>
+            nested_results
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">results</span>)
+        <span class="prelude-val">Ok</span>(results)
     };
 
-    <span class="ident">fut</span>.<span class="ident">boxed</span>()
+    fut.boxed()
 }
 
-<span class="doccomment">/// Removes the relation aggregation data from the database result and collect it into some RelAggregationRow</span>
-<span class="doccomment">/// Explanation: Relation aggregations on a findMany are selected from an output object type. eg:</span>
-<span class="doccomment">/// findManyX { _count { rel_1, rel 2 } }</span>
-<span class="doccomment">/// Output object types are typically used for selecting relations, so they&#39;re are queried in a different request</span>
-<span class="doccomment">/// In the case of relation aggregations though, we query that data along side the request sent for the base model (&quot;X&quot; in the query above)</span>
-<span class="doccomment">/// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the schema</span>
-<span class="doccomment">/// This function takes care of removing the aggregation data from the database result and collects it separately</span>
-<span class="doccomment">/// so that it can be serialized separately later according to the schema</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_aggregation_rows_from_scalars</span>(
-    <span class="kw-2">mut</span> <span class="ident">scalars</span>: <span class="ident">ManyRecords</span>,
-    <span class="ident">aggr_selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationSelection</span><span class="op">&gt;</span>,
-) -&gt; (<span class="ident">ManyRecords</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">aggr_selections</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> (<span class="ident">scalars</span>, <span class="prelude-val">None</span>);
+<span class="doccomment">/// Removes the relation aggregation data from the database result and collect it into some RelAggregationRow
+/// Explanation: Relation aggregations on a findMany are selected from an output object type. eg:
+/// findManyX { _count { rel_1, rel 2 } }
+/// Output object types are typically used for selecting relations, so they&#39;re are queried in a different request
+/// In the case of relation aggregations though, we query that data along side the request sent for the base model (&quot;X&quot; in the query above)
+/// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the schema
+/// This function takes care of removing the aggregation data from the database result and collects it separately
+/// so that it can be serialized separately later according to the schema
+</span><span class="kw">pub fn </span>extract_aggregation_rows_from_scalars(
+    <span class="kw-2">mut </span>scalars: ManyRecords,
+    aggr_selections: Vec&lt;RelAggregationSelection&gt;,
+) -&gt; (ManyRecords, <span class="prelude-ty">Option</span>&lt;Vec&lt;RelAggregationRow&gt;&gt;) {
+    <span class="kw">if </span>aggr_selections.is_empty() {
+        <span class="kw">return </span>(scalars, <span class="prelude-val">None</span>);
     }
 
-    <span class="kw">let</span> <span class="ident">aggr_field_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="ident">RelAggregationSelection</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">aggr_selections</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">aggr_sel</span><span class="op">|</span> (<span class="ident">aggr_sel</span>.<span class="ident">db_alias</span>(), <span class="ident">aggr_sel</span>))
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>aggr_field_names: HashMap&lt;String, <span class="kw-2">&amp;</span>RelAggregationSelection&gt; = aggr_selections
+        .iter()
+        .map(|aggr_sel| (aggr_sel.db_alias(), aggr_sel))
+        .collect();
 
-    <span class="kw">let</span> <span class="ident">indexes_to_remove</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">scalars</span>
-        .<span class="ident">field_names</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">enumerate</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">field_name</span>)<span class="op">|</span> <span class="ident">aggr_field_names</span>.<span class="ident">get</span>(<span class="ident">field_name</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">aggr_sel</span><span class="op">|</span> (<span class="ident">i</span>, <span class="kw-2">*</span><span class="ident">aggr_sel</span>)))
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>indexes_to_remove: Vec&lt;<span class="kw">_</span>&gt; = scalars
+        .field_names
+        .iter()
+        .enumerate()
+        .filter_map(|(i, field_name)| aggr_field_names.get(field_name).map(|aggr_sel| (i, <span class="kw-2">*</span>aggr_sel)))
+        .collect();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aggregation_rows</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationRow</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n_record_removed</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>aggregation_rows: Vec&lt;RelAggregationRow&gt; = <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>n_record_removed = <span class="number">0</span>;
 
-    <span class="kw">for</span> (<span class="ident">index_to_remove</span>, <span class="ident">aggr_sel</span>) <span class="kw">in</span> <span class="ident">indexes_to_remove</span>.<span class="ident">into_iter</span>() {
-        <span class="kw">let</span> <span class="ident">index_to_remove</span> <span class="op">=</span> <span class="ident">index_to_remove</span> <span class="op">-</span> <span class="ident">n_record_removed</span>;
+    <span class="kw">for </span>(index_to_remove, aggr_sel) <span class="kw">in </span>indexes_to_remove.into_iter() {
+        <span class="kw">let </span>index_to_remove = index_to_remove - n_record_removed;
 
-        <span class="comment">// Remove all aggr field names</span>
-        <span class="ident">scalars</span>.<span class="ident">field_names</span>.<span class="ident">remove</span>(<span class="ident">index_to_remove</span>);
+        <span class="comment">// Remove all aggr field names
+        </span>scalars.field_names.remove(index_to_remove);
 
-        <span class="comment">// Remove and collect all aggr prisma values</span>
-        <span class="kw">for</span> (<span class="ident">r_index</span>, <span class="ident">record</span>) <span class="kw">in</span> <span class="ident">scalars</span>.<span class="ident">records</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">values</span>.<span class="ident">remove</span>(<span class="ident">index_to_remove</span>);
-            <span class="kw">let</span> <span class="ident">aggr_result</span> <span class="op">=</span> <span class="ident">aggr_sel</span>.<span class="ident">clone</span>().<span class="ident">into_result</span>(<span class="ident">val</span>);
+        <span class="comment">// Remove and collect all aggr prisma values
+        </span><span class="kw">for </span>(r_index, record) <span class="kw">in </span>scalars.records.iter_mut().enumerate() {
+            <span class="kw">let </span>val = record.values.remove(index_to_remove);
+            <span class="kw">let </span>aggr_result = aggr_sel.clone().into_result(val);
 
-            <span class="comment">// Group the aggregation results by record</span>
-            <span class="kw">match</span> <span class="ident">aggregation_rows</span>.<span class="ident">get_mut</span>(<span class="ident">r_index</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">inner_vec</span>) =&gt; <span class="ident">inner_vec</span>.<span class="ident">push</span>(<span class="ident">aggr_result</span>),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">aggregation_rows</span>.<span class="ident">push</span>(<span class="macro">vec!</span>[<span class="ident">aggr_result</span>]),
+            <span class="comment">// Group the aggregation results by record
+            </span><span class="kw">match </span>aggregation_rows.get_mut(r_index) {
+                <span class="prelude-val">Some</span>(inner_vec) =&gt; inner_vec.push(aggr_result),
+                <span class="prelude-val">None </span>=&gt; aggregation_rows.push(<span class="macro">vec!</span>[aggr_result]),
             }
         }
-        <span class="ident">n_record_removed</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        n_record_removed += <span class="number">1</span>;
     }
 
-    (<span class="ident">scalars</span>, <span class="prelude-val">Some</span>(<span class="ident">aggregation_rows</span>))
+    (scalars, <span class="prelude-val">Some</span>(aggregation_rows))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

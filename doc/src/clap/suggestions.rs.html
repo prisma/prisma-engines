@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/suggestions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>suggestions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../clap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/suggestions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>suggestions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../clap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -139,146 +139,146 @@
 <span id="139">139</span>
 <span id="140">140</span>
 <span id="141">141</span>
-</pre><pre class="rust"><code><span class="comment">// Internal</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">app::App</span>, <span class="ident">fmt::Format</span>};
+</pre><pre class="rust"><code><span class="comment">// Internal
+</span><span class="kw">use crate</span>::{app::App, fmt::Format};
 
-<span class="doccomment">/// Produces a string from a given list of possible values which is similar to</span>
-<span class="doccomment">/// the passed in value `v` with a certain confidence.</span>
-<span class="doccomment">/// Thus in a list of possible values like [&quot;foo&quot;, &quot;bar&quot;], the value &quot;fop&quot; will yield</span>
-<span class="doccomment">/// `Some(&quot;foo&quot;)`, whereas &quot;blark&quot; would yield `None`.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;suggestions&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy::needless_lifetimes</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">did_you_mean</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">possible_values</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Produces a string from a given list of possible values which is similar to
+/// the passed in value `v` with a certain confidence.
+/// Thus in a list of possible values like [&quot;foo&quot;, &quot;bar&quot;], the value &quot;fop&quot; will yield
+/// `Some(&quot;foo&quot;)`, whereas &quot;blark&quot; would yield `None`.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;suggestions&quot;</span>)]
+#[cfg_attr(feature = <span class="string">&quot;cargo-clippy&quot;</span>, allow(clippy::needless_lifetimes))]
+</span><span class="kw">pub fn </span>did_you_mean&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized, I&gt;(v: <span class="kw-2">&amp;</span>str, possible_values: I) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;
+<span class="kw">where
+    </span>T: AsRef&lt;str&gt; + <span class="lifetime">&#39;a</span>,
+    I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">candidate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">for</span> <span class="ident">pv</span> <span class="kw">in</span> <span class="ident">possible_values</span> {
-        <span class="kw">let</span> <span class="ident">confidence</span> <span class="op">=</span> <span class="ident">strsim::jaro_winkler</span>(<span class="ident">v</span>, <span class="ident">pv</span>.<span class="ident">as_ref</span>());
-        <span class="kw">if</span> <span class="ident">confidence</span> <span class="op">&gt;</span> <span class="number">0.8</span> <span class="op">&amp;&amp;</span> (<span class="ident">candidate</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> (<span class="ident">candidate</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="number">0</span> <span class="op">&lt;</span> <span class="ident">confidence</span>))
+    <span class="kw">let </span><span class="kw-2">mut </span>candidate: <span class="prelude-ty">Option</span>&lt;(f64, <span class="kw-2">&amp;</span>str)&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">for </span>pv <span class="kw">in </span>possible_values {
+        <span class="kw">let </span>confidence = strsim::jaro_winkler(v, pv.as_ref());
+        <span class="kw">if </span>confidence &gt; <span class="number">0.8 </span>&amp;&amp; (candidate.is_none() || (candidate.as_ref().unwrap().<span class="number">0 </span>&lt; confidence))
         {
-            <span class="ident">candidate</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">confidence</span>, <span class="ident">pv</span>.<span class="ident">as_ref</span>()));
+            candidate = <span class="prelude-val">Some</span>((confidence, pv.as_ref()));
         }
     }
-    <span class="kw">match</span> <span class="ident">candidate</span> {
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">candidate</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">candidate</span>),
+    <span class="kw">match </span>candidate {
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>((<span class="kw">_</span>, candidate)) =&gt; <span class="prelude-val">Some</span>(candidate),
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;suggestions&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">did_you_mean</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw">_</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;suggestions&quot;</span>))]
+</span><span class="kw">pub fn </span>did_you_mean&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized, I&gt;(<span class="kw">_</span>: <span class="kw-2">&amp;</span>str, <span class="kw">_</span>: I) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;
+<span class="kw">where
+    </span>T: AsRef&lt;str&gt; + <span class="lifetime">&#39;a</span>,
+    I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;,
 {
-    <span class="prelude-val">None</span>
-}
+    <span class="prelude-val">None
+</span>}
 
-<span class="doccomment">/// Returns a suffix that can be empty, or is the standard &#39;did you mean&#39; phrase</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">did_you_mean_flag_suffix</span><span class="op">&lt;</span><span class="lifetime">&#39;z</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(
-    <span class="ident">arg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">args_rest</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;z</span> [<span class="kw-2">&amp;</span><span class="ident">str</span>],
-    <span class="ident">longs</span>: <span class="ident">I</span>,
-    <span class="ident">subcommands</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;z</span> [<span class="ident">App</span>],
-) -&gt; (<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;z</span> <span class="ident">str</span><span class="op">&gt;</span>)
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;z</span>,
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;z</span> <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Returns a suffix that can be empty, or is the standard &#39;did you mean&#39; phrase
+</span><span class="kw">pub fn </span>did_you_mean_flag_suffix&lt;<span class="lifetime">&#39;z</span>, T, I&gt;(
+    arg: <span class="kw-2">&amp;</span>str,
+    args_rest: <span class="kw-2">&amp;</span><span class="lifetime">&#39;z </span>[<span class="kw-2">&amp;</span>str],
+    longs: I,
+    subcommands: <span class="kw-2">&amp;</span><span class="lifetime">&#39;z </span>[App],
+) -&gt; (String, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;z </span>str&gt;)
+<span class="kw">where
+    </span>T: AsRef&lt;str&gt; + <span class="lifetime">&#39;z</span>,
+    I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;z </span>T&gt;,
 {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">candidate</span>) <span class="op">=</span> <span class="ident">did_you_mean</span>(<span class="ident">arg</span>, <span class="ident">longs</span>) {
-        <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(candidate) = did_you_mean(arg, longs) {
+        <span class="kw">let </span>suffix = <span class="macro">format!</span>(
             <span class="string">&quot;\n\tDid you mean {}{}?&quot;</span>,
-            <span class="ident">Format::Good</span>(<span class="string">&quot;--&quot;</span>),
-            <span class="ident">Format::Good</span>(<span class="ident">candidate</span>)
+            Format::Good(<span class="string">&quot;--&quot;</span>),
+            Format::Good(candidate)
         );
-        <span class="kw">return</span> (<span class="ident">suffix</span>, <span class="prelude-val">Some</span>(<span class="ident">candidate</span>));
+        <span class="kw">return </span>(suffix, <span class="prelude-val">Some</span>(candidate));
     }
 
-    <span class="ident">subcommands</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">subcommand</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">subcommand</span>
-                .<span class="ident">p</span>
-                .<span class="ident">flags</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">s</span>.<span class="ident">long</span>)
-                .<span class="ident">chain</span>(<span class="ident">subcommand</span>.<span class="ident">p</span>.<span class="ident">opts</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">s</span>.<span class="ident">long</span>));
+    subcommands
+        .iter()
+        .filter_map(|subcommand| {
+            <span class="kw">let </span>opts = subcommand
+                .p
+                .flags
+                .iter()
+                .filter_map(|f| f.s.long)
+                .chain(subcommand.p.opts.iter().filter_map(|o| o.s.long));
 
-            <span class="kw">let</span> <span class="ident">candidate</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">did_you_mean</span>(<span class="ident">arg</span>, <span class="ident">opts</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">candidate</span>) =&gt; <span class="ident">candidate</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="kw">let </span>candidate = <span class="kw">match </span>did_you_mean(arg, opts) {
+                <span class="prelude-val">Some</span>(candidate) =&gt; candidate,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             };
-            <span class="kw">let</span> <span class="ident">score</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args_rest</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="ident">subcommand</span>.<span class="ident">get_name</span>()) {
-                <span class="prelude-val">Some</span>(<span class="ident">score</span>) =&gt; <span class="ident">score</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="kw">let </span>score = <span class="kw">match </span>args_rest.iter().position(|x| <span class="kw-2">*</span>x == subcommand.get_name()) {
+                <span class="prelude-val">Some</span>(score) =&gt; score,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             };
 
-            <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="macro">format!</span>(
+            <span class="kw">let </span>suffix = <span class="macro">format!</span>(
                 <span class="string">&quot;\n\tDid you mean to put &#39;{}{}&#39; after the subcommand &#39;{}&#39;?&quot;</span>,
-                <span class="ident">Format::Good</span>(<span class="string">&quot;--&quot;</span>),
-                <span class="ident">Format::Good</span>(<span class="ident">candidate</span>),
-                <span class="ident">Format::Good</span>(<span class="ident">subcommand</span>.<span class="ident">get_name</span>())
+                Format::Good(<span class="string">&quot;--&quot;</span>),
+                Format::Good(candidate),
+                Format::Good(subcommand.get_name())
             );
 
-            <span class="prelude-val">Some</span>((<span class="ident">score</span>, (<span class="ident">suffix</span>, <span class="prelude-val">Some</span>(<span class="ident">candidate</span>))))
+            <span class="prelude-val">Some</span>((score, (suffix, <span class="prelude-val">Some</span>(candidate))))
         })
-        .<span class="ident">min_by_key</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">score</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">score</span>)
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">suggestion</span>)<span class="op">|</span> <span class="ident">suggestion</span>)
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> (<span class="ident">String::new</span>(), <span class="prelude-val">None</span>))
+        .min_by_key(|<span class="kw-2">&amp;</span>(score, <span class="kw">_</span>)| score)
+        .map(|(<span class="kw">_</span>, suggestion)| suggestion)
+        .unwrap_or_else(|| (String::new(), <span class="prelude-val">None</span>))
 }
 
-<span class="doccomment">/// Returns a suffix that can be empty, or is the standard &#39;did you mean&#39; phrase</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">did_you_mean_value_suffix</span><span class="op">&lt;</span><span class="lifetime">&#39;z</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">arg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">values</span>: <span class="ident">I</span>) -&gt; (<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;z</span> <span class="ident">str</span><span class="op">&gt;</span>)
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;z</span>,
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;z</span> <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Returns a suffix that can be empty, or is the standard &#39;did you mean&#39; phrase
+</span><span class="kw">pub fn </span>did_you_mean_value_suffix&lt;<span class="lifetime">&#39;z</span>, T, I&gt;(arg: <span class="kw-2">&amp;</span>str, values: I) -&gt; (String, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;z </span>str&gt;)
+<span class="kw">where
+    </span>T: AsRef&lt;str&gt; + <span class="lifetime">&#39;z</span>,
+    I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;z </span>T&gt;,
 {
-    <span class="kw">match</span> <span class="ident">did_you_mean</span>(<span class="ident">arg</span>, <span class="ident">values</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">candidate</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;\n\tDid you mean &#39;{}&#39;?&quot;</span>, <span class="ident">Format::Good</span>(<span class="ident">candidate</span>));
-            (<span class="ident">suffix</span>, <span class="prelude-val">Some</span>(<span class="ident">candidate</span>))
+    <span class="kw">match </span>did_you_mean(arg, values) {
+        <span class="prelude-val">Some</span>(candidate) =&gt; {
+            <span class="kw">let </span>suffix = <span class="macro">format!</span>(<span class="string">&quot;\n\tDid you mean &#39;{}&#39;?&quot;</span>, Format::Good(candidate));
+            (suffix, <span class="prelude-val">Some</span>(candidate))
         }
-        <span class="prelude-val">None</span> =&gt; (<span class="ident">String::new</span>(), <span class="prelude-val">None</span>),
+        <span class="prelude-val">None </span>=&gt; (String::new(), <span class="prelude-val">None</span>),
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">features</span> <span class="op">=</span> <span class="string">&quot;suggestions&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(all(test, features = <span class="string">&quot;suggestions&quot;</span>))]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">possible_values_match</span>() {
-        <span class="kw">let</span> <span class="ident">p_vals</span> <span class="op">=</span> [<span class="string">&quot;test&quot;</span>, <span class="string">&quot;possible&quot;</span>, <span class="string">&quot;values&quot;</span>];
-        <span class="macro">assert_eq!</span>(<span class="ident">did_you_mean</span>(<span class="string">&quot;tst&quot;</span>, <span class="ident">p_vals</span>.<span class="ident">iter</span>()), <span class="prelude-val">Some</span>(<span class="string">&quot;test&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>possible_values_match() {
+        <span class="kw">let </span>p_vals = [<span class="string">&quot;test&quot;</span>, <span class="string">&quot;possible&quot;</span>, <span class="string">&quot;values&quot;</span>];
+        <span class="macro">assert_eq!</span>(did_you_mean(<span class="string">&quot;tst&quot;</span>, p_vals.iter()), <span class="prelude-val">Some</span>(<span class="string">&quot;test&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">possible_values_nomatch</span>() {
-        <span class="kw">let</span> <span class="ident">p_vals</span> <span class="op">=</span> [<span class="string">&quot;test&quot;</span>, <span class="string">&quot;possible&quot;</span>, <span class="string">&quot;values&quot;</span>];
-        <span class="macro">assert!</span>(<span class="ident">did_you_mean</span>(<span class="string">&quot;hahaahahah&quot;</span>, <span class="ident">p_vals</span>.<span class="ident">iter</span>()).<span class="ident">is_none</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>possible_values_nomatch() {
+        <span class="kw">let </span>p_vals = [<span class="string">&quot;test&quot;</span>, <span class="string">&quot;possible&quot;</span>, <span class="string">&quot;values&quot;</span>];
+        <span class="macro">assert!</span>(did_you_mean(<span class="string">&quot;hahaahahah&quot;</span>, p_vals.iter()).is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">suffix_long</span>() {
-        <span class="kw">let</span> <span class="ident">p_vals</span> <span class="op">=</span> [<span class="string">&quot;test&quot;</span>, <span class="string">&quot;possible&quot;</span>, <span class="string">&quot;values&quot;</span>];
-        <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="string">&quot;\n\tDid you mean \&#39;--test\&#39;?&quot;</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>suffix_long() {
+        <span class="kw">let </span>p_vals = [<span class="string">&quot;test&quot;</span>, <span class="string">&quot;possible&quot;</span>, <span class="string">&quot;values&quot;</span>];
+        <span class="kw">let </span>suffix = <span class="string">&quot;\n\tDid you mean \&#39;--test\&#39;?&quot;</span>;
         <span class="macro">assert_eq!</span>(
-            <span class="ident">did_you_mean_flag_suffix</span>(<span class="string">&quot;tst&quot;</span>, <span class="ident">p_vals</span>.<span class="ident">iter</span>(), []),
-            (<span class="ident">suffix</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;test&quot;</span>))
+            did_you_mean_flag_suffix(<span class="string">&quot;tst&quot;</span>, p_vals.iter(), []),
+            (suffix, <span class="prelude-val">Some</span>(<span class="string">&quot;test&quot;</span>))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">suffix_enum</span>() {
-        <span class="kw">let</span> <span class="ident">p_vals</span> <span class="op">=</span> [<span class="string">&quot;test&quot;</span>, <span class="string">&quot;possible&quot;</span>, <span class="string">&quot;values&quot;</span>];
-        <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="string">&quot;\n\tDid you mean \&#39;test\&#39;?&quot;</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>suffix_enum() {
+        <span class="kw">let </span>p_vals = [<span class="string">&quot;test&quot;</span>, <span class="string">&quot;possible&quot;</span>, <span class="string">&quot;values&quot;</span>];
+        <span class="kw">let </span>suffix = <span class="string">&quot;\n\tDid you mean \&#39;test\&#39;?&quot;</span>;
         <span class="macro">assert_eq!</span>(
-            <span class="ident">did_you_mean_value_suffix</span>(<span class="string">&quot;tst&quot;</span>, <span class="ident">p_vals</span>.<span class="ident">iter</span>()),
-            (<span class="ident">suffix</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;test&quot;</span>))
+            did_you_mean_value_suffix(<span class="string">&quot;tst&quot;</span>, p_vals.iter()),
+            (suffix, <span class="prelude-val">Some</span>(<span class="string">&quot;test&quot;</span>))
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

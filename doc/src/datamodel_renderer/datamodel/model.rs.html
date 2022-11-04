@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/datamodel/model.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>model.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../datamodel_renderer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/datamodel/model.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>model.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../datamodel_renderer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -571,528 +571,528 @@
 <span id="571">571</span>
 <span id="572">572</span>
 <span id="573">573</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">field</span>;
-<span class="kw">mod</span> <span class="ident">id</span>;
-<span class="kw">mod</span> <span class="ident">index</span>;
-<span class="kw">mod</span> <span class="ident">index_field_input</span>;
-<span class="kw">mod</span> <span class="ident">relation</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>field;
+<span class="kw">mod </span>id;
+<span class="kw">mod </span>index;
+<span class="kw">mod </span>index_field_input;
+<span class="kw">mod </span>relation;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">field::ModelField</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">id</span>::{<span class="ident">IdDefinition</span>, <span class="ident">IdFieldDefinition</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">index</span>::{<span class="ident">IndexDefinition</span>, <span class="ident">IndexOps</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">index_field_input</span>::{<span class="ident">IndexFieldInput</span>, <span class="ident">IndexFieldOptions</span>};
-<span class="kw">use</span> <span class="ident">psl::dml</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">relation::Relation</span>;
+<span class="kw">pub use </span>field::ModelField;
+<span class="kw">pub use </span>id::{IdDefinition, IdFieldDefinition};
+<span class="kw">pub use </span>index::{IndexDefinition, IndexOps};
+<span class="kw">pub use </span>index_field_input::{IndexFieldInput, IndexFieldOptions};
+<span class="kw">use </span>psl::dml;
+<span class="kw">pub use </span>relation::Relation;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::value</span>::{<span class="ident">Constant</span>, <span class="ident">ConstantNameValidationError</span>, <span class="ident">Documentation</span>, <span class="ident">Function</span>, <span class="ident">Text</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::HashMap</span>, <span class="ident">fmt</span>};
+<span class="kw">use </span><span class="kw">crate</span>::value::{Constant, ConstantNameValidationError, Documentation, Function, Text};
+<span class="kw">use </span>std::{borrow::Cow, collections::HashMap, fmt};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::attributes::BlockAttribute</span>;
+<span class="kw">use </span><span class="kw">super</span>::attributes::BlockAttribute;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Commented</span> {
-    <span class="ident">On</span>,
-    <span class="ident">Off</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">enum </span>Commented {
+    On,
+    Off,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Commented</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Commented::On</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;// &quot;</span>),
-            <span class="ident">Commented::Off</span> =&gt; <span class="prelude-val">Ok</span>(()),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Commented {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            Commented::On =&gt; f.write_str(<span class="string">&quot;// &quot;</span>),
+            Commented::Off =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 }
 
-<span class="doccomment">/// Defines a model block.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Model</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">name</span>: <span class="ident">Constant</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Documentation</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">commented_out</span>: <span class="ident">Commented</span>,
-    <span class="ident">ignore</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BlockAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IdDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">map</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BlockAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">indexes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BlockAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Defines a model block.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Model&lt;<span class="lifetime">&#39;a</span>&gt; {
+    name: Constant&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    documentation: <span class="prelude-ty">Option</span>&lt;Documentation&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    commented_out: Commented,
+    ignore: <span class="prelude-ty">Option</span>&lt;BlockAttribute&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    id: <span class="prelude-ty">Option</span>&lt;IdDefinition&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    map: <span class="prelude-ty">Option</span>&lt;BlockAttribute&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    fields: Vec&lt;ModelField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    indexes: Vec&lt;IndexDefinition&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    schema: <span class="prelude-ty">Option</span>&lt;BlockAttribute&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Model</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new model declaration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// model User {</span>
-    <span class="doccomment">/// //    ^^^^ name</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">map</span>, <span class="ident">commented_out</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">Constant::new</span>(<span class="ident">name</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">name</span>) =&gt; (<span class="ident">name</span>, <span class="prelude-val">None</span>, <span class="ident">Commented::Off</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">ConstantNameValidationError::WasSanitized</span> { <span class="ident">sanitized</span> }) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Function::new</span>(<span class="string">&quot;map&quot;</span>);
-                <span class="ident">map</span>.<span class="ident">push_param</span>(<span class="ident">name</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Model&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Create a new model declaration.
+    ///
+    /// ```ignore
+    /// model User {
+    /// //    ^^^^ name
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>new(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(name, map, commented_out) = <span class="kw">match </span>Constant::new(name) {
+            <span class="prelude-val">Ok</span>(name) =&gt; (name, <span class="prelude-val">None</span>, Commented::Off),
+            <span class="prelude-val">Err</span>(ConstantNameValidationError::WasSanitized { sanitized }) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>map = Function::new(<span class="string">&quot;map&quot;</span>);
+                map.push_param(name);
 
-                <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">BlockAttribute</span>(<span class="ident">map</span>);
+                <span class="kw">let </span>map = BlockAttribute(map);
 
-                (<span class="ident">sanitized</span>, <span class="prelude-val">Some</span>(<span class="ident">map</span>), <span class="ident">Commented::Off</span>)
+                (sanitized, <span class="prelude-val">Some</span>(map), Commented::Off)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">ConstantNameValidationError::SanitizedEmpty</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Function::new</span>(<span class="string">&quot;map&quot;</span>);
-                <span class="ident">map</span>.<span class="ident">push_param</span>(<span class="ident">name</span>);
+            <span class="prelude-val">Err</span>(ConstantNameValidationError::SanitizedEmpty) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>map = Function::new(<span class="string">&quot;map&quot;</span>);
+                map.push_param(name);
 
-                <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">BlockAttribute</span>(<span class="ident">map</span>);
+                <span class="kw">let </span>map = BlockAttribute(map);
 
-                (<span class="ident">Constant::new_no_validate</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">name</span>)), <span class="prelude-val">Some</span>(<span class="ident">map</span>), <span class="ident">Commented::On</span>)
+                (Constant::new_no_validate(Cow::Borrowed(name)), <span class="prelude-val">Some</span>(map), Commented::On)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">ConstantNameValidationError::OriginalEmpty</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Function::new</span>(<span class="string">&quot;map&quot;</span>);
-                <span class="ident">map</span>.<span class="ident">push_param</span>(<span class="ident">name</span>);
+            <span class="prelude-val">Err</span>(ConstantNameValidationError::OriginalEmpty) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>map = Function::new(<span class="string">&quot;map&quot;</span>);
+                map.push_param(name);
 
-                <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">BlockAttribute</span>(<span class="ident">map</span>);
+                <span class="kw">let </span>map = BlockAttribute(map);
 
-                (<span class="ident">Constant::new_no_validate</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">name</span>)), <span class="prelude-val">Some</span>(<span class="ident">map</span>), <span class="ident">Commented::On</span>)
+                (Constant::new_no_validate(Cow::Borrowed(name)), <span class="prelude-val">Some</span>(map), Commented::On)
             }
         };
 
-        <span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">commented_out</span>,
-            <span class="ident">map</span>,
-            <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
-            <span class="ident">ignore</span>: <span class="prelude-val">None</span>,
-            <span class="ident">id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">schema</span>: <span class="prelude-val">None</span>,
-            <span class="ident">fields</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">indexes</span>: <span class="ident">Vec::new</span>(),
+        <span class="self">Self </span>{
+            name,
+            commented_out,
+            map,
+            documentation: <span class="prelude-val">None</span>,
+            ignore: <span class="prelude-val">None</span>,
+            id: <span class="prelude-val">None</span>,
+            schema: <span class="prelude-val">None</span>,
+            fields: Vec::new(),
+            indexes: Vec::new(),
         }
     }
 
-    <span class="doccomment">/// Documentation of the model.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// /// This is the documentation.</span>
-    <span class="doccomment">/// model Foo {</span>
-    <span class="doccomment">///   ....</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">documentation</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Documentation</span>(<span class="ident">documentation</span>));
+    <span class="doccomment">/// Documentation of the model.
+    ///
+    /// ```ignore
+    /// /// This is the documentation.
+    /// model Foo {
+    ///   ....
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation));
     }
 
-    <span class="doccomment">/// Ignore the model.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// model Foo {</span>
-    <span class="doccomment">///   @@ignore</span>
-    <span class="doccomment">///   ^^^^^^^^ this</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">ignore</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">BlockAttribute</span>(<span class="ident">Function::new</span>(<span class="string">&quot;ignore&quot;</span>)));
+    <span class="doccomment">/// Ignore the model.
+    ///
+    /// ```ignore
+    /// model Foo {
+    ///   @@ignore
+    ///   ^^^^^^^^ this
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>ignore(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.ignore = <span class="prelude-val">Some</span>(BlockAttribute(Function::new(<span class="string">&quot;ignore&quot;</span>)));
     }
 
-    <span class="doccomment">/// Add a model-level id definition.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// model Foo {</span>
-    <span class="doccomment">///   @@id([field1, field2(sort: Desc)])</span>
-    <span class="doccomment">///   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">IdDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>);
+    <span class="doccomment">/// Add a model-level id definition.
+    ///
+    /// ```ignore
+    /// model Foo {
+    ///   @@id([field1, field2(sort: Desc)])
+    ///   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: IdDefinition&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.id = <span class="prelude-val">Some</span>(id);
     }
 
-    <span class="doccomment">/// Add a model-level mapping.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// model Foo {</span>
-    <span class="doccomment">///   @@map(&quot;1Foo&quot;)</span>
-    <span class="doccomment">///   ^^^^^^^^^^^^^ this</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fun</span> <span class="op">=</span> <span class="ident">Function::new</span>(<span class="string">&quot;map&quot;</span>);
-        <span class="ident">fun</span>.<span class="ident">push_param</span>(<span class="ident">map</span>);
+    <span class="doccomment">/// Add a model-level mapping.
+    ///
+    /// ```ignore
+    /// model Foo {
+    ///   @@map(&quot;1Foo&quot;)
+    ///   ^^^^^^^^^^^^^ this
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+        <span class="kw">let </span><span class="kw-2">mut </span>fun = Function::new(<span class="string">&quot;map&quot;</span>);
+        fun.push_param(map);
 
-        <span class="self">self</span>.<span class="ident">map</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">BlockAttribute</span>(<span class="ident">fun</span>));
+        <span class="self">self</span>.map = <span class="prelude-val">Some</span>(BlockAttribute(fun));
     }
 
-    <span class="doccomment">/// The schema attribute of the model block</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// model Foo {</span>
-    <span class="doccomment">///   @@schema(&quot;public&quot;)</span>
-    <span class="doccomment">///   ^^^^^^^^^^^^^^^^^^ this</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fun</span> <span class="op">=</span> <span class="ident">Function::new</span>(<span class="string">&quot;schema&quot;</span>);
-        <span class="ident">fun</span>.<span class="ident">push_param</span>(<span class="ident">schema</span>);
+    <span class="doccomment">/// The schema attribute of the model block
+    ///
+    /// ```ignore
+    /// model Foo {
+    ///   @@schema(&quot;public&quot;)
+    ///   ^^^^^^^^^^^^^^^^^^ this
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+        <span class="kw">let </span><span class="kw-2">mut </span>fun = Function::new(<span class="string">&quot;schema&quot;</span>);
+        fun.push_param(schema);
 
-        <span class="self">self</span>.<span class="ident">schema</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">BlockAttribute</span>(<span class="ident">fun</span>));
+        <span class="self">self</span>.schema = <span class="prelude-val">Some</span>(BlockAttribute(fun));
     }
 
-    <span class="doccomment">/// Comments the complete model block out.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// // model Foo {</span>
-    <span class="doccomment">/// //   id Int @id</span>
-    <span class="doccomment">/// // }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">comment_out</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">commented_out</span> <span class="op">=</span> <span class="ident">Commented::On</span>
+    <span class="doccomment">/// Comments the complete model block out.
+    ///
+    /// ```ignore
+    /// // model Foo {
+    /// //   id Int @id
+    /// // }
+    /// ```
+    </span><span class="kw">pub fn </span>comment_out(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.commented_out = Commented::On
     }
 
-    <span class="doccomment">/// Push a new field to the model.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// model Foo {</span>
-    <span class="doccomment">///   id Int @id</span>
-    <span class="doccomment">///   ^^^^^^^^^^ this</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_field</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="ident">ModelField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">field</span>);
+    <span class="doccomment">/// Push a new field to the model.
+    ///
+    /// ```ignore
+    /// model Foo {
+    ///   id Int @id
+    ///   ^^^^^^^^^^ this
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>push_field(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: ModelField&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.fields.push(field);
     }
 
-    <span class="doccomment">/// Push a new index to the model.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// model Foo {</span>
-    <span class="doccomment">///   @@index([field1, field2])</span>
-    <span class="doccomment">///   ^^^^^^^^^^^^^^^^^^^^^^^^^ this</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_index</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IndexDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">indexes</span>.<span class="ident">push</span>(<span class="ident">index</span>);
+    <span class="doccomment">/// Push a new index to the model.
+    ///
+    /// ```ignore
+    /// model Foo {
+    ///   @@index([field1, field2])
+    ///   ^^^^^^^^^^^^^^^^^^^^^^^^^ this
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>push_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: IndexDefinition&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.indexes.push(index);
     }
 
-    <span class="doccomment">/// Generate a model rendering from the deprecated DML structure.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Remove when destroying the DML.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_dml</span>(<span class="ident">datasource</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">psl::Datasource</span>, <span class="ident">dml_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">dml::Model</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Model::new</span>(<span class="kw-2">&amp;</span><span class="ident">dml_model</span>.<span class="ident">name</span>);
+    <span class="doccomment">/// Generate a model rendering from the deprecated DML structure.
+    ///
+    /// Remove when destroying the DML.
+    </span><span class="kw">pub fn </span>from_dml(datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource, dml_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::Model) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>model = Model::new(<span class="kw-2">&amp;</span>dml_model.name);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">docs</span>) <span class="op">=</span> <span class="ident">dml_model</span>.<span class="ident">documentation</span> {
-            <span class="ident">model</span>.<span class="ident">documentation</span>(<span class="ident">docs</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = dml_model.documentation {
+            model.documentation(docs);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span> <span class="ident">dml_model</span>.<span class="ident">database_name</span> {
-            <span class="ident">model</span>.<span class="ident">map</span>(<span class="ident">map</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = dml_model.database_name {
+            model.map(map);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">schema</span>) <span class="op">=</span> <span class="ident">dml_model</span>.<span class="ident">schema</span> {
-            <span class="ident">model</span>.<span class="ident">schema</span>(<span class="ident">schema</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>schema) = dml_model.schema {
+            model.schema(schema);
         }
 
-        <span class="kw">if</span> <span class="ident">dml_model</span>.<span class="ident">is_commented_out</span> {
-            <span class="ident">model</span>.<span class="ident">comment_out</span>();
+        <span class="kw">if </span>dml_model.is_commented_out {
+            model.comment_out();
         }
 
-        <span class="kw">if</span> <span class="ident">dml_model</span>.<span class="ident">is_ignored</span> {
-            <span class="ident">model</span>.<span class="ident">ignore</span>();
+        <span class="kw">if </span>dml_model.is_ignored {
+            model.ignore();
         }
 
-        <span class="kw">match</span> <span class="ident">dml_model</span>.<span class="ident">primary_key</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">pk</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">dml_model</span>.<span class="ident">has_single_id_field</span>() =&gt; {
-                <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">IndexFieldInput</span> {
-                    <span class="ident">name</span>: <span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>),
-                    <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">so</span><span class="op">|</span> <span class="ident">so</span>.<span class="ident">as_ref</span>()),
-                    <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>,
-                    <span class="ident">ops</span>: <span class="prelude-val">None</span>,
+        <span class="kw">match </span>dml_model.primary_key {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>pk) <span class="kw">if </span>!dml_model.has_single_id_field() =&gt; {
+                <span class="kw">let </span>fields = pk.fields.iter().map(|field| IndexFieldInput {
+                    name: Cow::Borrowed(<span class="kw-2">&amp;</span>field.name),
+                    sort_order: field.sort_order.as_ref().map(|so| so.as_ref()),
+                    length: field.length,
+                    ops: <span class="prelude-val">None</span>,
                 });
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">definition</span> <span class="op">=</span> <span class="ident">IdDefinition::new</span>(<span class="ident">fields</span>);
+                <span class="kw">let </span><span class="kw-2">mut </span>definition = IdDefinition::new(fields);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">name</span> {
-                    <span class="ident">definition</span>.<span class="ident">name</span>(<span class="ident">name</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>name) = pk.name {
+                    definition.name(name);
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pk</span>.<span class="ident">db_name</span> {
-                    <span class="ident">definition</span>.<span class="ident">map</span>(<span class="ident">map</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = <span class="kw-2">&amp;</span>pk.db_name {
+                    definition.map(map);
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">clustered</span>) <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">clustered</span> {
-                    <span class="ident">definition</span>.<span class="ident">clustered</span>(<span class="ident">clustered</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = pk.clustered {
+                    definition.clustered(clustered);
                 }
 
-                <span class="ident">model</span>.<span class="ident">id</span>(<span class="ident">definition</span>);
+                model.id(definition);
             }
-            <span class="kw">_</span> =&gt; (),
+            <span class="kw">_ </span>=&gt; (),
         }
 
-        <span class="comment">// weep</span>
-        <span class="kw">let</span> <span class="ident">uniques</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">IndexFieldOptions</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">dml_model</span>
-            .<span class="ident">indices</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">rev</span>() <span class="comment">// replicate existing behaviour on duplicate unique constraints</span>
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">ix</span><span class="op">|</span> <span class="ident">ix</span>.<span class="ident">is_unique</span>())
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">ix</span><span class="op">|</span> <span class="ident">ix</span>.<span class="ident">defined_on_field</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ix</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">definition</span> <span class="op">=</span> <span class="ident">ix</span>.<span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">IndexFieldOptions::default</span>();
+        <span class="comment">// weep
+        </span><span class="kw">let </span>uniques: HashMap&lt;<span class="kw-2">&amp;</span>str, IndexFieldOptions&gt; = dml_model
+            .indices
+            .iter()
+            .rev() <span class="comment">// replicate existing behaviour on duplicate unique constraints
+            </span>.filter(|ix| ix.is_unique())
+            .filter(|ix| ix.defined_on_field)
+            .map(|ix| {
+                <span class="kw">let </span>definition = ix.fields.first().unwrap();
+                <span class="kw">let </span><span class="kw-2">mut </span>opts = IndexFieldOptions::default();
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">clustered</span>) <span class="op">=</span> <span class="ident">ix</span>.<span class="ident">clustered</span> {
-                    <span class="ident">opts</span>.<span class="ident">clustered</span>(<span class="ident">clustered</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = ix.clustered {
+                    opts.clustered(clustered);
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">sort_order</span>) <span class="op">=</span> <span class="ident">definition</span>.<span class="ident">sort_order</span> {
-                    <span class="ident">opts</span>.<span class="ident">sort_order</span>(<span class="ident">sort_order</span>.<span class="ident">as_ref</span>());
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>sort_order) = definition.sort_order {
+                    opts.sort_order(sort_order.as_ref());
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">length</span>) <span class="op">=</span> <span class="ident">definition</span>.<span class="ident">length</span> {
-                    <span class="ident">opts</span>.<span class="ident">length</span>(<span class="ident">length</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = definition.length {
+                    opts.length(length);
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span> <span class="ident">ix</span>.<span class="ident">db_name</span> {
-                    <span class="ident">opts</span>.<span class="ident">map</span>(<span class="ident">map</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = ix.db_name {
+                    opts.map(map);
                 }
 
-                (<span class="ident">definition</span>.<span class="ident">from_field</span>(), <span class="ident">opts</span>)
+                (definition.from_field(), opts)
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">dml_model</span>.<span class="ident">primary_key</span>.<span class="ident">as_ref</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">defined_on_field</span>);
+        <span class="kw">let </span>primary_key = dml_model.primary_key.as_ref().filter(|pk| pk.defined_on_field);
 
-        <span class="kw">for</span> <span class="ident">dml_field</span> <span class="kw">in</span> <span class="ident">dml_model</span>.<span class="ident">fields</span>.<span class="ident">iter</span>() {
-            <span class="comment">// sob :(</span>
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">primary_key</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>();
+        <span class="kw">for </span>dml_field <span class="kw">in </span>dml_model.fields.iter() {
+            <span class="comment">// sob :(
+            </span><span class="kw">let </span>id = primary_key.and_then(|pk| {
+                <span class="kw">let </span>field = pk.fields.first().unwrap();
 
-                <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">dml_field</span>.<span class="ident">name</span>() {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">IdFieldDefinition::default</span>();
+                <span class="kw">if </span>field.name == dml_field.name() {
+                    <span class="kw">let </span><span class="kw-2">mut </span>opts = IdFieldDefinition::default();
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">clustered</span>) <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">clustered</span> {
-                        <span class="ident">opts</span>.<span class="ident">clustered</span>(<span class="ident">clustered</span>);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = pk.clustered {
+                        opts.clustered(clustered);
                     }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">sort_order</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">sort_order</span> {
-                        <span class="ident">opts</span>.<span class="ident">sort_order</span>(<span class="ident">sort_order</span>.<span class="ident">as_ref</span>());
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>sort_order) = field.sort_order {
+                        opts.sort_order(sort_order.as_ref());
                     }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">length</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">length</span> {
-                        <span class="ident">opts</span>.<span class="ident">length</span>(<span class="ident">length</span>);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = field.length {
+                        opts.length(length);
                     }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">db_name</span> {
-                        <span class="ident">opts</span>.<span class="ident">map</span>(<span class="ident">map</span>);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = pk.db_name {
+                        opts.map(map);
                     }
 
-                    <span class="prelude-val">Some</span>(<span class="ident">opts</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+                    <span class="prelude-val">Some</span>(opts)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
             });
 
-            <span class="ident">model</span>.<span class="ident">push_field</span>(<span class="ident">ModelField::from_dml</span>(<span class="ident">datasource</span>, <span class="ident">dml_model</span>, <span class="ident">dml_field</span>, <span class="kw-2">&amp;</span><span class="ident">uniques</span>, <span class="ident">id</span>));
+            model.push_field(ModelField::from_dml(datasource, dml_model, dml_field, <span class="kw-2">&amp;</span>uniques, id));
         }
 
-        <span class="kw">for</span> <span class="ident">dml_index</span> <span class="kw">in</span> <span class="ident">dml_model</span>.<span class="ident">indices</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="ident">dml_index</span>.<span class="ident">defined_on_field</span> <span class="op">&amp;&amp;</span> <span class="ident">dml_index</span>.<span class="ident">is_unique</span>() {
+        <span class="kw">for </span>dml_index <span class="kw">in </span>dml_model.indices.iter() {
+            <span class="kw">if </span>dml_index.defined_on_field &amp;&amp; dml_index.is_unique() {
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// cry</span>
-            <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">dml_index</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">String::new</span>();
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name_path</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">peekable</span>();
+            <span class="comment">// cry
+            </span><span class="kw">let </span>fields = dml_index.fields.iter().map(|f| {
+                <span class="kw">let </span><span class="kw-2">mut </span>name = String::new();
+                <span class="kw">let </span><span class="kw-2">mut </span>name_path = f.path.iter().peekable();
 
-                <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">ident</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="ident">name_path</span>.<span class="ident">next</span>() {
-                    <span class="ident">name</span>.<span class="ident">push_str</span>(<span class="ident">ident</span>);
+                <span class="kw">while let </span><span class="prelude-val">Some</span>((ident, <span class="kw">_</span>)) = name_path.next() {
+                    name.push_str(ident);
 
-                    <span class="kw">if</span> <span class="ident">name_path</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
-                        <span class="ident">name</span>.<span class="ident">push</span>(<span class="string">&#39;.&#39;</span>);
+                    <span class="kw">if </span>name_path.peek().is_some() {
+                        name.push(<span class="string">&#39;.&#39;</span>);
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">ops</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">operator_class</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                    <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_raw</span>() {
-                        <span class="ident">IndexOps::Raw</span>(<span class="ident">Text</span>(<span class="ident">c</span>.<span class="ident">as_ref</span>()))
-                    } <span class="kw">else</span> {
-                        <span class="ident">IndexOps::Managed</span>(<span class="ident">c</span>.<span class="ident">as_ref</span>())
+                <span class="kw">let </span>ops = f.operator_class.as_ref().map(|c| {
+                    <span class="kw">if </span>c.is_raw() {
+                        IndexOps::Raw(Text(c.as_ref()))
+                    } <span class="kw">else </span>{
+                        IndexOps::Managed(c.as_ref())
                     }
                 });
 
-                <span class="ident">IndexFieldInput</span> {
-                    <span class="ident">name</span>: <span class="ident">Cow::Owned</span>(<span class="ident">name</span>),
-                    <span class="ident">sort_order</span>: <span class="ident">f</span>.<span class="ident">sort_order</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">AsRef::as_ref</span>),
-                    <span class="ident">length</span>: <span class="ident">f</span>.<span class="ident">length</span>,
-                    <span class="ident">ops</span>,
+                IndexFieldInput {
+                    name: Cow::Owned(name),
+                    sort_order: f.sort_order.as_ref().map(AsRef::as_ref),
+                    length: f.length,
+                    ops,
                 }
             });
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">definition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">dml_index</span>.<span class="ident">tpe</span> {
-                <span class="ident">dml::IndexType::Unique</span> =&gt; <span class="ident">IndexDefinition::unique</span>(<span class="ident">fields</span>),
-                <span class="ident">dml::IndexType::Normal</span> =&gt; <span class="ident">IndexDefinition::index</span>(<span class="ident">fields</span>),
-                <span class="ident">dml::IndexType::Fulltext</span> =&gt; <span class="ident">IndexDefinition::fulltext</span>(<span class="ident">fields</span>),
+            <span class="kw">let </span><span class="kw-2">mut </span>definition = <span class="kw">match </span>dml_index.tpe {
+                dml::IndexType::Unique =&gt; IndexDefinition::unique(fields),
+                dml::IndexType::Normal =&gt; IndexDefinition::index(fields),
+                dml::IndexType::Fulltext =&gt; IndexDefinition::fulltext(fields),
             };
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span> <span class="ident">dml_index</span>.<span class="ident">name</span> {
-                <span class="ident">definition</span>.<span class="ident">name</span>(<span class="ident">name</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>name) = dml_index.name {
+                definition.name(name);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span> <span class="ident">dml_index</span>.<span class="ident">db_name</span> {
-                <span class="ident">definition</span>.<span class="ident">map</span>(<span class="ident">map</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = dml_index.db_name {
+                definition.map(map);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">clustered</span>) <span class="op">=</span> <span class="ident">dml_index</span>.<span class="ident">clustered</span> {
-                <span class="ident">definition</span>.<span class="ident">clustered</span>(<span class="ident">clustered</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = dml_index.clustered {
+                definition.clustered(clustered);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">algo</span>) <span class="op">=</span> <span class="ident">dml_index</span>.<span class="ident">algorithm</span> {
-                <span class="ident">definition</span>.<span class="ident">index_type</span>(<span class="ident">algo</span>.<span class="ident">as_ref</span>());
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>algo) = dml_index.algorithm {
+                definition.index_type(algo.as_ref());
             }
 
-            <span class="ident">model</span>.<span class="ident">push_index</span>(<span class="ident">definition</span>);
+            model.push_index(definition);
         }
 
-        <span class="ident">model</span>
+        model
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Model</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="comment">// Prefix everything with this, so if the model is commented out, so</span>
-        <span class="comment">// is your line.</span>
-        <span class="kw">let</span> <span class="ident">comment</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">commented_out</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>Model&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="comment">// Prefix everything with this, so if the model is commented out, so
+        // is your line.
+        </span><span class="kw">let </span>comment = <span class="self">self</span>.commented_out;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">docs</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">documentation</span> {
-            <span class="ident">docs</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = <span class="self">self</span>.documentation {
+            docs.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{comment}model {} {{&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;{comment}model {} {{&quot;</span>, <span class="self">self</span>.name)<span class="question-mark">?</span>;
 
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>() {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{comment}{field}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>field <span class="kw">in </span><span class="self">self</span>.fields.iter() {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{comment}{field}&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">id</span> {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{comment}{id}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>id) = <span class="self">self</span>.id {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{comment}{id}&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">indexes</span>.<span class="ident">iter</span>() {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{comment}{index}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>index <span class="kw">in </span><span class="self">self</span>.indexes.iter() {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{comment}{index}&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">map</span> {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{comment}{map}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = <span class="self">self</span>.map {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{comment}{map}&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">ignore</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">ignore</span> {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{comment}{ignore}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>ignore) = <span class="self">self</span>.ignore {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{comment}{ignore}&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">schema</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span> {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{comment}{schema}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>schema) = <span class="self">self</span>.schema {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{comment}{schema}&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{comment}}}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;{comment}}}&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">ops::Deref</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::{borrow::Cow, ops::Deref};
 
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">datamodel</span>::<span class="kw-2">*</span>, <span class="ident">value::Function</span>};
-    <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
+    <span class="kw">use crate</span>::{datamodel::<span class="kw-2">*</span>, value::Function};
+    <span class="kw">use </span>expect_test::expect;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">kitchen_sink</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Model::new</span>(<span class="string">&quot;1Country&quot;</span>);
-        <span class="ident">model</span>.<span class="ident">documentation</span>(<span class="string">&quot;Do not fear death\nIf you love the trail of streaking fire\nDo not fear death\nIf you desire a speed king to become!&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>kitchen_sink() {
+        <span class="kw">let </span><span class="kw-2">mut </span>model = Model::new(<span class="string">&quot;1Country&quot;</span>);
+        model.documentation(<span class="string">&quot;Do not fear death\nIf you love the trail of streaking fire\nDo not fear death\nIf you desire a speed king to become!&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ModelField::new_required</span>(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;String&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">IdFieldDefinition::default</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>opts = IdFieldDefinition::default();
 
-        <span class="ident">opts</span>.<span class="ident">sort_order</span>(<span class="string">&quot;Desc&quot;</span>);
-        <span class="ident">opts</span>.<span class="ident">length</span>(<span class="number">32</span>);
-        <span class="ident">opts</span>.<span class="ident">clustered</span>(<span class="bool-val">false</span>);
+        opts.sort_order(<span class="string">&quot;Desc&quot;</span>);
+        opts.length(<span class="number">32</span>);
+        opts.clustered(<span class="bool-val">false</span>);
 
-        <span class="ident">field</span>.<span class="ident">id</span>(<span class="ident">opts</span>);
-        <span class="ident">field</span>.<span class="ident">native_type</span>(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;VarChar&quot;</span>, <span class="macro">vec!</span>[<span class="ident">String::from</span>(<span class="string">&quot;255&quot;</span>)]);
-        <span class="ident">field</span>.<span class="ident">default</span>(<span class="ident">DefaultValue::function</span>(<span class="ident">Function::new</span>(<span class="string">&quot;uuid&quot;</span>)));
+        field.id(opts);
+        field.native_type(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;VarChar&quot;</span>, <span class="macro">vec!</span>[String::from(<span class="string">&quot;255&quot;</span>)]);
+        field.default(DefaultValue::function(Function::new(<span class="string">&quot;uuid&quot;</span>)));
 
-        <span class="ident">model</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        model.push_field(field);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ModelField::new_optional</span>(<span class="string">&quot;value&quot;</span>, <span class="string">&quot;Bytes&quot;</span>);
-        <span class="ident">field</span>.<span class="ident">documentation</span>(<span class="string">&quot;NOPEUSKUNINGAS&quot;</span>);
-        <span class="ident">field</span>.<span class="ident">default</span>(<span class="ident">DefaultValue::bytes</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]));
-        <span class="ident">model</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_optional(<span class="string">&quot;value&quot;</span>, <span class="string">&quot;Bytes&quot;</span>);
+        field.documentation(<span class="string">&quot;NOPEUSKUNINGAS&quot;</span>);
+        field.default(DefaultValue::bytes(<span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]));
+        model.push_field(field);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ModelField::new_array</span>(<span class="string">&quot;1array&quot;</span>, <span class="string">&quot;Int&quot;</span>);
-        <span class="ident">field</span>.<span class="ident">default</span>(<span class="ident">DefaultValue::array</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]));
-        <span class="ident">model</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_array(<span class="string">&quot;1array&quot;</span>, <span class="string">&quot;Int&quot;</span>);
+        field.default(DefaultValue::array(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]));
+        model.push_field(field);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ModelField::new_required_unsupported</span>(<span class="string">&quot;konig&quot;</span>, <span class="string">&quot;King&quot;</span>);
-        <span class="ident">field</span>.<span class="ident">ignore</span>();
-        <span class="ident">model</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required_unsupported(<span class="string">&quot;konig&quot;</span>, <span class="string">&quot;King&quot;</span>);
+        field.ignore();
+        model.push_field(field);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ModelField::new_required</span>(<span class="string">&quot;information&quot;</span>, <span class="string">&quot;Int&quot;</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">IndexFieldOptions::default</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required(<span class="string">&quot;information&quot;</span>, <span class="string">&quot;Int&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>opts = IndexFieldOptions::default();
 
-        <span class="ident">opts</span>.<span class="ident">sort_order</span>(<span class="string">&quot;Desc&quot;</span>);
-        <span class="ident">opts</span>.<span class="ident">length</span>(<span class="number">32</span>);
-        <span class="ident">opts</span>.<span class="ident">clustered</span>(<span class="bool-val">true</span>);
+        opts.sort_order(<span class="string">&quot;Desc&quot;</span>);
+        opts.length(<span class="number">32</span>);
+        opts.clustered(<span class="bool-val">true</span>);
 
-        <span class="ident">field</span>.<span class="ident">unique</span>(<span class="ident">opts</span>);
+        field.unique(opts);
 
-        <span class="ident">model</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        model.push_field(field);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">Relation::new</span>();
-        <span class="ident">relation</span>.<span class="ident">fields</span>([<span class="string">&quot;information&quot;</span>].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Deref::deref</span>));
-        <span class="ident">relation</span>.<span class="ident">references</span>([<span class="string">&quot;id&quot;</span>].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Deref::deref</span>));
-        <span class="ident">relation</span>.<span class="ident">on_delete</span>(<span class="string">&quot;Cascade&quot;</span>);
-        <span class="ident">relation</span>.<span class="ident">on_update</span>(<span class="string">&quot;Restrict&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>relation = Relation::new();
+        relation.fields([<span class="string">&quot;information&quot;</span>].iter().map(Deref::deref));
+        relation.references([<span class="string">&quot;id&quot;</span>].iter().map(Deref::deref));
+        relation.on_delete(<span class="string">&quot;Cascade&quot;</span>);
+        relation.on_update(<span class="string">&quot;Restrict&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ModelField::new_required</span>(<span class="string">&quot;relfield&quot;</span>, <span class="string">&quot;1Planet&quot;</span>);
-        <span class="ident">field</span>.<span class="ident">relation</span>(<span class="ident">relation</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required(<span class="string">&quot;relfield&quot;</span>, <span class="string">&quot;1Planet&quot;</span>);
+        field.relation(relation);
 
-        <span class="ident">model</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        model.push_field(field);
 
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> [<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>].<span class="ident">iter</span>().<span class="ident">enumerate</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">name</span>)<span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">1</span> {
-                <span class="ident">IndexFieldInput</span> {
-                    <span class="ident">name</span>: <span class="ident">Cow::Borrowed</span>(<span class="ident">name</span>),
-                    <span class="ident">sort_order</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>),
-                    <span class="ident">length</span>: <span class="prelude-val">Some</span>(<span class="number">32</span>),
-                    <span class="ident">ops</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>fields = [<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>].iter().enumerate().map(|(i, name)| {
+            <span class="kw">if </span>i == <span class="number">1 </span>{
+                IndexFieldInput {
+                    name: Cow::Borrowed(name),
+                    sort_order: <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>),
+                    length: <span class="prelude-val">Some</span>(<span class="number">32</span>),
+                    ops: <span class="prelude-val">None</span>,
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">IndexFieldInput</span> {
-                    <span class="ident">name</span>: <span class="ident">Cow::Borrowed</span>(<span class="ident">name</span>),
-                    <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">length</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">ops</span>: <span class="prelude-val">None</span>,
+            } <span class="kw">else </span>{
+                IndexFieldInput {
+                    name: Cow::Borrowed(name),
+                    sort_order: <span class="prelude-val">None</span>,
+                    length: <span class="prelude-val">None</span>,
+                    ops: <span class="prelude-val">None</span>,
                 }
             }
         });
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">IdDefinition::new</span>(<span class="ident">fields</span>);
-        <span class="ident">id</span>.<span class="ident">name</span>(<span class="string">&quot;primary&quot;</span>);
-        <span class="ident">id</span>.<span class="ident">map</span>(<span class="string">&quot;PKPK&quot;</span>);
-        <span class="ident">id</span>.<span class="ident">clustered</span>(<span class="bool-val">false</span>);
-        <span class="ident">model</span>.<span class="ident">id</span>(<span class="ident">id</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>id = IdDefinition::new(fields);
+        id.name(<span class="string">&quot;primary&quot;</span>);
+        id.map(<span class="string">&quot;PKPK&quot;</span>);
+        id.clustered(<span class="bool-val">false</span>);
+        model.id(id);
 
-        <span class="kw">let</span> <span class="ident">unique</span> <span class="op">=</span> <span class="ident">IndexDefinition::unique</span>([<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">IndexFieldInput::new</span>(<span class="kw-2">*</span><span class="ident">s</span>)));
-        <span class="ident">model</span>.<span class="ident">push_index</span>(<span class="ident">unique</span>);
+        <span class="kw">let </span>unique = IndexDefinition::unique([<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>].iter().map(|s| IndexFieldInput::new(s)));
+        model.push_index(unique);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">IndexDefinition::index</span>([<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">IndexFieldInput::new</span>(<span class="kw-2">*</span><span class="ident">s</span>)));
-        <span class="ident">index</span>.<span class="ident">index_type</span>(<span class="string">&quot;BTree&quot;</span>);
-        <span class="ident">model</span>.<span class="ident">push_index</span>(<span class="ident">index</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>index = IndexDefinition::index([<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>].iter().map(|s| IndexFieldInput::new(s)));
+        index.index_type(<span class="string">&quot;BTree&quot;</span>);
+        model.push_index(index);
 
-        <span class="kw">let</span> <span class="ident">fulltext</span> <span class="op">=</span> <span class="ident">IndexDefinition::fulltext</span>([<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">IndexFieldInput::new</span>(<span class="kw-2">*</span><span class="ident">s</span>)));
-        <span class="ident">model</span>.<span class="ident">push_index</span>(<span class="ident">fulltext</span>);
+        <span class="kw">let </span>fulltext = IndexDefinition::fulltext([<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>].iter().map(|s| IndexFieldInput::new(s)));
+        model.push_index(fulltext);
 
-        <span class="ident">model</span>.<span class="ident">schema</span>(<span class="string">&quot;public&quot;</span>);
-        <span class="ident">model</span>.<span class="ident">ignore</span>();
+        model.schema(<span class="string">&quot;public&quot;</span>);
+        model.ignore();
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[<span class="string">r#&quot;
+        <span class="kw">let </span>expected = <span class="macro">expect!</span>[[<span class="string">r#&quot;
             /// Do not fear death
             /// If you love the trail of streaking fire
             /// Do not fear death
@@ -1116,33 +1116,33 @@
             }
         &quot;#</span>]];
 
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">psl::reformat</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">to_string</span>(), <span class="number">2</span>).<span class="ident">unwrap</span>();
-        <span class="ident">expected</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">rendered</span>);
+        <span class="kw">let </span>rendered = psl::reformat(<span class="kw-2">&amp;</span>model.to_string(), <span class="number">2</span>).unwrap();
+        expected.assert_eq(<span class="kw-2">&amp;</span>rendered);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">commented_out</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Model::new</span>(<span class="string">&quot;Country&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>commented_out() {
+        <span class="kw">let </span><span class="kw-2">mut </span>model = Model::new(<span class="string">&quot;Country&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ModelField::new_required</span>(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;String&quot;</span>);
-        <span class="ident">field</span>.<span class="ident">id</span>(<span class="ident">IdFieldDefinition::default</span>());
-        <span class="ident">field</span>.<span class="ident">native_type</span>(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;VarChar&quot;</span>, <span class="macro">vec!</span>[<span class="ident">String::from</span>(<span class="string">&quot;255&quot;</span>)]);
-        <span class="ident">field</span>.<span class="ident">default</span>(<span class="ident">DefaultValue::function</span>(<span class="ident">Function::new</span>(<span class="string">&quot;uuid&quot;</span>)));
-        <span class="ident">model</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        field.id(IdFieldDefinition::default());
+        field.native_type(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;VarChar&quot;</span>, <span class="macro">vec!</span>[String::from(<span class="string">&quot;255&quot;</span>)]);
+        field.default(DefaultValue::function(Function::new(<span class="string">&quot;uuid&quot;</span>)));
+        model.push_field(field);
 
-        <span class="ident">model</span>.<span class="ident">schema</span>(<span class="string">&quot;public&quot;</span>);
-        <span class="ident">model</span>.<span class="ident">comment_out</span>();
+        model.schema(<span class="string">&quot;public&quot;</span>);
+        model.comment_out();
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[<span class="string">r#&quot;
+        <span class="kw">let </span>expected = <span class="macro">expect!</span>[[<span class="string">r#&quot;
             // model Country {
             // id String @id @default(uuid()) @db.VarChar(255)
             // @@schema(&quot;public&quot;)
             // }
         &quot;#</span>]];
 
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">psl::reformat</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">to_string</span>(), <span class="number">2</span>).<span class="ident">unwrap</span>();
-        <span class="ident">expected</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">rendered</span>);
+        <span class="kw">let </span>rendered = psl::reformat(<span class="kw-2">&amp;</span>model.to_string(), <span class="number">2</span>).unwrap();
+        expected.assert_eq(<span class="kw-2">&amp;</span>rendered);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

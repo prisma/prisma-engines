@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/parser/restructured_text.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>restructured_text.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/parser/restructured_text.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>restructured_text.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1270,772 +1270,772 @@
 <span id="1270">1270</span>
 <span id="1271">1271</span>
 <span id="1272">1272</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This module implements parsers for RestructuredText hyperlinks.</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module implements parsers for RestructuredText hyperlinks.
+</span><span class="attribute">#![allow(dead_code)]
+#![allow(clippy::type_complexity)]
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::parse::LABEL_LEN_MAX</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::Link</span>;
-<span class="kw">use</span> <span class="ident">nom::branch::alt</span>;
-<span class="kw">use</span> <span class="ident">nom::bytes::complete::tag</span>;
-<span class="kw">use</span> <span class="ident">nom::combinator</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">nom::IResult</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::parser::parse::LABEL_LEN_MAX;
+<span class="kw">use </span><span class="kw">crate</span>::parser::Link;
+<span class="kw">use </span>nom::branch::alt;
+<span class="kw">use </span>nom::bytes::complete::tag;
+<span class="kw">use </span>nom::combinator::<span class="kw-2">*</span>;
+<span class="kw">use </span>nom::IResult;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="doccomment">/// Character that can be escaped with `\`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: If ever you change this, change also</span>
-<span class="doccomment">/// `rst_escaped_link_text_transform()`.</span>
-<span class="kw">const</span> <span class="ident">ESCAPABLE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot; `:&lt;&gt;_\&quot;#</span>;
+<span class="doccomment">/// Character that can be escaped with `\`.
+///
+/// Note: If ever you change this, change also
+/// `rst_escaped_link_text_transform()`.
+</span><span class="kw">const </span>ESCAPABLE: <span class="kw-2">&amp;</span>str = <span class="string">r#&quot; `:&lt;&gt;_\&quot;#</span>;
 
-<span class="doccomment">/// Wrapper around `rst_text2dest()` that packs the result in</span>
-<span class="doccomment">/// `Link::Text2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)) <span class="op">=</span> <span class="ident">rst_text2dest</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Text2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)))
+<span class="doccomment">/// Wrapper around `rst_text2dest()` that packs the result in
+/// `Link::Text2Dest`.
+</span><span class="kw">pub fn </span>rst_text2dest_link(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Link&gt; {
+    <span class="kw">let </span>(i, (te, de, ti)) = rst_text2dest(i)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((i, Link::Text2Dest(te, de, ti)))
 }
 
-<span class="doccomment">/// Parse a RestructuredText _inline hyperlink_.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The parser expects to start at the link start (\`) to succeed.</span>
-<span class="doccomment">/// As rst does not know about link titles,</span>
-<span class="doccomment">/// the parser always returns an empty `link_title` as `Cow::Borrowed(&quot;&quot;)`</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::Link;</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::restructured_text::rst_text2dest;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_text2dest(&quot;`name &lt;destination&gt;`__abc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;abc&quot;, (Cow::from(&quot;name&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// A hyperlink reference may directly embed a destination URI or (since Docutils</span>
-<span class="doccomment">/// 0.11) a hyperlink reference within angle brackets `&lt;&gt;` as shown in the</span>
-<span class="doccomment">/// following example:</span>
-<span class="doccomment">/// ```rst</span>
-<span class="doccomment">/// abc `Python home page &lt;http://www.python.org&gt;`__ abc</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// The bracketed URI must be preceded by whitespace and be the last text</span>
-<span class="doccomment">/// before the end string.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">ln</span>, <span class="ident">ld</span>)) <span class="op">=</span> <span class="ident">rst_parse_text2target</span>(<span class="bool-val">true</span>, <span class="bool-val">false</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">ln</span> <span class="op">=</span> <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">ln</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">ld</span> <span class="op">=</span> <span class="ident">rst_escaped_link_destination_transform</span>(<span class="ident">ld</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
+<span class="doccomment">/// Parse a RestructuredText _inline hyperlink_.
+///
+/// The parser expects to start at the link start (\`) to succeed.
+/// As rst does not know about link titles,
+/// the parser always returns an empty `link_title` as `Cow::Borrowed(&quot;&quot;)`
+/// ```
+/// use parse_hyperlinks::parser::Link;
+/// use parse_hyperlinks::parser::restructured_text::rst_text2dest;
+/// use std::borrow::Cow;
+///
+/// assert_eq!(
+///   rst_text2dest(&quot;`name &lt;destination&gt;`__abc&quot;),
+///   Ok((&quot;abc&quot;, (Cow::from(&quot;name&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;&quot;))))
+/// );
+/// ```
+/// A hyperlink reference may directly embed a destination URI or (since Docutils
+/// 0.11) a hyperlink reference within angle brackets `&lt;&gt;` as shown in the
+/// following example:
+/// ```rst
+/// abc `Python home page &lt;http://www.python.org&gt;`__ abc
+/// ```
+/// The bracketed URI must be preceded by whitespace and be the last text
+/// before the end string.
+</span><span class="kw">pub fn </span>rst_text2dest(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="kw">let </span>(i, (ln, ld)) = rst_parse_text2target(<span class="bool-val">true</span>, <span class="bool-val">false</span>)(i)<span class="question-mark">?</span>;
+    <span class="kw">let </span>ln = rst_escaped_link_text_transform(ln)<span class="question-mark">?</span>.<span class="number">1</span>;
+    <span class="kw">let </span>ld = rst_escaped_link_destination_transform(ld)<span class="question-mark">?</span>.<span class="number">1</span>;
 
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">ln</span>, <span class="ident">ld</span>, <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>))))
+    <span class="prelude-val">Ok</span>((i, (ln, ld, Cow::Borrowed(<span class="string">&quot;&quot;</span>))))
 }
 
-<span class="doccomment">/// Wrapper around `rst_textlabel2dest()` that packs the result in</span>
-<span class="doccomment">/// `Link::TextLabel2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text_label2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)) <span class="op">=</span> <span class="ident">rst_text_label2dest</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::TextLabel2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)))
+<span class="doccomment">/// Wrapper around `rst_textlabel2dest()` that packs the result in
+/// `Link::TextLabel2Dest`.
+</span><span class="kw">pub fn </span>rst_text_label2dest_link(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Link&gt; {
+    <span class="kw">let </span>(i, (te, de, ti)) = rst_text_label2dest(i)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((i, Link::TextLabel2Dest(te, de, ti)))
 }
 
-<span class="doccomment">/// Parse a RestructuredText combined _inline hyperlink_ with _link reference definition_.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The parser expects to start at the link start (\`) to succeed.</span>
-<span class="doccomment">/// As rst does not know about link titles,</span>
-<span class="doccomment">/// the parser always returns an empty `link_title` as `Cow::Borrowed(&quot;&quot;)`.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::Link;</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::restructured_text::rst_text_label2dest;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_text_label2dest(&quot;`name &lt;destination&gt;`_abc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;abc&quot;, (Cow::from(&quot;name&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// A hyperlink reference may directly embed a destination URI or (since Docutils</span>
-<span class="doccomment">/// 0.11) a hyperlink reference within angle brackets `&lt;&gt;` as shown in the</span>
-<span class="doccomment">/// following example:</span>
-<span class="doccomment">/// ```rst</span>
-<span class="doccomment">/// abc `Python home page &lt;http://www.python.org&gt;`_ abc</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// The bracketed URI must be preceded by whitespace and be the last text</span>
-<span class="doccomment">/// before the end string.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">ln</span>, <span class="ident">ld</span>)) <span class="op">=</span> <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">ln</span> <span class="op">=</span> <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">ln</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">ld</span> <span class="op">=</span> <span class="ident">rst_escaped_link_destination_transform</span>(<span class="ident">ld</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
+<span class="doccomment">/// Parse a RestructuredText combined _inline hyperlink_ with _link reference definition_.
+///
+/// The parser expects to start at the link start (\`) to succeed.
+/// As rst does not know about link titles,
+/// the parser always returns an empty `link_title` as `Cow::Borrowed(&quot;&quot;)`.
+/// ```
+/// use parse_hyperlinks::parser::Link;
+/// use parse_hyperlinks::parser::restructured_text::rst_text_label2dest;
+/// use std::borrow::Cow;
+///
+/// assert_eq!(
+///   rst_text_label2dest(&quot;`name &lt;destination&gt;`_abc&quot;),
+///   Ok((&quot;abc&quot;, (Cow::from(&quot;name&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;&quot;))))
+/// );
+/// ```
+/// A hyperlink reference may directly embed a destination URI or (since Docutils
+/// 0.11) a hyperlink reference within angle brackets `&lt;&gt;` as shown in the
+/// following example:
+/// ```rst
+/// abc `Python home page &lt;http://www.python.org&gt;`_ abc
+/// ```
+/// The bracketed URI must be preceded by whitespace and be the last text
+/// before the end string.
+</span><span class="kw">pub fn </span>rst_text_label2dest(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="kw">let </span>(i, (ln, ld)) = rst_parse_text2target(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(i)<span class="question-mark">?</span>;
+    <span class="kw">let </span>ln = rst_escaped_link_text_transform(ln)<span class="question-mark">?</span>.<span class="number">1</span>;
+    <span class="kw">let </span>ld = rst_escaped_link_destination_transform(ld)<span class="question-mark">?</span>.<span class="number">1</span>;
 
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">ln</span>, <span class="ident">ld</span>, <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>))))
+    <span class="prelude-val">Ok</span>((i, (ln, ld, Cow::Borrowed(<span class="string">&quot;&quot;</span>))))
 }
 
-<span class="doccomment">/// This parser finds rst links of type:</span>
-<span class="doccomment">///     `*&lt;*&gt;`__</span>
-<span class="doccomment">/// or:</span>
-<span class="doccomment">///     `*&lt;*&gt;`_</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Escape sequences are recognized and skipped, but not replaced here.</span>
-<span class="doccomment">/// If `anonym==true`: it recognizes:</span>
-<span class="doccomment">///     `*&lt;*&gt;`__</span>
-<span class="doccomment">/// otherwise:</span>
-<span class="doccomment">///     `*&lt;*&gt;`_</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If `label==true` (`target==label`): it recognizes</span>
-<span class="doccomment">///     `*&lt;*_&gt;`_?</span>
-<span class="doccomment">/// otherwise (`target==dest`):</span>
-<span class="doccomment">///     `*&lt;*&gt;`_?</span>
-<span class="kw">fn</span> <span class="ident">rst_parse_text2target</span>(
-    <span class="ident">anonym</span>: <span class="ident">bool</span>,
-    <span class="ident">label</span>: <span class="ident">bool</span>,
-) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
-    <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">i</span>, <span class="ident">inner</span>) <span class="op">=</span> <span class="ident">nom::sequence::delimited</span>(
-            <span class="ident">tag</span>(<span class="string">&quot;`&quot;</span>),
-            <span class="ident">nom::bytes::complete::escaped</span>(
-                <span class="ident">nom::character::complete::none_of</span>(<span class="string">r#&quot;\`&quot;#</span>),
+<span class="doccomment">/// This parser finds rst links of type:
+///     `*&lt;*&gt;`__
+/// or:
+///     `*&lt;*&gt;`_
+///
+/// Escape sequences are recognized and skipped, but not replaced here.
+/// If `anonym==true`: it recognizes:
+///     `*&lt;*&gt;`__
+/// otherwise:
+///     `*&lt;*&gt;`_
+///
+/// If `label==true` (`target==label`): it recognizes
+///     `*&lt;*_&gt;`_?
+/// otherwise (`target==dest`):
+///     `*&lt;*&gt;`_?
+</span><span class="kw">fn </span>rst_parse_text2target(
+    anonym: bool,
+    label: bool,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str)&gt; {
+    <span class="kw">move </span>|i: <span class="kw-2">&amp;</span>str| {
+        <span class="kw">let </span>(<span class="kw-2">mut </span>i, inner) = nom::sequence::delimited(
+            tag(<span class="string">&quot;`&quot;</span>),
+            nom::bytes::complete::escaped(
+                nom::character::complete::none_of(<span class="string">r#&quot;\`&quot;#</span>),
                 <span class="string">&#39;\\&#39;</span>,
-                <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
+                nom::character::complete::one_of(ESCAPABLE),
             ),
-            <span class="ident">tag</span>(<span class="string">&quot;`_&quot;</span>),
-        )(<span class="ident">i</span>)<span class="question-mark">?</span>;
+            tag(<span class="string">&quot;`_&quot;</span>),
+        )(i)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">anonym</span> {
-            <span class="kw">let</span> (<span class="ident">j</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::character::complete::char</span>(<span class="string">&#39;_&#39;</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
-            <span class="ident">i</span> <span class="op">=</span> <span class="ident">j</span>;
+        <span class="kw">if </span>anonym {
+            <span class="kw">let </span>(j, <span class="kw">_</span>) = nom::character::complete::char(<span class="string">&#39;_&#39;</span>)(i)<span class="question-mark">?</span>;
+            i = j;
         };
 
-        <span class="comment">// Assure that the next char is not`_`.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">i</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">nom::combinator::not</span>(<span class="ident">nom::character::complete::char</span>(<span class="string">&#39;_&#39;</span>))(<span class="ident">i</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Assure that the next char is not`_`.
+        </span><span class="kw">if </span>!i.is_empty() {
+            <span class="kw">let _ </span>= nom::combinator::not(nom::character::complete::char(<span class="string">&#39;_&#39;</span>))(i)<span class="question-mark">?</span>;
         };
 
-        <span class="comment">// From here on, we only deal with the inner result of the above.</span>
-        <span class="comment">// Take everything until the first unescaped `&lt;`</span>
-        <span class="kw">let</span> (<span class="ident">inner_rest</span>, <span class="ident">link_text</span>): (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">=</span> <span class="ident">nom::bytes::complete::escaped</span>(
-            <span class="ident">nom::character::complete::none_of</span>(<span class="string">r#&quot;\&lt;&quot;#</span>),
+        <span class="comment">// From here on, we only deal with the inner result of the above.
+        // Take everything until the first unescaped `&lt;`
+        </span><span class="kw">let </span>(inner_rest, link_text): (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str) = nom::bytes::complete::escaped(
+            nom::character::complete::none_of(<span class="string">r#&quot;\&lt;&quot;#</span>),
             <span class="string">&#39;\\&#39;</span>,
-            <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
-        )(<span class="ident">inner</span>)<span class="question-mark">?</span>;
-        <span class="comment">// Trim trailing whitespace.</span>
-        <span class="kw">let</span> <span class="ident">link_text</span> <span class="op">=</span> <span class="ident">link_text</span>.<span class="ident">trim_end</span>();
+            nom::character::complete::one_of(ESCAPABLE),
+        )(inner)<span class="question-mark">?</span>;
+        <span class="comment">// Trim trailing whitespace.
+        </span><span class="kw">let </span>link_text = link_text.trim_end();
 
-        <span class="kw">let</span> (<span class="ident">j</span>, <span class="kw-2">mut</span> <span class="ident">link_dest_label</span>) <span class="op">=</span> <span class="ident">nom::sequence::delimited</span>(
-            <span class="ident">tag</span>(<span class="string">&quot;&lt;&quot;</span>),
-            <span class="ident">nom::bytes::complete::escaped</span>(
-                <span class="ident">nom::character::complete::none_of</span>(<span class="string">r#&quot;\&lt;&gt;&quot;#</span>),
+        <span class="kw">let </span>(j, <span class="kw-2">mut </span>link_dest_label) = nom::sequence::delimited(
+            tag(<span class="string">&quot;&lt;&quot;</span>),
+            nom::bytes::complete::escaped(
+                nom::character::complete::none_of(<span class="string">r#&quot;\&lt;&gt;&quot;#</span>),
                 <span class="string">&#39;\\&#39;</span>,
-                <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
+                nom::character::complete::one_of(ESCAPABLE),
             ),
-            <span class="ident">tag</span>(<span class="string">&quot;&gt;&quot;</span>),
-        )(<span class="ident">inner_rest</span>)<span class="question-mark">?</span>;
+            tag(<span class="string">&quot;&gt;&quot;</span>),
+        )(inner_rest)<span class="question-mark">?</span>;
 
-        <span class="comment">// Fail if there are bytes left between `&gt;` and `\``.</span>
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::combinator::eof</span>(<span class="ident">j</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Fail if there are bytes left between `&gt;` and `\``.
+        </span><span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>) = nom::combinator::eof(j)<span class="question-mark">?</span>;
 
-        <span class="comment">// Now check if `link_dest_label` is what we are expecting (which depends</span>
-        <span class="comment">// on `label`).</span>
+        <span class="comment">// Now check if `link_dest_label` is what we are expecting (which depends
+        // on `label`).
 
-        <span class="comment">// Fail if `link_dest_label` is empty.</span>
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::combinator::not</span>(<span class="ident">nom::combinator::eof</span>)(<span class="ident">link_dest_label</span>)<span class="question-mark">?</span>;
+        // Fail if `link_dest_label` is empty.
+        </span><span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>) = nom::combinator::not(nom::combinator::eof)(link_dest_label)<span class="question-mark">?</span>;
 
-        <span class="comment">// Get last char.</span>
-        <span class="kw">let</span> <span class="ident">last_char_is_</span> <span class="op">=</span> <span class="ident">link_dest_label</span>.<span class="ident">is_char_boundary</span>(<span class="ident">link_dest_label</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)
-            <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">link_dest_label</span>[<span class="ident">link_dest_label</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>..] <span class="op">==</span> <span class="string">&quot;_&quot;</span>;
-        <span class="comment">// If (`label==true`), we expect trailing `_`, fail otherwise.</span>
-        <span class="comment">// If (`label==false`), we fail when there is a trailing `_`.</span>
-        <span class="kw">if</span> (<span class="ident">label</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">last_char_is_</span>) <span class="op">|</span><span class="op">|</span> (<span class="op">!</span><span class="ident">label</span> <span class="op">&amp;&amp;</span> <span class="ident">last_char_is_</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
-                <span class="ident">i</span>,
-                <span class="ident">nom::error::ErrorKind::Tag</span>,
+        <span class="comment">// Get last char.
+        </span><span class="kw">let </span>last_char_is_ = link_dest_label.is_char_boundary(link_dest_label.len() - <span class="number">1</span>)
+            &amp;&amp; <span class="kw-2">&amp;</span>link_dest_label[link_dest_label.len() - <span class="number">1</span>..] == <span class="string">&quot;_&quot;</span>;
+        <span class="comment">// If (`label==true`), we expect trailing `_`, fail otherwise.
+        // If (`label==false`), we fail when there is a trailing `_`.
+        </span><span class="kw">if </span>(label &amp;&amp; !last_char_is_) || (!label &amp;&amp; last_char_is_) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
+                i,
+                nom::error::ErrorKind::Tag,
             )));
         };
-        <span class="comment">// When label, strip trailing `_`.</span>
-        <span class="kw">if</span> <span class="ident">label</span> {
-            <span class="ident">link_dest_label</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">link_dest_label</span>[..<span class="ident">link_dest_label</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>];
+        <span class="comment">// When label, strip trailing `_`.
+        </span><span class="kw">if </span>label {
+            link_dest_label = <span class="kw-2">&amp;</span>link_dest_label[..link_dest_label.len() - <span class="number">1</span>];
         };
 
-        <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">link_text</span>, <span class="ident">link_dest_label</span>)))
+        <span class="prelude-val">Ok</span>((i, (link_text, link_dest_label)))
     }
 }
 
-<span class="doccomment">/// Wrapper around `rst_text2dest()` that packs the result in</span>
-<span class="doccomment">/// `Link::Text2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2label_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">la</span>)) <span class="op">=</span> <span class="ident">rst_text2label</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Text2Label</span>(<span class="ident">te</span>, <span class="ident">la</span>)))
+<span class="doccomment">/// Wrapper around `rst_text2dest()` that packs the result in
+/// `Link::Text2Dest`.
+</span><span class="kw">pub fn </span>rst_text2label_link(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Link&gt; {
+    <span class="kw">let </span>(i, (te, la)) = rst_text2label(i)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((i, Link::Text2Label(te, la)))
 }
 
-<span class="doccomment">/// Parse a RestructuredText _reference link_.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The caller must guarantee, that</span>
-<span class="doccomment">/// * the parser is at the input start (no bytes exist before).</span>
-<span class="doccomment">/// * the preceding bytes are whitespaces or newline, _or_</span>
-<span class="doccomment">/// * the preceding bytes are whitespaces or newline, followed by one of: `([&lt;&#39;&quot;`</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::Link;</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::restructured_text::rst_text2label;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_text2label(&quot;linktext_ abc&quot;),</span>
-<span class="doccomment">///   Ok((&quot; abc&quot;, (Cow::from(&quot;linktext&quot;), Cow::from(&quot;linktext&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_text2label(&quot;`link text`_ abc&quot;),</span>
-<span class="doccomment">///   Ok((&quot; abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;link text&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_text2label(&quot;`link text&lt;link label_&gt;`_ abc&quot;),</span>
-<span class="doccomment">///   Ok((&quot; abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;link label&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_text2label(&quot;`link text`__ abc&quot;),</span>
-<span class="doccomment">///   Ok((&quot; abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;_&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">la</span>)) <span class="op">=</span> <span class="ident">rst_parse_text2label</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">te</span> <span class="op">=</span> <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">te</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">la</span> <span class="op">=</span> <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">la</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
+<span class="doccomment">/// Parse a RestructuredText _reference link_.
+///
+/// The caller must guarantee, that
+/// * the parser is at the input start (no bytes exist before).
+/// * the preceding bytes are whitespaces or newline, _or_
+/// * the preceding bytes are whitespaces or newline, followed by one of: `([&lt;&#39;&quot;`
+/// ```rust
+/// use parse_hyperlinks::parser::Link;
+/// use parse_hyperlinks::parser::restructured_text::rst_text2label;
+/// use std::borrow::Cow;
+///
+/// assert_eq!(
+///   rst_text2label(&quot;linktext_ abc&quot;),
+///   Ok((&quot; abc&quot;, (Cow::from(&quot;linktext&quot;), Cow::from(&quot;linktext&quot;))))
+/// );
+/// assert_eq!(
+///   rst_text2label(&quot;`link text`_ abc&quot;),
+///   Ok((&quot; abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;link text&quot;))))
+/// );
+/// assert_eq!(
+///   rst_text2label(&quot;`link text&lt;link label_&gt;`_ abc&quot;),
+///   Ok((&quot; abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;link label&quot;))))
+/// );
+/// assert_eq!(
+///   rst_text2label(&quot;`link text`__ abc&quot;),
+///   Ok((&quot; abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;_&quot;))))
+/// );
+/// ```
+///
+</span><span class="kw">pub fn </span>rst_text2label(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="kw">let </span>(i, (te, la)) = rst_parse_text2label(i)<span class="question-mark">?</span>;
+    <span class="kw">let </span>te = rst_escaped_link_text_transform(te)<span class="question-mark">?</span>.<span class="number">1</span>;
+    <span class="kw">let </span>la = rst_escaped_link_text_transform(la)<span class="question-mark">?</span>.<span class="number">1</span>;
 
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">la</span>)))
+    <span class="prelude-val">Ok</span>((i, (te, la)))
 }
 
-<span class="doccomment">/// Parses a _reference link_. (Doctree element `reference`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Named hyperlink references:</span>
-<span class="doccomment">/// No start-string, end-string = `_.</span>
-<span class="doccomment">/// Start-string = &quot;`&quot;, end-string = `\`_`. (Phrase references.)</span>
-<span class="doccomment">/// Anonymous hyperlink references:</span>
-<span class="doccomment">/// No start-string, end-string = `__`.</span>
-<span class="doccomment">/// Start-string = &quot;`&quot;, end-string = `\`__`. (Phrase references.)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Hyperlink references are indicated by a trailing underscore, &quot;_&quot;, except for</span>
-<span class="doccomment">/// standalone hyperlinks which are recognized independently.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Important: before this parser try `rst_text2dest()` first!</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The caller must guarantee, that either:</span>
-<span class="doccomment">/// * we are at the input start -or-</span>
-<span class="doccomment">/// * the byte just before was a whitespace (including newline)!</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For named references in reStructuredText `link_text` and `link_label`</span>
-<span class="doccomment">/// are the same. By convention we return for anonymous references:</span>
-<span class="doccomment">/// `link_label=&#39;_&#39;`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The parser checks that this _reference link_ is followed by a whitespace</span>
-<span class="doccomment">/// without consuming it.</span>
-<span class="doccomment">///</span>
-<span class="kw">fn</span> <span class="ident">rst_parse_text2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">i</span>, (<span class="ident">link_text</span>, <span class="kw-2">mut</span> <span class="ident">link_label</span>)) <span class="op">=</span> <span class="ident">alt</span>((
-        <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">true</span>),
-        <span class="ident">nom::combinator::map</span>(<span class="ident">rst_parse_simple_label</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> (<span class="ident">s</span>, <span class="ident">s</span>)),
-    ))(<span class="ident">i</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// Parses a _reference link_. (Doctree element `reference`).
+///
+/// Named hyperlink references:
+/// No start-string, end-string = `_.
+/// Start-string = &quot;`&quot;, end-string = `\`_`. (Phrase references.)
+/// Anonymous hyperlink references:
+/// No start-string, end-string = `__`.
+/// Start-string = &quot;`&quot;, end-string = `\`__`. (Phrase references.)
+///
+///
+/// Hyperlink references are indicated by a trailing underscore, &quot;_&quot;, except for
+/// standalone hyperlinks which are recognized independently.
+///
+/// Important: before this parser try `rst_text2dest()` first!
+///
+/// The caller must guarantee, that either:
+/// * we are at the input start -or-
+/// * the byte just before was a whitespace (including newline)!
+///
+/// For named references in reStructuredText `link_text` and `link_label`
+/// are the same. By convention we return for anonymous references:
+/// `link_label=&#39;_&#39;`.
+///
+/// The parser checks that this _reference link_ is followed by a whitespace
+/// without consuming it.
+///
+</span><span class="kw">fn </span>rst_parse_text2label(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str)&gt; {
+    <span class="kw">let </span>(<span class="kw-2">mut </span>i, (link_text, <span class="kw-2">mut </span>link_label)) = alt((
+        rst_parse_text2target(<span class="bool-val">false</span>, <span class="bool-val">true</span>),
+        nom::combinator::map(rst_parse_simple_label, |s| (s, s)),
+    ))(i)<span class="question-mark">?</span>;
 
-    <span class="comment">// Is this an anonymous reference? Consume the second `_` also.</span>
-    <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">j</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">=</span> <span class="ident">nom::combinator::opt</span>(<span class="ident">nom::character::complete::char</span>(<span class="string">&#39;_&#39;</span>))(<span class="ident">i</span>)<span class="question-mark">?</span> {
-        <span class="ident">link_label</span> <span class="op">=</span> <span class="string">&quot;_&quot;</span>;
-        <span class="ident">i</span> <span class="op">=</span> <span class="ident">j</span>;
+    <span class="comment">// Is this an anonymous reference? Consume the second `_` also.
+    </span><span class="kw">if let </span>(j, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) = nom::combinator::opt(nom::character::complete::char(<span class="string">&#39;_&#39;</span>))(i)<span class="question-mark">? </span>{
+        link_label = <span class="string">&quot;_&quot;</span>;
+        i = j;
     };
 
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">link_text</span>, <span class="ident">link_label</span>)))
+    <span class="prelude-val">Ok</span>((i, (link_text, link_label)))
 }
 
-<span class="doccomment">/// Wrapper around `rst_label2dest()` that packs the result in</span>
-<span class="doccomment">/// `Link::Label2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">l</span>, <span class="ident">d</span>, <span class="ident">t</span>)) <span class="op">=</span> <span class="ident">rst_label2dest</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Label2Dest</span>(<span class="ident">l</span>, <span class="ident">d</span>, <span class="ident">t</span>)))
+<span class="doccomment">/// Wrapper around `rst_label2dest()` that packs the result in
+/// `Link::Label2Dest`.
+</span><span class="kw">pub fn </span>rst_label2dest_link(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Link&gt; {
+    <span class="kw">let </span>(i, (l, d, t)) = rst_label2dest(i)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((i, Link::Label2Dest(l, d, t)))
 }
 
-<span class="doccomment">/// Parse a reStructuredText _link reference definition_.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This parser consumes until the end of the line. As rst does not know about link titles,</span>
-<span class="doccomment">/// the parser always returns an empty `link_title` as `Cow::Borrowed(&quot;&quot;)`.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::Link;</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::restructured_text::rst_label2dest;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_label2dest(&quot;   .. _`label`: destination\nabc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;label&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_label2dest(&quot;   .. __: destination\nabc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;_&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_label2dest(&quot;   __ destination\nabc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;_&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Here some examples for link references:</span>
-<span class="doccomment">/// ```rst</span>
-<span class="doccomment">/// .. _Python home page: http://www.python.org</span>
-<span class="doccomment">/// .. _`Python: home page`: http://www.python.org</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// See unit test `test_rst_label2dest()` for more examples.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">l</span>, <span class="ident">d</span>)) <span class="op">=</span> <span class="ident">rst_label2target</span>(<span class="bool-val">false</span>, <span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">l</span>, <span class="ident">d</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
+<span class="doccomment">/// Parse a reStructuredText _link reference definition_.
+///
+/// This parser consumes until the end of the line. As rst does not know about link titles,
+/// the parser always returns an empty `link_title` as `Cow::Borrowed(&quot;&quot;)`.
+/// ```
+/// use parse_hyperlinks::parser::Link;
+/// use parse_hyperlinks::parser::restructured_text::rst_label2dest;
+/// use std::borrow::Cow;
+///
+/// assert_eq!(
+///   rst_label2dest(&quot;   .. _`label`: destination\nabc&quot;),
+///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;label&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;&quot;))))
+/// );
+/// assert_eq!(
+///   rst_label2dest(&quot;   .. __: destination\nabc&quot;),
+///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;_&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;&quot;))))
+/// );
+/// assert_eq!(
+///   rst_label2dest(&quot;   __ destination\nabc&quot;),
+///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;_&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;&quot;))))
+/// );
+/// ```
+/// Here some examples for link references:
+/// ```rst
+/// .. _Python home page: http://www.python.org
+/// .. _`Python: home page`: http://www.python.org
+/// ```
+/// See unit test `test_rst_label2dest()` for more examples.
+</span><span class="kw">pub fn </span>rst_label2dest(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="kw">let </span>(i, (l, d)) = rst_label2target(<span class="bool-val">false</span>, i)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((i, (l, d, Cow::from(<span class="string">&quot;&quot;</span>))))
 }
 
-<span class="doccomment">/// Wrapper around `rst_label2label()` that packs the result in</span>
-<span class="doccomment">/// `Link::Label2Label`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2label_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">l1</span>, <span class="ident">l2</span>)) <span class="op">=</span> <span class="ident">rst_label2label</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Label2Label</span>(<span class="ident">l1</span>, <span class="ident">l2</span>)))
+<span class="doccomment">/// Wrapper around `rst_label2label()` that packs the result in
+/// `Link::Label2Label`.
+</span><span class="kw">pub fn </span>rst_label2label_link(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Link&gt; {
+    <span class="kw">let </span>(i, (l1, l2)) = rst_label2label(i)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((i, Link::Label2Label(l1, l2)))
 }
 
-<span class="doccomment">/// Parse a reStructuredText _link reference to link reference definition_.</span>
-<span class="doccomment">/// This type defines an alias (alternative name) for a link reference:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::Link;</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::restructured_text::rst_label2label;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_label2label(&quot;   .. _`alt label`: `label`_\nabc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;alt label&quot;), Cow::from(&quot;label&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_label2label(&quot;   .. __: label_\nabc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;_&quot;), Cow::from(&quot;label&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   rst_label2label(&quot;   __ label_\nabc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;_&quot;), Cow::from(&quot;label&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="ident">rst_label2target</span>(<span class="bool-val">true</span>, <span class="ident">i</span>)
+<span class="doccomment">/// Parse a reStructuredText _link reference to link reference definition_.
+/// This type defines an alias (alternative name) for a link reference:
+/// ```
+/// use parse_hyperlinks::parser::Link;
+/// use parse_hyperlinks::parser::restructured_text::rst_label2label;
+/// use std::borrow::Cow;
+///
+/// assert_eq!(
+///   rst_label2label(&quot;   .. _`alt label`: `label`_\nabc&quot;),
+///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;alt label&quot;), Cow::from(&quot;label&quot;))))
+/// );
+/// assert_eq!(
+///   rst_label2label(&quot;   .. __: label_\nabc&quot;),
+///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;_&quot;), Cow::from(&quot;label&quot;))))
+/// );
+/// assert_eq!(
+///   rst_label2label(&quot;   __ label_\nabc&quot;),
+///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;_&quot;), Cow::from(&quot;label&quot;))))
+/// );
+/// ```
+</span><span class="kw">pub fn </span>rst_label2label(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    rst_label2target(<span class="bool-val">true</span>, i)
 }
 
-<span class="doccomment">/// Parser for _link_reference_definitions_:</span>
-<span class="doccomment">/// * `label==false`:  the link is of type `Label2Dest`</span>
-<span class="doccomment">/// * `label==true`: the link is of type `Label2Label`</span>
-<span class="kw">fn</span> <span class="ident">rst_label2target</span>(<span class="ident">label</span>: <span class="ident">bool</span>, <span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">my_err</span> <span class="op">=</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-        <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
-            <span class="ident">i</span>,
-            <span class="ident">nom::error::ErrorKind::EscapedTransform</span>,
+<span class="doccomment">/// Parser for _link_reference_definitions_:
+/// * `label==false`:  the link is of type `Label2Dest`
+/// * `label==true`: the link is of type `Label2Label`
+</span><span class="kw">fn </span>rst_label2target(label: bool, i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="kw">let </span>my_err = |<span class="kw">_</span>| {
+        nom::Err::Error(nom::error::Error::new(
+            i,
+            nom::error::ErrorKind::EscapedTransform,
         ))
     };
 
-    <span class="comment">// If there is a block start? What kind of?</span>
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">c</span>, <span class="ident">block_header_is__</span>) <span class="op">=</span>
-        <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">i</span>, <span class="prelude-val">Some</span>(<span class="ident">c</span>)) <span class="op">=</span> <span class="ident">nom::combinator::opt</span>(<span class="ident">rst_explicit_markup_block</span>(<span class="string">&quot;.. &quot;</span>))(<span class="ident">i</span>)<span class="question-mark">?</span> {
-            (<span class="ident">i</span>, <span class="ident">c</span>, <span class="bool-val">false</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">c</span>) <span class="op">=</span> <span class="ident">rst_explicit_markup_block</span>(<span class="string">&quot;__ &quot;</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
-            (<span class="ident">i</span>, <span class="ident">c</span>, <span class="bool-val">true</span>)
+    <span class="comment">// If there is a block start? What kind of?
+    </span><span class="kw">let </span>(i, c, block_header_is__) =
+        <span class="kw">if let </span>(i, <span class="prelude-val">Some</span>(c)) = nom::combinator::opt(rst_explicit_markup_block(<span class="string">&quot;.. &quot;</span>))(i)<span class="question-mark">? </span>{
+            (i, c, <span class="bool-val">false</span>)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>(i, c) = rst_explicit_markup_block(<span class="string">&quot;__ &quot;</span>)(i)<span class="question-mark">?</span>;
+            (i, c, <span class="bool-val">true</span>)
         };
 
-    <span class="kw">let</span> (<span class="ident">source</span>, <span class="ident">target</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>) =&gt; {
-            <span class="kw">let</span> (<span class="kw">_</span>, (<span class="ident">ls</span>, <span class="ident">lt</span>)) <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">block_header_is__</span> {
-                <span class="ident">rst_parse_label2target</span>(<span class="ident">label</span>)(<span class="ident">s</span>)<span class="question-mark">?</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">label</span> {
-                <span class="comment">// This is supposed to be a label.</span>
-                (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;_&quot;</span>, <span class="ident">rst_parse_simple_label</span>(<span class="ident">s</span>)<span class="question-mark">?</span>.<span class="number">1</span>))
-            } <span class="kw">else</span> {
-                <span class="comment">// This is supposed to be a destination (url).</span>
-                (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;_&quot;</span>, <span class="ident">s</span>))
+    <span class="kw">let </span>(source, target) = <span class="kw">match </span>c {
+        Cow::Borrowed(s) =&gt; {
+            <span class="kw">let </span>(<span class="kw">_</span>, (ls, lt)) = <span class="kw">if </span>!block_header_is__ {
+                rst_parse_label2target(label)(s)<span class="question-mark">?
+            </span>} <span class="kw">else if </span>label {
+                <span class="comment">// This is supposed to be a label.
+                </span>(<span class="string">&quot;&quot;</span>, (<span class="string">&quot;_&quot;</span>, rst_parse_simple_label(s)<span class="question-mark">?</span>.<span class="number">1</span>))
+            } <span class="kw">else </span>{
+                <span class="comment">// This is supposed to be a destination (url).
+                </span>(<span class="string">&quot;&quot;</span>, (<span class="string">&quot;_&quot;</span>, s))
             };
-            <span class="comment">// If the target is a destination (not a label), the last char must not be `_`.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">label</span> {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">nom::combinator::not</span>(<span class="ident">rst_parse_simple_label</span>)(<span class="ident">lt</span>).<span class="ident">map_err</span>(<span class="ident">my_err</span>)<span class="question-mark">?</span>;
+            <span class="comment">// If the target is a destination (not a label), the last char must not be `_`.
+            </span><span class="kw">if </span>!label {
+                <span class="kw">let _ </span>= nom::combinator::not(rst_parse_simple_label)(lt).map_err(my_err)<span class="question-mark">?</span>;
             };
             (
-                <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">ls</span>)<span class="question-mark">?</span>.<span class="number">1</span>,
-                <span class="ident">rst_escaped_link_destination_transform</span>(<span class="ident">lt</span>)<span class="question-mark">?</span>.<span class="number">1</span>,
+                rst_escaped_link_text_transform(ls)<span class="question-mark">?</span>.<span class="number">1</span>,
+                rst_escaped_link_destination_transform(lt)<span class="question-mark">?</span>.<span class="number">1</span>,
             )
         }
 
-        <span class="ident">Cow::Owned</span>(<span class="ident">strg</span>) =&gt; {
-            <span class="kw">let</span> (<span class="kw">_</span>, (<span class="ident">ls</span>, <span class="ident">lt</span>)) <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">block_header_is__</span> {
-                <span class="ident">rst_parse_label2target</span>(<span class="ident">label</span>)(<span class="kw-2">&amp;</span><span class="ident">strg</span>).<span class="ident">map_err</span>(<span class="ident">my_err</span>)<span class="question-mark">?</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">label</span> {
-                <span class="comment">// This is supposed to be a label.</span>
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">rst_parse_simple_label</span>(<span class="kw-2">&amp;</span><span class="ident">strg</span>).<span class="ident">map_err</span>(<span class="ident">my_err</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
-                (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;_&quot;</span>, <span class="ident">s</span>))
-            } <span class="kw">else</span> {
-                <span class="comment">// This is supposed to be a destination (url).</span>
-                (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;_&quot;</span>, <span class="ident">strg</span>.<span class="ident">as_str</span>()))
+        Cow::Owned(strg) =&gt; {
+            <span class="kw">let </span>(<span class="kw">_</span>, (ls, lt)) = <span class="kw">if </span>!block_header_is__ {
+                rst_parse_label2target(label)(<span class="kw-2">&amp;</span>strg).map_err(my_err)<span class="question-mark">?
+            </span>} <span class="kw">else if </span>label {
+                <span class="comment">// This is supposed to be a label.
+                </span><span class="kw">let </span>s = rst_parse_simple_label(<span class="kw-2">&amp;</span>strg).map_err(my_err)<span class="question-mark">?</span>.<span class="number">1</span>;
+                (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;_&quot;</span>, s))
+            } <span class="kw">else </span>{
+                <span class="comment">// This is supposed to be a destination (url).
+                </span>(<span class="string">&quot;&quot;</span>, (<span class="string">&quot;_&quot;</span>, strg.as_str()))
             };
-            <span class="comment">// If the target is a destination (not a label), the last char must not be `_`.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">label</span> {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">nom::combinator::not</span>(<span class="ident">rst_parse_simple_label</span>)(<span class="ident">lt</span>).<span class="ident">map_err</span>(<span class="ident">my_err</span>)<span class="question-mark">?</span>;
+            <span class="comment">// If the target is a destination (not a label), the last char must not be `_`.
+            </span><span class="kw">if </span>!label {
+                <span class="kw">let _ </span>= nom::combinator::not(rst_parse_simple_label)(lt).map_err(my_err)<span class="question-mark">?</span>;
             };
-            <span class="kw">let</span> <span class="ident">ls</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(
-                <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">ls</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">my_err</span>)<span class="question-mark">?</span>
-                    .<span class="number">1</span>
-                    .<span class="ident">to_string</span>(),
+            <span class="kw">let </span>ls = Cow::Owned(
+                rst_escaped_link_text_transform(ls)
+                    .map_err(my_err)<span class="question-mark">?
+                    </span>.<span class="number">1
+                    </span>.to_string(),
             );
-            <span class="kw">let</span> <span class="ident">lt</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(
-                <span class="ident">rst_escaped_link_destination_transform</span>(<span class="ident">lt</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">my_err</span>)<span class="question-mark">?</span>
-                    .<span class="number">1</span>
-                    .<span class="ident">to_string</span>(),
+            <span class="kw">let </span>lt = Cow::Owned(
+                rst_escaped_link_destination_transform(lt)
+                    .map_err(my_err)<span class="question-mark">?
+                    </span>.<span class="number">1
+                    </span>.to_string(),
             );
-            (<span class="ident">ls</span>, <span class="ident">lt</span>)
+            (ls, lt)
         }
     };
 
-    <span class="comment">// We do not need to consume whitespace until the end of the line,</span>
-    <span class="comment">// because `rst_explicit_markup_block()` had stripped the whitespace</span>
-    <span class="comment">// already.</span>
+    <span class="comment">// We do not need to consume whitespace until the end of the line,
+    // because `rst_explicit_markup_block()` had stripped the whitespace
+    // already.
 
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">source</span>, <span class="ident">target</span>)))
+    </span><span class="prelude-val">Ok</span>((i, (source, target)))
 }
 
-<span class="doccomment">/// The parser recognizes `Label2Dest` links (`label==false`):</span>
-<span class="doccomment">///     _label: dest</span>
-<span class="doccomment">/// or `Label2Label` links (`label==true):</span>
-<span class="doccomment">///     _alt_label: label_</span>
-<span class="doccomment">/// It does not perform any escape character transformation.</span>
-<span class="kw">fn</span> <span class="ident">rst_parse_label2target</span>(<span class="ident">label</span>: <span class="ident">bool</span>) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
-    <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-        <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">link_text</span>) <span class="op">=</span> <span class="ident">alt</span>((
-            <span class="ident">nom::sequence::delimited</span>(
-                <span class="ident">tag</span>(<span class="string">&quot;_`&quot;</span>),
-                <span class="ident">nom::bytes::complete::escaped</span>(
-                    <span class="ident">nom::character::complete::none_of</span>(<span class="string">r#&quot;\`&quot;#</span>),
+<span class="doccomment">/// The parser recognizes `Label2Dest` links (`label==false`):
+///     _label: dest
+/// or `Label2Label` links (`label==true):
+///     _alt_label: label_
+/// It does not perform any escape character transformation.
+</span><span class="kw">fn </span>rst_parse_label2target(label: bool) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str)&gt; {
+    <span class="kw">move </span>|i: <span class="kw-2">&amp;</span>str| {
+        <span class="kw">let </span>(i, link_text) = alt((
+            nom::sequence::delimited(
+                tag(<span class="string">&quot;_`&quot;</span>),
+                nom::bytes::complete::escaped(
+                    nom::character::complete::none_of(<span class="string">r#&quot;\`&quot;#</span>),
                     <span class="string">&#39;\\&#39;</span>,
-                    <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
+                    nom::character::complete::one_of(ESCAPABLE),
                 ),
-                <span class="ident">tag</span>(<span class="string">&quot;`: &quot;</span>),
+                tag(<span class="string">&quot;`: &quot;</span>),
             ),
-            <span class="ident">nom::sequence::delimited</span>(
-                <span class="ident">tag</span>(<span class="string">&quot;_&quot;</span>),
-                <span class="ident">nom::bytes::complete::escaped</span>(
-                    <span class="ident">nom::character::complete::none_of</span>(<span class="string">r#&quot;\:&quot;#</span>),
+            nom::sequence::delimited(
+                tag(<span class="string">&quot;_&quot;</span>),
+                nom::bytes::complete::escaped(
+                    nom::character::complete::none_of(<span class="string">r#&quot;\:&quot;#</span>),
                     <span class="string">&#39;\\&#39;</span>,
-                    <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
+                    nom::character::complete::one_of(ESCAPABLE),
                 ),
-                <span class="ident">tag</span>(<span class="string">&quot;: &quot;</span>),
+                tag(<span class="string">&quot;: &quot;</span>),
             ),
-            <span class="ident">nom::combinator::value</span>(<span class="string">&quot;_&quot;</span>, <span class="ident">tag</span>(<span class="string">&quot;__: &quot;</span>)),
-        ))(<span class="ident">i</span>)<span class="question-mark">?</span>;
+            nom::combinator::value(<span class="string">&quot;_&quot;</span>, tag(<span class="string">&quot;__: &quot;</span>)),
+        ))(i)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">link_target</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">label</span> {
-            <span class="comment">// The target is another label.</span>
-            <span class="ident">rst_parse_simple_label</span>(<span class="ident">i</span>)<span class="question-mark">?</span>.<span class="number">1</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// The target is a destination.</span>
-            <span class="ident">i</span>
+        <span class="kw">let </span>link_target = <span class="kw">if </span>label {
+            <span class="comment">// The target is another label.
+            </span>rst_parse_simple_label(i)<span class="question-mark">?</span>.<span class="number">1
+        </span>} <span class="kw">else </span>{
+            <span class="comment">// The target is a destination.
+            </span>i
         };
 
-        <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, (<span class="ident">link_text</span>, <span class="ident">link_target</span>)))
+        <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, (link_text, link_target)))
     }
 }
 
-<span class="doccomment">/// This parser consumes a simple label:</span>
-<span class="doccomment">///     one_word_label_</span>
-<span class="doccomment">/// or</span>
-<span class="doccomment">///     `more words label`_</span>
-<span class="kw">fn</span> <span class="ident">rst_parse_simple_label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="comment">// Consumes and returns a word ending with `_`.</span>
-    <span class="comment">// Strips off one the trailing `_` before returning the result.</span>
-    <span class="kw">fn</span> <span class="ident">take_word_consume_first_ending_underscore</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">i</span>;
-        <span class="kw">let</span> (<span class="ident">k</span>, <span class="kw-2">mut</span> <span class="ident">r</span>) <span class="op">=</span> <span class="ident">nom::bytes::complete::take_till1</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> {
-            <span class="op">!</span>(<span class="ident">c</span>.<span class="ident">is_alphanumeric</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;-&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;_&#39;</span>)
-        })(<span class="ident">i</span>)<span class="question-mark">?</span>;
-        <span class="comment">// Is `r` ending with `__`? There should be at least 2 bytes: `&quot;__&quot;.len()`</span>
-        <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">3</span> <span class="op">&amp;&amp;</span> <span class="ident">r</span>.<span class="ident">is_char_boundary</span>(<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>) <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>[<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>..] <span class="op">==</span> <span class="string">&quot;__&quot;</span> {
-            <span class="comment">// Consume one `_`, but keep one `_` in remaining bytes.</span>
-            <span class="ident">i</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">i</span>[<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>..];
-            <span class="comment">// Strip two `__` from result.</span>
-            <span class="ident">r</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">r</span>[..<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>];
-        <span class="comment">// Is `r` ending with `_`? There should be at least 1 byte: `&quot;_&quot;.len()`.</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">r</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">r</span>.<span class="ident">is_char_boundary</span>(<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>) <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>[<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>..] <span class="op">==</span> <span class="string">&quot;_&quot;</span> {
-            <span class="comment">// Remaining bytes.</span>
-            <span class="ident">i</span> <span class="op">=</span> <span class="ident">k</span>;
-            <span class="comment">// Strip `_` from result.</span>
-            <span class="ident">r</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">r</span>[..<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>]
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
-                <span class="ident">k</span>,
-                <span class="ident">nom::error::ErrorKind::Tag</span>,
+<span class="doccomment">/// This parser consumes a simple label:
+///     one_word_label_
+/// or
+///     `more words label`_
+</span><span class="kw">fn </span>rst_parse_simple_label(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; {
+    <span class="comment">// Consumes and returns a word ending with `_`.
+    // Strips off one the trailing `_` before returning the result.
+    </span><span class="kw">fn </span>take_word_consume_first_ending_underscore(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>i = i;
+        <span class="kw">let </span>(k, <span class="kw-2">mut </span>r) = nom::bytes::complete::take_till1(|c: char| {
+            !(c.is_alphanumeric() || c == <span class="string">&#39;-&#39; </span>|| c == <span class="string">&#39;_&#39;</span>)
+        })(i)<span class="question-mark">?</span>;
+        <span class="comment">// Is `r` ending with `__`? There should be at least 2 bytes: `&quot;__&quot;.len()`
+        </span><span class="kw">if </span>r.len() &gt;= <span class="number">3 </span>&amp;&amp; r.is_char_boundary(r.len() - <span class="number">2</span>) &amp;&amp; <span class="kw-2">&amp;</span>r[r.len() - <span class="number">2</span>..] == <span class="string">&quot;__&quot; </span>{
+            <span class="comment">// Consume one `_`, but keep one `_` in remaining bytes.
+            </span>i = <span class="kw-2">&amp;</span>i[r.len() - <span class="number">1</span>..];
+            <span class="comment">// Strip two `__` from result.
+            </span>r = <span class="kw-2">&amp;</span>r[..r.len() - <span class="number">2</span>];
+        <span class="comment">// Is `r` ending with `_`? There should be at least 1 byte: `&quot;_&quot;.len()`.
+        </span>} <span class="kw">else if </span>!r.is_empty() &amp;&amp; r.is_char_boundary(r.len() - <span class="number">1</span>) &amp;&amp; <span class="kw-2">&amp;</span>r[r.len() - <span class="number">1</span>..] == <span class="string">&quot;_&quot; </span>{
+            <span class="comment">// Remaining bytes.
+            </span>i = k;
+            <span class="comment">// Strip `_` from result.
+            </span>r = <span class="kw-2">&amp;</span>r[..r.len() - <span class="number">1</span>]
+        } <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
+                k,
+                nom::error::ErrorKind::Tag,
             )));
         };
 
-        <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">r</span>))
+        <span class="prelude-val">Ok</span>((i, r))
     }
 
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">nom::combinator::verify</span>(
-        <span class="ident">alt</span>((
-            <span class="ident">nom::sequence::delimited</span>(
-                <span class="ident">tag</span>(<span class="string">&quot;`&quot;</span>),
-                <span class="ident">nom::bytes::complete::escaped</span>(
-                    <span class="ident">nom::character::complete::none_of</span>(<span class="string">r#&quot;\`&quot;#</span>),
+    <span class="kw">let </span>(i, r) = nom::combinator::verify(
+        alt((
+            nom::sequence::delimited(
+                tag(<span class="string">&quot;`&quot;</span>),
+                nom::bytes::complete::escaped(
+                    nom::character::complete::none_of(<span class="string">r#&quot;\`&quot;#</span>),
                     <span class="string">&#39;\\&#39;</span>,
-                    <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
+                    nom::character::complete::one_of(ESCAPABLE),
                 ),
-                <span class="ident">tag</span>(<span class="string">&quot;`_&quot;</span>),
+                tag(<span class="string">&quot;`_&quot;</span>),
             ),
-            <span class="ident">take_word_consume_first_ending_underscore</span>,
+            take_word_consume_first_ending_underscore,
         )),
-        <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">LABEL_LEN_MAX</span>,
-    )(<span class="ident">i</span>)<span class="question-mark">?</span>;
+        |s: <span class="kw-2">&amp;</span>str| s.len() &lt;= LABEL_LEN_MAX,
+    )(i)<span class="question-mark">?</span>;
 
-    <span class="comment">// Return error if label is empty.</span>
-    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">nom::combinator::not</span>(<span class="ident">alt</span>((<span class="ident">nom::combinator::eof</span>, <span class="ident">tag</span>(<span class="string">&quot;``&quot;</span>))))(<span class="ident">r</span>)<span class="question-mark">?</span>;
+    <span class="comment">// Return error if label is empty.
+    </span><span class="kw">let _ </span>= nom::combinator::not(alt((nom::combinator::eof, tag(<span class="string">&quot;``&quot;</span>))))(r)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">r</span>))
+    <span class="prelude-val">Ok</span>((i, r))
 }
 
-<span class="doccomment">/// This parses an explicit markup block.</span>
-<span class="doccomment">/// The parser expects to start at the beginning of the line.</span>
-<span class="doccomment">/// Syntax diagram:</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// +-------+----------------------+</span>
-<span class="doccomment">/// | &quot;.. &quot; | in  1                |</span>
-<span class="doccomment">/// +-------+ in  2                |</span>
-<span class="doccomment">///         |    in  3             |</span>
-<span class="doccomment">///         +----------------------+</span>
-<span class="doccomment">/// out</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// An explicit markup block is a text block:</span>
-<span class="doccomment">/// * whose first line begins with &quot;..&quot; followed by whitespace (the &quot;explicit</span>
-<span class="doccomment">///   markup start&quot;),</span>
-<span class="doccomment">/// * whose second and subsequent lines (if any) are indented relative to the</span>
-<span class="doccomment">///   first, and</span>
-<span class="doccomment">/// * which ends before an unindented line</span>
-<span class="doccomment">/// As with external hyperlink targets, the link block of an indirect</span>
-<span class="doccomment">/// hyperlink target may begin on the same line as the explicit markup start</span>
-<span class="doccomment">/// or the next line. It may also be split over multiple lines, in which case</span>
-<span class="doccomment">/// the lines are joined with whitespace before being normalized.</span>
-<span class="kw">fn</span> <span class="ident">rst_explicit_markup_block</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">block_header</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">|</span> {
-        <span class="kw">fn</span> <span class="ident">indent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">wsp1</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">wsp2</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, ()<span class="op">&gt;</span> {
-            <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-                <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::character::complete::line_ending</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::bytes::complete::tag</span>(<span class="ident">wsp1</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::bytes::complete::tag</span>(<span class="ident">wsp2</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>((<span class="ident">i</span>, ()))
+<span class="doccomment">/// This parses an explicit markup block.
+/// The parser expects to start at the beginning of the line.
+/// Syntax diagram:
+/// ```text
+/// +-------+----------------------+
+/// | &quot;.. &quot; | in  1                |
+/// +-------+ in  2                |
+///         |    in  3             |
+///         +----------------------+
+/// out
+/// ```
+/// An explicit markup block is a text block:
+/// * whose first line begins with &quot;..&quot; followed by whitespace (the &quot;explicit
+///   markup start&quot;),
+/// * whose second and subsequent lines (if any) are indented relative to the
+///   first, and
+/// * which ends before an unindented line
+/// As with external hyperlink targets, the link block of an indirect
+/// hyperlink target may begin on the same line as the explicit markup start
+/// or the next line. It may also be split over multiple lines, in which case
+/// the lines are joined with whitespace before being normalized.
+</span><span class="kw">fn </span>rst_explicit_markup_block&lt;<span class="lifetime">&#39;a</span>&gt;(
+    block_header: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+    <span class="kw">move </span>|i: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str| {
+        <span class="kw">fn </span>indent&lt;<span class="lifetime">&#39;a</span>&gt;(wsp1: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, wsp2: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, ()&gt; {
+            <span class="kw">move </span>|i: <span class="kw-2">&amp;</span>str| {
+                <span class="kw">let </span>(i, <span class="kw">_</span>) = nom::character::complete::line_ending(i)<span class="question-mark">?</span>;
+                <span class="kw">let </span>(i, <span class="kw">_</span>) = nom::bytes::complete::tag(wsp1)(i)<span class="question-mark">?</span>;
+                <span class="kw">let </span>(i, <span class="kw">_</span>) = nom::bytes::complete::tag(wsp2)(i)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>((i, ()))
             }
         }
 
-        <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">wsp1</span>, <span class="ident">wsp2</span>)) <span class="op">=</span> <span class="ident">nom::sequence::pair</span>(
-            <span class="ident">nom::character::complete::space0</span>,
-            <span class="ident">nom::combinator::map</span>(<span class="ident">nom::bytes::complete::tag</span>(<span class="ident">block_header</span>), <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;   &quot;</span>),
-        )(<span class="ident">i</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>(i, (wsp1, wsp2)) = nom::sequence::pair(
+            nom::character::complete::space0,
+            nom::combinator::map(nom::bytes::complete::tag(block_header), |<span class="kw">_</span>| <span class="string">&quot;   &quot;</span>),
+        )(i)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> (<span class="ident">j</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">nom::multi::separated_list1</span>(
-            <span class="ident">indent</span>(<span class="ident">wsp1</span>, <span class="ident">wsp2</span>),
-            <span class="ident">nom::character::complete::not_line_ending</span>,
-        )(<span class="ident">i</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>(j, v) = nom::multi::separated_list1(
+            indent(wsp1, wsp2),
+            nom::character::complete::not_line_ending,
+        )(i)<span class="question-mark">?</span>;
 
-        <span class="comment">// If the block consists of only one line return now.</span>
-        <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">j</span>, <span class="ident">Cow::Borrowed</span>(<span class="ident">v</span>[<span class="number">0</span>])));
+        <span class="comment">// If the block consists of only one line return now.
+        </span><span class="kw">if </span>v.len() == <span class="number">1 </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>((j, Cow::Borrowed(v[<span class="number">0</span>])));
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_first</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>is_first = <span class="bool-val">true</span>;
 
-        <span class="kw">for</span> <span class="ident">subs</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">v</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">is_first</span> {
-                <span class="ident">s</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
+        <span class="kw">for </span>subs <span class="kw">in </span><span class="kw-2">&amp;</span>v {
+            <span class="kw">if </span>!is_first {
+                s.push(<span class="string">&#39; &#39;</span>);
             }
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="ident">subs</span>);
-            <span class="ident">is_first</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            s.push_str(subs);
+            is_first = <span class="bool-val">false</span>;
         }
 
-        <span class="prelude-val">Ok</span>((<span class="ident">j</span>, <span class="ident">Cow::from</span>(<span class="ident">s</span>)))
+        <span class="prelude-val">Ok</span>((j, Cow::from(s)))
     }
 }
 
-<span class="doccomment">/// Replace the following escaped characters:</span>
-<span class="doccomment">///     \\\`\ \:\&lt;\&gt;</span>
-<span class="doccomment">/// with:</span>
-<span class="doccomment">///     \`:&lt;&gt;</span>
-<span class="doccomment">/// Preserves usual whitespace, but removes `\ `.</span>
-<span class="kw">fn</span> <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">nom::combinator::map</span>(
-        <span class="ident">nom::bytes::complete::escaped_transform</span>(
-            <span class="ident">nom::bytes::complete::is_not</span>(<span class="string">&quot;\\&quot;</span>),
+<span class="doccomment">/// Replace the following escaped characters:
+///     \\\`\ \:\&lt;\&gt;
+/// with:
+///     \`:&lt;&gt;
+/// Preserves usual whitespace, but removes `\ `.
+</span><span class="kw">fn </span>rst_escaped_link_text_transform(i: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Cow&lt;str&gt;&gt; {
+    nom::combinator::map(
+        nom::bytes::complete::escaped_transform(
+            nom::bytes::complete::is_not(<span class="string">&quot;\\&quot;</span>),
             <span class="string">&#39;\\&#39;</span>,
-            <span class="comment">// This list is the same as `ESCAPABLE`.</span>
-            <span class="ident">alt</span>((
-                <span class="ident">tag</span>(<span class="string">&quot;\\&quot;</span>),
-                <span class="ident">tag</span>(<span class="string">&quot;`&quot;</span>),
-                <span class="ident">tag</span>(<span class="string">&quot;:&quot;</span>),
-                <span class="ident">tag</span>(<span class="string">&quot;&lt;&quot;</span>),
-                <span class="ident">tag</span>(<span class="string">&quot;&gt;&quot;</span>),
-                <span class="ident">tag</span>(<span class="string">&quot;_&quot;</span>),
-                <span class="ident">value</span>(<span class="string">&quot;&quot;</span>, <span class="ident">tag</span>(<span class="string">&quot; &quot;</span>)),
+            <span class="comment">// This list is the same as `ESCAPABLE`.
+            </span>alt((
+                tag(<span class="string">&quot;\\&quot;</span>),
+                tag(<span class="string">&quot;`&quot;</span>),
+                tag(<span class="string">&quot;:&quot;</span>),
+                tag(<span class="string">&quot;&lt;&quot;</span>),
+                tag(<span class="string">&quot;&gt;&quot;</span>),
+                tag(<span class="string">&quot;_&quot;</span>),
+                value(<span class="string">&quot;&quot;</span>, tag(<span class="string">&quot; &quot;</span>)),
             )),
         ),
-        <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="ident">i</span> { <span class="ident">Cow::from</span>(<span class="ident">i</span>) } <span class="kw">else</span> { <span class="ident">Cow::from</span>(<span class="ident">s</span>) },
-    )(<span class="ident">i</span>)
+        |s| <span class="kw">if </span>s == i { Cow::from(i) } <span class="kw">else </span>{ Cow::from(s) },
+    )(i)
 }
 
-<span class="doccomment">/// Deletes all whitespace, but keeps one space for each `\ `.</span>
-<span class="kw">fn</span> <span class="ident">remove_whitespace</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">j</span> <span class="op">=</span> <span class="ident">i</span>;
-    <span class="kw">while</span> <span class="op">!</span><span class="ident">j</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">let</span> (<span class="ident">k</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::character::complete::multispace0</span>(<span class="ident">j</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">s</span>) <span class="op">=</span> <span class="ident">nom::bytes::complete::escaped</span>(
-            <span class="ident">nom::character::complete::none_of</span>(<span class="string">&quot;\\\r\n \t&quot;</span>),
+<span class="doccomment">/// Deletes all whitespace, but keeps one space for each `\ `.
+</span><span class="kw">fn </span>remove_whitespace(i: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Cow&lt;str&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>res = Cow::Borrowed(<span class="string">&quot;&quot;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>j = i;
+    <span class="kw">while </span>!j.is_empty() {
+        <span class="kw">let </span>(k, <span class="kw">_</span>) = nom::character::complete::multispace0(j)<span class="question-mark">?</span>;
+        <span class="kw">let </span>(k, s) = nom::bytes::complete::escaped(
+            nom::character::complete::none_of(<span class="string">&quot;\\\r\n \t&quot;</span>),
             <span class="string">&#39;\\&#39;</span>,
-            <span class="ident">nom::character::complete::one_of</span>(<span class="string">r#&quot; :`&lt;&gt;\&quot;#</span>),
-        )(<span class="ident">k</span>)<span class="question-mark">?</span>;
-        <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span> {
-            <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>) =&gt; <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>),
-            <span class="ident">Cow::Borrowed</span>(<span class="ident">res_str</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">strg</span> <span class="op">=</span> <span class="ident">res_str</span>.<span class="ident">to_string</span>();
-                <span class="ident">strg</span>.<span class="ident">push_str</span>(<span class="ident">s</span>);
-                <span class="ident">Cow::Owned</span>(<span class="ident">strg</span>)
+            nom::character::complete::one_of(<span class="string">r#&quot; :`&lt;&gt;\&quot;#</span>),
+        )(k)<span class="question-mark">?</span>;
+        res = <span class="kw">match </span>res {
+            Cow::Borrowed(<span class="string">&quot;&quot;</span>) =&gt; Cow::Borrowed(s),
+            Cow::Borrowed(res_str) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>strg = res_str.to_string();
+                strg.push_str(s);
+                Cow::Owned(strg)
             }
-            <span class="ident">Cow::Owned</span>(<span class="kw-2">mut</span> <span class="ident">strg</span>) =&gt; {
-                <span class="ident">strg</span>.<span class="ident">push_str</span>(<span class="ident">s</span>);
-                <span class="ident">Cow::Owned</span>(<span class="ident">strg</span>)
+            Cow::Owned(<span class="kw-2">mut </span>strg) =&gt; {
+                strg.push_str(s);
+                Cow::Owned(strg)
             }
         };
-        <span class="ident">j</span> <span class="op">=</span> <span class="ident">k</span>;
+        j = k;
     }
 
-    <span class="prelude-val">Ok</span>((<span class="ident">j</span>, <span class="ident">res</span>))
+    <span class="prelude-val">Ok</span>((j, res))
 }
 
-<span class="doccomment">/// Replace the following escaped characters:</span>
-<span class="doccomment">///     \\\`\ \:\&lt;\&gt;</span>
-<span class="doccomment">/// with:</span>
-<span class="doccomment">///     \` :&lt;&gt;</span>
-<span class="kw">fn</span> <span class="ident">rst_escaped_link_destination_transform</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">my_err</span> <span class="op">=</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-        <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
-            <span class="ident">i</span>,
-            <span class="ident">nom::error::ErrorKind::EscapedTransform</span>,
+<span class="doccomment">/// Replace the following escaped characters:
+///     \\\`\ \:\&lt;\&gt;
+/// with:
+///     \` :&lt;&gt;
+</span><span class="kw">fn </span>rst_escaped_link_destination_transform(i: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Cow&lt;str&gt;&gt; {
+    <span class="kw">let </span>my_err = |<span class="kw">_</span>| {
+        nom::Err::Error(nom::error::Error::new(
+            i,
+            nom::error::ErrorKind::EscapedTransform,
         ))
     };
 
-    <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">remove_whitespace</span>(<span class="ident">i</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
+    <span class="kw">let </span>c = <span class="kw-2">&amp;*</span>remove_whitespace(i)<span class="question-mark">?</span>.<span class="number">1</span>;
 
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">nom::bytes::complete::escaped_transform</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">nom::error::Error</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(
-        <span class="ident">nom::bytes::complete::is_not</span>(<span class="string">&quot;\\&quot;</span>),
+    <span class="kw">let </span>s = nom::bytes::complete::escaped_transform::&lt;<span class="kw">_</span>, nom::error::Error&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
+        nom::bytes::complete::is_not(<span class="string">&quot;\\&quot;</span>),
         <span class="string">&#39;\\&#39;</span>,
-        <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
-    )(<span class="ident">c</span>)
-    .<span class="ident">map_err</span>(<span class="ident">my_err</span>)<span class="question-mark">?</span>
-    .<span class="number">1</span>;
+        nom::character::complete::one_of(ESCAPABLE),
+    )(c)
+    .map_err(my_err)<span class="question-mark">?
+    </span>.<span class="number">1</span>;
 
-    <span class="comment">// When nothing was changed we can continue with `Borrowed`.</span>
-    <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="ident">i</span> {
-        <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Borrowed</span>(<span class="ident">i</span>)))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Owned</span>(<span class="ident">s</span>)))
+    <span class="comment">// When nothing was changed we can continue with `Borrowed`.
+    </span><span class="kw">if </span>s == i {
+        <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Borrowed(i)))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Owned(s)))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">nom::error::ErrorKind</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>nom::error::ErrorKind;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rst_text2dest</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rst_text2dest() {
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;abc&quot;</span>,
             (
-                <span class="ident">Cow::from</span>(<span class="string">&quot;Python home page&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;http://www.python.org&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                Cow::from(<span class="string">&quot;Python home page&quot;</span>),
+                Cow::from(<span class="string">&quot;http://www.python.org&quot;</span>),
+                Cow::from(<span class="string">&quot;&quot;</span>),
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_text2dest</span>(<span class="string">&quot;`Python home page &lt;http://www.python.org&gt;`__abc&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_text2dest(<span class="string">&quot;`Python home page &lt;http://www.python.org&gt;`__abc&quot;</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;abc&quot;</span>,
             (
-                <span class="ident">Cow::from</span>(<span class="string">r#&quot;Python&lt;home&gt; page&quot;#</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;http://www.python.org&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                Cow::from(<span class="string">r#&quot;Python&lt;home&gt; page&quot;#</span>),
+                Cow::from(<span class="string">&quot;http://www.python.org&quot;</span>),
+                Cow::from(<span class="string">&quot;&quot;</span>),
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_text2dest</span>(<span class="string">r#&quot;`Python\ \&lt;home\&gt; page &lt;http://www.python.org&gt;`__abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_text2dest(<span class="string">r#&quot;`Python\ \&lt;home\&gt; page &lt;http://www.python.org&gt;`__abc&quot;#</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;abc&quot;</span>,
             (
-                <span class="ident">Cow::from</span>(<span class="string">r#&quot;my news at &lt;http://python.org&gt;&quot;#</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;http://news.python.org&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                Cow::from(<span class="string">r#&quot;my news at &lt;http://python.org&gt;&quot;#</span>),
+                Cow::from(<span class="string">&quot;http://news.python.org&quot;</span>),
+                Cow::from(<span class="string">&quot;&quot;</span>),
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_text2dest</span>(<span class="string">r#&quot;`my news at \&lt;http://python.org\&gt; &lt;http://news.python.org&gt;`__abc&quot;#</span>)
-                .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_text2dest(<span class="string">r#&quot;`my news at \&lt;http://python.org\&gt; &lt;http://news.python.org&gt;`__abc&quot;#</span>)
+                .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;abc&quot;</span>,
             (
-                <span class="ident">Cow::from</span>(<span class="string">r#&quot;my news at &lt;http://python.org&gt;&quot;#</span>),
-                <span class="ident">Cow::from</span>(<span class="string">r#&quot;http://news. &lt;python&gt;.org&quot;#</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                Cow::from(<span class="string">r#&quot;my news at &lt;http://python.org&gt;&quot;#</span>),
+                Cow::from(<span class="string">r#&quot;http://news. &lt;python&gt;.org&quot;#</span>),
+                Cow::from(<span class="string">&quot;&quot;</span>),
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_text2dest</span>(
-                <span class="string">r#&quot;`my news at \&lt;http\://python.org\&gt; &lt;http:// news.\ \&lt;python\&gt;.org&gt;`__abc&quot;#</span>
-            )
-            .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_text2dest(
+                <span class="string">r#&quot;`my news at \&lt;http\://python.org\&gt; &lt;http:// news.\ \&lt;python\&gt;.org&gt;`__abc&quot;#
+            </span>)
+            .unwrap(),
+            expected
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rst_parse_text2dest_label</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;abc&quot;</span>, (<span class="string">&quot;Python home page&quot;</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rst_parse_text2dest_label() {
+        <span class="kw">let </span>expected = (<span class="string">&quot;abc&quot;</span>, (<span class="string">&quot;Python home page&quot;</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(<span class="string">&quot;`Python home page &lt;http://www.python.org&gt;`_abc&quot;</span>)
-                .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_text2target(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(<span class="string">&quot;`Python home page &lt;http://www.python.org&gt;`_abc&quot;</span>)
+                .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;abc&quot;</span>, <span class="ident">ErrorKind::Tag</span>));
+        <span class="kw">let </span>expected = nom::Err::Error(nom::error::Error::new(<span class="string">&quot;abc&quot;</span>, ErrorKind::Tag));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(<span class="string">&quot;`Python home page &lt;http://www.python.org_&gt;`_abc&quot;</span>)
-                .<span class="ident">unwrap_err</span>(),
-            <span class="ident">expected</span>
+            rst_parse_text2target(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(<span class="string">&quot;`Python home page &lt;http://www.python.org_&gt;`_abc&quot;</span>)
+                .unwrap_err(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;&quot;</span>, <span class="ident">ErrorKind::Tag</span>));
+        <span class="kw">let </span>expected = nom::Err::Error(nom::error::Error::new(<span class="string">&quot;&quot;</span>, ErrorKind::Tag));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(<span class="string">&quot;`_abc&quot;</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">expected</span>
+            rst_parse_text2target(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(<span class="string">&quot;`_abc&quot;</span>).unwrap_err(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;abc&quot;</span>, (<span class="string">&quot;Python home page&quot;</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
+        <span class="kw">let </span>expected = (<span class="string">&quot;abc&quot;</span>, (<span class="string">&quot;Python home page&quot;</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2target</span>(<span class="bool-val">true</span>, <span class="bool-val">false</span>)(<span class="string">&quot;`Python home page &lt;http://www.python.org&gt;`__abc&quot;</span>)
-                .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_text2target(<span class="bool-val">true</span>, <span class="bool-val">false</span>)(<span class="string">&quot;`Python home page &lt;http://www.python.org&gt;`__abc&quot;</span>)
+                .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;abc&quot;</span>, (<span class="string">r#&quot;Python\ \&lt;home\&gt; page&quot;#</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
+        <span class="kw">let </span>expected = (<span class="string">&quot;abc&quot;</span>, (<span class="string">r#&quot;Python\ \&lt;home\&gt; page&quot;#</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(
-                <span class="string">r#&quot;`Python\ \&lt;home\&gt; page &lt;http://www.python.org&gt;`_abc&quot;#</span>
-            )
-            .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_text2target(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(
+                <span class="string">r#&quot;`Python\ \&lt;home\&gt; page &lt;http://www.python.org&gt;`_abc&quot;#
+            </span>)
+            .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;abc&quot;</span>,
             (
                 <span class="string">r#&quot;my news at \&lt;http://python.org\&gt;&quot;#</span>,
@@ -2043,14 +2043,14 @@
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(
-                <span class="string">r#&quot;`my news at \&lt;http://python.org\&gt; &lt;http://news.python.org&gt;`_abc&quot;#</span>
-            )
-            .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_text2target(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(
+                <span class="string">r#&quot;`my news at \&lt;http://python.org\&gt; &lt;http://news.python.org&gt;`_abc&quot;#
+            </span>)
+            .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;abc&quot;</span>,
             (
                 <span class="string">r#&quot;my news at \&lt;http\://python.org\&gt;&quot;#</span>,
@@ -2058,14 +2058,14 @@
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(
-                <span class="string">r#&quot;`my news at \&lt;http\://python.org\&gt; &lt;http:// news.\ \&lt;python\&gt;.org&gt;`_abc&quot;#</span>
-            )
-            .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_text2target(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(
+                <span class="string">r#&quot;`my news at \&lt;http\://python.org\&gt; &lt;http:// news.\ \&lt;python\&gt;.org&gt;`_abc&quot;#
+            </span>)
+            .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;abc&quot;</span>,
             (
                 <span class="string">r#&quot;my news at \&lt;http\://python.org\&gt;&quot;#</span>,
@@ -2073,264 +2073,264 @@
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(
-                <span class="string">r#&quot;`my news at \&lt;http\://python.org\&gt; &lt;http:// news.\ \&lt;python\&gt;.org&gt;`_abc&quot;#</span>
-            )
-            .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_text2target(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(
+                <span class="string">r#&quot;`my news at \&lt;http\://python.org\&gt; &lt;http:// news.\ \&lt;python\&gt;.org&gt;`_abc&quot;#
+            </span>)
+            .unwrap(),
+            expected
         );
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;abc&quot;</span>, (<span class="string">r#&quot;rst link text&quot;#</span>, <span class="string">&quot;rst_link_label&quot;</span>));
+        <span class="kw">let </span>expected = (<span class="string">&quot;abc&quot;</span>, (<span class="string">r#&quot;rst link text&quot;#</span>, <span class="string">&quot;rst_link_label&quot;</span>));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">true</span>)(<span class="string">r#&quot;`rst link text &lt;rst_link_label_&gt;`_abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_text2target(<span class="bool-val">false</span>, <span class="bool-val">true</span>)(<span class="string">r#&quot;`rst link text &lt;rst_link_label_&gt;`_abc&quot;#</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;abc&quot;</span>, <span class="ident">ErrorKind::Tag</span>));
+        <span class="kw">let </span>expected = nom::Err::Error(nom::error::Error::new(<span class="string">&quot;abc&quot;</span>, ErrorKind::Tag));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">true</span>)(<span class="string">r#&quot;`my news &lt;python webpage&gt;`_abc&quot;#</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">expected</span>
+            rst_parse_text2target(<span class="bool-val">false</span>, <span class="bool-val">true</span>)(<span class="string">r#&quot;`my news &lt;python webpage&gt;`_abc&quot;#</span>).unwrap_err(),
+            expected
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rst_text2label</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rst_text2label() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_text2label</span>(<span class="string">r#&quot;link_text_ abc&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;link_text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;link_text&quot;</span>))))
+            rst_text2label(<span class="string">r#&quot;link_text_ abc&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (Cow::from(<span class="string">&quot;link_text&quot;</span>), Cow::from(<span class="string">&quot;link_text&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_text2label</span>(<span class="string">r#&quot;`li\:nk text`_ abc&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;li:nk text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;li:nk text&quot;</span>))))
+            rst_text2label(<span class="string">r#&quot;`li\:nk text`_ abc&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (Cow::from(<span class="string">&quot;li:nk text&quot;</span>), Cow::from(<span class="string">&quot;li:nk text&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_text2label</span>(<span class="string">&quot;`link text`__ abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;link text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;_&quot;</span>))))
+            rst_text2label(<span class="string">&quot;`link text`__ abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (Cow::from(<span class="string">&quot;link text&quot;</span>), Cow::from(<span class="string">&quot;_&quot;</span>))))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rst_parse_text2label</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rst_parse_text2label() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2label</span>(<span class="string">&quot;linktext_ abc&quot;</span>),
+            rst_parse_text2label(<span class="string">&quot;linktext_ abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;linktext&quot;</span>, <span class="string">&quot;linktext&quot;</span>)))
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2label</span>(<span class="string">&quot;linktext__ abc&quot;</span>),
+            rst_parse_text2label(<span class="string">&quot;linktext__ abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;linktext&quot;</span>, <span class="string">&quot;_&quot;</span>)))
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2label</span>(<span class="string">&quot;link_text_ abc&quot;</span>),
+            rst_parse_text2label(<span class="string">&quot;link_text_ abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;link_text&quot;</span>, <span class="string">&quot;link_text&quot;</span>)))
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2label</span>(<span class="string">&quot;`link text`_ abc&quot;</span>),
+            rst_parse_text2label(<span class="string">&quot;`link text`_ abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;link text&quot;</span>, <span class="string">&quot;link text&quot;</span>)))
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2label</span>(<span class="string">&quot;`link text`_abc&quot;</span>),
+            rst_parse_text2label(<span class="string">&quot;`link text`_abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="string">&quot;link text&quot;</span>, <span class="string">&quot;link text&quot;</span>)))
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2label</span>(<span class="string">&quot;`link_text`_ abc&quot;</span>),
+            rst_parse_text2label(<span class="string">&quot;`link_text`_ abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;link_text&quot;</span>, <span class="string">&quot;link_text&quot;</span>)))
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2label</span>(<span class="string">&quot;`link text`__ abc&quot;</span>),
+            rst_parse_text2label(<span class="string">&quot;`link text`__ abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;link text&quot;</span>, <span class="string">&quot;_&quot;</span>)))
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_text2label</span>(<span class="string">&quot;`link text&lt;link label_&gt;`_ abc&quot;</span>),
+            rst_parse_text2label(<span class="string">&quot;`link text&lt;link label_&gt;`_ abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;link text&quot;</span>, <span class="string">&quot;link label&quot;</span>)))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rst_label2dest</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rst_label2dest() {
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;\nabc&quot;</span>,
             (
-                <span class="ident">Cow::from</span>(<span class="string">&quot;Python: home page&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;http://www.python.org&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                Cow::from(<span class="string">&quot;Python: home page&quot;</span>),
+                Cow::from(<span class="string">&quot;http://www.python.org&quot;</span>),
+                Cow::from(<span class="string">&quot;&quot;</span>),
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">&quot;.. _`Python: home page`: http://www.python.org\nabc&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">&quot;.. _`Python: home page`: http://www.python.org\nabc&quot;</span>).unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">&quot;  .. _`Python: home page`: http://www.py\n     thon.org    \nabc&quot;</span>)
-                .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">&quot;  .. _`Python: home page`: http://www.py\n     thon.org    \nabc&quot;</span>)
+                .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+        <span class="kw">let </span>expected = nom::Err::Error(nom::error::Error::new(
             <span class="string">&quot;x .. _`Python: home page`: http://www.python.org\nabc&quot;</span>,
-            <span class="ident">ErrorKind::Tag</span>,
+            ErrorKind::Tag,
         ));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">&quot;x .. _`Python: home page`: http://www.python.org\nabc&quot;</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">&quot;x .. _`Python: home page`: http://www.python.org\nabc&quot;</span>).unwrap_err(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;&quot;</span>,
             (
-                <span class="ident">Cow::from</span>(<span class="string">&quot;Python: `home page`&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;http://www.python .org&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                Cow::from(<span class="string">&quot;Python: `home page`&quot;</span>),
+                Cow::from(<span class="string">&quot;http://www.python .org&quot;</span>),
+                Cow::from(<span class="string">&quot;&quot;</span>),
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">r#&quot;.. _Python\: \`home page\`: http://www.python\ .org&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">r#&quot;.. _Python\: \`home page\`: http://www.python\ .org&quot;#</span>).unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">r#&quot;.. _`Python: \`home page\``: http://www.python\ .org&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">r#&quot;.. _`Python: \`home page\``: http://www.python\ .org&quot;#</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;&quot;</span>,
             (
-                <span class="ident">Cow::from</span>(<span class="string">&quot;my news at &lt;http://python.org&gt;&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;http://news.python.org&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                Cow::from(<span class="string">&quot;my news at &lt;http://python.org&gt;&quot;</span>),
+                Cow::from(<span class="string">&quot;http://news.python.org&quot;</span>),
+                Cow::from(<span class="string">&quot;&quot;</span>),
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">r#&quot;.. _`my news at &lt;http://python.org&gt;`: http://news.python.org&quot;#</span>)
-                .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">r#&quot;.. _`my news at &lt;http://python.org&gt;`: http://news.python.org&quot;#</span>)
+                .unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">r#&quot;.. _`my news at \&lt;http://python.org\&gt;`: http://news.python.org&quot;#</span>)
-                .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">r#&quot;.. _`my news at \&lt;http://python.org\&gt;`: http://news.python.org&quot;#</span>)
+                .unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">r#&quot;.. _my news at \&lt;http\://python.org\&gt;: http://news.python.org&quot;#</span>)
-                .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">r#&quot;.. _my news at \&lt;http\://python.org\&gt;: http://news.python.org&quot;#</span>)
+                .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;&quot;</span>,
             (
-                <span class="ident">Cow::from</span>(<span class="string">&quot;my news&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;http://news.&lt;python&gt;.org&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                Cow::from(<span class="string">&quot;my news&quot;</span>),
+                Cow::from(<span class="string">&quot;http://news.&lt;python&gt;.org&quot;</span>),
+                Cow::from(<span class="string">&quot;&quot;</span>),
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">r#&quot;.. _my news: http://news.&lt;python&gt;.org&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">r#&quot;.. _my news: http://news.&lt;python&gt;.org&quot;#</span>).unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">r#&quot;.. _my news: http://news.\&lt;python\&gt;.org&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">r#&quot;.. _my news: http://news.\&lt;python\&gt;.org&quot;#</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;&quot;</span>,
             (
-                <span class="ident">Cow::from</span>(<span class="string">&quot;_&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;http://news.python.org&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                Cow::from(<span class="string">&quot;_&quot;</span>),
+                Cow::from(<span class="string">&quot;http://news.python.org&quot;</span>),
+                Cow::from(<span class="string">&quot;&quot;</span>),
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">r#&quot;.. __: http://news.python.org&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">r#&quot;.. __: http://news.python.org&quot;#</span>).unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">r#&quot;__ http://news.python.org&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_label2dest(<span class="string">r#&quot;__ http://news.python.org&quot;#</span>).unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">&quot;.. _label: `link destination`_&quot;</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            rst_label2dest(<span class="string">&quot;.. _label: `link destination`_&quot;</span>).unwrap_err(),
+            nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;.. _label: `link destination`_&quot;</span>,
-                <span class="ident">ErrorKind::EscapedTransform</span>
+                ErrorKind::EscapedTransform
             )),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2dest</span>(<span class="string">&quot;__ link_destination_&quot;</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            rst_label2dest(<span class="string">&quot;__ link_destination_&quot;</span>).unwrap_err(),
+            nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;__ link_destination_&quot;</span>,
-                <span class="ident">ErrorKind::EscapedTransform</span>
+                ErrorKind::EscapedTransform
             )),
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rst_label2label</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rst_label2label() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2label</span>(<span class="string">&quot;   .. _`alt label`: `label`_\nabc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;alt label&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;label&quot;</span>))))
+            rst_label2label(<span class="string">&quot;   .. _`alt label`: `label`_\nabc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, (Cow::from(<span class="string">&quot;alt label&quot;</span>), Cow::from(<span class="string">&quot;label&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2label</span>(<span class="string">&quot;   .. __: label_\nabc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;_&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;label&quot;</span>))))
+            rst_label2label(<span class="string">&quot;   .. __: label_\nabc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, (Cow::from(<span class="string">&quot;_&quot;</span>), Cow::from(<span class="string">&quot;label&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2label</span>(<span class="string">&quot;   __ label_\nabc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;_&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;label&quot;</span>))))
+            rst_label2label(<span class="string">&quot;   __ label_\nabc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, (Cow::from(<span class="string">&quot;_&quot;</span>), Cow::from(<span class="string">&quot;label&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2label</span>(<span class="string">&quot;_label: label&quot;</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;_label: label&quot;</span>, <span class="ident">ErrorKind::Tag</span>)),
+            rst_label2label(<span class="string">&quot;_label: label&quot;</span>).unwrap_err(),
+            nom::Err::Error(nom::error::Error::new(<span class="string">&quot;_label: label&quot;</span>, ErrorKind::Tag)),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_label2label</span>(<span class="string">&quot;__ destination&quot;</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;&quot;</span>, <span class="ident">ErrorKind::Tag</span>)),
+            rst_label2label(<span class="string">&quot;__ destination&quot;</span>).unwrap_err(),
+            nom::Err::Error(nom::error::Error::new(<span class="string">&quot;&quot;</span>, ErrorKind::Tag)),
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rst_parse_label2target</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;Python home page&quot;</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rst_parse_label2target() {
+        <span class="kw">let </span>expected = (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;Python home page&quot;</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_label2target</span>(<span class="bool-val">false</span>)(<span class="string">&quot;_Python home page: http://www.python.org&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_label2target(<span class="bool-val">false</span>)(<span class="string">&quot;_Python home page: http://www.python.org&quot;</span>).unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_label2target</span>(<span class="bool-val">false</span>)(<span class="string">&quot;_`Python home page`: http://www.python.org&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
-        );
-
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;Python: home page&quot;</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_label2target</span>(<span class="bool-val">false</span>)(<span class="string">&quot;_`Python: home page`: http://www.python.org&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_label2target(<span class="bool-val">false</span>)(<span class="string">&quot;_`Python home page`: http://www.python.org&quot;</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;&quot;</span>, (<span class="string">r#&quot;Python\: home page&quot;#</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
+        <span class="kw">let </span>expected = (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;Python: home page&quot;</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_label2target</span>(<span class="bool-val">false</span>)(<span class="string">r#&quot;_Python\: home page: http://www.python.org&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_label2target(<span class="bool-val">false</span>)(<span class="string">&quot;_`Python: home page`: http://www.python.org&quot;</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (<span class="string">&quot;&quot;</span>, (<span class="string">r#&quot;Python\: home page&quot;#</span>, <span class="string">&quot;http://www.python.org&quot;</span>));
+        <span class="macro">assert_eq!</span>(
+            rst_parse_label2target(<span class="bool-val">false</span>)(<span class="string">r#&quot;_Python\: home page: http://www.python.org&quot;#</span>).unwrap(),
+            expected
+        );
+
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;&quot;</span>,
             (<span class="string">&quot;my news at &lt;http://python.org&gt;&quot;</span>, <span class="string">&quot;http://news.python.org&quot;</span>),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_label2target</span>(<span class="bool-val">false</span>)(
-                <span class="string">r#&quot;_`my news at &lt;http://python.org&gt;`: http://news.python.org&quot;#</span>
-            )
-            .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_label2target(<span class="bool-val">false</span>)(
+                <span class="string">r#&quot;_`my news at &lt;http://python.org&gt;`: http://news.python.org&quot;#
+            </span>)
+            .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;&quot;</span>,
             (
                 <span class="string">r#&quot;my news at \&lt;http://python.org\&gt;&quot;#</span>,
@@ -2338,14 +2338,14 @@
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_label2target</span>(<span class="bool-val">false</span>)(
-                <span class="string">r#&quot;_`my news at \&lt;http://python.org\&gt;`: http://news.python.org&quot;#</span>
-            )
-            .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_label2target(<span class="bool-val">false</span>)(
+                <span class="string">r#&quot;_`my news at \&lt;http://python.org\&gt;`: http://news.python.org&quot;#
+            </span>)
+            .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;&quot;</span>,
             (
                 <span class="string">r#&quot;my news at \&lt;http\://python.org\&gt;&quot;#</span>,
@@ -2353,194 +2353,194 @@
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_label2target</span>(<span class="bool-val">false</span>)(
-                <span class="string">r#&quot;_my news at \&lt;http\://python.org\&gt;: http://news.python.org&quot;#</span>
-            )
-            .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_label2target(<span class="bool-val">false</span>)(
+                <span class="string">r#&quot;_my news at \&lt;http\://python.org\&gt;: http://news.python.org&quot;#
+            </span>)
+            .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;_&quot;</span>, <span class="string">&quot;http://news.python.org&quot;</span>));
+        <span class="kw">let </span>expected = (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;_&quot;</span>, <span class="string">&quot;http://news.python.org&quot;</span>));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_label2target</span>(<span class="bool-val">false</span>)(<span class="string">r#&quot;__: http://news.python.org&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_label2target(<span class="bool-val">false</span>)(<span class="string">r#&quot;__: http://news.python.org&quot;#</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;alt_label&quot;</span>, <span class="string">&quot;one_word_label&quot;</span>));
+        <span class="kw">let </span>expected = (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;alt_label&quot;</span>, <span class="string">&quot;one_word_label&quot;</span>));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_label2target</span>(<span class="bool-val">true</span>)(<span class="string">&quot;_alt_label: one_word_label_&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_label2target(<span class="bool-val">true</span>)(<span class="string">&quot;_alt_label: one_word_label_&quot;</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;alt label&quot;</span>, <span class="string">&quot;more words label&quot;</span>));
+        <span class="kw">let </span>expected = (<span class="string">&quot;&quot;</span>, (<span class="string">&quot;alt label&quot;</span>, <span class="string">&quot;more words label&quot;</span>));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_label2target</span>(<span class="bool-val">true</span>)(<span class="string">&quot;_`alt label`: `more words label`_&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_label2target(<span class="bool-val">true</span>)(<span class="string">&quot;_`alt label`: `more words label`_&quot;</span>).unwrap(),
+            expected
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parse_simple_label</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;&quot;</span>, <span class="string">&quot;one_word_label&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">rst_parse_simple_label</span>(<span class="string">&quot;one_word_label_&quot;</span>).<span class="ident">unwrap</span>(), <span class="ident">expected</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parse_simple_label() {
+        <span class="kw">let </span>expected = (<span class="string">&quot;&quot;</span>, <span class="string">&quot;one_word_label&quot;</span>);
+        <span class="macro">assert_eq!</span>(rst_parse_simple_label(<span class="string">&quot;one_word_label_&quot;</span>).unwrap(), expected);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot; abc&quot;</span>, <span class="string">&quot;one_word_label&quot;</span>);
+        <span class="kw">let </span>expected = (<span class="string">&quot; abc&quot;</span>, <span class="string">&quot;one_word_label&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_simple_label</span>(<span class="string">&quot;one_word_label_ abc&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_simple_label(<span class="string">&quot;one_word_label_ abc&quot;</span>).unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_simple_label</span>(<span class="string">&quot;`one_word_label`_ abc&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_simple_label(<span class="string">&quot;`one_word_label`_ abc&quot;</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;&quot;</span>, <span class="string">&quot;more words label&quot;</span>);
+        <span class="kw">let </span>expected = (<span class="string">&quot;&quot;</span>, <span class="string">&quot;more words label&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_simple_label</span>(<span class="string">&quot;`more words label`_&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_simple_label(<span class="string">&quot;`more words label`_&quot;</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;. abc&quot;</span>, <span class="string">&quot;more words label&quot;</span>);
+        <span class="kw">let </span>expected = (<span class="string">&quot;. abc&quot;</span>, <span class="string">&quot;more words label&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_simple_label</span>(<span class="string">&quot;`more words label`_. abc&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_simple_label(<span class="string">&quot;`more words label`_. abc&quot;</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;? abc&quot;</span>, <span class="string">&quot;more words label&quot;</span>);
+        <span class="kw">let </span>expected = (<span class="string">&quot;? abc&quot;</span>, <span class="string">&quot;more words label&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_simple_label</span>(<span class="string">&quot;`more words label`_? abc&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            rst_parse_simple_label(<span class="string">&quot;`more words label`_? abc&quot;</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot; abc&quot;</span>, <span class="string">&quot;more words label&quot;</span>);
+        <span class="kw">let </span>expected = (<span class="string">&quot; abc&quot;</span>, <span class="string">&quot;more words label&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_simple_label</span>(<span class="string">&quot;`more words label`_ abc&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
-        );
-
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_simple_label</span>(<span class="string">&quot;_&quot;</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;&quot;</span>, <span class="ident">ErrorKind::Not</span>)),
+            rst_parse_simple_label(<span class="string">&quot;`more words label`_ abc&quot;</span>).unwrap(),
+            expected
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_parse_simple_label</span>(<span class="string">&quot;``_&quot;</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;``_&quot;</span>, <span class="ident">ErrorKind::TakeTill1</span>)),
+            rst_parse_simple_label(<span class="string">&quot;_&quot;</span>).unwrap_err(),
+            nom::Err::Error(nom::error::Error::new(<span class="string">&quot;&quot;</span>, ErrorKind::Not)),
+        );
+
+        <span class="macro">assert_eq!</span>(
+            rst_parse_simple_label(<span class="string">&quot;``_&quot;</span>).unwrap_err(),
+            nom::Err::Error(nom::error::Error::new(<span class="string">&quot;``_&quot;</span>, ErrorKind::TakeTill1)),
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rst_explicit_markup_block</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rst_explicit_markup_block() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_explicit_markup_block</span>(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;.. 11111&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;11111&quot;</span>)))
+            rst_explicit_markup_block(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;.. 11111&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;11111&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_explicit_markup_block</span>(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;   .. 11111\nout&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nout&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;11111&quot;</span>)))
+            rst_explicit_markup_block(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;   .. 11111\nout&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nout&quot;</span>, Cow::from(<span class="string">&quot;11111&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_explicit_markup_block</span>(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;   .. 11111\n      222222\n      333333\nout&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nout&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;11111 222222 333333&quot;</span>)))
+            rst_explicit_markup_block(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;   .. 11111\n      222222\n      333333\nout&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nout&quot;</span>, Cow::from(<span class="string">&quot;11111 222222 333333&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_explicit_markup_block</span>(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;   .. first\n      second\n       1indent\nout&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nout&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;first second  1indent&quot;</span>)))
+            rst_explicit_markup_block(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;   .. first\n      second\n       1indent\nout&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nout&quot;</span>, Cow::from(<span class="string">&quot;first second  1indent&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_explicit_markup_block</span>(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;   ..first&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            rst_explicit_markup_block(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;   ..first&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;..first&quot;</span>,
-                <span class="ident">ErrorKind::Tag</span>
+                ErrorKind::Tag
             )))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_explicit_markup_block</span>(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;x  .. first&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            rst_explicit_markup_block(<span class="string">&quot;.. &quot;</span>)(<span class="string">&quot;x  .. first&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;x  .. first&quot;</span>,
-                <span class="ident">ErrorKind::Tag</span>
+                ErrorKind::Tag
             )))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rst_escaped_link_text_transform</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">rst_escaped_link_text_transform</span>(<span class="string">&quot;&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))));
-        <span class="comment">// Different than the link destination version.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_escaped_link_text_transform</span>(<span class="string">&quot;   &quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;   &quot;</span>)))
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rst_escaped_link_text_transform() {
+        <span class="macro">assert_eq!</span>(rst_escaped_link_text_transform(<span class="string">&quot;&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;&quot;</span>))));
+        <span class="comment">// Different than the link destination version.
+        </span><span class="macro">assert_eq!</span>(
+            rst_escaped_link_text_transform(<span class="string">&quot;   &quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;   &quot;</span>)))
         );
-        <span class="comment">// Different than the link destination version.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_escaped_link_text_transform</span>(<span class="string">r#&quot;\ \ \ &quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)))
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_escaped_link_text_transform</span>(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>)))
+        <span class="comment">// Different than the link destination version.
+        </span><span class="macro">assert_eq!</span>(
+            rst_escaped_link_text_transform(<span class="string">r#&quot;\ \ \ &quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_escaped_link_text_transform</span>(<span class="string">r#&quot;\:\`\&lt;\&gt;\\&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">r#&quot;:`&lt;&gt;\&quot;#</span>)))
+            rst_escaped_link_text_transform(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>)))
+        );
+        <span class="macro">assert_eq!</span>(
+            rst_escaped_link_text_transform(<span class="string">r#&quot;\:\`\&lt;\&gt;\\&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">r#&quot;:`&lt;&gt;\&quot;#</span>)))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rst_escaped_link_destination_transform</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rst_escaped_link_destination_transform() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_escaped_link_destination_transform</span>(<span class="string">&quot;&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>)))
+            rst_escaped_link_destination_transform(<span class="string">&quot;&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Borrowed(<span class="string">&quot;&quot;</span>)))
         );
-        <span class="comment">// Different than the link name version.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_escaped_link_destination_transform</span>(<span class="string">&quot;  &quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>)))
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_escaped_link_destination_transform</span>(<span class="string">&quot; x x&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Owned</span>(<span class="string">&quot;xx&quot;</span>.<span class="ident">to_string</span>())))
-        );
-        <span class="comment">// Different than the link name version.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_escaped_link_destination_transform</span>(<span class="string">r#&quot;\ \ \ &quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Owned</span>(<span class="string">&quot;   &quot;</span>.<span class="ident">to_string</span>())))
+        <span class="comment">// Different than the link name version.
+        </span><span class="macro">assert_eq!</span>(
+            rst_escaped_link_destination_transform(<span class="string">&quot;  &quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Borrowed(<span class="string">&quot;&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_escaped_link_destination_transform</span>(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Borrowed</span>(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>)))
+            rst_escaped_link_destination_transform(<span class="string">&quot; x x&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Owned(<span class="string">&quot;xx&quot;</span>.to_string())))
+        );
+        <span class="comment">// Different than the link name version.
+        </span><span class="macro">assert_eq!</span>(
+            rst_escaped_link_destination_transform(<span class="string">r#&quot;\ \ \ &quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Owned(<span class="string">&quot;   &quot;</span>.to_string())))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rst_escaped_link_destination_transform</span>(<span class="string">r#&quot;\:\`\&lt;\&gt;\\&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Owned</span>(<span class="string">r#&quot;:`&lt;&gt;\&quot;#</span>.<span class="ident">to_string</span>())))
+            rst_escaped_link_destination_transform(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Borrowed(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>)))
+        );
+        <span class="macro">assert_eq!</span>(
+            rst_escaped_link_destination_transform(<span class="string">r#&quot;\:\`\&lt;\&gt;\\&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Owned(<span class="string">r#&quot;:`&lt;&gt;\&quot;#</span>.to_string())))
         );
     }
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_remove_whitespace</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">remove_whitespace</span>(<span class="string">&quot; abc &quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;abc&quot;</span>))));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_remove_whitespace() {
+        <span class="macro">assert_eq!</span>(remove_whitespace(<span class="string">&quot; abc &quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Borrowed(<span class="string">&quot;abc&quot;</span>))));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">remove_whitespace</span>(<span class="string">&quot; x x&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Owned</span>(<span class="string">&quot;xx&quot;</span>.<span class="ident">to_string</span>())))
+            remove_whitespace(<span class="string">&quot; x x&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Owned(<span class="string">&quot;xx&quot;</span>.to_string())))
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">remove_whitespace</span>(<span class="string">&quot;  \t \r \n&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))));
+        <span class="macro">assert_eq!</span>(remove_whitespace(<span class="string">&quot;  \t \r \n&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;&quot;</span>))));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">remove_whitespace</span>(<span class="string">r#&quot;\ \ \ &quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Borrowed</span>(<span class="string">r#&quot;\ \ \ &quot;#</span>)))
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">remove_whitespace</span>(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Borrowed</span>(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>)))
+            remove_whitespace(<span class="string">r#&quot;\ \ \ &quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Borrowed(<span class="string">r#&quot;\ \ \ &quot;#</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">remove_whitespace</span>(<span class="string">r#&quot;\:\`\&lt;\&gt;\\&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Borrowed</span>(<span class="string">r#&quot;\:\`\&lt;\&gt;\\&quot;#</span>)))
+            remove_whitespace(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Borrowed(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>)))
+        );
+        <span class="macro">assert_eq!</span>(
+            remove_whitespace(<span class="string">r#&quot;\:\`\&lt;\&gt;\\&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Borrowed(<span class="string">r#&quot;\:\`\&lt;\&gt;\\&quot;#</span>)))
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">remove_whitespace</span>(<span class="string">&quot;http://www.py\n     thon.org&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Owned</span>(<span class="string">&quot;http://www.python.org&quot;</span>.<span class="ident">to_string</span>())))
+            remove_whitespace(<span class="string">&quot;http://www.py\n     thon.org&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::Owned(<span class="string">&quot;http://www.python.org&quot;</span>.to_string())))
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

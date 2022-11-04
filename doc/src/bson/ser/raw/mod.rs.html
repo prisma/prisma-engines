@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/ser/raw/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../bson/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/ser/raw/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../bson/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -522,529 +522,529 @@
 <span id="522">522</span>
 <span id="523">523</span>
 <span id="524">524</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">document_serializer</span>;
-<span class="kw">mod</span> <span class="ident">value_serializer</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>document_serializer;
+<span class="kw">mod </span>value_serializer;
 
-<span class="kw">use</span> <span class="ident">std::io::Write</span>;
+<span class="kw">use </span>std::io::Write;
 
-<span class="kw">use</span> <span class="ident">serde</span>::{
-    <span class="ident">ser</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">SerdeError</span>, <span class="ident">SerializeMap</span>, <span class="ident">SerializeStruct</span>},
-    <span class="ident">Serialize</span>,
+<span class="kw">use </span>serde::{
+    ser::{Error <span class="kw">as </span>SerdeError, SerializeMap, SerializeStruct},
+    Serialize,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::value_serializer</span>::{<span class="ident">ValueSerializer</span>, <span class="ident">ValueType</span>};
+<span class="kw">use </span><span class="self">self</span>::value_serializer::{ValueSerializer, ValueType};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">write_binary</span>, <span class="ident">write_cstring</span>, <span class="ident">write_f64</span>, <span class="ident">write_i32</span>, <span class="ident">write_i64</span>, <span class="ident">write_string</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">raw</span>::{<span class="ident">RAW_ARRAY_NEWTYPE</span>, <span class="ident">RAW_DOCUMENT_NEWTYPE</span>},
-    <span class="ident">ser</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">spec</span>::{<span class="ident">BinarySubtype</span>, <span class="ident">ElementType</span>},
-    <span class="ident">uuid::UUID_NEWTYPE_NAME</span>,
+<span class="kw">use super</span>::{write_binary, write_cstring, write_f64, write_i32, write_i64, write_string};
+<span class="kw">use crate</span>::{
+    raw::{RAW_ARRAY_NEWTYPE, RAW_DOCUMENT_NEWTYPE},
+    ser::{Error, <span class="prelude-ty">Result</span>},
+    spec::{BinarySubtype, ElementType},
+    uuid::UUID_NEWTYPE_NAME,
 };
-<span class="kw">use</span> <span class="ident">document_serializer::DocumentSerializer</span>;
+<span class="kw">use </span>document_serializer::DocumentSerializer;
 
-<span class="doccomment">/// Serializer used to convert a type `T` into raw BSON bytes.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Serializer</span> {
-    <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Serializer used to convert a type `T` into raw BSON bytes.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Serializer {
+    bytes: Vec&lt;u8&gt;,
 
-    <span class="doccomment">/// The index into `bytes` where the current element type will need to be stored.</span>
-    <span class="doccomment">/// This needs to be set retroactively because in BSON, the element type comes before the key,</span>
-    <span class="doccomment">/// but in serde, the serializer learns of the type after serializing the key.</span>
-    <span class="ident">type_index</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The index into `bytes` where the current element type will need to be stored.
+    /// This needs to be set retroactively because in BSON, the element type comes before the key,
+    /// but in serde, the serializer learns of the type after serializing the key.
+    </span>type_index: usize,
 
-    <span class="doccomment">/// Hint provided by the type being serialized.</span>
-    <span class="ident">hint</span>: <span class="ident">SerializerHint</span>,
+    <span class="doccomment">/// Hint provided by the type being serialized.
+    </span>hint: SerializerHint,
 }
 
-<span class="doccomment">/// Various bits of information that the serialized type can provide to the serializer to</span>
-<span class="doccomment">/// inform the purpose of the next serialization step.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">SerializerHint</span> {
+<span class="doccomment">/// Various bits of information that the serialized type can provide to the serializer to
+/// inform the purpose of the next serialization step.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">enum </span>SerializerHint {
     <span class="prelude-val">None</span>,
 
-    <span class="doccomment">/// The next call to `serialize_bytes` is for the purposes of serializing a UUID.</span>
-    <span class="ident">Uuid</span>,
+    <span class="doccomment">/// The next call to `serialize_bytes` is for the purposes of serializing a UUID.
+    </span>Uuid,
 
-    <span class="doccomment">/// The next call to `serialize_bytes` is for the purposes of serializing a raw document.</span>
-    <span class="ident">RawDocument</span>,
+    <span class="doccomment">/// The next call to `serialize_bytes` is for the purposes of serializing a raw document.
+    </span>RawDocument,
 
-    <span class="doccomment">/// The next call to `serialize_bytes` is for the purposes of serializing a raw array.</span>
-    <span class="ident">RawArray</span>,
+    <span class="doccomment">/// The next call to `serialize_bytes` is for the purposes of serializing a raw array.
+    </span>RawArray,
 }
 
-<span class="kw">impl</span> <span class="ident">SerializerHint</span> {
-    <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">SerializerHint</span> {
-        <span class="ident">std::mem::replace</span>(<span class="self">self</span>, <span class="ident">SerializerHint::None</span>)
+<span class="kw">impl </span>SerializerHint {
+    <span class="kw">fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SerializerHint {
+        std::mem::replace(<span class="self">self</span>, SerializerHint::None)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serializer</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">bytes</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">type_index</span>: <span class="number">0</span>,
-            <span class="ident">hint</span>: <span class="ident">SerializerHint::None</span>,
+<span class="kw">impl </span>Serializer {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            bytes: Vec::new(),
+            type_index: <span class="number">0</span>,
+            hint: SerializerHint::None,
         }
     }
 
-    <span class="doccomment">/// Convert this serializer into the vec of the serialized bytes.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_vec</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">bytes</span>
+    <span class="doccomment">/// Convert this serializer into the vec of the serialized bytes.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_vec(<span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        <span class="self">self</span>.bytes
     }
 
-    <span class="doccomment">/// Reserve a spot for the element type to be set retroactively via `update_element_type`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">reserve_element_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">type_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>(); <span class="comment">// record index</span>
-        <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">push</span>(<span class="number">0</span>); <span class="comment">// push temporary placeholder</span>
-    }
+    <span class="doccomment">/// Reserve a spot for the element type to be set retroactively via `update_element_type`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>reserve_element_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.type_index = <span class="self">self</span>.bytes.len(); <span class="comment">// record index
+        </span><span class="self">self</span>.bytes.push(<span class="number">0</span>); <span class="comment">// push temporary placeholder
+    </span>}
 
-    <span class="doccomment">/// Retroactively set the element type of the most recently serialized element.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">update_element_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">ElementType</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">type_index</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">t</span>, <span class="ident">ElementType::EmbeddedDocument</span>) {
-                <span class="comment">// don&#39;t need to set the element type for the top level document</span>
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::custom</span>(<span class="macro">format!</span>(
+    <span class="doccomment">/// Retroactively set the element type of the most recently serialized element.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>update_element_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, t: ElementType) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if </span><span class="self">self</span>.type_index == <span class="number">0 </span>{
+            <span class="kw">if </span><span class="macro">matches!</span>(t, ElementType::EmbeddedDocument) {
+                <span class="comment">// don&#39;t need to set the element type for the top level document
+                </span><span class="kw">return </span><span class="prelude-val">Ok</span>(());
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::custom(<span class="macro">format!</span>(
                     <span class="string">&quot;attempted to encode a non-document type at the top level: {:?}&quot;</span>,
-                    <span class="ident">t</span>
+                    t
                 )));
             }
         }
 
-        <span class="self">self</span>.<span class="ident">bytes</span>[<span class="self">self</span>.<span class="ident">type_index</span>] <span class="op">=</span> <span class="ident">t</span> <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="self">self</span>.bytes[<span class="self">self</span>.type_index] = t <span class="kw">as </span>u8;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Replace an i32 value at the given index with the given value.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">replace_i32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">at</span>: <span class="ident">usize</span>, <span class="ident">with</span>: <span class="ident">i32</span>) {
-        <span class="kw">let</span> <span class="ident">portion</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>[<span class="ident">at</span>..<span class="ident">at</span> <span class="op">+</span> <span class="number">4</span>];
-        <span class="ident">portion</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">with</span>.<span class="ident">to_le_bytes</span>());
+    <span class="doccomment">/// Replace an i32 value at the given index with the given value.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>replace_i32(<span class="kw-2">&amp;mut </span><span class="self">self</span>, at: usize, with: i32) {
+        <span class="kw">let </span>portion = <span class="kw-2">&amp;mut </span><span class="self">self</span>.bytes[at..at + <span class="number">4</span>];
+        portion.copy_from_slice(<span class="kw-2">&amp;</span>with.to_le_bytes());
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">serde::Serializer</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Serializer</span> {
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; serde::Serializer <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Serializer {
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= ();
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">type</span> <span class="ident">SerializeSeq</span> <span class="op">=</span> <span class="ident">DocumentSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTuple</span> <span class="op">=</span> <span class="ident">DocumentSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTupleStruct</span> <span class="op">=</span> <span class="ident">DocumentSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeTupleVariant</span> <span class="op">=</span> <span class="ident">VariantSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeMap</span> <span class="op">=</span> <span class="ident">DocumentSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeStruct</span> <span class="op">=</span> <span class="ident">StructSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SerializeStructVariant</span> <span class="op">=</span> <span class="ident">VariantSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>SerializeSeq = DocumentSerializer&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>SerializeTuple = DocumentSerializer&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>SerializeTupleStruct = DocumentSerializer&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>SerializeTupleVariant = VariantSerializer&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>SerializeMap = DocumentSerializer&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>SerializeStruct = StructSerializer&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>SerializeStructVariant = VariantSerializer&lt;<span class="lifetime">&#39;a</span>&gt;;
 
-    <span class="kw">fn</span> <span class="ident">is_human_readable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>is_human_readable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_bool</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::Boolean</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">push</span>(<span class="kw">if</span> <span class="ident">v</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> });
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_bool(<span class="self">self</span>, v: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.update_element_type(ElementType::Boolean)<span class="question-mark">?</span>;
+        <span class="self">self</span>.bytes.push(<span class="kw">if </span>v { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>});
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_i8</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_i32</span>(<span class="ident">v</span>.<span class="ident">into</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_i8(<span class="self">self</span>, v: i8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.serialize_i32(v.into())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_i16</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_i32</span>(<span class="ident">v</span>.<span class="ident">into</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_i16(<span class="self">self</span>, v: i16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.serialize_i32(v.into())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_i32</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::Int32</span>)<span class="question-mark">?</span>;
-        <span class="ident">write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>, <span class="ident">v</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_i32(<span class="self">self</span>, v: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.update_element_type(ElementType::Int32)<span class="question-mark">?</span>;
+        write_i32(<span class="kw-2">&amp;mut </span><span class="self">self</span>.bytes, v)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_i64</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::Int64</span>)<span class="question-mark">?</span>;
-        <span class="ident">write_i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>, <span class="ident">v</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_i64(<span class="self">self</span>, v: i64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.update_element_type(ElementType::Int64)<span class="question-mark">?</span>;
+        write_i64(<span class="kw-2">&amp;mut </span><span class="self">self</span>.bytes, v)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_u8</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_i32</span>(<span class="ident">v</span>.<span class="ident">into</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_u8(<span class="self">self</span>, v: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.serialize_i32(v.into())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_u16</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_i32</span>(<span class="ident">v</span>.<span class="ident">into</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_u16(<span class="self">self</span>, v: u16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.serialize_i32(v.into())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_u32</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_i64</span>(<span class="ident">v</span>.<span class="ident">into</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_u32(<span class="self">self</span>, v: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.serialize_i64(v.into())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_u64</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_u64(<span class="self">self</span>, v: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="kw">use </span>std::convert::TryFrom;
 
-        <span class="kw">match</span> <span class="ident">i64::try_from</span>(<span class="ident">v</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">ivalue</span>) =&gt; <span class="self">self</span>.<span class="ident">serialize_i64</span>(<span class="ident">ivalue</span>),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnsignedIntegerExceededRange</span>(<span class="ident">v</span>)),
+        <span class="kw">match </span>i64::try_from(v) {
+            <span class="prelude-val">Ok</span>(ivalue) =&gt; <span class="self">self</span>.serialize_i64(ivalue),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(Error::UnsignedIntegerExceededRange(v)),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_f32</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_f64</span>(<span class="ident">v</span>.<span class="ident">into</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_f32(<span class="self">self</span>, v: f32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.serialize_f64(v.into())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_f64</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::Double</span>)<span class="question-mark">?</span>;
-        <span class="ident">write_f64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>, <span class="ident">v</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_f64(<span class="self">self</span>, v: f64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.update_element_type(ElementType::Double)<span class="question-mark">?</span>;
+        write_f64(<span class="kw-2">&amp;mut </span><span class="self">self</span>.bytes, v)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_char</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="ident">s</span>.<span class="ident">push</span>(<span class="ident">v</span>);
-        <span class="self">self</span>.<span class="ident">serialize_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_char(<span class="self">self</span>, v: char) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
+        s.push(v);
+        <span class="self">self</span>.serialize_str(<span class="kw-2">&amp;</span>s)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_str</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::String</span>)<span class="question-mark">?</span>;
-        <span class="ident">write_string</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>, <span class="ident">v</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_str(<span class="self">self</span>, v: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.update_element_type(ElementType::String)<span class="question-mark">?</span>;
+        write_string(<span class="kw-2">&amp;mut </span><span class="self">self</span>.bytes, v)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_bytes</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">hint</span>.<span class="ident">take</span>() {
-            <span class="ident">SerializerHint::RawDocument</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::EmbeddedDocument</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">write_all</span>(<span class="ident">v</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_bytes(<span class="self">self</span>, v: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="kw">match </span><span class="self">self</span>.hint.take() {
+            SerializerHint::RawDocument =&gt; {
+                <span class="self">self</span>.update_element_type(ElementType::EmbeddedDocument)<span class="question-mark">?</span>;
+                <span class="self">self</span>.bytes.write_all(v)<span class="question-mark">?</span>;
             }
-            <span class="ident">SerializerHint::RawArray</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::Array</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">write_all</span>(<span class="ident">v</span>)<span class="question-mark">?</span>;
+            SerializerHint::RawArray =&gt; {
+                <span class="self">self</span>.update_element_type(ElementType::Array)<span class="question-mark">?</span>;
+                <span class="self">self</span>.bytes.write_all(v)<span class="question-mark">?</span>;
             }
-            <span class="ident">hint</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::Binary</span>)<span class="question-mark">?</span>;
+            hint =&gt; {
+                <span class="self">self</span>.update_element_type(ElementType::Binary)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">hint</span>, <span class="ident">SerializerHint::Uuid</span>) {
-                    <span class="ident">BinarySubtype::Uuid</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">BinarySubtype::Generic</span>
+                <span class="kw">let </span>subtype = <span class="kw">if </span><span class="macro">matches!</span>(hint, SerializerHint::Uuid) {
+                    BinarySubtype::Uuid
+                } <span class="kw">else </span>{
+                    BinarySubtype::Generic
                 };
 
-                <span class="ident">write_binary</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>, <span class="ident">v</span>, <span class="ident">subtype</span>)<span class="question-mark">?</span>;
+                write_binary(<span class="kw-2">&amp;mut </span><span class="self">self</span>.bytes, v, subtype)<span class="question-mark">?</span>;
             }
         };
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_none</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::Null</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_none(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.update_element_type(ElementType::Null)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_some</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">serde::Serialize</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_some&lt;T: <span class="question-mark">?</span>Sized&gt;(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt;
+    <span class="kw">where
+        </span>T: serde::Serialize,
     {
-        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="self">self</span>)
+        value.serialize(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_unit</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_none</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_unit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.serialize_none()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_unit_struct</span>(<span class="self">self</span>, <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_unit</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_unit_struct(<span class="self">self</span>, _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.serialize_unit()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_unit_variant</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_unit_variant(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_str</span>(<span class="ident">variant</span>)
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.serialize_str(variant)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_newtype_struct</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">serde::Serialize</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_newtype_struct&lt;T: <span class="question-mark">?</span>Sized&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        value: <span class="kw-2">&amp;</span>T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt;
+    <span class="kw">where
+        </span>T: serde::Serialize,
     {
-        <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="ident">UUID_NEWTYPE_NAME</span> =&gt; <span class="self">self</span>.<span class="ident">hint</span> <span class="op">=</span> <span class="ident">SerializerHint::Uuid</span>,
-            <span class="ident">RAW_DOCUMENT_NEWTYPE</span> =&gt; <span class="self">self</span>.<span class="ident">hint</span> <span class="op">=</span> <span class="ident">SerializerHint::RawDocument</span>,
-            <span class="ident">RAW_ARRAY_NEWTYPE</span> =&gt; <span class="self">self</span>.<span class="ident">hint</span> <span class="op">=</span> <span class="ident">SerializerHint::RawArray</span>,
-            <span class="kw">_</span> =&gt; {}
+        <span class="kw">match </span>name {
+            UUID_NEWTYPE_NAME =&gt; <span class="self">self</span>.hint = SerializerHint::Uuid,
+            RAW_DOCUMENT_NEWTYPE =&gt; <span class="self">self</span>.hint = SerializerHint::RawDocument,
+            RAW_ARRAY_NEWTYPE =&gt; <span class="self">self</span>.hint = SerializerHint::RawArray,
+            <span class="kw">_ </span>=&gt; {}
         }
-        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="self">self</span>)
+        value.serialize(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_newtype_variant</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_newtype_variant&lt;T: <span class="question-mark">?</span>Sized&gt;(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">serde::Serialize</span>,
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        value: <span class="kw-2">&amp;</span>T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt;
+    <span class="kw">where
+        </span>T: serde::Serialize,
     {
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::EmbeddedDocument</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">DocumentSerializer::start</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>)<span class="question-mark">?</span>;
-        <span class="ident">d</span>.<span class="ident">serialize_entry</span>(<span class="ident">variant</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
-        <span class="ident">d</span>.<span class="ident">end_doc</span>()<span class="question-mark">?</span>;
+        <span class="self">self</span>.update_element_type(ElementType::EmbeddedDocument)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>d = DocumentSerializer::start(<span class="kw-2">&amp;mut *</span><span class="self">self</span>)<span class="question-mark">?</span>;
+        d.serialize_entry(variant, value)<span class="question-mark">?</span>;
+        d.end_doc()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_seq</span>(<span class="self">self</span>, <span class="ident">_len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeSeq</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::Array</span>)<span class="question-mark">?</span>;
-        <span class="ident">DocumentSerializer::start</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_seq(<span class="self">self</span>, _len: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeSeq&gt; {
+        <span class="self">self</span>.update_element_type(ElementType::Array)<span class="question-mark">?</span>;
+        DocumentSerializer::start(<span class="kw-2">&amp;mut *</span><span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_tuple</span>(<span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTuple</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_tuple(<span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTuple&gt; {
+        <span class="self">self</span>.serialize_seq(<span class="prelude-val">Some</span>(len))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_tuple_struct</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_tuple_struct(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTupleStruct</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>))
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTupleStruct&gt; {
+        <span class="self">self</span>.serialize_seq(<span class="prelude-val">Some</span>(len))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_tuple_variant</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_tuple_variant(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeTupleVariant</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::EmbeddedDocument</span>)<span class="question-mark">?</span>;
-        <span class="ident">VariantSerializer::start</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>, <span class="ident">variant</span>, <span class="ident">VariantInnerType::Tuple</span>)
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTupleVariant&gt; {
+        <span class="self">self</span>.update_element_type(ElementType::EmbeddedDocument)<span class="question-mark">?</span>;
+        VariantSerializer::start(<span class="kw-2">&amp;mut *</span><span class="self">self</span>, variant, VariantInnerType::Tuple)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_map</span>(<span class="self">self</span>, <span class="ident">_len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeMap</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::EmbeddedDocument</span>)<span class="question-mark">?</span>;
-        <span class="ident">DocumentSerializer::start</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_map(<span class="self">self</span>, _len: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeMap&gt; {
+        <span class="self">self</span>.update_element_type(ElementType::EmbeddedDocument)<span class="question-mark">?</span>;
+        DocumentSerializer::start(<span class="kw-2">&amp;mut *</span><span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_struct</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">_len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeStruct</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="string">&quot;$oid&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::ObjectId</span>),
-            <span class="string">&quot;$date&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::DateTime</span>),
-            <span class="string">&quot;$binary&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::Binary</span>),
-            <span class="string">&quot;$timestamp&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::Timestamp</span>),
-            <span class="string">&quot;$minKey&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::MinKey</span>),
-            <span class="string">&quot;$maxKey&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::MaxKey</span>),
-            <span class="string">&quot;$code&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::JavaScriptCode</span>),
-            <span class="string">&quot;$codeWithScope&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::JavaScriptCodeWithScope</span>),
-            <span class="string">&quot;$symbol&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::Symbol</span>),
-            <span class="string">&quot;$undefined&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::Undefined</span>),
-            <span class="string">&quot;$regularExpression&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::RegularExpression</span>),
-            <span class="string">&quot;$dbPointer&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::DbPointer</span>),
-            <span class="string">&quot;$numberDecimal&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ValueType::Decimal128</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_struct(<span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, _len: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeStruct&gt; {
+        <span class="kw">let </span>value_type = <span class="kw">match </span>name {
+            <span class="string">&quot;$oid&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::ObjectId),
+            <span class="string">&quot;$date&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::DateTime),
+            <span class="string">&quot;$binary&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::Binary),
+            <span class="string">&quot;$timestamp&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::Timestamp),
+            <span class="string">&quot;$minKey&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::MinKey),
+            <span class="string">&quot;$maxKey&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::MaxKey),
+            <span class="string">&quot;$code&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::JavaScriptCode),
+            <span class="string">&quot;$codeWithScope&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::JavaScriptCodeWithScope),
+            <span class="string">&quot;$symbol&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::Symbol),
+            <span class="string">&quot;$undefined&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::Undefined),
+            <span class="string">&quot;$regularExpression&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::RegularExpression),
+            <span class="string">&quot;$dbPointer&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::DbPointer),
+            <span class="string">&quot;$numberDecimal&quot; </span>=&gt; <span class="prelude-val">Some</span>(ValueType::Decimal128),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(
-            <span class="ident">value_type</span>
-                .<span class="ident">map</span>(<span class="ident">Into::into</span>)
-                .<span class="ident">unwrap_or</span>(<span class="ident">ElementType::EmbeddedDocument</span>),
+        <span class="self">self</span>.update_element_type(
+            value_type
+                .map(Into::into)
+                .unwrap_or(ElementType::EmbeddedDocument),
         )<span class="question-mark">?</span>;
-        <span class="kw">match</span> <span class="ident">value_type</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">vt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StructSerializer::Value</span>(<span class="ident">ValueSerializer::new</span>(<span class="self">self</span>, <span class="ident">vt</span>))),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StructSerializer::Document</span>(<span class="ident">DocumentSerializer::start</span>(<span class="self">self</span>)<span class="question-mark">?</span>)),
+        <span class="kw">match </span>value_type {
+            <span class="prelude-val">Some</span>(vt) =&gt; <span class="prelude-val">Ok</span>(StructSerializer::Value(ValueSerializer::new(<span class="self">self</span>, vt))),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(StructSerializer::Document(DocumentSerializer::start(<span class="self">self</span>)<span class="question-mark">?</span>)),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_struct_variant</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_struct_variant(
         <span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_variant_index</span>: <span class="ident">u32</span>,
-        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">_len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::SerializeStructVariant</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_element_type</span>(<span class="ident">ElementType::EmbeddedDocument</span>)<span class="question-mark">?</span>;
-        <span class="ident">VariantSerializer::start</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>, <span class="ident">variant</span>, <span class="ident">VariantInnerType::Struct</span>)
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _variant_index: u32,
+        variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        _len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeStructVariant&gt; {
+        <span class="self">self</span>.update_element_type(ElementType::EmbeddedDocument)<span class="question-mark">?</span>;
+        VariantSerializer::start(<span class="kw-2">&amp;mut *</span><span class="self">self</span>, variant, VariantInnerType::Struct)
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">StructSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Serialize a BSON value currently represented in serde as a struct (e.g. ObjectId)</span>
-    <span class="ident">Value</span>(<span class="ident">ValueSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>StructSerializer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Serialize a BSON value currently represented in serde as a struct (e.g. ObjectId)
+    </span>Value(ValueSerializer&lt;<span class="lifetime">&#39;a</span>&gt;),
 
-    <span class="doccomment">/// Serialize the struct as a document.</span>
-    <span class="ident">Document</span>(<span class="ident">DocumentSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Serialize the struct as a document.
+    </span>Document(DocumentSerializer&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SerializeStruct</span> <span class="kw">for</span> <span class="ident">StructSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SerializeStruct <span class="kw">for </span>StructSerializer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= ();
+    <span class="kw">type </span>Error = Error;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_field&lt;T: <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">StructSerializer::Value</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; (<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">v</span>).<span class="ident">serialize_field</span>(<span class="ident">key</span>, <span class="ident">value</span>),
-            <span class="ident">StructSerializer::Document</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>.<span class="ident">serialize_field</span>(<span class="ident">key</span>, <span class="ident">value</span>),
+        <span class="kw">match </span><span class="self">self </span>{
+            StructSerializer::Value(<span class="kw-2">ref mut </span>v) =&gt; (<span class="kw-2">&amp;mut *</span>v).serialize_field(key, value),
+            StructSerializer::Document(d) =&gt; d.serialize_field(key, value),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">StructSerializer::Document</span>(<span class="ident">d</span>) =&gt; <span class="ident">SerializeStruct::end</span>(<span class="ident">d</span>),
-            <span class="ident">StructSerializer::Value</span>(<span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">end</span>(),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>end(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            StructSerializer::Document(d) =&gt; SerializeStruct::end(d),
+            StructSerializer::Value(<span class="kw-2">mut </span>v) =&gt; v.end(),
         }
     }
 }
 
-<span class="kw">enum</span> <span class="ident">VariantInnerType</span> {
-    <span class="ident">Tuple</span>,
-    <span class="ident">Struct</span>,
+<span class="kw">enum </span>VariantInnerType {
+    Tuple,
+    Struct,
 }
 
-<span class="doccomment">/// Serializer used for enum variants, including both tuple (e.g. Foo::Bar(1, 2, 3)) and</span>
-<span class="doccomment">/// struct (e.g. Foo::Bar { a: 1 }).</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">VariantSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">root_serializer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Serializer</span>,
+<span class="doccomment">/// Serializer used for enum variants, including both tuple (e.g. Foo::Bar(1, 2, 3)) and
+/// struct (e.g. Foo::Bar { a: 1 }).
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>VariantSerializer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    root_serializer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Serializer,
 
-    <span class="doccomment">/// Variants are serialized as documents of the form `{ &lt;variant name&gt;: &lt;document or array&gt; }`,</span>
-    <span class="doccomment">/// and `doc_start` indicates the index at which the outer document begins.</span>
-    <span class="ident">doc_start</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Variants are serialized as documents of the form `{ &lt;variant name&gt;: &lt;document or array&gt; }`,
+    /// and `doc_start` indicates the index at which the outer document begins.
+    </span>doc_start: usize,
 
-    <span class="doccomment">/// `inner_start` indicates the index at which the inner document or array begins.</span>
-    <span class="ident">inner_start</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// `inner_start` indicates the index at which the inner document or array begins.
+    </span>inner_start: usize,
 
-    <span class="doccomment">/// How many elements have been serialized in the inner document / array so far.</span>
-    <span class="ident">num_elements_serialized</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// How many elements have been serialized in the inner document / array so far.
+    </span>num_elements_serialized: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">VariantSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">start</span>(
-        <span class="ident">rs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Serializer</span>,
-        <span class="ident">variant</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">inner_type</span>: <span class="ident">VariantInnerType</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">doc_start</span> <span class="op">=</span> <span class="ident">rs</span>.<span class="ident">bytes</span>.<span class="ident">len</span>();
-        <span class="comment">// write placeholder length for document, will be updated at end</span>
-        <span class="ident">write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rs</span>.<span class="ident">bytes</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; VariantSerializer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>start(
+        rs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Serializer,
+        variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        inner_type: VariantInnerType,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>doc_start = rs.bytes.len();
+        <span class="comment">// write placeholder length for document, will be updated at end
+        </span>write_i32(<span class="kw-2">&amp;mut </span>rs.bytes, <span class="number">0</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">inner_type</span> {
-            <span class="ident">VariantInnerType::Struct</span> =&gt; <span class="ident">ElementType::EmbeddedDocument</span>,
-            <span class="ident">VariantInnerType::Tuple</span> =&gt; <span class="ident">ElementType::Array</span>,
+        <span class="kw">let </span>inner = <span class="kw">match </span>inner_type {
+            VariantInnerType::Struct =&gt; ElementType::EmbeddedDocument,
+            VariantInnerType::Tuple =&gt; ElementType::Array,
         };
-        <span class="ident">rs</span>.<span class="ident">bytes</span>.<span class="ident">push</span>(<span class="ident">inner</span> <span class="kw">as</span> <span class="ident">u8</span>);
-        <span class="ident">write_cstring</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rs</span>.<span class="ident">bytes</span>, <span class="ident">variant</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">inner_start</span> <span class="op">=</span> <span class="ident">rs</span>.<span class="ident">bytes</span>.<span class="ident">len</span>();
-        <span class="comment">// write placeholder length for inner, will be updated at end</span>
-        <span class="ident">write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rs</span>.<span class="ident">bytes</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
+        rs.bytes.push(inner <span class="kw">as </span>u8);
+        write_cstring(<span class="kw-2">&amp;mut </span>rs.bytes, variant)<span class="question-mark">?</span>;
+        <span class="kw">let </span>inner_start = rs.bytes.len();
+        <span class="comment">// write placeholder length for inner, will be updated at end
+        </span>write_i32(<span class="kw-2">&amp;mut </span>rs.bytes, <span class="number">0</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">root_serializer</span>: <span class="ident">rs</span>,
-            <span class="ident">num_elements_serialized</span>: <span class="number">0</span>,
-            <span class="ident">doc_start</span>,
-            <span class="ident">inner_start</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            root_serializer: rs,
+            num_elements_serialized: <span class="number">0</span>,
+            doc_start,
+            inner_start,
         })
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_element</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_element&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>str, v: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+    <span class="kw">where
+        </span>T: Serialize + <span class="question-mark">?</span>Sized,
     {
-        <span class="self">self</span>.<span class="ident">root_serializer</span>.<span class="ident">reserve_element_type</span>();
-        <span class="ident">write_cstring</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root_serializer</span>.<span class="ident">bytes</span>, <span class="ident">k</span>)<span class="question-mark">?</span>;
-        <span class="ident">v</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">root_serializer</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.root_serializer.reserve_element_type();
+        write_cstring(<span class="kw-2">&amp;mut </span><span class="self">self</span>.root_serializer.bytes, k)<span class="question-mark">?</span>;
+        v.serialize(<span class="kw-2">&amp;mut *</span><span class="self">self</span>.root_serializer)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">num_elements_serialized</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="self">self</span>.num_elements_serialized += <span class="number">1</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">end_both</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="comment">// null byte for the inner</span>
-        <span class="self">self</span>.<span class="ident">root_serializer</span>.<span class="ident">bytes</span>.<span class="ident">push</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">arr_length</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">root_serializer</span>.<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">inner_start</span>) <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="self">self</span>.<span class="ident">root_serializer</span>
-            .<span class="ident">replace_i32</span>(<span class="self">self</span>.<span class="ident">inner_start</span>, <span class="ident">arr_length</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>end_both(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="comment">// null byte for the inner
+        </span><span class="self">self</span>.root_serializer.bytes.push(<span class="number">0</span>);
+        <span class="kw">let </span>arr_length = (<span class="self">self</span>.root_serializer.bytes.len() - <span class="self">self</span>.inner_start) <span class="kw">as </span>i32;
+        <span class="self">self</span>.root_serializer
+            .replace_i32(<span class="self">self</span>.inner_start, arr_length);
 
-        <span class="comment">// null byte for document</span>
-        <span class="self">self</span>.<span class="ident">root_serializer</span>.<span class="ident">bytes</span>.<span class="ident">push</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">doc_length</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">root_serializer</span>.<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">doc_start</span>) <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="self">self</span>.<span class="ident">root_serializer</span>.<span class="ident">replace_i32</span>(<span class="self">self</span>.<span class="ident">doc_start</span>, <span class="ident">doc_length</span>);
+        <span class="comment">// null byte for document
+        </span><span class="self">self</span>.root_serializer.bytes.push(<span class="number">0</span>);
+        <span class="kw">let </span>doc_length = (<span class="self">self</span>.root_serializer.bytes.len() - <span class="self">self</span>.doc_start) <span class="kw">as </span>i32;
+        <span class="self">self</span>.root_serializer.replace_i32(<span class="self">self</span>.doc_start, doc_length);
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">serde::ser::SerializeTupleVariant</span> <span class="kw">for</span> <span class="ident">VariantSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; serde::ser::SerializeTupleVariant <span class="kw">for </span>VariantSerializer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= ();
 
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+    <span class="kw">type </span>Error = Error;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_field&lt;T: <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="self">self</span>.<span class="ident">serialize_element</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">num_elements_serialized</span>).<span class="ident">as_str</span>(), <span class="ident">value</span>)
+        <span class="self">self</span>.serialize_element(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.num_elements_serialized).as_str(), value)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">end_both</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>end(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.end_both()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">serde::ser::SerializeStructVariant</span> <span class="kw">for</span> <span class="ident">VariantSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; serde::ser::SerializeStructVariant <span class="kw">for </span>VariantSerializer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span><span class="prelude-val">Ok </span>= ();
 
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+    <span class="kw">type </span>Error = Error;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Serialize</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>serialize_field&lt;T: <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, value: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+    <span class="kw">where
+        </span>T: Serialize,
     {
-        <span class="self">self</span>.<span class="ident">serialize_element</span>(<span class="ident">key</span>, <span class="ident">value</span>)
+        <span class="self">self</span>.serialize_element(key, value)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">end_both</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>end(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok&gt; {
+        <span class="self">self</span>.end_both()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/ast/top.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>top.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/ast/top.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>top.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -95,102 +95,102 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">traits::WithSpan</span>, <span class="ident">CompositeType</span>, <span class="ident">Enum</span>, <span class="ident">GeneratorConfig</span>, <span class="ident">Identifier</span>, <span class="ident">Model</span>, <span class="ident">SourceConfig</span>, <span class="ident">Span</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{traits::WithSpan, CompositeType, Enum, GeneratorConfig, Identifier, Model, SourceConfig, Span};
 
-<span class="doccomment">/// Enum for distinguishing between top-level entries</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Top</span> {
-    <span class="doccomment">/// A composite type</span>
-    <span class="ident">CompositeType</span>(<span class="ident">CompositeType</span>),
-    <span class="doccomment">/// An enum declaration</span>
-    <span class="ident">Enum</span>(<span class="ident">Enum</span>),
-    <span class="doccomment">/// A model declaration</span>
-    <span class="ident">Model</span>(<span class="ident">Model</span>),
-    <span class="doccomment">/// A datasource block</span>
-    <span class="ident">Source</span>(<span class="ident">SourceConfig</span>),
-    <span class="doccomment">/// A generator block</span>
-    <span class="ident">Generator</span>(<span class="ident">GeneratorConfig</span>),
+<span class="doccomment">/// Enum for distinguishing between top-level entries
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>Top {
+    <span class="doccomment">/// A composite type
+    </span>CompositeType(CompositeType),
+    <span class="doccomment">/// An enum declaration
+    </span>Enum(Enum),
+    <span class="doccomment">/// A model declaration
+    </span>Model(Model),
+    <span class="doccomment">/// A datasource block
+    </span>Source(SourceConfig),
+    <span class="doccomment">/// A generator block
+    </span>Generator(GeneratorConfig),
 }
 
-<span class="kw">impl</span> <span class="ident">Top</span> {
-    <span class="doccomment">/// A string saying what kind of item this is.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Top::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;composite type&quot;</span>,
-            <span class="ident">Top::Enum</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>,
-            <span class="ident">Top::Model</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;model&quot;</span>,
-            <span class="ident">Top::Source</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;source&quot;</span>,
-            <span class="ident">Top::Generator</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;generator&quot;</span>,
+<span class="kw">impl </span>Top {
+    <span class="doccomment">/// A string saying what kind of item this is.
+    </span><span class="kw">pub fn </span>get_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            Top::CompositeType(<span class="kw">_</span>) =&gt; <span class="string">&quot;composite type&quot;</span>,
+            Top::Enum(<span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>,
+            Top::Model(<span class="kw">_</span>) =&gt; <span class="string">&quot;model&quot;</span>,
+            Top::Source(<span class="kw">_</span>) =&gt; <span class="string">&quot;source&quot;</span>,
+            Top::Generator(<span class="kw">_</span>) =&gt; <span class="string">&quot;generator&quot;</span>,
         }
     }
 
-    <span class="doccomment">/// The name of the item.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Identifier</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Top::CompositeType</span>(<span class="ident">ct</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">ct</span>.<span class="ident">name</span>,
-            <span class="ident">Top::Enum</span>(<span class="ident">x</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">name</span>,
-            <span class="ident">Top::Model</span>(<span class="ident">x</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">name</span>,
-            <span class="ident">Top::Source</span>(<span class="ident">x</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">name</span>,
-            <span class="ident">Top::Generator</span>(<span class="ident">x</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">name</span>,
+    <span class="doccomment">/// The name of the item.
+    </span><span class="kw">pub fn </span>identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Identifier {
+        <span class="kw">match </span><span class="self">self </span>{
+            Top::CompositeType(ct) =&gt; <span class="kw-2">&amp;</span>ct.name,
+            Top::Enum(x) =&gt; <span class="kw-2">&amp;</span>x.name,
+            Top::Model(x) =&gt; <span class="kw-2">&amp;</span>x.name,
+            Top::Source(x) =&gt; <span class="kw-2">&amp;</span>x.name,
+            Top::Generator(x) =&gt; <span class="kw-2">&amp;</span>x.name,
         }
     }
 
-    <span class="doccomment">/// The name of the item.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">identifier</span>().<span class="ident">name</span>
+    <span class="doccomment">/// The name of the item.
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.identifier().name
     }
 
-    <span class="doccomment">/// Try to interpret the item as a composite type declaration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_composite_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CompositeType</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Top::CompositeType</span>(<span class="ident">ct</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ct</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Try to interpret the item as a composite type declaration.
+    </span><span class="kw">pub fn </span>as_composite_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CompositeType&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Top::CompositeType(ct) =&gt; <span class="prelude-val">Some</span>(ct),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Try to interpret the item as a model declaration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Model</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Top::Model</span>(<span class="ident">model</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">model</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Try to interpret the item as a model declaration.
+    </span><span class="kw">pub fn </span>as_model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Top::Model(model) =&gt; <span class="prelude-val">Some</span>(model),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Try to interpret the item as an enum declaration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Enum</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Top::Enum</span>(<span class="ident">r#enum</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">r#enum</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Try to interpret the item as an enum declaration.
+    </span><span class="kw">pub fn </span>as_enum(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Enum&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Top::Enum(r#enum) =&gt; <span class="prelude-val">Some</span>(r#enum),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Try to interpret the item as a generator block.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_generator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">GeneratorConfig</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Top::Generator</span>(<span class="ident">gen</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">gen</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Try to interpret the item as a generator block.
+    </span><span class="kw">pub fn </span>as_generator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>GeneratorConfig&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Top::Generator(gen) =&gt; <span class="prelude-val">Some</span>(gen),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Try to interpret the item as a datasource block.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SourceConfig</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Top::Source</span>(<span class="ident">source</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">source</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Try to interpret the item as a datasource block.
+    </span><span class="kw">pub fn </span>as_source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SourceConfig&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Top::Source(source) =&gt; <span class="prelude-val">Some</span>(source),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithSpan</span> <span class="kw">for</span> <span class="ident">Top</span> {
-    <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Span</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Top::CompositeType</span>(<span class="ident">ct</span>) =&gt; <span class="ident">ct</span>.<span class="ident">span</span>,
-            <span class="ident">Top::Enum</span>(<span class="ident">en</span>) =&gt; <span class="ident">en</span>.<span class="ident">span</span>(),
-            <span class="ident">Top::Model</span>(<span class="ident">model</span>) =&gt; <span class="ident">model</span>.<span class="ident">span</span>(),
-            <span class="ident">Top::Source</span>(<span class="ident">source</span>) =&gt; <span class="ident">source</span>.<span class="ident">span</span>(),
-            <span class="ident">Top::Generator</span>(<span class="ident">gen</span>) =&gt; <span class="ident">gen</span>.<span class="ident">span</span>(),
+<span class="kw">impl </span>WithSpan <span class="kw">for </span>Top {
+    <span class="kw">fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Span {
+        <span class="kw">match </span><span class="self">self </span>{
+            Top::CompositeType(ct) =&gt; ct.span,
+            Top::Enum(en) =&gt; en.span(),
+            Top::Model(model) =&gt; model.span(),
+            Top::Source(source) =&gt; source.span(),
+            Top::Generator(gen) =&gt; gen.span(),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/introspection/inline_relations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>inline_relations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/introspection/inline_relations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>inline_relations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -287,86 +287,86 @@
 <span id="287">287</span>
 <span id="288">288</span>
 <span id="289">289</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::introspection_helpers::is_prisma_join_table</span>;
-<span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">datamodel_connector</span>::{<span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">Connector</span>},
-    <span class="ident">dml</span>::{<span class="ident">FieldArity</span>, <span class="ident">ReferentialAction</span>},
-    <span class="ident">parser_database::walkers</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::is_prisma_join_table;
+<span class="kw">use </span>psl::{
+    datamodel_connector::{constraint_names::ConstraintNames, Connector},
+    dml::{FieldArity, ReferentialAction},
+    parser_database::walkers,
 };
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span> <span class="kw">as</span> <span class="ident">sql</span>;
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
+<span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
+<span class="kw">use </span>std::collections::{HashMap, HashSet};
 
-<span class="doccomment">/// For each foreign key in the SQL schema, produce two relation fields in the resulting Prisma</span>
-<span class="doccomment">/// schema.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">introspect_inline_relations</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;mut</span> <span class="ident">psl::dml::Datamodel</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">duplicated_foreign_keys</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-    <span class="kw">let</span> <span class="ident">m2m_table_names</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
-        .<span class="ident">schema</span>
-        .<span class="ident">table_walkers</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">is_prisma_join_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span>()[<span class="number">1</span>..].<span class="ident">to_string</span>())
-        .<span class="ident">collect</span>();
+<span class="doccomment">/// For each foreign key in the SQL schema, produce two relation fields in the resulting Prisma
+/// schema.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>introspect_inline_relations(datamodel: <span class="kw-2">&amp;mut </span>psl::dml::Datamodel, ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>duplicated_foreign_keys = Default::default();
+    <span class="kw">let </span>m2m_table_names: HashSet&lt;String&gt; = ctx
+        .schema
+        .table_walkers()
+        .filter(|table| is_prisma_join_table(<span class="kw-2">*</span>table))
+        .map(|table| table.name()[<span class="number">1</span>..].to_string())
+        .collect();
 
-    <span class="kw">let</span> <span class="ident">dml_model_ids</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">datamodel</span>
-        .<span class="ident">models</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">enumerate</span>()
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="ident">m</span>)<span class="op">|</span> (<span class="ident">m</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">id</span>))
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>dml_model_ids: HashMap&lt;String, usize&gt; = datamodel
+        .models
+        .iter()
+        .enumerate()
+        .map(|(id, m)| (m.name.clone(), id))
+        .collect();
 
-    <span class="kw">for</span> <span class="ident">table</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">table_walkers</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_prisma_join_table</span>(<span class="kw-2">*</span><span class="ident">t</span>)) {
-        <span class="ident">collect_duplicated_fks</span>(<span class="ident">table</span>, <span class="kw-2">&amp;mut</span> <span class="ident">duplicated_foreign_keys</span>);
+    <span class="kw">for </span>table <span class="kw">in </span>ctx.schema.table_walkers().filter(|t| !is_prisma_join_table(<span class="kw-2">*</span>t)) {
+        collect_duplicated_fks(table, <span class="kw-2">&amp;mut </span>duplicated_foreign_keys);
 
-        <span class="kw">for</span> <span class="ident">fk</span> <span class="kw">in</span> <span class="ident">table</span>
-            .<span class="ident">foreign_keys</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="op">!</span><span class="ident">duplicated_foreign_keys</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">fk</span>.<span class="ident">id</span>))
+        <span class="kw">for </span>fk <span class="kw">in </span>table
+            .foreign_keys()
+            .filter(|fk| !duplicated_foreign_keys.contains(<span class="kw-2">&amp;</span>fk.id))
         {
-            <span class="kw">let</span> <span class="ident">existing_relation</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">existing_inline_relation</span>(<span class="ident">fk</span>.<span class="ident">id</span>);
-            <span class="kw">let</span> <span class="ident">relation_name</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">existing_relation</span>
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">relation</span><span class="op">|</span> <span class="ident">relation</span>.<span class="ident">relation_name</span>().<span class="ident">to_string</span>())
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">calculate_relation_name</span>(<span class="ident">fk</span>, <span class="kw-2">&amp;</span><span class="ident">m2m_table_names</span>, <span class="kw-2">&amp;</span><span class="ident">duplicated_foreign_keys</span>));
-            <span class="kw">let</span> <span class="ident">field_names_clash_with_m2m_relation_field_names</span> <span class="op">=</span> <span class="ident">existing_relation</span>.<span class="ident">is_some</span>() <span class="comment">// short-circuit</span>
-                <span class="op">|</span><span class="op">|</span> <span class="ident">ctx</span>
-                    .<span class="ident">schema</span>
-                    .<span class="ident">table_walkers</span>()
-                    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">is_prisma_join_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
-                    .<span class="ident">any</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> {
-                        <span class="ident">table</span>
-                            .<span class="ident">foreign_keys</span>()
-                            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">m2m_fk</span><span class="op">|</span> <span class="ident">m2m_fk</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span> <span class="op">==</span> <span class="ident">fk</span>.<span class="ident">table</span>().<span class="ident">id</span>)
-                            <span class="op">&amp;&amp;</span> <span class="ident">table</span>
-                                .<span class="ident">foreign_keys</span>()
-                                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">m2m_fk</span><span class="op">|</span> <span class="ident">m2m_fk</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span> <span class="op">==</span> <span class="ident">fk</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span>)
+            <span class="kw">let </span>existing_relation = ctx.existing_inline_relation(fk.id);
+            <span class="kw">let </span>relation_name: String = existing_relation
+                .map(|relation| relation.relation_name().to_string())
+                .unwrap_or_else(|| calculate_relation_name(fk, <span class="kw-2">&amp;</span>m2m_table_names, <span class="kw-2">&amp;</span>duplicated_foreign_keys));
+            <span class="kw">let </span>field_names_clash_with_m2m_relation_field_names = existing_relation.is_some() <span class="comment">// short-circuit
+                </span>|| ctx
+                    .schema
+                    .table_walkers()
+                    .filter(|table| is_prisma_join_table(<span class="kw-2">*</span>table))
+                    .any(|table| {
+                        table
+                            .foreign_keys()
+                            .any(|m2m_fk| m2m_fk.referenced_table().id == fk.table().id)
+                            &amp;&amp; table
+                                .foreign_keys()
+                                .any(|m2m_fk| m2m_fk.referenced_table().id == fk.referenced_table().id)
                     });
 
-            <span class="comment">// Forward relation field.</span>
-            {
-                <span class="kw">let</span> <span class="ident">referencing_model_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">model_prisma_name</span>(<span class="ident">table</span>.<span class="ident">id</span>);
-                <span class="kw">let</span> <span class="ident">referencing_model_idx</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">dml_model_ids</span>[<span class="ident">referencing_model_name</span>];
-                <span class="ident">datamodel</span>.<span class="ident">models</span>[<span class="ident">referencing_model_idx</span>].<span class="ident">add_field</span>(<span class="ident">psl::dml::Field::RelationField</span>(
-                    <span class="ident">calculate_relation_field</span>(
-                        <span class="ident">fk</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">relation_name</span>,
-                        <span class="ident">existing_relation</span>,
-                        <span class="ident">field_names_clash_with_m2m_relation_field_names</span>,
-                        <span class="ident">ctx</span>,
+            <span class="comment">// Forward relation field.
+            </span>{
+                <span class="kw">let </span>referencing_model_name: <span class="kw-2">&amp;</span>str = ctx.model_prisma_name(table.id);
+                <span class="kw">let </span>referencing_model_idx: usize = dml_model_ids[referencing_model_name];
+                datamodel.models[referencing_model_idx].add_field(psl::dml::Field::RelationField(
+                    calculate_relation_field(
+                        fk,
+                        <span class="kw-2">&amp;</span>relation_name,
+                        existing_relation,
+                        field_names_clash_with_m2m_relation_field_names,
+                        ctx,
                     ),
                 ));
             }
 
-            <span class="comment">// Back relation field.</span>
-            {
-                <span class="kw">let</span> <span class="ident">referenced_model_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">model_prisma_name</span>(<span class="ident">fk</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span>);
-                <span class="kw">let</span> <span class="ident">referenced_model_idx</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">dml_model_ids</span>[<span class="ident">referenced_model_name</span>];
+            <span class="comment">// Back relation field.
+            </span>{
+                <span class="kw">let </span>referenced_model_name: <span class="kw-2">&amp;</span>str = ctx.model_prisma_name(fk.referenced_table().id);
+                <span class="kw">let </span>referenced_model_idx: usize = dml_model_ids[referenced_model_name];
 
-                <span class="comment">// Back relation field</span>
-                <span class="ident">datamodel</span>.<span class="ident">models</span>[<span class="ident">referenced_model_idx</span>].<span class="ident">add_field</span>(<span class="ident">psl::dml::Field::RelationField</span>(
-                    <span class="ident">calculate_backrelation_field</span>(
-                        <span class="ident">fk</span>,
-                        <span class="ident">relation_name</span>,
-                        <span class="ident">existing_relation</span>,
-                        <span class="ident">field_names_clash_with_m2m_relation_field_names</span>,
-                        <span class="ident">ctx</span>,
+                <span class="comment">// Back relation field
+                </span>datamodel.models[referenced_model_idx].add_field(psl::dml::Field::RelationField(
+                    calculate_backrelation_field(
+                        fk,
+                        relation_name,
+                        existing_relation,
+                        field_names_clash_with_m2m_relation_field_names,
+                        ctx,
                     ),
                 ));
             }
@@ -374,207 +374,207 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">calculate_relation_field</span>(
-    <span class="ident">foreign_key</span>: <span class="ident">sql::ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">relation_name</span>: <span class="kw-2">&amp;</span><span class="ident">String</span>,
-    <span class="ident">existing_relation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">field_names_clash_with_m2m_relation_field_names</span>: <span class="ident">bool</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">psl::dml::RelationField</span> {
-    <span class="kw">let</span> <span class="ident">map_action</span> <span class="op">=</span> <span class="op">|</span><span class="ident">action</span>: <span class="ident">sql::ForeignKeyAction</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">action</span> {
-        <span class="ident">sql::ForeignKeyAction::NoAction</span> =&gt; <span class="ident">ReferentialAction::NoAction</span>,
-        <span class="ident">sql::ForeignKeyAction::Restrict</span> =&gt; <span class="ident">ReferentialAction::Restrict</span>,
-        <span class="ident">sql::ForeignKeyAction::Cascade</span> =&gt; <span class="ident">ReferentialAction::Cascade</span>,
-        <span class="ident">sql::ForeignKeyAction::SetNull</span> =&gt; <span class="ident">ReferentialAction::SetNull</span>,
-        <span class="ident">sql::ForeignKeyAction::SetDefault</span> =&gt; <span class="ident">ReferentialAction::SetDefault</span>,
+<span class="kw">fn </span>calculate_relation_field(
+    foreign_key: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    relation_name: <span class="kw-2">&amp;</span>String,
+    existing_relation: <span class="prelude-ty">Option</span>&lt;walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    field_names_clash_with_m2m_relation_field_names: bool,
+    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; psl::dml::RelationField {
+    <span class="kw">let </span>map_action = |action: sql::ForeignKeyAction| <span class="kw">match </span>action {
+        sql::ForeignKeyAction::NoAction =&gt; ReferentialAction::NoAction,
+        sql::ForeignKeyAction::Restrict =&gt; ReferentialAction::Restrict,
+        sql::ForeignKeyAction::Cascade =&gt; ReferentialAction::Cascade,
+        sql::ForeignKeyAction::SetNull =&gt; ReferentialAction::SetNull,
+        sql::ForeignKeyAction::SetDefault =&gt; ReferentialAction::SetDefault,
     };
 
-    <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">psl::dml::RelationInfo</span> {
-        <span class="ident">name</span>: <span class="ident">relation_name</span>.<span class="ident">clone</span>(),
-        <span class="ident">fk_name</span>: <span class="ident">relation_mapped_name</span>(<span class="ident">foreign_key</span>, <span class="ident">ctx</span>.<span class="ident">active_connector</span>()),
-        <span class="ident">fields</span>: <span class="ident">foreign_key</span>
-            .<span class="ident">constrained_columns</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">column_prisma_name</span>(<span class="ident">c</span>.<span class="ident">id</span>).<span class="ident">to_owned</span>())
-            .<span class="ident">collect</span>(),
-        <span class="ident">referenced_model</span>: <span class="ident">ctx</span>.<span class="ident">model_prisma_name</span>(<span class="ident">foreign_key</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span>).<span class="ident">to_owned</span>(),
-        <span class="ident">references</span>: <span class="ident">foreign_key</span>
-            .<span class="ident">referenced_columns</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">column_prisma_name</span>(<span class="ident">c</span>.<span class="ident">id</span>).<span class="ident">to_owned</span>())
-            .<span class="ident">collect</span>(),
-        <span class="ident">on_delete</span>: <span class="prelude-val">None</span>,
-        <span class="ident">on_update</span>: <span class="prelude-val">None</span>,
+    <span class="kw">let </span>relation_info = psl::dml::RelationInfo {
+        name: relation_name.clone(),
+        fk_name: relation_mapped_name(foreign_key, ctx.active_connector()),
+        fields: foreign_key
+            .constrained_columns()
+            .map(|c| ctx.column_prisma_name(c.id).to_owned())
+            .collect(),
+        referenced_model: ctx.model_prisma_name(foreign_key.referenced_table().id).to_owned(),
+        references: foreign_key
+            .referenced_columns()
+            .map(|c| ctx.column_prisma_name(c.id).to_owned())
+            .collect(),
+        on_delete: <span class="prelude-val">None</span>,
+        on_update: <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">foreign_key</span>.<span class="ident">constrained_columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>()) {
-        <span class="bool-val">true</span> =&gt; <span class="ident">FieldArity::Optional</span>,
-        <span class="bool-val">false</span> =&gt; <span class="ident">FieldArity::Required</span>,
+    <span class="kw">let </span>arity = <span class="kw">match </span>foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
+        <span class="bool-val">true </span>=&gt; FieldArity::Optional,
+        <span class="bool-val">false </span>=&gt; FieldArity::Required,
     };
 
-    <span class="kw">let</span> <span class="ident">calculated_arity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">foreign_key</span>.<span class="ident">constrained_columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>()) {
-        <span class="bool-val">true</span> =&gt; <span class="ident">FieldArity::Required</span>,
-        <span class="bool-val">false</span> =&gt; <span class="ident">arity</span>,
+    <span class="kw">let </span>calculated_arity = <span class="kw">match </span>foreign_key.constrained_columns().any(|c| c.arity().is_required()) {
+        <span class="bool-val">true </span>=&gt; FieldArity::Required,
+        <span class="bool-val">false </span>=&gt; arity,
     };
 
-    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">forward_relation_field_name</span>(
-        <span class="ident">existing_relation</span>,
-        <span class="ident">foreign_key</span>,
-        <span class="ident">field_names_clash_with_m2m_relation_field_names</span>,
-        <span class="ident">relation_name</span>,
-        <span class="ident">ctx</span>,
+    <span class="kw">let </span>field_name = forward_relation_field_name(
+        existing_relation,
+        foreign_key,
+        field_names_clash_with_m2m_relation_field_names,
+        relation_name,
+        ctx,
     );
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="ident">psl::dml::RelationField::new</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="ident">arity</span>, <span class="ident">calculated_arity</span>, <span class="ident">relation_info</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>relation_field = psl::dml::RelationField::new(<span class="kw-2">&amp;</span>field_name, arity, calculated_arity, relation_info);
 
-    <span class="kw">let</span> <span class="ident">on_delete_action</span> <span class="op">=</span> <span class="ident">map_action</span>(<span class="ident">foreign_key</span>.<span class="ident">on_delete_action</span>());
-    <span class="kw">let</span> <span class="ident">on_update_action</span> <span class="op">=</span> <span class="ident">map_action</span>(<span class="ident">foreign_key</span>.<span class="ident">on_update_action</span>());
+    <span class="kw">let </span>on_delete_action = map_action(foreign_key.on_delete_action());
+    <span class="kw">let </span>on_update_action = map_action(foreign_key.on_update_action());
 
-    <span class="ident">relation_field</span>.<span class="ident">supports_restrict_action</span>(<span class="op">!</span><span class="ident">ctx</span>.<span class="ident">sql_family</span>.<span class="ident">is_mssql</span>());
+    relation_field.supports_restrict_action(!ctx.sql_family.is_mssql());
 
-    <span class="kw">if</span> <span class="ident">relation_field</span>.<span class="ident">default_on_delete_action</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">on_delete_action</span> {
-        <span class="ident">relation_field</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">on_delete_action</span>);
+    <span class="kw">if </span>relation_field.default_on_delete_action() != on_delete_action {
+        relation_field.relation_info.on_delete = <span class="prelude-val">Some</span>(on_delete_action);
     }
 
-    <span class="kw">if</span> <span class="ident">relation_field</span>.<span class="ident">default_on_update_action</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">on_update_action</span> {
-        <span class="ident">relation_field</span>.<span class="ident">relation_info</span>.<span class="ident">on_update</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">on_update_action</span>);
+    <span class="kw">if </span>relation_field.default_on_update_action() != on_update_action {
+        relation_field.relation_info.on_update = <span class="prelude-val">Some</span>(on_update_action);
     }
 
-    <span class="ident">relation_field</span>
+    relation_field
 }
 
-<span class="kw">fn</span> <span class="ident">calculate_backrelation_field</span>(
-    <span class="ident">fk</span>: <span class="ident">sql::ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">relation_name</span>: <span class="ident">String</span>,
-    <span class="ident">existing_relation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">field_names_clash_with_m2m_relation_field_names</span>: <span class="ident">bool</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">psl::dml::RelationField</span> {
-    <span class="kw">let</span> <span class="ident">model_a_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">model_prisma_name</span>(<span class="ident">fk</span>.<span class="ident">table</span>().<span class="ident">id</span>).<span class="ident">to_owned</span>();
-    <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">psl::dml::RelationInfo</span> {
-        <span class="ident">name</span>: <span class="ident">relation_name</span>.<span class="ident">clone</span>(),
-        <span class="ident">fk_name</span>: <span class="prelude-val">None</span>,
-        <span class="ident">referenced_model</span>: <span class="ident">model_a_name</span>.<span class="ident">clone</span>(),
-        <span class="ident">fields</span>: <span class="macro">vec!</span>[],
-        <span class="ident">references</span>: <span class="macro">vec!</span>[],
-        <span class="ident">on_delete</span>: <span class="prelude-val">None</span>,
-        <span class="ident">on_update</span>: <span class="prelude-val">None</span>,
+<span class="kw">fn </span>calculate_backrelation_field(
+    fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    relation_name: String,
+    existing_relation: <span class="prelude-ty">Option</span>&lt;walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    field_names_clash_with_m2m_relation_field_names: bool,
+    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; psl::dml::RelationField {
+    <span class="kw">let </span>model_a_name = ctx.model_prisma_name(fk.table().id).to_owned();
+    <span class="kw">let </span>relation_info = psl::dml::RelationInfo {
+        name: relation_name.clone(),
+        fk_name: <span class="prelude-val">None</span>,
+        referenced_model: model_a_name.clone(),
+        fields: <span class="macro">vec!</span>[],
+        references: <span class="macro">vec!</span>[],
+        on_delete: <span class="prelude-val">None</span>,
+        on_update: <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">forward_relation_field_is_unique</span> <span class="op">=</span> <span class="ident">fk</span>
-        .<span class="ident">table</span>()
-        .<span class="ident">indexes</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">is_primary_key</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">is_unique</span>())
-        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> {
-            <span class="ident">idx</span>.<span class="ident">columns</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">idx_col</span><span class="op">|</span> {
-                <span class="ident">fk</span>.<span class="ident">constrained_columns</span>()
-                    .<span class="ident">any</span>(<span class="op">|</span><span class="ident">fk_col</span><span class="op">|</span> <span class="ident">fk_col</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">idx_col</span>.<span class="ident">as_column</span>().<span class="ident">id</span>)
+    <span class="kw">let </span>forward_relation_field_is_unique = fk
+        .table()
+        .indexes()
+        .filter(|idx| idx.is_primary_key() || idx.is_unique())
+        .any(|idx| {
+            idx.columns().all(|idx_col| {
+                fk.constrained_columns()
+                    .any(|fk_col| fk_col.id == idx_col.as_column().id)
             })
         });
 
-    <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">forward_relation_field_is_unique</span> {
-        <span class="ident">FieldArity::Optional</span> <span class="comment">// 1:1 relation</span>
-    } <span class="kw">else</span> {
-        <span class="ident">FieldArity::List</span>
+    <span class="kw">let </span>arity = <span class="kw">if </span>forward_relation_field_is_unique {
+        FieldArity::Optional <span class="comment">// 1:1 relation
+    </span>} <span class="kw">else </span>{
+        FieldArity::List
     };
 
-    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fk</span>.<span class="ident">is_self_relation</span>() <span class="op">&amp;&amp;</span> <span class="ident">existing_relation</span>.<span class="ident">is_none</span>() {
-        <span class="macro">format!</span>(<span class="string">&quot;other_{model_a_name}&quot;</span>) <span class="comment">// we need to generate a different name for the backrelation field</span>
-    } <span class="kw">else</span> {
-        <span class="ident">existing_relation</span>
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">relation</span><span class="op">|</span> <span class="ident">relation</span>.<span class="ident">back_relation_field</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()))
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">model_a_name</span>.<span class="ident">to_owned</span>();
-                <span class="kw">if</span> <span class="ident">field_names_clash_with_m2m_relation_field_names</span> {
-                    <span class="ident">name</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">relation_name</span>);
+    <span class="kw">let </span>field_name = <span class="kw">if </span>fk.is_self_relation() &amp;&amp; existing_relation.is_none() {
+        <span class="macro">format!</span>(<span class="string">&quot;other_{model_a_name}&quot;</span>) <span class="comment">// we need to generate a different name for the backrelation field
+    </span>} <span class="kw">else </span>{
+        existing_relation
+            .and_then(|relation| relation.back_relation_field().map(|field| field.name().to_owned()))
+            .unwrap_or_else(|| {
+                <span class="kw">let </span><span class="kw-2">mut </span>name = model_a_name.to_owned();
+                <span class="kw">if </span>field_names_clash_with_m2m_relation_field_names {
+                    name.push_str(<span class="kw-2">&amp;</span>relation_name);
                 }
-                <span class="ident">name</span>
+                name
             })
     };
 
-    <span class="ident">psl::dml::RelationField::new</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="ident">arity</span>, <span class="ident">arity</span>, <span class="ident">relation_info</span>)
+    psl::dml::RelationField::new(<span class="kw-2">&amp;</span>field_name, arity, arity, relation_info)
 }
 
-<span class="doccomment">/// This is not used for Prisma many to many relations. For them the name is the name of the join</span>
-<span class="doccomment">/// table.</span>
-<span class="kw">fn</span> <span class="ident">calculate_relation_name</span>(
-    <span class="ident">fk</span>: <span class="ident">sql::ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">m2m_table_names</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">duplicated_foreign_keys</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">sql::ForeignKeyId</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">referenced_model</span> <span class="op">=</span> <span class="ident">fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>();
-    <span class="kw">let</span> <span class="ident">model_with_fk</span> <span class="op">=</span> <span class="ident">fk</span>.<span class="ident">table</span>().<span class="ident">name</span>();
-    <span class="kw">let</span> <span class="ident">fk_column_name</span> <span class="op">=</span> <span class="ident">fk</span>.<span class="ident">constrained_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>);
-    <span class="kw">let</span> <span class="ident">unambiguous_name</span> <span class="op">=</span> <span class="ident">psl::RelationNames::name_for_unambiguous_relation</span>(<span class="ident">model_with_fk</span>, <span class="ident">referenced_model</span>);
+<span class="doccomment">/// This is not used for Prisma many to many relations. For them the name is the name of the join
+/// table.
+</span><span class="kw">fn </span>calculate_relation_name(
+    fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    m2m_table_names: <span class="kw-2">&amp;</span>HashSet&lt;String&gt;,
+    duplicated_foreign_keys: <span class="kw-2">&amp;</span>HashSet&lt;sql::ForeignKeyId&gt;,
+) -&gt; String {
+    <span class="kw">let </span>referenced_model = fk.referenced_table().name();
+    <span class="kw">let </span>model_with_fk = fk.table().name();
+    <span class="kw">let </span>fk_column_name = fk.constrained_columns().map(|c| c.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;_&quot;</span>);
+    <span class="kw">let </span>unambiguous_name = psl::RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model);
 
-    <span class="comment">// this needs to know whether there are m2m relations and then use ambiguous name path</span>
-    <span class="kw">if</span> <span class="ident">default_relation_name_is_ambiguous</span>(<span class="ident">fk</span>, <span class="ident">duplicated_foreign_keys</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">m2m_table_names</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">unambiguous_name</span>) {
-        <span class="ident">psl::RelationNames::name_for_ambiguous_relation</span>(<span class="ident">model_with_fk</span>, <span class="ident">referenced_model</span>, <span class="kw-2">&amp;</span><span class="ident">fk_column_name</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">unambiguous_name</span>
+    <span class="comment">// this needs to know whether there are m2m relations and then use ambiguous name path
+    </span><span class="kw">if </span>default_relation_name_is_ambiguous(fk, duplicated_foreign_keys) || m2m_table_names.contains(<span class="kw-2">&amp;</span>unambiguous_name) {
+        psl::RelationNames::name_for_ambiguous_relation(model_with_fk, referenced_model, <span class="kw-2">&amp;</span>fk_column_name)
+    } <span class="kw">else </span>{
+        unambiguous_name
     }
 }
 
-<span class="kw">fn</span> <span class="ident">default_relation_name_is_ambiguous</span>(
-    <span class="ident">fk</span>: <span class="ident">sql::ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">duplicated_foreign_keys</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">sql::ForeignKeyId</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">both_ids</span> <span class="op">=</span> [<span class="ident">fk</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span>, <span class="ident">fk</span>.<span class="ident">table</span>().<span class="ident">id</span>];
-    <span class="ident">both_ids</span>.<span class="ident">sort</span>();
-    <span class="ident">fk</span>.<span class="ident">schema</span>.<span class="ident">walk_foreign_keys</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">other_fk</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">other_ids</span> <span class="op">=</span> [<span class="ident">other_fk</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span>, <span class="ident">other_fk</span>.<span class="ident">table</span>().<span class="ident">id</span>];
-        <span class="ident">other_ids</span>.<span class="ident">sort</span>();
+<span class="kw">fn </span>default_relation_name_is_ambiguous(
+    fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    duplicated_foreign_keys: <span class="kw-2">&amp;</span>HashSet&lt;sql::ForeignKeyId&gt;,
+) -&gt; bool {
+    <span class="kw">let </span><span class="kw-2">mut </span>both_ids = [fk.referenced_table().id, fk.table().id];
+    both_ids.sort();
+    fk.schema.walk_foreign_keys().any(|other_fk| {
+        <span class="kw">let </span><span class="kw-2">mut </span>other_ids = [other_fk.referenced_table().id, other_fk.table().id];
+        other_ids.sort();
 
-        <span class="ident">other_fk</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">fk</span>.<span class="ident">id</span> <span class="op">&amp;&amp;</span> <span class="ident">both_ids</span> <span class="op">==</span> <span class="ident">other_ids</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">duplicated_foreign_keys</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">other_fk</span>.<span class="ident">id</span>)
+        other_fk.id != fk.id &amp;&amp; both_ids == other_ids &amp;&amp; !duplicated_foreign_keys.contains(<span class="kw-2">&amp;</span>other_fk.id)
     })
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relation_mapped_name</span>(<span class="ident">fk</span>: <span class="ident">sql::ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">cols</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fk</span>.<span class="ident">constrained_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>()).<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">default_name</span> <span class="op">=</span> <span class="ident">ConstraintNames::foreign_key_constraint_name</span>(<span class="ident">fk</span>.<span class="ident">table</span>().<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">cols</span>, <span class="ident">connector</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_mapped_name(fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+    <span class="kw">let </span>cols: Vec&lt;<span class="kw">_</span>&gt; = fk.constrained_columns().map(|c| c.name()).collect();
+    <span class="kw">let </span>default_name = ConstraintNames::foreign_key_constraint_name(fk.table().name(), <span class="kw-2">&amp;</span>cols, connector);
 
-    <span class="ident">fk</span>.<span class="ident">constraint_name</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">default_name</span>.<span class="ident">as_str</span>())
-        .<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>)
+    fk.constraint_name()
+        .filter(|name| <span class="kw-2">*</span>name != default_name.as_str())
+        .map(ToOwned::to_owned)
 }
 
-<span class="kw">fn</span> <span class="ident">collect_duplicated_fks</span>(<span class="ident">table</span>: <span class="ident">sql::TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">fks</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">sql::ForeignKeyId</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">new_fks</span> <span class="op">=</span> <span class="ident">table</span>
-        .<span class="ident">foreign_keys</span>()
-        .<span class="ident">enumerate</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">left</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">already_visited</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">foreign_keys</span>().<span class="ident">take</span>(<span class="kw-2">*</span><span class="ident">idx</span>);
-            <span class="ident">already_visited</span>.<span class="ident">any</span>(<span class="op">|</span><span class="ident">right</span><span class="op">|</span> {
-                <span class="kw">let</span> (<span class="ident">left_constrained</span>, <span class="ident">right_constrained</span>) <span class="op">=</span> (<span class="ident">left</span>.<span class="ident">constrained_columns</span>(), <span class="ident">right</span>.<span class="ident">constrained_columns</span>());
-                <span class="ident">left_constrained</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">right_constrained</span>.<span class="ident">len</span>()
-                    <span class="op">&amp;&amp;</span> <span class="ident">left_constrained</span>
-                        .<span class="ident">zip</span>(<span class="ident">right_constrained</span>)
-                        .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">left</span>, <span class="ident">right</span>)<span class="op">|</span> <span class="ident">left</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">right</span>.<span class="ident">id</span>)
-                    <span class="op">&amp;&amp;</span> <span class="ident">left</span>
-                        .<span class="ident">referenced_columns</span>()
-                        .<span class="ident">zip</span>(<span class="ident">right</span>.<span class="ident">referenced_columns</span>())
-                        .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">left</span>, <span class="ident">right</span>)<span class="op">|</span> <span class="ident">left</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">right</span>.<span class="ident">id</span>)
+<span class="kw">fn </span>collect_duplicated_fks(table: sql::TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, fks: <span class="kw-2">&amp;mut </span>HashSet&lt;sql::ForeignKeyId&gt;) {
+    <span class="kw">let </span>new_fks = table
+        .foreign_keys()
+        .enumerate()
+        .filter(|(idx, left)| {
+            <span class="kw">let </span><span class="kw-2">mut </span>already_visited = table.foreign_keys().take(<span class="kw-2">*</span>idx);
+            already_visited.any(|right| {
+                <span class="kw">let </span>(left_constrained, right_constrained) = (left.constrained_columns(), right.constrained_columns());
+                left_constrained.len() == right_constrained.len()
+                    &amp;&amp; left_constrained
+                        .zip(right_constrained)
+                        .all(|(left, right)| left.id == right.id)
+                    &amp;&amp; left
+                        .referenced_columns()
+                        .zip(right.referenced_columns())
+                        .all(|(left, right)| left.id == right.id)
             })
         })
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">fk</span>)<span class="op">|</span> <span class="ident">fk</span>.<span class="ident">id</span>);
-    <span class="ident">fks</span>.<span class="ident">clear</span>();
-    <span class="ident">fks</span>.<span class="ident">extend</span>(<span class="ident">new_fks</span>)
+        .map(|(<span class="kw">_</span>, fk)| fk.id);
+    fks.clear();
+    fks.extend(new_fks)
 }
 
-<span class="kw">fn</span> <span class="ident">forward_relation_field_name</span>(
-    <span class="ident">existing_relation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">foreign_key</span>: <span class="ident">sql::ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">field_names_clash_with_m2m_relation_field_names</span>: <span class="ident">bool</span>,
-    <span class="ident">relation_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">String</span> {
-    <span class="ident">existing_relation</span>
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">forward_relation_field</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">model_prisma_name</span>(<span class="ident">foreign_key</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span>).<span class="ident">to_owned</span>();
-            <span class="kw">if</span> <span class="ident">field_names_clash_with_m2m_relation_field_names</span> {
-                <span class="ident">name</span>.<span class="ident">push_str</span>(<span class="ident">relation_name</span>);
+<span class="kw">fn </span>forward_relation_field_name(
+    existing_relation: <span class="prelude-ty">Option</span>&lt;walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    foreign_key: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    field_names_clash_with_m2m_relation_field_names: bool,
+    relation_name: <span class="kw-2">&amp;</span>str,
+    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; String {
+    existing_relation
+        .and_then(|r| r.forward_relation_field())
+        .map(|f| f.name().to_owned())
+        .unwrap_or_else(|| {
+            <span class="kw">let </span><span class="kw-2">mut </span>name = ctx.model_prisma_name(foreign_key.referenced_table().id).to_owned();
+            <span class="kw">if </span>field_names_clash_with_m2m_relation_field_names {
+                name.push_str(relation_name);
             }
-            <span class="ident">name</span>
+            name
         })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

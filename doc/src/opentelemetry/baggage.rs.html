@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/baggage.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>baggage.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/baggage.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>baggage.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -533,538 +533,538 @@
 <span id="531">531</span>
 <span id="532">532</span>
 <span id="533">533</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Primitives for sending name-value data across system boundaries.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Main types in this module are:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [`Baggage`]: Baggage is used to annotate telemetry, adding context and</span>
-<span class="doccomment">//!   information to metrics, traces, and logs.</span>
-<span class="doccomment">//! * [`BaggageExt`]: Extensions for managing `Baggage` in a [`Context`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Baggage can be sent between systems using the [`BaggagePropagator`] in</span>
-<span class="doccomment">//! accordance with the [W3C Baggage] specification.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`BaggagePropagator`]: crate::sdk::propagation::BaggagePropagator</span>
-<span class="doccomment">//! [W3C Baggage]: https://w3c.github.io/baggage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;trace&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::{baggage::BaggageExt, Key, propagation::TextMapPropagator};</span>
-<span class="doccomment">//! use opentelemetry::sdk::propagation::BaggagePropagator;</span>
-<span class="doccomment">//! use std::collections::HashMap;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Example baggage value passed in externally via http headers</span>
-<span class="doccomment">//! let mut headers = HashMap::new();</span>
-<span class="doccomment">//! headers.insert(&quot;baggage&quot;.to_string(), &quot;user_id=1&quot;.to_string());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let propagator = BaggagePropagator::new();</span>
-<span class="doccomment">//! // can extract from any type that impls `Extractor`, usually an HTTP header map</span>
-<span class="doccomment">//! let cx = propagator.extract(&amp;headers);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Iterate over extracted name-value pairs</span>
-<span class="doccomment">//! for (name, value) in cx.baggage() {</span>
-<span class="doccomment">//!     // ...</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Add new baggage</span>
-<span class="doccomment">//! let cx_with_additions = cx.with_baggage(vec![Key::new(&quot;server_id&quot;).i64(42)]);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Inject baggage into http request</span>
-<span class="doccomment">//! propagator.inject_context(&amp;cx_with_additions, &amp;mut headers);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let header_value = headers.get(&quot;baggage&quot;).expect(&quot;header is injected&quot;);</span>
-<span class="doccomment">//! assert!(header_value.contains(&quot;user_id=1&quot;), &quot;still contains previous name-value&quot;);</span>
-<span class="doccomment">//! assert!(header_value.contains(&quot;server_id=42&quot;), &quot;contains new name-value pair&quot;);</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Context</span>, <span class="ident">Key</span>, <span class="ident">KeyValue</span>, <span class="ident">Value</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">hash_map</span>, <span class="ident">HashMap</span>};
-<span class="kw">use</span> <span class="ident">std::iter::FromIterator</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Primitives for sending name-value data across system boundaries.
+//!
+//! Main types in this module are:
+//!
+//! * [`Baggage`]: Baggage is used to annotate telemetry, adding context and
+//!   information to metrics, traces, and logs.
+//! * [`BaggageExt`]: Extensions for managing `Baggage` in a [`Context`].
+//!
+//! Baggage can be sent between systems using the [`BaggagePropagator`] in
+//! accordance with the [W3C Baggage] specification.
+//!
+//! [`BaggagePropagator`]: crate::sdk::propagation::BaggagePropagator
+//! [W3C Baggage]: https://w3c.github.io/baggage
+//!
+//! # Examples
+//!
+//! ```
+//! # #[cfg(feature = &quot;trace&quot;)]
+//! # {
+//! use opentelemetry::{baggage::BaggageExt, Key, propagation::TextMapPropagator};
+//! use opentelemetry::sdk::propagation::BaggagePropagator;
+//! use std::collections::HashMap;
+//!
+//! // Example baggage value passed in externally via http headers
+//! let mut headers = HashMap::new();
+//! headers.insert(&quot;baggage&quot;.to_string(), &quot;user_id=1&quot;.to_string());
+//!
+//! let propagator = BaggagePropagator::new();
+//! // can extract from any type that impls `Extractor`, usually an HTTP header map
+//! let cx = propagator.extract(&amp;headers);
+//!
+//! // Iterate over extracted name-value pairs
+//! for (name, value) in cx.baggage() {
+//!     // ...
+//! }
+//!
+//! // Add new baggage
+//! let cx_with_additions = cx.with_baggage(vec![Key::new(&quot;server_id&quot;).i64(42)]);
+//!
+//! // Inject baggage into http request
+//! propagator.inject_context(&amp;cx_with_additions, &amp;mut headers);
+//!
+//! let header_value = headers.get(&quot;baggage&quot;).expect(&quot;header is injected&quot;);
+//! assert!(header_value.contains(&quot;user_id=1&quot;), &quot;still contains previous name-value&quot;);
+//! assert!(header_value.contains(&quot;server_id=42&quot;), &quot;contains new name-value pair&quot;);
+//! # }
+//! ```
+</span><span class="kw">use crate</span>::{Context, Key, KeyValue, Value};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::collections::{hash_map, HashMap};
+<span class="kw">use </span>std::iter::FromIterator;
 
-<span class="macro">lazy_static::lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DEFAULT_BAGGAGE</span>: <span class="ident">Baggage</span> <span class="op">=</span> <span class="ident">Baggage::default</span>();
+<span class="macro">lazy_static::lazy_static! </span>{
+    <span class="kw">static </span><span class="kw-2">ref </span>DEFAULT_BAGGAGE: Baggage = Baggage::default();
 }
 
-<span class="kw">const</span> <span class="ident">MAX_KEY_VALUE_PAIRS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">180</span>;
-<span class="kw">const</span> <span class="ident">MAX_BYTES_FOR_ONE_PAIR</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span>;
-<span class="kw">const</span> <span class="ident">MAX_LEN_OF_ALL_PAIRS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8192</span>;
+<span class="kw">const </span>MAX_KEY_VALUE_PAIRS: usize = <span class="number">180</span>;
+<span class="kw">const </span>MAX_BYTES_FOR_ONE_PAIR: usize = <span class="number">4096</span>;
+<span class="kw">const </span>MAX_LEN_OF_ALL_PAIRS: usize = <span class="number">8192</span>;
 
-<span class="doccomment">/// A set of name-value pairs describing user-defined properties.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Baggage Names</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * ASCII strings according to the token format, defined in [RFC2616, Section 2.2]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Baggage Values</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * URL encoded UTF-8 strings.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Baggage Value Metadata</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Additional metadata can be added to values in the form of a property set,</span>
-<span class="doccomment">/// represented as semi-colon `;` delimited list of names and/or name-value pairs,</span>
-<span class="doccomment">/// e.g. `;k1=v1;k2;k3=v3`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Limits</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * Maximum number of name-value pairs: `180`.</span>
-<span class="doccomment">/// * Maximum number of bytes per a single name-value pair: `4096`.</span>
-<span class="doccomment">/// * Maximum total length of all name-value pairs: `8192`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC2616, Section 2.2]: https://tools.ietf.org/html/rfc2616#section-2.2</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Baggage</span> {
-    <span class="ident">inner</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Key</span>, (<span class="ident">Value</span>, <span class="ident">BaggageMetadata</span>)<span class="op">&gt;</span>,
-    <span class="ident">kv_content_len</span>: <span class="ident">usize</span>, <span class="comment">// the length of key-value-metadata string in `inner`</span>
-}
+<span class="doccomment">/// A set of name-value pairs describing user-defined properties.
+///
+/// ### Baggage Names
+///
+/// * ASCII strings according to the token format, defined in [RFC2616, Section 2.2]
+///
+/// ### Baggage Values
+///
+/// * URL encoded UTF-8 strings.
+///
+/// ### Baggage Value Metadata
+///
+/// Additional metadata can be added to values in the form of a property set,
+/// represented as semi-colon `;` delimited list of names and/or name-value pairs,
+/// e.g. `;k1=v1;k2;k3=v3`.
+///
+/// ### Limits
+///
+/// * Maximum number of name-value pairs: `180`.
+/// * Maximum number of bytes per a single name-value pair: `4096`.
+/// * Maximum total length of all name-value pairs: `8192`.
+///
+/// [RFC2616, Section 2.2]: https://tools.ietf.org/html/rfc2616#section-2.2
+</span><span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>Baggage {
+    inner: HashMap&lt;Key, (Value, BaggageMetadata)&gt;,
+    kv_content_len: usize, <span class="comment">// the length of key-value-metadata string in `inner`
+</span>}
 
-<span class="kw">impl</span> <span class="ident">Baggage</span> {
-    <span class="doccomment">/// Creates an empty `Baggage`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Baggage</span> {
-            <span class="ident">inner</span>: <span class="ident">HashMap::default</span>(),
-            <span class="ident">kv_content_len</span>: <span class="number">0</span>,
+<span class="kw">impl </span>Baggage {
+    <span class="doccomment">/// Creates an empty `Baggage`.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        Baggage {
+            inner: HashMap::default(),
+            kv_content_len: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Returns a reference to the value associated with a given name</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::{baggage::Baggage, Value};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut cc = Baggage::new();</span>
-    <span class="doccomment">/// let _ = cc.insert(&quot;my-name&quot;, &quot;my-value&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(cc.get(&quot;my-name&quot;), Some(&amp;Value::from(&quot;my-value&quot;)))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Value</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">into</span>()).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">value</span>, <span class="ident">_metadata</span>)<span class="op">|</span> <span class="ident">value</span>)
+    <span class="doccomment">/// Returns a reference to the value associated with a given name
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::{baggage::Baggage, Value};
+    ///
+    /// let mut cc = Baggage::new();
+    /// let _ = cc.insert(&quot;my-name&quot;, &quot;my-value&quot;);
+    ///
+    /// assert_eq!(cc.get(&quot;my-name&quot;), Some(&amp;Value::from(&quot;my-value&quot;)))
+    /// ```
+    </span><span class="kw">pub fn </span>get&lt;T: Into&lt;Key&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Value&gt; {
+        <span class="self">self</span>.inner.get(<span class="kw-2">&amp;</span>key.into()).map(|(value, _metadata)| value)
     }
 
-    <span class="doccomment">/// Returns a reference to the value and metadata associated with a given name</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::{baggage::{Baggage, BaggageMetadata}, Value};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut cc = Baggage::new();</span>
-    <span class="doccomment">/// let _ = cc.insert(&quot;my-name&quot;, &quot;my-value&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // By default, the metadata is empty</span>
-    <span class="doccomment">/// assert_eq!(cc.get_with_metadata(&quot;my-name&quot;), Some(&amp;(Value::from(&quot;my-value&quot;), BaggageMetadata::from(&quot;&quot;))))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_with_metadata</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">Value</span>, <span class="ident">BaggageMetadata</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">into</span>())
+    <span class="doccomment">/// Returns a reference to the value and metadata associated with a given name
+    ///
+    /// # Examples
+    /// ```
+    /// use opentelemetry::{baggage::{Baggage, BaggageMetadata}, Value};
+    ///
+    /// let mut cc = Baggage::new();
+    /// let _ = cc.insert(&quot;my-name&quot;, &quot;my-value&quot;);
+    ///
+    /// // By default, the metadata is empty
+    /// assert_eq!(cc.get_with_metadata(&quot;my-name&quot;), Some(&amp;(Value::from(&quot;my-value&quot;), BaggageMetadata::from(&quot;&quot;))))
+    /// ```
+    </span><span class="kw">pub fn </span>get_with_metadata&lt;T: Into&lt;Key&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(Value, BaggageMetadata)&gt; {
+        <span class="self">self</span>.inner.get(<span class="kw-2">&amp;</span>key.into())
     }
 
-    <span class="doccomment">/// Inserts a name-value pair into the baggage.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the name was not present, [`None`] is returned. If the name was present,</span>
-    <span class="doccomment">/// the value is updated, and the old value is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::{baggage::Baggage, Value};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut cc = Baggage::new();</span>
-    <span class="doccomment">/// let _ = cc.insert(&quot;my-name&quot;, &quot;my-value&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(cc.get(&quot;my-name&quot;), Some(&amp;Value::from(&quot;my-value&quot;)))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Inserts a name-value pair into the baggage.
+    ///
+    /// If the name was not present, [`None`] is returned. If the name was present,
+    /// the value is updated, and the old value is returned.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::{baggage::Baggage, Value};
+    ///
+    /// let mut cc = Baggage::new();
+    /// let _ = cc.insert(&quot;my-name&quot;, &quot;my-value&quot;);
+    ///
+    /// assert_eq!(cc.get(&quot;my-name&quot;), Some(&amp;Value::from(&quot;my-value&quot;)))
+    /// ```
+    </span><span class="kw">pub fn </span>insert&lt;K, V&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: K, value: V) -&gt; <span class="prelude-ty">Option</span>&lt;Value&gt;
+    <span class="kw">where
+        </span>K: Into&lt;Key&gt;,
+        V: Into&lt;Value&gt;,
     {
-        <span class="self">self</span>.<span class="ident">insert_with_metadata</span>(<span class="ident">key</span>, <span class="ident">value</span>, <span class="ident">BaggageMetadata::default</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="number">0</span>)
+        <span class="self">self</span>.insert_with_metadata(key, value, BaggageMetadata::default())
+            .map(|pair| pair.<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Inserts a name-value pair into the baggage.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Same with `insert`, if the name was not present, [`None`] will be returned.</span>
-    <span class="doccomment">/// If the name is present, the old value and metadata will be returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::{baggage::{Baggage, BaggageMetadata}, Value};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut cc = Baggage::new();</span>
-    <span class="doccomment">/// let _ = cc.insert_with_metadata(&quot;my-name&quot;, &quot;my-value&quot;, &quot;test&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(cc.get_with_metadata(&quot;my-name&quot;), Some(&amp;(Value::from(&quot;my-value&quot;), BaggageMetadata::from(&quot;test&quot;))))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_with_metadata</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">key</span>: <span class="ident">K</span>,
-        <span class="ident">value</span>: <span class="ident">V</span>,
-        <span class="ident">metadata</span>: <span class="ident">S</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Value</span>, <span class="ident">BaggageMetadata</span>)<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>,
-        <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">BaggageMetadata</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Inserts a name-value pair into the baggage.
+    ///
+    /// Same with `insert`, if the name was not present, [`None`] will be returned.
+    /// If the name is present, the old value and metadata will be returned.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::{baggage::{Baggage, BaggageMetadata}, Value};
+    ///
+    /// let mut cc = Baggage::new();
+    /// let _ = cc.insert_with_metadata(&quot;my-name&quot;, &quot;my-value&quot;, &quot;test&quot;);
+    ///
+    /// assert_eq!(cc.get_with_metadata(&quot;my-name&quot;), Some(&amp;(Value::from(&quot;my-value&quot;), BaggageMetadata::from(&quot;test&quot;))))
+    /// ```
+    </span><span class="kw">pub fn </span>insert_with_metadata&lt;K, V, S&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        key: K,
+        value: V,
+        metadata: S,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;(Value, BaggageMetadata)&gt;
+    <span class="kw">where
+        </span>K: Into&lt;Key&gt;,
+        V: Into&lt;Value&gt;,
+        S: Into&lt;BaggageMetadata&gt;,
     {
-        <span class="kw">let</span> (<span class="ident">key</span>, <span class="ident">value</span>, <span class="ident">metadata</span>) <span class="op">=</span> (<span class="ident">key</span>.<span class="ident">into</span>(), <span class="ident">value</span>.<span class="ident">into</span>(), <span class="ident">metadata</span>.<span class="ident">into</span>());
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">insertable</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">metadata</span>) {
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">insert</span>(<span class="ident">key</span>, (<span class="ident">value</span>, <span class="ident">metadata</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+        <span class="kw">let </span>(key, value, metadata) = (key.into(), value.into(), metadata.into());
+        <span class="kw">if </span><span class="self">self</span>.insertable(<span class="kw-2">&amp;</span>key, <span class="kw-2">&amp;</span>value, <span class="kw-2">&amp;</span>metadata) {
+            <span class="self">self</span>.inner.insert(key, (value, metadata))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="doccomment">/// Removes a name from the baggage, returning the value
+    /// corresponding to the name if the pair was previously in the map.
+    </span><span class="kw">pub fn </span>remove&lt;K: Into&lt;Key&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: K) -&gt; <span class="prelude-ty">Option</span>&lt;(Value, BaggageMetadata)&gt; {
+        <span class="self">self</span>.inner.remove(<span class="kw-2">&amp;</span>key.into())
+    }
+
+    <span class="doccomment">/// Returns the number of attributes for this baggage
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.inner.len()
+    }
+
+    <span class="doccomment">/// Returns `true` if the baggage contains no items.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.inner.is_empty()
+    }
+
+    <span class="doccomment">/// Gets an iterator over the baggage items, sorted by name.
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.into_iter()
+    }
+
+    <span class="doccomment">/// Determine whether the key value pair exceed one of the [limits](https://w3c.github.io/baggage/#limits).
+    /// If not, update the total length of key values
+    </span><span class="kw">fn </span>insertable(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key, value: <span class="kw-2">&amp;</span>Value, metadata: <span class="kw-2">&amp;</span>BaggageMetadata) -&gt; bool {
+        <span class="kw">if </span>!key.as_str().is_ascii() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-    }
-
-    <span class="doccomment">/// Removes a name from the baggage, returning the value</span>
-    <span class="doccomment">/// corresponding to the name if the pair was previously in the map.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Value</span>, <span class="ident">BaggageMetadata</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">into</span>())
-    }
-
-    <span class="doccomment">/// Returns the number of attributes for this baggage</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>()
-    }
-
-    <span class="doccomment">/// Returns `true` if the baggage contains no items.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">is_empty</span>()
-    }
-
-    <span class="doccomment">/// Gets an iterator over the baggage items, sorted by name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">into_iter</span>()
-    }
-
-    <span class="doccomment">/// Determine whether the key value pair exceed one of the [limits](https://w3c.github.io/baggage/#limits).</span>
-    <span class="doccomment">/// If not, update the total length of key values</span>
-    <span class="kw">fn</span> <span class="ident">insertable</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">BaggageMetadata</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">key</span>.<span class="ident">as_str</span>().<span class="ident">is_ascii</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
-        }
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_str</span>();
-        <span class="kw">if</span> <span class="ident">key_value_metadata_bytes_size</span>(<span class="ident">key</span>.<span class="ident">as_str</span>(), <span class="ident">value</span>.<span class="ident">as_ref</span>(), <span class="ident">metadata</span>.<span class="ident">as_str</span>())
-            <span class="op">&lt;</span> <span class="ident">MAX_BYTES_FOR_ONE_PAIR</span>
+        <span class="kw">let </span>value = value.as_str();
+        <span class="kw">if </span>key_value_metadata_bytes_size(key.as_str(), value.as_ref(), metadata.as_str())
+            &lt; MAX_BYTES_FOR_ONE_PAIR
         {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get</span>(<span class="ident">key</span>) {
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="comment">// check total length</span>
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kv_content_len</span>
-                        <span class="op">+</span> <span class="ident">metadata</span>.<span class="ident">as_str</span>().<span class="ident">len</span>()
-                        <span class="op">+</span> <span class="ident">value</span>.<span class="ident">len</span>()
-                        <span class="op">+</span> <span class="ident">key</span>.<span class="ident">as_str</span>().<span class="ident">len</span>()
-                        <span class="op">&gt;</span> <span class="ident">MAX_LEN_OF_ALL_PAIRS</span>
+            <span class="kw">match </span><span class="self">self</span>.inner.get(key) {
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="comment">// check total length
+                    </span><span class="kw">if </span><span class="self">self</span>.kv_content_len
+                        + metadata.as_str().len()
+                        + value.len()
+                        + key.as_str().len()
+                        &gt; MAX_LEN_OF_ALL_PAIRS
                     {
-                        <span class="kw">return</span> <span class="bool-val">false</span>;
+                        <span class="kw">return </span><span class="bool-val">false</span>;
                     }
-                    <span class="comment">// check number of pairs</span>
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span> <span class="op">&gt;</span> <span class="ident">MAX_KEY_VALUE_PAIRS</span> {
-                        <span class="kw">return</span> <span class="bool-val">false</span>;
+                    <span class="comment">// check number of pairs
+                    </span><span class="kw">if </span><span class="self">self</span>.inner.len() + <span class="number">1 </span>&gt; MAX_KEY_VALUE_PAIRS {
+                        <span class="kw">return </span><span class="bool-val">false</span>;
                     }
-                    <span class="self">self</span>.<span class="ident">kv_content_len</span> <span class="op">+</span><span class="op">=</span>
-                        <span class="ident">metadata</span>.<span class="ident">as_str</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="ident">value</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">key</span>.<span class="ident">as_str</span>().<span class="ident">len</span>()
+                    <span class="self">self</span>.kv_content_len +=
+                        metadata.as_str().len() + value.len() + key.as_str().len()
                 }
-                <span class="prelude-val">Some</span>((<span class="ident">old_value</span>, <span class="ident">old_metadata</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">old_value</span> <span class="op">=</span> <span class="ident">old_value</span>.<span class="ident">as_str</span>();
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kv_content_len</span> <span class="op">-</span> <span class="ident">old_metadata</span>.<span class="ident">as_str</span>().<span class="ident">len</span>() <span class="op">-</span> <span class="ident">old_value</span>.<span class="ident">len</span>()
-                        <span class="op">+</span> <span class="ident">metadata</span>.<span class="ident">as_str</span>().<span class="ident">len</span>()
-                        <span class="op">+</span> <span class="ident">value</span>.<span class="ident">len</span>()
-                        <span class="op">&gt;</span> <span class="ident">MAX_LEN_OF_ALL_PAIRS</span>
+                <span class="prelude-val">Some</span>((old_value, old_metadata)) =&gt; {
+                    <span class="kw">let </span>old_value = old_value.as_str();
+                    <span class="kw">if </span><span class="self">self</span>.kv_content_len - old_metadata.as_str().len() - old_value.len()
+                        + metadata.as_str().len()
+                        + value.len()
+                        &gt; MAX_LEN_OF_ALL_PAIRS
                     {
-                        <span class="kw">return</span> <span class="bool-val">false</span>;
+                        <span class="kw">return </span><span class="bool-val">false</span>;
                     }
-                    <span class="self">self</span>.<span class="ident">kv_content_len</span> <span class="op">=</span>
-                        <span class="self">self</span>.<span class="ident">kv_content_len</span> <span class="op">-</span> <span class="ident">old_metadata</span>.<span class="ident">as_str</span>().<span class="ident">len</span>() <span class="op">-</span> <span class="ident">old_value</span>.<span class="ident">len</span>()
-                            <span class="op">+</span> <span class="ident">metadata</span>.<span class="ident">as_str</span>().<span class="ident">len</span>()
-                            <span class="op">+</span> <span class="ident">value</span>.<span class="ident">len</span>()
+                    <span class="self">self</span>.kv_content_len =
+                        <span class="self">self</span>.kv_content_len - old_metadata.as_str().len() - old_value.len()
+                            + metadata.as_str().len()
+                            + value.len()
                 }
             }
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
+    }
+}
+
+<span class="doccomment">/// Get the number of bytes for one key-value pair
+</span><span class="kw">fn </span>key_value_metadata_bytes_size(key: <span class="kw-2">&amp;</span>str, value: <span class="kw-2">&amp;</span>str, metadata: <span class="kw-2">&amp;</span>str) -&gt; usize {
+    key.bytes().len() + value.bytes().len() + metadata.bytes().len()
+}
+
+<span class="doccomment">/// An iterator over the entries of a [`Baggage`].
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt;(hash_map::Iter&lt;<span class="lifetime">&#39;a</span>, Key, (Value, BaggageMetadata)&gt;);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Key, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(Value, BaggageMetadata));
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.next()
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Baggage {
+    <span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Key, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(Value, BaggageMetadata));
+    <span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>&gt;;
+
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        Iter(<span class="self">self</span>.inner.iter())
+    }
+}
+
+<span class="kw">impl </span>FromIterator&lt;(Key, (Value, BaggageMetadata))&gt; <span class="kw">for </span>Baggage {
+    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = (Key, (Value, BaggageMetadata))&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>baggage = Baggage::default();
+        <span class="kw">for </span>(key, (value, metadata)) <span class="kw">in </span>iter.into_iter() {
+            baggage.insert_with_metadata(key, value, metadata);
         }
+        baggage
     }
 }
 
-<span class="doccomment">/// Get the number of bytes for one key-value pair</span>
-<span class="kw">fn</span> <span class="ident">key_value_metadata_bytes_size</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">usize</span> {
-    <span class="ident">key</span>.<span class="ident">bytes</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="ident">value</span>.<span class="ident">bytes</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="ident">metadata</span>.<span class="ident">bytes</span>().<span class="ident">len</span>()
-}
-
-<span class="doccomment">/// An iterator over the entries of a [`Baggage`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">hash_map::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Key</span>, (<span class="ident">Value</span>, <span class="ident">BaggageMetadata</span>)<span class="op">&gt;</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Key</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">Value</span>, <span class="ident">BaggageMetadata</span>));
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Baggage</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Key</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">Value</span>, <span class="ident">BaggageMetadata</span>));
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">Iter</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">iter</span>())
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">FromIterator</span><span class="op">&lt;</span>(<span class="ident">Key</span>, (<span class="ident">Value</span>, <span class="ident">BaggageMetadata</span>))<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Baggage</span> {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">Key</span>, (<span class="ident">Value</span>, <span class="ident">BaggageMetadata</span>))<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">baggage</span> <span class="op">=</span> <span class="ident">Baggage::default</span>();
-        <span class="kw">for</span> (<span class="ident">key</span>, (<span class="ident">value</span>, <span class="ident">metadata</span>)) <span class="kw">in</span> <span class="ident">iter</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">baggage</span>.<span class="ident">insert_with_metadata</span>(<span class="ident">key</span>, <span class="ident">value</span>, <span class="ident">metadata</span>);
+<span class="kw">impl </span>FromIterator&lt;KeyValue&gt; <span class="kw">for </span>Baggage {
+    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = KeyValue&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>baggage = Baggage::default();
+        <span class="kw">for </span>kv <span class="kw">in </span>iter.into_iter() {
+            baggage.insert(kv.key, kv.value);
         }
-        <span class="ident">baggage</span>
+        baggage
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Baggage</span> {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">KeyValue</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">baggage</span> <span class="op">=</span> <span class="ident">Baggage::default</span>();
-        <span class="kw">for</span> <span class="ident">kv</span> <span class="kw">in</span> <span class="ident">iter</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">baggage</span>.<span class="ident">insert</span>(<span class="ident">kv</span>.<span class="ident">key</span>, <span class="ident">kv</span>.<span class="ident">value</span>);
+<span class="kw">impl </span>FromIterator&lt;KeyValueMetadata&gt; <span class="kw">for </span>Baggage {
+    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = KeyValueMetadata&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>baggage = Baggage::default();
+        <span class="kw">for </span>kvm <span class="kw">in </span>iter.into_iter() {
+            baggage.insert_with_metadata(kvm.key, kvm.value, kvm.metadata);
         }
-        <span class="ident">baggage</span>
+        baggage
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="ident">KeyValueMetadata</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Baggage</span> {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">KeyValueMetadata</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">baggage</span> <span class="op">=</span> <span class="ident">Baggage::default</span>();
-        <span class="kw">for</span> <span class="ident">kvm</span> <span class="kw">in</span> <span class="ident">iter</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">baggage</span>.<span class="ident">insert_with_metadata</span>(<span class="ident">kvm</span>.<span class="ident">key</span>, <span class="ident">kvm</span>.<span class="ident">value</span>, <span class="ident">kvm</span>.<span class="ident">metadata</span>);
-        }
-        <span class="ident">baggage</span>
-    }
-}
-
-<span class="doccomment">/// Methods for sorting and retrieving baggage data in a context.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BaggageExt</span> {
-    <span class="doccomment">/// Returns a clone of the given context with the included name-value pairs.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::{baggage::BaggageExt, Context, KeyValue, Value};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let some_context = Context::current();</span>
-    <span class="doccomment">/// let cx = some_context.with_baggage(vec![KeyValue::new(&quot;my-name&quot;, &quot;my-value&quot;)]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     cx.baggage().get(&quot;my-name&quot;),</span>
-    <span class="doccomment">///     Some(&amp;Value::from(&quot;my-value&quot;)),</span>
-    <span class="doccomment">/// )</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">with_baggage</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>, <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">KeyValueMetadata</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+<span class="doccomment">/// Methods for sorting and retrieving baggage data in a context.
+</span><span class="kw">pub trait </span>BaggageExt {
+    <span class="doccomment">/// Returns a clone of the given context with the included name-value pairs.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::{baggage::BaggageExt, Context, KeyValue, Value};
+    ///
+    /// let some_context = Context::current();
+    /// let cx = some_context.with_baggage(vec![KeyValue::new(&quot;my-name&quot;, &quot;my-value&quot;)]);
+    ///
+    /// assert_eq!(
+    ///     cx.baggage().get(&quot;my-name&quot;),
+    ///     Some(&amp;Value::from(&quot;my-value&quot;)),
+    /// )
+    /// ```
+    </span><span class="kw">fn </span>with_baggage&lt;T: IntoIterator&lt;Item = I&gt;, I: Into&lt;KeyValueMetadata&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">baggage</span>: <span class="ident">T</span>,
+        baggage: T,
     ) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Returns a clone of the current context with the included name-value pairs.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::{baggage::BaggageExt, Context, KeyValue, Value};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let cx = Context::current_with_baggage(vec![KeyValue::new(&quot;my-name&quot;, &quot;my-value&quot;)]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     cx.baggage().get(&quot;my-name&quot;),</span>
-    <span class="doccomment">///     Some(&amp;Value::from(&quot;my-value&quot;)),</span>
-    <span class="doccomment">/// )</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">current_with_baggage</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>, <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">KeyValueMetadata</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="ident">baggage</span>: <span class="ident">T</span>,
+    <span class="doccomment">/// Returns a clone of the current context with the included name-value pairs.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::{baggage::BaggageExt, Context, KeyValue, Value};
+    ///
+    /// let cx = Context::current_with_baggage(vec![KeyValue::new(&quot;my-name&quot;, &quot;my-value&quot;)]);
+    ///
+    /// assert_eq!(
+    ///     cx.baggage().get(&quot;my-name&quot;),
+    ///     Some(&amp;Value::from(&quot;my-value&quot;)),
+    /// )
+    /// ```
+    </span><span class="kw">fn </span>current_with_baggage&lt;T: IntoIterator&lt;Item = I&gt;, I: Into&lt;KeyValueMetadata&gt;&gt;(
+        baggage: T,
     ) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Returns a clone of the given context with the included name-value pairs.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::{baggage::BaggageExt, Context, KeyValue, Value};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let cx = Context::current().with_cleared_baggage();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(cx.baggage().len(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">with_cleared_baggage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Returns a clone of the given context with the included name-value pairs.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::{baggage::BaggageExt, Context, KeyValue, Value};
+    ///
+    /// let cx = Context::current().with_cleared_baggage();
+    ///
+    /// assert_eq!(cx.baggage().len(), 0);
+    /// ```
+    </span><span class="kw">fn </span>with_cleared_baggage(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Returns a reference to this context&#39;s baggage, or the default</span>
-    <span class="doccomment">/// empty baggage if none has been set.</span>
-    <span class="kw">fn</span> <span class="ident">baggage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Baggage</span>;
+    <span class="doccomment">/// Returns a reference to this context&#39;s baggage, or the default
+    /// empty baggage if none has been set.
+    </span><span class="kw">fn </span>baggage(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Baggage;
 }
 
-<span class="kw">impl</span> <span class="ident">BaggageExt</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">with_baggage</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>, <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">KeyValueMetadata</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+<span class="kw">impl </span>BaggageExt <span class="kw">for </span>Context {
+    <span class="kw">fn </span>with_baggage&lt;T: IntoIterator&lt;Item = I&gt;, I: Into&lt;KeyValueMetadata&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">baggage</span>: <span class="ident">T</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">merged</span>: <span class="ident">Baggage</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">baggage</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, (<span class="ident">value</span>, <span class="ident">metadata</span>))<span class="op">|</span> {
-                <span class="ident">KeyValueMetadata::new</span>(<span class="ident">key</span>.<span class="ident">clone</span>(), <span class="ident">value</span>.<span class="ident">clone</span>(), <span class="ident">metadata</span>.<span class="ident">clone</span>())
+        baggage: T,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>merged: Baggage = <span class="self">self
+            </span>.baggage()
+            .iter()
+            .map(|(key, (value, metadata))| {
+                KeyValueMetadata::new(key.clone(), value.clone(), metadata.clone())
             })
-            .<span class="ident">collect</span>();
-        <span class="kw">for</span> <span class="ident">kvm</span> <span class="kw">in</span> <span class="ident">baggage</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">kv</span><span class="op">|</span> <span class="ident">kv</span>.<span class="ident">into</span>()) {
-            <span class="ident">merged</span>.<span class="ident">insert_with_metadata</span>(<span class="ident">kvm</span>.<span class="ident">key</span>, <span class="ident">kvm</span>.<span class="ident">value</span>, <span class="ident">kvm</span>.<span class="ident">metadata</span>);
+            .collect();
+        <span class="kw">for </span>kvm <span class="kw">in </span>baggage.into_iter().map(|kv| kv.into()) {
+            merged.insert_with_metadata(kvm.key, kvm.value, kvm.metadata);
         }
 
-        <span class="self">self</span>.<span class="ident">with_value</span>(<span class="ident">merged</span>)
+        <span class="self">self</span>.with_value(merged)
     }
 
-    <span class="kw">fn</span> <span class="ident">current_with_baggage</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>, <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">KeyValueMetadata</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">kvs</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Context::current</span>().<span class="ident">with_baggage</span>(<span class="ident">kvs</span>)
+    <span class="kw">fn </span>current_with_baggage&lt;T: IntoIterator&lt;Item = I&gt;, I: Into&lt;KeyValueMetadata&gt;&gt;(kvs: T) -&gt; <span class="self">Self </span>{
+        Context::current().with_baggage(kvs)
     }
 
-    <span class="kw">fn</span> <span class="ident">with_cleared_baggage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">with_value</span>(<span class="ident">Baggage::new</span>())
+    <span class="kw">fn </span>with_cleared_baggage(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.with_value(Baggage::new())
     }
 
-    <span class="kw">fn</span> <span class="ident">baggage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Baggage</span> {
-        <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Baggage</span><span class="op">&gt;</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">DEFAULT_BAGGAGE</span>)
-    }
-}
-
-<span class="doccomment">/// An optional property set that can be added to [`Baggage`] values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `BaggageMetadata` can be added to values in the form of a property set,</span>
-<span class="doccomment">/// represented as semi-colon `;` delimited list of names and/or name-value</span>
-<span class="doccomment">/// pairs, e.g. `;k1=v1;k2;k3=v3`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialOrd</span>, <span class="ident">PartialEq</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BaggageMetadata</span>(<span class="ident">String</span>);
-
-<span class="kw">impl</span> <span class="ident">BaggageMetadata</span> {
-    <span class="doccomment">/// Return underlying string</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_str</span>()
+    <span class="kw">fn </span>baggage(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Baggage {
+        <span class="self">self</span>.get::&lt;Baggage&gt;().unwrap_or(<span class="kw-2">&amp;</span>DEFAULT_BAGGAGE)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BaggageMetadata</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="ident">BaggageMetadata</span> {
-        <span class="ident">BaggageMetadata</span>(<span class="ident">s</span>.<span class="ident">trim</span>().<span class="ident">to_string</span>())
+<span class="doccomment">/// An optional property set that can be added to [`Baggage`] values.
+///
+/// `BaggageMetadata` can be added to values in the form of a property set,
+/// represented as semi-colon `;` delimited list of names and/or name-value
+/// pairs, e.g. `;k1=v1;k2;k3=v3`.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialOrd, PartialEq, Default)]
+</span><span class="kw">pub struct </span>BaggageMetadata(String);
+
+<span class="kw">impl </span>BaggageMetadata {
+    <span class="doccomment">/// Return underlying string
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.<span class="number">0</span>.as_str()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BaggageMetadata</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">BaggageMetadata</span>(<span class="ident">s</span>.<span class="ident">trim</span>().<span class="ident">to_string</span>())
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>BaggageMetadata {
+    <span class="kw">fn </span>from(s: String) -&gt; BaggageMetadata {
+        BaggageMetadata(s.trim().to_string())
     }
 }
 
-<span class="doccomment">/// [`Baggage`] name-value pairs with their associated metadata.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">KeyValueMetadata</span> {
-    <span class="doccomment">/// Dimension or event key</span>
-    <span class="kw">pub</span> <span class="ident">key</span>: <span class="ident">Key</span>,
-    <span class="doccomment">/// Dimension or event value</span>
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Value</span>,
-    <span class="doccomment">/// Metadata associate with this key value pair</span>
-    <span class="kw">pub</span> <span class="ident">metadata</span>: <span class="ident">BaggageMetadata</span>,
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>str&gt; <span class="kw">for </span>BaggageMetadata {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        BaggageMetadata(s.trim().to_string())
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">KeyValueMetadata</span> {
-    <span class="doccomment">/// Create a new `KeyValue` pair with metadata</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>, <span class="ident">metadata</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>,
-        <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">BaggageMetadata</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`Baggage`] name-value pairs with their associated metadata.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>KeyValueMetadata {
+    <span class="doccomment">/// Dimension or event key
+    </span><span class="kw">pub </span>key: Key,
+    <span class="doccomment">/// Dimension or event value
+    </span><span class="kw">pub </span>value: Value,
+    <span class="doccomment">/// Metadata associate with this key value pair
+    </span><span class="kw">pub </span>metadata: BaggageMetadata,
+}
+
+<span class="kw">impl </span>KeyValueMetadata {
+    <span class="doccomment">/// Create a new `KeyValue` pair with metadata
+    </span><span class="kw">pub fn </span>new&lt;K, V, S&gt;(key: K, value: V, metadata: S) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>K: Into&lt;Key&gt;,
+        V: Into&lt;Value&gt;,
+        S: Into&lt;BaggageMetadata&gt;,
     {
-        <span class="ident">KeyValueMetadata</span> {
-            <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">value</span>.<span class="ident">into</span>(),
-            <span class="ident">metadata</span>: <span class="ident">metadata</span>.<span class="ident">into</span>(),
+        KeyValueMetadata {
+            key: key.into(),
+            value: value.into(),
+            metadata: metadata.into(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KeyValueMetadata</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">kv</span>: <span class="ident">KeyValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyValueMetadata</span> {
-            <span class="ident">key</span>: <span class="ident">kv</span>.<span class="ident">key</span>,
-            <span class="ident">value</span>: <span class="ident">kv</span>.<span class="ident">value</span>,
-            <span class="ident">metadata</span>: <span class="ident">BaggageMetadata::default</span>(),
+<span class="kw">impl </span>From&lt;KeyValue&gt; <span class="kw">for </span>KeyValueMetadata {
+    <span class="kw">fn </span>from(kv: KeyValue) -&gt; <span class="self">Self </span>{
+        KeyValueMetadata {
+            key: kv.key,
+            value: kv.value,
+            metadata: BaggageMetadata::default(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">insert_non_ascii_key</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">baggage</span> <span class="op">=</span> <span class="ident">Baggage::new</span>();
-        <span class="ident">baggage</span>.<span class="ident">insert</span>(<span class="string">&quot;🚫&quot;</span>, <span class="string">&quot;not ascii key&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">baggage</span>.<span class="ident">len</span>(), <span class="number">0</span>, <span class="string">&quot;did not insert invalid key&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>insert_non_ascii_key() {
+        <span class="kw">let </span><span class="kw-2">mut </span>baggage = Baggage::new();
+        baggage.insert(<span class="string">&quot;🚫&quot;</span>, <span class="string">&quot;not ascii key&quot;</span>);
+        <span class="macro">assert_eq!</span>(baggage.len(), <span class="number">0</span>, <span class="string">&quot;did not insert invalid key&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">insert_too_much_baggage</span>() {
-        <span class="comment">// too many key pairs</span>
-        <span class="kw">let</span> <span class="ident">over_limit</span> <span class="op">=</span> <span class="ident">MAX_KEY_VALUE_PAIRS</span> <span class="op">+</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">over_limit</span>);
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">over_limit</span> {
-            <span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">KeyValue::new</span>(<span class="macro">format!</span>(<span class="string">&quot;key{}&quot;</span>, <span class="ident">i</span>), <span class="macro">format!</span>(<span class="string">&quot;key{}&quot;</span>, <span class="ident">i</span>)))
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>insert_too_much_baggage() {
+        <span class="comment">// too many key pairs
+        </span><span class="kw">let </span>over_limit = MAX_KEY_VALUE_PAIRS + <span class="number">1</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::with_capacity(over_limit);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..over_limit {
+            data.push(KeyValue::new(<span class="macro">format!</span>(<span class="string">&quot;key{}&quot;</span>, i), <span class="macro">format!</span>(<span class="string">&quot;key{}&quot;</span>, i)))
         }
-        <span class="kw">let</span> <span class="ident">baggage</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Baggage</span><span class="op">&gt;</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">baggage</span>.<span class="ident">len</span>(), <span class="ident">MAX_KEY_VALUE_PAIRS</span>)
+        <span class="kw">let </span>baggage = data.into_iter().collect::&lt;Baggage&gt;();
+        <span class="macro">assert_eq!</span>(baggage.len(), MAX_KEY_VALUE_PAIRS)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">insert_too_long_pair</span>() {
-        <span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident">KeyValue::new</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>insert_too_long_pair() {
+        <span class="kw">let </span>pair = KeyValue::new(
             <span class="string">&quot;test&quot;</span>,
-            <span class="ident">String::from_utf8_lossy</span>(<span class="macro">vec!</span>[<span class="number">12u8</span>; <span class="ident">MAX_BYTES_FOR_ONE_PAIR</span>].<span class="ident">as_slice</span>()).<span class="ident">to_string</span>(),
+            String::from_utf8_lossy(<span class="macro">vec!</span>[<span class="number">12u8</span>; MAX_BYTES_FOR_ONE_PAIR].as_slice()).to_string(),
         );
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">baggage</span> <span class="op">=</span> <span class="ident">Baggage::default</span>();
-        <span class="ident">baggage</span>.<span class="ident">insert</span>(<span class="ident">pair</span>.<span class="ident">key</span>.<span class="ident">clone</span>(), <span class="ident">pair</span>.<span class="ident">value</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>baggage = Baggage::default();
+        baggage.insert(pair.key.clone(), pair.value.clone());
         <span class="macro">assert_eq!</span>(
-            <span class="ident">baggage</span>.<span class="ident">len</span>(),
+            baggage.len(),
             <span class="number">0</span>,
-            <span class="string">&quot;The input pair is too long to insert into baggage&quot;</span>
-        );
+            <span class="string">&quot;The input pair is too long to insert into baggage&quot;
+        </span>);
 
-        <span class="ident">baggage</span>.<span class="ident">insert</span>(<span class="string">&quot;test&quot;</span>, <span class="string">&quot;value&quot;</span>);
-        <span class="ident">baggage</span>.<span class="ident">insert</span>(<span class="ident">pair</span>.<span class="ident">key</span>.<span class="ident">clone</span>(), <span class="ident">pair</span>.<span class="ident">value</span>);
+        baggage.insert(<span class="string">&quot;test&quot;</span>, <span class="string">&quot;value&quot;</span>);
+        baggage.insert(pair.key.clone(), pair.value);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">baggage</span>.<span class="ident">get</span>(<span class="ident">pair</span>.<span class="ident">key</span>),
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="string">&quot;value&quot;</span>)),
-            <span class="string">&quot;If the input pair is too long, then don&#39;t replace entry with same key&quot;</span>
-        )
+            baggage.get(pair.key),
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>Value::from(<span class="string">&quot;value&quot;</span>)),
+            <span class="string">&quot;If the input pair is too long, then don&#39;t replace entry with same key&quot;
+        </span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">insert_pairs_length_exceed</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">for</span> <span class="ident">letter</span> <span class="kw">in</span> <span class="macro">vec!</span>[<span class="string">&#39;a&#39;</span>, <span class="string">&#39;b&#39;</span>, <span class="string">&#39;c&#39;</span>, <span class="string">&#39;d&#39;</span>].<span class="ident">into_iter</span>() {
-            <span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">KeyValue::new</span>(
-                (<span class="number">0</span>..<span class="ident">MAX_LEN_OF_ALL_PAIRS</span> <span class="op">/</span> <span class="number">3</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">letter</span>)
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>insert_pairs_length_exceed() {
+        <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="macro">vec!</span>[];
+        <span class="kw">for </span>letter <span class="kw">in </span><span class="macro">vec!</span>[<span class="string">&#39;a&#39;</span>, <span class="string">&#39;b&#39;</span>, <span class="string">&#39;c&#39;</span>, <span class="string">&#39;d&#39;</span>].into_iter() {
+            data.push(KeyValue::new(
+                (<span class="number">0</span>..MAX_LEN_OF_ALL_PAIRS / <span class="number">3</span>)
+                    .map(|<span class="kw">_</span>| letter)
+                    .collect::&lt;String&gt;(),
                 <span class="string">&quot;&quot;</span>,
             ));
         }
-        <span class="kw">let</span> <span class="ident">baggage</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Baggage</span><span class="op">&gt;</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">baggage</span>.<span class="ident">len</span>(), <span class="number">3</span>)
+        <span class="kw">let </span>baggage = data.into_iter().collect::&lt;Baggage&gt;();
+        <span class="macro">assert_eq!</span>(baggage.len(), <span class="number">3</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

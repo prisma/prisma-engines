@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/core/src/state.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../migration_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/core/src/state.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../migration_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -383,390 +383,390 @@
 <span id="383">383</span>
 <span id="384">384</span>
 <span id="385">385</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more migration connectors, based on request contents.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Why this rather than using connectors directly? We must be able to use the migration engine</span>
-<span class="doccomment">//! without a valid schema or database connection for commands like createDatabase and diff.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more migration connectors, based on request contents.
+//!
+//! Why this rather than using connectors directly? We must be able to use the migration engine
+//! without a valid schema or database connection for commands like createDatabase and diff.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">api::GenericApi</span>, <span class="ident">commands</span>, <span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreResult</span>};
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorHost</span>, <span class="ident">MigrationConnector</span>, <span class="ident">Namespaces</span>};
-<span class="kw">use</span> <span class="ident">psl::parser_database::SourceFile</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">future::Future</span>, <span class="ident">path::Path</span>, <span class="ident">pin::Pin</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">mpsc</span>, <span class="ident">Mutex</span>};
-<span class="kw">use</span> <span class="ident">tracing_futures::Instrument</span>;
+</span><span class="kw">use crate</span>::{api::GenericApi, commands, json_rpc::types::<span class="kw-2">*</span>, CoreResult};
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>migration_connector::{ConnectorError, ConnectorHost, MigrationConnector, Namespaces};
+<span class="kw">use </span>psl::parser_database::SourceFile;
+<span class="kw">use </span>std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
+<span class="kw">use </span>tokio::sync::{mpsc, Mutex};
+<span class="kw">use </span>tracing_futures::Instrument;
 
-<span class="doccomment">/// The container for the state of the migration engine. It can contain one or more connectors</span>
-<span class="doccomment">/// corresponding to a database to be reached or that we are already connected to.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The general mechanism is that we match a single url or prisma schema to a single connector in</span>
-<span class="doccomment">/// `connectors`. Each connector has its own async task, and communicates with the core through</span>
-<span class="doccomment">/// channels. That ensures that each connector is handling requests one at a time to avoid</span>
-<span class="doccomment">/// synchronization issues. You can think of it in terms of the actor model.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">EngineState</span> {
-    <span class="ident">initial_datamodel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">host</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ConnectorHost</span><span class="op">&gt;</span>,
-    <span class="comment">// A map from either:</span>
-    <span class="comment">//</span>
-    <span class="comment">// - a connection string / url</span>
-    <span class="comment">// - a full schema</span>
-    <span class="comment">//</span>
-    <span class="comment">// To a channel leading to a spawned MigrationConnector.</span>
-    <span class="ident">connectors</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">ErasedConnectorRequest</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The container for the state of the migration engine. It can contain one or more connectors
+/// corresponding to a database to be reached or that we are already connected to.
+///
+/// The general mechanism is that we match a single url or prisma schema to a single connector in
+/// `connectors`. Each connector has its own async task, and communicates with the core through
+/// channels. That ensures that each connector is handling requests one at a time to avoid
+/// synchronization issues. You can think of it in terms of the actor model.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EngineState {
+    initial_datamodel: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    host: Arc&lt;<span class="kw">dyn </span>ConnectorHost&gt;,
+    <span class="comment">// A map from either:
+    //
+    // - a connection string / url
+    // - a full schema
+    //
+    // To a channel leading to a spawned MigrationConnector.
+    </span>connectors: Mutex&lt;HashMap&lt;String, mpsc::Sender&lt;ErasedConnectorRequest&gt;&gt;&gt;,
 }
 
-<span class="doccomment">/// A request from the core to a connector, in the form of an async closure.</span>
-<span class="kw">type</span> <span class="ident">ConnectorRequest</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span>
-    <span class="kw">dyn</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;c</span><span class="op">&gt;</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Send</span>,
-<span class="op">&gt;</span>;
+<span class="doccomment">/// A request from the core to a connector, in the form of an async closure.
+</span><span class="kw">type </span>ConnectorRequest&lt;O&gt; = Box&lt;
+    <span class="kw">dyn for</span>&lt;<span class="lifetime">&#39;c</span>&gt; FnOnce(<span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span><span class="kw-2">mut </span><span class="kw">dyn </span>MigrationConnector) -&gt; Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = CoreResult&lt;O&gt;&gt; + Send + <span class="lifetime">&#39;c</span>&gt;&gt;
+        + Send,
+&gt;;
 
-<span class="doccomment">/// Same as ConnectorRequest, but with the return type erased with a channel.</span>
-<span class="kw">type</span> <span class="ident">ErasedConnectorRequest</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span>
-    <span class="kw">dyn</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;c</span><span class="op">&gt;</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Send</span>
-        <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-<span class="op">&gt;</span>;
+<span class="doccomment">/// Same as ConnectorRequest, but with the return type erased with a channel.
+</span><span class="kw">type </span>ErasedConnectorRequest = Box&lt;
+    <span class="kw">dyn for</span>&lt;<span class="lifetime">&#39;c</span>&gt; FnOnce(<span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span><span class="kw-2">mut </span><span class="kw">dyn </span>MigrationConnector) -&gt; Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = ()&gt; + Send + <span class="lifetime">&#39;c</span>&gt;&gt;
+        + Send
+        + <span class="lifetime">&#39;static</span>,
+&gt;;
 
-<span class="kw">impl</span> <span class="ident">EngineState</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">initial_datamodel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">host</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ConnectorHost</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">EngineState</span> {
-            <span class="ident">initial_datamodel</span>,
-            <span class="ident">host</span>: <span class="ident">host</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Arc::new</span>(<span class="ident">migration_connector::EmptyHost</span>)),
-            <span class="ident">connectors</span>: <span class="ident">Default::default</span>(),
+<span class="kw">impl </span>EngineState {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(initial_datamodel: <span class="prelude-ty">Option</span>&lt;String&gt;, host: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>ConnectorHost&gt;&gt;) -&gt; <span class="self">Self </span>{
+        EngineState {
+            initial_datamodel,
+            host: host.unwrap_or_else(|| Arc::new(migration_connector::EmptyHost)),
+            connectors: Default::default(),
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_connector_from_schema_path</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
+    <span class="kw">async fn </span>with_connector_from_schema_path&lt;O: Send + <span class="lifetime">&#39;static</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">f</span>: <span class="ident">ConnectorRequest</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">config_dir</span> <span class="op">=</span> <span class="ident">std::path::Path::new</span>(<span class="ident">path</span>).<span class="ident">parent</span>();
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">std::fs::read_to_string</span>(<span class="ident">path</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::from_source</span>(<span class="ident">err</span>, <span class="string">&quot;Falied to read Prisma schema.&quot;</span>))<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">with_connector_for_schema</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>, <span class="ident">config_dir</span>, <span class="ident">f</span>).<span class="kw">await</span>
-    }
+        path: <span class="kw-2">&amp;</span>str,
+        f: ConnectorRequest&lt;O&gt;,
+    ) -&gt; CoreResult&lt;O&gt; {
+        <span class="kw">let </span>config_dir = std::path::Path::new(path).parent();
+        <span class="kw">let </span>schema = std::fs::read_to_string(path)
+            .map_err(|err| ConnectorError::from_source(err, <span class="string">&quot;Falied to read Prisma schema.&quot;</span>))<span class="question-mark">?</span>;
+        <span class="self">self</span>.with_connector_for_schema(<span class="kw-2">&amp;</span>schema, config_dir, f).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_connector_for_schema</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
+    <span class="kw">async fn </span>with_connector_for_schema&lt;O: Send + <span class="lifetime">&#39;static</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">config_dir</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Path</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">ConnectorRequest</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">response_sender</span>, <span class="ident">response_receiver</span>) <span class="op">=</span> <span class="ident">tokio::sync::oneshot::channel</span>::<span class="op">&lt;</span><span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">erased</span>: <span class="ident">ErasedConnectorRequest</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">connector</span>).<span class="kw">await</span>;
-                <span class="ident">response_sender</span>
-                    .<span class="ident">send</span>(<span class="ident">output</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-                    .<span class="ident">expect</span>(<span class="string">&quot;failed to send back response in migration-engine state&quot;</span>);
+        schema: <span class="kw-2">&amp;</span>str,
+        config_dir: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Path&gt;,
+        f: ConnectorRequest&lt;O&gt;,
+    ) -&gt; CoreResult&lt;O&gt; {
+        <span class="kw">let </span>(response_sender, response_receiver) = tokio::sync::oneshot::channel::&lt;CoreResult&lt;O&gt;&gt;();
+        <span class="kw">let </span>erased: ErasedConnectorRequest = Box::new(<span class="kw">move </span>|connector| {
+            Box::pin(<span class="kw">async move </span>{
+                <span class="kw">let </span>output = f(connector).<span class="kw">await</span>;
+                response_sender
+                    .send(output)
+                    .map_err(|<span class="kw">_</span>| ())
+                    .expect(<span class="string">&quot;failed to send back response in migration-engine state&quot;</span>);
             })
         });
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connectors</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connectors</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="kw">match</span> <span class="ident">connectors</span>.<span class="ident">get</span>(<span class="ident">schema</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">request_sender</span>) =&gt; <span class="kw">match</span> <span class="ident">request_sender</span>.<span class="ident">send</span>(<span class="ident">erased</span>).<span class="kw">await</span> {
+        <span class="kw">let </span><span class="kw-2">mut </span>connectors = <span class="self">self</span>.connectors.lock().<span class="kw">await</span>;
+        <span class="kw">match </span>connectors.get(schema) {
+            <span class="prelude-val">Some</span>(request_sender) =&gt; <span class="kw">match </span>request_sender.send(erased).<span class="kw">await </span>{
                 <span class="prelude-val">Ok</span>(()) =&gt; (),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;tokio mpsc send error&quot;</span>.<span class="ident">to_owned</span>())),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_msg(<span class="string">&quot;tokio mpsc send error&quot;</span>.to_owned())),
             },
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::schema_to_connector</span>(<span class="ident">schema</span>, <span class="ident">config_dir</span>)<span class="question-mark">?</span>;
-                <span class="ident">connector</span>.<span class="ident">set_host</span>(<span class="self">self</span>.<span class="ident">host</span>.<span class="ident">clone</span>());
-                <span class="kw">let</span> (<span class="ident">erased_sender</span>, <span class="kw-2">mut</span> <span class="ident">erased_receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>::<span class="op">&lt;</span><span class="ident">ErasedConnectorRequest</span><span class="op">&gt;</span>(<span class="number">12</span>);
-                <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">req</span>) <span class="op">=</span> <span class="ident">erased_receiver</span>.<span class="ident">recv</span>().<span class="kw">await</span> {
-                        <span class="ident">req</span>(<span class="ident">connector</span>.<span class="ident">as_mut</span>()).<span class="kw">await</span>;
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>connector = <span class="kw">crate</span>::schema_to_connector(schema, config_dir)<span class="question-mark">?</span>;
+                connector.set_host(<span class="self">self</span>.host.clone());
+                <span class="kw">let </span>(erased_sender, <span class="kw-2">mut </span>erased_receiver) = mpsc::channel::&lt;ErasedConnectorRequest&gt;(<span class="number">12</span>);
+                tokio::spawn(<span class="kw">async move </span>{
+                    <span class="kw">while let </span><span class="prelude-val">Some</span>(req) = erased_receiver.recv().<span class="kw">await </span>{
+                        req(connector.as_mut()).<span class="kw">await</span>;
                     }
                 });
-                <span class="kw">match</span> <span class="ident">erased_sender</span>.<span class="ident">send</span>(<span class="ident">erased</span>).<span class="kw">await</span> {
+                <span class="kw">match </span>erased_sender.send(erased).<span class="kw">await </span>{
                     <span class="prelude-val">Ok</span>(()) =&gt; (),
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;erased sender send error&quot;</span>.<span class="ident">to_owned</span>())),
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_msg(<span class="string">&quot;erased sender send error&quot;</span>.to_owned())),
                 };
-                <span class="ident">connectors</span>.<span class="ident">insert</span>(<span class="ident">schema</span>.<span class="ident">to_owned</span>(), <span class="ident">erased_sender</span>);
+                connectors.insert(schema.to_owned(), erased_sender);
             }
         }
 
-        <span class="ident">response_receiver</span>.<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;receiver boomed&quot;</span>)
+        response_receiver.<span class="kw">await</span>.expect(<span class="string">&quot;receiver boomed&quot;</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_connector_for_url</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="ident">String</span>, <span class="ident">f</span>: <span class="ident">ConnectorRequest</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">response_sender</span>, <span class="ident">response_receiver</span>) <span class="op">=</span> <span class="ident">tokio::sync::oneshot::channel</span>::<span class="op">&lt;</span><span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">erased</span>: <span class="ident">ErasedConnectorRequest</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">connector</span>).<span class="kw">await</span>;
-                <span class="ident">response_sender</span>
-                    .<span class="ident">send</span>(<span class="ident">output</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-                    .<span class="ident">expect</span>(<span class="string">&quot;failed to send back response in migration-engine state&quot;</span>);
+    <span class="kw">async fn </span>with_connector_for_url&lt;O: Send + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, url: String, f: ConnectorRequest&lt;O&gt;) -&gt; CoreResult&lt;O&gt; {
+        <span class="kw">let </span>(response_sender, response_receiver) = tokio::sync::oneshot::channel::&lt;CoreResult&lt;O&gt;&gt;();
+        <span class="kw">let </span>erased: ErasedConnectorRequest = Box::new(<span class="kw">move </span>|connector| {
+            Box::pin(<span class="kw">async move </span>{
+                <span class="kw">let </span>output = f(connector).<span class="kw">await</span>;
+                response_sender
+                    .send(output)
+                    .map_err(|<span class="kw">_</span>| ())
+                    .expect(<span class="string">&quot;failed to send back response in migration-engine state&quot;</span>);
             })
         });
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connectors</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connectors</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="kw">match</span> <span class="ident">connectors</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">request_sender</span>) =&gt; <span class="kw">match</span> <span class="ident">request_sender</span>.<span class="ident">send</span>(<span class="ident">erased</span>).<span class="kw">await</span> {
+        <span class="kw">let </span><span class="kw-2">mut </span>connectors = <span class="self">self</span>.connectors.lock().<span class="kw">await</span>;
+        <span class="kw">match </span>connectors.get(<span class="kw-2">&amp;</span>url) {
+            <span class="prelude-val">Some</span>(request_sender) =&gt; <span class="kw">match </span>request_sender.send(erased).<span class="kw">await </span>{
                 <span class="prelude-val">Ok</span>(()) =&gt; (),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;tokio mpsc send error&quot;</span>.<span class="ident">to_owned</span>())),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_msg(<span class="string">&quot;tokio mpsc send error&quot;</span>.to_owned())),
             },
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::connector_for_connection_string</span>(<span class="ident">url</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">BitFlags::default</span>())<span class="question-mark">?</span>;
-                <span class="ident">connector</span>.<span class="ident">set_host</span>(<span class="self">self</span>.<span class="ident">host</span>.<span class="ident">clone</span>());
-                <span class="kw">let</span> (<span class="ident">erased_sender</span>, <span class="kw-2">mut</span> <span class="ident">erased_receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>::<span class="op">&lt;</span><span class="ident">ErasedConnectorRequest</span><span class="op">&gt;</span>(<span class="number">12</span>);
-                <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">req</span>) <span class="op">=</span> <span class="ident">erased_receiver</span>.<span class="ident">recv</span>().<span class="kw">await</span> {
-                        <span class="ident">req</span>(<span class="ident">connector</span>.<span class="ident">as_mut</span>()).<span class="kw">await</span>;
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>connector = <span class="kw">crate</span>::connector_for_connection_string(url.clone(), <span class="prelude-val">None</span>, BitFlags::default())<span class="question-mark">?</span>;
+                connector.set_host(<span class="self">self</span>.host.clone());
+                <span class="kw">let </span>(erased_sender, <span class="kw-2">mut </span>erased_receiver) = mpsc::channel::&lt;ErasedConnectorRequest&gt;(<span class="number">12</span>);
+                tokio::spawn(<span class="kw">async move </span>{
+                    <span class="kw">while let </span><span class="prelude-val">Some</span>(req) = erased_receiver.recv().<span class="kw">await </span>{
+                        req(connector.as_mut()).<span class="kw">await</span>;
                     }
                 });
-                <span class="kw">match</span> <span class="ident">erased_sender</span>.<span class="ident">send</span>(<span class="ident">erased</span>).<span class="kw">await</span> {
+                <span class="kw">match </span>erased_sender.send(erased).<span class="kw">await </span>{
                     <span class="prelude-val">Ok</span>(()) =&gt; (),
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;erased sender send error&quot;</span>.<span class="ident">to_owned</span>())),
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_msg(<span class="string">&quot;erased sender send error&quot;</span>.to_owned())),
                 };
-                <span class="ident">connectors</span>.<span class="ident">insert</span>(<span class="ident">url</span>, <span class="ident">erased_sender</span>);
+                connectors.insert(url, erased_sender);
             }
         }
 
-        <span class="ident">response_receiver</span>.<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;receiver boomed&quot;</span>)
+        response_receiver.<span class="kw">await</span>.expect(<span class="string">&quot;receiver boomed&quot;</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_connector_from_datasource_param</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
+    <span class="kw">async fn </span>with_connector_from_datasource_param&lt;O: Send + <span class="lifetime">&#39;static</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident">DatasourceParam</span>,
-        <span class="ident">f</span>: <span class="ident">ConnectorRequest</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">param</span> {
-            <span class="ident">DatasourceParam::ConnectionString</span>(<span class="ident">UrlContainer</span> { <span class="ident">url</span> }) =&gt; {
-                <span class="self">self</span>.<span class="ident">with_connector_for_url</span>(<span class="ident">url</span>.<span class="ident">clone</span>(), <span class="ident">f</span>).<span class="kw">await</span>
-            }
-            <span class="ident">DatasourceParam::SchemaPath</span>(<span class="ident">PathContainer</span> { <span class="ident">path</span> }) =&gt; <span class="self">self</span>.<span class="ident">with_connector_from_schema_path</span>(<span class="ident">path</span>, <span class="ident">f</span>).<span class="kw">await</span>,
-            <span class="ident">DatasourceParam::SchemaString</span>(<span class="ident">SchemaContainer</span> { <span class="ident">schema</span> }) =&gt; {
-                <span class="self">self</span>.<span class="ident">with_connector_for_schema</span>(<span class="ident">schema</span>, <span class="prelude-val">None</span>, <span class="ident">f</span>).<span class="kw">await</span>
-            }
+        param: <span class="kw-2">&amp;</span>DatasourceParam,
+        f: ConnectorRequest&lt;O&gt;,
+    ) -&gt; CoreResult&lt;O&gt; {
+        <span class="kw">match </span>param {
+            DatasourceParam::ConnectionString(UrlContainer { url }) =&gt; {
+                <span class="self">self</span>.with_connector_for_url(url.clone(), f).<span class="kw">await
+            </span>}
+            DatasourceParam::SchemaPath(PathContainer { path }) =&gt; <span class="self">self</span>.with_connector_from_schema_path(path, f).<span class="kw">await</span>,
+            DatasourceParam::SchemaString(SchemaContainer { schema }) =&gt; {
+                <span class="self">self</span>.with_connector_for_schema(schema, <span class="prelude-val">None</span>, f).<span class="kw">await
+            </span>}
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_default_connector</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="ident">ConnectorRequest</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">O</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="kw">async fn </span>with_default_connector&lt;O: Send + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: ConnectorRequest&lt;O&gt;) -&gt; CoreResult&lt;O&gt;
+    <span class="kw">where
+        </span>O: Sized + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">initial_datamodel</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">initial_datamodel</span> {
-            <span class="ident">initial_datamodel</span>
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;Missing --datamodel&quot;</span>.<span class="ident">to_owned</span>()));
+        <span class="kw">let </span>schema = <span class="kw">if let </span><span class="prelude-val">Some</span>(initial_datamodel) = <span class="kw-2">&amp;</span><span class="self">self</span>.initial_datamodel {
+            initial_datamodel
+        } <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_msg(<span class="string">&quot;Missing --datamodel&quot;</span>.to_owned()));
         };
 
-        <span class="self">self</span>.<span class="ident">with_connector_for_schema</span>(<span class="ident">schema</span>, <span class="prelude-val">None</span>, <span class="ident">f</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>.with_connector_for_schema(schema, <span class="prelude-val">None</span>, f).<span class="kw">await
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">GenericApi</span> <span class="kw">for</span> <span class="ident">EngineState</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_default_connector</span>(<span class="ident">Box::new</span>(<span class="op">|</span><span class="ident">connector</span><span class="op">|</span> <span class="ident">connector</span>.<span class="ident">version</span>()))
-            .<span class="kw">await</span>
-    }
+<span class="attribute">#[async_trait::async_trait]
+</span><span class="kw">impl </span>GenericApi <span class="kw">for </span>EngineState {
+    <span class="kw">async fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CoreResult&lt;String&gt; {
+        <span class="self">self</span>.with_default_connector(Box::new(|connector| connector.version()))
+            .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">ApplyMigrationsInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ApplyMigrationsOutput</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_default_connector</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="ident">Box::pin</span>(<span class="ident">commands::apply_migrations</span>(<span class="ident">input</span>, <span class="ident">connector</span>).<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;ApplyMigrations&quot;</span>)))
+    <span class="kw">async fn </span>apply_migrations(<span class="kw-2">&amp;</span><span class="self">self</span>, input: ApplyMigrationsInput) -&gt; CoreResult&lt;ApplyMigrationsOutput&gt; {
+        <span class="self">self</span>.with_default_connector(Box::new(<span class="kw">move </span>|connector| {
+            Box::pin(commands::apply_migrations(input, connector).instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;ApplyMigrations&quot;</span>)))
         }))
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">CreateDatabaseParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">CreateDatabaseResult</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_connector_from_datasource_param</span>(
-            <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">datasource</span>,
-            <span class="ident">Box::new</span>(<span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-                <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">let</span> <span class="ident">database_name</span> <span class="op">=</span> <span class="ident">MigrationConnector::create_database</span>(<span class="ident">connector</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="prelude-val">Ok</span>(<span class="ident">CreateDatabaseResult</span> { <span class="ident">database_name</span> })
+    <span class="kw">async fn </span>create_database(<span class="kw-2">&amp;</span><span class="self">self</span>, params: CreateDatabaseParams) -&gt; CoreResult&lt;CreateDatabaseResult&gt; {
+        <span class="self">self</span>.with_connector_from_datasource_param(
+            <span class="kw-2">&amp;</span>params.datasource,
+            Box::new(|connector| {
+                Box::pin(<span class="kw">async move </span>{
+                    <span class="kw">let </span>database_name = MigrationConnector::create_database(connector).<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(CreateDatabaseResult { database_name })
                 })
             }),
         )
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_migration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">CreateMigrationInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">CreateMigrationOutput</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_default_connector</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(
+    <span class="kw">async fn </span>create_migration(<span class="kw-2">&amp;</span><span class="self">self</span>, input: CreateMigrationInput) -&gt; CoreResult&lt;CreateMigrationOutput&gt; {
+        <span class="self">self</span>.with_default_connector(Box::new(<span class="kw">move </span>|connector| {
+            <span class="kw">let </span>span = <span class="macro">tracing::info_span!</span>(
                 <span class="string">&quot;CreateMigration&quot;</span>,
-                <span class="ident">migration_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">migration_name</span>.<span class="ident">as_str</span>(),
-                <span class="ident">draft</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">draft</span>,
+                migration_name = input.migration_name.as_str(),
+                draft = input.draft,
             );
-            <span class="ident">Box::pin</span>(<span class="ident">commands::create_migration</span>(<span class="ident">input</span>, <span class="ident">connector</span>).<span class="ident">instrument</span>(<span class="ident">span</span>))
+            Box::pin(commands::create_migration(input, connector).instrument(span))
         }))
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">DbExecuteParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">std::io::Read</span>;
+    <span class="kw">async fn </span>db_execute(<span class="kw-2">&amp;</span><span class="self">self</span>, params: DbExecuteParams) -&gt; CoreResult&lt;()&gt; {
+        <span class="kw">use </span>std::io::Read;
 
-        <span class="kw">let</span> <span class="ident">url</span>: <span class="ident">String</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">datasource_type</span> {
-            <span class="ident">DbExecuteDatasourceType::Url</span>(<span class="ident">UrlContainer</span> { <span class="ident">url</span> }) =&gt; <span class="ident">url</span>.<span class="ident">clone</span>(),
-            <span class="ident">DbExecuteDatasourceType::Schema</span>(<span class="ident">SchemaContainer</span> { <span class="ident">schema</span>: <span class="ident">file_path</span> }) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema_file</span> <span class="op">=</span> <span class="ident">std::fs::File::open</span>(<span class="kw-2">&amp;</span><span class="ident">file_path</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::from_source</span>(<span class="ident">err</span>, <span class="string">&quot;Opening Prisma schema file.&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema_string</span> <span class="op">=</span> <span class="ident">String::new</span>();
-                <span class="ident">schema_file</span>
-                    .<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema_string</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::from_source</span>(<span class="ident">err</span>, <span class="string">&quot;Reading Prisma schema file.&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">let</span> (<span class="ident">datasource</span>, <span class="ident">url</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::parse_configuration</span>(<span class="kw-2">&amp;</span><span class="ident">schema_string</span>)<span class="question-mark">?</span>;
-                <span class="ident">std::path::Path::new</span>(<span class="ident">file_path</span>)
-                    .<span class="ident">parent</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">config_dir</span><span class="op">|</span> {
-                        <span class="ident">datasource</span>
-                            .<span class="ident">active_connector</span>
-                            .<span class="ident">set_config_dir</span>(<span class="ident">config_dir</span>, <span class="kw-2">&amp;</span><span class="ident">url</span>)
-                            .<span class="ident">into_owned</span>()
+        <span class="kw">let </span>url: String = <span class="kw">match </span><span class="kw-2">&amp;</span>params.datasource_type {
+            DbExecuteDatasourceType::Url(UrlContainer { url }) =&gt; url.clone(),
+            DbExecuteDatasourceType::Schema(SchemaContainer { schema: file_path }) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>schema_file = std::fs::File::open(file_path)
+                    .map_err(|err| ConnectorError::from_source(err, <span class="string">&quot;Opening Prisma schema file.&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>schema_string = String::new();
+                schema_file
+                    .read_to_string(<span class="kw-2">&amp;mut </span>schema_string)
+                    .map_err(|err| ConnectorError::from_source(err, <span class="string">&quot;Reading Prisma schema file.&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">let </span>(datasource, url, <span class="kw">_</span>, <span class="kw">_</span>) = <span class="kw">crate</span>::parse_configuration(<span class="kw-2">&amp;</span>schema_string)<span class="question-mark">?</span>;
+                std::path::Path::new(file_path)
+                    .parent()
+                    .map(|config_dir| {
+                        datasource
+                            .active_connector
+                            .set_config_dir(config_dir, <span class="kw-2">&amp;</span>url)
+                            .into_owned()
                     })
-                    .<span class="ident">unwrap_or</span>(<span class="ident">url</span>)
+                    .unwrap_or(url)
             }
         };
 
-        <span class="self">self</span>.<span class="ident">with_connector_for_url</span>(<span class="ident">url</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> <span class="ident">connector</span>.<span class="ident">db_execute</span>(<span class="ident">params</span>.<span class="ident">script</span>)))
-            .<span class="kw">await</span>
-    }
+        <span class="self">self</span>.with_connector_for_url(url, Box::new(<span class="kw">move </span>|connector| connector.db_execute(params.script)))
+            .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">debug_panic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async fn </span>debug_panic(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CoreResult&lt;()&gt; {
         <span class="macro">panic!</span>(<span class="string">&quot;This is the debugPanic artificial panic&quot;</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dev_diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">DevDiagnosticInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DevDiagnosticOutput</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_default_connector</span>(<span class="ident">Box::new</span>(<span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="ident">Box::pin</span>(<span class="ident">commands::dev_diagnostic</span>(<span class="ident">input</span>, <span class="ident">connector</span>).<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;DevDiagnostic&quot;</span>)))
+    <span class="kw">async fn </span>dev_diagnostic(<span class="kw-2">&amp;</span><span class="self">self</span>, input: DevDiagnosticInput) -&gt; CoreResult&lt;DevDiagnosticOutput&gt; {
+        <span class="self">self</span>.with_default_connector(Box::new(|connector| {
+            Box::pin(commands::dev_diagnostic(input, connector).instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;DevDiagnostic&quot;</span>)))
         }))
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">DiffParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiffResult</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="kw">crate</span>::commands::diff</span>(<span class="ident">params</span>, <span class="self">self</span>.<span class="ident">host</span>.<span class="ident">clone</span>()).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>diff(<span class="kw-2">&amp;</span><span class="self">self</span>, params: DiffParams) -&gt; CoreResult&lt;DiffResult&gt; {
+        <span class="kw">crate</span>::commands::diff(params, <span class="self">self</span>.host.clone()).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="ident">String</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_connector_for_url</span>(<span class="ident">url</span>, <span class="ident">Box::new</span>(<span class="op">|</span><span class="ident">connector</span><span class="op">|</span> <span class="ident">MigrationConnector::drop_database</span>(<span class="ident">connector</span>)))
-            .<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>drop_database(<span class="kw-2">&amp;</span><span class="self">self</span>, url: String) -&gt; CoreResult&lt;()&gt; {
+        <span class="self">self</span>.with_connector_for_url(url, Box::new(|connector| MigrationConnector::drop_database(connector)))
+            .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diagnose_migration_history</span>(
+    <span class="kw">async fn </span>diagnose_migration_history(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="ident">commands::DiagnoseMigrationHistoryInput</span>,
-    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">commands::DiagnoseMigrationHistoryOutput</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_default_connector</span>(<span class="ident">Box::new</span>(<span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="ident">Box::pin</span>(
-                <span class="ident">commands::diagnose_migration_history</span>(<span class="ident">input</span>, <span class="ident">connector</span>)
-                    .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;DiagnoseMigrationHistory&quot;</span>)),
+        input: commands::DiagnoseMigrationHistoryInput,
+    ) -&gt; CoreResult&lt;commands::DiagnoseMigrationHistoryOutput&gt; {
+        <span class="self">self</span>.with_default_connector(Box::new(|connector| {
+            Box::pin(
+                commands::diagnose_migration_history(input, connector)
+                    .instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;DiagnoseMigrationHistory&quot;</span>)),
             )
         }))
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(
+    <span class="kw">async fn </span>ensure_connection_validity(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">params</span>: <span class="ident">EnsureConnectionValidityParams</span>,
-    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EnsureConnectionValidityResult</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_connector_from_datasource_param</span>(
-            <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">datasource</span>,
-            <span class="ident">Box::new</span>(<span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-                <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="ident">MigrationConnector::ensure_connection_validity</span>(<span class="ident">connector</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="prelude-val">Ok</span>(<span class="ident">EnsureConnectionValidityResult</span> {})
+        params: EnsureConnectionValidityParams,
+    ) -&gt; CoreResult&lt;EnsureConnectionValidityResult&gt; {
+        <span class="self">self</span>.with_connector_from_datasource_param(
+            <span class="kw-2">&amp;</span>params.datasource,
+            Box::new(|connector| {
+                Box::pin(<span class="kw">async move </span>{
+                    MigrationConnector::ensure_connection_validity(connector).<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(EnsureConnectionValidityResult {})
                 })
             }),
         )
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">evaluate_data_loss</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">EvaluateDataLossInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EvaluateDataLossOutput</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_default_connector</span>(<span class="ident">Box::new</span>(<span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="ident">Box::pin</span>(<span class="ident">commands::evaluate_data_loss</span>(<span class="ident">input</span>, <span class="ident">connector</span>).<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;EvaluateDataLoss&quot;</span>)))
+    <span class="kw">async fn </span>evaluate_data_loss(<span class="kw-2">&amp;</span><span class="self">self</span>, input: EvaluateDataLossInput) -&gt; CoreResult&lt;EvaluateDataLossOutput&gt; {
+        <span class="self">self</span>.with_default_connector(Box::new(|connector| {
+            Box::pin(commands::evaluate_data_loss(input, connector).instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;EvaluateDataLoss&quot;</span>)))
         }))
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">IntrospectParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">IntrospectResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">source_file</span> <span class="op">=</span> <span class="ident">SourceFile::new_allocated</span>(<span class="ident">Arc::from</span>(<span class="ident">params</span>.<span class="ident">schema</span>.<span class="ident">clone</span>().<span class="ident">into_boxed_str</span>()));
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">psl::parse_schema</span>(<span class="ident">source_file</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">with_connector_for_schema</span>(
-            <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">schema</span>,
+    <span class="kw">async fn </span>introspect(<span class="kw-2">&amp;</span><span class="self">self</span>, params: IntrospectParams) -&gt; CoreResult&lt;IntrospectResult&gt; {
+        <span class="kw">let </span>source_file = SourceFile::new_allocated(Arc::from(params.schema.clone().into_boxed_str()));
+        <span class="kw">let </span>schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)<span class="question-mark">?</span>;
+        <span class="self">self</span>.with_connector_for_schema(
+            <span class="kw-2">&amp;</span>params.schema,
             <span class="prelude-val">None</span>,
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">composite_type_depth</span> <span class="op">=</span> <span class="ident">From::from</span>(<span class="ident">params</span>.<span class="ident">composite_type_depth</span> <span class="kw">as</span> <span class="ident">isize</span>);
-                <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">migration_connector::IntrospectionContext::new</span>(<span class="ident">schema</span>, <span class="ident">composite_type_depth</span>);
-                <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="comment">// TODO(MultiSchema): Grab namespaces from introspect params?</span>
-                    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            Box::new(<span class="kw">move </span>|connector| {
+                <span class="kw">let </span>composite_type_depth = From::from(params.composite_type_depth <span class="kw">as </span>isize);
+                <span class="kw">let </span>ctx = migration_connector::IntrospectionContext::new(schema, composite_type_depth);
+                Box::pin(<span class="kw">async move </span>{
+                    <span class="comment">// TODO(MultiSchema): Grab namespaces from introspect params?
+                    </span><span class="kw">let </span>result = connector.introspect(<span class="kw-2">&amp;</span>ctx, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="prelude-val">Ok</span>(<span class="ident">IntrospectResult</span> {
-                        <span class="ident">datamodel</span>: <span class="ident">result</span>.<span class="ident">data_model</span>,
-                        <span class="ident">version</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">result</span>.<span class="ident">version</span>),
-                        <span class="ident">warnings</span>: <span class="ident">result</span>
-                            .<span class="ident">warnings</span>
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">warning</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::json_rpc::types::IntrospectionWarning</span> {
-                                <span class="ident">code</span>: <span class="ident">warning</span>.<span class="ident">code</span> <span class="kw">as</span> <span class="ident">u32</span>,
-                                <span class="ident">message</span>: <span class="ident">warning</span>.<span class="ident">message</span>,
+                    <span class="prelude-val">Ok</span>(IntrospectResult {
+                        datamodel: result.data_model,
+                        version: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, result.version),
+                        warnings: result
+                            .warnings
+                            .into_iter()
+                            .map(|warning| <span class="kw">crate</span>::json_rpc::types::IntrospectionWarning {
+                                code: warning.code <span class="kw">as </span>u32,
+                                message: warning.message,
                             })
-                            .<span class="ident">collect</span>(),
+                            .collect(),
                     })
                 })
             }),
         )
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_migration_directories</span>(
+    <span class="kw">async fn </span>list_migration_directories(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="ident">ListMigrationDirectoriesInput</span>,
-    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ListMigrationDirectoriesOutput</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">migrations_from_filesystem</span> <span class="op">=</span>
-            <span class="ident">migration_connector::migrations_directory::list_migrations</span>(<span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">migrations_directory_path</span>))<span class="question-mark">?</span>;
+        input: ListMigrationDirectoriesInput,
+    ) -&gt; CoreResult&lt;ListMigrationDirectoriesOutput&gt; {
+        <span class="kw">let </span>migrations_from_filesystem =
+            migration_connector::migrations_directory::list_migrations(Path::new(<span class="kw-2">&amp;</span>input.migrations_directory_path))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">migrations</span> <span class="op">=</span> <span class="ident">migrations_from_filesystem</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">migration</span><span class="op">|</span> <span class="ident">migration</span>.<span class="ident">migration_name</span>().<span class="ident">to_string</span>())
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>migrations = migrations_from_filesystem
+            .iter()
+            .map(|migration| migration.migration_name().to_string())
+            .collect();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ListMigrationDirectoriesOutput</span> { <span class="ident">migrations</span> })
+        <span class="prelude-val">Ok</span>(ListMigrationDirectoriesOutput { migrations })
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">MarkMigrationAppliedInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">MarkMigrationAppliedOutput</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_default_connector</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;MarkMigrationApplied&quot;</span>, <span class="ident">migration_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">migration_name</span>.<span class="ident">as_str</span>());
-            <span class="ident">Box::pin</span>(<span class="ident">commands::mark_migration_applied</span>(<span class="ident">input</span>, <span class="ident">connector</span>).<span class="ident">instrument</span>(<span class="ident">span</span>))
+    <span class="kw">async fn </span>mark_migration_applied(<span class="kw-2">&amp;</span><span class="self">self</span>, input: MarkMigrationAppliedInput) -&gt; CoreResult&lt;MarkMigrationAppliedOutput&gt; {
+        <span class="self">self</span>.with_default_connector(Box::new(<span class="kw">move </span>|connector| {
+            <span class="kw">let </span>span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;MarkMigrationApplied&quot;</span>, migration_name = input.migration_name.as_str());
+            Box::pin(commands::mark_migration_applied(input, connector).instrument(span))
         }))
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back</span>(
+    <span class="kw">async fn </span>mark_migration_rolled_back(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="ident">MarkMigrationRolledBackInput</span>,
-    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">MarkMigrationRolledBackOutput</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_default_connector</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(
+        input: MarkMigrationRolledBackInput,
+    ) -&gt; CoreResult&lt;MarkMigrationRolledBackOutput&gt; {
+        <span class="self">self</span>.with_default_connector(Box::new(<span class="kw">move </span>|connector| {
+            <span class="kw">let </span>span = <span class="macro">tracing::info_span!</span>(
                 <span class="string">&quot;MarkMigrationRolledBack&quot;</span>,
-                <span class="ident">migration_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">migration_name</span>.<span class="ident">as_str</span>()
+                migration_name = input.migration_name.as_str()
             );
-            <span class="ident">Box::pin</span>(<span class="ident">commands::mark_migration_rolled_back</span>(<span class="ident">input</span>, <span class="ident">connector</span>).<span class="ident">instrument</span>(<span class="ident">span</span>))
+            Box::pin(commands::mark_migration_rolled_back(input, connector).instrument(span))
         }))
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async fn </span>reset(<span class="kw-2">&amp;</span><span class="self">self</span>, namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; CoreResult&lt;()&gt; {
         <span class="macro">tracing::debug!</span>(<span class="string">&quot;Resetting the database.&quot;</span>);
 
-        <span class="self">self</span>.<span class="ident">with_default_connector</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="ident">Box::pin</span>(<span class="ident">MigrationConnector::reset</span>(<span class="ident">connector</span>, <span class="bool-val">false</span>, <span class="ident">namespaces</span>).<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;Reset&quot;</span>)))
+        <span class="self">self</span>.with_default_connector(Box::new(<span class="kw">move </span>|connector| {
+            Box::pin(MigrationConnector::reset(connector, <span class="bool-val">false</span>, namespaces).instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;Reset&quot;</span>)))
         }))
         .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">SchemaPushInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushOutput</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_default_connector</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="ident">Box::pin</span>(<span class="ident">commands::schema_push</span>(<span class="ident">input</span>, <span class="ident">connector</span>).<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;SchemaPush&quot;</span>)))
+    <span class="kw">async fn </span>schema_push(<span class="kw-2">&amp;</span><span class="self">self</span>, input: SchemaPushInput) -&gt; CoreResult&lt;SchemaPushOutput&gt; {
+        <span class="self">self</span>.with_default_connector(Box::new(<span class="kw">move </span>|connector| {
+            Box::pin(commands::schema_push(input, connector).instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;SchemaPush&quot;</span>)))
         }))
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

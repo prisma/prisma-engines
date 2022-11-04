@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/op/response_code.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>response_code.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/op/response_code.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>response_code.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -295,274 +295,274 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */</span>
+ */
 
-<span class="comment">// there is not much to format in this file, and we don&#39;t want rustfmt to mess up the comments</span>
+// there is not much to format in this file, and we don&#39;t want rustfmt to mess up the comments
 
-<span class="doccomment">//! All defined response codes in DNS</span>
+</span><span class="doccomment">//! All defined response codes in DNS
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>};
+</span><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::fmt::{Display, Formatter};
 
-<span class="doccomment">/// The status code of the response to a query.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// RCODE           Response code - this 4 bit field is set as part of</span>
-<span class="doccomment">///                 responses.  The values have the following</span>
-<span class="doccomment">///                 interpretation:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                 0               No error condition</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                 1               Format error - The name server was</span>
-<span class="doccomment">///                                 unable to interpret the query.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                 2               Server failure - The name server was</span>
-<span class="doccomment">///                                 unable to process this query due to a</span>
-<span class="doccomment">///                                 problem with the name server.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                 3               Name Error - Meaningful only for</span>
-<span class="doccomment">///                                 responses from an authoritative name</span>
-<span class="doccomment">///                                 server, this code signifies that the</span>
-<span class="doccomment">///                                 domain name referenced in the query does</span>
-<span class="doccomment">///                                 not exist.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                 4               Not Implemented - The name server does</span>
-<span class="doccomment">///                                 not support the requested kind of query.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                 5               Refused - The name server refuses to</span>
-<span class="doccomment">///                                 perform the specified operation for</span>
-<span class="doccomment">///                                 policy reasons.  For example, a name</span>
-<span class="doccomment">///                                 server may not wish to provide the</span>
-<span class="doccomment">///                                 information to the particular requester,</span>
-<span class="doccomment">///                                 or a name server may not wish to perform</span>
-<span class="doccomment">///                                 a particular operation (e.g., zone</span>
-<span class="doccomment">///                                 transfer) for particular data.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                 6-15            Reserved for future use.</span>
-<span class="doccomment">///  ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResponseCode</span> {
-    <span class="doccomment">/// No Error [RFC 1035](https://tools.ietf.org/html/rfc1035)</span>
-    <span class="ident">NoError</span>,
+<span class="doccomment">/// The status code of the response to a query.
+///
+/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)
+///
+/// ```text
+/// RCODE           Response code - this 4 bit field is set as part of
+///                 responses.  The values have the following
+///                 interpretation:
+///
+///                 0               No error condition
+///
+///                 1               Format error - The name server was
+///                                 unable to interpret the query.
+///
+///                 2               Server failure - The name server was
+///                                 unable to process this query due to a
+///                                 problem with the name server.
+///
+///                 3               Name Error - Meaningful only for
+///                                 responses from an authoritative name
+///                                 server, this code signifies that the
+///                                 domain name referenced in the query does
+///                                 not exist.
+///
+///                 4               Not Implemented - The name server does
+///                                 not support the requested kind of query.
+///
+///                 5               Refused - The name server refuses to
+///                                 perform the specified operation for
+///                                 policy reasons.  For example, a name
+///                                 server may not wish to provide the
+///                                 information to the particular requester,
+///                                 or a name server may not wish to perform
+///                                 a particular operation (e.g., zone
+///                                 transfer) for particular data.
+///
+///                 6-15            Reserved for future use.
+///  ```
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, PartialOrd, Copy, Clone, Hash)]
+#[allow(dead_code)]
+</span><span class="kw">pub enum </span>ResponseCode {
+    <span class="doccomment">/// No Error [RFC 1035](https://tools.ietf.org/html/rfc1035)
+    </span>NoError,
 
-    <span class="doccomment">/// Format Error [RFC 1035](https://tools.ietf.org/html/rfc1035)</span>
-    <span class="ident">FormErr</span>,
+    <span class="doccomment">/// Format Error [RFC 1035](https://tools.ietf.org/html/rfc1035)
+    </span>FormErr,
 
-    <span class="doccomment">/// Server Failure [RFC 1035](https://tools.ietf.org/html/rfc1035)</span>
-    <span class="ident">ServFail</span>,
+    <span class="doccomment">/// Server Failure [RFC 1035](https://tools.ietf.org/html/rfc1035)
+    </span>ServFail,
 
-    <span class="doccomment">/// Non-Existent Domain [RFC 1035](https://tools.ietf.org/html/rfc1035)</span>
-    <span class="ident">NXDomain</span>,
+    <span class="doccomment">/// Non-Existent Domain [RFC 1035](https://tools.ietf.org/html/rfc1035)
+    </span>NXDomain,
 
-    <span class="doccomment">/// Not Implemented [RFC 1035](https://tools.ietf.org/html/rfc1035)</span>
-    <span class="ident">NotImp</span>,
+    <span class="doccomment">/// Not Implemented [RFC 1035](https://tools.ietf.org/html/rfc1035)
+    </span>NotImp,
 
-    <span class="doccomment">/// Query Refused [RFC 1035](https://tools.ietf.org/html/rfc1035)</span>
-    <span class="ident">Refused</span>,
+    <span class="doccomment">/// Query Refused [RFC 1035](https://tools.ietf.org/html/rfc1035)
+    </span>Refused,
 
-    <span class="doccomment">/// Name Exists when it should not [RFC 2136](https://tools.ietf.org/html/rfc2136)</span>
-    <span class="ident">YXDomain</span>,
+    <span class="doccomment">/// Name Exists when it should not [RFC 2136](https://tools.ietf.org/html/rfc2136)
+    </span>YXDomain,
 
-    <span class="doccomment">/// RR Set Exists when it should not [RFC 2136](https://tools.ietf.org/html/rfc2136)</span>
-    <span class="ident">YXRRSet</span>,
+    <span class="doccomment">/// RR Set Exists when it should not [RFC 2136](https://tools.ietf.org/html/rfc2136)
+    </span>YXRRSet,
 
-    <span class="doccomment">/// RR Set that should exist does not [RFC 2136](https://tools.ietf.org/html/rfc2136)</span>
-    <span class="ident">NXRRSet</span>,
+    <span class="doccomment">/// RR Set that should exist does not [RFC 2136](https://tools.ietf.org/html/rfc2136)
+    </span>NXRRSet,
 
-    <span class="doccomment">/// Server Not Authoritative for zone [RFC 2136](https://tools.ietf.org/html/rfc2136)</span>
-    <span class="doccomment">/// or Not Authorized [RFC 2845](https://tools.ietf.org/html/rfc2845)</span>
-    <span class="ident">NotAuth</span>,
+    <span class="doccomment">/// Server Not Authoritative for zone [RFC 2136](https://tools.ietf.org/html/rfc2136)
+    /// or Not Authorized [RFC 2845](https://tools.ietf.org/html/rfc2845)
+    </span>NotAuth,
 
-    <span class="doccomment">/// Name not contained in zone [RFC 2136](https://tools.ietf.org/html/rfc2136)</span>
-    <span class="ident">NotZone</span>,
+    <span class="doccomment">/// Name not contained in zone [RFC 2136](https://tools.ietf.org/html/rfc2136)
+    </span>NotZone,
 
-    <span class="doccomment">/// Bad OPT Version [RFC 6891](https://tools.ietf.org/html/rfc6891#section-9)</span>
-    <span class="ident">BADVERS</span>,
+    <span class="doccomment">/// Bad OPT Version [RFC 6891](https://tools.ietf.org/html/rfc6891#section-9)
+    </span>BADVERS,
 
-    <span class="doccomment">/// TSIG Signature Failure [RFC 2845](https://tools.ietf.org/html/rfc2845)</span>
-    <span class="ident">BADSIG</span>,
+    <span class="doccomment">/// TSIG Signature Failure [RFC 2845](https://tools.ietf.org/html/rfc2845)
+    </span>BADSIG,
 
-    <span class="doccomment">/// Key not recognized [RFC 2845](https://tools.ietf.org/html/rfc2845)</span>
-    <span class="ident">BADKEY</span>,
+    <span class="doccomment">/// Key not recognized [RFC 2845](https://tools.ietf.org/html/rfc2845)
+    </span>BADKEY,
 
-    <span class="doccomment">/// Signature out of time window [RFC 2845](https://tools.ietf.org/html/rfc2845)</span>
-    <span class="ident">BADTIME</span>,
+    <span class="doccomment">/// Signature out of time window [RFC 2845](https://tools.ietf.org/html/rfc2845)
+    </span>BADTIME,
 
-    <span class="doccomment">/// Bad TKEY Mode [RFC 2930](https://tools.ietf.org/html/rfc2930#section-2.6)</span>
-    <span class="ident">BADMODE</span>,
+    <span class="doccomment">/// Bad TKEY Mode [RFC 2930](https://tools.ietf.org/html/rfc2930#section-2.6)
+    </span>BADMODE,
 
-    <span class="doccomment">/// Duplicate key name [RFC 2930](https://tools.ietf.org/html/rfc2930#section-2.6)</span>
-    <span class="ident">BADNAME</span>,
+    <span class="doccomment">/// Duplicate key name [RFC 2930](https://tools.ietf.org/html/rfc2930#section-2.6)
+    </span>BADNAME,
 
-    <span class="doccomment">/// Algorithm not supported [RFC 2930](https://tools.ietf.org/html/rfc2930#section-2.6)</span>
-    <span class="ident">BADALG</span>,
+    <span class="doccomment">/// Algorithm not supported [RFC 2930](https://tools.ietf.org/html/rfc2930#section-2.6)
+    </span>BADALG,
 
-    <span class="doccomment">/// Bad Truncation [RFC 4635](https://tools.ietf.org/html/rfc4635#section-4)</span>
-    <span class="ident">BADTRUNC</span>,
+    <span class="doccomment">/// Bad Truncation [RFC 4635](https://tools.ietf.org/html/rfc4635#section-4)
+    </span>BADTRUNC,
 
-    <span class="doccomment">/// Bad/missing server cookie [draft-ietf-dnsop-cookies](https://tools.ietf.org/html/draft-ietf-dnsop-cookies-10)</span>
-    <span class="ident">BADCOOKIE</span>,
-    <span class="comment">// 24-3840      Unassigned</span>
-    <span class="comment">// 3841-4095    Reserved for Private Use                        [RFC6895]</span>
-    <span class="comment">// 4096-65534   Unassigned</span>
-    <span class="comment">// 65535        Reserved, can be allocated by Standards Action  [RFC6895]</span>
-    <span class="doccomment">/// An unknown or unregisterd response code was received.</span>
-    <span class="ident">Unknown</span>(<span class="ident">u16</span>),
+    <span class="doccomment">/// Bad/missing server cookie [draft-ietf-dnsop-cookies](https://tools.ietf.org/html/draft-ietf-dnsop-cookies-10)
+    </span>BADCOOKIE,
+    <span class="comment">// 24-3840      Unassigned
+    // 3841-4095    Reserved for Private Use                        [RFC6895]
+    // 4096-65534   Unassigned
+    // 65535        Reserved, can be allocated by Standards Action  [RFC6895]
+    </span><span class="doccomment">/// An unknown or unregisterd response code was received.
+    </span>Unknown(u16),
 }
 
-<span class="kw">impl</span> <span class="ident">ResponseCode</span> {
-    <span class="doccomment">/// returns the lower 4 bits of the response code (for the original header portion of the code)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">low</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        (<span class="ident">u16::from</span>(<span class="self">self</span>) <span class="op">&amp;</span> <span class="number">0x000F</span>) <span class="kw">as</span> <span class="ident">u8</span>
+<span class="kw">impl </span>ResponseCode {
+    <span class="doccomment">/// returns the lower 4 bits of the response code (for the original header portion of the code)
+    </span><span class="kw">pub fn </span>low(<span class="self">self</span>) -&gt; u8 {
+        (u16::from(<span class="self">self</span>) &amp; <span class="number">0x000F</span>) <span class="kw">as </span>u8
     }
 
-    <span class="doccomment">/// returns the high 8 bits for the EDNS portion of the response code</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">high</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        ((<span class="ident">u16::from</span>(<span class="self">self</span>) <span class="op">&amp;</span> <span class="number">0x0FF0</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    <span class="doccomment">/// returns the high 8 bits for the EDNS portion of the response code
+    </span><span class="kw">pub fn </span>high(<span class="self">self</span>) -&gt; u8 {
+        ((u16::from(<span class="self">self</span>) &amp; <span class="number">0x0FF0</span>) &gt;&gt; <span class="number">4</span>) <span class="kw">as </span>u8
     }
 
-    <span class="doccomment">/// DNS can not store the entire space of ResponseCodes in 4 bit space of the Header, this function</span>
-    <span class="doccomment">///   allows for a initial value of the first 4 bits to be set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// After the EDNS is read, the entire ResponseCode (12 bits) can be reconstructed for the full ResponseCode.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_low</span>(<span class="ident">low</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        ((<span class="ident">u16::from</span>(<span class="ident">low</span>)) <span class="op">&amp;</span> <span class="number">0x000F</span>).<span class="ident">into</span>()
+    <span class="doccomment">/// DNS can not store the entire space of ResponseCodes in 4 bit space of the Header, this function
+    ///   allows for a initial value of the first 4 bits to be set.
+    ///
+    /// After the EDNS is read, the entire ResponseCode (12 bits) can be reconstructed for the full ResponseCode.
+    </span><span class="kw">pub fn </span>from_low(low: u8) -&gt; <span class="self">Self </span>{
+        ((u16::from(low)) &amp; <span class="number">0x000F</span>).into()
     }
 
-    <span class="doccomment">/// Combines the EDNS high and low from the Header to produce the Extended ResponseCode</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">high</span>: <span class="ident">u8</span>, <span class="ident">low</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        ((<span class="ident">u16::from</span>(<span class="ident">high</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">|</span> ((<span class="ident">u16::from</span>(<span class="ident">low</span>)) <span class="op">&amp;</span> <span class="number">0x000F</span>)).<span class="ident">into</span>()
+    <span class="doccomment">/// Combines the EDNS high and low from the Header to produce the Extended ResponseCode
+    </span><span class="kw">pub fn </span>from(high: u8, low: u8) -&gt; <span class="self">Self </span>{
+        ((u16::from(high) &lt;&lt; <span class="number">4</span>) | ((u16::from(low)) &amp; <span class="number">0x000F</span>)).into()
     }
 
-    <span class="doccomment">/// Transforms the response code into the human message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_str</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ResponseCode::NoError</span> =&gt; <span class="string">&quot;No Error&quot;</span>,
-            <span class="ident">ResponseCode::FormErr</span> =&gt; <span class="string">&quot;Form Error&quot;</span>, <span class="comment">// 1     FormErr       Format Error                        [RFC1035]</span>
-            <span class="ident">ResponseCode::ServFail</span> =&gt; <span class="string">&quot;Server Failure&quot;</span>, <span class="comment">// 2     ServFail      Server Failure                      [RFC1035]</span>
-            <span class="ident">ResponseCode::NXDomain</span> =&gt; <span class="string">&quot;Non-Existent Domain&quot;</span>, <span class="comment">// 3     NXDomain      Non-Existent Domain                 [RFC1035]</span>
-            <span class="ident">ResponseCode::NotImp</span> =&gt; <span class="string">&quot;Not Implemented&quot;</span>, <span class="comment">// 4     NotImp        Not Implemented                     [RFC1035]</span>
-            <span class="ident">ResponseCode::Refused</span> =&gt; <span class="string">&quot;Query Refused&quot;</span>, <span class="comment">// 5     Refused       Query Refused                       [RFC1035]</span>
-            <span class="ident">ResponseCode::YXDomain</span> =&gt; <span class="string">&quot;Name should not exist&quot;</span>, <span class="comment">// 6     YXDomain      Name Exists when it should not      [RFC2136][RFC6672]</span>
-            <span class="ident">ResponseCode::YXRRSet</span> =&gt; <span class="string">&quot;RR Set should not exist&quot;</span>, <span class="comment">// 7     YXRRSet       RR Set Exists when it should not    [RFC2136]</span>
-            <span class="ident">ResponseCode::NXRRSet</span> =&gt; <span class="string">&quot;RR Set does not exist&quot;</span>, <span class="comment">// 8     NXRRSet       RR Set that should exist does not   [RFC2136]</span>
-            <span class="ident">ResponseCode::NotAuth</span> =&gt; <span class="string">&quot;Not authorized&quot;</span>, <span class="comment">// 9     NotAuth       Server Not Authoritative for zone   [RFC2136]</span>
-            <span class="ident">ResponseCode::NotZone</span> =&gt; <span class="string">&quot;Name not in zone&quot;</span>, <span class="comment">// 10    NotZone       Name not contained in zone          [RFC2136]</span>
-            <span class="ident">ResponseCode::BADVERS</span> =&gt; <span class="string">&quot;Bad option verions&quot;</span>, <span class="comment">// 16    BADVERS       Bad OPT Version                     [RFC6891]</span>
-            <span class="ident">ResponseCode::BADSIG</span> =&gt; <span class="string">&quot;TSIG Failure&quot;</span>, <span class="comment">// 16    BADSIG        TSIG Signature Failure              [RFC2845]</span>
-            <span class="ident">ResponseCode::BADKEY</span> =&gt; <span class="string">&quot;Key not recognized&quot;</span>, <span class="comment">// 17    BADKEY        Key not recognized                  [RFC2845]</span>
-            <span class="ident">ResponseCode::BADTIME</span> =&gt; <span class="string">&quot;Signature out of time window&quot;</span>, <span class="comment">// 18    BADTIME       Signature out of time window        [RFC2845]</span>
-            <span class="ident">ResponseCode::BADMODE</span> =&gt; <span class="string">&quot;Bad TKEY mode&quot;</span>, <span class="comment">// 19    BADMODE       Bad TKEY Mode                       [RFC2930]</span>
-            <span class="ident">ResponseCode::BADNAME</span> =&gt; <span class="string">&quot;Duplicate key name&quot;</span>, <span class="comment">// 20    BADNAME       Duplicate key name                  [RFC2930]</span>
-            <span class="ident">ResponseCode::BADALG</span> =&gt; <span class="string">&quot;Algorithm not supported&quot;</span>, <span class="comment">// 21    BADALG        Algorithm not supported             [RFC2930]</span>
-            <span class="ident">ResponseCode::BADTRUNC</span> =&gt; <span class="string">&quot;Bad truncation&quot;</span>, <span class="comment">// 22    BADTRUNC      Bad Truncation                      [RFC4635]</span>
-            <span class="ident">ResponseCode::BADCOOKIE</span> =&gt; <span class="string">&quot;Bad server cookie&quot;</span>, <span class="comment">// 23    BADCOOKIE (TEMPORARY - registered 2015-07-26, expires 2016-07-26)    Bad/missing server cookie    [draft-ietf-dnsop-cookies]</span>
-            <span class="ident">ResponseCode::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Unknown response code&quot;</span>,
+    <span class="doccomment">/// Transforms the response code into the human message
+    </span><span class="kw">pub fn </span>to_str(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            ResponseCode::NoError =&gt; <span class="string">&quot;No Error&quot;</span>,
+            ResponseCode::FormErr =&gt; <span class="string">&quot;Form Error&quot;</span>, <span class="comment">// 1     FormErr       Format Error                        [RFC1035]
+            </span>ResponseCode::ServFail =&gt; <span class="string">&quot;Server Failure&quot;</span>, <span class="comment">// 2     ServFail      Server Failure                      [RFC1035]
+            </span>ResponseCode::NXDomain =&gt; <span class="string">&quot;Non-Existent Domain&quot;</span>, <span class="comment">// 3     NXDomain      Non-Existent Domain                 [RFC1035]
+            </span>ResponseCode::NotImp =&gt; <span class="string">&quot;Not Implemented&quot;</span>, <span class="comment">// 4     NotImp        Not Implemented                     [RFC1035]
+            </span>ResponseCode::Refused =&gt; <span class="string">&quot;Query Refused&quot;</span>, <span class="comment">// 5     Refused       Query Refused                       [RFC1035]
+            </span>ResponseCode::YXDomain =&gt; <span class="string">&quot;Name should not exist&quot;</span>, <span class="comment">// 6     YXDomain      Name Exists when it should not      [RFC2136][RFC6672]
+            </span>ResponseCode::YXRRSet =&gt; <span class="string">&quot;RR Set should not exist&quot;</span>, <span class="comment">// 7     YXRRSet       RR Set Exists when it should not    [RFC2136]
+            </span>ResponseCode::NXRRSet =&gt; <span class="string">&quot;RR Set does not exist&quot;</span>, <span class="comment">// 8     NXRRSet       RR Set that should exist does not   [RFC2136]
+            </span>ResponseCode::NotAuth =&gt; <span class="string">&quot;Not authorized&quot;</span>, <span class="comment">// 9     NotAuth       Server Not Authoritative for zone   [RFC2136]
+            </span>ResponseCode::NotZone =&gt; <span class="string">&quot;Name not in zone&quot;</span>, <span class="comment">// 10    NotZone       Name not contained in zone          [RFC2136]
+            </span>ResponseCode::BADVERS =&gt; <span class="string">&quot;Bad option verions&quot;</span>, <span class="comment">// 16    BADVERS       Bad OPT Version                     [RFC6891]
+            </span>ResponseCode::BADSIG =&gt; <span class="string">&quot;TSIG Failure&quot;</span>, <span class="comment">// 16    BADSIG        TSIG Signature Failure              [RFC2845]
+            </span>ResponseCode::BADKEY =&gt; <span class="string">&quot;Key not recognized&quot;</span>, <span class="comment">// 17    BADKEY        Key not recognized                  [RFC2845]
+            </span>ResponseCode::BADTIME =&gt; <span class="string">&quot;Signature out of time window&quot;</span>, <span class="comment">// 18    BADTIME       Signature out of time window        [RFC2845]
+            </span>ResponseCode::BADMODE =&gt; <span class="string">&quot;Bad TKEY mode&quot;</span>, <span class="comment">// 19    BADMODE       Bad TKEY Mode                       [RFC2930]
+            </span>ResponseCode::BADNAME =&gt; <span class="string">&quot;Duplicate key name&quot;</span>, <span class="comment">// 20    BADNAME       Duplicate key name                  [RFC2930]
+            </span>ResponseCode::BADALG =&gt; <span class="string">&quot;Algorithm not supported&quot;</span>, <span class="comment">// 21    BADALG        Algorithm not supported             [RFC2930]
+            </span>ResponseCode::BADTRUNC =&gt; <span class="string">&quot;Bad truncation&quot;</span>, <span class="comment">// 22    BADTRUNC      Bad Truncation                      [RFC4635]
+            </span>ResponseCode::BADCOOKIE =&gt; <span class="string">&quot;Bad server cookie&quot;</span>, <span class="comment">// 23    BADCOOKIE (TEMPORARY - registered 2015-07-26, expires 2016-07-26)    Bad/missing server cookie    [draft-ietf-dnsop-cookies]
+            </span>ResponseCode::Unknown(<span class="kw">_</span>) =&gt; <span class="string">&quot;Unknown response code&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ResponseCode</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::NoError</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>ResponseCode {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::NoError
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ResponseCode</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">to_str</span>())
+<span class="kw">impl </span>Display <span class="kw">for </span>ResponseCode {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        f.write_str(<span class="self">self</span>.to_str())
     }
 }
 
-<span class="doccomment">/// Convert from `ResponseCode` to `u16`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use std::convert::From;</span>
-<span class="doccomment">/// use trust_dns_proto::op::response_code::ResponseCode;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let var: ResponseCode = From::from(0);</span>
-<span class="doccomment">/// assert_eq!(ResponseCode::NoError, var);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let var: ResponseCode = 0.into();</span>
-<span class="doccomment">/// assert_eq!(ResponseCode::NoError, var);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ResponseCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">ResponseCode</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">rt</span> {
-            <span class="ident">ResponseCode::NoError</span> =&gt; <span class="number">0</span>, <span class="comment">// 0   NoError    No Error                              [RFC1035]</span>
-            <span class="ident">ResponseCode::FormErr</span> =&gt; <span class="number">1</span>, <span class="comment">// 1   FormErr    Format Error                          [RFC1035]</span>
-            <span class="ident">ResponseCode::ServFail</span> =&gt; <span class="number">2</span>, <span class="comment">// 2   ServFail   Server Failure                        [RFC1035]</span>
-            <span class="ident">ResponseCode::NXDomain</span> =&gt; <span class="number">3</span>, <span class="comment">// 3   NXDomain   Non-Existent Domain                   [RFC1035]</span>
-            <span class="ident">ResponseCode::NotImp</span> =&gt; <span class="number">4</span>, <span class="comment">// 4   NotImp     Not Implemented                       [RFC1035]</span>
-            <span class="ident">ResponseCode::Refused</span> =&gt; <span class="number">5</span>, <span class="comment">// 5   Refused    Query Refused                         [RFC1035]</span>
-            <span class="ident">ResponseCode::YXDomain</span> =&gt; <span class="number">6</span>, <span class="comment">// 6   YXDomain   Name Exists when it should not        [RFC2136][RFC6672]</span>
-            <span class="ident">ResponseCode::YXRRSet</span> =&gt; <span class="number">7</span>, <span class="comment">// 7   YXRRSet    RR Set Exists when it should not      [RFC2136]</span>
-            <span class="ident">ResponseCode::NXRRSet</span> =&gt; <span class="number">8</span>, <span class="comment">// 8   NXRRSet    RR Set that should exist does not     [RFC2136]</span>
-            <span class="ident">ResponseCode::NotAuth</span> =&gt; <span class="number">9</span>, <span class="comment">// 9   NotAuth    Server Not Authoritative for zone     [RFC2136]</span>
-            <span class="ident">ResponseCode::NotZone</span> =&gt; <span class="number">10</span>, <span class="comment">// 10  NotZone    Name not contained in zone            [RFC2136]</span>
-            <span class="comment">//</span>
-            <span class="comment">// 11-15    Unassigned</span>
-            <span class="comment">//</span>
-            <span class="comment">// 16  BADVERS  Bad OPT Version         [RFC6891]</span>
-            <span class="comment">// 16  BADSIG   TSIG Signature Failure  [RFC2845]</span>
-            <span class="ident">ResponseCode::BADVERS</span> <span class="op">|</span> <span class="ident">ResponseCode::BADSIG</span> =&gt; <span class="number">16</span>,
-            <span class="ident">ResponseCode::BADKEY</span> =&gt; <span class="number">17</span>, <span class="comment">// 17  BADKEY    Key not recognized                     [RFC2845]</span>
-            <span class="ident">ResponseCode::BADTIME</span> =&gt; <span class="number">18</span>, <span class="comment">// 18  BADTIME   Signature out of time window           [RFC2845]</span>
-            <span class="ident">ResponseCode::BADMODE</span> =&gt; <span class="number">19</span>, <span class="comment">// 19  BADMODE   Bad TKEY Mode                          [RFC2930]</span>
-            <span class="ident">ResponseCode::BADNAME</span> =&gt; <span class="number">20</span>, <span class="comment">// 20  BADNAME   Duplicate key name                     [RFC2930]</span>
-            <span class="ident">ResponseCode::BADALG</span> =&gt; <span class="number">21</span>, <span class="comment">// 21  BADALG    Algorithm not supported                [RFC2930]</span>
-            <span class="ident">ResponseCode::BADTRUNC</span> =&gt; <span class="number">22</span>, <span class="comment">// 22  BADTRUNC  Bad Truncation                         [RFC4635]</span>
-            <span class="comment">// 23  BADCOOKIE (TEMPORARY - registered 2015-07-26, expires 2016-07-26)    Bad/missing server cookie    [draft-ietf-dnsop-cookies]</span>
-            <span class="ident">ResponseCode::BADCOOKIE</span> =&gt; <span class="number">23</span>,
-            <span class="ident">ResponseCode::Unknown</span>(<span class="ident">code</span>) =&gt; <span class="ident">code</span>,
+<span class="doccomment">/// Convert from `ResponseCode` to `u16`
+///
+/// ```
+/// use std::convert::From;
+/// use trust_dns_proto::op::response_code::ResponseCode;
+///
+/// let var: ResponseCode = From::from(0);
+/// assert_eq!(ResponseCode::NoError, var);
+///
+/// let var: ResponseCode = 0.into();
+/// assert_eq!(ResponseCode::NoError, var);
+/// ```
+</span><span class="kw">impl </span>From&lt;ResponseCode&gt; <span class="kw">for </span>u16 {
+    <span class="kw">fn </span>from(rt: ResponseCode) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>rt {
+            ResponseCode::NoError =&gt; <span class="number">0</span>, <span class="comment">// 0   NoError    No Error                              [RFC1035]
+            </span>ResponseCode::FormErr =&gt; <span class="number">1</span>, <span class="comment">// 1   FormErr    Format Error                          [RFC1035]
+            </span>ResponseCode::ServFail =&gt; <span class="number">2</span>, <span class="comment">// 2   ServFail   Server Failure                        [RFC1035]
+            </span>ResponseCode::NXDomain =&gt; <span class="number">3</span>, <span class="comment">// 3   NXDomain   Non-Existent Domain                   [RFC1035]
+            </span>ResponseCode::NotImp =&gt; <span class="number">4</span>, <span class="comment">// 4   NotImp     Not Implemented                       [RFC1035]
+            </span>ResponseCode::Refused =&gt; <span class="number">5</span>, <span class="comment">// 5   Refused    Query Refused                         [RFC1035]
+            </span>ResponseCode::YXDomain =&gt; <span class="number">6</span>, <span class="comment">// 6   YXDomain   Name Exists when it should not        [RFC2136][RFC6672]
+            </span>ResponseCode::YXRRSet =&gt; <span class="number">7</span>, <span class="comment">// 7   YXRRSet    RR Set Exists when it should not      [RFC2136]
+            </span>ResponseCode::NXRRSet =&gt; <span class="number">8</span>, <span class="comment">// 8   NXRRSet    RR Set that should exist does not     [RFC2136]
+            </span>ResponseCode::NotAuth =&gt; <span class="number">9</span>, <span class="comment">// 9   NotAuth    Server Not Authoritative for zone     [RFC2136]
+            </span>ResponseCode::NotZone =&gt; <span class="number">10</span>, <span class="comment">// 10  NotZone    Name not contained in zone            [RFC2136]
+            //
+            // 11-15    Unassigned
+            //
+            // 16  BADVERS  Bad OPT Version         [RFC6891]
+            // 16  BADSIG   TSIG Signature Failure  [RFC2845]
+            </span>ResponseCode::BADVERS | ResponseCode::BADSIG =&gt; <span class="number">16</span>,
+            ResponseCode::BADKEY =&gt; <span class="number">17</span>, <span class="comment">// 17  BADKEY    Key not recognized                     [RFC2845]
+            </span>ResponseCode::BADTIME =&gt; <span class="number">18</span>, <span class="comment">// 18  BADTIME   Signature out of time window           [RFC2845]
+            </span>ResponseCode::BADMODE =&gt; <span class="number">19</span>, <span class="comment">// 19  BADMODE   Bad TKEY Mode                          [RFC2930]
+            </span>ResponseCode::BADNAME =&gt; <span class="number">20</span>, <span class="comment">// 20  BADNAME   Duplicate key name                     [RFC2930]
+            </span>ResponseCode::BADALG =&gt; <span class="number">21</span>, <span class="comment">// 21  BADALG    Algorithm not supported                [RFC2930]
+            </span>ResponseCode::BADTRUNC =&gt; <span class="number">22</span>, <span class="comment">// 22  BADTRUNC  Bad Truncation                         [RFC4635]
+            // 23  BADCOOKIE (TEMPORARY - registered 2015-07-26, expires 2016-07-26)    Bad/missing server cookie    [draft-ietf-dnsop-cookies]
+            </span>ResponseCode::BADCOOKIE =&gt; <span class="number">23</span>,
+            ResponseCode::Unknown(code) =&gt; code,
         }
     }
 }
 
-<span class="doccomment">/// Convert from `u16` to `ResponseCode`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use std::convert::From;</span>
-<span class="doccomment">/// use trust_dns_proto::op::response_code::ResponseCode;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let var: u16 = From::from(ResponseCode::NoError);</span>
-<span class="doccomment">/// assert_eq!(0, var);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let var: u16 = ResponseCode::NoError.into();</span>
-<span class="doccomment">/// assert_eq!(0, var);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResponseCode</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unimplemented</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::NoError</span>, <span class="comment">// 0    NoError    No Error                             [RFC1035]</span>
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::FormErr</span>, <span class="comment">// 1    FormErr    Format Error                         [RFC1035]</span>
-            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::ServFail</span>, <span class="comment">// 2    ServFail   Server Failure                       [RFC1035]</span>
-            <span class="number">3</span> =&gt; <span class="ident"><span class="self">Self</span>::NXDomain</span>, <span class="comment">// 3    NXDomain   Non-Existent Domain                  [RFC1035]</span>
-            <span class="number">4</span> =&gt; <span class="ident"><span class="self">Self</span>::NotImp</span>,  <span class="comment">// 4    NotImp     Not Implemented                      [RFC1035]</span>
-            <span class="number">5</span> =&gt; <span class="ident"><span class="self">Self</span>::Refused</span>, <span class="comment">// 5    Refused    Query Refused                        [RFC1035]</span>
-            <span class="number">6</span> =&gt; <span class="ident"><span class="self">Self</span>::YXDomain</span>, <span class="comment">// 6    YXDomain   Name Exists when it should not       [RFC2136][RFC6672]</span>
-            <span class="number">7</span> =&gt; <span class="ident"><span class="self">Self</span>::YXRRSet</span>,  <span class="comment">// 7    YXRRSet    RR Set Exists when it should not     [RFC2136]</span>
-            <span class="number">8</span> =&gt; <span class="ident"><span class="self">Self</span>::NXRRSet</span>,  <span class="comment">// 8    NXRRSet    RR Set that should exist does not    [RFC2136]</span>
-            <span class="number">9</span> =&gt; <span class="ident"><span class="self">Self</span>::NotAuth</span>,  <span class="comment">// 9    NotAuth    Server Not Authoritative for zone    [RFC2136]</span>
-            <span class="number">10</span> =&gt; <span class="ident"><span class="self">Self</span>::NotZone</span>, <span class="comment">// 10   NotZone    Name not contained in zone           [RFC2136]</span>
-            <span class="comment">// this looks to be backwards compat for 4 bit ResponseCodes.</span>
-            <span class="comment">// 16    BADVERS    Bad OPT Version    [RFC6891]</span>
-            <span class="comment">// 16 =&gt; ResponseCode::BADVERS,</span>
-            <span class="number">16</span> =&gt; <span class="ident"><span class="self">Self</span>::BADSIG</span>, <span class="comment">// 16    BADSIG    TSIG Signature Failure               [RFC2845]</span>
-            <span class="number">17</span> =&gt; <span class="ident"><span class="self">Self</span>::BADKEY</span>, <span class="comment">// 17    BADKEY    Key not recognized                   [RFC2845]</span>
-            <span class="number">18</span> =&gt; <span class="ident"><span class="self">Self</span>::BADTIME</span>, <span class="comment">// 18    BADTIME   Signature out of time window         [RFC2845]</span>
-            <span class="number">19</span> =&gt; <span class="ident"><span class="self">Self</span>::BADMODE</span>, <span class="comment">// 19    BADMODE   Bad TKEY Mode                        [RFC2930]</span>
-            <span class="number">20</span> =&gt; <span class="ident"><span class="self">Self</span>::BADNAME</span>, <span class="comment">// 20    BADNAME   Duplicate key name                   [RFC2930]</span>
-            <span class="number">21</span> =&gt; <span class="ident"><span class="self">Self</span>::BADALG</span>, <span class="comment">// 21    BADALG    Algorithm not supported              [RFC2930]</span>
-            <span class="number">22</span> =&gt; <span class="ident"><span class="self">Self</span>::BADTRUNC</span>, <span class="comment">// 22    BADTRUNC  Bad Truncation                       [RFC4635]</span>
-            <span class="number">23</span> =&gt; <span class="ident"><span class="self">Self</span>::BADCOOKIE</span>, <span class="comment">// 23    BADCOOKIE (TEMPORARY - registered 2015-07-26, expires 2016-07-26)    Bad/missing server cookie    [draft-ietf-dnsop-cookies]</span>
-            <span class="ident">code</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">code</span>),
+<span class="doccomment">/// Convert from `u16` to `ResponseCode`
+///
+/// ```
+/// use std::convert::From;
+/// use trust_dns_proto::op::response_code::ResponseCode;
+///
+/// let var: u16 = From::from(ResponseCode::NoError);
+/// assert_eq!(0, var);
+///
+/// let var: u16 = ResponseCode::NoError.into();
+/// assert_eq!(0, var);
+/// ```
+</span><span class="kw">impl </span>From&lt;u16&gt; <span class="kw">for </span>ResponseCode {
+    <span class="attribute">#[allow(clippy::unimplemented)]
+    </span><span class="kw">fn </span>from(value: u16) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="self">Self</span>::NoError, <span class="comment">// 0    NoError    No Error                             [RFC1035]
+            </span><span class="number">1 </span>=&gt; <span class="self">Self</span>::FormErr, <span class="comment">// 1    FormErr    Format Error                         [RFC1035]
+            </span><span class="number">2 </span>=&gt; <span class="self">Self</span>::ServFail, <span class="comment">// 2    ServFail   Server Failure                       [RFC1035]
+            </span><span class="number">3 </span>=&gt; <span class="self">Self</span>::NXDomain, <span class="comment">// 3    NXDomain   Non-Existent Domain                  [RFC1035]
+            </span><span class="number">4 </span>=&gt; <span class="self">Self</span>::NotImp,  <span class="comment">// 4    NotImp     Not Implemented                      [RFC1035]
+            </span><span class="number">5 </span>=&gt; <span class="self">Self</span>::Refused, <span class="comment">// 5    Refused    Query Refused                        [RFC1035]
+            </span><span class="number">6 </span>=&gt; <span class="self">Self</span>::YXDomain, <span class="comment">// 6    YXDomain   Name Exists when it should not       [RFC2136][RFC6672]
+            </span><span class="number">7 </span>=&gt; <span class="self">Self</span>::YXRRSet,  <span class="comment">// 7    YXRRSet    RR Set Exists when it should not     [RFC2136]
+            </span><span class="number">8 </span>=&gt; <span class="self">Self</span>::NXRRSet,  <span class="comment">// 8    NXRRSet    RR Set that should exist does not    [RFC2136]
+            </span><span class="number">9 </span>=&gt; <span class="self">Self</span>::NotAuth,  <span class="comment">// 9    NotAuth    Server Not Authoritative for zone    [RFC2136]
+            </span><span class="number">10 </span>=&gt; <span class="self">Self</span>::NotZone, <span class="comment">// 10   NotZone    Name not contained in zone           [RFC2136]
+            // this looks to be backwards compat for 4 bit ResponseCodes.
+            // 16    BADVERS    Bad OPT Version    [RFC6891]
+            // 16 =&gt; ResponseCode::BADVERS,
+            </span><span class="number">16 </span>=&gt; <span class="self">Self</span>::BADSIG, <span class="comment">// 16    BADSIG    TSIG Signature Failure               [RFC2845]
+            </span><span class="number">17 </span>=&gt; <span class="self">Self</span>::BADKEY, <span class="comment">// 17    BADKEY    Key not recognized                   [RFC2845]
+            </span><span class="number">18 </span>=&gt; <span class="self">Self</span>::BADTIME, <span class="comment">// 18    BADTIME   Signature out of time window         [RFC2845]
+            </span><span class="number">19 </span>=&gt; <span class="self">Self</span>::BADMODE, <span class="comment">// 19    BADMODE   Bad TKEY Mode                        [RFC2930]
+            </span><span class="number">20 </span>=&gt; <span class="self">Self</span>::BADNAME, <span class="comment">// 20    BADNAME   Duplicate key name                   [RFC2930]
+            </span><span class="number">21 </span>=&gt; <span class="self">Self</span>::BADALG, <span class="comment">// 21    BADALG    Algorithm not supported              [RFC2930]
+            </span><span class="number">22 </span>=&gt; <span class="self">Self</span>::BADTRUNC, <span class="comment">// 22    BADTRUNC  Bad Truncation                       [RFC4635]
+            </span><span class="number">23 </span>=&gt; <span class="self">Self</span>::BADCOOKIE, <span class="comment">// 23    BADCOOKIE (TEMPORARY - registered 2015-07-26, expires 2016-07-26)    Bad/missing server cookie    [draft-ietf-dnsop-cookies]
+            </span>code =&gt; <span class="self">Self</span>::Unknown(code),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

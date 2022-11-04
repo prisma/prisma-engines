@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/flavour/postgres/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/flavour/postgres/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -180,187 +180,187 @@
 <span id="180">180</span>
 <span id="181">181</span>
 <span id="182">182</span>
-</pre><pre class="rust"><code><span class="doccomment">//! All the quaint-wrangling for the postgres connector should happen here.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! All the quaint-wrangling for the postgres connector should happen here.
 
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">Namespaces</span>};
-<span class="kw">use</span> <span class="ident">psl::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">quaint</span>::{
-    <span class="ident">connector</span>::{<span class="self">self</span>, <span class="ident">tokio_postgres::error::ErrorPosition</span>, <span class="ident">PostgresUrl</span>},
-    <span class="ident">prelude</span>::{<span class="ident">ConnectionInfo</span>, <span class="ident">Queryable</span>},
+</span><span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>migration_connector::{ConnectorError, ConnectorResult, Namespaces};
+<span class="kw">use </span>psl::PreviewFeature;
+<span class="kw">use </span>quaint::{
+    connector::{<span class="self">self</span>, tokio_postgres::error::ErrorPosition, PostgresUrl},
+    prelude::{ConnectionInfo, Queryable},
 };
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">postgres::PostgresSchemaExt</span>, <span class="ident">SqlSchema</span>};
-<span class="kw">use</span> <span class="ident">user_facing_errors</span>::{<span class="ident">introspection_engine::DatabaseSchemaInconsistent</span>, <span class="ident">migration_engine::ApplyMigrationError</span>};
+<span class="kw">use </span>sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
+<span class="kw">use </span>user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, migration_engine::ApplyMigrationError};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_renderer::IteratorJoin</span>;
+<span class="kw">use </span><span class="kw">crate</span>::sql_renderer::IteratorJoin;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Connection</span>(<span class="ident">connector::PostgreSql</span>);
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Connection(connector::PostgreSql);
 
-<span class="kw">impl</span> <span class="ident">Connection</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">url</span>: <span class="ident">url::Url</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">PostgresUrl::new</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-            <span class="ident">ConnectorError::user_facing</span>(<span class="ident">user_facing_errors::common::InvalidConnectionString</span> {
-                <span class="ident">details</span>: <span class="ident">err</span>.<span class="ident">to_string</span>(),
+<span class="kw">impl </span>Connection {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>new(url: url::Url) -&gt; ConnectorResult&lt;Connection&gt; {
+        <span class="kw">let </span>url = PostgresUrl::new(url).map_err(|err| {
+            ConnectorError::user_facing(user_facing_errors::common::InvalidConnectionString {
+                details: err.to_string(),
             })
         })<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">Connection</span>(
-            <span class="ident">connector::PostgreSql::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>())
-                .<span class="kw">await</span>
-                .<span class="ident">map_err</span>(<span class="ident">quaint_err</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>))<span class="question-mark">?</span>,
+        <span class="prelude-val">Ok</span>(Connection(
+            connector::PostgreSql::new(url.clone())
+                .<span class="kw">await
+                </span>.map_err(quaint_err(<span class="kw-2">&amp;</span>url))<span class="question-mark">?</span>,
         ))
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">circumstances</span>, <span class="ident">params</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe_schema</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">circumstances</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Circumstances</span><span class="op">&gt;</span>,
-        <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Params</span>,
-        <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">postgres</span> <span class="kw">as</span> <span class="ident">describer</span>, <span class="ident">DescriberErrorKind</span>, <span class="ident">SqlSchemaDescriberBackend</span>};
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">describer_circumstances</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">describer::Circumstances</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+    <span class="attribute">#[tracing::instrument(skip(<span class="self">self</span>, circumstances, params))]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>describe_schema(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        circumstances: BitFlags&lt;<span class="kw">super</span>::Circumstances&gt;,
+        params: <span class="kw-2">&amp;</span><span class="kw">super</span>::Params,
+        namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;,
+    ) -&gt; ConnectorResult&lt;SqlSchema&gt; {
+        <span class="kw">use </span>sql_schema_describer::{postgres <span class="kw">as </span>describer, DescriberErrorKind, SqlSchemaDescriberBackend};
+        <span class="kw">let </span><span class="kw-2">mut </span>describer_circumstances: BitFlags&lt;describer::Circumstances&gt; = Default::default();
 
-        <span class="kw">if</span> <span class="ident">circumstances</span>.<span class="ident">contains</span>(<span class="ident"><span class="kw">super</span>::Circumstances::IsCockroachDb</span>) {
-            <span class="ident">describer_circumstances</span> <span class="op">|</span><span class="op">=</span> <span class="ident">describer::Circumstances::Cockroach</span>;
+        <span class="kw">if </span>circumstances.contains(<span class="kw">super</span>::Circumstances::IsCockroachDb) {
+            describer_circumstances |= describer::Circumstances::Cockroach;
         }
 
-        <span class="kw">let</span> <span class="ident">namespaces_vec</span> <span class="op">=</span> <span class="ident">Namespaces::to_vec</span>(<span class="ident">namespaces</span>, <span class="ident">String::from</span>(<span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>()));
-        <span class="kw">let</span> <span class="ident">namespaces_str</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">namespaces_vec</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">AsRef::as_ref</span>).<span class="ident">collect</span>();
+        <span class="kw">let </span>namespaces_vec = Namespaces::to_vec(namespaces, String::from(params.url.schema()));
+        <span class="kw">let </span>namespaces_str: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = namespaces_vec.iter().map(AsRef::as_ref).collect();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">sql_schema_describer::postgres::SqlSchemaDescriber::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">describer_circumstances</span>)
-            .<span class="ident">describe</span>(<span class="ident">namespaces_str</span>.<span class="ident">as_slice</span>())
-            .<span class="kw">await</span>
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">into_kind</span>() {
-                <span class="ident">DescriberErrorKind::QuaintError</span>(<span class="ident">err</span>) =&gt; <span class="ident">quaint_err</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>)(<span class="ident">err</span>),
-                <span class="ident">e</span> @ <span class="ident">DescriberErrorKind::CrossSchemaReference</span> { .. } =&gt; {
-                    <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">DatabaseSchemaInconsistent</span> {
-                        <span class="ident">explanation</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>schema = sql_schema_describer::postgres::SqlSchemaDescriber::new(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, describer_circumstances)
+            .describe(namespaces_str.as_slice())
+            .<span class="kw">await
+            </span>.map_err(|err| <span class="kw">match </span>err.into_kind() {
+                DescriberErrorKind::QuaintError(err) =&gt; quaint_err(<span class="kw-2">&amp;</span>params.url)(err),
+                e @ DescriberErrorKind::CrossSchemaReference { .. } =&gt; {
+                    <span class="kw">let </span>err = DatabaseSchemaInconsistent {
+                        explanation: e.to_string(),
                     };
-                    <span class="ident">ConnectorError::user_facing</span>(<span class="ident">err</span>)
+                    ConnectorError::user_facing(err)
                 }
             })<span class="question-mark">?</span>;
 
-        <span class="ident"><span class="kw">crate</span>::flavour::normalize_sql_schema</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>);
-        <span class="ident">normalize_sql_schema</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>);
+        <span class="kw">crate</span>::flavour::normalize_sql_schema(<span class="kw-2">&amp;mut </span>schema, params.connector_params.preview_features);
+        normalize_sql_schema(<span class="kw-2">&amp;mut </span>schema, params.connector_params.preview_features);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
+        <span class="prelude-val">Ok</span>(schema)
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresUrl</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">tracing::debug!</span>(<span class="ident">query_type</span> <span class="op">=</span> <span class="string">&quot;raw_cmd&quot;</span>, <span class="ident">sql</span>);
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">quaint_err</span>(<span class="ident">url</span>))
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>raw_cmd(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, url: <span class="kw-2">&amp;</span>PostgresUrl) -&gt; ConnectorResult&lt;()&gt; {
+        <span class="macro">tracing::debug!</span>(query_type = <span class="string">&quot;raw_cmd&quot;</span>, sql);
+        <span class="self">self</span>.<span class="number">0</span>.raw_cmd(sql).<span class="kw">await</span>.map_err(quaint_err(url))
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresUrl</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">tracing::debug!</span>(<span class="ident">query_type</span> <span class="op">=</span> <span class="string">&quot;version&quot;</span>);
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">version</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">quaint_err</span>(<span class="ident">url</span>))
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>version(<span class="kw-2">&amp;mut </span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>PostgresUrl) -&gt; ConnectorResult&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
+        <span class="macro">tracing::debug!</span>(query_type = <span class="string">&quot;version&quot;</span>);
+        <span class="self">self</span>.<span class="number">0</span>.version().<span class="kw">await</span>.map_err(quaint_err(url))
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">query</span>: <span class="ident">quaint::ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresUrl</span>,
-    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">quaint::visitor::Visitor</span>;
-        <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">quaint::visitor::Postgres::build</span>(<span class="ident">query</span>).<span class="ident">unwrap</span>();
-        <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>, <span class="ident">url</span>).<span class="kw">await</span>
-    }
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>query(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        query: quaint::ast::Query&lt;<span class="lifetime">&#39;_</span>&gt;,
+        url: <span class="kw-2">&amp;</span>PostgresUrl,
+    ) -&gt; ConnectorResult&lt;quaint::prelude::ResultSet&gt; {
+        <span class="kw">use </span>quaint::visitor::Visitor;
+        <span class="kw">let </span>(sql, params) = quaint::visitor::Postgres::build(query).unwrap();
+        <span class="self">self</span>.query_raw(<span class="kw-2">&amp;</span>sql, <span class="kw-2">&amp;</span>params, url).<span class="kw">await
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>query_raw(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">quaint::prelude::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
-        <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresUrl</span>,
-    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span> {
-        <span class="macro">tracing::debug!</span>(<span class="ident">query_type</span> <span class="op">=</span> <span class="string">&quot;query_raw&quot;</span>, <span class="ident">sql</span>, <span class="question-mark">?</span><span class="ident">params</span>);
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">quaint_err</span>(<span class="ident">url</span>))
+        sql: <span class="kw-2">&amp;</span>str,
+        params: <span class="kw-2">&amp;</span>[quaint::prelude::Value&lt;<span class="lifetime">&#39;_</span>&gt;],
+        url: <span class="kw-2">&amp;</span>PostgresUrl,
+    ) -&gt; ConnectorResult&lt;quaint::prelude::ResultSet&gt; {
+        <span class="macro">tracing::debug!</span>(query_type = <span class="string">&quot;query_raw&quot;</span>, sql, <span class="question-mark">?</span>params);
+        <span class="self">self</span>.<span class="number">0</span>.query_raw(sql, params).<span class="kw">await</span>.map_err(quaint_err(url))
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migration_script</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">tracing::debug!</span>(<span class="ident">query_type</span> <span class="op">=</span> <span class="string">&quot;raw_cmd&quot;</span>, <span class="ident">script</span>);
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">client</span>();
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>apply_migration_script(<span class="kw-2">&amp;mut </span><span class="self">self</span>, migration_name: <span class="kw-2">&amp;</span>str, script: <span class="kw-2">&amp;</span>str) -&gt; ConnectorResult&lt;()&gt; {
+        <span class="macro">tracing::debug!</span>(query_type = <span class="string">&quot;raw_cmd&quot;</span>, script);
+        <span class="kw">let </span>client = <span class="self">self</span>.<span class="number">0</span>.client();
 
-        <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">simple_query</span>(<span class="ident">script</span>).<span class="kw">await</span> {
+        <span class="kw">match </span>client.simple_query(script).<span class="kw">await </span>{
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">database_error_code</span>, <span class="ident">database_error</span>): (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">db_error</span>) <span class="op">=</span> <span class="ident">err</span>.<span class="ident">as_db_error</span>()
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="kw">let </span>(database_error_code, database_error): (<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, <span class="kw">_</span>) = <span class="kw">if let </span><span class="prelude-val">Some</span>(db_error) = err.as_db_error()
                 {
-                    <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ErrorPosition::Original</span>(<span class="ident">position</span>)) <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">position</span>() {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">previous_lines</span> <span class="op">=</span> [<span class="string">&quot;&quot;</span>; <span class="number">5</span>];
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_index</span> <span class="op">=</span> <span class="number">0</span>;
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error_position</span> <span class="op">=</span> <span class="ident">String::new</span>();
+                    <span class="kw">let </span>position = <span class="kw">if let </span><span class="prelude-val">Some</span>(ErrorPosition::Original(position)) = db_error.position() {
+                        <span class="kw">let </span><span class="kw-2">mut </span>previous_lines = [<span class="string">&quot;&quot;</span>; <span class="number">5</span>];
+                        <span class="kw">let </span><span class="kw-2">mut </span>byte_index = <span class="number">0</span>;
+                        <span class="kw">let </span><span class="kw-2">mut </span>error_position = String::new();
 
-                        <span class="kw">for</span> (<span class="ident">line_idx</span>, <span class="ident">line</span>) <span class="kw">in</span> <span class="ident">script</span>.<span class="ident">lines</span>().<span class="ident">enumerate</span>() {
-                            <span class="comment">// Line numbers start at 1, not 0.</span>
-                            <span class="kw">let</span> <span class="ident">line_number</span> <span class="op">=</span> <span class="ident">line_idx</span> <span class="op">+</span> <span class="number">1</span>;
-                            <span class="ident">byte_index</span> <span class="op">+</span><span class="op">=</span> <span class="ident">line</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>; <span class="comment">// + 1 for the \n character.</span>
+                        <span class="kw">for </span>(line_idx, line) <span class="kw">in </span>script.lines().enumerate() {
+                            <span class="comment">// Line numbers start at 1, not 0.
+                            </span><span class="kw">let </span>line_number = line_idx + <span class="number">1</span>;
+                            byte_index += line.len() + <span class="number">1</span>; <span class="comment">// + 1 for the \n character.
 
-                            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">position</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">byte_index</span> {
-                                <span class="kw">let</span> <span class="ident">numbered_lines</span> <span class="op">=</span> <span class="ident">previous_lines</span>
-                                    .<span class="ident">iter</span>()
-                                    .<span class="ident">enumerate</span>()
-                                    .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">line</span>)<span class="op">|</span> {
-                                        <span class="ident">line_number</span>
-                                            .<span class="ident">checked_sub</span>(<span class="ident">previous_lines</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">idx</span>)
-                                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> (<span class="ident">idx</span>, <span class="ident">line</span>))
+                            </span><span class="kw">if </span><span class="kw-2">*</span>position <span class="kw">as </span>usize &lt;= byte_index {
+                                <span class="kw">let </span>numbered_lines = previous_lines
+                                    .iter()
+                                    .enumerate()
+                                    .filter_map(|(idx, line)| {
+                                        line_number
+                                            .checked_sub(previous_lines.len() - idx)
+                                            .map(|idx| (idx, line))
                                     })
-                                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">line</span>)<span class="op">|</span> {
+                                    .map(|(idx, line)| {
                                         <span class="macro">format!</span>(
                                             <span class="string">&quot;\x1b[1m{:&gt;3}\x1b[0m{}{}&quot;</span>,
-                                            <span class="ident">idx</span>,
-                                            <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">is_empty</span>() { <span class="string">&quot;&quot;</span> } <span class="kw">else</span> { <span class="string">&quot; &quot;</span> },
-                                            <span class="ident">line</span>
+                                            idx,
+                                            <span class="kw">if </span>line.is_empty() { <span class="string">&quot;&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot; &quot; </span>},
+                                            line
                                         )
                                     })
-                                    .<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>);
+                                    .join(<span class="string">&quot;\n&quot;</span>);
 
-                                <span class="ident">error_position</span> <span class="op">=</span> <span class="macro">format!</span>(
+                                error_position = <span class="macro">format!</span>(
                                     <span class="string">&quot;\n\nPosition:\n{}\n\x1b[1m{:&gt;3}\x1b[1;31m {}\x1b[0m&quot;</span>,
-                                    <span class="ident">numbered_lines</span>, <span class="ident">line_number</span>, <span class="ident">line</span>
+                                    numbered_lines, line_number, line
                                 );
                                 <span class="kw">break</span>;
-                            } <span class="kw">else</span> {
-                                <span class="ident">previous_lines</span> <span class="op">=</span> [
-                                    <span class="ident">previous_lines</span>[<span class="number">1</span>],
-                                    <span class="ident">previous_lines</span>[<span class="number">2</span>],
-                                    <span class="ident">previous_lines</span>[<span class="number">3</span>],
-                                    <span class="ident">previous_lines</span>[<span class="number">4</span>],
-                                    <span class="ident">line</span>,
+                            } <span class="kw">else </span>{
+                                previous_lines = [
+                                    previous_lines[<span class="number">1</span>],
+                                    previous_lines[<span class="number">2</span>],
+                                    previous_lines[<span class="number">3</span>],
+                                    previous_lines[<span class="number">4</span>],
+                                    line,
                                 ];
                             }
                         }
 
-                        <span class="ident">error_position</span>
-                    } <span class="kw">else</span> {
-                        <span class="ident">String::new</span>()
+                        error_position
+                    } <span class="kw">else </span>{
+                        String::new()
                     };
 
-                    <span class="kw">let</span> <span class="ident">database_error</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}\n\n{:?}&quot;</span>, <span class="ident">db_error</span>, <span class="ident">position</span>, <span class="ident">db_error</span>);
+                    <span class="kw">let </span>database_error = <span class="macro">format!</span>(<span class="string">&quot;{}{}\n\n{:?}&quot;</span>, db_error, position, db_error);
 
-                    (<span class="prelude-val">Some</span>(<span class="ident">db_error</span>.<span class="ident">code</span>().<span class="ident">code</span>()), <span class="ident">database_error</span>)
-                } <span class="kw">else</span> {
-                    (<span class="ident">err</span>.<span class="ident">code</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">code</span>()), <span class="ident">err</span>.<span class="ident">to_string</span>())
+                    (<span class="prelude-val">Some</span>(db_error.code().code()), database_error)
+                } <span class="kw">else </span>{
+                    (err.code().map(|c| c.code()), err.to_string())
                 };
 
-                <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::user_facing</span>(<span class="ident">ApplyMigrationError</span> {
-                    <span class="ident">migration_name</span>: <span class="ident">migration_name</span>.<span class="ident">to_owned</span>(),
-                    <span class="ident">database_error_code</span>: <span class="ident">database_error_code</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;none&quot;</span>).<span class="ident">to_owned</span>(),
-                    <span class="ident">database_error</span>,
+                <span class="prelude-val">Err</span>(ConnectorError::user_facing(ApplyMigrationError {
+                    migration_name: migration_name.to_owned(),
+                    database_error_code: database_error_code.unwrap_or(<span class="string">&quot;none&quot;</span>).to_owned(),
+                    database_error,
                 }))
             }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">normalize_sql_schema</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::PostgresqlExtensions</span>) {
-        <span class="kw">let</span> <span class="ident">pg_ext</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">downcast_connector_data_mut</span>();
-        <span class="ident">pg_ext</span>.<span class="ident">clear_extensions</span>();
+<span class="kw">fn </span>normalize_sql_schema(schema: <span class="kw-2">&amp;mut </span>SqlSchema, preview_features: BitFlags&lt;PreviewFeature&gt;) {
+    <span class="kw">if </span>!preview_features.contains(PreviewFeature::PostgresqlExtensions) {
+        <span class="kw">let </span>pg_ext: <span class="kw-2">&amp;mut </span>PostgresSchemaExt = schema.downcast_connector_data_mut();
+        pg_ext.clear_extensions();
     }
 }
 
-<span class="kw">fn</span> <span class="ident">quaint_err</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresUrl</span>) -&gt; <span class="kw">impl</span> (<span class="ident">Fn</span>(<span class="ident">quaint::error::Error</span>) -&gt; <span class="ident">ConnectorError</span>) <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-    <span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::flavour::quaint_error_to_connector_error</span>(<span class="ident">err</span>, <span class="kw-2">&amp;</span><span class="ident">ConnectionInfo::Postgres</span>(<span class="ident">url</span>.<span class="ident">clone</span>()))
+<span class="kw">fn </span>quaint_err(url: <span class="kw-2">&amp;</span>PostgresUrl) -&gt; <span class="kw">impl </span>(Fn(quaint::error::Error) -&gt; ConnectorError) + <span class="lifetime">&#39;_ </span>{
+    |err| <span class="kw">crate</span>::flavour::quaint_error_to_connector_error(err, <span class="kw-2">&amp;</span>ConnectionInfo::Postgres(url.clone()))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

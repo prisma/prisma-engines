@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="`enum_dispatch` provides a set of macros that can be used to easily refactor dynamically dispatched trait accesses to improve their performance by up to 10x."><meta name="keywords" content="rust, rustlang, rust-lang, enum_dispatch"><title>enum_dispatch - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script defer src="../crates.js"></script><script defer src="../main.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" href="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../enum_dispatch/index.html"><div class="logo-container"><img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../enum_dispatch/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="`enum_dispatch` provides a set of macros that can be used to easily refactor dynamically dispatched trait accesses to improve their performance by up to 10x."><meta name="keywords" content="rust, rustlang, rust-lang, enum_dispatch"><title>enum_dispatch - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../normalize.css"><link rel="stylesheet" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../ayu.css" disabled><link rel="stylesheet" href="../dark.css" disabled><link rel="stylesheet" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script defer src="../crates.js"></script><script defer src="../main.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" href="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../enum_dispatch/index.html"><div class="logo-container"><img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../enum_dispatch/index.html"><div class="logo-container">
                     <img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a><h2 class="location"><a href="#">Crate enum_dispatch</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.3.8</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#attributes">Attribute Macros</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../enum_dispatch/index.html">
                         <img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">enum_dispatch</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/enum_dispatch/lib.rs.html#1-450">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><code>enum_dispatch</code> provides a set of macros that can be used to easily refactor dynamically
 dispatched trait accesses to improve their performance by up to 10x.</p>
@@ -19,46 +19,46 @@ check the repository’s
 hold a value between 0.0 and 1.0. Some knobs provide a <em>linear</em> range, whereas other knobs
 provide a <em>logarithmic</em> range.</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">trait</span> <span class="ident">KnobControl</span> {
-    <span class="kw">fn</span> <span class="ident">set_position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>);
-    <span class="kw">fn</span> <span class="ident">get_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">trait </span>KnobControl {
+    <span class="kw">fn </span>set_position(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: f64);
+    <span class="kw">fn </span>get_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64;
 }
 
-<span class="kw">struct</span> <span class="ident">LinearKnob</span> {
-    <span class="ident">position</span>: <span class="ident">f64</span>,
+<span class="kw">struct </span>LinearKnob {
+    position: f64,
 }
 
-<span class="kw">struct</span> <span class="ident">LogarithmicKnob</span> {
-    <span class="ident">position</span>: <span class="ident">f64</span>,
+<span class="kw">struct </span>LogarithmicKnob {
+    position: f64,
 }
 
-<span class="kw">impl</span> <span class="ident">KnobControl</span> <span class="kw">for</span> <span class="ident">LinearKnob</span> {
-    <span class="kw">fn</span> <span class="ident">set_position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">value</span>;
+<span class="kw">impl </span>KnobControl <span class="kw">for </span>LinearKnob {
+    <span class="kw">fn </span>set_position(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: f64) {
+        <span class="self">self</span>.position = value;
     }
 
-    <span class="kw">fn</span> <span class="ident">get_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span> {
-        <span class="self">self</span>.<span class="ident">position</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">KnobControl</span> <span class="kw">for</span> <span class="ident">LogarithmicKnob</span> {
-    <span class="kw">fn</span> <span class="ident">set_position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="ident">value</span>;
-    }
-
-    <span class="kw">fn</span> <span class="ident">get_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span> {
-        (<span class="self">self</span>.<span class="ident">position</span> <span class="op">+</span> <span class="number">1.</span>).<span class="ident">log2</span>()
+    <span class="kw">fn </span>get_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+        <span class="self">self</span>.position
     }
 }
 
-<span class="kw">fn</span> <span class="ident">main</span>() {
-    <span class="kw">let</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">KnobControl</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
-        <span class="comment">//set the knobs</span>
-    ];
+<span class="kw">impl </span>KnobControl <span class="kw">for </span>LogarithmicKnob {
+    <span class="kw">fn </span>set_position(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: f64) {
+        <span class="self">self</span>.position = value;
+    }
 
-    <span class="comment">//use the knobs</span>
-}</code></pre></div>
+    <span class="kw">fn </span>get_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+        (<span class="self">self</span>.position + <span class="number">1.</span>).log2()
+    }
+}
+
+<span class="kw">fn </span>main() {
+    <span class="kw">let </span>v: Vec&lt;Box&lt;<span class="kw">dyn </span>KnobControl&gt;&gt; = <span class="macro">vec!</span>[
+        <span class="comment">//set the knobs
+    </span>];
+
+    <span class="comment">//use the knobs
+</span>}</code></pre></div>
 <p>There are other ways to keep an arbitrarily ordered list of different knob types, but none of
 them are quite as simple or easy to maintain. Unfortunately, this implementation uses both heap
 allocated <code>Box</code>es and dynamic dispatch, which will have performance implications.</p>
@@ -66,23 +66,23 @@ allocated <code>Box</code>es and dynamic dispatch, which will have performance i
 <code>LogarithmicKnob</code> as a variant, and also implements <code>KnobControl</code> by matching on itself and
 delegating calls to its variants. This would look like the following:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">enum</span> <span class="ident">Knob</span> {
-    <span class="ident">Linear</span>(<span class="ident">LinearKnob</span>),
-    <span class="ident">Logarithmic</span>(<span class="ident">LogarithmicKnob</span>),
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">enum </span>Knob {
+    Linear(LinearKnob),
+    Logarithmic(LogarithmicKnob),
 }
 
-<span class="kw">impl</span> <span class="ident">KnobControl</span> <span class="kw">for</span> <span class="ident">Knob</span> {
-    <span class="kw">fn</span> <span class="ident">set_position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Knob::Linear</span>(<span class="ident">inner_knob</span>) =&gt; <span class="ident">inner_knob</span>.<span class="ident">set_position</span>(<span class="ident">value</span>),
-            <span class="ident">Knob::Logarithmic</span>(<span class="ident">inner_knob</span>) =&gt; <span class="ident">inner_knob</span>.<span class="ident">set_position</span>(<span class="ident">value</span>),
+<span class="kw">impl </span>KnobControl <span class="kw">for </span>Knob {
+    <span class="kw">fn </span>set_position(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: f64) {
+        <span class="kw">match </span><span class="self">self </span>{
+            Knob::Linear(inner_knob) =&gt; inner_knob.set_position(value),
+            Knob::Logarithmic(inner_knob) =&gt; inner_knob.set_position(value),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Knob::Linear</span>(<span class="ident">inner_knob</span>) =&gt; <span class="ident">inner_knob</span>.<span class="ident">get_value</span>(),
-            <span class="ident">Knob::Logarithmic</span>(<span class="ident">inner_knob</span>) =&gt; <span class="ident">inner_knob</span>.<span class="ident">get_value</span>(),
+    <span class="kw">fn </span>get_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+        <span class="kw">match </span><span class="self">self </span>{
+            Knob::Linear(inner_knob) =&gt; inner_knob.get_value(),
+            Knob::Logarithmic(inner_knob) =&gt; inner_knob.get_value(),
         }
     }
 }</code></pre></div>
@@ -97,24 +97,24 @@ methods? Even worse, what happens when we do both!</p>
 generation. The <code>enum_dispatch</code> macro can do the automatic generation for you. Examine the code
 to generate the same implementation when using <code>enum_dispatch</code>.</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">enum_dispatch</span>]</span>
-<span class="kw">trait</span> <span class="ident">KnobControl</span> {
-    <span class="comment">//...</span>
-}
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[enum_dispatch]
+</span><span class="kw">trait </span>KnobControl {
+    <span class="comment">//...
+</span>}
 
-<span class="attribute">#[<span class="ident">enum_dispatch</span>(<span class="ident">KnobControl</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Knob</span> {
-    <span class="ident">LinearKnob</span>,
-    <span class="ident">LogarithmicKnob</span>,
+<span class="attribute">#[enum_dispatch(KnobControl)]
+</span><span class="kw">enum </span>Knob {
+    LinearKnob,
+    LogarithmicKnob,
 }</code></pre></div>
 <p>That’s it. <code>enum_dispatch</code> will also automatically generate implementations of
 <code>std::convert::From</code> for each enum variant, so that new <code>Knob</code>s can be created without concern
 for the names of each enum variant.</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> (<span class="ident">a_linear_knob</span>, <span class="ident">a_logarithmic_knob</span>) <span class="op">=</span> <span class="ident">some_existing_knobs</span>();
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>(a_linear_knob, a_logarithmic_knob) = some_existing_knobs();
 
-<span class="kw">let</span> <span class="ident">knob</span> <span class="op">=</span> <span class="ident">Knob::from</span>(<span class="ident">a_linear_knob</span>);
-<span class="kw">let</span> <span class="ident">knob</span> <span class="op">=</span> <span class="ident">Knob::from</span>(<span class="ident">a_logarithmic_knob</span>);</code></pre></div>
+<span class="kw">let </span>knob = Knob::from(a_linear_knob);
+<span class="kw">let </span>knob = Knob::from(a_logarithmic_knob);</code></pre></div>
 <h2 id="performance"><a href="#performance">Performance</a></h2>
 <p>The <code>benches</code> directory contains three benchmarks of different natures, each comparing four
 different methods of accessing a traited struct of an arbitrary type. The four methods are as
@@ -164,6 +164,5 @@ where <code>enum_dispatch</code> really shines. Since a <code>Vec</code> of <cod
 other techniques. Add that to the lack of vtable accesses, and we have a result that is 10
 times faster than the closest alternative, and almost 12 times faster than the best technique
 from the standard library.</p>
-</div></details><h2 id="attributes" class="small-section-header"><a href="#attributes">Attribute Macros</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.enum_dispatch.html" title="enum_dispatch::enum_dispatch attr">enum_dispatch</a></div><div class="item-right docblock-short"><p>Annotating a trait or enum definition with an <code>#[enum_dispatch]</code> attribute will register it
-with the enum_dispatch library, allowing it to be used to generate impl blocks elsewhere.</p>
-</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="enum_dispatch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</div></details><h2 id="attributes" class="small-section-header"><a href="#attributes">Attribute Macros</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.enum_dispatch.html" title="enum_dispatch::enum_dispatch attr">enum_dispatch</a></div><div class="item-right docblock-short">Annotating a trait or enum definition with an <code>#[enum_dispatch]</code> attribute will register it
+with the enum_dispatch library, allowing it to be used to generate impl blocks elsewhere.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="enum_dispatch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

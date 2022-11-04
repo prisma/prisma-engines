@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/conn/binlog_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>binlog_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/conn/binlog_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>binlog_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -118,125 +118,125 @@
 <span id="118">118</span>
 <span id="119">119</span>
 <span id="120">120</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">futures_core::ready</span>;
-<span class="kw">use</span> <span class="ident">mysql_common</span>::{
-    <span class="ident">binlog</span>::{
-        <span class="ident">consts::BinlogVersion::Version4</span>,
-        <span class="ident">events</span>::{<span class="ident">Event</span>, <span class="ident">TableMapEvent</span>},
-        <span class="ident">EventStreamReader</span>,
+</span><span class="kw">use </span>futures_core::ready;
+<span class="kw">use </span>mysql_common::{
+    binlog::{
+        consts::BinlogVersion::Version4,
+        events::{Event, TableMapEvent},
+        EventStreamReader,
     },
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">packets</span>::{<span class="ident">ErrPacket</span>, <span class="ident">NetworkStreamTerminator</span>, <span class="ident">OkPacketDeserializer</span>},
+    io::ParseBuf,
+    packets::{ErrPacket, NetworkStreamTerminator, OkPacketDeserializer},
 };
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">future::Future</span>,
-    <span class="ident">io::ErrorKind</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+<span class="kw">use </span>std::{
+    future::Future,
+    io::ErrorKind,
+    pin::Pin,
+    task::{Context, Poll},
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connection_like::Connection</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::DriverError</span>, <span class="ident">io::ReadPacket</span>, <span class="ident">Conn</span>, <span class="ident">Error</span>, <span class="ident">IoError</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span><span class="kw">crate</span>::connection_like::Connection;
+<span class="kw">use crate</span>::{error::DriverError, io::ReadPacket, Conn, Error, IoError, <span class="prelude-ty">Result</span>};
 
-<span class="doccomment">/// Binlog event stream.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Stream initialization is lazy, i.e. binlog won&#39;t be requested until this stream is polled.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinlogStream</span> {
-    <span class="ident">read_packet</span>: <span class="ident">ReadPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="ident">esr</span>: <span class="ident">EventStreamReader</span>,
+<span class="doccomment">/// Binlog event stream.
+///
+/// Stream initialization is lazy, i.e. binlog won&#39;t be requested until this stream is polled.
+</span><span class="kw">pub struct </span>BinlogStream {
+    read_packet: ReadPacket&lt;<span class="lifetime">&#39;static</span>, <span class="lifetime">&#39;static</span>&gt;,
+    esr: EventStreamReader,
 }
 
-<span class="kw">impl</span> <span class="ident">BinlogStream</span> {
-    <span class="doccomment">/// `conn` is a `Conn` with `request_binlog` executed on it.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="ident">Conn</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">BinlogStream</span> {
-            <span class="ident">read_packet</span>: <span class="ident">ReadPacket::new</span>(<span class="ident">conn</span>),
-            <span class="ident">esr</span>: <span class="ident">EventStreamReader::new</span>(<span class="ident">Version4</span>),
+<span class="kw">impl </span>BinlogStream {
+    <span class="doccomment">/// `conn` is a `Conn` with `request_binlog` executed on it.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(conn: Conn) -&gt; <span class="self">Self </span>{
+        BinlogStream {
+            read_packet: ReadPacket::new(conn),
+            esr: EventStreamReader::new(Version4),
         }
     }
 
-    <span class="doccomment">/// Returns a table map event for the given table id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_tme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">TableMapEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">esr</span>.<span class="ident">get_tme</span>(<span class="ident">table_id</span>)
+    <span class="doccomment">/// Returns a table map event for the given table id.
+    </span><span class="kw">pub fn </span>get_tme(<span class="kw-2">&amp;</span><span class="self">self</span>, table_id: u64) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>TableMapEvent&lt;<span class="lifetime">&#39;static</span>&gt;&gt; {
+        <span class="self">self</span>.esr.get_tme(table_id)
     }
 
-    <span class="doccomment">/// Closes the stream&#39;s `Conn`. Additionally, the connection is dropped, so its associated</span>
-    <span class="doccomment">/// pool (if any) will regain a connection slot.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">read_packet</span>.<span class="number">0</span> {
-            <span class="comment">// `close_conn` requires ownership of `Conn`. That&#39;s okay, because</span>
-            <span class="comment">// `BinLogStream`&#39;s connection is always owned.</span>
-            <span class="ident">Connection::Conn</span>(<span class="ident">conn</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Io</span>(<span class="ident">IoError::Io</span>(<span class="kw-2">ref</span> <span class="ident">error</span>))) <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">close_conn</span>().<span class="kw">await</span> {
-                    <span class="comment">// If the binlog was requested with the flag BINLOG_DUMP_NON_BLOCK,</span>
-                    <span class="comment">// the connection&#39;s file handler will already have been closed (EOF).</span>
-                    <span class="kw">if</span> <span class="ident">error</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">ErrorKind::BrokenPipe</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="doccomment">/// Closes the stream&#39;s `Conn`. Additionally, the connection is dropped, so its associated
+    /// pool (if any) will regain a connection slot.
+    </span><span class="kw">pub async fn </span>close(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self</span>.read_packet.<span class="number">0 </span>{
+            <span class="comment">// `close_conn` requires ownership of `Conn`. That&#39;s okay, because
+            // `BinLogStream`&#39;s connection is always owned.
+            </span>Connection::Conn(conn) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Err</span>(Error::Io(IoError::Io(<span class="kw-2">ref </span>error))) = conn.close_conn().<span class="kw">await </span>{
+                    <span class="comment">// If the binlog was requested with the flag BINLOG_DUMP_NON_BLOCK,
+                    // the connection&#39;s file handler will already have been closed (EOF).
+                    </span><span class="kw">if </span>error.kind() == ErrorKind::BrokenPipe {
+                        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                     }
                 }
             }
-            <span class="ident">Connection::ConnMut</span>(<span class="kw">_</span>) =&gt; {}
-            <span class="ident">Connection::Tx</span>(<span class="kw">_</span>) =&gt; {}
+            Connection::ConnMut(<span class="kw">_</span>) =&gt; {}
+            Connection::Tx(<span class="kw">_</span>) =&gt; {}
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">futures_core::stream::Stream</span> <span class="kw">for</span> <span class="ident">BinlogStream</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>futures_core::stream::Stream <span class="kw">for </span>BinlogStream {
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;Event&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">read_packet</span>).<span class="ident">poll</span>(<span class="ident">cx</span>)) {
-            <span class="prelude-val">Ok</span>(<span class="ident">packet</span>) =&gt; <span class="ident">packet</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()))),
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span>packet = <span class="kw">match </span><span class="macro">ready!</span>(Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.read_packet).poll(cx)) {
+            <span class="prelude-val">Ok</span>(packet) =&gt; packet,
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err.into()))),
         };
 
-        <span class="kw">let</span> <span class="ident">first_byte</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">copied</span>();
+        <span class="kw">let </span>first_byte = packet.get(<span class="number">0</span>).copied();
 
-        <span class="kw">if</span> <span class="ident">first_byte</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="number">255</span>) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ErrPacket::Error</span>(<span class="ident">err</span>)) <span class="op">=</span>
-                <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">packet</span>).<span class="ident">parse</span>(<span class="self">self</span>.<span class="ident">read_packet</span>.<span class="ident">conn_ref</span>().<span class="ident">capabilities</span>())
+        <span class="kw">if </span>first_byte == <span class="prelude-val">Some</span>(<span class="number">255</span>) {
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(ErrPacket::Error(err)) =
+                ParseBuf(<span class="kw-2">&amp;*</span>packet).parse(<span class="self">self</span>.read_packet.conn_ref().capabilities())
             {
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">From::from</span>(<span class="ident">err</span>))));
+                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(From::from(err))));
             }
         }
 
-        <span class="kw">if</span> <span class="ident">first_byte</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="number">254</span>) <span class="op">&amp;&amp;</span> <span class="ident">packet</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">8</span> {
-            <span class="kw">if</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">packet</span>)
-                .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">OkPacketDeserializer</span><span class="op">&lt;</span><span class="ident">NetworkStreamTerminator</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-                    <span class="self">self</span>.<span class="ident">read_packet</span>.<span class="ident">conn_ref</span>().<span class="ident">capabilities</span>(),
+        <span class="kw">if </span>first_byte == <span class="prelude-val">Some</span>(<span class="number">254</span>) &amp;&amp; packet.len() &lt; <span class="number">8 </span>{
+            <span class="kw">if </span>ParseBuf(<span class="kw-2">&amp;*</span>packet)
+                .parse::&lt;OkPacketDeserializer&lt;NetworkStreamTerminator&gt;&gt;(
+                    <span class="self">self</span>.read_packet.conn_ref().capabilities(),
                 )
-                .<span class="ident">is_ok</span>()
+                .is_ok()
             {
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
+                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>);
             }
         }
 
-        <span class="kw">if</span> <span class="ident">first_byte</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="number">0</span>) {
-            <span class="kw">let</span> <span class="ident">event_data</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">packet</span>[<span class="number">1</span>..];
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">esr</span>.<span class="ident">read</span>(<span class="ident">event_data</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">event</span>) =&gt; {
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">event</span>)));
+        <span class="kw">if </span>first_byte == <span class="prelude-val">Some</span>(<span class="number">0</span>) {
+            <span class="kw">let </span>event_data = <span class="kw-2">&amp;</span>packet[<span class="number">1</span>..];
+            <span class="kw">match </span><span class="self">self</span>.esr.read(event_data) {
+                <span class="prelude-val">Ok</span>(event) =&gt; {
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(event)));
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()))),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err.into()))),
             }
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">DriverError::UnexpectedPacket</span> {
-                <span class="ident">payload</span>: <span class="ident">packet</span>.<span class="ident">to_vec</span>(),
+        } <span class="kw">else </span>{
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(DriverError::UnexpectedPacket {
+                payload: packet.to_vec(),
             }
-            .<span class="ident">into</span>())));
+            .into())));
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_ast/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_ast/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -99,106 +99,106 @@
 <span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">read</span>;
-<span class="kw">mod</span> <span class="ident">write</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>read;
+<span class="kw">mod </span>write;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">read</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">write</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>read::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>write::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">connector::filter::Filter</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelRef</span>, <span class="ident">SelectionResult</span>};
+<span class="kw">use </span>connector::filter::Filter;
+<span class="kw">use </span>prisma_models::{FieldSelection, ModelRef, SelectionResult};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Query</span> {
-    <span class="ident">Read</span>(<span class="ident">ReadQuery</span>),
-    <span class="ident">Write</span>(<span class="ident">WriteQuery</span>),
+<span class="attribute">#[derive(Debug, Clone)]
+#[allow(clippy::large_enum_variant)]
+</span><span class="kw">pub enum </span>Query {
+    Read(ReadQuery),
+    Write(WriteQuery),
 }
 
-<span class="kw">impl</span> <span class="ident">Query</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">returns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) =&gt; <span class="ident">rq</span>.<span class="ident">returns</span>(<span class="ident">fields</span>),
-            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) =&gt; <span class="ident">wq</span>.<span class="ident">returns</span>(<span class="ident">fields</span>),
+<span class="kw">impl </span>Query {
+    <span class="kw">pub fn </span>returns(<span class="kw-2">&amp;</span><span class="self">self</span>, fields: <span class="kw-2">&amp;</span>FieldSelection) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Read(rq) =&gt; rq.returns(fields),
+            <span class="self">Self</span>::Write(wq) =&gt; wq.returns(fields),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelRef</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) =&gt; <span class="ident">rq</span>.<span class="ident">model</span>(),
-            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) =&gt; <span class="ident">wq</span>.<span class="ident">model</span>(),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">FilteredQuery</span> <span class="kw">for</span> <span class="ident">Query</span> {
-    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) =&gt; <span class="ident">rq</span>.<span class="ident">get_filter</span>(),
-            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) =&gt; <span class="ident">wq</span>.<span class="ident">get_filter</span>(),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">set_filter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">Filter</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) =&gt; <span class="ident">rq</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
-            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) =&gt; <span class="ident">wq</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
+    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Read(rq) =&gt; rq.model(),
+            <span class="self">Self</span>::Write(wq) =&gt; wq.model(),
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FilteredQuery</span> {
-    <span class="kw">fn</span> <span class="ident">add_filter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>)
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>FilteredQuery <span class="kw">for </span>Query {
+    <span class="kw">fn </span>get_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Filter&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Read(rq) =&gt; rq.get_filter(),
+            <span class="self">Self</span>::Write(wq) =&gt; wq.get_filter(),
+        }
+    }
+
+    <span class="kw">fn </span>set_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filter: Filter) {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Read(rq) =&gt; rq.set_filter(filter),
+            <span class="self">Self</span>::Write(wq) =&gt; wq.set_filter(filter),
+        }
+    }
+}
+
+<span class="kw">pub trait </span>FilteredQuery {
+    <span class="kw">fn </span>add_filter&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filter: T)
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;,
     {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">existing_filter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_filter</span>();
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">existing_filter</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">Filter::And</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>)) =&gt; {
-                <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">filter</span>);
-                <span class="prelude-val">None</span>
-            }
-            <span class="prelude-val">Some</span>(<span class="ident">Filter::Or</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>)) =&gt; {
-                <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">filter</span>);
-                <span class="prelude-val">None</span>
-            }
-            <span class="prelude-val">Some</span>(<span class="ident">Filter::Not</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>)) =&gt; {
-                <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">filter</span>);
-                <span class="prelude-val">None</span>
-            }
-            <span class="prelude-val">Some</span>(<span class="ident">Filter::Empty</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">filter</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::default_filter_behaviour</span>(<span class="macro">vec!</span>[<span class="ident">other</span>.<span class="ident">clone</span>(), <span class="ident">filter</span>])),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">filter</span>),
+        <span class="kw">let </span>filter = filter.into();
+        <span class="kw">let </span>existing_filter = <span class="self">self</span>.get_filter();
+        <span class="kw">let </span>filter = <span class="kw">match </span>existing_filter {
+            <span class="prelude-val">Some</span>(Filter::And(<span class="kw-2">ref mut </span>v)) =&gt; {
+                v.push(filter);
+                <span class="prelude-val">None
+            </span>}
+            <span class="prelude-val">Some</span>(Filter::Or(<span class="kw-2">ref mut </span>v)) =&gt; {
+                v.push(filter);
+                <span class="prelude-val">None
+            </span>}
+            <span class="prelude-val">Some</span>(Filter::Not(<span class="kw-2">ref mut </span>v)) =&gt; {
+                v.push(filter);
+                <span class="prelude-val">None
+            </span>}
+            <span class="prelude-val">Some</span>(Filter::Empty) =&gt; <span class="prelude-val">Some</span>(filter),
+            <span class="prelude-val">Some</span>(other) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::default_filter_behaviour(<span class="macro">vec!</span>[other.clone(), filter])),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(filter),
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span> <span class="ident">filter</span> {
-            <span class="self">self</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(filter) = filter {
+            <span class="self">self</span>.set_filter(filter);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">Filter</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">set_filter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">Filter</span>);
+    <span class="kw">fn </span>get_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Filter&gt;;
+    <span class="kw">fn </span>set_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filter: Filter);
 
-    <span class="kw">fn</span> <span class="ident">default_filter_behaviour</span>(<span class="ident">inner_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span> {
-        <span class="ident">Filter::Or</span>(<span class="ident">inner_filters</span>)
+    <span class="kw">fn </span>default_filter_behaviour(inner_filters: Vec&lt;Filter&gt;) -&gt; Filter {
+        Filter::Or(inner_filters)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FilteredNestedMutation</span> {
-    <span class="doccomment">/// Sets the parent id of a nested mutation.</span>
-    <span class="doccomment">/// This indicates the connector that it doesn&#39;t need to refetch the child and that the mutation</span>
-    <span class="doccomment">/// can directly be performed using that id.</span>
-    <span class="kw">fn</span> <span class="ident">set_selectors</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">selectors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>);
+<span class="kw">pub trait </span>FilteredNestedMutation {
+    <span class="doccomment">/// Sets the parent id of a nested mutation.
+    /// This indicates the connector that it doesn&#39;t need to refetch the child and that the mutation
+    /// can directly be performed using that id.
+    </span><span class="kw">fn </span>set_selectors(<span class="kw-2">&amp;mut </span><span class="self">self</span>, selectors: Vec&lt;SelectionResult&gt;);
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Query</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">q</span>),
-            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">q</span>),
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>Query {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Read(q) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, q),
+            <span class="self">Self</span>::Write(q) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, q),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

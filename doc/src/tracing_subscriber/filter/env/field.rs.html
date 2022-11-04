@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/env/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/env/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -626,631 +626,631 @@
 <span id="624">624</span>
 <span id="625">625</span>
 <span id="626">626</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">matchers::Pattern</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">cmp::Ordering</span>,
-    <span class="ident">error::Error</span>,
-    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>},
-    <span class="ident">str::FromStr</span>,
-    <span class="ident">sync</span>::{
-        <span class="ident">atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>::<span class="kw-2">*</span>},
-        <span class="ident">Arc</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>matchers::Pattern;
+<span class="kw">use </span>std::{
+    cmp::Ordering,
+    error::Error,
+    fmt::{<span class="self">self</span>, Write},
+    str::FromStr,
+    sync::{
+        atomic::{AtomicBool, Ordering::<span class="kw-2">*</span>},
+        Arc,
     },
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FieldMap</span>, <span class="ident">LevelFilter</span>};
-<span class="kw">use</span> <span class="ident">tracing_core::field</span>::{<span class="ident">Field</span>, <span class="ident">Visit</span>};
+<span class="kw">use super</span>::{FieldMap, LevelFilter};
+<span class="kw">use </span>tracing_core::field::{Field, Visit};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Match</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">name</span>: <span class="ident">String</span>, <span class="comment">// TODO: allow match patterns for names?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValueMatch</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Eq, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Match {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) name: String, <span class="comment">// TODO: allow match patterns for names?
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) value: <span class="prelude-ty">Option</span>&lt;ValueMatch&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CallsiteMatch</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="ident">FieldMap</span><span class="op">&lt;</span><span class="ident">ValueMatch</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">level</span>: <span class="ident">LevelFilter</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CallsiteMatch {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: FieldMap&lt;ValueMatch&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) level: LevelFilter,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">SpanMatch</span> {
-    <span class="ident">fields</span>: <span class="ident">FieldMap</span><span class="op">&lt;</span>(<span class="ident">ValueMatch</span>, <span class="ident">AtomicBool</span>)<span class="op">&gt;</span>,
-    <span class="ident">level</span>: <span class="ident">LevelFilter</span>,
-    <span class="ident">has_matched</span>: <span class="ident">AtomicBool</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SpanMatch {
+    fields: FieldMap&lt;(ValueMatch, AtomicBool)&gt;,
+    level: LevelFilter,
+    has_matched: AtomicBool,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MatchVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SpanMatch</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MatchVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    inner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SpanMatch,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ValueMatch</span> {
-    <span class="doccomment">/// Matches a specific `bool` value.</span>
-    <span class="ident">Bool</span>(<span class="ident">bool</span>),
-    <span class="doccomment">/// Matches a specific `f64` value.</span>
-    <span class="ident">F64</span>(<span class="ident">f64</span>),
-    <span class="doccomment">/// Matches a specific `u64` value.</span>
-    <span class="ident">U64</span>(<span class="ident">u64</span>),
-    <span class="doccomment">/// Matches a specific `i64` value.</span>
-    <span class="ident">I64</span>(<span class="ident">i64</span>),
-    <span class="doccomment">/// Matches any `NaN` `f64` value.</span>
-    <span class="ident">NaN</span>,
-    <span class="doccomment">/// Matches any field whose `fmt::Debug` output is equal to a fixed string.</span>
-    <span class="ident">Debug</span>(<span class="ident">MatchDebug</span>),
-    <span class="doccomment">/// Matches any field whose `fmt::Debug` output matches a regular expression</span>
-    <span class="doccomment">/// pattern.</span>
-    <span class="ident">Pat</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">MatchPattern</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ValueMatch {
+    <span class="doccomment">/// Matches a specific `bool` value.
+    </span>Bool(bool),
+    <span class="doccomment">/// Matches a specific `f64` value.
+    </span>F64(f64),
+    <span class="doccomment">/// Matches a specific `u64` value.
+    </span>U64(u64),
+    <span class="doccomment">/// Matches a specific `i64` value.
+    </span>I64(i64),
+    <span class="doccomment">/// Matches any `NaN` `f64` value.
+    </span>NaN,
+    <span class="doccomment">/// Matches any field whose `fmt::Debug` output is equal to a fixed string.
+    </span>Debug(MatchDebug),
+    <span class="doccomment">/// Matches any field whose `fmt::Debug` output matches a regular expression
+    /// pattern.
+    </span>Pat(Box&lt;MatchPattern&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">ValueMatch</span> {}
+<span class="kw">impl </span>Eq <span class="kw">for </span>ValueMatch {}
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">ValueMatch</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">use</span> <span class="ident">ValueMatch</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident">Bool</span>(<span class="ident">a</span>), <span class="ident">Bool</span>(<span class="ident">b</span>)) =&gt; <span class="ident">a</span>.<span class="ident">eq</span>(<span class="ident">b</span>),
-            (<span class="ident">F64</span>(<span class="ident">a</span>), <span class="ident">F64</span>(<span class="ident">b</span>)) =&gt; {
-                <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">a</span>.<span class="ident">is_nan</span>());
-                <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">b</span>.<span class="ident">is_nan</span>());
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>ValueMatch {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">use </span>ValueMatch::<span class="kw-2">*</span>;
+        <span class="kw">match </span>(<span class="self">self</span>, other) {
+            (Bool(a), Bool(b)) =&gt; a.eq(b),
+            (F64(a), F64(b)) =&gt; {
+                <span class="macro">debug_assert!</span>(!a.is_nan());
+                <span class="macro">debug_assert!</span>(!b.is_nan());
 
-                <span class="ident">a</span>.<span class="ident">eq</span>(<span class="ident">b</span>)
+                a.eq(b)
             }
-            (<span class="ident">U64</span>(<span class="ident">a</span>), <span class="ident">U64</span>(<span class="ident">b</span>)) =&gt; <span class="ident">a</span>.<span class="ident">eq</span>(<span class="ident">b</span>),
-            (<span class="ident">I64</span>(<span class="ident">a</span>), <span class="ident">I64</span>(<span class="ident">b</span>)) =&gt; <span class="ident">a</span>.<span class="ident">eq</span>(<span class="ident">b</span>),
-            (<span class="ident">NaN</span>, <span class="ident">NaN</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="ident">Pat</span>(<span class="ident">a</span>), <span class="ident">Pat</span>(<span class="ident">b</span>)) =&gt; <span class="ident">a</span>.<span class="ident">eq</span>(<span class="ident">b</span>),
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+            (U64(a), U64(b)) =&gt; a.eq(b),
+            (I64(a), I64(b)) =&gt; a.eq(b),
+            (NaN, NaN) =&gt; <span class="bool-val">true</span>,
+            (Pat(a), Pat(b)) =&gt; a.eq(b),
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">ValueMatch</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="kw">use</span> <span class="ident">ValueMatch</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident">Bool</span>(<span class="ident">this</span>), <span class="ident">Bool</span>(<span class="ident">that</span>)) =&gt; <span class="ident">this</span>.<span class="ident">cmp</span>(<span class="ident">that</span>),
-            (<span class="ident">Bool</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="ident">Ordering::Less</span>,
+<span class="kw">impl </span>Ord <span class="kw">for </span>ValueMatch {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="kw">use </span>ValueMatch::<span class="kw-2">*</span>;
+        <span class="kw">match </span>(<span class="self">self</span>, other) {
+            (Bool(this), Bool(that)) =&gt; this.cmp(that),
+            (Bool(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; Ordering::Less,
 
-            (<span class="ident">F64</span>(<span class="ident">this</span>), <span class="ident">F64</span>(<span class="ident">that</span>)) =&gt; <span class="ident">this</span>
-                .<span class="ident">partial_cmp</span>(<span class="ident">that</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;`ValueMatch::F64` may not contain `NaN` values&quot;</span>),
-            (<span class="ident">F64</span>(<span class="kw">_</span>), <span class="ident">Bool</span>(<span class="kw">_</span>)) =&gt; <span class="ident">Ordering::Greater</span>,
-            (<span class="ident">F64</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="ident">Ordering::Less</span>,
+            (F64(this), F64(that)) =&gt; this
+                .partial_cmp(that)
+                .expect(<span class="string">&quot;`ValueMatch::F64` may not contain `NaN` values&quot;</span>),
+            (F64(<span class="kw">_</span>), Bool(<span class="kw">_</span>)) =&gt; Ordering::Greater,
+            (F64(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; Ordering::Less,
 
-            (<span class="ident">NaN</span>, <span class="ident">NaN</span>) =&gt; <span class="ident">Ordering::Equal</span>,
-            (<span class="ident">NaN</span>, <span class="ident">Bool</span>(<span class="kw">_</span>)) <span class="op">|</span> (<span class="ident">NaN</span>, <span class="ident">F64</span>(<span class="kw">_</span>)) =&gt; <span class="ident">Ordering::Greater</span>,
-            (<span class="ident">NaN</span>, <span class="kw">_</span>) =&gt; <span class="ident">Ordering::Less</span>,
+            (NaN, NaN) =&gt; Ordering::Equal,
+            (NaN, Bool(<span class="kw">_</span>)) | (NaN, F64(<span class="kw">_</span>)) =&gt; Ordering::Greater,
+            (NaN, <span class="kw">_</span>) =&gt; Ordering::Less,
 
-            (<span class="ident">U64</span>(<span class="ident">this</span>), <span class="ident">U64</span>(<span class="ident">that</span>)) =&gt; <span class="ident">this</span>.<span class="ident">cmp</span>(<span class="ident">that</span>),
-            (<span class="ident">U64</span>(<span class="kw">_</span>), <span class="ident">Bool</span>(<span class="kw">_</span>)) <span class="op">|</span> (<span class="ident">U64</span>(<span class="kw">_</span>), <span class="ident">F64</span>(<span class="kw">_</span>)) <span class="op">|</span> (<span class="ident">U64</span>(<span class="kw">_</span>), <span class="ident">NaN</span>) =&gt; <span class="ident">Ordering::Greater</span>,
-            (<span class="ident">U64</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="ident">Ordering::Less</span>,
+            (U64(this), U64(that)) =&gt; this.cmp(that),
+            (U64(<span class="kw">_</span>), Bool(<span class="kw">_</span>)) | (U64(<span class="kw">_</span>), F64(<span class="kw">_</span>)) | (U64(<span class="kw">_</span>), NaN) =&gt; Ordering::Greater,
+            (U64(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; Ordering::Less,
 
-            (<span class="ident">I64</span>(<span class="ident">this</span>), <span class="ident">I64</span>(<span class="ident">that</span>)) =&gt; <span class="ident">this</span>.<span class="ident">cmp</span>(<span class="ident">that</span>),
-            (<span class="ident">I64</span>(<span class="kw">_</span>), <span class="ident">Bool</span>(<span class="kw">_</span>)) <span class="op">|</span> (<span class="ident">I64</span>(<span class="kw">_</span>), <span class="ident">F64</span>(<span class="kw">_</span>)) <span class="op">|</span> (<span class="ident">I64</span>(<span class="kw">_</span>), <span class="ident">NaN</span>) <span class="op">|</span> (<span class="ident">I64</span>(<span class="kw">_</span>), <span class="ident">U64</span>(<span class="kw">_</span>)) =&gt; {
-                <span class="ident">Ordering::Greater</span>
+            (I64(this), I64(that)) =&gt; this.cmp(that),
+            (I64(<span class="kw">_</span>), Bool(<span class="kw">_</span>)) | (I64(<span class="kw">_</span>), F64(<span class="kw">_</span>)) | (I64(<span class="kw">_</span>), NaN) | (I64(<span class="kw">_</span>), U64(<span class="kw">_</span>)) =&gt; {
+                Ordering::Greater
             }
-            (<span class="ident">I64</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="ident">Ordering::Less</span>,
+            (I64(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; Ordering::Less,
 
-            (<span class="ident">Pat</span>(<span class="ident">this</span>), <span class="ident">Pat</span>(<span class="ident">that</span>)) =&gt; <span class="ident">this</span>.<span class="ident">cmp</span>(<span class="ident">that</span>),
-            (<span class="ident">Pat</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="ident">Ordering::Greater</span>,
+            (Pat(this), Pat(that)) =&gt; this.cmp(that),
+            (Pat(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; Ordering::Greater,
 
-            (<span class="ident">Debug</span>(<span class="ident">this</span>), <span class="ident">Debug</span>(<span class="ident">that</span>)) =&gt; <span class="ident">this</span>.<span class="ident">cmp</span>(<span class="ident">that</span>),
-            (<span class="ident">Debug</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="ident">Ordering::Greater</span>,
+            (Debug(this), Debug(that)) =&gt; this.cmp(that),
+            (Debug(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; Ordering::Greater,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">ValueMatch</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>ValueMatch {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="doccomment">/// Matches a field&#39;s `fmt::Debug` output against a regular expression pattern.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is used for matching all non-literal field value filters when regular</span>
-<span class="doccomment">/// expressions are enabled.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MatchPattern</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">matcher</span>: <span class="ident">Pattern</span>,
-    <span class="ident">pattern</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Matches a field&#39;s `fmt::Debug` output against a regular expression pattern.
+///
+/// This is used for matching all non-literal field value filters when regular
+/// expressions are enabled.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MatchPattern {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) matcher: Pattern,
+    pattern: Arc&lt;str&gt;,
 }
 
-<span class="doccomment">/// Matches a field&#39;s `fmt::Debug` output against a fixed string pattern.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is used for matching all non-literal field value filters when regular</span>
-<span class="doccomment">/// expressions are disabled.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MatchDebug</span> {
-    <span class="ident">pattern</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Matches a field&#39;s `fmt::Debug` output against a fixed string pattern.
+///
+/// This is used for matching all non-literal field value filters when regular
+/// expressions are disabled.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MatchDebug {
+    pattern: Arc&lt;str&gt;,
 }
 
-<span class="doccomment">/// Indicates that a field name specified in a filter directive was invalid.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;env-filter&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BadName</span> {
-    <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Indicates that a field name specified in a filter directive was invalid.
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;env-filter&quot;</span>)))]
+</span><span class="kw">pub struct </span>BadName {
+    name: String,
 }
 
-<span class="comment">// === impl Match ===</span>
+<span class="comment">// === impl Match ===
 
-<span class="kw">impl</span> <span class="ident">Match</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">is_some</span>()
+</span><span class="kw">impl </span>Match {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.value.is_some()
     }
 
-    <span class="comment">// TODO: reference count these strings?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()
+    <span class="comment">// TODO: reference count these strings?
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.name.clone()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">regex</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;=&#39;</span>);
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">parts</span>
-            .<span class="ident">next</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">BadName</span> {
-                <span class="ident">name</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-            })<span class="question-mark">?</span>
-            <span class="comment">// TODO: validate field name</span>
-            .<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">parts</span>
-            .<span class="ident">next</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">part</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">regex</span> {
-                <span class="bool-val">true</span> =&gt; <span class="ident">ValueMatch::parse_regex</span>(<span class="ident">part</span>),
-                <span class="bool-val">false</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ValueMatch::parse_non_regex</span>(<span class="ident">part</span>)),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(s: <span class="kw-2">&amp;</span>str, regex: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Box&lt;<span class="kw">dyn </span>Error + Send + Sync&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>parts = s.split(<span class="string">&#39;=&#39;</span>);
+        <span class="kw">let </span>name = parts
+            .next()
+            .ok_or_else(|| BadName {
+                name: <span class="string">&quot;&quot;</span>.to_string(),
+            })<span class="question-mark">?
+            </span><span class="comment">// TODO: validate field name
+            </span>.to_string();
+        <span class="kw">let </span>value = parts
+            .next()
+            .map(|part| <span class="kw">match </span>regex {
+                <span class="bool-val">true </span>=&gt; ValueMatch::parse_regex(part),
+                <span class="bool-val">false </span>=&gt; <span class="prelude-val">Ok</span>(ValueMatch::parse_non_regex(part)),
             })
-            .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">Match</span> { <span class="ident">name</span>, <span class="ident">value</span> })
+            .transpose()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(Match { name, value })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Match</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;={}&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Match {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.name, f)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>value) = <span class="self">self</span>.value {
+            <span class="macro">write!</span>(f, <span class="string">&quot;={}&quot;</span>, value)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Match</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="comment">// Ordering for `Match` directives is based first on _whether_ a value</span>
-        <span class="comment">// is matched or not. This is semantically meaningful --- we would</span>
-        <span class="comment">// prefer to check directives that match values first as they are more</span>
-        <span class="comment">// specific.</span>
-        <span class="kw">let</span> <span class="ident">has_value</span> <span class="op">=</span> <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_ref</span>(), <span class="ident">other</span>.<span class="ident">value</span>.<span class="ident">as_ref</span>()) {
-            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">Ordering::Greater</span>,
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="ident">Ordering::Less</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">Ordering::Equal</span>,
+<span class="kw">impl </span>Ord <span class="kw">for </span>Match {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="comment">// Ordering for `Match` directives is based first on _whether_ a value
+        // is matched or not. This is semantically meaningful --- we would
+        // prefer to check directives that match values first as they are more
+        // specific.
+        </span><span class="kw">let </span>has_value = <span class="kw">match </span>(<span class="self">self</span>.value.as_ref(), other.value.as_ref()) {
+            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; Ordering::Greater,
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; Ordering::Less,
+            <span class="kw">_ </span>=&gt; Ordering::Equal,
         };
-        <span class="comment">// If both directives match a value, we fall back to the field names in</span>
-        <span class="comment">// length + lexicographic ordering, and if these are equal as well, we</span>
-        <span class="comment">// compare the match directives.</span>
-        <span class="comment">//</span>
-        <span class="comment">// This ordering is no longer semantically meaningful but is necessary</span>
-        <span class="comment">// so that the directives can be stored in the `BTreeMap` in a defined</span>
-        <span class="comment">// order.</span>
-        <span class="ident">has_value</span>
-            .<span class="ident">then_with</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">name</span>))
-            .<span class="ident">then_with</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">value</span>))
+        <span class="comment">// If both directives match a value, we fall back to the field names in
+        // length + lexicographic ordering, and if these are equal as well, we
+        // compare the match directives.
+        //
+        // This ordering is no longer semantically meaningful but is necessary
+        // so that the directives can be stored in the `BTreeMap` in a defined
+        // order.
+        </span>has_value
+            .then_with(|| <span class="self">self</span>.name.cmp(<span class="kw-2">&amp;</span>other.name))
+            .then_with(|| <span class="self">self</span>.value.cmp(<span class="kw-2">&amp;</span>other.value))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Match</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>Match {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="comment">// === impl ValueMatch ===</span>
+<span class="comment">// === impl ValueMatch ===
 
-<span class="kw">fn</span> <span class="ident">value_match_f64</span>(<span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="ident">ValueMatch</span> {
-    <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_nan</span>() {
-        <span class="ident">ValueMatch::NaN</span>
-    } <span class="kw">else</span> {
-        <span class="ident">ValueMatch::F64</span>(<span class="ident">v</span>)
+</span><span class="kw">fn </span>value_match_f64(v: f64) -&gt; ValueMatch {
+    <span class="kw">if </span>v.is_nan() {
+        ValueMatch::NaN
+    } <span class="kw">else </span>{
+        ValueMatch::F64(v)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ValueMatch</span> {
-    <span class="doccomment">/// Parse a `ValueMatch` that will match `fmt::Debug` fields using regular</span>
-    <span class="doccomment">/// expressions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This returns an error if the string didn&#39;t contain a valid `bool`,</span>
-    <span class="doccomment">/// `u64`, `i64`, or `f64` literal, and couldn&#39;t be parsed as a regular</span>
-    <span class="doccomment">/// expression.</span>
-    <span class="kw">fn</span> <span class="ident">parse_regex</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">matchers::Error</span><span class="op">&gt;</span> {
-        <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>()
-            .<span class="ident">map</span>(<span class="ident">ValueMatch::Bool</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">ValueMatch::U64</span>))
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">ValueMatch::I64</span>))
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">value_match_f64</span>))
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">MatchPattern</span><span class="op">&gt;</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">ValueMatch::Pat</span>(<span class="ident">Box::new</span>(<span class="ident">p</span>)))
+<span class="kw">impl </span>ValueMatch {
+    <span class="doccomment">/// Parse a `ValueMatch` that will match `fmt::Debug` fields using regular
+    /// expressions.
+    ///
+    /// This returns an error if the string didn&#39;t contain a valid `bool`,
+    /// `u64`, `i64`, or `f64` literal, and couldn&#39;t be parsed as a regular
+    /// expression.
+    </span><span class="kw">fn </span>parse_regex(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, matchers::Error&gt; {
+        s.parse::&lt;bool&gt;()
+            .map(ValueMatch::Bool)
+            .or_else(|<span class="kw">_</span>| s.parse::&lt;u64&gt;().map(ValueMatch::U64))
+            .or_else(|<span class="kw">_</span>| s.parse::&lt;i64&gt;().map(ValueMatch::I64))
+            .or_else(|<span class="kw">_</span>| s.parse::&lt;f64&gt;().map(value_match_f64))
+            .or_else(|<span class="kw">_</span>| {
+                s.parse::&lt;MatchPattern&gt;()
+                    .map(|p| ValueMatch::Pat(Box::new(p)))
             })
     }
 
-    <span class="doccomment">/// Parse a `ValueMatch` that will match `fmt::Debug` against a fixed</span>
-    <span class="doccomment">/// string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This does *not* return an error, because any string that isn&#39;t a valid</span>
-    <span class="doccomment">/// `bool`, `u64`, `i64`, or `f64` literal is treated as expected</span>
-    <span class="doccomment">/// `fmt::Debug` output.</span>
-    <span class="kw">fn</span> <span class="ident">parse_non_regex</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>()
-            .<span class="ident">map</span>(<span class="ident">ValueMatch::Bool</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">ValueMatch::U64</span>))
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">ValueMatch::I64</span>))
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">value_match_f64</span>))
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ValueMatch::Debug</span>(<span class="ident">MatchDebug::new</span>(<span class="ident">s</span>)))
+    <span class="doccomment">/// Parse a `ValueMatch` that will match `fmt::Debug` against a fixed
+    /// string.
+    ///
+    /// This does *not* return an error, because any string that isn&#39;t a valid
+    /// `bool`, `u64`, `i64`, or `f64` literal is treated as expected
+    /// `fmt::Debug` output.
+    </span><span class="kw">fn </span>parse_non_regex(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        s.parse::&lt;bool&gt;()
+            .map(ValueMatch::Bool)
+            .or_else(|<span class="kw">_</span>| s.parse::&lt;u64&gt;().map(ValueMatch::U64))
+            .or_else(|<span class="kw">_</span>| s.parse::&lt;i64&gt;().map(ValueMatch::I64))
+            .or_else(|<span class="kw">_</span>| s.parse::&lt;f64&gt;().map(value_match_f64))
+            .unwrap_or_else(|<span class="kw">_</span>| ValueMatch::Debug(MatchDebug::new(s)))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ValueMatch</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ValueMatch::Bool</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="ident">inner</span>, <span class="ident">f</span>),
-            <span class="ident">ValueMatch::F64</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="ident">inner</span>, <span class="ident">f</span>),
-            <span class="ident">ValueMatch::NaN</span> =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">std::f64::NAN</span>, <span class="ident">f</span>),
-            <span class="ident">ValueMatch::I64</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="ident">inner</span>, <span class="ident">f</span>),
-            <span class="ident">ValueMatch::U64</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="ident">inner</span>, <span class="ident">f</span>),
-            <span class="ident">ValueMatch::Debug</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="ident">inner</span>, <span class="ident">f</span>),
-            <span class="ident">ValueMatch::Pat</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="ident">inner</span>, <span class="ident">f</span>),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ValueMatch {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            ValueMatch::Bool(<span class="kw-2">ref </span>inner) =&gt; fmt::Display::fmt(inner, f),
+            ValueMatch::F64(<span class="kw-2">ref </span>inner) =&gt; fmt::Display::fmt(inner, f),
+            ValueMatch::NaN =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>std::f64::NAN, f),
+            ValueMatch::I64(<span class="kw-2">ref </span>inner) =&gt; fmt::Display::fmt(inner, f),
+            ValueMatch::U64(<span class="kw-2">ref </span>inner) =&gt; fmt::Display::fmt(inner, f),
+            ValueMatch::Debug(<span class="kw-2">ref </span>inner) =&gt; fmt::Display::fmt(inner, f),
+            ValueMatch::Pat(<span class="kw-2">ref </span>inner) =&gt; fmt::Display::fmt(inner, f),
         }
     }
 }
 
-<span class="comment">// === impl MatchPattern ===</span>
+<span class="comment">// === impl MatchPattern ===
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">MatchPattern</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">matchers::Error</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">matcher</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Pattern</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">matcher</span>,
-            <span class="ident">pattern</span>: <span class="ident">s</span>.<span class="ident">to_owned</span>().<span class="ident">into</span>(),
+</span><span class="kw">impl </span>FromStr <span class="kw">for </span>MatchPattern {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= matchers::Error;
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">let </span>matcher = s.parse::&lt;Pattern&gt;()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            matcher,
+            pattern: s.to_owned().into(),
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">MatchPattern</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">pattern</span>, <span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>MatchPattern {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Display::fmt(<span class="kw-2">&amp;*</span><span class="self">self</span>.pattern, f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MatchPattern</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">pattern</span>.<span class="ident">as_ref</span>()
+<span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>MatchPattern {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.pattern.as_ref()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MatchPattern</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">str_matches</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">matcher</span>.<span class="ident">matches</span>(<span class="ident">s</span>)
+<span class="kw">impl </span>MatchPattern {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>str_matches(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span><span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; bool {
+        <span class="self">self</span>.matcher.matches(s)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">debug_matches</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">fmt::Debug</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">matcher</span>.<span class="ident">debug_matches</span>(<span class="ident">d</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>debug_matches(<span class="kw-2">&amp;</span><span class="self">self</span>, d: <span class="kw-2">&amp;</span><span class="kw">impl </span>fmt::Debug) -&gt; bool {
+        <span class="self">self</span>.matcher.debug_matches(d)
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">into_debug_match</span>(<span class="self">self</span>) -&gt; <span class="ident">MatchDebug</span> {
-        <span class="ident">MatchDebug</span> {
-            <span class="ident">pattern</span>: <span class="self">self</span>.<span class="ident">pattern</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>into_debug_match(<span class="self">self</span>) -&gt; MatchDebug {
+        MatchDebug {
+            pattern: <span class="self">self</span>.pattern,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">MatchPattern</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">pattern</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">pattern</span>
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>MatchPattern {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.pattern == other.pattern
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">MatchPattern</span> {}
+<span class="kw">impl </span>Eq <span class="kw">for </span>MatchPattern {}
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">MatchPattern</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">pattern</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">pattern</span>))
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>MatchPattern {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.pattern.cmp(<span class="kw-2">&amp;</span>other.pattern))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">MatchPattern</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="self">self</span>.<span class="ident">pattern</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">pattern</span>)
+<span class="kw">impl </span>Ord <span class="kw">for </span>MatchPattern {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="self">self</span>.pattern.cmp(<span class="kw-2">&amp;</span>other.pattern)
     }
 }
 
-<span class="comment">// === impl MatchDebug ===</span>
+<span class="comment">// === impl MatchDebug ===
 
-<span class="kw">impl</span> <span class="ident">MatchDebug</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">pattern</span>: <span class="ident">s</span>.<span class="ident">to_owned</span>().<span class="ident">into</span>(),
+</span><span class="kw">impl </span>MatchDebug {
+    <span class="kw">fn </span>new(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            pattern: s.to_owned().into(),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">debug_matches</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">fmt::Debug</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Naively, we would probably match a value&#39;s `fmt::Debug` output by</span>
-        <span class="comment">// formatting it to a string, and then checking if the string is equal</span>
-        <span class="comment">// to the expected pattern. However, this would require allocating every</span>
-        <span class="comment">// time we want to match a field value against a `Debug` matcher, which</span>
-        <span class="comment">// can be avoided.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Instead, we implement `fmt::Write` for a type that, rather than</span>
-        <span class="comment">// actually _writing_ the strings to something, matches them against the</span>
-        <span class="comment">// expected pattern, and returns an error if the pattern does not match.</span>
-        <span class="kw">struct</span> <span class="ident">Matcher</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="ident">pattern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>debug_matches(<span class="kw-2">&amp;</span><span class="self">self</span>, d: <span class="kw-2">&amp;</span><span class="kw">impl </span>fmt::Debug) -&gt; bool {
+        <span class="comment">// Naively, we would probably match a value&#39;s `fmt::Debug` output by
+        // formatting it to a string, and then checking if the string is equal
+        // to the expected pattern. However, this would require allocating every
+        // time we want to match a field value against a `Debug` matcher, which
+        // can be avoided.
+        //
+        // Instead, we implement `fmt::Write` for a type that, rather than
+        // actually _writing_ the strings to something, matches them against the
+        // expected pattern, and returns an error if the pattern does not match.
+        </span><span class="kw">struct </span>Matcher&lt;<span class="lifetime">&#39;a</span>&gt; {
+            pattern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
         }
 
-        <span class="kw">impl</span> <span class="ident">fmt::Write</span> <span class="kw">for</span> <span class="ident">Matcher</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="comment">// If the string is longer than the remaining expected string,</span>
-                <span class="comment">// we know it won&#39;t match, so bail.</span>
-                <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">pattern</span>.<span class="ident">len</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">fmt::Error</span>);
+        <span class="kw">impl </span>fmt::Write <span class="kw">for </span>Matcher&lt;<span class="lifetime">&#39;_</span>&gt; {
+            <span class="kw">fn </span>write_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; fmt::Result {
+                <span class="comment">// If the string is longer than the remaining expected string,
+                // we know it won&#39;t match, so bail.
+                </span><span class="kw">if </span>s.len() &gt; <span class="self">self</span>.pattern.len() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(fmt::Error);
                 }
 
-                <span class="comment">// If the expected string begins with the string that was</span>
-                <span class="comment">// written, we are still potentially a match. Advance the</span>
-                <span class="comment">// position in the expected pattern to chop off the matched</span>
-                <span class="comment">// output, and continue.</span>
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pattern</span>.<span class="ident">starts_with</span>(<span class="ident">s</span>) {
-                    <span class="self">self</span>.<span class="ident">pattern</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pattern</span>[<span class="ident">s</span>.<span class="ident">len</span>()..];
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+                <span class="comment">// If the expected string begins with the string that was
+                // written, we are still potentially a match. Advance the
+                // position in the expected pattern to chop off the matched
+                // output, and continue.
+                </span><span class="kw">if </span><span class="self">self</span>.pattern.starts_with(s) {
+                    <span class="self">self</span>.pattern = <span class="kw-2">&amp;</span><span class="self">self</span>.pattern[s.len()..];
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                 }
 
-                <span class="comment">// Otherwise, the expected string doesn&#39;t include the string</span>
-                <span class="comment">// that was written at the current position, so the `fmt::Debug`</span>
-                <span class="comment">// output doesn&#39;t match! Return an error signalling that this</span>
-                <span class="comment">// doesn&#39;t match.</span>
-                <span class="prelude-val">Err</span>(<span class="ident">fmt::Error</span>)
+                <span class="comment">// Otherwise, the expected string doesn&#39;t include the string
+                // that was written at the current position, so the `fmt::Debug`
+                // output doesn&#39;t match! Return an error signalling that this
+                // doesn&#39;t match.
+                </span><span class="prelude-val">Err</span>(fmt::Error)
             }
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">matcher</span> <span class="op">=</span> <span class="ident">Matcher</span> {
-            <span class="ident">pattern</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pattern</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>matcher = Matcher {
+            pattern: <span class="kw-2">&amp;</span><span class="self">self</span>.pattern,
         };
 
-        <span class="comment">// Try to &quot;write&quot; the value&#39;s `fmt::Debug` output to a `Matcher`. This</span>
-        <span class="comment">// returns an error if the `fmt::Debug` implementation wrote any</span>
-        <span class="comment">// characters that did not match the expected pattern.</span>
-        <span class="macro">write!</span>(<span class="ident">matcher</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">d</span>).<span class="ident">is_ok</span>()
+        <span class="comment">// Try to &quot;write&quot; the value&#39;s `fmt::Debug` output to a `Matcher`. This
+        // returns an error if the `fmt::Debug` implementation wrote any
+        // characters that did not match the expected pattern.
+        </span><span class="macro">write!</span>(matcher, <span class="string">&quot;{:?}&quot;</span>, d).is_ok()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">MatchDebug</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">pattern</span>, <span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>MatchDebug {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Display::fmt(<span class="kw-2">&amp;*</span><span class="self">self</span>.pattern, f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MatchDebug</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">pattern</span>.<span class="ident">as_ref</span>()
+<span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>MatchDebug {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.pattern.as_ref()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">MatchDebug</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">pattern</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">pattern</span>
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>MatchDebug {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.pattern == other.pattern
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">MatchDebug</span> {}
+<span class="kw">impl </span>Eq <span class="kw">for </span>MatchDebug {}
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">MatchDebug</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">pattern</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">pattern</span>))
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>MatchDebug {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.pattern.cmp(<span class="kw-2">&amp;</span>other.pattern))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">MatchDebug</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="self">self</span>.<span class="ident">pattern</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">pattern</span>)
+<span class="kw">impl </span>Ord <span class="kw">for </span>MatchDebug {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="self">self</span>.pattern.cmp(<span class="kw-2">&amp;</span>other.pattern)
     }
 }
 
-<span class="comment">// === impl BadName ===</span>
+<span class="comment">// === impl BadName ===
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">BadName</span> {}
+</span><span class="kw">impl </span>Error <span class="kw">for </span>BadName {}
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">BadName</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid field name `{}`&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>BadName {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;invalid field name `{}`&quot;</span>, <span class="self">self</span>.name)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CallsiteMatch</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_span_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SpanMatch</span> {
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>.<span class="ident">clone</span>(), (<span class="ident">v</span>.<span class="ident">clone</span>(), <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>))))
-            .<span class="ident">collect</span>();
-        <span class="ident">SpanMatch</span> {
-            <span class="ident">fields</span>,
-            <span class="ident">level</span>: <span class="self">self</span>.<span class="ident">level</span>,
-            <span class="ident">has_matched</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
+<span class="kw">impl </span>CallsiteMatch {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_span_match(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SpanMatch {
+        <span class="kw">let </span>fields = <span class="self">self
+            </span>.fields
+            .iter()
+            .map(|(k, v)| (k.clone(), (v.clone(), AtomicBool::new(<span class="bool-val">false</span>))))
+            .collect();
+        SpanMatch {
+            fields,
+            level: <span class="self">self</span>.level,
+            has_matched: AtomicBool::new(<span class="bool-val">false</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SpanMatch</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">MatchVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">MatchVisitor</span> { <span class="ident">inner</span>: <span class="self">self</span> }
+<span class="kw">impl </span>SpanMatch {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visitor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MatchVisitor&lt;<span class="lifetime">&#39;_</span>&gt; {
+        MatchVisitor { inner: <span class="self">self </span>}
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_matched</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_matched</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>) {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_matched(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.has_matched.load(Acquire) {
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
-        <span class="self">self</span>.<span class="ident">is_matched_slow</span>()
+        <span class="self">self</span>.is_matched_slow()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_matched_slow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">matched</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">fields</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">all</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">matched</span>)<span class="op">|</span> <span class="ident">matched</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>));
-        <span class="kw">if</span> <span class="ident">matched</span> {
-            <span class="self">self</span>.<span class="ident">has_matched</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>);
+    <span class="attribute">#[inline(never)]
+    </span><span class="kw">fn </span>is_matched_slow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>matched = <span class="self">self
+            </span>.fields
+            .values()
+            .all(|(<span class="kw">_</span>, matched)| matched.load(Acquire));
+        <span class="kw">if </span>matched {
+            <span class="self">self</span>.has_matched.store(<span class="bool-val">true</span>, Release);
         }
-        <span class="ident">matched</span>
+        matched
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_matched</span>() {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">level</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>filter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_matched() {
+            <span class="prelude-val">Some</span>(<span class="self">self</span>.level)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Visit</span> <span class="kw">for</span> <span class="ident">MatchVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">record_f64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="ident">field</span>) {
-            <span class="prelude-val">Some</span>((<span class="ident">ValueMatch::NaN</span>, <span class="kw-2">ref</span> <span class="ident">matched</span>)) <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">is_nan</span>() =&gt; {
-                <span class="ident">matched</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Visit <span class="kw">for </span>MatchVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>record_f64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: f64) {
+        <span class="kw">match </span><span class="self">self</span>.inner.fields.get(field) {
+            <span class="prelude-val">Some</span>((ValueMatch::NaN, <span class="kw-2">ref </span>matched)) <span class="kw">if </span>value.is_nan() =&gt; {
+                matched.store(<span class="bool-val">true</span>, Release);
             }
-            <span class="prelude-val">Some</span>((<span class="ident">ValueMatch::F64</span>(<span class="kw-2">ref</span> <span class="ident">e</span>), <span class="kw-2">ref</span> <span class="ident">matched</span>))
-                <span class="kw">if</span> (<span class="ident">value</span> <span class="op">-</span> <span class="kw-2">*</span><span class="ident">e</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">std::f64::EPSILON</span> =&gt;
+            <span class="prelude-val">Some</span>((ValueMatch::F64(<span class="kw-2">ref </span>e), <span class="kw-2">ref </span>matched))
+                <span class="kw">if </span>(value - <span class="kw-2">*</span>e).abs() &lt; std::f64::EPSILON =&gt;
             {
-                <span class="ident">matched</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>);
+                matched.store(<span class="bool-val">true</span>, Release);
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record_i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">i64</span>) {
-        <span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
+    <span class="kw">fn </span>record_i64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: i64) {
+        <span class="kw">use </span>std::convert::TryInto;
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="ident">field</span>) {
-            <span class="prelude-val">Some</span>((<span class="ident">ValueMatch::I64</span>(<span class="kw-2">ref</span> <span class="ident">e</span>), <span class="kw-2">ref</span> <span class="ident">matched</span>)) <span class="kw">if</span> <span class="ident">value</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">e</span> =&gt; {
-                <span class="ident">matched</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>);
+        <span class="kw">match </span><span class="self">self</span>.inner.fields.get(field) {
+            <span class="prelude-val">Some</span>((ValueMatch::I64(<span class="kw-2">ref </span>e), <span class="kw-2">ref </span>matched)) <span class="kw">if </span>value == <span class="kw-2">*</span>e =&gt; {
+                matched.store(<span class="bool-val">true</span>, Release);
             }
-            <span class="prelude-val">Some</span>((<span class="ident">ValueMatch::U64</span>(<span class="kw-2">ref</span> <span class="ident">e</span>), <span class="kw-2">ref</span> <span class="ident">matched</span>)) <span class="kw">if</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>) <span class="op">==</span> (<span class="kw-2">*</span><span class="ident">e</span>).<span class="ident">try_into</span>() =&gt; {
-                <span class="ident">matched</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>);
+            <span class="prelude-val">Some</span>((ValueMatch::U64(<span class="kw-2">ref </span>e), <span class="kw-2">ref </span>matched)) <span class="kw">if </span><span class="prelude-val">Ok</span>(value) == (<span class="kw-2">*</span>e).try_into() =&gt; {
+                matched.store(<span class="bool-val">true</span>, Release);
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record_u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="ident">field</span>) {
-            <span class="prelude-val">Some</span>((<span class="ident">ValueMatch::U64</span>(<span class="kw-2">ref</span> <span class="ident">e</span>), <span class="kw-2">ref</span> <span class="ident">matched</span>)) <span class="kw">if</span> <span class="ident">value</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">e</span> =&gt; {
-                <span class="ident">matched</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>);
+    <span class="kw">fn </span>record_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: u64) {
+        <span class="kw">match </span><span class="self">self</span>.inner.fields.get(field) {
+            <span class="prelude-val">Some</span>((ValueMatch::U64(<span class="kw-2">ref </span>e), <span class="kw-2">ref </span>matched)) <span class="kw">if </span>value == <span class="kw-2">*</span>e =&gt; {
+                matched.store(<span class="bool-val">true</span>, Release);
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record_bool</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="ident">field</span>) {
-            <span class="prelude-val">Some</span>((<span class="ident">ValueMatch::Bool</span>(<span class="kw-2">ref</span> <span class="ident">e</span>), <span class="kw-2">ref</span> <span class="ident">matched</span>)) <span class="kw">if</span> <span class="ident">value</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">e</span> =&gt; {
-                <span class="ident">matched</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>);
+    <span class="kw">fn </span>record_bool(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: bool) {
+        <span class="kw">match </span><span class="self">self</span>.inner.fields.get(field) {
+            <span class="prelude-val">Some</span>((ValueMatch::Bool(<span class="kw-2">ref </span>e), <span class="kw-2">ref </span>matched)) <span class="kw">if </span>value == <span class="kw-2">*</span>e =&gt; {
+                matched.store(<span class="bool-val">true</span>, Release);
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="ident">field</span>) {
-            <span class="prelude-val">Some</span>((<span class="ident">ValueMatch::Pat</span>(<span class="kw-2">ref</span> <span class="ident">e</span>), <span class="kw-2">ref</span> <span class="ident">matched</span>)) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">str_matches</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>) =&gt; {
-                <span class="ident">matched</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>);
+    <span class="kw">fn </span>record_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">match </span><span class="self">self</span>.inner.fields.get(field) {
+            <span class="prelude-val">Some</span>((ValueMatch::Pat(<span class="kw-2">ref </span>e), <span class="kw-2">ref </span>matched)) <span class="kw">if </span>e.str_matches(<span class="kw-2">&amp;</span>value) =&gt; {
+                matched.store(<span class="bool-val">true</span>, Release);
             }
-            <span class="prelude-val">Some</span>((<span class="ident">ValueMatch::Debug</span>(<span class="kw-2">ref</span> <span class="ident">e</span>), <span class="kw-2">ref</span> <span class="ident">matched</span>)) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">debug_matches</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>) =&gt; {
-                <span class="ident">matched</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>)
+            <span class="prelude-val">Some</span>((ValueMatch::Debug(<span class="kw-2">ref </span>e), <span class="kw-2">ref </span>matched)) <span class="kw">if </span>e.debug_matches(<span class="kw-2">&amp;</span>value) =&gt; {
+                matched.store(<span class="bool-val">true</span>, Release)
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record_debug</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="ident">field</span>) {
-            <span class="prelude-val">Some</span>((<span class="ident">ValueMatch::Pat</span>(<span class="kw-2">ref</span> <span class="ident">e</span>), <span class="kw-2">ref</span> <span class="ident">matched</span>)) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">debug_matches</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>) =&gt; {
-                <span class="ident">matched</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>);
+    <span class="kw">fn </span>record_debug(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>fmt::Debug) {
+        <span class="kw">match </span><span class="self">self</span>.inner.fields.get(field) {
+            <span class="prelude-val">Some</span>((ValueMatch::Pat(<span class="kw-2">ref </span>e), <span class="kw-2">ref </span>matched)) <span class="kw">if </span>e.debug_matches(<span class="kw-2">&amp;</span>value) =&gt; {
+                matched.store(<span class="bool-val">true</span>, Release);
             }
-            <span class="prelude-val">Some</span>((<span class="ident">ValueMatch::Debug</span>(<span class="kw-2">ref</span> <span class="ident">e</span>), <span class="kw-2">ref</span> <span class="ident">matched</span>)) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">debug_matches</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>) =&gt; {
-                <span class="ident">matched</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Release</span>)
+            <span class="prelude-val">Some</span>((ValueMatch::Debug(<span class="kw-2">ref </span>e), <span class="kw-2">ref </span>matched)) <span class="kw">if </span>e.debug_matches(<span class="kw-2">&amp;</span>value) =&gt; {
+                matched.store(<span class="bool-val">true</span>, Release)
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">MyStruct</span> {
-        <span class="ident">answer</span>: <span class="ident">usize</span>,
-        <span class="ident">question</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[derive(Debug)]
+    #[allow(dead_code)]
+    </span><span class="kw">struct </span>MyStruct {
+        answer: usize,
+        question: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">debug_struct_match</span>() {
-        <span class="kw">let</span> <span class="ident">my_struct</span> <span class="op">=</span> <span class="ident">MyStruct</span> {
-            <span class="ident">answer</span>: <span class="number">42</span>,
-            <span class="ident">question</span>: <span class="string">&quot;life, the universe, and everything&quot;</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>debug_struct_match() {
+        <span class="kw">let </span>my_struct = MyStruct {
+            answer: <span class="number">42</span>,
+            question: <span class="string">&quot;life, the universe, and everything&quot;</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">pattern</span> <span class="op">=</span> <span class="string">&quot;MyStruct { answer: 42, question: \&quot;life, the universe, and everything\&quot; }&quot;</span>;
+        <span class="kw">let </span>pattern = <span class="string">&quot;MyStruct { answer: 42, question: \&quot;life, the universe, and everything\&quot; }&quot;</span>;
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">my_struct</span>),
-            <span class="ident">pattern</span>,
-            <span class="string">&quot;`MyStruct`&#39;s `Debug` impl doesn&#39;t output the expected string&quot;</span>
-        );
+            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, my_struct),
+            pattern,
+            <span class="string">&quot;`MyStruct`&#39;s `Debug` impl doesn&#39;t output the expected string&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="ident">matcher</span> <span class="op">=</span> <span class="ident">MatchDebug</span> {
-            <span class="ident">pattern</span>: <span class="ident">pattern</span>.<span class="ident">into</span>(),
+        <span class="kw">let </span>matcher = MatchDebug {
+            pattern: pattern.into(),
         };
-        <span class="macro">assert!</span>(<span class="ident">matcher</span>.<span class="ident">debug_matches</span>(<span class="kw-2">&amp;</span><span class="ident">my_struct</span>))
+        <span class="macro">assert!</span>(matcher.debug_matches(<span class="kw-2">&amp;</span>my_struct))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">debug_struct_not_match</span>() {
-        <span class="kw">let</span> <span class="ident">my_struct</span> <span class="op">=</span> <span class="ident">MyStruct</span> {
-            <span class="ident">answer</span>: <span class="number">42</span>,
-            <span class="ident">question</span>: <span class="string">&quot;what shall we have for lunch?&quot;</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>debug_struct_not_match() {
+        <span class="kw">let </span>my_struct = MyStruct {
+            answer: <span class="number">42</span>,
+            question: <span class="string">&quot;what shall we have for lunch?&quot;</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">pattern</span> <span class="op">=</span> <span class="string">&quot;MyStruct { answer: 42, question: \&quot;life, the universe, and everything\&quot; }&quot;</span>;
+        <span class="kw">let </span>pattern = <span class="string">&quot;MyStruct { answer: 42, question: \&quot;life, the universe, and everything\&quot; }&quot;</span>;
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">my_struct</span>),
+            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, my_struct),
             <span class="string">&quot;MyStruct { answer: 42, question: \&quot;what shall we have for lunch?\&quot; }&quot;</span>,
-            <span class="string">&quot;`MyStruct`&#39;s `Debug` impl doesn&#39;t output the expected string&quot;</span>
-        );
+            <span class="string">&quot;`MyStruct`&#39;s `Debug` impl doesn&#39;t output the expected string&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="ident">matcher</span> <span class="op">=</span> <span class="ident">MatchDebug</span> {
-            <span class="ident">pattern</span>: <span class="ident">pattern</span>.<span class="ident">into</span>(),
+        <span class="kw">let </span>matcher = MatchDebug {
+            pattern: pattern.into(),
         };
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">matcher</span>.<span class="ident">debug_matches</span>(<span class="kw-2">&amp;</span><span class="ident">my_struct</span>))
+        <span class="macro">assert!</span>(!matcher.debug_matches(<span class="kw-2">&amp;</span>my_struct))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

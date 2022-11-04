@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/datamodel.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datamodel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/datamodel.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datamodel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -168,175 +168,175 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::composite_type::CompositeType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::field</span>::{<span class="ident">Field</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarField</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Model</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">r#enum</span><span class="ident">::Enum</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::relation_info::RelationInfo</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::composite_type::CompositeType;
+<span class="kw">use </span><span class="kw">crate</span>::field::{Field, RelationField, ScalarField};
+<span class="kw">use </span><span class="kw">crate</span>::model::Model;
+<span class="kw">use crate</span>::r#enum::Enum;
+<span class="kw">use </span><span class="kw">crate</span>::relation_info::RelationInfo;
 
-<span class="doccomment">/// Entities in the datamodel can be flagged as `is_commented_out`. This lets the renderer</span>
-<span class="doccomment">/// know that introspection encountered unsupported names or features and these are supposed</span>
-<span class="doccomment">/// to be rendered as comments. Since the parser will not set these flags when reading a schema</span>
-<span class="doccomment">/// string, only introspection and the lowering of the datamodel to the ast care about these flags.</span>
-<span class="doccomment">/// The FieldType: Unsupported behaves in the same way.</span>
-<span class="doccomment">/// Both of these are never converted into the internal datamodel.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Datamodel</span> {
-    <span class="kw">pub</span> <span class="ident">enums</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Enum</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">models</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Model</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">composite_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CompositeType</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Entities in the datamodel can be flagged as `is_commented_out`. This lets the renderer
+/// know that introspection encountered unsupported names or features and these are supposed
+/// to be rendered as comments. Since the parser will not set these flags when reading a schema
+/// string, only introspection and the lowering of the datamodel to the ast care about these flags.
+/// The FieldType: Unsupported behaves in the same way.
+/// Both of these are never converted into the internal datamodel.
+</span><span class="attribute">#[derive(Debug, Clone, Default)]
+</span><span class="kw">pub struct </span>Datamodel {
+    <span class="kw">pub </span>enums: Vec&lt;Enum&gt;,
+    <span class="kw">pub </span>models: Vec&lt;Model&gt;,
+    <span class="kw">pub </span>composite_types: Vec&lt;CompositeType&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Datamodel</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Datamodel</span> {
-        <span class="ident">Datamodel</span> { ..<span class="ident">Default::default</span>() }
+<span class="kw">impl </span>Datamodel {
+    <span class="kw">pub fn </span>new() -&gt; Datamodel {
+        Datamodel { ..Default::default() }
     }
 
-    <span class="doccomment">/// Checks if a datamodel contains neither enums nor models.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">enums</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// Checks if a datamodel contains neither enums nor models.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.enums.is_empty() &amp;&amp; <span class="self">self</span>.models.is_empty()
     }
 
-    <span class="doccomment">/// Gets an iterator over all models.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">std::slice::Iter</span><span class="op">&lt;</span><span class="ident">Model</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">iter</span>()
+    <span class="doccomment">/// Gets an iterator over all models.
+    </span><span class="kw">pub fn </span>models(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::slice::Iter&lt;Model&gt; {
+        <span class="self">self</span>.models.iter()
     }
 
-    <span class="doccomment">/// Gets an iterator over all composite types.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">std::slice::Iter</span><span class="op">&lt;</span><span class="ident">CompositeType</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">composite_types</span>.<span class="ident">iter</span>()
+    <span class="doccomment">/// Gets an iterator over all composite types.
+    </span><span class="kw">pub fn </span>composite_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::slice::Iter&lt;CompositeType&gt; {
+        <span class="self">self</span>.composite_types.iter()
     }
 
-    <span class="doccomment">/// Gets an iterator over all enums.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">std::slice::Iter</span><span class="op">&lt;</span><span class="ident">Enum</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">enums</span>.<span class="ident">iter</span>()
+    <span class="doccomment">/// Gets an iterator over all enums.
+    </span><span class="kw">pub fn </span>enums(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::slice::Iter&lt;Enum&gt; {
+        <span class="self">self</span>.enums.iter()
     }
 
-    <span class="doccomment">/// Gets a mutable iterator over all models.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">std::slice::IterMut</span><span class="op">&lt;</span><span class="ident">Model</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">iter_mut</span>()
+    <span class="doccomment">/// Gets a mutable iterator over all models.
+    </span><span class="kw">pub fn </span>models_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; std::slice::IterMut&lt;Model&gt; {
+        <span class="self">self</span>.models.iter_mut()
     }
 
-    <span class="doccomment">/// Gets a mutable iterator over all enums.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enums_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">std::slice::IterMut</span><span class="op">&lt;</span><span class="ident">Enum</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">enums</span>.<span class="ident">iter_mut</span>()
+    <span class="doccomment">/// Gets a mutable iterator over all enums.
+    </span><span class="kw">pub fn </span>enums_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; std::slice::IterMut&lt;Enum&gt; {
+        <span class="self">self</span>.enums.iter_mut()
     }
 
-    <span class="doccomment">/// Finds a model by name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Model</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">models</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
+    <span class="doccomment">/// Finds a model by name.
+    </span><span class="kw">pub fn </span>find_model(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt; {
+        <span class="self">self</span>.models().find(|model| model.name == name)
     }
 
-    <span class="doccomment">/// Finds a composite type by name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_composite_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CompositeType</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">composite_types</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">composite</span><span class="op">|</span> <span class="ident">composite</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
+    <span class="doccomment">/// Finds a composite type by name.
+    </span><span class="kw">pub fn </span>find_composite_type(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CompositeType&gt; {
+        <span class="self">self</span>.composite_types().find(|composite| composite.name == name)
     }
 
-    <span class="doccomment">/// Finds a model by database name. This will only find models with a name</span>
-    <span class="doccomment">/// remapped to the provided `db_name`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model_db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Model</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">models</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">database_name</span>.<span class="ident">as_deref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">db_name</span>))
+    <span class="doccomment">/// Finds a model by database name. This will only find models with a name
+    /// remapped to the provided `db_name`.
+    </span><span class="kw">pub fn </span>find_model_db_name(<span class="kw-2">&amp;</span><span class="self">self</span>, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt; {
+        <span class="self">self</span>.models()
+            .find(|model| model.database_name.as_deref() == <span class="prelude-val">Some</span>(db_name))
     }
 
-    <span class="doccomment">/// Finds parent  model for a field reference.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model_by_relation_field_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Model</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">find_related_field_bang</span>(<span class="ident">field</span>).<span class="number">1</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span>)
+    <span class="doccomment">/// Finds parent  model for a field reference.
+    </span><span class="kw">pub fn </span>find_model_by_relation_field_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>RelationField) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt; {
+        <span class="self">self</span>.find_model(<span class="kw-2">&amp;</span><span class="self">self</span>.find_related_field_bang(field).<span class="number">1</span>.relation_info.referenced_model)
     }
 
-    <span class="doccomment">/// Finds a mutable field reference by a model and field name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_field_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Field</span> {
-        <span class="self">self</span>.<span class="ident">find_model_mut</span>(<span class="ident">model</span>).<span class="ident">find_field_mut</span>(<span class="ident">field</span>)
+    <span class="doccomment">/// Finds a mutable field reference by a model and field name.
+    </span><span class="kw">pub fn </span>find_field_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>str, field: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>Field {
+        <span class="self">self</span>.find_model_mut(model).find_field_mut(field)
     }
 
-    <span class="doccomment">/// Finds a mutable scalar field reference by a model and field name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_scalar_field_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">ScalarField</span> {
-        <span class="comment">// This uses the memory location of field for equality.</span>
-        <span class="self">self</span>.<span class="ident">find_model_mut</span>(<span class="ident">model</span>).<span class="ident">find_scalar_field_mut</span>(<span class="ident">field</span>)
+    <span class="doccomment">/// Finds a mutable scalar field reference by a model and field name.
+    </span><span class="kw">pub fn </span>find_scalar_field_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>str, field: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>ScalarField {
+        <span class="comment">// This uses the memory location of field for equality.
+        </span><span class="self">self</span>.find_model_mut(model).find_scalar_field_mut(field)
     }
 
-    <span class="doccomment">/// Finds a mutable relation field reference by a model and field name.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_relation_field_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">RelationField</span> {
-        <span class="self">self</span>.<span class="ident">find_model_mut</span>(<span class="ident">model</span>).<span class="ident">find_relation_field_mut</span>(<span class="ident">field</span>)
+    <span class="doccomment">/// Finds a mutable relation field reference by a model and field name.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>find_relation_field_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>str, field: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>RelationField {
+        <span class="self">self</span>.find_model_mut(model).find_relation_field_mut(field)
     }
 
-    <span class="doccomment">/// Finds an enum by name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Enum</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">enums</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">name</span>)
+    <span class="doccomment">/// Finds an enum by name.
+    </span><span class="kw">pub fn </span>find_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Enum&gt; {
+        <span class="self">self</span>.enums().find(|m| m.name == <span class="kw-2">*</span>name)
     }
 
-    <span class="doccomment">/// Finds an enum by database name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_enum_db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Enum</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">enums</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">database_name</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">db_name</span>.<span class="ident">to_owned</span>()))
+    <span class="doccomment">/// Finds an enum by database name.
+    </span><span class="kw">pub fn </span>find_enum_db_name(<span class="kw-2">&amp;</span><span class="self">self</span>, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Enum&gt; {
+        <span class="self">self</span>.enums().find(|e| e.database_name == <span class="prelude-val">Some</span>(db_name.to_owned()))
     }
 
-    <span class="doccomment">/// Finds a model by name and returns a mutable reference.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Model</span> {
-        <span class="self">self</span>.<span class="ident">models_mut</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">name</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;We assume an internally valid datamodel before mutating.&quot;</span>)
+    <span class="doccomment">/// Finds a model by name and returns a mutable reference.
+    </span><span class="kw">pub fn </span>find_model_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>Model {
+        <span class="self">self</span>.models_mut()
+            .find(|m| m.name == <span class="kw-2">*</span>name)
+            .expect(<span class="string">&quot;We assume an internally valid datamodel before mutating.&quot;</span>)
     }
 
-    <span class="doccomment">/// Finds an enum by name and returns a mutable reference.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_enum_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Enum</span> {
-        <span class="self">self</span>.<span class="ident">enums_mut</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">name</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;We assume an internally valid datamodel before mutating.&quot;</span>)
+    <span class="doccomment">/// Finds an enum by name and returns a mutable reference.
+    </span><span class="kw">pub fn </span>find_enum_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>Enum {
+        <span class="self">self</span>.enums_mut()
+            .find(|m| m.name == <span class="kw-2">*</span>name)
+            .expect(<span class="string">&quot;We assume an internally valid datamodel before mutating.&quot;</span>)
     }
 
-    <span class="doccomment">/// Returns (model_name, field_name) for all fields using a specific enum.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_enum_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">enum_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">models</span>() {
-            <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>() {
-                <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">field_type</span>.<span class="ident">is_enum</span>(<span class="ident">enum_name</span>) {
-                    <span class="ident">fields</span>.<span class="ident">push</span>((<span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>()))
+    <span class="doccomment">/// Returns (model_name, field_name) for all fields using a specific enum.
+    </span><span class="kw">pub fn </span>find_enum_fields(<span class="kw-2">&amp;</span><span class="self">self</span>, enum_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;(String, String)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[];
+        <span class="kw">for </span>model <span class="kw">in </span><span class="self">self</span>.models() {
+            <span class="kw">for </span>field <span class="kw">in </span>model.scalar_fields() {
+                <span class="kw">if </span>field.field_type.is_enum(enum_name) {
+                    fields.push((model.name.clone(), field.name.clone()))
                 }
             }
         }
-        <span class="ident">fields</span>
+        fields
     }
 
-    <span class="doccomment">/// Returns (model_name, field_name) for all relation fields pointing to a specific model.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_relation_fields_for_model</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">models</span>() {
-            <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">relation_fields</span>() {
-                <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span> <span class="op">==</span> <span class="ident">model_name</span> {
-                    <span class="ident">fields</span>.<span class="ident">push</span>((<span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>()))
+    <span class="doccomment">/// Returns (model_name, field_name) for all relation fields pointing to a specific model.
+    </span><span class="kw">pub fn </span>find_relation_fields_for_model(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;(String, String)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[];
+        <span class="kw">for </span>model <span class="kw">in </span><span class="self">self</span>.models() {
+            <span class="kw">for </span>field <span class="kw">in </span>model.relation_fields() {
+                <span class="kw">if </span>field.relation_info.referenced_model == model_name {
+                    fields.push((model.name.clone(), field.name.clone()))
                 }
             }
         }
-        <span class="ident">fields</span>
+        fields
     }
 
-    <span class="doccomment">/// Finds a relation field related to a relation info. Returns a tuple (index_of_relation_field_in_model, relation_field).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_related_field_for_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">RelationInfo</span>, <span class="ident">exclude</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">RelationField</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="ident">info</span>.<span class="ident">referenced_model</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;The model referred to by a RelationInfo should always exist.&quot;</span>)
-            .<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">field</span>)<span class="op">|</span> <span class="ident">field</span>.<span class="ident">as_relation_field</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> (<span class="ident">idx</span>, <span class="ident">f</span>)))
-            .<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">_idx</span>, <span class="ident">f</span>)<span class="op">|</span> {
-                <span class="ident">f</span>.<span class="ident">relation_info</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">info</span>.<span class="ident">name</span>
-                    <span class="op">&amp;&amp;</span> (<span class="ident">f</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span> <span class="op">!</span><span class="op">=</span> <span class="ident">info</span>.<span class="ident">referenced_model</span> <span class="op">|</span><span class="op">|</span>
-          <span class="comment">// This is to differentiate the opposite field from self in the self relation case.</span>
-          <span class="ident">f</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">exclude</span>)
+    <span class="doccomment">/// Finds a relation field related to a relation info. Returns a tuple (index_of_relation_field_in_model, relation_field).
+    </span><span class="kw">pub fn </span>find_related_field_for_info(<span class="kw-2">&amp;</span><span class="self">self</span>, info: <span class="kw-2">&amp;</span>RelationInfo, exclude: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="kw-2">&amp;</span>RelationField)&gt; {
+        <span class="self">self</span>.find_model(<span class="kw-2">&amp;</span>info.referenced_model)
+            .expect(<span class="string">&quot;The model referred to by a RelationInfo should always exist.&quot;</span>)
+            .fields
+            .iter()
+            .enumerate()
+            .filter_map(|(idx, field)| field.as_relation_field().map(|f| (idx, f)))
+            .find(|(_idx, f)| {
+                f.relation_info.name == info.name
+                    &amp;&amp; (f.relation_info.referenced_model != info.referenced_model ||
+          <span class="comment">// This is to differentiate the opposite field from self in the self relation case.
+          </span>f.name != exclude)
             })
     }
 
-    <span class="doccomment">/// This finds the related field for a relationfield if available</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_related_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">RelationField</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">find_related_field_for_info</span>(<span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">relation_info</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">name</span>)
+    <span class="doccomment">/// This finds the related field for a relationfield if available
+    </span><span class="kw">pub fn </span>find_related_field(<span class="kw-2">&amp;</span><span class="self">self</span>, rf: <span class="kw-2">&amp;</span>RelationField) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="kw-2">&amp;</span>RelationField)&gt; {
+        <span class="self">self</span>.find_related_field_for_info(<span class="kw-2">&amp;</span>rf.relation_info, <span class="kw-2">&amp;</span>rf.name)
     }
 
-    <span class="doccomment">/// This is used once we assume the datamodel to be internally valid</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_related_field_bang</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; (<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) {
-        <span class="self">self</span>.<span class="ident">find_related_field</span>(<span class="ident">rf</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;Every RelationInfo should have a complementary RelationInfo on the opposite relation field.&quot;</span>)
+    <span class="doccomment">/// This is used once we assume the datamodel to be internally valid
+    </span><span class="kw">pub fn </span>find_related_field_bang(<span class="kw-2">&amp;</span><span class="self">self</span>, rf: <span class="kw-2">&amp;</span>RelationField) -&gt; (usize, <span class="kw-2">&amp;</span>RelationField) {
+        <span class="self">self</span>.find_related_field(rf)
+            .expect(<span class="string">&quot;Every RelationInfo should have a complementary RelationInfo on the opposite relation field.&quot;</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

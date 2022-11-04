@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/dissimilar-1.0.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dissimilar/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/dissimilar-1.0.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dissimilar/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -930,937 +930,937 @@
 <span id="930">930</span>
 <span id="931">931</span>
 <span id="932">932</span>
-</pre><pre class="rust"><code><span class="doccomment">//! [![github]](https://github.com/dtolnay/dissimilar)&amp;ensp;[![crates-io]](https://crates.io/crates/dissimilar)&amp;ensp;[![docs-rs]](https://docs.rs/dissimilar)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [github]: https://img.shields.io/badge/github-8da0cb?style=for-the-badge&amp;labelColor=555555&amp;logo=github</span>
-<span class="doccomment">//! [crates-io]: https://img.shields.io/badge/crates.io-fc8d62?style=for-the-badge&amp;labelColor=555555&amp;logo=rust</span>
-<span class="doccomment">//! [docs-rs]: https://img.shields.io/badge/docs.rs-66c2a5?style=for-the-badge&amp;labelColor=555555&amp;logoColor=white&amp;logo=data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDUxMiA1MTIiPjxwYXRoIGZpbGw9IiNmNWY1ZjUiIGQ9Ik00ODguNiAyNTAuMkwzOTIgMjE0VjEwNS41YzAtMTUtOS4zLTI4LjQtMjMuNC0zMy43bC0xMDAtMzcuNWMtOC4xLTMuMS0xNy4xLTMuMS0yNS4zIDBsLTEwMCAzNy41Yy0xNC4xIDUuMy0yMy40IDE4LjctMjMuNCAzMy43VjIxNGwtOTYuNiAzNi4yQzkuMyAyNTUuNSAwIDI2OC45IDAgMjgzLjlWMzk0YzAgMTMuNiA3LjcgMjYuMSAxOS45IDMyLjJsMTAwIDUwYzEwLjEgNS4xIDIyLjEgNS4xIDMyLjIgMGwxMDMuOS01MiAxMDMuOSA1MmMxMC4xIDUuMSAyMi4xIDUuMSAzMi4yIDBsMTAwLTUwYzEyLjItNi4xIDE5LjktMTguNiAxOS45LTMyLjJWMjgzLjljMC0xNS05LjMtMjguNC0yMy40LTMzLjd6TTM1OCAyMTQuOGwtODUgMzEuOXYtNjguMmw4NS0zN3Y3My4zek0xNTQgMTA0LjFsMTAyLTM4LjIgMTAyIDM4LjJ2LjZsLTEwMiA0MS40LTEwMi00MS40di0uNnptODQgMjkxLjFsLTg1IDQyLjV2LTc5LjFsODUtMzguOHY3NS40em0wLTExMmwtMTAyIDQxLjQtMTAyLTQxLjR2LS42bDEwMi0zOC4yIDEwMiAzOC4ydi42em0yNDAgMTEybC04NSA0Mi41di03OS4xbDg1LTM4Ljh2NzUuNHptMC0xMTJsLTEwMiA0MS40LTEwMi00MS40di0uNmwxMDItMzguMiAxMDIgMzguMnYuNnoiPjwvcGF0aD48L3N2Zz4K</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;br&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Diff library with semantic cleanup, based on Google&#39;s diff-match-patch</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This library is a port of the Diff component of [Diff Match Patch] to Rust.</span>
-<span class="doccomment">//! The diff implementation is based on [Myers&#39; diff algorithm] but includes</span>
-<span class="doccomment">//! some [semantic cleanups] to increase human readability by factoring out</span>
-<span class="doccomment">//! commonalities which are likely to be coincidental.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Diff Match Patch was originally built in 2006 to power Google Docs.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Interface</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Here is the entire API of the Rust implementation. It operates on borrowed</span>
-<span class="doccomment">//! strings and the return value of the diff algorithm is a vector of chunks</span>
-<span class="doccomment">//! pointing into slices of those input strings.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! pub enum Chunk&lt;&#39;a&gt; {</span>
-<span class="doccomment">//!     Equal(&amp;&#39;a str),</span>
-<span class="doccomment">//!     Delete(&amp;&#39;a str),</span>
-<span class="doccomment">//!     Insert(&amp;&#39;a str),</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # const IGNORE: &amp;str = stringify! {</span>
-<span class="doccomment">//! pub fn diff(text1: &amp;str, text2: &amp;str) -&gt; Vec&lt;Chunk&gt;;</span>
-<span class="doccomment">//! # };</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [Diff Match Patch]: https://github.com/google/diff-match-patch</span>
-<span class="doccomment">//! [Myers&#39; diff algorithm]: https://neil.fraser.name/writing/diff/myers.pdf</span>
-<span class="doccomment">//! [semantic cleanups]: https://neil.fraser.name/writing/diff/</span>
+</pre><pre class="rust"><code><span class="doccomment">//! [![github]](https://github.com/dtolnay/dissimilar)&amp;ensp;[![crates-io]](https://crates.io/crates/dissimilar)&amp;ensp;[![docs-rs]](https://docs.rs/dissimilar)
+//!
+//! [github]: https://img.shields.io/badge/github-8da0cb?style=for-the-badge&amp;labelColor=555555&amp;logo=github
+//! [crates-io]: https://img.shields.io/badge/crates.io-fc8d62?style=for-the-badge&amp;labelColor=555555&amp;logo=rust
+//! [docs-rs]: https://img.shields.io/badge/docs.rs-66c2a5?style=for-the-badge&amp;labelColor=555555&amp;logoColor=white&amp;logo=data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDUxMiA1MTIiPjxwYXRoIGZpbGw9IiNmNWY1ZjUiIGQ9Ik00ODguNiAyNTAuMkwzOTIgMjE0VjEwNS41YzAtMTUtOS4zLTI4LjQtMjMuNC0zMy43bC0xMDAtMzcuNWMtOC4xLTMuMS0xNy4xLTMuMS0yNS4zIDBsLTEwMCAzNy41Yy0xNC4xIDUuMy0yMy40IDE4LjctMjMuNCAzMy43VjIxNGwtOTYuNiAzNi4yQzkuMyAyNTUuNSAwIDI2OC45IDAgMjgzLjlWMzk0YzAgMTMuNiA3LjcgMjYuMSAxOS45IDMyLjJsMTAwIDUwYzEwLjEgNS4xIDIyLjEgNS4xIDMyLjIgMGwxMDMuOS01MiAxMDMuOSA1MmMxMC4xIDUuMSAyMi4xIDUuMSAzMi4yIDBsMTAwLTUwYzEyLjItNi4xIDE5LjktMTguNiAxOS45LTMyLjJWMjgzLjljMC0xNS05LjMtMjguNC0yMy40LTMzLjd6TTM1OCAyMTQuOGwtODUgMzEuOXYtNjguMmw4NS0zN3Y3My4zek0xNTQgMTA0LjFsMTAyLTM4LjIgMTAyIDM4LjJ2LjZsLTEwMiA0MS40LTEwMi00MS40di0uNnptODQgMjkxLjFsLTg1IDQyLjV2LTc5LjFsODUtMzguOHY3NS40em0wLTExMmwtMTAyIDQxLjQtMTAyLTQxLjR2LS42bDEwMi0zOC4yIDEwMiAzOC4ydi42em0yNDAgMTEybC04NSA0Mi41di03OS4xbDg1LTM4Ljh2NzUuNHptMC0xMTJsLTEwMiA0MS40LTEwMi00MS40di0uNmwxMDItMzguMiAxMDIgMzguMnYuNnoiPjwvcGF0aD48L3N2Zz4K
+//!
+//! &lt;br&gt;
+//!
+//! ## Diff library with semantic cleanup, based on Google&#39;s diff-match-patch
+//!
+//! This library is a port of the Diff component of [Diff Match Patch] to Rust.
+//! The diff implementation is based on [Myers&#39; diff algorithm] but includes
+//! some [semantic cleanups] to increase human readability by factoring out
+//! commonalities which are likely to be coincidental.
+//!
+//! Diff Match Patch was originally built in 2006 to power Google Docs.
+//!
+//! # Interface
+//!
+//! Here is the entire API of the Rust implementation. It operates on borrowed
+//! strings and the return value of the diff algorithm is a vector of chunks
+//! pointing into slices of those input strings.
+//!
+//! ```
+//! pub enum Chunk&lt;&#39;a&gt; {
+//!     Equal(&amp;&#39;a str),
+//!     Delete(&amp;&#39;a str),
+//!     Insert(&amp;&#39;a str),
+//! }
+//!
+//! # const IGNORE: &amp;str = stringify! {
+//! pub fn diff(text1: &amp;str, text2: &amp;str) -&gt; Vec&lt;Chunk&gt;;
+//! # };
+//! ```
+//!
+//! [Diff Match Patch]: https://github.com/google/diff-match-patch
+//! [Myers&#39; diff algorithm]: https://neil.fraser.name/writing/diff/myers.pdf
+//! [semantic cleanups]: https://neil.fraser.name/writing/diff/
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/dissimilar/1.0.4&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(
-    <span class="ident">clippy::blocks_in_if_conditions</span>,
-    <span class="ident">clippy::cast_possible_wrap</span>,
-    <span class="ident">clippy::cast_sign_loss</span>,
-    <span class="ident">clippy::cloned_instead_of_copied</span>, <span class="comment">// https://github.com/rust-lang/rust-clippy/issues/7127</span>
-    <span class="ident">clippy::collapsible_else_if</span>,
-    <span class="ident">clippy::comparison_chain</span>,
-    <span class="ident">clippy::match_same_arms</span>,
-    <span class="ident">clippy::module_name_repetitions</span>,
-    <span class="ident">clippy::must_use_candidate</span>,
-    <span class="ident">clippy::new_without_default</span>,
-    <span class="ident">clippy::octal_escapes</span>,
-    <span class="ident">clippy::shadow_unrelated</span>,
-    <span class="ident">clippy::similar_names</span>,
-    <span class="ident">clippy::too_many_lines</span>,
-    <span class="ident">clippy::unseparated_literal_suffix</span>,
-    <span class="ident">unused_parens</span>, <span class="comment">// false positive on Some(&amp;(mut diff)) pattern</span>
-)]</span>
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/dissimilar/1.0.4&quot;</span>)]
+#![allow(
+    clippy::blocks_in_if_conditions,
+    clippy::cast_possible_wrap,
+    clippy::cast_sign_loss,
+    clippy::cloned_instead_of_copied, <span class="comment">// https://github.com/rust-lang/rust-clippy/issues/7127
+    </span>clippy::collapsible_else_if,
+    clippy::comparison_chain,
+    clippy::match_same_arms,
+    clippy::module_name_repetitions,
+    clippy::must_use_candidate,
+    clippy::new_without_default,
+    clippy::octal_escapes,
+    clippy::shadow_unrelated,
+    clippy::similar_names,
+    clippy::too_many_lines,
+    clippy::unseparated_literal_suffix,
+    unused_parens, <span class="comment">// false positive on Some(&amp;(mut diff)) pattern
+</span>)]
 
-<span class="kw">mod</span> <span class="ident">find</span>;
-<span class="kw">mod</span> <span class="ident">range</span>;
+</span><span class="kw">mod </span>find;
+<span class="kw">mod </span>range;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::range</span>::{<span class="ident">bytes</span>, <span class="ident">str</span>, <span class="ident">Range</span>};
-<span class="kw">use</span> <span class="ident">std::cmp</span>;
-<span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>};
+<span class="kw">use </span><span class="kw">crate</span>::range::{bytes, str, Range};
+<span class="kw">use </span>std::cmp;
+<span class="kw">use </span>std::collections::VecDeque;
+<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Debug};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Chunk</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Equal</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
-    <span class="ident">Delete</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
-    <span class="ident">Insert</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+<span class="attribute">#[derive(Copy, Clone, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>Chunk&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Equal(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
+    Delete(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
+    Insert(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-    <span class="ident">Equal</span>(<span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>),
-    <span class="ident">Delete</span>(<span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">Insert</span>(<span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">enum </span>Diff&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+    Equal(Range&lt;<span class="lifetime">&#39;a</span>&gt;, Range&lt;<span class="lifetime">&#39;b</span>&gt;),
+    Delete(Range&lt;<span class="lifetime">&#39;a</span>&gt;),
+    Insert(Range&lt;<span class="lifetime">&#39;b</span>&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;tmp</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;tmp</span>, <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;tmp</span><span class="op">&gt;</span> <span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;tmp</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">range</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) <span class="op">|</span> <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) =&gt; <span class="ident">range</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;tmp</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;tmp</span>, <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;tmp</span>&gt; Diff&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">fn </span>text(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Range&lt;<span class="lifetime">&#39;tmp</span>&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Diff::Equal(range, <span class="kw">_</span>) | Diff::Delete(range) | Diff::Insert(range) =&gt; range,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">grow_left</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">increment</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">range</span><span class="op">|</span> {
-            <span class="ident">range</span>.<span class="ident">offset</span> <span class="op">-</span><span class="op">=</span> <span class="ident">increment</span>;
-            <span class="ident">range</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">increment</span>;
+    <span class="kw">fn </span>grow_left(<span class="kw-2">&amp;mut </span><span class="self">self</span>, increment: usize) {
+        <span class="self">self</span>.for_each(|range| {
+            range.offset -= increment;
+            range.len += increment;
         });
     }
 
-    <span class="kw">fn</span> <span class="ident">grow_right</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">increment</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">range</span><span class="op">|</span> <span class="ident">range</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">increment</span>);
+    <span class="kw">fn </span>grow_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, increment: usize) {
+        <span class="self">self</span>.for_each(|range| range.len += increment);
     }
 
-    <span class="kw">fn</span> <span class="ident">shift_left</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">increment</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">range</span><span class="op">|</span> <span class="ident">range</span>.<span class="ident">offset</span> <span class="op">-</span><span class="op">=</span> <span class="ident">increment</span>);
+    <span class="kw">fn </span>shift_left(<span class="kw-2">&amp;mut </span><span class="self">self</span>, increment: usize) {
+        <span class="self">self</span>.for_each(|range| range.offset -= increment);
     }
 
-    <span class="kw">fn</span> <span class="ident">shift_right</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">increment</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">range</span><span class="op">|</span> <span class="ident">range</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">increment</span>);
+    <span class="kw">fn </span>shift_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, increment: usize) {
+        <span class="self">self</span>.for_each(|range| range.offset += increment);
     }
 
-    <span class="kw">fn</span> <span class="ident">for_each</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Range</span>)) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">range1</span>, <span class="ident">range2</span>) =&gt; {
-                <span class="ident">f</span>(<span class="ident">range1</span>);
-                <span class="ident">f</span>(<span class="ident">range2</span>);
+    <span class="kw">fn </span>for_each(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;mut </span>Range)) {
+        <span class="kw">match </span><span class="self">self </span>{
+            Diff::Equal(range1, range2) =&gt; {
+                f(range1);
+                f(range2);
             }
-            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) =&gt; <span class="ident">f</span>(<span class="ident">range</span>),
-            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) =&gt; <span class="ident">f</span>(<span class="ident">range</span>),
+            Diff::Delete(range) =&gt; f(range),
+            Diff::Insert(range) =&gt; f(range),
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">text1</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">text2</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Chunk</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">text1</span> <span class="op">=</span> <span class="ident">Range::new</span>(<span class="ident">text1</span>, ..);
-    <span class="kw">let</span> <span class="ident">text2</span> <span class="op">=</span> <span class="ident">Range::new</span>(<span class="ident">text2</span>, ..);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">solution</span> <span class="op">=</span> <span class="ident">main</span>(<span class="ident">text1</span>, <span class="ident">text2</span>);
-    <span class="ident">cleanup_char_boundary</span>(<span class="kw-2">&amp;mut</span> <span class="ident">solution</span>);
-    <span class="ident">cleanup_semantic</span>(<span class="kw-2">&amp;mut</span> <span class="ident">solution</span>);
-    <span class="ident">cleanup_merge</span>(<span class="kw-2">&amp;mut</span> <span class="ident">solution</span>);
-    <span class="ident">solution</span>.<span class="ident">diffs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Chunk::from</span>).<span class="ident">collect</span>()
+<span class="kw">pub fn </span>diff&lt;<span class="lifetime">&#39;a</span>&gt;(text1: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, text2: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Vec&lt;Chunk&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">let </span>text1 = Range::new(text1, ..);
+    <span class="kw">let </span>text2 = Range::new(text2, ..);
+    <span class="kw">let </span><span class="kw-2">mut </span>solution = main(text1, text2);
+    cleanup_char_boundary(<span class="kw-2">&amp;mut </span>solution);
+    cleanup_semantic(<span class="kw-2">&amp;mut </span>solution);
+    cleanup_merge(<span class="kw-2">&amp;mut </span>solution);
+    solution.diffs.into_iter().map(Chunk::from).collect()
 }
 
-<span class="kw">struct</span> <span class="ident">Solution</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-    <span class="ident">text1</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
-    <span class="ident">diffs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">utf8</span>: <span class="ident">bool</span>,
+<span class="kw">struct </span>Solution&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+    text1: Range&lt;<span class="lifetime">&#39;a</span>&gt;,
+    text2: Range&lt;<span class="lifetime">&#39;b</span>&gt;,
+    diffs: Vec&lt;Diff&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;&gt;,
+    utf8: bool,
 }
 
-<span class="kw">fn</span> <span class="ident">main</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">text1</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="ident">Solution</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">whole1</span> <span class="op">=</span> <span class="ident">text1</span>;
-    <span class="kw">let</span> <span class="ident">whole2</span> <span class="op">=</span> <span class="ident">text2</span>;
+<span class="kw">fn </span>main&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">mut </span>text1: Range&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="kw-2">mut </span>text2: Range&lt;<span class="lifetime">&#39;b</span>&gt;) -&gt; Solution&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">let </span>whole1 = text1;
+    <span class="kw">let </span>whole2 = text2;
 
-    <span class="comment">// Trim off common prefix.</span>
-    <span class="kw">let</span> <span class="ident">common_prefix_len</span> <span class="op">=</span> <span class="ident">common_prefix_bytes</span>(<span class="ident">text1</span>, <span class="ident">text2</span>);
-    <span class="kw">let</span> <span class="ident">common_prefix</span> <span class="op">=</span> <span class="ident">Diff::Equal</span>(
-        <span class="ident">text1</span>.<span class="ident">substring</span>(..<span class="ident">common_prefix_len</span>),
-        <span class="ident">text2</span>.<span class="ident">substring</span>(..<span class="ident">common_prefix_len</span>),
+    <span class="comment">// Trim off common prefix.
+    </span><span class="kw">let </span>common_prefix_len = common_prefix_bytes(text1, text2);
+    <span class="kw">let </span>common_prefix = Diff::Equal(
+        text1.substring(..common_prefix_len),
+        text2.substring(..common_prefix_len),
     );
-    <span class="ident">text1</span> <span class="op">=</span> <span class="ident">text1</span>.<span class="ident">substring</span>(<span class="ident">common_prefix_len</span>..);
-    <span class="ident">text2</span> <span class="op">=</span> <span class="ident">text2</span>.<span class="ident">substring</span>(<span class="ident">common_prefix_len</span>..);
+    text1 = text1.substring(common_prefix_len..);
+    text2 = text2.substring(common_prefix_len..);
 
-    <span class="comment">// Trim off common suffix.</span>
-    <span class="kw">let</span> <span class="ident">common_suffix_len</span> <span class="op">=</span> <span class="ident">common_suffix_bytes</span>(<span class="ident">text1</span>, <span class="ident">text2</span>);
-    <span class="kw">let</span> <span class="ident">common_suffix</span> <span class="op">=</span> <span class="ident">Diff::Equal</span>(
-        <span class="ident">text1</span>.<span class="ident">substring</span>(<span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">common_suffix_len</span>..),
-        <span class="ident">text2</span>.<span class="ident">substring</span>(<span class="ident">text2</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">common_suffix_len</span>..),
+    <span class="comment">// Trim off common suffix.
+    </span><span class="kw">let </span>common_suffix_len = common_suffix_bytes(text1, text2);
+    <span class="kw">let </span>common_suffix = Diff::Equal(
+        text1.substring(text1.len - common_suffix_len..),
+        text2.substring(text2.len - common_suffix_len..),
     );
-    <span class="ident">text1</span> <span class="op">=</span> <span class="ident">text1</span>.<span class="ident">substring</span>(..<span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">common_suffix_len</span>);
-    <span class="ident">text2</span> <span class="op">=</span> <span class="ident">text2</span>.<span class="ident">substring</span>(..<span class="ident">text2</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">common_suffix_len</span>);
+    text1 = text1.substring(..text1.len - common_suffix_len);
+    text2 = text2.substring(..text2.len - common_suffix_len);
 
-    <span class="comment">// Compute the diff on the middle block.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">solution</span> <span class="op">=</span> <span class="ident">Solution</span> {
-        <span class="ident">text1</span>: <span class="ident">whole1</span>,
-        <span class="ident">text2</span>: <span class="ident">whole2</span>,
-        <span class="ident">diffs</span>: <span class="ident">compute</span>(<span class="ident">text1</span>, <span class="ident">text2</span>),
-        <span class="ident">utf8</span>: <span class="bool-val">false</span>,
+    <span class="comment">// Compute the diff on the middle block.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>solution = Solution {
+        text1: whole1,
+        text2: whole2,
+        diffs: compute(text1, text2),
+        utf8: <span class="bool-val">false</span>,
     };
 
-    <span class="comment">// Restore the prefix and suffix.</span>
-    <span class="kw">if</span> <span class="ident">common_prefix_len</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="ident">solution</span>.<span class="ident">diffs</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">common_prefix</span>);
+    <span class="comment">// Restore the prefix and suffix.
+    </span><span class="kw">if </span>common_prefix_len &gt; <span class="number">0 </span>{
+        solution.diffs.insert(<span class="number">0</span>, common_prefix);
     }
-    <span class="kw">if</span> <span class="ident">common_suffix_len</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="ident">solution</span>.<span class="ident">diffs</span>.<span class="ident">push</span>(<span class="ident">common_suffix</span>);
+    <span class="kw">if </span>common_suffix_len &gt; <span class="number">0 </span>{
+        solution.diffs.push(common_suffix);
     }
 
-    <span class="ident">cleanup_merge</span>(<span class="kw-2">&amp;mut</span> <span class="ident">solution</span>);
+    cleanup_merge(<span class="kw-2">&amp;mut </span>solution);
 
-    <span class="ident">solution</span>
+    solution
 }
 
-<span class="comment">// Find the differences between two texts. Assumes that the texts do not have</span>
-<span class="comment">// any common prefix or suffix.</span>
-<span class="kw">fn</span> <span class="ident">compute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">text1</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> (<span class="ident">text1</span>.<span class="ident">is_empty</span>(), <span class="ident">text2</span>.<span class="ident">is_empty</span>()) {
-        (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="kw">return</span> <span class="ident">Vec::new</span>(),
-        (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="kw">return</span> <span class="macro">vec!</span>[<span class="ident">Diff::Insert</span>(<span class="ident">text2</span>)],
-        (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="kw">return</span> <span class="macro">vec!</span>[<span class="ident">Diff::Delete</span>(<span class="ident">text1</span>)],
+<span class="comment">// Find the differences between two texts. Assumes that the texts do not have
+// any common prefix or suffix.
+</span><span class="kw">fn </span>compute&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(text1: Range&lt;<span class="lifetime">&#39;a</span>&gt;, text2: Range&lt;<span class="lifetime">&#39;b</span>&gt;) -&gt; Vec&lt;Diff&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;&gt; {
+    <span class="kw">match </span>(text1.is_empty(), text2.is_empty()) {
+        (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="kw">return </span>Vec::new(),
+        (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="kw">return </span><span class="macro">vec!</span>[Diff::Insert(text2)],
+        (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="kw">return </span><span class="macro">vec!</span>[Diff::Delete(text1)],
         (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {}
     }
 
-    <span class="comment">// Check for entire shorter text inside the longer text.</span>
-    <span class="kw">if</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="op">&gt;</span> <span class="ident">text2</span>.<span class="ident">len</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">text1</span>.<span class="ident">find</span>(<span class="ident">text2</span>) {
-            <span class="kw">return</span> <span class="macro">vec!</span>[
-                <span class="ident">Diff::Delete</span>(<span class="ident">text1</span>.<span class="ident">substring</span>(..<span class="ident">i</span>)),
-                <span class="ident">Diff::Equal</span>(<span class="ident">text1</span>.<span class="ident">substring</span>(<span class="ident">i</span>..<span class="ident">i</span> <span class="op">+</span> <span class="ident">text2</span>.<span class="ident">len</span>), <span class="ident">text2</span>),
-                <span class="ident">Diff::Delete</span>(<span class="ident">text1</span>.<span class="ident">substring</span>(<span class="ident">i</span> <span class="op">+</span> <span class="ident">text2</span>.<span class="ident">len</span>..)),
+    <span class="comment">// Check for entire shorter text inside the longer text.
+    </span><span class="kw">if </span>text1.len &gt; text2.len {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = text1.find(text2) {
+            <span class="kw">return </span><span class="macro">vec!</span>[
+                Diff::Delete(text1.substring(..i)),
+                Diff::Equal(text1.substring(i..i + text2.len), text2),
+                Diff::Delete(text1.substring(i + text2.len..)),
             ];
         }
-    } <span class="kw">else</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">text2</span>.<span class="ident">find</span>(<span class="ident">text1</span>) {
-            <span class="kw">return</span> <span class="macro">vec!</span>[
-                <span class="ident">Diff::Insert</span>(<span class="ident">text2</span>.<span class="ident">substring</span>(..<span class="ident">i</span>)),
-                <span class="ident">Diff::Equal</span>(<span class="ident">text1</span>, <span class="ident">text2</span>.<span class="ident">substring</span>(<span class="ident">i</span>..<span class="ident">i</span> <span class="op">+</span> <span class="ident">text1</span>.<span class="ident">len</span>)),
-                <span class="ident">Diff::Insert</span>(<span class="ident">text2</span>.<span class="ident">substring</span>(<span class="ident">i</span> <span class="op">+</span> <span class="ident">text1</span>.<span class="ident">len</span>..)),
+    } <span class="kw">else </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = text2.find(text1) {
+            <span class="kw">return </span><span class="macro">vec!</span>[
+                Diff::Insert(text2.substring(..i)),
+                Diff::Equal(text1, text2.substring(i..i + text1.len)),
+                Diff::Insert(text2.substring(i + text1.len..)),
             ];
         }
     }
 
-    <span class="kw">if</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">text2</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">1</span> {
-        <span class="comment">// Single character string.</span>
-        <span class="comment">// After the previous check, the character can&#39;t be an equality.</span>
-        <span class="kw">return</span> <span class="macro">vec!</span>[<span class="ident">Diff::Delete</span>(<span class="ident">text1</span>), <span class="ident">Diff::Insert</span>(<span class="ident">text2</span>)];
+    <span class="kw">if </span>text1.len == <span class="number">1 </span>|| text2.len == <span class="number">1 </span>{
+        <span class="comment">// Single character string.
+        // After the previous check, the character can&#39;t be an equality.
+        </span><span class="kw">return </span><span class="macro">vec!</span>[Diff::Delete(text1), Diff::Insert(text2)];
     }
 
-    <span class="ident">bisect</span>(<span class="ident">text1</span>, <span class="ident">text2</span>)
+    bisect(text1, text2)
 }
 
-<span class="comment">// Find the &#39;middle snake&#39; of a diff, split the problem in two and return the</span>
-<span class="comment">// recursively constructed diff.</span>
-<span class="comment">//</span>
-<span class="comment">// See Myers 1986 paper: An O(ND) Difference Algorithm and Its Variations.</span>
-<span class="kw">fn</span> <span class="ident">bisect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">text1</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">max_d</span> <span class="op">=</span> (<span class="ident">text1</span>.<span class="ident">len</span> <span class="op">+</span> <span class="ident">text2</span>.<span class="ident">len</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="ident">v_offset</span> <span class="op">=</span> <span class="ident">max_d</span>;
-    <span class="kw">let</span> <span class="ident">v_len</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">max_d</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v1</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1isize</span>; <span class="ident">v_len</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v2</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">-</span><span class="number">1isize</span>; <span class="ident">v_len</span>];
-    <span class="ident">v1</span>[<span class="ident">v_offset</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="number">0</span>;
-    <span class="ident">v2</span>[<span class="ident">v_offset</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">-</span> <span class="ident">text2</span>.<span class="ident">len</span> <span class="kw">as</span> <span class="ident">isize</span>;
-    <span class="comment">// If the total number of characters is odd, then the front path will</span>
-    <span class="comment">// collide with the reverse path.</span>
-    <span class="kw">let</span> <span class="ident">front</span> <span class="op">=</span> <span class="ident">delta</span> <span class="op">%</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
-    <span class="comment">// Offsets for start and end of k loop.</span>
-    <span class="comment">// Prevents mapping of space beyond the grid.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k1start</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k1end</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k2start</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k2end</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">for</span> <span class="ident">d</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">max_d</span> <span class="kw">as</span> <span class="ident">isize</span> {
-        <span class="comment">// Walk the front path one step.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k1</span> <span class="op">=</span> <span class="op">-</span><span class="ident">d</span> <span class="op">+</span> <span class="ident">k1start</span>;
-        <span class="kw">while</span> <span class="ident">k1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">d</span> <span class="op">-</span> <span class="ident">k1end</span> {
-            <span class="kw">let</span> <span class="ident">k1_offset</span> <span class="op">=</span> (<span class="ident">v_offset</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">k1</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x1</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">k1</span> <span class="op">==</span> <span class="op">-</span><span class="ident">d</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">k1</span> <span class="op">!</span><span class="op">=</span> <span class="ident">d</span> <span class="op">&amp;&amp;</span> <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">&lt;</span> <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="op">+</span> <span class="number">1</span>]) {
-                <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="op">+</span> <span class="number">1</span>]
-            } <span class="kw">else</span> {
-                <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">+</span> <span class="number">1</span>
-            } <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">y1</span> <span class="op">=</span> (<span class="ident">x1</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">-</span> <span class="ident">k1</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">s1</span>), <span class="prelude-val">Some</span>(<span class="ident">s2</span>)) <span class="op">=</span> (<span class="ident">text1</span>.<span class="ident">get</span>(<span class="ident">x1</span>..), <span class="ident">text2</span>.<span class="ident">get</span>(<span class="ident">y1</span>..)) {
-                <span class="kw">let</span> <span class="ident">advance</span> <span class="op">=</span> <span class="ident">common_prefix_bytes</span>(<span class="ident">s1</span>, <span class="ident">s2</span>);
-                <span class="ident">x1</span> <span class="op">+</span><span class="op">=</span> <span class="ident">advance</span>;
-                <span class="ident">y1</span> <span class="op">+</span><span class="op">=</span> <span class="ident">advance</span>;
+<span class="comment">// Find the &#39;middle snake&#39; of a diff, split the problem in two and return the
+// recursively constructed diff.
+//
+// See Myers 1986 paper: An O(ND) Difference Algorithm and Its Variations.
+</span><span class="kw">fn </span>bisect&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(text1: Range&lt;<span class="lifetime">&#39;a</span>&gt;, text2: Range&lt;<span class="lifetime">&#39;b</span>&gt;) -&gt; Vec&lt;Diff&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;&gt; {
+    <span class="kw">let </span>max_d = (text1.len + text2.len + <span class="number">1</span>) / <span class="number">2</span>;
+    <span class="kw">let </span>v_offset = max_d;
+    <span class="kw">let </span>v_len = <span class="number">2 </span>* max_d;
+    <span class="kw">let </span><span class="kw-2">mut </span>v1 = <span class="macro">vec!</span>[-<span class="number">1isize</span>; v_len];
+    <span class="kw">let </span><span class="kw-2">mut </span>v2 = <span class="macro">vec!</span>[-<span class="number">1isize</span>; v_len];
+    v1[v_offset + <span class="number">1</span>] = <span class="number">0</span>;
+    v2[v_offset + <span class="number">1</span>] = <span class="number">0</span>;
+    <span class="kw">let </span>delta = text1.len <span class="kw">as </span>isize - text2.len <span class="kw">as </span>isize;
+    <span class="comment">// If the total number of characters is odd, then the front path will
+    // collide with the reverse path.
+    </span><span class="kw">let </span>front = delta % <span class="number">2 </span>!= <span class="number">0</span>;
+    <span class="comment">// Offsets for start and end of k loop.
+    // Prevents mapping of space beyond the grid.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>k1start = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>k1end = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>k2start = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>k2end = <span class="number">0</span>;
+    <span class="kw">for </span>d <span class="kw">in </span><span class="number">0</span>..max_d <span class="kw">as </span>isize {
+        <span class="comment">// Walk the front path one step.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>k1 = -d + k1start;
+        <span class="kw">while </span>k1 &lt;= d - k1end {
+            <span class="kw">let </span>k1_offset = (v_offset <span class="kw">as </span>isize + k1) <span class="kw">as </span>usize;
+            <span class="kw">let </span><span class="kw-2">mut </span>x1 = <span class="kw">if </span>k1 == -d || (k1 != d &amp;&amp; v1[k1_offset - <span class="number">1</span>] &lt; v1[k1_offset + <span class="number">1</span>]) {
+                v1[k1_offset + <span class="number">1</span>]
+            } <span class="kw">else </span>{
+                v1[k1_offset - <span class="number">1</span>] + <span class="number">1
+            </span>} <span class="kw">as </span>usize;
+            <span class="kw">let </span><span class="kw-2">mut </span>y1 = (x1 <span class="kw">as </span>isize - k1) <span class="kw">as </span>usize;
+            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(s1), <span class="prelude-val">Some</span>(s2)) = (text1.get(x1..), text2.get(y1..)) {
+                <span class="kw">let </span>advance = common_prefix_bytes(s1, s2);
+                x1 += advance;
+                y1 += advance;
             }
-            <span class="ident">v1</span>[<span class="ident">k1_offset</span>] <span class="op">=</span> <span class="ident">x1</span> <span class="kw">as</span> <span class="ident">isize</span>;
-            <span class="kw">if</span> <span class="ident">x1</span> <span class="op">&gt;</span> <span class="ident">text1</span>.<span class="ident">len</span> {
-                <span class="comment">// Ran off the right of the graph.</span>
-                <span class="ident">k1end</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">y1</span> <span class="op">&gt;</span> <span class="ident">text2</span>.<span class="ident">len</span> {
-                <span class="comment">// Ran off the bottom of the graph.</span>
-                <span class="ident">k1start</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">front</span> {
-                <span class="kw">let</span> <span class="ident">k2_offset</span> <span class="op">=</span> <span class="ident">v_offset</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">delta</span> <span class="op">-</span> <span class="ident">k1</span>;
-                <span class="kw">if</span> <span class="ident">k2_offset</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">k2_offset</span> <span class="op">&lt;</span> <span class="ident">v_len</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">&amp;&amp;</span> <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">!</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span> {
-                    <span class="comment">// Mirror x2 onto top-left coordinate system.</span>
-                    <span class="kw">let</span> <span class="ident">x2</span> <span class="op">=</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">-</span> <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="kw">as</span> <span class="ident">usize</span>];
-                    <span class="kw">if</span> <span class="ident">x1</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">x2</span> {
-                        <span class="comment">// Overlap detected.</span>
-                        <span class="kw">return</span> <span class="ident">bisect_split</span>(<span class="ident">text1</span>, <span class="ident">text2</span>, <span class="ident">x1</span>, <span class="ident">y1</span>);
+            v1[k1_offset] = x1 <span class="kw">as </span>isize;
+            <span class="kw">if </span>x1 &gt; text1.len {
+                <span class="comment">// Ran off the right of the graph.
+                </span>k1end += <span class="number">2</span>;
+            } <span class="kw">else if </span>y1 &gt; text2.len {
+                <span class="comment">// Ran off the bottom of the graph.
+                </span>k1start += <span class="number">2</span>;
+            } <span class="kw">else if </span>front {
+                <span class="kw">let </span>k2_offset = v_offset <span class="kw">as </span>isize + delta - k1;
+                <span class="kw">if </span>k2_offset &gt;= <span class="number">0 </span>&amp;&amp; k2_offset &lt; v_len <span class="kw">as </span>isize &amp;&amp; v2[k2_offset <span class="kw">as </span>usize] != -<span class="number">1 </span>{
+                    <span class="comment">// Mirror x2 onto top-left coordinate system.
+                    </span><span class="kw">let </span>x2 = text1.len <span class="kw">as </span>isize - v2[k2_offset <span class="kw">as </span>usize];
+                    <span class="kw">if </span>x1 <span class="kw">as </span>isize &gt;= x2 {
+                        <span class="comment">// Overlap detected.
+                        </span><span class="kw">return </span>bisect_split(text1, text2, x1, y1);
                     }
                 }
             }
-            <span class="ident">k1</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
+            k1 += <span class="number">2</span>;
         }
 
-        <span class="comment">// Walk the reverse path one step.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k2</span> <span class="op">=</span> <span class="op">-</span><span class="ident">d</span> <span class="op">+</span> <span class="ident">k2start</span>;
-        <span class="kw">while</span> <span class="ident">k2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">d</span> <span class="op">-</span> <span class="ident">k2end</span> {
-            <span class="kw">let</span> <span class="ident">k2_offset</span> <span class="op">=</span> (<span class="ident">v_offset</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">k2</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x2</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">k2</span> <span class="op">==</span> <span class="op">-</span><span class="ident">d</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">k2</span> <span class="op">!</span><span class="op">=</span> <span class="ident">d</span> <span class="op">&amp;&amp;</span> <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">&lt;</span> <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="op">+</span> <span class="number">1</span>]) {
-                <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="op">+</span> <span class="number">1</span>]
-            } <span class="kw">else</span> {
-                <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">+</span> <span class="number">1</span>
-            } <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">y2</span> <span class="op">=</span> (<span class="ident">x2</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">-</span> <span class="ident">k2</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">if</span> <span class="ident">x2</span> <span class="op">&lt;</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="op">&amp;&amp;</span> <span class="ident">y2</span> <span class="op">&lt;</span> <span class="ident">text2</span>.<span class="ident">len</span> {
-                <span class="kw">let</span> <span class="ident">advance</span> <span class="op">=</span> <span class="ident">common_suffix_bytes</span>(
-                    <span class="ident">text1</span>.<span class="ident">substring</span>(..<span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">x2</span>),
-                    <span class="ident">text2</span>.<span class="ident">substring</span>(..<span class="ident">text2</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">y2</span>),
+        <span class="comment">// Walk the reverse path one step.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>k2 = -d + k2start;
+        <span class="kw">while </span>k2 &lt;= d - k2end {
+            <span class="kw">let </span>k2_offset = (v_offset <span class="kw">as </span>isize + k2) <span class="kw">as </span>usize;
+            <span class="kw">let </span><span class="kw-2">mut </span>x2 = <span class="kw">if </span>k2 == -d || (k2 != d &amp;&amp; v2[k2_offset - <span class="number">1</span>] &lt; v2[k2_offset + <span class="number">1</span>]) {
+                v2[k2_offset + <span class="number">1</span>]
+            } <span class="kw">else </span>{
+                v2[k2_offset - <span class="number">1</span>] + <span class="number">1
+            </span>} <span class="kw">as </span>usize;
+            <span class="kw">let </span><span class="kw-2">mut </span>y2 = (x2 <span class="kw">as </span>isize - k2) <span class="kw">as </span>usize;
+            <span class="kw">if </span>x2 &lt; text1.len &amp;&amp; y2 &lt; text2.len {
+                <span class="kw">let </span>advance = common_suffix_bytes(
+                    text1.substring(..text1.len - x2),
+                    text2.substring(..text2.len - y2),
                 );
-                <span class="ident">x2</span> <span class="op">+</span><span class="op">=</span> <span class="ident">advance</span>;
-                <span class="ident">y2</span> <span class="op">+</span><span class="op">=</span> <span class="ident">advance</span>;
+                x2 += advance;
+                y2 += advance;
             }
-            <span class="ident">v2</span>[<span class="ident">k2_offset</span>] <span class="op">=</span> <span class="ident">x2</span> <span class="kw">as</span> <span class="ident">isize</span>;
-            <span class="kw">if</span> <span class="ident">x2</span> <span class="op">&gt;</span> <span class="ident">text1</span>.<span class="ident">len</span> {
-                <span class="comment">// Ran off the left of the graph.</span>
-                <span class="ident">k2end</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">y2</span> <span class="op">&gt;</span> <span class="ident">text2</span>.<span class="ident">len</span> {
-                <span class="comment">// Ran off the top of the graph.</span>
-                <span class="ident">k2start</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">front</span> {
-                <span class="kw">let</span> <span class="ident">k1_offset</span> <span class="op">=</span> <span class="ident">v_offset</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">delta</span> <span class="op">-</span> <span class="ident">k2</span>;
-                <span class="kw">if</span> <span class="ident">k1_offset</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">k1_offset</span> <span class="op">&lt;</span> <span class="ident">v_len</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">&amp;&amp;</span> <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">!</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span> {
-                    <span class="kw">let</span> <span class="ident">x1</span> <span class="op">=</span> <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="kw">let</span> <span class="ident">y1</span> <span class="op">=</span> <span class="ident">v_offset</span> <span class="op">+</span> <span class="ident">x1</span> <span class="op">-</span> <span class="ident">k1_offset</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="comment">// Mirror x2 onto top-left coordinate system.</span>
-                    <span class="ident">x2</span> <span class="op">=</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">x2</span>;
-                    <span class="kw">if</span> <span class="ident">x1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">x2</span> {
-                        <span class="comment">// Overlap detected.</span>
-                        <span class="kw">return</span> <span class="ident">bisect_split</span>(<span class="ident">text1</span>, <span class="ident">text2</span>, <span class="ident">x1</span>, <span class="ident">y1</span>);
+            v2[k2_offset] = x2 <span class="kw">as </span>isize;
+            <span class="kw">if </span>x2 &gt; text1.len {
+                <span class="comment">// Ran off the left of the graph.
+                </span>k2end += <span class="number">2</span>;
+            } <span class="kw">else if </span>y2 &gt; text2.len {
+                <span class="comment">// Ran off the top of the graph.
+                </span>k2start += <span class="number">2</span>;
+            } <span class="kw">else if </span>!front {
+                <span class="kw">let </span>k1_offset = v_offset <span class="kw">as </span>isize + delta - k2;
+                <span class="kw">if </span>k1_offset &gt;= <span class="number">0 </span>&amp;&amp; k1_offset &lt; v_len <span class="kw">as </span>isize &amp;&amp; v1[k1_offset <span class="kw">as </span>usize] != -<span class="number">1 </span>{
+                    <span class="kw">let </span>x1 = v1[k1_offset <span class="kw">as </span>usize] <span class="kw">as </span>usize;
+                    <span class="kw">let </span>y1 = v_offset + x1 - k1_offset <span class="kw">as </span>usize;
+                    <span class="comment">// Mirror x2 onto top-left coordinate system.
+                    </span>x2 = text1.len - x2;
+                    <span class="kw">if </span>x1 &gt;= x2 {
+                        <span class="comment">// Overlap detected.
+                        </span><span class="kw">return </span>bisect_split(text1, text2, x1, y1);
                     }
                 }
             }
-            <span class="ident">k2</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
+            k2 += <span class="number">2</span>;
         }
     }
-    <span class="comment">// Number of diffs equals number of characters, no commonality at all.</span>
-    <span class="macro">vec!</span>[<span class="ident">Diff::Delete</span>(<span class="ident">text1</span>), <span class="ident">Diff::Insert</span>(<span class="ident">text2</span>)]
+    <span class="comment">// Number of diffs equals number of characters, no commonality at all.
+    </span><span class="macro">vec!</span>[Diff::Delete(text1), Diff::Insert(text2)]
 }
 
-<span class="comment">// Given the location of the &#39;middle snake&#39;, split the diff in two parts and</span>
-<span class="comment">// recurse.</span>
-<span class="kw">fn</span> <span class="ident">bisect_split</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(
-    <span class="ident">text1</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
-    <span class="ident">x</span>: <span class="ident">usize</span>,
-    <span class="ident">y</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">text1a</span>, <span class="ident">text1b</span>) <span class="op">=</span> <span class="ident">text1</span>.<span class="ident">split_at</span>(<span class="ident">x</span>);
-    <span class="kw">let</span> (<span class="ident">text2a</span>, <span class="ident">text2b</span>) <span class="op">=</span> <span class="ident">text2</span>.<span class="ident">split_at</span>(<span class="ident">y</span>);
+<span class="comment">// Given the location of the &#39;middle snake&#39;, split the diff in two parts and
+// recurse.
+</span><span class="kw">fn </span>bisect_split&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+    text1: Range&lt;<span class="lifetime">&#39;a</span>&gt;,
+    text2: Range&lt;<span class="lifetime">&#39;b</span>&gt;,
+    x: usize,
+    y: usize,
+) -&gt; Vec&lt;Diff&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;&gt; {
+    <span class="kw">let </span>(text1a, text1b) = text1.split_at(x);
+    <span class="kw">let </span>(text2a, text2b) = text2.split_at(y);
 
-    <span class="comment">// Compute both diffs serially.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diffs</span> <span class="op">=</span> <span class="ident">main</span>(<span class="ident">text1a</span>, <span class="ident">text2a</span>).<span class="ident">diffs</span>;
-    <span class="ident">diffs</span>.<span class="ident">extend</span>(<span class="ident">main</span>(<span class="ident">text1b</span>, <span class="ident">text2b</span>).<span class="ident">diffs</span>);
+    <span class="comment">// Compute both diffs serially.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>diffs = main(text1a, text2a).diffs;
+    diffs.extend(main(text1b, text2b).diffs);
 
-    <span class="ident">diffs</span>
+    diffs
 }
 
-<span class="comment">// Determine the length of the common prefix of two strings.</span>
-<span class="kw">fn</span> <span class="ident">common_prefix</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">for</span> ((<span class="ident">i</span>, <span class="ident">ch1</span>), <span class="ident">ch2</span>) <span class="kw">in</span> <span class="ident">text1</span>.<span class="ident">char_indices</span>().<span class="ident">zip</span>(<span class="ident">text2</span>.<span class="ident">chars</span>()) {
-        <span class="kw">if</span> <span class="ident">ch1</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ch2</span> {
-            <span class="kw">return</span> <span class="ident">i</span>;
+<span class="comment">// Determine the length of the common prefix of two strings.
+</span><span class="kw">fn </span>common_prefix(text1: Range, text2: Range) -&gt; usize {
+    <span class="kw">for </span>((i, ch1), ch2) <span class="kw">in </span>text1.char_indices().zip(text2.chars()) {
+        <span class="kw">if </span>ch1 != ch2 {
+            <span class="kw">return </span>i;
         }
     }
-    <span class="ident">cmp::min</span>(<span class="ident">text1</span>.<span class="ident">len</span>, <span class="ident">text2</span>.<span class="ident">len</span>)
+    cmp::min(text1.len, text2.len)
 }
 
-<span class="comment">// Determine the length of the common suffix of two strings.</span>
-<span class="kw">fn</span> <span class="ident">common_suffix</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">for</span> ((<span class="ident">i</span>, <span class="ident">ch1</span>), <span class="ident">ch2</span>) <span class="kw">in</span> <span class="ident">text1</span>.<span class="ident">char_indices</span>().<span class="ident">rev</span>().<span class="ident">zip</span>(<span class="ident">text2</span>.<span class="ident">chars</span>().<span class="ident">rev</span>()) {
-        <span class="kw">if</span> <span class="ident">ch1</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ch2</span> {
-            <span class="kw">return</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">i</span> <span class="op">-</span> <span class="ident">ch1</span>.<span class="ident">len_utf8</span>();
+<span class="comment">// Determine the length of the common suffix of two strings.
+</span><span class="kw">fn </span>common_suffix(text1: Range, text2: Range) -&gt; usize {
+    <span class="kw">for </span>((i, ch1), ch2) <span class="kw">in </span>text1.char_indices().rev().zip(text2.chars().rev()) {
+        <span class="kw">if </span>ch1 != ch2 {
+            <span class="kw">return </span>text1.len - i - ch1.len_utf8();
         }
     }
-    <span class="ident">cmp::min</span>(<span class="ident">text1</span>.<span class="ident">len</span>, <span class="ident">text2</span>.<span class="ident">len</span>)
+    cmp::min(text1.len, text2.len)
 }
 
-<span class="kw">fn</span> <span class="ident">common_prefix_bytes</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">for</span> (<span class="ident">i</span>, (<span class="ident">b1</span>, <span class="ident">b2</span>)) <span class="kw">in</span> <span class="ident">text1</span>.<span class="ident">bytes</span>().<span class="ident">zip</span>(<span class="ident">text2</span>.<span class="ident">bytes</span>()).<span class="ident">enumerate</span>() {
-        <span class="kw">if</span> <span class="ident">b1</span> <span class="op">!</span><span class="op">=</span> <span class="ident">b2</span> {
-            <span class="kw">return</span> <span class="ident">i</span>;
+<span class="kw">fn </span>common_prefix_bytes(text1: Range, text2: Range) -&gt; usize {
+    <span class="kw">for </span>(i, (b1, b2)) <span class="kw">in </span>text1.bytes().zip(text2.bytes()).enumerate() {
+        <span class="kw">if </span>b1 != b2 {
+            <span class="kw">return </span>i;
         }
     }
-    <span class="ident">cmp::min</span>(<span class="ident">text1</span>.<span class="ident">len</span>, <span class="ident">text2</span>.<span class="ident">len</span>)
+    cmp::min(text1.len, text2.len)
 }
 
-<span class="kw">fn</span> <span class="ident">common_suffix_bytes</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">for</span> (<span class="ident">i</span>, (<span class="ident">b1</span>, <span class="ident">b2</span>)) <span class="kw">in</span> <span class="ident">text1</span>.<span class="ident">bytes</span>().<span class="ident">rev</span>().<span class="ident">zip</span>(<span class="ident">text2</span>.<span class="ident">bytes</span>().<span class="ident">rev</span>()).<span class="ident">enumerate</span>() {
-        <span class="kw">if</span> <span class="ident">b1</span> <span class="op">!</span><span class="op">=</span> <span class="ident">b2</span> {
-            <span class="kw">return</span> <span class="ident">i</span>;
+<span class="kw">fn </span>common_suffix_bytes(text1: Range, text2: Range) -&gt; usize {
+    <span class="kw">for </span>(i, (b1, b2)) <span class="kw">in </span>text1.bytes().rev().zip(text2.bytes().rev()).enumerate() {
+        <span class="kw">if </span>b1 != b2 {
+            <span class="kw">return </span>i;
         }
     }
-    <span class="ident">cmp::min</span>(<span class="ident">text1</span>.<span class="ident">len</span>, <span class="ident">text2</span>.<span class="ident">len</span>)
+    cmp::min(text1.len, text2.len)
 }
 
-<span class="comment">// Determine if the suffix of one string is the prefix of another.</span>
-<span class="comment">//</span>
-<span class="comment">// Returns the number of characters common to the end of the first string and</span>
-<span class="comment">// the start of the second string.</span>
-<span class="kw">fn</span> <span class="ident">common_overlap</span>(<span class="kw-2">mut</span> <span class="ident">text1</span>: <span class="ident">Range</span>, <span class="kw-2">mut</span> <span class="ident">text2</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
-    <span class="comment">// Eliminate the null case.</span>
-    <span class="kw">if</span> <span class="ident">text1</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">text2</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="number">0</span>;
+<span class="comment">// Determine if the suffix of one string is the prefix of another.
+//
+// Returns the number of characters common to the end of the first string and
+// the start of the second string.
+</span><span class="kw">fn </span>common_overlap(<span class="kw-2">mut </span>text1: Range, <span class="kw-2">mut </span>text2: Range) -&gt; usize {
+    <span class="comment">// Eliminate the null case.
+    </span><span class="kw">if </span>text1.is_empty() || text2.is_empty() {
+        <span class="kw">return </span><span class="number">0</span>;
     }
-    <span class="comment">// Truncate the longer string.</span>
-    <span class="kw">if</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="op">&gt;</span> <span class="ident">text2</span>.<span class="ident">len</span> {
-        <span class="ident">text1</span> <span class="op">=</span> <span class="ident">text1</span>.<span class="ident">substring</span>(<span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">text2</span>.<span class="ident">len</span>..);
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="op">&lt;</span> <span class="ident">text2</span>.<span class="ident">len</span> {
-        <span class="ident">text2</span> <span class="op">=</span> <span class="ident">text2</span>.<span class="ident">substring</span>(..<span class="ident">text1</span>.<span class="ident">len</span>);
+    <span class="comment">// Truncate the longer string.
+    </span><span class="kw">if </span>text1.len &gt; text2.len {
+        text1 = text1.substring(text1.len - text2.len..);
+    } <span class="kw">else if </span>text1.len &lt; text2.len {
+        text2 = text2.substring(..text1.len);
     }
-    <span class="comment">// Quick check for the worst case.</span>
-    <span class="kw">if</span> <span class="ident">bytes</span>(<span class="ident">text1</span>) <span class="op">==</span> <span class="ident">bytes</span>(<span class="ident">text2</span>) {
-        <span class="kw">return</span> <span class="ident">text1</span>.<span class="ident">len</span>;
+    <span class="comment">// Quick check for the worst case.
+    </span><span class="kw">if </span>bytes(text1) == bytes(text2) {
+        <span class="kw">return </span>text1.len;
     }
 
-    <span class="comment">// Start by looking for a single character match</span>
-    <span class="comment">// and increase length until no match is found.</span>
-    <span class="comment">// Performance analysis: https://neil.fraser.name/news/2010/11/04/</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">best</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">pattern</span> <span class="op">=</span> <span class="ident">text1</span>.<span class="ident">substring</span>(<span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">length</span>..);
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">text2</span>.<span class="ident">find</span>(<span class="ident">pattern</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">found</span>) =&gt; <span class="ident">found</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">best</span>,
+    <span class="comment">// Start by looking for a single character match
+    // and increase length until no match is found.
+    // Performance analysis: https://neil.fraser.name/news/2010/11/04/
+    </span><span class="kw">let </span><span class="kw-2">mut </span>best = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>length = <span class="number">1</span>;
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>pattern = text1.substring(text1.len - length..);
+        <span class="kw">let </span>found = <span class="kw">match </span>text2.find(pattern) {
+            <span class="prelude-val">Some</span>(found) =&gt; found,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>best,
         };
-        <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">found</span>;
-        <span class="kw">if</span> <span class="ident">found</span> <span class="op">==</span> <span class="number">0</span>
-            <span class="op">|</span><span class="op">|</span> <span class="ident">bytes</span>(<span class="ident">text1</span>.<span class="ident">substring</span>(<span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">length</span>..)) <span class="op">==</span> <span class="ident">bytes</span>(<span class="ident">text2</span>.<span class="ident">substring</span>(..<span class="ident">length</span>))
+        length += found;
+        <span class="kw">if </span>found == <span class="number">0
+            </span>|| bytes(text1.substring(text1.len - length..)) == bytes(text2.substring(..length))
         {
-            <span class="ident">best</span> <span class="op">=</span> <span class="ident">length</span>;
-            <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            best = length;
+            length += <span class="number">1</span>;
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">cleanup_char_boundary</span>(<span class="ident">solution</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Solution</span>) {
-    <span class="kw">fn</span> <span class="ident">boundary_down</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">doc</span>.<span class="ident">is_char_boundary</span>(<span class="ident">pos</span> <span class="op">-</span> <span class="ident">adjust</span>) {
-            <span class="ident">adjust</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+<span class="kw">fn </span>cleanup_char_boundary(solution: <span class="kw-2">&amp;mut </span>Solution) {
+    <span class="kw">fn </span>boundary_down(doc: <span class="kw-2">&amp;</span>str, pos: usize) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>adjust = <span class="number">0</span>;
+        <span class="kw">while </span>!doc.is_char_boundary(pos - adjust) {
+            adjust += <span class="number">1</span>;
         }
-        <span class="ident">adjust</span>
+        adjust
     }
 
-    <span class="kw">fn</span> <span class="ident">boundary_up</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">doc</span>.<span class="ident">is_char_boundary</span>(<span class="ident">pos</span> <span class="op">+</span> <span class="ident">adjust</span>) {
-            <span class="ident">adjust</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">fn </span>boundary_up(doc: <span class="kw-2">&amp;</span>str, pos: usize) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>adjust = <span class="number">0</span>;
+        <span class="kw">while </span>!doc.is_char_boundary(pos + adjust) {
+            adjust += <span class="number">1</span>;
         }
-        <span class="ident">adjust</span>
+        adjust
     }
 
-    <span class="kw">fn</span> <span class="ident">skip_overlap</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">prev</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">range</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">prev_end</span> <span class="op">=</span> <span class="ident">prev</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="ident">prev</span>.<span class="ident">len</span>;
-        <span class="kw">if</span> <span class="ident">prev_end</span> <span class="op">&gt;</span> <span class="ident">range</span>.<span class="ident">offset</span> {
-            <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">prev_end</span> <span class="op">-</span> <span class="ident">range</span>.<span class="ident">offset</span>, <span class="ident">range</span>.<span class="ident">len</span>);
-            <span class="ident">range</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">delta</span>;
-            <span class="ident">range</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">delta</span>;
+    <span class="kw">fn </span>skip_overlap&lt;<span class="lifetime">&#39;a</span>&gt;(prev: <span class="kw-2">&amp;</span>Range&lt;<span class="lifetime">&#39;a</span>&gt;, range: <span class="kw-2">&amp;mut </span>Range&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="kw">let </span>prev_end = prev.offset + prev.len;
+        <span class="kw">if </span>prev_end &gt; range.offset {
+            <span class="kw">let </span>delta = cmp::min(prev_end - range.offset, range.len);
+            range.offset += delta;
+            range.len -= delta;
         }
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">retain</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_delete</span> <span class="op">=</span> <span class="ident">Range::empty</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_insert</span> <span class="op">=</span> <span class="ident">Range::empty</span>();
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">mut</span> <span class="ident">diff</span>)) <span class="op">=</span> <span class="ident">solution</span>.<span class="ident">diffs</span>.<span class="ident">get</span>(<span class="ident">read</span>) {
-        <span class="ident">read</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="ident">diff</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">range1</span>, <span class="ident">range2</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="ident">boundary_up</span>(<span class="ident">range1</span>.<span class="ident">doc</span>, <span class="ident">range1</span>.<span class="ident">offset</span>);
-                <span class="comment">// If the whole range is sub-character, skip it.</span>
-                <span class="kw">if</span> <span class="ident">range1</span>.<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">adjust</span> {
+    <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>retain = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>last_delete = Range::empty();
+    <span class="kw">let </span><span class="kw-2">mut </span>last_insert = Range::empty();
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">mut </span>diff)) = solution.diffs.get(read) {
+        read += <span class="number">1</span>;
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span>diff {
+            Diff::Equal(range1, range2) =&gt; {
+                <span class="kw">let </span>adjust = boundary_up(range1.doc, range1.offset);
+                <span class="comment">// If the whole range is sub-character, skip it.
+                </span><span class="kw">if </span>range1.len &lt;= adjust {
                     <span class="kw">continue</span>;
                 }
-                <span class="ident">range1</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="ident">range1</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="ident">range2</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="ident">range2</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="kw">let</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="ident">boundary_down</span>(<span class="ident">range1</span>.<span class="ident">doc</span>, <span class="ident">range1</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="ident">range1</span>.<span class="ident">len</span>);
-                <span class="ident">range1</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="ident">range2</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="ident">last_delete</span> <span class="op">=</span> <span class="ident">Range::empty</span>();
-                <span class="ident">last_insert</span> <span class="op">=</span> <span class="ident">Range::empty</span>();
+                range1.offset += adjust;
+                range1.len -= adjust;
+                range2.offset += adjust;
+                range2.len -= adjust;
+                <span class="kw">let </span>adjust = boundary_down(range1.doc, range1.offset + range1.len);
+                range1.len -= adjust;
+                range2.len -= adjust;
+                last_delete = Range::empty();
+                last_insert = Range::empty();
             }
-            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) =&gt; {
-                <span class="ident">skip_overlap</span>(<span class="kw-2">&amp;</span><span class="ident">last_delete</span>, <span class="ident">range</span>);
-                <span class="kw">if</span> <span class="ident">range</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
+            Diff::Delete(range) =&gt; {
+                skip_overlap(<span class="kw-2">&amp;</span>last_delete, range);
+                <span class="kw">if </span>range.len == <span class="number">0 </span>{
                     <span class="kw">continue</span>;
                 }
-                <span class="kw">let</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="ident">boundary_down</span>(<span class="ident">range</span>.<span class="ident">doc</span>, <span class="ident">range</span>.<span class="ident">offset</span>);
-                <span class="ident">range</span>.<span class="ident">offset</span> <span class="op">-</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="ident">range</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="kw">let</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="ident">boundary_up</span>(<span class="ident">range</span>.<span class="ident">doc</span>, <span class="ident">range</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="ident">range</span>.<span class="ident">len</span>);
-                <span class="ident">range</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="ident">last_delete</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">range</span>;
+                <span class="kw">let </span>adjust = boundary_down(range.doc, range.offset);
+                range.offset -= adjust;
+                range.len += adjust;
+                <span class="kw">let </span>adjust = boundary_up(range.doc, range.offset + range.len);
+                range.len += adjust;
+                last_delete = <span class="kw-2">*</span>range;
             }
-            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) =&gt; {
-                <span class="ident">skip_overlap</span>(<span class="kw-2">&amp;</span><span class="ident">last_insert</span>, <span class="ident">range</span>);
-                <span class="kw">if</span> <span class="ident">range</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
+            Diff::Insert(range) =&gt; {
+                skip_overlap(<span class="kw-2">&amp;</span>last_insert, range);
+                <span class="kw">if </span>range.len == <span class="number">0 </span>{
                     <span class="kw">continue</span>;
                 }
-                <span class="kw">let</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="ident">boundary_down</span>(<span class="ident">range</span>.<span class="ident">doc</span>, <span class="ident">range</span>.<span class="ident">offset</span>);
-                <span class="ident">range</span>.<span class="ident">offset</span> <span class="op">-</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="ident">range</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="kw">let</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="ident">boundary_up</span>(<span class="ident">range</span>.<span class="ident">doc</span>, <span class="ident">range</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="ident">range</span>.<span class="ident">len</span>);
-                <span class="ident">range</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">adjust</span>;
-                <span class="ident">last_insert</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">range</span>;
+                <span class="kw">let </span>adjust = boundary_down(range.doc, range.offset);
+                range.offset -= adjust;
+                range.len += adjust;
+                <span class="kw">let </span>adjust = boundary_up(range.doc, range.offset + range.len);
+                range.len += adjust;
+                last_insert = <span class="kw-2">*</span>range;
             }
         }
-        <span class="ident">solution</span>.<span class="ident">diffs</span>[<span class="ident">retain</span>] <span class="op">=</span> <span class="ident">diff</span>;
-        <span class="ident">retain</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        solution.diffs[retain] = diff;
+        retain += <span class="number">1</span>;
     }
 
-    <span class="ident">solution</span>.<span class="ident">diffs</span>.<span class="ident">truncate</span>(<span class="ident">retain</span>);
-    <span class="ident">solution</span>.<span class="ident">utf8</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    solution.diffs.truncate(retain);
+    solution.utf8 = <span class="bool-val">true</span>;
 }
 
-<span class="comment">// Reduce the number of edits by eliminating semantically trivial equalities.</span>
-<span class="kw">fn</span> <span class="ident">cleanup_semantic</span>(<span class="ident">solution</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Solution</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diffs</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">solution</span>.<span class="ident">diffs</span>;
-    <span class="kw">if</span> <span class="ident">diffs</span>.<span class="ident">is_empty</span>() {
+<span class="comment">// Reduce the number of edits by eliminating semantically trivial equalities.
+</span><span class="kw">fn </span>cleanup_semantic(solution: <span class="kw-2">&amp;mut </span>Solution) {
+    <span class="kw">let </span><span class="kw-2">mut </span>diffs = <span class="kw-2">&amp;mut </span>solution.diffs;
+    <span class="kw">if </span>diffs.is_empty() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">equalities</span> <span class="op">=</span> <span class="ident">VecDeque::new</span>(); <span class="comment">// Double-ended queue of equalities.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_equality</span> <span class="op">=</span> <span class="prelude-val">None</span>; <span class="comment">// Always equal to equalities.peek().text</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pointer</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="comment">// Number of characters that changed prior to the equality.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len_insertions1</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len_deletions1</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="comment">// Number of characters that changed after the equality.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len_insertions2</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len_deletions2</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">this_diff</span>) <span class="op">=</span> <span class="ident">diffs</span>.<span class="ident">get</span>(<span class="ident">pointer</span>) {
-        <span class="kw">match</span> <span class="ident">this_diff</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">text1</span>, <span class="ident">text2</span>) =&gt; {
-                <span class="ident">equalities</span>.<span class="ident">push_back</span>(<span class="ident">pointer</span>);
-                <span class="ident">len_insertions1</span> <span class="op">=</span> <span class="ident">len_insertions2</span>;
-                <span class="ident">len_deletions1</span> <span class="op">=</span> <span class="ident">len_deletions2</span>;
-                <span class="ident">len_insertions2</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="ident">len_deletions2</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="ident">last_equality</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">text1</span>, <span class="ident">text2</span>));
-                <span class="ident">pointer</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>changes = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>equalities = VecDeque::new(); <span class="comment">// Double-ended queue of equalities.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>last_equality = <span class="prelude-val">None</span>; <span class="comment">// Always equal to equalities.peek().text
+    </span><span class="kw">let </span><span class="kw-2">mut </span>pointer = <span class="number">0</span>;
+    <span class="comment">// Number of characters that changed prior to the equality.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>len_insertions1 = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>len_deletions1 = <span class="number">0</span>;
+    <span class="comment">// Number of characters that changed after the equality.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>len_insertions2 = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>len_deletions2 = <span class="number">0</span>;
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>this_diff) = diffs.get(pointer) {
+        <span class="kw">match </span>this_diff {
+            Diff::Equal(text1, text2) =&gt; {
+                equalities.push_back(pointer);
+                len_insertions1 = len_insertions2;
+                len_deletions1 = len_deletions2;
+                len_insertions2 = <span class="number">0</span>;
+                len_deletions2 = <span class="number">0</span>;
+                last_equality = <span class="prelude-val">Some</span>((text1, text2));
+                pointer += <span class="number">1</span>;
                 <span class="kw">continue</span>;
             }
-            <span class="ident">Diff::Delete</span>(<span class="ident">text</span>) =&gt; <span class="ident">len_deletions2</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>,
-            <span class="ident">Diff::Insert</span>(<span class="ident">text</span>) =&gt; <span class="ident">len_insertions2</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>,
+            Diff::Delete(text) =&gt; len_deletions2 += text.len,
+            Diff::Insert(text) =&gt; len_insertions2 += text.len,
         }
-        <span class="comment">// Eliminate an equality that is smaller or equal to the edits on both</span>
-        <span class="comment">// sides of it.</span>
-        <span class="kw">if</span> <span class="ident">last_equality</span>.<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span>(<span class="ident">last_equality</span>, <span class="kw">_</span>)<span class="op">|</span> {
-            <span class="ident">last_equality</span>.<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">cmp::max</span>(<span class="ident">len_insertions1</span>, <span class="ident">len_deletions1</span>)
-                <span class="op">&amp;&amp;</span> <span class="ident">last_equality</span>.<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">cmp::max</span>(<span class="ident">len_insertions2</span>, <span class="ident">len_deletions2</span>)
+        <span class="comment">// Eliminate an equality that is smaller or equal to the edits on both
+        // sides of it.
+        </span><span class="kw">if </span>last_equality.map_or(<span class="bool-val">false</span>, |(last_equality, <span class="kw">_</span>)| {
+            last_equality.len &lt;= cmp::max(len_insertions1, len_deletions1)
+                &amp;&amp; last_equality.len &lt;= cmp::max(len_insertions2, len_deletions2)
         }) {
-            <span class="comment">// Jump back to offending equality.</span>
-            <span class="ident">pointer</span> <span class="op">=</span> <span class="ident">equalities</span>.<span class="ident">pop_back</span>().<span class="ident">unwrap</span>();
+            <span class="comment">// Jump back to offending equality.
+            </span>pointer = equalities.pop_back().unwrap();
 
-            <span class="comment">// Replace equality with a delete.</span>
-            <span class="ident">diffs</span>[<span class="ident">pointer</span>] <span class="op">=</span> <span class="ident">Diff::Delete</span>(<span class="ident">last_equality</span>.<span class="ident">unwrap</span>().<span class="number">0</span>);
-            <span class="comment">// Insert a corresponding insert.</span>
-            <span class="ident">diffs</span>.<span class="ident">insert</span>(<span class="ident">pointer</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">Diff::Insert</span>(<span class="ident">last_equality</span>.<span class="ident">unwrap</span>().<span class="number">1</span>));
+            <span class="comment">// Replace equality with a delete.
+            </span>diffs[pointer] = Diff::Delete(last_equality.unwrap().<span class="number">0</span>);
+            <span class="comment">// Insert a corresponding insert.
+            </span>diffs.insert(pointer + <span class="number">1</span>, Diff::Insert(last_equality.unwrap().<span class="number">1</span>));
 
-            <span class="ident">len_insertions1</span> <span class="op">=</span> <span class="number">0</span>; <span class="comment">// Reset the counters.</span>
-            <span class="ident">len_insertions2</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="ident">len_deletions1</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="ident">len_deletions2</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="ident">last_equality</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="ident">changes</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            len_insertions1 = <span class="number">0</span>; <span class="comment">// Reset the counters.
+            </span>len_insertions2 = <span class="number">0</span>;
+            len_deletions1 = <span class="number">0</span>;
+            len_deletions2 = <span class="number">0</span>;
+            last_equality = <span class="prelude-val">None</span>;
+            changes = <span class="bool-val">true</span>;
 
-            <span class="comment">// Throw away the previous equality (it needs to be reevaluated).</span>
-            <span class="ident">equalities</span>.<span class="ident">pop_back</span>();
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">back</span>) <span class="op">=</span> <span class="ident">equalities</span>.<span class="ident">back</span>() {
-                <span class="comment">// There is a safe equality we can fall back to.</span>
-                <span class="ident">pointer</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">back</span>;
-            } <span class="kw">else</span> {
-                <span class="comment">// There are no previous equalities, jump back to the start.</span>
-                <span class="ident">pointer</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="comment">// Throw away the previous equality (it needs to be reevaluated).
+            </span>equalities.pop_back();
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(back) = equalities.back() {
+                <span class="comment">// There is a safe equality we can fall back to.
+                </span>pointer = <span class="kw-2">*</span>back;
+            } <span class="kw">else </span>{
+                <span class="comment">// There are no previous equalities, jump back to the start.
+                </span>pointer = <span class="number">0</span>;
                 <span class="kw">continue</span>;
             }
         }
-        <span class="ident">pointer</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        pointer += <span class="number">1</span>;
     }
 
-    <span class="comment">// Normalize the diff.</span>
-    <span class="kw">if</span> <span class="ident">changes</span> {
-        <span class="ident">cleanup_merge</span>(<span class="ident">solution</span>);
+    <span class="comment">// Normalize the diff.
+    </span><span class="kw">if </span>changes {
+        cleanup_merge(solution);
     }
-    <span class="ident">cleanup_semantic_lossless</span>(<span class="ident">solution</span>);
-    <span class="ident">diffs</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">solution</span>.<span class="ident">diffs</span>;
+    cleanup_semantic_lossless(solution);
+    diffs = <span class="kw-2">&amp;mut </span>solution.diffs;
 
-    <span class="comment">// Find any overlaps between deletions and insertions.</span>
-    <span class="comment">// e.g: &lt;del&gt;abcxxx&lt;/del&gt;&lt;ins&gt;xxxdef&lt;/ins&gt;</span>
-    <span class="comment">//   -&gt; &lt;del&gt;abc&lt;/del&gt;xxx&lt;ins&gt;def&lt;/ins&gt;</span>
-    <span class="comment">// e.g: &lt;del&gt;xxxabc&lt;/del&gt;&lt;ins&gt;defxxx&lt;/ins&gt;</span>
-    <span class="comment">//   -&gt; &lt;ins&gt;def&lt;/ins&gt;xxx&lt;del&gt;abc&lt;/del&gt;</span>
-    <span class="comment">// Only extract an overlap if it is as big as the edit ahead or behind it.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pointer</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">this_diff</span>) <span class="op">=</span> <span class="ident">diffs</span>.<span class="ident">get</span>(<span class="ident">pointer</span>) {
-        <span class="kw">let</span> <span class="ident">prev_diff</span> <span class="op">=</span> <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>];
-        <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">Diff::Delete</span>(<span class="ident">deletion</span>), <span class="ident">Diff::Insert</span>(<span class="ident">insertion</span>)) <span class="op">=</span> (<span class="ident">prev_diff</span>, <span class="ident">this_diff</span>) {
-            <span class="kw">let</span> <span class="ident">overlap_len1</span> <span class="op">=</span> <span class="ident">common_overlap</span>(<span class="ident">deletion</span>, <span class="ident">insertion</span>);
-            <span class="kw">let</span> <span class="ident">overlap_len2</span> <span class="op">=</span> <span class="ident">common_overlap</span>(<span class="ident">insertion</span>, <span class="ident">deletion</span>);
-            <span class="kw">let</span> <span class="ident">overlap_min</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">deletion</span>.<span class="ident">len</span>, <span class="ident">insertion</span>.<span class="ident">len</span>);
-            <span class="kw">if</span> <span class="ident">overlap_len1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">overlap_len2</span> <span class="op">&amp;&amp;</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">overlap_len1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">overlap_min</span> {
-                <span class="comment">// Overlap found. Insert an equality and trim the surrounding edits.</span>
-                <span class="ident">diffs</span>.<span class="ident">insert</span>(
-                    <span class="ident">pointer</span>,
-                    <span class="ident">Diff::Equal</span>(
-                        <span class="ident">deletion</span>.<span class="ident">substring</span>(<span class="ident">deletion</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">overlap_len1</span>..<span class="ident">deletion</span>.<span class="ident">len</span>),
-                        <span class="ident">insertion</span>.<span class="ident">substring</span>(..<span class="ident">overlap_len1</span>),
+    <span class="comment">// Find any overlaps between deletions and insertions.
+    // e.g: &lt;del&gt;abcxxx&lt;/del&gt;&lt;ins&gt;xxxdef&lt;/ins&gt;
+    //   -&gt; &lt;del&gt;abc&lt;/del&gt;xxx&lt;ins&gt;def&lt;/ins&gt;
+    // e.g: &lt;del&gt;xxxabc&lt;/del&gt;&lt;ins&gt;defxxx&lt;/ins&gt;
+    //   -&gt; &lt;ins&gt;def&lt;/ins&gt;xxx&lt;del&gt;abc&lt;/del&gt;
+    // Only extract an overlap if it is as big as the edit ahead or behind it.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>pointer = <span class="number">1</span>;
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>this_diff) = diffs.get(pointer) {
+        <span class="kw">let </span>prev_diff = diffs[pointer - <span class="number">1</span>];
+        <span class="kw">if let </span>(Diff::Delete(deletion), Diff::Insert(insertion)) = (prev_diff, this_diff) {
+            <span class="kw">let </span>overlap_len1 = common_overlap(deletion, insertion);
+            <span class="kw">let </span>overlap_len2 = common_overlap(insertion, deletion);
+            <span class="kw">let </span>overlap_min = cmp::min(deletion.len, insertion.len);
+            <span class="kw">if </span>overlap_len1 &gt;= overlap_len2 &amp;&amp; <span class="number">2 </span>* overlap_len1 &gt;= overlap_min {
+                <span class="comment">// Overlap found. Insert an equality and trim the surrounding edits.
+                </span>diffs.insert(
+                    pointer,
+                    Diff::Equal(
+                        deletion.substring(deletion.len - overlap_len1..deletion.len),
+                        insertion.substring(..overlap_len1),
                     ),
                 );
-                <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">=</span>
-                    <span class="ident">Diff::Delete</span>(<span class="ident">deletion</span>.<span class="ident">substring</span>(..<span class="ident">deletion</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">overlap_len1</span>));
-                <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">Diff::Insert</span>(<span class="ident">insertion</span>.<span class="ident">substring</span>(<span class="ident">overlap_len1</span>..));
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">overlap_len1</span> <span class="op">&lt;</span> <span class="ident">overlap_len2</span> <span class="op">&amp;&amp;</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">overlap_len2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">overlap_min</span> {
-                <span class="comment">// Reverse overlap found.</span>
-                <span class="comment">// Insert an equality and swap and trim the surrounding edits.</span>
-                <span class="ident">diffs</span>.<span class="ident">insert</span>(
-                    <span class="ident">pointer</span>,
-                    <span class="ident">Diff::Equal</span>(
-                        <span class="ident">deletion</span>.<span class="ident">substring</span>(..<span class="ident">overlap_len2</span>),
-                        <span class="ident">insertion</span>.<span class="ident">substring</span>(<span class="ident">insertion</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">overlap_len2</span>..<span class="ident">insertion</span>.<span class="ident">len</span>),
+                diffs[pointer - <span class="number">1</span>] =
+                    Diff::Delete(deletion.substring(..deletion.len - overlap_len1));
+                diffs[pointer + <span class="number">1</span>] = Diff::Insert(insertion.substring(overlap_len1..));
+            } <span class="kw">else if </span>overlap_len1 &lt; overlap_len2 &amp;&amp; <span class="number">2 </span>* overlap_len2 &gt;= overlap_min {
+                <span class="comment">// Reverse overlap found.
+                // Insert an equality and swap and trim the surrounding edits.
+                </span>diffs.insert(
+                    pointer,
+                    Diff::Equal(
+                        deletion.substring(..overlap_len2),
+                        insertion.substring(insertion.len - overlap_len2..insertion.len),
                     ),
                 );
-                <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">=</span>
-                    <span class="ident">Diff::Insert</span>(<span class="ident">insertion</span>.<span class="ident">substring</span>(..<span class="ident">insertion</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">overlap_len2</span>));
-                <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">Diff::Delete</span>(<span class="ident">deletion</span>.<span class="ident">substring</span>(<span class="ident">overlap_len2</span>..));
+                diffs[pointer - <span class="number">1</span>] =
+                    Diff::Insert(insertion.substring(..insertion.len - overlap_len2));
+                diffs[pointer + <span class="number">1</span>] = Diff::Delete(deletion.substring(overlap_len2..));
             }
-            <span class="ident">pointer</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            pointer += <span class="number">1</span>;
         }
-        <span class="ident">pointer</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        pointer += <span class="number">1</span>;
     }
 }
 
-<span class="comment">// Look for single edits surrounded on both sides by equalities which can be</span>
-<span class="comment">// shifted sideways to align the edit to a word boundary.</span>
-<span class="comment">//</span>
-<span class="comment">// e.g: The c&lt;ins&gt;at c&lt;/ins&gt;ame. -&gt; The &lt;ins&gt;cat &lt;/ins&gt;came.</span>
-<span class="kw">fn</span> <span class="ident">cleanup_semantic_lossless</span>(<span class="ident">solution</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Solution</span>) {
-    <span class="kw">let</span> <span class="ident">diffs</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">solution</span>.<span class="ident">diffs</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pointer</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">next_diff</span>) <span class="op">=</span> <span class="ident">diffs</span>.<span class="ident">get</span>(<span class="ident">pointer</span> <span class="op">+</span> <span class="number">1</span>) {
-        <span class="kw">let</span> <span class="ident">prev_diff</span> <span class="op">=</span> <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>];
-        <span class="kw">if</span> <span class="kw">let</span> (
-            <span class="ident">Diff::Equal</span>(<span class="kw-2">mut</span> <span class="ident">prev_equal1</span>, <span class="kw-2">mut</span> <span class="ident">prev_equal2</span>),
-            <span class="ident">Diff::Equal</span>(<span class="kw-2">mut</span> <span class="ident">next_equal1</span>, <span class="kw-2">mut</span> <span class="ident">next_equal2</span>),
-        ) <span class="op">=</span> (<span class="ident">prev_diff</span>, <span class="ident">next_diff</span>)
+<span class="comment">// Look for single edits surrounded on both sides by equalities which can be
+// shifted sideways to align the edit to a word boundary.
+//
+// e.g: The c&lt;ins&gt;at c&lt;/ins&gt;ame. -&gt; The &lt;ins&gt;cat &lt;/ins&gt;came.
+</span><span class="kw">fn </span>cleanup_semantic_lossless(solution: <span class="kw-2">&amp;mut </span>Solution) {
+    <span class="kw">let </span>diffs = <span class="kw-2">&amp;mut </span>solution.diffs;
+    <span class="kw">let </span><span class="kw-2">mut </span>pointer = <span class="number">1</span>;
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>next_diff) = diffs.get(pointer + <span class="number">1</span>) {
+        <span class="kw">let </span>prev_diff = diffs[pointer - <span class="number">1</span>];
+        <span class="kw">if let </span>(
+            Diff::Equal(<span class="kw-2">mut </span>prev_equal1, <span class="kw-2">mut </span>prev_equal2),
+            Diff::Equal(<span class="kw-2">mut </span>next_equal1, <span class="kw-2">mut </span>next_equal2),
+        ) = (prev_diff, next_diff)
         {
-            <span class="comment">// This is a single edit surrounded by equalities.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit</span> <span class="op">=</span> <span class="ident">diffs</span>[<span class="ident">pointer</span>];
+            <span class="comment">// This is a single edit surrounded by equalities.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>edit = diffs[pointer];
 
-            <span class="comment">// First, shift the edit as far left as possible.</span>
-            <span class="kw">let</span> <span class="ident">common_offset</span> <span class="op">=</span> <span class="ident">common_suffix</span>(<span class="ident">prev_equal1</span>, <span class="ident">edit</span>.<span class="ident">text</span>());
-            <span class="kw">let</span> <span class="ident">original_prev_len</span> <span class="op">=</span> <span class="ident">prev_equal1</span>.<span class="ident">len</span>;
-            <span class="ident">prev_equal1</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">common_offset</span>;
-            <span class="ident">prev_equal2</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">common_offset</span>;
-            <span class="ident">edit</span>.<span class="ident">shift_left</span>(<span class="ident">common_offset</span>);
-            <span class="ident">next_equal1</span>.<span class="ident">offset</span> <span class="op">-</span><span class="op">=</span> <span class="ident">common_offset</span>;
-            <span class="ident">next_equal1</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">common_offset</span>;
-            <span class="ident">next_equal2</span>.<span class="ident">offset</span> <span class="op">-</span><span class="op">=</span> <span class="ident">common_offset</span>;
-            <span class="ident">next_equal2</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">common_offset</span>;
+            <span class="comment">// First, shift the edit as far left as possible.
+            </span><span class="kw">let </span>common_offset = common_suffix(prev_equal1, edit.text());
+            <span class="kw">let </span>original_prev_len = prev_equal1.len;
+            prev_equal1.len -= common_offset;
+            prev_equal2.len -= common_offset;
+            edit.shift_left(common_offset);
+            next_equal1.offset -= common_offset;
+            next_equal1.len += common_offset;
+            next_equal2.offset -= common_offset;
+            next_equal2.len += common_offset;
 
-            <span class="comment">// Second, step character by character right, looking for the best fit.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">best_prev_equal</span> <span class="op">=</span> (<span class="ident">prev_equal1</span>, <span class="ident">prev_equal2</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">best_edit</span> <span class="op">=</span> <span class="ident">edit</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">best_next_equal</span> <span class="op">=</span> (<span class="ident">next_equal1</span>, <span class="ident">next_equal2</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">best_score</span> <span class="op">=</span> <span class="ident">cleanup_semantic_score</span>(<span class="ident">prev_equal1</span>, <span class="ident">edit</span>.<span class="ident">text</span>())
-                <span class="op">+</span> <span class="ident">cleanup_semantic_score</span>(<span class="ident">edit</span>.<span class="ident">text</span>(), <span class="ident">next_equal1</span>);
-            <span class="kw">while</span> <span class="op">!</span><span class="ident">edit</span>.<span class="ident">text</span>().<span class="ident">is_empty</span>()
-                <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next_equal1</span>.<span class="ident">is_empty</span>()
-                <span class="op">&amp;&amp;</span> <span class="ident">edit</span>.<span class="ident">text</span>().<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="ident">next_equal1</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()
+            <span class="comment">// Second, step character by character right, looking for the best fit.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>best_prev_equal = (prev_equal1, prev_equal2);
+            <span class="kw">let </span><span class="kw-2">mut </span>best_edit = edit;
+            <span class="kw">let </span><span class="kw-2">mut </span>best_next_equal = (next_equal1, next_equal2);
+            <span class="kw">let </span><span class="kw-2">mut </span>best_score = cleanup_semantic_score(prev_equal1, edit.text())
+                + cleanup_semantic_score(edit.text(), next_equal1);
+            <span class="kw">while </span>!edit.text().is_empty()
+                &amp;&amp; !next_equal1.is_empty()
+                &amp;&amp; edit.text().chars().next().unwrap() == next_equal1.chars().next().unwrap()
             {
-                <span class="kw">let</span> <span class="ident">increment</span> <span class="op">=</span> <span class="ident">edit</span>.<span class="ident">text</span>().<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">len_utf8</span>();
-                <span class="ident">prev_equal1</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">increment</span>;
-                <span class="ident">prev_equal2</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">increment</span>;
-                <span class="ident">edit</span>.<span class="ident">shift_right</span>(<span class="ident">increment</span>);
-                <span class="ident">next_equal1</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">increment</span>;
-                <span class="ident">next_equal1</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">increment</span>;
-                <span class="ident">next_equal2</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">increment</span>;
-                <span class="ident">next_equal2</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">increment</span>;
-                <span class="kw">let</span> <span class="ident">score</span> <span class="op">=</span> <span class="ident">cleanup_semantic_score</span>(<span class="ident">prev_equal1</span>, <span class="ident">edit</span>.<span class="ident">text</span>())
-                    <span class="op">+</span> <span class="ident">cleanup_semantic_score</span>(<span class="ident">edit</span>.<span class="ident">text</span>(), <span class="ident">next_equal1</span>);
-                <span class="comment">// The &gt;= encourages trailing rather than leading whitespace on edits.</span>
-                <span class="kw">if</span> <span class="ident">score</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">best_score</span> {
-                    <span class="ident">best_score</span> <span class="op">=</span> <span class="ident">score</span>;
-                    <span class="ident">best_prev_equal</span> <span class="op">=</span> (<span class="ident">prev_equal1</span>, <span class="ident">prev_equal2</span>);
-                    <span class="ident">best_edit</span> <span class="op">=</span> <span class="ident">edit</span>;
-                    <span class="ident">best_next_equal</span> <span class="op">=</span> (<span class="ident">next_equal1</span>, <span class="ident">next_equal2</span>);
+                <span class="kw">let </span>increment = edit.text().chars().next().unwrap().len_utf8();
+                prev_equal1.len += increment;
+                prev_equal2.len += increment;
+                edit.shift_right(increment);
+                next_equal1.offset += increment;
+                next_equal1.len -= increment;
+                next_equal2.offset += increment;
+                next_equal2.len -= increment;
+                <span class="kw">let </span>score = cleanup_semantic_score(prev_equal1, edit.text())
+                    + cleanup_semantic_score(edit.text(), next_equal1);
+                <span class="comment">// The &gt;= encourages trailing rather than leading whitespace on edits.
+                </span><span class="kw">if </span>score &gt;= best_score {
+                    best_score = score;
+                    best_prev_equal = (prev_equal1, prev_equal2);
+                    best_edit = edit;
+                    best_next_equal = (next_equal1, next_equal2);
                 }
             }
 
-            <span class="kw">if</span> <span class="ident">original_prev_len</span> <span class="op">!</span><span class="op">=</span> <span class="ident">best_prev_equal</span>.<span class="number">0</span>.<span class="ident">len</span> {
-                <span class="comment">// We have an improvement, save it back to the diff.</span>
-                <span class="kw">if</span> <span class="ident">best_next_equal</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">diffs</span>.<span class="ident">remove</span>(<span class="ident">pointer</span> <span class="op">+</span> <span class="number">1</span>);
-                } <span class="kw">else</span> {
-                    <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">Diff::Equal</span>(<span class="ident">best_next_equal</span>.<span class="number">0</span>, <span class="ident">best_next_equal</span>.<span class="number">1</span>);
+            <span class="kw">if </span>original_prev_len != best_prev_equal.<span class="number">0</span>.len {
+                <span class="comment">// We have an improvement, save it back to the diff.
+                </span><span class="kw">if </span>best_next_equal.<span class="number">0</span>.is_empty() {
+                    diffs.remove(pointer + <span class="number">1</span>);
+                } <span class="kw">else </span>{
+                    diffs[pointer + <span class="number">1</span>] = Diff::Equal(best_next_equal.<span class="number">0</span>, best_next_equal.<span class="number">1</span>);
                 }
-                <span class="ident">diffs</span>[<span class="ident">pointer</span>] <span class="op">=</span> <span class="ident">best_edit</span>;
-                <span class="kw">if</span> <span class="ident">best_prev_equal</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">diffs</span>.<span class="ident">remove</span>(<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>);
-                    <span class="ident">pointer</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">Diff::Equal</span>(<span class="ident">best_prev_equal</span>.<span class="number">0</span>, <span class="ident">best_prev_equal</span>.<span class="number">1</span>);
+                diffs[pointer] = best_edit;
+                <span class="kw">if </span>best_prev_equal.<span class="number">0</span>.is_empty() {
+                    diffs.remove(pointer - <span class="number">1</span>);
+                    pointer -= <span class="number">1</span>;
+                } <span class="kw">else </span>{
+                    diffs[pointer - <span class="number">1</span>] = Diff::Equal(best_prev_equal.<span class="number">0</span>, best_prev_equal.<span class="number">1</span>);
                 }
             }
         }
-        <span class="ident">pointer</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        pointer += <span class="number">1</span>;
     }
 }
 
-<span class="comment">// Given two strings, compute a score representing whether the internal boundary</span>
-<span class="comment">// falls on logical boundaries.</span>
-<span class="comment">//</span>
-<span class="comment">// Scores range from 6 (best) to 0 (worst).</span>
-<span class="kw">fn</span> <span class="ident">cleanup_semantic_score</span>(<span class="ident">one</span>: <span class="ident">Range</span>, <span class="ident">two</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">if</span> <span class="ident">one</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">two</span>.<span class="ident">is_empty</span>() {
-        <span class="comment">// Edges are the best.</span>
-        <span class="kw">return</span> <span class="number">6</span>;
+<span class="comment">// Given two strings, compute a score representing whether the internal boundary
+// falls on logical boundaries.
+//
+// Scores range from 6 (best) to 0 (worst).
+</span><span class="kw">fn </span>cleanup_semantic_score(one: Range, two: Range) -&gt; usize {
+    <span class="kw">if </span>one.is_empty() || two.is_empty() {
+        <span class="comment">// Edges are the best.
+        </span><span class="kw">return </span><span class="number">6</span>;
     }
 
-    <span class="comment">// Each port of this function behaves slightly differently due to subtle</span>
-    <span class="comment">// differences in each language&#39;s definition of things like &#39;whitespace&#39;.</span>
-    <span class="comment">// Since this function&#39;s purpose is largely cosmetic, the choice has been</span>
-    <span class="comment">// made to use each language&#39;s native features rather than force total</span>
-    <span class="comment">// conformity.</span>
-    <span class="kw">let</span> <span class="ident">char1</span> <span class="op">=</span> <span class="ident">one</span>.<span class="ident">chars</span>().<span class="ident">next_back</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">char2</span> <span class="op">=</span> <span class="ident">two</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">non_alphanumeric1</span> <span class="op">=</span> <span class="op">!</span><span class="ident">char1</span>.<span class="ident">is_ascii_alphanumeric</span>();
-    <span class="kw">let</span> <span class="ident">non_alphanumeric2</span> <span class="op">=</span> <span class="op">!</span><span class="ident">char2</span>.<span class="ident">is_ascii_alphanumeric</span>();
-    <span class="kw">let</span> <span class="ident">whitespace1</span> <span class="op">=</span> <span class="ident">non_alphanumeric1</span> <span class="op">&amp;&amp;</span> <span class="ident">char1</span>.<span class="ident">is_ascii_whitespace</span>();
-    <span class="kw">let</span> <span class="ident">whitespace2</span> <span class="op">=</span> <span class="ident">non_alphanumeric2</span> <span class="op">&amp;&amp;</span> <span class="ident">char2</span>.<span class="ident">is_ascii_whitespace</span>();
-    <span class="kw">let</span> <span class="ident">line_break1</span> <span class="op">=</span> <span class="ident">whitespace1</span> <span class="op">&amp;&amp;</span> <span class="ident">char1</span>.<span class="ident">is_control</span>();
-    <span class="kw">let</span> <span class="ident">line_break2</span> <span class="op">=</span> <span class="ident">whitespace2</span> <span class="op">&amp;&amp;</span> <span class="ident">char2</span>.<span class="ident">is_control</span>();
-    <span class="kw">let</span> <span class="ident">blank_line1</span> <span class="op">=</span> <span class="ident">line_break1</span> <span class="op">&amp;&amp;</span> (<span class="ident">one</span>.<span class="ident">ends_with</span>(<span class="string">&quot;\n\n&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">one</span>.<span class="ident">ends_with</span>(<span class="string">&quot;\n\r\n&quot;</span>));
-    <span class="kw">let</span> <span class="ident">blank_line2</span> <span class="op">=</span> <span class="ident">line_break2</span> <span class="op">&amp;&amp;</span> (<span class="ident">two</span>.<span class="ident">starts_with</span>(<span class="string">&quot;\n\n&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">two</span>.<span class="ident">starts_with</span>(<span class="string">&quot;\r\n\r\n&quot;</span>));
+    <span class="comment">// Each port of this function behaves slightly differently due to subtle
+    // differences in each language&#39;s definition of things like &#39;whitespace&#39;.
+    // Since this function&#39;s purpose is largely cosmetic, the choice has been
+    // made to use each language&#39;s native features rather than force total
+    // conformity.
+    </span><span class="kw">let </span>char1 = one.chars().next_back().unwrap();
+    <span class="kw">let </span>char2 = two.chars().next().unwrap();
+    <span class="kw">let </span>non_alphanumeric1 = !char1.is_ascii_alphanumeric();
+    <span class="kw">let </span>non_alphanumeric2 = !char2.is_ascii_alphanumeric();
+    <span class="kw">let </span>whitespace1 = non_alphanumeric1 &amp;&amp; char1.is_ascii_whitespace();
+    <span class="kw">let </span>whitespace2 = non_alphanumeric2 &amp;&amp; char2.is_ascii_whitespace();
+    <span class="kw">let </span>line_break1 = whitespace1 &amp;&amp; char1.is_control();
+    <span class="kw">let </span>line_break2 = whitespace2 &amp;&amp; char2.is_control();
+    <span class="kw">let </span>blank_line1 = line_break1 &amp;&amp; (one.ends_with(<span class="string">&quot;\n\n&quot;</span>) || one.ends_with(<span class="string">&quot;\n\r\n&quot;</span>));
+    <span class="kw">let </span>blank_line2 = line_break2 &amp;&amp; (two.starts_with(<span class="string">&quot;\n\n&quot;</span>) || two.starts_with(<span class="string">&quot;\r\n\r\n&quot;</span>));
 
-    <span class="kw">if</span> <span class="ident">blank_line1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">blank_line2</span> {
-        <span class="comment">// Five points for blank lines.</span>
-        <span class="number">5</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">line_break1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">line_break2</span> {
-        <span class="comment">// Four points for line breaks.</span>
-        <span class="number">4</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">non_alphanumeric1</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">whitespace1</span> <span class="op">&amp;&amp;</span> <span class="ident">whitespace2</span> {
-        <span class="comment">// Three points for end of sentences.</span>
-        <span class="number">3</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">whitespace1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">whitespace2</span> {
-        <span class="comment">// Two points for whitespace.</span>
-        <span class="number">2</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">non_alphanumeric1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">non_alphanumeric2</span> {
-        <span class="comment">// One point for non-alphanumeric.</span>
-        <span class="number">1</span>
-    } <span class="kw">else</span> {
-        <span class="number">0</span>
-    }
+    <span class="kw">if </span>blank_line1 || blank_line2 {
+        <span class="comment">// Five points for blank lines.
+        </span><span class="number">5
+    </span>} <span class="kw">else if </span>line_break1 || line_break2 {
+        <span class="comment">// Four points for line breaks.
+        </span><span class="number">4
+    </span>} <span class="kw">else if </span>non_alphanumeric1 &amp;&amp; !whitespace1 &amp;&amp; whitespace2 {
+        <span class="comment">// Three points for end of sentences.
+        </span><span class="number">3
+    </span>} <span class="kw">else if </span>whitespace1 || whitespace2 {
+        <span class="comment">// Two points for whitespace.
+        </span><span class="number">2
+    </span>} <span class="kw">else if </span>non_alphanumeric1 || non_alphanumeric2 {
+        <span class="comment">// One point for non-alphanumeric.
+        </span><span class="number">1
+    </span>} <span class="kw">else </span>{
+        <span class="number">0
+    </span>}
 }
 
-<span class="comment">// Reorder and merge like edit sections. Merge equalities. Any edit section can</span>
-<span class="comment">// move as long as it doesn&#39;t cross an equality.</span>
-<span class="kw">fn</span> <span class="ident">cleanup_merge</span>(<span class="ident">solution</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Solution</span>) {
-    <span class="kw">let</span> <span class="ident">diffs</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">solution</span>.<span class="ident">diffs</span>;
-    <span class="kw">let</span> <span class="ident">common_prefix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">solution</span>.<span class="ident">utf8</span> {
-        <span class="ident">common_prefix</span>
-    } <span class="kw">else</span> {
-        <span class="ident">common_prefix_bytes</span>
+<span class="comment">// Reorder and merge like edit sections. Merge equalities. Any edit section can
+// move as long as it doesn&#39;t cross an equality.
+</span><span class="kw">fn </span>cleanup_merge(solution: <span class="kw-2">&amp;mut </span>Solution) {
+    <span class="kw">let </span>diffs = <span class="kw-2">&amp;mut </span>solution.diffs;
+    <span class="kw">let </span>common_prefix = <span class="kw">if </span>solution.utf8 {
+        common_prefix
+    } <span class="kw">else </span>{
+        common_prefix_bytes
     };
-    <span class="kw">let</span> <span class="ident">common_suffix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">solution</span>.<span class="ident">utf8</span> {
-        <span class="ident">common_suffix</span>
-    } <span class="kw">else</span> {
-        <span class="ident">common_suffix_bytes</span>
+    <span class="kw">let </span>common_suffix = <span class="kw">if </span>solution.utf8 {
+        common_suffix
+    } <span class="kw">else </span>{
+        common_suffix_bytes
     };
 
-    <span class="kw">loop</span> {
-        <span class="kw">if</span> <span class="ident">diffs</span>.<span class="ident">is_empty</span>() {
+    <span class="kw">loop </span>{
+        <span class="kw">if </span>diffs.is_empty() {
             <span class="kw">return</span>;
         }
 
-        <span class="ident">diffs</span>.<span class="ident">push</span>(<span class="ident">Diff::Equal</span>(
-            <span class="ident">solution</span>.<span class="ident">text1</span>.<span class="ident">substring</span>(<span class="ident">solution</span>.<span class="ident">text1</span>.<span class="ident">len</span>..),
-            <span class="ident">solution</span>.<span class="ident">text2</span>.<span class="ident">substring</span>(<span class="ident">solution</span>.<span class="ident">text2</span>.<span class="ident">len</span>..),
-        )); <span class="comment">// Add a dummy entry at the end.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pointer</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count_delete</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count_insert</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">text_delete</span> <span class="op">=</span> <span class="ident">Range::empty</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">text_insert</span> <span class="op">=</span> <span class="ident">Range::empty</span>();
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">this_diff</span>) <span class="op">=</span> <span class="ident">diffs</span>.<span class="ident">get</span>(<span class="ident">pointer</span>) {
-            <span class="kw">match</span> <span class="ident">this_diff</span> {
-                <span class="ident">Diff::Insert</span>(<span class="ident">text</span>) =&gt; {
-                    <span class="ident">count_insert</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="kw">if</span> <span class="ident">text_insert</span>.<span class="ident">is_empty</span>() {
-                        <span class="ident">text_insert</span> <span class="op">=</span> <span class="ident">text</span>;
-                    } <span class="kw">else</span> {
-                        <span class="ident">text_insert</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>;
+        diffs.push(Diff::Equal(
+            solution.text1.substring(solution.text1.len..),
+            solution.text2.substring(solution.text2.len..),
+        )); <span class="comment">// Add a dummy entry at the end.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>pointer = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>count_delete = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>count_insert = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>text_delete = Range::empty();
+        <span class="kw">let </span><span class="kw-2">mut </span>text_insert = Range::empty();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>this_diff) = diffs.get(pointer) {
+            <span class="kw">match </span>this_diff {
+                Diff::Insert(text) =&gt; {
+                    count_insert += <span class="number">1</span>;
+                    <span class="kw">if </span>text_insert.is_empty() {
+                        text_insert = text;
+                    } <span class="kw">else </span>{
+                        text_insert.len += text.len;
                     }
                 }
-                <span class="ident">Diff::Delete</span>(<span class="ident">text</span>) =&gt; {
-                    <span class="ident">count_delete</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="kw">if</span> <span class="ident">text_delete</span>.<span class="ident">is_empty</span>() {
-                        <span class="ident">text_delete</span> <span class="op">=</span> <span class="ident">text</span>;
-                    } <span class="kw">else</span> {
-                        <span class="ident">text_delete</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>;
+                Diff::Delete(text) =&gt; {
+                    count_delete += <span class="number">1</span>;
+                    <span class="kw">if </span>text_delete.is_empty() {
+                        text_delete = text;
+                    } <span class="kw">else </span>{
+                        text_delete.len += text.len;
                     }
                 }
-                <span class="ident">Diff::Equal</span>(<span class="ident">text</span>, <span class="kw">_</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">count_both</span> <span class="op">=</span> <span class="ident">count_delete</span> <span class="op">+</span> <span class="ident">count_insert</span>;
-                    <span class="kw">if</span> <span class="ident">count_both</span> <span class="op">&gt;</span> <span class="number">1</span> {
-                        <span class="kw">let</span> <span class="ident">both_types</span> <span class="op">=</span> <span class="ident">count_delete</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">count_insert</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
-                        <span class="comment">// Delete the offending records.</span>
-                        <span class="ident">diffs</span>.<span class="ident">splice</span>(<span class="ident">pointer</span> <span class="op">-</span> <span class="ident">count_both</span>..<span class="ident">pointer</span>, <span class="prelude-val">None</span>);
-                        <span class="ident">pointer</span> <span class="op">-</span><span class="op">=</span> <span class="ident">count_both</span>;
-                        <span class="kw">if</span> <span class="ident">both_types</span> {
-                            <span class="comment">// Factor out any common prefix.</span>
-                            <span class="kw">let</span> <span class="ident">common_length</span> <span class="op">=</span> <span class="ident">common_prefix</span>(<span class="ident">text_insert</span>, <span class="ident">text_delete</span>);
-                            <span class="kw">if</span> <span class="ident">common_length</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                                <span class="kw">if</span> <span class="ident">pointer</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                                    <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>] {
-                                        <span class="ident">Diff::Equal</span>(<span class="ident">this_diff1</span>, <span class="ident">this_diff2</span>) =&gt; {
-                                            <span class="ident">this_diff1</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">common_length</span>;
-                                            <span class="ident">this_diff2</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">common_length</span>;
+                Diff::Equal(text, <span class="kw">_</span>) =&gt; {
+                    <span class="kw">let </span>count_both = count_delete + count_insert;
+                    <span class="kw">if </span>count_both &gt; <span class="number">1 </span>{
+                        <span class="kw">let </span>both_types = count_delete != <span class="number">0 </span>&amp;&amp; count_insert != <span class="number">0</span>;
+                        <span class="comment">// Delete the offending records.
+                        </span>diffs.splice(pointer - count_both..pointer, <span class="prelude-val">None</span>);
+                        pointer -= count_both;
+                        <span class="kw">if </span>both_types {
+                            <span class="comment">// Factor out any common prefix.
+                            </span><span class="kw">let </span>common_length = common_prefix(text_insert, text_delete);
+                            <span class="kw">if </span>common_length != <span class="number">0 </span>{
+                                <span class="kw">if </span>pointer &gt; <span class="number">0 </span>{
+                                    <span class="kw">match </span><span class="kw-2">&amp;mut </span>diffs[pointer - <span class="number">1</span>] {
+                                        Diff::Equal(this_diff1, this_diff2) =&gt; {
+                                            this_diff1.len += common_length;
+                                            this_diff2.len += common_length;
                                         }
-                                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(
-                                            <span class="string">&quot;previous diff should have been an equality&quot;</span>
-                                        ),
+                                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(
+                                            <span class="string">&quot;previous diff should have been an equality&quot;
+                                        </span>),
                                     }
-                                } <span class="kw">else</span> {
-                                    <span class="ident">diffs</span>.<span class="ident">insert</span>(
-                                        <span class="ident">pointer</span>,
-                                        <span class="ident">Diff::Equal</span>(
-                                            <span class="ident">text_delete</span>.<span class="ident">substring</span>(..<span class="ident">common_length</span>),
-                                            <span class="ident">text_insert</span>.<span class="ident">substring</span>(..<span class="ident">common_length</span>),
+                                } <span class="kw">else </span>{
+                                    diffs.insert(
+                                        pointer,
+                                        Diff::Equal(
+                                            text_delete.substring(..common_length),
+                                            text_insert.substring(..common_length),
                                         ),
                                     );
-                                    <span class="ident">pointer</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                                    pointer += <span class="number">1</span>;
                                 }
-                                <span class="ident">text_insert</span> <span class="op">=</span> <span class="ident">text_insert</span>.<span class="ident">substring</span>(<span class="ident">common_length</span>..);
-                                <span class="ident">text_delete</span> <span class="op">=</span> <span class="ident">text_delete</span>.<span class="ident">substring</span>(<span class="ident">common_length</span>..);
+                                text_insert = text_insert.substring(common_length..);
+                                text_delete = text_delete.substring(common_length..);
                             }
-                            <span class="comment">// Factor out any common suffix.</span>
-                            <span class="kw">let</span> <span class="ident">common_length</span> <span class="op">=</span> <span class="ident">common_suffix</span>(<span class="ident">text_insert</span>, <span class="ident">text_delete</span>);
-                            <span class="kw">if</span> <span class="ident">common_length</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                                <span class="ident">diffs</span>[<span class="ident">pointer</span>].<span class="ident">grow_left</span>(<span class="ident">common_length</span>);
-                                <span class="ident">text_insert</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">common_length</span>;
-                                <span class="ident">text_delete</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">common_length</span>;
+                            <span class="comment">// Factor out any common suffix.
+                            </span><span class="kw">let </span>common_length = common_suffix(text_insert, text_delete);
+                            <span class="kw">if </span>common_length != <span class="number">0 </span>{
+                                diffs[pointer].grow_left(common_length);
+                                text_insert.len -= common_length;
+                                text_delete.len -= common_length;
                             }
                         }
-                        <span class="comment">// Insert the merged records.</span>
-                        <span class="kw">if</span> <span class="op">!</span><span class="ident">text_delete</span>.<span class="ident">is_empty</span>() {
-                            <span class="ident">diffs</span>.<span class="ident">insert</span>(<span class="ident">pointer</span>, <span class="ident">Diff::Delete</span>(<span class="ident">text_delete</span>));
-                            <span class="ident">pointer</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                        <span class="comment">// Insert the merged records.
+                        </span><span class="kw">if </span>!text_delete.is_empty() {
+                            diffs.insert(pointer, Diff::Delete(text_delete));
+                            pointer += <span class="number">1</span>;
                         }
-                        <span class="kw">if</span> <span class="op">!</span><span class="ident">text_insert</span>.<span class="ident">is_empty</span>() {
-                            <span class="ident">diffs</span>.<span class="ident">insert</span>(<span class="ident">pointer</span>, <span class="ident">Diff::Insert</span>(<span class="ident">text_insert</span>));
-                            <span class="ident">pointer</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                        <span class="kw">if </span>!text_insert.is_empty() {
+                            diffs.insert(pointer, Diff::Insert(text_insert));
+                            pointer += <span class="number">1</span>;
                         }
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">pointer</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Diff::Equal</span>(<span class="ident">prev_equal1</span>, <span class="ident">prev_equal2</span>)) <span class="op">=</span>
-                            <span class="ident">diffs</span>.<span class="ident">get_mut</span>(<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>)
+                    } <span class="kw">else if </span>pointer &gt; <span class="number">0 </span>{
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(Diff::Equal(prev_equal1, prev_equal2)) =
+                            diffs.get_mut(pointer - <span class="number">1</span>)
                         {
-                            <span class="comment">// Merge this equality with the previous one.</span>
-                            <span class="ident">prev_equal1</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>;
-                            <span class="ident">prev_equal2</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>;
-                            <span class="ident">diffs</span>.<span class="ident">remove</span>(<span class="ident">pointer</span>);
-                            <span class="ident">pointer</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+                            <span class="comment">// Merge this equality with the previous one.
+                            </span>prev_equal1.len += text.len;
+                            prev_equal2.len += text.len;
+                            diffs.remove(pointer);
+                            pointer -= <span class="number">1</span>;
                         }
                     }
-                    <span class="ident">count_insert</span> <span class="op">=</span> <span class="number">0</span>;
-                    <span class="ident">count_delete</span> <span class="op">=</span> <span class="number">0</span>;
-                    <span class="ident">text_delete</span> <span class="op">=</span> <span class="ident">Range::empty</span>();
-                    <span class="ident">text_insert</span> <span class="op">=</span> <span class="ident">Range::empty</span>();
+                    count_insert = <span class="number">0</span>;
+                    count_delete = <span class="number">0</span>;
+                    text_delete = Range::empty();
+                    text_insert = Range::empty();
                 }
             }
-            <span class="ident">pointer</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            pointer += <span class="number">1</span>;
         }
-        <span class="kw">if</span> <span class="ident">diffs</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">text</span>().<span class="ident">is_empty</span>() {
-            <span class="ident">diffs</span>.<span class="ident">pop</span>(); <span class="comment">// Remove the dummy entry at the end.</span>
-        }
+        <span class="kw">if </span>diffs.last().unwrap().text().is_empty() {
+            diffs.pop(); <span class="comment">// Remove the dummy entry at the end.
+        </span>}
 
-        <span class="comment">// Second pass: look for single edits surrounded on both sides by equalities</span>
-        <span class="comment">// which can be shifted sideways to eliminate an equality.</span>
-        <span class="comment">// e.g: A&lt;ins&gt;BA&lt;/ins&gt;C -&gt; &lt;ins&gt;AB&lt;/ins&gt;AC</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pointer</span> <span class="op">=</span> <span class="number">1</span>;
-        <span class="comment">// Intentionally ignore the first and last element (don&#39;t need checking).</span>
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">next_diff</span>) <span class="op">=</span> <span class="ident">diffs</span>.<span class="ident">get</span>(<span class="ident">pointer</span> <span class="op">+</span> <span class="number">1</span>) {
-            <span class="kw">let</span> <span class="ident">prev_diff</span> <span class="op">=</span> <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>];
-            <span class="kw">let</span> <span class="ident">this_diff</span> <span class="op">=</span> <span class="ident">diffs</span>[<span class="ident">pointer</span>];
-            <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">Diff::Equal</span>(<span class="ident">prev_diff</span>, <span class="kw">_</span>), <span class="ident">Diff::Equal</span>(<span class="ident">next_diff</span>, <span class="kw">_</span>)) <span class="op">=</span> (<span class="ident">prev_diff</span>, <span class="ident">next_diff</span>) {
-                <span class="comment">// This is a single edit surrounded by equalities.</span>
-                <span class="kw">if</span> <span class="ident">this_diff</span>.<span class="ident">text</span>().<span class="ident">ends_with</span>(<span class="ident">prev_diff</span>) {
-                    <span class="comment">// Shift the edit over the previous equality.</span>
-                    <span class="ident">diffs</span>[<span class="ident">pointer</span>].<span class="ident">shift_left</span>(<span class="ident">prev_diff</span>.<span class="ident">len</span>);
-                    <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">+</span> <span class="number">1</span>].<span class="ident">grow_left</span>(<span class="ident">prev_diff</span>.<span class="ident">len</span>);
-                    <span class="ident">diffs</span>.<span class="ident">remove</span>(<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>); <span class="comment">// Delete prev_diff.</span>
-                    <span class="ident">changes</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">this_diff</span>.<span class="ident">text</span>().<span class="ident">starts_with</span>(<span class="ident">next_diff</span>) {
-                    <span class="comment">// Shift the edit over the next equality.</span>
-                    <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">grow_right</span>(<span class="ident">next_diff</span>.<span class="ident">len</span>);
-                    <span class="ident">diffs</span>[<span class="ident">pointer</span>].<span class="ident">shift_right</span>(<span class="ident">next_diff</span>.<span class="ident">len</span>);
-                    <span class="ident">diffs</span>.<span class="ident">remove</span>(<span class="ident">pointer</span> <span class="op">+</span> <span class="number">1</span>); <span class="comment">// Delete next_diff.</span>
-                    <span class="ident">changes</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="comment">// Second pass: look for single edits surrounded on both sides by equalities
+        // which can be shifted sideways to eliminate an equality.
+        // e.g: A&lt;ins&gt;BA&lt;/ins&gt;C -&gt; &lt;ins&gt;AB&lt;/ins&gt;AC
+        </span><span class="kw">let </span><span class="kw-2">mut </span>changes = <span class="bool-val">false</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>pointer = <span class="number">1</span>;
+        <span class="comment">// Intentionally ignore the first and last element (don&#39;t need checking).
+        </span><span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>next_diff) = diffs.get(pointer + <span class="number">1</span>) {
+            <span class="kw">let </span>prev_diff = diffs[pointer - <span class="number">1</span>];
+            <span class="kw">let </span>this_diff = diffs[pointer];
+            <span class="kw">if let </span>(Diff::Equal(prev_diff, <span class="kw">_</span>), Diff::Equal(next_diff, <span class="kw">_</span>)) = (prev_diff, next_diff) {
+                <span class="comment">// This is a single edit surrounded by equalities.
+                </span><span class="kw">if </span>this_diff.text().ends_with(prev_diff) {
+                    <span class="comment">// Shift the edit over the previous equality.
+                    </span>diffs[pointer].shift_left(prev_diff.len);
+                    diffs[pointer + <span class="number">1</span>].grow_left(prev_diff.len);
+                    diffs.remove(pointer - <span class="number">1</span>); <span class="comment">// Delete prev_diff.
+                    </span>changes = <span class="bool-val">true</span>;
+                } <span class="kw">else if </span>this_diff.text().starts_with(next_diff) {
+                    <span class="comment">// Shift the edit over the next equality.
+                    </span>diffs[pointer - <span class="number">1</span>].grow_right(next_diff.len);
+                    diffs[pointer].shift_right(next_diff.len);
+                    diffs.remove(pointer + <span class="number">1</span>); <span class="comment">// Delete next_diff.
+                    </span>changes = <span class="bool-val">true</span>;
                 }
             }
-            <span class="ident">pointer</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            pointer += <span class="number">1</span>;
         }
-        <span class="comment">// If shifts were made, the diff needs reordering and another shift sweep.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">changes</span> {
+        <span class="comment">// If shifts were made, the diff needs reordering and another shift sweep.
+        </span><span class="kw">if </span>!changes {
             <span class="kw">return</span>;
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Chunk</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">text</span>) <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Chunk::Equal</span>(<span class="ident">text</span>) =&gt; (<span class="string">&quot;Equal&quot;</span>, <span class="ident">text</span>),
-            <span class="ident">Chunk::Delete</span>(<span class="ident">text</span>) =&gt; (<span class="string">&quot;Delete&quot;</span>, <span class="ident">text</span>),
-            <span class="ident">Chunk::Insert</span>(<span class="ident">text</span>) =&gt; (<span class="string">&quot;Insert&quot;</span>, <span class="ident">text</span>),
+<span class="kw">impl </span>Debug <span class="kw">for </span>Chunk&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span>(name, text) = <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Chunk::Equal(text) =&gt; (<span class="string">&quot;Equal&quot;</span>, text),
+            Chunk::Delete(text) =&gt; (<span class="string">&quot;Delete&quot;</span>, text),
+            Chunk::Insert(text) =&gt; (<span class="string">&quot;Insert&quot;</span>, text),
         };
-        <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;{}({:?})&quot;</span>, <span class="ident">name</span>, <span class="ident">text</span>)
+        <span class="macro">write!</span>(formatter, <span class="string">&quot;{}({:?})&quot;</span>, name, text)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">bytes</span>) <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">range</span>, <span class="kw">_</span>) =&gt; (<span class="string">&quot;Equal&quot;</span>, <span class="ident">bytes</span>(<span class="ident">range</span>)),
-            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) =&gt; (<span class="string">&quot;Delete&quot;</span>, <span class="ident">bytes</span>(<span class="ident">range</span>)),
-            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) =&gt; (<span class="string">&quot;Insert&quot;</span>, <span class="ident">bytes</span>(<span class="ident">range</span>)),
+<span class="kw">impl </span>Debug <span class="kw">for </span>Diff&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span>(name, bytes) = <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Diff::Equal(range, <span class="kw">_</span>) =&gt; (<span class="string">&quot;Equal&quot;</span>, bytes(range)),
+            Diff::Delete(range) =&gt; (<span class="string">&quot;Delete&quot;</span>, bytes(range)),
+            Diff::Insert(range) =&gt; (<span class="string">&quot;Insert&quot;</span>, bytes(range)),
         };
-        <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">String::from_utf8_lossy</span>(<span class="ident">bytes</span>);
-        <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;{}({:?})&quot;</span>, <span class="ident">name</span>, <span class="ident">text</span>)
+        <span class="kw">let </span>text = String::from_utf8_lossy(bytes);
+        <span class="macro">write!</span>(formatter, <span class="string">&quot;{}({:?})&quot;</span>, name, text)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Chunk</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">diff</span>: <span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">diff</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">range</span>, <span class="kw">_</span>) =&gt; <span class="ident">Chunk::Equal</span>(<span class="ident">str</span>(<span class="ident">range</span>)),
-            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) =&gt; <span class="ident">Chunk::Delete</span>(<span class="ident">str</span>(<span class="ident">range</span>)),
-            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) =&gt; <span class="ident">Chunk::Insert</span>(<span class="ident">str</span>(<span class="ident">range</span>)),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Diff&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Chunk&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(diff: Diff&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>diff {
+            Diff::Equal(range, <span class="kw">_</span>) =&gt; Chunk::Equal(str(range)),
+            Diff::Delete(range) =&gt; Chunk::Delete(str(range)),
+            Diff::Insert(range) =&gt; Chunk::Insert(str(range)),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dissimilar" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dissimilar" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

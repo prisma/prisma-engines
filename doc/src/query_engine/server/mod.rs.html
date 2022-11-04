@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/query-engine/src/server/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_engine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/query-engine/src/server/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_engine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -460,467 +460,467 @@
 <span id="460">460</span>
 <span id="461">461</span>
 <span id="462">462</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::PrismaContext</span>, <span class="ident">opt::PrismaOpt</span>, <span class="ident">PrismaResult</span>};
-<span class="kw">use</span> <span class="ident">hyper::service</span>::{<span class="ident">make_service_fn</span>, <span class="ident">service_fn</span>};
-<span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">header::CONTENT_TYPE</span>, <span class="ident">Body</span>, <span class="ident">HeaderMap</span>, <span class="ident">Method</span>, <span class="ident">Request</span>, <span class="ident">Response</span>, <span class="ident">Server</span>, <span class="ident">StatusCode</span>};
-<span class="kw">use</span> <span class="ident">opentelemetry</span>::{<span class="ident">global</span>, <span class="ident">propagation::Extractor</span>, <span class="ident">Context</span>};
-<span class="kw">use</span> <span class="ident">psl::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">schema::QuerySchemaRenderer</span>, <span class="ident">TxId</span>};
-<span class="kw">use</span> <span class="ident">query_engine_metrics</span>::{<span class="ident">MetricFormat</span>, <span class="ident">MetricRegistry</span>};
-<span class="kw">use</span> <span class="ident">request_handlers</span>::{<span class="ident">dmmf</span>, <span class="ident">GraphQLSchemaRenderer</span>, <span class="ident">GraphQlHandler</span>, <span class="ident">TxInput</span>};
-<span class="kw">use</span> <span class="ident">serde_json::json</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::net::SocketAddr</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::time::Instant</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">field</span>, <span class="ident">Instrument</span>, <span class="ident">Span</span>};
-<span class="kw">use</span> <span class="ident">tracing_opentelemetry::OpenTelemetrySpanExt</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{context::PrismaContext, opt::PrismaOpt, PrismaResult};
+<span class="kw">use </span>hyper::service::{make_service_fn, service_fn};
+<span class="kw">use </span>hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
+<span class="kw">use </span>opentelemetry::{global, propagation::Extractor, Context};
+<span class="kw">use </span>psl::PreviewFeature;
+<span class="kw">use </span>query_core::{schema::QuerySchemaRenderer, TxId};
+<span class="kw">use </span>query_engine_metrics::{MetricFormat, MetricRegistry};
+<span class="kw">use </span>request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
+<span class="kw">use </span>serde_json::json;
+<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::net::SocketAddr;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::time::Instant;
+<span class="kw">use </span>tracing::{field, Instrument, Span};
+<span class="kw">use </span>tracing_opentelemetry::OpenTelemetrySpanExt;
 
-<span class="kw">const</span> <span class="ident">TRANSACTION_ID_HEADER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;X-transaction-id&quot;</span>;
+<span class="kw">const </span>TRANSACTION_ID_HEADER: <span class="kw-2">&amp;</span>str = <span class="string">&quot;X-transaction-id&quot;</span>;
 
-<span class="comment">//// Shared application state.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">State</span> {
-    <span class="ident">cx</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">PrismaContext</span><span class="op">&gt;</span>,
-    <span class="ident">enable_playground</span>: <span class="ident">bool</span>,
-    <span class="ident">enable_debug_mode</span>: <span class="ident">bool</span>,
-    <span class="ident">enable_itx</span>: <span class="ident">bool</span>,
-    <span class="ident">enable_metrics</span>: <span class="ident">bool</span>,
+<span class="comment">//// Shared application state.
+</span><span class="kw">pub struct </span>State {
+    cx: Arc&lt;PrismaContext&gt;,
+    enable_playground: bool,
+    enable_debug_mode: bool,
+    enable_itx: bool,
+    enable_metrics: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">State</span> {
-    <span class="doccomment">/// Create a new instance of `State`.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">cx</span>: <span class="ident">PrismaContext</span>,
-        <span class="ident">enable_playground</span>: <span class="ident">bool</span>,
-        <span class="ident">enable_debug_mode</span>: <span class="ident">bool</span>,
-        <span class="ident">enable_itx</span>: <span class="ident">bool</span>,
-        <span class="ident">enable_metrics</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">cx</span>: <span class="ident">Arc::new</span>(<span class="ident">cx</span>),
-            <span class="ident">enable_playground</span>,
-            <span class="ident">enable_debug_mode</span>,
-            <span class="ident">enable_itx</span>,
-            <span class="ident">enable_metrics</span>,
+<span class="kw">impl </span>State {
+    <span class="doccomment">/// Create a new instance of `State`.
+    </span><span class="kw">fn </span>new(
+        cx: PrismaContext,
+        enable_playground: bool,
+        enable_debug_mode: bool,
+        enable_itx: bool,
+        enable_metrics: bool,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            cx: Arc::new(cx),
+            enable_playground,
+            enable_debug_mode,
+            enable_itx,
+            enable_metrics,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_metrics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">MetricRegistry</span> {
-        <span class="self">self</span>.<span class="ident">cx</span>.<span class="ident">metrics</span>.<span class="ident">clone</span>()
+    <span class="kw">pub fn </span>get_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MetricRegistry {
+        <span class="self">self</span>.cx.metrics.clone()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">cx</span>: <span class="self">self</span>.<span class="ident">cx</span>.<span class="ident">clone</span>(),
-            <span class="ident">enable_playground</span>: <span class="self">self</span>.<span class="ident">enable_playground</span>,
-            <span class="ident">enable_debug_mode</span>: <span class="self">self</span>.<span class="ident">enable_debug_mode</span>,
-            <span class="ident">enable_itx</span>: <span class="self">self</span>.<span class="ident">enable_itx</span>,
-            <span class="ident">enable_metrics</span>: <span class="self">self</span>.<span class="ident">enable_metrics</span>,
+<span class="kw">impl </span>Clone <span class="kw">for </span>State {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            cx: <span class="self">self</span>.cx.clone(),
+            enable_playground: <span class="self">self</span>.enable_playground,
+            enable_debug_mode: <span class="self">self</span>.enable_debug_mode,
+            enable_itx: <span class="self">self</span>.enable_itx,
+            enable_metrics: <span class="self">self</span>.enable_metrics,
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">setup</span>(<span class="ident">opts</span>: <span class="kw-2">&amp;</span><span class="ident">PrismaOpt</span>, <span class="ident">metrics</span>: <span class="ident">MetricRegistry</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">schema</span>(<span class="bool-val">false</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">datamodel</span>.<span class="ident">configuration</span>;
-    <span class="ident">config</span>.<span class="ident">validate_that_one_datasource_is_provided</span>()<span class="question-mark">?</span>;
+<span class="kw">pub async fn </span>setup(opts: <span class="kw-2">&amp;</span>PrismaOpt, metrics: MetricRegistry) -&gt; PrismaResult&lt;State&gt; {
+    <span class="kw">let </span>datamodel = opts.schema(<span class="bool-val">false</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>config = <span class="kw-2">&amp;</span>datamodel.configuration;
+    config.validate_that_one_datasource_is_provided()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;prisma:engine:connect&quot;</span>);
+    <span class="kw">let </span>span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;prisma:engine:connect&quot;</span>);
 
-    <span class="kw">let</span> <span class="ident">enable_itx</span> <span class="op">=</span> <span class="ident">config</span>
-        .<span class="ident">preview_features</span>()
-        .<span class="ident">contains</span>(<span class="ident">PreviewFeature::InteractiveTransactions</span>);
+    <span class="kw">let </span>enable_itx = config
+        .preview_features()
+        .contains(PreviewFeature::InteractiveTransactions);
 
-    <span class="kw">let</span> <span class="ident">enable_metrics</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">preview_features</span>().<span class="ident">contains</span>(<span class="ident">PreviewFeature::Metrics</span>);
+    <span class="kw">let </span>enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
 
-    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">PrismaContext::builder</span>(<span class="ident">datamodel</span>)
-        .<span class="ident">set_metrics</span>(<span class="ident">metrics</span>)
-        .<span class="ident">enable_raw_queries</span>(<span class="ident">opts</span>.<span class="ident">enable_raw_queries</span>)
-        .<span class="ident">build</span>()
-        .<span class="ident">instrument</span>(<span class="ident">span</span>)
+    <span class="kw">let </span>cx = PrismaContext::builder(datamodel)
+        .set_metrics(metrics)
+        .enable_raw_queries(opts.enable_raw_queries)
+        .build()
+        .instrument(span)
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::new</span>(
-        <span class="ident">cx</span>,
-        <span class="ident">opts</span>.<span class="ident">enable_playground</span>,
-        <span class="ident">opts</span>.<span class="ident">enable_debug_mode</span>,
-        <span class="ident">enable_itx</span>,
-        <span class="ident">enable_metrics</span>,
+    <span class="kw">let </span>state = State::new(
+        cx,
+        opts.enable_playground,
+        opts.enable_debug_mode,
+        enable_itx,
+        enable_metrics,
     );
-    <span class="prelude-val">Ok</span>(<span class="ident">state</span>)
+    <span class="prelude-val">Ok</span>(state)
 }
 
-<span class="doccomment">/// Starts up the graphql query engine server</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">listen</span>(<span class="ident">opts</span>: <span class="ident">PrismaOpt</span>, <span class="ident">metrics</span>: <span class="ident">MetricRegistry</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">setup</span>(<span class="kw-2">&amp;</span><span class="ident">opts</span>, <span class="ident">metrics</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="doccomment">/// Starts up the graphql query engine server
+</span><span class="kw">pub async fn </span>listen(opts: PrismaOpt, metrics: MetricRegistry) -&gt; PrismaResult&lt;()&gt; {
+    <span class="kw">let </span>state = setup(<span class="kw-2">&amp;</span>opts, metrics).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">query_engine</span> <span class="op">=</span> <span class="ident">make_service_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">clone</span>();
-        <span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span>(<span class="ident">service_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">req</span><span class="op">|</span> <span class="ident">routes</span>(<span class="ident">state</span>.<span class="ident">clone</span>(), <span class="ident">req</span>))) }
+    <span class="kw">let </span>query_engine = make_service_fn(<span class="kw">move </span>|<span class="kw">_</span>| {
+        <span class="kw">let </span>state = state.clone();
+        <span class="kw">async move </span>{ <span class="prelude-val">Ok</span>::&lt;<span class="kw">_</span>, hyper::Error&gt;(service_fn(<span class="kw">move </span>|req| routes(state.clone(), req))) }
     });
 
-    <span class="kw">let</span> <span class="ident">ip</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">host</span>.<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;Host was not a valid IP address.&quot;</span>);
-    <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">SocketAddr::new</span>(<span class="ident">ip</span>, <span class="ident">opts</span>.<span class="ident">port</span>);
+    <span class="kw">let </span>ip = opts.host.parse().expect(<span class="string">&quot;Host was not a valid IP address.&quot;</span>);
+    <span class="kw">let </span>addr = SocketAddr::new(ip, opts.port);
 
-    <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">Server::bind</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>).<span class="ident">tcp_nodelay</span>(<span class="bool-val">true</span>).<span class="ident">serve</span>(<span class="ident">query_engine</span>);
+    <span class="kw">let </span>server = Server::bind(<span class="kw-2">&amp;</span>addr).tcp_nodelay(<span class="bool-val">true</span>).serve(query_engine);
 
-    <span class="macro">info!</span>(<span class="string">&quot;Started query engine http server on http://{}&quot;</span>, <span class="ident">addr</span>);
+    <span class="macro">info!</span>(<span class="string">&quot;Started query engine http server on http://{}&quot;</span>, addr);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">server</span>.<span class="kw">await</span> {
-        <span class="macro">eprintln!</span>(<span class="string">&quot;server error: {}&quot;</span>, <span class="ident">e</span>);
+    <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = server.<span class="kw">await </span>{
+        <span class="macro">eprintln!</span>(<span class="string">&quot;server error: {}&quot;</span>, e);
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">routes</span>(<span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+<span class="kw">pub async fn </span>routes(state: State, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
+    <span class="kw">let </span>start = Instant::now();
 
-    <span class="kw">if</span> <span class="ident">req</span>.<span class="ident">method</span>() <span class="op">==</span> <span class="ident">Method::POST</span> <span class="op">&amp;&amp;</span> <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">path</span>().<span class="ident">contains</span>(<span class="string">&quot;transaction&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">state</span>.<span class="ident">enable_itx</span> {
-        <span class="kw">return</span> <span class="ident">handle_transaction</span>(<span class="ident">state</span>, <span class="ident">req</span>).<span class="kw">await</span>;
+    <span class="kw">if </span>req.method() == Method::POST &amp;&amp; req.uri().path().contains(<span class="string">&quot;transaction&quot;</span>) &amp;&amp; state.enable_itx {
+        <span class="kw">return </span>handle_transaction(state, req).<span class="kw">await</span>;
     }
 
-    <span class="kw">if</span> [<span class="ident">Method::POST</span>, <span class="ident">Method::GET</span>].<span class="ident">contains</span>(<span class="ident">req</span>.<span class="ident">method</span>())
-        <span class="op">&amp;&amp;</span> <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">path</span>().<span class="ident">contains</span>(<span class="string">&quot;metrics&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">state</span>.<span class="ident">enable_metrics</span>
+    <span class="kw">if </span>[Method::POST, Method::GET].contains(req.method())
+        &amp;&amp; req.uri().path().contains(<span class="string">&quot;metrics&quot;</span>)
+        &amp;&amp; state.enable_metrics
     {
-        <span class="kw">return</span> <span class="ident">handle_metrics</span>(<span class="ident">state</span>, <span class="ident">req</span>).<span class="kw">await</span>;
+        <span class="kw">return </span>handle_metrics(state, req).<span class="kw">await</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">req</span>.<span class="ident">method</span>(), <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">path</span>()) {
-        (<span class="kw-2">&amp;</span><span class="ident">Method::POST</span>, <span class="string">&quot;/&quot;</span>) =&gt; <span class="ident">graphql_handler</span>(<span class="ident">state</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        (<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="string">&quot;/&quot;</span>) <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">enable_playground</span> =&gt; <span class="ident">playground_handler</span>(),
-        (<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="string">&quot;/status&quot;</span>) =&gt; <span class="ident">Response::builder</span>()
-            .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
-            .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
-            .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="string">r#&quot;{&quot;status&quot;:&quot;ok&quot;}&quot;#</span>))
-            .<span class="ident">unwrap</span>(),
+    <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="kw">match </span>(req.method(), req.uri().path()) {
+        (<span class="kw-2">&amp;</span>Method::POST, <span class="string">&quot;/&quot;</span>) =&gt; graphql_handler(state, req).<span class="kw">await</span><span class="question-mark">?</span>,
+        (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/&quot;</span>) <span class="kw">if </span>state.enable_playground =&gt; playground_handler(),
+        (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/status&quot;</span>) =&gt; Response::builder()
+            .status(StatusCode::OK)
+            .header(CONTENT_TYPE, <span class="string">&quot;application/json&quot;</span>)
+            .body(Body::from(<span class="string">r#&quot;{&quot;status&quot;:&quot;ok&quot;}&quot;#</span>))
+            .unwrap(),
 
-        (<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="string">&quot;/sdl&quot;</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">GraphQLSchemaRenderer::render</span>(<span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">query_schema</span>().<span class="ident">clone</span>());
+        (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/sdl&quot;</span>) =&gt; {
+            <span class="kw">let </span>schema = GraphQLSchemaRenderer::render(state.cx.query_schema().clone());
 
-            <span class="ident">Response::builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
-                .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/text&quot;</span>)
-                .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">schema</span>))
-                .<span class="ident">unwrap</span>()
+            Response::builder()
+                .status(StatusCode::OK)
+                .header(CONTENT_TYPE, <span class="string">&quot;application/text&quot;</span>)
+                .body(Body::from(schema))
+                .unwrap()
         }
 
-        (<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="string">&quot;/dmmf&quot;</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">dmmf::render_dmmf</span>(<span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">datamodel</span>(), <span class="ident">Arc::clone</span>(<span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">query_schema</span>()));
+        (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/dmmf&quot;</span>) =&gt; {
+            <span class="kw">let </span>schema = dmmf::render_dmmf(state.cx.datamodel(), Arc::clone(state.cx.query_schema()));
 
-            <span class="ident">Response::builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
-                .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
-                .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>).<span class="ident">unwrap</span>()))
-                .<span class="ident">unwrap</span>()
+            Response::builder()
+                .status(StatusCode::OK)
+                .header(CONTENT_TYPE, <span class="string">&quot;application/json&quot;</span>)
+                .body(Body::from(serde_json::to_vec(<span class="kw-2">&amp;</span>schema).unwrap()))
+                .unwrap()
         }
 
-        (<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="string">&quot;/server_info&quot;</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="macro">json!</span>({
+        (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/server_info&quot;</span>) =&gt; {
+            <span class="kw">let </span>body = <span class="macro">json!</span>({
                 <span class="string">&quot;commit&quot;</span>: <span class="macro">env!</span>(<span class="string">&quot;GIT_HASH&quot;</span>),
                 <span class="string">&quot;version&quot;</span>: <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>),
-                <span class="string">&quot;primary_connector&quot;</span>: <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">primary_connector</span>(),
+                <span class="string">&quot;primary_connector&quot;</span>: state.cx.primary_connector(),
             });
 
-            <span class="ident">Response::builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
-                .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
-                .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>).<span class="ident">unwrap</span>()))
-                .<span class="ident">unwrap</span>()
+            Response::builder()
+                .status(StatusCode::OK)
+                .header(CONTENT_TYPE, <span class="string">&quot;application/json&quot;</span>)
+                .body(Body::from(serde_json::to_vec(<span class="kw-2">&amp;</span>body).unwrap()))
+                .unwrap()
         }
-        <span class="kw">_</span> =&gt; <span class="ident">Response::builder</span>()
-            .<span class="ident">status</span>(<span class="ident">StatusCode::NOT_FOUND</span>)
-            .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
-            .<span class="ident">unwrap</span>(),
+        <span class="kw">_ </span>=&gt; Response::builder()
+            .status(StatusCode::NOT_FOUND)
+            .body(Body::empty())
+            .unwrap(),
     };
 
-    <span class="kw">let</span> <span class="ident">elapsed</span> <span class="op">=</span> <span class="ident">Instant::now</span>().<span class="ident">duration_since</span>(<span class="ident">start</span>).<span class="ident">as_micros</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-    <span class="ident">res</span>.<span class="ident">headers_mut</span>().<span class="ident">insert</span>(<span class="string">&quot;x-elapsed&quot;</span>, <span class="ident">elapsed</span>.<span class="ident">into</span>());
+    <span class="kw">let </span>elapsed = Instant::now().duration_since(start).as_micros() <span class="kw">as </span>u64;
+    res.headers_mut().insert(<span class="string">&quot;x-elapsed&quot;</span>, elapsed.into());
 
-    <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+    <span class="prelude-val">Ok</span>(res)
 }
 
-<span class="doccomment">/// The main query handler. This handles incoming GraphQL queries and passes it</span>
-<span class="doccomment">/// to the query engine.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">graphql_handler</span>(<span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span> {
-    <span class="comment">// Check for debug headers if enabled.</span>
-    <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">enable_debug_mode</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">handle_debug_headers</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>));
+<span class="doccomment">/// The main query handler. This handles incoming GraphQL queries and passes it
+/// to the query engine.
+</span><span class="kw">async fn </span>graphql_handler(state: State, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
+    <span class="comment">// Check for debug headers if enabled.
+    </span><span class="kw">if </span>state.enable_debug_mode {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(handle_debug_headers(<span class="kw-2">&amp;</span>req));
     }
 
-    <span class="kw">let</span> <span class="ident">tx_id</span> <span class="op">=</span> <span class="ident">get_transaction_id_from_header</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>);
+    <span class="kw">let </span>tx_id = get_transaction_id_from_header(<span class="kw-2">&amp;</span>req);
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">tx_id</span>.<span class="ident">is_none</span>() {
-        <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">get_parent_span_context</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>);
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>);
-        <span class="ident">span</span>.<span class="ident">set_parent</span>(<span class="ident">cx</span>);
-        <span class="ident">span</span>
-    } <span class="kw">else</span> {
-        <span class="ident">Span::none</span>()
+    <span class="kw">let </span>span = <span class="kw">if </span>tx_id.is_none() {
+        <span class="kw">let </span>cx = get_parent_span_context(<span class="kw-2">&amp;</span>req);
+        <span class="kw">let </span>span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine&quot;</span>, user_facing = <span class="bool-val">true</span>);
+        span.set_parent(cx);
+        span
+    } <span class="kw">else </span>{
+        Span::none()
     };
 
-    <span class="kw">let</span> <span class="ident">trace_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">req</span>.<span class="ident">headers</span>().<span class="ident">get</span>(<span class="string">&quot;traceparent&quot;</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">traceparent</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">traceparent</span>.<span class="ident">to_str</span>().<span class="ident">unwrap_or_default</span>().<span class="ident">to_string</span>();
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>)
+    <span class="kw">let </span>trace_id = <span class="kw">match </span>req.headers().get(<span class="string">&quot;traceparent&quot;</span>) {
+        <span class="prelude-val">Some</span>(traceparent) =&gt; {
+            <span class="kw">let </span>s = traceparent.to_str().unwrap_or_default().to_string();
+            <span class="prelude-val">Some</span>(s)
         }
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">work</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">let</span> <span class="ident">body_start</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">into_body</span>();
-        <span class="comment">// block and buffer request until the request has completed</span>
-        <span class="kw">let</span> <span class="ident">full_body</span> <span class="op">=</span> <span class="ident">hyper::body::to_bytes</span>(<span class="ident">body_start</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>work = <span class="kw">async move </span>{
+        <span class="kw">let </span>body_start = req.into_body();
+        <span class="comment">// block and buffer request until the request has completed
+        </span><span class="kw">let </span>full_body = hyper::body::to_bytes(body_start).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">serde_json::from_slice</span>(<span class="ident">full_body</span>.<span class="ident">as_ref</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="ident">body</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">GraphQlHandler::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>, <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">query_schema</span>());
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">body</span>, <span class="ident">tx_id</span>, <span class="ident">trace_id</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span>;
+        <span class="kw">match </span>serde_json::from_slice(full_body.as_ref()) {
+            <span class="prelude-val">Ok</span>(body) =&gt; {
+                <span class="kw">let </span>handler = GraphQlHandler::new(<span class="kw-2">&amp;*</span>state.cx.executor, state.cx.query_schema());
+                <span class="kw">let </span>result = handler.handle(body, tx_id, trace_id).instrument(span).<span class="kw">await</span>;
 
-                <span class="kw">let</span> <span class="ident">result_bytes</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>).<span class="ident">unwrap</span>();
+                <span class="kw">let </span>result_bytes = serde_json::to_vec(<span class="kw-2">&amp;</span>result).unwrap();
 
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
-                    .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
-                    .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
-                    .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">result_bytes</span>))
-                    .<span class="ident">unwrap</span>();
+                <span class="kw">let </span>res = Response::builder()
+                    .status(StatusCode::OK)
+                    .header(CONTENT_TYPE, <span class="string">&quot;application/json&quot;</span>)
+                    .body(Body::from(result_bytes))
+                    .unwrap();
 
-                <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+                <span class="prelude-val">Ok</span>(res)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">_e</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
-                    .<span class="ident">status</span>(<span class="ident">StatusCode::BAD_REQUEST</span>)
-                    .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
-                    .<span class="ident">unwrap</span>();
+            <span class="prelude-val">Err</span>(_e) =&gt; {
+                <span class="kw">let </span>res = Response::builder()
+                    .status(StatusCode::BAD_REQUEST)
+                    .body(Body::empty())
+                    .unwrap();
 
-                <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+                <span class="prelude-val">Ok</span>(res)
             }
         }
     };
 
-    <span class="ident">work</span>.<span class="kw">await</span>
+    work.<span class="kw">await
+</span>}
+
+<span class="doccomment">/// Expose the GraphQL playground if enabled.
+///
+/// # Security
+///
+/// In production exposing the playground is equivalent to exposing the database
+/// on a port. This should never be enabled on production servers.
+</span><span class="kw">fn </span>playground_handler() -&gt; Response&lt;Body&gt; {
+    <span class="kw">let </span>playground = <span class="macro">include_bytes!</span>(<span class="string">&quot;../../static_files/playground.html&quot;</span>).to_vec();
+
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, <span class="string">&quot;text/html&quot;</span>)
+        .body(Body::from(playground))
+        .unwrap()
 }
 
-<span class="doccomment">/// Expose the GraphQL playground if enabled.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Security</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In production exposing the playground is equivalent to exposing the database</span>
-<span class="doccomment">/// on a port. This should never be enabled on production servers.</span>
-<span class="kw">fn</span> <span class="ident">playground_handler</span>() -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">playground</span> <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../../static_files/playground.html&quot;</span>).<span class="ident">to_vec</span>();
-
-    <span class="ident">Response::builder</span>()
-        .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
-        .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;text/html&quot;</span>)
-        .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">playground</span>))
-        .<span class="ident">unwrap</span>()
-}
-
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_metrics</span>(<span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">query</span>() {
-        <span class="kw">if</span> <span class="ident">query</span>.<span class="ident">contains</span>(<span class="string">&quot;format=json&quot;</span>) {
-            <span class="ident">MetricFormat::Json</span>
-        } <span class="kw">else</span> {
-            <span class="ident">MetricFormat::Prometheus</span>
+<span class="kw">async fn </span>handle_metrics(state: State, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
+    <span class="kw">let </span>format = <span class="kw">if let </span><span class="prelude-val">Some</span>(query) = req.uri().query() {
+        <span class="kw">if </span>query.contains(<span class="string">&quot;format=json&quot;</span>) {
+            MetricFormat::Json
+        } <span class="kw">else </span>{
+            MetricFormat::Prometheus
         }
-    } <span class="kw">else</span> {
-        <span class="ident">MetricFormat::Prometheus</span>
+    } <span class="kw">else </span>{
+        MetricFormat::Prometheus
     };
 
-    <span class="kw">let</span> <span class="ident">body_start</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">into_body</span>();
-    <span class="comment">// block and buffer request until the request has completed</span>
-    <span class="kw">let</span> <span class="ident">full_body</span> <span class="op">=</span> <span class="ident">hyper::body::to_bytes</span>(<span class="ident">body_start</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>body_start = req.into_body();
+    <span class="comment">// block and buffer request until the request has completed
+    </span><span class="kw">let </span>full_body = hyper::body::to_bytes(body_start).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">global_labels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">serde_json::from_slice</span>(<span class="ident">full_body</span>.<span class="ident">as_ref</span>()) {
-        <span class="prelude-val">Ok</span>(<span class="ident">map</span>) =&gt; <span class="ident">map</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">_e</span>) =&gt; <span class="ident">HashMap::new</span>(),
+    <span class="kw">let </span>global_labels: HashMap&lt;String, String&gt; = <span class="kw">match </span>serde_json::from_slice(full_body.as_ref()) {
+        <span class="prelude-val">Ok</span>(map) =&gt; map,
+        <span class="prelude-val">Err</span>(_e) =&gt; HashMap::new(),
     };
 
-    <span class="kw">if</span> <span class="ident">format</span> <span class="op">==</span> <span class="ident">MetricFormat::Json</span> {
-        <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">metrics</span>.<span class="ident">to_json</span>(<span class="ident">global_labels</span>);
+    <span class="kw">if </span>format == MetricFormat::Json {
+        <span class="kw">let </span>metrics = state.cx.metrics.to_json(global_labels);
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
-            .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
-            .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
-            .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">metrics</span>.<span class="ident">to_string</span>()))
-            .<span class="ident">unwrap</span>();
+        <span class="kw">let </span>res = Response::builder()
+            .status(StatusCode::OK)
+            .header(CONTENT_TYPE, <span class="string">&quot;application/json&quot;</span>)
+            .body(Body::from(metrics.to_string()))
+            .unwrap();
 
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">res</span>);
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(res);
     }
 
-    <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">metrics</span>.<span class="ident">to_prometheus</span>(<span class="ident">global_labels</span>);
+    <span class="kw">let </span>metrics = state.cx.metrics.to_prometheus(global_labels);
 
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
-        .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
-        .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;text/plain; version=0.0.4&quot;</span>)
-        .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">metrics</span>))
-        .<span class="ident">unwrap</span>();
+    <span class="kw">let </span>res = Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, <span class="string">&quot;text/plain; version=0.0.4&quot;</span>)
+        .body(Body::from(metrics))
+        .unwrap();
 
-    <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+    <span class="prelude-val">Ok</span>(res)
 }
 
-<span class="doccomment">/// Sadly the routing doesn&#39;t make it obvious what the transaction routes are:</span>
-<span class="doccomment">/// POST /transaction/start -&gt; start a transaction</span>
-<span class="doccomment">/// POST /transaction/{tx_id}/commit -&gt; commit a transaction</span>
-<span class="doccomment">/// POST /transaction/{tx_id}/rollback -&gt; rollback a transaction</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_transaction</span>(<span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">path</span>();
+<span class="doccomment">/// Sadly the routing doesn&#39;t make it obvious what the transaction routes are:
+/// POST /transaction/start -&gt; start a transaction
+/// POST /transaction/{tx_id}/commit -&gt; commit a transaction
+/// POST /transaction/{tx_id}/rollback -&gt; rollback a transaction
+</span><span class="kw">async fn </span>handle_transaction(state: State, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
+    <span class="kw">let </span>path = req.uri().path();
 
-    <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">contains</span>(<span class="string">&quot;start&quot;</span>) {
-        <span class="kw">return</span> <span class="ident">transaction_start_handler</span>(<span class="ident">state</span>, <span class="ident">req</span>).<span class="kw">await</span>;
+    <span class="kw">if </span>path.contains(<span class="string">&quot;start&quot;</span>) {
+        <span class="kw">return </span>transaction_start_handler(state, req).<span class="kw">await</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">sections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">split</span>(<span class="string">&#39;/&#39;</span>).<span class="ident">collect</span>();
+    <span class="kw">let </span>sections: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = path.split(<span class="string">&#39;/&#39;</span>).collect();
 
-    <span class="kw">if</span> <span class="ident">sections</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">2</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Response::builder</span>()
-            .<span class="ident">status</span>(<span class="ident">StatusCode::INTERNAL_SERVER_ERROR</span>)
-            .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="string">&quot;Request does not contain the transaction id&quot;</span>))
-            .<span class="ident">unwrap</span>());
+    <span class="kw">if </span>sections.len() &lt; <span class="number">2 </span>{
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(Response::builder()
+            .status(StatusCode::INTERNAL_SERVER_ERROR)
+            .body(Body::from(<span class="string">&quot;Request does not contain the transaction id&quot;</span>))
+            .unwrap());
     }
 
-    <span class="kw">let</span> <span class="ident">tx_id</span>: <span class="ident">TxId</span> <span class="op">=</span> <span class="ident">sections</span>[<span class="number">2</span>].<span class="ident">into</span>();
+    <span class="kw">let </span>tx_id: TxId = sections[<span class="number">2</span>].into();
 
-    <span class="kw">let</span> <span class="ident">succuss_resp</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
-        .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
-        .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
-        .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="string">r#&quot;{}&quot;#</span>))
-        .<span class="ident">unwrap</span>();
+    <span class="kw">let </span>succuss_resp = Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, <span class="string">&quot;application/json&quot;</span>)
+        .body(Body::from(<span class="string">r#&quot;{}&quot;#</span>))
+        .unwrap();
 
-    <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">contains</span>(<span class="string">&quot;commit&quot;</span>) {
-        <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>.<span class="ident">commit_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">succuss_resp</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">err_to_http_resp</span>(<span class="ident">err</span>)),
+    <span class="kw">if </span>path.contains(<span class="string">&quot;commit&quot;</span>) {
+        <span class="kw">match </span>state.cx.executor.commit_tx(tx_id).<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(succuss_resp),
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Ok</span>(err_to_http_resp(err)),
         }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">contains</span>(<span class="string">&quot;rollback&quot;</span>) {
-        <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>.<span class="ident">rollback_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">succuss_resp</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">err_to_http_resp</span>(<span class="ident">err</span>)),
+    } <span class="kw">else if </span>path.contains(<span class="string">&quot;rollback&quot;</span>) {
+        <span class="kw">match </span>state.cx.executor.rollback_tx(tx_id).<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(succuss_resp),
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Ok</span>(err_to_http_resp(err)),
         }
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
-            .<span class="ident">status</span>(<span class="ident">StatusCode::BAD_REQUEST</span>)
-            .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
-            .<span class="ident">unwrap</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>res = Response::builder()
+            .status(StatusCode::BAD_REQUEST)
+            .body(Body::empty())
+            .unwrap();
+        <span class="prelude-val">Ok</span>(res)
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_start_handler</span>(<span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">get_parent_span_context</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>);
+<span class="kw">async fn </span>transaction_start_handler(state: State, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
+    <span class="kw">let </span>cx = get_parent_span_context(<span class="kw-2">&amp;</span>req);
 
-    <span class="kw">let</span> <span class="ident">body_start</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">into_body</span>();
-    <span class="comment">// block and buffer request until the request has completed</span>
-    <span class="kw">let</span> <span class="ident">full_body</span> <span class="op">=</span> <span class="ident">hyper::body::to_bytes</span>(<span class="ident">body_start</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">TxInput</span> <span class="op">=</span> <span class="ident">serde_json::from_slice</span>(<span class="ident">full_body</span>.<span class="ident">as_ref</span>()).<span class="ident">unwrap</span>();
+    <span class="kw">let </span>body_start = req.into_body();
+    <span class="comment">// block and buffer request until the request has completed
+    </span><span class="kw">let </span>full_body = hyper::body::to_bytes(body_start).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>input: TxInput = serde_json::from_slice(full_body.as_ref()).unwrap();
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;prisma:engine:itx_runner&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>, <span class="ident">itx_id</span> <span class="op">=</span> <span class="ident">field::Empty</span>);
-    <span class="ident">span</span>.<span class="ident">set_parent</span>(<span class="ident">cx</span>);
+    <span class="kw">let </span>span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;prisma:engine:itx_runner&quot;</span>, user_facing = <span class="bool-val">true</span>, itx_id = field::Empty);
+    span.set_parent(cx);
 
-    <span class="kw">match</span> <span class="ident">state</span>
-        .<span class="ident">cx</span>
-        .<span class="ident">executor</span>
-        .<span class="ident">start_tx</span>(
-            <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">query_schema</span>().<span class="ident">clone</span>(),
-            <span class="ident">input</span>.<span class="ident">max_wait</span>,
-            <span class="ident">input</span>.<span class="ident">timeout</span>,
-            <span class="ident">input</span>.<span class="ident">isolation_level</span>,
+    <span class="kw">match </span>state
+        .cx
+        .executor
+        .start_tx(
+            state.cx.query_schema().clone(),
+            input.max_wait,
+            input.timeout,
+            input.isolation_level,
         )
-        .<span class="ident">instrument</span>(<span class="ident">span</span>)
-        .<span class="kw">await</span>
-    {
-        <span class="prelude-val">Ok</span>(<span class="ident">tx_id</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">json!</span>({ <span class="string">&quot;id&quot;</span>: <span class="ident">tx_id</span>.<span class="ident">to_string</span>() });
-            <span class="kw">let</span> <span class="ident">result_bytes</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>).<span class="ident">unwrap</span>();
+        .instrument(span)
+        .<span class="kw">await
+    </span>{
+        <span class="prelude-val">Ok</span>(tx_id) =&gt; {
+            <span class="kw">let </span>result = <span class="macro">json!</span>({ <span class="string">&quot;id&quot;</span>: tx_id.to_string() });
+            <span class="kw">let </span>result_bytes = serde_json::to_vec(<span class="kw-2">&amp;</span>result).unwrap();
 
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
-                .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
-                .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">result_bytes</span>))
-                .<span class="ident">unwrap</span>();
+            <span class="kw">let </span>res = Response::builder()
+                .status(StatusCode::OK)
+                .header(CONTENT_TYPE, <span class="string">&quot;application/json&quot;</span>)
+                .body(Body::from(result_bytes))
+                .unwrap();
 
-            <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+            <span class="prelude-val">Ok</span>(res)
         }
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">err_to_http_resp</span>(<span class="ident">err</span>)),
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Ok</span>(err_to_http_resp(err)),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_transaction_id_from_header</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">req</span>.<span class="ident">headers</span>().<span class="ident">get</span>(<span class="ident">TRANSACTION_ID_HEADER</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">id_header</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{} has not been correctly set.&quot;</span>, <span class="ident">TRANSACTION_ID_HEADER</span>);
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">id_header</span>.<span class="ident">to_str</span>().<span class="ident">unwrap_or</span>(<span class="ident">msg</span>.<span class="ident">as_str</span>());
-            <span class="prelude-val">Some</span>(<span class="ident">TxId::from</span>(<span class="ident">id</span>))
+<span class="kw">fn </span>get_transaction_id_from_header(req: <span class="kw-2">&amp;</span>Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;TxId&gt; {
+    <span class="kw">match </span>req.headers().get(TRANSACTION_ID_HEADER) {
+        <span class="prelude-val">Some</span>(id_header) =&gt; {
+            <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;{} has not been correctly set.&quot;</span>, TRANSACTION_ID_HEADER);
+            <span class="kw">let </span>id = id_header.to_str().unwrap_or(msg.as_str());
+            <span class="prelude-val">Some</span>(TxId::from(id))
         }
 
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Handle debug headers inside the main GraphQL endpoint.</span>
-<span class="kw">fn</span> <span class="ident">handle_debug_headers</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Debug header that triggers a panic in the request thread.</span>
-    <span class="kw">static</span> <span class="ident">DEBUG_NON_FATAL_HEADER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;x-debug-non-fatal&quot;</span>;
+<span class="doccomment">/// Handle debug headers inside the main GraphQL endpoint.
+</span><span class="kw">fn </span>handle_debug_headers(req: <span class="kw-2">&amp;</span>Request&lt;Body&gt;) -&gt; Response&lt;Body&gt; {
+    <span class="doccomment">/// Debug header that triggers a panic in the request thread.
+    </span><span class="kw">static </span>DEBUG_NON_FATAL_HEADER: <span class="kw-2">&amp;</span>str = <span class="string">&quot;x-debug-non-fatal&quot;</span>;
 
-    <span class="doccomment">/// Debug header that causes the query engine to crash.</span>
-    <span class="kw">static</span> <span class="ident">DEBUG_FATAL_HEADER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;x-debug-fatal&quot;</span>;
+    <span class="doccomment">/// Debug header that causes the query engine to crash.
+    </span><span class="kw">static </span>DEBUG_FATAL_HEADER: <span class="kw-2">&amp;</span>str = <span class="string">&quot;x-debug-fatal&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">headers</span>();
+    <span class="kw">let </span>headers = req.headers();
 
-    <span class="kw">if</span> <span class="ident">headers</span>.<span class="ident">contains_key</span>(<span class="ident">DEBUG_FATAL_HEADER</span>) {
+    <span class="kw">if </span>headers.contains_key(DEBUG_FATAL_HEADER) {
         <span class="macro">info!</span>(<span class="string">&quot;Query engine debug fatal error, shutting down.&quot;</span>);
-        <span class="ident">std::process::exit</span>(<span class="number">1</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">headers</span>.<span class="ident">contains_key</span>(<span class="ident">DEBUG_NON_FATAL_HEADER</span>) {
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">user_facing_errors::Error::from_panic_payload</span>(<span class="ident">Box::new</span>(<span class="string">&quot;Debug panic&quot;</span>));
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">Body::from</span>(<span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>).<span class="ident">unwrap</span>());
+        std::process::exit(<span class="number">1</span>)
+    } <span class="kw">else if </span>headers.contains_key(DEBUG_NON_FATAL_HEADER) {
+        <span class="kw">let </span>err = user_facing_errors::Error::from_panic_payload(Box::new(<span class="string">&quot;Debug panic&quot;</span>));
+        <span class="kw">let </span>body = Body::from(serde_json::to_vec(<span class="kw-2">&amp;</span>err).unwrap());
 
-        <span class="ident">Response::builder</span>().<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>).<span class="ident">body</span>(<span class="ident">body</span>).<span class="ident">unwrap</span>()
-    } <span class="kw">else</span> {
-        <span class="ident">Response::builder</span>().<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>()
+        Response::builder().status(StatusCode::OK).body(body).unwrap()
+    } <span class="kw">else </span>{
+        Response::builder().status(StatusCode::OK).body(Body::empty()).unwrap()
     }
 }
 
-<span class="kw">struct</span> <span class="ident">HeaderExtractor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HeaderMap</span>);
+<span class="kw">struct </span>HeaderExtractor&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HeaderMap);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Extractor</span> <span class="kw">for</span> <span class="ident">HeaderExtractor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get</span>(<span class="ident">key</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">hv</span><span class="op">|</span> <span class="ident">hv</span>.<span class="ident">to_str</span>().<span class="ident">ok</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Extractor <span class="kw">for </span>HeaderExtractor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.get(key).and_then(|hv| hv.to_str().ok())
     }
 
-    <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">keys</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">hk</span><span class="op">|</span> <span class="ident">hk</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>()
+    <span class="kw">fn </span>keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.keys().map(|hk| hk.as_str()).collect()
     }
 }
 
-<span class="doccomment">/// If the client sends us a trace and span id, extracting a new context if the</span>
-<span class="doccomment">/// headers are set. If not, returns current context.</span>
-<span class="kw">fn</span> <span class="ident">get_parent_span_context</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="ident">Context</span> {
-    <span class="kw">let</span> <span class="ident">extractor</span> <span class="op">=</span> <span class="ident">HeaderExtractor</span>(<span class="ident">req</span>.<span class="ident">headers</span>());
-    <span class="ident">global::get_text_map_propagator</span>(<span class="op">|</span><span class="ident">propagator</span><span class="op">|</span> <span class="ident">propagator</span>.<span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="ident">extractor</span>))
+<span class="doccomment">/// If the client sends us a trace and span id, extracting a new context if the
+/// headers are set. If not, returns current context.
+</span><span class="kw">fn </span>get_parent_span_context(req: <span class="kw-2">&amp;</span>Request&lt;Body&gt;) -&gt; Context {
+    <span class="kw">let </span>extractor = HeaderExtractor(req.headers());
+    global::get_text_map_propagator(|propagator| propagator.extract(<span class="kw-2">&amp;</span>extractor))
 }
 
-<span class="kw">fn</span> <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>: <span class="ident">query_core::CoreError</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">err</span> {
-        <span class="ident">query_core::CoreError::TransactionError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">query_core::TransactionError::AcquisitionTimeout</span> =&gt; <span class="number">504</span>,
-            <span class="ident">query_core::TransactionError::AlreadyStarted</span> =&gt; <span class="macro">todo!</span>(),
-            <span class="ident">query_core::TransactionError::NotFound</span> =&gt; <span class="number">404</span>,
-            <span class="ident">query_core::TransactionError::Closed</span> { <span class="ident">reason</span>: <span class="kw">_</span> } =&gt; <span class="number">422</span>,
-            <span class="ident">query_core::TransactionError::Unknown</span> { <span class="ident">reason</span>: <span class="kw">_</span> } =&gt; <span class="number">500</span>,
+<span class="kw">fn </span>err_to_http_resp(err: query_core::CoreError) -&gt; Response&lt;Body&gt; {
+    <span class="kw">let </span>status = <span class="kw">match </span>err {
+        query_core::CoreError::TransactionError(<span class="kw-2">ref </span>err) =&gt; <span class="kw">match </span>err {
+            query_core::TransactionError::AcquisitionTimeout =&gt; <span class="number">504</span>,
+            query_core::TransactionError::AlreadyStarted =&gt; <span class="macro">todo!</span>(),
+            query_core::TransactionError::NotFound =&gt; <span class="number">404</span>,
+            query_core::TransactionError::Closed { reason: <span class="kw">_ </span>} =&gt; <span class="number">422</span>,
+            query_core::TransactionError::Unknown { reason: <span class="kw">_ </span>} =&gt; <span class="number">500</span>,
         },
 
-        <span class="comment">// All other errors are treated as 500s, most of these paths should never be hit, only connector errors may occur.</span>
-        <span class="kw">_</span> =&gt; <span class="number">500</span>,
+        <span class="comment">// All other errors are treated as 500s, most of these paths should never be hit, only connector errors may occur.
+        </span><span class="kw">_ </span>=&gt; <span class="number">500</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">user_error</span>: <span class="ident">user_facing_errors::Error</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">Body::from</span>(<span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">user_error</span>).<span class="ident">unwrap</span>());
+    <span class="kw">let </span>user_error: user_facing_errors::Error = err.into();
+    <span class="kw">let </span>body = Body::from(serde_json::to_vec(<span class="kw-2">&amp;</span>user_error).unwrap());
 
-    <span class="ident">Response::builder</span>().<span class="ident">status</span>(<span class="ident">status</span>).<span class="ident">body</span>(<span class="ident">body</span>).<span class="ident">unwrap</span>()
+    Response::builder().status(status).body(body).unwrap()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_engine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_engine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,6 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Create new conversion adapters from functions"><meta name="keywords" content="rust, rustlang, rust-lang, serde_conv"><title>serde_conv in serde_with - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script defer src="sidebar-items.js"></script><script defer src="../main.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc macro"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div></a><div class="sidebar-elems"><h2 class="location"><a href="index.html">In serde_with</a></h2></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../serde_with/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn"><span class="in-band">Macro <a href="index.html">serde_with</a>::<wbr><a class="macro" href="#">serde_conv</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/serde_with/serde_conv.rs.html#104-147">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><div class="example-wrap"><pre class="rust macro"><code><span class="macro">macro_rules!</span> <span class="ident">serde_conv</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ser</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">de</span>:<span class="ident">expr</span>) =&gt; { ... };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">vis</span>:<span class="ident">vis</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ser</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">de</span>:<span class="ident">expr</span>) =&gt; { ... };
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Create new conversion adapters from functions"><meta name="keywords" content="rust, rustlang, rust-lang, serde_conv"><title>serde_conv in serde_with - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../normalize.css"><link rel="stylesheet" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../ayu.css" disabled><link rel="stylesheet" href="../dark.css" disabled><link rel="stylesheet" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script defer src="sidebar-items.js"></script><script defer src="../main.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc macro"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div></a><div class="sidebar-elems"><h2 class="location"><a href="index.html">In serde_with</a></h2></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../serde_with/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn"><span class="in-band">Macro <a href="index.html">serde_with</a>::<wbr><a class="macro" href="#">serde_conv</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/serde_with/serde_conv.rs.html#104-147">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><div class="example-wrap"><pre class="rust macro"><code><span class="macro">macro_rules! </span>serde_conv {
+    (<span class="macro-nonterminal">$m</span>:ident, <span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$ser</span>:expr, <span class="macro-nonterminal">$de</span>:expr) =&gt; { ... };
+    (<span class="macro-nonterminal">$vis</span>:vis <span class="macro-nonterminal">$m</span>:ident, <span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$ser</span>:expr, <span class="macro-nonterminal">$de</span>:expr) =&gt; { ... };
 }</code></pre></div>
 </div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Create new conversion adapters from functions</p>
 <p>The macro lets you create a new converter, which is usable for serde’s with-attribute and <code>#[serde_as]</code>.
@@ -21,52 +21,52 @@ The error type <code>E</code> must implement <code>Display</code>.</li>
 We want to serialize it as a <code>[u8; 3]</code>.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Rgb</span> {
-    <span class="ident">red</span>: <span class="ident">u8</span>,
-    <span class="ident">green</span>: <span class="ident">u8</span>,
-    <span class="ident">blue</span>: <span class="ident">u8</span>,
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+</span><span class="kw">struct </span>Rgb {
+    red: u8,
+    green: u8,
+    blue: u8,
 }
 
 <span class="macro">serde_with::serde_conv!</span>(
-    <span class="ident">RgbAsArray</span>,
-    <span class="ident">Rgb</span>,
-    <span class="op">|</span><span class="ident">rgb</span>: <span class="kw-2">&amp;</span><span class="ident">Rgb</span><span class="op">|</span> [<span class="ident">rgb</span>.<span class="ident">red</span>, <span class="ident">rgb</span>.<span class="ident">green</span>, <span class="ident">rgb</span>.<span class="ident">blue</span>],
-    <span class="op">|</span><span class="ident">value</span>: [<span class="ident">u8</span>; <span class="number">3</span>]<span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">std::convert::Infallible</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Rgb</span> {
-            <span class="ident">red</span>: <span class="ident">value</span>[<span class="number">0</span>],
-            <span class="ident">green</span>: <span class="ident">value</span>[<span class="number">1</span>],
-            <span class="ident">blue</span>: <span class="ident">value</span>[<span class="number">2</span>],
+    RgbAsArray,
+    Rgb,
+    |rgb: <span class="kw-2">&amp;</span>Rgb| [rgb.red, rgb.green, rgb.blue],
+    |value: [u8; <span class="number">3</span>]| -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, std::convert::Infallible&gt; {
+        <span class="prelude-val">Ok</span>(Rgb {
+            red: value[<span class="number">0</span>],
+            green: value[<span class="number">1</span>],
+            blue: value[<span class="number">2</span>],
         })
     }
 );
 
-<span class="comment">//////////////////////////////////////////////////</span>
+<span class="comment">//////////////////////////////////////////////////
 
-<span class="comment">// We define some colors to be used later</span>
+// We define some colors to be used later
 
-<span class="kw">let</span> <span class="ident">green</span> <span class="op">=</span> <span class="ident">Rgb</span> {<span class="ident">red</span>: <span class="number">0</span>, <span class="ident">green</span>: <span class="number">255</span>, <span class="ident">blue</span>: <span class="number">0</span>};
-<span class="kw">let</span> <span class="ident">orange</span> <span class="op">=</span> <span class="ident">Rgb</span> {<span class="ident">red</span>: <span class="number">255</span>, <span class="ident">green</span>: <span class="number">128</span>, <span class="ident">blue</span>: <span class="number">0</span>};
-<span class="kw">let</span> <span class="ident">pink</span> <span class="op">=</span> <span class="ident">Rgb</span> {<span class="ident">red</span>: <span class="number">255</span>, <span class="ident">green</span>: <span class="number">0</span>, <span class="ident">blue</span>: <span class="number">255</span>};
+</span><span class="kw">let </span>green = Rgb {red: <span class="number">0</span>, green: <span class="number">255</span>, blue: <span class="number">0</span>};
+<span class="kw">let </span>orange = Rgb {red: <span class="number">255</span>, green: <span class="number">128</span>, blue: <span class="number">0</span>};
+<span class="kw">let </span>pink = Rgb {red: <span class="number">255</span>, green: <span class="number">0</span>, blue: <span class="number">255</span>};
 
-<span class="comment">//////////////////////////////////////////////////</span>
+<span class="comment">//////////////////////////////////////////////////
 
-<span class="comment">// We can now use the `RgbAsArray` adapter with `serde_as`.</span>
+// We can now use the `RgbAsArray` adapter with `serde_as`.
 
-<span class="attribute">#[<span class="ident">serde_with::serde_as</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Colors</span> {
-    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;RgbAsArray&quot;</span>)]</span>
-    <span class="ident">one_rgb</span>: <span class="ident">Rgb</span>,
-    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;RgbAsArray&gt;&quot;</span>)]</span>
-    <span class="ident">rgbs_in_vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Rgb</span><span class="op">&gt;</span>,
+</span><span class="attribute">#[serde_with::serde_as]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+</span><span class="kw">struct </span>Colors {
+    <span class="attribute">#[serde_as(<span class="kw">as </span>= <span class="string">&quot;RgbAsArray&quot;</span>)]
+    </span>one_rgb: Rgb,
+    <span class="attribute">#[serde_as(<span class="kw">as </span>= <span class="string">&quot;Vec&lt;RgbAsArray&gt;&quot;</span>)]
+    </span>rgbs_in_vec: Vec&lt;Rgb&gt;,
 }
 
-<span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Colors</span> {
-    <span class="ident">one_rgb</span>: <span class="ident">orange</span>,
-    <span class="ident">rgbs_in_vec</span>: <span class="macro">vec!</span>[<span class="ident">green</span>, <span class="ident">pink</span>],
+<span class="kw">let </span>data = Colors {
+    one_rgb: orange,
+    rgbs_in_vec: <span class="macro">vec!</span>[green, pink],
 };
-<span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="macro">serde_json::json!</span>({
+<span class="kw">let </span>json = <span class="macro">serde_json::json!</span>({
     <span class="string">&quot;one_rgb&quot;</span>: [<span class="number">255</span>, <span class="number">128</span>, <span class="number">0</span>],
     <span class="string">&quot;rgbs_in_vec&quot;</span>: [
         [<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>],
@@ -74,26 +74,26 @@ We want to serialize it as a <code>[u8; 3]</code>.</p>
     ]
 });
 
-<span class="macro">assert_eq!</span>(<span class="ident">json</span>, <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">unwrap</span>());
-<span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">serde_json::from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>());
+<span class="macro">assert_eq!</span>(json, serde_json::to_value(<span class="kw-2">&amp;</span>data).unwrap());
+<span class="macro">assert_eq!</span>(data, serde_json::from_value(json).unwrap());
 
-<span class="comment">//////////////////////////////////////////////////</span>
+<span class="comment">//////////////////////////////////////////////////
 
-<span class="comment">// The types generated by `serde_conv` is also compatible with serde&#39;s with attribute</span>
+// The types generated by `serde_conv` is also compatible with serde&#39;s with attribute
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">struct</span> <span class="ident">ColorsWith</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;RgbAsArray&quot;</span>)]</span>
-    <span class="ident">rgb_with</span>: <span class="ident">Rgb</span>,
+</span><span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+</span><span class="kw">struct </span>ColorsWith {
+    <span class="attribute">#[serde(with = <span class="string">&quot;RgbAsArray&quot;</span>)]
+    </span>rgb_with: Rgb,
 }
 
-<span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ColorsWith</span> {
-    <span class="ident">rgb_with</span>: <span class="ident">pink</span>,
+<span class="kw">let </span>data = ColorsWith {
+    rgb_with: pink,
 };
-<span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="macro">serde_json::json!</span>({
+<span class="kw">let </span>json = <span class="macro">serde_json::json!</span>({
     <span class="string">&quot;rgb_with&quot;</span>: [<span class="number">255</span>, <span class="number">0</span>, <span class="number">255</span>]
 });
 
-<span class="macro">assert_eq!</span>(<span class="ident">json</span>, <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">unwrap</span>());
-<span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">serde_json::from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>());</code></pre></div>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+<span class="macro">assert_eq!</span>(json, serde_json::to_value(<span class="kw-2">&amp;</span>data).unwrap());
+<span class="macro">assert_eq!</span>(data, serde_json::from_value(json).unwrap());</code></pre></div>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

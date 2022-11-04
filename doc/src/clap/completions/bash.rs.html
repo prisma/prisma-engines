@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/completions/bash.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bash.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/completions/bash.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bash.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -221,31 +221,31 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
-</pre><pre class="rust"><code><span class="comment">// Std</span>
-<span class="kw">use</span> <span class="ident">std::io::Write</span>;
+</pre><pre class="rust"><code><span class="comment">// Std
+</span><span class="kw">use </span>std::io::Write;
 
-<span class="comment">// Internal</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">app::parser::Parser</span>,
-    <span class="ident">args</span>::{<span class="ident">AnyArg</span>, <span class="ident">OptBuilder</span>},
-    <span class="ident">completions</span>,
+<span class="comment">// Internal
+</span><span class="kw">use crate</span>::{
+    app::parser::Parser,
+    args::{AnyArg, OptBuilder},
+    completions,
 };
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BashGen</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
+<span class="kw">pub struct </span>BashGen&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;
+<span class="kw">where
+    </span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
 {
-    <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
+    p: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Parser&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">BashGen</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">BashGen</span> { <span class="ident">p</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; BashGen&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub fn </span>new(p: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Parser&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;) -&gt; <span class="self">Self </span>{
+        BashGen { p }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_to</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) {
+    <span class="kw">pub fn </span>generate_to&lt;W: Write&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>W) {
         <span class="macro">w!</span>(
-            <span class="ident">buf</span>,
+            buf,
             <span class="macro">format!</span>(
                 <span class="string">r#&quot;_{name}() {{
     local i cur prev opts cmds
@@ -289,46 +289,46 @@
 
 complete -F _{name} -o bashdefault -o default {name}
 &quot;#</span>,
-                <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">bin_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>(),
-                <span class="ident">name_opts</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">all_options_for_path</span>(<span class="self">self</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">bin_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()),
-                <span class="ident">name_opts_details</span> <span class="op">=</span>
-                    <span class="self">self</span>.<span class="ident">option_details_for_path</span>(<span class="self">self</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">bin_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()),
-                <span class="ident">subcmds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">all_subcommands</span>(),
-                <span class="ident">subcmd_details</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">subcommand_details</span>()
+                name = <span class="self">self</span>.p.meta.bin_name.as_ref().unwrap(),
+                name_opts = <span class="self">self</span>.all_options_for_path(<span class="self">self</span>.p.meta.bin_name.as_ref().unwrap()),
+                name_opts_details =
+                    <span class="self">self</span>.option_details_for_path(<span class="self">self</span>.p.meta.bin_name.as_ref().unwrap()),
+                subcmds = <span class="self">self</span>.all_subcommands(),
+                subcmd_details = <span class="self">self</span>.subcommand_details()
             )
-            .<span class="ident">as_bytes</span>()
+            .as_bytes()
         );
     }
 
-    <span class="kw">fn</span> <span class="ident">all_subcommands</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn </span>all_subcommands(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::all_subcommands;&quot;</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subcmds</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="kw">let</span> <span class="ident">scs</span> <span class="op">=</span> <span class="ident">completions::all_subcommand_names</span>(<span class="self">self</span>.<span class="ident">p</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>subcmds = String::new();
+        <span class="kw">let </span>scs = completions::all_subcommand_names(<span class="self">self</span>.p);
 
-        <span class="kw">for</span> <span class="ident">sc</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">scs</span> {
-            <span class="ident">subcmds</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">for </span>sc <span class="kw">in </span><span class="kw-2">&amp;</span>scs {
+            subcmds = <span class="macro">format!</span>(
                 <span class="string">r#&quot;{}
             {name})
                 cmd+=&quot;__{fn_name}&quot;
                 ;;&quot;#</span>,
-                <span class="ident">subcmds</span>,
-                <span class="ident">name</span> <span class="op">=</span> <span class="ident">sc</span>,
-                <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">sc</span>.<span class="ident">replace</span>(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;__&quot;</span>)
+                subcmds,
+                name = sc,
+                fn_name = sc.replace(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;__&quot;</span>)
             );
         }
 
-        <span class="ident">subcmds</span>
+        subcmds
     }
 
-    <span class="kw">fn</span> <span class="ident">subcommand_details</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn </span>subcommand_details(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::subcommand_details;&quot;</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subcmd_dets</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scs</span> <span class="op">=</span> <span class="ident">completions::get_all_subcommand_paths</span>(<span class="self">self</span>.<span class="ident">p</span>, <span class="bool-val">true</span>);
-        <span class="ident">scs</span>.<span class="ident">sort</span>();
-        <span class="ident">scs</span>.<span class="ident">dedup</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>subcmd_dets = String::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>scs = completions::get_all_subcommand_paths(<span class="self">self</span>.p, <span class="bool-val">true</span>);
+        scs.sort();
+        scs.dedup();
 
-        <span class="kw">for</span> <span class="ident">sc</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">scs</span> {
-            <span class="ident">subcmd_dets</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">for </span>sc <span class="kw">in </span><span class="kw-2">&amp;</span>scs {
+            subcmd_dets = <span class="macro">format!</span>(
                 <span class="string">r#&quot;{}
         {subcmd})
             opts=&quot;{sc_opts}&quot;
@@ -345,104 +345,104 @@ complete -F _{name} -o bashdefault -o default {name}
             COMPREPLY=( $(compgen -W &quot;${{opts}}&quot; -- &quot;${{cur}}&quot;) )
             return 0
             ;;&quot;#</span>,
-                <span class="ident">subcmd_dets</span>,
-                <span class="ident">subcmd</span> <span class="op">=</span> <span class="ident">sc</span>.<span class="ident">replace</span>(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;__&quot;</span>),
-                <span class="ident">sc_opts</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">all_options_for_path</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sc</span>),
-                <span class="ident">level</span> <span class="op">=</span> <span class="ident">sc</span>.<span class="ident">split</span>(<span class="string">&quot;__&quot;</span>).<span class="ident">count</span>(),
-                <span class="ident">opts_details</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">option_details_for_path</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sc</span>)
+                subcmd_dets,
+                subcmd = sc.replace(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;__&quot;</span>),
+                sc_opts = <span class="self">self</span>.all_options_for_path(<span class="kw-2">&amp;*</span>sc),
+                level = sc.split(<span class="string">&quot;__&quot;</span>).count(),
+                opts_details = <span class="self">self</span>.option_details_for_path(<span class="kw-2">&amp;*</span>sc)
             );
         }
 
-        <span class="ident">subcmd_dets</span>
+        subcmd_dets
     }
 
-    <span class="kw">fn</span> <span class="ident">option_details_for_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::option_details_for_path: path={}&quot;</span>, <span class="ident">path</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>;
-        <span class="kw">for</span> <span class="ident">sc</span> <span class="kw">in</span> <span class="ident">path</span>.<span class="ident">split</span>(<span class="string">&quot;__&quot;</span>).<span class="ident">skip</span>(<span class="number">1</span>) {
-            <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::option_details_for_path:iter: sc={}&quot;</span>, <span class="ident">sc</span>);
-            <span class="ident">p</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">find_subcmd!</span>(<span class="ident">p</span>, <span class="ident">sc</span>).<span class="ident">unwrap</span>().<span class="ident">p</span>;
+    <span class="kw">fn </span>option_details_for_path(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::option_details_for_path: path={}&quot;</span>, path);
+        <span class="kw">let </span><span class="kw-2">mut </span>p = <span class="self">self</span>.p;
+        <span class="kw">for </span>sc <span class="kw">in </span>path.split(<span class="string">&quot;__&quot;</span>).skip(<span class="number">1</span>) {
+            <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::option_details_for_path:iter: sc={}&quot;</span>, sc);
+            p = <span class="kw-2">&amp;</span><span class="macro">find_subcmd!</span>(p, sc).unwrap().p;
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="kw">for</span> <span class="ident">o</span> <span class="kw">in</span> <span class="ident">p</span>.<span class="ident">opts</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">l</span>) <span class="op">=</span> <span class="ident">o</span>.<span class="ident">s</span>.<span class="ident">long</span> {
-                <span class="ident">opts</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span><span class="kw-2">mut </span>opts = String::new();
+        <span class="kw">for </span>o <span class="kw">in </span>p.opts() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(l) = o.s.long {
+                opts = <span class="macro">format!</span>(
                     <span class="string">&quot;{}
                 --{})
                     COMPREPLY=({})
                     return 0
                     ;;&quot;</span>,
-                    <span class="ident">opts</span>,
-                    <span class="ident">l</span>,
-                    <span class="self">self</span>.<span class="ident">vals_for</span>(<span class="ident">o</span>)
+                    opts,
+                    l,
+                    <span class="self">self</span>.vals_for(o)
                 );
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">o</span>.<span class="ident">s</span>.<span class="ident">short</span> {
-                <span class="ident">opts</span> <span class="op">=</span> <span class="macro">format!</span>(
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = o.s.short {
+                opts = <span class="macro">format!</span>(
                     <span class="string">&quot;{}
                     -{})
                     COMPREPLY=({})
                     return 0
                     ;;&quot;</span>,
-                    <span class="ident">opts</span>,
-                    <span class="ident">s</span>,
-                    <span class="self">self</span>.<span class="ident">vals_for</span>(<span class="ident">o</span>)
+                    opts,
+                    s,
+                    <span class="self">self</span>.vals_for(o)
                 );
             }
         }
-        <span class="ident">opts</span>
+        opts
     }
 
-    <span class="kw">fn</span> <span class="ident">vals_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">o</span>: <span class="kw-2">&amp;</span><span class="ident">OptBuilder</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::vals_for: o={}&quot;</span>, <span class="ident">o</span>.<span class="ident">b</span>.<span class="ident">name</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">vals</span>) <span class="op">=</span> <span class="ident">o</span>.<span class="ident">possible_vals</span>() {
-            <span class="macro">format!</span>(<span class="string">r#&quot;$(compgen -W &quot;{}&quot; -- &quot;${{cur}}&quot;)&quot;#</span>, <span class="ident">vals</span>.<span class="ident">join</span>(<span class="string">&quot; &quot;</span>))
-        } <span class="kw">else</span> {
-            <span class="ident">String::from</span>(<span class="string">r#&quot;$(compgen -f &quot;${cur}&quot;)&quot;#</span>)
+    <span class="kw">fn </span>vals_for(<span class="kw-2">&amp;</span><span class="self">self</span>, o: <span class="kw-2">&amp;</span>OptBuilder) -&gt; String {
+        <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::vals_for: o={}&quot;</span>, o.b.name);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(vals) = o.possible_vals() {
+            <span class="macro">format!</span>(<span class="string">r#&quot;$(compgen -W &quot;{}&quot; -- &quot;${{cur}}&quot;)&quot;#</span>, vals.join(<span class="string">&quot; &quot;</span>))
+        } <span class="kw">else </span>{
+            String::from(<span class="string">r#&quot;$(compgen -f &quot;${cur}&quot;)&quot;#</span>)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">all_options_for_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::all_options_for_path: path={}&quot;</span>, <span class="ident">path</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>;
-        <span class="kw">for</span> <span class="ident">sc</span> <span class="kw">in</span> <span class="ident">path</span>.<span class="ident">split</span>(<span class="string">&quot;__&quot;</span>).<span class="ident">skip</span>(<span class="number">1</span>) {
-            <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::all_options_for_path:iter: sc={}&quot;</span>, <span class="ident">sc</span>);
-            <span class="ident">p</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">find_subcmd!</span>(<span class="ident">p</span>, <span class="ident">sc</span>).<span class="ident">unwrap</span>().<span class="ident">p</span>;
+    <span class="kw">fn </span>all_options_for_path(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::all_options_for_path: path={}&quot;</span>, path);
+        <span class="kw">let </span><span class="kw-2">mut </span>p = <span class="self">self</span>.p;
+        <span class="kw">for </span>sc <span class="kw">in </span>path.split(<span class="string">&quot;__&quot;</span>).skip(<span class="number">1</span>) {
+            <span class="macro">debugln!</span>(<span class="string">&quot;BashGen::all_options_for_path:iter: sc={}&quot;</span>, sc);
+            p = <span class="kw-2">&amp;</span><span class="macro">find_subcmd!</span>(p, sc).unwrap().p;
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opts</span> <span class="op">=</span> <span class="macro">shorts!</span>(<span class="ident">p</span>).<span class="ident">fold</span>(<span class="ident">String::new</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">s</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{} -{}&quot;</span>, <span class="ident">acc</span>, <span class="ident">s</span>));
-        <span class="ident">opts</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span><span class="kw-2">mut </span>opts = <span class="macro">shorts!</span>(p).fold(String::new(), |acc, s| <span class="macro">format!</span>(<span class="string">&quot;{} -{}&quot;</span>, acc, s));
+        opts = <span class="macro">format!</span>(
             <span class="string">&quot;{} {}&quot;</span>,
-            <span class="ident">opts</span>,
-            <span class="macro">longs!</span>(<span class="ident">p</span>).<span class="ident">fold</span>(<span class="ident">String::new</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">l</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{} --{}&quot;</span>, <span class="ident">acc</span>, <span class="ident">l</span>))
+            opts,
+            <span class="macro">longs!</span>(p).fold(String::new(), |acc, l| <span class="macro">format!</span>(<span class="string">&quot;{} --{}&quot;</span>, acc, l))
         );
-        <span class="ident">opts</span> <span class="op">=</span> <span class="macro">format!</span>(
+        opts = <span class="macro">format!</span>(
             <span class="string">&quot;{} {}&quot;</span>,
-            <span class="ident">opts</span>,
-            <span class="ident">p</span>.<span class="ident">positionals</span>
-                .<span class="ident">values</span>()
-                .<span class="ident">fold</span>(<span class="ident">String::new</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">p</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="ident">acc</span>, <span class="ident">p</span>))
+            opts,
+            p.positionals
+                .values()
+                .fold(String::new(), |acc, p| <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, acc, p))
         );
-        <span class="ident">opts</span> <span class="op">=</span> <span class="macro">format!</span>(
+        opts = <span class="macro">format!</span>(
             <span class="string">&quot;{} {}&quot;</span>,
-            <span class="ident">opts</span>,
-            <span class="ident">p</span>.<span class="ident">subcommands</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">fold</span>(<span class="ident">String::new</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">s</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="ident">acc</span>, <span class="ident">s</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">name</span>))
+            opts,
+            p.subcommands
+                .iter()
+                .fold(String::new(), |acc, s| <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, acc, s.p.meta.name))
         );
-        <span class="kw">for</span> <span class="ident">sc</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">subcommands</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">aliases</span>) <span class="op">=</span> <span class="ident">sc</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">aliases</span> {
-                <span class="ident">opts</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">for </span>sc <span class="kw">in </span><span class="kw-2">&amp;</span>p.subcommands {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>aliases) = sc.p.meta.aliases {
+                opts = <span class="macro">format!</span>(
                     <span class="string">&quot;{} {}&quot;</span>,
-                    <span class="ident">opts</span>,
-                    <span class="ident">aliases</span>
-                        .<span class="ident">iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">n</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">n</span>)
-                        .<span class="ident">fold</span>(<span class="ident">String::new</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">a</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="ident">acc</span>, <span class="ident">a</span>))
+                    opts,
+                    aliases
+                        .iter()
+                        .map(|<span class="kw-2">&amp;</span>(n, <span class="kw">_</span>)| n)
+                        .fold(String::new(), |acc, a| <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, acc, a))
                 );
             }
         }
-        <span class="ident">opts</span>
+        opts
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

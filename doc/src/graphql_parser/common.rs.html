@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/graphql-parser-0ee44412461ea4ee/6a3f58b/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../graphql_parser/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/graphql-parser-0ee44412461ea4ee/6a3f58b/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../graphql_parser/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -382,389 +382,389 @@
 <span id="382">382</span>
 <span id="383">383</span>
 <span id="384">384</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">hash::Hash</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::{fmt, hash::Hash};
 
-<span class="kw">use</span> <span class="ident">combine::combinator</span>::{<span class="ident">choice</span>, <span class="ident">many</span>, <span class="ident">many1</span>, <span class="ident">optional</span>, <span class="ident">position</span>};
-<span class="kw">use</span> <span class="ident">combine::easy::Error</span>;
-<span class="kw">use</span> <span class="ident">combine::error::StreamError</span>;
-<span class="kw">use</span> <span class="ident">combine</span>::{<span class="ident">parser</span>, <span class="ident">ParseResult</span>, <span class="ident">Parser</span>};
+<span class="kw">use </span>combine::combinator::{choice, many, many1, optional, position};
+<span class="kw">use </span>combine::easy::Error;
+<span class="kw">use </span>combine::error::StreamError;
+<span class="kw">use </span>combine::{parser, ParseResult, Parser};
 
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
+<span class="kw">use </span>indexmap::IndexMap;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::helpers</span>::{<span class="ident">ident</span>, <span class="ident">kind</span>, <span class="ident">name</span>, <span class="ident">punct</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::position::Pos</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tokenizer</span>::{<span class="ident">Kind</span> <span class="kw">as</span> <span class="ident">T</span>, <span class="ident">Token</span>, <span class="ident">TokenStream</span>};
+<span class="kw">use </span><span class="kw">crate</span>::helpers::{ident, kind, name, punct};
+<span class="kw">use </span><span class="kw">crate</span>::position::Pos;
+<span class="kw">use </span><span class="kw">crate</span>::tokenizer::{Kind <span class="kw">as </span>T, Token, TokenStream};
 
-<span class="doccomment">/// Text abstracts over types that hold a string value.</span>
-<span class="doccomment">/// It is used to make the AST generic over the string type.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>: <span class="lifetime">&#39;a</span> {
-    <span class="kw">type</span> <span class="ident">Value</span>: <span class="lifetime">&#39;a</span>
-        <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">std::borrow::Borrow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">PartialEq</span>
-        <span class="op">+</span> <span class="ident">Eq</span>
-        <span class="op">+</span> <span class="ident">PartialOrd</span>
-        <span class="op">+</span> <span class="ident">Ord</span>
-        <span class="op">+</span> <span class="ident">fmt::Debug</span>
-        <span class="op">+</span> <span class="ident">Clone</span>
-        <span class="op">+</span> <span class="ident">Hash</span>;
+<span class="doccomment">/// Text abstracts over types that hold a string value.
+/// It is used to make the AST generic over the string type.
+</span><span class="kw">pub trait </span>Text&lt;<span class="lifetime">&#39;a</span>&gt;: <span class="lifetime">&#39;a </span>{
+    <span class="kw">type </span>Value: <span class="lifetime">&#39;a
+        </span>+ From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;
+        + AsRef&lt;str&gt;
+        + std::borrow::Borrow&lt;str&gt;
+        + PartialEq
+        + Eq
+        + PartialOrd
+        + Ord
+        + fmt::Debug
+        + Clone
+        + Hash;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="kw">type </span>Value = <span class="self">Self</span>;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">String</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>String {
+    <span class="kw">type </span>Value = String;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">std::borrow::Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>std::borrow::Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+    <span class="kw">type </span>Value = <span class="self">Self</span>;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">arguments</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">T::Value</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>Directive&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>arguments: Vec&lt;(T::Value, Value&lt;<span class="lifetime">&#39;a</span>, T&gt;)&gt;,
 }
 
-<span class="doccomment">/// This represents integer number</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// But since there is no definition on limit of number in spec</span>
-<span class="doccomment">/// (only in implemetation), we do a trick similar to the one</span>
-<span class="doccomment">/// in `serde_json`: encapsulate value in new-type, allowing type</span>
-<span class="doccomment">/// to be extended later.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="comment">// we use i64 as a reference implementation: graphql-js thinks even 32bit</span>
-<span class="comment">// integers is enough. We might consider lift this limit later though</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Number</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">i64</span>);
+<span class="doccomment">/// This represents integer number
+///
+/// But since there is no definition on limit of number in spec
+/// (only in implemetation), we do a trick similar to the one
+/// in `serde_json`: encapsulate value in new-type, allowing type
+/// to be extended later.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="comment">// we use i64 as a reference implementation: graphql-js thinks even 32bit
+// integers is enough. We might consider lift this limit later though
+</span><span class="kw">pub struct </span>Number(<span class="kw">pub</span>(<span class="kw">crate</span>) i64);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">Variable</span>(<span class="ident">T::Value</span>),
-    <span class="ident">Int</span>(<span class="ident">Number</span>),
-    <span class="ident">Float</span>(<span class="ident">f64</span>),
-    <span class="ident">String</span>(<span class="ident">String</span>),
-    <span class="ident">Boolean</span>(<span class="ident">bool</span>),
-    <span class="ident">Null</span>,
-    <span class="ident">Enum</span>(<span class="ident">T::Value</span>),
-    <span class="ident">List</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">Object</span>(<span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">T::Value</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>Value&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    Variable(T::Value),
+    Int(Number),
+    Float(f64),
+    String(String),
+    Boolean(bool),
+    Null,
+    Enum(T::Value),
+    List(Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;),
+    Object(IndexMap&lt;T::Value, Value&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">NamedType</span>(<span class="ident">T::Value</span>),
-    <span class="ident">ListType</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">NonNullType</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>Type&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    NamedType(T::Value),
+    ListType(Box&lt;Type&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;),
+    NonNullType(Box&lt;Type&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">Number</span> {
-    <span class="doccomment">/// Returns a number as i64 if it fits the type</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+<span class="kw">impl </span>Number {
+    <span class="doccomment">/// Returns a number as i64 if it fits the type
+    </span><span class="kw">pub fn </span>as_i64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Number</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">i</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Number</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>)
+<span class="kw">impl </span>From&lt;i32&gt; <span class="kw">for </span>Number {
+    <span class="kw">fn </span>from(i: i32) -&gt; <span class="self">Self </span>{
+        Number(i <span class="kw">as </span>i64)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">directives</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>directives&lt;<span class="lifetime">&#39;a</span>, T&gt;(
+    input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; ParseResult&lt;Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+<span class="kw">where
+    </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">many</span>(
-        <span class="ident">position</span>()
-            .<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;@&quot;</span>))
-            .<span class="ident">and</span>(<span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>())
-            .<span class="ident">and</span>(<span class="ident">parser</span>(<span class="ident">arguments</span>))
-            .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">position</span>, <span class="ident">name</span>), <span class="ident">arguments</span>)<span class="op">|</span> <span class="ident">Directive</span> {
-                <span class="ident">position</span>,
-                <span class="ident">name</span>,
-                <span class="ident">arguments</span>,
+    many(
+        position()
+            .skip(punct(<span class="string">&quot;@&quot;</span>))
+            .and(name::&lt;<span class="lifetime">&#39;a</span>, T&gt;())
+            .and(parser(arguments))
+            .map(|((position, name), arguments)| Directive {
+                position,
+                name,
+                arguments,
             }),
     )
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">T::Value</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>arguments&lt;<span class="lifetime">&#39;a</span>, T&gt;(
+    input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; ParseResult&lt;Vec&lt;(T::Value, Value&lt;<span class="lifetime">&#39;a</span>, T&gt;)&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+<span class="kw">where
+    </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">optional</span>(
-        <span class="ident">punct</span>(<span class="string">&quot;(&quot;</span>)
-            .<span class="ident">with</span>(<span class="ident">many1</span>(<span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;:&quot;</span>)).<span class="ident">and</span>(<span class="ident">parser</span>(<span class="ident">value</span>))))
-            .<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;)&quot;</span>)),
+    optional(
+        punct(<span class="string">&quot;(&quot;</span>)
+            .with(many1(name::&lt;<span class="lifetime">&#39;a</span>, T&gt;().skip(punct(<span class="string">&quot;:&quot;</span>)).and(parser(value))))
+            .skip(punct(<span class="string">&quot;)&quot;</span>)),
     )
-    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">opt</span><span class="op">|</span> <span class="ident">opt</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">Vec::new</span>))
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    .map(|opt| opt.unwrap_or_else(Vec::new))
+    .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">int_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>int_value&lt;<span class="lifetime">&#39;a</span>, S&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ParseResult&lt;Value&lt;<span class="lifetime">&#39;a</span>, S&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+<span class="kw">where
+    </span>S: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">kind</span>(<span class="ident">T::IntValue</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">tok</span><span class="op">|</span> <span class="ident">tok</span>.<span class="ident">value</span>.<span class="ident">parse</span>())
-        .<span class="ident">map</span>(<span class="ident">Number</span>)
-        .<span class="ident">map</span>(<span class="ident">Value::Int</span>)
-        .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    kind(T::IntValue)
+        .and_then(|tok| tok.value.parse())
+        .map(Number)
+        .map(Value::Int)
+        .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">float_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>float_value&lt;<span class="lifetime">&#39;a</span>, S&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ParseResult&lt;Value&lt;<span class="lifetime">&#39;a</span>, S&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+<span class="kw">where
+    </span>S: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">kind</span>(<span class="ident">T::FloatValue</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">tok</span><span class="op">|</span> <span class="ident">tok</span>.<span class="ident">value</span>.<span class="ident">parse</span>())
-        .<span class="ident">map</span>(<span class="ident">Value::Float</span>)
-        .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    kind(T::FloatValue)
+        .and_then(|tok| tok.value.parse())
+        .map(Value::Float)
+        .parse_stream(input)
 }
 
-<span class="kw">fn</span> <span class="ident">unquote_block_string</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="macro">debug_assert!</span>(<span class="ident">src</span>.<span class="ident">starts_with</span>(<span class="string">&quot;\&quot;\&quot;\&quot;&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">src</span>.<span class="ident">ends_with</span>(<span class="string">&quot;\&quot;\&quot;\&quot;&quot;</span>));
-    <span class="kw">let</span> <span class="ident">indent</span> <span class="op">=</span> <span class="ident">src</span>[<span class="number">3</span>..<span class="ident">src</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">3</span>]
-        .<span class="ident">lines</span>()
-        .<span class="ident">skip</span>(<span class="number">1</span>)
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">line</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">trim_start</span>().<span class="ident">len</span>();
-            <span class="kw">if</span> <span class="ident">trimmed</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">line</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">trimmed</span>)
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span> <span class="comment">// skip whitespace-only lines</span>
-            }
+<span class="kw">fn </span>unquote_block_string&lt;<span class="lifetime">&#39;a</span>&gt;(src: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, Error&lt;Token&lt;<span class="lifetime">&#39;a</span>&gt;, Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
+    <span class="macro">debug_assert!</span>(src.starts_with(<span class="string">&quot;\&quot;\&quot;\&quot;&quot;</span>) &amp;&amp; src.ends_with(<span class="string">&quot;\&quot;\&quot;\&quot;&quot;</span>));
+    <span class="kw">let </span>indent = src[<span class="number">3</span>..src.len() - <span class="number">3</span>]
+        .lines()
+        .skip(<span class="number">1</span>)
+        .filter_map(|line| {
+            <span class="kw">let </span>trimmed = line.trim_start().len();
+            <span class="kw">if </span>trimmed &gt; <span class="number">0 </span>{
+                <span class="prelude-val">Some</span>(line.len() - trimmed)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None </span><span class="comment">// skip whitespace-only lines
+            </span>}
         })
-        .<span class="ident">min</span>()
-        .<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">src</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">6</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lines</span> <span class="op">=</span> <span class="ident">src</span>[<span class="number">3</span>..<span class="ident">src</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">3</span>].<span class="ident">lines</span>();
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">first</span>) <span class="op">=</span> <span class="ident">lines</span>.<span class="ident">next</span>() {
-        <span class="kw">let</span> <span class="ident">stripped</span> <span class="op">=</span> <span class="ident">first</span>.<span class="ident">trim</span>();
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">stripped</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="ident">stripped</span>);
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+        .min()
+        .unwrap_or(<span class="number">0</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>result = String::with_capacity(src.len() - <span class="number">6</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>lines = src[<span class="number">3</span>..src.len() - <span class="number">3</span>].lines();
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(first) = lines.next() {
+        <span class="kw">let </span>stripped = first.trim();
+        <span class="kw">if </span>!stripped.is_empty() {
+            result.push_str(stripped);
+            result.push(<span class="string">&#39;\n&#39;</span>);
         }
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_line</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">for</span> <span class="ident">line</span> <span class="kw">in</span> <span class="ident">lines</span> {
-        <span class="ident">last_line</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">len</span>();
-        <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">indent</span> {
-            <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">line</span>[<span class="ident">indent</span>..].<span class="ident">replace</span>(<span class="string">r#&quot;\&quot;&quot;&quot;&quot;#</span>, <span class="string">r#&quot;&quot;&quot;&quot;&quot;#</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>last_line = <span class="number">0</span>;
+    <span class="kw">for </span>line <span class="kw">in </span>lines {
+        last_line = result.len();
+        <span class="kw">if </span>line.len() &gt; indent {
+            result.push_str(<span class="kw-2">&amp;</span>line[indent..].replace(<span class="string">r#&quot;\&quot;&quot;&quot;&quot;#</span>, <span class="string">r#&quot;&quot;&quot;&quot;&quot;#</span>));
         }
-        <span class="ident">result</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+        result.push(<span class="string">&#39;\n&#39;</span>);
     }
-    <span class="kw">if</span> <span class="ident">result</span>[<span class="ident">last_line</span>..].<span class="ident">trim</span>().<span class="ident">is_empty</span>() {
-        <span class="ident">result</span>.<span class="ident">truncate</span>(<span class="ident">last_line</span>);
+    <span class="kw">if </span>result[last_line..].trim().is_empty() {
+        result.truncate(last_line);
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+    <span class="prelude-val">Ok</span>(result)
 }
 
-<span class="kw">fn</span> <span class="ident">unquote_string</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Token</span>, <span class="ident">Token</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">s</span>.<span class="ident">len</span>());
-    <span class="macro">debug_assert!</span>(<span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;&quot;&#39;</span>) <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">ends_with</span>(<span class="string">&#39;&quot;&#39;</span>));
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">s</span>[<span class="number">1</span>..<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>].<span class="ident">chars</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">temp_code_point</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">4</span>);
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-        <span class="kw">match</span> <span class="ident">c</span> {
-            <span class="string">&#39;\\&#39;</span> =&gt; {
-                <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;slash cant be at the end&quot;</span>) {
-                    <span class="ident">c</span> @ <span class="string">&#39;&quot;&#39;</span> <span class="op">|</span> <span class="ident">c</span> @ <span class="string">&#39;\\&#39;</span> <span class="op">|</span> <span class="ident">c</span> @ <span class="string">&#39;/&#39;</span> =&gt; <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">c</span>),
-                    <span class="string">&#39;b&#39;</span> =&gt; <span class="ident">res</span>.<span class="ident">push</span>(<span class="string">&#39;\u{0010}&#39;</span>),
-                    <span class="string">&#39;f&#39;</span> =&gt; <span class="ident">res</span>.<span class="ident">push</span>(<span class="string">&#39;\u{000C}&#39;</span>),
-                    <span class="string">&#39;n&#39;</span> =&gt; <span class="ident">res</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>),
-                    <span class="string">&#39;r&#39;</span> =&gt; <span class="ident">res</span>.<span class="ident">push</span>(<span class="string">&#39;\r&#39;</span>),
-                    <span class="string">&#39;t&#39;</span> =&gt; <span class="ident">res</span>.<span class="ident">push</span>(<span class="string">&#39;\t&#39;</span>),
-                    <span class="string">&#39;u&#39;</span> =&gt; {
-                        <span class="ident">temp_code_point</span>.<span class="ident">clear</span>();
-                        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">4</span> {
-                            <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-                                <span class="prelude-val">Some</span>(<span class="ident">inner_c</span>) =&gt; <span class="ident">temp_code_point</span>.<span class="ident">push</span>(<span class="ident">inner_c</span>),
-                                <span class="prelude-val">None</span> =&gt; {
-                                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>(<span class="macro">format_args!</span>(
+<span class="kw">fn </span>unquote_string&lt;<span class="lifetime">&#39;a</span>&gt;(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, Error&lt;Token, Token&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>res = String::with_capacity(s.len());
+    <span class="macro">debug_assert!</span>(s.starts_with(<span class="string">&#39;&quot;&#39;</span>) &amp;&amp; s.ends_with(<span class="string">&#39;&quot;&#39;</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>chars = s[<span class="number">1</span>..s.len() - <span class="number">1</span>].chars();
+    <span class="kw">let </span><span class="kw-2">mut </span>temp_code_point = String::with_capacity(<span class="number">4</span>);
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(c) = chars.next() {
+        <span class="kw">match </span>c {
+            <span class="string">&#39;\\&#39; </span>=&gt; {
+                <span class="kw">match </span>chars.next().expect(<span class="string">&quot;slash cant be at the end&quot;</span>) {
+                    c @ <span class="string">&#39;&quot;&#39; </span>| c @ <span class="string">&#39;\\&#39; </span>| c @ <span class="string">&#39;/&#39; </span>=&gt; res.push(c),
+                    <span class="string">&#39;b&#39; </span>=&gt; res.push(<span class="string">&#39;\u{0010}&#39;</span>),
+                    <span class="string">&#39;f&#39; </span>=&gt; res.push(<span class="string">&#39;\u{000C}&#39;</span>),
+                    <span class="string">&#39;n&#39; </span>=&gt; res.push(<span class="string">&#39;\n&#39;</span>),
+                    <span class="string">&#39;r&#39; </span>=&gt; res.push(<span class="string">&#39;\r&#39;</span>),
+                    <span class="string">&#39;t&#39; </span>=&gt; res.push(<span class="string">&#39;\t&#39;</span>),
+                    <span class="string">&#39;u&#39; </span>=&gt; {
+                        temp_code_point.clear();
+                        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">4 </span>{
+                            <span class="kw">match </span>chars.next() {
+                                <span class="prelude-val">Some</span>(inner_c) =&gt; temp_code_point.push(inner_c),
+                                <span class="prelude-val">None </span>=&gt; {
+                                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unexpected_message(<span class="macro">format_args!</span>(
                                         <span class="string">&quot;\\u must have 4 characters after it, only found &#39;{}&#39;&quot;</span>,
-                                        <span class="ident">temp_code_point</span>
+                                        temp_code_point
                                     )))
                                 }
                             }
                         }
 
-                        <span class="comment">// convert our hex string into a u32, then convert that into a char</span>
-                        <span class="kw">match</span> <span class="ident">u32::from_str_radix</span>(<span class="kw-2">&amp;</span><span class="ident">temp_code_point</span>, <span class="number">16</span>).<span class="ident">map</span>(<span class="ident">std::char::from_u32</span>) {
-                            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">unicode_char</span>)) =&gt; <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">unicode_char</span>),
-                            <span class="kw">_</span> =&gt; {
-                                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>(<span class="macro">format_args!</span>(
+                        <span class="comment">// convert our hex string into a u32, then convert that into a char
+                        </span><span class="kw">match </span>u32::from_str_radix(<span class="kw-2">&amp;</span>temp_code_point, <span class="number">16</span>).map(std::char::from_u32) {
+                            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(unicode_char)) =&gt; res.push(unicode_char),
+                            <span class="kw">_ </span>=&gt; {
+                                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unexpected_message(<span class="macro">format_args!</span>(
                                     <span class="string">&quot;{} is not a valid unicode code point&quot;</span>,
-                                    <span class="ident">temp_code_point</span>
+                                    temp_code_point
                                 )))
                             }
                         }
                     }
-                    <span class="ident">c</span> =&gt; {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>(<span class="macro">format_args!</span>(
+                    c =&gt; {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unexpected_message(<span class="macro">format_args!</span>(
                             <span class="string">&quot;bad escaped char {:?}&quot;</span>,
-                            <span class="ident">c</span>
+                            c
                         )));
                     }
                 }
             }
-            <span class="ident">c</span> =&gt; <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">c</span>),
+            c =&gt; res.push(c),
         }
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+    <span class="prelude-val">Ok</span>(res)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">choice</span>((
-        <span class="ident">kind</span>(<span class="ident">T::StringValue</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">tok</span><span class="op">|</span> <span class="ident">unquote_string</span>(<span class="ident">tok</span>.<span class="ident">value</span>)),
-        <span class="ident">kind</span>(<span class="ident">T::BlockString</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">tok</span><span class="op">|</span> <span class="ident">unquote_block_string</span>(<span class="ident">tok</span>.<span class="ident">value</span>)),
+<span class="kw">pub fn </span>string&lt;<span class="lifetime">&#39;a</span>&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ParseResult&lt;String, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    choice((
+        kind(T::StringValue).and_then(|tok| unquote_string(tok.value)),
+        kind(T::BlockString).and_then(|tok| unquote_block_string(tok.value)),
     ))
-    .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>string_value&lt;<span class="lifetime">&#39;a</span>, S&gt;(
+    input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; ParseResult&lt;Value&lt;<span class="lifetime">&#39;a</span>, S&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+<span class="kw">where
+    </span>S: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">kind</span>(<span class="ident">T::StringValue</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">tok</span><span class="op">|</span> <span class="ident">unquote_string</span>(<span class="ident">tok</span>.<span class="ident">value</span>))
-        .<span class="ident">map</span>(<span class="ident">Value::String</span>)
-        .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    kind(T::StringValue)
+        .and_then(|tok| unquote_string(tok.value))
+        .map(Value::String)
+        .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">block_string_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>block_string_value&lt;<span class="lifetime">&#39;a</span>, S&gt;(
+    input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; ParseResult&lt;Value&lt;<span class="lifetime">&#39;a</span>, S&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+<span class="kw">where
+    </span>S: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">kind</span>(<span class="ident">T::BlockString</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">tok</span><span class="op">|</span> <span class="ident">unquote_block_string</span>(<span class="ident">tok</span>.<span class="ident">value</span>))
-        .<span class="ident">map</span>(<span class="ident">Value::String</span>)
-        .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    kind(T::BlockString)
+        .and_then(|tok| unquote_block_string(tok.value))
+        .map(Value::String)
+        .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">plain_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>plain_value&lt;<span class="lifetime">&#39;a</span>, T&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ParseResult&lt;Value&lt;<span class="lifetime">&#39;a</span>, T&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+<span class="kw">where
+    </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">ident</span>(<span class="string">&quot;true&quot;</span>)
-        .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Value::Boolean</span>(<span class="bool-val">true</span>))
-        .<span class="ident">or</span>(<span class="ident">ident</span>(<span class="string">&quot;false&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Value::Boolean</span>(<span class="bool-val">false</span>)))
-        .<span class="ident">or</span>(<span class="ident">ident</span>(<span class="string">&quot;null&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Value::Null</span>))
-        .<span class="ident">or</span>(<span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">Value::Enum</span>))
-        .<span class="ident">or</span>(<span class="ident">parser</span>(<span class="ident">int_value</span>))
-        .<span class="ident">or</span>(<span class="ident">parser</span>(<span class="ident">float_value</span>))
-        .<span class="ident">or</span>(<span class="ident">parser</span>(<span class="ident">string_value</span>))
-        .<span class="ident">or</span>(<span class="ident">parser</span>(<span class="ident">block_string_value</span>))
-        .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    ident(<span class="string">&quot;true&quot;</span>)
+        .map(|<span class="kw">_</span>| Value::Boolean(<span class="bool-val">true</span>))
+        .or(ident(<span class="string">&quot;false&quot;</span>).map(|<span class="kw">_</span>| Value::Boolean(<span class="bool-val">false</span>)))
+        .or(ident(<span class="string">&quot;null&quot;</span>).map(|<span class="kw">_</span>| Value::Null))
+        .or(name::&lt;<span class="lifetime">&#39;a</span>, T&gt;().map(Value::Enum))
+        .or(parser(int_value))
+        .or(parser(float_value))
+        .or(parser(string_value))
+        .or(parser(block_string_value))
+        .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>value&lt;<span class="lifetime">&#39;a</span>, T&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ParseResult&lt;Value&lt;<span class="lifetime">&#39;a</span>, T&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+<span class="kw">where
+    </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">parser</span>(<span class="ident">plain_value</span>)
-        .<span class="ident">or</span>(<span class="ident">punct</span>(<span class="string">&quot;$&quot;</span>).<span class="ident">with</span>(<span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>()).<span class="ident">map</span>(<span class="ident">Value::Variable</span>))
-        .<span class="ident">or</span>(<span class="ident">punct</span>(<span class="string">&quot;[&quot;</span>)
-            .<span class="ident">with</span>(<span class="ident">many</span>(<span class="ident">parser</span>(<span class="ident">value</span>)))
-            .<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;]&quot;</span>))
-            .<span class="ident">map</span>(<span class="ident">Value::List</span>))
-        .<span class="ident">or</span>(<span class="ident">punct</span>(<span class="string">&quot;{&quot;</span>)
-            .<span class="ident">with</span>(<span class="ident">many</span>(<span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;:&quot;</span>)).<span class="ident">and</span>(<span class="ident">parser</span>(<span class="ident">value</span>))))
-            .<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;}&quot;</span>))
-            .<span class="ident">map</span>(<span class="ident">Value::Object</span>))
-        .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+    parser(plain_value)
+        .or(punct(<span class="string">&quot;$&quot;</span>).with(name::&lt;<span class="lifetime">&#39;a</span>, T&gt;()).map(Value::Variable))
+        .or(punct(<span class="string">&quot;[&quot;</span>)
+            .with(many(parser(value)))
+            .skip(punct(<span class="string">&quot;]&quot;</span>))
+            .map(Value::List))
+        .or(punct(<span class="string">&quot;{&quot;</span>)
+            .with(many(name::&lt;<span class="lifetime">&#39;a</span>, T&gt;().skip(punct(<span class="string">&quot;:&quot;</span>)).and(parser(value))))
+            .skip(punct(<span class="string">&quot;}&quot;</span>))
+            .map(Value::Object))
+        .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>default_value&lt;<span class="lifetime">&#39;a</span>, T&gt;(
+    input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; ParseResult&lt;Value&lt;<span class="lifetime">&#39;a</span>, T&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+<span class="kw">where
+    </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">parser</span>(<span class="ident">plain_value</span>)
-        .<span class="ident">or</span>(<span class="ident">punct</span>(<span class="string">&quot;[&quot;</span>)
-            .<span class="ident">with</span>(<span class="ident">many</span>(<span class="ident">parser</span>(<span class="ident">default_value</span>)))
-            .<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;]&quot;</span>))
-            .<span class="ident">map</span>(<span class="ident">Value::List</span>))
-        .<span class="ident">or</span>(<span class="ident">punct</span>(<span class="string">&quot;{&quot;</span>)
-            .<span class="ident">with</span>(<span class="ident">many</span>(
-                <span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;:&quot;</span>)).<span class="ident">and</span>(<span class="ident">parser</span>(<span class="ident">default_value</span>)),
+    parser(plain_value)
+        .or(punct(<span class="string">&quot;[&quot;</span>)
+            .with(many(parser(default_value)))
+            .skip(punct(<span class="string">&quot;]&quot;</span>))
+            .map(Value::List))
+        .or(punct(<span class="string">&quot;{&quot;</span>)
+            .with(many(
+                name::&lt;<span class="lifetime">&#39;a</span>, T&gt;().skip(punct(<span class="string">&quot;:&quot;</span>)).and(parser(default_value)),
             ))
-            .<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;}&quot;</span>))
-            .<span class="ident">map</span>(<span class="ident">Value::Object</span>))
-        .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+            .skip(punct(<span class="string">&quot;}&quot;</span>))
+            .map(Value::Object))
+        .parse_stream(input)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub fn </span>parse_type&lt;<span class="lifetime">&#39;a</span>, T&gt;(input: <span class="kw-2">&amp;mut </span>TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ParseResult&lt;Type&lt;<span class="lifetime">&#39;a</span>, T&gt;, TokenStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+<span class="kw">where
+    </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="ident">name</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>()
-        .<span class="ident">map</span>(<span class="ident">Type::NamedType</span>)
-        .<span class="ident">or</span>(<span class="ident">punct</span>(<span class="string">&quot;[&quot;</span>)
-            .<span class="ident">with</span>(<span class="ident">parser</span>(<span class="ident">parse_type</span>))
-            .<span class="ident">skip</span>(<span class="ident">punct</span>(<span class="string">&quot;]&quot;</span>))
-            .<span class="ident">map</span>(<span class="ident">Box::new</span>)
-            .<span class="ident">map</span>(<span class="ident">Type::ListType</span>))
-        .<span class="ident">and</span>(<span class="ident">optional</span>(<span class="ident">punct</span>(<span class="string">&quot;!&quot;</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">is_some</span>()))
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">typ</span>, <span class="ident">strict</span>)<span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">strict</span> {
-                <span class="ident">Type::NonNullType</span>(<span class="ident">Box::new</span>(<span class="ident">typ</span>))
-            } <span class="kw">else</span> {
-                <span class="ident">typ</span>
+    name::&lt;<span class="lifetime">&#39;a</span>, T&gt;()
+        .map(Type::NamedType)
+        .or(punct(<span class="string">&quot;[&quot;</span>)
+            .with(parser(parse_type))
+            .skip(punct(<span class="string">&quot;]&quot;</span>))
+            .map(Box::new)
+            .map(Type::ListType))
+        .and(optional(punct(<span class="string">&quot;!&quot;</span>)).map(|v| v.is_some()))
+        .map(|(typ, strict)| {
+            <span class="kw">if </span>strict {
+                Type::NonNullType(Box::new(typ))
+            } <span class="kw">else </span>{
+                typ
             }
         })
-        .<span class="ident">parse_stream</span>(<span class="ident">input</span>)
+        .parse_stream(input)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::unquote_string</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Number</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::unquote_string;
+    <span class="kw">use </span><span class="kw">super</span>::Number;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">number_from_i32_and_to_i64_conversion</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Number::from</span>(<span class="number">1</span>).<span class="ident">as_i64</span>(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Number::from</span>(<span class="number">584</span>).<span class="ident">as_i64</span>(), <span class="prelude-val">Some</span>(<span class="number">584</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>number_from_i32_and_to_i64_conversion() {
+        <span class="macro">assert_eq!</span>(Number::from(<span class="number">1</span>).as_i64(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(Number::from(<span class="number">584</span>).as_i64(), <span class="prelude-val">Some</span>(<span class="number">584</span>));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Number::from</span>(<span class="ident">i32::min_value</span>()).<span class="ident">as_i64</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">i32::min_value</span>() <span class="kw">as</span> <span class="ident">i64</span>)
+            Number::from(i32::min_value()).as_i64(),
+            <span class="prelude-val">Some</span>(i32::min_value() <span class="kw">as </span>i64)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Number::from</span>(<span class="ident">i32::max_value</span>()).<span class="ident">as_i64</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">i32::max_value</span>() <span class="kw">as</span> <span class="ident">i64</span>)
+            Number::from(i32::max_value()).as_i64(),
+            <span class="prelude-val">Some</span>(i32::max_value() <span class="kw">as </span>i64)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unquote_unicode_string</span>() {
-        <span class="comment">// basic tests</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">unquote_string</span>(<span class="string">r#&quot;&quot;\u0009&quot;&quot;#</span>).<span class="ident">expect</span>(<span class="string">&quot;&quot;</span>), <span class="string">&quot;\u{0009}&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">unquote_string</span>(<span class="string">r#&quot;&quot;\u000A&quot;&quot;#</span>).<span class="ident">expect</span>(<span class="string">&quot;&quot;</span>), <span class="string">&quot;\u{000A}&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">unquote_string</span>(<span class="string">r#&quot;&quot;\u000D&quot;&quot;#</span>).<span class="ident">expect</span>(<span class="string">&quot;&quot;</span>), <span class="string">&quot;\u{000D}&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">unquote_string</span>(<span class="string">r#&quot;&quot;\u0020&quot;&quot;#</span>).<span class="ident">expect</span>(<span class="string">&quot;&quot;</span>), <span class="string">&quot;\u{0020}&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">unquote_string</span>(<span class="string">r#&quot;&quot;\uFFFF&quot;&quot;#</span>).<span class="ident">expect</span>(<span class="string">&quot;&quot;</span>), <span class="string">&quot;\u{FFFF}&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>unquote_unicode_string() {
+        <span class="comment">// basic tests
+        </span><span class="macro">assert_eq!</span>(unquote_string(<span class="string">r#&quot;&quot;\u0009&quot;&quot;#</span>).expect(<span class="string">&quot;&quot;</span>), <span class="string">&quot;\u{0009}&quot;</span>);
+        <span class="macro">assert_eq!</span>(unquote_string(<span class="string">r#&quot;&quot;\u000A&quot;&quot;#</span>).expect(<span class="string">&quot;&quot;</span>), <span class="string">&quot;\u{000A}&quot;</span>);
+        <span class="macro">assert_eq!</span>(unquote_string(<span class="string">r#&quot;&quot;\u000D&quot;&quot;#</span>).expect(<span class="string">&quot;&quot;</span>), <span class="string">&quot;\u{000D}&quot;</span>);
+        <span class="macro">assert_eq!</span>(unquote_string(<span class="string">r#&quot;&quot;\u0020&quot;&quot;#</span>).expect(<span class="string">&quot;&quot;</span>), <span class="string">&quot;\u{0020}&quot;</span>);
+        <span class="macro">assert_eq!</span>(unquote_string(<span class="string">r#&quot;&quot;\uFFFF&quot;&quot;#</span>).expect(<span class="string">&quot;&quot;</span>), <span class="string">&quot;\u{FFFF}&quot;</span>);
 
-        <span class="comment">// a more complex string</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">unquote_string</span>(<span class="string">r#&quot;&quot;\u0009 hello \u000A there&quot;&quot;#</span>).<span class="ident">expect</span>(<span class="string">&quot;&quot;</span>),
-            <span class="string">&quot;\u{0009} hello \u{000A} there&quot;</span>
-        );
+        <span class="comment">// a more complex string
+        </span><span class="macro">assert_eq!</span>(
+            unquote_string(<span class="string">r#&quot;&quot;\u0009 hello \u000A there&quot;&quot;#</span>).expect(<span class="string">&quot;&quot;</span>),
+            <span class="string">&quot;\u{0009} hello \u{000A} there&quot;
+        </span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="graphql_parser" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="graphql_parser" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

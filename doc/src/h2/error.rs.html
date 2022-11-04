@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../h2/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../h2/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -198,205 +198,205 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec</span>::{<span class="ident">SendError</span>, <span class="ident">UserError</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::frame::StreamId</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto</span>::{<span class="self">self</span>, <span class="ident">Initiator</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::codec::{SendError, UserError};
+<span class="kw">use </span><span class="kw">crate</span>::frame::StreamId;
+<span class="kw">use </span><span class="kw">crate</span>::proto::{<span class="self">self</span>, Initiator};
 
-<span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error</span>, <span class="ident">fmt</span>, <span class="ident">io</span>};
+<span class="kw">use </span>bytes::Bytes;
+<span class="kw">use </span>std::{error, fmt, io};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::frame::Reason</span>;
+<span class="kw">pub use </span><span class="kw">crate</span>::frame::Reason;
 
-<span class="doccomment">/// Represents HTTP/2 operation errors.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Error` covers error cases raised by protocol errors caused by the</span>
-<span class="doccomment">/// peer, I/O (transport) errors, and errors caused by the user of the library.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the error was caused by the remote peer, then it will contain a</span>
-<span class="doccomment">/// [`Reason`] which can be obtained with the [`reason`] function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Reason`]: struct.Reason.html</span>
-<span class="doccomment">/// [`reason`]: #method.reason</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Error</span> {
-    <span class="ident">kind</span>: <span class="ident">Kind</span>,
+<span class="doccomment">/// Represents HTTP/2 operation errors.
+///
+/// `Error` covers error cases raised by protocol errors caused by the
+/// peer, I/O (transport) errors, and errors caused by the user of the library.
+///
+/// If the error was caused by the remote peer, then it will contain a
+/// [`Reason`] which can be obtained with the [`reason`] function.
+///
+/// [`Reason`]: struct.Reason.html
+/// [`reason`]: #method.reason
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Error {
+    kind: Kind,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Kind</span> {
-    <span class="doccomment">/// A RST_STREAM frame was received or sent.</span>
-    <span class="ident">Reset</span>(<span class="ident">StreamId</span>, <span class="ident">Reason</span>, <span class="ident">Initiator</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>Kind {
+    <span class="doccomment">/// A RST_STREAM frame was received or sent.
+    </span>Reset(StreamId, Reason, Initiator),
 
-    <span class="doccomment">/// A GO_AWAY frame was received or sent.</span>
-    <span class="ident">GoAway</span>(<span class="ident">Bytes</span>, <span class="ident">Reason</span>, <span class="ident">Initiator</span>),
+    <span class="doccomment">/// A GO_AWAY frame was received or sent.
+    </span>GoAway(Bytes, Reason, Initiator),
 
-    <span class="doccomment">/// The user created an error from a bare Reason.</span>
-    <span class="ident">Reason</span>(<span class="ident">Reason</span>),
+    <span class="doccomment">/// The user created an error from a bare Reason.
+    </span>Reason(Reason),
 
-    <span class="doccomment">/// An error resulting from an invalid action taken by the user of this</span>
-    <span class="doccomment">/// library.</span>
-    <span class="ident">User</span>(<span class="ident">UserError</span>),
+    <span class="doccomment">/// An error resulting from an invalid action taken by the user of this
+    /// library.
+    </span>User(UserError),
 
-    <span class="doccomment">/// An `io::Error` occurred while trying to read or write.</span>
-    <span class="ident">Io</span>(<span class="ident">io::Error</span>),
+    <span class="doccomment">/// An `io::Error` occurred while trying to read or write.
+    </span>Io(io::Error),
 }
 
-<span class="comment">// ===== impl Error =====</span>
+<span class="comment">// ===== impl Error =====
 
-<span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// If the error was caused by the remote peer, the error reason.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is either an error received by the peer or caused by an invalid</span>
-    <span class="doccomment">/// action taken by the peer (i.e. a protocol error).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reason</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Reason</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Reset</span>(<span class="kw">_</span>, <span class="ident">reason</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Kind::GoAway</span>(<span class="kw">_</span>, <span class="ident">reason</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Kind::Reason</span>(<span class="ident">reason</span>) =&gt; {
-                <span class="prelude-val">Some</span>(<span class="ident">reason</span>)
+</span><span class="kw">impl </span>Error {
+    <span class="doccomment">/// If the error was caused by the remote peer, the error reason.
+    ///
+    /// This is either an error received by the peer or caused by an invalid
+    /// action taken by the peer (i.e. a protocol error).
+    </span><span class="kw">pub fn </span>reason(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Reason&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            Kind::Reset(<span class="kw">_</span>, reason, <span class="kw">_</span>) | Kind::GoAway(<span class="kw">_</span>, reason, <span class="kw">_</span>) | Kind::Reason(reason) =&gt; {
+                <span class="prelude-val">Some</span>(reason)
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Returns true if the error is an io::Error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_io</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">Kind::Io</span>(..))
+    <span class="doccomment">/// Returns true if the error is an io::Error
+    </span><span class="kw">pub fn </span>is_io(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.kind, Kind::Io(..))
     }
 
-    <span class="doccomment">/// Returns the error if the error is an io::Error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_io</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">io::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Io</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Returns the error if the error is an io::Error
+    </span><span class="kw">pub fn </span>get_io(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>io::Error&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            Kind::Io(<span class="kw-2">ref </span>e) =&gt; <span class="prelude-val">Some</span>(e),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Returns the error if the error is an io::Error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_io</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Io</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Returns the error if the error is an io::Error
+    </span><span class="kw">pub fn </span>into_io(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;io::Error&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            Kind::Io(e) =&gt; <span class="prelude-val">Some</span>(e),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_io</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error</span> {
-            <span class="ident">kind</span>: <span class="ident">Kind::Io</span>(<span class="ident">err</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_io(err: io::Error) -&gt; <span class="self">Self </span>{
+        Error {
+            kind: Kind::Io(err),
         }
     }
 
-    <span class="doccomment">/// Returns true if the error is from a `GOAWAY`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_go_away</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">Kind::GoAway</span>(..))
+    <span class="doccomment">/// Returns true if the error is from a `GOAWAY`.
+    </span><span class="kw">pub fn </span>is_go_away(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.kind, Kind::GoAway(..))
     }
 
-    <span class="doccomment">/// Returns true if the error is from a `RST_STREAM`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">Kind::Reset</span>(..))
+    <span class="doccomment">/// Returns true if the error is from a `RST_STREAM`.
+    </span><span class="kw">pub fn </span>is_reset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.kind, Kind::Reset(..))
     }
 
-    <span class="doccomment">/// Returns true if the error was received in a frame from the remote.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Such as from a received `RST_STREAM` or `GOAWAY` frame.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="doccomment">/// Returns true if the error was received in a frame from the remote.
+    ///
+    /// Such as from a received `RST_STREAM` or `GOAWAY` frame.
+    </span><span class="kw">pub fn </span>is_remote(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(
-            <span class="self">self</span>.<span class="ident">kind</span>,
-            <span class="ident">Kind::GoAway</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">Initiator::Remote</span>) <span class="op">|</span> <span class="ident">Kind::Reset</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">Initiator::Remote</span>)
+            <span class="self">self</span>.kind,
+            Kind::GoAway(<span class="kw">_</span>, <span class="kw">_</span>, Initiator::Remote) | Kind::Reset(<span class="kw">_</span>, <span class="kw">_</span>, Initiator::Remote)
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">proto::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">proto::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::Error</span>::<span class="kw-2">*</span>;
+<span class="kw">impl </span>From&lt;proto::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(src: proto::Error) -&gt; Error {
+        <span class="kw">use </span><span class="kw">crate</span>::proto::Error::<span class="kw-2">*</span>;
 
-        <span class="ident">Error</span> {
-            <span class="ident">kind</span>: <span class="kw">match</span> <span class="ident">src</span> {
-                <span class="ident">Reset</span>(<span class="ident">stream_id</span>, <span class="ident">reason</span>, <span class="ident">initiator</span>) =&gt; <span class="ident">Kind::Reset</span>(<span class="ident">stream_id</span>, <span class="ident">reason</span>, <span class="ident">initiator</span>),
-                <span class="ident">GoAway</span>(<span class="ident">debug_data</span>, <span class="ident">reason</span>, <span class="ident">initiator</span>) =&gt; {
-                    <span class="ident">Kind::GoAway</span>(<span class="ident">debug_data</span>, <span class="ident">reason</span>, <span class="ident">initiator</span>)
+        Error {
+            kind: <span class="kw">match </span>src {
+                Reset(stream_id, reason, initiator) =&gt; Kind::Reset(stream_id, reason, initiator),
+                GoAway(debug_data, reason, initiator) =&gt; {
+                    Kind::GoAway(debug_data, reason, initiator)
                 }
-                <span class="ident">Io</span>(<span class="ident">kind</span>, <span class="ident">inner</span>) =&gt; {
-                    <span class="ident">Kind::Io</span>(<span class="ident">inner</span>.<span class="ident">map_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">kind</span>.<span class="ident">into</span>(), <span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">kind</span>, <span class="ident">inner</span>)))
+                Io(kind, inner) =&gt; {
+                    Kind::Io(inner.map_or_else(|| kind.into(), |inner| io::Error::new(kind, inner)))
                 }
             },
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Reason</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">Reason</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error</span> {
-            <span class="ident">kind</span>: <span class="ident">Kind::Reason</span>(<span class="ident">src</span>),
+<span class="kw">impl </span>From&lt;Reason&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(src: Reason) -&gt; Error {
+        Error {
+            kind: Kind::Reason(src),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SendError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">SendError</span>) -&gt; <span class="ident">Error</span> {
-        <span class="kw">match</span> <span class="ident">src</span> {
-            <span class="ident">SendError::User</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">into</span>(),
-            <span class="ident">SendError::Connection</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">into</span>(),
+<span class="kw">impl </span>From&lt;SendError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(src: SendError) -&gt; Error {
+        <span class="kw">match </span>src {
+            SendError::User(e) =&gt; e.into(),
+            SendError::Connection(e) =&gt; e.into(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UserError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">UserError</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error</span> {
-            <span class="ident">kind</span>: <span class="ident">Kind::User</span>(<span class="ident">src</span>),
+<span class="kw">impl </span>From&lt;UserError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(src: UserError) -&gt; Error {
+        Error {
+            kind: Kind::User(src),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">debug_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Reset</span>(<span class="kw">_</span>, <span class="ident">reason</span>, <span class="ident">Initiator::User</span>) =&gt; {
-                <span class="kw">return</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;stream error sent by user: {}&quot;</span>, <span class="ident">reason</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span>debug_data = <span class="kw">match </span><span class="self">self</span>.kind {
+            Kind::Reset(<span class="kw">_</span>, reason, Initiator::User) =&gt; {
+                <span class="kw">return </span><span class="macro">write!</span>(fmt, <span class="string">&quot;stream error sent by user: {}&quot;</span>, reason)
             }
-            <span class="ident">Kind::Reset</span>(<span class="kw">_</span>, <span class="ident">reason</span>, <span class="ident">Initiator::Library</span>) =&gt; {
-                <span class="kw">return</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;stream error detected: {}&quot;</span>, <span class="ident">reason</span>)
+            Kind::Reset(<span class="kw">_</span>, reason, Initiator::Library) =&gt; {
+                <span class="kw">return </span><span class="macro">write!</span>(fmt, <span class="string">&quot;stream error detected: {}&quot;</span>, reason)
             }
-            <span class="ident">Kind::Reset</span>(<span class="kw">_</span>, <span class="ident">reason</span>, <span class="ident">Initiator::Remote</span>) =&gt; {
-                <span class="kw">return</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;stream error received: {}&quot;</span>, <span class="ident">reason</span>)
+            Kind::Reset(<span class="kw">_</span>, reason, Initiator::Remote) =&gt; {
+                <span class="kw">return </span><span class="macro">write!</span>(fmt, <span class="string">&quot;stream error received: {}&quot;</span>, reason)
             }
-            <span class="ident">Kind::GoAway</span>(<span class="kw-2">ref</span> <span class="ident">debug_data</span>, <span class="ident">reason</span>, <span class="ident">Initiator::User</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;connection error sent by user: {}&quot;</span>, <span class="ident">reason</span>)<span class="question-mark">?</span>;
-                <span class="ident">debug_data</span>
+            Kind::GoAway(<span class="kw-2">ref </span>debug_data, reason, Initiator::User) =&gt; {
+                <span class="macro">write!</span>(fmt, <span class="string">&quot;connection error sent by user: {}&quot;</span>, reason)<span class="question-mark">?</span>;
+                debug_data
             }
-            <span class="ident">Kind::GoAway</span>(<span class="kw-2">ref</span> <span class="ident">debug_data</span>, <span class="ident">reason</span>, <span class="ident">Initiator::Library</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;connection error detected: {}&quot;</span>, <span class="ident">reason</span>)<span class="question-mark">?</span>;
-                <span class="ident">debug_data</span>
+            Kind::GoAway(<span class="kw-2">ref </span>debug_data, reason, Initiator::Library) =&gt; {
+                <span class="macro">write!</span>(fmt, <span class="string">&quot;connection error detected: {}&quot;</span>, reason)<span class="question-mark">?</span>;
+                debug_data
             }
-            <span class="ident">Kind::GoAway</span>(<span class="kw-2">ref</span> <span class="ident">debug_data</span>, <span class="ident">reason</span>, <span class="ident">Initiator::Remote</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;connection error received: {}&quot;</span>, <span class="ident">reason</span>)<span class="question-mark">?</span>;
-                <span class="ident">debug_data</span>
+            Kind::GoAway(<span class="kw-2">ref </span>debug_data, reason, Initiator::Remote) =&gt; {
+                <span class="macro">write!</span>(fmt, <span class="string">&quot;connection error received: {}&quot;</span>, reason)<span class="question-mark">?</span>;
+                debug_data
             }
-            <span class="ident">Kind::Reason</span>(<span class="ident">reason</span>) =&gt; <span class="kw">return</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;protocol error: {}&quot;</span>, <span class="ident">reason</span>),
-            <span class="ident">Kind::User</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;user error: {}&quot;</span>, <span class="ident">e</span>),
-            <span class="ident">Kind::Io</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="ident">e</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
+            Kind::Reason(reason) =&gt; <span class="kw">return </span><span class="macro">write!</span>(fmt, <span class="string">&quot;protocol error: {}&quot;</span>, reason),
+            Kind::User(<span class="kw-2">ref </span>e) =&gt; <span class="kw">return </span><span class="macro">write!</span>(fmt, <span class="string">&quot;user error: {}&quot;</span>, e),
+            Kind::Io(<span class="kw-2">ref </span>e) =&gt; <span class="kw">return </span>e.fmt(fmt),
         };
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">debug_data</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot; ({:?})&quot;</span>, <span class="ident">debug_data</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>!debug_data.is_empty() {
+            <span class="macro">write!</span>(fmt, <span class="string">&quot; ({:?})&quot;</span>, debug_data)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+<span class="kw">impl </span>error::Error <span class="kw">for </span>Error {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Error</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Reason</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::Error;
+    <span class="kw">use </span><span class="kw">crate</span>::Reason;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">error_from_reason</span>() {
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">Error::from</span>(<span class="ident">Reason::HTTP_1_1_REQUIRED</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">err</span>.<span class="ident">reason</span>(), <span class="prelude-val">Some</span>(<span class="ident">Reason::HTTP_1_1_REQUIRED</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>error_from_reason() {
+        <span class="kw">let </span>err = Error::from(Reason::HTTP_1_1_REQUIRED);
+        <span class="macro">assert_eq!</span>(err.reason(), <span class="prelude-val">Some</span>(Reason::HTTP_1_1_REQUIRED));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

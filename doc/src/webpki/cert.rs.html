@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/cert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/cert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -224,231 +224,231 @@
 <span id="224">224</span>
 <span id="225">225</span>
 <span id="226">226</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR</span>
-<span class="comment">// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN</span>
-<span class="comment">// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF</span>
-<span class="comment">// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">der</span>, <span class="ident">signed_data</span>, <span class="ident">Error</span>};
+</span><span class="kw">use crate</span>::{der, signed_data, Error};
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EndEntityOrCa</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">EndEntity</span>,
-    <span class="ident">Ca</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="kw">pub enum </span>EndEntityOrCa&lt;<span class="lifetime">&#39;a</span>&gt; {
+    EndEntity,
+    Ca(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Cert&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">ee_or_ca</span>: <span class="ident">EndEntityOrCa</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>Cert&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>ee_or_ca: EndEntityOrCa&lt;<span class="lifetime">&#39;a</span>&gt;,
 
-    <span class="kw">pub</span> <span class="ident">signed_data</span>: <span class="ident">signed_data::SignedData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">issuer</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">validity</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">subject</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">spki</span>: <span class="ident">der::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="kw">pub </span>signed_data: signed_data::SignedData&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub </span>issuer: untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub </span>validity: untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub </span>subject: untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub </span>spki: der::Value&lt;<span class="lifetime">&#39;a</span>&gt;,
 
-    <span class="kw">pub</span> <span class="ident">basic_constraints</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">eku</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name_constraints</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">subject_alt_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub </span>basic_constraints: <span class="prelude-ty">Option</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub </span>eku: <span class="prelude-ty">Option</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub </span>name_constraints: <span class="prelude-ty">Option</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub </span>subject_alt_name: <span class="prelude-ty">Option</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">cert_der</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">ee_or_ca</span>: <span class="ident">EndEntityOrCa</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="ident">parse_cert_internal</span>(<span class="ident">cert_der</span>, <span class="ident">ee_or_ca</span>, <span class="ident">certificate_serial_number</span>)
+<span class="kw">pub fn </span>parse_cert&lt;<span class="lifetime">&#39;a</span>&gt;(
+    cert_der: untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;,
+    ee_or_ca: EndEntityOrCa&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Cert&lt;<span class="lifetime">&#39;a</span>&gt;, Error&gt; {
+    parse_cert_internal(cert_der, ee_or_ca, certificate_serial_number)
 }
 
-<span class="doccomment">/// Used by `parse_cert` for regular certificates (end-entity and intermediate)</span>
-<span class="doccomment">/// and by `cert_der_as_trust_anchor` for trust anchors encoded as</span>
-<span class="doccomment">/// certificates.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_cert_internal</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">cert_der</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">ee_or_ca</span>: <span class="ident">EndEntityOrCa</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">serial_number</span>: <span class="kw">fn</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">tbs</span>, <span class="ident">signed_data</span>) <span class="op">=</span> <span class="ident">cert_der</span>.<span class="ident">read_all</span>(<span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">cert_der</span><span class="op">|</span> {
-        <span class="ident">der::nested</span>(
-            <span class="ident">cert_der</span>,
-            <span class="ident">der::Tag::Sequence</span>,
-            <span class="ident">Error::BadDer</span>,
-            <span class="ident">signed_data::parse_signed_data</span>,
+<span class="doccomment">/// Used by `parse_cert` for regular certificates (end-entity and intermediate)
+/// and by `cert_der_as_trust_anchor` for trust anchors encoded as
+/// certificates.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_cert_internal&lt;<span class="lifetime">&#39;a</span>&gt;(
+    cert_der: untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;,
+    ee_or_ca: EndEntityOrCa&lt;<span class="lifetime">&#39;a</span>&gt;,
+    serial_number: <span class="kw">fn</span>(input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Cert&lt;<span class="lifetime">&#39;a</span>&gt;, Error&gt; {
+    <span class="kw">let </span>(tbs, signed_data) = cert_der.read_all(Error::BadDer, |cert_der| {
+        der::nested(
+            cert_der,
+            der::Tag::Sequence,
+            Error::BadDer,
+            signed_data::parse_signed_data,
         )
     })<span class="question-mark">?</span>;
 
-    <span class="ident">tbs</span>.<span class="ident">read_all</span>(<span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">tbs</span><span class="op">|</span> {
-        <span class="ident">version3</span>(<span class="ident">tbs</span>)<span class="question-mark">?</span>;
-        <span class="ident">serial_number</span>(<span class="ident">tbs</span>)<span class="question-mark">?</span>;
+    tbs.read_all(Error::BadDer, |tbs| {
+        version3(tbs)<span class="question-mark">?</span>;
+        serial_number(tbs)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">tbs</span>, <span class="ident">der::Tag::Sequence</span>)<span class="question-mark">?</span>;
-        <span class="comment">// TODO: In mozilla::pkix, the comparison is done based on the</span>
-        <span class="comment">// normalized value (ignoring whether or not there is an optional NULL</span>
-        <span class="comment">// parameter for RSA-based algorithms), so this may be too strict.</span>
-        <span class="kw">if</span> <span class="ident">signature</span> <span class="op">!</span><span class="op">=</span> <span class="ident">signed_data</span>.<span class="ident">algorithm</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::SignatureAlgorithmMismatch</span>);
+        <span class="kw">let </span>signature = der::expect_tag_and_get_value(tbs, der::Tag::Sequence)<span class="question-mark">?</span>;
+        <span class="comment">// TODO: In mozilla::pkix, the comparison is done based on the
+        // normalized value (ignoring whether or not there is an optional NULL
+        // parameter for RSA-based algorithms), so this may be too strict.
+        </span><span class="kw">if </span>signature != signed_data.algorithm {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::SignatureAlgorithmMismatch);
         }
 
-        <span class="kw">let</span> <span class="ident">issuer</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">tbs</span>, <span class="ident">der::Tag::Sequence</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">validity</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">tbs</span>, <span class="ident">der::Tag::Sequence</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">subject</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">tbs</span>, <span class="ident">der::Tag::Sequence</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">spki</span> <span class="op">=</span> <span class="ident">der::expect_tag</span>(<span class="ident">tbs</span>, <span class="ident">der::Tag::Sequence</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>issuer = der::expect_tag_and_get_value(tbs, der::Tag::Sequence)<span class="question-mark">?</span>;
+        <span class="kw">let </span>validity = der::expect_tag_and_get_value(tbs, der::Tag::Sequence)<span class="question-mark">?</span>;
+        <span class="kw">let </span>subject = der::expect_tag_and_get_value(tbs, der::Tag::Sequence)<span class="question-mark">?</span>;
+        <span class="kw">let </span>spki = der::expect_tag(tbs, der::Tag::Sequence)<span class="question-mark">?</span>;
 
-        <span class="comment">// In theory there could be fields [1] issuerUniqueID and [2]</span>
-        <span class="comment">// subjectUniqueID, but in practice there never are, and to keep the</span>
-        <span class="comment">// code small and simple we don&#39;t accept any certificates that do</span>
-        <span class="comment">// contain them.</span>
+        <span class="comment">// In theory there could be fields [1] issuerUniqueID and [2]
+        // subjectUniqueID, but in practice there never are, and to keep the
+        // code small and simple we don&#39;t accept any certificates that do
+        // contain them.
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cert</span> <span class="op">=</span> <span class="ident">Cert</span> {
-            <span class="ident">ee_or_ca</span>,
+        </span><span class="kw">let </span><span class="kw-2">mut </span>cert = Cert {
+            ee_or_ca,
 
-            <span class="ident">signed_data</span>,
-            <span class="ident">issuer</span>,
-            <span class="ident">validity</span>,
-            <span class="ident">subject</span>,
-            <span class="ident">spki</span>,
+            signed_data,
+            issuer,
+            validity,
+            subject,
+            spki,
 
-            <span class="ident">basic_constraints</span>: <span class="prelude-val">None</span>,
-            <span class="ident">eku</span>: <span class="prelude-val">None</span>,
-            <span class="ident">name_constraints</span>: <span class="prelude-val">None</span>,
-            <span class="ident">subject_alt_name</span>: <span class="prelude-val">None</span>,
+            basic_constraints: <span class="prelude-val">None</span>,
+            eku: <span class="prelude-val">None</span>,
+            name_constraints: <span class="prelude-val">None</span>,
+            subject_alt_name: <span class="prelude-val">None</span>,
         };
 
-        <span class="comment">// mozilla::pkix allows the extensions to be omitted. However, since</span>
-        <span class="comment">// the subjectAltName extension is mandatory, the extensions are</span>
-        <span class="comment">// mandatory too, and we enforce that. Also, mozilla::pkix includes</span>
-        <span class="comment">// special logic for handling critical Netscape Cert Type extensions.</span>
-        <span class="comment">// That has been intentionally omitted.</span>
+        <span class="comment">// mozilla::pkix allows the extensions to be omitted. However, since
+        // the subjectAltName extension is mandatory, the extensions are
+        // mandatory too, and we enforce that. Also, mozilla::pkix includes
+        // special logic for handling critical Netscape Cert Type extensions.
+        // That has been intentionally omitted.
 
-        <span class="ident">der::nested</span>(
-            <span class="ident">tbs</span>,
-            <span class="ident">der::Tag::ContextSpecificConstructed3</span>,
-            <span class="ident">Error::MissingOrMalformedExtensions</span>,
-            <span class="op">|</span><span class="ident">tagged</span><span class="op">|</span> {
-                <span class="ident">der::nested_of_mut</span>(
-                    <span class="ident">tagged</span>,
-                    <span class="ident">der::Tag::Sequence</span>,
-                    <span class="ident">der::Tag::Sequence</span>,
-                    <span class="ident">Error::BadDer</span>,
-                    <span class="op">|</span><span class="ident">extension</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">extn_id</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">extension</span>, <span class="ident">der::Tag::OID</span>)<span class="question-mark">?</span>;
-                        <span class="kw">let</span> <span class="ident">critical</span> <span class="op">=</span> <span class="ident">der::optional_boolean</span>(<span class="ident">extension</span>)<span class="question-mark">?</span>;
-                        <span class="kw">let</span> <span class="ident">extn_value</span> <span class="op">=</span>
-                            <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">extension</span>, <span class="ident">der::Tag::OctetString</span>)<span class="question-mark">?</span>;
-                        <span class="kw">match</span> <span class="ident">remember_extension</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cert</span>, <span class="ident">extn_id</span>, <span class="ident">extn_value</span>)<span class="question-mark">?</span> {
-                            <span class="ident">Understood::No</span> <span class="kw">if</span> <span class="ident">critical</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedCriticalExtension</span>),
-                            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+        </span>der::nested(
+            tbs,
+            der::Tag::ContextSpecificConstructed3,
+            Error::MissingOrMalformedExtensions,
+            |tagged| {
+                der::nested_of_mut(
+                    tagged,
+                    der::Tag::Sequence,
+                    der::Tag::Sequence,
+                    Error::BadDer,
+                    |extension| {
+                        <span class="kw">let </span>extn_id = der::expect_tag_and_get_value(extension, der::Tag::OID)<span class="question-mark">?</span>;
+                        <span class="kw">let </span>critical = der::optional_boolean(extension)<span class="question-mark">?</span>;
+                        <span class="kw">let </span>extn_value =
+                            der::expect_tag_and_get_value(extension, der::Tag::OctetString)<span class="question-mark">?</span>;
+                        <span class="kw">match </span>remember_extension(<span class="kw-2">&amp;mut </span>cert, extn_id, extn_value)<span class="question-mark">? </span>{
+                            Understood::No <span class="kw">if </span>critical =&gt; <span class="prelude-val">Err</span>(Error::UnsupportedCriticalExtension),
+                            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
                         }
                     },
                 )
             },
         )<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">cert</span>)
+        <span class="prelude-val">Ok</span>(cert)
     })
 }
 
-<span class="comment">// mozilla::pkix supports v1, v2, v3, and v4, including both the implicit</span>
-<span class="comment">// (correct) and explicit (incorrect) encoding of v1. We allow only v3.</span>
-<span class="kw">fn</span> <span class="ident">version3</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="ident">der::nested</span>(
-        <span class="ident">input</span>,
-        <span class="ident">der::Tag::ContextSpecificConstructed0</span>,
-        <span class="ident">Error::UnsupportedCertVersion</span>,
-        <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">der::small_nonnegative_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="number">2</span> {
-                <span class="comment">// v3</span>
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedCertVersion</span>);
+<span class="comment">// mozilla::pkix supports v1, v2, v3, and v4, including both the implicit
+// (correct) and explicit (incorrect) encoding of v1. We allow only v3.
+</span><span class="kw">fn </span>version3(input: <span class="kw-2">&amp;mut </span>untrusted::Reader) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    der::nested(
+        input,
+        der::Tag::ContextSpecificConstructed0,
+        Error::UnsupportedCertVersion,
+        |input| {
+            <span class="kw">let </span>version = der::small_nonnegative_integer(input)<span class="question-mark">?</span>;
+            <span class="kw">if </span>version != <span class="number">2 </span>{
+                <span class="comment">// v3
+                </span><span class="kw">return </span><span class="prelude-val">Err</span>(Error::UnsupportedCertVersion);
             }
             <span class="prelude-val">Ok</span>(())
         },
     )
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">certificate_serial_number</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.1.2.2:</span>
-    <span class="comment">// * Conforming CAs MUST NOT use serialNumber values longer than 20 octets.&quot;</span>
-    <span class="comment">// * &quot;The serial number MUST be a positive integer [...]&quot;</span>
+<span class="kw">pub fn </span>certificate_serial_number(input: <span class="kw-2">&amp;mut </span>untrusted::Reader) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.1.2.2:
+    // * Conforming CAs MUST NOT use serialNumber values longer than 20 octets.&quot;
+    // * &quot;The serial number MUST be a positive integer [...]&quot;
 
-    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">der::positive_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">big_endian_without_leading_zero</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">20</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::BadDer</span>);
+    </span><span class="kw">let </span>value = der::positive_integer(input)<span class="question-mark">?</span>;
+    <span class="kw">if </span>value.big_endian_without_leading_zero().len() &gt; <span class="number">20 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::BadDer);
     }
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">enum</span> <span class="ident">Understood</span> {
-    <span class="ident">Yes</span>,
-    <span class="ident">No</span>,
+<span class="kw">enum </span>Understood {
+    Yes,
+    No,
 }
 
-<span class="kw">fn</span> <span class="ident">remember_extension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">cert</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">extn_id</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">value</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Understood</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="comment">// We don&#39;t do anything with certificate policies so we can safely ignore</span>
-    <span class="comment">// all policy-related stuff. We assume that the policy-related extensions</span>
-    <span class="comment">// are not marked critical.</span>
+<span class="kw">fn </span>remember_extension&lt;<span class="lifetime">&#39;a</span>&gt;(
+    cert: <span class="kw-2">&amp;mut </span>Cert&lt;<span class="lifetime">&#39;a</span>&gt;,
+    extn_id: untrusted::Input,
+    value: untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Understood, Error&gt; {
+    <span class="comment">// We don&#39;t do anything with certificate policies so we can safely ignore
+    // all policy-related stuff. We assume that the policy-related extensions
+    // are not marked critical.
 
-    <span class="comment">// id-ce 2.5.29</span>
-    <span class="kw">static</span> <span class="ident">ID_CE</span>: [<span class="ident">u8</span>; <span class="number">2</span>] <span class="op">=</span> <span class="macro">oid!</span>[<span class="number">2</span>, <span class="number">5</span>, <span class="number">29</span>];
+    // id-ce 2.5.29
+    </span><span class="kw">static </span>ID_CE: [u8; <span class="number">2</span>] = <span class="macro">oid!</span>[<span class="number">2</span>, <span class="number">5</span>, <span class="number">29</span>];
 
-    <span class="kw">if</span> <span class="ident">extn_id</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">ID_CE</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">extn_id</span>.<span class="ident">as_slice_less_safe</span>().<span class="ident">starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">ID_CE</span>) {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Understood::No</span>);
+    <span class="kw">if </span>extn_id.len() != ID_CE.len() + <span class="number">1 </span>|| !extn_id.as_slice_less_safe().starts_with(<span class="kw-2">&amp;</span>ID_CE) {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(Understood::No);
     }
 
-    <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">extn_id</span>.<span class="ident">as_slice_less_safe</span>().<span class="ident">last</span>().<span class="ident">unwrap</span>() {
-        <span class="comment">// id-ce-keyUsage 2.5.29.15. We ignore the KeyUsage extension. For CA</span>
-        <span class="comment">// certificates, BasicConstraints.cA makes KeyUsage redundant. Firefox</span>
-        <span class="comment">// and other common browsers do not check KeyUsage for end-entities,</span>
-        <span class="comment">// though it would be kind of nice to ensure that a KeyUsage without</span>
-        <span class="comment">// the keyEncipherment bit could not be used for RSA key exchange.</span>
-        <span class="number">15</span> =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Understood::Yes</span>);
+    <span class="kw">let </span>out = <span class="kw">match </span><span class="kw-2">*</span>extn_id.as_slice_less_safe().last().unwrap() {
+        <span class="comment">// id-ce-keyUsage 2.5.29.15. We ignore the KeyUsage extension. For CA
+        // certificates, BasicConstraints.cA makes KeyUsage redundant. Firefox
+        // and other common browsers do not check KeyUsage for end-entities,
+        // though it would be kind of nice to ensure that a KeyUsage without
+        // the keyEncipherment bit could not be used for RSA key exchange.
+        </span><span class="number">15 </span>=&gt; {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Understood::Yes);
         }
 
-        <span class="comment">// id-ce-subjectAltName 2.5.29.17</span>
-        <span class="number">17</span> =&gt; <span class="kw-2">&amp;mut</span> <span class="ident">cert</span>.<span class="ident">subject_alt_name</span>,
+        <span class="comment">// id-ce-subjectAltName 2.5.29.17
+        </span><span class="number">17 </span>=&gt; <span class="kw-2">&amp;mut </span>cert.subject_alt_name,
 
-        <span class="comment">// id-ce-basicConstraints 2.5.29.19</span>
-        <span class="number">19</span> =&gt; <span class="kw-2">&amp;mut</span> <span class="ident">cert</span>.<span class="ident">basic_constraints</span>,
+        <span class="comment">// id-ce-basicConstraints 2.5.29.19
+        </span><span class="number">19 </span>=&gt; <span class="kw-2">&amp;mut </span>cert.basic_constraints,
 
-        <span class="comment">// id-ce-nameConstraints 2.5.29.30</span>
-        <span class="number">30</span> =&gt; <span class="kw-2">&amp;mut</span> <span class="ident">cert</span>.<span class="ident">name_constraints</span>,
+        <span class="comment">// id-ce-nameConstraints 2.5.29.30
+        </span><span class="number">30 </span>=&gt; <span class="kw-2">&amp;mut </span>cert.name_constraints,
 
-        <span class="comment">// id-ce-extKeyUsage 2.5.29.37</span>
-        <span class="number">37</span> =&gt; <span class="kw-2">&amp;mut</span> <span class="ident">cert</span>.<span class="ident">eku</span>,
+        <span class="comment">// id-ce-extKeyUsage 2.5.29.37
+        </span><span class="number">37 </span>=&gt; <span class="kw-2">&amp;mut </span>cert.eku,
 
-        <span class="kw">_</span> =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Understood::No</span>);
+        <span class="kw">_ </span>=&gt; {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Understood::No);
         }
     };
 
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">out</span> {
+    <span class="kw">match </span><span class="kw-2">*</span>out {
         <span class="prelude-val">Some</span>(..) =&gt; {
-            <span class="comment">// The certificate contains more than one instance of this</span>
-            <span class="comment">// extension.</span>
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExtensionValueInvalid</span>);
+            <span class="comment">// The certificate contains more than one instance of this
+            // extension.
+            </span><span class="kw">return </span><span class="prelude-val">Err</span>(Error::ExtensionValueInvalid);
         }
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="comment">// All the extensions that we care about are wrapped in a SEQUENCE.</span>
-            <span class="kw">let</span> <span class="ident">sequence_value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">read_all</span>(<span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-                <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">value</span>, <span class="ident">der::Tag::Sequence</span>)
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="comment">// All the extensions that we care about are wrapped in a SEQUENCE.
+            </span><span class="kw">let </span>sequence_value = value.read_all(Error::BadDer, |value| {
+                der::expect_tag_and_get_value(value, der::Tag::Sequence)
             })<span class="question-mark">?</span>;
-            <span class="kw-2">*</span><span class="ident">out</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">sequence_value</span>);
+            <span class="kw-2">*</span>out = <span class="prelude-val">Some</span>(sequence_value);
         }
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">Understood::Yes</span>)
+    <span class="prelude-val">Ok</span>(Understood::Yes)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

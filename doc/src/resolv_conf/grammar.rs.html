@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/resolv-conf-0.7.0/src/grammar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>grammar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../resolv_conf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../resolv_conf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../resolv_conf/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/resolv-conf-0.7.0/src/grammar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>grammar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../resolv_conf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../resolv_conf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../resolv_conf/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -229,106 +229,106 @@
 <span id="229">229</span>
 <span id="230">230</span>
 <span id="231">231</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">Ipv4Addr</span>, <span class="ident">Ipv6Addr</span>};
-<span class="kw">use</span> <span class="ident">std::str</span>::{<span class="ident">Utf8Error</span>, <span class="ident">from_utf8</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::net::{Ipv4Addr, Ipv6Addr};
+<span class="kw">use </span>std::str::{Utf8Error, from_utf8};
 
-<span class="kw">use</span> {<span class="ident">AddrParseError</span>, <span class="ident">Config</span>, <span class="ident">Network</span>, <span class="ident">Lookup</span>, <span class="ident">Family</span>};
+<span class="kw">use </span>{AddrParseError, Config, Network, Lookup, Family};
 
 <span class="macro">quick_error!</span>{
-    <span class="doccomment">/// Error while parsing resolv.conf file</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ParseError</span> {
-        <span class="doccomment">/// Error that may be returned when the string to parse contains invalid UTF-8 sequences</span>
-        <span class="ident">InvalidUtf8</span>(<span class="ident">line</span>: <span class="ident">usize</span>, <span class="ident">err</span>: <span class="ident">Utf8Error</span>) {
-            <span class="ident">display</span>(<span class="string">&quot;bad unicode at line {}: {}&quot;</span>, <span class="ident">line</span>, <span class="ident">err</span>)
-            <span class="ident">cause</span>(<span class="ident">err</span>)
+    <span class="doccomment">/// Error while parsing resolv.conf file
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub enum </span>ParseError {
+        <span class="doccomment">/// Error that may be returned when the string to parse contains invalid UTF-8 sequences
+        </span>InvalidUtf8(line: usize, err: Utf8Error) {
+            display(<span class="string">&quot;bad unicode at line {}: {}&quot;</span>, line, err)
+            cause(err)
         }
-        <span class="doccomment">/// Error returned a value for a given directive is invalid.</span>
-        <span class="doccomment">/// This can also happen when the value is missing, if the directive requires a value.</span>
-        <span class="ident">InvalidValue</span>(<span class="ident">line</span>: <span class="ident">usize</span>) {
-            <span class="ident">display</span>(<span class="string">&quot;directive at line {} is improperly formatted \
-                or contains invalid value&quot;</span>, <span class="ident">line</span>)
+        <span class="doccomment">/// Error returned a value for a given directive is invalid.
+        /// This can also happen when the value is missing, if the directive requires a value.
+        </span>InvalidValue(line: usize) {
+            display(<span class="string">&quot;directive at line {} is improperly formatted \
+                or contains invalid value&quot;</span>, line)
         }
-        <span class="doccomment">/// Error returned when a value for a given option is invalid.</span>
-        <span class="doccomment">/// This can also happen when the value is missing, if the option requires a value.</span>
-        <span class="ident">InvalidOptionValue</span>(<span class="ident">line</span>: <span class="ident">usize</span>) {
-            <span class="ident">display</span>(<span class="string">&quot;directive options at line {} contains invalid \
-                value of some option&quot;</span>, <span class="ident">line</span>)
+        <span class="doccomment">/// Error returned when a value for a given option is invalid.
+        /// This can also happen when the value is missing, if the option requires a value.
+        </span>InvalidOptionValue(line: usize) {
+            display(<span class="string">&quot;directive options at line {} contains invalid \
+                value of some option&quot;</span>, line)
         }
-        <span class="doccomment">/// Error returned when a invalid option is found.</span>
-        <span class="ident">InvalidOption</span>(<span class="ident">line</span>: <span class="ident">usize</span>) {
-            <span class="ident">display</span>(<span class="string">&quot;option at line {} is not recognized&quot;</span>, <span class="ident">line</span>)
+        <span class="doccomment">/// Error returned when a invalid option is found.
+        </span>InvalidOption(line: usize) {
+            display(<span class="string">&quot;option at line {} is not recognized&quot;</span>, line)
         }
-        <span class="doccomment">/// Error returned when a invalid directive is found.</span>
-        <span class="ident">InvalidDirective</span>(<span class="ident">line</span>: <span class="ident">usize</span>) {
-            <span class="ident">display</span>(<span class="string">&quot;directive at line {} is not recognized&quot;</span>, <span class="ident">line</span>)
+        <span class="doccomment">/// Error returned when a invalid directive is found.
+        </span>InvalidDirective(line: usize) {
+            display(<span class="string">&quot;directive at line {} is not recognized&quot;</span>, line)
         }
-        <span class="doccomment">/// Error returned when a value cannot be parsed an an IP address.</span>
-        <span class="ident">InvalidIp</span>(<span class="ident">line</span>: <span class="ident">usize</span>, <span class="ident">err</span>: <span class="ident">AddrParseError</span>) {
-            <span class="ident">display</span>(<span class="string">&quot;directive at line {} contains invalid IP: {}&quot;</span>, <span class="ident">line</span>, <span class="ident">err</span>)
+        <span class="doccomment">/// Error returned when a value cannot be parsed an an IP address.
+        </span>InvalidIp(line: usize, err: AddrParseError) {
+            display(<span class="string">&quot;directive at line {} contains invalid IP: {}&quot;</span>, line, err)
         }
-        <span class="doccomment">/// Error returned when there is extra data at the end of a line.</span>
-        <span class="ident">ExtraData</span>(<span class="ident">line</span>: <span class="ident">usize</span>) {
-            <span class="ident">display</span>(<span class="string">&quot;extra data at the end of the line {}&quot;</span>, <span class="ident">line</span>)
+        <span class="doccomment">/// Error returned when there is extra data at the end of a line.
+        </span>ExtraData(line: usize) {
+            display(<span class="string">&quot;extra data at the end of the line {}&quot;</span>, line)
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">ip_v4_netw</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Network</span>, <span class="ident">AddrParseError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&#39;/&#39;</span>);
-    <span class="kw">let</span> <span class="ident">ip</span>: <span class="ident">Ipv4Addr</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">parse</span>()<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">ip</span>.<span class="ident">is_unspecified</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">AddrParseError</span>);
+<span class="kw">fn </span>ip_v4_netw(val: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Network, AddrParseError&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>pair = val.splitn(<span class="number">2</span>, <span class="string">&#39;/&#39;</span>);
+    <span class="kw">let </span>ip: Ipv4Addr = pair.next().unwrap().parse()<span class="question-mark">?</span>;
+    <span class="kw">if </span>ip.is_unspecified() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(AddrParseError);
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mask</span>) <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">next</span>() {
-        <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">mask</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="comment">// make sure this is a valid mask</span>
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">ip</span>.<span class="ident">octets</span>().<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="ident">u32::from</span>(<span class="ident">x</span>));
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">value</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">value</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-            <span class="prelude-val">Err</span>(<span class="ident">AddrParseError</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Network::V4</span>(<span class="ident">ip</span>, <span class="ident">mask</span>))
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(mask) = pair.next() {
+        <span class="kw">let </span>mask = mask.parse()<span class="question-mark">?</span>;
+        <span class="comment">// make sure this is a valid mask
+        </span><span class="kw">let </span>value: u32 = ip.octets().iter().fold(<span class="number">0</span>, |acc, <span class="kw-2">&amp;</span>x| acc + u32::from(x));
+        <span class="kw">if </span>value == <span class="number">0 </span>|| (value &amp; !value != <span class="number">0</span>) {
+            <span class="prelude-val">Err</span>(AddrParseError)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(Network::V4(ip, mask))
         }
-    } <span class="kw">else</span> {
-        <span class="comment">// We have to &quot;guess&quot; the mask.</span>
-        <span class="comment">//</span>
-        <span class="comment">// FIXME(@little-dude) right now, we look at the number or bytes that are 0, but maybe we</span>
-        <span class="comment">// should use the number of bits that are 0.</span>
-        <span class="comment">//</span>
-        <span class="comment">// In other words, with this implementation, the mask of `128.192.0.0` will be</span>
-        <span class="comment">// `255.255.0.0` (a.k.a `/16`). But we could also consider that the mask is `/10` (a.k.a</span>
-        <span class="comment">// `255.63.0.0`).</span>
-        <span class="comment">//</span>
-        <span class="comment">// My only source on topic is the &quot;DNS and Bind&quot; book which suggests using bytes, not bits.</span>
-        <span class="kw">let</span> <span class="ident">octets</span> <span class="op">=</span> <span class="ident">ip</span>.<span class="ident">octets</span>();
-        <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">octets</span>[<span class="number">3</span>] <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="ident">octets</span>[<span class="number">2</span>] <span class="op">==</span> <span class="number">0</span> {
-                <span class="kw">if</span> <span class="ident">octets</span>[<span class="number">1</span>] <span class="op">==</span> <span class="number">0</span> {
-                    <span class="ident">Ipv4Addr::new</span>(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">Ipv4Addr::new</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)
+    } <span class="kw">else </span>{
+        <span class="comment">// We have to &quot;guess&quot; the mask.
+        //
+        // FIXME(@little-dude) right now, we look at the number or bytes that are 0, but maybe we
+        // should use the number of bits that are 0.
+        //
+        // In other words, with this implementation, the mask of `128.192.0.0` will be
+        // `255.255.0.0` (a.k.a `/16`). But we could also consider that the mask is `/10` (a.k.a
+        // `255.63.0.0`).
+        //
+        // My only source on topic is the &quot;DNS and Bind&quot; book which suggests using bytes, not bits.
+        </span><span class="kw">let </span>octets = ip.octets();
+        <span class="kw">let </span>mask = <span class="kw">if </span>octets[<span class="number">3</span>] == <span class="number">0 </span>{
+            <span class="kw">if </span>octets[<span class="number">2</span>] == <span class="number">0 </span>{
+                <span class="kw">if </span>octets[<span class="number">1</span>] == <span class="number">0 </span>{
+                    Ipv4Addr::new(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
+                } <span class="kw">else </span>{
+                    Ipv4Addr::new(<span class="number">255</span>, <span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">Ipv4Addr::new</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0</span>)
+            } <span class="kw">else </span>{
+                Ipv4Addr::new(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0</span>)
             }
-        } <span class="kw">else</span> {
-            <span class="ident">Ipv4Addr::new</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)
+        } <span class="kw">else </span>{
+            Ipv4Addr::new(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)
         };
-        <span class="prelude-val">Ok</span>(<span class="ident">Network::V4</span>(<span class="ident">ip</span>, <span class="ident">mask</span>))
+        <span class="prelude-val">Ok</span>(Network::V4(ip, mask))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">ip_v6_netw</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Network</span>, <span class="ident">AddrParseError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&#39;/&#39;</span>);
-    <span class="kw">let</span> <span class="ident">ip</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">parse</span>()<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">msk</span>) <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">next</span>() {
-        <span class="comment">// FIXME: validate the mask</span>
-        <span class="prelude-val">Ok</span>(<span class="ident">Network::V6</span>(<span class="ident">ip</span>, <span class="ident">msk</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-    } <span class="kw">else</span> {
-        <span class="comment">// FIXME: &quot;guess&quot; an appropriate mask for the IP</span>
-        <span class="prelude-val">Ok</span>(<span class="ident">Network::V6</span>(
-            <span class="ident">ip</span>,
-            <span class="ident">Ipv6Addr::new</span>(
+<span class="kw">fn </span>ip_v6_netw(val: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Network, AddrParseError&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>pair = val.splitn(<span class="number">2</span>, <span class="string">&#39;/&#39;</span>);
+    <span class="kw">let </span>ip = pair.next().unwrap().parse()<span class="question-mark">?</span>;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(msk) = pair.next() {
+        <span class="comment">// FIXME: validate the mask
+        </span><span class="prelude-val">Ok</span>(Network::V6(ip, msk.parse()<span class="question-mark">?</span>))
+    } <span class="kw">else </span>{
+        <span class="comment">// FIXME: &quot;guess&quot; an appropriate mask for the IP
+        </span><span class="prelude-val">Ok</span>(Network::V6(
+            ip,
+            Ipv6Addr::new(
                 <span class="number">65_535</span>,
                 <span class="number">65_535</span>,
                 <span class="number">65_535</span>,
@@ -342,123 +342,123 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Config</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ParseError</span>::<span class="kw-2">*</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="ident">Config::new</span>();
-    <span class="lifetime">&#39;lines</span>: <span class="kw">for</span> (<span class="ident">lineno</span>, <span class="ident">line</span>) <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">split</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">b&#39;\n&#39;</span>).<span class="ident">enumerate</span>() {
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">c</span> <span class="kw">in</span> <span class="ident">line</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;\t&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39; &#39;</span> {
-                <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">b&#39;#&#39;</span> {
-                    <span class="kw">continue</span> <span class="lifetime">&#39;lines</span>;
-                } <span class="kw">else</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Config, ParseError&gt; {
+    <span class="kw">use </span><span class="self">self</span>::ParseError::<span class="kw-2">*</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>cfg = Config::new();
+    <span class="lifetime">&#39;lines</span>: <span class="kw">for </span>(lineno, line) <span class="kw">in </span>bytes.split(|<span class="kw-2">&amp;</span>x| x == <span class="string">b&#39;\n&#39;</span>).enumerate() {
+        <span class="kw">for </span><span class="kw-2">&amp;</span>c <span class="kw">in </span>line.iter() {
+            <span class="kw">if </span>c != <span class="string">b&#39;\t&#39; </span>&amp;&amp; c != <span class="string">b&#39; &#39; </span>{
+                <span class="kw">if </span>c == <span class="string">b&#39;;&#39; </span>|| c == <span class="string">b&#39;#&#39; </span>{
+                    <span class="kw">continue </span><span class="lifetime">&#39;lines</span>;
+                } <span class="kw">else </span>{
                     <span class="kw">break</span>;
                 }
             }
         }
-        <span class="comment">// All that dances above to allow invalid utf-8 inside the comments</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">words</span> <span class="op">=</span> <span class="ident">from_utf8</span>(<span class="ident">line</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">InvalidUtf8</span>(<span class="ident">lineno</span>, <span class="ident">e</span>))<span class="question-mark">?</span>
-            <span class="comment">// ignore everything after &#39;;&#39; or &#39;#&#39;</span>
-            .<span class="ident">split</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;;&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;#&#39;</span>)
-            .<span class="ident">next</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">InvalidValue</span>(<span class="ident">lineno</span>))<span class="question-mark">?</span>
-            .<span class="ident">split_whitespace</span>();
-        <span class="kw">let</span> <span class="ident">keyword</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">words</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>,
+        <span class="comment">// All that dances above to allow invalid utf-8 inside the comments
+        </span><span class="kw">let </span><span class="kw-2">mut </span>words = from_utf8(line)
+            .map_err(|e| InvalidUtf8(lineno, e))<span class="question-mark">?
+            </span><span class="comment">// ignore everything after &#39;;&#39; or &#39;#&#39;
+            </span>.split(|c| c == <span class="string">&#39;;&#39; </span>|| c == <span class="string">&#39;#&#39;</span>)
+            .next()
+            .ok_or_else(|| InvalidValue(lineno))<span class="question-mark">?
+            </span>.split_whitespace();
+        <span class="kw">let </span>keyword = <span class="kw">match </span>words.next() {
+            <span class="prelude-val">Some</span>(x) =&gt; x,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
         };
-        <span class="kw">match</span> <span class="ident">keyword</span> {
-            <span class="string">&quot;nameserver&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">srv</span> <span class="op">=</span> <span class="ident">words</span>
-                    .<span class="ident">next</span>()
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">InvalidValue</span>(<span class="ident">lineno</span>))
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">addr</span><span class="op">|</span> <span class="ident">addr</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">InvalidIp</span>(<span class="ident">lineno</span>, <span class="ident">e</span>)))<span class="question-mark">?</span><span class="question-mark">?</span>;
-                <span class="ident">cfg</span>.<span class="ident">nameservers</span>.<span class="ident">push</span>(<span class="ident">srv</span>);
-                <span class="kw">if</span> <span class="ident">words</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ExtraData</span>(<span class="ident">lineno</span>));
+        <span class="kw">match </span>keyword {
+            <span class="string">&quot;nameserver&quot; </span>=&gt; {
+                <span class="kw">let </span>srv = words
+                    .next()
+                    .ok_or_else(|| InvalidValue(lineno))
+                    .map(|addr| addr.parse().map_err(|e| InvalidIp(lineno, e)))<span class="question-mark">??</span>;
+                cfg.nameservers.push(srv);
+                <span class="kw">if </span>words.next().is_some() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(ExtraData(lineno));
                 }
             }
-            <span class="string">&quot;domain&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">dom</span> <span class="op">=</span> <span class="ident">words</span>
-                    .<span class="ident">next</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">parse</span>().<span class="ident">ok</span>())
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">InvalidValue</span>(<span class="ident">lineno</span>))<span class="question-mark">?</span>;
-                <span class="ident">cfg</span>.<span class="ident">set_domain</span>(<span class="ident">dom</span>);
-                <span class="kw">if</span> <span class="ident">words</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ExtraData</span>(<span class="ident">lineno</span>));
+            <span class="string">&quot;domain&quot; </span>=&gt; {
+                <span class="kw">let </span>dom = words
+                    .next()
+                    .and_then(|x| x.parse().ok())
+                    .ok_or_else(|| InvalidValue(lineno))<span class="question-mark">?</span>;
+                cfg.set_domain(dom);
+                <span class="kw">if </span>words.next().is_some() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(ExtraData(lineno));
                 }
             }
-            <span class="string">&quot;search&quot;</span> =&gt; {
-                <span class="ident">cfg</span>.<span class="ident">set_search</span>(<span class="ident">words</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>());
+            <span class="string">&quot;search&quot; </span>=&gt; {
+                cfg.set_search(words.map(|x| x.to_string()).collect());
             }
-            <span class="string">&quot;sortlist&quot;</span> =&gt; {
-                <span class="ident">cfg</span>.<span class="ident">sortlist</span>.<span class="ident">clear</span>();
-                <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">words</span> {
-                    <span class="kw">let</span> <span class="ident">netw</span> <span class="op">=</span> <span class="ident">ip_v4_netw</span>(<span class="ident">pair</span>)
-                        .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ip_v6_netw</span>(<span class="ident">pair</span>))
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">InvalidIp</span>(<span class="ident">lineno</span>, <span class="ident">e</span>))<span class="question-mark">?</span>;
-                    <span class="ident">cfg</span>.<span class="ident">sortlist</span>.<span class="ident">push</span>(<span class="ident">netw</span>);
+            <span class="string">&quot;sortlist&quot; </span>=&gt; {
+                cfg.sortlist.clear();
+                <span class="kw">for </span>pair <span class="kw">in </span>words {
+                    <span class="kw">let </span>netw = ip_v4_netw(pair)
+                        .or_else(|<span class="kw">_</span>| ip_v6_netw(pair))
+                        .map_err(|e| InvalidIp(lineno, e))<span class="question-mark">?</span>;
+                    cfg.sortlist.push(netw);
                 }
             }
-            <span class="string">&quot;options&quot;</span> =&gt; {
-                <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">words</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&#39;:&#39;</span>);
-                    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
-                    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
-                    <span class="kw">if</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ExtraData</span>(<span class="ident">lineno</span>));
+            <span class="string">&quot;options&quot; </span>=&gt; {
+                <span class="kw">for </span>pair <span class="kw">in </span>words {
+                    <span class="kw">let </span><span class="kw-2">mut </span>iter = pair.splitn(<span class="number">2</span>, <span class="string">&#39;:&#39;</span>);
+                    <span class="kw">let </span>key = iter.next().unwrap();
+                    <span class="kw">let </span>value = iter.next();
+                    <span class="kw">if </span>iter.next().is_some() {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(ExtraData(lineno));
                     }
-                    <span class="kw">match</span> (<span class="ident">key</span>, <span class="ident">value</span>) {
-                        <span class="comment">// TODO(tailhook) ensure that values are None?</span>
-                        (<span class="string">&quot;debug&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">debug</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;ndots&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">x</span>)) =&gt; {
-                            <span class="ident">cfg</span>.<span class="ident">ndots</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidOptionValue</span>(<span class="ident">lineno</span>))<span class="question-mark">?</span>
-                        }
-                        (<span class="string">&quot;timeout&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">x</span>)) =&gt; {
-                            <span class="ident">cfg</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidOptionValue</span>(<span class="ident">lineno</span>))<span class="question-mark">?</span>
-                        }
-                        (<span class="string">&quot;attempts&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">x</span>)) =&gt; {
-                            <span class="ident">cfg</span>.<span class="ident">attempts</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidOptionValue</span>(<span class="ident">lineno</span>))<span class="question-mark">?</span>
-                        }
-                        (<span class="string">&quot;rotate&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">rotate</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;no-check-names&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">no_check_names</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;inet6&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">inet6</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;ip6-bytestring&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">ip6_bytestring</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;ip6-dotint&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">ip6_dotint</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;no-ip6-dotint&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">ip6_dotint</span> <span class="op">=</span> <span class="bool-val">false</span>,
-                        (<span class="string">&quot;edns0&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">edns0</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;single-request&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">single_request</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;single-request-reopen&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">single_request_reopen</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;no-reload&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">no_reload</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;trust-ad&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">trust_ad</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;no-tld-query&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">no_tld_query</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;use-vc&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">use_vc</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidOption</span>(<span class="ident">lineno</span>)),
-                    }
-                }
-            }
-            <span class="string">&quot;lookup&quot;</span> =&gt; {
-                <span class="kw">for</span> <span class="ident">word</span> <span class="kw">in</span> <span class="ident">words</span> {
-                    <span class="kw">match</span> <span class="ident">word</span> {
-                        <span class="string">&quot;file&quot;</span> =&gt; <span class="ident">cfg</span>.<span class="ident">lookup</span>.<span class="ident">push</span>(<span class="ident">Lookup::File</span>),
-                        <span class="string">&quot;bind&quot;</span> =&gt; <span class="ident">cfg</span>.<span class="ident">lookup</span>.<span class="ident">push</span>(<span class="ident">Lookup::Bind</span>),
-                        <span class="ident">extra</span> =&gt; <span class="ident">cfg</span>.<span class="ident">lookup</span>.<span class="ident">push</span>(<span class="ident">Lookup::Extra</span>(<span class="ident">extra</span>.<span class="ident">to_string</span>())),
+                    <span class="kw">match </span>(key, value) {
+                        <span class="comment">// TODO(tailhook) ensure that values are None?
+                        </span>(<span class="string">&quot;debug&quot;</span>, <span class="kw">_</span>) =&gt; cfg.debug = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;ndots&quot;</span>, <span class="prelude-val">Some</span>(x)) =&gt; {
+                            cfg.ndots = x.parse().map_err(|<span class="kw">_</span>| InvalidOptionValue(lineno))<span class="question-mark">?
+                        </span>}
+                        (<span class="string">&quot;timeout&quot;</span>, <span class="prelude-val">Some</span>(x)) =&gt; {
+                            cfg.timeout = x.parse().map_err(|<span class="kw">_</span>| InvalidOptionValue(lineno))<span class="question-mark">?
+                        </span>}
+                        (<span class="string">&quot;attempts&quot;</span>, <span class="prelude-val">Some</span>(x)) =&gt; {
+                            cfg.attempts = x.parse().map_err(|<span class="kw">_</span>| InvalidOptionValue(lineno))<span class="question-mark">?
+                        </span>}
+                        (<span class="string">&quot;rotate&quot;</span>, <span class="kw">_</span>) =&gt; cfg.rotate = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;no-check-names&quot;</span>, <span class="kw">_</span>) =&gt; cfg.no_check_names = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;inet6&quot;</span>, <span class="kw">_</span>) =&gt; cfg.inet6 = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;ip6-bytestring&quot;</span>, <span class="kw">_</span>) =&gt; cfg.ip6_bytestring = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;ip6-dotint&quot;</span>, <span class="kw">_</span>) =&gt; cfg.ip6_dotint = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;no-ip6-dotint&quot;</span>, <span class="kw">_</span>) =&gt; cfg.ip6_dotint = <span class="bool-val">false</span>,
+                        (<span class="string">&quot;edns0&quot;</span>, <span class="kw">_</span>) =&gt; cfg.edns0 = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;single-request&quot;</span>, <span class="kw">_</span>) =&gt; cfg.single_request = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;single-request-reopen&quot;</span>, <span class="kw">_</span>) =&gt; cfg.single_request_reopen = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;no-reload&quot;</span>, <span class="kw">_</span>) =&gt; cfg.no_reload = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;trust-ad&quot;</span>, <span class="kw">_</span>) =&gt; cfg.trust_ad = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;no-tld-query&quot;</span>, <span class="kw">_</span>) =&gt; cfg.no_tld_query = <span class="bool-val">true</span>,
+                        (<span class="string">&quot;use-vc&quot;</span>, <span class="kw">_</span>) =&gt; cfg.use_vc = <span class="bool-val">true</span>,
+                        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidOption(lineno)),
                     }
                 }
             }
-            <span class="string">&quot;family&quot;</span> =&gt; {
-                <span class="kw">for</span> <span class="ident">word</span> <span class="kw">in</span> <span class="ident">words</span> {
-                    <span class="kw">match</span> <span class="ident">word</span> {
-                        <span class="string">&quot;inet4&quot;</span> =&gt; <span class="ident">cfg</span>.<span class="ident">family</span>.<span class="ident">push</span>(<span class="ident">Family::Inet4</span>),
-                        <span class="string">&quot;inet6&quot;</span> =&gt; <span class="ident">cfg</span>.<span class="ident">family</span>.<span class="ident">push</span>(<span class="ident">Family::Inet6</span>),
-                        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidValue</span>(<span class="ident">lineno</span>)),
+            <span class="string">&quot;lookup&quot; </span>=&gt; {
+                <span class="kw">for </span>word <span class="kw">in </span>words {
+                    <span class="kw">match </span>word {
+                        <span class="string">&quot;file&quot; </span>=&gt; cfg.lookup.push(Lookup::File),
+                        <span class="string">&quot;bind&quot; </span>=&gt; cfg.lookup.push(Lookup::Bind),
+                        extra =&gt; cfg.lookup.push(Lookup::Extra(extra.to_string())),
                     }
                 }
             }
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidDirective</span>(<span class="ident">lineno</span>)),
+            <span class="string">&quot;family&quot; </span>=&gt; {
+                <span class="kw">for </span>word <span class="kw">in </span>words {
+                    <span class="kw">match </span>word {
+                        <span class="string">&quot;inet4&quot; </span>=&gt; cfg.family.push(Family::Inet4),
+                        <span class="string">&quot;inet6&quot; </span>=&gt; cfg.family.push(Family::Inet6),
+                        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidValue(lineno)),
+                    }
+                }
+            }
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidDirective(lineno)),
         }
     }
-    <span class="prelude-val">Ok</span>(<span class="ident">cfg</span>)
+    <span class="prelude-val">Ok</span>(cfg)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="resolv_conf" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="resolv_conf" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-util-0.7.3/src/io/reader_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reader_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-util-0.7.3/src/io/reader_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reader_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -116,123 +116,123 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Bytes</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">futures_core::stream::Stream</span>;
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tokio::io::AsyncRead</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>bytes::{Bytes, BytesMut};
+<span class="kw">use </span>futures_core::stream::Stream;
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>tokio::io::AsyncRead;
 
-<span class="kw">const</span> <span class="ident">DEFAULT_CAPACITY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span>;
+<span class="kw">const </span>DEFAULT_CAPACITY: usize = <span class="number">4096</span>;
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// Convert an [`AsyncRead`] into a [`Stream`] of byte chunks.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This stream is fused. It performs the inverse operation of</span>
-    <span class="doccomment">/// [`StreamReader`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; std::io::Result&lt;()&gt; {</span>
-    <span class="doccomment">/// use tokio_stream::StreamExt;</span>
-    <span class="doccomment">/// use tokio_util::io::ReaderStream;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create a stream of data.</span>
-    <span class="doccomment">/// let data = b&quot;hello, world!&quot;;</span>
-    <span class="doccomment">/// let mut stream = ReaderStream::new(&amp;data[..]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Read all of the chunks into a vector.</span>
-    <span class="doccomment">/// let mut stream_contents = Vec::new();</span>
-    <span class="doccomment">/// while let Some(chunk) = stream.next().await {</span>
-    <span class="doccomment">///    stream_contents.extend_from_slice(&amp;chunk?);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Once the chunks are concatenated, we should have the</span>
-    <span class="doccomment">/// // original data.</span>
-    <span class="doccomment">/// assert_eq!(stream_contents, data);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AsyncRead`]: tokio::io::AsyncRead</span>
-    <span class="doccomment">/// [`StreamReader`]: crate::io::StreamReader</span>
-    <span class="doccomment">/// [`Stream`]: futures_core::Stream</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReaderStream</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="comment">// Reader itself.</span>
-        <span class="comment">//</span>
-        <span class="comment">// This value is `None` if the stream has terminated.</span>
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">reader</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-        <span class="comment">// Working buffer, used to optimize allocations.</span>
-        <span class="ident">buf</span>: <span class="ident">BytesMut</span>,
-        <span class="ident">capacity</span>: <span class="ident">usize</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// Convert an [`AsyncRead`] into a [`Stream`] of byte chunks.
+    ///
+    /// This stream is fused. It performs the inverse operation of
+    /// [`StreamReader`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; std::io::Result&lt;()&gt; {
+    /// use tokio_stream::StreamExt;
+    /// use tokio_util::io::ReaderStream;
+    ///
+    /// // Create a stream of data.
+    /// let data = b&quot;hello, world!&quot;;
+    /// let mut stream = ReaderStream::new(&amp;data[..]);
+    ///
+    /// // Read all of the chunks into a vector.
+    /// let mut stream_contents = Vec::new();
+    /// while let Some(chunk) = stream.next().await {
+    ///    stream_contents.extend_from_slice(&amp;chunk?);
+    /// }
+    ///
+    /// // Once the chunks are concatenated, we should have the
+    /// // original data.
+    /// assert_eq!(stream_contents, data);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`AsyncRead`]: tokio::io::AsyncRead
+    /// [`StreamReader`]: crate::io::StreamReader
+    /// [`Stream`]: futures_core::Stream
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>ReaderStream&lt;R&gt; {
+        <span class="comment">// Reader itself.
+        //
+        // This value is `None` if the stream has terminated.
+        </span><span class="attribute">#[pin]
+        </span>reader: <span class="prelude-ty">Option</span>&lt;R&gt;,
+        <span class="comment">// Working buffer, used to optimize allocations.
+        </span>buf: BytesMut,
+        capacity: usize,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncRead</span><span class="op">&gt;</span> <span class="ident">ReaderStream</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Convert an [`AsyncRead`] into a [`Stream`] with item type</span>
-    <span class="doccomment">/// `Result&lt;Bytes, std::io::Error&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AsyncRead`]: tokio::io::AsyncRead</span>
-    <span class="doccomment">/// [`Stream`]: futures_core::Stream</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ReaderStream</span> {
-            <span class="ident">reader</span>: <span class="prelude-val">Some</span>(<span class="ident">reader</span>),
-            <span class="ident">buf</span>: <span class="ident">BytesMut::new</span>(),
-            <span class="ident">capacity</span>: <span class="ident">DEFAULT_CAPACITY</span>,
+<span class="kw">impl</span>&lt;R: AsyncRead&gt; ReaderStream&lt;R&gt; {
+    <span class="doccomment">/// Convert an [`AsyncRead`] into a [`Stream`] with item type
+    /// `Result&lt;Bytes, std::io::Error&gt;`.
+    ///
+    /// [`AsyncRead`]: tokio::io::AsyncRead
+    /// [`Stream`]: futures_core::Stream
+    </span><span class="kw">pub fn </span>new(reader: R) -&gt; <span class="self">Self </span>{
+        ReaderStream {
+            reader: <span class="prelude-val">Some</span>(reader),
+            buf: BytesMut::new(),
+            capacity: DEFAULT_CAPACITY,
         }
     }
 
-    <span class="doccomment">/// Convert an [`AsyncRead`] into a [`Stream`] with item type</span>
-    <span class="doccomment">/// `Result&lt;Bytes, std::io::Error&gt;`,</span>
-    <span class="doccomment">/// with a specific read buffer initial capacity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AsyncRead`]: tokio::io::AsyncRead</span>
-    <span class="doccomment">/// [`Stream`]: futures_core::Stream</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">reader</span>: <span class="ident">R</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ReaderStream</span> {
-            <span class="ident">reader</span>: <span class="prelude-val">Some</span>(<span class="ident">reader</span>),
-            <span class="ident">buf</span>: <span class="ident">BytesMut::with_capacity</span>(<span class="ident">capacity</span>),
-            <span class="ident">capacity</span>,
+    <span class="doccomment">/// Convert an [`AsyncRead`] into a [`Stream`] with item type
+    /// `Result&lt;Bytes, std::io::Error&gt;`,
+    /// with a specific read buffer initial capacity.
+    ///
+    /// [`AsyncRead`]: tokio::io::AsyncRead
+    /// [`Stream`]: futures_core::Stream
+    </span><span class="kw">pub fn </span>with_capacity(reader: R, capacity: usize) -&gt; <span class="self">Self </span>{
+        ReaderStream {
+            reader: <span class="prelude-val">Some</span>(reader),
+            buf: BytesMut::with_capacity(capacity),
+            capacity,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncRead</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">ReaderStream</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::poll_read_buf</span>;
+<span class="kw">impl</span>&lt;R: AsyncRead&gt; Stream <span class="kw">for </span>ReaderStream&lt;R&gt; {
+    <span class="kw">type </span>Item = std::io::Result&lt;Bytes&gt;;
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">use </span><span class="kw">crate</span>::util::poll_read_buf;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.as_mut().project();
 
-        <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">reader</span>.<span class="ident">as_pin_mut</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+        <span class="kw">let </span>reader = <span class="kw">match </span>this.reader.as_pin_mut() {
+            <span class="prelude-val">Some</span>(r) =&gt; r,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>),
         };
 
-        <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">capacity</span>() <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">reserve</span>(<span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">capacity</span>);
+        <span class="kw">if </span>this.buf.capacity() == <span class="number">0 </span>{
+            this.buf.reserve(<span class="kw-2">*</span>this.capacity);
         }
 
-        <span class="kw">match</span> <span class="ident">poll_read_buf</span>(<span class="ident">reader</span>, <span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">this</span>.<span class="ident">buf</span>) {
-            <span class="ident">Poll::Pending</span> =&gt; <span class="ident">Poll::Pending</span>,
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
-                <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">reader</span>.<span class="ident">set</span>(<span class="prelude-val">None</span>);
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)))
+        <span class="kw">match </span>poll_read_buf(reader, cx, <span class="kw-2">&amp;mut </span>this.buf) {
+            Poll::Pending =&gt; Poll::Pending,
+            Poll::Ready(<span class="prelude-val">Err</span>(err)) =&gt; {
+                <span class="self">self</span>.project().reader.set(<span class="prelude-val">None</span>);
+                Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)))
             }
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>)) =&gt; {
-                <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">reader</span>.<span class="ident">set</span>(<span class="prelude-val">None</span>);
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
+            Poll::Ready(<span class="prelude-val">Ok</span>(<span class="number">0</span>)) =&gt; {
+                <span class="self">self</span>.project().reader.set(<span class="prelude-val">None</span>);
+                Poll::Ready(<span class="prelude-val">None</span>)
             }
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="kw">_</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">split</span>();
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">chunk</span>.<span class="ident">freeze</span>())))
+            Poll::Ready(<span class="prelude-val">Ok</span>(<span class="kw">_</span>)) =&gt; {
+                <span class="kw">let </span>chunk = this.buf.split();
+                Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(chunk.freeze())))
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

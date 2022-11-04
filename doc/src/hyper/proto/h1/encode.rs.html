@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/h1/encode.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>encode.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../hyper/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/h1/encode.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>encode.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../hyper/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -437,444 +437,444 @@
 <span id="437">437</span>
 <span id="438">438</span>
 <span id="439">439</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::io::IoSlice</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::io::IoSlice;
 
-<span class="kw">use</span> <span class="ident">bytes::buf</span>::{<span class="ident">Chain</span>, <span class="ident">Take</span>};
-<span class="kw">use</span> <span class="ident">bytes::Buf</span>;
-<span class="kw">use</span> <span class="ident">tracing::trace</span>;
+<span class="kw">use </span>bytes::buf::{Chain, Take};
+<span class="kw">use </span>bytes::Buf;
+<span class="kw">use </span>tracing::trace;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::io::WriteBuf</span>;
+<span class="kw">use </span><span class="kw">super</span>::io::WriteBuf;
 
-<span class="kw">type</span> <span class="ident">StaticBuf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>];
+<span class="kw">type </span>StaticBuf = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8];
 
-<span class="doccomment">/// Encoders to handle different Transfer-Encodings.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Encoder</span> {
-    <span class="ident">kind</span>: <span class="ident">Kind</span>,
-    <span class="ident">is_last</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Encoders to handle different Transfer-Encodings.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Encoder {
+    kind: Kind,
+    is_last: bool,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="ident">kind</span>: <span class="ident">BufKind</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EncodedBuf&lt;B&gt; {
+    kind: BufKind&lt;B&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">NotEof</span>(<span class="ident">u64</span>);
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>NotEof(u64);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Kind</span> {
-    <span class="doccomment">/// An Encoder for when Transfer-Encoding includes `chunked`.</span>
-    <span class="ident">Chunked</span>,
-    <span class="doccomment">/// An Encoder for when Content-Length is set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Enforces that the body is not longer than the Content-Length header.</span>
-    <span class="ident">Length</span>(<span class="ident">u64</span>),
-    <span class="doccomment">/// An Encoder for when neither Content-Length nor Chunked encoding is set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is mostly only used with HTTP/1.0 with a length. This kind requires</span>
-    <span class="doccomment">/// the connection to be closed when the body is finished.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-    <span class="ident">CloseDelimited</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">enum </span>Kind {
+    <span class="doccomment">/// An Encoder for when Transfer-Encoding includes `chunked`.
+    </span>Chunked,
+    <span class="doccomment">/// An Encoder for when Content-Length is set.
+    ///
+    /// Enforces that the body is not longer than the Content-Length header.
+    </span>Length(u64),
+    <span class="doccomment">/// An Encoder for when neither Content-Length nor Chunked encoding is set.
+    ///
+    /// This is mostly only used with HTTP/1.0 with a length. This kind requires
+    /// the connection to be closed when the body is finished.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;server&quot;</span>)]
+    </span>CloseDelimited,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">BufKind</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="ident">Exact</span>(<span class="ident">B</span>),
-    <span class="ident">Limited</span>(<span class="ident">Take</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>),
-    <span class="ident">Chunked</span>(<span class="ident">Chain</span><span class="op">&lt;</span><span class="ident">Chain</span><span class="op">&lt;</span><span class="ident">ChunkSize</span>, <span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">StaticBuf</span><span class="op">&gt;</span>),
-    <span class="ident">ChunkedEnd</span>(<span class="ident">StaticBuf</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>BufKind&lt;B&gt; {
+    Exact(B),
+    Limited(Take&lt;B&gt;),
+    Chunked(Chain&lt;Chain&lt;ChunkSize, B&gt;, StaticBuf&gt;),
+    ChunkedEnd(StaticBuf),
 }
 
-<span class="kw">impl</span> <span class="ident">Encoder</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>) -&gt; <span class="ident">Encoder</span> {
-        <span class="ident">Encoder</span> {
-            <span class="ident">kind</span>,
-            <span class="ident">is_last</span>: <span class="bool-val">false</span>,
+<span class="kw">impl </span>Encoder {
+    <span class="kw">fn </span>new(kind: Kind) -&gt; Encoder {
+        Encoder {
+            kind,
+            is_last: <span class="bool-val">false</span>,
         }
     }
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">chunked</span>() -&gt; <span class="ident">Encoder</span> {
-        <span class="ident">Encoder::new</span>(<span class="ident">Kind::Chunked</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>chunked() -&gt; Encoder {
+        Encoder::new(Kind::Chunked)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">length</span>(<span class="ident">len</span>: <span class="ident">u64</span>) -&gt; <span class="ident">Encoder</span> {
-        <span class="ident">Encoder::new</span>(<span class="ident">Kind::Length</span>(<span class="ident">len</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>length(len: u64) -&gt; Encoder {
+        Encoder::new(Kind::Length(len))
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">close_delimited</span>() -&gt; <span class="ident">Encoder</span> {
-        <span class="ident">Encoder::new</span>(<span class="ident">Kind::CloseDelimited</span>)
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;server&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>close_delimited() -&gt; Encoder {
+        Encoder::new(Kind::CloseDelimited)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_eof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">Kind::Length</span>(<span class="number">0</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_eof(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.kind, Kind::Length(<span class="number">0</span>))
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_last</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">is_last</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">is_last</span> <span class="op">=</span> <span class="ident">is_last</span>;
-        <span class="self">self</span>
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;server&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_last(<span class="kw-2">mut </span><span class="self">self</span>, is_last: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.is_last = is_last;
+        <span class="self">self
+    </span>}
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_last(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_last
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_last</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_last</span>
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_close_delimited</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-            <span class="ident">Kind::CloseDelimited</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_close_delimited(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;server&quot;</span>)]
+            </span>Kind::CloseDelimited =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">end</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">NotEof</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Length</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            <span class="ident">Kind::Chunked</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">EncodedBuf</span> {
-                <span class="ident">kind</span>: <span class="ident">BufKind::ChunkedEnd</span>(<span class="string">b&quot;0\r\n\r\n&quot;</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>end&lt;B&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;EncodedBuf&lt;B&gt;&gt;, NotEof&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            Kind::Length(<span class="number">0</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            Kind::Chunked =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(EncodedBuf {
+                kind: BufKind::ChunkedEnd(<span class="string">b&quot;0\r\n\r\n&quot;</span>),
             })),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-            <span class="ident">Kind::CloseDelimited</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            <span class="ident">Kind::Length</span>(<span class="ident">n</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">NotEof</span>(<span class="ident">n</span>)),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;server&quot;</span>)]
+            </span>Kind::CloseDelimited =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            Kind::Length(n) =&gt; <span class="prelude-val">Err</span>(NotEof(n)),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">B</span>) -&gt; <span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>encode&lt;B&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, msg: B) -&gt; EncodedBuf&lt;B&gt;
+    <span class="kw">where
+        </span>B: Buf,
     {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">remaining</span>();
-        <span class="macro">debug_assert!</span>(<span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;encode() called with empty buf&quot;</span>);
+        <span class="kw">let </span>len = msg.remaining();
+        <span class="macro">debug_assert!</span>(len &gt; <span class="number">0</span>, <span class="string">&quot;encode() called with empty buf&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Chunked</span> =&gt; {
-                <span class="macro">trace!</span>(<span class="string">&quot;encoding chunked {}B&quot;</span>, <span class="ident">len</span>);
-                <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ChunkSize::new</span>(<span class="ident">len</span>)
-                    .<span class="ident">chain</span>(<span class="ident">msg</span>)
-                    .<span class="ident">chain</span>(<span class="string">b&quot;\r\n&quot;</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]);
-                <span class="ident">BufKind::Chunked</span>(<span class="ident">buf</span>)
+        <span class="kw">let </span>kind = <span class="kw">match </span><span class="self">self</span>.kind {
+            Kind::Chunked =&gt; {
+                <span class="macro">trace!</span>(<span class="string">&quot;encoding chunked {}B&quot;</span>, len);
+                <span class="kw">let </span>buf = ChunkSize::new(len)
+                    .chain(msg)
+                    .chain(<span class="string">b&quot;\r\n&quot; </span><span class="kw">as </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8]);
+                BufKind::Chunked(buf)
             }
-            <span class="ident">Kind::Length</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">remaining</span>) =&gt; {
-                <span class="macro">trace!</span>(<span class="string">&quot;sized write, len = {}&quot;</span>, <span class="ident">len</span>);
-                <span class="kw">if</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">remaining</span> {
-                    <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="kw-2">*</span><span class="ident">remaining</span> <span class="op">=</span> <span class="number">0</span>;
-                    <span class="ident">BufKind::Limited</span>(<span class="ident">msg</span>.<span class="ident">take</span>(<span class="ident">limit</span>))
-                } <span class="kw">else</span> {
-                    <span class="kw-2">*</span><span class="ident">remaining</span> <span class="op">-</span><span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u64</span>;
-                    <span class="ident">BufKind::Exact</span>(<span class="ident">msg</span>)
+            Kind::Length(<span class="kw-2">ref mut </span>remaining) =&gt; {
+                <span class="macro">trace!</span>(<span class="string">&quot;sized write, len = {}&quot;</span>, len);
+                <span class="kw">if </span>len <span class="kw">as </span>u64 &gt; <span class="kw-2">*</span>remaining {
+                    <span class="kw">let </span>limit = <span class="kw-2">*</span>remaining <span class="kw">as </span>usize;
+                    <span class="kw-2">*</span>remaining = <span class="number">0</span>;
+                    BufKind::Limited(msg.take(limit))
+                } <span class="kw">else </span>{
+                    <span class="kw-2">*</span>remaining -= len <span class="kw">as </span>u64;
+                    BufKind::Exact(msg)
                 }
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-            <span class="ident">Kind::CloseDelimited</span> =&gt; {
-                <span class="macro">trace!</span>(<span class="string">&quot;close delimited write {}B&quot;</span>, <span class="ident">len</span>);
-                <span class="ident">BufKind::Exact</span>(<span class="ident">msg</span>)
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;server&quot;</span>)]
+            </span>Kind::CloseDelimited =&gt; {
+                <span class="macro">trace!</span>(<span class="string">&quot;close delimited write {}B&quot;</span>, len);
+                BufKind::Exact(msg)
             }
         };
-        <span class="ident">EncodedBuf</span> { <span class="ident">kind</span> }
+        EncodedBuf { kind }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">encode_and_end</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">B</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">WriteBuf</span><span class="op">&lt;</span><span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>encode_and_end&lt;B&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: B, dst: <span class="kw-2">&amp;mut </span>WriteBuf&lt;EncodedBuf&lt;B&gt;&gt;) -&gt; bool
+    <span class="kw">where
+        </span>B: Buf,
     {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">remaining</span>();
-        <span class="macro">debug_assert!</span>(<span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;encode() called with empty buf&quot;</span>);
+        <span class="kw">let </span>len = msg.remaining();
+        <span class="macro">debug_assert!</span>(len &gt; <span class="number">0</span>, <span class="string">&quot;encode() called with empty buf&quot;</span>);
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Chunked</span> =&gt; {
-                <span class="macro">trace!</span>(<span class="string">&quot;encoding chunked {}B&quot;</span>, <span class="ident">len</span>);
-                <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ChunkSize::new</span>(<span class="ident">len</span>)
-                    .<span class="ident">chain</span>(<span class="ident">msg</span>)
-                    .<span class="ident">chain</span>(<span class="string">b&quot;\r\n0\r\n\r\n&quot;</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]);
-                <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">buf</span>);
-                <span class="op">!</span><span class="self">self</span>.<span class="ident">is_last</span>
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            Kind::Chunked =&gt; {
+                <span class="macro">trace!</span>(<span class="string">&quot;encoding chunked {}B&quot;</span>, len);
+                <span class="kw">let </span>buf = ChunkSize::new(len)
+                    .chain(msg)
+                    .chain(<span class="string">b&quot;\r\n0\r\n\r\n&quot; </span><span class="kw">as </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8]);
+                dst.buffer(buf);
+                !<span class="self">self</span>.is_last
             }
-            <span class="ident">Kind::Length</span>(<span class="ident">remaining</span>) =&gt; {
-                <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
+            Kind::Length(remaining) =&gt; {
+                <span class="kw">use </span>std::cmp::Ordering;
 
-                <span class="macro">trace!</span>(<span class="string">&quot;sized write, len = {}&quot;</span>, <span class="ident">len</span>);
-                <span class="kw">match</span> (<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">remaining</span>) {
-                    <span class="ident">Ordering::Equal</span> =&gt; {
-                        <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">msg</span>);
-                        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_last</span>
+                <span class="macro">trace!</span>(<span class="string">&quot;sized write, len = {}&quot;</span>, len);
+                <span class="kw">match </span>(len <span class="kw">as </span>u64).cmp(<span class="kw-2">&amp;</span>remaining) {
+                    Ordering::Equal =&gt; {
+                        dst.buffer(msg);
+                        !<span class="self">self</span>.is_last
                     }
-                    <span class="ident">Ordering::Greater</span> =&gt; {
-                        <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">msg</span>.<span class="ident">take</span>(<span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">usize</span>));
-                        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_last</span>
+                    Ordering::Greater =&gt; {
+                        dst.buffer(msg.take(remaining <span class="kw">as </span>usize));
+                        !<span class="self">self</span>.is_last
                     }
-                    <span class="ident">Ordering::Less</span> =&gt; {
-                        <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">msg</span>);
-                        <span class="bool-val">false</span>
-                    }
+                    Ordering::Less =&gt; {
+                        dst.buffer(msg);
+                        <span class="bool-val">false
+                    </span>}
                 }
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-            <span class="ident">Kind::CloseDelimited</span> =&gt; {
-                <span class="macro">trace!</span>(<span class="string">&quot;close delimited write {}B&quot;</span>, <span class="ident">len</span>);
-                <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">msg</span>);
-                <span class="bool-val">false</span>
-            }
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;server&quot;</span>)]
+            </span>Kind::CloseDelimited =&gt; {
+                <span class="macro">trace!</span>(<span class="string">&quot;close delimited write {}B&quot;</span>, len);
+                dst.buffer(msg);
+                <span class="bool-val">false
+            </span>}
         }
     }
 
-    <span class="doccomment">/// Encodes the full body, without verifying the remaining length matches.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used in conjunction with HttpBody::__hyper_full_data(), which</span>
-    <span class="doccomment">/// means we can trust that the buf has the correct size (the buf itself</span>
-    <span class="doccomment">/// was checked to make the headers).</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">danger_full_buf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">B</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">WriteBuf</span><span class="op">&lt;</span><span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>)
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="doccomment">/// Encodes the full body, without verifying the remaining length matches.
+    ///
+    /// This is used in conjunction with HttpBody::__hyper_full_data(), which
+    /// means we can trust that the buf has the correct size (the buf itself
+    /// was checked to make the headers).
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>danger_full_buf&lt;B&gt;(<span class="self">self</span>, msg: B, dst: <span class="kw-2">&amp;mut </span>WriteBuf&lt;EncodedBuf&lt;B&gt;&gt;)
+    <span class="kw">where
+        </span>B: Buf,
     {
-        <span class="macro">debug_assert!</span>(<span class="ident">msg</span>.<span class="ident">remaining</span>() <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;encode() called with empty buf&quot;</span>);
+        <span class="macro">debug_assert!</span>(msg.remaining() &gt; <span class="number">0</span>, <span class="string">&quot;encode() called with empty buf&quot;</span>);
         <span class="macro">debug_assert!</span>(
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-                <span class="ident">Kind::Length</span>(<span class="ident">len</span>) =&gt; <span class="ident">len</span> <span class="op">==</span> <span class="ident">msg</span>.<span class="ident">remaining</span>() <span class="kw">as</span> <span class="ident">u64</span>,
-                <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
+            <span class="kw">match </span><span class="self">self</span>.kind {
+                Kind::Length(len) =&gt; len == msg.remaining() <span class="kw">as </span>u64,
+                <span class="kw">_ </span>=&gt; <span class="bool-val">true</span>,
             },
-            <span class="string">&quot;danger_full_buf length mismatches&quot;</span>
-        );
+            <span class="string">&quot;danger_full_buf length mismatches&quot;
+        </span>);
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Chunked</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">remaining</span>();
-                <span class="macro">trace!</span>(<span class="string">&quot;encoding chunked {}B&quot;</span>, <span class="ident">len</span>);
-                <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ChunkSize::new</span>(<span class="ident">len</span>)
-                    .<span class="ident">chain</span>(<span class="ident">msg</span>)
-                    .<span class="ident">chain</span>(<span class="string">b&quot;\r\n0\r\n\r\n&quot;</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]);
-                <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">buf</span>);
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            Kind::Chunked =&gt; {
+                <span class="kw">let </span>len = msg.remaining();
+                <span class="macro">trace!</span>(<span class="string">&quot;encoding chunked {}B&quot;</span>, len);
+                <span class="kw">let </span>buf = ChunkSize::new(len)
+                    .chain(msg)
+                    .chain(<span class="string">b&quot;\r\n0\r\n\r\n&quot; </span><span class="kw">as </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8]);
+                dst.buffer(buf);
             }
-            <span class="kw">_</span> =&gt; {
-                <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">msg</span>);
+            <span class="kw">_ </span>=&gt; {
+                dst.buffer(msg);
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Buf</span> <span class="kw">for</span> <span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+<span class="kw">impl</span>&lt;B&gt; Buf <span class="kw">for </span>EncodedBuf&lt;B&gt;
+<span class="kw">where
+    </span>B: Buf,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">BufKind::Exact</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">remaining</span>(),
-            <span class="ident">BufKind::Limited</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">remaining</span>(),
-            <span class="ident">BufKind::Chunked</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">remaining</span>(),
-            <span class="ident">BufKind::ChunkedEnd</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">remaining</span>(),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>remaining(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            BufKind::Exact(<span class="kw-2">ref </span>b) =&gt; b.remaining(),
+            BufKind::Limited(<span class="kw-2">ref </span>b) =&gt; b.remaining(),
+            BufKind::Chunked(<span class="kw-2">ref </span>b) =&gt; b.remaining(),
+            BufKind::ChunkedEnd(<span class="kw-2">ref </span>b) =&gt; b.remaining(),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">BufKind::Exact</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">chunk</span>(),
-            <span class="ident">BufKind::Limited</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">chunk</span>(),
-            <span class="ident">BufKind::Chunked</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">chunk</span>(),
-            <span class="ident">BufKind::ChunkedEnd</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">chunk</span>(),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>chunk(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            BufKind::Exact(<span class="kw-2">ref </span>b) =&gt; b.chunk(),
+            BufKind::Limited(<span class="kw-2">ref </span>b) =&gt; b.chunk(),
+            BufKind::Chunked(<span class="kw-2">ref </span>b) =&gt; b.chunk(),
+            BufKind::ChunkedEnd(<span class="kw-2">ref </span>b) =&gt; b.chunk(),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">BufKind::Exact</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">advance</span>(<span class="ident">cnt</span>),
-            <span class="ident">BufKind::Limited</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">advance</span>(<span class="ident">cnt</span>),
-            <span class="ident">BufKind::Chunked</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">advance</span>(<span class="ident">cnt</span>),
-            <span class="ident">BufKind::ChunkedEnd</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">advance</span>(<span class="ident">cnt</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize) {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            BufKind::Exact(<span class="kw-2">ref mut </span>b) =&gt; b.advance(cnt),
+            BufKind::Limited(<span class="kw-2">ref mut </span>b) =&gt; b.advance(cnt),
+            BufKind::Chunked(<span class="kw-2">ref mut </span>b) =&gt; b.advance(cnt),
+            BufKind::ChunkedEnd(<span class="kw-2">ref mut </span>b) =&gt; b.advance(cnt),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chunks_vectored</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;t</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span>]) -&gt; <span class="ident">usize</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">BufKind::Exact</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">chunks_vectored</span>(<span class="ident">dst</span>),
-            <span class="ident">BufKind::Limited</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">chunks_vectored</span>(<span class="ident">dst</span>),
-            <span class="ident">BufKind::Chunked</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">chunks_vectored</span>(<span class="ident">dst</span>),
-            <span class="ident">BufKind::ChunkedEnd</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">chunks_vectored</span>(<span class="ident">dst</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>chunks_vectored&lt;<span class="lifetime">&#39;t</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>[IoSlice&lt;<span class="lifetime">&#39;t</span>&gt;]) -&gt; usize {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            BufKind::Exact(<span class="kw-2">ref </span>b) =&gt; b.chunks_vectored(dst),
+            BufKind::Limited(<span class="kw-2">ref </span>b) =&gt; b.chunks_vectored(dst),
+            BufKind::Chunked(<span class="kw-2">ref </span>b) =&gt; b.chunks_vectored(dst),
+            BufKind::ChunkedEnd(<span class="kw-2">ref </span>b) =&gt; b.chunks_vectored(dst),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">USIZE_BYTES</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;32&quot;</span>)]
+</span><span class="kw">const </span>USIZE_BYTES: usize = <span class="number">4</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">USIZE_BYTES</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+</span><span class="kw">const </span>USIZE_BYTES: usize = <span class="number">8</span>;
 
-<span class="comment">// each byte will become 2 hex</span>
-<span class="kw">const</span> <span class="ident">CHUNK_SIZE_MAX_BYTES</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">USIZE_BYTES</span> <span class="op">*</span> <span class="number">2</span>;
+<span class="comment">// each byte will become 2 hex
+</span><span class="kw">const </span>CHUNK_SIZE_MAX_BYTES: usize = USIZE_BYTES * <span class="number">2</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">struct</span> <span class="ident">ChunkSize</span> {
-    <span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="ident">CHUNK_SIZE_MAX_BYTES</span> <span class="op">+</span> <span class="number">2</span>],
-    <span class="ident">pos</span>: <span class="ident">u8</span>,
-    <span class="ident">len</span>: <span class="ident">u8</span>,
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">struct </span>ChunkSize {
+    bytes: [u8; CHUNK_SIZE_MAX_BYTES + <span class="number">2</span>],
+    pos: u8,
+    len: u8,
 }
 
-<span class="kw">impl</span> <span class="ident">ChunkSize</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ChunkSize</span> {
-        <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">ChunkSize</span> {
-            <span class="ident">bytes</span>: [<span class="number">0</span>; <span class="ident">CHUNK_SIZE_MAX_BYTES</span> <span class="op">+</span> <span class="number">2</span>],
-            <span class="ident">pos</span>: <span class="number">0</span>,
-            <span class="ident">len</span>: <span class="number">0</span>,
+<span class="kw">impl </span>ChunkSize {
+    <span class="kw">fn </span>new(len: usize) -&gt; ChunkSize {
+        <span class="kw">use </span>std::fmt::Write;
+        <span class="kw">let </span><span class="kw-2">mut </span>size = ChunkSize {
+            bytes: [<span class="number">0</span>; CHUNK_SIZE_MAX_BYTES + <span class="number">2</span>],
+            pos: <span class="number">0</span>,
+            len: <span class="number">0</span>,
         };
-        <span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">size</span>, <span class="string">&quot;{:X}\r\n&quot;</span>, <span class="ident">len</span>).<span class="ident">expect</span>(<span class="string">&quot;CHUNK_SIZE_MAX_BYTES should fit any usize&quot;</span>);
-        <span class="ident">size</span>
+        <span class="macro">write!</span>(<span class="kw-2">&amp;mut </span>size, <span class="string">&quot;{:X}\r\n&quot;</span>, len).expect(<span class="string">&quot;CHUNK_SIZE_MAX_BYTES should fit any usize&quot;</span>);
+        size
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Buf</span> <span class="kw">for</span> <span class="ident">ChunkSize</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        (<span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">pos</span>).<span class="ident">into</span>()
+<span class="kw">impl </span>Buf <span class="kw">for </span>ChunkSize {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>remaining(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        (<span class="self">self</span>.len - <span class="self">self</span>.pos).into()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="self">self</span>.<span class="ident">pos</span>.<span class="ident">into</span>()..<span class="self">self</span>.<span class="ident">len</span>.<span class="ident">into</span>()]
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>chunk(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.bytes[<span class="self">self</span>.pos.into()..<span class="self">self</span>.len.into()]
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-        <span class="macro">assert!</span>(<span class="ident">cnt</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">remaining</span>());
-        <span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">cnt</span> <span class="kw">as</span> <span class="ident">u8</span>; <span class="comment">// just asserted cnt fits in u8</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize) {
+        <span class="macro">assert!</span>(cnt &lt;= <span class="self">self</span>.remaining());
+        <span class="self">self</span>.pos += cnt <span class="kw">as </span>u8; <span class="comment">// just asserted cnt fits in u8
+    </span>}
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>ChunkSize {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;ChunkSize&quot;</span>)
+            .field(<span class="string">&quot;bytes&quot;</span>, &amp;&amp;<span class="self">self</span>.bytes[..<span class="self">self</span>.len.into()])
+            .field(<span class="string">&quot;pos&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.pos)
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ChunkSize</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ChunkSize&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;bytes&quot;</span>, <span class="op">&amp;&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[..<span class="self">self</span>.<span class="ident">len</span>.<span class="ident">into</span>()])
-            .<span class="ident">field</span>(<span class="string">&quot;pos&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pos</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Write <span class="kw">for </span>ChunkSize {
+    <span class="kw">fn </span>write_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num: <span class="kw-2">&amp;</span>str) -&gt; fmt::Result {
+        <span class="kw">use </span>std::io::Write;
+        (<span class="kw-2">&amp;mut </span><span class="self">self</span>.bytes[<span class="self">self</span>.len.into()..])
+            .write_all(num.as_bytes())
+            .expect(<span class="string">&quot;&amp;mut [u8].write() cannot error&quot;</span>);
+        <span class="self">self</span>.len += num.len() <span class="kw">as </span>u8; <span class="comment">// safe because bytes is never bigger than 256
+        </span><span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Write</span> <span class="kw">for</span> <span class="ident">ChunkSize</span> {
-    <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">num</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">use</span> <span class="ident">std::io::Write</span>;
-        (<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>[<span class="self">self</span>.<span class="ident">len</span>.<span class="ident">into</span>()..])
-            .<span class="ident">write_all</span>(<span class="ident">num</span>.<span class="ident">as_bytes</span>())
-            .<span class="ident">expect</span>(<span class="string">&quot;&amp;mut [u8].write() cannot error&quot;</span>);
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">num</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>; <span class="comment">// safe because bytes is never bigger than 256</span>
-        <span class="prelude-val">Ok</span>(())
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Buf</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">buf</span>: <span class="ident">B</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">EncodedBuf</span> {
-            <span class="ident">kind</span>: <span class="ident">BufKind::Exact</span>(<span class="ident">buf</span>),
+<span class="kw">impl</span>&lt;B: Buf&gt; From&lt;B&gt; <span class="kw">for </span>EncodedBuf&lt;B&gt; {
+    <span class="kw">fn </span>from(buf: B) -&gt; <span class="self">Self </span>{
+        EncodedBuf {
+            kind: BufKind::Exact(buf),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Buf</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Take</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">buf</span>: <span class="ident">Take</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">EncodedBuf</span> {
-            <span class="ident">kind</span>: <span class="ident">BufKind::Limited</span>(<span class="ident">buf</span>),
+<span class="kw">impl</span>&lt;B: Buf&gt; From&lt;Take&lt;B&gt;&gt; <span class="kw">for </span>EncodedBuf&lt;B&gt; {
+    <span class="kw">fn </span>from(buf: Take&lt;B&gt;) -&gt; <span class="self">Self </span>{
+        EncodedBuf {
+            kind: BufKind::Limited(buf),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Buf</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Chain</span><span class="op">&lt;</span><span class="ident">Chain</span><span class="op">&lt;</span><span class="ident">ChunkSize</span>, <span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">StaticBuf</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">buf</span>: <span class="ident">Chain</span><span class="op">&lt;</span><span class="ident">Chain</span><span class="op">&lt;</span><span class="ident">ChunkSize</span>, <span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">StaticBuf</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">EncodedBuf</span> {
-            <span class="ident">kind</span>: <span class="ident">BufKind::Chunked</span>(<span class="ident">buf</span>),
+<span class="kw">impl</span>&lt;B: Buf&gt; From&lt;Chain&lt;Chain&lt;ChunkSize, B&gt;, StaticBuf&gt;&gt; <span class="kw">for </span>EncodedBuf&lt;B&gt; {
+    <span class="kw">fn </span>from(buf: Chain&lt;Chain&lt;ChunkSize, B&gt;, StaticBuf&gt;) -&gt; <span class="self">Self </span>{
+        EncodedBuf {
+            kind: BufKind::Chunked(buf),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">NotEof</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;early end, expected {} more bytes&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>NotEof {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;early end, expected {} more bytes&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">NotEof</span> {}
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>NotEof {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">bytes::BufMut</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>bytes::BufMut;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::io::Cursor</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Encoder</span>;
+    <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::io::Cursor;
+    <span class="kw">use </span><span class="kw">super</span>::Encoder;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chunked</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">Encoder::chunked</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>chunked() {
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = Encoder::chunked();
+        <span class="kw">let </span><span class="kw-2">mut </span>dst = Vec::new();
 
-        <span class="kw">let</span> <span class="ident">msg1</span> <span class="op">=</span> <span class="string">b&quot;foo bar&quot;</span>.<span class="ident">as_ref</span>();
-        <span class="kw">let</span> <span class="ident">buf1</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="ident">msg1</span>);
-        <span class="ident">dst</span>.<span class="ident">put</span>(<span class="ident">buf1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="string">b&quot;7\r\nfoo bar\r\n&quot;</span>);
+        <span class="kw">let </span>msg1 = <span class="string">b&quot;foo bar&quot;</span>.as_ref();
+        <span class="kw">let </span>buf1 = encoder.encode(msg1);
+        dst.put(buf1);
+        <span class="macro">assert_eq!</span>(dst, <span class="string">b&quot;7\r\nfoo bar\r\n&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">msg2</span> <span class="op">=</span> <span class="string">b&quot;baz quux herp&quot;</span>.<span class="ident">as_ref</span>();
-        <span class="kw">let</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="ident">msg2</span>);
-        <span class="ident">dst</span>.<span class="ident">put</span>(<span class="ident">buf2</span>);
+        <span class="kw">let </span>msg2 = <span class="string">b&quot;baz quux herp&quot;</span>.as_ref();
+        <span class="kw">let </span>buf2 = encoder.encode(msg2);
+        dst.put(buf2);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="string">b&quot;7\r\nfoo bar\r\nD\r\nbaz quux herp\r\n&quot;</span>);
+        <span class="macro">assert_eq!</span>(dst, <span class="string">b&quot;7\r\nfoo bar\r\nD\r\nbaz quux herp\r\n&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">end</span>::<span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-        <span class="ident">dst</span>.<span class="ident">put</span>(<span class="ident">end</span>);
+        <span class="kw">let </span>end = encoder.end::&lt;Cursor&lt;Vec&lt;u8&gt;&gt;&gt;().unwrap().unwrap();
+        dst.put(end);
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">dst</span>,
-            <span class="string">b&quot;7\r\nfoo bar\r\nD\r\nbaz quux herp\r\n0\r\n\r\n&quot;</span>.<span class="ident">as_ref</span>()
+            dst,
+            <span class="string">b&quot;7\r\nfoo bar\r\nD\r\nbaz quux herp\r\n0\r\n\r\n&quot;</span>.as_ref()
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">length</span>() {
-        <span class="kw">let</span> <span class="ident">max_len</span> <span class="op">=</span> <span class="number">8</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">Encoder::length</span>(<span class="ident">max_len</span> <span class="kw">as</span> <span class="ident">u64</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>length() {
+        <span class="kw">let </span>max_len = <span class="number">8</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = Encoder::length(max_len <span class="kw">as </span>u64);
+        <span class="kw">let </span><span class="kw-2">mut </span>dst = Vec::new();
 
-        <span class="kw">let</span> <span class="ident">msg1</span> <span class="op">=</span> <span class="string">b&quot;foo bar&quot;</span>.<span class="ident">as_ref</span>();
-        <span class="kw">let</span> <span class="ident">buf1</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="ident">msg1</span>);
-        <span class="ident">dst</span>.<span class="ident">put</span>(<span class="ident">buf1</span>);
+        <span class="kw">let </span>msg1 = <span class="string">b&quot;foo bar&quot;</span>.as_ref();
+        <span class="kw">let </span>buf1 = encoder.encode(msg1);
+        dst.put(buf1);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="string">b&quot;foo bar&quot;</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">encoder</span>.<span class="ident">is_eof</span>());
-        <span class="ident">encoder</span>.<span class="ident">end</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>().<span class="ident">unwrap_err</span>();
+        <span class="macro">assert_eq!</span>(dst, <span class="string">b&quot;foo bar&quot;</span>);
+        <span class="macro">assert!</span>(!encoder.is_eof());
+        encoder.end::&lt;()&gt;().unwrap_err();
 
-        <span class="kw">let</span> <span class="ident">msg2</span> <span class="op">=</span> <span class="string">b&quot;baz&quot;</span>.<span class="ident">as_ref</span>();
-        <span class="kw">let</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="ident">msg2</span>);
-        <span class="ident">dst</span>.<span class="ident">put</span>(<span class="ident">buf2</span>);
+        <span class="kw">let </span>msg2 = <span class="string">b&quot;baz&quot;</span>.as_ref();
+        <span class="kw">let </span>buf2 = encoder.encode(msg2);
+        dst.put(buf2);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>.<span class="ident">len</span>(), <span class="ident">max_len</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="string">b&quot;foo barb&quot;</span>);
-        <span class="macro">assert!</span>(<span class="ident">encoder</span>.<span class="ident">is_eof</span>());
-        <span class="macro">assert!</span>(<span class="ident">encoder</span>.<span class="ident">end</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert_eq!</span>(dst.len(), max_len);
+        <span class="macro">assert_eq!</span>(dst, <span class="string">b&quot;foo barb&quot;</span>);
+        <span class="macro">assert!</span>(encoder.is_eof());
+        <span class="macro">assert!</span>(encoder.end::&lt;()&gt;().unwrap().is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eof</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">Encoder::close_delimited</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>eof() {
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = Encoder::close_delimited();
+        <span class="kw">let </span><span class="kw-2">mut </span>dst = Vec::new();
 
-        <span class="kw">let</span> <span class="ident">msg1</span> <span class="op">=</span> <span class="string">b&quot;foo bar&quot;</span>.<span class="ident">as_ref</span>();
-        <span class="kw">let</span> <span class="ident">buf1</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="ident">msg1</span>);
-        <span class="ident">dst</span>.<span class="ident">put</span>(<span class="ident">buf1</span>);
+        <span class="kw">let </span>msg1 = <span class="string">b&quot;foo bar&quot;</span>.as_ref();
+        <span class="kw">let </span>buf1 = encoder.encode(msg1);
+        dst.put(buf1);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="string">b&quot;foo bar&quot;</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">encoder</span>.<span class="ident">is_eof</span>());
-        <span class="ident">encoder</span>.<span class="ident">end</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(dst, <span class="string">b&quot;foo bar&quot;</span>);
+        <span class="macro">assert!</span>(!encoder.is_eof());
+        encoder.end::&lt;()&gt;().unwrap();
 
-        <span class="kw">let</span> <span class="ident">msg2</span> <span class="op">=</span> <span class="string">b&quot;baz&quot;</span>.<span class="ident">as_ref</span>();
-        <span class="kw">let</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="ident">msg2</span>);
-        <span class="ident">dst</span>.<span class="ident">put</span>(<span class="ident">buf2</span>);
+        <span class="kw">let </span>msg2 = <span class="string">b&quot;baz&quot;</span>.as_ref();
+        <span class="kw">let </span>buf2 = encoder.encode(msg2);
+        dst.put(buf2);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="string">b&quot;foo barbaz&quot;</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">encoder</span>.<span class="ident">is_eof</span>());
-        <span class="ident">encoder</span>.<span class="ident">end</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(dst, <span class="string">b&quot;foo barbaz&quot;</span>);
+        <span class="macro">assert!</span>(!encoder.is_eof());
+        encoder.end::&lt;()&gt;().unwrap();
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

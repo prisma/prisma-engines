@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/mongodb-introspection-connector/src/sampler.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sampler.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/mongodb-introspection-connector/src/sampler.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sampler.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -69,76 +69,76 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">field_type</span>;
-<span class="kw">mod</span> <span class="ident">statistics</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>field_type;
+<span class="kw">mod </span>statistics;
 
-<span class="kw">use</span> <span class="ident">datamodel_renderer</span> <span class="kw">as</span> <span class="ident">render</span>;
-<span class="kw">use</span> <span class="ident">futures::TryStreamExt</span>;
-<span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">CompositeTypeDepth</span>, <span class="ident">IntrospectionContext</span>, <span class="ident">IntrospectionResult</span>, <span class="ident">Version</span>};
-<span class="kw">use</span> <span class="ident">mongodb</span>::{
-    <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>},
-    <span class="ident">options::AggregateOptions</span>,
-    <span class="ident">Database</span>,
+<span class="kw">use </span>datamodel_renderer <span class="kw">as </span>render;
+<span class="kw">use </span>futures::TryStreamExt;
+<span class="kw">use </span>introspection_connector::{CompositeTypeDepth, IntrospectionContext, IntrospectionResult, Version};
+<span class="kw">use </span>mongodb::{
+    bson::{doc, Document},
+    options::AggregateOptions,
+    Database,
 };
-<span class="kw">use</span> <span class="ident">mongodb_schema_describer::MongoSchema</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">statistics::Name</span>;
-<span class="kw">use</span> <span class="ident">statistics</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>mongodb_schema_describer::MongoSchema;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>statistics::Name;
+<span class="kw">use </span>statistics::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// From the given database, lists all collections as models, and samples</span>
-<span class="doccomment">/// maximum of SAMPLE_SIZE documents for their fields with the following rules:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - If the same field differs in types between documents, takes the most</span>
-<span class="doccomment">/// common type or if even, the latest type and adds a warning.</span>
-<span class="doccomment">/// - Missing fields count as null.</span>
-<span class="doccomment">/// - Indices are taken, but not if they are partial.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sample</span>(
-    <span class="ident">database</span>: <span class="ident">Database</span>,
-    <span class="ident">schema</span>: <span class="ident">MongoSchema</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">statistics</span> <span class="op">=</span> <span class="ident">Statistics::new</span>(<span class="ident">ctx</span>.<span class="ident">composite_type_depth</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">warnings</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="doccomment">/// From the given database, lists all collections as models, and samples
+/// maximum of SAMPLE_SIZE documents for their fields with the following rules:
+///
+/// - If the same field differs in types between documents, takes the most
+/// common type or if even, the latest type and adds a warning.
+/// - Missing fields count as null.
+/// - Indices are taken, but not if they are partial.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>sample(
+    database: Database,
+    schema: MongoSchema,
+    ctx: <span class="kw-2">&amp;</span>IntrospectionContext,
+) -&gt; <span class="kw">crate</span>::Result&lt;IntrospectionResult&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>statistics = Statistics::new(ctx.composite_type_depth);
+    <span class="kw">let </span><span class="kw-2">mut </span>warnings = Vec::new();
 
-    <span class="kw">for</span> <span class="ident">collection</span> <span class="kw">in</span> <span class="ident">schema</span>.<span class="ident">walk_collections</span>() {
-        <span class="ident">statistics</span>.<span class="ident">track_model</span>(<span class="ident">collection</span>.<span class="ident">name</span>());
+    <span class="kw">for </span>collection <span class="kw">in </span>schema.walk_collections() {
+        statistics.track_model(collection.name());
     }
 
-    <span class="kw">for</span> <span class="ident">collection</span> <span class="kw">in</span> <span class="ident">schema</span>.<span class="ident">walk_collections</span>() {
-        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">AggregateOptions::builder</span>().<span class="ident">allow_disk_use</span>(<span class="prelude-val">Some</span>(<span class="bool-val">true</span>)).<span class="ident">build</span>();
+    <span class="kw">for </span>collection <span class="kw">in </span>schema.walk_collections() {
+        <span class="kw">let </span>options = AggregateOptions::builder().allow_disk_use(<span class="prelude-val">Some</span>(<span class="bool-val">true</span>)).build();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">documents</span> <span class="op">=</span> <span class="ident">database</span>
-            .<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">collection</span>.<span class="ident">name</span>())
-            .<span class="ident">aggregate</span>(<span class="macro">vec!</span>[<span class="macro">doc!</span> { <span class="string">&quot;$sample&quot;</span>: { <span class="string">&quot;size&quot;</span>: <span class="ident">SAMPLE_SIZE</span> } }], <span class="prelude-val">Some</span>(<span class="ident">options</span>))
+        <span class="kw">let </span><span class="kw-2">mut </span>documents = database
+            .collection::&lt;Document&gt;(collection.name())
+            .aggregate(<span class="macro">vec!</span>[<span class="macro">doc! </span>{ <span class="string">&quot;$sample&quot;</span>: { <span class="string">&quot;size&quot;</span>: SAMPLE_SIZE } }], <span class="prelude-val">Some</span>(options))
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">document</span>) <span class="op">=</span> <span class="ident">documents</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="ident">statistics</span>.<span class="ident">track_model_fields</span>(<span class="ident">collection</span>.<span class="ident">name</span>(), <span class="ident">document</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(document) = documents.try_next().<span class="kw">await</span><span class="question-mark">? </span>{
+            statistics.track_model_fields(collection.name(), document);
         }
 
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">collection</span>.<span class="ident">indexes</span>() {
-            <span class="ident">statistics</span>.<span class="ident">track_index</span>(<span class="ident">collection</span>.<span class="ident">name</span>(), <span class="ident">index</span>);
+        <span class="kw">for </span>index <span class="kw">in </span>collection.indexes() {
+            statistics.track_index(collection.name(), index);
         }
     }
 
-    <span class="kw">let</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="ident">statistics</span>.<span class="ident">into_datamodel</span>(<span class="kw-2">&amp;mut</span> <span class="ident">warnings</span>);
-    <span class="kw">let</span> <span class="ident">is_empty</span> <span class="op">=</span> <span class="ident">data_model</span>.<span class="ident">is_empty</span>();
+    <span class="kw">let </span>data_model = statistics.into_datamodel(<span class="kw-2">&amp;mut </span>warnings);
+    <span class="kw">let </span>is_empty = data_model.is_empty();
 
-    <span class="kw">let</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">render_config</span> {
+    <span class="kw">let </span>data_model = <span class="kw">if </span>ctx.render_config {
         <span class="macro">format!</span>(
             <span class="string">&quot;{}\n{}&quot;</span>,
-            <span class="ident">render::Configuration::from_psl</span>(<span class="ident">ctx</span>.<span class="ident">configuration</span>()),
-            <span class="ident">render::Datamodel::from_dml</span>(<span class="ident">ctx</span>.<span class="ident">datasource</span>(), <span class="kw-2">&amp;</span><span class="ident">data_model</span>),
+            render::Configuration::from_psl(ctx.configuration()),
+            render::Datamodel::from_dml(ctx.datasource(), <span class="kw-2">&amp;</span>data_model),
         )
-    } <span class="kw">else</span> {
-        <span class="ident">render::Datamodel::from_dml</span>(<span class="ident">ctx</span>.<span class="ident">datasource</span>(), <span class="kw-2">&amp;</span><span class="ident">data_model</span>).<span class="ident">to_string</span>()
+    } <span class="kw">else </span>{
+        render::Datamodel::from_dml(ctx.datasource(), <span class="kw-2">&amp;</span>data_model).to_string()
     };
 
-    <span class="prelude-val">Ok</span>(<span class="ident">IntrospectionResult</span> {
-        <span class="ident">data_model</span>: <span class="ident">psl::reformat</span>(<span class="kw-2">&amp;</span><span class="ident">data_model</span>, <span class="number">2</span>).<span class="ident">unwrap</span>(),
-        <span class="ident">is_empty</span>,
-        <span class="ident">warnings</span>,
-        <span class="ident">version</span>: <span class="ident">Version::NonPrisma</span>,
+    <span class="prelude-val">Ok</span>(IntrospectionResult {
+        data_model: psl::reformat(<span class="kw-2">&amp;</span>data_model, <span class="number">2</span>).unwrap(),
+        is_empty,
+        warnings,
+        version: Version::NonPrisma,
     })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

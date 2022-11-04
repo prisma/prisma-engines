@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/large_powers64.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>large_powers64.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/large_powers64.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>large_powers64.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -623,26 +623,26 @@
 <span id="623">623</span>
 <span id="624">624</span>
 <span id="625">625</span>
-</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.</span>
+</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
-<span class="doccomment">//! Precalculated large powers for 64-bit limbs.</span>
+</span><span class="doccomment">//! Precalculated large powers for 64-bit limbs.
 
-<span class="doccomment">/// Large powers (&amp;[u64]) for base5 operations.</span>
-<span class="kw">const</span> <span class="ident">POW5_1</span>: [<span class="ident">u64</span>; <span class="number">1</span>] <span class="op">=</span> [<span class="number">5</span>];
-<span class="kw">const</span> <span class="ident">POW5_2</span>: [<span class="ident">u64</span>; <span class="number">1</span>] <span class="op">=</span> [<span class="number">25</span>];
-<span class="kw">const</span> <span class="ident">POW5_3</span>: [<span class="ident">u64</span>; <span class="number">1</span>] <span class="op">=</span> [<span class="number">625</span>];
-<span class="kw">const</span> <span class="ident">POW5_4</span>: [<span class="ident">u64</span>; <span class="number">1</span>] <span class="op">=</span> [<span class="number">390625</span>];
-<span class="kw">const</span> <span class="ident">POW5_5</span>: [<span class="ident">u64</span>; <span class="number">1</span>] <span class="op">=</span> [<span class="number">152587890625</span>];
-<span class="kw">const</span> <span class="ident">POW5_6</span>: [<span class="ident">u64</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">3273344365508751233</span>, <span class="number">1262</span>];
-<span class="kw">const</span> <span class="ident">POW5_7</span>: [<span class="ident">u64</span>; <span class="number">3</span>] <span class="op">=</span> [<span class="number">7942358959831785217</span>, <span class="number">16807427164405733357</span>, <span class="number">1593091</span>];
-<span class="kw">const</span> <span class="ident">POW5_8</span>: [<span class="ident">u64</span>; <span class="number">5</span>] <span class="op">=</span> [
+/// Large powers (&amp;[u64]) for base5 operations.
+</span><span class="kw">const </span>POW5_1: [u64; <span class="number">1</span>] = [<span class="number">5</span>];
+<span class="kw">const </span>POW5_2: [u64; <span class="number">1</span>] = [<span class="number">25</span>];
+<span class="kw">const </span>POW5_3: [u64; <span class="number">1</span>] = [<span class="number">625</span>];
+<span class="kw">const </span>POW5_4: [u64; <span class="number">1</span>] = [<span class="number">390625</span>];
+<span class="kw">const </span>POW5_5: [u64; <span class="number">1</span>] = [<span class="number">152587890625</span>];
+<span class="kw">const </span>POW5_6: [u64; <span class="number">2</span>] = [<span class="number">3273344365508751233</span>, <span class="number">1262</span>];
+<span class="kw">const </span>POW5_7: [u64; <span class="number">3</span>] = [<span class="number">7942358959831785217</span>, <span class="number">16807427164405733357</span>, <span class="number">1593091</span>];
+<span class="kw">const </span>POW5_8: [u64; <span class="number">5</span>] = [
     <span class="number">279109966635548161</span>,
     <span class="number">2554917779393558781</span>,
     <span class="number">14124656261812188652</span>,
     <span class="number">11976055582626787546</span>,
     <span class="number">2537941837315</span>,
 ];
-<span class="kw">const</span> <span class="ident">POW5_9</span>: [<span class="ident">u64</span>; <span class="number">10</span>] <span class="op">=</span> [
+<span class="kw">const </span>POW5_9: [u64; <span class="number">10</span>] = [
     <span class="number">13750482914757213185</span>,
     <span class="number">1302999927698857842</span>,
     <span class="number">14936872543252795590</span>,
@@ -654,7 +654,7 @@
     <span class="number">6907659600622710236</span>,
     <span class="number">349175</span>,
 ];
-<span class="kw">const</span> <span class="ident">POW5_10</span>: [<span class="ident">u64</span>; <span class="number">19</span>] <span class="op">=</span> [
+<span class="kw">const </span>POW5_10: [u64; <span class="number">19</span>] = [
     <span class="number">8643096425819600897</span>,
     <span class="number">6743743997439985372</span>,
     <span class="number">14059704609098336919</span>,
@@ -675,7 +675,7 @@
     <span class="number">13966287901448440471</span>,
     <span class="number">121923442132</span>,
 ];
-<span class="kw">const</span> <span class="ident">POW5_11</span>: [<span class="ident">u64</span>; <span class="number">38</span>] <span class="op">=</span> [
+<span class="kw">const </span>POW5_11: [u64; <span class="number">38</span>] = [
     <span class="number">17679772531488845825</span>,
     <span class="number">2216509366347768155</span>,
     <span class="number">1568689219195129479</span>,
@@ -715,7 +715,7 @@
     <span class="number">15696762163583540628</span>,
     <span class="number">805</span>,
 ];
-<span class="kw">const</span> <span class="ident">POW5_12</span>: [<span class="ident">u64</span>; <span class="number">75</span>] <span class="op">=</span> [
+<span class="kw">const </span>POW5_12: [u64; <span class="number">75</span>] = [
     <span class="number">16359721904723189761</span>,
     <span class="number">5323973632697650495</span>,
     <span class="number">17187956456762001185</span>,
@@ -792,7 +792,7 @@
     <span class="number">13104441193763861714</span>,
     <span class="number">649395</span>,
 ];
-<span class="kw">const</span> <span class="ident">POW5_13</span>: [<span class="ident">u64</span>; <span class="number">149</span>] <span class="op">=</span> [
+<span class="kw">const </span>POW5_13: [u64; <span class="number">149</span>] = [
     <span class="number">15308384451594534913</span>,
     <span class="number">17913664074042735335</span>,
     <span class="number">6115977719198531863</span>,
@@ -943,7 +943,7 @@
     <span class="number">1174257960026283968</span>,
     <span class="number">421714788677</span>,
 ];
-<span class="kw">const</span> <span class="ident">POW5_14</span>: [<span class="ident">u64</span>; <span class="number">298</span>] <span class="op">=</span> [
+<span class="kw">const </span>POW5_14: [u64; <span class="number">298</span>] = [
     <span class="number">11471884475673051137</span>,
     <span class="number">8902860357476377573</span>,
     <span class="number">13350296775839230505</span>,
@@ -1244,9 +1244,9 @@
     <span class="number">9640</span>,
 ];
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">POW5</span>: [<span class="kw-2">&amp;</span>[<span class="ident">u64</span>]; <span class="number">14</span>] <span class="op">=</span> [
-    <span class="kw-2">&amp;</span><span class="ident">POW5_1</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_2</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_3</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_4</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_5</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_6</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_7</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_8</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_9</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_10</span>,
-    <span class="kw-2">&amp;</span><span class="ident">POW5_11</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_12</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_13</span>, <span class="kw-2">&amp;</span><span class="ident">POW5_14</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>POW5: [<span class="kw-2">&amp;</span>[u64]; <span class="number">14</span>] = [
+    <span class="kw-2">&amp;</span>POW5_1, <span class="kw-2">&amp;</span>POW5_2, <span class="kw-2">&amp;</span>POW5_3, <span class="kw-2">&amp;</span>POW5_4, <span class="kw-2">&amp;</span>POW5_5, <span class="kw-2">&amp;</span>POW5_6, <span class="kw-2">&amp;</span>POW5_7, <span class="kw-2">&amp;</span>POW5_8, <span class="kw-2">&amp;</span>POW5_9, <span class="kw-2">&amp;</span>POW5_10,
+    <span class="kw-2">&amp;</span>POW5_11, <span class="kw-2">&amp;</span>POW5_12, <span class="kw-2">&amp;</span>POW5_13, <span class="kw-2">&amp;</span>POW5_14,
 ];
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

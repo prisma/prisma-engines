@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.9.10/src/epoch.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>epoch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_epoch/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.9.10/src/epoch.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>epoch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_epoch/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -131,138 +131,138 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The global epoch</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The last bit in this number is unused and is always zero. Every so often the global epoch is</span>
-<span class="doccomment">//! incremented, i.e. we say it &quot;advances&quot;. A pinned participant may advance the global epoch only</span>
-<span class="doccomment">//! if all currently pinned participants have been pinned in the current epoch.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If an object became garbage in some epoch, then we can be sure that after two advancements no</span>
-<span class="doccomment">//! participant will hold a reference to it. That is the crux of safe memory reclamation.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The global epoch
+//!
+//! The last bit in this number is unused and is always zero. Every so often the global epoch is
+//! incremented, i.e. we say it &quot;advances&quot;. A pinned participant may advance the global epoch only
+//! if all currently pinned participants have been pinned in the current epoch.
+//!
+//! If an object became garbage in some epoch, then we can be sure that after two advancements no
+//! participant will hold a reference to it. That is the crux of safe memory reclamation.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::primitive::sync::atomic::AtomicUsize</span>;
-<span class="kw">use</span> <span class="ident">core::sync::atomic::Ordering</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::primitive::sync::atomic::AtomicUsize;
+<span class="kw">use </span>core::sync::atomic::Ordering;
 
-<span class="doccomment">/// An epoch that can be marked as pinned or unpinned.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Internally, the epoch is represented as an integer that wraps around at some unspecified point</span>
-<span class="doccomment">/// and a flag that represents whether it is pinned or unpinned.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Epoch</span> {
-    <span class="doccomment">/// The least significant bit is set if pinned. The rest of the bits hold the epoch.</span>
-    <span class="ident">data</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// An epoch that can be marked as pinned or unpinned.
+///
+/// Internally, the epoch is represented as an integer that wraps around at some unspecified point
+/// and a flag that represents whether it is pinned or unpinned.
+</span><span class="attribute">#[derive(Copy, Clone, Default, Debug, Eq, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Epoch {
+    <span class="doccomment">/// The least significant bit is set if pinned. The rest of the bits hold the epoch.
+    </span>data: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Epoch</span> {
-    <span class="doccomment">/// Returns the starting epoch in unpinned state.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">starting</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>Epoch {
+    <span class="doccomment">/// Returns the starting epoch in unpinned state.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>starting() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Returns the number of epochs `self` is ahead of `rhs`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Internally, epochs are represented as numbers in the range `(isize::MIN / 2) .. (isize::MAX</span>
-    <span class="doccomment">/// / 2)`, so the returned distance will be in the same interval.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wrapping_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="ident">isize</span> {
-        <span class="comment">// The result is the same with `(self.data &amp; !1).wrapping_sub(rhs.data &amp; !1) as isize &gt;&gt; 1`,</span>
-        <span class="comment">// because the possible difference of LSB in `(self.data &amp; !1).wrapping_sub(rhs.data &amp; !1)`</span>
-        <span class="comment">// will be ignored in the shift operation.</span>
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">wrapping_sub</span>(<span class="ident">rhs</span>.<span class="ident">data</span> <span class="op">&amp;</span> <span class="op">!</span><span class="number">1</span>) <span class="kw">as</span> <span class="ident">isize</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>
-    }
+    <span class="doccomment">/// Returns the number of epochs `self` is ahead of `rhs`.
+    ///
+    /// Internally, epochs are represented as numbers in the range `(isize::MIN / 2) .. (isize::MAX
+    /// / 2)`, so the returned distance will be in the same interval.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>wrapping_sub(<span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; isize {
+        <span class="comment">// The result is the same with `(self.data &amp; !1).wrapping_sub(rhs.data &amp; !1) as isize &gt;&gt; 1`,
+        // because the possible difference of LSB in `(self.data &amp; !1).wrapping_sub(rhs.data &amp; !1)`
+        // will be ignored in the shift operation.
+        </span><span class="self">self</span>.data.wrapping_sub(rhs.data &amp; !<span class="number">1</span>) <span class="kw">as </span>isize &gt;&gt; <span class="number">1
+    </span>}
 
-    <span class="doccomment">/// Returns `true` if the epoch is marked as pinned.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_pinned</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">data</span> <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">==</span> <span class="number">1</span>
-    }
+    <span class="doccomment">/// Returns `true` if the epoch is marked as pinned.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_pinned(<span class="self">self</span>) -&gt; bool {
+        (<span class="self">self</span>.data &amp; <span class="number">1</span>) == <span class="number">1
+    </span>}
 
-    <span class="doccomment">/// Returns the same epoch, but marked as pinned.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pinned</span>(<span class="self">self</span>) -&gt; <span class="ident">Epoch</span> {
-        <span class="ident">Epoch</span> {
-            <span class="ident">data</span>: <span class="self">self</span>.<span class="ident">data</span> <span class="op">|</span> <span class="number">1</span>,
+    <span class="doccomment">/// Returns the same epoch, but marked as pinned.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pinned(<span class="self">self</span>) -&gt; Epoch {
+        Epoch {
+            data: <span class="self">self</span>.data | <span class="number">1</span>,
         }
     }
 
-    <span class="doccomment">/// Returns the same epoch, but marked as unpinned.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unpinned</span>(<span class="self">self</span>) -&gt; <span class="ident">Epoch</span> {
-        <span class="ident">Epoch</span> {
-            <span class="ident">data</span>: <span class="self">self</span>.<span class="ident">data</span> <span class="op">&amp;</span> <span class="op">!</span><span class="number">1</span>,
+    <span class="doccomment">/// Returns the same epoch, but marked as unpinned.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unpinned(<span class="self">self</span>) -&gt; Epoch {
+        Epoch {
+            data: <span class="self">self</span>.data &amp; !<span class="number">1</span>,
         }
     }
 
-    <span class="doccomment">/// Returns the successor epoch.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned epoch will be marked as pinned only if the previous one was as well.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">successor</span>(<span class="self">self</span>) -&gt; <span class="ident">Epoch</span> {
-        <span class="ident">Epoch</span> {
-            <span class="ident">data</span>: <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">wrapping_add</span>(<span class="number">2</span>),
+    <span class="doccomment">/// Returns the successor epoch.
+    ///
+    /// The returned epoch will be marked as pinned only if the previous one was as well.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>successor(<span class="self">self</span>) -&gt; Epoch {
+        Epoch {
+            data: <span class="self">self</span>.data.wrapping_add(<span class="number">2</span>),
         }
     }
 }
 
-<span class="doccomment">/// An atomic value that holds an `Epoch`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AtomicEpoch</span> {
-    <span class="doccomment">/// Since `Epoch` is just a wrapper around `usize`, an `AtomicEpoch` is similarly represented</span>
-    <span class="doccomment">/// using an `AtomicUsize`.</span>
-    <span class="ident">data</span>: <span class="ident">AtomicUsize</span>,
+<span class="doccomment">/// An atomic value that holds an `Epoch`.
+</span><span class="attribute">#[derive(Default, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AtomicEpoch {
+    <span class="doccomment">/// Since `Epoch` is just a wrapper around `usize`, an `AtomicEpoch` is similarly represented
+    /// using an `AtomicUsize`.
+    </span>data: AtomicUsize,
 }
 
-<span class="kw">impl</span> <span class="ident">AtomicEpoch</span> {
-    <span class="doccomment">/// Creates a new atomic epoch.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">epoch</span>: <span class="ident">Epoch</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="ident">epoch</span>.<span class="ident">data</span>);
-        <span class="ident">AtomicEpoch</span> { <span class="ident">data</span> }
+<span class="kw">impl </span>AtomicEpoch {
+    <span class="doccomment">/// Creates a new atomic epoch.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(epoch: Epoch) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>data = AtomicUsize::new(epoch.data);
+        AtomicEpoch { data }
     }
 
-    <span class="doccomment">/// Loads a value from the atomic epoch.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ord</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">Epoch</span> {
-        <span class="ident">Epoch</span> {
-            <span class="ident">data</span>: <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">load</span>(<span class="ident">ord</span>),
+    <span class="doccomment">/// Loads a value from the atomic epoch.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>, ord: Ordering) -&gt; Epoch {
+        Epoch {
+            data: <span class="self">self</span>.data.load(ord),
         }
     }
 
-    <span class="doccomment">/// Stores a value into the atomic epoch.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">epoch</span>: <span class="ident">Epoch</span>, <span class="ident">ord</span>: <span class="ident">Ordering</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">store</span>(<span class="ident">epoch</span>.<span class="ident">data</span>, <span class="ident">ord</span>);
+    <span class="doccomment">/// Stores a value into the atomic epoch.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>store(<span class="kw-2">&amp;</span><span class="self">self</span>, epoch: Epoch, ord: Ordering) {
+        <span class="self">self</span>.data.store(epoch.data, ord);
     }
 
-    <span class="doccomment">/// Stores a value into the atomic epoch if the current value is the same as `current`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The return value is a result indicating whether the new value was written and containing</span>
-    <span class="doccomment">/// the previous value. On success this value is guaranteed to be equal to `current`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method takes two `Ordering` arguments to describe the memory</span>
-    <span class="doccomment">/// ordering of this operation. `success` describes the required ordering for the</span>
-    <span class="doccomment">/// read-modify-write operation that takes place if the comparison with `current` succeeds.</span>
-    <span class="doccomment">/// `failure` describes the required ordering for the load operation that takes place when</span>
-    <span class="doccomment">/// the comparison fails. Using `Acquire` as success ordering makes the store part</span>
-    <span class="doccomment">/// of this operation `Relaxed`, and using `Release` makes the successful load</span>
-    <span class="doccomment">/// `Relaxed`. The failure ordering can only be `SeqCst`, `Acquire` or `Relaxed`</span>
-    <span class="doccomment">/// and must be equivalent to or weaker than the success ordering.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">compare_exchange</span>(
+    <span class="doccomment">/// Stores a value into the atomic epoch if the current value is the same as `current`.
+    ///
+    /// The return value is a result indicating whether the new value was written and containing
+    /// the previous value. On success this value is guaranteed to be equal to `current`.
+    ///
+    /// This method takes two `Ordering` arguments to describe the memory
+    /// ordering of this operation. `success` describes the required ordering for the
+    /// read-modify-write operation that takes place if the comparison with `current` succeeds.
+    /// `failure` describes the required ordering for the load operation that takes place when
+    /// the comparison fails. Using `Acquire` as success ordering makes the store part
+    /// of this operation `Relaxed`, and using `Release` makes the successful load
+    /// `Relaxed`. The failure ordering can only be `SeqCst`, `Acquire` or `Relaxed`
+    /// and must be equivalent to or weaker than the success ordering.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>compare_exchange(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">current</span>: <span class="ident">Epoch</span>,
-        <span class="ident">new</span>: <span class="ident">Epoch</span>,
-        <span class="ident">success</span>: <span class="ident">Ordering</span>,
-        <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Epoch</span>, <span class="ident">Epoch</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>
-            .<span class="ident">data</span>
-            .<span class="ident">compare_exchange</span>(<span class="ident">current</span>.<span class="ident">data</span>, <span class="ident">new</span>.<span class="ident">data</span>, <span class="ident">success</span>, <span class="ident">failure</span>)
+        current: Epoch,
+        new: Epoch,
+        success: Ordering,
+        failure: Ordering,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Epoch, Epoch&gt; {
+        <span class="kw">match </span><span class="self">self
+            </span>.data
+            .compare_exchange(current.data, new.data, success, failure)
         {
-            <span class="prelude-val">Ok</span>(<span class="ident">data</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Epoch</span> { <span class="ident">data</span> }),
-            <span class="prelude-val">Err</span>(<span class="ident">data</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Epoch</span> { <span class="ident">data</span> }),
+            <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(Epoch { data }),
+            <span class="prelude-val">Err</span>(data) =&gt; <span class="prelude-val">Err</span>(Epoch { data }),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_epoch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_epoch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

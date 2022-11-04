@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-integer-0.8.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_integer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-integer-0.8.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_integer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -71,78 +71,78 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Fast lexical integer-to-string conversion routines.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The default implementations use power reduction to unroll</span>
-<span class="doccomment">//! 4 loops at a time to minimize the number of required divisions,</span>
-<span class="doccomment">//! leading to massive performance gains. In addition, decimal</span>
-<span class="doccomment">//! strings pre-calculate the number of digits, avoiding temporary buffers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A compact, fallback algorithm uses a naive, simple algorithm,</span>
-<span class="doccomment">//! where each loop generates a single digit. This comes at a performance</span>
-<span class="doccomment">//! penalty, but produces smaller binaries.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * `std` - Use the standard library.</span>
-<span class="doccomment">//! * `power-of-two` - Add support for writing power-of-two integer strings.</span>
-<span class="doccomment">//! * `radix` - Add support for strings of any radix.</span>
-<span class="doccomment">//! * `compact` - Reduce code size at the cost of performance.</span>
-<span class="doccomment">//! * `safe` - Ensure only memory-safe indexing is used.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Note</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Only documented functionality is considered part of the public API:</span>
-<span class="doccomment">//! any of the modules, internal functions, or structs may change</span>
-<span class="doccomment">//! release-to-release without major or minor version changes. Use</span>
-<span class="doccomment">//! internal implementation details at your own risk.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! lexical-write-integer mainly exists as an implementation detail for</span>
-<span class="doccomment">//! lexical-core, although its API is stable. If you would like to use</span>
-<span class="doccomment">//! a high-level API that writes to and parses from `String` and `&amp;str`,</span>
-<span class="doccomment">//! respectively, please look at [lexical](https://crates.io/crates/lexical)</span>
-<span class="doccomment">//! instead. If you would like an API that supports multiple numeric</span>
-<span class="doccomment">//! conversions, please look at [lexical-core](https://crates.io/crates/lexical-core)</span>
-<span class="doccomment">//! instead.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Version Support</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The minimum, standard, required version is 1.51.0, for const generic</span>
-<span class="doccomment">//! support. Older versions of lexical support older Rust versions.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Design</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Algorithm Approach](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-integer/docs/Algorithm.md)</span>
-<span class="doccomment">//! - [Benchmarks](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-integer/docs/Benchmarks.md)</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Fast lexical integer-to-string conversion routines.
+//!
+//! The default implementations use power reduction to unroll
+//! 4 loops at a time to minimize the number of required divisions,
+//! leading to massive performance gains. In addition, decimal
+//! strings pre-calculate the number of digits, avoiding temporary buffers.
+//!
+//! A compact, fallback algorithm uses a naive, simple algorithm,
+//! where each loop generates a single digit. This comes at a performance
+//! penalty, but produces smaller binaries.
+//!
+//! # Features
+//!
+//! * `std` - Use the standard library.
+//! * `power-of-two` - Add support for writing power-of-two integer strings.
+//! * `radix` - Add support for strings of any radix.
+//! * `compact` - Reduce code size at the cost of performance.
+//! * `safe` - Ensure only memory-safe indexing is used.
+//!
+//! # Note
+//!
+//! Only documented functionality is considered part of the public API:
+//! any of the modules, internal functions, or structs may change
+//! release-to-release without major or minor version changes. Use
+//! internal implementation details at your own risk.
+//!
+//! lexical-write-integer mainly exists as an implementation detail for
+//! lexical-core, although its API is stable. If you would like to use
+//! a high-level API that writes to and parses from `String` and `&amp;str`,
+//! respectively, please look at [lexical](https://crates.io/crates/lexical)
+//! instead. If you would like an API that supports multiple numeric
+//! conversions, please look at [lexical-core](https://crates.io/crates/lexical-core)
+//! instead.
+//!
+//! # Version Support
+//!
+//! The minimum, standard, required version is 1.51.0, for const generic
+//! support. Older versions of lexical support older Rust versions.
+//!
+//! # Design
+//!
+//! - [Algorithm Approach](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-integer/docs/Algorithm.md)
+//! - [Benchmarks](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-integer/docs/Benchmarks.md)
 
-<span class="comment">// We want to have the same safety guarantees as Rust core,</span>
-<span class="comment">// so we allow unused unsafe to clearly document safety guarantees.</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_unsafe</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;lint&quot;</span>, <span class="ident">warn</span>(<span class="ident">unsafe_op_in_unsafe_fn</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
+</span><span class="comment">// We want to have the same safety guarantees as Rust core,
+// so we allow unused unsafe to clearly document safety guarantees.
+</span><span class="attribute">#![allow(unused_unsafe)]
+#![cfg_attr(feature = <span class="string">&quot;lint&quot;</span>, warn(unsafe_op_in_unsafe_fn))]
+#![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">index</span>;
+#[macro_use]
+</span><span class="kw">mod </span>index;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">algorithm</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">compact</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">decimal</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">options</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">radix</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">table</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">write</span>;
+<span class="kw">pub mod </span>algorithm;
+<span class="kw">pub mod </span>compact;
+<span class="kw">pub mod </span>decimal;
+<span class="kw">pub mod </span>options;
+<span class="kw">pub mod </span>radix;
+<span class="kw">pub mod </span>table;
+<span class="kw">pub mod </span>write;
 
-<span class="kw">mod</span> <span class="ident">api</span>;
-<span class="kw">mod</span> <span class="ident">table_binary</span>;
-<span class="kw">mod</span> <span class="ident">table_decimal</span>;
-<span class="kw">mod</span> <span class="ident">table_radix</span>;
+<span class="kw">mod </span>api;
+<span class="kw">mod </span>table_binary;
+<span class="kw">mod </span>table_decimal;
+<span class="kw">mod </span>table_radix;
 
-<span class="comment">// Re-exports</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::api</span>::{<span class="ident">ToLexical</span>, <span class="ident">ToLexicalWithOptions</span>};
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::options</span>::{<span class="ident">Options</span>, <span class="ident">OptionsBuilder</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_util::constants</span>::{<span class="ident">FormattedSize</span>, <span class="ident">BUFFER_SIZE</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_util::format</span>::{<span class="self">self</span>, <span class="ident">NumberFormatBuilder</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_util::options::WriteOptions</span>;
+<span class="comment">// Re-exports
+</span><span class="kw">pub use </span><span class="self">self</span>::api::{ToLexical, ToLexicalWithOptions};
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="self">self</span>::options::{Options, OptionsBuilder};
+<span class="kw">pub use </span>lexical_util::constants::{FormattedSize, BUFFER_SIZE};
+<span class="kw">pub use </span>lexical_util::format::{<span class="self">self</span>, NumberFormatBuilder};
+<span class="kw">pub use </span>lexical_util::options::WriteOptions;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_integer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_integer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

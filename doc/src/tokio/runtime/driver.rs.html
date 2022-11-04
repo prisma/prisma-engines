@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/driver.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>driver.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/driver.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>driver.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -206,213 +206,213 @@
 <span id="206">206</span>
 <span id="207">207</span>
 <span id="208">208</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Abstracts out the entire chain of runtime sub-drivers into common types.</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::park::thread::ParkThread</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::park::Park</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Abstracts out the entire chain of runtime sub-drivers into common types.
+</span><span class="kw">use </span><span class="kw">crate</span>::park::thread::ParkThread;
+<span class="kw">use </span><span class="kw">crate</span>::park::Park;
 
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::time::Duration;
 
-<span class="comment">// ===== io driver =====</span>
+<span class="comment">// ===== io driver =====
 
-<span class="macro">cfg_io_driver!</span> {
-    <span class="kw">type</span> <span class="ident">IoDriver</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::runtime::io::Driver</span>;
-    <span class="kw">type</span> <span class="ident">IoStack</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::park::either::Either</span><span class="op">&lt;</span><span class="ident">ProcessDriver</span>, <span class="ident">ParkThread</span><span class="op">&gt;</span>;
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">IoHandle</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::runtime::io::Handle</span><span class="op">&gt;</span>;
+</span><span class="macro">cfg_io_driver! </span>{
+    <span class="kw">type </span>IoDriver = <span class="kw">crate</span>::runtime::io::Driver;
+    <span class="kw">type </span>IoStack = <span class="kw">crate</span>::park::either::Either&lt;ProcessDriver, ParkThread&gt;;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>IoHandle = <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::runtime::io::Handle&gt;;
 
-    <span class="kw">fn</span> <span class="ident">create_io_stack</span>(<span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">IoStack</span>, <span class="ident">IoHandle</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::park::either::Either</span>;
+    <span class="kw">fn </span>create_io_stack(enabled: bool) -&gt; io::Result&lt;(IoStack, IoHandle, SignalHandle)&gt; {
+        <span class="kw">use </span><span class="kw">crate</span>::park::either::Either;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">loom</span>)]</span>
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">enabled</span>);
+        <span class="attribute">#[cfg(loom)]
+        </span><span class="macro">assert!</span>(!enabled);
 
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">enabled</span> {
-            <span class="kw">let</span> <span class="ident">io_driver</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::runtime::io::Driver::new</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">io_handle</span> <span class="op">=</span> <span class="ident">io_driver</span>.<span class="ident">handle</span>();
+        <span class="kw">let </span>ret = <span class="kw">if </span>enabled {
+            <span class="kw">let </span>io_driver = <span class="kw">crate</span>::runtime::io::Driver::new()<span class="question-mark">?</span>;
+            <span class="kw">let </span>io_handle = io_driver.handle();
 
-            <span class="kw">let</span> (<span class="ident">signal_driver</span>, <span class="ident">signal_handle</span>) <span class="op">=</span> <span class="ident">create_signal_driver</span>(<span class="ident">io_driver</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">process_driver</span> <span class="op">=</span> <span class="ident">create_process_driver</span>(<span class="ident">signal_driver</span>);
+            <span class="kw">let </span>(signal_driver, signal_handle) = create_signal_driver(io_driver)<span class="question-mark">?</span>;
+            <span class="kw">let </span>process_driver = create_process_driver(signal_driver);
 
-            (<span class="ident">Either::A</span>(<span class="ident">process_driver</span>), <span class="prelude-val">Some</span>(<span class="ident">io_handle</span>), <span class="ident">signal_handle</span>)
-        } <span class="kw">else</span> {
-            (<span class="ident">Either::B</span>(<span class="ident">ParkThread::new</span>()), <span class="ident">Default::default</span>(), <span class="ident">Default::default</span>())
+            (Either::A(process_driver), <span class="prelude-val">Some</span>(io_handle), signal_handle)
+        } <span class="kw">else </span>{
+            (Either::B(ParkThread::new()), Default::default(), Default::default())
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
+        <span class="prelude-val">Ok</span>(ret)
     }
 }
 
-<span class="macro">cfg_not_io_driver!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">IoHandle</span> <span class="op">=</span> ();
-    <span class="kw">type</span> <span class="ident">IoStack</span> <span class="op">=</span> <span class="ident">ParkThread</span>;
+<span class="macro">cfg_not_io_driver! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>IoHandle = ();
+    <span class="kw">type </span>IoStack = ParkThread;
 
-    <span class="kw">fn</span> <span class="ident">create_io_stack</span>(<span class="ident">_enabled</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">IoStack</span>, <span class="ident">IoHandle</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>((<span class="ident">ParkThread::new</span>(), <span class="ident">Default::default</span>(), <span class="ident">Default::default</span>()))
+    <span class="kw">fn </span>create_io_stack(_enabled: bool) -&gt; io::Result&lt;(IoStack, IoHandle, SignalHandle)&gt; {
+        <span class="prelude-val">Ok</span>((ParkThread::new(), Default::default(), Default::default()))
     }
 }
 
-<span class="comment">// ===== signal driver =====</span>
+<span class="comment">// ===== signal driver =====
 
-<span class="macro">macro_rules!</span> <span class="ident">cfg_signal_internal_and_unix</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>:<span class="ident">item</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-        <span class="macro">cfg_signal_internal!</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>)<span class="op">*</span> }
+</span><span class="macro">macro_rules! </span>cfg_signal_internal_and_unix {
+    ($(<span class="macro-nonterminal">$item</span>:item)<span class="kw-2">*</span>) =&gt; {
+        <span class="attribute">#[cfg(unix)]
+        </span><span class="macro">cfg_signal_internal! </span>{ $(<span class="macro-nonterminal">$item</span>)* }
     }
 }
 
-<span class="macro">cfg_signal_internal_and_unix!</span> {
-    <span class="kw">type</span> <span class="ident">SignalDriver</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::signal::unix::driver::Driver</span>;
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">SignalHandle</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::signal::unix::driver::Handle</span><span class="op">&gt;</span>;
+<span class="macro">cfg_signal_internal_and_unix! </span>{
+    <span class="kw">type </span>SignalDriver = <span class="kw">crate</span>::signal::unix::driver::Driver;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>SignalHandle = <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::signal::unix::driver::Handle&gt;;
 
-    <span class="kw">fn</span> <span class="ident">create_signal_driver</span>(<span class="ident">io_driver</span>: <span class="ident">IoDriver</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">SignalDriver</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">driver</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::signal::unix::driver::Driver::new</span>(<span class="ident">io_driver</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">driver</span>.<span class="ident">handle</span>();
-        <span class="prelude-val">Ok</span>((<span class="ident">driver</span>, <span class="prelude-val">Some</span>(<span class="ident">handle</span>)))
+    <span class="kw">fn </span>create_signal_driver(io_driver: IoDriver) -&gt; io::Result&lt;(SignalDriver, SignalHandle)&gt; {
+        <span class="kw">let </span>driver = <span class="kw">crate</span>::signal::unix::driver::Driver::new(io_driver)<span class="question-mark">?</span>;
+        <span class="kw">let </span>handle = driver.handle();
+        <span class="prelude-val">Ok</span>((driver, <span class="prelude-val">Some</span>(handle)))
     }
 }
 
-<span class="macro">cfg_not_signal_internal!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">SignalHandle</span> <span class="op">=</span> ();
+<span class="macro">cfg_not_signal_internal! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>SignalHandle = ();
 
-    <span class="macro">cfg_io_driver!</span> {
-        <span class="kw">type</span> <span class="ident">SignalDriver</span> <span class="op">=</span> <span class="ident">IoDriver</span>;
+    <span class="macro">cfg_io_driver! </span>{
+        <span class="kw">type </span>SignalDriver = IoDriver;
 
-        <span class="kw">fn</span> <span class="ident">create_signal_driver</span>(<span class="ident">io_driver</span>: <span class="ident">IoDriver</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">SignalDriver</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
-            <span class="prelude-val">Ok</span>((<span class="ident">io_driver</span>, ()))
+        <span class="kw">fn </span>create_signal_driver(io_driver: IoDriver) -&gt; io::Result&lt;(SignalDriver, SignalHandle)&gt; {
+            <span class="prelude-val">Ok</span>((io_driver, ()))
         }
     }
 }
 
-<span class="comment">// ===== process driver =====</span>
+<span class="comment">// ===== process driver =====
 
-<span class="macro">cfg_process_driver!</span> {
-    <span class="kw">type</span> <span class="ident">ProcessDriver</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::process::unix::driver::Driver</span>;
+</span><span class="macro">cfg_process_driver! </span>{
+    <span class="kw">type </span>ProcessDriver = <span class="kw">crate</span>::process::unix::driver::Driver;
 
-    <span class="kw">fn</span> <span class="ident">create_process_driver</span>(<span class="ident">signal_driver</span>: <span class="ident">SignalDriver</span>) -&gt; <span class="ident">ProcessDriver</span> {
-        <span class="ident"><span class="kw">crate</span>::process::unix::driver::Driver::new</span>(<span class="ident">signal_driver</span>)
+    <span class="kw">fn </span>create_process_driver(signal_driver: SignalDriver) -&gt; ProcessDriver {
+        <span class="kw">crate</span>::process::unix::driver::Driver::new(signal_driver)
     }
 }
 
-<span class="macro">cfg_not_process_driver!</span> {
-    <span class="macro">cfg_io_driver!</span> {
-        <span class="kw">type</span> <span class="ident">ProcessDriver</span> <span class="op">=</span> <span class="ident">SignalDriver</span>;
+<span class="macro">cfg_not_process_driver! </span>{
+    <span class="macro">cfg_io_driver! </span>{
+        <span class="kw">type </span>ProcessDriver = SignalDriver;
 
-        <span class="kw">fn</span> <span class="ident">create_process_driver</span>(<span class="ident">signal_driver</span>: <span class="ident">SignalDriver</span>) -&gt; <span class="ident">ProcessDriver</span> {
-            <span class="ident">signal_driver</span>
+        <span class="kw">fn </span>create_process_driver(signal_driver: SignalDriver) -&gt; ProcessDriver {
+            signal_driver
         }
     }
 }
 
-<span class="comment">// ===== time driver =====</span>
+<span class="comment">// ===== time driver =====
 
-<span class="macro">cfg_time!</span> {
-    <span class="kw">type</span> <span class="ident">TimeDriver</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::park::either::Either</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::time::driver::Driver</span><span class="op">&lt;</span><span class="ident">IoStack</span><span class="op">&gt;</span>, <span class="ident">IoStack</span><span class="op">&gt;</span>;
+</span><span class="macro">cfg_time! </span>{
+    <span class="kw">type </span>TimeDriver = <span class="kw">crate</span>::park::either::Either&lt;<span class="kw">crate</span>::time::driver::Driver&lt;IoStack&gt;, IoStack&gt;;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Clock</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::Clock</span>;
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">TimeHandle</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::time::driver::Handle</span><span class="op">&gt;</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Clock = <span class="kw">crate</span>::time::Clock;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>TimeHandle = <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::time::driver::Handle&gt;;
 
-    <span class="kw">fn</span> <span class="ident">create_clock</span>(<span class="ident">enable_pausing</span>: <span class="ident">bool</span>, <span class="ident">start_paused</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Clock</span> {
-        <span class="ident"><span class="kw">crate</span>::time::Clock::new</span>(<span class="ident">enable_pausing</span>, <span class="ident">start_paused</span>)
+    <span class="kw">fn </span>create_clock(enable_pausing: bool, start_paused: bool) -&gt; Clock {
+        <span class="kw">crate</span>::time::Clock::new(enable_pausing, start_paused)
     }
 
-    <span class="kw">fn</span> <span class="ident">create_time_driver</span>(
-        <span class="ident">enable</span>: <span class="ident">bool</span>,
-        <span class="ident">io_stack</span>: <span class="ident">IoStack</span>,
-        <span class="ident">clock</span>: <span class="ident">Clock</span>,
-    ) -&gt; (<span class="ident">TimeDriver</span>, <span class="ident">TimeHandle</span>) {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::park::either::Either</span>;
+    <span class="kw">fn </span>create_time_driver(
+        enable: bool,
+        io_stack: IoStack,
+        clock: Clock,
+    ) -&gt; (TimeDriver, TimeHandle) {
+        <span class="kw">use </span><span class="kw">crate</span>::park::either::Either;
 
-        <span class="kw">if</span> <span class="ident">enable</span> {
-            <span class="kw">let</span> <span class="ident">driver</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::driver::Driver::new</span>(<span class="ident">io_stack</span>, <span class="ident">clock</span>);
-            <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">driver</span>.<span class="ident">handle</span>();
+        <span class="kw">if </span>enable {
+            <span class="kw">let </span>driver = <span class="kw">crate</span>::time::driver::Driver::new(io_stack, clock);
+            <span class="kw">let </span>handle = driver.handle();
 
-            (<span class="ident">Either::A</span>(<span class="ident">driver</span>), <span class="prelude-val">Some</span>(<span class="ident">handle</span>))
-        } <span class="kw">else</span> {
-            (<span class="ident">Either::B</span>(<span class="ident">io_stack</span>), <span class="prelude-val">None</span>)
+            (Either::A(driver), <span class="prelude-val">Some</span>(handle))
+        } <span class="kw">else </span>{
+            (Either::B(io_stack), <span class="prelude-val">None</span>)
         }
     }
 }
 
-<span class="macro">cfg_not_time!</span> {
-    <span class="kw">type</span> <span class="ident">TimeDriver</span> <span class="op">=</span> <span class="ident">IoStack</span>;
+<span class="macro">cfg_not_time! </span>{
+    <span class="kw">type </span>TimeDriver = IoStack;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Clock</span> <span class="op">=</span> ();
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">TimeHandle</span> <span class="op">=</span> ();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Clock = ();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>TimeHandle = ();
 
-    <span class="kw">fn</span> <span class="ident">create_clock</span>(<span class="ident">_enable_pausing</span>: <span class="ident">bool</span>, <span class="ident">_start_paused</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Clock</span> {
+    <span class="kw">fn </span>create_clock(_enable_pausing: bool, _start_paused: bool) -&gt; Clock {
         ()
     }
 
-    <span class="kw">fn</span> <span class="ident">create_time_driver</span>(
-        <span class="ident">_enable</span>: <span class="ident">bool</span>,
-        <span class="ident">io_stack</span>: <span class="ident">IoStack</span>,
-        <span class="ident">_clock</span>: <span class="ident">Clock</span>,
-    ) -&gt; (<span class="ident">TimeDriver</span>, <span class="ident">TimeHandle</span>) {
-        (<span class="ident">io_stack</span>, ())
+    <span class="kw">fn </span>create_time_driver(
+        _enable: bool,
+        io_stack: IoStack,
+        _clock: Clock,
+    ) -&gt; (TimeDriver, TimeHandle) {
+        (io_stack, ())
     }
 }
 
-<span class="comment">// ===== runtime driver =====</span>
+<span class="comment">// ===== runtime driver =====
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Driver</span> {
-    <span class="ident">inner</span>: <span class="ident">TimeDriver</span>,
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Driver {
+    inner: TimeDriver,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Resources</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">io_handle</span>: <span class="ident">IoHandle</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">signal_handle</span>: <span class="ident">SignalHandle</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">time_handle</span>: <span class="ident">TimeHandle</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">clock</span>: <span class="ident">Clock</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Resources {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) io_handle: IoHandle,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) signal_handle: SignalHandle,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) time_handle: TimeHandle,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) clock: Clock,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Cfg</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">enable_io</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">enable_time</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">enable_pause_time</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">start_paused</span>: <span class="ident">bool</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Cfg {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) enable_io: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) enable_time: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) enable_pause_time: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) start_paused: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Driver</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cfg</span>: <span class="ident">Cfg</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">Resources</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">io_stack</span>, <span class="ident">io_handle</span>, <span class="ident">signal_handle</span>) <span class="op">=</span> <span class="ident">create_io_stack</span>(<span class="ident">cfg</span>.<span class="ident">enable_io</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Driver {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(cfg: Cfg) -&gt; io::Result&lt;(<span class="self">Self</span>, Resources)&gt; {
+        <span class="kw">let </span>(io_stack, io_handle, signal_handle) = create_io_stack(cfg.enable_io)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">create_clock</span>(<span class="ident">cfg</span>.<span class="ident">enable_pause_time</span>, <span class="ident">cfg</span>.<span class="ident">start_paused</span>);
+        <span class="kw">let </span>clock = create_clock(cfg.enable_pause_time, cfg.start_paused);
 
-        <span class="kw">let</span> (<span class="ident">time_driver</span>, <span class="ident">time_handle</span>) <span class="op">=</span>
-            <span class="ident">create_time_driver</span>(<span class="ident">cfg</span>.<span class="ident">enable_time</span>, <span class="ident">io_stack</span>, <span class="ident">clock</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>(time_driver, time_handle) =
+            create_time_driver(cfg.enable_time, io_stack, clock.clone());
 
         <span class="prelude-val">Ok</span>((
-            <span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">time_driver</span> },
-            <span class="ident">Resources</span> {
-                <span class="ident">io_handle</span>,
-                <span class="ident">signal_handle</span>,
-                <span class="ident">time_handle</span>,
-                <span class="ident">clock</span>,
+            <span class="self">Self </span>{ inner: time_driver },
+            Resources {
+                io_handle,
+                signal_handle,
+                time_handle,
+                clock,
             },
         ))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Park</span> <span class="kw">for</span> <span class="ident">Driver</span> {
-    <span class="kw">type</span> <span class="ident">Unpark</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">TimeDriver</span> <span class="kw">as</span> <span class="ident">Park</span><span class="op">&gt;</span><span class="ident">::Unpark</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">TimeDriver</span> <span class="kw">as</span> <span class="ident">Park</span><span class="op">&gt;</span><span class="ident">::Error</span>;
+<span class="kw">impl </span>Park <span class="kw">for </span>Driver {
+    <span class="kw">type </span>Unpark = &lt;TimeDriver <span class="kw">as </span>Park&gt;::Unpark;
+    <span class="kw">type </span>Error = &lt;TimeDriver <span class="kw">as </span>Park&gt;::Error;
 
-    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Unpark</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">unpark</span>()
+    <span class="kw">fn </span>unpark(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Unpark {
+        <span class="self">self</span>.inner.unpark()
     }
 
-    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">park</span>()
+    <span class="kw">fn </span>park(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.inner.park()
     }
 
-    <span class="kw">fn</span> <span class="ident">park_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">park_timeout</span>(<span class="ident">duration</span>)
+    <span class="kw">fn </span>park_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, duration: Duration) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.inner.park_timeout(duration)
     }
 
-    <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">shutdown</span>()
+    <span class="kw">fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.shutdown()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

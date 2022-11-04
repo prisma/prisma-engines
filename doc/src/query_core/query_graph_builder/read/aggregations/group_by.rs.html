@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/read/aggregations/group_by.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>group_by.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/read/aggregations/group_by.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>group_by.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -170,177 +170,177 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::convert::TryInto;
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">query_document::ParsedField</span>, <span class="ident">AggregateRecordsQuery</span>, <span class="ident">ArgumentListLookup</span>, <span class="ident">ParsedInputValue</span>, <span class="ident">ReadQuery</span>};
-<span class="kw">use</span> <span class="ident">connector::Filter</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelRef</span>, <span class="ident">OrderBy</span>, <span class="ident">ScalarFieldRef</span>};
-<span class="kw">use</span> <span class="ident">schema_builder::constants::args</span>;
+<span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue, ReadQuery};
+<span class="kw">use </span>connector::Filter;
+<span class="kw">use </span>prisma_models::{ModelRef, OrderBy, ScalarFieldRef};
+<span class="kw">use </span>schema_builder::constants::args;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_by</span>(<span class="kw-2">mut</span> <span class="ident">field</span>: <span class="ident">ParsedField</span>, <span class="ident">model</span>: <span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">ReadQuery</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">name</span>;
-    <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">alias</span>;
-    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">model</span>;
+<span class="kw">pub fn </span>group_by(<span class="kw-2">mut </span>field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+    <span class="kw">let </span>name = field.name;
+    <span class="kw">let </span>alias = field.alias;
+    <span class="kw">let </span>model = model;
 
-    <span class="kw">let</span> <span class="ident">by_arg</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::BY</span>).<span class="ident">unwrap</span>().<span class="ident">value</span>;
-    <span class="kw">let</span> <span class="ident">group_by</span> <span class="op">=</span> <span class="ident">extract_grouping</span>(<span class="ident">by_arg</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::HAVING</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">having_arg</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">extract_filter</span>(<span class="ident">having_arg</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>)<span class="question-mark">?</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">let </span>by_arg = field.arguments.lookup(args::BY).unwrap().value;
+    <span class="kw">let </span>group_by = extract_grouping(by_arg)<span class="question-mark">?</span>;
+    <span class="kw">let </span>having: <span class="prelude-ty">Option</span>&lt;Filter&gt; = <span class="kw">match </span>field.arguments.lookup(args::HAVING) {
+        <span class="prelude-val">Some</span>(having_arg) =&gt; <span class="prelude-val">Some</span>(extract_filter(having_arg.value.try_into()<span class="question-mark">?</span>, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">extractors::extract_query_args</span>(<span class="ident">field</span>.<span class="ident">arguments</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">nested_fields</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">nested_fields</span>.<span class="ident">unwrap</span>().<span class="ident">fields</span>;
-    <span class="kw">let</span> <span class="ident">selection_order</span> <span class="op">=</span> <span class="ident">collect_selection_tree</span>(<span class="kw-2">&amp;</span><span class="ident">nested_fields</span>);
+    <span class="kw">let </span>args = extractors::extract_query_args(field.arguments, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
+    <span class="kw">let </span>nested_fields = field.nested_fields.unwrap().fields;
+    <span class="kw">let </span>selection_order = collect_selection_tree(<span class="kw-2">&amp;</span>nested_fields);
 
-    <span class="kw">let</span> <span class="ident">selectors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">nested_fields</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">resolve_query</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="bool-val">false</span>))
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+    <span class="kw">let </span>selectors: Vec&lt;<span class="kw">_</span>&gt; = nested_fields
+        .into_iter()
+        .map(|field| resolve_query(field, <span class="kw-2">&amp;</span>model, <span class="bool-val">false</span>))
+        .collect::&lt;QueryGraphBuilderResult&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="ident">verify_selections</span>(<span class="kw-2">&amp;</span><span class="ident">selectors</span>, <span class="kw-2">&amp;</span><span class="ident">group_by</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">verify_orderings</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>.<span class="ident">order_by</span>, <span class="kw-2">&amp;</span><span class="ident">group_by</span>))
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">verify_having</span>(<span class="ident">having</span>.<span class="ident">as_ref</span>(), <span class="kw-2">&amp;</span><span class="ident">selectors</span>))<span class="question-mark">?</span>;
+    verify_selections(<span class="kw-2">&amp;</span>selectors, <span class="kw-2">&amp;</span>group_by)
+        .and_then(|<span class="kw">_</span>| verify_orderings(<span class="kw-2">&amp;</span>args.order_by, <span class="kw-2">&amp;</span>group_by))
+        .and_then(|<span class="kw">_</span>| verify_having(having.as_ref(), <span class="kw-2">&amp;</span>selectors))<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">ReadQuery::AggregateRecordsQuery</span>(<span class="ident">AggregateRecordsQuery</span> {
-        <span class="ident">name</span>,
-        <span class="ident">alias</span>,
-        <span class="ident">model</span>,
-        <span class="ident">selection_order</span>,
-        <span class="ident">args</span>,
-        <span class="ident">selectors</span>,
-        <span class="ident">group_by</span>,
-        <span class="ident">having</span>,
+    <span class="prelude-val">Ok</span>(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
+        name,
+        alias,
+        model,
+        selection_order,
+        args,
+        selectors,
+        group_by,
+        having,
     }))
 }
 
-<span class="doccomment">/// Cross checks that the selections of the request are valid with regard to the requested group bys:</span>
-<span class="doccomment">/// Every plain scalar field in the selectors must be present in the group by as well.</span>
-<span class="kw">fn</span> <span class="ident">verify_selections</span>(<span class="ident">selectors</span>: <span class="kw-2">&amp;</span>[<span class="ident">AggregationSelection</span>], <span class="ident">group_by</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarFieldRef</span>]) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">missing_fields</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="doccomment">/// Cross checks that the selections of the request are valid with regard to the requested group bys:
+/// Every plain scalar field in the selectors must be present in the group by as well.
+</span><span class="kw">fn </span>verify_selections(selectors: <span class="kw-2">&amp;</span>[AggregationSelection], group_by: <span class="kw-2">&amp;</span>[ScalarFieldRef]) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>missing_fields = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">selector</span> <span class="kw">in</span> <span class="ident">selectors</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AggregationSelection::Field</span>(<span class="ident">field</span>) <span class="op">=</span> <span class="ident">selector</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">group_by</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>) {
-                <span class="ident">missing_fields</span>.<span class="ident">push</span>(<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>());
+    <span class="kw">for </span>selector <span class="kw">in </span>selectors {
+        <span class="kw">if let </span>AggregationSelection::Field(field) = selector {
+            <span class="kw">if </span>!group_by.contains(<span class="kw-2">&amp;</span>field) {
+                missing_fields.push(field.name.clone());
             }
         }
     }
 
-    <span class="kw">if</span> <span class="ident">missing_fields</span>.<span class="ident">is_empty</span>() {
+    <span class="kw">if </span>missing_fields.is_empty() {
         <span class="prelude-val">Ok</span>(())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
             <span class="string">&quot;Every selected scalar field that is not part of an aggregation \
         must be included in the by-arguments of the query. Missing fields: {}&quot;</span>,
-            <span class="ident">missing_fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+            missing_fields.join(<span class="string">&quot;, &quot;</span>)
         )))
     }
 }
 
-<span class="doccomment">/// Cross checks that the requested order-bys of the request are valid with regard to the requested group bys.</span>
-<span class="doccomment">/// Every ordered field must be present in the group by as well, except aggregation &amp; relevance orderings, which are always valid.</span>
-<span class="kw">fn</span> <span class="ident">verify_orderings</span>(<span class="ident">orderings</span>: <span class="kw-2">&amp;</span>[<span class="ident">OrderBy</span>], <span class="ident">group_by</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarFieldRef</span>]) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">missing_fields</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="doccomment">/// Cross checks that the requested order-bys of the request are valid with regard to the requested group bys.
+/// Every ordered field must be present in the group by as well, except aggregation &amp; relevance orderings, which are always valid.
+</span><span class="kw">fn </span>verify_orderings(orderings: <span class="kw-2">&amp;</span>[OrderBy], group_by: <span class="kw-2">&amp;</span>[ScalarFieldRef]) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>missing_fields = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">ordering</span> <span class="kw">in</span> <span class="ident">orderings</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OrderBy::Scalar</span>(<span class="ident">by_scalar</span>) <span class="op">=</span> <span class="ident">ordering</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">group_by</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">by_scalar</span>.<span class="ident">field</span>) {
-                <span class="ident">missing_fields</span>.<span class="ident">push</span>(<span class="ident">by_scalar</span>.<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>());
+    <span class="kw">for </span>ordering <span class="kw">in </span>orderings {
+        <span class="kw">if let </span>OrderBy::Scalar(by_scalar) = ordering {
+            <span class="kw">if </span>!group_by.contains(<span class="kw-2">&amp;</span>by_scalar.field) {
+                missing_fields.push(by_scalar.field.name.clone());
             }
         }
     }
 
-    <span class="kw">if</span> <span class="ident">missing_fields</span>.<span class="ident">is_empty</span>() {
+    <span class="kw">if </span>missing_fields.is_empty() {
         <span class="prelude-val">Ok</span>(())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
             <span class="string">&quot;Every field used for orderBy must be included in the by-arguments of the query. Missing fields: {}&quot;</span>,
-            <span class="ident">missing_fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+            missing_fields.join(<span class="string">&quot;, &quot;</span>)
         )))
     }
 }
 
-<span class="doccomment">/// Cross checks that every scalar field used in `having` is either an aggregate or contained in the selectors.</span>
-<span class="kw">fn</span> <span class="ident">verify_having</span>(<span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Filter</span><span class="op">&gt;</span>, <span class="ident">selectors</span>: <span class="kw-2">&amp;</span>[<span class="ident">AggregationSelection</span>]) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span> <span class="ident">having</span> {
-        <span class="kw">let</span> <span class="ident">having_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">collect_scalar_fields</span>(<span class="ident">filter</span>);
-        <span class="kw">let</span> <span class="ident">selector_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">selectors</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">selector</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">selector</span> {
-                <span class="ident">AggregationSelection::Field</span>(<span class="ident">field</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">field</span>),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Cross checks that every scalar field used in `having` is either an aggregate or contained in the selectors.
+</span><span class="kw">fn </span>verify_having(having: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Filter&gt;, selectors: <span class="kw-2">&amp;</span>[AggregationSelection]) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(filter) = having {
+        <span class="kw">let </span>having_fields: Vec&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; = collect_scalar_fields(filter);
+        <span class="kw">let </span>selector_fields: Vec&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; = selectors
+            .iter()
+            .filter_map(|selector| <span class="kw">match </span>selector {
+                AggregationSelection::Field(field) =&gt; <span class="prelude-val">Some</span>(field),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">missing_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">having_fields</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">selector_fields</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>) {
-                    <span class="prelude-val">None</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>())
+        <span class="kw">let </span>missing_fields: Vec&lt;String&gt; = having_fields
+            .into_iter()
+            .filter_map(|field| {
+                <span class="kw">if </span>selector_fields.contains(<span class="kw-2">&amp;</span>field) {
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(field.name.clone())
                 }
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">if</span> <span class="ident">missing_fields</span>.<span class="ident">is_empty</span>() {
+        <span class="kw">if </span>missing_fields.is_empty() {
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
                     <span class="string">&quot;Every field used in `having` filters must either be an aggregation filter or be included in the selection of the query. Missing fields: {}&quot;</span>,
-                    <span class="ident">missing_fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+                    missing_fields.join(<span class="string">&quot;, &quot;</span>)
                 )))
         }
-    } <span class="kw">else</span> {
+    } <span class="kw">else </span>{
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="doccomment">/// Collects all flat scalar fields that are used in the having filter.</span>
-<span class="kw">fn</span> <span class="ident">collect_scalar_fields</span>(<span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">Filter</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">filter</span> {
-        <span class="ident">Filter::And</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="ident">collect_scalar_fields</span>).<span class="ident">collect</span>(),
-        <span class="ident">Filter::Or</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="ident">collect_scalar_fields</span>).<span class="ident">collect</span>(),
-        <span class="ident">Filter::Not</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="ident">collect_scalar_fields</span>).<span class="ident">collect</span>(),
-        <span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">scalar_fields</span>(),
-        <span class="comment">// Referenced fields in an aggregation filter need to be grouped by too.</span>
-        <span class="ident">Filter::Aggregation</span>(<span class="ident">af</span>) =&gt; <span class="ident">collect_aggregate_field_refs</span>(<span class="ident">af</span>.<span class="ident">filter</span>()),
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+<span class="doccomment">/// Collects all flat scalar fields that are used in the having filter.
+</span><span class="kw">fn </span>collect_scalar_fields(filter: <span class="kw-2">&amp;</span>Filter) -&gt; Vec&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; {
+    <span class="kw">match </span>filter {
+        Filter::And(inner) =&gt; inner.iter().flat_map(collect_scalar_fields).collect(),
+        Filter::Or(inner) =&gt; inner.iter().flat_map(collect_scalar_fields).collect(),
+        Filter::Not(inner) =&gt; inner.iter().flat_map(collect_scalar_fields).collect(),
+        Filter::Scalar(sf) =&gt; sf.scalar_fields(),
+        <span class="comment">// Referenced fields in an aggregation filter need to be grouped by too.
+        </span>Filter::Aggregation(af) =&gt; collect_aggregate_field_refs(af.filter()),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="doccomment">/// Collects all referenced fields that are used in an aggregate filter</span>
-<span class="kw">fn</span> <span class="ident">collect_aggregate_field_refs</span>(<span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">Filter</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">filter</span> {
-        <span class="ident">Filter::And</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="ident">collect_aggregate_field_refs</span>).<span class="ident">collect</span>(),
-        <span class="ident">Filter::Or</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="ident">collect_aggregate_field_refs</span>).<span class="ident">collect</span>(),
-        <span class="ident">Filter::Not</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="ident">collect_aggregate_field_refs</span>).<span class="ident">collect</span>(),
-        <span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">as_field_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">sf</span>]).<span class="ident">unwrap_or_default</span>(),
-        <span class="ident">Filter::Aggregation</span>(<span class="ident">af</span>) =&gt; <span class="ident">collect_aggregate_field_refs</span>(<span class="ident">af</span>.<span class="ident">filter</span>()),
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+<span class="doccomment">/// Collects all referenced fields that are used in an aggregate filter
+</span><span class="kw">fn </span>collect_aggregate_field_refs(filter: <span class="kw-2">&amp;</span>Filter) -&gt; Vec&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; {
+    <span class="kw">match </span>filter {
+        Filter::And(inner) =&gt; inner.iter().flat_map(collect_aggregate_field_refs).collect(),
+        Filter::Or(inner) =&gt; inner.iter().flat_map(collect_aggregate_field_refs).collect(),
+        Filter::Not(inner) =&gt; inner.iter().flat_map(collect_aggregate_field_refs).collect(),
+        Filter::Scalar(sf) =&gt; sf.as_field_ref().map(|sf| <span class="macro">vec!</span>[sf]).unwrap_or_default(),
+        Filter::Aggregation(af) =&gt; collect_aggregate_field_refs(af.filter()),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">extract_grouping</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">ParsedInputValue::ScalarField</span>(<span class="ident">field</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>]),
+<span class="kw">fn </span>extract_grouping(value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
+    <span class="kw">match </span>value {
+        ParsedInputValue::ScalarField(field) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field]),
 
-        <span class="ident">ParsedInputValue::List</span>(<span class="ident">list</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">list</span>.<span class="ident">is_empty</span>() =&gt; <span class="ident">list</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">item</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+        ParsedInputValue::List(list) <span class="kw">if </span>!list.is_empty() =&gt; list
+            .into_iter()
+            .map(|item| <span class="prelude-val">Ok</span>(item.try_into()<span class="question-mark">?</span>))
+            .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;ScalarFieldRef&gt;&gt;&gt;(),
 
-        <span class="ident">ParsedInputValue::List</span>(<span class="ident">list</span>) <span class="kw">if</span> <span class="ident">list</span>.<span class="ident">is_empty</span>() =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(
-            <span class="string">&quot;At least one selection is required for the `by` argument.&quot;</span>.<span class="ident">to_owned</span>(),
+        ParsedInputValue::List(list) <span class="kw">if </span>list.is_empty() =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(
+            <span class="string">&quot;At least one selection is required for the `by` argument.&quot;</span>.to_owned(),
         )),
 
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(
-            <span class="string">&quot;Expected parsing to guarantee either a single enum or a list of enums is provided for group by `by` arg.&quot;</span>
-                .<span class="ident">to_owned</span>(),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(
+            <span class="string">&quot;Expected parsing to guarantee either a single enum or a list of enums is provided for group by `by` arg.&quot;
+                </span>.to_owned(),
         )),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

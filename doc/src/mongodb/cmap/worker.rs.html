@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/worker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>worker.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/worker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>worker.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -724,622 +724,622 @@
 <span id="724">724</span>
 <span id="725">725</span>
 <span id="726">726</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>derivative::Derivative;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::options::BackgroundThreadInterval</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">conn::PendingConnection</span>,
-    <span class="ident">connection_requester</span>,
-    <span class="ident">connection_requester</span>::{
-        <span class="ident">ConnectionRequest</span>,
-        <span class="ident">ConnectionRequestReceiver</span>,
-        <span class="ident">ConnectionRequestResult</span>,
-        <span class="ident">ConnectionRequester</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span><span class="kw">super</span>::options::BackgroundThreadInterval;
+<span class="kw">use super</span>::{
+    conn::PendingConnection,
+    connection_requester,
+    connection_requester::{
+        ConnectionRequest,
+        ConnectionRequestReceiver,
+        ConnectionRequestResult,
+        ConnectionRequester,
     },
-    <span class="ident">establish::ConnectionEstablisher</span>,
-    <span class="ident">manager</span>,
-    <span class="ident">manager</span>::{<span class="ident">ConnectionSucceeded</span>, <span class="ident">ManagementRequestReceiver</span>, <span class="ident">PoolManagementRequest</span>, <span class="ident">PoolManager</span>},
-    <span class="ident">options</span>::{<span class="ident">ConnectionOptions</span>, <span class="ident">ConnectionPoolOptions</span>},
-    <span class="ident">status</span>,
-    <span class="ident">status</span>::{<span class="ident">PoolGenerationPublisher</span>, <span class="ident">PoolGenerationSubscriber</span>},
-    <span class="ident">Connection</span>,
-    <span class="ident">DEFAULT_MAX_POOL_SIZE</span>,
+    establish::ConnectionEstablisher,
+    manager,
+    manager::{ConnectionSucceeded, ManagementRequestReceiver, PoolManagementRequest, PoolManager},
+    options::{ConnectionOptions, ConnectionPoolOptions},
+    status,
+    status::{PoolGenerationPublisher, PoolGenerationSubscriber},
+    Connection,
+    DEFAULT_MAX_POOL_SIZE,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson::oid::ObjectId</span>,
-    <span class="ident">error</span>::{<span class="ident">load_balanced_mode_mismatch</span>, <span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">event::cmap</span>::{
-        <span class="ident">CmapEventHandler</span>,
-        <span class="ident">ConnectionClosedEvent</span>,
-        <span class="ident">ConnectionClosedReason</span>,
-        <span class="ident">PoolClearedEvent</span>,
-        <span class="ident">PoolClosedEvent</span>,
-        <span class="ident">PoolReadyEvent</span>,
+<span class="kw">use crate</span>::{
+    bson::oid::ObjectId,
+    error::{load_balanced_mode_mismatch, Error, ErrorKind, <span class="prelude-ty">Result</span>},
+    event::cmap::{
+        CmapEventHandler,
+        ConnectionClosedEvent,
+        ConnectionClosedReason,
+        PoolClearedEvent,
+        PoolClosedEvent,
+        PoolReadyEvent,
     },
-    <span class="ident">options::ServerAddress</span>,
-    <span class="ident">runtime</span>::{<span class="self">self</span>, <span class="ident">WorkerHandleListener</span>},
-    <span class="ident">sdam::TopologyUpdater</span>,
+    options::ServerAddress,
+    runtime::{<span class="self">self</span>, WorkerHandleListener},
+    sdam::TopologyUpdater,
 };
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>},
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">time::Duration</span>,
+<span class="kw">use </span>std::{
+    collections::{HashMap, VecDeque},
+    sync::Arc,
+    time::Duration,
 };
 
-<span class="kw">const</span> <span class="ident">MAX_CONNECTING</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">const</span> <span class="ident">MAINTENACE_FREQUENCY</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">500</span>);
+<span class="kw">const </span>MAX_CONNECTING: u32 = <span class="number">2</span>;
+<span class="kw">const </span>MAINTENACE_FREQUENCY: Duration = Duration::from_millis(<span class="number">500</span>);
 
-<span class="doccomment">/// A worker task that manages the shared state of the pool.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>)]</span>
-<span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ConnectionPoolWorker</span> {
-    <span class="doccomment">/// The address the pool&#39;s connections will connect to.</span>
-    <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// A worker task that manages the shared state of the pool.
+</span><span class="attribute">#[derive(Derivative)]
+#[derivative(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ConnectionPoolWorker {
+    <span class="doccomment">/// The address the pool&#39;s connections will connect to.
+    </span>address: ServerAddress,
 
-    <span class="doccomment">/// Current state of the pool. Determines if connections may be checked out</span>
-    <span class="doccomment">/// and if min_pool_size connection creation should continue.</span>
-    <span class="ident">state</span>: <span class="ident">PoolState</span>,
+    <span class="doccomment">/// Current state of the pool. Determines if connections may be checked out
+    /// and if min_pool_size connection creation should continue.
+    </span>state: PoolState,
 
-    <span class="doccomment">/// The total number of connections managed by the pool, including connections which are</span>
-    <span class="doccomment">/// currently checked out of the pool or have yet to be established.</span>
-    <span class="ident">total_connection_count</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The total number of connections managed by the pool, including connections which are
+    /// currently checked out of the pool or have yet to be established.
+    </span>total_connection_count: u32,
 
-    <span class="doccomment">/// The number of connections currently being established by this pool.</span>
-    <span class="ident">pending_connection_count</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The number of connections currently being established by this pool.
+    </span>pending_connection_count: u32,
 
-    <span class="doccomment">/// The ID of the next connection created by the pool.</span>
-    <span class="ident">next_connection_id</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The ID of the next connection created by the pool.
+    </span>next_connection_id: u32,
 
-    <span class="doccomment">/// The current generation of the pool. The generation is incremented whenever the pool is</span>
-    <span class="doccomment">/// cleared. Connections belonging to a previous generation are considered stale and will be</span>
-    <span class="doccomment">/// closed when checked back in or when popped off of the set of available connections.</span>
-    <span class="ident">generation</span>: <span class="ident">PoolGeneration</span>,
+    <span class="doccomment">/// The current generation of the pool. The generation is incremented whenever the pool is
+    /// cleared. Connections belonging to a previous generation are considered stale and will be
+    /// closed when checked back in or when popped off of the set of available connections.
+    </span>generation: PoolGeneration,
 
-    <span class="doccomment">/// The connection count for each serviceId in load-balanced mode.</span>
-    <span class="ident">service_connection_count</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ObjectId</span>, <span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The connection count for each serviceId in load-balanced mode.
+    </span>service_connection_count: HashMap&lt;ObjectId, u32&gt;,
 
-    <span class="doccomment">/// The established connections that are currently checked into the pool and awaiting usage in</span>
-    <span class="doccomment">/// future operations.</span>
-    <span class="ident">available_connections</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The established connections that are currently checked into the pool and awaiting usage in
+    /// future operations.
+    </span>available_connections: VecDeque&lt;Connection&gt;,
 
-    <span class="doccomment">/// Contains the logic for &quot;establishing&quot; a connection. This includes handshaking and</span>
-    <span class="doccomment">/// authenticating a connection when it&#39;s first created.</span>
-    <span class="ident">establisher</span>: <span class="ident">ConnectionEstablisher</span>,
+    <span class="doccomment">/// Contains the logic for &quot;establishing&quot; a connection. This includes handshaking and
+    /// authenticating a connection when it&#39;s first created.
+    </span>establisher: ConnectionEstablisher,
 
-    <span class="doccomment">/// The options used to create new connections.</span>
-    <span class="ident">connection_options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The options used to create new connections.
+    </span>connection_options: <span class="prelude-ty">Option</span>&lt;ConnectionOptions&gt;,
 
-    <span class="doccomment">/// The event handler specified by the user to process CMAP events.</span>
-    <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span> <span class="op">=</span> <span class="string">&quot;ignore&quot;</span>)]</span>
-    <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CmapEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The event handler specified by the user to process CMAP events.
+    </span><span class="attribute">#[derivative(Debug = <span class="string">&quot;ignore&quot;</span>)]
+    </span>event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>CmapEventHandler&gt;&gt;,
 
-    <span class="doccomment">/// The time between maintenance tasks.</span>
-    <span class="ident">maintenance_frequency</span>: <span class="ident">Duration</span>,
+    <span class="doccomment">/// The time between maintenance tasks.
+    </span>maintenance_frequency: Duration,
 
-    <span class="doccomment">/// Connections that have been ready for usage in the pool for longer than `max_idle_time` will</span>
-    <span class="doccomment">/// be closed either by the background thread or when popped off of the set of available</span>
-    <span class="doccomment">/// connections. If `max_idle_time` is `None`, then connections will not be closed due to being</span>
-    <span class="doccomment">/// idle.</span>
-    <span class="ident">max_idle_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Connections that have been ready for usage in the pool for longer than `max_idle_time` will
+    /// be closed either by the background thread or when popped off of the set of available
+    /// connections. If `max_idle_time` is `None`, then connections will not be closed due to being
+    /// idle.
+    </span>max_idle_time: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
-    <span class="doccomment">/// The minimum number of connections that the pool can have at a given time. This includes</span>
-    <span class="doccomment">/// connections which are currently checked out of the pool. If fewer than `min_pool_size`</span>
-    <span class="doccomment">/// connections are in the pool, the background thread will create more connections and add</span>
-    <span class="doccomment">/// them to the pool.</span>
-    <span class="ident">min_pool_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The minimum number of connections that the pool can have at a given time. This includes
+    /// connections which are currently checked out of the pool. If fewer than `min_pool_size`
+    /// connections are in the pool, the background thread will create more connections and add
+    /// them to the pool.
+    </span>min_pool_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 
-    <span class="doccomment">/// The maximum number of connections that the pool can manage, including connections checked</span>
-    <span class="doccomment">/// out of the pool. If a thread requests a connection and the pool is empty + there are</span>
-    <span class="doccomment">/// already max_pool_size connections in use, it will block until one is returned or the</span>
-    <span class="doccomment">/// wait_queue_timeout is exceeded.</span>
-    <span class="ident">max_pool_size</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The maximum number of connections that the pool can manage, including connections checked
+    /// out of the pool. If a thread requests a connection and the pool is empty + there are
+    /// already max_pool_size connections in use, it will block until one is returned or the
+    /// wait_queue_timeout is exceeded.
+    </span>max_pool_size: u32,
 
-    <span class="doccomment">/// Receiver used to determine if any threads hold references to this pool. If all the</span>
-    <span class="doccomment">/// sender ends of this receiver drop, this worker will be notified and drop too.</span>
-    <span class="ident">handle_listener</span>: <span class="ident">WorkerHandleListener</span>,
+    <span class="doccomment">/// Receiver used to determine if any threads hold references to this pool. If all the
+    /// sender ends of this receiver drop, this worker will be notified and drop too.
+    </span>handle_listener: WorkerHandleListener,
 
-    <span class="doccomment">/// Receiver for incoming connection check out requests.</span>
-    <span class="ident">request_receiver</span>: <span class="ident">ConnectionRequestReceiver</span>,
+    <span class="doccomment">/// Receiver for incoming connection check out requests.
+    </span>request_receiver: ConnectionRequestReceiver,
 
-    <span class="doccomment">/// Ordered queue of incoming requests waiting for connections.</span>
-    <span class="ident">wait_queue</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">ConnectionRequest</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Ordered queue of incoming requests waiting for connections.
+    </span>wait_queue: VecDeque&lt;ConnectionRequest&gt;,
 
-    <span class="doccomment">/// Receiver for incoming pool management requests (e.g. checking in a connection).</span>
-    <span class="ident">management_receiver</span>: <span class="ident">ManagementRequestReceiver</span>,
+    <span class="doccomment">/// Receiver for incoming pool management requests (e.g. checking in a connection).
+    </span>management_receiver: ManagementRequestReceiver,
 
-    <span class="doccomment">/// Sender used to publish the latest generation and notifications for any establishment errors</span>
-    <span class="doccomment">/// encountered by the pool.</span>
-    <span class="ident">generation_publisher</span>: <span class="ident">PoolGenerationPublisher</span>,
+    <span class="doccomment">/// Sender used to publish the latest generation and notifications for any establishment errors
+    /// encountered by the pool.
+    </span>generation_publisher: PoolGenerationPublisher,
 
-    <span class="doccomment">/// A pool manager that can be cloned and attached to connections checked out of the pool.</span>
-    <span class="ident">manager</span>: <span class="ident">PoolManager</span>,
+    <span class="doccomment">/// A pool manager that can be cloned and attached to connections checked out of the pool.
+    </span>manager: PoolManager,
 
-    <span class="doccomment">/// A handle used to notify SDAM that a connection establishment error happened. This will</span>
-    <span class="doccomment">/// allow the server to transition to Unknown and clear the pool as necessary.</span>
-    <span class="ident">server_updater</span>: <span class="ident">TopologyUpdater</span>,
+    <span class="doccomment">/// A handle used to notify SDAM that a connection establishment error happened. This will
+    /// allow the server to transition to Unknown and clear the pool as necessary.
+    </span>server_updater: TopologyUpdater,
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectionPoolWorker</span> {
-    <span class="doccomment">/// Starts a worker and returns a manager and connection requester.</span>
-    <span class="doccomment">/// Once all connection requesters are dropped, the worker will stop executing</span>
-    <span class="doccomment">/// and close the pool.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">start</span>(
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">http_client</span>: <span class="ident">runtime::HttpClient</span>,
-        <span class="ident">server_updater</span>: <span class="ident">TopologyUpdater</span>,
-        <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionPoolOptions</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="ident">PoolManager</span>, <span class="ident">ConnectionRequester</span>, <span class="ident">PoolGenerationSubscriber</span>) {
-        <span class="kw">let</span> <span class="ident">establisher</span> <span class="op">=</span> <span class="ident">ConnectionEstablisher::new</span>(<span class="ident">http_client</span>, <span class="ident">options</span>.<span class="ident">as_ref</span>());
-        <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">options</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">cmap_event_handler</span>.<span class="ident">clone</span>());
+<span class="kw">impl </span>ConnectionPoolWorker {
+    <span class="doccomment">/// Starts a worker and returns a manager and connection requester.
+    /// Once all connection requesters are dropped, the worker will stop executing
+    /// and close the pool.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>start(
+        address: ServerAddress,
+        http_client: runtime::HttpClient,
+        server_updater: TopologyUpdater,
+        options: <span class="prelude-ty">Option</span>&lt;ConnectionPoolOptions&gt;,
+    ) -&gt; (PoolManager, ConnectionRequester, PoolGenerationSubscriber) {
+        <span class="kw">let </span>establisher = ConnectionEstablisher::new(http_client, options.as_ref());
+        <span class="kw">let </span>event_handler = options
+            .as_ref()
+            .and_then(|opts| opts.cmap_event_handler.clone());
 
-        <span class="comment">// The CMAP spec indicates that a max idle time of zero means that connections should not be</span>
-        <span class="comment">// closed due to idleness.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_idle_time</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">max_idle_time</span>);
-        <span class="kw">if</span> <span class="ident">max_idle_time</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="number">0</span>)) {
-            <span class="ident">max_idle_time</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="comment">// The CMAP spec indicates that a max idle time of zero means that connections should not be
+        // closed due to idleness.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>max_idle_time = options.as_ref().and_then(|opts| opts.max_idle_time);
+        <span class="kw">if </span>max_idle_time == <span class="prelude-val">Some</span>(Duration::from_millis(<span class="number">0</span>)) {
+            max_idle_time = <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">max_pool_size</span> <span class="op">=</span> <span class="ident">options</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">max_pool_size</span>)
-            .<span class="ident">unwrap_or</span>(<span class="ident">DEFAULT_MAX_POOL_SIZE</span>);
+        <span class="kw">let </span>max_pool_size = options
+            .as_ref()
+            .and_then(|opts| opts.max_pool_size)
+            .unwrap_or(DEFAULT_MAX_POOL_SIZE);
 
-        <span class="kw">let</span> <span class="ident">min_pool_size</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">min_pool_size</span>);
+        <span class="kw">let </span>min_pool_size = options.as_ref().and_then(|opts| opts.min_pool_size);
 
-        <span class="kw">let</span> <span class="ident">connection_options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionOptions</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">options</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pool_options</span><span class="op">|</span> <span class="ident">ConnectionOptions::from</span>(<span class="ident">pool_options</span>.<span class="ident">clone</span>()));
+        <span class="kw">let </span>connection_options: <span class="prelude-ty">Option</span>&lt;ConnectionOptions&gt; = options
+            .as_ref()
+            .map(|pool_options| ConnectionOptions::from(pool_options.clone()));
 
-        <span class="kw">let</span> (<span class="ident">handle</span>, <span class="ident">handle_listener</span>) <span class="op">=</span> <span class="ident">WorkerHandleListener::channel</span>();
-        <span class="kw">let</span> (<span class="ident">connection_requester</span>, <span class="ident">request_receiver</span>) <span class="op">=</span> <span class="ident">connection_requester::channel</span>(<span class="ident">handle</span>);
-        <span class="kw">let</span> (<span class="ident">manager</span>, <span class="ident">management_receiver</span>) <span class="op">=</span> <span class="ident">manager::channel</span>();
+        <span class="kw">let </span>(handle, handle_listener) = WorkerHandleListener::channel();
+        <span class="kw">let </span>(connection_requester, request_receiver) = connection_requester::channel(handle);
+        <span class="kw">let </span>(manager, management_receiver) = manager::channel();
 
-        <span class="kw">let</span> <span class="ident">is_load_balanced</span> <span class="op">=</span> <span class="ident">options</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">load_balanced</span>)
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
-        <span class="kw">let</span> <span class="ident">generation</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_load_balanced</span> {
-            <span class="ident">PoolGeneration::load_balanced</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">PoolGeneration::normal</span>()
+        <span class="kw">let </span>is_load_balanced = options
+            .as_ref()
+            .and_then(|opts| opts.load_balanced)
+            .unwrap_or(<span class="bool-val">false</span>);
+        <span class="kw">let </span>generation = <span class="kw">if </span>is_load_balanced {
+            PoolGeneration::load_balanced()
+        } <span class="kw">else </span>{
+            PoolGeneration::normal()
         };
-        <span class="kw">let</span> (<span class="ident">generation_publisher</span>, <span class="ident">generation_subscriber</span>) <span class="op">=</span> <span class="ident">status::channel</span>(<span class="ident">generation</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>(generation_publisher, generation_subscriber) = status::channel(generation.clone());
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">options</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">ready</span>)
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        <span class="attribute">#[cfg(test)]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>state = <span class="kw">if </span>options
+            .as_ref()
+            .and_then(|opts| opts.ready)
+            .unwrap_or(<span class="bool-val">false</span>)
         {
-            <span class="ident">PoolState::Ready</span>
-        } <span class="kw">else</span> {
-            <span class="ident">PoolState::New</span>
+            PoolState::Ready
+        } <span class="kw">else </span>{
+            PoolState::New
         };
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-        <span class="kw">let</span> <span class="ident">maintenance_frequency</span> <span class="op">=</span> <span class="ident">options</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">background_thread_interval</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">i</span> {
-                <span class="comment">// One year is long enough to count as never for tests, but not so long that it</span>
-                <span class="comment">// will overflow interval math.</span>
-                <span class="ident">BackgroundThreadInterval::Never</span> =&gt; <span class="ident">Duration::from_secs</span>(<span class="number">31_556_952</span>),
-                <span class="ident">BackgroundThreadInterval::Every</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>,
+        <span class="attribute">#[cfg(test)]
+        </span><span class="kw">let </span>maintenance_frequency = options
+            .as_ref()
+            .and_then(|opts| opts.background_thread_interval)
+            .map(|i| <span class="kw">match </span>i {
+                <span class="comment">// One year is long enough to count as never for tests, but not so long that it
+                // will overflow interval math.
+                </span>BackgroundThreadInterval::Never =&gt; Duration::from_secs(<span class="number">31_556_952</span>),
+                BackgroundThreadInterval::Every(d) =&gt; d,
             })
-            .<span class="ident">unwrap_or</span>(<span class="ident">MAINTENACE_FREQUENCY</span>);
+            .unwrap_or(MAINTENACE_FREQUENCY);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">maintenance_frequency</span>) <span class="op">=</span> (<span class="ident">PoolState::New</span>, <span class="ident">MAINTENACE_FREQUENCY</span>);
+        <span class="attribute">#[cfg(not(test))]
+        </span><span class="kw">let </span>(<span class="kw-2">mut </span>state, maintenance_frequency) = (PoolState::New, MAINTENACE_FREQUENCY);
 
-        <span class="kw">if</span> <span class="ident">is_load_balanced</span> {
-            <span class="comment">// Because load balancer servers don&#39;t have a monitoring connection, the associated</span>
-            <span class="comment">// connection pool needs start in the ready state.</span>
-            <span class="ident">state</span> <span class="op">=</span> <span class="ident">PoolState::Ready</span>;
+        <span class="kw">if </span>is_load_balanced {
+            <span class="comment">// Because load balancer servers don&#39;t have a monitoring connection, the associated
+            // connection pool needs start in the ready state.
+            </span>state = PoolState::Ready;
         }
 
-        <span class="kw">let</span> <span class="ident">worker</span> <span class="op">=</span> <span class="ident">ConnectionPoolWorker</span> {
-            <span class="ident">address</span>,
-            <span class="ident">event_handler</span>: <span class="ident">event_handler</span>.<span class="ident">clone</span>(),
-            <span class="ident">max_idle_time</span>,
-            <span class="ident">min_pool_size</span>,
-            <span class="ident">establisher</span>,
-            <span class="ident">next_connection_id</span>: <span class="number">1</span>,
-            <span class="ident">total_connection_count</span>: <span class="number">0</span>,
-            <span class="ident">pending_connection_count</span>: <span class="number">0</span>,
-            <span class="ident">generation</span>,
-            <span class="ident">service_connection_count</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">connection_options</span>,
-            <span class="ident">available_connections</span>: <span class="ident">VecDeque::new</span>(),
-            <span class="ident">max_pool_size</span>,
-            <span class="ident">request_receiver</span>,
-            <span class="ident">wait_queue</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">management_receiver</span>,
-            <span class="ident">manager</span>: <span class="ident">manager</span>.<span class="ident">clone</span>(),
-            <span class="ident">handle_listener</span>,
-            <span class="ident">state</span>,
-            <span class="ident">generation_publisher</span>,
-            <span class="ident">maintenance_frequency</span>,
-            <span class="ident">server_updater</span>,
+        <span class="kw">let </span>worker = ConnectionPoolWorker {
+            address,
+            event_handler: event_handler.clone(),
+            max_idle_time,
+            min_pool_size,
+            establisher,
+            next_connection_id: <span class="number">1</span>,
+            total_connection_count: <span class="number">0</span>,
+            pending_connection_count: <span class="number">0</span>,
+            generation,
+            service_connection_count: HashMap::new(),
+            connection_options,
+            available_connections: VecDeque::new(),
+            max_pool_size,
+            request_receiver,
+            wait_queue: Default::default(),
+            management_receiver,
+            manager: manager.clone(),
+            handle_listener,
+            state,
+            generation_publisher,
+            maintenance_frequency,
+            server_updater,
         };
 
-        <span class="ident">runtime::execute</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">worker</span>.<span class="ident">execute</span>().<span class="kw">await</span>;
+        runtime::execute(<span class="kw">async move </span>{
+            worker.execute().<span class="kw">await</span>;
         });
 
-        (<span class="ident">manager</span>, <span class="ident">connection_requester</span>, <span class="ident">generation_subscriber</span>)
+        (manager, connection_requester, generation_subscriber)
     }
 
-    <span class="doccomment">/// Run the worker thread, listening on the various receivers until all handles have been</span>
-    <span class="doccomment">/// dropped. Once all handles are dropped, the pool will close any available connections and</span>
-    <span class="doccomment">/// emit a pool closed event.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">maintenance_interval</span> <span class="op">=</span> <span class="ident">runtime::interval</span>(<span class="self">self</span>.<span class="ident">maintenance_frequency</span>);
+    <span class="doccomment">/// Run the worker thread, listening on the various receivers until all handles have been
+    /// dropped. Once all handles are dropped, the pool will close any available connections and
+    /// emit a pool closed event.
+    </span><span class="kw">async fn </span>execute(<span class="kw-2">mut </span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>maintenance_interval = runtime::interval(<span class="self">self</span>.maintenance_frequency);
 
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="macro">tokio::select!</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">request_receiver</span>.<span class="ident">recv</span>() =&gt; {
-                    <span class="ident">PoolTask::CheckOut</span>(<span class="ident">request</span>)
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>task = <span class="macro">tokio::select! </span>{
+                <span class="prelude-val">Some</span>(request) = <span class="self">self</span>.request_receiver.recv() =&gt; {
+                    PoolTask::CheckOut(request)
                 },
-                <span class="prelude-val">Some</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">management_receiver</span>.<span class="ident">recv</span>() =&gt; <span class="ident">request</span>.<span class="ident">into</span>(),
-                <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handle_listener</span>.<span class="ident">wait_for_all_handle_drops</span>() =&gt; {
-                    <span class="comment">// all worker handles have been dropped meaning this</span>
-                    <span class="comment">// pool has no more references and can be dropped itself.</span>
-                    <span class="kw">break</span>
+                <span class="prelude-val">Some</span>(request) = <span class="self">self</span>.management_receiver.recv() =&gt; request.into(),
+                <span class="kw">_ </span>= <span class="self">self</span>.handle_listener.wait_for_all_handle_drops() =&gt; {
+                    <span class="comment">// all worker handles have been dropped meaning this
+                    // pool has no more references and can be dropped itself.
+                    </span><span class="kw">break
+                </span>},
+                <span class="kw">_ </span>= maintenance_interval.tick() =&gt; {
+                    PoolTask::Maintenance
                 },
-                <span class="kw">_</span> <span class="op">=</span> <span class="ident">maintenance_interval</span>.<span class="ident">tick</span>() =&gt; {
-                    <span class="ident">PoolTask::Maintenance</span>
-                },
-                <span class="kw">else</span> =&gt; {
-                    <span class="kw">break</span>
-                }
+                <span class="kw">else </span>=&gt; {
+                    <span class="kw">break
+                </span>}
             };
 
-            <span class="kw">match</span> <span class="ident">task</span> {
-                <span class="ident">PoolTask::CheckOut</span>(<span class="ident">request</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
-                    <span class="ident">PoolState::Ready</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">wait_queue</span>.<span class="ident">push_back</span>(<span class="ident">request</span>);
+            <span class="kw">match </span>task {
+                PoolTask::CheckOut(request) =&gt; <span class="kw">match </span><span class="self">self</span>.state {
+                    PoolState::Ready =&gt; {
+                        <span class="self">self</span>.wait_queue.push_back(request);
                     }
-                    <span class="ident">PoolState::Paused</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; {
-                        <span class="comment">// if receiver doesn&#39;t listen to error that&#39;s ok.</span>
-                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">fulfill</span>(<span class="ident">ConnectionRequestResult::PoolCleared</span>(<span class="ident">e</span>.<span class="ident">clone</span>()));
+                    PoolState::Paused(<span class="kw-2">ref </span>e) =&gt; {
+                        <span class="comment">// if receiver doesn&#39;t listen to error that&#39;s ok.
+                        </span><span class="kw">let _ </span>= request.fulfill(ConnectionRequestResult::PoolCleared(e.clone()));
                     }
-                    <span class="ident">PoolState::New</span> =&gt; {
-                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">fulfill</span>(<span class="ident">ConnectionRequestResult::PoolCleared</span>(
-                            <span class="ident">ErrorKind::Internal</span> {
-                                <span class="ident">message</span>: <span class="string">&quot;check out attempted from new pool&quot;</span>.<span class="ident">to_string</span>(),
+                    PoolState::New =&gt; {
+                        <span class="kw">let _ </span>= request.fulfill(ConnectionRequestResult::PoolCleared(
+                            ErrorKind::Internal {
+                                message: <span class="string">&quot;check out attempted from new pool&quot;</span>.to_string(),
                             }
-                            .<span class="ident">into</span>(),
+                            .into(),
                         ));
                     }
                 },
-                <span class="ident">PoolTask::HandleManagementRequest</span>(<span class="ident">request</span>) =&gt; <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">request</span> {
-                    <span class="ident">PoolManagementRequest::CheckIn</span>(<span class="ident">connection</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">check_in</span>(<span class="kw-2">*</span><span class="ident">connection</span>);
+                PoolTask::HandleManagementRequest(request) =&gt; <span class="kw">match </span><span class="kw-2">*</span>request {
+                    PoolManagementRequest::CheckIn(connection) =&gt; {
+                        <span class="self">self</span>.check_in(<span class="kw-2">*</span>connection);
                     }
-                    <span class="ident">PoolManagementRequest::Clear</span> {
-                        <span class="ident">cause</span>, <span class="ident">service_id</span>, ..
+                    PoolManagementRequest::Clear {
+                        cause, service_id, ..
                     } =&gt; {
-                        <span class="self">self</span>.<span class="ident">clear</span>(<span class="ident">cause</span>, <span class="ident">service_id</span>);
+                        <span class="self">self</span>.clear(cause, service_id);
                     }
-                    <span class="ident">PoolManagementRequest::MarkAsReady</span> {
-                        <span class="ident">_completion_handler</span>,
+                    PoolManagementRequest::MarkAsReady {
+                        _completion_handler,
                     } =&gt; {
-                        <span class="self">self</span>.<span class="ident">mark_as_ready</span>();
-                        <span class="ident">_completion_handler</span>.<span class="ident">acknowledge</span>(());
+                        <span class="self">self</span>.mark_as_ready();
+                        _completion_handler.acknowledge(());
                     }
-                    <span class="ident">PoolManagementRequest::HandleConnectionSucceeded</span>(<span class="ident">conn</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">handle_connection_succeeded</span>(<span class="ident">conn</span>);
+                    PoolManagementRequest::HandleConnectionSucceeded(conn) =&gt; {
+                        <span class="self">self</span>.handle_connection_succeeded(conn);
                     }
-                    <span class="ident">PoolManagementRequest::HandleConnectionFailed</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">handle_connection_failed</span>();
+                    PoolManagementRequest::HandleConnectionFailed =&gt; {
+                        <span class="self">self</span>.handle_connection_failed();
                     }
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-                    <span class="ident">PoolManagementRequest::Sync</span>(<span class="ident">tx</span>) =&gt; {
-                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">send</span>(());
+                    <span class="attribute">#[cfg(test)]
+                    </span>PoolManagementRequest::Sync(tx) =&gt; {
+                        <span class="kw">let _ </span>= tx.send(());
                     }
                 },
-                <span class="ident">PoolTask::Maintenance</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">perform_maintenance</span>();
+                PoolTask::Maintenance =&gt; {
+                    <span class="self">self</span>.perform_maintenance();
                 }
             }
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">can_service_connection_request</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">wait_queue</span>.<span class="ident">pop_front</span>() {
-                    <span class="self">self</span>.<span class="ident">check_out</span>(<span class="ident">request</span>).<span class="kw">await</span>;
+            <span class="kw">if </span><span class="self">self</span>.can_service_connection_request() {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(request) = <span class="self">self</span>.wait_queue.pop_front() {
+                    <span class="self">self</span>.check_out(request).<span class="kw">await</span>;
                 }
             }
         }
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">connection</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">available_connections</span>.<span class="ident">pop_front</span>() {
-            <span class="ident">connection</span>.<span class="ident">close_and_drop</span>(<span class="ident">ConnectionClosedReason::PoolClosed</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(connection) = <span class="self">self</span>.available_connections.pop_front() {
+            connection.close_and_drop(ConnectionClosedReason::PoolClosed);
         }
 
-        <span class="self">self</span>.<span class="ident">emit_event</span>(<span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-            <span class="ident">handler</span>.<span class="ident">handle_pool_closed_event</span>(<span class="ident">PoolClosedEvent</span> {
-                <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
+        <span class="self">self</span>.emit_event(|handler| {
+            handler.handle_pool_closed_event(PoolClosedEvent {
+                address: <span class="self">self</span>.address.clone(),
             });
         });
     }
 
-    <span class="kw">fn</span> <span class="ident">below_max_connections</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">total_connection_count</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">max_pool_size</span>
+    <span class="kw">fn </span>below_max_connections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.total_connection_count &lt; <span class="self">self</span>.max_pool_size
     }
 
-    <span class="kw">fn</span> <span class="ident">can_service_connection_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">state</span>, <span class="ident">PoolState::Ready</span>) {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="kw">fn </span>can_service_connection_request(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">if </span>!<span class="macro">matches!</span>(<span class="self">self</span>.state, PoolState::Ready) {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">available_connections</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span>!<span class="self">self</span>.available_connections.is_empty() {
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">below_max_connections</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">pending_connection_count</span> <span class="op">&lt;</span> <span class="ident">MAX_CONNECTING</span>
+        <span class="self">self</span>.below_max_connections() &amp;&amp; <span class="self">self</span>.pending_connection_count &lt; MAX_CONNECTING
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_out</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">ConnectionRequest</span>) {
-        <span class="comment">// first attempt to check out an available connection</span>
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">available_connections</span>.<span class="ident">pop_back</span>() {
-            <span class="comment">// Close the connection if it&#39;s stale.</span>
-            <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">generation</span>.<span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generation</span>) {
-                <span class="self">self</span>.<span class="ident">close_connection</span>(<span class="ident">conn</span>, <span class="ident">ConnectionClosedReason::Stale</span>);
+    <span class="kw">async fn </span>check_out(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request: ConnectionRequest) {
+        <span class="comment">// first attempt to check out an available connection
+        </span><span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>conn) = <span class="self">self</span>.available_connections.pop_back() {
+            <span class="comment">// Close the connection if it&#39;s stale.
+            </span><span class="kw">if </span>conn.generation.is_stale(<span class="kw-2">&amp;</span><span class="self">self</span>.generation) {
+                <span class="self">self</span>.close_connection(conn, ConnectionClosedReason::Stale);
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// Close the connection if it&#39;s idle.</span>
-            <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">is_idle</span>(<span class="self">self</span>.<span class="ident">max_idle_time</span>) {
-                <span class="self">self</span>.<span class="ident">close_connection</span>(<span class="ident">conn</span>, <span class="ident">ConnectionClosedReason::Idle</span>);
+            <span class="comment">// Close the connection if it&#39;s idle.
+            </span><span class="kw">if </span>conn.is_idle(<span class="self">self</span>.max_idle_time) {
+                <span class="self">self</span>.close_connection(conn, ConnectionClosedReason::Idle);
                 <span class="kw">continue</span>;
             }
 
-            <span class="ident">conn</span>.<span class="ident">mark_as_in_use</span>(<span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">clone</span>());
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="ident">request</span>.<span class="ident">fulfill</span>(<span class="ident">ConnectionRequestResult::Pooled</span>(<span class="ident">Box::new</span>(<span class="ident">conn</span>))) {
-                <span class="comment">// checking out thread stopped listening, indicating it hit the WaitQueue</span>
-                <span class="comment">// timeout, so we put connection back into pool.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">unwrap_pooled_connection</span>();
-                <span class="ident">connection</span>.<span class="ident">mark_as_available</span>();
-                <span class="self">self</span>.<span class="ident">available_connections</span>.<span class="ident">push_back</span>(<span class="ident">connection</span>);
+            conn.mark_as_in_use(<span class="self">self</span>.manager.clone());
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(request) = request.fulfill(ConnectionRequestResult::Pooled(Box::new(conn))) {
+                <span class="comment">// checking out thread stopped listening, indicating it hit the WaitQueue
+                // timeout, so we put connection back into pool.
+                </span><span class="kw">let </span><span class="kw-2">mut </span>connection = request.unwrap_pooled_connection();
+                connection.mark_as_available();
+                <span class="self">self</span>.available_connections.push_back(connection);
             }
 
             <span class="kw">return</span>;
         }
 
-        <span class="comment">// otherwise, attempt to create a connection.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">below_max_connections</span>() {
-            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">establisher</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">establisher</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">pending_connection</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">create_pending_connection</span>();
-            <span class="kw">let</span> <span class="ident">manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">server_updater</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">server_updater</span>.<span class="ident">clone</span>();
+        <span class="comment">// otherwise, attempt to create a connection.
+        </span><span class="kw">if </span><span class="self">self</span>.below_max_connections() {
+            <span class="kw">let </span>event_handler = <span class="self">self</span>.event_handler.clone();
+            <span class="kw">let </span>establisher = <span class="self">self</span>.establisher.clone();
+            <span class="kw">let </span>pending_connection = <span class="self">self</span>.create_pending_connection();
+            <span class="kw">let </span>manager = <span class="self">self</span>.manager.clone();
+            <span class="kw">let </span><span class="kw-2">mut </span>server_updater = <span class="self">self</span>.server_updater.clone();
 
-            <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">runtime::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">establish_result</span> <span class="op">=</span> <span class="ident">establish_connection</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">establisher</span>,
-                    <span class="ident">pending_connection</span>,
-                    <span class="kw-2">&amp;mut</span> <span class="ident">server_updater</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">manager</span>,
-                    <span class="ident">event_handler</span>.<span class="ident">as_ref</span>(),
+            <span class="kw">let </span>handle = runtime::spawn(<span class="kw">async move </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>establish_result = establish_connection(
+                    <span class="kw-2">&amp;</span>establisher,
+                    pending_connection,
+                    <span class="kw-2">&amp;mut </span>server_updater,
+                    <span class="kw-2">&amp;</span>manager,
+                    event_handler.as_ref(),
                 )
                 .<span class="kw">await</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=</span> <span class="ident">establish_result</span> {
-                    <span class="ident">c</span>.<span class="ident">mark_as_in_use</span>(<span class="ident">manager</span>.<span class="ident">clone</span>());
-                    <span class="ident">manager</span>.<span class="ident">handle_connection_succeeded</span>(<span class="ident">ConnectionSucceeded::Used</span> {
-                        <span class="ident">service_id</span>: <span class="ident">c</span>.<span class="ident">generation</span>.<span class="ident">service_id</span>(),
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">ref mut </span>c) = establish_result {
+                    c.mark_as_in_use(manager.clone());
+                    manager.handle_connection_succeeded(ConnectionSucceeded::Used {
+                        service_id: c.generation.service_id(),
                     });
                 }
 
-                <span class="ident">establish_result</span>
+                establish_result
             });
 
-            <span class="comment">// this only fails if the other end stopped listening (e.g. due to timeout), in</span>
-            <span class="comment">// which case we just let the connection establish in the background.</span>
-            <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
-                <span class="ident">request</span>.<span class="ident">fulfill</span>(<span class="ident">ConnectionRequestResult::Establishing</span>(<span class="ident">handle</span>));
-        } <span class="kw">else</span> {
-            <span class="comment">// put the request to the the front of the wait queue so that it will be processed</span>
-            <span class="comment">// next time a request can be processed.</span>
-            <span class="self">self</span>.<span class="ident">wait_queue</span>.<span class="ident">push_front</span>(<span class="ident">request</span>);
+            <span class="comment">// this only fails if the other end stopped listening (e.g. due to timeout), in
+            // which case we just let the connection establish in the background.
+            </span><span class="kw">let _</span>: std::result::Result&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; =
+                request.fulfill(ConnectionRequestResult::Establishing(handle));
+        } <span class="kw">else </span>{
+            <span class="comment">// put the request to the the front of the wait queue so that it will be processed
+            // next time a request can be processed.
+            </span><span class="self">self</span>.wait_queue.push_front(request);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">create_pending_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">PendingConnection</span> {
-        <span class="self">self</span>.<span class="ident">total_connection_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">pending_connection_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">fn </span>create_pending_connection(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; PendingConnection {
+        <span class="self">self</span>.total_connection_count += <span class="number">1</span>;
+        <span class="self">self</span>.pending_connection_count += <span class="number">1</span>;
 
-        <span class="kw">let</span> <span class="ident">pending_connection</span> <span class="op">=</span> <span class="ident">PendingConnection</span> {
-            <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">next_connection_id</span>,
-            <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-            <span class="ident">generation</span>: <span class="self">self</span>.<span class="ident">generation</span>.<span class="ident">clone</span>(),
-            <span class="ident">options</span>: <span class="self">self</span>.<span class="ident">connection_options</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span>pending_connection = PendingConnection {
+            id: <span class="self">self</span>.next_connection_id,
+            address: <span class="self">self</span>.address.clone(),
+            generation: <span class="self">self</span>.generation.clone(),
+            options: <span class="self">self</span>.connection_options.clone(),
         };
-        <span class="self">self</span>.<span class="ident">next_connection_id</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">emit_event</span>(<span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-            <span class="ident">handler</span>.<span class="ident">handle_connection_created_event</span>(<span class="ident">pending_connection</span>.<span class="ident">created_event</span>())
+        <span class="self">self</span>.next_connection_id += <span class="number">1</span>;
+        <span class="self">self</span>.emit_event(|handler| {
+            handler.handle_connection_created_event(pending_connection.created_event())
         });
 
-        <span class="ident">pending_connection</span>
+        pending_connection
     }
 
-    <span class="doccomment">/// Process a connection establishment failure.</span>
-    <span class="kw">fn</span> <span class="ident">handle_connection_failed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// Establishing a pending connection failed, so that must be reflected in to total</span>
-        <span class="comment">// connection count.</span>
-        <span class="self">self</span>.<span class="ident">total_connection_count</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">pending_connection_count</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="doccomment">/// Process a connection establishment failure.
+    </span><span class="kw">fn </span>handle_connection_failed(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// Establishing a pending connection failed, so that must be reflected in to total
+        // connection count.
+        </span><span class="self">self</span>.total_connection_count -= <span class="number">1</span>;
+        <span class="self">self</span>.pending_connection_count -= <span class="number">1</span>;
     }
 
-    <span class="doccomment">/// Process a successful connection establishment, optionally populating the pool with the</span>
-    <span class="doccomment">/// resulting connection.</span>
-    <span class="kw">fn</span> <span class="ident">handle_connection_succeeded</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">connection</span>: <span class="ident">ConnectionSucceeded</span>) {
-        <span class="self">self</span>.<span class="ident">pending_connection_count</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sid</span>) <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">service_id</span>() {
-            <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">service_connection_count</span>.<span class="ident">entry</span>(<span class="ident">sid</span>).<span class="ident">or_insert</span>(<span class="number">0</span>);
-            <span class="kw-2">*</span><span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="doccomment">/// Process a successful connection establishment, optionally populating the pool with the
+    /// resulting connection.
+    </span><span class="kw">fn </span>handle_connection_succeeded(<span class="kw-2">&amp;mut </span><span class="self">self</span>, connection: ConnectionSucceeded) {
+        <span class="self">self</span>.pending_connection_count -= <span class="number">1</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(sid) = connection.service_id() {
+            <span class="kw">let </span>count = <span class="self">self</span>.service_connection_count.entry(sid).or_insert(<span class="number">0</span>);
+            <span class="kw-2">*</span>count += <span class="number">1</span>;
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ConnectionSucceeded::ForPool</span>(<span class="ident">connection</span>) <span class="op">=</span> <span class="ident">connection</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connection</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">connection</span>;
-            <span class="ident">connection</span>.<span class="ident">mark_as_available</span>();
-            <span class="self">self</span>.<span class="ident">available_connections</span>.<span class="ident">push_back</span>(<span class="ident">connection</span>);
+        <span class="kw">if let </span>ConnectionSucceeded::ForPool(connection) = connection {
+            <span class="kw">let </span><span class="kw-2">mut </span>connection = <span class="kw-2">*</span>connection;
+            connection.mark_as_available();
+            <span class="self">self</span>.available_connections.push_back(connection);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">check_in</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">conn</span>: <span class="ident">Connection</span>) {
-        <span class="self">self</span>.<span class="ident">emit_event</span>(<span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-            <span class="ident">handler</span>.<span class="ident">handle_connection_checked_in_event</span>(<span class="ident">conn</span>.<span class="ident">checked_in_event</span>());
+    <span class="kw">fn </span>check_in(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>conn: Connection) {
+        <span class="self">self</span>.emit_event(|handler| {
+            handler.handle_connection_checked_in_event(conn.checked_in_event());
         });
 
-        <span class="ident">conn</span>.<span class="ident">mark_as_available</span>();
+        conn.mark_as_available();
 
-        <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">has_errored</span>() {
-            <span class="self">self</span>.<span class="ident">close_connection</span>(<span class="ident">conn</span>, <span class="ident">ConnectionClosedReason::Error</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">generation</span>.<span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generation</span>) {
-            <span class="self">self</span>.<span class="ident">close_connection</span>(<span class="ident">conn</span>, <span class="ident">ConnectionClosedReason::Stale</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">is_executing</span>() {
-            <span class="self">self</span>.<span class="ident">close_connection</span>(<span class="ident">conn</span>, <span class="ident">ConnectionClosedReason::Dropped</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">available_connections</span>.<span class="ident">push_back</span>(<span class="ident">conn</span>);
+        <span class="kw">if </span>conn.has_errored() {
+            <span class="self">self</span>.close_connection(conn, ConnectionClosedReason::Error);
+        } <span class="kw">else if </span>conn.generation.is_stale(<span class="kw-2">&amp;</span><span class="self">self</span>.generation) {
+            <span class="self">self</span>.close_connection(conn, ConnectionClosedReason::Stale);
+        } <span class="kw">else if </span>conn.is_executing() {
+            <span class="self">self</span>.close_connection(conn, ConnectionClosedReason::Dropped);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.available_connections.push_back(conn);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cause</span>: <span class="ident">Error</span>, <span class="ident">service_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">was_ready</span> <span class="op">=</span> <span class="kw">match</span> (<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">generation</span>, <span class="ident">service_id</span>) {
-            (<span class="ident">PoolGeneration::Normal</span>(<span class="ident">gen</span>), <span class="prelude-val">None</span>) =&gt; {
-                <span class="kw-2">*</span><span class="ident">gen</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="ident">PoolState::Paused</span>(<span class="ident">cause</span>.<span class="ident">clone</span>()));
-                <span class="macro">matches!</span>(<span class="ident">prev</span>, <span class="ident">PoolState::Ready</span>)
+    <span class="kw">fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cause: Error, service_id: <span class="prelude-ty">Option</span>&lt;ObjectId&gt;) {
+        <span class="kw">let </span>was_ready = <span class="kw">match </span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>.generation, service_id) {
+            (PoolGeneration::Normal(gen), <span class="prelude-val">None</span>) =&gt; {
+                <span class="kw-2">*</span>gen += <span class="number">1</span>;
+                <span class="kw">let </span>prev = std::mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.state, PoolState::Paused(cause.clone()));
+                <span class="macro">matches!</span>(prev, PoolState::Ready)
             }
-            (<span class="ident">PoolGeneration::LoadBalanced</span>(<span class="ident">gen_map</span>), <span class="prelude-val">Some</span>(<span class="ident">sid</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">gen_map</span>.<span class="ident">entry</span>(<span class="ident">sid</span>).<span class="ident">or_insert</span>(<span class="number">0</span>);
-                <span class="kw-2">*</span><span class="ident">gen</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="bool-val">true</span>
-            }
+            (PoolGeneration::LoadBalanced(gen_map), <span class="prelude-val">Some</span>(sid)) =&gt; {
+                <span class="kw">let </span>gen = gen_map.entry(sid).or_insert(<span class="number">0</span>);
+                <span class="kw-2">*</span>gen += <span class="number">1</span>;
+                <span class="bool-val">true
+            </span>}
             (..) =&gt; <span class="macro">load_balanced_mode_mismatch!</span>(),
         };
-        <span class="self">self</span>.<span class="ident">generation_publisher</span>.<span class="ident">publish</span>(<span class="self">self</span>.<span class="ident">generation</span>.<span class="ident">clone</span>());
+        <span class="self">self</span>.generation_publisher.publish(<span class="self">self</span>.generation.clone());
 
-        <span class="kw">if</span> <span class="ident">was_ready</span> {
-            <span class="self">self</span>.<span class="ident">emit_event</span>(<span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">PoolClearedEvent</span> {
-                    <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-                    <span class="ident">service_id</span>,
+        <span class="kw">if </span>was_ready {
+            <span class="self">self</span>.emit_event(|handler| {
+                <span class="kw">let </span>event = PoolClearedEvent {
+                    address: <span class="self">self</span>.address.clone(),
+                    service_id,
                 };
 
-                <span class="ident">handler</span>.<span class="ident">handle_pool_cleared_event</span>(<span class="ident">event</span>);
+                handler.handle_pool_cleared_event(event);
             });
 
-            <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">generation</span>, <span class="ident">PoolGeneration::LoadBalanced</span>(<span class="kw">_</span>)) {
-                <span class="kw">for</span> <span class="ident">request</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">wait_queue</span>.<span class="ident">drain</span>(..) {
-                    <span class="comment">// an error means the other end hung up already, which is okay because we were</span>
-                    <span class="comment">// returning an error anyways</span>
-                    <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
-                        <span class="ident">request</span>.<span class="ident">fulfill</span>(<span class="ident">ConnectionRequestResult::PoolCleared</span>(<span class="ident">cause</span>.<span class="ident">clone</span>()));
+            <span class="kw">if </span>!<span class="macro">matches!</span>(<span class="self">self</span>.generation, PoolGeneration::LoadBalanced(<span class="kw">_</span>)) {
+                <span class="kw">for </span>request <span class="kw">in </span><span class="self">self</span>.wait_queue.drain(..) {
+                    <span class="comment">// an error means the other end hung up already, which is okay because we were
+                    // returning an error anyways
+                    </span><span class="kw">let _</span>: std::result::Result&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; =
+                        request.fulfill(ConnectionRequestResult::PoolCleared(cause.clone()));
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">mark_as_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">state</span>, <span class="ident">PoolState::Ready</span>) {
+    <span class="kw">fn </span>mark_as_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="macro">matches!</span>(<span class="self">self</span>.state, PoolState::Ready) {
             <span class="kw">return</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">PoolState::Ready</span>;
-        <span class="self">self</span>.<span class="ident">emit_event</span>(<span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">PoolReadyEvent</span> {
-                <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
+        <span class="self">self</span>.state = PoolState::Ready;
+        <span class="self">self</span>.emit_event(|handler| {
+            <span class="kw">let </span>event = PoolReadyEvent {
+                address: <span class="self">self</span>.address.clone(),
             };
 
-            <span class="ident">handler</span>.<span class="ident">handle_pool_ready_event</span>(<span class="ident">event</span>);
+            handler.handle_pool_ready_event(event);
         });
     }
 
-    <span class="kw">fn</span> <span class="ident">emit_event</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">emit</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CmapEventHandler</span><span class="op">&gt;</span>),
+    <span class="kw">fn </span>emit_event&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, emit: F)
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;</span>Arc&lt;<span class="kw">dyn </span>CmapEventHandler&gt;),
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">handler</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">event_handler</span> {
-            <span class="ident">emit</span>(<span class="ident">handler</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>handler) = <span class="self">self</span>.event_handler {
+            emit(handler);
         }
     }
 
-    <span class="doccomment">/// Close a connection, emit the event for it being closed, and decrement the</span>
-    <span class="doccomment">/// total connection count.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::single_match</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">close_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">connection</span>: <span class="ident">Connection</span>, <span class="ident">reason</span>: <span class="ident">ConnectionClosedReason</span>) {
-        <span class="kw">match</span> (<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">generation</span>, <span class="ident">connection</span>.<span class="ident">generation</span>.<span class="ident">service_id</span>()) {
-            (<span class="ident">PoolGeneration::LoadBalanced</span>(<span class="ident">gen_map</span>), <span class="prelude-val">Some</span>(<span class="ident">sid</span>)) =&gt; {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">service_connection_count</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">sid</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">count</span>) =&gt; {
-                        <span class="kw-2">*</span><span class="ident">count</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-                        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">count</span> <span class="op">==</span> <span class="number">0</span> {
-                            <span class="ident">gen_map</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">sid</span>);
-                            <span class="self">self</span>.<span class="ident">service_connection_count</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">sid</span>);
+    <span class="doccomment">/// Close a connection, emit the event for it being closed, and decrement the
+    /// total connection count.
+    </span><span class="attribute">#[allow(clippy::single_match)]
+    </span><span class="kw">fn </span>close_connection(<span class="kw-2">&amp;mut </span><span class="self">self</span>, connection: Connection, reason: ConnectionClosedReason) {
+        <span class="kw">match </span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>.generation, connection.generation.service_id()) {
+            (PoolGeneration::LoadBalanced(gen_map), <span class="prelude-val">Some</span>(sid)) =&gt; {
+                <span class="kw">match </span><span class="self">self</span>.service_connection_count.get_mut(<span class="kw-2">&amp;</span>sid) {
+                    <span class="prelude-val">Some</span>(count) =&gt; {
+                        <span class="kw-2">*</span>count -= <span class="number">1</span>;
+                        <span class="kw">if </span><span class="kw-2">*</span>count == <span class="number">0 </span>{
+                            gen_map.remove(<span class="kw-2">&amp;</span>sid);
+                            <span class="self">self</span>.service_connection_count.remove(<span class="kw-2">&amp;</span>sid);
                         }
                     }
-                    <span class="prelude-val">None</span> =&gt; <span class="macro">load_balanced_mode_mismatch!</span>(),
+                    <span class="prelude-val">None </span>=&gt; <span class="macro">load_balanced_mode_mismatch!</span>(),
                 }
             }
-            (<span class="ident">PoolGeneration::Normal</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; {}
-            <span class="kw">_</span> =&gt; <span class="macro">load_balanced_mode_mismatch!</span>(),
+            (PoolGeneration::Normal(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; {}
+            <span class="kw">_ </span>=&gt; <span class="macro">load_balanced_mode_mismatch!</span>(),
         }
-        <span class="ident">connection</span>.<span class="ident">close_and_drop</span>(<span class="ident">reason</span>);
-        <span class="self">self</span>.<span class="ident">total_connection_count</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        connection.close_and_drop(reason);
+        <span class="self">self</span>.total_connection_count -= <span class="number">1</span>;
     }
 
-    <span class="doccomment">/// Ensure all connections in the pool are valid and that the pool is managing at least</span>
-    <span class="doccomment">/// min_pool_size connections.</span>
-    <span class="kw">fn</span> <span class="ident">perform_maintenance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">remove_perished_connections</span>();
-        <span class="kw">if</span> <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">state</span>, <span class="ident">PoolState::Ready</span>) {
-            <span class="self">self</span>.<span class="ident">ensure_min_connections</span>();
+    <span class="doccomment">/// Ensure all connections in the pool are valid and that the pool is managing at least
+    /// min_pool_size connections.
+    </span><span class="kw">fn </span>perform_maintenance(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.remove_perished_connections();
+        <span class="kw">if </span><span class="macro">matches!</span>(<span class="self">self</span>.state, PoolState::Ready) {
+            <span class="self">self</span>.ensure_min_connections();
         }
     }
 
-    <span class="doccomment">/// Iterate over the connections and remove any that are stale or idle.</span>
-    <span class="kw">fn</span> <span class="ident">remove_perished_connections</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">connection</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">available_connections</span>.<span class="ident">pop_front</span>() {
-            <span class="kw">if</span> <span class="ident">connection</span>.<span class="ident">generation</span>.<span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generation</span>) {
-                <span class="comment">// the following unwrap is okay becaue we asserted the pool was nonempty</span>
-                <span class="self">self</span>.<span class="ident">close_connection</span>(<span class="ident">connection</span>, <span class="ident">ConnectionClosedReason::Stale</span>);
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">connection</span>.<span class="ident">is_idle</span>(<span class="self">self</span>.<span class="ident">max_idle_time</span>) {
-                <span class="self">self</span>.<span class="ident">close_connection</span>(<span class="ident">connection</span>, <span class="ident">ConnectionClosedReason::Idle</span>);
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">available_connections</span>.<span class="ident">push_front</span>(<span class="ident">connection</span>);
-                <span class="comment">// All subsequent connections are either not idle or not stale since they were</span>
-                <span class="comment">// checked into the pool later, so we can just quit early.</span>
-                <span class="kw">break</span>;
+    <span class="doccomment">/// Iterate over the connections and remove any that are stale or idle.
+    </span><span class="kw">fn </span>remove_perished_connections(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(connection) = <span class="self">self</span>.available_connections.pop_front() {
+            <span class="kw">if </span>connection.generation.is_stale(<span class="kw-2">&amp;</span><span class="self">self</span>.generation) {
+                <span class="comment">// the following unwrap is okay becaue we asserted the pool was nonempty
+                </span><span class="self">self</span>.close_connection(connection, ConnectionClosedReason::Stale);
+            } <span class="kw">else if </span>connection.is_idle(<span class="self">self</span>.max_idle_time) {
+                <span class="self">self</span>.close_connection(connection, ConnectionClosedReason::Idle);
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.available_connections.push_front(connection);
+                <span class="comment">// All subsequent connections are either not idle or not stale since they were
+                // checked into the pool later, so we can just quit early.
+                </span><span class="kw">break</span>;
             };
         }
     }
 
-    <span class="doccomment">/// Populate the the pool with enough connections to meet the min_pool_size_requirement.</span>
-    <span class="kw">fn</span> <span class="ident">ensure_min_connections</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">min_pool_size</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">min_pool_size</span> {
-            <span class="kw">while</span> <span class="self">self</span>.<span class="ident">total_connection_count</span> <span class="op">&lt;</span> <span class="ident">min_pool_size</span>
-                <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">pending_connection_count</span> <span class="op">&lt;</span> <span class="ident">MAX_CONNECTING</span>
+    <span class="doccomment">/// Populate the the pool with enough connections to meet the min_pool_size_requirement.
+    </span><span class="kw">fn </span>ensure_min_connections(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(min_pool_size) = <span class="self">self</span>.min_pool_size {
+            <span class="kw">while </span><span class="self">self</span>.total_connection_count &lt; min_pool_size
+                &amp;&amp; <span class="self">self</span>.pending_connection_count &lt; MAX_CONNECTING
             {
-                <span class="kw">let</span> <span class="ident">pending_connection</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">create_pending_connection</span>();
-                <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">clone</span>();
-                <span class="kw">let</span> <span class="ident">manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">clone</span>();
-                <span class="kw">let</span> <span class="ident">establisher</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">establisher</span>.<span class="ident">clone</span>();
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">updater</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">server_updater</span>.<span class="ident">clone</span>();
-                <span class="ident">runtime::execute</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">let</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">establish_connection</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">establisher</span>,
-                        <span class="ident">pending_connection</span>,
-                        <span class="kw-2">&amp;mut</span> <span class="ident">updater</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">manager</span>,
-                        <span class="ident">event_handler</span>.<span class="ident">as_ref</span>(),
+                <span class="kw">let </span>pending_connection = <span class="self">self</span>.create_pending_connection();
+                <span class="kw">let </span>event_handler = <span class="self">self</span>.event_handler.clone();
+                <span class="kw">let </span>manager = <span class="self">self</span>.manager.clone();
+                <span class="kw">let </span>establisher = <span class="self">self</span>.establisher.clone();
+                <span class="kw">let </span><span class="kw-2">mut </span>updater = <span class="self">self</span>.server_updater.clone();
+                runtime::execute(<span class="kw">async move </span>{
+                    <span class="kw">let </span>connection = establish_connection(
+                        <span class="kw-2">&amp;</span>establisher,
+                        pending_connection,
+                        <span class="kw-2">&amp;mut </span>updater,
+                        <span class="kw-2">&amp;</span>manager,
+                        event_handler.as_ref(),
                     )
                     .<span class="kw">await</span>;
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">connection</span>) <span class="op">=</span> <span class="ident">connection</span> {
-                        <span class="ident">manager</span>.<span class="ident">handle_connection_succeeded</span>(<span class="ident">ConnectionSucceeded::ForPool</span>(<span class="ident">Box::new</span>(
-                            <span class="ident">connection</span>,
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(connection) = connection {
+                        manager.handle_connection_succeeded(ConnectionSucceeded::ForPool(Box::new(
+                            connection,
                         )))
                     }
                 });
@@ -1348,107 +1348,107 @@
     }
 }
 
-<span class="doccomment">/// Helper covering the common connection establishment behavior between</span>
-<span class="doccomment">/// connections established in check_out and those established as part of</span>
-<span class="doccomment">/// satisfying min_pool_size.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">establish_connection</span>(
-    <span class="ident">establisher</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectionEstablisher</span>,
-    <span class="ident">pending_connection</span>: <span class="ident">PendingConnection</span>,
-    <span class="ident">server_updater</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TopologyUpdater</span>,
-    <span class="ident">manager</span>: <span class="kw-2">&amp;</span><span class="ident">PoolManager</span>,
-    <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CmapEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">connection_id</span> <span class="op">=</span> <span class="ident">pending_connection</span>.<span class="ident">id</span>;
-    <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">pending_connection</span>.<span class="ident">address</span>.<span class="ident">clone</span>();
+<span class="doccomment">/// Helper covering the common connection establishment behavior between
+/// connections established in check_out and those established as part of
+/// satisfying min_pool_size.
+</span><span class="kw">async fn </span>establish_connection(
+    establisher: <span class="kw-2">&amp;</span>ConnectionEstablisher,
+    pending_connection: PendingConnection,
+    server_updater: <span class="kw-2">&amp;mut </span>TopologyUpdater,
+    manager: <span class="kw-2">&amp;</span>PoolManager,
+    event_handler: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;<span class="kw">dyn </span>CmapEventHandler&gt;&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Connection&gt; {
+    <span class="kw">let </span>connection_id = pending_connection.id;
+    <span class="kw">let </span>address = pending_connection.address.clone();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">establish_result</span> <span class="op">=</span> <span class="ident">establisher</span>.<span class="ident">establish_connection</span>(<span class="ident">pending_connection</span>).<span class="kw">await</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>establish_result = establisher.establish_connection(pending_connection).<span class="kw">await</span>;
 
-    <span class="kw">match</span> <span class="ident">establish_result</span> {
-        <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; {
-            <span class="ident">server_updater</span>
-                .<span class="ident">handle_application_error</span>(
-                    <span class="ident">address</span>.<span class="ident">clone</span>(),
-                    <span class="ident">e</span>.<span class="ident">cause</span>.<span class="ident">clone</span>(),
-                    <span class="ident">e</span>.<span class="ident">handshake_phase</span>.<span class="ident">clone</span>(),
+    <span class="kw">match </span>establish_result {
+        <span class="prelude-val">Err</span>(<span class="kw-2">ref </span>e) =&gt; {
+            server_updater
+                .handle_application_error(
+                    address.clone(),
+                    e.cause.clone(),
+                    e.handshake_phase.clone(),
                 )
                 .<span class="kw">await</span>;
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>) <span class="op">=</span> <span class="ident">event_handler</span> {
-                <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ConnectionClosedEvent</span> {
-                    <span class="ident">address</span>,
-                    <span class="ident">reason</span>: <span class="ident">ConnectionClosedReason::Error</span>,
-                    <span class="ident">connection_id</span>,
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(handler) = event_handler {
+                <span class="kw">let </span>event = ConnectionClosedEvent {
+                    address,
+                    reason: ConnectionClosedReason::Error,
+                    connection_id,
                 };
-                <span class="ident">handler</span>.<span class="ident">handle_connection_closed_event</span>(<span class="ident">event</span>);
+                handler.handle_connection_closed_event(event);
             }
-            <span class="ident">manager</span>.<span class="ident">handle_connection_failed</span>();
+            manager.handle_connection_failed();
         }
-        <span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">connection</span>) =&gt; {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>) <span class="op">=</span> <span class="ident">event_handler</span> {
-                <span class="ident">handler</span>.<span class="ident">handle_connection_ready_event</span>(<span class="ident">connection</span>.<span class="ident">ready_event</span>())
+        <span class="prelude-val">Ok</span>(<span class="kw-2">ref mut </span>connection) =&gt; {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(handler) = event_handler {
+                handler.handle_connection_ready_event(connection.ready_event())
             };
         }
     }
 
-    <span class="ident">establish_result</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">cause</span>)
+    establish_result.map_err(|e| e.cause)
 }
 
-<span class="doccomment">/// Enum modeling the possible pool states as described in the CMAP spec.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The &quot;closed&quot; state is omitted here because the pool considered closed only</span>
-<span class="doccomment">/// once it goes out of scope and cannot be manually closed before then.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">PoolState</span> {
-    <span class="doccomment">/// Same as Paused, but only for a new pool, not one that has been cleared due to an error.</span>
-    <span class="ident">New</span>,
+<span class="doccomment">/// Enum modeling the possible pool states as described in the CMAP spec.
+///
+/// The &quot;closed&quot; state is omitted here because the pool considered closed only
+/// once it goes out of scope and cannot be manually closed before then.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>PoolState {
+    <span class="doccomment">/// Same as Paused, but only for a new pool, not one that has been cleared due to an error.
+    </span>New,
 
-    <span class="doccomment">/// Connections may not be checked out nor created in the background to satisfy minPoolSize.</span>
-    <span class="ident">Paused</span>(<span class="ident">Error</span>),
+    <span class="doccomment">/// Connections may not be checked out nor created in the background to satisfy minPoolSize.
+    </span>Paused(Error),
 
-    <span class="doccomment">/// Pool is operational.</span>
-    <span class="ident">Ready</span>,
+    <span class="doccomment">/// Pool is operational.
+    </span>Ready,
 }
 
-<span class="doccomment">/// Task to process by the worker.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">PoolTask</span> {
-    <span class="doccomment">/// Handle a management request from a `PoolManager`.</span>
-    <span class="ident">HandleManagementRequest</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">PoolManagementRequest</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Task to process by the worker.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>PoolTask {
+    <span class="doccomment">/// Handle a management request from a `PoolManager`.
+    </span>HandleManagementRequest(Box&lt;PoolManagementRequest&gt;),
 
-    <span class="doccomment">/// Fulfill the given connection request.</span>
-    <span class="ident">CheckOut</span>(<span class="ident">ConnectionRequest</span>),
+    <span class="doccomment">/// Fulfill the given connection request.
+    </span>CheckOut(ConnectionRequest),
 
-    <span class="doccomment">/// Perform pool maintenance (ensure min connections, remove stale or idle connections).</span>
-    <span class="ident">Maintenance</span>,
+    <span class="doccomment">/// Perform pool maintenance (ensure min connections, remove stale or idle connections).
+    </span>Maintenance,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PoolManagementRequest</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PoolTask</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">request</span>: <span class="ident">PoolManagementRequest</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">PoolTask::HandleManagementRequest</span>(<span class="ident">Box::new</span>(<span class="ident">request</span>))
+<span class="kw">impl </span>From&lt;PoolManagementRequest&gt; <span class="kw">for </span>PoolTask {
+    <span class="kw">fn </span>from(request: PoolManagementRequest) -&gt; <span class="self">Self </span>{
+        PoolTask::HandleManagementRequest(Box::new(request))
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">PoolGeneration</span> {
-    <span class="ident">Normal</span>(<span class="ident">u32</span>),
-    <span class="ident">LoadBalanced</span>(<span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ObjectId</span>, <span class="ident">u32</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>PoolGeneration {
+    Normal(u32),
+    LoadBalanced(HashMap&lt;ObjectId, u32&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">PoolGeneration</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">normal</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Normal</span>(<span class="number">0</span>)
+<span class="kw">impl </span>PoolGeneration {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>normal() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Normal(<span class="number">0</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">load_balanced</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::LoadBalanced</span>(<span class="ident">HashMap::new</span>())
+    <span class="kw">fn </span>load_balanced() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::LoadBalanced(HashMap::new())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_normal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PoolGeneration::Normal</span>(<span class="ident">n</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">n</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_normal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            PoolGeneration::Normal(n) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>n),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

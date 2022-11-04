@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/fmt/time/time_crate.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>time_crate.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/fmt/time/time_crate.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>time_crate.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -470,475 +470,475 @@
 <span id="468">468</span>
 <span id="469">469</span>
 <span id="470">470</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fmt</span>::{<span class="ident">format::Writer</span>, <span class="ident">time::FormatTime</span>, <span class="ident">writer::WriteAdaptor</span>};
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">time</span>::{<span class="ident">format_description::well_known</span>, <span class="ident">formatting::Formattable</span>, <span class="ident">OffsetDateTime</span>, <span class="ident">UtcOffset</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::fmt::{format::Writer, time::FormatTime, writer::WriteAdaptor};
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>time::{format_description::well_known, formatting::Formattable, OffsetDateTime, UtcOffset};
 
-<span class="doccomment">/// Formats the current [local time] using a [formatter] from the [`time` crate].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To format the current [UTC time] instead, use the [`UtcTime`] type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;div class=&quot;example-wrap&quot; style=&quot;display:inline-block&quot;&gt;</span>
-<span class="doccomment">/// &lt;pre class=&quot;compile_fail&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;</span>
-<span class="doccomment">///     &lt;strong&gt;Warning&lt;/strong&gt;: The &lt;a href = &quot;https://docs.rs/time/0.3/time/&quot;&gt;&lt;code&gt;time&lt;/code&gt;</span>
-<span class="doccomment">///     crate&lt;/a&gt; must be compiled with &lt;code&gt;--cfg unsound_local_offset&lt;/code&gt; in order to use</span>
-<span class="doccomment">///     local timestamps. When this cfg is not enabled, local timestamps cannot be recorded, and</span>
-<span class="doccomment">///     events will be logged without timestamps.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    Alternatively, [`OffsetTime`] can log with a local offset if it is initialized early.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    See the &lt;a href=&quot;https://docs.rs/time/0.3.4/time/#feature-flags&quot;&gt;&lt;code&gt;time&lt;/code&gt;</span>
-<span class="doccomment">///    documentation&lt;/a&gt; for more details.</span>
-<span class="doccomment">/// &lt;/pre&gt;&lt;/div&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [local time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_local</span>
-<span class="doccomment">/// [UTC time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_utc</span>
-<span class="doccomment">/// [formatter]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html</span>
-<span class="doccomment">/// [`time` crate]: https://docs.rs/time/0.3/time/</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(
-    <span class="ident">docsrs</span>,
-    <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unsound_local_offset</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-time&quot;</span>)))
-)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-time&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LocalTime</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="ident">format</span>: <span class="ident">F</span>,
+<span class="doccomment">/// Formats the current [local time] using a [formatter] from the [`time` crate].
+///
+/// To format the current [UTC time] instead, use the [`UtcTime`] type.
+///
+/// &lt;div class=&quot;example-wrap&quot; style=&quot;display:inline-block&quot;&gt;
+/// &lt;pre class=&quot;compile_fail&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;
+///     &lt;strong&gt;Warning&lt;/strong&gt;: The &lt;a href = &quot;https://docs.rs/time/0.3/time/&quot;&gt;&lt;code&gt;time&lt;/code&gt;
+///     crate&lt;/a&gt; must be compiled with &lt;code&gt;--cfg unsound_local_offset&lt;/code&gt; in order to use
+///     local timestamps. When this cfg is not enabled, local timestamps cannot be recorded, and
+///     events will be logged without timestamps.
+///
+///    Alternatively, [`OffsetTime`] can log with a local offset if it is initialized early.
+///
+///    See the &lt;a href=&quot;https://docs.rs/time/0.3.4/time/#feature-flags&quot;&gt;&lt;code&gt;time&lt;/code&gt;
+///    documentation&lt;/a&gt; for more details.
+/// &lt;/pre&gt;&lt;/div&gt;
+///
+/// [local time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_local
+/// [UTC time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_utc
+/// [formatter]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html
+/// [`time` crate]: https://docs.rs/time/0.3/time/
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[cfg_attr(
+    docsrs,
+    doc(cfg(all(unsound_local_offset, feature = <span class="string">&quot;time&quot;</span>, feature = <span class="string">&quot;local-time&quot;</span>)))
+)]
+#[cfg(feature = <span class="string">&quot;local-time&quot;</span>)]
+</span><span class="kw">pub struct </span>LocalTime&lt;F&gt; {
+    format: F,
 }
 
-<span class="doccomment">/// Formats the current [UTC time] using a [formatter] from the [`time` crate].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To format the current [local time] instead, use the [`LocalTime`] type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [local time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_local</span>
-<span class="doccomment">/// [UTC time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_utc</span>
-<span class="doccomment">/// [formatter]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html</span>
-<span class="doccomment">/// [`time` crate]: https://docs.rs/time/0.3/time/</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UtcTime</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="ident">format</span>: <span class="ident">F</span>,
+<span class="doccomment">/// Formats the current [UTC time] using a [formatter] from the [`time` crate].
+///
+/// To format the current [local time] instead, use the [`LocalTime`] type.
+///
+/// [local time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_local
+/// [UTC time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_utc
+/// [formatter]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html
+/// [`time` crate]: https://docs.rs/time/0.3/time/
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;time&quot;</span>)))]
+#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>UtcTime&lt;F&gt; {
+    format: F,
 }
 
-<span class="doccomment">/// Formats the current time using a fixed offset and a [formatter] from the [`time` crate].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is typically used as an alternative to [`LocalTime`]. `LocalTime` determines the offset</span>
-<span class="doccomment">/// every time it formats a message, which may be unsound or fail. With `OffsetTime`, the offset is</span>
-<span class="doccomment">/// determined once. This makes it possible to do so while the program is still single-threaded and</span>
-<span class="doccomment">/// handle any errors. However, this also means the offset cannot change while the program is</span>
-<span class="doccomment">/// running (the offset will not change across DST changes).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [formatter]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html</span>
-<span class="doccomment">/// [`time` crate]: https://docs.rs/time/0.3/time/</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OffsetTime</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="ident">offset</span>: <span class="ident">time::UtcOffset</span>,
-    <span class="ident">format</span>: <span class="ident">F</span>,
+<span class="doccomment">/// Formats the current time using a fixed offset and a [formatter] from the [`time` crate].
+///
+/// This is typically used as an alternative to [`LocalTime`]. `LocalTime` determines the offset
+/// every time it formats a message, which may be unsound or fail. With `OffsetTime`, the offset is
+/// determined once. This makes it possible to do so while the program is still single-threaded and
+/// handle any errors. However, this also means the offset cannot change while the program is
+/// running (the offset will not change across DST changes).
+///
+/// [formatter]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html
+/// [`time` crate]: https://docs.rs/time/0.3/time/
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;time&quot;</span>)))]
+</span><span class="kw">pub struct </span>OffsetTime&lt;F&gt; {
+    offset: time::UtcOffset,
+    format: F,
 }
 
-<span class="comment">// === impl LocalTime ===</span>
+<span class="comment">// === impl LocalTime ===
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-time&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">LocalTime</span><span class="op">&lt;</span><span class="ident">well_known::Rfc3339</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a formatter that formats the current [local time] in the</span>
-    <span class="doccomment">/// [RFC 3339] format (a subset of the [ISO 8601] timestamp format).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(time::LocalTime::rfc_3339());</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [local time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_local</span>
-    <span class="doccomment">/// [RFC 3339]: https://datatracker.ietf.org/doc/html/rfc3339</span>
-    <span class="doccomment">/// [ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rfc_3339</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">well_known::Rfc3339</span>)
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;local-time&quot;</span>)]
+</span><span class="kw">impl </span>LocalTime&lt;well_known::Rfc3339&gt; {
+    <span class="doccomment">/// Returns a formatter that formats the current [local time] in the
+    /// [RFC 3339] format (a subset of the [ISO 8601] timestamp format).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time};
+    ///
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(time::LocalTime::rfc_3339());
+    /// # drop(collector);
+    /// ```
+    ///
+    /// [local time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_local
+    /// [RFC 3339]: https://datatracker.ietf.org/doc/html/rfc3339
+    /// [ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601
+    </span><span class="kw">pub fn </span>rfc_3339() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(well_known::Rfc3339)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-time&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Formattable</span><span class="op">&gt;</span> <span class="ident">LocalTime</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a formatter that formats the current [local time] using the</span>
-    <span class="doccomment">/// [`time` crate] with the provided provided format. The format may be any</span>
-    <span class="doccomment">/// type that implements the [`Formattable`] trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// &lt;div class=&quot;example-wrap&quot; style=&quot;display:inline-block&quot;&gt;</span>
-    <span class="doccomment">/// &lt;pre class=&quot;compile_fail&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;</span>
-    <span class="doccomment">///     &lt;strong&gt;Warning&lt;/strong&gt;: The &lt;a href = &quot;https://docs.rs/time/0.3/time/&quot;&gt;</span>
-    <span class="doccomment">///     &lt;code&gt;time&lt;/code&gt; crate&lt;/a&gt; must be compiled with &lt;code&gt;--cfg</span>
-    <span class="doccomment">///     unsound_local_offset&lt;/code&gt; in order to use local timestamps. When this</span>
-    <span class="doccomment">///     cfg is not enabled, local timestamps cannot be recorded, and</span>
-    <span class="doccomment">///     events will be logged without timestamps.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    See the &lt;a href=&quot;https://docs.rs/time/0.3.4/time/#feature-flags&quot;&gt;</span>
-    <span class="doccomment">///    &lt;code&gt;time&lt;/code&gt; documentation&lt;/a&gt; for more details.</span>
-    <span class="doccomment">/// &lt;/pre&gt;&lt;/div&gt;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Typically, the format will be a format description string, or one of the</span>
-    <span class="doccomment">/// `time` crate&#39;s [well-known formats].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the format description is statically known, then the</span>
-    <span class="doccomment">/// [`format_description!`] macro should be used. This is identical to the</span>
-    <span class="doccomment">/// [`time::format_description::parse`] method, but runs at compile-time,</span>
-    <span class="doccomment">/// throwing an error if the format description is invalid. If the desired format</span>
-    <span class="doccomment">/// is not known statically (e.g., a user is providing a format string), then the</span>
-    <span class="doccomment">/// [`time::format_description::parse`] method should be used. Note that this</span>
-    <span class="doccomment">/// method is fallible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the [`time` book] for details on the format description syntax.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using the [`format_description!`] macro:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time::LocalTime};</span>
-    <span class="doccomment">/// use time::macros::format_description;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let timer = LocalTime::new(format_description!(&quot;[hour]:[minute]:[second]&quot;));</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(timer);</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using [`time::format_description::parse`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time::LocalTime};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let time_format = time::format_description::parse(&quot;[hour]:[minute]:[second]&quot;)</span>
-    <span class="doccomment">///     .expect(&quot;format string should be valid!&quot;);</span>
-    <span class="doccomment">/// let timer = LocalTime::new(time_format);</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(timer);</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using the [`format_description!`] macro requires enabling the `time`</span>
-    <span class="doccomment">/// crate&#39;s &quot;macros&quot; feature flag.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using a [well-known format][well-known formats] (this is equivalent to</span>
-    <span class="doccomment">/// [`LocalTime::rfc_3339`]):</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time::LocalTime};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let timer = LocalTime::new(time::format_description::well_known::Rfc3339);</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(timer);</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [local time]: https://docs.rs/time/latest/time/struct.OffsetDateTime.html#method.now_local</span>
-    <span class="doccomment">/// [`time` crate]: https://docs.rs/time/0.3/time/</span>
-    <span class="doccomment">/// [`Formattable`]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html</span>
-    <span class="doccomment">/// [well-known formats]: https://docs.rs/time/0.3/time/format_description/well_known/index.html</span>
-    <span class="doccomment">/// [`format_description!`]: https://docs.rs/time/0.3/time/macros/macro.format_description.html</span>
-    <span class="doccomment">/// [`time::format_description::parse`]: https://docs.rs/time/0.3/time/format_description/fn.parse.html</span>
-    <span class="doccomment">/// [`time` book]: https://time-rs.github.io/book/api/format-description.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">format</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">format</span> }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;local-time&quot;</span>)]
+</span><span class="kw">impl</span>&lt;F: Formattable&gt; LocalTime&lt;F&gt; {
+    <span class="doccomment">/// Returns a formatter that formats the current [local time] using the
+    /// [`time` crate] with the provided provided format. The format may be any
+    /// type that implements the [`Formattable`] trait.
+    ///
+    ///
+    /// &lt;div class=&quot;example-wrap&quot; style=&quot;display:inline-block&quot;&gt;
+    /// &lt;pre class=&quot;compile_fail&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;
+    ///     &lt;strong&gt;Warning&lt;/strong&gt;: The &lt;a href = &quot;https://docs.rs/time/0.3/time/&quot;&gt;
+    ///     &lt;code&gt;time&lt;/code&gt; crate&lt;/a&gt; must be compiled with &lt;code&gt;--cfg
+    ///     unsound_local_offset&lt;/code&gt; in order to use local timestamps. When this
+    ///     cfg is not enabled, local timestamps cannot be recorded, and
+    ///     events will be logged without timestamps.
+    ///
+    ///    See the &lt;a href=&quot;https://docs.rs/time/0.3.4/time/#feature-flags&quot;&gt;
+    ///    &lt;code&gt;time&lt;/code&gt; documentation&lt;/a&gt; for more details.
+    /// &lt;/pre&gt;&lt;/div&gt;
+    ///
+    /// Typically, the format will be a format description string, or one of the
+    /// `time` crate&#39;s [well-known formats].
+    ///
+    /// If the format description is statically known, then the
+    /// [`format_description!`] macro should be used. This is identical to the
+    /// [`time::format_description::parse`] method, but runs at compile-time,
+    /// throwing an error if the format description is invalid. If the desired format
+    /// is not known statically (e.g., a user is providing a format string), then the
+    /// [`time::format_description::parse`] method should be used. Note that this
+    /// method is fallible.
+    ///
+    /// See the [`time` book] for details on the format description syntax.
+    ///
+    /// # Examples
+    ///
+    /// Using the [`format_description!`] macro:
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time::LocalTime};
+    /// use time::macros::format_description;
+    ///
+    /// let timer = LocalTime::new(format_description!(&quot;[hour]:[minute]:[second]&quot;));
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(timer);
+    /// # drop(collector);
+    /// ```
+    ///
+    /// Using [`time::format_description::parse`]:
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time::LocalTime};
+    ///
+    /// let time_format = time::format_description::parse(&quot;[hour]:[minute]:[second]&quot;)
+    ///     .expect(&quot;format string should be valid!&quot;);
+    /// let timer = LocalTime::new(time_format);
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(timer);
+    /// # drop(collector);
+    /// ```
+    ///
+    /// Using the [`format_description!`] macro requires enabling the `time`
+    /// crate&#39;s &quot;macros&quot; feature flag.
+    ///
+    /// Using a [well-known format][well-known formats] (this is equivalent to
+    /// [`LocalTime::rfc_3339`]):
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time::LocalTime};
+    ///
+    /// let timer = LocalTime::new(time::format_description::well_known::Rfc3339);
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(timer);
+    /// # drop(collector);
+    /// ```
+    ///
+    /// [local time]: https://docs.rs/time/latest/time/struct.OffsetDateTime.html#method.now_local
+    /// [`time` crate]: https://docs.rs/time/0.3/time/
+    /// [`Formattable`]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html
+    /// [well-known formats]: https://docs.rs/time/0.3/time/format_description/well_known/index.html
+    /// [`format_description!`]: https://docs.rs/time/0.3/time/macros/macro.format_description.html
+    /// [`time::format_description::parse`]: https://docs.rs/time/0.3/time/format_description/fn.parse.html
+    /// [`time` book]: https://time-rs.github.io/book/api/format-description.html
+    </span><span class="kw">pub fn </span>new(format: F) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ format }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-time&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">FormatTime</span> <span class="kw">for</span> <span class="ident">LocalTime</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Formattable</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;local-time&quot;</span>)]
+</span><span class="kw">impl</span>&lt;F&gt; FormatTime <span class="kw">for </span>LocalTime&lt;F&gt;
+<span class="kw">where
+    </span>F: Formattable,
 {
-    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">OffsetDateTime::now_local</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fmt::Error</span>)<span class="question-mark">?</span>;
-        <span class="ident">format_datetime</span>(<span class="ident">now</span>, <span class="ident">w</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">format</span>)
+    <span class="kw">fn </span>format_time(<span class="kw-2">&amp;</span><span class="self">self</span>, w: <span class="kw-2">&amp;mut </span>Writer&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>now = OffsetDateTime::now_local().map_err(|<span class="kw">_</span>| fmt::Error)<span class="question-mark">?</span>;
+        format_datetime(now, w, <span class="kw-2">&amp;</span><span class="self">self</span>.format)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-time&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">LocalTime</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Formattable</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;local-time&quot;</span>)]
+</span><span class="kw">impl</span>&lt;F&gt; Default <span class="kw">for </span>LocalTime&lt;F&gt;
+<span class="kw">where
+    </span>F: Formattable + Default,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">F::default</span>())
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(F::default())
     }
 }
 
-<span class="comment">// === impl UtcTime ===</span>
+<span class="comment">// === impl UtcTime ===
 
-<span class="kw">impl</span> <span class="ident">UtcTime</span><span class="op">&lt;</span><span class="ident">well_known::Rfc3339</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a formatter that formats the current [UTC time] in the</span>
-    <span class="doccomment">/// [RFC 3339] format, which is a subset of the [ISO 8601] timestamp format.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(time::UtcTime::rfc_3339());</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [local time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_utc</span>
-    <span class="doccomment">/// [RFC 3339]: https://datatracker.ietf.org/doc/html/rfc3339</span>
-    <span class="doccomment">/// [ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rfc_3339</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">well_known::Rfc3339</span>)
+</span><span class="kw">impl </span>UtcTime&lt;well_known::Rfc3339&gt; {
+    <span class="doccomment">/// Returns a formatter that formats the current [UTC time] in the
+    /// [RFC 3339] format, which is a subset of the [ISO 8601] timestamp format.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time};
+    ///
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(time::UtcTime::rfc_3339());
+    /// # drop(collector);
+    /// ```
+    ///
+    /// [local time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_utc
+    /// [RFC 3339]: https://datatracker.ietf.org/doc/html/rfc3339
+    /// [ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601
+    </span><span class="kw">pub fn </span>rfc_3339() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(well_known::Rfc3339)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Formattable</span><span class="op">&gt;</span> <span class="ident">UtcTime</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a formatter that formats the current [UTC time] using the</span>
-    <span class="doccomment">/// [`time` crate], with the provided provided format. The format may be any</span>
-    <span class="doccomment">/// type that implements the [`Formattable`] trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Typically, the format will be a format description string, or one of the</span>
-    <span class="doccomment">/// `time` crate&#39;s [well-known formats].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the format description is statically known, then the</span>
-    <span class="doccomment">/// [`format_description!`] macro should be used. This is identical to the</span>
-    <span class="doccomment">/// [`time::format_description::parse`] method, but runs at compile-time,</span>
-    <span class="doccomment">/// failing  an error if the format description is invalid. If the desired format</span>
-    <span class="doccomment">/// is not known statically (e.g., a user is providing a format string), then the</span>
-    <span class="doccomment">/// [`time::format_description::parse`] method should be used. Note that this</span>
-    <span class="doccomment">/// method is fallible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the [`time` book] for details on the format description syntax.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using the [`format_description!`] macro:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time::UtcTime};</span>
-    <span class="doccomment">/// use time::macros::format_description;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let timer = UtcTime::new(format_description!(&quot;[hour]:[minute]:[second]&quot;));</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(timer);</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using the [`format_description!`] macro requires enabling the `time`</span>
-    <span class="doccomment">/// crate&#39;s &quot;macros&quot; feature flag.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using [`time::format_description::parse`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time::UtcTime};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let time_format = time::format_description::parse(&quot;[hour]:[minute]:[second]&quot;)</span>
-    <span class="doccomment">///     .expect(&quot;format string should be valid!&quot;);</span>
-    <span class="doccomment">/// let timer = UtcTime::new(time_format);</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(timer);</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using a [well-known format][well-known formats] (this is equivalent to</span>
-    <span class="doccomment">/// [`UtcTime::rfc_3339`]):</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time::UtcTime};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let timer = UtcTime::new(time::format_description::well_known::Rfc3339);</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(timer);</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [UTC time]: https://docs.rs/time/latest/time/struct.OffsetDateTime.html#method.now_utc</span>
-    <span class="doccomment">/// [`time` crate]: https://docs.rs/time/0.3/time/</span>
-    <span class="doccomment">/// [`Formattable`]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html</span>
-    <span class="doccomment">/// [well-known formats]: https://docs.rs/time/0.3/time/format_description/well_known/index.html</span>
-    <span class="doccomment">/// [`format_description!`]: https://docs.rs/time/0.3/time/macros/macro.format_description.html</span>
-    <span class="doccomment">/// [`time::format_description::parse`]: https://docs.rs/time/0.3/time/format_description/fn.parse.html</span>
-    <span class="doccomment">/// [`time` book]: https://time-rs.github.io/book/api/format-description.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">format</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">format</span> }
+<span class="kw">impl</span>&lt;F: Formattable&gt; UtcTime&lt;F&gt; {
+    <span class="doccomment">/// Returns a formatter that formats the current [UTC time] using the
+    /// [`time` crate], with the provided provided format. The format may be any
+    /// type that implements the [`Formattable`] trait.
+    ///
+    /// Typically, the format will be a format description string, or one of the
+    /// `time` crate&#39;s [well-known formats].
+    ///
+    /// If the format description is statically known, then the
+    /// [`format_description!`] macro should be used. This is identical to the
+    /// [`time::format_description::parse`] method, but runs at compile-time,
+    /// failing  an error if the format description is invalid. If the desired format
+    /// is not known statically (e.g., a user is providing a format string), then the
+    /// [`time::format_description::parse`] method should be used. Note that this
+    /// method is fallible.
+    ///
+    /// See the [`time` book] for details on the format description syntax.
+    ///
+    /// # Examples
+    ///
+    /// Using the [`format_description!`] macro:
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time::UtcTime};
+    /// use time::macros::format_description;
+    ///
+    /// let timer = UtcTime::new(format_description!(&quot;[hour]:[minute]:[second]&quot;));
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(timer);
+    /// # drop(collector);
+    /// ```
+    ///
+    /// Using the [`format_description!`] macro requires enabling the `time`
+    /// crate&#39;s &quot;macros&quot; feature flag.
+    ///
+    /// Using [`time::format_description::parse`]:
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time::UtcTime};
+    ///
+    /// let time_format = time::format_description::parse(&quot;[hour]:[minute]:[second]&quot;)
+    ///     .expect(&quot;format string should be valid!&quot;);
+    /// let timer = UtcTime::new(time_format);
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(timer);
+    /// # drop(collector);
+    /// ```
+    ///
+    /// Using a [well-known format][well-known formats] (this is equivalent to
+    /// [`UtcTime::rfc_3339`]):
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time::UtcTime};
+    ///
+    /// let timer = UtcTime::new(time::format_description::well_known::Rfc3339);
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(timer);
+    /// # drop(collector);
+    /// ```
+    ///
+    /// [UTC time]: https://docs.rs/time/latest/time/struct.OffsetDateTime.html#method.now_utc
+    /// [`time` crate]: https://docs.rs/time/0.3/time/
+    /// [`Formattable`]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html
+    /// [well-known formats]: https://docs.rs/time/0.3/time/format_description/well_known/index.html
+    /// [`format_description!`]: https://docs.rs/time/0.3/time/macros/macro.format_description.html
+    /// [`time::format_description::parse`]: https://docs.rs/time/0.3/time/format_description/fn.parse.html
+    /// [`time` book]: https://time-rs.github.io/book/api/format-description.html
+    </span><span class="kw">pub fn </span>new(format: F) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ format }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">FormatTime</span> <span class="kw">for</span> <span class="ident">UtcTime</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Formattable</span>,
+<span class="kw">impl</span>&lt;F&gt; FormatTime <span class="kw">for </span>UtcTime&lt;F&gt;
+<span class="kw">where
+    </span>F: Formattable,
 {
-    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">format_datetime</span>(<span class="ident">OffsetDateTime::now_utc</span>(), <span class="ident">w</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">format</span>)
+    <span class="kw">fn </span>format_time(<span class="kw-2">&amp;</span><span class="self">self</span>, w: <span class="kw-2">&amp;mut </span>Writer&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        format_datetime(OffsetDateTime::now_utc(), w, <span class="kw-2">&amp;</span><span class="self">self</span>.format)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">UtcTime</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Formattable</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;F&gt; Default <span class="kw">for </span>UtcTime&lt;F&gt;
+<span class="kw">where
+    </span>F: Formattable + Default,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">F::default</span>())
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(F::default())
     }
 }
 
-<span class="comment">// === impl OffsetTime ===</span>
+<span class="comment">// === impl OffsetTime ===
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-time&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">OffsetTime</span><span class="op">&lt;</span><span class="ident">well_known::Rfc3339</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a formatter that formats the current time using the [local time offset] in the [RFC</span>
-    <span class="doccomment">/// 3339] format (a subset of the [ISO 8601] timestamp format).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an error if the local time offset cannot be determined. This typically occurs in</span>
-    <span class="doccomment">/// multithreaded programs. To avoid this problem, initialize `OffsetTime` before forking</span>
-    <span class="doccomment">/// threads. When using Tokio, this means initializing `OffsetTime` before the Tokio runtime.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(time::OffsetTime::local_rfc_3339().expect(&quot;could not get local offset!&quot;));</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using `OffsetTime` with Tokio:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::time::OffsetTime;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[tokio::main]</span>
-    <span class="doccomment">/// async fn run() {</span>
-    <span class="doccomment">///     tracing::info!(&quot;runtime initialized&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // At this point the Tokio runtime is initialized, and we can use both Tokio and Tracing</span>
-    <span class="doccomment">///     // normally.</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn main() {</span>
-    <span class="doccomment">///     // Because we need to get the local offset before Tokio spawns any threads, our `main`</span>
-    <span class="doccomment">///     // function cannot use `tokio::main`.</span>
-    <span class="doccomment">///     tracing_subscriber::fmt()</span>
-    <span class="doccomment">///         .with_timer(OffsetTime::local_rfc_3339().expect(&quot;could not get local time offset&quot;))</span>
-    <span class="doccomment">///         .init();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // Even though `run` is written as an `async fn`, because we used `tokio::main` on it</span>
-    <span class="doccomment">///     // we can call it as a synchronous function.</span>
-    <span class="doccomment">///     run();</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [local time offset]: https://docs.rs/time/0.3/time/struct.UtcOffset.html#method.current_local_offset</span>
-    <span class="doccomment">/// [RFC 3339]: https://datatracker.ietf.org/doc/html/rfc3339</span>
-    <span class="doccomment">/// [ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_rfc_3339</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">time::error::IndeterminateOffset</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">UtcOffset::current_local_offset</span>()<span class="question-mark">?</span>,
-            <span class="ident">well_known::Rfc3339</span>,
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;local-time&quot;</span>)]
+</span><span class="kw">impl </span>OffsetTime&lt;well_known::Rfc3339&gt; {
+    <span class="doccomment">/// Returns a formatter that formats the current time using the [local time offset] in the [RFC
+    /// 3339] format (a subset of the [ISO 8601] timestamp format).
+    ///
+    /// Returns an error if the local time offset cannot be determined. This typically occurs in
+    /// multithreaded programs. To avoid this problem, initialize `OffsetTime` before forking
+    /// threads. When using Tokio, this means initializing `OffsetTime` before the Tokio runtime.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time};
+    ///
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(time::OffsetTime::local_rfc_3339().expect(&quot;could not get local offset!&quot;));
+    /// # drop(collector);
+    /// ```
+    ///
+    /// Using `OffsetTime` with Tokio:
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::time::OffsetTime;
+    ///
+    /// #[tokio::main]
+    /// async fn run() {
+    ///     tracing::info!(&quot;runtime initialized&quot;);
+    ///
+    ///     // At this point the Tokio runtime is initialized, and we can use both Tokio and Tracing
+    ///     // normally.
+    /// }
+    ///
+    /// fn main() {
+    ///     // Because we need to get the local offset before Tokio spawns any threads, our `main`
+    ///     // function cannot use `tokio::main`.
+    ///     tracing_subscriber::fmt()
+    ///         .with_timer(OffsetTime::local_rfc_3339().expect(&quot;could not get local time offset&quot;))
+    ///         .init();
+    ///
+    ///     // Even though `run` is written as an `async fn`, because we used `tokio::main` on it
+    ///     // we can call it as a synchronous function.
+    ///     run();
+    /// }
+    /// ```
+    ///
+    /// [local time offset]: https://docs.rs/time/0.3/time/struct.UtcOffset.html#method.current_local_offset
+    /// [RFC 3339]: https://datatracker.ietf.org/doc/html/rfc3339
+    /// [ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601
+    </span><span class="kw">pub fn </span>local_rfc_3339() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, time::error::IndeterminateOffset&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::new(
+            UtcOffset::current_local_offset()<span class="question-mark">?</span>,
+            well_known::Rfc3339,
         ))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">time::formatting::Formattable</span><span class="op">&gt;</span> <span class="ident">OffsetTime</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a formatter that formats the current time using the [`time` crate] with the provided</span>
-    <span class="doccomment">/// provided format and [timezone offset]. The format may be any type that implements the</span>
-    <span class="doccomment">/// [`Formattable`] trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Typically, the offset will be the [local offset], and format will be a format description</span>
-    <span class="doccomment">/// string, or one of the `time` crate&#39;s [well-known formats].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the format description is statically known, then the</span>
-    <span class="doccomment">/// [`format_description!`] macro should be used. This is identical to the</span>
-    <span class="doccomment">/// [`time::format_description::parse`] method, but runs at compile-time,</span>
-    <span class="doccomment">/// throwing an error if the format description is invalid. If the desired format</span>
-    <span class="doccomment">/// is not known statically (e.g., a user is providing a format string), then the</span>
-    <span class="doccomment">/// [`time::format_description::parse`] method should be used. Note that this</span>
-    <span class="doccomment">/// method is fallible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the [`time` book] for details on the format description syntax.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using the [`format_description!`] macro:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time::OffsetTime};</span>
-    <span class="doccomment">/// use time::macros::format_description;</span>
-    <span class="doccomment">/// use time::UtcOffset;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let offset = UtcOffset::current_local_offset().expect(&quot;should get local offset!&quot;);</span>
-    <span class="doccomment">/// let timer = OffsetTime::new(offset, format_description!(&quot;[hour]:[minute]:[second]&quot;));</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(timer);</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using [`time::format_description::parse`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time::OffsetTime};</span>
-    <span class="doccomment">/// use time::UtcOffset;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let offset = UtcOffset::current_local_offset().expect(&quot;should get local offset!&quot;);</span>
-    <span class="doccomment">/// let time_format = time::format_description::parse(&quot;[hour]:[minute]:[second]&quot;)</span>
-    <span class="doccomment">///     .expect(&quot;format string should be valid!&quot;);</span>
-    <span class="doccomment">/// let timer = OffsetTime::new(offset, time_format);</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(timer);</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using the [`format_description!`] macro requires enabling the `time`</span>
-    <span class="doccomment">/// crate&#39;s &quot;macros&quot; feature flag.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using a [well-known format][well-known formats] (this is equivalent to</span>
-    <span class="doccomment">/// [`OffsetTime::local_rfc_3339`]):</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tracing_subscriber::fmt::{self, time::OffsetTime};</span>
-    <span class="doccomment">/// use time::UtcOffset;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let offset = UtcOffset::current_local_offset().expect(&quot;should get local offset!&quot;);</span>
-    <span class="doccomment">/// let timer = OffsetTime::new(offset, time::format_description::well_known::Rfc3339);</span>
-    <span class="doccomment">/// let collector = tracing_subscriber::fmt()</span>
-    <span class="doccomment">///     .with_timer(timer);</span>
-    <span class="doccomment">/// # drop(collector);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`time` crate]: https://docs.rs/time/0.3/time/</span>
-    <span class="doccomment">/// [timezone offset]: https://docs.rs/time/latest/time/struct.UtcOffset.html</span>
-    <span class="doccomment">/// [`Formattable`]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html</span>
-    <span class="doccomment">/// [local offset]: https://docs.rs/time/0.3.5/time/struct.UtcOffset.html#method.current_local_offset</span>
-    <span class="doccomment">/// [well-known formats]: https://docs.rs/time/0.3/time/format_description/well_known/index.html</span>
-    <span class="doccomment">/// [`format_description!`]: https://docs.rs/time/0.3/time/macros/macro.format_description.html</span>
-    <span class="doccomment">/// [`time::format_description::parse`]: https://docs.rs/time/0.3/time/format_description/fn.parse.html</span>
-    <span class="doccomment">/// [`time` book]: https://time-rs.github.io/book/api/format-description.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">offset</span>: <span class="ident">time::UtcOffset</span>, <span class="ident">format</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">offset</span>, <span class="ident">format</span> }
+<span class="kw">impl</span>&lt;F: time::formatting::Formattable&gt; OffsetTime&lt;F&gt; {
+    <span class="doccomment">/// Returns a formatter that formats the current time using the [`time` crate] with the provided
+    /// provided format and [timezone offset]. The format may be any type that implements the
+    /// [`Formattable`] trait.
+    ///
+    ///
+    /// Typically, the offset will be the [local offset], and format will be a format description
+    /// string, or one of the `time` crate&#39;s [well-known formats].
+    ///
+    /// If the format description is statically known, then the
+    /// [`format_description!`] macro should be used. This is identical to the
+    /// [`time::format_description::parse`] method, but runs at compile-time,
+    /// throwing an error if the format description is invalid. If the desired format
+    /// is not known statically (e.g., a user is providing a format string), then the
+    /// [`time::format_description::parse`] method should be used. Note that this
+    /// method is fallible.
+    ///
+    /// See the [`time` book] for details on the format description syntax.
+    ///
+    /// # Examples
+    ///
+    /// Using the [`format_description!`] macro:
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time::OffsetTime};
+    /// use time::macros::format_description;
+    /// use time::UtcOffset;
+    ///
+    /// let offset = UtcOffset::current_local_offset().expect(&quot;should get local offset!&quot;);
+    /// let timer = OffsetTime::new(offset, format_description!(&quot;[hour]:[minute]:[second]&quot;));
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(timer);
+    /// # drop(collector);
+    /// ```
+    ///
+    /// Using [`time::format_description::parse`]:
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time::OffsetTime};
+    /// use time::UtcOffset;
+    ///
+    /// let offset = UtcOffset::current_local_offset().expect(&quot;should get local offset!&quot;);
+    /// let time_format = time::format_description::parse(&quot;[hour]:[minute]:[second]&quot;)
+    ///     .expect(&quot;format string should be valid!&quot;);
+    /// let timer = OffsetTime::new(offset, time_format);
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(timer);
+    /// # drop(collector);
+    /// ```
+    ///
+    /// Using the [`format_description!`] macro requires enabling the `time`
+    /// crate&#39;s &quot;macros&quot; feature flag.
+    ///
+    /// Using a [well-known format][well-known formats] (this is equivalent to
+    /// [`OffsetTime::local_rfc_3339`]):
+    ///
+    /// ```
+    /// use tracing_subscriber::fmt::{self, time::OffsetTime};
+    /// use time::UtcOffset;
+    ///
+    /// let offset = UtcOffset::current_local_offset().expect(&quot;should get local offset!&quot;);
+    /// let timer = OffsetTime::new(offset, time::format_description::well_known::Rfc3339);
+    /// let collector = tracing_subscriber::fmt()
+    ///     .with_timer(timer);
+    /// # drop(collector);
+    /// ```
+    ///
+    /// [`time` crate]: https://docs.rs/time/0.3/time/
+    /// [timezone offset]: https://docs.rs/time/latest/time/struct.UtcOffset.html
+    /// [`Formattable`]: https://docs.rs/time/0.3/time/formatting/trait.Formattable.html
+    /// [local offset]: https://docs.rs/time/0.3.5/time/struct.UtcOffset.html#method.current_local_offset
+    /// [well-known formats]: https://docs.rs/time/0.3/time/format_description/well_known/index.html
+    /// [`format_description!`]: https://docs.rs/time/0.3/time/macros/macro.format_description.html
+    /// [`time::format_description::parse`]: https://docs.rs/time/0.3/time/format_description/fn.parse.html
+    /// [`time` book]: https://time-rs.github.io/book/api/format-description.html
+    </span><span class="kw">pub fn </span>new(offset: time::UtcOffset, format: F) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ offset, format }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">FormatTime</span> <span class="kw">for</span> <span class="ident">OffsetTime</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">time::formatting::Formattable</span>,
+<span class="kw">impl</span>&lt;F&gt; FormatTime <span class="kw">for </span>OffsetTime&lt;F&gt;
+<span class="kw">where
+    </span>F: time::formatting::Formattable,
 {
-    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">OffsetDateTime::now_utc</span>().<span class="ident">to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>);
-        <span class="ident">format_datetime</span>(<span class="ident">now</span>, <span class="ident">w</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">format</span>)
+    <span class="kw">fn </span>format_time(<span class="kw-2">&amp;</span><span class="self">self</span>, w: <span class="kw-2">&amp;mut </span>Writer&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>now = OffsetDateTime::now_utc().to_offset(<span class="self">self</span>.offset);
+        format_datetime(now, w, <span class="kw-2">&amp;</span><span class="self">self</span>.format)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">format_datetime</span>(
-    <span class="ident">now</span>: <span class="ident">OffsetDateTime</span>,
-    <span class="ident">into</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">Formattable</span>,
-) -&gt; <span class="ident">fmt::Result</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">into</span> <span class="op">=</span> <span class="ident">WriteAdaptor::new</span>(<span class="ident">into</span>);
-    <span class="ident">now</span>.<span class="ident">format_into</span>(<span class="kw-2">&amp;mut</span> <span class="ident">into</span>, <span class="ident">fmt</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fmt::Error</span>)
-        .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+<span class="kw">fn </span>format_datetime(
+    now: OffsetDateTime,
+    into: <span class="kw-2">&amp;mut </span>Writer&lt;<span class="lifetime">&#39;_</span>&gt;,
+    fmt: <span class="kw-2">&amp;</span><span class="kw">impl </span>Formattable,
+) -&gt; fmt::Result {
+    <span class="kw">let </span><span class="kw-2">mut </span>into = WriteAdaptor::new(into);
+    now.format_into(<span class="kw-2">&amp;mut </span>into, fmt)
+        .map_err(|<span class="kw">_</span>| fmt::Error)
+        .map(|<span class="kw">_</span>| ())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

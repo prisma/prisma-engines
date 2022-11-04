@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wyz-0.5.0/src/fmt.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fmt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wyz/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wyz-0.5.0/src/fmt.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fmt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wyz/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -601,582 +601,582 @@ Any modifiers in the format template string or struct modifier are passed
 through to the desired trait implementation unchanged. The only effect of the
 forwarding types in this module is to change the `?` template character to one
 of the other trait signifiers.
-!*/</span>
+!*/
 
-<span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">fmt</span>::{
+</span><span class="kw">use </span>core::{
+	fmt::{
 		<span class="self">self</span>,
-		<span class="ident">Binary</span>,
-		<span class="ident">Debug</span>,
-		<span class="ident">Display</span>,
-		<span class="ident">Formatter</span>,
-		<span class="ident">LowerExp</span>,
-		<span class="ident">LowerHex</span>,
-		<span class="ident">Octal</span>,
-		<span class="ident">Pointer</span>,
-		<span class="ident">UpperExp</span>,
-		<span class="ident">UpperHex</span>,
+		Binary,
+		Debug,
+		Display,
+		Formatter,
+		LowerExp,
+		LowerHex,
+		Octal,
+		Pointer,
+		UpperExp,
+		UpperHex,
 	},
-	<span class="ident">ops</span>::{
-		<span class="ident">Deref</span>,
-		<span class="ident">DerefMut</span>,
+	ops::{
+		Deref,
+		DerefMut,
 	},
 };
 
-<span class="doccomment">/// Wraps any value with a format-forward to `Debug`.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FmtForward</span>: <span class="ident">Sized</span> {
-	<span class="doccomment">/// Causes `self` to use its `Binary` implementation when `Debug`-formatted.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
-	<span class="doccomment">/// use wyz::fmt::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert_eq!(</span>
-	<span class="doccomment">///   format!(&quot;{:?}&quot;, 3.fmt_binary()),</span>
-	<span class="doccomment">///   &quot;11&quot;,</span>
-	<span class="doccomment">/// );</span>
-	<span class="doccomment">/// # }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt_binary</span>(<span class="self">self</span>) -&gt; <span class="ident">FmtBinary</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Binary</span> {
-		<span class="ident">FmtBinary</span>(<span class="self">self</span>)
+<span class="doccomment">/// Wraps any value with a format-forward to `Debug`.
+</span><span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">pub trait </span>FmtForward: Sized {
+	<span class="doccomment">/// Causes `self` to use its `Binary` implementation when `Debug`-formatted.
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// # #[cfg(feature = &quot;std&quot;)] {
+	/// use wyz::fmt::*;
+	///
+	/// assert_eq!(
+	///   format!(&quot;{:?}&quot;, 3.fmt_binary()),
+	///   &quot;11&quot;,
+	/// );
+	/// # }
+	/// ```
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>fmt_binary(<span class="self">self</span>) -&gt; FmtBinary&lt;<span class="self">Self</span>&gt;
+	<span class="kw">where </span><span class="self">Self</span>: Binary {
+		FmtBinary(<span class="self">self</span>)
 	}
 
-	<span class="doccomment">/// Causes `self` to use its `Display` implementation when</span>
-	<span class="doccomment">/// `Debug`-formatted.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
-	<span class="doccomment">/// use wyz::fmt::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let text = &quot;hello,</span>
-	<span class="doccomment">/// world!&quot;;</span>
-	<span class="doccomment">/// assert_eq!(</span>
-	<span class="doccomment">///   format!(&quot;{:?}&quot;, text),</span>
-	<span class="doccomment">///   r#&quot;&quot;hello,\nworld!&quot;&quot;#,</span>
-	<span class="doccomment">///   // the render contains the sequence U+005C REVERSE SOLIDUS,</span>
-	<span class="doccomment">///   // then U+006E LATIN SMALL LETTER N, *not* U+000A LINE FEED.</span>
-	<span class="doccomment">/// );</span>
-	<span class="doccomment">/// assert_eq!(</span>
-	<span class="doccomment">///   format!(&quot;{:?}&quot;, text.fmt_display()),</span>
-	<span class="doccomment">///   &quot;hello,\nworld!&quot;,</span>
-	<span class="doccomment">///   // the render does not have wrapping quotes, and</span>
-	<span class="doccomment">///   // the newline is printed directly, not escaped.</span>
-	<span class="doccomment">/// );</span>
-	<span class="doccomment">/// # }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt_display</span>(<span class="self">self</span>) -&gt; <span class="ident">FmtDisplay</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Display</span> {
-		<span class="ident">FmtDisplay</span>(<span class="self">self</span>)
+	<span class="doccomment">/// Causes `self` to use its `Display` implementation when
+	/// `Debug`-formatted.
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// # #[cfg(feature = &quot;std&quot;)] {
+	/// use wyz::fmt::*;
+	///
+	/// let text = &quot;hello,
+	/// world!&quot;;
+	/// assert_eq!(
+	///   format!(&quot;{:?}&quot;, text),
+	///   r#&quot;&quot;hello,\nworld!&quot;&quot;#,
+	///   // the render contains the sequence U+005C REVERSE SOLIDUS,
+	///   // then U+006E LATIN SMALL LETTER N, *not* U+000A LINE FEED.
+	/// );
+	/// assert_eq!(
+	///   format!(&quot;{:?}&quot;, text.fmt_display()),
+	///   &quot;hello,\nworld!&quot;,
+	///   // the render does not have wrapping quotes, and
+	///   // the newline is printed directly, not escaped.
+	/// );
+	/// # }
+	/// ```
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>fmt_display(<span class="self">self</span>) -&gt; FmtDisplay&lt;<span class="self">Self</span>&gt;
+	<span class="kw">where </span><span class="self">Self</span>: Display {
+		FmtDisplay(<span class="self">self</span>)
 	}
 
-	<span class="doccomment">/// Causes `self` to use its `LowerExp` implementation when</span>
-	<span class="doccomment">/// `Debug`-formatted.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
-	<span class="doccomment">/// use wyz::fmt::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert_eq!(</span>
-	<span class="doccomment">///   format!(&quot;{:?}&quot;, (31.4).fmt_lower_exp()),</span>
-	<span class="doccomment">///   &quot;3.14e1&quot;,</span>
-	<span class="doccomment">/// );</span>
-	<span class="doccomment">/// # }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt_lower_exp</span>(<span class="self">self</span>) -&gt; <span class="ident">FmtLowerExp</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="self">Self</span>: <span class="ident">LowerExp</span> {
-		<span class="ident">FmtLowerExp</span>(<span class="self">self</span>)
+	<span class="doccomment">/// Causes `self` to use its `LowerExp` implementation when
+	/// `Debug`-formatted.
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// # #[cfg(feature = &quot;std&quot;)] {
+	/// use wyz::fmt::*;
+	///
+	/// assert_eq!(
+	///   format!(&quot;{:?}&quot;, (31.4).fmt_lower_exp()),
+	///   &quot;3.14e1&quot;,
+	/// );
+	/// # }
+	/// ```
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>fmt_lower_exp(<span class="self">self</span>) -&gt; FmtLowerExp&lt;<span class="self">Self</span>&gt;
+	<span class="kw">where </span><span class="self">Self</span>: LowerExp {
+		FmtLowerExp(<span class="self">self</span>)
 	}
 
-	<span class="doccomment">/// Causes `self` to use its `LowerHex` implementation when</span>
-	<span class="doccomment">/// `Debug`-formatted.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
-	<span class="doccomment">/// use wyz::fmt::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert_eq!(</span>
-	<span class="doccomment">///   format!(&quot;{:?}&quot;, 44203.fmt_lower_hex()),</span>
-	<span class="doccomment">///   &quot;acab&quot;,</span>
-	<span class="doccomment">/// );</span>
-	<span class="doccomment">/// # }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt_lower_hex</span>(<span class="self">self</span>) -&gt; <span class="ident">FmtLowerHex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="self">Self</span>: <span class="ident">LowerHex</span> {
-		<span class="ident">FmtLowerHex</span>(<span class="self">self</span>)
+	<span class="doccomment">/// Causes `self` to use its `LowerHex` implementation when
+	/// `Debug`-formatted.
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// # #[cfg(feature = &quot;std&quot;)] {
+	/// use wyz::fmt::*;
+	///
+	/// assert_eq!(
+	///   format!(&quot;{:?}&quot;, 44203.fmt_lower_hex()),
+	///   &quot;acab&quot;,
+	/// );
+	/// # }
+	/// ```
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>fmt_lower_hex(<span class="self">self</span>) -&gt; FmtLowerHex&lt;<span class="self">Self</span>&gt;
+	<span class="kw">where </span><span class="self">Self</span>: LowerHex {
+		FmtLowerHex(<span class="self">self</span>)
 	}
 
-	<span class="doccomment">/// Causes `self` to use its `Octal` implementation when `Debug`-formatted.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
-	<span class="doccomment">/// use wyz::fmt::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert_eq!(</span>
-	<span class="doccomment">///   format!(&quot;{:?}&quot;, 493.fmt_octal()),</span>
-	<span class="doccomment">///   &quot;755&quot;,</span>
-	<span class="doccomment">/// );</span>
-	<span class="doccomment">/// # }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt_octal</span>(<span class="self">self</span>) -&gt; <span class="ident">FmtOctal</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Octal</span> {
-		<span class="ident">FmtOctal</span>(<span class="self">self</span>)
+	<span class="doccomment">/// Causes `self` to use its `Octal` implementation when `Debug`-formatted.
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// # #[cfg(feature = &quot;std&quot;)] {
+	/// use wyz::fmt::*;
+	///
+	/// assert_eq!(
+	///   format!(&quot;{:?}&quot;, 493.fmt_octal()),
+	///   &quot;755&quot;,
+	/// );
+	/// # }
+	/// ```
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>fmt_octal(<span class="self">self</span>) -&gt; FmtOctal&lt;<span class="self">Self</span>&gt;
+	<span class="kw">where </span><span class="self">Self</span>: Octal {
+		FmtOctal(<span class="self">self</span>)
 	}
 
-	<span class="doccomment">/// Causes `self` to use its `Pointer` implementation when</span>
-	<span class="doccomment">/// `Debug`-formatted.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
-	<span class="doccomment">/// use wyz::fmt::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let val = 6;</span>
-	<span class="doccomment">/// let addr = &amp;val as *const i32;</span>
-	<span class="doccomment">/// println!(&quot;{:?}&quot;, addr.fmt_pointer());</span>
-	<span class="doccomment">/// // prints a memory address.</span>
-	<span class="doccomment">/// # }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt_pointer</span>(<span class="self">self</span>) -&gt; <span class="ident">FmtPointer</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Pointer</span> {
-		<span class="ident">FmtPointer</span>(<span class="self">self</span>)
+	<span class="doccomment">/// Causes `self` to use its `Pointer` implementation when
+	/// `Debug`-formatted.
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// # #[cfg(feature = &quot;std&quot;)] {
+	/// use wyz::fmt::*;
+	///
+	/// let val = 6;
+	/// let addr = &amp;val as *const i32;
+	/// println!(&quot;{:?}&quot;, addr.fmt_pointer());
+	/// // prints a memory address.
+	/// # }
+	/// ```
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>fmt_pointer(<span class="self">self</span>) -&gt; FmtPointer&lt;<span class="self">Self</span>&gt;
+	<span class="kw">where </span><span class="self">Self</span>: Pointer {
+		FmtPointer(<span class="self">self</span>)
 	}
 
-	<span class="doccomment">/// Causes `self` to use its `UpperExp` implementation when</span>
-	<span class="doccomment">/// `Debug`-formatted.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
-	<span class="doccomment">/// use wyz::fmt::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert_eq!(</span>
-	<span class="doccomment">///   format!(&quot;{:?}&quot;, (62.8).fmt_upper_exp()),</span>
-	<span class="doccomment">///   &quot;6.28E1&quot;,</span>
-	<span class="doccomment">/// );</span>
-	<span class="doccomment">/// # }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt_upper_exp</span>(<span class="self">self</span>) -&gt; <span class="ident">FmtUpperExp</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="self">Self</span>: <span class="ident">UpperExp</span> {
-		<span class="ident">FmtUpperExp</span>(<span class="self">self</span>)
+	<span class="doccomment">/// Causes `self` to use its `UpperExp` implementation when
+	/// `Debug`-formatted.
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// # #[cfg(feature = &quot;std&quot;)] {
+	/// use wyz::fmt::*;
+	///
+	/// assert_eq!(
+	///   format!(&quot;{:?}&quot;, (62.8).fmt_upper_exp()),
+	///   &quot;6.28E1&quot;,
+	/// );
+	/// # }
+	/// ```
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>fmt_upper_exp(<span class="self">self</span>) -&gt; FmtUpperExp&lt;<span class="self">Self</span>&gt;
+	<span class="kw">where </span><span class="self">Self</span>: UpperExp {
+		FmtUpperExp(<span class="self">self</span>)
 	}
 
-	<span class="doccomment">/// Causes `self` to use its `UpperHex` implementation when</span>
-	<span class="doccomment">/// `Debug`-formatted.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
-	<span class="doccomment">/// use wyz::fmt::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert_eq!(</span>
-	<span class="doccomment">///   format!(&quot;{:?}&quot;, 55322.fmt_upper_hex()),</span>
-	<span class="doccomment">///   &quot;D81A&quot;,</span>
-	<span class="doccomment">/// );</span>
-	<span class="doccomment">/// # }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt_upper_hex</span>(<span class="self">self</span>) -&gt; <span class="ident">FmtUpperHex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="self">Self</span>: <span class="ident">UpperHex</span> {
-		<span class="ident">FmtUpperHex</span>(<span class="self">self</span>)
+	<span class="doccomment">/// Causes `self` to use its `UpperHex` implementation when
+	/// `Debug`-formatted.
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// # #[cfg(feature = &quot;std&quot;)] {
+	/// use wyz::fmt::*;
+	///
+	/// assert_eq!(
+	///   format!(&quot;{:?}&quot;, 55322.fmt_upper_hex()),
+	///   &quot;D81A&quot;,
+	/// );
+	/// # }
+	/// ```
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>fmt_upper_hex(<span class="self">self</span>) -&gt; FmtUpperHex&lt;<span class="self">Self</span>&gt;
+	<span class="kw">where </span><span class="self">Self</span>: UpperHex {
+		FmtUpperHex(<span class="self">self</span>)
 	}
 
-	<span class="doccomment">/// Formats each item in a sequence.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This wrapper structure conditionally implements all of the formatting</span>
-	<span class="doccomment">/// traits when `self` can be viewed as an iterator whose *items* implement</span>
-	<span class="doccomment">/// them. It iterates over `&amp;self` and prints each item according to the</span>
-	<span class="doccomment">/// formatting specifier provided.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
-	<span class="doccomment">/// use wyz::fmt::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let seq = [10, 20, 30, 40];</span>
-	<span class="doccomment">/// assert_eq!(</span>
-	<span class="doccomment">///   format!(&quot;{:?}&quot;, seq.fmt_list().fmt_lower_hex()),</span>
-	<span class="doccomment">///   &quot;[a, 14, 1e, 28]&quot;,</span>
-	<span class="doccomment">/// );</span>
-	<span class="doccomment">/// # }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt_list</span>(<span class="self">self</span>) -&gt; <span class="ident">FmtList</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>: <span class="ident">IntoIterator</span> {
-		<span class="ident">FmtList</span>(<span class="self">self</span>)
+	<span class="doccomment">/// Formats each item in a sequence.
+	///
+	/// This wrapper structure conditionally implements all of the formatting
+	/// traits when `self` can be viewed as an iterator whose *items* implement
+	/// them. It iterates over `&amp;self` and prints each item according to the
+	/// formatting specifier provided.
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// # #[cfg(feature = &quot;std&quot;)] {
+	/// use wyz::fmt::*;
+	///
+	/// let seq = [10, 20, 30, 40];
+	/// assert_eq!(
+	///   format!(&quot;{:?}&quot;, seq.fmt_list().fmt_lower_hex()),
+	///   &quot;[a, 14, 1e, 28]&quot;,
+	/// );
+	/// # }
+	/// ```
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>fmt_list(<span class="self">self</span>) -&gt; FmtList&lt;<span class="self">Self</span>&gt;
+	<span class="kw">where for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self</span>: IntoIterator {
+		FmtList(<span class="self">self</span>)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">FmtForward</span> <span class="kw">for</span> <span class="ident">T</span> {
+<span class="kw">impl</span>&lt;T: Sized&gt; FmtForward <span class="kw">for </span>T {
 }
 
-<span class="doccomment">/// Forwards a type’s `Binary` formatting implementation to `Debug`.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FmtBinary</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Binary</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Forwards a type’s `Binary` formatting implementation to `Debug`.
+</span><span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub struct </span>FmtBinary&lt;T: Binary&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// Forwards a type’s `Display` formatting implementation to `Debug`.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FmtDisplay</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Forwards a type’s `Display` formatting implementation to `Debug`.
+</span><span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub struct </span>FmtDisplay&lt;T: Display&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// Renders each element of a stream into a list.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>)
-<span class="kw">where</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>;
+<span class="doccomment">/// Renders each element of a stream into a list.
+</span><span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub struct </span>FmtList&lt;T&gt;(<span class="kw">pub </span>T)
+<span class="kw">where for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator;
 
-<span class="doccomment">/// Forwards a type’s `LowerExp` formatting implementation to `Debug`.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FmtLowerExp</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">LowerExp</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Forwards a type’s `LowerExp` formatting implementation to `Debug`.
+</span><span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub struct </span>FmtLowerExp&lt;T: LowerExp&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// Forwards a type’s `LowerHex` formatting implementation to `Debug`.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FmtLowerHex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">LowerHex</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Forwards a type’s `LowerHex` formatting implementation to `Debug`.
+</span><span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub struct </span>FmtLowerHex&lt;T: LowerHex&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// Forwards a type’s `Octal` formatting implementation to `Debug`.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FmtOctal</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Octal</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Forwards a type’s `Octal` formatting implementation to `Debug`.
+</span><span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub struct </span>FmtOctal&lt;T: Octal&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// Forwards a type’s `Pointer` formatting implementation to `Debug`.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FmtPointer</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Pointer</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Forwards a type’s `Pointer` formatting implementation to `Debug`.
+</span><span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub struct </span>FmtPointer&lt;T: Pointer&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// Forwards a type’s `UpperExp` formatting implementation to `Debug`.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FmtUpperExp</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">UpperExp</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Forwards a type’s `UpperExp` formatting implementation to `Debug`.
+</span><span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub struct </span>FmtUpperExp&lt;T: UpperExp&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// Forwards a type’s `UpperHex` formatting implementation to `Debug`.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FmtUpperHex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">UpperHex</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Forwards a type’s `UpperHex` formatting implementation to `Debug`.
+</span><span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub struct </span>FmtUpperHex&lt;T: UpperHex&gt;(<span class="kw">pub </span>T);
 
-<span class="macro">macro_rules!</span> <span class="ident">fmt</span> {
-	($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span>:<span class="ident">ty</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; { $(
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">+</span> <span class="ident">Binary</span><span class="op">&gt;</span> <span class="ident">Binary</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-				<span class="ident">Binary::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">fmt</span>)
+<span class="macro">macro_rules! </span>fmt {
+	($(<span class="macro-nonterminal">$w</span>:ty =&gt; <span class="macro-nonterminal">$t</span>:ident),* $(,)<span class="question-mark">?</span>) =&gt; { $(
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t </span>+ Binary&gt; Binary <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+				Binary::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, fmt)
 			}
 		}
 
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-				<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="ident">::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">fmt</span>)
+		<span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t</span>&gt; Debug <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+				&lt;T <span class="kw">as </span><span class="macro-nonterminal">$t</span>&gt;::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, fmt)
 			}
 		}
 
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">+</span> <span class="ident">Display</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-				<span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">fmt</span>)
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t </span>+ Display&gt; Display <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+				Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, fmt)
 			}
 		}
 
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">+</span> <span class="ident">LowerExp</span><span class="op">&gt;</span> <span class="ident">LowerExp</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-				<span class="ident">LowerExp::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">fmt</span>)
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t </span>+ LowerExp&gt; LowerExp <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+				LowerExp::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, fmt)
 			}
 		}
 
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">+</span> <span class="ident">LowerHex</span><span class="op">&gt;</span> <span class="ident">LowerHex</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-				<span class="ident">LowerHex::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">fmt</span>)
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t </span>+ LowerHex&gt; LowerHex <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+				LowerHex::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, fmt)
 			}
 		}
 
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">+</span> <span class="ident">Octal</span><span class="op">&gt;</span> <span class="ident">Octal</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-				<span class="ident">Octal::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">fmt</span>)
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t </span>+ Octal&gt; Octal <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+				Octal::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, fmt)
 			}
 		}
 
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">+</span> <span class="ident">Pointer</span><span class="op">&gt;</span> <span class="ident">Pointer</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-				<span class="ident">Pointer::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">fmt</span>)
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t </span>+ Pointer&gt; Pointer <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+				Pointer::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, fmt)
 			}
 		}
 
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">+</span> <span class="ident">UpperExp</span><span class="op">&gt;</span> <span class="ident">UpperExp</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-				<span class="ident">UpperExp::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">fmt</span>)
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t </span>+ UpperExp&gt; UpperExp <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+				UpperExp::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, fmt)
 			}
 		}
 
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">+</span> <span class="ident">UpperHex</span><span class="op">&gt;</span> <span class="ident">UpperHex</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-				<span class="ident">UpperHex::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">fmt</span>)
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t </span>+ UpperHex&gt; UpperHex <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+				UpperHex::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, fmt)
 			}
 		}
 
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t</span>&gt; Deref <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="kw">type </span>Target = T;
 
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-				<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-			}
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+				<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+			</span>}
 		}
 
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-				<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>
-			}
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t</span>&gt; DerefMut <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+				<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0
+			</span>}
 		}
 
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-				<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-			}
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t</span>&gt; AsRef&lt;T&gt; <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+				<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+			</span>}
 		}
 
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-				<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>
-			}
+		<span class="attribute">#[cfg(not(tarpaulin_include))]
+		</span><span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$t</span>&gt; AsMut&lt;T&gt; <span class="kw">for </span><span class="macro-nonterminal">$w </span>{
+			<span class="attribute">#[inline(always)]
+			</span><span class="kw">fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+				<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0
+			</span>}
 		}
-	)<span class="op">*</span> };
+	)* };
 }
 
 <span class="macro">fmt!</span>(
-	<span class="ident">FmtBinary</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> =&gt; <span class="ident">Binary</span>,
-	<span class="ident">FmtDisplay</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> =&gt; <span class="ident">Display</span>,
-	<span class="ident">FmtLowerExp</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> =&gt; <span class="ident">LowerExp</span>,
-	<span class="ident">FmtLowerHex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> =&gt; <span class="ident">LowerHex</span>,
-	<span class="ident">FmtOctal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> =&gt; <span class="ident">Octal</span>,
-	<span class="ident">FmtPointer</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> =&gt; <span class="ident">Pointer</span>,
-	<span class="ident">FmtUpperExp</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> =&gt; <span class="ident">UpperExp</span>,
-	<span class="ident">FmtUpperHex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> =&gt; <span class="ident">UpperHex</span>,
+	FmtBinary&lt;T&gt; =&gt; Binary,
+	FmtDisplay&lt;T&gt; =&gt; Display,
+	FmtLowerExp&lt;T&gt; =&gt; LowerExp,
+	FmtLowerHex&lt;T&gt; =&gt; LowerHex,
+	FmtOctal&lt;T&gt; =&gt; Octal,
+	FmtPointer&lt;T&gt; =&gt; Pointer,
+	FmtUpperExp&lt;T&gt; =&gt; UpperExp,
+	FmtUpperHex&lt;T&gt; =&gt; UpperHex,
 );
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Binary</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>,
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident">Binary</span>,
+<span class="kw">impl</span>&lt;T&gt; Binary <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where
+	for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator,
+	<span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T <span class="kw">as </span>IntoIterator&gt;::Item: Binary,
 {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">fmt</span>.<span class="ident">debug_list</span>()
-			.<span class="ident">entries</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">FmtBinary</span>))
-			.<span class="ident">finish</span>()
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		fmt.debug_list()
+			.entries((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).into_iter().map(FmtBinary))
+			.finish()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>,
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident">Debug</span>,
+<span class="kw">impl</span>&lt;T&gt; Debug <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where
+	for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator,
+	<span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T <span class="kw">as </span>IntoIterator&gt;::Item: Debug,
 {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">fmt</span>.<span class="ident">debug_list</span>().<span class="ident">entries</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">into_iter</span>()).<span class="ident">finish</span>()
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		fmt.debug_list().entries((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).into_iter()).finish()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>,
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident">Display</span>,
+<span class="kw">impl</span>&lt;T&gt; Display <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where
+	for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator,
+	<span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T <span class="kw">as </span>IntoIterator&gt;::Item: Display,
 {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">fmt</span>.<span class="ident">debug_list</span>()
-			.<span class="ident">entries</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">FmtDisplay</span>))
-			.<span class="ident">finish</span>()
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		fmt.debug_list()
+			.entries((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).into_iter().map(FmtDisplay))
+			.finish()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">LowerExp</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>,
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident">LowerExp</span>,
+<span class="kw">impl</span>&lt;T&gt; LowerExp <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where
+	for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator,
+	<span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T <span class="kw">as </span>IntoIterator&gt;::Item: LowerExp,
 {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">fmt</span>.<span class="ident">debug_list</span>()
-			.<span class="ident">entries</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">FmtLowerExp</span>))
-			.<span class="ident">finish</span>()
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		fmt.debug_list()
+			.entries((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).into_iter().map(FmtLowerExp))
+			.finish()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">LowerHex</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>,
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident">LowerHex</span>,
+<span class="kw">impl</span>&lt;T&gt; LowerHex <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where
+	for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator,
+	<span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T <span class="kw">as </span>IntoIterator&gt;::Item: LowerHex,
 {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">fmt</span>.<span class="ident">debug_list</span>()
-			.<span class="ident">entries</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">FmtLowerHex</span>))
-			.<span class="ident">finish</span>()
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		fmt.debug_list()
+			.entries((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).into_iter().map(FmtLowerHex))
+			.finish()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Octal</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>,
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident">Octal</span>,
+<span class="kw">impl</span>&lt;T&gt; Octal <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where
+	for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator,
+	<span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T <span class="kw">as </span>IntoIterator&gt;::Item: Octal,
 {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">fmt</span>.<span class="ident">debug_list</span>()
-			.<span class="ident">entries</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">FmtOctal</span>))
-			.<span class="ident">finish</span>()
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		fmt.debug_list()
+			.entries((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).into_iter().map(FmtOctal))
+			.finish()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">UpperExp</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>,
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident">UpperExp</span>,
+<span class="kw">impl</span>&lt;T&gt; UpperExp <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where
+	for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator,
+	<span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T <span class="kw">as </span>IntoIterator&gt;::Item: UpperExp,
 {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">fmt</span>.<span class="ident">debug_list</span>()
-			.<span class="ident">entries</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">FmtUpperExp</span>))
-			.<span class="ident">finish</span>()
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		fmt.debug_list()
+			.entries((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).into_iter().map(FmtUpperExp))
+			.finish()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">UpperHex</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>,
-	<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident">UpperHex</span>,
+<span class="kw">impl</span>&lt;T&gt; UpperHex <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where
+	for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator,
+	<span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T <span class="kw">as </span>IntoIterator&gt;::Item: UpperHex,
 {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">fmt</span>.<span class="ident">debug_list</span>()
-			.<span class="ident">entries</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">FmtUpperHex</span>))
-			.<span class="ident">finish</span>()
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		fmt.debug_list()
+			.entries((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).into_iter().map(FmtUpperHex))
+			.finish()
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T&gt; Deref <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator
 {
-	<span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
+	<span class="kw">type </span>Target = T;
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-	}
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+	</span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T&gt; DerefMut <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-		<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>
-	}
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+		<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0
+	</span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T&gt; AsRef&lt;T&gt; <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-	}
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+	</span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FmtList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span>
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T&gt; AsMut&lt;T&gt; <span class="kw">for </span>FmtList&lt;T&gt;
+<span class="kw">where for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: IntoIterator
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-		<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>
-	}
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+		<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0
+	</span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-	<span class="kw">use</span> <span class="ident">alloc::format</span>;
+<span class="attribute">#[cfg(all(test, feature = <span class="string">&quot;alloc&quot;</span>))]
+</span><span class="kw">mod </span>tests {
+	<span class="attribute">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+	</span><span class="kw">use </span>alloc::format;
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-	<span class="kw">use</span> <span class="ident">std::format</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+	</span><span class="kw">use </span>std::format;
 
-	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+	<span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">render_item</span>() {
-		<span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="number">29</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>render_item() {
+		<span class="kw">let </span>num = <span class="number">29</span>;
 
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">num</span>.<span class="ident">fmt_binary</span>()), <span class="string">&quot;11101&quot;</span>);
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">num</span>.<span class="ident">fmt_display</span>()), <span class="string">&quot;29&quot;</span>);
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">num</span>.<span class="ident">fmt_upper_hex</span>()), <span class="string">&quot;1D&quot;</span>);
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">num</span>.<span class="ident">fmt_octal</span>()), <span class="string">&quot;35&quot;</span>);
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">num</span>.<span class="ident">fmt_lower_hex</span>()), <span class="string">&quot;1d&quot;</span>);
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, num.fmt_binary()), <span class="string">&quot;11101&quot;</span>);
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, num.fmt_display()), <span class="string">&quot;29&quot;</span>);
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, num.fmt_upper_hex()), <span class="string">&quot;1D&quot;</span>);
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, num.fmt_octal()), <span class="string">&quot;35&quot;</span>);
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, num.fmt_lower_hex()), <span class="string">&quot;1d&quot;</span>);
 
-		<span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="number">53.7</span>;
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">num</span>.<span class="ident">fmt_lower_exp</span>()), <span class="string">&quot;5.37e1&quot;</span>);
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">num</span>.<span class="ident">fmt_upper_exp</span>()), <span class="string">&quot;5.37E1&quot;</span>);
+		<span class="kw">let </span>num = <span class="number">53.7</span>;
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, num.fmt_lower_exp()), <span class="string">&quot;5.37e1&quot;</span>);
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, num.fmt_upper_exp()), <span class="string">&quot;5.37E1&quot;</span>);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">render_list</span>() {
-		<span class="kw">let</span> <span class="ident">list</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:02b}&quot;</span>, <span class="ident">list</span>.<span class="ident">fmt_list</span>()), <span class="string">&quot;[00, 01, 10, 11]&quot;</span>);
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:01?}&quot;</span>, <span class="ident">list</span>.<span class="ident">fmt_list</span>()), <span class="string">&quot;[0, 1, 2, 3]&quot;</span>);
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:01}&quot;</span>, <span class="ident">list</span>.<span class="ident">fmt_list</span>()), <span class="string">&quot;[0, 1, 2, 3]&quot;</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>render_list() {
+		<span class="kw">let </span>list = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:02b}&quot;</span>, list.fmt_list()), <span class="string">&quot;[00, 01, 10, 11]&quot;</span>);
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:01?}&quot;</span>, list.fmt_list()), <span class="string">&quot;[0, 1, 2, 3]&quot;</span>);
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:01}&quot;</span>, list.fmt_list()), <span class="string">&quot;[0, 1, 2, 3]&quot;</span>);
 
-		<span class="kw">let</span> <span class="ident">list</span> <span class="op">=</span> [<span class="op">-</span><span class="number">51.0</span>, <span class="op">-</span><span class="number">1.2</span>, <span class="number">1.3</span>, <span class="number">54.0</span>];
+		<span class="kw">let </span>list = [-<span class="number">51.0</span>, -<span class="number">1.2</span>, <span class="number">1.3</span>, <span class="number">54.0</span>];
 		<span class="macro">assert_eq!</span>(
-			<span class="macro">format!</span>(<span class="string">&quot;{:e}&quot;</span>, <span class="ident">list</span>.<span class="ident">fmt_list</span>()),
-			<span class="string">&quot;[-5.1e1, -1.2e0, 1.3e0, 5.4e1]&quot;</span>
-		);
+			<span class="macro">format!</span>(<span class="string">&quot;{:e}&quot;</span>, list.fmt_list()),
+			<span class="string">&quot;[-5.1e1, -1.2e0, 1.3e0, 5.4e1]&quot;
+		</span>);
 		<span class="macro">assert_eq!</span>(
-			<span class="macro">format!</span>(<span class="string">&quot;{:E}&quot;</span>, <span class="ident">list</span>.<span class="ident">fmt_list</span>()),
-			<span class="string">&quot;[-5.1E1, -1.2E0, 1.3E0, 5.4E1]&quot;</span>
-		);
+			<span class="macro">format!</span>(<span class="string">&quot;{:E}&quot;</span>, list.fmt_list()),
+			<span class="string">&quot;[-5.1E1, -1.2E0, 1.3E0, 5.4E1]&quot;
+		</span>);
 
-		<span class="kw">let</span> <span class="ident">list</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>];
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:02x}&quot;</span>, <span class="ident">list</span>.<span class="ident">fmt_list</span>()), <span class="string">&quot;[00, 0a, 14, 1e]&quot;</span>);
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:02o}&quot;</span>, <span class="ident">list</span>.<span class="ident">fmt_list</span>()), <span class="string">&quot;[00, 12, 24, 36]&quot;</span>);
-		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:02X}&quot;</span>, <span class="ident">list</span>.<span class="ident">fmt_list</span>()), <span class="string">&quot;[00, 0A, 14, 1E]&quot;</span>);
+		<span class="kw">let </span>list = [<span class="number">0</span>, <span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>];
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:02x}&quot;</span>, list.fmt_list()), <span class="string">&quot;[00, 0a, 14, 1e]&quot;</span>);
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:02o}&quot;</span>, list.fmt_list()), <span class="string">&quot;[00, 12, 24, 36]&quot;</span>);
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:02X}&quot;</span>, list.fmt_list()), <span class="string">&quot;[00, 0A, 14, 1E]&quot;</span>);
 
 		<span class="macro">assert_eq!</span>(
-			<span class="macro">format!</span>(<span class="string">&quot;{:02?}&quot;</span>, <span class="ident">list</span>.<span class="ident">fmt_list</span>().<span class="ident">fmt_lower_hex</span>()),
-			<span class="string">&quot;[00, 0a, 14, 1e]&quot;</span>
-		);
+			<span class="macro">format!</span>(<span class="string">&quot;{:02?}&quot;</span>, list.fmt_list().fmt_lower_hex()),
+			<span class="string">&quot;[00, 0a, 14, 1e]&quot;
+		</span>);
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wyz" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wyz" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

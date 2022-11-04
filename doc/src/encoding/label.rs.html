@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-0.2.33/src/label.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>label.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../encoding/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-0.2.33/src/label.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>label.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../encoding/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -354,361 +354,361 @@
 <span id="354">354</span>
 <span id="355">355</span>
 <span id="356">356</span>
-</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.</span>
-<span class="comment">// Copyright (c) 2013-2015, Kang Seonghoon.</span>
-<span class="comment">// See README.md and LICENSE.txt for details.</span>
+</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.
+// Copyright (c) 2013-2015, Kang Seonghoon.
+// See README.md and LICENSE.txt for details.
 
-<span class="doccomment">//! An interface for retrieving an encoding (or a set of encodings) from a string/numeric label.</span>
+</span><span class="doccomment">//! An interface for retrieving an encoding (or a set of encodings) from a string/numeric label.
 
-<span class="kw">use</span> <span class="ident">all</span>;
-<span class="kw">use</span> <span class="ident">types::EncodingRef</span>;
+</span><span class="kw">use </span>all;
+<span class="kw">use </span>types::EncodingRef;
 
-<span class="doccomment">/// Returns an encoding from given label, defined in the WHATWG Encoding standard, if any.</span>
-<span class="doccomment">/// Implements &quot;get an encoding&quot; algorithm: http://encoding.spec.whatwg.org/#concept-encoding-get</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding_from_whatwg_label</span>(<span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EncodingRef</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">label</span> <span class="op">=</span> <span class="ident">label</span>.<span class="ident">trim_matches</span>(<span class="kw-2">&amp;</span>[<span class="string">&#39; &#39;</span>, <span class="string">&#39;\n&#39;</span>, <span class="string">&#39;\r&#39;</span>, <span class="string">&#39;\t&#39;</span>, <span class="string">&#39;\x0C&#39;</span>][..]);
-    <span class="kw">let</span> <span class="ident">label</span>: <span class="ident">String</span> <span class="op">=</span>
-        <span class="ident">label</span>.<span class="ident">chars</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> { <span class="string">&#39;A&#39;</span>...<span class="string">&#39;Z&#39;</span> =&gt; (<span class="ident">c</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">+</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">char</span>, <span class="kw">_</span> =&gt; <span class="ident">c</span> }).<span class="ident">collect</span>();
-    <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">label</span>[..] {
-        <span class="string">&quot;unicode-1-1-utf-8&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;utf-8&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;utf8&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::UTF_8</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;866&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;cp866&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;csibm866&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;ibm866&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::IBM866</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csisolatin2&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-2&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-101&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-2&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso88592&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-2&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-2:1987&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;l2&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;latin2&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_2</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csisolatin3&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-3&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-109&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-3&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso88593&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-3&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-3:1988&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;l3&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;latin3&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_3</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csisolatin4&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-4&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-110&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-4&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso88594&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-4&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-4:1988&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;l4&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;latin4&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_4</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csisolatincyrillic&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;cyrillic&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-5&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-144&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-5&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso88595&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-5&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-5:1988&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_5</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;arabic&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;asmo-708&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;csiso88596e&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;csiso88596i&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;csisolatinarabic&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;ecma-114&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-6&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-6-e&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-6-i&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-127&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-6&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso88596&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-6&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-6:1987&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_6</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csisolatingreek&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;ecma-118&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;elot_928&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;greek&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;greek8&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-7&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-126&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-7&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso88597&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-7&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-7:1987&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;sun_eu_greek&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_7</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csiso88598e&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;csisolatinhebrew&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;hebrew&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-8&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-8-e&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-138&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-8&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso88598&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-8&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-8:1988&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;visual&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_8</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csiso88598i&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-8-i&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;logical&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::whatwg::ISO_8859_8_I</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csisolatin6&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-10&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-157&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-10&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso885910&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;l6&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;latin6&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_10</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;iso-8859-13&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-13&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso885913&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_13</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;iso-8859-14&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-14&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso885914&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_14</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csisolatin9&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-15&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-15&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso885915&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-15&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;l9&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_15</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;iso-8859-16&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_16</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;cskoi8r&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;koi&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;koi8&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;koi8-r&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;koi8_r&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::KOI8_R</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;koi8-u&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::KOI8_U</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csmacintosh&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;mac&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;macintosh&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-mac-roman&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::MAC_ROMAN</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;dos-874&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-11&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-11&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso885911&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;tis-620&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-874&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_874</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;cp1250&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-1250&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-cp1250&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1250</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;cp1251&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-1251&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-cp1251&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1251</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;ansi_x3.4-1968&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;ascii&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;cp1252&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;cp819&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;csisolatin1&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;ibm819&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-1&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-100&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-1&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso88591&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-1&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-1:1987&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;l1&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;latin1&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;us-ascii&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-1252&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-cp1252&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1252</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;cp1253&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-1253&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-cp1253&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1253</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;cp1254&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;csisolatin5&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-8859-9&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-148&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso8859-9&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso88599&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-9&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso_8859-9:1989&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;l5&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;latin5&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-1254&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-cp1254&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1254</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;cp1255&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-1255&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-cp1255&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1255</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;cp1256&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-1256&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-cp1256&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1256</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;cp1257&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-1257&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-cp1257&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1257</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;cp1258&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-1258&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-cp1258&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1258</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;x-mac-cyrillic&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-mac-ukrainian&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::MAC_CYRILLIC</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;chinese&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;csgb2312&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;csiso58gb231280&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;gb2312&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;gb_2312&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;gb_2312-80&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;gbk&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-58&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-gbk&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::GBK</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;gb18030&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::GB18030</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;big5&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;big5-hkscs&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;cn-big5&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;csbig5&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-x-big5&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::BIG5_2003</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;cseucpkdfmtjapanese&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;euc-jp&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-euc-jp&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::EUC_JP</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csiso2022jp&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-2022-jp&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::ISO_2022_JP</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csshiftjis&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;ms_kanji&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;shift-jis&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;shift_jis&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;sjis&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-31j&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;x-sjis&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_31J</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;cseuckr&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;csksc56011987&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;euc-kr&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-ir-149&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;korean&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;ks_c_5601-1987&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;ks_c_5601-1989&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;ksc5601&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;ksc_5601&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;windows-949&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_949</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;csiso2022kr&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;hz-gb-2312&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-2022-kr&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-2022-cn&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;iso-2022-cn-ext&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::whatwg::REPLACEMENT</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;utf-16be&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::UTF_16BE</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;utf-16&quot;</span> <span class="op">|</span>
-        <span class="string">&quot;utf-16le&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::UTF_16LE</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="string">&quot;x-user-defined&quot;</span> =&gt;
-            <span class="prelude-val">Some</span>(<span class="ident">all::whatwg::X_USER_DEFINED</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
-    }
+<span class="doccomment">/// Returns an encoding from given label, defined in the WHATWG Encoding standard, if any.
+/// Implements &quot;get an encoding&quot; algorithm: http://encoding.spec.whatwg.org/#concept-encoding-get
+</span><span class="kw">pub fn </span>encoding_from_whatwg_label(label: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;EncodingRef&gt; {
+    <span class="kw">let </span>label = label.trim_matches(<span class="kw-2">&amp;</span>[<span class="string">&#39; &#39;</span>, <span class="string">&#39;\n&#39;</span>, <span class="string">&#39;\r&#39;</span>, <span class="string">&#39;\t&#39;</span>, <span class="string">&#39;\x0C&#39;</span>][..]);
+    <span class="kw">let </span>label: String =
+        label.chars().map(|c| <span class="kw">match </span>c { <span class="string">&#39;A&#39;</span>...<span class="string">&#39;Z&#39; </span>=&gt; (c <span class="kw">as </span>u8 + <span class="number">32</span>) <span class="kw">as </span>char, <span class="kw">_ </span>=&gt; c }).collect();
+    <span class="kw">match </span><span class="kw-2">&amp;</span>label[..] {
+        <span class="string">&quot;unicode-1-1-utf-8&quot; </span>|
+        <span class="string">&quot;utf-8&quot; </span>|
+        <span class="string">&quot;utf8&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::UTF_8 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;866&quot; </span>|
+        <span class="string">&quot;cp866&quot; </span>|
+        <span class="string">&quot;csibm866&quot; </span>|
+        <span class="string">&quot;ibm866&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::IBM866 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csisolatin2&quot; </span>|
+        <span class="string">&quot;iso-8859-2&quot; </span>|
+        <span class="string">&quot;iso-ir-101&quot; </span>|
+        <span class="string">&quot;iso8859-2&quot; </span>|
+        <span class="string">&quot;iso88592&quot; </span>|
+        <span class="string">&quot;iso_8859-2&quot; </span>|
+        <span class="string">&quot;iso_8859-2:1987&quot; </span>|
+        <span class="string">&quot;l2&quot; </span>|
+        <span class="string">&quot;latin2&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_2 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csisolatin3&quot; </span>|
+        <span class="string">&quot;iso-8859-3&quot; </span>|
+        <span class="string">&quot;iso-ir-109&quot; </span>|
+        <span class="string">&quot;iso8859-3&quot; </span>|
+        <span class="string">&quot;iso88593&quot; </span>|
+        <span class="string">&quot;iso_8859-3&quot; </span>|
+        <span class="string">&quot;iso_8859-3:1988&quot; </span>|
+        <span class="string">&quot;l3&quot; </span>|
+        <span class="string">&quot;latin3&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_3 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csisolatin4&quot; </span>|
+        <span class="string">&quot;iso-8859-4&quot; </span>|
+        <span class="string">&quot;iso-ir-110&quot; </span>|
+        <span class="string">&quot;iso8859-4&quot; </span>|
+        <span class="string">&quot;iso88594&quot; </span>|
+        <span class="string">&quot;iso_8859-4&quot; </span>|
+        <span class="string">&quot;iso_8859-4:1988&quot; </span>|
+        <span class="string">&quot;l4&quot; </span>|
+        <span class="string">&quot;latin4&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_4 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csisolatincyrillic&quot; </span>|
+        <span class="string">&quot;cyrillic&quot; </span>|
+        <span class="string">&quot;iso-8859-5&quot; </span>|
+        <span class="string">&quot;iso-ir-144&quot; </span>|
+        <span class="string">&quot;iso8859-5&quot; </span>|
+        <span class="string">&quot;iso88595&quot; </span>|
+        <span class="string">&quot;iso_8859-5&quot; </span>|
+        <span class="string">&quot;iso_8859-5:1988&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_5 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;arabic&quot; </span>|
+        <span class="string">&quot;asmo-708&quot; </span>|
+        <span class="string">&quot;csiso88596e&quot; </span>|
+        <span class="string">&quot;csiso88596i&quot; </span>|
+        <span class="string">&quot;csisolatinarabic&quot; </span>|
+        <span class="string">&quot;ecma-114&quot; </span>|
+        <span class="string">&quot;iso-8859-6&quot; </span>|
+        <span class="string">&quot;iso-8859-6-e&quot; </span>|
+        <span class="string">&quot;iso-8859-6-i&quot; </span>|
+        <span class="string">&quot;iso-ir-127&quot; </span>|
+        <span class="string">&quot;iso8859-6&quot; </span>|
+        <span class="string">&quot;iso88596&quot; </span>|
+        <span class="string">&quot;iso_8859-6&quot; </span>|
+        <span class="string">&quot;iso_8859-6:1987&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_6 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csisolatingreek&quot; </span>|
+        <span class="string">&quot;ecma-118&quot; </span>|
+        <span class="string">&quot;elot_928&quot; </span>|
+        <span class="string">&quot;greek&quot; </span>|
+        <span class="string">&quot;greek8&quot; </span>|
+        <span class="string">&quot;iso-8859-7&quot; </span>|
+        <span class="string">&quot;iso-ir-126&quot; </span>|
+        <span class="string">&quot;iso8859-7&quot; </span>|
+        <span class="string">&quot;iso88597&quot; </span>|
+        <span class="string">&quot;iso_8859-7&quot; </span>|
+        <span class="string">&quot;iso_8859-7:1987&quot; </span>|
+        <span class="string">&quot;sun_eu_greek&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_7 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csiso88598e&quot; </span>|
+        <span class="string">&quot;csisolatinhebrew&quot; </span>|
+        <span class="string">&quot;hebrew&quot; </span>|
+        <span class="string">&quot;iso-8859-8&quot; </span>|
+        <span class="string">&quot;iso-8859-8-e&quot; </span>|
+        <span class="string">&quot;iso-ir-138&quot; </span>|
+        <span class="string">&quot;iso8859-8&quot; </span>|
+        <span class="string">&quot;iso88598&quot; </span>|
+        <span class="string">&quot;iso_8859-8&quot; </span>|
+        <span class="string">&quot;iso_8859-8:1988&quot; </span>|
+        <span class="string">&quot;visual&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_8 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csiso88598i&quot; </span>|
+        <span class="string">&quot;iso-8859-8-i&quot; </span>|
+        <span class="string">&quot;logical&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::whatwg::ISO_8859_8_I <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csisolatin6&quot; </span>|
+        <span class="string">&quot;iso-8859-10&quot; </span>|
+        <span class="string">&quot;iso-ir-157&quot; </span>|
+        <span class="string">&quot;iso8859-10&quot; </span>|
+        <span class="string">&quot;iso885910&quot; </span>|
+        <span class="string">&quot;l6&quot; </span>|
+        <span class="string">&quot;latin6&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_10 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;iso-8859-13&quot; </span>|
+        <span class="string">&quot;iso8859-13&quot; </span>|
+        <span class="string">&quot;iso885913&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_13 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;iso-8859-14&quot; </span>|
+        <span class="string">&quot;iso8859-14&quot; </span>|
+        <span class="string">&quot;iso885914&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_14 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csisolatin9&quot; </span>|
+        <span class="string">&quot;iso-8859-15&quot; </span>|
+        <span class="string">&quot;iso8859-15&quot; </span>|
+        <span class="string">&quot;iso885915&quot; </span>|
+        <span class="string">&quot;iso_8859-15&quot; </span>|
+        <span class="string">&quot;l9&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_15 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;iso-8859-16&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_8859_16 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;cskoi8r&quot; </span>|
+        <span class="string">&quot;koi&quot; </span>|
+        <span class="string">&quot;koi8&quot; </span>|
+        <span class="string">&quot;koi8-r&quot; </span>|
+        <span class="string">&quot;koi8_r&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::KOI8_R <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;koi8-u&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::KOI8_U <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csmacintosh&quot; </span>|
+        <span class="string">&quot;mac&quot; </span>|
+        <span class="string">&quot;macintosh&quot; </span>|
+        <span class="string">&quot;x-mac-roman&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::MAC_ROMAN <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;dos-874&quot; </span>|
+        <span class="string">&quot;iso-8859-11&quot; </span>|
+        <span class="string">&quot;iso8859-11&quot; </span>|
+        <span class="string">&quot;iso885911&quot; </span>|
+        <span class="string">&quot;tis-620&quot; </span>|
+        <span class="string">&quot;windows-874&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_874 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;cp1250&quot; </span>|
+        <span class="string">&quot;windows-1250&quot; </span>|
+        <span class="string">&quot;x-cp1250&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_1250 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;cp1251&quot; </span>|
+        <span class="string">&quot;windows-1251&quot; </span>|
+        <span class="string">&quot;x-cp1251&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_1251 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;ansi_x3.4-1968&quot; </span>|
+        <span class="string">&quot;ascii&quot; </span>|
+        <span class="string">&quot;cp1252&quot; </span>|
+        <span class="string">&quot;cp819&quot; </span>|
+        <span class="string">&quot;csisolatin1&quot; </span>|
+        <span class="string">&quot;ibm819&quot; </span>|
+        <span class="string">&quot;iso-8859-1&quot; </span>|
+        <span class="string">&quot;iso-ir-100&quot; </span>|
+        <span class="string">&quot;iso8859-1&quot; </span>|
+        <span class="string">&quot;iso88591&quot; </span>|
+        <span class="string">&quot;iso_8859-1&quot; </span>|
+        <span class="string">&quot;iso_8859-1:1987&quot; </span>|
+        <span class="string">&quot;l1&quot; </span>|
+        <span class="string">&quot;latin1&quot; </span>|
+        <span class="string">&quot;us-ascii&quot; </span>|
+        <span class="string">&quot;windows-1252&quot; </span>|
+        <span class="string">&quot;x-cp1252&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_1252 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;cp1253&quot; </span>|
+        <span class="string">&quot;windows-1253&quot; </span>|
+        <span class="string">&quot;x-cp1253&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_1253 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;cp1254&quot; </span>|
+        <span class="string">&quot;csisolatin5&quot; </span>|
+        <span class="string">&quot;iso-8859-9&quot; </span>|
+        <span class="string">&quot;iso-ir-148&quot; </span>|
+        <span class="string">&quot;iso8859-9&quot; </span>|
+        <span class="string">&quot;iso88599&quot; </span>|
+        <span class="string">&quot;iso_8859-9&quot; </span>|
+        <span class="string">&quot;iso_8859-9:1989&quot; </span>|
+        <span class="string">&quot;l5&quot; </span>|
+        <span class="string">&quot;latin5&quot; </span>|
+        <span class="string">&quot;windows-1254&quot; </span>|
+        <span class="string">&quot;x-cp1254&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_1254 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;cp1255&quot; </span>|
+        <span class="string">&quot;windows-1255&quot; </span>|
+        <span class="string">&quot;x-cp1255&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_1255 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;cp1256&quot; </span>|
+        <span class="string">&quot;windows-1256&quot; </span>|
+        <span class="string">&quot;x-cp1256&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_1256 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;cp1257&quot; </span>|
+        <span class="string">&quot;windows-1257&quot; </span>|
+        <span class="string">&quot;x-cp1257&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_1257 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;cp1258&quot; </span>|
+        <span class="string">&quot;windows-1258&quot; </span>|
+        <span class="string">&quot;x-cp1258&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_1258 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;x-mac-cyrillic&quot; </span>|
+        <span class="string">&quot;x-mac-ukrainian&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::MAC_CYRILLIC <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;chinese&quot; </span>|
+        <span class="string">&quot;csgb2312&quot; </span>|
+        <span class="string">&quot;csiso58gb231280&quot; </span>|
+        <span class="string">&quot;gb2312&quot; </span>|
+        <span class="string">&quot;gb_2312&quot; </span>|
+        <span class="string">&quot;gb_2312-80&quot; </span>|
+        <span class="string">&quot;gbk&quot; </span>|
+        <span class="string">&quot;iso-ir-58&quot; </span>|
+        <span class="string">&quot;x-gbk&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::GBK <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;gb18030&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::GB18030 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;big5&quot; </span>|
+        <span class="string">&quot;big5-hkscs&quot; </span>|
+        <span class="string">&quot;cn-big5&quot; </span>|
+        <span class="string">&quot;csbig5&quot; </span>|
+        <span class="string">&quot;x-x-big5&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::BIG5_2003 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;cseucpkdfmtjapanese&quot; </span>|
+        <span class="string">&quot;euc-jp&quot; </span>|
+        <span class="string">&quot;x-euc-jp&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::EUC_JP <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csiso2022jp&quot; </span>|
+        <span class="string">&quot;iso-2022-jp&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::ISO_2022_JP <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csshiftjis&quot; </span>|
+        <span class="string">&quot;ms_kanji&quot; </span>|
+        <span class="string">&quot;shift-jis&quot; </span>|
+        <span class="string">&quot;shift_jis&quot; </span>|
+        <span class="string">&quot;sjis&quot; </span>|
+        <span class="string">&quot;windows-31j&quot; </span>|
+        <span class="string">&quot;x-sjis&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_31J <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;cseuckr&quot; </span>|
+        <span class="string">&quot;csksc56011987&quot; </span>|
+        <span class="string">&quot;euc-kr&quot; </span>|
+        <span class="string">&quot;iso-ir-149&quot; </span>|
+        <span class="string">&quot;korean&quot; </span>|
+        <span class="string">&quot;ks_c_5601-1987&quot; </span>|
+        <span class="string">&quot;ks_c_5601-1989&quot; </span>|
+        <span class="string">&quot;ksc5601&quot; </span>|
+        <span class="string">&quot;ksc_5601&quot; </span>|
+        <span class="string">&quot;windows-949&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::WINDOWS_949 <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;csiso2022kr&quot; </span>|
+        <span class="string">&quot;hz-gb-2312&quot; </span>|
+        <span class="string">&quot;iso-2022-kr&quot; </span>|
+        <span class="string">&quot;iso-2022-cn&quot; </span>|
+        <span class="string">&quot;iso-2022-cn-ext&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::whatwg::REPLACEMENT <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;utf-16be&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::UTF_16BE <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;utf-16&quot; </span>|
+        <span class="string">&quot;utf-16le&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::UTF_16LE <span class="kw">as </span>EncodingRef),
+        <span class="string">&quot;x-user-defined&quot; </span>=&gt;
+            <span class="prelude-val">Some</span>(all::whatwg::X_USER_DEFINED <span class="kw">as </span>EncodingRef),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// Returns an encoding from Windows code page number.</span>
-<span class="doccomment">/// http://msdn.microsoft.com/en-us/library/windows/desktop/dd317756%28v=vs.85%29.aspx</span>
-<span class="doccomment">/// Sometimes it can return a *superset* of the requested encoding, e.g. for several CJK encodings.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding_from_windows_code_page</span>(<span class="ident">cp</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EncodingRef</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">cp</span> {
-        <span class="number">65001</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::UTF_8</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">866</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::IBM866</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">28591</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_1</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">28592</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_2</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">28593</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_3</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">28594</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_4</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">28595</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_5</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">28596</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_6</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">28597</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_7</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">28598</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_8</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">38598</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::whatwg::ISO_8859_8_I</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">28603</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_13</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">28605</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::ISO_8859_15</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">20866</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::KOI8_R</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">21866</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::KOI8_U</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">10000</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::MAC_ROMAN</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">874</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_874</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1250</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1250</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1251</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1251</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1252</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1252</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1253</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1253</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1254</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1254</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1255</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1255</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1256</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1256</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1257</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1257</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1258</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_1258</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1259</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::MAC_CYRILLIC</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">936</span> <span class="op">|</span> <span class="number">54936</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::GB18030</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>), <span class="comment">// XXX technically wrong</span>
-        <span class="number">52936</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::HZ</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">950</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::BIG5_2003</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">20932</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::EUC_JP</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">50220</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::ISO_2022_JP</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">932</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_31J</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">949</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::WINDOWS_949</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1201</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::UTF_16BE</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="number">1200</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">all::UTF_16LE</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
-    }
+<span class="doccomment">/// Returns an encoding from Windows code page number.
+/// http://msdn.microsoft.com/en-us/library/windows/desktop/dd317756%28v=vs.85%29.aspx
+/// Sometimes it can return a *superset* of the requested encoding, e.g. for several CJK encodings.
+</span><span class="kw">pub fn </span>encoding_from_windows_code_page(cp: usize) -&gt; <span class="prelude-ty">Option</span>&lt;EncodingRef&gt; {
+    <span class="kw">match </span>cp {
+        <span class="number">65001 </span>=&gt; <span class="prelude-val">Some</span>(all::UTF_8 <span class="kw">as </span>EncodingRef),
+        <span class="number">866 </span>=&gt; <span class="prelude-val">Some</span>(all::IBM866 <span class="kw">as </span>EncodingRef),
+        <span class="number">28591 </span>=&gt; <span class="prelude-val">Some</span>(all::ISO_8859_1 <span class="kw">as </span>EncodingRef),
+        <span class="number">28592 </span>=&gt; <span class="prelude-val">Some</span>(all::ISO_8859_2 <span class="kw">as </span>EncodingRef),
+        <span class="number">28593 </span>=&gt; <span class="prelude-val">Some</span>(all::ISO_8859_3 <span class="kw">as </span>EncodingRef),
+        <span class="number">28594 </span>=&gt; <span class="prelude-val">Some</span>(all::ISO_8859_4 <span class="kw">as </span>EncodingRef),
+        <span class="number">28595 </span>=&gt; <span class="prelude-val">Some</span>(all::ISO_8859_5 <span class="kw">as </span>EncodingRef),
+        <span class="number">28596 </span>=&gt; <span class="prelude-val">Some</span>(all::ISO_8859_6 <span class="kw">as </span>EncodingRef),
+        <span class="number">28597 </span>=&gt; <span class="prelude-val">Some</span>(all::ISO_8859_7 <span class="kw">as </span>EncodingRef),
+        <span class="number">28598 </span>=&gt; <span class="prelude-val">Some</span>(all::ISO_8859_8 <span class="kw">as </span>EncodingRef),
+        <span class="number">38598 </span>=&gt; <span class="prelude-val">Some</span>(all::whatwg::ISO_8859_8_I <span class="kw">as </span>EncodingRef),
+        <span class="number">28603 </span>=&gt; <span class="prelude-val">Some</span>(all::ISO_8859_13 <span class="kw">as </span>EncodingRef),
+        <span class="number">28605 </span>=&gt; <span class="prelude-val">Some</span>(all::ISO_8859_15 <span class="kw">as </span>EncodingRef),
+        <span class="number">20866 </span>=&gt; <span class="prelude-val">Some</span>(all::KOI8_R <span class="kw">as </span>EncodingRef),
+        <span class="number">21866 </span>=&gt; <span class="prelude-val">Some</span>(all::KOI8_U <span class="kw">as </span>EncodingRef),
+        <span class="number">10000 </span>=&gt; <span class="prelude-val">Some</span>(all::MAC_ROMAN <span class="kw">as </span>EncodingRef),
+        <span class="number">874 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_874 <span class="kw">as </span>EncodingRef),
+        <span class="number">1250 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_1250 <span class="kw">as </span>EncodingRef),
+        <span class="number">1251 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_1251 <span class="kw">as </span>EncodingRef),
+        <span class="number">1252 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_1252 <span class="kw">as </span>EncodingRef),
+        <span class="number">1253 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_1253 <span class="kw">as </span>EncodingRef),
+        <span class="number">1254 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_1254 <span class="kw">as </span>EncodingRef),
+        <span class="number">1255 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_1255 <span class="kw">as </span>EncodingRef),
+        <span class="number">1256 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_1256 <span class="kw">as </span>EncodingRef),
+        <span class="number">1257 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_1257 <span class="kw">as </span>EncodingRef),
+        <span class="number">1258 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_1258 <span class="kw">as </span>EncodingRef),
+        <span class="number">1259 </span>=&gt; <span class="prelude-val">Some</span>(all::MAC_CYRILLIC <span class="kw">as </span>EncodingRef),
+        <span class="number">936 </span>| <span class="number">54936 </span>=&gt; <span class="prelude-val">Some</span>(all::GB18030 <span class="kw">as </span>EncodingRef), <span class="comment">// XXX technically wrong
+        </span><span class="number">52936 </span>=&gt; <span class="prelude-val">Some</span>(all::HZ <span class="kw">as </span>EncodingRef),
+        <span class="number">950 </span>=&gt; <span class="prelude-val">Some</span>(all::BIG5_2003 <span class="kw">as </span>EncodingRef),
+        <span class="number">20932 </span>=&gt; <span class="prelude-val">Some</span>(all::EUC_JP <span class="kw">as </span>EncodingRef),
+        <span class="number">50220 </span>=&gt; <span class="prelude-val">Some</span>(all::ISO_2022_JP <span class="kw">as </span>EncodingRef),
+        <span class="number">932 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_31J <span class="kw">as </span>EncodingRef),
+        <span class="number">949 </span>=&gt; <span class="prelude-val">Some</span>(all::WINDOWS_949 <span class="kw">as </span>EncodingRef),
+        <span class="number">1201 </span>=&gt; <span class="prelude-val">Some</span>(all::UTF_16BE <span class="kw">as </span>EncodingRef),
+        <span class="number">1200 </span>=&gt; <span class="prelude-val">Some</span>(all::UTF_16LE <span class="kw">as </span>EncodingRef),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
-    <span class="kw">use</span> <span class="ident">all</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::encoding_from_whatwg_label</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">extern crate </span>test;
+    <span class="kw">use </span>all;
+    <span class="kw">use </span><span class="kw">super</span>::encoding_from_whatwg_label;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encoding_from_whatwg_label</span>() {
-        <span class="macro">assert!</span>(<span class="ident">encoding_from_whatwg_label</span>(<span class="string">&quot;utf-8&quot;</span>).<span class="ident">is_some</span>());
-        <span class="macro">assert!</span>(<span class="ident">encoding_from_whatwg_label</span>(<span class="string">&quot;UTF-8&quot;</span>).<span class="ident">is_some</span>());
-        <span class="macro">assert!</span>(<span class="ident">encoding_from_whatwg_label</span>(<span class="string">&quot;\t\n\x0C\r utf-8\t\n\x0C\r &quot;</span>).<span class="ident">is_some</span>());
-        <span class="macro">assert!</span>(<span class="ident">encoding_from_whatwg_label</span>(<span class="string">&quot;\u{A0}utf-8&quot;</span>).<span class="ident">is_none</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encoding_from_whatwg_label() {
+        <span class="macro">assert!</span>(encoding_from_whatwg_label(<span class="string">&quot;utf-8&quot;</span>).is_some());
+        <span class="macro">assert!</span>(encoding_from_whatwg_label(<span class="string">&quot;UTF-8&quot;</span>).is_some());
+        <span class="macro">assert!</span>(encoding_from_whatwg_label(<span class="string">&quot;\t\n\x0C\r utf-8\t\n\x0C\r &quot;</span>).is_some());
+        <span class="macro">assert!</span>(encoding_from_whatwg_label(<span class="string">&quot;\u{A0}utf-8&quot;</span>).is_none(),
                 <span class="string">&quot;Non-ASCII whitespace should not be trimmed&quot;</span>);
-        <span class="macro">assert!</span>(<span class="ident">encoding_from_whatwg_label</span>(<span class="string">&quot;greek&quot;</span>).<span class="ident">is_some</span>());
-        <span class="macro">assert!</span>(<span class="ident">encoding_from_whatwg_label</span>(<span class="string">&quot;gree\u{212A}&quot;</span>).<span class="ident">is_none</span>(),
+        <span class="macro">assert!</span>(encoding_from_whatwg_label(<span class="string">&quot;greek&quot;</span>).is_some());
+        <span class="macro">assert!</span>(encoding_from_whatwg_label(<span class="string">&quot;gree\u{212A}&quot;</span>).is_none(),
                 <span class="string">&quot;Case-insensitive matching should be ASCII only. Kelvin sign does not match k.&quot;</span>);
 
-        <span class="comment">// checks if the `whatwg_name` method returns the label that resolves back to that encoding</span>
-        <span class="kw">for</span> <span class="ident">encoding</span> <span class="kw">in</span> <span class="ident">all::encodings</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">whatwg_name</span>) <span class="op">=</span> <span class="ident">encoding</span>.<span class="ident">whatwg_name</span>() {
-                <span class="kw">if</span> <span class="ident">whatwg_name</span> <span class="op">==</span> <span class="string">&quot;replacement&quot;</span> { <span class="kw">continue</span>; }
-                <span class="macro">assert_eq!</span>(<span class="ident">encoding_from_whatwg_label</span>(<span class="ident">whatwg_name</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">whatwg_name</span>()),
-                           <span class="prelude-val">Some</span>(<span class="ident">whatwg_name</span>));
+        <span class="comment">// checks if the `whatwg_name` method returns the label that resolves back to that encoding
+        </span><span class="kw">for </span>encoding <span class="kw">in </span>all::encodings() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(whatwg_name) = encoding.whatwg_name() {
+                <span class="kw">if </span>whatwg_name == <span class="string">&quot;replacement&quot; </span>{ <span class="kw">continue</span>; }
+                <span class="macro">assert_eq!</span>(encoding_from_whatwg_label(whatwg_name).and_then(|e| e.whatwg_name()),
+                           <span class="prelude-val">Some</span>(whatwg_name));
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bench_encoding_from_whatwg_label</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-            <span class="ident">encoding_from_whatwg_label</span>(<span class="string">&quot;iso-8859-bazinga&quot;</span>)
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>bench_encoding_from_whatwg_label(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+        bencher.iter(|| test::black_box({
+            encoding_from_whatwg_label(<span class="string">&quot;iso-8859-bazinga&quot;</span>)
         }))
     }
 }
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="encoding" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="encoding" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

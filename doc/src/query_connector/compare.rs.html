@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/compare.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compare.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/compare.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compare.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -189,196 +189,196 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::PrismaValue</span>;
+<span class="kw">use </span><span class="kw">crate</span>::filter::Filter;
+<span class="kw">use </span>prisma_models::PrismaValue;
 
-<span class="doccomment">/// Comparing methods for scalar fields.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ScalarCompare</span> {
-    <span class="kw">fn</span> <span class="ident">is_in</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionListValue</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Comparing methods for scalar fields.
+</span><span class="kw">pub trait </span>ScalarCompare {
+    <span class="kw">fn </span>is_in&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionListValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">not_in</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionListValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>not_in&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionListValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>equals&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">not_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>not_equals&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>contains&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">not_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>not_contains&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>starts_with&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">not_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>not_starts_with&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>ends_with&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">not_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>not_ends_with&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">less_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>less_than&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">less_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>less_than_or_equals&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">greater_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>greater_than&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">greater_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>greater_than_or_equals&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">search</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>search&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">not_search</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>not_search&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">is_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Filter</span>;
+    <span class="kw">fn </span>is_set(<span class="kw-2">&amp;</span><span class="self">self</span>, val: bool) -&gt; Filter;
 }
 
-<span class="doccomment">/// Comparison methods for relational fields.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RelationCompare</span> {
-    <span class="kw">fn</span> <span class="ident">every_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Comparison methods for relational fields.
+</span><span class="kw">pub trait </span>RelationCompare {
+    <span class="kw">fn </span>every_related&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;;
 
-    <span class="kw">fn</span> <span class="ident">at_least_one_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>at_least_one_related&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;;
 
-    <span class="kw">fn</span> <span class="ident">to_one_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>to_one_related&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;;
 
-    <span class="kw">fn</span> <span class="ident">no_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>no_related&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;;
 
-    <span class="kw">fn</span> <span class="ident">one_relation_is_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Filter</span>;
+    <span class="kw">fn </span>one_relation_is_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Filter;
 }
 
-<span class="doccomment">/// Comparison methods for scalar list fields.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ScalarListCompare</span> {
-    <span class="kw">fn</span> <span class="ident">contains_element</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Comparison methods for scalar list fields.
+</span><span class="kw">pub trait </span>ScalarListCompare {
+    <span class="kw">fn </span>contains_element&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">contains_every_element</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionListValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>contains_every_element&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionListValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">contains_some_element</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionListValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>contains_some_element&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionListValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">is_empty_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Filter</span>;
+    <span class="kw">fn </span>is_empty_list(<span class="kw-2">&amp;</span><span class="self">self</span>, b: bool) -&gt; Filter;
 }
 
-<span class="doccomment">/// Comparison methods for json fields</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">JsonCompare</span> {
-    <span class="kw">fn</span> <span class="ident">json_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Comparison methods for json fields
+</span><span class="kw">pub trait </span>JsonCompare {
+    <span class="kw">fn </span>json_equals&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">json_not_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>json_not_equals&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">json_less_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>json_less_than&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">json_less_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>json_less_than_or_equals&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">json_greater_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>json_greater_than&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">json_greater_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>json_greater_than_or_equals&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">json_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>json_contains&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;, target_type: JsonTargetType) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">json_not_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>json_not_contains&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;, target_type: JsonTargetType) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">json_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>json_starts_with&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;, target_type: JsonTargetType) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">json_not_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>json_not_starts_with&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;, target_type: JsonTargetType) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">json_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>json_ends_with&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;, target_type: JsonTargetType) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">json_not_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>json_not_ends_with&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T, path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;, target_type: JsonTargetType) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;ConditionValue&gt;;
 }
 
-<span class="doccomment">/// Comparison methods for composite fields.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CompositeCompare</span> {
-    <span class="kw">fn</span> <span class="ident">every</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Comparison methods for composite fields.
+</span><span class="kw">pub trait </span>CompositeCompare {
+    <span class="kw">fn </span>every&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;;
 
-    <span class="kw">fn</span> <span class="ident">some</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>some&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;;
 
-    <span class="kw">fn</span> <span class="ident">none</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>none&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;;
 
-    <span class="kw">fn</span> <span class="ident">is</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>is&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;;
 
-    <span class="kw">fn</span> <span class="ident">is_not</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>is_not&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
+    <span class="kw">where
+        </span>T: Into&lt;Filter&gt;;
 
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Filter</span>;
+    <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>, b: bool) -&gt; Filter;
 
-    <span class="kw">fn</span> <span class="ident">is_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Filter</span>;
+    <span class="kw">fn </span>is_set(<span class="kw-2">&amp;</span><span class="self">self</span>, b: bool) -&gt; Filter;
 
-    <span class="kw">fn</span> <span class="ident">equals</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="ident">Filter</span>;
+    <span class="kw">fn </span>equals(<span class="kw-2">&amp;</span><span class="self">self</span>, val: PrismaValue) -&gt; Filter;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

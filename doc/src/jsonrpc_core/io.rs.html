@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-core-17.1.0/src/io.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-core-17.1.0/src/io.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -642,649 +642,649 @@
 <span id="642">642</span>
 <span id="643">643</span>
 <span id="644">644</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections</span>::{
-	<span class="ident">hash_map</span>::{<span class="ident">IntoIter</span>, <span class="ident">Iter</span>},
-	<span class="ident">HashMap</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{
+	hash_map::{IntoIter, Iter},
+	HashMap,
 };
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::ops::{Deref, DerefMut};
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="self">self</span>, <span class="ident">future</span>, <span class="ident">FutureExt</span>};
-<span class="kw">use</span> <span class="ident">serde_json</span>;
+<span class="kw">use </span>futures_util::{<span class="self">self</span>, future, FutureExt};
+<span class="kw">use </span>serde_json;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::calls</span>::{
-	<span class="ident">Metadata</span>, <span class="ident">RemoteProcedure</span>, <span class="ident">RpcMethod</span>, <span class="ident">RpcMethodSimple</span>, <span class="ident">RpcMethodSync</span>, <span class="ident">RpcNotification</span>, <span class="ident">RpcNotificationSimple</span>,
+<span class="kw">use </span><span class="kw">crate</span>::calls::{
+	Metadata, RemoteProcedure, RpcMethod, RpcMethodSimple, RpcMethodSync, RpcNotification, RpcNotificationSimple,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::middleware</span>::{<span class="self">self</span>, <span class="ident">Middleware</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">Call</span>, <span class="ident">Output</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">Error</span>, <span class="ident">ErrorCode</span>, <span class="ident">Version</span>};
+<span class="kw">use </span><span class="kw">crate</span>::middleware::{<span class="self">self</span>, Middleware};
+<span class="kw">use </span><span class="kw">crate</span>::types::{Call, Output, Request, Response};
+<span class="kw">use </span><span class="kw">crate</span>::types::{Error, ErrorCode, Version};
 
-<span class="doccomment">/// A type representing middleware or RPC response before serialization.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">FutureResponse</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A type representing middleware or RPC response before serialization.
+</span><span class="kw">pub type </span>FutureResponse = Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="prelude-ty">Option</span>&lt;Response&gt;&gt; + Send&gt;&gt;;
 
-<span class="doccomment">/// A type representing middleware or RPC call output.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">FutureOutput</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A type representing middleware or RPC call output.
+</span><span class="kw">pub type </span>FutureOutput = Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="prelude-ty">Option</span>&lt;Output&gt;&gt; + Send&gt;&gt;;
 
-<span class="doccomment">/// A type representing future string response.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">FutureResult</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">future::Map</span><span class="op">&lt;</span>
-	<span class="ident">future::Either</span><span class="op">&lt;</span><span class="ident">future::Ready</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">FutureRpcResult</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="kw">fn</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-<span class="op">&gt;</span>;
+<span class="doccomment">/// A type representing future string response.
+</span><span class="kw">pub type </span>FutureResult&lt;F, G&gt; = future::Map&lt;
+	future::Either&lt;future::Ready&lt;<span class="prelude-ty">Option</span>&lt;Response&gt;&gt;, FutureRpcResult&lt;F, G&gt;&gt;,
+	<span class="kw">fn</span>(<span class="prelude-ty">Option</span>&lt;Response&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt;,
+&gt;;
 
-<span class="doccomment">/// A type representing a result of a single method call.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">FutureRpcOutput</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">future::Either</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">future::Either</span><span class="op">&lt;</span><span class="ident">FutureOutput</span>, <span class="ident">future::Ready</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A type representing a result of a single method call.
+</span><span class="kw">pub type </span>FutureRpcOutput&lt;F&gt; = future::Either&lt;F, future::Either&lt;FutureOutput, future::Ready&lt;<span class="prelude-ty">Option</span>&lt;Output&gt;&gt;&gt;&gt;;
 
-<span class="doccomment">/// A type representing an optional `Response` for RPC `Request`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">FutureRpcResult</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">future::Either</span><span class="op">&lt;</span>
-	<span class="ident">F</span>,
-	<span class="ident">future::Either</span><span class="op">&lt;</span>
-		<span class="ident">future::Map</span><span class="op">&lt;</span><span class="ident">FutureRpcOutput</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="kw">fn</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-		<span class="ident">future::Map</span><span class="op">&lt;</span><span class="ident">future::JoinAll</span><span class="op">&lt;</span><span class="ident">FutureRpcOutput</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="kw">fn</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="op">&gt;</span>,
-<span class="op">&gt;</span>;
+<span class="doccomment">/// A type representing an optional `Response` for RPC `Request`.
+</span><span class="kw">pub type </span>FutureRpcResult&lt;F, G&gt; = future::Either&lt;
+	F,
+	future::Either&lt;
+		future::Map&lt;FutureRpcOutput&lt;G&gt;, <span class="kw">fn</span>(<span class="prelude-ty">Option</span>&lt;Output&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Response&gt;&gt;,
+		future::Map&lt;future::JoinAll&lt;FutureRpcOutput&lt;G&gt;&gt;, <span class="kw">fn</span>(Vec&lt;<span class="prelude-ty">Option</span>&lt;Output&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Response&gt;&gt;,
+	&gt;,
+&gt;;
 
-<span class="doccomment">/// `IoHandler` json-rpc protocol compatibility</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Compatibility</span> {
-	<span class="doccomment">/// Compatible only with JSON-RPC 1.x</span>
-	<span class="ident">V1</span>,
-	<span class="doccomment">/// Compatible only with JSON-RPC 2.0</span>
-	<span class="ident">V2</span>,
-	<span class="doccomment">/// Compatible with both</span>
-	<span class="ident">Both</span>,
+<span class="doccomment">/// `IoHandler` json-rpc protocol compatibility
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub enum </span>Compatibility {
+	<span class="doccomment">/// Compatible only with JSON-RPC 1.x
+	</span>V1,
+	<span class="doccomment">/// Compatible only with JSON-RPC 2.0
+	</span>V2,
+	<span class="doccomment">/// Compatible with both
+	</span>Both,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Compatibility</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="ident">Compatibility::V2</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>Compatibility {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		Compatibility::V2
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">Compatibility</span> {
-	<span class="kw">fn</span> <span class="ident">is_version_valid</span>(<span class="self">self</span>, <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">match</span> (<span class="self">self</span>, <span class="ident">version</span>) {
-			(<span class="ident">Compatibility::V1</span>, <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="ident">Compatibility::V2</span>, <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>)) <span class="op">|</span> (<span class="ident">Compatibility::Both</span>, <span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-			<span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="kw">impl </span>Compatibility {
+	<span class="kw">fn </span>is_version_valid(<span class="self">self</span>, version: <span class="prelude-ty">Option</span>&lt;Version&gt;) -&gt; bool {
+		<span class="kw">match </span>(<span class="self">self</span>, version) {
+			(Compatibility::V1, <span class="prelude-val">None</span>) | (Compatibility::V2, <span class="prelude-val">Some</span>(Version::V2)) | (Compatibility::Both, <span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+			<span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">default_version</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident">Compatibility::V1</span> =&gt; <span class="prelude-val">None</span>,
-			<span class="ident">Compatibility::V2</span> <span class="op">|</span> <span class="ident">Compatibility::Both</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-		}
-	}
-}
-
-<span class="doccomment">/// Request handler</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// By default compatible only with jsonrpc v2</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Metadata</span>, <span class="ident">S</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">middleware::Noop</span><span class="op">&gt;</span> {
-	<span class="ident">middleware</span>: <span class="ident">S</span>,
-	<span class="ident">compatibility</span>: <span class="ident">Compatibility</span>,
-	<span class="ident">methods</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Metadata</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="ident">MetaIoHandler::with_compatibility</span>(<span class="ident">Default::default</span>())
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Metadata</span>, <span class="ident">S</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">String</span>, <span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-	<span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-		<span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">into_iter</span>()
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Metadata</span>, <span class="ident">S</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-	<span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">String</span>, <span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-		<span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">iter</span>()
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Metadata</span><span class="op">&gt;</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Creates new `MetaIoHandler` compatible with specified protocol version.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_compatibility</span>(<span class="ident">compatibility</span>: <span class="ident">Compatibility</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">MetaIoHandler</span> {
-			<span class="ident">compatibility</span>,
-			<span class="ident">middleware</span>: <span class="ident">Default::default</span>(),
-			<span class="ident">methods</span>: <span class="ident">Default::default</span>(),
+	<span class="kw">fn </span>default_version(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Version&gt; {
+		<span class="kw">match </span><span class="self">self </span>{
+			Compatibility::V1 =&gt; <span class="prelude-val">None</span>,
+			Compatibility::V2 | Compatibility::Both =&gt; <span class="prelude-val">Some</span>(Version::V2),
 		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Metadata</span>, <span class="ident">S</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Creates new `MetaIoHandler`</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">compatibility</span>: <span class="ident">Compatibility</span>, <span class="ident">middleware</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">MetaIoHandler</span> {
-			<span class="ident">compatibility</span>,
-			<span class="ident">middleware</span>,
-			<span class="ident">methods</span>: <span class="ident">Default::default</span>(),
+<span class="doccomment">/// Request handler
+///
+/// By default compatible only with jsonrpc v2
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>MetaIoHandler&lt;T: Metadata, S: Middleware&lt;T&gt; = middleware::Noop&gt; {
+	middleware: S,
+	compatibility: Compatibility,
+	methods: HashMap&lt;String, RemoteProcedure&lt;T&gt;&gt;,
+}
+
+<span class="kw">impl</span>&lt;T: Metadata&gt; Default <span class="kw">for </span>MetaIoHandler&lt;T&gt; {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		MetaIoHandler::with_compatibility(Default::default())
+	}
+}
+
+<span class="kw">impl</span>&lt;T: Metadata, S: Middleware&lt;T&gt;&gt; IntoIterator <span class="kw">for </span>MetaIoHandler&lt;T, S&gt; {
+	<span class="kw">type </span>Item = (String, RemoteProcedure&lt;T&gt;);
+	<span class="kw">type </span>IntoIter = IntoIter&lt;String, RemoteProcedure&lt;T&gt;&gt;;
+
+	<span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+		<span class="self">self</span>.methods.into_iter()
+	}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Metadata, S: Middleware&lt;T&gt;&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MetaIoHandler&lt;T, S&gt; {
+	<span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RemoteProcedure&lt;T&gt;);
+	<span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>, String, RemoteProcedure&lt;T&gt;&gt;;
+
+	<span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+		<span class="self">self</span>.methods.iter()
+	}
+}
+
+<span class="kw">impl</span>&lt;T: Metadata&gt; MetaIoHandler&lt;T&gt; {
+	<span class="doccomment">/// Creates new `MetaIoHandler` compatible with specified protocol version.
+	</span><span class="kw">pub fn </span>with_compatibility(compatibility: Compatibility) -&gt; <span class="self">Self </span>{
+		MetaIoHandler {
+			compatibility,
+			middleware: Default::default(),
+			methods: Default::default(),
+		}
+	}
+}
+
+<span class="kw">impl</span>&lt;T: Metadata, S: Middleware&lt;T&gt;&gt; MetaIoHandler&lt;T, S&gt; {
+	<span class="doccomment">/// Creates new `MetaIoHandler`
+	</span><span class="kw">pub fn </span>new(compatibility: Compatibility, middleware: S) -&gt; <span class="self">Self </span>{
+		MetaIoHandler {
+			compatibility,
+			middleware,
+			methods: Default::default(),
 		}
 	}
 
-	<span class="doccomment">/// Creates new `MetaIoHandler` with specified middleware.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_middleware</span>(<span class="ident">middleware</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">MetaIoHandler</span> {
-			<span class="ident">compatibility</span>: <span class="ident">Default::default</span>(),
-			<span class="ident">middleware</span>,
-			<span class="ident">methods</span>: <span class="ident">Default::default</span>(),
+	<span class="doccomment">/// Creates new `MetaIoHandler` with specified middleware.
+	</span><span class="kw">pub fn </span>with_middleware(middleware: S) -&gt; <span class="self">Self </span>{
+		MetaIoHandler {
+			compatibility: Default::default(),
+			middleware,
+			methods: Default::default(),
 		}
 	}
 
-	<span class="doccomment">/// Adds an alias to a method.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_alias</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-		<span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">insert</span>(<span class="ident">alias</span>.<span class="ident">into</span>(), <span class="ident">RemoteProcedure::Alias</span>(<span class="ident">other</span>.<span class="ident">into</span>()));
+	<span class="doccomment">/// Adds an alias to a method.
+	</span><span class="kw">pub fn </span>add_alias(<span class="kw-2">&amp;mut </span><span class="self">self</span>, alias: <span class="kw-2">&amp;</span>str, other: <span class="kw-2">&amp;</span>str) {
+		<span class="self">self</span>.methods.insert(alias.into(), RemoteProcedure::Alias(other.into()));
 	}
 
-	<span class="doccomment">/// Adds new supported synchronous method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// A backward-compatible wrapper.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_sync_method</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">method</span>: <span class="ident">F</span>)
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">RpcMethodSync</span>,
+	<span class="doccomment">/// Adds new supported synchronous method.
+	///
+	/// A backward-compatible wrapper.
+	</span><span class="kw">pub fn </span>add_sync_method&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, method: F)
+	<span class="kw">where
+		</span>F: RpcMethodSync,
 	{
-		<span class="self">self</span>.<span class="ident">add_method</span>(<span class="ident">name</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span><span class="op">|</span> <span class="ident">method</span>.<span class="ident">call</span>(<span class="ident">params</span>))
+		<span class="self">self</span>.add_method(name, <span class="kw">move </span>|params| method.call(params))
 	}
 
-	<span class="doccomment">/// Adds new supported asynchronous method.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_method</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">method</span>: <span class="ident">F</span>)
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">RpcMethodSimple</span>,
+	<span class="doccomment">/// Adds new supported asynchronous method.
+	</span><span class="kw">pub fn </span>add_method&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, method: F)
+	<span class="kw">where
+		</span>F: RpcMethodSimple,
 	{
-		<span class="self">self</span>.<span class="ident">add_method_with_meta</span>(<span class="ident">name</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="ident">_meta</span><span class="op">|</span> <span class="ident">method</span>.<span class="ident">call</span>(<span class="ident">params</span>))
+		<span class="self">self</span>.add_method_with_meta(name, <span class="kw">move </span>|params, _meta| method.call(params))
 	}
 
-	<span class="doccomment">/// Adds new supported notification</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_notification</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">notification</span>: <span class="ident">F</span>)
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">RpcNotificationSimple</span>,
+	<span class="doccomment">/// Adds new supported notification
+	</span><span class="kw">pub fn </span>add_notification&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, notification: F)
+	<span class="kw">where
+		</span>F: RpcNotificationSimple,
 	{
-		<span class="self">self</span>.<span class="ident">add_notification_with_meta</span>(<span class="ident">name</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="ident">_meta</span><span class="op">|</span> <span class="ident">notification</span>.<span class="ident">execute</span>(<span class="ident">params</span>))
+		<span class="self">self</span>.add_notification_with_meta(name, <span class="kw">move </span>|params, _meta| notification.execute(params))
 	}
 
-	<span class="doccomment">/// Adds new supported asynchronous method with metadata support.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_method_with_meta</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">method</span>: <span class="ident">F</span>)
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">RpcMethod</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// Adds new supported asynchronous method with metadata support.
+	</span><span class="kw">pub fn </span>add_method_with_meta&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, method: F)
+	<span class="kw">where
+		</span>F: RpcMethod&lt;T&gt;,
 	{
-		<span class="self">self</span>.<span class="ident">methods</span>
-			.<span class="ident">insert</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">RemoteProcedure::Method</span>(<span class="ident">Arc::new</span>(<span class="ident">method</span>)));
+		<span class="self">self</span>.methods
+			.insert(name.into(), RemoteProcedure::Method(Arc::new(method)));
 	}
 
-	<span class="doccomment">/// Adds new supported notification with metadata support.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_notification_with_meta</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">notification</span>: <span class="ident">F</span>)
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">RpcNotification</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// Adds new supported notification with metadata support.
+	</span><span class="kw">pub fn </span>add_notification_with_meta&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, notification: F)
+	<span class="kw">where
+		</span>F: RpcNotification&lt;T&gt;,
 	{
-		<span class="self">self</span>.<span class="ident">methods</span>
-			.<span class="ident">insert</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">RemoteProcedure::Notification</span>(<span class="ident">Arc::new</span>(<span class="ident">notification</span>)));
+		<span class="self">self</span>.methods
+			.insert(name.into(), RemoteProcedure::Notification(Arc::new(notification)));
 	}
 
-	<span class="doccomment">/// Extend this `MetaIoHandler` with methods defined elsewhere.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extend_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">methods</span>: <span class="ident">F</span>)
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">String</span>, <span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+	<span class="doccomment">/// Extend this `MetaIoHandler` with methods defined elsewhere.
+	</span><span class="kw">pub fn </span>extend_with&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, methods: F)
+	<span class="kw">where
+		</span>F: IntoIterator&lt;Item = (String, RemoteProcedure&lt;T&gt;)&gt;,
 	{
-		<span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">extend</span>(<span class="ident">methods</span>)
+		<span class="self">self</span>.methods.extend(methods)
 	}
 
-	<span class="doccomment">/// Handle given request synchronously - will block until response is available.</span>
-	<span class="doccomment">/// If you have any asynchronous methods in your RPC it is much wiser to use</span>
-	<span class="doccomment">/// `handle_request` instead and deal with asynchronous requests in a non-blocking fashion.</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;futures-executor&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_request_sync</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">meta</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="ident">futures_executor::block_on</span>(<span class="self">self</span>.<span class="ident">handle_request</span>(<span class="ident">request</span>, <span class="ident">meta</span>))
+	<span class="doccomment">/// Handle given request synchronously - will block until response is available.
+	/// If you have any asynchronous methods in your RPC it is much wiser to use
+	/// `handle_request` instead and deal with asynchronous requests in a non-blocking fashion.
+	</span><span class="attribute">#[cfg(feature = <span class="string">&quot;futures-executor&quot;</span>)]
+	</span><span class="kw">pub fn </span>handle_request_sync(<span class="kw-2">&amp;</span><span class="self">self</span>, request: <span class="kw-2">&amp;</span>str, meta: T) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+		futures_executor::block_on(<span class="self">self</span>.handle_request(request, meta))
 	}
 
-	<span class="doccomment">/// Handle given request asynchronously.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">meta</span>: <span class="ident">T</span>) -&gt; <span class="ident">FutureResult</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">S::CallFuture</span><span class="op">&gt;</span> {
-		<span class="kw">use</span> <span class="ident"><span class="self">self</span>::future::Either</span>::{<span class="ident">Left</span>, <span class="ident">Right</span>};
-		<span class="kw">fn</span> <span class="ident">as_string</span>(<span class="ident">response</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-			<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">map</span>(<span class="ident">write_response</span>);
-			<span class="macro">debug!</span>(<span class="ident">target</span>: <span class="string">&quot;rpc&quot;</span>, <span class="string">&quot;Response: {}.&quot;</span>, <span class="kw">match</span> <span class="ident">res</span> {
-				<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">res</span>) =&gt; <span class="ident">res</span>,
-				<span class="prelude-val">None</span> =&gt; <span class="string">&quot;None&quot;</span>,
+	<span class="doccomment">/// Handle given request asynchronously.
+	</span><span class="kw">pub fn </span>handle_request(<span class="kw-2">&amp;</span><span class="self">self</span>, request: <span class="kw-2">&amp;</span>str, meta: T) -&gt; FutureResult&lt;S::Future, S::CallFuture&gt; {
+		<span class="kw">use </span><span class="self">self</span>::future::Either::{Left, Right};
+		<span class="kw">fn </span>as_string(response: <span class="prelude-ty">Option</span>&lt;Response&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+			<span class="kw">let </span>res = response.map(write_response);
+			<span class="macro">debug!</span>(target: <span class="string">&quot;rpc&quot;</span>, <span class="string">&quot;Response: {}.&quot;</span>, <span class="kw">match </span>res {
+				<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>res) =&gt; res,
+				<span class="prelude-val">None </span>=&gt; <span class="string">&quot;None&quot;</span>,
 			});
-			<span class="ident">res</span>
+			res
 		}
 
-		<span class="macro">trace!</span>(<span class="ident">target</span>: <span class="string">&quot;rpc&quot;</span>, <span class="string">&quot;Request: {}.&quot;</span>, <span class="ident">request</span>);
-		<span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">read_request</span>(<span class="ident">request</span>);
-		<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">request</span> {
-			<span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="ident">Left</span>(<span class="ident">future::ready</span>(<span class="prelude-val">Some</span>(<span class="ident">Response::from</span>(
-				<span class="ident">error</span>,
-				<span class="self">self</span>.<span class="ident">compatibility</span>.<span class="ident">default_version</span>(),
+		<span class="macro">trace!</span>(target: <span class="string">&quot;rpc&quot;</span>, <span class="string">&quot;Request: {}.&quot;</span>, request);
+		<span class="kw">let </span>request = read_request(request);
+		<span class="kw">let </span>result = <span class="kw">match </span>request {
+			<span class="prelude-val">Err</span>(error) =&gt; Left(future::ready(<span class="prelude-val">Some</span>(Response::from(
+				error,
+				<span class="self">self</span>.compatibility.default_version(),
 			)))),
-			<span class="prelude-val">Ok</span>(<span class="ident">request</span>) =&gt; <span class="ident">Right</span>(<span class="self">self</span>.<span class="ident">handle_rpc_request</span>(<span class="ident">request</span>, <span class="ident">meta</span>)),
+			<span class="prelude-val">Ok</span>(request) =&gt; Right(<span class="self">self</span>.handle_rpc_request(request, meta)),
 		};
 
-		<span class="ident">result</span>.<span class="ident">map</span>(<span class="ident">as_string</span>)
+		result.map(as_string)
 	}
 
-	<span class="doccomment">/// Handle deserialized RPC request.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_rpc_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>: <span class="ident">Request</span>, <span class="ident">meta</span>: <span class="ident">T</span>) -&gt; <span class="ident">FutureRpcResult</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">S::CallFuture</span><span class="op">&gt;</span> {
-		<span class="kw">use</span> <span class="ident"><span class="self">self</span>::future::Either</span>::{<span class="ident">Left</span>, <span class="ident">Right</span>};
+	<span class="doccomment">/// Handle deserialized RPC request.
+	</span><span class="kw">pub fn </span>handle_rpc_request(<span class="kw-2">&amp;</span><span class="self">self</span>, request: Request, meta: T) -&gt; FutureRpcResult&lt;S::Future, S::CallFuture&gt; {
+		<span class="kw">use </span><span class="self">self</span>::future::Either::{Left, Right};
 
-		<span class="kw">fn</span> <span class="ident">output_as_response</span>(<span class="ident">output</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span> {
-			<span class="ident">output</span>.<span class="ident">map</span>(<span class="ident">Response::Single</span>)
+		<span class="kw">fn </span>output_as_response(output: <span class="prelude-ty">Option</span>&lt;Output&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Response&gt; {
+			output.map(Response::Single)
 		}
 
-		<span class="kw">fn</span> <span class="ident">outputs_as_batch</span>(<span class="ident">outs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span> {
-			<span class="kw">let</span> <span class="ident">outs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">outs</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>).<span class="ident">collect</span>();
-			<span class="kw">if</span> <span class="ident">outs</span>.<span class="ident">is_empty</span>() {
-				<span class="prelude-val">None</span>
-			} <span class="kw">else</span> {
-				<span class="prelude-val">Some</span>(<span class="ident">Response::Batch</span>(<span class="ident">outs</span>))
+		<span class="kw">fn </span>outputs_as_batch(outs: Vec&lt;<span class="prelude-ty">Option</span>&lt;Output&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Response&gt; {
+			<span class="kw">let </span>outs: Vec&lt;<span class="kw">_</span>&gt; = outs.into_iter().filter_map(|v| v).collect();
+			<span class="kw">if </span>outs.is_empty() {
+				<span class="prelude-val">None
+			</span>} <span class="kw">else </span>{
+				<span class="prelude-val">Some</span>(Response::Batch(outs))
 			}
 		}
 
-		<span class="self">self</span>.<span class="ident">middleware</span>
-			.<span class="ident">on_request</span>(<span class="ident">request</span>, <span class="ident">meta</span>, <span class="op">|</span><span class="ident">request</span>, <span class="ident">meta</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">request</span> {
-				<span class="ident">Request::Single</span>(<span class="ident">call</span>) =&gt; <span class="ident">Left</span>(
-					<span class="self">self</span>.<span class="ident">handle_call</span>(<span class="ident">call</span>, <span class="ident">meta</span>)
-						.<span class="ident">map</span>(<span class="ident">output_as_response</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span>),
+		<span class="self">self</span>.middleware
+			.on_request(request, meta, |request, meta| <span class="kw">match </span>request {
+				Request::Single(call) =&gt; Left(
+					<span class="self">self</span>.handle_call(call, meta)
+						.map(output_as_response <span class="kw">as fn</span>(<span class="prelude-ty">Option</span>&lt;Output&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Response&gt;),
 				),
-				<span class="ident">Request::Batch</span>(<span class="ident">calls</span>) =&gt; {
-					<span class="kw">let</span> <span class="ident">futures</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">calls</span>
-						.<span class="ident">into_iter</span>()
-						.<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">call</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">handle_call</span>(<span class="ident">call</span>, <span class="ident">meta</span>.<span class="ident">clone</span>()))
-						.<span class="ident">collect</span>();
-					<span class="ident">Right</span>(
-						<span class="ident">future::join_all</span>(<span class="ident">futures</span>).<span class="ident">map</span>(<span class="ident">outputs_as_batch</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span>),
+				Request::Batch(calls) =&gt; {
+					<span class="kw">let </span>futures: Vec&lt;<span class="kw">_</span>&gt; = calls
+						.into_iter()
+						.map(<span class="kw">move </span>|call| <span class="self">self</span>.handle_call(call, meta.clone()))
+						.collect();
+					Right(
+						future::join_all(futures).map(outputs_as_batch <span class="kw">as fn</span>(Vec&lt;<span class="prelude-ty">Option</span>&lt;Output&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Response&gt;),
 					)
 				}
 			})
 	}
 
-	<span class="doccomment">/// Handle single call asynchronously.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">call</span>: <span class="ident">Call</span>, <span class="ident">meta</span>: <span class="ident">T</span>) -&gt; <span class="ident">FutureRpcOutput</span><span class="op">&lt;</span><span class="ident">S::CallFuture</span><span class="op">&gt;</span> {
-		<span class="kw">use</span> <span class="ident"><span class="self">self</span>::future::Either</span>::{<span class="ident">Left</span>, <span class="ident">Right</span>};
+	<span class="doccomment">/// Handle single call asynchronously.
+	</span><span class="kw">pub fn </span>handle_call(<span class="kw-2">&amp;</span><span class="self">self</span>, call: Call, meta: T) -&gt; FutureRpcOutput&lt;S::CallFuture&gt; {
+		<span class="kw">use </span><span class="self">self</span>::future::Either::{Left, Right};
 
-		<span class="self">self</span>.<span class="ident">middleware</span>.<span class="ident">on_call</span>(<span class="ident">call</span>, <span class="ident">meta</span>, <span class="op">|</span><span class="ident">call</span>, <span class="ident">meta</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">call</span> {
-			<span class="ident">Call::MethodCall</span>(<span class="ident">method</span>) =&gt; {
-				<span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">params</span>;
-				<span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">id</span>;
-				<span class="kw">let</span> <span class="ident">jsonrpc</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">jsonrpc</span>;
-				<span class="kw">let</span> <span class="ident">valid_version</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">compatibility</span>.<span class="ident">is_version_valid</span>(<span class="ident">jsonrpc</span>);
+		<span class="self">self</span>.middleware.on_call(call, meta, |call, meta| <span class="kw">match </span>call {
+			Call::MethodCall(method) =&gt; {
+				<span class="kw">let </span>params = method.params;
+				<span class="kw">let </span>id = method.id;
+				<span class="kw">let </span>jsonrpc = method.jsonrpc;
+				<span class="kw">let </span>valid_version = <span class="self">self</span>.compatibility.is_version_valid(jsonrpc);
 
-				<span class="kw">let</span> <span class="ident">call_method</span> <span class="op">=</span> <span class="op">|</span><span class="ident">method</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RpcMethod</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">method</span>.<span class="ident">call</span>(<span class="ident">params</span>, <span class="ident">meta</span>);
+				<span class="kw">let </span>call_method = |method: <span class="kw-2">&amp;</span>Arc&lt;<span class="kw">dyn </span>RpcMethod&lt;T&gt;&gt;| method.call(params, meta);
 
-				<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">valid_version</span>, <span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">method</span>)) {
-					(<span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_version</span>()),
-					(<span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">RemoteProcedure::Method</span>(<span class="kw-2">ref</span> <span class="ident">method</span>))) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">call_method</span>(<span class="ident">method</span>)),
-					(<span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">RemoteProcedure::Alias</span>(<span class="kw-2">ref</span> <span class="ident">alias</span>))) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">get</span>(<span class="ident">alias</span>) {
-						<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">RemoteProcedure::Method</span>(<span class="kw-2">ref</span> <span class="ident">method</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">call_method</span>(<span class="ident">method</span>)),
-						<span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::method_not_found</span>()),
+				<span class="kw">let </span>result = <span class="kw">match </span>(valid_version, <span class="self">self</span>.methods.get(<span class="kw-2">&amp;</span>method.method)) {
+					(<span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(Error::invalid_version()),
+					(<span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>RemoteProcedure::Method(<span class="kw-2">ref </span>method))) =&gt; <span class="prelude-val">Ok</span>(call_method(method)),
+					(<span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>RemoteProcedure::Alias(<span class="kw-2">ref </span>alias))) =&gt; <span class="kw">match </span><span class="self">self</span>.methods.get(alias) {
+						<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>RemoteProcedure::Method(<span class="kw-2">ref </span>method)) =&gt; <span class="prelude-val">Ok</span>(call_method(method)),
+						<span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::method_not_found()),
 					},
-					(<span class="bool-val">true</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::method_not_found</span>()),
+					(<span class="bool-val">true</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(Error::method_not_found()),
 				};
 
-				<span class="kw">match</span> <span class="ident">result</span> {
-					<span class="prelude-val">Ok</span>(<span class="ident">result</span>) =&gt; <span class="ident">Left</span>(<span class="ident">Box::pin</span>(
-						<span class="ident">result</span>.<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">result</span><span class="op">|</span> <span class="ident">future::ready</span>(<span class="prelude-val">Some</span>(<span class="ident">Output::from</span>(<span class="ident">result</span>, <span class="ident">id</span>, <span class="ident">jsonrpc</span>)))),
-					) <span class="kw">as</span> <span class="kw">_</span>),
-					<span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">Right</span>(<span class="ident">future::ready</span>(<span class="prelude-val">Some</span>(<span class="ident">Output::from</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>), <span class="ident">id</span>, <span class="ident">jsonrpc</span>)))),
+				<span class="kw">match </span>result {
+					<span class="prelude-val">Ok</span>(result) =&gt; Left(Box::pin(
+						result.then(<span class="kw">move </span>|result| future::ready(<span class="prelude-val">Some</span>(Output::from(result, id, jsonrpc)))),
+					) <span class="kw">as _</span>),
+					<span class="prelude-val">Err</span>(err) =&gt; Right(future::ready(<span class="prelude-val">Some</span>(Output::from(<span class="prelude-val">Err</span>(err), id, jsonrpc)))),
 				}
 			}
-			<span class="ident">Call::Notification</span>(<span class="ident">notification</span>) =&gt; {
-				<span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">notification</span>.<span class="ident">params</span>;
-				<span class="kw">let</span> <span class="ident">jsonrpc</span> <span class="op">=</span> <span class="ident">notification</span>.<span class="ident">jsonrpc</span>;
-				<span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">compatibility</span>.<span class="ident">is_version_valid</span>(<span class="ident">jsonrpc</span>) {
-					<span class="kw">return</span> <span class="ident">Right</span>(<span class="ident">future::ready</span>(<span class="prelude-val">None</span>));
+			Call::Notification(notification) =&gt; {
+				<span class="kw">let </span>params = notification.params;
+				<span class="kw">let </span>jsonrpc = notification.jsonrpc;
+				<span class="kw">if </span>!<span class="self">self</span>.compatibility.is_version_valid(jsonrpc) {
+					<span class="kw">return </span>Right(future::ready(<span class="prelude-val">None</span>));
 				}
 
-				<span class="kw">match</span> <span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">notification</span>.<span class="ident">method</span>) {
-					<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">RemoteProcedure::Notification</span>(<span class="kw-2">ref</span> <span class="ident">notification</span>)) =&gt; {
-						<span class="ident">notification</span>.<span class="ident">execute</span>(<span class="ident">params</span>, <span class="ident">meta</span>);
+				<span class="kw">match </span><span class="self">self</span>.methods.get(<span class="kw-2">&amp;</span>notification.method) {
+					<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>RemoteProcedure::Notification(<span class="kw-2">ref </span>notification)) =&gt; {
+						notification.execute(params, meta);
 					}
-					<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">RemoteProcedure::Alias</span>(<span class="kw-2">ref</span> <span class="ident">alias</span>)) =&gt; {
-						<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">RemoteProcedure::Notification</span>(<span class="kw-2">ref</span> <span class="ident">notification</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">get</span>(<span class="ident">alias</span>) {
-							<span class="ident">notification</span>.<span class="ident">execute</span>(<span class="ident">params</span>, <span class="ident">meta</span>);
+					<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>RemoteProcedure::Alias(<span class="kw-2">ref </span>alias)) =&gt; {
+						<span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>RemoteProcedure::Notification(<span class="kw-2">ref </span>notification)) = <span class="self">self</span>.methods.get(alias) {
+							notification.execute(params, meta);
 						}
 					}
-					<span class="kw">_</span> =&gt; {}
+					<span class="kw">_ </span>=&gt; {}
 				}
 
-				<span class="ident">Right</span>(<span class="ident">future::ready</span>(<span class="prelude-val">None</span>))
+				Right(future::ready(<span class="prelude-val">None</span>))
 			}
-			<span class="ident">Call::Invalid</span> { <span class="ident">id</span> } =&gt; <span class="ident">Right</span>(<span class="ident">future::ready</span>(<span class="prelude-val">Some</span>(<span class="ident">Output::invalid_request</span>(
-				<span class="ident">id</span>,
-				<span class="self">self</span>.<span class="ident">compatibility</span>.<span class="ident">default_version</span>(),
+			Call::Invalid { id } =&gt; Right(future::ready(<span class="prelude-val">Some</span>(Output::invalid_request(
+				id,
+				<span class="self">self</span>.compatibility.default_version(),
 			)))),
 		})
 	}
 
-	<span class="doccomment">/// Returns an iterator visiting all methods in arbitrary order.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">iter</span>()
+	<span class="doccomment">/// Returns an iterator visiting all methods in arbitrary order.
+	</span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (<span class="kw-2">&amp;</span>String, <span class="kw-2">&amp;</span>RemoteProcedure&lt;T&gt;)&gt; {
+		<span class="self">self</span>.methods.iter()
 	}
 }
 
-<span class="doccomment">/// A type that can augment `MetaIoHandler`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This allows your code to accept generic extensions for `IoHandler`</span>
-<span class="doccomment">/// and compose them to create the RPC server.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IoHandlerExtension</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Metadata</span> <span class="op">=</span> ()<span class="op">&gt;</span> {
-	<span class="doccomment">/// Extend given `handler` with additional methods.</span>
-	<span class="kw">fn</span> <span class="ident">augment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">handler</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A type that can augment `MetaIoHandler`.
+///
+/// This allows your code to accept generic extensions for `IoHandler`
+/// and compose them to create the RPC server.
+</span><span class="kw">pub trait </span>IoHandlerExtension&lt;M: Metadata = ()&gt; {
+	<span class="doccomment">/// Extend given `handler` with additional methods.
+	</span><span class="kw">fn </span>augment&lt;S: Middleware&lt;M&gt;&gt;(<span class="self">self</span>, handler: <span class="kw-2">&amp;mut </span>MetaIoHandler&lt;M, S&gt;);
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_io_handler_extension</span> {
-	($( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ident</span>, )<span class="kw-2">*</span>) =&gt; {
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>, )<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">IoHandlerExtension</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> ($( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>, )<span class="kw-2">*</span>) <span class="kw">where</span>
-			<span class="ident">M</span>: <span class="ident">Metadata</span>,
+<span class="macro">macro_rules! </span>impl_io_handler_extension {
+	($( <span class="macro-nonterminal">$x</span>:ident, )<span class="kw-2">*</span>) =&gt; {
+		<span class="kw">impl</span>&lt;M, $( <span class="macro-nonterminal">$x</span>, )<span class="kw-2">*</span>&gt; IoHandlerExtension&lt;M&gt; <span class="kw">for </span>($( <span class="macro-nonterminal">$x</span>, )<span class="kw-2">*</span>) <span class="kw">where
+			</span>M: Metadata,
 			$(
-				<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>: <span class="ident">IoHandlerExtension</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-			)<span class="op">*</span>
+				<span class="macro-nonterminal">$x</span>: IoHandlerExtension&lt;M&gt;,
+			)*
 			{
-				<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-				<span class="kw">fn</span> <span class="ident">augment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">handler</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-					<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-					<span class="kw">let</span> (
-						$( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>, )<span class="op">*</span>
-					) <span class="op">=</span> <span class="self">self</span>;
+				<span class="attribute">#[allow(unused)]
+				</span><span class="kw">fn </span>augment&lt;S: Middleware&lt;M&gt;&gt;(<span class="self">self</span>, handler: <span class="kw-2">&amp;mut </span>MetaIoHandler&lt;M, S&gt;) {
+					<span class="attribute">#[allow(non_snake_case)]
+					</span><span class="kw">let </span>(
+						$( <span class="macro-nonterminal">$x</span>, )*
+					) = <span class="self">self</span>;
 					$(
-						<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>.<span class="ident">augment</span>(<span class="ident">handler</span>);
-					)<span class="op">*</span>
+						<span class="macro-nonterminal">$x</span>.augment(handler);
+					)*
 				}
 			}
 	}
 }
 
 <span class="macro">impl_io_handler_extension!</span>();
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>,);
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>, <span class="ident">B</span>,);
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>,);
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>,);
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>,);
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>,);
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>,);
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">H</span>,);
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">H</span>, <span class="ident">I</span>,);
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">H</span>, <span class="ident">I</span>, <span class="ident">J</span>,);
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">H</span>, <span class="ident">I</span>, <span class="ident">J</span>, <span class="ident">K</span>,);
-<span class="macro">impl_io_handler_extension!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">H</span>, <span class="ident">I</span>, <span class="ident">J</span>, <span class="ident">K</span>, <span class="ident">L</span>,);
+<span class="macro">impl_io_handler_extension!</span>(A,);
+<span class="macro">impl_io_handler_extension!</span>(A, B,);
+<span class="macro">impl_io_handler_extension!</span>(A, B, C,);
+<span class="macro">impl_io_handler_extension!</span>(A, B, C, D,);
+<span class="macro">impl_io_handler_extension!</span>(A, B, C, D, E,);
+<span class="macro">impl_io_handler_extension!</span>(A, B, C, D, E, F,);
+<span class="macro">impl_io_handler_extension!</span>(A, B, C, D, E, F, G,);
+<span class="macro">impl_io_handler_extension!</span>(A, B, C, D, E, F, G, H,);
+<span class="macro">impl_io_handler_extension!</span>(A, B, C, D, E, F, G, H, I,);
+<span class="macro">impl_io_handler_extension!</span>(A, B, C, D, E, F, G, H, I, J,);
+<span class="macro">impl_io_handler_extension!</span>(A, B, C, D, E, F, G, H, I, J, K,);
+<span class="macro">impl_io_handler_extension!</span>(A, B, C, D, E, F, G, H, I, J, K, L,);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Metadata</span><span class="op">&gt;</span> <span class="ident">IoHandlerExtension</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">augment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">handler</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-		<span class="ident">handler</span>.<span class="ident">methods</span>.<span class="ident">extend</span>(<span class="self">self</span>)
+<span class="kw">impl</span>&lt;M: Metadata&gt; IoHandlerExtension&lt;M&gt; <span class="kw">for </span>Vec&lt;(String, RemoteProcedure&lt;M&gt;)&gt; {
+	<span class="kw">fn </span>augment&lt;S: Middleware&lt;M&gt;&gt;(<span class="self">self</span>, handler: <span class="kw-2">&amp;mut </span>MetaIoHandler&lt;M, S&gt;) {
+		handler.methods.extend(<span class="self">self</span>)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Metadata</span><span class="op">&gt;</span> <span class="ident">IoHandlerExtension</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">augment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">handler</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-		<span class="ident">handler</span>.<span class="ident">methods</span>.<span class="ident">extend</span>(<span class="self">self</span>)
+<span class="kw">impl</span>&lt;M: Metadata&gt; IoHandlerExtension&lt;M&gt; <span class="kw">for </span>HashMap&lt;String, RemoteProcedure&lt;M&gt;&gt; {
+	<span class="kw">fn </span>augment&lt;S: Middleware&lt;M&gt;&gt;(<span class="self">self</span>, handler: <span class="kw-2">&amp;mut </span>MetaIoHandler&lt;M, S&gt;) {
+		handler.methods.extend(<span class="self">self</span>)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Metadata</span>, <span class="ident">S2</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">IoHandlerExtension</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S2</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">augment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">handler</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-		<span class="ident">handler</span>.<span class="ident">methods</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">methods</span>)
+<span class="kw">impl</span>&lt;M: Metadata, S2: Middleware&lt;M&gt;&gt; IoHandlerExtension&lt;M&gt; <span class="kw">for </span>MetaIoHandler&lt;M, S2&gt; {
+	<span class="kw">fn </span>augment&lt;S: Middleware&lt;M&gt;&gt;(<span class="self">self</span>, handler: <span class="kw-2">&amp;mut </span>MetaIoHandler&lt;M, S&gt;) {
+		handler.methods.extend(<span class="self">self</span>.methods)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Metadata</span>, <span class="ident">T</span>: <span class="ident">IoHandlerExtension</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">IoHandlerExtension</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">augment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">handler</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="self">self</span> {
-			<span class="ident">x</span>.<span class="ident">augment</span>(<span class="ident">handler</span>)
+<span class="kw">impl</span>&lt;M: Metadata, T: IoHandlerExtension&lt;M&gt;&gt; IoHandlerExtension&lt;M&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt; {
+	<span class="kw">fn </span>augment&lt;S: Middleware&lt;M&gt;&gt;(<span class="self">self</span>, handler: <span class="kw-2">&amp;mut </span>MetaIoHandler&lt;M, S&gt;) {
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(x) = <span class="self">self </span>{
+			x.augment(handler)
 		}
 	}
 }
 
-<span class="doccomment">/// Simplified `IoHandler` with no `Metadata` associated with each request.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IoHandler</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Metadata</span> <span class="op">=</span> ()<span class="op">&gt;</span>(<span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Simplified `IoHandler` with no `Metadata` associated with each request.
+</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="kw">pub struct </span>IoHandler&lt;M: Metadata = ()&gt;(MetaIoHandler&lt;M&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Metadata</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">IoHandler</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::Item</span>;
-	<span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::IntoIter</span>;
+<span class="kw">impl</span>&lt;T: Metadata&gt; IntoIterator <span class="kw">for </span>IoHandler&lt;T&gt; {
+	<span class="kw">type </span>Item = &lt;MetaIoHandler&lt;T&gt; <span class="kw">as </span>IntoIterator&gt;::Item;
+	<span class="kw">type </span>IntoIter = &lt;MetaIoHandler&lt;T&gt; <span class="kw">as </span>IntoIterator&gt;::IntoIter;
 
-	<span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">into_iter</span>()
+	<span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+		<span class="self">self</span>.<span class="number">0</span>.into_iter()
 	}
 }
 
-<span class="comment">// Type inference helper</span>
-<span class="kw">impl</span> <span class="ident">IoHandler</span> {
-	<span class="doccomment">/// Creates new `IoHandler` without any metadata.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-		<span class="ident">IoHandler::default</span>()
+<span class="comment">// Type inference helper
+</span><span class="kw">impl </span>IoHandler {
+	<span class="doccomment">/// Creates new `IoHandler` without any metadata.
+	</span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+		IoHandler::default()
 	}
 
-	<span class="doccomment">/// Creates new `IoHandler` without any metadata compatible with specified protocol version.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_compatibility</span>(<span class="ident">compatibility</span>: <span class="ident">Compatibility</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">IoHandler</span>(<span class="ident">MetaIoHandler::with_compatibility</span>(<span class="ident">compatibility</span>))
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Metadata</span> <span class="op">+</span> <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">IoHandler</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Handle given string request asynchronously.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">FutureResult</span><span class="op">&lt;</span><span class="ident">FutureResponse</span>, <span class="ident">FutureOutput</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">handle_request</span>(<span class="ident">request</span>, <span class="ident">M::default</span>())
-	}
-
-	<span class="doccomment">/// Handle deserialized RPC request asynchronously.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_rpc_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>: <span class="ident">Request</span>) -&gt; <span class="ident">FutureRpcResult</span><span class="op">&lt;</span><span class="ident">FutureResponse</span>, <span class="ident">FutureOutput</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">handle_rpc_request</span>(<span class="ident">request</span>, <span class="ident">M::default</span>())
-	}
-
-	<span class="doccomment">/// Handle single Call asynchronously.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">call</span>: <span class="ident">Call</span>) -&gt; <span class="ident">FutureRpcOutput</span><span class="op">&lt;</span><span class="ident">FutureOutput</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">handle_call</span>(<span class="ident">call</span>, <span class="ident">M::default</span>())
-	}
-
-	<span class="doccomment">/// Handle given request synchronously - will block until response is available.</span>
-	<span class="doccomment">/// If you have any asynchronous methods in your RPC it is much wiser to use</span>
-	<span class="doccomment">/// `handle_request` instead and deal with asynchronous requests in a non-blocking fashion.</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;futures-executor&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_request_sync</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">handle_request_sync</span>(<span class="ident">request</span>, <span class="ident">M::default</span>())
+	<span class="doccomment">/// Creates new `IoHandler` without any metadata compatible with specified protocol version.
+	</span><span class="kw">pub fn </span>with_compatibility(compatibility: Compatibility) -&gt; <span class="self">Self </span>{
+		IoHandler(MetaIoHandler::with_compatibility(compatibility))
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Metadata</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">IoHandler</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;M: Metadata + Default&gt; IoHandler&lt;M&gt; {
+	<span class="doccomment">/// Handle given string request asynchronously.
+	</span><span class="kw">pub fn </span>handle_request(<span class="kw-2">&amp;</span><span class="self">self</span>, request: <span class="kw-2">&amp;</span>str) -&gt; FutureResult&lt;FutureResponse, FutureOutput&gt; {
+		<span class="self">self</span>.<span class="number">0</span>.handle_request(request, M::default())
+	}
 
-	<span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+	<span class="doccomment">/// Handle deserialized RPC request asynchronously.
+	</span><span class="kw">pub fn </span>handle_rpc_request(<span class="kw-2">&amp;</span><span class="self">self</span>, request: Request) -&gt; FutureRpcResult&lt;FutureResponse, FutureOutput&gt; {
+		<span class="self">self</span>.<span class="number">0</span>.handle_rpc_request(request, M::default())
+	}
+
+	<span class="doccomment">/// Handle single Call asynchronously.
+	</span><span class="kw">pub fn </span>handle_call(<span class="kw-2">&amp;</span><span class="self">self</span>, call: Call) -&gt; FutureRpcOutput&lt;FutureOutput&gt; {
+		<span class="self">self</span>.<span class="number">0</span>.handle_call(call, M::default())
+	}
+
+	<span class="doccomment">/// Handle given request synchronously - will block until response is available.
+	/// If you have any asynchronous methods in your RPC it is much wiser to use
+	/// `handle_request` instead and deal with asynchronous requests in a non-blocking fashion.
+	</span><span class="attribute">#[cfg(feature = <span class="string">&quot;futures-executor&quot;</span>)]
+	</span><span class="kw">pub fn </span>handle_request_sync(<span class="kw-2">&amp;</span><span class="self">self</span>, request: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+		<span class="self">self</span>.<span class="number">0</span>.handle_request_sync(request, M::default())
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Metadata</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">IoHandler</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-		<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl</span>&lt;M: Metadata&gt; Deref <span class="kw">for </span>IoHandler&lt;M&gt; {
+	<span class="kw">type </span>Target = MetaIoHandler&lt;M&gt;;
+
+	<span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+	</span>}
+}
+
+<span class="kw">impl</span>&lt;M: Metadata&gt; DerefMut <span class="kw">for </span>IoHandler&lt;M&gt; {
+	<span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+		<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0
+	</span>}
+}
+
+<span class="kw">impl </span>From&lt;IoHandler&gt; <span class="kw">for </span>MetaIoHandler&lt;()&gt; {
+	<span class="kw">fn </span>from(io: IoHandler) -&gt; <span class="self">Self </span>{
+		io.<span class="number">0
+	</span>}
+}
+
+<span class="kw">impl</span>&lt;M: Metadata&gt; IoHandlerExtension&lt;M&gt; <span class="kw">for </span>IoHandler&lt;M&gt; {
+	<span class="kw">fn </span>augment&lt;S: Middleware&lt;M&gt;&gt;(<span class="self">self</span>, handler: <span class="kw-2">&amp;mut </span>MetaIoHandler&lt;M, S&gt;) {
+		handler.methods.extend(<span class="self">self</span>.<span class="number">0</span>.methods)
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IoHandler</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">io</span>: <span class="ident">IoHandler</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">io</span>.<span class="number">0</span>
-	}
+<span class="kw">fn </span>read_request(request_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Request, Error&gt; {
+	<span class="kw">crate</span>::serde_from_str(request_str).map_err(|<span class="kw">_</span>| Error::new(ErrorCode::ParseError))
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Metadata</span><span class="op">&gt;</span> <span class="ident">IoHandlerExtension</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IoHandler</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">augment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">handler</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MetaIoHandler</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-		<span class="ident">handler</span>.<span class="ident">methods</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">methods</span>)
-	}
+<span class="kw">fn </span>write_response(response: Response) -&gt; String {
+	<span class="comment">// this should never fail
+	</span>serde_json::to_string(<span class="kw-2">&amp;</span>response).unwrap()
 }
 
-<span class="kw">fn</span> <span class="ident">read_request</span>(<span class="ident">request_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-	<span class="ident"><span class="kw">crate</span>::serde_from_str</span>(<span class="ident">request_str</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::new</span>(<span class="ident">ErrorCode::ParseError</span>))
-}
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+	<span class="kw">use super</span>::{Compatibility, IoHandler};
+	<span class="kw">use </span><span class="kw">crate</span>::types::Value;
 
-<span class="kw">fn</span> <span class="ident">write_response</span>(<span class="ident">response</span>: <span class="ident">Response</span>) -&gt; <span class="ident">String</span> {
-	<span class="comment">// this should never fail</span>
-	<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="ident">unwrap</span>()
-}
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_io_handler() {
+		<span class="kw">let </span><span class="kw-2">mut </span>io = IoHandler::new();
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-	<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Compatibility</span>, <span class="ident">IoHandler</span>};
-	<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::Value</span>;
+		io.add_method(<span class="string">&quot;say_hello&quot;</span>, |<span class="kw">_</span>| <span class="kw">async </span>{ <span class="prelude-val">Ok</span>(Value::String(<span class="string">&quot;hello&quot;</span>.to_string())) });
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_io_handler</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">IoHandler::new</span>();
+		<span class="kw">let </span>request = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#</span>;
+		<span class="kw">let </span>response = <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;result&quot;:&quot;hello&quot;,&quot;id&quot;:1}&quot;#</span>;
 
-		<span class="ident">io</span>.<span class="ident">add_method</span>(<span class="string">&quot;say_hello&quot;</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">async</span> { <span class="prelude-val">Ok</span>(<span class="ident">Value::String</span>(<span class="string">&quot;hello&quot;</span>.<span class="ident">to_string</span>())) });
-
-		<span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;result&quot;:&quot;hello&quot;,&quot;id&quot;:1}&quot;#</span>;
-
-		<span class="macro">assert_eq!</span>(<span class="ident">io</span>.<span class="ident">handle_request_sync</span>(<span class="ident">request</span>), <span class="prelude-val">Some</span>(<span class="ident">response</span>.<span class="ident">to_string</span>()));
+		<span class="macro">assert_eq!</span>(io.handle_request_sync(request), <span class="prelude-val">Some</span>(response.to_string()));
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_io_handler_1dot0</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">IoHandler::with_compatibility</span>(<span class="ident">Compatibility::Both</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_io_handler_1dot0() {
+		<span class="kw">let </span><span class="kw-2">mut </span>io = IoHandler::with_compatibility(Compatibility::Both);
 
-		<span class="ident">io</span>.<span class="ident">add_method</span>(<span class="string">&quot;say_hello&quot;</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">async</span> { <span class="prelude-val">Ok</span>(<span class="ident">Value::String</span>(<span class="string">&quot;hello&quot;</span>.<span class="ident">to_string</span>())) });
+		io.add_method(<span class="string">&quot;say_hello&quot;</span>, |<span class="kw">_</span>| <span class="kw">async </span>{ <span class="prelude-val">Ok</span>(Value::String(<span class="string">&quot;hello&quot;</span>.to_string())) });
 
-		<span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;result&quot;:&quot;hello&quot;,&quot;id&quot;:1}&quot;#</span>;
+		<span class="kw">let </span>request = <span class="string">r#&quot;{&quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#</span>;
+		<span class="kw">let </span>response = <span class="string">r#&quot;{&quot;result&quot;:&quot;hello&quot;,&quot;id&quot;:1}&quot;#</span>;
 
-		<span class="macro">assert_eq!</span>(<span class="ident">io</span>.<span class="ident">handle_request_sync</span>(<span class="ident">request</span>), <span class="prelude-val">Some</span>(<span class="ident">response</span>.<span class="ident">to_string</span>()));
+		<span class="macro">assert_eq!</span>(io.handle_request_sync(request), <span class="prelude-val">Some</span>(response.to_string()));
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_async_io_handler</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">IoHandler::new</span>();
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_async_io_handler() {
+		<span class="kw">let </span><span class="kw-2">mut </span>io = IoHandler::new();
 
-		<span class="ident">io</span>.<span class="ident">add_method</span>(<span class="string">&quot;say_hello&quot;</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">async</span> { <span class="prelude-val">Ok</span>(<span class="ident">Value::String</span>(<span class="string">&quot;hello&quot;</span>.<span class="ident">to_string</span>())) });
+		io.add_method(<span class="string">&quot;say_hello&quot;</span>, |<span class="kw">_</span>| <span class="kw">async </span>{ <span class="prelude-val">Ok</span>(Value::String(<span class="string">&quot;hello&quot;</span>.to_string())) });
 
-		<span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;result&quot;:&quot;hello&quot;,&quot;id&quot;:1}&quot;#</span>;
+		<span class="kw">let </span>request = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#</span>;
+		<span class="kw">let </span>response = <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;result&quot;:&quot;hello&quot;,&quot;id&quot;:1}&quot;#</span>;
 
-		<span class="macro">assert_eq!</span>(<span class="ident">io</span>.<span class="ident">handle_request_sync</span>(<span class="ident">request</span>), <span class="prelude-val">Some</span>(<span class="ident">response</span>.<span class="ident">to_string</span>()));
+		<span class="macro">assert_eq!</span>(io.handle_request_sync(request), <span class="prelude-val">Some</span>(response.to_string()));
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_notification</span>() {
-		<span class="kw">use</span> <span class="ident">std::sync::atomic</span>;
-		<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_notification() {
+		<span class="kw">use </span>std::sync::atomic;
+		<span class="kw">use </span>std::sync::Arc;
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">IoHandler::new</span>();
+		<span class="kw">let </span><span class="kw-2">mut </span>io = IoHandler::new();
 
-		<span class="kw">let</span> <span class="ident">called</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">atomic::AtomicBool::new</span>(<span class="bool-val">false</span>));
-		<span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">called</span>.<span class="ident">clone</span>();
-		<span class="ident">io</span>.<span class="ident">add_notification</span>(<span class="string">&quot;say_hello&quot;</span>, <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-			<span class="ident">c</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">atomic::Ordering::SeqCst</span>);
+		<span class="kw">let </span>called = Arc::new(atomic::AtomicBool::new(<span class="bool-val">false</span>));
+		<span class="kw">let </span>c = called.clone();
+		io.add_notification(<span class="string">&quot;say_hello&quot;</span>, <span class="kw">move </span>|<span class="kw">_</span>| {
+			c.store(<span class="bool-val">true</span>, atomic::Ordering::SeqCst);
 		});
-		<span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23]}&quot;#</span>;
+		<span class="kw">let </span>request = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23]}&quot;#</span>;
 
-		<span class="macro">assert_eq!</span>(<span class="ident">io</span>.<span class="ident">handle_request_sync</span>(<span class="ident">request</span>), <span class="prelude-val">None</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">called</span>.<span class="ident">load</span>(<span class="ident">atomic::Ordering::SeqCst</span>), <span class="bool-val">true</span>);
+		<span class="macro">assert_eq!</span>(io.handle_request_sync(request), <span class="prelude-val">None</span>);
+		<span class="macro">assert_eq!</span>(called.load(atomic::Ordering::SeqCst), <span class="bool-val">true</span>);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_method_not_found</span>() {
-		<span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">IoHandler::new</span>();
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_method_not_found() {
+		<span class="kw">let </span>io = IoHandler::new();
 
-		<span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;error&quot;:{&quot;code&quot;:-32601,&quot;message&quot;:&quot;Method not found&quot;},&quot;id&quot;:1}&quot;#</span>;
+		<span class="kw">let </span>request = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#</span>;
+		<span class="kw">let </span>response = <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;error&quot;:{&quot;code&quot;:-32601,&quot;message&quot;:&quot;Method not found&quot;},&quot;id&quot;:1}&quot;#</span>;
 
-		<span class="macro">assert_eq!</span>(<span class="ident">io</span>.<span class="ident">handle_request_sync</span>(<span class="ident">request</span>), <span class="prelude-val">Some</span>(<span class="ident">response</span>.<span class="ident">to_string</span>()));
+		<span class="macro">assert_eq!</span>(io.handle_request_sync(request), <span class="prelude-val">Some</span>(response.to_string()));
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_method_alias</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">IoHandler::new</span>();
-		<span class="ident">io</span>.<span class="ident">add_method</span>(<span class="string">&quot;say_hello&quot;</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">async</span> { <span class="prelude-val">Ok</span>(<span class="ident">Value::String</span>(<span class="string">&quot;hello&quot;</span>.<span class="ident">to_string</span>())) });
-		<span class="ident">io</span>.<span class="ident">add_alias</span>(<span class="string">&quot;say_hello_alias&quot;</span>, <span class="string">&quot;say_hello&quot;</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_method_alias() {
+		<span class="kw">let </span><span class="kw-2">mut </span>io = IoHandler::new();
+		io.add_method(<span class="string">&quot;say_hello&quot;</span>, |<span class="kw">_</span>| <span class="kw">async </span>{ <span class="prelude-val">Ok</span>(Value::String(<span class="string">&quot;hello&quot;</span>.to_string())) });
+		io.add_alias(<span class="string">&quot;say_hello_alias&quot;</span>, <span class="string">&quot;say_hello&quot;</span>);
 
-		<span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello_alias&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;result&quot;:&quot;hello&quot;,&quot;id&quot;:1}&quot;#</span>;
+		<span class="kw">let </span>request = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello_alias&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#</span>;
+		<span class="kw">let </span>response = <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;result&quot;:&quot;hello&quot;,&quot;id&quot;:1}&quot;#</span>;
 
-		<span class="macro">assert_eq!</span>(<span class="ident">io</span>.<span class="ident">handle_request_sync</span>(<span class="ident">request</span>), <span class="prelude-val">Some</span>(<span class="ident">response</span>.<span class="ident">to_string</span>()));
+		<span class="macro">assert_eq!</span>(io.handle_request_sync(request), <span class="prelude-val">Some</span>(response.to_string()));
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_notification_alias</span>() {
-		<span class="kw">use</span> <span class="ident">std::sync::atomic</span>;
-		<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_notification_alias() {
+		<span class="kw">use </span>std::sync::atomic;
+		<span class="kw">use </span>std::sync::Arc;
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">IoHandler::new</span>();
+		<span class="kw">let </span><span class="kw-2">mut </span>io = IoHandler::new();
 
-		<span class="kw">let</span> <span class="ident">called</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">atomic::AtomicBool::new</span>(<span class="bool-val">false</span>));
-		<span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">called</span>.<span class="ident">clone</span>();
-		<span class="ident">io</span>.<span class="ident">add_notification</span>(<span class="string">&quot;say_hello&quot;</span>, <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-			<span class="ident">c</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">atomic::Ordering::SeqCst</span>);
+		<span class="kw">let </span>called = Arc::new(atomic::AtomicBool::new(<span class="bool-val">false</span>));
+		<span class="kw">let </span>c = called.clone();
+		io.add_notification(<span class="string">&quot;say_hello&quot;</span>, <span class="kw">move </span>|<span class="kw">_</span>| {
+			c.store(<span class="bool-val">true</span>, atomic::Ordering::SeqCst);
 		});
-		<span class="ident">io</span>.<span class="ident">add_alias</span>(<span class="string">&quot;say_hello_alias&quot;</span>, <span class="string">&quot;say_hello&quot;</span>);
+		io.add_alias(<span class="string">&quot;say_hello_alias&quot;</span>, <span class="string">&quot;say_hello&quot;</span>);
 
-		<span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello_alias&quot;, &quot;params&quot;: [42, 23]}&quot;#</span>;
-		<span class="macro">assert_eq!</span>(<span class="ident">io</span>.<span class="ident">handle_request_sync</span>(<span class="ident">request</span>), <span class="prelude-val">None</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">called</span>.<span class="ident">load</span>(<span class="ident">atomic::Ordering::SeqCst</span>), <span class="bool-val">true</span>);
+		<span class="kw">let </span>request = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello_alias&quot;, &quot;params&quot;: [42, 23]}&quot;#</span>;
+		<span class="macro">assert_eq!</span>(io.handle_request_sync(request), <span class="prelude-val">None</span>);
+		<span class="macro">assert_eq!</span>(called.load(atomic::Ordering::SeqCst), <span class="bool-val">true</span>);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_batch_notification</span>() {
-		<span class="kw">use</span> <span class="ident">std::sync::atomic</span>;
-		<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_batch_notification() {
+		<span class="kw">use </span>std::sync::atomic;
+		<span class="kw">use </span>std::sync::Arc;
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">IoHandler::new</span>();
+		<span class="kw">let </span><span class="kw-2">mut </span>io = IoHandler::new();
 
-		<span class="kw">let</span> <span class="ident">called</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">atomic::AtomicBool::new</span>(<span class="bool-val">false</span>));
-		<span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">called</span>.<span class="ident">clone</span>();
-		<span class="ident">io</span>.<span class="ident">add_notification</span>(<span class="string">&quot;say_hello&quot;</span>, <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-			<span class="ident">c</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">atomic::Ordering::SeqCst</span>);
+		<span class="kw">let </span>called = Arc::new(atomic::AtomicBool::new(<span class="bool-val">false</span>));
+		<span class="kw">let </span>c = called.clone();
+		io.add_notification(<span class="string">&quot;say_hello&quot;</span>, <span class="kw">move </span>|<span class="kw">_</span>| {
+			c.store(<span class="bool-val">true</span>, atomic::Ordering::SeqCst);
 		});
 
-		<span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="string">r#&quot;[{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23]}]&quot;#</span>;
-		<span class="macro">assert_eq!</span>(<span class="ident">io</span>.<span class="ident">handle_request_sync</span>(<span class="ident">request</span>), <span class="prelude-val">None</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">called</span>.<span class="ident">load</span>(<span class="ident">atomic::Ordering::SeqCst</span>), <span class="bool-val">true</span>);
+		<span class="kw">let </span>request = <span class="string">r#&quot;[{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23]}]&quot;#</span>;
+		<span class="macro">assert_eq!</span>(io.handle_request_sync(request), <span class="prelude-val">None</span>);
+		<span class="macro">assert_eq!</span>(called.load(atomic::Ordering::SeqCst), <span class="bool-val">true</span>);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_send_sync</span>() {
-		<span class="kw">fn</span> <span class="ident">is_send_sync</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">_obj</span>: <span class="ident">T</span>) -&gt; <span class="ident">bool</span>
-		<span class="kw">where</span>
-			<span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_send_sync() {
+		<span class="kw">fn </span>is_send_sync&lt;T&gt;(_obj: T) -&gt; bool
+		<span class="kw">where
+			</span>T: Send + Sync,
 		{
-			<span class="bool-val">true</span>
-		}
+			<span class="bool-val">true
+		</span>}
 
-		<span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">IoHandler::new</span>();
+		<span class="kw">let </span>io = IoHandler::new();
 
-		<span class="macro">assert!</span>(<span class="ident">is_send_sync</span>(<span class="ident">io</span>))
+		<span class="macro">assert!</span>(is_send_sync(io))
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_extending_by_multiple_delegates</span>() {
-		<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::IoHandlerExtension</span>;
-		<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::delegates::IoDelegate</span>;
-		<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_extending_by_multiple_delegates() {
+		<span class="kw">use </span><span class="kw">super</span>::IoHandlerExtension;
+		<span class="kw">use </span><span class="kw">crate</span>::delegates::IoDelegate;
+		<span class="kw">use </span>std::sync::Arc;
 
-		<span class="kw">struct</span> <span class="ident">Test</span>;
-		<span class="kw">impl</span> <span class="ident">Test</span> {
-			<span class="kw">fn</span> <span class="ident">abc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="ident"><span class="kw">crate</span>::Params</span>) -&gt; <span class="ident"><span class="kw">crate</span>::BoxFuture</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-				<span class="ident">Box::pin</span>(<span class="kw">async</span> { <span class="prelude-val">Ok</span>(<span class="number">5</span>.<span class="ident">into</span>()) })
+		<span class="kw">struct </span>Test;
+		<span class="kw">impl </span>Test {
+			<span class="kw">fn </span>abc(<span class="kw-2">&amp;</span><span class="self">self</span>, _p: <span class="kw">crate</span>::Params) -&gt; <span class="kw">crate</span>::BoxFuture&lt;<span class="kw">crate</span>::Result&lt;Value&gt;&gt; {
+				Box::pin(<span class="kw">async </span>{ <span class="prelude-val">Ok</span>(<span class="number">5</span>.into()) })
 			}
 		}
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">IoHandler::new</span>();
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">del1</span> <span class="op">=</span> <span class="ident">IoDelegate::new</span>(<span class="ident">Arc::new</span>(<span class="ident">Test</span>));
-		<span class="ident">del1</span>.<span class="ident">add_method</span>(<span class="string">&quot;rpc_test&quot;</span>, <span class="ident">Test::abc</span>);
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">del2</span> <span class="op">=</span> <span class="ident">IoDelegate::new</span>(<span class="ident">Arc::new</span>(<span class="ident">Test</span>));
-		<span class="ident">del2</span>.<span class="ident">add_method</span>(<span class="string">&quot;rpc_test&quot;</span>, <span class="ident">Test::abc</span>);
+		<span class="kw">let </span><span class="kw-2">mut </span>io = IoHandler::new();
+		<span class="kw">let </span><span class="kw-2">mut </span>del1 = IoDelegate::new(Arc::new(Test));
+		del1.add_method(<span class="string">&quot;rpc_test&quot;</span>, Test::abc);
+		<span class="kw">let </span><span class="kw-2">mut </span>del2 = IoDelegate::new(Arc::new(Test));
+		del2.add_method(<span class="string">&quot;rpc_test&quot;</span>, Test::abc);
 
-		<span class="kw">fn</span> <span class="ident">augment</span><span class="op">&lt;</span><span class="ident">X</span>: <span class="ident">IoHandlerExtension</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="ident">X</span>, <span class="ident">io</span>: <span class="kw-2">&amp;mut</span> <span class="ident">IoHandler</span>) {
-			<span class="ident">x</span>.<span class="ident">augment</span>(<span class="ident">io</span>);
+		<span class="kw">fn </span>augment&lt;X: IoHandlerExtension&gt;(x: X, io: <span class="kw-2">&amp;mut </span>IoHandler) {
+			x.augment(io);
 		}
 
-		<span class="ident">augment</span>((<span class="ident">del1</span>, <span class="ident">del2</span>), <span class="kw-2">&amp;mut</span> <span class="ident">io</span>);
+		augment((del1, del2), <span class="kw-2">&amp;mut </span>io);
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

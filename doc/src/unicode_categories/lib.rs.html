@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/unicode_categories-0.1.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../unicode_categories/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../unicode_categories/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../unicode_categories/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/unicode_categories-0.1.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../unicode_categories/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../unicode_categories/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../unicode_categories/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -419,426 +419,426 @@
 <span id="419">419</span>
 <span id="420">420</span>
 <span id="421">421</span>
-</pre><pre class="rust"><code><span class="doccomment">//! `unicode_categories` is a crate that adds extensions to the</span>
-<span class="doccomment">//! `char` primitive type that allow for a char to be queried</span>
-<span class="doccomment">//! about whether or not it belongs to a particular Unicode category.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These extensions exist on the `UnicodeCategories` trait, so</span>
-<span class="doccomment">//! by importing it the extensions will be active on all chars:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use unicode_categories::UnicodeCategories;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert!(&#39;a&#39;.is_letter_lowercase());</span>
-<span class="doccomment">//! assert!(&#39;A&#39;.is_letter_uppercase());</span>
-<span class="doccomment">//! assert!(&#39;\n&#39;.is_other_control());</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `UnicodeCategories` is the only item contained exported</span>
-<span class="doccomment">//! by this crate and contains all of methods that allow</span>
-<span class="doccomment">//! for category queries.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! `unicode_categories` is a crate that adds extensions to the
+//! `char` primitive type that allow for a char to be queried
+//! about whether or not it belongs to a particular Unicode category.
+//!
+//! These extensions exist on the `UnicodeCategories` trait, so
+//! by importing it the extensions will be active on all chars:
+//!
+//! ```
+//! use unicode_categories::UnicodeCategories;
+//!
+//! assert!(&#39;a&#39;.is_letter_lowercase());
+//! assert!(&#39;A&#39;.is_letter_uppercase());
+//! assert!(&#39;\n&#39;.is_other_control());
+//! ```
+//!
+//! `UnicodeCategories` is the only item contained exported
+//! by this crate and contains all of methods that allow
+//! for category queries.
 
-<span class="kw">mod</span> <span class="ident">tables</span>;
+</span><span class="kw">mod </span>tables;
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UnicodeCategories</span> : <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Copy</span> {
+<span class="kw">pub trait </span>UnicodeCategories : Sized + Copy {
 
-    <span class="doccomment">/// Returns `true` if this value is a member</span>
-    <span class="doccomment">/// of the &quot;Other, Control&quot; (Cc) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_other_control</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns `true` if this value is a member
+    /// of the &quot;Other, Control&quot; (Cc) category.
+    </span><span class="kw">fn </span>is_other_control(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns `true` if this value is a member</span>
-    <span class="doccomment">/// of the &quot;Other, Format&quot; (Cf) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_other_format</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns `true` if this value is a member
+    /// of the &quot;Other, Format&quot; (Cf) category.
+    </span><span class="kw">fn </span>is_other_format(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member</span>
-    <span class="doccomment">/// of the &quot;Other, Private Use&quot; (Co) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_other_private_use</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member
+    /// of the &quot;Other, Private Use&quot; (Co) category.
+    </span><span class="kw">fn </span>is_other_private_use(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member</span>
-    <span class="doccomment">/// of the &quot;Letter, Lowercase&quot; (Ll) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_lowercase</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member
+    /// of the &quot;Letter, Lowercase&quot; (Ll) category.
+    </span><span class="kw">fn </span>is_letter_lowercase(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Letter, Modifier&quot; (Lm) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_modifier</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Letter, Modifier&quot; (Lm) category.
+    </span><span class="kw">fn </span>is_letter_modifier(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Letter, Other&quot; (Lo) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_other</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Letter, Other&quot; (Lo) category.
+    </span><span class="kw">fn </span>is_letter_other(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Letter, Titlecase&quot; (Lt) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_titlecase</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Letter, Titlecase&quot; (Lt) category.
+    </span><span class="kw">fn </span>is_letter_titlecase(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Letter, Uppercase&quot; (Lu) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_uppercase</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Letter, Uppercase&quot; (Lu) category.
+    </span><span class="kw">fn </span>is_letter_uppercase(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Mark, Spacing Combining&quot; (Mc) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_mark_spacing_combining</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Mark, Spacing Combining&quot; (Mc) category.
+    </span><span class="kw">fn </span>is_mark_spacing_combining(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Mark, Enclosing&quot; (Me) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_mark_enclosing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Mark, Enclosing&quot; (Me) category.
+    </span><span class="kw">fn </span>is_mark_enclosing(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Mark, Nonspacing&quot; (Mn) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_mark_nonspacing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Mark, Nonspacing&quot; (Mn) category.
+    </span><span class="kw">fn </span>is_mark_nonspacing(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Number, Decimal Digit&quot; (Nd) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_number_decimal_digit</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Number, Decimal Digit&quot; (Nd) category.
+    </span><span class="kw">fn </span>is_number_decimal_digit(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Number, Letter&quot; (Nl) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_number_letter</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Number, Letter&quot; (Nl) category.
+    </span><span class="kw">fn </span>is_number_letter(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Number, Other&quot; (No) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_number_other</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Number, Other&quot; (No) category.
+    </span><span class="kw">fn </span>is_number_other(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Punctuation, Connector&quot; (Pc) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_connector</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Punctuation, Connector&quot; (Pc) category.
+    </span><span class="kw">fn </span>is_punctuation_connector(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Punctuation, Dash&quot; (Pd) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_dash</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Punctuation, Dash&quot; (Pd) category.
+    </span><span class="kw">fn </span>is_punctuation_dash(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Punctuation, Close&quot; (Pe) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_close</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Punctuation, Close&quot; (Pe) category.
+    </span><span class="kw">fn </span>is_punctuation_close(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Punctuation, Final Quote&quot; (Pf) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_final_quote</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Punctuation, Final Quote&quot; (Pf) category.
+    </span><span class="kw">fn </span>is_punctuation_final_quote(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Punctuation, Initial Quote&quot; (Pi) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_initial_quote</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Punctuation, Initial Quote&quot; (Pi) category.
+    </span><span class="kw">fn </span>is_punctuation_initial_quote(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Punctuation, Other&quot; (Po) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_other</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Punctuation, Other&quot; (Po) category.
+    </span><span class="kw">fn </span>is_punctuation_other(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Punctuation, Open&quot; (Ps) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_open</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Punctuation, Open&quot; (Ps) category.
+    </span><span class="kw">fn </span>is_punctuation_open(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Symbol, Currency&quot; (Sc) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_symbol_currency</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Symbol, Currency&quot; (Sc) category.
+    </span><span class="kw">fn </span>is_symbol_currency(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Symbol, Modifier&quot; (Sk) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_symbol_modifier</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Symbol, Modifier&quot; (Sk) category.
+    </span><span class="kw">fn </span>is_symbol_modifier(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Symbol, Math&quot; (Sm) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_symbol_math</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Symbol, Math&quot; (Sm) category.
+    </span><span class="kw">fn </span>is_symbol_math(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Symbol, Other&quot; (So) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_symbol_other</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Symbol, Other&quot; (So) category.
+    </span><span class="kw">fn </span>is_symbol_other(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Separator, Line&quot; (Zl) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_separator_line</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Separator, Line&quot; (Zl) category.
+    </span><span class="kw">fn </span>is_separator_line(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Separator, Paragraph&quot; (Zp) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_separator_paragraph</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Separator, Paragraph&quot; (Zp) category.
+    </span><span class="kw">fn </span>is_separator_paragraph(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// the &quot;Separator, Space&quot; (Zs) category.</span>
-    <span class="kw">fn</span> <span class="ident">is_separator_space</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// the &quot;Separator, Space&quot; (Zs) category.
+    </span><span class="kw">fn </span>is_separator_space(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// a &quot;Other&quot; category: Cc, Cf, Cn, or Co.</span>
-    <span class="doccomment">/// Surrogates cannot be `chars` in Rust, so</span>
-    <span class="doccomment">/// they are not included.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_other</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_other_control</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_other_format</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_other_private_use</span>()
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// a &quot;Other&quot; category: Cc, Cf, Cn, or Co.
+    /// Surrogates cannot be `chars` in Rust, so
+    /// they are not included.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_other(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_other_control()
+            || <span class="self">self</span>.is_other_format()
+            || <span class="self">self</span>.is_other_private_use()
     }
 
-    <span class="doccomment">/// Returns true if this value is a member of</span>
-    <span class="doccomment">/// a &quot;Letter&quot; category: Lc, Ll, Lm, Lo, Lt, or Lu.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_letter</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_letter_lowercase</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_letter_modifier</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_letter_other</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_letter_titlecase</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_letter_uppercase</span>()
+    <span class="doccomment">/// Returns true if this value is a member of
+    /// a &quot;Letter&quot; category: Lc, Ll, Lm, Lo, Lt, or Lu.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_letter(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_letter_lowercase()
+            || <span class="self">self</span>.is_letter_modifier()
+            || <span class="self">self</span>.is_letter_other()
+            || <span class="self">self</span>.is_letter_titlecase()
+            || <span class="self">self</span>.is_letter_uppercase()
     }
 
-    <span class="doccomment">/// Returns true if this value is a member of a</span>
-    <span class="doccomment">/// &quot;Mark&quot; category: Mc, Me, or Mn.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_mark</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_mark_spacing_combining</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_mark_enclosing</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_mark_nonspacing</span>()
+    <span class="doccomment">/// Returns true if this value is a member of a
+    /// &quot;Mark&quot; category: Mc, Me, or Mn.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_mark(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_mark_spacing_combining()
+            || <span class="self">self</span>.is_mark_enclosing()
+            || <span class="self">self</span>.is_mark_nonspacing()
     }
 
-    <span class="doccomment">/// Returns true if this value is a member of a</span>
-    <span class="doccomment">/// &quot;Number&quot; category: Nd, Nl, or No.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_number</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_number_decimal_digit</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_number_letter</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_number_other</span>()
+    <span class="doccomment">/// Returns true if this value is a member of a
+    /// &quot;Number&quot; category: Nd, Nl, or No.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_number(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_number_decimal_digit()
+            || <span class="self">self</span>.is_number_letter()
+            || <span class="self">self</span>.is_number_other()
     }
 
-    <span class="doccomment">/// Returns true if this value is a member of a</span>
-    <span class="doccomment">/// &quot;Punctuation&quot; category: Pc, Pd, Pe, Pf, Pi, Po, or Ps.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_punctuation_connector</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_punctuation_dash</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_punctuation_close</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_punctuation_close</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_punctuation_final_quote</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_punctuation_initial_quote</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_punctuation_other</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_punctuation_open</span>()
+    <span class="doccomment">/// Returns true if this value is a member of a
+    /// &quot;Punctuation&quot; category: Pc, Pd, Pe, Pf, Pi, Po, or Ps.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_punctuation(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_punctuation_connector()
+            || <span class="self">self</span>.is_punctuation_dash()
+            || <span class="self">self</span>.is_punctuation_close()
+            || <span class="self">self</span>.is_punctuation_close()
+            || <span class="self">self</span>.is_punctuation_final_quote()
+            || <span class="self">self</span>.is_punctuation_initial_quote()
+            || <span class="self">self</span>.is_punctuation_other()
+            || <span class="self">self</span>.is_punctuation_open()
     }
 
-    <span class="doccomment">/// Returns true if this value is a member of a</span>
-    <span class="doccomment">/// &quot;Symbol&quot; category: Sc, Sk, Sm, or So.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_symbol</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_symbol_currency</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_symbol_modifier</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_symbol_math</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_symbol_other</span>()
+    <span class="doccomment">/// Returns true if this value is a member of a
+    /// &quot;Symbol&quot; category: Sc, Sk, Sm, or So.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_symbol(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_symbol_currency()
+            || <span class="self">self</span>.is_symbol_modifier()
+            || <span class="self">self</span>.is_symbol_math()
+            || <span class="self">self</span>.is_symbol_other()
     }
 
-    <span class="doccomment">/// Returns true if this value is a member of a</span>
-    <span class="doccomment">/// &quot;Separator&quot; category: Zl, Zp, or Zs.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_separator</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_separator_line</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_separator_paragraph</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_separator_space</span>()
+    <span class="doccomment">/// Returns true if this value is a member of a
+    /// &quot;Separator&quot; category: Zl, Zp, or Zs.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_separator(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_separator_line()
+            || <span class="self">self</span>.is_separator_paragraph()
+            || <span class="self">self</span>.is_separator_space()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">table_binary_search</span>(<span class="ident">target</span>: <span class="ident">char</span>, <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">char</span>]) -&gt; <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="ident">target</span>).<span class="ident">is_ok</span>()
+<span class="kw">fn </span>table_binary_search(target: char, table: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[char]) -&gt; bool {
+    table.binary_search(<span class="kw-2">&amp;</span>target).is_ok()
 }
 
-<span class="kw">impl</span> <span class="ident">UnicodeCategories</span> <span class="kw">for</span> <span class="ident">char</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_other_control</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::OTHER_CONTROL</span>)
+<span class="kw">impl </span>UnicodeCategories <span class="kw">for </span>char {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_other_control(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::OTHER_CONTROL)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_other_format</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::OTHER_FORMAT</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_other_format(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::OTHER_FORMAT)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_other_private_use</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="comment">// Private Use</span>
-            <span class="string">&#39;\u{E000}&#39;</span>...<span class="string">&#39;\u{F8FF}&#39;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// Plane 15, Private Use</span>
-            <span class="string">&#39;\u{F0000}&#39;</span>...<span class="string">&#39;\u{FFFFD}&#39;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// Plane 16, private Use</span>
-            <span class="string">&#39;\u{100000}&#39;</span>...<span class="string">&#39;\u{10FFFD}&#39;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::OTHER_PRIVATE_USE</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_other_private_use(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="comment">// Private Use
+            </span><span class="string">&#39;\u{E000}&#39;</span>...<span class="string">&#39;\u{F8FF}&#39; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="comment">// Plane 15, Private Use
+            </span><span class="string">&#39;\u{F0000}&#39;</span>...<span class="string">&#39;\u{FFFFD}&#39; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="comment">// Plane 16, private Use
+            </span><span class="string">&#39;\u{100000}&#39;</span>...<span class="string">&#39;\u{10FFFD}&#39; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; table_binary_search(<span class="self">self</span>, tables::OTHER_PRIVATE_USE)
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_lowercase</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::LETTER_LOWERCASED</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_letter_lowercase(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::LETTER_LOWERCASED)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_modifier</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::LETTER_MODIFIER</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_letter_modifier(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::LETTER_MODIFIER)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_other</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="comment">// CJK Ideograph Extension A</span>
-            <span class="string">&#39;\u{3400}&#39;</span>...<span class="string">&#39;\u{4DB5}&#39;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// CJK Ideograph</span>
-            <span class="string">&#39;\u{4E00}&#39;</span>...<span class="string">&#39;\u{9FD5}&#39;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// Hangul Syllable</span>
-            <span class="string">&#39;\u{AC00}&#39;</span>...<span class="string">&#39;\u{D7A3}&#39;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// Tangut Ideograph</span>
-            <span class="string">&#39;\u{17000}&#39;</span>...<span class="string">&#39;\u{187EC}&#39;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// CJK Ideograph Extension B</span>
-            <span class="string">&#39;\u{20000}&#39;</span>...<span class="string">&#39;\u{2A6D6}&#39;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// CJK Ideograph Extension C</span>
-            <span class="string">&#39;\u{2A700}&#39;</span>...<span class="string">&#39;\u{2B734}&#39;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// CJK Ideograph Extension D</span>
-            <span class="string">&#39;\u{2B740}&#39;</span>...<span class="string">&#39;\u{2B81D}&#39;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// CJK Ideograph Extension E</span>
-            <span class="string">&#39;\u{2B820}&#39;</span>...<span class="string">&#39;\u{2CEA1}&#39;</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::LETTER_OTHER</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_letter_other(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="comment">// CJK Ideograph Extension A
+            </span><span class="string">&#39;\u{3400}&#39;</span>...<span class="string">&#39;\u{4DB5}&#39; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="comment">// CJK Ideograph
+            </span><span class="string">&#39;\u{4E00}&#39;</span>...<span class="string">&#39;\u{9FD5}&#39; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="comment">// Hangul Syllable
+            </span><span class="string">&#39;\u{AC00}&#39;</span>...<span class="string">&#39;\u{D7A3}&#39; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="comment">// Tangut Ideograph
+            </span><span class="string">&#39;\u{17000}&#39;</span>...<span class="string">&#39;\u{187EC}&#39; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="comment">// CJK Ideograph Extension B
+            </span><span class="string">&#39;\u{20000}&#39;</span>...<span class="string">&#39;\u{2A6D6}&#39; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="comment">// CJK Ideograph Extension C
+            </span><span class="string">&#39;\u{2A700}&#39;</span>...<span class="string">&#39;\u{2B734}&#39; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="comment">// CJK Ideograph Extension D
+            </span><span class="string">&#39;\u{2B740}&#39;</span>...<span class="string">&#39;\u{2B81D}&#39; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="comment">// CJK Ideograph Extension E
+            </span><span class="string">&#39;\u{2B820}&#39;</span>...<span class="string">&#39;\u{2CEA1}&#39; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; table_binary_search(<span class="self">self</span>, tables::LETTER_OTHER)
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_titlecase</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::LETTER_TITLECASE</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_letter_titlecase(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::LETTER_TITLECASE)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_uppercase</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::LETTER_UPPERCASE</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_letter_uppercase(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::LETTER_UPPERCASE)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_mark_spacing_combining</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::MARK_SPACE_COMBINING</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_mark_spacing_combining(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::MARK_SPACE_COMBINING)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_mark_enclosing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::MARK_ENCLOSING</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_mark_enclosing(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::MARK_ENCLOSING)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_mark_nonspacing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::MARK_NONSPACING</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_mark_nonspacing(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::MARK_NONSPACING)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_number_decimal_digit</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::NUMBER_DECIMAL_DIGIT</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_number_decimal_digit(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::NUMBER_DECIMAL_DIGIT)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_number_letter</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::NUMBER_LETTER</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_number_letter(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::NUMBER_LETTER)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_number_other</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::NUMBER_OTHER</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_number_other(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::NUMBER_OTHER)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_connector</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::PUNCTUATION_CONNECTOR</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_punctuation_connector(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::PUNCTUATION_CONNECTOR)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_dash</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::PUNCTUATION_DASH</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_punctuation_dash(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::PUNCTUATION_DASH)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_close</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::PUNCTUATION_CLOSE</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_punctuation_close(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::PUNCTUATION_CLOSE)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_final_quote</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::PUNCTUATION_FINAL_QUOTE</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_punctuation_final_quote(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::PUNCTUATION_FINAL_QUOTE)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_initial_quote</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::PUNCTUATION_INITIAL_QUOTE</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_punctuation_initial_quote(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::PUNCTUATION_INITIAL_QUOTE)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_other</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::PUNCTUATION_OTHER</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_punctuation_other(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::PUNCTUATION_OTHER)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_punctuation_open</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::PUNCTUATION_OPEN</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_punctuation_open(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::PUNCTUATION_OPEN)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_symbol_currency</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::SYMBOL_CURRENCY</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_symbol_currency(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::SYMBOL_CURRENCY)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_symbol_modifier</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::SYMBOL_MODIFIER</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_symbol_modifier(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::SYMBOL_MODIFIER)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_symbol_math</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::SYMBOL_MATH</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_symbol_math(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::SYMBOL_MATH)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_symbol_other</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::SYMBOL_OTHER</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_symbol_other(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::SYMBOL_OTHER)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_separator_line</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::SEPARATOR_LINE</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_separator_line(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::SEPARATOR_LINE)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_separator_paragraph</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::SEPARATOR_PARAGRAPH</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_separator_paragraph(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::SEPARATOR_PARAGRAPH)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_separator_space</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">table_binary_search</span>(<span class="self">self</span>, <span class="ident">tables::SEPARATOR_SPACE</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_separator_space(<span class="self">self</span>) -&gt; bool {
+        table_binary_search(<span class="self">self</span>, tables::SEPARATOR_SPACE)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::UnicodeCategories</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::UnicodeCategories;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_other_control</span>() {
-        <span class="macro">assert!</span>(<span class="string">&#39;\0&#39;</span>.<span class="ident">is_other_control</span>());
-        <span class="macro">assert!</span>(<span class="string">&#39;\u{007F}&#39;</span>.<span class="ident">is_other_control</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="string">&#39;f&#39;</span>.<span class="ident">is_other_control</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_other_control() {
+        <span class="macro">assert!</span>(<span class="string">&#39;\0&#39;</span>.is_other_control());
+        <span class="macro">assert!</span>(<span class="string">&#39;\u{007F}&#39;</span>.is_other_control());
+        <span class="macro">assert!</span>(!<span class="string">&#39;f&#39;</span>.is_other_control());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_other_format</span>() {
-        <span class="macro">assert!</span>(<span class="string">&#39;؁&#39;</span>.<span class="ident">is_other_format</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="string">&#39;0&#39;</span>.<span class="ident">is_other_format</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_other_format() {
+        <span class="macro">assert!</span>(<span class="string">&#39;؁&#39;</span>.is_other_format());
+        <span class="macro">assert!</span>(!<span class="string">&#39;0&#39;</span>.is_other_format());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_other_private_use</span>() {
-        <span class="macro">assert!</span>(<span class="string">&#39;\u{F8FF}&#39;</span>.<span class="ident">is_other_private_use</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="string">&#39;n&#39;</span>.<span class="ident">is_other_private_use</span>())
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_other_private_use() {
+        <span class="macro">assert!</span>(<span class="string">&#39;\u{F8FF}&#39;</span>.is_other_private_use());
+        <span class="macro">assert!</span>(!<span class="string">&#39;n&#39;</span>.is_other_private_use())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_lowercase</span>() {
-        <span class="macro">assert!</span>(<span class="string">&#39;q&#39;</span>.<span class="ident">is_letter_lowercase</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="string">&#39;N&#39;</span>.<span class="ident">is_letter_lowercase</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_letter_lowercase() {
+        <span class="macro">assert!</span>(<span class="string">&#39;q&#39;</span>.is_letter_lowercase());
+        <span class="macro">assert!</span>(!<span class="string">&#39;N&#39;</span>.is_letter_lowercase());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_modifier</span>() {
-        <span class="macro">assert!</span>(<span class="string">&#39;ˢ&#39;</span>.<span class="ident">is_letter_modifier</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="string">&#39;m&#39;</span>.<span class="ident">is_letter_modifier</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_letter_modifier() {
+        <span class="macro">assert!</span>(<span class="string">&#39;ˢ&#39;</span>.is_letter_modifier());
+        <span class="macro">assert!</span>(!<span class="string">&#39;m&#39;</span>.is_letter_modifier());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_letter_range</span>() {
-        <span class="macro">assert!</span>(<span class="string">&#39;界&#39;</span>.<span class="ident">is_letter_other</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_letter_range() {
+        <span class="macro">assert!</span>(<span class="string">&#39;界&#39;</span>.is_letter_other());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="unicode_categories" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="unicode_categories" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

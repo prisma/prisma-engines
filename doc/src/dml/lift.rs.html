@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/lift.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lift.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/lift.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lift.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -685,285 +685,285 @@
 <span id="685">685</span>
 <span id="686">686</span>
 <span id="687">687</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">dml</span>, <span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">either::Either</span>;
-<span class="kw">use</span> <span class="ident">psl_core</span>::{
-    <span class="ident">datamodel_connector</span>::{<span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">Connector</span>, <span class="ident">RelationMode</span>},
-    <span class="ident">parser_database</span>::{
-        <span class="self">self</span> <span class="kw">as</span> <span class="ident">db</span>,
-        <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
-        <span class="ident">walkers</span>::<span class="kw-2">*</span>,
-        <span class="ident">IndexAlgorithm</span>, <span class="ident">ScalarType</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{<span class="self">self </span><span class="kw">as </span>dml, <span class="kw-2">*</span>};
+<span class="kw">use </span>either::Either;
+<span class="kw">use </span>psl_core::{
+    datamodel_connector::{constraint_names::ConstraintNames, walker_ext_traits::<span class="kw-2">*</span>, Connector, RelationMode},
+    parser_database::{
+        <span class="self">self </span><span class="kw">as </span>db,
+        ast::{<span class="self">self</span>, WithDocumentation, WithName, WithSpan},
+        walkers::<span class="kw-2">*</span>,
+        IndexAlgorithm, ScalarType,
     },
 };
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="doccomment">/// Helper for lifting a datamodel.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When lifting, the AST is converted to the Datamodel data structure, and</span>
-<span class="doccomment">/// additional semantics are attached.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Guarantees</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For a parsed, validated and standardised datamodel, the following guarantees hold:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Each referenced model or enum does exist.</span>
-<span class="doccomment">/// - Each related field has a backwards related field on the related type with equal relation</span>
-<span class="doccomment">/// name. If the user did not specify any, a backwards field will be generated.</span>
-<span class="doccomment">/// - All relations are named.</span>
-<span class="doccomment">/// - All relations have a valid list of `to_fields` on the referencing side. An empty list</span>
-<span class="doccomment">/// indicates the back relation field. If the user does not give any `references` argument, the</span>
-<span class="doccomment">/// `to_fields` will point to the related types id fields.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">LiftAstToDml</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">db::ParserDatabase</span>,
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
-    <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
+<span class="doccomment">/// Helper for lifting a datamodel.
+///
+/// When lifting, the AST is converted to the Datamodel data structure, and
+/// additional semantics are attached.
+///
+/// ## Guarantees
+///
+/// For a parsed, validated and standardised datamodel, the following guarantees hold:
+///
+/// - Each referenced model or enum does exist.
+/// - Each related field has a backwards related field on the related type with equal relation
+/// name. If the user did not specify any, a backwards field will be generated.
+/// - All relations are named.
+/// - All relations have a valid list of `to_fields` on the referencing side. An empty list
+/// indicates the back relation field. If the user does not give any `references` argument, the
+/// `to_fields` will point to the related types id fields.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>LiftAstToDml&lt;<span class="lifetime">&#39;a</span>&gt; {
+    db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>db::ParserDatabase,
+    connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
+    relation_mode: RelationMode,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LiftAstToDml</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">db::ParserDatabase</span>,
-        <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
-        <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
-    ) -&gt; <span class="ident">LiftAstToDml</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">LiftAstToDml</span> {
-            <span class="ident">db</span>,
-            <span class="ident">connector</span>,
-            <span class="ident">relation_mode</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LiftAstToDml&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>db::ParserDatabase,
+        connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
+        relation_mode: RelationMode,
+    ) -&gt; LiftAstToDml&lt;<span class="lifetime">&#39;a</span>&gt; {
+        LiftAstToDml {
+            db,
+            connector,
+            relation_mode,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">lift</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Datamodel</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">Datamodel::new</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>lift(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Datamodel {
+        <span class="kw">let </span><span class="kw-2">mut </span>schema = Datamodel::new();
 
-        <span class="comment">// We iterate over scalar fields, then relations, but we want the</span>
-        <span class="comment">// order of fields in the Model to match the order of the fields in</span>
-        <span class="comment">// the AST, so we need this bit of extra bookkeeping.</span>
-        <span class="comment">//</span>
-        <span class="comment">// (model_idx, field_name) -&gt; sort_key</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_ids_for_sorting</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+        <span class="comment">// We iterate over scalar fields, then relations, but we want the
+        // order of fields in the Model to match the order of the fields in
+        // the AST, so we need this bit of extra bookkeeping.
+        //
+        // (model_idx, field_name) -&gt; sort_key
+        </span><span class="kw">let </span><span class="kw-2">mut </span>field_ids_for_sorting: HashMap&lt;(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str), ast::FieldId&gt; = HashMap::new();
 
-        <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_models</span>() {
-            <span class="ident">schema</span>.<span class="ident">models</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">lift_model</span>(<span class="ident">model</span>, <span class="kw-2">&amp;mut</span> <span class="ident">field_ids_for_sorting</span>));
+        <span class="kw">for </span>model <span class="kw">in </span><span class="self">self</span>.db.walk_models() {
+            schema.models.push(<span class="self">self</span>.lift_model(model, <span class="kw-2">&amp;mut </span>field_ids_for_sorting));
         }
 
-        <span class="kw">for</span> <span class="ident">composite_type</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_composite_types</span>() {
-            <span class="ident">schema</span>.<span class="ident">composite_types</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">lift_composite_type</span>(<span class="ident">composite_type</span>))
+        <span class="kw">for </span>composite_type <span class="kw">in </span><span class="self">self</span>.db.walk_composite_types() {
+            schema.composite_types.push(<span class="self">self</span>.lift_composite_type(composite_type))
         }
 
-        <span class="kw">for</span> <span class="ident">r#enum</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_enums</span>() {
-            <span class="ident">schema</span>.<span class="ident">enums</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">lift_enum</span>(<span class="ident">r#enum</span>))
+        <span class="kw">for </span>r#enum <span class="kw">in </span><span class="self">self</span>.db.walk_enums() {
+            schema.enums.push(<span class="self">self</span>.lift_enum(r#enum))
         }
 
-        <span class="self">self</span>.<span class="ident">lift_relations</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">field_ids_for_sorting</span>);
+        <span class="self">self</span>.lift_relations(<span class="kw-2">&amp;mut </span>schema, <span class="kw-2">&amp;mut </span>field_ids_for_sorting);
 
-        <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">schema</span>.<span class="ident">models_mut</span>() {
-            <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">as_str</span>();
-            <span class="ident">model</span>
-                .<span class="ident">fields</span>
-                .<span class="ident">sort_by_key</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field_ids_for_sorting</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_name</span>, <span class="ident">field</span>.<span class="ident">name</span>())).<span class="ident">cloned</span>());
+        <span class="kw">for </span>model <span class="kw">in </span>schema.models_mut() {
+            <span class="kw">let </span>model_name = model.name.as_str();
+            model
+                .fields
+                .sort_by_key(|field| field_ids_for_sorting.get(<span class="kw-2">&amp;</span>(model_name, field.name())).cloned());
         }
 
-        <span class="ident">schema</span>
+        schema
     }
 
-    <span class="kw">fn</span> <span class="ident">lift_relations</span>(
+    <span class="kw">fn </span>lift_relations(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>,
-        <span class="ident">field_ids_for_sorting</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
+        schema: <span class="kw-2">&amp;mut </span>Datamodel,
+        field_ids_for_sorting: <span class="kw-2">&amp;mut </span>HashMap&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str), ast::FieldId&gt;,
     ) {
-        <span class="kw">let</span> <span class="ident">active_connector</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector</span>;
-        <span class="kw">let</span> <span class="ident">relation_mode</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">relation_mode</span>;
-        <span class="kw">let</span> <span class="ident">common_dml_fields</span> <span class="op">=</span> <span class="op">|</span><span class="ident">field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RelationField</span>, <span class="ident">relation_field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
-            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">explicit_on_delete</span>().<span class="ident">map</span>(<span class="ident">From::from</span>);
-            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">on_update</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">explicit_on_update</span>().<span class="ident">map</span>(<span class="ident">From::from</span>);
-            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">relation_name</span>().<span class="ident">to_string</span>();
-            <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-            <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">is_ignored</span>();
-            <span class="ident">field</span>.<span class="ident">supports_restrict_action</span>(
-                <span class="ident">active_connector</span>.<span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="ident">relation_mode</span>, <span class="ident">db::ReferentialAction::Restrict</span>),
+        <span class="kw">let </span>active_connector = <span class="self">self</span>.connector;
+        <span class="kw">let </span>relation_mode = <span class="self">self</span>.relation_mode;
+        <span class="kw">let </span>common_dml_fields = |field: <span class="kw-2">&amp;mut </span>RelationField, relation_field: RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;| {
+            <span class="kw">let </span>ast_field = relation_field.ast_field();
+            field.relation_info.on_delete = relation_field.explicit_on_delete().map(From::from);
+            field.relation_info.on_update = relation_field.explicit_on_update().map(From::from);
+            field.relation_info.name = relation_field.relation_name().to_string();
+            field.documentation = ast_field.documentation().map(String::from);
+            field.is_ignored = relation_field.is_ignored();
+            field.supports_restrict_action(
+                active_connector.supports_referential_action(<span class="kw-2">&amp;</span>relation_mode, db::ReferentialAction::Restrict),
             );
-            <span class="ident">field</span>.<span class="ident">emulates_referential_actions</span>(<span class="ident">relation_mode</span>.<span class="ident">is_prisma</span>());
+            field.emulates_referential_actions(relation_mode.is_prisma());
         };
 
-        <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_relations</span>() {
-            <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">refine</span>() {
-                <span class="ident">RefinedRelationWalker::Inline</span>(<span class="ident">relation</span>) =&gt; {
-                    <span class="comment">// Forward field</span>
-                    {
-                        <span class="comment">// If we have an array field we detect as a</span>
-                        <span class="comment">// back-relation, but it has fields defined, we expect</span>
-                        <span class="comment">// it to be the other side of a embedded 2-way m:n</span>
-                        <span class="comment">// relation, and we don&#39;t want to mess around with the</span>
-                        <span class="comment">// data model here at all.</span>
-                        <span class="comment">//</span>
-                        <span class="comment">// Please kill this with fire when we introduce code</span>
-                        <span class="comment">// actions for relations.</span>
-                        <span class="kw">if</span> <span class="ident">relation</span>
-                            .<span class="ident">back_relation_field</span>()
-                            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_list</span>())
-                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">fields</span>())
-                            .<span class="ident">is_some</span>()
+        <span class="kw">for </span>relation <span class="kw">in </span><span class="self">self</span>.db.walk_relations() {
+            <span class="kw">match </span>relation.refine() {
+                RefinedRelationWalker::Inline(relation) =&gt; {
+                    <span class="comment">// Forward field
+                    </span>{
+                        <span class="comment">// If we have an array field we detect as a
+                        // back-relation, but it has fields defined, we expect
+                        // it to be the other side of a embedded 2-way m:n
+                        // relation, and we don&#39;t want to mess around with the
+                        // data model here at all.
+                        //
+                        // Please kill this with fire when we introduce code
+                        // actions for relations.
+                        </span><span class="kw">if </span>relation
+                            .back_relation_field()
+                            .filter(|rf| rf.ast_field().arity.is_list())
+                            .and_then(|rf| rf.fields())
+                            .is_some()
                         {
                             <span class="kw">continue</span>;
                         }
 
-                        <span class="kw">let</span> <span class="ident">referenced_model</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referenced_model</span>();
+                        <span class="kw">let </span>referenced_model = relation.referenced_model();
 
-                        <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">RelationInfo::new</span>(<span class="ident">referenced_model</span>.<span class="ident">name</span>());
+                        <span class="kw">let </span>relation_info = RelationInfo::new(referenced_model.name());
 
-                        <span class="kw">let</span> <span class="ident">forward_field_walker</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>().<span class="ident">unwrap</span>();
-                        <span class="comment">// Construct a relation field in the DML for an existing relation field in the source.</span>
-                        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="ident">forward_field_walker</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">into</span>();
-                        <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="ident">forward_field_walker</span>.<span class="ident">referential_arity</span>().<span class="ident">into</span>();
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relation_field</span> <span class="op">=</span>
-                            <span class="ident">RelationField::new</span>(<span class="ident">forward_field_walker</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
+                        <span class="kw">let </span>forward_field_walker = relation.forward_relation_field().unwrap();
+                        <span class="comment">// Construct a relation field in the DML for an existing relation field in the source.
+                        </span><span class="kw">let </span>arity = forward_field_walker.ast_field().arity.into();
+                        <span class="kw">let </span>referential_arity = forward_field_walker.referential_arity().into();
+                        <span class="kw">let </span><span class="kw-2">mut </span>relation_field =
+                            RelationField::new(forward_field_walker.name(), arity, referential_arity, relation_info);
 
-                        <span class="kw">let</span> <span class="ident">column_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">relation</span>
-                            .<span class="ident">referencing_fields</span>()
-                            .<span class="ident">unwrap</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">database_name</span>())
-                            .<span class="ident">collect</span>();
+                        <span class="kw">let </span>column_names: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = relation
+                            .referencing_fields()
+                            .unwrap()
+                            .map(|f| f.database_name())
+                            .collect();
 
-                        <span class="kw">let</span> <span class="ident">fk_name</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">constraint_name</span>(<span class="ident">active_connector</span>);
+                        <span class="kw">let </span>fk_name = relation.constraint_name(active_connector);
 
-                        <span class="kw">let</span> <span class="ident">default_name</span> <span class="op">=</span> <span class="ident">ConstraintNames::foreign_key_constraint_name</span>(
-                            <span class="ident">relation</span>.<span class="ident">referencing_model</span>().<span class="ident">database_name</span>(),
-                            <span class="kw-2">&amp;</span><span class="ident">column_names</span>,
-                            <span class="self">self</span>.<span class="ident">connector</span>,
+                        <span class="kw">let </span>default_name = ConstraintNames::foreign_key_constraint_name(
+                            relation.referencing_model().database_name(),
+                            <span class="kw-2">&amp;</span>column_names,
+                            <span class="self">self</span>.connector,
                         );
 
-                        <span class="kw">let</span> <span class="ident">fk_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fk_name</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">default_name</span>.<span class="ident">as_str</span>() {
-                            <span class="prelude-val">None</span>
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">relation</span>.<span class="ident">constraint_name</span>(<span class="ident">active_connector</span>).<span class="ident">to_string</span>())
+                        <span class="kw">let </span>fk_name = <span class="kw">if </span>fk_name.as_ref() == default_name.as_str() {
+                            <span class="prelude-val">None
+                        </span>} <span class="kw">else </span>{
+                            <span class="prelude-val">Some</span>(relation.constraint_name(active_connector).to_string())
                         };
 
-                        <span class="ident">relation_field</span>.<span class="ident">relation_info</span>.<span class="ident">fk_name</span> <span class="op">=</span> <span class="ident">fk_name</span>;
+                        relation_field.relation_info.fk_name = fk_name;
 
-                        <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;mut</span> <span class="ident">relation_field</span>, <span class="ident">forward_field_walker</span>);
-                        <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>(
-                            (<span class="ident">forward_field_walker</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">forward_field_walker</span>.<span class="ident">name</span>()),
-                            <span class="ident">forward_field_walker</span>.<span class="ident">field_id</span>(),
+                        common_dml_fields(<span class="kw-2">&amp;mut </span>relation_field, forward_field_walker);
+                        field_ids_for_sorting.insert(
+                            (forward_field_walker.model().name(), forward_field_walker.name()),
+                            forward_field_walker.field_id(),
                         );
 
-                        <span class="ident">relation_field</span>.<span class="ident">relation_info</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">relation_name</span>().<span class="ident">to_string</span>();
+                        relation_field.relation_info.name = relation.relation_name().to_string();
 
-                        <span class="ident">relation_field</span>.<span class="ident">relation_info</span>.<span class="ident">references</span> <span class="op">=</span> <span class="ident">relation</span>
-                            .<span class="ident">referenced_fields</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
-                            .<span class="ident">collect</span>();
+                        relation_field.relation_info.references = relation
+                            .referenced_fields()
+                            .map(|field| field.name().to_owned())
+                            .collect();
 
-                        <span class="ident">relation_field</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="ident">relation</span>
-                            .<span class="ident">referencing_fields</span>()
-                            .<span class="ident">unwrap</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
-                            .<span class="ident">collect</span>();
+                        relation_field.relation_info.fields = relation
+                            .referencing_fields()
+                            .unwrap()
+                            .map(|f| f.name().to_owned())
+                            .collect();
 
-                        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">find_model_mut</span>(<span class="ident">relation</span>.<span class="ident">referencing_model</span>().<span class="ident">name</span>());
-                        <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">Field::RelationField</span>(<span class="ident">relation_field</span>));
+                        <span class="kw">let </span>model = schema.find_model_mut(relation.referencing_model().name());
+                        model.add_field(Field::RelationField(relation_field));
                     };
 
-                    <span class="comment">// Back field</span>
-                    {
-                        <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">RelationInfo::new</span>(<span class="ident">relation</span>.<span class="ident">referencing_model</span>().<span class="ident">name</span>());
-                        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">find_model_mut</span>(<span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">name</span>());
+                    <span class="comment">// Back field
+                    </span>{
+                        <span class="kw">let </span>relation_info = RelationInfo::new(relation.referencing_model().name());
+                        <span class="kw">let </span>model = schema.find_model_mut(relation.referenced_model().name());
 
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation_field</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">back_relation_field</span>() {
-                            <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
-                            <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">arity</span>.<span class="ident">into</span>();
-                            <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">referential_arity</span>().<span class="ident">into</span>();
-                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span>
-                                <span class="ident">RelationField::new</span>(<span class="ident">relation_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
+                        <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">if let </span><span class="prelude-val">Some</span>(relation_field) = relation.back_relation_field() {
+                            <span class="kw">let </span>ast_field = relation_field.ast_field();
+                            <span class="kw">let </span>arity = ast_field.arity.into();
+                            <span class="kw">let </span>referential_arity = relation_field.referential_arity().into();
+                            <span class="kw">let </span><span class="kw-2">mut </span>field =
+                                RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
-                            <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;mut</span> <span class="ident">field</span>, <span class="ident">relation_field</span>);
+                            common_dml_fields(<span class="kw-2">&amp;mut </span>field, relation_field);
 
-                            <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>(
-                                (<span class="ident">relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">relation_field</span>.<span class="ident">name</span>()),
-                                <span class="ident">relation_field</span>.<span class="ident">field_id</span>(),
+                            field_ids_for_sorting.insert(
+                                (relation_field.model().name(), relation_field.name()),
+                                relation_field.field_id(),
                             );
 
-                            <span class="ident">field</span>
-                        } <span class="kw">else</span> {
-                            <span class="comment">// This is part of reformatting.</span>
-                            <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="ident">FieldArity::List</span>;
-                            <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="ident">FieldArity::List</span>;
-                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">RelationField::new</span>(
-                                <span class="ident">relation</span>.<span class="ident">referencing_model</span>().<span class="ident">name</span>(),
-                                <span class="ident">arity</span>,
-                                <span class="ident">referential_arity</span>,
-                                <span class="ident">relation_info</span>,
+                            field
+                        } <span class="kw">else </span>{
+                            <span class="comment">// This is part of reformatting.
+                            </span><span class="kw">let </span>arity = FieldArity::List;
+                            <span class="kw">let </span>referential_arity = FieldArity::List;
+                            <span class="kw">let </span><span class="kw-2">mut </span>field = RelationField::new(
+                                relation.referencing_model().name(),
+                                arity,
+                                referential_arity,
+                                relation_info,
                             );
-                            <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_model</span>().<span class="ident">is_ignored</span>();
-                            <span class="ident">field</span>
+                            field.is_ignored = relation.referencing_model().is_ignored();
+                            field
                         };
 
-                        <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">relation_name</span>().<span class="ident">to_string</span>();
-                        <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">Field::RelationField</span>(<span class="ident">field</span>));
+                        field.relation_info.name = relation.relation_name().to_string();
+                        model.add_field(Field::RelationField(field));
                     };
                 }
-                <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="ident">relation</span>) =&gt; {
-                    <span class="kw">for</span> <span class="ident">relation_field</span> <span class="kw">in</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()] {
-                        <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
-                        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">arity</span>.<span class="ident">into</span>();
-                        <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">RelationInfo::new</span>(<span class="ident">relation_field</span>.<span class="ident">related_model</span>().<span class="ident">name</span>());
-                        <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">referential_arity</span>().<span class="ident">into</span>();
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span>
-                            <span class="ident">RelationField::new</span>(<span class="ident">relation_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
+                RefinedRelationWalker::ImplicitManyToMany(relation) =&gt; {
+                    <span class="kw">for </span>relation_field <span class="kw">in </span>[relation.field_a(), relation.field_b()] {
+                        <span class="kw">let </span>ast_field = relation_field.ast_field();
+                        <span class="kw">let </span>arity = ast_field.arity.into();
+                        <span class="kw">let </span>relation_info = RelationInfo::new(relation_field.related_model().name());
+                        <span class="kw">let </span>referential_arity = relation_field.referential_arity().into();
+                        <span class="kw">let </span><span class="kw-2">mut </span>field =
+                            RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
-                        <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;mut</span> <span class="ident">field</span>, <span class="ident">relation_field</span>);
+                        common_dml_fields(<span class="kw-2">&amp;mut </span>field, relation_field);
 
-                        <span class="kw">let</span> <span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_key</span>().<span class="ident">unwrap</span>();
-                        <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">references</span> <span class="op">=</span>
-                            <span class="ident">primary_key</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()).<span class="ident">collect</span>();
+                        <span class="kw">let </span>primary_key = relation_field.related_model().primary_key().unwrap();
+                        field.relation_info.references =
+                            primary_key.fields().map(|field| field.name().to_owned()).collect();
 
-                        <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="ident">relation_field</span>
-                            .<span class="ident">fields</span>()
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">flatten</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
-                            .<span class="ident">collect</span>();
+                        field.relation_info.fields = relation_field
+                            .fields()
+                            .into_iter()
+                            .flatten()
+                            .map(|f| f.name().to_owned())
+                            .collect();
 
-                        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">find_model_mut</span>(<span class="ident">relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>());
-                        <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">Field::RelationField</span>(<span class="ident">field</span>));
-                        <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>(
-                            (<span class="ident">relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">relation_field</span>.<span class="ident">name</span>()),
-                            <span class="ident">relation_field</span>.<span class="ident">field_id</span>(),
+                        <span class="kw">let </span>model = schema.find_model_mut(relation_field.model().name());
+                        model.add_field(Field::RelationField(field));
+                        field_ids_for_sorting.insert(
+                            (relation_field.model().name(), relation_field.name()),
+                            relation_field.field_id(),
                         );
                     }
                 }
-                <span class="ident">RefinedRelationWalker::TwoWayEmbeddedManyToMany</span>(<span class="ident">relation</span>) =&gt; {
-                    <span class="kw">for</span> <span class="ident">relation_field</span> <span class="kw">in</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()] {
-                        <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
-                        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">arity</span>.<span class="ident">into</span>();
-                        <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">RelationInfo::new</span>(<span class="ident">relation_field</span>.<span class="ident">related_model</span>().<span class="ident">name</span>());
-                        <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">referential_arity</span>().<span class="ident">into</span>();
+                RefinedRelationWalker::TwoWayEmbeddedManyToMany(relation) =&gt; {
+                    <span class="kw">for </span>relation_field <span class="kw">in </span>[relation.field_a(), relation.field_b()] {
+                        <span class="kw">let </span>ast_field = relation_field.ast_field();
+                        <span class="kw">let </span>arity = ast_field.arity.into();
+                        <span class="kw">let </span>relation_info = RelationInfo::new(relation_field.related_model().name());
+                        <span class="kw">let </span>referential_arity = relation_field.referential_arity().into();
 
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span>
-                            <span class="ident">RelationField::new</span>(<span class="ident">relation_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
+                        <span class="kw">let </span><span class="kw-2">mut </span>field =
+                            RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
-                        <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;mut</span> <span class="ident">field</span>, <span class="ident">relation_field</span>);
+                        common_dml_fields(<span class="kw-2">&amp;mut </span>field, relation_field);
 
-                        <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">references</span> <span class="op">=</span> <span class="ident">relation_field</span>
-                            .<span class="ident">referenced_fields</span>()
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">flatten</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
-                            .<span class="ident">collect</span>();
+                        field.relation_info.references = relation_field
+                            .referenced_fields()
+                            .into_iter()
+                            .flatten()
+                            .map(|f| f.name().to_owned())
+                            .collect();
 
-                        <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="ident">relation_field</span>
-                            .<span class="ident">fields</span>()
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">flatten</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
-                            .<span class="ident">collect</span>();
+                        field.relation_info.fields = relation_field
+                            .fields()
+                            .into_iter()
+                            .flatten()
+                            .map(|f| f.name().to_owned())
+                            .collect();
 
-                        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">find_model_mut</span>(<span class="ident">relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>());
-                        <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">Field::RelationField</span>(<span class="ident">field</span>));
-                        <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>(
-                            (<span class="ident">relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">relation_field</span>.<span class="ident">name</span>()),
-                            <span class="ident">relation_field</span>.<span class="ident">field_id</span>(),
+                        <span class="kw">let </span>model = schema.find_model_mut(relation_field.model().name());
+                        model.add_field(Field::RelationField(field));
+                        field_ids_for_sorting.insert(
+                            (relation_field.model().name(), relation_field.name()),
+                            relation_field.field_id(),
                         );
                     }
                 }
@@ -971,406 +971,406 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">lift_composite_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">walker</span>: <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">CompositeType</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="kw">fn </span>lift_composite_type(<span class="kw-2">&amp;</span><span class="self">self</span>, walker: CompositeTypeWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; CompositeType {
+        <span class="kw">let </span><span class="kw-2">mut </span>fields = Vec::new();
 
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">walker</span>.<span class="ident">fields</span>() {
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField</span> {
-                <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">r#type</span>: <span class="self">self</span>.<span class="ident">lift_composite_type_field_type</span>(<span class="ident">field</span>, <span class="ident">field</span>.<span class="ident">r#type</span>()),
-                <span class="ident">arity</span>: <span class="ident">field</span>.<span class="ident">arity</span>().<span class="ident">into</span>(),
-                <span class="ident">database_name</span>: <span class="ident">field</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
-                <span class="ident">documentation</span>: <span class="ident">field</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>),
-                <span class="ident">default_value</span>: <span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">DefaultValue</span> {
-                    <span class="ident">kind</span>: <span class="ident">dml_default_kind</span>(<span class="ident">value</span>, <span class="ident">field</span>.<span class="ident">r#type</span>().<span class="ident">as_builtin_scalar</span>()),
-                    <span class="ident">db_name</span>: <span class="prelude-val">None</span>,
+        <span class="kw">for </span>field <span class="kw">in </span>walker.fields() {
+            <span class="kw">let </span>field = CompositeTypeField {
+                name: field.name().to_owned(),
+                r#type: <span class="self">self</span>.lift_composite_type_field_type(field, field.r#type()),
+                arity: field.arity().into(),
+                database_name: field.mapped_name().map(String::from),
+                documentation: field.documentation().map(ToString::to_string),
+                default_value: field.default_value().map(|value| DefaultValue {
+                    kind: dml_default_kind(value, field.r#type().as_builtin_scalar()),
+                    db_name: <span class="prelude-val">None</span>,
                 }),
-                <span class="ident">is_commented_out</span>: <span class="bool-val">false</span>,
+                is_commented_out: <span class="bool-val">false</span>,
             };
 
-            <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">field</span>);
+            fields.push(field);
         }
 
-        <span class="ident">CompositeType</span> {
-            <span class="ident">name</span>: <span class="ident">walker</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">fields</span>,
+        CompositeType {
+            name: walker.name().to_owned(),
+            fields,
         }
     }
 
-    <span class="doccomment">/// Internal: Validates a model AST node and lifts it to a DML model.</span>
-    <span class="kw">fn</span> <span class="ident">lift_model</span>(
+    <span class="doccomment">/// Internal: Validates a model AST node and lifts it to a DML model.
+    </span><span class="kw">fn </span>lift_model(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">walker</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-        <span class="ident">field_ids_for_sorting</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Model</span> {
-        <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">ast_model</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Model::new</span>(<span class="ident">ast_model</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(), <span class="prelude-val">None</span>);
+        walker: ModelWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
+        field_ids_for_sorting: <span class="kw-2">&amp;mut </span>HashMap&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str), ast::FieldId&gt;,
+    ) -&gt; Model {
+        <span class="kw">let </span>ast_model = walker.ast_model();
+        <span class="kw">let </span><span class="kw-2">mut </span>model = Model::new(ast_model.name().to_owned(), <span class="prelude-val">None</span>);
 
-        <span class="ident">model</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_model</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-        <span class="ident">model</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-        <span class="ident">model</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">is_ignored</span>();
-        <span class="ident">model</span>.<span class="ident">schema</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">schema</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">s</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>());
+        model.documentation = ast_model.documentation().map(String::from);
+        model.database_name = walker.mapped_name().map(String::from);
+        model.is_ignored = walker.is_ignored();
+        model.schema = walker.schema().map(|(s, <span class="kw">_</span>)| s.to_owned());
 
-        <span class="ident">model</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">primary_key</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">PrimaryKeyDefinition</span> {
-            <span class="ident">name</span>: <span class="ident">pk</span>.<span class="ident">name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
-            <span class="ident">db_name</span>: <span class="ident">pk</span>.<span class="ident">constraint_name</span>(<span class="self">self</span>.<span class="ident">connector</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into_owned</span>()),
-            <span class="ident">fields</span>: <span class="ident">pk</span>
-                .<span class="ident">scalar_field_attributes</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span>
-                     <span class="comment">//TODO (extended indexes) here it is ok to pass sort and length with out a preview flag</span>
-                     <span class="comment">// check since this is coming from the ast and the parsing would reject the args without</span>
-                     <span class="comment">// the flag set</span>
-                     <span class="comment">// When we start using the extra args here could be a place to fill in the defaults.</span>
-                     <span class="ident">PrimaryKeyField</span> {
-                         <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">as_scalar_field</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                         <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="ident">parser_database_sort_order_to_dml_sort_order</span>),
-                         <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>(),
+        model.primary_key = walker.primary_key().map(|pk| PrimaryKeyDefinition {
+            name: pk.name().map(String::from),
+            db_name: pk.constraint_name(<span class="self">self</span>.connector).map(|c| c.into_owned()),
+            fields: pk
+                .scalar_field_attributes()
+                .map(|field|
+                     <span class="comment">//TODO (extended indexes) here it is ok to pass sort and length with out a preview flag
+                     // check since this is coming from the ast and the parsing would reject the args without
+                     // the flag set
+                     // When we start using the extra args here could be a place to fill in the defaults.
+                     </span>PrimaryKeyField {
+                         name: field.as_index_field().as_scalar_field().unwrap().name().to_owned(),
+                         sort_order: field.sort_order().map(parser_database_sort_order_to_dml_sort_order),
+                         length: field.length(),
                      })
-                .<span class="ident">collect</span>(),
-            <span class="ident">defined_on_field</span>: <span class="ident">pk</span>.<span class="ident">is_defined_on_field</span>(),
-            <span class="comment">// By default a primary key is always clustered in any database.</span>
-            <span class="ident">clustered</span>: <span class="ident">pk</span>.<span class="ident">clustered</span>(),
+                .collect(),
+            defined_on_field: pk.is_defined_on_field(),
+            <span class="comment">// By default a primary key is always clustered in any database.
+            </span>clustered: pk.clustered(),
         });
 
-        <span class="ident">model</span>.<span class="ident">indices</span> <span class="op">=</span> <span class="ident">walker</span>
-            .<span class="ident">indexes</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">idx</span>
-                    .<span class="ident">scalar_field_attributes</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">field</span>
-                            .<span class="ident">as_path_to_indexed_field</span>()
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> (<span class="ident">a</span>.<span class="ident">to_owned</span>(), <span class="ident">b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>())))
-                            .<span class="ident">collect</span>();
+        model.indices = walker
+            .indexes()
+            .map(|idx| {
+                <span class="kw">let </span>fields = idx
+                    .scalar_field_attributes()
+                    .map(|field| {
+                        <span class="kw">let </span>path = field
+                            .as_path_to_indexed_field()
+                            .into_iter()
+                            .map(|(a, b)| (a.to_owned(), b.map(|s| s.to_owned())))
+                            .collect();
 
-                        <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="ident">parser_database_sort_order_to_dml_sort_order</span>);
-                        <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">length</span>();
-                        <span class="kw">let</span> <span class="ident">operator_class</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">operator_class</span>().<span class="ident">map</span>(<span class="ident">convert_op_class</span>);
+                        <span class="kw">let </span>sort_order = field.sort_order().map(parser_database_sort_order_to_dml_sort_order);
+                        <span class="kw">let </span>length = field.length();
+                        <span class="kw">let </span>operator_class = field.operator_class().map(convert_op_class);
 
-                        <span class="ident">IndexField</span> {
-                            <span class="ident">path</span>,
-                            <span class="ident">sort_order</span>,
-                            <span class="ident">length</span>,
-                            <span class="ident">operator_class</span>,
+                        IndexField {
+                            path,
+                            sort_order,
+                            length,
+                            operator_class,
                         }
                     })
-                    .<span class="ident">collect</span>();
+                    .collect();
 
-                <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">idx</span>.<span class="ident">index_type</span>() {
-                    <span class="ident">db::IndexType::Unique</span> =&gt; <span class="ident">IndexType::Unique</span>,
-                    <span class="ident">db::IndexType::Normal</span> =&gt; <span class="ident">IndexType::Normal</span>,
-                    <span class="ident">db::IndexType::Fulltext</span> =&gt; <span class="ident">IndexType::Fulltext</span>,
+                <span class="kw">let </span>tpe = <span class="kw">match </span>idx.index_type() {
+                    db::IndexType::Unique =&gt; IndexType::Unique,
+                    db::IndexType::Normal =&gt; IndexType::Normal,
+                    db::IndexType::Fulltext =&gt; IndexType::Fulltext,
                 };
 
-                <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">idx</span>.<span class="ident">algorithm</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">using</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">using</span> {
-                    <span class="ident">IndexAlgorithm::BTree</span> =&gt; <span class="ident">model::IndexAlgorithm::BTree</span>,
-                    <span class="ident">IndexAlgorithm::Hash</span> =&gt; <span class="ident">model::IndexAlgorithm::Hash</span>,
-                    <span class="ident">IndexAlgorithm::Gist</span> =&gt; <span class="ident">model::IndexAlgorithm::Gist</span>,
-                    <span class="ident">IndexAlgorithm::Gin</span> =&gt; <span class="ident">model::IndexAlgorithm::Gin</span>,
-                    <span class="ident">IndexAlgorithm::SpGist</span> =&gt; <span class="ident">model::IndexAlgorithm::SpGist</span>,
-                    <span class="ident">IndexAlgorithm::Brin</span> =&gt; <span class="ident">model::IndexAlgorithm::Brin</span>,
+                <span class="kw">let </span>algorithm = idx.algorithm().map(|using| <span class="kw">match </span>using {
+                    IndexAlgorithm::BTree =&gt; model::IndexAlgorithm::BTree,
+                    IndexAlgorithm::Hash =&gt; model::IndexAlgorithm::Hash,
+                    IndexAlgorithm::Gist =&gt; model::IndexAlgorithm::Gist,
+                    IndexAlgorithm::Gin =&gt; model::IndexAlgorithm::Gin,
+                    IndexAlgorithm::SpGist =&gt; model::IndexAlgorithm::SpGist,
+                    IndexAlgorithm::Brin =&gt; model::IndexAlgorithm::Brin,
                 });
 
-                <span class="ident">IndexDefinition</span> {
-                    <span class="ident">name</span>: <span class="ident">idx</span>.<span class="ident">name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
-                    <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">idx</span>.<span class="ident">constraint_name</span>(<span class="self">self</span>.<span class="ident">connector</span>).<span class="ident">into_owned</span>()),
-                    <span class="ident">fields</span>,
-                    <span class="ident">tpe</span>,
-                    <span class="ident">algorithm</span>,
-                    <span class="ident">defined_on_field</span>: <span class="ident">idx</span>.<span class="ident">is_defined_on_field</span>(),
-                    <span class="comment">// By default an index that is not a primary key is always non-clustered in any database.</span>
-                    <span class="ident">clustered</span>: <span class="ident">idx</span>.<span class="ident">clustered</span>(),
+                IndexDefinition {
+                    name: idx.name().map(String::from),
+                    db_name: <span class="prelude-val">Some</span>(idx.constraint_name(<span class="self">self</span>.connector).into_owned()),
+                    fields,
+                    tpe,
+                    algorithm,
+                    defined_on_field: idx.is_defined_on_field(),
+                    <span class="comment">// By default an index that is not a primary key is always non-clustered in any database.
+                    </span>clustered: idx.clustered(),
                 }
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">for</span> <span class="ident">scalar_field</span> <span class="kw">in</span> <span class="ident">walker</span>.<span class="ident">scalar_fields</span>() {
-            <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">field_id</span>();
-            <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast_model</span>[<span class="ident">field_id</span>];
+        <span class="kw">for </span>scalar_field <span class="kw">in </span>walker.scalar_fields() {
+            <span class="kw">let </span>field_id = scalar_field.field_id();
+            <span class="kw">let </span>ast_field = <span class="kw-2">&amp;</span>ast_model[field_id];
 
-            <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>((<span class="ident">ast_model</span>.<span class="ident">name</span>(), <span class="ident">ast_field</span>.<span class="ident">name</span>()), <span class="ident">field_id</span>);
+            field_ids_for_sorting.insert((ast_model.name(), ast_field.name()), field_id);
 
-            <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">scalar_field</span>.<span class="ident">scalar_field_type</span>() {
-                <span class="ident">db::ScalarFieldType::CompositeType</span>(<span class="ident">ctid</span>) =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeField::new</span>();
-                    <span class="ident">field</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>();
-                    <span class="ident">field</span>.<span class="ident">composite_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="kw-2">*</span><span class="ident">ctid</span>].<span class="ident">name</span>().<span class="ident">to_owned</span>();
-                    <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-                    <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">is_ignored</span>();
-                    <span class="ident">field</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-                    <span class="ident">field</span>.<span class="ident">arity</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">arity</span>.<span class="ident">into</span>();
+            <span class="kw">let </span>field_type = <span class="kw">match </span><span class="kw-2">&amp;</span>scalar_field.scalar_field_type() {
+                db::ScalarFieldType::CompositeType(ctid) =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeField::new();
+                    field.name = scalar_field.name().to_owned();
+                    field.composite_type = <span class="self">self</span>.db.ast()[<span class="kw-2">*</span>ctid].name().to_owned();
+                    field.documentation = ast_field.documentation().map(String::from);
+                    field.is_ignored = scalar_field.is_ignored();
+                    field.database_name = scalar_field.mapped_name().map(String::from);
+                    field.arity = ast_field.arity.into();
 
-                    <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">Field::CompositeField</span>(<span class="ident">field</span>));
+                    model.add_field(Field::CompositeField(field));
                     <span class="kw">continue</span>;
                 }
-                <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">lift_scalar_field_type</span>(<span class="ident">ast_field</span>, <span class="kw-2">&amp;</span><span class="ident">scalar_field</span>.<span class="ident">scalar_field_type</span>(), <span class="ident">scalar_field</span>),
+                <span class="kw">_ </span>=&gt; <span class="self">self</span>.lift_scalar_field_type(ast_field, <span class="kw-2">&amp;</span>scalar_field.scalar_field_type(), scalar_field),
             };
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ScalarField::new</span>(<span class="ident">ast_field</span>.<span class="ident">name</span>(), <span class="ident">ast_field</span>.<span class="ident">arity</span>.<span class="ident">into</span>(), <span class="ident">field_type</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>field = ScalarField::new(ast_field.name(), ast_field.arity.into(), field_type);
 
-            <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-            <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">is_ignored</span>();
-            <span class="ident">field</span>.<span class="ident">is_updated_at</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">is_updated_at</span>();
-            <span class="ident">field</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-            <span class="ident">field</span>.<span class="ident">default_value</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">DefaultValue</span> {
-                <span class="ident">kind</span>: <span class="ident">dml_default_kind</span>(<span class="ident">d</span>.<span class="ident">value</span>(), <span class="ident">scalar_field</span>.<span class="ident">scalar_type</span>()),
-                <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">d</span>.<span class="ident">constraint_name</span>(<span class="self">self</span>.<span class="ident">connector</span>).<span class="ident">into</span>())
-                    .<span class="ident">filter</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">supports_named_default_values</span>()),
+            field.documentation = ast_field.documentation().map(String::from);
+            field.is_ignored = scalar_field.is_ignored();
+            field.is_updated_at = scalar_field.is_updated_at();
+            field.database_name = scalar_field.mapped_name().map(String::from);
+            field.default_value = scalar_field.default_value().map(|d| DefaultValue {
+                kind: dml_default_kind(d.value(), scalar_field.scalar_type()),
+                db_name: <span class="prelude-val">Some</span>(d.constraint_name(<span class="self">self</span>.connector).into())
+                    .filter(|<span class="kw">_</span>| <span class="self">self</span>.connector.supports_named_default_values()),
             });
 
-            <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">Field::ScalarField</span>(<span class="ident">field</span>));
+            model.add_field(Field::ScalarField(field));
         }
 
-        <span class="ident">model</span>
+        model
     }
 
-    <span class="doccomment">/// Internal: Validates an enum AST node.</span>
-    <span class="kw">fn</span> <span class="ident">lift_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">r#enum</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Enum</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">en</span> <span class="op">=</span> <span class="ident">Enum::new</span>(<span class="ident">r#enum</span>.<span class="ident">name</span>(), <span class="macro">vec!</span>[], <span class="prelude-val">None</span>);
+    <span class="doccomment">/// Internal: Validates an enum AST node.
+    </span><span class="kw">fn </span>lift_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, r#enum: EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Enum {
+        <span class="kw">let </span><span class="kw-2">mut </span>en = Enum::new(r#enum.name(), <span class="macro">vec!</span>[], <span class="prelude-val">None</span>);
 
-        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">r#enum</span>.<span class="ident">values</span>() {
-            <span class="ident">en</span>.<span class="ident">add_value</span>(<span class="self">self</span>.<span class="ident">lift_enum_value</span>(<span class="ident">value</span>));
+        <span class="kw">for </span>value <span class="kw">in </span>r#enum.values() {
+            en.add_value(<span class="self">self</span>.lift_enum_value(value));
         }
 
-        <span class="ident">en</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">ast_enum</span>().<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-        <span class="ident">en</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-        <span class="ident">en</span>.<span class="ident">schema</span> <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">schema</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">s</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>());
-        <span class="ident">en</span>
+        en.documentation = r#enum.ast_enum().documentation().map(String::from);
+        en.database_name = r#enum.mapped_name().map(String::from);
+        en.schema = r#enum.schema().map(|(s, <span class="kw">_</span>)| s.to_owned());
+        en
     }
 
-    <span class="doccomment">/// Internal: Lifts an enum value AST node.</span>
-    <span class="kw">fn</span> <span class="ident">lift_enum_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">EnumValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">EnumValue</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enum_value</span> <span class="op">=</span> <span class="ident">EnumValue::new</span>(<span class="ident">value</span>.<span class="ident">name</span>());
-        <span class="ident">enum_value</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-        <span class="ident">enum_value</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-        <span class="ident">enum_value</span>
+    <span class="doccomment">/// Internal: Lifts an enum value AST node.
+    </span><span class="kw">fn </span>lift_enum_value(<span class="kw-2">&amp;</span><span class="self">self</span>, value: EnumValueWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; EnumValue {
+        <span class="kw">let </span><span class="kw-2">mut </span>enum_value = EnumValue::new(value.name());
+        enum_value.documentation = value.documentation().map(String::from);
+        enum_value.database_name = value.mapped_name().map(String::from);
+        enum_value
     }
 
-    <span class="kw">fn</span> <span class="ident">lift_scalar_field_type</span>(
+    <span class="kw">fn </span>lift_scalar_field_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">ast_field</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Field</span>,
-        <span class="ident">scalar_field_type</span>: <span class="kw-2">&amp;</span><span class="ident">db::ScalarFieldType</span>,
-        <span class="ident">scalar_field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">FieldType</span> {
-        <span class="kw">match</span> <span class="ident">scalar_field_type</span> {
-            <span class="ident">db::ScalarFieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; {
+        ast_field: <span class="kw-2">&amp;</span>ast::Field,
+        scalar_field_type: <span class="kw-2">&amp;</span>db::ScalarFieldType,
+        scalar_field: ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; FieldType {
+        <span class="kw">match </span>scalar_field_type {
+            db::ScalarFieldType::CompositeType(<span class="kw">_</span>) =&gt; {
                 <span class="macro">unreachable!</span>();
             }
-            <span class="ident">db::ScalarFieldType::Enum</span>(<span class="ident">enum_id</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">enum_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="kw-2">*</span><span class="ident">enum_id</span>].<span class="ident">name</span>.<span class="ident">name</span>;
-                <span class="ident">FieldType::Enum</span>(<span class="ident">enum_name</span>.<span class="ident">to_owned</span>())
+            db::ScalarFieldType::Enum(enum_id) =&gt; {
+                <span class="kw">let </span>enum_name = <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast()[<span class="kw-2">*</span>enum_id].name.name;
+                FieldType::Enum(enum_name.to_owned())
             }
-            <span class="ident">db::ScalarFieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; {
-                <span class="ident">FieldType::Unsupported</span>(<span class="ident">ast_field</span>.<span class="ident">field_type</span>.<span class="ident">as_unsupported</span>().<span class="ident">unwrap</span>().<span class="number">0</span>.<span class="ident">to_owned</span>())
+            db::ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; {
+                FieldType::Unsupported(ast_field.field_type.as_unsupported().unwrap().<span class="number">0</span>.to_owned())
             }
-            <span class="ident">db::ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">raw_native_type</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
-                    <span class="self">self</span>.<span class="ident">connector</span>
-                        .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">scalar_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">Default::default</span>())
-                        .<span class="ident">unwrap</span>()
+            db::ScalarFieldType::BuiltInScalar(scalar_type) =&gt; {
+                <span class="kw">let </span>native_type = scalar_field.raw_native_type().map(|(<span class="kw">_</span>, name, args, <span class="kw">_</span>)| {
+                    <span class="self">self</span>.connector
+                        .parse_native_type(name, args, scalar_field.ast_field().span(), <span class="kw-2">&amp;mut </span>Default::default())
+                        .unwrap()
                 });
-                <span class="ident">FieldType::Scalar</span>(
-                    <span class="ident">parser_database_scalar_type_to_dml_scalar_type</span>(<span class="kw-2">*</span><span class="ident">scalar_type</span>),
-                    <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">nt</span><span class="op">|</span> <span class="ident">dml::NativeTypeInstance</span> {
-                        <span class="ident">native_type</span>: <span class="ident">nt</span>,
-                        <span class="ident">connector</span>: <span class="self">self</span>.<span class="ident">connector</span>,
+                FieldType::Scalar(
+                    parser_database_scalar_type_to_dml_scalar_type(<span class="kw-2">*</span>scalar_type),
+                    native_type.map(|nt| dml::NativeTypeInstance {
+                        native_type: nt,
+                        connector: <span class="self">self</span>.connector,
                     }),
                 )
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">lift_composite_type_field_type</span>(
+    <span class="kw">fn </span>lift_composite_type_field_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">composite_type_field</span>: <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">scalar_field_type</span>: <span class="kw-2">&amp;</span><span class="ident">db::ScalarFieldType</span>,
-    ) -&gt; <span class="ident">CompositeTypeFieldType</span> {
-        <span class="kw">match</span> <span class="ident">scalar_field_type</span> {
-            <span class="ident">db::ScalarFieldType::CompositeType</span>(<span class="ident">ctid</span>) =&gt; {
-                <span class="ident">CompositeTypeFieldType::CompositeType</span>(<span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="kw-2">*</span><span class="ident">ctid</span>].<span class="ident">name</span>().<span class="ident">to_owned</span>())
+        composite_type_field: CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+        scalar_field_type: <span class="kw-2">&amp;</span>db::ScalarFieldType,
+    ) -&gt; CompositeTypeFieldType {
+        <span class="kw">match </span>scalar_field_type {
+            db::ScalarFieldType::CompositeType(ctid) =&gt; {
+                CompositeTypeFieldType::CompositeType(<span class="self">self</span>.db.ast()[<span class="kw-2">*</span>ctid].name().to_owned())
             }
-            <span class="ident">db::ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">composite_type_field</span>.<span class="ident">raw_native_type</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
-                    <span class="self">self</span>.<span class="ident">connector</span>
-                        .<span class="ident">parse_native_type</span>(
-                            <span class="ident">name</span>,
-                            <span class="ident">args</span>,
-                            <span class="ident">composite_type_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
-                            <span class="kw-2">&amp;mut</span> <span class="ident">Default::default</span>(),
+            db::ScalarFieldType::BuiltInScalar(scalar_type) =&gt; {
+                <span class="kw">let </span>native_type = composite_type_field.raw_native_type().map(|(<span class="kw">_</span>, name, args, <span class="kw">_</span>)| {
+                    <span class="self">self</span>.connector
+                        .parse_native_type(
+                            name,
+                            args,
+                            composite_type_field.ast_field().span(),
+                            <span class="kw-2">&amp;mut </span>Default::default(),
                         )
-                        .<span class="ident">unwrap</span>()
+                        .unwrap()
                 });
 
-                <span class="ident">CompositeTypeFieldType::Scalar</span>(
-                    <span class="ident">parser_database_scalar_type_to_dml_scalar_type</span>(<span class="kw-2">*</span><span class="ident">scalar_type</span>),
-                    <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">nt</span><span class="op">|</span> <span class="ident">dml::NativeTypeInstance</span> {
-                        <span class="ident">native_type</span>: <span class="ident">nt</span>,
-                        <span class="ident">connector</span>: <span class="self">self</span>.<span class="ident">connector</span>,
+                CompositeTypeFieldType::Scalar(
+                    parser_database_scalar_type_to_dml_scalar_type(<span class="kw-2">*</span>scalar_type),
+                    native_type.map(|nt| dml::NativeTypeInstance {
+                        native_type: nt,
+                        connector: <span class="self">self</span>.connector,
                     }),
                 )
             }
-            <span class="ident">db::ScalarFieldType::Enum</span>(<span class="ident">enum_id</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">enum_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="kw-2">*</span><span class="ident">enum_id</span>].<span class="ident">name</span>.<span class="ident">name</span>;
+            db::ScalarFieldType::Enum(enum_id) =&gt; {
+                <span class="kw">let </span>enum_name = <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast()[<span class="kw-2">*</span>enum_id].name.name;
 
-                <span class="ident">CompositeTypeFieldType::Enum</span>(<span class="ident">enum_name</span>.<span class="ident">to_owned</span>())
+                CompositeTypeFieldType::Enum(enum_name.to_owned())
             }
-            <span class="ident">db::ScalarFieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">composite_type_field</span>
-                    .<span class="ident">ast_field</span>()
-                    .<span class="ident">field_type</span>
-                    .<span class="ident">as_unsupported</span>()
-                    .<span class="ident">unwrap</span>()
-                    .<span class="number">0</span>
-                    .<span class="ident">to_owned</span>();
+            db::ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; {
+                <span class="kw">let </span>field = composite_type_field
+                    .ast_field()
+                    .field_type
+                    .as_unsupported()
+                    .unwrap()
+                    .<span class="number">0
+                    </span>.to_owned();
 
-                <span class="ident">CompositeTypeFieldType::Unsupported</span>(<span class="ident">field</span>)
+                CompositeTypeFieldType::Unsupported(field)
             }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parser_database_sort_order_to_dml_sort_order</span>(<span class="ident">sort_order</span>: <span class="ident">db::SortOrder</span>) -&gt; <span class="ident">SortOrder</span> {
-    <span class="kw">match</span> <span class="ident">sort_order</span> {
-        <span class="ident">db::SortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
-        <span class="ident">db::SortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
+<span class="kw">fn </span>parser_database_sort_order_to_dml_sort_order(sort_order: db::SortOrder) -&gt; SortOrder {
+    <span class="kw">match </span>sort_order {
+        db::SortOrder::Asc =&gt; SortOrder::Asc,
+        db::SortOrder::Desc =&gt; SortOrder::Desc,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parser_database_scalar_type_to_dml_scalar_type</span>(<span class="ident">st</span>: <span class="ident">db::ScalarType</span>) -&gt; <span class="ident">dml::ScalarType</span> {
-    <span class="ident">st</span>.<span class="ident">as_str</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+<span class="kw">fn </span>parser_database_scalar_type_to_dml_scalar_type(st: db::ScalarType) -&gt; dml::ScalarType {
+    st.as_str().parse().unwrap()
 }
 
-<span class="kw">fn</span> <span class="ident">dml_default_kind</span>(<span class="ident">default_value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>, <span class="ident">scalar_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarType</span><span class="op">&gt;</span>) -&gt; <span class="ident">DefaultKind</span> {
-    <span class="comment">// This has all been validated in parser-database, so unwrapping is always safe.</span>
-    <span class="kw">match</span> <span class="ident">default_value</span> {
-        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;dbgenerated&quot;</span> =&gt; {
-            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_dbgenerated</span>(
-                <span class="ident">args</span>.<span class="ident">arguments</span>
-                    .<span class="ident">get</span>(<span class="number">0</span>)
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">as_string_value</span>())
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">val</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">val</span>.<span class="ident">to_owned</span>())
-                    .<span class="ident">unwrap_or_else</span>(<span class="ident">String::new</span>),
+<span class="kw">fn </span>dml_default_kind(default_value: <span class="kw-2">&amp;</span>ast::Expression, scalar_type: <span class="prelude-ty">Option</span>&lt;ScalarType&gt;) -&gt; DefaultKind {
+    <span class="comment">// This has all been validated in parser-database, so unwrapping is always safe.
+    </span><span class="kw">match </span>default_value {
+        ast::Expression::Function(funcname, args, <span class="kw">_</span>) <span class="kw">if </span>funcname == <span class="string">&quot;dbgenerated&quot; </span>=&gt; {
+            DefaultKind::Expression(ValueGenerator::new_dbgenerated(
+                args.arguments
+                    .get(<span class="number">0</span>)
+                    .and_then(|arg| arg.value.as_string_value())
+                    .map(|(val, <span class="kw">_</span>)| val.to_owned())
+                    .unwrap_or_else(String::new),
             ))
         }
-        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;auto&quot;</span> =&gt; {
-            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_auto</span>())
+        ast::Expression::Function(funcname, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>funcname == <span class="string">&quot;auto&quot; </span>=&gt; {
+            DefaultKind::Expression(ValueGenerator::new_auto())
         }
-        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;autoincrement&quot;</span> =&gt; {
-            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_autoincrement</span>())
+        ast::Expression::Function(funcname, _args, <span class="kw">_</span>) <span class="kw">if </span>funcname == <span class="string">&quot;autoincrement&quot; </span>=&gt; {
+            DefaultKind::Expression(ValueGenerator::new_autoincrement())
         }
-        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;sequence&quot;</span> =&gt; {
-            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_sequence</span>(<span class="ident">Vec::new</span>()))
+        ast::Expression::Function(funcname, _args, <span class="kw">_</span>) <span class="kw">if </span>funcname == <span class="string">&quot;sequence&quot; </span>=&gt; {
+            DefaultKind::Expression(ValueGenerator::new_sequence(Vec::new()))
         }
-        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;uuid&quot;</span> =&gt; {
-            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_uuid</span>())
+        ast::Expression::Function(funcname, _args, <span class="kw">_</span>) <span class="kw">if </span>funcname == <span class="string">&quot;uuid&quot; </span>=&gt; {
+            DefaultKind::Expression(ValueGenerator::new_uuid())
         }
-        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;cuid&quot;</span> =&gt; {
-            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_cuid</span>())
+        ast::Expression::Function(funcname, _args, <span class="kw">_</span>) <span class="kw">if </span>funcname == <span class="string">&quot;cuid&quot; </span>=&gt; {
+            DefaultKind::Expression(ValueGenerator::new_cuid())
         }
-        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;now&quot;</span> =&gt; {
-            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_now</span>())
+        ast::Expression::Function(funcname, _args, <span class="kw">_</span>) <span class="kw">if </span>funcname == <span class="string">&quot;now&quot; </span>=&gt; {
+            DefaultKind::Expression(ValueGenerator::new_now())
         }
-        <span class="ident">ast::Expression::NumericValue</span>(<span class="ident">num</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">scalar_type</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Int</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::BigInt</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::BigInt</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Float</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Decimal</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-            <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
+        ast::Expression::NumericValue(num, <span class="kw">_</span>) =&gt; <span class="kw">match </span>scalar_type {
+            <span class="prelude-val">Some</span>(ScalarType::Int) =&gt; DefaultKind::Single(PrismaValue::Int(num.parse().unwrap())),
+            <span class="prelude-val">Some</span>(ScalarType::BigInt) =&gt; DefaultKind::Single(PrismaValue::BigInt(num.parse().unwrap())),
+            <span class="prelude-val">Some</span>(ScalarType::Float) =&gt; DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
+            <span class="prelude-val">Some</span>(ScalarType::Decimal) =&gt; DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
+            other =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, other),
         },
-        <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">v</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">scalar_type</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Boolean</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">v</span>.<span class="ident">to_owned</span>())),
-            <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
+        ast::Expression::ConstantValue(v, <span class="kw">_</span>) =&gt; <span class="kw">match </span>scalar_type {
+            <span class="prelude-val">Some</span>(ScalarType::Boolean) =&gt; DefaultKind::Single(PrismaValue::Boolean(v.parse().unwrap())),
+            <span class="prelude-val">None </span>=&gt; DefaultKind::Single(PrismaValue::Enum(v.to_owned())),
+            other =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, other),
         },
-        <span class="ident">ast::Expression::StringValue</span>(<span class="ident">v</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">scalar_type</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::DateTime</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::String</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Json</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Json</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Decimal</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Bytes</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Bytes</span>(<span class="ident">prisma_value::decode_bytes</span>(<span class="ident">v</span>).<span class="ident">unwrap</span>())),
-            <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
+        ast::Expression::StringValue(v, <span class="kw">_</span>) =&gt; <span class="kw">match </span>scalar_type {
+            <span class="prelude-val">Some</span>(ScalarType::DateTime) =&gt; DefaultKind::Single(PrismaValue::DateTime(v.parse().unwrap())),
+            <span class="prelude-val">Some</span>(ScalarType::String) =&gt; DefaultKind::Single(PrismaValue::String(v.parse().unwrap())),
+            <span class="prelude-val">Some</span>(ScalarType::Json) =&gt; DefaultKind::Single(PrismaValue::Json(v.parse().unwrap())),
+            <span class="prelude-val">Some</span>(ScalarType::Decimal) =&gt; DefaultKind::Single(PrismaValue::Float(v.parse().unwrap())),
+            <span class="prelude-val">Some</span>(ScalarType::Bytes) =&gt; DefaultKind::Single(PrismaValue::Bytes(prisma_value::decode_bytes(v).unwrap())),
+            other =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, other),
         },
-        <span class="ident">ast::Expression::Array</span>(<span class="ident">values</span>, <span class="kw">_</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">values</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">expr</span><span class="op">|</span> <span class="ident">dml_default_kind</span>(<span class="ident">expr</span>, <span class="ident">scalar_type</span>).<span class="ident">unwrap_single</span>())
-                .<span class="ident">collect</span>();
+        ast::Expression::Array(values, <span class="kw">_</span>) =&gt; {
+            <span class="kw">let </span>values = values
+                .iter()
+                .map(|expr| dml_default_kind(expr, scalar_type).unwrap_single())
+                .collect();
 
-            <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::List</span>(<span class="ident">values</span>))
+            DefaultKind::Single(PrismaValue::List(values))
         }
-        <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
+        other =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, other),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">convert_op_class</span>(<span class="ident">from_db</span>: <span class="ident">OperatorClassWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">OperatorClass</span> {
-    <span class="kw">match</span> <span class="ident">from_db</span>.<span class="ident">get</span>() {
-        <span class="comment">// gist</span>
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::InetOps</span>) =&gt; <span class="ident">OperatorClass::InetOps</span>,
+<span class="kw">fn </span>convert_op_class(from_db: OperatorClassWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; OperatorClass {
+    <span class="kw">match </span>from_db.get() {
+        <span class="comment">// gist
+        </span>Either::Left(db::OperatorClass::InetOps) =&gt; OperatorClass::InetOps,
 
-        <span class="comment">// gin</span>
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::JsonbOps</span>) =&gt; <span class="ident">OperatorClass::JsonbOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::JsonbPathOps</span>) =&gt; <span class="ident">OperatorClass::JsonbPathOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::ArrayOps</span>) =&gt; <span class="ident">OperatorClass::ArrayOps</span>,
+        <span class="comment">// gin
+        </span>Either::Left(db::OperatorClass::JsonbOps) =&gt; OperatorClass::JsonbOps,
+        Either::Left(db::OperatorClass::JsonbPathOps) =&gt; OperatorClass::JsonbPathOps,
+        Either::Left(db::OperatorClass::ArrayOps) =&gt; OperatorClass::ArrayOps,
 
-        <span class="comment">// sp-gist</span>
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TextOps</span>) =&gt; <span class="ident">OperatorClass::TextOps</span>,
+        <span class="comment">// sp-gist
+        </span>Either::Left(db::OperatorClass::TextOps) =&gt; OperatorClass::TextOps,
 
-        <span class="comment">// brin</span>
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::BitMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::BitMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::VarBitMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::VarBitMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::BpcharBloomOps</span>) =&gt; <span class="ident">OperatorClass::BpcharBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::BpcharMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::BpcharMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::ByteaBloomOps</span>) =&gt; <span class="ident">OperatorClass::ByteaBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::ByteaMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::ByteaMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::DateBloomOps</span>) =&gt; <span class="ident">OperatorClass::DateBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::DateMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::DateMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::DateMinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::DateMinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Float4BloomOps</span>) =&gt; <span class="ident">OperatorClass::Float4BloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Float4MinMaxOps</span>) =&gt; <span class="ident">OperatorClass::Float4MinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Float4MinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::Float4MinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Float8BloomOps</span>) =&gt; <span class="ident">OperatorClass::Float8BloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Float8MinMaxOps</span>) =&gt; <span class="ident">OperatorClass::Float8MinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Float8MinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::Float8MinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::InetInclusionOps</span>) =&gt; <span class="ident">OperatorClass::InetInclusionOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::InetBloomOps</span>) =&gt; <span class="ident">OperatorClass::InetBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::InetMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::InetMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::InetMinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::InetMinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Int2BloomOps</span>) =&gt; <span class="ident">OperatorClass::Int2BloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Int2MinMaxOps</span>) =&gt; <span class="ident">OperatorClass::Int2MinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Int2MinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::Int2MinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Int4BloomOps</span>) =&gt; <span class="ident">OperatorClass::Int4BloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Int4MinMaxOps</span>) =&gt; <span class="ident">OperatorClass::Int4MinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Int4MinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::Int4MinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Int8BloomOps</span>) =&gt; <span class="ident">OperatorClass::Int8BloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Int8MinMaxOps</span>) =&gt; <span class="ident">OperatorClass::Int8MinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::Int8MinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::Int8MinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::NumericBloomOps</span>) =&gt; <span class="ident">OperatorClass::NumericBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::NumericMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::NumericMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::NumericMinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::NumericMinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::OidBloomOps</span>) =&gt; <span class="ident">OperatorClass::OidBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::OidMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::OidMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::OidMinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::OidMinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TextBloomOps</span>) =&gt; <span class="ident">OperatorClass::TextBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TextMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::TextMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimestampBloomOps</span>) =&gt; <span class="ident">OperatorClass::TimestampBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimestampMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::TimestampMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimestampMinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::TimestampMinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimestampTzBloomOps</span>) =&gt; <span class="ident">OperatorClass::TimestampTzBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimestampTzMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::TimestampTzMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimestampTzMinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::TimestampTzMinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimeBloomOps</span>) =&gt; <span class="ident">OperatorClass::TimeBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimeMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::TimeMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimeMinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::TimeMinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimeTzBloomOps</span>) =&gt; <span class="ident">OperatorClass::TimeTzBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimeTzMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::TimeTzMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::TimeTzMinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::TimeTzMinMaxMultiOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::UuidBloomOps</span>) =&gt; <span class="ident">OperatorClass::UuidBloomOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::UuidMinMaxOps</span>) =&gt; <span class="ident">OperatorClass::UuidMinMaxOps</span>,
-        <span class="ident">Either::Left</span>(<span class="ident">db::OperatorClass::UuidMinMaxMultiOps</span>) =&gt; <span class="ident">OperatorClass::UuidMinMaxMultiOps</span>,
+        <span class="comment">// brin
+        </span>Either::Left(db::OperatorClass::BitMinMaxOps) =&gt; OperatorClass::BitMinMaxOps,
+        Either::Left(db::OperatorClass::VarBitMinMaxOps) =&gt; OperatorClass::VarBitMinMaxOps,
+        Either::Left(db::OperatorClass::BpcharBloomOps) =&gt; OperatorClass::BpcharBloomOps,
+        Either::Left(db::OperatorClass::BpcharMinMaxOps) =&gt; OperatorClass::BpcharMinMaxOps,
+        Either::Left(db::OperatorClass::ByteaBloomOps) =&gt; OperatorClass::ByteaBloomOps,
+        Either::Left(db::OperatorClass::ByteaMinMaxOps) =&gt; OperatorClass::ByteaMinMaxOps,
+        Either::Left(db::OperatorClass::DateBloomOps) =&gt; OperatorClass::DateBloomOps,
+        Either::Left(db::OperatorClass::DateMinMaxOps) =&gt; OperatorClass::DateMinMaxOps,
+        Either::Left(db::OperatorClass::DateMinMaxMultiOps) =&gt; OperatorClass::DateMinMaxMultiOps,
+        Either::Left(db::OperatorClass::Float4BloomOps) =&gt; OperatorClass::Float4BloomOps,
+        Either::Left(db::OperatorClass::Float4MinMaxOps) =&gt; OperatorClass::Float4MinMaxOps,
+        Either::Left(db::OperatorClass::Float4MinMaxMultiOps) =&gt; OperatorClass::Float4MinMaxMultiOps,
+        Either::Left(db::OperatorClass::Float8BloomOps) =&gt; OperatorClass::Float8BloomOps,
+        Either::Left(db::OperatorClass::Float8MinMaxOps) =&gt; OperatorClass::Float8MinMaxOps,
+        Either::Left(db::OperatorClass::Float8MinMaxMultiOps) =&gt; OperatorClass::Float8MinMaxMultiOps,
+        Either::Left(db::OperatorClass::InetInclusionOps) =&gt; OperatorClass::InetInclusionOps,
+        Either::Left(db::OperatorClass::InetBloomOps) =&gt; OperatorClass::InetBloomOps,
+        Either::Left(db::OperatorClass::InetMinMaxOps) =&gt; OperatorClass::InetMinMaxOps,
+        Either::Left(db::OperatorClass::InetMinMaxMultiOps) =&gt; OperatorClass::InetMinMaxMultiOps,
+        Either::Left(db::OperatorClass::Int2BloomOps) =&gt; OperatorClass::Int2BloomOps,
+        Either::Left(db::OperatorClass::Int2MinMaxOps) =&gt; OperatorClass::Int2MinMaxOps,
+        Either::Left(db::OperatorClass::Int2MinMaxMultiOps) =&gt; OperatorClass::Int2MinMaxMultiOps,
+        Either::Left(db::OperatorClass::Int4BloomOps) =&gt; OperatorClass::Int4BloomOps,
+        Either::Left(db::OperatorClass::Int4MinMaxOps) =&gt; OperatorClass::Int4MinMaxOps,
+        Either::Left(db::OperatorClass::Int4MinMaxMultiOps) =&gt; OperatorClass::Int4MinMaxMultiOps,
+        Either::Left(db::OperatorClass::Int8BloomOps) =&gt; OperatorClass::Int8BloomOps,
+        Either::Left(db::OperatorClass::Int8MinMaxOps) =&gt; OperatorClass::Int8MinMaxOps,
+        Either::Left(db::OperatorClass::Int8MinMaxMultiOps) =&gt; OperatorClass::Int8MinMaxMultiOps,
+        Either::Left(db::OperatorClass::NumericBloomOps) =&gt; OperatorClass::NumericBloomOps,
+        Either::Left(db::OperatorClass::NumericMinMaxOps) =&gt; OperatorClass::NumericMinMaxOps,
+        Either::Left(db::OperatorClass::NumericMinMaxMultiOps) =&gt; OperatorClass::NumericMinMaxMultiOps,
+        Either::Left(db::OperatorClass::OidBloomOps) =&gt; OperatorClass::OidBloomOps,
+        Either::Left(db::OperatorClass::OidMinMaxOps) =&gt; OperatorClass::OidMinMaxOps,
+        Either::Left(db::OperatorClass::OidMinMaxMultiOps) =&gt; OperatorClass::OidMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TextBloomOps) =&gt; OperatorClass::TextBloomOps,
+        Either::Left(db::OperatorClass::TextMinMaxOps) =&gt; OperatorClass::TextMinMaxOps,
+        Either::Left(db::OperatorClass::TimestampBloomOps) =&gt; OperatorClass::TimestampBloomOps,
+        Either::Left(db::OperatorClass::TimestampMinMaxOps) =&gt; OperatorClass::TimestampMinMaxOps,
+        Either::Left(db::OperatorClass::TimestampMinMaxMultiOps) =&gt; OperatorClass::TimestampMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TimestampTzBloomOps) =&gt; OperatorClass::TimestampTzBloomOps,
+        Either::Left(db::OperatorClass::TimestampTzMinMaxOps) =&gt; OperatorClass::TimestampTzMinMaxOps,
+        Either::Left(db::OperatorClass::TimestampTzMinMaxMultiOps) =&gt; OperatorClass::TimestampTzMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TimeBloomOps) =&gt; OperatorClass::TimeBloomOps,
+        Either::Left(db::OperatorClass::TimeMinMaxOps) =&gt; OperatorClass::TimeMinMaxOps,
+        Either::Left(db::OperatorClass::TimeMinMaxMultiOps) =&gt; OperatorClass::TimeMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TimeTzBloomOps) =&gt; OperatorClass::TimeTzBloomOps,
+        Either::Left(db::OperatorClass::TimeTzMinMaxOps) =&gt; OperatorClass::TimeTzMinMaxOps,
+        Either::Left(db::OperatorClass::TimeTzMinMaxMultiOps) =&gt; OperatorClass::TimeTzMinMaxMultiOps,
+        Either::Left(db::OperatorClass::UuidBloomOps) =&gt; OperatorClass::UuidBloomOps,
+        Either::Left(db::OperatorClass::UuidMinMaxOps) =&gt; OperatorClass::UuidMinMaxOps,
+        Either::Left(db::OperatorClass::UuidMinMaxMultiOps) =&gt; OperatorClass::UuidMinMaxMultiOps,
 
-        <span class="ident">Either::Right</span>(<span class="ident">raw</span>) =&gt; <span class="ident">OperatorClass::Raw</span>(<span class="ident">raw</span>.<span class="ident">to_string</span>().<span class="ident">into</span>()),
+        Either::Right(raw) =&gt; OperatorClass::Raw(raw.to_string().into()),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

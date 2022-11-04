@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/proto/streams/counts.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>counts.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../h2/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/proto/streams/counts.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>counts.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../h2/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -208,215 +208,215 @@
 <span id="208">208</span>
 <span id="209">209</span>
 <span id="210">210</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">std::usize</span>;
+<span class="kw">use </span>std::usize;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Counts</span> {
-    <span class="doccomment">/// Acting as a client or server. This allows us to track which values to</span>
-    <span class="doccomment">/// inc / dec.</span>
-    <span class="ident">peer</span>: <span class="ident">peer::Dyn</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Counts {
+    <span class="doccomment">/// Acting as a client or server. This allows us to track which values to
+    /// inc / dec.
+    </span>peer: peer::Dyn,
 
-    <span class="doccomment">/// Maximum number of locally initiated streams</span>
-    <span class="ident">max_send_streams</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Maximum number of locally initiated streams
+    </span>max_send_streams: usize,
 
-    <span class="doccomment">/// Current number of remote initiated streams</span>
-    <span class="ident">num_send_streams</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Current number of remote initiated streams
+    </span>num_send_streams: usize,
 
-    <span class="doccomment">/// Maximum number of remote initiated streams</span>
-    <span class="ident">max_recv_streams</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Maximum number of remote initiated streams
+    </span>max_recv_streams: usize,
 
-    <span class="doccomment">/// Current number of locally initiated streams</span>
-    <span class="ident">num_recv_streams</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Current number of locally initiated streams
+    </span>num_recv_streams: usize,
 
-    <span class="doccomment">/// Maximum number of pending locally reset streams</span>
-    <span class="ident">max_reset_streams</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Maximum number of pending locally reset streams
+    </span>max_reset_streams: usize,
 
-    <span class="doccomment">/// Current number of pending locally reset streams</span>
-    <span class="ident">num_reset_streams</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Current number of pending locally reset streams
+    </span>num_reset_streams: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Counts</span> {
-    <span class="doccomment">/// Create a new `Counts` using the provided configuration values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">peer</span>: <span class="ident">peer::Dyn</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Counts</span> {
-            <span class="ident">peer</span>,
-            <span class="ident">max_send_streams</span>: <span class="ident">config</span>.<span class="ident">initial_max_send_streams</span>,
-            <span class="ident">num_send_streams</span>: <span class="number">0</span>,
-            <span class="ident">max_recv_streams</span>: <span class="ident">config</span>.<span class="ident">remote_max_initiated</span>.<span class="ident">unwrap_or</span>(<span class="ident">usize::MAX</span>),
-            <span class="ident">num_recv_streams</span>: <span class="number">0</span>,
-            <span class="ident">max_reset_streams</span>: <span class="ident">config</span>.<span class="ident">local_reset_max</span>,
-            <span class="ident">num_reset_streams</span>: <span class="number">0</span>,
+<span class="kw">impl </span>Counts {
+    <span class="doccomment">/// Create a new `Counts` using the provided configuration values.
+    </span><span class="kw">pub fn </span>new(peer: peer::Dyn, config: <span class="kw-2">&amp;</span>Config) -&gt; <span class="self">Self </span>{
+        Counts {
+            peer,
+            max_send_streams: config.initial_max_send_streams,
+            num_send_streams: <span class="number">0</span>,
+            max_recv_streams: config.remote_max_initiated.unwrap_or(usize::MAX),
+            num_recv_streams: <span class="number">0</span>,
+            max_reset_streams: config.local_reset_max,
+            num_reset_streams: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Returns the current peer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">peer::Dyn</span> {
-        <span class="self">self</span>.<span class="ident">peer</span>
+    <span class="doccomment">/// Returns the current peer
+    </span><span class="kw">pub fn </span>peer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; peer::Dyn {
+        <span class="self">self</span>.peer
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_streams</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">num_send_streams</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">num_recv_streams</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub fn </span>has_streams(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.num_send_streams != <span class="number">0 </span>|| <span class="self">self</span>.num_recv_streams != <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns true if the receive stream concurrency can be incremented
+    </span><span class="kw">pub fn </span>can_inc_num_recv_streams(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.max_recv_streams &gt; <span class="self">self</span>.num_recv_streams
     }
 
-    <span class="doccomment">/// Returns true if the receive stream concurrency can be incremented</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_inc_num_recv_streams</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">max_recv_streams</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">num_recv_streams</span>
+    <span class="doccomment">/// Increments the number of concurrent receive streams.
+    ///
+    /// # Panics
+    ///
+    /// Panics on failure as this should have been validated before hand.
+    </span><span class="kw">pub fn </span>inc_num_recv_streams(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr) {
+        <span class="macro">assert!</span>(<span class="self">self</span>.can_inc_num_recv_streams());
+        <span class="macro">assert!</span>(!stream.is_counted);
+
+        <span class="comment">// Increment the number of remote initiated streams
+        </span><span class="self">self</span>.num_recv_streams += <span class="number">1</span>;
+        stream.is_counted = <span class="bool-val">true</span>;
     }
 
-    <span class="doccomment">/// Increments the number of concurrent receive streams.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics on failure as this should have been validated before hand.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inc_num_recv_streams</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>) {
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">can_inc_num_recv_streams</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">stream</span>.<span class="ident">is_counted</span>);
-
-        <span class="comment">// Increment the number of remote initiated streams</span>
-        <span class="self">self</span>.<span class="ident">num_recv_streams</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">stream</span>.<span class="ident">is_counted</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Returns true if the send stream concurrency can be incremented
+    </span><span class="kw">pub fn </span>can_inc_num_send_streams(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.max_send_streams &gt; <span class="self">self</span>.num_send_streams
     }
 
-    <span class="doccomment">/// Returns true if the send stream concurrency can be incremented</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_inc_num_send_streams</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">max_send_streams</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">num_send_streams</span>
+    <span class="doccomment">/// Increments the number of concurrent send streams.
+    ///
+    /// # Panics
+    ///
+    /// Panics on failure as this should have been validated before hand.
+    </span><span class="kw">pub fn </span>inc_num_send_streams(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr) {
+        <span class="macro">assert!</span>(<span class="self">self</span>.can_inc_num_send_streams());
+        <span class="macro">assert!</span>(!stream.is_counted);
+
+        <span class="comment">// Increment the number of remote initiated streams
+        </span><span class="self">self</span>.num_send_streams += <span class="number">1</span>;
+        stream.is_counted = <span class="bool-val">true</span>;
     }
 
-    <span class="doccomment">/// Increments the number of concurrent send streams.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics on failure as this should have been validated before hand.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inc_num_send_streams</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>) {
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">can_inc_num_send_streams</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">stream</span>.<span class="ident">is_counted</span>);
-
-        <span class="comment">// Increment the number of remote initiated streams</span>
-        <span class="self">self</span>.<span class="ident">num_send_streams</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">stream</span>.<span class="ident">is_counted</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Returns true if the number of pending reset streams can be incremented.
+    </span><span class="kw">pub fn </span>can_inc_num_reset_streams(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.max_reset_streams &gt; <span class="self">self</span>.num_reset_streams
     }
 
-    <span class="doccomment">/// Returns true if the number of pending reset streams can be incremented.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_inc_num_reset_streams</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">max_reset_streams</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">num_reset_streams</span>
+    <span class="doccomment">/// Increments the number of pending reset streams.
+    ///
+    /// # Panics
+    ///
+    /// Panics on failure as this should have been validated before hand.
+    </span><span class="kw">pub fn </span>inc_num_reset_streams(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="macro">assert!</span>(<span class="self">self</span>.can_inc_num_reset_streams());
+
+        <span class="self">self</span>.num_reset_streams += <span class="number">1</span>;
     }
 
-    <span class="doccomment">/// Increments the number of pending reset streams.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics on failure as this should have been validated before hand.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inc_num_reset_streams</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">can_inc_num_reset_streams</span>());
-
-        <span class="self">self</span>.<span class="ident">num_reset_streams</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_remote_settings</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">settings</span>: <span class="kw-2">&amp;</span><span class="ident">frame::Settings</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">settings</span>.<span class="ident">max_concurrent_streams</span>() {
-            <span class="self">self</span>.<span class="ident">max_send_streams</span> <span class="op">=</span> <span class="ident">val</span> <span class="kw">as</span> <span class="ident">usize</span>;
+    <span class="kw">pub fn </span>apply_remote_settings(<span class="kw-2">&amp;mut </span><span class="self">self</span>, settings: <span class="kw-2">&amp;</span>frame::Settings) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = settings.max_concurrent_streams() {
+            <span class="self">self</span>.max_send_streams = val <span class="kw">as </span>usize;
         }
     }
 
-    <span class="doccomment">/// Run a block of code that could potentially transition a stream&#39;s state.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the stream state transitions to closed, this function will perform</span>
-    <span class="doccomment">/// all necessary cleanup.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// TODO: Is this function still needed?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transition</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">stream</span>: <span class="ident">store::Ptr</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">U</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="self">Self</span>, <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>) -&gt; <span class="ident">U</span>,
+    <span class="doccomment">/// Run a block of code that could potentially transition a stream&#39;s state.
+    ///
+    /// If the stream state transitions to closed, this function will perform
+    /// all necessary cleanup.
+    ///
+    /// TODO: Is this function still needed?
+    </span><span class="kw">pub fn </span>transition&lt;F, U&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>stream: store::Ptr, f: F) -&gt; U
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>, <span class="kw-2">&amp;mut </span>store::Ptr) -&gt; U,
     {
-        <span class="comment">// TODO: Does this need to be computed before performing the action?</span>
-        <span class="kw">let</span> <span class="ident">is_pending_reset</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">is_pending_reset_expiration</span>();
+        <span class="comment">// TODO: Does this need to be computed before performing the action?
+        </span><span class="kw">let </span>is_pending_reset = stream.is_pending_reset_expiration();
 
-        <span class="comment">// Run the action</span>
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">f</span>(<span class="self">self</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stream</span>);
+        <span class="comment">// Run the action
+        </span><span class="kw">let </span>ret = f(<span class="self">self</span>, <span class="kw-2">&amp;mut </span>stream);
 
-        <span class="self">self</span>.<span class="ident">transition_after</span>(<span class="ident">stream</span>, <span class="ident">is_pending_reset</span>);
+        <span class="self">self</span>.transition_after(stream, is_pending_reset);
 
-        <span class="ident">ret</span>
+        ret
     }
 
-    <span class="comment">// TODO: move this to macro?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transition_after</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">stream</span>: <span class="ident">store::Ptr</span>, <span class="ident">is_reset_counted</span>: <span class="ident">bool</span>) {
+    <span class="comment">// TODO: move this to macro?
+    </span><span class="kw">pub fn </span>transition_after(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>stream: store::Ptr, is_reset_counted: bool) {
         <span class="macro">tracing::trace!</span>(
             <span class="string">&quot;transition_after; stream={:?}; state={:?}; is_closed={:?}; \
              pending_send_empty={:?}; buffered_send_data={}; \
              num_recv={}; num_send={}&quot;</span>,
-            <span class="ident">stream</span>.<span class="ident">id</span>,
-            <span class="ident">stream</span>.<span class="ident">state</span>,
-            <span class="ident">stream</span>.<span class="ident">is_closed</span>(),
-            <span class="ident">stream</span>.<span class="ident">pending_send</span>.<span class="ident">is_empty</span>(),
-            <span class="ident">stream</span>.<span class="ident">buffered_send_data</span>,
-            <span class="self">self</span>.<span class="ident">num_recv_streams</span>,
-            <span class="self">self</span>.<span class="ident">num_send_streams</span>
+            stream.id,
+            stream.state,
+            stream.is_closed(),
+            stream.pending_send.is_empty(),
+            stream.buffered_send_data,
+            <span class="self">self</span>.num_recv_streams,
+            <span class="self">self</span>.num_send_streams
         );
 
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">is_closed</span>() {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">stream</span>.<span class="ident">is_pending_reset_expiration</span>() {
-                <span class="ident">stream</span>.<span class="ident">unlink</span>();
-                <span class="kw">if</span> <span class="ident">is_reset_counted</span> {
-                    <span class="self">self</span>.<span class="ident">dec_num_reset_streams</span>();
+        <span class="kw">if </span>stream.is_closed() {
+            <span class="kw">if </span>!stream.is_pending_reset_expiration() {
+                stream.unlink();
+                <span class="kw">if </span>is_reset_counted {
+                    <span class="self">self</span>.dec_num_reset_streams();
                 }
             }
 
-            <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">is_counted</span> {
-                <span class="macro">tracing::trace!</span>(<span class="string">&quot;dec_num_streams; stream={:?}&quot;</span>, <span class="ident">stream</span>.<span class="ident">id</span>);
-                <span class="comment">// Decrement the number of active streams.</span>
-                <span class="self">self</span>.<span class="ident">dec_num_streams</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stream</span>);
+            <span class="kw">if </span>stream.is_counted {
+                <span class="macro">tracing::trace!</span>(<span class="string">&quot;dec_num_streams; stream={:?}&quot;</span>, stream.id);
+                <span class="comment">// Decrement the number of active streams.
+                </span><span class="self">self</span>.dec_num_streams(<span class="kw-2">&amp;mut </span>stream);
             }
         }
 
-        <span class="comment">// Release the stream if it requires releasing</span>
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">is_released</span>() {
-            <span class="ident">stream</span>.<span class="ident">remove</span>();
+        <span class="comment">// Release the stream if it requires releasing
+        </span><span class="kw">if </span>stream.is_released() {
+            stream.remove();
         }
     }
 
-    <span class="doccomment">/// Returns the maximum number of streams that can be initiated by this</span>
-    <span class="doccomment">/// peer.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">max_send_streams</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">max_send_streams</span>
+    <span class="doccomment">/// Returns the maximum number of streams that can be initiated by this
+    /// peer.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>max_send_streams(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.max_send_streams
     }
 
-    <span class="doccomment">/// Returns the maximum number of streams that can be initiated by the</span>
-    <span class="doccomment">/// remote peer.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">max_recv_streams</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">max_recv_streams</span>
+    <span class="doccomment">/// Returns the maximum number of streams that can be initiated by the
+    /// remote peer.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>max_recv_streams(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.max_recv_streams
     }
 
-    <span class="kw">fn</span> <span class="ident">dec_num_streams</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>) {
-        <span class="macro">assert!</span>(<span class="ident">stream</span>.<span class="ident">is_counted</span>);
+    <span class="kw">fn </span>dec_num_streams(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr) {
+        <span class="macro">assert!</span>(stream.is_counted);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">peer</span>.<span class="ident">is_local_init</span>(<span class="ident">stream</span>.<span class="ident">id</span>) {
-            <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">num_send_streams</span> <span class="op">&gt;</span> <span class="number">0</span>);
-            <span class="self">self</span>.<span class="ident">num_send_streams</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">stream</span>.<span class="ident">is_counted</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        } <span class="kw">else</span> {
-            <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">num_recv_streams</span> <span class="op">&gt;</span> <span class="number">0</span>);
-            <span class="self">self</span>.<span class="ident">num_recv_streams</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">stream</span>.<span class="ident">is_counted</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span><span class="self">self</span>.peer.is_local_init(stream.id) {
+            <span class="macro">assert!</span>(<span class="self">self</span>.num_send_streams &gt; <span class="number">0</span>);
+            <span class="self">self</span>.num_send_streams -= <span class="number">1</span>;
+            stream.is_counted = <span class="bool-val">false</span>;
+        } <span class="kw">else </span>{
+            <span class="macro">assert!</span>(<span class="self">self</span>.num_recv_streams &gt; <span class="number">0</span>);
+            <span class="self">self</span>.num_recv_streams -= <span class="number">1</span>;
+            stream.is_counted = <span class="bool-val">false</span>;
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">dec_num_reset_streams</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">num_reset_streams</span> <span class="op">&gt;</span> <span class="number">0</span>);
-        <span class="self">self</span>.<span class="ident">num_reset_streams</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">fn </span>dec_num_reset_streams(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="macro">assert!</span>(<span class="self">self</span>.num_reset_streams &gt; <span class="number">0</span>);
+        <span class="self">self</span>.num_reset_streams -= <span class="number">1</span>;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Counts</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">use</span> <span class="ident">std::thread</span>;
+<span class="kw">impl </span>Drop <span class="kw">for </span>Counts {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">use </span>std::thread;
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">thread::panicking</span>() {
-            <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">has_streams</span>());
+        <span class="kw">if </span>!thread::panicking() {
+            <span class="macro">debug_assert!</span>(!<span class="self">self</span>.has_streams());
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

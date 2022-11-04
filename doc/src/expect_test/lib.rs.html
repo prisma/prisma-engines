@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/expect-test-1.4.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../expect_test/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../expect_test/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../expect_test/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/expect-test-1.4.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../expect_test/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../expect_test/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../expect_test/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -875,160 +875,160 @@
 <span id="875">875</span>
 <span id="876">876</span>
 <span id="877">877</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Minimalistic snapshot testing for Rust.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Introduction</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `expect_test` is a small addition over plain `assert_eq!` testing approach,</span>
-<span class="doccomment">//! which allows to automatically update tests results.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The core of the library is the `expect!` macro. It can be though of as a</span>
-<span class="doccomment">//! super-charged string literal, which can update itself.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Let&#39;s see an example:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use expect_test::expect;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let actual = 2 + 2;</span>
-<span class="doccomment">//! let expected = expect![&quot;5&quot;]; // or expect![[&quot;5&quot;]]</span>
-<span class="doccomment">//! expected.assert_eq(&amp;actual.to_string())</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Running this code will produce a test failure, as `&quot;5&quot;` is indeed not equal</span>
-<span class="doccomment">//! to `&quot;4&quot;`. Running the test with `UPDATE_EXPECT=1` env variable however would</span>
-<span class="doccomment">//! &quot;magically&quot; update the code to:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # use expect_test::expect;</span>
-<span class="doccomment">//! let actual = 2 + 2;</span>
-<span class="doccomment">//! let expected = expect![&quot;4&quot;];</span>
-<span class="doccomment">//! expected.assert_eq(&amp;actual.to_string())</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This becomes very useful when you have a lot of tests with verbose and</span>
-<span class="doccomment">//! potentially changing expected output.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Under the hood, the `expect!` macro uses `file!`, `line!` and `column!` to</span>
-<span class="doccomment">//! record source position at compile time. At runtime, this position is used</span>
-<span class="doccomment">//! to patch the file in-place, if `UPDATE_EXPECT` is set.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Guide</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `expect!` returns an instance of `Expect` struct, which holds position</span>
-<span class="doccomment">//! information and a string literal. Use `Expect::assert_eq` for string</span>
-<span class="doccomment">//! comparison. Use `Expect::assert_debug_eq` for verbose debug comparison. Note</span>
-<span class="doccomment">//! that leading indentation is automatically removed.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use expect_test::expect;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Debug)]</span>
-<span class="doccomment">//! struct Foo {</span>
-<span class="doccomment">//!     value: i32,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let actual = Foo { value: 92 };</span>
-<span class="doccomment">//! let expected = expect![[&quot;</span>
-<span class="doccomment">//!     Foo {</span>
-<span class="doccomment">//!         value: 92,</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! &quot;]];</span>
-<span class="doccomment">//! expected.assert_debug_eq(&amp;actual);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Be careful with `assert_debug_eq` - in general, stability of the debug</span>
-<span class="doccomment">//! representation is not guaranteed. However, even if it changes, you can</span>
-<span class="doccomment">//! quickly update all the tests by running the test suite with `UPDATE_EXPECT`</span>
-<span class="doccomment">//! environmental variable set.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If the expected data is too verbose to include inline, you can store it in</span>
-<span class="doccomment">//! an external file using the `expect_file!` macro:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use expect_test::expect_file;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let actual = 42;</span>
-<span class="doccomment">//! let expected = expect_file![&quot;./the-answer.txt&quot;];</span>
-<span class="doccomment">//! expected.assert_eq(&amp;actual.to_string());</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! File path is relative to the current file.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Suggested Workflows</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! I like to use data-driven tests with `expect_test`. I usually define a</span>
-<span class="doccomment">//! single driver function `check` and then call it from individual tests:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use expect_test::{expect, Expect};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn check(actual: i32, expect: Expect) {</span>
-<span class="doccomment">//!     let actual = actual.to_string();</span>
-<span class="doccomment">//!     expect.assert_eq(&amp;actual);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[test]</span>
-<span class="doccomment">//! fn test_addition() {</span>
-<span class="doccomment">//!     check(90 + 2, expect![[&quot;92&quot;]]);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[test]</span>
-<span class="doccomment">//! fn test_multiplication() {</span>
-<span class="doccomment">//!     check(46 * 2, expect![[&quot;92&quot;]]);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Each test&#39;s body is a single call to `check`. All the variation in tests</span>
-<span class="doccomment">//! comes from the input data.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! When writing a new test, I usually copy-paste an old one, leave the `expect`</span>
-<span class="doccomment">//! blank and use `UPDATE_EXPECT` to fill the value for me:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use expect_test::{expect, Expect};</span>
-<span class="doccomment">//! # fn check(_: i32, _: Expect) {}</span>
-<span class="doccomment">//! #[test]</span>
-<span class="doccomment">//! fn test_division() {</span>
-<span class="doccomment">//!     check(92 / 2, expect![[]])</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See</span>
-<span class="doccomment">//! https://blog.janestreet.com/using-ascii-waveforms-to-test-hardware-designs/</span>
-<span class="doccomment">//! for a cool example of snapshot testing in the wild!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Alternatives</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [insta](https://crates.io/crates/insta) - a more feature full snapshot</span>
-<span class="doccomment">//!   testing library.</span>
-<span class="doccomment">//! * [k9](https://crates.io/crates/k9) - a testing library which includes</span>
-<span class="doccomment">//!   support for snapshot testing among other things.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Maintenance status</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The main customer of this library is rust-analyzer. The library is  stable,</span>
-<span class="doccomment">//! it is planned to not release any major versions past 1.0.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Minimal Supported Rust Version</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate&#39;s minimum supported `rustc` version is `1.45.0`. MSRV is updated</span>
-<span class="doccomment">//! conservatively, supporting roughly 10 minor versions of `rustc`. MSRV bump</span>
-<span class="doccomment">//! is not considered semver breaking, but will require at least minor version</span>
-<span class="doccomment">//! bump.</span>
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::HashMap</span>,
-    <span class="ident">convert::TryInto</span>,
-    <span class="ident">env</span>, <span class="ident">fmt</span>, <span class="ident">fs</span>, <span class="ident">mem</span>,
-    <span class="ident">ops::Range</span>,
-    <span class="ident">panic</span>,
-    <span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
-    <span class="ident">sync::Mutex</span>,
+</pre><pre class="rust"><code><span class="doccomment">//! Minimalistic snapshot testing for Rust.
+//!
+//! # Introduction
+//!
+//! `expect_test` is a small addition over plain `assert_eq!` testing approach,
+//! which allows to automatically update tests results.
+//!
+//! The core of the library is the `expect!` macro. It can be though of as a
+//! super-charged string literal, which can update itself.
+//!
+//! Let&#39;s see an example:
+//!
+//! ```no_run
+//! use expect_test::expect;
+//!
+//! let actual = 2 + 2;
+//! let expected = expect![&quot;5&quot;]; // or expect![[&quot;5&quot;]]
+//! expected.assert_eq(&amp;actual.to_string())
+//! ```
+//!
+//! Running this code will produce a test failure, as `&quot;5&quot;` is indeed not equal
+//! to `&quot;4&quot;`. Running the test with `UPDATE_EXPECT=1` env variable however would
+//! &quot;magically&quot; update the code to:
+//!
+//! ```no_run
+//! # use expect_test::expect;
+//! let actual = 2 + 2;
+//! let expected = expect![&quot;4&quot;];
+//! expected.assert_eq(&amp;actual.to_string())
+//! ```
+//!
+//! This becomes very useful when you have a lot of tests with verbose and
+//! potentially changing expected output.
+//!
+//! Under the hood, the `expect!` macro uses `file!`, `line!` and `column!` to
+//! record source position at compile time. At runtime, this position is used
+//! to patch the file in-place, if `UPDATE_EXPECT` is set.
+//!
+//! # Guide
+//!
+//! `expect!` returns an instance of `Expect` struct, which holds position
+//! information and a string literal. Use `Expect::assert_eq` for string
+//! comparison. Use `Expect::assert_debug_eq` for verbose debug comparison. Note
+//! that leading indentation is automatically removed.
+//!
+//! ```
+//! use expect_test::expect;
+//!
+//! #[derive(Debug)]
+//! struct Foo {
+//!     value: i32,
+//! }
+//!
+//! let actual = Foo { value: 92 };
+//! let expected = expect![[&quot;
+//!     Foo {
+//!         value: 92,
+//!     }
+//! &quot;]];
+//! expected.assert_debug_eq(&amp;actual);
+//! ```
+//!
+//! Be careful with `assert_debug_eq` - in general, stability of the debug
+//! representation is not guaranteed. However, even if it changes, you can
+//! quickly update all the tests by running the test suite with `UPDATE_EXPECT`
+//! environmental variable set.
+//!
+//! If the expected data is too verbose to include inline, you can store it in
+//! an external file using the `expect_file!` macro:
+//!
+//! ```no_run
+//! use expect_test::expect_file;
+//!
+//! let actual = 42;
+//! let expected = expect_file![&quot;./the-answer.txt&quot;];
+//! expected.assert_eq(&amp;actual.to_string());
+//! ```
+//!
+//! File path is relative to the current file.
+//!
+//! # Suggested Workflows
+//!
+//! I like to use data-driven tests with `expect_test`. I usually define a
+//! single driver function `check` and then call it from individual tests:
+//!
+//! ```
+//! use expect_test::{expect, Expect};
+//!
+//! fn check(actual: i32, expect: Expect) {
+//!     let actual = actual.to_string();
+//!     expect.assert_eq(&amp;actual);
+//! }
+//!
+//! #[test]
+//! fn test_addition() {
+//!     check(90 + 2, expect![[&quot;92&quot;]]);
+//! }
+//!
+//! #[test]
+//! fn test_multiplication() {
+//!     check(46 * 2, expect![[&quot;92&quot;]]);
+//! }
+//! ```
+//!
+//! Each test&#39;s body is a single call to `check`. All the variation in tests
+//! comes from the input data.
+//!
+//! When writing a new test, I usually copy-paste an old one, leave the `expect`
+//! blank and use `UPDATE_EXPECT` to fill the value for me:
+//!
+//! ```
+//! # use expect_test::{expect, Expect};
+//! # fn check(_: i32, _: Expect) {}
+//! #[test]
+//! fn test_division() {
+//!     check(92 / 2, expect![[]])
+//! }
+//! ```
+//!
+//! See
+//! https://blog.janestreet.com/using-ascii-waveforms-to-test-hardware-designs/
+//! for a cool example of snapshot testing in the wild!
+//!
+//! # Alternatives
+//!
+//! * [insta](https://crates.io/crates/insta) - a more feature full snapshot
+//!   testing library.
+//! * [k9](https://crates.io/crates/k9) - a testing library which includes
+//!   support for snapshot testing among other things.
+//!
+//! # Maintenance status
+//!
+//! The main customer of this library is rust-analyzer. The library is  stable,
+//! it is planned to not release any major versions past 1.0.
+//!
+//! ## Minimal Supported Rust Version
+//!
+//! This crate&#39;s minimum supported `rustc` version is `1.45.0`. MSRV is updated
+//! conservatively, supporting roughly 10 minor versions of `rustc`. MSRV bump
+//! is not considered semver breaking, but will require at least minor version
+//! bump.
+</span><span class="kw">use </span>std::{
+    collections::HashMap,
+    convert::TryInto,
+    env, fmt, fs, mem,
+    ops::Range,
+    panic,
+    path::{Path, PathBuf},
+    sync::Mutex,
 };
 
-<span class="kw">use</span> <span class="ident">once_cell::sync</span>::{<span class="ident">Lazy</span>, <span class="ident">OnceCell</span>};
+<span class="kw">use </span>once_cell::sync::{Lazy, OnceCell};
 
-<span class="kw">const</span> <span class="ident">HELP</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;
+<span class="kw">const </span>HELP: <span class="kw-2">&amp;</span>str = <span class="string">&quot;
 You can update all `expect!` tests by running:
 
     env UPDATE_EXPECT=1 cargo test
@@ -1036,115 +1036,115 @@ You can update all `expect!` tests by running:
 To update a single test, place the cursor on `expect` token and use `run` feature of rust-analyzer.
 &quot;</span>;
 
-<span class="kw">fn</span> <span class="ident">update_expect</span>() -&gt; <span class="ident">bool</span> {
-    <span class="ident">env::var</span>(<span class="string">&quot;UPDATE_EXPECT&quot;</span>).<span class="ident">is_ok</span>()
+<span class="kw">fn </span>update_expect() -&gt; bool {
+    env::var(<span class="string">&quot;UPDATE_EXPECT&quot;</span>).is_ok()
 }
 
-<span class="doccomment">/// Creates an instance of `Expect` from string literal:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use expect_test::expect;</span>
-<span class="doccomment">/// expect![[&quot;</span>
-<span class="doccomment">///     Foo { value: 92 }</span>
-<span class="doccomment">/// &quot;]];</span>
-<span class="doccomment">/// expect![r#&quot;{&quot;Foo&quot;: 92}&quot;#];</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Leading indentation is stripped.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">expect</span> {
-    [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">data</span>:<span class="ident">literal</span>] =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::expect!</span>[[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">data</span>]] };
-    [[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">data</span>:<span class="ident">literal</span>]] =&gt; {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Expect</span> {
-        <span class="ident">position</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Position</span> {
-            <span class="ident">file</span>: <span class="macro">file!</span>(),
-            <span class="ident">line</span>: <span class="macro">line!</span>(),
-            <span class="ident">column</span>: <span class="macro">column!</span>(),
+<span class="doccomment">/// Creates an instance of `Expect` from string literal:
+///
+/// ```
+/// # use expect_test::expect;
+/// expect![[&quot;
+///     Foo { value: 92 }
+/// &quot;]];
+/// expect![r#&quot;{&quot;Foo&quot;: 92}&quot;#];
+/// ```
+///
+/// Leading indentation is stripped.
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>expect {
+    [<span class="macro-nonterminal">$data</span>:literal] =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::expect!</span>[[<span class="macro-nonterminal">$data</span>]] };
+    [[<span class="macro-nonterminal">$data</span>:literal]] =&gt; {<span class="macro-nonterminal">$crate::Expect </span>{
+        position: <span class="macro-nonterminal">$crate::Position </span>{
+            file: <span class="macro">file!</span>(),
+            line: <span class="macro">line!</span>(),
+            column: <span class="macro">column!</span>(),
         },
-        <span class="ident">data</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">data</span>,
-        <span class="ident">indent</span>: <span class="bool-val">true</span>,
+        data: <span class="macro-nonterminal">$data</span>,
+        indent: <span class="bool-val">true</span>,
     }};
     [] =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::expect!</span>[[<span class="string">&quot;&quot;</span>]] };
     [[]] =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::expect!</span>[[<span class="string">&quot;&quot;</span>]] };
 }
 
-<span class="doccomment">/// Creates an instance of `ExpectFile` from relative or absolute path:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use expect_test::expect_file;</span>
-<span class="doccomment">/// expect_file![&quot;./test_data/bar.html&quot;];</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="macro-nonterminal">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">expect_file</span> {
-    [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>:<span class="ident">expr</span>] =&gt; {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::ExpectFile</span> {
-        <span class="ident">path</span>: <span class="ident">std::path::PathBuf::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>),
-        <span class="ident">position</span>: <span class="macro">file!</span>(),
+<span class="doccomment">/// Creates an instance of `ExpectFile` from relative or absolute path:
+///
+/// ```
+/// # use expect_test::expect_file;
+/// expect_file![&quot;./test_data/bar.html&quot;];
+/// ```
+</span><span class="attribute">#[<span class="macro-nonterminal">macro_export</span>]
+</span><span class="macro">macro_rules! </span>expect_file {
+    [<span class="macro-nonterminal">$path</span>:expr] =&gt; {<span class="macro-nonterminal">$crate::ExpectFile </span>{
+        path: std::path::PathBuf::from(<span class="macro-nonterminal">$path</span>),
+        position: <span class="macro">file!</span>(),
     }};
 }
 
-<span class="doccomment">/// Self-updating string literal.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Expect</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Position</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">indent</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Self-updating string literal.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Expect {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>position: Position,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>indent: bool,
 }
 
-<span class="doccomment">/// Self-updating file.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExpectFile</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">PathBuf</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+<span class="doccomment">/// Self-updating file.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ExpectFile {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>path: PathBuf,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>position: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
 }
 
-<span class="doccomment">/// Position of original `expect!` in the source file.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Position</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">line</span>: <span class="ident">u32</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">column</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// Position of original `expect!` in the source file.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Position {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>line: u32,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>column: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Position</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}:{}:{}&quot;</span>, <span class="self">self</span>.<span class="ident">file</span>, <span class="self">self</span>.<span class="ident">line</span>, <span class="self">self</span>.<span class="ident">column</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Position {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}:{}:{}&quot;</span>, <span class="self">self</span>.file, <span class="self">self</span>.line, <span class="self">self</span>.column)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">StrLitKind</span> {
-    <span class="ident">Normal</span>,
-    <span class="ident">Raw</span>(<span class="ident">usize</span>),
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">enum </span>StrLitKind {
+    Normal,
+    Raw(usize),
 }
 
-<span class="kw">impl</span> <span class="ident">StrLitKind</span> {
-    <span class="kw">fn</span> <span class="ident">write_start</span>(<span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">std::fmt::Write</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Normal</span> =&gt; <span class="macro">write!</span>(<span class="ident">w</span>, <span class="string">&quot;\&quot;&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Raw</span>(<span class="ident">n</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">w</span>, <span class="string">&quot;r&quot;</span>)<span class="question-mark">?</span>;
-                <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
-                    <span class="macro">write!</span>(<span class="ident">w</span>, <span class="string">&quot;#&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>StrLitKind {
+    <span class="kw">fn </span>write_start(<span class="self">self</span>, w: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>std::fmt::Write) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Normal =&gt; <span class="macro">write!</span>(w, <span class="string">&quot;\&quot;&quot;</span>),
+            <span class="self">Self</span>::Raw(n) =&gt; {
+                <span class="macro">write!</span>(w, <span class="string">&quot;r&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">for _ in </span><span class="number">0</span>..n {
+                    <span class="macro">write!</span>(w, <span class="string">&quot;#&quot;</span>)<span class="question-mark">?</span>;
                 }
-                <span class="macro">write!</span>(<span class="ident">w</span>, <span class="string">&quot;\&quot;&quot;</span>)
+                <span class="macro">write!</span>(w, <span class="string">&quot;\&quot;&quot;</span>)
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">write_end</span>(<span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">std::fmt::Write</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Normal</span> =&gt; <span class="macro">write!</span>(<span class="ident">w</span>, <span class="string">&quot;\&quot;&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Raw</span>(<span class="ident">n</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">w</span>, <span class="string">&quot;\&quot;&quot;</span>)<span class="question-mark">?</span>;
-                <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
-                    <span class="macro">write!</span>(<span class="ident">w</span>, <span class="string">&quot;#&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>write_end(<span class="self">self</span>, w: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>std::fmt::Write) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Normal =&gt; <span class="macro">write!</span>(w, <span class="string">&quot;\&quot;&quot;</span>),
+            <span class="self">Self</span>::Raw(n) =&gt; {
+                <span class="macro">write!</span>(w, <span class="string">&quot;\&quot;&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">for _ in </span><span class="number">0</span>..n {
+                    <span class="macro">write!</span>(w, <span class="string">&quot;#&quot;</span>)<span class="question-mark">?</span>;
                 }
                 <span class="prelude-val">Ok</span>(())
             }
@@ -1152,226 +1152,226 @@ To update a single test, place the cursor on `expect` token and use `run` featur
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Expect</span> {
-    <span class="doccomment">/// Checks if this expect is equal to `actual`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">trimmed</span>();
-        <span class="kw">if</span> <span class="ident">trimmed</span> <span class="op">==</span> <span class="ident">actual</span> {
+<span class="kw">impl </span>Expect {
+    <span class="doccomment">/// Checks if this expect is equal to `actual`.
+    </span><span class="kw">pub fn </span>assert_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, actual: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">let </span>trimmed = <span class="self">self</span>.trimmed();
+        <span class="kw">if </span>trimmed == actual {
             <span class="kw">return</span>;
         }
-        <span class="ident">Runtime::fail_expect</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">trimmed</span>, <span class="ident">actual</span>);
+        Runtime::fail_expect(<span class="self">self</span>, <span class="kw-2">&amp;</span>trimmed, actual);
     }
-    <span class="doccomment">/// Checks if this expect is equal to `format!(&quot;{:#?}&quot;, actual)`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_debug_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">fmt::Debug</span>) {
-        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:#?}\n&quot;</span>, <span class="ident">actual</span>);
-        <span class="self">self</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">actual</span>)
+    <span class="doccomment">/// Checks if this expect is equal to `format!(&quot;{:#?}&quot;, actual)`.
+    </span><span class="kw">pub fn </span>assert_debug_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, actual: <span class="kw-2">&amp;</span><span class="kw">impl </span>fmt::Debug) {
+        <span class="kw">let </span>actual = <span class="macro">format!</span>(<span class="string">&quot;{:#?}\n&quot;</span>, actual);
+        <span class="self">self</span>.assert_eq(<span class="kw-2">&amp;</span>actual)
     }
-    <span class="doccomment">/// If `true` (default), in-place update will indent the string literal.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indent</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">yes</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">indent</span> <span class="op">=</span> <span class="ident">yes</span>;
-    }
-
-    <span class="doccomment">/// Returns the content of this expect.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">data</span>
+    <span class="doccomment">/// If `true` (default), in-place update will indent the string literal.
+    </span><span class="kw">pub fn </span>indent(<span class="kw-2">&amp;mut </span><span class="self">self</span>, yes: bool) {
+        <span class="self">self</span>.indent = yes;
     }
 
-    <span class="kw">fn</span> <span class="ident">trimmed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">contains</span>(<span class="string">&#39;\n&#39;</span>) {
-            <span class="kw">return</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">to_string</span>();
+    <span class="doccomment">/// Returns the content of this expect.
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.data
+    }
+
+    <span class="kw">fn </span>trimmed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">if </span>!<span class="self">self</span>.data.contains(<span class="string">&#39;\n&#39;</span>) {
+            <span class="kw">return </span><span class="self">self</span>.data.to_string();
         }
-        <span class="ident">trim_indent</span>(<span class="self">self</span>.<span class="ident">data</span>)
+        trim_indent(<span class="self">self</span>.data)
     }
 
-    <span class="kw">fn</span> <span class="ident">locate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Location</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">target_line</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">line_start</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">line</span>) <span class="kw">in</span> <span class="ident">lines_with_ends</span>(<span class="ident">file</span>).<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">line</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span> {
-                <span class="comment">// `column` points to the first character of the macro invocation:</span>
-                <span class="comment">//</span>
-                <span class="comment">//    expect![[r#&quot;&quot;#]]        expect![&quot;&quot;]</span>
-                <span class="comment">//    ^       ^               ^       ^</span>
-                <span class="comment">//  column   offset                 offset</span>
-                <span class="comment">//</span>
-                <span class="comment">// Seek past the exclam, then skip any whitespace and</span>
-                <span class="comment">// the macro delimiter to get to our argument.</span>
-                <span class="kw">let</span> <span class="ident">byte_offset</span> <span class="op">=</span> <span class="ident">line</span>
-                    .<span class="ident">char_indices</span>()
-                    .<span class="ident">skip</span>((<span class="self">self</span>.<span class="ident">position</span>.<span class="ident">column</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">try_into</span>().<span class="ident">unwrap</span>())
-                    .<span class="ident">skip_while</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">c</span>)<span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;!&#39;</span>)
-                    .<span class="ident">skip</span>(<span class="number">1</span>) <span class="comment">// !</span>
-                    .<span class="ident">skip_while</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">c</span>)<span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>())
-                    .<span class="ident">skip</span>(<span class="number">1</span>) <span class="comment">// [({</span>
-                    .<span class="ident">skip_while</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">c</span>)<span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>())
-                    .<span class="ident">next</span>()
-                    .<span class="ident">expect</span>(<span class="string">&quot;Failed to parse macro invocation&quot;</span>)
+    <span class="kw">fn </span>locate(<span class="kw-2">&amp;</span><span class="self">self</span>, file: <span class="kw-2">&amp;</span>str) -&gt; Location {
+        <span class="kw">let </span><span class="kw-2">mut </span>target_line = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>line_start = <span class="number">0</span>;
+        <span class="kw">for </span>(i, line) <span class="kw">in </span>lines_with_ends(file).enumerate() {
+            <span class="kw">if </span>i == <span class="self">self</span>.position.line <span class="kw">as </span>usize - <span class="number">1 </span>{
+                <span class="comment">// `column` points to the first character of the macro invocation:
+                //
+                //    expect![[r#&quot;&quot;#]]        expect![&quot;&quot;]
+                //    ^       ^               ^       ^
+                //  column   offset                 offset
+                //
+                // Seek past the exclam, then skip any whitespace and
+                // the macro delimiter to get to our argument.
+                </span><span class="kw">let </span>byte_offset = line
+                    .char_indices()
+                    .skip((<span class="self">self</span>.position.column - <span class="number">1</span>).try_into().unwrap())
+                    .skip_while(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, c)| c != <span class="string">&#39;!&#39;</span>)
+                    .skip(<span class="number">1</span>) <span class="comment">// !
+                    </span>.skip_while(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, c)| c.is_whitespace())
+                    .skip(<span class="number">1</span>) <span class="comment">// [({
+                    </span>.skip_while(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, c)| c.is_whitespace())
+                    .next()
+                    .expect(<span class="string">&quot;Failed to parse macro invocation&quot;</span>)
                     .<span class="number">0</span>;
 
-                <span class="kw">let</span> <span class="ident">literal_start</span> <span class="op">=</span> <span class="ident">line_start</span> <span class="op">+</span> <span class="ident">byte_offset</span>;
-                <span class="kw">let</span> <span class="ident">indent</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">chars</span>().<span class="ident">take_while</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">it</span><span class="op">|</span> <span class="ident">it</span> <span class="op">==</span> <span class="string">&#39; &#39;</span>).<span class="ident">count</span>();
-                <span class="ident">target_line</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">literal_start</span>, <span class="ident">indent</span>));
+                <span class="kw">let </span>literal_start = line_start + byte_offset;
+                <span class="kw">let </span>indent = line.chars().take_while(|<span class="kw-2">&amp;</span>it| it == <span class="string">&#39; &#39;</span>).count();
+                target_line = <span class="prelude-val">Some</span>((literal_start, indent));
                 <span class="kw">break</span>;
             }
-            <span class="ident">line_start</span> <span class="op">+</span><span class="op">=</span> <span class="ident">line</span>.<span class="ident">len</span>();
+            line_start += line.len();
         }
-        <span class="kw">let</span> (<span class="ident">literal_start</span>, <span class="ident">line_indent</span>) <span class="op">=</span> <span class="ident">target_line</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let </span>(literal_start, line_indent) = target_line.unwrap();
 
-        <span class="kw">let</span> <span class="ident">lit_to_eof</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">file</span>[<span class="ident">literal_start</span>..];
-        <span class="kw">let</span> <span class="ident">lit_to_eof_trimmed</span> <span class="op">=</span> <span class="ident">lit_to_eof</span>.<span class="ident">trim_start</span>();
+        <span class="kw">let </span>lit_to_eof = <span class="kw-2">&amp;</span>file[literal_start..];
+        <span class="kw">let </span>lit_to_eof_trimmed = lit_to_eof.trim_start();
 
-        <span class="kw">let</span> <span class="ident">literal_start</span> <span class="op">=</span> <span class="ident">literal_start</span> <span class="op">+</span> (<span class="ident">lit_to_eof</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">lit_to_eof_trimmed</span>.<span class="ident">len</span>());
+        <span class="kw">let </span>literal_start = literal_start + (lit_to_eof.len() - lit_to_eof_trimmed.len());
 
-        <span class="kw">let</span> <span class="ident">literal_len</span> <span class="op">=</span>
-            <span class="ident">locate_end</span>(<span class="ident">lit_to_eof_trimmed</span>).<span class="ident">expect</span>(<span class="string">&quot;Couldn&#39;t find closing delimiter for `expect!`.&quot;</span>);
-        <span class="kw">let</span> <span class="ident">literal_range</span> <span class="op">=</span> <span class="ident">literal_start</span>..<span class="ident">literal_start</span> <span class="op">+</span> <span class="ident">literal_len</span>;
-        <span class="ident">Location</span> { <span class="ident">line_indent</span>, <span class="ident">literal_range</span> }
+        <span class="kw">let </span>literal_len =
+            locate_end(lit_to_eof_trimmed).expect(<span class="string">&quot;Couldn&#39;t find closing delimiter for `expect!`.&quot;</span>);
+        <span class="kw">let </span>literal_range = literal_start..literal_start + literal_len;
+        Location { line_indent, literal_range }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">locate_end</span>(<span class="ident">arg_start_to_eof</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">arg_start_to_eof</span>.<span class="ident">chars</span>().<span class="ident">next</span>()<span class="question-mark">?</span> {
-        <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>() =&gt; <span class="macro">panic!</span>(<span class="string">&quot;skip whitespace before calling `locate_end`&quot;</span>),
+<span class="kw">fn </span>locate_end(arg_start_to_eof: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+    <span class="kw">match </span>arg_start_to_eof.chars().next()<span class="question-mark">? </span>{
+        c <span class="kw">if </span>c.is_whitespace() =&gt; <span class="macro">panic!</span>(<span class="string">&quot;skip whitespace before calling `locate_end`&quot;</span>),
 
-        <span class="comment">// expect![[]]</span>
-        <span class="string">&#39;[&#39;</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">str_start_to_eof</span> <span class="op">=</span> <span class="ident">arg_start_to_eof</span>[<span class="number">1</span>..].<span class="ident">trim_start</span>();
-            <span class="kw">let</span> <span class="ident">str_len</span> <span class="op">=</span> <span class="ident">find_str_lit_len</span>(<span class="ident">str_start_to_eof</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">str_end_to_eof</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">str_start_to_eof</span>[<span class="ident">str_len</span>..];
-            <span class="kw">let</span> <span class="ident">closing_brace_offset</span> <span class="op">=</span> <span class="ident">str_end_to_eof</span>.<span class="ident">find</span>(<span class="string">&#39;]&#39;</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Some</span>((<span class="ident">arg_start_to_eof</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">str_end_to_eof</span>.<span class="ident">len</span>()) <span class="op">+</span> <span class="ident">closing_brace_offset</span> <span class="op">+</span> <span class="number">1</span>)
+        <span class="comment">// expect![[]]
+        </span><span class="string">&#39;[&#39; </span>=&gt; {
+            <span class="kw">let </span>str_start_to_eof = arg_start_to_eof[<span class="number">1</span>..].trim_start();
+            <span class="kw">let </span>str_len = find_str_lit_len(str_start_to_eof)<span class="question-mark">?</span>;
+            <span class="kw">let </span>str_end_to_eof = <span class="kw-2">&amp;</span>str_start_to_eof[str_len..];
+            <span class="kw">let </span>closing_brace_offset = str_end_to_eof.find(<span class="string">&#39;]&#39;</span>)<span class="question-mark">?</span>;
+            <span class="prelude-val">Some</span>((arg_start_to_eof.len() - str_end_to_eof.len()) + closing_brace_offset + <span class="number">1</span>)
         }
 
-        <span class="comment">// expect![] | expect!{} | expect!()</span>
-        <span class="string">&#39;]&#39;</span> <span class="op">|</span> <span class="string">&#39;}&#39;</span> <span class="op">|</span> <span class="string">&#39;)&#39;</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">0</span>),
+        <span class="comment">// expect![] | expect!{} | expect!()
+        </span><span class="string">&#39;]&#39; </span>| <span class="string">&#39;}&#39; </span>| <span class="string">&#39;)&#39; </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">0</span>),
 
-        <span class="comment">// expect![&quot;...&quot;] | expect![r#&quot;...&quot;#]</span>
-        <span class="kw">_</span> =&gt; <span class="ident">find_str_lit_len</span>(<span class="ident">arg_start_to_eof</span>),
+        <span class="comment">// expect![&quot;...&quot;] | expect![r#&quot;...&quot;#]
+        </span><span class="kw">_ </span>=&gt; find_str_lit_len(arg_start_to_eof),
     }
 }
 
-<span class="doccomment">/// Parses a string literal, returning the byte index of its last character</span>
-<span class="doccomment">/// (either a quote or a hash).</span>
-<span class="kw">fn</span> <span class="ident">find_str_lit_len</span>(<span class="ident">str_lit_to_eof</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">StrLitKind</span>::<span class="kw-2">*</span>;
+<span class="doccomment">/// Parses a string literal, returning the byte index of its last character
+/// (either a quote or a hash).
+</span><span class="kw">fn </span>find_str_lit_len(str_lit_to_eof: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+    <span class="kw">use </span>StrLitKind::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_find_n_hashes</span>(
-        <span class="ident">s</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
-        <span class="ident">desired_hashes</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
-                <span class="string">&#39;#&#39;</span> =&gt; <span class="ident">n</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
-                <span class="ident">c</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">n</span>, <span class="prelude-val">Some</span>(<span class="ident">c</span>))),
+    <span class="kw">fn </span>try_find_n_hashes(
+        s: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>Iterator&lt;Item = char&gt;,
+        desired_hashes: usize,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="prelude-ty">Option</span>&lt;char&gt;)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>n = <span class="number">0</span>;
+        <span class="kw">loop </span>{
+            <span class="kw">match </span>s.next()<span class="question-mark">? </span>{
+                <span class="string">&#39;#&#39; </span>=&gt; n += <span class="number">1</span>,
+                c =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>((n, <span class="prelude-val">Some</span>(c))),
             }
 
-            <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">desired_hashes</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">n</span>, <span class="prelude-val">None</span>));
+            <span class="kw">if </span>n == desired_hashes {
+                <span class="kw">return </span><span class="prelude-val">Some</span>((n, <span class="prelude-val">None</span>));
             }
         }
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">str_lit_to_eof</span>.<span class="ident">chars</span>();
-    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
-        <span class="string">&#39;&quot;&#39;</span> =&gt; <span class="ident">Normal</span>,
-        <span class="string">&#39;r&#39;</span> =&gt; {
-            <span class="kw">let</span> (<span class="ident">n</span>, <span class="ident">c</span>) <span class="op">=</span> <span class="ident">try_find_n_hashes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>, <span class="ident">usize::MAX</span>)<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&#39;&quot;&#39;</span>) {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>s = str_lit_to_eof.chars();
+    <span class="kw">let </span>kind = <span class="kw">match </span>s.next()<span class="question-mark">? </span>{
+        <span class="string">&#39;&quot;&#39; </span>=&gt; Normal,
+        <span class="string">&#39;r&#39; </span>=&gt; {
+            <span class="kw">let </span>(n, c) = try_find_n_hashes(<span class="kw-2">&amp;mut </span>s, usize::MAX)<span class="question-mark">?</span>;
+            <span class="kw">if </span>c != <span class="prelude-val">Some</span>(<span class="string">&#39;&quot;&#39;</span>) {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
-            <span class="ident">Raw</span>(<span class="ident">n</span>)
+            Raw(n)
         }
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">oldc</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">oldc</span>.<span class="ident">take</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">next</span>())<span class="question-mark">?</span>;
-        <span class="kw">match</span> (<span class="ident">c</span>, <span class="ident">kind</span>) {
-            (<span class="string">&#39;\\&#39;</span>, <span class="ident">Normal</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">_escaped</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">next</span>()<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>oldc = <span class="prelude-val">None</span>;
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>c = oldc.take().or_else(|| s.next())<span class="question-mark">?</span>;
+        <span class="kw">match </span>(c, kind) {
+            (<span class="string">&#39;\\&#39;</span>, Normal) =&gt; {
+                <span class="kw">let </span>_escaped = s.next()<span class="question-mark">?</span>;
             }
-            (<span class="string">&#39;&quot;&#39;</span>, <span class="ident">Normal</span>) =&gt; <span class="kw">break</span>,
-            (<span class="string">&#39;&quot;&#39;</span>, <span class="ident">Raw</span>(<span class="number">0</span>)) =&gt; <span class="kw">break</span>,
-            (<span class="string">&#39;&quot;&#39;</span>, <span class="ident">Raw</span>(<span class="ident">n</span>)) =&gt; {
-                <span class="kw">let</span> (<span class="ident">seen</span>, <span class="ident">c</span>) <span class="op">=</span> <span class="ident">try_find_n_hashes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>, <span class="ident">n</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">seen</span> <span class="op">==</span> <span class="ident">n</span> {
+            (<span class="string">&#39;&quot;&#39;</span>, Normal) =&gt; <span class="kw">break</span>,
+            (<span class="string">&#39;&quot;&#39;</span>, Raw(<span class="number">0</span>)) =&gt; <span class="kw">break</span>,
+            (<span class="string">&#39;&quot;&#39;</span>, Raw(n)) =&gt; {
+                <span class="kw">let </span>(seen, c) = try_find_n_hashes(<span class="kw-2">&amp;mut </span>s, n)<span class="question-mark">?</span>;
+                <span class="kw">if </span>seen == n {
                     <span class="kw">break</span>;
                 }
-                <span class="ident">oldc</span> <span class="op">=</span> <span class="ident">c</span>;
+                oldc = c;
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         }
     }
 
-    <span class="prelude-val">Some</span>(<span class="ident">str_lit_to_eof</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">s</span>.<span class="ident">as_str</span>().<span class="ident">len</span>())
+    <span class="prelude-val">Some</span>(str_lit_to_eof.len() - s.as_str().len())
 }
 
-<span class="kw">impl</span> <span class="ident">ExpectFile</span> {
-    <span class="doccomment">/// Checks if file contents is equal to `actual`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read</span>();
-        <span class="kw">if</span> <span class="ident">actual</span> <span class="op">==</span> <span class="ident">expected</span> {
+<span class="kw">impl </span>ExpectFile {
+    <span class="doccomment">/// Checks if file contents is equal to `actual`.
+    </span><span class="kw">pub fn </span>assert_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, actual: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">let </span>expected = <span class="self">self</span>.read();
+        <span class="kw">if </span>actual == expected {
             <span class="kw">return</span>;
         }
-        <span class="ident">Runtime::fail_file</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">expected</span>, <span class="ident">actual</span>);
+        Runtime::fail_file(<span class="self">self</span>, <span class="kw-2">&amp;</span>expected, actual);
     }
-    <span class="doccomment">/// Checks if file contents is equal to `format!(&quot;{:#?}&quot;, actual)`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_debug_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">fmt::Debug</span>) {
-        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:#?}\n&quot;</span>, <span class="ident">actual</span>);
-        <span class="self">self</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">actual</span>)
+    <span class="doccomment">/// Checks if file contents is equal to `format!(&quot;{:#?}&quot;, actual)`.
+    </span><span class="kw">pub fn </span>assert_debug_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, actual: <span class="kw-2">&amp;</span><span class="kw">impl </span>fmt::Debug) {
+        <span class="kw">let </span>actual = <span class="macro">format!</span>(<span class="string">&quot;{:#?}\n&quot;</span>, actual);
+        <span class="self">self</span>.assert_eq(<span class="kw-2">&amp;</span>actual)
     }
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">fs::read_to_string</span>(<span class="self">self</span>.<span class="ident">abs_path</span>()).<span class="ident">unwrap_or_default</span>().<span class="ident">replace</span>(<span class="string">&quot;\r\n&quot;</span>, <span class="string">&quot;\n&quot;</span>)
+    <span class="kw">fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        fs::read_to_string(<span class="self">self</span>.abs_path()).unwrap_or_default().replace(<span class="string">&quot;\r\n&quot;</span>, <span class="string">&quot;\n&quot;</span>)
     }
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">contents</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="ident">fs::write</span>(<span class="self">self</span>.<span class="ident">abs_path</span>(), <span class="ident">contents</span>).<span class="ident">unwrap</span>()
+    <span class="kw">fn </span>write(<span class="kw-2">&amp;</span><span class="self">self</span>, contents: <span class="kw-2">&amp;</span>str) {
+        fs::write(<span class="self">self</span>.abs_path(), contents).unwrap()
     }
-    <span class="kw">fn</span> <span class="ident">abs_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PathBuf</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">is_absolute</span>() {
-            <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">to_owned</span>()
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">dir</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="self">self</span>.<span class="ident">position</span>).<span class="ident">parent</span>().<span class="ident">unwrap</span>();
-            <span class="ident">to_abs_ws_path</span>(<span class="kw-2">&amp;</span><span class="ident">dir</span>.<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>))
+    <span class="kw">fn </span>abs_path(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PathBuf {
+        <span class="kw">if </span><span class="self">self</span>.path.is_absolute() {
+            <span class="self">self</span>.path.to_owned()
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>dir = Path::new(<span class="self">self</span>.position).parent().unwrap();
+            to_abs_ws_path(<span class="kw-2">&amp;</span>dir.join(<span class="kw-2">&amp;</span><span class="self">self</span>.path))
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Runtime</span> {
-    <span class="ident">help_printed</span>: <span class="ident">bool</span>,
-    <span class="ident">per_file</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">FileRuntime</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Default)]
+</span><span class="kw">struct </span>Runtime {
+    help_printed: bool,
+    per_file: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, FileRuntime&gt;,
 }
-<span class="kw">static</span> <span class="ident">RT</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="ident">Default::default</span>);
+<span class="kw">static </span>RT: Lazy&lt;Mutex&lt;Runtime&gt;&gt; = Lazy::new(Default::default);
 
-<span class="kw">impl</span> <span class="ident">Runtime</span> {
-    <span class="kw">fn</span> <span class="ident">fail_expect</span>(<span class="ident">expect</span>: <span class="kw-2">&amp;</span><span class="ident">Expect</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rt</span> <span class="op">=</span> <span class="ident">RT</span>.<span class="ident">lock</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">poisoned</span><span class="op">|</span> <span class="ident">poisoned</span>.<span class="ident">into_inner</span>());
-        <span class="kw">if</span> <span class="ident">update_expect</span>() {
-            <span class="macro">println!</span>(<span class="string">&quot;\x1b[1m\x1b[92mupdating\x1b[0m: {}&quot;</span>, <span class="ident">expect</span>.<span class="ident">position</span>);
-            <span class="ident">rt</span>.<span class="ident">per_file</span>
-                .<span class="ident">entry</span>(<span class="ident">expect</span>.<span class="ident">position</span>.<span class="ident">file</span>)
-                .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">FileRuntime::new</span>(<span class="ident">expect</span>))
-                .<span class="ident">update</span>(<span class="ident">expect</span>, <span class="ident">actual</span>);
+<span class="kw">impl </span>Runtime {
+    <span class="kw">fn </span>fail_expect(expect: <span class="kw-2">&amp;</span>Expect, expected: <span class="kw-2">&amp;</span>str, actual: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">let </span><span class="kw-2">mut </span>rt = RT.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
+        <span class="kw">if </span>update_expect() {
+            <span class="macro">println!</span>(<span class="string">&quot;\x1b[1m\x1b[92mupdating\x1b[0m: {}&quot;</span>, expect.position);
+            rt.per_file
+                .entry(expect.position.file)
+                .or_insert_with(|| FileRuntime::new(expect))
+                .update(expect, actual);
             <span class="kw">return</span>;
         }
-        <span class="ident">rt</span>.<span class="ident">panic</span>(<span class="ident">expect</span>.<span class="ident">position</span>.<span class="ident">to_string</span>(), <span class="ident">expected</span>, <span class="ident">actual</span>);
+        rt.panic(expect.position.to_string(), expected, actual);
     }
-    <span class="kw">fn</span> <span class="ident">fail_file</span>(<span class="ident">expect</span>: <span class="kw-2">&amp;</span><span class="ident">ExpectFile</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rt</span> <span class="op">=</span> <span class="ident">RT</span>.<span class="ident">lock</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">poisoned</span><span class="op">|</span> <span class="ident">poisoned</span>.<span class="ident">into_inner</span>());
-        <span class="kw">if</span> <span class="ident">update_expect</span>() {
-            <span class="macro">println!</span>(<span class="string">&quot;\x1b[1m\x1b[92mupdating\x1b[0m: {}&quot;</span>, <span class="ident">expect</span>.<span class="ident">path</span>.<span class="ident">display</span>());
-            <span class="ident">expect</span>.<span class="ident">write</span>(<span class="ident">actual</span>);
+    <span class="kw">fn </span>fail_file(expect: <span class="kw-2">&amp;</span>ExpectFile, expected: <span class="kw-2">&amp;</span>str, actual: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">let </span><span class="kw-2">mut </span>rt = RT.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
+        <span class="kw">if </span>update_expect() {
+            <span class="macro">println!</span>(<span class="string">&quot;\x1b[1m\x1b[92mupdating\x1b[0m: {}&quot;</span>, expect.path.display());
+            expect.write(actual);
             <span class="kw">return</span>;
         }
-        <span class="ident">rt</span>.<span class="ident">panic</span>(<span class="ident">expect</span>.<span class="ident">path</span>.<span class="ident">display</span>().<span class="ident">to_string</span>(), <span class="ident">expected</span>, <span class="ident">actual</span>);
+        rt.panic(expect.path.display().to_string(), expected, actual);
     }
-    <span class="kw">fn</span> <span class="ident">panic</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">String</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">print_help</span> <span class="op">=</span> <span class="op">!</span><span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">help_printed</span>, <span class="bool-val">true</span>);
-        <span class="kw">let</span> <span class="ident">help</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">print_help</span> { <span class="ident">HELP</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> };
+    <span class="kw">fn </span>panic(<span class="kw-2">&amp;mut </span><span class="self">self</span>, position: String, expected: <span class="kw-2">&amp;</span>str, actual: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">let </span>print_help = !mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.help_printed, <span class="bool-val">true</span>);
+        <span class="kw">let </span>help = <span class="kw">if </span>print_help { HELP } <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
 
-        <span class="kw">let</span> <span class="ident">diff</span> <span class="op">=</span> <span class="ident">dissimilar::diff</span>(<span class="ident">expected</span>, <span class="ident">actual</span>);
+        <span class="kw">let </span>diff = dissimilar::diff(expected, actual);
 
         <span class="macro">println!</span>(
             <span class="string">&quot;\n
@@ -1393,260 +1393,260 @@ To update a single test, place the cursor on `expect` token and use `run` featur
 {}
 ----
 &quot;</span>,
-            <span class="ident">position</span>,
-            <span class="ident">help</span>,
-            <span class="ident">expected</span>,
-            <span class="ident">actual</span>,
-            <span class="ident">format_chunks</span>(<span class="ident">diff</span>)
+            position,
+            help,
+            expected,
+            actual,
+            format_chunks(diff)
         );
-        <span class="comment">// Use resume_unwind instead of panic!() to prevent a backtrace, which is unnecessary noise.</span>
-        <span class="ident">panic::resume_unwind</span>(<span class="ident">Box::new</span>(()));
+        <span class="comment">// Use resume_unwind instead of panic!() to prevent a backtrace, which is unnecessary noise.
+        </span>panic::resume_unwind(Box::new(()));
     }
 }
 
-<span class="kw">struct</span> <span class="ident">FileRuntime</span> {
-    <span class="ident">path</span>: <span class="ident">PathBuf</span>,
-    <span class="ident">original_text</span>: <span class="ident">String</span>,
-    <span class="ident">patchwork</span>: <span class="ident">Patchwork</span>,
+<span class="kw">struct </span>FileRuntime {
+    path: PathBuf,
+    original_text: String,
+    patchwork: Patchwork,
 }
 
-<span class="kw">impl</span> <span class="ident">FileRuntime</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">expect</span>: <span class="kw-2">&amp;</span><span class="ident">Expect</span>) -&gt; <span class="ident">FileRuntime</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">to_abs_ws_path</span>(<span class="ident">Path::new</span>(<span class="ident">expect</span>.<span class="ident">position</span>.<span class="ident">file</span>));
-        <span class="kw">let</span> <span class="ident">original_text</span> <span class="op">=</span> <span class="ident">fs::read_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">patchwork</span> <span class="op">=</span> <span class="ident">Patchwork::new</span>(<span class="ident">original_text</span>.<span class="ident">clone</span>());
-        <span class="ident">FileRuntime</span> { <span class="ident">path</span>, <span class="ident">original_text</span>, <span class="ident">patchwork</span> }
+<span class="kw">impl </span>FileRuntime {
+    <span class="kw">fn </span>new(expect: <span class="kw-2">&amp;</span>Expect) -&gt; FileRuntime {
+        <span class="kw">let </span>path = to_abs_ws_path(Path::new(expect.position.file));
+        <span class="kw">let </span>original_text = fs::read_to_string(<span class="kw-2">&amp;</span>path).unwrap();
+        <span class="kw">let </span>patchwork = Patchwork::new(original_text.clone());
+        FileRuntime { path, original_text, patchwork }
     }
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">expect</span>: <span class="kw-2">&amp;</span><span class="ident">Expect</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">expect</span>.<span class="ident">locate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">original_text</span>);
-        <span class="kw">let</span> <span class="ident">desired_indent</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">expect</span>.<span class="ident">indent</span> { <span class="prelude-val">Some</span>(<span class="ident">loc</span>.<span class="ident">line_indent</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
-        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="ident">desired_indent</span>, <span class="ident">actual</span>);
-        <span class="self">self</span>.<span class="ident">patchwork</span>.<span class="ident">patch</span>(<span class="ident">loc</span>.<span class="ident">literal_range</span>, <span class="kw-2">&amp;</span><span class="ident">patch</span>);
-        <span class="ident">fs::write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">patchwork</span>.<span class="ident">text</span>).<span class="ident">unwrap</span>()
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, expect: <span class="kw-2">&amp;</span>Expect, actual: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">let </span>loc = expect.locate(<span class="kw-2">&amp;</span><span class="self">self</span>.original_text);
+        <span class="kw">let </span>desired_indent = <span class="kw">if </span>expect.indent { <span class="prelude-val">Some</span>(loc.line_indent) } <span class="kw">else </span>{ <span class="prelude-val">None </span>};
+        <span class="kw">let </span>patch = format_patch(desired_indent, actual);
+        <span class="self">self</span>.patchwork.patch(loc.literal_range, <span class="kw-2">&amp;</span>patch);
+        fs::write(<span class="kw-2">&amp;</span><span class="self">self</span>.path, <span class="kw-2">&amp;</span><span class="self">self</span>.patchwork.text).unwrap()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Location</span> {
-    <span class="ident">line_indent</span>: <span class="ident">usize</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Location {
+    line_indent: usize,
 
-    <span class="doccomment">/// The byte range of the argument to `expect!`, including the inner `[]` if it exists.</span>
-    <span class="ident">literal_range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The byte range of the argument to `expect!`, including the inner `[]` if it exists.
+    </span>literal_range: Range&lt;usize&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Patchwork</span> {
-    <span class="ident">text</span>: <span class="ident">String</span>,
-    <span class="ident">indels</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Patchwork {
+    text: String,
+    indels: Vec&lt;(Range&lt;usize&gt;, usize)&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Patchwork</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">text</span>: <span class="ident">String</span>) -&gt; <span class="ident">Patchwork</span> {
-        <span class="ident">Patchwork</span> { <span class="ident">text</span>, <span class="ident">indels</span>: <span class="ident">Vec::new</span>() }
+<span class="kw">impl </span>Patchwork {
+    <span class="kw">fn </span>new(text: String) -&gt; Patchwork {
+        Patchwork { text, indels: Vec::new() }
     }
-    <span class="kw">fn</span> <span class="ident">patch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">patch</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">indels</span>.<span class="ident">push</span>((<span class="ident">range</span>.<span class="ident">clone</span>(), <span class="ident">patch</span>.<span class="ident">len</span>()));
-        <span class="self">self</span>.<span class="ident">indels</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="ident">delete</span>, <span class="ident">_insert</span>)<span class="op">|</span> <span class="ident">delete</span>.<span class="ident">start</span>);
+    <span class="kw">fn </span>patch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>range: Range&lt;usize&gt;, patch: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.indels.push((range.clone(), patch.len()));
+        <span class="self">self</span>.indels.sort_by_key(|(delete, _insert)| delete.start);
 
-        <span class="kw">let</span> (<span class="ident">delete</span>, <span class="ident">insert</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">indels</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">take_while</span>(<span class="op">|</span>(<span class="ident">delete</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">delete</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">range</span>.<span class="ident">start</span>)
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">delete</span>, <span class="ident">insert</span>)<span class="op">|</span> (<span class="ident">delete</span>.<span class="ident">end</span> <span class="op">-</span> <span class="ident">delete</span>.<span class="ident">start</span>, <span class="ident">insert</span>))
-            .<span class="ident">fold</span>((<span class="number">0usize</span>, <span class="number">0usize</span>), <span class="op">|</span>(<span class="ident">x1</span>, <span class="ident">y1</span>), (<span class="ident">x2</span>, <span class="ident">y2</span>)<span class="op">|</span> (<span class="ident">x1</span> <span class="op">+</span> <span class="ident">x2</span>, <span class="ident">y1</span> <span class="op">+</span> <span class="ident">y2</span>));
+        <span class="kw">let </span>(delete, insert) = <span class="self">self
+            </span>.indels
+            .iter()
+            .take_while(|(delete, <span class="kw">_</span>)| delete.start &lt; range.start)
+            .map(|(delete, insert)| (delete.end - delete.start, insert))
+            .fold((<span class="number">0usize</span>, <span class="number">0usize</span>), |(x1, y1), (x2, y2)| (x1 + x2, y1 + y2));
 
-        <span class="kw">for</span> <span class="ident">pos</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> [<span class="kw-2">&amp;mut</span> <span class="ident">range</span>.<span class="ident">start</span>, <span class="kw-2">&amp;mut</span> <span class="ident">range</span>.<span class="ident">end</span>] {
-            <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pos</span> <span class="op">-</span><span class="op">=</span> <span class="ident">delete</span>;
-            <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">insert</span>;
+        <span class="kw">for </span>pos <span class="kw">in </span><span class="kw-2">&amp;mut </span>[<span class="kw-2">&amp;mut </span>range.start, <span class="kw-2">&amp;mut </span>range.end] {
+            <span class="kw-2">**</span>pos -= delete;
+            <span class="kw-2">**</span>pos += insert;
         }
 
-        <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">replace_range</span>(<span class="ident">range</span>, <span class="kw-2">&amp;</span><span class="ident">patch</span>);
+        <span class="self">self</span>.text.replace_range(range, <span class="kw-2">&amp;</span>patch);
     }
 }
 
-<span class="kw">fn</span> <span class="ident">lit_kind_for_patch</span>(<span class="ident">patch</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">StrLitKind</span> {
-    <span class="kw">let</span> <span class="ident">has_dquote</span> <span class="op">=</span> <span class="ident">patch</span>.<span class="ident">chars</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span>);
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">has_dquote</span> {
-        <span class="kw">let</span> <span class="ident">has_bslash_or_newline</span> <span class="op">=</span> <span class="ident">patch</span>.<span class="ident">chars</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">c</span>, <span class="string">&#39;\\&#39;</span> <span class="op">|</span> <span class="string">&#39;\n&#39;</span>));
-        <span class="kw">return</span> <span class="kw">if</span> <span class="ident">has_bslash_or_newline</span> { <span class="ident">StrLitKind::Raw</span>(<span class="number">1</span>) } <span class="kw">else</span> { <span class="ident">StrLitKind::Normal</span> };
+<span class="kw">fn </span>lit_kind_for_patch(patch: <span class="kw-2">&amp;</span>str) -&gt; StrLitKind {
+    <span class="kw">let </span>has_dquote = patch.chars().any(|c| c == <span class="string">&#39;&quot;&#39;</span>);
+    <span class="kw">if </span>!has_dquote {
+        <span class="kw">let </span>has_bslash_or_newline = patch.chars().any(|c| <span class="macro">matches!</span>(c, <span class="string">&#39;\\&#39; </span>| <span class="string">&#39;\n&#39;</span>));
+        <span class="kw">return if </span>has_bslash_or_newline { StrLitKind::Raw(<span class="number">1</span>) } <span class="kw">else </span>{ StrLitKind::Normal };
     }
 
-    <span class="comment">// Find the maximum number of hashes that follow a double quote in the string.</span>
-    <span class="comment">// We need to use one more than that to delimit the string.</span>
-    <span class="kw">let</span> <span class="ident">leading_hashes</span> <span class="op">=</span> <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">take_while</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;#&#39;</span>).<span class="ident">count</span>();
-    <span class="kw">let</span> <span class="ident">max_hashes</span> <span class="op">=</span> <span class="ident">patch</span>.<span class="ident">split</span>(<span class="string">&#39;&quot;&#39;</span>).<span class="ident">map</span>(<span class="ident">leading_hashes</span>).<span class="ident">max</span>().<span class="ident">unwrap</span>();
-    <span class="ident">StrLitKind::Raw</span>(<span class="ident">max_hashes</span> <span class="op">+</span> <span class="number">1</span>)
+    <span class="comment">// Find the maximum number of hashes that follow a double quote in the string.
+    // We need to use one more than that to delimit the string.
+    </span><span class="kw">let </span>leading_hashes = |s: <span class="kw-2">&amp;</span>str| s.chars().take_while(|<span class="kw-2">&amp;</span>c| c == <span class="string">&#39;#&#39;</span>).count();
+    <span class="kw">let </span>max_hashes = patch.split(<span class="string">&#39;&quot;&#39;</span>).map(leading_hashes).max().unwrap();
+    StrLitKind::Raw(max_hashes + <span class="number">1</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">format_patch</span>(<span class="ident">desired_indent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">patch</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">lit_kind</span> <span class="op">=</span> <span class="ident">lit_kind_for_patch</span>(<span class="ident">patch</span>);
-    <span class="kw">let</span> <span class="ident">indent</span> <span class="op">=</span> <span class="ident">desired_indent</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">it</span><span class="op">|</span> <span class="string">&quot; &quot;</span>.<span class="ident">repeat</span>(<span class="ident">it</span>));
-    <span class="kw">let</span> <span class="ident">is_multiline</span> <span class="op">=</span> <span class="ident">patch</span>.<span class="ident">contains</span>(<span class="string">&#39;\n&#39;</span>);
+<span class="kw">fn </span>format_patch(desired_indent: <span class="prelude-ty">Option</span>&lt;usize&gt;, patch: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span>lit_kind = lit_kind_for_patch(patch);
+    <span class="kw">let </span>indent = desired_indent.map(|it| <span class="string">&quot; &quot;</span>.repeat(it));
+    <span class="kw">let </span>is_multiline = patch.contains(<span class="string">&#39;\n&#39;</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">lit_kind</span>, <span class="ident">StrLitKind::Raw</span>(<span class="kw">_</span>)) {
-        <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;[&#39;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = String::new();
+    <span class="kw">if </span><span class="macro">matches!</span>(lit_kind, StrLitKind::Raw(<span class="kw">_</span>)) {
+        buf.push(<span class="string">&#39;[&#39;</span>);
     }
-    <span class="ident">lit_kind</span>.<span class="ident">write_start</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>();
-    <span class="kw">if</span> <span class="ident">is_multiline</span> {
-        <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+    lit_kind.write_start(<span class="kw-2">&amp;mut </span>buf).unwrap();
+    <span class="kw">if </span>is_multiline {
+        buf.push(<span class="string">&#39;\n&#39;</span>);
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">final_newline</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">for</span> <span class="ident">line</span> <span class="kw">in</span> <span class="ident">lines_with_ends</span>(<span class="ident">patch</span>) {
-        <span class="kw">if</span> <span class="ident">is_multiline</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">line</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">indent</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">indent</span> {
-                <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="ident">indent</span>);
-                <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="string">&quot;    &quot;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>final_newline = <span class="bool-val">false</span>;
+    <span class="kw">for </span>line <span class="kw">in </span>lines_with_ends(patch) {
+        <span class="kw">if </span>is_multiline &amp;&amp; !line.trim().is_empty() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(indent) = <span class="kw-2">&amp;</span>indent {
+                buf.push_str(indent);
+                buf.push_str(<span class="string">&quot;    &quot;</span>);
             }
         }
-        <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="ident">line</span>);
-        <span class="ident">final_newline</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\n&#39;</span>);
+        buf.push_str(line);
+        final_newline = line.ends_with(<span class="string">&#39;\n&#39;</span>);
     }
-    <span class="kw">if</span> <span class="ident">final_newline</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">indent</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">indent</span> {
-            <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="ident">indent</span>);
+    <span class="kw">if </span>final_newline {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(indent) = <span class="kw-2">&amp;</span>indent {
+            buf.push_str(indent);
         }
     }
-    <span class="ident">lit_kind</span>.<span class="ident">write_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>();
-    <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">lit_kind</span>, <span class="ident">StrLitKind::Raw</span>(<span class="kw">_</span>)) {
-        <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;]&#39;</span>);
+    lit_kind.write_end(<span class="kw-2">&amp;mut </span>buf).unwrap();
+    <span class="kw">if </span><span class="macro">matches!</span>(lit_kind, StrLitKind::Raw(<span class="kw">_</span>)) {
+        buf.push(<span class="string">&#39;]&#39;</span>);
     }
-    <span class="ident">buf</span>
+    buf
 }
 
-<span class="kw">fn</span> <span class="ident">to_abs_ws_path</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">PathBuf</span> {
-    <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_absolute</span>() {
-        <span class="kw">return</span> <span class="ident">path</span>.<span class="ident">to_owned</span>();
+<span class="kw">fn </span>to_abs_ws_path(path: <span class="kw-2">&amp;</span>Path) -&gt; PathBuf {
+    <span class="kw">if </span>path.is_absolute() {
+        <span class="kw">return </span>path.to_owned();
     }
 
-    <span class="kw">static</span> <span class="ident">WORKSPACE_ROOT</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">OnceCell::new</span>();
-    <span class="ident">WORKSPACE_ROOT</span>
-        .<span class="ident">get_or_try_init</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="comment">// Until https://github.com/rust-lang/cargo/issues/3946 is resolved, this</span>
-            <span class="comment">// is set with a hack like https://github.com/rust-lang/cargo/issues/3946#issuecomment-973132993</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">workspace_root</span>) <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;CARGO_WORKSPACE_DIR&quot;</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">workspace_root</span>.<span class="ident">into</span>());
+    <span class="kw">static </span>WORKSPACE_ROOT: OnceCell&lt;PathBuf&gt; = OnceCell::new();
+    WORKSPACE_ROOT
+        .get_or_try_init(|| {
+            <span class="comment">// Until https://github.com/rust-lang/cargo/issues/3946 is resolved, this
+            // is set with a hack like https://github.com/rust-lang/cargo/issues/3946#issuecomment-973132993
+            </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(workspace_root) = env::var(<span class="string">&quot;CARGO_WORKSPACE_DIR&quot;</span>) {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(workspace_root.into());
             }
 
-            <span class="comment">// If a hack isn&#39;t used, we use a heuristic to find the &quot;top-level&quot; workspace.</span>
-            <span class="comment">// This fails in some cases, see https://github.com/rust-analyzer/expect-test/issues/33</span>
-            <span class="kw">let</span> <span class="ident">my_manifest</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">workspace_root</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="ident">my_manifest</span>)
-                .<span class="ident">ancestors</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">it</span><span class="op">|</span> <span class="ident">it</span>.<span class="ident">join</span>(<span class="string">&quot;Cargo.toml&quot;</span>).<span class="ident">exists</span>())
-                .<span class="ident">last</span>()
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">to_path_buf</span>();
+            <span class="comment">// If a hack isn&#39;t used, we use a heuristic to find the &quot;top-level&quot; workspace.
+            // This fails in some cases, see https://github.com/rust-analyzer/expect-test/issues/33
+            </span><span class="kw">let </span>my_manifest = env::var(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>workspace_root = Path::new(<span class="kw-2">&amp;</span>my_manifest)
+                .ancestors()
+                .filter(|it| it.join(<span class="string">&quot;Cargo.toml&quot;</span>).exists())
+                .last()
+                .unwrap()
+                .to_path_buf();
 
-            <span class="prelude-val">Ok</span>(<span class="ident">workspace_root</span>)
+            <span class="prelude-val">Ok</span>(workspace_root)
         })
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span>: <span class="ident">env::VarError</span><span class="op">|</span> {
-            <span class="macro">panic!</span>(<span class="string">&quot;No CARGO_MANIFEST_DIR env var and the path is relative: {}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>())
+        .unwrap_or_else(|<span class="kw">_</span>: env::VarError| {
+            <span class="macro">panic!</span>(<span class="string">&quot;No CARGO_MANIFEST_DIR env var and the path is relative: {}&quot;</span>, path.display())
         })
-        .<span class="ident">join</span>(<span class="ident">path</span>)
+        .join(path)
 }
 
-<span class="kw">fn</span> <span class="ident">trim_indent</span>(<span class="kw-2">mut</span> <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">if</span> <span class="ident">text</span>.<span class="ident">starts_with</span>(<span class="string">&#39;\n&#39;</span>) {
-        <span class="ident">text</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">text</span>[<span class="number">1</span>..];
+<span class="kw">fn </span>trim_indent(<span class="kw-2">mut </span>text: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">if </span>text.starts_with(<span class="string">&#39;\n&#39;</span>) {
+        text = <span class="kw-2">&amp;</span>text[<span class="number">1</span>..];
     }
-    <span class="kw">let</span> <span class="ident">indent</span> <span class="op">=</span> <span class="ident">text</span>
-        .<span class="ident">lines</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">it</span><span class="op">|</span> <span class="op">!</span><span class="ident">it</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">it</span><span class="op">|</span> <span class="ident">it</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">it</span>.<span class="ident">trim_start</span>().<span class="ident">len</span>())
-        .<span class="ident">min</span>()
-        .<span class="ident">unwrap_or</span>(<span class="number">0</span>);
+    <span class="kw">let </span>indent = text
+        .lines()
+        .filter(|it| !it.trim().is_empty())
+        .map(|it| it.len() - it.trim_start().len())
+        .min()
+        .unwrap_or(<span class="number">0</span>);
 
-    <span class="ident">lines_with_ends</span>(<span class="ident">text</span>)
-        .<span class="ident">map</span>(
-            <span class="op">|</span><span class="ident">line</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">indent</span> {
-                    <span class="ident">line</span>.<span class="ident">trim_start_matches</span>(<span class="string">&#39; &#39;</span>)
-                } <span class="kw">else</span> {
-                    <span class="kw-2">&amp;</span><span class="ident">line</span>[<span class="ident">indent</span>..]
+    lines_with_ends(text)
+        .map(
+            |line| {
+                <span class="kw">if </span>line.len() &lt;= indent {
+                    line.trim_start_matches(<span class="string">&#39; &#39;</span>)
+                } <span class="kw">else </span>{
+                    <span class="kw-2">&amp;</span>line[indent..]
                 }
             },
         )
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">fn</span> <span class="ident">lines_with_ends</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">LinesWithEnds</span> {
-    <span class="ident">LinesWithEnds</span> { <span class="ident">text</span> }
+<span class="kw">fn </span>lines_with_ends(text: <span class="kw-2">&amp;</span>str) -&gt; LinesWithEnds {
+    LinesWithEnds { text }
 }
 
-<span class="kw">struct</span> <span class="ident">LinesWithEnds</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+<span class="kw">struct </span>LinesWithEnds&lt;<span class="lifetime">&#39;a</span>&gt; {
+    text: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LinesWithEnds</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>LinesWithEnds&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="kw">if </span><span class="self">self</span>.text.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">find</span>(<span class="string">&#39;\n&#39;</span>).<span class="ident">map_or</span>(<span class="self">self</span>.<span class="ident">text</span>.<span class="ident">len</span>(), <span class="op">|</span><span class="ident">it</span><span class="op">|</span> <span class="ident">it</span> <span class="op">+</span> <span class="number">1</span>);
-        <span class="kw">let</span> (<span class="ident">res</span>, <span class="ident">next</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">split_at</span>(<span class="ident">idx</span>);
-        <span class="self">self</span>.<span class="ident">text</span> <span class="op">=</span> <span class="ident">next</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">res</span>)
+        <span class="kw">let </span>idx = <span class="self">self</span>.text.find(<span class="string">&#39;\n&#39;</span>).map_or(<span class="self">self</span>.text.len(), |it| it + <span class="number">1</span>);
+        <span class="kw">let </span>(res, next) = <span class="self">self</span>.text.split_at(idx);
+        <span class="self">self</span>.text = next;
+        <span class="prelude-val">Some</span>(res)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">format_chunks</span>(<span class="ident">chunks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">dissimilar::Chunk</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span> <span class="ident">chunks</span> {
-        <span class="kw">let</span> <span class="ident">formatted</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">chunk</span> {
-            <span class="ident">dissimilar::Chunk::Equal</span>(<span class="ident">text</span>) =&gt; <span class="ident">text</span>.<span class="ident">into</span>(),
-            <span class="ident">dissimilar::Chunk::Delete</span>(<span class="ident">text</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;\x1b[41m{}\x1b[0m&quot;</span>, <span class="ident">text</span>),
-            <span class="ident">dissimilar::Chunk::Insert</span>(<span class="ident">text</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;\x1b[42m{}\x1b[0m&quot;</span>, <span class="ident">text</span>),
+<span class="kw">fn </span>format_chunks(chunks: Vec&lt;dissimilar::Chunk&gt;) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = String::new();
+    <span class="kw">for </span>chunk <span class="kw">in </span>chunks {
+        <span class="kw">let </span>formatted = <span class="kw">match </span>chunk {
+            dissimilar::Chunk::Equal(text) =&gt; text.into(),
+            dissimilar::Chunk::Delete(text) =&gt; <span class="macro">format!</span>(<span class="string">&quot;\x1b[41m{}\x1b[0m&quot;</span>, text),
+            dissimilar::Chunk::Insert(text) =&gt; <span class="macro">format!</span>(<span class="string">&quot;\x1b[42m{}\x1b[0m&quot;</span>, text),
         };
-        <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">formatted</span>);
+        buf.push_str(<span class="kw-2">&amp;</span>formatted);
     }
-    <span class="ident">buf</span>
+    buf
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_trivial_assert</span>() {
-        <span class="macro">expect!</span>[<span class="string">&quot;5&quot;</span>].<span class="ident">assert_eq</span>(<span class="string">&quot;5&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_trivial_assert() {
+        <span class="macro">expect!</span>[<span class="string">&quot;5&quot;</span>].assert_eq(<span class="string">&quot;5&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_format_patch</span>() {
-        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="prelude-val">None</span>, <span class="string">&quot;hello\nworld\n&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_format_patch() {
+        <span class="kw">let </span>patch = format_patch(<span class="prelude-val">None</span>, <span class="string">&quot;hello\nworld\n&quot;</span>);
         <span class="macro">expect!</span>[[<span class="string">r##&quot;
             [r#&quot;
             hello
             world
             &quot;#]&quot;##</span>]]
-        .<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">patch</span>);
+        .assert_eq(<span class="kw-2">&amp;</span>patch);
 
-        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="prelude-val">None</span>, <span class="string">r&quot;hello\tworld&quot;</span>);
-        <span class="macro">expect!</span>[[<span class="string">r##&quot;[r#&quot;hello\tworld&quot;#]&quot;##</span>]].<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">patch</span>);
+        <span class="kw">let </span>patch = format_patch(<span class="prelude-val">None</span>, <span class="string">r&quot;hello\tworld&quot;</span>);
+        <span class="macro">expect!</span>[[<span class="string">r##&quot;[r#&quot;hello\tworld&quot;#]&quot;##</span>]].assert_eq(<span class="kw-2">&amp;</span>patch);
 
-        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="prelude-val">None</span>, <span class="string">&quot;{\&quot;foo\&quot;: 42}&quot;</span>);
-        <span class="macro">expect!</span>[[<span class="string">r##&quot;[r#&quot;{&quot;foo&quot;: 42}&quot;#]&quot;##</span>]].<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">patch</span>);
+        <span class="kw">let </span>patch = format_patch(<span class="prelude-val">None</span>, <span class="string">&quot;{\&quot;foo\&quot;: 42}&quot;</span>);
+        <span class="macro">expect!</span>[[<span class="string">r##&quot;[r#&quot;{&quot;foo&quot;: 42}&quot;#]&quot;##</span>]].assert_eq(<span class="kw-2">&amp;</span>patch);
 
-        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="string">&quot;hello\nworld\n&quot;</span>);
+        <span class="kw">let </span>patch = format_patch(<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="string">&quot;hello\nworld\n&quot;</span>);
         <span class="macro">expect!</span>[[<span class="string">r##&quot;
             [r#&quot;
                 hello
                 world
             &quot;#]&quot;##</span>]]
-        .<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">patch</span>);
+        .assert_eq(<span class="kw-2">&amp;</span>patch);
 
-        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="prelude-val">Some</span>(<span class="number">4</span>), <span class="string">&quot;single line&quot;</span>);
-        <span class="macro">expect!</span>[[<span class="string">r#&quot;&quot;single line&quot;&quot;#</span>]].<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">patch</span>);
+        <span class="kw">let </span>patch = format_patch(<span class="prelude-val">Some</span>(<span class="number">4</span>), <span class="string">&quot;single line&quot;</span>);
+        <span class="macro">expect!</span>[[<span class="string">r#&quot;&quot;single line&quot;&quot;#</span>]].assert_eq(<span class="kw-2">&amp;</span>patch);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_patchwork</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">patchwork</span> <span class="op">=</span> <span class="ident">Patchwork::new</span>(<span class="string">&quot;one two three&quot;</span>.<span class="ident">to_string</span>());
-        <span class="ident">patchwork</span>.<span class="ident">patch</span>(<span class="number">4</span>..<span class="number">7</span>, <span class="string">&quot;zwei&quot;</span>);
-        <span class="ident">patchwork</span>.<span class="ident">patch</span>(<span class="number">0</span>..<span class="number">3</span>, <span class="string">&quot;один&quot;</span>);
-        <span class="ident">patchwork</span>.<span class="ident">patch</span>(<span class="number">8</span>..<span class="number">13</span>, <span class="string">&quot;3&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_patchwork() {
+        <span class="kw">let </span><span class="kw-2">mut </span>patchwork = Patchwork::new(<span class="string">&quot;one two three&quot;</span>.to_string());
+        patchwork.patch(<span class="number">4</span>..<span class="number">7</span>, <span class="string">&quot;zwei&quot;</span>);
+        patchwork.patch(<span class="number">0</span>..<span class="number">3</span>, <span class="string">&quot;один&quot;</span>);
+        patchwork.patch(<span class="number">8</span>..<span class="number">13</span>, <span class="string">&quot;3&quot;</span>);
         <span class="macro">expect!</span>[[<span class="string">r#&quot;
             Patchwork {
                 text: &quot;один zwei 3&quot;,
@@ -1666,26 +1666,26 @@ To update a single test, place the cursor on `expect` token and use `run` featur
                 ],
             }
         &quot;#</span>]]
-        .<span class="ident">assert_debug_eq</span>(<span class="kw-2">&amp;</span><span class="ident">patchwork</span>);
+        .assert_debug_eq(<span class="kw-2">&amp;</span>patchwork);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_expect_file</span>() {
-        <span class="macro">expect_file!</span>[<span class="string">&quot;./lib.rs&quot;</span>].<span class="ident">assert_eq</span>(<span class="macro">include_str!</span>(<span class="string">&quot;./lib.rs&quot;</span>))
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_expect_file() {
+        <span class="macro">expect_file!</span>[<span class="string">&quot;./lib.rs&quot;</span>].assert_eq(<span class="macro">include_str!</span>(<span class="string">&quot;./lib.rs&quot;</span>))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smoke_test_indent</span>() {
-        <span class="kw">fn</span> <span class="ident">check_indented</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">expect</span>: <span class="ident">Expect</span>) {
-            <span class="ident">expect</span>.<span class="ident">indent</span>(<span class="bool-val">true</span>);
-            <span class="ident">expect</span>.<span class="ident">assert_eq</span>(<span class="ident">input</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>smoke_test_indent() {
+        <span class="kw">fn </span>check_indented(input: <span class="kw-2">&amp;</span>str, <span class="kw-2">mut </span>expect: Expect) {
+            expect.indent(<span class="bool-val">true</span>);
+            expect.assert_eq(input);
         }
-        <span class="kw">fn</span> <span class="ident">check_not_indented</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">expect</span>: <span class="ident">Expect</span>) {
-            <span class="ident">expect</span>.<span class="ident">indent</span>(<span class="bool-val">false</span>);
-            <span class="ident">expect</span>.<span class="ident">assert_eq</span>(<span class="ident">input</span>);
+        <span class="kw">fn </span>check_not_indented(input: <span class="kw-2">&amp;</span>str, <span class="kw-2">mut </span>expect: Expect) {
+            expect.indent(<span class="bool-val">false</span>);
+            expect.assert_eq(input);
         }
 
-        <span class="ident">check_indented</span>(
+        check_indented(
             <span class="string">&quot;\
 line1
   line2
@@ -1696,7 +1696,7 @@ line1
             &quot;#</span>]],
         );
 
-        <span class="ident">check_not_indented</span>(
+        check_not_indented(
             <span class="string">&quot;\
 line1
   line2
@@ -1708,34 +1708,34 @@ line1
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_locate</span>() {
-        <span class="macro">macro_rules!</span> <span class="ident">check_locate</span> {
-            ($( [[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">literal</span>]] ),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {$({
-                <span class="kw">let</span> <span class="ident">lit</span> <span class="op">=</span> <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>);
-                <span class="kw">let</span> <span class="ident">with_trailer</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{} \t]]\n&quot;</span>, <span class="ident">lit</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">locate_end</span>(<span class="kw-2">&amp;</span><span class="ident">with_trailer</span>), <span class="prelude-val">Some</span>(<span class="ident">lit</span>.<span class="ident">len</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_locate() {
+        <span class="macro">macro_rules! </span>check_locate {
+            ($( [[<span class="macro-nonterminal">$s</span>:literal]] ),* $(,)<span class="question-mark">?</span>) =&gt; {$({
+                <span class="kw">let </span>lit = <span class="macro">stringify!</span>(<span class="macro-nonterminal">$s</span>);
+                <span class="kw">let </span>with_trailer = <span class="macro">format!</span>(<span class="string">&quot;{} \t]]\n&quot;</span>, lit);
+                <span class="macro">assert_eq!</span>(locate_end(<span class="kw-2">&amp;</span>with_trailer), <span class="prelude-val">Some</span>(lit.len()));
             })<span class="kw-2">*</span>};
         }
 
-        <span class="comment">// Check that we handle string literals containing &quot;]]&quot; correctly.</span>
-        <span class="macro">check_locate!</span>(
+        <span class="comment">// Check that we handle string literals containing &quot;]]&quot; correctly.
+        </span><span class="macro">check_locate!</span>(
             [[<span class="string">r#&quot;{ arr: [[1, 2], [3, 4]], other: &quot;foo&quot; } &quot;#</span>]],
             [[<span class="string">&quot;]]&quot;</span>]],
             [[<span class="string">&quot;\&quot;]]&quot;</span>]],
             [[<span class="string">r#&quot;&quot;]]&quot;#</span>]],
         );
 
-        <span class="comment">// Check `expect![[  ]]` as well.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">locate_end</span>(<span class="string">&quot;]]&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">0</span>));
+        <span class="comment">// Check `expect![[  ]]` as well.
+        </span><span class="macro">assert_eq!</span>(locate_end(<span class="string">&quot;]]&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">0</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_find_str_lit_len</span>() {
-        <span class="macro">macro_rules!</span> <span class="ident">check_str_lit_len</span> {
-            ($( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">literal</span> ),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {$({
-                <span class="kw">let</span> <span class="ident">lit</span> <span class="op">=</span> <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">find_str_lit_len</span>(<span class="ident">lit</span>), <span class="prelude-val">Some</span>(<span class="ident">lit</span>.<span class="ident">len</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_find_str_lit_len() {
+        <span class="macro">macro_rules! </span>check_str_lit_len {
+            ($( <span class="macro-nonterminal">$s</span>:literal ),* $(,)<span class="question-mark">?</span>) =&gt; {$({
+                <span class="kw">let </span>lit = <span class="macro">stringify!</span>(<span class="macro-nonterminal">$s</span>);
+                <span class="macro">assert_eq!</span>(find_str_lit_len(lit), <span class="prelude-val">Some</span>(lit.len()));
             })<span class="kw-2">*</span>}
         }
 
@@ -1753,4 +1753,4 @@ line1
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="expect_test" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="expect_test" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

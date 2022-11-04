@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ahash-0.7.6/src/hash_set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hash_set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ahash/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ahash/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ahash/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ahash-0.7.6/src/hash_set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hash_set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ahash/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ahash/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ahash/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -311,318 +311,318 @@
 <span id="311">311</span>
 <span id="312">312</span>
 <span id="313">313</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RandomState</span>;
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">hash_set</span>, <span class="ident">HashSet</span>};
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>};
-<span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">BuildHasher</span>, <span class="ident">Hash</span>};
-<span class="kw">use</span> <span class="ident">std::iter::FromIterator</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">BitAnd</span>, <span class="ident">BitOr</span>, <span class="ident">BitXor</span>, <span class="ident">Deref</span>, <span class="ident">DerefMut</span>, <span class="ident">Sub</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::RandomState;
+<span class="kw">use </span>std::collections::{hash_set, HashSet};
+<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Debug};
+<span class="kw">use </span>std::hash::{BuildHasher, Hash};
+<span class="kw">use </span>std::iter::FromIterator;
+<span class="kw">use </span>std::ops::{BitAnd, BitOr, BitXor, Deref, DerefMut, Sub};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{
-    <span class="ident">de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>},
-    <span class="ident">ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>},
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde&quot;</span>)]
+</span><span class="kw">use </span>serde::{
+    de::{Deserialize, Deserializer},
+    ser::{Serialize, Serializer},
 };
 
-<span class="doccomment">/// A [`HashSet`](std::collections::HashSet) using [`RandomState`](crate::RandomState) to hash the items.</span>
-<span class="doccomment">/// (Requires the `std` feature to be enabled.)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::RandomState</span><span class="op">&gt;</span>(<span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A [`HashSet`](std::collections::HashSet) using [`RandomState`](crate::RandomState) to hash the items.
+/// (Requires the `std` feature to be enabled.)
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>AHashSet&lt;T, S = <span class="kw">crate</span>::RandomState&gt;(HashSet&lt;T, S&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident"><span class="kw">crate</span>::RandomState</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">item</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident"><span class="kw">crate</span>::RandomState</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">AHashSet</span>(<span class="ident">item</span>)
+<span class="kw">impl</span>&lt;T&gt; From&lt;HashSet&lt;T, <span class="kw">crate</span>::RandomState&gt;&gt; <span class="kw">for </span>AHashSet&lt;T&gt; {
+    <span class="kw">fn </span>from(item: HashSet&lt;T, <span class="kw">crate</span>::RandomState&gt;) -&gt; <span class="self">Self </span>{
+        AHashSet(item)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident"><span class="kw">crate</span>::RandomState</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident"><span class="kw">crate</span>::RandomState</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl</span>&lt;T&gt; Into&lt;HashSet&lt;T, <span class="kw">crate</span>::RandomState&gt;&gt; <span class="kw">for </span>AHashSet&lt;T&gt; {
+    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; HashSet&lt;T, <span class="kw">crate</span>::RandomState&gt; {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;T&gt; AHashSet&lt;T, RandomState&gt; {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        AHashSet(HashSet::with_hasher(RandomState::default()))
+    }
+
+    <span class="kw">pub fn </span>with_capacity(capacity: usize) -&gt; <span class="self">Self </span>{
+        AHashSet(HashSet::with_capacity_and_hasher(capacity, RandomState::default()))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RandomState</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">AHashSet</span>(<span class="ident">HashSet::with_hasher</span>(<span class="ident">RandomState::default</span>()))
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">AHashSet</span>(<span class="ident">HashSet::with_capacity_and_hasher</span>(<span class="ident">capacity</span>, <span class="ident">RandomState::default</span>()))
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;T, S&gt; AHashSet&lt;T, S&gt;
+<span class="kw">where
+    </span>S: BuildHasher,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_hasher</span>(<span class="ident">hash_builder</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">AHashSet</span>(<span class="ident">HashSet::with_hasher</span>(<span class="ident">hash_builder</span>))
+    <span class="kw">pub fn </span>with_hasher(hash_builder: S) -&gt; <span class="self">Self </span>{
+        AHashSet(HashSet::with_hasher(hash_builder))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity_and_hasher</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>, <span class="ident">hash_builder</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">AHashSet</span>(<span class="ident">HashSet::with_capacity_and_hasher</span>(<span class="ident">capacity</span>, <span class="ident">hash_builder</span>))
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+    <span class="kw">pub fn </span>with_capacity_and_hasher(capacity: usize, hash_builder: S) -&gt; <span class="self">Self </span>{
+        AHashSet(HashSet::with_capacity_and_hasher(capacity, hash_builder))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl</span>&lt;T, S&gt; Deref <span class="kw">for </span>AHashSet&lt;T, S&gt; {
+    <span class="kw">type </span>Target = HashSet&lt;T, S&gt;;
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;T, S&gt; DerefMut <span class="kw">for </span>AHashSet&lt;T, S&gt; {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;T, S&gt; PartialEq <span class="kw">for </span>AHashSet&lt;T, S&gt;
+<span class="kw">where
+    </span>T: Eq + Hash,
+    S: BuildHasher,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="number">0</span>)
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.eq(<span class="kw-2">&amp;</span>other.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;T, S&gt; Eq <span class="kw">for </span>AHashSet&lt;T, S&gt;
+<span class="kw">where
+    </span>T: Eq + Hash,
+    S: BuildHasher,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">BitOr</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;T, S&gt; BitOr&lt;<span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;
+<span class="kw">where
+    </span>T: Eq + Hash + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = AHashSet&lt;T, S&gt;;
 
-    <span class="doccomment">/// Returns the union of `self` and `rhs` as a new `AHashSet&lt;T, S&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ahash::AHashSet;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let a: AHashSet&lt;_&gt; = vec![1, 2, 3].into_iter().collect();</span>
-    <span class="doccomment">/// let b: AHashSet&lt;_&gt; = vec![3, 4, 5].into_iter().collect();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let set = &amp;a | &amp;b;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut i = 0;</span>
-    <span class="doccomment">/// let expected = [1, 2, 3, 4, 5];</span>
-    <span class="doccomment">/// for x in &amp;set {</span>
-    <span class="doccomment">///     assert!(expected.contains(x));</span>
-    <span class="doccomment">///     i += 1;</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// assert_eq!(i, expected.len());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">AHashSet</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">bitor</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="number">0</span>))
+    <span class="doccomment">/// Returns the union of `self` and `rhs` as a new `AHashSet&lt;T, S&gt;`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ahash::AHashSet;
+    ///
+    /// let a: AHashSet&lt;_&gt; = vec![1, 2, 3].into_iter().collect();
+    /// let b: AHashSet&lt;_&gt; = vec![3, 4, 5].into_iter().collect();
+    ///
+    /// let set = &amp;a | &amp;b;
+    ///
+    /// let mut i = 0;
+    /// let expected = [1, 2, 3, 4, 5];
+    /// for x in &amp;set {
+    ///     assert!(expected.contains(x));
+    ///     i += 1;
+    /// }
+    /// assert_eq!(i, expected.len());
+    /// ```
+    </span><span class="kw">fn </span>bitor(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;) -&gt; AHashSet&lt;T, S&gt; {
+        AHashSet(<span class="self">self</span>.<span class="number">0</span>.bitor(<span class="kw-2">&amp;</span>rhs.<span class="number">0</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">BitAnd</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;T, S&gt; BitAnd&lt;<span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;
+<span class="kw">where
+    </span>T: Eq + Hash + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = AHashSet&lt;T, S&gt;;
 
-    <span class="doccomment">/// Returns the intersection of `self` and `rhs` as a new `AHashSet&lt;T, S&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ahash::AHashSet;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let a: AHashSet&lt;_&gt; = vec![1, 2, 3].into_iter().collect();</span>
-    <span class="doccomment">/// let b: AHashSet&lt;_&gt; = vec![2, 3, 4].into_iter().collect();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let set = &amp;a &amp; &amp;b;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut i = 0;</span>
-    <span class="doccomment">/// let expected = [2, 3];</span>
-    <span class="doccomment">/// for x in &amp;set {</span>
-    <span class="doccomment">///     assert!(expected.contains(x));</span>
-    <span class="doccomment">///     i += 1;</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// assert_eq!(i, expected.len());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">AHashSet</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">bitand</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="number">0</span>))
+    <span class="doccomment">/// Returns the intersection of `self` and `rhs` as a new `AHashSet&lt;T, S&gt;`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ahash::AHashSet;
+    ///
+    /// let a: AHashSet&lt;_&gt; = vec![1, 2, 3].into_iter().collect();
+    /// let b: AHashSet&lt;_&gt; = vec![2, 3, 4].into_iter().collect();
+    ///
+    /// let set = &amp;a &amp; &amp;b;
+    ///
+    /// let mut i = 0;
+    /// let expected = [2, 3];
+    /// for x in &amp;set {
+    ///     assert!(expected.contains(x));
+    ///     i += 1;
+    /// }
+    /// assert_eq!(i, expected.len());
+    /// ```
+    </span><span class="kw">fn </span>bitand(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;) -&gt; AHashSet&lt;T, S&gt; {
+        AHashSet(<span class="self">self</span>.<span class="number">0</span>.bitand(<span class="kw-2">&amp;</span>rhs.<span class="number">0</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">BitXor</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;T, S&gt; BitXor&lt;<span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;
+<span class="kw">where
+    </span>T: Eq + Hash + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = AHashSet&lt;T, S&gt;;
 
-    <span class="doccomment">/// Returns the symmetric difference of `self` and `rhs` as a new `AHashSet&lt;T, S&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ahash::AHashSet;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let a: AHashSet&lt;_&gt; = vec![1, 2, 3].into_iter().collect();</span>
-    <span class="doccomment">/// let b: AHashSet&lt;_&gt; = vec![3, 4, 5].into_iter().collect();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let set = &amp;a ^ &amp;b;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut i = 0;</span>
-    <span class="doccomment">/// let expected = [1, 2, 4, 5];</span>
-    <span class="doccomment">/// for x in &amp;set {</span>
-    <span class="doccomment">///     assert!(expected.contains(x));</span>
-    <span class="doccomment">///     i += 1;</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// assert_eq!(i, expected.len());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">bitxor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">AHashSet</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">bitxor</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="number">0</span>))
+    <span class="doccomment">/// Returns the symmetric difference of `self` and `rhs` as a new `AHashSet&lt;T, S&gt;`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ahash::AHashSet;
+    ///
+    /// let a: AHashSet&lt;_&gt; = vec![1, 2, 3].into_iter().collect();
+    /// let b: AHashSet&lt;_&gt; = vec![3, 4, 5].into_iter().collect();
+    ///
+    /// let set = &amp;a ^ &amp;b;
+    ///
+    /// let mut i = 0;
+    /// let expected = [1, 2, 4, 5];
+    /// for x in &amp;set {
+    ///     assert!(expected.contains(x));
+    ///     i += 1;
+    /// }
+    /// assert_eq!(i, expected.len());
+    /// ```
+    </span><span class="kw">fn </span>bitxor(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;) -&gt; AHashSet&lt;T, S&gt; {
+        AHashSet(<span class="self">self</span>.<span class="number">0</span>.bitxor(<span class="kw-2">&amp;</span>rhs.<span class="number">0</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;T, S&gt; Sub&lt;<span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;
+<span class="kw">where
+    </span>T: Eq + Hash + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = AHashSet&lt;T, S&gt;;
 
-    <span class="doccomment">/// Returns the difference of `self` and `rhs` as a new `AHashSet&lt;T, S&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ahash::AHashSet;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let a: AHashSet&lt;_&gt; = vec![1, 2, 3].into_iter().collect();</span>
-    <span class="doccomment">/// let b: AHashSet&lt;_&gt; = vec![3, 4, 5].into_iter().collect();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let set = &amp;a - &amp;b;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut i = 0;</span>
-    <span class="doccomment">/// let expected = [1, 2];</span>
-    <span class="doccomment">/// for x in &amp;set {</span>
-    <span class="doccomment">///     assert!(expected.contains(x));</span>
-    <span class="doccomment">///     i += 1;</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// assert_eq!(i, expected.len());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">AHashSet</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="number">0</span>))
+    <span class="doccomment">/// Returns the difference of `self` and `rhs` as a new `AHashSet&lt;T, S&gt;`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ahash::AHashSet;
+    ///
+    /// let a: AHashSet&lt;_&gt; = vec![1, 2, 3].into_iter().collect();
+    /// let b: AHashSet&lt;_&gt; = vec![3, 4, 5].into_iter().collect();
+    ///
+    /// let set = &amp;a - &amp;b;
+    ///
+    /// let mut i = 0;
+    /// let expected = [1, 2];
+    /// for x in &amp;set {
+    ///     assert!(expected.contains(x));
+    ///     i += 1;
+    /// }
+    /// assert_eq!(i, expected.len());
+    /// ```
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>AHashSet&lt;T, S&gt;) -&gt; AHashSet&lt;T, S&gt; {
+        AHashSet(<span class="self">self</span>.<span class="number">0</span>.sub(<span class="kw-2">&amp;</span>rhs.<span class="number">0</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Debug</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;T, S&gt; Debug <span class="kw">for </span>AHashSet&lt;T, S&gt;
+<span class="kw">where
+    </span>T: Debug,
+    S: BuildHasher,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(fmt)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;T, S&gt; FromIterator&lt;T&gt; <span class="kw">for </span>AHashSet&lt;T, S&gt;
+<span class="kw">where
+    </span>T: Eq + Hash,
+    S: BuildHasher + Default,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">AHashSet</span>(<span class="ident">HashSet::from_iter</span>(<span class="ident">iter</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = T&gt;&gt;(iter: I) -&gt; AHashSet&lt;T, S&gt; {
+        AHashSet(HashSet::from_iter(iter))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">hash_set::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">iter</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, S&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AHashSet&lt;T, S&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T;
+    <span class="kw">type </span>IntoIter = hash_set::Iter&lt;<span class="lifetime">&#39;a</span>, T&gt;;
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">hash_set::IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into_iter</span>()
+<span class="kw">impl</span>&lt;T, S&gt; IntoIterator <span class="kw">for </span>AHashSet&lt;T, S&gt; {
+    <span class="kw">type </span>Item = T;
+    <span class="kw">type </span>IntoIter = hash_set::IntoIter&lt;T&gt;;
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.<span class="number">0</span>.into_iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;T, S&gt; Extend&lt;T&gt; <span class="kw">for </span>AHashSet&lt;T, S&gt;
+<span class="kw">where
+    </span>T: Eq + Hash,
+    S: BuildHasher,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">I</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">extend</span>(<span class="ident">iter</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = T&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
+        <span class="self">self</span>.<span class="number">0</span>.extend(iter)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Copy</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, S&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span>AHashSet&lt;T, S&gt;
+<span class="kw">where
+    </span>T: <span class="lifetime">&#39;a </span>+ Eq + Hash + Copy,
+    S: BuildHasher,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">I</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">extend</span>(<span class="ident">iter</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
+        <span class="self">self</span>.<span class="number">0</span>.extend(iter)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RandomState</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates an empty `AHashSet&lt;T, S&gt;` with the `Default` value for the hasher.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RandomState</span><span class="op">&gt;</span> {
-        <span class="ident">AHashSet</span>(<span class="ident">HashSet::default</span>())
+<span class="kw">impl</span>&lt;T&gt; Default <span class="kw">for </span>AHashSet&lt;T, RandomState&gt; {
+    <span class="doccomment">/// Creates an empty `AHashSet&lt;T, S&gt;` with the `Default` value for the hasher.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>default() -&gt; AHashSet&lt;T, RandomState&gt; {
+        AHashSet(HashSet::default())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Serialize</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde&quot;</span>)]
+</span><span class="kw">impl</span>&lt;T&gt; Serialize <span class="kw">for </span>AHashSet&lt;T&gt;
+<span class="kw">where
+    </span>T: Serialize + Eq + Hash,
 {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+    <span class="kw">fn </span>serialize&lt;S: Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="self">self</span>.deref().serialize(serializer)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>AHashSet&lt;T&gt;
+<span class="kw">where
+    </span>T: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; + Eq + Hash,
 {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">hash_set</span> <span class="op">=</span> <span class="ident">HashSet::deserialize</span>(<span class="ident">deserializer</span>);
-        <span class="ident">hash_set</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">hash_set</span><span class="op">|</span> <span class="self">Self</span>(<span class="ident">hash_set</span>))
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="kw">let </span>hash_set = HashSet::deserialize(deserializer);
+        hash_set.map(|hash_set| <span class="self">Self</span>(hash_set))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(all(test, feature = <span class="string">&quot;serde&quot;</span>))]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_serde</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident">AHashSet::new</span>();
-        <span class="ident">set</span>.<span class="ident">insert</span>(<span class="string">&quot;for&quot;</span>.<span class="ident">to_string</span>());
-        <span class="ident">set</span>.<span class="ident">insert</span>(<span class="string">&quot;bar&quot;</span>.<span class="ident">to_string</span>());
-        <span class="kw">let</span> <span class="ident">serialization</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">set</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">deserialization</span>: <span class="ident">AHashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">serialization</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">deserialization</span>, <span class="ident">set</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_serde() {
+        <span class="kw">let </span><span class="kw-2">mut </span>set = AHashSet::new();
+        set.insert(<span class="string">&quot;for&quot;</span>.to_string());
+        set.insert(<span class="string">&quot;bar&quot;</span>.to_string());
+        <span class="kw">let </span>serialization = serde_json::to_string(<span class="kw-2">&amp;</span>set).unwrap();
+        <span class="kw">let </span>deserialization: AHashSet&lt;String&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>serialization).unwrap();
+        <span class="macro">assert_eq!</span>(deserialization, set);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ahash" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ahash" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

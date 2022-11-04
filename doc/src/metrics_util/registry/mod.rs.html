@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/registry/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../metrics_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/registry/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../metrics_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -437,444 +437,444 @@
 <span id="437">437</span>
 <span id="438">438</span>
 <span id="439">439</span>
-</pre><pre class="rust"><code><span class="doccomment">//! High-performance metrics storage.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! High-performance metrics storage.
 
-<span class="kw">mod</span> <span class="ident">storage</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">hash::BuildHasherDefault</span>, <span class="ident">iter::repeat</span>};
+</span><span class="kw">mod </span>storage;
+<span class="kw">use </span>std::{hash::BuildHasherDefault, iter::repeat};
 
-<span class="kw">use</span> <span class="ident">hashbrown</span>::{<span class="ident">hash_map::RawEntryMut</span>, <span class="ident">HashMap</span>};
-<span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">Key</span>, <span class="ident">KeyHasher</span>};
-<span class="kw">use</span> <span class="ident">parking_lot::RwLock</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">storage</span>::{<span class="ident">AtomicStorage</span>, <span class="ident">Storage</span>};
+<span class="kw">use </span>hashbrown::{hash_map::RawEntryMut, HashMap};
+<span class="kw">use </span>metrics::{Key, KeyHasher};
+<span class="kw">use </span>parking_lot::RwLock;
+<span class="kw">pub use </span>storage::{AtomicStorage, Storage};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;recency&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">recency</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;recency&quot;</span>)]
+</span><span class="kw">mod </span>recency;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;recency&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">recency</span>::{
-    <span class="ident">Generation</span>, <span class="ident">Generational</span>, <span class="ident">GenerationalAtomicStorage</span>, <span class="ident">GenerationalStorage</span>, <span class="ident">Recency</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;recency&quot;</span>)]
+</span><span class="kw">pub use </span>recency::{
+    Generation, Generational, GenerationalAtomicStorage, GenerationalStorage, Recency,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Hashable</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Hashable;
 
-<span class="kw">type</span> <span class="ident">RegistryHasher</span> <span class="op">=</span> <span class="ident">KeyHasher</span>;
-<span class="kw">type</span> <span class="ident">RegistryHashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">BuildHasherDefault</span><span class="op">&lt;</span><span class="ident">RegistryHasher</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type </span>RegistryHasher = KeyHasher;
+<span class="kw">type </span>RegistryHashMap&lt;K, V&gt; = HashMap&lt;K, V, BuildHasherDefault&lt;RegistryHasher&gt;&gt;;
 
-<span class="doccomment">/// A high-performance metric registry.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Registry` provides the ability to maintain a central listing of metrics mapped by a given key.</span>
-<span class="doccomment">/// Metrics themselves are stored in the objects returned by `S`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Using `Registry` as the basis of an exporter</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As a reusable building blocking for building exporter implementations, users should look at</span>
-<span class="doccomment">/// [`Key`] and [`AtomicStorage`][crate::registry::AtomicStorage] to use for their key and storage,</span>
-<span class="doccomment">/// respectively.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These two implementations provide behavior that is suitable for most exporters, providing</span>
-<span class="doccomment">/// seamless integration with the existing key type used by the core</span>
-<span class="doccomment">/// [`Recorder`][metrics::Recorder] trait, as well as atomic storage for metrics.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In some cases, users may prefer</span>
-<span class="doccomment">/// [`GenerationalAtomicStorage`][crate::registry::GenerationalAtomicStorage] when know if a metric</span>
-<span class="doccomment">/// has been touched, even if its value has not changed since the last time it was observed, is</span>
-<span class="doccomment">/// necessary.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Performance</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Registry` is optimized for reads.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Registry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Hashable</span>,
-    <span class="ident">S</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A high-performance metric registry.
+///
+/// `Registry` provides the ability to maintain a central listing of metrics mapped by a given key.
+/// Metrics themselves are stored in the objects returned by `S`.
+///
+/// ## Using `Registry` as the basis of an exporter
+///
+/// As a reusable building blocking for building exporter implementations, users should look at
+/// [`Key`] and [`AtomicStorage`][crate::registry::AtomicStorage] to use for their key and storage,
+/// respectively.
+///
+/// These two implementations provide behavior that is suitable for most exporters, providing
+/// seamless integration with the existing key type used by the core
+/// [`Recorder`][metrics::Recorder] trait, as well as atomic storage for metrics.
+///
+/// In some cases, users may prefer
+/// [`GenerationalAtomicStorage`][crate::registry::GenerationalAtomicStorage] when know if a metric
+/// has been touched, even if its value has not changed since the last time it was observed, is
+/// necessary.
+///
+/// ## Performance
+///
+/// `Registry` is optimized for reads.
+</span><span class="kw">pub struct </span>Registry&lt;K, S&gt;
+<span class="kw">where
+    </span>K: Hashable,
+    S: Storage&lt;K&gt;,
 {
-    <span class="ident">counters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">RegistryHashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S::Counter</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">gauges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">RegistryHashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S::Gauge</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">histograms</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">RegistryHashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S::Histogram</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">shard_mask</span>: <span class="ident">usize</span>,
-    <span class="ident">storage</span>: <span class="ident">S</span>,
+    counters: Vec&lt;RwLock&lt;RegistryHashMap&lt;K, S::Counter&gt;&gt;&gt;,
+    gauges: Vec&lt;RwLock&lt;RegistryHashMap&lt;K, S::Gauge&gt;&gt;&gt;,
+    histograms: Vec&lt;RwLock&lt;RegistryHashMap&lt;K, S::Histogram&gt;&gt;&gt;,
+    shard_mask: usize,
+    storage: S,
 }
 
-<span class="kw">impl</span> <span class="ident">Registry</span><span class="op">&lt;</span><span class="ident">Key</span>, <span class="ident">AtomicStorage</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new `Registry` using a regular [`Key`] and atomic storage.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">atomic</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">shard_count</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(<span class="number">1</span>, <span class="ident">num_cpus::get</span>()).<span class="ident">next_power_of_two</span>();
-        <span class="kw">let</span> <span class="ident">shard_mask</span> <span class="op">=</span> <span class="ident">shard_count</span> <span class="op">-</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">counters</span> <span class="op">=</span>
-            <span class="ident">repeat</span>(()).<span class="ident">take</span>(<span class="ident">shard_count</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RwLock::new</span>(<span class="ident">RegistryHashMap::default</span>())).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">gauges</span> <span class="op">=</span>
-            <span class="ident">repeat</span>(()).<span class="ident">take</span>(<span class="ident">shard_count</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RwLock::new</span>(<span class="ident">RegistryHashMap::default</span>())).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">histograms</span> <span class="op">=</span>
-            <span class="ident">repeat</span>(()).<span class="ident">take</span>(<span class="ident">shard_count</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RwLock::new</span>(<span class="ident">RegistryHashMap::default</span>())).<span class="ident">collect</span>();
+<span class="kw">impl </span>Registry&lt;Key, AtomicStorage&gt; {
+    <span class="doccomment">/// Creates a new `Registry` using a regular [`Key`] and atomic storage.
+    </span><span class="kw">pub fn </span>atomic() -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>shard_count = std::cmp::max(<span class="number">1</span>, num_cpus::get()).next_power_of_two();
+        <span class="kw">let </span>shard_mask = shard_count - <span class="number">1</span>;
+        <span class="kw">let </span>counters =
+            repeat(()).take(shard_count).map(|<span class="kw">_</span>| RwLock::new(RegistryHashMap::default())).collect();
+        <span class="kw">let </span>gauges =
+            repeat(()).take(shard_count).map(|<span class="kw">_</span>| RwLock::new(RegistryHashMap::default())).collect();
+        <span class="kw">let </span>histograms =
+            repeat(()).take(shard_count).map(|<span class="kw">_</span>| RwLock::new(RegistryHashMap::default())).collect();
 
-        <span class="self">Self</span> { <span class="ident">counters</span>, <span class="ident">gauges</span>, <span class="ident">histograms</span>, <span class="ident">shard_mask</span>, <span class="ident">storage</span>: <span class="ident">AtomicStorage</span> }
+        <span class="self">Self </span>{ counters, gauges, histograms, shard_mask, storage: AtomicStorage }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Registry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hashable</span>,
-    <span class="ident">S</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;K, S&gt; Registry&lt;K, S&gt;
+<span class="kw">where
+    </span>K: Clone + Eq + Hashable,
+    S: Storage&lt;K&gt;,
 {
-    <span class="doccomment">/// Creates a new `Registry`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">storage</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">shard_count</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(<span class="number">1</span>, <span class="ident">num_cpus::get</span>()).<span class="ident">next_power_of_two</span>();
-        <span class="kw">let</span> <span class="ident">shard_mask</span> <span class="op">=</span> <span class="ident">shard_count</span> <span class="op">-</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">counters</span> <span class="op">=</span>
-            <span class="ident">repeat</span>(()).<span class="ident">take</span>(<span class="ident">shard_count</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RwLock::new</span>(<span class="ident">RegistryHashMap::default</span>())).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">gauges</span> <span class="op">=</span>
-            <span class="ident">repeat</span>(()).<span class="ident">take</span>(<span class="ident">shard_count</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RwLock::new</span>(<span class="ident">RegistryHashMap::default</span>())).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">histograms</span> <span class="op">=</span>
-            <span class="ident">repeat</span>(()).<span class="ident">take</span>(<span class="ident">shard_count</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RwLock::new</span>(<span class="ident">RegistryHashMap::default</span>())).<span class="ident">collect</span>();
+    <span class="doccomment">/// Creates a new `Registry`.
+    </span><span class="kw">pub fn </span>new(storage: S) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>shard_count = std::cmp::max(<span class="number">1</span>, num_cpus::get()).next_power_of_two();
+        <span class="kw">let </span>shard_mask = shard_count - <span class="number">1</span>;
+        <span class="kw">let </span>counters =
+            repeat(()).take(shard_count).map(|<span class="kw">_</span>| RwLock::new(RegistryHashMap::default())).collect();
+        <span class="kw">let </span>gauges =
+            repeat(()).take(shard_count).map(|<span class="kw">_</span>| RwLock::new(RegistryHashMap::default())).collect();
+        <span class="kw">let </span>histograms =
+            repeat(()).take(shard_count).map(|<span class="kw">_</span>| RwLock::new(RegistryHashMap::default())).collect();
 
-        <span class="self">Self</span> { <span class="ident">counters</span>, <span class="ident">gauges</span>, <span class="ident">histograms</span>, <span class="ident">shard_mask</span>, <span class="ident">storage</span> }
+        <span class="self">Self </span>{ counters, gauges, histograms, shard_mask, storage }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get_hash_and_shard_for_counter</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>get_hash_and_shard_for_counter(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>,
-    ) -&gt; (<span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">RegistryHashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S::Counter</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">hashable</span>();
+        key: <span class="kw-2">&amp;</span>K,
+    ) -&gt; (u64, <span class="kw-2">&amp;</span>RwLock&lt;RegistryHashMap&lt;K, S::Counter&gt;&gt;) {
+        <span class="kw">let </span>hash = key.hashable();
 
-        <span class="comment">// SAFETY: We initialize vector of subshards with a power-of-two value, and</span>
-        <span class="comment">// `self.shard_mask` is `self.counters.len() - 1`, thus we can never have a result from the</span>
-        <span class="comment">// masking operation that results in a value which is not in bounds of our subshards vector.</span>
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">get_unchecked</span>(<span class="ident">hash</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">shard_mask</span>) };
+        <span class="comment">// SAFETY: We initialize vector of subshards with a power-of-two value, and
+        // `self.shard_mask` is `self.counters.len() - 1`, thus we can never have a result from the
+        // masking operation that results in a value which is not in bounds of our subshards vector.
+        </span><span class="kw">let </span>shard = <span class="kw">unsafe </span>{ <span class="self">self</span>.counters.get_unchecked(hash <span class="kw">as </span>usize &amp; <span class="self">self</span>.shard_mask) };
 
-        (<span class="ident">hash</span>, <span class="ident">shard</span>)
+        (hash, shard)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get_hash_and_shard_for_gauge</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>get_hash_and_shard_for_gauge(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>,
-    ) -&gt; (<span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">RegistryHashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S::Gauge</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">hashable</span>();
+        key: <span class="kw-2">&amp;</span>K,
+    ) -&gt; (u64, <span class="kw-2">&amp;</span>RwLock&lt;RegistryHashMap&lt;K, S::Gauge&gt;&gt;) {
+        <span class="kw">let </span>hash = key.hashable();
 
-        <span class="comment">// SAFETY: We initialize the vector of subshards with a power-of-two value, and</span>
-        <span class="comment">// `self.shard_mask` is `self.gauges.len() - 1`, thus we can never have a result from the</span>
-        <span class="comment">// masking operation that results in a value which is not in bounds of our subshards vector.</span>
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">gauges</span>.<span class="ident">get_unchecked</span>(<span class="ident">hash</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">shard_mask</span>) };
+        <span class="comment">// SAFETY: We initialize the vector of subshards with a power-of-two value, and
+        // `self.shard_mask` is `self.gauges.len() - 1`, thus we can never have a result from the
+        // masking operation that results in a value which is not in bounds of our subshards vector.
+        </span><span class="kw">let </span>shard = <span class="kw">unsafe </span>{ <span class="self">self</span>.gauges.get_unchecked(hash <span class="kw">as </span>usize &amp; <span class="self">self</span>.shard_mask) };
 
-        (<span class="ident">hash</span>, <span class="ident">shard</span>)
+        (hash, shard)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get_hash_and_shard_for_histogram</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>get_hash_and_shard_for_histogram(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>,
-    ) -&gt; (<span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">RegistryHashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S::Histogram</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">hashable</span>();
+        key: <span class="kw-2">&amp;</span>K,
+    ) -&gt; (u64, <span class="kw-2">&amp;</span>RwLock&lt;RegistryHashMap&lt;K, S::Histogram&gt;&gt;) {
+        <span class="kw">let </span>hash = key.hashable();
 
-        <span class="comment">// SAFETY: We initialize the vector of subshards with a power-of-two value, and</span>
-        <span class="comment">// `self.shard_mask` is `self.histograms.len() - 1`, thus we can never have a result from</span>
-        <span class="comment">// the masking operation that results in a value which is not in bounds of our subshards</span>
-        <span class="comment">// vector.</span>
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">histograms</span>.<span class="ident">get_unchecked</span>(<span class="ident">hash</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">shard_mask</span>) };
+        <span class="comment">// SAFETY: We initialize the vector of subshards with a power-of-two value, and
+        // `self.shard_mask` is `self.histograms.len() - 1`, thus we can never have a result from
+        // the masking operation that results in a value which is not in bounds of our subshards
+        // vector.
+        </span><span class="kw">let </span>shard = <span class="kw">unsafe </span>{ <span class="self">self</span>.histograms.get_unchecked(hash <span class="kw">as </span>usize &amp; <span class="self">self</span>.shard_mask) };
 
-        (<span class="ident">hash</span>, <span class="ident">shard</span>)
+        (hash, shard)
     }
 
-    <span class="doccomment">/// Removes all metrics from the registry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operation is eventually consistent: metrics will be removed piecemeal, and this method</span>
-    <span class="doccomment">/// does not ensure that callers will see the registry as entirely empty at any given point.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">for</span> <span class="ident">shard</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">counters</span> {
-            <span class="ident">shard</span>.<span class="ident">write</span>().<span class="ident">clear</span>();
+    <span class="doccomment">/// Removes all metrics from the registry.
+    ///
+    /// This operation is eventually consistent: metrics will be removed piecemeal, and this method
+    /// does not ensure that callers will see the registry as entirely empty at any given point.
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">for </span>shard <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.counters {
+            shard.write().clear();
         }
-        <span class="kw">for</span> <span class="ident">shard</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">gauges</span> {
-            <span class="ident">shard</span>.<span class="ident">write</span>().<span class="ident">clear</span>();
+        <span class="kw">for </span>shard <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.gauges {
+            shard.write().clear();
         }
-        <span class="kw">for</span> <span class="ident">shard</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">histograms</span> {
-            <span class="ident">shard</span>.<span class="ident">write</span>().<span class="ident">clear</span>();
+        <span class="kw">for </span>shard <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.histograms {
+            shard.write().clear();
         }
     }
 
-    <span class="doccomment">/// Gets or creates the given counter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `op` function will be called for the counter under the given `key`, with the counter</span>
-    <span class="doccomment">/// first being created if it does not already exist.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_or_create_counter</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="ident">op</span>: <span class="ident">O</span>) -&gt; <span class="ident">V</span>
-    <span class="kw">where</span>
-        <span class="ident">O</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">S::Counter</span>) -&gt; <span class="ident">V</span>,
+    <span class="doccomment">/// Gets or creates the given counter.
+    ///
+    /// The `op` function will be called for the counter under the given `key`, with the counter
+    /// first being created if it does not already exist.
+    </span><span class="kw">pub fn </span>get_or_create_counter&lt;O, V&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K, op: O) -&gt; V
+    <span class="kw">where
+        </span>O: FnOnce(<span class="kw-2">&amp;</span>S::Counter) -&gt; V,
     {
-        <span class="kw">let</span> (<span class="ident">hash</span>, <span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_hash_and_shard_for_counter</span>(<span class="ident">key</span>);
+        <span class="kw">let </span>(hash, shard) = <span class="self">self</span>.get_hash_and_shard_for_counter(key);
 
-        <span class="comment">// Try and get the handle if it exists, running our operation if we succeed.</span>
-        <span class="kw">let</span> <span class="ident">shard_read</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">read</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">v</span>)) <span class="op">=</span> <span class="ident">shard_read</span>.<span class="ident">raw_entry</span>().<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>) {
-            <span class="ident">op</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// Switch to write guard and insert the handle first.</span>
-            <span class="ident">drop</span>(<span class="ident">shard_read</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shard_write</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">write</span>();
-            <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">v</span>)) <span class="op">=</span> <span class="ident">shard_write</span>.<span class="ident">raw_entry</span>().<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>)
+        <span class="comment">// Try and get the handle if it exists, running our operation if we succeed.
+        </span><span class="kw">let </span>shard_read = shard.read();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, v)) = shard_read.raw_entry().from_key_hashed_nocheck(hash, key) {
+            op(v)
+        } <span class="kw">else </span>{
+            <span class="comment">// Switch to write guard and insert the handle first.
+            </span>drop(shard_read);
+            <span class="kw">let </span><span class="kw-2">mut </span>shard_write = shard.write();
+            <span class="kw">let </span>v = <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, v)) = shard_write.raw_entry().from_key_hashed_nocheck(hash, key)
             {
-                <span class="ident">v</span>
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">shard_write</span>
-                    .<span class="ident">raw_entry_mut</span>()
-                    .<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>)
-                    .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> (<span class="ident">key</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">counter</span>(<span class="ident">key</span>)));
+                v
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>(<span class="kw">_</span>, v) = shard_write
+                    .raw_entry_mut()
+                    .from_key_hashed_nocheck(hash, key)
+                    .or_insert_with(|| (key.clone(), <span class="self">self</span>.storage.counter(key)));
 
-                <span class="ident">v</span>
+                v
             };
 
-            <span class="ident">op</span>(<span class="ident">v</span>)
+            op(v)
         }
     }
 
-    <span class="doccomment">/// Gets or creates the given gauge.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `op` function will be called for the gauge under the given `key`, with the gauge</span>
-    <span class="doccomment">/// first being created if it does not already exist.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_or_create_gauge</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="ident">op</span>: <span class="ident">O</span>) -&gt; <span class="ident">V</span>
-    <span class="kw">where</span>
-        <span class="ident">O</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">S::Gauge</span>) -&gt; <span class="ident">V</span>,
+    <span class="doccomment">/// Gets or creates the given gauge.
+    ///
+    /// The `op` function will be called for the gauge under the given `key`, with the gauge
+    /// first being created if it does not already exist.
+    </span><span class="kw">pub fn </span>get_or_create_gauge&lt;O, V&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K, op: O) -&gt; V
+    <span class="kw">where
+        </span>O: FnOnce(<span class="kw-2">&amp;</span>S::Gauge) -&gt; V,
     {
-        <span class="kw">let</span> (<span class="ident">hash</span>, <span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_hash_and_shard_for_gauge</span>(<span class="ident">key</span>);
+        <span class="kw">let </span>(hash, shard) = <span class="self">self</span>.get_hash_and_shard_for_gauge(key);
 
-        <span class="comment">// Try and get the handle if it exists, running our operation if we succeed.</span>
-        <span class="kw">let</span> <span class="ident">shard_read</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">read</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">v</span>)) <span class="op">=</span> <span class="ident">shard_read</span>.<span class="ident">raw_entry</span>().<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>) {
-            <span class="ident">op</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// Switch to write guard and insert the handle first.</span>
-            <span class="ident">drop</span>(<span class="ident">shard_read</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shard_write</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">write</span>();
-            <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">v</span>)) <span class="op">=</span> <span class="ident">shard_write</span>.<span class="ident">raw_entry</span>().<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>)
+        <span class="comment">// Try and get the handle if it exists, running our operation if we succeed.
+        </span><span class="kw">let </span>shard_read = shard.read();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, v)) = shard_read.raw_entry().from_key_hashed_nocheck(hash, key) {
+            op(v)
+        } <span class="kw">else </span>{
+            <span class="comment">// Switch to write guard and insert the handle first.
+            </span>drop(shard_read);
+            <span class="kw">let </span><span class="kw-2">mut </span>shard_write = shard.write();
+            <span class="kw">let </span>v = <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, v)) = shard_write.raw_entry().from_key_hashed_nocheck(hash, key)
             {
-                <span class="ident">v</span>
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">shard_write</span>
-                    .<span class="ident">raw_entry_mut</span>()
-                    .<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>)
-                    .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> (<span class="ident">key</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">gauge</span>(<span class="ident">key</span>)));
+                v
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>(<span class="kw">_</span>, v) = shard_write
+                    .raw_entry_mut()
+                    .from_key_hashed_nocheck(hash, key)
+                    .or_insert_with(|| (key.clone(), <span class="self">self</span>.storage.gauge(key)));
 
-                <span class="ident">v</span>
+                v
             };
 
-            <span class="ident">op</span>(<span class="ident">v</span>)
+            op(v)
         }
     }
 
-    <span class="doccomment">/// Gets or creates the given histogram.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `op` function will be called for the histogram under the given `key`, with the histogram</span>
-    <span class="doccomment">/// first being created if it does not already exist.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_or_create_histogram</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="ident">op</span>: <span class="ident">O</span>) -&gt; <span class="ident">V</span>
-    <span class="kw">where</span>
-        <span class="ident">O</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">S::Histogram</span>) -&gt; <span class="ident">V</span>,
+    <span class="doccomment">/// Gets or creates the given histogram.
+    ///
+    /// The `op` function will be called for the histogram under the given `key`, with the histogram
+    /// first being created if it does not already exist.
+    </span><span class="kw">pub fn </span>get_or_create_histogram&lt;O, V&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K, op: O) -&gt; V
+    <span class="kw">where
+        </span>O: FnOnce(<span class="kw-2">&amp;</span>S::Histogram) -&gt; V,
     {
-        <span class="kw">let</span> (<span class="ident">hash</span>, <span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_hash_and_shard_for_histogram</span>(<span class="ident">key</span>);
+        <span class="kw">let </span>(hash, shard) = <span class="self">self</span>.get_hash_and_shard_for_histogram(key);
 
-        <span class="comment">// Try and get the handle if it exists, running our operation if we succeed.</span>
-        <span class="kw">let</span> <span class="ident">shard_read</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">read</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">v</span>)) <span class="op">=</span> <span class="ident">shard_read</span>.<span class="ident">raw_entry</span>().<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>) {
-            <span class="ident">op</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// Switch to write guard and insert the handle first.</span>
-            <span class="ident">drop</span>(<span class="ident">shard_read</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shard_write</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">write</span>();
-            <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">v</span>)) <span class="op">=</span> <span class="ident">shard_write</span>.<span class="ident">raw_entry</span>().<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>)
+        <span class="comment">// Try and get the handle if it exists, running our operation if we succeed.
+        </span><span class="kw">let </span>shard_read = shard.read();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, v)) = shard_read.raw_entry().from_key_hashed_nocheck(hash, key) {
+            op(v)
+        } <span class="kw">else </span>{
+            <span class="comment">// Switch to write guard and insert the handle first.
+            </span>drop(shard_read);
+            <span class="kw">let </span><span class="kw-2">mut </span>shard_write = shard.write();
+            <span class="kw">let </span>v = <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, v)) = shard_write.raw_entry().from_key_hashed_nocheck(hash, key)
             {
-                <span class="ident">v</span>
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">shard_write</span>
-                    .<span class="ident">raw_entry_mut</span>()
-                    .<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>)
-                    .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> (<span class="ident">key</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">histogram</span>(<span class="ident">key</span>)));
+                v
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>(<span class="kw">_</span>, v) = shard_write
+                    .raw_entry_mut()
+                    .from_key_hashed_nocheck(hash, key)
+                    .or_insert_with(|| (key.clone(), <span class="self">self</span>.storage.histogram(key)));
 
-                <span class="ident">v</span>
+                v
             };
 
-            <span class="ident">op</span>(<span class="ident">v</span>)
+            op(v)
         }
     }
 
-    <span class="doccomment">/// Deletes a counter from the registry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `true` if the counter existed and was removed, `false` otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_counter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> (<span class="ident">hash</span>, <span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_hash_and_shard_for_counter</span>(<span class="ident">key</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shard_write</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">write</span>();
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">shard_write</span>.<span class="ident">raw_entry_mut</span>().<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RawEntryMut::Occupied</span>(<span class="ident">entry</span>) <span class="op">=</span> <span class="ident">entry</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">remove_entry</span>();
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Deletes a counter from the registry.
+    ///
+    /// Returns `true` if the counter existed and was removed, `false` otherwise.
+    </span><span class="kw">pub fn </span>delete_counter(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K) -&gt; bool {
+        <span class="kw">let </span>(hash, shard) = <span class="self">self</span>.get_hash_and_shard_for_counter(key);
+        <span class="kw">let </span><span class="kw-2">mut </span>shard_write = shard.write();
+        <span class="kw">let </span>entry = shard_write.raw_entry_mut().from_key_hashed_nocheck(hash, key);
+        <span class="kw">if let </span>RawEntryMut::Occupied(entry) = entry {
+            <span class="kw">let _ </span>= entry.remove_entry();
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="bool-val">false</span>
-    }
+        <span class="bool-val">false
+    </span>}
 
-    <span class="doccomment">/// Deletes a gauge from the registry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `true` if the gauge existed and was removed, `false` otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_gauge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> (<span class="ident">hash</span>, <span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_hash_and_shard_for_gauge</span>(<span class="ident">key</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shard_write</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">write</span>();
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">shard_write</span>.<span class="ident">raw_entry_mut</span>().<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RawEntryMut::Occupied</span>(<span class="ident">entry</span>) <span class="op">=</span> <span class="ident">entry</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">remove_entry</span>();
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Deletes a gauge from the registry.
+    ///
+    /// Returns `true` if the gauge existed and was removed, `false` otherwise.
+    </span><span class="kw">pub fn </span>delete_gauge(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K) -&gt; bool {
+        <span class="kw">let </span>(hash, shard) = <span class="self">self</span>.get_hash_and_shard_for_gauge(key);
+        <span class="kw">let </span><span class="kw-2">mut </span>shard_write = shard.write();
+        <span class="kw">let </span>entry = shard_write.raw_entry_mut().from_key_hashed_nocheck(hash, key);
+        <span class="kw">if let </span>RawEntryMut::Occupied(entry) = entry {
+            <span class="kw">let _ </span>= entry.remove_entry();
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="bool-val">false</span>
-    }
+        <span class="bool-val">false
+    </span>}
 
-    <span class="doccomment">/// Deletes a histogram from the registry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `true` if the histogram existed and was removed, `false` otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_histogram</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> (<span class="ident">hash</span>, <span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_hash_and_shard_for_histogram</span>(<span class="ident">key</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shard_write</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">write</span>();
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">shard_write</span>.<span class="ident">raw_entry_mut</span>().<span class="ident">from_key_hashed_nocheck</span>(<span class="ident">hash</span>, <span class="ident">key</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RawEntryMut::Occupied</span>(<span class="ident">entry</span>) <span class="op">=</span> <span class="ident">entry</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">remove_entry</span>();
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Deletes a histogram from the registry.
+    ///
+    /// Returns `true` if the histogram existed and was removed, `false` otherwise.
+    </span><span class="kw">pub fn </span>delete_histogram(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K) -&gt; bool {
+        <span class="kw">let </span>(hash, shard) = <span class="self">self</span>.get_hash_and_shard_for_histogram(key);
+        <span class="kw">let </span><span class="kw-2">mut </span>shard_write = shard.write();
+        <span class="kw">let </span>entry = shard_write.raw_entry_mut().from_key_hashed_nocheck(hash, key);
+        <span class="kw">if let </span>RawEntryMut::Occupied(entry) = entry {
+            <span class="kw">let _ </span>= entry.remove_entry();
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="bool-val">false</span>
-    }
+        <span class="bool-val">false
+    </span>}
 
-    <span class="doccomment">/// Visits every counter stored in this registry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operation does not lock the entire registry, but proceeds directly through the</span>
-    <span class="doccomment">/// &quot;subshards&quot; that are kept internally.  As a result, all subshards will be visited, but a</span>
-    <span class="doccomment">/// metric that existed at the exact moment that `visit_counters` was called may not actually be observed</span>
-    <span class="doccomment">/// if it is deleted before that subshard is reached.  Likewise, a metric that is added after</span>
-    <span class="doccomment">/// the call to `visit_counters`, but before `visit_counters` finishes, may also not be observed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">visit_counters</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">collect</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">S::Counter</span>),
+    <span class="doccomment">/// Visits every counter stored in this registry.
+    ///
+    /// This operation does not lock the entire registry, but proceeds directly through the
+    /// &quot;subshards&quot; that are kept internally.  As a result, all subshards will be visited, but a
+    /// metric that existed at the exact moment that `visit_counters` was called may not actually be observed
+    /// if it is deleted before that subshard is reached.  Likewise, a metric that is added after
+    /// the call to `visit_counters`, but before `visit_counters` finishes, may also not be observed.
+    </span><span class="kw">pub fn </span>visit_counters&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>collect: F)
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>S::Counter),
     {
-        <span class="kw">for</span> <span class="ident">subshard</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">shard_read</span> <span class="op">=</span> <span class="ident">subshard</span>.<span class="ident">read</span>();
-            <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">counter</span>) <span class="kw">in</span> <span class="ident">shard_read</span>.<span class="ident">iter</span>() {
-                <span class="ident">collect</span>(<span class="ident">key</span>, <span class="ident">counter</span>);
+        <span class="kw">for </span>subshard <span class="kw">in </span><span class="self">self</span>.counters.iter() {
+            <span class="kw">let </span>shard_read = subshard.read();
+            <span class="kw">for </span>(key, counter) <span class="kw">in </span>shard_read.iter() {
+                collect(key, counter);
             }
         }
     }
 
-    <span class="doccomment">/// Visits every gauge stored in this registry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operation does not lock the entire registry, but proceeds directly through the</span>
-    <span class="doccomment">/// &quot;subshards&quot; that are kept internally.  As a result, all subshards will be visited, but a</span>
-    <span class="doccomment">/// metric that existed at the exact moment that `visit_gauges` was called may not actually be observed</span>
-    <span class="doccomment">/// if it is deleted before that subshard is reached.  Likewise, a metric that is added after</span>
-    <span class="doccomment">/// the call to `visit_gauges`, but before `visit_gauges` finishes, may also not be observed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">visit_gauges</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">collect</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">S::Gauge</span>),
+    <span class="doccomment">/// Visits every gauge stored in this registry.
+    ///
+    /// This operation does not lock the entire registry, but proceeds directly through the
+    /// &quot;subshards&quot; that are kept internally.  As a result, all subshards will be visited, but a
+    /// metric that existed at the exact moment that `visit_gauges` was called may not actually be observed
+    /// if it is deleted before that subshard is reached.  Likewise, a metric that is added after
+    /// the call to `visit_gauges`, but before `visit_gauges` finishes, may also not be observed.
+    </span><span class="kw">pub fn </span>visit_gauges&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>collect: F)
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>S::Gauge),
     {
-        <span class="kw">for</span> <span class="ident">subshard</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">gauges</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">shard_read</span> <span class="op">=</span> <span class="ident">subshard</span>.<span class="ident">read</span>();
-            <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">gauge</span>) <span class="kw">in</span> <span class="ident">shard_read</span>.<span class="ident">iter</span>() {
-                <span class="ident">collect</span>(<span class="ident">key</span>, <span class="ident">gauge</span>);
+        <span class="kw">for </span>subshard <span class="kw">in </span><span class="self">self</span>.gauges.iter() {
+            <span class="kw">let </span>shard_read = subshard.read();
+            <span class="kw">for </span>(key, gauge) <span class="kw">in </span>shard_read.iter() {
+                collect(key, gauge);
             }
         }
     }
 
-    <span class="doccomment">/// Visits every histogram stored in this registry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operation does not lock the entire registry, but proceeds directly through the</span>
-    <span class="doccomment">/// &quot;subshards&quot; that are kept internally.  As a result, all subshards will be visited, but a</span>
-    <span class="doccomment">/// metric that existed at the exact moment that `visit_histograms` was called may not actually be observed</span>
-    <span class="doccomment">/// if it is deleted before that subshard is reached.  Likewise, a metric that is added after</span>
-    <span class="doccomment">/// the call to `visit_histograms`, but before `visit_histograms` finishes, may also not be observed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">visit_histograms</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">collect</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">S::Histogram</span>),
+    <span class="doccomment">/// Visits every histogram stored in this registry.
+    ///
+    /// This operation does not lock the entire registry, but proceeds directly through the
+    /// &quot;subshards&quot; that are kept internally.  As a result, all subshards will be visited, but a
+    /// metric that existed at the exact moment that `visit_histograms` was called may not actually be observed
+    /// if it is deleted before that subshard is reached.  Likewise, a metric that is added after
+    /// the call to `visit_histograms`, but before `visit_histograms` finishes, may also not be observed.
+    </span><span class="kw">pub fn </span>visit_histograms&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>collect: F)
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>S::Histogram),
     {
-        <span class="kw">for</span> <span class="ident">subshard</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">histograms</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">shard_read</span> <span class="op">=</span> <span class="ident">subshard</span>.<span class="ident">read</span>();
-            <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">histogram</span>) <span class="kw">in</span> <span class="ident">shard_read</span>.<span class="ident">iter</span>() {
-                <span class="ident">collect</span>(<span class="ident">key</span>, <span class="ident">histogram</span>);
+        <span class="kw">for </span>subshard <span class="kw">in </span><span class="self">self</span>.histograms.iter() {
+            <span class="kw">let </span>shard_read = subshard.read();
+            <span class="kw">for </span>(key, histogram) <span class="kw">in </span>shard_read.iter() {
+                collect(key, histogram);
             }
         }
     }
 
-    <span class="doccomment">/// Gets a map of all present counters, mapped by key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This map is a point-in-time snapshot of the registry.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_counter_handles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S::Counter</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">counters</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="self">self</span>.<span class="ident">visit_counters</span>(<span class="op">|</span><span class="ident">k</span>, <span class="ident">v</span><span class="op">|</span> {
-            <span class="ident">counters</span>.<span class="ident">insert</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">v</span>.<span class="ident">clone</span>());
+    <span class="doccomment">/// Gets a map of all present counters, mapped by key.
+    ///
+    /// This map is a point-in-time snapshot of the registry.
+    </span><span class="kw">pub fn </span>get_counter_handles(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashMap&lt;K, S::Counter&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>counters = HashMap::new();
+        <span class="self">self</span>.visit_counters(|k, v| {
+            counters.insert(k.clone(), v.clone());
         });
-        <span class="ident">counters</span>
+        counters
     }
 
-    <span class="doccomment">/// Gets a map of all present gauges, mapped by key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This map is a point-in-time snapshot of the registry.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_gauge_handles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S::Gauge</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gauges</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="self">self</span>.<span class="ident">visit_gauges</span>(<span class="op">|</span><span class="ident">k</span>, <span class="ident">v</span><span class="op">|</span> {
-            <span class="ident">gauges</span>.<span class="ident">insert</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">v</span>.<span class="ident">clone</span>());
+    <span class="doccomment">/// Gets a map of all present gauges, mapped by key.
+    ///
+    /// This map is a point-in-time snapshot of the registry.
+    </span><span class="kw">pub fn </span>get_gauge_handles(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashMap&lt;K, S::Gauge&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>gauges = HashMap::new();
+        <span class="self">self</span>.visit_gauges(|k, v| {
+            gauges.insert(k.clone(), v.clone());
         });
-        <span class="ident">gauges</span>
+        gauges
     }
 
-    <span class="doccomment">/// Gets a map of all present histograms, mapped by key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This map is a point-in-time snapshot of the registry.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_histogram_handles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S::Histogram</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">histograms</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="self">self</span>.<span class="ident">visit_histograms</span>(<span class="op">|</span><span class="ident">k</span>, <span class="ident">v</span><span class="op">|</span> {
-            <span class="ident">histograms</span>.<span class="ident">insert</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">v</span>.<span class="ident">clone</span>());
+    <span class="doccomment">/// Gets a map of all present histograms, mapped by key.
+    ///
+    /// This map is a point-in-time snapshot of the registry.
+    </span><span class="kw">pub fn </span>get_histogram_handles(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashMap&lt;K, S::Histogram&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>histograms = HashMap::new();
+        <span class="self">self</span>.visit_histograms(|k, v| {
+            histograms.insert(k.clone(), v.clone());
         });
-        <span class="ident">histograms</span>
+        histograms
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">atomic_shim::AtomicU64</span>;
-    <span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">CounterFn</span>, <span class="ident">Key</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>atomic_shim::AtomicU64;
+    <span class="kw">use </span>metrics::{CounterFn, Key};
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Registry</span>;
-    <span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">atomic::Ordering</span>, <span class="ident">Arc</span>};
+    <span class="kw">use </span><span class="kw">super</span>::Registry;
+    <span class="kw">use </span>std::sync::{atomic::Ordering, Arc};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_registry</span>() {
-        <span class="kw">let</span> <span class="ident">registry</span> <span class="op">=</span> <span class="ident">Registry::atomic</span>();
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;foobar&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_registry() {
+        <span class="kw">let </span>registry = Registry::atomic();
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;foobar&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">entries</span> <span class="op">=</span> <span class="ident">registry</span>.<span class="ident">get_counter_handles</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">entries</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span>entries = registry.get_counter_handles();
+        <span class="macro">assert_eq!</span>(entries.len(), <span class="number">0</span>);
 
-        <span class="ident">registry</span>.<span class="ident">get_or_create_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="op">|</span><span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicU64</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">increment</span>(<span class="number">1</span>));
+        registry.get_or_create_counter(<span class="kw-2">&amp;</span>key, |c: <span class="kw-2">&amp;</span>Arc&lt;AtomicU64&gt;| c.increment(<span class="number">1</span>));
 
-        <span class="kw">let</span> <span class="ident">initial_entries</span> <span class="op">=</span> <span class="ident">registry</span>.<span class="ident">get_counter_handles</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">initial_entries</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="kw">let </span>initial_entries = registry.get_counter_handles();
+        <span class="macro">assert_eq!</span>(initial_entries.len(), <span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">initial_entry</span>: (<span class="ident">Key</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicU64</span><span class="op">&gt;</span>) <span class="op">=</span>
-            <span class="ident">initial_entries</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;failed to get first entry&quot;</span>);
+        <span class="kw">let </span>initial_entry: (Key, Arc&lt;AtomicU64&gt;) =
+            initial_entries.into_iter().next().expect(<span class="string">&quot;failed to get first entry&quot;</span>);
 
-        <span class="kw">let</span> (<span class="ident">ikey</span>, <span class="ident">ivalue</span>) <span class="op">=</span> <span class="ident">initial_entry</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">ikey</span>, <span class="ident">key</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">ivalue</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>), <span class="number">1</span>);
+        <span class="kw">let </span>(ikey, ivalue) = initial_entry;
+        <span class="macro">assert_eq!</span>(ikey, key);
+        <span class="macro">assert_eq!</span>(ivalue.load(Ordering::SeqCst), <span class="number">1</span>);
 
-        <span class="ident">registry</span>.<span class="ident">get_or_create_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="op">|</span><span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicU64</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">increment</span>(<span class="number">1</span>));
+        registry.get_or_create_counter(<span class="kw-2">&amp;</span>key, |c: <span class="kw-2">&amp;</span>Arc&lt;AtomicU64&gt;| c.increment(<span class="number">1</span>));
 
-        <span class="kw">let</span> <span class="ident">updated_entries</span> <span class="op">=</span> <span class="ident">registry</span>.<span class="ident">get_counter_handles</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">updated_entries</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="kw">let </span>updated_entries = registry.get_counter_handles();
+        <span class="macro">assert_eq!</span>(updated_entries.len(), <span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">updated_entry</span>: (<span class="ident">Key</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicU64</span><span class="op">&gt;</span>) <span class="op">=</span>
-            <span class="ident">updated_entries</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;failed to get updated entry&quot;</span>);
+        <span class="kw">let </span>updated_entry: (Key, Arc&lt;AtomicU64&gt;) =
+            updated_entries.into_iter().next().expect(<span class="string">&quot;failed to get updated entry&quot;</span>);
 
-        <span class="kw">let</span> (<span class="ident">ukey</span>, <span class="ident">uvalue</span>) <span class="op">=</span> <span class="ident">updated_entry</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">ukey</span>, <span class="ident">key</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">uvalue</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>), <span class="number">2</span>);
+        <span class="kw">let </span>(ukey, uvalue) = updated_entry;
+        <span class="macro">assert_eq!</span>(ukey, key);
+        <span class="macro">assert_eq!</span>(uvalue.load(Ordering::SeqCst), <span class="number">2</span>);
 
-        <span class="macro">assert!</span>(<span class="ident">registry</span>.<span class="ident">delete_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>));
+        <span class="macro">assert!</span>(registry.delete_counter(<span class="kw-2">&amp;</span>key));
 
-        <span class="kw">let</span> <span class="ident">entries</span> <span class="op">=</span> <span class="ident">registry</span>.<span class="ident">get_counter_handles</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">entries</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span>entries = registry.get_counter_handles();
+        <span class="macro">assert_eq!</span>(entries.len(), <span class="number">0</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-layer-0.3.2/src/tuple.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tuple.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tower_layer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tower_layer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tower_layer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-layer-0.3.2/src/tuple.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tuple.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tower_layer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tower_layer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tower_layer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -328,335 +328,335 @@
 <span id="328">328</span>
 <span id="329">329</span>
 <span id="330">330</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Layer</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::Layer;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> () {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">S</span>;
+<span class="kw">impl</span>&lt;S&gt; Layer&lt;S&gt; <span class="kw">for </span>() {
+    <span class="kw">type </span>Service = S;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="ident">service</span>
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        service
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">L1</span>,)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1&gt; Layer&lt;S&gt; <span class="kw">for </span>(L1,)
+<span class="kw">where
+    </span>L1: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>,) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>(<span class="ident">service</span>)
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1,) = <span class="self">self</span>;
+        l1.layer(service)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2&gt; Layer&lt;S&gt; <span class="kw">for </span>(L1, L2)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>(<span class="ident">l2</span>.<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2) = <span class="self">self</span>;
+        l1.layer(l2.layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3&gt; Layer&lt;S&gt; <span class="kw">for </span>(L1, L2, L3)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3) = <span class="self">self</span>;
+        l1.layer((l2, l3).layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3, L4&gt; Layer&lt;S&gt; <span class="kw">for </span>(L1, L2, L3, L4)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4).layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5&gt; Layer&lt;S&gt; <span class="kw">for </span>(L1, L2, L3, L4, L5)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5).layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L6::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L6</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5, L6&gt; Layer&lt;S&gt; <span class="kw">for </span>(L1, L2, L3, L4, L5, L6)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;L6::Service&gt;,
+    L6: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5, l6) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5, l6).layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L6::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L6</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L7::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L7</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5, L6, L7&gt; Layer&lt;S&gt; <span class="kw">for </span>(L1, L2, L3, L4, L5, L6, L7)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;L6::Service&gt;,
+    L6: Layer&lt;L7::Service&gt;,
+    L7: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5, l6, l7) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5, l6, l7).layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L6::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L6</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L7::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L7</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L8::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L8</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5, L6, L7, L8&gt; Layer&lt;S&gt; <span class="kw">for </span>(L1, L2, L3, L4, L5, L6, L7, L8)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;L6::Service&gt;,
+    L6: Layer&lt;L7::Service&gt;,
+    L7: Layer&lt;L8::Service&gt;,
+    L8: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5, l6, l7, l8) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5, l6, l7, l8).layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L6::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L6</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L7::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L7</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L8::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L8</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L9::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L9</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5, L6, L7, L8, L9&gt; Layer&lt;S&gt; <span class="kw">for </span>(L1, L2, L3, L4, L5, L6, L7, L8, L9)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;L6::Service&gt;,
+    L6: Layer&lt;L7::Service&gt;,
+    L7: Layer&lt;L8::Service&gt;,
+    L8: Layer&lt;L9::Service&gt;,
+    L9: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5, l6, l7, l8, l9) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5, l6, l7, l8, l9).layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L6::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L6</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L7::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L7</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L8::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L8</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L9::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L9</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L10::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L10</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5, L6, L7, L8, L9, L10&gt; Layer&lt;S&gt;
+    <span class="kw">for </span>(L1, L2, L3, L4, L5, L6, L7, L8, L9, L10)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;L6::Service&gt;,
+    L6: Layer&lt;L7::Service&gt;,
+    L7: Layer&lt;L8::Service&gt;,
+    L8: Layer&lt;L9::Service&gt;,
+    L9: Layer&lt;L10::Service&gt;,
+    L10: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5, l6, l7, l8, l9, l10) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5, l6, l7, l8, l9, l10).layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L6::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L6</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L7::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L7</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L8::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L8</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L9::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L9</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L10::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L10</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L11::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L11</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11&gt; Layer&lt;S&gt;
+    <span class="kw">for </span>(L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;L6::Service&gt;,
+    L6: Layer&lt;L7::Service&gt;,
+    L7: Layer&lt;L8::Service&gt;,
+    L8: Layer&lt;L9::Service&gt;,
+    L9: Layer&lt;L10::Service&gt;,
+    L10: Layer&lt;L11::Service&gt;,
+    L11: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5, l6, l7, l8, l9, l10, l11).layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span>, <span class="ident">L12</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span>, <span class="ident">L12</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L6::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L6</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L7::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L7</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L8::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L8</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L9::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L9</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L10::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L10</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L11::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L11</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L12::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L12</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12&gt; Layer&lt;S&gt;
+    <span class="kw">for </span>(L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;L6::Service&gt;,
+    L6: Layer&lt;L7::Service&gt;,
+    L7: Layer&lt;L8::Service&gt;,
+    L8: Layer&lt;L9::Service&gt;,
+    L9: Layer&lt;L10::Service&gt;,
+    L10: Layer&lt;L11::Service&gt;,
+    L11: Layer&lt;L12::Service&gt;,
+    L12: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>, <span class="ident">l12</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>, <span class="ident">l12</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12).layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span>, <span class="ident">L12</span>, <span class="ident">L13</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span>, <span class="ident">L12</span>, <span class="ident">L13</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L6::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L6</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L7::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L7</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L8::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L8</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L9::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L9</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L10::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L10</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L11::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L11</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L12::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L12</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L13::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L13</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12, L13&gt; Layer&lt;S&gt;
+    <span class="kw">for </span>(L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12, L13)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;L6::Service&gt;,
+    L6: Layer&lt;L7::Service&gt;,
+    L7: Layer&lt;L8::Service&gt;,
+    L8: Layer&lt;L9::Service&gt;,
+    L9: Layer&lt;L10::Service&gt;,
+    L10: Layer&lt;L11::Service&gt;,
+    L11: Layer&lt;L12::Service&gt;,
+    L12: Layer&lt;L13::Service&gt;,
+    L13: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>, <span class="ident">l12</span>, <span class="ident">l13</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>, <span class="ident">l12</span>, <span class="ident">l13</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13).layer(service))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span>, <span class="ident">L12</span>, <span class="ident">L13</span>, <span class="ident">L14</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span>, <span class="ident">L12</span>, <span class="ident">L13</span>, <span class="ident">L14</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L6::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L6</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L7::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L7</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L8::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L8</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L9::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L9</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L10::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L10</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L11::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L11</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L12::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L12</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L13::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L13</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L14::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L14</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12, L13, L14&gt; Layer&lt;S&gt;
+    <span class="kw">for </span>(L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12, L13, L14)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;L6::Service&gt;,
+    L6: Layer&lt;L7::Service&gt;,
+    L7: Layer&lt;L8::Service&gt;,
+    L8: Layer&lt;L9::Service&gt;,
+    L9: Layer&lt;L10::Service&gt;,
+    L10: Layer&lt;L11::Service&gt;,
+    L11: Layer&lt;L12::Service&gt;,
+    L12: Layer&lt;L13::Service&gt;,
+    L13: Layer&lt;L14::Service&gt;,
+    L14: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>, <span class="ident">l12</span>, <span class="ident">l13</span>, <span class="ident">l14</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>, <span class="ident">l12</span>, <span class="ident">l13</span>, <span class="ident">l14</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14).layer(service))
     }
 }
 
-<span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span>, <span class="ident">L12</span>, <span class="ident">L13</span>, <span class="ident">L14</span>, <span class="ident">L15</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span>, <span class="ident">L12</span>, <span class="ident">L13</span>, <span class="ident">L14</span>, <span class="ident">L15</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L6::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L6</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L7::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L7</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L8::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L8</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L9::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L9</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L10::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L10</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L11::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L11</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L12::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L12</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L13::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L13</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L14::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L14</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L15::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L15</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="attribute">#[rustfmt::skip]
+</span><span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12, L13, L14, L15&gt; Layer&lt;S&gt;
+    <span class="kw">for </span>(L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12, L13, L14, L15)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;L6::Service&gt;,
+    L6: Layer&lt;L7::Service&gt;,
+    L7: Layer&lt;L8::Service&gt;,
+    L8: Layer&lt;L9::Service&gt;,
+    L9: Layer&lt;L10::Service&gt;,
+    L10: Layer&lt;L11::Service&gt;,
+    L11: Layer&lt;L12::Service&gt;,
+    L12: Layer&lt;L13::Service&gt;,
+    L13: Layer&lt;L14::Service&gt;,
+    L14: Layer&lt;L15::Service&gt;,
+    L15: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>, <span class="ident">l12</span>, <span class="ident">l13</span>, <span class="ident">l14</span>, <span class="ident">l15</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>, <span class="ident">l12</span>, <span class="ident">l13</span>, <span class="ident">l14</span>, <span class="ident">l15</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15).layer(service))
     }
 }
 
-<span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span>, <span class="ident">L12</span>, <span class="ident">L13</span>, <span class="ident">L14</span>, <span class="ident">L15</span>, <span class="ident">L16</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">for</span> (<span class="ident">L1</span>, <span class="ident">L2</span>, <span class="ident">L3</span>, <span class="ident">L4</span>, <span class="ident">L5</span>, <span class="ident">L6</span>, <span class="ident">L7</span>, <span class="ident">L8</span>, <span class="ident">L9</span>, <span class="ident">L10</span>, <span class="ident">L11</span>, <span class="ident">L12</span>, <span class="ident">L13</span>, <span class="ident">L14</span>, <span class="ident">L15</span>, <span class="ident">L16</span>)
-<span class="kw">where</span>
-    <span class="ident">L1</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L2::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L2</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L3::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L3</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L4::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L4</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L5::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L5</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L6::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L6</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L7::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L7</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L8::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L8</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L9::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L9</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L10::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L10</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L11::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L11</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L12::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L12</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L13::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L13</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L14::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L14</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L15::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L15</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L16::Service</span><span class="op">&gt;</span>,
-    <span class="ident">L16</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="attribute">#[rustfmt::skip]
+</span><span class="kw">impl</span>&lt;S, L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12, L13, L14, L15, L16&gt; Layer&lt;S&gt;
+    <span class="kw">for </span>(L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12, L13, L14, L15, L16)
+<span class="kw">where
+    </span>L1: Layer&lt;L2::Service&gt;,
+    L2: Layer&lt;L3::Service&gt;,
+    L3: Layer&lt;L4::Service&gt;,
+    L4: Layer&lt;L5::Service&gt;,
+    L5: Layer&lt;L6::Service&gt;,
+    L6: Layer&lt;L7::Service&gt;,
+    L7: Layer&lt;L8::Service&gt;,
+    L8: Layer&lt;L9::Service&gt;,
+    L9: Layer&lt;L10::Service&gt;,
+    L10: Layer&lt;L11::Service&gt;,
+    L11: Layer&lt;L12::Service&gt;,
+    L12: Layer&lt;L13::Service&gt;,
+    L13: Layer&lt;L14::Service&gt;,
+    L14: Layer&lt;L15::Service&gt;,
+    L15: Layer&lt;L16::Service&gt;,
+    L16: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L1::Service</span>;
+    <span class="kw">type </span>Service = L1::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="kw">let</span> (<span class="ident">l1</span>, <span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>, <span class="ident">l12</span>, <span class="ident">l13</span>, <span class="ident">l14</span>, <span class="ident">l15</span>, <span class="ident">l16</span>) <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">l1</span>.<span class="ident">layer</span>((<span class="ident">l2</span>, <span class="ident">l3</span>, <span class="ident">l4</span>, <span class="ident">l5</span>, <span class="ident">l6</span>, <span class="ident">l7</span>, <span class="ident">l8</span>, <span class="ident">l9</span>, <span class="ident">l10</span>, <span class="ident">l11</span>, <span class="ident">l12</span>, <span class="ident">l13</span>, <span class="ident">l14</span>, <span class="ident">l15</span>, <span class="ident">l16</span>).<span class="ident">layer</span>(<span class="ident">service</span>))
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="kw">let </span>(l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15, l16) = <span class="self">self</span>;
+        l1.layer((l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15, l16).layer(service))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tower_layer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tower_layer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

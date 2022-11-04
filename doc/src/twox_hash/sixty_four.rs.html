@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/twox-hash-1.6.3/src/sixty_four.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sixty_four.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../twox_hash/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../twox_hash/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../twox_hash/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/twox-hash-1.6.3/src/sixty_four.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sixty_four.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../twox_hash/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../twox_hash/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../twox_hash/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -411,397 +411,397 @@
 <span id="411">411</span>
 <span id="412">412</span>
 <span id="413">413</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::UnalignedBuffer</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">cmp</span>, <span class="ident">hash::Hasher</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::UnalignedBuffer;
+<span class="kw">use </span>core::{cmp, hash::Hasher};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">const</span> <span class="ident">CHUNK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="kw">const </span>CHUNK_SIZE: usize = <span class="number">32</span>;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRIME_1</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">11_400_714_785_074_694_791</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRIME_2</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">14_029_467_366_897_019_727</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRIME_3</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1_609_587_929_392_839_161</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRIME_4</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">9_650_029_242_287_828_579</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRIME_5</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">2_870_177_450_012_600_261</span>;
+<span class="kw">pub const </span>PRIME_1: u64 = <span class="number">11_400_714_785_074_694_791</span>;
+<span class="kw">pub const </span>PRIME_2: u64 = <span class="number">14_029_467_366_897_019_727</span>;
+<span class="kw">pub const </span>PRIME_3: u64 = <span class="number">1_609_587_929_392_839_161</span>;
+<span class="kw">pub const </span>PRIME_4: u64 = <span class="number">9_650_029_242_287_828_579</span>;
+<span class="kw">pub const </span>PRIME_5: u64 = <span class="number">2_870_177_450_012_600_261</span>;
 
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">struct</span> <span class="ident">XxCore</span> {
-    <span class="ident">v1</span>: <span class="ident">u64</span>,
-    <span class="ident">v2</span>: <span class="ident">u64</span>,
-    <span class="ident">v3</span>: <span class="ident">u64</span>,
-    <span class="ident">v4</span>: <span class="ident">u64</span>,
+<span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq)]
+</span><span class="kw">struct </span>XxCore {
+    v1: u64,
+    v2: u64,
+    v3: u64,
+    v4: u64,
 }
 
-<span class="doccomment">/// Calculates the 64-bit hash.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">XxHash64</span> {
-    <span class="ident">total_len</span>: <span class="ident">u64</span>,
-    <span class="ident">seed</span>: <span class="ident">u64</span>,
-    <span class="ident">core</span>: <span class="ident">XxCore</span>,
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">serde</span>(<span class="ident">flatten</span>))]</span>
-    <span class="ident">buffer</span>: <span class="ident">Buffer</span>,
+<span class="doccomment">/// Calculates the 64-bit hash.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, Copy, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>XxHash64 {
+    total_len: u64,
+    seed: u64,
+    core: XxCore,
+    <span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, serde(flatten))]
+    </span>buffer: Buffer,
 }
 
-<span class="kw">impl</span> <span class="ident">XxCore</span> {
-    <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">XxCore</span> {
-        <span class="ident">XxCore</span> {
-            <span class="ident">v1</span>: <span class="ident">seed</span>.<span class="ident">wrapping_add</span>(<span class="ident">PRIME_1</span>).<span class="ident">wrapping_add</span>(<span class="ident">PRIME_2</span>),
-            <span class="ident">v2</span>: <span class="ident">seed</span>.<span class="ident">wrapping_add</span>(<span class="ident">PRIME_2</span>),
-            <span class="ident">v3</span>: <span class="ident">seed</span>,
-            <span class="ident">v4</span>: <span class="ident">seed</span>.<span class="ident">wrapping_sub</span>(<span class="ident">PRIME_1</span>),
+<span class="kw">impl </span>XxCore {
+    <span class="kw">fn </span>with_seed(seed: u64) -&gt; XxCore {
+        XxCore {
+            v1: seed.wrapping_add(PRIME_1).wrapping_add(PRIME_2),
+            v2: seed.wrapping_add(PRIME_2),
+            v3: seed,
+            v4: seed.wrapping_sub(PRIME_1),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">ingest_chunks</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">values</span>: <span class="ident">I</span>)
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> [<span class="ident">u64</span>; <span class="number">4</span>]<span class="op">&gt;</span>,
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>ingest_chunks&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, values: I)
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = [u64; <span class="number">4</span>]&gt;,
     {
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">ingest_one_number</span>(<span class="kw-2">mut</span> <span class="ident">current_value</span>: <span class="ident">u64</span>, <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-            <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_2</span>);
-            <span class="ident">current_value</span> <span class="op">=</span> <span class="ident">current_value</span>.<span class="ident">wrapping_add</span>(<span class="ident">value</span>);
-            <span class="ident">current_value</span> <span class="op">=</span> <span class="ident">current_value</span>.<span class="ident">rotate_left</span>(<span class="number">31</span>);
-            <span class="ident">current_value</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_1</span>)
+        <span class="attribute">#[inline(always)]
+        </span><span class="kw">fn </span>ingest_one_number(<span class="kw-2">mut </span>current_value: u64, <span class="kw-2">mut </span>value: u64) -&gt; u64 {
+            value = value.wrapping_mul(PRIME_2);
+            current_value = current_value.wrapping_add(value);
+            current_value = current_value.rotate_left(<span class="number">31</span>);
+            current_value.wrapping_mul(PRIME_1)
         }
 
-        <span class="comment">// By drawing these out, we can avoid going back and forth to</span>
-        <span class="comment">// memory. It only really helps for large files, when we need</span>
-        <span class="comment">// to iterate multiple times here.</span>
+        <span class="comment">// By drawing these out, we can avoid going back and forth to
+        // memory. It only really helps for large files, when we need
+        // to iterate multiple times here.
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">v1</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">v2</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v3</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">v3</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v4</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">v4</span>;
+        </span><span class="kw">let </span><span class="kw-2">mut </span>v1 = <span class="self">self</span>.v1;
+        <span class="kw">let </span><span class="kw-2">mut </span>v2 = <span class="self">self</span>.v2;
+        <span class="kw">let </span><span class="kw-2">mut </span>v3 = <span class="self">self</span>.v3;
+        <span class="kw">let </span><span class="kw-2">mut </span>v4 = <span class="self">self</span>.v4;
 
-        <span class="kw">for</span> [<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">n3</span>, <span class="ident">n4</span>] <span class="kw">in</span> <span class="ident">values</span> {
-            <span class="ident">v1</span> <span class="op">=</span> <span class="ident">ingest_one_number</span>(<span class="ident">v1</span>, <span class="ident">n1</span>.<span class="ident">to_le</span>());
-            <span class="ident">v2</span> <span class="op">=</span> <span class="ident">ingest_one_number</span>(<span class="ident">v2</span>, <span class="ident">n2</span>.<span class="ident">to_le</span>());
-            <span class="ident">v3</span> <span class="op">=</span> <span class="ident">ingest_one_number</span>(<span class="ident">v3</span>, <span class="ident">n3</span>.<span class="ident">to_le</span>());
-            <span class="ident">v4</span> <span class="op">=</span> <span class="ident">ingest_one_number</span>(<span class="ident">v4</span>, <span class="ident">n4</span>.<span class="ident">to_le</span>());
+        <span class="kw">for </span>[n1, n2, n3, n4] <span class="kw">in </span>values {
+            v1 = ingest_one_number(v1, n1.to_le());
+            v2 = ingest_one_number(v2, n2.to_le());
+            v3 = ingest_one_number(v3, n3.to_le());
+            v4 = ingest_one_number(v4, n4.to_le());
         }
 
-        <span class="self">self</span>.<span class="ident">v1</span> <span class="op">=</span> <span class="ident">v1</span>;
-        <span class="self">self</span>.<span class="ident">v2</span> <span class="op">=</span> <span class="ident">v2</span>;
-        <span class="self">self</span>.<span class="ident">v3</span> <span class="op">=</span> <span class="ident">v3</span>;
-        <span class="self">self</span>.<span class="ident">v4</span> <span class="op">=</span> <span class="ident">v4</span>;
+        <span class="self">self</span>.v1 = v1;
+        <span class="self">self</span>.v2 = v2;
+        <span class="self">self</span>.v3 = v3;
+        <span class="self">self</span>.v4 = v4;
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="comment">// The original code pulls out local vars for v[1234]</span>
-        <span class="comment">// here. Performance tests did not show that to be effective</span>
-        <span class="comment">// here, presumably because this method is not called in a</span>
-        <span class="comment">// tight loop.</span>
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>finish(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="comment">// The original code pulls out local vars for v[1234]
+        // here. Performance tests did not show that to be effective
+        // here, presumably because this method is not called in a
+        // tight loop.
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unknown_lints</span>, <span class="ident">clippy::needless_late_init</span>)]</span> <span class="comment">// keeping things parallel</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span>;
+        </span><span class="attribute">#[allow(unknown_lints, clippy::needless_late_init)] </span><span class="comment">// keeping things parallel
+        </span><span class="kw">let </span><span class="kw-2">mut </span>hash;
 
-        <span class="ident">hash</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">v1</span>.<span class="ident">rotate_left</span>(<span class="number">1</span>);
-        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">v2</span>.<span class="ident">rotate_left</span>(<span class="number">7</span>));
-        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">v3</span>.<span class="ident">rotate_left</span>(<span class="number">12</span>));
-        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">v4</span>.<span class="ident">rotate_left</span>(<span class="number">18</span>));
+        hash = <span class="self">self</span>.v1.rotate_left(<span class="number">1</span>);
+        hash = hash.wrapping_add(<span class="self">self</span>.v2.rotate_left(<span class="number">7</span>));
+        hash = hash.wrapping_add(<span class="self">self</span>.v3.rotate_left(<span class="number">12</span>));
+        hash = hash.wrapping_add(<span class="self">self</span>.v4.rotate_left(<span class="number">18</span>));
 
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">mix_one</span>(<span class="kw-2">mut</span> <span class="ident">hash</span>: <span class="ident">u64</span>, <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-            <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_2</span>);
-            <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">rotate_left</span>(<span class="number">31</span>);
-            <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_1</span>);
-            <span class="ident">hash</span> <span class="op">^</span><span class="op">=</span> <span class="ident">value</span>;
-            <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_1</span>);
-            <span class="ident">hash</span>.<span class="ident">wrapping_add</span>(<span class="ident">PRIME_4</span>)
+        <span class="attribute">#[inline(always)]
+        </span><span class="kw">fn </span>mix_one(<span class="kw-2">mut </span>hash: u64, <span class="kw-2">mut </span>value: u64) -&gt; u64 {
+            value = value.wrapping_mul(PRIME_2);
+            value = value.rotate_left(<span class="number">31</span>);
+            value = value.wrapping_mul(PRIME_1);
+            hash ^= value;
+            hash = hash.wrapping_mul(PRIME_1);
+            hash.wrapping_add(PRIME_4)
         }
 
-        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">mix_one</span>(<span class="ident">hash</span>, <span class="self">self</span>.<span class="ident">v1</span>);
-        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">mix_one</span>(<span class="ident">hash</span>, <span class="self">self</span>.<span class="ident">v2</span>);
-        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">mix_one</span>(<span class="ident">hash</span>, <span class="self">self</span>.<span class="ident">v3</span>);
-        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">mix_one</span>(<span class="ident">hash</span>, <span class="self">self</span>.<span class="ident">v4</span>);
+        hash = mix_one(hash, <span class="self">self</span>.v1);
+        hash = mix_one(hash, <span class="self">self</span>.v2);
+        hash = mix_one(hash, <span class="self">self</span>.v3);
+        hash = mix_one(hash, <span class="self">self</span>.v4);
 
-        <span class="ident">hash</span>
+        hash
     }
 }
 
-<span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">XxCore</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
+<span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>XxCore {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), core::fmt::Error&gt; {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;XxCore {{ {:016x} {:016x} {:016x} {:016x} }}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">v1</span>, <span class="self">self</span>.<span class="ident">v2</span>, <span class="self">self</span>.<span class="ident">v3</span>, <span class="self">self</span>.<span class="ident">v4</span>
+            <span class="self">self</span>.v1, <span class="self">self</span>.v2, <span class="self">self</span>.v3, <span class="self">self</span>.v4
         )
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">align</span>(<span class="number">8</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">serde</span>(<span class="ident">transparent</span>))]</span>
-<span class="kw">struct</span> <span class="ident">AlignToU64</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>);
+<span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Serialize, Deserialize))]
+#[derive(Debug, Copy, Clone, Default, PartialEq)]
+#[repr(align(<span class="number">8</span>))]
+#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, serde(transparent))]
+</span><span class="kw">struct </span>AlignToU64&lt;T&gt;(T);
 
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Buffer</span> {
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;buffer&quot;</span>))]</span>
-    <span class="ident">data</span>: <span class="ident">AlignToU64</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">CHUNK_SIZE</span>]<span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;buffer_usage&quot;</span>))]</span>
-    <span class="ident">len</span>: <span class="ident">usize</span>,
+<span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Serialize, Deserialize))]
+#[derive(Debug, Copy, Clone, Default, PartialEq)]
+</span><span class="kw">struct </span>Buffer {
+    <span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, serde(rename = <span class="string">&quot;buffer&quot;</span>))]
+    </span>data: AlignToU64&lt;[u8; CHUNK_SIZE]&gt;,
+    <span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, serde(rename = <span class="string">&quot;buffer_usage&quot;</span>))]
+    </span>len: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Buffer</span> {
-    <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>.<span class="number">0</span>[..<span class="self">self</span>.<span class="ident">len</span>]
+<span class="kw">impl </span>Buffer {
+    <span class="kw">fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.data.<span class="number">0</span>[..<span class="self">self</span>.len]
     }
 
-    <span class="doccomment">/// Consumes as much of the parameter as it can, returning the unused part.</span>
-    <span class="kw">fn</span> <span class="ident">consume</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="kw">let</span> <span class="ident">to_use</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="self">self</span>.<span class="ident">available</span>(), <span class="ident">data</span>.<span class="ident">len</span>());
-        <span class="kw">let</span> (<span class="ident">data</span>, <span class="ident">remaining</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">split_at</span>(<span class="ident">to_use</span>);
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="number">0</span>[<span class="self">self</span>.<span class="ident">len</span>..][..<span class="ident">to_use</span>].<span class="ident">copy_from_slice</span>(<span class="ident">data</span>);
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">to_use</span>;
-        <span class="ident">remaining</span>
+    <span class="doccomment">/// Consumes as much of the parameter as it can, returning the unused part.
+    </span><span class="kw">fn </span>consume&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="kw">let </span>to_use = cmp::min(<span class="self">self</span>.available(), data.len());
+        <span class="kw">let </span>(data, remaining) = data.split_at(to_use);
+        <span class="self">self</span>.data.<span class="number">0</span>[<span class="self">self</span>.len..][..to_use].copy_from_slice(data);
+        <span class="self">self</span>.len += to_use;
+        remaining
     }
 
-    <span class="kw">fn</span> <span class="ident">set_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">is_empty</span>());
-        <span class="macro">debug_assert!</span>(<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">CHUNK_SIZE</span>);
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="number">0</span>[..<span class="ident">data</span>.<span class="ident">len</span>()].<span class="ident">copy_from_slice</span>(<span class="ident">data</span>);
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
+    <span class="kw">fn </span>set_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.is_empty());
+        <span class="macro">debug_assert!</span>(data.len() &lt; CHUNK_SIZE);
+        <span class="self">self</span>.data.<span class="number">0</span>[..data.len()].copy_from_slice(data);
+        <span class="self">self</span>.len = data.len();
     }
 
-    <span class="kw">fn</span> <span class="ident">available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">CHUNK_SIZE</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">len</span>
+    <span class="kw">fn </span>available(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        CHUNK_SIZE - <span class="self">self</span>.len
     }
 
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span>
-    }
+    <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len == <span class="number">0
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="ident">CHUNK_SIZE</span>
+    <span class="kw">fn </span>is_full(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len == CHUNK_SIZE
     }
 }
 
-<span class="kw">impl</span> <span class="ident">XxHash64</span> {
-    <span class="doccomment">/// Constructs the hash with an initial seed</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">XxHash64</span> {
-        <span class="ident">XxHash64</span> {
-            <span class="ident">total_len</span>: <span class="number">0</span>,
-            <span class="ident">seed</span>,
-            <span class="ident">core</span>: <span class="ident">XxCore::with_seed</span>(<span class="ident">seed</span>),
-            <span class="ident">buffer</span>: <span class="ident">Buffer::default</span>(),
+<span class="kw">impl </span>XxHash64 {
+    <span class="doccomment">/// Constructs the hash with an initial seed
+    </span><span class="kw">pub fn </span>with_seed(seed: u64) -&gt; XxHash64 {
+        XxHash64 {
+            total_len: <span class="number">0</span>,
+            seed,
+            core: XxCore::with_seed(seed),
+            buffer: Buffer::default(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="kw">let</span> <span class="ident">remaining</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">maybe_consume_bytes</span>(<span class="ident">bytes</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">remaining</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remaining</span> <span class="op">=</span> <span class="ident">UnalignedBuffer::new</span>(<span class="ident">remaining</span>);
-            <span class="self">self</span>.<span class="ident">core</span>.<span class="ident">ingest_chunks</span>(<span class="kw-2">&amp;mut</span> <span class="ident">remaining</span>);
-            <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">set_data</span>(<span class="ident">remaining</span>.<span class="ident">remaining</span>());
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bytes: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="kw">let </span>remaining = <span class="self">self</span>.maybe_consume_bytes(bytes);
+        <span class="kw">if </span>!remaining.is_empty() {
+            <span class="kw">let </span><span class="kw-2">mut </span>remaining = UnalignedBuffer::new(remaining);
+            <span class="self">self</span>.core.ingest_chunks(<span class="kw-2">&amp;mut </span>remaining);
+            <span class="self">self</span>.buffer.set_data(remaining.remaining());
         }
-        <span class="self">self</span>.<span class="ident">total_len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="self">self</span>.total_len += bytes.len() <span class="kw">as </span>u64;
     }
 
-    <span class="comment">// Consume bytes and try to make `self.buffer` empty.</span>
-    <span class="comment">// If there are not enough bytes, `self.buffer` can be non-empty, and this</span>
-    <span class="comment">// function returns an empty slice.</span>
-    <span class="kw">fn</span> <span class="ident">maybe_consume_bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">data</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">consume</span>(<span class="ident">data</span>);
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">is_full</span>() {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">u64s</span> <span class="op">=</span> <span class="ident">UnalignedBuffer::new</span>(<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">data</span>());
-                <span class="self">self</span>.<span class="ident">core</span>.<span class="ident">ingest_chunks</span>(<span class="kw-2">&amp;mut</span> <span class="ident">u64s</span>);
-                <span class="macro">debug_assert!</span>(<span class="ident">u64s</span>.<span class="ident">remaining</span>().<span class="ident">is_empty</span>());
-                <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="comment">// Consume bytes and try to make `self.buffer` empty.
+    // If there are not enough bytes, `self.buffer` can be non-empty, and this
+    // function returns an empty slice.
+    </span><span class="kw">fn </span>maybe_consume_bytes&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="kw">if </span><span class="self">self</span>.buffer.is_empty() {
+            data
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>data = <span class="self">self</span>.buffer.consume(data);
+            <span class="kw">if </span><span class="self">self</span>.buffer.is_full() {
+                <span class="kw">let </span><span class="kw-2">mut </span>u64s = UnalignedBuffer::new(<span class="self">self</span>.buffer.data());
+                <span class="self">self</span>.core.ingest_chunks(<span class="kw-2">&amp;mut </span>u64s);
+                <span class="macro">debug_assert!</span>(u64s.remaining().is_empty());
+                <span class="self">self</span>.buffer.len = <span class="number">0</span>;
             }
-            <span class="ident">data</span>
+            data
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">total_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">CHUNK_SIZE</span> <span class="kw">as</span> <span class="ident">u64</span> {
-            <span class="comment">// We have processed at least one full chunk</span>
-            <span class="self">self</span>.<span class="ident">core</span>.<span class="ident">finish</span>()
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">seed</span>.<span class="ident">wrapping_add</span>(<span class="ident">PRIME_5</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>finish(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="kw">let </span><span class="kw-2">mut </span>hash = <span class="kw">if </span><span class="self">self</span>.total_len &gt;= CHUNK_SIZE <span class="kw">as </span>u64 {
+            <span class="comment">// We have processed at least one full chunk
+            </span><span class="self">self</span>.core.finish()
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.seed.wrapping_add(PRIME_5)
         };
 
-        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">total_len</span>);
+        hash = hash.wrapping_add(<span class="self">self</span>.total_len);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffered_u64s</span> <span class="op">=</span> <span class="ident">UnalignedBuffer</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">data</span>());
-        <span class="kw">for</span> <span class="ident">buffered_u64</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">buffered_u64s</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k1</span> <span class="op">=</span> <span class="ident">buffered_u64</span>.<span class="ident">to_le</span>().<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_2</span>);
-            <span class="ident">k1</span> <span class="op">=</span> <span class="ident">k1</span>.<span class="ident">rotate_left</span>(<span class="number">31</span>);
-            <span class="ident">k1</span> <span class="op">=</span> <span class="ident">k1</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_1</span>);
-            <span class="ident">hash</span> <span class="op">^</span><span class="op">=</span> <span class="ident">k1</span>;
-            <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">rotate_left</span>(<span class="number">27</span>);
-            <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_1</span>);
-            <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_add</span>(<span class="ident">PRIME_4</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffered_u64s = UnalignedBuffer::&lt;u64&gt;::new(<span class="self">self</span>.buffer.data());
+        <span class="kw">for </span>buffered_u64 <span class="kw">in </span><span class="kw-2">&amp;mut </span>buffered_u64s {
+            <span class="kw">let </span><span class="kw-2">mut </span>k1 = buffered_u64.to_le().wrapping_mul(PRIME_2);
+            k1 = k1.rotate_left(<span class="number">31</span>);
+            k1 = k1.wrapping_mul(PRIME_1);
+            hash ^= k1;
+            hash = hash.rotate_left(<span class="number">27</span>);
+            hash = hash.wrapping_mul(PRIME_1);
+            hash = hash.wrapping_add(PRIME_4);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffered_u32s</span> <span class="op">=</span> <span class="ident">UnalignedBuffer</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">buffered_u64s</span>.<span class="ident">remaining</span>());
-        <span class="kw">for</span> <span class="ident">buffered_u32</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">buffered_u32s</span> {
-            <span class="kw">let</span> <span class="ident">k1</span> <span class="op">=</span> <span class="ident">u64::from</span>(<span class="ident">buffered_u32</span>.<span class="ident">to_le</span>()).<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_1</span>);
-            <span class="ident">hash</span> <span class="op">^</span><span class="op">=</span> <span class="ident">k1</span>;
-            <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">rotate_left</span>(<span class="number">23</span>);
-            <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_2</span>);
-            <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_add</span>(<span class="ident">PRIME_3</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffered_u32s = UnalignedBuffer::&lt;u32&gt;::new(buffered_u64s.remaining());
+        <span class="kw">for </span>buffered_u32 <span class="kw">in </span><span class="kw-2">&amp;mut </span>buffered_u32s {
+            <span class="kw">let </span>k1 = u64::from(buffered_u32.to_le()).wrapping_mul(PRIME_1);
+            hash ^= k1;
+            hash = hash.rotate_left(<span class="number">23</span>);
+            hash = hash.wrapping_mul(PRIME_2);
+            hash = hash.wrapping_add(PRIME_3);
         }
 
-        <span class="kw">let</span> <span class="ident">buffered_u8s</span> <span class="op">=</span> <span class="ident">buffered_u32s</span>.<span class="ident">remaining</span>();
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">buffered_u8</span> <span class="kw">in</span> <span class="ident">buffered_u8s</span> {
-            <span class="kw">let</span> <span class="ident">k1</span> <span class="op">=</span> <span class="ident">u64::from</span>(<span class="ident">buffered_u8</span>).<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_5</span>);
-            <span class="ident">hash</span> <span class="op">^</span><span class="op">=</span> <span class="ident">k1</span>;
-            <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">rotate_left</span>(<span class="number">11</span>);
-            <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_1</span>);
+        <span class="kw">let </span>buffered_u8s = buffered_u32s.remaining();
+        <span class="kw">for </span><span class="kw-2">&amp;</span>buffered_u8 <span class="kw">in </span>buffered_u8s {
+            <span class="kw">let </span>k1 = u64::from(buffered_u8).wrapping_mul(PRIME_5);
+            hash ^= k1;
+            hash = hash.rotate_left(<span class="number">11</span>);
+            hash = hash.wrapping_mul(PRIME_1);
         }
 
-        <span class="comment">// The final intermixing</span>
-        <span class="ident">hash</span> <span class="op">^</span><span class="op">=</span> <span class="ident">hash</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">33</span>;
-        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_2</span>);
-        <span class="ident">hash</span> <span class="op">^</span><span class="op">=</span> <span class="ident">hash</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">29</span>;
-        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME_3</span>);
-        <span class="ident">hash</span> <span class="op">^</span><span class="op">=</span> <span class="ident">hash</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>;
+        <span class="comment">// The final intermixing
+        </span>hash ^= hash &gt;&gt; <span class="number">33</span>;
+        hash = hash.wrapping_mul(PRIME_2);
+        hash ^= hash &gt;&gt; <span class="number">29</span>;
+        hash = hash.wrapping_mul(PRIME_3);
+        hash ^= hash &gt;&gt; <span class="number">32</span>;
 
-        <span class="ident">hash</span>
+        hash
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">seed</span>
+    <span class="kw">pub fn </span>seed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.seed
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">total_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">total_len</span>
+    <span class="kw">pub fn </span>total_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.total_len
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">XxHash64</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">XxHash64</span> {
-        <span class="ident">XxHash64::with_seed</span>(<span class="number">0</span>)
+<span class="kw">impl </span>Default <span class="kw">for </span>XxHash64 {
+    <span class="kw">fn </span>default() -&gt; XxHash64 {
+        XxHash64::with_seed(<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Hasher</span> <span class="kw">for</span> <span class="ident">XxHash64</span> {
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="ident">XxHash64::finish</span>(<span class="self">self</span>)
+<span class="kw">impl </span>Hasher <span class="kw">for </span>XxHash64 {
+    <span class="kw">fn </span>finish(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        XxHash64::finish(<span class="self">self</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="ident">XxHash64::write</span>(<span class="self">self</span>, <span class="ident">bytes</span>)
+    <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bytes: <span class="kw-2">&amp;</span>[u8]) {
+        XxHash64::write(<span class="self">self</span>, bytes)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::std_support::sixty_four::RandomXxHashBuilder64</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::std_support::sixty_four::RandomXxHashBuilder64;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">RandomXxHashBuilder64</span>, <span class="ident">XxHash64</span>};
-    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-    <span class="kw">use</span> <span class="ident">std::hash::BuildHasherDefault</span>;
-    <span class="kw">use</span> <span class="ident">std::prelude::v1</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::{RandomXxHashBuilder64, XxHash64};
+    <span class="kw">use </span>std::collections::HashMap;
+    <span class="kw">use </span>std::hash::BuildHasherDefault;
+    <span class="kw">use </span>std::prelude::v1::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ingesting_byte_by_byte_is_equivalent_to_large_chunks</span>() {
-        <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">32</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="number">0</span>).<span class="ident">collect</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>ingesting_byte_by_byte_is_equivalent_to_large_chunks() {
+        <span class="kw">let </span>bytes: Vec&lt;<span class="kw">_</span>&gt; = (<span class="number">0</span>..<span class="number">32</span>).map(|<span class="kw">_</span>| <span class="number">0</span>).collect();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_by_byte</span> <span class="op">=</span> <span class="ident">XxHash64::with_seed</span>(<span class="number">0</span>);
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">chunks</span>(<span class="number">1</span>) {
-            <span class="ident">byte_by_byte</span>.<span class="ident">write</span>(<span class="ident">byte</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>byte_by_byte = XxHash64::with_seed(<span class="number">0</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>bytes.chunks(<span class="number">1</span>) {
+            byte_by_byte.write(byte);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_chunk</span> <span class="op">=</span> <span class="ident">XxHash64::with_seed</span>(<span class="number">0</span>);
-        <span class="ident">one_chunk</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>one_chunk = XxHash64::with_seed(<span class="number">0</span>);
+        one_chunk.write(<span class="kw-2">&amp;</span>bytes);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">byte_by_byte</span>.<span class="ident">core</span>, <span class="ident">one_chunk</span>.<span class="ident">core</span>);
+        <span class="macro">assert_eq!</span>(byte_by_byte.core, one_chunk.core);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hash_of_nothing_matches_c_implementation</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">XxHash64::with_seed</span>(<span class="number">0</span>);
-        <span class="ident">hasher</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span>[]);
-        <span class="macro">assert_eq!</span>(<span class="ident">hasher</span>.<span class="ident">finish</span>(), <span class="number">0xef46_db37_51d8_e999</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hash_of_nothing_matches_c_implementation() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = XxHash64::with_seed(<span class="number">0</span>);
+        hasher.write(<span class="kw-2">&amp;</span>[]);
+        <span class="macro">assert_eq!</span>(hasher.finish(), <span class="number">0xef46_db37_51d8_e999</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hash_of_single_byte_matches_c_implementation</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">XxHash64::with_seed</span>(<span class="number">0</span>);
-        <span class="ident">hasher</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span>[<span class="number">42</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">hasher</span>.<span class="ident">finish</span>(), <span class="number">0x0a9e_dece_beb0_3ae4</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hash_of_single_byte_matches_c_implementation() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = XxHash64::with_seed(<span class="number">0</span>);
+        hasher.write(<span class="kw-2">&amp;</span>[<span class="number">42</span>]);
+        <span class="macro">assert_eq!</span>(hasher.finish(), <span class="number">0x0a9e_dece_beb0_3ae4</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hash_of_multiple_bytes_matches_c_implementation</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">XxHash64::with_seed</span>(<span class="number">0</span>);
-        <span class="ident">hasher</span>.<span class="ident">write</span>(<span class="string">b&quot;Hello, world!\0&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">hasher</span>.<span class="ident">finish</span>(), <span class="number">0x7b06_c531_ea43_e89f</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hash_of_multiple_bytes_matches_c_implementation() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = XxHash64::with_seed(<span class="number">0</span>);
+        hasher.write(<span class="string">b&quot;Hello, world!\0&quot;</span>);
+        <span class="macro">assert_eq!</span>(hasher.finish(), <span class="number">0x7b06_c531_ea43_e89f</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hash_of_multiple_chunks_matches_c_implementation</span>() {
-        <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">100</span>).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">XxHash64::with_seed</span>(<span class="number">0</span>);
-        <span class="ident">hasher</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">hasher</span>.<span class="ident">finish</span>(), <span class="number">0x6ac1_e580_3216_6597</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hash_of_multiple_chunks_matches_c_implementation() {
+        <span class="kw">let </span>bytes: Vec&lt;<span class="kw">_</span>&gt; = (<span class="number">0</span>..<span class="number">100</span>).collect();
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = XxHash64::with_seed(<span class="number">0</span>);
+        hasher.write(<span class="kw-2">&amp;</span>bytes);
+        <span class="macro">assert_eq!</span>(hasher.finish(), <span class="number">0x6ac1_e580_3216_6597</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hash_with_different_seed_matches_c_implementation</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">XxHash64::with_seed</span>(<span class="number">0xae05_4331_1b70_2d91</span>);
-        <span class="ident">hasher</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span>[]);
-        <span class="macro">assert_eq!</span>(<span class="ident">hasher</span>.<span class="ident">finish</span>(), <span class="number">0x4b6a_04fc_df7a_4672</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hash_with_different_seed_matches_c_implementation() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = XxHash64::with_seed(<span class="number">0xae05_4331_1b70_2d91</span>);
+        hasher.write(<span class="kw-2">&amp;</span>[]);
+        <span class="macro">assert_eq!</span>(hasher.finish(), <span class="number">0x4b6a_04fc_df7a_4672</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hash_with_different_seed_and_multiple_chunks_matches_c_implementation</span>() {
-        <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">100</span>).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">XxHash64::with_seed</span>(<span class="number">0xae05_4331_1b70_2d91</span>);
-        <span class="ident">hasher</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">hasher</span>.<span class="ident">finish</span>(), <span class="number">0x567e_355e_0682_e1f1</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hash_with_different_seed_and_multiple_chunks_matches_c_implementation() {
+        <span class="kw">let </span>bytes: Vec&lt;<span class="kw">_</span>&gt; = (<span class="number">0</span>..<span class="number">100</span>).collect();
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = XxHash64::with_seed(<span class="number">0xae05_4331_1b70_2d91</span>);
+        hasher.write(<span class="kw-2">&amp;</span>bytes);
+        <span class="macro">assert_eq!</span>(hasher.finish(), <span class="number">0x567e_355e_0682_e1f1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">can_be_used_in_a_hashmap_with_a_default_seed</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">BuildHasherDefault</span><span class="op">&lt;</span><span class="ident">XxHash64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="ident">hash</span>.<span class="ident">insert</span>(<span class="number">42</span>, <span class="string">&quot;the answer&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">hash</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">42</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;the answer&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>can_be_used_in_a_hashmap_with_a_default_seed() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hash: HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>, BuildHasherDefault&lt;XxHash64&gt;&gt; = Default::default();
+        hash.insert(<span class="number">42</span>, <span class="string">&quot;the answer&quot;</span>);
+        <span class="macro">assert_eq!</span>(hash.get(<span class="kw-2">&amp;</span><span class="number">42</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;the answer&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">can_be_used_in_a_hashmap_with_a_random_seed</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">RandomXxHashBuilder64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="ident">hash</span>.<span class="ident">insert</span>(<span class="number">42</span>, <span class="string">&quot;the answer&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">hash</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">42</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;the answer&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>can_be_used_in_a_hashmap_with_a_random_seed() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hash: HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>, RandomXxHashBuilder64&gt; = Default::default();
+        hash.insert(<span class="number">42</span>, <span class="string">&quot;the answer&quot;</span>);
+        <span class="macro">assert_eq!</span>(hash.get(<span class="kw-2">&amp;</span><span class="number">42</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;the answer&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-    <span class="kw">type</span> <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">T</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+    </span><span class="kw">type </span>TestResult&lt;T = ()&gt; = <span class="prelude-ty">Result</span>&lt;T, Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt;;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_serialization_cycle</span>() -&gt; <span class="ident">TestResult</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">XxHash64::with_seed</span>(<span class="number">0</span>);
-        <span class="ident">hasher</span>.<span class="ident">write</span>(<span class="string">b&quot;Hello, world!\0&quot;</span>);
-        <span class="ident">hasher</span>.<span class="ident">finish</span>();
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>test_serialization_cycle() -&gt; TestResult {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = XxHash64::with_seed(<span class="number">0</span>);
+        hasher.write(<span class="string">b&quot;Hello, world!\0&quot;</span>);
+        hasher.finish();
 
-        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">hasher</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">unserialized</span>: <span class="ident">XxHash64</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">serialized</span>)<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">hasher</span>, <span class="ident">unserialized</span>);
+        <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>hasher)<span class="question-mark">?</span>;
+        <span class="kw">let </span>unserialized: XxHash64 = serde_json::from_str(<span class="kw-2">&amp;</span>serialized)<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(hasher, unserialized);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_serialization_stability</span>() -&gt; <span class="ident">TestResult</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">XxHash64::with_seed</span>(<span class="number">0</span>);
-        <span class="ident">hasher</span>.<span class="ident">write</span>(<span class="string">b&quot;Hello, world!\0&quot;</span>);
-        <span class="ident">hasher</span>.<span class="ident">finish</span>();
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>test_serialization_stability() -&gt; TestResult {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = XxHash64::with_seed(<span class="number">0</span>);
+        hasher.write(<span class="string">b&quot;Hello, world!\0&quot;</span>);
+        hasher.finish();
 
-        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="string">r#&quot;{
+        <span class="kw">let </span>serialized = <span class="string">r#&quot;{
             &quot;total_len&quot;: 14,
             &quot;seed&quot;: 0,
             &quot;core&quot;: {
@@ -819,10 +819,10 @@
             &quot;buffer_usage&quot;: 14
         }&quot;#</span>;
 
-        <span class="kw">let</span> <span class="ident">unserialized</span>: <span class="ident">XxHash64</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">serialized</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">hasher</span>, <span class="ident">unserialized</span>);
+        <span class="kw">let </span>unserialized: XxHash64 = serde_json::from_str(serialized).unwrap();
+        <span class="macro">assert_eq!</span>(hasher, unserialized);
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twox_hash" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twox_hash" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

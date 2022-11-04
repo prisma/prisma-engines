@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/introspection-engine-tests/src/test_api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test_api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../introspection_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../introspection_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../introspection_engine_tests/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/introspection-engine-tests/src/test_api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test_api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../introspection_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../introspection_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../introspection_engine_tests/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -371,378 +371,378 @@
 <span id="371">371</span>
 <span id="372">372</span>
 <span id="373">373</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TestResult</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indoc</span>::{<span class="ident">formatdoc</span>, <span class="ident">indoc</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">quaint::prelude::Queryable</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_macros::test_connector</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">BitFlags</span>, <span class="ident">Capabilities</span>, <span class="ident">Tags</span>};
+</pre><pre class="rust"><code><span class="kw">pub use </span><span class="kw">super</span>::TestResult;
+<span class="kw">pub use </span>expect_test::expect;
+<span class="kw">pub use </span>indoc::{formatdoc, indoc};
+<span class="kw">pub use </span>quaint::prelude::Queryable;
+<span class="kw">pub use </span>test_macros::test_connector;
+<span class="kw">pub use </span>test_setup::{BitFlags, Capabilities, Tags};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">BarrelMigrationExecutor</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="ident">introspection_connector</span>::{
-    <span class="ident">CompositeTypeDepth</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DatabaseMetadata</span>, <span class="ident">IntrospectionConnector</span>, <span class="ident">IntrospectionContext</span>,
-    <span class="ident">IntrospectionResult</span>, <span class="ident">Version</span>,
+<span class="kw">use crate</span>::{BarrelMigrationExecutor, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span>introspection_connector::{
+    CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
+    IntrospectionResult, Version,
 };
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorParams</span>, <span class="ident">MigrationConnector</span>};
-<span class="kw">use</span> <span class="ident">psl::Configuration</span>;
-<span class="kw">use</span> <span class="ident">psl::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::SqlFamily</span>, <span class="ident">single::Quaint</span>};
-<span class="kw">use</span> <span class="ident">sql_introspection_connector::SqlIntrospectionConnector</span>;
-<span class="kw">use</span> <span class="ident">sql_migration_connector::SqlMigrationConnector</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
-<span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">sqlite_test_url</span>, <span class="ident">DatasourceBlock</span>, <span class="ident">TestApiArgs</span>};
-<span class="kw">use</span> <span class="ident">tracing::Instrument</span>;
+<span class="kw">use </span>migration_connector::{ConnectorParams, MigrationConnector};
+<span class="kw">use </span>psl::Configuration;
+<span class="kw">use </span>psl::PreviewFeature;
+<span class="kw">use </span>quaint::{prelude::SqlFamily, single::Quaint};
+<span class="kw">use </span>sql_introspection_connector::SqlIntrospectionConnector;
+<span class="kw">use </span>sql_migration_connector::SqlMigrationConnector;
+<span class="kw">use </span>std::fmt::Write;
+<span class="kw">use </span>test_setup::{sqlite_test_url, DatasourceBlock, TestApiArgs};
+<span class="kw">use </span>tracing::Instrument;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestApi</span> {
-    <span class="kw">pub</span> <span class="ident">api</span>: <span class="ident">SqlIntrospectionConnector</span>,
-    <span class="ident">database</span>: <span class="ident">Quaint</span>,
-    <span class="ident">args</span>: <span class="ident">TestApiArgs</span>,
-    <span class="ident">connection_string</span>: <span class="ident">String</span>,
-    <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-    <span class="ident">namespaces</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>TestApi {
+    <span class="kw">pub </span>api: SqlIntrospectionConnector,
+    database: Quaint,
+    args: TestApiArgs,
+    connection_string: String,
+    preview_features: BitFlags&lt;PreviewFeature&gt;,
+    namespaces: Vec&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TestApi</span> {
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">args</span>: <span class="ident">TestApiArgs</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">tags</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">tags</span>();
-        <span class="kw">let</span> <span class="ident">connection_string</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">database_url</span>();
+<span class="kw">impl </span>TestApi {
+    <span class="kw">pub async fn </span>new(args: TestApiArgs) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>tags = args.tags();
+        <span class="kw">let </span>connection_string = args.database_url();
 
-        <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">args</span>
-            .<span class="ident">preview_features</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">PreviewFeature::parse_opt</span>(<span class="ident">f</span>))
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>preview_features = args
+            .preview_features()
+            .iter()
+            .flat_map(|f| PreviewFeature::parse_opt(f))
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">namespaces</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">namespaces</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ns</span><span class="op">|</span> <span class="ident">ns</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
+        <span class="kw">let </span>namespaces: Vec&lt;String&gt; = args.namespaces().iter().map(|ns| ns.to_string()).collect();
 
-        <span class="kw">let</span> (<span class="ident">database</span>, <span class="ident">connection_string</span>): (<span class="ident">Quaint</span>, <span class="ident">String</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">intersects</span>(<span class="ident">Tags::Vitess</span>) {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
-                <span class="ident">connection_string</span>: <span class="ident">connection_string</span>.<span class="ident">to_owned</span>(),
-                <span class="ident">preview_features</span>,
-                <span class="ident">shadow_database_connection_string</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>(database, connection_string): (Quaint, String) = <span class="kw">if </span>tags.intersects(Tags::Vitess) {
+            <span class="kw">let </span>params = ConnectorParams {
+                connection_string: connection_string.to_owned(),
+                preview_features,
+                shadow_database_connection_string: <span class="prelude-val">None</span>,
             };
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident">SqlMigrationConnector::new_mysql</span>();
-            <span class="ident">me</span>.<span class="ident">set_params</span>(<span class="ident">params</span>).<span class="ident">unwrap</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>me = SqlMigrationConnector::new_mysql();
+            me.set_params(params).unwrap();
 
-            <span class="ident">me</span>.<span class="ident">reset</span>(<span class="bool-val">true</span>, <span class="ident">migration_connector::Namespaces::from_vec</span>(<span class="kw-2">&amp;mut</span> <span class="ident">namespaces</span>.<span class="ident">clone</span>()))
-                .<span class="kw">await</span>
-                .<span class="ident">unwrap</span>();
+            me.reset(<span class="bool-val">true</span>, migration_connector::Namespaces::from_vec(<span class="kw-2">&amp;mut </span>namespaces.clone()))
+                .<span class="kw">await
+                </span>.unwrap();
 
             (
-                <span class="ident">Quaint::new</span>(<span class="ident">connection_string</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>(),
-                <span class="ident">connection_string</span>.<span class="ident">to_owned</span>(),
+                Quaint::new(connection_string).<span class="kw">await</span>.unwrap(),
+                connection_string.to_owned(),
             )
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mysql</span>) {
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">cs</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">create_mysql_database</span>().<span class="kw">await</span>;
-            (<span class="ident">Quaint::new</span>(<span class="kw-2">&amp;</span><span class="ident">cs</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>(), <span class="ident">cs</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Postgres</span>) {
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">q</span>, <span class="ident">cs</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">create_postgres_database</span>().<span class="kw">await</span>;
-            <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::CockroachDb</span>) {
-                <span class="ident">q</span>.<span class="ident">raw_cmd</span>(
+        } <span class="kw">else if </span>tags.contains(Tags::Mysql) {
+            <span class="kw">let </span>(<span class="kw">_</span>, cs) = args.create_mysql_database().<span class="kw">await</span>;
+            (Quaint::new(<span class="kw-2">&amp;</span>cs).<span class="kw">await</span>.unwrap(), cs)
+        } <span class="kw">else if </span>tags.contains(Tags::Postgres) {
+            <span class="kw">let </span>(<span class="kw">_</span>, q, cs) = args.create_postgres_database().<span class="kw">await</span>;
+            <span class="kw">if </span>tags.contains(Tags::CockroachDb) {
+                q.raw_cmd(
                     <span class="string">r#&quot;
                     SET default_int_size = 4;
                     &quot;#</span>,
                 )
-                .<span class="kw">await</span>
-                .<span class="ident">unwrap</span>();
+                .<span class="kw">await
+                </span>.unwrap();
             }
-            (<span class="ident">q</span>, <span class="ident">cs</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mssql</span>) {
-            <span class="ident">args</span>.<span class="ident">create_mssql_database</span>().<span class="kw">await</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Sqlite</span>) {
-            <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">sqlite_test_url</span>(<span class="ident">args</span>.<span class="ident">test_function_name</span>());
-            (<span class="ident">Quaint::new</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>(), <span class="ident">url</span>)
-        } <span class="kw">else</span> {
+            (q, cs)
+        } <span class="kw">else if </span>tags.contains(Tags::Mssql) {
+            args.create_mssql_database().<span class="kw">await
+        </span>} <span class="kw">else if </span>tags.contains(Tags::Sqlite) {
+            <span class="kw">let </span>url = sqlite_test_url(args.test_function_name());
+            (Quaint::new(<span class="kw-2">&amp;</span>url).<span class="kw">await</span>.unwrap(), url)
+        } <span class="kw">else </span>{
             <span class="macro">unreachable!</span>()
         };
 
-        <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">SqlIntrospectionConnector::new</span>(<span class="kw-2">&amp;</span><span class="ident">connection_string</span>, <span class="ident">preview_features</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>();
+        <span class="kw">let </span>api = SqlIntrospectionConnector::new(<span class="kw-2">&amp;</span>connection_string, preview_features)
+            .<span class="kw">await
+            </span>.unwrap();
 
-        <span class="ident">TestApi</span> {
-            <span class="ident">api</span>,
-            <span class="ident">database</span>,
-            <span class="ident">args</span>,
-            <span class="ident">connection_string</span>,
-            <span class="ident">preview_features</span>,
-            <span class="ident">namespaces</span>,
+        TestApi {
+            api,
+            database,
+            args,
+            connection_string,
+            preview_features,
+            namespaces,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection_string</span>
+    <span class="kw">pub fn </span>connection_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.connection_string
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_databases</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">api</span>.<span class="ident">list_databases</span>().<span class="kw">await</span><span class="question-mark">?</span>)
+    <span class="kw">pub async fn </span>list_databases(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.api.list_databases().<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Quaint</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>
+    <span class="kw">pub fn </span>database(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Quaint {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.database
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">previous_schema</span> <span class="op">=</span> <span class="ident">psl::validate</span>(<span class="self">self</span>.<span class="ident">pure_config</span>().<span class="ident">into</span>());
-        <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_introspect_internal</span>(<span class="ident">previous_schema</span>, <span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">pub async fn </span>introspect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+        <span class="kw">let </span>previous_schema = psl::validate(<span class="self">self</span>.pure_config().into());
+        <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(previous_schema, <span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">introspection_result</span>.<span class="ident">data_model</span>)
+        <span class="prelude-val">Ok</span>(introspection_result.data_model)
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect_dml</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">previous_schema</span> <span class="op">=</span> <span class="ident">psl::validate</span>(<span class="self">self</span>.<span class="ident">pure_config</span>().<span class="ident">into</span>());
-        <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_introspect_internal</span>(<span class="ident">previous_schema</span>, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">pub async fn </span>introspect_dml(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+        <span class="kw">let </span>previous_schema = psl::validate(<span class="self">self</span>.pure_config().into());
+        <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(previous_schema, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">introspection_result</span>.<span class="ident">data_model</span>)
+        <span class="prelude-val">Ok</span>(introspection_result.data_model)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cockroach</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::CockroachDb</span>)
+    <span class="kw">pub fn </span>is_cockroach(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::CockroachDb)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mysql8</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::Mysql8</span>)
+    <span class="kw">pub fn </span>is_mysql8(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::Mysql8)
     }
 
-    <span class="doccomment">/// Returns true only when testing on vitess.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_vitess</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::Vitess</span>)
+    <span class="doccomment">/// Returns true only when testing on vitess.
+    </span><span class="kw">pub fn </span>is_vitess(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::Vitess)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">preview_features</span>
+    <span class="kw">pub fn </span>preview_features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;PreviewFeature&gt; {
+        <span class="self">self</span>.preview_features
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">namespaces</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">String</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">namespaces</span>
+    <span class="kw">pub fn </span>namespaces(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[String] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.namespaces
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_introspect_internal</span>(
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">async fn </span>test_introspect_internal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">previous_schema</span>: <span class="ident">psl::ValidatedSchema</span>,
-        <span class="ident">render_config</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">IntrospectionContext::new</span>(<span class="ident">previous_schema</span>, <span class="ident">CompositeTypeDepth::Infinite</span>);
-        <span class="ident">ctx</span>.<span class="ident">render_config</span> <span class="op">=</span> <span class="ident">render_config</span>;
+        previous_schema: psl::ValidatedSchema,
+        render_config: bool,
+    ) -&gt; ConnectorResult&lt;IntrospectionResult&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>ctx = IntrospectionContext::new(previous_schema, CompositeTypeDepth::Infinite);
+        ctx.render_config = render_config;
 
-        <span class="self">self</span>.<span class="ident">api</span>
-            .<span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>)
-            .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;introspect&quot;</span>))
-            .<span class="kw">await</span>
+        <span class="self">self</span>.api
+            .introspect(<span class="kw-2">&amp;</span>ctx)
+            .instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;introspect&quot;</span>))
+            .<span class="kw">await
+    </span>}
+
+    <span class="attribute">#[tracing::instrument(skip(<span class="self">self</span>, data_model_string))]
+    #[track_caller]
+    </span><span class="kw">pub async fn </span>re_introspect(<span class="kw-2">&amp;</span><span class="self">self</span>, data_model_string: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+        <span class="kw">let </span>schema = <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.pure_config(), data_model_string);
+        <span class="kw">let </span>schema = parse_datamodel(<span class="kw-2">&amp;</span>schema);
+        <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(schema, <span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(introspection_result.data_model)
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">data_model_string</span>))]</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">re_introspect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">data_model_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">pure_config</span>(), <span class="ident">data_model_string</span>);
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">parse_datamodel</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>);
-        <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_introspect_internal</span>(<span class="ident">schema</span>, <span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="attribute">#[tracing::instrument(skip(<span class="self">self</span>, data_model_string))]
+    #[track_caller]
+    </span><span class="kw">pub async fn </span>re_introspect_dml(<span class="kw-2">&amp;</span><span class="self">self</span>, data_model_string: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+        <span class="kw">let </span>data_model = parse_datamodel(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.pure_config(), data_model_string));
+        <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(data_model, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">introspection_result</span>.<span class="ident">data_model</span>)
+        <span class="prelude-val">Ok</span>(introspection_result.data_model)
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">data_model_string</span>))]</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">re_introspect_dml</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">data_model_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="ident">parse_datamodel</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">pure_config</span>(), <span class="ident">data_model_string</span>));
-        <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_introspect_internal</span>(<span class="ident">data_model</span>, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="attribute">#[tracing::instrument(skip(<span class="self">self</span>, data_model_string))]
+    #[track_caller]
+    </span><span class="kw">pub async fn </span>re_introspect_config(<span class="kw-2">&amp;</span><span class="self">self</span>, data_model_string: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+        <span class="kw">let </span>data_model = parse_datamodel(data_model_string);
+        <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(data_model, <span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">introspection_result</span>.<span class="ident">data_model</span>)
+        <span class="prelude-val">Ok</span>(introspection_result.data_model)
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">data_model_string</span>))]</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">re_introspect_config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">data_model_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="ident">parse_datamodel</span>(<span class="ident">data_model_string</span>);
-        <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_introspect_internal</span>(<span class="ident">data_model</span>, <span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">pub async fn </span>re_introspect_warnings(<span class="kw-2">&amp;</span><span class="self">self</span>, data_model_string: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+        <span class="kw">let </span>data_model = parse_datamodel(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.pure_config(), data_model_string));
+        <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(data_model, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">introspection_result</span>.<span class="ident">data_model</span>)
+        <span class="prelude-val">Ok</span>(serde_json::to_string(<span class="kw-2">&amp;</span>introspection_result.warnings)<span class="question-mark">?</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">re_introspect_warnings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">data_model_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="ident">parse_datamodel</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">pure_config</span>(), <span class="ident">data_model_string</span>));
-        <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_introspect_internal</span>(<span class="ident">data_model</span>, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">pub async fn </span>introspect_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Version&gt; {
+        <span class="kw">let </span>previous_schema = psl::validate(<span class="self">self</span>.pure_config().into());
+        <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(previous_schema, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">introspection_result</span>.<span class="ident">warnings</span>)<span class="question-mark">?</span>)
+        <span class="prelude-val">Ok</span>(introspection_result.version)
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">previous_schema</span> <span class="op">=</span> <span class="ident">psl::validate</span>(<span class="self">self</span>.<span class="ident">pure_config</span>().<span class="ident">into</span>());
-        <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_introspect_internal</span>(<span class="ident">previous_schema</span>, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">pub async fn </span>introspection_warnings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+        <span class="kw">let </span>previous_schema = psl::validate(<span class="self">self</span>.pure_config().into());
+        <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(previous_schema, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">introspection_result</span>.<span class="ident">version</span>)
+        <span class="prelude-val">Ok</span>(serde_json::to_string(<span class="kw-2">&amp;</span>introspection_result.warnings)<span class="question-mark">?</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspection_warnings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">previous_schema</span> <span class="op">=</span> <span class="ident">psl::validate</span>(<span class="self">self</span>.<span class="ident">pure_config</span>().<span class="ident">into</span>());
-        <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_introspect_internal</span>(<span class="ident">previous_schema</span>, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">introspection_result</span>.<span class="ident">warnings</span>)<span class="question-mark">?</span>)
+    <span class="kw">pub async fn </span>get_metadata(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;DatabaseMetadata&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.api.get_metadata().<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DatabaseMetadata</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">api</span>.<span class="ident">get_metadata</span>().<span class="kw">await</span><span class="question-mark">?</span>)
+    <span class="kw">pub async fn </span>get_database_description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.api.get_database_description().<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_database_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">api</span>.<span class="ident">get_database_description</span>().<span class="kw">await</span><span class="question-mark">?</span>)
+    <span class="kw">pub async fn </span>get_database_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.api.get_database_version().<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_database_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">api</span>.<span class="ident">get_database_version</span>().<span class="kw">await</span><span class="question-mark">?</span>)
+    <span class="kw">pub fn </span>sql_family(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlFamily {
+        <span class="self">self</span>.database.connection_info().sql_family()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sql_family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlFamily</span> {
-        <span class="self">self</span>.<span class="ident">database</span>.<span class="ident">connection_info</span>().<span class="ident">sql_family</span>()
+    <span class="kw">pub fn </span>schema_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.database.connection_info().schema_name()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">database</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>()
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">barrel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BarrelMigrationExecutor</span> {
-        <span class="ident">BarrelMigrationExecutor</span> {
-            <span class="ident">schema_name</span>: <span class="self">self</span>.<span class="ident">schema_name</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">database</span>: <span class="self">self</span>.<span class="ident">database</span>.<span class="ident">clone</span>(),
-            <span class="ident">sql_variant</span>: <span class="kw">match</span> <span class="self">self</span>.<span class="ident">sql_family</span>() {
-                <span class="ident">SqlFamily::Mysql</span> =&gt; <span class="ident">barrel::SqlVariant::Mysql</span>,
-                <span class="ident">SqlFamily::Postgres</span> =&gt; <span class="ident">barrel::SqlVariant::Pg</span>,
-                <span class="ident">SqlFamily::Sqlite</span> =&gt; <span class="ident">barrel::SqlVariant::Sqlite</span>,
-                <span class="ident">SqlFamily::Mssql</span> =&gt; <span class="ident">barrel::SqlVariant::Mssql</span>,
+    <span class="kw">pub fn </span>barrel(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BarrelMigrationExecutor {
+        BarrelMigrationExecutor {
+            schema_name: <span class="self">self</span>.schema_name().to_owned(),
+            database: <span class="self">self</span>.database.clone(),
+            sql_variant: <span class="kw">match </span><span class="self">self</span>.sql_family() {
+                SqlFamily::Mysql =&gt; barrel::SqlVariant::Mysql,
+                SqlFamily::Postgres =&gt; barrel::SqlVariant::Pg,
+                SqlFamily::Sqlite =&gt; barrel::SqlVariant::Sqlite,
+                SqlFamily::Mssql =&gt; barrel::SqlVariant::Mssql,
             },
-            <span class="ident">tags</span>: <span class="self">self</span>.<span class="ident">tags</span>(),
+            tags: <span class="self">self</span>.tags(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">intersects</span>(<span class="ident">Tags::Vitess</span>) {
-            <span class="string">&quot;test&quot;</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">test_function_name</span>()
+    <span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">if </span><span class="self">self</span>.tags().intersects(Tags::Vitess) {
+            <span class="string">&quot;test&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.args.test_function_name()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">tags</span>()
+    <span class="kw">pub fn </span>tags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;Tags&gt; {
+        <span class="self">self</span>.args.tags()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datasource_block_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">relation_mode</span> <span class="op">=</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_vitess</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">preview_features</span>().<span class="ident">contains</span>(<span class="ident">PreviewFeature::ReferentialIntegrity</span>) {
-                <span class="string">&quot;\nrelationMode = \&quot;prisma\&quot;&quot;</span>
-            } <span class="kw">else</span> {
-                <span class="string">&quot;&quot;</span>
-            };
+    <span class="kw">pub fn </span>datasource_block_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span>relation_mode =
+            <span class="kw">if </span><span class="self">self</span>.is_vitess() &amp;&amp; <span class="self">self</span>.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
+                <span class="string">&quot;\nrelationMode = \&quot;prisma\&quot;&quot;
+            </span>} <span class="kw">else </span>{
+                <span class="string">&quot;&quot;
+            </span>};
 
-        <span class="kw">let</span> <span class="ident">namespaces</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">namespaces</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ns</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, <span class="ident">ns</span>)).<span class="ident">collect</span>();
+        <span class="kw">let </span>namespaces: Vec&lt;String&gt; = <span class="self">self</span>.namespaces().iter().map(|ns| <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, ns)).collect();
 
-        <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">namespaces</span>.<span class="ident">is_empty</span>() {
-            <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()
-        } <span class="kw">else</span> {
-            <span class="macro">format!</span>(<span class="string">&quot;\nschemas = [{}]&quot;</span>, <span class="ident">namespaces</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
+        <span class="kw">let </span>namespaces = <span class="kw">if </span>namespaces.is_empty() {
+            <span class="string">&quot;&quot;</span>.to_string()
+        } <span class="kw">else </span>{
+            <span class="macro">format!</span>(<span class="string">&quot;\nschemas = [{}]&quot;</span>, namespaces.join(<span class="string">&quot;, &quot;</span>))
         };
 
-        <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>.<span class="ident">provider</span>();
-        <span class="kw">let</span> <span class="ident">datasource_block</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>provider = <span class="kw-2">&amp;</span><span class="self">self</span>.args.provider();
+        <span class="kw">let </span>datasource_block = <span class="macro">format!</span>(
             <span class="string">r#&quot;datasource db {{
                  provider = &quot;{}&quot;
                  url = &quot;{}&quot;{}{}
                }}&quot;#</span>,
-            <span class="ident">provider</span>, <span class="string">&quot;env(TEST_DATABASE_URL)&quot;</span>, <span class="ident">namespaces</span>, <span class="ident">relation_mode</span>
+            provider, <span class="string">&quot;env(TEST_DATABASE_URL)&quot;</span>, namespaces, relation_mode
         );
-        <span class="ident">datasource_block</span>
+        datasource_block
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datasource_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DatasourceBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">datasource_block</span>(
+    <span class="kw">pub fn </span>datasource_block(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DatasourceBlock&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.args.datasource_block(
             <span class="string">&quot;env(TEST_DATABASE_URL)&quot;</span>,
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_vitess</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">preview_features</span>().<span class="ident">contains</span>(<span class="ident">PreviewFeature::ReferentialIntegrity</span>) {
+            <span class="kw">if </span><span class="self">self</span>.is_vitess() &amp;&amp; <span class="self">self</span>.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
                 <span class="kw-2">&amp;</span>[(<span class="string">&quot;relationMode&quot;</span>, <span class="string">r#&quot;&quot;prisma&quot;&quot;#</span>)]
-            } <span class="kw">else</span> {
+            } <span class="kw">else </span>{
                 <span class="kw-2">&amp;</span>[]
             },
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">pure_config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;{}\n{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">datasource_block_string</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generator_block</span>())
+    <span class="kw">fn </span>pure_config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;{}\n{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.datasource_block_string(), <span class="kw-2">&amp;</span><span class="self">self</span>.generator_block())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configuration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Configuration</span> {
-        <span class="ident">psl::parse_configuration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pure_config</span>()).<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>configuration(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Configuration {
+        psl::parse_configuration(<span class="kw-2">&amp;</span><span class="self">self</span>.pure_config()).unwrap()
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">expect_datamodel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">expectation</span>: <span class="kw-2">&amp;</span><span class="ident">expect_test::Expect</span>) {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">introspect</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="ident">expectation</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">found</span>);
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub async fn </span>expect_datamodel(<span class="kw-2">&amp;</span><span class="self">self</span>, expectation: <span class="kw-2">&amp;</span>expect_test::Expect) {
+        <span class="kw">let </span>found = <span class="self">self</span>.introspect().<span class="kw">await</span>.unwrap();
+        expectation.assert_eq(<span class="kw-2">&amp;</span>found);
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">expect_re_introspected_datamodel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">expectation</span>: <span class="ident">expect_test::Expect</span>) {
-        <span class="kw">let</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="ident">parse_datamodel</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">pure_config</span>(), <span class="ident">schema</span>));
-        <span class="kw">let</span> <span class="ident">reintrospected</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">test_introspect_internal</span>(<span class="ident">data_model</span>, <span class="bool-val">false</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub async fn </span>expect_re_introspected_datamodel(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str, expectation: expect_test::Expect) {
+        <span class="kw">let </span>data_model = parse_datamodel(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.pure_config(), schema));
+        <span class="kw">let </span>reintrospected = <span class="self">self</span>.test_introspect_internal(data_model, <span class="bool-val">false</span>).<span class="kw">await</span>.unwrap();
 
-        <span class="ident">expectation</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">reintrospected</span>.<span class="ident">data_model</span>);
+        expectation.assert_eq(<span class="kw-2">&amp;</span>reintrospected.data_model);
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_eq_datamodels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">expected_without_header</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">result_with_header</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">expected_with_source</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dm_with_sources</span>(<span class="ident">expected_without_header</span>);
-        <span class="kw">let</span> <span class="ident">expected_with_generator</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dm_with_generator_and_preview_flags</span>(<span class="kw-2">&amp;</span><span class="ident">expected_with_source</span>);
-        <span class="kw">let</span> <span class="ident">reformatted_expected</span> <span class="op">=</span> <span class="ident">psl::reformat</span>(<span class="kw-2">&amp;</span><span class="ident">expected_with_generator</span>, <span class="number">2</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_eq_datamodels(<span class="kw-2">&amp;</span><span class="self">self</span>, expected_without_header: <span class="kw-2">&amp;</span>str, result_with_header: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">let </span>expected_with_source = <span class="self">self</span>.dm_with_sources(expected_without_header);
+        <span class="kw">let </span>expected_with_generator = <span class="self">self</span>.dm_with_generator_and_preview_flags(<span class="kw-2">&amp;</span>expected_with_source);
+        <span class="kw">let </span>reformatted_expected = psl::reformat(<span class="kw-2">&amp;</span>expected_with_generator, <span class="number">2</span>).unwrap();
 
-        <span class="macro">pretty_assertions::assert_eq!</span>(<span class="ident">reformatted_expected</span>, <span class="ident">result_with_header</span>);
+        <span class="macro">pretty_assertions::assert_eq!</span>(reformatted_expected, result_with_header);
     }
 
-    <span class="kw">fn</span> <span class="ident">dm_with_sources</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">320</span> <span class="op">+</span> <span class="ident">schema</span>.<span class="ident">len</span>());
+    <span class="kw">fn </span>dm_with_sources(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>out = String::with_capacity(<span class="number">320 </span>+ schema.len());
 
-        <span class="macro">write!</span>(<span class="ident">out</span>, <span class="string">&quot;{}\n{}&quot;</span>, <span class="self">self</span>.<span class="ident">datasource_block_string</span>(), <span class="ident">schema</span>).<span class="ident">unwrap</span>();
+        <span class="macro">write!</span>(out, <span class="string">&quot;{}\n{}&quot;</span>, <span class="self">self</span>.datasource_block_string(), schema).unwrap();
 
-        <span class="ident">out</span>
+        out
     }
 
-    <span class="kw">fn</span> <span class="ident">dm_with_generator_and_preview_flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">320</span> <span class="op">+</span> <span class="ident">schema</span>.<span class="ident">len</span>());
+    <span class="kw">fn </span>dm_with_generator_and_preview_flags(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>out = String::with_capacity(<span class="number">320 </span>+ schema.len());
 
-        <span class="macro">write!</span>(<span class="ident">out</span>, <span class="string">&quot;{}\n{}&quot;</span>, <span class="self">self</span>.<span class="ident">generator_block</span>(), <span class="ident">schema</span>).<span class="ident">unwrap</span>();
+        <span class="macro">write!</span>(out, <span class="string">&quot;{}\n{}&quot;</span>, <span class="self">self</span>.generator_block(), schema).unwrap();
 
-        <span class="ident">out</span>
+        out
     }
 
-    <span class="kw">fn</span> <span class="ident">generator_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">preview_features</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, <span class="ident">pf</span>))
-            .<span class="ident">collect</span>();
+    <span class="kw">fn </span>generator_block(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span>preview_features: Vec&lt;String&gt; = <span class="self">self
+            </span>.preview_features()
+            .iter()
+            .map(|pf| <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, pf))
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">preview_feature_string</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">preview_features</span>.<span class="ident">is_empty</span>() {
-            <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()
-        } <span class="kw">else</span> {
-            <span class="macro">format!</span>(<span class="string">&quot;\npreviewFeatures = [{}]&quot;</span>, <span class="ident">preview_features</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
+        <span class="kw">let </span>preview_feature_string = <span class="kw">if </span>preview_features.is_empty() {
+            <span class="string">&quot;&quot;</span>.to_string()
+        } <span class="kw">else </span>{
+            <span class="macro">format!</span>(<span class="string">&quot;\npreviewFeatures = [{}]&quot;</span>, preview_features.join(<span class="string">&quot;, &quot;</span>))
         };
 
-        <span class="kw">let</span> <span class="ident">generator_block</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>generator_block = <span class="macro">format!</span>(
             <span class="string">r#&quot;generator client {{
                  provider = &quot;prisma-client-js&quot;{}
                }}&quot;#</span>,
-            <span class="ident">preview_feature_string</span>
+            preview_feature_string
         );
-        <span class="ident">generator_block</span>
+        generator_block
     }
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">database</span>.<span class="ident">raw_cmd</span>(<span class="ident">query</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>()
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub async fn </span>raw_cmd(<span class="kw-2">&amp;</span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.database.raw_cmd(query).<span class="kw">await</span>.unwrap()
     }
 }
 
-<span class="attribute">#[<span class="ident">track_caller</span>]</span>
-<span class="kw">fn</span> <span class="ident">parse_datamodel</span>(<span class="ident">dm</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">psl::ValidatedSchema</span> {
-    <span class="ident">psl::parse_schema</span>(<span class="ident">dm</span>).<span class="ident">unwrap</span>()
+<span class="attribute">#[track_caller]
+</span><span class="kw">fn </span>parse_datamodel(dm: <span class="kw-2">&amp;</span>str) -&gt; psl::ValidatedSchema {
+    psl::parse_schema(dm).unwrap()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="introspection_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="introspection_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

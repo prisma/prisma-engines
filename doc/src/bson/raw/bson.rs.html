@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/bson.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bson.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/bson.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bson.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -520,527 +520,527 @@
 <span id="520">520</span>
 <span id="521">521</span>
 <span id="522">522</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::convert::{TryFrom, TryInto};
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">oid</span>::{<span class="self">self</span>, <span class="ident">ObjectId</span>},
-    <span class="ident">raw::RAW_BSON_NEWTYPE</span>,
-    <span class="ident">spec::ElementType</span>,
-    <span class="ident">Binary</span>,
-    <span class="ident">Bson</span>,
-    <span class="ident">DbPointer</span>,
-    <span class="ident">Decimal128</span>,
-    <span class="ident">RawArray</span>,
-    <span class="ident">RawArrayBuf</span>,
-    <span class="ident">RawBinaryRef</span>,
-    <span class="ident">RawBsonRef</span>,
-    <span class="ident">RawDbPointerRef</span>,
-    <span class="ident">RawDocument</span>,
-    <span class="ident">RawDocumentBuf</span>,
-    <span class="ident">RawJavaScriptCodeWithScopeRef</span>,
-    <span class="ident">RawRegexRef</span>,
-    <span class="ident">Regex</span>,
-    <span class="ident">Timestamp</span>,
+<span class="kw">use crate</span>::{
+    oid::{<span class="self">self</span>, ObjectId},
+    raw::RAW_BSON_NEWTYPE,
+    spec::ElementType,
+    Binary,
+    Bson,
+    DbPointer,
+    Decimal128,
+    RawArray,
+    RawArrayBuf,
+    RawBinaryRef,
+    RawBsonRef,
+    RawDbPointerRef,
+    RawDocument,
+    RawDocumentBuf,
+    RawJavaScriptCodeWithScopeRef,
+    RawRegexRef,
+    Regex,
+    Timestamp,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">serde</span>::{<span class="ident">OwnedOrBorrowedRawBson</span>, <span class="ident">OwnedOrBorrowedRawBsonVisitor</span>},
-    <span class="ident">Error</span>,
+<span class="kw">use super</span>::{
+    serde::{OwnedOrBorrowedRawBson, OwnedOrBorrowedRawBsonVisitor},
+    Error,
     <span class="prelude-ty">Result</span>,
 };
 
-<span class="doccomment">/// A BSON value backed by owned raw BSON bytes.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RawBson</span> {
-    <span class="doccomment">/// 64-bit binary floating point</span>
-    <span class="ident">Double</span>(<span class="ident">f64</span>),
-    <span class="doccomment">/// UTF-8 string</span>
-    <span class="ident">String</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// Array</span>
-    <span class="ident">Array</span>(<span class="ident">RawArrayBuf</span>),
-    <span class="doccomment">/// Embedded document</span>
-    <span class="ident">Document</span>(<span class="ident">RawDocumentBuf</span>),
-    <span class="doccomment">/// Boolean value</span>
-    <span class="ident">Boolean</span>(<span class="ident">bool</span>),
-    <span class="doccomment">/// Null value</span>
-    <span class="ident">Null</span>,
-    <span class="doccomment">/// Regular expression</span>
-    <span class="ident">RegularExpression</span>(<span class="ident">Regex</span>),
-    <span class="doccomment">/// JavaScript code</span>
-    <span class="ident">JavaScriptCode</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// JavaScript code w/ scope</span>
-    <span class="ident">JavaScriptCodeWithScope</span>(<span class="ident">RawJavaScriptCodeWithScope</span>),
-    <span class="doccomment">/// 32-bit signed integer</span>
-    <span class="ident">Int32</span>(<span class="ident">i32</span>),
-    <span class="doccomment">/// 64-bit signed integer</span>
-    <span class="ident">Int64</span>(<span class="ident">i64</span>),
-    <span class="doccomment">/// Timestamp</span>
-    <span class="ident">Timestamp</span>(<span class="ident">Timestamp</span>),
-    <span class="doccomment">/// Binary data</span>
-    <span class="ident">Binary</span>(<span class="ident">Binary</span>),
-    <span class="doccomment">/// [ObjectId](http://dochub.mongodb.org/core/objectids)</span>
-    <span class="ident">ObjectId</span>(<span class="ident">oid::ObjectId</span>),
-    <span class="doccomment">/// UTC datetime</span>
-    <span class="ident">DateTime</span>(<span class="ident"><span class="kw">crate</span>::DateTime</span>),
-    <span class="doccomment">/// Symbol (Deprecated)</span>
-    <span class="ident">Symbol</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// [128-bit decimal floating point](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst)</span>
-    <span class="ident">Decimal128</span>(<span class="ident">Decimal128</span>),
-    <span class="doccomment">/// Undefined value (Deprecated)</span>
-    <span class="ident">Undefined</span>,
-    <span class="doccomment">/// Max key</span>
-    <span class="ident">MaxKey</span>,
-    <span class="doccomment">/// Min key</span>
-    <span class="ident">MinKey</span>,
-    <span class="doccomment">/// DBPointer (Deprecated)</span>
-    <span class="ident">DbPointer</span>(<span class="ident">DbPointer</span>),
+<span class="doccomment">/// A BSON value backed by owned raw BSON bytes.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>RawBson {
+    <span class="doccomment">/// 64-bit binary floating point
+    </span>Double(f64),
+    <span class="doccomment">/// UTF-8 string
+    </span>String(String),
+    <span class="doccomment">/// Array
+    </span>Array(RawArrayBuf),
+    <span class="doccomment">/// Embedded document
+    </span>Document(RawDocumentBuf),
+    <span class="doccomment">/// Boolean value
+    </span>Boolean(bool),
+    <span class="doccomment">/// Null value
+    </span>Null,
+    <span class="doccomment">/// Regular expression
+    </span>RegularExpression(Regex),
+    <span class="doccomment">/// JavaScript code
+    </span>JavaScriptCode(String),
+    <span class="doccomment">/// JavaScript code w/ scope
+    </span>JavaScriptCodeWithScope(RawJavaScriptCodeWithScope),
+    <span class="doccomment">/// 32-bit signed integer
+    </span>Int32(i32),
+    <span class="doccomment">/// 64-bit signed integer
+    </span>Int64(i64),
+    <span class="doccomment">/// Timestamp
+    </span>Timestamp(Timestamp),
+    <span class="doccomment">/// Binary data
+    </span>Binary(Binary),
+    <span class="doccomment">/// [ObjectId](http://dochub.mongodb.org/core/objectids)
+    </span>ObjectId(oid::ObjectId),
+    <span class="doccomment">/// UTC datetime
+    </span>DateTime(<span class="kw">crate</span>::DateTime),
+    <span class="doccomment">/// Symbol (Deprecated)
+    </span>Symbol(String),
+    <span class="doccomment">/// [128-bit decimal floating point](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst)
+    </span>Decimal128(Decimal128),
+    <span class="doccomment">/// Undefined value (Deprecated)
+    </span>Undefined,
+    <span class="doccomment">/// Max key
+    </span>MaxKey,
+    <span class="doccomment">/// Min key
+    </span>MinKey,
+    <span class="doccomment">/// DBPointer (Deprecated)
+    </span>DbPointer(DbPointer),
 }
 
-<span class="kw">impl</span> <span class="ident">RawBson</span> {
-    <span class="doccomment">/// Get the [`ElementType`] of this value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">element_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ElementType</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RawBson::Double</span>(..) =&gt; <span class="ident">ElementType::Double</span>,
-            <span class="ident">RawBson::String</span>(..) =&gt; <span class="ident">ElementType::String</span>,
-            <span class="ident">RawBson::Array</span>(..) =&gt; <span class="ident">ElementType::Array</span>,
-            <span class="ident">RawBson::Document</span>(..) =&gt; <span class="ident">ElementType::EmbeddedDocument</span>,
-            <span class="ident">RawBson::Boolean</span>(..) =&gt; <span class="ident">ElementType::Boolean</span>,
-            <span class="ident">RawBson::Null</span> =&gt; <span class="ident">ElementType::Null</span>,
-            <span class="ident">RawBson::RegularExpression</span>(..) =&gt; <span class="ident">ElementType::RegularExpression</span>,
-            <span class="ident">RawBson::JavaScriptCode</span>(..) =&gt; <span class="ident">ElementType::JavaScriptCode</span>,
-            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(..) =&gt; <span class="ident">ElementType::JavaScriptCodeWithScope</span>,
-            <span class="ident">RawBson::Int32</span>(..) =&gt; <span class="ident">ElementType::Int32</span>,
-            <span class="ident">RawBson::Int64</span>(..) =&gt; <span class="ident">ElementType::Int64</span>,
-            <span class="ident">RawBson::Timestamp</span>(..) =&gt; <span class="ident">ElementType::Timestamp</span>,
-            <span class="ident">RawBson::Binary</span>(..) =&gt; <span class="ident">ElementType::Binary</span>,
-            <span class="ident">RawBson::ObjectId</span>(..) =&gt; <span class="ident">ElementType::ObjectId</span>,
-            <span class="ident">RawBson::DateTime</span>(..) =&gt; <span class="ident">ElementType::DateTime</span>,
-            <span class="ident">RawBson::Symbol</span>(..) =&gt; <span class="ident">ElementType::Symbol</span>,
-            <span class="ident">RawBson::Decimal128</span>(..) =&gt; <span class="ident">ElementType::Decimal128</span>,
-            <span class="ident">RawBson::Undefined</span> =&gt; <span class="ident">ElementType::Undefined</span>,
-            <span class="ident">RawBson::MaxKey</span> =&gt; <span class="ident">ElementType::MaxKey</span>,
-            <span class="ident">RawBson::MinKey</span> =&gt; <span class="ident">ElementType::MinKey</span>,
-            <span class="ident">RawBson::DbPointer</span>(..) =&gt; <span class="ident">ElementType::DbPointer</span>,
+<span class="kw">impl </span>RawBson {
+    <span class="doccomment">/// Get the [`ElementType`] of this value.
+    </span><span class="kw">pub fn </span>element_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ElementType {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            RawBson::Double(..) =&gt; ElementType::Double,
+            RawBson::String(..) =&gt; ElementType::String,
+            RawBson::Array(..) =&gt; ElementType::Array,
+            RawBson::Document(..) =&gt; ElementType::EmbeddedDocument,
+            RawBson::Boolean(..) =&gt; ElementType::Boolean,
+            RawBson::Null =&gt; ElementType::Null,
+            RawBson::RegularExpression(..) =&gt; ElementType::RegularExpression,
+            RawBson::JavaScriptCode(..) =&gt; ElementType::JavaScriptCode,
+            RawBson::JavaScriptCodeWithScope(..) =&gt; ElementType::JavaScriptCodeWithScope,
+            RawBson::Int32(..) =&gt; ElementType::Int32,
+            RawBson::Int64(..) =&gt; ElementType::Int64,
+            RawBson::Timestamp(..) =&gt; ElementType::Timestamp,
+            RawBson::Binary(..) =&gt; ElementType::Binary,
+            RawBson::ObjectId(..) =&gt; ElementType::ObjectId,
+            RawBson::DateTime(..) =&gt; ElementType::DateTime,
+            RawBson::Symbol(..) =&gt; ElementType::Symbol,
+            RawBson::Decimal128(..) =&gt; ElementType::Decimal128,
+            RawBson::Undefined =&gt; ElementType::Undefined,
+            RawBson::MaxKey =&gt; ElementType::MaxKey,
+            RawBson::MinKey =&gt; ElementType::MinKey,
+            RawBson::DbPointer(..) =&gt; ElementType::DbPointer,
         }
     }
 
-    <span class="doccomment">/// Gets the wrapped `f64` value or returns `None` if the value isn&#39;t a BSON</span>
-    <span class="doccomment">/// double.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Double</span>(<span class="ident">d</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">d</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets the wrapped `f64` value or returns `None` if the value isn&#39;t a BSON
+    /// double.
+    </span><span class="kw">pub fn </span>as_f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Double(d) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>d),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the `String` that&#39;s wrapped or returns `None` if the wrapped value isn&#39;t</span>
-    <span class="doccomment">/// a BSON String.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::String</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets a reference to the `String` that&#39;s wrapped or returns `None` if the wrapped value isn&#39;t
+    /// a BSON String.
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::String(s) =&gt; <span class="prelude-val">Some</span>(s),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the [`RawArrayBuf`] that&#39;s wrapped or returns `None` if the wrapped</span>
-    <span class="doccomment">/// value isn&#39;t a BSON array.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">RawArray</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Array</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets a reference to the [`RawArrayBuf`] that&#39;s wrapped or returns `None` if the wrapped
+    /// value isn&#39;t a BSON array.
+    </span><span class="kw">pub fn </span>as_array(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>RawArray&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Array(v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a mutable reference to the [`RawArrayBuf`] that&#39;s wrapped or returns `None` if the</span>
-    <span class="doccomment">/// wrapped value isn&#39;t a BSON array.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_array_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">RawArrayBuf</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Array</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets a mutable reference to the [`RawArrayBuf`] that&#39;s wrapped or returns `None` if the
+    /// wrapped value isn&#39;t a BSON array.
+    </span><span class="kw">pub fn </span>as_array_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>RawArrayBuf&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Array(<span class="kw-2">ref mut </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the [`RawDocumentBuf`] that&#39;s wrapped or returns `None` if the wrapped</span>
-    <span class="doccomment">/// value isn&#39;t a BSON document.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">RawDocument</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Document</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets a reference to the [`RawDocumentBuf`] that&#39;s wrapped or returns `None` if the wrapped
+    /// value isn&#39;t a BSON document.
+    </span><span class="kw">pub fn </span>as_document(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>RawDocument&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Document(v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a mutable reference to the [`RawDocumentBuf`] that&#39;s wrapped or returns `None` if the</span>
-    <span class="doccomment">/// wrapped value isn&#39;t a BSON document.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_document_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Document</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets a mutable reference to the [`RawDocumentBuf`] that&#39;s wrapped or returns `None` if the
+    /// wrapped value isn&#39;t a BSON document.
+    </span><span class="kw">pub fn </span>as_document_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>RawDocumentBuf&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Document(<span class="kw-2">ref mut </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets the wrapped `bool` value or returns `None` if the wrapped value isn&#39;t a BSON</span>
-    <span class="doccomment">/// boolean.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Boolean</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets the wrapped `bool` value or returns `None` if the wrapped value isn&#39;t a BSON
+    /// boolean.
+    </span><span class="kw">pub fn </span>as_bool(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Boolean(v) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets the wrapped `i32` value or returns `None` if the wrapped value isn&#39;t a BSON</span>
-    <span class="doccomment">/// Int32.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_i32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Int32</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets the wrapped `i32` value or returns `None` if the wrapped value isn&#39;t a BSON
+    /// Int32.
+    </span><span class="kw">pub fn </span>as_i32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i32&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Int32(v) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets the wrapped `i64` value or returns `None` if the wrapped value isn&#39;t a BSON</span>
-    <span class="doccomment">/// Int64.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Int64</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets the wrapped `i64` value or returns `None` if the wrapped value isn&#39;t a BSON
+    /// Int64.
+    </span><span class="kw">pub fn </span>as_i64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Int64(v) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets the wrapped [`crate::oid::ObjectId`] value or returns `None` if the wrapped value isn&#39;t</span>
-    <span class="doccomment">/// a BSON ObjectID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_object_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">oid::ObjectId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::ObjectId</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets the wrapped [`crate::oid::ObjectId`] value or returns `None` if the wrapped value isn&#39;t
+    /// a BSON ObjectID.
+    </span><span class="kw">pub fn </span>as_object_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;oid::ObjectId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::ObjectId(v) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the [`Binary`] that&#39;s wrapped or returns `None` if the wrapped value</span>
-    <span class="doccomment">/// isn&#39;t a BSON binary.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_binary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawBinaryRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Binary</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RawBinaryRef</span> {
-                <span class="ident">bytes</span>: <span class="ident">v</span>.<span class="ident">bytes</span>.<span class="ident">as_slice</span>(),
-                <span class="ident">subtype</span>: <span class="ident">v</span>.<span class="ident">subtype</span>,
+    <span class="doccomment">/// Gets a reference to the [`Binary`] that&#39;s wrapped or returns `None` if the wrapped value
+    /// isn&#39;t a BSON binary.
+    </span><span class="kw">pub fn </span>as_binary(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RawBinaryRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Binary(v) =&gt; <span class="prelude-val">Some</span>(RawBinaryRef {
+                bytes: v.bytes.as_slice(),
+                subtype: v.subtype,
             }),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the [`Regex`] that&#39;s wrapped or returns `None` if the wrapped value</span>
-    <span class="doccomment">/// isn&#39;t a BSON regular expression.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_regex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawRegexRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::RegularExpression</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RawRegexRef</span> {
-                <span class="ident">pattern</span>: <span class="ident">v</span>.<span class="ident">pattern</span>.<span class="ident">as_str</span>(),
-                <span class="ident">options</span>: <span class="ident">v</span>.<span class="ident">options</span>.<span class="ident">as_str</span>(),
+    <span class="doccomment">/// Gets a reference to the [`Regex`] that&#39;s wrapped or returns `None` if the wrapped value
+    /// isn&#39;t a BSON regular expression.
+    </span><span class="kw">pub fn </span>as_regex(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RawRegexRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::RegularExpression(v) =&gt; <span class="prelude-val">Some</span>(RawRegexRef {
+                pattern: v.pattern.as_str(),
+                options: v.options.as_str(),
             }),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets the wrapped [`crate::DateTime`] value or returns `None` if the wrapped value isn&#39;t a</span>
-    <span class="doccomment">/// BSON datetime.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_datetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::DateTime</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets the wrapped [`crate::DateTime`] value or returns `None` if the wrapped value isn&#39;t a
+    /// BSON datetime.
+    </span><span class="kw">pub fn </span>as_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::DateTime&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::DateTime(v) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the symbol that&#39;s wrapped or returns `None` if the wrapped value isn&#39;t a</span>
-    <span class="doccomment">/// BSON Symbol.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_symbol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Symbol</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets a reference to the symbol that&#39;s wrapped or returns `None` if the wrapped value isn&#39;t a
+    /// BSON Symbol.
+    </span><span class="kw">pub fn </span>as_symbol(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Symbol(v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets the wrapped [`crate::Timestamp`] value or returns `None` if the wrapped value isn&#39;t a</span>
-    <span class="doccomment">/// BSON datetime.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Timestamp</span>(<span class="ident">timestamp</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">timestamp</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets the wrapped [`crate::Timestamp`] value or returns `None` if the wrapped value isn&#39;t a
+    /// BSON datetime.
+    </span><span class="kw">pub fn </span>as_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Timestamp&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Timestamp(timestamp) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>timestamp),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Returns `Some(())` if this value is null, otherwise returns `None`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Null</span> =&gt; <span class="prelude-val">Some</span>(()),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Returns `Some(())` if this value is null, otherwise returns `None`.
+    </span><span class="kw">pub fn </span>as_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Null =&gt; <span class="prelude-val">Some</span>(()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the [`crate::DbPointer`] that&#39;s wrapped or returns `None` if the wrapped</span>
-    <span class="doccomment">/// value isn&#39;t a BSON DbPointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_db_pointer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawDbPointerRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::DbPointer</span>(<span class="ident">d</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RawDbPointerRef</span> {
-                <span class="ident">namespace</span>: <span class="ident">d</span>.<span class="ident">namespace</span>.<span class="ident">as_str</span>(),
-                <span class="ident">id</span>: <span class="ident">d</span>.<span class="ident">id</span>,
+    <span class="doccomment">/// Gets a reference to the [`crate::DbPointer`] that&#39;s wrapped or returns `None` if the wrapped
+    /// value isn&#39;t a BSON DbPointer.
+    </span><span class="kw">pub fn </span>as_db_pointer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RawDbPointerRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::DbPointer(d) =&gt; <span class="prelude-val">Some</span>(RawDbPointerRef {
+                namespace: d.namespace.as_str(),
+                id: d.id,
             }),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the code that&#39;s wrapped or returns `None` if the wrapped value isn&#39;t a</span>
-    <span class="doccomment">/// BSON JavaScript code.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_javascript</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::JavaScriptCode</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets a reference to the code that&#39;s wrapped or returns `None` if the wrapped value isn&#39;t a
+    /// BSON JavaScript code.
+    </span><span class="kw">pub fn </span>as_javascript(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::JavaScriptCode(s) =&gt; <span class="prelude-val">Some</span>(s),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the [`RawJavaScriptCodeWithScope`] that&#39;s wrapped or returns `None`</span>
-    <span class="doccomment">/// if the wrapped value isn&#39;t a BSON JavaScript code with scope value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_javascript_with_scope</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawJavaScriptCodeWithScopeRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RawJavaScriptCodeWithScopeRef</span> {
-                <span class="ident">code</span>: <span class="ident">s</span>.<span class="ident">code</span>.<span class="ident">as_str</span>(),
-                <span class="ident">scope</span>: <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">scope</span>,
+    <span class="doccomment">/// Gets a reference to the [`RawJavaScriptCodeWithScope`] that&#39;s wrapped or returns `None`
+    /// if the wrapped value isn&#39;t a BSON JavaScript code with scope value.
+    </span><span class="kw">pub fn </span>as_javascript_with_scope(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RawJavaScriptCodeWithScopeRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::JavaScriptCodeWithScope(s) =&gt; <span class="prelude-val">Some</span>(RawJavaScriptCodeWithScopeRef {
+                code: s.code.as_str(),
+                scope: <span class="kw-2">&amp;</span>s.scope,
             }),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Gets a [`RawBsonRef`] value referencing this owned raw BSON value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw_bson_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Double</span>(<span class="ident">d</span>) =&gt; <span class="ident">RawBsonRef::Double</span>(<span class="kw-2">*</span><span class="ident">d</span>),
-            <span class="ident">RawBson::String</span>(<span class="ident">s</span>) =&gt; <span class="ident">RawBsonRef::String</span>(<span class="ident">s</span>.<span class="ident">as_str</span>()),
-            <span class="ident">RawBson::Array</span>(<span class="ident">a</span>) =&gt; <span class="ident">RawBsonRef::Array</span>(<span class="ident">a</span>),
-            <span class="ident">RawBson::Document</span>(<span class="ident">d</span>) =&gt; <span class="ident">RawBsonRef::Document</span>(<span class="ident">d</span>),
-            <span class="ident">RawBson::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="ident">RawBsonRef::Boolean</span>(<span class="kw-2">*</span><span class="ident">b</span>),
-            <span class="ident">RawBson::Null</span> =&gt; <span class="ident">RawBsonRef::Null</span>,
-            <span class="ident">RawBson::RegularExpression</span>(<span class="ident">re</span>) =&gt; <span class="ident">RawBsonRef::RegularExpression</span>(<span class="ident">RawRegexRef</span> {
-                <span class="ident">options</span>: <span class="ident">re</span>.<span class="ident">options</span>.<span class="ident">as_str</span>(),
-                <span class="ident">pattern</span>: <span class="ident">re</span>.<span class="ident">pattern</span>.<span class="ident">as_str</span>(),
+    <span class="doccomment">/// Gets a [`RawBsonRef`] value referencing this owned raw BSON value.
+    </span><span class="kw">pub fn </span>as_raw_bson_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawBsonRef&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RawBson::Double(d) =&gt; RawBsonRef::Double(<span class="kw-2">*</span>d),
+            RawBson::String(s) =&gt; RawBsonRef::String(s.as_str()),
+            RawBson::Array(a) =&gt; RawBsonRef::Array(a),
+            RawBson::Document(d) =&gt; RawBsonRef::Document(d),
+            RawBson::Boolean(b) =&gt; RawBsonRef::Boolean(<span class="kw-2">*</span>b),
+            RawBson::Null =&gt; RawBsonRef::Null,
+            RawBson::RegularExpression(re) =&gt; RawBsonRef::RegularExpression(RawRegexRef {
+                options: re.options.as_str(),
+                pattern: re.pattern.as_str(),
             }),
-            <span class="ident">RawBson::JavaScriptCode</span>(<span class="ident">c</span>) =&gt; <span class="ident">RawBsonRef::JavaScriptCode</span>(<span class="ident">c</span>.<span class="ident">as_str</span>()),
-            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(<span class="ident">code_w_scope</span>) =&gt; {
-                <span class="ident">RawBsonRef::JavaScriptCodeWithScope</span>(<span class="ident">RawJavaScriptCodeWithScopeRef</span> {
-                    <span class="ident">code</span>: <span class="ident">code_w_scope</span>.<span class="ident">code</span>.<span class="ident">as_str</span>(),
-                    <span class="ident">scope</span>: <span class="ident">code_w_scope</span>.<span class="ident">scope</span>.<span class="ident">as_ref</span>(),
+            RawBson::JavaScriptCode(c) =&gt; RawBsonRef::JavaScriptCode(c.as_str()),
+            RawBson::JavaScriptCodeWithScope(code_w_scope) =&gt; {
+                RawBsonRef::JavaScriptCodeWithScope(RawJavaScriptCodeWithScopeRef {
+                    code: code_w_scope.code.as_str(),
+                    scope: code_w_scope.scope.as_ref(),
                 })
             }
-            <span class="ident">RawBson::Int32</span>(<span class="ident">i</span>) =&gt; <span class="ident">RawBsonRef::Int32</span>(<span class="kw-2">*</span><span class="ident">i</span>),
-            <span class="ident">RawBson::Int64</span>(<span class="ident">i</span>) =&gt; <span class="ident">RawBsonRef::Int64</span>(<span class="kw-2">*</span><span class="ident">i</span>),
-            <span class="ident">RawBson::Timestamp</span>(<span class="ident">ts</span>) =&gt; <span class="ident">RawBsonRef::Timestamp</span>(<span class="kw-2">*</span><span class="ident">ts</span>),
-            <span class="ident">RawBson::Binary</span>(<span class="ident">b</span>) =&gt; <span class="ident">RawBsonRef::Binary</span>(<span class="ident">RawBinaryRef</span> {
-                <span class="ident">bytes</span>: <span class="ident">b</span>.<span class="ident">bytes</span>.<span class="ident">as_slice</span>(),
-                <span class="ident">subtype</span>: <span class="ident">b</span>.<span class="ident">subtype</span>,
+            RawBson::Int32(i) =&gt; RawBsonRef::Int32(<span class="kw-2">*</span>i),
+            RawBson::Int64(i) =&gt; RawBsonRef::Int64(<span class="kw-2">*</span>i),
+            RawBson::Timestamp(ts) =&gt; RawBsonRef::Timestamp(<span class="kw-2">*</span>ts),
+            RawBson::Binary(b) =&gt; RawBsonRef::Binary(RawBinaryRef {
+                bytes: b.bytes.as_slice(),
+                subtype: b.subtype,
             }),
-            <span class="ident">RawBson::ObjectId</span>(<span class="ident">oid</span>) =&gt; <span class="ident">RawBsonRef::ObjectId</span>(<span class="kw-2">*</span><span class="ident">oid</span>),
-            <span class="ident">RawBson::DateTime</span>(<span class="ident">dt</span>) =&gt; <span class="ident">RawBsonRef::DateTime</span>(<span class="kw-2">*</span><span class="ident">dt</span>),
-            <span class="ident">RawBson::Symbol</span>(<span class="ident">s</span>) =&gt; <span class="ident">RawBsonRef::Symbol</span>(<span class="ident">s</span>.<span class="ident">as_str</span>()),
-            <span class="ident">RawBson::Decimal128</span>(<span class="ident">d</span>) =&gt; <span class="ident">RawBsonRef::Decimal128</span>(<span class="kw-2">*</span><span class="ident">d</span>),
-            <span class="ident">RawBson::Undefined</span> =&gt; <span class="ident">RawBsonRef::Undefined</span>,
-            <span class="ident">RawBson::MaxKey</span> =&gt; <span class="ident">RawBsonRef::MaxKey</span>,
-            <span class="ident">RawBson::MinKey</span> =&gt; <span class="ident">RawBsonRef::MinKey</span>,
-            <span class="ident">RawBson::DbPointer</span>(<span class="ident">dbp</span>) =&gt; <span class="ident">RawBsonRef::DbPointer</span>(<span class="ident">RawDbPointerRef</span> {
-                <span class="ident">namespace</span>: <span class="ident">dbp</span>.<span class="ident">namespace</span>.<span class="ident">as_str</span>(),
-                <span class="ident">id</span>: <span class="ident">dbp</span>.<span class="ident">id</span>,
+            RawBson::ObjectId(oid) =&gt; RawBsonRef::ObjectId(<span class="kw-2">*</span>oid),
+            RawBson::DateTime(dt) =&gt; RawBsonRef::DateTime(<span class="kw-2">*</span>dt),
+            RawBson::Symbol(s) =&gt; RawBsonRef::Symbol(s.as_str()),
+            RawBson::Decimal128(d) =&gt; RawBsonRef::Decimal128(<span class="kw-2">*</span>d),
+            RawBson::Undefined =&gt; RawBsonRef::Undefined,
+            RawBson::MaxKey =&gt; RawBsonRef::MaxKey,
+            RawBson::MinKey =&gt; RawBsonRef::MinKey,
+            RawBson::DbPointer(dbp) =&gt; RawBsonRef::DbPointer(RawDbPointerRef {
+                namespace: dbp.namespace.as_str(),
+                id: dbp.id,
             }),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">i</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::Int32</span>(<span class="ident">i</span>)
+<span class="kw">impl </span>From&lt;i32&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(i: i32) -&gt; <span class="self">Self </span>{
+        RawBson::Int32(i)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">i</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::Int64</span>(<span class="ident">i</span>)
+<span class="kw">impl </span>From&lt;i64&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(i: i64) -&gt; <span class="self">Self </span>{
+        RawBson::Int64(i)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::String</span>(<span class="ident">s</span>)
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(s: String) -&gt; <span class="self">Self </span>{
+        RawBson::String(s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::String</span>(<span class="ident">s</span>.<span class="ident">to_owned</span>())
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>str&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        RawBson::String(s.to_owned())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::Double</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>From&lt;f64&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(f: f64) -&gt; <span class="self">Self </span>{
+        RawBson::Double(f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::Boolean</span>(<span class="ident">b</span>)
+<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(b: bool) -&gt; <span class="self">Self </span>{
+        RawBson::Boolean(b)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">d</span>: <span class="ident">RawDocumentBuf</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::Document</span>(<span class="ident">d</span>)
+<span class="kw">impl </span>From&lt;RawDocumentBuf&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(d: RawDocumentBuf) -&gt; <span class="self">Self </span>{
+        RawBson::Document(d)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RawArrayBuf</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">RawArrayBuf</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::Array</span>(<span class="ident">a</span>)
+<span class="kw">impl </span>From&lt;RawArrayBuf&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(a: RawArrayBuf) -&gt; <span class="self">Self </span>{
+        RawBson::Array(a)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">dt</span>: <span class="ident"><span class="kw">crate</span>::DateTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::DateTime</span>(<span class="ident">dt</span>)
+<span class="kw">impl </span>From&lt;<span class="kw">crate</span>::DateTime&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(dt: <span class="kw">crate</span>::DateTime) -&gt; <span class="self">Self </span>{
+        RawBson::DateTime(dt)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ts</span>: <span class="ident">Timestamp</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::Timestamp</span>(<span class="ident">ts</span>)
+<span class="kw">impl </span>From&lt;Timestamp&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(ts: Timestamp) -&gt; <span class="self">Self </span>{
+        RawBson::Timestamp(ts)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">oid</span>: <span class="ident">ObjectId</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::ObjectId</span>(<span class="ident">oid</span>)
+<span class="kw">impl </span>From&lt;ObjectId&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(oid: ObjectId) -&gt; <span class="self">Self </span>{
+        RawBson::ObjectId(oid)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Decimal128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">d</span>: <span class="ident">Decimal128</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::Decimal128</span>(<span class="ident">d</span>)
+<span class="kw">impl </span>From&lt;Decimal128&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(d: Decimal128) -&gt; <span class="self">Self </span>{
+        RawBson::Decimal128(d)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RawJavaScriptCodeWithScope</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">code_w_scope</span>: <span class="ident">RawJavaScriptCodeWithScope</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::JavaScriptCodeWithScope</span>(<span class="ident">code_w_scope</span>)
+<span class="kw">impl </span>From&lt;RawJavaScriptCodeWithScope&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(code_w_scope: RawJavaScriptCodeWithScope) -&gt; <span class="self">Self </span>{
+        RawBson::JavaScriptCodeWithScope(code_w_scope)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Binary</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">b</span>: <span class="ident">Binary</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::Binary</span>(<span class="ident">b</span>)
+<span class="kw">impl </span>From&lt;Binary&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(b: Binary) -&gt; <span class="self">Self </span>{
+        RawBson::Binary(b)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">re</span>: <span class="ident">Regex</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::RegularExpression</span>(<span class="ident">re</span>)
+<span class="kw">impl </span>From&lt;Regex&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(re: Regex) -&gt; <span class="self">Self </span>{
+        RawBson::RegularExpression(re)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DbPointer</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">d</span>: <span class="ident">DbPointer</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">RawBson::DbPointer</span>(<span class="ident">d</span>)
+<span class="kw">impl </span>From&lt;DbPointer&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>from(d: DbPointer) -&gt; <span class="self">Self </span>{
+        RawBson::DbPointer(d)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">match</span> <span class="ident">deserializer</span>
-            .<span class="ident">deserialize_newtype_struct</span>(<span class="ident">RAW_BSON_NEWTYPE</span>, <span class="ident">OwnedOrBorrowedRawBsonVisitor</span>)<span class="question-mark">?</span>
-        {
-            <span class="ident">OwnedOrBorrowedRawBson::Owned</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">o</span>),
-            <span class="ident">OwnedOrBorrowedRawBson::Borrowed</span>(<span class="ident">b</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">b</span>.<span class="ident">to_raw_bson</span>()),
+        <span class="kw">match </span>deserializer
+            .deserialize_newtype_struct(RAW_BSON_NEWTYPE, OwnedOrBorrowedRawBsonVisitor)<span class="question-mark">?
+        </span>{
+            OwnedOrBorrowedRawBson::Owned(o) =&gt; <span class="prelude-val">Ok</span>(o),
+            OwnedOrBorrowedRawBson::Borrowed(b) =&gt; <span class="prelude-val">Ok</span>(b.to_raw_bson()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">RawBson</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="kw">impl </span>Serialize <span class="kw">for </span>RawBson {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="self">self</span>.<span class="ident">as_raw_bson_ref</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="self">self</span>.as_raw_bson_ref().serialize(serializer)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">RawBson</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl </span>TryFrom&lt;RawBson&gt; <span class="kw">for </span>Bson {
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">rawbson</span>: <span class="ident">RawBson</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">rawbson</span> {
-            <span class="ident">RawBson::Double</span>(<span class="ident">d</span>) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">d</span>),
-            <span class="ident">RawBson::String</span>(<span class="ident">s</span>) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
-            <span class="ident">RawBson::Document</span>(<span class="ident">rawdoc</span>) =&gt; <span class="ident">Bson::Document</span>(<span class="ident">rawdoc</span>.<span class="ident">as_ref</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>),
-            <span class="ident">RawBson::Array</span>(<span class="ident">rawarray</span>) =&gt; <span class="ident">Bson::Array</span>(<span class="ident">rawarray</span>.<span class="ident">as_ref</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>),
-            <span class="ident">RawBson::Binary</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Binary</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::ObjectId</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::ObjectId</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Boolean</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Boolean</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::DateTime</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::DateTime</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Null</span> =&gt; <span class="ident">Bson::Null</span>,
-            <span class="ident">RawBson::RegularExpression</span>(<span class="ident">rawregex</span>) =&gt; <span class="ident">Bson::RegularExpression</span>(<span class="ident">rawregex</span>),
-            <span class="ident">RawBson::JavaScriptCode</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::JavaScriptCode</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Int32</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Int32</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Timestamp</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Timestamp</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Int64</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Undefined</span> =&gt; <span class="ident">Bson::Undefined</span>,
-            <span class="ident">RawBson::DbPointer</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::DbPointer</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Symbol</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Symbol</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(<span class="ident">rawbson</span>) =&gt; {
-                <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident"><span class="kw">crate</span>::JavaScriptCodeWithScope</span> {
-                    <span class="ident">code</span>: <span class="ident">rawbson</span>.<span class="ident">code</span>,
-                    <span class="ident">scope</span>: <span class="ident">rawbson</span>.<span class="ident">scope</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
+    <span class="kw">fn </span>try_from(rawbson: RawBson) -&gt; <span class="prelude-ty">Result</span>&lt;Bson&gt; {
+        <span class="prelude-val">Ok</span>(<span class="kw">match </span>rawbson {
+            RawBson::Double(d) =&gt; Bson::Double(d),
+            RawBson::String(s) =&gt; Bson::String(s),
+            RawBson::Document(rawdoc) =&gt; Bson::Document(rawdoc.as_ref().try_into()<span class="question-mark">?</span>),
+            RawBson::Array(rawarray) =&gt; Bson::Array(rawarray.as_ref().try_into()<span class="question-mark">?</span>),
+            RawBson::Binary(rawbson) =&gt; Bson::Binary(rawbson),
+            RawBson::ObjectId(rawbson) =&gt; Bson::ObjectId(rawbson),
+            RawBson::Boolean(rawbson) =&gt; Bson::Boolean(rawbson),
+            RawBson::DateTime(rawbson) =&gt; Bson::DateTime(rawbson),
+            RawBson::Null =&gt; Bson::Null,
+            RawBson::RegularExpression(rawregex) =&gt; Bson::RegularExpression(rawregex),
+            RawBson::JavaScriptCode(rawbson) =&gt; Bson::JavaScriptCode(rawbson),
+            RawBson::Int32(rawbson) =&gt; Bson::Int32(rawbson),
+            RawBson::Timestamp(rawbson) =&gt; Bson::Timestamp(rawbson),
+            RawBson::Int64(rawbson) =&gt; Bson::Int64(rawbson),
+            RawBson::Undefined =&gt; Bson::Undefined,
+            RawBson::DbPointer(rawbson) =&gt; Bson::DbPointer(rawbson),
+            RawBson::Symbol(rawbson) =&gt; Bson::Symbol(rawbson),
+            RawBson::JavaScriptCodeWithScope(rawbson) =&gt; {
+                Bson::JavaScriptCodeWithScope(<span class="kw">crate</span>::JavaScriptCodeWithScope {
+                    code: rawbson.code,
+                    scope: rawbson.scope.try_into()<span class="question-mark">?</span>,
                 })
             }
-            <span class="ident">RawBson::Decimal128</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Decimal128</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::MaxKey</span> =&gt; <span class="ident">Bson::MaxKey</span>,
-            <span class="ident">RawBson::MinKey</span> =&gt; <span class="ident">Bson::MinKey</span>,
+            RawBson::Decimal128(rawbson) =&gt; Bson::Decimal128(rawbson),
+            RawBson::MaxKey =&gt; Bson::MaxKey,
+            RawBson::MinKey =&gt; Bson::MinKey,
         })
     }
 }
 
-<span class="doccomment">/// A BSON &quot;code with scope&quot; value backed by owned raw BSON.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RawJavaScriptCodeWithScope</span> {
-    <span class="doccomment">/// The code value.</span>
-    <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A BSON &quot;code with scope&quot; value backed by owned raw BSON.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>RawJavaScriptCodeWithScope {
+    <span class="doccomment">/// The code value.
+    </span><span class="kw">pub </span>code: String,
 
-    <span class="doccomment">/// The scope document.</span>
-    <span class="kw">pub</span> <span class="ident">scope</span>: <span class="ident">RawDocumentBuf</span>,
+    <span class="doccomment">/// The scope document.
+    </span><span class="kw">pub </span>scope: RawDocumentBuf,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawJavaScriptCodeWithScope</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>RawJavaScriptCodeWithScope {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">match</span> <span class="ident">RawBson::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span> {
-            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(<span class="ident">b</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">b</span>),
-            <span class="ident">c</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::custom</span>(<span class="macro">format!</span>(
+        <span class="kw">match </span>RawBson::deserialize(deserializer)<span class="question-mark">? </span>{
+            RawBson::JavaScriptCodeWithScope(b) =&gt; <span class="prelude-val">Ok</span>(b),
+            c =&gt; <span class="prelude-val">Err</span>(serde::de::Error::custom(<span class="macro">format!</span>(
                 <span class="string">&quot;expected CodeWithScope, but got {:?} instead&quot;</span>,
-                <span class="ident">c</span>
+                c
             ))),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">RawJavaScriptCodeWithScope</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="kw">impl </span>Serialize <span class="kw">for </span>RawJavaScriptCodeWithScope {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawJavaScriptCodeWithScopeRef</span> {
-            <span class="ident">code</span>: <span class="self">self</span>.<span class="ident">code</span>.<span class="ident">as_str</span>(),
-            <span class="ident">scope</span>: <span class="self">self</span>.<span class="ident">scope</span>.<span class="ident">as_ref</span>(),
+        <span class="kw">let </span>raw = RawJavaScriptCodeWithScopeRef {
+            code: <span class="self">self</span>.code.as_str(),
+            scope: <span class="self">self</span>.scope.as_ref(),
         };
 
-        <span class="ident">raw</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        raw.serialize(serializer)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

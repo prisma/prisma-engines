@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pest-2.3.0/src/iterators/flat_pairs.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>flat_pairs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../pest/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pest-2.3.0/src/iterators/flat_pairs.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>flat_pairs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../pest/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -178,185 +178,185 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
-</pre><pre class="rust"><code><span class="comment">// pest. The Elegant Parser</span>
-<span class="comment">// Copyright (c) 2018 Dragoș Tiselice</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// pest. The Elegant Parser
+// Copyright (c) 2018 Dragoș Tiselice
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">alloc::rc::Rc</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
+</span><span class="kw">use </span>alloc::rc::Rc;
+<span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>core::fmt;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::pair</span>::{<span class="self">self</span>, <span class="ident">Pair</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::queueable_token::QueueableToken</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::tokens</span>::{<span class="self">self</span>, <span class="ident">Tokens</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RuleType</span>;
+<span class="kw">use </span><span class="kw">super</span>::pair::{<span class="self">self</span>, Pair};
+<span class="kw">use </span><span class="kw">super</span>::queueable_token::QueueableToken;
+<span class="kw">use </span><span class="kw">super</span>::tokens::{<span class="self">self</span>, Tokens};
+<span class="kw">use </span><span class="kw">crate</span>::RuleType;
 
-<span class="doccomment">/// An iterator over [`Pair`]s. It is created by [`Pairs::flatten`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Pair`]: struct.Pair.html</span>
-<span class="doccomment">/// [`Pairs::flatten`]: struct.Pairs.html#method.flatten</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FlatPairs</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// All `QueueableToken`s&#39; `input_pos` must be valid character boundary indices into `input`.</span>
-    <span class="ident">queue</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueueableToken</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span>,
-    <span class="ident">start</span>: <span class="ident">usize</span>,
-    <span class="ident">end</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// An iterator over [`Pair`]s. It is created by [`Pairs::flatten`].
+///
+/// [`Pair`]: struct.Pair.html
+/// [`Pairs::flatten`]: struct.Pairs.html#method.flatten
+</span><span class="kw">pub struct </span>FlatPairs&lt;<span class="lifetime">&#39;i</span>, R&gt; {
+    <span class="doccomment">/// # Safety
+    ///
+    /// All `QueueableToken`s&#39; `input_pos` must be valid character boundary indices into `input`.
+    </span>queue: Rc&lt;Vec&lt;QueueableToken&lt;R&gt;&gt;&gt;,
+    input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;i </span>str,
+    start: usize,
+    end: usize,
 }
 
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All `QueueableToken`s&#39; `input_pos` must be valid character boundary indices into `input`.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RuleType</span><span class="op">&gt;</span>(
-    <span class="ident">queue</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueueableToken</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">start</span>: <span class="ident">usize</span>,
-    <span class="ident">end</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">FlatPairs</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="ident">FlatPairs</span> {
-        <span class="ident">queue</span>,
-        <span class="ident">input</span>,
-        <span class="ident">start</span>,
-        <span class="ident">end</span>,
+<span class="doccomment">/// # Safety
+///
+/// All `QueueableToken`s&#39; `input_pos` must be valid character boundary indices into `input`.
+</span><span class="kw">pub unsafe fn </span>new&lt;R: RuleType&gt;(
+    queue: Rc&lt;Vec&lt;QueueableToken&lt;R&gt;&gt;&gt;,
+    input: <span class="kw-2">&amp;</span>str,
+    start: usize,
+    end: usize,
+) -&gt; FlatPairs&lt;R&gt; {
+    FlatPairs {
+        queue,
+        input,
+        start,
+        end,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span>: <span class="ident">RuleType</span><span class="op">&gt;</span> <span class="ident">FlatPairs</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns the `Tokens` for these pairs.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::rc::Rc;</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {</span>
-    <span class="doccomment">///     a</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;&quot;;</span>
-    <span class="doccomment">/// let pairs = pest::state(input, |state| {</span>
-    <span class="doccomment">///     // generating Token pair with Rule::a ...</span>
-    <span class="doccomment">/// #     state.rule(Rule::a, |s| Ok(s))</span>
-    <span class="doccomment">/// }).unwrap();</span>
-    <span class="doccomment">/// let tokens: Vec&lt;_&gt; = pairs.flatten().tokens().collect();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(tokens.len(), 2);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokens</span>(<span class="self">self</span>) -&gt; <span class="ident">Tokens</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">tokens::new</span>(<span class="self">self</span>.<span class="ident">queue</span>, <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">start</span>, <span class="self">self</span>.<span class="ident">end</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>, R: RuleType&gt; FlatPairs&lt;<span class="lifetime">&#39;i</span>, R&gt; {
+    <span class="doccomment">/// Returns the `Tokens` for these pairs.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use std::rc::Rc;
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {
+    ///     a
+    /// }
+    ///
+    /// let input = &quot;&quot;;
+    /// let pairs = pest::state(input, |state| {
+    ///     // generating Token pair with Rule::a ...
+    /// #     state.rule(Rule::a, |s| Ok(s))
+    /// }).unwrap();
+    /// let tokens: Vec&lt;_&gt; = pairs.flatten().tokens().collect();
+    ///
+    /// assert_eq!(tokens.len(), 2);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>tokens(<span class="self">self</span>) -&gt; Tokens&lt;<span class="lifetime">&#39;i</span>, R&gt; {
+        tokens::new(<span class="self">self</span>.queue, <span class="self">self</span>.input, <span class="self">self</span>.start, <span class="self">self</span>.end)
     }
 
-    <span class="kw">fn</span> <span class="ident">next_start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">start</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">fn </span>next_start(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.start += <span class="number">1</span>;
 
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">end</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_start</span>(<span class="self">self</span>.<span class="ident">start</span>) {
-            <span class="self">self</span>.<span class="ident">start</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">while </span><span class="self">self</span>.start &lt; <span class="self">self</span>.end &amp;&amp; !<span class="self">self</span>.is_start(<span class="self">self</span>.start) {
+            <span class="self">self</span>.start += <span class="number">1</span>;
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">next_start_from_end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">end</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">fn </span>next_start_from_end(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.end -= <span class="number">1</span>;
 
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">end</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_start</span>(<span class="self">self</span>.<span class="ident">end</span>) {
-            <span class="self">self</span>.<span class="ident">end</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">while </span><span class="self">self</span>.end &gt;= <span class="self">self</span>.start &amp;&amp; !<span class="self">self</span>.is_start(<span class="self">self</span>.end) {
+            <span class="self">self</span>.end -= <span class="number">1</span>;
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">queue</span>[<span class="ident">index</span>] {
-            <span class="ident">QueueableToken::Start</span> { .. } =&gt; <span class="bool-val">true</span>,
-            <span class="ident">QueueableToken::End</span> { .. } =&gt; <span class="bool-val">false</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span>: <span class="ident">RuleType</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">FlatPairs</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">end</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
-        }
-
-        <span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">pair::new</span>(<span class="ident">Rc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">queue</span>), <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">start</span>) };
-
-        <span class="self">self</span>.<span class="ident">next_start</span>();
-
-        <span class="prelude-val">Some</span>(<span class="ident">pair</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span>: <span class="ident">RuleType</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">FlatPairs</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">start</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
-        }
-
-        <span class="self">self</span>.<span class="ident">next_start_from_end</span>();
-
-        <span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">pair::new</span>(<span class="ident">Rc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">queue</span>), <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">end</span>) };
-
-        <span class="prelude-val">Some</span>(<span class="ident">pair</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span>: <span class="ident">RuleType</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FlatPairs</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;FlatPairs&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;pairs&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>())
-            .<span class="ident">finish</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">FlatPairs</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FlatPairs</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">FlatPairs</span> {
-            <span class="ident">queue</span>: <span class="ident">Rc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">queue</span>),
-            <span class="ident">input</span>: <span class="self">self</span>.<span class="ident">input</span>,
-            <span class="ident">start</span>: <span class="self">self</span>.<span class="ident">start</span>,
-            <span class="ident">end</span>: <span class="self">self</span>.<span class="ident">end</span>,
+    <span class="kw">fn </span>is_start(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.queue[index] {
+            QueueableToken::Start { .. } =&gt; <span class="bool-val">true</span>,
+            QueueableToken::End { .. } =&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::macros::tests</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::Parser</span>;
-    <span class="kw">use</span> <span class="ident">alloc::vec</span>;
-    <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>, R: RuleType&gt; Iterator <span class="kw">for </span>FlatPairs&lt;<span class="lifetime">&#39;i</span>, R&gt; {
+    <span class="kw">type </span>Item = Pair&lt;<span class="lifetime">&#39;i</span>, R&gt;;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">iter_for_flat_pairs</span>() {
-        <span class="kw">let</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">AbcParser::parse</span>(<span class="ident">Rule::a</span>, <span class="string">&quot;abcde&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">if </span><span class="self">self</span>.start &gt;= <span class="self">self</span>.end {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+
+        <span class="kw">let </span>pair = <span class="kw">unsafe </span>{ pair::new(Rc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.queue), <span class="self">self</span>.input, <span class="self">self</span>.start) };
+
+        <span class="self">self</span>.next_start();
+
+        <span class="prelude-val">Some</span>(pair)
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>, R: RuleType&gt; DoubleEndedIterator <span class="kw">for </span>FlatPairs&lt;<span class="lifetime">&#39;i</span>, R&gt; {
+    <span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">if </span><span class="self">self</span>.end &lt;= <span class="self">self</span>.start {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+
+        <span class="self">self</span>.next_start_from_end();
+
+        <span class="kw">let </span>pair = <span class="kw">unsafe </span>{ pair::new(Rc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.queue), <span class="self">self</span>.input, <span class="self">self</span>.end) };
+
+        <span class="prelude-val">Some</span>(pair)
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>, R: RuleType&gt; fmt::Debug <span class="kw">for </span>FlatPairs&lt;<span class="lifetime">&#39;i</span>, R&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;FlatPairs&quot;</span>)
+            .field(<span class="string">&quot;pairs&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.clone().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;())
+            .finish()
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>, R: Clone&gt; Clone <span class="kw">for </span>FlatPairs&lt;<span class="lifetime">&#39;i</span>, R&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FlatPairs&lt;<span class="lifetime">&#39;i</span>, R&gt; {
+        FlatPairs {
+            queue: Rc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.queue),
+            input: <span class="self">self</span>.input,
+            start: <span class="self">self</span>.start,
+            end: <span class="self">self</span>.end,
+        }
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::macros::tests::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::Parser;
+    <span class="kw">use </span>alloc::vec;
+    <span class="kw">use </span>alloc::vec::Vec;
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>iter_for_flat_pairs() {
+        <span class="kw">let </span>pairs = AbcParser::parse(Rule::a, <span class="string">&quot;abcde&quot;</span>).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">pairs</span>.<span class="ident">flatten</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_rule</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Rule::a</span>, <span class="ident">Rule::b</span>, <span class="ident">Rule::c</span>]
+            pairs.flatten().map(|p| p.as_rule()).collect::&lt;Vec&lt;Rule&gt;&gt;(),
+            <span class="macro">vec!</span>[Rule::a, Rule::b, Rule::c]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">double_ended_iter_for_flat_pairs</span>() {
-        <span class="kw">let</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">AbcParser::parse</span>(<span class="ident">Rule::a</span>, <span class="string">&quot;abcde&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>double_ended_iter_for_flat_pairs() {
+        <span class="kw">let </span>pairs = AbcParser::parse(Rule::a, <span class="string">&quot;abcde&quot;</span>).unwrap();
         <span class="macro">assert_eq!</span>(
-            <span class="ident">pairs</span>
-                .<span class="ident">flatten</span>()
-                .<span class="ident">rev</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_rule</span>())
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Rule::c</span>, <span class="ident">Rule::b</span>, <span class="ident">Rule::a</span>]
+            pairs
+                .flatten()
+                .rev()
+                .map(|p| p.as_rule())
+                .collect::&lt;Vec&lt;Rule&gt;&gt;(),
+            <span class="macro">vec!</span>[Rule::c, Rule::b, Rule::a]
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="pest" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="pest" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -629,636 +629,636 @@
 <span id="629">629</span>
 <span id="630">630</span>
 <span id="631">631</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">conversion</span>;
-<span class="kw">mod</span> <span class="ident">error</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>conversion;
+<span class="kw">mod </span>error;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="ident">Query</span>, <span class="ident">Value</span>},
-    <span class="ident">connector</span>::{<span class="ident">metrics</span>, <span class="ident">queryable</span>::<span class="kw-2">*</span>, <span class="ident">ResultSet</span>},
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>},
-    <span class="ident">visitor</span>::{<span class="self">self</span>, <span class="ident">Visitor</span>},
+<span class="kw">use crate</span>::{
+    ast::{Query, Value},
+    connector::{metrics, queryable::<span class="kw-2">*</span>, ResultSet},
+    error::{Error, ErrorKind},
+    visitor::{<span class="self">self</span>, Visitor},
 };
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">lru_cache::LruCache</span>;
-<span class="kw">use</span> <span class="ident">mysql_async</span>::{
-    <span class="self">self</span> <span class="kw">as</span> <span class="ident">my</span>,
-    <span class="ident">prelude</span>::{<span class="ident">Query</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">Queryable</span> <span class="kw">as</span> <span class="kw">_</span>},
+<span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>lru_cache::LruCache;
+<span class="kw">use </span>mysql_async::{
+    <span class="self">self </span><span class="kw">as </span>my,
+    prelude::{Query <span class="kw">as _</span>, Queryable <span class="kw">as _</span>},
 };
-<span class="kw">use</span> <span class="ident">percent_encoding::percent_decode</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">future::Future</span>,
-    <span class="ident">path::Path</span>,
-    <span class="ident">sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>},
-    <span class="ident">time::Duration</span>,
+<span class="kw">use </span>percent_encoding::percent_decode;
+<span class="kw">use </span>std::{
+    borrow::Cow,
+    future::Future,
+    path::Path,
+    sync::atomic::{AtomicBool, Ordering},
+    time::Duration,
 };
-<span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
-<span class="kw">use</span> <span class="ident">url::Url</span>;
+<span class="kw">use </span>tokio::sync::Mutex;
+<span class="kw">use </span>url::Url;
 
-<span class="doccomment">/// The underlying MySQL driver. Only available with the `expose-drivers`</span>
-<span class="doccomment">/// Cargo feature.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;expose-drivers&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mysql_async</span>;
+<span class="doccomment">/// The underlying MySQL driver. Only available with the `expose-drivers`
+/// Cargo feature.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;expose-drivers&quot;</span>)]
+</span><span class="kw">pub use </span>mysql_async;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::IsolationLevel</span>;
+<span class="kw">use </span><span class="kw">super</span>::IsolationLevel;
 
-<span class="doccomment">/// A connector interface for the MySQL database.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Mysql</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">conn</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">my::Conn</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">url</span>: <span class="ident">MysqlUrl</span>,
-    <span class="ident">socket_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">is_healthy</span>: <span class="ident">AtomicBool</span>,
-    <span class="ident">statement_cache</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">my::Statement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A connector interface for the MySQL database.
+</span><span class="attribute">#[derive(Debug)]
+#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;mysql&quot;</span>)))]
+</span><span class="kw">pub struct </span>Mysql {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) conn: Mutex&lt;my::Conn&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) url: MysqlUrl,
+    socket_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    is_healthy: AtomicBool,
+    statement_cache: Mutex&lt;LruCache&lt;String, my::Statement&gt;&gt;,
 }
 
-<span class="doccomment">/// Wraps a connection url and exposes the parsing logic used by quaint, including default values.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MysqlUrl</span> {
-    <span class="ident">url</span>: <span class="ident">Url</span>,
-    <span class="ident">query_params</span>: <span class="ident">MysqlUrlQueryParams</span>,
+<span class="doccomment">/// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
+</span><span class="attribute">#[derive(Debug, Clone)]
+#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;mysql&quot;</span>)))]
+</span><span class="kw">pub struct </span>MysqlUrl {
+    url: Url,
+    query_params: MysqlUrlQueryParams,
 }
 
-<span class="kw">impl</span> <span class="ident">MysqlUrl</span> {
-    <span class="doccomment">/// Parse `Url` to `MysqlUrl`. Returns error for mistyped connection</span>
-    <span class="doccomment">/// parameters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">url</span>: <span class="ident">Url</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">query_params</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::parse_query_params</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>MysqlUrl {
+    <span class="doccomment">/// Parse `Url` to `MysqlUrl`. Returns error for mistyped connection
+    /// parameters.
+    </span><span class="kw">pub fn </span>new(url: Url) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span>query_params = <span class="self">Self</span>::parse_query_params(<span class="kw-2">&amp;</span>url)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">url</span>, <span class="ident">query_params</span> })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ url, query_params })
     }
 
-    <span class="doccomment">/// The bare `Url` to the database.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Url</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">url</span>
+    <span class="doccomment">/// The bare `Url` to the database.
+    </span><span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Url {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.url
     }
 
-    <span class="doccomment">/// The percent-decoded database username.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">percent_decode</span>(<span class="self">self</span>.<span class="ident">url</span>.<span class="ident">username</span>().<span class="ident">as_bytes</span>()).<span class="ident">decode_utf8</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">username</span>) =&gt; <span class="ident">username</span>,
+    <span class="doccomment">/// The percent-decoded database username.
+    </span><span class="kw">pub fn </span>username(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;str&gt; {
+        <span class="kw">match </span>percent_decode(<span class="self">self</span>.url.username().as_bytes()).decode_utf8() {
+            <span class="prelude-val">Ok</span>(username) =&gt; username,
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                 <span class="macro">tracing::warn!</span>(<span class="string">&quot;Couldn&#39;t decode username to UTF-8, using the non-decoded version.&quot;</span>);
 
-                <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">username</span>().<span class="ident">into</span>()
+                <span class="self">self</span>.url.username().into()
             }
         }
     }
 
-    <span class="doccomment">/// The percent-decoded database password.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">password</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>
-            .<span class="ident">url</span>
-            .<span class="ident">password</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pw</span><span class="op">|</span> <span class="ident">percent_decode</span>(<span class="ident">pw</span>.<span class="ident">as_bytes</span>()).<span class="ident">decode_utf8</span>().<span class="ident">ok</span>())
+    <span class="doccomment">/// The percent-decoded database password.
+    </span><span class="kw">pub fn </span>password(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;str&gt;&gt; {
+        <span class="kw">match </span><span class="self">self
+            </span>.url
+            .password()
+            .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
         {
-            <span class="prelude-val">Some</span>(<span class="ident">password</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">password</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">password</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">into</span>()),
+            <span class="prelude-val">Some</span>(password) =&gt; <span class="prelude-val">Some</span>(password),
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.url.password().map(|s| s.into()),
         }
     }
 
-    <span class="doccomment">/// Name of the database connected. Defaults to `mysql`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dbname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">path_segments</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">segments</span>) =&gt; <span class="ident">segments</span>.<span class="ident">next</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;mysql&quot;</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="string">&quot;mysql&quot;</span>,
+    <span class="doccomment">/// Name of the database connected. Defaults to `mysql`.
+    </span><span class="kw">pub fn </span>dbname(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self</span>.url.path_segments() {
+            <span class="prelude-val">Some</span>(<span class="kw-2">mut </span>segments) =&gt; segments.next().unwrap_or(<span class="string">&quot;mysql&quot;</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="string">&quot;mysql&quot;</span>,
         }
     }
 
-    <span class="doccomment">/// The database host. If `socket` and `host` are not set, defaults to `localhost`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">host_str</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;localhost&quot;</span>)
+    <span class="doccomment">/// The database host. If `socket` and `host` are not set, defaults to `localhost`.
+    </span><span class="kw">pub fn </span>host(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.url.host_str().unwrap_or(<span class="string">&quot;localhost&quot;</span>)
     }
 
-    <span class="doccomment">/// If set, connected to the database through a Unix socket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">socket</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">socket</span>
+    <span class="doccomment">/// If set, connected to the database through a Unix socket.
+    </span><span class="kw">pub fn </span>socket(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.query_params.socket
     }
 
-    <span class="doccomment">/// The database port, defaults to `3306`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">port</span>().<span class="ident">unwrap_or</span>(<span class="number">3306</span>)
+    <span class="doccomment">/// The database port, defaults to `3306`.
+    </span><span class="kw">pub fn </span>port(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.url.port().unwrap_or(<span class="number">3306</span>)
     }
 
-    <span class="doccomment">/// The connection timeout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">connect_timeout</span>
+    <span class="doccomment">/// The connection timeout.
+    </span><span class="kw">pub fn </span>connect_timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.query_params.connect_timeout
     }
 
-    <span class="doccomment">/// The pool check_out timeout</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pool_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">pool_timeout</span>
+    <span class="doccomment">/// The pool check_out timeout
+    </span><span class="kw">pub fn </span>pool_timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.query_params.pool_timeout
     }
 
-    <span class="doccomment">/// The socket timeout</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">socket_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">socket_timeout</span>
+    <span class="doccomment">/// The socket timeout
+    </span><span class="kw">pub fn </span>socket_timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.query_params.socket_timeout
     }
 
-    <span class="doccomment">/// Prefer socket connection</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefer_socket</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">prefer_socket</span>
+    <span class="doccomment">/// Prefer socket connection
+    </span><span class="kw">pub fn </span>prefer_socket(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="self">self</span>.query_params.prefer_socket
     }
 
-    <span class="doccomment">/// The maximum connection lifetime</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_connection_lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">max_connection_lifetime</span>
+    <span class="doccomment">/// The maximum connection lifetime
+    </span><span class="kw">pub fn </span>max_connection_lifetime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.query_params.max_connection_lifetime
     }
 
-    <span class="doccomment">/// The maximum idle connection lifetime</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle_connection_lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">max_idle_connection_lifetime</span>
+    <span class="doccomment">/// The maximum idle connection lifetime
+    </span><span class="kw">pub fn </span>max_idle_connection_lifetime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.query_params.max_idle_connection_lifetime
     }
 
-    <span class="kw">fn</span> <span class="ident">statement_cache_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">statement_cache_size</span>
+    <span class="kw">fn </span>statement_cache_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.query_params.statement_cache_size
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">my::Statement</span><span class="op">&gt;</span> {
-        <span class="ident">LruCache::new</span>(<span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">statement_cache_size</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LruCache&lt;String, my::Statement&gt; {
+        LruCache::new(<span class="self">self</span>.query_params.statement_cache_size)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_query_params</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">Url</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MysqlUrlQueryParams</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ssl_opts</span> <span class="op">=</span> <span class="ident">my::SslOpts::default</span>();
-        <span class="ident">ssl_opts</span> <span class="op">=</span> <span class="ident">ssl_opts</span>.<span class="ident">with_danger_accept_invalid_certs</span>(<span class="bool-val">true</span>);
+    <span class="kw">fn </span>parse_query_params(url: <span class="kw-2">&amp;</span>Url) -&gt; <span class="prelude-ty">Result</span>&lt;MysqlUrlQueryParams, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>ssl_opts = my::SslOpts::default();
+        ssl_opts = ssl_opts.with_danger_accept_invalid_certs(<span class="bool-val">true</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connection_limit</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">use_ssl</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">socket</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">socket_timeout</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connect_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">5</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pool_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_idle_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">300</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prefer_socket</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">statement_cache_size</span> <span class="op">=</span> <span class="number">100</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>connection_limit = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>use_ssl = <span class="bool-val">false</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>socket = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>socket_timeout = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>connect_timeout = <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">5</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>pool_timeout = <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">10</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>max_connection_lifetime = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>max_idle_connection_lifetime = <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">300</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>prefer_socket = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>statement_cache_size = <span class="number">100</span>;
 
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">url</span>.<span class="ident">query_pairs</span>() {
-            <span class="kw">match</span> <span class="ident">k</span>.<span class="ident">as_ref</span>() {
-                <span class="string">&quot;connection_limit&quot;</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">as_int</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">v</span>
-                        .<span class="ident">parse</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
+        <span class="kw">for </span>(k, v) <span class="kw">in </span>url.query_pairs() {
+            <span class="kw">match </span>k.as_ref() {
+                <span class="string">&quot;connection_limit&quot; </span>=&gt; {
+                    <span class="kw">let </span>as_int: usize = v
+                        .parse()
+                        .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
 
-                    <span class="ident">connection_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">as_int</span>);
+                    connection_limit = <span class="prelude-val">Some</span>(as_int);
                 }
-                <span class="string">&quot;statement_cache_size&quot;</span> =&gt; {
-                    <span class="ident">statement_cache_size</span> <span class="op">=</span> <span class="ident">v</span>
-                        .<span class="ident">parse</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
+                <span class="string">&quot;statement_cache_size&quot; </span>=&gt; {
+                    statement_cache_size = v
+                        .parse()
+                        .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;sslcert&quot;</span> =&gt; {
-                    <span class="ident">use_ssl</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="ident">ssl_opts</span> <span class="op">=</span> <span class="ident">ssl_opts</span>.<span class="ident">with_root_cert_path</span>(<span class="prelude-val">Some</span>(<span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>).<span class="ident">to_path_buf</span>()));
+                <span class="string">&quot;sslcert&quot; </span>=&gt; {
+                    use_ssl = <span class="bool-val">true</span>;
+                    ssl_opts = ssl_opts.with_root_cert_path(<span class="prelude-val">Some</span>(Path::new(<span class="kw-2">&amp;*</span>v).to_path_buf()));
                 }
-                <span class="string">&quot;sslidentity&quot;</span> =&gt; {
-                    <span class="ident">use_ssl</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="ident">ssl_opts</span> <span class="op">=</span> <span class="ident">ssl_opts</span>.<span class="ident">with_pkcs12_path</span>(<span class="prelude-val">Some</span>(<span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>).<span class="ident">to_path_buf</span>()));
+                <span class="string">&quot;sslidentity&quot; </span>=&gt; {
+                    use_ssl = <span class="bool-val">true</span>;
+                    ssl_opts = ssl_opts.with_pkcs12_path(<span class="prelude-val">Some</span>(Path::new(<span class="kw-2">&amp;*</span>v).to_path_buf()));
                 }
-                <span class="string">&quot;sslpassword&quot;</span> =&gt; {
-                    <span class="ident">use_ssl</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="ident">ssl_opts</span> <span class="op">=</span> <span class="ident">ssl_opts</span>.<span class="ident">with_password</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">to_string</span>()));
+                <span class="string">&quot;sslpassword&quot; </span>=&gt; {
+                    use_ssl = <span class="bool-val">true</span>;
+                    ssl_opts = ssl_opts.with_password(<span class="prelude-val">Some</span>(v.to_string()));
                 }
-                <span class="string">&quot;socket&quot;</span> =&gt; {
-                    <span class="ident">socket</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">replace</span>(<span class="string">&#39;(&#39;</span>, <span class="string">&quot;&quot;</span>).<span class="ident">replace</span>(<span class="string">&#39;)&#39;</span>, <span class="string">&quot;&quot;</span>));
+                <span class="string">&quot;socket&quot; </span>=&gt; {
+                    socket = <span class="prelude-val">Some</span>(v.replace(<span class="string">&#39;(&#39;</span>, <span class="string">&quot;&quot;</span>).replace(<span class="string">&#39;)&#39;</span>, <span class="string">&quot;&quot;</span>));
                 }
-                <span class="string">&quot;socket_timeout&quot;</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">as_int</span> <span class="op">=</span> <span class="ident">v</span>
-                        .<span class="ident">parse</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
-                    <span class="ident">socket_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">as_int</span>));
+                <span class="string">&quot;socket_timeout&quot; </span>=&gt; {
+                    <span class="kw">let </span>as_int = v
+                        .parse()
+                        .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
+                    socket_timeout = <span class="prelude-val">Some</span>(Duration::from_secs(as_int));
                 }
-                <span class="string">&quot;prefer_socket&quot;</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">as_bool</span> <span class="op">=</span> <span class="ident">v</span>
-                        .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
-                    <span class="ident">prefer_socket</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">as_bool</span>)
+                <span class="string">&quot;prefer_socket&quot; </span>=&gt; {
+                    <span class="kw">let </span>as_bool = v
+                        .parse::&lt;bool&gt;()
+                        .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
+                    prefer_socket = <span class="prelude-val">Some</span>(as_bool)
                 }
-                <span class="string">&quot;connect_timeout&quot;</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">as_int</span> <span class="op">=</span> <span class="ident">v</span>
-                        .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
+                <span class="string">&quot;connect_timeout&quot; </span>=&gt; {
+                    <span class="kw">let </span>as_int = v
+                        .parse::&lt;u64&gt;()
+                        .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
 
-                    <span class="ident">connect_timeout</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">as_int</span> {
-                        <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
-                        <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">as_int</span>)),
+                    connect_timeout = <span class="kw">match </span>as_int {
+                        <span class="number">0 </span>=&gt; <span class="prelude-val">None</span>,
+                        <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(Duration::from_secs(as_int)),
                     };
                 }
-                <span class="string">&quot;pool_timeout&quot;</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">as_int</span> <span class="op">=</span> <span class="ident">v</span>
-                        .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
+                <span class="string">&quot;pool_timeout&quot; </span>=&gt; {
+                    <span class="kw">let </span>as_int = v
+                        .parse::&lt;u64&gt;()
+                        .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
 
-                    <span class="ident">pool_timeout</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">as_int</span> {
-                        <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
-                        <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">as_int</span>)),
+                    pool_timeout = <span class="kw">match </span>as_int {
+                        <span class="number">0 </span>=&gt; <span class="prelude-val">None</span>,
+                        <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(Duration::from_secs(as_int)),
                     };
                 }
-                <span class="string">&quot;sslaccept&quot;</span> =&gt; {
-                    <span class="ident">use_ssl</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">as_ref</span>() {
-                        <span class="string">&quot;strict&quot;</span> =&gt; {
-                            <span class="ident">ssl_opts</span> <span class="op">=</span> <span class="ident">ssl_opts</span>.<span class="ident">with_danger_accept_invalid_certs</span>(<span class="bool-val">false</span>);
+                <span class="string">&quot;sslaccept&quot; </span>=&gt; {
+                    use_ssl = <span class="bool-val">true</span>;
+                    <span class="kw">match </span>v.as_ref() {
+                        <span class="string">&quot;strict&quot; </span>=&gt; {
+                            ssl_opts = ssl_opts.with_danger_accept_invalid_certs(<span class="bool-val">false</span>);
                         }
-                        <span class="string">&quot;accept_invalid_certs&quot;</span> =&gt; {}
-                        <span class="kw">_</span> =&gt; {
+                        <span class="string">&quot;accept_invalid_certs&quot; </span>=&gt; {}
+                        <span class="kw">_ </span>=&gt; {
                             <span class="macro">tracing::debug!</span>(
-                                <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Unsupported SSL accept mode, defaulting to `accept_invalid_certs`&quot;</span>,
-                                <span class="ident">mode</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>
+                                message = <span class="string">&quot;Unsupported SSL accept mode, defaulting to `accept_invalid_certs`&quot;</span>,
+                                mode = <span class="kw-2">&amp;*</span>v
                             );
                         }
                     };
                 }
-                <span class="string">&quot;max_connection_lifetime&quot;</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">as_int</span> <span class="op">=</span> <span class="ident">v</span>
-                        .<span class="ident">parse</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
+                <span class="string">&quot;max_connection_lifetime&quot; </span>=&gt; {
+                    <span class="kw">let </span>as_int = v
+                        .parse()
+                        .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
 
-                    <span class="kw">if</span> <span class="ident">as_int</span> <span class="op">==</span> <span class="number">0</span> {
-                        <span class="ident">max_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                    } <span class="kw">else</span> {
-                        <span class="ident">max_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">as_int</span>));
+                    <span class="kw">if </span>as_int == <span class="number">0 </span>{
+                        max_connection_lifetime = <span class="prelude-val">None</span>;
+                    } <span class="kw">else </span>{
+                        max_connection_lifetime = <span class="prelude-val">Some</span>(Duration::from_secs(as_int));
                     }
                 }
-                <span class="string">&quot;max_idle_connection_lifetime&quot;</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">as_int</span> <span class="op">=</span> <span class="ident">v</span>
-                        .<span class="ident">parse</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
+                <span class="string">&quot;max_idle_connection_lifetime&quot; </span>=&gt; {
+                    <span class="kw">let </span>as_int = v
+                        .parse()
+                        .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
 
-                    <span class="kw">if</span> <span class="ident">as_int</span> <span class="op">==</span> <span class="number">0</span> {
-                        <span class="ident">max_idle_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                    } <span class="kw">else</span> {
-                        <span class="ident">max_idle_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">as_int</span>));
+                    <span class="kw">if </span>as_int == <span class="number">0 </span>{
+                        max_idle_connection_lifetime = <span class="prelude-val">None</span>;
+                    } <span class="kw">else </span>{
+                        max_idle_connection_lifetime = <span class="prelude-val">Some</span>(Duration::from_secs(as_int));
                     }
                 }
-                <span class="kw">_</span> =&gt; {
-                    <span class="macro">tracing::trace!</span>(<span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Discarding connection string param&quot;</span>, <span class="ident">param</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">k</span>);
+                <span class="kw">_ </span>=&gt; {
+                    <span class="macro">tracing::trace!</span>(message = <span class="string">&quot;Discarding connection string param&quot;</span>, param = <span class="kw-2">&amp;*</span>k);
                 }
             };
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">MysqlUrlQueryParams</span> {
-            <span class="ident">ssl_opts</span>,
-            <span class="ident">connection_limit</span>,
-            <span class="ident">use_ssl</span>,
-            <span class="ident">socket</span>,
-            <span class="ident">socket_timeout</span>,
-            <span class="ident">connect_timeout</span>,
-            <span class="ident">pool_timeout</span>,
-            <span class="ident">max_connection_lifetime</span>,
-            <span class="ident">max_idle_connection_lifetime</span>,
-            <span class="ident">prefer_socket</span>,
-            <span class="ident">statement_cache_size</span>,
+        <span class="prelude-val">Ok</span>(MysqlUrlQueryParams {
+            ssl_opts,
+            connection_limit,
+            use_ssl,
+            socket,
+            socket_timeout,
+            connect_timeout,
+            pool_timeout,
+            max_connection_lifetime,
+            max_idle_connection_lifetime,
+            prefer_socket,
+            statement_cache_size,
         })
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pooled&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">connection_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">connection_limit</span>
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;pooled&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>connection_limit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="self">self</span>.query_params.connection_limit
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_opts_builder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">my::OptsBuilder</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">my::OptsBuilder::default</span>()
-            .<span class="ident">stmt_cache_size</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>))
-            .<span class="ident">user</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">username</span>()))
-            .<span class="ident">pass</span>(<span class="self">self</span>.<span class="ident">password</span>())
-            .<span class="ident">db_name</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">dbname</span>()));
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_opts_builder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; my::OptsBuilder {
+        <span class="kw">let </span><span class="kw-2">mut </span>config = my::OptsBuilder::default()
+            .stmt_cache_size(<span class="prelude-val">Some</span>(<span class="number">0</span>))
+            .user(<span class="prelude-val">Some</span>(<span class="self">self</span>.username()))
+            .pass(<span class="self">self</span>.password())
+            .db_name(<span class="prelude-val">Some</span>(<span class="self">self</span>.dbname()));
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">socket</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">socket</span>) =&gt; {
-                <span class="ident">config</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">socket</span>(<span class="prelude-val">Some</span>(<span class="ident">socket</span>));
+        <span class="kw">match </span><span class="self">self</span>.socket() {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>socket) =&gt; {
+                config = config.socket(<span class="prelude-val">Some</span>(socket));
             }
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="ident">config</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">ip_or_hostname</span>(<span class="self">self</span>.<span class="ident">host</span>()).<span class="ident">tcp_port</span>(<span class="self">self</span>.<span class="ident">port</span>());
+            <span class="prelude-val">None </span>=&gt; {
+                config = config.ip_or_hostname(<span class="self">self</span>.host()).tcp_port(<span class="self">self</span>.port());
             }
         }
 
-        <span class="ident">config</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">conn_ttl</span>(<span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">5</span>)));
+        config = config.conn_ttl(<span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">5</span>)));
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">use_ssl</span> {
-            <span class="ident">config</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">ssl_opts</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">ssl_opts</span>.<span class="ident">clone</span>()));
+        <span class="kw">if </span><span class="self">self</span>.query_params.use_ssl {
+            config = config.ssl_opts(<span class="prelude-val">Some</span>(<span class="self">self</span>.query_params.ssl_opts.clone()));
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">prefer_socket</span>.<span class="ident">is_some</span>() {
-            <span class="ident">config</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">prefer_socket</span>(<span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">prefer_socket</span>);
+        <span class="kw">if </span><span class="self">self</span>.query_params.prefer_socket.is_some() {
+            config = config.prefer_socket(<span class="self">self</span>.query_params.prefer_socket);
         }
 
-        <span class="ident">config</span>
+        config
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MysqlUrlQueryParams</span> {
-    <span class="ident">ssl_opts</span>: <span class="ident">my::SslOpts</span>,
-    <span class="ident">connection_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">use_ssl</span>: <span class="ident">bool</span>,
-    <span class="ident">socket</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">socket_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">pool_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">max_connection_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">max_idle_connection_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">prefer_socket</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="ident">statement_cache_size</span>: <span class="ident">usize</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MysqlUrlQueryParams {
+    ssl_opts: my::SslOpts,
+    connection_limit: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    use_ssl: bool,
+    socket: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    socket_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    connect_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    pool_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    max_connection_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    max_idle_connection_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    prefer_socket: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    statement_cache_size: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Mysql</span> {
-    <span class="doccomment">/// Create a new MySQL connection using `OptsBuilder` from the `mysql` crate.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">url</span>: <span class="ident">MysqlUrl</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::timeout::connect</span>(<span class="ident">url</span>.<span class="ident">connect_timeout</span>(), <span class="ident">my::Conn::new</span>(<span class="ident">url</span>.<span class="ident">to_opts_builder</span>())).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">impl </span>Mysql {
+    <span class="doccomment">/// Create a new MySQL connection using `OptsBuilder` from the `mysql` crate.
+    </span><span class="kw">pub async fn </span>new(url: MysqlUrl) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>conn = <span class="kw">super</span>::timeout::connect(url.connect_timeout(), my::Conn::new(url.to_opts_builder())).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">socket_timeout</span>: <span class="ident">url</span>.<span class="ident">query_params</span>.<span class="ident">socket_timeout</span>,
-            <span class="ident">conn</span>: <span class="ident">Mutex::new</span>(<span class="ident">conn</span>),
-            <span class="ident">statement_cache</span>: <span class="ident">Mutex::new</span>(<span class="ident">url</span>.<span class="ident">cache</span>()),
-            <span class="ident">url</span>,
-            <span class="ident">is_healthy</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">true</span>),
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            socket_timeout: url.query_params.socket_timeout,
+            conn: Mutex::new(conn),
+            statement_cache: Mutex::new(url.cache()),
+            url,
+            is_healthy: AtomicBool::new(<span class="bool-val">true</span>),
         })
     }
 
-    <span class="doccomment">/// The underlying mysql_async::Conn. Only available with the</span>
-    <span class="doccomment">/// `expose-drivers` Cargo feature. This is a lower level API when you need</span>
-    <span class="doccomment">/// to get into database specific features.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;expose-drivers&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">conn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">mysql_async::Conn</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">conn</span>
+    <span class="doccomment">/// The underlying mysql_async::Conn. Only available with the
+    /// `expose-drivers` Cargo feature. This is a lower level API when you need
+    /// to get into database specific features.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;expose-drivers&quot;</span>)]
+    </span><span class="kw">pub fn </span>conn(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Mutex&lt;mysql_async::Conn&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.conn
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">perform_io</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">op</span>: <span class="ident">U</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">U</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">F</span>,
+    <span class="kw">async fn </span>perform_io&lt;F, U, T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, op: U) -&gt; <span class="kw">crate</span>::Result&lt;T&gt;
+    <span class="kw">where
+        </span>F: Future&lt;Output = <span class="kw">crate</span>::Result&lt;T&gt;&gt;,
+        U: FnOnce() -&gt; F,
     {
-        <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::timeout::socket</span>(<span class="self">self</span>.<span class="ident">socket_timeout</span>, <span class="ident">op</span>()).<span class="kw">await</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is_closed</span>() =&gt; {
-                <span class="self">self</span>.<span class="ident">is_healthy</span>.<span class="ident">store</span>(<span class="bool-val">false</span>, <span class="ident">Ordering::SeqCst</span>);
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>)
+        <span class="kw">match </span><span class="kw">super</span>::timeout::socket(<span class="self">self</span>.socket_timeout, op()).<span class="kw">await </span>{
+            <span class="prelude-val">Err</span>(e) <span class="kw">if </span>e.is_closed() =&gt; {
+                <span class="self">self</span>.is_healthy.store(<span class="bool-val">false</span>, Ordering::SeqCst);
+                <span class="prelude-val">Err</span>(e)
             }
-            <span class="ident">res</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">res</span><span class="question-mark">?</span>),
+            res =&gt; <span class="prelude-val">Ok</span>(res<span class="question-mark">?</span>),
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prepared</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">op</span>: <span class="ident">U</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">U</span>: <span class="ident">Fn</span>(<span class="ident">my::Statement</span>) -&gt; <span class="ident">F</span>,
+    <span class="kw">async fn </span>prepared&lt;F, U, T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, op: U) -&gt; <span class="kw">crate</span>::Result&lt;T&gt;
+    <span class="kw">where
+        </span>F: Future&lt;Output = <span class="kw">crate</span>::Result&lt;T&gt;&gt;,
+        U: Fn(my::Statement) -&gt; F,
     {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">statement_cache_size</span>() <span class="op">==</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">perform_io</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-                    <span class="ident">conn</span>.<span class="ident">prep</span>(<span class="ident">sql</span>).<span class="kw">await</span><span class="question-mark">?</span>
-                };
+        <span class="kw">if </span><span class="self">self</span>.url.statement_cache_size() == <span class="number">0 </span>{
+            <span class="self">self</span>.perform_io(|| <span class="kw">async move </span>{
+                <span class="kw">let </span>stmt = {
+                    <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="self">self</span>.conn.lock().<span class="kw">await</span>;
+                    conn.prep(sql).<span class="kw">await</span><span class="question-mark">?
+                </span>};
 
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">op</span>(<span class="ident">stmt</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
+                <span class="kw">let </span>res = op(stmt.clone()).<span class="kw">await</span>;
 
                 {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-                    <span class="ident">conn</span>.<span class="ident">close</span>(<span class="ident">stmt</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="self">self</span>.conn.lock().<span class="kw">await</span>;
+                    conn.close(stmt).<span class="kw">await</span><span class="question-mark">?</span>;
                 }
 
-                <span class="ident">res</span>
+                res
             })
-            .<span class="kw">await</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">perform_io</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fetch_cached</span>(<span class="ident">sql</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="ident">op</span>(<span class="ident">stmt</span>).<span class="kw">await</span>
-            })
-            .<span class="kw">await</span>
-        }
+            .<span class="kw">await
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.perform_io(|| <span class="kw">async move </span>{
+                <span class="kw">let </span>stmt = <span class="self">self</span>.fetch_cached(sql).<span class="kw">await</span><span class="question-mark">?</span>;
+                op(stmt).<span class="kw">await
+            </span>})
+            .<span class="kw">await
+        </span>}
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">fetch_cached</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">my::Statement</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">statement_cache</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">capacity</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">capacity</span>();
-        <span class="kw">let</span> <span class="ident">stored</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">len</span>();
+    <span class="kw">async fn </span>fetch_cached(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;my::Statement&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>cache = <span class="self">self</span>.statement_cache.lock().<span class="kw">await</span>;
+        <span class="kw">let </span>capacity = cache.capacity();
+        <span class="kw">let </span>stored = cache.len();
 
-        <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">get_mut</span>(<span class="ident">sql</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">stmt</span>) =&gt; {
+        <span class="kw">match </span>cache.get_mut(sql) {
+            <span class="prelude-val">Some</span>(stmt) =&gt; {
                 <span class="macro">tracing::trace!</span>(
-                    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;CACHE HIT!&quot;</span>,
-                    <span class="ident">query</span> <span class="op">=</span> <span class="ident">sql</span>,
-                    <span class="ident">capacity</span> <span class="op">=</span> <span class="ident">capacity</span>,
-                    <span class="ident">stored</span> <span class="op">=</span> <span class="ident">stored</span>,
+                    message = <span class="string">&quot;CACHE HIT!&quot;</span>,
+                    query = sql,
+                    capacity = capacity,
+                    stored = stored,
                 );
 
-                <span class="prelude-val">Ok</span>(<span class="ident">stmt</span>.<span class="ident">clone</span>()) <span class="comment">// arc&#39;d</span>
-            }
-            <span class="prelude-val">None</span> =&gt; {
+                <span class="prelude-val">Ok</span>(stmt.clone()) <span class="comment">// arc&#39;d
+            </span>}
+            <span class="prelude-val">None </span>=&gt; {
                 <span class="macro">tracing::trace!</span>(
-                    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;CACHE MISS!&quot;</span>,
-                    <span class="ident">query</span> <span class="op">=</span> <span class="ident">sql</span>,
-                    <span class="ident">capacity</span> <span class="op">=</span> <span class="ident">capacity</span>,
-                    <span class="ident">stored</span> <span class="op">=</span> <span class="ident">stored</span>,
+                    message = <span class="string">&quot;CACHE MISS!&quot;</span>,
+                    query = sql,
+                    capacity = capacity,
+                    stored = stored,
                 );
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-                <span class="kw">if</span> <span class="ident">cache</span>.<span class="ident">capacity</span>() <span class="op">==</span> <span class="ident">cache</span>.<span class="ident">len</span>() {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">stmt</span>)) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">remove_lru</span>() {
-                        <span class="ident">conn</span>.<span class="ident">close</span>(<span class="ident">stmt</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="self">self</span>.conn.lock().<span class="kw">await</span>;
+                <span class="kw">if </span>cache.capacity() == cache.len() {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, stmt)) = cache.remove_lru() {
+                        conn.close(stmt).<span class="kw">await</span><span class="question-mark">?</span>;
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">prep</span>(<span class="ident">sql</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="ident">cache</span>.<span class="ident">insert</span>(<span class="ident">sql</span>.<span class="ident">to_string</span>(), <span class="ident">stmt</span>.<span class="ident">clone</span>());
+                <span class="kw">let </span>stmt = conn.prep(sql).<span class="kw">await</span><span class="question-mark">?</span>;
+                cache.insert(sql.to_string(), stmt.clone());
 
-                <span class="prelude-val">Ok</span>(<span class="ident">stmt</span>)
+                <span class="prelude-val">Ok</span>(stmt)
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TransactionCapable</span> <span class="kw">for</span> <span class="ident">Mysql</span> {}
+<span class="kw">impl </span>TransactionCapable <span class="kw">for </span>Mysql {}
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">Queryable</span> <span class="kw">for</span> <span class="ident">Mysql</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">visitor::Mysql::build</span>(<span class="ident">q</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>).<span class="kw">await</span>
-    }
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl </span>Queryable <span class="kw">for </span>Mysql {
+    <span class="kw">async fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>, q: Query&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;ResultSet&gt; {
+        <span class="kw">let </span>(sql, params) = visitor::Mysql::build(q)<span class="question-mark">?</span>;
+        <span class="self">self</span>.query_raw(<span class="kw-2">&amp;</span>sql, <span class="kw-2">&amp;</span>params).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
-        <span class="ident">metrics::query</span>(<span class="string">&quot;mysql.query_raw&quot;</span>, <span class="ident">sql</span>, <span class="ident">params</span>, <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">prepared</span>(<span class="ident">sql</span>, <span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-                <span class="kw">let</span> <span class="ident">rows</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">my::Row</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="ident">stmt</span>, <span class="ident">conversion::conv_params</span>(<span class="ident">params</span>)<span class="question-mark">?</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">columns</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">name_str</span>().<span class="ident">into_owned</span>()).<span class="ident">collect</span>();
+    <span class="kw">async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;ResultSet&gt; {
+        metrics::query(<span class="string">&quot;mysql.query_raw&quot;</span>, sql, params, <span class="kw">move </span>|| <span class="kw">async move </span>{
+            <span class="self">self</span>.prepared(sql, |stmt| <span class="kw">async move </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="self">self</span>.conn.lock().<span class="kw">await</span>;
+                <span class="kw">let </span>rows: Vec&lt;my::Row&gt; = conn.exec(<span class="kw-2">&amp;</span>stmt, conversion::conv_params(params)<span class="question-mark">?</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>columns = stmt.columns().iter().map(|s| s.name_str().into_owned()).collect();
 
-                <span class="kw">let</span> <span class="ident">last_id</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">last_insert_id</span>();
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="ident">ResultSet::new</span>(<span class="ident">columns</span>, <span class="ident">Vec::new</span>());
+                <span class="kw">let </span>last_id = conn.last_insert_id();
+                <span class="kw">let </span><span class="kw-2">mut </span>result_set = ResultSet::new(columns, Vec::new());
 
-                <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">rows</span> {
-                    <span class="ident">result_set</span>.<span class="ident">rows</span>.<span class="ident">push</span>(<span class="ident">row</span>.<span class="ident">take_result_row</span>()<span class="question-mark">?</span>);
+                <span class="kw">for </span><span class="kw-2">mut </span>row <span class="kw">in </span>rows {
+                    result_set.rows.push(row.take_result_row()<span class="question-mark">?</span>);
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">last_id</span> {
-                    <span class="ident">result_set</span>.<span class="ident">set_last_insert_id</span>(<span class="ident">id</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = last_id {
+                    result_set.set_last_insert_id(id);
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">result_set</span>)
+                <span class="prelude-val">Ok</span>(result_set)
             })
-            .<span class="kw">await</span>
-        })
-        .<span class="kw">await</span>
-    }
+            .<span class="kw">await
+        </span>})
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw_typed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>query_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;ResultSet&gt; {
+        <span class="self">self</span>.query_raw(sql, params).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">visitor::Mysql::build</span>(<span class="ident">q</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>execute(<span class="kw-2">&amp;</span><span class="self">self</span>, q: Query&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        <span class="kw">let </span>(sql, params) = visitor::Mysql::build(q)<span class="question-mark">?</span>;
+        <span class="self">self</span>.execute_raw(<span class="kw-2">&amp;</span>sql, <span class="kw-2">&amp;</span>params).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="ident">metrics::query</span>(<span class="string">&quot;mysql.execute_raw&quot;</span>, <span class="ident">sql</span>, <span class="ident">params</span>, <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">prepared</span>(<span class="ident">sql</span>, <span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-                <span class="ident">conn</span>.<span class="ident">exec_drop</span>(<span class="ident">stmt</span>, <span class="ident">conversion::conv_params</span>(<span class="ident">params</span>)<span class="question-mark">?</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        metrics::query(<span class="string">&quot;mysql.execute_raw&quot;</span>, sql, params, <span class="kw">move </span>|| <span class="kw">async move </span>{
+            <span class="self">self</span>.prepared(sql, |stmt| <span class="kw">async move </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="self">self</span>.conn.lock().<span class="kw">await</span>;
+                conn.exec_drop(stmt, conversion::conv_params(params)<span class="question-mark">?</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">conn</span>.<span class="ident">affected_rows</span>())
+                <span class="prelude-val">Ok</span>(conn.affected_rows())
             })
-            .<span class="kw">await</span>
-        })
-        .<span class="kw">await</span>
-    }
+            .<span class="kw">await
+        </span>})
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw_typed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">execute_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>execute_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        <span class="self">self</span>.execute_raw(sql, params).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">metrics::query</span>(<span class="string">&quot;mysql.raw_cmd&quot;</span>, <span class="ident">cmd</span>, <span class="kw-2">&amp;</span>[], <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">perform_io</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">run</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async fn </span>raw_cmd(<span class="kw-2">&amp;</span><span class="self">self</span>, cmd: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        metrics::query(<span class="string">&quot;mysql.raw_cmd&quot;</span>, cmd, <span class="kw-2">&amp;</span>[], <span class="kw">move </span>|| <span class="kw">async move </span>{
+            <span class="self">self</span>.perform_io(|| <span class="kw">async move </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="self">self</span>.conn.lock().<span class="kw">await</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>result = cmd.run(<span class="kw-2">&amp;mut *</span>conn).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">loop</span> {
-                    <span class="ident">result</span>.<span class="ident">map</span>(<span class="ident">drop</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">loop </span>{
+                    result.map(drop).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_empty</span>() {
-                        <span class="ident">result</span>.<span class="ident">map</span>(<span class="ident">drop</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="kw">if </span>result.is_empty() {
+                        result.map(drop).<span class="kw">await</span><span class="question-mark">?</span>;
                         <span class="kw">break</span>;
                     }
                 }
 
                 <span class="prelude-val">Ok</span>(())
             })
-            .<span class="kw">await</span>
-        })
-        .<span class="kw">await</span>
+            .<span class="kw">await
+        </span>})
+        .<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
+        <span class="kw">let </span>query = <span class="string">r#&quot;SELECT @@GLOBAL.version version&quot;#</span>;
+        <span class="kw">let </span>rows = <span class="kw">super</span>::timeout::socket(<span class="self">self</span>.socket_timeout, <span class="self">self</span>.query_raw(query, <span class="kw-2">&amp;</span>[])).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">let </span>version_string = rows
+            .get(<span class="number">0</span>)
+            .and_then(|row| row.get(<span class="string">&quot;version&quot;</span>).and_then(|version| version.to_string()));
+
+        <span class="prelude-val">Ok</span>(version_string)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="string">r#&quot;SELECT @@GLOBAL.version version&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::timeout::socket</span>(<span class="self">self</span>.<span class="ident">socket_timeout</span>, <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="ident">query</span>, <span class="kw-2">&amp;</span>[])).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">version_string</span> <span class="op">=</span> <span class="ident">rows</span>
-            .<span class="ident">get</span>(<span class="number">0</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;version&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">version</span><span class="op">|</span> <span class="ident">version</span>.<span class="ident">to_string</span>()));
-
-        <span class="prelude-val">Ok</span>(<span class="ident">version_string</span>)
+    <span class="kw">fn </span>is_healthy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_healthy.load(Ordering::SeqCst)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_healthy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_healthy</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_tx_isolation_level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">isolation_level</span>: <span class="ident">IsolationLevel</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">isolation_level</span>, <span class="ident">IsolationLevel::Snapshot</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::builder</span>(<span class="ident">ErrorKind::invalid_isolation_level</span>(<span class="kw-2">&amp;</span><span class="ident">isolation_level</span>)).<span class="ident">build</span>());
+    <span class="kw">async fn </span>set_tx_isolation_level(<span class="kw-2">&amp;</span><span class="self">self</span>, isolation_level: IsolationLevel) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">if </span><span class="macro">matches!</span>(isolation_level, IsolationLevel::Snapshot) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(ErrorKind::invalid_isolation_level(<span class="kw-2">&amp;</span>isolation_level)).build());
         }
 
-        <span class="self">self</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;SET TRANSACTION ISOLATION LEVEL {}&quot;</span>, <span class="ident">isolation_level</span>))
+        <span class="self">self</span>.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;SET TRANSACTION ISOLATION LEVEL {}&quot;</span>, isolation_level))
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">requires_isolation_first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>requires_isolation_first(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::MysqlUrl</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tests::test_api::mysql::CONN_STR</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">single::Quaint</span>};
-    <span class="kw">use</span> <span class="ident">url::Url</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::MysqlUrl;
+    <span class="kw">use </span><span class="kw">crate</span>::tests::test_api::mysql::CONN_STR;
+    <span class="kw">use crate</span>::{error::<span class="kw-2">*</span>, single::Quaint};
+    <span class="kw">use </span>url::Url;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">should_parse_socket_url</span>() {
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">MysqlUrl::new</span>(<span class="ident">Url::parse</span>(<span class="string">&quot;mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;dbname&quot;</span>, <span class="ident">url</span>.<span class="ident">dbname</span>());
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="ident">String::from</span>(<span class="string">&quot;/tmp/mysql.sock&quot;</span>)), <span class="ident">url</span>.<span class="ident">socket</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>should_parse_socket_url() {
+        <span class="kw">let </span>url = MysqlUrl::new(Url::parse(<span class="string">&quot;mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)&quot;</span>).unwrap()).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;dbname&quot;</span>, url.dbname());
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(String::from(<span class="string">&quot;/tmp/mysql.sock&quot;</span>)), url.socket());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">should_parse_prefer_socket</span>() {
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span>
-            <span class="ident">MysqlUrl::new</span>(<span class="ident">Url::parse</span>(<span class="string">&quot;mysql://root:root@localhost:3307/testdb?prefer_socket=false&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, <span class="ident">url</span>.<span class="ident">prefer_socket</span>().<span class="ident">unwrap</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>should_parse_prefer_socket() {
+        <span class="kw">let </span>url =
+            MysqlUrl::new(Url::parse(<span class="string">&quot;mysql://root:root@localhost:3307/testdb?prefer_socket=false&quot;</span>).unwrap()).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, url.prefer_socket().unwrap());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">should_parse_sslaccept</span>() {
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span>
-            <span class="ident">MysqlUrl::new</span>(<span class="ident">Url::parse</span>(<span class="string">&quot;mysql://root:root@localhost:3307/testdb?sslaccept=strict&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="bool-val">true</span>, <span class="ident">url</span>.<span class="ident">query_params</span>.<span class="ident">use_ssl</span>);
-        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, <span class="ident">url</span>.<span class="ident">query_params</span>.<span class="ident">ssl_opts</span>.<span class="ident">skip_domain_validation</span>());
-        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, <span class="ident">url</span>.<span class="ident">query_params</span>.<span class="ident">ssl_opts</span>.<span class="ident">accept_invalid_certs</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>should_parse_sslaccept() {
+        <span class="kw">let </span>url =
+            MysqlUrl::new(Url::parse(<span class="string">&quot;mysql://root:root@localhost:3307/testdb?sslaccept=strict&quot;</span>).unwrap()).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="bool-val">true</span>, url.query_params.use_ssl);
+        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, url.query_params.ssl_opts.skip_domain_validation());
+        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, url.query_params.ssl_opts.accept_invalid_certs());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">should_allow_changing_of_cache_size</span>() {
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">MysqlUrl::new</span>(<span class="ident">Url::parse</span>(<span class="string">&quot;mysql:///root:root@localhost:3307/foo?statement_cache_size=420&quot;</span>).<span class="ident">unwrap</span>())
-            .<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="number">420</span>, <span class="ident">url</span>.<span class="ident">cache</span>().<span class="ident">capacity</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>should_allow_changing_of_cache_size() {
+        <span class="kw">let </span>url = MysqlUrl::new(Url::parse(<span class="string">&quot;mysql:///root:root@localhost:3307/foo?statement_cache_size=420&quot;</span>).unwrap())
+            .unwrap();
+        <span class="macro">assert_eq!</span>(<span class="number">420</span>, url.cache().capacity());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">should_have_default_cache_size</span>() {
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">MysqlUrl::new</span>(<span class="ident">Url::parse</span>(<span class="string">&quot;mysql:///root:root@localhost:3307/foo&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="number">100</span>, <span class="ident">url</span>.<span class="ident">cache</span>().<span class="ident">capacity</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>should_have_default_cache_size() {
+        <span class="kw">let </span>url = MysqlUrl::new(Url::parse(<span class="string">&quot;mysql:///root:root@localhost:3307/foo&quot;</span>).unwrap()).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="number">100</span>, url.cache().capacity());
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_map_nonexisting_database_error</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">CONN_STR</span>).<span class="ident">unwrap</span>();
-        <span class="ident">url</span>.<span class="ident">set_username</span>(<span class="string">&quot;root&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="ident">url</span>.<span class="ident">set_path</span>(<span class="string">&quot;/this_does_not_exist&quot;</span>);
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>should_map_nonexisting_database_error() {
+        <span class="kw">let </span><span class="kw-2">mut </span>url = Url::parse(<span class="kw-2">&amp;*</span>CONN_STR).unwrap();
+        url.set_username(<span class="string">&quot;root&quot;</span>).unwrap();
+        url.set_path(<span class="string">&quot;/this_does_not_exist&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Quaint::new</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span>;
+        <span class="kw">let </span>url = url.as_str().to_string();
+        <span class="kw">let </span>res = Quaint::new(<span class="kw-2">&amp;</span>url).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap_err</span>();
+        <span class="kw">let </span>err = res.unwrap_err();
 
-        <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">kind</span>() {
-            <span class="ident">ErrorKind::DatabaseDoesNotExist</span> { <span class="ident">db_name</span> } =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;1049&quot;</span>), <span class="ident">err</span>.<span class="ident">original_code</span>());
-                <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Unknown database \&#39;this_does_not_exist\&#39;&quot;</span>), <span class="ident">err</span>.<span class="ident">original_message</span>());
-                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">Name::available</span>(<span class="string">&quot;this_does_not_exist&quot;</span>), <span class="ident">db_name</span>)
+        <span class="kw">match </span>err.kind() {
+            ErrorKind::DatabaseDoesNotExist { db_name } =&gt; {
+                <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;1049&quot;</span>), err.original_code());
+                <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Unknown database \&#39;this_does_not_exist\&#39;&quot;</span>), err.original_message());
+                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Name::available(<span class="string">&quot;this_does_not_exist&quot;</span>), db_name)
             }
-            <span class="ident">e</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected `DatabaseDoesNotExist`, got {:?}&quot;</span>, <span class="ident">e</span>),
+            e =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected `DatabaseDoesNotExist`, got {:?}&quot;</span>, e),
         }
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_map_wrong_credentials_error</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="ident">CONN_STR</span>).<span class="ident">unwrap</span>();
-        <span class="ident">url</span>.<span class="ident">set_username</span>(<span class="string">&quot;WRONG&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>should_map_wrong_credentials_error() {
+        <span class="kw">let </span><span class="kw-2">mut </span>url = Url::parse(<span class="kw-2">&amp;</span>CONN_STR).unwrap();
+        url.set_username(<span class="string">&quot;WRONG&quot;</span>).unwrap();
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Quaint::new</span>(<span class="ident">url</span>.<span class="ident">as_str</span>()).<span class="kw">await</span>;
-        <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_err</span>());
+        <span class="kw">let </span>res = Quaint::new(url.as_str()).<span class="kw">await</span>;
+        <span class="macro">assert!</span>(res.is_err());
 
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap_err</span>();
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">err</span>.<span class="ident">kind</span>(), <span class="ident">ErrorKind::AuthenticationFailed</span> { <span class="ident">user</span> } <span class="kw">if</span> <span class="ident">user</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">Name::available</span>(<span class="string">&quot;WRONG&quot;</span>)));
+        <span class="kw">let </span>err = res.unwrap_err();
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(err.kind(), ErrorKind::AuthenticationFailed { user } <span class="kw">if </span>user == <span class="kw-2">&amp;</span>Name::available(<span class="string">&quot;WRONG&quot;</span>)));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

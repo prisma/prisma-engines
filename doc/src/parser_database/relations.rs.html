@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/relations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parser_database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/relations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parser_database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -490,497 +490,497 @@
 <span id="490">490</span>
 <span id="491">491</span>
 <span id="492">492</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
-    <span class="ident">interner::StringId</span>,
-    <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>,
-    {<span class="ident">context::Context</span>, <span class="ident">types::RelationField</span>},
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    ast::{<span class="self">self</span>, WithName},
+    interner::StringId,
+    DatamodelError, Diagnostics,
+    {context::Context, types::RelationField},
 };
-<span class="kw">use</span> <span class="ident">enumflags2::bitflags</span>;
-<span class="kw">use</span> <span class="ident">std::collections::BTreeSet</span>;
+<span class="kw">use </span>enumflags2::bitflags;
+<span class="kw">use </span>std::collections::BTreeSet;
 
-<span class="doccomment">/// Detect relation types and construct relation objects to the database.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">infer_relations</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relations</span> <span class="op">=</span> <span class="ident">Relations::default</span>();
+<span class="doccomment">/// Detect relation types and construct relation objects to the database.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>infer_relations(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>relations = Relations::default();
 
-    <span class="kw">for</span> <span class="ident">rf</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">relation_fields</span>.<span class="ident">iter</span>() {
-        <span class="kw">let</span> <span class="ident">evidence</span> <span class="op">=</span> <span class="ident">relation_evidence</span>(<span class="ident">rf</span>, <span class="ident">ctx</span>);
-        <span class="ident">ingest_relation</span>(<span class="ident">evidence</span>, <span class="kw-2">&amp;mut</span> <span class="ident">relations</span>, <span class="ident">ctx</span>);
+    <span class="kw">for </span>rf <span class="kw">in </span>ctx.types.relation_fields.iter() {
+        <span class="kw">let </span>evidence = relation_evidence(rf, ctx);
+        ingest_relation(evidence, <span class="kw-2">&amp;mut </span>relations, ctx);
     }
 
-    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="ident">ctx</span>.<span class="ident">relations</span>, <span class="ident">relations</span>);
+    <span class="kw">let _ </span>= std::mem::replace(ctx.relations, relations);
 }
 
-<span class="doccomment">/// Identifier for a single relation in a Prisma schema.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationId</span>(<span class="ident">u32</span>);
+<span class="doccomment">/// Identifier for a single relation in a Prisma schema.
+</span><span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+</span><span class="kw">pub struct </span>RelationId(u32);
 
-<span class="kw">impl</span> <span class="ident">RelationId</span> {
-    <span class="kw">const</span> <span class="ident">MAX</span>: <span class="ident">RelationId</span> <span class="op">=</span> <span class="ident">RelationId</span>(<span class="ident">u32::MAX</span>);
-    <span class="kw">const</span> <span class="ident">MIN</span>: <span class="ident">RelationId</span> <span class="op">=</span> <span class="ident">RelationId</span>(<span class="ident">u32::MIN</span>);
+<span class="kw">impl </span>RelationId {
+    <span class="kw">const </span>MAX: RelationId = RelationId(u32::MAX);
+    <span class="kw">const </span>MIN: RelationId = RelationId(u32::MIN);
 }
 
-<span class="doccomment">/// Identifier for a single implicit many-to-many relation in a Prisma schema.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ManyToManyRelationId</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">RelationId</span>);
+<span class="doccomment">/// Identifier for a single implicit many-to-many relation in a Prisma schema.
+</span><span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+</span><span class="kw">pub struct </span>ManyToManyRelationId(<span class="kw">pub</span>(<span class="kw">crate</span>) RelationId);
 
-<span class="doccomment">/// Storage for the relations in a schema.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A relation is always between two models. One model is assigned the role</span>
-<span class="doccomment">/// of &quot;model A&quot;, and the other is &quot;model B&quot;. The meaning of &quot;model A&quot; and</span>
-<span class="doccomment">/// &quot;model B&quot; depends on the type of relation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - In implicit many-to-many relations, model A and model B are ordered</span>
-<span class="doccomment">///   lexicographically, by model name, and failing that by relation field</span>
-<span class="doccomment">///   name. This order must be stable in order for the columns in the</span>
-<span class="doccomment">///   implicit many-to-many relation table columns and the data in them to</span>
-<span class="doccomment">///   keep their meaning.</span>
-<span class="doccomment">/// - In one-to-one and one-to-many relations, model A is the one carrying</span>
-<span class="doccomment">///   the referencing information and possible constraint. For example, on a</span>
-<span class="doccomment">///   SQL database, model A would correspond to the table with the foreign</span>
-<span class="doccomment">///   key constraint, while model B would correspond to the table referenced</span>
-<span class="doccomment">///   by the foreign key.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Relations</span> {
-    <span class="doccomment">/// Storage. Private. Do not use directly.</span>
-    <span class="ident">relations_storage</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Relation</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Storage for the relations in a schema.
+///
+/// A relation is always between two models. One model is assigned the role
+/// of &quot;model A&quot;, and the other is &quot;model B&quot;. The meaning of &quot;model A&quot; and
+/// &quot;model B&quot; depends on the type of relation.
+///
+/// - In implicit many-to-many relations, model A and model B are ordered
+///   lexicographically, by model name, and failing that by relation field
+///   name. This order must be stable in order for the columns in the
+///   implicit many-to-many relation table columns and the data in them to
+///   keep their meaning.
+/// - In one-to-one and one-to-many relations, model A is the one carrying
+///   the referencing information and possible constraint. For example, on a
+///   SQL database, model A would correspond to the table with the foreign
+///   key constraint, while model B would correspond to the table referenced
+///   by the foreign key.
+</span><span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Relations {
+    <span class="doccomment">/// Storage. Private. Do not use directly.
+    </span>relations_storage: Vec&lt;Relation&gt;,
 
-    <span class="comment">// Indexes for efficient querying.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Why BTreeSets?</span>
-    <span class="comment">//</span>
-    <span class="comment">// - We can&#39;t use a BTreeMap because there can be more than one relation</span>
-    <span class="comment">//   between two models.</span>
-    <span class="comment">// - We use a BTree because we want range queries. Meaning that with a</span>
-    <span class="comment">//   BTreeSet, we can efficiently ask:</span>
-    <span class="comment">//   - Give me all the relations on other models that point to this model</span>
-    <span class="comment">//   - Give me all the relations on this model that point to other models</span>
-    <span class="comment">//</span>
-    <span class="comment">// Where &quot;on this model&quot; doesn&#39;t mean &quot;the relation field is on the model&quot;</span>
-    <span class="comment">// but &quot;the foreign key is on this model&quot; (= this model is model a)</span>
-    <span class="doccomment">/// (model_a, model_b, relation_idx)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be interpreted as the relations _from_ a model.</span>
-    <span class="ident">forward</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">ast::ModelId</span>, <span class="ident">RelationId</span>)<span class="op">&gt;</span>,
-    <span class="doccomment">/// (model_b, model_a, relation_idx)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be interpreted as the relations _to_ a model.</span>
-    <span class="ident">back</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">ast::ModelId</span>, <span class="ident">RelationId</span>)<span class="op">&gt;</span>,
+    <span class="comment">// Indexes for efficient querying.
+    //
+    // Why BTreeSets?
+    //
+    // - We can&#39;t use a BTreeMap because there can be more than one relation
+    //   between two models.
+    // - We use a BTree because we want range queries. Meaning that with a
+    //   BTreeSet, we can efficiently ask:
+    //   - Give me all the relations on other models that point to this model
+    //   - Give me all the relations on this model that point to other models
+    //
+    // Where &quot;on this model&quot; doesn&#39;t mean &quot;the relation field is on the model&quot;
+    // but &quot;the foreign key is on this model&quot; (= this model is model a)
+    </span><span class="doccomment">/// (model_a, model_b, relation_idx)
+    ///
+    /// This can be interpreted as the relations _from_ a model.
+    </span>forward: BTreeSet&lt;(ast::ModelId, ast::ModelId, RelationId)&gt;,
+    <span class="doccomment">/// (model_b, model_a, relation_idx)
+    ///
+    /// This can be interpreted as the relations _to_ a model.
+    </span>back: BTreeSet&lt;(ast::ModelId, ast::ModelId, RelationId)&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Index</span><span class="op">&lt;</span><span class="ident">RelationId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Relations</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Relation</span>;
+<span class="kw">impl </span>std::ops::Index&lt;RelationId&gt; <span class="kw">for </span>Relations {
+    <span class="kw">type </span>Output = Relation;
 
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">RelationId</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relations_storage</span>[<span class="ident">index</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Relations</span> {
-    <span class="doccomment">/// Iterate over all relations in the schema.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationId</span><span class="op">&gt;</span> {
-        (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">relations_storage</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">RelationId</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>))
-    }
-
-    <span class="doccomment">/// Iterator over all the relations in a schema.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// (model_a_id, model_b_id, relation)</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">iter_relations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">ast::ModelId</span>, <span class="ident">ast::ModelId</span>, <span class="kw-2">&amp;</span><span class="ident">Relation</span>)<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">forward</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">model_a_id</span>, <span class="ident">model_b_id</span>, <span class="ident">relation_idx</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">model_a_id</span>, <span class="kw-2">*</span><span class="ident">model_b_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="kw-2">*</span><span class="ident">relation_idx</span>]))
-    }
-
-    <span class="doccomment">/// Iterator over relations where the provided model is model A, or the forward side of the</span>
-    <span class="doccomment">/// relation.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span> <span class="comment">// this is the name we want</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_a_id</span>: <span class="ident">ast::ModelId</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">forward</span>
-            .<span class="ident">range</span>((<span class="ident">model_a_id</span>, <span class="ident">ast::ModelId::ZERO</span>, <span class="ident">RelationId::MIN</span>)..(<span class="ident">model_a_id</span>, <span class="ident">ast::ModelId::MAX</span>, <span class="ident">RelationId::MAX</span>))
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">relation_id</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">relation_id</span>)
-    }
-
-    <span class="doccomment">/// Iterator over relationss where the provided model is model B, or the backrelation side of</span>
-    <span class="doccomment">/// the relation.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_a_id</span>: <span class="ident">ast::ModelId</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">back</span>
-            .<span class="ident">range</span>((<span class="ident">model_a_id</span>, <span class="ident">ast::ModelId::ZERO</span>, <span class="ident">RelationId::MIN</span>)..(<span class="ident">model_a_id</span>, <span class="ident">ast::ModelId::MAX</span>, <span class="ident">RelationId::MAX</span>))
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">relation_id</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">relation_id</span>)
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: RelationId) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.relations_storage[index.<span class="number">0 </span><span class="kw">as </span>usize]
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">OneToManyRelationFields</span> {
-    <span class="ident">Forward</span>(<span class="ident">ast::FieldId</span>),
-    <span class="ident">Back</span>(<span class="ident">ast::FieldId</span>),
-    <span class="ident">Both</span>(<span class="ident">ast::FieldId</span>, <span class="ident">ast::FieldId</span>),
+<span class="kw">impl </span>Relations {
+    <span class="doccomment">/// Iterate over all relations in the schema.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationId&gt; {
+        (<span class="number">0</span>..<span class="self">self</span>.relations_storage.len()).map(|idx| RelationId(idx <span class="kw">as </span>u32))
+    }
+
+    <span class="doccomment">/// Iterator over all the relations in a schema.
+    ///
+    /// (model_a_id, model_b_id, relation)
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>iter_relations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (ast::ModelId, ast::ModelId, <span class="kw-2">&amp;</span>Relation)&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.forward
+            .iter()
+            .map(<span class="kw">move </span>|(model_a_id, model_b_id, relation_idx)| (<span class="kw-2">*</span>model_a_id, <span class="kw-2">*</span>model_b_id, <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="kw-2">*</span>relation_idx]))
+    }
+
+    <span class="doccomment">/// Iterator over relations where the provided model is model A, or the forward side of the
+    /// relation.
+    </span><span class="attribute">#[allow(clippy::wrong_self_convention)] </span><span class="comment">// this is the name we want
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model_a_id: ast::ModelId) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationId&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.forward
+            .range((model_a_id, ast::ModelId::ZERO, RelationId::MIN)..(model_a_id, ast::ModelId::MAX, RelationId::MAX))
+            .map(<span class="kw">move </span>|(<span class="kw">_</span>, <span class="kw">_</span>, relation_id)| <span class="kw-2">*</span>relation_id)
+    }
+
+    <span class="doccomment">/// Iterator over relationss where the provided model is model B, or the backrelation side of
+    /// the relation.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model_a_id: ast::ModelId) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationId&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.back
+            .range((model_a_id, ast::ModelId::ZERO, RelationId::MIN)..(model_a_id, ast::ModelId::MAX, RelationId::MAX))
+            .map(<span class="kw">move </span>|(<span class="kw">_</span>, <span class="kw">_</span>, relation_id)| <span class="kw-2">*</span>relation_id)
+    }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">OneToOneRelationFields</span> {
-    <span class="ident">Forward</span>(<span class="ident">ast::FieldId</span>),
-    <span class="ident">Both</span>(<span class="ident">ast::FieldId</span>, <span class="ident">ast::FieldId</span>),
+<span class="attribute">#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>OneToManyRelationFields {
+    Forward(ast::FieldId),
+    Back(ast::FieldId),
+    Both(ast::FieldId, ast::FieldId),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">RelationAttributes</span> {
-    <span class="ident">ImplicitManyToMany</span> {
-        <span class="ident">field_a</span>: <span class="ident">ast::FieldId</span>,
-        <span class="ident">field_b</span>: <span class="ident">ast::FieldId</span>,
+<span class="attribute">#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>OneToOneRelationFields {
+    Forward(ast::FieldId),
+    Both(ast::FieldId, ast::FieldId),
+}
+
+<span class="attribute">#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>RelationAttributes {
+    ImplicitManyToMany {
+        field_a: ast::FieldId,
+        field_b: ast::FieldId,
     },
-    <span class="ident">TwoWayEmbeddedManyToMany</span> {
-        <span class="ident">field_a</span>: <span class="ident">ast::FieldId</span>,
-        <span class="ident">field_b</span>: <span class="ident">ast::FieldId</span>,
+    TwoWayEmbeddedManyToMany {
+        field_a: ast::FieldId,
+        field_b: ast::FieldId,
     },
-    <span class="ident">OneToOne</span>(<span class="ident">OneToOneRelationFields</span>),
-    <span class="ident">OneToMany</span>(<span class="ident">OneToManyRelationFields</span>),
+    OneToOne(OneToOneRelationFields),
+    OneToMany(OneToManyRelationFields),
 }
 
-<span class="kw">impl</span> <span class="ident">RelationAttributes</span> {
-    <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>, <span class="ident">field_b</span> }
-            <span class="op">|</span> <span class="ident">RelationAttributes::TwoWayEmbeddedManyToMany</span> { <span class="ident">field_a</span>, <span class="ident">field_b</span> }
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="ident">field_a</span>, <span class="ident">field_b</span>))
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Both</span>(<span class="ident">field_a</span>, <span class="ident">field_b</span>)) =&gt; {
-                (<span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">field_a</span>), <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">field_b</span>))
+<span class="kw">impl </span>RelationAttributes {
+    <span class="kw">fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="prelude-ty">Option</span>&lt;ast::FieldId&gt;, <span class="prelude-ty">Option</span>&lt;ast::FieldId&gt;) {
+        <span class="kw">match </span><span class="self">self </span>{
+            RelationAttributes::ImplicitManyToMany { field_a, field_b }
+            | RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b }
+            | RelationAttributes::OneToOne(OneToOneRelationFields::Both(field_a, field_b))
+            | RelationAttributes::OneToMany(OneToManyRelationFields::Both(field_a, field_b)) =&gt; {
+                (<span class="prelude-val">Some</span>(<span class="kw-2">*</span>field_a), <span class="prelude-val">Some</span>(<span class="kw-2">*</span>field_b))
             }
-            <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Forward</span>(<span class="ident">field_a</span>))
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Forward</span>(<span class="ident">field_a</span>)) =&gt; (<span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">field_a</span>), <span class="prelude-val">None</span>),
-            <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Back</span>(<span class="ident">field_b</span>)) =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">field_b</span>)),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Forward(field_a))
+            | RelationAttributes::OneToOne(OneToOneRelationFields::Forward(field_a)) =&gt; (<span class="prelude-val">Some</span>(<span class="kw-2">*</span>field_a), <span class="prelude-val">None</span>),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Back(field_b)) =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw-2">*</span>field_b)),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Relation</span> {
-    <span class="doccomment">/// The `name` argument in `@relation`.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">relation_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">attributes</span>: <span class="ident">RelationAttributes</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">model_a</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">model_b</span>: <span class="ident">ast::ModelId</span>,
+<span class="attribute">#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Relation {
+    <span class="doccomment">/// The `name` argument in `@relation`.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) relation_name: <span class="prelude-ty">Option</span>&lt;StringId&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) attributes: RelationAttributes,
+    <span class="kw">pub</span>(<span class="kw">super</span>) model_a: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">super</span>) model_b: ast::ModelId,
 }
 
-<span class="kw">impl</span> <span class="ident">Relation</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">fields</span>() {
-            (<span class="prelude-val">Some</span>(<span class="ident">field_a</span>), <span class="kw">_</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">model_a</span> <span class="op">==</span> <span class="ident">model_id</span> <span class="op">&amp;&amp;</span> <span class="ident">field_a</span> <span class="op">==</span> <span class="ident">field_id</span> =&gt; <span class="bool-val">true</span>,
-            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">field_b</span>)) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">model_b</span> <span class="op">==</span> <span class="ident">model_id</span> <span class="op">&amp;&amp;</span> <span class="ident">field_b</span> <span class="op">==</span> <span class="ident">field_id</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="kw">impl </span>Relation {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_field(<span class="kw-2">&amp;</span><span class="self">self</span>, model_id: ast::ModelId, field_id: ast::FieldId) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.attributes.fields() {
+            (<span class="prelude-val">Some</span>(field_a), <span class="kw">_</span>) <span class="kw">if </span><span class="self">self</span>.model_a == model_id &amp;&amp; field_a == field_id =&gt; <span class="bool-val">true</span>,
+            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(field_b)) <span class="kw">if </span><span class="self">self</span>.model_b == model_id &amp;&amp; field_b == field_id =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_implicit_many_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">attributes</span>, <span class="ident">RelationAttributes::ImplicitManyToMany</span> { .. })
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_implicit_many_to_many(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.attributes, RelationAttributes::ImplicitManyToMany { .. })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_complete_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">ast::FieldId</span>, <span class="ident">ast::FieldId</span>)<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attributes</span> {
-            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>, <span class="ident">field_b</span> } =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">field_a</span>, <span class="kw-2">*</span><span class="ident">field_b</span>)),
-            <span class="ident">RelationAttributes::TwoWayEmbeddedManyToMany</span> { <span class="ident">field_a</span>, <span class="ident">field_b</span> } =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">field_a</span>, <span class="kw-2">*</span><span class="ident">field_b</span>)),
-            <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="ident">field_a</span>, <span class="ident">field_b</span>)) =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">field_a</span>, <span class="kw-2">*</span><span class="ident">field_b</span>)),
-            <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Both</span>(<span class="ident">field_a</span>, <span class="ident">field_b</span>)) =&gt; {
-                <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">field_a</span>, <span class="kw-2">*</span><span class="ident">field_b</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_complete_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(ast::FieldId, ast::FieldId)&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.attributes {
+            RelationAttributes::ImplicitManyToMany { field_a, field_b } =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span>field_a, <span class="kw-2">*</span>field_b)),
+            RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b } =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span>field_a, <span class="kw-2">*</span>field_b)),
+            RelationAttributes::OneToOne(OneToOneRelationFields::Both(field_a, field_b)) =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span>field_a, <span class="kw-2">*</span>field_b)),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Both(field_a, field_b)) =&gt; {
+                <span class="prelude-val">Some</span>((<span class="kw-2">*</span>field_a, <span class="kw-2">*</span>field_b))
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_two_way_embedded_many_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">attributes</span>, <span class="ident">RelationAttributes::TwoWayEmbeddedManyToMany</span> { .. })
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_two_way_embedded_many_to_many(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.attributes, RelationAttributes::TwoWayEmbeddedManyToMany { .. })
     }
 }
 
-<span class="comment">// Implementation detail for this module. Should stay private.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">RelationEvidence</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">ast_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Model</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">ast_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">is_self_relation</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">is_two_way_embedded_many_to_many_relation</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">opposite_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Model</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">opposite_relation_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">ast::FieldId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>)<span class="op">&gt;</span>,
+<span class="comment">// Implementation detail for this module. Should stay private.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>RelationEvidence&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) ast_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Model,
+    <span class="kw">pub</span>(<span class="kw">super</span>) model_id: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">super</span>) ast_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field,
+    <span class="kw">pub</span>(<span class="kw">super</span>) field_id: ast::FieldId,
+    <span class="kw">pub</span>(<span class="kw">super</span>) is_self_relation: bool,
+    <span class="kw">pub</span>(<span class="kw">super</span>) is_two_way_embedded_many_to_many_relation: bool,
+    <span class="kw">pub</span>(<span class="kw">super</span>) relation_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField,
+    <span class="kw">pub</span>(<span class="kw">super</span>) opposite_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Model,
+    <span class="kw">pub</span>(<span class="kw">super</span>) opposite_relation_field: <span class="prelude-ty">Option</span>&lt;(ast::FieldId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField)&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">relation_evidence</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
-    ((<span class="ident">model_id</span>, <span class="ident">field_id</span>), <span class="ident">relation_field</span>): (<span class="kw-2">&amp;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">ast::FieldId</span>), <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>),
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">RelationEvidence</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">ast</span>;
-    <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">model_id</span>];
-    <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast_model</span>[<span class="kw-2">*</span><span class="ident">field_id</span>];
-    <span class="kw">let</span> <span class="ident">opposite_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>[<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>];
-    <span class="kw">let</span> <span class="ident">is_self_relation</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">model_id</span> <span class="op">==</span> <span class="ident">relation_field</span>.<span class="ident">referenced_model</span>;
-    <span class="kw">let</span> <span class="ident">opposite_relation_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">ast::FieldId</span>, <span class="kw-2">&amp;</span><span class="ident">ast::Field</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
-        .<span class="ident">types</span>
-        .<span class="ident">relation_fields</span>
-        .<span class="ident">range</span>(
-            (<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>, <span class="ident">ast::FieldId::MIN</span>)..(<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>, <span class="ident">ast::FieldId::MAX</span>),
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>relation_evidence&lt;<span class="lifetime">&#39;db</span>&gt;(
+    ((model_id, field_id), relation_field): (<span class="kw-2">&amp;</span>(ast::ModelId, ast::FieldId), <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField),
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
+) -&gt; RelationEvidence&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">let </span>ast = ctx.ast;
+    <span class="kw">let </span>ast_model = <span class="kw-2">&amp;</span>ast[<span class="kw-2">*</span>model_id];
+    <span class="kw">let </span>ast_field = <span class="kw-2">&amp;</span>ast_model[<span class="kw-2">*</span>field_id];
+    <span class="kw">let </span>opposite_model = <span class="kw-2">&amp;</span>ast[relation_field.referenced_model];
+    <span class="kw">let </span>is_self_relation = <span class="kw-2">*</span>model_id == relation_field.referenced_model;
+    <span class="kw">let </span>opposite_relation_field: <span class="prelude-ty">Option</span>&lt;(ast::FieldId, <span class="kw-2">&amp;</span>ast::Field, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField)&gt; = ctx
+        .types
+        .relation_fields
+        .range(
+            (relation_field.referenced_model, ast::FieldId::MIN)..(relation_field.referenced_model, ast::FieldId::MAX),
         )
-        <span class="comment">// Only considers relations between the same models</span>
-        .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">opposite_relation_field</span>)<span class="op">|</span> <span class="ident">opposite_relation_field</span>.<span class="ident">referenced_model</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">model_id</span>)
-        <span class="comment">// Filter out the field itself, in case of self-relations</span>
-        .<span class="ident">filter</span>(<span class="op">|</span>((<span class="kw">_</span>, <span class="ident">opp_relation_field_id</span>), <span class="kw">_</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">is_self_relation</span> <span class="op">|</span><span class="op">|</span> <span class="ident">opp_relation_field_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">field_id</span>)
-        .<span class="ident">find</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">opposite_relation_field</span>)<span class="op">|</span> <span class="ident">opposite_relation_field</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">relation_field</span>.<span class="ident">name</span>)
-        .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">opp_model_id</span>, <span class="ident">opp_field_id</span>), <span class="ident">opp_rf</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">opp_field_id</span>, <span class="kw-2">&amp;</span><span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">opp_model_id</span>][<span class="kw-2">*</span><span class="ident">opp_field_id</span>], <span class="ident">opp_rf</span>));
+        <span class="comment">// Only considers relations between the same models
+        </span>.filter(|(<span class="kw">_</span>, opposite_relation_field)| opposite_relation_field.referenced_model == <span class="kw-2">*</span>model_id)
+        <span class="comment">// Filter out the field itself, in case of self-relations
+        </span>.filter(|((<span class="kw">_</span>, opp_relation_field_id), <span class="kw">_</span>)| !is_self_relation || opp_relation_field_id != field_id)
+        .find(|(<span class="kw">_</span>, opposite_relation_field)| opposite_relation_field.name == relation_field.name)
+        .map(|((opp_model_id, opp_field_id), opp_rf)| (<span class="kw-2">*</span>opp_field_id, <span class="kw-2">&amp;</span>ast[<span class="kw-2">*</span>opp_model_id][<span class="kw-2">*</span>opp_field_id], opp_rf));
 
-    <span class="kw">let</span> <span class="ident">is_two_way_embedded_many_to_many_relation</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation_field</span>, <span class="ident">opposite_relation_field</span>) {
-        (<span class="ident">left</span>, <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">right</span>))) =&gt; <span class="ident">left</span>.<span class="ident">fields</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">right</span>.<span class="ident">fields</span>.<span class="ident">is_some</span>(),
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">let </span>is_two_way_embedded_many_to_many_relation = <span class="kw">match </span>(relation_field, opposite_relation_field) {
+        (left, <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="kw">_</span>, right))) =&gt; left.fields.is_some() || right.fields.is_some(),
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     };
 
-    <span class="ident">RelationEvidence</span> {
-        <span class="ident">ast_model</span>,
-        <span class="ident">model_id</span>: <span class="kw-2">*</span><span class="ident">model_id</span>,
-        <span class="ident">ast_field</span>,
-        <span class="ident">field_id</span>: <span class="kw-2">*</span><span class="ident">field_id</span>,
-        <span class="ident">relation_field</span>,
-        <span class="ident">opposite_model</span>,
-        <span class="ident">is_self_relation</span>,
-        <span class="ident">opposite_relation_field</span>,
-        <span class="ident">is_two_way_embedded_many_to_many_relation</span>,
+    RelationEvidence {
+        ast_model,
+        model_id: <span class="kw-2">*</span>model_id,
+        ast_field,
+        field_id: <span class="kw-2">*</span>field_id,
+        relation_field,
+        opposite_model,
+        is_self_relation,
+        opposite_relation_field,
+        is_two_way_embedded_many_to_many_relation,
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ingest_relation</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="ident">evidence</span>: <span class="ident">RelationEvidence</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>, <span class="ident">relations</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Relations</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) {
-    <span class="comment">// In this function, we want to ingest the relation only once,</span>
-    <span class="comment">// so if we know that we will create a relation for the opposite</span>
-    <span class="comment">// field, we skip the field by returning early.</span>
-    <span class="kw">let</span> <span class="ident">relation_type</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">evidence</span>.<span class="ident">ast_field</span>.<span class="ident">arity</span>, <span class="ident">evidence</span>.<span class="ident">opposite_relation_field</span>) {
-        <span class="comment">// m:n</span>
-        (<span class="ident">ast::FieldArity::List</span>, <span class="prelude-val">Some</span>((<span class="ident">opp_field_id</span>, <span class="ident">opp_field</span>, <span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">opp_field</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>() =&gt; {
-            <span class="comment">// This is an implicit many-to-many relation.</span>
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>ingest_relation&lt;<span class="lifetime">&#39;db</span>&gt;(evidence: RelationEvidence&lt;<span class="lifetime">&#39;db</span>&gt;, relations: <span class="kw-2">&amp;mut </span>Relations, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;db</span>&gt;) {
+    <span class="comment">// In this function, we want to ingest the relation only once,
+    // so if we know that we will create a relation for the opposite
+    // field, we skip the field by returning early.
+    </span><span class="kw">let </span>relation_type = <span class="kw">match </span>(evidence.ast_field.arity, evidence.opposite_relation_field) {
+        <span class="comment">// m:n
+        </span>(ast::FieldArity::List, <span class="prelude-val">Some</span>((opp_field_id, opp_field, <span class="kw">_</span>))) <span class="kw">if </span>opp_field.arity.is_list() =&gt; {
+            <span class="comment">// This is an implicit many-to-many relation.
 
-            <span class="comment">// We will meet the relation twice when we walk over all relation</span>
-            <span class="comment">// fields, so we only instantiate it when the relation field is that</span>
-            <span class="comment">// of model A, and the opposite is model B.</span>
-            <span class="kw">if</span> <span class="ident">evidence</span>.<span class="ident">ast_model</span>.<span class="ident">name</span>() <span class="op">&gt;</span> <span class="ident">evidence</span>.<span class="ident">opposite_model</span>.<span class="ident">name</span>() {
+            // We will meet the relation twice when we walk over all relation
+            // fields, so we only instantiate it when the relation field is that
+            // of model A, and the opposite is model B.
+            </span><span class="kw">if </span>evidence.ast_model.name() &gt; evidence.opposite_model.name() {
                 <span class="kw">return</span>;
             }
 
-            <span class="comment">// For self-relations, the ordering logic is different: model A</span>
-            <span class="comment">// and model B are the same. The lexicographical order is on field names.</span>
-            <span class="kw">if</span> <span class="ident">evidence</span>.<span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">evidence</span>.<span class="ident">ast_field</span>.<span class="ident">name</span>() <span class="op">&gt;</span> <span class="ident">opp_field</span>.<span class="ident">name</span>() {
+            <span class="comment">// For self-relations, the ordering logic is different: model A
+            // and model B are the same. The lexicographical order is on field names.
+            </span><span class="kw">if </span>evidence.is_self_relation &amp;&amp; evidence.ast_field.name() &gt; opp_field.name() {
                 <span class="kw">return</span>;
             }
 
-            <span class="kw">if</span> <span class="ident">evidence</span>.<span class="ident">is_two_way_embedded_many_to_many_relation</span> {
-                <span class="ident">RelationAttributes::TwoWayEmbeddedManyToMany</span> {
-                    <span class="ident">field_a</span>: <span class="ident">evidence</span>.<span class="ident">field_id</span>,
-                    <span class="ident">field_b</span>: <span class="ident">opp_field_id</span>,
+            <span class="kw">if </span>evidence.is_two_way_embedded_many_to_many_relation {
+                RelationAttributes::TwoWayEmbeddedManyToMany {
+                    field_a: evidence.field_id,
+                    field_b: opp_field_id,
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">RelationAttributes::ImplicitManyToMany</span> {
-                    <span class="ident">field_a</span>: <span class="ident">evidence</span>.<span class="ident">field_id</span>,
-                    <span class="ident">field_b</span>: <span class="ident">opp_field_id</span>,
+            } <span class="kw">else </span>{
+                RelationAttributes::ImplicitManyToMany {
+                    field_a: evidence.field_id,
+                    field_b: opp_field_id,
                 }
             }
         }
 
-        <span class="comment">// 1:1</span>
-        (<span class="ident">ast::FieldArity::Required</span>, <span class="prelude-val">Some</span>((<span class="ident">opp_field_id</span>, <span class="ident">opp_field</span>, <span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">opp_field</span>.<span class="ident">arity</span>.<span class="ident">is_optional</span>() =&gt; {
-            <span class="comment">// This is a required 1:1 relation, and we are on the required side.</span>
-            <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>, <span class="ident">opp_field_id</span>))
+        <span class="comment">// 1:1
+        </span>(ast::FieldArity::Required, <span class="prelude-val">Some</span>((opp_field_id, opp_field, <span class="kw">_</span>))) <span class="kw">if </span>opp_field.arity.is_optional() =&gt; {
+            <span class="comment">// This is a required 1:1 relation, and we are on the required side.
+            </span>RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
         }
-        (<span class="ident">ast::FieldArity::Required</span>, <span class="prelude-val">Some</span>((<span class="ident">opp_field_id</span>, <span class="ident">opp_field</span>, <span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">opp_field</span>.<span class="ident">arity</span>.<span class="ident">is_required</span>() =&gt; {
-            <span class="comment">// This is a 1:1 relation that is required on both sides. We are going to reject this later,</span>
-            <span class="comment">// so which model is model A doesn&#39;t matter.</span>
+        (ast::FieldArity::Required, <span class="prelude-val">Some</span>((opp_field_id, opp_field, <span class="kw">_</span>))) <span class="kw">if </span>opp_field.arity.is_required() =&gt; {
+            <span class="comment">// This is a 1:1 relation that is required on both sides. We are going to reject this later,
+            // so which model is model A doesn&#39;t matter.
 
-            <span class="kw">if</span> [<span class="ident">evidence</span>.<span class="ident">ast_model</span>.<span class="ident">name</span>(), <span class="ident">evidence</span>.<span class="ident">ast_field</span>.<span class="ident">name</span>()]
-                <span class="op">&gt;</span> [<span class="ident">evidence</span>.<span class="ident">opposite_model</span>.<span class="ident">name</span>(), <span class="ident">opp_field</span>.<span class="ident">name</span>()]
+            </span><span class="kw">if </span>[evidence.ast_model.name(), evidence.ast_field.name()]
+                &gt; [evidence.opposite_model.name(), opp_field.name()]
             {
                 <span class="kw">return</span>;
             }
 
-            <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>, <span class="ident">opp_field_id</span>))
+            RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
         }
-        (<span class="ident">ast::FieldArity::Optional</span>, <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">opp_field</span>, <span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">opp_field</span>.<span class="ident">arity</span>.<span class="ident">is_required</span>() =&gt; {
-            <span class="comment">// This is a required 1:1 relation, and we are on the virtual side. Skip.</span>
-            <span class="kw">return</span>;
+        (ast::FieldArity::Optional, <span class="prelude-val">Some</span>((<span class="kw">_</span>, opp_field, <span class="kw">_</span>))) <span class="kw">if </span>opp_field.arity.is_required() =&gt; {
+            <span class="comment">// This is a required 1:1 relation, and we are on the virtual side. Skip.
+            </span><span class="kw">return</span>;
         }
-        (<span class="ident">ast::FieldArity::Optional</span>, <span class="prelude-val">Some</span>((<span class="ident">opp_field_id</span>, <span class="ident">opp_field</span>, <span class="ident">opp_field_attributes</span>)))
-            <span class="kw">if</span> <span class="ident">opp_field</span>.<span class="ident">arity</span>.<span class="ident">is_optional</span>() =&gt;
+        (ast::FieldArity::Optional, <span class="prelude-val">Some</span>((opp_field_id, opp_field, opp_field_attributes)))
+            <span class="kw">if </span>opp_field.arity.is_optional() =&gt;
         {
-            <span class="comment">// This is a 1:1 relation that is optional on both sides. We must infer which side is model A.</span>
+            <span class="comment">// This is a 1:1 relation that is optional on both sides. We must infer which side is model A.
 
-            <span class="kw">if</span> <span class="ident">evidence</span>.<span class="ident">relation_field</span>.<span class="ident">fields</span>.<span class="ident">is_some</span>() {
-                <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>, <span class="ident">opp_field_id</span>))
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">opp_field_attributes</span>.<span class="ident">fields</span>.<span class="ident">is_none</span>() {
-                <span class="comment">// No fields defined, we have to break the tie: take the first model name / field name (self relations)</span>
-                <span class="comment">// in lexicographic order.</span>
-                <span class="kw">if</span> [<span class="ident">evidence</span>.<span class="ident">ast_model</span>.<span class="ident">name</span>(), <span class="ident">evidence</span>.<span class="ident">ast_field</span>.<span class="ident">name</span>()]
-                    <span class="op">&gt;</span> [<span class="ident">evidence</span>.<span class="ident">opposite_model</span>.<span class="ident">name</span>(), <span class="ident">opp_field</span>.<span class="ident">name</span>()]
+            </span><span class="kw">if </span>evidence.relation_field.fields.is_some() {
+                RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
+            } <span class="kw">else if </span>opp_field_attributes.fields.is_none() {
+                <span class="comment">// No fields defined, we have to break the tie: take the first model name / field name (self relations)
+                // in lexicographic order.
+                </span><span class="kw">if </span>[evidence.ast_model.name(), evidence.ast_field.name()]
+                    &gt; [evidence.opposite_model.name(), opp_field.name()]
                 {
                     <span class="kw">return</span>;
                 }
 
-                <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>, <span class="ident">opp_field_id</span>))
-            } <span class="kw">else</span> {
-                <span class="comment">// Opposite field has fields, it&#39;s the forward side. Return.</span>
-                <span class="kw">return</span>;
+                RelationAttributes::OneToOne(OneToOneRelationFields::Both(evidence.field_id, opp_field_id))
+            } <span class="kw">else </span>{
+                <span class="comment">// Opposite field has fields, it&#39;s the forward side. Return.
+                </span><span class="kw">return</span>;
             }
         }
 
-        <span class="comment">// 1:m</span>
-        (<span class="ident">ast::FieldArity::List</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; {
-            <span class="comment">// This is a 1:m relation defined on both sides. We skip the virtual side.</span>
-            <span class="kw">return</span>;
+        <span class="comment">// 1:m
+        </span>(ast::FieldArity::List, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; {
+            <span class="comment">// This is a 1:m relation defined on both sides. We skip the virtual side.
+            </span><span class="kw">return</span>;
         }
-        (<span class="ident">ast::FieldArity::List</span>, <span class="prelude-val">None</span>) =&gt; {
-            <span class="comment">// This is a 1:m relation defined on the virtual side only.</span>
-            <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Back</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>))
+        (ast::FieldArity::List, <span class="prelude-val">None</span>) =&gt; {
+            <span class="comment">// This is a 1:m relation defined on the virtual side only.
+            </span>RelationAttributes::OneToMany(OneToManyRelationFields::Back(evidence.field_id))
         }
-        (<span class="ident">ast::FieldArity::Required</span> <span class="op">|</span> <span class="ident">ast::FieldArity::Optional</span>, <span class="prelude-val">Some</span>((<span class="ident">opp_field_id</span>, <span class="kw">_</span>, <span class="kw">_</span>))) =&gt; {
-            <span class="comment">// This is a 1:m relation defined on both sides.</span>
-            <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Both</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>, <span class="ident">opp_field_id</span>))
+        (ast::FieldArity::Required | ast::FieldArity::Optional, <span class="prelude-val">Some</span>((opp_field_id, <span class="kw">_</span>, <span class="kw">_</span>))) =&gt; {
+            <span class="comment">// This is a 1:m relation defined on both sides.
+            </span>RelationAttributes::OneToMany(OneToManyRelationFields::Both(evidence.field_id, opp_field_id))
         }
 
-        <span class="comment">// 1:m or 1:1</span>
-        (<span class="ident">ast::FieldArity::Optional</span> <span class="op">|</span> <span class="ident">ast::FieldArity::Required</span>, <span class="prelude-val">None</span>) =&gt; {
-            <span class="comment">// This is a relation defined on both sides. We check whether the</span>
-            <span class="comment">// relation scalar fields are unique to determine whether it is a</span>
-            <span class="comment">// 1:1 or a 1:m relation.</span>
-            <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">evidence</span>.<span class="ident">relation_field</span>.<span class="ident">fields</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">fields_are_unique</span> <span class="op">=</span>
-                        <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">model_attributes</span>[<span class="kw-2">&amp;</span><span class="ident">evidence</span>.<span class="ident">model_id</span>]
-                            .<span class="ident">ast_indexes</span>
-                            .<span class="ident">iter</span>()
-                            .<span class="ident">any</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">idx</span>)<span class="op">|</span> {
-                                <span class="ident">idx</span>.<span class="ident">is_unique</span>()
-                                    <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">idx</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">field_in_index</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">fields</span>
+        <span class="comment">// 1:m or 1:1
+        </span>(ast::FieldArity::Optional | ast::FieldArity::Required, <span class="prelude-val">None</span>) =&gt; {
+            <span class="comment">// This is a relation defined on both sides. We check whether the
+            // relation scalar fields are unique to determine whether it is a
+            // 1:1 or a 1:m relation.
+            </span><span class="kw">match </span><span class="kw-2">&amp;</span>evidence.relation_field.fields {
+                <span class="prelude-val">Some</span>(fields) =&gt; {
+                    <span class="kw">let </span>fields_are_unique =
+                        ctx.types.model_attributes[<span class="kw-2">&amp;</span>evidence.model_id]
+                            .ast_indexes
+                            .iter()
+                            .any(|(<span class="kw">_</span>, idx)| {
+                                idx.is_unique()
+                                    &amp;&amp; <span class="kw-2">&amp;</span>idx.fields.iter().map(|f| f.path.field_in_index()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;() == fields
                             });
-                    <span class="kw">if</span> <span class="ident">fields_are_unique</span> {
-                        <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Forward</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>))
-                    } <span class="kw">else</span> {
-                        <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Forward</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>))
+                    <span class="kw">if </span>fields_are_unique {
+                        RelationAttributes::OneToOne(OneToOneRelationFields::Forward(evidence.field_id))
+                    } <span class="kw">else </span>{
+                        RelationAttributes::OneToMany(OneToManyRelationFields::Forward(evidence.field_id))
                     }
                 }
-                <span class="kw">_</span> =&gt; <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Forward</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>)),
+                <span class="kw">_ </span>=&gt; RelationAttributes::OneToMany(OneToManyRelationFields::Forward(evidence.field_id)),
             }
         }
     };
 
-    <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation_type</span> {
-        <span class="comment">// Back-only relation fields are special, because we always take the forward side when defining the relation type,</span>
-        <span class="comment">// except in this case, because there is no forward side.</span>
-        <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Back</span>(<span class="kw">_</span>)) =&gt; <span class="ident">Relation</span> {
-            <span class="ident">attributes</span>: <span class="ident">relation_type</span>,
-            <span class="ident">relation_name</span>: <span class="ident">evidence</span>.<span class="ident">relation_field</span>.<span class="ident">name</span>,
-            <span class="ident">model_a</span>: <span class="ident">evidence</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>,
-            <span class="ident">model_b</span>: <span class="ident">evidence</span>.<span class="ident">model_id</span>,
+    <span class="kw">let </span>relation = <span class="kw">match </span>relation_type {
+        <span class="comment">// Back-only relation fields are special, because we always take the forward side when defining the relation type,
+        // except in this case, because there is no forward side.
+        </span>RelationAttributes::OneToMany(OneToManyRelationFields::Back(<span class="kw">_</span>)) =&gt; Relation {
+            attributes: relation_type,
+            relation_name: evidence.relation_field.name,
+            model_a: evidence.relation_field.referenced_model,
+            model_b: evidence.model_id,
         },
-        <span class="kw">_</span> =&gt; <span class="ident">Relation</span> {
-            <span class="ident">attributes</span>: <span class="ident">relation_type</span>,
-            <span class="ident">relation_name</span>: <span class="ident">evidence</span>.<span class="ident">relation_field</span>.<span class="ident">name</span>,
-            <span class="ident">model_a</span>: <span class="ident">evidence</span>.<span class="ident">model_id</span>,
-            <span class="ident">model_b</span>: <span class="ident">evidence</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>,
+        <span class="kw">_ </span>=&gt; Relation {
+            attributes: relation_type,
+            relation_name: evidence.relation_field.name,
+            model_a: evidence.model_id,
+            model_b: evidence.relation_field.referenced_model,
         },
     };
 
-    <span class="kw">let</span> <span class="ident">relation_id</span> <span class="op">=</span> <span class="ident">RelationId</span>(<span class="ident">relations</span>.<span class="ident">relations_storage</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>);
+    <span class="kw">let </span>relation_id = RelationId(relations.relations_storage.len() <span class="kw">as </span>u32);
 
-    <span class="ident">relations</span>.<span class="ident">relations_storage</span>.<span class="ident">push</span>(<span class="ident">relation</span>);
+    relations.relations_storage.push(relation);
 
-    <span class="ident">relations</span>
-        .<span class="ident">forward</span>
-        .<span class="ident">insert</span>((<span class="ident">evidence</span>.<span class="ident">model_id</span>, <span class="ident">evidence</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>, <span class="ident">relation_id</span>));
+    relations
+        .forward
+        .insert((evidence.model_id, evidence.relation_field.referenced_model, relation_id));
 
-    <span class="ident">relations</span>
-        .<span class="ident">back</span>
-        .<span class="ident">insert</span>((<span class="ident">evidence</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>, <span class="ident">evidence</span>.<span class="ident">model_id</span>, <span class="ident">relation_id</span>));
+    relations
+        .back
+        .insert((evidence.relation_field.referenced_model, evidence.model_id, relation_id));
 }
 
-<span class="doccomment">/// An action describing the way referential integrity is managed in the system.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An action is triggered when a relation constraint gets violated in a way</span>
-<span class="doccomment">/// that would make the the data inconsistent, e.g. deleting or updating a</span>
-<span class="doccomment">/// referencing record that leaves related records into a wrong state.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// @relation(fields: [a], references: [b], onDelete: NoAction, onUpdate: Cascade)</span>
-<span class="doccomment">///                                                   ^^^^^^^^            ^^^^^^^</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="attribute">#[<span class="ident">bitflags</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReferentialAction</span> {
-    <span class="doccomment">/// Deletes record if dependent record is deleted. Updates relation scalar</span>
-    <span class="doccomment">/// fields if referenced scalar fields of the dependent record are updated.</span>
-    <span class="ident">Cascade</span>,
-    <span class="doccomment">/// Prevents operation (both updates and deletes) from succeeding if any</span>
-    <span class="doccomment">/// records are connected. This behavior will always result in a runtime</span>
-    <span class="doccomment">/// error for required relations.</span>
-    <span class="ident">Restrict</span>,
-    <span class="doccomment">/// Behavior is database specific. Either defers throwing an integrity check</span>
-    <span class="doccomment">/// error until the end of the transaction or errors immediately. If</span>
-    <span class="doccomment">/// deferred, this makes it possible to temporarily violate integrity in a</span>
-    <span class="doccomment">/// transaction while making sure that subsequent operations in the</span>
-    <span class="doccomment">/// transaction restore integrity.</span>
-    <span class="ident">NoAction</span>,
-    <span class="doccomment">/// Sets relation scalar fields to null if the relation is deleted or</span>
-    <span class="doccomment">/// updated. This will always result in a runtime error if one or more of the</span>
-    <span class="doccomment">/// relation scalar fields are required.</span>
-    <span class="ident">SetNull</span>,
-    <span class="doccomment">/// Sets relation scalar fields to their default values on update or delete</span>
-    <span class="doccomment">/// of relation. Will always result in a runtime error if no defaults are</span>
-    <span class="doccomment">/// provided for any relation scalar fields.</span>
-    <span class="ident">SetDefault</span>,
+<span class="doccomment">/// An action describing the way referential integrity is managed in the system.
+///
+/// An action is triggered when a relation constraint gets violated in a way
+/// that would make the the data inconsistent, e.g. deleting or updating a
+/// referencing record that leaves related records into a wrong state.
+///
+/// ```ignore
+/// @relation(fields: [a], references: [b], onDelete: NoAction, onUpdate: Cascade)
+///                                                   ^^^^^^^^            ^^^^^^^
+/// ```
+</span><span class="attribute">#[repr(u8)]
+#[bitflags]
+#[derive(Debug, Copy, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>ReferentialAction {
+    <span class="doccomment">/// Deletes record if dependent record is deleted. Updates relation scalar
+    /// fields if referenced scalar fields of the dependent record are updated.
+    </span>Cascade,
+    <span class="doccomment">/// Prevents operation (both updates and deletes) from succeeding if any
+    /// records are connected. This behavior will always result in a runtime
+    /// error for required relations.
+    </span>Restrict,
+    <span class="doccomment">/// Behavior is database specific. Either defers throwing an integrity check
+    /// error until the end of the transaction or errors immediately. If
+    /// deferred, this makes it possible to temporarily violate integrity in a
+    /// transaction while making sure that subsequent operations in the
+    /// transaction restore integrity.
+    </span>NoAction,
+    <span class="doccomment">/// Sets relation scalar fields to null if the relation is deleted or
+    /// updated. This will always result in a runtime error if one or more of the
+    /// relation scalar fields are required.
+    </span>SetNull,
+    <span class="doccomment">/// Sets relation scalar fields to their default values on update or delete
+    /// of relation. Will always result in a runtime error if no defaults are
+    /// provided for any relation scalar fields.
+    </span>SetDefault,
 }
 
-<span class="kw">impl</span> <span class="ident">ReferentialAction</span> {
-    <span class="doccomment">/// True if the action modifies the related items.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">triggers_modification</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::NoAction</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Restrict</span>)
+<span class="kw">impl </span>ReferentialAction {
+    <span class="doccomment">/// True if the action modifies the related items.
+    </span><span class="kw">pub fn </span>triggers_modification(<span class="self">self</span>) -&gt; bool {
+        !<span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::NoAction | <span class="self">Self</span>::Restrict)
     }
 
-    <span class="doccomment">/// The string representation of the referential action in the schema.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ReferentialAction::Cascade</span> =&gt; <span class="string">&quot;Cascade&quot;</span>,
-            <span class="ident">ReferentialAction::Restrict</span> =&gt; <span class="string">&quot;Restrict&quot;</span>,
-            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="string">&quot;NoAction&quot;</span>,
-            <span class="ident">ReferentialAction::SetNull</span> =&gt; <span class="string">&quot;SetNull&quot;</span>,
-            <span class="ident">ReferentialAction::SetDefault</span> =&gt; <span class="string">&quot;SetDefault&quot;</span>,
+    <span class="doccomment">/// The string representation of the referential action in the schema.
+    </span><span class="kw">pub fn </span>as_str(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            ReferentialAction::Cascade =&gt; <span class="string">&quot;Cascade&quot;</span>,
+            ReferentialAction::Restrict =&gt; <span class="string">&quot;Restrict&quot;</span>,
+            ReferentialAction::NoAction =&gt; <span class="string">&quot;NoAction&quot;</span>,
+            ReferentialAction::SetNull =&gt; <span class="string">&quot;SetNull&quot;</span>,
+            ReferentialAction::SetDefault =&gt; <span class="string">&quot;SetDefault&quot;</span>,
         }
     }
 
-    <span class="doccomment">/// The documentation string to display in autocompletion / editor hints.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ReferentialAction::Cascade</span> =&gt; <span class="string">&quot;Delete the child records when the parent record is deleted.&quot;</span>,
-            <span class="ident">ReferentialAction::Restrict</span> =&gt; <span class="string">&quot;Prevent deleting a parent record as long as it is referenced.&quot;</span>,
-            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="string">&quot;Prevent deleting a parent record as long as it is referenced.&quot;</span>,
-            <span class="ident">ReferentialAction::SetNull</span> =&gt; <span class="string">&quot;Set the referencing fields to NULL when the referenced record is deleted.&quot;</span>,
-            <span class="ident">ReferentialAction::SetDefault</span> =&gt; {
-                <span class="string">&quot;Set the referencing field&#39;s value to the default when the referenced record is deleted.&quot;</span>
-            }
+    <span class="doccomment">/// The documentation string to display in autocompletion / editor hints.
+    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            ReferentialAction::Cascade =&gt; <span class="string">&quot;Delete the child records when the parent record is deleted.&quot;</span>,
+            ReferentialAction::Restrict =&gt; <span class="string">&quot;Prevent deleting a parent record as long as it is referenced.&quot;</span>,
+            ReferentialAction::NoAction =&gt; <span class="string">&quot;Prevent deleting a parent record as long as it is referenced.&quot;</span>,
+            ReferentialAction::SetNull =&gt; <span class="string">&quot;Set the referencing fields to NULL when the referenced record is deleted.&quot;</span>,
+            ReferentialAction::SetDefault =&gt; {
+                <span class="string">&quot;Set the referencing field&#39;s value to the default when the referenced record is deleted.&quot;
+            </span>}
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_from_expression</span>(
-        <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>,
-        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident"><span class="kw">crate</span>::coerce::constant</span>(<span class="ident">expr</span>, <span class="ident">diagnostics</span>)<span class="question-mark">?</span> {
-            <span class="string">&quot;Cascade&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ReferentialAction::Cascade</span>),
-            <span class="string">&quot;Restrict&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ReferentialAction::Restrict</span>),
-            <span class="string">&quot;NoAction&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ReferentialAction::NoAction</span>),
-            <span class="string">&quot;SetNull&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ReferentialAction::SetNull</span>),
-            <span class="string">&quot;SetDefault&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ReferentialAction::SetDefault</span>),
-            <span class="ident">s</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Invalid referential action: `{}`&quot;</span>, <span class="ident">s</span>);
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">message</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_from_expression(
+        expr: <span class="kw-2">&amp;</span>ast::Expression,
+        diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;ReferentialAction&gt; {
+        <span class="kw">match </span><span class="kw">crate</span>::coerce::constant(expr, diagnostics)<span class="question-mark">? </span>{
+            <span class="string">&quot;Cascade&quot; </span>=&gt; <span class="prelude-val">Some</span>(ReferentialAction::Cascade),
+            <span class="string">&quot;Restrict&quot; </span>=&gt; <span class="prelude-val">Some</span>(ReferentialAction::Restrict),
+            <span class="string">&quot;NoAction&quot; </span>=&gt; <span class="prelude-val">Some</span>(ReferentialAction::NoAction),
+            <span class="string">&quot;SetNull&quot; </span>=&gt; <span class="prelude-val">Some</span>(ReferentialAction::SetNull),
+            <span class="string">&quot;SetDefault&quot; </span>=&gt; <span class="prelude-val">Some</span>(ReferentialAction::SetDefault),
+            s =&gt; {
+                <span class="kw">let </span>message = <span class="macro">format!</span>(<span class="string">&quot;Invalid referential action: `{}`&quot;</span>, s);
+                diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+                    <span class="kw-2">&amp;</span>message,
                     <span class="string">&quot;@relation&quot;</span>,
-                    <span class="ident">expr</span>.<span class="ident">span</span>(),
+                    expr.span(),
                 ));
-                <span class="prelude-val">None</span>
-            }
+                <span class="prelude-val">None
+            </span>}
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

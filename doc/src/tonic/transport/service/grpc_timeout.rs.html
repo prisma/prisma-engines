@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/service/grpc_timeout.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>grpc_timeout.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/service/grpc_timeout.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>grpc_timeout.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -288,293 +288,293 @@
 <span id="286">286</span>
 <span id="287">287</span>
 <span id="288">288</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metadata::GRPC_TIMEOUT_HEADER</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">OptionPin</span>, <span class="ident">OptionPinProj</span>};
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">HeaderMap</span>, <span class="ident">HeaderValue</span>, <span class="ident">Request</span>};
-<span class="kw">use</span> <span class="ident">pin_project::pin_project</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt</span>,
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
-    <span class="ident">time::Duration</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::metadata::GRPC_TIMEOUT_HEADER;
+<span class="kw">use </span><span class="kw">crate</span>::util::{OptionPin, OptionPinProj};
+<span class="kw">use </span>http::{HeaderMap, HeaderValue, Request};
+<span class="kw">use </span>pin_project::pin_project;
+<span class="kw">use </span>std::{
+    fmt,
+    future::Future,
+    pin::Pin,
+    task::{Context, Poll},
+    time::Duration,
 };
-<span class="kw">use</span> <span class="ident">tokio::time::Sleep</span>;
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+<span class="kw">use </span>tokio::time::Sleep;
+<span class="kw">use </span>tower_service::Service;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">GrpcTimeout</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">S</span>,
-    <span class="ident">server_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>GrpcTimeout&lt;S&gt; {
+    inner: S,
+    server_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GrpcTimeout</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">S</span>, <span class="ident">server_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>,
-            <span class="ident">server_timeout</span>,
+<span class="kw">impl</span>&lt;S&gt; GrpcTimeout&lt;S&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(inner: S, server_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner,
+            server_timeout,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">ReqBody</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GrpcTimeout</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, ReqBody&gt; Service&lt;Request&lt;ReqBody&gt;&gt; <span class="kw">for </span>GrpcTimeout&lt;S&gt;
+<span class="kw">where
+    </span>S: Service&lt;Request&lt;ReqBody&gt;&gt;,
+    S::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">S::Response</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ResponseFuture</span><span class="op">&lt;</span><span class="ident">S::Future</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Response = S::Response;
+    <span class="kw">type </span>Error = <span class="kw">crate</span>::Error;
+    <span class="kw">type </span>Future = ResponseFuture&lt;S::Future&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.inner.poll_ready(cx).map_err(Into::into)
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="kw">let</span> <span class="ident">client_timeout</span> <span class="op">=</span> <span class="ident">try_parse_grpc_timeout</span>(<span class="ident">req</span>.<span class="ident">headers</span>()).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-            <span class="macro">tracing::trace!</span>(<span class="string">&quot;Error parsing `grpc-timeout` header {:?}&quot;</span>, <span class="ident">e</span>);
-            <span class="prelude-val">None</span>
-        });
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, req: Request&lt;ReqBody&gt;) -&gt; <span class="self">Self</span>::Future {
+        <span class="kw">let </span>client_timeout = try_parse_grpc_timeout(req.headers()).unwrap_or_else(|e| {
+            <span class="macro">tracing::trace!</span>(<span class="string">&quot;Error parsing `grpc-timeout` header {:?}&quot;</span>, e);
+            <span class="prelude-val">None
+        </span>});
 
-        <span class="comment">// Use the shorter of the two durations, if either are set</span>
-        <span class="kw">let</span> <span class="ident">timeout_duration</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">client_timeout</span>, <span class="self">self</span>.<span class="ident">server_timeout</span>) {
+        <span class="comment">// Use the shorter of the two durations, if either are set
+        </span><span class="kw">let </span>timeout_duration = <span class="kw">match </span>(client_timeout, <span class="self">self</span>.server_timeout) {
             (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
-            (<span class="prelude-val">Some</span>(<span class="ident">dur</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">dur</span>),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">dur</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">dur</span>),
-            (<span class="prelude-val">Some</span>(<span class="ident">header</span>), <span class="prelude-val">Some</span>(<span class="ident">server</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">shorter_duration</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">header</span>, <span class="ident">server</span>);
-                <span class="prelude-val">Some</span>(<span class="ident">shorter_duration</span>)
+            (<span class="prelude-val">Some</span>(dur), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(dur),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(dur)) =&gt; <span class="prelude-val">Some</span>(dur),
+            (<span class="prelude-val">Some</span>(header), <span class="prelude-val">Some</span>(server)) =&gt; {
+                <span class="kw">let </span>shorter_duration = std::cmp::min(header, server);
+                <span class="prelude-val">Some</span>(shorter_duration)
             }
         };
 
-        <span class="ident">ResponseFuture</span> {
-            <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">call</span>(<span class="ident">req</span>),
-            <span class="ident">sleep</span>: <span class="ident">timeout_duration</span>
-                .<span class="ident">map</span>(<span class="ident">tokio::time::sleep</span>)
-                .<span class="ident">map</span>(<span class="ident">OptionPin::Some</span>)
-                .<span class="ident">unwrap_or</span>(<span class="ident">OptionPin::None</span>),
+        ResponseFuture {
+            inner: <span class="self">self</span>.inner.call(req),
+            sleep: timeout_duration
+                .map(tokio::time::sleep)
+                .map(OptionPin::Some)
+                .unwrap_or(OptionPin::None),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">pin_project</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ResponseFuture</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">pin</span>]</span>
-    <span class="ident">inner</span>: <span class="ident">F</span>,
-    <span class="attribute">#[<span class="ident">pin</span>]</span>
-    <span class="ident">sleep</span>: <span class="ident">OptionPin</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span>,
+<span class="attribute">#[pin_project]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ResponseFuture&lt;F&gt; {
+    <span class="attribute">#[pin]
+    </span>inner: F,
+    <span class="attribute">#[pin]
+    </span>sleep: OptionPin&lt;Sleep&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Res</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">ResponseFuture</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Res</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;F, Res, E&gt; Future <span class="kw">for </span>ResponseFuture&lt;F&gt;
+<span class="kw">where
+    </span>F: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Res, E&gt;&gt;,
+    E: Into&lt;<span class="kw">crate</span>::Error&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Res</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;Res, <span class="kw">crate</span>::Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="ident">result</span>) <span class="op">=</span> <span class="ident">this</span>.<span class="ident">inner</span>.<span class="ident">poll</span>(<span class="ident">cx</span>) {
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="ident">result</span>.<span class="ident">map_err</span>(<span class="ident">Into::into</span>));
+        <span class="kw">if let </span>Poll::Ready(result) = this.inner.poll(cx) {
+            <span class="kw">return </span>Poll::Ready(result.map_err(Into::into));
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OptionPinProj::Some</span>(<span class="ident">sleep</span>) <span class="op">=</span> <span class="ident">this</span>.<span class="ident">sleep</span>.<span class="ident">project</span>() {
-            <span class="macro">futures_util::ready!</span>(<span class="ident">sleep</span>.<span class="ident">poll</span>(<span class="ident">cx</span>));
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">TimeoutExpired</span>(()).<span class="ident">into</span>()));
+        <span class="kw">if let </span>OptionPinProj::Some(sleep) = this.sleep.project() {
+            <span class="macro">futures_util::ready!</span>(sleep.poll(cx));
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(TimeoutExpired(()).into()));
         }
 
-        <span class="ident">Poll::Pending</span>
+        Poll::Pending
     }
 }
 
-<span class="kw">const</span> <span class="ident">SECONDS_IN_HOUR</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>;
-<span class="kw">const</span> <span class="ident">SECONDS_IN_MINUTE</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">60</span>;
+<span class="kw">const </span>SECONDS_IN_HOUR: u64 = <span class="number">60 </span>* <span class="number">60</span>;
+<span class="kw">const </span>SECONDS_IN_MINUTE: u64 = <span class="number">60</span>;
 
-<span class="doccomment">/// Tries to parse the `grpc-timeout` header if it is present. If we fail to parse, returns</span>
-<span class="doccomment">/// the value we attempted to parse.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Follows the [gRPC over HTTP2 spec](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md).</span>
-<span class="kw">fn</span> <span class="ident">try_parse_grpc_timeout</span>(
-    <span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderMap</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">headers</span>.<span class="ident">get</span>(<span class="ident">GRPC_TIMEOUT_HEADER</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
-            <span class="kw">let</span> (<span class="ident">timeout_value</span>, <span class="ident">timeout_unit</span>) <span class="op">=</span> <span class="ident">val</span>
-                .<span class="ident">to_str</span>()
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">val</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">is_empty</span>() { <span class="prelude-val">Err</span>(<span class="ident">val</span>) } <span class="kw">else</span> { <span class="prelude-val">Ok</span>(<span class="ident">s</span>) })<span class="question-mark">?</span>
-                <span class="comment">// `HeaderValue::to_str` only returns `Ok` if the header contains ASCII so this</span>
-                <span class="comment">// `split_at` will never panic from trying to split in the middle of a character.</span>
-                <span class="comment">// See https://docs.rs/http/0.2.4/http/header/struct.HeaderValue.html#method.to_str</span>
-                <span class="comment">//</span>
-                <span class="comment">// `len - 1` also wont panic since we just checked `s.is_empty`.</span>
-                .<span class="ident">split_at</span>(<span class="ident">val</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>);
+<span class="doccomment">/// Tries to parse the `grpc-timeout` header if it is present. If we fail to parse, returns
+/// the value we attempted to parse.
+///
+/// Follows the [gRPC over HTTP2 spec](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md).
+</span><span class="kw">fn </span>try_parse_grpc_timeout(
+    headers: <span class="kw-2">&amp;</span>HeaderMap&lt;HeaderValue&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Duration&gt;, <span class="kw-2">&amp;</span>HeaderValue&gt; {
+    <span class="kw">match </span>headers.get(GRPC_TIMEOUT_HEADER) {
+        <span class="prelude-val">Some</span>(val) =&gt; {
+            <span class="kw">let </span>(timeout_value, timeout_unit) = val
+                .to_str()
+                .map_err(|<span class="kw">_</span>| val)
+                .and_then(|s| <span class="kw">if </span>s.is_empty() { <span class="prelude-val">Err</span>(val) } <span class="kw">else </span>{ <span class="prelude-val">Ok</span>(s) })<span class="question-mark">?
+                </span><span class="comment">// `HeaderValue::to_str` only returns `Ok` if the header contains ASCII so this
+                // `split_at` will never panic from trying to split in the middle of a character.
+                // See https://docs.rs/http/0.2.4/http/header/struct.HeaderValue.html#method.to_str
+                //
+                // `len - 1` also wont panic since we just checked `s.is_empty`.
+                </span>.split_at(val.len() - <span class="number">1</span>);
 
-            <span class="comment">// gRPC spec specifies `TimeoutValue` will be at most 8 digits</span>
-            <span class="comment">// Caping this at 8 digits also prevents integer overflow from ever occurring</span>
-            <span class="kw">if</span> <span class="ident">timeout_value</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">8</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">val</span>);
+            <span class="comment">// gRPC spec specifies `TimeoutValue` will be at most 8 digits
+            // Caping this at 8 digits also prevents integer overflow from ever occurring
+            </span><span class="kw">if </span>timeout_value.len() &gt; <span class="number">8 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(val);
             }
 
-            <span class="kw">let</span> <span class="ident">timeout_value</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">timeout_value</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">val</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>timeout_value: u64 = timeout_value.parse().map_err(|<span class="kw">_</span>| val)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">timeout_unit</span> {
-                <span class="comment">// Hours</span>
-                <span class="string">&quot;H&quot;</span> =&gt; <span class="ident">Duration::from_secs</span>(<span class="ident">timeout_value</span> <span class="op">*</span> <span class="ident">SECONDS_IN_HOUR</span>),
-                <span class="comment">// Minutes</span>
-                <span class="string">&quot;M&quot;</span> =&gt; <span class="ident">Duration::from_secs</span>(<span class="ident">timeout_value</span> <span class="op">*</span> <span class="ident">SECONDS_IN_MINUTE</span>),
-                <span class="comment">// Seconds</span>
-                <span class="string">&quot;S&quot;</span> =&gt; <span class="ident">Duration::from_secs</span>(<span class="ident">timeout_value</span>),
-                <span class="comment">// Milliseconds</span>
-                <span class="string">&quot;m&quot;</span> =&gt; <span class="ident">Duration::from_millis</span>(<span class="ident">timeout_value</span>),
-                <span class="comment">// Microseconds</span>
-                <span class="string">&quot;u&quot;</span> =&gt; <span class="ident">Duration::from_micros</span>(<span class="ident">timeout_value</span>),
-                <span class="comment">// Nanoseconds</span>
-                <span class="string">&quot;n&quot;</span> =&gt; <span class="ident">Duration::from_nanos</span>(<span class="ident">timeout_value</span>),
-                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">val</span>),
+            <span class="kw">let </span>duration = <span class="kw">match </span>timeout_unit {
+                <span class="comment">// Hours
+                </span><span class="string">&quot;H&quot; </span>=&gt; Duration::from_secs(timeout_value * SECONDS_IN_HOUR),
+                <span class="comment">// Minutes
+                </span><span class="string">&quot;M&quot; </span>=&gt; Duration::from_secs(timeout_value * SECONDS_IN_MINUTE),
+                <span class="comment">// Seconds
+                </span><span class="string">&quot;S&quot; </span>=&gt; Duration::from_secs(timeout_value),
+                <span class="comment">// Milliseconds
+                </span><span class="string">&quot;m&quot; </span>=&gt; Duration::from_millis(timeout_value),
+                <span class="comment">// Microseconds
+                </span><span class="string">&quot;u&quot; </span>=&gt; Duration::from_micros(timeout_value),
+                <span class="comment">// Nanoseconds
+                </span><span class="string">&quot;n&quot; </span>=&gt; Duration::from_nanos(timeout_value),
+                <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(val),
             };
 
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">duration</span>))
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(duration))
         }
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
     }
 }
 
-<span class="doccomment">/// Error returned if a request didn&#39;t complete within the configured timeout.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Timeouts can be configured either with [`Endpoint::timeout`], [`Server::timeout`], or by</span>
-<span class="doccomment">/// setting the [`grpc-timeout` metadata value][spec].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Endpoint::timeout`]: crate::transport::server::Server::timeout</span>
-<span class="doccomment">/// [`Server::timeout`]: crate::transport::channel::Endpoint::timeout</span>
-<span class="doccomment">/// [spec]: https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TimeoutExpired</span>(());
+<span class="doccomment">/// Error returned if a request didn&#39;t complete within the configured timeout.
+///
+/// Timeouts can be configured either with [`Endpoint::timeout`], [`Server::timeout`], or by
+/// setting the [`grpc-timeout` metadata value][spec].
+///
+/// [`Endpoint::timeout`]: crate::transport::server::Server::timeout
+/// [`Server::timeout`]: crate::transport::channel::Endpoint::timeout
+/// [spec]: https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>TimeoutExpired(());
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TimeoutExpired</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Timeout expired&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>TimeoutExpired {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;Timeout expired&quot;</span>)
     }
 }
 
-<span class="comment">// std::error::Error only requires a type to impl Debug and Display</span>
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">TimeoutExpired</span> {}
+<span class="comment">// std::error::Error only requires a type to impl Debug and Display
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>TimeoutExpired {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">quickcheck</span>::{<span class="ident">Arbitrary</span>, <span class="ident">Gen</span>};
-    <span class="kw">use</span> <span class="ident">quickcheck_macros::quickcheck</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>quickcheck::{Arbitrary, Gen};
+    <span class="kw">use </span>quickcheck_macros::quickcheck;
 
-    <span class="comment">// Helper function to reduce the boiler plate of our test cases</span>
-    <span class="kw">fn</span> <span class="ident">setup_map_try_parse</span>(<span class="ident">val</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>, <span class="ident">HeaderValue</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hm</span> <span class="op">=</span> <span class="ident">HeaderMap::new</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">val</span> {
-            <span class="kw">let</span> <span class="ident">hv</span> <span class="op">=</span> <span class="ident">HeaderValue::from_str</span>(<span class="ident">v</span>).<span class="ident">unwrap</span>();
-            <span class="ident">hm</span>.<span class="ident">insert</span>(<span class="ident">GRPC_TIMEOUT_HEADER</span>, <span class="ident">hv</span>);
+    <span class="comment">// Helper function to reduce the boiler plate of our test cases
+    </span><span class="kw">fn </span>setup_map_try_parse(val: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Duration&gt;, HeaderValue&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>hm = HeaderMap::new();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = val {
+            <span class="kw">let </span>hv = HeaderValue::from_str(v).unwrap();
+            hm.insert(GRPC_TIMEOUT_HEADER, hv);
         };
 
-        <span class="ident">try_parse_grpc_timeout</span>(<span class="kw-2">&amp;</span><span class="ident">hm</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">clone</span>())
+        try_parse_grpc_timeout(<span class="kw-2">&amp;</span>hm).map_err(|e| e.clone())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_hours</span>() {
-        <span class="kw">let</span> <span class="ident">parsed_duration</span> <span class="op">=</span> <span class="ident">setup_map_try_parse</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;3H&quot;</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">Duration::from_secs</span>(<span class="number">3</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>), <span class="ident">parsed_duration</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_hours() {
+        <span class="kw">let </span>parsed_duration = setup_map_try_parse(<span class="prelude-val">Some</span>(<span class="string">&quot;3H&quot;</span>)).unwrap().unwrap();
+        <span class="macro">assert_eq!</span>(Duration::from_secs(<span class="number">3 </span>* <span class="number">60 </span>* <span class="number">60</span>), parsed_duration);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_minutes</span>() {
-        <span class="kw">let</span> <span class="ident">parsed_duration</span> <span class="op">=</span> <span class="ident">setup_map_try_parse</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;1M&quot;</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">Duration::from_secs</span>(<span class="number">60</span>), <span class="ident">parsed_duration</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_minutes() {
+        <span class="kw">let </span>parsed_duration = setup_map_try_parse(<span class="prelude-val">Some</span>(<span class="string">&quot;1M&quot;</span>)).unwrap().unwrap();
+        <span class="macro">assert_eq!</span>(Duration::from_secs(<span class="number">60</span>), parsed_duration);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_seconds</span>() {
-        <span class="kw">let</span> <span class="ident">parsed_duration</span> <span class="op">=</span> <span class="ident">setup_map_try_parse</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;42S&quot;</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">Duration::from_secs</span>(<span class="number">42</span>), <span class="ident">parsed_duration</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_seconds() {
+        <span class="kw">let </span>parsed_duration = setup_map_try_parse(<span class="prelude-val">Some</span>(<span class="string">&quot;42S&quot;</span>)).unwrap().unwrap();
+        <span class="macro">assert_eq!</span>(Duration::from_secs(<span class="number">42</span>), parsed_duration);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_milliseconds</span>() {
-        <span class="kw">let</span> <span class="ident">parsed_duration</span> <span class="op">=</span> <span class="ident">setup_map_try_parse</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;13m&quot;</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">Duration::from_millis</span>(<span class="number">13</span>), <span class="ident">parsed_duration</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_milliseconds() {
+        <span class="kw">let </span>parsed_duration = setup_map_try_parse(<span class="prelude-val">Some</span>(<span class="string">&quot;13m&quot;</span>)).unwrap().unwrap();
+        <span class="macro">assert_eq!</span>(Duration::from_millis(<span class="number">13</span>), parsed_duration);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_microseconds</span>() {
-        <span class="kw">let</span> <span class="ident">parsed_duration</span> <span class="op">=</span> <span class="ident">setup_map_try_parse</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;2u&quot;</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">Duration::from_micros</span>(<span class="number">2</span>), <span class="ident">parsed_duration</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_microseconds() {
+        <span class="kw">let </span>parsed_duration = setup_map_try_parse(<span class="prelude-val">Some</span>(<span class="string">&quot;2u&quot;</span>)).unwrap().unwrap();
+        <span class="macro">assert_eq!</span>(Duration::from_micros(<span class="number">2</span>), parsed_duration);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_nanoseconds</span>() {
-        <span class="kw">let</span> <span class="ident">parsed_duration</span> <span class="op">=</span> <span class="ident">setup_map_try_parse</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;82n&quot;</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">Duration::from_nanos</span>(<span class="number">82</span>), <span class="ident">parsed_duration</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_nanoseconds() {
+        <span class="kw">let </span>parsed_duration = setup_map_try_parse(<span class="prelude-val">Some</span>(<span class="string">&quot;82n&quot;</span>)).unwrap().unwrap();
+        <span class="macro">assert_eq!</span>(Duration::from_nanos(<span class="number">82</span>), parsed_duration);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_header_not_present</span>() {
-        <span class="kw">let</span> <span class="ident">parsed_duration</span> <span class="op">=</span> <span class="ident">setup_map_try_parse</span>(<span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">parsed_duration</span>.<span class="ident">is_none</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_header_not_present() {
+        <span class="kw">let </span>parsed_duration = setup_map_try_parse(<span class="prelude-val">None</span>).unwrap();
+        <span class="macro">assert!</span>(parsed_duration.is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;82f&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_unit</span>() {
-        <span class="comment">// &quot;f&quot; is not a valid TimeoutUnit</span>
-        <span class="ident">setup_map_try_parse</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;82f&quot;</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;82f&quot;</span>)]
+    </span><span class="kw">fn </span>test_invalid_unit() {
+        <span class="comment">// &quot;f&quot; is not a valid TimeoutUnit
+        </span>setup_map_try_parse(<span class="prelude-val">Some</span>(<span class="string">&quot;82f&quot;</span>)).unwrap().unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;123456789H&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_too_many_digits</span>() {
-        <span class="comment">// gRPC spec states TimeoutValue will be at most 8 digits</span>
-        <span class="ident">setup_map_try_parse</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;123456789H&quot;</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;123456789H&quot;</span>)]
+    </span><span class="kw">fn </span>test_too_many_digits() {
+        <span class="comment">// gRPC spec states TimeoutValue will be at most 8 digits
+        </span>setup_map_try_parse(<span class="prelude-val">Some</span>(<span class="string">&quot;123456789H&quot;</span>)).unwrap().unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;oneH&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_digits</span>() {
-        <span class="comment">// gRPC spec states TimeoutValue will be at most 8 digits</span>
-        <span class="ident">setup_map_try_parse</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;oneH&quot;</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;oneH&quot;</span>)]
+    </span><span class="kw">fn </span>test_invalid_digits() {
+        <span class="comment">// gRPC spec states TimeoutValue will be at most 8 digits
+        </span>setup_map_try_parse(<span class="prelude-val">Some</span>(<span class="string">&quot;oneH&quot;</span>)).unwrap().unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">quickcheck</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fuzz</span>(<span class="ident">header_value</span>: <span class="ident">HeaderValueGen</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">header_value</span> <span class="op">=</span> <span class="ident">header_value</span>.<span class="number">0</span>;
+    <span class="attribute">#[quickcheck]
+    </span><span class="kw">fn </span>fuzz(header_value: HeaderValueGen) -&gt; bool {
+        <span class="kw">let </span>header_value = header_value.<span class="number">0</span>;
 
-        <span class="comment">// this just shouldn&#39;t panic</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">setup_map_try_parse</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">header_value</span>));
+        <span class="comment">// this just shouldn&#39;t panic
+        </span><span class="kw">let _ </span>= setup_map_try_parse(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>header_value));
 
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 
-    <span class="doccomment">/// Newtype to implement `Arbitrary` for generating `String`s that are valid `HeaderValue`s.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">HeaderValueGen</span>(<span class="ident">String</span>);
+    <span class="doccomment">/// Newtype to implement `Arbitrary` for generating `String`s that are valid `HeaderValue`s.
+    </span><span class="attribute">#[derive(Clone, Debug)]
+    </span><span class="kw">struct </span>HeaderValueGen(String);
 
-    <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">HeaderValueGen</span> {
-        <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Gen</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">choose</span>(<span class="kw-2">&amp;</span>(<span class="number">1</span>..<span class="number">70</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()).<span class="ident">copied</span>().<span class="ident">unwrap</span>();
-            <span class="self">Self</span>(<span class="ident">gen_string</span>(<span class="ident">g</span>, <span class="number">0</span>, <span class="ident">max</span>))
+    <span class="kw">impl </span>Arbitrary <span class="kw">for </span>HeaderValueGen {
+        <span class="kw">fn </span>arbitrary(g: <span class="kw-2">&amp;mut </span>Gen) -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span>max = g.choose(<span class="kw-2">&amp;</span>(<span class="number">1</span>..<span class="number">70</span>).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()).copied().unwrap();
+            <span class="self">Self</span>(gen_string(g, <span class="number">0</span>, max))
         }
     }
 
-    <span class="comment">// copied from https://github.com/hyperium/http/blob/master/tests/header_map_fuzz.rs</span>
-    <span class="kw">fn</span> <span class="ident">gen_string</span>(<span class="ident">g</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Gen</span>, <span class="ident">min</span>: <span class="ident">usize</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="ident">min</span>..<span class="ident">max</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="comment">// Chars to pick from</span>
-                <span class="ident">g</span>.<span class="ident">choose</span>(<span class="string">b&quot;ABCDEFGHIJKLMNOPQRSTUVabcdefghilpqrstuvwxyz----&quot;</span>)
-                    .<span class="ident">copied</span>()
-                    .<span class="ident">unwrap</span>()
+    <span class="comment">// copied from https://github.com/hyperium/http/blob/master/tests/header_map_fuzz.rs
+    </span><span class="kw">fn </span>gen_string(g: <span class="kw-2">&amp;mut </span>Gen, min: usize, max: usize) -&gt; String {
+        <span class="kw">let </span>bytes: Vec&lt;<span class="kw">_</span>&gt; = (min..max)
+            .map(|<span class="kw">_</span>| {
+                <span class="comment">// Chars to pick from
+                </span>g.choose(<span class="string">b&quot;ABCDEFGHIJKLMNOPQRSTUVabcdefghilpqrstuvwxyz----&quot;</span>)
+                    .copied()
+                    .unwrap()
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="ident">String::from_utf8</span>(<span class="ident">bytes</span>).<span class="ident">unwrap</span>()
+        String::from_utf8(bytes).unwrap()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

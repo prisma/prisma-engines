@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-otlp-0.10.0/src/span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../opentelemetry_otlp/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-otlp-0.10.0/src/span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../opentelemetry_otlp/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -524,531 +524,531 @@
 <span id="524">524</span>
 <span id="525">525</span>
 <span id="526">526</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # OTLP - Span Exporter</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Defines a [SpanExporter] to send trace data via the OpenTelemetry Protocol (OTLP)</span>
+</pre><pre class="rust"><code><span class="doccomment">//! # OTLP - Span Exporter
+//!
+//! Defines a [SpanExporter] to send trace data via the OpenTelemetry Protocol (OTLP)
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::collector::trace::v1</span>::{
-    <span class="ident">trace_service_client::TraceServiceClient</span> <span class="kw">as</span> <span class="ident">TonicTraceServiceClient</span>,
-    <span class="ident">ExportTraceServiceRequest</span> <span class="kw">as</span> <span class="ident">TonicRequest</span>,
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::proto::collector::trace::v1::{
+    trace_service_client::TraceServiceClient <span class="kw">as </span>TonicTraceServiceClient,
+    ExportTraceServiceRequest <span class="kw">as </span>TonicRequest,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::prost::collector::trace::v1::ExportTraceServiceRequest</span> <span class="kw">as</span> <span class="ident">ProstRequest</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::proto::prost::collector::trace::v1::ExportTraceServiceRequest <span class="kw">as </span>ProstRequest;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tonic</span>::{
-    <span class="ident">metadata</span>::{<span class="ident">KeyAndValueRef</span>, <span class="ident">MetadataMap</span>},
-    <span class="ident">transport::Channel</span> <span class="kw">as</span> <span class="ident">TonicChannel</span>,
-    <span class="ident">Request</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+</span><span class="kw">use </span>tonic::{
+    metadata::{KeyAndValueRef, MetadataMap},
+    transport::Channel <span class="kw">as </span>TonicChannel,
+    Request,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::grpcio::trace_service::ExportTraceServiceRequest</span> <span class="kw">as</span> <span class="ident">GrpcRequest</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::proto::grpcio::trace_service::ExportTraceServiceRequest <span class="kw">as </span>GrpcRequest;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::grpcio::trace_service_grpc::TraceServiceClient</span> <span class="kw">as</span> <span class="ident">GrpcioTraceServiceClient</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::proto::grpcio::trace_service_grpc::TraceServiceClient <span class="kw">as </span>GrpcioTraceServiceClient;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">grpcio</span>::{
-    <span class="ident">CallOption</span>, <span class="ident">Channel</span> <span class="kw">as</span> <span class="ident">GrpcChannel</span>, <span class="ident">ChannelBuilder</span>, <span class="ident">ChannelCredentialsBuilder</span>, <span class="ident">Environment</span>,
-    <span class="ident">MetadataBuilder</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+</span><span class="kw">use </span>grpcio::{
+    CallOption, Channel <span class="kw">as </span>GrpcChannel, ChannelBuilder, ChannelCredentialsBuilder, Environment,
+    MetadataBuilder,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">protobuf::RepeatedField</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+</span><span class="kw">use </span>protobuf::RepeatedField;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">prost::Message</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+</span><span class="kw">use </span>prost::Message;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+</span><span class="kw">use </span>std::convert::TryFrom;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;grpc-sys&quot;</span>, feature = <span class="string">&quot;http-proto&quot;</span>))]
+</span><span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::fmt::Debug;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter::grpcio::GrpcioConfig</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter::http::HttpConfig</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter::tonic::TonicConfig</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::OtlpPipeline</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::exporter::grpcio::GrpcioConfig;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::exporter::http::HttpConfig;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::exporter::tonic::TonicConfig;
+<span class="kw">use </span><span class="kw">crate</span>::OtlpPipeline;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter::grpcio::GrpcioExporterBuilder</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter::http::HttpExporterBuilder</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter::tonic::TonicExporterBuilder</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter::ExportConfig</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::exporter::grpcio::GrpcioExporterBuilder;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::exporter::http::HttpExporterBuilder;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::exporter::tonic::TonicExporterBuilder;
+<span class="kw">use </span><span class="kw">crate</span>::exporter::ExportConfig;
 
-<span class="kw">use</span> <span class="ident">opentelemetry::global</span>;
-<span class="kw">use</span> <span class="ident">opentelemetry::sdk::export::trace</span>::{<span class="ident">ExportResult</span>, <span class="ident">SpanData</span>};
-<span class="kw">use</span> <span class="ident">opentelemetry::sdk</span>::{<span class="self">self</span>, <span class="ident">trace::TraceRuntime</span>};
-<span class="kw">use</span> <span class="ident">opentelemetry::trace</span>::{<span class="ident">TraceError</span>, <span class="ident">TracerProvider</span>};
+<span class="kw">use </span>opentelemetry::global;
+<span class="kw">use </span>opentelemetry::sdk::export::trace::{ExportResult, SpanData};
+<span class="kw">use </span>opentelemetry::sdk::{<span class="self">self</span>, trace::TraceRuntime};
+<span class="kw">use </span>opentelemetry::trace::{TraceError, TracerProvider};
 
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
+<span class="kw">use </span>async_trait::async_trait;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+</span><span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use </span>std::time::Duration;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">http</span>::{
-    <span class="ident">header</span>::{<span class="ident">HeaderName</span>, <span class="ident">HeaderValue</span>, <span class="ident">CONTENT_TYPE</span>},
-    <span class="ident">Method</span>, <span class="ident">Uri</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+</span><span class="kw">use </span>http::{
+    header::{HeaderName, HeaderValue, CONTENT_TYPE},
+    Method, Uri,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">opentelemetry_http::HttpClient</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+</span><span class="kw">use </span>opentelemetry_http::HttpClient;
 
-<span class="kw">impl</span> <span class="ident">OtlpPipeline</span> {
-    <span class="doccomment">/// Create a OTLP tracing pipeline.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tracing</span>(<span class="self">self</span>) -&gt; <span class="ident">OtlpTracePipeline</span> {
-        <span class="ident">OtlpTracePipeline::default</span>()
+<span class="kw">impl </span>OtlpPipeline {
+    <span class="doccomment">/// Create a OTLP tracing pipeline.
+    </span><span class="kw">pub fn </span>tracing(<span class="self">self</span>) -&gt; OtlpTracePipeline {
+        OtlpTracePipeline::default()
     }
 }
 
-<span class="doccomment">/// Recommended configuration for an OTLP exporter pipeline.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// let tracing_pipeline = opentelemetry_otlp::new_pipeline().tracing();</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OtlpTracePipeline</span> {
-    <span class="ident">exporter_builder</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SpanExporterBuilder</span><span class="op">&gt;</span>,
-    <span class="ident">trace_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">sdk::trace::Config</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Recommended configuration for an OTLP exporter pipeline.
+///
+/// ## Examples
+///
+/// ```no_run
+/// let tracing_pipeline = opentelemetry_otlp::new_pipeline().tracing();
+/// ```
+</span><span class="attribute">#[derive(Default, Debug)]
+</span><span class="kw">pub struct </span>OtlpTracePipeline {
+    exporter_builder: <span class="prelude-ty">Option</span>&lt;SpanExporterBuilder&gt;,
+    trace_config: <span class="prelude-ty">Option</span>&lt;sdk::trace::Config&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">OtlpTracePipeline</span> {
-    <span class="doccomment">/// Set the trace provider configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_trace_config</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">trace_config</span>: <span class="ident">sdk::trace::Config</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">trace_config</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">trace_config</span>);
-        <span class="self">self</span>
-    }
+<span class="kw">impl </span>OtlpTracePipeline {
+    <span class="doccomment">/// Set the trace provider configuration.
+    </span><span class="kw">pub fn </span>with_trace_config(<span class="kw-2">mut </span><span class="self">self</span>, trace_config: sdk::trace::Config) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.trace_config = <span class="prelude-val">Some</span>(trace_config);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the OTLP span exporter builder.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the pipeline will not build the exporter until [`install_batch`] or [`install_simple`]</span>
-    <span class="doccomment">/// is called.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`install_batch`]: OtlpTracePipeline::install_batch</span>
-    <span class="doccomment">/// [`install_simple`]: OtlpTracePipeline::install_simple</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_exporter</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SpanExporterBuilder</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pipeline</span>: <span class="ident">B</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">exporter_builder</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">pipeline</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the OTLP span exporter builder.
+    ///
+    /// Note that the pipeline will not build the exporter until [`install_batch`] or [`install_simple`]
+    /// is called.
+    ///
+    /// [`install_batch`]: OtlpTracePipeline::install_batch
+    /// [`install_simple`]: OtlpTracePipeline::install_simple
+    </span><span class="kw">pub fn </span>with_exporter&lt;B: Into&lt;SpanExporterBuilder&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, pipeline: B) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exporter_builder = <span class="prelude-val">Some</span>(pipeline.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Install the configured span exporter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`Tracer`] with the name `opentelemetry-otlp` and current crate version.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Tracer`]: opentelemetry::trace::Tracer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install_simple</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sdk::trace::Tracer</span>, <span class="ident">TraceError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">build_simple_with_exporter</span>(
-            <span class="self">self</span>.<span class="ident">exporter_builder</span>
-                .<span class="ident">ok_or</span>(<span class="ident"><span class="kw">crate</span>::Error::NoExporterBuilder</span>)<span class="question-mark">?</span>
-                .<span class="ident">build_span_exporter</span>()<span class="question-mark">?</span>,
-            <span class="self">self</span>.<span class="ident">trace_config</span>,
+    <span class="doccomment">/// Install the configured span exporter.
+    ///
+    /// Returns a [`Tracer`] with the name `opentelemetry-otlp` and current crate version.
+    ///
+    /// [`Tracer`]: opentelemetry::trace::Tracer
+    </span><span class="kw">pub fn </span>install_simple(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;sdk::trace::Tracer, TraceError&gt; {
+        <span class="prelude-val">Ok</span>(build_simple_with_exporter(
+            <span class="self">self</span>.exporter_builder
+                .ok_or(<span class="kw">crate</span>::Error::NoExporterBuilder)<span class="question-mark">?
+                </span>.build_span_exporter()<span class="question-mark">?</span>,
+            <span class="self">self</span>.trace_config,
         ))
     }
 
-    <span class="doccomment">/// Install the configured span exporter and a batch span processor using the</span>
-    <span class="doccomment">/// specified runtime.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`Tracer`] with the name `opentelemetry-otlp` and current crate version.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `install_batch` will panic if not called within a tokio runtime</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Tracer`]: opentelemetry::trace::Tracer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install_batch</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">TraceRuntime</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Install the configured span exporter and a batch span processor using the
+    /// specified runtime.
+    ///
+    /// Returns a [`Tracer`] with the name `opentelemetry-otlp` and current crate version.
+    ///
+    /// `install_batch` will panic if not called within a tokio runtime
+    ///
+    /// [`Tracer`]: opentelemetry::trace::Tracer
+    </span><span class="kw">pub fn </span>install_batch&lt;R: TraceRuntime&gt;(
         <span class="self">self</span>,
-        <span class="ident">runtime</span>: <span class="ident">R</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sdk::trace::Tracer</span>, <span class="ident">TraceError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">build_batch_with_exporter</span>(
-            <span class="self">self</span>.<span class="ident">exporter_builder</span>
-                .<span class="ident">ok_or</span>(<span class="ident"><span class="kw">crate</span>::Error::NoExporterBuilder</span>)<span class="question-mark">?</span>
-                .<span class="ident">build_span_exporter</span>()<span class="question-mark">?</span>,
-            <span class="self">self</span>.<span class="ident">trace_config</span>,
-            <span class="ident">runtime</span>,
+        runtime: R,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;sdk::trace::Tracer, TraceError&gt; {
+        <span class="prelude-val">Ok</span>(build_batch_with_exporter(
+            <span class="self">self</span>.exporter_builder
+                .ok_or(<span class="kw">crate</span>::Error::NoExporterBuilder)<span class="question-mark">?
+                </span>.build_span_exporter()<span class="question-mark">?</span>,
+            <span class="self">self</span>.trace_config,
+            runtime,
         ))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">build_simple_with_exporter</span>(
-    <span class="ident">exporter</span>: <span class="ident">SpanExporter</span>,
-    <span class="ident">trace_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">sdk::trace::Config</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">sdk::trace::Tracer</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::builder</span>().<span class="ident">with_simple_exporter</span>(<span class="ident">exporter</span>);
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">config</span>) <span class="op">=</span> <span class="ident">trace_config</span> {
-        <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">with_config</span>(<span class="ident">config</span>);
+<span class="kw">fn </span>build_simple_with_exporter(
+    exporter: SpanExporter,
+    trace_config: <span class="prelude-ty">Option</span>&lt;sdk::trace::Config&gt;,
+) -&gt; sdk::trace::Tracer {
+    <span class="kw">let </span><span class="kw-2">mut </span>provider_builder = sdk::trace::TracerProvider::builder().with_simple_exporter(exporter);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(config) = trace_config {
+        provider_builder = provider_builder.with_config(config);
     }
-    <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">build</span>();
-    <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span>
-        <span class="ident">provider</span>.<span class="ident">versioned_tracer</span>(<span class="string">&quot;opentelemetry-otlp&quot;</span>, <span class="prelude-val">Some</span>(<span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>)), <span class="prelude-val">None</span>);
-    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">global::set_tracer_provider</span>(<span class="ident">provider</span>);
-    <span class="ident">tracer</span>
+    <span class="kw">let </span>provider = provider_builder.build();
+    <span class="kw">let </span>tracer =
+        provider.versioned_tracer(<span class="string">&quot;opentelemetry-otlp&quot;</span>, <span class="prelude-val">Some</span>(<span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>)), <span class="prelude-val">None</span>);
+    <span class="kw">let _ </span>= global::set_tracer_provider(provider);
+    tracer
 }
 
-<span class="kw">fn</span> <span class="ident">build_batch_with_exporter</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">TraceRuntime</span><span class="op">&gt;</span>(
-    <span class="ident">exporter</span>: <span class="ident">SpanExporter</span>,
-    <span class="ident">trace_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">sdk::trace::Config</span><span class="op">&gt;</span>,
-    <span class="ident">runtime</span>: <span class="ident">R</span>,
-) -&gt; <span class="ident">sdk::trace::Tracer</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">provider_builder</span> <span class="op">=</span>
-        <span class="ident">sdk::trace::TracerProvider::builder</span>().<span class="ident">with_batch_exporter</span>(<span class="ident">exporter</span>, <span class="ident">runtime</span>);
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">config</span>) <span class="op">=</span> <span class="ident">trace_config</span> {
-        <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">with_config</span>(<span class="ident">config</span>);
+<span class="kw">fn </span>build_batch_with_exporter&lt;R: TraceRuntime&gt;(
+    exporter: SpanExporter,
+    trace_config: <span class="prelude-ty">Option</span>&lt;sdk::trace::Config&gt;,
+    runtime: R,
+) -&gt; sdk::trace::Tracer {
+    <span class="kw">let </span><span class="kw-2">mut </span>provider_builder =
+        sdk::trace::TracerProvider::builder().with_batch_exporter(exporter, runtime);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(config) = trace_config {
+        provider_builder = provider_builder.with_config(config);
     }
-    <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">build</span>();
-    <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span>
-        <span class="ident">provider</span>.<span class="ident">versioned_tracer</span>(<span class="string">&quot;opentelemetry-otlp&quot;</span>, <span class="prelude-val">Some</span>(<span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>)), <span class="prelude-val">None</span>);
-    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">global::set_tracer_provider</span>(<span class="ident">provider</span>);
-    <span class="ident">tracer</span>
+    <span class="kw">let </span>provider = provider_builder.build();
+    <span class="kw">let </span>tracer =
+        provider.versioned_tracer(<span class="string">&quot;opentelemetry-otlp&quot;</span>, <span class="prelude-val">Some</span>(<span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>)), <span class="prelude-val">None</span>);
+    <span class="kw">let _ </span>= global::set_tracer_provider(provider);
+    tracer
 }
 
-<span class="doccomment">/// OTLP span exporter builder.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="comment">// This enum only used during initialization stage of application. The overhead should be OK.</span>
-<span class="comment">// Users can also disable the unused features to make the overhead on object size smaller.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SpanExporterBuilder</span> {
-    <span class="doccomment">/// Tonic span exporter builder</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-    <span class="ident">Tonic</span>(<span class="ident">TonicExporterBuilder</span>),
-    <span class="doccomment">/// Grpc span exporter builder</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-    <span class="ident">Grpcio</span>(<span class="ident">GrpcioExporterBuilder</span>),
-    <span class="doccomment">/// Http span exporter builder</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-    <span class="ident">Http</span>(<span class="ident">HttpExporterBuilder</span>),
+<span class="doccomment">/// OTLP span exporter builder.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="comment">// This enum only used during initialization stage of application. The overhead should be OK.
+// Users can also disable the unused features to make the overhead on object size smaller.
+</span><span class="attribute">#[allow(clippy::large_enum_variant)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>SpanExporterBuilder {
+    <span class="doccomment">/// Tonic span exporter builder
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+    </span>Tonic(TonicExporterBuilder),
+    <span class="doccomment">/// Grpc span exporter builder
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+    </span>Grpcio(GrpcioExporterBuilder),
+    <span class="doccomment">/// Http span exporter builder
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+    </span>Http(HttpExporterBuilder),
 }
 
-<span class="kw">impl</span> <span class="ident">SpanExporterBuilder</span> {
-    <span class="doccomment">/// Build a OTLP span exporter using the given tonic configuration and exporter configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_span_exporter</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SpanExporter</span>, <span class="ident">TraceError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-            <span class="ident">SpanExporterBuilder::Tonic</span>(<span class="ident">builder</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">builder</span>.<span class="ident">channel</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">channel</span>) =&gt; <span class="ident">SpanExporter::from_tonic_channel</span>(
-                    <span class="ident">builder</span>.<span class="ident">exporter_config</span>,
-                    <span class="ident">builder</span>.<span class="ident">tonic_config</span>,
-                    <span class="ident">channel</span>,
+<span class="kw">impl </span>SpanExporterBuilder {
+    <span class="doccomment">/// Build a OTLP span exporter using the given tonic configuration and exporter configuration.
+    </span><span class="kw">pub fn </span>build_span_exporter(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;SpanExporter, TraceError&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+            </span>SpanExporterBuilder::Tonic(builder) =&gt; <span class="prelude-val">Ok</span>(<span class="kw">match </span>builder.channel {
+                <span class="prelude-val">Some</span>(channel) =&gt; SpanExporter::from_tonic_channel(
+                    builder.exporter_config,
+                    builder.tonic_config,
+                    channel,
                 ),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">SpanExporter::new_tonic</span>(<span class="ident">builder</span>.<span class="ident">exporter_config</span>, <span class="ident">builder</span>.<span class="ident">tonic_config</span>),
+                <span class="prelude-val">None </span>=&gt; SpanExporter::new_tonic(builder.exporter_config, builder.tonic_config),
             }<span class="question-mark">?</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-            <span class="ident">SpanExporterBuilder::Grpcio</span>(<span class="ident">builder</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SpanExporter::new_grpcio</span>(
-                <span class="ident">builder</span>.<span class="ident">exporter_config</span>,
-                <span class="ident">builder</span>.<span class="ident">grpcio_config</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+            </span>SpanExporterBuilder::Grpcio(builder) =&gt; <span class="prelude-val">Ok</span>(SpanExporter::new_grpcio(
+                builder.exporter_config,
+                builder.grpcio_config,
             )),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-            <span class="ident">SpanExporterBuilder::Http</span>(<span class="ident">builder</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SpanExporter::new_http</span>(
-                <span class="ident">builder</span>.<span class="ident">exporter_config</span>,
-                <span class="ident">builder</span>.<span class="ident">http_config</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+            </span>SpanExporterBuilder::Http(builder) =&gt; <span class="prelude-val">Ok</span>(SpanExporter::new_http(
+                builder.exporter_config,
+                builder.http_config,
             )<span class="question-mark">?</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TonicExporterBuilder</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SpanExporterBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">exporter</span>: <span class="ident">TonicExporterBuilder</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanExporterBuilder::Tonic</span>(<span class="ident">exporter</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;TonicExporterBuilder&gt; <span class="kw">for </span>SpanExporterBuilder {
+    <span class="kw">fn </span>from(exporter: TonicExporterBuilder) -&gt; <span class="self">Self </span>{
+        SpanExporterBuilder::Tonic(exporter)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">GrpcioExporterBuilder</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SpanExporterBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">exporter</span>: <span class="ident">GrpcioExporterBuilder</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanExporterBuilder::Grpcio</span>(<span class="ident">exporter</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;GrpcioExporterBuilder&gt; <span class="kw">for </span>SpanExporterBuilder {
+    <span class="kw">fn </span>from(exporter: GrpcioExporterBuilder) -&gt; <span class="self">Self </span>{
+        SpanExporterBuilder::Grpcio(exporter)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HttpExporterBuilder</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SpanExporterBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">exporter</span>: <span class="ident">HttpExporterBuilder</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanExporterBuilder::Http</span>(<span class="ident">exporter</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;HttpExporterBuilder&gt; <span class="kw">for </span>SpanExporterBuilder {
+    <span class="kw">fn </span>from(exporter: HttpExporterBuilder) -&gt; <span class="self">Self </span>{
+        SpanExporterBuilder::Http(exporter)
     }
 }
 
-<span class="doccomment">/// OTLP exporter that sends tracing information</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SpanExporter</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-    <span class="doccomment">/// Trace Exporter using tonic as grpc layer.</span>
-    <span class="ident">Tonic</span> {
-        <span class="doccomment">/// Duration of timeout when sending spans to backend.</span>
-        <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-        <span class="doccomment">/// Additional headers of the outbound requests.</span>
-        <span class="ident">metadata</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MetadataMap</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// The Grpc trace exporter</span>
-        <span class="ident">trace_exporter</span>: <span class="ident">TonicTraceServiceClient</span><span class="op">&lt;</span><span class="ident">TonicChannel</span><span class="op">&gt;</span>,
+<span class="doccomment">/// OTLP exporter that sends tracing information
+</span><span class="kw">pub enum </span>SpanExporter {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+    </span><span class="doccomment">/// Trace Exporter using tonic as grpc layer.
+    </span>Tonic {
+        <span class="doccomment">/// Duration of timeout when sending spans to backend.
+        </span>timeout: Duration,
+        <span class="doccomment">/// Additional headers of the outbound requests.
+        </span>metadata: <span class="prelude-ty">Option</span>&lt;MetadataMap&gt;,
+        <span class="doccomment">/// The Grpc trace exporter
+        </span>trace_exporter: TonicTraceServiceClient&lt;TonicChannel&gt;,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-    <span class="doccomment">/// Trace Exporter using grpcio as grpc layer</span>
-    <span class="ident">Grpcio</span> {
-        <span class="doccomment">/// Duration of timeout when sending spans to backend.</span>
-        <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-        <span class="doccomment">/// Additional headers of the outbound requests.</span>
-        <span class="ident">headers</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// The Grpc trace exporter</span>
-        <span class="ident">trace_exporter</span>: <span class="ident">GrpcioTraceServiceClient</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+    </span><span class="doccomment">/// Trace Exporter using grpcio as grpc layer
+    </span>Grpcio {
+        <span class="doccomment">/// Duration of timeout when sending spans to backend.
+        </span>timeout: Duration,
+        <span class="doccomment">/// Additional headers of the outbound requests.
+        </span>headers: <span class="prelude-ty">Option</span>&lt;HashMap&lt;String, String&gt;&gt;,
+        <span class="doccomment">/// The Grpc trace exporter
+        </span>trace_exporter: GrpcioTraceServiceClient,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-    <span class="doccomment">/// Trace Exporter using HTTP transport</span>
-    <span class="ident">Http</span> {
-        <span class="doccomment">/// Duration of timeout when sending spans to backend.</span>
-        <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-        <span class="doccomment">/// Additional headers of the outbound requests.</span>
-        <span class="ident">headers</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// The Collector URL</span>
-        <span class="ident">collector_endpoint</span>: <span class="ident">Uri</span>,
-        <span class="doccomment">/// The HTTP trace exporter</span>
-        <span class="ident">trace_exporter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">HttpClient</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+    </span><span class="doccomment">/// Trace Exporter using HTTP transport
+    </span>Http {
+        <span class="doccomment">/// Duration of timeout when sending spans to backend.
+        </span>timeout: Duration,
+        <span class="doccomment">/// Additional headers of the outbound requests.
+        </span>headers: <span class="prelude-ty">Option</span>&lt;HashMap&lt;String, String&gt;&gt;,
+        <span class="doccomment">/// The Collector URL
+        </span>collector_endpoint: Uri,
+        <span class="doccomment">/// The HTTP trace exporter
+        </span>trace_exporter: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>HttpClient&gt;&gt;,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SpanExporter</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-            <span class="ident">SpanExporter::Tonic</span> {
-                <span class="ident">metadata</span>, <span class="ident">timeout</span>, ..
-            } =&gt; <span class="ident">f</span>
-                .<span class="ident">debug_struct</span>(<span class="string">&quot;Exporter&quot;</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;metadata&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">metadata</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">timeout</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;trace_exporter&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;TraceServiceClient&quot;</span>)
-                .<span class="ident">finish</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-            <span class="ident">SpanExporter::Grpcio</span> {
-                <span class="ident">headers</span>, <span class="ident">timeout</span>, ..
-            } =&gt; <span class="ident">f</span>
-                .<span class="ident">debug_struct</span>(<span class="string">&quot;Exporter&quot;</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;headers&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">timeout</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;trace_exporter&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;TraceServiceClient&quot;</span>)
-                .<span class="ident">finish</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-            <span class="ident">SpanExporter::Http</span> {
-                <span class="ident">headers</span>, <span class="ident">timeout</span>, ..
-            } =&gt; <span class="ident">f</span>
-                .<span class="ident">debug_struct</span>(<span class="string">&quot;Exporter&quot;</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;headers&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">timeout</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;trace_exporter&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;TraceServiceClient&quot;</span>)
-                .<span class="ident">finish</span>(),
+<span class="kw">impl </span>Debug <span class="kw">for </span>SpanExporter {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+            </span>SpanExporter::Tonic {
+                metadata, timeout, ..
+            } =&gt; f
+                .debug_struct(<span class="string">&quot;Exporter&quot;</span>)
+                .field(<span class="string">&quot;metadata&quot;</span>, <span class="kw-2">&amp;</span>metadata)
+                .field(<span class="string">&quot;timeout&quot;</span>, <span class="kw-2">&amp;</span>timeout)
+                .field(<span class="string">&quot;trace_exporter&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;TraceServiceClient&quot;</span>)
+                .finish(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+            </span>SpanExporter::Grpcio {
+                headers, timeout, ..
+            } =&gt; f
+                .debug_struct(<span class="string">&quot;Exporter&quot;</span>)
+                .field(<span class="string">&quot;headers&quot;</span>, <span class="kw-2">&amp;</span>headers)
+                .field(<span class="string">&quot;timeout&quot;</span>, <span class="kw-2">&amp;</span>timeout)
+                .field(<span class="string">&quot;trace_exporter&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;TraceServiceClient&quot;</span>)
+                .finish(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+            </span>SpanExporter::Http {
+                headers, timeout, ..
+            } =&gt; f
+                .debug_struct(<span class="string">&quot;Exporter&quot;</span>)
+                .field(<span class="string">&quot;headers&quot;</span>, <span class="kw-2">&amp;</span>headers)
+                .field(<span class="string">&quot;timeout&quot;</span>, <span class="kw-2">&amp;</span>timeout)
+                .field(<span class="string">&quot;trace_exporter&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;TraceServiceClient&quot;</span>)
+                .finish(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SpanExporter</span> {
-    <span class="doccomment">/// Builds a new span exporter with the given configuration.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_tonic</span>(
-        <span class="ident">config</span>: <span class="ident">ExportConfig</span>,
-        <span class="ident">tonic_config</span>: <span class="ident">TonicConfig</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">endpoint</span> <span class="op">=</span> <span class="ident">TonicChannel::from_shared</span>(<span class="ident">config</span>.<span class="ident">endpoint</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+<span class="kw">impl </span>SpanExporter {
+    <span class="doccomment">/// Builds a new span exporter with the given configuration.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+    </span><span class="kw">pub fn </span>new_tonic(
+        config: ExportConfig,
+        tonic_config: TonicConfig,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="kw">crate</span>::Error&gt; {
+        <span class="kw">let </span>endpoint = TonicChannel::from_shared(config.endpoint.clone())<span class="question-mark">?</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tonic_config</span>.<span class="ident">tls_config</span>.<span class="ident">as_ref</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">tls_config</span>) =&gt; <span class="ident">endpoint</span>.<span class="ident">tls_config</span>(<span class="ident">tls_config</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="ident">endpoint</span>,
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+        </span><span class="kw">let </span>channel = <span class="kw">match </span>tonic_config.tls_config.as_ref() {
+            <span class="prelude-val">Some</span>(tls_config) =&gt; endpoint.tls_config(tls_config.clone())<span class="question-mark">?</span>,
+            <span class="prelude-val">None </span>=&gt; endpoint,
         }
-        .<span class="ident">timeout</span>(<span class="ident">config</span>.<span class="ident">timeout</span>)
-        .<span class="ident">connect_lazy</span>();
+        .timeout(config.timeout)
+        .connect_lazy();
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">endpoint</span>.<span class="ident">timeout</span>(<span class="ident">config</span>.<span class="ident">timeout</span>).<span class="ident">connect_lazy</span>();
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;tls&quot;</span>))]
+        </span><span class="kw">let </span>channel = endpoint.timeout(config.timeout).connect_lazy();
 
-        <span class="ident">SpanExporter::from_tonic_channel</span>(<span class="ident">config</span>, <span class="ident">tonic_config</span>, <span class="ident">channel</span>)
+        SpanExporter::from_tonic_channel(config, tonic_config, channel)
     }
 
-    <span class="doccomment">/// Builds a new span exporter with given tonic channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This allows users to bring their own custom channel like UDS.</span>
-    <span class="doccomment">/// However, users MUST make sure the [`ExportConfig::timeout`] is</span>
-    <span class="doccomment">/// the same as the channel&#39;s timeout.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_tonic_channel</span>(
-        <span class="ident">config</span>: <span class="ident">ExportConfig</span>,
-        <span class="ident">tonic_config</span>: <span class="ident">TonicConfig</span>,
-        <span class="ident">channel</span>: <span class="ident">tonic::transport::Channel</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">SpanExporter::Tonic</span> {
-            <span class="ident">timeout</span>: <span class="ident">config</span>.<span class="ident">timeout</span>,
-            <span class="ident">metadata</span>: <span class="ident">tonic_config</span>.<span class="ident">metadata</span>,
-            <span class="ident">trace_exporter</span>: <span class="ident">TonicTraceServiceClient::new</span>(<span class="ident">channel</span>),
+    <span class="doccomment">/// Builds a new span exporter with given tonic channel.
+    ///
+    /// This allows users to bring their own custom channel like UDS.
+    /// However, users MUST make sure the [`ExportConfig::timeout`] is
+    /// the same as the channel&#39;s timeout.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+    </span><span class="kw">pub fn </span>from_tonic_channel(
+        config: ExportConfig,
+        tonic_config: TonicConfig,
+        channel: tonic::transport::Channel,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="kw">crate</span>::Error&gt; {
+        <span class="prelude-val">Ok</span>(SpanExporter::Tonic {
+            timeout: config.timeout,
+            metadata: tonic_config.metadata,
+            trace_exporter: TonicTraceServiceClient::new(channel),
         })
     }
 
-    <span class="doccomment">/// Builds a new span exporter with the given configuration</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_grpcio</span>(<span class="ident">config</span>: <span class="ident">ExportConfig</span>, <span class="ident">grpcio_config</span>: <span class="ident">GrpcioConfig</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span>: <span class="ident">ChannelBuilder</span> <span class="op">=</span> <span class="ident">ChannelBuilder::new</span>(<span class="ident">Arc::new</span>(<span class="ident">Environment::new</span>(
-            <span class="ident">grpcio_config</span>.<span class="ident">completion_queue_count</span>,
+    <span class="doccomment">/// Builds a new span exporter with the given configuration
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+    </span><span class="kw">pub fn </span>new_grpcio(config: ExportConfig, grpcio_config: GrpcioConfig) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>builder: ChannelBuilder = ChannelBuilder::new(Arc::new(Environment::new(
+            grpcio_config.completion_queue_count,
         )));
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">compression</span>) <span class="op">=</span> <span class="ident">grpcio_config</span>.<span class="ident">compression</span> {
-            <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">default_compression_algorithm</span>(<span class="ident">compression</span>.<span class="ident">into</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(compression) = grpcio_config.compression {
+            builder = builder.default_compression_algorithm(compression.into());
         }
 
-        <span class="kw">let</span> <span class="ident">channel</span>: <span class="ident">GrpcChannel</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">grpcio_config</span>.<span class="ident">credentials</span>, <span class="ident">grpcio_config</span>.<span class="ident">use_tls</span>) {
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)) =&gt; <span class="ident">builder</span>.<span class="ident">secure_connect</span>(
-                <span class="ident">config</span>.<span class="ident">endpoint</span>.<span class="ident">as_str</span>(),
-                <span class="ident">ChannelCredentialsBuilder::new</span>().<span class="ident">build</span>(),
+        <span class="kw">let </span>channel: GrpcChannel = <span class="kw">match </span>(grpcio_config.credentials, grpcio_config.use_tls) {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)) =&gt; builder.secure_connect(
+                config.endpoint.as_str(),
+                ChannelCredentialsBuilder::new().build(),
             ),
-            (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="ident">builder</span>.<span class="ident">connect</span>(<span class="ident">config</span>.<span class="ident">endpoint</span>.<span class="ident">as_str</span>()),
-            (<span class="prelude-val">Some</span>(<span class="ident">credentials</span>), <span class="kw">_</span>) =&gt; <span class="ident">builder</span>.<span class="ident">secure_connect</span>(
-                <span class="ident">config</span>.<span class="ident">endpoint</span>.<span class="ident">as_str</span>(),
-                <span class="ident">ChannelCredentialsBuilder::new</span>()
-                    .<span class="ident">cert</span>(<span class="ident">credentials</span>.<span class="ident">cert</span>.<span class="ident">into</span>(), <span class="ident">credentials</span>.<span class="ident">key</span>.<span class="ident">into</span>())
-                    .<span class="ident">build</span>(),
+            (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; builder.connect(config.endpoint.as_str()),
+            (<span class="prelude-val">Some</span>(credentials), <span class="kw">_</span>) =&gt; builder.secure_connect(
+                config.endpoint.as_str(),
+                ChannelCredentialsBuilder::new()
+                    .cert(credentials.cert.into(), credentials.key.into())
+                    .build(),
             ),
         };
 
-        <span class="ident">SpanExporter::Grpcio</span> {
-            <span class="ident">trace_exporter</span>: <span class="ident">GrpcioTraceServiceClient::new</span>(<span class="ident">channel</span>),
-            <span class="ident">timeout</span>: <span class="ident">config</span>.<span class="ident">timeout</span>,
-            <span class="ident">headers</span>: <span class="ident">grpcio_config</span>.<span class="ident">headers</span>,
+        SpanExporter::Grpcio {
+            trace_exporter: GrpcioTraceServiceClient::new(channel),
+            timeout: config.timeout,
+            headers: grpcio_config.headers,
         }
     }
 
-    <span class="doccomment">/// Builds a new span exporter with the given configuration</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_http</span>(<span class="ident">config</span>: <span class="ident">ExportConfig</span>, <span class="ident">http_config</span>: <span class="ident">HttpConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">url</span>: <span class="ident">Uri</span> <span class="op">=</span> <span class="ident">config</span>
-            .<span class="ident">endpoint</span>
-            .<span class="ident">parse</span>()
-            .<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Builds a new span exporter with the given configuration
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+    </span><span class="kw">pub fn </span>new_http(config: ExportConfig, http_config: HttpConfig) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="kw">crate</span>::Error&gt; {
+        <span class="kw">let </span>url: Uri = config
+            .endpoint
+            .parse()
+            .map_err::&lt;<span class="kw">crate</span>::Error, <span class="kw">_</span>&gt;(Into::into)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">SpanExporter::Http</span> {
-            <span class="ident">trace_exporter</span>: <span class="ident">http_config</span>.<span class="ident">client</span>,
-            <span class="ident">timeout</span>: <span class="ident">config</span>.<span class="ident">timeout</span>,
-            <span class="ident">collector_endpoint</span>: <span class="ident">url</span>,
-            <span class="ident">headers</span>: <span class="ident">http_config</span>.<span class="ident">headers</span>,
+        <span class="prelude-val">Ok</span>(SpanExporter::Http {
+            trace_exporter: http_config.client,
+            timeout: config.timeout,
+            collector_endpoint: url,
+            headers: http_config.headers,
         })
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">opentelemetry::sdk::export::trace::SpanExporter</span> <span class="kw">for</span> <span class="ident">SpanExporter</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span>) -&gt; <span class="ident">ExportResult</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-            <span class="ident">SpanExporter::Grpcio</span> {
-                <span class="ident">timeout</span>,
-                <span class="ident">headers</span>,
-                <span class="ident">trace_exporter</span>,
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl </span>opentelemetry::sdk::export::trace::SpanExporter <span class="kw">for </span>SpanExporter {
+    <span class="kw">async fn </span>export(<span class="kw-2">&amp;mut </span><span class="self">self</span>, batch: Vec&lt;SpanData&gt;) -&gt; ExportResult {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+            </span>SpanExporter::Grpcio {
+                timeout,
+                headers,
+                trace_exporter,
             } =&gt; {
-                <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">GrpcRequest</span> {
-                    <span class="ident">resource_spans</span>: <span class="ident">RepeatedField::from_vec</span>(
-                        <span class="ident">batch</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
+                <span class="kw">let </span>request = GrpcRequest {
+                    resource_spans: RepeatedField::from_vec(
+                        batch.into_iter().map(Into::into).collect(),
                     ),
-                    <span class="ident">unknown_fields</span>: <span class="ident">Default::default</span>(),
-                    <span class="ident">cached_size</span>: <span class="ident">Default::default</span>(),
+                    unknown_fields: Default::default(),
+                    cached_size: Default::default(),
                 };
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">call_options</span> <span class="op">=</span> <span class="ident">CallOption::default</span>().<span class="ident">timeout</span>(<span class="kw-2">*</span><span class="ident">timeout</span>);
+                <span class="kw">let </span><span class="kw-2">mut </span>call_options = CallOption::default().timeout(<span class="kw-2">*</span>timeout);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">headers</span>) <span class="op">=</span> <span class="ident">headers</span>.<span class="ident">clone</span>() {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">metadata_builder</span>: <span class="ident">MetadataBuilder</span> <span class="op">=</span> <span class="ident">MetadataBuilder::new</span>();
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(headers) = headers.clone() {
+                    <span class="kw">let </span><span class="kw-2">mut </span>metadata_builder: MetadataBuilder = MetadataBuilder::new();
 
-                    <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">headers</span> {
-                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">metadata_builder</span>.<span class="ident">add_str</span>(<span class="ident">key</span>.<span class="ident">as_str</span>(), <span class="ident">value</span>.<span class="ident">as_str</span>());
+                    <span class="kw">for </span>(key, value) <span class="kw">in </span>headers {
+                        <span class="kw">let _ </span>= metadata_builder.add_str(key.as_str(), value.as_str());
                     }
 
-                    <span class="ident">call_options</span> <span class="op">=</span> <span class="ident">call_options</span>.<span class="ident">headers</span>(<span class="ident">metadata_builder</span>.<span class="ident">build</span>());
+                    call_options = call_options.headers(metadata_builder.build());
                 }
 
-                <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">trace_exporter</span>
-                    .<span class="ident">export_async_opt</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>, <span class="ident">call_options</span>)
-                    .<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
-                <span class="ident">receiver</span>.<span class="kw">await</span>.<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>receiver = trace_exporter
+                    .export_async_opt(<span class="kw-2">&amp;</span>request, call_options)
+                    .map_err::&lt;<span class="kw">crate</span>::Error, <span class="kw">_</span>&gt;(Into::into)<span class="question-mark">?</span>;
+                receiver.<span class="kw">await</span>.map_err::&lt;<span class="kw">crate</span>::Error, <span class="kw">_</span>&gt;(Into::into)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-            <span class="ident">SpanExporter::Tonic</span> {
-                <span class="ident">trace_exporter</span>,
-                <span class="ident">metadata</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+            </span>SpanExporter::Tonic {
+                trace_exporter,
+                metadata,
                 ..
             } =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">Request::new</span>(<span class="ident">TonicRequest</span> {
-                    <span class="ident">resource_spans</span>: <span class="ident">batch</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
+                <span class="kw">let </span><span class="kw-2">mut </span>request = Request::new(TonicRequest {
+                    resource_spans: batch.into_iter().map(Into::into).collect(),
                 });
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">metadata</span>) <span class="op">=</span> <span class="ident">metadata</span> {
-                    <span class="kw">for</span> <span class="ident">key_and_value</span> <span class="kw">in</span> <span class="ident">metadata</span>.<span class="ident">iter</span>() {
-                        <span class="kw">match</span> <span class="ident">key_and_value</span> {
-                            <span class="ident">KeyAndValueRef::Ascii</span>(<span class="ident">key</span>, <span class="ident">value</span>) =&gt; {
-                                <span class="ident">request</span>.<span class="ident">metadata_mut</span>().<span class="ident">append</span>(<span class="ident">key</span>, <span class="ident">value</span>.<span class="ident">to_owned</span>())
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(metadata) = metadata {
+                    <span class="kw">for </span>key_and_value <span class="kw">in </span>metadata.iter() {
+                        <span class="kw">match </span>key_and_value {
+                            KeyAndValueRef::Ascii(key, value) =&gt; {
+                                request.metadata_mut().append(key, value.to_owned())
                             }
-                            <span class="ident">KeyAndValueRef::Binary</span>(<span class="ident">key</span>, <span class="ident">value</span>) =&gt; {
-                                <span class="ident">request</span>.<span class="ident">metadata_mut</span>().<span class="ident">append_bin</span>(<span class="ident">key</span>, <span class="ident">value</span>.<span class="ident">to_owned</span>())
+                            KeyAndValueRef::Binary(key, value) =&gt; {
+                                request.metadata_mut().append_bin(key, value.to_owned())
                             }
                         };
                     }
                 }
 
-                <span class="ident">trace_exporter</span>
-                    .<span class="ident">to_owned</span>()
-                    .<span class="ident">export</span>(<span class="ident">request</span>)
-                    .<span class="kw">await</span>
-                    .<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
+                trace_exporter
+                    .to_owned()
+                    .export(request)
+                    .<span class="kw">await
+                    </span>.map_err::&lt;<span class="kw">crate</span>::Error, <span class="kw">_</span>&gt;(Into::into)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-            <span class="ident">SpanExporter::Http</span> {
-                <span class="ident">trace_exporter</span>,
-                <span class="ident">collector_endpoint</span>,
-                <span class="ident">headers</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+            </span>SpanExporter::Http {
+                trace_exporter,
+                collector_endpoint,
+                headers,
                 ..
             } =&gt; {
-                <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">ProstRequest</span> {
-                    <span class="ident">resource_spans</span>: <span class="ident">batch</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
+                <span class="kw">let </span>req = ProstRequest {
+                    resource_spans: batch.into_iter().map(Into::into).collect(),
                 };
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-                <span class="ident">req</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)
-                    .<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">vec!</span>[];
+                req.encode(<span class="kw-2">&amp;mut </span>buf)
+                    .map_err::&lt;<span class="kw">crate</span>::Error, <span class="kw">_</span>&gt;(Into::into)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">http::Request::builder</span>()
-                    .<span class="ident">method</span>(<span class="ident">Method::POST</span>)
-                    .<span class="ident">uri</span>(<span class="ident">collector_endpoint</span>.<span class="ident">clone</span>())
-                    .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/x-protobuf&quot;</span>)
-                    .<span class="ident">body</span>(<span class="ident">buf</span>)
-                    .<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>request = http::Request::builder()
+                    .method(Method::POST)
+                    .uri(collector_endpoint.clone())
+                    .header(CONTENT_TYPE, <span class="string">&quot;application/x-protobuf&quot;</span>)
+                    .body(buf)
+                    .map_err::&lt;<span class="kw">crate</span>::Error, <span class="kw">_</span>&gt;(Into::into)<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">headers</span>) <span class="op">=</span> <span class="ident">headers</span>.<span class="ident">clone</span>() {
-                    <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">val</span>) <span class="kw">in</span> <span class="ident">headers</span> {
-                        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">HeaderValue::from_str</span>(<span class="ident">val</span>.<span class="ident">as_ref</span>())
-                            .<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
-                        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span>
-                            <span class="ident">HeaderName::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>).<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
-                        <span class="ident">request</span>.<span class="ident">headers_mut</span>().<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(headers) = headers.clone() {
+                    <span class="kw">for </span>(k, val) <span class="kw">in </span>headers {
+                        <span class="kw">let </span>value = HeaderValue::from_str(val.as_ref())
+                            .map_err::&lt;<span class="kw">crate</span>::Error, <span class="kw">_</span>&gt;(Into::into)<span class="question-mark">?</span>;
+                        <span class="kw">let </span>key =
+                            HeaderName::try_from(<span class="kw-2">&amp;</span>k).map_err::&lt;<span class="kw">crate</span>::Error, <span class="kw">_</span>&gt;(Into::into)<span class="question-mark">?</span>;
+                        request.headers_mut().insert(key, value);
                     }
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">client</span>) <span class="op">=</span> <span class="ident">trace_exporter</span> {
-                    <span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(client) = trace_exporter {
+                    client.send(request).<span class="kw">await</span><span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(())
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::NoHttpClient</span>.<span class="ident">into</span>())
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::NoHttpClient.into())
                 }
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry_otlp" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry_otlp" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

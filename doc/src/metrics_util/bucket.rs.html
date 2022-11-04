@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/bucket.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bucket.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/bucket.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bucket.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -666,673 +666,673 @@
 <span id="666">666</span>
 <span id="667">667</span>
 <span id="668">668</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">crossbeam_epoch</span>::{<span class="ident">pin</span> <span class="kw">as</span> <span class="ident">epoch_pin</span>, <span class="ident">unprotected</span>, <span class="ident">Atomic</span>, <span class="ident">Guard</span>, <span class="ident">Owned</span>, <span class="ident">Shared</span>};
-<span class="kw">use</span> <span class="ident">crossbeam_utils::Backoff</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">cell::UnsafeCell</span>,
-    <span class="ident">cmp::min</span>,
-    <span class="ident">mem</span>::{<span class="self">self</span>, <span class="ident">MaybeUninit</span>},
-    <span class="ident">slice</span>,
-    <span class="ident">sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>crossbeam_epoch::{pin <span class="kw">as </span>epoch_pin, unprotected, Atomic, Guard, Owned, Shared};
+<span class="kw">use </span>crossbeam_utils::Backoff;
+<span class="kw">use </span>std::{
+    cell::UnsafeCell,
+    cmp::min,
+    mem::{<span class="self">self</span>, MaybeUninit},
+    slice,
+    sync::atomic::{AtomicUsize, Ordering},
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;16&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">BLOCK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">BLOCK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">BLOCK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">64</span>;
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;16&quot;</span>)]
+</span><span class="kw">const </span>BLOCK_SIZE: usize = <span class="number">16</span>;
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;32&quot;</span>)]
+</span><span class="kw">const </span>BLOCK_SIZE: usize = <span class="number">32</span>;
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+</span><span class="kw">const </span>BLOCK_SIZE: usize = <span class="number">64</span>;
 
-<span class="kw">const</span> <span class="ident">DEFERRED_BLOCK_BATCH_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="kw">const </span>DEFERRED_BLOCK_BATCH_SIZE: usize = <span class="number">32</span>;
 
-<span class="doccomment">/// Discrete chunk of values with atomic read/write access.</span>
-<span class="kw">struct</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="comment">// Write index.</span>
-    <span class="ident">write</span>: <span class="ident">AtomicUsize</span>,
+<span class="doccomment">/// Discrete chunk of values with atomic read/write access.
+</span><span class="kw">struct </span>Block&lt;T&gt; {
+    <span class="comment">// Write index.
+    </span>write: AtomicUsize,
 
-    <span class="comment">// Read bitmap.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Internally, we track the write index which indicates what slot should be written by the next</span>
-    <span class="comment">// writer.  This works fine as writers race via CAS to &quot;acquire&quot; a slot to write to.  The</span>
-    <span class="comment">// trouble comes when attempting to read written values, as writers may still have writes</span>
-    <span class="comment">// in-flight, thus leading to potential uninitialized reads, UB, and the world imploding.</span>
-    <span class="comment">//</span>
-    <span class="comment">// We use a simple scheme where writers acknowledge their writes by setting a bit in `read`</span>
-    <span class="comment">// that corresponds to the index that they&#39;ve written.  For example, a write at index 5 being</span>
-    <span class="comment">// complete can be verified by checking if `1 &lt;&lt; 5` in `read` is set.  This allows writers to</span>
-    <span class="comment">// concurrently update `read` despite non-sequential indexes.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Additionally, an optimization is then available where finding the longest sequential run of</span>
-    <span class="comment">// initialized slots can be trivially calculated by getting the number of trailing ones in</span>
-    <span class="comment">// `read`.  This allows reading the &quot;length&quot; of initialized values in constant time, without</span>
-    <span class="comment">// blocking.</span>
-    <span class="comment">//</span>
-    <span class="comment">// This optimization does mean, however, that the simplest implementation is limited to block</span>
-    <span class="comment">// sizes that match the number of bits available in the target platform pointer size.  A</span>
-    <span class="comment">// potential future optimization could use const generics to size an array of read bitmap</span>
-    <span class="comment">// atomics such that the total sum of the bits could be efficiently utilized, although this</span>
-    <span class="comment">// would involve more complex logic to read all of the atomics.</span>
-    <span class="ident">read</span>: <span class="ident">AtomicUsize</span>,
+    <span class="comment">// Read bitmap.
+    //
+    // Internally, we track the write index which indicates what slot should be written by the next
+    // writer.  This works fine as writers race via CAS to &quot;acquire&quot; a slot to write to.  The
+    // trouble comes when attempting to read written values, as writers may still have writes
+    // in-flight, thus leading to potential uninitialized reads, UB, and the world imploding.
+    //
+    // We use a simple scheme where writers acknowledge their writes by setting a bit in `read`
+    // that corresponds to the index that they&#39;ve written.  For example, a write at index 5 being
+    // complete can be verified by checking if `1 &lt;&lt; 5` in `read` is set.  This allows writers to
+    // concurrently update `read` despite non-sequential indexes.
+    //
+    // Additionally, an optimization is then available where finding the longest sequential run of
+    // initialized slots can be trivially calculated by getting the number of trailing ones in
+    // `read`.  This allows reading the &quot;length&quot; of initialized values in constant time, without
+    // blocking.
+    //
+    // This optimization does mean, however, that the simplest implementation is limited to block
+    // sizes that match the number of bits available in the target platform pointer size.  A
+    // potential future optimization could use const generics to size an array of read bitmap
+    // atomics such that the total sum of the bits could be efficiently utilized, although this
+    // would involve more complex logic to read all of the atomics.
+    </span>read: AtomicUsize,
 
-    <span class="comment">// The individual slots.</span>
-    <span class="ident">slots</span>: [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>; <span class="ident">BLOCK_SIZE</span>],
+    <span class="comment">// The individual slots.
+    </span>slots: [MaybeUninit&lt;UnsafeCell&lt;T&gt;&gt;; BLOCK_SIZE],
 
-    <span class="comment">// The &quot;next&quot; block to iterate, aka the block that came before this one.</span>
-    <span class="ident">next</span>: <span class="ident">Atomic</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="comment">// The &quot;next&quot; block to iterate, aka the block that came before this one.
+    </span>next: Atomic&lt;Block&lt;T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new [`Block`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="comment">// SAFETY:</span>
-        <span class="comment">// At a high level, all types inherent to  `Block&lt;T&gt;` can be safely zero initialized.</span>
-        <span class="comment">//</span>
-        <span class="comment">// `write`/`read` are meant to start at zero (`AtomicUsize`)</span>
-        <span class="comment">// `slots` is an array of `MaybeUninit`, which is zero init safe</span>
-        <span class="comment">// `next` is meant to start as &quot;null&quot;, where the pointer (`AtomicUsize`) is zero</span>
-        <span class="kw">unsafe</span> { <span class="ident">MaybeUninit::zeroed</span>().<span class="ident">assume_init</span>() }
+<span class="kw">impl</span>&lt;T&gt; Block&lt;T&gt; {
+    <span class="doccomment">/// Creates a new [`Block`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="comment">// SAFETY:
+        // At a high level, all types inherent to  `Block&lt;T&gt;` can be safely zero initialized.
+        //
+        // `write`/`read` are meant to start at zero (`AtomicUsize`)
+        // `slots` is an array of `MaybeUninit`, which is zero init safe
+        // `next` is meant to start as &quot;null&quot;, where the pointer (`AtomicUsize`) is zero
+        </span><span class="kw">unsafe </span>{ MaybeUninit::zeroed().assume_init() }
     }
 
-    <span class="comment">// Gets the length of the next block, if it exists.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">next_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="ident">Guard</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>, <span class="ident">guard</span>);
-        <span class="kw">if</span> <span class="ident">tail</span>.<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="number">0</span>;
+    <span class="comment">// Gets the length of the next block, if it exists.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>next_len(<span class="kw-2">&amp;</span><span class="self">self</span>, guard: <span class="kw-2">&amp;</span>Guard) -&gt; usize {
+        <span class="kw">let </span>tail = <span class="self">self</span>.next.load(Ordering::Acquire, guard);
+        <span class="kw">if </span>tail.is_null() {
+            <span class="kw">return </span><span class="number">0</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">tail_block</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">tail</span>.<span class="ident">deref</span>() };
-        <span class="ident">tail_block</span>.<span class="ident">len</span>()
+        <span class="kw">let </span>tail_block = <span class="kw">unsafe </span>{ tail.deref() };
+        tail_block.len()
     }
 
-    <span class="doccomment">/// Gets the current length of this block.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>).<span class="ident">trailing_ones</span>() <span class="kw">as</span> <span class="ident">usize</span>
+    <span class="doccomment">/// Gets the current length of this block.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.read.load(Ordering::Acquire).trailing_ones() <span class="kw">as </span>usize
     }
 
-    <span class="comment">// Whether or not this block is currently quieseced i.e. no in-flight writes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_quiesced</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="ident">BLOCK_SIZE</span> {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="comment">// Whether or not this block is currently quieseced i.e. no in-flight writes.
+    </span><span class="kw">pub fn </span>is_quiesced(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
+        <span class="kw">if </span>len == BLOCK_SIZE {
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="comment">// We have to clamp self.write since multiple threads might race on filling the last block,</span>
-        <span class="comment">// so the value could actually exceed BLOCK_SIZE.</span>
-        <span class="ident">min</span>(<span class="self">self</span>.<span class="ident">write</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>), <span class="ident">BLOCK_SIZE</span>) <span class="op">==</span> <span class="ident">len</span>
+        <span class="comment">// We have to clamp self.write since multiple threads might race on filling the last block,
+        // so the value could actually exceed BLOCK_SIZE.
+        </span>min(<span class="self">self</span>.write.load(Ordering::Acquire), BLOCK_SIZE) == len
     }
 
-    <span class="doccomment">/// Gets a slice of the data written to this block.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">T</span>] {
-        <span class="comment">// SAFETY:</span>
-        <span class="comment">// We can always get a pointer to the first slot, but the reference we give back will only</span>
-        <span class="comment">// be as long as the number of slots written, indicated by `len`.  The value of `len` is</span>
-        <span class="comment">// only updated once a slot has been fully written, guaranteeing the slot is initialized.</span>
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="number">0</span>).<span class="ident">as_ptr</span>();
-            <span class="ident">slice::from_raw_parts</span>(<span class="ident">head</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">T</span>, <span class="ident">len</span>)
+    <span class="doccomment">/// Gets a slice of the data written to this block.
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[T] {
+        <span class="comment">// SAFETY:
+        // We can always get a pointer to the first slot, but the reference we give back will only
+        // be as long as the number of slots written, indicated by `len`.  The value of `len` is
+        // only updated once a slot has been fully written, guaranteeing the slot is initialized.
+        </span><span class="kw">let </span>len = <span class="self">self</span>.len();
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>head = <span class="self">self</span>.slots.get_unchecked(<span class="number">0</span>).as_ptr();
+            slice::from_raw_parts(head <span class="kw">as </span><span class="kw-2">*const </span>T, len)
         }
     }
 
-    <span class="doccomment">/// Pushes a value into this block.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="comment">// Try to increment the index.  If we&#39;ve reached the end of the block, let the bucket know</span>
-        <span class="comment">// so it can attach another block.</span>
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::AcqRel</span>);
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">BLOCK_SIZE</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">value</span>);
+    <span class="doccomment">/// Pushes a value into this block.
+    </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), T&gt; {
+        <span class="comment">// Try to increment the index.  If we&#39;ve reached the end of the block, let the bucket know
+        // so it can attach another block.
+        </span><span class="kw">let </span>index = <span class="self">self</span>.write.fetch_add(<span class="number">1</span>, Ordering::AcqRel);
+        <span class="kw">if </span>index &gt;= BLOCK_SIZE {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(value);
         }
 
-        <span class="comment">// SAFETY:</span>
-        <span class="comment">// - We never index outside of our block size.</span>
-        <span class="comment">// - Each slot is `MaybeUninit`, which itself can be safely zero initialized.</span>
-        <span class="comment">// - We&#39;re writing an initialized value into the slot before anyone is able to ever read</span>
-        <span class="comment">//   it, ensuring no uninitialized access.</span>
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Update the slot.</span>
-            <span class="self">self</span>.<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">index</span>).<span class="ident">assume_init_ref</span>().<span class="ident">get</span>().<span class="ident">write</span>(<span class="ident">value</span>);
+        <span class="comment">// SAFETY:
+        // - We never index outside of our block size.
+        // - Each slot is `MaybeUninit`, which itself can be safely zero initialized.
+        // - We&#39;re writing an initialized value into the slot before anyone is able to ever read
+        //   it, ensuring no uninitialized access.
+        </span><span class="kw">unsafe </span>{
+            <span class="comment">// Update the slot.
+            </span><span class="self">self</span>.slots.get_unchecked(index).assume_init_ref().get().write(value);
         }
 
-        <span class="comment">// Scoot our read index forward.</span>
-        <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">fetch_or</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">index</span>, <span class="ident">Ordering::AcqRel</span>);
+        <span class="comment">// Scoot our read index forward.
+        </span><span class="self">self</span>.read.fetch_or(<span class="number">1 </span>&lt;&lt; index, Ordering::AcqRel);
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe impl</span>&lt;T: Send&gt; Send <span class="kw">for </span>Block&lt;T&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: Sync&gt; Sync <span class="kw">for </span>Block&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">while</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_quiesced</span>() {}
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>Block&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">while </span>!<span class="self">self</span>.is_quiesced() {}
 
-        <span class="comment">// SAFETY:</span>
-        <span class="comment">// The value of `len` is only updated once a slot has been fully written, guaranteeing the</span>
-        <span class="comment">// slot is initialized.  Thus, we&#39;re only touching initialized slots here.</span>
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">len</span> {
-                <span class="self">self</span>.<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">i</span>).<span class="ident">assume_init_ref</span>().<span class="ident">get</span>().<span class="ident">drop_in_place</span>();
+        <span class="comment">// SAFETY:
+        // The value of `len` is only updated once a slot has been fully written, guaranteeing the
+        // slot is initialized.  Thus, we&#39;re only touching initialized slots here.
+        </span><span class="kw">unsafe </span>{
+            <span class="kw">let </span>len = <span class="self">self</span>.len();
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..len {
+                <span class="self">self</span>.slots.get_unchecked(i).assume_init_ref().get().drop_in_place();
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">has_next</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="op">!</span><span class="self">self</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>, <span class="ident">unprotected</span>()).<span class="ident">is_null</span>() };
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Block&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;type&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;block_size&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">BLOCK_SIZE</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;write&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">write</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>))
-            .<span class="ident">field</span>(<span class="string">&quot;read&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">read</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>))
-            .<span class="ident">field</span>(<span class="string">&quot;len&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">len</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;has_next&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">has_next</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;T&gt; std::fmt::Debug <span class="kw">for </span>Block&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">let </span>has_next = <span class="kw">unsafe </span>{ !<span class="self">self</span>.next.load(Ordering::Acquire, unprotected()).is_null() };
+        f.debug_struct(<span class="string">&quot;Block&quot;</span>)
+            .field(<span class="string">&quot;type&quot;</span>, <span class="kw-2">&amp;</span>std::any::type_name::&lt;T&gt;())
+            .field(<span class="string">&quot;block_size&quot;</span>, <span class="kw-2">&amp;</span>BLOCK_SIZE)
+            .field(<span class="string">&quot;write&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.write.load(Ordering::Acquire))
+            .field(<span class="string">&quot;read&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.read.load(Ordering::Acquire))
+            .field(<span class="string">&quot;len&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.len())
+            .field(<span class="string">&quot;has_next&quot;</span>, <span class="kw-2">&amp;</span>has_next)
+            .finish()
     }
 }
 
-<span class="doccomment">/// A lock-free bucket with snapshot capabilities.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This bucket is implemented as a singly-linked list of blocks, where each block is a small</span>
-<span class="doccomment">/// buffer that can hold a handful of elements.  There is no limit to how many elements can be in</span>
-<span class="doccomment">/// the bucket at a time.  Blocks are dynamically allocated as elements are pushed into the bucket.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Unlike a queue, buckets cannot be drained element by element: callers must iterate the whole</span>
-<span class="doccomment">/// structure.  Reading the bucket happens in a quasi-reverse fashion, to allow writers to make</span>
-<span class="doccomment">/// forward progress without affecting the iteration of the previously written values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For example, in a scenario where an internal block can hold 4 elements, and the caller has</span>
-<span class="doccomment">/// written 10 elements to the bucket, you would expect to see the values in this order when iterating:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// [6 7 8 9] [2 3 4 5] [0 1]</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Block sizes are dependent on the target architecture, where each block can hold N items, and N</span>
-<span class="doccomment">/// is the number of bits in the target architecture&#39;s pointer width.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AtomicBucket</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">tail</span>: <span class="ident">Atomic</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A lock-free bucket with snapshot capabilities.
+///
+/// This bucket is implemented as a singly-linked list of blocks, where each block is a small
+/// buffer that can hold a handful of elements.  There is no limit to how many elements can be in
+/// the bucket at a time.  Blocks are dynamically allocated as elements are pushed into the bucket.
+///
+/// Unlike a queue, buckets cannot be drained element by element: callers must iterate the whole
+/// structure.  Reading the bucket happens in a quasi-reverse fashion, to allow writers to make
+/// forward progress without affecting the iteration of the previously written values.
+///
+/// For example, in a scenario where an internal block can hold 4 elements, and the caller has
+/// written 10 elements to the bucket, you would expect to see the values in this order when iterating:
+///
+/// ```text
+/// [6 7 8 9] [2 3 4 5] [0 1]
+/// ```
+///
+/// Block sizes are dependent on the target architecture, where each block can hold N items, and N
+/// is the number of bits in the target architecture&#39;s pointer width.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>AtomicBucket&lt;T&gt; {
+    tail: Atomic&lt;Block&lt;T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AtomicBucket</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new, empty bucket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">AtomicBucket</span> { <span class="ident">tail</span>: <span class="ident">Atomic::null</span>() }
+<span class="kw">impl</span>&lt;T&gt; AtomicBucket&lt;T&gt; {
+    <span class="doccomment">/// Creates a new, empty bucket.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        AtomicBucket { tail: Atomic::null() }
     }
 
-    <span class="doccomment">/// Checks whether or not this bucket is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">epoch_pin</span>();
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>, <span class="ident">guard</span>);
-        <span class="kw">if</span> <span class="ident">tail</span>.<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Checks whether or not this bucket is empty.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>epoch_pin();
+        <span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Ordering::Acquire, guard);
+        <span class="kw">if </span>tail.is_null() {
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="comment">// We have to check the next block of our tail in case the current tail is simply a fresh</span>
-        <span class="comment">// block that has not been written to yet.</span>
-        <span class="kw">let</span> <span class="ident">tail_block</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">tail</span>.<span class="ident">deref</span>() };
-        <span class="ident">tail_block</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">tail_block</span>.<span class="ident">next_len</span>(<span class="ident">guard</span>) <span class="op">==</span> <span class="number">0</span>
-    }
+        <span class="comment">// We have to check the next block of our tail in case the current tail is simply a fresh
+        // block that has not been written to yet.
+        </span><span class="kw">let </span>tail_block = <span class="kw">unsafe </span>{ tail.deref() };
+        tail_block.len() == <span class="number">0 </span>&amp;&amp; tail_block.next_len(guard) == <span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Pushes an element into the bucket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">original</span> <span class="op">=</span> <span class="ident">value</span>;
-        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">epoch_pin</span>();
-        <span class="kw">loop</span> {
-            <span class="comment">// Load the tail block, or install a new one.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>, <span class="ident">guard</span>);
-            <span class="kw">if</span> <span class="ident">tail</span>.<span class="ident">is_null</span>() {
-                <span class="comment">// No blocks at all yet.  We need to create one.</span>
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">compare_exchange</span>(
-                    <span class="ident">Shared::null</span>(),
-                    <span class="ident">Owned::new</span>(<span class="ident">Block::new</span>()),
-                    <span class="ident">Ordering::AcqRel</span>,
-                    <span class="ident">Ordering::Acquire</span>,
-                    <span class="ident">guard</span>,
+    <span class="doccomment">/// Pushes an element into the bucket.
+    </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) {
+        <span class="kw">let </span><span class="kw-2">mut </span>original = value;
+        <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>epoch_pin();
+        <span class="kw">loop </span>{
+            <span class="comment">// Load the tail block, or install a new one.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="self">self</span>.tail.load(Ordering::Acquire, guard);
+            <span class="kw">if </span>tail.is_null() {
+                <span class="comment">// No blocks at all yet.  We need to create one.
+                </span><span class="kw">match </span><span class="self">self</span>.tail.compare_exchange(
+                    Shared::null(),
+                    Owned::new(Block::new()),
+                    Ordering::AcqRel,
+                    Ordering::Acquire,
+                    guard,
                 ) {
-                    <span class="comment">// We won the race to install the new block.</span>
-                    <span class="prelude-val">Ok</span>(<span class="ident">ptr</span>) =&gt; <span class="ident">tail</span> <span class="op">=</span> <span class="ident">ptr</span>,
-                    <span class="comment">// Somebody else beat us, so just update our pointer.</span>
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">tail</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">current</span>,
+                    <span class="comment">// We won the race to install the new block.
+                    </span><span class="prelude-val">Ok</span>(ptr) =&gt; tail = ptr,
+                    <span class="comment">// Somebody else beat us, so just update our pointer.
+                    </span><span class="prelude-val">Err</span>(e) =&gt; tail = e.current,
                 }
             }
 
-            <span class="comment">// We have a block now, so we need to try writing to it.</span>
-            <span class="kw">let</span> <span class="ident">tail_block</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">tail</span>.<span class="ident">deref</span>() };
-            <span class="kw">match</span> <span class="ident">tail_block</span>.<span class="ident">push</span>(<span class="ident">original</span>) {
-                <span class="comment">// If the push was OK, then the block wasn&#39;t full.  It might _now_ be full, but we&#39;ll</span>
-                <span class="comment">// let future callers deal with installing a new block if necessary.</span>
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
-                <span class="comment">// The block was full, so we&#39;ve been given the value back and we need to install a new block.</span>
-                <span class="prelude-val">Err</span>(<span class="ident">value</span>) =&gt; {
-                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">compare_exchange</span>(
-                        <span class="ident">tail</span>,
-                        <span class="ident">Owned::new</span>(<span class="ident">Block::new</span>()),
-                        <span class="ident">Ordering::AcqRel</span>,
-                        <span class="ident">Ordering::Acquire</span>,
-                        <span class="ident">guard</span>,
+            <span class="comment">// We have a block now, so we need to try writing to it.
+            </span><span class="kw">let </span>tail_block = <span class="kw">unsafe </span>{ tail.deref() };
+            <span class="kw">match </span>tail_block.push(original) {
+                <span class="comment">// If the push was OK, then the block wasn&#39;t full.  It might _now_ be full, but we&#39;ll
+                // let future callers deal with installing a new block if necessary.
+                </span><span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
+                <span class="comment">// The block was full, so we&#39;ve been given the value back and we need to install a new block.
+                </span><span class="prelude-val">Err</span>(value) =&gt; {
+                    <span class="kw">match </span><span class="self">self</span>.tail.compare_exchange(
+                        tail,
+                        Owned::new(Block::new()),
+                        Ordering::AcqRel,
+                        Ordering::Acquire,
+                        guard,
                     ) {
-                        <span class="comment">// We managed to install the block, so we need to link this new block to</span>
-                        <span class="comment">// the nextious block.</span>
-                        <span class="prelude-val">Ok</span>(<span class="ident">ptr</span>) =&gt; {
-                            <span class="kw">let</span> <span class="ident">new_tail</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ptr</span>.<span class="ident">deref</span>() };
-                            <span class="ident">new_tail</span>.<span class="ident">next</span>.<span class="ident">store</span>(<span class="ident">tail</span>, <span class="ident">Ordering::Release</span>);
+                        <span class="comment">// We managed to install the block, so we need to link this new block to
+                        // the nextious block.
+                        </span><span class="prelude-val">Ok</span>(ptr) =&gt; {
+                            <span class="kw">let </span>new_tail = <span class="kw">unsafe </span>{ ptr.deref() };
+                            new_tail.next.store(tail, Ordering::Release);
 
-                            <span class="comment">// Now push into our new block.</span>
-                            <span class="kw">match</span> <span class="ident">new_tail</span>.<span class="ident">push</span>(<span class="ident">value</span>) {
-                                <span class="comment">// We wrote the value successfully, so we&#39;re good here!</span>
-                                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
-                                <span class="comment">// The block was full, so just loop and start over.</span>
-                                <span class="prelude-val">Err</span>(<span class="ident">value</span>) =&gt; {
-                                    <span class="ident">original</span> <span class="op">=</span> <span class="ident">value</span>;
+                            <span class="comment">// Now push into our new block.
+                            </span><span class="kw">match </span>new_tail.push(value) {
+                                <span class="comment">// We wrote the value successfully, so we&#39;re good here!
+                                </span><span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
+                                <span class="comment">// The block was full, so just loop and start over.
+                                </span><span class="prelude-val">Err</span>(value) =&gt; {
+                                    original = value;
                                     <span class="kw">continue</span>;
                                 }
                             }
                         }
-                        <span class="comment">// Somebody else installed the block before us, so let&#39;s just start over.</span>
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">original</span> <span class="op">=</span> <span class="ident">value</span>,
+                        <span class="comment">// Somebody else installed the block before us, so let&#39;s just start over.
+                        </span><span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; original = value,
                     }
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Collects all of the elements written to the bucket.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operation can be slow as it involves allocating enough space to hold all of the</span>
-    <span class="doccomment">/// elements within the bucket.  Consider [`data_with`](AtomicBucket::data_with) to incrementally iterate</span>
-    <span class="doccomment">/// the internal blocks within the bucket.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Elements are in partial reverse order: blocks are iterated in reverse order, but the</span>
-    <span class="doccomment">/// elements within them will appear in their original order.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Clone</span>,
+    <span class="doccomment">/// Collects all of the elements written to the bucket.
+    ///
+    /// This operation can be slow as it involves allocating enough space to hold all of the
+    /// elements within the bucket.  Consider [`data_with`](AtomicBucket::data_with) to incrementally iterate
+    /// the internal blocks within the bucket.
+    ///
+    /// Elements are in partial reverse order: blocks are iterated in reverse order, but the
+    /// elements within them will appear in their original order.
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;T&gt;
+    <span class="kw">where
+        </span>T: Clone,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="self">self</span>.<span class="ident">data_with</span>(<span class="op">|</span><span class="ident">block</span><span class="op">|</span> <span class="ident">values</span>.<span class="ident">extend_from_slice</span>(<span class="ident">block</span>));
-        <span class="ident">values</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>values = Vec::new();
+        <span class="self">self</span>.data_with(|block| values.extend_from_slice(block));
+        values
     }
 
-    <span class="doccomment">/// Iterates all of the elements written to the bucket, invoking `f` for each block.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Elements are in partial reverse order: blocks are iterated in reverse order, but the</span>
-    <span class="doccomment">/// elements within them will appear in their original order.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span>[<span class="ident">T</span>]),
+    <span class="doccomment">/// Iterates all of the elements written to the bucket, invoking `f` for each block.
+    ///
+    /// Elements are in partial reverse order: blocks are iterated in reverse order, but the
+    /// elements within them will appear in their original order.
+    </span><span class="kw">pub fn </span>data_with&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>f: F)
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>[T]),
     {
-        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">epoch_pin</span>();
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
+        <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>epoch_pin();
+        <span class="kw">let </span>backoff = Backoff::new();
 
-        <span class="comment">// While we have a valid block -- either `tail` or the next block as we keep reading -- we</span>
-        <span class="comment">// load the data from each block and process it by calling `f`.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block_ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>, <span class="ident">guard</span>);
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">block_ptr</span>.<span class="ident">is_null</span>() {
-            <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">block_ptr</span>.<span class="ident">deref</span>() };
+        <span class="comment">// While we have a valid block -- either `tail` or the next block as we keep reading -- we
+        // load the data from each block and process it by calling `f`.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>block_ptr = <span class="self">self</span>.tail.load(Ordering::Acquire, guard);
+        <span class="kw">while </span>!block_ptr.is_null() {
+            <span class="kw">let </span>block = <span class="kw">unsafe </span>{ block_ptr.deref() };
 
-            <span class="comment">// We wait for the block to be quiesced to ensure we get any in-flight writes, and</span>
-            <span class="comment">// snoozing specifically yields the reading thread to ensure things are given a</span>
-            <span class="comment">// chance to complete.</span>
-            <span class="kw">while</span> <span class="op">!</span><span class="ident">block</span>.<span class="ident">is_quiesced</span>() {
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+            <span class="comment">// We wait for the block to be quiesced to ensure we get any in-flight writes, and
+            // snoozing specifically yields the reading thread to ensure things are given a
+            // chance to complete.
+            </span><span class="kw">while </span>!block.is_quiesced() {
+                backoff.snooze();
             }
 
-            <span class="comment">// Read the data out of the block.</span>
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">data</span>();
-            <span class="ident">f</span>(<span class="ident">data</span>);
+            <span class="comment">// Read the data out of the block.
+            </span><span class="kw">let </span>data = block.data();
+            f(data);
 
-            <span class="comment">// Load the next block.</span>
-            <span class="ident">block_ptr</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>, <span class="ident">guard</span>);
+            <span class="comment">// Load the next block.
+            </span>block_ptr = block.next.load(Ordering::Acquire, guard);
         }
     }
 
-    <span class="doccomment">/// Clears the bucket.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Deallocation of the internal blocks happens only when all readers have finished, and so</span>
-    <span class="doccomment">/// will not necessarily occur during or immediately preceding this method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">/// This method will not affect reads that are already in progress.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">clear_with</span>(<span class="op">|</span><span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]<span class="op">|</span> {})
+    <span class="doccomment">/// Clears the bucket.
+    ///
+    /// Deallocation of the internal blocks happens only when all readers have finished, and so
+    /// will not necessarily occur during or immediately preceding this method.
+    ///
+    /// # Note
+    /// This method will not affect reads that are already in progress.
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.clear_with(|<span class="kw">_</span>: <span class="kw-2">&amp;</span>[T]| {})
     }
 
-    <span class="doccomment">/// Clears the bucket, invoking `f` for every block that will be cleared.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Deallocation of the internal blocks happens only when all readers have finished, and so</span>
-    <span class="doccomment">/// will not necessarily occur during or immediately preceding this method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is useful for accumulating values and then observing them, in a way that allows</span>
-    <span class="doccomment">/// the caller to avoid visiting the same values again the next time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method allows a pattern of observing values before they&#39;re cleared, with a clear</span>
-    <span class="doccomment">/// demarcation. A similar pattern used in the wild would be to have some data structure, like</span>
-    <span class="doccomment">/// a vector, which is continuously filled, and then eventually swapped out with a new, empty</span>
-    <span class="doccomment">/// vector, allowing the caller to read all of the old values while new values are being</span>
-    <span class="doccomment">/// written, over and over again.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">/// This method will not affect reads that are already in progress.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span>[<span class="ident">T</span>]),
+    <span class="doccomment">/// Clears the bucket, invoking `f` for every block that will be cleared.
+    ///
+    /// Deallocation of the internal blocks happens only when all readers have finished, and so
+    /// will not necessarily occur during or immediately preceding this method.
+    ///
+    /// This method is useful for accumulating values and then observing them, in a way that allows
+    /// the caller to avoid visiting the same values again the next time.
+    ///
+    /// This method allows a pattern of observing values before they&#39;re cleared, with a clear
+    /// demarcation. A similar pattern used in the wild would be to have some data structure, like
+    /// a vector, which is continuously filled, and then eventually swapped out with a new, empty
+    /// vector, allowing the caller to read all of the old values while new values are being
+    /// written, over and over again.
+    ///
+    /// # Note
+    /// This method will not affect reads that are already in progress.
+    </span><span class="kw">pub fn </span>clear_with&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>f: F)
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>[T]),
     {
-        <span class="comment">// We simply swap the tail pointer which effectively clears the bucket.  Callers might</span>
-        <span class="comment">// still be in process of writing to the tail node, or reading the data, but new callers</span>
-        <span class="comment">// will see it as empty until another write proceeds.</span>
-        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">epoch_pin</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block_ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>, <span class="ident">guard</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">block_ptr</span>.<span class="ident">is_null</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>
-                .<span class="ident">tail</span>
-                .<span class="ident">compare_exchange</span>(
-                    <span class="ident">block_ptr</span>,
-                    <span class="ident">Shared::null</span>(),
-                    <span class="ident">Ordering::SeqCst</span>,
-                    <span class="ident">Ordering::SeqCst</span>,
-                    <span class="ident">guard</span>,
+        <span class="comment">// We simply swap the tail pointer which effectively clears the bucket.  Callers might
+        // still be in process of writing to the tail node, or reading the data, but new callers
+        // will see it as empty until another write proceeds.
+        </span><span class="kw">let </span>guard = <span class="kw-2">&amp;</span>epoch_pin();
+        <span class="kw">let </span><span class="kw-2">mut </span>block_ptr = <span class="self">self</span>.tail.load(Ordering::Acquire, guard);
+        <span class="kw">if </span>!block_ptr.is_null()
+            &amp;&amp; <span class="self">self
+                </span>.tail
+                .compare_exchange(
+                    block_ptr,
+                    Shared::null(),
+                    Ordering::SeqCst,
+                    Ordering::SeqCst,
+                    guard,
                 )
-                .<span class="ident">is_ok</span>()
+                .is_ok()
         {
-            <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">freeable_blocks</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+            <span class="kw">let </span>backoff = Backoff::new();
+            <span class="kw">let </span><span class="kw-2">mut </span>freeable_blocks = Vec::new();
 
-            <span class="comment">// While we have a valid block -- either `tail` or the next block as we keep reading -- we</span>
-            <span class="comment">// load the data from each block and process it by calling `f`.</span>
-            <span class="kw">while</span> <span class="op">!</span><span class="ident">block_ptr</span>.<span class="ident">is_null</span>() {
-                <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">block_ptr</span>.<span class="ident">deref</span>() };
+            <span class="comment">// While we have a valid block -- either `tail` or the next block as we keep reading -- we
+            // load the data from each block and process it by calling `f`.
+            </span><span class="kw">while </span>!block_ptr.is_null() {
+                <span class="kw">let </span>block = <span class="kw">unsafe </span>{ block_ptr.deref() };
 
-                <span class="comment">// We wait for the block to be quiesced to ensure we get any in-flight writes, and</span>
-                <span class="comment">// snoozing specifically yields the reading thread to ensure things are given a</span>
-                <span class="comment">// chance to complete.</span>
-                <span class="kw">while</span> <span class="op">!</span><span class="ident">block</span>.<span class="ident">is_quiesced</span>() {
-                    <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+                <span class="comment">// We wait for the block to be quiesced to ensure we get any in-flight writes, and
+                // snoozing specifically yields the reading thread to ensure things are given a
+                // chance to complete.
+                </span><span class="kw">while </span>!block.is_quiesced() {
+                    backoff.snooze();
                 }
 
-                <span class="comment">// Read the data out of the block.</span>
-                <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">data</span>();
-                <span class="ident">f</span>(<span class="ident">data</span>);
+                <span class="comment">// Read the data out of the block.
+                </span><span class="kw">let </span>data = block.data();
+                f(data);
 
-                <span class="comment">// Load the next block and take the shared reference to the current.</span>
-                <span class="kw">let</span> <span class="ident">old_block_ptr</span> <span class="op">=</span>
-                    <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="ident">block_ptr</span>, <span class="ident">block</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>, <span class="ident">guard</span>));
+                <span class="comment">// Load the next block and take the shared reference to the current.
+                </span><span class="kw">let </span>old_block_ptr =
+                    mem::replace(<span class="kw-2">&amp;mut </span>block_ptr, block.next.load(Ordering::Acquire, guard));
 
-                <span class="ident">freeable_blocks</span>.<span class="ident">push</span>(<span class="ident">old_block_ptr</span>);
-                <span class="kw">if</span> <span class="ident">freeable_blocks</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">DEFERRED_BLOCK_BATCH_SIZE</span> {
-                    <span class="kw">let</span> <span class="ident">blocks</span> <span class="op">=</span> <span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">freeable_blocks</span>);
-                    <span class="kw">unsafe</span> {
-                        <span class="ident">guard</span>.<span class="ident">defer_unchecked</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                            <span class="kw">for</span> <span class="ident">block</span> <span class="kw">in</span> <span class="ident">blocks</span> {
-                                <span class="ident">drop</span>(<span class="ident">block</span>.<span class="ident">into_owned</span>());
+                freeable_blocks.push(old_block_ptr);
+                <span class="kw">if </span>freeable_blocks.len() &gt;= DEFERRED_BLOCK_BATCH_SIZE {
+                    <span class="kw">let </span>blocks = mem::take(<span class="kw-2">&amp;mut </span>freeable_blocks);
+                    <span class="kw">unsafe </span>{
+                        guard.defer_unchecked(<span class="kw">move </span>|| {
+                            <span class="kw">for </span>block <span class="kw">in </span>blocks {
+                                drop(block.into_owned());
                             }
                         });
                     }
                 }
             }
 
-            <span class="comment">// Free any remaining old blocks.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">freeable_blocks</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">unsafe</span> {
-                    <span class="ident">guard</span>.<span class="ident">defer_unchecked</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                        <span class="kw">for</span> <span class="ident">block</span> <span class="kw">in</span> <span class="ident">freeable_blocks</span> {
-                            <span class="ident">drop</span>(<span class="ident">block</span>.<span class="ident">into_owned</span>());
+            <span class="comment">// Free any remaining old blocks.
+            </span><span class="kw">if </span>!freeable_blocks.is_empty() {
+                <span class="kw">unsafe </span>{
+                    guard.defer_unchecked(<span class="kw">move </span>|| {
+                        <span class="kw">for </span>block <span class="kw">in </span>freeable_blocks {
+                            drop(block.into_owned());
                         }
                     });
                 }
             }
 
-            <span class="comment">// This asks the global collector to attempt to drive execution of deferred operations a</span>
-            <span class="comment">// little sooner than it may have done so otherwise.</span>
-            <span class="ident">guard</span>.<span class="ident">flush</span>();
+            <span class="comment">// This asks the global collector to attempt to drive execution of deferred operations a
+            // little sooner than it may have done so otherwise.
+            </span>guard.flush();
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">AtomicBucket</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">tail</span>: <span class="ident">Atomic::null</span>() }
+<span class="kw">impl</span>&lt;T&gt; Default <span class="kw">for </span>AtomicBucket&lt;T&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ tail: Atomic::null() }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">AtomicBucket</span>, <span class="ident">Block</span>, <span class="ident">BLOCK_SIZE</span>};
-    <span class="kw">use</span> <span class="ident">crossbeam_utils::thread::scope</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::{AtomicBucket, Block, BLOCK_SIZE};
+    <span class="kw">use </span>crossbeam_utils::thread::scope;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_create_new_block</span>() {
-        <span class="kw">let</span> <span class="ident">block</span>: <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Block::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">block</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_create_new_block() {
+        <span class="kw">let </span>block: Block&lt;u64&gt; = Block::new();
+        <span class="macro">assert_eq!</span>(block.len(), <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span>data = block.data();
+        <span class="macro">assert_eq!</span>(data.len(), <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_block_write_then_read</span>() {
-        <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">Block::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">block</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_block_write_then_read() {
+        <span class="kw">let </span>block = Block::new();
+        <span class="macro">assert_eq!</span>(block.len(), <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span>data = block.data();
+        <span class="macro">assert_eq!</span>(data.len(), <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">push</span>(<span class="number">42</span>);
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_ok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">block</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="kw">let </span>result = block.push(<span class="number">42</span>);
+        <span class="macro">assert!</span>(result.is_ok());
+        <span class="macro">assert_eq!</span>(block.len(), <span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>[<span class="number">0</span>], <span class="number">42</span>);
+        <span class="kw">let </span>data = block.data();
+        <span class="macro">assert_eq!</span>(data.len(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(data[<span class="number">0</span>], <span class="number">42</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_block_write_until_full_then_read</span>() {
-        <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">Block::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">block</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_block_write_until_full_then_read() {
+        <span class="kw">let </span>block = Block::new();
+        <span class="macro">assert_eq!</span>(block.len(), <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span>data = block.data();
+        <span class="macro">assert_eq!</span>(data.len(), <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">BLOCK_SIZE</span> <span class="kw">as</span> <span class="ident">u64</span> {
-            <span class="macro">assert!</span>(<span class="ident">block</span>.<span class="ident">push</span>(<span class="ident">i</span>).<span class="ident">is_ok</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>total = <span class="number">0</span>;
+        <span class="kw">while </span>i &lt; BLOCK_SIZE <span class="kw">as </span>u64 {
+            <span class="macro">assert!</span>(block.push(i).is_ok());
 
-            <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>;
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            total += i;
+            i += <span class="number">1</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">len</span>(), <span class="ident">BLOCK_SIZE</span>);
+        <span class="kw">let </span>data = block.data();
+        <span class="macro">assert_eq!</span>(data.len(), BLOCK_SIZE);
 
-        <span class="kw">let</span> <span class="ident">sum</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">iter</span>().<span class="ident">sum</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">sum</span>, <span class="ident">total</span>);
+        <span class="kw">let </span>sum: u64 = data.iter().sum();
+        <span class="macro">assert_eq!</span>(sum, total);
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">push</span>(<span class="number">42</span>);
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_err</span>());
+        <span class="kw">let </span>result = block.push(<span class="number">42</span>);
+        <span class="macro">assert!</span>(result.is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_block_write_until_full_then_read_mt</span>() {
-        <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">Block::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">block</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_block_write_until_full_then_read_mt() {
+        <span class="kw">let </span>block = Block::new();
+        <span class="macro">assert_eq!</span>(block.len(), <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span>data = block.data();
+        <span class="macro">assert_eq!</span>(data.len(), <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">scope</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">t1</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">BLOCK_SIZE</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">/</span> <span class="number">2</span> {
-                    <span class="macro">assert!</span>(<span class="ident">block</span>.<span class="ident">push</span>(<span class="ident">i</span>).<span class="ident">is_ok</span>());
+        <span class="kw">let </span>res = scope(|s| {
+            <span class="kw">let </span>t1 = s.spawn(|<span class="kw">_</span>| {
+                <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>total = <span class="number">0</span>;
+                <span class="kw">while </span>i &lt; BLOCK_SIZE <span class="kw">as </span>u64 / <span class="number">2 </span>{
+                    <span class="macro">assert!</span>(block.push(i).is_ok());
 
-                    <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>;
-                    <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    total += i;
+                    i += <span class="number">1</span>;
                 }
-                <span class="ident">total</span>
+                total
             });
 
-            <span class="kw">let</span> <span class="ident">t2</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">BLOCK_SIZE</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">/</span> <span class="number">2</span> {
-                    <span class="macro">assert!</span>(<span class="ident">block</span>.<span class="ident">push</span>(<span class="ident">i</span>).<span class="ident">is_ok</span>());
+            <span class="kw">let </span>t2 = s.spawn(|<span class="kw">_</span>| {
+                <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>total = <span class="number">0</span>;
+                <span class="kw">while </span>i &lt; BLOCK_SIZE <span class="kw">as </span>u64 / <span class="number">2 </span>{
+                    <span class="macro">assert!</span>(block.push(i).is_ok());
 
-                    <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>;
-                    <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    total += i;
+                    i += <span class="number">1</span>;
                 }
-                <span class="ident">total</span>
+                total
             });
 
-            <span class="kw">let</span> <span class="ident">t1_total</span> <span class="op">=</span> <span class="ident">t1</span>.<span class="ident">join</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">t2_total</span> <span class="op">=</span> <span class="ident">t2</span>.<span class="ident">join</span>().<span class="ident">unwrap</span>();
+            <span class="kw">let </span>t1_total = t1.join().unwrap();
+            <span class="kw">let </span>t2_total = t2.join().unwrap();
 
-            <span class="ident">t1_total</span> <span class="op">+</span> <span class="ident">t2_total</span>
+            t1_total + t2_total
         });
 
-        <span class="kw">let</span> <span class="ident">total</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let </span>total = res.unwrap();
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">len</span>(), <span class="ident">BLOCK_SIZE</span>);
+        <span class="kw">let </span>data = block.data();
+        <span class="macro">assert_eq!</span>(data.len(), BLOCK_SIZE);
 
-        <span class="kw">let</span> <span class="ident">sum</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">iter</span>().<span class="ident">sum</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">sum</span>, <span class="ident">total</span>);
+        <span class="kw">let </span>sum: u64 = data.iter().sum();
+        <span class="macro">assert_eq!</span>(sum, total);
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">push</span>(<span class="number">42</span>);
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_err</span>());
+        <span class="kw">let </span>result = block.push(<span class="number">42</span>);
+        <span class="macro">assert!</span>(result.is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_bucket_write_then_read</span>() {
-        <span class="kw">let</span> <span class="ident">bucket</span> <span class="op">=</span> <span class="ident">AtomicBucket::new</span>();
-        <span class="ident">bucket</span>.<span class="ident">push</span>(<span class="number">42</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_bucket_write_then_read() {
+        <span class="kw">let </span>bucket = AtomicBucket::new();
+        bucket.push(<span class="number">42</span>);
 
-        <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">snapshot</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">snapshot</span>[<span class="number">0</span>], <span class="number">42</span>);
+        <span class="kw">let </span>snapshot = bucket.data();
+        <span class="macro">assert_eq!</span>(snapshot.len(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(snapshot[<span class="number">0</span>], <span class="number">42</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_bucket_multiple_blocks_write_then_read</span>() {
-        <span class="kw">let</span> <span class="ident">bucket</span> <span class="op">=</span> <span class="ident">AtomicBucket::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_bucket_multiple_blocks_write_then_read() {
+        <span class="kw">let </span>bucket = AtomicBucket::new();
 
-        <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">snapshot</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span>snapshot = bucket.data();
+        <span class="macro">assert_eq!</span>(snapshot.len(), <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> (<span class="ident">BLOCK_SIZE</span> <span class="op">*</span> <span class="number">3</span> <span class="op">+</span> <span class="ident">BLOCK_SIZE</span> <span class="op">/</span> <span class="number">2</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">target</span> {
-            <span class="ident">bucket</span>.<span class="ident">push</span>(<span class="ident">i</span>);
+        <span class="kw">let </span>target = (BLOCK_SIZE * <span class="number">3 </span>+ BLOCK_SIZE / <span class="number">2</span>) <span class="kw">as </span>u64;
+        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>total = <span class="number">0</span>;
+        <span class="kw">while </span>i &lt; target {
+            bucket.push(i);
 
-            <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>;
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            total += i;
+            i += <span class="number">1</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">snapshot</span>.<span class="ident">len</span>(), <span class="ident">target</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="kw">let </span>snapshot = bucket.data();
+        <span class="macro">assert_eq!</span>(snapshot.len(), target <span class="kw">as </span>usize);
 
-        <span class="kw">let</span> <span class="ident">sum</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">snapshot</span>.<span class="ident">iter</span>().<span class="ident">sum</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">sum</span>, <span class="ident">total</span>);
+        <span class="kw">let </span>sum: u64 = snapshot.iter().sum();
+        <span class="macro">assert_eq!</span>(sum, total);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_bucket_write_then_read_mt</span>() {
-        <span class="kw">let</span> <span class="ident">bucket</span> <span class="op">=</span> <span class="ident">AtomicBucket::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_bucket_write_then_read_mt() {
+        <span class="kw">let </span>bucket = AtomicBucket::new();
 
-        <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">snapshot</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span>snapshot = bucket.data();
+        <span class="macro">assert_eq!</span>(snapshot.len(), <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">scope</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">t1</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">BLOCK_SIZE</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">100_000</span> {
-                    <span class="ident">bucket</span>.<span class="ident">push</span>(<span class="ident">i</span>);
+        <span class="kw">let </span>res = scope(|s| {
+            <span class="kw">let </span>t1 = s.spawn(|<span class="kw">_</span>| {
+                <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>total = <span class="number">0</span>;
+                <span class="kw">while </span>i &lt; BLOCK_SIZE <span class="kw">as </span>u64 * <span class="number">100_000 </span>{
+                    bucket.push(i);
 
-                    <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>;
-                    <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    total += i;
+                    i += <span class="number">1</span>;
                 }
-                <span class="ident">total</span>
+                total
             });
 
-            <span class="kw">let</span> <span class="ident">t2</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">BLOCK_SIZE</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">100_000</span> {
-                    <span class="ident">bucket</span>.<span class="ident">push</span>(<span class="ident">i</span>);
+            <span class="kw">let </span>t2 = s.spawn(|<span class="kw">_</span>| {
+                <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>total = <span class="number">0</span>;
+                <span class="kw">while </span>i &lt; BLOCK_SIZE <span class="kw">as </span>u64 * <span class="number">100_000 </span>{
+                    bucket.push(i);
 
-                    <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>;
-                    <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    total += i;
+                    i += <span class="number">1</span>;
                 }
-                <span class="ident">total</span>
+                total
             });
 
-            <span class="kw">let</span> <span class="ident">t1_total</span> <span class="op">=</span> <span class="ident">t1</span>.<span class="ident">join</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">t2_total</span> <span class="op">=</span> <span class="ident">t2</span>.<span class="ident">join</span>().<span class="ident">unwrap</span>();
+            <span class="kw">let </span>t1_total = t1.join().unwrap();
+            <span class="kw">let </span>t2_total = t2.join().unwrap();
 
-            <span class="ident">t1_total</span> <span class="op">+</span> <span class="ident">t2_total</span>
+            t1_total + t2_total
         });
 
-        <span class="kw">let</span> <span class="ident">total</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let </span>total = res.unwrap();
 
-        <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">snapshot</span>.<span class="ident">len</span>(), <span class="ident">BLOCK_SIZE</span> <span class="op">*</span> <span class="number">200_000</span>);
+        <span class="kw">let </span>snapshot = bucket.data();
+        <span class="macro">assert_eq!</span>(snapshot.len(), BLOCK_SIZE * <span class="number">200_000</span>);
 
-        <span class="kw">let</span> <span class="ident">sum</span> <span class="op">=</span> <span class="ident">snapshot</span>.<span class="ident">iter</span>().<span class="ident">sum</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">sum</span>, <span class="ident">total</span>);
+        <span class="kw">let </span>sum = snapshot.iter().sum::&lt;u64&gt;();
+        <span class="macro">assert_eq!</span>(sum, total);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_clear_and_clear_with</span>() {
-        <span class="kw">let</span> <span class="ident">bucket</span> <span class="op">=</span> <span class="ident">AtomicBucket::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_clear_and_clear_with() {
+        <span class="kw">let </span>bucket = AtomicBucket::new();
 
-        <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">snapshot</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span>snapshot = bucket.data();
+        <span class="macro">assert_eq!</span>(snapshot.len(), <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total_pushed</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">BLOCK_SIZE</span> <span class="op">*</span> <span class="number">4</span> {
-            <span class="ident">bucket</span>.<span class="ident">push</span>(<span class="ident">i</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>total_pushed = <span class="number">0</span>;
+        <span class="kw">while </span>i &lt; BLOCK_SIZE * <span class="number">4 </span>{
+            bucket.push(i);
 
-            <span class="ident">total_pushed</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>;
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            total_pushed += i;
+            i += <span class="number">1</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">snapshot</span>.<span class="ident">len</span>(), <span class="ident">i</span>);
+        <span class="kw">let </span>snapshot = bucket.data();
+        <span class="macro">assert_eq!</span>(snapshot.len(), i);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total_accumulated</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="ident">bucket</span>.<span class="ident">clear_with</span>(<span class="op">|</span><span class="ident">xs</span><span class="op">|</span> <span class="ident">total_accumulated</span> <span class="op">+</span><span class="op">=</span> <span class="ident">xs</span>.<span class="ident">iter</span>().<span class="ident">sum</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">total_pushed</span>, <span class="ident">total_accumulated</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>total_accumulated = <span class="number">0</span>;
+        bucket.clear_with(|xs| total_accumulated += xs.iter().sum::&lt;usize&gt;());
+        <span class="macro">assert_eq!</span>(total_pushed, total_accumulated);
 
-        <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">snapshot</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span>snapshot = bucket.data();
+        <span class="macro">assert_eq!</span>(snapshot.len(), <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_bucket_len_and_next_len</span>() {
-        <span class="kw">let</span> <span class="ident">bucket</span> <span class="op">=</span> <span class="ident">AtomicBucket::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">bucket</span>.<span class="ident">is_empty</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_bucket_len_and_next_len() {
+        <span class="kw">let </span>bucket = AtomicBucket::new();
+        <span class="macro">assert!</span>(bucket.is_empty());
 
-        <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">data</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">snapshot</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let </span>snapshot = bucket.data();
+        <span class="macro">assert_eq!</span>(snapshot.len(), <span class="number">0</span>);
 
-        <span class="comment">// Just making sure that `is_empty` holds as we go from</span>
-        <span class="comment">// the first block, to the second block, to exercise the</span>
-        <span class="comment">// `Block::next_len` codepath.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">BLOCK_SIZE</span> <span class="op">*</span> <span class="number">2</span> {
-            <span class="ident">bucket</span>.<span class="ident">push</span>(<span class="ident">i</span>);
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bucket</span>.<span class="ident">is_empty</span>());
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="comment">// Just making sure that `is_empty` holds as we go from
+        // the first block, to the second block, to exercise the
+        // `Block::next_len` codepath.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+        <span class="kw">while </span>i &lt; BLOCK_SIZE * <span class="number">2 </span>{
+            bucket.push(i);
+            <span class="macro">assert!</span>(!bucket.is_empty());
+            i += <span class="number">1</span>;
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

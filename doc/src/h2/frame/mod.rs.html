@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/frame/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../h2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/frame/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../h2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -169,176 +169,176 @@
 <span id="169">169</span>
 <span id="170">170</span>
 <span id="171">171</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::hpack</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::hpack;
 
-<span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
+<span class="kw">use </span>bytes::Bytes;
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// A helper macro that unpacks a sequence of 4 bytes found in the buffer with</span>
-<span class="doccomment">/// the given identifier, starting at the given offset, into the given integer</span>
-<span class="doccomment">/// type. Obviously, the integer type should be able to support at least 4</span>
-<span class="doccomment">/// bytes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// # // We ignore this doctest because the macro is not exported.</span>
-<span class="doccomment">/// let buf: [u8; 4] = [0, 0, 0, 1];</span>
-<span class="doccomment">/// assert_eq!(1u32, unpack_octets_4!(buf, 0, u32));</span>
-<span class="doccomment">/// ```</span>
-<span class="macro">macro_rules!</span> <span class="ident">unpack_octets_4</span> {
-    <span class="comment">// TODO: Get rid of this macro</span>
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tip</span>:<span class="ident">ty</span>) =&gt; {
-        ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span> <span class="op">+</span> <span class="number">0</span>] <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tip</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>)
-            <span class="op">|</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span> <span class="op">+</span> <span class="number">1</span>] <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tip</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>)
-            <span class="op">|</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span> <span class="op">+</span> <span class="number">2</span>] <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tip</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>)
-            <span class="op">|</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span> <span class="op">+</span> <span class="number">3</span>] <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tip</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>)
+<span class="doccomment">/// A helper macro that unpacks a sequence of 4 bytes found in the buffer with
+/// the given identifier, starting at the given offset, into the given integer
+/// type. Obviously, the integer type should be able to support at least 4
+/// bytes.
+///
+/// # Examples
+///
+/// ```ignore
+/// # // We ignore this doctest because the macro is not exported.
+/// let buf: [u8; 4] = [0, 0, 0, 1];
+/// assert_eq!(1u32, unpack_octets_4!(buf, 0, u32));
+/// ```
+</span><span class="macro">macro_rules! </span>unpack_octets_4 {
+    <span class="comment">// TODO: Get rid of this macro
+    </span>(<span class="macro-nonterminal">$buf</span>:expr, <span class="macro-nonterminal">$offset</span>:expr, <span class="macro-nonterminal">$tip</span>:ty) =&gt; {
+        ((<span class="macro-nonterminal">$buf</span>[<span class="macro-nonterminal">$offset </span>+ <span class="number">0</span>] <span class="kw">as </span><span class="macro-nonterminal">$tip</span>) &lt;&lt; <span class="number">24</span>)
+            | ((<span class="macro-nonterminal">$buf</span>[<span class="macro-nonterminal">$offset </span>+ <span class="number">1</span>] <span class="kw">as </span><span class="macro-nonterminal">$tip</span>) &lt;&lt; <span class="number">16</span>)
+            | ((<span class="macro-nonterminal">$buf</span>[<span class="macro-nonterminal">$offset </span>+ <span class="number">2</span>] <span class="kw">as </span><span class="macro-nonterminal">$tip</span>) &lt;&lt; <span class="number">8</span>)
+            | ((<span class="macro-nonterminal">$buf</span>[<span class="macro-nonterminal">$offset </span>+ <span class="number">3</span>] <span class="kw">as </span><span class="macro-nonterminal">$tip</span>) &lt;&lt; <span class="number">0</span>)
     };
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_unpack_octets_4</span>() {
-        <span class="kw">let</span> <span class="ident">buf</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>];
-        <span class="macro">assert_eq!</span>(<span class="number">1u32</span>, <span class="macro">unpack_octets_4!</span>(<span class="ident">buf</span>, <span class="number">0</span>, <span class="ident">u32</span>));
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_unpack_octets_4() {
+        <span class="kw">let </span>buf: [u8; <span class="number">4</span>] = [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>];
+        <span class="macro">assert_eq!</span>(<span class="number">1u32</span>, <span class="macro">unpack_octets_4!</span>(buf, <span class="number">0</span>, u32));
     }
 }
 
-<span class="kw">mod</span> <span class="ident">data</span>;
-<span class="kw">mod</span> <span class="ident">go_away</span>;
-<span class="kw">mod</span> <span class="ident">head</span>;
-<span class="kw">mod</span> <span class="ident">headers</span>;
-<span class="kw">mod</span> <span class="ident">ping</span>;
-<span class="kw">mod</span> <span class="ident">priority</span>;
-<span class="kw">mod</span> <span class="ident">reason</span>;
-<span class="kw">mod</span> <span class="ident">reset</span>;
-<span class="kw">mod</span> <span class="ident">settings</span>;
-<span class="kw">mod</span> <span class="ident">stream_id</span>;
-<span class="kw">mod</span> <span class="ident">util</span>;
-<span class="kw">mod</span> <span class="ident">window_update</span>;
+<span class="kw">mod </span>data;
+<span class="kw">mod </span>go_away;
+<span class="kw">mod </span>head;
+<span class="kw">mod </span>headers;
+<span class="kw">mod </span>ping;
+<span class="kw">mod </span>priority;
+<span class="kw">mod </span>reason;
+<span class="kw">mod </span>reset;
+<span class="kw">mod </span>settings;
+<span class="kw">mod </span>stream_id;
+<span class="kw">mod </span>util;
+<span class="kw">mod </span>window_update;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::data::Data</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::go_away::GoAway</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::head</span>::{<span class="ident">Head</span>, <span class="ident">Kind</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::headers</span>::{
-    <span class="ident">parse_u64</span>, <span class="ident">Continuation</span>, <span class="ident">Headers</span>, <span class="ident">Pseudo</span>, <span class="ident">PushPromise</span>, <span class="ident">PushPromiseHeaderError</span>,
+<span class="kw">pub use </span><span class="self">self</span>::data::Data;
+<span class="kw">pub use </span><span class="self">self</span>::go_away::GoAway;
+<span class="kw">pub use </span><span class="self">self</span>::head::{Head, Kind};
+<span class="kw">pub use </span><span class="self">self</span>::headers::{
+    parse_u64, Continuation, Headers, Pseudo, PushPromise, PushPromiseHeaderError,
 };
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ping::Ping</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::priority</span>::{<span class="ident">Priority</span>, <span class="ident">StreamDependency</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::reason::Reason</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::reset::Reset</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::settings::Settings</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::stream_id</span>::{<span class="ident">StreamId</span>, <span class="ident">StreamIdOverflow</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::window_update::WindowUpdate</span>;
+<span class="kw">pub use </span><span class="self">self</span>::ping::Ping;
+<span class="kw">pub use </span><span class="self">self</span>::priority::{Priority, StreamDependency};
+<span class="kw">pub use </span><span class="self">self</span>::reason::Reason;
+<span class="kw">pub use </span><span class="self">self</span>::reset::Reset;
+<span class="kw">pub use </span><span class="self">self</span>::settings::Settings;
+<span class="kw">pub use </span><span class="self">self</span>::stream_id::{StreamId, StreamIdOverflow};
+<span class="kw">pub use </span><span class="self">self</span>::window_update::WindowUpdate;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::hpack::BytesStr</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;unstable&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::hpack::BytesStr;
 
-<span class="comment">// Re-export some constants</span>
+<span class="comment">// Re-export some constants
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::settings</span>::{
-    <span class="ident">DEFAULT_INITIAL_WINDOW_SIZE</span>, <span class="ident">DEFAULT_MAX_FRAME_SIZE</span>, <span class="ident">DEFAULT_SETTINGS_HEADER_TABLE_SIZE</span>,
-    <span class="ident">MAX_INITIAL_WINDOW_SIZE</span>, <span class="ident">MAX_MAX_FRAME_SIZE</span>,
+</span><span class="kw">pub use </span><span class="self">self</span>::settings::{
+    DEFAULT_INITIAL_WINDOW_SIZE, DEFAULT_MAX_FRAME_SIZE, DEFAULT_SETTINGS_HEADER_TABLE_SIZE,
+    MAX_INITIAL_WINDOW_SIZE, MAX_MAX_FRAME_SIZE,
 };
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">FrameSize</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">pub type </span>FrameSize = u32;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">9</span>;
+<span class="kw">pub const </span>HEADER_LEN: usize = <span class="number">9</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">T</span> <span class="op">=</span> <span class="ident">Bytes</span><span class="op">&gt;</span> {
-    <span class="ident">Data</span>(<span class="ident">Data</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">Headers</span>(<span class="ident">Headers</span>),
-    <span class="ident">Priority</span>(<span class="ident">Priority</span>),
-    <span class="ident">PushPromise</span>(<span class="ident">PushPromise</span>),
-    <span class="ident">Settings</span>(<span class="ident">Settings</span>),
-    <span class="ident">Ping</span>(<span class="ident">Ping</span>),
-    <span class="ident">GoAway</span>(<span class="ident">GoAway</span>),
-    <span class="ident">WindowUpdate</span>(<span class="ident">WindowUpdate</span>),
-    <span class="ident">Reset</span>(<span class="ident">Reset</span>),
+<span class="attribute">#[derive(Eq, PartialEq)]
+</span><span class="kw">pub enum </span>Frame&lt;T = Bytes&gt; {
+    Data(Data&lt;T&gt;),
+    Headers(Headers),
+    Priority(Priority),
+    PushPromise(PushPromise),
+    Settings(Settings),
+    Ping(Ping),
+    GoAway(GoAway),
+    WindowUpdate(WindowUpdate),
+    Reset(Reset),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">U</span>,
+<span class="kw">impl</span>&lt;T&gt; Frame&lt;T&gt; {
+    <span class="kw">pub fn </span>map&lt;F, U&gt;(<span class="self">self</span>, f: F) -&gt; Frame&lt;U&gt;
+    <span class="kw">where
+        </span>F: FnOnce(T) -&gt; U,
     {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Frame</span>::<span class="kw-2">*</span>;
+        <span class="kw">use </span><span class="self">self</span>::Frame::<span class="kw-2">*</span>;
 
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Data</span>(<span class="ident">frame</span>) =&gt; <span class="ident">frame</span>.<span class="ident">map</span>(<span class="ident">f</span>).<span class="ident">into</span>(),
-            <span class="ident">Headers</span>(<span class="ident">frame</span>) =&gt; <span class="ident">frame</span>.<span class="ident">into</span>(),
-            <span class="ident">Priority</span>(<span class="ident">frame</span>) =&gt; <span class="ident">frame</span>.<span class="ident">into</span>(),
-            <span class="ident">PushPromise</span>(<span class="ident">frame</span>) =&gt; <span class="ident">frame</span>.<span class="ident">into</span>(),
-            <span class="ident">Settings</span>(<span class="ident">frame</span>) =&gt; <span class="ident">frame</span>.<span class="ident">into</span>(),
-            <span class="ident">Ping</span>(<span class="ident">frame</span>) =&gt; <span class="ident">frame</span>.<span class="ident">into</span>(),
-            <span class="ident">GoAway</span>(<span class="ident">frame</span>) =&gt; <span class="ident">frame</span>.<span class="ident">into</span>(),
-            <span class="ident">WindowUpdate</span>(<span class="ident">frame</span>) =&gt; <span class="ident">frame</span>.<span class="ident">into</span>(),
-            <span class="ident">Reset</span>(<span class="ident">frame</span>) =&gt; <span class="ident">frame</span>.<span class="ident">into</span>(),
+        <span class="kw">match </span><span class="self">self </span>{
+            Data(frame) =&gt; frame.map(f).into(),
+            Headers(frame) =&gt; frame.into(),
+            Priority(frame) =&gt; frame.into(),
+            PushPromise(frame) =&gt; frame.into(),
+            Settings(frame) =&gt; frame.into(),
+            Ping(frame) =&gt; frame.into(),
+            GoAway(frame) =&gt; frame.into(),
+            WindowUpdate(frame) =&gt; frame.into(),
+            Reset(frame) =&gt; frame.into(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Frame</span>::<span class="kw-2">*</span>;
+<span class="kw">impl</span>&lt;T&gt; fmt::Debug <span class="kw">for </span>Frame&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">use </span><span class="self">self</span>::Frame::<span class="kw-2">*</span>;
 
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Data</span>(<span class="kw-2">ref</span> <span class="ident">frame</span>) =&gt; <span class="ident">fmt::Debug::fmt</span>(<span class="ident">frame</span>, <span class="ident">fmt</span>),
-            <span class="ident">Headers</span>(<span class="kw-2">ref</span> <span class="ident">frame</span>) =&gt; <span class="ident">fmt::Debug::fmt</span>(<span class="ident">frame</span>, <span class="ident">fmt</span>),
-            <span class="ident">Priority</span>(<span class="kw-2">ref</span> <span class="ident">frame</span>) =&gt; <span class="ident">fmt::Debug::fmt</span>(<span class="ident">frame</span>, <span class="ident">fmt</span>),
-            <span class="ident">PushPromise</span>(<span class="kw-2">ref</span> <span class="ident">frame</span>) =&gt; <span class="ident">fmt::Debug::fmt</span>(<span class="ident">frame</span>, <span class="ident">fmt</span>),
-            <span class="ident">Settings</span>(<span class="kw-2">ref</span> <span class="ident">frame</span>) =&gt; <span class="ident">fmt::Debug::fmt</span>(<span class="ident">frame</span>, <span class="ident">fmt</span>),
-            <span class="ident">Ping</span>(<span class="kw-2">ref</span> <span class="ident">frame</span>) =&gt; <span class="ident">fmt::Debug::fmt</span>(<span class="ident">frame</span>, <span class="ident">fmt</span>),
-            <span class="ident">GoAway</span>(<span class="kw-2">ref</span> <span class="ident">frame</span>) =&gt; <span class="ident">fmt::Debug::fmt</span>(<span class="ident">frame</span>, <span class="ident">fmt</span>),
-            <span class="ident">WindowUpdate</span>(<span class="kw-2">ref</span> <span class="ident">frame</span>) =&gt; <span class="ident">fmt::Debug::fmt</span>(<span class="ident">frame</span>, <span class="ident">fmt</span>),
-            <span class="ident">Reset</span>(<span class="kw-2">ref</span> <span class="ident">frame</span>) =&gt; <span class="ident">fmt::Debug::fmt</span>(<span class="ident">frame</span>, <span class="ident">fmt</span>),
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Data(<span class="kw-2">ref </span>frame) =&gt; fmt::Debug::fmt(frame, fmt),
+            Headers(<span class="kw-2">ref </span>frame) =&gt; fmt::Debug::fmt(frame, fmt),
+            Priority(<span class="kw-2">ref </span>frame) =&gt; fmt::Debug::fmt(frame, fmt),
+            PushPromise(<span class="kw-2">ref </span>frame) =&gt; fmt::Debug::fmt(frame, fmt),
+            Settings(<span class="kw-2">ref </span>frame) =&gt; fmt::Debug::fmt(frame, fmt),
+            Ping(<span class="kw-2">ref </span>frame) =&gt; fmt::Debug::fmt(frame, fmt),
+            GoAway(<span class="kw-2">ref </span>frame) =&gt; fmt::Debug::fmt(frame, fmt),
+            WindowUpdate(<span class="kw-2">ref </span>frame) =&gt; fmt::Debug::fmt(frame, fmt),
+            Reset(<span class="kw-2">ref </span>frame) =&gt; fmt::Debug::fmt(frame, fmt),
         }
     }
 }
 
-<span class="doccomment">/// Errors that can occur during parsing an HTTP/2 frame.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// A length value other than 8 was set on a PING message.</span>
-    <span class="ident">BadFrameSize</span>,
+<span class="doccomment">/// Errors that can occur during parsing an HTTP/2 frame.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// A length value other than 8 was set on a PING message.
+    </span>BadFrameSize,
 
-    <span class="doccomment">/// The padding length was larger than the frame-header-specified</span>
-    <span class="doccomment">/// length of the payload.</span>
-    <span class="ident">TooMuchPadding</span>,
+    <span class="doccomment">/// The padding length was larger than the frame-header-specified
+    /// length of the payload.
+    </span>TooMuchPadding,
 
-    <span class="doccomment">/// An invalid setting value was provided</span>
-    <span class="ident">InvalidSettingValue</span>,
+    <span class="doccomment">/// An invalid setting value was provided
+    </span>InvalidSettingValue,
 
-    <span class="doccomment">/// An invalid window update value</span>
-    <span class="ident">InvalidWindowUpdateValue</span>,
+    <span class="doccomment">/// An invalid window update value
+    </span>InvalidWindowUpdateValue,
 
-    <span class="doccomment">/// The payload length specified by the frame header was not the</span>
-    <span class="doccomment">/// value necessary for the specific frame type.</span>
-    <span class="ident">InvalidPayloadLength</span>,
+    <span class="doccomment">/// The payload length specified by the frame header was not the
+    /// value necessary for the specific frame type.
+    </span>InvalidPayloadLength,
 
-    <span class="doccomment">/// Received a payload with an ACK settings frame</span>
-    <span class="ident">InvalidPayloadAckSettings</span>,
+    <span class="doccomment">/// Received a payload with an ACK settings frame
+    </span>InvalidPayloadAckSettings,
 
-    <span class="doccomment">/// An invalid stream identifier was provided.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is returned if a SETTINGS or PING frame is received with a stream</span>
-    <span class="doccomment">/// identifier other than zero.</span>
-    <span class="ident">InvalidStreamId</span>,
+    <span class="doccomment">/// An invalid stream identifier was provided.
+    ///
+    /// This is returned if a SETTINGS or PING frame is received with a stream
+    /// identifier other than zero.
+    </span>InvalidStreamId,
 
-    <span class="doccomment">/// A request or response is malformed.</span>
-    <span class="ident">MalformedMessage</span>,
+    <span class="doccomment">/// A request or response is malformed.
+    </span>MalformedMessage,
 
-    <span class="doccomment">/// An invalid stream dependency ID was provided</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is returned if a HEADERS or PRIORITY frame is received with an</span>
-    <span class="doccomment">/// invalid stream identifier.</span>
-    <span class="ident">InvalidDependencyId</span>,
+    <span class="doccomment">/// An invalid stream dependency ID was provided
+    ///
+    /// This is returned if a HEADERS or PRIORITY frame is received with an
+    /// invalid stream identifier.
+    </span>InvalidDependencyId,
 
-    <span class="doccomment">/// Failed to perform HPACK decoding</span>
-    <span class="ident">Hpack</span>(<span class="ident">hpack::DecoderError</span>),
+    <span class="doccomment">/// Failed to perform HPACK decoding
+    </span>Hpack(hpack::DecoderError),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

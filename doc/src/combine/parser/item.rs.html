@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/item.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>item.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/item.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>item.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -684,691 +684,691 @@
 <span id="684">684</span>
 <span id="685">685</span>
 <span id="686">686</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Parsers working with single stream items.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Parsers working with single stream items.
 
-<span class="kw">use</span> <span class="ident">lib::marker::PhantomData</span>;
+</span><span class="kw">use </span>lib::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConsumedResult</span>, <span class="ident">Info</span>, <span class="ident">ParseError</span>, <span class="ident">StreamError</span>, <span class="ident">Tracked</span>};
-<span class="kw">use</span> <span class="ident">stream</span>::{<span class="ident">uncons</span>, <span class="ident">Stream</span>, <span class="ident">StreamOnce</span>};
-<span class="kw">use</span> <span class="ident">Parser</span>;
+<span class="kw">use </span>error::{ConsumedResult, Info, ParseError, StreamError, Tracked};
+<span class="kw">use </span>stream::{uncons, Stream, StreamOnce};
+<span class="kw">use </span>Parser;
 
-<span class="kw">use</span> <span class="ident">error::FastResult</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>error::FastResult::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::token</span> <span class="kw">as</span> <span class="ident">item</span>;
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="self">self</span>::token <span class="kw">as </span>item;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Any</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>);
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>Any&lt;I&gt;(PhantomData&lt;<span class="kw">fn</span>(I) -&gt; I&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Any</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="kw">impl</span>&lt;I&gt; Parser <span class="kw">for </span>Any&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Item;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">uncons</span>(<span class="ident">input</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;I::Item, I&gt; {
+        uncons(input)
     }
 }
 
-<span class="doccomment">/// Parses any token.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let mut char_parser = any();</span>
-<span class="doccomment">/// assert_eq!(char_parser.parse(&quot;!&quot;).map(|x| x.0), Ok(&#39;!&#39;));</span>
-<span class="doccomment">/// assert!(char_parser.parse(&quot;&quot;).is_err());</span>
-<span class="doccomment">/// let mut byte_parser = any();</span>
-<span class="doccomment">/// assert_eq!(byte_parser.parse(&amp;b&quot;!&quot;[..]).map(|x| x.0), Ok(b&#39;!&#39;));</span>
-<span class="doccomment">/// assert!(byte_parser.parse(&amp;b&quot;&quot;[..]).is_err());</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Any</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="doccomment">/// Parses any token.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # fn main() {
+/// let mut char_parser = any();
+/// assert_eq!(char_parser.parse(&quot;!&quot;).map(|x| x.0), Ok(&#39;!&#39;));
+/// assert!(char_parser.parse(&quot;&quot;).is_err());
+/// let mut byte_parser = any();
+/// assert_eq!(byte_parser.parse(&amp;b&quot;!&quot;[..]).map(|x| x.0), Ok(b&#39;!&#39;));
+/// assert!(byte_parser.parse(&amp;b&quot;&quot;[..]).is_err());
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>any&lt;I&gt;() -&gt; Any&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="ident">Any</span>(<span class="ident">PhantomData</span>)
+    Any(PhantomData)
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="ident">predicate</span>: <span class="ident">P</span>,
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>Satisfy&lt;I, P&gt; {
+    predicate: P,
+    _marker: PhantomData&lt;I&gt;,
 }
 
-<span class="kw">fn</span> <span class="ident">satisfy_impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">I</span>, <span class="kw-2">mut</span> <span class="ident">predicate</span>: <span class="ident">P</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+<span class="kw">fn </span>satisfy_impl&lt;I, P, R&gt;(input: <span class="kw-2">&amp;mut </span>I, <span class="kw-2">mut </span>predicate: P) -&gt; ConsumedResult&lt;R, I&gt;
+<span class="kw">where
+    </span>I: Stream,
+    P: FnMut(I::Item) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt;,
 {
-    <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">position</span>();
-    <span class="kw">match</span> <span class="ident">uncons</span>(<span class="ident">input</span>) {
-        <span class="ident">EmptyOk</span>(<span class="ident">c</span>) <span class="op">|</span> <span class="ident">ConsumedOk</span>(<span class="ident">c</span>) =&gt; <span class="kw">match</span> <span class="ident">predicate</span>(<span class="ident">c</span>.<span class="ident">clone</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">c</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">EmptyErr</span>(<span class="ident">I::Error::empty</span>(<span class="ident">position</span>).<span class="ident">into</span>()),
+    <span class="kw">let </span>position = input.position();
+    <span class="kw">match </span>uncons(input) {
+        EmptyOk(c) | ConsumedOk(c) =&gt; <span class="kw">match </span>predicate(c.clone()) {
+            <span class="prelude-val">Some</span>(c) =&gt; ConsumedOk(c),
+            <span class="prelude-val">None </span>=&gt; EmptyErr(I::Error::empty(position).into()),
         },
-        <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
-        <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">err</span>),
+        EmptyErr(err) =&gt; EmptyErr(err),
+        ConsumedErr(err) =&gt; ConsumedErr(err),
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
+<span class="kw">impl</span>&lt;I, P&gt; Parser <span class="kw">for </span>Satisfy&lt;I, P&gt;
+<span class="kw">where
+    </span>I: Stream,
+    P: FnMut(I::Item) -&gt; bool,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Item;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
-        <span class="ident">satisfy_impl</span>(<span class="ident">input</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-            <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">predicate</span>)(<span class="ident">c</span>.<span class="ident">clone</span>()) {
-                <span class="prelude-val">Some</span>(<span class="ident">c</span>)
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt; {
+        satisfy_impl(input, |c| {
+            <span class="kw">if </span>(<span class="self">self</span>.predicate)(c.clone()) {
+                <span class="prelude-val">Some</span>(c)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
         })
     }
 }
 
-<span class="doccomment">/// Parses a token and succeeds depending on the result of `predicate`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let mut parser = satisfy(|c| c == &#39;!&#39; || c == &#39;?&#39;);</span>
-<span class="doccomment">/// assert_eq!(parser.parse(&quot;!&quot;).map(|x| x.0), Ok(&#39;!&#39;));</span>
-<span class="doccomment">/// assert_eq!(parser.parse(&quot;?&quot;).map(|x| x.0), Ok(&#39;?&#39;));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">predicate</span>: <span class="ident">P</span>) -&gt; <span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
+<span class="doccomment">/// Parses a token and succeeds depending on the result of `predicate`.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # fn main() {
+/// let mut parser = satisfy(|c| c == &#39;!&#39; || c == &#39;?&#39;);
+/// assert_eq!(parser.parse(&quot;!&quot;).map(|x| x.0), Ok(&#39;!&#39;));
+/// assert_eq!(parser.parse(&quot;?&quot;).map(|x| x.0), Ok(&#39;?&#39;));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>satisfy&lt;I, P&gt;(predicate: P) -&gt; Satisfy&lt;I, P&gt;
+<span class="kw">where
+    </span>I: Stream,
+    P: FnMut(I::Item) -&gt; bool,
 {
-    <span class="ident">Satisfy</span> {
-        <span class="ident">predicate</span>: <span class="ident">predicate</span>,
-        <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+    Satisfy {
+        predicate: predicate,
+        _marker: PhantomData,
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SatisfyMap</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="ident">predicate</span>: <span class="ident">P</span>,
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>SatisfyMap&lt;I, P&gt; {
+    predicate: P,
+    _marker: PhantomData&lt;I&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">SatisfyMap</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;I, P, R&gt; Parser <span class="kw">for </span>SatisfyMap&lt;I, P&gt;
+<span class="kw">where
+    </span>I: Stream,
+    P: FnMut(I::Item) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">R</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
-        <span class="ident">satisfy_impl</span>(<span class="ident">input</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">predicate</span>)
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = R;
+    <span class="kw">type </span>PartialState = ();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt; {
+        satisfy_impl(input, <span class="kw-2">&amp;mut </span><span class="self">self</span>.predicate)
     }
 }
 
-<span class="doccomment">/// Parses a token and passes it to `predicate`. If `predicate` returns `Some` the parser succeeds</span>
-<span class="doccomment">/// and returns the value inside the `Option`. If `predicate` returns `None` the parser fails</span>
-<span class="doccomment">/// without consuming any input.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-<span class="doccomment">/// enum YesNo {</span>
-<span class="doccomment">///     Yes,</span>
-<span class="doccomment">///     No,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// let mut parser = satisfy_map(|c| {</span>
-<span class="doccomment">///     match c {</span>
-<span class="doccomment">///         &#39;Y&#39; =&gt; Some(YesNo::Yes),</span>
-<span class="doccomment">///         &#39;N&#39; =&gt; Some(YesNo::No),</span>
-<span class="doccomment">///         _ =&gt; None,</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// assert_eq!(parser.parse(&quot;Y&quot;).map(|x| x.0), Ok(YesNo::Yes));</span>
-<span class="doccomment">/// assert!(parser.parse(&quot;A&quot;).map(|x| x.0).is_err());</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">satisfy_map</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">predicate</span>: <span class="ident">P</span>) -&gt; <span class="ident">SatisfyMap</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses a token and passes it to `predicate`. If `predicate` returns `Some` the parser succeeds
+/// and returns the value inside the `Option`. If `predicate` returns `None` the parser fails
+/// without consuming any input.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # fn main() {
+/// #[derive(Debug, PartialEq)]
+/// enum YesNo {
+///     Yes,
+///     No,
+/// }
+/// let mut parser = satisfy_map(|c| {
+///     match c {
+///         &#39;Y&#39; =&gt; Some(YesNo::Yes),
+///         &#39;N&#39; =&gt; Some(YesNo::No),
+///         _ =&gt; None,
+///     }
+/// });
+/// assert_eq!(parser.parse(&quot;Y&quot;).map(|x| x.0), Ok(YesNo::Yes));
+/// assert!(parser.parse(&quot;A&quot;).map(|x| x.0).is_err());
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>satisfy_map&lt;I, P, R&gt;(predicate: P) -&gt; SatisfyMap&lt;I, P&gt;
+<span class="kw">where
+    </span>I: Stream,
+    P: FnMut(I::Item) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt;,
 {
-    <span class="ident">SatisfyMap</span> {
-        <span class="ident">predicate</span>: <span class="ident">predicate</span>,
-        <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+    SatisfyMap {
+        predicate: predicate,
+        _marker: PhantomData,
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Token</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">I::Item</span>: <span class="ident">PartialEq</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>Token&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream,
+    I::Item: PartialEq,
 {
-    <span class="ident">c</span>: <span class="ident">I::Item</span>,
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
+    c: I::Item,
+    _marker: PhantomData&lt;I&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Token</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">I::Item</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;I&gt; Parser <span class="kw">for </span>Token&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream,
+    I::Item: PartialEq + Clone,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Item;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">satisfy_impl</span>(<span class="ident">input</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">c</span> { <span class="prelude-val">Some</span>(<span class="ident">c</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> })
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;I::Item, I&gt; {
+        satisfy_impl(input, |c| <span class="kw">if </span>c == <span class="self">self</span>.c { <span class="prelude-val">Some</span>(c) } <span class="kw">else </span>{ <span class="prelude-val">None </span>})
     }
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="ident">errors</span>.<span class="ident">error</span>.<span class="ident">add_expected</span>(<span class="ident">Info::Token</span>(<span class="self">self</span>.<span class="ident">c</span>.<span class="ident">clone</span>()));
-    }
-}
-
-<span class="doccomment">/// Parses a character and succeeds if the character is equal to `c`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let result = token(&#39;!&#39;)</span>
-<span class="doccomment">///     .parse(&quot;!&quot;)</span>
-<span class="doccomment">///     .map(|x| x.0);</span>
-<span class="doccomment">/// assert_eq!(result, Ok(&#39;!&#39;));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">I::Item</span>) -&gt; <span class="ident">Token</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">I::Item</span>: <span class="ident">PartialEq</span>,
-{
-    <span class="ident">Token</span> {
-        <span class="ident">c</span>: <span class="ident">c</span>,
-        <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        errors.error.add_expected(Info::Token(<span class="self">self</span>.c.clone()));
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tokens</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="doccomment">/// Parses a character and succeeds if the character is equal to `c`.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # fn main() {
+/// let result = token(&#39;!&#39;)
+///     .parse(&quot;!&quot;)
+///     .map(|x| x.0);
+/// assert_eq!(result, Ok(&#39;!&#39;));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>token&lt;I&gt;(c: I::Item) -&gt; Token&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream,
+    I::Item: PartialEq,
 {
-    <span class="ident">cmp</span>: <span class="ident">C</span>,
-    <span class="ident">expected</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span>,
-    <span class="ident">tokens</span>: <span class="ident">T</span>,
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
+    Token {
+        c: c,
+        _marker: PhantomData,
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Tokens</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Tokens&lt;C, T, I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">position</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">consumed</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>() {
-            <span class="kw">match</span> <span class="ident">::stream::uncons</span>(<span class="ident">input</span>) {
-                <span class="ident">ConsumedOk</span>(<span class="ident">other</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="ident">other</span>) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">cmp</span>)(<span class="ident">c</span>, <span class="ident">other</span>.<span class="ident">clone</span>()) {
-                        <span class="kw">return</span> <span class="kw">if</span> <span class="ident">consumed</span> {
-                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error::from_error</span>(
-                                <span class="ident">start</span>,
-                                <span class="ident">StreamError::unexpected</span>(<span class="ident">Info::Token</span>(<span class="ident">other</span>)),
+    cmp: C,
+    expected: Info&lt;I::Item, I::Range&gt;,
+    tokens: T,
+    _marker: PhantomData&lt;I&gt;,
+}
+
+<span class="kw">impl</span>&lt;C, T, I&gt; Parser <span class="kw">for </span>Tokens&lt;C, T, I&gt;
+<span class="kw">where
+    </span>C: FnMut(T::Item, I::Item) -&gt; bool,
+    T: Clone + IntoIterator,
+    I: Stream,
+{
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = T;
+    <span class="kw">type </span>PartialState = ();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;T, I&gt; {
+        <span class="kw">let </span>start = input.position();
+        <span class="kw">let </span><span class="kw-2">mut </span>consumed = <span class="bool-val">false</span>;
+        <span class="kw">for </span>c <span class="kw">in </span><span class="self">self</span>.tokens.clone() {
+            <span class="kw">match </span>::stream::uncons(input) {
+                ConsumedOk(other) | EmptyOk(other) =&gt; {
+                    <span class="kw">if </span>!(<span class="self">self</span>.cmp)(c, other.clone()) {
+                        <span class="kw">return if </span>consumed {
+                            <span class="kw">let </span><span class="kw-2">mut </span>errors = &lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error::from_error(
+                                start,
+                                StreamError::unexpected(Info::Token(other)),
                             );
-                            <span class="ident">errors</span>.<span class="ident">add_expected</span>(<span class="self">self</span>.<span class="ident">expected</span>.<span class="ident">clone</span>());
-                            <span class="ident">ConsumedErr</span>(<span class="ident">errors</span>)
-                        } <span class="kw">else</span> {
-                            <span class="ident">EmptyErr</span>(<span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error::empty</span>(<span class="ident">start</span>).<span class="ident">into</span>())
+                            errors.add_expected(<span class="self">self</span>.expected.clone());
+                            ConsumedErr(errors)
+                        } <span class="kw">else </span>{
+                            EmptyErr(&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error::empty(start).into())
                         };
                     }
-                    <span class="ident">consumed</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    consumed = <span class="bool-val">true</span>;
                 }
-                <span class="ident">EmptyErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) =&gt; {
-                    <span class="ident">error</span>.<span class="ident">error</span>.<span class="ident">set_position</span>(<span class="ident">start</span>);
-                    <span class="kw">return</span> <span class="kw">if</span> <span class="ident">consumed</span> {
-                        <span class="ident">ConsumedErr</span>(<span class="ident">error</span>.<span class="ident">error</span>)
-                    } <span class="kw">else</span> {
-                        <span class="ident">EmptyErr</span>(<span class="ident">error</span>.<span class="ident">into</span>())
+                EmptyErr(<span class="kw-2">mut </span>error) =&gt; {
+                    error.error.set_position(start);
+                    <span class="kw">return if </span>consumed {
+                        ConsumedErr(error.error)
+                    } <span class="kw">else </span>{
+                        EmptyErr(error.into())
                     };
                 }
-                <span class="ident">ConsumedErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) =&gt; {
-                    <span class="ident">error</span>.<span class="ident">set_position</span>(<span class="ident">start</span>);
-                    <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">error</span>);
+                ConsumedErr(<span class="kw-2">mut </span>error) =&gt; {
+                    error.set_position(start);
+                    <span class="kw">return </span>ConsumedErr(error);
                 }
             }
         }
-        <span class="kw">if</span> <span class="ident">consumed</span> {
-            <span class="ident">ConsumedOk</span>(<span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>())
-        } <span class="kw">else</span> {
-            <span class="ident">EmptyOk</span>(<span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>())
+        <span class="kw">if </span>consumed {
+            ConsumedOk(<span class="self">self</span>.tokens.clone())
+        } <span class="kw">else </span>{
+            EmptyOk(<span class="self">self</span>.tokens.clone())
         }
     }
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="ident">errors</span>.<span class="ident">error</span>.<span class="ident">add_expected</span>(<span class="self">self</span>.<span class="ident">expected</span>.<span class="ident">clone</span>());
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        errors.error.add_expected(<span class="self">self</span>.expected.clone());
     }
 }
 
-<span class="doccomment">/// Parses multiple tokens.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Consumes items from the input and compares them to the values from `tokens` using the</span>
-<span class="doccomment">/// comparison function `cmp`. Succeeds if all the items from `tokens` are matched in the input</span>
-<span class="doccomment">/// stream and fails otherwise with `expected` used as part of the error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # use combine::error::Info;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// use std::ascii::AsciiExt;</span>
-<span class="doccomment">/// let result = tokens(|l, r| l.eq_ignore_ascii_case(&amp;r), &quot;abc&quot;.into(), &quot;abc&quot;.chars())</span>
-<span class="doccomment">///     .parse(&quot;AbC&quot;)</span>
-<span class="doccomment">///     .map(|x| x.0.as_str());</span>
-<span class="doccomment">/// assert_eq!(result, Ok(&quot;abc&quot;));</span>
-<span class="doccomment">/// let result = tokens(</span>
-<span class="doccomment">///     |&amp;l, r| (if l &lt; r { r - l } else { l - r }) &lt;= 2,</span>
-<span class="doccomment">///     Info::Range(&amp;b&quot;025&quot;[..]),</span>
-<span class="doccomment">///     &amp;b&quot;025&quot;[..]</span>
-<span class="doccomment">/// )</span>
-<span class="doccomment">///     .parse(&amp;b&quot;123&quot;[..])</span>
-<span class="doccomment">///     .map(|x| x.0);</span>
-<span class="doccomment">/// assert_eq!(result, Ok(&amp;b&quot;025&quot;[..]));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokens</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">cmp</span>: <span class="ident">C</span>, <span class="ident">expected</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span>, <span class="ident">tokens</span>: <span class="ident">T</span>) -&gt; <span class="ident">Tokens</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="doccomment">/// Parses multiple tokens.
+///
+/// Consumes items from the input and compares them to the values from `tokens` using the
+/// comparison function `cmp`. Succeeds if all the items from `tokens` are matched in the input
+/// stream and fails otherwise with `expected` used as part of the error.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # use combine::error::Info;
+/// # fn main() {
+/// use std::ascii::AsciiExt;
+/// let result = tokens(|l, r| l.eq_ignore_ascii_case(&amp;r), &quot;abc&quot;.into(), &quot;abc&quot;.chars())
+///     .parse(&quot;AbC&quot;)
+///     .map(|x| x.0.as_str());
+/// assert_eq!(result, Ok(&quot;abc&quot;));
+/// let result = tokens(
+///     |&amp;l, r| (if l &lt; r { r - l } else { l - r }) &lt;= 2,
+///     Info::Range(&amp;b&quot;025&quot;[..]),
+///     &amp;b&quot;025&quot;[..]
+/// )
+///     .parse(&amp;b&quot;123&quot;[..])
+///     .map(|x| x.0);
+/// assert_eq!(result, Ok(&amp;b&quot;025&quot;[..]));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>tokens&lt;C, T, I&gt;(cmp: C, expected: Info&lt;I::Item, I::Range&gt;, tokens: T) -&gt; Tokens&lt;C, T, I&gt;
+<span class="kw">where
+    </span>C: FnMut(T::Item, I::Item) -&gt; bool,
+    T: Clone + IntoIterator,
+    I: Stream,
 {
-    <span class="ident">Tokens</span> {
-        <span class="ident">cmp</span>: <span class="ident">cmp</span>,
-        <span class="ident">expected</span>: <span class="ident">expected</span>,
-        <span class="ident">tokens</span>: <span class="ident">tokens</span>,
-        <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+    Tokens {
+        cmp: cmp,
+        expected: expected,
+        tokens: tokens,
+        _marker: PhantomData,
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tokens2</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Tokens2&lt;C, T, I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="ident">cmp</span>: <span class="ident">C</span>,
-    <span class="ident">tokens</span>: <span class="ident">T</span>,
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
+    cmp: C,
+    tokens: T,
+    _marker: PhantomData&lt;I&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Tokens2</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="kw">impl</span>&lt;C, T, I&gt; Parser <span class="kw">for </span>Tokens2&lt;C, T, I&gt;
+<span class="kw">where
+    </span>C: FnMut(T::Item, I::Item) -&gt; bool,
+    T: Clone + IntoIterator,
+    I: Stream,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = T;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">position</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">consumed</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>() {
-            <span class="kw">match</span> <span class="ident">::stream::uncons</span>(<span class="ident">input</span>) {
-                <span class="ident">ConsumedOk</span>(<span class="ident">other</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="ident">other</span>) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">cmp</span>)(<span class="ident">c</span>, <span class="ident">other</span>.<span class="ident">clone</span>()) {
-                        <span class="kw">return</span> <span class="kw">if</span> <span class="ident">consumed</span> {
-                            <span class="kw">let</span> <span class="ident">errors</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error::from_error</span>(
-                                <span class="ident">start</span>,
-                                <span class="ident">StreamError::unexpected</span>(<span class="ident">Info::Token</span>(<span class="ident">other</span>)),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;T, I&gt; {
+        <span class="kw">let </span>start = input.position();
+        <span class="kw">let </span><span class="kw-2">mut </span>consumed = <span class="bool-val">false</span>;
+        <span class="kw">for </span>c <span class="kw">in </span><span class="self">self</span>.tokens.clone() {
+            <span class="kw">match </span>::stream::uncons(input) {
+                ConsumedOk(other) | EmptyOk(other) =&gt; {
+                    <span class="kw">if </span>!(<span class="self">self</span>.cmp)(c, other.clone()) {
+                        <span class="kw">return if </span>consumed {
+                            <span class="kw">let </span>errors = &lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error::from_error(
+                                start,
+                                StreamError::unexpected(Info::Token(other)),
                             );
-                            <span class="ident">ConsumedErr</span>(<span class="ident">errors</span>)
-                        } <span class="kw">else</span> {
-                            <span class="ident">EmptyErr</span>(<span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error::empty</span>(<span class="ident">start</span>).<span class="ident">into</span>())
+                            ConsumedErr(errors)
+                        } <span class="kw">else </span>{
+                            EmptyErr(&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error::empty(start).into())
                         };
                     }
-                    <span class="ident">consumed</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    consumed = <span class="bool-val">true</span>;
                 }
-                <span class="ident">EmptyErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) =&gt; {
-                    <span class="ident">error</span>.<span class="ident">error</span>.<span class="ident">set_position</span>(<span class="ident">start</span>);
-                    <span class="kw">return</span> <span class="kw">if</span> <span class="ident">consumed</span> {
-                        <span class="ident">ConsumedErr</span>(<span class="ident">error</span>.<span class="ident">error</span>)
-                    } <span class="kw">else</span> {
-                        <span class="ident">EmptyErr</span>(<span class="ident">error</span>)
+                EmptyErr(<span class="kw-2">mut </span>error) =&gt; {
+                    error.error.set_position(start);
+                    <span class="kw">return if </span>consumed {
+                        ConsumedErr(error.error)
+                    } <span class="kw">else </span>{
+                        EmptyErr(error)
                     };
                 }
-                <span class="ident">ConsumedErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) =&gt; {
-                    <span class="ident">error</span>.<span class="ident">set_position</span>(<span class="ident">start</span>);
-                    <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">error</span>);
+                ConsumedErr(<span class="kw-2">mut </span>error) =&gt; {
+                    error.set_position(start);
+                    <span class="kw">return </span>ConsumedErr(error);
                 }
             }
         }
-        <span class="kw">if</span> <span class="ident">consumed</span> {
-            <span class="ident">ConsumedOk</span>(<span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>())
-        } <span class="kw">else</span> {
-            <span class="ident">EmptyOk</span>(<span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>())
+        <span class="kw">if </span>consumed {
+            ConsumedOk(<span class="self">self</span>.tokens.clone())
+        } <span class="kw">else </span>{
+            EmptyOk(<span class="self">self</span>.tokens.clone())
         }
     }
 }
 
-<span class="doccomment">/// Parses multiple tokens.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Consumes items from the input and compares them to the values from `tokens` using the</span>
-<span class="doccomment">/// comparison function `cmp`. Succeeds if all the items from `tokens` are matched in the input</span>
-<span class="doccomment">/// stream and fails otherwise.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// # #[allow(deprecated)]</span>
-<span class="doccomment">/// # use std::ascii::AsciiExt;</span>
-<span class="doccomment">/// let result = tokens2(|l, r| l.eq_ignore_ascii_case(&amp;r), &quot;abc&quot;.chars())</span>
-<span class="doccomment">///     .parse(&quot;AbC&quot;)</span>
-<span class="doccomment">///     .map(|x| x.0.as_str());</span>
-<span class="doccomment">/// assert_eq!(result, Ok(&quot;abc&quot;));</span>
-<span class="doccomment">/// let result = tokens2(</span>
-<span class="doccomment">///     |&amp;l, r| (if l &lt; r { r - l } else { l - r }) &lt;= 2,</span>
-<span class="doccomment">///     &amp;b&quot;025&quot;[..]</span>
-<span class="doccomment">/// )</span>
-<span class="doccomment">///     .parse(&amp;b&quot;123&quot;[..])</span>
-<span class="doccomment">///     .map(|x| x.0);</span>
-<span class="doccomment">/// assert_eq!(result, Ok(&amp;b&quot;025&quot;[..]));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokens2</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">cmp</span>: <span class="ident">C</span>, <span class="ident">tokens</span>: <span class="ident">T</span>) -&gt; <span class="ident">Tokens2</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="doccomment">/// Parses multiple tokens.
+///
+/// Consumes items from the input and compares them to the values from `tokens` using the
+/// comparison function `cmp`. Succeeds if all the items from `tokens` are matched in the input
+/// stream and fails otherwise.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # fn main() {
+/// # #[allow(deprecated)]
+/// # use std::ascii::AsciiExt;
+/// let result = tokens2(|l, r| l.eq_ignore_ascii_case(&amp;r), &quot;abc&quot;.chars())
+///     .parse(&quot;AbC&quot;)
+///     .map(|x| x.0.as_str());
+/// assert_eq!(result, Ok(&quot;abc&quot;));
+/// let result = tokens2(
+///     |&amp;l, r| (if l &lt; r { r - l } else { l - r }) &lt;= 2,
+///     &amp;b&quot;025&quot;[..]
+/// )
+///     .parse(&amp;b&quot;123&quot;[..])
+///     .map(|x| x.0);
+/// assert_eq!(result, Ok(&amp;b&quot;025&quot;[..]));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>tokens2&lt;C, T, I&gt;(cmp: C, tokens: T) -&gt; Tokens2&lt;C, T, I&gt;
+<span class="kw">where
+    </span>C: FnMut(T::Item, I::Item) -&gt; bool,
+    T: Clone + IntoIterator,
+    I: Stream,
 {
-    <span class="ident">Tokens2</span> {
-        <span class="ident">cmp</span>: <span class="ident">cmp</span>,
-        <span class="ident">tokens</span>: <span class="ident">tokens</span>,
-        <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+    Tokens2 {
+        cmp: cmp,
+        tokens: tokens,
+        _marker: PhantomData,
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>Position&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
+    _marker: PhantomData&lt;I&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="kw">impl</span>&lt;I&gt; Parser <span class="kw">for </span>Position&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Position</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Position;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Position</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">EmptyOk</span>(<span class="ident">input</span>.<span class="ident">position</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;I::Position, I&gt; {
+        EmptyOk(input.position())
     }
 }
 
-<span class="doccomment">/// Parser which just returns the current position in the stream.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # use combine::stream::state::{State, SourcePosition};</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let result = (position(), token(&#39;!&#39;), position())</span>
-<span class="doccomment">///     .parse(State::new(&quot;!&quot;))</span>
-<span class="doccomment">///     .map(|x| x.0);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((SourcePosition { line: 1, column: 1 },</span>
-<span class="doccomment">///                        &#39;!&#39;,</span>
-<span class="doccomment">///                        SourcePosition { line: 1, column: 2 })));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="doccomment">/// Parser which just returns the current position in the stream.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # use combine::stream::state::{State, SourcePosition};
+/// # fn main() {
+/// let result = (position(), token(&#39;!&#39;), position())
+///     .parse(State::new(&quot;!&quot;))
+///     .map(|x| x.0);
+/// assert_eq!(result, Ok((SourcePosition { line: 1, column: 1 },
+///                        &#39;!&#39;,
+///                        SourcePosition { line: 1, column: 2 })));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>position&lt;I&gt;() -&gt; Position&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="ident">Position</span> {
-        <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+    Position {
+        _marker: PhantomData,
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OneOf</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>OneOf&lt;T, I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="ident">tokens</span>: <span class="ident">T</span>,
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
+    tokens: T,
+    _marker: PhantomData&lt;I&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">OneOf</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span><span class="op">&gt;</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">I::Item</span>: <span class="ident">PartialEq</span>,
+<span class="kw">impl</span>&lt;T, I&gt; Parser <span class="kw">for </span>OneOf&lt;T, I&gt;
+<span class="kw">where
+    </span>T: Clone + IntoIterator&lt;Item = I::Item&gt;,
+    I: Stream,
+    I::Item: PartialEq,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Item;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">satisfy</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">==</span> <span class="ident">c</span>)).<span class="ident">parse_lazy</span>(<span class="ident">input</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;I::Item, I&gt; {
+        satisfy(|c| <span class="self">self</span>.tokens.clone().into_iter().any(|t| t == c)).parse_lazy(input)
     }
 
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="kw">for</span> <span class="ident">expected</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>() {
-            <span class="ident">errors</span>.<span class="ident">error</span>.<span class="ident">add_expected</span>(<span class="ident">Info::Token</span>(<span class="ident">expected</span>));
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        <span class="kw">for </span>expected <span class="kw">in </span><span class="self">self</span>.tokens.clone() {
+            errors.error.add_expected(Info::Token(expected));
         }
     }
 }
 
-<span class="doccomment">/// Extract one token and succeeds if it is part of `tokens`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let result = many(one_of(&quot;abc&quot;.chars()))</span>
-<span class="doccomment">///     .parse(&quot;abd&quot;);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((String::from(&quot;ab&quot;), &quot;d&quot;)));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">one_of</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">tokens</span>: <span class="ident">T</span>) -&gt; <span class="ident">OneOf</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">I::Item</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T::Item</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Extract one token and succeeds if it is part of `tokens`.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # fn main() {
+/// let result = many(one_of(&quot;abc&quot;.chars()))
+///     .parse(&quot;abd&quot;);
+/// assert_eq!(result, Ok((String::from(&quot;ab&quot;), &quot;d&quot;)));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>one_of&lt;T, I&gt;(tokens: T) -&gt; OneOf&lt;T, I&gt;
+<span class="kw">where
+    </span>T: Clone + IntoIterator,
+    I: Stream,
+    I::Item: PartialEq&lt;T::Item&gt;,
 {
-    <span class="ident">OneOf</span> {
-        <span class="ident">tokens</span>: <span class="ident">tokens</span>,
-        <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+    OneOf {
+        tokens: tokens,
+        _marker: PhantomData,
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoneOf</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>NoneOf&lt;T, I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="ident">tokens</span>: <span class="ident">T</span>,
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
+    tokens: T,
+    _marker: PhantomData&lt;I&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">NoneOf</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span><span class="op">&gt;</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">I::Item</span>: <span class="ident">PartialEq</span>,
+<span class="kw">impl</span>&lt;T, I&gt; Parser <span class="kw">for </span>NoneOf&lt;T, I&gt;
+<span class="kw">where
+    </span>T: Clone + IntoIterator&lt;Item = I::Item&gt;,
+    I: Stream,
+    I::Item: PartialEq,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Item;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">satisfy</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">!</span><span class="op">=</span> <span class="ident">c</span>)).<span class="ident">parse_lazy</span>(<span class="ident">input</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;I::Item, I&gt; {
+        satisfy(|c| <span class="self">self</span>.tokens.clone().into_iter().all(|t| t != c)).parse_lazy(input)
     }
 }
 
-<span class="doccomment">/// Extract one token and succeeds if it is not part of `tokens`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # use combine::stream::easy;</span>
-<span class="doccomment">/// # use combine::stream::state::State;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let mut parser = many1(none_of(b&quot;abc&quot;.iter().cloned()));</span>
-<span class="doccomment">/// let result = parser.easy_parse(State::new(&amp;b&quot;xyb&quot;[..]))</span>
-<span class="doccomment">///     .map(|(output, input)| (output, input.input));</span>
-<span class="doccomment">/// assert_eq!(result, Ok((b&quot;xy&quot;[..].to_owned(), &amp;b&quot;b&quot;[..])));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let result = parser.easy_parse(State::new(&amp;b&quot;ab&quot;[..]));</span>
-<span class="doccomment">/// assert_eq!(result, Err(easy::Errors {</span>
-<span class="doccomment">///     position: 0,</span>
-<span class="doccomment">///     errors: vec![</span>
-<span class="doccomment">///         easy::Error::Unexpected(easy::Info::Token(b&#39;a&#39;)),</span>
-<span class="doccomment">///     ]</span>
-<span class="doccomment">/// }));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">none_of</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">tokens</span>: <span class="ident">T</span>) -&gt; <span class="ident">NoneOf</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">I::Item</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T::Item</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Extract one token and succeeds if it is not part of `tokens`.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # use combine::stream::easy;
+/// # use combine::stream::state::State;
+/// # fn main() {
+/// let mut parser = many1(none_of(b&quot;abc&quot;.iter().cloned()));
+/// let result = parser.easy_parse(State::new(&amp;b&quot;xyb&quot;[..]))
+///     .map(|(output, input)| (output, input.input));
+/// assert_eq!(result, Ok((b&quot;xy&quot;[..].to_owned(), &amp;b&quot;b&quot;[..])));
+///
+/// let result = parser.easy_parse(State::new(&amp;b&quot;ab&quot;[..]));
+/// assert_eq!(result, Err(easy::Errors {
+///     position: 0,
+///     errors: vec![
+///         easy::Error::Unexpected(easy::Info::Token(b&#39;a&#39;)),
+///     ]
+/// }));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>none_of&lt;T, I&gt;(tokens: T) -&gt; NoneOf&lt;T, I&gt;
+<span class="kw">where
+    </span>T: Clone + IntoIterator,
+    I: Stream,
+    I::Item: PartialEq&lt;T::Item&gt;,
 {
-    <span class="ident">NoneOf</span> {
-        <span class="ident">tokens</span>: <span class="ident">tokens</span>,
-        <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+    NoneOf {
+        tokens: tokens,
+        _marker: PhantomData,
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">T</span>: <span class="ident">Clone</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>Value&lt;I, T&gt;(T, PhantomData&lt;<span class="kw">fn</span>(I) -&gt; I&gt;);
+<span class="kw">impl</span>&lt;I, T&gt; Parser <span class="kw">for </span>Value&lt;I, T&gt;
+<span class="kw">where
+    </span>I: Stream,
+    T: Clone,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">EmptyOk</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>())
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = T;
+    <span class="kw">type </span>PartialState = ();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;T, I&gt; {
+        EmptyOk(<span class="self">self</span>.<span class="number">0</span>.clone())
     }
 }
 
-<span class="doccomment">/// Always returns the value `v` without consuming any input.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let result = value(42)</span>
-<span class="doccomment">///     .parse(&quot;hello world&quot;)</span>
-<span class="doccomment">///     .map(|x| x.0);</span>
-<span class="doccomment">/// assert_eq!(result, Ok(42));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="ident">T</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">T</span>: <span class="ident">Clone</span>,
+<span class="doccomment">/// Always returns the value `v` without consuming any input.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # fn main() {
+/// let result = value(42)
+///     .parse(&quot;hello world&quot;)
+///     .map(|x| x.0);
+/// assert_eq!(result, Ok(42));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>value&lt;I, T&gt;(v: T) -&gt; Value&lt;I, T&gt;
+<span class="kw">where
+    </span>I: Stream,
+    T: Clone,
 {
-    <span class="ident">Value</span>(<span class="ident">v</span>, <span class="ident">PhantomData</span>)
+    Value(v, PhantomData)
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Eof</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Eof</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>Eof&lt;I&gt;(PhantomData&lt;I&gt;);
+<span class="kw">impl</span>&lt;I&gt; Parser <span class="kw">for </span>Eof&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = ();
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span>(), <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
-        <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">uncons</span>() {
-            <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">err</span> <span class="op">==</span> <span class="ident">StreamError::end_of_input</span>() =&gt; <span class="ident">EmptyOk</span>(()),
-            <span class="kw">_</span> =&gt; {
-                <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
-                <span class="ident">EmptyErr</span>(<span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error::empty</span>(<span class="ident">input</span>.<span class="ident">position</span>()).<span class="ident">into</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;(), I&gt; {
+        <span class="kw">let </span>before = input.checkpoint();
+        <span class="kw">match </span>input.uncons() {
+            <span class="prelude-val">Err</span>(<span class="kw-2">ref </span>err) <span class="kw">if </span><span class="kw-2">*</span>err == StreamError::end_of_input() =&gt; EmptyOk(()),
+            <span class="kw">_ </span>=&gt; {
+                input.reset(before);
+                EmptyErr(&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error::empty(input.position()).into())
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="ident">errors</span>.<span class="ident">error</span>.<span class="ident">add_expected</span>(<span class="string">&quot;end of input&quot;</span>.<span class="ident">into</span>());
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        errors.error.add_expected(<span class="string">&quot;end of input&quot;</span>.into());
     }
 }
 
-<span class="doccomment">/// Succeeds only if the stream is at end of input, fails otherwise.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # use combine::stream::easy;</span>
-<span class="doccomment">/// # use combine::stream::state::{State, SourcePosition};</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let mut parser = eof();</span>
-<span class="doccomment">/// assert_eq!(parser.easy_parse(State::new(&quot;&quot;)), Ok(((), State::new(&quot;&quot;))));</span>
-<span class="doccomment">/// assert_eq!(parser.easy_parse(State::new(&quot;x&quot;)), Err(easy::Errors {</span>
-<span class="doccomment">///     position: SourcePosition::default(),</span>
-<span class="doccomment">///     errors: vec![</span>
-<span class="doccomment">///         easy::Error::Unexpected(&#39;x&#39;.into()),</span>
-<span class="doccomment">///         easy::Error::Expected(&quot;end of input&quot;.into())</span>
-<span class="doccomment">///     ]</span>
-<span class="doccomment">/// }));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eof</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Eof</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="doccomment">/// Succeeds only if the stream is at end of input, fails otherwise.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # use combine::stream::easy;
+/// # use combine::stream::state::{State, SourcePosition};
+/// # fn main() {
+/// let mut parser = eof();
+/// assert_eq!(parser.easy_parse(State::new(&quot;&quot;)), Ok(((), State::new(&quot;&quot;))));
+/// assert_eq!(parser.easy_parse(State::new(&quot;x&quot;)), Err(easy::Errors {
+///     position: SourcePosition::default(),
+///     errors: vec![
+///         easy::Error::Unexpected(&#39;x&#39;.into()),
+///         easy::Error::Expected(&quot;end of input&quot;.into())
+///     ]
+/// }));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>eof&lt;I&gt;() -&gt; Eof&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="ident">Eof</span>(<span class="ident">PhantomData</span>)
+    Eof(PhantomData)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

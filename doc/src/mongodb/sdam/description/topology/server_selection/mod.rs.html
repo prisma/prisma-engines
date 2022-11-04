@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/sdam/description/topology/server_selection/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../../storage.js"></script><script defer src="../../../../../../source-script.js"></script><script defer src="../../../../../../source-files.js"></script><script defer src="../../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/sdam/description/topology/server_selection/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../../normalize.css"><link rel="stylesheet" href="../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../../storage.js"></script><script defer src="../../../../../../source-script.js"></script><script defer src="../../../../../../source-files.js"></script><script defer src="../../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -385,392 +385,392 @@
 <span id="385">385</span>
 <span id="386">386</span>
 <span id="387">387</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">fmt</span>, <span class="ident">ops::Deref</span>, <span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
+<span class="kw">use </span>std::{collections::HashMap, fmt, ops::Deref, sync::Arc, time::Duration};
 
-<span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">rngs::SmallRng</span>, <span class="ident">seq::SliceRandom</span>, <span class="ident">SeedableRng</span>};
+<span class="kw">use </span>rand::{rngs::SmallRng, seq::SliceRandom, SeedableRng};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TopologyDescription</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">options::ServerAddress</span>,
-    <span class="ident">sdam</span>::{
-        <span class="ident">description</span>::{
-            <span class="ident">server</span>::{<span class="ident">ServerDescription</span>, <span class="ident">ServerType</span>},
-            <span class="ident">topology::TopologyType</span>,
+<span class="kw">use </span><span class="kw">super</span>::TopologyDescription;
+<span class="kw">use crate</span>::{
+    error::{ErrorKind, <span class="prelude-ty">Result</span>},
+    options::ServerAddress,
+    sdam::{
+        description::{
+            server::{ServerDescription, ServerType},
+            topology::TopologyType,
         },
-        <span class="ident">Server</span>,
-        <span class="ident">ServerInfo</span>,
+        Server,
+        ServerInfo,
     },
-    <span class="ident">selection_criteria</span>::{<span class="ident">ReadPreference</span>, <span class="ident">SelectionCriteria</span>, <span class="ident">TagSet</span>},
+    selection_criteria::{ReadPreference, SelectionCriteria, TagSet},
 };
 
-<span class="kw">const</span> <span class="ident">DEFAULT_LOCAL_THRESHOLD</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">15</span>);
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">IDLE_WRITE_PERIOD</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">10</span>);
+<span class="kw">const </span>DEFAULT_LOCAL_THRESHOLD: Duration = Duration::from_millis(<span class="number">15</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>IDLE_WRITE_PERIOD: Duration = Duration::from_secs(<span class="number">10</span>);
 
-<span class="doccomment">/// Struct encapsulating a selected server that handles the opcount accounting.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">SelectedServer</span> {
-    <span class="ident">server</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Struct encapsulating a selected server that handles the opcount accounting.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SelectedServer {
+    server: Arc&lt;Server&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">SelectedServer</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">server</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">server</span>.<span class="ident">increment_operation_count</span>();
-        <span class="self">Self</span> { <span class="ident">server</span> }
+<span class="kw">impl </span>SelectedServer {
+    <span class="kw">fn </span>new(server: Arc&lt;Server&gt;) -&gt; <span class="self">Self </span>{
+        server.increment_operation_count();
+        <span class="self">Self </span>{ server }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">SelectedServer</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Server</span>;
+<span class="kw">impl </span>Deref <span class="kw">for </span>SelectedServer {
+    <span class="kw">type </span>Target = Server;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Server</span> {
-        <span class="self">self</span>.<span class="ident">server</span>.<span class="ident">deref</span>()
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Server {
+        <span class="self">self</span>.server.deref()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">SelectedServer</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">server</span>.<span class="ident">decrement_operation_count</span>();
+<span class="kw">impl </span>Drop <span class="kw">for </span>SelectedServer {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.server.decrement_operation_count();
     }
 }
 
-<span class="doccomment">/// Attempt to select a server, returning None if no server could be selected</span>
-<span class="doccomment">/// that matched the provided criteria.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attempt_to_select_server</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">criteria</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SelectionCriteria</span>,
-    <span class="ident">topology_description</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TopologyDescription</span>,
-    <span class="ident">servers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ServerAddress</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectedServer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">in_window</span> <span class="op">=</span> <span class="ident">topology_description</span>.<span class="ident">suitable_servers_in_latency_window</span>(<span class="ident">criteria</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">in_window_servers</span> <span class="op">=</span> <span class="ident">in_window</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">desc</span><span class="op">|</span> <span class="ident">servers</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">desc</span>.<span class="ident">address</span>))
-        .<span class="ident">collect</span>();
-    <span class="prelude-val">Ok</span>(<span class="ident">select_server_in_latency_window</span>(<span class="ident">in_window_servers</span>).<span class="ident">map</span>(<span class="ident">SelectedServer::new</span>))
+<span class="doccomment">/// Attempt to select a server, returning None if no server could be selected
+/// that matched the provided criteria.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>attempt_to_select_server&lt;<span class="lifetime">&#39;a</span>&gt;(
+    criteria: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SelectionCriteria,
+    topology_description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TopologyDescription,
+    servers: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HashMap&lt;ServerAddress, Arc&lt;Server&gt;&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;SelectedServer&gt;&gt; {
+    <span class="kw">let </span>in_window = topology_description.suitable_servers_in_latency_window(criteria)<span class="question-mark">?</span>;
+    <span class="kw">let </span>in_window_servers = in_window
+        .into_iter()
+        .flat_map(|desc| servers.get(<span class="kw-2">&amp;</span>desc.address))
+        .collect();
+    <span class="prelude-val">Ok</span>(select_server_in_latency_window(in_window_servers).map(SelectedServer::new))
 }
 
-<span class="doccomment">/// Choose a server from several suitable choices within the latency window according to</span>
-<span class="doccomment">/// the algorithm laid out in the server selection specification.</span>
-<span class="kw">fn</span> <span class="ident">select_server_in_latency_window</span>(<span class="ident">in_window</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">in_window</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">in_window</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">in_window</span>[<span class="number">0</span>].<span class="ident">clone</span>());
+<span class="doccomment">/// Choose a server from several suitable choices within the latency window according to
+/// the algorithm laid out in the server selection specification.
+</span><span class="kw">fn </span>select_server_in_latency_window(in_window: Vec&lt;<span class="kw-2">&amp;</span>Arc&lt;Server&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;Server&gt;&gt; {
+    <span class="kw">if </span>in_window.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
+    } <span class="kw">else if </span>in_window.len() == <span class="number">1 </span>{
+        <span class="kw">return </span><span class="prelude-val">Some</span>(in_window[<span class="number">0</span>].clone());
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">SmallRng::from_entropy</span>();
-    <span class="ident">in_window</span>
-        .<span class="ident">choose_multiple</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rng</span>, <span class="number">2</span>)
-        .<span class="ident">min_by_key</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">operation_count</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">server</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">server</span>).<span class="ident">clone</span>())
+    <span class="kw">let </span><span class="kw-2">mut </span>rng = SmallRng::from_entropy();
+    in_window
+        .choose_multiple(<span class="kw-2">&amp;mut </span>rng, <span class="number">2</span>)
+        .min_by_key(|s| s.operation_count())
+        .map(|server| (<span class="kw-2">*</span>server).clone())
 }
 
-<span class="kw">impl</span> <span class="ident">TopologyDescription</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">server_selection_timeout_error_message</span>(
+<span class="kw">impl </span>TopologyDescription {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>server_selection_timeout_error_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">criteria</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span>,
-    ) -&gt; <span class="ident">String</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_available_servers</span>() {
+        criteria: <span class="kw-2">&amp;</span>SelectionCriteria,
+    ) -&gt; String {
+        <span class="kw">if </span><span class="self">self</span>.has_available_servers() {
             <span class="macro">format!</span>(
                 <span class="string">&quot;Server selection timeout: None of the available servers suitable for criteria \
                  {:?}. Topology: {}&quot;</span>,
-                <span class="ident">criteria</span>, <span class="self">self</span>
-            )
-        } <span class="kw">else</span> {
+                criteria, <span class="self">self
+            </span>)
+        } <span class="kw">else </span>{
             <span class="macro">format!</span>(
                 <span class="string">&quot;Server selection timeout: No available servers. Topology: {}&quot;</span>,
-                <span class="self">self</span>
-            )
+                <span class="self">self
+            </span>)
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">suitable_servers_in_latency_window</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">criteria</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SelectionCriteria</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ServerDescription</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">compatibility_error</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::ServerSelection</span> {
-                <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">to_string</span>(),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>suitable_servers_in_latency_window&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        criteria: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SelectionCriteria,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerDescription&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = <span class="self">self</span>.compatibility_error() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::ServerSelection {
+                message: message.to_string(),
             }
-            .<span class="ident">into</span>());
+            .into());
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">TopologyType::Unknown</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">topology_type</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Vec::new</span>());
+        <span class="kw">if let </span>TopologyType::Unknown = <span class="self">self</span>.topology_type {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Vec::new());
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">suitable_servers</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">criteria</span> {
-            <span class="ident">SelectionCriteria::ReadPreference</span>(<span class="kw-2">ref</span> <span class="ident">read_pref</span>) =&gt; <span class="self">self</span>.<span class="ident">suitable_servers</span>(<span class="ident">read_pref</span>)<span class="question-mark">?</span>,
-            <span class="ident">SelectionCriteria::Predicate</span>(<span class="kw-2">ref</span> <span class="ident">filter</span>) =&gt; <span class="self">self</span>
-                .<span class="ident">servers</span>
-                .<span class="ident">values</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">server_type</span>.<span class="ident">is_data_bearing</span>() <span class="op">&amp;&amp;</span> <span class="ident">filter</span>(<span class="kw-2">&amp;</span><span class="ident">ServerInfo::new_borrowed</span>(<span class="ident">s</span>)))
-                .<span class="ident">collect</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>suitable_servers = <span class="kw">match </span>criteria {
+            SelectionCriteria::ReadPreference(<span class="kw-2">ref </span>read_pref) =&gt; <span class="self">self</span>.suitable_servers(read_pref)<span class="question-mark">?</span>,
+            SelectionCriteria::Predicate(<span class="kw-2">ref </span>filter) =&gt; <span class="self">self
+                </span>.servers
+                .values()
+                .filter(|s| s.server_type.is_data_bearing() &amp;&amp; filter(<span class="kw-2">&amp;</span>ServerInfo::new_borrowed(s)))
+                .collect(),
         };
 
-        <span class="self">self</span>.<span class="ident">retain_servers_within_latency_window</span>(<span class="kw-2">&amp;mut</span> <span class="ident">suitable_servers</span>);
+        <span class="self">self</span>.retain_servers_within_latency_window(<span class="kw-2">&amp;mut </span>suitable_servers);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">suitable_servers</span>)
+        <span class="prelude-val">Ok</span>(suitable_servers)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_available_servers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">values</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">server</span><span class="op">|</span> <span class="ident">server</span>.<span class="ident">is_available</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_available_servers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.servers.values().any(|server| server.is_available())
     }
 
-    <span class="kw">fn</span> <span class="ident">suitable_servers</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>suitable_servers&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">read_preference</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ReadPreference</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">servers</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">topology_type</span> {
-            <span class="ident">TopologyType::Unknown</span> =&gt; <span class="ident">Vec::new</span>(),
-            <span class="ident">TopologyType::Single</span> <span class="op">|</span> <span class="ident">TopologyType::LoadBalanced</span> =&gt; <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">values</span>().<span class="ident">collect</span>(),
-            <span class="ident">TopologyType::Sharded</span> =&gt; <span class="self">self</span>.<span class="ident">servers_with_type</span>(<span class="kw-2">&amp;</span>[<span class="ident">ServerType::Mongos</span>]).<span class="ident">collect</span>(),
-            <span class="ident">TopologyType::ReplicaSetWithPrimary</span> <span class="op">|</span> <span class="ident">TopologyType::ReplicaSetNoPrimary</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">suitable_servers_in_replica_set</span>(<span class="ident">read_preference</span>)<span class="question-mark">?</span>
-            }
+        read_preference: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ReadPreference,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw-2">&amp;</span>ServerDescription&gt;&gt; {
+        <span class="kw">let </span>servers = <span class="kw">match </span><span class="self">self</span>.topology_type {
+            TopologyType::Unknown =&gt; Vec::new(),
+            TopologyType::Single | TopologyType::LoadBalanced =&gt; <span class="self">self</span>.servers.values().collect(),
+            TopologyType::Sharded =&gt; <span class="self">self</span>.servers_with_type(<span class="kw-2">&amp;</span>[ServerType::Mongos]).collect(),
+            TopologyType::ReplicaSetWithPrimary | TopologyType::ReplicaSetNoPrimary =&gt; {
+                <span class="self">self</span>.suitable_servers_in_replica_set(read_preference)<span class="question-mark">?
+            </span>}
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">servers</span>)
+        <span class="prelude-val">Ok</span>(servers)
     }
 
-    <span class="kw">fn</span> <span class="ident">retain_servers_within_latency_window</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>retain_servers_within_latency_window&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">suitable_servers</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ServerDescription</span><span class="op">&gt;</span>,
+        suitable_servers: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerDescription&gt;,
     ) {
-        <span class="kw">let</span> <span class="ident">shortest_average_rtt</span> <span class="op">=</span> <span class="ident">suitable_servers</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">server_desc</span><span class="op">|</span> <span class="ident">server_desc</span>.<span class="ident">average_round_trip_time</span>)
-            .<span class="ident">fold</span>(<span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="ident">::None</span>, <span class="op">|</span><span class="ident">min</span>, <span class="ident">curr</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">min</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">prev</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">prev</span>.<span class="ident">min</span>(<span class="ident">curr</span>)),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">curr</span>),
+        <span class="kw">let </span>shortest_average_rtt = suitable_servers
+            .iter()
+            .filter_map(|server_desc| server_desc.average_round_trip_time)
+            .fold(<span class="prelude-ty">Option</span>::&lt;Duration&gt;::None, |min, curr| <span class="kw">match </span>min {
+                <span class="prelude-val">Some</span>(prev) =&gt; <span class="prelude-val">Some</span>(prev.min(curr)),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(curr),
             });
 
-        <span class="kw">let</span> <span class="ident">local_threshold</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">local_threshold</span>.<span class="ident">unwrap_or</span>(<span class="ident">DEFAULT_LOCAL_THRESHOLD</span>);
+        <span class="kw">let </span>local_threshold = <span class="self">self</span>.local_threshold.unwrap_or(DEFAULT_LOCAL_THRESHOLD);
 
-        <span class="kw">let</span> <span class="ident">max_rtt_within_window</span> <span class="op">=</span> <span class="ident">shortest_average_rtt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">rtt</span><span class="op">|</span> <span class="ident">rtt</span> <span class="op">+</span> <span class="ident">local_threshold</span>);
+        <span class="kw">let </span>max_rtt_within_window = shortest_average_rtt.map(|rtt| rtt + local_threshold);
 
-        <span class="ident">suitable_servers</span>.<span class="ident">retain</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">server_desc</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">server_rtt</span>) <span class="op">=</span> <span class="ident">server_desc</span>.<span class="ident">average_round_trip_time</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_rtt</span>) <span class="op">=</span> <span class="ident">max_rtt_within_window</span> {
-                    <span class="kw">return</span> <span class="ident">server_rtt</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max_rtt</span>;
+        suitable_servers.retain(<span class="kw">move </span>|server_desc| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(server_rtt) = server_desc.average_round_trip_time {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(max_rtt) = max_rtt_within_window {
+                    <span class="kw">return </span>server_rtt &lt;= max_rtt;
                 }
             }
 
-            <span class="bool-val">false</span>
-        });
+            <span class="bool-val">false
+        </span>});
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">servers_with_type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ServerType</span>],
-    ) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ServerDescription</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">servers</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">server</span><span class="op">|</span> <span class="ident">types</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">server</span>.<span class="ident">server_type</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>servers_with_type&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        types: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ServerType],
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerDescription&gt; {
+        <span class="self">self</span>.servers
+            .values()
+            .filter(<span class="kw">move </span>|server| types.contains(<span class="kw-2">&amp;</span>server.server_type))
     }
 
-    <span class="kw">fn</span> <span class="ident">suitable_servers_in_replica_set</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>suitable_servers_in_replica_set&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">read_preference</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ReadPreference</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">servers</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">read_preference</span> {
-            <span class="ident">ReadPreference::Primary</span> =&gt; <span class="self">self</span>.<span class="ident">servers_with_type</span>(<span class="kw-2">&amp;</span>[<span class="ident">ServerType::RsPrimary</span>]).<span class="ident">collect</span>(),
-            <span class="ident">ReadPreference::Secondary</span> { <span class="kw-2">ref</span> <span class="ident">options</span> } =&gt; <span class="self">self</span>
-                .<span class="ident">suitable_servers_for_read_preference</span>(
-                    <span class="kw-2">&amp;</span>[<span class="ident">ServerType::RsSecondary</span>],
-                    <span class="ident">options</span>.<span class="ident">tag_sets</span>.<span class="ident">as_ref</span>(),
-                    <span class="ident">options</span>.<span class="ident">max_staleness</span>,
+        read_preference: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ReadPreference,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw-2">&amp;</span>ServerDescription&gt;&gt; {
+        <span class="kw">let </span>servers = <span class="kw">match </span>read_preference {
+            ReadPreference::Primary =&gt; <span class="self">self</span>.servers_with_type(<span class="kw-2">&amp;</span>[ServerType::RsPrimary]).collect(),
+            ReadPreference::Secondary { <span class="kw-2">ref </span>options } =&gt; <span class="self">self
+                </span>.suitable_servers_for_read_preference(
+                    <span class="kw-2">&amp;</span>[ServerType::RsSecondary],
+                    options.tag_sets.as_ref(),
+                    options.max_staleness,
                 )<span class="question-mark">?</span>,
-            <span class="ident">ReadPreference::PrimaryPreferred</span> { <span class="kw-2">ref</span> <span class="ident">options</span> } =&gt; {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">servers_with_type</span>(<span class="kw-2">&amp;</span>[<span class="ident">ServerType::RsPrimary</span>]).<span class="ident">next</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">primary</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">primary</span>],
-                    <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">suitable_servers_for_read_preference</span>(
-                        <span class="kw-2">&amp;</span>[<span class="ident">ServerType::RsSecondary</span>],
-                        <span class="ident">options</span>.<span class="ident">tag_sets</span>.<span class="ident">as_ref</span>(),
-                        <span class="ident">options</span>.<span class="ident">max_staleness</span>,
+            ReadPreference::PrimaryPreferred { <span class="kw-2">ref </span>options } =&gt; {
+                <span class="kw">match </span><span class="self">self</span>.servers_with_type(<span class="kw-2">&amp;</span>[ServerType::RsPrimary]).next() {
+                    <span class="prelude-val">Some</span>(primary) =&gt; <span class="macro">vec!</span>[primary],
+                    <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.suitable_servers_for_read_preference(
+                        <span class="kw-2">&amp;</span>[ServerType::RsSecondary],
+                        options.tag_sets.as_ref(),
+                        options.max_staleness,
                     )<span class="question-mark">?</span>,
                 }
             }
-            <span class="ident">ReadPreference::SecondaryPreferred</span> { <span class="kw-2">ref</span> <span class="ident">options</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">suitable_servers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">suitable_servers_for_read_preference</span>(
-                    <span class="kw-2">&amp;</span>[<span class="ident">ServerType::RsSecondary</span>],
-                    <span class="ident">options</span>.<span class="ident">tag_sets</span>.<span class="ident">as_ref</span>(),
-                    <span class="ident">options</span>.<span class="ident">max_staleness</span>,
+            ReadPreference::SecondaryPreferred { <span class="kw-2">ref </span>options } =&gt; {
+                <span class="kw">let </span>suitable_servers = <span class="self">self</span>.suitable_servers_for_read_preference(
+                    <span class="kw-2">&amp;</span>[ServerType::RsSecondary],
+                    options.tag_sets.as_ref(),
+                    options.max_staleness,
                 )<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="ident">suitable_servers</span>.<span class="ident">is_empty</span>() {
-                    <span class="self">self</span>.<span class="ident">servers_with_type</span>(<span class="kw-2">&amp;</span>[<span class="ident">ServerType::RsPrimary</span>]).<span class="ident">collect</span>()
-                } <span class="kw">else</span> {
-                    <span class="ident">suitable_servers</span>
+                <span class="kw">if </span>suitable_servers.is_empty() {
+                    <span class="self">self</span>.servers_with_type(<span class="kw-2">&amp;</span>[ServerType::RsPrimary]).collect()
+                } <span class="kw">else </span>{
+                    suitable_servers
                 }
             }
-            <span class="ident">ReadPreference::Nearest</span> { <span class="kw-2">ref</span> <span class="ident">options</span> } =&gt; <span class="self">self</span>.<span class="ident">suitable_servers_for_read_preference</span>(
-                <span class="kw-2">&amp;</span>[<span class="ident">ServerType::RsPrimary</span>, <span class="ident">ServerType::RsSecondary</span>],
-                <span class="ident">options</span>.<span class="ident">tag_sets</span>.<span class="ident">as_ref</span>(),
-                <span class="ident">options</span>.<span class="ident">max_staleness</span>,
+            ReadPreference::Nearest { <span class="kw-2">ref </span>options } =&gt; <span class="self">self</span>.suitable_servers_for_read_preference(
+                <span class="kw-2">&amp;</span>[ServerType::RsPrimary, ServerType::RsSecondary],
+                options.tag_sets.as_ref(),
+                options.max_staleness,
             )<span class="question-mark">?</span>,
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">servers</span>)
+        <span class="prelude-val">Ok</span>(servers)
     }
 
-    <span class="kw">fn</span> <span class="ident">suitable_servers_for_read_preference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>suitable_servers_for_read_preference&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ServerType</span>],
-        <span class="ident">tag_sets</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TagSet</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">max_staleness</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="kw">super</span>::verify_max_staleness</span>(<span class="ident">max_staleness</span>)<span class="question-mark">?</span>;
+        types: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ServerType],
+        tag_sets: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vec&lt;TagSet&gt;&gt;,
+        max_staleness: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw-2">&amp;</span>ServerDescription&gt;&gt; {
+        <span class="kw">super</span>::verify_max_staleness(max_staleness)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">servers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">servers_with_type</span>(<span class="ident">types</span>).<span class="ident">collect</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>servers = <span class="self">self</span>.servers_with_type(types).collect();
 
-        <span class="comment">// We don&#39;t need to check for the Client&#39;s default max_staleness because it would be passed</span>
-        <span class="comment">// in as part of the Client&#39;s default ReadPreference if none is specified for the operation.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_staleness</span>) <span class="op">=</span> <span class="ident">max_staleness</span> {
-            <span class="comment">// According to the spec, max staleness &lt;= 0 is the same as no max staleness.</span>
-            <span class="kw">if</span> <span class="ident">max_staleness</span> <span class="op">&gt;</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>) {
-                <span class="self">self</span>.<span class="ident">filter_servers_by_max_staleness</span>(<span class="kw-2">&amp;mut</span> <span class="ident">servers</span>, <span class="ident">max_staleness</span>);
+        <span class="comment">// We don&#39;t need to check for the Client&#39;s default max_staleness because it would be passed
+        // in as part of the Client&#39;s default ReadPreference if none is specified for the operation.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(max_staleness) = max_staleness {
+            <span class="comment">// According to the spec, max staleness &lt;= 0 is the same as no max staleness.
+            </span><span class="kw">if </span>max_staleness &gt; Duration::from_secs(<span class="number">0</span>) {
+                <span class="self">self</span>.filter_servers_by_max_staleness(<span class="kw-2">&amp;mut </span>servers, max_staleness);
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">tag_sets</span>) <span class="op">=</span> <span class="ident">tag_sets</span> {
-            <span class="ident">filter_servers_by_tag_sets</span>(<span class="kw-2">&amp;mut</span> <span class="ident">servers</span>, <span class="ident">tag_sets</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(tag_sets) = tag_sets {
+            filter_servers_by_tag_sets(<span class="kw-2">&amp;mut </span>servers, tag_sets);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">servers</span>)
+        <span class="prelude-val">Ok</span>(servers)
     }
 
-    <span class="kw">fn</span> <span class="ident">filter_servers_by_max_staleness</span>(
+    <span class="kw">fn </span>filter_servers_by_max_staleness(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">servers</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span>,
-        <span class="ident">max_staleness</span>: <span class="ident">Duration</span>,
+        servers: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw-2">&amp;</span>ServerDescription&gt;,
+        max_staleness: Duration,
     ) {
-        <span class="kw">let</span> <span class="ident">primary</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">servers</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">server</span><span class="op">|</span> <span class="ident">server</span>.<span class="ident">server_type</span> <span class="op">==</span> <span class="ident">ServerType::RsPrimary</span>);
+        <span class="kw">let </span>primary = <span class="self">self
+            </span>.servers
+            .values()
+            .find(|server| server.server_type == ServerType::RsPrimary);
 
-        <span class="kw">match</span> <span class="ident">primary</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">primary</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">filter_servers_by_max_staleness_with_primary</span>(<span class="ident">servers</span>, <span class="ident">primary</span>, <span class="ident">max_staleness</span>)
+        <span class="kw">match </span>primary {
+            <span class="prelude-val">Some</span>(primary) =&gt; {
+                <span class="self">self</span>.filter_servers_by_max_staleness_with_primary(servers, primary, max_staleness)
             }
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">filter_servers_by_max_staleness_without_primary</span>(<span class="ident">servers</span>, <span class="ident">max_staleness</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.filter_servers_by_max_staleness_without_primary(servers, max_staleness),
         };
     }
 
-    <span class="kw">fn</span> <span class="ident">filter_servers_by_max_staleness_with_primary</span>(
+    <span class="kw">fn </span>filter_servers_by_max_staleness_with_primary(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">servers</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span>,
-        <span class="ident">primary</span>: <span class="kw-2">&amp;</span><span class="ident">ServerDescription</span>,
-        <span class="ident">max_staleness</span>: <span class="ident">Duration</span>,
+        servers: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw-2">&amp;</span>ServerDescription&gt;,
+        primary: <span class="kw-2">&amp;</span>ServerDescription,
+        max_staleness: Duration,
     ) {
-        <span class="kw">let</span> <span class="ident">max_staleness_ms</span> <span class="op">=</span> <span class="ident">max_staleness</span>.<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">i64</span>;
+        <span class="kw">let </span>max_staleness_ms = max_staleness.as_millis() <span class="kw">as </span>i64;
 
-        <span class="ident">servers</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">server</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">server_staleness</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calculate_secondary_staleness_with_primary</span>(<span class="ident">server</span>, <span class="ident">primary</span>);
+        servers.retain(|server| {
+            <span class="kw">let </span>server_staleness = <span class="self">self</span>.calculate_secondary_staleness_with_primary(server, primary);
 
-            <span class="ident">server_staleness</span>
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">staleness</span><span class="op">|</span> <span class="ident">staleness</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max_staleness_ms</span>)
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+            server_staleness
+                .map(|staleness| staleness &lt;= max_staleness_ms)
+                .unwrap_or(<span class="bool-val">false</span>)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">filter_servers_by_max_staleness_without_primary</span>(
+    <span class="kw">fn </span>filter_servers_by_max_staleness_without_primary(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">servers</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span>,
-        <span class="ident">max_staleness</span>: <span class="ident">Duration</span>,
+        servers: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw-2">&amp;</span>ServerDescription&gt;,
+        max_staleness: Duration,
     ) {
-        <span class="kw">let</span> <span class="ident">max_staleness</span> <span class="op">=</span> <span class="ident">max_staleness</span>.<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">i64</span>;
-        <span class="kw">let</span> <span class="ident">max_write_date</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">servers</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">server</span><span class="op">|</span> <span class="ident">server</span>.<span class="ident">server_type</span> <span class="op">==</span> <span class="ident">ServerType::RsSecondary</span>)
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">server</span><span class="op">|</span> {
-                <span class="ident">server</span>
-                    .<span class="ident">last_write_date</span>()
-                    .<span class="ident">ok</span>()
-                    .<span class="ident">and_then</span>(<span class="ident">std::convert::identity</span>)
+        <span class="kw">let </span>max_staleness = max_staleness.as_millis() <span class="kw">as </span>i64;
+        <span class="kw">let </span>max_write_date = <span class="self">self
+            </span>.servers
+            .values()
+            .filter(|server| server.server_type == ServerType::RsSecondary)
+            .filter_map(|server| {
+                server
+                    .last_write_date()
+                    .ok()
+                    .and_then(std::convert::identity)
             })
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">last_write_date</span><span class="op">|</span> <span class="ident">last_write_date</span>.<span class="ident">timestamp_millis</span>())
-            .<span class="ident">max</span>();
+            .map(|last_write_date| last_write_date.timestamp_millis())
+            .max();
 
-        <span class="kw">let</span> <span class="ident">secondary_max_write_date</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">max_write_date</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">max_write_date</span>) =&gt; <span class="ident">max_write_date</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+        <span class="kw">let </span>secondary_max_write_date = <span class="kw">match </span>max_write_date {
+            <span class="prelude-val">Some</span>(max_write_date) =&gt; max_write_date,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
         };
 
-        <span class="ident">servers</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">server</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">server_staleness</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">calculate_secondary_staleness_without_primary</span>(<span class="ident">server</span>, <span class="ident">secondary_max_write_date</span>);
+        servers.retain(|server| {
+            <span class="kw">let </span>server_staleness = <span class="self">self
+                </span>.calculate_secondary_staleness_without_primary(server, secondary_max_write_date);
 
-            <span class="ident">server_staleness</span>
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">staleness</span><span class="op">|</span> <span class="ident">staleness</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max_staleness</span>)
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+            server_staleness
+                .map(|staleness| staleness &lt;= max_staleness)
+                .unwrap_or(<span class="bool-val">false</span>)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">calculate_secondary_staleness_with_primary</span>(
+    <span class="kw">fn </span>calculate_secondary_staleness_with_primary(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">secondary</span>: <span class="kw-2">&amp;</span><span class="ident">ServerDescription</span>,
-        <span class="ident">primary</span>: <span class="kw-2">&amp;</span><span class="ident">ServerDescription</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">primary_last_update</span> <span class="op">=</span> <span class="ident">primary</span>.<span class="ident">last_update_time</span><span class="question-mark">?</span>.<span class="ident">timestamp_millis</span>();
-        <span class="kw">let</span> <span class="ident">primary_last_write</span> <span class="op">=</span> <span class="ident">primary</span>.<span class="ident">last_write_date</span>().<span class="ident">ok</span>()<span class="question-mark">?</span><span class="question-mark">?</span>.<span class="ident">timestamp_millis</span>();
+        secondary: <span class="kw-2">&amp;</span>ServerDescription,
+        primary: <span class="kw-2">&amp;</span>ServerDescription,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+        <span class="kw">let </span>primary_last_update = primary.last_update_time<span class="question-mark">?</span>.timestamp_millis();
+        <span class="kw">let </span>primary_last_write = primary.last_write_date().ok()<span class="question-mark">??</span>.timestamp_millis();
 
-        <span class="kw">let</span> <span class="ident">secondary_last_update</span> <span class="op">=</span> <span class="ident">secondary</span>.<span class="ident">last_update_time</span><span class="question-mark">?</span>.<span class="ident">timestamp_millis</span>();
-        <span class="kw">let</span> <span class="ident">secondary_last_write</span> <span class="op">=</span> <span class="ident">secondary</span>.<span class="ident">last_write_date</span>().<span class="ident">ok</span>()<span class="question-mark">?</span><span class="question-mark">?</span>.<span class="ident">timestamp_millis</span>();
+        <span class="kw">let </span>secondary_last_update = secondary.last_update_time<span class="question-mark">?</span>.timestamp_millis();
+        <span class="kw">let </span>secondary_last_write = secondary.last_write_date().ok()<span class="question-mark">??</span>.timestamp_millis();
 
-        <span class="kw">let</span> <span class="ident">heartbeat_frequency</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">heartbeat_frequency</span>().<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">i64</span>;
+        <span class="kw">let </span>heartbeat_frequency = <span class="self">self</span>.heartbeat_frequency().as_millis() <span class="kw">as </span>i64;
 
-        <span class="kw">let</span> <span class="ident">staleness</span> <span class="op">=</span> (<span class="ident">secondary_last_update</span> <span class="op">-</span> <span class="ident">secondary_last_write</span>)
-            <span class="op">-</span> (<span class="ident">primary_last_update</span> <span class="op">-</span> <span class="ident">primary_last_write</span>)
-            <span class="op">+</span> <span class="ident">heartbeat_frequency</span>;
+        <span class="kw">let </span>staleness = (secondary_last_update - secondary_last_write)
+            - (primary_last_update - primary_last_write)
+            + heartbeat_frequency;
 
-        <span class="prelude-val">Some</span>(<span class="ident">staleness</span>)
+        <span class="prelude-val">Some</span>(staleness)
     }
 
-    <span class="kw">fn</span> <span class="ident">calculate_secondary_staleness_without_primary</span>(
+    <span class="kw">fn </span>calculate_secondary_staleness_without_primary(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">secondary</span>: <span class="kw-2">&amp;</span><span class="ident">ServerDescription</span>,
-        <span class="ident">max_last_write_date</span>: <span class="ident">i64</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">secondary_last_write</span> <span class="op">=</span> <span class="ident">secondary</span>.<span class="ident">last_write_date</span>().<span class="ident">ok</span>()<span class="question-mark">?</span><span class="question-mark">?</span>.<span class="ident">timestamp_millis</span>();
-        <span class="kw">let</span> <span class="ident">heartbeat_frequency</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">heartbeat_frequency</span>().<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">i64</span>;
+        secondary: <span class="kw-2">&amp;</span>ServerDescription,
+        max_last_write_date: i64,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+        <span class="kw">let </span>secondary_last_write = secondary.last_write_date().ok()<span class="question-mark">??</span>.timestamp_millis();
+        <span class="kw">let </span>heartbeat_frequency = <span class="self">self</span>.heartbeat_frequency().as_millis() <span class="kw">as </span>i64;
 
-        <span class="kw">let</span> <span class="ident">staleness</span> <span class="op">=</span> <span class="ident">max_last_write_date</span> <span class="op">-</span> <span class="ident">secondary_last_write</span> <span class="op">+</span> <span class="ident">heartbeat_frequency</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">staleness</span>)
+        <span class="kw">let </span>staleness = max_last_write_date - secondary_last_write + heartbeat_frequency;
+        <span class="prelude-val">Some</span>(staleness)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TopologyDescription</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{{ Type: {:?}, Servers: [ &quot;</span>, <span class="self">self</span>.<span class="ident">topology_type</span>)<span class="question-mark">?</span>;
-        <span class="kw">for</span> <span class="ident">server_info</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">values</span>().<span class="ident">map</span>(<span class="ident">ServerInfo::new_borrowed</span>) {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}, &quot;</span>, <span class="ident">server_info</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>TopologyDescription {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{{ Type: {:?}, Servers: [ &quot;</span>, <span class="self">self</span>.topology_type)<span class="question-mark">?</span>;
+        <span class="kw">for </span>server_info <span class="kw">in </span><span class="self">self</span>.servers.values().map(ServerInfo::new_borrowed) {
+            <span class="macro">write!</span>(f, <span class="string">&quot;{}, &quot;</span>, server_info)<span class="question-mark">?</span>;
         }
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;] }}&quot;</span>)
+        <span class="macro">write!</span>(f, <span class="string">&quot;] }}&quot;</span>)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">filter_servers_by_tag_sets</span>(<span class="ident">servers</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span>, <span class="ident">tag_sets</span>: <span class="kw-2">&amp;</span>[<span class="ident">TagSet</span>]) {
-    <span class="kw">if</span> <span class="ident">tag_sets</span>.<span class="ident">is_empty</span>() {
+<span class="kw">fn </span>filter_servers_by_tag_sets(servers: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw-2">&amp;</span>ServerDescription&gt;, tag_sets: <span class="kw-2">&amp;</span>[TagSet]) {
+    <span class="kw">if </span>tag_sets.is_empty() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">for</span> <span class="ident">tag_set</span> <span class="kw">in</span> <span class="ident">tag_sets</span> {
-        <span class="kw">let</span> <span class="ident">matches_tag_set</span> <span class="op">=</span> <span class="op">|</span><span class="ident">server</span>: <span class="op">&amp;&amp;</span><span class="ident">ServerDescription</span><span class="op">|</span> <span class="ident">server</span>.<span class="ident">matches_tag_set</span>(<span class="ident">tag_set</span>);
+    <span class="kw">for </span>tag_set <span class="kw">in </span>tag_sets {
+        <span class="kw">let </span>matches_tag_set = |server: &amp;&amp;ServerDescription| server.matches_tag_set(tag_set);
 
-        <span class="kw">if</span> <span class="ident">servers</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="ident">matches_tag_set</span>) {
-            <span class="ident">servers</span>.<span class="ident">retain</span>(<span class="ident">matches_tag_set</span>);
+        <span class="kw">if </span>servers.iter().any(matches_tag_set) {
+            servers.retain(matches_tag_set);
 
             <span class="kw">return</span>;
         }
     }
 
-    <span class="ident">servers</span>.<span class="ident">clear</span>();
+    servers.clear();
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

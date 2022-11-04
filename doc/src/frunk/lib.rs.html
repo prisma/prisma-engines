@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk-0.4.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk-0.4.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -307,23 +307,23 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_playground_url</span> <span class="op">=</span> <span class="string">&quot;https://play.rust-lang.org/&quot;</span>)]</span>
-<span class="doccomment">//! Frunk: generic functional programming toolbelt for Rust</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Aims to be a collection of functional programming abstractions implemented in Rust</span>
-<span class="doccomment">//! in effective, useful, and idiomatic ways. Examples of things that are included in rust are:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   1. HLists (heterogeneously-typed lists)</span>
-<span class="doccomment">//!   2. LabelledGeneric, and Generic</span>
-<span class="doccomment">//!   3. Coproduct</span>
-<span class="doccomment">//!   4. Validated (accumulator for Result)</span>
-<span class="doccomment">//!   5. Semigroup</span>
-<span class="doccomment">//!   6. Monoid</span>
-<span class="doccomment">//!</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>,
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">r#&quot;
+</pre><pre class="rust"><code><span class="attribute">#![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]
+#![doc(html_playground_url = <span class="string">&quot;https://play.rust-lang.org/&quot;</span>)]
+</span><span class="doccomment">//! Frunk: generic functional programming toolbelt for Rust
+//!
+//! Aims to be a collection of functional programming abstractions implemented in Rust
+//! in effective, useful, and idiomatic ways. Examples of things that are included in rust are:
+//!
+//!   1. HLists (heterogeneously-typed lists)
+//!   2. LabelledGeneric, and Generic
+//!   3. Coproduct
+//!   4. Validated (accumulator for Result)
+//!   5. Semigroup
+//!   6. Monoid
+//!
+</span><span class="attribute">#![cfg_attr(
+    feature = <span class="string">&quot;std&quot;</span>,
+    doc = <span class="string">r#&quot;
 Here is a small taste of what Frunk has to offer:
 
 ```
@@ -406,215 +406,215 @@ struct DeletedUser&lt;&#39;a&gt; {
 let d_user: DeletedUser = frunk::transform_from(s_user);
 assert_eq!(d_user.first_name, &quot;Joe&quot;);
 # }
-```&quot;#</span>
-)]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ##### Transmogrifying</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Sometimes you need might have one data type that is &quot;similar in shape&quot; to another data type, but it</span>
-<span class="doccomment">//! is similar _recursively_ (e.g. it has fields that are structs that have fields that are a superset of</span>
-<span class="doccomment">//! the fields in the target type, so they are transformable recursively).  `.transform_from` can&#39;t</span>
-<span class="doccomment">//! help you there because it doesn&#39;t deal with recursion, but the `Transmogrifier` can help if both</span>
-<span class="doccomment">//! are `LabelledGeneric` by `transmogrify()`ing from one to the other.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! What is &quot;transmogrifying&quot;? In this context, it means to recursively transform some data of type A</span>
-<span class="doccomment">//! into data of type B, in a typesafe way, as long as A and B are &quot;similarly-shaped&quot;.  In other words,</span>
-<span class="doccomment">//! as long as B&#39;s fields and their subfields are subsets of A&#39;s fields and their respective subfields,</span>
-<span class="doccomment">//! then A can be turned into B.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! As usual, the goal with Frunk is to do this:</span>
-<span class="doccomment">//! * Using stable (so no specialisation, which would have been helpful, methinks)</span>
-<span class="doccomment">//! * Typesafe</span>
-<span class="doccomment">//! * No usage of `unsafe`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Here is an example:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # #[macro_use] extern crate frunk;</span>
-<span class="doccomment">//! # #[macro_use] extern crate frunk_core;</span>
-<span class="doccomment">//! # fn main() {</span>
-<span class="doccomment">//! use frunk::labelled::Transmogrifier;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(LabelledGeneric)]</span>
-<span class="doccomment">//! struct InternalPhoneNumber {</span>
-<span class="doccomment">//!     emergency: Option&lt;usize&gt;,</span>
-<span class="doccomment">//!     main: usize,</span>
-<span class="doccomment">//!     secondary: Option&lt;usize&gt;,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(LabelledGeneric)]</span>
-<span class="doccomment">//! struct InternalAddress&lt;&#39;a&gt; {</span>
-<span class="doccomment">//!     is_whitelisted: bool,</span>
-<span class="doccomment">//!     name: &amp;&#39;a str,</span>
-<span class="doccomment">//!     phone: InternalPhoneNumber,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(LabelledGeneric)]</span>
-<span class="doccomment">//! struct InternalUser&lt;&#39;a&gt; {</span>
-<span class="doccomment">//!     name: &amp;&#39;a str,</span>
-<span class="doccomment">//!     age: usize,</span>
-<span class="doccomment">//!     address: InternalAddress&lt;&#39;a&gt;,</span>
-<span class="doccomment">//!     is_banned: bool,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(LabelledGeneric, PartialEq, Debug)]</span>
-<span class="doccomment">//! struct ExternalPhoneNumber {</span>
-<span class="doccomment">//!     main: usize,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(LabelledGeneric, PartialEq, Debug)]</span>
-<span class="doccomment">//! struct ExternalAddress&lt;&#39;a&gt; {</span>
-<span class="doccomment">//!     name: &amp;&#39;a str,</span>
-<span class="doccomment">//!     phone: ExternalPhoneNumber,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(LabelledGeneric, PartialEq, Debug)]</span>
-<span class="doccomment">//! struct ExternalUser&lt;&#39;a&gt; {</span>
-<span class="doccomment">//!     age: usize,</span>
-<span class="doccomment">//!     address: ExternalAddress&lt;&#39;a&gt;,</span>
-<span class="doccomment">//!     name: &amp;&#39;a str,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let internal_user = InternalUser {</span>
-<span class="doccomment">//!     name: &quot;John&quot;,</span>
-<span class="doccomment">//!     age: 10,</span>
-<span class="doccomment">//!     address: InternalAddress {</span>
-<span class="doccomment">//!         is_whitelisted: true,</span>
-<span class="doccomment">//!         name: &quot;somewhere out there&quot;,</span>
-<span class="doccomment">//!         phone: InternalPhoneNumber {</span>
-<span class="doccomment">//!             main: 1234,</span>
-<span class="doccomment">//!             secondary: None,</span>
-<span class="doccomment">//!             emergency: Some(5678),</span>
-<span class="doccomment">//!         },</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//!     is_banned: true,</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! /// Boilerplate-free conversion of a top-level InternalUser into an</span>
-<span class="doccomment">//! /// ExternalUser, taking care of subfield conversions as well.</span>
-<span class="doccomment">//! let external_user: ExternalUser = internal_user.transmogrify();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let expected_external_user = ExternalUser {</span>
-<span class="doccomment">//!     name: &quot;John&quot;,</span>
-<span class="doccomment">//!     age: 10,</span>
-<span class="doccomment">//!     address: ExternalAddress {</span>
-<span class="doccomment">//!         name: &quot;somewhere out there&quot;,</span>
-<span class="doccomment">//!         phone: ExternalPhoneNumber {</span>
-<span class="doccomment">//!             main: 1234,</span>
-<span class="doccomment">//!         },</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(external_user, expected_external_user);</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Links:</span>
-<span class="doccomment">//!   1. [Source on Github](https://github.com/lloydmeta/frunk)</span>
-<span class="doccomment">//!   2. [Crates.io page](https://crates.io/crates/frunk)</span>
+```&quot;#
+</span>)]
+</span><span class="doccomment">//!
+//! ##### Transmogrifying
+//!
+//! Sometimes you need might have one data type that is &quot;similar in shape&quot; to another data type, but it
+//! is similar _recursively_ (e.g. it has fields that are structs that have fields that are a superset of
+//! the fields in the target type, so they are transformable recursively).  `.transform_from` can&#39;t
+//! help you there because it doesn&#39;t deal with recursion, but the `Transmogrifier` can help if both
+//! are `LabelledGeneric` by `transmogrify()`ing from one to the other.
+//!
+//! What is &quot;transmogrifying&quot;? In this context, it means to recursively transform some data of type A
+//! into data of type B, in a typesafe way, as long as A and B are &quot;similarly-shaped&quot;.  In other words,
+//! as long as B&#39;s fields and their subfields are subsets of A&#39;s fields and their respective subfields,
+//! then A can be turned into B.
+//!
+//! As usual, the goal with Frunk is to do this:
+//! * Using stable (so no specialisation, which would have been helpful, methinks)
+//! * Typesafe
+//! * No usage of `unsafe`
+//!
+//! Here is an example:
+//!
+//! ```rust
+//! # #[macro_use] extern crate frunk;
+//! # #[macro_use] extern crate frunk_core;
+//! # fn main() {
+//! use frunk::labelled::Transmogrifier;
+//!
+//! #[derive(LabelledGeneric)]
+//! struct InternalPhoneNumber {
+//!     emergency: Option&lt;usize&gt;,
+//!     main: usize,
+//!     secondary: Option&lt;usize&gt;,
+//! }
+//!
+//! #[derive(LabelledGeneric)]
+//! struct InternalAddress&lt;&#39;a&gt; {
+//!     is_whitelisted: bool,
+//!     name: &amp;&#39;a str,
+//!     phone: InternalPhoneNumber,
+//! }
+//!
+//! #[derive(LabelledGeneric)]
+//! struct InternalUser&lt;&#39;a&gt; {
+//!     name: &amp;&#39;a str,
+//!     age: usize,
+//!     address: InternalAddress&lt;&#39;a&gt;,
+//!     is_banned: bool,
+//! }
+//!
+//! #[derive(LabelledGeneric, PartialEq, Debug)]
+//! struct ExternalPhoneNumber {
+//!     main: usize,
+//! }
+//!
+//! #[derive(LabelledGeneric, PartialEq, Debug)]
+//! struct ExternalAddress&lt;&#39;a&gt; {
+//!     name: &amp;&#39;a str,
+//!     phone: ExternalPhoneNumber,
+//! }
+//!
+//! #[derive(LabelledGeneric, PartialEq, Debug)]
+//! struct ExternalUser&lt;&#39;a&gt; {
+//!     age: usize,
+//!     address: ExternalAddress&lt;&#39;a&gt;,
+//!     name: &amp;&#39;a str,
+//! }
+//!
+//! let internal_user = InternalUser {
+//!     name: &quot;John&quot;,
+//!     age: 10,
+//!     address: InternalAddress {
+//!         is_whitelisted: true,
+//!         name: &quot;somewhere out there&quot;,
+//!         phone: InternalPhoneNumber {
+//!             main: 1234,
+//!             secondary: None,
+//!             emergency: Some(5678),
+//!         },
+//!     },
+//!     is_banned: true,
+//! };
+//!
+//! /// Boilerplate-free conversion of a top-level InternalUser into an
+//! /// ExternalUser, taking care of subfield conversions as well.
+//! let external_user: ExternalUser = internal_user.transmogrify();
+//!
+//! let expected_external_user = ExternalUser {
+//!     name: &quot;John&quot;,
+//!     age: 10,
+//!     address: ExternalAddress {
+//!         name: &quot;somewhere out there&quot;,
+//!         phone: ExternalPhoneNumber {
+//!             main: 1234,
+//!         },
+//!     }
+//! };
+//!
+//! assert_eq!(external_user, expected_external_user);
+//! # }
+//! ```
+//!
+//! Links:
+//!   1. [Source on Github](https://github.com/lloydmeta/frunk)
+//!   2. [Crates.io page](https://crates.io/crates/frunk)
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">core</span> <span class="kw">as</span> <span class="ident">std</span>;
+</span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+</span><span class="kw">extern crate </span>core <span class="kw">as </span>std;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">frunk_core</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">frunk_derives</span>;
+<span class="attribute">#[allow(unused_imports)]
+#[macro_use]
+</span><span class="kw">extern crate </span>frunk_core;
+<span class="attribute">#[allow(unused_imports)]
+#[macro_use]
+</span><span class="kw">extern crate </span>frunk_derives;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">monoid</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">semigroup</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;validated&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">validated</span>;
+<span class="kw">pub mod </span>monoid;
+<span class="kw">pub mod </span>semigroup;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;validated&quot;</span>)]
+</span><span class="kw">pub mod </span>validated;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">frunk_core</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">frunk_derives</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>frunk_core::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>frunk_derives::<span class="kw-2">*</span>;
 
-<span class="comment">// Root-level reexports so that users don&#39;t need to guess where things are located.</span>
-<span class="comment">//</span>
-<span class="comment">// Things to re-export:</span>
-<span class="comment">//</span>
-<span class="comment">// * Datatypes and free functions intended for human consumption.</span>
-<span class="comment">//   * **Exception:** things that benefit from being namespaced,</span>
-<span class="comment">//     like `frunk::semigroup::Any`</span>
-<span class="comment">//</span>
-<span class="comment">// * Traits that users ought to care enough about to `use` it **by name:**</span>
-<span class="comment">//   * ...because users might want to `impl` it for their own types</span>
-<span class="comment">//   * ...because it shows up in lots of `where` bounds</span>
-<span class="comment">//   * NOT simply because it extends existing types with useful methods</span>
-<span class="comment">//     (that&#39;s what the prelude is for!)</span>
+<span class="comment">// Root-level reexports so that users don&#39;t need to guess where things are located.
+//
+// Things to re-export:
+//
+// * Datatypes and free functions intended for human consumption.
+//   * **Exception:** things that benefit from being namespaced,
+//     like `frunk::semigroup::Any`
+//
+// * Traits that users ought to care enough about to `use` it **by name:**
+//   * ...because users might want to `impl` it for their own types
+//   * ...because it shows up in lots of `where` bounds
+//   * NOT simply because it extends existing types with useful methods
+//     (that&#39;s what the prelude is for!)
 
-<span class="comment">// NOTE: without `#[doc(no_inline)]`, rustdoc will generate two separate pages for</span>
-<span class="comment">//       each item (one in `frunk::` and another in `frunk_core::module::`).</span>
-<span class="comment">//       Hyperlinks will be broken for the ones in `frunk::`, so we need to prevent it.</span>
+// NOTE: without `#[doc(no_inline)]`, rustdoc will generate two separate pages for
+//       each item (one in `frunk::` and another in `frunk_core::module::`).
+//       Hyperlinks will be broken for the ones in `frunk::`, so we need to prevent it.
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">hlist::lift_from</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">hlist::HCons</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">hlist::HNil</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traits::Func</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traits::Poly</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traits</span>::{<span class="ident">ToMut</span>, <span class="ident">ToRef</span>}; <span class="comment">// useful for where bounds</span>
+</span><span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>hlist::lift_from;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>hlist::HCons;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>hlist::HNil;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>traits::Func;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>traits::Poly;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>traits::{ToMut, ToRef}; <span class="comment">// useful for where bounds
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">coproduct::Coproduct</span>;
+</span><span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>coproduct::Coproduct;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generic::convert_from</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generic::from_generic</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generic::into_generic</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generic::map_inter</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generic::map_repr</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generic::Generic</span>;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>generic::convert_from;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>generic::from_generic;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>generic::into_generic;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>generic::map_inter;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>generic::map_repr;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>generic::Generic;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">labelled::from_labelled_generic</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">labelled::into_labelled_generic</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">labelled::labelled_convert_from</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">labelled::transform_from</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">labelled::LabelledGeneric</span>;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>labelled::from_labelled_generic;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>labelled::into_labelled_generic;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>labelled::labelled_convert_from;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>labelled::transform_from;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>labelled::LabelledGeneric;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">semigroup::Semigroup</span>;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>semigroup::Semigroup;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">monoid::Monoid</span>;
+<span class="attribute">#[doc(no_inline)]
+</span><span class="kw">pub use </span>monoid::Monoid;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;validated&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">validated::Validated</span>;
+<span class="attribute">#[doc(no_inline)]
+#[cfg(feature = <span class="string">&quot;validated&quot;</span>)]
+</span><span class="kw">pub use </span>validated::Validated;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span> {
-    <span class="doccomment">//! Traits that need to be imported for the complete `frunk` experience.</span>
-    <span class="doccomment">//!</span>
-    <span class="doccomment">//! The intent here is that `use frunk::prelude::*` is enough to provide</span>
-    <span class="doccomment">//! access to any missing methods advertised in frunk&#39;s documentation.</span>
+<span class="kw">pub mod </span>prelude {
+    <span class="doccomment">//! Traits that need to be imported for the complete `frunk` experience.
+    //!
+    //! The intent here is that `use frunk::prelude::*` is enough to provide
+    //! access to any missing methods advertised in frunk&#39;s documentation.
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">hlist::HList</span>; <span class="comment">// for LEN</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">hlist::LiftFrom</span>;
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">hlist::LiftInto</span>;
+    </span><span class="attribute">#[doc(no_inline)]
+    </span><span class="kw">pub use </span>hlist::HList; <span class="comment">// for LEN
+    </span><span class="attribute">#[doc(no_inline)]
+    </span><span class="kw">pub use </span>hlist::LiftFrom;
+    <span class="attribute">#[doc(no_inline)]
+    </span><span class="kw">pub use </span>hlist::LiftInto;
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;validated&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">validated::IntoValidated</span>;
+    <span class="attribute">#[doc(no_inline)]
+    #[cfg(feature = <span class="string">&quot;validated&quot;</span>)]
+    </span><span class="kw">pub use </span>validated::IntoValidated;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

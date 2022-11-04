@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/util/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/util/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1081,1088 +1081,1088 @@
 <span id="1081">1081</span>
 <span id="1082">1082</span>
 <span id="1083">1083</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Various utility types and functions that are generally used with Tower.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Various utility types and functions that are generally used with Tower.
 
-<span class="kw">mod</span> <span class="ident">and_then</span>;
-<span class="kw">mod</span> <span class="ident">boxed</span>;
-<span class="kw">mod</span> <span class="ident">boxed_clone</span>;
-<span class="kw">mod</span> <span class="ident">call_all</span>;
-<span class="kw">mod</span> <span class="ident">either</span>;
+</span><span class="kw">mod </span>and_then;
+<span class="kw">mod </span>boxed;
+<span class="kw">mod </span>boxed_clone;
+<span class="kw">mod </span>call_all;
+<span class="kw">mod </span>either;
 
-<span class="kw">mod</span> <span class="ident">future_service</span>;
-<span class="kw">mod</span> <span class="ident">map_err</span>;
-<span class="kw">mod</span> <span class="ident">map_request</span>;
-<span class="kw">mod</span> <span class="ident">map_response</span>;
-<span class="kw">mod</span> <span class="ident">map_result</span>;
+<span class="kw">mod </span>future_service;
+<span class="kw">mod </span>map_err;
+<span class="kw">mod </span>map_request;
+<span class="kw">mod </span>map_response;
+<span class="kw">mod </span>map_result;
 
-<span class="kw">mod</span> <span class="ident">map_future</span>;
-<span class="kw">mod</span> <span class="ident">oneshot</span>;
-<span class="kw">mod</span> <span class="ident">optional</span>;
-<span class="kw">mod</span> <span class="ident">ready</span>;
-<span class="kw">mod</span> <span class="ident">service_fn</span>;
-<span class="kw">mod</span> <span class="ident">then</span>;
+<span class="kw">mod </span>map_future;
+<span class="kw">mod </span>oneshot;
+<span class="kw">mod </span>optional;
+<span class="kw">mod </span>ready;
+<span class="kw">mod </span>service_fn;
+<span class="kw">mod </span>then;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">and_then</span>::{<span class="ident">AndThen</span>, <span class="ident">AndThenLayer</span>},
-    <span class="ident">boxed</span>::{<span class="ident">BoxLayer</span>, <span class="ident">BoxService</span>, <span class="ident">UnsyncBoxService</span>},
-    <span class="ident">boxed_clone::BoxCloneService</span>,
-    <span class="ident">either::Either</span>,
-    <span class="ident">future_service</span>::{<span class="ident">future_service</span>, <span class="ident">FutureService</span>},
-    <span class="ident">map_err</span>::{<span class="ident">MapErr</span>, <span class="ident">MapErrLayer</span>},
-    <span class="ident">map_future</span>::{<span class="ident">MapFuture</span>, <span class="ident">MapFutureLayer</span>},
-    <span class="ident">map_request</span>::{<span class="ident">MapRequest</span>, <span class="ident">MapRequestLayer</span>},
-    <span class="ident">map_response</span>::{<span class="ident">MapResponse</span>, <span class="ident">MapResponseLayer</span>},
-    <span class="ident">map_result</span>::{<span class="ident">MapResult</span>, <span class="ident">MapResultLayer</span>},
-    <span class="ident">oneshot::Oneshot</span>,
-    <span class="ident">optional::Optional</span>,
-    <span class="ident">ready</span>::{<span class="ident">Ready</span>, <span class="ident">ReadyAnd</span>, <span class="ident">ReadyOneshot</span>},
-    <span class="ident">service_fn</span>::{<span class="ident">service_fn</span>, <span class="ident">ServiceFn</span>},
-    <span class="ident">then</span>::{<span class="ident">Then</span>, <span class="ident">ThenLayer</span>},
+<span class="attribute">#[allow(deprecated)]
+</span><span class="kw">pub use </span><span class="self">self</span>::{
+    and_then::{AndThen, AndThenLayer},
+    boxed::{BoxLayer, BoxService, UnsyncBoxService},
+    boxed_clone::BoxCloneService,
+    either::Either,
+    future_service::{future_service, FutureService},
+    map_err::{MapErr, MapErrLayer},
+    map_future::{MapFuture, MapFutureLayer},
+    map_request::{MapRequest, MapRequestLayer},
+    map_response::{MapResponse, MapResponseLayer},
+    map_result::{MapResult, MapResultLayer},
+    oneshot::Oneshot,
+    optional::Optional,
+    ready::{Ready, ReadyAnd, ReadyOneshot},
+    service_fn::{service_fn, ServiceFn},
+    then::{Then, ThenLayer},
 };
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::call_all</span>::{<span class="ident">CallAll</span>, <span class="ident">CallAllUnordered</span>};
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
+<span class="kw">pub use </span><span class="self">self</span>::call_all::{CallAll, CallAllUnordered};
+<span class="kw">use </span>std::future::Future;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::layer::util::Identity</span>;
+<span class="kw">use </span><span class="kw">crate</span>::layer::util::Identity;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span> {
-    <span class="doccomment">//! Error types</span>
+<span class="kw">pub mod </span>error {
+    <span class="doccomment">//! Error types
 
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::optional::error</span> <span class="kw">as</span> <span class="ident">optional</span>;
+    </span><span class="kw">pub use </span><span class="kw">super</span>::optional::error <span class="kw">as </span>optional;
 }
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">future</span> {
-    <span class="doccomment">//! Future types</span>
+<span class="kw">pub mod </span>future {
+    <span class="doccomment">//! Future types
 
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::and_then::AndThenFuture</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::map_err::MapErrFuture</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::map_response::MapResponseFuture</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::map_result::MapResultFuture</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::optional::future</span> <span class="kw">as</span> <span class="ident">optional</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::then::ThenFuture</span>;
+    </span><span class="kw">pub use </span><span class="kw">super</span>::and_then::AndThenFuture;
+    <span class="kw">pub use </span><span class="kw">super</span>::map_err::MapErrFuture;
+    <span class="kw">pub use </span><span class="kw">super</span>::map_response::MapResponseFuture;
+    <span class="kw">pub use </span><span class="kw">super</span>::map_result::MapResultFuture;
+    <span class="kw">pub use </span><span class="kw">super</span>::optional::future <span class="kw">as </span>optional;
+    <span class="kw">pub use </span><span class="kw">super</span>::then::ThenFuture;
 }
 
-<span class="doccomment">/// An extension trait for `Service`s that provides a variety of convenient</span>
-<span class="doccomment">/// adapters</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ServiceExt</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>: <span class="ident">tower_service::Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Yields a mutable reference to the service when it is ready to accept a request.</span>
-    <span class="kw">fn</span> <span class="ident">ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Ready</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+<span class="doccomment">/// An extension trait for `Service`s that provides a variety of convenient
+/// adapters
+</span><span class="kw">pub trait </span>ServiceExt&lt;Request&gt;: tower_service::Service&lt;Request&gt; {
+    <span class="doccomment">/// Yields a mutable reference to the service when it is ready to accept a request.
+    </span><span class="kw">fn </span>ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Ready&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>, Request&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">Ready::new</span>(<span class="self">self</span>)
+        Ready::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Yields a mutable reference to the service when it is ready to accept a request.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.4.6&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;please use the `ServiceExt::ready` method instead&quot;</span>
-    )]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">ready_and</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ReadyAnd</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Yields a mutable reference to the service when it is ready to accept a request.
+    </span><span class="attribute">#[deprecated(
+        since = <span class="string">&quot;0.4.6&quot;</span>,
+        note = <span class="string">&quot;please use the `ServiceExt::ready` method instead&quot;
+    </span>)]
+    #[allow(deprecated)]
+    </span><span class="kw">fn </span>ready_and(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ReadyAnd&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>, Request&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">ReadyAnd::new</span>(<span class="self">self</span>)
+        ReadyAnd::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Yields the service when it is ready to accept a request.</span>
-    <span class="kw">fn</span> <span class="ident">ready_oneshot</span>(<span class="self">self</span>) -&gt; <span class="ident">ReadyOneshot</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Yields the service when it is ready to accept a request.
+    </span><span class="kw">fn </span>ready_oneshot(<span class="self">self</span>) -&gt; ReadyOneshot&lt;<span class="self">Self</span>, Request&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">ReadyOneshot::new</span>(<span class="self">self</span>)
+        ReadyOneshot::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Consume this `Service`, calling with the providing request once it is ready.</span>
-    <span class="kw">fn</span> <span class="ident">oneshot</span>(<span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span>) -&gt; <span class="ident">Oneshot</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Consume this `Service`, calling with the providing request once it is ready.
+    </span><span class="kw">fn </span>oneshot(<span class="self">self</span>, req: Request) -&gt; Oneshot&lt;<span class="self">Self</span>, Request&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">Oneshot::new</span>(<span class="self">self</span>, <span class="ident">req</span>)
+        Oneshot::new(<span class="self">self</span>, req)
     }
 
-    <span class="doccomment">/// Process all requests from the given [`Stream`], and produce a [`Stream`] of their responses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is essentially [`Stream&lt;Item = Request&gt;`][stream] + `Self` =&gt; [`Stream&lt;Item =</span>
-    <span class="doccomment">/// Response&gt;`][stream]. See the documentation for [`CallAll`] for</span>
-    <span class="doccomment">/// details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Stream`]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html</span>
-    <span class="doccomment">/// [stream]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html</span>
-    <span class="kw">fn</span> <span class="ident">call_all</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">reqs</span>: <span class="ident">S</span>) -&gt; <span class="ident">CallAll</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident"><span class="self">Self</span>::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-        <span class="ident">S</span>: <span class="ident">futures_core::Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Request</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Process all requests from the given [`Stream`], and produce a [`Stream`] of their responses.
+    ///
+    /// This is essentially [`Stream&lt;Item = Request&gt;`][stream] + `Self` =&gt; [`Stream&lt;Item =
+    /// Response&gt;`][stream]. See the documentation for [`CallAll`] for
+    /// details.
+    ///
+    /// [`Stream`]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html
+    /// [stream]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html
+    </span><span class="kw">fn </span>call_all&lt;S&gt;(<span class="self">self</span>, reqs: S) -&gt; CallAll&lt;<span class="self">Self</span>, S&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        <span class="self">Self</span>::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+        S: futures_core::Stream&lt;Item = Request&gt;,
     {
-        <span class="ident">CallAll::new</span>(<span class="self">self</span>, <span class="ident">reqs</span>)
+        CallAll::new(<span class="self">self</span>, reqs)
     }
 
-    <span class="doccomment">/// Executes a new future after this service&#39;s future resolves. This does</span>
-    <span class="doccomment">/// not alter the behaviour of the [`poll_ready`] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be used to change the [`Response`] type of the service</span>
-    <span class="doccomment">/// into a different type. You can use this method to chain along a computation once the</span>
-    <span class="doccomment">/// service&#39;s response has been resolved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Response`]: crate::Service::Response</span>
-    <span class="doccomment">/// [`poll_ready`]: crate::Service::poll_ready</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use tower::{Service, ServiceExt};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct DatabaseService;</span>
-    <span class="doccomment">/// # impl DatabaseService {</span>
-    <span class="doccomment">/// #   fn new(address: &amp;str) -&gt; Self {</span>
-    <span class="doccomment">/// #       DatabaseService</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Record {</span>
-    <span class="doccomment">/// #   pub name: String,</span>
-    <span class="doccomment">/// #   pub age: u16</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Service&lt;u32&gt; for DatabaseService {</span>
-    <span class="doccomment">/// #   type Response = Record;</span>
-    <span class="doccomment">/// #   type Error = u8;</span>
-    <span class="doccomment">/// #   type Future = futures_util::future::Ready&lt;Result&lt;Record, u8&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #       Poll::Ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {</span>
-    <span class="doccomment">/// #       futures_util::future::ready(Ok(Record { name: &quot;Jack&quot;.into(), age: 32 }))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn avatar_lookup(name: String) -&gt; Result&lt;Vec&lt;u8&gt;, u8&gt; { Ok(vec![]) }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// #    async {</span>
-    <span class="doccomment">/// // A service returning Result&lt;Record, _&gt;</span>
-    <span class="doccomment">/// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Map the response into a new response</span>
-    <span class="doccomment">/// let mut new_service = service.and_then(|record: Record| async move {</span>
-    <span class="doccomment">///     let name = record.name;</span>
-    <span class="doccomment">///     avatar_lookup(name).await</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the new service</span>
-    <span class="doccomment">/// let id = 13;</span>
-    <span class="doccomment">/// let avatar = new_service.call(id).await.unwrap();</span>
-    <span class="doccomment">/// #    };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">and_then</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">AndThen</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">Clone</span>,
+    <span class="doccomment">/// Executes a new future after this service&#39;s future resolves. This does
+    /// not alter the behaviour of the [`poll_ready`] method.
+    ///
+    /// This method can be used to change the [`Response`] type of the service
+    /// into a different type. You can use this method to chain along a computation once the
+    /// service&#39;s response has been resolved.
+    ///
+    /// [`Response`]: crate::Service::Response
+    /// [`poll_ready`]: crate::Service::poll_ready
+    ///
+    /// # Example
+    /// ```
+    /// # use std::task::{Poll, Context};
+    /// # use tower::{Service, ServiceExt};
+    /// #
+    /// # struct DatabaseService;
+    /// # impl DatabaseService {
+    /// #   fn new(address: &amp;str) -&gt; Self {
+    /// #       DatabaseService
+    /// #   }
+    /// # }
+    /// #
+    /// # struct Record {
+    /// #   pub name: String,
+    /// #   pub age: u16
+    /// # }
+    /// #
+    /// # impl Service&lt;u32&gt; for DatabaseService {
+    /// #   type Response = Record;
+    /// #   type Error = u8;
+    /// #   type Future = futures_util::future::Ready&lt;Result&lt;Record, u8&gt;&gt;;
+    /// #
+    /// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    /// #       Poll::Ready(Ok(()))
+    /// #   }
+    /// #
+    /// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {
+    /// #       futures_util::future::ready(Ok(Record { name: &quot;Jack&quot;.into(), age: 32 }))
+    /// #   }
+    /// # }
+    /// #
+    /// # async fn avatar_lookup(name: String) -&gt; Result&lt;Vec&lt;u8&gt;, u8&gt; { Ok(vec![]) }
+    /// #
+    /// # fn main() {
+    /// #    async {
+    /// // A service returning Result&lt;Record, _&gt;
+    /// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);
+    ///
+    /// // Map the response into a new response
+    /// let mut new_service = service.and_then(|record: Record| async move {
+    ///     let name = record.name;
+    ///     avatar_lookup(name).await
+    /// });
+    ///
+    /// // Call the new service
+    /// let id = 13;
+    /// let avatar = new_service.call(id).await.unwrap();
+    /// #    };
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>and_then&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; AndThen&lt;<span class="self">Self</span>, F&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        F: Clone,
     {
-        <span class="ident">AndThen::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
+        AndThen::new(<span class="self">self</span>, f)
     }
 
-    <span class="doccomment">/// Maps this service&#39;s response value to a different value. This does not</span>
-    <span class="doccomment">/// alter the behaviour of the [`poll_ready`] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be used to change the [`Response`] type of the service</span>
-    <span class="doccomment">/// into a different type. It is similar to the [`Result::map`]</span>
-    <span class="doccomment">/// method. You can use this method to chain along a computation once the</span>
-    <span class="doccomment">/// service&#39;s response has been resolved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Response`]: crate::Service::Response</span>
-    <span class="doccomment">/// [`poll_ready`]: crate::Service::poll_ready</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use tower::{Service, ServiceExt};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct DatabaseService;</span>
-    <span class="doccomment">/// # impl DatabaseService {</span>
-    <span class="doccomment">/// #   fn new(address: &amp;str) -&gt; Self {</span>
-    <span class="doccomment">/// #       DatabaseService</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Record {</span>
-    <span class="doccomment">/// #   pub name: String,</span>
-    <span class="doccomment">/// #   pub age: u16</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Service&lt;u32&gt; for DatabaseService {</span>
-    <span class="doccomment">/// #   type Response = Record;</span>
-    <span class="doccomment">/// #   type Error = u8;</span>
-    <span class="doccomment">/// #   type Future = futures_util::future::Ready&lt;Result&lt;Record, u8&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #       Poll::Ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {</span>
-    <span class="doccomment">/// #       futures_util::future::ready(Ok(Record { name: &quot;Jack&quot;.into(), age: 32 }))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// #    async {</span>
-    <span class="doccomment">/// // A service returning Result&lt;Record, _&gt;</span>
-    <span class="doccomment">/// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Map the response into a new response</span>
-    <span class="doccomment">/// let mut new_service = service.map_response(|record| record.name);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the new service</span>
-    <span class="doccomment">/// let id = 13;</span>
-    <span class="doccomment">/// let name = new_service</span>
-    <span class="doccomment">///     .ready()</span>
-    <span class="doccomment">///     .await?</span>
-    <span class="doccomment">///     .call(id)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// # Ok::&lt;(), u8&gt;(())</span>
-    <span class="doccomment">/// #    };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">map_response</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Response</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">MapResponse</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident"><span class="self">Self</span>::Response</span>) -&gt; <span class="ident">Response</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="doccomment">/// Maps this service&#39;s response value to a different value. This does not
+    /// alter the behaviour of the [`poll_ready`] method.
+    ///
+    /// This method can be used to change the [`Response`] type of the service
+    /// into a different type. It is similar to the [`Result::map`]
+    /// method. You can use this method to chain along a computation once the
+    /// service&#39;s response has been resolved.
+    ///
+    /// [`Response`]: crate::Service::Response
+    /// [`poll_ready`]: crate::Service::poll_ready
+    ///
+    /// # Example
+    /// ```
+    /// # use std::task::{Poll, Context};
+    /// # use tower::{Service, ServiceExt};
+    /// #
+    /// # struct DatabaseService;
+    /// # impl DatabaseService {
+    /// #   fn new(address: &amp;str) -&gt; Self {
+    /// #       DatabaseService
+    /// #   }
+    /// # }
+    /// #
+    /// # struct Record {
+    /// #   pub name: String,
+    /// #   pub age: u16
+    /// # }
+    /// #
+    /// # impl Service&lt;u32&gt; for DatabaseService {
+    /// #   type Response = Record;
+    /// #   type Error = u8;
+    /// #   type Future = futures_util::future::Ready&lt;Result&lt;Record, u8&gt;&gt;;
+    /// #
+    /// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    /// #       Poll::Ready(Ok(()))
+    /// #   }
+    /// #
+    /// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {
+    /// #       futures_util::future::ready(Ok(Record { name: &quot;Jack&quot;.into(), age: 32 }))
+    /// #   }
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #    async {
+    /// // A service returning Result&lt;Record, _&gt;
+    /// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);
+    ///
+    /// // Map the response into a new response
+    /// let mut new_service = service.map_response(|record| record.name);
+    ///
+    /// // Call the new service
+    /// let id = 13;
+    /// let name = new_service
+    ///     .ready()
+    ///     .await?
+    ///     .call(id)
+    ///     .await?;
+    /// # Ok::&lt;(), u8&gt;(())
+    /// #    };
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>map_response&lt;F, Response&gt;(<span class="self">self</span>, f: F) -&gt; MapResponse&lt;<span class="self">Self</span>, F&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        F: FnOnce(<span class="self">Self</span>::Response) -&gt; Response + Clone,
     {
-        <span class="ident">MapResponse::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
+        MapResponse::new(<span class="self">self</span>, f)
     }
 
-    <span class="doccomment">/// Maps this service&#39;s error value to a different value. This does not</span>
-    <span class="doccomment">/// alter the behaviour of the [`poll_ready`] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be used to change the [`Error`] type of the service</span>
-    <span class="doccomment">/// into a different type. It is similar to the [`Result::map_err`] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error`]: crate::Service::Error</span>
-    <span class="doccomment">/// [`poll_ready`]: crate::Service::poll_ready</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use tower::{Service, ServiceExt};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct DatabaseService;</span>
-    <span class="doccomment">/// # impl DatabaseService {</span>
-    <span class="doccomment">/// #   fn new(address: &amp;str) -&gt; Self {</span>
-    <span class="doccomment">/// #       DatabaseService</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Error {</span>
-    <span class="doccomment">/// #   pub code: u32,</span>
-    <span class="doccomment">/// #   pub message: String</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Service&lt;u32&gt; for DatabaseService {</span>
-    <span class="doccomment">/// #   type Response = String;</span>
-    <span class="doccomment">/// #   type Error = Error;</span>
-    <span class="doccomment">/// #   type Future = futures_util::future::Ready&lt;Result&lt;String, Error&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #       Poll::Ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {</span>
-    <span class="doccomment">/// #       futures_util::future::ready(Ok(String::new()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// #   async {</span>
-    <span class="doccomment">/// // A service returning Result&lt;_, Error&gt;</span>
-    <span class="doccomment">/// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Map the error to a new error</span>
-    <span class="doccomment">/// let mut new_service = service.map_err(|err| err.code);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the new service</span>
-    <span class="doccomment">/// let id = 13;</span>
-    <span class="doccomment">/// let code = new_service</span>
-    <span class="doccomment">///     .ready()</span>
-    <span class="doccomment">///     .await?</span>
-    <span class="doccomment">///     .call(id)</span>
-    <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .unwrap_err();</span>
-    <span class="doccomment">/// # Ok::&lt;(), u32&gt;(())</span>
-    <span class="doccomment">/// #   };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">map_err</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">MapErr</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident"><span class="self">Self</span>::Error</span>) -&gt; <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="doccomment">/// Maps this service&#39;s error value to a different value. This does not
+    /// alter the behaviour of the [`poll_ready`] method.
+    ///
+    /// This method can be used to change the [`Error`] type of the service
+    /// into a different type. It is similar to the [`Result::map_err`] method.
+    ///
+    /// [`Error`]: crate::Service::Error
+    /// [`poll_ready`]: crate::Service::poll_ready
+    ///
+    /// # Example
+    /// ```
+    /// # use std::task::{Poll, Context};
+    /// # use tower::{Service, ServiceExt};
+    /// #
+    /// # struct DatabaseService;
+    /// # impl DatabaseService {
+    /// #   fn new(address: &amp;str) -&gt; Self {
+    /// #       DatabaseService
+    /// #   }
+    /// # }
+    /// #
+    /// # struct Error {
+    /// #   pub code: u32,
+    /// #   pub message: String
+    /// # }
+    /// #
+    /// # impl Service&lt;u32&gt; for DatabaseService {
+    /// #   type Response = String;
+    /// #   type Error = Error;
+    /// #   type Future = futures_util::future::Ready&lt;Result&lt;String, Error&gt;&gt;;
+    /// #
+    /// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    /// #       Poll::Ready(Ok(()))
+    /// #   }
+    /// #
+    /// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {
+    /// #       futures_util::future::ready(Ok(String::new()))
+    /// #   }
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #   async {
+    /// // A service returning Result&lt;_, Error&gt;
+    /// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);
+    ///
+    /// // Map the error to a new error
+    /// let mut new_service = service.map_err(|err| err.code);
+    ///
+    /// // Call the new service
+    /// let id = 13;
+    /// let code = new_service
+    ///     .ready()
+    ///     .await?
+    ///     .call(id)
+    ///     .await
+    ///     .unwrap_err();
+    /// # Ok::&lt;(), u32&gt;(())
+    /// #   };
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>map_err&lt;F, Error&gt;(<span class="self">self</span>, f: F) -&gt; MapErr&lt;<span class="self">Self</span>, F&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        F: FnOnce(<span class="self">Self</span>::Error) -&gt; Error + Clone,
     {
-        <span class="ident">MapErr::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
+        MapErr::new(<span class="self">self</span>, f)
     }
 
-    <span class="doccomment">/// Maps this service&#39;s result type (`Result&lt;Self::Response, Self::Error&gt;`)</span>
-    <span class="doccomment">/// to a different value, regardless of whether the future succeeds or</span>
-    <span class="doccomment">/// fails.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is similar to the [`map_response`] and [`map_err`] combinators,</span>
-    <span class="doccomment">/// except that the *same* function is invoked when the service&#39;s future</span>
-    <span class="doccomment">/// completes, whether it completes successfully or fails. This function</span>
-    <span class="doccomment">/// takes the [`Result`] returned by the service&#39;s future, and returns a</span>
-    <span class="doccomment">/// [`Result`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Like the standard library&#39;s [`Result::and_then`], this method can be</span>
-    <span class="doccomment">/// used to implement control flow based on `Result` values. For example, it</span>
-    <span class="doccomment">/// may be used to implement error recovery, by turning some [`Err`]</span>
-    <span class="doccomment">/// responses from the service into [`Ok`] responses. Similarly, some</span>
-    <span class="doccomment">/// successful responses from the service could be rejected, by returning an</span>
-    <span class="doccomment">/// [`Err`] conditionally, depending on the value inside the [`Ok`.] Finally,</span>
-    <span class="doccomment">/// this method can also be used to implement behaviors that must run when a</span>
-    <span class="doccomment">/// service&#39;s future completes, regardless of whether it succeeded or failed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be used to change the [`Response`] type of the service</span>
-    <span class="doccomment">/// into a different type. It can also be used to change the [`Error`] type</span>
-    <span class="doccomment">/// of the service. However, because the [`map_result`] function is not applied</span>
-    <span class="doccomment">/// to the errors returned by the service&#39;s [`poll_ready`] method, it must</span>
-    <span class="doccomment">/// be possible to convert the service&#39;s [`Error`] type into the error type</span>
-    <span class="doccomment">/// returned by the [`map_result`] function. This is trivial when the function</span>
-    <span class="doccomment">/// returns the same error type as the service, but in other cases, it can</span>
-    <span class="doccomment">/// be useful to use [`BoxError`] to erase differing error types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Recovering from certain errors:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use tower::{Service, ServiceExt};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct DatabaseService;</span>
-    <span class="doccomment">/// # impl DatabaseService {</span>
-    <span class="doccomment">/// #   fn new(address: &amp;str) -&gt; Self {</span>
-    <span class="doccomment">/// #       DatabaseService</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Record {</span>
-    <span class="doccomment">/// #   pub name: String,</span>
-    <span class="doccomment">/// #   pub age: u16</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// # #[derive(Debug)]</span>
-    <span class="doccomment">/// # enum DbError {</span>
-    <span class="doccomment">/// #   Parse(std::num::ParseIntError),</span>
-    <span class="doccomment">/// #   NoRecordsFound,</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Service&lt;u32&gt; for DatabaseService {</span>
-    <span class="doccomment">/// #   type Response = Vec&lt;Record&gt;;</span>
-    <span class="doccomment">/// #   type Error = DbError;</span>
-    <span class="doccomment">/// #   type Future = futures_util::future::Ready&lt;Result&lt;Vec&lt;Record&gt;, DbError&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #       Poll::Ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {</span>
-    <span class="doccomment">/// #       futures_util::future::ready(Ok(vec![Record { name: &quot;Jack&quot;.into(), age: 32 }]))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// #    async {</span>
-    <span class="doccomment">/// // A service returning Result&lt;Vec&lt;Record&gt;, DbError&gt;</span>
-    <span class="doccomment">/// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // If the database returns no records for the query, we just want an empty `Vec`.</span>
-    <span class="doccomment">/// let mut new_service = service.map_result(|result| match result {</span>
-    <span class="doccomment">///     // If the error indicates that no records matched the query, return an empty</span>
-    <span class="doccomment">///     // `Vec` instead.</span>
-    <span class="doccomment">///     Err(DbError::NoRecordsFound) =&gt; Ok(Vec::new()),</span>
-    <span class="doccomment">///     // Propagate all other responses (`Ok` and `Err`) unchanged</span>
-    <span class="doccomment">///     x =&gt; x,</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the new service</span>
-    <span class="doccomment">/// let id = 13;</span>
-    <span class="doccomment">/// let name = new_service</span>
-    <span class="doccomment">///     .ready()</span>
-    <span class="doccomment">///     .await?</span>
-    <span class="doccomment">///     .call(id)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// # Ok::&lt;(), DbError&gt;(())</span>
-    <span class="doccomment">/// #    };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Rejecting some `Ok` responses:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use tower::{Service, ServiceExt};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct DatabaseService;</span>
-    <span class="doccomment">/// # impl DatabaseService {</span>
-    <span class="doccomment">/// #   fn new(address: &amp;str) -&gt; Self {</span>
-    <span class="doccomment">/// #       DatabaseService</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Record {</span>
-    <span class="doccomment">/// #   pub name: String,</span>
-    <span class="doccomment">/// #   pub age: u16</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// # type DbError = String;</span>
-    <span class="doccomment">/// # type AppError = String;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Service&lt;u32&gt; for DatabaseService {</span>
-    <span class="doccomment">/// #   type Response = Record;</span>
-    <span class="doccomment">/// #   type Error = DbError;</span>
-    <span class="doccomment">/// #   type Future = futures_util::future::Ready&lt;Result&lt;Record, DbError&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #       Poll::Ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {</span>
-    <span class="doccomment">/// #       futures_util::future::ready(Ok(Record { name: &quot;Jack&quot;.into(), age: 32 }))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// #    async {</span>
-    <span class="doccomment">/// use tower::BoxError;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // A service returning Result&lt;Record, DbError&gt;</span>
-    <span class="doccomment">/// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // If the user is zero years old, return an error.</span>
-    <span class="doccomment">/// let mut new_service = service.map_result(|result| {</span>
-    <span class="doccomment">///    let record = result?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    if record.age == 0 {</span>
-    <span class="doccomment">///         // Users must have been born to use our app!</span>
-    <span class="doccomment">///         let app_error = AppError::from(&quot;users cannot be 0 years old!&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///         // Box the error to erase its type (as it can be an `AppError`</span>
-    <span class="doccomment">///         // *or* the inner service&#39;s `DbError`).</span>
-    <span class="doccomment">///         return Err(BoxError::from(app_error));</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // Otherwise, return the record.</span>
-    <span class="doccomment">///     Ok(record)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the new service</span>
-    <span class="doccomment">/// let id = 13;</span>
-    <span class="doccomment">/// let record = new_service</span>
-    <span class="doccomment">///     .ready()</span>
-    <span class="doccomment">///     .await?</span>
-    <span class="doccomment">///     .call(id)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// # Ok::&lt;(), BoxError&gt;(())</span>
-    <span class="doccomment">/// #    };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Performing an action that must be run for both successes and failures:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use tower::{Service, ServiceExt};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct DatabaseService;</span>
-    <span class="doccomment">/// # impl DatabaseService {</span>
-    <span class="doccomment">/// #   fn new(address: &amp;str) -&gt; Self {</span>
-    <span class="doccomment">/// #       DatabaseService</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Service&lt;u32&gt; for DatabaseService {</span>
-    <span class="doccomment">/// #   type Response = String;</span>
-    <span class="doccomment">/// #   type Error = u8;</span>
-    <span class="doccomment">/// #   type Future = futures_util::future::Ready&lt;Result&lt;String, u8&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #       Poll::Ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {</span>
-    <span class="doccomment">/// #       futures_util::future::ready(Ok(String::new()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// #   async {</span>
-    <span class="doccomment">/// // A service returning Result&lt;Record, DbError&gt;</span>
-    <span class="doccomment">/// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Print a message whenever a query completes.</span>
-    <span class="doccomment">/// let mut new_service = service.map_result(|result| {</span>
-    <span class="doccomment">///     println!(&quot;query completed; success={}&quot;, result.is_ok());</span>
-    <span class="doccomment">///     result</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the new service</span>
-    <span class="doccomment">/// let id = 13;</span>
-    <span class="doccomment">/// let response = new_service</span>
-    <span class="doccomment">///     .ready()</span>
-    <span class="doccomment">///     .await?</span>
-    <span class="doccomment">///     .call(id)</span>
-    <span class="doccomment">///     .await;</span>
-    <span class="doccomment">/// # response</span>
-    <span class="doccomment">/// #    };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`map_response`]: ServiceExt::map_response</span>
-    <span class="doccomment">/// [`map_err`]: ServiceExt::map_err</span>
-    <span class="doccomment">/// [`map_result`]: ServiceExt::map_result</span>
-    <span class="doccomment">/// [`Error`]: crate::Service::Error</span>
-    <span class="doccomment">/// [`Response`]: crate::Service::Response</span>
-    <span class="doccomment">/// [`poll_ready`]: crate::Service::poll_ready</span>
-    <span class="doccomment">/// [`BoxError`]: crate::BoxError</span>
-    <span class="kw">fn</span> <span class="ident">map_result</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Response</span>, <span class="ident">Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">MapResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">Error</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Response</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="doccomment">/// Maps this service&#39;s result type (`Result&lt;Self::Response, Self::Error&gt;`)
+    /// to a different value, regardless of whether the future succeeds or
+    /// fails.
+    ///
+    /// This is similar to the [`map_response`] and [`map_err`] combinators,
+    /// except that the *same* function is invoked when the service&#39;s future
+    /// completes, whether it completes successfully or fails. This function
+    /// takes the [`Result`] returned by the service&#39;s future, and returns a
+    /// [`Result`].
+    ///
+    /// Like the standard library&#39;s [`Result::and_then`], this method can be
+    /// used to implement control flow based on `Result` values. For example, it
+    /// may be used to implement error recovery, by turning some [`Err`]
+    /// responses from the service into [`Ok`] responses. Similarly, some
+    /// successful responses from the service could be rejected, by returning an
+    /// [`Err`] conditionally, depending on the value inside the [`Ok`.] Finally,
+    /// this method can also be used to implement behaviors that must run when a
+    /// service&#39;s future completes, regardless of whether it succeeded or failed.
+    ///
+    /// This method can be used to change the [`Response`] type of the service
+    /// into a different type. It can also be used to change the [`Error`] type
+    /// of the service. However, because the [`map_result`] function is not applied
+    /// to the errors returned by the service&#39;s [`poll_ready`] method, it must
+    /// be possible to convert the service&#39;s [`Error`] type into the error type
+    /// returned by the [`map_result`] function. This is trivial when the function
+    /// returns the same error type as the service, but in other cases, it can
+    /// be useful to use [`BoxError`] to erase differing error types.
+    ///
+    /// # Examples
+    ///
+    /// Recovering from certain errors:
+    ///
+    /// ```
+    /// # use std::task::{Poll, Context};
+    /// # use tower::{Service, ServiceExt};
+    /// #
+    /// # struct DatabaseService;
+    /// # impl DatabaseService {
+    /// #   fn new(address: &amp;str) -&gt; Self {
+    /// #       DatabaseService
+    /// #   }
+    /// # }
+    /// #
+    /// # struct Record {
+    /// #   pub name: String,
+    /// #   pub age: u16
+    /// # }
+    /// # #[derive(Debug)]
+    /// # enum DbError {
+    /// #   Parse(std::num::ParseIntError),
+    /// #   NoRecordsFound,
+    /// # }
+    /// #
+    /// # impl Service&lt;u32&gt; for DatabaseService {
+    /// #   type Response = Vec&lt;Record&gt;;
+    /// #   type Error = DbError;
+    /// #   type Future = futures_util::future::Ready&lt;Result&lt;Vec&lt;Record&gt;, DbError&gt;&gt;;
+    /// #
+    /// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    /// #       Poll::Ready(Ok(()))
+    /// #   }
+    /// #
+    /// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {
+    /// #       futures_util::future::ready(Ok(vec![Record { name: &quot;Jack&quot;.into(), age: 32 }]))
+    /// #   }
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #    async {
+    /// // A service returning Result&lt;Vec&lt;Record&gt;, DbError&gt;
+    /// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);
+    ///
+    /// // If the database returns no records for the query, we just want an empty `Vec`.
+    /// let mut new_service = service.map_result(|result| match result {
+    ///     // If the error indicates that no records matched the query, return an empty
+    ///     // `Vec` instead.
+    ///     Err(DbError::NoRecordsFound) =&gt; Ok(Vec::new()),
+    ///     // Propagate all other responses (`Ok` and `Err`) unchanged
+    ///     x =&gt; x,
+    /// });
+    ///
+    /// // Call the new service
+    /// let id = 13;
+    /// let name = new_service
+    ///     .ready()
+    ///     .await?
+    ///     .call(id)
+    ///     .await?;
+    /// # Ok::&lt;(), DbError&gt;(())
+    /// #    };
+    /// # }
+    /// ```
+    ///
+    /// Rejecting some `Ok` responses:
+    ///
+    /// ```
+    /// # use std::task::{Poll, Context};
+    /// # use tower::{Service, ServiceExt};
+    /// #
+    /// # struct DatabaseService;
+    /// # impl DatabaseService {
+    /// #   fn new(address: &amp;str) -&gt; Self {
+    /// #       DatabaseService
+    /// #   }
+    /// # }
+    /// #
+    /// # struct Record {
+    /// #   pub name: String,
+    /// #   pub age: u16
+    /// # }
+    /// # type DbError = String;
+    /// # type AppError = String;
+    /// #
+    /// # impl Service&lt;u32&gt; for DatabaseService {
+    /// #   type Response = Record;
+    /// #   type Error = DbError;
+    /// #   type Future = futures_util::future::Ready&lt;Result&lt;Record, DbError&gt;&gt;;
+    /// #
+    /// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    /// #       Poll::Ready(Ok(()))
+    /// #   }
+    /// #
+    /// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {
+    /// #       futures_util::future::ready(Ok(Record { name: &quot;Jack&quot;.into(), age: 32 }))
+    /// #   }
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #    async {
+    /// use tower::BoxError;
+    ///
+    /// // A service returning Result&lt;Record, DbError&gt;
+    /// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);
+    ///
+    /// // If the user is zero years old, return an error.
+    /// let mut new_service = service.map_result(|result| {
+    ///    let record = result?;
+    ///
+    ///    if record.age == 0 {
+    ///         // Users must have been born to use our app!
+    ///         let app_error = AppError::from(&quot;users cannot be 0 years old!&quot;);
+    ///
+    ///         // Box the error to erase its type (as it can be an `AppError`
+    ///         // *or* the inner service&#39;s `DbError`).
+    ///         return Err(BoxError::from(app_error));
+    ///     }
+    ///
+    ///     // Otherwise, return the record.
+    ///     Ok(record)
+    /// });
+    ///
+    /// // Call the new service
+    /// let id = 13;
+    /// let record = new_service
+    ///     .ready()
+    ///     .await?
+    ///     .call(id)
+    ///     .await?;
+    /// # Ok::&lt;(), BoxError&gt;(())
+    /// #    };
+    /// # }
+    /// ```
+    ///
+    /// Performing an action that must be run for both successes and failures:
+    ///
+    /// ```
+    /// # use std::convert::TryFrom;
+    /// # use std::task::{Poll, Context};
+    /// # use tower::{Service, ServiceExt};
+    /// #
+    /// # struct DatabaseService;
+    /// # impl DatabaseService {
+    /// #   fn new(address: &amp;str) -&gt; Self {
+    /// #       DatabaseService
+    /// #   }
+    /// # }
+    /// #
+    /// # impl Service&lt;u32&gt; for DatabaseService {
+    /// #   type Response = String;
+    /// #   type Error = u8;
+    /// #   type Future = futures_util::future::Ready&lt;Result&lt;String, u8&gt;&gt;;
+    /// #
+    /// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    /// #       Poll::Ready(Ok(()))
+    /// #   }
+    /// #
+    /// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {
+    /// #       futures_util::future::ready(Ok(String::new()))
+    /// #   }
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #   async {
+    /// // A service returning Result&lt;Record, DbError&gt;
+    /// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);
+    ///
+    /// // Print a message whenever a query completes.
+    /// let mut new_service = service.map_result(|result| {
+    ///     println!(&quot;query completed; success={}&quot;, result.is_ok());
+    ///     result
+    /// });
+    ///
+    /// // Call the new service
+    /// let id = 13;
+    /// let response = new_service
+    ///     .ready()
+    ///     .await?
+    ///     .call(id)
+    ///     .await;
+    /// # response
+    /// #    };
+    /// # }
+    /// ```
+    ///
+    /// [`map_response`]: ServiceExt::map_response
+    /// [`map_err`]: ServiceExt::map_err
+    /// [`map_result`]: ServiceExt::map_result
+    /// [`Error`]: crate::Service::Error
+    /// [`Response`]: crate::Service::Response
+    /// [`poll_ready`]: crate::Service::poll_ready
+    /// [`BoxError`]: crate::BoxError
+    </span><span class="kw">fn </span>map_result&lt;F, Response, Error&gt;(<span class="self">self</span>, f: F) -&gt; MapResult&lt;<span class="self">Self</span>, F&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        Error: From&lt;<span class="self">Self</span>::Error&gt;,
+        F: FnOnce(<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Response, <span class="self">Self</span>::Error&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response, Error&gt; + Clone,
     {
-        <span class="ident">MapResult::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
+        MapResult::new(<span class="self">self</span>, f)
     }
 
-    <span class="doccomment">/// Composes a function *in front of* the service.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This adapter produces a new service that passes each value through the</span>
-    <span class="doccomment">/// given function `f` before sending it to `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use tower::{Service, ServiceExt};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct DatabaseService;</span>
-    <span class="doccomment">/// # impl DatabaseService {</span>
-    <span class="doccomment">/// #   fn new(address: &amp;str) -&gt; Self {</span>
-    <span class="doccomment">/// #       DatabaseService</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Service&lt;String&gt; for DatabaseService {</span>
-    <span class="doccomment">/// #   type Response = String;</span>
-    <span class="doccomment">/// #   type Error = u8;</span>
-    <span class="doccomment">/// #   type Future = futures_util::future::Ready&lt;Result&lt;String, u8&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #       Poll::Ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn call(&amp;mut self, request: String) -&gt; Self::Future {</span>
-    <span class="doccomment">/// #       futures_util::future::ready(Ok(String::new()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// #   async {</span>
-    <span class="doccomment">/// // A service taking a String as a request</span>
-    <span class="doccomment">/// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Map the request to a new request</span>
-    <span class="doccomment">/// let mut new_service = service.map_request(|id: u32| id.to_string());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the new service</span>
-    <span class="doccomment">/// let id = 13;</span>
-    <span class="doccomment">/// let response = new_service</span>
-    <span class="doccomment">///     .ready()</span>
-    <span class="doccomment">///     .await?</span>
-    <span class="doccomment">///     .call(id)</span>
-    <span class="doccomment">///     .await;</span>
-    <span class="doccomment">/// # response</span>
-    <span class="doccomment">/// #    };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">map_request</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">NewRequest</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">MapRequest</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">NewRequest</span>) -&gt; <span class="ident">Request</span>,
+    <span class="doccomment">/// Composes a function *in front of* the service.
+    ///
+    /// This adapter produces a new service that passes each value through the
+    /// given function `f` before sending it to `self`.
+    ///
+    /// # Example
+    /// ```
+    /// # use std::convert::TryFrom;
+    /// # use std::task::{Poll, Context};
+    /// # use tower::{Service, ServiceExt};
+    /// #
+    /// # struct DatabaseService;
+    /// # impl DatabaseService {
+    /// #   fn new(address: &amp;str) -&gt; Self {
+    /// #       DatabaseService
+    /// #   }
+    /// # }
+    /// #
+    /// # impl Service&lt;String&gt; for DatabaseService {
+    /// #   type Response = String;
+    /// #   type Error = u8;
+    /// #   type Future = futures_util::future::Ready&lt;Result&lt;String, u8&gt;&gt;;
+    /// #
+    /// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    /// #       Poll::Ready(Ok(()))
+    /// #   }
+    /// #
+    /// #   fn call(&amp;mut self, request: String) -&gt; Self::Future {
+    /// #       futures_util::future::ready(Ok(String::new()))
+    /// #   }
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #   async {
+    /// // A service taking a String as a request
+    /// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);
+    ///
+    /// // Map the request to a new request
+    /// let mut new_service = service.map_request(|id: u32| id.to_string());
+    ///
+    /// // Call the new service
+    /// let id = 13;
+    /// let response = new_service
+    ///     .ready()
+    ///     .await?
+    ///     .call(id)
+    ///     .await;
+    /// # response
+    /// #    };
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>map_request&lt;F, NewRequest&gt;(<span class="self">self</span>, f: F) -&gt; MapRequest&lt;<span class="self">Self</span>, F&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        F: FnMut(NewRequest) -&gt; Request,
     {
-        <span class="ident">MapRequest::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
+        MapRequest::new(<span class="self">self</span>, f)
     }
 
-    <span class="doccomment">/// Composes this service with a [`Filter`] that conditionally accepts or</span>
-    <span class="doccomment">/// rejects requests based on a [predicate].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This adapter produces a new service that passes each value through the</span>
-    <span class="doccomment">/// given function `predicate` before sending it to `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use tower::{Service, ServiceExt};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct DatabaseService;</span>
-    <span class="doccomment">/// # impl DatabaseService {</span>
-    <span class="doccomment">/// #   fn new(address: &amp;str) -&gt; Self {</span>
-    <span class="doccomment">/// #       DatabaseService</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Debug)] enum DbError {</span>
-    <span class="doccomment">/// #   Parse(std::num::ParseIntError)</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl std::fmt::Display for DbError {</span>
-    <span class="doccomment">/// #    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter) -&gt; std::fmt::Result { std::fmt::Debug::fmt(self, f) }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// # impl std::error::Error for DbError {}</span>
-    <span class="doccomment">/// # impl Service&lt;u32&gt; for DatabaseService {</span>
-    <span class="doccomment">/// #   type Response = String;</span>
-    <span class="doccomment">/// #   type Error = DbError;</span>
-    <span class="doccomment">/// #   type Future = futures_util::future::Ready&lt;Result&lt;String, DbError&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #       Poll::Ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {</span>
-    <span class="doccomment">/// #       futures_util::future::ready(Ok(String::new()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// #    async {</span>
-    <span class="doccomment">/// // A service taking a u32 as a request and returning Result&lt;_, DbError&gt;</span>
-    <span class="doccomment">/// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Fallibly map the request to a new request</span>
-    <span class="doccomment">/// let mut new_service = service</span>
-    <span class="doccomment">///     .filter(|id_str: &amp;str| id_str.parse().map_err(DbError::Parse));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the new service</span>
-    <span class="doccomment">/// let id = &quot;13&quot;;</span>
-    <span class="doccomment">/// let response = new_service</span>
-    <span class="doccomment">///     .ready()</span>
-    <span class="doccomment">///     .await?</span>
-    <span class="doccomment">///     .call(id)</span>
-    <span class="doccomment">///     .await;</span>
-    <span class="doccomment">/// # response</span>
-    <span class="doccomment">/// #    };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Filter`]: crate::filter::Filter</span>
-    <span class="doccomment">/// [predicate]: crate::filter::Predicate</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filter&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filter&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">filter</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">NewRequest</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">F</span>) -&gt; <span class="ident"><span class="kw">crate</span>::filter::Filter</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident"><span class="kw">crate</span>::filter::Predicate</span><span class="op">&lt;</span><span class="ident">NewRequest</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Composes this service with a [`Filter`] that conditionally accepts or
+    /// rejects requests based on a [predicate].
+    ///
+    /// This adapter produces a new service that passes each value through the
+    /// given function `predicate` before sending it to `self`.
+    ///
+    /// # Example
+    /// ```
+    /// # use std::convert::TryFrom;
+    /// # use std::task::{Poll, Context};
+    /// # use tower::{Service, ServiceExt};
+    /// #
+    /// # struct DatabaseService;
+    /// # impl DatabaseService {
+    /// #   fn new(address: &amp;str) -&gt; Self {
+    /// #       DatabaseService
+    /// #   }
+    /// # }
+    /// #
+    /// # #[derive(Debug)] enum DbError {
+    /// #   Parse(std::num::ParseIntError)
+    /// # }
+    /// #
+    /// # impl std::fmt::Display for DbError {
+    /// #    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter) -&gt; std::fmt::Result { std::fmt::Debug::fmt(self, f) }
+    /// # }
+    /// # impl std::error::Error for DbError {}
+    /// # impl Service&lt;u32&gt; for DatabaseService {
+    /// #   type Response = String;
+    /// #   type Error = DbError;
+    /// #   type Future = futures_util::future::Ready&lt;Result&lt;String, DbError&gt;&gt;;
+    /// #
+    /// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    /// #       Poll::Ready(Ok(()))
+    /// #   }
+    /// #
+    /// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {
+    /// #       futures_util::future::ready(Ok(String::new()))
+    /// #   }
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #    async {
+    /// // A service taking a u32 as a request and returning Result&lt;_, DbError&gt;
+    /// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);
+    ///
+    /// // Fallibly map the request to a new request
+    /// let mut new_service = service
+    ///     .filter(|id_str: &amp;str| id_str.parse().map_err(DbError::Parse));
+    ///
+    /// // Call the new service
+    /// let id = &quot;13&quot;;
+    /// let response = new_service
+    ///     .ready()
+    ///     .await?
+    ///     .call(id)
+    ///     .await;
+    /// # response
+    /// #    };
+    /// # }
+    /// ```
+    ///
+    /// [`Filter`]: crate::filter::Filter
+    /// [predicate]: crate::filter::Predicate
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;filter&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;filter&quot;</span>)))]
+    </span><span class="kw">fn </span>filter&lt;F, NewRequest&gt;(<span class="self">self</span>, filter: F) -&gt; <span class="kw">crate</span>::filter::Filter&lt;<span class="self">Self</span>, F&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        F: <span class="kw">crate</span>::filter::Predicate&lt;NewRequest&gt;,
     {
-        <span class="ident"><span class="kw">crate</span>::filter::Filter::new</span>(<span class="self">self</span>, <span class="ident">filter</span>)
+        <span class="kw">crate</span>::filter::Filter::new(<span class="self">self</span>, filter)
     }
 
-    <span class="doccomment">/// Composes this service with an [`AsyncFilter`] that conditionally accepts or</span>
-    <span class="doccomment">/// rejects requests based on an [async predicate].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This adapter produces a new service that passes each value through the</span>
-    <span class="doccomment">/// given function `predicate` before sending it to `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use tower::{Service, ServiceExt};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[derive(Clone)] struct DatabaseService;</span>
-    <span class="doccomment">/// # impl DatabaseService {</span>
-    <span class="doccomment">/// #   fn new(address: &amp;str) -&gt; Self {</span>
-    <span class="doccomment">/// #       DatabaseService</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// # #[derive(Debug)]</span>
-    <span class="doccomment">/// # enum DbError {</span>
-    <span class="doccomment">/// #   Rejected</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// # impl std::fmt::Display for DbError {</span>
-    <span class="doccomment">/// #    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter) -&gt; std::fmt::Result { std::fmt::Debug::fmt(self, f) }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// # impl std::error::Error for DbError {}</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Service&lt;u32&gt; for DatabaseService {</span>
-    <span class="doccomment">/// #   type Response = String;</span>
-    <span class="doccomment">/// #   type Error = DbError;</span>
-    <span class="doccomment">/// #   type Future = futures_util::future::Ready&lt;Result&lt;String, DbError&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #       Poll::Ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {</span>
-    <span class="doccomment">/// #       futures_util::future::ready(Ok(String::new()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// #    async {</span>
-    <span class="doccomment">/// // A service taking a u32 as a request and returning Result&lt;_, DbError&gt;</span>
-    <span class="doccomment">/// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// /// Returns `true` if we should query the database for an ID.</span>
-    <span class="doccomment">/// async fn should_query(id: u32) -&gt; bool {</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">///     # true</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Filter requests based on `should_query`.</span>
-    <span class="doccomment">/// let mut new_service = service</span>
-    <span class="doccomment">///     .filter_async(|id: u32| async move {</span>
-    <span class="doccomment">///         if should_query(id).await {</span>
-    <span class="doccomment">///             return Ok(id);</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///         Err(DbError::Rejected)</span>
-    <span class="doccomment">///     });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the new service</span>
-    <span class="doccomment">/// let id = 13;</span>
-    <span class="doccomment">/// # let id: u32 = id;</span>
-    <span class="doccomment">/// let response = new_service</span>
-    <span class="doccomment">///     .ready()</span>
-    <span class="doccomment">///     .await?</span>
-    <span class="doccomment">///     .call(id)</span>
-    <span class="doccomment">///     .await;</span>
-    <span class="doccomment">/// # response</span>
-    <span class="doccomment">/// #    };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AsyncFilter`]: crate::filter::AsyncFilter</span>
-    <span class="doccomment">/// [asynchronous predicate]: crate::filter::AsyncPredicate</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filter&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filter&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">filter_async</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">NewRequest</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">F</span>) -&gt; <span class="ident"><span class="kw">crate</span>::filter::AsyncFilter</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident"><span class="kw">crate</span>::filter::AsyncPredicate</span><span class="op">&lt;</span><span class="ident">NewRequest</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Composes this service with an [`AsyncFilter`] that conditionally accepts or
+    /// rejects requests based on an [async predicate].
+    ///
+    /// This adapter produces a new service that passes each value through the
+    /// given function `predicate` before sending it to `self`.
+    ///
+    /// # Example
+    /// ```
+    /// # use std::convert::TryFrom;
+    /// # use std::task::{Poll, Context};
+    /// # use tower::{Service, ServiceExt};
+    /// #
+    /// # #[derive(Clone)] struct DatabaseService;
+    /// # impl DatabaseService {
+    /// #   fn new(address: &amp;str) -&gt; Self {
+    /// #       DatabaseService
+    /// #   }
+    /// # }
+    /// # #[derive(Debug)]
+    /// # enum DbError {
+    /// #   Rejected
+    /// # }
+    /// # impl std::fmt::Display for DbError {
+    /// #    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter) -&gt; std::fmt::Result { std::fmt::Debug::fmt(self, f) }
+    /// # }
+    /// # impl std::error::Error for DbError {}
+    /// #
+    /// # impl Service&lt;u32&gt; for DatabaseService {
+    /// #   type Response = String;
+    /// #   type Error = DbError;
+    /// #   type Future = futures_util::future::Ready&lt;Result&lt;String, DbError&gt;&gt;;
+    /// #
+    /// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    /// #       Poll::Ready(Ok(()))
+    /// #   }
+    /// #
+    /// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {
+    /// #       futures_util::future::ready(Ok(String::new()))
+    /// #   }
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #    async {
+    /// // A service taking a u32 as a request and returning Result&lt;_, DbError&gt;
+    /// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);
+    ///
+    /// /// Returns `true` if we should query the database for an ID.
+    /// async fn should_query(id: u32) -&gt; bool {
+    ///     // ...
+    ///     # true
+    /// }
+    ///
+    /// // Filter requests based on `should_query`.
+    /// let mut new_service = service
+    ///     .filter_async(|id: u32| async move {
+    ///         if should_query(id).await {
+    ///             return Ok(id);
+    ///         }
+    ///
+    ///         Err(DbError::Rejected)
+    ///     });
+    ///
+    /// // Call the new service
+    /// let id = 13;
+    /// # let id: u32 = id;
+    /// let response = new_service
+    ///     .ready()
+    ///     .await?
+    ///     .call(id)
+    ///     .await;
+    /// # response
+    /// #    };
+    /// # }
+    /// ```
+    ///
+    /// [`AsyncFilter`]: crate::filter::AsyncFilter
+    /// [asynchronous predicate]: crate::filter::AsyncPredicate
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;filter&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;filter&quot;</span>)))]
+    </span><span class="kw">fn </span>filter_async&lt;F, NewRequest&gt;(<span class="self">self</span>, filter: F) -&gt; <span class="kw">crate</span>::filter::AsyncFilter&lt;<span class="self">Self</span>, F&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        F: <span class="kw">crate</span>::filter::AsyncPredicate&lt;NewRequest&gt;,
     {
-        <span class="ident"><span class="kw">crate</span>::filter::AsyncFilter::new</span>(<span class="self">self</span>, <span class="ident">filter</span>)
+        <span class="kw">crate</span>::filter::AsyncFilter::new(<span class="self">self</span>, filter)
     }
 
-    <span class="doccomment">/// Composes an asynchronous function *after* this service.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This takes a function or closure returning a future, and returns a new</span>
-    <span class="doccomment">/// `Service` that chains that function after this service&#39;s [`Future`]. The</span>
-    <span class="doccomment">/// new `Service`&#39;s future will consist of this service&#39;s future, followed</span>
-    <span class="doccomment">/// by the future returned by calling the chained function with the future&#39;s</span>
-    <span class="doccomment">/// [`Output`] type. The chained function is called regardless of whether</span>
-    <span class="doccomment">/// this service&#39;s future completes with a successful response or with an</span>
-    <span class="doccomment">/// error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be thought of as an equivalent to the [`futures`</span>
-    <span class="doccomment">/// crate]&#39;s [`FutureExt::then`] combinator, but acting on `Service`s that</span>
-    <span class="doccomment">/// _return_ futures, rather than on an individual future. Similarly to that</span>
-    <span class="doccomment">/// combinator, [`ServiceExt::then`] can be used to implement asynchronous</span>
-    <span class="doccomment">/// error recovery, by calling some asynchronous function with errors</span>
-    <span class="doccomment">/// returned by this service. Alternatively, it may also be used to call a</span>
-    <span class="doccomment">/// fallible async function with the successful response of this service.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be used to change the [`Response`] type of the service</span>
-    <span class="doccomment">/// into a different type. It can also be used to change the [`Error`] type</span>
-    <span class="doccomment">/// of the service. However, because the `then` function is not applied</span>
-    <span class="doccomment">/// to the errors returned by the service&#39;s [`poll_ready`] method, it must</span>
-    <span class="doccomment">/// be possible to convert the service&#39;s [`Error`] type into the error type</span>
-    <span class="doccomment">/// returned by the `then` future. This is trivial when the function</span>
-    <span class="doccomment">/// returns the same error type as the service, but in other cases, it can</span>
-    <span class="doccomment">/// be useful to use [`BoxError`] to erase differing error types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use tower::{Service, ServiceExt};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct DatabaseService;</span>
-    <span class="doccomment">/// # impl DatabaseService {</span>
-    <span class="doccomment">/// #   fn new(address: &amp;str) -&gt; Self {</span>
-    <span class="doccomment">/// #       DatabaseService</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # type Record = ();</span>
-    <span class="doccomment">/// # type DbError = ();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Service&lt;u32&gt; for DatabaseService {</span>
-    <span class="doccomment">/// #   type Response = Record;</span>
-    <span class="doccomment">/// #   type Error = DbError;</span>
-    <span class="doccomment">/// #   type Future = futures_util::future::Ready&lt;Result&lt;Record, DbError&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #       Poll::Ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {</span>
-    <span class="doccomment">/// #       futures_util::future::ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// // A service returning Result&lt;Record, DbError&gt;</span>
-    <span class="doccomment">/// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // An async function that attempts to recover from errors returned by the</span>
-    <span class="doccomment">/// // database.</span>
-    <span class="doccomment">/// async fn recover_from_error(error: DbError) -&gt; Result&lt;Record, DbError&gt; {</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">///     # Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// #    async {</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // If the database service returns an error, attempt to recover by</span>
-    <span class="doccomment">/// // calling `recover_from_error`. Otherwise, return the successful response.</span>
-    <span class="doccomment">/// let mut new_service = service.then(|result| async move {</span>
-    <span class="doccomment">///     match result {</span>
-    <span class="doccomment">///         Ok(record) =&gt; Ok(record),</span>
-    <span class="doccomment">///         Err(e) =&gt; recover_from_error(e).await,</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the new service</span>
-    <span class="doccomment">/// let id = 13;</span>
-    <span class="doccomment">/// let record = new_service</span>
-    <span class="doccomment">///     .ready()</span>
-    <span class="doccomment">///     .await?</span>
-    <span class="doccomment">///     .call(id)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// # Ok::&lt;(), DbError&gt;(())</span>
-    <span class="doccomment">/// #    };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Future`]: crate::Service::Future</span>
-    <span class="doccomment">/// [`Output`]: std::future::Future::Output</span>
-    <span class="doccomment">/// [`futures` crate]: https://docs.rs/futures</span>
-    <span class="doccomment">/// [`FutureExt::then`]: https://docs.rs/futures/latest/futures/future/trait.FutureExt.html#method.then</span>
-    <span class="doccomment">/// [`Error`]: crate::Service::Error</span>
-    <span class="doccomment">/// [`Response`]: crate::Service::Response</span>
-    <span class="doccomment">/// [`poll_ready`]: crate::Service::poll_ready</span>
-    <span class="doccomment">/// [`BoxError`]: crate::BoxError</span>
-    <span class="kw">fn</span> <span class="ident">then</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Response</span>, <span class="ident">Error</span>, <span class="ident">Fut</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Then</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">Error</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Response</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>) -&gt; <span class="ident">Fut</span> <span class="op">+</span> <span class="ident">Clone</span>,
-        <span class="ident">Fut</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Composes an asynchronous function *after* this service.
+    ///
+    /// This takes a function or closure returning a future, and returns a new
+    /// `Service` that chains that function after this service&#39;s [`Future`]. The
+    /// new `Service`&#39;s future will consist of this service&#39;s future, followed
+    /// by the future returned by calling the chained function with the future&#39;s
+    /// [`Output`] type. The chained function is called regardless of whether
+    /// this service&#39;s future completes with a successful response or with an
+    /// error.
+    ///
+    /// This method can be thought of as an equivalent to the [`futures`
+    /// crate]&#39;s [`FutureExt::then`] combinator, but acting on `Service`s that
+    /// _return_ futures, rather than on an individual future. Similarly to that
+    /// combinator, [`ServiceExt::then`] can be used to implement asynchronous
+    /// error recovery, by calling some asynchronous function with errors
+    /// returned by this service. Alternatively, it may also be used to call a
+    /// fallible async function with the successful response of this service.
+    ///
+    /// This method can be used to change the [`Response`] type of the service
+    /// into a different type. It can also be used to change the [`Error`] type
+    /// of the service. However, because the `then` function is not applied
+    /// to the errors returned by the service&#39;s [`poll_ready`] method, it must
+    /// be possible to convert the service&#39;s [`Error`] type into the error type
+    /// returned by the `then` future. This is trivial when the function
+    /// returns the same error type as the service, but in other cases, it can
+    /// be useful to use [`BoxError`] to erase differing error types.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use std::task::{Poll, Context};
+    /// # use tower::{Service, ServiceExt};
+    /// #
+    /// # struct DatabaseService;
+    /// # impl DatabaseService {
+    /// #   fn new(address: &amp;str) -&gt; Self {
+    /// #       DatabaseService
+    /// #   }
+    /// # }
+    /// #
+    /// # type Record = ();
+    /// # type DbError = ();
+    /// #
+    /// # impl Service&lt;u32&gt; for DatabaseService {
+    /// #   type Response = Record;
+    /// #   type Error = DbError;
+    /// #   type Future = futures_util::future::Ready&lt;Result&lt;Record, DbError&gt;&gt;;
+    /// #
+    /// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    /// #       Poll::Ready(Ok(()))
+    /// #   }
+    /// #
+    /// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {
+    /// #       futures_util::future::ready(Ok(()))
+    /// #   }
+    /// # }
+    /// #
+    /// # fn main() {
+    /// // A service returning Result&lt;Record, DbError&gt;
+    /// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);
+    ///
+    /// // An async function that attempts to recover from errors returned by the
+    /// // database.
+    /// async fn recover_from_error(error: DbError) -&gt; Result&lt;Record, DbError&gt; {
+    ///     // ...
+    ///     # Ok(())
+    /// }
+    /// #    async {
+    ///
+    /// // If the database service returns an error, attempt to recover by
+    /// // calling `recover_from_error`. Otherwise, return the successful response.
+    /// let mut new_service = service.then(|result| async move {
+    ///     match result {
+    ///         Ok(record) =&gt; Ok(record),
+    ///         Err(e) =&gt; recover_from_error(e).await,
+    ///     }
+    /// });
+    ///
+    /// // Call the new service
+    /// let id = 13;
+    /// let record = new_service
+    ///     .ready()
+    ///     .await?
+    ///     .call(id)
+    ///     .await?;
+    /// # Ok::&lt;(), DbError&gt;(())
+    /// #    };
+    /// # }
+    /// ```
+    ///
+    /// [`Future`]: crate::Service::Future
+    /// [`Output`]: std::future::Future::Output
+    /// [`futures` crate]: https://docs.rs/futures
+    /// [`FutureExt::then`]: https://docs.rs/futures/latest/futures/future/trait.FutureExt.html#method.then
+    /// [`Error`]: crate::Service::Error
+    /// [`Response`]: crate::Service::Response
+    /// [`poll_ready`]: crate::Service::poll_ready
+    /// [`BoxError`]: crate::BoxError
+    </span><span class="kw">fn </span>then&lt;F, Response, Error, Fut&gt;(<span class="self">self</span>, f: F) -&gt; Then&lt;<span class="self">Self</span>, F&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        Error: From&lt;<span class="self">Self</span>::Error&gt;,
+        F: FnOnce(<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Response, <span class="self">Self</span>::Error&gt;) -&gt; Fut + Clone,
+        Fut: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Response, Error&gt;&gt;,
     {
-        <span class="ident">Then::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
+        Then::new(<span class="self">self</span>, f)
     }
 
-    <span class="doccomment">/// Composes a function that transforms futures produced by the service.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This takes a function or closure returning a future computed from the future returned by</span>
-    <span class="doccomment">/// the service&#39;s [`call`] method, as opposed to the responses produced by the future.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// # use tower::{Service, ServiceExt, BoxError};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct DatabaseService;</span>
-    <span class="doccomment">/// # impl DatabaseService {</span>
-    <span class="doccomment">/// #   fn new(address: &amp;str) -&gt; Self {</span>
-    <span class="doccomment">/// #       DatabaseService</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # type Record = ();</span>
-    <span class="doccomment">/// # type DbError = crate::BoxError;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl Service&lt;u32&gt; for DatabaseService {</span>
-    <span class="doccomment">/// #   type Response = Record;</span>
-    <span class="doccomment">/// #   type Error = DbError;</span>
-    <span class="doccomment">/// #   type Future = futures_util::future::Ready&lt;Result&lt;Record, DbError&gt;&gt;;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #       Poll::Ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {</span>
-    <span class="doccomment">/// #       futures_util::future::ready(Ok(()))</span>
-    <span class="doccomment">/// #   }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// use std::time::Duration;</span>
-    <span class="doccomment">/// use tokio::time::timeout;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // A service returning Result&lt;Record, DbError&gt;</span>
-    <span class="doccomment">/// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);</span>
-    <span class="doccomment">/// #    async {</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut new_service = service.map_future(|future| async move {</span>
-    <span class="doccomment">///     let res = timeout(Duration::from_secs(1), future).await?;</span>
-    <span class="doccomment">///     Ok::&lt;_, BoxError&gt;(res)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Call the new service</span>
-    <span class="doccomment">/// let id = 13;</span>
-    <span class="doccomment">/// let record = new_service</span>
-    <span class="doccomment">///     .ready()</span>
-    <span class="doccomment">///     .await?</span>
-    <span class="doccomment">///     .call(id)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// # Ok::&lt;(), BoxError&gt;(())</span>
-    <span class="doccomment">/// #    };</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that normally you wouldn&#39;t implement timeouts like this and instead use [`Timeout`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`call`]: crate::Service::call</span>
-    <span class="doccomment">/// [`Timeout`]: crate::timeout::Timeout</span>
-    <span class="kw">fn</span> <span class="ident">map_future</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Fut</span>, <span class="ident">Response</span>, <span class="ident">Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">MapFuture</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Future</span>) -&gt; <span class="ident">Fut</span>,
-        <span class="ident">Error</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>,
-        <span class="ident">Fut</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Composes a function that transforms futures produced by the service.
+    ///
+    /// This takes a function or closure returning a future computed from the future returned by
+    /// the service&#39;s [`call`] method, as opposed to the responses produced by the future.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use std::task::{Poll, Context};
+    /// # use tower::{Service, ServiceExt, BoxError};
+    /// #
+    /// # struct DatabaseService;
+    /// # impl DatabaseService {
+    /// #   fn new(address: &amp;str) -&gt; Self {
+    /// #       DatabaseService
+    /// #   }
+    /// # }
+    /// #
+    /// # type Record = ();
+    /// # type DbError = crate::BoxError;
+    /// #
+    /// # impl Service&lt;u32&gt; for DatabaseService {
+    /// #   type Response = Record;
+    /// #   type Error = DbError;
+    /// #   type Future = futures_util::future::Ready&lt;Result&lt;Record, DbError&gt;&gt;;
+    /// #
+    /// #   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    /// #       Poll::Ready(Ok(()))
+    /// #   }
+    /// #
+    /// #   fn call(&amp;mut self, request: u32) -&gt; Self::Future {
+    /// #       futures_util::future::ready(Ok(()))
+    /// #   }
+    /// # }
+    /// #
+    /// # fn main() {
+    /// use std::time::Duration;
+    /// use tokio::time::timeout;
+    ///
+    /// // A service returning Result&lt;Record, DbError&gt;
+    /// let service = DatabaseService::new(&quot;127.0.0.1:8080&quot;);
+    /// #    async {
+    ///
+    /// let mut new_service = service.map_future(|future| async move {
+    ///     let res = timeout(Duration::from_secs(1), future).await?;
+    ///     Ok::&lt;_, BoxError&gt;(res)
+    /// });
+    ///
+    /// // Call the new service
+    /// let id = 13;
+    /// let record = new_service
+    ///     .ready()
+    ///     .await?
+    ///     .call(id)
+    ///     .await?;
+    /// # Ok::&lt;(), BoxError&gt;(())
+    /// #    };
+    /// # }
+    /// ```
+    ///
+    /// Note that normally you wouldn&#39;t implement timeouts like this and instead use [`Timeout`].
+    ///
+    /// [`call`]: crate::Service::call
+    /// [`Timeout`]: crate::timeout::Timeout
+    </span><span class="kw">fn </span>map_future&lt;F, Fut, Response, Error&gt;(<span class="self">self</span>, f: F) -&gt; MapFuture&lt;<span class="self">Self</span>, F&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        F: FnMut(<span class="self">Self</span>::Future) -&gt; Fut,
+        Error: From&lt;<span class="self">Self</span>::Error&gt;,
+        Fut: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Response, Error&gt;&gt;,
     {
-        <span class="ident">MapFuture::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
+        MapFuture::new(<span class="self">self</span>, f)
     }
 
-    <span class="doccomment">/// Convert the service into a [`Service`] + [`Send`] trait object.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [`BoxService`] for more details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `Self` implements the [`Clone`] trait, the [`boxed_clone`] method</span>
-    <span class="doccomment">/// can be used instead, to produce a boxed service which will also</span>
-    <span class="doccomment">/// implement [`Clone`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tower::{Service, ServiceExt, BoxError, service_fn, util::BoxService};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Request;</span>
-    <span class="doccomment">/// # struct Response;</span>
-    <span class="doccomment">/// # impl Response {</span>
-    <span class="doccomment">/// #     fn new() -&gt; Self { Self }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let service = service_fn(|req: Request| async {</span>
-    <span class="doccomment">///     Ok::&lt;_, BoxError&gt;(Response::new())</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let service: BoxService&lt;Request, Response, BoxError&gt; = service</span>
-    <span class="doccomment">///     .map_request(|req| {</span>
-    <span class="doccomment">///         println!(&quot;received request&quot;);</span>
-    <span class="doccomment">///         req</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .map_response(|res| {</span>
-    <span class="doccomment">///         println!(&quot;response produced&quot;);</span>
-    <span class="doccomment">///         res</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .boxed();</span>
-    <span class="doccomment">/// # let service = assert_service(service);</span>
-    <span class="doccomment">/// # fn assert_service&lt;S, R&gt;(svc: S) -&gt; S</span>
-    <span class="doccomment">/// # where S: Service&lt;R&gt; { svc }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Service`]: crate::Service</span>
-    <span class="doccomment">/// [`boxed_clone`]: Self::boxed_clone</span>
-    <span class="kw">fn</span> <span class="ident">boxed</span>(<span class="self">self</span>) -&gt; <span class="ident">BoxService</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident"><span class="self">Self</span>::Response</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident"><span class="self">Self</span>::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Convert the service into a [`Service`] + [`Send`] trait object.
+    ///
+    /// See [`BoxService`] for more details.
+    ///
+    /// If `Self` implements the [`Clone`] trait, the [`boxed_clone`] method
+    /// can be used instead, to produce a boxed service which will also
+    /// implement [`Clone`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use tower::{Service, ServiceExt, BoxError, service_fn, util::BoxService};
+    /// #
+    /// # struct Request;
+    /// # struct Response;
+    /// # impl Response {
+    /// #     fn new() -&gt; Self { Self }
+    /// # }
+    ///
+    /// let service = service_fn(|req: Request| async {
+    ///     Ok::&lt;_, BoxError&gt;(Response::new())
+    /// });
+    ///
+    /// let service: BoxService&lt;Request, Response, BoxError&gt; = service
+    ///     .map_request(|req| {
+    ///         println!(&quot;received request&quot;);
+    ///         req
+    ///     })
+    ///     .map_response(|res| {
+    ///         println!(&quot;response produced&quot;);
+    ///         res
+    ///     })
+    ///     .boxed();
+    /// # let service = assert_service(service);
+    /// # fn assert_service&lt;S, R&gt;(svc: S) -&gt; S
+    /// # where S: Service&lt;R&gt; { svc }
+    /// ```
+    ///
+    /// [`Service`]: crate::Service
+    /// [`boxed_clone`]: Self::boxed_clone
+    </span><span class="kw">fn </span>boxed(<span class="self">self</span>) -&gt; BoxService&lt;Request, <span class="self">Self</span>::Response, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized + Send + <span class="lifetime">&#39;static</span>,
+        <span class="self">Self</span>::Future: Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">BoxService::new</span>(<span class="self">self</span>)
+        BoxService::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Convert the service into a [`Service`] + [`Clone`] + [`Send`] trait object.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is similar to the [`boxed`] method, but it requires that `Self` implement</span>
-    <span class="doccomment">/// [`Clone`], and the returned boxed service implements [`Clone`].</span>
-    <span class="doccomment">/// See [`BoxCloneService`] for more details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tower::{Service, ServiceExt, BoxError, service_fn, util::BoxCloneService};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Request;</span>
-    <span class="doccomment">/// # struct Response;</span>
-    <span class="doccomment">/// # impl Response {</span>
-    <span class="doccomment">/// #     fn new() -&gt; Self { Self }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let service = service_fn(|req: Request| async {</span>
-    <span class="doccomment">///     Ok::&lt;_, BoxError&gt;(Response::new())</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let service: BoxCloneService&lt;Request, Response, BoxError&gt; = service</span>
-    <span class="doccomment">///     .map_request(|req| {</span>
-    <span class="doccomment">///         println!(&quot;received request&quot;);</span>
-    <span class="doccomment">///         req</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .map_response(|res| {</span>
-    <span class="doccomment">///         println!(&quot;response produced&quot;);</span>
-    <span class="doccomment">///         res</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .boxed_clone();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The boxed service can still be cloned.</span>
-    <span class="doccomment">/// service.clone();</span>
-    <span class="doccomment">/// # let service = assert_service(service);</span>
-    <span class="doccomment">/// # fn assert_service&lt;S, R&gt;(svc: S) -&gt; S</span>
-    <span class="doccomment">/// # where S: Service&lt;R&gt; { svc }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Service`]: crate::Service</span>
-    <span class="doccomment">/// [`boxed`]: Self::boxed</span>
-    <span class="kw">fn</span> <span class="ident">boxed_clone</span>(<span class="self">self</span>) -&gt; <span class="ident">BoxCloneService</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident"><span class="self">Self</span>::Response</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident"><span class="self">Self</span>::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Convert the service into a [`Service`] + [`Clone`] + [`Send`] trait object.
+    ///
+    /// This is similar to the [`boxed`] method, but it requires that `Self` implement
+    /// [`Clone`], and the returned boxed service implements [`Clone`].
+    /// See [`BoxCloneService`] for more details.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use tower::{Service, ServiceExt, BoxError, service_fn, util::BoxCloneService};
+    /// #
+    /// # struct Request;
+    /// # struct Response;
+    /// # impl Response {
+    /// #     fn new() -&gt; Self { Self }
+    /// # }
+    ///
+    /// let service = service_fn(|req: Request| async {
+    ///     Ok::&lt;_, BoxError&gt;(Response::new())
+    /// });
+    ///
+    /// let service: BoxCloneService&lt;Request, Response, BoxError&gt; = service
+    ///     .map_request(|req| {
+    ///         println!(&quot;received request&quot;);
+    ///         req
+    ///     })
+    ///     .map_response(|res| {
+    ///         println!(&quot;response produced&quot;);
+    ///         res
+    ///     })
+    ///     .boxed_clone();
+    ///
+    /// // The boxed service can still be cloned.
+    /// service.clone();
+    /// # let service = assert_service(service);
+    /// # fn assert_service&lt;S, R&gt;(svc: S) -&gt; S
+    /// # where S: Service&lt;R&gt; { svc }
+    /// ```
+    ///
+    /// [`Service`]: crate::Service
+    /// [`boxed`]: Self::boxed
+    </span><span class="kw">fn </span>boxed_clone(<span class="self">self</span>) -&gt; BoxCloneService&lt;Request, <span class="self">Self</span>::Response, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Clone + Sized + Send + <span class="lifetime">&#39;static</span>,
+        <span class="self">Self</span>::Future: Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">BoxCloneService::new</span>(<span class="self">self</span>)
+        BoxCloneService::new(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">ServiceExt</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">tower_service::Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized, Request&gt; ServiceExt&lt;Request&gt; <span class="kw">for </span>T <span class="kw">where </span>T: tower_service::Service&lt;Request&gt; {}
 
-<span class="doccomment">/// Convert an `Option&lt;Layer&gt;` into a [`Layer`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use std::time::Duration;</span>
-<span class="doccomment">/// # use tower::Service;</span>
-<span class="doccomment">/// # use tower::builder::ServiceBuilder;</span>
-<span class="doccomment">/// use tower::util::option_layer;</span>
-<span class="doccomment">/// # use tower::timeout::TimeoutLayer;</span>
-<span class="doccomment">/// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {</span>
-<span class="doccomment">/// # let timeout = Some(Duration::new(10, 0));</span>
-<span class="doccomment">/// // Layer to apply a timeout if configured</span>
-<span class="doccomment">/// let maybe_timeout = option_layer(timeout.map(TimeoutLayer::new));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ServiceBuilder::new()</span>
-<span class="doccomment">///     .layer(maybe_timeout)</span>
-<span class="doccomment">///     .service(svc);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Layer`]: crate::layer::Layer</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">option_layer</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>(<span class="ident">layer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>) -&gt; <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">Identity</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">layer</span>) <span class="op">=</span> <span class="ident">layer</span> {
-        <span class="ident">Either::A</span>(<span class="ident">layer</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">Either::B</span>(<span class="ident">Identity::new</span>())
+<span class="doccomment">/// Convert an `Option&lt;Layer&gt;` into a [`Layer`].
+///
+/// ```
+/// # use std::time::Duration;
+/// # use tower::Service;
+/// # use tower::builder::ServiceBuilder;
+/// use tower::util::option_layer;
+/// # use tower::timeout::TimeoutLayer;
+/// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {
+/// # let timeout = Some(Duration::new(10, 0));
+/// // Layer to apply a timeout if configured
+/// let maybe_timeout = option_layer(timeout.map(TimeoutLayer::new));
+///
+/// ServiceBuilder::new()
+///     .layer(maybe_timeout)
+///     .service(svc);
+/// # }
+/// ```
+///
+/// [`Layer`]: crate::layer::Layer
+</span><span class="kw">pub fn </span>option_layer&lt;L&gt;(layer: <span class="prelude-ty">Option</span>&lt;L&gt;) -&gt; Either&lt;L, Identity&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(layer) = layer {
+        Either::A(layer)
+    } <span class="kw">else </span>{
+        Either::B(Identity::new())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

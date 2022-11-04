@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/server/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/server/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -929,934 +929,934 @@
 <span id="927">927</span>
 <span id="928">928</span>
 <span id="929">929</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Server implementation and builder.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Server implementation and builder.
 
-<span class="kw">mod</span> <span class="ident">conn</span>;
-<span class="kw">mod</span> <span class="ident">incoming</span>;
-<span class="kw">mod</span> <span class="ident">recover_error</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)))]</span>
-<span class="kw">mod</span> <span class="ident">tls</span>;
+</span><span class="kw">mod </span>conn;
+<span class="kw">mod </span>incoming;
+<span class="kw">mod </span>recover_error;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tls&quot;</span>)))]
+</span><span class="kw">mod </span>tls;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">conn</span>::{<span class="ident">Connected</span>, <span class="ident">TcpConnectInfo</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tls::ServerTlsConfig</span>;
+<span class="kw">pub use </span>conn::{Connected, TcpConnectInfo};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">pub use </span>tls::ServerTlsConfig;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">conn::TlsConnectInfo</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">pub use </span>conn::TlsConnectInfo;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::service::TlsAcceptor</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">super</span>::service::TlsAcceptor;
 
-<span class="kw">use</span> <span class="ident">incoming::TcpIncoming</span>;
+<span class="kw">use </span>incoming::TcpIncoming;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">tokio_rustls::server::TlsStream</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>tokio_rustls::server::TlsStream;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transport::Error</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::transport::Error;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::recover_error::RecoverError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::service</span>::{<span class="ident">GrpcTimeout</span>, <span class="ident">Or</span>, <span class="ident">Routes</span>, <span class="ident">ServerIo</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::body::BoxBody</span>;
-<span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
-<span class="kw">use</span> <span class="ident">futures_core::Stream</span>;
-<span class="kw">use</span> <span class="ident">futures_util</span>::{
-    <span class="ident">future</span>::{<span class="self">self</span>, <span class="ident">MapErr</span>},
-    <span class="ident">ready</span>, <span class="ident">TryFutureExt</span>,
+<span class="kw">use </span><span class="self">self</span>::recover_error::RecoverError;
+<span class="kw">use </span><span class="kw">super</span>::service::{GrpcTimeout, Or, Routes, ServerIo};
+<span class="kw">use </span><span class="kw">crate</span>::body::BoxBody;
+<span class="kw">use </span>bytes::Bytes;
+<span class="kw">use </span>futures_core::Stream;
+<span class="kw">use </span>futures_util::{
+    future::{<span class="self">self</span>, MapErr},
+    ready, TryFutureExt,
 };
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Request</span>, <span class="ident">Response</span>};
-<span class="kw">use</span> <span class="ident">http_body::Body</span> <span class="kw">as</span> <span class="kw">_</span>;
-<span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">server::accept</span>, <span class="ident">Body</span>};
-<span class="kw">use</span> <span class="ident">pin_project::pin_project</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt</span>,
-    <span class="ident">future::Future</span>,
-    <span class="ident">marker::PhantomData</span>,
-    <span class="ident">net::SocketAddr</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
-    <span class="ident">time::Duration</span>,
+<span class="kw">use </span>http::{Request, Response};
+<span class="kw">use </span>http_body::Body <span class="kw">as _</span>;
+<span class="kw">use </span>hyper::{server::accept, Body};
+<span class="kw">use </span>pin_project::pin_project;
+<span class="kw">use </span>std::{
+    fmt,
+    future::Future,
+    marker::PhantomData,
+    net::SocketAddr,
+    pin::Pin,
+    sync::Arc,
+    task::{Context, Poll},
+    time::Duration,
 };
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-<span class="kw">use</span> <span class="ident">tower</span>::{
-    <span class="ident">layer::util::Identity</span>, <span class="ident">layer::Layer</span>, <span class="ident">limit::concurrency::ConcurrencyLimitLayer</span>, <span class="ident">util::Either</span>,
-    <span class="ident">Service</span>, <span class="ident">ServiceBuilder</span>,
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
+<span class="kw">use </span>tower::{
+    layer::util::Identity, layer::Layer, limit::concurrency::ConcurrencyLimitLayer, util::Either,
+    Service, ServiceBuilder,
 };
 
-<span class="kw">type</span> <span class="ident">BoxHttpBody</span> <span class="op">=</span> <span class="ident">http_body::combinators::UnsyncBoxBody</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">BoxService</span> <span class="op">=</span> <span class="ident">tower::util::BoxService</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxHttpBody</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">TraceInterceptor</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">http::Request</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) -&gt; <span class="ident">tracing::Span</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+<span class="kw">type </span>BoxHttpBody = http_body::combinators::UnsyncBoxBody&lt;Bytes, <span class="kw">crate</span>::Error&gt;;
+<span class="kw">type </span>BoxService = tower::util::BoxService&lt;Request&lt;Body&gt;, Response&lt;BoxHttpBody&gt;, <span class="kw">crate</span>::Error&gt;;
+<span class="kw">type </span>TraceInterceptor = Arc&lt;<span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>http::Request&lt;()&gt;) -&gt; tracing::Span + Send + Sync + <span class="lifetime">&#39;static</span>&gt;;
 
-<span class="kw">const</span> <span class="ident">DEFAULT_HTTP2_KEEPALIVE_TIMEOUT_SECS</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">20</span>;
+<span class="kw">const </span>DEFAULT_HTTP2_KEEPALIVE_TIMEOUT_SECS: u64 = <span class="number">20</span>;
 
-<span class="doccomment">/// A default batteries included `transport` server.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is a wrapper around [`hyper::Server`] and provides an easy builder</span>
-<span class="doccomment">/// pattern style builder [`Server`]. This builder exposes easy configuration parameters</span>
-<span class="doccomment">/// for providing a fully featured http2 based gRPC server. This should provide</span>
-<span class="doccomment">/// a very good out of the box http2 server for use with tonic but is also a</span>
-<span class="doccomment">/// reference implementation that should be a good starting point for anyone</span>
-<span class="doccomment">/// wanting to create a more complex and/or specific implementation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">L</span> <span class="op">=</span> <span class="ident">Identity</span><span class="op">&gt;</span> {
-    <span class="ident">trace_interceptor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TraceInterceptor</span><span class="op">&gt;</span>,
-    <span class="ident">concurrency_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-    <span class="ident">tls</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TlsAcceptor</span><span class="op">&gt;</span>,
-    <span class="ident">init_stream_window_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">init_connection_window_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">max_concurrent_streams</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">tcp_keepalive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">tcp_nodelay</span>: <span class="ident">bool</span>,
-    <span class="ident">http2_keepalive_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">http2_keepalive_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">max_frame_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">accept_http1</span>: <span class="ident">bool</span>,
-    <span class="ident">layer</span>: <span class="ident">L</span>,
+<span class="doccomment">/// A default batteries included `transport` server.
+///
+/// This is a wrapper around [`hyper::Server`] and provides an easy builder
+/// pattern style builder [`Server`]. This builder exposes easy configuration parameters
+/// for providing a fully featured http2 based gRPC server. This should provide
+/// a very good out of the box http2 server for use with tonic but is also a
+/// reference implementation that should be a good starting point for anyone
+/// wanting to create a more complex and/or specific implementation.
+</span><span class="attribute">#[derive(Default, Clone)]
+</span><span class="kw">pub struct </span>Server&lt;L = Identity&gt; {
+    trace_interceptor: <span class="prelude-ty">Option</span>&lt;TraceInterceptor&gt;,
+    concurrency_limit: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+    </span>tls: <span class="prelude-ty">Option</span>&lt;TlsAcceptor&gt;,
+    init_stream_window_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    init_connection_window_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    max_concurrent_streams: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    tcp_keepalive: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    tcp_nodelay: bool,
+    http2_keepalive_interval: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    http2_keepalive_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    max_frame_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    accept_http1: bool,
+    layer: L,
 }
 
-<span class="doccomment">/// A stack based `Service` router.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Router</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">L</span> <span class="op">=</span> <span class="ident">Identity</span><span class="op">&gt;</span> {
-    <span class="ident">server</span>: <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>,
-    <span class="ident">routes</span>: <span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A stack based `Service` router.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Router&lt;A, B, L = Identity&gt; {
+    server: Server&lt;L&gt;,
+    routes: Routes&lt;A, B, Request&lt;Body&gt;&gt;,
 }
 
-<span class="doccomment">/// A service that is produced from a Tonic `Router`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This service implementation will route between multiple Tonic</span>
-<span class="doccomment">/// gRPC endpoints and can be consumed with the rest of the `tower`</span>
-<span class="doccomment">/// ecosystem.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RouterService</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">S</span>,
+<span class="doccomment">/// A service that is produced from a Tonic `Router`.
+///
+/// This service implementation will route between multiple Tonic
+/// gRPC endpoints and can be consumed with the rest of the `tower`
+/// ecosystem.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>RouterService&lt;S&gt; {
+    inner: S,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RouterService</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+<span class="kw">impl</span>&lt;S&gt; Service&lt;Request&lt;Body&gt;&gt; <span class="kw">for </span>RouterService&lt;S&gt;
+<span class="kw">where
+    </span>S: Service&lt;Request&lt;Body&gt;, Response = Response&lt;BoxBody&gt;&gt; + Clone + Send + <span class="lifetime">&#39;static</span>,
+    S::Future: Send + <span class="lifetime">&#39;static</span>,
+    S::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
+    <span class="kw">type </span>Response = Response&lt;BoxBody&gt;;
+    <span class="kw">type </span>Error = <span class="kw">crate</span>::Error;
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">MapErr</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="kw">fn</span>(<span class="ident">S::Error</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>;
+    <span class="attribute">#[allow(clippy::type_complexity)]
+    </span><span class="kw">type </span>Future = MapErr&lt;S::Future, <span class="kw">fn</span>(S::Error) -&gt; <span class="kw">crate</span>::Error&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">call</span>(<span class="ident">req</span>).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
-    }
-}
-
-<span class="doccomment">/// A trait to provide a static reference to the service&#39;s</span>
-<span class="doccomment">/// name. This is used for routing service&#39;s within the router.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NamedService</span> {
-    <span class="doccomment">/// The `Service-Name` as described [here].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [here]: https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests</span>
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">NamedService</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">NamedService</span> <span class="kw">for</span> <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="ident">S::NAME</span>;
-}
-
-<span class="kw">impl</span> <span class="ident">Server</span> {
-    <span class="doccomment">/// Create a new server builder that can configure a [`Server`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">tcp_nodelay</span>: <span class="bool-val">true</span>,
-            <span class="ident">accept_http1</span>: <span class="bool-val">false</span>,
-            ..<span class="ident">Default::default</span>()
-        }
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, req: Request&lt;Body&gt;) -&gt; <span class="self">Self</span>::Future {
+        <span class="self">self</span>.inner.call(req).map_err(Into::into)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Configure TLS for this server.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tls_config</span>(<span class="self">self</span>, <span class="ident">tls_config</span>: <span class="ident">ServerTlsConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Server</span> {
-            <span class="ident">tls</span>: <span class="prelude-val">Some</span>(<span class="ident">tls_config</span>.<span class="ident">tls_acceptor</span>().<span class="ident">map_err</span>(<span class="ident">Error::from_source</span>)<span class="question-mark">?</span>),
-            ..<span class="self">self</span>
-        })
-    }
+<span class="doccomment">/// A trait to provide a static reference to the service&#39;s
+/// name. This is used for routing service&#39;s within the router.
+</span><span class="kw">pub trait </span>NamedService {
+    <span class="doccomment">/// The `Service-Name` as described [here].
+    ///
+    /// [here]: https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests
+    </span><span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
+}
 
-    <span class="doccomment">/// Set the concurrency limit applied to on requests inbound per connection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Server;</span>
-    <span class="doccomment">/// # use tower_service::Service;</span>
-    <span class="doccomment">/// # let builder = Server::builder();</span>
-    <span class="doccomment">/// builder.concurrency_limit_per_connection(32);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">concurrency_limit_per_connection</span>(<span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">concurrency_limit</span>: <span class="prelude-val">Some</span>(<span class="ident">limit</span>),
-            ..<span class="self">self</span>
+<span class="kw">impl</span>&lt;S: NamedService, T&gt; NamedService <span class="kw">for </span>Either&lt;S, T&gt; {
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = S::NAME;
+}
+
+<span class="kw">impl </span>Server {
+    <span class="doccomment">/// Create a new server builder that can configure a [`Server`].
+    </span><span class="kw">pub fn </span>builder() -&gt; <span class="self">Self </span>{
+        Server {
+            tcp_nodelay: <span class="bool-val">true</span>,
+            accept_http1: <span class="bool-val">false</span>,
+            ..Default::default()
         }
     }
+}
 
-    <span class="doccomment">/// Set a timeout on for all request handlers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Server;</span>
-    <span class="doccomment">/// # use tower_service::Service;</span>
-    <span class="doccomment">/// # use std::time::Duration;</span>
-    <span class="doccomment">/// # let mut builder = Server::builder();</span>
-    <span class="doccomment">/// builder.timeout(Duration::from_secs(30));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timeout</span>);
-        <span class="self">self</span>
+<span class="kw">impl</span>&lt;L&gt; Server&lt;L&gt; {
+    <span class="doccomment">/// Configure TLS for this server.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tls&quot;</span>)))]
+    </span><span class="kw">pub fn </span>tls_config(<span class="self">self</span>, tls_config: ServerTlsConfig) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="prelude-val">Ok</span>(Server {
+            tls: <span class="prelude-val">Some</span>(tls_config.tls_acceptor().map_err(Error::from_source)<span class="question-mark">?</span>),
+            ..<span class="self">self
+        </span>})
     }
 
-    <span class="doccomment">/// Sets the [`SETTINGS_INITIAL_WINDOW_SIZE`][spec] option for HTTP2</span>
-    <span class="doccomment">/// stream-level flow control.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is 65,535</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [spec]: https://http2.github.io/http2-spec/#SETTINGS_INITIAL_WINDOW_SIZE</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_stream_window_size</span>(<span class="self">self</span>, <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">init_stream_window_size</span>: <span class="ident">sz</span>.<span class="ident">into</span>(),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Set the concurrency limit applied to on requests inbound per connection.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use tonic::transport::Server;
+    /// # use tower_service::Service;
+    /// # let builder = Server::builder();
+    /// builder.concurrency_limit_per_connection(32);
+    /// ```
+    </span><span class="kw">pub fn </span>concurrency_limit_per_connection(<span class="self">self</span>, limit: usize) -&gt; <span class="self">Self </span>{
+        Server {
+            concurrency_limit: <span class="prelude-val">Some</span>(limit),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Sets the max connection-level flow control for HTTP2</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is 65,535</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_connection_window_size</span>(<span class="self">self</span>, <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">init_connection_window_size</span>: <span class="ident">sz</span>.<span class="ident">into</span>(),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Set a timeout on for all request handlers.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use tonic::transport::Server;
+    /// # use tower_service::Service;
+    /// # use std::time::Duration;
+    /// # let mut builder = Server::builder();
+    /// builder.timeout(Duration::from_secs(30));
+    /// ```
+    </span><span class="kw">pub fn </span>timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timeout: Duration) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.timeout = <span class="prelude-val">Some</span>(timeout);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the [`SETTINGS_INITIAL_WINDOW_SIZE`][spec] option for HTTP2
+    /// stream-level flow control.
+    ///
+    /// Default is 65,535
+    ///
+    /// [spec]: https://http2.github.io/http2-spec/#SETTINGS_INITIAL_WINDOW_SIZE
+    </span><span class="kw">pub fn </span>initial_stream_window_size(<span class="self">self</span>, sz: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;) -&gt; <span class="self">Self </span>{
+        Server {
+            init_stream_window_size: sz.into(),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Sets the [`SETTINGS_MAX_CONCURRENT_STREAMS`][spec] option for HTTP2</span>
-    <span class="doccomment">/// connections.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is no limit (`None`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [spec]: https://http2.github.io/http2-spec/#SETTINGS_MAX_CONCURRENT_STREAMS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_concurrent_streams</span>(<span class="self">self</span>, <span class="ident">max</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">max_concurrent_streams</span>: <span class="ident">max</span>.<span class="ident">into</span>(),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Sets the max connection-level flow control for HTTP2
+    ///
+    /// Default is 65,535
+    </span><span class="kw">pub fn </span>initial_connection_window_size(<span class="self">self</span>, sz: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;) -&gt; <span class="self">Self </span>{
+        Server {
+            init_connection_window_size: sz.into(),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Set whether HTTP2 Ping frames are enabled on accepted connections.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `None` is specified, HTTP2 keepalive is disabled, otherwise the duration</span>
-    <span class="doccomment">/// specified will be the time interval between HTTP2 Ping frames.</span>
-    <span class="doccomment">/// The timeout for receiving an acknowledgement of the keepalive ping</span>
-    <span class="doccomment">/// can be set with [`Server::http2_keepalive_timeout`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is no HTTP2 keepalive (`None`)</span>
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_keepalive_interval</span>(<span class="self">self</span>, <span class="ident">http2_keepalive_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">http2_keepalive_interval</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Sets the [`SETTINGS_MAX_CONCURRENT_STREAMS`][spec] option for HTTP2
+    /// connections.
+    ///
+    /// Default is no limit (`None`).
+    ///
+    /// [spec]: https://http2.github.io/http2-spec/#SETTINGS_MAX_CONCURRENT_STREAMS
+    </span><span class="kw">pub fn </span>max_concurrent_streams(<span class="self">self</span>, max: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;) -&gt; <span class="self">Self </span>{
+        Server {
+            max_concurrent_streams: max.into(),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Sets a timeout for receiving an acknowledgement of the keepalive ping.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the ping is not acknowledged within the timeout, the connection will be closed.</span>
-    <span class="doccomment">/// Does nothing if http2_keep_alive_interval is disabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is 20 seconds.</span>
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_keepalive_timeout</span>(<span class="self">self</span>, <span class="ident">http2_keepalive_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">http2_keepalive_timeout</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Set whether HTTP2 Ping frames are enabled on accepted connections.
+    ///
+    /// If `None` is specified, HTTP2 keepalive is disabled, otherwise the duration
+    /// specified will be the time interval between HTTP2 Ping frames.
+    /// The timeout for receiving an acknowledgement of the keepalive ping
+    /// can be set with [`Server::http2_keepalive_timeout`].
+    ///
+    /// Default is no HTTP2 keepalive (`None`)
+    ///
+    </span><span class="kw">pub fn </span>http2_keepalive_interval(<span class="self">self</span>, http2_keepalive_interval: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="self">Self </span>{
+        Server {
+            http2_keepalive_interval,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Set whether TCP keepalive messages are enabled on accepted connections.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `None` is specified, keepalive is disabled, otherwise the duration</span>
-    <span class="doccomment">/// specified will be the time to remain idle before sending TCP keepalive</span>
-    <span class="doccomment">/// probes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is no keepalive (`None`)</span>
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tcp_keepalive</span>(<span class="self">self</span>, <span class="ident">tcp_keepalive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">tcp_keepalive</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Sets a timeout for receiving an acknowledgement of the keepalive ping.
+    ///
+    /// If the ping is not acknowledged within the timeout, the connection will be closed.
+    /// Does nothing if http2_keep_alive_interval is disabled.
+    ///
+    /// Default is 20 seconds.
+    ///
+    </span><span class="kw">pub fn </span>http2_keepalive_timeout(<span class="self">self</span>, http2_keepalive_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="self">Self </span>{
+        Server {
+            http2_keepalive_timeout,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Set the value of `TCP_NODELAY` option for accepted connections. Enabled by default.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tcp_nodelay</span>(<span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">tcp_nodelay</span>: <span class="ident">enabled</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Set whether TCP keepalive messages are enabled on accepted connections.
+    ///
+    /// If `None` is specified, keepalive is disabled, otherwise the duration
+    /// specified will be the time to remain idle before sending TCP keepalive
+    /// probes.
+    ///
+    /// Default is no keepalive (`None`)
+    ///
+    </span><span class="kw">pub fn </span>tcp_keepalive(<span class="self">self</span>, tcp_keepalive: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="self">Self </span>{
+        Server {
+            tcp_keepalive,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Sets the maximum frame size to use for HTTP2.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Passing `None` will do nothing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If not set, will default from underlying transport.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_frame_size</span>(<span class="self">self</span>, <span class="ident">frame_size</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">max_frame_size</span>: <span class="ident">frame_size</span>.<span class="ident">into</span>(),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Set the value of `TCP_NODELAY` option for accepted connections. Enabled by default.
+    </span><span class="kw">pub fn </span>tcp_nodelay(<span class="self">self</span>, enabled: bool) -&gt; <span class="self">Self </span>{
+        Server {
+            tcp_nodelay: enabled,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Allow this server to accept http1 requests.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Accepting http1 requests is only useful when developing `grpc-web`</span>
-    <span class="doccomment">/// enabled services. If this setting is set to `true` but services are</span>
-    <span class="doccomment">/// not correctly configured to handle grpc-web requests, your server may</span>
-    <span class="doccomment">/// return confusing (but correct) protocol errors.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is `false`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept_http1</span>(<span class="self">self</span>, <span class="ident">accept_http1</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">accept_http1</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Sets the maximum frame size to use for HTTP2.
+    ///
+    /// Passing `None` will do nothing.
+    ///
+    /// If not set, will default from underlying transport.
+    </span><span class="kw">pub fn </span>max_frame_size(<span class="self">self</span>, frame_size: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;) -&gt; <span class="self">Self </span>{
+        Server {
+            max_frame_size: frame_size.into(),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Intercept inbound headers and add a [`tracing::Span`] to each response future.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trace_fn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">http::Request</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) -&gt; <span class="ident">tracing::Span</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Allow this server to accept http1 requests.
+    ///
+    /// Accepting http1 requests is only useful when developing `grpc-web`
+    /// enabled services. If this setting is set to `true` but services are
+    /// not correctly configured to handle grpc-web requests, your server may
+    /// return confusing (but correct) protocol errors.
+    ///
+    /// Default is `false`.
+    </span><span class="kw">pub fn </span>accept_http1(<span class="self">self</span>, accept_http1: bool) -&gt; <span class="self">Self </span>{
+        Server {
+            accept_http1,
+            ..<span class="self">self
+        </span>}
+    }
+
+    <span class="doccomment">/// Intercept inbound headers and add a [`tracing::Span`] to each response future.
+    </span><span class="kw">pub fn </span>trace_fn&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: Fn(<span class="kw-2">&amp;</span>http::Request&lt;()&gt;) -&gt; tracing::Span + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">Server</span> {
-            <span class="ident">trace_interceptor</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">f</span>)),
-            ..<span class="self">self</span>
-        }
+        Server {
+            trace_interceptor: <span class="prelude-val">Some</span>(Arc::new(f)),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Create a router with the `S` typed service as the first service.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will clone the `Server` builder and create a router that will</span>
-    <span class="doccomment">/// route around different services.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_service</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">svc</span>: <span class="ident">S</span>) -&gt; <span class="ident">Router</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Unimplemented</span>, <span class="ident">L</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span><span class="op">&gt;</span>
-            <span class="op">+</span> <span class="ident">NamedService</span>
-            <span class="op">+</span> <span class="ident">Clone</span>
-            <span class="op">+</span> <span class="ident">Send</span>
-            <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">S::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">L</span>: <span class="ident">Clone</span>,
+    <span class="doccomment">/// Create a router with the `S` typed service as the first service.
+    ///
+    /// This will clone the `Server` builder and create a router that will
+    /// route around different services.
+    </span><span class="kw">pub fn </span>add_service&lt;S&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, svc: S) -&gt; Router&lt;S, Unimplemented, L&gt;
+    <span class="kw">where
+        </span>S: Service&lt;Request&lt;Body&gt;, Response = Response&lt;BoxBody&gt;&gt;
+            + NamedService
+            + Clone
+            + Send
+            + <span class="lifetime">&#39;static</span>,
+        S::Future: Send + <span class="lifetime">&#39;static</span>,
+        S::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+        L: Clone,
     {
-        <span class="ident">Router::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">svc</span>)
+        Router::new(<span class="self">self</span>.clone(), svc)
     }
 
-    <span class="doccomment">/// Create a router with the optional `S` typed service as the first service.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will clone the `Server` builder and create a router that will</span>
-    <span class="doccomment">/// route around different services.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">/// Even when the argument given is `None` this will capture *all* requests to this service name.</span>
-    <span class="doccomment">/// As a result, one cannot use this to toggle between two identically named implementations.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_optional_service</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">svc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Router</span><span class="op">&lt;</span><span class="ident">Either</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Unimplemented</span><span class="op">&gt;</span>, <span class="ident">Unimplemented</span>, <span class="ident">L</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span><span class="op">&gt;</span>
-            <span class="op">+</span> <span class="ident">NamedService</span>
-            <span class="op">+</span> <span class="ident">Clone</span>
-            <span class="op">+</span> <span class="ident">Send</span>
-            <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">S::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">L</span>: <span class="ident">Clone</span>,
+    <span class="doccomment">/// Create a router with the optional `S` typed service as the first service.
+    ///
+    /// This will clone the `Server` builder and create a router that will
+    /// route around different services.
+    ///
+    /// # Note
+    /// Even when the argument given is `None` this will capture *all* requests to this service name.
+    /// As a result, one cannot use this to toggle between two identically named implementations.
+    </span><span class="kw">pub fn </span>add_optional_service&lt;S&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        svc: <span class="prelude-ty">Option</span>&lt;S&gt;,
+    ) -&gt; Router&lt;Either&lt;S, Unimplemented&gt;, Unimplemented, L&gt;
+    <span class="kw">where
+        </span>S: Service&lt;Request&lt;Body&gt;, Response = Response&lt;BoxBody&gt;&gt;
+            + NamedService
+            + Clone
+            + Send
+            + <span class="lifetime">&#39;static</span>,
+        S::Future: Send + <span class="lifetime">&#39;static</span>,
+        S::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+        L: Clone,
     {
-        <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">svc</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">some</span>) =&gt; <span class="ident">Either::A</span>(<span class="ident">some</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">Either::B</span>(<span class="ident">Unimplemented::default</span>()),
+        <span class="kw">let </span>svc = <span class="kw">match </span>svc {
+            <span class="prelude-val">Some</span>(some) =&gt; Either::A(some),
+            <span class="prelude-val">None </span>=&gt; Either::B(Unimplemented::default()),
         };
-        <span class="ident">Router::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">svc</span>)
+        Router::new(<span class="self">self</span>.clone(), svc)
     }
 
-    <span class="doccomment">/// Set the [Tower] [`Layer`] all services will be wrapped in.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This enables using middleware from the [Tower ecosystem][eco].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Server;</span>
-    <span class="doccomment">/// # use tower_service::Service;</span>
-    <span class="doccomment">/// use tower::timeout::TimeoutLayer;</span>
-    <span class="doccomment">/// use std::time::Duration;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # let mut builder = Server::builder();</span>
-    <span class="doccomment">/// builder.layer(TimeoutLayer::new(Duration::from_secs(30)));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that timeouts should be set using [`Server::timeout`]. `TimeoutLayer` is only used</span>
-    <span class="doccomment">/// here as an example.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You can build more complex layers using [`ServiceBuilder`]. Those layers can include</span>
-    <span class="doccomment">/// [interceptors]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Server;</span>
-    <span class="doccomment">/// # use tower_service::Service;</span>
-    <span class="doccomment">/// use tower::ServiceBuilder;</span>
-    <span class="doccomment">/// use std::time::Duration;</span>
-    <span class="doccomment">/// use tonic::{Request, Status, service::interceptor};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn auth_interceptor(request: Request&lt;()&gt;) -&gt; Result&lt;Request&lt;()&gt;, Status&gt; {</span>
-    <span class="doccomment">///     if valid_credentials(&amp;request) {</span>
-    <span class="doccomment">///         Ok(request)</span>
-    <span class="doccomment">///     } else {</span>
-    <span class="doccomment">///         Err(Status::unauthenticated(&quot;invalid credentials&quot;))</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn valid_credentials(request: &amp;Request&lt;()&gt;) -&gt; bool {</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">///     # true</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn some_other_interceptor(request: Request&lt;()&gt;) -&gt; Result&lt;Request&lt;()&gt;, Status&gt; {</span>
-    <span class="doccomment">///     Ok(request)</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let layer = ServiceBuilder::new()</span>
-    <span class="doccomment">///     .load_shed()</span>
-    <span class="doccomment">///     .timeout(Duration::from_secs(30))</span>
-    <span class="doccomment">///     .layer(interceptor(auth_interceptor))</span>
-    <span class="doccomment">///     .layer(interceptor(some_other_interceptor))</span>
-    <span class="doccomment">///     .into_inner();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Server::builder().layer(layer);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Tower]: https://github.com/tower-rs/tower</span>
-    <span class="doccomment">/// [`Layer`]: tower::layer::Layer</span>
-    <span class="doccomment">/// [eco]: https://github.com/tower-rs</span>
-    <span class="doccomment">/// [`ServiceBuilder`]: tower::ServiceBuilder</span>
-    <span class="doccomment">/// [interceptors]: crate::service::Interceptor</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">layer</span><span class="op">&lt;</span><span class="ident">NewLayer</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">new_layer</span>: <span class="ident">NewLayer</span>) -&gt; <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">NewLayer</span><span class="op">&gt;</span> {
-        <span class="ident">Server</span> {
-            <span class="ident">layer</span>: <span class="ident">new_layer</span>,
-            <span class="ident">trace_interceptor</span>: <span class="self">self</span>.<span class="ident">trace_interceptor</span>,
-            <span class="ident">concurrency_limit</span>: <span class="self">self</span>.<span class="ident">concurrency_limit</span>,
-            <span class="ident">timeout</span>: <span class="self">self</span>.<span class="ident">timeout</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-            <span class="ident">tls</span>: <span class="self">self</span>.<span class="ident">tls</span>,
-            <span class="ident">init_stream_window_size</span>: <span class="self">self</span>.<span class="ident">init_stream_window_size</span>,
-            <span class="ident">init_connection_window_size</span>: <span class="self">self</span>.<span class="ident">init_connection_window_size</span>,
-            <span class="ident">max_concurrent_streams</span>: <span class="self">self</span>.<span class="ident">max_concurrent_streams</span>,
-            <span class="ident">tcp_keepalive</span>: <span class="self">self</span>.<span class="ident">tcp_keepalive</span>,
-            <span class="ident">tcp_nodelay</span>: <span class="self">self</span>.<span class="ident">tcp_nodelay</span>,
-            <span class="ident">http2_keepalive_interval</span>: <span class="self">self</span>.<span class="ident">http2_keepalive_interval</span>,
-            <span class="ident">http2_keepalive_timeout</span>: <span class="self">self</span>.<span class="ident">http2_keepalive_timeout</span>,
-            <span class="ident">max_frame_size</span>: <span class="self">self</span>.<span class="ident">max_frame_size</span>,
-            <span class="ident">accept_http1</span>: <span class="self">self</span>.<span class="ident">accept_http1</span>,
+    <span class="doccomment">/// Set the [Tower] [`Layer`] all services will be wrapped in.
+    ///
+    /// This enables using middleware from the [Tower ecosystem][eco].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use tonic::transport::Server;
+    /// # use tower_service::Service;
+    /// use tower::timeout::TimeoutLayer;
+    /// use std::time::Duration;
+    ///
+    /// # let mut builder = Server::builder();
+    /// builder.layer(TimeoutLayer::new(Duration::from_secs(30)));
+    /// ```
+    ///
+    /// Note that timeouts should be set using [`Server::timeout`]. `TimeoutLayer` is only used
+    /// here as an example.
+    ///
+    /// You can build more complex layers using [`ServiceBuilder`]. Those layers can include
+    /// [interceptors]:
+    ///
+    /// ```
+    /// # use tonic::transport::Server;
+    /// # use tower_service::Service;
+    /// use tower::ServiceBuilder;
+    /// use std::time::Duration;
+    /// use tonic::{Request, Status, service::interceptor};
+    ///
+    /// fn auth_interceptor(request: Request&lt;()&gt;) -&gt; Result&lt;Request&lt;()&gt;, Status&gt; {
+    ///     if valid_credentials(&amp;request) {
+    ///         Ok(request)
+    ///     } else {
+    ///         Err(Status::unauthenticated(&quot;invalid credentials&quot;))
+    ///     }
+    /// }
+    ///
+    /// fn valid_credentials(request: &amp;Request&lt;()&gt;) -&gt; bool {
+    ///     // ...
+    ///     # true
+    /// }
+    ///
+    /// fn some_other_interceptor(request: Request&lt;()&gt;) -&gt; Result&lt;Request&lt;()&gt;, Status&gt; {
+    ///     Ok(request)
+    /// }
+    ///
+    /// let layer = ServiceBuilder::new()
+    ///     .load_shed()
+    ///     .timeout(Duration::from_secs(30))
+    ///     .layer(interceptor(auth_interceptor))
+    ///     .layer(interceptor(some_other_interceptor))
+    ///     .into_inner();
+    ///
+    /// Server::builder().layer(layer);
+    /// ```
+    ///
+    /// [Tower]: https://github.com/tower-rs/tower
+    /// [`Layer`]: tower::layer::Layer
+    /// [eco]: https://github.com/tower-rs
+    /// [`ServiceBuilder`]: tower::ServiceBuilder
+    /// [interceptors]: crate::service::Interceptor
+    </span><span class="kw">pub fn </span>layer&lt;NewLayer&gt;(<span class="self">self</span>, new_layer: NewLayer) -&gt; Server&lt;NewLayer&gt; {
+        Server {
+            layer: new_layer,
+            trace_interceptor: <span class="self">self</span>.trace_interceptor,
+            concurrency_limit: <span class="self">self</span>.concurrency_limit,
+            timeout: <span class="self">self</span>.timeout,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+            </span>tls: <span class="self">self</span>.tls,
+            init_stream_window_size: <span class="self">self</span>.init_stream_window_size,
+            init_connection_window_size: <span class="self">self</span>.init_connection_window_size,
+            max_concurrent_streams: <span class="self">self</span>.max_concurrent_streams,
+            tcp_keepalive: <span class="self">self</span>.tcp_keepalive,
+            tcp_nodelay: <span class="self">self</span>.tcp_nodelay,
+            http2_keepalive_interval: <span class="self">self</span>.http2_keepalive_interval,
+            http2_keepalive_timeout: <span class="self">self</span>.http2_keepalive_timeout,
+            max_frame_size: <span class="self">self</span>.max_frame_size,
+            accept_http1: <span class="self">self</span>.accept_http1,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">serve_with_shutdown</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span>, <span class="ident">F</span>, <span class="ident">IO</span>, <span class="ident">IE</span>, <span class="ident">ResBody</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>serve_with_shutdown&lt;S, I, F, IO, IE, ResBody&gt;(
         <span class="self">self</span>,
-        <span class="ident">svc</span>: <span class="ident">S</span>,
-        <span class="ident">incoming</span>: <span class="ident">I</span>,
-        <span class="ident">signal</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-        <span class="ident">L::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IO</span>, <span class="ident">IE</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Connected</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">IO::ConnectInfo</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">IE</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
-        <span class="ident">ResBody</span>: <span class="ident">http_body::Body</span><span class="op">&lt;</span><span class="ident">Data</span> <span class="op">=</span> <span class="ident">Bytes</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">ResBody::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+        svc: S,
+        incoming: I,
+        signal: <span class="prelude-ty">Option</span>&lt;F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw">super</span>::Error&gt;
+    <span class="kw">where
+        </span>L: Layer&lt;S&gt;,
+        L::Service: Service&lt;Request&lt;Body&gt;, Response = Response&lt;ResBody&gt;&gt; + Clone + Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;S&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Future: Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;S&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+        I: Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;IO, IE&gt;&gt;,
+        IO: AsyncRead + AsyncWrite + Connected + Unpin + Send + <span class="lifetime">&#39;static</span>,
+        IO::ConnectInfo: Clone + Send + Sync + <span class="lifetime">&#39;static</span>,
+        IE: Into&lt;<span class="kw">crate</span>::Error&gt;,
+        F: Future&lt;Output = ()&gt;,
+        ResBody: http_body::Body&lt;Data = Bytes&gt; + Send + <span class="lifetime">&#39;static</span>,
+        ResBody::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
     {
-        <span class="kw">let</span> <span class="ident">trace_interceptor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">trace_interceptor</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">concurrency_limit</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">concurrency_limit</span>;
-        <span class="kw">let</span> <span class="ident">init_connection_window_size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">init_connection_window_size</span>;
-        <span class="kw">let</span> <span class="ident">init_stream_window_size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">init_stream_window_size</span>;
-        <span class="kw">let</span> <span class="ident">max_concurrent_streams</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_concurrent_streams</span>;
-        <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timeout</span>;
-        <span class="kw">let</span> <span class="ident">max_frame_size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_frame_size</span>;
-        <span class="kw">let</span> <span class="ident">http2_only</span> <span class="op">=</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">accept_http1</span>;
+        <span class="kw">let </span>trace_interceptor = <span class="self">self</span>.trace_interceptor.clone();
+        <span class="kw">let </span>concurrency_limit = <span class="self">self</span>.concurrency_limit;
+        <span class="kw">let </span>init_connection_window_size = <span class="self">self</span>.init_connection_window_size;
+        <span class="kw">let </span>init_stream_window_size = <span class="self">self</span>.init_stream_window_size;
+        <span class="kw">let </span>max_concurrent_streams = <span class="self">self</span>.max_concurrent_streams;
+        <span class="kw">let </span>timeout = <span class="self">self</span>.timeout;
+        <span class="kw">let </span>max_frame_size = <span class="self">self</span>.max_frame_size;
+        <span class="kw">let </span>http2_only = !<span class="self">self</span>.accept_http1;
 
-        <span class="kw">let</span> <span class="ident">http2_keepalive_interval</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">http2_keepalive_interval</span>;
-        <span class="kw">let</span> <span class="ident">http2_keepalive_timeout</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">http2_keepalive_timeout</span>
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Duration::new</span>(<span class="ident">DEFAULT_HTTP2_KEEPALIVE_TIMEOUT_SECS</span>, <span class="number">0</span>));
+        <span class="kw">let </span>http2_keepalive_interval = <span class="self">self</span>.http2_keepalive_interval;
+        <span class="kw">let </span>http2_keepalive_timeout = <span class="self">self
+            </span>.http2_keepalive_timeout
+            .unwrap_or_else(|| Duration::new(DEFAULT_HTTP2_KEEPALIVE_TIMEOUT_SECS, <span class="number">0</span>));
 
-        <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">layer</span>(<span class="ident">svc</span>);
+        <span class="kw">let </span>svc = <span class="self">self</span>.layer.layer(svc);
 
-        <span class="kw">let</span> <span class="ident">tcp</span> <span class="op">=</span> <span class="ident">incoming::tcp_incoming</span>(<span class="ident">incoming</span>, <span class="self">self</span>);
-        <span class="kw">let</span> <span class="ident">incoming</span> <span class="op">=</span> <span class="ident">accept::from_stream</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>(<span class="ident">tcp</span>);
+        <span class="kw">let </span>tcp = incoming::tcp_incoming(incoming, <span class="self">self</span>);
+        <span class="kw">let </span>incoming = accept::from_stream::&lt;<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">crate</span>::Error&gt;(tcp);
 
-        <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="ident">MakeSvc</span> {
-            <span class="ident">inner</span>: <span class="ident">svc</span>,
-            <span class="ident">concurrency_limit</span>,
-            <span class="ident">timeout</span>,
-            <span class="ident">trace_interceptor</span>,
-            <span class="ident">_io</span>: <span class="ident">PhantomData</span>,
+        <span class="kw">let </span>svc = MakeSvc {
+            inner: svc,
+            concurrency_limit,
+            timeout,
+            trace_interceptor,
+            _io: PhantomData,
         };
 
-        <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">hyper::Server::builder</span>(<span class="ident">incoming</span>)
-            .<span class="ident">http2_only</span>(<span class="ident">http2_only</span>)
-            .<span class="ident">http2_initial_connection_window_size</span>(<span class="ident">init_connection_window_size</span>)
-            .<span class="ident">http2_initial_stream_window_size</span>(<span class="ident">init_stream_window_size</span>)
-            .<span class="ident">http2_max_concurrent_streams</span>(<span class="ident">max_concurrent_streams</span>)
-            .<span class="ident">http2_keep_alive_interval</span>(<span class="ident">http2_keepalive_interval</span>)
-            .<span class="ident">http2_keep_alive_timeout</span>(<span class="ident">http2_keepalive_timeout</span>)
-            .<span class="ident">http2_max_frame_size</span>(<span class="ident">max_frame_size</span>);
+        <span class="kw">let </span>server = hyper::Server::builder(incoming)
+            .http2_only(http2_only)
+            .http2_initial_connection_window_size(init_connection_window_size)
+            .http2_initial_stream_window_size(init_stream_window_size)
+            .http2_max_concurrent_streams(max_concurrent_streams)
+            .http2_keep_alive_interval(http2_keepalive_interval)
+            .http2_keep_alive_timeout(http2_keepalive_timeout)
+            .http2_max_frame_size(max_frame_size);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">signal</span>) <span class="op">=</span> <span class="ident">signal</span> {
-            <span class="ident">server</span>
-                .<span class="ident">serve</span>(<span class="ident">svc</span>)
-                .<span class="ident">with_graceful_shutdown</span>(<span class="ident">signal</span>)
-                .<span class="kw">await</span>
-                .<span class="ident">map_err</span>(<span class="ident"><span class="kw">super</span>::Error::from_source</span>)<span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">server</span>.<span class="ident">serve</span>(<span class="ident">svc</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident"><span class="kw">super</span>::Error::from_source</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(signal) = signal {
+            server
+                .serve(svc)
+                .with_graceful_shutdown(signal)
+                .<span class="kw">await
+                </span>.map_err(<span class="kw">super</span>::Error::from_source)<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            server.serve(svc).<span class="kw">await</span>.map_err(<span class="kw">super</span>::Error::from_source)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">Router</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Unimplemented</span>, <span class="ident">L</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">server</span>: <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>, <span class="ident">svc</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span><span class="op">&gt;</span>
-            <span class="op">+</span> <span class="ident">NamedService</span>
-            <span class="op">+</span> <span class="ident">Clone</span>
-            <span class="op">+</span> <span class="ident">Send</span>
-            <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">S::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+<span class="kw">impl</span>&lt;S, L&gt; Router&lt;S, Unimplemented, L&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(server: Server&lt;L&gt;, svc: S) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>S: Service&lt;Request&lt;Body&gt;, Response = Response&lt;BoxBody&gt;&gt;
+            + NamedService
+            + Clone
+            + Send
+            + <span class="lifetime">&#39;static</span>,
+        S::Future: Send + <span class="lifetime">&#39;static</span>,
+        S::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
     {
-        <span class="kw">let</span> <span class="ident">svc_name</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">NamedService</span><span class="op">&gt;</span><span class="ident">::NAME</span>;
-        <span class="kw">let</span> <span class="ident">svc_route</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, <span class="ident">svc_name</span>);
-        <span class="kw">let</span> <span class="ident">pred</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">path</span>();
+        <span class="kw">let </span>svc_name = &lt;S <span class="kw">as </span>NamedService&gt;::NAME;
+        <span class="kw">let </span>svc_route = <span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, svc_name);
+        <span class="kw">let </span>pred = <span class="kw">move </span>|req: <span class="kw-2">&amp;</span>Request&lt;Body&gt;| {
+            <span class="kw">let </span>path = req.uri().path();
 
-            <span class="ident">path</span>.<span class="ident">starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">svc_route</span>)
+            path.starts_with(<span class="kw-2">&amp;</span>svc_route)
         };
-        <span class="self">Self</span> {
-            <span class="ident">server</span>,
-            <span class="ident">routes</span>: <span class="ident">Routes::new</span>(<span class="ident">pred</span>, <span class="ident">svc</span>, <span class="ident">Unimplemented::default</span>()),
+        <span class="self">Self </span>{
+            server,
+            routes: Routes::new(pred, svc, Unimplemented::default()),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">Router</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">L</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">A::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">A::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-    <span class="ident">B</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">B::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+<span class="kw">impl</span>&lt;A, B, L&gt; Router&lt;A, B, L&gt;
+<span class="kw">where
+    </span>A: Service&lt;Request&lt;Body&gt;, Response = Response&lt;BoxBody&gt;&gt; + Clone + Send + <span class="lifetime">&#39;static</span>,
+    A::Future: Send + <span class="lifetime">&#39;static</span>,
+    A::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+    B: Service&lt;Request&lt;Body&gt;, Response = Response&lt;BoxBody&gt;&gt; + Clone + Send + <span class="lifetime">&#39;static</span>,
+    B::Future: Send + <span class="lifetime">&#39;static</span>,
+    B::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
 {
-    <span class="doccomment">/// Add a new service to this router.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_service</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">svc</span>: <span class="ident">S</span>) -&gt; <span class="ident">Router</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Or</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span><span class="op">&gt;</span>
-            <span class="op">+</span> <span class="ident">NamedService</span>
-            <span class="op">+</span> <span class="ident">Clone</span>
-            <span class="op">+</span> <span class="ident">Send</span>
-            <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">S::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+    <span class="doccomment">/// Add a new service to this router.
+    </span><span class="kw">pub fn </span>add_service&lt;S&gt;(<span class="self">self</span>, svc: S) -&gt; Router&lt;S, Or&lt;A, B, Request&lt;Body&gt;&gt;, L&gt;
+    <span class="kw">where
+        </span>S: Service&lt;Request&lt;Body&gt;, Response = Response&lt;BoxBody&gt;&gt;
+            + NamedService
+            + Clone
+            + Send
+            + <span class="lifetime">&#39;static</span>,
+        S::Future: Send + <span class="lifetime">&#39;static</span>,
+        S::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
     {
-        <span class="kw">let</span> <span class="self">Self</span> { <span class="ident">routes</span>, <span class="ident">server</span> } <span class="op">=</span> <span class="self">self</span>;
+        <span class="kw">let </span><span class="self">Self </span>{ routes, server } = <span class="self">self</span>;
 
-        <span class="kw">let</span> <span class="ident">svc_name</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">NamedService</span><span class="op">&gt;</span><span class="ident">::NAME</span>;
-        <span class="kw">let</span> <span class="ident">svc_route</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, <span class="ident">svc_name</span>);
-        <span class="kw">let</span> <span class="ident">pred</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">path</span>();
+        <span class="kw">let </span>svc_name = &lt;S <span class="kw">as </span>NamedService&gt;::NAME;
+        <span class="kw">let </span>svc_route = <span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, svc_name);
+        <span class="kw">let </span>pred = <span class="kw">move </span>|req: <span class="kw-2">&amp;</span>Request&lt;Body&gt;| {
+            <span class="kw">let </span>path = req.uri().path();
 
-            <span class="ident">path</span>.<span class="ident">starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">svc_route</span>)
+            path.starts_with(<span class="kw-2">&amp;</span>svc_route)
         };
-        <span class="kw">let</span> <span class="ident">routes</span> <span class="op">=</span> <span class="ident">routes</span>.<span class="ident">push</span>(<span class="ident">pred</span>, <span class="ident">svc</span>);
+        <span class="kw">let </span>routes = routes.push(pred, svc);
 
-        <span class="ident">Router</span> { <span class="ident">server</span>, <span class="ident">routes</span> }
+        Router { server, routes }
     }
 
-    <span class="doccomment">/// Add a new optional service to this router.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">/// Even when the argument given is `None` this will capture *all* requests to this service name.</span>
-    <span class="doccomment">/// As a result, one cannot use this to toggle between two identically named implementations.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_optional_service</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Add a new optional service to this router.
+    ///
+    /// # Note
+    /// Even when the argument given is `None` this will capture *all* requests to this service name.
+    /// As a result, one cannot use this to toggle between two identically named implementations.
+    </span><span class="attribute">#[allow(clippy::type_complexity)]
+    </span><span class="kw">pub fn </span>add_optional_service&lt;S&gt;(
         <span class="self">self</span>,
-        <span class="ident">svc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Router</span><span class="op">&lt;</span><span class="ident">Either</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Unimplemented</span><span class="op">&gt;</span>, <span class="ident">Or</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span><span class="op">&gt;</span>
-            <span class="op">+</span> <span class="ident">NamedService</span>
-            <span class="op">+</span> <span class="ident">Clone</span>
-            <span class="op">+</span> <span class="ident">Send</span>
-            <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">S::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+        svc: <span class="prelude-ty">Option</span>&lt;S&gt;,
+    ) -&gt; Router&lt;Either&lt;S, Unimplemented&gt;, Or&lt;A, B, Request&lt;Body&gt;&gt;, L&gt;
+    <span class="kw">where
+        </span>S: Service&lt;Request&lt;Body&gt;, Response = Response&lt;BoxBody&gt;&gt;
+            + NamedService
+            + Clone
+            + Send
+            + <span class="lifetime">&#39;static</span>,
+        S::Future: Send + <span class="lifetime">&#39;static</span>,
+        S::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
     {
-        <span class="kw">let</span> <span class="self">Self</span> { <span class="ident">routes</span>, <span class="ident">server</span> } <span class="op">=</span> <span class="self">self</span>;
+        <span class="kw">let </span><span class="self">Self </span>{ routes, server } = <span class="self">self</span>;
 
-        <span class="kw">let</span> <span class="ident">svc_name</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">NamedService</span><span class="op">&gt;</span><span class="ident">::NAME</span>;
-        <span class="kw">let</span> <span class="ident">svc_route</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, <span class="ident">svc_name</span>);
-        <span class="kw">let</span> <span class="ident">pred</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">path</span>();
+        <span class="kw">let </span>svc_name = &lt;S <span class="kw">as </span>NamedService&gt;::NAME;
+        <span class="kw">let </span>svc_route = <span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, svc_name);
+        <span class="kw">let </span>pred = <span class="kw">move </span>|req: <span class="kw-2">&amp;</span>Request&lt;Body&gt;| {
+            <span class="kw">let </span>path = req.uri().path();
 
-            <span class="ident">path</span>.<span class="ident">starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">svc_route</span>)
+            path.starts_with(<span class="kw-2">&amp;</span>svc_route)
         };
-        <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">svc</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">some</span>) =&gt; <span class="ident">Either::A</span>(<span class="ident">some</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">Either::B</span>(<span class="ident">Unimplemented::default</span>()),
+        <span class="kw">let </span>svc = <span class="kw">match </span>svc {
+            <span class="prelude-val">Some</span>(some) =&gt; Either::A(some),
+            <span class="prelude-val">None </span>=&gt; Either::B(Unimplemented::default()),
         };
-        <span class="kw">let</span> <span class="ident">routes</span> <span class="op">=</span> <span class="ident">routes</span>.<span class="ident">push</span>(<span class="ident">pred</span>, <span class="ident">svc</span>);
+        <span class="kw">let </span>routes = routes.push(pred, svc);
 
-        <span class="ident">Router</span> { <span class="ident">server</span>, <span class="ident">routes</span> }
+        Router { server, routes }
     }
 
-    <span class="doccomment">/// Consume this [`Server`] creating a future that will execute the server</span>
-    <span class="doccomment">/// on [tokio]&#39;s default executor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Server`]: struct.Server.html</span>
-    <span class="doccomment">/// [tokio]: https://docs.rs/tokio</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">serve</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">L::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Future</span>:
-            <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>:
-            <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">ResBody</span>: <span class="ident">http_body::Body</span><span class="op">&lt;</span><span class="ident">Data</span> <span class="op">=</span> <span class="ident">Bytes</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">ResBody::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Consume this [`Server`] creating a future that will execute the server
+    /// on [tokio]&#39;s default executor.
+    ///
+    /// [`Server`]: struct.Server.html
+    /// [tokio]: https://docs.rs/tokio
+    </span><span class="kw">pub async fn </span>serve&lt;ResBody&gt;(<span class="self">self</span>, addr: SocketAddr) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw">super</span>::Error&gt;
+    <span class="kw">where
+        </span>L: Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;,
+        L::Service: Service&lt;Request&lt;Body&gt;, Response = Response&lt;ResBody&gt;&gt; + Clone + Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Future:
+            Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Error:
+            Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+        ResBody: http_body::Body&lt;Data = Bytes&gt; + Send + <span class="lifetime">&#39;static</span>,
+        ResBody::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
     {
-        <span class="kw">let</span> <span class="ident">incoming</span> <span class="op">=</span> <span class="ident">TcpIncoming::new</span>(<span class="ident">addr</span>, <span class="self">self</span>.<span class="ident">server</span>.<span class="ident">tcp_nodelay</span>, <span class="self">self</span>.<span class="ident">server</span>.<span class="ident">tcp_keepalive</span>)
-            .<span class="ident">map_err</span>(<span class="ident"><span class="kw">super</span>::Error::from_source</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">server</span>
-            .<span class="ident">serve_with_shutdown</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">future::Ready</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">ResBody</span><span class="op">&gt;</span>(
-                <span class="self">self</span>.<span class="ident">routes</span>,
-                <span class="ident">incoming</span>,
+        <span class="kw">let </span>incoming = TcpIncoming::new(addr, <span class="self">self</span>.server.tcp_nodelay, <span class="self">self</span>.server.tcp_keepalive)
+            .map_err(<span class="kw">super</span>::Error::from_source)<span class="question-mark">?</span>;
+        <span class="self">self</span>.server
+            .serve_with_shutdown::&lt;<span class="kw">_</span>, <span class="kw">_</span>, future::Ready&lt;()&gt;, <span class="kw">_</span>, <span class="kw">_</span>, ResBody&gt;(
+                <span class="self">self</span>.routes,
+                incoming,
                 <span class="prelude-val">None</span>,
             )
-            .<span class="kw">await</span>
-    }
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Consume this [`Server`] creating a future that will execute the server</span>
-    <span class="doccomment">/// on [tokio]&#39;s default executor. And shutdown when the provided signal</span>
-    <span class="doccomment">/// is received.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Server`]: struct.Server.html</span>
-    <span class="doccomment">/// [tokio]: https://docs.rs/tokio</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">serve_with_shutdown</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span>, <span class="ident">ResBody</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Consume this [`Server`] creating a future that will execute the server
+    /// on [tokio]&#39;s default executor. And shutdown when the provided signal
+    /// is received.
+    ///
+    /// [`Server`]: struct.Server.html
+    /// [tokio]: https://docs.rs/tokio
+    </span><span class="kw">pub async fn </span>serve_with_shutdown&lt;F: Future&lt;Output = ()&gt;, ResBody&gt;(
         <span class="self">self</span>,
-        <span class="ident">addr</span>: <span class="ident">SocketAddr</span>,
-        <span class="ident">signal</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">L::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Future</span>:
-            <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>:
-            <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">ResBody</span>: <span class="ident">http_body::Body</span><span class="op">&lt;</span><span class="ident">Data</span> <span class="op">=</span> <span class="ident">Bytes</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">ResBody::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+        addr: SocketAddr,
+        signal: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw">super</span>::Error&gt;
+    <span class="kw">where
+        </span>L: Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;,
+        L::Service: Service&lt;Request&lt;Body&gt;, Response = Response&lt;ResBody&gt;&gt; + Clone + Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Future:
+            Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Error:
+            Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+        ResBody: http_body::Body&lt;Data = Bytes&gt; + Send + <span class="lifetime">&#39;static</span>,
+        ResBody::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
     {
-        <span class="kw">let</span> <span class="ident">incoming</span> <span class="op">=</span> <span class="ident">TcpIncoming::new</span>(<span class="ident">addr</span>, <span class="self">self</span>.<span class="ident">server</span>.<span class="ident">tcp_nodelay</span>, <span class="self">self</span>.<span class="ident">server</span>.<span class="ident">tcp_keepalive</span>)
-            .<span class="ident">map_err</span>(<span class="ident"><span class="kw">super</span>::Error::from_source</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">server</span>
-            .<span class="ident">serve_with_shutdown</span>(<span class="self">self</span>.<span class="ident">routes</span>, <span class="ident">incoming</span>, <span class="prelude-val">Some</span>(<span class="ident">signal</span>))
-            .<span class="kw">await</span>
-    }
+        <span class="kw">let </span>incoming = TcpIncoming::new(addr, <span class="self">self</span>.server.tcp_nodelay, <span class="self">self</span>.server.tcp_keepalive)
+            .map_err(<span class="kw">super</span>::Error::from_source)<span class="question-mark">?</span>;
+        <span class="self">self</span>.server
+            .serve_with_shutdown(<span class="self">self</span>.routes, incoming, <span class="prelude-val">Some</span>(signal))
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Consume this [`Server`] creating a future that will execute the server on</span>
-    <span class="doccomment">/// the provided incoming stream of `AsyncRead + AsyncWrite`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Server`]: struct.Server.html</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">serve_with_incoming</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">IO</span>, <span class="ident">IE</span>, <span class="ident">ResBody</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Consume this [`Server`] creating a future that will execute the server on
+    /// the provided incoming stream of `AsyncRead + AsyncWrite`.
+    ///
+    /// [`Server`]: struct.Server.html
+    </span><span class="kw">pub async fn </span>serve_with_incoming&lt;I, IO, IE, ResBody&gt;(
         <span class="self">self</span>,
-        <span class="ident">incoming</span>: <span class="ident">I</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IO</span>, <span class="ident">IE</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Connected</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">IO::ConnectInfo</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">IE</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">L::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Future</span>:
-            <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>:
-            <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">ResBody</span>: <span class="ident">http_body::Body</span><span class="op">&lt;</span><span class="ident">Data</span> <span class="op">=</span> <span class="ident">Bytes</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">ResBody::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+        incoming: I,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw">super</span>::Error&gt;
+    <span class="kw">where
+        </span>I: Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;IO, IE&gt;&gt;,
+        IO: AsyncRead + AsyncWrite + Connected + Unpin + Send + <span class="lifetime">&#39;static</span>,
+        IO::ConnectInfo: Clone + Send + Sync + <span class="lifetime">&#39;static</span>,
+        IE: Into&lt;<span class="kw">crate</span>::Error&gt;,
+        L: Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;,
+        L::Service: Service&lt;Request&lt;Body&gt;, Response = Response&lt;ResBody&gt;&gt; + Clone + Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Future:
+            Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Error:
+            Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+        ResBody: http_body::Body&lt;Data = Bytes&gt; + Send + <span class="lifetime">&#39;static</span>,
+        ResBody::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
     {
-        <span class="self">self</span>.<span class="ident">server</span>
-            .<span class="ident">serve_with_shutdown</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">future::Ready</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">ResBody</span><span class="op">&gt;</span>(
-                <span class="self">self</span>.<span class="ident">routes</span>,
-                <span class="ident">incoming</span>,
+        <span class="self">self</span>.server
+            .serve_with_shutdown::&lt;<span class="kw">_</span>, <span class="kw">_</span>, future::Ready&lt;()&gt;, <span class="kw">_</span>, <span class="kw">_</span>, ResBody&gt;(
+                <span class="self">self</span>.routes,
+                incoming,
                 <span class="prelude-val">None</span>,
             )
-            .<span class="kw">await</span>
-    }
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Consume this [`Server`] creating a future that will execute the server on</span>
-    <span class="doccomment">/// the provided incoming stream of `AsyncRead + AsyncWrite`. Similar to</span>
-    <span class="doccomment">/// `serve_with_shutdown` this method will also take a signal future to</span>
-    <span class="doccomment">/// gracefully shutdown the server.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Server`]: struct.Server.html</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">serve_with_incoming_shutdown</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">IO</span>, <span class="ident">IE</span>, <span class="ident">F</span>, <span class="ident">ResBody</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Consume this [`Server`] creating a future that will execute the server on
+    /// the provided incoming stream of `AsyncRead + AsyncWrite`. Similar to
+    /// `serve_with_shutdown` this method will also take a signal future to
+    /// gracefully shutdown the server.
+    ///
+    /// [`Server`]: struct.Server.html
+    </span><span class="kw">pub async fn </span>serve_with_incoming_shutdown&lt;I, IO, IE, F, ResBody&gt;(
         <span class="self">self</span>,
-        <span class="ident">incoming</span>: <span class="ident">I</span>,
-        <span class="ident">signal</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">super</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IO</span>, <span class="ident">IE</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Connected</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">IO::ConnectInfo</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">IE</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">L::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Future</span>:
-            <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>:
-            <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">ResBody</span>: <span class="ident">http_body::Body</span><span class="op">&lt;</span><span class="ident">Data</span> <span class="op">=</span> <span class="ident">Bytes</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">ResBody::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+        incoming: I,
+        signal: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw">super</span>::Error&gt;
+    <span class="kw">where
+        </span>I: Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;IO, IE&gt;&gt;,
+        IO: AsyncRead + AsyncWrite + Connected + Unpin + Send + <span class="lifetime">&#39;static</span>,
+        IO::ConnectInfo: Clone + Send + Sync + <span class="lifetime">&#39;static</span>,
+        IE: Into&lt;<span class="kw">crate</span>::Error&gt;,
+        F: Future&lt;Output = ()&gt;,
+        L: Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;,
+        L::Service: Service&lt;Request&lt;Body&gt;, Response = Response&lt;ResBody&gt;&gt; + Clone + Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Future:
+            Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Error:
+            Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+        ResBody: http_body::Body&lt;Data = Bytes&gt; + Send + <span class="lifetime">&#39;static</span>,
+        ResBody::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
     {
-        <span class="self">self</span>.<span class="ident">server</span>
-            .<span class="ident">serve_with_shutdown</span>(<span class="self">self</span>.<span class="ident">routes</span>, <span class="ident">incoming</span>, <span class="prelude-val">Some</span>(<span class="ident">signal</span>))
-            .<span class="kw">await</span>
-    }
+        <span class="self">self</span>.server
+            .serve_with_shutdown(<span class="self">self</span>.routes, incoming, <span class="prelude-val">Some</span>(signal))
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Create a tower service out of a router.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_service</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">RouterService</span><span class="op">&lt;</span><span class="ident">L::Service</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">L::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Future</span>:
-            <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">Routes</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>:
-            <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">ResBody</span>: <span class="ident">http_body::Body</span><span class="op">&lt;</span><span class="ident">Data</span> <span class="op">=</span> <span class="ident">Bytes</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">ResBody::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Create a tower service out of a router.
+    </span><span class="kw">pub fn </span>into_service&lt;ResBody&gt;(<span class="self">self</span>) -&gt; RouterService&lt;L::Service&gt;
+    <span class="kw">where
+        </span>L: Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;,
+        L::Service: Service&lt;Request&lt;Body&gt;, Response = Response&lt;ResBody&gt;&gt; + Clone + Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Future:
+            Send + <span class="lifetime">&#39;static</span>,
+        &lt;&lt;L <span class="kw">as </span>Layer&lt;Routes&lt;A, B, Request&lt;Body&gt;&gt;&gt;&gt;::Service <span class="kw">as </span>Service&lt;Request&lt;Body&gt;&gt;&gt;::Error:
+            Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+        ResBody: http_body::Body&lt;Data = Bytes&gt; + Send + <span class="lifetime">&#39;static</span>,
+        ResBody::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
     {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">server</span>.<span class="ident">layer</span>.<span class="ident">layer</span>(<span class="self">self</span>.<span class="ident">routes</span>);
-        <span class="ident">RouterService</span> { <span class="ident">inner</span> }
+        <span class="kw">let </span>inner = <span class="self">self</span>.server.layer.layer(<span class="self">self</span>.routes);
+        RouterService { inner }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Builder&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;L&gt; fmt::Debug <span class="kw">for </span>Server&lt;L&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Builder&quot;</span>).finish()
     }
 }
 
-<span class="kw">struct</span> <span class="ident">Svc</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">S</span>,
-    <span class="ident">trace_interceptor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TraceInterceptor</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Svc&lt;S&gt; {
+    inner: S,
+    trace_interceptor: <span class="prelude-ty">Option</span>&lt;TraceInterceptor&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">ResBody</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Svc</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
-    <span class="ident">ResBody</span>: <span class="ident">http_body::Body</span><span class="op">&lt;</span><span class="ident">Data</span> <span class="op">=</span> <span class="ident">Bytes</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">ResBody::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, ResBody&gt; Service&lt;Request&lt;Body&gt;&gt; <span class="kw">for </span>Svc&lt;S&gt;
+<span class="kw">where
+    </span>S: Service&lt;Request&lt;Body&gt;, Response = Response&lt;ResBody&gt;&gt;,
+    S::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
+    ResBody: http_body::Body&lt;Data = Bytes&gt; + Send + <span class="lifetime">&#39;static</span>,
+    ResBody::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxHttpBody</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">SvcFuture</span><span class="op">&lt;</span><span class="ident">S::Future</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Response = Response&lt;BoxHttpBody&gt;;
+    <span class="kw">type </span>Error = <span class="kw">crate</span>::Error;
+    <span class="kw">type </span>Future = SvcFuture&lt;S::Future&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.inner.poll_ready(cx).map_err(Into::into)
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">trace_interceptor</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">trace_interceptor</span> {
-            <span class="kw">let</span> (<span class="ident">parts</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">into_parts</span>();
-            <span class="kw">let</span> <span class="ident">bodyless_request</span> <span class="op">=</span> <span class="ident">Request::from_parts</span>(<span class="ident">parts</span>, ());
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>req: Request&lt;Body&gt;) -&gt; <span class="self">Self</span>::Future {
+        <span class="kw">let </span>span = <span class="kw">if let </span><span class="prelude-val">Some</span>(trace_interceptor) = <span class="kw-2">&amp;</span><span class="self">self</span>.trace_interceptor {
+            <span class="kw">let </span>(parts, body) = req.into_parts();
+            <span class="kw">let </span>bodyless_request = Request::from_parts(parts, ());
 
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">trace_interceptor</span>(<span class="kw-2">&amp;</span><span class="ident">bodyless_request</span>);
+            <span class="kw">let </span>span = trace_interceptor(<span class="kw-2">&amp;</span>bodyless_request);
 
-            <span class="kw">let</span> (<span class="ident">parts</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">bodyless_request</span>.<span class="ident">into_parts</span>();
-            <span class="ident">req</span> <span class="op">=</span> <span class="ident">Request::from_parts</span>(<span class="ident">parts</span>, <span class="ident">body</span>);
+            <span class="kw">let </span>(parts, <span class="kw">_</span>) = bodyless_request.into_parts();
+            req = Request::from_parts(parts, body);
 
-            <span class="ident">span</span>
-        } <span class="kw">else</span> {
-            <span class="ident">tracing::Span::none</span>()
+            span
+        } <span class="kw">else </span>{
+            tracing::Span::none()
         };
 
-        <span class="ident">SvcFuture</span> {
-            <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">call</span>(<span class="ident">req</span>),
-            <span class="ident">span</span>,
+        SvcFuture {
+            inner: <span class="self">self</span>.inner.call(req),
+            span,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">pin_project</span>]</span>
-<span class="kw">struct</span> <span class="ident">SvcFuture</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">pin</span>]</span>
-    <span class="ident">inner</span>: <span class="ident">F</span>,
-    <span class="ident">span</span>: <span class="ident">tracing::Span</span>,
+<span class="attribute">#[pin_project]
+</span><span class="kw">struct </span>SvcFuture&lt;F&gt; {
+    <span class="attribute">#[pin]
+    </span>inner: F,
+    span: tracing::Span,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span>, <span class="ident">ResBody</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">SvcFuture</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
-    <span class="ident">ResBody</span>: <span class="ident">http_body::Body</span><span class="op">&lt;</span><span class="ident">Data</span> <span class="op">=</span> <span class="ident">Bytes</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">ResBody::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;F, E, ResBody&gt; Future <span class="kw">for </span>SvcFuture&lt;F&gt;
+<span class="kw">where
+    </span>F: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Response&lt;ResBody&gt;, E&gt;&gt;,
+    E: Into&lt;<span class="kw">crate</span>::Error&gt;,
+    ResBody: http_body::Body&lt;Data = Bytes&gt; + Send + <span class="lifetime">&#39;static</span>,
+    ResBody::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxHttpBody</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;Response&lt;BoxHttpBody&gt;, <span class="kw">crate</span>::Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">span</span>.<span class="ident">enter</span>();
+    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span>_guard = this.span.enter();
 
-        <span class="kw">let</span> <span class="ident">response</span>: <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">inner</span>.<span class="ident">poll</span>(<span class="ident">cx</span>)).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> <span class="ident">body</span>.<span class="ident">map_err</span>(<span class="ident">Into::into</span>).<span class="ident">boxed_unsync</span>());
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">response</span>))
+        <span class="kw">let </span>response: Response&lt;ResBody&gt; = <span class="macro">ready!</span>(this.inner.poll(cx)).map_err(Into::into)<span class="question-mark">?</span>;
+        <span class="kw">let </span>response = response.map(|body| body.map_err(Into::into).boxed_unsync());
+        Poll::Ready(<span class="prelude-val">Ok</span>(response))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Svc</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Svc&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;S&gt; fmt::Debug <span class="kw">for </span>Svc&lt;S&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Svc&quot;</span>).finish()
     }
 }
 
-<span class="kw">struct</span> <span class="ident">MakeSvc</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">IO</span><span class="op">&gt;</span> {
-    <span class="ident">concurrency_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">inner</span>: <span class="ident">S</span>,
-    <span class="ident">trace_interceptor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TraceInterceptor</span><span class="op">&gt;</span>,
-    <span class="ident">_io</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>() -&gt; <span class="ident">IO</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>MakeSvc&lt;S, IO&gt; {
+    concurrency_limit: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    inner: S,
+    trace_interceptor: <span class="prelude-ty">Option</span>&lt;TraceInterceptor&gt;,
+    _io: PhantomData&lt;<span class="kw">fn</span>() -&gt; IO&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">ResBody</span>, <span class="ident">IO</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerIo</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MakeSvc</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">IO</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">IO</span>: <span class="ident">Connected</span>,
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">ResBody</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-    <span class="ident">ResBody</span>: <span class="ident">http_body::Body</span><span class="op">&lt;</span><span class="ident">Data</span> <span class="op">=</span> <span class="ident">Bytes</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">ResBody::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, ResBody, IO&gt; Service&lt;<span class="kw-2">&amp;</span>ServerIo&lt;IO&gt;&gt; <span class="kw">for </span>MakeSvc&lt;S, IO&gt;
+<span class="kw">where
+    </span>IO: Connected,
+    S: Service&lt;Request&lt;Body&gt;, Response = Response&lt;ResBody&gt;&gt; + Clone + Send + <span class="lifetime">&#39;static</span>,
+    S::Future: Send + <span class="lifetime">&#39;static</span>,
+    S::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+    ResBody: http_body::Body&lt;Data = Bytes&gt; + Send + <span class="lifetime">&#39;static</span>,
+    ResBody::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">BoxService</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">future::Ready</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Response</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Response = BoxService;
+    <span class="kw">type </span>Error = <span class="kw">crate</span>::Error;
+    <span class="kw">type </span>Future = future::Ready&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Response, <span class="self">Self</span>::Error&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(()).<span class="ident">into</span>()
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="prelude-val">Ok</span>(()).into()
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">ServerIo</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="kw">let</span> <span class="ident">conn_info</span> <span class="op">=</span> <span class="ident">io</span>.<span class="ident">connect_info</span>();
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, io: <span class="kw-2">&amp;</span>ServerIo&lt;IO&gt;) -&gt; <span class="self">Self</span>::Future {
+        <span class="kw">let </span>conn_info = io.connect_info();
 
-        <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">concurrency_limit</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">concurrency_limit</span>;
-        <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timeout</span>;
-        <span class="kw">let</span> <span class="ident">trace_interceptor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">trace_interceptor</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>svc = <span class="self">self</span>.inner.clone();
+        <span class="kw">let </span>concurrency_limit = <span class="self">self</span>.concurrency_limit;
+        <span class="kw">let </span>timeout = <span class="self">self</span>.timeout;
+        <span class="kw">let </span>trace_interceptor = <span class="self">self</span>.trace_interceptor.clone();
 
-        <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="ident">ServiceBuilder::new</span>()
-            .<span class="ident">layer_fn</span>(<span class="ident">RecoverError::new</span>)
-            .<span class="ident">option_layer</span>(<span class="ident">concurrency_limit</span>.<span class="ident">map</span>(<span class="ident">ConcurrencyLimitLayer::new</span>))
-            .<span class="ident">layer_fn</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">GrpcTimeout::new</span>(<span class="ident">s</span>, <span class="ident">timeout</span>))
-            .<span class="ident">service</span>(<span class="ident">svc</span>);
+        <span class="kw">let </span>svc = ServiceBuilder::new()
+            .layer_fn(RecoverError::new)
+            .option_layer(concurrency_limit.map(ConcurrencyLimitLayer::new))
+            .layer_fn(|s| GrpcTimeout::new(s, timeout))
+            .service(svc);
 
-        <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="ident">ServiceBuilder::new</span>()
-            .<span class="ident">layer</span>(<span class="ident">BoxService::layer</span>())
-            .<span class="ident">map_request</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">request</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">|</span> {
-                <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">conn_info</span> {
-                    <span class="ident">tower::util::Either::A</span>(<span class="ident">inner</span>) =&gt; {
-                        <span class="ident">request</span>.<span class="ident">extensions_mut</span>().<span class="ident">insert</span>(<span class="ident">inner</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>svc = ServiceBuilder::new()
+            .layer(BoxService::layer())
+            .map_request(<span class="kw">move </span>|<span class="kw-2">mut </span>request: Request&lt;Body&gt;| {
+                <span class="kw">match </span><span class="kw-2">&amp;</span>conn_info {
+                    tower::util::Either::A(inner) =&gt; {
+                        request.extensions_mut().insert(inner.clone());
                     }
-                    <span class="ident">tower::util::Either::B</span>(<span class="ident">inner</span>) =&gt; {
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-                        {
-                            <span class="ident">request</span>.<span class="ident">extensions_mut</span>().<span class="ident">insert</span>(<span class="ident">inner</span>.<span class="ident">clone</span>());
-                            <span class="ident">request</span>.<span class="ident">extensions_mut</span>().<span class="ident">insert</span>(<span class="ident">inner</span>.<span class="ident">get_ref</span>().<span class="ident">clone</span>());
+                    tower::util::Either::B(inner) =&gt; {
+                        <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+                        </span>{
+                            request.extensions_mut().insert(inner.clone());
+                            request.extensions_mut().insert(inner.get_ref().clone());
                         }
 
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>))]</span>
-                        {
-                            <span class="comment">// just a type check to make sure we didn&#39;t forget to</span>
-                            <span class="comment">// insert this into the extensions</span>
-                            <span class="kw">let</span> <span class="kw">_</span>: <span class="kw-2">&amp;</span>() <span class="op">=</span> <span class="ident">inner</span>;
+                        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;tls&quot;</span>))]
+                        </span>{
+                            <span class="comment">// just a type check to make sure we didn&#39;t forget to
+                            // insert this into the extensions
+                            </span><span class="kw">let _</span>: <span class="kw-2">&amp;</span>() = inner;
                         }
                     }
                 }
 
-                <span class="ident">request</span>
+                request
             })
-            .<span class="ident">service</span>(<span class="ident">Svc</span> {
-                <span class="ident">inner</span>: <span class="ident">svc</span>,
-                <span class="ident">trace_interceptor</span>,
+            .service(Svc {
+                inner: svc,
+                trace_interceptor,
             });
 
-        <span class="ident">future::ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">svc</span>))
+        future::ready(<span class="prelude-val">Ok</span>(svc))
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Unimplemented</span> {
-    <span class="ident">_p</span>: (),
+<span class="attribute">#[derive(Default, Clone, Debug)]
+#[doc(hidden)]
+</span><span class="kw">pub struct </span>Unimplemented {
+    _p: (),
 }
 
-<span class="kw">impl</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Unimplemented</span> {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">future::Ready</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Response</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>Service&lt;Request&lt;Body&gt;&gt; <span class="kw">for </span>Unimplemented {
+    <span class="kw">type </span>Response = Response&lt;BoxBody&gt;;
+    <span class="kw">type </span>Error = <span class="kw">crate</span>::Error;
+    <span class="kw">type </span>Future = future::Ready&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Response, <span class="self">Self</span>::Error&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(()).<span class="ident">into</span>()
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="prelude-val">Ok</span>(()).into()
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="ident">future::ok</span>(
-            <span class="ident">http::Response::builder</span>()
-                .<span class="ident">status</span>(<span class="number">200</span>)
-                .<span class="ident">header</span>(<span class="string">&quot;grpc-status&quot;</span>, <span class="string">&quot;12&quot;</span>)
-                .<span class="ident">header</span>(<span class="string">&quot;content-type&quot;</span>, <span class="string">&quot;application/grpc&quot;</span>)
-                .<span class="ident">body</span>(<span class="ident"><span class="kw">crate</span>::body::empty_body</span>())
-                .<span class="ident">unwrap</span>(),
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _req: Request&lt;Body&gt;) -&gt; <span class="self">Self</span>::Future {
+        future::ok(
+            http::Response::builder()
+                .status(<span class="number">200</span>)
+                .header(<span class="string">&quot;grpc-status&quot;</span>, <span class="string">&quot;12&quot;</span>)
+                .header(<span class="string">&quot;content-type&quot;</span>, <span class="string">&quot;application/grpc&quot;</span>)
+                .body(<span class="kw">crate</span>::body::empty_body())
+                .unwrap(),
         )
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

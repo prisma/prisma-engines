@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-backend-0.2.83/src/ast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wasm_bindgen_backend/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wasm_bindgen_backend/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wasm_bindgen_backend/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-backend-0.2.83/src/ast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wasm_bindgen_backend/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wasm_bindgen_backend/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wasm_bindgen_backend/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -451,458 +451,458 @@
 <span id="451">451</span>
 <span id="452">452</span>
 <span id="453">453</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A representation of the Abstract Syntax Tree of a Rust program,</span>
-<span class="doccomment">//! with all the added metadata necessary to generate WASM bindings</span>
-<span class="doccomment">//! for it.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A representation of the Abstract Syntax Tree of a Rust program,
+//! with all the added metadata necessary to generate WASM bindings
+//! for it.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Diagnostic</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">Span</span>};
-<span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>};
-<span class="kw">use</span> <span class="ident">wasm_bindgen_shared</span> <span class="kw">as</span> <span class="ident">shared</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::Diagnostic;
+<span class="kw">use </span>proc_macro2::{Ident, Span};
+<span class="kw">use </span>std::hash::{Hash, Hasher};
+<span class="kw">use </span>wasm_bindgen_shared <span class="kw">as </span>shared;
 
-<span class="doccomment">/// An abstract syntax tree representing a rust program. Contains</span>
-<span class="doccomment">/// extra information for joining up this rust code with javascript.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Program</span> {
-    <span class="doccomment">/// rust -&gt; js interfaces</span>
-    <span class="kw">pub</span> <span class="ident">exports</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Export</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// js -&gt; rust interfaces</span>
-    <span class="kw">pub</span> <span class="ident">imports</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Import</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// rust enums</span>
-    <span class="kw">pub</span> <span class="ident">enums</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Enum</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// rust structs</span>
-    <span class="kw">pub</span> <span class="ident">structs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Struct</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// custom typescript sections to be included in the definition file</span>
-    <span class="kw">pub</span> <span class="ident">typescript_custom_sections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Inline JS snippets</span>
-    <span class="kw">pub</span> <span class="ident">inline_js</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An abstract syntax tree representing a rust program. Contains
+/// extra information for joining up this rust code with javascript.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug))]
+#[derive(Default, Clone)]
+</span><span class="kw">pub struct </span>Program {
+    <span class="doccomment">/// rust -&gt; js interfaces
+    </span><span class="kw">pub </span>exports: Vec&lt;Export&gt;,
+    <span class="doccomment">/// js -&gt; rust interfaces
+    </span><span class="kw">pub </span>imports: Vec&lt;Import&gt;,
+    <span class="doccomment">/// rust enums
+    </span><span class="kw">pub </span>enums: Vec&lt;Enum&gt;,
+    <span class="doccomment">/// rust structs
+    </span><span class="kw">pub </span>structs: Vec&lt;Struct&gt;,
+    <span class="doccomment">/// custom typescript sections to be included in the definition file
+    </span><span class="kw">pub </span>typescript_custom_sections: Vec&lt;String&gt;,
+    <span class="doccomment">/// Inline JS snippets
+    </span><span class="kw">pub </span>inline_js: Vec&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Program</span> {
-    <span class="doccomment">/// Returns true if the Program is empty</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">exports</span>.<span class="ident">is_empty</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">imports</span>.<span class="ident">is_empty</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">enums</span>.<span class="ident">is_empty</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">structs</span>.<span class="ident">is_empty</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">typescript_custom_sections</span>.<span class="ident">is_empty</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">inline_js</span>.<span class="ident">is_empty</span>()
+<span class="kw">impl </span>Program {
+    <span class="doccomment">/// Returns true if the Program is empty
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.exports.is_empty()
+            &amp;&amp; <span class="self">self</span>.imports.is_empty()
+            &amp;&amp; <span class="self">self</span>.enums.is_empty()
+            &amp;&amp; <span class="self">self</span>.structs.is_empty()
+            &amp;&amp; <span class="self">self</span>.typescript_custom_sections.is_empty()
+            &amp;&amp; <span class="self">self</span>.inline_js.is_empty()
     }
 }
 
-<span class="doccomment">/// A rust to js interface. Allows interaction with rust objects/functions</span>
-<span class="doccomment">/// from javascript.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Export</span> {
-    <span class="doccomment">/// Comments extracted from the rust source.</span>
-    <span class="kw">pub</span> <span class="ident">comments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The rust function</span>
-    <span class="kw">pub</span> <span class="ident">function</span>: <span class="ident">Function</span>,
-    <span class="doccomment">/// The class name in JS this is attached to</span>
-    <span class="kw">pub</span> <span class="ident">js_class</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The kind (static, named, regular)</span>
-    <span class="kw">pub</span> <span class="ident">method_kind</span>: <span class="ident">MethodKind</span>,
-    <span class="doccomment">/// The type of `self` (either `self`, `&amp;self`, or `&amp;mut self`)</span>
-    <span class="kw">pub</span> <span class="ident">method_self</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MethodSelf</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The struct name, in Rust, this is attached to</span>
-    <span class="kw">pub</span> <span class="ident">rust_class</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The name of the rust function/method on the rust side.</span>
-    <span class="kw">pub</span> <span class="ident">rust_name</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// Whether or not this function should be flagged as the wasm start</span>
-    <span class="doccomment">/// function.</span>
-    <span class="kw">pub</span> <span class="ident">start</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A rust to js interface. Allows interaction with rust objects/functions
+/// from javascript.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>Export {
+    <span class="doccomment">/// Comments extracted from the rust source.
+    </span><span class="kw">pub </span>comments: Vec&lt;String&gt;,
+    <span class="doccomment">/// The rust function
+    </span><span class="kw">pub </span>function: Function,
+    <span class="doccomment">/// The class name in JS this is attached to
+    </span><span class="kw">pub </span>js_class: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The kind (static, named, regular)
+    </span><span class="kw">pub </span>method_kind: MethodKind,
+    <span class="doccomment">/// The type of `self` (either `self`, `&amp;self`, or `&amp;mut self`)
+    </span><span class="kw">pub </span>method_self: <span class="prelude-ty">Option</span>&lt;MethodSelf&gt;,
+    <span class="doccomment">/// The struct name, in Rust, this is attached to
+    </span><span class="kw">pub </span>rust_class: <span class="prelude-ty">Option</span>&lt;Ident&gt;,
+    <span class="doccomment">/// The name of the rust function/method on the rust side.
+    </span><span class="kw">pub </span>rust_name: Ident,
+    <span class="doccomment">/// Whether or not this function should be flagged as the wasm start
+    /// function.
+    </span><span class="kw">pub </span>start: bool,
 }
 
-<span class="doccomment">/// The 3 types variations of `self`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MethodSelf</span> {
-    <span class="doccomment">/// `self`</span>
-    <span class="ident">ByValue</span>,
-    <span class="doccomment">/// `&amp;mut self`</span>
-    <span class="ident">RefMutable</span>,
-    <span class="doccomment">/// `&amp;self`</span>
-    <span class="ident">RefShared</span>,
+<span class="doccomment">/// The 3 types variations of `self`.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub enum </span>MethodSelf {
+    <span class="doccomment">/// `self`
+    </span>ByValue,
+    <span class="doccomment">/// `&amp;mut self`
+    </span>RefMutable,
+    <span class="doccomment">/// `&amp;self`
+    </span>RefShared,
 }
 
-<span class="doccomment">/// Things imported from a JS module (in an `extern` block)</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Import</span> {
-    <span class="doccomment">/// The type of module being imported from, if any</span>
-    <span class="kw">pub</span> <span class="ident">module</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ImportModule</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The namespace to access the item through, if any</span>
-    <span class="kw">pub</span> <span class="ident">js_namespace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The type of item being imported</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ImportKind</span>,
+<span class="doccomment">/// Things imported from a JS module (in an `extern` block)
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>Import {
+    <span class="doccomment">/// The type of module being imported from, if any
+    </span><span class="kw">pub </span>module: <span class="prelude-ty">Option</span>&lt;ImportModule&gt;,
+    <span class="doccomment">/// The namespace to access the item through, if any
+    </span><span class="kw">pub </span>js_namespace: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
+    <span class="doccomment">/// The type of item being imported
+    </span><span class="kw">pub </span>kind: ImportKind,
 }
 
-<span class="doccomment">/// The possible types of module to import from</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ImportModule</span> {
-    <span class="doccomment">/// Import from the named module, with relative paths interpreted</span>
-    <span class="ident">Named</span>(<span class="ident">String</span>, <span class="ident">Span</span>),
-    <span class="doccomment">/// Import from the named module, without interpreting paths</span>
-    <span class="ident">RawNamed</span>(<span class="ident">String</span>, <span class="ident">Span</span>),
-    <span class="doccomment">/// Import from an inline JS snippet</span>
-    <span class="ident">Inline</span>(<span class="ident">usize</span>, <span class="ident">Span</span>),
+<span class="doccomment">/// The possible types of module to import from
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug))]
+#[derive(Clone)]
+</span><span class="kw">pub enum </span>ImportModule {
+    <span class="doccomment">/// Import from the named module, with relative paths interpreted
+    </span>Named(String, Span),
+    <span class="doccomment">/// Import from the named module, without interpreting paths
+    </span>RawNamed(String, Span),
+    <span class="doccomment">/// Import from an inline JS snippet
+    </span>Inline(usize, Span),
 }
 
-<span class="kw">impl</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">ImportModule</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">h</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ImportModule::Named</span>(<span class="ident">name</span>, <span class="kw">_</span>) =&gt; (<span class="number">1u8</span>, <span class="ident">name</span>).<span class="ident">hash</span>(<span class="ident">h</span>),
-            <span class="ident">ImportModule::Inline</span>(<span class="ident">idx</span>, <span class="kw">_</span>) =&gt; (<span class="number">2u8</span>, <span class="ident">idx</span>).<span class="ident">hash</span>(<span class="ident">h</span>),
-            <span class="ident">ImportModule::RawNamed</span>(<span class="ident">name</span>, <span class="kw">_</span>) =&gt; (<span class="number">3u8</span>, <span class="ident">name</span>).<span class="ident">hash</span>(<span class="ident">h</span>),
+<span class="kw">impl </span>Hash <span class="kw">for </span>ImportModule {
+    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, h: <span class="kw-2">&amp;mut </span>H) {
+        <span class="kw">match </span><span class="self">self </span>{
+            ImportModule::Named(name, <span class="kw">_</span>) =&gt; (<span class="number">1u8</span>, name).hash(h),
+            ImportModule::Inline(idx, <span class="kw">_</span>) =&gt; (<span class="number">2u8</span>, idx).hash(h),
+            ImportModule::RawNamed(name, <span class="kw">_</span>) =&gt; (<span class="number">3u8</span>, name).hash(h),
         }
     }
 }
 
-<span class="doccomment">/// The type of item being imported</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ImportKind</span> {
-    <span class="doccomment">/// Importing a function</span>
-    <span class="ident">Function</span>(<span class="ident">ImportFunction</span>),
-    <span class="doccomment">/// Importing a static value</span>
-    <span class="ident">Static</span>(<span class="ident">ImportStatic</span>),
-    <span class="doccomment">/// Importing a type/class</span>
-    <span class="ident">Type</span>(<span class="ident">ImportType</span>),
-    <span class="doccomment">/// Importing a JS enum</span>
-    <span class="ident">Enum</span>(<span class="ident">ImportEnum</span>),
+<span class="doccomment">/// The type of item being imported
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug))]
+#[derive(Clone)]
+</span><span class="kw">pub enum </span>ImportKind {
+    <span class="doccomment">/// Importing a function
+    </span>Function(ImportFunction),
+    <span class="doccomment">/// Importing a static value
+    </span>Static(ImportStatic),
+    <span class="doccomment">/// Importing a type/class
+    </span>Type(ImportType),
+    <span class="doccomment">/// Importing a JS enum
+    </span>Enum(ImportEnum),
 }
 
-<span class="doccomment">/// A function being imported from JS</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ImportFunction</span> {
-    <span class="doccomment">/// The full signature of the function</span>
-    <span class="kw">pub</span> <span class="ident">function</span>: <span class="ident">Function</span>,
-    <span class="doccomment">/// The name rust code will use</span>
-    <span class="kw">pub</span> <span class="ident">rust_name</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// The type being returned</span>
-    <span class="kw">pub</span> <span class="ident">js_ret</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Type</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether to catch JS exceptions</span>
-    <span class="kw">pub</span> <span class="ident">catch</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Whether the function is variadic on the JS side</span>
-    <span class="kw">pub</span> <span class="ident">variadic</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Whether the function should use structural type checking</span>
-    <span class="kw">pub</span> <span class="ident">structural</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Causes the Builder (See cli-support::js::binding::Builder) to error out if</span>
-    <span class="doccomment">/// it finds itself generating code for a function with this signature</span>
-    <span class="kw">pub</span> <span class="ident">assert_no_shim</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The kind of function being imported</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ImportFunctionKind</span>,
-    <span class="doccomment">/// The shim name to use in the generated code. The &#39;shim&#39; is a function that appears in</span>
-    <span class="doccomment">/// the generated JS as a wrapper around the actual function to import, performing any</span>
-    <span class="doccomment">/// necessary conversions (EG adding a try/catch to change a thrown error into a Result)</span>
-    <span class="kw">pub</span> <span class="ident">shim</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// The doc comment on this import, if one is provided</span>
-    <span class="kw">pub</span> <span class="ident">doc_comment</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A function being imported from JS
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>ImportFunction {
+    <span class="doccomment">/// The full signature of the function
+    </span><span class="kw">pub </span>function: Function,
+    <span class="doccomment">/// The name rust code will use
+    </span><span class="kw">pub </span>rust_name: Ident,
+    <span class="doccomment">/// The type being returned
+    </span><span class="kw">pub </span>js_ret: <span class="prelude-ty">Option</span>&lt;syn::Type&gt;,
+    <span class="doccomment">/// Whether to catch JS exceptions
+    </span><span class="kw">pub </span>catch: bool,
+    <span class="doccomment">/// Whether the function is variadic on the JS side
+    </span><span class="kw">pub </span>variadic: bool,
+    <span class="doccomment">/// Whether the function should use structural type checking
+    </span><span class="kw">pub </span>structural: bool,
+    <span class="doccomment">/// Causes the Builder (See cli-support::js::binding::Builder) to error out if
+    /// it finds itself generating code for a function with this signature
+    </span><span class="kw">pub </span>assert_no_shim: bool,
+    <span class="doccomment">/// The kind of function being imported
+    </span><span class="kw">pub </span>kind: ImportFunctionKind,
+    <span class="doccomment">/// The shim name to use in the generated code. The &#39;shim&#39; is a function that appears in
+    /// the generated JS as a wrapper around the actual function to import, performing any
+    /// necessary conversions (EG adding a try/catch to change a thrown error into a Result)
+    </span><span class="kw">pub </span>shim: Ident,
+    <span class="doccomment">/// The doc comment on this import, if one is provided
+    </span><span class="kw">pub </span>doc_comment: String,
 }
 
-<span class="doccomment">/// The type of a function being imported</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ImportFunctionKind</span> {
-    <span class="doccomment">/// A class method</span>
-    <span class="ident">Method</span> {
-        <span class="doccomment">/// The name of the class for this method, in JS</span>
-        <span class="ident">class</span>: <span class="ident">String</span>,
-        <span class="doccomment">/// The type of the class for this method, in Rust</span>
-        <span class="ident">ty</span>: <span class="ident">syn::Type</span>,
-        <span class="doccomment">/// The kind of method this is</span>
-        <span class="ident">kind</span>: <span class="ident">MethodKind</span>,
+<span class="doccomment">/// The type of a function being imported
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub enum </span>ImportFunctionKind {
+    <span class="doccomment">/// A class method
+    </span>Method {
+        <span class="doccomment">/// The name of the class for this method, in JS
+        </span>class: String,
+        <span class="doccomment">/// The type of the class for this method, in Rust
+        </span>ty: syn::Type,
+        <span class="doccomment">/// The kind of method this is
+        </span>kind: MethodKind,
     },
-    <span class="doccomment">/// A standard function</span>
-    <span class="ident">Normal</span>,
+    <span class="doccomment">/// A standard function
+    </span>Normal,
 }
 
-<span class="doccomment">/// The type of a method</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MethodKind</span> {
-    <span class="doccomment">/// A class constructor</span>
-    <span class="ident">Constructor</span>,
-    <span class="doccomment">/// Any other kind of method</span>
-    <span class="ident">Operation</span>(<span class="ident">Operation</span>),
+<span class="doccomment">/// The type of a method
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub enum </span>MethodKind {
+    <span class="doccomment">/// A class constructor
+    </span>Constructor,
+    <span class="doccomment">/// Any other kind of method
+    </span>Operation(Operation),
 }
 
-<span class="doccomment">/// The operation performed by a class method</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Operation</span> {
-    <span class="doccomment">/// Whether this method is static</span>
-    <span class="kw">pub</span> <span class="ident">is_static</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The internal kind of this Operation</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">OperationKind</span>,
+<span class="doccomment">/// The operation performed by a class method
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>Operation {
+    <span class="doccomment">/// Whether this method is static
+    </span><span class="kw">pub </span>is_static: bool,
+    <span class="doccomment">/// The internal kind of this Operation
+    </span><span class="kw">pub </span>kind: OperationKind,
 }
 
-<span class="doccomment">/// The kind of operation performed by a method</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OperationKind</span> {
-    <span class="doccomment">/// A standard method, nothing special</span>
-    <span class="ident">Regular</span>,
-    <span class="doccomment">/// A method for getting the value of the provided Ident</span>
-    <span class="ident">Getter</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// A method for setting the value of the provided Ident</span>
-    <span class="ident">Setter</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// A dynamically intercepted getter</span>
-    <span class="ident">IndexingGetter</span>,
-    <span class="doccomment">/// A dynamically intercepted setter</span>
-    <span class="ident">IndexingSetter</span>,
-    <span class="doccomment">/// A dynamically intercepted deleter</span>
-    <span class="ident">IndexingDeleter</span>,
+<span class="doccomment">/// The kind of operation performed by a method
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub enum </span>OperationKind {
+    <span class="doccomment">/// A standard method, nothing special
+    </span>Regular,
+    <span class="doccomment">/// A method for getting the value of the provided Ident
+    </span>Getter(<span class="prelude-ty">Option</span>&lt;Ident&gt;),
+    <span class="doccomment">/// A method for setting the value of the provided Ident
+    </span>Setter(<span class="prelude-ty">Option</span>&lt;Ident&gt;),
+    <span class="doccomment">/// A dynamically intercepted getter
+    </span>IndexingGetter,
+    <span class="doccomment">/// A dynamically intercepted setter
+    </span>IndexingSetter,
+    <span class="doccomment">/// A dynamically intercepted deleter
+    </span>IndexingDeleter,
 }
 
-<span class="doccomment">/// The type of a static being imported</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ImportStatic</span> {
-    <span class="doccomment">/// The visibility of this static in Rust</span>
-    <span class="kw">pub</span> <span class="ident">vis</span>: <span class="ident">syn::Visibility</span>,
-    <span class="doccomment">/// The type of static being imported</span>
-    <span class="kw">pub</span> <span class="ident">ty</span>: <span class="ident">syn::Type</span>,
-    <span class="doccomment">/// The name of the shim function used to access this static</span>
-    <span class="kw">pub</span> <span class="ident">shim</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// The name of this static on the Rust side</span>
-    <span class="kw">pub</span> <span class="ident">rust_name</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// The name of this static on the JS side</span>
-    <span class="kw">pub</span> <span class="ident">js_name</span>: <span class="ident">String</span>,
+<span class="doccomment">/// The type of a static being imported
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>ImportStatic {
+    <span class="doccomment">/// The visibility of this static in Rust
+    </span><span class="kw">pub </span>vis: syn::Visibility,
+    <span class="doccomment">/// The type of static being imported
+    </span><span class="kw">pub </span>ty: syn::Type,
+    <span class="doccomment">/// The name of the shim function used to access this static
+    </span><span class="kw">pub </span>shim: Ident,
+    <span class="doccomment">/// The name of this static on the Rust side
+    </span><span class="kw">pub </span>rust_name: Ident,
+    <span class="doccomment">/// The name of this static on the JS side
+    </span><span class="kw">pub </span>js_name: String,
 }
 
-<span class="doccomment">/// The metadata for a type being imported</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ImportType</span> {
-    <span class="doccomment">/// The visibility of this type in Rust</span>
-    <span class="kw">pub</span> <span class="ident">vis</span>: <span class="ident">syn::Visibility</span>,
-    <span class="doccomment">/// The name of this type on the Rust side</span>
-    <span class="kw">pub</span> <span class="ident">rust_name</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// The name of this type on the JS side</span>
-    <span class="kw">pub</span> <span class="ident">js_name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The custom attributes to apply to this type</span>
-    <span class="kw">pub</span> <span class="ident">attrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::Attribute</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The TS definition to generate for this type</span>
-    <span class="kw">pub</span> <span class="ident">typescript_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The doc comment applied to this type, if one exists</span>
-    <span class="kw">pub</span> <span class="ident">doc_comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The name of the shim to check instanceof for this type</span>
-    <span class="kw">pub</span> <span class="ident">instanceof_shim</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The name of the remote function to use for the generated is_type_of</span>
-    <span class="kw">pub</span> <span class="ident">is_type_of</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Expr</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The list of classes this extends, if any</span>
-    <span class="kw">pub</span> <span class="ident">extends</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::Path</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A custom prefix to add and attempt to fall back to, if the type isn&#39;t found</span>
-    <span class="kw">pub</span> <span class="ident">vendor_prefixes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// If present, don&#39;t generate a `Deref` impl</span>
-    <span class="kw">pub</span> <span class="ident">no_deref</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// The metadata for a type being imported
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>ImportType {
+    <span class="doccomment">/// The visibility of this type in Rust
+    </span><span class="kw">pub </span>vis: syn::Visibility,
+    <span class="doccomment">/// The name of this type on the Rust side
+    </span><span class="kw">pub </span>rust_name: Ident,
+    <span class="doccomment">/// The name of this type on the JS side
+    </span><span class="kw">pub </span>js_name: String,
+    <span class="doccomment">/// The custom attributes to apply to this type
+    </span><span class="kw">pub </span>attrs: Vec&lt;syn::Attribute&gt;,
+    <span class="doccomment">/// The TS definition to generate for this type
+    </span><span class="kw">pub </span>typescript_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The doc comment applied to this type, if one exists
+    </span><span class="kw">pub </span>doc_comment: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The name of the shim to check instanceof for this type
+    </span><span class="kw">pub </span>instanceof_shim: String,
+    <span class="doccomment">/// The name of the remote function to use for the generated is_type_of
+    </span><span class="kw">pub </span>is_type_of: <span class="prelude-ty">Option</span>&lt;syn::Expr&gt;,
+    <span class="doccomment">/// The list of classes this extends, if any
+    </span><span class="kw">pub </span>extends: Vec&lt;syn::Path&gt;,
+    <span class="doccomment">/// A custom prefix to add and attempt to fall back to, if the type isn&#39;t found
+    </span><span class="kw">pub </span>vendor_prefixes: Vec&lt;Ident&gt;,
+    <span class="doccomment">/// If present, don&#39;t generate a `Deref` impl
+    </span><span class="kw">pub </span>no_deref: bool,
 }
 
-<span class="doccomment">/// The metadata for an Enum being imported</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ImportEnum</span> {
-    <span class="doccomment">/// The Rust enum&#39;s visibility</span>
-    <span class="kw">pub</span> <span class="ident">vis</span>: <span class="ident">syn::Visibility</span>,
-    <span class="doccomment">/// The Rust enum&#39;s identifiers</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// The Rust identifiers for the variants</span>
-    <span class="kw">pub</span> <span class="ident">variants</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The JS string values of the variants</span>
-    <span class="kw">pub</span> <span class="ident">variant_values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Attributes to apply to the Rust enum</span>
-    <span class="kw">pub</span> <span class="ident">rust_attrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::Attribute</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The metadata for an Enum being imported
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>ImportEnum {
+    <span class="doccomment">/// The Rust enum&#39;s visibility
+    </span><span class="kw">pub </span>vis: syn::Visibility,
+    <span class="doccomment">/// The Rust enum&#39;s identifiers
+    </span><span class="kw">pub </span>name: Ident,
+    <span class="doccomment">/// The Rust identifiers for the variants
+    </span><span class="kw">pub </span>variants: Vec&lt;Ident&gt;,
+    <span class="doccomment">/// The JS string values of the variants
+    </span><span class="kw">pub </span>variant_values: Vec&lt;String&gt;,
+    <span class="doccomment">/// Attributes to apply to the Rust enum
+    </span><span class="kw">pub </span>rust_attrs: Vec&lt;syn::Attribute&gt;,
 }
 
-<span class="doccomment">/// Information about a function being imported or exported</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Function</span> {
-    <span class="doccomment">/// The name of the function</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The span of the function&#39;s name in Rust code</span>
-    <span class="kw">pub</span> <span class="ident">name_span</span>: <span class="ident">Span</span>,
-    <span class="doccomment">/// Whether the function has a js_name attribute</span>
-    <span class="kw">pub</span> <span class="ident">renamed_via_js_name</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The arguments to the function</span>
-    <span class="kw">pub</span> <span class="ident">arguments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::PatType</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The return type of the function, if provided</span>
-    <span class="kw">pub</span> <span class="ident">ret</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Type</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Any custom attributes being applied to the function</span>
-    <span class="kw">pub</span> <span class="ident">rust_attrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::Attribute</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The visibility of this function in Rust</span>
-    <span class="kw">pub</span> <span class="ident">rust_vis</span>: <span class="ident">syn::Visibility</span>,
-    <span class="doccomment">/// Whether this is an `async` function</span>
-    <span class="kw">pub</span> <span class="ident">r#async</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Whether to generate a typescript definition for this function</span>
-    <span class="kw">pub</span> <span class="ident">generate_typescript</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Whether this is a function with a variadict parameter</span>
-    <span class="kw">pub</span> <span class="ident">variadic</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Information about a function being imported or exported
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>Function {
+    <span class="doccomment">/// The name of the function
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The span of the function&#39;s name in Rust code
+    </span><span class="kw">pub </span>name_span: Span,
+    <span class="doccomment">/// Whether the function has a js_name attribute
+    </span><span class="kw">pub </span>renamed_via_js_name: bool,
+    <span class="doccomment">/// The arguments to the function
+    </span><span class="kw">pub </span>arguments: Vec&lt;syn::PatType&gt;,
+    <span class="doccomment">/// The return type of the function, if provided
+    </span><span class="kw">pub </span>ret: <span class="prelude-ty">Option</span>&lt;syn::Type&gt;,
+    <span class="doccomment">/// Any custom attributes being applied to the function
+    </span><span class="kw">pub </span>rust_attrs: Vec&lt;syn::Attribute&gt;,
+    <span class="doccomment">/// The visibility of this function in Rust
+    </span><span class="kw">pub </span>rust_vis: syn::Visibility,
+    <span class="doccomment">/// Whether this is an `async` function
+    </span><span class="kw">pub </span>r#async: bool,
+    <span class="doccomment">/// Whether to generate a typescript definition for this function
+    </span><span class="kw">pub </span>generate_typescript: bool,
+    <span class="doccomment">/// Whether this is a function with a variadict parameter
+    </span><span class="kw">pub </span>variadic: bool,
 }
 
-<span class="doccomment">/// Information about a Struct being exported</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Struct</span> {
-    <span class="doccomment">/// The name of the struct in Rust code</span>
-    <span class="kw">pub</span> <span class="ident">rust_name</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// The name of the struct in JS code</span>
-    <span class="kw">pub</span> <span class="ident">js_name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// All the fields of this struct to export</span>
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StructField</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The doc comments on this struct, if provided</span>
-    <span class="kw">pub</span> <span class="ident">comments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether this struct is inspectable (provides toJSON/toString properties to JS)</span>
-    <span class="kw">pub</span> <span class="ident">is_inspectable</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Whether to generate a typescript definition for this struct</span>
-    <span class="kw">pub</span> <span class="ident">generate_typescript</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Information about a Struct being exported
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>Struct {
+    <span class="doccomment">/// The name of the struct in Rust code
+    </span><span class="kw">pub </span>rust_name: Ident,
+    <span class="doccomment">/// The name of the struct in JS code
+    </span><span class="kw">pub </span>js_name: String,
+    <span class="doccomment">/// All the fields of this struct to export
+    </span><span class="kw">pub </span>fields: Vec&lt;StructField&gt;,
+    <span class="doccomment">/// The doc comments on this struct, if provided
+    </span><span class="kw">pub </span>comments: Vec&lt;String&gt;,
+    <span class="doccomment">/// Whether this struct is inspectable (provides toJSON/toString properties to JS)
+    </span><span class="kw">pub </span>is_inspectable: bool,
+    <span class="doccomment">/// Whether to generate a typescript definition for this struct
+    </span><span class="kw">pub </span>generate_typescript: bool,
 }
 
-<span class="doccomment">/// The field of a struct</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StructField</span> {
-    <span class="doccomment">/// The name of the field in Rust code</span>
-    <span class="kw">pub</span> <span class="ident">rust_name</span>: <span class="ident">syn::Member</span>,
-    <span class="doccomment">/// The name of the field in JS code</span>
-    <span class="kw">pub</span> <span class="ident">js_name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The name of the struct this field is part of</span>
-    <span class="kw">pub</span> <span class="ident">struct_name</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// Whether this value is read-only to JS</span>
-    <span class="kw">pub</span> <span class="ident">readonly</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The type of this field</span>
-    <span class="kw">pub</span> <span class="ident">ty</span>: <span class="ident">syn::Type</span>,
-    <span class="doccomment">/// The name of the getter shim for this field</span>
-    <span class="kw">pub</span> <span class="ident">getter</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// The name of the setter shim for this field</span>
-    <span class="kw">pub</span> <span class="ident">setter</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// The doc comments on this field, if any</span>
-    <span class="kw">pub</span> <span class="ident">comments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether to generate a typescript definition for this field</span>
-    <span class="kw">pub</span> <span class="ident">generate_typescript</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Whether to use .clone() in the auto-generated getter for this field</span>
-    <span class="kw">pub</span> <span class="ident">getter_with_clone</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// The field of a struct
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>StructField {
+    <span class="doccomment">/// The name of the field in Rust code
+    </span><span class="kw">pub </span>rust_name: syn::Member,
+    <span class="doccomment">/// The name of the field in JS code
+    </span><span class="kw">pub </span>js_name: String,
+    <span class="doccomment">/// The name of the struct this field is part of
+    </span><span class="kw">pub </span>struct_name: Ident,
+    <span class="doccomment">/// Whether this value is read-only to JS
+    </span><span class="kw">pub </span>readonly: bool,
+    <span class="doccomment">/// The type of this field
+    </span><span class="kw">pub </span>ty: syn::Type,
+    <span class="doccomment">/// The name of the getter shim for this field
+    </span><span class="kw">pub </span>getter: Ident,
+    <span class="doccomment">/// The name of the setter shim for this field
+    </span><span class="kw">pub </span>setter: Ident,
+    <span class="doccomment">/// The doc comments on this field, if any
+    </span><span class="kw">pub </span>comments: Vec&lt;String&gt;,
+    <span class="doccomment">/// Whether to generate a typescript definition for this field
+    </span><span class="kw">pub </span>generate_typescript: bool,
+    <span class="doccomment">/// Whether to use .clone() in the auto-generated getter for this field
+    </span><span class="kw">pub </span>getter_with_clone: bool,
 }
 
-<span class="doccomment">/// Information about an Enum being exported</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Enum</span> {
-    <span class="doccomment">/// The name of this enum in Rust code</span>
-    <span class="kw">pub</span> <span class="ident">rust_name</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// The name of this enum in JS code</span>
-    <span class="kw">pub</span> <span class="ident">js_name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The variants provided by this enum</span>
-    <span class="kw">pub</span> <span class="ident">variants</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Variant</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The doc comments on this enum, if any</span>
-    <span class="kw">pub</span> <span class="ident">comments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The value to use for a `none` variant of the enum</span>
-    <span class="kw">pub</span> <span class="ident">hole</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// Whether to generate a typescript definition for this enum</span>
-    <span class="kw">pub</span> <span class="ident">generate_typescript</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Information about an Enum being exported
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>Enum {
+    <span class="doccomment">/// The name of this enum in Rust code
+    </span><span class="kw">pub </span>rust_name: Ident,
+    <span class="doccomment">/// The name of this enum in JS code
+    </span><span class="kw">pub </span>js_name: String,
+    <span class="doccomment">/// The variants provided by this enum
+    </span><span class="kw">pub </span>variants: Vec&lt;Variant&gt;,
+    <span class="doccomment">/// The doc comments on this enum, if any
+    </span><span class="kw">pub </span>comments: Vec&lt;String&gt;,
+    <span class="doccomment">/// The value to use for a `none` variant of the enum
+    </span><span class="kw">pub </span>hole: u32,
+    <span class="doccomment">/// Whether to generate a typescript definition for this enum
+    </span><span class="kw">pub </span>generate_typescript: bool,
 }
 
-<span class="doccomment">/// The variant of an enum</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Variant</span> {
-    <span class="doccomment">/// The name of this variant</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Ident</span>,
-    <span class="doccomment">/// The backing value of this variant</span>
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// The doc comments on this variant, if any</span>
-    <span class="kw">pub</span> <span class="ident">comments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The variant of an enum
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;extra-traits&quot;</span>, derive(Debug, PartialEq, Eq))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>Variant {
+    <span class="doccomment">/// The name of this variant
+    </span><span class="kw">pub </span>name: Ident,
+    <span class="doccomment">/// The backing value of this variant
+    </span><span class="kw">pub </span>value: u32,
+    <span class="doccomment">/// The doc comments on this variant, if any
+    </span><span class="kw">pub </span>comments: Vec&lt;String&gt;,
 }
 
-<span class="doccomment">/// Unused, the type of an argument to / return from a function</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TypeKind</span> {
-    <span class="doccomment">/// A by-reference arg, EG `&amp;T`</span>
-    <span class="ident">ByRef</span>,
-    <span class="doccomment">/// A by-mutable-reference arg, EG `&amp;mut T`</span>
-    <span class="ident">ByMutRef</span>,
-    <span class="doccomment">/// A by-value arg, EG `T`</span>
-    <span class="ident">ByValue</span>,
+<span class="doccomment">/// Unused, the type of an argument to / return from a function
+</span><span class="attribute">#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>TypeKind {
+    <span class="doccomment">/// A by-reference arg, EG `&amp;T`
+    </span>ByRef,
+    <span class="doccomment">/// A by-mutable-reference arg, EG `&amp;mut T`
+    </span>ByMutRef,
+    <span class="doccomment">/// A by-value arg, EG `T`
+    </span>ByValue,
 }
 
-<span class="doccomment">/// Unused, the location of a type for a function argument (import/export, argument/ret)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TypeLocation</span> {
-    <span class="doccomment">/// An imported argument (JS side type)</span>
-    <span class="ident">ImportArgument</span>,
-    <span class="doccomment">/// An imported return</span>
-    <span class="ident">ImportRet</span>,
-    <span class="doccomment">/// An exported argument (Rust side type)</span>
-    <span class="ident">ExportArgument</span>,
-    <span class="doccomment">/// An exported return</span>
-    <span class="ident">ExportRet</span>,
+<span class="doccomment">/// Unused, the location of a type for a function argument (import/export, argument/ret)
+</span><span class="attribute">#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>TypeLocation {
+    <span class="doccomment">/// An imported argument (JS side type)
+    </span>ImportArgument,
+    <span class="doccomment">/// An imported return
+    </span>ImportRet,
+    <span class="doccomment">/// An exported argument (Rust side type)
+    </span>ExportArgument,
+    <span class="doccomment">/// An exported return
+    </span>ExportRet,
 }
 
-<span class="kw">impl</span> <span class="ident">Export</span> {
-    <span class="doccomment">/// Mangles a rust -&gt; javascript export, so that the created Ident will be unique over function</span>
-    <span class="doccomment">/// name and class name, if the function belongs to a javascript class.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">rust_symbol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ident</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">generated_name</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;__wasm_bindgen_generated&quot;</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">class</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">js_class</span> {
-            <span class="ident">generated_name</span>.<span class="ident">push_str</span>(<span class="string">&quot;_&quot;</span>);
-            <span class="ident">generated_name</span>.<span class="ident">push_str</span>(<span class="ident">class</span>);
+<span class="kw">impl </span>Export {
+    <span class="doccomment">/// Mangles a rust -&gt; javascript export, so that the created Ident will be unique over function
+    /// name and class name, if the function belongs to a javascript class.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>rust_symbol(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ident {
+        <span class="kw">let </span><span class="kw-2">mut </span>generated_name = String::from(<span class="string">&quot;__wasm_bindgen_generated&quot;</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(class) = <span class="kw-2">&amp;</span><span class="self">self</span>.js_class {
+            generated_name.push_str(<span class="string">&quot;_&quot;</span>);
+            generated_name.push_str(class);
         }
-        <span class="ident">generated_name</span>.<span class="ident">push_str</span>(<span class="string">&quot;_&quot;</span>);
-        <span class="ident">generated_name</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">function</span>.<span class="ident">name</span>.<span class="ident">to_string</span>());
-        <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">generated_name</span>, <span class="ident">Span::call_site</span>())
+        generated_name.push_str(<span class="string">&quot;_&quot;</span>);
+        generated_name.push_str(<span class="kw-2">&amp;</span><span class="self">self</span>.function.name.to_string());
+        Ident::new(<span class="kw-2">&amp;</span>generated_name, Span::call_site())
     }
 
-    <span class="doccomment">/// This is the name of the shim function that gets exported and takes the raw</span>
-    <span class="doccomment">/// ABI form of its arguments and converts them back into their normal,</span>
-    <span class="doccomment">/// &quot;high level&quot; form before calling the actual function.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">export_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">function</span>.<span class="ident">name</span>.<span class="ident">to_string</span>();
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">js_class</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">class</span>) =&gt; <span class="ident">shared::struct_function_export_name</span>(<span class="ident">class</span>, <span class="kw-2">&amp;</span><span class="ident">fn_name</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">shared::free_function_export_name</span>(<span class="kw-2">&amp;</span><span class="ident">fn_name</span>),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ImportKind</span> {
-    <span class="doccomment">/// Whether this type can be inside an `impl` block.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fits_on_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ImportKind::Function</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="ident">ImportKind::Static</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="ident">ImportKind::Type</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="ident">ImportKind::Enum</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+    <span class="doccomment">/// This is the name of the shim function that gets exported and takes the raw
+    /// ABI form of its arguments and converts them back into their normal,
+    /// &quot;high level&quot; form before calling the actual function.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>export_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span>fn_name = <span class="self">self</span>.function.name.to_string();
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.js_class {
+            <span class="prelude-val">Some</span>(class) =&gt; shared::struct_function_export_name(class, <span class="kw-2">&amp;</span>fn_name),
+            <span class="prelude-val">None </span>=&gt; shared::free_function_export_name(<span class="kw-2">&amp;</span>fn_name),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Function</span> {
-    <span class="doccomment">/// If the rust object has a `fn xxx(&amp;self) -&gt; MyType` method, get the name for a getter in</span>
-    <span class="doccomment">/// javascript (in this case `xxx`, so you can write `val = obj.xxx`)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">infer_getter_property</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+<span class="kw">impl </span>ImportKind {
+    <span class="doccomment">/// Whether this type can be inside an `impl` block.
+    </span><span class="kw">pub fn </span>fits_on_impl(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ImportKind::Function(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            ImportKind::Static(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            ImportKind::Type(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            ImportKind::Enum(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+        }
+    }
+}
+
+<span class="kw">impl </span>Function {
+    <span class="doccomment">/// If the rust object has a `fn xxx(&amp;self) -&gt; MyType` method, get the name for a getter in
+    /// javascript (in this case `xxx`, so you can write `val = obj.xxx`)
+    </span><span class="kw">pub fn </span>infer_getter_property(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 
-    <span class="doccomment">/// If the rust object has a `fn set_xxx(&amp;mut self, MyType)` style method, get the name</span>
-    <span class="doccomment">/// for a setter in javascript (in this case `xxx`, so you can write `obj.xxx = val`)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">infer_setter_property</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">to_string</span>();
+    <span class="doccomment">/// If the rust object has a `fn set_xxx(&amp;mut self, MyType)` style method, get the name
+    /// for a setter in javascript (in this case `xxx`, so you can write `obj.xxx = val`)
+    </span><span class="kw">pub fn </span>infer_setter_property(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, Diagnostic&gt; {
+        <span class="kw">let </span>name = <span class="self">self</span>.name.to_string();
 
-        <span class="comment">// Otherwise we infer names based on the Rust function name.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;set_&quot;</span>) {
+        <span class="comment">// Otherwise we infer names based on the Rust function name.
+        </span><span class="kw">if </span>!name.starts_with(<span class="string">&quot;set_&quot;</span>) {
             <span class="macro">bail_span!</span>(
-                <span class="ident">syn::token::Pub</span>(<span class="self">self</span>.<span class="ident">name_span</span>),
+                syn::token::Pub(<span class="self">self</span>.name_span),
                 <span class="string">&quot;setters must start with `set_`, found: {}&quot;</span>,
-                <span class="ident">name</span>,
+                name,
             );
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">name</span>[<span class="number">4</span>..].<span class="ident">to_string</span>())
+        <span class="prelude-val">Ok</span>(name[<span class="number">4</span>..].to_string())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasm_bindgen_backend" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasm_bindgen_backend" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

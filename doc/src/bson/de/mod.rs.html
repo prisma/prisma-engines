@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/de/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/de/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -570,577 +570,577 @@
 <span id="570">570</span>
 <span id="571">571</span>
 <span id="572">572</span>
-</pre><pre class="rust"><code><span class="comment">// The MIT License (MIT)</span>
+</pre><pre class="rust"><code><span class="comment">// The MIT License (MIT)
 
-<span class="comment">// Copyright (c) 2015 Y. T. Chung &lt;zonyitoo@gmail.com&gt;</span>
+// Copyright (c) 2015 Y. T. Chung &lt;zonyitoo@gmail.com&gt;
 
-<span class="comment">// Permission is hereby granted, free of charge, to any person obtaining a copy of</span>
-<span class="comment">// this software and associated documentation files (the &quot;Software&quot;), to deal in</span>
-<span class="comment">// the Software without restriction, including without limitation the rights to</span>
-<span class="comment">// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of</span>
-<span class="comment">// the Software, and to permit persons to whom the Software is furnished to do so,</span>
-<span class="comment">// subject to the following conditions:</span>
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the &quot;Software&quot;), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+// the Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
 
-<span class="comment">// The above copyright notice and this permission notice shall be included in all</span>
-<span class="comment">// copies or substantial portions of the Software.</span>
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
 
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
-<span class="comment">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS</span>
-<span class="comment">// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR</span>
-<span class="comment">// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER</span>
-<span class="comment">// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-<span class="doccomment">//! Deserializer</span>
+</span><span class="doccomment">//! Deserializer
 
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">raw</span>;
-<span class="kw">mod</span> <span class="ident">serde</span>;
+</span><span class="kw">mod </span>error;
+<span class="kw">mod </span>raw;
+<span class="kw">mod </span>serde;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">serde</span>::{<span class="ident">Deserializer</span>, <span class="ident">DeserializerOptions</span>},
+<span class="kw">pub use </span><span class="self">self</span>::{
+    error::{Error, <span class="prelude-ty">Result</span>},
+    serde::{Deserializer, DeserializerOptions},
 };
 
-<span class="kw">use</span> <span class="ident">std::io::Read</span>;
+<span class="kw">use </span>std::io::Read;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">Array</span>, <span class="ident">Binary</span>, <span class="ident">Bson</span>, <span class="ident">DbPointer</span>, <span class="ident">Document</span>, <span class="ident">JavaScriptCodeWithScope</span>, <span class="ident">Regex</span>, <span class="ident">Timestamp</span>},
-    <span class="ident">oid</span>::{<span class="self">self</span>, <span class="ident">ObjectId</span>},
-    <span class="ident">raw::RawBinaryRef</span>,
-    <span class="ident">ser::write_i32</span>,
-    <span class="ident">spec</span>::{<span class="self">self</span>, <span class="ident">BinarySubtype</span>},
-    <span class="ident">Decimal128</span>,
+<span class="kw">use crate</span>::{
+    bson::{Array, Binary, Bson, DbPointer, Document, JavaScriptCodeWithScope, Regex, Timestamp},
+    oid::{<span class="self">self</span>, ObjectId},
+    raw::RawBinaryRef,
+    ser::write_i32,
+    spec::{<span class="self">self</span>, BinarySubtype},
+    Decimal128,
 };
 
-<span class="kw">use</span> <span class="ident">::serde</span>::{
-    <span class="ident">de</span>::{<span class="ident">DeserializeOwned</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">Unexpected</span>},
-    <span class="ident">Deserialize</span>,
+<span class="kw">use </span>::serde::{
+    de::{DeserializeOwned, Error <span class="kw">as _</span>, Unexpected},
+    Deserialize,
 };
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::serde</span>::{<span class="ident">convert_unsigned_to_signed_raw</span>, <span class="ident">BsonVisitor</span>};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::serde::{convert_unsigned_to_signed_raw, BsonVisitor};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::raw::Deserializer</span> <span class="kw">as</span> <span class="ident">RawDeserializer</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::raw::Deserializer <span class="kw">as </span>RawDeserializer;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MAX_BSON_SIZE</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">16</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MIN_BSON_DOCUMENT_SIZE</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>; <span class="comment">// 4 bytes for length, one byte for null terminator</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MIN_BSON_STRING_SIZE</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>; <span class="comment">// 4 bytes for length, one byte for null terminator</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MIN_CODE_WITH_SCOPE_SIZE</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">4</span> <span class="op">+</span> <span class="ident">MIN_BSON_STRING_SIZE</span> <span class="op">+</span> <span class="ident">MIN_BSON_DOCUMENT_SIZE</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MAX_BSON_SIZE: i32 = <span class="number">16 </span>* <span class="number">1024 </span>* <span class="number">1024</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MIN_BSON_DOCUMENT_SIZE: i32 = <span class="number">4 </span>+ <span class="number">1</span>; <span class="comment">// 4 bytes for length, one byte for null terminator
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MIN_BSON_STRING_SIZE: i32 = <span class="number">4 </span>+ <span class="number">1</span>; <span class="comment">// 4 bytes for length, one byte for null terminator
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MIN_CODE_WITH_SCOPE_SIZE: i32 = <span class="number">4 </span>+ MIN_BSON_STRING_SIZE + MIN_BSON_DOCUMENT_SIZE;
 
-<span class="doccomment">/// Hint provided to the deserializer via `deserialize_newtype_struct` as to the type of thing</span>
-<span class="doccomment">/// being deserialized.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">DeserializerHint</span> {
-    <span class="doccomment">/// No hint provided, deserialize normally.</span>
-    <span class="prelude-val">None</span>,
+<span class="doccomment">/// Hint provided to the deserializer via `deserialize_newtype_struct` as to the type of thing
+/// being deserialized.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">enum </span>DeserializerHint {
+    <span class="doccomment">/// No hint provided, deserialize normally.
+    </span><span class="prelude-val">None</span>,
 
-    <span class="doccomment">/// The type being deserialized expects the BSON to contain a binary value with the provided</span>
-    <span class="doccomment">/// subtype. This is currently used to deserialize `bson::Uuid` values.</span>
-    <span class="ident">BinarySubtype</span>(<span class="ident">BinarySubtype</span>),
+    <span class="doccomment">/// The type being deserialized expects the BSON to contain a binary value with the provided
+    /// subtype. This is currently used to deserialize `bson::Uuid` values.
+    </span>BinarySubtype(BinarySubtype),
 
-    <span class="doccomment">/// The type being deserialized is raw BSON, meaning no allocations should occur as part of</span>
-    <span class="doccomment">/// deserializing and everything should be visited via borrowing or `Copy` if possible.</span>
-    <span class="ident">RawBson</span>,
+    <span class="doccomment">/// The type being deserialized is raw BSON, meaning no allocations should occur as part of
+    /// deserializing and everything should be visited via borrowing or `Copy` if possible.
+    </span>RawBson,
 }
 
-<span class="doccomment">/// Run the provided closure, ensuring that over the course of its execution, exactly `length` bytes</span>
-<span class="doccomment">/// were read from the reader.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ensure_read_exactly</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(
-    <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
-    <span class="ident">length</span>: <span class="ident">usize</span>,
-    <span class="ident">error_message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">func</span>: <span class="ident">F</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-    <span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="doccomment">/// Run the provided closure, ensuring that over the course of its execution, exactly `length` bytes
+/// were read from the reader.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ensure_read_exactly&lt;F, R&gt;(
+    reader: <span class="kw-2">&amp;mut </span>R,
+    length: usize,
+    error_message: <span class="kw-2">&amp;</span>str,
+    func: F,
+) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+<span class="kw">where
+    </span>F: FnOnce(<span class="kw-2">&amp;mut </span>std::io::Cursor&lt;Vec&lt;u8&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;,
+    R: Read + <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">length</span>];
-    <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">std::io::Cursor::new</span>(<span class="ident">buf</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; length];
+    reader.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>cursor = std::io::Cursor::new(buf);
 
-    <span class="ident">func</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
+    func(<span class="kw-2">&amp;mut </span>cursor)<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">cursor</span>.<span class="ident">position</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">length</span> <span class="kw">as</span> <span class="ident">u64</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(<span class="ident">length</span>, <span class="kw-2">&amp;</span><span class="ident">error_message</span>));
+    <span class="kw">if </span>cursor.position() != length <span class="kw">as </span>u64 {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(length, <span class="kw-2">&amp;</span>error_message));
     }
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_string</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>, <span class="ident">utf8_lossy</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_string&lt;R: Read + <span class="question-mark">?</span>Sized&gt;(reader: <span class="kw-2">&amp;mut </span>R, utf8_lossy: bool) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+    <span class="kw">let </span>len = read_i32(reader)<span class="question-mark">?</span>;
 
-    <span class="comment">// UTF-8 String must have at least 1 byte (the last 0x00).</span>
-    <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">1</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
-            <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>,
+    <span class="comment">// UTF-8 String must have at least 1 byte (the last 0x00).
+    </span><span class="kw">if </span>len &lt; <span class="number">1 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(
+            len <span class="kw">as </span>usize,
             <span class="kw-2">&amp;</span><span class="string">&quot;UTF-8 string must have at least 1 byte&quot;</span>,
         ));
     }
 
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">utf8_lossy</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>);
-        <span class="ident">reader</span>.<span class="ident">take</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
-        <span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">to_string</span>()
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>);
-        <span class="ident">reader</span>.<span class="ident">take</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
-        <span class="ident">s</span>
+    <span class="kw">let </span>s = <span class="kw">if </span>utf8_lossy {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::with_capacity(len <span class="kw">as </span>usize - <span class="number">1</span>);
+        reader.take(len <span class="kw">as </span>u64 - <span class="number">1</span>).read_to_end(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
+        String::from_utf8_lossy(<span class="kw-2">&amp;</span>buf).to_string()
+    } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>s = String::with_capacity(len <span class="kw">as </span>usize - <span class="number">1</span>);
+        reader.take(len <span class="kw">as </span>u64 - <span class="number">1</span>).read_to_string(<span class="kw-2">&amp;mut </span>s)<span class="question-mark">?</span>;
+        s
     };
 
-    <span class="comment">// read the null terminator</span>
-    <span class="kw">if</span> <span class="ident">read_u8</span>(<span class="ident">reader</span>)<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
-            <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>,
+    <span class="comment">// read the null terminator
+    </span><span class="kw">if </span>read_u8(reader)<span class="question-mark">? </span>!= <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(
+            len <span class="kw">as </span>usize,
             <span class="kw-2">&amp;</span><span class="string">&quot;contents of string longer than provided length&quot;</span>,
         ));
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">s</span>)
+    <span class="prelude-val">Ok</span>(s)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_bool</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">val</span> <span class="op">&gt;</span> <span class="number">1</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_value</span>(
-            <span class="ident">Unexpected::Unsigned</span>(<span class="ident">val</span> <span class="kw">as</span> <span class="ident">u64</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_bool&lt;R: Read&gt;(<span class="kw-2">mut </span>reader: R) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+    <span class="kw">let </span>val = read_u8(<span class="kw-2">&amp;mut </span>reader)<span class="question-mark">?</span>;
+    <span class="kw">if </span>val &gt; <span class="number">1 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_value(
+            Unexpected::Unsigned(val <span class="kw">as </span>u64),
             <span class="kw-2">&amp;</span><span class="string">&quot;boolean must be stored as 0 or 1&quot;</span>,
         ));
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">val</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
+    <span class="prelude-val">Ok</span>(val != <span class="number">0</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">read_cstring</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="kw">fn </span>read_cstring&lt;R: Read + <span class="question-mark">?</span>Sized&gt;(reader: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>v = Vec::new();
 
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="number">0</span> {
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>c = read_u8(reader)<span class="question-mark">?</span>;
+        <span class="kw">if </span>c == <span class="number">0 </span>{
             <span class="kw">break</span>;
         }
-        <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">c</span>);
+        v.push(c);
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">String::from_utf8</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
+    <span class="prelude-val">Ok</span>(String::from_utf8(v)<span class="question-mark">?</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_u8</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">1</span>];
-    <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">u8::from_le_bytes</span>(<span class="ident">buf</span>))
+<span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_u8&lt;R: Read + <span class="question-mark">?</span>Sized&gt;(reader: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="prelude-ty">Result</span>&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">1</span>];
+    reader.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(u8::from_le_bytes(buf))
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_i32</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-    <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">i32::from_le_bytes</span>(<span class="ident">buf</span>))
+<span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_i32&lt;R: Read + <span class="question-mark">?</span>Sized&gt;(reader: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="prelude-ty">Result</span>&lt;i32&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">4</span>];
+    reader.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(i32::from_le_bytes(buf))
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_i64</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-    <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">i64::from_le_bytes</span>(<span class="ident">buf</span>))
+<span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_i64&lt;R: Read + <span class="question-mark">?</span>Sized&gt;(reader: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="prelude-ty">Result</span>&lt;i64&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">8</span>];
+    reader.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(i64::from_le_bytes(buf))
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">read_f64</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-    <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">f64::from_le_bytes</span>(<span class="ident">buf</span>))
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>read_f64&lt;R: Read + <span class="question-mark">?</span>Sized&gt;(reader: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="prelude-ty">Result</span>&lt;f64&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">8</span>];
+    reader.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(f64::from_le_bytes(buf))
 }
 
-<span class="doccomment">/// Placeholder decoder for `Decimal128`. Reads 128 bits and just stores them, does no validation or</span>
-<span class="doccomment">/// parsing.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">read_f128</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal128</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">128</span> <span class="op">/</span> <span class="number">8</span>];
-    <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">Decimal128</span> { <span class="ident">bytes</span>: <span class="ident">buf</span> })
+<span class="doccomment">/// Placeholder decoder for `Decimal128`. Reads 128 bits and just stores them, does no validation or
+/// parsing.
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>read_f128&lt;R: Read + <span class="question-mark">?</span>Sized&gt;(reader: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal128&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0u8</span>; <span class="number">128 </span>/ <span class="number">8</span>];
+    reader.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(Decimal128 { bytes: buf })
 }
 
-<span class="kw">fn</span> <span class="ident">deserialize_array</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>, <span class="ident">utf8_lossy</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Array</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arr</span> <span class="op">=</span> <span class="ident">Array::new</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+<span class="kw">fn </span>deserialize_array&lt;R: Read + <span class="question-mark">?</span>Sized&gt;(reader: <span class="kw-2">&amp;mut </span>R, utf8_lossy: bool) -&gt; <span class="prelude-ty">Result</span>&lt;Array&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>arr = Array::new();
+    <span class="kw">let </span>length = read_i32(reader)<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="op">!</span>(<span class="ident">MIN_BSON_DOCUMENT_SIZE</span>..<span class="op">=</span><span class="ident">MAX_BSON_SIZE</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">length</span>) {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
-            <span class="ident">length</span> <span class="kw">as</span> <span class="ident">usize</span>,
+    <span class="kw">if </span>!(MIN_BSON_DOCUMENT_SIZE..=MAX_BSON_SIZE).contains(<span class="kw-2">&amp;</span>length) {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(
+            length <span class="kw">as </span>usize,
             <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">&quot;array length must be between {} and {}&quot;</span>,
-                <span class="ident">MIN_BSON_DOCUMENT_SIZE</span>, <span class="ident">MAX_BSON_SIZE</span>
+                MIN_BSON_DOCUMENT_SIZE, MAX_BSON_SIZE
             )
-            .<span class="ident">as_str</span>(),
+            .as_str(),
         ));
     }
 
-    <span class="ident">ensure_read_exactly</span>(
-        <span class="ident">reader</span>,
-        (<span class="ident">length</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">-</span> <span class="number">4</span>,
+    ensure_read_exactly(
+        reader,
+        (length <span class="kw">as </span>usize) - <span class="number">4</span>,
         <span class="string">&quot;array length longer than contents&quot;</span>,
-        <span class="op">|</span><span class="ident">cursor</span><span class="op">|</span> {
-            <span class="kw">loop</span> {
-                <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="ident">cursor</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">tag</span> <span class="op">==</span> <span class="number">0</span> {
+        |cursor| {
+            <span class="kw">loop </span>{
+                <span class="kw">let </span>tag = read_u8(cursor)<span class="question-mark">?</span>;
+                <span class="kw">if </span>tag == <span class="number">0 </span>{
                     <span class="kw">break</span>;
                 }
 
-                <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">deserialize_bson_kvp</span>(<span class="ident">cursor</span>, <span class="ident">tag</span>, <span class="ident">utf8_lossy</span>)<span class="question-mark">?</span>;
-                <span class="ident">arr</span>.<span class="ident">push</span>(<span class="ident">val</span>)
+                <span class="kw">let </span>(<span class="kw">_</span>, val) = deserialize_bson_kvp(cursor, tag, utf8_lossy)<span class="question-mark">?</span>;
+                arr.push(val)
             }
             <span class="prelude-val">Ok</span>(())
         },
     )<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">arr</span>)
+    <span class="prelude-val">Ok</span>(arr)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">deserialize_bson_kvp</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
-    <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
-    <span class="ident">tag</span>: <span class="ident">u8</span>,
-    <span class="ident">utf8_lossy</span>: <span class="ident">bool</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Bson</span>)<span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">spec::ElementType</span>;
-    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">read_cstring</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize_bson_kvp&lt;R: Read + <span class="question-mark">?</span>Sized&gt;(
+    reader: <span class="kw-2">&amp;mut </span>R,
+    tag: u8,
+    utf8_lossy: bool,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(String, Bson)&gt; {
+    <span class="kw">use </span>spec::ElementType;
+    <span class="kw">let </span>key = read_cstring(reader)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ElementType::from</span>(<span class="ident">tag</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Double</span>) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">read_f64</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::String</span>) =&gt; <span class="ident">read_string</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>).<span class="ident">map</span>(<span class="ident">Bson::String</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::EmbeddedDocument</span>) =&gt; <span class="ident">Document::from_reader</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Document</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Array</span>) =&gt; <span class="ident">deserialize_array</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>).<span class="ident">map</span>(<span class="ident">Bson::Array</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Binary</span>) =&gt; <span class="ident">Bson::Binary</span>(<span class="ident">Binary::from_reader</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::ObjectId</span>) =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">objid</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">12</span>];
-            <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">objid</span> {
-                <span class="kw-2">*</span><span class="ident">x</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>val = <span class="kw">match </span>ElementType::from(tag) {
+        <span class="prelude-val">Some</span>(ElementType::Double) =&gt; Bson::Double(read_f64(reader)<span class="question-mark">?</span>),
+        <span class="prelude-val">Some</span>(ElementType::String) =&gt; read_string(reader, utf8_lossy).map(Bson::String)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(ElementType::EmbeddedDocument) =&gt; Document::from_reader(reader).map(Bson::Document)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(ElementType::Array) =&gt; deserialize_array(reader, utf8_lossy).map(Bson::Array)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(ElementType::Binary) =&gt; Bson::Binary(Binary::from_reader(reader)<span class="question-mark">?</span>),
+        <span class="prelude-val">Some</span>(ElementType::ObjectId) =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>objid = [<span class="number">0</span>; <span class="number">12</span>];
+            <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;mut </span>objid {
+                <span class="kw-2">*</span>x = read_u8(reader)<span class="question-mark">?</span>;
             }
-            <span class="ident">Bson::ObjectId</span>(<span class="ident">oid::ObjectId::from_bytes</span>(<span class="ident">objid</span>))
+            Bson::ObjectId(oid::ObjectId::from_bytes(objid))
         }
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Boolean</span>) =&gt; <span class="ident">Bson::Boolean</span>(<span class="ident">read_bool</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Null</span>) =&gt; <span class="ident">Bson::Null</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::RegularExpression</span>) =&gt; {
-            <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex::from_reader</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>)
+        <span class="prelude-val">Some</span>(ElementType::Boolean) =&gt; Bson::Boolean(read_bool(reader)<span class="question-mark">?</span>),
+        <span class="prelude-val">Some</span>(ElementType::Null) =&gt; Bson::Null,
+        <span class="prelude-val">Some</span>(ElementType::RegularExpression) =&gt; {
+            Bson::RegularExpression(Regex::from_reader(reader)<span class="question-mark">?</span>)
         }
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::JavaScriptCode</span>) =&gt; {
-            <span class="ident">read_string</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>).<span class="ident">map</span>(<span class="ident">Bson::JavaScriptCode</span>)<span class="question-mark">?</span>
+        <span class="prelude-val">Some</span>(ElementType::JavaScriptCode) =&gt; {
+            read_string(reader, utf8_lossy).map(Bson::JavaScriptCode)<span class="question-mark">?
+        </span>}
+        <span class="prelude-val">Some</span>(ElementType::JavaScriptCodeWithScope) =&gt; {
+            Bson::JavaScriptCodeWithScope(JavaScriptCodeWithScope::from_reader(reader, utf8_lossy)<span class="question-mark">?</span>)
         }
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::JavaScriptCodeWithScope</span>) =&gt; {
-            <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident">JavaScriptCodeWithScope::from_reader</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>)<span class="question-mark">?</span>)
+        <span class="prelude-val">Some</span>(ElementType::Int32) =&gt; read_i32(reader).map(Bson::Int32)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(ElementType::Int64) =&gt; read_i64(reader).map(Bson::Int64)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(ElementType::Timestamp) =&gt; Bson::Timestamp(Timestamp::from_reader(reader)<span class="question-mark">?</span>),
+        <span class="prelude-val">Some</span>(ElementType::DateTime) =&gt; {
+            <span class="comment">// The int64 is UTC milliseconds since the Unix epoch.
+            </span><span class="kw">let </span>time = read_i64(reader)<span class="question-mark">?</span>;
+            Bson::DateTime(<span class="kw">crate</span>::DateTime::from_millis(time))
         }
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Int32</span>) =&gt; <span class="ident">read_i32</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Int32</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Int64</span>) =&gt; <span class="ident">read_i64</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Int64</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Timestamp</span>) =&gt; <span class="ident">Bson::Timestamp</span>(<span class="ident">Timestamp::from_reader</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::DateTime</span>) =&gt; {
-            <span class="comment">// The int64 is UTC milliseconds since the Unix epoch.</span>
-            <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">read_i64</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
-            <span class="ident">Bson::DateTime</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from_millis</span>(<span class="ident">time</span>))
-        }
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Symbol</span>) =&gt; <span class="ident">read_string</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>).<span class="ident">map</span>(<span class="ident">Bson::Symbol</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Decimal128</span>) =&gt; <span class="ident">read_f128</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Decimal128</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Undefined</span>) =&gt; <span class="ident">Bson::Undefined</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::DbPointer</span>) =&gt; <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer::from_reader</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::MaxKey</span>) =&gt; <span class="ident">Bson::MaxKey</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::MinKey</span>) =&gt; <span class="ident">Bson::MinKey</span>,
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnrecognizedDocumentElementType</span> {
-                <span class="ident">key</span>,
-                <span class="ident">element_type</span>: <span class="ident">tag</span>,
+        <span class="prelude-val">Some</span>(ElementType::Symbol) =&gt; read_string(reader, utf8_lossy).map(Bson::Symbol)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(ElementType::Decimal128) =&gt; read_f128(reader).map(Bson::Decimal128)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(ElementType::Undefined) =&gt; Bson::Undefined,
+        <span class="prelude-val">Some</span>(ElementType::DbPointer) =&gt; Bson::DbPointer(DbPointer::from_reader(reader)<span class="question-mark">?</span>),
+        <span class="prelude-val">Some</span>(ElementType::MaxKey) =&gt; Bson::MaxKey,
+        <span class="prelude-val">Some</span>(ElementType::MinKey) =&gt; Bson::MinKey,
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::UnrecognizedDocumentElementType {
+                key,
+                element_type: tag,
             })
         }
     };
 
-    <span class="prelude-val">Ok</span>((<span class="ident">key</span>, <span class="ident">val</span>))
+    <span class="prelude-val">Ok</span>((key, val))
 }
 
-<span class="kw">impl</span> <span class="ident">Binary</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="op">!</span>(<span class="number">0</span>..<span class="op">=</span><span class="ident">MAX_BSON_SIZE</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
-                <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>,
-                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;binary length must be between 0 and {}&quot;</span>, <span class="ident">MAX_BSON_SIZE</span>).<span class="ident">as_str</span>(),
+<span class="kw">impl </span>Binary {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_reader&lt;R: Read&gt;(<span class="kw-2">mut </span>reader: R) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>len = read_i32(<span class="kw-2">&amp;mut </span>reader)<span class="question-mark">?</span>;
+        <span class="kw">if </span>!(<span class="number">0</span>..=MAX_BSON_SIZE).contains(<span class="kw-2">&amp;</span>len) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(
+                len <span class="kw">as </span>usize,
+                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;binary length must be between 0 and {}&quot;</span>, MAX_BSON_SIZE).as_str(),
             ));
         }
-        <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">BinarySubtype::from</span>(<span class="ident">read_u8</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>);
+        <span class="kw">let </span>subtype = BinarySubtype::from(read_u8(<span class="kw-2">&amp;mut </span>reader)<span class="question-mark">?</span>);
 
-        <span class="comment">// Skip length data in old binary.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">BinarySubtype::BinaryOld</span> <span class="op">=</span> <span class="ident">subtype</span> {
-            <span class="kw">let</span> <span class="ident">data_len</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Skip length data in old binary.
+        </span><span class="kw">if let </span>BinarySubtype::BinaryOld = subtype {
+            <span class="kw">let </span>data_len = read_i32(<span class="kw-2">&amp;mut </span>reader)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="op">!</span>(<span class="number">0</span>..<span class="op">=</span>(<span class="ident">MAX_BSON_SIZE</span> <span class="op">-</span> <span class="number">4</span>)).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">data_len</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
-                    <span class="ident">data_len</span> <span class="kw">as</span> <span class="ident">usize</span>,
-                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;0x02 length must be between 0 and {}&quot;</span>, <span class="ident">MAX_BSON_SIZE</span> <span class="op">-</span> <span class="number">4</span>).<span class="ident">as_str</span>(),
+            <span class="kw">if </span>!(<span class="number">0</span>..=(MAX_BSON_SIZE - <span class="number">4</span>)).contains(<span class="kw-2">&amp;</span>data_len) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(
+                    data_len <span class="kw">as </span>usize,
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;0x02 length must be between 0 and {}&quot;</span>, MAX_BSON_SIZE - <span class="number">4</span>).as_str(),
                 ));
             }
 
-            <span class="kw">if</span> <span class="ident">data_len</span> <span class="op">+</span> <span class="number">4</span> <span class="op">!</span><span class="op">=</span> <span class="ident">len</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
-                    <span class="ident">data_len</span> <span class="kw">as</span> <span class="ident">usize</span>,
+            <span class="kw">if </span>data_len + <span class="number">4 </span>!= len {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(
+                    data_len <span class="kw">as </span>usize,
                     <span class="kw-2">&amp;</span><span class="string">&quot;0x02 length did not match top level binary length&quot;</span>,
                 ));
             }
 
-            <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">4</span>;
+            len -= <span class="number">4</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::with_capacity(len <span class="kw">as </span>usize);
 
-        <span class="ident">reader</span>.<span class="ident">take</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">Binary</span> { <span class="ident">subtype</span>, <span class="ident">bytes</span> })
+        reader.take(len <span class="kw">as </span>u64).read_to_end(<span class="kw-2">&amp;mut </span>bytes)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(Binary { subtype, bytes })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RawBinaryRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_slice_with_len_and_payload</span>(
-        <span class="kw-2">mut</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-        <span class="kw-2">mut</span> <span class="ident">len</span>: <span class="ident">i32</span>,
-        <span class="ident">subtype</span>: <span class="ident">BinarySubtype</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span>(<span class="number">0</span>..<span class="op">=</span><span class="ident">MAX_BSON_SIZE</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
-                <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>,
-                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;binary length must be between 0 and {}&quot;</span>, <span class="ident">MAX_BSON_SIZE</span>).<span class="ident">as_str</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RawBinaryRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_slice_with_len_and_payload(
+        <span class="kw-2">mut </span>bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+        <span class="kw-2">mut </span>len: i32,
+        subtype: BinarySubtype,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>!(<span class="number">0</span>..=MAX_BSON_SIZE).contains(<span class="kw-2">&amp;</span>len) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(
+                len <span class="kw">as </span>usize,
+                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;binary length must be between 0 and {}&quot;</span>, MAX_BSON_SIZE).as_str(),
             ));
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span> <span class="ident">bytes</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
-                <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>,
+        } <span class="kw">else if </span>len <span class="kw">as </span>usize &gt; bytes.len() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(
+                len <span class="kw">as </span>usize,
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                     <span class="string">&quot;binary length {} exceeds buffer length {}&quot;</span>,
-                    <span class="ident">len</span>,
-                    <span class="ident">bytes</span>.<span class="ident">len</span>()
+                    len,
+                    bytes.len()
                 )
-                .<span class="ident">as_str</span>(),
+                .as_str(),
             ));
         }
 
-        <span class="comment">// Skip length data in old binary.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">BinarySubtype::BinaryOld</span> <span class="op">=</span> <span class="ident">subtype</span> {
-            <span class="kw">let</span> <span class="ident">data_len</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Skip length data in old binary.
+        </span><span class="kw">if let </span>BinarySubtype::BinaryOld = subtype {
+            <span class="kw">let </span>data_len = read_i32(<span class="kw-2">&amp;mut </span>bytes)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">data_len</span> <span class="op">+</span> <span class="number">4</span> <span class="op">!</span><span class="op">=</span> <span class="ident">len</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
-                    <span class="ident">data_len</span> <span class="kw">as</span> <span class="ident">usize</span>,
+            <span class="kw">if </span>data_len + <span class="number">4 </span>!= len {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(
+                    data_len <span class="kw">as </span>usize,
                     <span class="kw-2">&amp;</span><span class="string">&quot;0x02 length did not match top level binary length&quot;</span>,
                 ));
             }
 
-            <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">4</span>;
+            len -= <span class="number">4</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="number">0</span>..<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>],
-            <span class="ident">subtype</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            bytes: <span class="kw-2">&amp;</span>bytes[<span class="number">0</span>..len <span class="kw">as </span>usize],
+            subtype,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DbPointer</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ns</span> <span class="op">=</span> <span class="ident">read_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">ObjectId::from_reader</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">DbPointer</span> {
-            <span class="ident">namespace</span>: <span class="ident">ns</span>,
-            <span class="ident">id</span>: <span class="ident">oid</span>,
+<span class="kw">impl </span>DbPointer {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_reader&lt;R: Read&gt;(<span class="kw-2">mut </span>reader: R) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>ns = read_string(<span class="kw-2">&amp;mut </span>reader, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>oid = ObjectId::from_reader(<span class="kw-2">&amp;mut </span>reader)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(DbPointer {
+            namespace: ns,
+            id: oid,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Regex</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pattern</span> <span class="op">=</span> <span class="ident">read_cstring</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">read_cstring</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Regex {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_reader&lt;R: Read&gt;(<span class="kw-2">mut </span>reader: R) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>pattern = read_cstring(<span class="kw-2">&amp;mut </span>reader)<span class="question-mark">?</span>;
+        <span class="kw">let </span>options = read_cstring(<span class="kw-2">&amp;mut </span>reader)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Regex</span> { <span class="ident">pattern</span>, <span class="ident">options</span> })
+        <span class="prelude-val">Ok</span>(Regex { pattern, options })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Timestamp</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">read_i64</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Timestamp::from_le_i64</span>)
+<span class="kw">impl </span>Timestamp {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_reader&lt;R: Read&gt;(<span class="kw-2">mut </span>reader: R) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        read_i64(<span class="kw-2">&amp;mut </span>reader).map(Timestamp::from_le_i64)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ObjectId</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">12</span>];
-        <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_bytes</span>(<span class="ident">buf</span>))
+<span class="kw">impl </span>ObjectId {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_reader&lt;R: Read&gt;(<span class="kw-2">mut </span>reader: R) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0u8</span>; <span class="number">12</span>];
+        reader.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_bytes(buf))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">JavaScriptCodeWithScope</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>, <span class="ident">utf8_lossy</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">length</span> <span class="op">&lt;</span> <span class="ident">MIN_CODE_WITH_SCOPE_SIZE</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
-                <span class="ident">length</span> <span class="kw">as</span> <span class="ident">usize</span>,
+<span class="kw">impl </span>JavaScriptCodeWithScope {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_reader&lt;R: Read&gt;(<span class="kw-2">mut </span>reader: R, utf8_lossy: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>length = read_i32(<span class="kw-2">&amp;mut </span>reader)<span class="question-mark">?</span>;
+        <span class="kw">if </span>length &lt; MIN_CODE_WITH_SCOPE_SIZE {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(
+                length <span class="kw">as </span>usize,
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                     <span class="string">&quot;code with scope length must be at least {}&quot;</span>,
-                    <span class="ident">MIN_CODE_WITH_SCOPE_SIZE</span>
+                    MIN_CODE_WITH_SCOPE_SIZE
                 )
-                .<span class="ident">as_str</span>(),
+                .as_str(),
             ));
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span> <span class="ident">MAX_BSON_SIZE</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
-                <span class="ident">length</span> <span class="kw">as</span> <span class="ident">usize</span>,
+        } <span class="kw">else if </span>length &gt; MAX_BSON_SIZE {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(
+                length <span class="kw">as </span>usize,
                 <span class="kw-2">&amp;</span><span class="string">&quot;code with scope length too large&quot;</span>,
             ));
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; (<span class="ident">length</span> <span class="op">-</span> <span class="number">4</span>) <span class="kw">as</span> <span class="ident">usize</span>];
-        <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; (length - <span class="number">4</span>) <span class="kw">as </span>usize];
+        reader.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">as_slice</span>();
-        <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">read_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">slice</span>, <span class="ident">utf8_lossy</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">scope</span> <span class="op">=</span> <span class="ident">Document::from_reader</span>(<span class="kw-2">&amp;mut</span> <span class="ident">slice</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">JavaScriptCodeWithScope</span> { <span class="ident">code</span>, <span class="ident">scope</span> })
+        <span class="kw">let </span><span class="kw-2">mut </span>slice = buf.as_slice();
+        <span class="kw">let </span>code = read_string(<span class="kw-2">&amp;mut </span>slice, utf8_lossy)<span class="question-mark">?</span>;
+        <span class="kw">let </span>scope = Document::from_reader(<span class="kw-2">&amp;mut </span>slice)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(JavaScriptCodeWithScope { code, scope })
     }
 }
 
-<span class="doccomment">/// Deserialize a `T` from the provided [`Bson`] value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Deserializer` used by this function presents itself as human readable, whereas the</span>
-<span class="doccomment">/// one used in [`from_slice`] does not. This means that this function may deserialize differently</span>
-<span class="doccomment">/// than [`from_slice`] for types that change their deserialization logic depending on whether</span>
-<span class="doccomment">/// the format is human readable or not. To deserialize from [`Bson`] with a deserializer that</span>
-<span class="doccomment">/// presents itself as not human readable, use [`from_bson_with_options`] with</span>
-<span class="doccomment">/// [`DeserializerOptions::human_readable`] set to false.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bson</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">bson</span>: <span class="ident">Bson</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span>,
+<span class="doccomment">/// Deserialize a `T` from the provided [`Bson`] value.
+///
+/// The `Deserializer` used by this function presents itself as human readable, whereas the
+/// one used in [`from_slice`] does not. This means that this function may deserialize differently
+/// than [`from_slice`] for types that change their deserialization logic depending on whether
+/// the format is human readable or not. To deserialize from [`Bson`] with a deserializer that
+/// presents itself as not human readable, use [`from_bson_with_options`] with
+/// [`DeserializerOptions::human_readable`] set to false.
+</span><span class="kw">pub fn </span>from_bson&lt;T&gt;(bson: Bson) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned,
 {
-    <span class="kw">let</span> <span class="ident">de</span> <span class="op">=</span> <span class="ident">Deserializer::new</span>(<span class="ident">bson</span>);
-    <span class="ident">Deserialize::deserialize</span>(<span class="ident">de</span>)
+    <span class="kw">let </span>de = Deserializer::new(bson);
+    Deserialize::deserialize(de)
 }
 
-<span class="doccomment">/// Deserialize a `T` from the provided [`Bson`] value, configuring the underlying</span>
-<span class="doccomment">/// deserializer with the provided options.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde::Deserialize;</span>
-<span class="doccomment">/// # use bson::{bson, DeserializerOptions};</span>
-<span class="doccomment">/// #[derive(Debug, Deserialize, PartialEq)]</span>
-<span class="doccomment">/// struct MyData {</span>
-<span class="doccomment">///     a: String,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let bson = bson!({ &quot;a&quot;: &quot;hello&quot; });</span>
-<span class="doccomment">/// let options = DeserializerOptions::builder().human_readable(false).build();</span>
-<span class="doccomment">/// let data: MyData = bson::from_bson_with_options(bson, options)?;</span>
-<span class="doccomment">/// assert_eq!(data, MyData { a: &quot;hello&quot;.to_string() });</span>
-<span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bson_with_options</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">bson</span>: <span class="ident">Bson</span>, <span class="ident">options</span>: <span class="ident">DeserializerOptions</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span>,
+<span class="doccomment">/// Deserialize a `T` from the provided [`Bson`] value, configuring the underlying
+/// deserializer with the provided options.
+/// ```
+/// # use serde::Deserialize;
+/// # use bson::{bson, DeserializerOptions};
+/// #[derive(Debug, Deserialize, PartialEq)]
+/// struct MyData {
+///     a: String,
+/// }
+///
+/// let bson = bson!({ &quot;a&quot;: &quot;hello&quot; });
+/// let options = DeserializerOptions::builder().human_readable(false).build();
+/// let data: MyData = bson::from_bson_with_options(bson, options)?;
+/// assert_eq!(data, MyData { a: &quot;hello&quot;.to_string() });
+/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+/// ```
+</span><span class="kw">pub fn </span>from_bson_with_options&lt;T&gt;(bson: Bson, options: DeserializerOptions) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned,
 {
-    <span class="kw">let</span> <span class="ident">de</span> <span class="op">=</span> <span class="ident">Deserializer::new_with_options</span>(<span class="ident">bson</span>, <span class="ident">options</span>);
-    <span class="ident">Deserialize::deserialize</span>(<span class="ident">de</span>)
+    <span class="kw">let </span>de = Deserializer::new_with_options(bson, options);
+    Deserialize::deserialize(de)
 }
 
-<span class="doccomment">/// Deserialize a `T` from the provided [`Document`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Deserializer` used by this function presents itself as human readable, whereas the</span>
-<span class="doccomment">/// one used in [`from_slice`] does not. This means that this function may deserialize differently</span>
-<span class="doccomment">/// than [`from_slice`] for types that change their deserialization logic depending on whether</span>
-<span class="doccomment">/// the format is human readable or not. To deserialize from [`Document`] with a deserializer that</span>
-<span class="doccomment">/// presents itself as not human readable, use [`from_document_with_options`] with</span>
-<span class="doccomment">/// [`DeserializerOptions::human_readable`] set to false.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_document</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">doc</span>: <span class="ident">Document</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span>,
+<span class="doccomment">/// Deserialize a `T` from the provided [`Document`].
+///
+/// The `Deserializer` used by this function presents itself as human readable, whereas the
+/// one used in [`from_slice`] does not. This means that this function may deserialize differently
+/// than [`from_slice`] for types that change their deserialization logic depending on whether
+/// the format is human readable or not. To deserialize from [`Document`] with a deserializer that
+/// presents itself as not human readable, use [`from_document_with_options`] with
+/// [`DeserializerOptions::human_readable`] set to false.
+</span><span class="kw">pub fn </span>from_document&lt;T&gt;(doc: Document) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned,
 {
-    <span class="ident">from_bson</span>(<span class="ident">Bson::Document</span>(<span class="ident">doc</span>))
+    from_bson(Bson::Document(doc))
 }
 
-<span class="doccomment">/// Deserialize a `T` from the provided [`Document`], configuring the underlying</span>
-<span class="doccomment">/// deserializer with the provided options.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde::Deserialize;</span>
-<span class="doccomment">/// # use bson::{doc, DeserializerOptions};</span>
-<span class="doccomment">/// #[derive(Debug, Deserialize, PartialEq)]</span>
-<span class="doccomment">/// struct MyData {</span>
-<span class="doccomment">///     a: String,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let doc = doc! { &quot;a&quot;: &quot;hello&quot; };</span>
-<span class="doccomment">/// let options = DeserializerOptions::builder().human_readable(false).build();</span>
-<span class="doccomment">/// let data: MyData = bson::from_document_with_options(doc, options)?;</span>
-<span class="doccomment">/// assert_eq!(data, MyData { a: &quot;hello&quot;.to_string() });</span>
-<span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_document_with_options</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">doc</span>: <span class="ident">Document</span>, <span class="ident">options</span>: <span class="ident">DeserializerOptions</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span>,
+<span class="doccomment">/// Deserialize a `T` from the provided [`Document`], configuring the underlying
+/// deserializer with the provided options.
+/// ```
+/// # use serde::Deserialize;
+/// # use bson::{doc, DeserializerOptions};
+/// #[derive(Debug, Deserialize, PartialEq)]
+/// struct MyData {
+///     a: String,
+/// }
+///
+/// let doc = doc! { &quot;a&quot;: &quot;hello&quot; };
+/// let options = DeserializerOptions::builder().human_readable(false).build();
+/// let data: MyData = bson::from_document_with_options(doc, options)?;
+/// assert_eq!(data, MyData { a: &quot;hello&quot;.to_string() });
+/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+/// ```
+</span><span class="kw">pub fn </span>from_document_with_options&lt;T&gt;(doc: Document, options: DeserializerOptions) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned,
 {
-    <span class="kw">let</span> <span class="ident">de</span> <span class="op">=</span> <span class="ident">Deserializer::new_with_options</span>(<span class="ident">Bson::Document</span>(<span class="ident">doc</span>), <span class="ident">options</span>);
-    <span class="ident">Deserialize::deserialize</span>(<span class="ident">de</span>)
+    <span class="kw">let </span>de = Deserializer::new_with_options(Bson::Document(doc), options);
+    Deserialize::deserialize(de)
 }
 
-<span class="kw">fn</span> <span class="ident">reader_to_vec</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
+<span class="kw">fn </span>reader_to_vec&lt;R: Read&gt;(<span class="kw-2">mut </span>reader: R) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
+    <span class="kw">let </span>length = read_i32(<span class="kw-2">&amp;mut </span>reader)<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">length</span> <span class="op">&lt;</span> <span class="ident">MIN_BSON_DOCUMENT_SIZE</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::custom</span>(<span class="string">&quot;document size too small&quot;</span>));
+    <span class="kw">if </span>length &lt; MIN_BSON_DOCUMENT_SIZE {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::custom(<span class="string">&quot;document size too small&quot;</span>));
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">usize</span>);
-    <span class="ident">write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>, <span class="ident">length</span>).<span class="ident">map_err</span>(<span class="ident">Error::custom</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::with_capacity(length <span class="kw">as </span>usize);
+    write_i32(<span class="kw-2">&amp;mut </span>bytes, length).map_err(Error::custom)<span class="question-mark">?</span>;
 
-    <span class="ident">reader</span>.<span class="ident">take</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> <span class="number">4</span>).<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>)
+    reader.take(length <span class="kw">as </span>u64 - <span class="number">4</span>).read_to_end(<span class="kw-2">&amp;mut </span>bytes)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(bytes)
 }
 
-<span class="doccomment">/// Deserialize an instance of type `T` from an I/O stream of BSON.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span>,
-    <span class="ident">R</span>: <span class="ident">Read</span>,
+<span class="doccomment">/// Deserialize an instance of type `T` from an I/O stream of BSON.
+</span><span class="kw">pub fn </span>from_reader&lt;R, T&gt;(reader: R) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned,
+    R: Read,
 {
-    <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">reader_to_vec</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
-    <span class="ident">from_slice</span>(<span class="ident">bytes</span>.<span class="ident">as_slice</span>())
+    <span class="kw">let </span>bytes = reader_to_vec(reader)<span class="question-mark">?</span>;
+    from_slice(bytes.as_slice())
 }
 
-<span class="doccomment">/// Deserialize an instance of type `T` from an I/O stream of BSON, replacing any invalid UTF-8</span>
-<span class="doccomment">/// sequences with the Unicode replacement character.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is mainly useful when reading raw BSON returned from a MongoDB server, which</span>
-<span class="doccomment">/// in rare cases can contain invalidly truncated strings (&lt;https://jira.mongodb.org/browse/SERVER-24007&gt;).</span>
-<span class="doccomment">/// For most use cases, [`crate::from_reader`] can be used instead.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_reader_utf8_lossy</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span>,
-    <span class="ident">R</span>: <span class="ident">Read</span>,
+<span class="doccomment">/// Deserialize an instance of type `T` from an I/O stream of BSON, replacing any invalid UTF-8
+/// sequences with the Unicode replacement character.
+///
+/// This is mainly useful when reading raw BSON returned from a MongoDB server, which
+/// in rare cases can contain invalidly truncated strings (&lt;https://jira.mongodb.org/browse/SERVER-24007&gt;).
+/// For most use cases, [`crate::from_reader`] can be used instead.
+</span><span class="kw">pub fn </span>from_reader_utf8_lossy&lt;R, T&gt;(reader: R) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned,
+    R: Read,
 {
-    <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">reader_to_vec</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
-    <span class="ident">from_slice_utf8_lossy</span>(<span class="ident">bytes</span>.<span class="ident">as_slice</span>())
+    <span class="kw">let </span>bytes = reader_to_vec(reader)<span class="question-mark">?</span>;
+    from_slice_utf8_lossy(bytes.as_slice())
 }
 
-<span class="doccomment">/// Deserialize an instance of type `T` from a slice of BSON bytes.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Deserialize an instance of type `T` from a slice of BSON bytes.
+</span><span class="kw">pub fn </span>from_slice&lt;<span class="lifetime">&#39;de</span>, T&gt;(bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">deserializer</span> <span class="op">=</span> <span class="ident">raw::Deserializer::new</span>(<span class="ident">bytes</span>, <span class="bool-val">false</span>);
-    <span class="ident">T::deserialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">deserializer</span>)
+    <span class="kw">let </span><span class="kw-2">mut </span>deserializer = raw::Deserializer::new(bytes, <span class="bool-val">false</span>);
+    T::deserialize(<span class="kw-2">&amp;mut </span>deserializer)
 }
 
-<span class="doccomment">/// Deserialize an instance of type `T` from a slice of BSON bytes, replacing any invalid UTF-8</span>
-<span class="doccomment">/// sequences with the Unicode replacement character.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is mainly useful when reading raw BSON returned from a MongoDB server, which</span>
-<span class="doccomment">/// in rare cases can contain invalidly truncated strings (&lt;https://jira.mongodb.org/browse/SERVER-24007&gt;).</span>
-<span class="doccomment">/// For most use cases, [`crate::from_slice`] can be used instead.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice_utf8_lossy</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Deserialize an instance of type `T` from a slice of BSON bytes, replacing any invalid UTF-8
+/// sequences with the Unicode replacement character.
+///
+/// This is mainly useful when reading raw BSON returned from a MongoDB server, which
+/// in rare cases can contain invalidly truncated strings (&lt;https://jira.mongodb.org/browse/SERVER-24007&gt;).
+/// For most use cases, [`crate::from_slice`] can be used instead.
+</span><span class="kw">pub fn </span>from_slice_utf8_lossy&lt;<span class="lifetime">&#39;de</span>, T&gt;(bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">deserializer</span> <span class="op">=</span> <span class="ident">raw::Deserializer::new</span>(<span class="ident">bytes</span>, <span class="bool-val">true</span>);
-    <span class="ident">T::deserialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">deserializer</span>)
+    <span class="kw">let </span><span class="kw-2">mut </span>deserializer = raw::Deserializer::new(bytes, <span class="bool-val">true</span>);
+    T::deserialize(<span class="kw-2">&amp;mut </span>deserializer)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

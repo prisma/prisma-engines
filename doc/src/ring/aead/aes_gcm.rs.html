@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/aes_gcm.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aes_gcm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/aes_gcm.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aes_gcm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -299,306 +299,306 @@
 <span id="299">299</span>
 <span id="300">300</span>
 <span id="301">301</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">aes</span>::{<span class="self">self</span>, <span class="ident">Counter</span>},
-    <span class="ident">gcm</span>, <span class="ident">shift</span>, <span class="ident">Aad</span>, <span class="ident">Block</span>, <span class="ident">Direction</span>, <span class="ident">Nonce</span>, <span class="ident">Tag</span>, <span class="ident">BLOCK_LEN</span>,
+</span><span class="kw">use super</span>::{
+    aes::{<span class="self">self</span>, Counter},
+    gcm, shift, Aad, Block, Direction, Nonce, Tag, BLOCK_LEN,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">aead</span>, <span class="ident">cpu</span>, <span class="ident">endian</span>::<span class="kw-2">*</span>, <span class="ident">error</span>, <span class="ident">polyfill</span>};
+<span class="kw">use crate</span>::{aead, cpu, endian::<span class="kw-2">*</span>, error, polyfill};
 
-<span class="doccomment">/// AES-128 in GCM mode with 128-bit tags and 96 bit nonces.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">AES_128_GCM</span>: <span class="ident">aead::Algorithm</span> <span class="op">=</span> <span class="ident">aead::Algorithm</span> {
-    <span class="ident">key_len</span>: <span class="number">16</span>,
-    <span class="ident">init</span>: <span class="ident">init_128</span>,
-    <span class="ident">seal</span>: <span class="ident">aes_gcm_seal</span>,
-    <span class="ident">open</span>: <span class="ident">aes_gcm_open</span>,
-    <span class="ident">id</span>: <span class="ident">aead::AlgorithmID::AES_128_GCM</span>,
-    <span class="ident">max_input_len</span>: <span class="ident">AES_GCM_MAX_INPUT_LEN</span>,
-};
-
-<span class="doccomment">/// AES-256 in GCM mode with 128-bit tags and 96 bit nonces.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">AES_256_GCM</span>: <span class="ident">aead::Algorithm</span> <span class="op">=</span> <span class="ident">aead::Algorithm</span> {
-    <span class="ident">key_len</span>: <span class="number">32</span>,
-    <span class="ident">init</span>: <span class="ident">init_256</span>,
-    <span class="ident">seal</span>: <span class="ident">aes_gcm_seal</span>,
-    <span class="ident">open</span>: <span class="ident">aes_gcm_open</span>,
-    <span class="ident">id</span>: <span class="ident">aead::AlgorithmID::AES_256_GCM</span>,
-    <span class="ident">max_input_len</span>: <span class="ident">AES_GCM_MAX_INPUT_LEN</span>,
+<span class="doccomment">/// AES-128 in GCM mode with 128-bit tags and 96 bit nonces.
+</span><span class="kw">pub static </span>AES_128_GCM: aead::Algorithm = aead::Algorithm {
+    key_len: <span class="number">16</span>,
+    init: init_128,
+    seal: aes_gcm_seal,
+    open: aes_gcm_open,
+    id: aead::AlgorithmID::AES_128_GCM,
+    max_input_len: AES_GCM_MAX_INPUT_LEN,
 };
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Key</span> {
-    <span class="ident">gcm_key</span>: <span class="ident">gcm::Key</span>, <span class="comment">// First because it has a large alignment requirement.</span>
-    <span class="ident">aes_key</span>: <span class="ident">aes::Key</span>,
+<span class="doccomment">/// AES-256 in GCM mode with 128-bit tags and 96 bit nonces.
+</span><span class="kw">pub static </span>AES_256_GCM: aead::Algorithm = aead::Algorithm {
+    key_len: <span class="number">32</span>,
+    init: init_256,
+    seal: aes_gcm_seal,
+    open: aes_gcm_open,
+    id: aead::AlgorithmID::AES_256_GCM,
+    max_input_len: AES_GCM_MAX_INPUT_LEN,
+};
+
+<span class="kw">pub struct </span>Key {
+    gcm_key: gcm::Key, <span class="comment">// First because it has a large alignment requirement.
+    </span>aes_key: aes::Key,
 }
 
-<span class="kw">fn</span> <span class="ident">init_128</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">aead::KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="ident">init</span>(<span class="ident">key</span>, <span class="ident">aes::Variant::AES_128</span>, <span class="ident">cpu_features</span>)
+<span class="kw">fn </span>init_128(key: <span class="kw-2">&amp;</span>[u8], cpu_features: cpu::Features) -&gt; <span class="prelude-ty">Result</span>&lt;aead::KeyInner, error::Unspecified&gt; {
+    init(key, aes::Variant::AES_128, cpu_features)
 }
 
-<span class="kw">fn</span> <span class="ident">init_256</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">aead::KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="ident">init</span>(<span class="ident">key</span>, <span class="ident">aes::Variant::AES_256</span>, <span class="ident">cpu_features</span>)
+<span class="kw">fn </span>init_256(key: <span class="kw-2">&amp;</span>[u8], cpu_features: cpu::Features) -&gt; <span class="prelude-ty">Result</span>&lt;aead::KeyInner, error::Unspecified&gt; {
+    init(key, aes::Variant::AES_256, cpu_features)
 }
 
-<span class="kw">fn</span> <span class="ident">init</span>(
-    <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">variant</span>: <span class="ident">aes::Variant</span>,
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">aead::KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">aes_key</span> <span class="op">=</span> <span class="ident">aes::Key::new</span>(<span class="ident">key</span>, <span class="ident">variant</span>, <span class="ident">cpu_features</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">gcm_key</span> <span class="op">=</span> <span class="ident">gcm::Key::new</span>(<span class="ident">aes_key</span>.<span class="ident">encrypt_block</span>(<span class="ident">Block::zero</span>()), <span class="ident">cpu_features</span>);
-    <span class="prelude-val">Ok</span>(<span class="ident">aead::KeyInner::AesGcm</span>(<span class="ident">Key</span> { <span class="ident">aes_key</span>, <span class="ident">gcm_key</span> }))
+<span class="kw">fn </span>init(
+    key: <span class="kw-2">&amp;</span>[u8],
+    variant: aes::Variant,
+    cpu_features: cpu::Features,
+) -&gt; <span class="prelude-ty">Result</span>&lt;aead::KeyInner, error::Unspecified&gt; {
+    <span class="kw">let </span>aes_key = aes::Key::new(key, variant, cpu_features)<span class="question-mark">?</span>;
+    <span class="kw">let </span>gcm_key = gcm::Key::new(aes_key.encrypt_block(Block::zero()), cpu_features);
+    <span class="prelude-val">Ok</span>(aead::KeyInner::AesGcm(Key { aes_key, gcm_key }))
 }
 
-<span class="kw">const</span> <span class="ident">CHUNK_BLOCKS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">/</span> <span class="number">16</span>;
+<span class="kw">const </span>CHUNK_BLOCKS: usize = <span class="number">3 </span>* <span class="number">1024 </span>/ <span class="number">16</span>;
 
-<span class="kw">fn</span> <span class="ident">aes_gcm_seal</span>(
-    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">aead::KeyInner</span>,
-    <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-    <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-) -&gt; <span class="ident">Tag</span> {
-    <span class="ident">aead</span>(<span class="ident">key</span>, <span class="ident">nonce</span>, <span class="ident">aad</span>, <span class="ident">in_out</span>, <span class="ident">Direction::Sealing</span>, <span class="ident">cpu_features</span>)
+<span class="kw">fn </span>aes_gcm_seal(
+    key: <span class="kw-2">&amp;</span>aead::KeyInner,
+    nonce: Nonce,
+    aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+    in_out: <span class="kw-2">&amp;mut </span>[u8],
+    cpu_features: cpu::Features,
+) -&gt; Tag {
+    aead(key, nonce, aad, in_out, Direction::Sealing, cpu_features)
 }
 
-<span class="kw">fn</span> <span class="ident">aes_gcm_open</span>(
-    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">aead::KeyInner</span>,
-    <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-    <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">in_prefix_len</span>: <span class="ident">usize</span>,
-    <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-) -&gt; <span class="ident">Tag</span> {
-    <span class="ident">aead</span>(
-        <span class="ident">key</span>,
-        <span class="ident">nonce</span>,
-        <span class="ident">aad</span>,
-        <span class="ident">in_out</span>,
-        <span class="ident">Direction::Opening</span> { <span class="ident">in_prefix_len</span> },
-        <span class="ident">cpu_features</span>,
+<span class="kw">fn </span>aes_gcm_open(
+    key: <span class="kw-2">&amp;</span>aead::KeyInner,
+    nonce: Nonce,
+    aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+    in_prefix_len: usize,
+    in_out: <span class="kw-2">&amp;mut </span>[u8],
+    cpu_features: cpu::Features,
+) -&gt; Tag {
+    aead(
+        key,
+        nonce,
+        aad,
+        in_out,
+        Direction::Opening { in_prefix_len },
+        cpu_features,
     )
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span> <span class="comment">// Avoid branching on `direction`.</span>
-<span class="kw">fn</span> <span class="ident">aead</span>(
-    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">aead::KeyInner</span>,
-    <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-    <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">direction</span>: <span class="ident">Direction</span>,
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-) -&gt; <span class="ident">Tag</span> {
-    <span class="kw">let</span> <span class="ident">Key</span> { <span class="ident">aes_key</span>, <span class="ident">gcm_key</span> } <span class="op">=</span> <span class="kw">match</span> <span class="ident">key</span> {
-        <span class="ident">aead::KeyInner::AesGcm</span>(<span class="ident">key</span>) =&gt; <span class="ident">key</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+<span class="attribute">#[inline(always)] </span><span class="comment">// Avoid branching on `direction`.
+</span><span class="kw">fn </span>aead(
+    key: <span class="kw-2">&amp;</span>aead::KeyInner,
+    nonce: Nonce,
+    aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+    in_out: <span class="kw-2">&amp;mut </span>[u8],
+    direction: Direction,
+    cpu_features: cpu::Features,
+) -&gt; Tag {
+    <span class="kw">let </span>Key { aes_key, gcm_key } = <span class="kw">match </span>key {
+        aead::KeyInner::AesGcm(key) =&gt; key,
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctr</span> <span class="op">=</span> <span class="ident">Counter::one</span>(<span class="ident">nonce</span>);
-    <span class="kw">let</span> <span class="ident">tag_iv</span> <span class="op">=</span> <span class="ident">ctr</span>.<span class="ident">increment</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>ctr = Counter::one(nonce);
+    <span class="kw">let </span>tag_iv = ctr.increment();
 
-    <span class="kw">let</span> <span class="ident">aad_len</span> <span class="op">=</span> <span class="ident">aad</span>.<span class="number">0</span>.<span class="ident">len</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gcm_ctx</span> <span class="op">=</span> <span class="ident">gcm::Context::new</span>(<span class="ident">gcm_key</span>, <span class="ident">aad</span>, <span class="ident">cpu_features</span>);
+    <span class="kw">let </span>aad_len = aad.<span class="number">0</span>.len();
+    <span class="kw">let </span><span class="kw-2">mut </span>gcm_ctx = gcm::Context::new(gcm_key, aad, cpu_features);
 
-    <span class="kw">let</span> <span class="ident">in_prefix_len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">direction</span> {
-        <span class="ident">Direction::Opening</span> { <span class="ident">in_prefix_len</span> } =&gt; <span class="ident">in_prefix_len</span>,
-        <span class="ident">Direction::Sealing</span> =&gt; <span class="number">0</span>,
+    <span class="kw">let </span>in_prefix_len = <span class="kw">match </span>direction {
+        Direction::Opening { in_prefix_len } =&gt; in_prefix_len,
+        Direction::Sealing =&gt; <span class="number">0</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">total_in_out_len</span> <span class="op">=</span> <span class="ident">in_out</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">in_prefix_len</span>;
+    <span class="kw">let </span>total_in_out_len = in_out.len() - in_prefix_len;
 
-    <span class="kw">let</span> <span class="ident">in_out</span> <span class="op">=</span> <span class="ident">integrated_aes_gcm</span>(
-        <span class="ident">aes_key</span>,
-        <span class="kw-2">&amp;mut</span> <span class="ident">gcm_ctx</span>,
-        <span class="ident">in_out</span>,
-        <span class="kw-2">&amp;mut</span> <span class="ident">ctr</span>,
-        <span class="ident">direction</span>,
-        <span class="ident">cpu_features</span>,
+    <span class="kw">let </span>in_out = integrated_aes_gcm(
+        aes_key,
+        <span class="kw-2">&amp;mut </span>gcm_ctx,
+        in_out,
+        <span class="kw-2">&amp;mut </span>ctr,
+        direction,
+        cpu_features,
     );
-    <span class="kw">let</span> <span class="ident">in_out_len</span> <span class="op">=</span> <span class="ident">in_out</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">in_prefix_len</span>;
+    <span class="kw">let </span>in_out_len = in_out.len() - in_prefix_len;
 
-    <span class="comment">// Process any (remaining) whole blocks.</span>
-    <span class="kw">let</span> <span class="ident">whole_len</span> <span class="op">=</span> <span class="ident">in_out_len</span> <span class="op">-</span> (<span class="ident">in_out_len</span> <span class="op">%</span> <span class="ident">BLOCK_LEN</span>);
+    <span class="comment">// Process any (remaining) whole blocks.
+    </span><span class="kw">let </span>whole_len = in_out_len - (in_out_len % BLOCK_LEN);
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk_len</span> <span class="op">=</span> <span class="ident">CHUNK_BLOCKS</span> <span class="op">*</span> <span class="ident">BLOCK_LEN</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">in_prefix_len</span>;
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="ident">whole_len</span> <span class="op">-</span> <span class="ident">output</span> <span class="op">&lt;</span> <span class="ident">chunk_len</span> {
-                <span class="ident">chunk_len</span> <span class="op">=</span> <span class="ident">whole_len</span> <span class="op">-</span> <span class="ident">output</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk_len = CHUNK_BLOCKS * BLOCK_LEN;
+        <span class="kw">let </span><span class="kw-2">mut </span>output = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>input = in_prefix_len;
+        <span class="kw">loop </span>{
+            <span class="kw">if </span>whole_len - output &lt; chunk_len {
+                chunk_len = whole_len - output;
             }
-            <span class="kw">if</span> <span class="ident">chunk_len</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="kw">if </span>chunk_len == <span class="number">0 </span>{
                 <span class="kw">break</span>;
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Direction::Opening</span> { .. } <span class="op">=</span> <span class="ident">direction</span> {
-                <span class="ident">gcm_ctx</span>.<span class="ident">update_blocks</span>(<span class="kw-2">&amp;</span><span class="ident">in_out</span>[<span class="ident">input</span>..][..<span class="ident">chunk_len</span>]);
+            <span class="kw">if let </span>Direction::Opening { .. } = direction {
+                gcm_ctx.update_blocks(<span class="kw-2">&amp;</span>in_out[input..][..chunk_len]);
             }
 
-            <span class="ident">aes_key</span>.<span class="ident">ctr32_encrypt_blocks</span>(
-                <span class="kw-2">&amp;mut</span> <span class="ident">in_out</span>[<span class="ident">output</span>..][..(<span class="ident">chunk_len</span> <span class="op">+</span> <span class="ident">in_prefix_len</span>)],
-                <span class="ident">direction</span>,
-                <span class="kw-2">&amp;mut</span> <span class="ident">ctr</span>,
+            aes_key.ctr32_encrypt_blocks(
+                <span class="kw-2">&amp;mut </span>in_out[output..][..(chunk_len + in_prefix_len)],
+                direction,
+                <span class="kw-2">&amp;mut </span>ctr,
             );
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Direction::Sealing</span> <span class="op">=</span> <span class="ident">direction</span> {
-                <span class="ident">gcm_ctx</span>.<span class="ident">update_blocks</span>(<span class="kw-2">&amp;</span><span class="ident">in_out</span>[<span class="ident">output</span>..][..<span class="ident">chunk_len</span>]);
+            <span class="kw">if let </span>Direction::Sealing = direction {
+                gcm_ctx.update_blocks(<span class="kw-2">&amp;</span>in_out[output..][..chunk_len]);
             }
 
-            <span class="ident">output</span> <span class="op">+</span><span class="op">=</span> <span class="ident">chunk_len</span>;
-            <span class="ident">input</span> <span class="op">+</span><span class="op">=</span> <span class="ident">chunk_len</span>;
+            output += chunk_len;
+            input += chunk_len;
         }
     }
 
-    <span class="comment">// Process any remaining partial block.</span>
-    <span class="kw">let</span> <span class="ident">remainder</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">in_out</span>[<span class="ident">whole_len</span>..];
-    <span class="ident">shift::shift_partial</span>((<span class="ident">in_prefix_len</span>, <span class="ident">remainder</span>), <span class="op">|</span><span class="ident">remainder</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">Block::zero</span>();
-        <span class="ident">input</span>.<span class="ident">overwrite_part_at</span>(<span class="number">0</span>, <span class="ident">remainder</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Direction::Opening</span> { .. } <span class="op">=</span> <span class="ident">direction</span> {
-            <span class="ident">gcm_ctx</span>.<span class="ident">update_block</span>(<span class="ident">input</span>);
+    <span class="comment">// Process any remaining partial block.
+    </span><span class="kw">let </span>remainder = <span class="kw-2">&amp;mut </span>in_out[whole_len..];
+    shift::shift_partial((in_prefix_len, remainder), |remainder| {
+        <span class="kw">let </span><span class="kw-2">mut </span>input = Block::zero();
+        input.overwrite_part_at(<span class="number">0</span>, remainder);
+        <span class="kw">if let </span>Direction::Opening { .. } = direction {
+            gcm_ctx.update_block(input);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">aes_key</span>.<span class="ident">encrypt_iv_xor_block</span>(<span class="ident">ctr</span>.<span class="ident">into</span>(), <span class="ident">input</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Direction::Sealing</span> <span class="op">=</span> <span class="ident">direction</span> {
-            <span class="ident">output</span>.<span class="ident">zero_from</span>(<span class="ident">remainder</span>.<span class="ident">len</span>());
-            <span class="ident">gcm_ctx</span>.<span class="ident">update_block</span>(<span class="ident">output</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>output = aes_key.encrypt_iv_xor_block(ctr.into(), input);
+        <span class="kw">if let </span>Direction::Sealing = direction {
+            output.zero_from(remainder.len());
+            gcm_ctx.update_block(output);
         }
-        <span class="ident">output</span>
+        output
     });
 
-    <span class="comment">// Authenticate the final block containing the input lengths.</span>
-    <span class="kw">let</span> <span class="ident">aad_bits</span> <span class="op">=</span> <span class="ident">polyfill::u64_from_usize</span>(<span class="ident">aad_len</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-    <span class="kw">let</span> <span class="ident">ciphertext_bits</span> <span class="op">=</span> <span class="ident">polyfill::u64_from_usize</span>(<span class="ident">total_in_out_len</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-    <span class="ident">gcm_ctx</span>.<span class="ident">update_block</span>(<span class="ident">Block::from_u64_be</span>(
-        <span class="ident">BigEndian::from</span>(<span class="ident">aad_bits</span>),
-        <span class="ident">BigEndian::from</span>(<span class="ident">ciphertext_bits</span>),
+    <span class="comment">// Authenticate the final block containing the input lengths.
+    </span><span class="kw">let </span>aad_bits = polyfill::u64_from_usize(aad_len) &lt;&lt; <span class="number">3</span>;
+    <span class="kw">let </span>ciphertext_bits = polyfill::u64_from_usize(total_in_out_len) &lt;&lt; <span class="number">3</span>;
+    gcm_ctx.update_block(Block::from_u64_be(
+        BigEndian::from(aad_bits),
+        BigEndian::from(ciphertext_bits),
     ));
 
-    <span class="comment">// Finalize the tag and return it.</span>
-    <span class="ident">gcm_ctx</span>.<span class="ident">pre_finish</span>(<span class="op">|</span><span class="ident">pre_tag</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">tag_iv</span>.<span class="ident">into_bytes_less_safe</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">aes_key</span>.<span class="ident">encrypt_block</span>(<span class="ident">Block::from</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>));
-        <span class="ident">tag</span>.<span class="ident">bitxor_assign</span>(<span class="ident">pre_tag</span>.<span class="ident">into</span>());
-        <span class="ident">Tag</span>(<span class="kw-2">*</span><span class="ident">tag</span>.<span class="ident">as_ref</span>())
+    <span class="comment">// Finalize the tag and return it.
+    </span>gcm_ctx.pre_finish(|pre_tag| {
+        <span class="kw">let </span>bytes = tag_iv.into_bytes_less_safe();
+        <span class="kw">let </span><span class="kw-2">mut </span>tag = aes_key.encrypt_block(Block::from(<span class="kw-2">&amp;</span>bytes));
+        tag.bitxor_assign(pre_tag.into());
+        Tag(<span class="kw-2">*</span>tag.as_ref())
     })
 }
 
-<span class="comment">// Returns the data that wasn&#39;t processed.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span> <span class="comment">// Optimize out the match on `direction`.</span>
-<span class="kw">fn</span> <span class="ident">integrated_aes_gcm</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">aes_key</span>: <span class="kw-2">&amp;</span><span class="ident">aes::Key</span>,
-    <span class="ident">gcm_ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">gcm::Context</span>,
-    <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    <span class="ident">ctr</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counter</span>,
-    <span class="ident">direction</span>: <span class="ident">Direction</span>,
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>] {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::c</span>;
+<span class="comment">// Returns the data that wasn&#39;t processed.
+</span><span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+#[inline] </span><span class="comment">// Optimize out the match on `direction`.
+</span><span class="kw">fn </span>integrated_aes_gcm&lt;<span class="lifetime">&#39;a</span>&gt;(
+    aes_key: <span class="kw-2">&amp;</span>aes::Key,
+    gcm_ctx: <span class="kw-2">&amp;mut </span>gcm::Context,
+    in_out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+    ctr: <span class="kw-2">&amp;mut </span>Counter,
+    direction: Direction,
+    cpu_features: cpu::Features,
+) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8] {
+    <span class="kw">use </span><span class="kw">crate</span>::c;
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">aes_key</span>.<span class="ident">is_aes_hw</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">gcm_ctx</span>.<span class="ident">is_avx2</span>(<span class="ident">cpu_features</span>) {
-        <span class="kw">return</span> <span class="ident">in_out</span>;
+    <span class="kw">if </span>!aes_key.is_aes_hw() || !gcm_ctx.is_avx2(cpu_features) {
+        <span class="kw">return </span>in_out;
     }
 
-    <span class="kw">let</span> <span class="ident">processed</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">direction</span> {
-        <span class="ident">Direction::Opening</span> { <span class="ident">in_prefix_len</span> } =&gt; {
-            <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                <span class="kw">fn</span> <span class="ident">GFp_aesni_gcm_decrypt</span>(
-                    <span class="ident">input</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-                    <span class="ident">output</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>,
-                    <span class="ident">len</span>: <span class="ident">c::size_t</span>,
-                    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">aes::AES_KEY</span>,
-                    <span class="ident">ivec</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counter</span>,
-                    <span class="ident">gcm</span>: <span class="kw-2">&amp;mut</span> <span class="ident">gcm::ContextInner</span>,
-                ) -&gt; <span class="ident">c::size_t</span>;
+    <span class="kw">let </span>processed = <span class="kw">match </span>direction {
+        Direction::Opening { in_prefix_len } =&gt; {
+            <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                <span class="kw">fn </span>GFp_aesni_gcm_decrypt(
+                    input: <span class="kw-2">*const </span>u8,
+                    output: <span class="kw-2">*mut </span>u8,
+                    len: c::size_t,
+                    key: <span class="kw-2">&amp;</span>aes::AES_KEY,
+                    ivec: <span class="kw-2">&amp;mut </span>Counter,
+                    gcm: <span class="kw-2">&amp;mut </span>gcm::ContextInner,
+                ) -&gt; c::size_t;
             }
-            <span class="kw">unsafe</span> {
-                <span class="ident">GFp_aesni_gcm_decrypt</span>(
-                    <span class="ident">in_out</span>[<span class="ident">in_prefix_len</span>..].<span class="ident">as_ptr</span>(),
-                    <span class="ident">in_out</span>.<span class="ident">as_mut_ptr</span>(),
-                    <span class="ident">in_out</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">in_prefix_len</span>,
-                    <span class="ident">aes_key</span>.<span class="ident">inner_less_safe</span>(),
-                    <span class="ident">ctr</span>,
-                    <span class="ident">gcm_ctx</span>.<span class="ident">inner</span>(),
+            <span class="kw">unsafe </span>{
+                GFp_aesni_gcm_decrypt(
+                    in_out[in_prefix_len..].as_ptr(),
+                    in_out.as_mut_ptr(),
+                    in_out.len() - in_prefix_len,
+                    aes_key.inner_less_safe(),
+                    ctr,
+                    gcm_ctx.inner(),
                 )
             }
         }
-        <span class="ident">Direction::Sealing</span> =&gt; {
-            <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                <span class="kw">fn</span> <span class="ident">GFp_aesni_gcm_encrypt</span>(
-                    <span class="ident">input</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-                    <span class="ident">output</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>,
-                    <span class="ident">len</span>: <span class="ident">c::size_t</span>,
-                    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">aes::AES_KEY</span>,
-                    <span class="ident">ivec</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counter</span>,
-                    <span class="ident">gcm</span>: <span class="kw-2">&amp;mut</span> <span class="ident">gcm::ContextInner</span>,
-                ) -&gt; <span class="ident">c::size_t</span>;
+        Direction::Sealing =&gt; {
+            <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                <span class="kw">fn </span>GFp_aesni_gcm_encrypt(
+                    input: <span class="kw-2">*const </span>u8,
+                    output: <span class="kw-2">*mut </span>u8,
+                    len: c::size_t,
+                    key: <span class="kw-2">&amp;</span>aes::AES_KEY,
+                    ivec: <span class="kw-2">&amp;mut </span>Counter,
+                    gcm: <span class="kw-2">&amp;mut </span>gcm::ContextInner,
+                ) -&gt; c::size_t;
             }
-            <span class="kw">unsafe</span> {
-                <span class="ident">GFp_aesni_gcm_encrypt</span>(
-                    <span class="ident">in_out</span>.<span class="ident">as_ptr</span>(),
-                    <span class="ident">in_out</span>.<span class="ident">as_mut_ptr</span>(),
-                    <span class="ident">in_out</span>.<span class="ident">len</span>(),
-                    <span class="ident">aes_key</span>.<span class="ident">inner_less_safe</span>(),
-                    <span class="ident">ctr</span>,
-                    <span class="ident">gcm_ctx</span>.<span class="ident">inner</span>(),
+            <span class="kw">unsafe </span>{
+                GFp_aesni_gcm_encrypt(
+                    in_out.as_ptr(),
+                    in_out.as_mut_ptr(),
+                    in_out.len(),
+                    aes_key.inner_less_safe(),
+                    ctr,
+                    gcm_ctx.inner(),
                 )
             }
         }
     };
 
-    <span class="kw-2">&amp;mut</span> <span class="ident">in_out</span>[<span class="ident">processed</span>..]
+    <span class="kw-2">&amp;mut </span>in_out[processed..]
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">integrated_aes_gcm</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">aes::Key</span>,
-    <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">gcm::Context</span>,
-    <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counter</span>,
-    <span class="kw">_</span>: <span class="ident">Direction</span>,
-    <span class="kw">_</span>: <span class="ident">cpu::Features</span>,
-) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>] {
-    <span class="ident">in_out</span> <span class="comment">// This doesn&#39;t process any of the input so it all remains.</span>
-}
+<span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+#[inline]
+</span><span class="kw">fn </span>integrated_aes_gcm&lt;<span class="lifetime">&#39;a</span>&gt;(
+    <span class="kw">_</span>: <span class="kw-2">&amp;</span>aes::Key,
+    <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>gcm::Context,
+    in_out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+    <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Counter,
+    <span class="kw">_</span>: Direction,
+    <span class="kw">_</span>: cpu::Features,
+) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8] {
+    in_out <span class="comment">// This doesn&#39;t process any of the input so it all remains.
+</span>}
 
-<span class="kw">const</span> <span class="ident">AES_GCM_MAX_INPUT_LEN</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::max_input_len</span>(<span class="ident">BLOCK_LEN</span>, <span class="number">2</span>);
+<span class="kw">const </span>AES_GCM_MAX_INPUT_LEN: u64 = <span class="kw">super</span>::max_input_len(BLOCK_LEN, <span class="number">2</span>);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">max_input_len_test</span>() {
-        <span class="comment">// [NIST SP800-38D] Section 5.2.1.1. Note that [RFC 5116 Section 5.1] and</span>
-        <span class="comment">// [RFC 5116 Section 5.2] have an off-by-one error in `P_MAX`.</span>
-        <span class="comment">//</span>
-        <span class="comment">// [NIST SP800-38D]:</span>
-        <span class="comment">//    http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf</span>
-        <span class="comment">// [RFC 5116 Section 5.1]: https://tools.ietf.org/html/rfc5116#section-5.1</span>
-        <span class="comment">// [RFC 5116 Section 5.2]: https://tools.ietf.org/html/rfc5116#section-5.2</span>
-        <span class="kw">const</span> <span class="ident">NIST_SP800_38D_MAX_BITS</span>: <span class="ident">u64</span> <span class="op">=</span> (<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">39</span>) <span class="op">-</span> <span class="number">256</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">NIST_SP800_38D_MAX_BITS</span>, <span class="number">549_755_813_632u64</span>);
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>max_input_len_test() {
+        <span class="comment">// [NIST SP800-38D] Section 5.2.1.1. Note that [RFC 5116 Section 5.1] and
+        // [RFC 5116 Section 5.2] have an off-by-one error in `P_MAX`.
+        //
+        // [NIST SP800-38D]:
+        //    http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
+        // [RFC 5116 Section 5.1]: https://tools.ietf.org/html/rfc5116#section-5.1
+        // [RFC 5116 Section 5.2]: https://tools.ietf.org/html/rfc5116#section-5.2
+        </span><span class="kw">const </span>NIST_SP800_38D_MAX_BITS: u64 = (<span class="number">1u64 </span>&lt;&lt; <span class="number">39</span>) - <span class="number">256</span>;
+        <span class="macro">assert_eq!</span>(NIST_SP800_38D_MAX_BITS, <span class="number">549_755_813_632u64</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident"><span class="kw">super</span>::AES_128_GCM</span>.<span class="ident">max_input_len</span> <span class="op">*</span> <span class="number">8</span>,
-            <span class="ident">NIST_SP800_38D_MAX_BITS</span>
+            <span class="kw">super</span>::AES_128_GCM.max_input_len * <span class="number">8</span>,
+            NIST_SP800_38D_MAX_BITS
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident"><span class="kw">super</span>::AES_256_GCM</span>.<span class="ident">max_input_len</span> <span class="op">*</span> <span class="number">8</span>,
-            <span class="ident">NIST_SP800_38D_MAX_BITS</span>
+            <span class="kw">super</span>::AES_256_GCM.max_input_len * <span class="number">8</span>,
+            NIST_SP800_38D_MAX_BITS
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

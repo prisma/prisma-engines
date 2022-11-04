@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/db/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/db/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -493,500 +493,500 @@
 <span id="493">493</span>
 <span id="494">494</span>
 <span id="495">495</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">options</span>;
+</pre><pre class="rust"><code><span class="kw">pub mod </span>options;
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt::Debug</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>std::{fmt::Debug, sync::Arc};
 
-<span class="kw">use</span> <span class="ident">futures_util::stream::TryStreamExt</span>;
+<span class="kw">use </span>futures_util::stream::TryStreamExt;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">Bson</span>, <span class="ident">Document</span>},
-    <span class="ident">change_stream</span>::{
-        <span class="ident">event::ChangeStreamEvent</span>,
-        <span class="ident">options::ChangeStreamOptions</span>,
-        <span class="ident">session::SessionChangeStream</span>,
-        <span class="ident">ChangeStream</span>,
+<span class="kw">use crate</span>::{
+    bson::{Bson, Document},
+    change_stream::{
+        event::ChangeStreamEvent,
+        options::ChangeStreamOptions,
+        session::SessionChangeStream,
+        ChangeStream,
     },
-    <span class="ident">client::session::TransactionState</span>,
-    <span class="ident">cmap::conn::PinnedConnectionHandle</span>,
-    <span class="ident">concern</span>::{<span class="ident">ReadConcern</span>, <span class="ident">WriteConcern</span>},
-    <span class="ident">cursor::Cursor</span>,
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">operation</span>::{<span class="ident">Aggregate</span>, <span class="ident">AggregateTarget</span>, <span class="ident">Create</span>, <span class="ident">DropDatabase</span>, <span class="ident">ListCollections</span>, <span class="ident">RunCommand</span>},
-    <span class="ident">options</span>::{
-        <span class="ident">AggregateOptions</span>,
-        <span class="ident">CollectionOptions</span>,
-        <span class="ident">CreateCollectionOptions</span>,
-        <span class="ident">DatabaseOptions</span>,
-        <span class="ident">DropDatabaseOptions</span>,
-        <span class="ident">ListCollectionsOptions</span>,
+    client::session::TransactionState,
+    cmap::conn::PinnedConnectionHandle,
+    concern::{ReadConcern, WriteConcern},
+    cursor::Cursor,
+    error::{Error, ErrorKind, <span class="prelude-ty">Result</span>},
+    operation::{Aggregate, AggregateTarget, Create, DropDatabase, ListCollections, RunCommand},
+    options::{
+        AggregateOptions,
+        CollectionOptions,
+        CreateCollectionOptions,
+        DatabaseOptions,
+        DropDatabaseOptions,
+        ListCollectionsOptions,
     },
-    <span class="ident">results::CollectionSpecification</span>,
-    <span class="ident">selection_criteria::SelectionCriteria</span>,
-    <span class="ident">Client</span>,
-    <span class="ident">ClientSession</span>,
-    <span class="ident">Collection</span>,
-    <span class="ident">Namespace</span>,
-    <span class="ident">SessionCursor</span>,
+    results::CollectionSpecification,
+    selection_criteria::SelectionCriteria,
+    Client,
+    ClientSession,
+    Collection,
+    Namespace,
+    SessionCursor,
 };
 
-<span class="doccomment">/// `Database` is the client-side abstraction of a MongoDB database. It can be used to perform</span>
-<span class="doccomment">/// database-level operations or to obtain handles to specific collections within the database. A</span>
-<span class="doccomment">/// `Database` can only be obtained through a [`Client`](struct.Client.html) by calling either</span>
-<span class="doccomment">/// [`Client::database`](struct.Client.html#method.database) or</span>
-<span class="doccomment">/// [`Client::database_with_options`](struct.Client.html#method.database_with_options).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Database` uses [`std::sync::Arc`](https://doc.rust-lang.org/std/sync/struct.Arc.html) internally,</span>
-<span class="doccomment">/// so it can safely be shared across threads or async tasks. For example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// </span>
-<span class="doccomment">/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]</span>
-<span class="doccomment">/// # use mongodb::{bson::Document, Client, error::Result};</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;async-std-runtime&quot;)]</span>
-<span class="doccomment">/// # use async_std::task;</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;tokio-runtime&quot;)]</span>
-<span class="doccomment">/// # use tokio::task;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]</span>
-<span class="doccomment">/// # async fn start_workers() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-<span class="doccomment">/// let db = client.database(&quot;items&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// for i in 0..5 {</span>
-<span class="doccomment">///     let db_ref = db.clone();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     task::spawn(async move {</span>
-<span class="doccomment">///         let collection = db_ref.collection::&lt;Document&gt;(&amp;format!(&quot;coll{}&quot;, i));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///         // Do something with the collection</span>
-<span class="doccomment">///     });</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Database</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DatabaseInner</span><span class="op">&gt;</span>,
+<span class="doccomment">/// `Database` is the client-side abstraction of a MongoDB database. It can be used to perform
+/// database-level operations or to obtain handles to specific collections within the database. A
+/// `Database` can only be obtained through a [`Client`](struct.Client.html) by calling either
+/// [`Client::database`](struct.Client.html#method.database) or
+/// [`Client::database_with_options`](struct.Client.html#method.database_with_options).
+///
+/// `Database` uses [`std::sync::Arc`](https://doc.rust-lang.org/std/sync/struct.Arc.html) internally,
+/// so it can safely be shared across threads or async tasks. For example:
+///
+/// ```rust
+/// 
+/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]
+/// # use mongodb::{bson::Document, Client, error::Result};
+/// # #[cfg(feature = &quot;async-std-runtime&quot;)]
+/// # use async_std::task;
+/// # #[cfg(feature = &quot;tokio-runtime&quot;)]
+/// # use tokio::task;
+/// #
+/// #
+/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]
+/// # async fn start_workers() -&gt; Result&lt;()&gt; {
+/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+/// let db = client.database(&quot;items&quot;);
+///
+/// for i in 0..5 {
+///     let db_ref = db.clone();
+///
+///     task::spawn(async move {
+///         let collection = db_ref.collection::&lt;Document&gt;(&amp;format!(&quot;coll{}&quot;, i));
+///
+///         // Do something with the collection
+///     });
+/// }
+/// #
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Database {
+    inner: Arc&lt;DatabaseInner&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">DatabaseInner</span> {
-    <span class="ident">client</span>: <span class="ident">Client</span>,
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">selection_criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
-    <span class="ident">read_concern</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadConcern</span><span class="op">&gt;</span>,
-    <span class="ident">write_concern</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>DatabaseInner {
+    client: Client,
+    name: String,
+    selection_criteria: <span class="prelude-ty">Option</span>&lt;SelectionCriteria&gt;,
+    read_concern: <span class="prelude-ty">Option</span>&lt;ReadConcern&gt;,
+    write_concern: <span class="prelude-ty">Option</span>&lt;WriteConcern&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Database</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Client</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DatabaseOptions</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">unwrap_or_default</span>();
-        <span class="kw">let</span> <span class="ident">selection_criteria</span> <span class="op">=</span> <span class="ident">options</span>
-            .<span class="ident">selection_criteria</span>
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">selection_criteria</span>().<span class="ident">cloned</span>());
+<span class="kw">impl </span>Database {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(client: Client, name: <span class="kw-2">&amp;</span>str, options: <span class="prelude-ty">Option</span>&lt;DatabaseOptions&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>options = options.unwrap_or_default();
+        <span class="kw">let </span>selection_criteria = options
+            .selection_criteria
+            .or_else(|| client.selection_criteria().cloned());
 
-        <span class="kw">let</span> <span class="ident">read_concern</span> <span class="op">=</span> <span class="ident">options</span>
-            .<span class="ident">read_concern</span>
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">read_concern</span>().<span class="ident">cloned</span>());
+        <span class="kw">let </span>read_concern = options
+            .read_concern
+            .or_else(|| client.read_concern().cloned());
 
-        <span class="kw">let</span> <span class="ident">write_concern</span> <span class="op">=</span> <span class="ident">options</span>
-            .<span class="ident">write_concern</span>
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">write_concern</span>().<span class="ident">cloned</span>());
+        <span class="kw">let </span>write_concern = options
+            .write_concern
+            .or_else(|| client.write_concern().cloned());
 
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">DatabaseInner</span> {
-                <span class="ident">client</span>,
-                <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-                <span class="ident">selection_criteria</span>,
-                <span class="ident">read_concern</span>,
-                <span class="ident">write_concern</span>,
+        <span class="self">Self </span>{
+            inner: Arc::new(DatabaseInner {
+                client,
+                name: name.to_string(),
+                selection_criteria,
+                read_concern,
+                write_concern,
             }),
         }
     }
 
-    <span class="doccomment">/// Get the `Client` that this collection descended from.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Client</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">client</span>
+    <span class="doccomment">/// Get the `Client` that this collection descended from.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>client(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Client {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner.client
     }
 
-    <span class="doccomment">/// Gets the name of the `Database`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">name</span>
+    <span class="doccomment">/// Gets the name of the `Database`.
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner.name
     }
 
-    <span class="doccomment">/// Gets the read preference of the `Database`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selection_criteria</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">selection_criteria</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Gets the read preference of the `Database`.
+    </span><span class="kw">pub fn </span>selection_criteria(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SelectionCriteria&gt; {
+        <span class="self">self</span>.inner.selection_criteria.as_ref()
     }
 
-    <span class="doccomment">/// Gets the read concern of the `Database`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReadConcern</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read_concern</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Gets the read concern of the `Database`.
+    </span><span class="kw">pub fn </span>read_concern(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ReadConcern&gt; {
+        <span class="self">self</span>.inner.read_concern.as_ref()
     }
 
-    <span class="doccomment">/// Gets the write concern of the `Database`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">write_concern</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Gets the write concern of the `Database`.
+    </span><span class="kw">pub fn </span>write_concern(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>WriteConcern&gt; {
+        <span class="self">self</span>.inner.write_concern.as_ref()
     }
 
-    <span class="doccomment">/// Gets a handle to a collection in this database with the provided name. The</span>
-    <span class="doccomment">/// [`Collection`] options (e.g. read preference and write concern) will default to those of</span>
-    <span class="doccomment">/// this [`Database`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For more information on how the generic parameter `T` is used, check out the [`Collection`]</span>
-    <span class="doccomment">/// documentation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method does not send or receive anything across the wire to the database, so it can be</span>
-    <span class="doccomment">/// used repeatedly without incurring any costs from I/O.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collection</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Collection::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">name</span>, <span class="prelude-val">None</span>)
+    <span class="doccomment">/// Gets a handle to a collection in this database with the provided name. The
+    /// [`Collection`] options (e.g. read preference and write concern) will default to those of
+    /// this [`Database`].
+    ///
+    /// For more information on how the generic parameter `T` is used, check out the [`Collection`]
+    /// documentation.
+    ///
+    /// This method does not send or receive anything across the wire to the database, so it can be
+    /// used repeatedly without incurring any costs from I/O.
+    </span><span class="kw">pub fn </span>collection&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; Collection&lt;T&gt; {
+        Collection::new(<span class="self">self</span>.clone(), name, <span class="prelude-val">None</span>)
     }
 
-    <span class="doccomment">/// Gets a handle to a collection in this database with the provided name.</span>
-    <span class="doccomment">/// Operations done with this `Collection` will use the options specified by</span>
-    <span class="doccomment">/// `options` and will otherwise default to those of this [`Database`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For more information on how the generic parameter `T` is used, check out the [`Collection`]</span>
-    <span class="doccomment">/// documentation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method does not send or receive anything across the wire to the database, so it can be</span>
-    <span class="doccomment">/// used repeatedly without incurring any costs from I/O.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collection_with_options</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Gets a handle to a collection in this database with the provided name.
+    /// Operations done with this `Collection` will use the options specified by
+    /// `options` and will otherwise default to those of this [`Database`].
+    ///
+    /// For more information on how the generic parameter `T` is used, check out the [`Collection`]
+    /// documentation.
+    ///
+    /// This method does not send or receive anything across the wire to the database, so it can be
+    /// used repeatedly without incurring any costs from I/O.
+    </span><span class="kw">pub fn </span>collection_with_options&lt;T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">options</span>: <span class="ident">CollectionOptions</span>,
-    ) -&gt; <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Collection::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">name</span>, <span class="prelude-val">Some</span>(<span class="ident">options</span>))
+        name: <span class="kw-2">&amp;</span>str,
+        options: CollectionOptions,
+    ) -&gt; Collection&lt;T&gt; {
+        Collection::new(<span class="self">self</span>.clone(), name, <span class="prelude-val">Some</span>(options))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_common</span>(
+    <span class="kw">async fn </span>drop_common(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropDatabaseOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
-        <span class="macro">resolve_options!</span>(<span class="self">self</span>, <span class="ident">options</span>, [<span class="ident">write_concern</span>]);
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;DropDatabaseOptions&gt;&gt;,
+        session: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>options = options.into();
+        <span class="macro">resolve_options!</span>(<span class="self">self</span>, options, [write_concern]);
 
-        <span class="kw">let</span> <span class="ident">drop_database</span> <span class="op">=</span> <span class="ident">DropDatabase::new</span>(<span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(), <span class="ident">options</span>);
-        <span class="self">self</span>.<span class="ident">client</span>()
-            .<span class="ident">execute_operation</span>(<span class="ident">drop_database</span>, <span class="ident">session</span>)
-            .<span class="kw">await</span>
-    }
+        <span class="kw">let </span>drop_database = DropDatabase::new(<span class="self">self</span>.name().to_string(), options);
+        <span class="self">self</span>.client()
+            .execute_operation(drop_database, session)
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Drops the database, deleting all data, collections, and indexes stored in it.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropDatabaseOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">drop_common</span>(<span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Drops the database, deleting all data, collections, and indexes stored in it.
+    </span><span class="kw">pub async fn </span>drop(<span class="kw-2">&amp;</span><span class="self">self</span>, options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;DropDatabaseOptions&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.drop_common(options, <span class="prelude-val">None</span>).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Drops the database, deleting all data, collections, and indexes stored in it using the</span>
-    <span class="doccomment">/// provided `ClientSession`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_with_session</span>(
+    <span class="doccomment">/// Drops the database, deleting all data, collections, and indexes stored in it using the
+    /// provided `ClientSession`.
+    </span><span class="kw">pub async fn </span>drop_with_session(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropDatabaseOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">drop_common</span>(<span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span>
-    }
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;DropDatabaseOptions&gt;&gt;,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.drop_common(options, session).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Gets information about each of the collections in the database. The cursor will yield a</span>
-    <span class="doccomment">/// document pertaining to each collection in the database.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_collections</span>(
+    <span class="doccomment">/// Gets information about each of the collections in the database. The cursor will yield a
+    /// document pertaining to each collection in the database.
+    </span><span class="kw">pub async fn </span>list_collections(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListCollectionsOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">CollectionSpecification</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">list_collections</span> <span class="op">=</span> <span class="ident">ListCollections::new</span>(
-            <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(),
-            <span class="ident">filter</span>.<span class="ident">into</span>(),
+        filter: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;Document&gt;&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;ListCollectionsOptions&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Cursor&lt;CollectionSpecification&gt;&gt; {
+        <span class="kw">let </span>list_collections = ListCollections::new(
+            <span class="self">self</span>.name().to_string(),
+            filter.into(),
             <span class="bool-val">false</span>,
-            <span class="ident">options</span>.<span class="ident">into</span>(),
+            options.into(),
         );
-        <span class="self">self</span>.<span class="ident">client</span>()
-            .<span class="ident">execute_cursor_operation</span>(<span class="ident">list_collections</span>)
-            .<span class="kw">await</span>
-    }
+        <span class="self">self</span>.client()
+            .execute_cursor_operation(list_collections)
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Gets information about each of the collections in the database using the provided</span>
-    <span class="doccomment">/// `ClientSession`. The cursor will yield a document pertaining to each collection in the</span>
-    <span class="doccomment">/// database.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_collections_with_session</span>(
+    <span class="doccomment">/// Gets information about each of the collections in the database using the provided
+    /// `ClientSession`. The cursor will yield a document pertaining to each collection in the
+    /// database.
+    </span><span class="kw">pub async fn </span>list_collections_with_session(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListCollectionsOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">CollectionSpecification</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">list_collections</span> <span class="op">=</span> <span class="ident">ListCollections::new</span>(
-            <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(),
-            <span class="ident">filter</span>.<span class="ident">into</span>(),
+        filter: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;Document&gt;&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;ListCollectionsOptions&gt;&gt;,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;SessionCursor&lt;CollectionSpecification&gt;&gt; {
+        <span class="kw">let </span>list_collections = ListCollections::new(
+            <span class="self">self</span>.name().to_string(),
+            filter.into(),
             <span class="bool-val">false</span>,
-            <span class="ident">options</span>.<span class="ident">into</span>(),
+            options.into(),
         );
-        <span class="self">self</span>.<span class="ident">client</span>()
-            .<span class="ident">execute_session_cursor_operation</span>(<span class="ident">list_collections</span>, <span class="ident">session</span>)
-            .<span class="kw">await</span>
-    }
+        <span class="self">self</span>.client()
+            .execute_session_cursor_operation(list_collections, session)
+            .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_collection_names_common</span>(
+    <span class="kw">async fn </span>list_collection_names_common(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cursor</span>: <span class="kw">impl</span> <span class="ident">TryStreamExt</span><span class="op">&lt;</span><span class="prelude-val">Ok</span> <span class="op">=</span> <span class="ident">Document</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">cursor</span>
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">doc</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">doc</span>.<span class="ident">get</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">and_then</span>(<span class="ident">Bson::as_str</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">futures_util::future::ok</span>(<span class="ident">name</span>.<span class="ident">into</span>()),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">futures_util::future::err</span>(
-                    <span class="ident">ErrorKind::InvalidResponse</span> {
-                        <span class="ident">message</span>: <span class="string">&quot;Expected name field in server response, but there was none.&quot;</span>
-                            .<span class="ident">to_string</span>(),
+        cursor: <span class="kw">impl </span>TryStreamExt&lt;<span class="prelude-val">Ok </span>= Document, Error = Error&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;&gt; {
+        cursor
+            .and_then(|doc| <span class="kw">match </span>doc.get(<span class="string">&quot;name&quot;</span>).and_then(Bson::as_str) {
+                <span class="prelude-val">Some</span>(name) =&gt; futures_util::future::ok(name.into()),
+                <span class="prelude-val">None </span>=&gt; futures_util::future::err(
+                    ErrorKind::InvalidResponse {
+                        message: <span class="string">&quot;Expected name field in server response, but there was none.&quot;
+                            </span>.to_string(),
                     }
-                    .<span class="ident">into</span>(),
+                    .into(),
                 ),
             })
-            .<span class="ident">try_collect</span>()
-            .<span class="kw">await</span>
-    }
+            .try_collect()
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Gets the names of the collections in the database.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_collection_names</span>(
+    <span class="doccomment">/// Gets the names of the collections in the database.
+    </span><span class="kw">pub async fn </span>list_collection_names(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">list_collections</span> <span class="op">=</span>
-            <span class="ident">ListCollections::new</span>(<span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(), <span class="ident">filter</span>.<span class="ident">into</span>(), <span class="bool-val">true</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let</span> <span class="ident">cursor</span>: <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">client</span>()
-            .<span class="ident">execute_cursor_operation</span>(<span class="ident">list_collections</span>)
+        filter: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;Document&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;&gt; {
+        <span class="kw">let </span>list_collections =
+            ListCollections::new(<span class="self">self</span>.name().to_string(), filter.into(), <span class="bool-val">true</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>cursor: Cursor&lt;Document&gt; = <span class="self">self
+            </span>.client()
+            .execute_cursor_operation(list_collections)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">list_collection_names_common</span>(<span class="ident">cursor</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>.list_collection_names_common(cursor).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Gets the names of the collections in the database using the provided `ClientSession`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_collection_names_with_session</span>(
+    <span class="doccomment">/// Gets the names of the collections in the database using the provided `ClientSession`.
+    </span><span class="kw">pub async fn </span>list_collection_names_with_session(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">list_collections</span> <span class="op">=</span>
-            <span class="ident">ListCollections::new</span>(<span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(), <span class="ident">filter</span>.<span class="ident">into</span>(), <span class="bool-val">true</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span>: <span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">client</span>()
-            .<span class="ident">execute_session_cursor_operation</span>(<span class="ident">list_collections</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">session</span>)
+        filter: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;Document&gt;&gt;,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;&gt; {
+        <span class="kw">let </span>list_collections =
+            ListCollections::new(<span class="self">self</span>.name().to_string(), filter.into(), <span class="bool-val">true</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>cursor: SessionCursor&lt;Document&gt; = <span class="self">self
+            </span>.client()
+            .execute_session_cursor_operation(list_collections, <span class="kw-2">&amp;mut *</span>session)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">list_collection_names_common</span>(<span class="ident">cursor</span>.<span class="ident">stream</span>(<span class="ident">session</span>))
-            .<span class="kw">await</span>
-    }
+        <span class="self">self</span>.list_collection_names_common(cursor.stream(session))
+            .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_collection_common</span>(
+    <span class="kw">async fn </span>create_collection_common(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateCollectionOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
-        <span class="macro">resolve_options!</span>(<span class="self">self</span>, <span class="ident">options</span>, [<span class="ident">write_concern</span>]);
+        name: <span class="kw">impl </span>AsRef&lt;str&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;CreateCollectionOptions&gt;&gt;,
+        session: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>options = options.into();
+        <span class="macro">resolve_options!</span>(<span class="self">self</span>, options, [write_concern]);
 
-        <span class="kw">let</span> <span class="ident">create</span> <span class="op">=</span> <span class="ident">Create::new</span>(
-            <span class="ident">Namespace</span> {
-                <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(),
-                <span class="ident">coll</span>: <span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">to_string</span>(),
+        <span class="kw">let </span>create = Create::new(
+            Namespace {
+                db: <span class="self">self</span>.name().to_string(),
+                coll: name.as_ref().to_string(),
             },
-            <span class="ident">options</span>,
+            options,
         );
-        <span class="self">self</span>.<span class="ident">client</span>().<span class="ident">execute_operation</span>(<span class="ident">create</span>, <span class="ident">session</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>.client().execute_operation(create, session).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Creates a new collection in the database with the given `name` and `options`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that MongoDB creates collections implicitly when data is inserted, so this method is</span>
-    <span class="doccomment">/// not needed if no special options are required.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_collection</span>(
+    <span class="doccomment">/// Creates a new collection in the database with the given `name` and `options`.
+    ///
+    /// Note that MongoDB creates collections implicitly when data is inserted, so this method is
+    /// not needed if no special options are required.
+    </span><span class="kw">pub async fn </span>create_collection(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateCollectionOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">create_collection_common</span>(<span class="ident">name</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
-    }
+        name: <span class="kw">impl </span>AsRef&lt;str&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;CreateCollectionOptions&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.create_collection_common(name, options, <span class="prelude-val">None</span>).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Creates a new collection in the database with the given `name` and `options` using the</span>
-    <span class="doccomment">/// provided `ClientSession`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that MongoDB creates collections implicitly when data is inserted, so this method is</span>
-    <span class="doccomment">/// not needed if no special options are required.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_collection_with_session</span>(
+    <span class="doccomment">/// Creates a new collection in the database with the given `name` and `options` using the
+    /// provided `ClientSession`.
+    ///
+    /// Note that MongoDB creates collections implicitly when data is inserted, so this method is
+    /// not needed if no special options are required.
+    </span><span class="kw">pub async fn </span>create_collection_with_session(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateCollectionOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">create_collection_common</span>(<span class="ident">name</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span>
-    }
+        name: <span class="kw">impl </span>AsRef&lt;str&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;CreateCollectionOptions&gt;&gt;,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.create_collection_common(name, options, session).<span class="kw">await
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_command_common</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>run_command_common(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">command</span>: <span class="ident">Document</span>,
-        <span class="ident">selection_criteria</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">pinned_connection</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">operation</span> <span class="op">=</span> <span class="ident">RunCommand::new</span>(
-            <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
-            <span class="ident">command</span>,
-            <span class="ident">selection_criteria</span>.<span class="ident">into</span>(),
-            <span class="ident">pinned_connection</span>,
+        command: Document,
+        selection_criteria: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;SelectionCriteria&gt;&gt;,
+        session: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;&gt;,
+        pinned_connection: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PinnedConnectionHandle&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Document&gt; {
+        <span class="kw">let </span>operation = RunCommand::new(
+            <span class="self">self</span>.name().into(),
+            command,
+            selection_criteria.into(),
+            pinned_connection,
         )<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">client</span>().<span class="ident">execute_operation</span>(<span class="ident">operation</span>, <span class="ident">session</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>.client().execute_operation(operation, session).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Runs a database-level command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that no inspection is done on `doc`, so the command will not use the database&#39;s default</span>
-    <span class="doccomment">/// read concern or write concern. If specific read concern or write concern is desired, it must</span>
-    <span class="doccomment">/// be specified manually.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_command</span>(
+    <span class="doccomment">/// Runs a database-level command.
+    ///
+    /// Note that no inspection is done on `doc`, so the command will not use the database&#39;s default
+    /// read concern or write concern. If specific read concern or write concern is desired, it must
+    /// be specified manually.
+    </span><span class="kw">pub async fn </span>run_command(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">command</span>: <span class="ident">Document</span>,
-        <span class="ident">selection_criteria</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">run_command_common</span>(<span class="ident">command</span>, <span class="ident">selection_criteria</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
-            .<span class="kw">await</span>
-    }
+        command: Document,
+        selection_criteria: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;SelectionCriteria&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Document&gt; {
+        <span class="self">self</span>.run_command_common(command, selection_criteria, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Runs a database-level command using the provided `ClientSession`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `ClientSession` provided is currently in a transaction, `command` must not specify a</span>
-    <span class="doccomment">/// read concern. If this operation is the first operation in the transaction, the read concern</span>
-    <span class="doccomment">/// associated with the transaction will be inherited.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Otherwise no inspection is done on `command`, so the command will not use the database&#39;s</span>
-    <span class="doccomment">/// default read concern or write concern. If specific read concern or write concern is</span>
-    <span class="doccomment">/// desired, it must be specified manually.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_command_with_session</span>(
+    <span class="doccomment">/// Runs a database-level command using the provided `ClientSession`.
+    ///
+    /// If the `ClientSession` provided is currently in a transaction, `command` must not specify a
+    /// read concern. If this operation is the first operation in the transaction, the read concern
+    /// associated with the transaction will be inherited.
+    ///
+    /// Otherwise no inspection is done on `command`, so the command will not use the database&#39;s
+    /// default read concern or write concern. If specific read concern or write concern is
+    /// desired, it must be specified manually.
+    </span><span class="kw">pub async fn </span>run_command_with_session(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">command</span>: <span class="ident">Document</span>,
-        <span class="ident">selection_criteria</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">selection_criteria</span> <span class="op">=</span> <span class="ident">selection_criteria</span>.<span class="ident">into</span>();
-        <span class="kw">match</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span> {
-            <span class="ident">TransactionState::Starting</span> <span class="op">|</span> <span class="ident">TransactionState::InProgress</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">command</span>.<span class="ident">contains_key</span>(<span class="string">&quot;readConcern&quot;</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                        <span class="ident">message</span>: <span class="string">&quot;Cannot set read concern after starting a transaction&quot;</span>.<span class="ident">into</span>(),
+        command: Document,
+        selection_criteria: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;SelectionCriteria&gt;&gt;,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Document&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>selection_criteria = selection_criteria.into();
+        <span class="kw">match </span>session.transaction.state {
+            TransactionState::Starting | TransactionState::InProgress =&gt; {
+                <span class="kw">if </span>command.contains_key(<span class="string">&quot;readConcern&quot;</span>) {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+                        message: <span class="string">&quot;Cannot set read concern after starting a transaction&quot;</span>.into(),
                     }
-                    .<span class="ident">into</span>());
+                    .into());
                 }
-                <span class="ident">selection_criteria</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">selection_criteria</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">selection_criteria</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">selection_criteria</span>),
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">options</span>) <span class="op">=</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">options</span> {
-                            <span class="ident">options</span>.<span class="ident">selection_criteria</span>.<span class="ident">clone</span>()
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">None</span>
-                        }
+                selection_criteria = <span class="kw">match </span>selection_criteria {
+                    <span class="prelude-val">Some</span>(selection_criteria) =&gt; <span class="prelude-val">Some</span>(selection_criteria),
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>options) = session.transaction.options {
+                            options.selection_criteria.clone()
+                        } <span class="kw">else </span>{
+                            <span class="prelude-val">None
+                        </span>}
                     }
                 };
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         }
-        <span class="self">self</span>.<span class="ident">run_command_common</span>(<span class="ident">command</span>, <span class="ident">selection_criteria</span>, <span class="ident">session</span>, <span class="prelude-val">None</span>)
-            .<span class="kw">await</span>
-    }
+        <span class="self">self</span>.run_command_common(command, selection_criteria, session, <span class="prelude-val">None</span>)
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Runs an aggregation operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation [here](https://www.mongodb.com/docs/manual/aggregation/) for more</span>
-    <span class="doccomment">/// information on aggregations.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">aggregate</span>(
+    <span class="doccomment">/// Runs an aggregation operation.
+    ///
+    /// See the documentation [here](https://www.mongodb.com/docs/manual/aggregation/) for more
+    /// information on aggregations.
+    </span><span class="kw">pub async fn </span>aggregate(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">pipeline</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Document</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AggregateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
+        pipeline: <span class="kw">impl </span>IntoIterator&lt;Item = Document&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;AggregateOptions&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Cursor&lt;Document&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>options = options.into();
         <span class="macro">resolve_options!</span>(
             <span class="self">self</span>,
-            <span class="ident">options</span>,
-            [<span class="ident">read_concern</span>, <span class="ident">write_concern</span>, <span class="ident">selection_criteria</span>]
+            options,
+            [read_concern, write_concern, selection_criteria]
         );
 
-        <span class="kw">let</span> <span class="ident">aggregate</span> <span class="op">=</span> <span class="ident">Aggregate::new</span>(<span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(), <span class="ident">pipeline</span>, <span class="ident">options</span>);
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>();
-        <span class="ident">client</span>.<span class="ident">execute_cursor_operation</span>(<span class="ident">aggregate</span>).<span class="kw">await</span>
-    }
+        <span class="kw">let </span>aggregate = Aggregate::new(<span class="self">self</span>.name().to_string(), pipeline, options);
+        <span class="kw">let </span>client = <span class="self">self</span>.client();
+        client.execute_cursor_operation(aggregate).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Runs an aggregation operation with the provided `ClientSession`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation [here](https://www.mongodb.com/docs/manual/aggregation/) for more</span>
-    <span class="doccomment">/// information on aggregations.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">aggregate_with_session</span>(
+    <span class="doccomment">/// Runs an aggregation operation with the provided `ClientSession`.
+    ///
+    /// See the documentation [here](https://www.mongodb.com/docs/manual/aggregation/) for more
+    /// information on aggregations.
+    </span><span class="kw">pub async fn </span>aggregate_with_session(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">pipeline</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Document</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AggregateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
+        pipeline: <span class="kw">impl </span>IntoIterator&lt;Item = Document&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;AggregateOptions&gt;&gt;,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;SessionCursor&lt;Document&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>options = options.into();
         <span class="macro">resolve_options!</span>(
             <span class="self">self</span>,
-            <span class="ident">options</span>,
-            [<span class="ident">read_concern</span>, <span class="ident">write_concern</span>, <span class="ident">selection_criteria</span>]
+            options,
+            [read_concern, write_concern, selection_criteria]
         );
 
-        <span class="kw">let</span> <span class="ident">aggregate</span> <span class="op">=</span> <span class="ident">Aggregate::new</span>(<span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(), <span class="ident">pipeline</span>, <span class="ident">options</span>);
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>();
-        <span class="ident">client</span>
-            .<span class="ident">execute_session_cursor_operation</span>(<span class="ident">aggregate</span>, <span class="ident">session</span>)
-            .<span class="kw">await</span>
-    }
+        <span class="kw">let </span>aggregate = Aggregate::new(<span class="self">self</span>.name().to_string(), pipeline, options);
+        <span class="kw">let </span>client = <span class="self">self</span>.client();
+        client
+            .execute_session_cursor_operation(aggregate, session)
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Starts a new [`ChangeStream`](change_stream/struct.ChangeStream.html) that receives events</span>
-    <span class="doccomment">/// for all changes in this database. The stream does not observe changes from system</span>
-    <span class="doccomment">/// collections and cannot be started on &quot;config&quot;, &quot;local&quot; or &quot;admin&quot; databases.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation [here](https://www.mongodb.com/docs/manual/changeStreams/) on change</span>
-    <span class="doccomment">/// streams.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Change streams require either a &quot;majority&quot; read concern or no read</span>
-    <span class="doccomment">/// concern. Anything else will cause a server error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that using a `$project` stage to remove any of the `_id`, `operationType` or `ns`</span>
-    <span class="doccomment">/// fields will cause an error. The driver requires these fields to support resumability. For</span>
-    <span class="doccomment">/// more information on resumability, see the documentation for</span>
-    <span class="doccomment">/// [`ChangeStream`](change_stream/struct.ChangeStream.html)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the pipeline alters the structure of the returned events, the parsed type will need to be</span>
-    <span class="doccomment">/// changed via [`ChangeStream::with_type`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">watch</span>(
+    <span class="doccomment">/// Starts a new [`ChangeStream`](change_stream/struct.ChangeStream.html) that receives events
+    /// for all changes in this database. The stream does not observe changes from system
+    /// collections and cannot be started on &quot;config&quot;, &quot;local&quot; or &quot;admin&quot; databases.
+    ///
+    /// See the documentation [here](https://www.mongodb.com/docs/manual/changeStreams/) on change
+    /// streams.
+    ///
+    /// Change streams require either a &quot;majority&quot; read concern or no read
+    /// concern. Anything else will cause a server error.
+    ///
+    /// Note that using a `$project` stage to remove any of the `_id`, `operationType` or `ns`
+    /// fields will cause an error. The driver requires these fields to support resumability. For
+    /// more information on resumability, see the documentation for
+    /// [`ChangeStream`](change_stream/struct.ChangeStream.html)
+    ///
+    /// If the pipeline alters the structure of the returned events, the parsed type will need to be
+    /// changed via [`ChangeStream::with_type`].
+    </span><span class="kw">pub async fn </span>watch(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">pipeline</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Document</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeStreamOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ChangeStream</span><span class="op">&lt;</span><span class="ident">ChangeStreamEvent</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
-        <span class="macro">resolve_options!</span>(<span class="self">self</span>, <span class="ident">options</span>, [<span class="ident">read_concern</span>, <span class="ident">selection_criteria</span>]);
-        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">AggregateTarget::Database</span>(<span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_string</span>());
-        <span class="self">self</span>.<span class="ident">client</span>()
-            .<span class="ident">execute_watch</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>, <span class="ident">target</span>, <span class="prelude-val">None</span>)
-            .<span class="kw">await</span>
-    }
+        pipeline: <span class="kw">impl </span>IntoIterator&lt;Item = Document&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;ChangeStreamOptions&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ChangeStream&lt;ChangeStreamEvent&lt;Document&gt;&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>options = options.into();
+        <span class="macro">resolve_options!</span>(<span class="self">self</span>, options, [read_concern, selection_criteria]);
+        <span class="kw">let </span>target = AggregateTarget::Database(<span class="self">self</span>.name().to_string());
+        <span class="self">self</span>.client()
+            .execute_watch(pipeline, options, target, <span class="prelude-val">None</span>)
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Starts a new [`SessionChangeStream`] that receives events for all changes in this database</span>
-    <span class="doccomment">/// using the provided [`ClientSession`].  See [`Database::watch`] for more information.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">watch_with_session</span>(
+    <span class="doccomment">/// Starts a new [`SessionChangeStream`] that receives events for all changes in this database
+    /// using the provided [`ClientSession`].  See [`Database::watch`] for more information.
+    </span><span class="kw">pub async fn </span>watch_with_session(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">pipeline</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Document</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeStreamOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionChangeStream</span><span class="op">&lt;</span><span class="ident">ChangeStreamEvent</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
-        <span class="macro">resolve_read_concern_with_session!</span>(<span class="self">self</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">session</span>))<span class="question-mark">?</span>;
-        <span class="macro">resolve_selection_criteria_with_session!</span>(<span class="self">self</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">session</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">AggregateTarget::Database</span>(<span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_string</span>());
-        <span class="self">self</span>.<span class="ident">client</span>()
-            .<span class="ident">execute_watch_with_session</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>, <span class="ident">target</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)
-            .<span class="kw">await</span>
-    }
+        pipeline: <span class="kw">impl </span>IntoIterator&lt;Item = Document&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;ChangeStreamOptions&gt;&gt;,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;SessionChangeStream&lt;ChangeStreamEvent&lt;Document&gt;&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>options = options.into();
+        <span class="macro">resolve_read_concern_with_session!</span>(<span class="self">self</span>, options, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut *</span>session))<span class="question-mark">?</span>;
+        <span class="macro">resolve_selection_criteria_with_session!</span>(<span class="self">self</span>, options, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut *</span>session))<span class="question-mark">?</span>;
+        <span class="kw">let </span>target = AggregateTarget::Database(<span class="self">self</span>.name().to_string());
+        <span class="self">self</span>.client()
+            .execute_watch_with_session(pipeline, options, target, <span class="prelude-val">None</span>, session)
+            .<span class="kw">await
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

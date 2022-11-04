@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/client/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/client/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -188,195 +188,195 @@
 <span id="188">188</span>
 <span id="189">189</span>
 <span id="190">190</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::anchors</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">ConfigBuilder</span>, <span class="ident">WantsVerifier</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::handy</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">ClientConfig</span>, <span class="ident">ResolvesClientCert</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::key</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kx::SupportedKxGroup</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::SupportedCipherSuite</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::verify</span>::{<span class="self">self</span>, <span class="ident">CertificateTransparencyPolicy</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::versions</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::NoKeyLog</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::anchors;
+<span class="kw">use </span><span class="kw">crate</span>::builder::{ConfigBuilder, WantsVerifier};
+<span class="kw">use </span><span class="kw">crate</span>::client::handy;
+<span class="kw">use </span><span class="kw">crate</span>::client::{ClientConfig, ResolvesClientCert};
+<span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::key;
+<span class="kw">use </span><span class="kw">crate</span>::kx::SupportedKxGroup;
+<span class="kw">use </span><span class="kw">crate</span>::suites::SupportedCipherSuite;
+<span class="kw">use </span><span class="kw">crate</span>::verify::{<span class="self">self</span>, CertificateTransparencyPolicy};
+<span class="kw">use </span><span class="kw">crate</span>::versions;
+<span class="kw">use </span><span class="kw">crate</span>::NoKeyLog;
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::time::SystemTime;
 
-<span class="kw">impl</span> <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">ClientConfig</span>, <span class="ident">WantsVerifier</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Choose how to verify client certificates.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_root_certificates</span>(
+<span class="kw">impl </span>ConfigBuilder&lt;ClientConfig, WantsVerifier&gt; {
+    <span class="doccomment">/// Choose how to verify client certificates.
+    </span><span class="kw">pub fn </span>with_root_certificates(
         <span class="self">self</span>,
-        <span class="ident">root_store</span>: <span class="ident">anchors::RootCertStore</span>,
-    ) -&gt; <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">ClientConfig</span>, <span class="ident">WantsTransparencyPolicyOrClientCert</span><span class="op">&gt;</span> {
-        <span class="ident">ConfigBuilder</span> {
-            <span class="ident">state</span>: <span class="ident">WantsTransparencyPolicyOrClientCert</span> {
-                <span class="ident">cipher_suites</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cipher_suites</span>,
-                <span class="ident">kx_groups</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">kx_groups</span>,
-                <span class="ident">versions</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">versions</span>,
-                <span class="ident">root_store</span>,
+        root_store: anchors::RootCertStore,
+    ) -&gt; ConfigBuilder&lt;ClientConfig, WantsTransparencyPolicyOrClientCert&gt; {
+        ConfigBuilder {
+            state: WantsTransparencyPolicyOrClientCert {
+                cipher_suites: <span class="self">self</span>.state.cipher_suites,
+                kx_groups: <span class="self">self</span>.state.kx_groups,
+                versions: <span class="self">self</span>.state.versions,
+                root_store,
             },
-            <span class="ident">side</span>: <span class="ident">PhantomData::default</span>(),
+            side: PhantomData::default(),
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)]</span>
-    <span class="doccomment">/// Set a custom certificate verifier.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_custom_certificate_verifier</span>(
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)]
+    </span><span class="doccomment">/// Set a custom certificate verifier.
+    </span><span class="kw">pub fn </span>with_custom_certificate_verifier(
         <span class="self">self</span>,
-        <span class="ident">verifier</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">verify::ServerCertVerifier</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">ClientConfig</span>, <span class="ident">WantsClientCert</span><span class="op">&gt;</span> {
-        <span class="ident">ConfigBuilder</span> {
-            <span class="ident">state</span>: <span class="ident">WantsClientCert</span> {
-                <span class="ident">cipher_suites</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cipher_suites</span>,
-                <span class="ident">kx_groups</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">kx_groups</span>,
-                <span class="ident">versions</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">versions</span>,
-                <span class="ident">verifier</span>,
+        verifier: Arc&lt;<span class="kw">dyn </span>verify::ServerCertVerifier&gt;,
+    ) -&gt; ConfigBuilder&lt;ClientConfig, WantsClientCert&gt; {
+        ConfigBuilder {
+            state: WantsClientCert {
+                cipher_suites: <span class="self">self</span>.state.cipher_suites,
+                kx_groups: <span class="self">self</span>.state.kx_groups,
+                versions: <span class="self">self</span>.state.versions,
+                verifier,
             },
-            <span class="ident">side</span>: <span class="ident">PhantomData::default</span>(),
+            side: PhantomData::default(),
         }
     }
 }
 
-<span class="doccomment">/// A config builder state where the caller needs to supply a certificate transparency policy or</span>
-<span class="doccomment">/// client certificate resolver.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In this state, the caller can optionally enable certificate transparency, or ignore CT and</span>
-<span class="doccomment">/// invoke one of the methods related to client certificates (as in the [`WantsClientCert`] state).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For more information, see the [`ConfigBuilder`] documentation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WantsTransparencyPolicyOrClientCert</span> {
-    <span class="ident">cipher_suites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span>,
-    <span class="ident">kx_groups</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedKxGroup</span><span class="op">&gt;</span>,
-    <span class="ident">versions</span>: <span class="ident">versions::EnabledVersions</span>,
-    <span class="ident">root_store</span>: <span class="ident">anchors::RootCertStore</span>,
+<span class="doccomment">/// A config builder state where the caller needs to supply a certificate transparency policy or
+/// client certificate resolver.
+///
+/// In this state, the caller can optionally enable certificate transparency, or ignore CT and
+/// invoke one of the methods related to client certificates (as in the [`WantsClientCert`] state).
+///
+/// For more information, see the [`ConfigBuilder`] documentation.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>WantsTransparencyPolicyOrClientCert {
+    cipher_suites: Vec&lt;SupportedCipherSuite&gt;,
+    kx_groups: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>SupportedKxGroup&gt;,
+    versions: versions::EnabledVersions,
+    root_store: anchors::RootCertStore,
 }
 
-<span class="kw">impl</span> <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">ClientConfig</span>, <span class="ident">WantsTransparencyPolicyOrClientCert</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Set Certificate Transparency logs to use for server certificate validation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Because Certificate Transparency logs are sharded on a per-year basis and can be trusted or</span>
-    <span class="doccomment">/// distrusted relatively quickly, rustls stores a validation deadline. Server certificates will</span>
-    <span class="doccomment">/// be validated against the configured CT logs until the deadline expires. After the deadline,</span>
-    <span class="doccomment">/// certificates will no longer be validated, and a warning message will be logged. The deadline</span>
-    <span class="doccomment">/// may vary depending on how often you deploy builds with updated dependencies.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_certificate_transparency_logs</span>(
+<span class="kw">impl </span>ConfigBuilder&lt;ClientConfig, WantsTransparencyPolicyOrClientCert&gt; {
+    <span class="doccomment">/// Set Certificate Transparency logs to use for server certificate validation.
+    ///
+    /// Because Certificate Transparency logs are sharded on a per-year basis and can be trusted or
+    /// distrusted relatively quickly, rustls stores a validation deadline. Server certificates will
+    /// be validated against the configured CT logs until the deadline expires. After the deadline,
+    /// certificates will no longer be validated, and a warning message will be logged. The deadline
+    /// may vary depending on how often you deploy builds with updated dependencies.
+    </span><span class="kw">pub fn </span>with_certificate_transparency_logs(
         <span class="self">self</span>,
-        <span class="ident">logs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">sct::Log</span>],
-        <span class="ident">validation_deadline</span>: <span class="ident">SystemTime</span>,
-    ) -&gt; <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">ClientConfig</span>, <span class="ident">WantsClientCert</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_logs</span>(<span class="prelude-val">Some</span>(<span class="ident">CertificateTransparencyPolicy::new</span>(
-            <span class="ident">logs</span>,
-            <span class="ident">validation_deadline</span>,
+        logs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>sct::Log],
+        validation_deadline: SystemTime,
+    ) -&gt; ConfigBuilder&lt;ClientConfig, WantsClientCert&gt; {
+        <span class="self">self</span>.with_logs(<span class="prelude-val">Some</span>(CertificateTransparencyPolicy::new(
+            logs,
+            validation_deadline,
         )))
     }
 
-    <span class="doccomment">/// Sets a single certificate chain and matching private key for use</span>
-    <span class="doccomment">/// in client authentication.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `cert_chain` is a vector of DER-encoded certificates.</span>
-    <span class="doccomment">/// `key_der` is a DER-encoded RSA, ECDSA, or Ed25519 private key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function fails if `key_der` is invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_single_cert</span>(
+    <span class="doccomment">/// Sets a single certificate chain and matching private key for use
+    /// in client authentication.
+    ///
+    /// `cert_chain` is a vector of DER-encoded certificates.
+    /// `key_der` is a DER-encoded RSA, ECDSA, or Ed25519 private key.
+    ///
+    /// This function fails if `key_der` is invalid.
+    </span><span class="kw">pub fn </span>with_single_cert(
         <span class="self">self</span>,
-        <span class="ident">cert_chain</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>,
-        <span class="ident">key_der</span>: <span class="ident">key::PrivateKey</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ClientConfig</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_logs</span>(<span class="prelude-val">None</span>)
-            .<span class="ident">with_single_cert</span>(<span class="ident">cert_chain</span>, <span class="ident">key_der</span>)
+        cert_chain: Vec&lt;key::Certificate&gt;,
+        key_der: key::PrivateKey,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientConfig, Error&gt; {
+        <span class="self">self</span>.with_logs(<span class="prelude-val">None</span>)
+            .with_single_cert(cert_chain, key_der)
     }
 
-    <span class="doccomment">/// Do not support client auth.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_no_client_auth</span>(<span class="self">self</span>) -&gt; <span class="ident">ClientConfig</span> {
-        <span class="self">self</span>.<span class="ident">with_logs</span>(<span class="prelude-val">None</span>)
-            .<span class="ident">with_client_cert_resolver</span>(<span class="ident">Arc::new</span>(<span class="ident">handy::FailResolveClientCert</span> {}))
+    <span class="doccomment">/// Do not support client auth.
+    </span><span class="kw">pub fn </span>with_no_client_auth(<span class="self">self</span>) -&gt; ClientConfig {
+        <span class="self">self</span>.with_logs(<span class="prelude-val">None</span>)
+            .with_client_cert_resolver(Arc::new(handy::FailResolveClientCert {}))
     }
 
-    <span class="doccomment">/// Sets a custom [`ResolvesClientCert`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_client_cert_resolver</span>(
+    <span class="doccomment">/// Sets a custom [`ResolvesClientCert`].
+    </span><span class="kw">pub fn </span>with_client_cert_resolver(
         <span class="self">self</span>,
-        <span class="ident">client_auth_cert_resolver</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ResolvesClientCert</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ClientConfig</span> {
-        <span class="self">self</span>.<span class="ident">with_logs</span>(<span class="prelude-val">None</span>)
-            .<span class="ident">with_client_cert_resolver</span>(<span class="ident">client_auth_cert_resolver</span>)
+        client_auth_cert_resolver: Arc&lt;<span class="kw">dyn </span>ResolvesClientCert&gt;,
+    ) -&gt; ClientConfig {
+        <span class="self">self</span>.with_logs(<span class="prelude-val">None</span>)
+            .with_client_cert_resolver(client_auth_cert_resolver)
     }
 
-    <span class="kw">fn</span> <span class="ident">with_logs</span>(
+    <span class="kw">fn </span>with_logs(
         <span class="self">self</span>,
-        <span class="ident">ct_policy</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateTransparencyPolicy</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">ClientConfig</span>, <span class="ident">WantsClientCert</span><span class="op">&gt;</span> {
-        <span class="ident">ConfigBuilder</span> {
-            <span class="ident">state</span>: <span class="ident">WantsClientCert</span> {
-                <span class="ident">cipher_suites</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cipher_suites</span>,
-                <span class="ident">kx_groups</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">kx_groups</span>,
-                <span class="ident">versions</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">versions</span>,
-                <span class="ident">verifier</span>: <span class="ident">Arc::new</span>(<span class="ident">verify::WebPkiVerifier::new</span>(
-                    <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">root_store</span>,
-                    <span class="ident">ct_policy</span>,
+        ct_policy: <span class="prelude-ty">Option</span>&lt;CertificateTransparencyPolicy&gt;,
+    ) -&gt; ConfigBuilder&lt;ClientConfig, WantsClientCert&gt; {
+        ConfigBuilder {
+            state: WantsClientCert {
+                cipher_suites: <span class="self">self</span>.state.cipher_suites,
+                kx_groups: <span class="self">self</span>.state.kx_groups,
+                versions: <span class="self">self</span>.state.versions,
+                verifier: Arc::new(verify::WebPkiVerifier::new(
+                    <span class="self">self</span>.state.root_store,
+                    ct_policy,
                 )),
             },
-            <span class="ident">side</span>: <span class="ident">PhantomData</span>,
+            side: PhantomData,
         }
     }
 }
 
-<span class="doccomment">/// A config builder state where the caller needs to supply whether and how to provide a client</span>
-<span class="doccomment">/// certificate.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For more information, see the [`ConfigBuilder`] documentation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WantsClientCert</span> {
-    <span class="ident">cipher_suites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span>,
-    <span class="ident">kx_groups</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedKxGroup</span><span class="op">&gt;</span>,
-    <span class="ident">versions</span>: <span class="ident">versions::EnabledVersions</span>,
-    <span class="ident">verifier</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">verify::ServerCertVerifier</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A config builder state where the caller needs to supply whether and how to provide a client
+/// certificate.
+///
+/// For more information, see the [`ConfigBuilder`] documentation.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>WantsClientCert {
+    cipher_suites: Vec&lt;SupportedCipherSuite&gt;,
+    kx_groups: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>SupportedKxGroup&gt;,
+    versions: versions::EnabledVersions,
+    verifier: Arc&lt;<span class="kw">dyn </span>verify::ServerCertVerifier&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">ClientConfig</span>, <span class="ident">WantsClientCert</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Sets a single certificate chain and matching private key for use</span>
-    <span class="doccomment">/// in client authentication.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `cert_chain` is a vector of DER-encoded certificates.</span>
-    <span class="doccomment">/// `key_der` is a DER-encoded RSA, ECDSA, or Ed25519 private key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function fails if `key_der` is invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_single_cert</span>(
+<span class="kw">impl </span>ConfigBuilder&lt;ClientConfig, WantsClientCert&gt; {
+    <span class="doccomment">/// Sets a single certificate chain and matching private key for use
+    /// in client authentication.
+    ///
+    /// `cert_chain` is a vector of DER-encoded certificates.
+    /// `key_der` is a DER-encoded RSA, ECDSA, or Ed25519 private key.
+    ///
+    /// This function fails if `key_der` is invalid.
+    </span><span class="kw">pub fn </span>with_single_cert(
         <span class="self">self</span>,
-        <span class="ident">cert_chain</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>,
-        <span class="ident">key_der</span>: <span class="ident">key::PrivateKey</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ClientConfig</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">resolver</span> <span class="op">=</span> <span class="ident">handy::AlwaysResolvesClientCert::new</span>(<span class="ident">cert_chain</span>, <span class="kw-2">&amp;</span><span class="ident">key_der</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">with_client_cert_resolver</span>(<span class="ident">Arc::new</span>(<span class="ident">resolver</span>)))
+        cert_chain: Vec&lt;key::Certificate&gt;,
+        key_der: key::PrivateKey,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientConfig, Error&gt; {
+        <span class="kw">let </span>resolver = handy::AlwaysResolvesClientCert::new(cert_chain, <span class="kw-2">&amp;</span>key_der)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.with_client_cert_resolver(Arc::new(resolver)))
     }
 
-    <span class="doccomment">/// Do not support client auth.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_no_client_auth</span>(<span class="self">self</span>) -&gt; <span class="ident">ClientConfig</span> {
-        <span class="self">self</span>.<span class="ident">with_client_cert_resolver</span>(<span class="ident">Arc::new</span>(<span class="ident">handy::FailResolveClientCert</span> {}))
+    <span class="doccomment">/// Do not support client auth.
+    </span><span class="kw">pub fn </span>with_no_client_auth(<span class="self">self</span>) -&gt; ClientConfig {
+        <span class="self">self</span>.with_client_cert_resolver(Arc::new(handy::FailResolveClientCert {}))
     }
 
-    <span class="doccomment">/// Sets a custom [`ResolvesClientCert`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_client_cert_resolver</span>(
+    <span class="doccomment">/// Sets a custom [`ResolvesClientCert`].
+    </span><span class="kw">pub fn </span>with_client_cert_resolver(
         <span class="self">self</span>,
-        <span class="ident">client_auth_cert_resolver</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ResolvesClientCert</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ClientConfig</span> {
-        <span class="ident">ClientConfig</span> {
-            <span class="ident">cipher_suites</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cipher_suites</span>,
-            <span class="ident">kx_groups</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">kx_groups</span>,
-            <span class="ident">alpn_protocols</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">session_storage</span>: <span class="ident">handy::ClientSessionMemoryCache::new</span>(<span class="number">256</span>),
-            <span class="ident">max_fragment_size</span>: <span class="prelude-val">None</span>,
-            <span class="ident">client_auth_cert_resolver</span>,
-            <span class="ident">enable_tickets</span>: <span class="bool-val">true</span>,
-            <span class="ident">versions</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">versions</span>,
-            <span class="ident">enable_sni</span>: <span class="bool-val">true</span>,
-            <span class="ident">verifier</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">verifier</span>,
-            <span class="ident">key_log</span>: <span class="ident">Arc::new</span>(<span class="ident">NoKeyLog</span> {}),
-            <span class="ident">enable_early_data</span>: <span class="bool-val">false</span>,
+        client_auth_cert_resolver: Arc&lt;<span class="kw">dyn </span>ResolvesClientCert&gt;,
+    ) -&gt; ClientConfig {
+        ClientConfig {
+            cipher_suites: <span class="self">self</span>.state.cipher_suites,
+            kx_groups: <span class="self">self</span>.state.kx_groups,
+            alpn_protocols: Vec::new(),
+            session_storage: handy::ClientSessionMemoryCache::new(<span class="number">256</span>),
+            max_fragment_size: <span class="prelude-val">None</span>,
+            client_auth_cert_resolver,
+            enable_tickets: <span class="bool-val">true</span>,
+            versions: <span class="self">self</span>.state.versions,
+            enable_sni: <span class="bool-val">true</span>,
+            verifier: <span class="self">self</span>.state.verifier,
+            key_log: Arc::new(NoKeyLog {}),
+            enable_early_data: <span class="bool-val">false</span>,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

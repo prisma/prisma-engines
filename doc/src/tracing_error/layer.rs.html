@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-error-0.2.0/src/layer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>layer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-error-0.2.0/src/layer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>layer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tracing_error/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -132,137 +132,137 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::any</span>::{<span class="ident">type_name</span>, <span class="ident">TypeId</span>};
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">span</span>, <span class="ident">Dispatch</span>, <span class="ident">Metadata</span>, <span class="ident">Subscriber</span>};
-<span class="kw">use</span> <span class="ident">tracing_subscriber::fmt::format</span>::{<span class="ident">DefaultFields</span>, <span class="ident">FormatFields</span>};
-<span class="kw">use</span> <span class="ident">tracing_subscriber</span>::{
-    <span class="ident">fmt::FormattedFields</span>,
-    <span class="ident">layer</span>::{<span class="self">self</span>, <span class="ident">Layer</span>},
-    <span class="ident">registry::LookupSpan</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>std::any::{type_name, TypeId};
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>tracing::{span, Dispatch, Metadata, Subscriber};
+<span class="kw">use </span>tracing_subscriber::fmt::format::{DefaultFields, FormatFields};
+<span class="kw">use </span>tracing_subscriber::{
+    fmt::FormattedFields,
+    layer::{<span class="self">self</span>, Layer},
+    registry::LookupSpan,
 };
 
-<span class="doccomment">/// A subscriber [`Layer`] that enables capturing [`SpanTrace`]s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Optionally, this type may be constructed with a [field formatter] to use</span>
-<span class="doccomment">/// when formatting the fields of each span in a trace. When no formatter is</span>
-<span class="doccomment">/// provided, the [default format] is used instead.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Layer`]: https://docs.rs/tracing-subscriber/0.3/tracing_subscriber/layer/trait.Layer.html</span>
-<span class="doccomment">/// [`SpanTrace`]: ../struct.SpanTrace.html</span>
-<span class="doccomment">/// [field formatter]: https://docs.rs/tracing-subscriber/0.3/tracing_subscriber/fmt/trait.FormatFields.html</span>
-<span class="doccomment">/// [default format]: https://docs.rs/tracing-subscriber/0.3/tracing_subscriber/fmt/format/struct.DefaultFields.html</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ErrorLayer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span> <span class="op">=</span> <span class="ident">DefaultFields</span><span class="op">&gt;</span> {
-    <span class="ident">format</span>: <span class="ident">F</span>,
+<span class="doccomment">/// A subscriber [`Layer`] that enables capturing [`SpanTrace`]s.
+///
+/// Optionally, this type may be constructed with a [field formatter] to use
+/// when formatting the fields of each span in a trace. When no formatter is
+/// provided, the [default format] is used instead.
+///
+/// [`Layer`]: https://docs.rs/tracing-subscriber/0.3/tracing_subscriber/layer/trait.Layer.html
+/// [`SpanTrace`]: ../struct.SpanTrace.html
+/// [field formatter]: https://docs.rs/tracing-subscriber/0.3/tracing_subscriber/fmt/trait.FormatFields.html
+/// [default format]: https://docs.rs/tracing-subscriber/0.3/tracing_subscriber/fmt/format/struct.DefaultFields.html
+</span><span class="kw">pub struct </span>ErrorLayer&lt;S, F = DefaultFields&gt; {
+    format: F,
 
-    <span class="ident">get_context</span>: <span class="ident">WithContext</span>,
-    <span class="ident">_subscriber</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">S</span>)<span class="op">&gt;</span>,
+    get_context: WithContext,
+    _subscriber: PhantomData&lt;<span class="kw">fn</span>(S)&gt;,
 }
 
-<span class="comment">// this function &quot;remembers&quot; the types of the subscriber and the formatter,</span>
-<span class="comment">// so that we can downcast to something aware of them without knowing those</span>
-<span class="comment">// types at the callsite.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">WithContext</span>(
-    <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">Dispatch</span>, <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span>),
+<span class="comment">// this function &quot;remembers&quot; the types of the subscriber and the formatter,
+// so that we can downcast to something aware of them without knowing those
+// types at the callsite.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>WithContext(
+    <span class="kw">fn</span>(<span class="kw-2">&amp;</span>Dispatch, <span class="kw-2">&amp;</span>span::Id, f: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;, <span class="kw-2">&amp;</span>str) -&gt; bool),
 );
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ErrorLayer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;S, F&gt; Layer&lt;S&gt; <span class="kw">for </span>ErrorLayer&lt;S, F&gt;
+<span class="kw">where
+    </span>S: Subscriber + <span class="kw">for</span>&lt;<span class="lifetime">&#39;span</span>&gt; LookupSpan&lt;<span class="lifetime">&#39;span</span>&gt;,
+    F: <span class="kw">for</span>&lt;<span class="lifetime">&#39;writer</span>&gt; FormatFields&lt;<span class="lifetime">&#39;writer</span>&gt; + <span class="lifetime">&#39;static</span>,
 {
-    <span class="doccomment">/// Notifies this layer that a new span was constructed with the given</span>
-    <span class="doccomment">/// `Attributes` and `Id`.</span>
-    <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">span</span>(<span class="ident">id</span>).<span class="ident">expect</span>(<span class="string">&quot;span must already exist!&quot;</span>);
-        <span class="kw">if</span> <span class="ident">span</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">FormattedFields</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">is_some</span>() {
+    <span class="doccomment">/// Notifies this layer that a new span was constructed with the given
+    /// `Attributes` and `Id`.
+    </span><span class="kw">fn </span>on_new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>span::Attributes&lt;<span class="lifetime">&#39;_</span>&gt;, id: <span class="kw-2">&amp;</span>span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="kw">let </span>span = ctx.span(id).expect(<span class="string">&quot;span must already exist!&quot;</span>);
+        <span class="kw">if </span>span.extensions().get::&lt;FormattedFields&lt;F&gt;&gt;().is_some() {
             <span class="kw">return</span>;
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">FormattedFields</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">String::new</span>());
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">format_fields</span>(<span class="ident">fields</span>.<span class="ident">as_writer</span>(), <span class="ident">attrs</span>).<span class="ident">is_ok</span>() {
-            <span class="ident">span</span>.<span class="ident">extensions_mut</span>().<span class="ident">insert</span>(<span class="ident">fields</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>fields = FormattedFields::&lt;F&gt;::new(String::new());
+        <span class="kw">if </span><span class="self">self</span>.format.format_fields(fields.as_writer(), attrs).is_ok() {
+            span.extensions_mut().insert(fields);
         }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*const</span> ()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">id</span> {
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> ()),
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">WithContext</span><span class="op">&gt;</span>() =&gt; {
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_context</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> ())
+    <span class="kw">unsafe fn </span>downcast_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, id: TypeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>()&gt; {
+        <span class="kw">match </span>id {
+            id <span class="kw">if </span>id == TypeId::of::&lt;<span class="self">Self</span>&gt;() =&gt; <span class="prelude-val">Some</span>(<span class="self">self </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>()),
+            id <span class="kw">if </span>id == TypeId::of::&lt;WithContext&gt;() =&gt; {
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.get_context <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>())
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">ErrorLayer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, F&gt; ErrorLayer&lt;S, F&gt;
+<span class="kw">where
+    </span>F: <span class="kw">for</span>&lt;<span class="lifetime">&#39;writer</span>&gt; FormatFields&lt;<span class="lifetime">&#39;writer</span>&gt; + <span class="lifetime">&#39;static</span>,
+    S: Subscriber + <span class="kw">for</span>&lt;<span class="lifetime">&#39;span</span>&gt; LookupSpan&lt;<span class="lifetime">&#39;span</span>&gt;,
 {
-    <span class="doccomment">/// Returns a new `ErrorLayer` with the provided [field formatter].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [field formatter]: https://docs.rs/tracing-subscriber/0.2.10/tracing_subscriber/fmt/trait.FormatFields.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">format</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">format</span>,
-            <span class="ident">get_context</span>: <span class="ident">WithContext</span>(<span class="ident"><span class="self">Self</span>::get_context</span>),
-            <span class="ident">_subscriber</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Returns a new `ErrorLayer` with the provided [field formatter].
+    ///
+    /// [field formatter]: https://docs.rs/tracing-subscriber/0.2.10/tracing_subscriber/fmt/trait.FormatFields.html
+    </span><span class="kw">pub fn </span>new(format: F) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            format,
+            get_context: WithContext(<span class="self">Self</span>::get_context),
+            _subscriber: PhantomData,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_context</span>(
-        <span class="ident">dispatch</span>: <span class="kw-2">&amp;</span><span class="ident">Dispatch</span>,
-        <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>,
-        <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span>,
+    <span class="kw">fn </span>get_context(
+        dispatch: <span class="kw-2">&amp;</span>Dispatch,
+        id: <span class="kw-2">&amp;</span>span::Id,
+        f: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;, <span class="kw-2">&amp;</span>str) -&gt; bool,
     ) {
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">dispatch</span>
-            .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;subscriber should downcast to expected type; this is a bug!&quot;</span>);
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">subscriber</span>
-            .<span class="ident">span</span>(<span class="ident">id</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;registry should have a span for the current ID&quot;</span>);
-        <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">span</span>.<span class="ident">scope</span>() {
-            <span class="kw">let</span> <span class="ident">cont</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="op">=</span> <span class="ident">span</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">FormattedFields</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>() {
-                <span class="ident">f</span>(<span class="ident">span</span>.<span class="ident">metadata</span>(), <span class="ident">fields</span>.<span class="ident">fields</span>.<span class="ident">as_str</span>())
-            } <span class="kw">else</span> {
-                <span class="ident">f</span>(<span class="ident">span</span>.<span class="ident">metadata</span>(), <span class="string">&quot;&quot;</span>)
+        <span class="kw">let </span>subscriber = dispatch
+            .downcast_ref::&lt;S&gt;()
+            .expect(<span class="string">&quot;subscriber should downcast to expected type; this is a bug!&quot;</span>);
+        <span class="kw">let </span>span = subscriber
+            .span(id)
+            .expect(<span class="string">&quot;registry should have a span for the current ID&quot;</span>);
+        <span class="kw">for </span>span <span class="kw">in </span>span.scope() {
+            <span class="kw">let </span>cont = <span class="kw">if let </span><span class="prelude-val">Some</span>(fields) = span.extensions().get::&lt;FormattedFields&lt;F&gt;&gt;() {
+                f(span.metadata(), fields.fields.as_str())
+            } <span class="kw">else </span>{
+                f(span.metadata(), <span class="string">&quot;&quot;</span>)
             };
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">cont</span> {
+            <span class="kw">if </span>!cont {
                 <span class="kw">break</span>;
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithContext</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+<span class="kw">impl </span>WithContext {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_context&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">dispatch</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Dispatch</span>,
-        <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>,
-        <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span>,
+        dispatch: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Dispatch,
+        id: <span class="kw-2">&amp;</span>span::Id,
+        <span class="kw-2">mut </span>f: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;, <span class="kw-2">&amp;</span>str) -&gt; bool,
     ) {
-        (<span class="self">self</span>.<span class="number">0</span>)(<span class="ident">dispatch</span>, <span class="ident">id</span>, <span class="kw-2">&amp;mut</span> <span class="ident">f</span>)
+        (<span class="self">self</span>.<span class="number">0</span>)(dispatch, id, <span class="kw-2">&amp;mut </span>f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ErrorLayer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S&gt; Default <span class="kw">for </span>ErrorLayer&lt;S&gt;
+<span class="kw">where
+    </span>S: Subscriber + <span class="kw">for</span>&lt;<span class="lifetime">&#39;span</span>&gt; LookupSpan&lt;<span class="lifetime">&#39;span</span>&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">DefaultFields::default</span>())
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(DefaultFields::default())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ErrorLayer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ErrorLayer&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;format&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">format</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;subscriber&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>()))
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;S, F: fmt::Debug&gt; fmt::Debug <span class="kw">for </span>ErrorLayer&lt;S, F&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;ErrorLayer&quot;</span>)
+            .field(<span class="string">&quot;format&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.format)
+            .field(<span class="string">&quot;subscriber&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, type_name::&lt;S&gt;()))
+            .finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_error" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_error" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

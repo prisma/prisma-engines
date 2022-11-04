@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/fields.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fields.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/fields.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fields.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -375,382 +375,382 @@
 <span id="375">375</span>
 <span id="376">376</span>
 <span id="377">377</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">constraint_namespace::ConstraintName</span>,
-    <span class="ident">database_name::validate_db_name</span>,
-    <span class="ident">default_value</span>,
-    <span class="ident">names</span>::{<span class="ident">NameTaken</span>, <span class="ident">Names</span>},
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    constraint_namespace::ConstraintName,
+    database_name::validate_db_name,
+    default_value,
+    names::{NameTaken, Names},
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">diagnostics::DatamodelError</span>, <span class="ident">validate::validation_pipeline::context::Context</span>};
-<span class="kw">use</span> <span class="ident">parser_database</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithSpan</span>},
-    <span class="ident">walkers</span>::{<span class="ident">FieldWalker</span>, <span class="ident">PrimaryKeyWalker</span>, <span class="ident">ScalarFieldAttributeWalker</span>, <span class="ident">ScalarFieldWalker</span>, <span class="ident">TypedFieldWalker</span>},
-    <span class="ident">ScalarFieldType</span>, <span class="ident">ScalarType</span>,
+<span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::{walker_ext_traits::<span class="kw-2">*</span>, ConnectorCapability};
+<span class="kw">use crate</span>::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
+<span class="kw">use </span>parser_database::{
+    ast::{<span class="self">self</span>, WithSpan},
+    walkers::{FieldWalker, PrimaryKeyWalker, ScalarFieldAttributeWalker, ScalarFieldWalker, TypedFieldWalker},
+    ScalarFieldType, ScalarType,
 };
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_client_name</span>(<span class="ident">field</span>: <span class="ident">FieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>validate_client_name(field: FieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;, names: <span class="kw-2">&amp;</span>Names&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>model = field.model();
 
-    <span class="kw">for</span> <span class="ident">taken</span> <span class="kw">in</span> <span class="ident">names</span>.<span class="ident">name_taken</span>(<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">field</span>.<span class="ident">name</span>()).<span class="ident">into_iter</span>() {
-        <span class="kw">match</span> <span class="ident">taken</span> {
-            <span class="ident">NameTaken::Index</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">for </span>taken <span class="kw">in </span>names.name_taken(model.model_id(), field.name()).into_iter() {
+        <span class="kw">match </span>taken {
+            NameTaken::Index =&gt; {
+                <span class="kw">let </span>message = <span class="macro">format!</span>(
                     <span class="string">&quot;The custom name `{}` specified for the `@@index` attribute is already used as a name for a field. Please choose a different name.&quot;</span>,
-                    <span class="ident">field</span>.<span class="ident">name</span>()
+                    field.name()
                 );
 
-                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span>
-                    <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>());
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
+                <span class="kw">let </span>error =
+                    DatamodelError::new_model_validation_error(<span class="kw-2">&amp;</span>message, model.name(), model.ast_model().span());
+                ctx.push_error(error);
             }
-            <span class="ident">NameTaken::Unique</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+            NameTaken::Unique =&gt; {
+                <span class="kw">let </span>message = <span class="macro">format!</span>(
                     <span class="string">&quot;The custom name `{}` specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.&quot;</span>,
-                    <span class="ident">field</span>.<span class="ident">name</span>()
+                    field.name()
                 );
 
-                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span>
-                    <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>());
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
+                <span class="kw">let </span>error =
+                    DatamodelError::new_model_validation_error(<span class="kw-2">&amp;</span>message, model.name(), model.ast_model().span());
+                ctx.push_error(error);
             }
-            <span class="ident">NameTaken::PrimaryKey</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+            NameTaken::PrimaryKey =&gt; {
+                <span class="kw">let </span>message = <span class="macro">format!</span>(
                     <span class="string">&quot;The custom name `{}` specified for the `@@id` attribute is already used as a name for a field. Please choose a different name.&quot;</span>,
-                    <span class="ident">field</span>.<span class="ident">name</span>()
+                    field.name()
                 );
 
-                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span>
-                    <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>());
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
+                <span class="kw">let </span>error =
+                    DatamodelError::new_model_validation_error(<span class="kw-2">&amp;</span>message, model.name(), model.ast_model().span());
+                ctx.push_error(error);
             }
         }
     }
 }
 
-<span class="doccomment">/// Some databases use constraints for default values, with a name that can be unique in a certain</span>
-<span class="doccomment">/// namespace. Validates the field default constraint against name clases.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_a_unique_default_constraint_name</span>(
-    <span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Some databases use constraints for default values, with a name that can be unique in a certain
+/// namespace. Validates the field default constraint against name clases.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>has_a_unique_default_constraint_name(
+    field: ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    names: <span class="kw-2">&amp;</span>Names&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">connector</span>)) {
-        <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>name = <span class="kw">match </span>field.default_value().map(|w| w.constraint_name(ctx.connector)) {
+        <span class="prelude-val">Some</span>(name) =&gt; name,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">for</span> <span class="ident">violation</span> <span class="kw">in</span> <span class="ident">names</span>.<span class="ident">constraint_namespace</span>.<span class="ident">constraint_name_scope_violations</span>(
-        <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">model_id</span>(),
-        <span class="ident">ConstraintName::Default</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()),
-        <span class="ident">ctx</span>,
+    <span class="kw">for </span>violation <span class="kw">in </span>names.constraint_namespace.constraint_name_scope_violations(
+        field.model().model_id(),
+        ConstraintName::Default(name.as_ref()),
+        ctx,
     ) {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.&quot;</span>,
-            <span class="ident">name</span>,
-            <span class="ident">violation</span>.<span class="ident">description</span>(<span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>()),
+            name,
+            violation.description(field.model().name()),
         );
 
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">field</span>
-            .<span class="ident">ast_field</span>()
-            .<span class="ident">span_for_argument</span>(<span class="string">&quot;default&quot;</span>, <span class="string">&quot;map&quot;</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>());
+        <span class="kw">let </span>span = field
+            .ast_field()
+            .span_for_argument(<span class="string">&quot;default&quot;</span>, <span class="string">&quot;map&quot;</span>)
+            .unwrap_or_else(|| field.ast_field().span());
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;@default&quot;</span>, <span class="ident">span</span>,
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message, <span class="string">&quot;@default&quot;</span>, span,
         ));
     }
 }
 
-<span class="doccomment">/// The length prefix can be used with strings and byte columns.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate_length_used_with_correct_types</span>(
-    <span class="ident">attr</span>: <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">attribute</span>: (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ast::Span</span>),
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The length prefix can be used with strings and byte columns.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>validate_length_used_with_correct_types(
+    attr: ScalarFieldAttributeWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    attribute: (<span class="kw-2">&amp;</span>str, ast::Span),
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::IndexColumnLengthPrefixing</span>)
+    <span class="kw">if </span>!ctx
+        .connector
+        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">length</span>().<span class="ident">is_none</span>() {
+    <span class="kw">if </span>attr.length().is_none() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">as_index_field</span>().<span class="ident">scalar_field_type</span>().<span class="ident">is_unsupported</span>() {
+    <span class="kw">if </span>attr.as_index_field().scalar_field_type().is_unsupported() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">r#type</span>) <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">as_index_field</span>().<span class="ident">scalar_field_type</span>().<span class="ident">as_builtin_scalar</span>() {
-        <span class="kw">if</span> [<span class="ident">ScalarType::String</span>, <span class="ident">ScalarType::Bytes</span>].<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">r#type</span>) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(r#type) = attr.as_index_field().scalar_field_type().as_builtin_scalar() {
+        <span class="kw">if </span>[ScalarType::String, ScalarType::Bytes].iter().any(|t| t == <span class="kw-2">&amp;</span>r#type) {
             <span class="kw">return</span>;
         }
     };
 
-    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The length argument is only allowed with field types `String` or `Bytes`.&quot;</span>;
+    <span class="kw">let </span>message = <span class="string">&quot;The length argument is only allowed with field types `String` or `Bytes`.&quot;</span>;
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-        <span class="ident">message</span>,
-        <span class="ident">attribute</span>.<span class="number">0</span>,
-        <span class="ident">attribute</span>.<span class="number">1</span>,
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        message,
+        attribute.<span class="number">0</span>,
+        attribute.<span class="number">1</span>,
     ));
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_native_type_arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="ident">field</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">TypedFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">into</span>();
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>validate_native_type_arguments&lt;<span class="lifetime">&#39;db</span>&gt;(field: <span class="kw">impl </span>Into&lt;TypedFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;) {
+    <span class="kw">let </span>field = field.into();
 
-    <span class="kw">let</span> <span class="ident">connector_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">datasource</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ds</span><span class="op">|</span> <span class="ident">ds</span>.<span class="ident">active_provider</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;Default&quot;</span>);
-    <span class="kw">let</span> (<span class="ident">scalar_type</span>, (<span class="ident">attr_scope</span>, <span class="ident">type_name</span>, <span class="ident">args</span>, <span class="ident">span</span>)) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">field</span>.<span class="ident">scalar_type</span>(), <span class="ident">field</span>.<span class="ident">raw_native_type</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">scalar_type</span>), <span class="prelude-val">Some</span>(<span class="ident">raw</span>)) =&gt; (<span class="ident">scalar_type</span>, <span class="ident">raw</span>),
-        <span class="kw">_</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>connector_name = ctx.datasource.map(|ds| ds.active_provider).unwrap_or_else(|| <span class="string">&quot;Default&quot;</span>);
+    <span class="kw">let </span>(scalar_type, (attr_scope, type_name, args, span)) = <span class="kw">match </span>(field.scalar_type(), field.raw_native_type()) {
+        (<span class="prelude-val">Some</span>(scalar_type), <span class="prelude-val">Some</span>(raw)) =&gt; (scalar_type, raw),
+        <span class="kw">_ </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="comment">// Validate that the attribute is scoped with the right datasource name.</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">datasource</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">datasource</span> {
-        <span class="kw">if</span> <span class="ident">datasource</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">attr_scope</span> {
-            <span class="kw">let</span> <span class="ident">suggestion</span> <span class="op">=</span> [<span class="ident">datasource</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), <span class="ident">type_name</span>].<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>);
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_invalid_prefix_for_native_types</span>(
-                <span class="ident">attr_scope</span>,
-                <span class="kw-2">&amp;</span><span class="ident">datasource</span>.<span class="ident">name</span>,
-                <span class="kw-2">&amp;</span><span class="ident">suggestion</span>,
-                <span class="ident">span</span>,
+    <span class="comment">// Validate that the attribute is scoped with the right datasource name.
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(datasource) = ctx.datasource {
+        <span class="kw">if </span>datasource.name != attr_scope {
+            <span class="kw">let </span>suggestion = [datasource.name.as_str(), type_name].join(<span class="string">&quot;.&quot;</span>);
+            ctx.push_error(DatamodelError::new_invalid_prefix_for_native_types(
+                attr_scope,
+                <span class="kw-2">&amp;</span>datasource.name,
+                <span class="kw-2">&amp;</span>suggestion,
+                span,
             ));
         }
     }
 
-    <span class="kw">let</span> <span class="ident">constructor</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cons</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">find_native_type_constructor</span>(<span class="ident">type_name</span>) {
-        <span class="ident">cons</span>
-    } <span class="kw">else</span> {
-        <span class="kw">return</span> <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_native_type_name_unknown</span>(
-            <span class="ident">connector_name</span>,
-            <span class="ident">type_name</span>,
-            <span class="ident">span</span>,
+    <span class="kw">let </span>constructor = <span class="kw">if let </span><span class="prelude-val">Some</span>(cons) = ctx.connector.find_native_type_constructor(type_name) {
+        cons
+    } <span class="kw">else </span>{
+        <span class="kw">return </span>ctx.push_error(DatamodelError::new_native_type_name_unknown(
+            connector_name,
+            type_name,
+            span,
         ));
     };
 
-    <span class="kw">let</span> <span class="ident">number_of_args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">len</span>();
+    <span class="kw">let </span>number_of_args = args.len();
 
-    <span class="kw">if</span> <span class="ident">number_of_args</span> <span class="op">&lt;</span> <span class="ident">constructor</span>.<span class="ident">number_of_args</span>
-        <span class="op">|</span><span class="op">|</span> ((<span class="ident">number_of_args</span> <span class="op">&gt;</span> <span class="ident">constructor</span>.<span class="ident">number_of_args</span>) <span class="op">&amp;&amp;</span> <span class="ident">constructor</span>.<span class="ident">number_of_optional_args</span> <span class="op">==</span> <span class="number">0</span>)
+    <span class="kw">if </span>number_of_args &lt; constructor.number_of_args
+        || ((number_of_args &gt; constructor.number_of_args) &amp;&amp; constructor.number_of_optional_args == <span class="number">0</span>)
     {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_argument_count_mismatch_error</span>(
-            <span class="ident">type_name</span>,
-            <span class="ident">constructor</span>.<span class="ident">number_of_args</span>,
-            <span class="ident">number_of_args</span>,
-            <span class="ident">span</span>,
+        ctx.push_error(DatamodelError::new_argument_count_mismatch_error(
+            type_name,
+            constructor.number_of_args,
+            number_of_args,
+            span,
         ));
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">number_of_args</span> <span class="op">&gt;</span> <span class="ident">constructor</span>.<span class="ident">number_of_args</span> <span class="op">+</span> <span class="ident">constructor</span>.<span class="ident">number_of_optional_args</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">constructor</span>.<span class="ident">number_of_optional_args</span> <span class="op">&gt;</span> <span class="number">0</span>
-    {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_optional_argument_count_mismatch</span>(
-            <span class="ident">type_name</span>,
-            <span class="ident">constructor</span>.<span class="ident">number_of_optional_args</span>,
-            <span class="ident">number_of_args</span>,
-            <span class="ident">span</span>,
+    <span class="kw">if </span>number_of_args &gt; constructor.number_of_args + constructor.number_of_optional_args
+        &amp;&amp; constructor.number_of_optional_args &gt; <span class="number">0
+    </span>{
+        ctx.push_error(DatamodelError::new_optional_argument_count_mismatch(
+            type_name,
+            constructor.number_of_optional_args,
+            number_of_args,
+            span,
         ));
         <span class="kw">return</span>;
     }
 
-    <span class="comment">// check for compatibility with scalar type</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">constructor</span>.<span class="ident">prisma_types</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">scalar_type</span>) {
-        <span class="kw">let</span> <span class="ident">expected_types</span> <span class="op">=</span> <span class="ident">constructor</span>
-            .<span class="ident">prisma_types</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">join</span>(<span class="string">&quot; or &quot;</span>);
+    <span class="comment">// check for compatibility with scalar type
+    </span><span class="kw">if </span>!constructor.prisma_types.contains(<span class="kw-2">&amp;</span>scalar_type) {
+        <span class="kw">let </span>expected_types = constructor
+            .prisma_types
+            .iter()
+            .map(|s| s.as_str())
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+            .join(<span class="string">&quot; or &quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">DatamodelError::new_incompatible_native_type</span>(<span class="ident">type_name</span>, <span class="ident">scalar_type</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;</span><span class="ident">expected_types</span>, <span class="ident">span</span>);
+        <span class="kw">let </span>err = DatamodelError::new_incompatible_native_type(type_name, scalar_type.as_str(), <span class="kw-2">&amp;</span>expected_types, span);
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
+        ctx.push_error(err);
 
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">type_name</span>, <span class="ident">args</span>, <span class="ident">span</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>) {
-        <span class="ident">ctx</span>.<span class="ident">connector</span>
-            .<span class="ident">validate_native_type_arguments</span>(<span class="kw-2">&amp;</span><span class="ident">native_type</span>, <span class="kw-2">&amp;</span><span class="ident">scalar_type</span>, <span class="ident">span</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(native_type) = ctx.connector.parse_native_type(type_name, args, span, ctx.diagnostics) {
+        ctx.connector
+            .validate_native_type_arguments(<span class="kw-2">&amp;</span>native_type, <span class="kw-2">&amp;</span>scalar_type, span, ctx.diagnostics);
     }
 }
 
-<span class="doccomment">/// Validates the @default attribute of a model scalar field</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_default_value</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>();
-    <span class="kw">let</span> <span class="ident">default_mapped_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">mapped_name</span>());
-    <span class="kw">let</span> <span class="ident">default_attribute</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_attribute</span>();
+<span class="doccomment">/// Validates the @default attribute of a model scalar field
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>validate_default_value(field: ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>model_name = field.model().name();
+    <span class="kw">let </span>default_mapped_name = field.default_value().and_then(|d| d.mapped_name());
+    <span class="kw">let </span>default_attribute = field.default_attribute();
 
-    <span class="comment">// Named defaults.</span>
-    <span class="kw">if</span> <span class="ident">default_mapped_name</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_named_default_values</span>() {
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;You defined a database name for the default value of a field on the model. This is not supported by the provider.&quot;</span>;
+    <span class="comment">// Named defaults.
+    </span><span class="kw">if </span>default_mapped_name.is_some() &amp;&amp; !ctx.connector.supports_named_default_values() {
+        <span class="kw">let </span>msg = <span class="string">&quot;You defined a database name for the default value of a field on the model. This is not supported by the provider.&quot;</span>;
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="ident">msg</span>,
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            msg,
             <span class="string">&quot;@default&quot;</span>,
-            <span class="ident">default_attribute</span>.<span class="ident">unwrap</span>().<span class="ident">span</span>,
+            default_attribute.unwrap().span,
         ));
     }
 
-    <span class="kw">if</span> <span class="ident">default_mapped_name</span>.<span class="ident">is_some</span>() {
-        <span class="ident">validate_db_name</span>(<span class="ident">model_name</span>, <span class="ident">default_attribute</span>.<span class="ident">unwrap</span>(), <span class="ident">default_mapped_name</span>, <span class="ident">ctx</span>, <span class="bool-val">false</span>);
+    <span class="kw">if </span>default_mapped_name.is_some() {
+        validate_db_name(model_name, default_attribute.unwrap(), default_mapped_name, ctx, <span class="bool-val">false</span>);
     }
 
-    <span class="kw">let</span> <span class="ident">default_value</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">value</span>());
-    <span class="kw">let</span> <span class="ident">scalar_type</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">scalar_type</span>();
+    <span class="kw">let </span>default_value = field.default_value().map(|d| d.value());
+    <span class="kw">let </span>scalar_type = field.scalar_type();
 
-    <span class="ident">default_value::validate_default_value</span>(<span class="ident">default_value</span>, <span class="ident">scalar_type</span>, <span class="ident">ctx</span>);
-    <span class="ident">default_value::validate_auto_param</span>(<span class="ident">default_value</span>, <span class="ident">ctx</span>);
+    default_value::validate_default_value(default_value, scalar_type, ctx);
+    default_value::validate_auto_param(default_value, ctx);
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_scalar_field_connector_specific</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">scalar_field_type</span>() {
-        <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">ScalarType::Json</span>) =&gt; {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_json</span>() {
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>validate_scalar_field_connector_specific(field: ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">match </span>field.scalar_field_type() {
+        ScalarFieldType::BuiltInScalar(ScalarType::Json) =&gt; {
+            <span class="kw">if </span>!ctx.connector.supports_json() {
+                ctx.push_error(DatamodelError::new_field_validation_error(
                     <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;Field `{}` in model `{}` can&#39;t be of type Json. The current connector does not support the Json type.&quot;</span>,
-                        <span class="ident">field</span>.<span class="ident">name</span>(),
-                        <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+                        field.name(),
+                        field.model().name(),
                     ),
-                    <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-                    <span class="ident">field</span>.<span class="ident">name</span>(),
-                    <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+                    field.model().name(),
+                    field.name(),
+                    field.ast_field().span(),
                 ));
             }
 
-            <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_json_lists</span>() {
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
+            <span class="kw">if </span>field.ast_field().arity.is_list() &amp;&amp; !ctx.connector.supports_json_lists() {
+                ctx.push_error(DatamodelError::new_field_validation_error(
                     <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;Field `{}` in model `{}` can&#39;t be of type Json[]. The current connector does not support the Json List type.&quot;</span>,
-                        <span class="ident">field</span>.<span class="ident">name</span>(),
-                        <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>()
+                        field.name(),
+                        field.model().name()
                     ),
-                    <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-                    <span class="ident">field</span>.<span class="ident">name</span>(),
-                    <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+                    field.model().name(),
+                    field.name(),
+                    field.ast_field().span(),
                 ));
             }
         }
 
-        <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">ScalarType::Decimal</span>) =&gt; {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_decimal</span>() {
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
+        ScalarFieldType::BuiltInScalar(ScalarType::Decimal) =&gt; {
+            <span class="kw">if </span>!ctx.connector.supports_decimal() {
+                ctx.push_error(DatamodelError::new_field_validation_error(
                     <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;Field `{}` in model `{}` can&#39;t be of type Decimal. The current connector does not support the Decimal type.&quot;</span>,
-                        <span class="ident">field</span>.<span class="ident">name</span>(),
-                        <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+                        field.name(),
+                        field.model().name(),
                     ),
-                    <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-                    <span class="ident">field</span>.<span class="ident">name</span>(),
-                    <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+                    field.model().name(),
+                    field.name(),
+                    field.ast_field().span(),
                 ));
             }
         }
 
-        <span class="kw">_</span> =&gt; (),
+        <span class="kw">_ </span>=&gt; (),
     }
 
-    <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_scalar_lists</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_scalar_list_fields_are_not_supported</span>(
-            <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-            <span class="ident">field</span>.<span class="ident">name</span>(),
-            <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+    <span class="kw">if </span>field.ast_field().arity.is_list() &amp;&amp; !ctx.connector.supports_scalar_lists() {
+        ctx.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
+            field.model().name(),
+            field.name(),
+            field.ast_field().span(),
         ));
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_unsupported_field_type</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-    <span class="kw">use</span> <span class="ident">regex::Regex</span>;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>validate_unsupported_field_type(field: ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">use </span>once_cell::sync::Lazy;
+    <span class="kw">use </span>regex::Regex;
 
-    <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">datasource</span> { <span class="ident">s</span> } <span class="kw">else</span> { <span class="kw">return</span> };
+    <span class="kw">let </span>source = <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = ctx.datasource { s } <span class="kw">else </span>{ <span class="kw">return </span>};
 
-    <span class="kw">static</span> <span class="ident">TYPE_REGEX</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">Regex::new</span>(<span class="string">r#&quot;(?x)
+    <span class="kw">static </span>TYPE_REGEX: Lazy&lt;Regex&gt; = Lazy::new(|| {
+        Regex::new(<span class="string">r#&quot;(?x)
     ^                           # beginning of the string
     (?P&lt;prefix&gt;[^(]+)           # a required prefix that is any character until the first opening brace
     (?:\((?P&lt;params&gt;.*?)\))?    # (optional) an opening parenthesis, a closing parenthesis and captured params in-between
     (?P&lt;suffix&gt;.+)?             # (optional) captured suffix after the params until the end of the string
     $                           # end of the string
-    &quot;#</span>).<span class="ident">unwrap</span>()
+    &quot;#</span>).unwrap()
     });
 
-    <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">source</span>.<span class="ident">active_connector</span>;
-    <span class="kw">let</span> (<span class="ident">unsupported_lit</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ScalarFieldType::Unsupported</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">scalar_field_type</span>() {
-        <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">field_type</span>.<span class="ident">as_unsupported</span>().<span class="ident">unwrap</span>()
-    } <span class="kw">else</span> {
+    <span class="kw">let </span>connector = source.active_connector;
+    <span class="kw">let </span>(unsupported_lit, <span class="kw">_</span>) = <span class="kw">if let </span>ScalarFieldType::Unsupported(<span class="kw">_</span>) = field.scalar_field_type() {
+        field.ast_field().field_type.as_unsupported().unwrap()
+    } <span class="kw">else </span>{
         <span class="kw">return</span>;
     };
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">captures</span>) <span class="op">=</span> <span class="ident">TYPE_REGEX</span>.<span class="ident">captures</span>(<span class="ident">unsupported_lit</span>) {
-        <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">name</span>(<span class="string">&quot;prefix&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">trim</span>();
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(captures) = TYPE_REGEX.captures(unsupported_lit) {
+        <span class="kw">let </span>prefix = captures.name(<span class="string">&quot;prefix&quot;</span>).unwrap().as_str().trim();
 
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>);
-        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">params</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
-            <span class="prelude-val">Some</span>(<span class="ident">params</span>) =&gt; <span class="ident">params</span>.<span class="ident">as_str</span>().<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">trim</span>().<span class="ident">to_string</span>()).<span class="ident">collect</span>(),
+        <span class="kw">let </span>params = captures.name(<span class="string">&quot;params&quot;</span>);
+        <span class="kw">let </span>args = <span class="kw">match </span>params {
+            <span class="prelude-val">None </span>=&gt; <span class="macro">vec!</span>[],
+            <span class="prelude-val">Some</span>(params) =&gt; params.as_str().split(<span class="string">&#39;,&#39;</span>).map(|s| s.trim().to_string()).collect(),
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) <span class="op">=</span>
-            <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">prefix</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">Default::default</span>())
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(native_type) =
+            connector.parse_native_type(prefix, <span class="kw-2">&amp;</span>args, field.ast_field().span(), <span class="kw-2">&amp;mut </span>Default::default())
         {
-            <span class="kw">let</span> <span class="ident">prisma_type</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="ident">native_type</span>);
+            <span class="kw">let </span>prisma_type = connector.scalar_type_for_native_type(<span class="kw-2">&amp;</span>native_type);
 
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+            <span class="kw">let </span>msg = <span class="macro">format!</span>(
                         <span class="string">&quot;The type `Unsupported(\&quot;{}\&quot;)` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.&quot;</span>,
-                        <span class="ident">unsupported_lit</span>, <span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">prisma_type</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">name</span>, <span class="ident">connector</span>.<span class="ident">native_type_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">native_type</span>)
+                        unsupported_lit, field.name(), prisma_type.as_str(), <span class="kw-2">&amp;</span>source.name, connector.native_type_to_string(<span class="kw-2">&amp;</span>native_type)
                     );
 
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>()));
+            ctx.push_error(DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, field.ast_field().span()));
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">id_supports_clustering_setting</span>(<span class="ident">pk</span>: <span class="ident">PrimaryKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::ClusteringSetting</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>id_supports_clustering_setting(pk: PrimaryKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">clustered</span>().<span class="ident">is_none</span>() {
+    <span class="kw">if </span>pk.clustered().is_none() {
         <span class="kw">return</span>;
     }
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
         <span class="string">&quot;Defining clustering is not supported in the current connector.&quot;</span>,
-        <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
-        <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>(),
+        pk.attribute_name(),
+        pk.ast_attribute().span(),
     ));
 }
 
-<span class="doccomment">/// Only one index or key can be clustered per table.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Here we check the primary key. Another check in index validations.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clustering_can_be_defined_only_once</span>(<span class="ident">pk</span>: <span class="ident">PrimaryKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::ClusteringSetting</span>) {
+<span class="doccomment">/// Only one index or key can be clustered per table.
+///
+/// Here we check the primary key. Another check in index validations.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clustering_can_be_defined_only_once(pk: PrimaryKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>!ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">clustered</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) {
+    <span class="kw">if </span>pk.clustered() == <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">pk</span>.<span class="ident">model</span>().<span class="ident">indexes</span>() {
-        <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">clustered</span>() <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
+    <span class="kw">for </span>index <span class="kw">in </span>pk.model().indexes() {
+        <span class="kw">if </span>index.clustered() != <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
             <span class="kw">continue</span>;
         }
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             <span class="string">&quot;A model can only hold one clustered index or id.&quot;</span>,
-            <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
-            <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>(),
+            pk.attribute_name(),
+            pk.ast_attribute().span(),
         ));
 
         <span class="kw">return</span>;
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

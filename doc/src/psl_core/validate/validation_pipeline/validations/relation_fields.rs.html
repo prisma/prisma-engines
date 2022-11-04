@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/relation_fields.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation_fields.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/relation_fields.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation_fields.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -249,53 +249,53 @@
 <span id="249">249</span>
 <span id="250">250</span>
 <span id="251">251</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">database_name::validate_db_name</span>, <span class="ident">names::Names</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
-    <span class="ident">datamodel_connector::RelationMode</span>,
-    <span class="ident">diagnostics::DatamodelError</span>,
-    <span class="ident">validate::validation_pipeline::context::Context</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{database_name::validate_db_name, names::Names};
+<span class="kw">use crate</span>::{
+    ast::{<span class="self">self</span>, WithName, WithSpan},
+    datamodel_connector::RelationMode,
+    diagnostics::DatamodelError,
+    validate::validation_pipeline::context::Context,
 };
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">parser_database</span>::{
-    <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>},
-    <span class="ident">ReferentialAction</span>,
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>parser_database::{
+    walkers::{ModelWalker, RelationFieldWalker, RelationName},
+    ReferentialAction,
 };
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span>std::fmt;
 
-<span class="kw">struct</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">ast::FieldId</span>],
-    <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Fields&lt;<span class="lifetime">&#39;db</span>&gt; {
+    fields: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>[ast::FieldId],
+    model: ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">ast::FieldId</span>], <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">fields</span>, <span class="ident">model</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Fields&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>new(fields: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>[ast::FieldId], model: ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ fields, model }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">relation_field</span>(<span class="kw-2">*</span><span class="ident">field_id</span>).<span class="ident">name</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">name</span>));
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; fmt::Display <span class="kw">for </span>Fields&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="self">self
+            </span>.fields
+            .iter()
+            .map(|field_id| <span class="self">self</span>.model.relation_field(<span class="kw-2">*</span>field_id).name())
+            .map(|name| <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, name));
 
-        <span class="kw">match</span> <span class="ident">fields</span>.<span class="ident">len</span>() {
-            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="number">2</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)),
-            <span class="number">2</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot; and &quot;</span>)),
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">len</span>();
+        <span class="kw">match </span>fields.len() {
+            x <span class="kw">if </span>x &lt; <span class="number">2 </span>=&gt; f.write_str(<span class="kw-2">&amp;</span>fields.join(<span class="string">&quot;, &quot;</span>)),
+            <span class="number">2 </span>=&gt; f.write_str(<span class="kw-2">&amp;</span>fields.join(<span class="string">&quot; and &quot;</span>)),
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>len = fields.len();
 
-                <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">name</span>) <span class="kw">in</span> <span class="ident">fields</span>.<span class="ident">enumerate</span>() {
-                    <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>)<span class="question-mark">?</span>;
+                <span class="kw">for </span>(i, name) <span class="kw">in </span>fields.enumerate() {
+                    f.write_str(<span class="kw-2">&amp;</span>name)<span class="question-mark">?</span>;
 
-                    <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">len</span> <span class="op">-</span> <span class="number">2</span> {
-                        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">len</span> <span class="op">-</span> <span class="number">1</span> {
-                        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; and &quot;</span>)<span class="question-mark">?</span>;
+                    <span class="kw">if </span>i &lt; len - <span class="number">2 </span>{
+                        f.write_str(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                    } <span class="kw">else if </span>i &lt; len - <span class="number">1 </span>{
+                        f.write_str(<span class="string">&quot; and &quot;</span>)<span class="question-mark">?</span>;
                     }
                 }
 
@@ -305,200 +305,200 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ambiguity</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
-    <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_model</span>();
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>ambiguity(field: RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;, names: <span class="kw-2">&amp;</span>Names&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), DatamodelError&gt; {
+    <span class="kw">let </span>model = field.model();
+    <span class="kw">let </span>related_model = field.related_model();
 
-    <span class="kw">let</span> <span class="ident">identifier</span> <span class="op">=</span> (<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">related_model</span>.<span class="ident">model_id</span>(), <span class="ident">field</span>.<span class="ident">relation_name</span>());
+    <span class="kw">let </span>identifier = (model.model_id(), related_model.model_id(), field.relation_name());
 
-    <span class="kw">match</span> <span class="ident">names</span>.<span class="ident">relation_names</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">identifier</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="ident">Fields::new</span>(<span class="ident">fields</span>, <span class="ident">model</span>);
-            <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">identifier</span>.<span class="number">2</span>;
-            <span class="kw">let</span> <span class="ident">is_self_relation</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">related_model</span>.<span class="ident">id</span>;
+    <span class="kw">match </span>names.relation_names.get(<span class="kw-2">&amp;</span>identifier) {
+        <span class="prelude-val">Some</span>(fields) <span class="kw">if </span>fields.len() &gt; <span class="number">1 </span>=&gt; {
+            <span class="kw">let </span>field_names = Fields::new(fields, model);
+            <span class="kw">let </span>relation_name = identifier.<span class="number">2</span>;
+            <span class="kw">let </span>is_self_relation = model.id == related_model.id;
 
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation_name</span> {
-                <span class="ident">RelationName::Generated</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span> =&gt; {
+            <span class="kw">let </span>message = <span class="kw">match </span>relation_name {
+                RelationName::Generated(<span class="kw">_</span>) <span class="kw">if </span>is_self_relation &amp;&amp; fields.len() == <span class="number">2 </span>=&gt; {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;Ambiguous self relation detected. The fields {} in model `{}` both refer to `{}`. If they are part of the same relation add the same relation name for them with `@relation(&lt;name&gt;)`.&quot;</span>,
-                        <span class="ident">field_names</span>,
-                        <span class="ident">model</span>.<span class="ident">name</span>(),
-                        <span class="ident">related_model</span>.<span class="ident">name</span>(),
+                        field_names,
+                        model.name(),
+                        related_model.name(),
                     )
                 }
-                <span class="ident">RelationName::Generated</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">2</span> =&gt; {
+                RelationName::Generated(<span class="kw">_</span>) <span class="kw">if </span>is_self_relation &amp;&amp; fields.len() &gt; <span class="number">2 </span>=&gt; {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;Unnamed self relation detected. The fields {} in model `{}` have no relation name. Please provide a relation name for one of them by adding `@relation(&lt;name&gt;).&quot;</span>,
-                        <span class="ident">field_names</span>,
-                        <span class="ident">model</span>.<span class="ident">name</span>(),
+                        field_names,
+                        model.name(),
                     )
                 }
-                <span class="ident">RelationName::Explicit</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">2</span> =&gt; {
+                RelationName::Explicit(<span class="kw">_</span>) <span class="kw">if </span>is_self_relation &amp;&amp; fields.len() &gt; <span class="number">2 </span>=&gt; {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;Wrongly named self relation detected. The fields {} in model `{}` have the same relation name. At most two relation fields can belong to the same relation and therefore have the same name. Please assign a different relation name to one of them.&quot;</span>,
-                        <span class="ident">field_names</span>,
-                        <span class="ident">model</span>.<span class="ident">name</span>(),
+                        field_names,
+                        model.name(),
                     )
                 }
-                <span class="ident">RelationName::Explicit</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
-                <span class="ident">RelationName::Generated</span>(<span class="kw">_</span>) =&gt; {
+                RelationName::Explicit(<span class="kw">_</span>) <span class="kw">if </span>is_self_relation &amp;&amp; fields.len() == <span class="number">2 </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
+                RelationName::Generated(<span class="kw">_</span>) =&gt; {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;Ambiguous relation detected. The fields {} in model `{}` both refer to `{}`. Please provide different relation names for them by adding `@relation(&lt;name&gt;).&quot;</span>,
-                        <span class="ident">field_names</span>,
-                        <span class="ident">model</span>.<span class="ident">name</span>(),
-                        <span class="ident">related_model</span>.<span class="ident">name</span>(),
+                        field_names,
+                        model.name(),
+                        related_model.name(),
                     )
                 }
-                <span class="ident">RelationName::Explicit</span>(<span class="kw">_</span>) =&gt; {
+                RelationName::Explicit(<span class="kw">_</span>) =&gt; {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;Wrongly named relation detected. The fields {} in model `{}` both use the same relation name. Please provide different relation names for them through `@relation(&lt;name&gt;).&quot;</span>,
-                        <span class="ident">field_names</span>,
-                        <span class="ident">model</span>.<span class="ident">name</span>(),
+                        field_names,
+                        model.name(),
                     )
                 }
             };
 
-            <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
-                <span class="kw-2">&amp;</span><span class="ident">message</span>,
-                <span class="ident">model</span>.<span class="ident">name</span>(),
-                <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+            <span class="prelude-val">Err</span>(DatamodelError::new_model_validation_error(
+                <span class="kw-2">&amp;</span>message,
+                model.name(),
+                field.ast_field().span(),
             ))
         }
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
     }
 }
 
-<span class="doccomment">/// Validates if the related model for the relation is ignored.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ignored_related_model</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_model</span>();
-    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
+<span class="doccomment">/// Validates if the related model for the relation is ignored.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>ignored_related_model(field: RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>related_model = field.related_model();
+    <span class="kw">let </span>model = field.model();
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">related_model</span>.<span class="ident">is_ignored</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">is_ignored</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">is_ignored</span>() {
+    <span class="kw">if </span>!related_model.is_ignored() || field.is_ignored() || model.is_ignored() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>message = <span class="macro">format!</span>(
         <span class="string">&quot;The relation field `{}` on Model `{}` must specify the `@ignore` attribute, because the model {} it is pointing to is marked ignored.&quot;</span>,
-        <span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">related_model</span>.<span class="ident">name</span>()
+        field.name(), model.name(), related_model.name()
     );
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-        <span class="kw-2">&amp;</span><span class="ident">message</span>,
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        <span class="kw-2">&amp;</span>message,
         <span class="string">&quot;@ignore&quot;</span>,
-        <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        field.ast_field().span(),
     ));
 }
 
-<span class="doccomment">/// Does the connector support the given referential actions.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">connector</span>;
-    <span class="kw">let</span> <span class="ident">relation_mode</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">relation_mode</span>;
+<span class="doccomment">/// Does the connector support the given referential actions.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>referential_actions(field: RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>connector = ctx.connector;
+    <span class="kw">let </span>relation_mode = ctx.relation_mode;
 
-    <span class="kw">fn</span> <span class="ident">fmt_allowed_actions</span>(<span class="ident">allowed_actions</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">allowed_actions</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">f</span>.<span class="ident">as_str</span>())).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+    <span class="kw">fn </span>fmt_allowed_actions(allowed_actions: BitFlags&lt;ReferentialAction&gt;) -&gt; String {
+        allowed_actions.iter().map(|f| <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, f.as_str())).join(<span class="string">&quot;, &quot;</span>)
     }
 
-    <span class="comment">// validation template for relationMode = &quot;foreignKeys&quot;</span>
-    <span class="kw">let</span> <span class="ident">msg_foreign_keys</span> <span class="op">=</span> <span class="op">|</span><span class="ident">action</span>: <span class="ident">ReferentialAction</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">allowed_actions</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">referential_actions</span>();
+    <span class="comment">// validation template for relationMode = &quot;foreignKeys&quot;
+    </span><span class="kw">let </span>msg_foreign_keys = |action: ReferentialAction| {
+        <span class="kw">let </span>allowed_actions = connector.referential_actions();
 
         <span class="macro">format!</span>(
             <span class="string">&quot;Invalid referential action: `{}`. Allowed values: ({})&quot;</span>,
-            <span class="ident">action</span>.<span class="ident">as_str</span>(),
-            <span class="ident">fmt_allowed_actions</span>(<span class="ident">allowed_actions</span>),
+            action.as_str(),
+            fmt_allowed_actions(allowed_actions),
         )
     };
 
-    <span class="comment">// validation template for relationMode = &quot;prisma&quot;</span>
-    <span class="kw">let</span> <span class="ident">msg_prisma</span> <span class="op">=</span> <span class="op">|</span><span class="ident">action</span>: <span class="ident">ReferentialAction</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">allowed_actions</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">emulated_referential_actions</span>();
+    <span class="comment">// validation template for relationMode = &quot;prisma&quot;
+    </span><span class="kw">let </span>msg_prisma = |action: ReferentialAction| {
+        <span class="kw">let </span>allowed_actions = connector.emulated_referential_actions();
 
-        <span class="kw">let</span> <span class="ident">additional_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">action</span> {
-            <span class="ident">ReferentialAction::NoAction</span> =&gt; {
-                <span class="comment">// we don&#39;t want to suggest the users to use Restrict instead, if the connector doesn&#39;t support it</span>
-                <span class="kw">if</span> <span class="ident">ctx</span>
-                    .<span class="ident">connector</span>
-                    .<span class="ident">emulated_referential_actions</span>()
-                    .<span class="ident">contains</span>(<span class="ident">ReferentialAction::Restrict</span>)
+        <span class="kw">let </span>additional_info = <span class="kw">match </span>action {
+            ReferentialAction::NoAction =&gt; {
+                <span class="comment">// we don&#39;t want to suggest the users to use Restrict instead, if the connector doesn&#39;t support it
+                </span><span class="kw">if </span>ctx
+                    .connector
+                    .emulated_referential_actions()
+                    .contains(ReferentialAction::Restrict)
                 {
                     <span class="prelude-val">Some</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;. `{}` is not implemented for {} when using `relationMode = \&quot;prisma\&quot;`, you could try using `{}` instead. Learn more at https://pris.ly/d/relationMode&quot;</span>,
-                        <span class="ident">ReferentialAction::NoAction</span>.<span class="ident">as_str</span>(),
-                        <span class="ident">connector</span>.<span class="ident">name</span>(),
-                        <span class="ident">ReferentialAction::Restrict</span>.<span class="ident">as_str</span>(),
+                        ReferentialAction::NoAction.as_str(),
+                        connector.name(),
+                        ReferentialAction::Restrict.as_str(),
                     ))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         };
-        <span class="kw">let</span> <span class="ident">additional_info</span> <span class="op">=</span> <span class="ident">additional_info</span>.<span class="ident">unwrap_or_default</span>();
+        <span class="kw">let </span>additional_info = additional_info.unwrap_or_default();
 
         <span class="macro">format!</span>(
             <span class="string">&quot;Invalid referential action: `{}`. Allowed values: ({}){additional_info}&quot;</span>,
-            <span class="ident">action</span>.<span class="ident">as_str</span>(),
-            <span class="ident">fmt_allowed_actions</span>(<span class="ident">allowed_actions</span>),
+            action.as_str(),
+            fmt_allowed_actions(allowed_actions),
         )
     };
 
-    <span class="kw">let</span> <span class="ident">msg_template</span> <span class="op">=</span> <span class="op">|</span><span class="ident">action</span>: <span class="ident">ReferentialAction</span><span class="op">|</span> -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="ident">relation_mode</span> {
-            <span class="ident">RelationMode::ForeignKeys</span> =&gt; <span class="ident">msg_foreign_keys</span>(<span class="ident">action</span>),
-            <span class="ident">RelationMode::Prisma</span> =&gt; <span class="ident">msg_prisma</span>(<span class="ident">action</span>),
+    <span class="kw">let </span>msg_template = |action: ReferentialAction| -&gt; String {
+        <span class="kw">match </span>relation_mode {
+            RelationMode::ForeignKeys =&gt; msg_foreign_keys(action),
+            RelationMode::Prisma =&gt; msg_prisma(action),
         }
     };
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_delete</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">explicit_on_delete</span>() {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">field</span>
-            .<span class="ident">ast_field</span>()
-            .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;onDelete&quot;</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>());
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(on_delete) = field.explicit_on_delete() {
+        <span class="kw">let </span>span = field
+            .ast_field()
+            .span_for_argument(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;onDelete&quot;</span>)
+            .unwrap_or_else(|| field.ast_field().span());
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">relation_mode</span>, <span class="ident">on_delete</span>) {
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg_template</span>(<span class="ident">on_delete</span>), <span class="ident">span</span>));
+        <span class="kw">if </span>!ctx.connector.supports_referential_action(<span class="kw-2">&amp;</span>ctx.relation_mode, on_delete) {
+            ctx.push_error(DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg_template(on_delete), span));
         }
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_update</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">explicit_on_update</span>() {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">field</span>
-            .<span class="ident">ast_field</span>()
-            .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;onUpdate&quot;</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>());
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(on_update) = field.explicit_on_update() {
+        <span class="kw">let </span>span = field
+            .ast_field()
+            .span_for_argument(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;onUpdate&quot;</span>)
+            .unwrap_or_else(|| field.ast_field().span());
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">relation_mode</span>, <span class="ident">on_update</span>) {
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg_template</span>(<span class="ident">on_update</span>), <span class="ident">span</span>));
+        <span class="kw">if </span>!ctx.connector.supports_referential_action(<span class="kw-2">&amp;</span>ctx.relation_mode, on_update) {
+            ctx.push_error(DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg_template(on_update), span));
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">map</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">mapped_name</span>().<span class="ident">is_none</span>() {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>map(field: RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>field.mapped_name().is_none() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_named_foreign_keys</span>() {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">field</span>
-            .<span class="ident">ast_field</span>()
-            .<span class="ident">span_for_attribute</span>(<span class="string">&quot;relation&quot;</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="ident">ast::Span::empty</span>);
+    <span class="kw">if </span>!ctx.connector.supports_named_foreign_keys() {
+        <span class="kw">let </span>span = field
+            .ast_field()
+            .span_for_attribute(<span class="string">&quot;relation&quot;</span>)
+            .unwrap_or_else(ast::Span::empty);
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             <span class="string">&quot;Your provider does not support named foreign keys.&quot;</span>,
             <span class="string">&quot;@relation&quot;</span>,
-            <span class="ident">span</span>,
+            span,
         ));
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation_attr</span>) <span class="op">=</span> <span class="ident">field</span>
-        .<span class="ident">ast_field</span>()
-        .<span class="ident">attributes</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;relation&quot;</span>)
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(relation_attr) = field
+        .ast_field()
+        .attributes
+        .iter()
+        .find(|attr| attr.name() == <span class="string">&quot;relation&quot;</span>)
     {
-        <span class="ident">validate_db_name</span>(<span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">relation_attr</span>, <span class="ident">field</span>.<span class="ident">mapped_name</span>(), <span class="ident">ctx</span>, <span class="bool-val">false</span>);
+        validate_db_name(field.model().name(), relation_attr, field.mapped_name(), ctx, <span class="bool-val">false</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/convert_case-0.5.0/src/pattern.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pattern.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../convert_case/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/convert_case-0.5.0/src/pattern.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pattern.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../convert_case/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -351,358 +351,358 @@
 <span id="351">351</span>
 <span id="352">352</span>
 <span id="353">353</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::iter</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::iter;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">rand::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+</span><span class="kw">use </span>rand::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">WordCase</span> {
-    <span class="ident">Lower</span>,
-    <span class="ident">Upper</span>,
-    <span class="ident">Capital</span>,
-    <span class="ident">Toggle</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+</span><span class="kw">enum </span>WordCase {
+    Lower,
+    Upper,
+    Capital,
+    Toggle,
 }
 
-<span class="kw">impl</span> <span class="ident">WordCase</span> {
-    <span class="kw">fn</span> <span class="ident">mutate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">word</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">use</span> <span class="ident">WordCase</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Lower</span> =&gt; <span class="ident">word</span>.<span class="ident">to_lowercase</span>(),
-            <span class="ident">Upper</span> =&gt; <span class="ident">word</span>.<span class="ident">to_uppercase</span>(),
-            <span class="ident">Capital</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">word</span>.<span class="ident">chars</span>();
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-                    <span class="ident">c</span>.<span class="ident">to_uppercase</span>()
-                        .<span class="ident">chain</span>(<span class="ident">chars</span>.<span class="ident">as_str</span>().<span class="ident">to_lowercase</span>().<span class="ident">chars</span>())
-                        .<span class="ident">collect</span>()
-                } <span class="kw">else</span> {
-                    <span class="ident">String::new</span>()
+<span class="kw">impl </span>WordCase {
+    <span class="kw">fn </span>mutate(<span class="kw-2">&amp;</span><span class="self">self</span>, word: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="kw">use </span>WordCase::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Lower =&gt; word.to_lowercase(),
+            Upper =&gt; word.to_uppercase(),
+            Capital =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>chars = word.chars();
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = chars.next() {
+                    c.to_uppercase()
+                        .chain(chars.as_str().to_lowercase().chars())
+                        .collect()
+                } <span class="kw">else </span>{
+                    String::new()
                 }
             }
-            <span class="ident">Toggle</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">word</span>.<span class="ident">chars</span>();
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-                    <span class="ident">c</span>.<span class="ident">to_lowercase</span>()
-                        .<span class="ident">chain</span>(<span class="ident">chars</span>.<span class="ident">as_str</span>().<span class="ident">to_uppercase</span>().<span class="ident">chars</span>())
-                        .<span class="ident">collect</span>()
-                } <span class="kw">else</span> {
-                    <span class="ident">String::new</span>()
+            Toggle =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>chars = word.chars();
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = chars.next() {
+                    c.to_lowercase()
+                        .chain(chars.as_str().to_uppercase().chars())
+                        .collect()
+                } <span class="kw">else </span>{
+                    String::new()
                 }
             }
         }
     }
 }
 
-<span class="doccomment">/// A pattern is how a set of words is mutated before joining with</span>
-<span class="doccomment">/// a delimeter.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Random` and `PseudoRandom` patterns are used for their respective cases</span>
-<span class="doccomment">/// and are only available in the &quot;random&quot; feature. </span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Pattern</span> {
-    <span class="doccomment">/// Lowercase patterns make all words lowercase.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Pattern;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![&quot;case&quot;, &quot;conversion&quot;, &quot;library&quot;],</span>
-    <span class="doccomment">///     Pattern::Lowercase.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Lowercase</span>,
+<span class="doccomment">/// A pattern is how a set of words is mutated before joining with
+/// a delimeter.
+///
+/// The `Random` and `PseudoRandom` patterns are used for their respective cases
+/// and are only available in the &quot;random&quot; feature. 
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+</span><span class="kw">pub enum </span>Pattern {
+    <span class="doccomment">/// Lowercase patterns make all words lowercase.
+    /// ```
+    /// use convert_case::Pattern;
+    /// assert_eq!(
+    ///     vec![&quot;case&quot;, &quot;conversion&quot;, &quot;library&quot;],
+    ///     Pattern::Lowercase.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])
+    /// );
+    /// ```
+    </span>Lowercase,
 
-    <span class="doccomment">/// Uppercase patterns make all words uppercase.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Pattern;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![&quot;CASE&quot;, &quot;CONVERSION&quot;, &quot;LIBRARY&quot;],</span>
-    <span class="doccomment">///     Pattern::Uppercase.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Uppercase</span>,
+    <span class="doccomment">/// Uppercase patterns make all words uppercase.
+    /// ```
+    /// use convert_case::Pattern;
+    /// assert_eq!(
+    ///     vec![&quot;CASE&quot;, &quot;CONVERSION&quot;, &quot;LIBRARY&quot;],
+    ///     Pattern::Uppercase.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])
+    /// );
+    /// ```
+    </span>Uppercase,
 
-    <span class="doccomment">/// Capital patterns makes the first letter of each word uppercase</span>
-    <span class="doccomment">/// and the remaining letters of each word lowercase.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Pattern;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![&quot;Case&quot;, &quot;Conversion&quot;, &quot;Library&quot;],</span>
-    <span class="doccomment">///     Pattern::Capital.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Capital</span>,
+    <span class="doccomment">/// Capital patterns makes the first letter of each word uppercase
+    /// and the remaining letters of each word lowercase.
+    /// ```
+    /// use convert_case::Pattern;
+    /// assert_eq!(
+    ///     vec![&quot;Case&quot;, &quot;Conversion&quot;, &quot;Library&quot;],
+    ///     Pattern::Capital.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])
+    /// );
+    /// ```
+    </span>Capital,
 
-    <span class="doccomment">/// Capital patterns make the first word capitalized and the</span>
-    <span class="doccomment">/// remaining lowercase.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Pattern;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![&quot;Case&quot;, &quot;conversion&quot;, &quot;library&quot;],</span>
-    <span class="doccomment">///     Pattern::Sentence.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Sentence</span>,
+    <span class="doccomment">/// Capital patterns make the first word capitalized and the
+    /// remaining lowercase.
+    /// ```
+    /// use convert_case::Pattern;
+    /// assert_eq!(
+    ///     vec![&quot;Case&quot;, &quot;conversion&quot;, &quot;library&quot;],
+    ///     Pattern::Sentence.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])
+    /// );
+    /// ```
+    </span>Sentence,
 
-    <span class="doccomment">/// Camel patterns make the first word lowercase and the remaining</span>
-    <span class="doccomment">/// capitalized.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Pattern;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![&quot;case&quot;, &quot;Conversion&quot;, &quot;Library&quot;],</span>
-    <span class="doccomment">///     Pattern::Camel.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Camel</span>,
+    <span class="doccomment">/// Camel patterns make the first word lowercase and the remaining
+    /// capitalized.
+    /// ```
+    /// use convert_case::Pattern;
+    /// assert_eq!(
+    ///     vec![&quot;case&quot;, &quot;Conversion&quot;, &quot;Library&quot;],
+    ///     Pattern::Camel.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])
+    /// );
+    /// ```
+    </span>Camel,
 
-    <span class="doccomment">/// Alternating patterns make each letter of each word alternate</span>
-    <span class="doccomment">/// between lowercase and uppercase.  They alternate across words,</span>
-    <span class="doccomment">/// which means the last letter of one word and the first letter of the</span>
-    <span class="doccomment">/// next will not be the same letter casing.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Pattern;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![&quot;cAsE&quot;, &quot;cOnVeRsIoN&quot;, &quot;lIbRaRy&quot;],</span>
-    <span class="doccomment">///     Pattern::Alternating.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![&quot;aNoThEr&quot;, &quot;ExAmPlE&quot;],</span>
-    <span class="doccomment">///     Pattern::Alternating.mutate(&amp;[&quot;Another&quot;, &quot;Example&quot;]),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Alternating</span>,
+    <span class="doccomment">/// Alternating patterns make each letter of each word alternate
+    /// between lowercase and uppercase.  They alternate across words,
+    /// which means the last letter of one word and the first letter of the
+    /// next will not be the same letter casing.
+    /// ```
+    /// use convert_case::Pattern;
+    /// assert_eq!(
+    ///     vec![&quot;cAsE&quot;, &quot;cOnVeRsIoN&quot;, &quot;lIbRaRy&quot;],
+    ///     Pattern::Alternating.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])
+    /// );
+    /// assert_eq!(
+    ///     vec![&quot;aNoThEr&quot;, &quot;ExAmPlE&quot;],
+    ///     Pattern::Alternating.mutate(&amp;[&quot;Another&quot;, &quot;Example&quot;]),
+    /// );
+    /// ```
+    </span>Alternating,
 
-    <span class="doccomment">/// Toggle patterns have the first letter of each word uppercase</span>
-    <span class="doccomment">/// and the remaining letters of each word uppercase.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Pattern;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![&quot;cASE&quot;, &quot;cONVERSION&quot;, &quot;lIBRARY&quot;],</span>
-    <span class="doccomment">///     Pattern::Toggle.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Toggle</span>,
+    <span class="doccomment">/// Toggle patterns have the first letter of each word uppercase
+    /// and the remaining letters of each word uppercase.
+    /// ```
+    /// use convert_case::Pattern;
+    /// assert_eq!(
+    ///     vec![&quot;cASE&quot;, &quot;cONVERSION&quot;, &quot;lIBRARY&quot;],
+    ///     Pattern::Toggle.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])
+    /// );
+    /// ```
+    </span>Toggle,
 
-    <span class="doccomment">/// Random patterns will lowercase or uppercase each letter</span>
-    <span class="doccomment">/// uniformly randomly.  This uses the `rand` crate and is only available with the &quot;random&quot;</span>
-    <span class="doccomment">/// feature.  This example will not pass the assertion due to randomness, but it used as an </span>
-    <span class="doccomment">/// example of what output is possible.</span>
-    <span class="doccomment">/// ```should_panic</span>
-    <span class="doccomment">/// use convert_case::Pattern;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![&quot;Case&quot;, &quot;coNVeRSiOn&quot;, &quot;lIBraRY&quot;],</span>
-    <span class="doccomment">///     Pattern::Random.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">doc</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>))]</span>
-    <span class="ident">Random</span>,
+    <span class="doccomment">/// Random patterns will lowercase or uppercase each letter
+    /// uniformly randomly.  This uses the `rand` crate and is only available with the &quot;random&quot;
+    /// feature.  This example will not pass the assertion due to randomness, but it used as an 
+    /// example of what output is possible.
+    /// ```should_panic
+    /// use convert_case::Pattern;
+    /// assert_eq!(
+    ///     vec![&quot;Case&quot;, &quot;coNVeRSiOn&quot;, &quot;lIBraRY&quot;],
+    ///     Pattern::Random.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;])
+    /// );
+    /// ```
+    </span><span class="attribute">#[cfg(any(doc, feature = <span class="string">&quot;random&quot;</span>))]
+    </span>Random,
 
-    <span class="doccomment">/// PseudoRandom patterns are random-like patterns.  Instead of randomizing</span>
-    <span class="doccomment">/// each letter individually, it mutates each pair of characters</span>
-    <span class="doccomment">/// as either (Lowercase, Uppercase) or (Uppercase, Lowercase).  This generates</span>
-    <span class="doccomment">/// more &quot;random looking&quot; words.  A consequence of this algorithm for randomization</span>
-    <span class="doccomment">/// is that there will never be three consecutive letters that are all lowercase</span>
-    <span class="doccomment">/// or all uppercase.  This uses the `rand` crate and is only available with the &quot;random&quot;</span>
-    <span class="doccomment">/// feature.  This example will not pass the assertion due to randomness, but it used as an </span>
-    <span class="doccomment">/// example of what output is possible.</span>
-    <span class="doccomment">/// ```should_panic</span>
-    <span class="doccomment">/// use convert_case::Pattern;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![&quot;cAsE&quot;, &quot;cONveRSioN&quot;, &quot;lIBrAry&quot;],</span>
-    <span class="doccomment">///     Pattern::Random.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;]),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">doc</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>))]</span>
-    <span class="ident">PseudoRandom</span>,
+    <span class="doccomment">/// PseudoRandom patterns are random-like patterns.  Instead of randomizing
+    /// each letter individually, it mutates each pair of characters
+    /// as either (Lowercase, Uppercase) or (Uppercase, Lowercase).  This generates
+    /// more &quot;random looking&quot; words.  A consequence of this algorithm for randomization
+    /// is that there will never be three consecutive letters that are all lowercase
+    /// or all uppercase.  This uses the `rand` crate and is only available with the &quot;random&quot;
+    /// feature.  This example will not pass the assertion due to randomness, but it used as an 
+    /// example of what output is possible.
+    /// ```should_panic
+    /// use convert_case::Pattern;
+    /// assert_eq!(
+    ///     vec![&quot;cAsE&quot;, &quot;cONveRSioN&quot;, &quot;lIBrAry&quot;],
+    ///     Pattern::Random.mutate(&amp;[&quot;Case&quot;, &quot;CONVERSION&quot;, &quot;library&quot;]),
+    /// );
+    /// ```
+    </span><span class="attribute">#[cfg(any(doc, feature = <span class="string">&quot;random&quot;</span>))]
+    </span>PseudoRandom,
 }
 
-<span class="kw">impl</span> <span class="ident">Pattern</span> {
-    <span class="doccomment">/// Generates a vector of new `String`s in the right pattern given</span>
-    <span class="doccomment">/// the input strings.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Pattern;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![&quot;crack&quot;, &quot;the&quot;, &quot;skye&quot;],</span>
-    <span class="doccomment">///     Pattern::Lowercase.mutate(&amp;vec![&quot;CRACK&quot;, &quot;the&quot;, &quot;Skye&quot;]),</span>
-    <span class="doccomment">/// )</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mutate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">words</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">Pattern</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Lowercase</span> =&gt; <span class="ident">words</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">word</span><span class="op">|</span> <span class="ident">WordCase::Lower</span>.<span class="ident">mutate</span>(<span class="ident">word</span>))
-                .<span class="ident">collect</span>(),
-            <span class="ident">Uppercase</span> =&gt; <span class="ident">words</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">word</span><span class="op">|</span> <span class="ident">WordCase::Upper</span>.<span class="ident">mutate</span>(<span class="ident">word</span>))
-                .<span class="ident">collect</span>(),
-            <span class="ident">Capital</span> =&gt; <span class="ident">words</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">word</span><span class="op">|</span> <span class="ident">WordCase::Capital</span>.<span class="ident">mutate</span>(<span class="ident">word</span>))
-                .<span class="ident">collect</span>(),
-            <span class="ident">Toggle</span> =&gt; <span class="ident">words</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">word</span><span class="op">|</span> <span class="ident">WordCase::Toggle</span>.<span class="ident">mutate</span>(<span class="ident">word</span>))
-                .<span class="ident">collect</span>(),
-            <span class="ident">Sentence</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">word_cases</span> <span class="op">=</span>
-                    <span class="ident">iter::once</span>(<span class="ident">WordCase::Capital</span>).<span class="ident">chain</span>(<span class="ident">iter::once</span>(<span class="ident">WordCase::Lower</span>).<span class="ident">cycle</span>());
-                <span class="ident">words</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">zip</span>(<span class="ident">word_cases</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">word</span>, <span class="ident">word_case</span>)<span class="op">|</span> <span class="ident">word_case</span>.<span class="ident">mutate</span>(<span class="ident">word</span>))
-                    .<span class="ident">collect</span>()
+<span class="kw">impl </span>Pattern {
+    <span class="doccomment">/// Generates a vector of new `String`s in the right pattern given
+    /// the input strings.
+    /// ```
+    /// use convert_case::Pattern;
+    ///
+    /// assert_eq!(
+    ///     vec![&quot;crack&quot;, &quot;the&quot;, &quot;skye&quot;],
+    ///     Pattern::Lowercase.mutate(&amp;vec![&quot;CRACK&quot;, &quot;the&quot;, &quot;Skye&quot;]),
+    /// )
+    /// ```
+    </span><span class="kw">pub fn </span>mutate(<span class="kw-2">&amp;</span><span class="self">self</span>, words: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; Vec&lt;String&gt; {
+        <span class="kw">use </span>Pattern::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Lowercase =&gt; words
+                .iter()
+                .map(|word| WordCase::Lower.mutate(word))
+                .collect(),
+            Uppercase =&gt; words
+                .iter()
+                .map(|word| WordCase::Upper.mutate(word))
+                .collect(),
+            Capital =&gt; words
+                .iter()
+                .map(|word| WordCase::Capital.mutate(word))
+                .collect(),
+            Toggle =&gt; words
+                .iter()
+                .map(|word| WordCase::Toggle.mutate(word))
+                .collect(),
+            Sentence =&gt; {
+                <span class="kw">let </span>word_cases =
+                    iter::once(WordCase::Capital).chain(iter::once(WordCase::Lower).cycle());
+                words
+                    .iter()
+                    .zip(word_cases)
+                    .map(|(word, word_case)| word_case.mutate(word))
+                    .collect()
             }
-            <span class="ident">Camel</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">word_cases</span> <span class="op">=</span>
-                    <span class="ident">iter::once</span>(<span class="ident">WordCase::Lower</span>).<span class="ident">chain</span>(<span class="ident">iter::once</span>(<span class="ident">WordCase::Capital</span>).<span class="ident">cycle</span>());
-                <span class="ident">words</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">zip</span>(<span class="ident">word_cases</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">word</span>, <span class="ident">word_case</span>)<span class="op">|</span> <span class="ident">word_case</span>.<span class="ident">mutate</span>(<span class="ident">word</span>))
-                    .<span class="ident">collect</span>()
+            Camel =&gt; {
+                <span class="kw">let </span>word_cases =
+                    iter::once(WordCase::Lower).chain(iter::once(WordCase::Capital).cycle());
+                words
+                    .iter()
+                    .zip(word_cases)
+                    .map(|(word, word_case)| word_case.mutate(word))
+                    .collect()
             }
-            <span class="ident">Alternating</span> =&gt; <span class="ident">alternating</span>(<span class="ident">words</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
-            <span class="ident">Random</span> =&gt; <span class="ident">randomize</span>(<span class="ident">words</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
-            <span class="ident">PseudoRandom</span> =&gt; <span class="ident">pseudo_randomize</span>(<span class="ident">words</span>),
+            Alternating =&gt; alternating(words),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+            </span>Random =&gt; randomize(words),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+            </span>PseudoRandom =&gt; pseudo_randomize(words),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">alternating</span>(<span class="ident">words</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">upper</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="ident">words</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">word</span><span class="op">|</span> {
-            <span class="ident">word</span>.<span class="ident">chars</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">letter</span><span class="op">|</span> {
-                    <span class="kw">if</span> <span class="ident">letter</span>.<span class="ident">is_uppercase</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">letter</span>.<span class="ident">is_lowercase</span>() {
-                        <span class="kw">if</span> <span class="ident">upper</span> {
-                            <span class="ident">upper</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                            <span class="ident">letter</span>.<span class="ident">to_uppercase</span>().<span class="ident">to_string</span>()
-                        } <span class="kw">else</span> {
-                            <span class="ident">upper</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                            <span class="ident">letter</span>.<span class="ident">to_lowercase</span>().<span class="ident">to_string</span>()
+<span class="kw">fn </span>alternating(words: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; Vec&lt;String&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>upper = <span class="bool-val">false</span>;
+    words
+        .iter()
+        .map(|word| {
+            word.chars()
+                .map(|letter| {
+                    <span class="kw">if </span>letter.is_uppercase() || letter.is_lowercase() {
+                        <span class="kw">if </span>upper {
+                            upper = <span class="bool-val">false</span>;
+                            letter.to_uppercase().to_string()
+                        } <span class="kw">else </span>{
+                            upper = <span class="bool-val">true</span>;
+                            letter.to_lowercase().to_string()
                         }
-                    } <span class="kw">else</span> {
-                        <span class="ident">letter</span>.<span class="ident">to_string</span>()
+                    } <span class="kw">else </span>{
+                        letter.to_string()
                     }
                 })
-                .<span class="ident">collect</span>()
+                .collect()
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="doccomment">/// Randomly picks whether to be upper case or lower case</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">randomize</span>(<span class="ident">words</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
-    <span class="ident">words</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">word</span><span class="op">|</span> {
-            <span class="ident">word</span>.<span class="ident">chars</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">letter</span><span class="op">|</span> {
-                    <span class="kw">if</span> <span class="ident">rng</span>.<span class="ident">gen</span>::<span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>() <span class="op">&gt;</span> <span class="number">0.5</span> {
-                        <span class="ident">letter</span>.<span class="ident">to_uppercase</span>().<span class="ident">to_string</span>()
-                    } <span class="kw">else</span> {
-                        <span class="ident">letter</span>.<span class="ident">to_lowercase</span>().<span class="ident">to_string</span>()
+<span class="doccomment">/// Randomly picks whether to be upper case or lower case
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+</span><span class="kw">fn </span>randomize(words: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; Vec&lt;String&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::thread_rng();
+    words
+        .iter()
+        .map(|word| {
+            word.chars()
+                .map(|letter| {
+                    <span class="kw">if </span>rng.gen::&lt;f32&gt;() &gt; <span class="number">0.5 </span>{
+                        letter.to_uppercase().to_string()
+                    } <span class="kw">else </span>{
+                        letter.to_lowercase().to_string()
                     }
                 })
-                .<span class="ident">collect</span>()
+                .collect()
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="doccomment">/// Randomly selects patterns: [upper, lower] or [lower, upper]</span>
-<span class="doccomment">/// for a more random feeling pattern.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">pseudo_randomize</span>(<span class="ident">words</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
+<span class="doccomment">/// Randomly selects patterns: [upper, lower] or [lower, upper]
+/// for a more random feeling pattern.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+</span><span class="kw">fn </span>pseudo_randomize(words: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; Vec&lt;String&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::thread_rng();
 
-    <span class="comment">// Keeps track of when to alternate</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">alt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="ident">words</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">word</span><span class="op">|</span> {
-            <span class="ident">word</span>.<span class="ident">chars</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">letter</span><span class="op">|</span> {
-                    <span class="kw">match</span> <span class="ident">alt</span> {
-                        <span class="comment">// No existing pattern, start one</span>
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="kw">if</span> <span class="ident">rng</span>.<span class="ident">gen</span>::<span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>() <span class="op">&gt;</span> <span class="number">0.5</span> {
-                                <span class="ident">alt</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>); <span class="comment">// Make the next char lower</span>
-                                <span class="ident">letter</span>.<span class="ident">to_uppercase</span>().<span class="ident">to_string</span>()
-                            } <span class="kw">else</span> {
-                                <span class="ident">alt</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>); <span class="comment">// Make the next char upper</span>
-                                <span class="ident">letter</span>.<span class="ident">to_lowercase</span>().<span class="ident">to_string</span>()
+    <span class="comment">// Keeps track of when to alternate
+    </span><span class="kw">let </span><span class="kw-2">mut </span>alt: <span class="prelude-ty">Option</span>&lt;bool&gt; = <span class="prelude-val">None</span>;
+    words
+        .iter()
+        .map(|word| {
+            word.chars()
+                .map(|letter| {
+                    <span class="kw">match </span>alt {
+                        <span class="comment">// No existing pattern, start one
+                        </span><span class="prelude-val">None </span>=&gt; {
+                            <span class="kw">if </span>rng.gen::&lt;f32&gt;() &gt; <span class="number">0.5 </span>{
+                                alt = <span class="prelude-val">Some</span>(<span class="bool-val">false</span>); <span class="comment">// Make the next char lower
+                                </span>letter.to_uppercase().to_string()
+                            } <span class="kw">else </span>{
+                                alt = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>); <span class="comment">// Make the next char upper
+                                </span>letter.to_lowercase().to_string()
                             }
                         }
-                        <span class="comment">// Existing pattern, do what it says</span>
-                        <span class="prelude-val">Some</span>(<span class="ident">upper</span>) =&gt; {
-                            <span class="ident">alt</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                            <span class="kw">if</span> <span class="ident">upper</span> {
-                                <span class="ident">letter</span>.<span class="ident">to_uppercase</span>().<span class="ident">to_string</span>()
-                            } <span class="kw">else</span> {
-                                <span class="ident">letter</span>.<span class="ident">to_lowercase</span>().<span class="ident">to_string</span>()
+                        <span class="comment">// Existing pattern, do what it says
+                        </span><span class="prelude-val">Some</span>(upper) =&gt; {
+                            alt = <span class="prelude-val">None</span>;
+                            <span class="kw">if </span>upper {
+                                letter.to_uppercase().to_string()
+                            } <span class="kw">else </span>{
+                                letter.to_lowercase().to_string()
                             }
                         }
                     }
                 })
-                .<span class="ident">collect</span>()
+                .collect()
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pseudo_no_triples</span>() {
-        <span class="kw">let</span> <span class="ident">words</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;abcdefg&quot;</span>, <span class="string">&quot;hijklmnop&quot;</span>, <span class="string">&quot;qrstuv&quot;</span>, <span class="string">&quot;wxyz&quot;</span>];
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">5</span> {
-            <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">pseudo_randomize</span>(<span class="kw-2">&amp;</span><span class="ident">words</span>).<span class="ident">join</span>(<span class="string">&quot;&quot;</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">new</span>
-                .<span class="ident">chars</span>()
-                .<span class="ident">zip</span>(<span class="ident">new</span>.<span class="ident">chars</span>().<span class="ident">skip</span>(<span class="number">1</span>))
-                .<span class="ident">zip</span>(<span class="ident">new</span>.<span class="ident">chars</span>().<span class="ident">skip</span>(<span class="number">2</span>));
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">iter</span>
-                .<span class="ident">clone</span>()
-                .<span class="ident">any</span>(<span class="op">|</span>((<span class="ident">a</span>, <span class="ident">b</span>), <span class="ident">c</span>)<span class="op">|</span> <span class="ident">a</span>.<span class="ident">is_lowercase</span>() <span class="op">&amp;&amp;</span> <span class="ident">b</span>.<span class="ident">is_lowercase</span>() <span class="op">&amp;&amp;</span> <span class="ident">c</span>.<span class="ident">is_lowercase</span>()));
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>pseudo_no_triples() {
+        <span class="kw">let </span>words = <span class="macro">vec!</span>[<span class="string">&quot;abcdefg&quot;</span>, <span class="string">&quot;hijklmnop&quot;</span>, <span class="string">&quot;qrstuv&quot;</span>, <span class="string">&quot;wxyz&quot;</span>];
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">5 </span>{
+            <span class="kw">let </span>new = pseudo_randomize(<span class="kw-2">&amp;</span>words).join(<span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>iter = new
+                .chars()
+                .zip(new.chars().skip(<span class="number">1</span>))
+                .zip(new.chars().skip(<span class="number">2</span>));
+            <span class="macro">assert!</span>(!iter
+                .clone()
+                .any(|((a, b), c)| a.is_lowercase() &amp;&amp; b.is_lowercase() &amp;&amp; c.is_lowercase()));
             <span class="macro">assert!</span>(
-                <span class="op">!</span><span class="ident">iter</span>.<span class="ident">any</span>(<span class="op">|</span>((<span class="ident">a</span>, <span class="ident">b</span>), <span class="ident">c</span>)<span class="op">|</span> <span class="ident">a</span>.<span class="ident">is_uppercase</span>() <span class="op">&amp;&amp;</span> <span class="ident">b</span>.<span class="ident">is_uppercase</span>() <span class="op">&amp;&amp;</span> <span class="ident">c</span>.<span class="ident">is_uppercase</span>())
+                !iter.any(|((a, b), c)| a.is_uppercase() &amp;&amp; b.is_uppercase() &amp;&amp; c.is_uppercase())
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">randoms_are_random</span>() {
-        <span class="kw">let</span> <span class="ident">words</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;abcdefg&quot;</span>, <span class="string">&quot;hijklmnop&quot;</span>, <span class="string">&quot;qrstuv&quot;</span>, <span class="string">&quot;wxyz&quot;</span>];
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>randoms_are_random() {
+        <span class="kw">let </span>words = <span class="macro">vec!</span>[<span class="string">&quot;abcdefg&quot;</span>, <span class="string">&quot;hijklmnop&quot;</span>, <span class="string">&quot;qrstuv&quot;</span>, <span class="string">&quot;wxyz&quot;</span>];
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">5</span> {
-            <span class="kw">let</span> <span class="ident">transformed</span> <span class="op">=</span> <span class="ident">pseudo_randomize</span>(<span class="kw-2">&amp;</span><span class="ident">words</span>);
-            <span class="macro">assert_ne!</span>(<span class="ident">words</span>, <span class="ident">transformed</span>);
-            <span class="kw">let</span> <span class="ident">transformed</span> <span class="op">=</span> <span class="ident">randomize</span>(<span class="kw-2">&amp;</span><span class="ident">words</span>);
-            <span class="macro">assert_ne!</span>(<span class="ident">words</span>, <span class="ident">transformed</span>);
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">5 </span>{
+            <span class="kw">let </span>transformed = pseudo_randomize(<span class="kw-2">&amp;</span>words);
+            <span class="macro">assert_ne!</span>(words, transformed);
+            <span class="kw">let </span>transformed = randomize(<span class="kw-2">&amp;</span>words);
+            <span class="macro">assert_ne!</span>(words, transformed);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mutate_empty_strings</span>() {
-        <span class="kw">for</span> <span class="ident">wcase</span> <span class="kw">in</span> [
-            <span class="ident">WordCase::Lower</span>,
-            <span class="ident">WordCase::Upper</span>,
-            <span class="ident">WordCase::Capital</span>,
-            <span class="ident">WordCase::Toggle</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>mutate_empty_strings() {
+        <span class="kw">for </span>wcase <span class="kw">in </span>[
+            WordCase::Lower,
+            WordCase::Upper,
+            WordCase::Capital,
+            WordCase::Toggle,
         ] {
-            <span class="macro">assert_eq!</span>(<span class="ident">String::new</span>(), <span class="ident">wcase</span>.<span class="ident">mutate</span>(<span class="kw-2">&amp;</span><span class="ident">String::new</span>()))
+            <span class="macro">assert_eq!</span>(String::new(), wcase.mutate(<span class="kw-2">&amp;</span>String::new()))
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="convert_case" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="convert_case" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

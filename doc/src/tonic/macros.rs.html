@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -77,82 +77,82 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
-</pre><pre class="rust"><code><span class="doccomment">/// Include generated proto server and client items.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You must specify the gRPC package name.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// mod pb {</span>
-<span class="doccomment">///     tonic::include_proto!(&quot;helloworld&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Note:</span>
-<span class="doccomment">/// **This only works if the tonic-build output directory has been unmodified**.</span>
-<span class="doccomment">/// The default output directory is set to the [`OUT_DIR`] environment variable.</span>
-<span class="doccomment">/// If the output directory has been modified, the following pattern may be used</span>
-<span class="doccomment">/// instead of this macro.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// mod pb {</span>
-<span class="doccomment">///     include!(&quot;/relative/protobuf/directory/helloworld.rs&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// You can also use a custom environment variable using the following pattern.</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// mod pb {</span>
-<span class="doccomment">///     include!(concat!(env!(&quot;PROTOBUFS&quot;), &quot;/helloworld.rs&quot;));</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`OUT_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">include_proto</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">package</span>: <span class="ident">tt</span>) =&gt; {
-        <span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="macro">concat!</span>(<span class="string">&quot;/&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">package</span>, <span class="string">&quot;.rs&quot;</span>)));
+</pre><pre class="rust"><code><span class="doccomment">/// Include generated proto server and client items.
+///
+/// You must specify the gRPC package name.
+///
+/// ```rust,ignore
+/// mod pb {
+///     tonic::include_proto!(&quot;helloworld&quot;);
+/// }
+/// ```
+///
+/// # Note:
+/// **This only works if the tonic-build output directory has been unmodified**.
+/// The default output directory is set to the [`OUT_DIR`] environment variable.
+/// If the output directory has been modified, the following pattern may be used
+/// instead of this macro.
+///
+/// ```rust,ignore
+/// mod pb {
+///     include!(&quot;/relative/protobuf/directory/helloworld.rs&quot;);
+/// }
+/// ```
+/// You can also use a custom environment variable using the following pattern.
+/// ```rust,ignore
+/// mod pb {
+///     include!(concat!(env!(&quot;PROTOBUFS&quot;), &quot;/helloworld.rs&quot;));
+/// }
+/// ```
+///
+/// [`OUT_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>include_proto {
+    (<span class="macro-nonterminal">$package</span>: tt) =&gt; {
+        <span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="macro">concat!</span>(<span class="string">&quot;/&quot;</span>, <span class="macro-nonterminal">$package</span>, <span class="string">&quot;.rs&quot;</span>)));
     };
 }
 
-<span class="doccomment">/// Include an encoded `prost_types::FileDescriptorSet` as a `&amp;&#39;static [u8]`. The parameter must be</span>
-<span class="doccomment">/// the stem of the filename passed to `file_descriptor_set_path` for the `tonic-build::Builder`,</span>
-<span class="doccomment">/// excluding the `.bin` extension.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For example, a file descriptor set compiled like this in `build.rs`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// let descriptor_path = PathBuf::from(env::var(&quot;OUT_DIR&quot;).unwrap()).join(&quot;my_descriptor.bin&quot;)</span>
-<span class="doccomment">/// tonic_build::configure()</span>
-<span class="doccomment">///     .file_descriptor_set_path(&amp;descriptor_path)</span>
-<span class="doccomment">///     .format(true)</span>
-<span class="doccomment">///     .compile(&amp;[&quot;proto/reflection.proto&quot;], &amp;[&quot;proto/&quot;])?;</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Can be included like this:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// mod pb {</span>
-<span class="doccomment">///     pub(crate) const FILE_DESCRIPTOR_SET: &amp;[u8] = tonic::include_file_descriptor_set!(&quot;my_descriptor&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Note:</span>
-<span class="doccomment">/// **This only works if the tonic-build output directory has been unmodified**.</span>
-<span class="doccomment">/// The default output directory is set to the [`OUT_DIR`] environment variable.</span>
-<span class="doccomment">/// If the output directory has been modified, the following pattern may be used</span>
-<span class="doccomment">/// instead of this macro.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// mod pb {</span>
-<span class="doccomment">///     pub(crate) const FILE_DESCRIPTOR_SET: &amp;[u8] = include_bytes!(&quot;/relative/protobuf/directory/descriptor_name.bin&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`OUT_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">include_file_descriptor_set</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">package</span>: <span class="ident">tt</span>) =&gt; {
-        <span class="macro">include_bytes!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="macro">concat!</span>(<span class="string">&quot;/&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">package</span>, <span class="string">&quot;.bin&quot;</span>)))
+<span class="doccomment">/// Include an encoded `prost_types::FileDescriptorSet` as a `&amp;&#39;static [u8]`. The parameter must be
+/// the stem of the filename passed to `file_descriptor_set_path` for the `tonic-build::Builder`,
+/// excluding the `.bin` extension.
+///
+/// For example, a file descriptor set compiled like this in `build.rs`:
+///
+/// ```rust,ignore
+/// let descriptor_path = PathBuf::from(env::var(&quot;OUT_DIR&quot;).unwrap()).join(&quot;my_descriptor.bin&quot;)
+/// tonic_build::configure()
+///     .file_descriptor_set_path(&amp;descriptor_path)
+///     .format(true)
+///     .compile(&amp;[&quot;proto/reflection.proto&quot;], &amp;[&quot;proto/&quot;])?;
+/// ```
+///
+/// Can be included like this:
+///
+/// ```rust,ignore
+/// mod pb {
+///     pub(crate) const FILE_DESCRIPTOR_SET: &amp;[u8] = tonic::include_file_descriptor_set!(&quot;my_descriptor&quot;);
+/// }
+/// ```
+///
+/// # Note:
+/// **This only works if the tonic-build output directory has been unmodified**.
+/// The default output directory is set to the [`OUT_DIR`] environment variable.
+/// If the output directory has been modified, the following pattern may be used
+/// instead of this macro.
+///
+/// ```rust,ignore
+/// mod pb {
+///     pub(crate) const FILE_DESCRIPTOR_SET: &amp;[u8] = include_bytes!(&quot;/relative/protobuf/directory/descriptor_name.bin&quot;);
+/// }
+/// ```
+///
+/// [`OUT_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>include_file_descriptor_set {
+    (<span class="macro-nonterminal">$package</span>: tt) =&gt; {
+        <span class="macro">include_bytes!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="macro">concat!</span>(<span class="string">&quot;/&quot;</span>, <span class="macro-nonterminal">$package</span>, <span class="string">&quot;.bin&quot;</span>)))
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

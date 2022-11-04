@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rand_xoshiro-0.6.0/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rand_xoshiro/index.html"><div class="logo-container"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rand_xoshiro/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rand_xoshiro-0.6.0/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rand_xoshiro/index.html"><div class="logo-container"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rand_xoshiro/index.html"><div class="logo-container">
                     <img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rand_xoshiro/index.html">
                         <img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -265,270 +265,270 @@
 <span id="263">263</span>
 <span id="264">264</span>
 <span id="265">265</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Developers of the Rand project.</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. This file may not be copied, modified, or distributed</span>
-<span class="comment">// except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Developers of the Rand project.
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
+// &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
 
-<span class="doccomment">/// Initialize a RNG from a `u64` seed using `SplitMix64`.</span>
-<span class="macro">macro_rules!</span> <span class="ident">from_splitmix</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">seed</span>:<span class="ident">expr</span>) =&gt; { {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::SplitMix64::seed_from_u64</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">seed</span>);
-        <span class="ident"><span class="self">Self</span>::from_rng</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rng</span>).<span class="ident">unwrap</span>()
+</span><span class="doccomment">/// Initialize a RNG from a `u64` seed using `SplitMix64`.
+</span><span class="macro">macro_rules! </span>from_splitmix {
+    (<span class="macro-nonterminal">$seed</span>:expr) =&gt; { {
+        <span class="kw">let </span><span class="kw-2">mut </span>rng = <span class="kw">crate</span>::SplitMix64::seed_from_u64(<span class="macro-nonterminal">$seed</span>);
+        <span class="self">Self</span>::from_rng(<span class="kw-2">&amp;mut </span>rng).unwrap()
     } }
 }
 
-<span class="doccomment">/// Apply the ** scrambler used by some RNGs from the xoshiro family.</span>
-<span class="macro">macro_rules!</span> <span class="ident">starstar_u64</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>.<span class="ident">wrapping_mul</span>(<span class="number">5</span>).<span class="ident">rotate_left</span>(<span class="number">7</span>).<span class="ident">wrapping_mul</span>(<span class="number">9</span>)
+<span class="doccomment">/// Apply the ** scrambler used by some RNGs from the xoshiro family.
+</span><span class="macro">macro_rules! </span>starstar_u64 {
+    (<span class="macro-nonterminal">$x</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$x</span>.wrapping_mul(<span class="number">5</span>).rotate_left(<span class="number">7</span>).wrapping_mul(<span class="number">9</span>)
     }
 }
 
-<span class="doccomment">/// Apply the ** scrambler used by some RNGs from the xoshiro family.</span>
-<span class="macro">macro_rules!</span> <span class="ident">starstar_u32</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>.<span class="ident">wrapping_mul</span>(<span class="number">0x9E3779BB</span>).<span class="ident">rotate_left</span>(<span class="number">5</span>).<span class="ident">wrapping_mul</span>(<span class="number">5</span>)
+<span class="doccomment">/// Apply the ** scrambler used by some RNGs from the xoshiro family.
+</span><span class="macro">macro_rules! </span>starstar_u32 {
+    (<span class="macro-nonterminal">$x</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$x</span>.wrapping_mul(<span class="number">0x9E3779BB</span>).rotate_left(<span class="number">5</span>).wrapping_mul(<span class="number">5</span>)
     }
 }
 
-<span class="doccomment">/// Apply the ++ scrambler used by some RNGs from the xoshiro family.</span>
-<span class="macro">macro_rules!</span> <span class="ident">plusplus_u64</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">y</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rot</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>.<span class="ident">wrapping_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">y</span>).<span class="ident">rotate_left</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rot</span>).<span class="ident">wrapping_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>)
+<span class="doccomment">/// Apply the ++ scrambler used by some RNGs from the xoshiro family.
+</span><span class="macro">macro_rules! </span>plusplus_u64 {
+    (<span class="macro-nonterminal">$x</span>:expr, <span class="macro-nonterminal">$y</span>:expr, <span class="macro-nonterminal">$rot</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$x</span>.wrapping_add(<span class="macro-nonterminal">$y</span>).rotate_left(<span class="macro-nonterminal">$rot</span>).wrapping_add(<span class="macro-nonterminal">$x</span>)
     }
 }
 
-<span class="doccomment">/// Apply the ++ scrambler used by some RNGs from the xoshiro family.</span>
-<span class="macro">macro_rules!</span> <span class="ident">plusplus_u32</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">y</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>.<span class="ident">wrapping_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">y</span>).<span class="ident">rotate_left</span>(<span class="number">7</span>).<span class="ident">wrapping_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>)
+<span class="doccomment">/// Apply the ++ scrambler used by some RNGs from the xoshiro family.
+</span><span class="macro">macro_rules! </span>plusplus_u32 {
+    (<span class="macro-nonterminal">$x</span>:expr, <span class="macro-nonterminal">$y</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$x</span>.wrapping_add(<span class="macro-nonterminal">$y</span>).rotate_left(<span class="number">7</span>).wrapping_add(<span class="macro-nonterminal">$x</span>)
     }
 }
 
-<span class="doccomment">/// Implement a jump function for an RNG from the xoshiro family.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_jump</span> {
-    (<span class="ident">u32</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>, [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">j0</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j1</span>:<span class="ident">expr</span>]) =&gt; {
-        <span class="kw">const</span> <span class="ident">JUMP</span>: [<span class="ident">u32</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">j0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j1</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s0</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s1</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">JUMP</span> {
-            <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">32</span> {
-                <span class="kw">if</span> (<span class="ident">j</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">b</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">s0</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span>;
-                    <span class="ident">s1</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span>;
+<span class="doccomment">/// Implement a jump function for an RNG from the xoshiro family.
+</span><span class="macro">macro_rules! </span>impl_jump {
+    (u32, <span class="macro-nonterminal">$self</span>:expr, [<span class="macro-nonterminal">$j0</span>:expr, <span class="macro-nonterminal">$j1</span>:expr]) =&gt; {
+        <span class="kw">const </span>JUMP: [u32; <span class="number">2</span>] = [<span class="macro-nonterminal">$j0</span>, <span class="macro-nonterminal">$j1</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>s0 = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>s1 = <span class="number">0</span>;
+        <span class="kw">for </span>j <span class="kw">in </span><span class="kw-2">&amp;</span>JUMP {
+            <span class="kw">for </span>b <span class="kw">in </span><span class="number">0</span>..<span class="number">32 </span>{
+                <span class="kw">if </span>(j &amp; <span class="number">1 </span>&lt;&lt; b) != <span class="number">0 </span>{
+                    s0 ^= <span class="macro-nonterminal">$self</span>.s0;
+                    s1 ^= <span class="macro-nonterminal">$self</span>.s1;
                 }
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">next_u32</span>();
+                <span class="macro-nonterminal">$self</span>.next_u32();
             }
         }
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span> <span class="op">=</span> <span class="ident">s0</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">=</span> <span class="ident">s1</span>;
+        <span class="macro-nonterminal">$self</span>.s0 = s0;
+        <span class="macro-nonterminal">$self</span>.s1 = s1;
     };
-    (<span class="ident">u64</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>, [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">j0</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j1</span>:<span class="ident">expr</span>]) =&gt; {
-        <span class="kw">const</span> <span class="ident">JUMP</span>: [<span class="ident">u64</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">j0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j1</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s0</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s1</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">JUMP</span> {
-            <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">64</span> {
-                <span class="kw">if</span> (<span class="ident">j</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">b</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">s0</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span>;
-                    <span class="ident">s1</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span>;
+    (u64, <span class="macro-nonterminal">$self</span>:expr, [<span class="macro-nonterminal">$j0</span>:expr, <span class="macro-nonterminal">$j1</span>:expr]) =&gt; {
+        <span class="kw">const </span>JUMP: [u64; <span class="number">2</span>] = [<span class="macro-nonterminal">$j0</span>, <span class="macro-nonterminal">$j1</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>s0 = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>s1 = <span class="number">0</span>;
+        <span class="kw">for </span>j <span class="kw">in </span><span class="kw-2">&amp;</span>JUMP {
+            <span class="kw">for </span>b <span class="kw">in </span><span class="number">0</span>..<span class="number">64 </span>{
+                <span class="kw">if </span>(j &amp; <span class="number">1 </span>&lt;&lt; b) != <span class="number">0 </span>{
+                    s0 ^= <span class="macro-nonterminal">$self</span>.s0;
+                    s1 ^= <span class="macro-nonterminal">$self</span>.s1;
                 }
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">next_u64</span>();
+                <span class="macro-nonterminal">$self</span>.next_u64();
             }
         }
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span> <span class="op">=</span> <span class="ident">s0</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">=</span> <span class="ident">s1</span>;
+        <span class="macro-nonterminal">$self</span>.s0 = s0;
+        <span class="macro-nonterminal">$self</span>.s1 = s1;
     };
-    (<span class="ident">u32</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>, [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">j0</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j2</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j3</span>:<span class="ident">expr</span>]) =&gt; {
-        <span class="kw">const</span> <span class="ident">JUMP</span>: [<span class="ident">u32</span>; <span class="number">4</span>] <span class="op">=</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">j0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j2</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j3</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s0</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s1</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s2</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s3</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">JUMP</span> {
-            <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">32</span> {
-                <span class="kw">if</span> (<span class="ident">j</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">b</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">s0</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">0</span>];
-                    <span class="ident">s1</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>];
-                    <span class="ident">s2</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>];
-                    <span class="ident">s3</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>];
+    (u32, <span class="macro-nonterminal">$self</span>:expr, [<span class="macro-nonterminal">$j0</span>:expr, <span class="macro-nonterminal">$j1</span>:expr, <span class="macro-nonterminal">$j2</span>:expr, <span class="macro-nonterminal">$j3</span>:expr]) =&gt; {
+        <span class="kw">const </span>JUMP: [u32; <span class="number">4</span>] = [<span class="macro-nonterminal">$j0</span>, <span class="macro-nonterminal">$j1</span>, <span class="macro-nonterminal">$j2</span>, <span class="macro-nonterminal">$j3</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>s0 = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>s1 = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>s2 = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>s3 = <span class="number">0</span>;
+        <span class="kw">for </span>j <span class="kw">in </span><span class="kw-2">&amp;</span>JUMP {
+            <span class="kw">for </span>b <span class="kw">in </span><span class="number">0</span>..<span class="number">32 </span>{
+                <span class="kw">if </span>(j &amp; <span class="number">1 </span>&lt;&lt; b) != <span class="number">0 </span>{
+                    s0 ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">0</span>];
+                    s1 ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>];
+                    s2 ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>];
+                    s3 ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>];
                 }
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">next_u32</span>();
+                <span class="macro-nonterminal">$self</span>.next_u32();
             }
         }
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">s0</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">s1</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">s2</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>] <span class="op">=</span> <span class="ident">s3</span>;
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">0</span>] = s0;
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>] = s1;
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>] = s2;
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>] = s3;
     };
-    (<span class="ident">u64</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>, [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">j0</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j2</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j3</span>:<span class="ident">expr</span>]) =&gt; {
-        <span class="kw">const</span> <span class="ident">JUMP</span>: [<span class="ident">u64</span>; <span class="number">4</span>] <span class="op">=</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">j0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j2</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j3</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s0</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s1</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s2</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s3</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">JUMP</span> {
-            <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">64</span> {
-                <span class="kw">if</span> (<span class="ident">j</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">b</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">s0</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">0</span>];
-                    <span class="ident">s1</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>];
-                    <span class="ident">s2</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>];
-                    <span class="ident">s3</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>];
+    (u64, <span class="macro-nonterminal">$self</span>:expr, [<span class="macro-nonterminal">$j0</span>:expr, <span class="macro-nonterminal">$j1</span>:expr, <span class="macro-nonterminal">$j2</span>:expr, <span class="macro-nonterminal">$j3</span>:expr]) =&gt; {
+        <span class="kw">const </span>JUMP: [u64; <span class="number">4</span>] = [<span class="macro-nonterminal">$j0</span>, <span class="macro-nonterminal">$j1</span>, <span class="macro-nonterminal">$j2</span>, <span class="macro-nonterminal">$j3</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>s0 = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>s1 = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>s2 = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>s3 = <span class="number">0</span>;
+        <span class="kw">for </span>j <span class="kw">in </span><span class="kw-2">&amp;</span>JUMP {
+            <span class="kw">for </span>b <span class="kw">in </span><span class="number">0</span>..<span class="number">64 </span>{
+                <span class="kw">if </span>(j &amp; <span class="number">1 </span>&lt;&lt; b) != <span class="number">0 </span>{
+                    s0 ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">0</span>];
+                    s1 ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>];
+                    s2 ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>];
+                    s3 ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>];
                 }
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">next_u64</span>();
+                <span class="macro-nonterminal">$self</span>.next_u64();
             }
         }
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">s0</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">s1</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">s2</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>] <span class="op">=</span> <span class="ident">s3</span>;
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">0</span>] = s0;
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>] = s1;
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>] = s2;
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>] = s3;
     };
-    (<span class="ident">u64</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>, [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">j0</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j2</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j3</span>:<span class="ident">expr</span>,
-                       <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j4</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j5</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j6</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j7</span>:<span class="ident">expr</span>]) =&gt; {
-        <span class="kw">const</span> <span class="ident">JUMP</span>: [<span class="ident">u64</span>; <span class="number">8</span>] <span class="op">=</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">j0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j2</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j3</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j4</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j5</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j6</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">j7</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">JUMP</span> {
-            <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">64</span> {
-                <span class="kw">if</span> (<span class="ident">j</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">b</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">s</span>[<span class="number">0</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">0</span>];
-                    <span class="ident">s</span>[<span class="number">1</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>];
-                    <span class="ident">s</span>[<span class="number">2</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>];
-                    <span class="ident">s</span>[<span class="number">3</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>];
-                    <span class="ident">s</span>[<span class="number">4</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">4</span>];
-                    <span class="ident">s</span>[<span class="number">5</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">5</span>];
-                    <span class="ident">s</span>[<span class="number">6</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">6</span>];
-                    <span class="ident">s</span>[<span class="number">7</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">7</span>];
+    (u64, <span class="macro-nonterminal">$self</span>:expr, [<span class="macro-nonterminal">$j0</span>:expr, <span class="macro-nonterminal">$j1</span>:expr, <span class="macro-nonterminal">$j2</span>:expr, <span class="macro-nonterminal">$j3</span>:expr,
+                       <span class="macro-nonterminal">$j4</span>:expr, <span class="macro-nonterminal">$j5</span>:expr, <span class="macro-nonterminal">$j6</span>:expr, <span class="macro-nonterminal">$j7</span>:expr]) =&gt; {
+        <span class="kw">const </span>JUMP: [u64; <span class="number">8</span>] = [<span class="macro-nonterminal">$j0</span>, <span class="macro-nonterminal">$j1</span>, <span class="macro-nonterminal">$j2</span>, <span class="macro-nonterminal">$j3</span>, <span class="macro-nonterminal">$j4</span>, <span class="macro-nonterminal">$j5</span>, <span class="macro-nonterminal">$j6</span>, <span class="macro-nonterminal">$j7</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>s = [<span class="number">0</span>; <span class="number">8</span>];
+        <span class="kw">for </span>j <span class="kw">in </span><span class="kw-2">&amp;</span>JUMP {
+            <span class="kw">for </span>b <span class="kw">in </span><span class="number">0</span>..<span class="number">64 </span>{
+                <span class="kw">if </span>(j &amp; <span class="number">1 </span>&lt;&lt; b) != <span class="number">0 </span>{
+                    s[<span class="number">0</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">0</span>];
+                    s[<span class="number">1</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>];
+                    s[<span class="number">2</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>];
+                    s[<span class="number">3</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>];
+                    s[<span class="number">4</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">4</span>];
+                    s[<span class="number">5</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">5</span>];
+                    s[<span class="number">6</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">6</span>];
+                    s[<span class="number">7</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">7</span>];
                 }
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">next_u64</span>();
+                <span class="macro-nonterminal">$self</span>.next_u64();
             }
         }
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>;
+        <span class="macro-nonterminal">$self</span>.s = s;
     };
 }
 
-<span class="doccomment">/// Implement the xoroshiro iteration.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_xoroshiro_u32</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span>.<span class="ident">rotate_left</span>(<span class="number">26</span>) <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>);
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span>.<span class="ident">rotate_left</span>(<span class="number">13</span>);
+<span class="doccomment">/// Implement the xoroshiro iteration.
+</span><span class="macro">macro_rules! </span>impl_xoroshiro_u32 {
+    (<span class="macro-nonterminal">$self</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$self</span>.s1 ^= <span class="macro-nonterminal">$self</span>.s0;
+        <span class="macro-nonterminal">$self</span>.s0 = <span class="macro-nonterminal">$self</span>.s0.rotate_left(<span class="number">26</span>) ^ <span class="macro-nonterminal">$self</span>.s1 ^ (<span class="macro-nonterminal">$self</span>.s1 &lt;&lt; <span class="number">9</span>);
+        <span class="macro-nonterminal">$self</span>.s1 = <span class="macro-nonterminal">$self</span>.s1.rotate_left(<span class="number">13</span>);
     }
 }
 
-<span class="doccomment">/// Implement the xoroshiro iteration.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_xoroshiro_u64</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span>.<span class="ident">rotate_left</span>(<span class="number">24</span>) <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>);
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span>.<span class="ident">rotate_left</span>(<span class="number">37</span>);
+<span class="doccomment">/// Implement the xoroshiro iteration.
+</span><span class="macro">macro_rules! </span>impl_xoroshiro_u64 {
+    (<span class="macro-nonterminal">$self</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$self</span>.s1 ^= <span class="macro-nonterminal">$self</span>.s0;
+        <span class="macro-nonterminal">$self</span>.s0 = <span class="macro-nonterminal">$self</span>.s0.rotate_left(<span class="number">24</span>) ^ <span class="macro-nonterminal">$self</span>.s1 ^ (<span class="macro-nonterminal">$self</span>.s1 &lt;&lt; <span class="number">16</span>);
+        <span class="macro-nonterminal">$self</span>.s1 = <span class="macro-nonterminal">$self</span>.s1.rotate_left(<span class="number">37</span>);
     }
 }
 
-<span class="doccomment">/// Implement the xoroshiro iteration for the ++ scrambler.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_xoroshiro_u64_plusplus</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s0</span>.<span class="ident">rotate_left</span>(<span class="number">49</span>) <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">21</span>);
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s1</span>.<span class="ident">rotate_left</span>(<span class="number">28</span>);
+<span class="doccomment">/// Implement the xoroshiro iteration for the ++ scrambler.
+</span><span class="macro">macro_rules! </span>impl_xoroshiro_u64_plusplus {
+    (<span class="macro-nonterminal">$self</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$self</span>.s1 ^= <span class="macro-nonterminal">$self</span>.s0;
+        <span class="macro-nonterminal">$self</span>.s0 = <span class="macro-nonterminal">$self</span>.s0.rotate_left(<span class="number">49</span>) ^ <span class="macro-nonterminal">$self</span>.s1 ^ (<span class="macro-nonterminal">$self</span>.s1 &lt;&lt; <span class="number">21</span>);
+        <span class="macro-nonterminal">$self</span>.s1 = <span class="macro-nonterminal">$self</span>.s1.rotate_left(<span class="number">28</span>);
     }
 }
 
-<span class="doccomment">/// Implement the xoshiro iteration for `u32` output.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_xoshiro_u32</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>] <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
+<span class="doccomment">/// Implement the xoshiro iteration for `u32` output.
+</span><span class="macro">macro_rules! </span>impl_xoshiro_u32 {
+    (<span class="macro-nonterminal">$self</span>:expr) =&gt; {
+        <span class="kw">let </span>t = <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>] &lt;&lt; <span class="number">9</span>;
 
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">0</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">0</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">0</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">0</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>];
 
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">t</span>;
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>] ^= t;
 
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>].<span class="ident">rotate_left</span>(<span class="number">11</span>);
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>] = <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>].rotate_left(<span class="number">11</span>);
     }
 }
 
-<span class="doccomment">/// Implement the xoshiro iteration for `u64` output.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_xoshiro_u64</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>] <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
+<span class="doccomment">/// Implement the xoshiro iteration for `u64` output.
+</span><span class="macro">macro_rules! </span>impl_xoshiro_u64 {
+    (<span class="macro-nonterminal">$self</span>:expr) =&gt; {
+        <span class="kw">let </span>t = <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>] &lt;&lt; <span class="number">17</span>;
 
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">0</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">0</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">0</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">0</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>];
 
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">t</span>;
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>] ^= t;
 
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>].<span class="ident">rotate_left</span>(<span class="number">45</span>);
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>] = <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>].rotate_left(<span class="number">45</span>);
     }
 }
 
-<span class="doccomment">/// Implement the large-state xoshiro iteration.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_xoshiro_large</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>] <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
+<span class="doccomment">/// Implement the large-state xoshiro iteration.
+</span><span class="macro">macro_rules! </span>impl_xoshiro_large {
+    (<span class="macro-nonterminal">$self</span>:expr) =&gt; {
+        <span class="kw">let </span>t = <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>] &lt;&lt; <span class="number">11</span>;
 
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">0</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">5</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">1</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">2</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">7</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">3</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">4</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">4</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">5</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">0</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">6</span>];
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">6</span>] <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">7</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">0</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">5</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">1</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">2</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">7</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">3</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">4</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">4</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">5</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">0</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">6</span>];
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">6</span>] ^= <span class="macro-nonterminal">$self</span>.s[<span class="number">7</span>];
 
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">6</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">t</span>;
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">6</span>] ^= t;
 
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">7</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self</span>.<span class="ident">s</span>[<span class="number">7</span>].<span class="ident">rotate_left</span>(<span class="number">21</span>);
+        <span class="macro-nonterminal">$self</span>.s[<span class="number">7</span>] = <span class="macro-nonterminal">$self</span>.s[<span class="number">7</span>].rotate_left(<span class="number">21</span>);
     }
 }
 
-<span class="doccomment">/// Map an all-zero seed to a different one.</span>
-<span class="macro">macro_rules!</span> <span class="ident">deal_with_zero_seed</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">seed</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Self</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">seed</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>) {
-            <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Self::seed_from_u64</span>(<span class="number">0</span>);
+<span class="doccomment">/// Map an all-zero seed to a different one.
+</span><span class="macro">macro_rules! </span>deal_with_zero_seed {
+    (<span class="macro-nonterminal">$seed</span>:expr, <span class="macro-nonterminal">$Self</span>:ident) =&gt; {
+        <span class="kw">if </span><span class="macro-nonterminal">$seed</span>.iter().all(|<span class="kw-2">&amp;</span>x| x == <span class="number">0</span>) {
+            <span class="kw">return </span><span class="macro-nonterminal">$Self::seed_from_u64</span>(<span class="number">0</span>);
         }
     }
 }
 
-<span class="doccomment">/// 512-bit seed for a generator.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This wrapper is necessary, because some traits required for a seed are not</span>
-<span class="doccomment">/// implemented on large arrays.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Seed512</span>(<span class="kw">pub</span> [<span class="ident">u8</span>; <span class="number">64</span>]);
+<span class="doccomment">/// 512-bit seed for a generator.
+///
+/// This wrapper is necessary, because some traits required for a seed are not
+/// implemented on large arrays.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Seed512(<span class="kw">pub </span>[u8; <span class="number">64</span>]);
 
-<span class="kw">impl</span> <span class="ident">Seed512</span> {
-    <span class="doccomment">/// Return an iterator over the seed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">core::slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>()
+<span class="kw">impl </span>Seed512 {
+    <span class="doccomment">/// Return an iterator over the seed.
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; core::slice::Iter&lt;u8&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.iter()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Seed512</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>[..].<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>Seed512 {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>[..].fmt(f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Seed512</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Seed512</span> {
-        <span class="ident">Seed512</span>([<span class="number">0</span>; <span class="number">64</span>])
+<span class="kw">impl </span>Default <span class="kw">for </span>Seed512 {
+    <span class="kw">fn </span>default() -&gt; Seed512 {
+        Seed512([<span class="number">0</span>; <span class="number">64</span>])
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Seed512</span> {
-    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>AsMut&lt;[u8]&gt; <span class="kw">for </span>Seed512 {
+    <span class="kw">fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u8] {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rand_xoshiro" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rand_xoshiro" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

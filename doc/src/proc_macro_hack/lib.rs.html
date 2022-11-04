@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro-hack-0.5.19/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../proc_macro_hack/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../proc_macro_hack/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../proc_macro_hack/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro-hack-0.5.19/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../proc_macro_hack/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../proc_macro_hack/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../proc_macro_hack/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -589,596 +589,596 @@
 <span id="589">589</span>
 <span id="590">590</span>
 <span id="591">591</span>
-</pre><pre class="rust"><code><span class="doccomment">//! [![github]](https://github.com/dtolnay/proc-macro-hack)&amp;ensp;[![crates-io]](https://crates.io/crates/proc-macro-hack)&amp;ensp;[![docs-rs]](https://docs.rs/proc-macro-hack)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [github]: https://img.shields.io/badge/github-8da0cb?style=for-the-badge&amp;labelColor=555555&amp;logo=github</span>
-<span class="doccomment">//! [crates-io]: https://img.shields.io/badge/crates.io-fc8d62?style=for-the-badge&amp;labelColor=555555&amp;logo=rust</span>
-<span class="doccomment">//! [docs-rs]: https://img.shields.io/badge/docs.rs-66c2a5?style=for-the-badge&amp;labelColor=555555&amp;logoColor=white&amp;logo=data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDUxMiA1MTIiPjxwYXRoIGZpbGw9IiNmNWY1ZjUiIGQ9Ik00ODguNiAyNTAuMkwzOTIgMjE0VjEwNS41YzAtMTUtOS4zLTI4LjQtMjMuNC0zMy43bC0xMDAtMzcuNWMtOC4xLTMuMS0xNy4xLTMuMS0yNS4zIDBsLTEwMCAzNy41Yy0xNC4xIDUuMy0yMy40IDE4LjctMjMuNCAzMy43VjIxNGwtOTYuNiAzNi4yQzkuMyAyNTUuNSAwIDI2OC45IDAgMjgzLjlWMzk0YzAgMTMuNiA3LjcgMjYuMSAxOS45IDMyLjJsMTAwIDUwYzEwLjEgNS4xIDIyLjEgNS4xIDMyLjIgMGwxMDMuOS01MiAxMDMuOSA1MmMxMC4xIDUuMSAyMi4xIDUuMSAzMi4yIDBsMTAwLTUwYzEyLjItNi4xIDE5LjktMTguNiAxOS45LTMyLjJWMjgzLjljMC0xNS05LjMtMjguNC0yMy40LTMzLjd6TTM1OCAyMTQuOGwtODUgMzEuOXYtNjguMmw4NS0zN3Y3My4zek0xNTQgMTA0LjFsMTAyLTM4LjIgMTAyIDM4LjJ2LjZsLTEwMiA0MS40LTEwMi00MS40di0uNnptODQgMjkxLjFsLTg1IDQyLjV2LTc5LjFsODUtMzguOHY3NS40em0wLTExMmwtMTAyIDQxLjQtMTAyLTQxLjR2LS42bDEwMi0zOC4yIDEwMiAzOC4ydi42em0yNDAgMTEybC04NSA0Mi41di03OS4xbDg1LTM4Ljh2NzUuNHptMC0xMTJsLTEwMiA0MS40LTEwMi00MS40di0uNmwxMDItMzguMiAxMDIgMzguMnYuNnoiPjwvcGF0aD48L3N2Zz4K</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;br&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;table&gt;&lt;tr&gt;&lt;td&gt;&lt;hr&gt;</span>
-<span class="doccomment">//! &lt;b&gt;Note:&lt;/b&gt; &lt;i&gt;As of Rust 1.45 this crate is superseded by native support</span>
-<span class="doccomment">//! for #[proc_macro] in expression position. Only consider using this crate if</span>
-<span class="doccomment">//! you care about supporting compilers between 1.31 and 1.45.&lt;/i&gt;</span>
-<span class="doccomment">//! &lt;hr&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Since Rust 1.30, the language supports user-defined function-like procedural</span>
-<span class="doccomment">//! macros. However these can only be invoked in item position, not in</span>
-<span class="doccomment">//! statements or expressions.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate implements an alternative type of procedural macro that can be</span>
-<span class="doccomment">//! invoked in statement or expression position.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Defining procedural macros</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Two crates are required to define a procedural macro.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## The implementation crate</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate must contain nothing but procedural macros. Private helper</span>
-<span class="doccomment">//! functions and private modules are fine but nothing can be public.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [&amp;raquo; example of an implementation crate][demo-hack-impl]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Just like you would use a #\[proc_macro\] attribute to define a natively</span>
-<span class="doccomment">//! supported procedural macro, use proc-macro-hack&#39;s #\[proc_macro_hack\]</span>
-<span class="doccomment">//! attribute to define a procedural macro that works in expression position.</span>
-<span class="doccomment">//! The function signature is the same as for ordinary function-like procedural</span>
-<span class="doccomment">//! macros.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # extern crate proc_macro;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! use proc_macro::TokenStream;</span>
-<span class="doccomment">//! use proc_macro_hack::proc_macro_hack;</span>
-<span class="doccomment">//! use quote::quote;</span>
-<span class="doccomment">//! use syn::{parse_macro_input, Expr};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # const IGNORE: &amp;str = stringify! {</span>
-<span class="doccomment">//! #[proc_macro_hack]</span>
-<span class="doccomment">//! # };</span>
-<span class="doccomment">//! pub fn add_one(input: TokenStream) -&gt; TokenStream {</span>
-<span class="doccomment">//!     let expr = parse_macro_input!(input as Expr);</span>
-<span class="doccomment">//!     TokenStream::from(quote! {</span>
-<span class="doccomment">//!         1 + (#expr)</span>
-<span class="doccomment">//!     })</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # fn main() {}</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## The declaration crate</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate is allowed to contain other public things if you need, for</span>
-<span class="doccomment">//! example traits or functions or ordinary macros.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [&amp;raquo; example of a declaration crate][demo-hack]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Within the declaration crate there needs to be a re-export of your</span>
-<span class="doccomment">//! procedural macro from the implementation crate. The re-export also carries a</span>
-<span class="doccomment">//! \#\[proc_macro_hack\] attribute.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use proc_macro_hack::proc_macro_hack;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! /// Add one to an expression.</span>
-<span class="doccomment">//! ///</span>
-<span class="doccomment">//! /// (Documentation goes here on the re-export, not in the other crate.)</span>
-<span class="doccomment">//! #[proc_macro_hack]</span>
-<span class="doccomment">//! pub use demo_hack_impl::add_one;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # fn main() {}</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Both crates depend on `proc-macro-hack`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! proc-macro-hack = &quot;0.5&quot;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Additionally, your implementation crate (but not your declaration crate) is</span>
-<span class="doccomment">//! a proc macro crate:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [lib]</span>
-<span class="doccomment">//! proc-macro = true</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Using procedural macros</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Users of your crate depend on your declaration crate (not your</span>
-<span class="doccomment">//! implementation crate), then use your procedural macros as usual.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [&amp;raquo; example of a downstream crate][example]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use demo_hack::add_one;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     let two = 2;</span>
-<span class="doccomment">//!     let nine = add_one!(two) + add_one!(2 + 3);</span>
-<span class="doccomment">//!     println!(&quot;nine = {}&quot;, nine);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [demo-hack-impl]: https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl</span>
-<span class="doccomment">//! [demo-hack]: https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack</span>
-<span class="doccomment">//! [example]: https://github.com/dtolnay/proc-macro-hack/tree/master/example</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Limitations</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - Only proc macros in expression position are supported. Proc macros in</span>
-<span class="doccomment">//!   pattern position ([#20]) are not supported.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - By default, nested invocations are not supported i.e. the code emitted by</span>
-<span class="doccomment">//!   a proc-macro-hack macro invocation cannot contain recursive calls to the</span>
-<span class="doccomment">//!   same proc-macro-hack macro nor calls to any other proc-macro-hack macros.</span>
-<span class="doccomment">//!   Use [`proc-macro-nested`] if you require support for nested invocations.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - By default, hygiene is structured such that the expanded code can&#39;t refer</span>
-<span class="doccomment">//!   to local variables other than those passed by name somewhere in the macro</span>
-<span class="doccomment">//!   input. If your macro must refer to *local* variables that don&#39;t get named</span>
-<span class="doccomment">//!   in the macro input, use `#[proc_macro_hack(fake_call_site)]` on the</span>
-<span class="doccomment">//!   re-export in your declaration crate. *Most macros won&#39;t need this.*</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - On compilers that are new enough to natively support proc macros in</span>
-<span class="doccomment">//!   expression position, proc-macro-hack does not automatically use that</span>
-<span class="doccomment">//!   support, since the hygiene can be subtly different between the two</span>
-<span class="doccomment">//!   implementations. To opt in to compiling your macro to native</span>
-<span class="doccomment">//!   `#[proc_macro]` on sufficiently new compilers, use</span>
-<span class="doccomment">//!   `#[proc_macro_hack(only_hack_old_rustc)]` on the re-export in your</span>
-<span class="doccomment">//!   declaration crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [#10]: https://github.com/dtolnay/proc-macro-hack/issues/10</span>
-<span class="doccomment">//! [#20]: https://github.com/dtolnay/proc-macro-hack/issues/20</span>
-<span class="doccomment">//! [`proc-macro-nested`]: https://docs.rs/proc-macro-nested</span>
+</pre><pre class="rust"><code><span class="doccomment">//! [![github]](https://github.com/dtolnay/proc-macro-hack)&amp;ensp;[![crates-io]](https://crates.io/crates/proc-macro-hack)&amp;ensp;[![docs-rs]](https://docs.rs/proc-macro-hack)
+//!
+//! [github]: https://img.shields.io/badge/github-8da0cb?style=for-the-badge&amp;labelColor=555555&amp;logo=github
+//! [crates-io]: https://img.shields.io/badge/crates.io-fc8d62?style=for-the-badge&amp;labelColor=555555&amp;logo=rust
+//! [docs-rs]: https://img.shields.io/badge/docs.rs-66c2a5?style=for-the-badge&amp;labelColor=555555&amp;logoColor=white&amp;logo=data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDUxMiA1MTIiPjxwYXRoIGZpbGw9IiNmNWY1ZjUiIGQ9Ik00ODguNiAyNTAuMkwzOTIgMjE0VjEwNS41YzAtMTUtOS4zLTI4LjQtMjMuNC0zMy43bC0xMDAtMzcuNWMtOC4xLTMuMS0xNy4xLTMuMS0yNS4zIDBsLTEwMCAzNy41Yy0xNC4xIDUuMy0yMy40IDE4LjctMjMuNCAzMy43VjIxNGwtOTYuNiAzNi4yQzkuMyAyNTUuNSAwIDI2OC45IDAgMjgzLjlWMzk0YzAgMTMuNiA3LjcgMjYuMSAxOS45IDMyLjJsMTAwIDUwYzEwLjEgNS4xIDIyLjEgNS4xIDMyLjIgMGwxMDMuOS01MiAxMDMuOSA1MmMxMC4xIDUuMSAyMi4xIDUuMSAzMi4yIDBsMTAwLTUwYzEyLjItNi4xIDE5LjktMTguNiAxOS45LTMyLjJWMjgzLjljMC0xNS05LjMtMjguNC0yMy40LTMzLjd6TTM1OCAyMTQuOGwtODUgMzEuOXYtNjguMmw4NS0zN3Y3My4zek0xNTQgMTA0LjFsMTAyLTM4LjIgMTAyIDM4LjJ2LjZsLTEwMiA0MS40LTEwMi00MS40di0uNnptODQgMjkxLjFsLTg1IDQyLjV2LTc5LjFsODUtMzguOHY3NS40em0wLTExMmwtMTAyIDQxLjQtMTAyLTQxLjR2LS42bDEwMi0zOC4yIDEwMiAzOC4ydi42em0yNDAgMTEybC04NSA0Mi41di03OS4xbDg1LTM4Ljh2NzUuNHptMC0xMTJsLTEwMiA0MS40LTEwMi00MS40di0uNmwxMDItMzguMiAxMDIgMzguMnYuNnoiPjwvcGF0aD48L3N2Zz4K
+//!
+//! &lt;br&gt;
+//!
+//! &lt;table&gt;&lt;tr&gt;&lt;td&gt;&lt;hr&gt;
+//! &lt;b&gt;Note:&lt;/b&gt; &lt;i&gt;As of Rust 1.45 this crate is superseded by native support
+//! for #[proc_macro] in expression position. Only consider using this crate if
+//! you care about supporting compilers between 1.31 and 1.45.&lt;/i&gt;
+//! &lt;hr&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+//!
+//! Since Rust 1.30, the language supports user-defined function-like procedural
+//! macros. However these can only be invoked in item position, not in
+//! statements or expressions.
+//!
+//! This crate implements an alternative type of procedural macro that can be
+//! invoked in statement or expression position.
+//!
+//! # Defining procedural macros
+//!
+//! Two crates are required to define a procedural macro.
+//!
+//! ## The implementation crate
+//!
+//! This crate must contain nothing but procedural macros. Private helper
+//! functions and private modules are fine but nothing can be public.
+//!
+//! [&amp;raquo; example of an implementation crate][demo-hack-impl]
+//!
+//! Just like you would use a #\[proc_macro\] attribute to define a natively
+//! supported procedural macro, use proc-macro-hack&#39;s #\[proc_macro_hack\]
+//! attribute to define a procedural macro that works in expression position.
+//! The function signature is the same as for ordinary function-like procedural
+//! macros.
+//!
+//! ```
+//! # extern crate proc_macro;
+//! #
+//! use proc_macro::TokenStream;
+//! use proc_macro_hack::proc_macro_hack;
+//! use quote::quote;
+//! use syn::{parse_macro_input, Expr};
+//!
+//! # const IGNORE: &amp;str = stringify! {
+//! #[proc_macro_hack]
+//! # };
+//! pub fn add_one(input: TokenStream) -&gt; TokenStream {
+//!     let expr = parse_macro_input!(input as Expr);
+//!     TokenStream::from(quote! {
+//!         1 + (#expr)
+//!     })
+//! }
+//! #
+//! # fn main() {}
+//! ```
+//!
+//! ## The declaration crate
+//!
+//! This crate is allowed to contain other public things if you need, for
+//! example traits or functions or ordinary macros.
+//!
+//! [&amp;raquo; example of a declaration crate][demo-hack]
+//!
+//! Within the declaration crate there needs to be a re-export of your
+//! procedural macro from the implementation crate. The re-export also carries a
+//! \#\[proc_macro_hack\] attribute.
+//!
+//! ```
+//! use proc_macro_hack::proc_macro_hack;
+//!
+//! /// Add one to an expression.
+//! ///
+//! /// (Documentation goes here on the re-export, not in the other crate.)
+//! #[proc_macro_hack]
+//! pub use demo_hack_impl::add_one;
+//! #
+//! # fn main() {}
+//! ```
+//!
+//! Both crates depend on `proc-macro-hack`:
+//!
+//! ```toml
+//! [dependencies]
+//! proc-macro-hack = &quot;0.5&quot;
+//! ```
+//!
+//! Additionally, your implementation crate (but not your declaration crate) is
+//! a proc macro crate:
+//!
+//! ```toml
+//! [lib]
+//! proc-macro = true
+//! ```
+//!
+//! # Using procedural macros
+//!
+//! Users of your crate depend on your declaration crate (not your
+//! implementation crate), then use your procedural macros as usual.
+//!
+//! [&amp;raquo; example of a downstream crate][example]
+//!
+//! ```
+//! use demo_hack::add_one;
+//!
+//! fn main() {
+//!     let two = 2;
+//!     let nine = add_one!(two) + add_one!(2 + 3);
+//!     println!(&quot;nine = {}&quot;, nine);
+//! }
+//! ```
+//!
+//! [demo-hack-impl]: https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl
+//! [demo-hack]: https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
+//! [example]: https://github.com/dtolnay/proc-macro-hack/tree/master/example
+//!
+//! # Limitations
+//!
+//! - Only proc macros in expression position are supported. Proc macros in
+//!   pattern position ([#20]) are not supported.
+//!
+//! - By default, nested invocations are not supported i.e. the code emitted by
+//!   a proc-macro-hack macro invocation cannot contain recursive calls to the
+//!   same proc-macro-hack macro nor calls to any other proc-macro-hack macros.
+//!   Use [`proc-macro-nested`] if you require support for nested invocations.
+//!
+//! - By default, hygiene is structured such that the expanded code can&#39;t refer
+//!   to local variables other than those passed by name somewhere in the macro
+//!   input. If your macro must refer to *local* variables that don&#39;t get named
+//!   in the macro input, use `#[proc_macro_hack(fake_call_site)]` on the
+//!   re-export in your declaration crate. *Most macros won&#39;t need this.*
+//!
+//! - On compilers that are new enough to natively support proc macros in
+//!   expression position, proc-macro-hack does not automatically use that
+//!   support, since the hygiene can be subtly different between the two
+//!   implementations. To opt in to compiling your macro to native
+//!   `#[proc_macro]` on sufficiently new compilers, use
+//!   `#[proc_macro_hack(only_hack_old_rustc)]` on the re-export in your
+//!   declaration crate.
+//!
+//! [#10]: https://github.com/dtolnay/proc-macro-hack/issues/10
+//! [#20]: https://github.com/dtolnay/proc-macro-hack/issues/20
+//! [`proc-macro-nested`]: https://docs.rs/proc-macro-nested
 
-<span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;512&quot;</span>]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_doctest_main</span>, <span class="ident">clippy::toplevel_ref_arg</span>)]</span>
+</span><span class="attribute">#![recursion_limit = <span class="string">&quot;512&quot;</span>]
+#![allow(clippy::needless_doctest_main, clippy::toplevel_ref_arg)]
 
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+</span><span class="kw">extern crate </span>proc_macro;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">quote</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">mod </span>quote;
 
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">iter</span>;
-<span class="kw">mod</span> <span class="ident">parse</span>;
+<span class="kw">mod </span>error;
+<span class="kw">mod </span>iter;
+<span class="kw">mod </span>parse;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">compile_error</span>, <span class="ident">Error</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::iter::Iter</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parse</span>::{
-    <span class="ident">parse_define_args</span>, <span class="ident">parse_enum_hack</span>, <span class="ident">parse_export_args</span>, <span class="ident">parse_fake_call_site</span>, <span class="ident">parse_input</span>,
+<span class="kw">use </span><span class="kw">crate</span>::error::{compile_error, Error};
+<span class="kw">use </span><span class="kw">crate</span>::iter::Iter;
+<span class="kw">use </span><span class="kw">crate</span>::parse::{
+    parse_define_args, parse_enum_hack, parse_export_args, parse_fake_call_site, parse_input,
 };
-<span class="kw">use</span> <span class="ident">proc_macro</span>::{<span class="ident">Ident</span>, <span class="ident">Punct</span>, <span class="ident">Spacing</span>, <span class="ident">Span</span>, <span class="ident">TokenStream</span>, <span class="ident">TokenTree</span>};
-<span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
+<span class="kw">use </span>proc_macro::{Ident, Punct, Spacing, Span, TokenStream, TokenTree};
+<span class="kw">use </span>std::fmt::Write;
 
-<span class="kw">type</span> <span class="ident">Visibility</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>;
+<span class="kw">type </span>Visibility = <span class="prelude-ty">Option</span>&lt;Ident&gt;;
 
-<span class="kw">enum</span> <span class="ident">Input</span> {
-    <span class="ident">Export</span>(<span class="ident">Export</span>),
-    <span class="ident">Define</span>(<span class="ident">Define</span>),
+<span class="kw">enum </span>Input {
+    Export(Export),
+    Define(Define),
 }
 
-<span class="comment">// pub use demo_hack_impl::{m1, m2 as qrst};</span>
-<span class="kw">struct</span> <span class="ident">Export</span> {
-    <span class="ident">attrs</span>: <span class="ident">TokenStream</span>,
-    <span class="ident">vis</span>: <span class="ident">Visibility</span>,
-    <span class="ident">from</span>: <span class="ident">Ident</span>,
-    <span class="ident">macros</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Macro</span><span class="op">&gt;</span>,
+<span class="comment">// pub use demo_hack_impl::{m1, m2 as qrst};
+</span><span class="kw">struct </span>Export {
+    attrs: TokenStream,
+    vis: Visibility,
+    from: Ident,
+    macros: Vec&lt;Macro&gt;,
 }
 
-<span class="comment">// pub fn m1(input: TokenStream) -&gt; TokenStream { ... }</span>
-<span class="kw">struct</span> <span class="ident">Define</span> {
-    <span class="ident">attrs</span>: <span class="ident">TokenStream</span>,
-    <span class="ident">name</span>: <span class="ident">Ident</span>,
-    <span class="ident">body</span>: <span class="ident">TokenStream</span>,
+<span class="comment">// pub fn m1(input: TokenStream) -&gt; TokenStream { ... }
+</span><span class="kw">struct </span>Define {
+    attrs: TokenStream,
+    name: Ident,
+    body: TokenStream,
 }
 
-<span class="kw">struct</span> <span class="ident">Macro</span> {
-    <span class="ident">name</span>: <span class="ident">Ident</span>,
-    <span class="ident">export_as</span>: <span class="ident">Ident</span>,
+<span class="kw">struct </span>Macro {
+    name: Ident,
+    export_as: Ident,
 }
 
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">proc_macro_hack</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">args</span>);
-    <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">input</span>);
-    <span class="ident">expand_proc_macro_hack</span>(<span class="ident">args</span>, <span class="ident">input</span>).<span class="ident">unwrap_or_else</span>(<span class="ident">compile_error</span>)
+<span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>proc_macro_hack(args: TokenStream, input: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span><span class="kw-2">ref mut </span>args = iter::new(args);
+    <span class="kw">let </span><span class="kw-2">ref mut </span>input = iter::new(input);
+    expand_proc_macro_hack(args, input).unwrap_or_else(compile_error)
 }
 
-<span class="kw">fn</span> <span class="ident">expand_proc_macro_hack</span>(<span class="ident">args</span>: <span class="ident">Iter</span>, <span class="ident">input</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">parse_input</span>(<span class="ident">input</span>)<span class="question-mark">?</span> {
-        <span class="ident">Input::Export</span>(<span class="ident">export</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">parse_export_args</span>(<span class="ident">args</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">expand_export</span>(<span class="ident">export</span>, <span class="ident">args</span>))
+<span class="kw">fn </span>expand_proc_macro_hack(args: Iter, input: Iter) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, Error&gt; {
+    <span class="kw">match </span>parse_input(input)<span class="question-mark">? </span>{
+        Input::Export(export) =&gt; {
+            <span class="kw">let </span>args = parse_export_args(args)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(expand_export(export, args))
         }
-        <span class="ident">Input::Define</span>(<span class="ident">define</span>) =&gt; {
-            <span class="ident">parse_define_args</span>(<span class="ident">args</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">expand_define</span>(<span class="ident">define</span>))
+        Input::Define(define) =&gt; {
+            parse_define_args(args)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(expand_define(define))
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">ProcMacroHack</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_hack</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">input</span>);
-    <span class="ident">parse_enum_hack</span>(<span class="ident">input</span>).<span class="ident">unwrap_or_else</span>(<span class="ident">compile_error</span>)
+<span class="attribute">#[doc(hidden)]
+#[proc_macro_derive(ProcMacroHack)]
+</span><span class="kw">pub fn </span>enum_hack(input: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span><span class="kw-2">ref mut </span>input = iter::new(input);
+    parse_enum_hack(input).unwrap_or_else(compile_error)
 }
 
-<span class="kw">struct</span> <span class="ident">FakeCallSite</span> {
-    <span class="ident">derive</span>: <span class="ident">Ident</span>,
-    <span class="ident">rest</span>: <span class="ident">TokenStream</span>,
+<span class="kw">struct </span>FakeCallSite {
+    derive: Ident,
+    rest: TokenStream,
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fake_call_site</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">args</span>);
-    <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">input</span>);
-    <span class="ident">expand_fake_call_site</span>(<span class="ident">args</span>, <span class="ident">input</span>).<span class="ident">unwrap_or_else</span>(<span class="ident">compile_error</span>)
+<span class="attribute">#[doc(hidden)]
+#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>fake_call_site(args: TokenStream, input: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span><span class="kw-2">ref mut </span>args = iter::new(args);
+    <span class="kw">let </span><span class="kw-2">ref mut </span>input = iter::new(input);
+    expand_fake_call_site(args, input).unwrap_or_else(compile_error)
 }
 
-<span class="kw">fn</span> <span class="ident">expand_fake_call_site</span>(<span class="ident">args</span>: <span class="ident">Iter</span>, <span class="ident">input</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">token</span>) =&gt; <span class="ident">token</span>.<span class="ident">span</span>(),
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>.<span class="ident">collect</span>()),
+<span class="kw">fn </span>expand_fake_call_site(args: Iter, input: Iter) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, Error&gt; {
+    <span class="kw">let </span>span = <span class="kw">match </span>args.next() {
+        <span class="prelude-val">Some</span>(token) =&gt; token.span(),
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(input.collect()),
     };
 
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">parse_fake_call_site</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">derive</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">derive</span>;
-    <span class="ident">derive</span>.<span class="ident">set_span</span>(<span class="ident">span</span>);
-    <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">rest</span>;
+    <span class="kw">let </span>input = parse_fake_call_site(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>derive = input.derive;
+    derive.set_span(span);
+    <span class="kw">let </span>rest = input.rest;
 
-    <span class="prelude-val">Ok</span>(<span class="macro">quote!</span> {
-        <span class="attribute">#[<span class="ident">derive</span>(#<span class="ident">derive</span>)]</span>
-        #<span class="ident">rest</span>
+    <span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
+        <span class="attribute">#[derive(#derive)]
+        </span>#rest
     })
 }
 
-<span class="kw">struct</span> <span class="ident">ExportArgs</span> {
-    <span class="ident">support_nested</span>: <span class="ident">bool</span>,
-    <span class="ident">internal_macro_calls</span>: <span class="ident">u16</span>,
-    <span class="ident">fake_call_site</span>: <span class="ident">bool</span>,
-    <span class="ident">only_hack_old_rustc</span>: <span class="ident">bool</span>,
+<span class="kw">struct </span>ExportArgs {
+    support_nested: bool,
+    internal_macro_calls: u16,
+    fake_call_site: bool,
+    only_hack_old_rustc: bool,
 }
 
-<span class="kw">fn</span> <span class="ident">expand_export</span>(<span class="ident">export</span>: <span class="ident">Export</span>, <span class="ident">args</span>: <span class="ident">ExportArgs</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">only_hack_old_rustc</span> <span class="op">&amp;&amp;</span> <span class="macro">cfg!</span>(<span class="ident">not</span>(<span class="ident">need_proc_macro_hack</span>)) {
-        <span class="kw">return</span> <span class="ident">expand_export_nohack</span>(<span class="ident">export</span>);
+<span class="kw">fn </span>expand_export(export: Export, args: ExportArgs) -&gt; TokenStream {
+    <span class="kw">if </span>args.only_hack_old_rustc &amp;&amp; <span class="macro">cfg!</span>(not(need_proc_macro_hack)) {
+        <span class="kw">return </span>expand_export_nohack(export);
     }
 
-    <span class="kw">let</span> <span class="ident">dummy</span> <span class="op">=</span> <span class="ident">dummy_name_for_export</span>(<span class="kw-2">&amp;</span><span class="ident">export</span>);
+    <span class="kw">let </span>dummy = dummy_name_for_export(<span class="kw-2">&amp;</span>export);
 
-    <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">attrs</span>;
-    <span class="kw">let</span> <span class="ident">vis</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">vis</span>;
-    <span class="kw">let</span> <span class="ident">macro_export</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">vis</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="macro">quote!</span>(<span class="attribute">#[<span class="ident">macro_export</span>]</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="macro">quote!</span>(),
+    <span class="kw">let </span>attrs = export.attrs;
+    <span class="kw">let </span>vis = export.vis;
+    <span class="kw">let </span>macro_export = <span class="kw">match </span>vis {
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="macro">quote!</span>(<span class="attribute">#[macro_export]</span>),
+        <span class="prelude-val">None </span>=&gt; <span class="macro">quote!</span>(),
     };
-    <span class="kw">let</span> <span class="ident">crate_prefix</span> <span class="op">=</span> <span class="ident">vis</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">quote!</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span>::));
-    <span class="kw">let</span> <span class="macro-nonterminal">enum_variant</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">support_nested</span> {
-        <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">internal_macro_calls</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">Ident::new</span>(<span class="string">&quot;Nested&quot;</span>, <span class="ident">Span::call_site</span>())
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Nested{}&quot;</span>, <span class="ident">args</span>.<span class="ident">internal_macro_calls</span>);
-            <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">Span::call_site</span>())
+    <span class="kw">let </span>crate_prefix = vis.as_ref().map(|<span class="kw">_</span>| <span class="macro">quote!</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span>::));
+    <span class="kw">let </span><span class="macro-nonterminal">enum_variant </span>= <span class="kw">if </span>args.support_nested {
+        <span class="kw">if </span>args.internal_macro_calls == <span class="number">0 </span>{
+            Ident::new(<span class="string">&quot;Nested&quot;</span>, Span::call_site())
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;Nested{}&quot;</span>, args.internal_macro_calls);
+            Ident::new(<span class="kw-2">&amp;</span>name, Span::call_site())
         }
-    } <span class="kw">else</span> {
-        <span class="ident">Ident::new</span>(<span class="string">&quot;Value&quot;</span>, <span class="ident">Span::call_site</span>())
+    } <span class="kw">else </span>{
+        Ident::new(<span class="string">&quot;Value&quot;</span>, Span::call_site())
     };
 
-    <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">from</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual_names</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">export_dispatch</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">export_call_site</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">macro_rules</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
-    <span class="kw">for</span> <span class="ident">Macro</span> { <span class="ident">name</span>, <span class="ident">export_as</span> } <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">export</span>.<span class="ident">macros</span> {
-        <span class="kw">let</span> <span class="ident">hacked</span> <span class="op">=</span> <span class="ident">hacked_proc_macro_name</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>);
-        <span class="kw">let</span> <span class="ident">dispatch</span> <span class="op">=</span> <span class="ident">dispatch_macro_name</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>);
-        <span class="kw">let</span> <span class="ident">call_site</span> <span class="op">=</span> <span class="ident">call_site_macro_name</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>);
+    <span class="kw">let </span>from = export.from;
+    <span class="kw">let </span><span class="kw-2">mut </span>actual_names = TokenStream::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>export_dispatch = TokenStream::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>export_call_site = TokenStream::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>macro_rules = TokenStream::new();
+    <span class="kw">for </span>Macro { name, export_as } <span class="kw">in </span><span class="kw-2">&amp;</span>export.macros {
+        <span class="kw">let </span>hacked = hacked_proc_macro_name(<span class="kw-2">&amp;</span>name);
+        <span class="kw">let </span>dispatch = dispatch_macro_name(<span class="kw-2">&amp;</span>name);
+        <span class="kw">let </span>call_site = call_site_macro_name(<span class="kw-2">&amp;</span>name);
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">actual_names</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">actual_names</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(,));
+        <span class="kw">if </span>!actual_names.is_empty() {
+            actual_names.extend(<span class="macro">quote!</span>(,));
         }
-        <span class="ident">actual_names</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">hacked</span>));
+        actual_names.extend(<span class="macro">quote!</span>(#hacked));
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">export_dispatch</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">export_dispatch</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(,));
+        <span class="kw">if </span>!export_dispatch.is_empty() {
+            export_dispatch.extend(<span class="macro">quote!</span>(,));
         }
-        <span class="ident">export_dispatch</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(<span class="ident">dispatch</span> <span class="kw">as</span> #<span class="ident">dispatch</span>));
+        export_dispatch.extend(<span class="macro">quote!</span>(dispatch <span class="kw">as </span>#dispatch));
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">export_call_site</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">export_call_site</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(,));
+        <span class="kw">if </span>!export_call_site.is_empty() {
+            export_call_site.extend(<span class="macro">quote!</span>(,));
         }
-        <span class="ident">export_call_site</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(<span class="ident">fake_call_site</span> <span class="kw">as</span> #<span class="ident">call_site</span>));
+        export_call_site.extend(<span class="macro">quote!</span>(fake_call_site <span class="kw">as </span>#call_site));
 
-        <span class="kw">let</span> <span class="ident">do_derive</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">args</span>.<span class="ident">fake_call_site</span> {
-            <span class="macro">quote!</span> {
-                <span class="attribute">#[<span class="ident">derive</span>(#<span class="ident">crate_prefix</span> #<span class="ident">hacked</span>)]</span>
-            }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">crate_prefix</span>.<span class="ident">is_some</span>() {
-            <span class="macro">quote!</span> {
-                <span class="kw">use</span> #<span class="ident">crate_prefix</span> #<span class="ident">hacked</span>;
-                <span class="attribute">#[#<span class="ident">crate_prefix</span> #<span class="ident">call_site</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">proc_macro</span>)<span class="kw-2">*</span>)]</span>
-                <span class="attribute">#[<span class="ident">derive</span>(#<span class="ident">hacked</span>)]</span>
-            }
-        } <span class="kw">else</span> {
-            <span class="macro">quote!</span> {
-                <span class="attribute">#[#<span class="ident">call_site</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">proc_macro</span>)<span class="kw-2">*</span>)]</span>
-                <span class="attribute">#[<span class="ident">derive</span>(#<span class="ident">hacked</span>)]</span>
-            }
+        <span class="kw">let </span>do_derive = <span class="kw">if </span>!args.fake_call_site {
+            <span class="macro">quote! </span>{
+                <span class="attribute">#[derive(#crate_prefix #hacked)]
+            </span>}
+        } <span class="kw">else if </span>crate_prefix.is_some() {
+            <span class="macro">quote! </span>{
+                <span class="kw">use </span>#crate_prefix #hacked;
+                <span class="attribute">#[#crate_prefix #call_site ($(<span class="macro-nonterminal">$proc_macro</span>)<span class="kw-2">*</span>)]
+                #[derive(#hacked)]
+            </span>}
+        } <span class="kw">else </span>{
+            <span class="macro">quote! </span>{
+                <span class="attribute">#[#call_site ($(<span class="macro-nonterminal">$proc_macro</span>)<span class="kw-2">*</span>)]
+                #[derive(#hacked)]
+            </span>}
         };
 
-        <span class="kw">let</span> <span class="ident">proc_macro_call</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">support_nested</span> {
-            <span class="kw">let</span> <span class="ident">extra_bangs</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">args</span>.<span class="ident">internal_macro_calls</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">TokenTree::Punct</span>(<span class="ident">Punct::new</span>(<span class="string">&#39;!&#39;</span>, <span class="ident">Spacing::Alone</span>)))
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span>();
-            <span class="macro">quote!</span> {
-                #<span class="ident">crate_prefix</span> #<span class="macro">dispatch!</span> { ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">proc_macro</span>)<span class="kw-2">*</span>) #<span class="ident">extra_bangs</span> }
+        <span class="kw">let </span>proc_macro_call = <span class="kw">if </span>args.support_nested {
+            <span class="kw">let </span>extra_bangs = (<span class="number">0</span>..args.internal_macro_calls)
+                .map(|<span class="kw">_</span>| TokenTree::Punct(Punct::new(<span class="string">&#39;!&#39;</span>, Spacing::Alone)))
+                .collect::&lt;TokenStream&gt;();
+            <span class="macro">quote! </span>{
+                #crate_prefix #<span class="macro">dispatch! </span>{ ($(<span class="macro-nonterminal">$proc_macro</span>)<span class="kw-2">*</span>) #extra_bangs }
             }
-        } <span class="kw">else</span> {
-            <span class="macro">quote!</span> {
+        } <span class="kw">else </span>{
+            <span class="macro">quote! </span>{
                 <span class="macro">proc_macro_call!</span>()
             }
         };
 
-        <span class="ident">macro_rules</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
-            #<span class="ident">attrs</span>
-            #<span class="ident">macro_export</span>
-            <span class="macro">macro_rules!</span> #<span class="ident">export_as</span> {
-                ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">proc_macro</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {{
-                    #<span class="ident">do_derive</span>
-                    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-                    <span class="kw">enum</span> <span class="ident">ProcMacroHack</span> {
-                        #<span class="ident">enum_variant</span> <span class="op">=</span> (<span class="macro">stringify!</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">proc_macro</span>)<span class="op">*</span> }, <span class="number">0</span>).<span class="number">1</span>,
+        macro_rules.extend(<span class="macro">quote! </span>{
+            #attrs
+            #macro_export
+            <span class="macro">macro_rules! </span>#export_as {
+                ($(<span class="macro-nonterminal">$proc_macro</span>:tt)<span class="kw-2">*</span>) =&gt; {{
+                    #do_derive
+                    <span class="attribute">#[allow(dead_code)]
+                    </span><span class="kw">enum </span>ProcMacroHack {
+                        #enum_variant = (<span class="macro">stringify! </span>{ $(<span class="macro-nonterminal">$proc_macro</span>)* }, <span class="number">0</span>).<span class="number">1</span>,
                     }
-                    #<span class="ident">proc_macro_call</span>
+                    #proc_macro_call
                 }};
             }
         });
     }
 
-    <span class="kw">if</span> <span class="ident">export</span>.<span class="ident">macros</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-        <span class="ident">export_dispatch</span> <span class="op">=</span> <span class="macro">quote!</span>({#<span class="ident">export_dispatch</span>});
-        <span class="ident">export_call_site</span> <span class="op">=</span> <span class="macro">quote!</span>({#<span class="ident">export_call_site</span>});
-        <span class="ident">actual_names</span> <span class="op">=</span> <span class="macro">quote!</span>({#<span class="ident">actual_names</span>});
+    <span class="kw">if </span>export.macros.len() != <span class="number">1 </span>{
+        export_dispatch = <span class="macro">quote!</span>({#export_dispatch});
+        export_call_site = <span class="macro">quote!</span>({#export_call_site});
+        actual_names = <span class="macro">quote!</span>({#actual_names});
     }
 
-    <span class="kw">let</span> <span class="ident">export_dispatch</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">support_nested</span> {
-        <span class="macro">quote!</span> {
-            <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-            #<span class="ident">vis</span> <span class="kw">use</span> <span class="ident">proc_macro_nested</span>::#<span class="ident">export_dispatch</span>;
+    <span class="kw">let </span>export_dispatch = <span class="kw">if </span>args.support_nested {
+        <span class="macro">quote! </span>{
+            <span class="attribute">#[doc(hidden)]
+            </span>#vis <span class="kw">use </span>proc_macro_nested::#export_dispatch;
         }
-    } <span class="kw">else</span> {
+    } <span class="kw">else </span>{
         <span class="macro">quote!</span>()
     };
 
-    <span class="kw">let</span> <span class="ident">export_call_site</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">fake_call_site</span> {
-        <span class="macro">quote!</span> {
-            <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-            #<span class="ident">vis</span> <span class="kw">use</span> <span class="ident">proc_macro_hack</span>::#<span class="ident">export_call_site</span>;
+    <span class="kw">let </span>export_call_site = <span class="kw">if </span>args.fake_call_site {
+        <span class="macro">quote! </span>{
+            <span class="attribute">#[doc(hidden)]
+            </span>#vis <span class="kw">use </span>proc_macro_hack::#export_call_site;
         }
-    } <span class="kw">else</span> {
+    } <span class="kw">else </span>{
         <span class="macro">quote!</span>()
     };
 
-    <span class="kw">let</span> <span class="ident">expanded</span> <span class="op">=</span> <span class="macro">quote!</span> {
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        #<span class="ident">vis</span> <span class="kw">use</span> #<span class="ident">from</span>::#<span class="ident">actual_names</span>;
+    <span class="kw">let </span>expanded = <span class="macro">quote! </span>{
+        <span class="attribute">#[doc(hidden)]
+        </span>#vis <span class="kw">use </span>#from::#actual_names;
 
-        #<span class="ident">export_dispatch</span>
-        #<span class="ident">export_call_site</span>
+        #export_dispatch
+        #export_call_site
 
-        #<span class="ident">macro_rules</span>
+        #macro_rules
     };
 
-    <span class="ident">wrap_in_enum_hack</span>(<span class="ident">dummy</span>, <span class="ident">expanded</span>)
+    wrap_in_enum_hack(dummy, expanded)
 }
 
-<span class="kw">fn</span> <span class="ident">expand_export_nohack</span>(<span class="ident">export</span>: <span class="ident">Export</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">attrs</span>;
-    <span class="kw">let</span> <span class="ident">vis</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">vis</span>;
-    <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">from</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
+<span class="kw">fn </span>expand_export_nohack(export: Export) -&gt; TokenStream {
+    <span class="kw">let </span>attrs = export.attrs;
+    <span class="kw">let </span>vis = export.vis;
+    <span class="kw">let </span>from = export.from;
+    <span class="kw">let </span><span class="kw-2">mut </span>names = TokenStream::new();
 
-    <span class="kw">for</span> <span class="ident">Macro</span> { <span class="ident">name</span>, <span class="ident">export_as</span> } <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">export</span>.<span class="ident">macros</span> {
-        <span class="kw">let</span> <span class="ident">pub_name</span> <span class="op">=</span> <span class="ident">pub_proc_macro_name</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">names</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">names</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(,));
+    <span class="kw">for </span>Macro { name, export_as } <span class="kw">in </span><span class="kw-2">&amp;</span>export.macros {
+        <span class="kw">let </span>pub_name = pub_proc_macro_name(<span class="kw-2">&amp;</span>name);
+        <span class="kw">if </span>!names.is_empty() {
+            names.extend(<span class="macro">quote!</span>(,));
         }
-        <span class="ident">names</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">pub_name</span> <span class="kw">as</span> #<span class="ident">export_as</span>));
+        names.extend(<span class="macro">quote!</span>(#pub_name <span class="kw">as </span>#export_as));
     }
 
-    <span class="kw">if</span> <span class="ident">export</span>.<span class="ident">macros</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-        <span class="ident">names</span> <span class="op">=</span> <span class="macro">quote!</span>({#<span class="ident">names</span>});
+    <span class="kw">if </span>export.macros.len() != <span class="number">1 </span>{
+        names = <span class="macro">quote!</span>({#names});
     }
 
-    <span class="macro">quote!</span> {
-        #<span class="ident">attrs</span>
-        #<span class="ident">vis</span> <span class="kw">use</span> #<span class="ident">from</span>::#<span class="ident">names</span>;
+    <span class="macro">quote! </span>{
+        #attrs
+        #vis <span class="kw">use </span>#from::#names;
     }
 }
 
-<span class="kw">fn</span> <span class="ident">expand_define</span>(<span class="ident">define</span>: <span class="ident">Define</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">define</span>.<span class="ident">attrs</span>;
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">define</span>.<span class="ident">name</span>;
-    <span class="kw">let</span> <span class="ident">pub_name</span> <span class="op">=</span> <span class="ident">pub_proc_macro_name</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>);
-    <span class="kw">let</span> <span class="ident">hacked</span> <span class="op">=</span> <span class="ident">hacked_proc_macro_name</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>);
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">define</span>.<span class="ident">body</span>;
+<span class="kw">fn </span>expand_define(define: Define) -&gt; TokenStream {
+    <span class="kw">let </span>attrs = define.attrs;
+    <span class="kw">let </span>name = define.name;
+    <span class="kw">let </span>pub_name = pub_proc_macro_name(<span class="kw-2">&amp;</span>name);
+    <span class="kw">let </span>hacked = hacked_proc_macro_name(<span class="kw-2">&amp;</span>name);
+    <span class="kw">let </span>body = define.body;
 
-    <span class="macro">quote!</span> {
-        <span class="kw">mod</span> #<span class="ident">pub_name</span> {
-            <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
-            <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::proc_macro</span>::<span class="kw-2">*</span>;
+    <span class="macro">quote! </span>{
+        <span class="kw">mod </span>#pub_name {
+            <span class="kw">extern crate </span>proc_macro;
+            <span class="kw">pub use </span><span class="self">self</span>::proc_macro::<span class="kw-2">*</span>;
         }
 
-        #<span class="ident">attrs</span>
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="attribute">#[<span class="ident">proc_macro_derive</span>(#<span class="ident">hacked</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">hacked</span>(<span class="ident">input</span>: #<span class="ident">pub_name::TokenStream</span>) -&gt; #<span class="ident">pub_name::TokenStream</span> {
-            <span class="kw">use</span> <span class="ident">std::iter::FromIterator</span>;
+        #attrs
+        <span class="attribute">#[doc(hidden)]
+        #[proc_macro_derive(#hacked)]
+        </span><span class="kw">pub fn </span>#hacked(input: #pub_name::TokenStream) -&gt; #pub_name::TokenStream {
+            <span class="kw">use </span>std::iter::FromIterator;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">into_iter</span>();
-            <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(); <span class="comment">// `enum`</span>
-            <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(); <span class="comment">// `ProcMacroHack`</span>
-            <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(); <span class="comment">// `#`</span>
-            <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(); <span class="comment">// `[allow(dead_code)]`</span>
+            <span class="kw">let </span><span class="kw-2">mut </span>iter = input.into_iter();
+            iter.next().unwrap(); <span class="comment">// `enum`
+            </span>iter.next().unwrap(); <span class="comment">// `ProcMacroHack`
+            </span>iter.next().unwrap(); <span class="comment">// `#`
+            </span>iter.next().unwrap(); <span class="comment">// `[allow(dead_code)]`
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">braces</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>() {
-                #<span class="ident">pub_name::TokenTree::Group</span>(<span class="ident">group</span>) =&gt; <span class="ident">group</span>.<span class="ident">stream</span>().<span class="ident">into_iter</span>(),
-                <span class="kw">_</span> =&gt; <span class="macro">unimplemented!</span>(),
+            </span><span class="kw">let </span><span class="kw-2">mut </span>braces = <span class="kw">match </span>iter.next().unwrap() {
+                #pub_name::TokenTree::Group(group) =&gt; group.stream().into_iter(),
+                <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(),
             };
-            <span class="kw">let</span> <span class="ident">variant</span> <span class="op">=</span> <span class="ident">braces</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(); <span class="comment">// `Value` or `Nested`</span>
-            <span class="kw">let</span> <span class="ident">varname</span> <span class="op">=</span> <span class="ident">variant</span>.<span class="ident">to_string</span>();
-            <span class="kw">let</span> <span class="ident">support_nested</span> <span class="op">=</span> <span class="ident">varname</span>.<span class="ident">starts_with</span>(<span class="string">&quot;Nested&quot;</span>);
-            <span class="ident">braces</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(); <span class="comment">// `=`</span>
+            <span class="kw">let </span>variant = braces.next().unwrap(); <span class="comment">// `Value` or `Nested`
+            </span><span class="kw">let </span>varname = variant.to_string();
+            <span class="kw">let </span>support_nested = varname.starts_with(<span class="string">&quot;Nested&quot;</span>);
+            braces.next().unwrap(); <span class="comment">// `=`
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parens</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">braces</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>() {
-                #<span class="ident">pub_name::TokenTree::Group</span>(<span class="ident">group</span>) =&gt; <span class="ident">group</span>.<span class="ident">stream</span>().<span class="ident">into_iter</span>(),
-                <span class="kw">_</span> =&gt; <span class="macro">unimplemented!</span>(),
+            </span><span class="kw">let </span><span class="kw-2">mut </span>parens = <span class="kw">match </span>braces.next().unwrap() {
+                #pub_name::TokenTree::Group(group) =&gt; group.stream().into_iter(),
+                <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(),
             };
-            <span class="ident">parens</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(); <span class="comment">// `stringify`</span>
-            <span class="ident">parens</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(); <span class="comment">// `!`</span>
+            parens.next().unwrap(); <span class="comment">// `stringify`
+            </span>parens.next().unwrap(); <span class="comment">// `!`
 
-            <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parens</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>() {
-                #<span class="ident">pub_name::TokenTree::Group</span>(<span class="ident">group</span>) =&gt; <span class="ident">group</span>.<span class="ident">stream</span>(),
-                <span class="kw">_</span> =&gt; <span class="macro">unimplemented!</span>(),
+            </span><span class="kw">let </span>inner = <span class="kw">match </span>parens.next().unwrap() {
+                #pub_name::TokenTree::Group(group) =&gt; group.stream(),
+                <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(),
             };
 
-            <span class="kw">let</span> <span class="ident">output</span>: #<span class="ident">pub_name::TokenStream</span> <span class="op">=</span> #<span class="ident">name</span>(<span class="ident">inner</span>.<span class="ident">clone</span>());
+            <span class="kw">let </span>output: #pub_name::TokenStream = #name(inner.clone());
 
-            <span class="kw">fn</span> <span class="ident">count_bangs</span>(<span class="ident">input</span>: #<span class="ident">pub_name::TokenStream</span>) -&gt; <span class="ident">usize</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">for</span> <span class="ident">token</span> <span class="kw">in</span> <span class="ident">input</span> {
-                    <span class="kw">match</span> <span class="ident">token</span> {
-                        #<span class="ident">pub_name::TokenTree::Punct</span>(<span class="ident">punct</span>) =&gt; {
-                            <span class="kw">if</span> <span class="ident">punct</span>.<span class="ident">as_char</span>() <span class="op">==</span> <span class="string">&#39;!&#39;</span> {
-                                <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">fn </span>count_bangs(input: #pub_name::TokenStream) -&gt; usize {
+                <span class="kw">let </span><span class="kw-2">mut </span>count = <span class="number">0</span>;
+                <span class="kw">for </span>token <span class="kw">in </span>input {
+                    <span class="kw">match </span>token {
+                        #pub_name::TokenTree::Punct(punct) =&gt; {
+                            <span class="kw">if </span>punct.as_char() == <span class="string">&#39;!&#39; </span>{
+                                count += <span class="number">1</span>;
                             }
                         }
-                        #<span class="ident">pub_name::TokenTree::Group</span>(<span class="ident">group</span>) =&gt; {
-                            <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">count_bangs</span>(<span class="ident">group</span>.<span class="ident">stream</span>());
+                        #pub_name::TokenTree::Group(group) =&gt; {
+                            count += count_bangs(group.stream());
                         }
-                        <span class="kw">_</span> =&gt; {}
+                        <span class="kw">_ </span>=&gt; {}
                     }
                 }
-                <span class="ident">count</span>
+                count
             }
 
-            <span class="comment">// macro_rules! proc_macro_call {</span>
-            <span class="comment">//     () =&gt; { #output }</span>
-            <span class="comment">// }</span>
-            #<span class="ident">pub_name::TokenStream::from_iter</span>(<span class="macro">vec!</span>[
-                #<span class="ident">pub_name::TokenTree::Ident</span>(
-                    #<span class="ident">pub_name::Ident::new</span>(<span class="string">&quot;macro_rules&quot;</span>, #<span class="ident">pub_name::Span::call_site</span>()),
+            <span class="comment">// macro_rules! proc_macro_call {
+            //     () =&gt; { #output }
+            // }
+            </span>#pub_name::TokenStream::from_iter(<span class="macro">vec!</span>[
+                #pub_name::TokenTree::Ident(
+                    #pub_name::Ident::new(<span class="string">&quot;macro_rules&quot;</span>, #pub_name::Span::call_site()),
                 ),
-                #<span class="ident">pub_name::TokenTree::Punct</span>(
-                    #<span class="ident">pub_name::Punct::new</span>(<span class="string">&#39;!&#39;</span>, #<span class="ident">pub_name::Spacing::Alone</span>),
+                #pub_name::TokenTree::Punct(
+                    #pub_name::Punct::new(<span class="string">&#39;!&#39;</span>, #pub_name::Spacing::Alone),
                 ),
-                #<span class="ident">pub_name::TokenTree::Ident</span>(
-                    #<span class="ident">pub_name::Ident::new</span>(
-                        <span class="kw-2">&amp;</span><span class="kw">if</span> <span class="ident">support_nested</span> {
-                            <span class="kw">let</span> <span class="ident">extra_bangs</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">varname</span> <span class="op">==</span> <span class="string">&quot;Nested&quot;</span> {
-                                <span class="number">0</span>
-                            } <span class="kw">else</span> {
-                                <span class="ident">varname</span>[<span class="string">&quot;Nested&quot;</span>.<span class="ident">len</span>()..].<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+                #pub_name::TokenTree::Ident(
+                    #pub_name::Ident::new(
+                        <span class="kw-2">&amp;</span><span class="kw">if </span>support_nested {
+                            <span class="kw">let </span>extra_bangs = <span class="kw">if </span>varname == <span class="string">&quot;Nested&quot; </span>{
+                                <span class="number">0
+                            </span>} <span class="kw">else </span>{
+                                varname[<span class="string">&quot;Nested&quot;</span>.len()..].parse().unwrap()
                             };
-                            <span class="macro">format!</span>(<span class="string">&quot;proc_macro_call_{}&quot;</span>, <span class="ident">extra_bangs</span> <span class="op">+</span> <span class="ident">count_bangs</span>(<span class="ident">inner</span>))
-                        } <span class="kw">else</span> {
-                            <span class="ident">String::from</span>(<span class="string">&quot;proc_macro_call&quot;</span>)
+                            <span class="macro">format!</span>(<span class="string">&quot;proc_macro_call_{}&quot;</span>, extra_bangs + count_bangs(inner))
+                        } <span class="kw">else </span>{
+                            String::from(<span class="string">&quot;proc_macro_call&quot;</span>)
                         },
-                        #<span class="ident">pub_name::Span::call_site</span>(),
+                        #pub_name::Span::call_site(),
                     ),
                 ),
-                #<span class="ident">pub_name::TokenTree::Group</span>(
-                    #<span class="ident">pub_name::Group::new</span>(#<span class="ident">pub_name::Delimiter::Brace</span>, #<span class="ident">pub_name::TokenStream::from_iter</span>(<span class="macro">vec!</span>[
-                        #<span class="ident">pub_name::TokenTree::Group</span>(
-                            #<span class="ident">pub_name::Group::new</span>(#<span class="ident">pub_name::Delimiter::Parenthesis</span>, #<span class="ident">pub_name::TokenStream::new</span>()),
+                #pub_name::TokenTree::Group(
+                    #pub_name::Group::new(#pub_name::Delimiter::Brace, #pub_name::TokenStream::from_iter(<span class="macro">vec!</span>[
+                        #pub_name::TokenTree::Group(
+                            #pub_name::Group::new(#pub_name::Delimiter::Parenthesis, #pub_name::TokenStream::new()),
                         ),
-                        #<span class="ident">pub_name::TokenTree::Punct</span>(
-                            #<span class="ident">pub_name::Punct::new</span>(<span class="string">&#39;=&#39;</span>, #<span class="ident">pub_name::Spacing::Joint</span>),
+                        #pub_name::TokenTree::Punct(
+                            #pub_name::Punct::new(<span class="string">&#39;=&#39;</span>, #pub_name::Spacing::Joint),
                         ),
-                        #<span class="ident">pub_name::TokenTree::Punct</span>(
-                            #<span class="ident">pub_name::Punct::new</span>(<span class="string">&#39;&gt;&#39;</span>, #<span class="ident">pub_name::Spacing::Alone</span>),
+                        #pub_name::TokenTree::Punct(
+                            #pub_name::Punct::new(<span class="string">&#39;&gt;&#39;</span>, #pub_name::Spacing::Alone),
                         ),
-                        #<span class="ident">pub_name::TokenTree::Group</span>(
-                            #<span class="ident">pub_name::Group::new</span>(#<span class="ident">pub_name::Delimiter::Brace</span>, <span class="ident">output</span>),
+                        #pub_name::TokenTree::Group(
+                            #pub_name::Group::new(#pub_name::Delimiter::Brace, output),
                         ),
                     ])),
                 ),
             ])
         }
 
-        #<span class="ident">attrs</span>
-        <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">pub_name</span>(<span class="ident">input</span>: #<span class="ident">pub_name::TokenStream</span>) -&gt; #<span class="ident">pub_name::TokenStream</span> {
-            #<span class="ident">name</span>(<span class="ident">input</span>)
+        #attrs
+        <span class="attribute">#[proc_macro]
+        </span><span class="kw">pub fn </span>#pub_name(input: #pub_name::TokenStream) -&gt; #pub_name::TokenStream {
+            #name(input)
         }
 
-        <span class="kw">fn</span> #<span class="ident">name</span> #<span class="ident">body</span>
+        <span class="kw">fn </span>#name #body
     }
 }
 
-<span class="kw">fn</span> <span class="ident">pub_proc_macro_name</span>(<span class="ident">conceptual</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) -&gt; <span class="ident">Ident</span> {
-    <span class="ident">Ident::new</span>(
-        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;proc_macro_hack_{}&quot;</span>, <span class="ident">conceptual</span>),
-        <span class="ident">conceptual</span>.<span class="ident">span</span>(),
+<span class="kw">fn </span>pub_proc_macro_name(conceptual: <span class="kw-2">&amp;</span>Ident) -&gt; Ident {
+    Ident::new(
+        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;proc_macro_hack_{}&quot;</span>, conceptual),
+        conceptual.span(),
     )
 }
 
-<span class="kw">fn</span> <span class="ident">hacked_proc_macro_name</span>(<span class="ident">conceptual</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) -&gt; <span class="ident">Ident</span> {
-    <span class="ident">Ident::new</span>(
-        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;_proc_macro_hack_{}&quot;</span>, <span class="ident">conceptual</span>),
-        <span class="ident">conceptual</span>.<span class="ident">span</span>(),
+<span class="kw">fn </span>hacked_proc_macro_name(conceptual: <span class="kw-2">&amp;</span>Ident) -&gt; Ident {
+    Ident::new(
+        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;_proc_macro_hack_{}&quot;</span>, conceptual),
+        conceptual.span(),
     )
 }
 
-<span class="kw">fn</span> <span class="ident">dispatch_macro_name</span>(<span class="ident">conceptual</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) -&gt; <span class="ident">Ident</span> {
-    <span class="ident">Ident::new</span>(
-        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;proc_macro_call_{}&quot;</span>, <span class="ident">conceptual</span>),
-        <span class="ident">conceptual</span>.<span class="ident">span</span>(),
+<span class="kw">fn </span>dispatch_macro_name(conceptual: <span class="kw-2">&amp;</span>Ident) -&gt; Ident {
+    Ident::new(
+        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;proc_macro_call_{}&quot;</span>, conceptual),
+        conceptual.span(),
     )
 }
 
-<span class="kw">fn</span> <span class="ident">call_site_macro_name</span>(<span class="ident">conceptual</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) -&gt; <span class="ident">Ident</span> {
-    <span class="ident">Ident::new</span>(
-        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;proc_macro_fake_call_site_{}&quot;</span>, <span class="ident">conceptual</span>),
-        <span class="ident">conceptual</span>.<span class="ident">span</span>(),
+<span class="kw">fn </span>call_site_macro_name(conceptual: <span class="kw-2">&amp;</span>Ident) -&gt; Ident {
+    Ident::new(
+        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;proc_macro_fake_call_site_{}&quot;</span>, conceptual),
+        conceptual.span(),
     )
 }
 
-<span class="kw">fn</span> <span class="ident">dummy_name_for_export</span>(<span class="ident">export</span>: <span class="kw-2">&amp;</span><span class="ident">Export</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dummy</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">unraw</span>(<span class="kw-2">&amp;</span><span class="ident">export</span>.<span class="ident">from</span>).<span class="ident">to_string</span>();
-    <span class="macro">write!</span>(<span class="ident">dummy</span>, <span class="string">&quot;_{}{}&quot;</span>, <span class="ident">from</span>.<span class="ident">len</span>(), <span class="ident">from</span>).<span class="ident">unwrap</span>();
-    <span class="kw">for</span> <span class="ident">m</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">export</span>.<span class="ident">macros</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">unraw</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">name</span>).<span class="ident">to_string</span>();
-        <span class="macro">write!</span>(<span class="ident">dummy</span>, <span class="string">&quot;_{}{}&quot;</span>, <span class="ident">name</span>.<span class="ident">len</span>(), <span class="ident">name</span>).<span class="ident">unwrap</span>();
+<span class="kw">fn </span>dummy_name_for_export(export: <span class="kw-2">&amp;</span>Export) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>dummy = String::new();
+    <span class="kw">let </span>from = unraw(<span class="kw-2">&amp;</span>export.from).to_string();
+    <span class="macro">write!</span>(dummy, <span class="string">&quot;_{}{}&quot;</span>, from.len(), from).unwrap();
+    <span class="kw">for </span>m <span class="kw">in </span><span class="kw-2">&amp;</span>export.macros {
+        <span class="kw">let </span>name = unraw(<span class="kw-2">&amp;</span>m.name).to_string();
+        <span class="macro">write!</span>(dummy, <span class="string">&quot;_{}{}&quot;</span>, name.len(), name).unwrap();
     }
-    <span class="ident">dummy</span>
+    dummy
 }
 
-<span class="kw">fn</span> <span class="ident">unraw</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) -&gt; <span class="ident">Ident</span> {
-    <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">ident</span>.<span class="ident">to_string</span>();
-    <span class="kw">if</span> <span class="ident">string</span>.<span class="ident">starts_with</span>(<span class="string">&quot;r#&quot;</span>) {
-        <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">string</span>[<span class="number">2</span>..], <span class="ident">ident</span>.<span class="ident">span</span>())
-    } <span class="kw">else</span> {
-        <span class="ident">ident</span>.<span class="ident">clone</span>()
+<span class="kw">fn </span>unraw(ident: <span class="kw-2">&amp;</span>Ident) -&gt; Ident {
+    <span class="kw">let </span>string = ident.to_string();
+    <span class="kw">if </span>string.starts_with(<span class="string">&quot;r#&quot;</span>) {
+        Ident::new(<span class="kw-2">&amp;</span>string[<span class="number">2</span>..], ident.span())
+    } <span class="kw">else </span>{
+        ident.clone()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">wrap_in_enum_hack</span>(<span class="ident">dummy</span>: <span class="ident">String</span>, <span class="ident">inner</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">dummy</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">dummy</span>, <span class="ident">Span::call_site</span>());
-    <span class="macro">quote!</span> {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">proc_macro_hack::ProcMacroHack</span>)]</span>
-        <span class="kw">enum</span> #<span class="ident">dummy</span> {
-            <span class="ident">Value</span> <span class="op">=</span> (<span class="macro">stringify!</span> { #<span class="ident">inner</span> }, <span class="number">0</span>).<span class="number">1</span>,
+<span class="kw">fn </span>wrap_in_enum_hack(dummy: String, inner: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span>dummy = Ident::new(<span class="kw-2">&amp;</span>dummy, Span::call_site());
+    <span class="macro">quote! </span>{
+        <span class="attribute">#[derive(proc_macro_hack::ProcMacroHack)]
+        </span><span class="kw">enum </span>#dummy {
+            Value = (<span class="macro">stringify! </span>{ #inner }, <span class="number">0</span>).<span class="number">1</span>,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="proc_macro_hack" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="proc_macro_hack" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

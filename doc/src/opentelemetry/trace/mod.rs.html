@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/trace/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/trace/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -342,347 +342,347 @@
 <span id="340">340</span>
 <span id="341">341</span>
 <span id="342">342</span>
-</pre><pre class="rust"><code><span class="doccomment">//! API for tracing applications and libraries.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `trace` module includes types for tracking the progression of a single</span>
-<span class="doccomment">//! request while it is handled by services that make up an application. A trace</span>
-<span class="doccomment">//! is a tree of [`Span`]s which are objects that represent the work being done</span>
-<span class="doccomment">//! by individual services or components involved in a request as it flows</span>
-<span class="doccomment">//! through a system. This module implements the OpenTelemetry [trace</span>
-<span class="doccomment">//! specification].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [trace specification]: https://github.com/open-telemetry/opentelemetry-specification/blob/v1.3.0/specification/trace/api.md</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Getting Started</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In application code:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;trace&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::{global, sdk::export::trace::stdout, trace::Tracer};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     // Create a new trace pipeline that prints to stdout</span>
-<span class="doccomment">//!     let tracer = stdout::new_pipeline().install_simple();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     tracer.in_span(&quot;doing_work&quot;, |cx| {</span>
-<span class="doccomment">//!         // Traced app logic here...</span>
-<span class="doccomment">//!     });</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // Shutdown trace pipeline</span>
-<span class="doccomment">//!     global::shutdown_tracer_provider();</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In library code:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;trace&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::{global, trace::{Span, Tracer, TracerProvider}};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn my_library_function() {</span>
-<span class="doccomment">//!     // Use the global tracer provider to get access to the user-specified</span>
-<span class="doccomment">//!     // tracer configuration</span>
-<span class="doccomment">//!     let tracer_provider = global::tracer_provider();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // Get a tracer for this library</span>
-<span class="doccomment">//!     let tracer = tracer_provider.versioned_tracer(</span>
-<span class="doccomment">//!         &quot;my_name&quot;,</span>
-<span class="doccomment">//!         Some(env!(&quot;CARGO_PKG_VERSION&quot;)),</span>
-<span class="doccomment">//!         None</span>
-<span class="doccomment">//!     );</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // Create spans</span>
-<span class="doccomment">//!     let mut span = tracer.start(&quot;doing_work&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // Do work...</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // End the span</span>
-<span class="doccomment">//!     span.end();</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Overview</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The tracing API consists of a three main traits:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [`TracerProvider`]s are the entry point of the API. They provide access to</span>
-<span class="doccomment">//!   `Tracer`s.</span>
-<span class="doccomment">//! * [`Tracer`]s are types responsible for creating `Span`s.</span>
-<span class="doccomment">//! * [`Span`]s provide the API to trace an operation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Working with Async Runtimes</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Exporting spans often involves sending data over a network or performing</span>
-<span class="doccomment">//! other I/O tasks. OpenTelemetry allows you to schedule these tasks using</span>
-<span class="doccomment">//! whichever runtime you area already using such as [Tokio] or [async-std].</span>
-<span class="doccomment">//! When using an async runtime it&#39;s best to use the [`BatchSpanProcessor`]</span>
-<span class="doccomment">//! where the spans will be sent in batches as opposed to being sent once ended,</span>
-<span class="doccomment">//! which often ends up being more efficient.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`BatchSpanProcessor`]: crate::sdk::trace::BatchSpanProcessor</span>
-<span class="doccomment">//! [Tokio]: https://tokio.rs</span>
-<span class="doccomment">//! [async-std]: https://async.rs</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Managing Active Spans</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Spans can be marked as &quot;active&quot; for a given [`Context`], and all newly</span>
-<span class="doccomment">//! created spans will automatically be children of the currently active span.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The active span for a given thread can be managed via [`get_active_span`]</span>
-<span class="doccomment">//! and [`mark_span_as_active`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Context`]: crate::Context</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;trace&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::{global, trace::{self, Span, StatusCode, Tracer, TracerProvider}};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn may_error(rand: f32) {</span>
-<span class="doccomment">//!     if rand &lt; 0.5 {</span>
-<span class="doccomment">//!         // Get the currently active span to record additional attributes,</span>
-<span class="doccomment">//!         // status, etc.</span>
-<span class="doccomment">//!         trace::get_active_span(|span| {</span>
-<span class="doccomment">//!             span.set_status(StatusCode::Error, &quot;value too small&quot;.into());</span>
-<span class="doccomment">//!         });</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Get a tracer</span>
-<span class="doccomment">//! let tracer = global::tracer(&quot;my_tracer&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Create a span</span>
-<span class="doccomment">//! let span = tracer.start(&quot;parent_span&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Mark the span as active</span>
-<span class="doccomment">//! let active = trace::mark_span_as_active(span);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Any span created here will be a child of `parent_span`...</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Drop the guard and the span will no longer be active</span>
-<span class="doccomment">//! drop(active)</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Additionally [`Tracer::with_span`] and [`Tracer::in_span`] can be used as shorthand to</span>
-<span class="doccomment">//! simplify managing the parent context.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;trace&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::{global, trace::Tracer};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Get a tracer</span>
-<span class="doccomment">//! let tracer = global::tracer(&quot;my_tracer&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Use `in_span` to create a new span and mark it as the parent, dropping it</span>
-<span class="doccomment">//! // at the end of the block.</span>
-<span class="doccomment">//! tracer.in_span(&quot;parent_span&quot;, |cx| {</span>
-<span class="doccomment">//!     // spans created here will be children of `parent_span`</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Use `with_span` to mark a span as active for a given period.</span>
-<span class="doccomment">//! let span = tracer.start(&quot;parent_span&quot;);</span>
-<span class="doccomment">//! tracer.with_span(span, |cx| {</span>
-<span class="doccomment">//!     // spans created here will be children of `parent_span`</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #### Async active spans</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Async spans can be propagated with [`TraceContextExt`] and [`FutureExt`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;trace&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::{Context, global, trace::{FutureExt, TraceContextExt, Tracer}};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! async fn some_work() { }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Get a tracer</span>
-<span class="doccomment">//! let tracer = global::tracer(&quot;my_tracer&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Start a span</span>
-<span class="doccomment">//! let span = tracer.start(&quot;my_span&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Perform some async work with this span as the currently active parent.</span>
-<span class="doccomment">//! some_work().with_context(Context::current_with_span(span));</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! API for tracing applications and libraries.
+//!
+//! The `trace` module includes types for tracking the progression of a single
+//! request while it is handled by services that make up an application. A trace
+//! is a tree of [`Span`]s which are objects that represent the work being done
+//! by individual services or components involved in a request as it flows
+//! through a system. This module implements the OpenTelemetry [trace
+//! specification].
+//!
+//! [trace specification]: https://github.com/open-telemetry/opentelemetry-specification/blob/v1.3.0/specification/trace/api.md
+//!
+//! ## Getting Started
+//!
+//! In application code:
+//!
+//! ```no_run
+//! # #[cfg(feature = &quot;trace&quot;)]
+//! # {
+//! use opentelemetry::{global, sdk::export::trace::stdout, trace::Tracer};
+//!
+//! fn main() {
+//!     // Create a new trace pipeline that prints to stdout
+//!     let tracer = stdout::new_pipeline().install_simple();
+//!
+//!     tracer.in_span(&quot;doing_work&quot;, |cx| {
+//!         // Traced app logic here...
+//!     });
+//!
+//!     // Shutdown trace pipeline
+//!     global::shutdown_tracer_provider();
+//! }
+//! # }
+//! ```
+//!
+//! In library code:
+//!
+//! ```
+//! # #[cfg(feature = &quot;trace&quot;)]
+//! # {
+//! use opentelemetry::{global, trace::{Span, Tracer, TracerProvider}};
+//!
+//! fn my_library_function() {
+//!     // Use the global tracer provider to get access to the user-specified
+//!     // tracer configuration
+//!     let tracer_provider = global::tracer_provider();
+//!
+//!     // Get a tracer for this library
+//!     let tracer = tracer_provider.versioned_tracer(
+//!         &quot;my_name&quot;,
+//!         Some(env!(&quot;CARGO_PKG_VERSION&quot;)),
+//!         None
+//!     );
+//!
+//!     // Create spans
+//!     let mut span = tracer.start(&quot;doing_work&quot;);
+//!
+//!     // Do work...
+//!
+//!     // End the span
+//!     span.end();
+//! }
+//! # }
+//! ```
+//!
+//! ## Overview
+//!
+//! The tracing API consists of a three main traits:
+//!
+//! * [`TracerProvider`]s are the entry point of the API. They provide access to
+//!   `Tracer`s.
+//! * [`Tracer`]s are types responsible for creating `Span`s.
+//! * [`Span`]s provide the API to trace an operation.
+//!
+//! ## Working with Async Runtimes
+//!
+//! Exporting spans often involves sending data over a network or performing
+//! other I/O tasks. OpenTelemetry allows you to schedule these tasks using
+//! whichever runtime you area already using such as [Tokio] or [async-std].
+//! When using an async runtime it&#39;s best to use the [`BatchSpanProcessor`]
+//! where the spans will be sent in batches as opposed to being sent once ended,
+//! which often ends up being more efficient.
+//!
+//! [`BatchSpanProcessor`]: crate::sdk::trace::BatchSpanProcessor
+//! [Tokio]: https://tokio.rs
+//! [async-std]: https://async.rs
+//!
+//! ## Managing Active Spans
+//!
+//! Spans can be marked as &quot;active&quot; for a given [`Context`], and all newly
+//! created spans will automatically be children of the currently active span.
+//!
+//! The active span for a given thread can be managed via [`get_active_span`]
+//! and [`mark_span_as_active`].
+//!
+//! [`Context`]: crate::Context
+//!
+//! ```
+//! # #[cfg(feature = &quot;trace&quot;)]
+//! # {
+//! use opentelemetry::{global, trace::{self, Span, StatusCode, Tracer, TracerProvider}};
+//!
+//! fn may_error(rand: f32) {
+//!     if rand &lt; 0.5 {
+//!         // Get the currently active span to record additional attributes,
+//!         // status, etc.
+//!         trace::get_active_span(|span| {
+//!             span.set_status(StatusCode::Error, &quot;value too small&quot;.into());
+//!         });
+//!     }
+//! }
+//!
+//! // Get a tracer
+//! let tracer = global::tracer(&quot;my_tracer&quot;);
+//!
+//! // Create a span
+//! let span = tracer.start(&quot;parent_span&quot;);
+//!
+//! // Mark the span as active
+//! let active = trace::mark_span_as_active(span);
+//!
+//! // Any span created here will be a child of `parent_span`...
+//!
+//! // Drop the guard and the span will no longer be active
+//! drop(active)
+//! # }
+//! ```
+//!
+//! Additionally [`Tracer::with_span`] and [`Tracer::in_span`] can be used as shorthand to
+//! simplify managing the parent context.
+//!
+//! ```
+//! # #[cfg(feature = &quot;trace&quot;)]
+//! # {
+//! use opentelemetry::{global, trace::Tracer};
+//!
+//! // Get a tracer
+//! let tracer = global::tracer(&quot;my_tracer&quot;);
+//!
+//! // Use `in_span` to create a new span and mark it as the parent, dropping it
+//! // at the end of the block.
+//! tracer.in_span(&quot;parent_span&quot;, |cx| {
+//!     // spans created here will be children of `parent_span`
+//! });
+//!
+//! // Use `with_span` to mark a span as active for a given period.
+//! let span = tracer.start(&quot;parent_span&quot;);
+//! tracer.with_span(span, |cx| {
+//!     // spans created here will be children of `parent_span`
+//! });
+//! # }
+//! ```
+//!
+//! #### Async active spans
+//!
+//! Async spans can be propagated with [`TraceContextExt`] and [`FutureExt`].
+//!
+//! ```
+//! # #[cfg(feature = &quot;trace&quot;)]
+//! # {
+//! use opentelemetry::{Context, global, trace::{FutureExt, TraceContextExt, Tracer}};
+//!
+//! async fn some_work() { }
+//!
+//! // Get a tracer
+//! let tracer = global::tracer(&quot;my_tracer&quot;);
+//!
+//! // Start a span
+//! let span = tracer.start(&quot;my_span&quot;);
+//!
+//! // Perform some async work with this span as the currently active parent.
+//! some_work().with_context(Context::current_with_span(span));
+//! # }
+//! ```
 
-<span class="kw">use</span> <span class="ident">futures_channel</span>::{<span class="ident">mpsc::TrySendError</span>, <span class="ident">oneshot::Canceled</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::time</span>;
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+</span><span class="kw">use </span>futures_channel::{mpsc::TrySendError, oneshot::Canceled};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::time;
+<span class="kw">use </span>thiserror::Error;
 
-<span class="kw">mod</span> <span class="ident">context</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">noop</span>;
-<span class="kw">mod</span> <span class="ident">span</span>;
-<span class="kw">mod</span> <span class="ident">span_context</span>;
-<span class="kw">mod</span> <span class="ident">tracer</span>;
-<span class="kw">mod</span> <span class="ident">tracer_provider</span>;
+<span class="kw">mod </span>context;
+<span class="kw">pub mod </span>noop;
+<span class="kw">mod </span>span;
+<span class="kw">mod </span>span_context;
+<span class="kw">mod </span>tracer;
+<span class="kw">mod </span>tracer_provider;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">context</span>::{<span class="ident">get_active_span</span>, <span class="ident">mark_span_as_active</span>, <span class="ident">FutureExt</span>, <span class="ident">SpanRef</span>, <span class="ident">TraceContextExt</span>},
-    <span class="ident">span</span>::{<span class="ident">Span</span>, <span class="ident">SpanKind</span>, <span class="ident">StatusCode</span>},
-    <span class="ident">span_context</span>::{<span class="ident">SpanContext</span>, <span class="ident">SpanId</span>, <span class="ident">TraceFlags</span>, <span class="ident">TraceId</span>, <span class="ident">TraceState</span>, <span class="ident">TraceStateError</span>},
-    <span class="ident">tracer</span>::{<span class="ident">SpanBuilder</span>, <span class="ident">Tracer</span>},
-    <span class="ident">tracer_provider::TracerProvider</span>,
+<span class="kw">pub use </span><span class="self">self</span>::{
+    context::{get_active_span, mark_span_as_active, FutureExt, SpanRef, TraceContextExt},
+    span::{Span, SpanKind, StatusCode},
+    span_context::{SpanContext, SpanId, TraceFlags, TraceId, TraceState, TraceStateError},
+    tracer::{SpanBuilder, Tracer},
+    tracer_provider::TracerProvider,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">sdk::export::ExportError</span>, <span class="ident">KeyValue</span>};
+<span class="kw">use crate</span>::{sdk::export::ExportError, KeyValue};
 
-<span class="doccomment">/// Describe the result of operations in tracing API.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TraceResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TraceError</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Describe the result of operations in tracing API.
+</span><span class="kw">pub type </span>TraceResult&lt;T&gt; = <span class="prelude-ty">Result</span>&lt;T, TraceError&gt;;
 
-<span class="doccomment">/// Errors returned by the trace API.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TraceError</span> {
-    <span class="doccomment">/// Export failed with the error returned by the exporter</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Exporter {} encountered the following error(s): {0}&quot;</span>, .<span class="number">0</span>.<span class="ident">exporter_name</span>())]</span>
-    <span class="ident">ExportFailed</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ExportError</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Errors returned by the trace API.
+</span><span class="attribute">#[derive(Error, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>TraceError {
+    <span class="doccomment">/// Export failed with the error returned by the exporter
+    </span><span class="attribute">#[error(<span class="string">&quot;Exporter {} encountered the following error(s): {0}&quot;</span>, .<span class="number">0</span>.exporter_name())]
+    </span>ExportFailed(Box&lt;<span class="kw">dyn </span>ExportError&gt;),
 
-    <span class="doccomment">/// Export failed to finish after certain period and processor stopped the export.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Exporting timed out after {} seconds&quot;</span>, .<span class="number">0</span>.<span class="ident">as_secs</span>())]</span>
-    <span class="ident">ExportTimedOut</span>(<span class="ident">time::Duration</span>),
+    <span class="doccomment">/// Export failed to finish after certain period and processor stopped the export.
+    </span><span class="attribute">#[error(<span class="string">&quot;Exporting timed out after {} seconds&quot;</span>, .<span class="number">0</span>.as_secs())]
+    </span>ExportTimedOut(time::Duration),
 
-    <span class="doccomment">/// Other errors propagated from trace SDK that weren&#39;t covered above</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">Other</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Other errors propagated from trace SDK that weren&#39;t covered above
+    </span><span class="attribute">#[error(transparent)]
+    </span>Other(<span class="attribute">#[from] </span>Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TraceError</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">ExportError</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;T&gt; <span class="kw">for </span>TraceError
+<span class="kw">where
+    </span>T: ExportError,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TraceError::ExportFailed</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))
+    <span class="kw">fn </span>from(err: T) -&gt; <span class="self">Self </span>{
+        TraceError::ExportFailed(Box::new(err))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TraceError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TraceError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>.<span class="ident">into_send_error</span>()))
+<span class="kw">impl</span>&lt;T&gt; From&lt;TrySendError&lt;T&gt;&gt; <span class="kw">for </span>TraceError {
+    <span class="kw">fn </span>from(err: TrySendError&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        TraceError::Other(Box::new(err.into_send_error()))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Canceled</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TraceError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">Canceled</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TraceError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))
+<span class="kw">impl </span>From&lt;Canceled&gt; <span class="kw">for </span>TraceError {
+    <span class="kw">fn </span>from(err: Canceled) -&gt; <span class="self">Self </span>{
+        TraceError::Other(Box::new(err))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TraceError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err_msg</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TraceError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">Custom</span>(<span class="ident">err_msg</span>)))
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>TraceError {
+    <span class="kw">fn </span>from(err_msg: String) -&gt; <span class="self">Self </span>{
+        TraceError::Other(Box::new(Custom(err_msg)))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TraceError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err_msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TraceError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">Custom</span>(<span class="ident">err_msg</span>.<span class="ident">into</span>())))
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>TraceError {
+    <span class="kw">fn </span>from(err_msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        TraceError::Other(Box::new(Custom(err_msg.into())))
     }
 }
 
-<span class="doccomment">/// Wrap type for string</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Custom</span>(<span class="ident">String</span>);
+<span class="doccomment">/// Wrap type for string
+</span><span class="attribute">#[derive(Error, Debug)]
+#[error(<span class="string">&quot;{0}&quot;</span>)]
+</span><span class="kw">struct </span>Custom(String);
 
-<span class="doccomment">/// Interface for generating IDs</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IdGenerator</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">fmt::Debug</span> {
-    <span class="doccomment">/// Generate a new `TraceId`</span>
-    <span class="kw">fn</span> <span class="ident">new_trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TraceId</span>;
+<span class="doccomment">/// Interface for generating IDs
+</span><span class="kw">pub trait </span>IdGenerator: Send + Sync + fmt::Debug {
+    <span class="doccomment">/// Generate a new `TraceId`
+    </span><span class="kw">fn </span>new_trace_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TraceId;
 
-    <span class="doccomment">/// Generate a new `SpanId`</span>
-    <span class="kw">fn</span> <span class="ident">new_span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SpanId</span>;
+    <span class="doccomment">/// Generate a new `SpanId`
+    </span><span class="kw">fn </span>new_span_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SpanId;
 }
 
-<span class="doccomment">/// A `Span` has the ability to add events. Events have a time associated</span>
-<span class="doccomment">/// with the moment when they are added to the `Span`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Event</span> {
-    <span class="doccomment">/// Event name</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Event timestamp</span>
-    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="ident">time::SystemTime</span>,
-    <span class="doccomment">/// Event attributes</span>
-    <span class="kw">pub</span> <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Number of dropped attributes</span>
-    <span class="kw">pub</span> <span class="ident">dropped_attributes_count</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// A `Span` has the ability to add events. Events have a time associated
+/// with the moment when they are added to the `Span`.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>Event {
+    <span class="doccomment">/// Event name
+    </span><span class="kw">pub </span>name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+    <span class="doccomment">/// Event timestamp
+    </span><span class="kw">pub </span>timestamp: time::SystemTime,
+    <span class="doccomment">/// Event attributes
+    </span><span class="kw">pub </span>attributes: Vec&lt;KeyValue&gt;,
+    <span class="doccomment">/// Number of dropped attributes
+    </span><span class="kw">pub </span>dropped_attributes_count: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">Event</span> {
-    <span class="doccomment">/// Create new `Event`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="ident">name</span>: <span class="ident">T</span>,
-        <span class="ident">timestamp</span>: <span class="ident">time::SystemTime</span>,
-        <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
-        <span class="ident">dropped_attributes_count</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident">Event</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">timestamp</span>,
-            <span class="ident">attributes</span>,
-            <span class="ident">dropped_attributes_count</span>,
+<span class="kw">impl </span>Event {
+    <span class="doccomment">/// Create new `Event`
+    </span><span class="kw">pub fn </span>new&lt;T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;&gt;(
+        name: T,
+        timestamp: time::SystemTime,
+        attributes: Vec&lt;KeyValue&gt;,
+        dropped_attributes_count: u32,
+    ) -&gt; <span class="self">Self </span>{
+        Event {
+            name: name.into(),
+            timestamp,
+            attributes,
+            dropped_attributes_count,
         }
     }
 
-    <span class="doccomment">/// Create new `Event` with a given name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Event</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">timestamp</span>: <span class="ident"><span class="kw">crate</span>::time::now</span>(),
-            <span class="ident">attributes</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">dropped_attributes_count</span>: <span class="number">0</span>,
+    <span class="doccomment">/// Create new `Event` with a given name.
+    </span><span class="kw">pub fn </span>with_name&lt;T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;&gt;(name: T) -&gt; <span class="self">Self </span>{
+        Event {
+            name: name.into(),
+            timestamp: <span class="kw">crate</span>::time::now(),
+            attributes: Vec::new(),
+            dropped_attributes_count: <span class="number">0</span>,
         }
     }
 }
 
-<span class="doccomment">/// During the `Span` creation user MUST have the ability to record links to other `Span`s. Linked</span>
-<span class="doccomment">/// `Span`s can be from the same or a different trace.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Link</span> {
-    <span class="ident">span_context</span>: <span class="ident">SpanContext</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">dropped_attributes_count</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// During the `Span` creation user MUST have the ability to record links to other `Span`s. Linked
+/// `Span`s can be from the same or a different trace.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>Link {
+    span_context: SpanContext,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) attributes: Vec&lt;KeyValue&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) dropped_attributes_count: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">Link</span> {
-    <span class="doccomment">/// Create a new link</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">span_context</span>: <span class="ident">SpanContext</span>, <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Link</span> {
-            <span class="ident">span_context</span>,
-            <span class="ident">attributes</span>,
-            <span class="ident">dropped_attributes_count</span>: <span class="number">0</span>,
+<span class="kw">impl </span>Link {
+    <span class="doccomment">/// Create a new link
+    </span><span class="kw">pub fn </span>new(span_context: SpanContext, attributes: Vec&lt;KeyValue&gt;) -&gt; <span class="self">Self </span>{
+        Link {
+            span_context,
+            attributes,
+            dropped_attributes_count: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// The span context of the linked span</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SpanContext</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">span_context</span>
+    <span class="doccomment">/// The span context of the linked span
+    </span><span class="kw">pub fn </span>span_context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>SpanContext {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.span_context
     }
 
-    <span class="doccomment">/// Attributes of the span link</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attributes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attributes</span>
+    <span class="doccomment">/// Attributes of the span link
+    </span><span class="kw">pub fn </span>attributes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Vec&lt;KeyValue&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.attributes
     }
 
-    <span class="doccomment">/// Dropped attributes count</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dropped_attributes_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">dropped_attributes_count</span>
+    <span class="doccomment">/// Dropped attributes count
+    </span><span class="kw">pub fn </span>dropped_attributes_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.dropped_attributes_count
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

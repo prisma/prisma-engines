@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/iter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/iter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -319,326 +319,326 @@
 <span id="319">319</span>
 <span id="320">320</span>
 <span id="321">321</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::convert::TryInto;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">de</span>::{<span class="ident">read_bool</span>, <span class="ident">MIN_BSON_DOCUMENT_SIZE</span>, <span class="ident">MIN_CODE_WITH_SCOPE_SIZE</span>},
-    <span class="ident">oid::ObjectId</span>,
-    <span class="ident">raw</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">spec</span>::{<span class="ident">BinarySubtype</span>, <span class="ident">ElementType</span>},
-    <span class="ident">DateTime</span>,
-    <span class="ident">Decimal128</span>,
-    <span class="ident">Timestamp</span>,
+<span class="kw">use crate</span>::{
+    de::{read_bool, MIN_BSON_DOCUMENT_SIZE, MIN_CODE_WITH_SCOPE_SIZE},
+    oid::ObjectId,
+    raw::{Error, ErrorKind, <span class="prelude-ty">Result</span>},
+    spec::{BinarySubtype, ElementType},
+    DateTime,
+    Decimal128,
+    Timestamp,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">bson_ref::RawDbPointerRef</span>,
-    <span class="ident">checked_add</span>,
-    <span class="ident">error::try_with_key</span>,
-    <span class="ident">f64_from_slice</span>,
-    <span class="ident">i32_from_slice</span>,
-    <span class="ident">i64_from_slice</span>,
-    <span class="ident">read_lenencoded</span>,
-    <span class="ident">read_nullterminated</span>,
-    <span class="ident">RawArray</span>,
-    <span class="ident">RawBinaryRef</span>,
-    <span class="ident">RawBsonRef</span>,
-    <span class="ident">RawDocument</span>,
-    <span class="ident">RawJavaScriptCodeWithScopeRef</span>,
-    <span class="ident">RawRegexRef</span>,
+<span class="kw">use super</span>::{
+    bson_ref::RawDbPointerRef,
+    checked_add,
+    error::try_with_key,
+    f64_from_slice,
+    i32_from_slice,
+    i64_from_slice,
+    read_lenencoded,
+    read_nullterminated,
+    RawArray,
+    RawBinaryRef,
+    RawBsonRef,
+    RawDocument,
+    RawJavaScriptCodeWithScopeRef,
+    RawRegexRef,
 };
 
-<span class="doccomment">/// An iterator over the document&#39;s entries.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span>,
-    <span class="ident">offset</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// An iterator over the document&#39;s entries.
+</span><span class="kw">pub struct </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    doc: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocument,
+    offset: usize,
 
-    <span class="doccomment">/// Whether the underlying doc is assumed to be valid or if an error has been encountered.</span>
-    <span class="doccomment">/// After an error, all subsequent iterations will return None.</span>
-    <span class="ident">valid</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether the underlying doc is assumed to be valid or if an error has been encountered.
+    /// After an error, all subsequent iterations will return None.
+    </span>valid: bool,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">doc</span>,
-            <span class="ident">offset</span>: <span class="number">4</span>,
-            <span class="ident">valid</span>: <span class="bool-val">true</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(doc: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocument) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            doc,
+            offset: <span class="number">4</span>,
+            valid: <span class="bool-val">true</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">verify_enough_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">num_bytes</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">checked_add</span>(<span class="ident">start</span>, <span class="ident">num_bytes</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>().<span class="ident">get</span>(<span class="ident">start</span>..<span class="ident">end</span>).<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(
+    <span class="kw">fn </span>verify_enough_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>, start: usize, num_bytes: usize) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>end = checked_add(start, num_bytes)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.doc.as_bytes().get(start..end).is_none() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+                message: <span class="macro">format!</span>(
                     <span class="string">&quot;length exceeds remaining length of buffer: {} vs {}&quot;</span>,
-                    <span class="ident">num_bytes</span>,
-                    <span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>() <span class="op">-</span> <span class="ident">start</span>
+                    num_bytes,
+                    <span class="self">self</span>.doc.as_bytes().len() - start
                 ),
             }));
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">next_oid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">starting_at</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">verify_enough_bytes</span>(<span class="ident">starting_at</span>, <span class="number">12</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">ObjectId::from_bytes</span>(
-            <span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">starting_at</span>..(<span class="ident">starting_at</span> <span class="op">+</span> <span class="number">12</span>)]
-                .<span class="ident">try_into</span>()
-                .<span class="ident">unwrap</span>(), <span class="comment">// ok because we know slice is 12 bytes long</span>
-        );
-        <span class="prelude-val">Ok</span>(<span class="ident">oid</span>)
+    <span class="kw">fn </span>next_oid(<span class="kw-2">&amp;</span><span class="self">self</span>, starting_at: usize) -&gt; <span class="prelude-ty">Result</span>&lt;ObjectId&gt; {
+        <span class="self">self</span>.verify_enough_bytes(starting_at, <span class="number">12</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>oid = ObjectId::from_bytes(
+            <span class="self">self</span>.doc.as_bytes()[starting_at..(starting_at + <span class="number">12</span>)]
+                .try_into()
+                .unwrap(), <span class="comment">// ok because we know slice is 12 bytes long
+        </span>);
+        <span class="prelude-val">Ok</span>(oid)
     }
 
-    <span class="kw">fn</span> <span class="ident">next_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">starting_at</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">verify_enough_bytes</span>(<span class="ident">starting_at</span>, <span class="ident">MIN_BSON_DOCUMENT_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">i32_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">starting_at</span>..])<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
+    <span class="kw">fn </span>next_document(<span class="kw-2">&amp;</span><span class="self">self</span>, starting_at: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocument&gt; {
+        <span class="self">self</span>.verify_enough_bytes(starting_at, MIN_BSON_DOCUMENT_SIZE <span class="kw">as </span>usize)<span class="question-mark">?</span>;
+        <span class="kw">let </span>size = i32_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[starting_at..])<span class="question-mark">? </span><span class="kw">as </span>usize;
 
-        <span class="kw">if</span> <span class="ident">size</span> <span class="op">&lt;</span> <span class="ident">MIN_BSON_DOCUMENT_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;document too small: {} bytes&quot;</span>, <span class="ident">size</span>),
+        <span class="kw">if </span>size &lt; MIN_BSON_DOCUMENT_SIZE <span class="kw">as </span>usize {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+                message: <span class="macro">format!</span>(<span class="string">&quot;document too small: {} bytes&quot;</span>, size),
             }));
         }
 
-        <span class="self">self</span>.<span class="ident">verify_enough_bytes</span>(<span class="ident">starting_at</span>, <span class="ident">size</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">starting_at</span> <span class="op">+</span> <span class="ident">size</span>;
+        <span class="self">self</span>.verify_enough_bytes(starting_at, size)<span class="question-mark">?</span>;
+        <span class="kw">let </span>end = starting_at + size;
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">end</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span> {
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::MalformedValue</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;not null terminated&quot;</span>.<span class="ident">into</span>(),
+        <span class="kw">if </span><span class="self">self</span>.doc.as_bytes()[end - <span class="number">1</span>] != <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error {
+                key: <span class="prelude-val">None</span>,
+                kind: ErrorKind::MalformedValue {
+                    message: <span class="string">&quot;not null terminated&quot;</span>.into(),
                 },
             });
         }
-        <span class="ident">RawDocument::from_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">starting_at</span>..<span class="ident">end</span>])
+        RawDocument::from_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[starting_at..end])
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)<span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, RawBsonRef&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">valid</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="self">self</span>.<span class="ident">offset</span>] <span class="op">==</span> <span class="number">0</span> {
-                <span class="comment">// end of document marker</span>
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">valid</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">Error</span> {
-                    <span class="ident">key</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">kind</span>: <span class="ident">ErrorKind::MalformedValue</span> {
-                        <span class="ident">message</span>: <span class="string">&quot;document not null terminated&quot;</span>.<span class="ident">into</span>(),
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, RawBsonRef&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.valid {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        } <span class="kw">else if </span><span class="self">self</span>.offset == <span class="self">self</span>.doc.as_bytes().len() - <span class="number">1 </span>{
+            <span class="kw">if </span><span class="self">self</span>.doc.as_bytes()[<span class="self">self</span>.offset] == <span class="number">0 </span>{
+                <span class="comment">// end of document marker
+                </span><span class="kw">return </span><span class="prelude-val">None</span>;
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.valid = <span class="bool-val">false</span>;
+                <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(Error {
+                    key: <span class="prelude-val">None</span>,
+                    kind: ErrorKind::MalformedValue {
+                        message: <span class="string">&quot;document not null terminated&quot;</span>.into(),
                     },
                 }));
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>() {
-            <span class="self">self</span>.<span class="ident">valid</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-                <span class="ident">message</span>: <span class="string">&quot;iteration overflowed document&quot;</span>.<span class="ident">to_string</span>(),
+        } <span class="kw">else if </span><span class="self">self</span>.offset &gt;= <span class="self">self</span>.doc.as_bytes().len() {
+            <span class="self">self</span>.valid = <span class="bool-val">false</span>;
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+                message: <span class="string">&quot;iteration overflowed document&quot;</span>.to_string(),
             })));
         }
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">read_nullterminated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>..]) {
-            <span class="prelude-val">Ok</span>(<span class="ident">k</span>) =&gt; <span class="ident">k</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">valid</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>));
+        <span class="kw">let </span>key = <span class="kw">match </span>read_nullterminated(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[<span class="self">self</span>.offset + <span class="number">1</span>..]) {
+            <span class="prelude-val">Ok</span>(k) =&gt; k,
+            <span class="prelude-val">Err</span>(e) =&gt; {
+                <span class="self">self</span>.valid = <span class="bool-val">false</span>;
+                <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e));
             }
         };
 
-        <span class="kw">let</span> <span class="ident">kvp_result</span> <span class="op">=</span> <span class="ident">try_with_key</span>(<span class="ident">key</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">valueoffset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">key</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>; <span class="comment">// type specifier + key + \0</span>
+        <span class="kw">let </span>kvp_result = try_with_key(key, || {
+            <span class="kw">let </span>valueoffset = <span class="self">self</span>.offset + <span class="number">1 </span>+ key.len() + <span class="number">1</span>; <span class="comment">// type specifier + key + \0
 
-            <span class="kw">let</span> <span class="ident">element_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ElementType::from</span>(<span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="self">self</span>.<span class="ident">offset</span>]) {
-                <span class="prelude-val">Some</span>(<span class="ident">et</span>) =&gt; <span class="ident">et</span>,
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_with_key</span>(
-                        <span class="ident">key</span>,
-                        <span class="ident">ErrorKind::MalformedValue</span> {
-                            <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid tag: {}&quot;</span>, <span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="self">self</span>.<span class="ident">offset</span>]),
+            </span><span class="kw">let </span>element_type = <span class="kw">match </span>ElementType::from(<span class="self">self</span>.doc.as_bytes()[<span class="self">self</span>.offset]) {
+                <span class="prelude-val">Some</span>(et) =&gt; et,
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_with_key(
+                        key,
+                        ErrorKind::MalformedValue {
+                            message: <span class="macro">format!</span>(<span class="string">&quot;invalid tag: {}&quot;</span>, <span class="self">self</span>.doc.as_bytes()[<span class="self">self</span>.offset]),
                         },
                     ))
                 }
             };
 
-            <span class="kw">let</span> (<span class="ident">element</span>, <span class="ident">element_size</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">element_type</span> {
-                <span class="ident">ElementType::Int32</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">i32_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..])<span class="question-mark">?</span>;
-                    (<span class="ident">RawBsonRef::Int32</span>(<span class="ident">i</span>), <span class="number">4</span>)
+            <span class="kw">let </span>(element, element_size) = <span class="kw">match </span>element_type {
+                ElementType::Int32 =&gt; {
+                    <span class="kw">let </span>i = i32_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..])<span class="question-mark">?</span>;
+                    (RawBsonRef::Int32(i), <span class="number">4</span>)
                 }
-                <span class="ident">ElementType::Int64</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">i64_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..])<span class="question-mark">?</span>;
-                    (<span class="ident">RawBsonRef::Int64</span>(<span class="ident">i</span>), <span class="number">8</span>)
+                ElementType::Int64 =&gt; {
+                    <span class="kw">let </span>i = i64_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..])<span class="question-mark">?</span>;
+                    (RawBsonRef::Int64(i), <span class="number">8</span>)
                 }
-                <span class="ident">ElementType::Double</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">f64_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..])<span class="question-mark">?</span>;
-                    (<span class="ident">RawBsonRef::Double</span>(<span class="ident">f</span>), <span class="number">8</span>)
+                ElementType::Double =&gt; {
+                    <span class="kw">let </span>f = f64_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..])<span class="question-mark">?</span>;
+                    (RawBsonRef::Double(f), <span class="number">8</span>)
                 }
-                <span class="ident">ElementType::String</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">read_lenencoded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..])<span class="question-mark">?</span>;
-                    (<span class="ident">RawBsonRef::String</span>(<span class="ident">s</span>), <span class="number">4</span> <span class="op">+</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>)
+                ElementType::String =&gt; {
+                    <span class="kw">let </span>s = read_lenencoded(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..])<span class="question-mark">?</span>;
+                    (RawBsonRef::String(s), <span class="number">4 </span>+ s.len() + <span class="number">1</span>)
                 }
-                <span class="ident">ElementType::EmbeddedDocument</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_document</span>(<span class="ident">valueoffset</span>)<span class="question-mark">?</span>;
-                    (<span class="ident">RawBsonRef::Document</span>(<span class="ident">doc</span>), <span class="ident">doc</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>())
+                ElementType::EmbeddedDocument =&gt; {
+                    <span class="kw">let </span>doc = <span class="self">self</span>.next_document(valueoffset)<span class="question-mark">?</span>;
+                    (RawBsonRef::Document(doc), doc.as_bytes().len())
                 }
-                <span class="ident">ElementType::Array</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_document</span>(<span class="ident">valueoffset</span>)<span class="question-mark">?</span>;
+                ElementType::Array =&gt; {
+                    <span class="kw">let </span>doc = <span class="self">self</span>.next_document(valueoffset)<span class="question-mark">?</span>;
                     (
-                        <span class="ident">RawBsonRef::Array</span>(<span class="ident">RawArray::from_doc</span>(<span class="ident">doc</span>)),
-                        <span class="ident">doc</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>(),
+                        RawBsonRef::Array(RawArray::from_doc(doc)),
+                        doc.as_bytes().len(),
                     )
                 }
-                <span class="ident">ElementType::Binary</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">i32_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..])<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="kw">let</span> <span class="ident">data_start</span> <span class="op">=</span> <span class="ident">valueoffset</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>;
+                ElementType::Binary =&gt; {
+                    <span class="kw">let </span>len = i32_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..])<span class="question-mark">? </span><span class="kw">as </span>usize;
+                    <span class="kw">let </span>data_start = valueoffset + <span class="number">4 </span>+ <span class="number">1</span>;
 
-                    <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">i32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-                            <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;binary length exceeds maximum: {}&quot;</span>, <span class="ident">len</span>),
+                    <span class="kw">if </span>len &gt;= i32::MAX <span class="kw">as </span>usize {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+                            message: <span class="macro">format!</span>(<span class="string">&quot;binary length exceeds maximum: {}&quot;</span>, len),
                         }));
                     }
 
-                    <span class="self">self</span>.<span class="ident">verify_enough_bytes</span>(<span class="ident">valueoffset</span> <span class="op">+</span> <span class="number">4</span>, <span class="ident">len</span> <span class="op">+</span> <span class="number">1</span>)<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">BinarySubtype::from</span>(<span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span> <span class="op">+</span> <span class="number">4</span>]);
-                    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">subtype</span> {
-                        <span class="ident">BinarySubtype::BinaryOld</span> =&gt; {
-                            <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">4</span> {
-                                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-                                    <span class="ident">message</span>: <span class="string">&quot;old binary subtype has no inner declared length&quot;</span>
-                                        .<span class="ident">into</span>(),
+                    <span class="self">self</span>.verify_enough_bytes(valueoffset + <span class="number">4</span>, len + <span class="number">1</span>)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>subtype = BinarySubtype::from(<span class="self">self</span>.doc.as_bytes()[valueoffset + <span class="number">4</span>]);
+                    <span class="kw">let </span>data = <span class="kw">match </span>subtype {
+                        BinarySubtype::BinaryOld =&gt; {
+                            <span class="kw">if </span>len &lt; <span class="number">4 </span>{
+                                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+                                    message: <span class="string">&quot;old binary subtype has no inner declared length&quot;
+                                        </span>.into(),
                                 }));
                             }
-                            <span class="kw">let</span> <span class="ident">oldlength</span> <span class="op">=</span>
-                                <span class="ident">i32_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">data_start</span>..])<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                            <span class="kw">if</span> <span class="ident">checked_add</span>(<span class="ident">oldlength</span>, <span class="number">4</span>)<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="ident">len</span> {
-                                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-                                    <span class="ident">message</span>: <span class="string">&quot;old binary subtype has wrong inner declared length&quot;</span>
-                                        .<span class="ident">into</span>(),
+                            <span class="kw">let </span>oldlength =
+                                i32_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[data_start..])<span class="question-mark">? </span><span class="kw">as </span>usize;
+                            <span class="kw">if </span>checked_add(oldlength, <span class="number">4</span>)<span class="question-mark">? </span>!= len {
+                                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+                                    message: <span class="string">&quot;old binary subtype has wrong inner declared length&quot;
+                                        </span>.into(),
                                 }));
                             }
-                            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[(<span class="ident">data_start</span> <span class="op">+</span> <span class="number">4</span>)..(<span class="ident">data_start</span> <span class="op">+</span> <span class="ident">len</span>)]
+                            <span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[(data_start + <span class="number">4</span>)..(data_start + len)]
                         }
-                        <span class="kw">_</span> =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">data_start</span>..(<span class="ident">data_start</span> <span class="op">+</span> <span class="ident">len</span>)],
+                        <span class="kw">_ </span>=&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[data_start..(data_start + len)],
                     };
                     (
-                        <span class="ident">RawBsonRef::Binary</span>(<span class="ident">RawBinaryRef</span> {
-                            <span class="ident">subtype</span>,
-                            <span class="ident">bytes</span>: <span class="ident">data</span>,
+                        RawBsonRef::Binary(RawBinaryRef {
+                            subtype,
+                            bytes: data,
                         }),
-                        <span class="number">4</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">len</span>,
+                        <span class="number">4 </span>+ <span class="number">1 </span>+ len,
                     )
                 }
-                <span class="ident">ElementType::ObjectId</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_oid</span>(<span class="ident">valueoffset</span>)<span class="question-mark">?</span>;
-                    (<span class="ident">RawBsonRef::ObjectId</span>(<span class="ident">oid</span>), <span class="number">12</span>)
+                ElementType::ObjectId =&gt; {
+                    <span class="kw">let </span>oid = <span class="self">self</span>.next_oid(valueoffset)<span class="question-mark">?</span>;
+                    (RawBsonRef::ObjectId(oid), <span class="number">12</span>)
                 }
-                <span class="ident">ElementType::Boolean</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">read_bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..]).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                        <span class="ident">Error::new_with_key</span>(
-                            <span class="ident">key</span>,
-                            <span class="ident">ErrorKind::MalformedValue</span> {
-                                <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
+                ElementType::Boolean =&gt; {
+                    <span class="kw">let </span>b = read_bool(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..]).map_err(|e| {
+                        Error::new_with_key(
+                            key,
+                            ErrorKind::MalformedValue {
+                                message: e.to_string(),
                             },
                         )
                     })<span class="question-mark">?</span>;
-                    (<span class="ident">RawBsonRef::Boolean</span>(<span class="ident">b</span>), <span class="number">1</span>)
+                    (RawBsonRef::Boolean(b), <span class="number">1</span>)
                 }
-                <span class="ident">ElementType::DateTime</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">ms</span> <span class="op">=</span> <span class="ident">i64_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..])<span class="question-mark">?</span>;
-                    (<span class="ident">RawBsonRef::DateTime</span>(<span class="ident">DateTime::from_millis</span>(<span class="ident">ms</span>)), <span class="number">8</span>)
+                ElementType::DateTime =&gt; {
+                    <span class="kw">let </span>ms = i64_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..])<span class="question-mark">?</span>;
+                    (RawBsonRef::DateTime(DateTime::from_millis(ms)), <span class="number">8</span>)
                 }
-                <span class="ident">ElementType::RegularExpression</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">pattern</span> <span class="op">=</span> <span class="ident">read_nullterminated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..])<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">read_nullterminated</span>(
-                        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[(<span class="ident">valueoffset</span> <span class="op">+</span> <span class="ident">pattern</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>)..],
+                ElementType::RegularExpression =&gt; {
+                    <span class="kw">let </span>pattern = read_nullterminated(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..])<span class="question-mark">?</span>;
+                    <span class="kw">let </span>options = read_nullterminated(
+                        <span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[(valueoffset + pattern.len() + <span class="number">1</span>)..],
                     )<span class="question-mark">?</span>;
                     (
-                        <span class="ident">RawBsonRef::RegularExpression</span>(<span class="ident">RawRegexRef</span> { <span class="ident">pattern</span>, <span class="ident">options</span> }),
-                        <span class="ident">pattern</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">options</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>,
+                        RawBsonRef::RegularExpression(RawRegexRef { pattern, options }),
+                        pattern.len() + <span class="number">1 </span>+ options.len() + <span class="number">1</span>,
                     )
                 }
-                <span class="ident">ElementType::Null</span> =&gt; (<span class="ident">RawBsonRef::Null</span>, <span class="number">0</span>),
-                <span class="ident">ElementType::Undefined</span> =&gt; (<span class="ident">RawBsonRef::Undefined</span>, <span class="number">0</span>),
-                <span class="ident">ElementType::Timestamp</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">ts</span> <span class="op">=</span> <span class="ident">Timestamp::from_reader</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..]).<span class="ident">map_err</span>(
-                        <span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                            <span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-                                <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
+                ElementType::Null =&gt; (RawBsonRef::Null, <span class="number">0</span>),
+                ElementType::Undefined =&gt; (RawBsonRef::Undefined, <span class="number">0</span>),
+                ElementType::Timestamp =&gt; {
+                    <span class="kw">let </span>ts = Timestamp::from_reader(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..]).map_err(
+                        |e| {
+                            Error::new_without_key(ErrorKind::MalformedValue {
+                                message: e.to_string(),
                             })
                         },
                     )<span class="question-mark">?</span>;
-                    (<span class="ident">RawBsonRef::Timestamp</span>(<span class="ident">ts</span>), <span class="number">8</span>)
+                    (RawBsonRef::Timestamp(ts), <span class="number">8</span>)
                 }
-                <span class="ident">ElementType::JavaScriptCode</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">read_lenencoded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..])<span class="question-mark">?</span>;
-                    (<span class="ident">RawBsonRef::JavaScriptCode</span>(<span class="ident">code</span>), <span class="number">4</span> <span class="op">+</span> <span class="ident">code</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>)
+                ElementType::JavaScriptCode =&gt; {
+                    <span class="kw">let </span>code = read_lenencoded(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..])<span class="question-mark">?</span>;
+                    (RawBsonRef::JavaScriptCode(code), <span class="number">4 </span>+ code.len() + <span class="number">1</span>)
                 }
-                <span class="ident">ElementType::JavaScriptCodeWithScope</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">i32_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..])<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
+                ElementType::JavaScriptCodeWithScope =&gt; {
+                    <span class="kw">let </span>length = i32_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..])<span class="question-mark">? </span><span class="kw">as </span>usize;
 
-                    <span class="kw">if</span> <span class="ident">length</span> <span class="op">&lt;</span> <span class="ident">MIN_CODE_WITH_SCOPE_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-                            <span class="ident">message</span>: <span class="string">&quot;code with scope length too small&quot;</span>.<span class="ident">to_string</span>(),
+                    <span class="kw">if </span>length &lt; MIN_CODE_WITH_SCOPE_SIZE <span class="kw">as </span>usize {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+                            message: <span class="string">&quot;code with scope length too small&quot;</span>.to_string(),
                         }));
                     }
 
-                    <span class="self">self</span>.<span class="ident">verify_enough_bytes</span>(<span class="ident">valueoffset</span>, <span class="ident">length</span>)<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="op">&amp;&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..(<span class="ident">valueoffset</span> <span class="op">+</span> <span class="ident">length</span>)];
-                    <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">read_lenencoded</span>(<span class="kw-2">&amp;</span><span class="ident">slice</span>[<span class="number">4</span>..])<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">scope_start</span> <span class="op">=</span> <span class="number">4</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="ident">code</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>;
-                    <span class="kw">let</span> <span class="ident">scope</span> <span class="op">=</span> <span class="ident">RawDocument::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">slice</span>[<span class="ident">scope_start</span>..])<span class="question-mark">?</span>;
+                    <span class="self">self</span>.verify_enough_bytes(valueoffset, length)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>slice = &amp;&amp;<span class="self">self</span>.doc.as_bytes()[valueoffset..(valueoffset + length)];
+                    <span class="kw">let </span>code = read_lenencoded(<span class="kw-2">&amp;</span>slice[<span class="number">4</span>..])<span class="question-mark">?</span>;
+                    <span class="kw">let </span>scope_start = <span class="number">4 </span>+ <span class="number">4 </span>+ code.len() + <span class="number">1</span>;
+                    <span class="kw">let </span>scope = RawDocument::from_bytes(<span class="kw-2">&amp;</span>slice[scope_start..])<span class="question-mark">?</span>;
                     (
-                        <span class="ident">RawBsonRef::JavaScriptCodeWithScope</span>(<span class="ident">RawJavaScriptCodeWithScopeRef</span> {
-                            <span class="ident">code</span>,
-                            <span class="ident">scope</span>,
+                        RawBsonRef::JavaScriptCodeWithScope(RawJavaScriptCodeWithScopeRef {
+                            code,
+                            scope,
                         }),
-                        <span class="ident">length</span>,
+                        length,
                     )
                 }
-                <span class="ident">ElementType::DbPointer</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">namespace</span> <span class="op">=</span> <span class="ident">read_lenencoded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..])<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_oid</span>(<span class="ident">valueoffset</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="ident">namespace</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>)<span class="question-mark">?</span>;
+                ElementType::DbPointer =&gt; {
+                    <span class="kw">let </span>namespace = read_lenencoded(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..])<span class="question-mark">?</span>;
+                    <span class="kw">let </span>id = <span class="self">self</span>.next_oid(valueoffset + <span class="number">4 </span>+ namespace.len() + <span class="number">1</span>)<span class="question-mark">?</span>;
                     (
-                        <span class="ident">RawBsonRef::DbPointer</span>(<span class="ident">RawDbPointerRef</span> { <span class="ident">namespace</span>, <span class="ident">id</span> }),
-                        <span class="number">4</span> <span class="op">+</span> <span class="ident">namespace</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">12</span>,
+                        RawBsonRef::DbPointer(RawDbPointerRef { namespace, id }),
+                        <span class="number">4 </span>+ namespace.len() + <span class="number">1 </span>+ <span class="number">12</span>,
                     )
                 }
-                <span class="ident">ElementType::Symbol</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">read_lenencoded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..])<span class="question-mark">?</span>;
-                    (<span class="ident">RawBsonRef::Symbol</span>(<span class="ident">s</span>), <span class="number">4</span> <span class="op">+</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>)
+                ElementType::Symbol =&gt; {
+                    <span class="kw">let </span>s = read_lenencoded(<span class="kw-2">&amp;</span><span class="self">self</span>.doc.as_bytes()[valueoffset..])<span class="question-mark">?</span>;
+                    (RawBsonRef::Symbol(s), <span class="number">4 </span>+ s.len() + <span class="number">1</span>)
                 }
-                <span class="ident">ElementType::Decimal128</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">verify_enough_bytes</span>(<span class="ident">valueoffset</span>, <span class="number">16</span>)<span class="question-mark">?</span>;
+                ElementType::Decimal128 =&gt; {
+                    <span class="self">self</span>.verify_enough_bytes(valueoffset, <span class="number">16</span>)<span class="question-mark">?</span>;
                     (
-                        <span class="ident">RawBsonRef::Decimal128</span>(<span class="ident">Decimal128::from_bytes</span>(
-                            <span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">valueoffset</span>..(<span class="ident">valueoffset</span> <span class="op">+</span> <span class="number">16</span>)]
-                                .<span class="ident">try_into</span>()
-                                .<span class="ident">unwrap</span>(),
+                        RawBsonRef::Decimal128(Decimal128::from_bytes(
+                            <span class="self">self</span>.doc.as_bytes()[valueoffset..(valueoffset + <span class="number">16</span>)]
+                                .try_into()
+                                .unwrap(),
                         )),
                         <span class="number">16</span>,
                     )
                 }
-                <span class="ident">ElementType::MinKey</span> =&gt; (<span class="ident">RawBsonRef::MinKey</span>, <span class="number">0</span>),
-                <span class="ident">ElementType::MaxKey</span> =&gt; (<span class="ident">RawBsonRef::MaxKey</span>, <span class="number">0</span>),
+                ElementType::MinKey =&gt; (RawBsonRef::MinKey, <span class="number">0</span>),
+                ElementType::MaxKey =&gt; (RawBsonRef::MaxKey, <span class="number">0</span>),
             };
 
-            <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">valueoffset</span> <span class="op">+</span> <span class="ident">element_size</span>;
-            <span class="self">self</span>.<span class="ident">verify_enough_bytes</span>(<span class="ident">valueoffset</span>, <span class="ident">element_size</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.offset = valueoffset + element_size;
+            <span class="self">self</span>.verify_enough_bytes(valueoffset, element_size)<span class="question-mark">?</span>;
 
-            <span class="prelude-val">Ok</span>((<span class="ident">key</span>, <span class="ident">element</span>))
+            <span class="prelude-val">Ok</span>((key, element))
         });
 
-        <span class="kw">if</span> <span class="ident">kvp_result</span>.<span class="ident">is_err</span>() {
-            <span class="self">self</span>.<span class="ident">valid</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>kvp_result.is_err() {
+            <span class="self">self</span>.valid = <span class="bool-val">false</span>;
         }
 
-        <span class="prelude-val">Some</span>(<span class="ident">kvp_result</span>)
+        <span class="prelude-val">Some</span>(kvp_result)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
